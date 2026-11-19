@@ -1022,8 +1022,10 @@ export class FinalKitFx {
           if (w) {
             const spin = whirlSpin(this.clock, warn);
             const live = kind === 'devil' ? 1 : 0.35 + 0.5 * warn;
-            const height = spin.height * 0.75;
-            const lip = R.devil * 2;
+            // Smaller than a fire tornado (about two raiders tall, its lip
+            // its reach): the player and the boss stay readable beside it.
+            const height = spin.height * 0.5;
+            const lip = R.devil * 1.6;
             w.smoke.position.set(x, y, z);
             w.smoke.scale.set(lip * 1.25, height * 1.06, lip * 1.25);
             w.outer.position.set(x, y, z);
@@ -1210,8 +1212,9 @@ export class FinalKitFx {
           this.stars.seeLane(e);
           break;
         case 'pillarCharged':
-          // Its electric ground (Jose's playtest of 2026-11-19): a hard-edged
-          // storm ring at the sim's reach, under the pillar's own arcs.
+          // Its electric ground (Jose's playtest of 2026-11-19): only a thin
+          // danger rim at the sim's reach (the raid's threat colour); the
+          // ground itself is the stars' lightning field (final_stars_fx.ts).
           this.foot(
             -(id * 4 + 3),
             'chargedZone',
@@ -1219,7 +1222,7 @@ export class FinalKitFx {
             x,
             z,
             R.chargedZone,
-            1,
+            0,
             false,
           );
           this.stars.chargedPillar(e, R.chargedZone);

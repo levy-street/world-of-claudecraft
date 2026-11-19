@@ -30,6 +30,7 @@ import {
   finalObjectSeconds,
   rootRise,
 } from '../src/render/smith_heart_fx/final_kit_fx_core';
+import { WHIRL_FRAG } from '../src/render/smith_heart_fx/final_kit_glsl';
 import {
   easeHeading,
   headingGap,
@@ -375,6 +376,8 @@ describe('FinalKitFx over a fake world', () => {
     expect(visibleNamed(root, 'smithHeartFinalIce')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalShell')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalAnvil')).toBe(1);
+    // The charged pillar's electric ground: its lightning field (2026-11-19).
+    expect(visibleNamed(root, 'smithHeartStarField')).toBe(1);
     // The personal arrow: my Ember Mark raises it over my head (the other
     // player's Drawn Lightning draws nothing on my screen); without a mark of
     // mine it goes; another player's anvil mark draws nothing, mine does.
@@ -599,6 +602,8 @@ describe('the Breath Dust Devil: the fire tornado in wind (playtest 2026-11-19)'
         wind = ((c as THREE.Mesh).material as THREE.ShaderMaterial).uniforms.uWind.value;
     });
     expect(wind).toBe(1);
+    // It thins away near the camera: never a white-out wall over the raid.
+    expect(WHIRL_FRAG).toContain('smoothstep(4.0, 16.0, vDepth)');
     const cue = {
       type: 'spellfx',
       sourceId: 40,

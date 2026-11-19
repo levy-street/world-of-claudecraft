@@ -39,6 +39,9 @@ export const STAR_COLORS = {
   boltGlow: [0.55, 0.62, 1.0] as const,
   charged: [0.82, 0.7, 1.0] as const,
   chargedHex: 0xd6c4ff,
+  /** A charged pillar's electric ground: its violet edge, its blue-white arcs. */
+  fieldEdge: [0.55, 0.42, 1.0] as const,
+  fieldArc: [0.55, 0.8, 1.0] as const,
   strikeHex: 0xe8f0ff,
   arcHex: 0xc9b2ff,
   frost: [0.72, 0.9, 1.0] as const,
@@ -59,6 +62,8 @@ export const STAR_POOLS = {
   blades: 3,
   /** Wake columns at once. */
   columns: 4,
+  /** Charged pillars' electric grounds at once (the Normal cap is eight). */
+  fields: 8,
 } as const;
 
 // ---- the bolt ------------------------------------------------------------------------

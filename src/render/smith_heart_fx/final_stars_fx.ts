@@ -68,6 +68,7 @@ import {
 import {
   COLUMN_FRAG,
   COLUMN_VERT,
+  FIELD_FRAG,
   ICE_HALO_FRAG,
   ICE_SWORD_FRAG,
   STAR_RING_FRAG,
@@ -208,6 +209,8 @@ export class FinalStarsFx {
   private readonly coreMesh: THREE.InstancedMesh;
   private readonly glowMesh: THREE.InstancedMesh;
   private readonly rings: Ring[] = [];
+  /** The charged pillars' electric grounds (pooled, by pillar id). */
+  private readonly fields: { id: number; seen: boolean; mesh: THREE.Mesh }[] = [];
   private readonly blades: Blade[] = [];
   private readonly columns: Column[] = [];
   /** This frame's lines by id (for the blades to find theirs). */
@@ -312,6 +315,34 @@ export class FinalStarsFx {
       mesh.renderOrder = floorVfxRenderOrder('encounter', h.ringRung);
       h.root.add(mesh);
       this.rings.push({ mesh, u, born: -99, radius: 1, seconds: 1, strength: 1, alive: false });
+    }
+    // ---- the charged pillars' electric ground (2026-11-19) ----
+    for (let i = 0; i < P.fields; i++) {
+      const mat = new THREE.ShaderMaterial({
+        name: 'smithHeartStarField',
+        uniforms: {
+          uTime: h.uTime,
+          uSeed: { value: i * 5.1 },
+          uPillar: { value: 0.3 },
+          uEdge: { value: new THREE.Color(...C.fieldEdge) },
+          uArc: { value: new THREE.Color(...C.fieldArc) },
+        },
+        vertexShader: STAR_RING_VERT,
+        fragmentShader: FIELD_FRAG,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+        toneMapped: false,
+      });
+      h.materials.push(mat);
+      const mesh = new THREE.Mesh(discGeo, mat);
+      mesh.name = 'smithHeartStarField';
+      mesh.frustumCulled = false;
+      mesh.visible = false;
+      mesh.renderOrder = floorVfxRenderOrder('encounter', h.ringRung);
+      h.root.add(mesh);
+      this.fields.push({ id: -1, seen: false, mesh });
     }
     // ---- the blades: the Smith's sword of ice, its cold light, its line ----
     const swordGeo = iceSwordGeometry();
@@ -427,6 +458,7 @@ export class FinalStarsFx {
     this.clock = clock;
     this.lanes.clear();
     for (const b of this.blades) b.seen = false;
+    for (const f of this.fields) f.seen = false;
   }
 
   /** The local player's drawn spot while their own Crossing Blade mark
@@ -567,9 +599,21 @@ export class FinalStarsFx {
   chargedPillar(e: Entity, zoneR = 0): void {
     const H = this.h;
     const y0 = H.groundY(e.pos.x, e.pos.z);
-    // Its electric ground (the playtest of 2026-11-19): arcs crawling over the
-    // floor from the pillar's foot out to the ring's edge, the edge spitting.
+    // Its electric ground (the playtest of 2026-11-19): the field's disc (its
+    // edge ring, arcs crawling over it, a flicker), bolts leaping out over the
+    // floor from the pillar's foot to the edge, the edge spitting.
     if (zoneR > 0) {
+      let f: (typeof this.fields)[number] | null = null;
+      for (const k of this.fields) if (k.id === e.id) f = k;
+      if (!f) for (const k of this.fields) if (!f && k.id < 0) f = k;
+      if (f) {
+        f.id = e.id;
+        f.seen = true;
+        f.mesh.position.set(e.pos.x, y0 + 0.1, e.pos.z);
+        f.mesh.scale.setScalar(zoneR);
+        (f.mesh.material as THREE.ShaderMaterial).uniforms.uPillar.value = 2.4 / zoneR;
+        f.mesh.visible = true;
+      }
       if (H.rand() < 0.45) {
         const a = H.rand() * Math.PI * 2;
         const b = a + (H.rand() - 0.5) * 0.9;
@@ -648,6 +692,11 @@ export class FinalStarsFx {
   /** The frame ends: the blades and their lines, the bolts, the rings and
    *  the columns. */
   end(): void {
+    for (const f of this.fields)
+      if (!f.seen && f.id >= 0) {
+        f.id = -1;
+        f.mesh.visible = false;
+      }
     this.paintBlades();
     this.paintBolts();
     this.paintRings();
@@ -763,8 +812,8 @@ export class FinalStarsFx {
     // The pulse rolling out over the floor to the whole raid (Jose's playtest
     // of 2026-11-19: it must be felt and seen): a bright ring racing across
     // the room, a second one on its heels, a flash up the pillar.
-    this.ring(pillar.pos.x, pillar.pos.z, 46, 1.1, C.arcHex, 1, 1.6);
-    this.ring(pillar.pos.x, pillar.pos.z, 30, 0.8, C.chargedHex, 0.6, 1.1);
+    this.ring(pillar.pos.x, pillar.pos.z, 46, 1.2, 0x8fc4ff, 1, 2.4);
+    this.ring(pillar.pos.x, pillar.pos.z, 30, 0.9, 0xb49cff, 0.6, 1.6);
     for (let k = 0; k < 3; k++)
       this.leap(
         pillar.pos.x,
@@ -836,6 +885,10 @@ export class FinalStarsFx {
     for (const r of this.rings) {
       r.alive = false;
       r.mesh.visible = false;
+    }
+    for (const f of this.fields) {
+      f.id = -1;
+      f.mesh.visible = false;
     }
     for (const b of this.blades) {
       b.id = -1;

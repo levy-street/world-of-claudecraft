@@ -70,6 +70,7 @@ uniform float uTwist;
 uniform float uSeed;
 varying vec2 vUv;
 varying float vH;
+varying float vDepth;
 void main() {
   vUv = uv;
   vec3 p = position;
@@ -85,7 +86,9 @@ void main() {
   float sway = sin(uTime * 1.3 + uSeed);
   p.x += sway * 0.35 * sin(p.y * 3.14159) + sin(uTime * 2.1 + uSeed * 1.7) * 0.22 * p.y * p.y;
   p.z += cos(uTime * 1.1 + uSeed) * 0.25 * sin(p.y * 3.14159);
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  vDepth = -mv.z;
+  gl_Position = projectionMatrix * mv;
 }
 `;
 
@@ -100,6 +103,7 @@ uniform vec3 uFire;
 // 2026-11-19): white, pale sky blue and grey dust, no ember glow.
 uniform float uWind;
 uniform vec3 uDust;
+varying float vDepth;
 varying vec2 vUv;
 varying float vH;
 ${KIT_NOISE}
@@ -118,8 +122,11 @@ void main() {
     float a = (0.35 + 0.65 * streak) * smoothstep(0.05, 0.55, vUv.y) * lip * 0.8;
     vec3 c = mix(vec3(0.07, 0.05, 0.04), uFire * vec3(0.5, 0.17, 0.05), (1.0 - vUv.y) * 0.6 * streak);
     // The wind's sheath: grey dust thick at the foot, paling up the flare.
-    vec3 w = mix(uDust * 0.75, mix(uDust, uFire, 0.35), vUv.y + streak * 0.3);
-    gl_FragColor = vec4(mix(c, w, uWind), a * uAlpha * mix(1.0, 0.7, uWind));
+    vec3 w = mix(uDust * 0.75, mix(uDust, uFire, 0.5), vUv.y + streak * 0.3);
+    // A Dust Devil thins to nothing close to the camera (never a white-out
+    // wall over the player and the boss) and stays a light veil of dust.
+    float nearW = mix(1.0, smoothstep(4.0, 16.0, vDepth), uWind);
+    gl_FragColor = vec4(mix(c, w, uWind), a * uAlpha * mix(1.0, 0.38, uWind) * nearW);
     return;
   }
   if (uWind > 0.5) {
@@ -128,8 +135,9 @@ void main() {
     float gust = clamp((1.0 - vUv.y) * 0.6 + streak * 0.6 + core * 0.3, 0.0, 1.0);
     vec3 wc = mix(uFire * 0.55, uFire, smoothstep(0.2, 0.7, gust));
     wc = mix(wc, uCore, smoothstep(0.7, 1.0, gust) * mix(0.4, 0.8, core));
-    float wb = (0.2 + 0.8 * streak) * lip * foot;
-    gl_FragColor = vec4(wc * (0.5 + 0.4 * gust), wb * uAlpha * mix(0.7, 0.55, core));
+    float wb = (0.15 + 0.85 * streak) * lip * foot;
+    float nearB = smoothstep(4.0, 16.0, vDepth);
+    gl_FragColor = vec4(wc * (0.45 + 0.35 * gust), wb * uAlpha * mix(0.42, 0.34, core) * nearB);
     return;
   }
   // Fire: hottest at the throat where it tears the floor, deep red up the
