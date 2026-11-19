@@ -53,6 +53,7 @@ describe("the final kits' element telegraphs", () => {
       whirl: 'fire',
       // The Breath's Dust Devil (Jose's playtest of 2026-11-19).
       devil: 'storm',
+      chargedZone: 'storm',
       pool: 'fire',
       ember: 'fire',
       crack: 'frost',

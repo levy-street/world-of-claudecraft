@@ -598,6 +598,14 @@ export class FinalKitFx {
       }
       else if (ev.ability === FINAL_CUES.shell) this.dustAt(x, z, 10, 1.4);
       else if (ev.ability === FINAL_CUES.charged) this.chargedPulse(target);
+      else if (ev.ability === FINAL_CUES.chargedHit || ev.ability === FINAL_CUES.chargedZone) {
+        // The pulse (or the ground) strikes a player: a violet-white crack on
+        // them, a small ring at their feet, a bolt from the pillar for the pulse.
+        const big = ev.ability === FINAL_CUES.chargedHit;
+        this.sparkAt(x, z, C.storm, big ? 16 : 6, big ? 1.5 : 0.9);
+        this.particles.shockRing(x, z, 0xe2d4ff, big ? 3 : 1.8, big ? 0.35 : 0.25);
+        if (big && source) this.addArc(source.id, target.id);
+      }
       else if (ev.ability === FINAL_CUES.rise) {
         this.dustAt(x, z, 30, 3.5);
         this.particles.shockRing(x, z, 0xe8c070, R.rise * 1.6, 0.5);
@@ -1204,7 +1212,19 @@ export class FinalKitFx {
           this.stars.seeLane(e);
           break;
         case 'pillarCharged':
-          this.stars.chargedPillar(e);
+          // Its electric ground (Jose's playtest of 2026-11-19): a hard-edged
+          // storm ring at the sim's reach, under the pillar's own arcs.
+          this.foot(
+            -(id * 4 + 3),
+            'chargedZone',
+            FINAL_FOOTPRINTS.chargedZone,
+            x,
+            z,
+            R.chargedZone,
+            1,
+            false,
+          );
+          this.stars.chargedPillar(e, R.chargedZone);
           break;
         default:
       }

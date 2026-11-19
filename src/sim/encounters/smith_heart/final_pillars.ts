@@ -15,7 +15,11 @@
 //                standing pillar onto the whole raid instead: break them.
 //   Charged      a Sky Strike that falls by a pillar leaves it Storm-Charged
 //                (final_sky.ts); every charged pillar pulses the whole raid
-//                every few seconds while it stands (summed per pillar).
+//                every 5 s while it stands (summed per pillar; 90 to 110 a
+//                pillar on Normal since Jose's playtest of 2026-11-19, a cue
+//                on each player struck), and its ground is electric: whoever
+//                stands within 5.5 yd of it is bitten every second (Charged
+//                Ground).
 //
 // Zero rng in every pick (hashed, distance and roster order); the only draws
 // are the damage rolls, in player order.
@@ -267,11 +271,46 @@ export function pulseCharged(s: FinalScope): Entity[] {
   }
   const [min, max] = chargedPulse(charged.length, s.rules.chargedMin, s.rules.chargedMax);
   const struck: Entity[] = [];
+  const source = s.ctx.entities.get(charged[0].objectId);
   for (const p of livePlayers(s)) {
     hit(s, p, roll(s, min, max), FINAL_NAMES.charged, 'nature');
     struck.push(p);
+    // The hit reads on the player: its flash and crack (the client's).
+    if (source)
+      s.ctx.emit({
+        type: 'spellfx',
+        sourceId: source.id,
+        targetId: p.id,
+        school: 'nature',
+        fx: 'nova',
+        ability: FINAL_CUES.chargedHit,
+      });
   }
   return struck;
+}
+
+/** Charged Ground: each charged pillar bites whoever stands within its
+ *  reach (per pillar). Returns the bites dealt. */
+export function biteChargedGround(s: FinalScope): number {
+  let bites = 0;
+  for (const pillar of s.st.stars.pillars) {
+    if (!pillar.charged) continue;
+    for (const p of livePlayers(s)) {
+      const q = at(s, p);
+      if (Math.hypot(q.x - pillar.x, q.z - pillar.z) > T.chargedZoneR + 1e-6) continue;
+      hit(s, p, roll(s, T.chargedZoneMin, T.chargedZoneMax), FINAL_NAMES.chargedZone, 'nature');
+      s.ctx.emit({
+        type: 'spellfx',
+        sourceId: pillar.objectId,
+        targetId: p.id,
+        school: 'nature',
+        fx: 'nova',
+        ability: FINAL_CUES.chargedZone,
+      });
+      bites++;
+    }
+  }
+  return bites;
 }
 
 /** One tick of the rises (each pillar bursts out at its time) and of the
@@ -297,7 +336,13 @@ export function stepPillars(s: FinalScope, live: boolean): void {
   if (!live) return;
   if (!st.pillars.some((p) => p.charged)) {
     st.chargedTimer = T.chargedEvery;
+    st.zoneTimer = T.chargedZoneEvery;
     return;
+  }
+  st.zoneTimer -= DT;
+  if (st.zoneTimer <= 1e-9) {
+    st.zoneTimer = T.chargedZoneEvery;
+    biteChargedGround(s);
   }
   st.chargedTimer -= DT;
   if (st.chargedTimer > 1e-9) return;

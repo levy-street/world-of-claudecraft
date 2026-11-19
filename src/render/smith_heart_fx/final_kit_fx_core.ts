@@ -139,6 +139,9 @@ export const FINAL_KIT_COLORS = {
  *  precedent): stand IN them. */
 export const FINAL_FOOTPRINTS = {
   whirl: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xffb060 },
+  /** A Storm-Charged pillar's electric ground (Jose's playtest of
+   *  2026-11-19): danger (it bites every second), a violet-white crackle. */
+  chargedZone: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xe2d4ff },
   /** A Dust Devil: the threat colour (it throws), a wind-white accent. */
   devil: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xdcecff },
   pool: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xff8a3a },
@@ -169,6 +172,7 @@ export const FINAL_FOOTPRINTS = {
 export const FINAL_REACH = {
   whirl: T.whirlR,
   devil: T.devilR,
+  chargedZone: T.chargedZoneR,
   ember: T.emberR,
   forge: T.forgeFireR,
   crack: T.iceR,

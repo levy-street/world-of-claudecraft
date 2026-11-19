@@ -564,9 +564,41 @@ export class FinalStarsFx {
   }
 
   /** A Storm-Charged pillar this frame (its crawling arcs). */
-  chargedPillar(e: Entity): void {
+  chargedPillar(e: Entity, zoneR = 0): void {
     const H = this.h;
     const y0 = H.groundY(e.pos.x, e.pos.z);
+    // Its electric ground (the playtest of 2026-11-19): arcs crawling over the
+    // floor from the pillar's foot out to the ring's edge, the edge spitting.
+    if (zoneR > 0) {
+      if (H.rand() < 0.45) {
+        const a = H.rand() * Math.PI * 2;
+        const b = a + (H.rand() - 0.5) * 0.9;
+        const r0 = 2.4 + H.rand();
+        this.leap(
+          e.pos.x + Math.cos(a) * r0,
+          y0 + 0.15,
+          e.pos.z + Math.sin(a) * r0,
+          e.pos.x + Math.cos(b) * zoneR,
+          y0 + 0.15,
+          e.pos.z + Math.sin(b) * zoneR,
+          0.12,
+          0.55,
+        );
+      }
+      if (H.rand() < 0.7 * H.density) {
+        const a = H.rand() * Math.PI * 2;
+        H.particles.puff(e.pos.x + Math.cos(a) * zoneR, y0 + 0.2, e.pos.z + Math.sin(a) * zoneR, 1, {
+          speed: 2.5,
+          up: 1.2,
+          life: 0.25,
+          size: [0.35, 0.05],
+          color: C.charged,
+          alpha: 1,
+          pool: 'glow',
+          gravity: 6,
+        });
+      }
+    }
     // Arcs climbing the stone: from low on its face up and round it.
     for (let k = 0; k < 3; k++) {
       const arc = chargedArc(this.clock, e.id, k);
@@ -721,9 +753,24 @@ export class FinalStarsFx {
       const t = targets[i];
       this.leap(pillar.pos.x, y + 9.5, pillar.pos.z, t.x, t.y + 1.3, t.z, 0.3, 0.75);
     }
-    H.particles.shockRing(pillar.pos.x, pillar.pos.z, C.chargedHex, 9, 0.5);
-    // The pulse rolling out over the floor (it reaches the whole raid).
-    this.ring(pillar.pos.x, pillar.pos.z, 16, 0.9, C.arcHex, 1, 1.3);
+    H.particles.shockRing(pillar.pos.x, pillar.pos.z, C.chargedHex, 12, 0.55);
+    // The pulse rolling out over the floor to the whole raid (Jose's playtest
+    // of 2026-11-19: it must be felt and seen): a bright ring racing across
+    // the room, a second one on its heels, a flash up the pillar.
+    this.ring(pillar.pos.x, pillar.pos.z, 46, 1.1, C.arcHex, 1, 1.6);
+    this.ring(pillar.pos.x, pillar.pos.z, 30, 0.8, C.chargedHex, 0.6, 1.1);
+    for (let k = 0; k < 3; k++)
+      this.leap(
+        pillar.pos.x,
+        y + 0.5,
+        pillar.pos.z,
+        pillar.pos.x + (H.rand() - 0.5) * 1.5,
+        y + 11,
+        pillar.pos.z + (H.rand() - 0.5) * 1.5,
+        0.25,
+        0.9,
+      );
+    H.shake(pillar.pos.x, pillar.pos.z, 0.18, 40);
   }
 
   /** A pillar shattered by a blade: frost and stone bursting out. */

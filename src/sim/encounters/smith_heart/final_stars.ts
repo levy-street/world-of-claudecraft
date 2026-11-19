@@ -45,6 +45,7 @@ export function freshStars(): FinalStarsState {
     blade: null,
     bladeQueue: [],
     chargedTimer: T.chargedEvery,
+    zoneTimer: T.chargedZoneEvery,
     volleys: 0,
     thrums: 0,
     shattered: 0,
