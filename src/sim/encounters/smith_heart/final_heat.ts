@@ -31,6 +31,7 @@ import { DT, type Entity } from '../../types';
 import { clearCastIf } from '../sunken_bastion/claim';
 import {
   FINAL_AURAS,
+  devilTemplate,
   FINAL_CASTS,
   FINAL_CUES,
   FINAL_NAMES,
@@ -249,7 +250,7 @@ export function raiseWhirls(s: FinalScope): number {
   return n;
 }
 
-/** One tick of every Fire Whirl. */
+/** One tick of every Fire Whirl (and every Breath Dust Devil). */
 export function stepWhirls(s: FinalScope): void {
   const st = s.st;
   if (st.whirls.length === 0) return;
@@ -257,9 +258,14 @@ export function stepWhirls(s: FinalScope): void {
   for (const w of st.whirls) {
     const obj = s.ctx.entities.get(w.objectId);
     if (!obj) continue;
+    // A Breath Dust Devil (final_breath.ts) runs the same loop on its own
+    // numbers: it wanders, and it throws instead of burning.
+    const wind = w.wind === true;
+    const speed = wind ? T.devilSpeed : T.whirlSpeed;
+    const reach = wind ? T.devilR : T.whirlR;
     if (w.warn > 0) {
       w.warn -= DT;
-      if (w.warn <= 1e-9) obj.templateId = whirlTemplate('live');
+      if (w.warn <= 1e-9) obj.templateId = wind ? devilTemplate('live') : whirlTemplate('live');
       keep.push(w);
       continue;
     }
@@ -268,16 +274,26 @@ export function stepWhirls(s: FinalScope): void {
       dropFightObject(s.ctx, s.inst, w.objectId);
       continue;
     }
+    if (wind) {
+      // It wanders: a hashed turn of up to 60 degrees either way, every few seconds.
+      w.turn = (w.turn ?? T.devilTurnEvery) - DT;
+      if (w.turn <= 1e-9) {
+        w.turn = T.devilTurnEvery;
+        const h = finalHash(obj.id, Math.round(w.life * 10));
+        w.heading += (((h % 121) - 60) * Math.PI) / 180;
+        obj.facing = w.heading;
+      }
+    }
     const p = at(s, obj);
     let next = {
-      x: p.x + Math.sin(w.heading) * T.whirlSpeed * DT,
-      z: p.z + Math.cos(w.heading) * T.whirlSpeed * DT,
+      x: p.x + Math.sin(w.heading) * speed * DT,
+      z: p.z + Math.cos(w.heading) * speed * DT,
     };
-    if (fromCentre(next) > HEART_ROOM.r - T.whirlR) {
+    if (fromCentre(next) > HEART_ROOM.r - reach) {
       // Off the rim: turn back toward the centre.
       w.heading = facingTo(next, HEART_ROOM);
       obj.facing = w.heading;
-      next = onFloor(next, T.whirlR);
+      next = onFloor(next, reach);
     }
     // At a fallen quarter's edge: it turns for the centre, never out over it.
     if (overTheVoid(s, next)) {
@@ -289,7 +305,7 @@ export function stepWhirls(s: FinalScope): void {
     // raids of 2026-11-18: tornadoes rolling into the stacked soakers): the
     // raid's one gather is never a tornado's.
     const anvil = st.anvil;
-    if (anvil && Math.hypot(next.x - anvil.x, next.z - anvil.z) < T.anvilR + T.whirlR) {
+    if (anvil && Math.hypot(next.x - anvil.x, next.z - anvil.z) < T.anvilR + reach) {
       w.heading = facingTo(anvil, p);
       obj.facing = w.heading;
       next = p;
@@ -303,16 +319,23 @@ export function stepWhirls(s: FinalScope): void {
     for (const pl of livePlayers(s)) {
       if (w.cooldown[pl.id] !== undefined) continue;
       const here = at(s, pl);
-      if (Math.hypot(here.x - next.x, here.z - next.z) > T.whirlR) continue;
-      w.cooldown[pl.id] = T.whirlHitEvery;
-      hit(s, pl, roll(s, T.whirlMin, T.whirlMax), FINAL_NAMES.whirl, 'fire');
+      if (Math.hypot(here.x - next.x, here.z - next.z) > reach) continue;
+      if (wind) {
+        w.cooldown[pl.id] = T.devilHitEvery;
+        hit(s, pl, roll(s, T.devilMin, T.devilMax), FINAL_NAMES.devil, 'nature');
+        // Thrown out of it, away from its eye.
+        if (!pl.dead) s.ctx.applyKnockback(obj, pl, T.devilKnockback);
+      } else {
+        w.cooldown[pl.id] = T.whirlHitEvery;
+        hit(s, pl, roll(s, T.whirlMin, T.whirlMax), FINAL_NAMES.whirl, 'fire');
+      }
       s.ctx.emit({
         type: 'spellfx',
         sourceId: obj.id,
         targetId: pl.id,
-        school: 'fire',
+        school: wind ? 'nature' : 'fire',
         fx: 'nova',
-        ability: FINAL_CUES.whirl,
+        ability: wind ? FINAL_CUES.devil : FINAL_CUES.whirl,
       });
     }
     keep.push(w);

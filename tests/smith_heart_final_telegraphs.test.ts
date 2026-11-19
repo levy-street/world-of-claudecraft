@@ -51,6 +51,8 @@ describe("the final kits' element telegraphs", () => {
   it('paints each quarter in its own element', () => {
     const want: Record<FinalTelegraphKind, string> = {
       whirl: 'fire',
+      // The Breath's Dust Devil (Jose's playtest of 2026-11-19).
+      devil: 'storm',
       pool: 'fire',
       ember: 'fire',
       crack: 'frost',

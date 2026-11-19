@@ -185,6 +185,8 @@ export class FinalKitFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly whirls: WhirlBody[] = [];
+  /** The Breath's Dust Devils: the same bodies in wind. */
+  private readonly devils: WhirlBody[] = [];
   private readonly tornadoRocks: THREE.InstancedMesh;
   private readonly orbs: OrbBody[] = [];
   private readonly ice: THREE.Mesh[] = [];
@@ -337,16 +339,21 @@ export class FinalKitFx {
       this.tornadoRocks.setMatrixAt(i, _tm.makeScale(0, 0, 0));
     this.tornadoRocks.visible = false;
     this.root.add(this.tornadoRocks);
-    for (let i = 0; i < P.whirls; i++) {
+    // The Breath's Dust Devils (Jose's playtest of 2026-11-19) are the same
+    // tornado in wind: its own pool, white, sky blue and grey dust.
+    for (let i = 0; i < P.whirls + P.devils; i++) {
+      const wind = i >= P.whirls;
       const seedU = { value: fxHash(i, 5) * 20 };
       const outerU = {
         uTime: this.uTime,
         uAlpha: { value: 1 },
         uCoreK: { value: 0 },
         uSeed: seedU,
-        uTwist: { value: 1.6 },
-        uCore: col(C.fireCore),
-        uFire: col(C.fire),
+        uTwist: { value: wind ? 2.1 : 1.6 },
+        uCore: col(wind ? C.windCore : C.fireCore),
+        uFire: col(wind ? C.wind : C.fire),
+        uWind: { value: wind ? 1 : 0 },
+        uDust: col(C.windDust),
       };
       const coreU = {
         ...outerU,
@@ -366,19 +373,19 @@ export class FinalKitFx {
         shader('smithHeartFinalWhirlSmoke', smokeU, WHIRL_VERT, WHIRL_FRAG, {
           side: THREE.DoubleSide,
         }),
-        'smithHeartFinalWhirlSmoke',
+        wind ? 'smithHeartFinalDevilSmoke' : 'smithHeartFinalWhirlSmoke',
       );
       const outer = mesh(
         funnel,
         shader('smithHeartFinalWhirl', outerU, WHIRL_VERT, WHIRL_FRAG, extra),
-        'smithHeartFinalWhirl',
+        wind ? 'smithHeartFinalDevil' : 'smithHeartFinalWhirl',
       );
       const core = mesh(
         coreGeo,
         shader('smithHeartFinalWhirlCore', coreU, WHIRL_VERT, WHIRL_FRAG, extra),
-        'smithHeartFinalWhirlCore',
+        wind ? 'smithHeartFinalDevilCore' : 'smithHeartFinalWhirlCore',
       );
-      this.whirls.push({ smoke, outer, core, smokeU, outerU, coreU });
+      (wind ? this.devils : this.whirls).push({ smoke, outer, core, smokeU, outerU, coreU });
     }
     // The Storm Orbs: a fresnel shell of storm light, a pulsing core, a ring
     // turning round it.
@@ -584,6 +591,11 @@ export class FinalKitFx {
       const x = fxAnchor(target).x;
       const z = fxAnchor(target).z;
       if (ev.ability === FINAL_CUES.whirl) this.sparkAt(x, z, C.fire, 14, 1.4);
+      else if (ev.ability === FINAL_CUES.devil) {
+        // Thrown by a Dust Devil: a burst of dust and a pale gust ring.
+        this.dustAt(x, z, 18, 2.2);
+        this.particles.shockRing(x, z, 0xdcecff, 4.5, 0.4);
+      }
       else if (ev.ability === FINAL_CUES.shell) this.dustAt(x, z, 10, 1.4);
       else if (ev.ability === FINAL_CUES.charged) this.chargedPulse(target);
       else if (ev.ability === FINAL_CUES.rise) {
@@ -885,6 +897,7 @@ export class FinalKitFx {
 
   private paintObjects(world: IWorld): void {
     let whirl = 0;
+    let devil = 0;
     let rocksUsed = 0;
     let orb = 0;
     for (const id of this.objectIds) {
@@ -988,6 +1001,69 @@ export class FinalKitFx {
                   spread: 0.3,
                 },
               );
+            }
+          }
+          break;
+        }
+        case 'devilWarn':
+        case 'devil': {
+          // A Breath Dust Devil (Jose's playtest of 2026-11-19): the fire
+          // tornado in wind, smaller and lower, dust whipped round its foot and
+          // streaks of wind thrown off it; it throws whoever it touches.
+          const warn = kind === 'devilWarn' ? timedFill(age, T.devilWarn) : 1;
+          this.foot(id, 'devil', FINAL_FOOTPRINTS.devil, x, z, R.devil, warn, true);
+          const w = this.devils[devil++];
+          if (w) {
+            const spin = whirlSpin(this.clock, warn);
+            const live = kind === 'devil' ? 1 : 0.35 + 0.5 * warn;
+            const height = spin.height * 0.75;
+            const lip = R.devil * 2;
+            w.smoke.position.set(x, y, z);
+            w.smoke.scale.set(lip * 1.25, height * 1.06, lip * 1.25);
+            w.outer.position.set(x, y, z);
+            w.outer.scale.set(lip, height, lip);
+            w.core.position.set(x, y, z);
+            w.core.scale.set(lip * 0.45, height * 0.94, lip * 0.45);
+            w.smokeU.uAlpha.value = live;
+            w.outerU.uAlpha.value = live;
+            w.coreU.uAlpha.value = live;
+            w.smoke.visible = true;
+            w.outer.visible = true;
+            w.core.visible = true;
+            const on = (kind === 'devil' ? 1 : warn) * this.density;
+            // Dust scoured up round its foot, whipped round.
+            for (let k = 0; k < 2; k++) {
+              if (this.rand() > on) continue;
+              const a = this.rand() * Math.PI * 2;
+              const rr = R.devil * (0.5 + 0.7 * this.rand());
+              this.particles.puff(x + Math.cos(a) * rr, y + 0.25, z + Math.sin(a) * rr, 1, {
+                speed: 4.5,
+                up: 2.5 + this.rand() * 2,
+                life: 1.1,
+                size: [1.1, 2.8],
+                color: C.windDust,
+                alpha: 0.4,
+                dir: [-Math.sin(a), 0.35, Math.cos(a)],
+                spread: 0.25,
+              });
+            }
+            // Streaks of wind spiralling up and flung off its lip.
+            for (let k = 0; k < 2; k++) {
+              if (this.rand() > on) continue;
+              const a = this.clock * 9 + this.rand() * Math.PI * 2;
+              const hh = 0.15 + this.rand() * 0.6;
+              const rr = lip * tornadoProfile(hh);
+              this.particles.puff(x + Math.cos(a) * rr, y + hh * height, z + Math.sin(a) * rr, 1, {
+                speed: 7,
+                up: 3 + this.rand() * 3,
+                life: 0.8,
+                size: [0.35, 0.08],
+                color: C.windCore,
+                alpha: 0.9,
+                pool: 'glow',
+                dir: [-Math.sin(a), 0.25, Math.cos(a)],
+                spread: 0.1,
+              });
             }
           }
           break;
@@ -1141,6 +1217,11 @@ export class FinalKitFx {
       this.whirls[i].smoke.visible = false;
       this.whirls[i].outer.visible = false;
       this.whirls[i].core.visible = false;
+    }
+    for (let i = devil; i < this.devils.length; i++) {
+      this.devils[i].smoke.visible = false;
+      this.devils[i].outer.visible = false;
+      this.devils[i].core.visible = false;
     }
     for (let i = orb; i < this.orbs.length; i++) {
       const ob = this.orbs[i];
@@ -1350,7 +1431,7 @@ export class FinalKitFx {
       }
     this.slotByKey.clear();
     this.seen.clear();
-    for (const w of this.whirls) {
+    for (const w of [...this.whirls, ...this.devils]) {
       w.smoke.visible = false;
       w.outer.visible = false;
       w.core.visible = false;

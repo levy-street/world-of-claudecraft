@@ -58,6 +58,7 @@ import {
   HEAT_TUNING,
   swellLaneOf,
 } from '../../src/sim/encounters/smith_heart/heat_ids';
+import { laneReach } from '../../src/sim/encounters/smith_heart/heat_geometry';
 import {
   add,
   alive,
@@ -174,12 +175,16 @@ export const final = {
       else if (t.startsWith(FINAL_OBJECTS.anvilPrefix))
         o.anvils.push({ ...at, r: at.r || T.anvilR });
       else if (t.startsWith(FINAL_OBJECTS.crackPrefix)) o.ice.push({ ...at, r: at.r + 1.2 });
-      else if (t.startsWith(FINAL_OBJECTS.whirlPrefix)) {
-        // A tornado rolls on at 4.5 yd a second: keep clear of where it
-        // will be, not only where it is (the Heroic bot raids of 2026-11-18).
+      else if (
+        t.startsWith(FINAL_OBJECTS.whirlPrefix) ||
+        t.startsWith(FINAL_OBJECTS.devilPrefix)
+      ) {
+        // A tornado rolls on (6.3 yd a second since 2026-11-19; a Breath Dust
+        // Devil 5, wandering): keep clear of where it will be, not only where
+        // it is (the Heroic bot raids of 2026-11-18).
         const r = at.r + 2;
         const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
-        o.danger.push({ ...at, r }, { ...add(at, d, 4), r }, { ...add(at, d, 8), r: r - 1 });
+        o.danger.push({ ...at, r }, { ...add(at, d, 5), r }, { ...add(at, d, 10), r: r - 1 });
       } else if (
         t.startsWith(FINAL_OBJECTS.whirlPrefix) ||
         t.startsWith(FINAL_OBJECTS.poolPrefix) ||
@@ -199,7 +204,17 @@ export const final = {
         const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
         o.lanes.push({
           from: { x: at.x, z: at.z },
-          to: add(at, d, HEAT_TUNING.laneLength),
+          // To the Anvil's rim since 2026-11-19 (laneReach), never the guardian's 32 yd.
+          to: add(
+            at,
+            d,
+            laneReach(
+              at.x - (world.origin?.x ?? 0),
+              at.z - (world.origin?.z ?? 0),
+              at.f,
+              HEAT_TUNING.laneLength,
+            ),
+          ),
           half: HEAT_TUNING.laneHalf + 1,
         });
       }

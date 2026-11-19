@@ -8,7 +8,7 @@
 //     central ring to the rim with a bright front, its light washed over the
 //     stones (a floor mark on the ground rung), its element rising off it in
 //     layers: the Hammer's floating grit, its tremor's chips and dust bursts;
-//     the Breath's dust devils, wind streaks and ground veils; the Quench's
+//     the Breath's wind streaks and ground veils; the Quench's
 //     frost mist, rising rime, crystal growing along its veins and its ice
 //     lit from inside; the Heat's embers, heat haze, flames licking out of
 //     its fissures and the lava pulses running out along them (the Heat
@@ -85,7 +85,6 @@ import {
 import {
   BLAZE_FRAG,
   BLAZE_VERT,
-  BREATH_DEVIL_VERT,
   BREATH_SHEET_VERT,
   BREATH_STREAK_VERT,
   CRYSTAL_FRAG,
@@ -475,30 +474,10 @@ export function buildHeartQuarters(
     seedQuads('hammer', n(A.hammer.dust), 2, (h) => [h[0], h[1], 0, 0]),
     airMaterial('smithHeartQuarterDust', HAMMER_DUST_VERT, 0xa07c4c, 0xd8b480, 0.3),
   );
-  // The Breath: dust devils (every mote of a devil on its anchor), streaks
-  // and low veils of dust along the spiral.
+  // The Breath: streaks and low veils of dust along the spiral. (Its dust
+  // devils left the dressing with Jose's playtest of 2026-11-19: a whirlwind
+  // in the Breath is now the boss's Dust Devil, final_breath.ts, which throws.)
   {
-    const anchors = heartQuarterSeeds('breath', A.breath.devils, 3, 5, 20, 54);
-    const bases: HeartAirV3[] = [];
-    const params: HeartAirV4[] = [];
-    anchors.forEach((a, d) => {
-      const m = n(A.breath.perDevil);
-      for (let i = 0; i < m; i++) {
-        bases.push(local(a.x, a.z));
-        params.push([
-          (i * 0.618034 + d * 0.31) % 1,
-          (i * 0.754877) % 1,
-          0.7 + a.h[0] * 0.6,
-          d / A.breath.devils,
-        ]);
-      }
-    });
-    addAir(
-      'breath',
-      'heartQuarterDevils:breath',
-      quads(bases, params),
-      airMaterial('smithHeartQuarterDevils', BREATH_DEVIL_VERT, 0xa8a4d8, 0xe4f0ff, 0.55),
-    );
     const streaks = heartQuarterSeeds('breath', n(A.breath.streaks), 4);
     addAir(
       'breath',

@@ -11,6 +11,14 @@
 //   Drawn Lightning  Heroic, every 22 s (first 12 s in): two marked players
 //                    for 6 s; every second it arcs from each to everyone
 //                    within 8 yd of them.
+//   Dust Devils      every 20 s (first 9 s in; Jose's playtest of 2026-11-19:
+//                    the quarter's whirlwinds were dressing, now they do
+//                    something): the tier's count (2 Normal, 3 Heroic and
+//                    Mythic) rise a few yards off hashed players (2 s of
+//                    warning), then wander the floor for 9 s; whoever one
+//                    touches is thrown 8 yd out of it and takes a little
+//                    nature damage (at most once in 2 s). Their loop is the
+//                    Fire Whirl's (final_heat.ts stepWhirls, `wind`).
 //   Storm Orbs       Mythic, every 25 s (first 15 s in): three orbs round the
 //                    boss; each must be stepped on by one player (a jolt;
 //                    two or more share nothing, each takes it twice over)
@@ -23,6 +31,7 @@
 import { DT, type Entity } from '../../types';
 import {
   boltScale,
+  devilTemplate,
   FINAL_AURAS,
   FINAL_CASTS,
   FINAL_CUES,
@@ -225,4 +234,47 @@ export function clearBreath(
   st.drawn = [];
   st.boltTarget = null;
   for (const p of players) dropAura(p, FINAL_AURAS.drawn);
+}
+
+// ---- Dust Devils -------------------------------------------------------------------------
+
+/** The tier's Dust Devils rise a few yards off hashed players. Returns how
+ *  many. Exported for the dev trigger. */
+export function raiseDevils(s: FinalScope): number {
+  const st = s.st;
+  st.kit.devil = T.devilEvery;
+  const victims = pickPlayers(s, s.rules.devilCount, st.casts + 501);
+  let n = 0;
+  victims.forEach((v, i) => {
+    const h = finalHash(s.boss.id, st.casts * 17 + i + 3);
+    const heading = ((h % 360) * Math.PI) / 180;
+    const p = at(s, v);
+    const spot = standingSpot(
+      s,
+      onFloor({ x: p.x - Math.sin(heading) * 6, z: p.z - Math.cos(heading) * 6 }, 3),
+      p,
+    );
+    const obj = spawnFightObject(
+      s.ctx,
+      s.inst,
+      devilTemplate('warn'),
+      FINAL_NAMES.devil,
+      spot.x,
+      spot.z,
+      T.devilR,
+    );
+    obj.facing = heading;
+    st.whirls.push({
+      objectId: obj.id,
+      warn: T.devilWarn,
+      life: T.devilLife,
+      heading,
+      cooldown: {},
+      wind: true,
+      turn: T.devilTurnEvery,
+    });
+    n++;
+  });
+  st.casts++;
+  return n;
 }

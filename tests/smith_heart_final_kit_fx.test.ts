@@ -42,6 +42,7 @@ import {
   FINAL_AURAS,
   FINAL_BOSS,
   FINAL_CASTS,
+  devilTemplate,
   FINAL_CUES,
   FINAL_OBJECTS,
   finalBladeTemplate,
@@ -556,6 +557,52 @@ describe("Crossing Blade follows the local player's drawn pose (playtest 2026-11
     for (let i = 0; i < 30; i++) fx.update(1 / 30);
     const back = Math.atan2(from.x - (h?.position.x ?? 0), from.z - (h?.position.z ?? 0));
     expect(headingGap(back, lateFacing)).toBeLessThan(0.01);
+    fx.dispose();
+  });
+});
+
+describe('the Breath Dust Devil: the fire tornado in wind (playtest 2026-11-19)', () => {
+  it("draws a devil with the tornado's own bodies, its wind palette, and claims its cue", () => {
+    expect(finalObjectKind(devilTemplate('warn'))).toBe('devilWarn');
+    expect(finalObjectKind(devilTemplate('live'))).toBe('devil');
+    expect(FINAL_REACH.devil).toBe(T.devilR);
+    const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
+    const at = (dx: number, dz: number) => ({ x: o.x + HEART_ROOM.x + dx, z: o.z + HEART_ROOM.z + dz });
+    const entities = new Map<number, Entity>();
+    const p = at(0, -30);
+    const me = entity(1, 'player', 'warrior', p.x, p.z);
+    entities.set(me.id, me);
+    const d = at(4, -26);
+    entities.set(40, entity(40, 'object', devilTemplate('live'), d.x, d.z, { scale: T.devilR }));
+    const world = { entities, player: me, playerId: me.id, entityRosterVersion: 1 } as unknown as IWorld;
+    const scene = new THREE.Scene();
+    const fx = new FinalKitFx(scene, () => 0, world);
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    const root = scene.getObjectByName('smith-heart-final-kit-fx');
+    expect(visibleNamed(root, 'smithHeartFinalDevil')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartFinalDevilCore')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartFinalDevilSmoke')).toBe(1);
+    // Never a fire whirl.
+    expect(visibleNamed(root, 'smithHeartFinalWhirl')).toBe(0);
+    let wind = -1;
+    root?.traverse((c) => {
+      if (c.name === 'smithHeartFinalDevil' && c.visible)
+        wind = ((c as THREE.Mesh).material as THREE.ShaderMaterial).uniforms.uWind.value;
+    });
+    expect(wind).toBe(1);
+    const cue = {
+      type: 'spellfx',
+      sourceId: 40,
+      targetId: 1,
+      school: 'nature',
+      fx: 'nova',
+      ability: FINAL_CUES.devil,
+    } as SimEvent;
+    expect(fx.handleEvent(cue)).toBe(true);
+    entities.delete(40);
+    (world as { entityRosterVersion: number }).entityRosterVersion = 2;
+    for (let i = 0; i < 3; i++) fx.update(1 / 30);
+    expect(visibleNamed(root, 'smithHeartFinalDevil')).toBe(0);
     fx.dispose();
   });
 });
