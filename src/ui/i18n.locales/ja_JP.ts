@@ -3593,6 +3593,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '中にプレイヤーがいる間はインスタンスをリセットできません。',
   'hudChrome.dungeonDifficulty.queuedOccupied':
     'プレイヤーかその死体がまだインスタンス内にあるため、難易度の変更を予約しました。インスタンス内に誰もおらず、死体もなくなれば変更を適用します。',
+  'hudChrome.dungeonDifficulty.queuedCooldown':
+    '難易度の変更を予約しました。リセットのクールダウンが終わると適用します。',
+  'hudChrome.dungeonDifficulty.queuedLoot':
+    '難易度の変更を予約しました。インスタンス内の戦利品が回収されるか、空のインスタンスが閉じると適用します。',
   'hudChrome.dungeonDifficulty.queuedCancelled':
     'パーティーまたはリーダーが変更されたため、予約していた難易度の変更をキャンセルしました。',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':

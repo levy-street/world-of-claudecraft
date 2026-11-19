@@ -5387,6 +5387,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Нельзя сбросить подземелья, пока внутри кто-то находится.',
   'hudChrome.dungeonDifficulty.queuedOccupied':
     'Смена сложности поставлена в очередь: внутри подземелья ещё есть игрок или его тело. Изменение применится, когда подземелья освободятся.',
+  'hudChrome.dungeonDifficulty.queuedCooldown':
+    'Смена сложности поставлена в очередь. Изменение применится, когда закончится время восстановления сброса.',
+  'hudChrome.dungeonDifficulty.queuedLoot':
+    'Смена сложности поставлена в очередь. Изменение применится, когда добычу внутри заберут или пустые подземелья закроются.',
   'hudChrome.dungeonDifficulty.queuedCancelled':
     'Ожидающая смена сложности отменена, поскольку изменились группа или её лидер.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':

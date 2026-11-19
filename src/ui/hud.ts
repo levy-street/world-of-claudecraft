@@ -16832,11 +16832,9 @@ export class Hud {
         this.socialWindow.selectRaidTab();
       } else if (act === 'loot-settings') this.openLootSettings();
       else if (act === 'leave-party') this.sim.partyLeave();
-      else if (act === 'dungeon-difficulty') {
-        this.sim.setDungeonDifficulty(
-          this.sim.dungeonDifficulty() === 'heroic' ? 'normal' : 'heroic',
-        );
-      } else if (act === 'reset-dungeons') {
+      else if (act === 'dungeon-difficulty-heroic') this.sim.setDungeonDifficulty('heroic');
+      else if (act === 'dungeon-difficulty-normal') this.sim.setDungeonDifficulty('normal');
+      else if (act === 'reset-dungeons') {
         this.confirmDialog(
           t('hudChrome.dungeonDifficulty.resetConfirmTitle'),
           t('hudChrome.dungeonDifficulty.resetConfirmBody'),

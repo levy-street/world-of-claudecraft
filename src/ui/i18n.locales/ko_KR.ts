@@ -3569,6 +3569,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아직 안에 플레이어가 있으면 인스턴스를 초기화할 수 없습니다.',
   'hudChrome.dungeonDifficulty.queuedOccupied':
     '아직 인스턴스 안에 플레이어 또는 그 시체가 있어 난이도 변경을 대기열에 등록했습니다. 인스턴스가 비면 변경이 적용됩니다.',
+  'hudChrome.dungeonDifficulty.queuedCooldown':
+    '난이도 변경을 대기열에 등록했습니다. 초기화 재사용 대기시간이 끝나면 변경이 적용됩니다.',
+  'hudChrome.dungeonDifficulty.queuedLoot':
+    '난이도 변경을 대기열에 등록했습니다. 인스턴스 안의 전리품을 가져가거나 빈 인스턴스가 닫히면 변경이 적용됩니다.',
   'hudChrome.dungeonDifficulty.queuedCancelled':
     '파티 또는 파티장이 변경되어 대기 중인 난이도 변경이 취소되었습니다.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':

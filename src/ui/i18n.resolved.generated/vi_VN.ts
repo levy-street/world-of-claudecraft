@@ -4344,6 +4344,8 @@ export const vi_VN: EnTranslations = {
       "resetOccupied": "Bạn không thể đặt lại phụ bản khi vẫn còn người ở bên trong.",
       "queuedOccupied": "Đổi độ khó được xếp hàng vì vẫn còn người hoặc thi thể bên trong. Sẽ áp dụng khi các phụ bản trống.",
       "queuedCancelled": "Đã hủy đổi độ khó đang chờ vì nhóm hoặc trưởng nhóm thay đổi.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Hãy đổi độ khó hầm ngục trước khi đặt lại các phụ bản này. Phụ bản trống sẽ tự đặt lại sau 5 phút.",
       "resetLoot": "Bạn không thể đặt lại phụ bản khi vẫn còn chiến lợi phẩm bên trong.",
       "resetConfirmTitle": "Đặt Lại Tất Cả Phụ Bản?",

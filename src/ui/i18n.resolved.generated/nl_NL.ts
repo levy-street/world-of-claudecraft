@@ -4344,6 +4344,8 @@ export const nl_NL: EnTranslations = {
       "resetOccupied": "Je kunt instanties niet resetten zolang er nog iemand binnen is.",
       "queuedOccupied": "Moeilijkheidswijziging wacht omdat er nog iemand of een lijk binnen is. Ze wordt toegepast zodra de instanties leeg zijn.",
       "queuedCancelled": "Wachtende moeilijkheidswijziging geannuleerd omdat de groep of leider veranderde.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Wijzig de kerkermoeilijkheid voordat je deze instanties reset. Lege instanties resetten zichzelf na 5 minuten.",
       "resetLoot": "Je kunt instanties niet resetten zolang er nog buit binnen ligt.",
       "resetConfirmTitle": "Alle instanties resetten?",

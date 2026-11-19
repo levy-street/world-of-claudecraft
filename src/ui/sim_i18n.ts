@@ -30803,6 +30803,14 @@ const RULES: Rule[] = [
     build: () => t('hudChrome.dungeonDifficulty.queuedCancelled'),
   },
   {
+    re: /^Difficulty change queued\. It will apply when the reset cooldown ends\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.queuedCooldown'),
+  },
+  {
+    re: /^Difficulty change queued\. It will apply once the loot inside is taken or the empty instances close\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.queuedLoot'),
+  },
+  {
     re: /^Change dungeon difficulty before resetting these instances\. Empty instances reset on their own after 5 minutes\.$/,
     build: () => t('hudChrome.dungeonDifficulty.resetSameDifficulty'),
   },

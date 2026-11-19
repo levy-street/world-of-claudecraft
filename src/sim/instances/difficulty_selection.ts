@@ -6,13 +6,28 @@ import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type DungeonDifficulty, isDungeonDifficulty } from '../types';
 import { claimDifficultyForDungeon } from './difficulty';
-import { instanceClaimContains, resetDungeonInstances } from './dungeons';
+import { type InstanceResetResult, instanceClaimContains, resetDungeonInstances } from './dungeons';
 
 export interface PendingDifficultyChange {
   key: string;
   difficulty: DungeonDifficulty;
   lastReason: string;
 }
+
+type BlockedReason = Extract<InstanceResetResult, { status: 'blocked' }>['reason'];
+
+/** The queued notice per blocker. Every blocker that clears on its own within
+ *  minutes is queued. A lockout has no entry: it can last days, and a request
+ *  left queued that long would fire on a group that has long moved on (freeing
+ *  a run in progress) and announce a tier the door still refuses. An authority
+ *  refusal is final too. Each line is re-localized by the client matcher
+ *  (src/ui/sim_i18n.ts). */
+export const QUEUED_DIFFICULTY_TEXT: Readonly<Partial<Record<BlockedReason, string>>> = {
+  occupancy:
+    'Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.',
+  cooldown: 'Difficulty change queued. It will apply when the reset cooldown ends.',
+  loot: 'Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.',
+};
 
 function applied(ctx: SimContext, pid: number, difficulty: DungeonDifficulty): void {
   ctx.error(
@@ -97,16 +112,18 @@ export function setDungeonDifficulty(
     return;
   }
   ctx.error(id, result.text);
-  if (result.reason === 'occupancy') {
+  // Every blocker that clears on its own within minutes (someone leaves, the
+  // cooldown runs out, the loot is taken, or the empty-instance reaper frees the
+  // claim) is queued and retried, so the leader never has to click again. A
+  // lockout or authority refusal is final (see QUEUED_DIFFICULTY_TEXT).
+  const queued = QUEUED_DIFFICULTY_TEXT[result.reason];
+  if (queued) {
     ctx.pendingDifficultyChanges.set(id, {
       key: ctx.instanceKeyFor(id),
       difficulty,
       lastReason: result.text,
     });
-    ctx.error(
-      id,
-      'Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.',
-    );
+    ctx.error(id, queued);
   }
 }
 

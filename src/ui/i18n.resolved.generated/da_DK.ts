@@ -4344,6 +4344,8 @@ export const da_DK: EnTranslations = {
       "resetOccupied": "Du kan ikke nulstille instanser, mens nogen stadig er derinde.",
       "queuedOccupied": "Ændringen af sværhedsgrad venter, fordi nogen eller deres lig stadig er indenfor. Den træder i kraft, når instanserne er tomme.",
       "queuedCancelled": "Den ventende ændring af sværhedsgrad blev annulleret, fordi gruppen eller lederen blev ændret.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Skift fangekældersværhedsgrad, før du nulstiller disse instanser. Tomme instanser nulstilles automatisk efter 5 minutter.",
       "resetLoot": "Du kan ikke nulstille instanser, mens der stadig er bytte derinde.",
       "resetConfirmTitle": "Nulstil alle instanser?",

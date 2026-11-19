@@ -1236,6 +1236,8 @@ describe('dungeons: heroic difficulty', () => {
     const bastionExit = bastion.exitId;
     const lootMob = sim.entities.get(bastion.mobIds[0]) as AnyEntity;
     lootMob.lootable = true;
+    // A shared uncommon drop: loot the gate keeps (a bare lootable body does not).
+    lootMob.loot = { copper: 0, items: [{ itemId: 'redbrook_blade', count: 1 }] };
     sim.setDungeonDifficulty('heroic', pid);
 
     sim.resetDungeonInstances(pid);

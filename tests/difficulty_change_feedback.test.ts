@@ -2,6 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { audio } from '../src/game/audio';
+import { QUEUED_DIFFICULTY_TEXT } from '../src/sim/instances/difficulty_selection';
 import type { SimEvent } from '../src/sim/types';
 import { ErrorToastController } from '../src/ui/error_toast_controller';
 import { Hud } from '../src/ui/hud';
@@ -21,6 +22,9 @@ vi.mock('../src/render/characters/portrait', () => ({
 const queued =
   'Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.';
 const cancelled = 'Queued difficulty change cancelled because the party or leader changed.';
+// Read from the sim's own table, so a matcher drifting from the emitted line fails here.
+const queuedCooldown = QUEUED_DIFFICULTY_TEXT.cooldown!;
+const queuedLoot = QUEUED_DIFFICULTY_TEXT.loot!;
 
 function rig() {
   const toast = document.createElement('div');
@@ -71,6 +75,8 @@ describe('difficulty change feedback reaches the screen and chat', () => {
     'Instances can only be reset once every 5 minutes.',
     'You are locked to Heroic Nythraxis Raid Arena.',
     queued,
+    queuedCooldown,
+    queuedLoot,
     cancelled,
   ])('shows and retains the reason: %s', (text) => {
     const { toast, hud, send } = rig();
@@ -84,10 +90,17 @@ describe('difficulty change feedback reaches the screen and chat', () => {
     expect(hud.log).toHaveBeenCalledTimes(1);
   });
 
+  it('queues exactly the blockers that clear on their own within minutes', () => {
+    expect(Object.keys(QUEUED_DIFFICULTY_TEXT).sort()).toEqual(['cooldown', 'loot', 'occupancy']);
+    expect(QUEUED_DIFFICULTY_TEXT.occupancy).toBe(queued);
+  });
+
   it('resolves queue and cancellation messages through their translation keys', () => {
     vi.spyOn(i18n, 't').mockImplementation((key) => `Translated ${key}`);
     for (const [text, key] of [
       [queued, 'hudChrome.dungeonDifficulty.queuedOccupied'],
+      [queuedCooldown, 'hudChrome.dungeonDifficulty.queuedCooldown'],
+      [queuedLoot, 'hudChrome.dungeonDifficulty.queuedLoot'],
       [cancelled, 'hudChrome.dungeonDifficulty.queuedCancelled'],
     ]) {
       const { toast, hud, send } = rig();

@@ -56,7 +56,8 @@ export type SelfPlayerContextActionId =
   | 'convert-party'
   | 'loot-settings'
   | 'leave-party'
-  | 'dungeon-difficulty'
+  | 'dungeon-difficulty-heroic'
+  | 'dungeon-difficulty-normal'
   | 'dungeon-difficulty-status'
   | 'reset-dungeons'
   | 'close';
@@ -101,14 +102,24 @@ export function selfPlayerContextActions(
         ),
       });
     }
-    actions.push({
-      id: 'dungeon-difficulty',
-      label: t(
-        state.isHeroic
-          ? 'hudChrome.dungeonDifficulty.setNormal'
-          : 'hudChrome.dungeonDifficulty.setHeroic',
-      ),
-    });
+    // Each row names the tier it sends. Normally that is the other tier. While a
+    // change has not landed, the first row RETRIES the selected tier (flipping
+    // the selection there sent the old tier instead, which "applied" without
+    // doing anything) and the second keeps the tier the instances are on.
+    const selected: DungeonDifficulty = state.isHeroic ? 'heroic' : 'normal';
+    const targets: DungeonDifficulty[] = state.unappliedDifficulty
+      ? [selected, state.unappliedDifficulty]
+      : [selected === 'heroic' ? 'normal' : 'heroic'];
+    for (const target of targets) {
+      actions.push({
+        id: target === 'heroic' ? 'dungeon-difficulty-heroic' : 'dungeon-difficulty-normal',
+        label: t(
+          target === 'heroic'
+            ? 'hudChrome.dungeonDifficulty.setHeroic'
+            : 'hudChrome.dungeonDifficulty.setNormal',
+        ),
+      });
+    }
     actions.push({ id: 'reset-dungeons', label: t('hudChrome.dungeonDifficulty.resetAll') });
   }
   actions.push({ id: 'close', label: t('hud.chat.context.cancel') });

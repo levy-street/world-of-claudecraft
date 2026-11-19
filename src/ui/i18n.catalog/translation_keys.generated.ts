@@ -14545,6 +14545,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.dungeonDifficulty.entryMismatchHeroic'
   | 'hudChrome.dungeonDifficulty.entryMismatchNormal'
   | 'hudChrome.dungeonDifficulty.queuedCancelled'
+  | 'hudChrome.dungeonDifficulty.queuedCooldown'
+  | 'hudChrome.dungeonDifficulty.queuedLoot'
   | 'hudChrome.dungeonDifficulty.queuedOccupied'
   | 'hudChrome.dungeonDifficulty.resetAll'
   | 'hudChrome.dungeonDifficulty.resetAlreadyFresh'
