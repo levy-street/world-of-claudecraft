@@ -26,10 +26,14 @@ export const TRANSIENT_MOB_PORTRAIT_SOURCE_IDS: Readonly<Record<string, string>>
 });
 
 // A mob whose visual comes from a procedural world renderer rather than the
-// creature manifest keeps its hand-painted portrait here, outside the
-// deterministic mob-render ledger (the retired Vale Cup ball was the one
-// occupant; the seam stays for the next bespoke-visual mob).
-const STATIC_MOB_PORTRAIT_URLS: Readonly<Record<string, string>> = Object.freeze({});
+// creature manifest keeps its own baked portrait here, outside the
+// deterministic mob-render ledger (the retired Vale Cup ball was the first
+// occupant). The Breath's Stillstone is a bodyless usable body whose crystal
+// the fight's painter draws (render/smith_heart_fx/breath_stillstone_fx.ts),
+// baked from that same crystal by scripts/render_stillstone_portrait.mjs.
+const STATIC_MOB_PORTRAIT_URLS: Readonly<Record<string, string>> = Object.freeze({
+  heart_breath_stillstone: '/ui/portraits/heart_breath_stillstone.webp',
+});
 
 export function targetPortraitSourceId(templateId: string, isMobEntity: boolean): string | null {
   if (!isMobEntity) return null;
