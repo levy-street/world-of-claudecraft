@@ -9,8 +9,8 @@
 //     CouncilFx's, the council's own pillars);
 //   - each footprint's look on the shared floor telegraph (`FINAL_FOOTPRINTS`:
 //     its threat colour and its element accent, on every tier);
-//   - the timed footprints' fill (`timedFill`) and the whirls', orbs' and
-//     roots' motion (`whirlSpin`, `orbBob`, `rootRise`; the anvil's whole
+//   - the timed footprints' fill (`timedFill`) and the whirls' and
+//     orbs' motion (`whirlSpin`, `orbBob`; the anvil's whole
 //     look is final_anvil_core.ts's);
 //   - the vein palette, the cues the painter claims (no generic burst doubles
 //     them), the floor rungs (`FINAL_KIT_FLOOR`: never tied with FinalFx's
@@ -247,14 +247,6 @@ export function shockWave(age: number): { front: number; alpha: number } {
   return { front: 4 + 92 * (1 - (1 - k) ** 2), alpha: (1 - k) ** 1.3 };
 }
 
-/** Taking Root's rock spikes round the boss's feet: how far up they stand
- *  (0..1) `left` seconds before the root lets go. */
-export function rootRise(left: number, total = T.rootSeconds): number {
-  if (left <= 0) return 0;
-  const grown = total - left;
-  return smooth(grown / 0.6) * smooth(left / 0.8);
-}
-
 // ---- the cues ------------------------------------------------------------------------
 
 const CLAIMED: ReadonlySet<string> = new Set(Object.values(FINAL_CUES));
@@ -313,5 +305,4 @@ export const FINAL_KIT_POOLS = {
   shells: 6,
   arcs: 16,
   arcSegments: 5,
-  rootSpikes: 10,
 } as const;

@@ -48,7 +48,7 @@ import {
   finalDevMechanic,
   finalDifficulty,
   finalReadout,
-  releaseRootForDev,
+  releaseBarForDev,
   resetFinalForDev,
   setFinalDevTier,
 } from '../encounters/smith_heart';
@@ -87,7 +87,7 @@ function quarterVerb(ctx: SimContext, inst: InstanceSlot, arg: string, pid: numb
   const boss = smithHeartFinalBoss(ctx, inst);
   if (!boss) return 'The Masterless Strength has fallen in this run (/dev heart reset).';
   const live = boss.smithHeartFinal !== undefined;
-  if (live) releaseRootForDev(ctx, inst);
+  if (live) releaseBarForDev(ctx, inst);
   standIn(ctx, inst, boss, zone);
   if (zone === 'ring' && !live) {
     // The final phase forced: its share of health (never raised past it).

@@ -28,7 +28,6 @@ import {
   finalKitRungs,
   finalObjectKind,
   finalObjectSeconds,
-  rootRise,
 } from '../src/render/smith_heart_fx/final_kit_fx_core';
 import { WHIRL_FRAG } from '../src/render/smith_heart_fx/final_kit_glsl';
 import {
@@ -158,15 +157,12 @@ describe("the final kits' plan", () => {
       expect(FINAL_KIT_FLOOR.telegraphChar).not.toBe(r);
   });
 
-  it('hangs the anvil high through its bar and lands it at the end; the root rises and sinks', () => {
+  it('hangs the anvil high through its bar and lands it at the end', () => {
     expect(anvilHang(0).height).toBeGreaterThan(15);
     expect(anvilHang(0.7).height).toBeGreaterThan(15);
     expect(anvilHang(1).height).toBeLessThan(0.5);
     for (let f = 0.8; f < 1; f += 0.02)
       expect(anvilHang(f + 0.02).height).toBeLessThanOrEqual(anvilHang(f).height + 1e-9);
-    expect(rootRise(T.rootSeconds)).toBe(0);
-    expect(rootRise(T.rootSeconds / 2)).toBeCloseTo(1, 5);
-    expect(rootRise(0)).toBe(0);
   });
 
   it("lays Basalt Fist's lanes on the Anvil out to its rim, all the way (playtest 2026-11-19)", () => {
@@ -295,15 +291,6 @@ describe('FinalKitFx over a fake world', () => {
       castTargetId: 3,
       auras: [
         {
-          id: FINAL_AURAS.root,
-          name: 'x',
-          kind: 'root',
-          remaining: 4,
-          duration: T.rootSeconds,
-          value: 0,
-          sourceId: 2,
-        },
-        {
           id: FINAL_AURAS.unbound,
           name: 'x',
           kind: 'internal_cd',
@@ -422,7 +409,8 @@ describe('FinalKitFx over a fake world', () => {
     fx.update(1 / 30);
     expect(visibleNamed(root, 'smithHeartStarBolts')).toBe(1);
     expect(visibleNamed(root, 'smithHeartStarRing')).toBeGreaterThanOrEqual(2);
-    expect(visibleNamed(root, 'smithHeartFinalRootSpikes')).toBe(1);
+    // No Taking Root since 2026-11-19: no rock spikes round its feet.
+    expect(visibleNamed(root, 'smithHeartFinalRootSpikes')).toBe(0);
     expect(visibleNamed(root, 'smithHeartFinalUnbound')).toBe(1);
     // A leap of lightning on its cue, claimed.
     const bolt = {

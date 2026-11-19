@@ -5,8 +5,6 @@
 //     (Breath, Quench, Hammer, Heat), the one the boss stands in highlighted
 //     and filling, the others draining; a bar three quarters full is in
 //     danger (its burst is near);
-//   - Taking Root's seconds left (the boss's root aura), or that it can be
-//     dragged;
 //   - Vein-Shaken's seconds left (Heroic: the state aura's `value3`), the
 //     window a quarter change hits three times as hard;
 //   - Heart Unbound's stacks while it stands in the central ring;
@@ -76,8 +74,6 @@ export interface OverloadView {
   visible: boolean;
   rows: OverloadRow[];
   /** The root's line ('Rooted 12' or 'Can be dragged'). */
-  root: string;
-  rooted: boolean;
   /** Vein-Shaken's line ('' when none). */
   shaken: string;
   /** Heart Unbound's line ('' when none). */
@@ -122,8 +118,6 @@ export function makeOverloadView(): OverloadView {
       pctText: '',
       aria: '',
     })),
-    root: '',
-    rooted: false,
     shaken: '',
     unbound: '',
     frozen: false,
@@ -172,14 +166,6 @@ export function buildOverloadView(boss: OverloadBoss | null, out: OverloadView):
       pct: formatNumber(row.pct, { maximumFractionDigits: 0 }),
     });
   }
-  const root = auraOf(boss.auras, FINAL_AURAS.root);
-  out.rooted = !!root && (root.remaining ?? 0) > 0;
-  out.root =
-    out.frozen || out.barsOff
-      ? ''
-      : out.rooted
-        ? t('hudChrome.finalOverload.rooted', { seconds: whole(root?.remaining ?? 0) })
-        : t('hudChrome.finalOverload.free');
   const shaken = Math.round(state.value3 ?? 0);
   out.shaken =
     shaken > 0 && !out.barsOff

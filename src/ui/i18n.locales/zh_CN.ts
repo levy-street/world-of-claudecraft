@@ -24454,8 +24454,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '吐息过载，已满{value}%。首领站在吐息区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.overloadHammer':
     '重锤过载，已满{value}%。首领站在重锤区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。',
-  'hudChrome.auraEffect.finalBoss.root':
-    '进入一个区域后扎根{seconds}秒：扎根结束前无法把它拖出去。',
   'hudChrome.auraEffect.finalBoss.unbound':
     '每层每秒对整个团队造成{per}点伤害（当前{total}点）；站在中央圆环内时每秒获得一层。把它拖出圆环即可结束。英雄难度：每层{heroicPer}点。史诗难度：每层{mythicPer}点。',
   'hudChrome.auraEffect.finalBoss.shaken':
@@ -24479,8 +24477,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.quench': '淬火',
   'hudChrome.finalOverload.breath': '吐息',
   'hudChrome.finalOverload.hammer': '重锤',
-  'hudChrome.finalOverload.rooted': '扎根 {seconds}',
-  'hudChrome.finalOverload.free': '可以拖动',
   'hudChrome.finalOverload.shaken': '动摇 {seconds}',
   'hudChrome.finalOverload.unbound': '脱缚 x{stacks}',
   'hudChrome.finalOverload.barAria': '{quarter}过载 百分之{pct}',

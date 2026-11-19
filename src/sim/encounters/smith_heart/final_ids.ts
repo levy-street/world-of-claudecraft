@@ -7,8 +7,8 @@
 // The boss fights on the Anvil of the World's four quarters
 // (content/smith_heart_quarters.ts). The quarter it stands in is the strength
 // it drinks: its kit is that quarter's (Heat, Quench, Breath, Hammer), and the
-// four rules (the Overload bars, the shockwave on switching, Taking Root, the
-// centre off-limits) push the tanks to drag it from quarter to quarter.
+// three rules (the Overload bars, the shockwave on switching, the centre
+// off-limits; Taking Root went with Jose's playtest of 2026-11-19) push the tanks to drag it from quarter to quarter.
 //
 // The rework of 2026-11-18 (the team's review of 2026-11-17, the owner's
 // design): each quarter also WAKES its guardian's star mechanic the first
@@ -43,7 +43,6 @@
 //     `value2` its base form, `value3` the switch mark's seconds left);
 //   - the four Overload bars: one aura each on the boss (`value` the bar,
 //     0 to 100, `value2` its trend: 1 filling, -1 draining, 0 still);
-//   - Taking Root: a root aura on the boss, its clock in `remaining`;
 //   - Heart Unbound: an aura on the boss, its stacks the ramp;
 //   - every footprint: objects (a radius in `scale`, a heading in `facing`,
 //     a state and its clock in the template);
@@ -83,8 +82,6 @@ export const FINAL_AURAS = {
   /** On the boss: the zone (`value`, FINAL_ZONE_CODES), the base form
    *  (`value2`), the switch mark's seconds left (`value3`, 0 none). */
   state: 'heart_final_state',
-  /** On the boss: Taking Root (a root, its clock the remaining time). */
-  root: 'heart_final_root',
   /** On the boss: Heart Unbound (stacks: the centre's ramp). */
   unbound: 'heart_final_unbound',
   /** On players (Heroic): Vein-Shaken, the switch's mark. */
@@ -181,8 +178,9 @@ export const FINAL_CUES = {
   burst: 'heart_final_overload_burst',
   /** The boss crosses into another quarter (spellfxAt at the crossing). */
   shock: 'heart_final_vein_shock',
-  /** It takes root (spellfx 'nova' on the boss). */
-  root: 'heart_final_root',
+  /** It enters a new quarter: its light shifts (spellfx 'nova' on the boss;
+   *  Taking Root's cue until Jose's playtest of 2026-11-19 took the root away). */
+  shift: 'heart_final_quarter_shift',
   /** Heart Unbound pulses (spellfx 'nova' on the boss). */
   unbound: 'heart_final_unbound',
   /** A Fire Whirl strikes a player (spellfx 'nova', whirl to them). */
@@ -256,7 +254,6 @@ export const FINAL_NAMES = {
   burst: 'Overload Burst',
   shock: 'Vein Shock',
   shaken: 'Vein-Shaken',
-  root: 'Taking Root',
   unbound: 'Heart Unbound',
   fist: 'Basalt Fist',
   swell: 'Molten Swell',
@@ -544,9 +541,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
  *  the sketch's 40 s fill ran too fast; a full bar on Mythic must be a wipe).
  *
  *  The pace: empty to full in 60 s in its quarter, draining at a third of
- *  that (180 s from full) away from it. With the root (6 s since
- *  2026-11-19, 10 before) and a drag of a few seconds, a visit lasts 10 to
- *  15 s or more and fills a sixth to a quarter of the bar:
+ *  that (180 s from full) away from it. With a drag of a few seconds (no
+ *  root since 2026-11-19), a visit lasts some 10 to 15 s or more and fills a
+ *  sixth to a quarter of the bar:
  *  bouncing between two quarters gains about a sixth of a bar every round
  *  trip and bursts within about two and a half minutes, while a rotation
  *  through all four never climbs past one visit's fill and a rotation
@@ -599,15 +596,6 @@ export const FINAL_TUNING = {
   shakenSeconds: 20,
   /** A change while marked hits this many times as hard. */
   shakenMult: 3,
-  /** Taking Root: on entering a new quarter (the pull's too), it cannot
-   *  move. 6 s since Jose's playtest of 2026-11-19 ("sometimes the boss
-   *  stays rooted a long time, like 10 s, why?"); 10 s before it, down from
-   *  the sketch's 15 on 28 Oct 2026 (the long root read as a boss that will
-   *  not follow). */
-  rootSeconds: 6,
-  /** After the root lets go, no planted bar begins for this long: the
-   *  tank's window to start the drag. */
-  dragGrace: 3,
   /** A free boss whose tank stands in another zone closes on its tank to
    *  this far (yards), past its long melee reach: the drag always carries
    *  it over the ridge. */
