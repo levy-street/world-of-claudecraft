@@ -7440,6 +7440,11 @@ export interface GuardianState {
   maxRange: number;
   /** Optional owner-scoped aura required on every valid target. */
   requiredTargetAuraId?: string;
+  /** Opt-in pet-style assist for a stationary guardian (the Tithefiend): the owner's
+   *  current hostile target in `maxRange`, once the fight has reached it, comes first
+   *  and needs no `requiredTargetAuraId`; the preferred and nearest-enemy fallbacks
+   *  keep that aura contract, so the guardian never opens a fight of its own. */
+  assistOwnerTarget?: boolean;
   /** Fire-and-forget guardians may dismiss when their target contract is exhausted. */
   dismissWhenUntargeted?: boolean;
   /** Opt-in walking melee mode (combat/guardians.ts). Absent: the classic stationary

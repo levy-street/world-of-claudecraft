@@ -55,19 +55,3 @@ export function priestMarkerStateForAuras(
   out.summonReady = out.gloomtitheStacks >= GLOOMTITHE_MAX_STACKS;
   return out;
 }
-
-/** Persistent action-bar cue required when the Vespers bank reaches five stacks. */
-export function priestActionGlowActive(
-  auras: readonly PriestMarkerAura[],
-  abilityId: string,
-): boolean {
-  if (abilityId !== 'summon_tithefiend') return false;
-  for (const aura of auras) {
-    if (
-      (aura.id === GLOOMTITHE_AURA_ID || aura.kind === 'gloomtithe') &&
-      (aura.stacks ?? 1) >= GLOOMTITHE_MAX_STACKS
-    )
-      return true;
-  }
-  return false;
-}

@@ -168,7 +168,7 @@ describe('Void Rupture', () => {
     expect(spiritBombProgress(f.p)).toBe(5);
   });
 
-  it('lets the pet consume the remaining two gems after Rupture', () => {
+  it('keeps the remaining two gems after Rupture and still summons a full-power pet', () => {
     const f = fixture();
     f.target.auras.push({
       id: 'shadow_word_pain',
@@ -189,8 +189,8 @@ describe('Void Rupture', () => {
     const pet = [...f.sim.entities.values()].find(
       (entity) => entity.ownerId === f.p.id && entity.guardianState?.key === 'tithefiend',
     );
-    expect(pet?.guardianState).toMatchObject({ remaining: 8, minDamage: 28, maxDamage: 32 });
-    expect(bank(f)).toBeUndefined();
+    expect(pet?.guardianState).toMatchObject({ remaining: 15, minDamage: 65, maxDamage: 70 });
+    expect(bank(f)?.stacks).toBe(2);
     expect(spiritBombProgress(f.p)).toBe(5);
   });
 

@@ -4,6 +4,7 @@ import {
   GLOOMTITHE_GRACE,
   resolveVespersAbility,
   TITHEFIEND_BASE_SPELL_POWER_COEFF,
+  TITHEFIEND_DURATION,
   TITHEFIEND_ECHO_RATE,
   TITHEFIEND_MANA_RETURN_RATE,
   TITHEFIEND_MAX_STACK_DAMAGE_MULT,
@@ -135,7 +136,7 @@ describe('Vespers baseline loop', () => {
 
     // The post-cast hook still runs after a miss. Only the landed-damage hook may
     // establish the relationship or build the bank.
-    vespersAfterAbility(ctx, priest, meta, primary, 'mind_blast', 0);
+    vespersAfterAbility(ctx, priest, meta, primary, 'mind_blast');
 
     expect(primary.auras.some((a) => a.id === 'priest_effigy')).toBe(false);
     expect(priest.auras.some((a) => a.id === 'priest_gloomtithe')).toBe(false);
@@ -298,64 +299,103 @@ describe('Vespers baseline loop', () => {
     expect(priest.auras.some((aura) => aura.id === 'priest_gloomtithe')).toBe(false);
   });
 
-  it('requires at least one Gloomtithe stack for a valid Tithefiend summon', () => {
+  it('summons a full-power Tithefiend with no Gloomtithe and no Dirge target', () => {
     const { sim, priest } = vespersPriest();
+    const def = sim.resolvedAbility('summon_tithefiend', priest.id)?.def;
+    expect(def?.requiresAuraKind).toBeUndefined();
+    expect(def?.cost).toBe(60);
+    expect(def?.cooldown).toBe(30);
+    expect(priest.auras.some((aura) => aura.kind === 'gloomtithe')).toBe(false);
     const resourceBefore = priest.resource;
 
     sim.castAbility('summon_tithefiend', priest.id);
     sim.tick();
 
-    expect(priest.resource).toBe(resourceBefore);
-    expect(priest.cooldowns.has('summon_tithefiend')).toBe(false);
-    expect(
-      [...sim.entities.values()].some(
-        (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
-      ),
-    ).toBe(false);
+    const guardian = [...sim.entities.values()].find(
+      (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
+    );
+    if (!guardian?.guardianState) throw new Error('Tithefiend missing');
+    expect(priest.resource).toBeLessThan(resourceBefore);
+    expect(priest.cooldowns.get('summon_tithefiend')).toBeGreaterThan(29);
+    expect(guardian.scale).toBe(TITHEFIEND_MAX_STACK_SCALE);
+    expect(TITHEFIEND_DURATION).toBe(15);
+    expect(guardian.guardianState.remaining).toBeCloseTo(15 - 1 / 20, 6);
+    expect(guardian.guardianState.minDamage).toBe(
+      Math.round((12 + 5 * 8) * TITHEFIEND_MAX_STACK_DAMAGE_MULT),
+    );
+    expect(guardian.guardianState.maxDamage).toBe(
+      Math.round((16 + 5 * 8) * TITHEFIEND_MAX_STACK_DAMAGE_MULT),
+    );
+    expect(guardian.guardianState.assistOwnerTarget).toBe(true);
+    // The tooltip states the live summon: duration and per-hit range.
+    const { minDamage, maxDamage } = guardian.guardianState;
+    expect(def?.description).toContain(`Summon a Tithefiend for ${TITHEFIEND_DURATION} sec.`);
+    expect(def?.description).toContain(`${minDamage} to ${maxDamage} Shadow damage`);
+    expect(def?.description).not.toMatch(/Consume|stacks/);
   });
 
-  it('preserves Gloomtithe, Mana, and cooldown when no owned Dirge target remains', () => {
-    const { sim, priest } = vespersPriest();
-    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
-    addGloomtithe(ctx, priest, 5);
-    const resourceBefore = priest.resource;
+  it.each([1, 3, 5])(
+    'leaves a %s-stack Gloomtithe bank untouched and summons at full power',
+    (stacks) => {
+      const { sim, priest } = vespersPriest();
+      const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+      addGloomtithe(ctx, priest, stacks);
+      const bank = priest.auras.find((aura) => aura.id === 'priest_gloomtithe');
 
-    sim.castAbility('summon_tithefiend', priest.id);
-    sim.tick();
+      sim.castAbility('summon_tithefiend', priest.id);
+      sim.tick();
 
-    expect(priest.resource).toBe(resourceBefore);
-    expect(priest.cooldowns.has('summon_tithefiend')).toBe(false);
-    expect(priest.auras.find((aura) => aura.id === 'priest_gloomtithe')?.stacks).toBe(5);
-    expect(
-      [...sim.entities.values()].some(
+      expect(priest.auras.find((aura) => aura.id === 'priest_gloomtithe')).toBe(bank);
+      expect(bank?.stacks).toBe(stacks);
+      const guardian = [...sim.entities.values()].find(
         (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
+      );
+      expect(guardian?.scale).toBe(TITHEFIEND_MAX_STACK_SCALE);
+      expect(guardian?.guardianState?.minDamage).toBe(
+        Math.round((12 + 5 * 8) * TITHEFIEND_MAX_STACK_DAMAGE_MULT),
+      );
+    },
+  );
+
+  it('attacks the enemy the priest is fighting, even without Dirge of Decay', () => {
+    const { sim, priest } = vespersPriest();
+    const target = addDummy(sim, 9916, priest.pos.x, priest.pos.z + 10);
+    sim.targetEntity(target.id, priest.id);
+    sim.castAbility('summon_tithefiend', priest.id);
+
+    // A target the fight has not reached is only a selection: the fiend never pulls it.
+    const idle = Array.from({ length: 40 }, () => sim.tick()).flat();
+    expect(target.inCombat).toBe(false);
+    expect(idle.some((e) => e.type === 'damage' && e.ability === 'Tithefiend Strike')).toBe(false);
+
+    // Mindfracture engages it; no Dirge of Decay is ever applied.
+    priest.gcdRemaining = 0;
+    sim.castAbility('mind_blast', priest.id);
+    const engaged = Array.from({ length: 80 }, () => sim.tick()).flat();
+    expect(target.auras.some((aura) => aura.id === 'shadow_word_pain')).toBe(false);
+    expect(
+      engaged.some(
+        (e) => e.type === 'damage' && e.ability === 'Tithefiend Strike' && e.targetId === target.id,
       ),
-    ).toBe(false);
+    ).toBe(true);
   });
 
-  it('preserves Gloomtithe, Mana, and cooldown when every owned Dirge target is out of range', () => {
+  it('attacks the priest current target instead of the Effigy', () => {
     const { sim, priest } = vespersPriest();
-    const target = addDummy(sim, 9916, priest.pos.x, priest.pos.z + 40);
-    target.auras.push({
-      id: 'shadow_word_pain',
-      name: 'Dirge of Decay',
-      kind: 'dot',
-      remaining: 18,
-      duration: 18,
-      value: 1,
-      sourceId: priest.id,
-      school: 'shadow',
-    });
-    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
-    addGloomtithe(ctx, priest, 5);
-    const resourceBefore = priest.resource;
-
+    const primary = addDummy(sim, 9917, priest.pos.x, priest.pos.z + 8);
+    const other = addDummy(sim, 9918, priest.pos.x + 4, priest.pos.z + 8);
+    prepareEffigy(sim, priest, primary);
+    castAndSettle(sim, priest, other, 'mind_blast');
+    expect(primary.auras.some((a) => a.id === 'priest_effigy')).toBe(true);
+    expect(priest.targetId).toBe(other.id);
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    priest.cooldowns.delete('summon_tithefiend');
     sim.castAbility('summon_tithefiend', priest.id);
-    sim.tick();
-
-    expect(priest.resource).toBe(resourceBefore);
-    expect(priest.cooldowns.has('summon_tithefiend')).toBe(false);
-    expect(priest.auras.find((aura) => aura.id === 'priest_gloomtithe')?.stacks).toBe(5);
+    const events = Array.from({ length: 60 }, () => sim.tick()).flat();
+    const strikes = events.filter((e) => e.type === 'damage' && e.ability === 'Tithefiend Strike');
+    expect(strikes.length).toBeGreaterThan(0);
+    expect(strikes.every((e) => e.type === 'damage' && e.targetId === other.id)).toBe(true);
   });
 
   it('uses a smaller Tithefiend echo against eligible linked enemies', () => {
@@ -387,11 +427,13 @@ describe('Vespers baseline loop', () => {
     expect(TITHEFIEND_ECHO_RATE).toBeLessThan(0.3);
   });
 
-  it('consumes Gloomtithe to summon a temporary guardian, not a command pet', () => {
+  it('keeps Gloomtithe and summons a temporary guardian, not a command pet', () => {
     const { sim, priest } = vespersPriest();
     const primary = addDummy(sim, 9920, priest.pos.x, priest.pos.z + 8);
     prepareEffigy(sim, priest, primary);
     const before = primary.hp;
+    const stacks = priest.auras.find((a) => a.id === 'priest_gloomtithe')?.stacks ?? 0;
+    expect(stacks).toBeGreaterThan(0);
 
     priest.gcdRemaining = 0;
     priest.resource = priest.maxResource;
@@ -405,7 +447,7 @@ describe('Vespers baseline loop', () => {
     );
     expect(guardian).toBeDefined();
     expect(sim.petOf(priest.id)).toBeNull();
-    expect(priest.auras.some((a) => a.id === 'priest_gloomtithe')).toBe(false);
+    expect(priest.auras.find((a) => a.id === 'priest_gloomtithe')?.stacks).toBe(stacks);
 
     for (let tick = 0; tick < 60; tick++) sim.tick();
     expect(primary.hp).toBeLessThan(before);
@@ -479,7 +521,7 @@ describe('Vespers baseline loop', () => {
     );
   });
 
-  it('keeps Tithefiend idle without own Dirge and resumes the same summon when Dirge returns', () => {
+  it('with no priest target, keeps Tithefiend idle without own Dirge and resumes when Dirge returns', () => {
     const { sim, priest } = vespersPriest();
     const primary = addDummy(sim, 9923, priest.pos.x, priest.pos.z + 8);
     prepareEffigy(sim, priest, primary);
@@ -501,6 +543,8 @@ describe('Vespers baseline loop', () => {
     );
     // Another priest's Dirge must not make this guardian attack.
     primary.auras.push({ ...dirge, sourceId: priest.id + 1000 });
+    // The fallback contract: with nothing selected it only fights its owner's Dirge.
+    priest.targetId = null;
     const idleEvents = Array.from({ length: 40 }, () => sim.tick()).flat();
     expect(sim.entities.get(guardian.id)).toBe(guardian);
     expect(guardian.guardianState.remaining).toBeCloseTo(remaining - 2, 6);
@@ -512,7 +556,9 @@ describe('Vespers baseline loop', () => {
 
     priest.gcdRemaining = 0;
     priest.resource = priest.maxResource;
+    sim.targetEntity(primary.id, priest.id);
     sim.castAbility('shadow_word_pain', priest.id);
+    priest.targetId = null;
     // Allow the reapplication projectile to arrive before the guardian's next poll.
     const resumedEvents = Array.from({ length: 40 }, () => sim.tick()).flat();
     expect(sim.entities.get(guardian.id)).toBe(guardian);

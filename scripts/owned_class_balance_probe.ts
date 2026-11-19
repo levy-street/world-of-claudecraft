@@ -712,7 +712,9 @@ function castWarspirit(state: RunState): void {
 
 function castVespers(state: RunState): void {
   if (tryCast(state, 'power_infusion', state.sim.player)) return;
-  if (fullStacks(state.sim.player, 'gloomtithe', 5) && tryCast(state, 'summon_tithefiend')) return;
+  // Call Tithefiend has no prerequisite: cast it on cooldown once the fight
+  // has reached the primary target, so the assisting fiend has an enemy.
+  if (state.primary.inCombat && tryCast(state, 'summon_tithefiend')) return;
   const missingDirge = state.targets.find((target) => {
     const dirge = ownAura(target, 'shadow_word_pain', state.sim.playerId);
     return !dirge || dirge.remaining <= 3;

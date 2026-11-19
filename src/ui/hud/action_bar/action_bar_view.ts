@@ -67,7 +67,6 @@ import {
 } from '../../../sim/combat/paladin_solar_reprisal';
 import { sunVerdictAbilityGlowActive } from '../../../sim/combat/paladin_sun_verdict';
 import { effectivePlayerAttackRange } from '../../../sim/combat/player_attack_reach';
-import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
@@ -1023,7 +1022,6 @@ export function createActionBarView(
           // Spore Burst at a full Verdance or Moontide bank (the 25% payoff).
           sporeBurstFullBankGlowActive(player.auras ?? [], player.id, def.id) ||
           flowStateReady ||
-          priestActionGlowActive(player.auras ?? [], def.id) ||
           sunVerdictAbilityGlowActive(target?.auras, player.id, def.id) ||
           (def.id === 'divine_ascension' && ascensionReady);
         slot.naturesBoonGlow = naturesBoonArmedFor(player.auras, def.id);

@@ -2268,7 +2268,7 @@ const classAbilityNamesEn = {
       [
         'summon_tithefiend',
         'Call Tithefiend',
-        'Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It attacks only enemies within 35 yards that have your Dirge of Decay, preferring your Effigy. Without a target, it waits until one becomes available or its duration ends. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
+        'Summon a Tithefiend for 15 sec. It attacks every 2 sec for 65 to 70 Shadow damage, increased by your current Spell Power. It attacks the enemy you are fighting within 35 yards. With no such target, it attacks your Effigy or the nearest enemy with your Dirge of Decay, so it never starts a fight on its own. Hits on an enemy with your Dirge of Decay restore 1% of your maximum Mana and echo 15% of the damage to up to 3 other enemies with your Dirge of Decay. Needs and spends no Gloomtithe. (Vespers signature)',
       ],
       ['martyrs_aegis', "Martyr's Aegis", "Reduce one ally's incoming damage by 40% for 8 sec."],
       [

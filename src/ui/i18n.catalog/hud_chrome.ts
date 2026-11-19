@@ -391,7 +391,7 @@ export const hudChromeStrings = {
     bombReady: 'Ready',
     chargeCount: '{value} / {max}',
     gloomtitheTooltip:
-      'Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.',
+      'Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage. Generating charges also fills Tithe Bomb, even while this bank is full.',
     bombTooltip:
       'Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it.',
   },

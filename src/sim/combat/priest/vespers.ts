@@ -73,22 +73,6 @@ export function ownDirge(target: Entity, priestId: number): Aura | undefined {
   );
 }
 
-export function hasTithefiendTarget(ctx: SimContext, priestId: number): boolean {
-  const priest = ctx.entities.get(priestId);
-  if (!priest || priest.dead) return false;
-  for (const entity of ctx.entities.values()) {
-    if (
-      !entity.dead &&
-      ctx.isHostileTo(priest, entity) &&
-      dist2d(priest.pos, entity.pos) <= TITHEFIEND_MAX_RANGE &&
-      ownDirge(entity, priestId)
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
-
 /** Exported for dirge_refresh.ts: same reuse reasoning as ownDirge above. */
 export function ownEffigy(target: Entity, priestId: number): Aura | undefined {
   return target.auras.find((aura) => aura.id === EFFIGY_AURA_ID && aura.sourceId === priestId);
@@ -183,44 +167,35 @@ export function addGloomtithe(ctx: SimContext, priest: Entity, amount = 1): void
   });
 }
 
-export function gloomtitheStacksForCast(priest: Entity, abilityId: string): number {
-  if (abilityId !== 'summon_tithefiend') return 0;
-  return priest.auras.find((aura) => aura.kind === 'gloomtithe')?.stacks ?? 0;
-}
+/** Call Tithefiend has no prerequisite: it neither needs nor spends Gloomtithe, and
+ *  the fiend always arrives at the full-bank tier (the former five-stack summon). */
+export const TITHEFIEND_DURATION = 15;
+const TITHEFIEND_TIER = GLOOMTITHE_MAX_STACKS;
 
-function tithefiendDuration(stacks: number): number {
-  return [0, 6, 8, 10, 12, 15][Math.max(0, Math.min(5, stacks))] ?? 0;
-}
-
-function summonTithefiend(ctx: SimContext, priest: Entity, stacks: number): void {
-  if (stacks <= 0) return;
-  const maxStackMult = stacks === GLOOMTITHE_MAX_STACKS ? TITHEFIEND_MAX_STACK_DAMAGE_MULT : 1;
-  const damageMult = maxStackMult;
+function summonTithefiend(ctx: SimContext, priest: Entity): void {
+  const damageMult = TITHEFIEND_MAX_STACK_DAMAGE_MULT;
   summonGuardian(ctx, priest, {
     key: TITHEFIEND_KEY,
     name: 'Tithefiend',
     color: 0x6c258a,
-    scale: stacks === GLOOMTITHE_MAX_STACKS ? TITHEFIEND_MAX_STACK_SCALE : 0.82,
-    remaining: tithefiendDuration(stacks),
+    scale: TITHEFIEND_MAX_STACK_SCALE,
+    remaining: TITHEFIEND_DURATION,
     attackInterval: 2,
-    minDamage: Math.round((12 + stacks * 8) * damageMult),
-    maxDamage: Math.round((16 + stacks * 8) * damageMult),
+    minDamage: Math.round((12 + TITHEFIEND_TIER * 8) * damageMult),
+    maxDamage: Math.round((16 + TITHEFIEND_TIER * 8) * damageMult),
     spellPowerCoeff: TITHEFIEND_BASE_SPELL_POWER_COEFF * damageMult,
     school: 'shadow',
     abilityId: TITHEFIEND_STRIKE_ID,
     abilityName: 'Tithefiend Strike',
     preferredTargetId: effigyTarget(ctx, priest.id)?.id ?? null,
     maxRange: TITHEFIEND_MAX_RANGE,
+    // Like a pet: it attacks the enemy the priest is fighting. With no such
+    // target it falls back to the Effigy, then the nearest Dirge of Decay
+    // target, so it never opens a fight on its own.
+    assistOwnerTarget: true,
     requiredTargetAuraId: 'shadow_word_pain',
     dismissWhenUntargeted: false,
   });
-}
-
-function consumeGloomtithe(ctx: SimContext, priest: Entity): void {
-  const index = priest.auras.findIndex((aura) => aura.kind === 'gloomtithe');
-  if (index < 0) return;
-  const [aura] = priest.auras.splice(index, 1);
-  ctx.emit({ type: 'aura', targetId: priest.id, name: aura.name, gained: false });
 }
 
 export function vespersAfterAbility(
@@ -229,13 +204,9 @@ export function vespersAfterAbility(
   meta: PlayerMeta,
   _target: Entity | null,
   abilityId: string,
-  gloomtitheStacks: number,
 ): void {
   if (meta.cls !== 'priest' || meta.talents.spec !== 'shadow') return;
-  if (abilityId === 'summon_tithefiend') {
-    summonTithefiend(ctx, priest, gloomtitheStacks);
-    if (gloomtitheStacks > 0) consumeGloomtithe(ctx, priest);
-  }
+  if (abilityId === 'summon_tithefiend') summonTithefiend(ctx, priest);
 }
 
 /** Dirge ticks build only while ticking the caster's current Effigy. */

@@ -229,11 +229,7 @@ import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
 import { reserveShadowStilledMind } from './priest/stilled_mind';
-import {
-  duskhymnChannelStart,
-  duskhymnChannelStopped,
-  hasTithefiendTarget,
-} from './priest/vespers';
+import { duskhymnChannelStart, duskhymnChannelStopped } from './priest/vespers';
 import { swingReadyForQueuedCast } from './queued_cast_swing_yield';
 import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
@@ -1386,10 +1382,6 @@ export function castAbility(
   // Icicles) additionally gates on the stack count.
   if (!hasRequiredAura(p, ability)) {
     ctx.error(p.id, 'That ability is not ready yet.');
-    return;
-  }
-  if (ability.id === 'summon_tithefiend' && !hasTithefiendTarget(ctx, p.id)) {
-    ctx.error(p.id, 'Your Tithefiend needs an enemy affected by Dirge of Decay.');
     return;
   }
   // combo points are character-bound: any built points finish on the current target

@@ -105,6 +105,8 @@ export function summonGuardian(ctx: SimContext, owner: Entity, config: GuardianC
     maxRange: config.maxRange,
     requiredTargetAuraId: config.requiredTargetAuraId,
     dismissWhenUntargeted: config.dismissWhenUntargeted,
+    // Spread only when set, so every other guardian keeps its exact state shape.
+    ...(config.assistOwnerTarget ? { assistOwnerTarget: true } : {}),
     // Spread only when set, so every stationary guardian keeps its exact state shape.
     ...(config.melee ? { melee: { ...config.melee } } : {}),
   };
@@ -119,9 +121,25 @@ export function summonGuardian(ctx: SimContext, owner: Entity, config: GuardianC
   return guardian;
 }
 
+/** The owner's current target for a pet-style assist guardian: a living enemy of the
+ *  owner within `maxRange` of them that the fight has already reached (a creature in
+ *  combat, or a player while the owner is in combat), so a mere selection never pulls. */
+function engagedOwnerTarget(ctx: SimContext, owner: Entity, maxRange: number): Entity | null {
+  const target = owner.targetId === null ? null : (ctx.entities.get(owner.targetId) ?? null);
+  if (!target || target.dead || target.id === owner.id) return null;
+  if (!ctx.isHostileTo(owner, target)) return null;
+  if (target.kind === 'mob' ? !target.inCombat : !owner.inCombat) return null;
+  if (dist2d(owner.pos, target.pos) > maxRange) return null;
+  return target;
+}
+
 function guardianTarget(ctx: SimContext, guardian: Entity, owner: Entity): Entity | null {
   const state = guardian.guardianState;
   if (!state) return null;
+  if (state.assistOwnerTarget) {
+    const assist = engagedOwnerTarget(ctx, owner, state.maxRange);
+    if (assist) return assist;
+  }
   const validTarget = (target: Entity): boolean =>
     !target.dead &&
     ctx.isHostileTo(owner, target) &&

@@ -236,7 +236,7 @@ import { benisonAfterAbility } from './priest/benison';
 import { doctrineAfterAbility } from './priest/doctrine';
 import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
 import { applyVampiricTouch } from './priest/vampiric_touch';
-import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
+import { vespersAfterAbility } from './priest/vespers';
 import { isPullEligible } from './pull_eligibility';
 import { offerResurrection } from './resurrection_offer';
 import { resurrectionCastRange } from './resurrection_reach';
@@ -512,7 +512,6 @@ export function runEffects(
   // asked for. The resist branch that returns before this point credits
   // itself (combat/casting_lifecycle.ts). Draws no rng.
   if (target) creditAbilityDrill(ctx, p, target, ability.id);
-  const vespersGloomtitheStacks = gloomtitheStacksForCast(p, ability.id);
   const initialTarget = target;
   const ascensionFxTargetId = target?.id ?? p.id;
   const ascensionFxTargetHostile = target !== null && ctx.isHostileTo(p, target);
@@ -4479,7 +4478,7 @@ export function runEffects(
   frostMageAfterCast(ctx, p, meta, ability, target);
   benisonAfterAbility(ctx, p, meta, target, ability.id);
   doctrineAfterAbility(ctx, p, meta, target, ability.id);
-  vespersAfterAbility(ctx, p, meta, target, ability.id, vespersGloomtitheStacks);
+  vespersAfterAbility(ctx, p, meta, target, ability.id);
   priestAfterAbility(ctx, p, ability.id, target);
 
   const paladinSpec = mods.spec;

@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   emptyPriestMarkerState,
-  priestActionGlowActive,
   priestMarkerStateForAuras,
 } from '../src/sim/combat/priest/presentation';
 import { auraDisplayNameFromSource } from '../src/ui/aura_display_name';
@@ -33,27 +32,6 @@ describe('Priest relationship presentation', () => {
       gloomtitheStacks: 5,
       summonReady: true,
     });
-  });
-
-  it('glows only Tithefiend at the full five-stack bank', () => {
-    expect(
-      priestActionGlowActive(
-        [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 }],
-        'summon_tithefiend',
-      ),
-    ).toBe(true);
-    expect(
-      priestActionGlowActive(
-        [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 4 }],
-        'summon_tithefiend',
-      ),
-    ).toBe(false);
-    expect(
-      priestActionGlowActive(
-        [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 }],
-        'mind_blast',
-      ),
-    ).toBe(false);
   });
 
   it('localizes every new visible Vespers state and guardian name', () => {

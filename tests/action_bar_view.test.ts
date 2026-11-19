@@ -1046,7 +1046,7 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(state.slots[1].procGlow).toBe(false); // not named -> no glow
   });
 
-  it('keeps Tithefiend glowing while Gloomtithe is fully banked', () => {
+  it('no longer glows Call Tithefiend for a Gloomtithe bank (it spends none)', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('summon_tithefiend', { cost: 10 }) })),
       fakeDeps(),
@@ -1057,7 +1057,7 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
         auras: [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 }],
       }),
     );
-    expect(ready.slots[0].procGlow).toBe(true);
+    expect(ready.slots[0].procGlow).toBe(false);
 
     const building = view.tick(
       world({

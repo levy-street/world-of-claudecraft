@@ -148,7 +148,7 @@ describe('Tithe Bomb content and Gloomtithe generation', () => {
   );
 
   it.each([1, 2, 3, 4, 5])(
-    'does not double-credit generation when summoning a %s-stack Tithefiend',
+    'neither credits Tithe Bomb nor spends a %s-stack bank when summoning the Tithefiend',
     (bank) => {
       const f = fixture();
       ownDirge(f);
@@ -160,7 +160,7 @@ describe('Tithe Bomb content and Gloomtithe generation', () => {
         ),
       ).toBe(true);
       expect(spiritBombProgress(f.priest)).toBe(bank);
-      expect(f.priest.auras.some((aura) => aura.kind === 'gloomtithe')).toBe(false);
+      expect(f.priest.auras.find((aura) => aura.kind === 'gloomtithe')?.stacks).toBe(bank);
     },
   );
 
