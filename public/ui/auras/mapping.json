@@ -5456,36 +5456,6 @@
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
     },
     {
-      "auraId": "heart_council_enraged",
-      "sourcePack": "smith-heart-aura-art-2026-11-19",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_council_enraged.png",
-      "sourceBytes": 2571654,
-      "output": "heart_council_enraged.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "A stone giant's face roaring in fury, its cracks blazing red-molten.",
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/council_grief.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_council_enraged."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "sourceSha256": "62508fac47140cddebecf6716531243f94df89db321e2e251c365e6c3089428a",
-      "acceptedSha256": "bdc3e597e2fcd13d1e1203a3beb580505f6bf1534d1e68fbc07e88139238de91",
-      "acceptedBytes": 5338,
-      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
-    },
-    {
       "auraId": "heart_narrow_shelter",
       "sourcePack": "smith-heart-aura-art-2026-11-19",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_narrow_shelter.png",
@@ -5512,36 +5482,6 @@
       "sourceSha256": "8181f215d9cdf22ce882db9cd672bba2123d810ae562cbe93e07bd038639f976",
       "acceptedSha256": "29b4fc55c073f3305db53c2d5d3b7f2f014c8c7a74a17e8c40cea119810a5b96",
       "acceptedBytes": 5034,
-      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
-    },
-    {
-      "auraId": "heart_bond_of_the_stone",
-      "sourcePack": "smith-heart-aura-art-2026-11-19",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_bond_of_the_stone.png",
-      "sourceBytes": 2332491,
-      "output": "heart_bond_of_the_stone.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "Two great stone hands clasped together, bound by a braided gold tether of light.",
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/council_bond.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_bond_of_the_stone."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "sourceSha256": "bfdaf12711462fcb4fd67665b8860257b29468c89645e1c6a86a377fa61eb97e",
-      "acceptedSha256": "8e41d7466a1e8c909c66b027f87028ab0ffce5c445004099a73d432bdfb013e9",
-      "acceptedBytes": 5488,
       "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
     },

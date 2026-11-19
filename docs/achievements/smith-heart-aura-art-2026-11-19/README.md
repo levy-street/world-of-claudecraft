@@ -101,9 +101,9 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | # | Aura id(s) | Name | Painting |
 |---|---|---|---|
 | 46 | `heart_memory_of_stone` | Memory of Stone | A glowing ochre stone tablet carved with a fallen silhouette |
-| 47 | `heart_council_enraged` | Enraged | A stone giant's face roaring, its cracks blazing red-molten |
+| 47 | `heart_council_enraged` (retired) | Enraged | A stone giant's face roaring, its cracks blazing red-molten |
 | 48 | `heart_narrow_shelter` | Narrow Shelter | One stone pillar, three figures crouched in its strip of shadow from a gold blast |
-| 49 | `heart_bond_of_the_stone` | Bond of the Stone | Two stone hands bound by a braided gold tether of light |
+| 49 | `heart_bond_of_the_stone` (retired) | Bond of the Stone | Two stone hands bound by a braided gold tether of light |
 | 50 | `heart_rush_shattered`, `heart_rush_exposed` | Shattered Charge | A stone giant reeling from a shattered crimson-magenta pillar |
 | 51 | `heart_council_intro`, `heart_breath_intro`, `heart_quench_intro`, `heart_heat_intro`, `mob_dormant` | Dormant | A stone giant asleep in a spur of rock, a faint light inside |
 | 52 | `heart_breath_storm_unbound` | Storm Unbound | A body of lightning tearing free of its stone |
@@ -118,7 +118,7 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 61 | `heart_final_unbound` | Heart Unbound | The heart crystal overflowing in four colours in a central ring |
 | 62 to 65 | `heart_final_overload_hammer`, `_breath`, `_quench`, `_heat` | Overload | A vein brimming with its element's light (one per vein) |
 | 66 | `heart_final_shield`, `heart_final_rising` | Gathered Strength | A dome of four-coloured light shielding a giant |
-| 67 | `heart_final_fury` | Masterless Fury | A crowned stone head roaring four-coloured fire |
+| 67 | `heart_final_fury`, `heart_grieving_fury` | Masterless Fury | A crowned stone head roaring four-coloured fire |
 | 68 | `heart_final_hidden` | Unmade Anvil | An anvil-shaped floor breaking into falling quarters |
 | 69 to 72 | `heart_final_poured_hammer`, `_breath`, `_quench`, `_heat` | Poured Strength | An element poured into the giant (one per vein) |
 
@@ -156,3 +156,13 @@ set, which brings the shared aliases to 22 and keeps the ids covered at 91:
   wears the Quench's Crossing Blade (row 30).
 - `heart_final_anvil_mark` (Weight of the Anvil, its circle follows the marked player)
   wears Crushed (row 41), the anvil looming overhead.
+
+## Amended after the Hammer Council's survivor rework
+
+The Hammer Council's survivor mechanic became Grieving Fury
+(`src/sim/encounters/smith_heart/council_fury.ts`), which replaced the Enraged survivor
+and removed Bond of the Stone, the council's proximity ward. Their two paintings (rows 47
+and 49) left the shipping set with their mapping and manifest rows, so 67 paintings ship.
+`heart_grieving_fury` (the survivor's haste once the fallen one's soul lands) wears the
+Masterless Fury (row 67), a roaring stone head, which brings the shared aliases to 23 and
+the ids covered to 90.

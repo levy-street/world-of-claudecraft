@@ -9,9 +9,9 @@
   },
   "scope": {
     "encounter": "The Smith's Heart raid",
-    "exactRuntimeAuras": 69,
-    "sharedRuntimeAliases": 22,
-    "runtimeIdsCovered": 91,
+    "exactRuntimeAuras": 67,
+    "sharedRuntimeAliases": 23,
+    "runtimeIdsCovered": 90,
     "unpainted": [
       {
         "auraId": "heart_endless_song",
@@ -1217,32 +1217,6 @@
       "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
     },
     {
-      "auraId": "heart_council_enraged",
-      "runtimeIds": ["heart_council_enraged"],
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_council_enraged.png",
-      "sourceBytes": 2571654,
-      "sourceSha256": "62508fac47140cddebecf6716531243f94df89db321e2e251c365e6c3089428a",
-      "acceptedSha256": "bdc3e597e2fcd13d1e1203a3beb580505f6bf1534d1e68fbc07e88139238de91",
-      "acceptedBytes": 5338,
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/council_grief.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_council_enraged."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "prompt": "Icon 47, same style as the reference icon. Name: Enraged. What it does: a buff on the surviving Hammer Council member; its fallen kin's strength healed it, and it now attacks faster and hits harder. Paint: a stone giant's face roaring in fury, its cracks blazing red-molten. Palette: dark stone with blazing red and molten orange light in the cracks. Square, edge to edge, no text, no border.",
-      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
-    },
-    {
       "auraId": "heart_narrow_shelter",
       "runtimeIds": ["heart_narrow_shelter"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
@@ -1267,32 +1241,6 @@
       ],
       "prompt": "Icon 48 again, please: that version came out as a collage of earlier icons. I need one single picture filling the square, not a grid or collage. Same style as the reference icon. Name: Narrow Shelter. What it does: Mountain's Wrath is coming; each stone pillar can only shelter a few players from the blast. Paint: one tall stone pillar seen up close, three small armoured figures crouched in the narrow strip of shadow behind it while a blinding gold blast floods past on both sides. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
       "review": "Second output accepted; the first output was a collage of three earlier icons instead of one picture. The owner approved the replacement in the 2026-11-19 audit at 128px, 40px and 28px."
-    },
-    {
-      "auraId": "heart_bond_of_the_stone",
-      "runtimeIds": ["heart_bond_of_the_stone"],
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_bond_of_the_stone.png",
-      "sourceBytes": 2332491,
-      "sourceSha256": "bfdaf12711462fcb4fd67665b8860257b29468c89645e1c6a86a377fa61eb97e",
-      "acceptedSha256": "8e41d7466a1e8c909c66b027f87028ab0ffce5c445004099a73d432bdfb013e9",
-      "acceptedBytes": 5488,
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/council_bond.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_bond_of_the_stone."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "prompt": "Icon 49, same style as the reference icon. Name: Bond of the Stone. What it does: a buff on the two Hammer Council members; while they stand together they take far less damage, so the tanks must pull them apart. Paint: two great stone hands clasped together, bound by a braided gold tether of light. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
-      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
     },
     {
       "auraId": "heart_rush_shattered",
@@ -1696,7 +1644,7 @@
     },
     {
       "auraId": "heart_final_fury",
-      "runtimeIds": ["heart_final_fury"],
+      "runtimeIds": ["heart_final_fury", "heart_grieving_fury"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_fury.png",
       "sourceBytes": 2420078,

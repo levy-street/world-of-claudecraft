@@ -10,7 +10,6 @@
 
 /** Raid aura ids with a painting of their own (public/ui/auras/<id>.webp). */
 export const SMITH_HEART_AURA_IMAGE_IDS: readonly string[] = [
-  'heart_bond_of_the_stone',
   'heart_breath_anchor',
   'heart_breath_blow_mark',
   'heart_breath_calm_spent',
@@ -26,7 +25,6 @@ export const SMITH_HEART_AURA_IMAGE_IDS: readonly string[] = [
   'heart_breath_swelling_storm',
   'heart_breath_thunder_laden',
   'heart_breath_wind_battered',
-  'heart_council_enraged',
   'heart_council_intro',
   'heart_falling_rock_mark',
   'heart_final_coal',
@@ -92,6 +90,8 @@ export const SMITH_HEART_AURA_IMAGE_IDS: readonly string[] = [
  * phase reuses its fight's art: the Gale Cocoon (and its root) is the storm
  * gathering for Skyrend Nova, the Shieldbearer's Squall Ward is the shield in
  * the wind, and a Stillstone's shared charge is Thessaly's calm stilling it.
+ * The Hammer Council survivor's Grieving Fury wears the Masterless Fury's roaring
+ * stone head.
  */
 export const SMITH_HEART_AURA_ICON_SOURCES: readonly (readonly [string, string])[] = [
   ['heart_breath_blow_thrown', 'heart_breath_roar_thrown'],
@@ -111,6 +111,7 @@ export const SMITH_HEART_AURA_ICON_SOURCES: readonly (readonly [string, string])
   ['heart_final_rising', 'heart_final_shield'],
   ['heart_final_sky_mark', 'heart_breath_sky_mark'],
   ['heart_final_under_ice', 'heart_quench_trapped'],
+  ['heart_grieving_fury', 'heart_final_fury'],
   ['heart_heat_intro', 'heart_council_intro'],
   ['heart_quench_intro', 'heart_council_intro'],
   ['heart_quench_rime_slow', 'heart_quench_rime'],
