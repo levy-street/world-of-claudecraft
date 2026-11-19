@@ -4764,7 +4764,6 @@ export const ko_KR: EnTranslations = {
         "bond": "망치 의회의 다른 구성원이 {reach}야드 안에 있는 동안 받는 피해가 {pct}% 감소합니다. {every}초마다 돌의 결속이 공격대 전체에 {min}에서 {max}의 피해를 주며, 매번 {growth}%씩 증가합니다. 둘을 떼어 놓으세요. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
         "collapse": "채석장이 무너지고 있습니다: {every}초마다 중첩 하나당 {min}에서 {max}의 피해를 받으며, 매번 중첩이 하나씩 쌓입니다. 저주받은 기둥이 부서지면 끝납니다.",
         "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.",
-        "enraged": "망치 의회의 다른 구성원이 쓰러질 때 그 힘이 이 구성원의 최대 생명력을 {heal}% 회복시켰습니다. 전투가 끝날 때까지 공격 속도가 {haste}% 빨라지고, 공격과 능력의 피해가 {dmg}% 증가합니다. 산의 분노, 낙석, 낙석 진동은 제외됩니다.",
         "pillarLimit": "기둥 하나는 산의 분노로부터 최대 {limit}명만 지켜 줍니다. 그보다 많이 숨으면 모두가 폭발의 {share}%를 받습니다. 숨지 않은 대상은 일반에서 {min}에서 {max}, 영웅에서 {heroicMin}에서 {heroicMax}, 신화에서 {mythicMin}에서 {mythicMax}의 피해를 받습니다."
       },
       "breathGuardian": {

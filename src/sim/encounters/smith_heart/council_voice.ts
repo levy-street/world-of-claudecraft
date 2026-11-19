@@ -15,8 +15,7 @@
 //   a kill     a player falls: a living member's kill line, the two in turn,
 //              at most one in SLAY_EVERY seconds (voice_slain.ts)
 //   a fall     the fallen's death line (on mythic its soul's line instead), and
-//              as its strength lands a breath later the survivor's "the stone
-//              remembers" (council_grief.ts: the survivor enraged)
+//              the first survivor's "the stone remembers"
 //   the end    the last to fall says its defeat line; a wipe, a survivor's
 //
 // Zero rng, no clock but the fight's: every line is ordered and once-gated.
@@ -174,11 +173,15 @@ export function stepCouncilVoice(s: CouncilScope): void {
   });
 }
 
-/** A member fell (not the last): its own line (its soul's on mythic). The
- *  survivor's memory of it ("the stone remembers") waits for its strength to
- *  land, a breath later (council_grief.ts). */
+/** A member fell (not the last): its own line (its soul's on mythic) and the
+ *  first survivor's memory of it. */
 export function sayFallen(s: CouncilScope, role: CouncilRole, soulTaken: boolean): void {
   councilSay(s, role, soulTaken ? 'soul' : 'death');
+  // A survivor who has not yet said it (the second fall, the other one).
+  const survivor = COUNCIL_ROLES.find(
+    (r) => r !== role && living(s.bodies[r]) && s.st.said[`${r}_remember`] === undefined,
+  );
+  if (survivor) councilSay(s, survivor, 'remember');
 }
 
 /** Watch the Quarry for a player's fall (called every tick of the fight):

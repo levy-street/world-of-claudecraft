@@ -83,21 +83,6 @@ export interface CouncilRush {
   struck: number[];
 }
 
-/** Grief of the Stone (council_grief.ts): the first fall's strength on its way
- *  to the survivor, then landed (the survivor healed and enraged for the rest
- *  of the pull). */
-export interface CouncilGrief {
-  /** The member that fell first (the survivor is the other). */
-  fallen: CouncilRole;
-  /** Seconds until the strength reaches the survivor. */
-  flow: number;
-  landed: boolean;
-  /** The survivor's weapon before its enraged swing, given back at a reset,
-   *  and the bonus the weapon carries now (a dev tier switch re-scales). */
-  baseSwing?: TierSwingBase;
-  swingBonus?: number;
-}
-
 export interface CouncilFightState {
   kind: 'council';
   difficulty: CouncilDifficulty;
@@ -158,9 +143,6 @@ export interface CouncilFightState {
   rubble: CouncilRubble[];
   /** The fallen, in the order they fell. */
   fallen: CouncilRole[];
-  /** Grief of the Stone, unset while both stand (and once both have fallen
-   *  before its strength landed). */
-  grief?: CouncilGrief;
   /** Lines said this pull (each once). */
   lines: string[];
   /** The members' spoken lines (council_voice.ts): `<role>_<moment>` to the

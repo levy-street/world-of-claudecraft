@@ -35,7 +35,6 @@ import {
   COUNCIL_CASTS,
   COUNCIL_NAMES,
   COUNCIL_ROLES,
-  type CouncilRole,
   councilFillSeconds,
   inCouncilShelter,
   COUNCIL_TUNING as T,
@@ -45,7 +44,6 @@ import { breakCursed } from './council_rush';
 import {
   beginBar,
   type CouncilScope,
-  enraged,
   jobHolder,
   living,
   memberFree,
@@ -233,23 +231,14 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
   return struck;
 }
 
-/** Who brings Hammer's Weight down: the Guardian; once he has fallen, the
- *  Seam Singer when his grief has enraged her (council_grief.ts), else
- *  nobody. */
-export function weightCaster(s: CouncilScope): CouncilRole | null {
-  if (living(s.bodies.guardian)) return 'guardian';
-  return enraged(s, s.bodies.singer) ? 'singer' : null;
-}
-
-/** Hammer's Weight: the Guardian's own, his enraged Singer's after him. */
+/** Hammer's Weight: the Guardian's own (it dies with it). */
 export function startWeight(s: CouncilScope): boolean {
-  const role = weightCaster(s);
-  const b = role !== null ? s.bodies[role] : null;
-  if (role === null || !living(b) || !memberFree(s, role)) return false;
-  const tank = b.aggroTargetId !== null ? s.ctx.entities.get(b.aggroTargetId) : undefined;
+  const g = s.bodies.guardian;
+  if (!living(g) || !memberFree(s, 'guardian')) return false;
+  const tank = g.aggroTargetId !== null ? s.ctx.entities.get(g.aggroTargetId) : undefined;
   if (!tank || tank.dead) return false;
   s.st.weightTimer = T.weightEvery;
-  beginBar(s, role, COUNCIL_CASTS.weight, T.weightCast, tank.id, role !== 'guardian');
+  beginBar(s, 'guardian', COUNCIL_CASTS.weight, T.weightCast, tank.id, false);
   return true;
 }
 

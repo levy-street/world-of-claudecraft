@@ -1202,8 +1202,6 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/final_overload_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
-  // Grief of the Stone on the Hammer Council's enraged survivor.
-  'src/render/smith_heart_fx/council_grief_core.ts',
   'src/render/smith_heart_fx/breath_isles_fx_core.ts',
   'src/render/smith_heart_fx/breath_isle_phase_core.ts',
   'src/render/smith_heart_fx/council_bodies_core.ts',

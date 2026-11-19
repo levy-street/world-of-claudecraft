@@ -4764,7 +4764,6 @@ export const zh_CN: EnTranslations = {
         "bond": "重锤议会的另一名成员在{reach}码内时，受到的伤害降低{pct}%。岩石之契每{every}秒对全团造成{min}到{max}点伤害，每次提高{growth}%。把他们拉开。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "collapse": "采石场正在坍塌：每{every}秒，你每层受到{min}到{max}点伤害，且每次增加一层。诅咒石柱碎裂时结束。",
         "memory": "造成的伤害提高{pct}%：重锤议会每倒下一名成员提高{per}%。",
-        "enraged": "重锤议会的另一名成员倒下时，其力量为此成员恢复了最大生命值的{heal}%。战斗结束前，其攻击速度提高{haste}%，攻击和技能造成的伤害提高{dmg}%，山岳之怒、落石和落石震荡除外。",
         "pillarLimit": "每根石柱最多只能为{limit}名玩家挡住山岳之怒。躲在后面的人更多时，每人承受冲击的{share}%。未躲藏者在普通难度受到{min}到{max}点伤害，英雄难度{heroicMin}到{heroicMax}点，史诗难度{mythicMin}到{mythicMax}点。"
       },
       "breathGuardian": {

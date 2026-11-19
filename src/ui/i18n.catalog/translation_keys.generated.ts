@@ -12791,7 +12791,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.costTax'
   | 'hudChrome.auraEffect.council.bond'
   | 'hudChrome.auraEffect.council.collapse'
-  | 'hudChrome.auraEffect.council.enraged'
   | 'hudChrome.auraEffect.council.intro'
   | 'hudChrome.auraEffect.council.memory'
   | 'hudChrome.auraEffect.council.pillarLimit'
