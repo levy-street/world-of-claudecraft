@@ -322,11 +322,18 @@ function due(s: FinalScope, key: keyof FinalKitClocks, needsBar = false): boolea
   const k = s.st.kit;
   k[key] -= DT;
   if (k[key] > 1e-9) return false;
-  if (needsBar && !bossFree(s)) {
+  if (needsBar && !bossFree(s, barSeconds(s, key))) {
     k[key] = 0;
     return false;
   }
   return true;
+}
+
+/** How long the bar a kit mechanic begins runs (0: no bar). */
+function barSeconds(s: FinalScope, key: keyof FinalKitClocks): number {
+  if (key === 'fist') return s.rules.fistCast;
+  if (key === 'bolt') return T.boltCast;
+  return 0;
 }
 
 /** The active quarter's kit, each mechanic on its clock. */
@@ -364,7 +371,7 @@ function runAnvil(s: FinalScope): void {
   const st = s.st;
   st.anvilClock -= DT;
   if (st.anvilClock > 1e-9) return;
-  if (!bossFree(s)) {
+  if (!bossFree(s, T.anvilCast)) {
     st.anvilClock = 0;
     return;
   }

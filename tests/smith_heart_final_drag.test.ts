@@ -296,3 +296,53 @@ describe('dragging the Masterless Strength online (the server input path)', () =
     expect(seconds).toBeLessThan(12);
   });
 });
+
+describe('Taking Root is short (Jose playtest of 2026-11-19: rooted like 10 s, why?)', () => {
+  it('holds 6 s on a new quarter, then the boss follows its tank at once', () => {
+    expect(T.rootSeconds).toBe(6);
+    const f = finalFight(5, 7);
+    f.pullIn('heat');
+    const root = f.boss().auras.find((a) => a.id === FINAL_AURAS.root);
+    expect(root?.duration).toBe(6);
+    // Its tank walks off toward the Quench the moment it roots: the boss
+    // stands its 6 s, then comes.
+    const goal = heartQuarterSpot('quench');
+    const start = f.local(f.boss());
+    let stillFor = 0;
+    let moved = false;
+    for (let i = 0; i < 20 * 12 && !moved; i++) {
+      f.walkStep(f.players[0], goal.x, goal.z, 2);
+      const here = f.local(f.boss());
+      if (Math.hypot(here.x - start.x, here.z - start.z) > 0.5) moved = true;
+      else stillFor++;
+    }
+    expect(moved).toBe(true);
+    expect(stillFor / 20).toBeLessThan(T.rootSeconds + 1);
+  });
+});
+
+describe('no planted bar outlasts Taking Root (playtest 2026-11-19)', () => {
+  it('a Weight of the Anvil due late in the root waits for it to end', () => {
+    const f = finalFight(5, 7);
+    f.pullIn('heat');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    // Two seconds of root left, the Anvil due now: it must not begin (its 6 s
+    // bar would hold the boss still for the root and the bar together).
+    while (st.rootLeft > 2) f.tick(1);
+    st.anvilClock = 0;
+    let begunInRoot = false;
+    while (st.rootLeft > 0) {
+      f.tick(1);
+      if (st.anvil && st.rootLeft > 0) begunInRoot = true;
+    }
+    expect(begunInRoot).toBe(false);
+    // Once the root and the drag's grace are over (its tank at its side), it comes.
+    let begun = false;
+    for (let i = 0; i < 20 * (T.dragGrace + 8) && !begun; i++) {
+      f.tick(1);
+      begun = st.anvil !== null;
+    }
+    expect(begun).toBe(true);
+  });
+});
