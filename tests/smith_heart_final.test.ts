@@ -131,11 +131,12 @@ describe('the pure rules', () => {
     expect(anvilShare(6, false, total)).toBe(Math.round(total / 6));
     expect(anvilShare(2, false, total)).toBe(Math.round((total / 2) * 1.5));
     expect(anvilShare(6, true, total)).toBe(Math.round((total / 6) * T.crushedMult));
-    // The tier's total: Normal 5,600, Heroic and Mythic 6,600 (2026-11-12).
-    expect(FINAL_DIFFICULTY.normal.anvilTotal).toBe(5600);
-    expect(FINAL_DIFFICULTY.heroic.anvilTotal).toBe(6600);
+    // The tier's total: Normal 4,200 and Heroic 5,600 since the Anvil came
+    // every 35 and 30 s (2026-11-19), Mythic 6,600 (its turning Anvil).
+    expect(FINAL_DIFFICULTY.normal.anvilTotal).toBe(4200);
+    expect(FINAL_DIFFICULTY.heroic.anvilTotal).toBe(5600);
     expect(FINAL_DIFFICULTY.mythic.anvilTotal).toBe(6600);
-    expect(anvilShare(10, false, FINAL_DIFFICULTY.normal.anvilTotal)).toBe(560);
+    expect(anvilShare(10, false, FINAL_DIFFICULTY.normal.anvilTotal)).toBe(420);
   });
 
   it('every zone code round-trips through the state aura', () => {

@@ -405,7 +405,11 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pulseRise: 45,
     anvilMissMin: 1000,
     anvilMissMax: 1100,
-    anvilTotal: 5600,
+    // 4,200 since Jose's playtest of 2026-11-19 brought it every 35 s (5,600
+    // every 60 s before): the bot raid read the Anvil as its heaviest damage,
+    // so its share a body (about 525 with eight under it) keeps the healing
+    // it costs a minute close to what it was.
+    anvilTotal: 4200,
     // One a volley on Normal (two until the bot raids of 2026-11-18: the
     // walls crowded the Hammer's soak).
     pillarCount: 1,
@@ -458,7 +462,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pulseRise: 70,
     anvilMissMin: 1500,
     anvilMissMax: 1600,
-    anvilTotal: 6600,
+    // 5,600 since it comes every 30 s (Jose's playtest of 2026-11-19; 6,600
+    // every 45 s before).
+    anvilTotal: 5600,
     // Two a volley (three until the Heroic bot raids of 2026-11-18: seven
     // standing at once outran the blades that break them).
     pillarCount: 2,
