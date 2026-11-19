@@ -7332,6 +7332,7 @@ export const de_DE: EnTranslations = {
         "guardian_slay_b": "One less hand to steal the strength.",
         "guardian_death": "My strength... I give it to the stone.",
         "guardian_remember": "The stone remembers. What was theirs is mine.",
+        "guardian_grief": "You took her song. I will make it a dirge.",
         "guardian_soul": "I am the stone now. My wrath has no body left to fail.",
         "guardian_wipe": "Dust. As all flesh becomes.",
         "guardian_defeat": "The Hammer's strength... is yours to carry.",
@@ -7344,6 +7345,7 @@ export const de_DE: EnTranslations = {
         "singer_slay_b": "Hear that? One note fewer.",
         "singer_death": "My song... runs into the rock...",
         "singer_remember": "The stone remembers. Listen, it still sings.",
+        "singer_grief": "His strength is mine now. Feel the mountain sing.",
         "singer_soul": "Listen. In the stone, my song never ends.",
         "singer_wipe": "Hush now. The seam is still.",
         "singer_defeat": "The last note... fades."

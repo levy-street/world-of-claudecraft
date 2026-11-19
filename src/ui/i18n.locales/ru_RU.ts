@@ -24764,6 +24764,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_wrath': 'Гора отвечает мне! Прячьтесь, если камень вас примет!',
   'hudChrome.council.say.guardian_death': 'Моя сила... я отдаю её камню.',
   'hudChrome.council.say.guardian_remember': 'Камень помнит. Что было их, теперь моё.',
+  'hudChrome.council.say.guardian_grief': 'Вы отняли её песню. Я превращу её в погребальный плач.',
   'hudChrome.council.say.guardian_soul':
     'Теперь я камень. У моего гнева нет тела, что может пасть.',
   'hudChrome.council.say.guardian_wipe': 'Прах. Как и всякая плоть.',
@@ -24772,6 +24773,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_song': 'Пойте со мной и разбейтесь!',
   'hudChrome.council.say.singer_death': 'Моя песнь... уходит в скалу...',
   'hudChrome.council.say.singer_remember': 'Камень помнит. Слушайте, он всё ещё поёт.',
+  'hudChrome.council.say.singer_grief': 'Его сила теперь моя. Почувствуйте, как поёт гора.',
   'hudChrome.council.say.singer_soul': 'Слушайте. В камне моя песнь не кончается.',
   'hudChrome.council.say.singer_wipe': 'Тише. Жила умолкла.',
   'hudChrome.council.say.singer_defeat': 'Последняя нота... тает.',

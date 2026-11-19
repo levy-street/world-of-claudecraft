@@ -22570,6 +22570,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_wrath': '산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!',
   'hudChrome.council.say.guardian_death': '나의 힘을... 돌에 맡긴다.',
   'hudChrome.council.say.guardian_remember': '돌은 기억한다. 그들의 것은 이제 나의 것이다.',
+  'hudChrome.council.say.guardian_grief':
+    '너희가 그녀의 노래를 빼앗았다. 내가 그것을 만가로 만들어 주마.',
   'hudChrome.council.say.guardian_soul': '이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.',
   'hudChrome.council.say.guardian_wipe': '먼지로다. 모든 살덩이가 그러하듯.',
   'hudChrome.council.say.guardian_defeat': '망치의 힘은... 이제 너희가 짊어져라.',
@@ -22578,6 +22580,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_song': '나와 함께 노래하고, 부서지세요!',
   'hudChrome.council.say.singer_death': '나의 노래가... 바위로 흘러들어...',
   'hudChrome.council.say.singer_remember': '돌은 기억해요. 들어 봐요, 아직 노래하고 있어요.',
+  'hudChrome.council.say.singer_grief': '그의 힘은 이제 내 것이에요. 산이 노래하는 걸 느껴 봐요.',
   'hudChrome.council.say.singer_soul': '들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.',
   'hudChrome.council.say.singer_wipe': '쉿. 광맥이 잠잠해졌어요.',
   'hudChrome.council.say.singer_defeat': '마지막 음이... 사라져요.',
