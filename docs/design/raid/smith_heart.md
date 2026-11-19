@@ -1734,6 +1734,23 @@ the Quench's.
 
 Pinned by `tests/smith_heart_breath_air.test.ts` and `tests/smith_heart_breath_env.test.ts`.
 
+#### The light-rivers as veins of light
+
+On the route's stills three of the four rivers read as flat translucent bands laid on the floor
+(on the Grand Stair, from above, a wide flat stripe), where the Heat's already was the Hearth's
+own mark, a seam of fire burned into the stone. The other three now follow it.
+
+| Piece | Now | Where |
+|---|---|---|
+| The dim ribbons (the Hammer's, the Breath's, the Quench's) | A groove cut the ribbon's width into the floor, a thread of the vein's own colour wandering down its middle, its glow breathing in pulses that run toward the guardian and never go out; one touch each: the Hammer's ore glints in the groove, the Breath's thread kinks and beads like static, the Quench's lips are rimed | `river_vein_look.ts` `RIVER_VEIN_LOOKS`, `riverVeinPulse` |
+| The bright ribbon (all four) | Its light pooled in the channel: full across its middle half, a hotter line down its middle, streaks drawn out along the flow, its lips feathered to nothing instead of a hard edge | `heart_fx_materials.ts` `heartRiverSurgeMaterial`, `RIVER_LIT_POOL` |
+
+**Kept.** Every river's line, width, lift and rung (the ground band, under every telegraph),
+the light's run from the arena to the seal and its surge, every tier, the vein colours (never a
+threat colour), the Heat's seam. A dim ribbon still reads dim beside its bright twin.
+
+Pinned by `tests/smith_heart_river_veins.test.ts`.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
