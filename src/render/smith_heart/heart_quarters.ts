@@ -8,7 +8,7 @@
 //     central ring to the rim with a bright front, its light washed over the
 //     stones (a floor mark on the ground rung), its element rising off it in
 //     layers: the Hammer's floating grit, its tremor's chips and dust bursts;
-//     the Breath's dust devils, wind streaks and ground veils; the Quench's
+//     the Breath's wind streaks and ground veils; the Quench's
 //     frost mist, rising rime, crystal growing along its veins and its ice
 //     lit from inside; the Heat's embers, heat haze, flames licking out of
 //     its fissures and the lava pulses running out along them (the Heat
@@ -47,6 +47,7 @@ import {
 } from '../../sim/content/smith_heart_quarters';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
+import { eruptLevel, floorThrob } from '../smith_heart_fx/final_overload_core';
 import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { buildHeartCollapse } from './heart_collapse';
 import {
@@ -56,7 +57,7 @@ import {
   heartRootFall,
 } from './heart_collapse_core';
 import type { HeartFallAltar } from './heart_collapse_rig';
-import { heartFloorMaterial, setHeartFloorQuarter } from './heart_floor';
+import { heartFloorMaterial, sampleHeartFloorSockets, setHeartFloorQuarter } from './heart_floor';
 import {
   heartKitMeshes,
   heartKitPiece,
@@ -84,7 +85,6 @@ import {
 import {
   BLAZE_FRAG,
   BLAZE_VERT,
-  BREATH_DEVIL_VERT,
   BREATH_SHEET_VERT,
   BREATH_STREAK_VERT,
   CRYSTAL_FRAG,
@@ -474,30 +474,10 @@ export function buildHeartQuarters(
     seedQuads('hammer', n(A.hammer.dust), 2, (h) => [h[0], h[1], 0, 0]),
     airMaterial('smithHeartQuarterDust', HAMMER_DUST_VERT, 0xa07c4c, 0xd8b480, 0.3),
   );
-  // The Breath: dust devils (every mote of a devil on its anchor), streaks
-  // and low veils of dust along the spiral.
+  // The Breath: streaks and low veils of dust along the spiral. (Its dust
+  // devils left the dressing with Jose's playtest of 2026-11-19: a whirlwind
+  // in the Breath is now the boss's Dust Devil, final_breath.ts, which throws.)
   {
-    const anchors = heartQuarterSeeds('breath', A.breath.devils, 3, 5, 20, 54);
-    const bases: HeartAirV3[] = [];
-    const params: HeartAirV4[] = [];
-    anchors.forEach((a, d) => {
-      const m = n(A.breath.perDevil);
-      for (let i = 0; i < m; i++) {
-        bases.push(local(a.x, a.z));
-        params.push([
-          (i * 0.618034 + d * 0.31) % 1,
-          (i * 0.754877) % 1,
-          0.7 + a.h[0] * 0.6,
-          d / A.breath.devils,
-        ]);
-      }
-    });
-    addAir(
-      'breath',
-      'heartQuarterDevils:breath',
-      quads(bases, params),
-      airMaterial('smithHeartQuarterDevils', BREATH_DEVIL_VERT, 0xa8a4d8, 0xe4f0ff, 0.55),
-    );
     const streaks = heartQuarterSeeds('breath', n(A.breath.streaks), 4);
     addAir(
       'breath',
@@ -848,6 +828,14 @@ export function buildHeartQuarters(
   const landmarks = buildHeartLandmarks(lowGfx, centre);
   group.add(landmarks.group);
 
+  // The arrival's sockets laid flush outside the rite wear the sheet's own
+  // paint round them (heart_floor_rite_core.ts).
+  sampleHeartFloorSockets(
+    HEART_QUARTER_ORDER.map(
+      (v) => heartKitPiece(SMITH_HEART_HEART_KIT_URL, HEART_QUARTER_PIECES[v])?.stone,
+    ),
+  );
+
   // ---- the Anvil falling apart (Mythic's hidden phase) --------------------------------------
   const collapse = buildHeartCollapse(
     lowGfx,
@@ -906,13 +894,17 @@ export function buildHeartQuarters(
         const whole = fallT >= 0 ? 0 : 1;
         if (r.shadeMesh.visible !== (whole === 1)) r.shadeMesh.visible = whole === 1;
         if (r.washMesh.visible !== (whole === 1)) r.washMesh.visible = whole === 1;
-        set(r.glow.uniforms.uBase, q.base);
+        // The Overload in the world: the quarter it drinks throbs as its bar
+        // fills (final_overload_core.ts floorThrob), every tier.
+        const throb =
+          state.mode === 'quarter' && state.zone === vein ? floorThrob(boss?.strain ?? 0, now) : 0;
+        set(r.glow.uniforms.uBase, q.base + throb);
         // The quarter's idle life (the Heat's smoulder) wakes with the room.
         set(r.glow.uniforms.uIdle, awakeRoom ? P[vein].idle * (1 - dark) : 0);
         set(r.glow.uniforms.uAwake, q.awake);
         set(r.glow.uniforms.uFront, q.front, 100);
         set(r.glow.uniforms.uDark, dark);
-        set(r.wash.uniforms.uAwake, q.awake * whole);
+        set(r.wash.uniforms.uAwake, q.awake * whole * (1 + throb));
         set(r.wash.uniforms.uFront, q.front, 100);
         set(r.wash.uniforms.uDark, dark);
         const shadeLevel = state.mode === 'rest' || state.mode === 'asleep' ? 0.88 : P[vein].shade;
@@ -926,10 +918,14 @@ export function buildHeartQuarters(
         }
         // Its wall landmark: a quiet glow of its tint, erupting as its
         // flood reaches the wall.
+        // From three quarters full it erupts: its light flares past its lit
+        // level, throbbing (its element thrown up off it is FinalFx's).
+        const erupt =
+          state.mode === 'quarter' && state.zone === vein ? eruptLevel(boss?.strain ?? 0) : 0;
         landmarks.set(
           vein,
           q.base * 4 + (awakeRoom ? P[vein].idle * 0.5 : 0),
-          heartLandmarkLit(q) * whole,
+          heartLandmarkLit(q) * whole * (1 + erupt * (0.6 + 0.5 * Math.sin(now * 14))),
           dark,
         );
         const lf = heartLandmarkFall(fallT);

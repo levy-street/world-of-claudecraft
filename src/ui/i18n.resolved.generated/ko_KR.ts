@@ -4782,9 +4782,9 @@ export const ko_KR: EnTranslations = {
         "spent": "닻이 다했습니다: 이것이 끝날 때까지 테살리 대장의 고요의 원은 당신을 다시 붙잡을 수 없습니다.",
         "drawn": "{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요. 영웅·신화: 각각 {heroicMin}에서 {heroicMax}, {heroicCMin}에서 {heroicCMax}의 피해.",
         "cradled": "폭풍 속으로 들어 올려져, 수호자가 요람을 유지하는 {hold}초 동안 붙잡힙니다. 그동안 수호자는 다른 것을 시전하지 않습니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다. 영웅: {heroicCount}명이 한꺼번에 들어 올려지며, 각 방전은 {heroicTotal}이고 {heroicSoakers}명이 필요하니 공격대가 나뉘어 받아야 합니다. 영웅·신화: 반동 피해는 {heroicBMin}에서 {heroicBMax}입니다.",
-        "bulwark": "바람의 방패가 피해를 {left} 더 흡수합니다. 떠 있는 섬의 질풍 파수병이나 질풍 치유사가 하나라도 살아 있으면 매초 전체의 {regrow}%가 다시 차오르고, 치유의 질풍마다 {mend}%가 회복됩니다. 질풍의 길을 타고 섬으로 건너가 그들을 쓰러뜨리세요. {max}초 동안 유지되면 벼랑 위에서 터져 {bmin}~{bmax}의 피해를 줍니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
+        "cocoon": "수호자는 하늘가름 회오리를 정신 집중하는 동안 피해를 입지 않습니다. 정신 집중이 끝나면 회오리가 모두에게 최대 생명력의 {share}%에 해당하는 피해를 줍니다(영웅 및 신화: 치명적). 테살리 대장의 상승 기류를 타고 동쪽과 서쪽의 떠 있는 섬으로 건너가 고요석 두 개를 정신 집중해 끊으십시오: {stilled}/2 잠재움.",
         "riding": "바람이 정해진 길을 따라 공허 위로 당신을 실어 갑니다: 내려놓을 때까지 행동할 수 없습니다.",
-        "windworn": "바람에 지쳤습니다: 이 효과가 끝날 때까지 질풍의 길이 당신을 섬으로 데려가지 않습니다.",
+        "ward": "정면 {arc}도 안에서 들어오는 공격의 피해를 {cut}% 흘려냅니다. 대상이 이것을 돌려세운 동안 등을 공격하십시오. 영웅 및 신화: {heroicCut}%.",
         "thrown": "정상의 포효에 날아갔습니다: 착지할 때까지 움직일 수 없습니다.",
         "blast": "정상의 포효의 돌풍이 당신을 수호자에게서 밀어냅니다: 입 앞에서는 초당 {speed}미터, 멀어질수록 약해지며 모두 {seconds}초 동안 지속됩니다. 즉시 바람을 거슬러 곧장 돌아가거나 세살리의 닻에 서세요. 그러지 않으면 처마 밖으로 날려갑니다.",
         "tossed": "떠도는 돌풍에 날아갔습니다: 돌풍이 내려놓을 때까지 움직일 수 없습니다.",
@@ -4813,11 +4813,11 @@ export const ko_KR: EnTranslations = {
         "tempered": "담금질 일격에 {stacks}번 담금질되었습니다: 냉기가 {floor} 아래로 내려가지 않고, 받는 냉기 피해가 {pct}% 증가합니다. 당신을 맞히는 담금질 일격마다 1중첩이 쌓이고(중첩당 냉기 {cold}, 냉기 피해 {per}%) 지속시간이 {seconds}초로 초기화됩니다. {swap}중첩에서 탱커를 교대하세요. 영웅 및 신화에서는 {heroicMax}중첩이 냉기를 {max}로 유지해 얼어붙습니다. 일반은 최대 {normalMax}중첩(냉기 {normalFloor})입니다."
       },
       "heatGuardian": {
-        "statePhase1": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹이 물가의 한 지점을 내리찍고, 그곳에서 용암 너울 세 줄기가 퍼져 나갑니다. 화로의 섬광은 샘에서 {reach}미터보다 멀리 있는 모두를 칩니다. 생명력 70%에서 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
-        "statePhase2": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹은 계속됩니다. 화로 씨앗이 공격대의 발밑에 떨어졌다가 잠시 뒤 터지고, 깨어나는 불이 샘 주위의 바닥을 띠마다 차례로 불태웁니다. 생명력 40%에서 다시 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
-        "statePhase3": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹과 깨어나는 불은 계속되고, 구르는 잉걸불이 떨어져 플레이어를 쫓습니다: 때리면 밀려납니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
+        "statePhase1": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 화로의 바퀴가 물가를 네 조각으로 나눕니다: 세 조각은 붉게 달아올라 {warn}초 뒤 분출하고(영웅 난이도 {heroicWarn}초), 한 조각만 어둡고 안전하게 남습니다. 한 차례가 분출하면 다음 차례의 안전한 조각이 다른 곳에 나타납니다. 현무암 주먹이 물가의 한 지점을 내리찍고, 그곳에서 용암 너울 세 줄기가 퍼져 나갑니다. 화로의 섬광은 샘에서 {reach}미터보다 멀리 있는 모두를 칩니다. 생명력 70%에서 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
+        "statePhase2": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 화로의 바퀴와 현무암 주먹은 계속됩니다. 화로 씨앗이 공격대의 발밑에 떨어졌다가 잠시 뒤 터지고, 깨어나는 불이 샘 주위의 바닥을 띠마다 차례로 불태웁니다. 생명력 40%에서 다시 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
+        "statePhase3": "샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 화로의 바퀴, 현무암 주먹, 깨어나는 불은 계속되고, 구르는 잉걸불이 떨어져 플레이어를 쫓습니다: 때리면 밀려납니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.",
         "intro": "샘 속에서 차갑게 식어 있다: 공격대가 다가와 깨어나 불타오를 때까지 공격하거나 피해를 줄 수 없다.",
-        "stateUnder": "샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 넘침이 끝나면 다시 떠오릅니다.",
+        "stateUnder": "샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 용암 고리가 샘에서 차례로 퍼져 나오며, 고리마다 불길이 갈라지는 틈이 두 곳 있습니다. 다음 고리의 틈은 고리가 오기 전에 바닥에서 빛납니다. 고리가 지나갈 때 틈 안에 서 있지 않으면 화염 피해를 {min}~{max} 입습니다(영웅 난이도 {heroicMin}~{heroicMax}). 두 번째 넘침의 고리는 더 빨리 오고 틈도 더 좁습니다. 마지막 고리가 지나가면 다시 떠오릅니다.",
         "scorched": "받는 화염, 냉기, 자연, 암흑, 비전 피해가 {pct}% 증가합니다. {every}초마다 화로의 섬광이 샘에서 {reach}미터보다 멀리 있는 모두를 치고 이 효과를 갱신합니다.",
         "grip": "매초 화염 피해를 {total} 받습니다(중첩 {stacks}개마다 {per}). 수호자의 공격이 적중할 때마다 중첩이 하나씩 쌓이고(최대 {most}개) {seconds}초 동안 지속됩니다: 너무 무거워지기 전에 방어 전담을 교대하십시오.",
         "kindling": "{seconds}초 뒤 {trail}초 동안 불의 자취를 남깁니다. 자취마다 아군에게 매초 {min}~{max}의 화염 피해를 주고, 그 위에 선 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다: 무리와 샘의 자식이 지나는 길에서 벗어나십시오. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
@@ -4826,38 +4826,37 @@ export const ko_KR: EnTranslations = {
         "crust": "단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다."
       },
       "finalBoss": {
-        "stateHeat": "열기를 마십니다: 현무암 주먹이 한 플레이어가 선 자리를 내리찍고 그곳에서 용암 너울 세 줄기가 퍼져 나가며, 화염 회오리가 바닥을 가로지릅니다. 영웅에서는 잉걸불 표식이 원거리 플레이어 발밑에 불을 떨어뜨리고, 신화에서는 정면 공격이 용광로의 불을 남깁니다.",
-        "stateQuench": "담금질을 마십니다: {reach}미터 안에 다른 플레이어가 {allies}명 미만인 사람은 점점 차가워져 얼어붙습니다. 영웅에서는 표식이 찍힌 플레이어 발밑의 얼음이 깨지고, 신화에서는 정면 공격이 이동 속도를 {slow}% 늦춥니다.",
-        "stateBreath": "숨결을 마십니다: 강풍이 공격대를 가장자리로 밀어내고, 튀어 오르는 번개가 서로 {jump}미터 안에 있는 플레이어 사이를 튑니다. 영웅에서는 끌려오는 번개가 플레이어에게 표식을 남기고, 신화에서는 폭풍 구슬을 각각 한 명이 밟아야 합니다.",
-        "stateHammer": "망치를 마십니다: 진동 균열이 플레이어 발밑에서 터지고, 모루의 무게가 표식 안의 모두에게 타격을 나눠 줍니다. 영웅에서는 돌 껍질이 치유를 흡수하고 모루를 나눠 맞은 사람은 짓눌림에 걸리며, 신화에서는 모루의 표식이 우두머리 주위를 돕니다.",
-        "stateRing": "중앙 원 안에서는 어느 구역의 힘도 마시지 않습니다. 생명력이 {pct}%보다 높으면 그곳에서 매초 풀려난 심장 중첩을 얻습니다.",
+        "stateHeat": "열기를 마십니다: 현무암 주먹이 플레이어가 선 자리를 내리치고 거기서 용암 너울 세 줄기가 굴러 나옵니다. 그 별인 불의 회오리가 깨어나 전투가 끝날 때까지 이어집니다: 높이 치솟은 불기둥이 바닥을 가로지릅니다. 영웅에서는 불씨 표식이 원거리 플레이어 발밑에 불을 떨어뜨리고, 신화에서는 정면 공격이 대장간 불을 남깁니다.",
+        "stateQuench": "담금질을 마십니다. 그 별인 교차하는 칼날이 깨어나 전투가 끝날 때까지 이어집니다: 얼음 검이 표식이 찍힌 플레이어를 지나는 선을 휩쓸고 그 선 위의 기둥을 모두 부숩니다. 영웅에서는 표식이 찍힌 플레이어 발밑의 얼음이 깨지고, 신화에서는 정면 공격이 이동 속도를 {slow}% 낮춥니다.",
+        "stateBreath": "숨결을 마십니다: 튀어 오르는 번개가 서로 {jump}미터 안에 있는 플레이어 사이를 튑니다. 그 별인 하늘의 일격이 깨어나 전투가 끝날 때까지 이어집니다: 번개가 플레이어 발밑에 떨어지고, 기둥 옆에 떨어진 번개는 기둥 주위로 호를 그리며 기둥을 충전합니다. 영웅에서는 끌어당긴 번개가 플레이어에게 표식을 남기고, 신화에서는 폭풍 구슬을 각각 한 명이 받아야 합니다.",
+        "stateHammer": "망치를 마십니다: 진동 균열이 플레이어 발밑에서 터집니다. 그 별인 돌의 각성이 깨어나 전투가 끝날 때까지 이어집니다: 기둥이 바닥에서 솟구쳐 교차하는 칼날에 부서질 때까지 남습니다. 영웅에서는 돌 껍질이 치유를 흡수합니다.",
+        "stateRing": "중앙 원 안에서는 어느 구역의 힘도 마시지 않습니다: 깨어난 별은 모두 {pace}% 속도로 움직입니다. 생명력이 {pct}%보다 높으면 그곳에서 매초 풀려난 심장 중첩을 얻습니다.",
         "overloadHeat": "열기의 과부하, {value}% 찼습니다. 우두머리가 열기 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.",
         "overloadQuench": "담금질의 과부하, {value}% 찼습니다. 우두머리가 담금질 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.",
         "overloadBreath": "숨결의 과부하, {value}% 찼습니다. 우두머리가 숨결 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.",
         "overloadHammer": "망치의 과부하, {value}% 찼습니다. 우두머리가 망치 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.",
-        "root": "구역에 들어간 뒤 {seconds}초 동안 뿌리내립니다: 뿌리내림이 끝날 때까지 끌어낼 수 없습니다.",
         "unbound": "중첩마다 매초 공격대 전체에 {per}의 피해를 주며(현재 {total}), 중앙 원 안에 서 있는 동안 매초 중첩이 쌓입니다. 원 밖으로 끌어내면 끝납니다. 영웅: 중첩당 {heroicPer}. 신화: 중첩당 {mythicPer}.",
         "shaken": "이 효과가 지속되는 동안 구역 전환이 {mult}배 강하게 적중합니다({baseMin}~{baseMax} 대신 {min}~{max}의 피해). 전환할 때마다 {seconds}초로 갱신됩니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
-        "cold": "냉기 {value}/100. {reach}미터 안에 다른 플레이어가 {allies}명 미만이면 매초 {rise}씩 오르고, 모이면 내려갑니다. 100이 되면 서리에 갇힙니다: {freeze}초 동안 기절하고 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
-        "frozen": "기절 상태. 혼자 서 있다가 얼어붙었습니다: 담금질을 마시는 동안 다른 플레이어 {allies}명 이상의 {reach}미터 안에 머무르세요.",
         "underIce": "기절 상태: 깨지는 얼음 아래로 떨어졌습니다.",
         "numbing": "정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.",
         "ember": "{seconds}초 후 발밑에 잉걸불이 떨어져 반경 {radius}미터 웅덩이로 {life}초 동안 타오르며, 그 안의 모두에게 매초 {min}~{max}의 화염 피해를 줍니다. 표식이 찍힌 다른 플레이어와 같은 구석에 모였다가 빠져나가세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
-        "wind": "강풍이 부는 방향으로 매초 {speed}미터씩 밀려납니다. 바람을 거슬러 걸으면 버틸 수 있습니다(시전은 끊기지 않습니다). 바람이 부는 동안 가장자리 {band}미터 안에 있으면 매초 {min}~{max}의 자연 피해를 받습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
         "drawn": "{seconds}초 동안 매초 당신에게서 {reach}미터 안의 다른 모든 플레이어에게 번개가 튀어 각각 {min}~{max}의 자연 피해를 줍니다. 모두에게서 {reach}미터 떨어지세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
         "shell": "다음에 받는 치유 {value}을(를) 흡수합니다.",
+        "skyMark": "{seconds}초 후 당신이 선 자리에 번개가 떨어집니다: {radius}미터 안의 모두에게 {min}~{max}의 자연 피해. 자리를 벗어나세요. 기둥에서 {arcReach}미터 안에 떨어진 번개는 기둥 주위로 호를 그리며 기둥을 폭풍으로 충전합니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.",
+        "bladeMark": "교차하는 칼날이 당신을 지나는 선을 겨눕니다: 선은 당신을 따라오다가 날아가기 {lock}초 전에 고정됩니다. 선을 기둥에 통과시켜 부순 뒤 선에서 벗어나세요. 선 위의 모두가 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.",
         "crushed": "{seconds}초 안에 다음 모루의 무게 아래에 서면 분담 피해를 {mult}배로 받습니다. 다른 조에게 맡기세요.",
+        "anvilMark": "모루의 무게가 당신을 따라옵니다: {radius}미터 원이 당신과 함께 움직이다가 떨어지기 {lock}초 전에 고정됩니다. 공격대를 원 안에 모으세요: {total}의 물리 피해를 안에 있는 모두가 나누어 받으며, {fewer}명 미만이면 각자 1.5배를 받습니다. 영웅: {heroicTotal}. 신화: {mythicTotal}.",
         "phaseCall": "네 구역의 부름: 파편이 살아 있는 동안 {seconds}초 동안 중앙에서 보호받습니다. 파편 하나마다 {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 모두 처치하면 보호막이 일찍 깨집니다. 부름이 끝날 때 살아 있는 파편은 전투가 끝날 때까지 그 원소를 우두머리에게 쏟아붓습니다. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
         "phaseFight": "생명력이 {first}%와 {second}%가 되면 보호막을 두른 채 중앙으로 걸어 들어가, 가장 많이 찬 구역마다 파편을 하나씩 불러냅니다. {final}%에서는 네 구역이 모두 깨어나 마지막 저항이 시작됩니다.",
-        "phaseFinal": "네 구역이 모두 깨어났습니다: 중앙 원에 머물며 불의 회오리, 신음하는 얼음, 튀어 오르는 번개, 모루의 무게를 {every}초마다 하나씩 차례로 시전합니다. {enrage}초 후에는 모든 절제를 잃습니다(주인 없는 분노).",
+        "phaseFinal": "네 구역이 모두 깨어났습니다: 중앙 원에 머물며 네 별이 모두 {pace}% 속도로 동시에 움직입니다. 기둥, 번개, 칼날, 회오리가 한꺼번에 몰아칩니다. {enrage}초 후에는 모든 절제를 잃습니다(주인 없는 분노).",
         "phaseKneel": "무릎을 꿇었다. 어떤 공격도 통하지 않는다.",
         "phaseRebirth": "심장이 고동친다. 생명력 {percent}%로 일어설 때까지 어떤 공격도 통하지 않는다.",
         "unmade": "{every}초마다 모루의 구역 하나가 통째로 무너진다. 과부하 막대가 가장 찼던 구역부터 {warn}초의 균열 경고 후에 떨어진다. 그 위에 선 자는 함께 떨어져 죽는다. 마지막 구역이 무너지고 {ring}초 뒤 중앙 고리가 부서져 모두 죽는다.",
         "shield": "모은 힘: 모든 피해에 면역이며 대상으로 지정할 수 없습니다.",
-        "pouredHeat": "열기가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 불의 회오리를 일으킵니다({times}회 쏟아부어짐).",
-        "pouredQuench": "담금질이 쏟아부어졌습니다: 전투가 끝날 때까지 {reach}미터 안에 다른 플레이어가 {allies}명 미만인 사람은 어디서든 추워집니다. 속도는 담금질 구역의 {share}%입니다({times}회 쏟아부어짐).",
-        "pouredBreath": "숨결이 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 튀어 오르는 번개를 시전하며, 서로 {jump}미터 안에 있는 플레이어 사이를 튑니다({times}회 쏟아부어짐).",
-        "pouredHammer": "망치가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 플레이어 발밑에서 진동 균열이 터집니다({times}회 쏟아부어짐).",
+        "pouredHeat": "열기가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 불의 회오리가 일어납니다.",
+        "pouredQuench": "담금질이 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 교차하는 칼날이 방을 휩쓸니다.",
+        "pouredBreath": "숨결이 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 하늘의 일격이 떨어집니다.",
+        "pouredHammer": "망치가 쏟아부어졌습니다: 전투가 끝날 때까지 어디에 있든 {every}초마다 기둥이 솟구칩니다.",
         "fury": "주인 없는 분노: {every}초마다 공격대 전체에 {min}~{max}의 피해를 주며, 파동마다 {rise}%씩 강해집니다. 지금 처치하십시오. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
         "coal": "{seconds}초 후 석탄이 터집니다: 당신으로부터 {reach}미터 안의 다른 모든 플레이어에게 {min}~{max}의 화염 피해, 당신에게 {selfMin}~{selfMax}. 지금 무리를 떠나십시오. 영웅: 각각 {heroicMin}에서 {heroicMax}, {heroicSelfMin}에서 {heroicSelfMax}의 피해. 신화: 각각 {mythicMin}에서 {mythicMax}, {mythicSelfMin}에서 {mythicSelfMax}.",
         "tether": "숨결의 파편이 {seconds}초 동안 당신을 쫓습니다. 그 몰아치는 돌풍은 파편으로부터 {reach}미터 안의 다른 모든 사람에게 매초 {min}~{max}의 자연 피해를 줍니다: 파편을 무리에서 떼어 놓으십시오. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.",
@@ -7348,14 +7347,6 @@ export const ko_KR: EnTranslations = {
         "singer_soul": "들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.",
         "singer_wipe": "쉿. 광맥이 잠잠해졌어요.",
         "singer_defeat": "마지막 음이... 사라져요."
-      },
-      "alert": {
-        "wakeTitle": "돌 깨우기!",
-        "rockTitle": "낙석!",
-        "resonanceTitle": "공명",
-        "rushTitle": "산의 돌진!",
-        "weightTitle": "망치의 무게",
-        "timeAria": "{seconds}초 남음"
       }
     },
     "knotAlert": {
@@ -7393,6 +7384,8 @@ export const ko_KR: EnTranslations = {
         "guardian_death": "숨결은... 산으로... 돌아간다...",
         "thessaly_pull": "하이워치가 함께한다! 여기엔 벽이 없어, 바람이 너희를 가장자리 밖으로 날려 버릴 거야!",
         "thessaly_isles": "저 방패는 섬들에서 힘을 얻고 있어! 바람을 타고 건너가 치유사들을 쓰러뜨리고 돌아와!",
+        "thessaly_updraft": "섬 정리 완료! 다음 상승 기류가 떴다, 가라!",
+        "thessaly_stone": "돌이 깨어났다! 정신 집중해, 아무것에도 맞지 마!",
         "thessaly_circle_a": "어서 제 고요 속으로! 셋까지만, 그 이상은 안 됩니다!",
         "thessaly_circle_b": "여기요! 제 곁에 서서 바람을 함께 받아 냅시다!",
         "thessaly_circle_c": "돌 위에 고요를! 셋, 지금 당장!",
@@ -7498,8 +7491,6 @@ export const ko_KR: EnTranslations = {
       "quench": "담금질",
       "breath": "숨결",
       "hammer": "망치",
-      "rooted": "뿌리내림 {seconds}",
-      "free": "끌 수 있음",
       "shaken": "흔들림 {seconds}",
       "unbound": "풀려남 x{stacks}",
       "barAria": "{quarter} 과부하 {pct}퍼센트",
@@ -7515,14 +7506,6 @@ export const ko_KR: EnTranslations = {
       "fury": "주인 없는 분노 x{stacks}",
       "poured": "쏟아부어진 원소: {elements}",
       "pouredTimes": "{quarter} x{times}"
-    },
-    "finalAlert": {
-      "emberTitle": "잉걸불 표식!",
-      "drawnTitle": "끌려오는 번개!",
-      "crushedTitle": "짓눌림",
-      "coalTitle": "터지는 석탄!",
-      "tetherTitle": "바람에 묶임!",
-      "weightTitle": "쌓이는 무게 x{stacks}"
     },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
@@ -16944,8 +16927,10 @@ export const ko_KR: EnTranslations = {
       "heart_breath_cradle_channel": "천둥의 요람",
       "heart_breath_bellows_blow": "풀무 강타",
       "heart_breath_thunder_lash": "천둥 채찍",
-      "heart_breath_gale_bulwark": "질풍의 방벽",
+      "heart_breath_skyrend_nova": "하늘가름 회오리",
       "heart_breath_mending_gale": "치유의 질풍",
+      "heart_breath_shoving_gale": "밀쳐내는 돌풍",
+      "kituse_heart_still_the_gale": "돌풍 잠재우기",
       "heart_quench_blades_wake": "검의 각성",
       "heart_quench_blades_hunt": "칼날의 사냥",
       "heart_heat_fist": "현무암 주먹",
@@ -26908,6 +26893,21 @@ export const ko_KR: EnTranslations = {
       },
       "heart_gale_mender": {
         "name": "질풍 치유사"
+      },
+      "heart_gust_herald": {
+        "name": "돌풍 전령"
+      },
+      "heart_riven_squall": {
+        "name": "갈라진 스콜"
+      },
+      "heart_squall_fragment": {
+        "name": "스콜 파편"
+      },
+      "heart_squall_shieldbearer": {
+        "name": "스콜 방패병"
+      },
+      "heart_breath_stillstone": {
+        "name": "고요석"
       },
       "heart_quench_warder": {
         "name": "담금질 광맥 파수꾼"

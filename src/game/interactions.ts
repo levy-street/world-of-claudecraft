@@ -6,7 +6,7 @@ import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { isLootableBody } from '../sim/corpse_loot_state';
 import { ESCORTS } from '../sim/data';
 import { corpseLootApproachPoint, corpseLootDistance } from '../sim/loot/corpse_loot_reach';
-import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
+import { kitUsableNow, kitUseOf } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
@@ -194,6 +194,18 @@ export function hoverCursorKind(
   return 'default';
 }
 
+/** Does a click on `e` start its use: a living, unspent, non-hostile body
+ *  whose use is `promptless` (it offers no prompt to press), within the use's
+ *  own reach of a living player? */
+export function clickStartsUse(
+  e: Entity,
+  player: Pick<Entity, 'pos' | 'dead'> | null | undefined,
+): boolean {
+  if (!player || player.dead || e.hostile || !kitUsableNow(e)) return false;
+  const def = kitUseOf(e);
+  return !!def?.promptless && dist2d(player.pos, e.pos) <= def.range;
+}
+
 /** Resolve the client-side range for a lootable object before dispatch or approach. */
 export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): number {
   if (FORGE_STATIONS.some((station) => `ground_${station.objectItemId}` === entity.templateId))
@@ -281,6 +293,14 @@ export function handlePickedEntity(
 
   if (e.kind !== 'object') world.targetEntity(id);
   if (e.kind === 'npc' && isShadowNpc(e.templateId) && e.id !== SHADOW_NPC_ID) return true;
+
+  // A promptless use (the Breath's Stillstone, Jose's call of 2026-11-18): a
+  // click in its reach starts it (the target set above, then the ordinary
+  // interact the sim validates); out of reach the click only targets.
+  if (clickStartsUse(e, world.player)) {
+    world.interact();
+    return true;
+  }
 
   if (button === 2) {
     const d = dist2d(world.player.pos, e.pos);

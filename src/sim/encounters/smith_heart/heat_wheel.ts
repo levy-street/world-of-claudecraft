@@ -1,11 +1,16 @@
 // The Guardian of the Heat's Wheel of the Hearth (docs/design/raid/smith_heart.md
-// section 7.4), Mythic, phases 2 and 3: the shore round the wellspring is cut in four
-// slices. Three turn red and erupt; one stays dark and safe. Three rounds run back to
-// back: as one round's fire falls, the next round's slices already show, its safe
-// slice somewhere else, so the raid crosses the moment the fire dies down.
+// section 7.4), every tier, every fighting phase (the rework of 2026-11-18: on Normal
+// the fight never made anyone move): the shore round the wellspring is cut in four
+// slices. Three turn red and erupt; one stays dark and safe. The tier's rounds run back
+// to back (three, Mythic four): as one round's fire falls, the next round's slices
+// already show, its safe slice somewhere else, so the raid crosses the moment the fire
+// dies down.
 //
-//   A round  each red slice warns `wheelWarn` s, erupts (a near-lethal blow to whoever
-//            stands in it, past the wellspring's lip), and burns `wheelBurn` s more.
+//   A round  each red slice warns the tier's `wheel.warn` s (Normal 5, Heroic 3.5,
+//            Mythic 3), erupts (a near-lethal blow to whoever stands in it, past the
+//            wellspring's lip), and burns `wheelBurn` s more.
+//   A run    the tier's `wheel.every` s apart, never over a Wakefire run (each waits
+//            out the other, heat.ts) nor a Basalt Fist (heat_fist.ts floorHoldsFist).
 //
 // Wakefire moves the raid in and out; the Wheel moves it round the wellspring.
 // Deterministic: the safe slices are hashed; the only rng draws are the damage rolls,
@@ -19,13 +24,13 @@ import {
   HEAT_NAMES,
   heatHash,
   HEAT_TUNING as T,
-  WHEEL_ROUNDS,
   WHEEL_SLICES,
   wheelTemplate,
 } from './heat_ids';
 import {
   at,
   cueAt,
+  damageMult,
   dropFightObject,
   fireHit,
   type HeatScope,
@@ -37,13 +42,13 @@ import {
 import type { HeatWheelRound } from './heat_state';
 import { heatSay } from './heat_voice';
 
-/** Run `run`'s safe slices: each a hashed one or two slices from the last, never the
- *  same, always on the shore. Pure. */
-export function wheelSafes(run: number): number[] {
+/** Run `run`'s `rounds` safe slices: each a hashed one or two slices from the last,
+ *  never the same, always on the shore. Pure. */
+export function wheelSafes(run: number, rounds: number): number[] {
   const out: number[] = [];
   let at0 = heatHash(run, 41) % WHEEL_SLICES;
   out.push(at0);
-  for (let i = 1; i < WHEEL_ROUNDS; i++) {
+  for (let i = 1; i < rounds; i++) {
     const step = 1 + (heatHash(run * 7 + i, 43) % 2);
     const up = at0 + step;
     const down = at0 - step;
@@ -55,6 +60,7 @@ export function wheelSafes(run: number): number[] {
 }
 
 function beginRound(s: HeatScope, safe: number): void {
+  const warn = s.rules.wheel.warn;
   const reds: number[] = [];
   for (let slice = 0; slice < WHEEL_SLICES; slice++) {
     if (slice === safe) continue;
@@ -62,7 +68,7 @@ function beginRound(s: HeatScope, safe: number): void {
       spawnFightObject(
         s.ctx,
         s.inst,
-        wheelTemplate(slice, 'warn', T.wheelWarn),
+        wheelTemplate(slice, 'warn', warn),
         HEAT_NAMES.wheel,
         HEARTH_WELL.x,
         HEARTH_WELL.z,
@@ -73,7 +79,7 @@ function beginRound(s: HeatScope, safe: number): void {
   const safeId = spawnFightObject(
     s.ctx,
     s.inst,
-    wheelTemplate(safe, 'safe', T.wheelWarn),
+    wheelTemplate(safe, 'safe', warn),
     HEAT_NAMES.wheel,
     HEARTH_WELL.x,
     HEARTH_WELL.z,
@@ -82,7 +88,7 @@ function beginRound(s: HeatScope, safe: number): void {
   s.st.wheelRounds.push({
     safe,
     state: 'warn',
-    remaining: T.wheelWarn,
+    remaining: warn,
     tick: 0,
     reds,
     safeId,
@@ -92,8 +98,8 @@ function beginRound(s: HeatScope, safe: number): void {
 /** Begin a Wheel of the Hearth now. Exported for the dev trigger. */
 export function startWheel(s: HeatScope): void {
   const st = s.st;
-  st.wheelTimer = T.wheelEvery;
-  st.wheelSafes = wheelSafes(st.wheelRuns);
+  st.wheelTimer = s.rules.wheel.every;
+  st.wheelSafes = wheelSafes(st.wheelRuns, s.rules.wheel.rounds);
   st.wheelRuns++;
   beginRound(s, st.wheelSafes[0]);
   st.wheelNext = 1;
@@ -143,7 +149,12 @@ export function stepWheel(s: HeatScope): void {
       dropFightObject(s.ctx, s.inst, round.safeId);
       cueAt(s, HEAT_CUES.ignite, HEARTH_WELL.x, HEARTH_WELL.z, T.wheelOuter);
       for (const p of inRed(s, round))
-        fireHit(s, p, roll(s, T.wheelMin, T.wheelMax, punishMult(s)), HEAT_NAMES.wheel);
+        fireHit(
+          s,
+          p,
+          roll(s, T.wheelMin, T.wheelMax, punishMult(s) * s.rules.wheel.hit),
+          HEAT_NAMES.wheel,
+        );
       keep.push(round);
       if (st.wheelNext < st.wheelSafes.length) beginRound(s, st.wheelSafes[st.wheelNext++]);
       continue;
@@ -156,7 +167,12 @@ export function stepWheel(s: HeatScope): void {
     if (round.tick <= 1e-9) {
       round.tick += T.wheelTick;
       for (const p of inRed(s, round))
-        fireHit(s, p, roll(s, T.wheelBurnMin, T.wheelBurnMax), HEAT_NAMES.wheel);
+        fireHit(
+          s,
+          p,
+          roll(s, T.wheelBurnMin, T.wheelBurnMax, damageMult(s) * s.rules.wheel.hit),
+          HEAT_NAMES.wheel,
+        );
     }
     keep.push(round);
   }

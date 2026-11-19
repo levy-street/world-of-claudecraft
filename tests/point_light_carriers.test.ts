@@ -543,6 +543,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
   'render/soulwell.ts':
     'the soulwell glow inside the entity view body, a view light marked on reconcile',
   'render/stations.ts': 'the crafting-station fire light, adopted into fireLights at construction',
+  'render/smith_heart_fx/heat_lava_wall_light.ts':
+    "the Heat's lava-wave wall lights on the raid, adoptDynamicBudgetLight into the renderer budgetLights registry (handed down through RiftDeathZoneVisuals) at construction, each in its own holder",
   'render/seasonal_decor_lights.ts':
     'the seasonal dressing candle-light pool, adoptDynamicBudgetLight into the renderer budgetLights registry before it joins the scene, built on the event first open',
   'render/warlock_meteor_fx.ts':

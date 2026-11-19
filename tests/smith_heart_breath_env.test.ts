@@ -17,6 +17,7 @@ import {
   BREATH_ENV_ROCK_TILE,
   BREATH_ENV_STONE_H,
   BREATH_OLD_STONE_H,
+  breathEnvOwnsHorizon,
   breathEnvOwnsRock,
   breathEnvRockGlsl,
   breathEnvRockPiece,
@@ -288,7 +289,10 @@ describe('the storm mountain', () => {
     const all = [...rock, ...planHeartNeedles()];
     for (const p of all) {
       if (hammerEnvOwnsRock(p)) expect(breathEnvOwnsRock(p)).toBe(false);
-      if (smithHeartAreaAt(p.x, p.z) === 'heart') expect(breathEnvOwnsRock(p)).toBe(false);
+      // The Heart's own rock, but the far horizon over the east isles (the Breath's
+      // quarter of the Heart's crown, BREATH_ENV_HORIZON).
+      if (smithHeartAreaAt(p.x, p.z) === 'heart')
+        expect(breathEnvOwnsRock(p)).toBe(breathEnvOwnsHorizon(p));
       if (smithHeartAreaAt(p.x, p.z) === 'breath') expect(breathEnvOwnsRock(p)).toBe(true);
     }
   });

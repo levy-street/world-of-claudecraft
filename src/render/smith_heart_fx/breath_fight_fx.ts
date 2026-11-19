@@ -57,6 +57,10 @@ import {
   timedOf,
 } from '../../sim/encounters/smith_heart/breath_ids';
 import { ISLE_MOBS } from '../../sim/encounters/smith_heart/breath_isle_ids';
+
+/** Every mob of the Islands of the Wind (its adds and its Stillstones). */
+const ISLE_MOB_IDS: ReadonlySet<string> = new Set(Object.values(ISLE_MOBS));
+
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor } from '../attached_fx_anchor';
@@ -91,6 +95,7 @@ import {
   GALE_CORE,
   gapLips,
   gapThreat,
+  INHALE_SWIRL,
   BREATH_FIGHT_POOLS as P,
   PINNED_MARK,
   STRIKE_BOLT_SECONDS,
@@ -142,6 +147,7 @@ uniform vec2 uDir;
 uniform vec2 uFocus;
 uniform vec2 uCentre;
 uniform float uInward;
+uniform float uSwirl;
 uniform float uStrength;
 uniform float uDust;
 uniform float uFlowT;
@@ -169,7 +175,9 @@ void main() {
     vec2 off = vLocal - uFocus;
     float r = length(off);
     along = -r;
-    across = atan(off.y, off.x) * 9.0;
+    // Each lane curls round it on the whirl's log spiral (INHALE_SWIRL): one
+    // vortex, the dust spiralling in, never spokes.
+    across = (atan(off.y, off.x) - uSwirl * log(max(r, 1.0))) * 9.0;
     laneW = 0.9;
   }
   float a = along - uFlowT;
@@ -510,10 +518,10 @@ export class BreathFightFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly audio = new BreathAudio(sfx);
-  /** The Rush's red arrow over each player a mechanic has singled out to
-   *  move (the owner's run of 2026-11-17): a sky strike's mark and Drawn
-   *  Lightning (auras), and the target of a bar aimed at one player (Storm
-   *  Lance, Leaping Bolt). Built in the constructor with the root. */
+  /** The Rush's red arrow over each player a mechanic has chosen personally
+   *  (breath_arrow_core.ts: Drawn Lightning and the Knotted Gale's marks by
+   *  their auras, Leaping Bolt's target by the bar; never a sky strike or
+   *  Storm Lance, whose floor says it). Built in the constructor with the root. */
   private auraArrows!: CouncilRushArrow;
   private barArrows!: CouncilRushArrow;
   private readonly glowTex: THREE.Texture | null;
@@ -685,6 +693,7 @@ export class BreathFightFx {
         uFocus: { value: new THREE.Vector2(0, 196) },
         uCentre: { value: new THREE.Vector2(0, 196) },
         uInward: { value: 0 },
+        uSwirl: { value: INHALE_SWIRL.twist },
         uStrength: { value: 0 },
         uDust: { value: 0 },
         uFlowT: { value: 0 },
@@ -1053,6 +1062,8 @@ export class BreathFightFx {
       materials: this.materials,
       groundY: (x, z) => this.groundY(x, z),
       shakeNear: (x, z, amount, reach) => this.shakeNear(x, z, amount, reach),
+      kit: this.kit,
+      paints: this.paints,
     });
     this.inhale = new BreathInhaleStreams({
       root: this.root,
@@ -1239,6 +1250,7 @@ export class BreathFightFx {
     }
     if (!this.origin) {
       this.audio.update(null, null, null, null);
+      this.audio.nova(0, null);
       this.particles.update(this.clock);
       this.updateBolts();
       return;
@@ -1277,6 +1289,7 @@ export class BreathFightFx {
         gale = e.pos;
       }
     }
+    this.audio.nova(this.isles.novaHum, meE ?? null);
     this.audio.update(
       this.windPhase,
       wind ? wind.pos : null,
@@ -1356,6 +1369,7 @@ export class BreathFightFx {
       } else if (e.kind === 'player' && !e.dead) {
         // Players move: the claim's box is checked on every pass.
         if (Math.abs(e.pos.x - origin.x) > 300 || Math.abs(e.pos.z - origin.z) > 260) continue;
+        this.isles.takePlayer(e);
         for (const a of e.auras) {
           if (a.id === BREATH_AURAS.anchor) this.anchorMarks.take(e.id);
           else if (a.id === BREATH_AURAS.pinned) this.pinnedMarks.take(e.id);
@@ -1373,7 +1387,7 @@ export class BreathFightFx {
     this.pinnedMarks.end();
     this.drawnMarks.end();
     this.auraArrows.endScan();
-    // A bar aimed at one player (Storm Lance, Leaping Bolt): its target.
+    // A bar aimed at one player who must move (Leaping Bolt): its target.
     const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
     if (g && breathTargetedBar(g) !== null && g.castTargetId !== null)
       this.barArrows.see(g.castTargetId);
@@ -1395,9 +1409,7 @@ export class BreathFightFx {
       if (
         e.kind === 'object' ||
         (e.kind === 'mob' &&
-          (e.templateId === BREATH_GUARDIAN ||
-            e.templateId === ISLE_MOBS.sentinel ||
-            e.templateId === ISLE_MOBS.mender)) ||
+          (e.templateId === BREATH_GUARDIAN || ISLE_MOB_IDS.has(e.templateId))) ||
         (e.kind === 'npc' && e.templateId === BREATH_THESSALY_NPC)
       )
         ids.push(e.id);

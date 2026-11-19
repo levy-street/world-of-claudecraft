@@ -7,6 +7,8 @@
 
 import {
   BREATH,
+  BREATH_ISLE_REACH,
+  BREATH_ISLES,
   CORNICE_GAPS,
   CORNICE_OPEN_RIM,
   SMITH_HEART_FIELD,
@@ -127,6 +129,33 @@ export function fellFromCornice(x: number, z: number, y: number, onGround: boole
   // Landed short of the void, but far below the Cornice: only in this
   // claim's own band (the next slot's floors lie within this reach).
   return inClaimBand(z) && nearCornice(x, z) && onGround && y < C.h - T.voidDepth;
+}
+
+/** A body walked off an isle (Jose's call of 2026-11-18: falls from the
+ *  isles are void falls): how far past its floor's rim it may have drifted
+ *  (yards), and the band under its floor it is caught in, from `drop` yards
+ *  under it down to `band` (never lower than `over` yards over the Cornice's
+ *  floor, so a body that walked off the Cornice under an isle is never
+ *  caught, the Cornice's own void judges it). The isles over the Heart's
+ *  crown float some forty yards over the Cornice with the crown's rock
+ *  capped under them (render/smith_heart/heart_walls_core.ts
+ *  heartIsleRockCap, `band` + 2 under the floor at its highest): a body is
+ *  the void's long before it would sink into that rock or drift out of this
+ *  claim's band. */
+export const ISLE_FALL = { drift: 14, drop: 8, band: 28, over: 2 } as const;
+
+/** Has a body at (x, z, y) fallen off an isle: over no floor at all, near an
+ *  isle's rim, in the band under its floor? A body riding a gale is carried,
+ *  never asked (the caller's test). */
+export function fellFromIsle(x: number, z: number, y: number): boolean {
+  if (authoredFieldSurfaceAt(F, x, z)) return false;
+  for (let i = 0; i < BREATH_ISLES.length; i++) {
+    const isle = BREATH_ISLES[i];
+    if (Math.hypot(x - isle.x, z - isle.z) > BREATH_ISLE_REACH[i] + ISLE_FALL.drift) continue;
+    const low = Math.max(C.h + ISLE_FALL.over, isle.h - ISLE_FALL.band);
+    if (y < isle.h - ISLE_FALL.drop && y > low) return true;
+  }
+  return false;
 }
 
 /** Where Thessaly's circle lands: on the guardian's upwind side (the wind

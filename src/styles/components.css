@@ -18616,9 +18616,7 @@
   #wildheart-alert,
   #sanctum-alert,
   #crypt-alert,
-  #heart-council-alert,
   #heart-quench-alert,
-  #heart-final-alert,
   #heart-knot-alert,
   #temple-alert,
   #kit-use-prompt {
@@ -18630,9 +18628,7 @@
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert,
   body.show-actionbar3 #crypt-alert,
-  body.show-actionbar3 #heart-council-alert,
   body.show-actionbar3 #heart-quench-alert,
-  body.show-actionbar3 #heart-final-alert,
   body.show-actionbar3 #heart-knot-alert,
   body.show-actionbar3 #temple-alert,
   body.show-actionbar3 #kit-use-prompt {
@@ -18644,9 +18640,7 @@
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert,
   body.mobile-touch #crypt-alert,
-  body.mobile-touch #heart-council-alert,
   body.mobile-touch #heart-quench-alert,
-  body.mobile-touch #heart-final-alert,
   body.mobile-touch #heart-knot-alert,
   body.mobile-touch #temple-alert,
   body.mobile-touch #kit-use-prompt {
@@ -19068,138 +19062,6 @@
     min-width: min(420px, calc(100vw - 32px));
   }
 
-  /* ---------- The Smith's Heart's Hammer Council alert (the rock, the wake, the Weight, Resonance) ---------- */
-  /* Self-mounted by the shared encounter alert painter
-     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/council_alert_view.ts.
-     It never takes the pointer. The state is carried by the text too: the
-     rock to share throbs in the soak gold, the wake sits in the vein's ochre,
-     the Weight in the hostile tone, a climbing crack in the hostile tone. */
-  #heart-council-alert {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    z-index: 30;
-    min-width: 340px;
-    max-width: calc(100vw - 32px);
-    padding: 10px 18px 12px;
-    pointer-events: none;
-    user-select: none;
-    text-align: center;
-    font: inherit;
-    color: var(--color-text-light);
-    border: 2px solid var(--color-gold);
-  }
-  #heart-council-alert .fa-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--color-gold);
-  }
-  #heart-council-alert .fa-line {
-    font-size: 14px;
-  }
-  #heart-council-alert .fa-hint {
-    display: none;
-  }
-  #heart-council-alert .fa-bar {
-    --bar-h: 12px;
-    --bar-color: var(--color-gold);
-    width: 100%;
-  }
-  #heart-council-alert .fa-fill {
-    width: 0;
-    transition: width 80ms linear;
-  }
-  #heart-council-alert.is-rock {
-    animation: bce-throb 0.9s ease-in-out infinite alternate;
-  }
-  #heart-council-alert.is-weight,
-  #heart-council-alert.is-rush {
-    border-color: var(--color-hostile);
-  }
-  #heart-council-alert.is-weight .fa-title,
-  #heart-council-alert.is-rush .fa-title,
-  #heart-council-alert.is-weight .fa-fill,
-  #heart-council-alert.is-rush .fa-fill {
-    color: var(--color-hostile);
-    --bar-color: var(--color-hostile);
-  }
-  #heart-council-alert.is-resonance {
-    border-color: var(--color-energy);
-  }
-  #heart-council-alert.is-resonance .fa-title,
-  #heart-council-alert.is-resonance .fa-fill {
-    color: var(--color-energy);
-    --bar-color: var(--color-energy);
-  }
-  /* Mountain's Rush on YOU: the one mark that kills, so it leaves the slot for the
-     screen's upper middle, big, red and throbbing for the whole bar (the owner's
-     playtest of 2026-11-12: the slot's panel went unnoticed). The raid sees the
-     red arrow over the marked player (council_rush_arrow.ts); this is the marked
-     player's own call, on every graphics tier. */
-  #heart-council-alert.is-rush,
-  body.show-actionbar3 #heart-council-alert.is-rush,
-  body.mobile-touch #heart-council-alert.is-rush {
-    top: 22%;
-    bottom: auto;
-    min-width: min(560px, calc(100vw - 32px));
-    padding: 14px 28px 16px;
-    border-width: 3px;
-    background: color-mix(in srgb, var(--color-hostile-rim) 55%, transparent);
-    animation: heart-rush-throb 0.55s ease-in-out infinite alternate;
-  }
-  #heart-council-alert.is-rush .fa-title {
-    font-size: 44px;
-    line-height: 1.05;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    text-shadow:
-      0 0 14px color-mix(in srgb, var(--color-hostile) 85%, transparent),
-      0 2px 0 var(--color-hostile-rim);
-  }
-  #heart-council-alert.is-rush .fa-bar {
-    --bar-h: 16px;
-  }
-  #heart-council-alert.is-rush .fa-bar-label {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--color-hostile);
-  }
-  body.mobile-touch #heart-council-alert.is-rush .fa-title {
-    font-size: 30px;
-  }
-  @keyframes heart-rush-throb {
-    from {
-      transform: translateX(-50%) scale(1);
-      box-shadow: 0 0 10px color-mix(in srgb, var(--color-hostile) 45%, transparent);
-    }
-    to {
-      transform: translateX(-50%) scale(1.06);
-      box-shadow: 0 0 36px color-mix(in srgb, var(--color-hostile) 90%, transparent);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    #heart-council-alert {
-      animation: none;
-    }
-    #heart-council-alert.is-rush,
-    body.show-actionbar3 #heart-council-alert.is-rush,
-    body.mobile-touch #heart-council-alert.is-rush {
-      animation: none;
-      box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
-    }
-  }
-  /* The in-game Reduce Motion setting holds the throb too. */
-  body.reduce-motion #heart-council-alert.is-rush,
-  body.reduce-motion.show-actionbar3 #heart-council-alert.is-rush,
-  body.reduce-motion.mobile-touch #heart-council-alert.is-rush {
-    animation: none;
-    box-shadow: 0 0 28px color-mix(in srgb, var(--color-hostile) 80%, transparent);
-  }
-
   /* ---------- The Smith's Heart's Guardian of the Quench cold bar ---------- */
   /* Self-mounted by the shared encounter alert painter
      (encounter_alert_painter.ts) under its own id, from
@@ -19412,19 +19274,7 @@
       animation: none;
     }
   }
-  body.mobile-touch #heart-council-alert {
-    min-width: min(420px, calc(100vw - 32px));
-  }
 
-  /* ---------- The Smith's Heart's Masterless Strength alert (the cold, the ember, the lightning, Crushed) ---------- */
-  /* Self-mounted by the shared encounter alert painter
-     (encounter_alert_painter.ts) under its own id, from
-     src/ui/hud/dungeon/final_alert_view.ts: what the final fight asks of the
-     local player, on every graphics tier (never hidden by the hints setting).
-     It never takes the pointer. The state is carried by the text too: the
-     cold in the frost tone, freezing and the freeze in the hostile tone, the
-     Ember Mark in the fire tone, Drawn Lightning in the storm's violet,
-     Crushed in the Hammer's gold. */
   /* The Knotted Gale (Mythic, knot_alert_view.ts): Portal A in the storm's teal,
      Portal B in its violet, Portal C in spring green, Portal D in rose (the
      floor's colours), the load in gold, the lip in
@@ -19526,90 +19376,10 @@
   /* The Smith's Heart's short alerts (2026-11-09): a title over the bar and
      its number, no sentence under it. The number (the seconds left, or a
      gauge's value) sits under the bar, in steady-width digits. */
-  #heart-council-alert .fa-bar-label,
-  #heart-final-alert .fa-bar-label,
   #heart-knot-alert .fa-bar-label {
     font-size: 13px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-  }
-  #heart-final-alert {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    z-index: 30;
-    min-width: 340px;
-    max-width: calc(100vw - 32px);
-    padding: 10px 18px 12px;
-    pointer-events: none;
-    user-select: none;
-    text-align: center;
-    font: inherit;
-    color: var(--color-text-light);
-    border: 2px solid var(--color-debuff-frost);
-    --final-alert-tone: var(--color-debuff-frost);
-  }
-  #heart-final-alert.is-ember {
-    --final-alert-tone: var(--color-debuff-fire);
-  }
-  #heart-final-alert.is-drawn {
-    --final-alert-tone: var(--color-debuff-shadow);
-  }
-  #heart-final-alert.is-crushed,
-  #heart-final-alert.is-weight {
-    --final-alert-tone: var(--color-gold);
-  }
-  #heart-final-alert.is-coal {
-    --final-alert-tone: var(--color-hostile);
-  }
-  #heart-final-alert.is-tether {
-    --final-alert-tone: var(--color-debuff-frost);
-  }
-  #heart-final-alert.is-freezing,
-  #heart-final-alert.is-frozen {
-    --final-alert-tone: var(--color-hostile);
-  }
-  #heart-final-alert {
-    border-color: var(--final-alert-tone);
-  }
-  #heart-final-alert .fa-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--final-alert-tone);
-  }
-  #heart-final-alert .fa-line {
-    font-size: 14px;
-  }
-  #heart-final-alert .fa-hint {
-    display: none;
-  }
-  #heart-final-alert .fa-bar {
-    --bar-h: 14px;
-    --bar-color: var(--final-alert-tone);
-    width: 100%;
-  }
-  #heart-final-alert .fa-fill {
-    width: 0;
-    transition: width 80ms linear;
-  }
-  #heart-final-alert.is-freezing,
-  #heart-final-alert.is-ember,
-  #heart-final-alert.is-drawn,
-  #heart-final-alert.is-coal,
-  #heart-final-alert.is-tether {
-    animation: bce-throb 0.9s ease-in-out infinite alternate;
-  }
-  body.mobile-touch #heart-final-alert {
-    min-width: min(340px, calc(100vw - 32px));
-  }
-  @media (prefers-reduced-motion: reduce) {
-    #heart-final-alert {
-      animation: none;
-    }
   }
 
   /* ---------- The Masterless Strength's Overload bars (the raid HUD) ---------- */
@@ -19617,8 +19387,8 @@
      heart_overload_view.ts while the final fight runs: four bars in one row
      at the top of the screen, over the raid warnings, one per quarter in its
      vein's tone, the quarter the boss drinks lit and framed, a bar near its
-     burst throbbing in the hostile tone; the foot says Taking Root's seconds
-     (or that it can be dragged), Vein-Shaken's and Heart Unbound's. Every
+     burst throbbing in the hostile tone; the foot says Vein-Shaken's and
+     Heart Unbound's. Every
      tier, never hidden by the hints setting; it never takes the pointer. The
      state is carried by text too (each bar prints its percent). */
   #heart-overload {
@@ -19714,10 +19484,6 @@
     justify-content: center;
     gap: 12px;
     font-size: 12px;
-  }
-  #heart-overload .ho-root.is-rooted {
-    color: var(--color-gold);
-    font-weight: 700;
   }
   #heart-overload .ho-shaken,
   #heart-overload .ho-unbound {

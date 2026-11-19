@@ -2,10 +2,11 @@
 // BOSS=heat; the plumbing is scripts/lib/heart_raid_bots.mjs). The guardian
 // never leaves its wellspring: the tanks hold it from the lip and swap on
 // Cinder Grip, the raid stands within Hearth Flare's reach on the shore, out of
-// Basalt Fist's spot and its Molten Swells' lanes, out of the overflow's rivers
-// and Falling Cinders, drops the Hearthseeds together and runs, steps into the
-// Wakefire band that has just burned, crosses to the Wheel of the Hearth's dark
-// slice (Mythic), kites a Rolling Cinder while two strikers knock it back, and
+// Basalt Fist's spot and its Molten Swells' lanes, walks the overflows' lava
+// waves' corridors (the corridor of the next wall to reach it, close to the
+// wellspring once a wall has passed), heals through the Falling Cinders, drops the
+// Hearthseeds together and runs, steps into the Wakefire band that has just
+// burned, crosses to the Wheel of the Hearth's dark slice (every tier), kites a Rolling Cinder while two strikers knock it back, and
 // burns the adds (Wellspawn first). Reads only what the server sends; the
 // geometry is the sim's own pure module (claim-local).
 //
@@ -14,16 +15,18 @@
 import { HEARTH_WELL } from '../../src/sim/content/smith_heart_layout';
 import {
   inHearthFloor,
+  inRingCorridor,
   wellDistance,
   wheelSliceAt,
 } from '../../src/sim/encounters/smith_heart/heat_geometry';
 import {
+  gapOf,
   HEAT_AURAS,
   HEAT_CASTS,
   HEAT_MOBS,
   HEAT_OBJECTS,
   HEAT_TUNING,
-  riverOf,
+  ringOf,
   swellLaneOf,
   WHEEL_ARCS_DEG,
   wheelOf,
@@ -101,11 +104,12 @@ export const heat = {
       fist: [],
       lanes: [],
       waves: [],
-      rivers: [],
       spots: [],
       seeds: [],
       zones: [],
       wheel: [],
+      rings: [],
+      gaps: [],
     };
     for (const e of world.obs.ents.values()) {
       if (e.k !== 'object' || typeof e.tid !== 'string') continue;
@@ -114,7 +118,6 @@ export const heat = {
       if (t.startsWith(HEAT_OBJECTS.fistPrefix)) o.fist.push({ ...at, r: T.fistR + 1.5 });
       else if (swellLaneOf(t)) o.lanes.push(lane(at, T.laneLength, T.laneHalf + 1));
       else if (t === HEAT_OBJECTS.wave) o.waves.push({ ...at, r: T.laneHalf + 2.5 });
-      else if (riverOf(t)) o.rivers.push(lane(at, T.riverLength, (e.sc ?? T.riverHalf) + 1));
       else if (
         t.startsWith(HEAT_OBJECTS.fallPrefix) ||
         t.startsWith(HEAT_OBJECTS.scorchPrefix) ||
@@ -131,7 +134,23 @@ export const heat = {
         if (!world.zoneSeen.has(key)) world.zoneSeen.set(key, Date.now());
         const left = z.seconds - (Date.now() - world.zoneSeen.get(key)) / 1000;
         o.zones.push({ ...z, seconds: left });
-      } else if (wheelOf(t)) o.wheel.push(wheelOf(t));
+      } else if (wheelOf(t)) {
+        // As Wakefire's: the template's seconds are the whole warning; the raid
+        // counts it down from when it first saw the slice in that state.
+        const w = wheelOf(t);
+        world.wheelSeen ??= new Map();
+        const key = `${e.id}:${w.state}`;
+        if (!world.wheelSeen.has(key)) world.wheelSeen.set(key, Date.now());
+        const left = w.seconds - (Date.now() - world.wheelSeen.get(key)) / 1000;
+        o.wheel.push({ ...w, seconds: left });
+      } else if (ringOf(t)) {
+        const l = L(world, at);
+        o.rings.push({
+          front: wellDistance(l.x, l.z),
+          gaps: ringOf(t).gaps,
+          half: e.sc ?? 3,
+        });
+      } else if (gapOf(t) !== null) o.gaps.push({ g: e.f ?? 0, half: e.sc ?? 3 });
     }
     world.o = o;
   },
@@ -220,7 +239,7 @@ export const heat = {
   report(world, st, note) {
     init(st);
     note(
-      `Wellspawn fed the guardian: ${st.feeds}; seeds ${st.seedRounds}; Wakefire runs ${st.zoneRuns}; wheels ${st.wheels}; cinders ${st.cinders}`,
+      `Wellspawn fed the guardian: ${st.feeds}; seeds ${st.seedRounds}; Wakefire runs ${st.zoneRuns}; wheels ${st.wheels}; lava waves ${st.waveRings ?? 0}; cinders ${st.cinders}`,
     );
     note(`Phases: ${st.phases.map((p) => `${fmtSec(p.t)} ${p.what}`).join(', ') || '-'}`);
   },
@@ -257,8 +276,7 @@ function inDanger(world, at, st) {
   const d = wellDistance(l.x, l.z);
   if (d < HEARTH_WELL.r + 1) return true;
   for (const h of [...o.fist, ...o.waves, ...o.spots]) if (hypot(h, at) < h.r) return true;
-  for (const ln of [...o.lanes, ...o.rivers])
-    if (segDist(at, ln.from, ln.to) < ln.half) return true;
+  for (const ln of o.lanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;
   if (IGNORE !== 'wakefire')
     for (const z of o.zones)
       if (
@@ -270,8 +288,24 @@ function inDanger(world, at, st) {
         d < BANDS[z.band][1] + 1
       )
         return true;
+  // A red slice burning, or about to erupt; one early in its warning (the next
+  // round's, shown as the last erupts) is where the raid crosses to once the
+  // fire it stands beside has died down.
   for (const w of o.wheel)
-    if (w.state !== 'safe' && wheelSliceAt(l.x, l.z) === w.slice && d > HEARTH_WELL.r) return true;
+    if (
+      (w.state === 'burn' || (w.state === 'warn' && w.seconds <= 2.6)) &&
+      wheelSliceAt(l.x, l.z) === w.slice &&
+      d > HEARTH_WELL.r
+    )
+      return true;
+  // A lava wave's wall on it now or about to be, outside its corridors.
+  for (const r of o.rings)
+    if (
+      d <= r.front + 3 &&
+      d >= r.front - T.ringDepth - 0.5 &&
+      !inRingCorridor(r.gaps, r.half - 0.8, l.x, l.z)
+    )
+      return true;
   const g = world.mobs.guardian;
   const phase = g ? (auraOf(g, HEAT_AURAS.state)?.value ?? 1) : 1;
   if (phase <= 1 && d > T.flareReach - 2) return true;
@@ -331,6 +365,13 @@ function track(world, st) {
     }, 2500);
   }
   st.prevZones = o.zones.length;
+  if (o.rings.length > (st.prevRings ?? 0)) {
+    st.waveRings = (st.waveRings ?? 0) + 1;
+    log(
+      `LAVA WAVE ${st.waveRings}: corridors ${o.rings[o.rings.length - 1].gaps.map((g) => Math.round((g * 180) / Math.PI)).join(', ')} deg`,
+    );
+  }
+  st.prevRings = o.rings.length;
   if (o.wheel.length && !st.prevWheel) {
     st.wheels++;
     log('WHEEL OF THE HEARTH');
@@ -367,9 +408,61 @@ function strikeTarget(world, st, b, me) {
   return null;
 }
 
+/** The lava waves: the corridor of the next wall to reach the bot (the
+ *  rolling ring just inside it, else the next ring's warning), on its line at
+ *  the bot's own distance, never moving in through a wall that has not passed.
+ *  Once a wall has passed, it walks in close to the wellspring, where the next
+ *  ring's corridors are only a few yards round. */
+function waveGoal(world, me) {
+  const o = world.o;
+  if (!o || (!o.rings.length && !o.gaps.length)) return null;
+  const l = L(world, me);
+  const d = wellDistance(l.x, l.z);
+  const inner = o.rings
+    .filter((r) => r.front - T.ringDepth - 0.6 < d)
+    .sort((a, b) => b.front - a.front);
+  // The ring still to pass over the bot: its front inside the bot's distance.
+  const coming = inner.find((r) => r.front < d + 0.3);
+  let gaps;
+  let half;
+  let radius;
+  if (coming) {
+    gaps = coming.gaps;
+    half = coming.half;
+    radius = Math.max(d, coming.front + 1.5);
+  } else if (o.gaps.length) {
+    gaps = o.gaps.map((g) => g.g);
+    half = o.gaps[0].half;
+    // Close in toward the wellspring (the next ring's corridors are only a
+    // few yards round there), never in through a wall still rolling over the
+    // way in.
+    radius = Math.max(HEARTH_WELL.r + 3.5, Math.min(d, 16));
+    const youngest = o.rings.reduce((m, r) => Math.min(m, r.front), Number.POSITIVE_INFINITY);
+    if (Number.isFinite(youngest) && youngest < d && youngest > radius - 1) radius = d;
+  } else return null;
+  // The nearest corridor along the bot's ring of the floor.
+  const a = Math.atan2(l.x - HEARTH_WELL.x, l.z - HEARTH_WELL.z);
+  let best = null;
+  for (const g of gaps) {
+    const da = Math.abs(((a - g + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+    if (!best || da < best.da) best = { g, da };
+  }
+  if (!best) return null;
+  const at = {
+    x: HEARTH_WELL.x + Math.sin(best.g) * radius,
+    z: HEARTH_WELL.z + Math.cos(best.g) * radius,
+  };
+  if (!inHearthFloor(at.x, at.z)) return null;
+  const inside = inRingCorridor([best.g], Math.max(0.5, half - 1), l.x, l.z);
+  return { goal: W(world, at), tol: inside ? Math.max(1, half - 1.5) : 0.8 };
+}
+
 function duty(world, st, b, me) {
   init(st);
   const o = world.o;
+  // The lava waves first: a wall outside a corridor is a heavy blow.
+  const wave = waveGoal(world, me);
+  if (wave) return { goal: wave.goal, tol: wave.tol, duty: 'lava waves' };
   // A cinder's quarry runs round the shore, away from it.
   if (hasAura(me, HEAT_AURAS.hunted)) {
     const c = cinders(world).sort((x, y) => hypot(x, me) - hypot(y, me))[0];

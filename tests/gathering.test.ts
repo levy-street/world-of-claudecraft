@@ -416,10 +416,21 @@ describe('isHarvestableCorpse', () => {
     ])
       expect(untagged).toContain(MOBS[id]);
     // The Breath's floating isles add the Gale Sentinel and the Gale Mender,
-    // untagged encounter adds: 328.
+    // untagged encounter adds: 328. The Islands of the Wind phase adds five
+    // more encounter bodies, untagged like every raid template (the Gust
+    // Herald, the Riven Squall and its Squall Fragment, the Squall
+    // Shieldbearer, and the Stillstone, a usable body, not a corpse): 333.
     expect(untagged).toContain(MOBS.heart_gale_sentinel);
     expect(untagged).toContain(MOBS.heart_gale_mender);
-    expect(untagged).toHaveLength(328);
+    for (const id of [
+      'heart_gust_herald',
+      'heart_riven_squall',
+      'heart_squall_fragment',
+      'heart_squall_shieldbearer',
+      'heart_breath_stillstone',
+    ])
+      expect(untagged).toContain(MOBS[id]);
+    expect(untagged).toHaveLength(333);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

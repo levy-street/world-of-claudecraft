@@ -18,11 +18,15 @@ import {
   isleRimRadius,
 } from '../../sim/content/smith_heart_isle_floor';
 import { BREATH, BREATH_ISLES } from '../../sim/content/smith_heart_layout';
-import { isleSpots, rideArc } from '../../sim/encounters/smith_heart/breath_isle_geometry';
+import {
+  cornicePads,
+  isleSpots,
+  rideArc,
+} from '../../sim/encounters/smith_heart/breath_isle_geometry';
 import {
   ISLE_OBJECTS,
   ISLE_TUNING as IT,
-  isleCircleOf,
+  padOf,
   rideOf,
 } from '../../sim/encounters/smith_heart/breath_isle_ids';
 
@@ -84,13 +88,38 @@ export function isleHash(a: number, b: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-/** What an isle's circle object is (a Gale Path, a Homeward Gale, a ride's
- *  carrier), or null. */
-export type IsleObjectKind = 'path' | 'home' | 'ride';
+/** What an isle's object is (an Updraft, a ride's carrier), or null. */
+export type IsleObjectKind = 'pad' | 'ride';
 export function isleObjectKind(templateId: string): IsleObjectKind | null {
   if (templateId.startsWith(ISLE_OBJECTS.ridePrefix)) return rideOf(templateId) ? 'ride' : null;
-  const c = isleCircleOf(templateId);
-  return c ? c.kind : null;
+  return padOf(templateId) ? 'pad' : null;
+}
+
+/** Every Updraft the phase can raise (from -1 the Cornice, to an isle): the
+ *  painter builds one slot each. */
+export const ISLE_PADS: readonly { from: number; to: number }[] = [
+  { from: -1, to: 0 },
+  { from: 0, to: 1 },
+  { from: 1, to: 2 },
+  { from: -1, to: 3 },
+  { from: 3, to: 4 },
+  { from: 4, to: 5 },
+];
+
+/** An Updraft's spot (instance-local, `y` its floor: the Cornice's
+ *  `cornice` or the isle's). */
+export function padSpot(
+  from: number,
+  to: number,
+  cornice: number,
+): { x: number; y: number; z: number } {
+  const spots = isleSpots();
+  if (from < 0) {
+    const c = cornicePads()[spots[to].side];
+    return { x: c.x, y: cornice, z: c.z };
+  }
+  const p = spots[from].pad ?? spots[from].land;
+  return { x: p.x, y: spots[from].h, z: p.z };
 }
 
 // ---- the isles ------------------------------------------------------------------------
@@ -103,15 +132,50 @@ export function isleObjectKind(templateId: string): IsleObjectKind | null {
  *  under the floor (yards) and where its point hangs (the kit's frame,
  *  Blender x and y: the spec's lean times four, breath_isles.py
  *  ISLE_SPECS). */
-export const ISLE_KIT: readonly {
+export interface IsleKit {
   piece: string;
   rot: number;
   depth: number;
   tip: readonly [number, number];
-}[] = [
-  { piece: 'Kit_WindIsleA', rot: 0.6, depth: 26, tip: [-2.2, 3.8] },
-  { piece: 'Kit_WindIsleB', rot: 2.4, depth: 18.5, tip: [3.4, -2.0] },
-];
+}
+
+/** The two sculpts as authored (breath_isles.py), each for the spot its
+ *  floor spec was first laid out at (`from`, instance-local): its turn there. */
+const ISLE_KIT_BASE: Readonly<
+  Record<string, IsleKit & { from: { readonly x: number; readonly z: number } }>
+> = {
+  breath_isle_southeast: {
+    piece: 'Kit_WindIsleA',
+    rot: 0.6,
+    depth: 26,
+    tip: [-2.2, 3.8],
+    from: { x: 31, z: 139 },
+  },
+  breath_isle_southwest: {
+    piece: 'Kit_WindIsleB',
+    rot: 2.4,
+    depth: 18.5,
+    tip: [3.4, -2.0],
+    from: { x: -28, z: 142 },
+  },
+};
+
+/** Each isle's sculpt, in BREATH_ISLES order: the one its floor spec names,
+ *  turned on from its authored turn by how far the isle's bearing to the
+ *  Cornice swings from the spot it was authored at (the floor is laid
+ *  relative to that bearing, so the sculpt's walk stays the sim's floor). */
+export const ISLE_KIT: readonly IsleKit[] = BREATH_ISLES.map((isle) => {
+  const base = ISLE_KIT_BASE[isle.spec];
+  const C = BREATH.cornice;
+  const swing =
+    bearingDeg(isle.x, isle.z, C.x, C.z) - bearingDeg(base.from.x, base.from.z, C.x, C.z);
+  return {
+    piece: base.piece,
+    rot: base.rot + (swing * Math.PI) / 180,
+    depth: base.depth,
+    tip: base.tip,
+  };
+});
 
 /** A point of an isle's kit frame (Blender x, y) as an offset from its
  *  centre in the game's frame (x, z): the glTF turn (x, -y) and then the
@@ -218,7 +282,7 @@ export function isleMist(i: number, u: number, v: number, w: number, out: IsleMo
  *  z = cos a): its organic rim (smith_heart_isle_floor.ts), the sim's own. */
 export function isleRimAt(i: number, a: number): number {
   const isle = BREATH_ISLES[i];
-  const spec = ISLE_FLOOR_SPECS[isle.id];
+  const spec = ISLE_FLOOR_SPECS[isle.spec];
   const toward = bearingDeg(isle.x, isle.z, BREATH.cornice.x, BREATH.cornice.z);
   return isleRimRadius(spec, toward, (a * 180) / Math.PI);
 }
@@ -295,25 +359,19 @@ export function circleLook(age: number): { open: number; glow: number; spin: num
   return { open, glow: 0.75 + 0.25 * Math.sin(age * 3.1) + 0.6 * flare, spin: 1.6 };
 }
 
-/** The route a circle draws to where it carries (instance-local points on
- *  the ride's own arc, from the circle's middle to its landing). */
+/** The route an Updraft draws to where it carries (instance-local points
+ *  on the ride's own arc, from the pad's middle to its landing). */
 export function circleRoute(
-  isle: number,
-  kind: 'path' | 'home',
+  from: number,
+  to: number,
   steps: number,
   heights: { cornice: number },
 ): { x: number; y: number; z: number }[] {
-  const s = isleSpots()[isle];
-  const from =
-    kind === 'path'
-      ? { x: s.path.x, y: heights.cornice, z: s.path.z }
-      : { x: s.home.x, y: s.h, z: s.home.z };
-  const to =
-    kind === 'path'
-      ? { x: s.land.x, y: s.h, z: s.land.z }
-      : { x: s.back.x, y: heights.cornice, z: s.back.z };
+  const a = padSpot(from, to, heights.cornice);
+  const s = isleSpots()[to];
+  const b = { x: s.land.x, y: s.h, z: s.land.z };
   const out: { x: number; y: number; z: number }[] = [];
-  for (let k = 0; k <= steps; k++) out.push(rideArc(from, to, k / steps));
+  for (let k = 0; k <= steps; k++) out.push(rideArc(a, b, k / steps));
   return out;
 }
 
@@ -354,7 +412,7 @@ export function riderLook(k: number): { wrap: number; bright: number } {
 }
 
 /** The ride's seconds and arc apex, read once (the painter's guards). */
-export const RIDE = { seconds: IT.rideSeconds, apex: IT.rideApex, circleR: IT.circleR } as const;
+export const RIDE = { seconds: IT.rideSeconds, apex: IT.rideApex, circleR: IT.padR } as const;
 
 // ---- the Bulwark's vortex (the third pass) -------------------------------------------
 

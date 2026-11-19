@@ -1,11 +1,17 @@
-// The Masterless Strength's Hammer quarter (design doc 7.5): the fight's only
-// group soak.
+// The Masterless Strength's Hammer quarter (design doc 7.5) and the boss's own
+// Weight of the Anvil, the fight's only group soak. (The quarter's star, Wake
+// the Stone, is final_pillars.ts.)
 //
-//   Tremor Crack         every 10 s (first 4 s into the quarter) the floor
+//   Tremor Crack         every 13 s (first 6 s into the quarter) the floor
 //                        cracks under three hashed players (four on Heroic);
 //                        2.5 s later each crack erupts (4 yd): step out.
-//   Weight of the Anvil  every 25 s (first 10 s in) a 6 s bar, planted: a
-//                        6 yd mark where a hashed player stood. When it lands
+//   Weight of the Anvil  the boss's OWN since the rework of 2026-11-18: all
+//                        fight (each tier's anvilEvery: 35 s Normal, 30 Heroic,
+//                        28 Mythic since Jose's playtest of 2026-11-19; first 30 s
+//                        in), wherever it stands (its clock is the coordinator's),
+//                        a 6 s bar on a hashed player: a 6 yd circle that FOLLOWS
+//                        them (the anvil mark on them, their personal arrow)
+//                        until 1 s before it falls, then plants. When it lands
 //                        its whole blow is split between everyone under it
 //                        (half as much again each with fewer than three); with
 //                        nobody under it the whole raid takes a heavy blow.
@@ -17,8 +23,8 @@
 //                        three hashed players, absorbing their next 600
 //                        healing.
 //   The turning Anvil    Mythic: the Anvil's mark turns round the boss through
-//                        its bar (11 yd out, 25 degrees a second): the soakers
-//                        walk with it.
+//                        its bar (11 yd out, 25 degrees a second) instead of
+//                        following anyone: the soakers walk with it.
 //
 // Deterministic: every pick is hashed (pickPlayers); the only rng draws are
 // the damage rolls, in player order.
@@ -117,15 +123,18 @@ function orbitSpot(s: FinalScope, angle: number): FPoint {
 
 /** Begin Weight of the Anvil on a hashed player's spot (or `forced`).
  *  Exported for the dev trigger. */
-export function startAnvil(s: FinalScope, forced?: FPoint): boolean {
+export function startAnvil(s: FinalScope, forced?: FPoint, forcedOn?: Entity): boolean {
   const st = s.st;
-  st.kit.anvil = T.anvilEvery;
+  st.anvilClock = s.rules.anvilEvery;
   let aim: FPoint | null = forced ?? null;
+  let victim: Entity | null = forcedOn ?? null;
   if (!aim) {
-    const [victim] = pickPlayers(s, 1, st.casts + 1001);
+    [victim] = pickPlayers(s, 1, st.casts + 1001);
     if (!victim) return false;
     aim = at(s, victim);
   }
+  // Mythic's mark turns round the boss: it follows nobody.
+  if (s.rules.rotatingAnvil) victim = null;
   const b = local(s.ctx, s.inst, s.boss);
   const angle = facingTo(b, aim);
   const spot = s.rules.rotatingAnvil ? orbitSpot(s, angle) : onFloor(aim, T.anvilR * 0.5);
@@ -138,21 +147,62 @@ export function startAnvil(s: FinalScope, forced?: FPoint): boolean {
     spot.z,
     T.anvilR,
   );
-  st.anvil = { objectId: obj.id, x: spot.x, z: spot.z, angle, left: T.anvilCast };
+  st.anvil = {
+    objectId: obj.id,
+    x: spot.x,
+    z: spot.z,
+    angle,
+    left: T.anvilCast,
+    targetId: victim?.id ?? 0,
+  };
+  if (victim)
+    putMarker(victim, FINAL_AURAS.anvilMark, FINAL_NAMES.anvil, T.anvilCast, s.boss.id, {
+      school: 'physical',
+    });
   beginBar(s, FINAL_CASTS.anvil, T.anvilCast, angle);
   return true;
 }
 
-/** One tick of the mark (Mythic: it turns round the boss). */
+/** One tick of the mark: it follows its player until it locks (Mythic: it
+ *  turns round the boss instead). */
 export function stepAnvil(s: FinalScope): void {
   const a = s.st.anvil;
-  if (!a || !s.rules.rotatingAnvil) return;
-  a.angle += ((T.anvilOrbitDegPerSec * Math.PI) / 180) * DT;
-  const spot = orbitSpot(s, a.angle);
+  if (!a) return;
+  a.left = Math.max(0, a.left - DT);
+  let spot: FPoint;
+  if (s.rules.rotatingAnvil) {
+    a.angle += ((T.anvilOrbitDegPerSec * Math.PI) / 180) * DT;
+    spot = orbitSpot(s, a.angle);
+  } else {
+    if (a.targetId === 0 || a.left <= T.anvilLock + 1e-9) return;
+    const p = s.ctx.entities.get(a.targetId);
+    // Its player fell or left: the circle plants where it is.
+    if (!p || p.dead || !livePlayers(s).includes(p)) {
+      a.targetId = 0;
+      return;
+    }
+    spot = onFloor(at(s, p), T.anvilR * 0.5);
+  }
   a.x = spot.x;
   a.z = spot.z;
   const obj = s.ctx.entities.get(a.objectId);
   if (obj) moveFightObject(s.ctx, s.inst, obj, spot.x, spot.z);
+}
+
+/** Its player's mark goes (the fall, a wipe, a stride). */
+function dropAnvilMark(s: Pick<FinalScope, 'ctx'>, targetId: number): void {
+  const p = targetId ? s.ctx.entities.get(targetId) : undefined;
+  if (p) dropAura(p, FINAL_AURAS.anvilMark);
+}
+
+/** The Anvil's circle and its player's mark gone, unfallen (a wipe, a stride,
+ *  a dropped bar). */
+export function clearAnvil(s: Pick<FinalScope, 'ctx' | 'inst' | 'st'>): void {
+  const a = s.st.anvil;
+  if (!a) return;
+  dropFightObject(s.ctx, s.inst, a.objectId);
+  dropAnvilMark(s, a.targetId);
+  s.st.anvil = null;
 }
 
 /** The Anvil falls: split between everyone under it (Crushed ones three
@@ -164,6 +214,7 @@ export function landAnvil(s: FinalScope): Entity[] {
   if (!a) return [];
   st.anvil = null;
   dropFightObject(s.ctx, s.inst, a.objectId);
+  dropAnvilMark(s, a.targetId);
   cueAt(s, FINAL_CUES.anvil, a.x, a.z, T.anvilR, 'physical');
   const under = livePlayers(s).filter((p) => {
     const q = at(s, p);
@@ -227,10 +278,10 @@ export function clearHammer(
   const st = s.st;
   for (const c of st.tremors) dropFightObject(s.ctx, s.inst, c.objectId);
   st.tremors = [];
-  if (st.anvil) dropFightObject(s.ctx, s.inst, st.anvil.objectId);
-  st.anvil = null;
+  clearAnvil(s);
   clearCastIf(s.boss, FINAL_CASTS.anvil);
   for (const p of players) {
+    dropAura(p, FINAL_AURAS.anvilMark);
     dropAura(p, FINAL_AURAS.crushed);
     dropAura(p, FINAL_AURAS.shell);
   }

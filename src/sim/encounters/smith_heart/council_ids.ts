@@ -1,5 +1,5 @@
 // The Hammer Council's leaf (docs/design/raid/smith_heart.md section 7.1):
-// every id the council's sim, its renderer, its HUD alert, its dev helpers and
+// every id the council's sim, its renderer, its sounds, its dev helpers and
 // its tests key on, the per-difficulty rules, the tuning, and the pure
 // template-id helpers of the pillars. No SimContext, no rng.
 //

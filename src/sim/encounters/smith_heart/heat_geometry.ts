@@ -10,11 +10,20 @@
 //                  reach, Wakefire's bands, the overflow's rivers)
 //   the lanes      Basalt Fist's three Molten Swell lanes and the overflow's
 //                  rivers: who stands in one, and where a wave's wall is
+//   the rings      the overflows' lava waves (heat_waves.ts): each ring's
+//                  corridors, who stands in its wall or a corridor, how long
+//                  an overflow's rings run
 //   the posts      where the Wellspawn climb out, the Wellkeepers rise, and
 //                  the shore points a Rolling Cinder lands on
 
 import { FORGE_POINTS, HEART_ROOM, HEARTH_WELL } from '../../content/smith_heart_layout';
-import { HEAT_TUNING as T, WHEEL_ARCS_DEG, ZONE_BANDS } from './heat_ids';
+import {
+  type HeatWaveRule,
+  heatHash,
+  HEAT_TUNING as T,
+  WHEEL_ARCS_DEG,
+  ZONE_BANDS,
+} from './heat_ids';
 
 export interface HPoint {
   x: number;
@@ -120,16 +129,22 @@ export function floorReach(x: number, z: number, facing: number, max: number): n
  *  to its rim. The sim's waves and the renderer's lanes both read it. */
 export function laneReach(x: number, z: number, facing: number, max: number): number {
   if (inHearthFloor(x, z)) return floorReach(x, z, facing, max);
+  // On the Anvil the swell rolls all the way to the rim, whatever the Heat
+  // guardian's lane length (Jose's playtest of 2026-11-19: "they die halfway").
+  const reach = ANVIL_LANE_MAX;
   const s = Math.sin(facing);
   const c = Math.cos(facing);
   let d = 0;
   while (
-    d < max &&
+    d < reach &&
     Math.hypot(x + s * (d + 1) - HEART_ROOM.x, z + c * (d + 1) - HEART_ROOM.z) <= HEART_ROOM.r
   )
     d++;
-  return Math.max(1, Math.min(max, d));
+  return Math.max(1, Math.min(reach, d));
 }
+
+/** The longest a swell's lane runs on the Anvil of the World: across it. */
+export const ANVIL_LANE_MAX = 2 * HEART_ROOM.r;
 
 /** Basalt Fist's three Molten Swell bearings from its spot: straight away
  *  from the wellspring and to either side of it (the gap toward the
@@ -174,6 +189,66 @@ export function nearestInReach(
     }
   }
   return best;
+}
+
+// ---- the lava waves' rings (heat_waves.ts) --------------------------------------------
+
+const TAU = Math.PI * 2;
+
+/** Bring a bearing into [0, 2 pi). */
+function wrap(a: number): number {
+  const r = a % TAU;
+  return r < 0 ? r + TAU : r;
+}
+
+/** Ring `k`'s corridors in overflow `n` (`gaps` of them, evenly round the
+ *  wellspring): the first hashed, each next turned a hashed 35 to 75 degrees
+ *  one way or the other from the last. Pure. */
+export function ringGaps(n: number, k: number, gaps: number): number[] {
+  let base = ((heatHash(n * 101 + 7, 13) % 360) * Math.PI) / 180;
+  for (let i = 1; i <= k; i++) {
+    const turn = 35 + (heatHash(n * 31 + i, 17) % 41);
+    const sign = heatHash(n * 53 + i, 19) % 2 === 0 ? 1 : -1;
+    base += (sign * turn * Math.PI) / 180;
+  }
+  const out: number[] = [];
+  for (let g = 0; g < gaps; g++) out.push(wrap(base + (g * TAU) / Math.max(1, gaps)));
+  return out;
+}
+
+/** Is (x, z) inside one of `gaps`' corridors (its half width `half`), on the
+ *  shore side of the wellspring? Pure. */
+export function inRingCorridor(
+  gaps: readonly number[],
+  half: number,
+  x: number,
+  z: number,
+): boolean {
+  for (const g of gaps) {
+    const f = laneFrame(HEARTH_WELL.x, HEARTH_WELL.z, g, x, z);
+    if (f.along > 0 && f.across <= half) return true;
+  }
+  return false;
+}
+
+/** Is (x, z) in the wall of a ring whose front is `front` yards out (the
+ *  wall `T.ringDepth` deep behind it), outside its corridors? Pure. */
+export function inRingWall(
+  gaps: readonly number[],
+  half: number,
+  front: number,
+  x: number,
+  z: number,
+): boolean {
+  const d = wellDistance(x, z);
+  if (d > front || d < front - T.ringDepth) return false;
+  return !inRingCorridor(gaps, half, x, z);
+}
+
+/** The whole overflow's length under the wellspring for a rule: the lead,
+ *  the rings' spacing and the last one's roll to the walls. Pure. */
+export function wavesSeconds(rule: HeatWaveRule): number {
+  return rule.lead + (rule.count - 1) * rule.every + (T.ringEnd - T.ringStart) / rule.speed;
 }
 
 // ---- the posts ------------------------------------------------------------------------

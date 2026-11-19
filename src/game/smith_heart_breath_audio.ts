@@ -15,6 +15,7 @@ import {
   BREATH_KNOT_SOUNDS,
   BREATH_MARK_ALARM,
   BREATH_MARK_SOUNDS,
+  BREATH_NOVA_HUM,
   BREATH_RIDE_LOOP,
   BREATH_RIDING_AURA,
   BREATH_SFX_KEYS,
@@ -23,6 +24,7 @@ import {
   breathBarRate,
   knotAlarmDue,
   knotFuseWarnDue,
+  novaHumGain,
   windPhaseSound,
 } from './smith_heart_breath_audio_core';
 import { HeartMarkEar } from './smith_heart_mark_audio';
@@ -59,6 +61,7 @@ const BLOW_LOOP = 'heart-breath-blow';
 const GALE_LOOP = 'heart-breath-gale';
 const CARRY_LOOP = 'heart-breath-knot-carry';
 const RIDE_LOOP = 'heart-breath-ride';
+const NOVA_LOOP = 'heart-breath-nova';
 
 function riding(me: Entity | null): boolean {
   if (!me || me.dead) return false;
@@ -74,6 +77,7 @@ export class BreathAudio {
   private galing = false;
   private carrying = false;
   private ridingNow = false;
+  private humming = false;
   private fuse = Number.POSITIVE_INFINITY;
   private bar = '';
   private barTotal = 0;
@@ -209,6 +213,19 @@ export class BreathAudio {
     this.updateKnot(knot);
   }
 
+  /** Skyrend Nova's hum in the local player's ears (`hum` 0..1, 0 none). */
+  nova(hum: number, me: Entity | null): void {
+    const gain = novaHumGain(hum);
+    if (gain > 0 && me) {
+      this.preload();
+      this.sink.loop(NOVA_LOOP, BREATH_NOVA_HUM.key, gain, me.pos.x, me.pos.y + 1.6, me.pos.z);
+      this.humming = true;
+    } else if (this.humming) {
+      this.sink.unloop(NOVA_LOOP, BREATH_NOVA_HUM.fadeOut);
+      this.humming = false;
+    }
+  }
+
   /** The wind past the local player's ears while a gale carries them. */
   private updateRide(me: Entity | null): void {
     if (riding(me) && me) {
@@ -253,6 +270,8 @@ export class BreathAudio {
     if (this.galing) this.sink.unloop(GALE_LOOP, 0.3);
     if (this.carrying) this.sink.unloop(CARRY_LOOP, 0.3);
     if (this.ridingNow) this.sink.unloop(RIDE_LOOP, 0.3);
+    if (this.humming) this.sink.unloop(NOVA_LOOP, 0.3);
+    this.humming = false;
     this.blowing = false;
     this.galing = false;
     this.carrying = false;

@@ -9,9 +9,9 @@
   },
   "scope": {
     "encounter": "The Smith's Heart raid",
-    "exactRuntimeAuras": 72,
-    "sharedRuntimeAliases": 18,
-    "runtimeIdsCovered": 90,
+    "exactRuntimeAuras": 69,
+    "sharedRuntimeAliases": 22,
+    "runtimeIdsCovered": 91,
     "unpainted": [
       {
         "auraId": "heart_endless_song",
@@ -195,7 +195,7 @@
     },
     {
       "auraId": "heart_breath_anchor",
-      "runtimeIds": ["heart_breath_anchor"],
+      "runtimeIds": ["heart_breath_anchor", "heart_breath_stone_charge"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_anchor.png",
       "sourceBytes": 2771924,
@@ -299,7 +299,7 @@
     },
     {
       "auraId": "heart_breath_sky_mark",
-      "runtimeIds": ["heart_breath_sky_mark"],
+      "runtimeIds": ["heart_breath_sky_mark", "heart_final_sky_mark"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_sky_mark.png",
       "sourceBytes": 2393418,
@@ -438,7 +438,7 @@
     },
     {
       "auraId": "heart_breath_wind_battered",
-      "runtimeIds": ["heart_breath_wind_battered"],
+      "runtimeIds": ["heart_breath_wind_battered", "heart_breath_squall_ward"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_wind_battered.png",
       "sourceBytes": 2446879,
@@ -541,32 +541,6 @@
       "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
     },
     {
-      "auraId": "heart_breath_windworn",
-      "runtimeIds": ["heart_breath_windworn"],
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_windworn.png",
-      "sourceBytes": 2293680,
-      "sourceSha256": "0898ef1024e660dd160b31bb841bebe484b3a26d967375630d488648de5d84b1",
-      "acceptedSha256": "1f6c638768e5bda7d9ebcfedd9cd9061859dd463e6cebc799becdc77b1bdc975",
-      "acceptedBytes": 5334,
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/breath_isles.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_windworn."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "prompt": "Icon 20, same style as the reference icon. Name: Windworn. What it does: a debuff; the player is worn out by the wind, and no Gale Path will carry them to the islands until it ends. Paint: a tattered cloak shredded and frayed by the wind, threads streaming away in grey-teal air. Palette: grey-teal and pale cyan wind on dark slate; no fire. Square, edge to edge, no text, no border.",
-      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
-    },
-    {
       "auraId": "wind_drift",
       "runtimeIds": ["wind_drift"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
@@ -646,7 +620,7 @@
     },
     {
       "auraId": "heart_quench_cold",
-      "runtimeIds": ["heart_quench_cold", "heart_final_cold"],
+      "runtimeIds": ["heart_quench_cold"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_cold.png",
       "sourceBytes": 2931630,
@@ -698,7 +672,7 @@
     },
     {
       "auraId": "heart_quench_frozen",
-      "runtimeIds": ["heart_quench_frozen", "heart_final_frozen"],
+      "runtimeIds": ["heart_quench_frozen"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_frozen.png",
       "sourceBytes": 2510741,
@@ -802,7 +776,7 @@
     },
     {
       "auraId": "heart_quench_slash_mark",
-      "runtimeIds": ["heart_quench_slash_mark"],
+      "runtimeIds": ["heart_quench_slash_mark", "heart_final_blade_mark"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_slash_mark.png",
       "sourceBytes": 2378704,
@@ -1088,7 +1062,7 @@
     },
     {
       "auraId": "heart_final_crushed",
-      "runtimeIds": ["heart_final_crushed"],
+      "runtimeIds": ["heart_final_crushed", "heart_final_anvil_mark"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_crushed.png",
       "sourceBytes": 2620202,
@@ -1406,7 +1380,11 @@
     },
     {
       "auraId": "heart_breath_swelling_storm",
-      "runtimeIds": ["heart_breath_swelling_storm"],
+      "runtimeIds": [
+        "heart_breath_swelling_storm",
+        "heart_breath_gale_cocoon",
+        "heart_breath_cocoon_hold"
+      ],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_swelling_storm.png",
       "sourceBytes": 2186013,
@@ -1428,32 +1406,6 @@
         }
       ],
       "prompt": "Icon 53, same style as the reference icon. Name: Swelling Storm. What it does: the storm swells, striking everyone on the cliff harder with every pulse. Paint: a swelling storm cloud growing ever larger, rings of pressure and lightning bursting around it. Palette: storm cyan and white lightning on dark slate; no fire. Square, edge to edge, no text, no border.",
-      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
-    },
-    {
-      "auraId": "heart_breath_gale_bulwark",
-      "runtimeIds": ["heart_breath_gale_bulwark", "heart_breath_bulwark_hold"],
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_gale_bulwark.png",
-      "sourceBytes": 2207006,
-      "sourceSha256": "9232a26faefff61df91fb52306c6388e5d349876e1bba657580fa2d3bf42e534",
-      "acceptedSha256": "5c2a21e56641bd1154e080a011fbfde7bd473ece893efae9c128350659a9f997",
-      "acceptedBytes": 5724,
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/breath_isles.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_gale_bulwark."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "prompt": "Icon 54, same style as the reference icon. Name: Gale Bulwark. What it does: a shield of wind absorbs damage on the Guardian of the Breath while its menders on the floating islands live. Paint: a domed vortex shield of wind and orbiting stones around a dark stone core. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
       "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
     },
     {
@@ -1584,32 +1536,6 @@
         }
       ],
       "prompt": "Icon 59, same style as the reference icon, one single picture, not a collage. Name: The Masterless Strength. What it does: the final boss, a stone giant, drinks the strength of one of the four veins at a time. Paint: a four-coloured crystal heart blazing in the chest of a stone giant, its facets glowing ochre, cyan, ice blue and white-gold. Palette: the four vein colours, ochre-gold, storm cyan, ice blue and white-gold, on dark stone. Square, edge to edge, no text, no border.",
-      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
-    },
-    {
-      "auraId": "heart_final_root",
-      "runtimeIds": ["heart_final_root"],
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_root.png",
-      "sourceBytes": 2558377,
-      "sourceSha256": "3e37499d97258949a05c987dd8fa64a732d05dd00db3f7ad066b9dace4c81bbf",
-      "acceptedSha256": "151024167d2e2d2bc53d7df5e12a756b30fca42eb448af81a9436241535819e8",
-      "acceptedBytes": 5976,
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/final_rules.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_final_root."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "prompt": "Icon 60, same style as the reference icon, one single picture, not a collage. Name: Taking Root. What it does: the Masterless Strength takes root in a quarter of the arena and cannot be dragged out until the root ends. Paint: thick stone roots driving down from a giant's stone feet into the cracked floor. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
       "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
     },
     {

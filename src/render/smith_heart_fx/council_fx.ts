@@ -49,6 +49,7 @@ import {
   type CouncilRole,
   COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
+import { FINAL_CUES, finalPillarOf } from '../../sim/encounters/smith_heart/final_ids';
 import type { Aura, Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { fxAnchor, needsRedrape } from '../attached_fx_anchor';
@@ -804,6 +805,17 @@ export class CouncilFx {
       (id) => world.entities.get(id),
       (x, z) => this.groundY(x, z),
     );
+    // The Masterless Strength's pillars are the council's stone (Wake the
+    // Stone, the rework of 2026-11-18): their rise, Stone Thrum and their
+    // shattering draw here; the final's kit claims the cues (its sound, its
+    // dust and frost).
+    if (ev.type === 'spellfx' && ev.ability === FINAL_CUES.rise) this.pillarsFx.rise(ev.sourceId);
+    else if (ev.type === 'spellfx' && ev.ability === FINAL_CUES.thrum)
+      this.pillarsFx.stoneThrum(ev.sourceId);
+    else if (ev.type === 'spellfx' && ev.ability === FINAL_CUES.charged)
+      this.pillarsFx.cursedPulse(ev.sourceId);
+    else if (ev.type === 'spellfxAt' && ev.ability === FINAL_CUES.shatter)
+      this.pillarsFx.collapseAt(ev.x, ev.z, ev.radius ?? 3.7, true);
     if (ev.type === 'spellfxAt') {
       if (!councilClaims(ev.ability)) return false;
       if (ev.ability === COUNCIL_CUES.collapse) {
@@ -954,7 +966,10 @@ export class CouncilFx {
         if (e.kind === 'object') {
           const pillar = councilPillarOf(e.templateId);
           const soul = pillar ? null : councilSoulOf(e.templateId);
+          const final = pillar || soul ? null : finalPillarOf(e.templateId);
           if (pillar) this.pillarsFx.seePillar(e, pillar.integrity, pillar.risen);
+          else if (final)
+            this.pillarsFx.seePillar(e, 1, true, null, false, true, final === 'charged');
           else if (isCursedPillar(e.templateId)) this.pillarsFx.seePillar(e, 1, true, null, true);
           else if (soul) {
             this.pillarsFx.seePillar(e, soul.pips, soul.risen, soul.role);

@@ -28,7 +28,12 @@ import {
   BREATH_ISLES,
   SMITH_HEART_FIELD,
 } from '../src/sim/content/smith_heart_layout';
-import { ISLE_TUNING as IT, isleAt, isleSpots } from '../src/sim/encounters/smith_heart';
+import {
+  cornicePads,
+  ISLE_TUNING as IT,
+  isleAt,
+  isleSpots,
+} from '../src/sim/encounters/smith_heart';
 import { onIsleFloor } from '../src/sim/encounters/smith_heart/breath_isle_hold';
 import { islePlayers } from '../src/sim/encounters/smith_heart/breath_isles';
 import {
@@ -51,7 +56,7 @@ function toward(i: number): number {
 
 /** The rim's reach at compass bearing `deg` of isle `i`. */
 function rim(i: number, deg: number): number {
-  return isleRimRadius(ISLE_FLOOR_SPECS[BREATH_ISLES[i].id], toward(i), deg);
+  return isleRimRadius(ISLE_FLOOR_SPECS[BREATH_ISLES[i].spec], toward(i), deg);
 }
 
 function at(i: number, deg: number, r: number): { x: number; z: number } {
@@ -90,7 +95,8 @@ describe('the Islands of the Wind: an organic floor', () => {
       const hi = Math.max(...radii);
       expect(lo, isle.id).toBeLessThan(isle.r - 1.8);
       expect(hi, isle.id).toBeGreaterThan(isle.r + 2.8);
-      expect(BREATH_ISLE_REACH[i]).toBeCloseTo(hi, 1);
+      // (The floor's vertices sit on its turned frame's bearings, not these.)
+      expect(Math.abs(BREATH_ISLE_REACH[i] - hi)).toBeLessThan(0.2);
       // At least two separate bays.
       const b = bays(i);
       expect(b.length, isle.id).toBeGreaterThanOrEqual(2);
@@ -151,12 +157,13 @@ describe('the Islands of the Wind: an organic floor', () => {
         expect(discOnIsle(i, p.x, p.z, 1.5), `${i} ${p.x} ${p.z}`).toBe(true);
         expect(authoredFieldHeight(F, p.x, p.z)).toBe(h);
       }
-      // The Homeward Gale's drawn disc (1.2 of its reach) and a half yard more.
-      expect(discOnIsle(i, s.home.x, s.home.z, IT.circleR * 1.2 + 0.5)).toBe(true);
-      // The Mender's interrupt: a melee raider can stand on floor within 2
-      // yd of it, all round.
-      const m = s.adds[1];
-      expect(discOnIsle(i, m.x, m.z, 2)).toBe(true);
+      // The Updraft on to the next isle: its drawn disc (1.2 of its reach)
+      // and a half yard more.
+      if (s.pad) expect(discOnIsle(i, s.pad.x, s.pad.z, IT.padR * 1.2 + 0.5)).toBe(true);
+      // The Stillstone: a raider can stand on floor within 2.5 yd of it.
+      if (s.stone) expect(discOnIsle(i, s.stone.x, s.stone.z, 2.5)).toBe(true);
+      // Every add: a melee raider can stand on floor within 2 yd of it.
+      for (const m of s.adds) expect(discOnIsle(i, m.x, m.z, 2)).toBe(true);
       // The fight's rune ring stays on the floor past every bay.
       const ring = isleRuneRing(i);
       for (let d = 0; d < 360; d += 2.5) expect(rim(i, d) - ring.outer).toBeGreaterThan(0.3);
@@ -210,11 +217,12 @@ function pulled(n = 4): BreathFight {
   return f;
 }
 
-function crossMark(f: BreathFight, frac: number): number {
+/** The phase at half health; the first isle of the east chain (its adds up). */
+function crossMark(f: BreathFight, _frac: number): number {
   const b = f.boss();
-  b.hp = Math.floor(b.maxHp * frac) - 1;
-  for (let k = 0; k < ticks(3) && !f.state()?.isles.round; k++) f.tick();
-  return f.state()?.isles.round?.isles[0] as number;
+  b.hp = Math.floor(b.maxHp * IT.at) - 1;
+  for (let k = 0; k < ticks(3) && f.state()?.isles.stage !== 'nova'; k++) f.tick();
+  return 0;
 }
 
 /** Walk `p` along compass bearing `deg` for up to `seconds` (stops early on
@@ -234,12 +242,13 @@ describe('the Islands of the Wind: standing on the new floor', () => {
     const i = crossMark(f, 0.7);
     const p = f.players[2];
     const s = isleSpots()[i];
-    f.put(p, s.path.x, s.path.z);
+    const pad = cornicePads()[s.side];
+    f.put(p, pad.x, pad.z);
     f.tick(ticks(IT.rideSeconds + 0.6));
     const l = f.local(p);
     expect(Math.hypot(l.x - s.land.x, l.z - s.land.z)).toBeLessThan(0.05);
     expect(p.pos.y).toBeCloseTo(BREATH_ISLES[i].h, 3);
-    const adds = f.state()?.isles.adds ?? [];
+    const adds = (f.state()?.isles.adds ?? []).filter((a) => a.isle === i);
     expect(adds.length).toBe(2);
     for (const a of adds) {
       const e = f.sim.ctx.entities.get(a.id) as Entity;
@@ -306,7 +315,10 @@ describe('the Islands of the Wind: standing on the new floor', () => {
       f.tick(1, false);
       expect(p.dead, isle.id).toBe(true);
       const back = f.local(p);
-      expect(Math.hypot((back.x - C.x) / C.rx, (back.z - C.z) / C.rz)).toBeLessThan(1);
+      expect(
+        Math.hypot((back.x - C.x) / C.rx, (back.z - C.z) / C.rz),
+        `${isle.id} ${JSON.stringify(back)} ${p.pos.y}`,
+      ).toBeLessThan(1);
       expect(p.pos.y).toBeGreaterThan(C.h - 3);
     });
   });

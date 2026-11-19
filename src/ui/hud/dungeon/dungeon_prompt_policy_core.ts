@@ -5,20 +5,19 @@
 // 1. The player's "Dungeon mechanic hints" setting (settings.showDungeonHints).
 //    It governs the ADVISORY prompts only: the encounter alerts whose panel is
 //    text explaining a mechanic (the Sunken Bastion's crown alert, the
-//    Wildheart Basin's, the Gravewyrm Sanctum's, the Hollow Crypt's, the
-//    Drowned Temple's (soft readouts included) and the Smith's Heart's Hammer
-//    Council's). None of them takes a press. The ACTION prompts are
+//    Wildheart Basin's, the Gravewyrm Sanctum's, the Hollow Crypt's and the
+//    Drowned Temple's, soft readouts included). None of them takes a press.
+//    The Smith's Heart's Hammer Council has no prompt at all since the team's
+//    feedback of 2026-11-17 ("too many on-screen markers"): its marks read in
+//    the world only (docs/design/raid/smith_heart.md 7.1), and neither has the
+//    Masterless Strength since Jose's playtest of 2026-11-19 (its marks read on
+//    the floor and in the marked player's own arrow). The ACTION prompts are
 //    never governed by it: the Iron Cage escape (the panel IS the escape
 //    button), Gaoler Ossick's chain alert (a live gauge the player steers by:
 //    the links left on the anchor and the shackle's reach used, with the
 //    distance), the Smith's Heart's Guardian of the Quench cold bar (the
-//    player's own gauge, steered by the whole fight), the Masterless
-//    Strength's alert (the same cold gauge and the marks the player must
-//    move for), and the use prompt (the
+//    player's own gauge, steered by the whole fight), and the use prompt (the
 //    panel is the interact press on a brazier or a candle).
-//    One carve-out: an advisory alert showing a mark that kills the player if
-//    ignored (`actionable`: the Hammer Council's Mountain's Rush on the player,
-//    council_alert_view.ts councilRushMarked) shows whatever the setting.
 //    It is a player-chosen interface preference, never a graphics-tier knob:
 //    this module takes the setting's own boolean and reads no preset, effects
 //    profile or governor (tests/dungeon_hints_setting.test.ts pins that).
@@ -38,9 +37,7 @@ export type DungeonPromptId =
   | 'wildheart'
   | 'sanctum'
   | 'crypt'
-  | 'council'
   | 'quench'
-  | 'final'
   | 'knot'
   | 'temple'
   | 'kitUse';
@@ -54,23 +51,16 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   wildheart: true,
   sanctum: true,
   crypt: true,
-  council: true,
   quench: false,
-  final: false,
   knot: false,
   temple: true,
   kitUse: false,
 };
 
 /** Whether `id` may show under the hints setting: an action prompt always, an
- *  advisory alert only while the hints are on, unless it now shows an
- *  `actionable` mark (one that kills if ignored). */
-export function dungeonPromptEnabled(
-  id: DungeonPromptId,
-  mechanicHints: boolean,
-  actionable = false,
-): boolean {
-  return mechanicHints || actionable || !DUNGEON_PROMPT_ADVISORY[id];
+ *  advisory alert only while the hints are on. */
+export function dungeonPromptEnabled(id: DungeonPromptId, mechanicHints: boolean): boolean {
+  return mechanicHints || !DUNGEON_PROMPT_ADVISORY[id];
 }
 
 /** The prompts above the use prompt, as painted this frame (a prompt the
@@ -82,12 +72,8 @@ export interface DungeonPromptSlotState {
   wildheart: boolean;
   sanctum: boolean;
   crypt: boolean;
-  /** The Smith's Heart's Hammer Council alert. */
-  council: boolean;
   /** The Smith's Heart's Guardian of the Quench cold bar. */
   quench: boolean;
-  /** The Smith's Heart's Masterless Strength alert (its cold, its marks). */
-  final: boolean;
   knot: boolean;
   temple: boolean;
   /** The showing Crypt alert is a SOFT readout (ignored while crypt is false). */
@@ -108,9 +94,7 @@ export function usePromptYields(s: DungeonPromptSlotState): boolean {
     s.sanctum ||
     (s.crypt && !s.cryptSoft) ||
     s.temple ||
-    s.council ||
     s.quench ||
-    s.final ||
     s.knot
   );
 }

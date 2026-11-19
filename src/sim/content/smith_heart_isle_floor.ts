@@ -45,6 +45,11 @@ export interface IsleFloorSpec {
   ledges: readonly IsleLedge[];
   /** Seeds the rim's ragged hash. */
   seed: number;
+  /** The bearing to the Cornice it was authored facing (its first isle's,
+   *  2026-11-04): the ragged hash is read relative to it, so an isle that
+   *  wears the floor facing another way gets the very same shape turned
+   *  (the kit's sculpt turned with it). */
+  authoredToward: number;
 }
 
 /** The rim's bearing step (degrees): fine enough for a tongue two yards wide. */
@@ -54,7 +59,9 @@ export const ISLE_RIM_STEP = 2.5;
  *  cliffStep 1.1), never a wall. */
 export const ISLE_LEDGE_MAX_RISE = 0.9;
 
-/** Each isle's floor, by its BREATH_ISLES id. A (south-east): the taller,
+/** The two authored floors, keyed by name (each BREATH_ISLES row names
+ *  the one it wears in its `spec`; three isles wear each, turned to face
+ *  the Cornice). A (south-east): the taller,
  *  narrower isle (its arch's promontory, one deep bay, a tongue east of the
  *  apron, a ledge on its far promontory). B (south-west): broad and squat
  *  (its tree's promontory, a tongue west, a deep bay, a broad far promontory
@@ -63,6 +70,7 @@ export const ISLE_FLOOR_SPECS: Readonly<Record<string, IsleFloorSpec>> = {
   breath_isle_southeast: {
     base: 9.4,
     seed: 71,
+    authoredToward: 331.46001481204,
     lobes: [
       { rel: 0, out: 0.8, half: 40 },
       { rel: 62, out: -2.5, half: 24 },
@@ -77,6 +85,7 @@ export const ISLE_FLOOR_SPECS: Readonly<Record<string, IsleFloorSpec>> = {
   breath_isle_southwest: {
     base: 9.4,
     seed: 43,
+    authoredToward: 27.407575437818423,
     lobes: [
       { rel: 0, out: 0.8, half: 36 },
       { rel: 298, out: -1.6, half: 14 },
@@ -129,7 +138,9 @@ export function bearingDeg(x: number, z: number, tx: number, tz: number): number
 /** How far the isle's rim reaches along compass bearing `deg` (yards from
  *  its centre), `toward` the bearing to the Cornice. */
 export function isleRimRadius(spec: IsleFloorSpec, toward: number, deg: number): number {
-  let r = spec.base + 0.32 * wobble(spec.seed, deg);
+  // The ragged hash in the authored frame (the shape turns with the isle).
+  const ad = deg - (toward - spec.authoredToward);
+  let r = spec.base + 0.32 * wobble(spec.seed, ad);
   for (const l of spec.lobes) {
     const off = Math.abs(degOff(deg, toward + l.rel));
     if (off >= l.half) continue;
@@ -137,8 +148,14 @@ export function isleRimRadius(spec: IsleFloorSpec, toward: number, deg: number):
     r += l.out * w * w;
   }
   // A last hashed nick per vertex (a few centimetres), never a spike.
-  const k = Math.round((((deg % 360) + 360) % 360) / ISLE_RIM_STEP);
+  const k =
+    Math.round((((ad % 360) + 360) % 360) / ISLE_RIM_STEP) % Math.round(360 / ISLE_RIM_STEP);
   return r + 0.1 * (hash01(k, spec.seed + 900) * 2 - 1);
+}
+
+/** How far the isle's frame is turned from the authored one (degrees). */
+function shiftOf(spec: IsleFloorSpec, toward: number): number {
+  return toward - spec.authoredToward;
 }
 
 function pointAt(cx: number, cz: number, deg: number, r: number): [number, number] {
@@ -146,10 +163,12 @@ function pointAt(cx: number, cz: number, deg: number, r: number): [number, numbe
   return [cx + Math.sin(a) * r, cz + Math.cos(a) * r];
 }
 
-/** The rim's bearings, ISLE_RIM_STEP apart, from north clockwise. */
-function rimBearings(): number[] {
+/** The rim's bearings, ISLE_RIM_STEP apart, clockwise from the authored
+ *  frame's north turned by `shift` (so a turned isle's vertices are the
+ *  authored ones turned). */
+function rimBearings(shift: number): number[] {
   const out: number[] = [];
-  for (let d = 0; d < 360 - 1e-9; d += ISLE_RIM_STEP) out.push(d);
+  for (let d = 0; d < 360 - 1e-9; d += ISLE_RIM_STEP) out.push((((d + shift) % 360) + 360) % 360);
   return out;
 }
 
@@ -157,13 +176,16 @@ function rimBearings(): number[] {
  *  `from` (ragged) in its middle, curling out to the rim at its ends. */
 function ledgeInner(
   spec: IsleFloorSpec,
+  toward: number,
   l: IsleLedge,
   deg: number,
   off: number,
   rim: number,
 ): number {
   const e = (Math.abs(off) / l.half) ** 3;
-  const ragged = l.from + 0.35 * wobble(spec.seed + 17, deg * 1.7);
+  const ragged =
+    l.from +
+    0.35 * wobble(spec.seed + 17, ((((deg - shiftOf(spec, toward)) % 360) + 360) % 360) * 1.7);
   return Math.min(rim - 0.6, ragged + (rim - ragged) * e);
 }
 
@@ -175,12 +197,12 @@ function ledgeInner(
  * falls to the void.
  */
 export function isleFloorSurfaces(
-  isle: { id: string; x: number; z: number; h: number },
+  isle: { id: string; x: number; z: number; h: number; spec?: string },
   toward: number,
 ): FieldPolySurface[] {
-  const spec = ISLE_FLOOR_SPECS[isle.id];
+  const spec = ISLE_FLOOR_SPECS[isle.spec ?? isle.id];
   if (!spec) throw new Error(`no floor spec for ${isle.id}`);
-  const bearings = rimBearings();
+  const bearings = rimBearings(shiftOf(spec, toward));
   const rim = bearings.map((d) => isleRimRadius(spec, toward, d));
   const points = bearings.map((d, k) => pointAt(isle.x, isle.z, d, rim[k]));
   const out: FieldPolySurface[] = [
@@ -198,7 +220,7 @@ export function isleFloorSurfaces(
     for (let j = inSector.length - 2; j >= 1; j--) {
       const k = inSector[j];
       const d = bearings[k];
-      pts.push(pointAt(isle.x, isle.z, d, ledgeInner(spec, l, d, degOff(d, mid), rim[k])));
+      pts.push(pointAt(isle.x, isle.z, d, ledgeInner(spec, toward, l, d, degOff(d, mid), rim[k])));
     }
     out.push({
       kind: 'poly',

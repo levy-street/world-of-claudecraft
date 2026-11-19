@@ -55,12 +55,12 @@ const painted = new Set(SMITH_HEART_AURA_IMAGE_IDS);
 const aliases = new Map(SMITH_HEART_AURA_ICON_SOURCES);
 
 describe("Smith's Heart aura art", () => {
-  it('keeps 72 paintings and 18 shared aliases, sorted and disjoint', () => {
-    expect(SMITH_HEART_AURA_IMAGE_IDS).toHaveLength(72);
-    expect(painted.size).toBe(72);
+  it('keeps 69 paintings and 22 shared aliases, sorted and disjoint', () => {
+    expect(SMITH_HEART_AURA_IMAGE_IDS).toHaveLength(69);
+    expect(painted.size).toBe(69);
     expect([...SMITH_HEART_AURA_IMAGE_IDS]).toEqual([...SMITH_HEART_AURA_IMAGE_IDS].sort());
-    expect(SMITH_HEART_AURA_ICON_SOURCES).toHaveLength(18);
-    expect(aliases.size).toBe(18);
+    expect(SMITH_HEART_AURA_ICON_SOURCES).toHaveLength(22);
+    expect(aliases.size).toBe(22);
     for (const [alias, source] of aliases) {
       expect(painted.has(alias), `${alias} is an alias, not a painting`).toBe(false);
       expect(painted.has(source), `${alias} shares a real painting (${source})`).toBe(true);
@@ -106,7 +106,7 @@ describe("Smith's Heart aura art", () => {
       expect(meta, id).toMatchObject({ format: 'webp', width: 128, height: 128, hasAlpha: false });
       total += bytes.length;
     }
-    // All 72 together stay under 400 KB.
+    // All 69 together stay under 400 KB.
     expect(total).toBeLessThan(400 * 1024);
   });
 });

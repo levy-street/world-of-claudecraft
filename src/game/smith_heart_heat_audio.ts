@@ -16,9 +16,12 @@ import {
   HEAT_GRIP_SOUND,
   HEAT_MARK_SOUNDS,
   HEAT_SFX_KEYS,
+  HEAT_WALL_LOOP,
+  HEAT_WALL_PASS,
   HEAT_WHEEL_SOUNDS,
   HEAT_ZONE_BUILD_SOUND,
   heatBarRate,
+  wallRoarGain,
 } from './smith_heart_heat_audio_core';
 import { HeartMarkEar } from './smith_heart_mark_audio';
 
@@ -42,6 +45,7 @@ export interface HeatAudioSink {
 }
 
 const CINDER_LOOP = 'heart-heat-cinder';
+const WALL_LOOP = 'heart-heat-wall';
 
 export class HeatAudio {
   private preloaded = false;
@@ -51,6 +55,7 @@ export class HeatAudio {
   /** Cinder Grip's stacks on the local player a frame ago. */
   private grip = 0;
   private rolling = false;
+  private roaring = false;
 
   constructor(private readonly sink: HeatAudioSink) {}
 
@@ -166,6 +171,29 @@ export class HeatAudio {
     }
   }
 
+  /** The nearest wall of fire this frame (its point and closeness), or null:
+   *  the roar looped there, faded out when no wall stands. */
+  wall(at: { x: number; y: number; z: number; near: number } | null): void {
+    if (at) {
+      this.preload();
+      this.sink.loop?.(WALL_LOOP, HEAT_WALL_LOOP.key, wallRoarGain(at.near), at.x, at.y, at.z);
+      this.roaring = true;
+    } else if (this.roaring) {
+      this.sink.unloop?.(WALL_LOOP, HEAT_WALL_LOOP.fadeOut);
+      this.roaring = false;
+    }
+  }
+
+  /** A wall of fire rolling past the local player: its rush in their ear. */
+  wallPass(x: number, y: number, z: number): void {
+    this.sink.playAt(HEAT_WALL_PASS.key, x, y, z, {
+      gain: HEAT_WALL_PASS.gain,
+      rate: HEAT_WALL_PASS.rate,
+      cooldown: 0.5,
+      priority: true,
+    });
+  }
+
   /** Each new stack of Cinder Grip on the local player: a sizzle in their ear. */
   private updateGrip(me: Entity | null): void {
     let stacks = 0;
@@ -186,5 +214,7 @@ export class HeatAudio {
   dispose(): void {
     if (this.rolling) this.sink.unloop?.(CINDER_LOOP, 0.3);
     this.rolling = false;
+    if (this.roaring) this.sink.unloop?.(WALL_LOOP, 0.3);
+    this.roaring = false;
   }
 }

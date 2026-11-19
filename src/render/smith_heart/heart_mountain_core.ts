@@ -19,7 +19,11 @@
 //
 // Three-free, DOM-free, deterministic.
 
-import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
+import {
+  HEART_ROOM,
+  HEART_ROOM_CHASM_R,
+  SMITH_HEART_FIELD,
+} from '../../sim/content/smith_heart_layout';
 import { hammerRockLift } from './heart_cliff_paint_core';
 import {
   HEART_ROOM_WALL_BAND,
@@ -116,8 +120,39 @@ export function heartSummitFall(back: number, jag: number): number {
 /** The mountain's height at (x, z), or HEART_MOUNTAIN_CHASM where none
  *  (under the summit's cap, heartSummitCap). */
 export function heartMountainHeight(x: number, z: number): number {
-  const h = heartMountainRaw(x, z);
-  return h <= HEART_MOUNTAIN_CHASM ? h : Math.min(h, heartSummitCap(x, z));
+  const raw = heartMountainRaw(x, z);
+  return raw <= HEART_MOUNTAIN_CHASM ? raw : Math.min(raw, heartSummitCap(x, z));
+}
+
+/** The Heart's crown ridge (Jose's call of 2026-11-18: the east chain of the
+ *  Breath's isles hangs over the crown, high over the Cornice): on the
+ *  chamber's rim toward the Cornice the crown climbs into one tall ridge, so
+ *  the open chamber stays out of sight from every isle and every ride (the
+ *  isles' floors stand 37 to 51 yd over the Cornice, far over the crown's
+ *  old shoulder). Its crest `top`, at its peak bearing from the chamber's
+ *  middle (`deg`, the chain's), falling off over `half` degrees either side;
+ *  across, a ridge of `width` yards just past the chasm's edge. Pinned by
+ *  tests/smith_heart_breath_isle_crown.test.ts (no reachable eye sees in). */
+export const HEART_CROWN_RIDGE = { top: 140, deg: 276, half: 32, from: 1, width: 12 } as const;
+
+/** The crown ridge's height at (x, z) (-Infinity off it). */
+export function heartCrownRidge(x: number, z: number): number {
+  const R = HEART_CROWN_RIDGE;
+  const d = Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z) - HEART_ROOM_CHASM_R - R.from;
+  if (d < 0 || d > R.width) return Number.NEGATIVE_INFINITY;
+  const deg = ((Math.atan2(x - HEART_ROOM.x, z - HEART_ROOM.z) * 180) / Math.PI + 360) % 360;
+  let off = Math.abs(deg - R.deg) % 360;
+  if (off > 180) off = 360 - off;
+  if (off >= R.half) return Number.NEGATIVE_INFINITY;
+  const along = Math.cos(((off / R.half) * Math.PI) / 2);
+  const across = Math.sin((d / R.width) * Math.PI);
+  // A broken crest, never one height: broad buttresses and gullies round the
+  // rim (a slow noise along the bearing), and a fine jag across them. The
+  // painted spires stand over it (heart_crown_ridge_core.ts).
+  const buttress = heartRidgeNoise(deg * 0.21 + 13, d * 0.05 - 41);
+  const jag = heartRidgeNoise(x * 1.9 + 31, z * 1.9 - 77);
+  const crest = 0.86 + 0.1 * buttress + 0.04 * jag;
+  return HEART_ROOM.h + (R.top - HEART_ROOM.h) * Math.sqrt(along) * (0.55 + 0.45 * across) * crest;
 }
 
 function heartMountainRaw(x: number, z: number): number {
@@ -153,7 +188,8 @@ function heartMountainRaw(x: number, z: number): number {
     if (open >= 1) return fall;
     return fall + (rising - fall) * (1 - open);
   }
-  if (back >= HEART_MOUNTAIN_RECESS) return top;
+  // Behind the recess (never on a ledge under a floor) the crown ridge.
+  if (back >= HEART_MOUNTAIN_RECESS) return Math.max(top, heartCrownRidge(x, z));
   if (back >= 0) return Math.min(top, c.floor - HEART_MOUNTAIN_LEDGE);
   // The foot: inside the clearance the face falls away into the chasm, well
   // under the floor (a camera above the floor never meets it), so the rock's

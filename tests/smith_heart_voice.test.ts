@@ -269,7 +269,14 @@ describe('the voice pack', () => {
     expect(SMITH_HEART_VOICE_LINES.length).toBeGreaterThanOrEqual(100);
     // Pending a clip (rendered with ElevenLabs on the owner's go): pinned,
     // so a new line never slips through unvoiced.
-    expect([...SMITH_HEART_VOICE_PENDING]).toEqual(['breath.intro']);
+    expect([...SMITH_HEART_VOICE_PENDING]).toEqual([
+      'breath.intro',
+      'breath.isles',
+      'breath.bulwark',
+      'thessaly.isles',
+      'thessaly.updraft',
+      'thessaly.stone',
+    ]);
     for (const line of SMITH_HEART_VOICE_LINES) {
       if (SMITH_HEART_VOICE_PENDING.has(line.id)) continue;
       const packed = packLine(line);

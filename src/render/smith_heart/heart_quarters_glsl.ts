@@ -440,22 +440,6 @@ void main() {
   ${gate()}
 }`;
 
-/** The Breath's dust devils: columns of dust spiralling up and wandering
- *  over the quarter (every mote of a devil shares its anchor). */
-export const BREATH_DEVIL_VERT = /* glsl */ `${HEAD}
-void main() {
-  float seed = aParams.x;
-  vec2 c = position.xz + vec2(sin(uTime * 0.27 + aParams.w * 6.28), cos(uTime * 0.21 + aParams.w * 4.0)) * 3.0;
-  float h = fract(seed + uTime * aParams.z * 0.16);
-  float rad = 0.4 + h * 2.5;
-  float ang = seed * 40.0 + uTime * (3.8 - h * 1.6);
-  vec3 p = vec3(c.x + sin(ang) * rad, h * 8.5, c.y + cos(ang) * rad);
-  vFade = sin(3.14159 * h) * 0.9;
-  vHot = h * 0.45;
-  float size = (0.16 + 0.3 * aParams.y) * (0.6 + h);
-  ${gate()}
-}`;
-
 /** The Breath's streaks: lines of wind running low over the quarter along
  *  the spiral (`aOther`: the wind's direction there). */
 export const BREATH_STREAK_VERT = /* glsl */ `

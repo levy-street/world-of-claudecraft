@@ -164,7 +164,7 @@ describe('the Guardian of the Breath model', () => {
     expect(c.castByAbility?.[BREATH_CASTS.storm]).toBe('StormBreaks');
     expect(c.castByAbility?.[BREATH_CASTS.fork]).toBe('Cast');
     expect(c.castByAbility?.[BREATH_CASTS.cradleHold]).toBe('Channel');
-    expect(c.castByAbility?.[ISLE_CASTS.bulwark]).toBe('Channel');
+    expect(c.castByAbility?.[ISLE_CASTS.nova]).toBe('Channel');
     const T = c.castTimeScaleByAbility ?? {};
     expect(T[BREATH_CASTS.inhale]).toBeCloseTo(
       BREATH_BODY_CLIP.inhale / BREATH_TUNING.inhaleCast,
@@ -353,7 +353,7 @@ describe('breath_body_core: the wind plan', () => {
     expect(at(BREATH_CASTS.storm)).toBe('break');
     expect(at(BREATH_CASTS.fork, true)).toBe('cast');
     expect(at(BREATH_CASTS.cradleHold, true)).toBe('channel');
-    expect(at(ISLE_CASTS.bulwark)).toBe('channel');
+    expect(at(ISLE_CASTS.nova)).toBe('channel');
     expect(at(null, true)).toBe('storm');
     expect(at(null)).toBe('idle');
     expect(

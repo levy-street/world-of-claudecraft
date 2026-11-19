@@ -10,7 +10,7 @@
 // of two marks). Two rules close it:
 //  - a RUNG per layer, unique across the four modules (this table; the pin in
 //    tests/smith_heart_heat_floor.test.ts), bottom to top: the wellspring and
-//    the floor's lasting scorch, the molten surfaces (craters, wakes, rivers,
+//    the floor's lasting scorch, the molten surfaces (craters, wakes, the lava wall's foot,
 //    Wakefire), the warnings (every telegraph a player must react to, over
 //    the fire it warns of), then the particles over everything on the floor,
 //    then the wellspring's shimmer standing in the air over its lip, then the
@@ -41,6 +41,7 @@ export type HeatFloorOwner =
   | 'heat_fight_fx'
   | 'heat_well_fx'
   | 'heat_cinder_fx'
+  | 'heat_lava_wall_fx'
   | 'heat_body'
   | 'heat_entrance';
 
@@ -74,17 +75,21 @@ export const HEAT_FLOOR = {
   // The molten surfaces: every char, then every glow.
   craterChar: rung(4, 'heat_fx', 'multiply', true),
   wakeChar: rung(5, 'heat_fx', 'multiply', true),
-  riverChar: rung(6, 'heat_well_fx', 'multiply', true),
+  // The lava waves' wall's foot (heat_lava_wall_fx.ts, the rework of
+  // 2026-11-18 in the rivers' rungs): its molten band, the lit floor ahead and
+  // the scorch behind, one char and one glow per ring.
+  wallChar: rung(6, 'heat_lava_wall_fx', 'multiply', true),
   // Wakefire's rungs also carry a thrown Hearthseed's crater (pass 4,
   // heat_meteor_fx.ts: the same root, the same commuting passes).
   zoneChar: rung(7, 'heat_fight_fx', 'multiply', true),
   craterGlow: rung(8, 'heat_fx', 'additive', true),
   wakeGlow: rung(9, 'heat_fx', 'additive', true),
-  riverGlow: rung(10, 'heat_well_fx', 'additive', true),
+  wallGlow: rung(10, 'heat_lava_wall_fx', 'additive', true),
   zoneGlow: rung(11, 'heat_fight_fx', 'additive', true),
   // The warnings over the fire: HeatFx's (the fist's spot, the swells'
-  // lanes) and the fight's (seeds, river lanes, falls, a cinder's reach, the
-  // hunted's rings; one kit lent to the well and the cinder parts).
+  // lanes) and the fight's (seeds, falls, a cinder's reach, the hunted's
+  // rings, the lava waves' corridors; one kit lent to the well and the cinder
+  // parts).
   fistTelegraphChar: rung(12, 'heat_fx', 'multiply', true),
   fightTelegraphChar: rung(13, 'heat_fight_fx', 'multiply', true),
   fistTelegraphGlow: rung(14, 'heat_fx', 'additive', true),

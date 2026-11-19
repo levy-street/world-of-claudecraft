@@ -1,48 +1,52 @@
-// The Guardian of the Breath's rework of 2026-11-03 over a REAL Sim claim
-// (src/sim/encounters/smith_heart/breath_isles.ts, breath_cradle.ts): the
-// Islands of the Wind (the Gale Bulwark at each tier's marks, the isles'
-// adds, the regrowth while any lives, the Gale Mender's kickable Mending
-// Gale, the scripted ride out and home on its fixed arc, the Homeward Gale
-// when the last add falls, mythic's Windworn, the break, the burst that keeps
-// the fight from stalling, a reset that brings every rider home), the
-// CHANNELED Thunder's Cradle (nothing else cast, heroic's three lifted), and
-// the Summit Roar that throws a raid tanked by the edge off the Cornice.
+// The Guardian of the Breath's 50 percent phase over a REAL Sim claim (the
+// team's design of 2026-11-17, src/sim/encounters/smith_heart/breath_isles.ts
+// and breath_isle_adds.ts): the lock at half health, the Gale Cocoon and
+// Skyrend Nova, Thessaly's Updrafts and the two chains of isles, each isle's
+// adds and its Closing Storm (Sky's Reckoning when it runs out), the Riven
+// Squall's split, the Gust Herald's Shoving Gale, the Shieldbearer's ward,
+// the Mender's kickable Mending Gale, the Stillstones, the way home and the
+// storm breaking after it; the nova run out; the ball never meeting the
+// phase; a wipe that brings everyone home; the old Bulwark rounds gone.
 
 import { describe, expect, it } from 'vitest';
+import { frontWardAmount } from '../src/sim/combat/front_ward';
 import { BREATH, BREATH_ISLES } from '../src/sim/content/smith_heart_layout';
+import { clearHeart } from '../src/sim/encounters/smith_heart/breath_heart';
 import {
-  BREATH_AURAS,
   BREATH_CASTS,
-  BREATH_CUES,
-  BREATH_DIFFICULTY,
-  BREATH_NAMES,
-  ISLE_AURAS,
-  ISLE_CASTS,
-  ISLE_MOBS,
-  ISLE_NAMES,
-  ISLE_OBJECTS,
-  ISLE_TUNING as IT,
-  inBreathArena,
+  BREATH_OBJECTS,
+  BREATH_TUNING as T,
+} from '../src/sim/encounters/smith_heart/breath_ids';
+import {
+  inShoveLine,
+  livingIsleAdds,
+  playersOnIsle,
+} from '../src/sim/encounters/smith_heart/breath_isle_adds';
+import {
+  cornicePads,
   isleAt,
   isleSpots,
   rideArc,
-  rideOf,
-  rideTemplate,
-  BREATH_TUNING as T,
-} from '../src/sim/encounters/smith_heart';
-import { dischargeCradles } from '../src/sim/encounters/smith_heart/breath_cradle';
+} from '../src/sim/encounters/smith_heart/breath_isle_geometry';
+import {
+  closingOf,
+  ISLE_AURAS,
+  ISLE_CASTS,
+  ISLE_MOBS,
+  ISLE_OBJECTS,
+  ISLE_TIERS,
+  ISLE_TUNING as IT,
+  padOf,
+  padTemplate,
+} from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import { islePlayers } from '../src/sim/encounters/smith_heart/breath_isles';
-import { DT, type Entity, type SimEvent } from '../src/sim/types';
-import { auraEffectDescriptor } from '../src/ui/aura_effect';
-import { t } from '../src/ui/i18n';
-import { localizeSimAuraName } from '../src/ui/sim_i18n';
+import { DT, type Entity } from '../src/sim/types';
 import { type BreathFight, breathFight } from './helpers/breath_fight';
-import { hitsOf } from './helpers/council_fight';
 
 const ticks = (s: number) => Math.round(s / DT);
 const has = (e: Entity, id: string) => e.auras.some((a) => a.id === id);
 
-/** Hold the wind calm: on the open rim an idle raid is carried off the edge. */
+/** Hold the wind calm (the open rim throws an idle raid off). */
 function stillAir(f: BreathFight): void {
   f.dev('/dev heart breath calm');
   const st = f.state();
@@ -50,17 +54,18 @@ function stillAir(f: BreathFight): void {
     st.wind.remaining = 9999;
     st.inhaleTimer = 9999;
     st.circleTimer = 9999;
+    st.skyTimer = 9999;
+    st.blowTimer = 9999;
+    st.heartTimer = 9999;
   }
 }
 
-function pulled(n = 6, tier: '' | 'heroic' | 'mythic' = '', seed = 23): BreathFight {
+function pulled(n = 6, tier: '' | 'heroic' = '', seed = 23): BreathFight {
   const f = breathFight(n, seed);
   expect(f.dev('/dev heart breath pull')).toBe(true);
   if (tier) f.dev(`/dev heart breath ${tier}`);
   f.tick(2);
   stillAir(f);
-  // Everyone on the threat table (a real raid fights it): one rider leaving
-  // the Cornice is never the guardian's last target.
   const b = f.boss();
   f.players.forEach((p, i) => {
     if (!b.threat.has(p.id)) b.threat.set(p.id, 10 - i);
@@ -68,666 +73,474 @@ function pulled(n = 6, tier: '' | 'heroic' | 'mythic' = '', seed = 23): BreathFi
   return f;
 }
 
-/** Take the guardian just under a health mark and let the round start. */
-function crossMark(f: BreathFight, frac: number): void {
+/** Take the guardian to half health and let the phase begin. */
+function toIsles(f: BreathFight): void {
   const b = f.boss();
-  b.hp = Math.floor(b.maxHp * frac) - 1;
-  for (let i = 0; i < ticks(3) && !f.state()?.isles.round; i++) f.tick();
+  b.hp = Math.floor(b.maxHp * IT.at) - 5;
+  for (let i = 0; i < ticks(2) && f.state()?.isles.stage !== 'nova'; i++) f.tick();
+  expect(f.state()?.isles.stage).toBe('nova');
 }
 
-function addsOf(f: BreathFight): Entity[] {
+function addsOn(f: BreathFight, isle: number): Entity[] {
   return (f.state()?.isles.adds ?? [])
+    .filter((a) => a.isle === isle)
     .map((a) => f.sim.ctx.entities.get(a.id))
     .filter((e): e is Entity => !!e && !e.dead);
 }
 
-function shield(f: BreathFight) {
-  return f.boss().auras.find((a) => a.id === ISLE_AURAS.bulwark);
+function killIsle(f: BreathFight, isle: number): void {
+  for (const e of addsOn(f, isle))
+    f.sim.ctx.dealDamage(f.boss(), e, e.hp * 20 + 1, false, 'nature', 'Test', 'hit', true); // through a ward
+  f.tick(2);
 }
 
-/** Ride `p` out by stepping into isle `i`'s Gale Path; returns once landed. */
-function rideOut(f: BreathFight, p: Entity, i: number): SimEvent[] {
-  const path = isleSpots()[i].path;
-  f.put(p, path.x, path.z);
-  return f.tick(ticks(IT.rideSeconds + 0.6));
+/** Step `p` into the pad from `from` (-1 the Cornice) to `to`; returns once landed. */
+function ride(f: BreathFight, p: Entity, from: number, to: number): void {
+  const at = from < 0 ? cornicePads()[isleSpots()[to].side] : isleSpots()[from].pad;
+  if (!at) throw new Error('no pad');
+  // Out of the last landing's grace first, then onto the pad.
+  f.tick(ticks(IT.rideGrace + 0.1));
+  f.put(p, at.x, at.z);
+  f.tick(ticks(IT.rideSeconds + 0.6));
+  expect(isleAt(f.local(p).x, f.local(p).z)).toBe(to);
 }
 
-describe('the Islands of the Wind: the round', () => {
-  it('normal: at 70 the Bulwark rises on a channel, one isle wakes with a Sentinel and a Mender', () => {
-    const f = pulled(4);
-    const b = f.boss();
-    crossMark(f, 0.85);
-    expect(f.state()?.isles.round).toBeNull();
-    crossMark(f, BREATH_DIFFICULTY.normal.isleAt[0]);
-    const round = f.state()?.isles.round;
-    expect(round?.isles.length).toBe(1);
-    const s = shield(f);
-    expect(s?.kind).toBe('absorb');
-    expect(s?.value).toBe(Math.round(b.maxHp * IT.bulwarkShare));
-    expect(b.castingAbility).toBe(ISLE_CASTS.bulwark);
-    expect(b.channeling).toBe(true);
-    const adds = addsOf(f);
-    expect(adds.map((e) => e.templateId).sort()).toEqual(
-      [ISLE_MOBS.mender, ISLE_MOBS.sentinel].sort(),
-    );
-    for (const e of adds) {
-      const at = f.local(e);
-      expect(isleAt(at.x, at.z)).toBe(round?.isles[0]);
+describe('the Islands of the Wind: the layout', () => {
+  it('six isles, three a side, each its own floor, climbing round the rim, inside the band', () => {
+    expect(BREATH_ISLES).toHaveLength(6);
+    for (const side of [0, 1] as const) {
+      const chain = BREATH_ISLES.filter((b) => b.side === side);
+      expect(chain.map((b) => b.step)).toEqual([0, 1, 2]);
+      expect(chain[1].h).toBeGreaterThan(chain[0].h);
+      expect(chain[2].h).toBeGreaterThan(chain[1].h);
     }
-    expect(f.objects(ISLE_OBJECTS.pathPrefix)).toHaveLength(1);
-    // Planted: no swing, no other bar while it holds.
-    const at = { ...b.pos };
-    f.tick(ticks(4));
-    expect(b.pos.x).toBe(at.x);
-    expect(b.castingAbility).toBe(ISLE_CASTS.bulwark);
-  });
-
-  it('the dev pool scale (the bot raid human-equivalent check) scales the isle adds', () => {
-    const poolOf = (k: number) => {
-      const f = breathFight(4, 23);
-      if (k !== 1) f.dev(`/dev heart pool ${k}`);
-      expect(f.dev('/dev heart breath pull')).toBe(true);
-      f.tick(2);
-      stillAir(f);
-      crossMark(f, BREATH_DIFFICULTY.normal.isleAt[0]);
-      const out = addsOf(f).map((e) => [e.templateId, e.hp, e.maxHp] as const);
-      f.dev('/dev heart pool 1');
-      return out.sort((a, b) => a[0].localeCompare(b[0]));
-    };
-    const whole = poolOf(1);
-    const scaled = poolOf(0.65);
-    expect(whole).toHaveLength(2);
-    expect(scaled.map((a) => a[0])).toEqual(whole.map((a) => a[0]));
-    whole.forEach(([, , max], i) => {
-      expect(scaled[i][2]).toBe(Math.round(max * 0.65));
-      expect(scaled[i][1]).toBe(scaled[i][2]);
+    BREATH_ISLES.forEach((b, i) => {
+      expect(isleAt(b.x, b.z)).toBe(i);
+      expect(b.z).toBeLessThan(238);
+      const sp = isleSpots()[i];
+      expect(isleAt(sp.land.x, sp.land.z)).toBe(i);
+      for (const a of sp.adds) expect(isleAt(a.x, a.z)).toBe(i);
+      if (sp.pad) expect(isleAt(sp.pad.x, sp.pad.z)).toBe(i);
+      if (sp.stone) expect(isleAt(sp.stone.x, sp.stone.z)).toBe(i);
+      expect(sp.pad === null).toBe(sp.step === 2);
+      expect(sp.stone === null).toBe(sp.step !== 2);
     });
   });
 
-  it('heroic and mythic: both isles at 80, and again at 60; one round per mark', () => {
-    for (const tier of ['heroic', 'mythic'] as const) {
-      const f = pulled(4, tier);
-      crossMark(f, 0.8);
-      expect(f.state()?.isles.round?.isles).toEqual([0, 1]);
-      expect(addsOf(f)).toHaveLength(4);
-      expect(f.objects(ISLE_OBJECTS.pathPrefix)).toHaveLength(2);
-      f.dev('/dev heart breath bulwark');
-      f.tick(2);
-      expect(f.state()?.isles.round).toBeNull();
-      expect(addsOf(f)).toHaveLength(0);
-      expect(f.objects(ISLE_OBJECTS.pathPrefix)).toHaveLength(0);
-      crossMark(f, 0.6);
-      expect(f.state()?.isles.round?.isles).toEqual([0, 1]);
-      expect(f.state()?.isles.next).toBe(2);
+  it('the pads and codecs read back; the ride arc is the fixed one', () => {
+    expect(padOf(padTemplate(-1, 3))).toEqual({ from: -1, to: 3 });
+    expect(padOf(padTemplate(1, 2))).toEqual({ from: 1, to: 2 });
+    expect(padOf('sh_breath_updraft_c_h')).toBeNull();
+    const a = { x: 0, y: 60, z: 0 };
+    const b = { x: 10, y: 80, z: 0 };
+    expect(rideArc(a, b, 0)).toEqual(a);
+    expect(rideArc(a, b, 1)).toEqual(b);
+    expect(rideArc(a, b, 0.5).y).toBeGreaterThan(80);
+  });
+});
+
+describe('the Islands of the Wind: the lock and the start', () => {
+  it('no isles above half health (the old Bulwark rounds at 70 and 80 are gone)', () => {
+    const f = pulled(6, 'heroic');
+    const b = f.boss();
+    b.hp = Math.floor(b.maxHp * 0.6);
+    f.tick(ticks(3));
+    expect(f.state()?.isles.stage).toBe('idle');
+    expect(f.state()?.half).toBe('wind');
+    expect(b.castingAbility).not.toBe('heart_breath_gale_bulwark');
+    expect(f.objects(ISLE_OBJECTS.padPrefix)).toHaveLength(0);
+    expect(b.damageImmune ?? false).toBe(false);
+  });
+
+  it('at half health the guardian is locked, cocooned, channels the nova; two pads, two isles wake', () => {
+    const f = pulled(6);
+    const b = f.boss();
+    toIsles(f);
+    const st = f.state()!;
+    expect(st.half).toBe('isles');
+    expect(b.damageImmune).toBe(true);
+    expect(has(b, ISLE_AURAS.cocoon)).toBe(true);
+    expect(b.castingAbility).toBe(ISLE_CASTS.nova);
+    expect(b.channeling).toBe(true);
+    expect(b.castTotal).toBe(ISLE_TIERS.normal.novaSeconds);
+    // Untouchable: a blow takes nothing.
+    const hp = b.hp;
+    f.sim.ctx.dealDamage(f.players[0], b, 5000, false, 'physical', 'Test', 'hit', false);
+    expect(b.hp).toBe(hp);
+    const pads = f.objects(ISLE_OBJECTS.padPrefix).map((e) => padOf(e.templateId));
+    expect(pads).toEqual(
+      expect.arrayContaining([
+        { from: -1, to: 0 },
+        { from: -1, to: 3 },
+      ]),
+    );
+    expect(pads).toHaveLength(2);
+    expect(
+      addsOn(f, 0)
+        .map((e) => e.templateId)
+        .sort(),
+    ).toEqual([ISLE_MOBS.mender, ISLE_MOBS.sentinel].sort());
+    expect(addsOn(f, 3)).toHaveLength(2);
+    expect(addsOn(f, 1)).toHaveLength(0);
+    // The wind still: no blow, no sky volley while the raid is out.
+    f.tick(ticks(20));
+    expect(f.state()?.wind.phase).toBe('calm');
+    expect(f.objects(BREATH_OBJECTS.strikePrefix)).toHaveLength(0);
+  });
+
+  it('a big hit through the mark never takes it under half health', () => {
+    const f = pulled(6);
+    const b = f.boss();
+    b.hp = Math.floor(b.maxHp * IT.at) + 10;
+    f.sim.ctx.dealDamage(
+      f.players[0],
+      b,
+      Math.floor(b.maxHp * 0.2),
+      false,
+      'physical',
+      'Test',
+      'hit',
+      false,
+    );
+    f.tick(2);
+    expect(b.hp).toBeGreaterThanOrEqual(Math.floor(b.maxHp * IT.at) - 1);
+    expect(b.damageImmune).toBe(true);
+  });
+
+  it('a Knotted Gale in play: the phase waits for it (locked), and no new ball comes after', () => {
+    const f = pulled(6, 'heroic');
+    f.dev('/dev heart breath heart');
+    expect(f.state()?.heart).not.toBeNull();
+    const b = f.boss();
+    b.hp = Math.floor(b.maxHp * IT.at) - 5;
+    f.tick(3);
+    expect(b.damageImmune).toBe(true);
+    expect(f.state()?.isles.stage).toBe('idle');
+    f.tick(ticks(5));
+    expect(f.state()?.isles.stage).toBe('idle');
+    // The ball is thrown (gone); the phase begins and never meets another.
+    clearHeart(f.sim.ctx, f.inst, f.state()!);
+    for (let i = 0; i < ticks(2) && f.state()?.isles.stage !== 'nova'; i++) f.tick();
+    expect(f.state()?.heart).toBeNull();
+    expect(f.state()?.isles.stage).toBe('nova');
+    const st = f.state()!;
+    st.heartTimer = 0;
+    f.tick(ticks(5));
+    expect(f.state()?.heart).toBeNull();
+  });
+});
+
+describe('the Islands of the Wind: the isles', () => {
+  it('a pad carries a player to its isle, stunned and carried; the storm closes from the landing', () => {
+    const f = pulled(6);
+    toIsles(f);
+    const p = f.players[1];
+    const pad = cornicePads()[0];
+    f.put(p, pad.x, pad.z);
+    f.tick(2);
+    expect(has(p, ISLE_AURAS.riding)).toBe(true);
+    expect(p.carriedBy).toBeDefined();
+    f.tick(ticks(IT.rideSeconds));
+    expect(isleAt(f.local(p).x, f.local(p).z)).toBe(0);
+    expect(has(p, ISLE_AURAS.riding)).toBe(false);
+    const closing = f.objects(ISLE_OBJECTS.closingPrefix).map((e) => closingOf(e.templateId));
+    expect(closing).toHaveLength(1);
+    expect(closing[0]?.isle).toBe(0);
+    expect(closing[0]?.whole).toBe(ISLE_TIERS.normal.closingSeconds);
+    // The wardens turn on the one set down among them.
+    expect(addsOn(f, 0).every((e) => e.inCombat)).toBe(true);
+  });
+
+  it('an isle cleared: Thessaly raises the next pad and its adds rise (herald and squall)', () => {
+    const f = pulled(6);
+    toIsles(f);
+    ride(f, f.players[1], -1, 0);
+    killIsle(f, 0);
+    const pads = f.objects(ISLE_OBJECTS.padPrefix).map((e) => padOf(e.templateId));
+    expect(pads).toContainEqual({ from: 0, to: 1 });
+    expect(
+      addsOn(f, 1)
+        .map((e) => e.templateId)
+        .sort(),
+    ).toEqual([ISLE_MOBS.herald, ISLE_MOBS.squall].sort());
+    // Its storm stands down.
+    expect(f.objects(ISLE_OBJECTS.closingPrefix)).toHaveLength(0);
+    ride(f, f.players[1], 0, 1);
+    killIsle(f, 1);
+    expect(addsOn(f, 1).filter((e) => e.templateId === ISLE_MOBS.fragment)).toHaveLength(2);
+    killIsle(f, 1);
+    expect(addsOn(f, 2).map((e) => e.templateId)).toEqual([ISLE_MOBS.shieldbearer]);
+  });
+
+  it("the Closing Storm runs out: Sky's Reckoning strikes under everyone on the isle", () => {
+    const f = pulled(6);
+    toIsles(f);
+    const p = f.players[1];
+    ride(f, p, -1, 0);
+    // Hold the adds off (they would hit too): no damage but the storm's.
+    for (const e of addsOn(f, 0)) {
+      e.encounterHeld = true;
+      e.inCombat = false;
     }
+    const st = f.state()!;
+    st.isles.isles[0].closing = 0.2;
+    p.hp = p.maxHp;
+    f.tick(ticks(0.5));
+    expect(f.objects(BREATH_OBJECTS.strikePrefix).length).toBeGreaterThan(0);
+    const before = p.hp;
+    f.tick(ticks(IT.reckonWarn + 0.2), false);
+    expect(before - p.hp).toBeGreaterThanOrEqual(
+      Math.round(p.maxHp * ISLE_TIERS.normal.reckonShare) - 1,
+    );
+    // Normal: painful, never one strike's wipe.
+    expect(p.dead).toBe(false);
   });
 
-  it('the Bulwark regrows while any add lives, and only then', () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const whole = f.state()?.isles.round?.whole ?? 0;
-    const s = shield(f);
-    if (!s) throw new Error('no bulwark');
-    s.value = whole * 0.2;
-    // Out of the Mender's way (its channel is its own test).
-    for (const a of f.state()?.isles.adds ?? []) a.next = 999;
-    f.tick(ticks(2));
-    expect(s.value).toBeCloseTo(whole * (0.2 + IT.regrowShare * 2), -1);
-    f.dev('/dev heart breath killisle');
-    const before = s.value;
-    f.tick(ticks(2));
-    expect(s.value).toBe(before);
+  it("the Gust Herald's Shoving Gale slides the line toward the rim; normal holds it on the isle", () => {
+    const f = pulled(6);
+    toIsles(f);
+    const p = f.players[1];
+    ride(f, p, -1, 0);
+    killIsle(f, 0);
+    ride(f, p, 0, 1);
+    const herald = addsOn(f, 1).find((e) => e.templateId === ISLE_MOBS.herald)!;
+    const a = f.state()!.isles.adds.find((x) => x.id === herald.id)!;
+    a.next = 0;
+    for (const e of addsOn(f, 1)) if (e !== herald) e.encounterHeld = true;
+    for (let i = 0; i < ticks(2) && herald.castingAbility !== ISLE_CASTS.shove; i++) f.tick();
+    expect(herald.castingAbility).toBe(ISLE_CASTS.shove);
+    expect(a.dir).toBeDefined();
+    const dir = a.dir!;
+    const at0 = { ...p.pos };
+    expect(inShoveLine(a.at!, dir, p.pos.x, p.pos.z)).toBe(true);
+    f.tick(ticks(IT.shoveCast + IT.shoveSlide + 0.5));
+    const moved = (p.pos.x - at0.x) * dir.ux + (p.pos.z - at0.z) * dir.uz;
+    expect(moved).toBeGreaterThan(0.4);
+    expect(p.dead).toBe(false);
+    expect(isleAt(f.local(p).x, f.local(p).z)).toBe(1);
   });
 
-  it("the Mender's Mending Gale restores the Bulwark; a kick cuts it and it starts over", () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const st = f.state();
-    const whole = st?.isles.round?.whole ?? 0;
-    const mender = addsOf(f).find((e) => e.templateId === ISLE_MOBS.mender) as Entity;
-    const sentinel = addsOf(f).find((e) => e.templateId === ISLE_MOBS.sentinel) as Entity;
-    // The regrowth alone off (the Sentinel gone), the Mender's channel left.
-    f.sim.ctx.dealDamage(null, sentinel, sentinel.hp + 1, false, 'physical', null, 'hit', true);
-    const s = shield(f);
-    if (!s) throw new Error('no bulwark');
-    for (
-      let i = 0;
-      i < ticks(IT.mendFirst + 1) && mender.castingAbility !== ISLE_CASTS.mending;
-      i++
-    )
-      f.tick();
+  it("the Shieldbearer's ward turns aside a blow from the front, never one from behind", () => {
+    const f = pulled(6);
+    toIsles(f);
+    const p = f.players[1];
+    ride(f, p, -1, 0);
+    killIsle(f, 0);
+    ride(f, p, 0, 1);
+    killIsle(f, 1);
+    killIsle(f, 1);
+    const sb = addsOn(f, 2).find((e) => e.templateId === ISLE_MOBS.shieldbearer);
+    expect(sb).toBeDefined();
+    const ward = sb!.auras.find((a) => a.id === ISLE_AURAS.ward)!;
+    expect(ward.value).toBe(ISLE_TIERS.normal.wardCut);
+    const front = {
+      ...f.players[1],
+      pos: {
+        x: sb!.pos.x + Math.sin(sb!.facing) * 3,
+        y: sb!.pos.y,
+        z: sb!.pos.z + Math.cos(sb!.facing) * 3,
+      },
+    } as Entity;
+    const back = {
+      ...f.players[1],
+      pos: {
+        x: sb!.pos.x - Math.sin(sb!.facing) * 3,
+        y: sb!.pos.y,
+        z: sb!.pos.z - Math.cos(sb!.facing) * 3,
+      },
+    } as Entity;
+    expect(frontWardAmount(sb!, front, 1000)).toBe(
+      Math.round(1000 * (1 - ISLE_TIERS.normal.wardCut)),
+    );
+    expect(frontWardAmount(sb!, back, 1000)).toBe(1000);
+  });
+
+  it("the Gale Mender's Mending Gale mends its isle's adds; a kick cuts it and nothing is mended", () => {
+    const f = pulled(6);
+    toIsles(f);
+    const p = f.players[1];
+    ride(f, p, -1, 0);
+    const mender = addsOn(f, 0).find((e) => e.templateId === ISLE_MOBS.mender)!;
+    const sentinel = addsOn(f, 0).find((e) => e.templateId === ISLE_MOBS.sentinel)!;
+    const a = f.state()!.isles.adds.find((x) => x.id === mender.id)!;
+    sentinel.hp = Math.round(sentinel.maxHp * 0.3);
+    // Its Gale Bolt (the trash kit's own bar) out of the way.
+    mender.castingAbility = null;
+    a.at = null;
+    a.next = 0;
+    f.tick(2);
     expect(mender.castingAbility).toBe(ISLE_CASTS.mending);
-    expect(mender.channeling).toBe(true);
-    // A kick (the interrupt clears the cast): nothing restored.
-    s.value = whole * 0.1;
+    // Kicked: cut.
     f.sim.ctx.cancelCast(mender);
     f.tick(ticks(IT.mendCast + 0.5));
-    expect(s.value).toBeLessThan(whole * 0.1 + whole * IT.regrowShare * (IT.mendCast + 1));
-    // Uninterrupted the next time: a third of the whole back.
-    for (
-      let i = 0;
-      i < ticks(IT.mendEvery + 1) && mender.castingAbility !== ISLE_CASTS.mending;
-      i++
-    )
-      f.tick();
-    const v0 = s.value;
-    const ev = f.tick(ticks(IT.mendCast + 0.2));
-    expect(s.value - v0).toBeGreaterThan(whole * IT.mendShare - whole * 0.05);
-    expect(ev.some((e) => e.type === 'spellfx' && e.sourceId === mender.id)).toBe(true);
-  });
-
-  it('broken, the round ends: the guardian fights on, the adds and the paths go', () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const b = f.boss();
-    const s = shield(f);
-    if (!s) throw new Error('no bulwark');
-    f.dev('/dev heart breath killisle');
-    // The raid strikes it down.
-    f.sim.ctx.dealDamage(f.players[0], b, s.value + 5, false, 'physical', null, 'hit', true);
+    expect(sentinel.hp).toBeLessThan(Math.round(sentinel.maxHp * 0.31));
+    mender.castingAbility = null;
+    a.at = null;
+    a.next = 0;
     f.tick(2);
-    expect(f.state()?.isles.round).toBeNull();
-    expect(b.castingAbility).not.toBe(ISLE_CASTS.bulwark);
-    expect(shield(f)).toBeUndefined();
-    expect(f.objects(ISLE_OBJECTS.pathPrefix)).toHaveLength(0);
-  });
-
-  it('held too long it bursts over the Cornice and the round ends (the fight never stalls)', () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const ev = f.tick(ticks(IT.bulwarkMax + 1));
-    expect(f.state()?.isles.round).toBeNull();
-    expect(addsOf(f)).toHaveLength(0);
-    const hits = hitsOf(ev, ISLE_NAMES.burst);
-    expect(hits.length).toBe(f.players.length);
-    for (const h of hits) expect(h).toBeGreaterThanOrEqual(IT.burstMin);
+    expect(mender.castingAbility).toBe(ISLE_CASTS.mending);
+    f.tick(ticks(IT.mendCast + 0.2));
+    expect(sentinel.hp).toBeGreaterThanOrEqual(
+      Math.round(sentinel.maxHp * (0.3 + ISLE_TIERS.normal.mendShare)) - 2,
+    );
   });
 });
 
-describe('the Islands of the Wind: the ride', () => {
-  it('the arc is fixed: its ends exact, its middle over both, eased', () => {
-    const a = { x: 0, y: 60, z: 0 };
-    const b = { x: 30, y: 66, z: 10 };
-    expect(rideArc(a, b, 0)).toEqual(a);
-    const end = rideArc(a, b, 1);
-    expect(end.x).toBeCloseTo(b.x, 9);
-    expect(end.y).toBeCloseTo(b.y, 9);
-    const mid = rideArc(a, b, 0.5);
-    expect(mid.y).toBeCloseTo(66 + IT.rideApex, 6);
-    expect(rideArc(a, b, 0.25).x).toBeLessThan(30 * 0.25);
-    expect(rideOf(rideTemplate('home', 1, 3.2))).toEqual({ dir: 'home', isle: 1, seconds: 3.2 });
+describe('the Islands of the Wind: the stones and the end', () => {
+  it('both Stillstones channeled: the cocoon breaks, everyone rides home, the storm breaks', () => {
+    const f = pulled(6);
+    toIsles(f);
+    const b = f.boss();
+    const [, east, west] = f.players;
+    // East: the whole chain by the pads.
+    ride(f, east, -1, 0);
+    killIsle(f, 0);
+    ride(f, east, 0, 1);
+    killIsle(f, 1);
+    killIsle(f, 1);
+    ride(f, east, 1, 2);
+    killIsle(f, 2);
+    const st = f.state()!;
+    const stoneId = st.isles.isles[2].stoneId;
+    expect(stoneId).not.toBeNull();
+    const stone = f.sim.ctx.entities.get(stoneId!)!;
+    expect(stone.templateId).toBe(ISLE_MOBS.stillstone);
+    const sp = isleSpots()[2].stone!;
+    f.put(east, sp.x + 1.5, sp.z);
+    east.targetId = stone.id;
+    f.sim.interact(east.id);
+    expect(east.castingAbility).toBe(ISLE_CASTS.still);
+    f.tick(ticks(ISLE_TIERS.normal.stoneSoloSeconds + 0.3));
+    expect(st.isles.isles[2].stilled).toBe(true);
+    expect(st.isles.stage).toBe('nova');
+    expect(b.auras.find((a) => a.id === ISLE_AURAS.cocoon)?.value).toBe(1);
+    // West by the dev line (the same rule), then the end.
+    ride(f, west, -1, 3);
+    f.dev('/dev heart breath still 1', west.id);
+    f.tick(2);
+    expect(st.isles.stage).toBe('home');
+    expect(has(b, ISLE_AURAS.cocoon)).toBe(false);
+    expect(b.castingAbility).not.toBe(ISLE_CASTS.nova);
+    expect(livingIsleAdds({ ctx: f.sim.ctx, st })).toHaveLength(0);
+    // Everyone out there rides home.
+    expect(has(east, ISLE_AURAS.riding)).toBe(true);
+    f.tick(ticks(IT.homeSeconds + 1));
+    expect(islePlayers(f.sim.ctx, f.inst)).toHaveLength(0);
+    for (const p of [east, west]) {
+      expect(isleAt(f.local(p).x, f.local(p).z)).toBe(-1);
+      expect(Math.abs(p.pos.y - BREATH.cornice.h)).toBeLessThan(2);
+    }
+    expect(st.isles.stage).toBe('done');
+    expect(['break', 'storm']).toContain(st.half);
+    expect(b.castingAbility).toBe(BREATH_CASTS.storm);
+    expect(b.damageImmune).toBe(false);
   });
 
-  it('a Gale Path carries a player to the isle, stunned, over the void; the wardens turn on them', () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const i = f.state()?.isles.round?.isles[0] as number;
-    const p = f.players[2];
-    const path = isleSpots()[i].path;
-    f.put(p, path.x, path.z);
-    f.tick(2);
-    expect(p.carriedBy).toBeDefined();
-    expect(has(p, ISLE_AURAS.riding)).toBe(true);
-    expect(f.objects(ISLE_OBJECTS.ridePrefix)).toHaveLength(1);
-    // Halfway: high over the void, never on any floor.
-    f.tick(ticks(IT.rideSeconds / 2));
-    const mid = f.local(p);
-    expect(p.pos.y).toBeGreaterThan(BREATH_ISLES[i].h + IT.rideApex * 0.6);
-    expect(inBreathArena(mid.x, mid.z)).toBe(false);
-    expect(p.dead).toBe(false);
-    f.tick(ticks(IT.rideSeconds / 2 + 0.3));
-    const at = f.local(p);
-    expect(isleAt(at.x, at.z)).toBe(i);
-    expect(p.carriedBy).toBeUndefined();
-    expect(has(p, ISLE_AURAS.riding)).toBe(false);
-    expect(p.pos.y).toBeCloseTo(BREATH_ISLES[i].h, 0);
-    expect(islePlayers(f.sim.ctx, f.inst).map((q) => q.p.id)).toContain(p.id);
-    for (const e of addsOf(f))
-      if (f.state()?.isles.adds.find((a) => a.id === e.id)?.isle === i)
-        expect(e.threat.has(p.id)).toBe(true);
-  });
-
-  it('the last add falls: a Homeward Gale rises and carries them back beside the path', () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const i = f.state()?.isles.round?.isles[0] as number;
-    const p = f.players[2];
-    rideOut(f, p, i);
-    expect(f.objects(ISLE_OBJECTS.homePrefix)).toHaveLength(0);
-    f.dev('/dev heart breath killisle');
-    f.tick(2);
-    expect(f.objects(ISLE_OBJECTS.homePrefix)).toHaveLength(1);
-    const home = isleSpots()[i].home;
-    f.put(p, home.x, home.z);
-    f.tick(ticks(IT.rideSeconds + 0.6));
-    const at = f.local(p);
-    expect(inBreathArena(at.x, at.z)).toBe(true);
-    const back = isleSpots()[i].back;
-    expect(Math.hypot(at.x - back.x, at.z - back.z)).toBeLessThan(2);
-    // Normal and heroic: no Windworn.
-    expect(has(p, ISLE_AURAS.windworn)).toBe(false);
-    // Nobody left on the isle: its Homeward Gale goes.
-    f.tick(2);
-    expect(f.objects(ISLE_OBJECTS.homePrefix)).toHaveLength(0);
-  });
-
-  it('heroic: the same player rides again; mythic: Windworn keeps them home', () => {
-    for (const tier of ['heroic', 'mythic'] as const) {
+  it('the nova run out: normal leaves the raid at a tenth of its health; heroic kills', () => {
+    for (const tier of ['', 'heroic'] as const) {
       const f = pulled(4, tier);
-      crossMark(f, 0.8);
-      const p = f.players[2];
-      rideOut(f, p, 0);
-      // Clear isle 0 only, ride home.
-      for (const a of f.state()?.isles.adds ?? []) {
-        const e = f.sim.ctx.entities.get(a.id);
-        if (e && a.isle === 0)
-          f.sim.ctx.dealDamage(null, e, e.hp + 1, false, 'physical', null, 'hit', true);
-      }
-      f.tick(2);
-      const home = isleSpots()[0].home;
-      f.put(p, home.x, home.z);
-      f.tick(ticks(IT.rideSeconds + IT.rideGrace * 2 + 1));
-      expect(has(p, ISLE_AURAS.windworn)).toBe(tier === 'mythic');
-      // The other isle's path still stands: step in.
-      const path = isleSpots()[1].path;
-      f.put(p, path.x, path.z);
-      f.tick(3);
-      expect(p.carriedBy !== undefined).toBe(tier === 'heroic');
+      toIsles(f);
+      for (const p of f.players) p.hp = p.maxHp;
+      f.dev('/dev heart breath nova');
+      f.tick(1, false);
+      const share = ISLE_TIERS[tier || 'normal'].novaShare;
+      if (share >= 1) expect(f.players.every((p) => p.dead)).toBe(true);
+      else
+        for (const p of f.players) {
+          expect(p.dead).toBe(false);
+          expect(p.hp).toBeLessThanOrEqual(Math.ceil(p.maxHp * (1 - share)) + 1);
+        }
+      expect(f.state()?.isles.stage).toBe('home');
+      expect(f.state()?.isles.burst).toBe(true);
     }
   });
 
-  it('a reset brings every rider and every body on an isle back to the Cornice', () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const i = f.state()?.isles.round?.isles[0] as number;
-    const rider = f.players[2];
-    rideOut(f, rider, i);
-    const flying = f.players[3];
-    const path = isleSpots()[i].path;
-    f.put(flying, path.x, path.z);
-    f.tick(10);
-    expect(flying.carriedBy).toBeDefined();
+  it('a wipe mid-phase brings every body home and leaves nothing of the phase', () => {
+    const f = pulled(6);
+    toIsles(f);
+    const p = f.players[1];
+    ride(f, p, -1, 0);
+    expect(playersOnIsle({ ctx: f.sim.ctx, inst: f.inst } as never, 0)).toContain(p);
     f.dev('/dev heart breath reset');
     f.tick(2);
-    for (const p of [rider, flying]) {
-      const at = f.local(p);
-      expect(inBreathArena(at.x, at.z)).toBe(true);
-      expect(p.carriedBy).toBeUndefined();
-      expect(p.pos.y).toBeCloseTo(BREATH.cornice.h, 0);
-    }
-    expect(addsOf(f)).toHaveLength(0);
-    expect(f.objects(ISLE_OBJECTS.ridePrefix)).toHaveLength(0);
+    expect(isleAt(f.local(p).x, f.local(p).z)).toBe(-1);
+    expect(f.objects(ISLE_OBJECTS.padPrefix)).toHaveLength(0);
+    expect(f.objects(ISLE_OBJECTS.closingPrefix)).toHaveLength(0);
+    expect(f.boss().damageImmune ?? false).toBe(false);
+    expect(
+      f.inst.mobIds
+        .map((id) => f.sim.ctx.entities.get(id))
+        .filter((e) => e && Object.values(ISLE_MOBS).includes(e.templateId as never) && !e.dead),
+    ).toHaveLength(0);
   });
 
-  it('is deterministic: the same seed picks the same isle and raises the same adds', () => {
-    const trace = () => {
-      const f = pulled(4, '', 41);
-      crossMark(f, 0.7);
-      return JSON.stringify({
-        isles: f.state()?.isles.round?.isles,
-        adds: addsOf(f).map((e) => [
-          e.templateId,
-          f.local(e).x.toFixed(3),
-          f.local(e).z.toFixed(3),
-        ]),
-      });
+  it('is deterministic: the same seed raises the same adds at the same spots', () => {
+    const run = () => {
+      const f = pulled(6, '', 41);
+      toIsles(f);
+      ride(f, f.players[1], -1, 0);
+      f.tick(ticks(4));
+      return addsOn(f, 0).map((e) => [
+        e.templateId,
+        Math.round(e.pos.x * 10),
+        Math.round(e.pos.z * 10),
+        e.hp,
+      ]);
     };
-    expect(trace()).toBe(trace());
+    expect(run()).toEqual(run());
+  });
+
+  it('the storm break no longer fires on the mark itself', () => {
+    expect(T.stormAt).toBe(IT.at);
   });
 });
 
-describe("Thunder's Cradle, channeled", () => {
-  function storm(n: number, tier: '' | 'heroic' = ''): BreathFight {
-    const f = pulled(n, tier);
-    f.dev('/dev heart breath phase2');
-    f.tick(ticks(T.stormCast + T.barrageSeconds + 1));
-    const st = f.state();
-    if (st) {
-      st.forkTimer = 999;
-      st.drawnTimer = 999;
-      st.cradleTimer = 999;
-      st.gustTimer = 999;
-    }
-    return f;
-  }
-
-  it('the guardian channels it: planted, no other bar while the lifted hang', () => {
-    const f = storm(6);
-    const b = f.boss();
-    f.dev('/dev heart breath eye');
-    f.tick(ticks(T.cradleCast) + 1);
-    expect(b.castingAbility).toBe(BREATH_CASTS.cradleHold);
-    expect(b.channeling).toBe(true);
+describe('the sky strikes wait out the indrawn breath and the Roar', () => {
+  it('no volley lands on a raid pulled in or blasted; it falls once the wind is back', () => {
+    const f = pulled(6);
     const st = f.state();
     if (!st) throw new Error('no fight');
-    // Everything else comes due: none begins.
-    st.forkTimer = 0;
-    st.drawnTimer = 0;
-    const seen = new Set<string>();
-    for (let i = 0; i < ticks(T.cradleHold - 0.5); i++) {
-      f.tick();
-      if (b.castingAbility) seen.add(b.castingAbility);
-    }
-    expect([...seen]).toEqual([BREATH_CASTS.cradleHold]);
+    st.wind.phase = 'inhale';
+    st.wind.remaining = 9999;
+    st.skyTimer = 0;
     f.tick(ticks(1));
-    expect(st.cradles).toHaveLength(0);
-  });
-
-  it('normal lifts one; heroic three, each its own circle and its own split', () => {
-    for (const tier of ['', 'heroic'] as const) {
-      const f = storm(9, tier);
-      // Spread wide, so each lifted player's circle stands alone.
-      f.players.forEach((p, k) => {
-        f.put(p, -24 + (k % 3) * 18, 178 + Math.floor(k / 3) * 14);
-      });
-      f.dev('/dev heart breath eye');
-      f.tick(ticks(T.cradleCast) + 2);
-      const st = f.state();
-      if (!st) throw new Error('no fight');
-      const want = BREATH_DIFFICULTY[tier || 'normal'].cradleCount;
-      expect(st.cradles).toHaveLength(want);
-      expect(new Set(st.cradles.map((c) => c.playerId)).size).toBe(want);
-      for (const c of st.cradles) {
-        const p = f.sim.ctx.entities.get(c.playerId) as Entity;
-        expect(has(p, BREATH_AURAS.cradled)).toBe(true);
-        expect(p.carriedBy).toBeDefined();
-      }
-      if (tier === 'heroic') {
-        // Two under each circle (three with its lifted): every split even.
-        const free = f.players.filter((p) => !st.cradles.some((c) => c.playerId === p.id));
-        st.cradles.forEach((c, k) => {
-          for (const p of free.slice(k * 2, k * 2 + 2)) f.put(p, c.x + 0.5, c.z);
-        });
-        const scope = {
-          ctx: f.sim.ctx,
-          inst: f.inst,
-          st,
-          boss: f.boss(),
-          players: f.players.filter((p) => !p.dead),
-          rules: BREATH_DIFFICULTY.heroic,
-        };
-        const under = dischargeCradles(scope);
-        expect(under.map((u) => u.length)).toEqual([3, 3, 3]);
-      }
-    }
+    expect(f.objects(BREATH_OBJECTS.strikePrefix)).toHaveLength(0);
+    st.wind.phase = 'calm';
+    f.tick(ticks(1));
+    expect(f.objects(BREATH_OBJECTS.strikePrefix).length).toBeGreaterThan(0);
   });
 });
 
-describe('the Summit Roar', () => {
-  it('a raid drawn to a guardian tanked by the edge is thrown off the Cornice', () => {
-    const f = pulled(4);
-    const b = f.boss();
-    // The guardian at the east rim, the raid gathered at its mouth.
-    const edge = isleSpots()[0].path;
-    const isle = isleSpots()[0];
-    const ox = (isle.x - edge.x) / Math.hypot(isle.x - edge.x, isle.z - edge.z);
-    const oz = (isle.z - edge.z) / Math.hypot(isle.x - edge.x, isle.z - edge.z);
-    const bw = f.world(edge.x - ox * 3, edge.z - oz * 3);
-    b.pos.x = bw.x;
-    b.pos.z = bw.z;
-    b.pos.y = f.sim.ctx.groundPos(bw.x, bw.z).y;
-    f.sim.ctx.rebucket(b);
-    const victims = f.players.slice(1);
-    // On its outer side, between it and the rim.
-    victims.forEach((p, k) => {
-      f.put(p, edge.x + ox * 1.5 - oz * (k - 1) * 2, edge.z + oz * 1.5 + ox * (k - 1) * 2);
-    });
-    f.dev('/dev heart breath roar');
-    for (let i = 0; i < ticks(T.inhaleCast + T.gustCast + 6); i++) f.tick(1, false);
-    expect(victims.some((p) => p.dead)).toBe(true);
-  });
-
-  it('its wave races out of the maw: the near struck first, each body blasted, never a blink', () => {
-    const f = pulled(4);
-    const b = f.boss();
-    // The guardian in the Cornice's middle, one raider at its feet and one
-    // across the floor (both on the Cornice).
-    const C = BREATH.cornice;
-    const bw = f.world(C.x, C.z);
-    b.pos.x = bw.x;
-    b.pos.z = bw.z;
-    b.pos.y = f.sim.ctx.groundPos(bw.x, bw.z).y;
-    f.sim.ctx.rebucket(b);
-    const [, near, far] = f.players;
-    f.put(near, C.x + 4, C.z);
-    f.put(far, C.x - 27, C.z + 4);
-    expect(inBreathArena(C.x - 27, C.z + 4)).toBe(true);
-    f.dev('/dev heart breath roar');
-    // Through the indrawn breath and the Roar's bar, keeping them in place
-    // (the pull would drag them in).
-    let landed = -1;
-    let nearHit = -1;
-    let farHit = -1;
-    const nearStart = { x: 0, z: 0 };
-    const roarName = BREATH_NAMES.gust;
-    for (let i = 0; i < ticks(T.inhaleCast + T.gustCast + 4); i++) {
-      if (landed < 0) {
-        f.put(near, C.x + 4, C.z);
-        f.put(far, C.x - 27, C.z + 4);
-      }
-      const ev = f.tick(1, true);
-      if (landed < 0 && ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust))
-        landed = i;
-      if (nearHit < 0 && hitsOf(ev, roarName, near.id).length) {
-        nearHit = i;
-        Object.assign(nearStart, f.local(near));
-        // The blast has only begun: a tick or so of it, not the whole way.
-        expect(Math.hypot(nearStart.x - C.x - 4, nearStart.z - C.z)).toBeLessThan(
-          BREATH_DIFFICULTY.normal.blastSpeed * DT * 2 + 0.1,
-        );
-      }
-      if (farHit < 0 && hitsOf(ev, roarName, far.id).length) farHit = i;
-    }
-    expect(landed).toBeGreaterThanOrEqual(0);
-    expect(nearHit).toBeGreaterThanOrEqual(landed);
-    // The far raider is struck as the front reaches them (27 yd at its pace).
-    expect(farHit).toBeGreaterThan(nearHit);
-    expect((farHit - landed) * DT).toBeGreaterThan(27 / T.roarSpeed - 0.15);
-    expect((farHit - landed) * DT).toBeLessThan(27 / T.roarSpeed + 0.2);
-    // And the near one is carried out by its blast (or off the lip) by now.
-    const end = f.local(near);
-    expect(Math.hypot(end.x - nearStart.x, end.z - nearStart.z)).toBeGreaterThan(8);
-    expect(f.state()?.roar ?? null).toBeNull();
-  });
-
-  it('its wave starts at the maw, ends with the storm, and drops a body that leaves', () => {
-    const f = pulled(4);
-    f.dev('/dev heart breath roar');
-    let landedAt = -1;
-    for (let i = 0; i < ticks(T.inhaleCast + T.gustCast + 1) && landedAt < 0; i++) {
-      const ev = f.tick(1, true);
-      if (ev.some((e) => e.type === 'spellfx' && e.ability === BREATH_CUES.gust)) landedAt = i;
-    }
-    expect(landedAt).toBeGreaterThanOrEqual(0);
-    // One tick's travel on the landing tick (never two).
-    expect(f.state()?.roar?.r ?? 0).toBeLessThanOrEqual(T.roarSpeed * DT + 1e-6);
-    // The storm breaking takes the wave in flight with it.
-    f.dev('/dev heart breath phase2');
-    expect(f.state()?.roar ?? null).toBeNull();
-  });
-
-  it('is named Summit Roar everywhere the player reads it', () => {
-    expect(BREATH_NAMES.gust).toBe('Summit Roar');
-    expect(localizeSimAuraName('Summit Roar')).toBe('Summit Roar');
-    expect(t(`abilityUi.cast.${BREATH_CASTS.gust}` as never)).toBe('Summit Roar');
-  });
-});
-
-describe('the Islands of the Wind: what the raid reads', () => {
-  it('every new aura says its rule; every name and bar is localized', () => {
-    for (const id of [ISLE_AURAS.bulwark, ISLE_AURAS.riding, ISLE_AURAS.windworn]) {
-      const d = auraEffectDescriptor({ id, kind: 'absorb', value: 1234 });
-      const text = t(d?.key as never, d?.nums as never);
-      expect(text, id).not.toMatch(/\{\w+\}/);
-      if (id === ISLE_AURAS.bulwark) expect(text).toContain('1234');
-    }
-    for (const name of Object.values(ISLE_NAMES))
-      expect(localizeSimAuraName(name), name).toBe(name);
-    for (const id of Object.values(ISLE_CASTS))
-      expect(t(`abilityUi.cast.${id}` as never), id).not.toContain('abilityUi');
-    expect(t('abilityUi.cast.heart_breath_cradle_channel' as never)).toBe("Thunder's Cradle");
-  });
-
-  it('calls no raid warning banner through a whole round', () => {
-    const f = pulled(4);
-    const ev: SimEvent[] = [];
-    crossMark(f, 0.7);
-    ev.push(...rideOut(f, f.players[2], f.state()?.isles.round?.isles[0] as number));
-    f.dev('/dev heart breath killisle');
-    ev.push(...f.tick(ticks(3)));
-    expect(ev.some((e) => e.type === 'chat' && e.channel === 'raidWarning')).toBe(false);
-  });
-});
-
-describe('the Islands of the Wind: the review gaps', () => {
-  it('a stunned Mender stops channeling and restores nothing', () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const mender = addsOf(f).find((e) => e.templateId === ISLE_MOBS.mender) as Entity;
-    const sentinel = addsOf(f).find((e) => e.templateId === ISLE_MOBS.sentinel) as Entity;
-    f.sim.ctx.dealDamage(null, sentinel, sentinel.hp + 1, false, 'physical', null, 'hit', true);
-    for (
-      let i = 0;
-      i < ticks(IT.mendFirst + 1) && mender.castingAbility !== ISLE_CASTS.mending;
-      i++
-    )
-      f.tick();
-    expect(mender.castingAbility).toBe(ISLE_CASTS.mending);
-    const s = shield(f);
-    if (!s) throw new Error('no bulwark');
-    s.value = 10;
-    f.sim.ctx.applyAura(mender, {
-      id: 'test_stun',
-      name: 'Test Stun',
-      kind: 'stun',
-      remaining: IT.mendCast + 1,
-      duration: IT.mendCast + 1,
-      value: 0,
-      sourceId: f.players[1].id,
-      school: 'physical',
-    });
+describe("Sky's Reckoning spares the Stillstone's channeler", () => {
+  it('lays no strike under a player channeling Still the Gale, one under everyone else', () => {
+    const f = pulled(6);
+    toIsles(f);
+    const [, a, c] = f.players;
+    ride(f, a, -1, 0);
+    killIsle(f, 0);
+    ride(f, a, 0, 1);
+    killIsle(f, 1);
+    killIsle(f, 1);
+    ride(f, a, 1, 2);
+    killIsle(f, 2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const stone = f.sim.ctx.entities.get(st.isles.isles[2].stoneId ?? -1);
+    if (!stone) throw new Error('no stone');
+    const sp = isleSpots()[2].stone;
+    if (!sp) throw new Error('no stone spot');
+    f.put(a, sp.x + 1.5, sp.z);
+    f.put(c, isleSpots()[2].land.x, isleSpots()[2].land.z);
+    a.targetId = stone.id;
+    f.sim.interact(a.id);
+    expect(a.castingAbility).toBe(ISLE_CASTS.still);
+    st.isles.isles[2].closing = 0.05;
     f.tick(2);
-    expect(mender.castingAbility).not.toBe(ISLE_CASTS.mending);
-    f.tick(ticks(IT.mendCast));
-    expect(s.value).toBeLessThan(f.boss().maxHp * IT.bulwarkShare * IT.mendShare);
-  });
-
-  it("Thessaly's anchor never keeps a player off the ride (the ride is no wind push)", () => {
-    // Jose's playtest of 2026-11-04: anchored by Thessaly's calm, the Gale
-    // Path would not take him up to the isle. The anchor stops the wind, the
-    // pull, the blast and the throws; the ride is the encounter's scripted
-    // flight, so it carries an anchored player all the same, out and home.
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const i = f.state()?.isles.round?.isles[0] as number;
-    const p = f.players[2];
-    p.auras.push({
-      id: BREATH_AURAS.anchor,
-      name: 'Anchored in Calm',
-      kind: 'internal_cd',
-      remaining: 15,
-      duration: 15,
-      value: 0,
-      sourceId: f.boss().id,
-      school: 'holy',
-    });
-    const path = isleSpots()[i].path;
-    f.put(p, path.x, path.z);
-    f.tick(2);
-    expect(p.carriedBy).toBeDefined();
-    expect(has(p, ISLE_AURAS.riding)).toBe(true);
-    f.tick(ticks(IT.rideSeconds + 0.3));
-    const at = f.local(p);
-    expect(isleAt(at.x, at.z)).toBe(i);
-    expect(p.carriedBy).toBeUndefined();
-    expect(p.pos.y).toBeCloseTo(BREATH_ISLES[i].h, 0);
-  });
-
-  it("the Knotted Gale's carrier never rides", () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const i = f.state()?.isles.round?.isles[0] as number;
-    const p = f.players[2];
-    p.auras.push({
-      id: BREATH_AURAS.laden,
-      name: 'Gale-Laden',
-      kind: 'internal_cd',
-      remaining: 20,
-      duration: 20,
-      value: 0.2,
-      sourceId: f.boss().id,
-      school: 'nature',
-    });
-    const path = isleSpots()[i].path;
-    f.put(p, path.x, path.z);
-    f.tick(4);
-    expect(p.carriedBy).toBeUndefined();
-  });
-
-  it('a lone rider (a solo pull, the tank) rides the whole arc out and home: the fight holds', () => {
-    // Jose's online playtest: the guardian's tether dropped the rider off its
-    // table mid-air, the lone target gone read as a wipe, and the reset set
-    // them back on the Cornice halfway up the arc.
-    const f = pulled(1);
-    crossMark(f, 0.7);
-    const i = f.state()?.isles.round?.isles[0] as number;
-    const p = f.players[0];
-    const spots = isleSpots()[i];
-    /** Ride from where `p` stands, tick by tick: every step on the arc. */
-    const ride = (dir: 'out' | 'home') => {
-      const r0 = f.state()?.isles.rides.find((r) => r.playerId === p.id);
-      expect(r0?.dir).toBe(dir);
-      const ride = { ...(r0 as NonNullable<typeof r0>) };
-      let prev = { ...p.pos };
-      let k = 0;
-      while (p.carriedBy !== undefined && k++ < ticks(IT.rideSeconds + 1)) {
-        f.tick();
-        expect(f.state()).not.toBeNull();
-        expect(f.boss().smithHeartBreath).toBeDefined();
-        const step = Math.hypot(p.pos.x - prev.x, p.pos.y - prev.y, p.pos.z - prev.z);
-        expect(step).toBeLessThan(4);
-        if (p.carriedBy !== undefined) {
-          const at = rideArc(ride.from, ride.to, Math.min(1, (k * DT) / ride.total));
-          const l = f.local(p);
-          expect(Math.hypot(l.x - at.x, p.pos.y - at.y, l.z - at.z)).toBeLessThan(1e-6);
-        }
-        prev = { ...p.pos };
-      }
-      expect(k).toBe(ticks(IT.rideSeconds));
-    };
-    f.put(p, spots.path.x, spots.path.z);
-    f.tick();
-    ride('out');
-    const on = f.local(p);
-    expect(isleAt(on.x, on.z)).toBe(i);
-    expect(p.pos.y).toBeCloseTo(BREATH_ISLES[i].h, 0);
-    // Standing on the isle the fight still holds (no reset carries them off).
-    f.tick(ticks(2));
-    expect(f.state()?.isles.round).not.toBeNull();
-    expect(isleAt(f.local(p).x, f.local(p).z)).toBe(i);
-    f.dev('/dev heart breath killisle');
-    f.tick(ticks(IT.rideGrace + 0.2));
-    f.put(p, spots.home.x, spots.home.z);
-    f.tick();
-    ride('home');
-    const back = f.local(p);
-    expect(Math.hypot(back.x - spots.back.x, back.z - spots.back.z)).toBeLessThan(2);
-    expect(f.state()).not.toBeNull();
-  });
-
-  it('a rider who dies in the air is set down, and no warden turns on the corpse', () => {
-    const f = pulled(4);
-    crossMark(f, 0.7);
-    const i = f.state()?.isles.round?.isles[0] as number;
-    const p = f.players[2];
-    const path = isleSpots()[i].path;
-    f.put(p, path.x, path.z);
-    f.tick(10);
-    expect(p.carriedBy).toBeDefined();
-    f.sim.ctx.dealDamage(null, p, p.hp + 1, false, 'physical', null, 'hit', true);
-    f.tick(3, false);
-    expect(p.carriedBy).toBeUndefined();
-    expect(f.state()?.isles.rides).toHaveLength(0);
-    for (const e of addsOf(f)) expect(e.threat.has(p.id)).toBe(false);
+    expect(a.castingAbility).toBe(ISLE_CASTS.still);
+    const strikes = st.isles.strikes.filter((k) => k.isle === 2);
+    const near = (p: Entity) =>
+      strikes.some((k) => Math.hypot(k.x - f.local(p).x, k.z - f.local(p).z) < 0.5);
+    expect(near(a)).toBe(false);
+    expect(near(c)).toBe(true);
   });
 });

@@ -4782,9 +4782,9 @@ export const tr_TR: EnTranslations = {
         "spent": "Your anchor has run out: Captain Thessaly's circle of calm cannot anchor you again until this ends.",
         "drawn": "A lightning strike falls where you stand every {every} sec: after {warn} sec it deals {min} to {max} damage to everyone within {radius} yd and leaves charged ground that deals {cmin} to {cmax} every second for {charged} sec. Keep moving, and lead the strikes to the edge, away from the raid. Heroic and Mythic: {heroicMin} to {heroicMax} and {heroicCMin} to {heroicCMax} damage respectively.",
         "cradled": "Lifted into the storm and held for {hold} sec while the Guardian channels the cradle; it casts nothing else meanwhile. Then the discharge deals {total} damage, split between you and everyone within {radius} yd beneath you. With fewer than {soakers} sharing it, each takes {penalty}% more and everyone on the Cornice takes {bmin} to {bmax}. Heroic: {heroicCount} players are lifted at once, each discharge {heroicTotal} wanting {heroicSoakers}, so the raid splits between them. Heroic and Mythic: the backlash deals {heroicBMin} to {heroicBMax} damage.",
-        "bulwark": "A shield of wind absorbs {left} more damage. While any Gale Sentinel or Gale Mender on the floating isles lives, it regrows {regrow}% of its whole every second, and each Mending Gale restores {mend}%. Ride a Gale Path to the isles and cut them down. Held for {max} sec, it bursts over the Cornice for {bmin} to {bmax} damage. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
+        "cocoon": "The Guardian cannot be harmed while it channels Skyrend Nova. If the channel ends, the nova deals {share}% of maximum health to everyone (Heroic and Mythic: lethal). Ride Captain Thessaly's Updrafts out to the floating isles, east and west, and channel both Stillstones to cut it: {stilled} of 2 stilled. A Stillstone wakes once its isle's foes are down; everyone on its isle can channel it at once, and the more channel it, the faster it fills. A hit breaks your channel, never the stone's progress.",
         "riding": "The wind carries you over the void on a fixed path: you cannot act until it sets you down.",
-        "windworn": "Worn out by the wind: no Gale Path will carry you to the isles until this ends.",
+        "ward": "Turns aside {cut}% of the damage from attacks made within {arc} degrees of where it faces. Attack its back while its target turns it away. Heroic and Mythic: {heroicCut}%.",
         "thrown": "Thrown by the Summit Roar: you cannot move until the throw sets you down.",
         "blast": "The Summit Roar's blast drives you away from the Guardian, {speed} yd a second at its mouth, easing farther out, for {seconds} sec in all. Run straight back against it, or stand in Thessaly's anchor, or it carries you off the Cornice.",
         "tossed": "Tossed by a Loose Gale: you cannot move until the gust sets you down.",
@@ -4813,11 +4813,11 @@ export const tr_TR: EnTranslations = {
         "tempered": "Tempering Strike tempered you {stacks} times: your cold cannot fall below {floor}, and you take {pct}% more Frost damage. Each Tempering Strike on you adds a stack ({cold} cold and {per}% Frost damage each) and resets this to {seconds} sec. Swap tanks at {swap} stacks. On Heroic and Mythic, stack {heroicMax} fills your cold to {max} and you freeze solid; Normal stops at {normalMax} stacks ({normalFloor} cold)."
       },
       "heatGuardian": {
-        "statePhase1": "Half sunk in its wellspring: it never moves. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
-        "statePhase2": "Half sunk in its wellspring: it never moves. Basalt Fist goes on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.",
-        "statePhase3": "Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.",
+        "statePhase1": "Half sunk in its wellspring: it never moves. The Wheel of the Hearth cuts the shore into four slices: three glow red and erupt after {warn} sec ({heroicWarn} sec on Heroic), one stays dark and safe, and as one round erupts the next round shows its safe slice somewhere else. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
+        "statePhase2": "Half sunk in its wellspring: it never moves. The Wheel of the Hearth and Basalt Fist go on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.",
+        "statePhase3": "Half sunk in its wellspring: it never moves. The Wheel of the Hearth, Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.",
         "intro": "Cold in its wellspring: it cannot be attacked or harmed until the raid comes near and it wakes, burning.",
-        "stateUnder": "Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. It rises again when the overflow ends.",
+        "stateUnder": "Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. Rings of lava roll out of the wellspring one after another, each with two gaps where its flames part; the next ring's gaps glow on the floor before it comes. Stand in a gap as a ring passes, or take {min} to {max} Fire damage ({heroicMin} to {heroicMax} on Heroic). The second overflow's rings come quicker and their gaps are narrower. It rises again once the last ring has passed.",
         "scorched": "Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage. Every {every} sec, Hearth Flare strikes everyone farther than {reach} yd from the wellspring and renews this.",
         "grip": "Takes {total} Fire damage every second ({per} for each of your {stacks} stacks). Each of the guardian's landed swings adds a stack, up to {most}, and lasts {seconds} sec: swap tanks before it grows too heavy.",
         "kindling": "In {seconds} sec you trail fire for {trail} sec. Each patch burns allies for {min} to {max} Fire damage a second and heals a Wellspawn standing in it by {heal}% of its health a second: leave the group and the Wellspawn's path. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
@@ -4826,38 +4826,37 @@ export const tr_TR: EnTranslations = {
         "crust": "Cooled hard: strikes cannot knock it back until this ends."
       },
       "finalBoss": {
-        "stateHeat": "Drinking the Heat: Basalt Fist slams a player's spot and three Molten Swells roll out of it, and Fire Whirls cross the floor. On Heroic, Ember Marks drop fire at ranged players' feet; on Mythic, its frontal leaves Forge Fire.",
-        "stateQuench": "Drinking the Quench: anyone with fewer than {allies} other players within {reach} yd grows cold and freezes. On Heroic, the ice breaks under marked players; on Mythic, its frontal slows by {slow}%.",
-        "stateBreath": "Drinking the Breath: a gale pushes the raid toward the rim, and Leaping Bolt leaps between players within {jump} yd of each other. On Heroic, Drawn Lightning marks players; on Mythic, each Storm Orb must be taken by one player.",
-        "stateHammer": "Drinking the Hammer: Tremor Cracks erupt under players, and Weight of the Anvil splits its blow among everyone under its mark. On Heroic, Stone Shell absorbs healing and the Anvil's soakers are Crushed; on Mythic, the Anvil's mark turns round it.",
-        "stateRing": "In the central ring it drinks no quarter. Above {pct}% health it grows Heart Unbound there every second.",
+        "stateHeat": "Drinking the Heat: Basalt Fist slams a player's spot and three Molten Swells roll out of it. Its star, Fire Whirl, wakes for the rest of the fight: tall columns of fire run across the floor. On Heroic, Ember Marks drop fire at ranged players' feet; on Mythic, its frontal leaves Forge Fire.",
+        "stateQuench": "Drinking the Quench. Its star, Crossing Blade, wakes for the rest of the fight: a sword of ice sweeps a line through a marked player and shatters every pillar on it. On Heroic, the ice breaks under marked players; on Mythic, its frontal slows by {slow}%.",
+        "stateBreath": "Drinking the Breath: Leaping Bolt leaps between players within {jump} yd of each other. Its star, Sky Strike, wakes for the rest of the fight: lightning falls under players, and lightning that falls by a pillar arcs round it and charges it. On Heroic, Drawn Lightning marks players; on Mythic, each Storm Orb must be taken by one player.",
+        "stateHammer": "Drinking the Hammer: Tremor Cracks erupt under players. Its star, Wake the Stone, wakes for the rest of the fight: pillars burst out of the floor and stay until a Crossing Blade shatters them. On Heroic, Stone Shell absorbs healing.",
+        "stateRing": "In the central ring it drinks no quarter: every awake star runs at {pace}% pace. Above {pct}% health it grows Heart Unbound there every second.",
         "overloadHeat": "The Heat's Overload, {value}% full. It fills while the boss stands in the Heat quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
         "overloadQuench": "The Quench's Overload, {value}% full. It fills while the boss stands in the Quench quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
         "overloadBreath": "The Breath's Overload, {value}% full. It fills while the boss stands in the Breath quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
         "overloadHammer": "The Hammer's Overload, {value}% full. It fills while the boss stands in the Hammer quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
-        "root": "Rooted for {seconds} sec after entering a quarter: it cannot be dragged out until the root ends.",
         "unbound": "Deals {per} damage to the whole raid every second for each stack ({total} now) and gains a stack every second while it stands in the central ring. Drag it out of the ring to end it. Heroic: {heroicPer} per stack. Mythic: {mythicPer} per stack.",
         "shaken": "A quarter change hits you {mult} times as hard while this lasts ({min} to {max} damage instead of {baseMin} to {baseMax}). Each change renews it for {seconds} sec. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
-        "cold": "Cold {value} of 100. Rises {rise} a second while fewer than {allies} other players stand within {reach} yd of you, and falls when they do. At 100 you are Encased in Rime: stunned for {freeze} sec and dealt {min} to {max} Frost damage. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
-        "frozen": "Stunned. You froze standing alone: stay within {reach} yd of {allies} or more other players while it drinks the Quench.",
         "underIce": "Stunned: you fell through the breaking ice.",
         "numbing": "Movement speed reduced by {pct}% for {seconds} sec by its frontal.",
         "ember": "In {seconds} sec embers fall at your feet and smoulder for {life} sec in a {radius} yd pool that deals {min} to {max} Fire damage a second to anyone in it. Join the other marked players in one corner, then move out. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
-        "wind": "The gale carries you {speed} yd a second the way it blows; walk into it to hold your ground (it does not interrupt casts). Within {band} yd of the rim you take {min} to {max} Nature damage every second while it blows. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
         "drawn": "Every second for {seconds} sec it arcs from you to every other player within {reach} yd, dealing {min} to {max} Nature damage to each. Keep {reach} yd from everyone. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
         "shell": "Absorbs the next {value} healing you receive.",
+        "skyMark": "Lightning falls where you stand in {seconds} sec: {min} to {max} Nature damage to everyone within {radius} yd. Move out. Lightning that falls within {arcReach} yd of a pillar arcs round it and leaves it Storm-Charged. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
+        "bladeMark": "A Crossing Blade aims its line through you: it follows you, then locks {lock} sec before it flies. Lead the line through the pillars to shatter them, then step off it. Everyone on the line takes {min} to {max} Frost damage. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
         "crushed": "Standing under the next Weight of the Anvil within {seconds} sec, you take your share {mult} times over. Let the other group share it.",
+        "anvilMark": "Weight of the Anvil follows you: its {radius} yd circle moves with you and plants {lock} sec before it falls. Gather the raid inside it: {total} Physical damage is split between everyone in it, half as much again each with fewer than {fewer}. Heroic: {heroicTotal}. Mythic: {mythicTotal}.",
         "phaseCall": "Call of the Quarters: shielded in the centre for {seconds} sec while its Splinters live. Every Splinter deals {min} to {max} damage to the whole raid every {every} sec, {rise}% more with each pulse. Kill them all to break the shield early; any still alive when the call ends pours its element into it for the rest of the fight. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
         "phaseFight": "At {first}% and {second}% health it strides into the centre, shielded, and calls a Splinter out of each of its fullest quarters. At {final}% all four quarters wake for the end of the fight.",
-        "phaseFinal": "All four quarters are awake: it stays in the central ring and casts Fire Whirls, Groaning Ice, Leaping Bolt and Weight of the Anvil in turn, one every {every} sec. After {enrage} sec it loses all restraint (Masterless Fury).",
+        "phaseFinal": "All four quarters are awake: it stays in the central ring and all four stars run at once at {pace}% pace, pillars, lightning, blades and whirls together. After {enrage} sec it loses all restraint (Masterless Fury).",
         "phaseKneel": "It kneels. Nothing harms it.",
         "phaseRebirth": "The Heart beats. Nothing harms it until it rises at {percent}% health.",
         "unmade": "Every {every} sec a whole quarter of the Anvil falls, the one with the fullest Overload bar first, after {warn} sec of warning cracks. Anyone standing on it falls and dies. {ring} sec after the last quarter the central ring breaks and kills everyone.",
         "shield": "Gathered Strength: immune to all damage and cannot be targeted.",
-        "pouredHeat": "The Heat poured into it: it raises Fire Whirls every {every} sec wherever it stands, for the rest of the fight (poured {times} times).",
-        "pouredQuench": "The Quench poured into it: anyone with fewer than {allies} other players within {reach} yd grows cold everywhere, at {share}% of the Quench quarter's pace, for the rest of the fight (poured {times} times).",
-        "pouredBreath": "The Breath poured into it: it casts Leaping Bolt every {every} sec wherever it stands, leaping between players within {jump} yd of each other, for the rest of the fight (poured {times} times).",
-        "pouredHammer": "The Hammer poured into it: Tremor Cracks erupt under players every {every} sec wherever it stands, for the rest of the fight (poured {times} times).",
+        "pouredHeat": "The Heat poured into it: Fire Whirls rise every {every} sec wherever it stands, for the rest of the fight.",
+        "pouredQuench": "The Quench poured into it: Crossing Blades sweep the room every {every} sec wherever it stands, for the rest of the fight.",
+        "pouredBreath": "The Breath poured into it: Sky Strikes fall every {every} sec wherever it stands, for the rest of the fight.",
+        "pouredHammer": "The Hammer poured into it: pillars rise every {every} sec wherever it stands, for the rest of the fight.",
         "fury": "Masterless Fury: deals {min} to {max} damage to the whole raid every {every} sec, {rise}% more with each pulse. Kill it now. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
         "coal": "In {seconds} sec the coal bursts: {min} to {max} Fire damage to every other player within {reach} yd of you, and {selfMin} to {selfMax} to you. Leave the group now. Heroic: {heroicMin} to {heroicMax} and {heroicSelfMin} to {heroicSelfMax} damage respectively. Mythic: {mythicMin} to {mythicMax} and {mythicSelfMin} to {mythicSelfMax}.",
         "tether": "The Splinter of the Breath hunts you for {seconds} sec. Its Buffeting Gale deals {min} to {max} Nature damage every second to everyone else within {reach} yd of it: drag it away from the group. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.",
@@ -7348,14 +7347,6 @@ export const tr_TR: EnTranslations = {
         "singer_soul": "Listen. In the stone, my song never ends.",
         "singer_wipe": "Hush now. The seam is still.",
         "singer_defeat": "The last note... fades."
-      },
-      "alert": {
-        "wakeTitle": "Wake the Stone!",
-        "rockTitle": "Falling Rock!",
-        "resonanceTitle": "Resonance",
-        "rushTitle": "Mountain's Rush!",
-        "weightTitle": "Hammer's Weight",
-        "timeAria": "{seconds} seconds left"
       }
     },
     "knotAlert": {
@@ -7382,8 +7373,8 @@ export const tr_TR: EnTranslations = {
         "guardian_storm": "Enough breath. Now the storm!",
         "guardian_cradle": "Rise, little one. Let them catch you.",
         "guardian_drawn": "The sky has chosen you. Run, and it follows.",
-        "guardian_isles": "Winds, wall me in! The isles will keep my breath whole.",
-        "guardian_bulwark": "My shield... torn open. Then feel the gale again!",
+        "guardian_isles": "Wrap me in the gale! When I breathe out, the sky ends.",
+        "guardian_bulwark": "My cocoon... torn open. Then feel the storm!",
         "guardian_roar": "Hear the summit roar!",
         "guardian_knot": "Hold my storm, if your arms can bear it.",
         "guardian_slay_a": "Another one given to the wind.",
@@ -7392,7 +7383,9 @@ export const tr_TR: EnTranslations = {
         "guardian_wipe": "Blown away, like dust from the summit.",
         "guardian_death": "The Breath... goes back... to the mountain...",
         "thessaly_pull": "Highwatch stands with you! There is no wall up here: the wind will throw you off the edge!",
-        "thessaly_isles": "Its shield feeds on the isles! Ride the gale out there, cut the menders down and come back!",
+        "thessaly_isles": "It is gathering a nova! Two stones out on the isles can still it: split in two and ride my updrafts!",
+        "thessaly_updraft": "Isle clear! The next updraft is up, go!",
+        "thessaly_stone": "The stone is awake! Channel it, and let nothing strike you!",
         "thessaly_circle_a": "Into my calm, quickly! It holds three, no more!",
         "thessaly_circle_b": "Here! Stand with me and let the wind break on us!",
         "thessaly_circle_c": "Calm on the stone! Three of you, now!",
@@ -7498,8 +7491,6 @@ export const tr_TR: EnTranslations = {
       "quench": "Quench",
       "breath": "Breath",
       "hammer": "Hammer",
-      "rooted": "Rooted {seconds}",
-      "free": "Can be dragged",
       "shaken": "Shaken {seconds}",
       "unbound": "Unbound x{stacks}",
       "barAria": "{quarter} Overload {pct} percent",
@@ -7515,14 +7506,6 @@ export const tr_TR: EnTranslations = {
       "fury": "Masterless Fury x{stacks}",
       "poured": "Poured in: {elements}",
       "pouredTimes": "{quarter} x{times}"
-    },
-    "finalAlert": {
-      "emberTitle": "Ember Mark!",
-      "drawnTitle": "Drawn Lightning!",
-      "crushedTitle": "Crushed",
-      "coalTitle": "Bursting Coal!",
-      "tetherTitle": "Wind-Tethered!",
-      "weightTitle": "Mounting Weight x{stacks}"
     },
     "sanctumAlert": {
       "quenchTitle": "Soğutma suyundasın!",
@@ -16944,8 +16927,10 @@ export const tr_TR: EnTranslations = {
       "heart_breath_cradle_channel": "Thunder's Cradle",
       "heart_breath_bellows_blow": "Bellows Blow",
       "heart_breath_thunder_lash": "Thunder Lash",
-      "heart_breath_gale_bulwark": "Gale Bulwark",
+      "heart_breath_skyrend_nova": "Skyrend Nova",
       "heart_breath_mending_gale": "Mending Gale",
+      "heart_breath_shoving_gale": "Shoving Gale",
+      "kituse_heart_still_the_gale": "Still the Gale",
       "heart_quench_blades_wake": "The Blades Wake",
       "heart_quench_blades_hunt": "The Blades Hunt",
       "heart_heat_fist": "Basalt Fist",
@@ -26908,6 +26893,21 @@ export const tr_TR: EnTranslations = {
       },
       "heart_gale_mender": {
         "name": "Gale Mender"
+      },
+      "heart_gust_herald": {
+        "name": "Gust Herald"
+      },
+      "heart_riven_squall": {
+        "name": "Riven Squall"
+      },
+      "heart_squall_fragment": {
+        "name": "Squall Fragment"
+      },
+      "heart_squall_shieldbearer": {
+        "name": "Squall Shieldbearer"
+      },
+      "heart_breath_stillstone": {
+        "name": "Stillstone"
       },
       "heart_quench_warder": {
         "name": "Quench Vein Warder"

@@ -19,7 +19,6 @@ import {
   heatFightClaims,
   heatObjectKind,
   patchLook,
-  riverLook,
   SEED_CORE_R,
   seedLook,
   wellLook,
@@ -30,13 +29,14 @@ import { HEAT_METEOR } from '../src/render/smith_heart_fx/heat_meteor_core';
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
+  gapTemplate,
   HEAT_CUES,
   HEAT_DIFFICULTY,
   HEAT_GUARDIAN,
   HEAT_MOBS,
   HEAT_OBJECTS,
   heatTimed,
-  riverTemplate,
+  ringTemplate,
   swellLaneTemplate,
   HEAT_TUNING as T,
   wellTemplate,
@@ -53,7 +53,8 @@ describe('heat_fight_fx_core: the fight in the Hearth', () => {
     expect(heatObjectKind(heatTimed(HEAT_OBJECTS.fistPrefix, 3))).toBe('fist');
     expect(heatObjectKind(swellLaneTemplate('warn', 3.6))).toBe('lane');
     expect(heatObjectKind(HEAT_OBJECTS.wave)).toBe('wave');
-    expect(heatObjectKind(riverTemplate('flow', 3))).toBe('river');
+    expect(heatObjectKind(ringTemplate([0.5, 0.5 + Math.PI]))).toBe('ring');
+    expect(heatObjectKind(gapTemplate(3))).toBe('gap');
     expect(heatObjectKind(heatTimed(HEAT_OBJECTS.seedPrefix, T.seedLife))).toBe('seed');
     expect(heatObjectKind(zoneTemplate(1, 'warn', T.zoneWarn))).toBe('zone');
     expect(heatObjectKind(heatTimed(HEAT_OBJECTS.fallPrefix, 2))).toBe('fall');
@@ -85,16 +86,6 @@ describe('heat_fight_fx_core: the fight in the Hearth', () => {
       expect(over.surge).toBeLessThanOrEqual(1 + 1e-9);
       expect(over.heat).toBeGreaterThan(p3.heat);
     }
-  });
-
-  it("fills a river's lane, then runs its fire down it and lets it die", () => {
-    expect(riverLook('warn', 0, T.riverWarn)).toMatchObject({ fill: 0, lane: true, front: 0 });
-    expect(riverLook('warn', T.riverWarn / 2, T.riverWarn).fill).toBeCloseTo(0.5, 9);
-    expect(riverLook('flow', 0, T.riverFlow).front).toBe(0);
-    expect(riverLook('flow', 1, T.riverFlow).front).toBe(1);
-    expect(riverLook('flow', 1, T.riverFlow).lane).toBe(true);
-    expect(riverLook('flow', T.riverFlow, T.riverFlow).heat).toBe(0);
-    expect(riverLook('flow', T.riverFlow, T.riverFlow).lane).toBe(false);
   });
 
   it('throbs a seed faster to its burst, its fill on the sim clock', () => {
@@ -149,7 +140,9 @@ describe('heat_fight_fx_core: the fight in the Hearth', () => {
   });
 
   it('pools every footprint the sim can keep at once', () => {
-    expect(HEAT_FIGHT_POOLS.rivers).toBeGreaterThanOrEqual(T.riverCount);
+    expect(HEAT_FIGHT_POOLS.gaps).toBeGreaterThanOrEqual(
+      Math.max(...Object.values(HEAT_DIFFICULTY).flatMap((d) => d.waves.map((w) => w.gaps))),
+    );
     expect(HEAT_FIGHT_POOLS.seeds).toBeGreaterThanOrEqual(T.seedCap);
     expect(HEAT_FIGHT_POOLS.zones).toBeGreaterThanOrEqual(ZONE_BANDS.length);
     expect(HEAT_FIGHT_POOLS.falls).toBeGreaterThanOrEqual(T.cinderCap);
@@ -223,17 +216,48 @@ describe('HeatFightFx over a fake world', () => {
     const root = scene.getObjectByName('smith-heart-heat-fight-fx');
     expect(root).toBeDefined();
     expect(shown('smithHeartHeatWellPool')).toBe(1);
-    expect(shown('smithHeartHeatRiver')).toBe(0);
-    // The overflow: the pool heaves, a river's lane, then its fire.
+    // The overflow: the pool heaves.
     well.templateId = wellTemplate('over');
-    const river = add(
-      entity('object', riverTemplate('warn', T.riverWarn), HEARTH_WELL.x + 8, 0, T.riverHalf),
+    bump();
+    run(4);
+    // The lava waves: the next ring's corridors glow (two strips from the lip);
+    // a ring rolling out stands as a wall of fire on its molten foot, its
+    // corridors ahead of it and the next ring's behind it.
+    expect(shown('smithHeartHeatWallFire')).toBe(0);
+    const gapA = add(entity('object', gapTemplate(3.5), HEARTH_WELL.x, HEARTH_WELL.z, 4.5));
+    gapA.facing = 0.4;
+    const gapB = add(entity('object', gapTemplate(3.5), HEARTH_WELL.x, HEARTH_WELL.z, 4.5));
+    gapB.facing = 0.4 + Math.PI;
+    bump();
+    run(4);
+    expect(shown('smithHeartHeatWallCorridor')).toBe(2);
+    const ring = add(
+      entity(
+        'object',
+        ringTemplate([1.2, 1.2 + Math.PI]),
+        HEARTH_WELL.x + Math.sin(1.2) * 20,
+        HEARTH_WELL.z + Math.cos(1.2) * 20,
+        4.5,
+      ),
     );
     bump();
     run(4);
-    river.templateId = riverTemplate('flow', T.riverFlow);
-    run(6);
-    expect(shown('smithHeartHeatRiver')).toBe(1);
+    for (const name of [
+      'smithHeartHeatWallFire',
+      'smithHeartHeatWallTongues',
+      'smithHeartHeatWallEmbers',
+      'smithHeartHeatWallFoot',
+    ])
+      expect(shown(name), name).toBe(1);
+    expect(shown('smithHeartHeatWallCorridor')).toBe(4);
+    // The ring and the warning gone: nothing of the wall stays.
+    entities.delete(ring.id);
+    entities.delete(gapA.id);
+    entities.delete(gapB.id);
+    bump();
+    run(4);
+    expect(shown('smithHeartHeatWallFire')).toBe(0);
+    expect(shown('smithHeartHeatWallCorridor')).toBe(0);
     // The melee's shore terrace lies round the pool.
     expect(shown('smithHeartHeatWellShore')).toBe(1);
     // The guardian throws the seeds: a meteor per seed, in the air until the

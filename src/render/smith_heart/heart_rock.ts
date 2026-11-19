@@ -19,6 +19,7 @@ import {
   fitHammerEnvRock,
   hammerEnvOwnsRock,
 } from './hammer_env_plan_core';
+import { planHeartCrownSpires } from './heart_crown_ridge_core';
 import {
   ensureHeartKit,
   heartKitLoaded,
@@ -109,6 +110,8 @@ export function buildHeartRock(
         [
           ...rock.filter(breath).map(fitBreathEnvRock),
           ...needles.filter(breath).map(fitBreathEnvNeedle),
+          // The crown ridge behind the east isles, as the Breath's own crags.
+          ...planHeartCrownSpires(),
         ],
         lowGfx,
         'smithHeartBreathEnvRock',

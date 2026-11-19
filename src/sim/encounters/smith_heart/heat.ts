@@ -4,14 +4,19 @@
 // back of the Hearth, it never moves on any difficulty; the raid fights on
 // the shore in front of it.
 //
+//   Every phase        the Wheel of the Hearth (heat_wheel.ts): the shore cut
+//                      in four, three slices erupting and one safe, round
+//                      after round (the rework of 2026-11-18, every tier).
 //   Phase 1 (100-70)   Basalt Fist and its Molten Swells (heat_fist.ts),
 //                      Hearth Flare on everyone out of its reach
 //                      (heat_flare.ts), Cinder Grip on the tank (the
 //                      template's own stacking burn).
 //   The overflows      at 70 and at 40 percent it sinks into the wellspring
-//                      and the Hearth overflows: rivers of fire and Falling
-//                      Cinders (heat_overflow.ts); heroic's Wellspawn walk to
-//                      the wellspring, and at 40 its Wellkeepers mark players
+//                      and the Hearth overflows: rings of lava roll out of it,
+//                      each parting in two corridors the raid stands in as
+//                      it passes (heat_waves.ts), and Falling Cinders
+//                      (heat_overflow.ts); heroic's Wellspawn walk to the
+//                      wellspring, and at 40 its Wellkeepers mark players
 //                      who trail fire (heat_wellspawn.ts). Then it rises.
 //   Phase 2 (70-40)    Hearthseeds (heat_seeds.ts; heroic hatches
 //                      Seedflames), Wakefire (heat_zones.ts), the fist.
@@ -28,9 +33,10 @@
 //
 // Difficulty: the claim's, with a dev switch for a run while the raid has no
 // heroic tier of its own. Heroic and mythic end with phase 3 like normal;
-// their pressure is the overflows' adds, the Seedflames, faster cinders and
-// more damage (Normal's x1.15, Heroic's x1.4375 since 2026-11-16). Mythic is a prototype behind its own switch and, for
-// heroic whole plus the Wheel of the Hearth (heat_ids.ts HEAT_DIFFICULTY, heat_wheel.ts).
+// their pressure is the overflows' adds, the Seedflames, faster cinders, a
+// quicker Wheel and more damage (Normal's x1.15, Heroic's x1.4375 since
+// 2026-11-16). Mythic is a prototype behind its own switch: heroic whole with
+// a quicker, longer Wheel (heat_ids.ts HEAT_DIFFICULTY, heat_wheel.ts).
 //
 // Deterministic: every pick is hashed or ordered; the only rng draws are the
 // damage rolls, in claim-player order. Every visible state rides existing
@@ -44,6 +50,7 @@ import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
 import { settleSmithHeartFeat } from './feats';
+import { dropFightObject } from './fight_kit';
 import {
   callCinder,
   clearCinders,
@@ -52,7 +59,7 @@ import {
   stepCinders,
   syncHunted,
 } from './heat_cinders';
-import { clearFist, landFist, startFist, stepSwells, wakefireHoldsFist } from './heat_fist';
+import { clearFist, FIST_SPAN, floorHoldsFist, landFist, startFist, stepSwells } from './heat_fist';
 import { flare, stepFlare, stepWellFire } from './heat_flare';
 import {
   HEAT_AURAS,
@@ -80,7 +87,7 @@ import {
   spendHeatIntro,
   stepHeatIntro,
 } from './heat_intro';
-import { clearRivers, freshOverflow, stepFlood } from './heat_overflow';
+import { beginFlood, clearFlood, floodDone, freshOverflow, stepFlood } from './heat_overflow';
 import {
   auraOf,
   cueOnBoss,
@@ -100,7 +107,6 @@ import { heatSay, watchHeatSlain } from './heat_voice';
 import {
   clearOverflowAdds,
   endOverflowAdds,
-  overflowAddsGone,
   raiseKeepers,
   raiseWellspawn,
   stepKeepers,
@@ -178,7 +184,7 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     seedWaves: 0,
     seeds: [],
     zoneTimer: T.zoneFirst,
-    wheelTimer: T.wheelFirst,
+    wheelTimer: HEAT_DIFFICULTY[difficulty].wheel.first,
     wheelRuns: 0,
     wheelSafes: [],
     wheelNext: 0,
@@ -294,6 +300,10 @@ export function beginOverflow(s: HeatScope, n: 1 | 2): void {
   const st = s.st;
   clearFist(s);
   clearZones(s);
+  // Hearthseeds still throbbing go out as it sinks: a burst over the lava
+  // waves would hide the corridors (the bot pass of 2026-11-18).
+  for (const seed of st.seeds) dropFightObject(s.ctx, s.inst, seed.objectId);
+  st.seeds = [];
   st.bar = null;
   st.stage = 'sinking';
   st.stageLeft = T.sinkSeconds;
@@ -315,7 +325,7 @@ function enterPhase(s: HeatScope, phase: HeatPhase): void {
   st.fistTimer = Math.min(st.fistTimer, 6);
   st.seedTimer = T.seedFirst;
   st.zoneTimer = T.zoneFirst;
-  st.wheelTimer = T.wheelFirst;
+  st.wheelTimer = s.rules.wheel.first;
   st.cinderTimer = T.cinderFirst;
 }
 
@@ -329,6 +339,7 @@ function stepOverflow(s: HeatScope): void {
     if (st.stageLeft > 1e-9) return;
     st.stage = 'under';
     st.stageLeft = 0;
+    beginFlood(s, o);
     if (s.rules.overflowAdds) {
       raiseWellspawn(s);
       if (o.n === 2) raiseKeepers(s);
@@ -337,12 +348,11 @@ function stepOverflow(s: HeatScope): void {
   }
   if (st.stage === 'under') {
     stepFlood(s, o);
-    const done = s.rules.overflowAdds
-      ? (o.clock >= T.overflowMin - 1e-9 && overflowAddsGone(s)) || o.clock >= T.overflowMax - 1e-9
-      : o.clock >= T.overflowSeconds - 1e-9;
-    if (!done) return;
+    // As long as its lava waves (heat_waves.ts): the Wellspawn still walking
+    // then dive in and feed it.
+    if (!floodDone(o)) return;
     endOverflowAdds(s);
-    clearRivers(s, o);
+    clearFlood(s, o);
     st.stage = 'rising';
     st.stageLeft = T.riseSeconds;
     cueOnBoss(s, HEAT_CUES.rise);
@@ -395,7 +405,34 @@ function watchThresholds(s: HeatScope): void {
   else if (st.phase === 2) beginOverflow(s, 2);
 }
 
-/** The phase's mechanics, each on its clock. */
+/** Is a Wakefire run, or a Wheel of the Hearth, on the floor? */
+function zonesBusy(st: HeatFightState): boolean {
+  return st.zoneRun !== null || st.zones.length > 0;
+}
+function wheelBusy(st: HeatFightState): boolean {
+  return st.wheelRounds.length > 0;
+}
+
+/** A whole Wakefire run (its three bands laid, the last one burnt out). */
+const ZONE_RUN_SECONDS = 2 * T.zoneStep + T.zoneWarn + T.zoneBurn;
+
+/** As a Wakefire run or a Wheel begins, the other waits at least until it
+ *  is done and a Basalt Fist has had room to land and roll (FIST_SPAN and a
+ *  breath): the two alternate and the fist is never starved between them. */
+function spaceRuns(s: HeatScope, began: 'wheel' | 'zones'): void {
+  const st = s.st;
+  const w = s.rules.wheel;
+  const room = FIST_SPAN + 2;
+  if (began === 'wheel')
+    st.zoneTimer = Math.max(st.zoneTimer, w.rounds * w.warn + T.wheelBurn + room);
+  else st.wheelTimer = Math.max(st.wheelTimer, ZONE_RUN_SECONDS + room);
+}
+
+/** The phase's mechanics, each on its clock. Wakefire and the Wheel of the
+ *  Hearth never share the floor: a due one waits out the other (its clock
+ *  held at zero), each start spaces the other (spaceRuns), and the
+ *  Hearthseeds wait out both and both wait out the Hearthseeds (the raid
+ *  runs from them first; since 2026-11-18). */
 function startMechanics(s: HeatScope): void {
   const st = s.st;
   const kit = HEAT_PHASE_KIT[st.phase];
@@ -404,23 +441,30 @@ function startMechanics(s: HeatScope): void {
   if (!live) return;
   if (kit.seeds) {
     st.seedTimer -= DT;
-    if (st.seedTimer <= 1e-9) dropSeeds(s);
+    if (st.seedTimer <= 1e-9 && !zonesBusy(st) && !wheelBusy(st)) dropSeeds(s);
+  }
+  if (kit.wheel) {
+    st.wheelTimer = Math.max(0, st.wheelTimer - DT);
+    // The Wheel also waits out the Hearthseeds (the raid runs from them).
+    if (st.wheelTimer <= 1e-9 && !zonesBusy(st) && !wheelBusy(st) && st.seeds.length === 0) {
+      startWheel(s);
+      if (kit.zones) spaceRuns(s, 'wheel');
+    }
   }
   if (kit.zones) {
-    st.zoneTimer -= DT;
-    if (st.zoneTimer <= 1e-9) startZones(s);
-    if (s.rules.wheel) {
-      st.wheelTimer -= DT;
-      if (st.wheelTimer <= 1e-9) startWheel(s);
+    st.zoneTimer = Math.max(0, st.zoneTimer - DT);
+    if (st.zoneTimer <= 1e-9 && !zonesBusy(st) && !wheelBusy(st) && st.seeds.length === 0) {
+      startZones(s);
+      if (kit.wheel) spaceRuns(s, 'zones');
     }
   }
   if (kit.cinders) stepCinderClock(s);
   if (kit.fist) {
     st.fistTimer -= DT;
-    // Due, it waits out Wakefire (heat_fist.ts wakefireHoldsFist), and
-    // the wait comes off the next one's.
+    // Due, it waits out Wakefire and the Wheel (heat_fist.ts floorHoldsFist),
+    // and the wait comes off the next one's.
     if (st.fistTimer <= 1e-9 && guardianFree(s)) {
-      if (wakefireHoldsFist(st, kit.zones)) st.fistHeld += DT;
+      if (floorHoldsFist(st, kit)) st.fistHeld += DT;
       else startFist(s);
     }
   }
@@ -452,7 +496,7 @@ function clearFight(
     clearSeeds(s);
     clearCinders(s);
     clearOverflowAdds(s);
-    clearRivers(s, st.overflow);
+    clearFlood(s, st.overflow);
   }
   // Every add the fight raised, dead or alive.
   for (const id of [...boss.summonedIds]) {
@@ -570,7 +614,7 @@ function jumpToPhase(s: HeatScope, phase: number): string | null {
   const b = s.boss;
   clearFist(s);
   clearZones(s);
-  clearRivers(s, s.st.overflow);
+  clearFlood(s, s.st.overflow);
   if (s.st.overflow) endOverflowAdds(s);
   s.st.bar = null;
   const top = {

@@ -35,7 +35,6 @@ const sec = (s: number) => Math.round(s * 20);
 
 const RULE_AURAS = [
   FINAL_AURAS.state,
-  FINAL_AURAS.root,
   FINAL_AURAS.unbound,
   ...HEART_QUARTER_ORDER.map(overloadAuraId),
 ];
@@ -96,9 +95,7 @@ describe('the Masterless Strength goes home (offline)', () => {
     f.pullIn('breath');
     f.dev('/dev heart final quarter hammer');
     f.dev('/dev heart final fill all 70');
-    f.dev('/dev heart final root');
     f.tick(sec(2));
-    expect(f.state()?.rootLeft).toBeGreaterThan(0);
     f.dev('/dev heart final reset');
     f.tick(2);
     expectHome(f.boss(), f.local(f.boss()), h);

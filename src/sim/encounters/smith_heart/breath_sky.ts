@@ -45,8 +45,15 @@ export function startSkyVolley(s: BreathScope): number {
 /** One tick of the sky's clock: a volley when it runs out, in either half. */
 export function stepSky(s: BreathScope): void {
   const st = s.st;
-  if (st.half === 'break' || st.barrage) return;
+  if (st.half === 'isles' || st.half === 'break' || st.barrage) return;
   st.skyTimer -= DT;
   if (st.skyTimer > 1e-9) return;
+  // Never into the indrawn breath or the Summit Roar's wave (the bot passes
+  // of 2026-11-18: a volley landing on a raid pulled in, then blasted and
+  // unable to step aside, killed two or three a pull): it waits them out.
+  if (st.wind.phase === 'inhale' || st.wind.phase === 'exhale' || st.roar) {
+    st.skyTimer = 0.5;
+    return;
+  }
   startSkyVolley(s);
 }

@@ -14,6 +14,7 @@ import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import {
   beyondFlare,
   FIST_SPAN,
+  floorHoldsFist,
   HEAT_AURAS,
   HEAT_CASTS,
   HEAT_CUES,
@@ -40,7 +41,7 @@ import {
   swellLaneTemplate,
   HEAT_TUNING as T,
   WELLSPAWN_SPOTS,
-  wakefireHoldsFist,
+  wavesSeconds,
   wellDistance,
   wellOf,
   wellTemplate,
@@ -64,6 +65,7 @@ function hold(f: HeatFight): void {
   st.flareTimer = 999;
   st.seedTimer = 999;
   st.zoneTimer = 999;
+  st.wheelTimer = 999;
   st.cinderTimer = 999;
 }
 
@@ -368,7 +370,7 @@ describe('Guardian of the Heat: phase 1', () => {
 });
 
 describe('Guardian of the Heat: the overflows', () => {
-  it('normal: holds at 70 percent, sinks out of reach, overflows 20 s with no adds, rises into phase 2', () => {
+  it('normal: holds at 70 percent, sinks out of reach, overflows as long as its lava waves with no adds, rises into phase 2', () => {
     const f = pulled(4);
     const b = f.boss();
     // A burst cannot skip the threshold.
@@ -386,37 +388,50 @@ describe('Guardian of the Heat: the overflows', () => {
     ev = f.tick(ticks(10));
     expect(st.stage).toBe('under');
     expect(adds(f, HEAT_MOBS.spawn)).toEqual([]);
-    expect(cues(ev, HEAT_CUES.river).length).toBeGreaterThan(0);
+    expect(cues(ev, HEAT_CUES.ring).length).toBeGreaterThan(0);
     expect(cues(ev, HEAT_CUES.bolt).length).toBeGreaterThanOrEqual(HEAT_DIFFICULTY.normal.bolts);
     // The guardian itself takes nothing while under.
     const hp = b.hp;
     f.sim.ctx.dealDamage(f.players[0], b, 500, false, 'physical', 'test', 'hit');
     expect(b.hp).toBe(hp);
-    until(f, () => st.phase === 2, 20);
+    // Kept whole: the rings strike whoever stands in their walls.
+    for (let i = 0; i < ticks(30) && st.phase !== 2; i++) {
+      f.tick(1);
+      for (const p of f.players) p.hp = p.maxHp;
+    }
     expect(st.phase).toBe(2);
     expect(st.stage).toBe('fight');
     expect(st.overflow).toBeNull();
     expect(b.hostile).toBe(true);
     expect(b.damageImmune).toBe(false);
-    expect(st.clock).toBeGreaterThan(T.sinkSeconds + T.overflowSeconds + T.riseSeconds);
-    expect(f.objects(HEAT_OBJECTS.riverPrefix)).toEqual([]);
+    expect(st.clock).toBeGreaterThan(
+      T.sinkSeconds + wavesSeconds(HEAT_DIFFICULTY.normal.waves[0]) + T.riseSeconds,
+    );
+    expect(f.objects(HEAT_OBJECTS.ringPrefix)).toEqual([]);
+    expect(f.objects(HEAT_OBJECTS.gapPrefix)).toEqual([]);
+    // The rivers are gone (the rework of 2026-11-18).
+    expect(f.objects('sh_heat_river_')).toEqual([]);
     expect(b.damageFloorHp).toBe(Math.ceil(b.maxHp * T.overflowTwoAt));
   });
 
-  it('a river strikes those on its lane while it flows', () => {
-    const f = pulled(2);
+  it('a ring of lava strikes those in its wall once, never those in its corridors', () => {
+    const f = pulled(3);
     setHp(f, 0.69);
     f.tick(ticks(T.sinkSeconds + 0.1));
     const st = f.state();
-    if (!st?.overflow) throw new Error('no overflow');
-    // The next surge, and a player stood down its first river.
-    st.overflow.riverIn = 0.05;
-    f.tick(2);
-    const r = st.overflow.rivers[0];
-    const p = f.players[1];
-    f.put(p, HEARTH_WELL.x + Math.sin(r.facing) * 14, HEARTH_WELL.z + Math.cos(r.facing) * 14);
-    const ev = f.tick(ticks(T.riverWarn + 1));
-    expect(hitsOf(ev, HEAT_NAMES.river, p.id).length).toBeGreaterThanOrEqual(1);
+    if (!st?.overflow?.next) throw new Error('no overflow');
+    const gaps = st.overflow.next.gaps;
+    const [, inGap, inWall] = f.players;
+    const off = gaps[0] + Math.PI / 4;
+    f.put(inGap, HEARTH_WELL.x + Math.sin(gaps[0]) * 16, HEARTH_WELL.z + Math.cos(gaps[0]) * 16);
+    f.put(inWall, HEARTH_WELL.x + Math.sin(off) * 16, HEARTH_WELL.z + Math.cos(off) * 16);
+    const rule = HEAT_DIFFICULTY.normal.waves[0];
+    // Through the first ring's launch and its roll past them.
+    const ev = f.tick(ticks(rule.lead + (16 - T.ringStart) / rule.speed + 0.5));
+    expect(hitsOf(ev, HEAT_NAMES.overflow, inGap.id)).toEqual([]);
+    const hits = hitsOf(ev, HEAT_NAMES.overflow, inWall.id);
+    expect(hits.length).toBe(1);
+    expect(hits[0]).toBeGreaterThanOrEqual(T.ringMin);
   });
 
   it('heroic: the Wellspawn walk to the wellspring, slowing as they lose health', () => {
@@ -474,42 +489,39 @@ describe('Guardian of the Heat: the overflows', () => {
     expect(f.sim.ctx.entities.has(kid.id)).toBe(false);
   });
 
-  it('heroic: the overflow ends once the adds are dead (never before 8 s), or at 45 s', () => {
-    const f = pulled(3, 31, true);
-    setHp(f, 0.69);
-    f.tick(ticks(T.sinkSeconds + 0.2));
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    for (const k of adds(f, HEAT_MOBS.spawn)) f.sim.ctx.handleDeath(k, f.players[0]);
-    f.tick(ticks(2));
-    expect(st.stage).toBe('under');
-    until(f, () => st.stage !== 'under', 10);
-    expect(st.stage).toBe('rising');
-    expect(st.overflow?.clock ?? 0).toBeGreaterThanOrEqual(T.overflowMin - 0.05);
-    expect(st.overflow?.clock ?? 99).toBeLessThan(T.overflowMin + 0.5);
-
-    // Left alone, the survivors dive in at the cap.
-    const g = pulled(3, 31, true);
-    setHp(g, 0.69);
-    g.tick(ticks(T.sinkSeconds + 0.2));
-    const kids = adds(g, HEAT_MOBS.spawn);
-    for (const k of kids) {
-      k.auras.push({
-        id: 'test_stun',
-        name: 'Stun',
-        kind: 'stun',
-        remaining: 999,
-        duration: 999,
-        value: 0,
-        sourceId: g.players[0].id,
-        school: 'physical',
-      });
+  it('heroic: the overflow lasts as long as its waves, dead adds or not, and the survivors dive in', () => {
+    const rule = HEAT_DIFFICULTY.heroic.waves[0];
+    for (const kill of [true, false]) {
+      const f = pulled(3, 31, true);
+      setHp(f, 0.69);
+      f.tick(ticks(T.sinkSeconds + 0.2));
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      const kids = adds(f, HEAT_MOBS.spawn);
+      expect(kids.length).toBe(4);
+      for (const k of kids) {
+        if (kill) f.sim.ctx.handleDeath(k, f.players[0]);
+        else
+          k.auras.push({
+            id: 'test_stun',
+            name: 'Stun',
+            kind: 'stun',
+            remaining: 999,
+            duration: 999,
+            value: 0,
+            sourceId: f.players[0].id,
+            school: 'physical',
+          });
+      }
+      for (let i = 0; i < ticks(40) && st.stage === 'under'; i++) {
+        f.tick(1);
+        for (const p of f.players) p.hp = p.maxHp;
+      }
+      expect(st.stage).toBe('rising');
+      expect(st.overflow?.clock ?? 0).toBeGreaterThanOrEqual(wavesSeconds(rule) - 0.1);
+      expect(st.overflow?.clock ?? 99).toBeLessThan(wavesSeconds(rule) + 0.2);
+      expect(st.feeds).toBe(kill ? 0 : kids.length);
     }
-    const gst = g.state();
-    if (!gst) throw new Error('no fight');
-    until(g, () => gst.stage !== 'under', T.overflowMax + 2);
-    expect(gst.overflow?.clock ?? 0).toBeGreaterThanOrEqual(T.overflowMax - 0.05);
-    expect(gst.feeds).toBe(kids.length);
   });
 
   it("heroic's second overflow: two Wellkeepers mark a player whose trail heals the Wellspawn", () => {
@@ -556,20 +568,26 @@ describe('Guardian of the Heat: the overflows', () => {
   });
 });
 
-describe('Guardian of the Heat: Basalt Fist waits out Wakefire', () => {
-  it('holds a due fist while a run lays bands, a band warns or burns, or a run is near', () => {
-    const quiet = { zoneRun: null, zones: [], zoneTimer: 30 };
-    expect(wakefireHoldsFist(quiet, true)).toBe(false);
+describe('Guardian of the Heat: Basalt Fist waits out Wakefire and the Wheel', () => {
+  it('holds a due fist while a run lays bands, a band warns or burns, a Wheel turns, or either is near', () => {
+    const quiet = { zoneRun: null, zones: [], zoneTimer: 30, wheelRounds: [], wheelTimer: 30 };
+    const both = { zones: true, wheel: true };
+    expect(floorHoldsFist(quiet, both)).toBe(false);
     expect(
-      wakefireHoldsFist({ ...quiet, zoneRun: { order: [0, 1, 2], next: 1, stepIn: 1 } }, true),
+      floorHoldsFist({ ...quiet, zoneRun: { order: [0, 1, 2], next: 1, stepIn: 1 } }, both),
     ).toBe(true);
     const band = { objectId: 1, band: 0, state: 'burn' as const, remaining: 1, tick: 0 };
-    expect(wakefireHoldsFist({ ...quiet, zones: [band] }, true)).toBe(true);
-    // The next run starting before its swells are done holds it too...
-    expect(wakefireHoldsFist({ ...quiet, zoneTimer: FIST_SPAN - 0.1 }, true)).toBe(true);
-    expect(wakefireHoldsFist({ ...quiet, zoneTimer: FIST_SPAN + 0.1 }, true)).toBe(false);
-    // ...but not in a phase without Wakefire (its timer never runs there).
-    expect(wakefireHoldsFist({ ...quiet, zoneTimer: 0 }, false)).toBe(false);
+    expect(floorHoldsFist({ ...quiet, zones: [band] }, both)).toBe(true);
+    const round = { safe: 1, state: 'warn' as const, remaining: 2, tick: 0, reds: [], safeId: 0 };
+    expect(floorHoldsFist({ ...quiet, wheelRounds: [round] }, both)).toBe(true);
+    // The next run or Wheel starting before its swells are done holds it too...
+    expect(floorHoldsFist({ ...quiet, zoneTimer: FIST_SPAN - 0.1 }, both)).toBe(true);
+    expect(floorHoldsFist({ ...quiet, zoneTimer: FIST_SPAN + 0.1 }, both)).toBe(false);
+    expect(floorHoldsFist({ ...quiet, wheelTimer: FIST_SPAN - 0.1 }, both)).toBe(true);
+    expect(floorHoldsFist({ ...quiet, wheelTimer: FIST_SPAN + 0.1 }, both)).toBe(false);
+    // ...but not in a phase without it (its timer never runs there).
+    expect(floorHoldsFist({ ...quiet, zoneTimer: 0 }, { zones: false, wheel: true })).toBe(false);
+    expect(floorHoldsFist({ ...quiet, wheelTimer: 0 }, { zones: true, wheel: false })).toBe(false);
     // The swells' whole run: the bar, the delay, the lane and the wall.
     expect(FIST_SPAN).toBeCloseTo(
       T.fistCast + T.waveDelay + (T.laneLength + T.waveDepth) / T.waveSpeed,
@@ -584,6 +602,7 @@ describe('Guardian of the Heat: Basalt Fist waits out Wakefire', () => {
     const st = f.state();
     if (!st) throw new Error('no fight');
     st.zoneTimer = 0.01;
+    st.wheelTimer = 999;
     st.fistTimer = 0.5;
     let begun = -1;
     for (let i = 0; i < ticks(20) && begun < 0; i++) {
@@ -602,13 +621,17 @@ describe('Guardian of the Heat: Basalt Fist waits out Wakefire', () => {
     expect(begun).toBeLessThan(run + 0.5);
   });
 
-  it('is never starved and keeps its 22 s rhythm round the runs (phases 2 and 3, Mythic too)', () => {
+  it('is never starved and keeps its 22 s rhythm round the runs and the Wheels (every phase, every tier)', () => {
     const run = 2 * T.zoneStep + T.zoneWarn + T.zoneBurn;
     for (const [phase, tier] of [
+      [1, ''],
       [2, ''],
       [3, ''],
-      [2, 'mythic'],
+      [2, 'heroic'],
+      [3, 'mythic'],
     ] as const) {
+      const w = HEAT_DIFFICULTY[tier || 'normal'].wheel;
+      const wheelRun = w.rounds * w.warn + T.wheelBurn;
       const f = pulled(3);
       if (tier) f.dev(`/dev heart heat ${tier}`);
       f.dev(`/dev heart heat phase ${phase}`);
@@ -618,7 +641,7 @@ describe('Guardian of the Heat: Basalt Fist waits out Wakefire', () => {
       let had = false;
       const seconds = 240;
       for (let i = 0; i < ticks(seconds); i++) {
-        // Only Wakefire (and Mythic's Wheel) and the fist run.
+        // Only Wakefire, the Wheel and the fist run.
         st.seedTimer = 999;
         st.flareTimer = 999;
         st.cinderTimer = 999;
@@ -631,17 +654,21 @@ describe('Guardian of the Heat: Basalt Fist waits out Wakefire', () => {
           expect(st.zones).toEqual([]);
           expect(st.zoneRun).toBeNull();
         }
-        // No swell rolls while a band is on the floor.
-        if (st.zones.length > 0) expect(st.swells).toEqual([]);
+        // No swell rolls while a band or a slice is on the floor, and a band
+        // and a slice never share it.
+        if (st.zones.length > 0 || st.wheelRounds.length > 0) expect(st.swells).toEqual([]);
+        expect(st.zones.length > 0 && st.wheelRounds.length > 0).toBe(false);
         had = has;
       }
-      // The rhythm: about one every 22 s over the whole stretch (a flat
-      // 34 s, one a run, would be 7).
-      expect(starts.length).toBeGreaterThanOrEqual(Math.floor(seconds / T.fistEvery) - 1);
+      // The rhythm: about one every 22 s over the whole stretch, or one a
+      // Wheel where the Wheel turns slower than that (Normal's phase 1).
+      const cycle = phase === 1 ? Math.max(T.fistEvery, w.every) : T.fistEvery;
+      expect(starts.length).toBeGreaterThanOrEqual(Math.floor(seconds / cycle) - 1);
       for (let k = 1; k < starts.length; k++) {
         const gap = starts[k] - starts[k - 1];
-        // Never starved: at most its cadence, a whole run and the lookahead.
-        expect(gap).toBeLessThanOrEqual(T.fistEvery + run + FIST_SPAN + DT);
+        // Never starved: at most its cadence, a Wheel and a run back to back,
+        // and the lookahead.
+        expect(gap).toBeLessThanOrEqual(T.fistEvery + wheelRun + run + FIST_SPAN + DT);
         // Never two on top of each other.
         expect(gap).toBeGreaterThanOrEqual(T.fistEvery / 2 - DT);
       }

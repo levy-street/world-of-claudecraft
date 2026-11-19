@@ -27,16 +27,25 @@ export type FinalElement = 'fire' | 'frost' | 'storm' | 'stone';
 /** Every floor warning the four quarter kits paint. */
 export type FinalTelegraphKind =
   | 'whirl'
+  // A Breath Dust Devil's moving reach (Jose's playtest of 2026-11-19).
+  | 'devil'
+  // A Storm-Charged pillar's electric ground (the same playtest): a hard
+  // edge and crackling cells, its curtain standing on the edge.
+  | 'chargedZone'
   | 'pool'
   | 'ember'
   | 'crack'
-  | 'cold'
   | 'drawn'
   | 'bolt'
   | 'orb'
   | 'tremor'
   | 'anvil'
   | 'crushed'
+  // The woken stars (the rework of 2026-11-18): a pillar's rise in granite,
+  // a Sky Strike's white storm spot, Arcing Stone's ring round its pillar.
+  | 'rise'
+  | 'strike'
+  | 'arcRing'
   // Part 2 (final_phase_fx.ts): each Splinter's Shearing Blow in its own
   // element, Bursting Coal's reach, Gale Pounce's landing, the hunt's
   // Buffeting Gale.
@@ -97,16 +106,21 @@ const look = (
  *  an ember, Crushed) go without a curtain. */
 export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTelegraphLook>> = {
   whirl: look('fire', 0.32, 0.5, 1.2, 0.85, { falloff: 0.5, curtain: false }),
+  devil: look('storm', 0.28, 0.6, 1.1, 0.8, { curtain: false }),
+  // Its rim only (fill 0): the lightning inside is final_stars_fx.ts's field.
+  chargedZone: look('storm', 0.18, 0.2, 0.9, 0.6, { rim: 1, curtain: false }),
   pool: look('fire', 0.45, 0.9, 0.5, 0.95),
   ember: look('fire', 0.55, 1, 0.9, 1, { curtain: false }),
   crack: look('frost', 0.62, 1, 0.75, 1, { inward: 1 }),
-  cold: look('frost', 0.22, 0.8, 0.45, 0.6, { inward: 1, rim: 0.75, curtain: false }),
   drawn: look('storm', 0.3, 0.9, 0.5, 0.85, { curtain: false }),
   bolt: look('storm', 0.4, 0.9, 0.6, 1, { curtain: false }),
   orb: look('storm', 0.36, 0.7, 0.9, 0.9),
   tremor: look('stone', 0.58, 0.8, 0.55, 1),
   anvil: look('stone', 0.6, 0.9, 0.32, 1),
   crushed: look('stone', 0.4, 0.6, 0.9, 0.8, { rim: 0.8, curtain: false }),
+  rise: look('stone', 0.55, 0.9, 0.7, 1),
+  strike: look('storm', 0.42, 1, 0.8, 1),
+  arcRing: look('storm', 0.3, 0.9, 0.35, 1, { rim: 1 }),
   shearFire: look('fire', 0.55, 1, 0.6, 1, { curtain: false }),
   shearFrost: look('frost', 0.6, 1, 0.6, 1, { curtain: false }),
   shearStorm: look('storm', 0.5, 0.9, 0.6, 1, { curtain: false }),
@@ -121,12 +135,15 @@ export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTel
 export const FINAL_TELEGRAPH_POOLS: Readonly<Record<FinalElement, number>> = {
   // Six whirls, ten pools, three ember marks.
   fire: 22,
-  // Two to four cracks and the local player's cold reach.
+  // Two to four cracks.
   frost: 8,
-  // Six orbs, two Drawn Lightning marks, the bolt's target.
-  storm: 10,
-  // Four tremors, the Anvil, the Crushed.
-  stone: 14,
+  // Six orbs, two Drawn Lightning marks, the bolt's target, a volley of Sky
+  // Strikes and their Arcing Stone rings (two volleys can overlap), and up to
+  // six Dust Devils (two volleys overlapping), and a charged pillar's ground
+  // under each of up to eight pillars.
+  storm: 38,
+  // Four tremors, the Anvil, the Crushed, a volley of rises.
+  stone: 18,
 };
 
 /** The element a kind paints in. */
@@ -145,9 +162,3 @@ export const FINAL_ELEMENT_TINTS: Readonly<
   storm: [0.62, 0.58, 0.74],
   stone: [0.5, 0.45, 0.4],
 };
-
-/** Cold's reach ring round the local player in the Quench quarter: its fill
- *  is the cold bar (0..100) as a share; shown while it is above zero. */
-export function coldReachFill(cold: number): number {
-  return Math.max(0, Math.min(1, cold / 100));
-}

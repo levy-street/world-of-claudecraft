@@ -223,8 +223,10 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_breath_drawn_lightning': true,
   // The Breath's rework (breath_cradle.ts, breath_isle_ids.ts ISLE_CASTS).
   'abilityUi.cast.heart_breath_cradle_channel': true,
-  'abilityUi.cast.heart_breath_gale_bulwark': true,
+  'abilityUi.cast.heart_breath_skyrend_nova': true,
   'abilityUi.cast.heart_breath_mending_gale': true,
+  'abilityUi.cast.heart_breath_shoving_gale': true,
+  'abilityUi.cast.kituse_heart_still_the_gale': true,
   'abilityUi.cast.heart_breath_bellows_blow': true,
   'abilityUi.cast.heart_breath_thunder_lash': true,
   'abilityUi.cast.heart_quench_blades_wake': true,

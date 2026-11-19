@@ -415,6 +415,11 @@ const MOB_IDS = [
   // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts).
   'heart_gale_sentinel',
   'heart_gale_mender',
+  'heart_gust_herald',
+  'heart_riven_squall',
+  'heart_squall_fragment',
+  'heart_squall_shieldbearer',
+  'heart_breath_stillstone',
   'heart_quench_warder',
   'heart_quench_caller',
   'heart_heat_warder',

@@ -842,9 +842,11 @@ const mergeStringsEn = {
       heart_breath_bellows_blow: 'Bellows Blow',
       heart_breath_thunder_lash: 'Thunder Lash',
       // The Islands of the Wind (breath_isle_ids.ts ISLE_CASTS): the guardian's
-      // Bulwark is never kicked; the Gale Mender's Mending Gale can be.
-      heart_breath_gale_bulwark: 'Gale Bulwark',
+      // nova is never kicked; the Gale Mender's Mending Gale can be.
+      heart_breath_skyrend_nova: 'Skyrend Nova',
       heart_breath_mending_gale: 'Mending Gale',
+      heart_breath_shoving_gale: 'Shoving Gale',
+      kituse_heart_still_the_gale: 'Still the Gale',
       // The Guardian of the Quench's awakening (encounters/smith_heart/quench_ids.ts).
       heart_quench_blades_wake: 'The Blades Wake',
       heart_quench_blades_hunt: 'The Blades Hunt',

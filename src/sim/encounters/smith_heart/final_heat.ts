@@ -1,15 +1,20 @@
 // The Masterless Strength's Heat quarter (design doc 7.5): dodge and place.
 // The Guardian of the Heat's fist, compressed.
 //
-//   Basalt Fist     every 16 s (first 5 s into the quarter) a 3 s bar,
+//   Basalt Fist     every 16 s (first 5 s into the quarter) a quick bar (the
+//                   tier's fistCast: 1.9 s Normal, 1.7 Heroic, 1.6 Mythic since
+//                   Jose's playtest of 2026-11-19; 3 s before it),
 //                   planted, its facing on the spot where a hashed player
 //                   (never the tank while anyone else stands) stood: the
 //                   spot's lethal blow, then three Molten Swells roll out
 //                   of it (away from the boss and to either side), the Heat
-//                   guardian's own objects, lanes and numbers.
-//   Fire Whirl      every 13 s (first 8 s in) three whirls of fire rise by
-//                   hashed players (1.5 s of warning), then run straight
-//                   across the floor for 9 s, turning back off the rim: each
+//                   guardian's own objects, lanes and numbers, all the way
+//                   to the Anvil's rim (heat_geometry.ts laneReach).
+//   Fire Whirl      the Heat's STAR since the rework of 2026-11-18 (woken
+//                   for the rest of the fight; final_stars.ts runs its
+//                   clock): the tier's count of tall columns of fire rise by
+//                   hashed players (2 s of warning), then run straight
+//                   across the floor for 10 s, turning back off the rim: each
 //                   strikes a player it touches at most once a second.
 //   Ember Mark      Heroic, every 22 s (first 10 s in): up to three ranged
 //                   players (12 yd or more from the boss) are marked; 6 s
@@ -25,6 +30,7 @@ import { HEART_ROOM } from '../../content/smith_heart_layout';
 import { DT, type Entity } from '../../types';
 import { clearCastIf } from '../sunken_bastion/claim';
 import {
+  devilTemplate,
   FINAL_AURAS,
   FINAL_CASTS,
   FINAL_CUES,
@@ -60,7 +66,7 @@ import {
   standingSpot,
 } from './final_scope';
 import type { FinalPool, FinalSwell } from './final_state';
-import { inWave, laneReach } from './heat_geometry';
+import { ANVIL_LANE_MAX, inWave, laneReach } from './heat_geometry';
 import {
   HEAT_TUNING as H,
   HEAT_CUES,
@@ -86,7 +92,7 @@ export function startFist(s: FinalScope, forced?: FPoint): boolean {
   const obj = spawnFightObject(
     s.ctx,
     s.inst,
-    heatTimed(HEAT_OBJECTS.fistPrefix, T.fistCast),
+    heatTimed(HEAT_OBJECTS.fistPrefix, s.rules.fistCast),
     FINAL_NAMES.fist,
     spot.x,
     spot.z,
@@ -101,7 +107,7 @@ export function startFist(s: FinalScope, forced?: FPoint): boolean {
     const lane = spawnFightObject(
       s.ctx,
       s.inst,
-      swellLaneTemplate('warn', T.fistCast + H.waveDelay),
+      swellLaneTemplate('warn', s.rules.fistCast + H.waveDelay),
       FINAL_NAMES.swell,
       spot.x,
       spot.z,
@@ -111,7 +117,7 @@ export function startFist(s: FinalScope, forced?: FPoint): boolean {
     lanes.push(lane.id);
   }
   st.fist = { objectId: obj.id, x: spot.x, z: spot.z, lanes, bearings };
-  beginBar(s, FINAL_CASTS.fist, T.fistCast, away);
+  beginBar(s, FINAL_CASTS.fist, s.rules.fistCast, away);
   return true;
 }
 
@@ -147,7 +153,8 @@ export function landFist(s: FinalScope): Entity[] {
 }
 
 function stepSwell(s: FinalScope, w: FinalSwell): boolean {
-  const length = laneReach(w.x, w.z, w.facing, H.laneLength);
+  // To the Anvil's rim (laneReach: the whole way since the playtest of 2026-11-19).
+  const length = laneReach(w.x, w.z, w.facing, ANVIL_LANE_MAX);
   if (w.waveId === null) {
     w.delay -= DT;
     if (w.delay > 1e-9) return true;
@@ -205,11 +212,10 @@ export function stepSwells(s: FinalScope): void {
 
 // ---- Fire Whirls ---------------------------------------------------------------------------
 
-/** Three Fire Whirls rise by hashed players. Returns how many. */
+/** The tier's Fire Whirls rise by hashed players. Returns how many. */
 export function raiseWhirls(s: FinalScope): number {
   const st = s.st;
-  st.kit.whirl = T.whirlEvery;
-  const victims = pickPlayers(s, T.whirlCount, st.casts + 401);
+  const victims = pickPlayers(s, s.rules.whirlCount, st.casts + 401);
   let n = 0;
   victims.forEach((v, i) => {
     const h = finalHash(s.boss.id, st.casts * 13 + i);
@@ -244,7 +250,7 @@ export function raiseWhirls(s: FinalScope): number {
   return n;
 }
 
-/** One tick of every Fire Whirl. */
+/** One tick of every Fire Whirl (and every Breath Dust Devil). */
 export function stepWhirls(s: FinalScope): void {
   const st = s.st;
   if (st.whirls.length === 0) return;
@@ -252,9 +258,14 @@ export function stepWhirls(s: FinalScope): void {
   for (const w of st.whirls) {
     const obj = s.ctx.entities.get(w.objectId);
     if (!obj) continue;
+    // A Breath Dust Devil (final_breath.ts) runs the same loop on its own
+    // numbers: it wanders, and it throws instead of burning.
+    const wind = w.wind === true;
+    const speed = wind ? T.devilSpeed : T.whirlSpeed;
+    const reach = wind ? T.devilR : T.whirlR;
     if (w.warn > 0) {
       w.warn -= DT;
-      if (w.warn <= 1e-9) obj.templateId = whirlTemplate('live');
+      if (w.warn <= 1e-9) obj.templateId = wind ? devilTemplate('live') : whirlTemplate('live');
       keep.push(w);
       continue;
     }
@@ -263,20 +274,39 @@ export function stepWhirls(s: FinalScope): void {
       dropFightObject(s.ctx, s.inst, w.objectId);
       continue;
     }
+    if (wind) {
+      // It wanders: a hashed turn of up to 60 degrees either way, every few seconds.
+      w.turn = (w.turn ?? T.devilTurnEvery) - DT;
+      if (w.turn <= 1e-9) {
+        w.turn = T.devilTurnEvery;
+        const h = finalHash(obj.id, Math.round(w.life * 10));
+        w.heading += (((h % 121) - 60) * Math.PI) / 180;
+        obj.facing = w.heading;
+      }
+    }
     const p = at(s, obj);
     let next = {
-      x: p.x + Math.sin(w.heading) * T.whirlSpeed * DT,
-      z: p.z + Math.cos(w.heading) * T.whirlSpeed * DT,
+      x: p.x + Math.sin(w.heading) * speed * DT,
+      z: p.z + Math.cos(w.heading) * speed * DT,
     };
-    if (fromCentre(next) > HEART_ROOM.r - T.whirlR) {
+    if (fromCentre(next) > HEART_ROOM.r - reach) {
       // Off the rim: turn back toward the centre.
       w.heading = facingTo(next, HEART_ROOM);
       obj.facing = w.heading;
-      next = onFloor(next, T.whirlR);
+      next = onFloor(next, reach);
     }
     // At a fallen quarter's edge: it turns for the centre, never out over it.
     if (overTheVoid(s, next)) {
       w.heading = facingTo(p, HEART_ROOM);
+      obj.facing = w.heading;
+      next = p;
+    }
+    // Through Weight of the Anvil's bar it veers off the mark (the Heroic bot
+    // raids of 2026-11-18: tornadoes rolling into the stacked soakers): the
+    // raid's one gather is never a tornado's.
+    const anvil = st.anvil;
+    if (anvil && Math.hypot(next.x - anvil.x, next.z - anvil.z) < T.anvilR + reach) {
+      w.heading = facingTo(anvil, p);
       obj.facing = w.heading;
       next = p;
     }
@@ -289,16 +319,23 @@ export function stepWhirls(s: FinalScope): void {
     for (const pl of livePlayers(s)) {
       if (w.cooldown[pl.id] !== undefined) continue;
       const here = at(s, pl);
-      if (Math.hypot(here.x - next.x, here.z - next.z) > T.whirlR) continue;
-      w.cooldown[pl.id] = T.whirlHitEvery;
-      hit(s, pl, roll(s, T.whirlMin, T.whirlMax), FINAL_NAMES.whirl, 'fire');
+      if (Math.hypot(here.x - next.x, here.z - next.z) > reach) continue;
+      if (wind) {
+        w.cooldown[pl.id] = T.devilHitEvery;
+        hit(s, pl, roll(s, T.devilMin, T.devilMax), FINAL_NAMES.devil, 'nature');
+        // Thrown out of it, away from its eye.
+        if (!pl.dead) s.ctx.applyKnockback(obj, pl, T.devilKnockback);
+      } else {
+        w.cooldown[pl.id] = T.whirlHitEvery;
+        hit(s, pl, roll(s, T.whirlMin, T.whirlMax), FINAL_NAMES.whirl, 'fire');
+      }
       s.ctx.emit({
         type: 'spellfx',
         sourceId: obj.id,
         targetId: pl.id,
-        school: 'fire',
+        school: wind ? 'nature' : 'fire',
         fx: 'nova',
-        ability: FINAL_CUES.whirl,
+        ability: wind ? FINAL_CUES.devil : FINAL_CUES.whirl,
       });
     }
     keep.push(w);

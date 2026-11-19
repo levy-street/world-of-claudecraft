@@ -273,3 +273,16 @@ export const ANVIL_SOUNDS: readonly AnvilSoundBeat[] = [
   { key: 'heart_heat_cinder_burst', gain: 0.7, rate: 0.8, after: 0.06 },
   { key: 'heart_heat_sink', gain: 0.45, rate: 0.9, after: 0.9 },
 ];
+
+/** Whether Weight of the Anvil is drawn at the LOCAL player's drawn pose:
+ *  they wear its mark (it follows them) and more than `lock` seconds of its
+ *  bar are left (it has not planted). The playtest of 2026-11-19: online the
+ *  server's circle trailed its player by a round trip. */
+export function anvilFollowsLocal(mine: boolean, left: number, lock: number): boolean {
+  return mine && left > lock + 0.05;
+}
+
+/** The share of the way an eased value closes in `dt` seconds at `rate`. */
+export function easeToward(dt: number, rate: number): number {
+  return 1 - Math.exp(-rate * Math.max(0, dt));
+}

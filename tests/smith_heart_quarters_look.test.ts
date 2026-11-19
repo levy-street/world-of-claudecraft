@@ -92,9 +92,23 @@ describe('the boss memory', () => {
   it('keeps what the effects saw, and forgets it when the heart sleeps', () => {
     expect(heartQuarterBoss('k')).toBeNull();
     noteHeartQuarterBoss('k', 1, 2, true, true, true);
-    expect(heartQuarterBoss('k')).toEqual({ x: 1, z: 2, engaged: true, final: true, mask: 0 });
+    expect(heartQuarterBoss('k')).toEqual({
+      x: 1,
+      z: 2,
+      engaged: true,
+      final: true,
+      mask: 0,
+      strain: 0,
+    });
     noteHeartQuarterBoss('k', 3, 4, false, true);
-    expect(heartQuarterBoss('k')).toEqual({ x: 3, z: 4, engaged: false, final: false, mask: 0 });
+    expect(heartQuarterBoss('k')).toEqual({
+      x: 3,
+      z: 4,
+      engaged: false,
+      final: false,
+      mask: 0,
+      strain: 0,
+    });
     expect(heartQuarterBoss('other')).toBeNull();
     noteHeartQuarterBoss('k', 3, 4, false, false);
     expect(heartQuarterBoss('k')).toBeNull();
@@ -312,12 +326,12 @@ describe('the painter', () => {
     expect(wash('breath')?.uAwake.value).toBe(1);
     expect(wash('breath')?.uFront.value).toBeGreaterThanOrEqual(HEART_QUARTERS.rimR);
     for (const v of ['hammer', 'quench', 'heat']) expect(wash(v)?.uAwake.value, v).toBe(0);
-    expect(mats.get('smithHeartQuarterDevils')?.uniforms.uLit.value).toBe(1);
+    expect(mats.get('smithHeartQuarterStreaks')?.uniforms.uLit.value).toBe(1);
     expect(mats.get('smithHeartQuarterEmbers')?.uniforms.uLit.value).toBe(0);
     // The heart gone dark: everything with it.
     frames(400, 1);
     expect(wash('breath')?.uAwake.value).toBe(0);
-    expect(mats.get('smithHeartQuarterDevils')?.uniforms.uLit.value).toBe(0);
+    expect(mats.get('smithHeartQuarterStreaks')?.uniforms.uLit.value).toBe(0);
   });
 
   it('draws the same lights on every tier, only fewer motes on the low one', () => {
@@ -402,9 +416,10 @@ describe('the quarters read apart (phase 2L)', () => {
   it('raises every element in layers, more of it than before, a share on the low tier', () => {
     const A = HEART_QUARTER_AIR;
     expect(A.hammer.grit + A.hammer.chips + A.hammer.dust + A.hammer.stones).toBeGreaterThan(300);
-    expect(
-      A.breath.devils * A.breath.perDevil + A.breath.streaks + A.breath.sheets,
-    ).toBeGreaterThan(500);
+    // The Breath's dressing is wind streaks and veils: its whirlwinds are the
+    // boss's Dust Devils since Jose's playtest of 2026-11-19 (never dressing).
+    expect(A.breath.streaks + A.breath.sheets).toBeGreaterThan(240);
+    expect('devils' in A.breath).toBe(false);
     expect(A.quench.mist + A.quench.frost + A.quench.crystals).toBeGreaterThan(350);
     expect(A.heat.embers + A.heat.haze + A.heat.flames).toBeGreaterThan(350);
     const hi = buildHeartQuarters(false, () => null).group;

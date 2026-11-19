@@ -17,8 +17,13 @@ import {
   heartQuarterSpot,
   heartRidgeBearingDeg,
 } from '../src/sim/content/smith_heart_quarters';
-import { FINAL_AURAS, FINAL_TUNING as T } from '../src/sim/encounters/smith_heart/final_ids';
-import type { Entity } from '../src/sim/types';
+import {
+  FINAL_AURAS,
+  FINAL_CUES,
+  FINAL_DIFFICULTY,
+  FINAL_TUNING as T,
+} from '../src/sim/encounters/smith_heart/final_ids';
+import type { Entity, SimEvent } from '../src/sim/types';
 import { type FinalFight, finalFight } from './helpers/final_fight';
 
 const sec = (s: number) => Math.round(s * 20);
@@ -51,10 +56,20 @@ function raidWalk(f: FinalFight, goal: { x: number; z: number }): boolean {
   return arrived;
 }
 
-/** Wait out the root (the raid standing). */
-function waitRoot(f: FinalFight): void {
-  for (let i = 0; i < sec(T.rootSeconds + 2) && (f.state()?.rootLeft ?? 0) > 0; i++) f.tick(1);
-  expect(f.state()?.rootLeft).toBe(0);
+/** One tick of the raid walking to `goal` (the tank in front), its events. */
+function raidWalkEvents(f: FinalFight, goal: { x: number; z: number }): SimEvent[] {
+  f.players.forEach((p, i) => {
+    const a = (i / f.players.length) * Math.PI * 2;
+    const meta = f.sim.ctx.players.get(p.id);
+    if (!meta) return;
+    const here = f.local(p);
+    const tx = i === 0 ? goal.x : goal.x + Math.sin(a) * 3;
+    const tz = i === 0 ? goal.z : goal.z + Math.cos(a) * 3;
+    const d = Math.hypot(tx - here.x, tz - here.z);
+    meta.moveInput.forward = d > 1;
+    if (d > 1) p.facing = Math.atan2(tx - here.x, tz - here.z);
+  });
+  return f.tick(1);
 }
 
 interface DragResult {
@@ -84,7 +99,7 @@ function drag(f: FinalFight, goal: { x: number; z: number }, to: SmithHeartVein,
     const dragged = heartQuarterAt(tank.x, tank.z) !== st.zone;
     if (dragged && !hadBar && st.bar !== null) r.barsWhileDragged++;
     const moved = Math.hypot(after.x - before.x, after.z - before.z) > 1e-3;
-    if (dragged && st.rootLeft <= 0 && st.bar === null && !moved) r.stuck += 1 / 20;
+    if (dragged && st.bar === null && !moved) r.stuck += 1 / 20;
   }
   return r;
 }
@@ -101,7 +116,6 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
       it(`follows its tank from the ${from} over ridge ${k} into the ${to} at ${r} yd`, () => {
         const f = finalFight(5, 41 + k);
         f.pullIn(from);
-        waitRoot(f);
         const goal = pastRidge(k, r, 6, cw);
         const start = f.local(f.boss());
         const path = Math.hypot(goal.x - start.x, goal.z - start.z);
@@ -109,18 +123,21 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
         // Promptly: about its walk over (it runs as fast as its tank), plus
         // the one bar it may already have had in flight, plus a breath.
         expect(res.seconds, 'never followed').toBeGreaterThanOrEqual(0);
-        expect(res.seconds).toBeLessThan(path / 7 + T.fistCast + 3);
+        // (Weight of the Anvil, its own all fight since 2026-11-18, is the
+        // longest bar that may be in flight: 6 s.)
+        expect(res.seconds).toBeLessThan(
+          path / 7 + Math.max(FINAL_DIFFICULTY.normal.fistCast, T.anvilCast) + 3,
+        );
         expect(res.stuck).toBeLessThan(0.5);
         expect(res.barsWhileDragged).toBe(0);
-        // And it took root in the new quarter.
-        expect(f.boss().auras.some((a) => a.id === FINAL_AURAS.root)).toBe(true);
+        // And it never took root there (2026-11-19).
+        expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
       });
     }
 
   it('a bar in flight plants it for that bar only, then it follows at once', () => {
     const f = finalFight(5, 43);
     f.pullIn('breath');
-    waitRoot(f);
     f.dev('/dev heart final bolt');
     f.tick(1);
     expect(f.state()?.bar).not.toBeNull();
@@ -131,17 +148,17 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
     expect(res.stuck).toBeLessThan(0.5);
   });
 
-  it('no planted bar begins while it is dragged, even one due as its root ends', () => {
+  it('no planted bar begins while it is dragged, even one due the moment the drag starts', () => {
     for (const vein of ['heat', 'breath', 'hammer'] as const) {
       const f = finalFight(5, 44);
       f.pullIn(vein);
-      // Every planted bar due the moment the root lets go.
-      for (let i = 0; i < sec(T.rootSeconds + 2) && (f.state()?.rootLeft ?? 0) > 0; i++) {
+      // Every planted bar due the moment the drag begins.
+      for (let i = 0; i < sec(1); i++) {
         const st = f.state();
         if (st) {
           st.kit.fist = 0.05;
           st.kit.bolt = 0.05;
-          st.kit.anvil = 0.05;
+          st.anvilClock = 0.05;
           st.bar = null;
           st.gap = 0;
           f.boss().castingAbility = null;
@@ -156,11 +173,15 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
     }
   });
 
-  it('a dip into the ring and back out into the same quarter never roots it again', () => {
+  it('a dip into the ring and back out into the same quarter is no new quarter', () => {
     const f = finalFight(5, 45);
     f.pullIn('heat');
-    waitRoot(f);
+    // Its own Weight of the Anvil (all fight since 2026-11-18) held off: this
+    // pins the quarter rule, not a bar planted in the ring.
+    const st0 = f.state();
+    if (st0) st0.anvilClock = 1e9;
     const clocks = { ...f.state()?.kit };
+    const firstFist = clocks.fist;
     // Into the ring...
     const centre = { x: HEART_ROOM.x - 4, z: HEART_ROOM.z };
     let inRing = false;
@@ -175,16 +196,14 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
     const st = f.state();
     expect(st?.zone).toBe('heat');
     expect(st?.switches).toBe(0);
-    expect(st?.rootLeft).toBe(0);
-    expect(f.boss().auras.some((a) => a.id === FINAL_AURAS.root)).toBe(false);
+    expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
     // Its kit kept counting (no fresh clocks for the same quarter).
-    expect(st?.kit.whirl).not.toBe(clocks.whirl === undefined ? -1 : T.whirlFirst);
+    expect(st?.kit.fist).not.toBe(firstFist === undefined ? -1 : T.fistFirst);
   });
 
   it('dragged from a quarter through the ring into the opposite one, it follows all the way', () => {
     const f = finalFight(5, 46);
     f.pullIn('heat');
-    waitRoot(f);
     const goal = heartQuarterSpot('quench');
     const res = drag(f, goal, 'quench', 30);
     expect(res.seconds).toBeGreaterThanOrEqual(0);
@@ -264,9 +283,8 @@ describe('dragging the Masterless Strength online (the server input path)', () =
       server.routeEvents(sim.tick());
       server.broadcastSnapshots();
     };
-    // The root runs out with the tank beside it.
-    for (let i = 0; i < sec(T.rootSeconds + 1); i++) step(null);
-    expect(boss.smithHeartFinal?.rootLeft).toBe(0);
+    // A breath with the tank beside it (no root to wait out since 2026-11-19).
+    for (let i = 0; i < sec(1); i++) step(null);
     expect(boss.smithHeartFinal?.zone).toBe('heat');
     // Heat to Breath over ridge 3 (Heat is the last of the bearing order).
     const k = HEART_QUARTER_ORDER.indexOf('heat');
@@ -281,5 +299,60 @@ describe('dragging the Masterless Strength online (the server input path)', () =
     }
     expect(seconds, 'never followed online').toBeGreaterThanOrEqual(0);
     expect(seconds).toBeLessThan(12);
+  });
+});
+
+describe('no Taking Root (Jose playtest of 2026-11-19: very annoying when you want to move it)', () => {
+  it('never roots: from the pull its tank drags it straight into the next quarter', () => {
+    const f = finalFight(5, 7);
+    f.pullIn('heat');
+    expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
+    const goal = heartQuarterSpot('quench');
+    const start = f.local(f.boss());
+    let stillFor = 0;
+    let moved = false;
+    for (let i = 0; i < 20 * 12 && !moved; i++) {
+      f.walkStep(f.players[0], goal.x, goal.z, 2);
+      const here = f.local(f.boss());
+      if (Math.hypot(here.x - start.x, here.z - start.z) > 0.5) moved = true;
+      else stillFor++;
+    }
+    expect(moved).toBe(true);
+    // Only its first planted bar (if one was in flight) may hold it, never a root.
+    expect(stillFor / 20).toBeLessThan(T.anvilCast + 0.5);
+  });
+
+  it('dragged fast across the quarters, each crossing counts once: no flicker, no opener spam', () => {
+    const f = finalFight(5, 9);
+    f.pullIn('breath');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    // Its bars held off: this pins the crossings, not a planted bar.
+    st.anvilClock = 1e9;
+    const shifts: string[] = [];
+    let entered = 0;
+    let last = st.zone;
+    const order = ['quench', 'hammer', 'heat', 'breath', 'quench'] as const;
+    for (const vein of order) {
+      const k = HEART_QUARTER_ORDER.indexOf(vein);
+      const goal = heartQuarterSpot(HEART_QUARTER_ORDER[k]);
+      for (let t = 0; t < sec(14) && st.zone !== vein; t++) {
+        st.kit.fist = 99;
+        st.kit.bolt = 99;
+        st.kit.ice = 99;
+        st.kit.tremor = 99;
+        st.kit.devil = 99;
+        for (const e of raidWalkEvents(f, goal))
+          if (e.type === 'spellfx' && (e as { ability: string }).ability === FINAL_CUES.shift)
+            shifts.push(st.zone);
+        if (st.zone !== last && st.zone !== 'ring') entered++;
+        if (st.zone !== 'ring') last = st.zone;
+      }
+      expect(st.zone, vein).toBe(vein);
+    }
+    // One opener (and one switch) per new quarter, never a flicker on a ridge.
+    expect(st.switches).toBe(order.length);
+    expect(shifts.length).toBe(order.length);
+    expect(entered).toBe(order.length);
   });
 });

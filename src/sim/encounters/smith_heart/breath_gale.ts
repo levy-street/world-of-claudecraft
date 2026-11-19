@@ -231,7 +231,7 @@ function syncWindAuras(s: BreathScope): void {
       keepWind(s, p, WIND_PULL_AURA, BREATH_NAMES.pull, {
         value: s.boss.pos.x,
         value2: s.boss.pos.z,
-        value3: T.pullSpeed,
+        value3: s.rules.pullSpeed,
       });
   }
 }

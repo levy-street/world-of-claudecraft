@@ -12,11 +12,13 @@
 //     a tank of Mounting Weight near the swap.
 
 import { describe, expect, it } from 'vitest';
+import { finalArrowMark } from '../src/render/smith_heart_fx/final_arrow_core';
 import {
   FINAL_AURAS,
   FINAL_BOSS,
   FINAL_ZONE_CODES,
   overloadAuraId,
+  FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS as A,
@@ -33,7 +35,6 @@ import {
 import type { Aura, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { castDisplayName } from '../src/ui/cast_display_name';
-import { buildFinalAlertView } from '../src/ui/hud/dungeon/final_alert_view';
 import {
   buildOverloadView,
   makeOverloadView,
@@ -121,7 +122,7 @@ describe('part 2: tooltips', () => {
     const nm = (v: number) => Math.round(v * 1.15);
     expect(call).toContain(`${nm(P.splinterMin)} to ${nm(P.splinterMax)}`);
     const fin = say({ id: A.phase, kind: 'internal_cd', value: FINAL_STAGE_CODES.final });
-    expect(fin).toContain(`one every ${P.mixEvery} sec`);
+    expect(fin).toContain(`all four stars run at once at ${Math.round(T.finalPace * 100)}% pace`);
     expect(fin).toContain(`After ${P.enrageAfter} sec`);
     expect(say({ id: A.shield, kind: 'internal_cd' })).toContain('immune');
     expect(say({ id: A.fury, kind: 'internal_cd', value: 1 })).toContain(
@@ -133,21 +134,18 @@ describe('part 2: tooltips', () => {
     expect(fight).toContain('At 15%');
   });
 
-  it('each poured element says its cadence, faster for each pour', () => {
+  it('each poured element says its star and its full pace', () => {
     expect(say({ id: pouredAuraId('heat'), kind: 'internal_cd', value: 1 })).toContain(
-      `every ${P.pouredHeatEvery} sec`,
-    );
-    expect(say({ id: pouredAuraId('heat'), kind: 'internal_cd', value: 2 })).toContain(
-      `every ${P.pouredHeatEvery / 2} sec`,
+      `Fire Whirls rise every ${T.whirlEvery} sec`,
     );
     expect(say({ id: pouredAuraId('quench'), kind: 'internal_cd', value: 1 })).toContain(
-      `${P.pouredColdShare * 100}%`,
+      `Crossing Blades sweep the room every ${T.bladeEvery} sec`,
     );
     expect(say({ id: pouredAuraId('breath'), kind: 'internal_cd', value: 1 })).toContain(
-      'Leaping Bolt',
+      `Sky Strikes fall every ${T.skyEvery} sec`,
     );
     expect(say({ id: pouredAuraId('hammer'), kind: 'internal_cd', value: 1 })).toContain(
-      'Tremor Cracks',
+      `pillars rise every ${T.pillarEvery} sec`,
     );
   });
 
@@ -197,7 +195,6 @@ describe('part 2: the Overload HUD', () => {
     expect(v.title).toBe('Call of the Quarters');
     expect(v.phase).toBe('Shield 31');
     expect(v.splinters).toBe('Splinters 2');
-    expect(v.root).toBe('');
     expect(v.rows.filter((r) => r.awake).map((r) => r.vein)).toEqual(['hammer', 'heat']);
     // A held bar never throbs as if it were about to burst.
     expect(v.rows.some((r) => r.danger || r.active)).toBe(false);
@@ -241,50 +238,11 @@ describe('part 2: the Overload HUD', () => {
   });
 });
 
-describe('part 2: the personal alert', () => {
-  it('Bursting Coal first, then Wind-Tethered, then the rest', () => {
-    const coal = { id: A.coal, remaining: 4, duration: 6 };
-    const tether = { id: A.tether, remaining: 6, duration: 9.5 };
-    const frozen = { id: FINAL_AURAS.frozen, remaining: 2, duration: 4 };
-    const v = buildFinalAlertView({ auras: [frozen, tether, coal] });
-    expect(v.visible && v.kind).toBe('coal');
-    const w = buildFinalAlertView({ auras: [frozen, tether] });
-    expect(w.visible && w.kind).toBe('tether');
-  });
-
-  it('every timed mark is a short title over its bar and seconds, no sentence', () => {
-    for (const id of [
-      A.coal,
-      A.tether,
-      FINAL_AURAS.frozen,
-      FINAL_AURAS.ember,
-      FINAL_AURAS.drawn,
-      FINAL_AURAS.crushed,
-    ]) {
-      const v = buildFinalAlertView({ auras: [{ id, remaining: 4.2, duration: 6 }] });
-      expect(v.visible, id).toBe(true);
-      if (!v.visible) continue;
-      expect(v.line, id).toBe('');
-      expect(v.barLabel, id).toBe('5s');
-      expect(v.progress, id).toBeCloseTo(0.7);
-      expect(v.title.split(' ').length, id).toBeLessThanOrEqual(4);
-    }
-  });
-
-  it('a tank near the swap sees the Weight and its stacks', () => {
-    const low = buildFinalAlertView({
-      auras: [{ id: MOUNTING_WEIGHT_AURA, remaining: 20, duration: 25, stacks: 2 }],
-    });
-    expect(low.visible).toBe(false);
-    const near = buildFinalAlertView({
-      auras: [{ id: MOUNTING_WEIGHT_AURA, remaining: 20, duration: 25, stacks: P.weightSwap }],
-    });
-    expect(near.visible && near.kind).toBe('weight');
-    if (near.visible) {
-      expect(near.title).toContain(String(P.weightSwap));
-      // A short title over the bar and its seconds: no sentence under it.
-      expect(near.line).toBe('');
-      expect(near.barLabel).toBe('20s');
-    }
+describe('part 2: the marked player reads the world, not the screen', () => {
+  it("Bursting Coal and Wind-Tethered raise the marked player's own arrow (no panel)", () => {
+    for (const id of [A.coal, A.tether])
+      expect(
+        finalArrowMark({ auras: [{ id, remaining: 4, duration: 6 } as Aura] })?.remaining,
+      ).toBe(4);
   });
 });

@@ -284,10 +284,63 @@ export function heartOpenAir(x: number, z: number, r: number, summitSky = true):
   const G = HEART_BREATH_GULF;
   if (segmentDistance(x, z, G.ax, G.az, G.bx, G.bz) - r < G.r) return true;
   for (let i = 0; i < BREATH_ISLES.length; i++) {
+    // An isle over the Heart's crown floats over its rock instead (its cap,
+    // heartIsleRockCap): a column of sky there would open the Heart's chamber.
+    if (heartIsleOverCrown(i)) continue;
     const isle = BREATH_ISLES[i];
     if (Math.hypot(x - isle.x, z - isle.z) - r < BREATH_ISLE_REACH[i] + HEART_ISLE_AIR) return true;
   }
   return false;
+}
+
+/** The deepest any isle's crag hangs under its floor (yards: the Breath
+ *  kit's taller sculpt, smith_heart_fx/breath_isles_fx_core.ts ISLE_KIT,
+ *  pinned no shallower there) and the air kept between that point and the
+ *  rock under it. */
+export const HEART_ISLE_HANG = 26;
+export const HEART_ISLE_ROCK_GAP = 4;
+/** How far past an isle's rim the rock under it stays capped (yards: its
+ *  open air and a crag's lean). */
+export const HEART_ISLE_CAP_REACH = HEART_ISLE_AIR + 2;
+
+/** Does isle `i` float over the Heart's crown (the east chain since Jose's
+ *  call of 2026-11-18: the two groups across the Cornice from each other)?
+ *  Its middle stands on the crown's rock bearings (HEART_SUMMIT_CROWN, its
+ *  blend too; never the climb's head, whose isle keeps its own sky). Such
+ *  an isle carves no sky out of the mountain: the crown's rock keeps the
+ *  Heart's chamber out of sight, and the isle hangs high over it, the rock
+ *  under it capped below its crag's point (heartIsleRockCap). */
+export function heartIsleOverCrown(i: number): boolean {
+  const isle = BREATH_ISLES[i];
+  if (!isle) return false;
+  const C = BREATH.cornice;
+  const deg = ((Math.atan2(isle.x - C.x, isle.z - C.z) * 180) / Math.PI + 360) % 360;
+  const S = HEART_SUMMIT_CROWN;
+  return deg >= S.from - S.blend && deg <= S.to + S.blend;
+}
+
+/** Does the disc of `r` round (x, z) come within an over-crown isle's open
+ *  air (its reach plus HEART_ISLE_AIR)? No loose crag stands there. */
+export function heartNearCrownIsle(x: number, z: number, r: number): boolean {
+  for (let i = 0; i < BREATH_ISLES.length; i++) {
+    if (!heartIsleOverCrown(i)) continue;
+    const isle = BREATH_ISLES[i];
+    if (Math.hypot(x - isle.x, z - isle.z) - r < BREATH_ISLE_REACH[i] + HEART_ISLE_AIR) return true;
+  }
+  return false;
+}
+
+/** The highest rock may stand at (x, z) under the isles that float over the
+ *  crown (+Infinity away from them): each one's crag point less a gap. */
+export function heartIsleRockCap(x: number, z: number): number {
+  let cap = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < BREATH_ISLES.length; i++) {
+    if (!heartIsleOverCrown(i)) continue;
+    const isle = BREATH_ISLES[i];
+    if (Math.hypot(x - isle.x, z - isle.z) > BREATH_ISLE_REACH[i] + HEART_ISLE_CAP_REACH) continue;
+    cap = Math.min(cap, isle.h - HEART_ISLE_HANG - HEART_ISLE_ROCK_GAP);
+  }
+  return cap;
 }
 
 /** The summit's open shoulders (the Breath's third pass, 2026-11-03): round
@@ -324,9 +377,13 @@ export function heartSummitOpen(x: number, z: number, floor: number): number {
  *  that (the far ridges keep their height, a horizon of peaks). */
 export const HEART_SUMMIT_CAP = { reach: 34, blend: 30, under: 5 } as const;
 
-/** The highest any rock may stand at (x, z) by the summit's cap (+Infinity
- *  where the cap does not reach). */
+/** The highest any rock may stand at (x, z) by the summit's cap and under
+ *  the isles that float over the crown (+Infinity where neither reaches). */
 export function heartSummitCap(x: number, z: number): number {
+  return Math.min(summitRingCap(x, z), heartIsleRockCap(x, z));
+}
+
+function summitRingCap(x: number, z: number): number {
   const C = BREATH.cornice;
   const e = Math.hypot((x - C.x) / C.rx, (z - C.z) / C.rz);
   const past = (e - 1) * (C.rx + C.rz) * 0.5;
@@ -402,6 +459,8 @@ export function planHeartWalls(spacing = 5): HeartWallBlock[] {
       if (r < MIN_R) continue;
       const reach = r + lean;
       if (heartOpenAir(x, z, reach)) continue;
+      // Beside an isle over the crown: its rock is the mountain's, capped.
+      if (heartNearCrownIsle(x, z, reach)) continue;
       // Under the summit's cap (no crag over the Cornice's horizon).
       if (c.floor + height > heartSummitCap(x, z)) continue;
       out.push({

@@ -199,7 +199,7 @@ describe("the Smith's Heart gating", () => {
       mask: 0,
       slabOpen: false,
       sealLit: false,
-      ringClear: true,
+      ringClear: false,
       ready: false,
       portalOpen: false,
     });
@@ -234,7 +234,11 @@ describe("the Smith's Heart gating", () => {
     ];
     for (const order of orders) {
       const { sim, pid, inst } = setup();
-      kill(sim, inst, [...SMITH_HEART_PACKS.hammer, SMITH_HEART_GUARDIANS.hammer]);
+      kill(sim, inst, [
+        ...SMITH_HEART_PACKS.hammer,
+        ...SMITH_HEART_PACKS.ring,
+        SMITH_HEART_GUARDIANS.hammer,
+      ]);
       sim.tick();
       let mask = SMITH_HEART_VEIN_BITS.hammer;
       for (const vein of order) {
@@ -246,7 +250,7 @@ describe("the Smith's Heart gating", () => {
         kill(sim, inst, [SMITH_HEART_GUARDIANS[v]]);
         const events = sim.tick();
         mask |= SMITH_HEART_VEIN_BITS[v];
-        // The fourth charges the crystal with it (the Ring holds no packs);
+        // The fourth charges the crystal with it (the Ring cleared first);
         // the portal waits for a raider on the dais.
         const shown = mask === SMITH_HEART_SEAL_FULL ? mask | SMITH_HEART_READY_BIT : mask;
         expect(markers(sim, inst).every((m) => m === shown)).toBe(true);
@@ -257,16 +261,15 @@ describe("the Smith's Heart gating", () => {
     }
   });
 
-  it('the fourth vein charges the crystal (the Ring holds no packs) and the portal stays shut', () => {
-    // The team's review of 2026-11-17 took the Ring's packs out.
-    expect(SMITH_HEART_PACKS.ring).toEqual([]);
-    expect(SPAWNS.some((s) => s.mobId === 'heart_ring_warder')).toBe(false);
+  it('the fourth vein charges the crystal (the Ring cleared) and the portal stays shut', () => {
+    // The team's doc of 2026-11-17: half the Ring's old eight packs, four.
+    expect(SMITH_HEART_PACKS.ring).toEqual(['r1', 'r2', 'r3', 'r4']);
+    expect(SPAWNS.filter((s) => s.mobId === 'heart_ring_warder').length).toBe(12);
     const { sim, pid, inst } = setup();
-    kill(
-      sim,
-      inst,
-      Object.values(SMITH_HEART_GUARDIANS).filter((g) => g !== SMITH_HEART_GUARDIANS.heat),
-    );
+    kill(sim, inst, [
+      ...SMITH_HEART_PACKS.ring,
+      ...Object.values(SMITH_HEART_GUARDIANS).filter((g) => g !== SMITH_HEART_GUARDIANS.heat),
+    ]);
     sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(false);
     expect(smithHeartProgress(sim.ctx, inst).ready).toBe(false);
@@ -358,7 +361,7 @@ describe("the Smith's Heart gating", () => {
 
   it('a reset starts the seal dark and every gate shut again', () => {
     const { sim, pid, inst } = setup();
-    kill(sim, inst, Object.values(SMITH_HEART_GUARDIANS));
+    kill(sim, inst, [...Object.values(SMITH_HEART_GUARDIANS), ...SMITH_HEART_PACKS.ring]);
     sim.tick();
     expect(
       markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT)),

@@ -5133,6 +5133,28 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 2,
   },
+  // The Stillstone's usable body (heart_breath_stillstone, the Islands of the Wind's last isles):
+  // the crystal is drawn by the fight's own painter (smith_heart_fx/breath_isles_fx.ts), so this
+  // draws no body; its click capsule, nameplate and bar stay, raised to the crystal so the use is
+  // easy to target; bound off the skeleton's rig (never seen).
+  smith_heart_stillstone_body: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    height: 4.2,
+    clips: {
+      idle: 'Lie_Idle',
+      walk: 'Lie_Idle',
+      run: 'Lie_Idle',
+      attack: [],
+      hit: ['Hit_A'],
+      death: 'Death_A',
+    },
+    bodyless: true,
+    clickRadius: 2.4,
+    // A click AIMED at the crystal (its hover band, 1 to 6 yd up) wins over
+    // a player or an add standing before it: the click is its use now
+    // (promptless, Jose's call of 2026-11-18; world_direct_pick.ts).
+    aimCore: { back: 0, radius: 1.7, height: 6.2 },
+  },
   // A Remembrance Candle's usable body (crypt_remembrance_candle, Morthen's
   // Rite: encounters/hollow_crypt/morthen_candles.ts) stands at its pillar's
   // foot: the pillar is the kit's and the flame the crypt's own painter

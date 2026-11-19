@@ -731,11 +731,9 @@ const UI_PURE_CORES = [
   // Zulgar's breath, spear, Sunstruck window and sun glyphs) and its scene scan.
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/dungeon/wildheart_alert_scene_core.ts',
-  // The Smith's Heart's alerts: the Hammer Council and the Guardian of the
-  // Quench's cold bar.
-  'src/ui/hud/dungeon/council_alert_view.ts',
+  // The Smith's Heart's alerts: the Guardian of the Quench's cold bar, the
+  // final's, the Knotted Gale's (the Hammer Council has none since 2026-11-17).
   'src/ui/hud/dungeon/quench_alert_view.ts',
-  'src/ui/hud/dungeon/final_alert_view.ts',
   'src/ui/hud/dungeon/knot_alert_view.ts',
   'src/ui/hud/dungeon/heart_overload_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
@@ -1158,9 +1156,12 @@ const RENDER_PURE_CORES = [
   // The roots of the mountain readable on the dark crown (the third round).
   'src/render/smith_heart/heart_root_look_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
+  'src/render/smith_heart_fx/boss_far_lod_core.ts',
+  'src/render/smith_heart/heart_crown_ridge_core.ts',
   'src/render/smith_heart_fx/breath_roar_fx_core.ts',
   // which players the Breath's red arrows ride (breath_fight_fx.ts)
   'src/render/smith_heart_fx/breath_arrow_core.ts',
+  'src/render/smith_heart_fx/final_arrow_core.ts',
   // a thrown body's drawn hop off the floor (thrown_hop.ts, the Summit Roar)
   'src/render/thrown_hop_core.ts',
   'src/render/smith_heart_fx/breath_heart_fx_core.ts',
@@ -1188,6 +1189,7 @@ const RENDER_PURE_CORES = [
   // floods, drains and shocks, the air's seeds.
   'src/render/smith_heart/heart_quarters_core.ts',
   'src/render/smith_heart/heart_vein_groove_core.ts',
+  'src/render/smith_heart/heart_floor_rite_core.ts',
   // Phase 2M: the wall landmarks' frame, spots, eruption and lightning.
   'src/render/smith_heart/heart_landmarks_core.ts',
   'src/render/smith_heart_fx/final_body_core.ts',
@@ -1196,11 +1198,14 @@ const RENDER_PURE_CORES = [
   // Weight of the Anvil's hang, countdown, strike, fragments and beats.
   'src/render/smith_heart_fx/final_anvil_core.ts',
   'src/render/smith_heart_fx/final_phase_fx_core.ts',
+  'src/render/smith_heart_fx/final_stars_fx_core.ts',
+  'src/render/smith_heart_fx/final_overload_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
   // Grief of the Stone on the Hammer Council's enraged survivor.
   'src/render/smith_heart_fx/council_grief_core.ts',
   'src/render/smith_heart_fx/breath_isles_fx_core.ts',
+  'src/render/smith_heart_fx/breath_isle_phase_core.ts',
   'src/render/smith_heart_fx/council_bodies_core.ts',
   // Bond of the Stone's tether and Mountain's Rush's wind-up, run and scar.
   'src/render/smith_heart_fx/council_mechanic_look_core.ts',
@@ -1253,6 +1258,10 @@ const RENDER_PURE_CORES = [
   // beats, stone, strikes and bolts.
   'src/render/smith_heart_fx/breath_entrance_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
+  'src/render/smith_heart_fx/heat_lava_wall_core.ts',
+  // The Wheel of the Hearth on screen: its slices' warning, eruption and
+  // scorch, its vents' layout and the low tier's share.
+  'src/render/smith_heart_fx/heat_wheel_fx_core.ts',
   // The Heat's floor ladder (every floor layer's unique rung) and its molten
   // telegraphs' looks.
   'src/render/smith_heart_fx/heat_floor_ladder_core.ts',

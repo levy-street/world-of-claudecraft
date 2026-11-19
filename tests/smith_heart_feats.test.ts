@@ -16,7 +16,7 @@ import {
   SMITH_HEART_META_DEED,
 } from '../src/sim/content/smith_heart_rewards';
 import { COUNCIL_CASTS, COUNCIL_TUNING as T } from '../src/sim/encounters/smith_heart';
-import { ISLE_AURAS, ISLE_TUNING as IT } from '../src/sim/encounters/smith_heart/breath_isle_ids';
+import { ISLE_AURAS } from '../src/sim/encounters/smith_heart/breath_isle_ids';
 import { raisePillar } from '../src/sim/encounters/smith_heart/council_pillars';
 import type { CouncilFightState } from '../src/sim/encounters/smith_heart/council_state';
 import {
@@ -340,15 +340,15 @@ describe("the Breath's feat: Keep Your Feet", () => {
     st.inhaleTimer = 9999;
     st.circleTimer = 9999;
     expect(f.dev('/dev heart breath isles')).toBe(true);
-    expect(f.boss().auras.some((a) => a.id === ISLE_AURAS.bulwark)).toBe(true);
+    expect(f.boss().auras.some((a) => a.id === ISLE_AURAS.cocoon)).toBe(true);
     return f;
   }
 
-  it('a Gale Bulwark the raid breaks keeps it', () => {
+  it('Skyrend Nova cut by the two Stillstones keeps it', () => {
     const f = bulwarkUp();
-    expect(f.dev('/dev heart breath bulwark')).toBe(true);
+    expect(f.dev('/dev heart breath still')).toBe(true);
     f.tick(2);
-    expect(f.state()?.isles.round).toBeNull();
+    expect(f.state()?.isles.burst).toBe(false);
     expect(f.state()?.feat?.broken ?? false).toBe(false);
     f.dev('/dev heart breath storm');
     f.tick(2);
@@ -357,14 +357,16 @@ describe("the Breath's feat: Keep Your Feet", () => {
     expect(earned(f.sim, f.pids, SMITH_HEART_FEAT_DEEDS.breath)).toEqual([true, true, true]);
   });
 
-  it('a Gale Bulwark left to burst by itself breaks it', () => {
+  it('Skyrend Nova left to run out breaks it', () => {
     const f = bulwarkUp();
-    f.tick(sec(IT.bulwarkMax - 1));
-    // Held, not yet burst: nothing broken so far.
-    expect(f.state()?.isles.round).not.toBeNull();
+    f.tick(sec(5));
+    // Gathering, not yet out: nothing broken so far.
+    expect(f.state()?.isles.stage).toBe('nova');
     expect(f.state()?.feat?.broken ?? false).toBe(false);
-    f.tick(sec(2));
-    expect(f.state()?.isles.round).toBeNull();
+    for (const p of f.players) p.hp = p.maxHp;
+    f.dev('/dev heart breath nova');
+    f.tick(2);
+    expect(f.state()?.isles.burst).toBe(true);
     expect(f.state()?.feat?.broken).toBe(true);
     f.dev('/dev heart breath storm');
     f.tick(2);
@@ -651,7 +653,7 @@ describe('the feat rules and the meta', () => {
     const desc = (e: keyof typeof SMITH_HEART_FEAT_DEEDS) => DEEDS[SMITH_HEART_FEAT_DEEDS[e]].desc;
     expect(desc('hammer_council')).toContain(`within ${COUNCIL_FEAT_FALL_WINDOW} seconds`);
     expect(desc('hammer_council')).toContain('striking no raider');
-    expect(desc('breath')).toContain('every Gale Bulwark broken by the raid');
+    expect(desc('breath')).toContain('both Stillstones stilled before Skyrend Nova is unleashed');
     expect(desc('quench')).toContain('without any ice blade striking a raider');
     expect(desc('masterless')).toContain('without any raider dying');
   });

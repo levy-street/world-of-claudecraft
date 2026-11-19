@@ -60,12 +60,11 @@ export {
   finalDifficulty,
   finalReadout,
   finalScopeForDev,
-  releaseRootForDev,
+  releaseBarForDev,
   resetFinalForDev,
   setFinalDevTier,
   tickFinalBoss,
 } from './final';
-export { FINAL_WIND_TAG } from './final_breath';
 export * from './final_ids';
 export * from './final_phase_ids';
 export type { FinalFightState } from './final_state';
@@ -79,7 +78,7 @@ export {
   tickHeatGuardian,
 } from './heat';
 export { heatCinderHitPoints } from './heat_cinder_ward';
-export { FIST_SPAN, wakefireHoldsFist } from './heat_fist';
+export { FIST_SPAN, floorHoldsFist } from './heat_fist';
 export * from './heat_geometry';
 export * from './heat_ids';
 export {

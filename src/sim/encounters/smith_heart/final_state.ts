@@ -47,6 +47,10 @@ export interface FinalWhirl {
   heading: number;
   /** Seconds before it may strike each player again (by id). */
   cooldown: Record<number, number>;
+  /** A Breath Dust Devil (wind: it wanders and throws) rather than a Fire
+   *  Whirl, and the seconds to its next turn. */
+  wind?: boolean;
+  turn?: number;
 }
 
 /** A burning pool (embers, the frontal's forge fire, the Heat Splinter's
@@ -75,15 +79,6 @@ export interface FinalSpot {
   left: number;
 }
 
-/** The wind: its warning, then its blow toward `heading`. */
-export interface FinalWind {
-  objectId: number;
-  heading: number;
-  warn: number;
-  blow: number;
-  rimTick: number;
-}
-
 /** Weight of the Anvil's mark under its bar. */
 export interface FinalAnvil {
   objectId: number;
@@ -92,21 +87,87 @@ export interface FinalAnvil {
   /** Mythic: its bearing round the boss (radians), turning. */
   angle: number;
   left: number;
+  /** The player its circle follows through the bar (0: none, a dev spot or
+   *  Mythic's turning mark). */
+  targetId: number;
 }
 
 /** The active quarter's kit clocks (fresh on entering a quarter). */
 export interface FinalKitClocks {
   fist: number;
-  whirl: number;
   ember: number;
   ice: number;
-  wind: number;
   bolt: number;
   drawn: number;
   orb: number;
   tremor: number;
-  anvil: number;
   shell: number;
+  devil: number;
+}
+
+/** A standing pillar (Wake the Stone): it stays until a blade shatters it. */
+export interface FinalPillar {
+  objectId: number;
+  x: number;
+  z: number;
+  /** Storm-Charged: a strike ran into it (it pulses the raid). */
+  charged: boolean;
+}
+
+/** A pillar on its way up: its warning spot on the floor. */
+export interface FinalRise {
+  objectId: number;
+  x: number;
+  z: number;
+  left: number;
+}
+
+/** A Sky Strike on its way down, and the pillars it will run into (each its
+ *  Arcing Stone ring's object). */
+export interface FinalStrike {
+  objectId: number;
+  x: number;
+  z: number;
+  left: number;
+  arcs: { pillarId: number; objectId: number }[];
+}
+
+/** A Crossing Blade's run: its blade, its line, its mark. */
+export interface FinalBladeRun {
+  bladeId: number;
+  laneId: number;
+  /** Its mark (the line runs through them until it locks). */
+  target: number;
+  phase: 'aim' | 'fly' | 'rest';
+  left: number;
+  from: { x: number; z: number };
+  facing: number;
+  length: number;
+  /** The flight's progress (0 to 1) last tick. */
+  flown: number;
+  struck: number[];
+}
+
+/** The woken stars (the rework of 2026-11-18): which quarters are awake, in
+ *  the order they woke, each star's clock, and what each has on the floor. */
+export interface FinalStarsState {
+  awake: SmithHeartVein[];
+  clock: Record<SmithHeartVein, number>;
+  pillars: FinalPillar[];
+  rises: FinalRise[];
+  strikes: FinalStrike[];
+  blade: FinalBladeRun | null;
+  /** The marks still to come in this round of blades. */
+  bladeQueue: number[];
+  chargedTimer: number;
+  /** Seconds to the charged pillars' electric ground's next bite. */
+  zoneTimer: number;
+  /** Volleys laid (the hashed picks' salt). */
+  volleys: number;
+  /** Counters the tests and the readout read. */
+  thrums: number;
+  shattered: number;
+  charges: number;
 }
 
 /** One Splinter of an intermission (part 2). */
@@ -201,14 +262,10 @@ export interface FinalPhaseState {
   coals: FinalCoal[];
   /** Times each element was poured into it. */
   poured: Record<SmithHeartVein, number>;
-  /** Each poured element's own clock. */
-  pouredClock: Record<SmithHeartVein, number>;
   /** Seconds Heart Unbound still holds after a call ends. */
   unboundGrace: number;
-  /** The final phase: its seconds, the mix's turn and clock, the fury. */
+  /** The final phase: its seconds and the fury. */
   finalClock: number;
-  mixTurn: number;
-  mixTimer: number;
   fury: number;
   furyTimer: number;
   furyWarned: boolean;
@@ -243,12 +300,6 @@ export interface FinalFightState {
   overload: Record<SmithHeartVein, number>;
   /** The next Overload pulse of the active bar. */
   pulseTimer: number;
-  /** Taking Root's seconds left, and the spot it holds. */
-  rootLeft: number;
-  rootAt: { x: number; y: number; z: number } | null;
-  /** Seconds after a root lets go in which no planted bar begins (the
-   *  tank's window to start the drag). */
-  dragGrace: number;
   /** Heroic: the switch mark's seconds left (raid-wide). */
   shakenLeft: number;
   switches: number;
@@ -268,13 +319,8 @@ export interface FinalFightState {
   pools: FinalPool[];
   poolTick: number;
   // -- the Quench --
-  /** The cold bar by player id (0 to 100). */
-  cold: Record<number, number>;
-  /** Frozen players' seconds left (by id). */
-  frozen: Record<number, number>;
   cracks: FinalSpot[];
   // -- the Breath --
-  wind: FinalWind | null;
   /** The player the bolt's bar aims at. */
   boltTarget: number | null;
   drawn: FinalMark[];
@@ -282,7 +328,12 @@ export interface FinalFightState {
   orbs: FinalSpot[];
   // -- the Hammer --
   tremors: FinalSpot[];
+  // -- its own --
   anvil: FinalAnvil | null;
+  /** Weight of the Anvil's clock (all fight, wherever it stands). */
+  anvilClock: number;
+  /** The woken stars (final_stars.ts). */
+  stars: FinalStarsState;
   /** The frontal's swing count last seen (Mythic's watch). */
   cleaveSeen: number;
   /** Part 2: the intermissions and the final phase. */

@@ -1442,7 +1442,11 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // drawn-position hooks). No capture was retaken.
   // Re-minted for the Smith's Heart raid's dormant warders (a sleeping body's heap held
   // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
-  'f6a693a9555f8686c10f248a395086525dda7a387f2fe87333f53385978e959e';
+  // Re-minted for the Smith's Heart raid's lava-wave lights, articulated bosses and
+  // hidden-until-posed sleeping bosses (renderer.ts). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's light crossfade between its rooms
+  // (renderer.ts). No capture was retaken.
+  '1f676692993b12bee0dddbfc2a2922f2fb895faf5051915d63f663858637620d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1504,7 +1508,11 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // drawn-position hooks). No capture was retaken.
   // Re-minted for the Smith's Heart raid's dormant warders (a sleeping body's heap held
   // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
-  '158f70500fec6fac2fae6e98047bc7d940ab56c34758596f7115f88e49628ca1';
+  // Re-minted for the Smith's Heart raid's lava-wave lights, articulated bosses and
+  // hidden-until-posed sleeping bosses (renderer.ts). No capture was retaken.
+  // Re-minted for the Smith's Heart raid's light crossfade between its rooms
+  // (renderer.ts). No capture was retaken.
+  '1f64aea8f3d65795831c78f989f7af57c43f103fd269d2cf7f1af4124da232e8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2917,7 +2925,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // The Smith's Heart raid's dormant warders over the Quench queen: recomputed from the
       // swept evidence. No capture was retaken.
-    ).toBe('2f76b105fc1c0203c79da519184aab047cf470c14bade5193d21953301b56d2d');
+      // The Smith's Heart raid's lava-wave lights and boss rig changes: recomputed
+      // from the swept evidence. No capture was retaken.
+      // The Smith's Heart raid's light crossfade between its rooms: recomputed from the
+      // swept evidence. No capture was retaken.
+    ).toBe('ab5349d964026163829c77d829b1b6d41f41f31870118215ff32da4e476a2421');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

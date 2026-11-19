@@ -24702,15 +24702,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_storm_lance': 'Грозовое копьё',
   'abilityUi.cast.heart_quenching_breath': 'Дыхание закалки',
   'hudChrome.auraEffect.heatGuardian.statePhase1':
-    'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак бьёт в точку на берегу, и оттуда расходятся три Волны расплава. Вспышка Очага поражает всех, кто дальше {reach} м от источника. При 70% здоровья он погружается, и Очаг переполняется. В героическом режиме урон выше на {heroicPct}%.',
+    'Наполовину погружён в свой источник и никогда не двигается. Колесо Очага делит берег на четыре сектора: три раскаляются докрасна и извергаются через {warn} сек. ({heroicWarn} сек. в героическом режиме), один остаётся тёмным и безопасным, а когда один круг извергается, безопасный сектор следующего круга появляется в другом месте. Базальтовый кулак бьёт в точку на берегу, и оттуда расходятся три Волны расплава. Вспышка Очага поражает всех, кто дальше {reach} м от источника. При 70% здоровья он погружается, и Очаг переполняется. В героическом режиме урон выше на {heroicPct}%.',
   'hudChrome.auraEffect.heatGuardian.statePhase2':
-    'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак продолжается; Семена Очага падают под рейд и вскоре лопаются, а Пробуждённый огонь поджигает пол вокруг источника кольцо за кольцом. При 40% здоровья он снова погружается, и Очаг переполняется. В героическом режиме урон выше на {heroicPct}%.',
+    'Наполовину погружён в свой источник и никогда не двигается. Колесо Очага и Базальтовый кулак продолжаются; Семена Очага падают под рейд и вскоре лопаются, а Пробуждённый огонь поджигает пол вокруг источника кольцо за кольцом. При 40% здоровья он снова погружается, и Очаг переполняется. В героическом режиме урон выше на {heroicPct}%.',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
-    'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак и Пробуждённый огонь продолжаются, а Катящиеся угли падают и преследуют игроков: удар отбрасывает уголь. В героическом режиме урон выше на {heroicPct}%.',
+    'Наполовину погружён в свой источник и никогда не двигается. Колесо Очага, Базальтовый кулак и Пробуждённый огонь продолжаются, а Катящиеся угли падают и преследуют игроков: удар отбрасывает уголь. В героическом режиме урон выше на {heroicPct}%.',
   'hudChrome.auraEffect.heatGuardian.intro':
     'Остывший в своём источнике: его нельзя атаковать или ранить, пока рейд не подойдёт и он не проснётся, вспыхнув.',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
-    'Погружён в источник: пока Очаг переполнен, его нельзя атаковать или ранить. Когда переполнение закончится, он поднимется снова.',
+    'Погружён в источник: пока Очаг переполнен, его нельзя атаковать или ранить. Кольца лавы одно за другим расходятся от источника, и в каждом есть два прохода, где пламя расступается; проходы следующего кольца светятся на полу до его прихода. Стойте в проходе, когда кольцо проходит, иначе получите от {min} до {max} ед. урона от огня (от {heroicMin} до {heroicMax} в героическом режиме). Во втором переполнении кольца идут быстрее, а проходы уже. Он поднимется снова, когда пройдёт последнее кольцо.',
   'hudChrome.auraEffect.heatGuardian.scorched':
     'Получаемый урон от огня, льда, природы, тьмы и тайной магии увеличен на {pct}%. Каждые {every} сек Вспышка Очага поражает всех, кто дальше {reach} м от источника, и обновляет этот эффект.',
   'hudChrome.auraEffect.heatGuardian.grip':
@@ -24744,11 +24744,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_falling_rock': 'Камнепад',
   'abilityUi.cast.heart_seam_bolt': 'Стрела жилы',
   'abilityUi.cast.heart_song_of_the_seam': 'Песнь жилы',
-  'hudChrome.council.alert.wakeTitle': 'Пробуждение камня!',
-  'hudChrome.council.alert.rockTitle': 'Камнепад!',
-  'hudChrome.council.alert.resonanceTitle': 'Резонанс',
-  'hudChrome.council.alert.weightTitle': 'Тяжесть Молота',
-  'hudChrome.council.alert.timeAria': 'Осталось {seconds} с',
   'hudChrome.auraEffect.breathGuardian.intro':
     'Спит: нельзя атаковать или ранить, пока буря не опустит его на землю.',
   'hudChrome.auraEffect.council.intro':
@@ -24794,7 +24789,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.collapse':
     'Каменоломня обрушивается: каждые {every} с вы получаете от {min} до {max} урона за каждый заряд, и каждый раз добавляется новый заряд. Эффект закончится, когда Проклятая колонна разрушится.',
   'hudChrome.auraEffect.council.pillarLimit': 'Каждая колонна защищает от Гнева горы не больше {limit} игроков. Если за ней больше, каждый из них получает {share}% удара. Тот, кто не укрылся, получает от {min} до {max} урона в обычном режиме, от {heroicMin} до {heroicMax} в героическом и от {mythicMin} до {mythicMax} в мифическом.',
-  'hudChrome.council.alert.rushTitle': 'Натиск горы!',
   'hudChrome.council.say.guardian_rush': 'Что ж, стойте у меня на пути. Гора не сворачивает.',
   'hudChrome.council.say.singer_wake': 'Проснись, спящий камень. Восстань там, где они стоят!',
   'hudChrome.council.say.singer_rock': 'Посмотрите наверх, малыши! Гора падает!',
@@ -24848,9 +24842,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Разорван и обращён в тело из молний: штормовая половина боя, пока Страж Дыхания не падёт.',
   'hudChrome.auraEffect.breathGuardian.swell':
     'Каждые {every} сек. разрастающаяся буря наносит от {min} до {max} урона всем на Карнизе, на {growth}% больше за каждый предыдущий импульс: уже {stacks}. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона, на {heroicGrowth}% больше за каждый предыдущий импульс.',
-  'hudChrome.auraEffect.breathGuardian.bulwark': 'Щит ветра поглотит ещё {left} урона. Пока жив хоть один Часовой шквала или Целитель шквала на парящих островах, он восстанавливает {regrow}% своей прочности в секунду, а каждый Целящий шквал возвращает {mend}%. Летите по Пути шквала на острова и сразите их. Если щит продержится {max} сек., он взорвётся над Карнизом, нанеся от {bmin} до {bmax} урона. Героический и мифический режимы: от {heroicMin} до {heroicMax} урона.',
   'hudChrome.auraEffect.breathGuardian.riding': 'Ветер несёт вас над пустотой по заданному пути: вы не можете действовать, пока он вас не опустит.',
-  'hudChrome.auraEffect.breathGuardian.windworn': 'Измотан ветром: пока эффект не закончится, Путь шквала не перенесёт вас на острова.',
   'hudChrome.auraEffect.breathGuardian.thrown':
     'Отброшен Рёвом вершины: вы не можете двигаться, пока не приземлитесь.',
   'hudChrome.auraEffect.breathGuardian.tossed':
@@ -26247,24 +26239,31 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.shutDown': '{killer} прервал серию {victim}!',
   'abilityUi.cast.heart_final_leaping_bolt': 'Скачущая молния',
   'abilityUi.cast.heart_final_anvil': 'Тяжесть наковальни',
-  'hudChrome.auraEffect.finalBoss.stateHeat': 'Пьёт Жар: Базальтовый кулак бьёт в место, где стоит игрок, и оттуда катятся три вала расплавленного камня, а по полу проносятся огненные вихри. В героическом режиме метки углей роняют огонь под ноги бойцам дальнего боя; в эпохальном его фронтальный удар оставляет огонь горна.',
-  'hudChrome.auraEffect.finalBoss.stateQuench': 'Пьёт Закалку: тот, рядом с кем в пределах {reach} м меньше {allies} других игроков, мёрзнет и замерзает. В героическом режиме лёд ломается под отмеченными игроками; в эпохальном его фронтальный удар замедляет на {slow}%.',
-  'hudChrome.auraEffect.finalBoss.stateBreath': 'Пьёт Дыхание: ветер сносит рейд к краю, а Скачущая молния перепрыгивает между игроками, стоящими в пределах {jump} м друг от друга. В героическом режиме Притянутая молния метит игроков; в эпохальном каждую грозовую сферу должен взять один игрок.',
-  'hudChrome.auraEffect.finalBoss.stateHammer': 'Пьёт Молот: под игроками раскрываются трещины толчка, а Тяжесть наковальни делит удар между всеми, кто стоит под меткой. В героическом режиме каменная скорлупа поглощает исцеление, а принявшие наковальню раздавлены; в эпохальном метка наковальни кружит вокруг босса.',
-  'hudChrome.auraEffect.finalBoss.stateRing': 'В центральном круге он не пьёт ни одну четверть. Пока у него больше {pct}% здоровья, он каждую секунду получает там заряд Освобождённого сердца.',
+  'hudChrome.auraEffect.finalBoss.stateHeat':
+    'Пьёт Жар: Базальтовый кулак бьёт в место, где стоит игрок, и оттуда катятся три вала расплавленного камня. Его звезда, Огненный вихрь, пробуждается до конца боя: высокие столбы огня проносятся по полу. В героическом режиме метки углей роняют огонь под ноги бойцам дальнего боя; в эпохальном его фронтальный удар оставляет огонь горна.',
+  'hudChrome.auraEffect.finalBoss.stateQuench':
+    'Пьёт Закалку. Его звезда, Скрещённый клинок, пробуждается до конца боя: ледяной меч проносится по линии через отмеченного игрока и разбивает все столпы на ней. В героическом режиме лёд ломается под отмеченными игроками, в эпохальном его фронтальный удар замедляет на {slow}%.',
+  'hudChrome.auraEffect.finalBoss.stateBreath':
+    'Пьёт Дыхание: Скачущая молния перепрыгивает между игроками в пределах {jump} м друг от друга. Его звезда, Небесный удар, пробуждается до конца боя: молния бьёт под ноги игрокам, а молния, упавшая у столпа, обвивает его дугой и заряжает. В героическом режиме Притянутая молния метит игроков, в эпохальном каждую грозовую сферу должен взять один игрок.',
+  'hudChrome.auraEffect.finalBoss.stateHammer':
+    'Пьёт Молот: под игроками раскрываются трещины толчка. Его звезда, Пробуждение камня, пробуждается до конца боя: столпы вырываются из пола и стоят, пока их не разобьёт Скрещённый клинок. В героическом режиме каменная скорлупа поглощает исцеление.',
+  'hudChrome.auraEffect.finalBoss.stateRing':
+    'В центральном круге он не пьёт ни одну четверть: все пробуждённые звёзды действуют в темпе {pace}%. Пока у него больше {pct}% здоровья, он каждую секунду получает там заряд Освобождённого сердца.',
   'hudChrome.auraEffect.finalBoss.overloadHeat': 'Перегрузка Жара: {value}%. Растёт, пока босс стоит в четверти Жара (от пустой до полной за {fill} с), и каждые {every} с бьёт по рейду: {min} ед. урона при пустой шкале, до {max} при полной. Почти заполнившись, предупреждает рейд. Заполнившись, взрывается по всему рейду и пустеет: от {normalMin} до {normalMax} ед. урона в обычном режиме (переживается с лечением), от {heroicMin} до {heroicMax} в героическом (тяжело: подлечитесь и используйте защитные способности), от {mythicMin} до {mythicMax} в эпохальном (смертельно: выжить можно только с сильной личной защитой). Вне своей четверти убывает втрое медленнее. Пульсации наносят от {heroicPulseMin} до {heroicPulseMax} урона в героическом режиме и от {mythicPulseMin} до {mythicPulseMax} в мифическом.',
   'hudChrome.auraEffect.finalBoss.overloadQuench': 'Перегрузка Закалки: {value}%. Растёт, пока босс стоит в четверти Закалки (от пустой до полной за {fill} с), и каждые {every} с бьёт по рейду: {min} ед. урона при пустой шкале, до {max} при полной. Почти заполнившись, предупреждает рейд. Заполнившись, взрывается по всему рейду и пустеет: от {normalMin} до {normalMax} ед. урона в обычном режиме (переживается с лечением), от {heroicMin} до {heroicMax} в героическом (тяжело: подлечитесь и используйте защитные способности), от {mythicMin} до {mythicMax} в эпохальном (смертельно: выжить можно только с сильной личной защитой). Вне своей четверти убывает втрое медленнее. Пульсации наносят от {heroicPulseMin} до {heroicPulseMax} урона в героическом режиме и от {mythicPulseMin} до {mythicPulseMax} в мифическом.',
   'hudChrome.auraEffect.finalBoss.overloadBreath': 'Перегрузка Дыхания: {value}%. Растёт, пока босс стоит в четверти Дыхания (от пустой до полной за {fill} с), и каждые {every} с бьёт по рейду: {min} ед. урона при пустой шкале, до {max} при полной. Почти заполнившись, предупреждает рейд. Заполнившись, взрывается по всему рейду и пустеет: от {normalMin} до {normalMax} ед. урона в обычном режиме (переживается с лечением), от {heroicMin} до {heroicMax} в героическом (тяжело: подлечитесь и используйте защитные способности), от {mythicMin} до {mythicMax} в эпохальном (смертельно: выжить можно только с сильной личной защитой). Вне своей четверти убывает втрое медленнее. Пульсации наносят от {heroicPulseMin} до {heroicPulseMax} урона в героическом режиме и от {mythicPulseMin} до {mythicPulseMax} в мифическом.',
   'hudChrome.auraEffect.finalBoss.overloadHammer': 'Перегрузка Молота: {value}%. Растёт, пока босс стоит в четверти Молота (от пустой до полной за {fill} с), и каждые {every} с бьёт по рейду: {min} ед. урона при пустой шкале, до {max} при полной. Почти заполнившись, предупреждает рейд. Заполнившись, взрывается по всему рейду и пустеет: от {normalMin} до {normalMax} ед. урона в обычном режиме (переживается с лечением), от {heroicMin} до {heroicMax} в героическом (тяжело: подлечитесь и используйте защитные способности), от {mythicMin} до {mythicMax} в эпохальном (смертельно: выжить можно только с сильной личной защитой). Вне своей четверти убывает втрое медленнее. Пульсации наносят от {heroicPulseMin} до {heroicPulseMax} урона в героическом режиме и от {mythicPulseMin} до {mythicPulseMax} в мифическом.',
-  'hudChrome.auraEffect.finalBoss.root': 'Укореняется на {seconds} с после входа в четверть: до конца укоренения его нельзя вытащить.',
   'hudChrome.auraEffect.finalBoss.unbound': 'Каждую секунду наносит всему рейду {per} ед. урона за каждый заряд (сейчас {total}) и получает заряд каждую секунду, пока стоит в центральном круге. Выведите его из круга, чтобы это прекратить. Героический режим: {heroicPer} за заряд. Мифический режим: {mythicPer} за заряд.',
   'hudChrome.auraEffect.finalBoss.shaken': 'Пока эффект действует, смена четверти бьёт вас в {mult} раза сильнее (от {min} до {max} ед. урона, а не от {baseMin} до {baseMax}). Каждая смена обновляет его на {seconds} с. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
-  'hudChrome.auraEffect.finalBoss.cold': 'Холод {value} из 100. Растёт на {rise} в секунду, пока в пределах {reach} м от вас меньше {allies} других игроков, и падает, когда они рядом. На 100 вы скованы инеем: оглушение на {freeze} с и от {min} до {max} ед. урона от магии льда. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
-  'hudChrome.auraEffect.finalBoss.frozen': 'Оглушение. Вы замёрзли, стоя в одиночку: пока он пьёт Закалку, держитесь в пределах {reach} м от {allies} или более других игроков.',
+  'hudChrome.auraEffect.finalBoss.skyMark':
+    'Через {seconds} с молния ударит туда, где вы стоите: от {min} до {max} ед. урона от сил природы всем в радиусе {radius} м. Отойдите. Молния, упавшая в пределах {arcReach} м от столпа, обвивает его дугой и оставляет Заряженным бурей. Героический: от {heroicMin} до {heroicMax} урона. Эпохальный: от {mythicMin} до {mythicMax} урона.',
+  'hudChrome.auraEffect.finalBoss.bladeMark':
+    'Скрещённый клинок наводит на вас свою линию: она следует за вами и фиксируется за {lock} с до полёта. Проведите линию через столпы, чтобы разбить их, затем сойдите с неё. Все на линии получают от {min} до {max} ед. урона от магии льда. Героический: от {heroicMin} до {heroicMax} урона. Эпохальный: от {mythicMin} до {mythicMax} урона.',
+  'hudChrome.auraEffect.finalBoss.anvilMark':
+    'Тяжесть Наковальни следует за вами: её круг радиусом {radius} м движется вместе с вами и замирает за {lock} сек. до падения. Соберите рейд внутри: {total} физического урона делится между всеми в круге, а если их меньше {fewer}, каждый получает в полтора раза больше. Героический: {heroicTotal}. Эпохальный: {mythicTotal}.',
   'hudChrome.auraEffect.finalBoss.underIce': 'Оглушение: вы провалились сквозь ломающийся лёд.',
   'hudChrome.auraEffect.finalBoss.numbing': 'Скорость передвижения снижена на {pct}% на {seconds} с его фронтальным ударом.',
   'hudChrome.auraEffect.finalBoss.ember': 'Через {seconds} с под ваши ноги упадут угли и будут тлеть {life} с лужей радиусом {radius} м, нанося от {min} до {max} ед. урона от огня в секунду всем внутри. Встаньте с другими отмеченными в один угол, а потом уходите. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
-  'hudChrome.auraEffect.finalBoss.wind': 'Ветер сносит вас на {speed} м в секунду туда, куда дует; идите против него, чтобы устоять (заклинания не прерываются). Пока он дует, в пределах {band} м от края вы получаете от {min} до {max} ед. урона от сил природы каждую секунду. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.drawn': 'Каждую секунду в течение {seconds} с молния бьёт от вас во всех других игроков в пределах {reach} м, нанося каждому от {min} до {max} ед. урона от сил природы. Держитесь в {reach} м от всех. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.shell': 'Поглощает следующие {value} ед. исцеления, которые вы получите.',
   'hudChrome.auraEffect.finalBoss.crushed': 'Если в ближайшие {seconds} с вы встанете под следующую Тяжесть наковальни, ваша доля урона будет в {mult} раза больше. Пусть её примет другая группа.',
@@ -26272,8 +26271,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.quench': 'Закалка',
   'hudChrome.finalOverload.breath': 'Дыхание',
   'hudChrome.finalOverload.hammer': 'Молот',
-  'hudChrome.finalOverload.rooted': 'Укоренён {seconds}',
-  'hudChrome.finalOverload.free': 'Можно тащить',
   'hudChrome.finalOverload.shaken': 'Потрясение {seconds}',
   'hudChrome.finalOverload.unbound': 'Освобождение x{stacks}',
   'hudChrome.finalOverload.barAria': 'Перегрузка: {quarter}, {pct} процентов',
@@ -26285,7 +26282,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_gale_pounce': 'Прыжок шквала',
   'abilityUi.cast.heart_final_rime_toll': 'Звон инея',
   'abilityUi.cast.heart_breath_cradle_channel': 'Колыбель грома',
-  'abilityUi.cast.heart_breath_gale_bulwark': 'Бастион бури',
   'abilityUi.cast.heart_breath_mending_gale': 'Целящий шквал',
   'entities.mobs.heart_final_splinter_heat.name': 'Осколок Жара',
   'entities.mobs.heart_final_splinter_quench.name': 'Осколок Закалки',
@@ -26301,20 +26297,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.phaseKneel': "Преклонил колени. Ничто не может ему навредить.",
   'hudChrome.auraEffect.finalBoss.phaseRebirth': "Сердце бьётся. Ничто не может ему навредить, пока он не восстанет с {percent}% здоровья.",
   'hudChrome.auraEffect.finalBoss.unmade': "Каждые {every} сек. рушится целая четверть Наковальни: сначала та, чья шкала Перегрузки была полнее всего, после {warn} сек. предупреждающих трещин. Все, кто стоит на ней, падают и погибают. Через {ring} сек. после последней четверти рушится центральное кольцо и убивает всех.",
-  'hudChrome.auraEffect.finalBoss.phaseFinal': 'Пробудились все четыре четверти: он остаётся в центральном круге и по очереди, каждые {every} с, применяет Огненный вихрь, Стонущий лёд, Скачущую молнию и Тяжесть наковальни. Через {enrage} с он теряет всякую сдержанность (Ярость без хозяина).',
+  'hudChrome.auraEffect.finalBoss.phaseFinal':
+    'Пробудились все четыре четверти: он остаётся в центральном круге, и все четыре звезды действуют разом в темпе {pace}%: столпы, молнии, клинки и вихри вместе. Через {enrage} с он теряет всякую сдержанность (Ярость без хозяина).',
   'hudChrome.auraEffect.finalBoss.shield': 'Собранная сила: невосприимчив к любому урону, его нельзя выбрать целью.',
-  'hudChrome.auraEffect.finalBoss.pouredHeat': 'В него влит Жар: до конца боя, где бы он ни стоял, каждые {every} с он поднимает Огненные вихри (влит {times} раз).',
-  'hudChrome.auraEffect.finalBoss.pouredQuench': 'В него влита Закалка: до конца боя всякий, рядом с кем в пределах {reach} м меньше {allies} других игроков, мёрзнет где угодно, со скоростью {share}% от четверти Закалки (влита {times} раз).',
-  'hudChrome.auraEffect.finalBoss.pouredBreath': 'В него влито Дыхание: до конца боя, где бы он ни стоял, каждые {every} с он применяет Скачущую молнию, прыгающую между игроками в пределах {jump} м друг от друга (влито {times} раз).',
-  'hudChrome.auraEffect.finalBoss.pouredHammer': 'В него влит Молот: до конца боя, где бы он ни стоял, каждые {every} с под игроками прорываются Трещины толчка (влит {times} раз).',
+  'hudChrome.auraEffect.finalBoss.pouredHeat':
+    'В него влит Жар: до конца боя, где бы он ни стоял, каждые {every} с поднимаются Огненные вихри.',
+  'hudChrome.auraEffect.finalBoss.pouredQuench':
+    'В него влита Закалка: до конца боя, где бы он ни стоял, каждые {every} с зал пересекают Скрещённые клинки.',
+  'hudChrome.auraEffect.finalBoss.pouredBreath':
+    'В него влито Дыхание: до конца боя, где бы он ни стоял, каждые {every} с падают Небесные удары.',
+  'hudChrome.auraEffect.finalBoss.pouredHammer':
+    'В него влит Молот: до конца боя, где бы он ни стоял, каждые {every} с из пола вырываются столпы.',
   'hudChrome.auraEffect.finalBoss.fury': 'Ярость без хозяина: каждые {every} с наносит всему рейду от {min} до {max} ед. урона, с каждым импульсом на {rise}% больше. Убейте его сейчас. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.coal': 'Через {seconds} с уголь взорвётся: от {min} до {max} ед. урона от огня каждому другому игроку в пределах {reach} м от вас и от {selfMin} до {selfMax} ед. вам. Немедленно отойдите от группы. Героический режим: от {heroicMin} до {heroicMax} и от {heroicSelfMin} до {heroicSelfMax} урона соответственно. Мифический режим: от {mythicMin} до {mythicMax} и от {mythicSelfMin} до {mythicSelfMax}.',
   'hudChrome.auraEffect.finalBoss.tether': 'Осколок Дыхания охотится на вас {seconds} с Его Бьющий шквал каждую секунду наносит от {min} до {max} ед. урона от сил природы всем остальным в пределах {reach} м от него: уведите его от группы. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.chill': 'Скорость передвижения снижена на {pct}% на {seconds} с: вы пересекли Кольцо закалки вне его просветов.',
   'hudChrome.auraEffect.finalBoss.weight': 'Наносит {total} ед. физического урона в секунду ({per} за заряд). Каждый заряд заставляет Осколок Молота бить вас на {step}% сильнее (сейчас на {harder}%). Длится {seconds} с; танки меняются на {swap} зарядах. Каждый заряд усиливает удары на {heroicStep}% в героическом режиме и на {mythicStep}% в мифическом.',
-  'hudChrome.finalAlert.coalTitle': 'Взрывной уголь!',
-  'hudChrome.finalAlert.tetherTitle': 'Привязан ветром!',
-  'hudChrome.finalAlert.weightTitle': 'Нарастающая тяжесть x{stacks}',
   'hudChrome.finalOverload.call': 'Щит {seconds}',
   'hudChrome.finalOverload.enrage': 'Ярость через {seconds}',
   'hudChrome.finalOverload.fury': 'Ярость без хозяина x{stacks}',
@@ -26324,9 +26322,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.striding': 'Идёт в центр',
   'hudChrome.finalOverload.titleCall': 'Зов четвертей',
   'hudChrome.finalOverload.titleFinal': 'Все четверти пробуждены',
-  'hudChrome.finalAlert.emberTitle': 'Метка углей!',
-  'hudChrome.finalAlert.drawnTitle': 'Притянутая молния!',
-  'hudChrome.finalAlert.crushedTitle': 'Раздавлен',
   'hudChrome.auraEffect.seasonalCosmetic': 'Только внешний вид: на бой не влияет',
   'seasonal.event.gourdlight_eve.name': 'Ночь Тыквенных Огней',
   'seasonal.trickOrTreat.row': 'Сладость или гадость!',
@@ -26518,6 +26513,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
 
   'entities.mobs.heart_gale_sentinel.name': 'Часовой шквала',
   'entities.mobs.heart_gale_mender.name': 'Целитель шквала',
+  'hudChrome.auraEffect.breathGuardian.cocoon': "Страж неуязвим, пока поддерживает Небесный разрыв. Если заклинание завершится, разрыв нанесёт всем урон в размере {share}% от максимального запаса здоровья (героический и эпохальный режимы: смертельно). Летите восходящими потоками капитана Тессали на парящие острова на востоке и западе и поддерживайте оба Камня затишья, чтобы прервать его: усмирено {stilled} из 2.",
+  'hudChrome.auraEffect.breathGuardian.ward': "Отводит {cut}% урона от атак, нанесённых в пределах {arc} градусов перед ним. Бейте в спину, пока его цель отворачивает его. Героический и эпохальный режимы: {heroicCut}%.",
+  'hudChrome.breathGuardian.say.thessaly_updraft': "Остров чист! Следующий восходящий поток готов, вперёд!",
+  'hudChrome.breathGuardian.say.thessaly_stone': "Камень проснулся! Направьте на него силу, и пусть ничто вас не ударит!",
+  'abilityUi.cast.heart_breath_skyrend_nova': "Небесный разрыв",
+  'abilityUi.cast.heart_breath_shoving_gale': "Толкающий шквал",
+  'abilityUi.cast.kituse_heart_still_the_gale': "Усмирить шквал",
+  'entities.mobs.heart_gust_herald.name': "Вестник порывов",
+  'entities.mobs.heart_riven_squall.name': "Расколотый шквал",
+  'entities.mobs.heart_squall_fragment.name': "Осколок шквала",
+  'entities.mobs.heart_squall_shieldbearer.name': "Щитоносец шквала",
+  'entities.mobs.heart_breath_stillstone.name': "Камень затишья",
   'hudChrome.knotAlert.aTitle': 'Вы Портал A!',
   'hudChrome.knotAlert.bTitle': 'Вы Портал B!',
   'hudChrome.knotAlert.cTitle': 'Вы Портал C!',

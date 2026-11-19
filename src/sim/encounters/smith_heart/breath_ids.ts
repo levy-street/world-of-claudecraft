@@ -289,6 +289,13 @@ export interface BreathDifficultyRules {
    *  of 2026-11-17 made every tier MUCH stronger (3.2 and 4.4 before): a run
    *  into it barely gains ground, a body left standing goes off the edge. */
   windSpeed: number;
+  /** The indrawn breath's pull toward the guardian (yards a second; the
+   *  kernel's WIND_PULL_AURA). Jose's playtest of 2026-11-18 ("the whirlwind
+   *  barely pulls me"; 5.5 on every tier before): a real threat now, a run
+   *  of 7 straight away from the maw still gains ground but only just
+   *  (Normal about 0.8 yd a second, Heroic about 0.3), a body that stands or
+   *  casts through the 5 s bar is drawn some 30 yards into the vortex. */
+  pullSpeed: number;
   /** The exhale (Bellows Gust) throws everyone this far outward (yards):
    *  0 since the owner's call of 2026-11-17, the Roar's blast carries them
    *  instead (a slid throw left no answer, and read jerky online). */
@@ -397,6 +404,7 @@ export const BREATH_KNOT: Readonly<Record<'heroic' | 'mythic', BreathKnotRules>>
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {
   normal: {
     windSpeed: 5.8,
+    pullSpeed: 6.2,
     gustThrow: 0,
     blastSpeed: 12,
     blastSeconds: 5,
@@ -433,6 +441,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   },
   heroic: {
     windSpeed: 6.6,
+    pullSpeed: 6.7,
     gustThrow: 0,
     blastSpeed: 14,
     blastSeconds: 6,
@@ -473,6 +482,7 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   // Gale and Windworn (one ride per player per round of isles: two groups).
   mythic: {
     windSpeed: 6.6,
+    pullSpeed: 6.7,
     gustThrow: 0,
     blastSpeed: 14,
     blastSeconds: 6,
@@ -557,8 +567,7 @@ export const BREATH_TUNING = {
   inhaleFirst: 25,
   inhaleEvery: 30,
   inhaleCast: 5,
-  /** The pull toward the guardian (a run is 7: walking away barely holds). */
-  pullSpeed: 5.5,
+  // The pull toward the guardian is each tier's (BREATH_DIFFICULTY pullSpeed).
   /** The vortex: this far before the mouth, this wide, this often. */
   vortexAhead: 7,
   vortexR: 4.5,

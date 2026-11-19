@@ -3,7 +3,7 @@
 // of the screen, under the target frame's row: a title, one row per quarter
 // (its name, its bar, its percent; the quarter the boss drinks highlighted in
 // its vein's colour, a bar near bursting throbbing), and a foot line with
-// Taking Root's seconds (or that the boss can be dragged), Vein-Shaken's and
+// Vein-Shaken's and
 // Heart Unbound's; part 2's call and Splinters, the enrage or the fury, the
 // poured elements (the bars held through an intermission, off in the final
 // phase). The skeleton is built once; every per-frame value rides
@@ -30,7 +30,6 @@ interface RowSlots {
 interface Slots {
   title: HTMLElement;
   rows: RowSlots[];
-  root: HTMLElement;
   shaken: HTMLElement;
   unbound: HTMLElement;
   phase: HTMLElement;
@@ -73,9 +72,6 @@ export class HeartOverloadPanel {
       w.setAttr(s.bar, 'aria-valuenow', String(r.pct));
       w.setAttr(s.bar, 'aria-valuetext', r.aria);
     });
-    w.toggleClass(slots.root, 'is-rooted', view.rooted);
-    w.setText(slots.root, view.root);
-    w.setStyleProp(slots.root, 'display', view.root ? 'inline' : 'none');
     w.setText(slots.phase, view.phase);
     w.setStyleProp(slots.phase, 'display', view.phase ? 'inline' : 'none');
     w.toggleClass(slots.phase, 'is-urgent', view.phaseUrgent);
@@ -130,8 +126,6 @@ export class HeartOverloadPanel {
     }
     const foot = doc.createElement('div');
     foot.className = 'ho-foot';
-    const root = doc.createElement('span');
-    root.className = 'ho-root';
     const shaken = doc.createElement('span');
     shaken.className = 'ho-shaken';
     const unbound = doc.createElement('span');
@@ -140,13 +134,13 @@ export class HeartOverloadPanel {
     phase.className = 'ho-phase';
     const splinters = doc.createElement('span');
     splinters.className = 'ho-splinters';
-    foot.append(phase, splinters, root, shaken, unbound);
+    foot.append(phase, splinters, shaken, unbound);
     const poured = doc.createElement('div');
     poured.className = 'ho-poured';
     el.append(title, list, foot, poured);
     layer.appendChild(el);
     this.el = el;
-    this.slots = { title, rows, root, shaken, unbound, phase, splinters, poured };
+    this.slots = { title, rows, shaken, unbound, phase, splinters, poured };
     return el;
   }
 }

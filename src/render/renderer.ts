@@ -380,7 +380,12 @@ import {
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
-import { latchFarLod } from './far_lod_latch';
+import {
+  keepsArticulatedRig,
+  latchFarLod,
+  noteScriptedGesture,
+  scriptedPoseHidden,
+} from './far_lod_latch';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -3060,7 +3065,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
-        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position,
+        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position, this.budgetLights,
       );
     });
     this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
@@ -8557,6 +8562,7 @@ export class Renderer {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return 0;
+    noteScriptedGesture(visual, this.time); // a boss's scripted pose reached this rig
     this.attackTriggerCount++;
     if (!gestureOnly)
       playSkinSwingTrail(this.abilityVfxFx, entityId, this.sim.entities.get(entityId), kind);
@@ -9814,7 +9820,10 @@ export class Renderer {
         // Per-frame visibility follows the create/destroy hysteresis above so
         // rigs at the draw edge do not flicker. The object branch below may
         // still re-hide loot.
-        v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
+        // A boss awaiting its scripted (entrance) pose: hidden until it arrives.
+        v.group.visible =
+          raidEncounterViewVisibleDuringCompile(e, v.compilePending) &&
+          !scriptedPoseHidden(this.activeVisual(v) ?? v, e, this.time);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The
@@ -9828,7 +9837,7 @@ export class Renderer {
         }
         if (shadowsEnabled) {
           // mid-distance rigs keep rendering but leave the shadow pass
-          wantShadow = d2 < shadowRangeSq;
+          wantShadow = d2 < shadowRangeSq || keepsArticulatedRig(e.templateId);
           inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
           v.visual?.setShadow(wantShadow);
           // past the articulated gate the static-pose proxy carries the

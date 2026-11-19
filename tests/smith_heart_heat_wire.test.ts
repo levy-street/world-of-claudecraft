@@ -29,15 +29,17 @@ vi.mock('../server/db', () => ({
 import { GameServer } from '../server/game';
 import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import {
+  gapOf,
   HEAT_AURAS,
   HEAT_CASTS,
   HEAT_CUES,
+  HEAT_DIFFICULTY,
   HEAT_GUARDIAN,
   HEAT_MOBS,
   HEAT_OBJECTS,
   HEAT_STAGES,
   heatTimedOf,
-  riverOf,
+  ringOf,
   swellLaneOf,
   HEAT_TUNING as T,
   wellOf,
@@ -195,7 +197,8 @@ describe('the Guardian of the Heat over the wire', () => {
     put(-206, 0);
 
     // The overflow: it sinks out of reach, the wellspring overflows, the
-    // rivers, heroic's Wellspawn climbing out.
+    // lava waves (their corridors, then a ring rolling out, a moving object),
+    // heroic's Wellspawn climbing out.
     sim.chat('/dev heart heat intermission', a.pid);
     run(T.sinkSeconds + 0.5);
     expect(aura(boss(), HEAT_AURAS.state)?.value2).toBe(HEAT_STAGES.under);
@@ -203,11 +206,22 @@ describe('the Guardian of the Heat over the wire', () => {
     expect(wellOf(objects(HEAT_OBJECTS.wellPrefix)[0].templateId)).toBe('over');
     run(1);
     expect(mobs(HEAT_MOBS.spawn).length).toBeGreaterThan(0);
-    run(T.riverWarn + 1);
-    const rivers = objects(HEAT_OBJECTS.riverPrefix);
-    expect(rivers.length).toBeGreaterThan(0);
-    expect(riverOf(rivers[0].templateId)).not.toBeNull();
-    expect(rivers[0].scale).toBe(T.riverHalf);
+    const rule = HEAT_DIFFICULTY.heroic.waves[0];
+    const gaps = objects(HEAT_OBJECTS.gapPrefix);
+    expect(gaps.length).toBe(rule.gaps);
+    expect(gapOf(gaps[0].templateId)).not.toBeNull();
+    expect(gaps[0].scale).toBe(rule.gapHalf);
+    run(rule.lead);
+    const rings = objects(HEAT_OBJECTS.ringPrefix);
+    expect(rings.length).toBe(1);
+    expect(ringOf(rings[0].templateId)?.gaps.length).toBe(rule.gaps);
+    expect(rings[0].scale).toBe(rule.gapHalf);
+    // It rolls out on the mirror too (the wellspring's middle is the claim's).
+    const wellAt = objects(HEAT_OBJECTS.wellPrefix)[0];
+    const out = (e: Any) => Math.hypot(e.pos.x - wellAt.pos.x, e.pos.z - wellAt.pos.z);
+    const out0 = out(rings[0]);
+    run(0.5);
+    expect(out(objects(HEAT_OBJECTS.ringPrefix)[0])).toBeGreaterThan(out0 + 2);
 
     // Phase 2: the guardian back up, the Hearthseeds and Wakefire's bands.
     sim.chat('/dev heart heat phase 2', a.pid);

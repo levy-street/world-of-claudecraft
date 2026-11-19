@@ -78,8 +78,9 @@ describe('Guardian of the Breath: tooltips and names', () => {
       id: WIND_PULL_AURA,
       kind: 'internal_cd',
       value: 0,
-      value3: T.pullSpeed,
+      value3: BREATH_DIFFICULTY.heroic.pullSpeed,
     });
+    expect(say(draw)).toContain(`${BREATH_DIFFICULTY.heroic.pullSpeed} yd a second`);
     expect(say(draw)).toContain(`${BREATH_DIFFICULTY.normal.blastSpeed} yd a second at its mouth`);
     expect(say(draw)).toContain(`${BREATH_DIFFICULTY.heroic.blastSpeed} on Heroic`);
     const anchor = auraEffectDescriptor({ id: BREATH_AURAS.anchor, kind: 'internal_cd', value: 0 });

@@ -13,12 +13,14 @@
 //                          its gaps, the indrawn breath and Bellows Gust,
 //                          heroic's loose gales); Thessaly's circles of calm
 //                          anchor three at a time (breath_thessaly.ts);
-//                          the Islands of the Wind at the tier's marks (the
-//                          Gale Bulwark, the isles' adds, the rides:
-//                          breath_isles.ts); Storm Lance stays the trash
+//                          Storm Lance stays the trash
 //                          kit's own line. Since 2026-11-03 no wall stands
 //                          round the Cornice: every edge is a fall.
-//   The storm breaks (50)  the wind drawn in, the guardian frozen and torn
+//   The isles (50)         the guardian untouchable in its Gale Cocoon,
+//                          channeling Skyrend Nova; the raid splits to two
+//                          chains of floating isles, clears their adds and
+//                          stills the two Stillstones (breath_isles.ts).
+//   The storm breaks       the wind drawn in, the guardian frozen and torn
 //                          open into a body of lightning, a barrage of strikes
 //                          (breath_storm.ts).
 //   The Storm (50 to 0)    the Leaping Bolt, the Thunder's Cradle, Drawn
@@ -94,7 +96,7 @@ import {
   stepBreathIntro,
 } from './breath_intro';
 import { ISLE_DEV_VERBS, isleDevTrigger, isleReadout } from './breath_isle_dev';
-import { clearIsles, islesDue, startIsles, stepIsles } from './breath_isles';
+import { clearIsles, freshIsles, lockForIsles, startIsles, stepIsles } from './breath_isles';
 import {
   type BreathScope,
   corniceListeners,
@@ -201,7 +203,7 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     swellPulses: 0,
     gustTimer: T.gustFirst,
     cradles: [],
-    isles: { next: 0, round: null, adds: [], paths: [], homes: [], rides: [], grace: {} },
+    isles: freshIsles(),
     roar: null,
     drawn: null,
     blowTimer: T.blowFirst,
@@ -430,11 +432,14 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   if (st.clock + 1e-9 >= THESSALY_PULL_DELAY)
     breathSay(s, thessalyOf(ctx, inst), 'thessaly', 'pull');
   stepBar(s);
+  // At half health the Islands of the Wind (breath_isles.ts): the guardian
+  // untouchable from the mark, the phase begun once no ball is in play; the
+  // storm breaks as it ends.
+  if (lockForIsles(s)) startIsles(s);
   if (stormDue(s)) startStorm(s);
   stepWind(s);
   stepThessaly(s);
-  if (islesDue(s)) startIsles(s);
-  stepIsles(s);
+  stepIsles(s, startStorm);
   stepStorm(s);
   stepBlow(s);
   stepHeart(s);
@@ -534,8 +539,11 @@ export function breathDevTrigger(
   }
   if (ISLE_DEV_VERBS.has(verb)) return isleDevTrigger(s, what.trim().split(/\s+/), pid);
   if (verb === 'phase2' || verb === 'p2' || verb === 'storm') {
-    if (st.half !== 'wind') return 'The storm has already broken.';
+    if (st.half !== 'wind') return 'The storm has already broken (or the isles are up).';
     s.boss.hp = Math.min(s.boss.hp, Math.floor(s.boss.maxHp * T.stormAt));
+    // The isles skipped: spent, the guardian back in reach.
+    st.isles.stage = 'done';
+    s.boss.damageImmune = false;
     cutBar(s);
     clearCastIf(s.boss, s.boss.castingAbility ?? '');
     s.boss.castingAbility = null;

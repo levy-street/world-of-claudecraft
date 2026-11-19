@@ -26,6 +26,16 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_gale_sentinel: 'smith_heart_gale_sentinel',
   // Its own model now: a floating wind caller of pale storm feathers (smith_heart_trash_looks.ts).
   heart_gale_mender: 'smith_heart_gale_mender',
+  // The 50 percent phase's other adds (breath_isle_adds.ts) borrow the Breath's own bodies,
+  // re-coloured and re-sized by their templates: the Gust Herald the hovering storm caller,
+  // the Riven Squall and its Fragments the final's Breath Splinter, the Squall Shieldbearer the
+  // storm-slate warder. Phase 2: their own models.
+  heart_gust_herald: 'smith_heart_breath_caller',
+  heart_riven_squall: 'smith_heart_splinter_breath',
+  heart_squall_fragment: 'smith_heart_splinter_breath',
+  heart_squall_shieldbearer: 'smith_heart_breath_warder',
+  // The Stillstone draws no body (the fight's painter draws the crystal).
+  heart_breath_stillstone: 'smith_heart_stillstone_body',
   // Its own model now: a golem of bright glacier ice over slate joints (manifest.ts).
   heart_quench_warder: 'smith_heart_quench_warder',
   // Its own model now: a floating hooded frost caster with an orb over each palm (manifest.ts).

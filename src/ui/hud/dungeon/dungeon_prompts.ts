@@ -11,12 +11,9 @@
 // Burning Knell's half, Grasp of the Grave, the Reap, the Toll and Harmony
 // readouts, the Rite's candles and the Bound Souls), the Drowned Temple's
 // (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
-// melody, its answer and her broken voice) and the Smith's Heart's Hammer
-// Council's (council_alert_view.ts: the rock, the wake, the Weight,
-// Resonance), its Guardian of the Quench's cold bar (quench_alert_view.ts:
-// the player's own gauge, never advisory) and its Masterless Strength's
-// (final_alert_view.ts: the cold, the ember, the lightning, Crushed; never
-// advisory), plus the trash engine's
+// melody, its answer and her broken voice), the Smith's Heart's Guardian of
+// the Quench's cold bar (quench_alert_view.ts:
+// the player's own gauge, never advisory), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
@@ -48,11 +45,6 @@
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
-import {
-  buildCouncilAlertView,
-  COUNCIL_ALERT_KINDS,
-  councilRushMarked,
-} from './council_alert_view';
 import { CryptAlertSceneScan, type CryptSceneEntity } from './crypt_alert_scene_core';
 import {
   buildCryptAlertView,
@@ -66,7 +58,6 @@ import {
   usePromptYields,
 } from './dungeon_prompt_policy_core';
 import { EncounterAlert } from './encounter_alert_painter';
-import { buildFinalAlertView, FINAL_ALERT_KINDS } from './final_alert_view';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
 import { HeartOverloadPanel } from './heart_overload_painter';
@@ -157,9 +148,7 @@ export class DungeonPrompts {
   private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
-  private readonly council: EncounterAlert;
   private readonly quench: EncounterAlert;
-  private readonly final: EncounterAlert;
   private readonly knot: EncounterAlert;
   private readonly overload: HeartOverloadPanel;
   private readonly overloadView = makeOverloadView();
@@ -182,9 +171,7 @@ export class DungeonPrompts {
     wildheart: false,
     sanctum: false,
     crypt: false,
-    council: false,
     quench: false,
-    final: false,
     knot: false,
     temple: false,
     cryptSoft: false,
@@ -214,11 +201,6 @@ export class DungeonPrompts {
       className: 'ui-panel-strong encounter-alert crypt-alert',
       kinds: CRYPT_ALERT_KINDS,
     });
-    this.council = new EncounterAlert(deps, {
-      id: 'heart-council-alert',
-      className: 'ui-panel-strong encounter-alert heart-council-alert',
-      kinds: COUNCIL_ALERT_KINDS,
-    });
     // The cold bar is the player's own gauge, read the whole fight: docked on
     // the player frame like a secondary resource bar (never the screen's
     // middle; the owner's rule of 2026-11-04), the HUD layer the fallback.
@@ -230,11 +212,6 @@ export class DungeonPrompts {
         kinds: QUENCH_ALERT_KINDS,
       },
     );
-    this.final = new EncounterAlert(deps, {
-      id: 'heart-final-alert',
-      className: 'ui-panel-strong encounter-alert heart-final-alert',
-      kinds: FINAL_ALERT_KINDS,
-    });
     this.knot = new EncounterAlert(deps, {
       id: 'heart-knot-alert',
       className: 'ui-panel-strong encounter-alert heart-knot-alert',
@@ -326,22 +303,13 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
-    // Mountain's Rush on the player is never advisory: the one council mark that kills.
-    const council = dungeonPromptEnabled('council', hints, councilRushMarked(p.auras))
-      ? buildCouncilAlertView({ auras: p.auras })
-      : HINT_HIDDEN;
-    this.council.paint(council);
+    // The Hammer Council paints no prompt: its marks read in the world only
+    // (the team's feedback of 2026-11-17; docs/design/raid/smith_heart.md 7.1).
     // The cold bar is the player's own gauge: never hidden by the hints.
     const quench = dungeonPromptEnabled('quench', hints)
       ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
       : HINT_HIDDEN;
     this.quench.paint(quench);
-    // The Masterless Strength's alert: the player's own gauge and marks,
-    // never advisory; its raid HUD beside the slot.
-    const final = dungeonPromptEnabled('final', hints)
-      ? buildFinalAlertView({ auras: p.auras, dead: p.dead })
-      : HINT_HIDDEN;
-    this.final.paint(final);
     // The Knotted Gale's part in the fight (the panel is the throw's button).
     const knot = dungeonPromptEnabled('knot', hints)
       ? buildKnotAlertView({
@@ -353,6 +321,8 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     this.knot.paint(knot);
+    // The Masterless Strength's raid HUD (its Overload bars): no personal
+    // alert since Jose's playtest of 2026-11-19 (its marks read in the world).
     this.overload.paint(buildOverloadView(this.finalScan.frame(f.world), this.overloadView));
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
@@ -371,10 +341,7 @@ export class DungeonPrompts {
     slot.wildheart = wildheart.visible;
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
-    // The Rush's alert leaves the slot for the screen's upper middle: it holds no slot.
-    slot.council = council.visible && council.kind !== 'rush';
     slot.quench = quench.visible;
-    slot.final = final.visible;
     slot.knot = knot.visible;
     slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
@@ -404,9 +371,7 @@ export class DungeonPrompts {
     this.wildheart.dispose();
     this.sanctum.dispose();
     this.crypt.dispose();
-    this.council.dispose();
     this.quench.dispose();
-    this.final.dispose();
     this.knot.dispose();
     this.overload.dispose();
     this.temple.dispose();

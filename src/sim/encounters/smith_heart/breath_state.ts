@@ -94,35 +94,79 @@ export interface BreathRide {
   total: number;
 }
 
-/** One add of the isles' round. */
+/** The roles of the isles' adds (breath_isle_ids.ts ISLE_MOBS). */
+export type BreathIsleRole =
+  | 'sentinel'
+  | 'mender'
+  | 'herald'
+  | 'squall'
+  | 'fragment'
+  | 'shieldbearer';
+
+/** One add of an isle (breath_isles.ts, breath_isle_adds.ts). */
 export interface BreathIsleAdd {
   id: number;
   isle: number;
-  role: 'sentinel' | 'mender';
-  /** The Mender's next channel (seconds), and its channel's planted spot. */
+  role: BreathIsleRole;
+  /** Its bar's next start (seconds), and the bar's planted spot while it
+   *  runs (the Mender's channel, the Herald's gale). */
   next: number;
   at: { x: number; y: number; z: number } | null;
+  /** The Herald's gale: its line (world unit), locked as the bar begins. */
+  dir?: { ux: number; uz: number };
+  /** A Riven Squall has split already. */
+  split?: boolean;
   /** Its last spot on its isle's floor (breath_isle_hold.ts): a step off
    *  the rim is undone to it. */
   floor?: { x: number; y: number; z: number };
 }
 
-/** The Islands of the Wind (breath_isles.ts). */
+/** One isle's state through the phase. */
+export interface BreathIsleState {
+  /** Its adds have risen (its pad is up). */
+  woken: boolean;
+  /** Every add of it has fallen. */
+  cleared: boolean;
+  /** Its Closing Storm: seconds left (null: not begun), its object. */
+  closing: number | null;
+  closingId: number | null;
+  /** Sky's Reckoning's clock once the storm has closed. */
+  reckon: number;
+  /** The Stillstone's body (the last isles), and whether it is stilled. */
+  stoneId: number | null;
+  stilled: boolean;
+  /** Its shared channel's progress (0 to 1; never decays). */
+  stoneProgress: number;
+}
+
+/** Sky's Reckoning's strike on an isle (instance-local spot). */
+export interface BreathIsleStrike {
+  objectId: number;
+  isle: number;
+  x: number;
+  z: number;
+  remaining: number;
+}
+
+/** The Islands of the Wind, the 50 percent phase (breath_isles.ts). */
 export interface BreathIsles {
-  /** The next threshold (an index into the tier's `isleAt`). */
-  next: number;
-  /** The round in flight: the Bulwark up, the woken isles, its clock. */
-  round: {
-    isles: number[];
-    whole: number;
-    elapsed: number;
-    at: { x: number; y: number; z: number };
-  } | null;
+  /** The phase's step: not yet, the cocoon up (the raid out on the isles),
+   *  the raid riding home before the storm breaks, done. */
+  stage: 'idle' | 'nova' | 'home' | 'done';
+  /** Seconds into the stage. */
+  elapsed: number;
+  /** The guardian's spot as it closed its cocoon. */
+  at: { x: number; y: number; z: number } | null;
+  /** The nova ran out (the raid did not still both stones). */
+  burst: boolean;
+  isles: BreathIsleState[];
   adds: BreathIsleAdd[];
-  /** The Gale Paths on the Cornice and the Homeward Gales on the isles. */
-  paths: { isle: number; objectId: number }[];
-  homes: { isle: number; objectId: number }[];
+  /** The Updrafts up: from (-1 the Cornice) to an isle. */
+  pads: { from: number; to: number; objectId: number }[];
   rides: BreathRide[];
+  strikes: BreathIsleStrike[];
+  /** The Herald's throws sliding. */
+  shoves: BreathShove[];
   /** Bodies a ride set down, to the fight clock their grace ends at. */
   grace: Record<number, number>;
 }
@@ -198,8 +242,9 @@ export interface BreathFightState {
   feat?: SmithHeartFeatAttempt;
   /** Seconds since the pull. */
   clock: number;
-  /** The fight's half: the Wind, the storm breaking, the Storm. */
-  half: 'wind' | 'break' | 'storm';
+  /** The fight's half: the Wind, the Islands of the Wind (the 50 percent
+   *  phase), the storm breaking, the Storm. */
+  half: 'wind' | 'isles' | 'break' | 'storm';
   /** The hashed start of the blows' bearing order (breath_ids.ts blowBearing). */
   start: number;
   wind: BreathWind;

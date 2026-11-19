@@ -20,7 +20,7 @@ import {
   BREATH_TUNING,
   breathWindTemplate,
 } from '../encounters/smith_heart/breath_ids';
-import { ISLE_MOBS } from '../encounters/smith_heart/breath_isle_ids';
+import { ISLE_CASTS, ISLE_MOBS } from '../encounters/smith_heart/breath_isle_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
 import {
   FINAL_ADD_MOBS,
@@ -62,6 +62,8 @@ import {
   QUENCH,
   QUENCH_BLADE_SPOTS,
   RING_PACK_DEGREES,
+  RING_PACKS,
+  ringPoint,
   SEAL_CRYSTAL,
   SLAB,
   SMITH_HEART_ANCHORS,
@@ -285,9 +287,10 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     'nature',
     0x5ab8e8,
   ),
-  // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts):
-  // a warden and a caster on each woken isle; their health is set as they
-  // rise (ISLE_TUNING), the Mender's Mending Gale is encounter-driven.
+  // The Islands of the Wind's adds (encounters/smith_heart/breath_isles.ts,
+  // breath_isle_adds.ts; the 50 percent phase): their health is set as they
+  // rise (ISLE_TIERS), every bar of theirs is encounter-driven. The first
+  // isle: a warden and a mender (Mending Gale, kickable).
   [ISLE_MOBS.sentinel]: {
     ...warder(ISLE_MOBS.sentinel, 'Gale Sentinel', 'Gale Sweep', 0x4f9fc8, 1.9),
     aggroRadius: 10,
@@ -298,6 +301,82 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 10,
     xpMult: 0,
     scale: 1.6,
+  },
+  // The second isle: the Gust Herald (Shoving Gale, a line of wind that
+  // throws toward the rim) and the Riven Squall (it splits in two as it falls).
+  [ISLE_MOBS.herald]: {
+    ...caster(ISLE_MOBS.herald, 'Gust Herald', C.galeBolt, 'Gale Bolt', 'nature', 0x7fc8f0),
+    aggroRadius: 10,
+    xpMult: 0,
+    scale: 1.75,
+  },
+  [ISLE_MOBS.squall]: {
+    ...warder(ISLE_MOBS.squall, 'Riven Squall', 'Squall Rake', 0x6ab0d8, 1.75),
+    aggroRadius: 10,
+    xpMult: 0,
+  },
+  [ISLE_MOBS.fragment]: {
+    ...warder(ISLE_MOBS.fragment, 'Squall Fragment', 'Squall Rake', 0x8cc8e8, 1.15),
+    aggroRadius: 14,
+    xpMult: 0,
+    moveSpeed: 8,
+    arcCleave: undefined,
+  },
+  // The third isle: the Squall Shieldbearer, its Squall Ward turning aside
+  // every blow from the front (the encounter lays it: combat/front_ward.ts).
+  [ISLE_MOBS.shieldbearer]: {
+    ...warder(ISLE_MOBS.shieldbearer, 'Squall Shieldbearer', 'Shield Sweep', 0x3f86b8, 2.2),
+    aggroRadius: 10,
+    xpMult: 0,
+    moveSpeed: 6,
+  },
+  // The Stillstone (the last isle of each side): the stone Captain Thessaly's
+  // calm is bound into. Never hostile, never fights (the encounter holds it
+  // and nothing can strike it); every player on its isle may click it (or
+  // target it and press interact) to still the gale through it together, the
+  // G3 use (mob/trash_kit/encounter_use.ts): ONE shared channel filling
+  // faster the more channel it, a landed hit breaking only that player's
+  // channel, locked while its isle's adds stand (KIT_USE_LOCKED_AURA), stilled
+  // ONCE (KIT_USE_SPENT_AURA). Its literals are breath_isle_ids.ts
+  // ISLE_MOBS.stillstone and ISLE_CASTS.still. The crystal is drawn by the
+  // fight's own painter (render/smith_heart_fx/breath_isles_fx.ts).
+  [ISLE_MOBS.stillstone]: {
+    id: ISLE_MOBS.stillstone,
+    name: 'Stillstone',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    untameable: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 50,
+    hpPerLevel: 0,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 30,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    idleStationary: true,
+    xpMult: 0,
+    trashKit: {
+      usable: {
+        castId: ISLE_CASTS.still,
+        name: 'Still the Gale',
+        // Its bar is the stone's ONE shared channel (breath_isles.ts
+        // stepStones keeps every channeler's bar on it: Normal 15 s alone,
+        // faster with more); this is only the bar's first length.
+        channel: 15,
+        range: 5,
+        effect: { kind: 'relight', school: 'nature' },
+        // No prompt: a click on the crystal starts the channel; its cast bar
+        // and the beam it fires say the rest (Jose's call of 2026-11-18).
+        promptless: true,
+      },
+    },
+    loot: [],
+    scale: 1,
+    color: 0xbfefff,
   },
   heart_quench_warder: warder(
     'heart_quench_warder',
@@ -656,7 +735,11 @@ function toward(x: number, z: number, tx: number, tz: number): number {
  *  layout's, where their cairns stand too). */
 export { RING_PACK_DEGREES };
 
+/** The Ring's four packs (r1 to r4), clockwise from the north-east. */
+const RING_PACK_IDS = RING_PACKS.degrees.map((_, i) => `r${i + 1}`);
+
 const HAMMER_TRIO = ['heart_hammer_warder', 'heart_hammer_warder', 'heart_hammer_warder'];
+const RING_TRIO = ['heart_ring_warder', 'heart_ring_warder', 'heart_ring_warder'];
 const BREATH_TRIO = ['heart_breath_warder', 'heart_breath_caller', 'heart_breath_warder'];
 const QUENCH_TRIO = ['heart_quench_warder', 'heart_quench_caller', 'heart_quench_warder'];
 const HEAT_TRIO = ['heart_heat_warder', 'heart_heat_caller', 'heart_heat_warder'];
@@ -700,8 +783,13 @@ export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
   ...pack('h3', G.h3.x, G.h3.z, HAMMER_TRIO, toward(G.h3.x, G.h3.z, G.h2.x, G.h2.z)),
   // The Hammer Council: one authored pack, so pulling one pulls both.
   ...councilSpawns(),
-  // ---- The Ring: no packs (the team's review of 2026-11-17: "there is enough
-  // to fight without them"); the Ring's cairns still mark where they stood.
+  // ---- The Ring: four packs, half the old eight (the team's doc of 2026-11-17:
+  // "maybe half them instead"), one in each stretch between the Ring's ways,
+  // out toward the rim (the layout's RING_PACKS); the cairns still stand.
+  ...RING_PACKS.degrees.flatMap((deg, i) => {
+    const p = ringPoint(deg, RING_PACKS.r);
+    return pack(RING_PACK_IDS[i], p.x, p.z, RING_TRIO, toward(p.x, p.z, 0, 0));
+  }),
   // ---- The Breath (north) ------------------------------------------------------------
   ...pack('b1', BREATH.b1.x, BREATH.b1.z, BREATH_TRIO, Math.PI),
   ...pack('b2', BREATH.b2.x, BREATH.b2.z, BREATH_TRIO, toward(-64, 112, 0, 104)),
@@ -725,10 +813,10 @@ export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
   ),
 ];
 
-/** Every pack, in route order (the Ring's eight after the Hammer). */
+/** Every pack, in route order (the Ring's four after the Hammer). */
 export const SMITH_HEART_PACKS = {
   hammer: ['h1', 'h2', 'h3'],
-  ring: [] as readonly string[],
+  ring: RING_PACK_IDS as readonly string[],
   breath: ['b1', 'b2', 'b3'],
   quench: ['q1', 'q2', 'q3'],
   heat: ['f1', 'f2', 'f3'],
@@ -841,6 +929,10 @@ export const SMITH_HEART_SEAL_MARKERS: readonly { x: number; z: number }[] = [
   { x: -40, z: 110 },
   { x: -100, z: 165 },
   { x: 0, z: 196 },
+  // The southern void under the Cornice (the Islands of the Wind's south-west
+  // chain and the old east chain's air; the east chain over the crown since
+  // 2026-11-18 stands within the Cornice's own marker's reach).
+  { x: 32, z: 112 },
   // The Quench, the Singing Ice, the Basin.
   { x: 116, z: -26 },
   { x: 166, z: -76 },

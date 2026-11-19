@@ -4782,9 +4782,9 @@ export const zh_CN: EnTranslations = {
         "spent": "你的锚定已经耗尽：在此效果结束前，瑟萨莉队长的宁静之环无法再次锚定你。",
         "drawn": "每{every}秒会有一道闪电落在你所站之处：{warn}秒后对{radius}码内的所有人造成{min}到{max}点伤害，并留下带电的地面，在{charged}秒内每秒造成{cmin}到{cmax}点伤害。保持移动，把落雷引向远离团队的边缘。英雄和史诗难度：分别为{heroicMin}到{heroicMax}点和{heroicCMin}到{heroicCMax}点伤害。",
         "cradled": "被举入风暴，在守护者引导摇篮的{hold}秒内被定住；其间守护者不会施放其他任何技能。随后的放电造成{total}点伤害，由你和你下方{radius}码内的所有人分担。分担人数少于{soakers}人时，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}点伤害。英雄难度：同时举起{heroicCount}名玩家，每次放电{heroicTotal}点，需要{heroicSoakers}人分担，团队要分头承受。英雄和史诗难度：反冲造成{heroicBMin}到{heroicBMax}点伤害。",
-        "bulwark": "风之护盾还能吸收{left}点伤害。只要浮岛上还有任一狂风哨兵或狂风愈者存活，它每秒恢复总量的{regrow}%，每次愈合之风恢复{mend}%。乘狂风之路飞往浮岛，消灭它们。维持{max}秒后，它会在崖台上爆裂，造成{bmin}到{bmax}点伤害。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
+        "cocoon": "守护者引导天裂新星时无法受到伤害。若引导完成，新星对所有人造成最大生命值{share}%的伤害（英雄和史诗难度：致命）。乘上塞萨莉队长的上升气流前往东西两侧的浮空岛，引导两块静风石来打断它：已平息 {stilled}/2。",
         "riding": "风沿着固定的路线带你越过虚空：在被放下之前你无法行动。",
-        "windworn": "被风耗尽了力气：效果结束前，狂风之路不会带你前往浮岛。",
+        "ward": "偏转来自其正面{arc}度以内攻击的{cut}%伤害。在其目标将它转开时攻击它的背后。英雄和史诗难度：{heroicCut}%。",
         "thrown": "被巅峰咆哮掀飞：落地之前无法移动。",
         "blast": "巅峰咆哮的狂风将你吹离守护者：在其口前每秒{speed}码，越远越弱，共持续{seconds}秒。立刻逆风直奔回去，或站进塞萨莉的锚点，否则会被吹下飞檐。",
         "tossed": "被游荡狂风掀飞：狂风放下你之前无法移动。",
@@ -4813,11 +4813,11 @@ export const zh_CN: EnTranslations = {
         "tempered": "淬火打击已淬炼你{stacks}次：你的寒意不会低于{floor}，你受到的冰霜伤害提高{pct}%。每次命中你的淬火打击都会叠加一层（每层{cold}点寒意和{per}%冰霜伤害），并将持续时间重置为{seconds}秒。达到{swap}层时换坦。英雄和史诗难度下，{heroicMax}层会将你的寒意维持在{max}，你会被冻结；普通难度最多{normalMax}层（{normalFloor}点寒意）。"
       },
       "heatGuardian": {
-        "statePhase1": "半身沉在涌泉之中，从不移动。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。",
-        "statePhase2": "半身沉在涌泉之中，从不移动。玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。",
-        "statePhase3": "半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。",
+        "statePhase1": "半身沉在涌泉之中，从不移动。炉心之轮把岸边切成四块：三块发红并在{warn}秒后爆发（英雄难度{heroicWarn}秒），一块保持黑暗、安全；每一轮爆发时，下一轮的安全区会出现在别处。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。",
+        "statePhase2": "半身沉在涌泉之中，从不移动。炉心之轮与玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。",
+        "statePhase3": "半身沉在涌泉之中，从不移动。炉心之轮、玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。",
         "intro": "在涌泉中冰冷沉寂：在团队靠近、它苏醒燃起之前，无法被攻击或伤害。",
-        "stateUnder": "沉入涌泉之中：炉心满溢期间无法被攻击或伤害。满溢结束后它会再次升起。",
+        "stateUnder": "沉入涌泉之中：炉心满溢期间无法被攻击或伤害。熔岩之环一圈接一圈地从涌泉中涌出，每一圈都有两处火焰分开的缺口；下一圈的缺口会在它到来之前在地面上发光。熔岩环经过时站进缺口里，否则会受到{min}到{max}点火焰伤害（英雄难度{heroicMin}到{heroicMax}点）。第二次满溢的熔岩环来得更快，缺口也更窄。最后一圈过去后它会再次升起。",
         "scorched": "受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%。每{every}秒，炉心闪焰会击中所有距离涌泉超过{reach}码的人并刷新此效果。",
         "grip": "每秒受到{total}点火焰伤害（{stacks}层中每层{per}点）。守护者每次命中都会叠加一层（最多{most}层），持续{seconds}秒：在灼烧过重之前换坦克。",
         "kindling": "{seconds}秒后你会在{trail}秒内留下火焰足迹。每一块足迹每秒对友方造成{min}到{max}点火焰伤害，并为站在其中的涌泉之子每秒恢复{heal}%生命值：离开团队和涌泉之子的路线。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
@@ -4826,38 +4826,37 @@ export const zh_CN: EnTranslations = {
         "crust": "已冷却变硬：此效果结束前，击打无法将它打退。"
       },
       "finalBoss": {
-        "stateHeat": "饮下炽热：玄武岩之拳砸向一名玩家所在的位置，三道熔岩涌浪从那里滚滚而出，火焰旋风在地面上穿行。英雄难度下，余烬印记会在远程玩家脚下落下火焰；史诗难度下，它的正面攻击会留下熔炉之火。",
-        "stateQuench": "饮下淬火：{reach}码内其他玩家少于{allies}名的人会越来越冷并被冻结。英雄难度下，被标记玩家脚下的冰面会碎裂；史诗难度下，它的正面攻击会减速{slow}%。",
-        "stateBreath": "饮下吐息：狂风把团队推向边缘，跳跃雷击会在彼此相距{jump}码以内的玩家之间跳跃。英雄难度下，引雷会标记玩家；史诗难度下，每个风暴宝珠都必须由一名玩家拾取。",
-        "stateHammer": "饮下重锤：震颤裂痕在玩家脚下爆发，铁砧之重把伤害分摊给标记内的所有人。英雄难度下，石壳会吸收治疗，铁砧的分摊者会被粉碎；史诗难度下，铁砧的标记会绕着它旋转。",
-        "stateRing": "身处中央圆环时，它不饮下任何一角的力量。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。",
+        "stateHeat": "饮下炽热：玄武之拳砸向玩家所站之处，三道熔岩涌浪从那里滚出。它的星辰火焰旋风苏醒并持续到战斗结束：高耸的火柱在地面上疾驰。英雄难度下，余烬印记会把火焰落在远程玩家脚下；史诗难度下，它的正面攻击会留下锻炉之火。",
+        "stateQuench": "饮下淬火。它的星辰交错之刃苏醒并持续到战斗结束：一把冰剑沿着穿过被标记玩家的直线横扫，击碎线上的所有石柱。英雄难度下，被标记玩家脚下的冰会碎裂；史诗难度下，它的正面攻击使移动速度降低{slow}%。",
+        "stateBreath": "饮下吐息：跳跃闪电在彼此相距{jump}码以内的玩家之间跳跃。它的星辰天落雷击苏醒并持续到战斗结束：闪电劈向玩家脚下，落在石柱旁的闪电会环绕石柱形成电弧并使其带电。英雄难度下，牵引闪电会标记玩家；史诗难度下，每颗风暴宝珠都必须由一名玩家接下。",
+        "stateHammer": "饮下重锤：震颤裂痕在玩家脚下爆发。它的星辰石之苏醒苏醒并持续到战斗结束：石柱从地面冲出，直到被交错之刃击碎前都会一直矗立。英雄难度下，石壳会吸收治疗。",
+        "stateRing": "身处中央圆环时，它不饮下任何一角的力量：所有已苏醒的星辰都以{pace}%的速度运转。生命值高于{pct}%时，它在那里每秒获得一层心之脱缚。",
         "overloadHeat": "炽热过载，已满{value}%。首领站在炽热区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。",
         "overloadQuench": "淬火过载，已满{value}%。首领站在淬火区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。",
         "overloadBreath": "吐息过载，已满{value}%。首领站在吐息区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。",
         "overloadHammer": "重锤过载，已满{value}%。首领站在重锤区域时它会充能（从空到满需{fill}秒），并每{every}秒对团队造成脉冲伤害：空时{min}点，满时最高{max}点。即将充满时会警告团队。充满时会爆发，对整个团队造成伤害并清空：普通难度{normalMin}至{normalMax}点（靠治疗可以撑过），英雄难度{heroicMin}至{heroicMax}点（很重：先抬满血并使用减伤技能），史诗难度{mythicMin}至{mythicMax}点（致命：只有强力的个人减伤才能存活）。首领离开该区域后，它以三分之一的速度消退。其脉冲在英雄难度造成{heroicPulseMin}到{heroicPulseMax}点伤害，在史诗难度造成{mythicPulseMin}到{mythicPulseMax}点伤害。",
-        "root": "进入一个区域后扎根{seconds}秒：扎根结束前无法把它拖出去。",
         "unbound": "每层每秒对整个团队造成{per}点伤害（当前{total}点）；站在中央圆环内时每秒获得一层。把它拖出圆环即可结束。英雄难度：每层{heroicPer}点。史诗难度：每层{mythicPer}点。",
         "shaken": "持续期间，切换区域对你造成的伤害提高至{mult}倍（{min}至{max}点，而非{baseMin}至{baseMax}点）。每次切换都会将其刷新为{seconds}秒。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
-        "cold": "寒冷值{value}/100。{reach}码内其他玩家少于{allies}名时每秒上升{rise}点，达到人数后下降。达到100时你会被霜封住：昏迷{freeze}秒并受到{min}至{max}点冰霜伤害。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
-        "frozen": "昏迷。你因独自站立而被冻结：在它饮下淬火时，保持在{allies}名或更多其他玩家的{reach}码内。",
         "underIce": "昏迷：你从碎裂的冰面掉了下去。",
         "numbing": "被它的正面攻击减速{pct}%，持续{seconds}秒。",
         "ember": "{seconds}秒后余烬会落在你的脚下，在{radius}码的范围内阴燃{life}秒，每秒对其中的任何人造成{min}至{max}点火焰伤害。与其他被标记的玩家站到同一个角落，然后离开。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
-        "wind": "狂风每秒把你朝它吹的方向推动{speed}码；顶着风走才能站稳（不会打断施法）。狂风吹拂时，处于边缘{band}码以内会每秒受到{min}至{max}点自然伤害。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
         "drawn": "在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
         "shell": "吸收你受到的下{value}点治疗。",
+        "skyMark": "{seconds}秒后闪电会劈在你所站之处：对{radius}码内的所有人造成{min}到{max}点自然伤害。快离开。落在石柱{arcReach}码内的闪电会环绕石柱形成电弧，使其被风暴充能。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。",
+        "bladeMark": "一把交错之刃把它的直线瞄准了你：直线会跟随你，并在飞出前{lock}秒锁定。把直线引过石柱将其击碎，然后离开直线。直线上的所有人受到{min}到{max}点冰霜伤害。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。",
         "crushed": "{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。",
+        "anvilMark": "铁砧之重跟随着你：它的{radius}码法圈随你移动，并在落下前{lock}秒固定。让团队聚集在圈内：{total}点物理伤害由圈内所有人分担，少于{fewer}人时每人多承受一半。英雄：{heroicTotal}。史诗：{mythicTotal}。",
         "phaseCall": "四角召唤：只要碎片还活着，它就在中央受到护盾保护{seconds}秒。每个碎片每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。将它们全部击杀可提前打破护盾；召唤结束时仍存活的碎片会把自己的元素注入它体内，直到战斗结束。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
         "phaseFight": "生命值降到{first}%和{second}%时，它会在护盾保护下走入中央，从最满的几个角各召出一个碎片。降到{final}%时四个角全部苏醒，开始最后的抵抗。",
-        "phaseFinal": "四个角已全部苏醒：它停留在中央圆环，每{every}秒依次施放一种技能：火焰旋风、呻吟之冰、跳跃闪电、铁砧之重。{enrage}秒后它将失去一切克制（无主之怒）。",
+        "phaseFinal": "四个角已全部苏醒：它停留在中央圆环，四颗星辰同时以{pace}%的速度运转，石柱、闪电、冰刃与旋风一齐袭来。{enrage}秒后它将失去一切克制（无主之怒）。",
         "phaseKneel": "它跪下了。任何攻击都无法伤害它。",
         "phaseRebirth": "心脏正在搏动。在它以{percent}%生命值站起之前，任何攻击都无法伤害它。",
         "unmade": "每{every}秒铁砧的一整块区域坠落，过载条最满的区域最先，坠落前有{warn}秒裂纹警告。站在其上的人会一同坠落并死亡。最后一块区域坠落{ring}秒后，中央圆环破碎，所有人死亡。",
         "shield": "聚集之力：免疫所有伤害，且无法被选为目标。",
-        "pouredHeat": "炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会掀起火焰旋风（已注入{times}次）。",
-        "pouredQuench": "淬火注入其中：直到战斗结束，{reach}码内其他玩家少于{allies}名的人在任何地方都会变冷，速度为淬火之角的{share}%（已注入{times}次）。",
-        "pouredBreath": "吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会施放跳跃闪电，在彼此相距{jump}码内的玩家之间跳跃（已注入{times}次）。",
-        "pouredHammer": "重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会在玩家脚下迸发震颤裂隙（已注入{times}次）。",
+        "pouredHeat": "炽热注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会升起火焰旋风。",
+        "pouredQuench": "淬火注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会有交错之刃横扫大厅。",
+        "pouredBreath": "吐息注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会落下天落雷击。",
+        "pouredHammer": "重锤注入其中：直到战斗结束，无论它站在哪里，每{every}秒都会有石柱冲出。",
         "fury": "无主之怒：每{every}秒对整个团队造成{min}到{max}点伤害，每次脉动提高{rise}%。立刻击杀它。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
         "coal": "{seconds}秒后煤块爆裂：对你{reach}码内的所有其他玩家造成{min}到{max}点火焰伤害，对你自己造成{selfMin}到{selfMax}点。现在就离开人群。英雄难度：分别为{heroicMin}到{heroicMax}点和{heroicSelfMin}到{heroicSelfMax}点伤害。史诗难度：分别为{mythicMin}到{mythicMax}点和{mythicSelfMin}到{mythicSelfMax}点。",
         "tether": "吐息碎片追猎你{seconds}秒。它的狂袭之风每秒对它{reach}码内的其他所有人造成{min}到{max}点自然伤害：把它从人群中拖走。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。",
@@ -7348,14 +7347,6 @@ export const zh_CN: EnTranslations = {
         "singer_soul": "听啊。在岩石之中，我的歌永不终结。",
         "singer_wipe": "嘘。矿脉已归于寂静。",
         "singer_defeat": "最后一个音……消散了。"
-      },
-      "alert": {
-        "wakeTitle": "唤醒岩石！",
-        "rockTitle": "落石！",
-        "resonanceTitle": "共鸣",
-        "rushTitle": "山岳冲锋！",
-        "weightTitle": "重锤之压",
-        "timeAria": "剩余{seconds}秒"
       }
     },
     "knotAlert": {
@@ -7393,6 +7384,8 @@ export const zh_CN: EnTranslations = {
         "guardian_death": "气息……回归……群山……",
         "thessaly_pull": "高望与你们同在！这上面没有墙：风会把你们从边缘吹下去！",
         "thessaly_isles": "它的护盾靠浮岛供能！乘风飞过去，干掉愈者再回来！",
+        "thessaly_updraft": "岛屿已肃清！下一道上升气流已经升起，快走！",
+        "thessaly_stone": "石头醒了！引导它，别让任何东西打到你！",
         "thessaly_circle_a": "快进我的宁静之中！最多三人，不能再多！",
         "thessaly_circle_b": "这里！站在我身边，让风撞碎在我们身上！",
         "thessaly_circle_c": "石上的宁静！三个人，现在就来！",
@@ -7498,8 +7491,6 @@ export const zh_CN: EnTranslations = {
       "quench": "淬火",
       "breath": "吐息",
       "hammer": "重锤",
-      "rooted": "扎根 {seconds}",
-      "free": "可以拖动",
       "shaken": "动摇 {seconds}",
       "unbound": "脱缚 x{stacks}",
       "barAria": "{quarter}过载 百分之{pct}",
@@ -7515,14 +7506,6 @@ export const zh_CN: EnTranslations = {
       "fury": "无主之怒 x{stacks}",
       "poured": "已注入：{elements}",
       "pouredTimes": "{quarter} x{times}"
-    },
-    "finalAlert": {
-      "emberTitle": "余烬印记！",
-      "drawnTitle": "引雷！",
-      "crushedTitle": "粉碎",
-      "coalTitle": "爆裂煤块！",
-      "tetherTitle": "风之束缚！",
-      "weightTitle": "渐增重压 x{stacks}"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -16944,8 +16927,10 @@ export const zh_CN: EnTranslations = {
       "heart_breath_cradle_channel": "雷霆摇篮",
       "heart_breath_bellows_blow": "风箱重击",
       "heart_breath_thunder_lash": "雷霆鞭笞",
-      "heart_breath_gale_bulwark": "狂风壁垒",
+      "heart_breath_skyrend_nova": "天裂新星",
       "heart_breath_mending_gale": "愈合之风",
+      "heart_breath_shoving_gale": "推搡狂风",
+      "kituse_heart_still_the_gale": "平息狂风",
       "heart_quench_blades_wake": "诸刃苏醒",
       "heart_quench_blades_hunt": "利刃狩猎",
       "heart_heat_fist": "玄武岩之拳",
@@ -26908,6 +26893,21 @@ export const zh_CN: EnTranslations = {
       },
       "heart_gale_mender": {
         "name": "狂风愈者"
+      },
+      "heart_gust_herald": {
+        "name": "阵风使者"
+      },
+      "heart_riven_squall": {
+        "name": "裂空飑"
+      },
+      "heart_squall_fragment": {
+        "name": "飑之碎片"
+      },
+      "heart_squall_shieldbearer": {
+        "name": "飑之持盾者"
+      },
+      "heart_breath_stillstone": {
+        "name": "静风石"
       },
       "heart_quench_warder": {
         "name": "淬脉守卫"

@@ -179,9 +179,6 @@ export const FINAL_PHASE_CUES = {
   ringCrack: 'heart_final_ring_crack',
   /** The central ring breaks: the wipe (spellfxAt at the centre). */
   ringBreak: 'heart_final_ring_break',
-  /** A turn of the final phase's mix begins (spellfxAt at the centre, its
-   *  school the turn's element: FINAL_VEIN_SCHOOL). */
-  mixTurn: 'heart_final_mix_turn',
 } as const;
 
 /** The damage, aura and mob names (combat log, nameplates, the buff bar;
@@ -450,20 +447,14 @@ export const FINAL_PHASES = {
   orbEvery: 13,
 
   // -- the poured elements (for the rest of the fight) --
-  /** Each poured element's normal-tier signature fires wherever the boss
-   *  stands, this often (seconds), divided by the times it was poured.
-   *  The Quench's cold runs everywhere at this share of its rise (times the
-   *  pours, never past whole). */
-  pouredHeatEvery: 26,
-  pouredBreathEvery: 22,
-  pouredHammerEvery: 20,
-  pouredColdShare: 0.5,
+  // Since the rework of 2026-11-18 a poured element is its quarter's star
+  // woken (if it slept) and running at full pace wherever the boss stands
+  // (final_stars.ts, FINAL_TUNING.reducedPace for the unpoured).
 
   // -- the final phase --
-  /** One ability of each element in turn, this far apart: Fire Whirls,
-   *  Groaning Ice, Leaping Bolt, Weight of the Anvil. */
-  mixFirst: 4,
-  mixEvery: 7,
+  // Since the rework of 2026-11-18 all four stars run at once at
+  // FINAL_TUNING.finalPace with their interactions (the mix of one ability
+  // in turn is gone); Weight of the Anvil keeps its own clock.
   /** The soft enrage: this long after the final phase begins, Masterless
    *  Fury pulses the raid every `furyEvery` seconds, `furyMin`..`furyMax`
    *  growing by `furyRise` of that each pulse. */
@@ -505,9 +496,6 @@ export const FINAL_PHASES = {
   plungeGravity: 21,
   plungeSeconds: 2.4,
 } as const;
-
-/** The final phase's mix, in turn. */
-export const FINAL_MIX: readonly SmithHeartVein[] = ['heat', 'quench', 'breath', 'hammer'];
 
 // ---- pure helpers -------------------------------------------------------------------------
 

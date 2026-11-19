@@ -6,10 +6,9 @@
 // a handful of fields. Local presentation: a sound never decides anything.
 
 import { HEART_QUARTER_ORDER } from '../sim/content/smith_heart_quarters';
-import { FINAL_AURAS, FINAL_CUES, overloadAuraId } from '../sim/encounters/smith_heart/final_ids';
+import { FINAL_CUES, overloadAuraId } from '../sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS,
-  FINAL_PHASE_CUES,
   FINAL_STAGE_CODES,
 } from '../sim/encounters/smith_heart/final_phase_ids';
 import type { Entity, SimEvent } from '../sim/types';
@@ -17,20 +16,17 @@ import {
   FINAL_BAR_SOUNDS,
   FINAL_CUE_SOUNDS,
   FINAL_FOOTPRINT_SOUNDS,
-  FINAL_GALE_LOOP,
   FINAL_MARK_SOUNDS,
   FINAL_OVERLOAD_RISING,
   FINAL_REBUILD_SOUND,
   FINAL_SFX_KEYS,
   type FinalFootprintKind,
   finalBarRate,
-  MIX_TURN_STING,
   overloadPulseSound,
   overloadRisingDue,
   rebuildDue,
 } from './smith_heart_final_audio_core';
 import { HeartMarkEar } from './smith_heart_mark_audio';
-import { coldWarningDue, QUENCH_COLD_SOUNDS } from './smith_heart_quench_audio_core';
 
 export interface FinalAudioSink {
   playAt(
@@ -51,7 +47,6 @@ export interface FinalAudioSink {
   preload?(key: string): void;
 }
 
-const GALE_LOOP = 'heart-final-gale';
 /** The boss and the Splinters (at most four): one bar slot each. */
 const MAX_BARS = 5;
 const OVERLOAD_IDS = HEART_QUARTER_ORDER.map((v) => overloadAuraId(v));
@@ -88,8 +83,6 @@ export class FinalAudio {
   private readonly barTotals: number[] = new Array(MAX_BARS).fill(0);
   private overload = 0;
   private fallen = 0;
-  private cold = 0;
-  private galing = false;
 
   constructor(private readonly sink: FinalAudioSink) {}
 
@@ -145,17 +138,15 @@ export class FinalAudio {
         }
       }
       this.play(sound.key, x, y + 1, z, gain, rate, sound.cooldown);
-      if (ev.type === 'spellfxAt' && ev.ability === FINAL_PHASE_CUES.mixTurn) {
-        const sting = MIX_TURN_STING[ev.school ?? ''];
-        if (sting) this.play(sting.key, x, y + 2, z, sting.gain, sting.rate, 1);
-      }
     }
     return true;
   }
 
   /** A footprint of `kind` first appeared at (x, y, z): its warning. */
-  footprint(kind: FinalFootprintKind, x: number, y: number, z: number): void {
-    const s = FINAL_FOOTPRINT_SOUNDS[kind];
+  footprint(kind: string, x: number, y: number, z: number): void {
+    const s = Object.hasOwn(FINAL_FOOTPRINT_SOUNDS, kind)
+      ? FINAL_FOOTPRINT_SOUNDS[kind as FinalFootprintKind]
+      : undefined;
     if (!s) return;
     this.preload();
     this.play(s.key, x, y + 1, z, s.gain, s.rate, 0.25);
@@ -194,15 +185,13 @@ export class FinalAudio {
 
   /**
    * One frame in the Heart: the boss (null out of the room), the Splinters
-   * (their ids, read through `entityOf`), Bellows Wind's gale while it blows
-   * (its spot, or null), the local player, and the Anvil's centre (where the
+   * (their ids, read through `entityOf`), the local player, and the Anvil's centre (where the
    * floor rises back).
    */
   update(
     boss: Entity | null,
     splinterIds: readonly number[],
     entityOf: (id: number) => Entity | undefined,
-    gale: { x: number; y: number; z: number } | null,
     me: Entity | null,
     centre: { x: number; y: number; z: number } | null,
   ): void {
@@ -239,34 +228,9 @@ export class FinalAudio {
         2,
       );
     this.fallen = fallen;
-    // Bellows Wind's gale.
-    if (gale) {
-      this.sink.loop?.(
-        GALE_LOOP,
-        FINAL_GALE_LOOP.key,
-        FINAL_GALE_LOOP.gain,
-        gale.x,
-        gale.y + 2,
-        gale.z,
-      );
-      this.galing = true;
-    } else if (this.galing) {
-      this.sink.unloop?.(GALE_LOOP, FINAL_GALE_LOOP.fadeOut);
-      this.galing = false;
-    }
-    // The local player's marks and their Quenching Cold.
+    // The local player's marks.
     this.marks.update(me, this.sink);
-    const cold = me && !me.dead ? (auraOf(me, FINAL_AURAS.cold)?.value ?? 0) : 0;
-    const due = me ? coldWarningDue(this.cold, cold) : null;
-    if (me && due) {
-      const s = QUENCH_COLD_SOUNDS[due];
-      this.play(s.key, me.pos.x, me.pos.y + 1.6, me.pos.z, s.gain, 1, 1);
-    }
-    this.cold = cold;
   }
 
-  dispose(): void {
-    if (this.galing) this.sink.unloop?.(GALE_LOOP, 0.3);
-    this.galing = false;
-  }
+  dispose(): void {}
 }

@@ -18,7 +18,12 @@
 import * as THREE from 'three';
 import { BREATH } from '../../sim/content/smith_heart_layout';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
-import { BREATH_FIGHT_COLORS as C, WIND_STREAKS, windStreakSeed } from './breath_fight_fx_core';
+import {
+  BREATH_FIGHT_COLORS as C,
+  INHALE_SWIRL,
+  WIND_STREAKS,
+  windStreakSeed,
+} from './breath_fight_fx_core';
 
 /** Segments along a streak (its waver bends it). */
 const SEGMENTS = 8;
@@ -34,6 +39,7 @@ uniform vec2 uCentre;
 uniform vec2 uFocus;
 uniform vec2 uRadii;
 uniform float uInward;
+uniform float uSwirl;
 uniform float uFront;
 attribute vec4 aSeed;
 varying float vT;
@@ -45,12 +51,16 @@ void main() {
   vec2 p;
   vec2 fwd;
   if (uInward > 0.5) {
-    // Drawn in down a radius to the guardian, fading at its mouth.
-    float ang = aSeed.x * 3.14159265;
-    vec2 rad = vec2(sin(ang), cos(ang));
+    // Drawn in to the guardian on the whirl's log spiral (INHALE_SWIRL:
+    // every streak curling the same way round it, tighter as it closes in),
+    // fading at its mouth.
     float r = mod(aSeed.z * 50.0 - uFlowT * uRate, 50.0) + 4.0;
-    p = uFocus + rad * (r + (1.0 - t) * len);
-    fwd = -rad;
+    float rr = r + (1.0 - t) * len;
+    float ang = aSeed.x * 3.14159265 - uSwirl * log(max(rr, 1.0));
+    vec2 rad = vec2(sin(ang), cos(ang));
+    p = uFocus + rad * rr;
+    // Its heading: inward along the spiral (minus d p / d r).
+    fwd = normalize(-rad + uSwirl * vec2(cos(ang), -sin(ang)));
     vFade = smoothstep(4.0, 9.0, r);
   } else {
     vec2 side = vec2(uDir.y, -uDir.x);
@@ -150,6 +160,7 @@ export class BreathWindStreaks {
         uFocus: { value: new THREE.Vector2(C0.x, C0.z) },
         uRadii: { value: new THREE.Vector2(C0.rx, C0.rz) },
         uInward: { value: 0 },
+        uSwirl: { value: INHALE_SWIRL.twist },
         uFront: { value: -1 },
         uStrength: { value: 0 },
         uHead: { value: new THREE.Color(C.streak) },

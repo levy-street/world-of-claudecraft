@@ -8,13 +8,10 @@
 // (src/sim/encounters/smith_heart/final_ids.ts), the same constants the sim
 // reads (Normal's numbers, but the Overload burst's, which names all three
 // tiers: survivable, heavy, lethal); the bar's fill, a stack count and the zone come
-// off the aura itself. The final's wind is the wind kernel's own aura, told
-// from the Guardian of the Breath's by its tag (`value3`). Pinned by
-// tests/smith_heart_final_ui.test.ts.
+// off the aura itself. Pinned by tests/smith_heart_final_ui.test.ts.
 
 import type { SmithHeartVein } from '../sim/content/smith_heart_layout';
 import { HEART_FINAL_PHASE_SHARE } from '../sim/content/smith_heart_quarters';
-import { FINAL_WIND_TAG } from '../sim/encounters/smith_heart/final_breath';
 import {
   FINAL_AURAS,
   FINAL_DIFFICULTY,
@@ -24,7 +21,6 @@ import {
   pulseScale,
   FINAL_TUNING as T,
 } from '../sim/encounters/smith_heart/final_ids';
-import { WIND_DRIFT_AURA } from '../sim/wind_drift';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
 import { finalPhaseAuraEffectDescriptor } from './final_phase_aura_effect';
 import { tierRange, tierValue } from './heart_tier_damage';
@@ -63,9 +59,8 @@ function stateDescriptor(a: AuraEffectInput): AuraEffectDescriptor {
   return {
     key: `${KEY}.${STATE_KEYS[zone]}`,
     nums: {
-      allies: T.coldAllies,
-      reach: T.coldReach,
       slow: pct(1 - T.numbingSlow),
+      pace: pct(T.reducedPace),
       jump: T.boltJump,
       pct: pct(HEART_FINAL_PHASE_SHARE),
     },
@@ -106,8 +101,6 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
   switch (a.id) {
     case FINAL_AURAS.state:
       return stateDescriptor(a);
-    case FINAL_AURAS.root:
-      return { key: `${KEY}.root`, nums: { seconds: T.rootSeconds } };
     case FINAL_AURAS.unbound: {
       const stacks = Math.max(1, Math.round(a.stacks ?? a.value ?? 1));
       return {
@@ -133,22 +126,6 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
           ...tiers(T.shockMin * T.shakenMult, T.shockMax * T.shakenMult),
         },
       };
-    case FINAL_AURAS.cold:
-      return {
-        key: `${KEY}.cold`,
-        nums: {
-          value: Math.max(0, Math.min(100, Math.round(a.value ?? 0))),
-          rise: T.coldRise,
-          allies: T.coldAllies,
-          reach: T.coldReach,
-          freeze: T.freezeSeconds,
-          min: tierValue(T.freezeMin, NM),
-          max: tierValue(T.freezeMax, NM),
-          ...tiers(T.freezeMin, T.freezeMax),
-        },
-      };
-    case FINAL_AURAS.frozen:
-      return { key: `${KEY}.frozen`, nums: { reach: T.coldReach, allies: T.coldAllies } };
     case FINAL_AURAS.underIce:
       return { key: `${KEY}.underIce`, nums: {} };
     case FINAL_AURAS.numbing:
@@ -183,16 +160,41 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
       return { key: `${KEY}.shell`, nums: { value: Math.round(a.value ?? T.shellAbsorb) } };
     case FINAL_AURAS.crushed:
       return { key: `${KEY}.crushed`, nums: { seconds: T.crushedSeconds, mult: T.crushedMult } };
-    case WIND_DRIFT_AURA:
-      if (a.value3 !== FINAL_WIND_TAG) return null;
+    case FINAL_AURAS.skyMark:
       return {
-        key: `${KEY}.wind`,
+        key: `${KEY}.skyMark`,
         nums: {
-          speed: a.value2 ?? T.windSpeed,
-          band: T.rimBand,
-          min: tierValue(T.rimMin, NM),
-          max: tierValue(T.rimMax, NM),
-          ...tiers(T.rimMin, T.rimMax),
+          radius: T.skyR,
+          seconds: T.skyWarn,
+          min: tierValue(T.skyMin, NM),
+          max: tierValue(T.skyMax, NM),
+          arcReach: T.arcReach,
+          ...tiers(T.skyMin, T.skyMax),
+        },
+      };
+    case FINAL_AURAS.anvilMark: {
+      const total = (t: 'normal' | 'heroic' | 'mythic') =>
+        Math.round(FINAL_DIFFICULTY[t].anvilTotal * FINAL_DIFFICULTY[t].punishMult);
+      return {
+        key: `${KEY}.anvilMark`,
+        nums: {
+          radius: T.anvilR,
+          lock: T.anvilLock,
+          total: total('normal'),
+          fewer: T.anvilMinSoakers,
+          heroicTotal: total('heroic'),
+          mythicTotal: total('mythic'),
+        },
+      };
+    }
+    case FINAL_AURAS.bladeMark:
+      return {
+        key: `${KEY}.bladeMark`,
+        nums: {
+          lock: T.bladeLock,
+          min: tierValue(T.bladeMin, NM),
+          max: tierValue(T.bladeMax, NM),
+          ...tiers(T.bladeMin, T.bladeMax),
         },
       };
     default:

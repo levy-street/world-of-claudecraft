@@ -2,21 +2,23 @@
 // The Masterless Strength's player text and raid HUD:
 //   - every raid warning resolves its key to the very English the sim sent;
 //   - every aura's tooltip says its rule with the live numbers (no token left
-//     unfilled), the final's wind told from the Guardian of the Breath's;
+//     unfilled), the stars' marks (Sky Strike, Crossing Blade) included;
 //   - every damage and aura name re-localizes;
 //   - the Overload bars' view (heart_overload_view.ts) reads the boss's
 //     mirrored auras the same off a Sim-shaped and a ClientWorld-shaped body,
 //     highlights the quarter it drinks, flags a bar near bursting, says the
 //     root, the switch mark and Heart Unbound, hides out of the fight;
-//   - the personal alert (final_alert_view.ts) keeps its priority;
+//   - no personal alert panel (Jose's playtest of 2026-11-19): the marks read in
+//     the world and in the marked player's own arrow;
 //   - the painter writes nothing on a still frame.
 
 import { describe, expect, it } from 'vitest';
-import { FINAL_WIND_TAG } from '../src/sim/encounters/smith_heart/final_breath';
+import { FINAL_ARROW_AURAS, finalArrowMark } from '../src/render/smith_heart_fx/final_arrow_core';
 import {
   FINAL_AURAS,
   FINAL_BOSS,
   FINAL_CASTS,
+  FINAL_DIFFICULTY,
   FINAL_NAMES,
   FINAL_ZONE_CODES,
   FINAL_OVERLOAD as O,
@@ -24,10 +26,8 @@ import {
   FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
 import type { Aura, SimEvent } from '../src/sim/types';
-import { WIND_DRIFT_AURA } from '../src/sim/wind_drift';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { castDisplayName } from '../src/ui/cast_display_name';
-import { buildFinalAlertView } from '../src/ui/hud/dungeon/final_alert_view';
 import { HeartOverloadPanel } from '../src/ui/hud/dungeon/heart_overload_painter';
 import {
   buildOverloadView,
@@ -56,7 +56,7 @@ describe('The Masterless Strength: what the raid reads', () => {
     f.put(f.players[2], b.x + 20, b.z);
     f.put(f.players[3], b.x - 20, b.z);
     events.push(...f.tick(2));
-    for (const verb of ['embers', 'wind', 'drawn', 'orbs', 'ice', 'anvil']) {
+    for (const verb of ['embers', 'drawn', 'orbs', 'ice', 'anvil', 'sky', 'blades', 'pillars 2']) {
       f.dev(`/dev heart final ${verb}`);
       events.push(...f.tick(2));
     }
@@ -91,9 +91,9 @@ describe('The Masterless Strength: what the raid reads', () => {
   });
 
   it('every damage and aura name re-localizes', () => {
-    // Groaning Ice names only the crack's object (never a hit or an aura).
+    // Groaning Ice and the Pillar name only objects (never a hit or an aura).
     for (const [k, name] of Object.entries(FINAL_NAMES))
-      if (k !== 'crack') expect(localizeSimAuraName(name), name).not.toBeNull();
+      if (k !== 'crack' && k !== 'pillar') expect(localizeSimAuraName(name), name).not.toBeNull();
   });
 });
 
@@ -110,11 +110,14 @@ describe('The Masterless Strength: tooltips', () => {
     const st = (zone: keyof typeof FINAL_ZONE_CODES) =>
       say({ id: FINAL_AURAS.state, kind: 'internal_cd', value: FINAL_ZONE_CODES[zone] });
     expect(st('heat')).toContain('Basalt Fist');
-    expect(st('quench')).toContain(`within ${T.coldReach} yd`);
+    expect(st('heat')).toContain('Fire Whirl');
+    expect(st('quench')).toContain('Crossing Blade');
     expect(st('quench')).toContain(`${Math.round((1 - T.numbingSlow) * 100)}%`);
     expect(st('breath')).toContain(`within ${T.boltJump} yd`);
-    expect(st('hammer')).toContain('Weight of the Anvil');
+    expect(st('breath')).toContain('Sky Strike');
+    expect(st('hammer')).toContain('Wake the Stone');
     expect(st('ring')).toContain('15%');
+    expect(st('ring')).toContain(`${Math.round(T.reducedPace * 100)}% pace`);
   });
 
   it('each bar, mark and the root say their rule with the live numbers', () => {
@@ -129,13 +132,17 @@ describe('The Masterless Strength: tooltips', () => {
     expect(bar).toContain(`${n(O.burst.normal.min)} to ${n(O.burst.normal.max)} damage on Normal`);
     expect(bar).toContain(`${n(O.burst.heroic.min)} to ${n(O.burst.heroic.max)} on Heroic (heavy`);
     expect(bar).toContain(`${n(O.burst.mythic.min)} to ${n(O.burst.mythic.max)} on Mythic (lethal`);
-    expect(say({ id: FINAL_AURAS.root, kind: 'root' })).toContain(`${T.rootSeconds} sec`);
     expect(say({ id: FINAL_AURAS.unbound, kind: 'internal_cd', stacks: 3 })).toContain(
       `(${Math.round(T.unboundPerStack * 1.15) * 3} now)`,
     );
     expect(say({ id: FINAL_AURAS.shaken, kind: 'internal_cd' })).toContain(`${T.shakenMult} times`);
-    expect(say({ id: FINAL_AURAS.cold, kind: 'internal_cd', value: 55 })).toContain('Cold 55');
-    expect(say({ id: FINAL_AURAS.frozen, kind: 'stun' })).toContain(`${T.coldReach} yd`);
+    const sky = say({ id: FINAL_AURAS.skyMark, kind: 'internal_cd' });
+    expect(sky).toContain(`${T.skyR} yd`);
+    expect(sky).toContain(`${T.arcReach} yd of a pillar`);
+    expect(sky).toContain(`${Math.round(T.skyMin * 1.15)} to ${Math.round(T.skyMax * 1.15)}`);
+    const blade = say({ id: FINAL_AURAS.bladeMark, kind: 'internal_cd' });
+    expect(blade).toContain(`${T.bladeLock} sec`);
+    expect(blade).toContain('pillars');
     expect(say({ id: FINAL_AURAS.underIce, kind: 'stun' })).toContain('breaking ice');
     expect(say({ id: FINAL_AURAS.numbing, kind: 'slow', value: T.numbingSlow })).toContain(
       `${Math.round((1 - T.numbingSlow) * 100)}%`,
@@ -148,19 +155,30 @@ describe('The Masterless Strength: tooltips', () => {
     expect(say({ id: FINAL_AURAS.crushed, kind: 'internal_cd' })).toContain(
       `${T.crushedMult} times`,
     );
+    // Weight of the Anvil's mark (Jose's playtest of 2026-11-19): it follows you, plants, splits.
+    const anvil = say({ id: FINAL_AURAS.anvilMark, kind: 'internal_cd' });
+    expect(anvil).toContain('follows you');
+    expect(anvil).toContain(`${T.anvilR} yd`);
+    expect(anvil).toContain(`plants ${T.anvilLock} sec`);
+    expect(anvil).toContain(String(FINAL_DIFFICULTY.normal.anvilTotal));
+    expect(anvil).not.toMatch(/\{\w+\}/);
   });
+});
 
-  it("the final's wind says its rim, the guardian's keeps its own", () => {
-    const mine = say({
-      id: WIND_DRIFT_AURA,
-      kind: 'internal_cd',
-      value: 0,
-      value2: T.windSpeed,
-      value3: FINAL_WIND_TAG,
-    });
-    expect(mine).toContain(`Within ${T.rimBand} yd of the rim`);
-    const theirs = say({ id: WIND_DRIFT_AURA, kind: 'internal_cd', value: 0, value2: 4 });
-    expect(theirs).toContain('Guardian of the Breath');
+describe("The Masterless Strength: the marked player's own arrow", () => {
+  it('every mark that singles one player out raises it; a tank debuff never does', () => {
+    for (const id of [
+      FINAL_AURAS.anvilMark,
+      FINAL_AURAS.bladeMark,
+      FINAL_AURAS.skyMark,
+      FINAL_AURAS.ember,
+      FINAL_AURAS.drawn,
+    ])
+      expect(FINAL_ARROW_AURAS, id).toContain(id);
+    expect(FINAL_ARROW_AURAS).not.toContain(FINAL_AURAS.crushed);
+    expect(finalArrowMark({ auras: [] })).toBeNull();
+    const a = { id: FINAL_AURAS.anvilMark, remaining: 4, duration: 6 } as Aura;
+    expect(finalArrowMark({ auras: [a] })).toBe(a);
   });
 });
 
@@ -185,11 +203,8 @@ function bossOf(
 }
 
 describe('The Masterless Strength: the Overload bars', () => {
-  it('reads the bars, the quarter it drinks, the danger, the root and the mark', () => {
-    const v = buildOverloadView(
-      bossOf({ heat: 80, quench: 30 }, [{ id: FINAL_AURAS.root, remaining: 9.2 }]),
-      makeOverloadView(),
-    );
+  it('reads the bars, the quarter it drinks, the danger and the mark', () => {
+    const v = buildOverloadView(bossOf({ heat: 80, quench: 30 }), makeOverloadView());
     expect(v.visible).toBe(true);
     const heat = v.rows.find((r) => r.vein === 'heat');
     expect(heat?.pct).toBe(80);
@@ -197,7 +212,6 @@ describe('The Masterless Strength: the Overload bars', () => {
     expect(heat?.danger).toBe(80 >= OVERLOAD_DANGER_AT);
     expect(v.rows.filter((r) => r.active).length).toBe(1);
     expect(v.rows.find((r) => r.vein === 'quench')?.pct).toBe(30);
-    expect(v.root).toBe(t('hudChrome.finalOverload.rooted', { seconds: '10' }));
     expect(v.shaken).toBe(t('hudChrome.finalOverload.shaken', { seconds: '12' }));
     expect(v.unbound).toBe('');
   });
@@ -242,7 +256,6 @@ describe('The Masterless Strength: the Overload bars', () => {
     );
     expect(v.unbound).toBe(t('hudChrome.finalOverload.unbound', { stacks: '4' }));
     expect(v.rows.some((r) => r.active)).toBe(false);
-    expect(v.root).toBe(t('hudChrome.finalOverload.free'));
   });
 
   it('the painter writes nothing on a still frame', () => {
@@ -291,25 +304,16 @@ describe('The Masterless Strength: the Overload bars', () => {
   });
 });
 
-describe('The Masterless Strength: the personal alert', () => {
-  const mark = (id: string, remaining = 3, duration = 6) => ({ id, remaining, duration });
-  it('frozen first, then the ember, the lightning, the cold, Crushed', () => {
-    const all = [
-      mark(FINAL_AURAS.crushed),
-      { id: FINAL_AURAS.cold, value: 80, value2: 1 },
-      mark(FINAL_AURAS.drawn),
-      mark(FINAL_AURAS.ember),
-      mark(FINAL_AURAS.frozen),
-    ];
-    const kinds: string[] = [];
-    for (let i = all.length; i > 0; i--) {
-      const v = buildFinalAlertView({ auras: all.slice(0, i) });
-      kinds.push(v.visible ? v.kind : 'none');
-    }
-    expect(kinds).toEqual(['frozen', 'ember', 'drawn', 'freezing', 'crushed']);
-    expect(
-      buildFinalAlertView({ auras: [{ id: FINAL_AURAS.cold, value: 0, value2: -1 }] }).visible,
-    ).toBe(false);
-    expect(buildFinalAlertView({ auras: all, dead: true }).visible).toBe(false);
+describe('The Masterless Strength: no personal alert panel (playtest 2026-11-19)', () => {
+  it('mounts no final alert: every mark reads in the world and the own arrow', async () => {
+    const policy = await import('../src/ui/hud/dungeon/dungeon_prompt_policy_core');
+    expect(Object.keys(policy.DUNGEON_PROMPT_ADVISORY)).not.toContain('final');
+    const fs = await import('node:fs');
+    expect(fs.existsSync('src/ui/hud/dungeon/final_alert_view.ts')).toBe(false);
+    const prompts = fs.readFileSync('src/ui/hud/dungeon/dungeon_prompts.ts', 'utf8');
+    expect(prompts).not.toContain('heart-final-alert');
+    expect(fs.readFileSync('src/styles/components.css', 'utf8')).not.toContain(
+      '#heart-final-alert',
+    );
   });
 });

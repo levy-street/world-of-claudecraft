@@ -27,6 +27,7 @@ import {
   ISLE_BOB,
   ISLE_KIT,
   ISLE_LIFE,
+  ISLE_PADS,
   type IsleMote,
   isleBob,
   isleDepth,
@@ -35,13 +36,13 @@ import {
   isleMist,
   isleObjectKind,
   isleWindAway,
+  padSpot,
 } from '../src/render/smith_heart_fx/breath_isles_fx_core';
 import { BREATH, BREATH_ISLE_REACH, BREATH_ISLES } from '../src/sim/content/smith_heart_layout';
 import {
-  galePathTemplate,
-  homeGaleTemplate,
   ISLE_CASTS,
   isleSpots,
+  padTemplate,
   rideArc,
   rideTemplate,
 } from '../src/sim/encounters/smith_heart';
@@ -51,7 +52,8 @@ import { castDisplayName } from '../src/ui/cast_display_name';
 describe('breath_isles_fx_core', () => {
   it('dresses each isle with its own kit sculpt, riding the wind but still under a body', () => {
     expect(ISLE_KIT.length).toBeGreaterThanOrEqual(BREATH_ISLES.length);
-    expect(new Set(ISLE_KIT.map((k) => k.piece)).size).toBe(ISLE_KIT.length);
+    // Six isles, the two sculpts, three each (each turned to face the Cornice).
+    expect(new Set(ISLE_KIT.map((k) => k.piece)).size).toBe(2);
     for (const k of ISLE_KIT) expect(SMITH_HEART_BREATH_KIT_PIECES).toContain(k.piece.slice(4));
     BREATH_ISLES.forEach((_, i) => {
       expect(isleDepth(i)).toBeGreaterThan(15);
@@ -125,7 +127,13 @@ describe('breath_isles_fx_core', () => {
           expect(m.y).toBeGreaterThanOrEqual(-isleDepth(i));
           // Out of the rock (past the crag's taper at that depth) and riding the wind.
           const f = -m.y / isleDepth(i);
-          expect(Math.hypot(m.x, m.z)).toBeGreaterThan((isle.r + 1) * (1 - f) ** 1.75 * 0.5);
+          // (measured from the crag's leaning axis at that depth: the kit's
+          // point turned with the isle)
+          const tip = isleKitOffset(i, ISLE_KIT[i].tip[0], ISLE_KIT[i].tip[1]);
+          const ax = { x: tip.x * f * f, z: tip.z * f * f };
+          expect(Math.hypot(m.x - ax.x, m.z - ax.z)).toBeGreaterThan(
+            (isle.r + 1) * (1 - f) ** 1.75,
+          );
           expect(m.vx * wind.x + m.vz * wind.z).toBeGreaterThan(0.4);
           expect(m.vy).toBeLessThan(0);
           isleGrit(i, u, v, m);
@@ -143,22 +151,21 @@ describe('breath_isles_fx_core', () => {
     }
   });
 
-  it('runs each route on the ride arc from its circle to where it carries', () => {
-    BREATH_ISLES.forEach((isle, i) => {
-      const s = isleSpots()[i];
-      const out = circleRoute(i, 'path', 20, { cornice: BREATH.cornice.h });
-      expect(out[0].x).toBeCloseTo(s.path.x, 6);
+  it('runs each Updraft route on the ride arc from its pad to where it carries', () => {
+    for (const pad of ISLE_PADS) {
+      const s = isleSpots()[pad.to];
+      const from = padSpot(pad.from, pad.to, BREATH.cornice.h);
+      const out = circleRoute(pad.from, pad.to, 20, { cornice: BREATH.cornice.h });
+      expect(out[0].x).toBeCloseTo(from.x, 6);
       expect(out[20].x).toBeCloseTo(s.land.x, 6);
-      expect(out[20].y).toBeCloseTo(isle.h, 6);
-      const mid = rideArc(
-        { x: s.path.x, y: BREATH.cornice.h, z: s.path.z },
-        { x: s.land.x, y: isle.h, z: s.land.z },
-        0.5,
-      );
+      expect(out[20].y).toBeCloseTo(s.h, 6);
+      const mid = rideArc(from, { x: s.land.x, y: s.h, z: s.land.z }, 0.5);
       expect(out[10].y).toBeCloseTo(mid.y, 6);
-      const home = circleRoute(i, 'home', 20, { cornice: BREATH.cornice.h });
-      expect(home[20].z).toBeCloseTo(s.back.z, 6);
-    });
+    }
+    // One slot for every pad the sim can raise: the Cornice's two and one on
+    // every isle but the last of each side.
+    expect(ISLE_PADS).toHaveLength(6);
+    expect(ISLE_PADS.filter((p) => p.from < 0)).toHaveLength(2);
   });
 
   it('the Bulwark thins and cracks as its absorb runs down', () => {
@@ -226,8 +233,8 @@ describe('breath_isles_fx_core', () => {
   });
 
   it('tells its objects apart, and names its bars', () => {
-    expect(isleObjectKind(galePathTemplate(1))).toBe('path');
-    expect(isleObjectKind(homeGaleTemplate(0))).toBe('home');
+    expect(isleObjectKind(padTemplate(-1, 0))).toBe('pad');
+    expect(isleObjectKind(padTemplate(1, 2))).toBe('pad');
     expect(isleObjectKind(rideTemplate('out', 1, 3.2))).toBe('ride');
     expect(isleObjectKind('sh_breath_vortex')).toBeNull();
     for (const id of Object.values(ISLE_CASTS)) expect(castDisplayName(id), id).not.toBe(id);

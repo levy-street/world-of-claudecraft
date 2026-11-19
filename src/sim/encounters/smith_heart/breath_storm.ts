@@ -65,7 +65,9 @@ import { breathSay } from './breath_voice';
 
 /** Is the storm due (half health, the Wind half, the guardian free)? */
 export function stormDue(s: BreathScope): boolean {
-  return s.st.half === 'wind' && s.boss.hp <= s.boss.maxHp * T.stormAt && guardianFree(s);
+  // Since 2026-11-18 the storm breaks at the end of the Islands of the Wind
+  // (breath_isles.ts), never on the health mark itself.
+  return s.st.half === 'wind' && s.st.isles.stage === 'done' && guardianFree(s);
 }
 
 /** Begin the storm's breaking: the wind drawn in, the guardian frozen on its

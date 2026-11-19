@@ -18,7 +18,11 @@
 
 import { BREATH_CASTS, BREATH_TUNING } from '../../sim/encounters/smith_heart/breath_ids';
 import { ISLE_CASTS } from '../../sim/encounters/smith_heart/breath_isle_ids';
-import { FINAL_CASTS, FINAL_TUNING } from '../../sim/encounters/smith_heart/final_ids';
+import {
+  FINAL_CASTS,
+  FINAL_DIFFICULTY,
+  FINAL_TUNING,
+} from '../../sim/encounters/smith_heart/final_ids';
 import { HEAT_CASTS, HEAT_TUNING } from '../../sim/encounters/smith_heart/heat_ids';
 import { QUENCH_CASTS, QUENCH_TUNING } from '../../sim/encounters/smith_heart/quench_ids';
 import {
@@ -133,7 +137,8 @@ const BASE: ClipMap = {
     [FINAL_CASTS.bolt]: 'Pour',
   },
   castTimeScaleByAbility: {
-    [FINAL_CASTS.fist]: onBarEnd(FINAL_BODY_CLIP.wrath, FINAL_TUNING.fistCast),
+    // Normal's bar (Heroic's and Mythic's are a breath shorter: the slam lands a hair late).
+    [FINAL_CASTS.fist]: onBarEnd(FINAL_BODY_CLIP.wrath, FINAL_DIFFICULTY.normal.fistCast),
     [FINAL_CASTS.anvil]: onBarEnd(FINAL_BODY_CLIP.wrath, FINAL_TUNING.anvilCast),
     [FINAL_CASTS.bolt]: onBarEnd(FINAL_BODY_CLIP.pour, FINAL_TUNING.boltCast),
   },
@@ -252,7 +257,7 @@ function breathClips(storm: boolean): ClipMap {
       [BREATH_CASTS.gust]: 'Roar',
       [BREATH_CASTS.storm]: 'StormBreaks',
       [BREATH_CASTS.cradleHold]: channel,
-      [ISLE_CASTS.bulwark]: channel,
+      [ISLE_CASTS.nova]: channel,
       ...Object.fromEntries(BREATH_BOLT_CASTS.map((c) => [c, cast])),
     },
     castTimeScaleByAbility: {
@@ -741,6 +746,11 @@ export const SMITH_HEART_BOSS_LOOKS: Record<string, VisualDef> = {
       // colour and light filling back over the fall once it stops.
       pulses: [
         { gesture: FINAL_BODY_GESTURES.charge, rise: 0.6, hold: 0.1, fall: 0.6, peak: 1.8 },
+        // The Overload straining its body (final_overload_core.ts strainPulse):
+        // its own cracks throbbing brighter in three steps as the bar fills.
+        { gesture: FINAL_BODY_GESTURES.strain[0], rise: 0.15, hold: 0.1, fall: 0.6, peak: 1.8 },
+        { gesture: FINAL_BODY_GESTURES.strain[1], rise: 0.12, hold: 0.1, fall: 0.45, peak: 2.8 },
+        { gesture: FINAL_BODY_GESTURES.strain[2], rise: 0.1, hold: 0.12, fall: 0.3, peak: 4.2 },
         {
           gesture: FINAL_BODY_GESTURES.dark,
           rise: 0,

@@ -1,12 +1,14 @@
 // The Masterless Strength, part 1 (encounters/smith_heart/final*.ts, design
-// doc 7.5) over a REAL Sim: the four quarter rules (Overload, Vein Shock,
-// Taking Root, Heart Unbound, the base form), the boss following its tank
-// across a ridge, each quarter's kit on Normal, Heroic and Mythic, the
-// difficulty gating, the dev verbs, determinism and a headless full-fight
-// smoke run on every tier.
+// doc 7.5) over a REAL Sim: the quarter rules (Overload, Vein Shock,
+// Heart Unbound, the base form; no Taking Root since 2026-11-19), the boss following its tank
+// across a ridge, each quarter's kit on Normal, Heroic and Mythic (the
+// Quench's cold and the Breath's wind are gone since the rework of
+// 2026-11-18; the woken stars are tests/smith_heart_final_stars.test.ts),
+// the difficulty gating, the dev verbs, determinism and a headless
+// full-fight smoke run on every tier.
 
 import { describe, expect, it } from 'vitest';
-import type { SmithHeartVein } from '../src/sim/content/smith_heart_layout';
+import { HEART_ROOM, type SmithHeartVein } from '../src/sim/content/smith_heart_layout';
 import {
   HEART_QUARTER_ORDER,
   heartQuarterAt,
@@ -15,6 +17,7 @@ import {
 import {
   anvilShare,
   FINAL_AURAS,
+  FINAL_CUES,
   FINAL_DIFFICULTY,
   FINAL_NAMES,
   FINAL_OBJECTS,
@@ -26,9 +29,9 @@ import {
   pulseScale,
   FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
+import { laneReach } from '../src/sim/encounters/smith_heart/heat_geometry';
 import { HEAT_OBJECTS } from '../src/sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../src/sim/types';
-import { WIND_DRIFT_AURA } from '../src/sim/wind_drift';
 import { type FinalFight, finalFight } from './helpers/final_fight';
 
 type Damage = Extract<SimEvent, { type: 'damage' }>;
@@ -105,13 +108,12 @@ describe('the pure rules', () => {
     return peak;
   };
   it('bouncing between two quarters fills a bar to bursting within three minutes', () => {
-    for (const visit of [T.rootSeconds + 4, 20]) expect(peakOf(2, visit, 180), `${visit}`).toBe(1);
+    for (const visit of [10, 20]) expect(peakOf(2, visit, 180), `${visit}`).toBe(1);
   });
   it('a rotation through four quarters never passes one visit, through three it stays clear', () => {
-    for (const visit of [T.rootSeconds + 4, 20, 25])
+    for (const visit of [10, 20, 25])
       expect(peakOf(4, visit, 360), `4 x ${visit}`).toBeLessThan(visit / O.fillSeconds + 0.01);
-    for (const visit of [T.rootSeconds + 4, 20])
-      expect(peakOf(3, visit, 360), `3 x ${visit}`).toBeLessThan(0.9);
+    for (const visit of [10, 20]) expect(peakOf(3, visit, 360), `3 x ${visit}`).toBeLessThan(0.9);
   });
   it('the burst: survivable with healing on Normal, heavy on Heroic, lethal on Mythic', () => {
     // The level-20 cloth reference: about 1,135 to 1,345 health.
@@ -129,11 +131,12 @@ describe('the pure rules', () => {
     expect(anvilShare(6, false, total)).toBe(Math.round(total / 6));
     expect(anvilShare(2, false, total)).toBe(Math.round((total / 2) * 1.5));
     expect(anvilShare(6, true, total)).toBe(Math.round((total / 6) * T.crushedMult));
-    // The tier's total: Normal 5,600, Heroic and Mythic 6,600 (2026-11-12).
-    expect(FINAL_DIFFICULTY.normal.anvilTotal).toBe(5600);
-    expect(FINAL_DIFFICULTY.heroic.anvilTotal).toBe(6600);
+    // The tier's total: Normal 4,200 and Heroic 5,600 since the Anvil came
+    // every 35 and 30 s (2026-11-19), Mythic 6,600 (its turning Anvil).
+    expect(FINAL_DIFFICULTY.normal.anvilTotal).toBe(4200);
+    expect(FINAL_DIFFICULTY.heroic.anvilTotal).toBe(5600);
     expect(FINAL_DIFFICULTY.mythic.anvilTotal).toBe(6600);
-    expect(anvilShare(10, false, FINAL_DIFFICULTY.normal.anvilTotal)).toBe(560);
+    expect(anvilShare(10, false, FINAL_DIFFICULTY.normal.anvilTotal)).toBe(420);
   });
 
   it('every zone code round-trips through the state aura', () => {
@@ -143,13 +146,14 @@ describe('the pure rules', () => {
 });
 
 describe('the quarter rules', () => {
-  it('pulls into its first quarter: that is its base form, and it takes root there', () => {
+  it('pulls into its first quarter: that is its base form, and it never takes root (2026-11-19)', () => {
     const f = finalFight(5);
     f.pullIn('quench');
     const st = f.state();
     expect(st?.zone).toBe('quench');
     expect(st?.baseForm).toBe('quench');
-    expect(aura(f.boss(), FINAL_AURAS.root)?.kind).toBe('root');
+    expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
+    expect(f.boss().auras.some((a) => a.id === 'heart_final_root')).toBe(false);
     const state = aura(f.boss(), FINAL_AURAS.state);
     expect(state?.value).toBe(FINAL_ZONE_CODES.quench);
     expect(state?.value2).toBe(FINAL_ZONE_CODES.quench);
@@ -209,19 +213,12 @@ describe('the quarter rules', () => {
     expect(f.players.every((p) => p.dead)).toBe(true);
   });
 
-  it('roots on entering a quarter, then follows its tank across a ridge', () => {
+  it('never roots on entering a quarter: it follows its tank across a ridge at once', () => {
     const f = finalFight(5);
     f.pullIn('heat');
     const tank = f.players[0];
-    const start = f.local(f.boss());
-    // The tank walks into the Breath quarter while it is rooted: it holds.
+    // The tank walks into the Breath quarter: it follows over the ridge.
     const breath = heartQuarterSpot('breath');
-    f.put(tank, breath.x, breath.z);
-    f.tick(sec(5));
-    const held = f.local(f.boss());
-    expect(Math.hypot(held.x - start.x, held.z - start.z)).toBeLessThan(0.5);
-    expect(f.state()?.zone).toBe('heat');
-    // The root ends: it follows its tank over the ridge into the Breath.
     let ev: SimEvent[] = [];
     for (let i = 0; i < sec(30) && f.state()?.zone !== 'breath'; i++) {
       f.put(tank, breath.x, breath.z);
@@ -232,7 +229,13 @@ describe('the quarter rules', () => {
     expect(st?.switches).toBe(1);
     expect(st?.baseForm).toBe('heat');
     expect(st?.lastQuarter).toBe('breath');
-    expect(aura(f.boss(), FINAL_AURAS.root)).toBeDefined();
+    // No root on the switch (Jose's playtest of 2026-11-19): its light shifts.
+    expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
+    expect(
+      ev.some(
+        (e) => e.type === 'spellfx' && (e as { ability: string }).ability === FINAL_CUES.shift,
+      ),
+    ).toBe(true);
     // Normal: no shockwave on the switch.
     expect(hits(ev, FINAL_NAMES.shock).length).toBe(0);
     // The quarter it drinks reads on the Overload panel, not a banner.
@@ -306,12 +309,81 @@ describe('the Heat quarter', () => {
     expect(f.objects(HEAT_OBJECTS.wave).length).toBe(3);
   });
 
+  it('Basalt Fist casts fast (playtest 2026-11-19): 1.9 s Normal, 1.7 Heroic, 1.6 Mythic, every 16 s', () => {
+    expect(FINAL_DIFFICULTY.normal.fistCast).toBe(1.9);
+    expect(FINAL_DIFFICULTY.heroic.fistCast).toBe(1.7);
+    expect(FINAL_DIFFICULTY.mythic.fistCast).toBe(1.6);
+    expect(T.fistEvery).toBe(16);
+    for (const tier of ['normal', 'heroic'] as const) {
+      const f = finalFight(5);
+      if (tier === 'heroic') f.dev('/dev heart final heroic');
+      f.pullIn('heat');
+      f.dev('/dev heart final fist', f.pids[2]);
+      expect(f.boss().castTotal).toBeCloseTo(FINAL_DIFFICULTY[tier].fistCast, 5);
+      // Still up a tick before its bar ends; landed (its swells set out) just after.
+      f.tick(sec(FINAL_DIFFICULTY[tier].fistCast) - 2, false);
+      expect(f.objects(HEAT_OBJECTS.fistPrefix).length).toBe(1);
+      f.tick(4, false);
+      expect(f.objects(HEAT_OBJECTS.fistPrefix).length).toBe(0);
+      expect(f.state()?.swells.length).toBe(3);
+    }
+  });
+
+  it("the Molten Swells roll all the way to the Anvil's rim (playtest 2026-11-19)", () => {
+    const f = finalFight(5);
+    f.pullIn('heat');
+    f.dev('/dev heart final fist', f.pids[2]);
+    f.tick(sec(FINAL_DIFFICULTY.normal.fistCast + 0.1), false);
+    const swells = f.state()?.swells ?? [];
+    expect(swells.length).toBe(3);
+    // Each lane runs to the rim: farther than the Heat guardian's own 32 yd
+    // wherever there is room, and its wave ends within a yard of the rim.
+    let far = 0;
+    for (const w of swells) {
+      const reach = laneReach(w.x, w.z, w.facing, 32);
+      const end = { x: w.x + Math.sin(w.facing) * reach, z: w.z + Math.cos(w.facing) * reach };
+      expect(HEART_ROOM.r - Math.hypot(end.x - HEART_ROOM.x, end.z - HEART_ROOM.z)).toBeLessThan(
+        1.01,
+      );
+      if (reach > 32) far++;
+    }
+    expect(far).toBeGreaterThan(0);
+    // A raider at the rim on a lane is still struck.
+    const w = swells[0];
+    const reach = laneReach(w.x, w.z, w.facing, 32);
+    const rim = {
+      x: w.x + Math.sin(w.facing) * (reach - 0.5),
+      z: w.z + Math.cos(w.facing) * (reach - 0.5),
+    };
+    let struck = 0;
+    for (let i = 0; i < sec(14); i++) {
+      f.put(f.players[4], rim.x, rim.z);
+      struck += hits(f.tick(1, false), FINAL_NAMES.swell, f.pids[4]).length;
+    }
+    expect(struck).toBe(1);
+  });
+
+  it("Fire Whirls run 40 percent faster (6.3 yd a second), still under a raider's run", () => {
+    expect(T.whirlSpeed).toBeCloseTo(4.5 * 1.4, 6);
+    expect(T.whirlSpeed).toBeLessThan(7);
+    const f = finalFight(5);
+    f.pullIn('heat');
+    f.dev('/dev heart final whirl');
+    f.tick(sec(T.whirlWarn + 0.1));
+    const w = f.objects(FINAL_OBJECTS.whirlPrefix)[0];
+    const a = f.local(w);
+    f.tick(sec(0.5));
+    const b = f.local(w);
+    // Half a second's run (a turn off the rim aside).
+    expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeCloseTo(T.whirlSpeed * 0.5, 0);
+  });
+
   it('Fire Whirls rise, run and strike whoever they touch', () => {
     const f = finalFight(5);
     f.pullIn('heat');
     f.dev('/dev heart final whirl');
     const whirls = f.objects(FINAL_OBJECTS.whirlPrefix);
-    expect(whirls.length).toBe(3);
+    expect(whirls.length).toBe(FINAL_DIFFICULTY.normal.whirlCount);
     expect(whirls[0].templateId).toBe(`${FINAL_OBJECTS.whirlPrefix}warn`);
     f.tick(sec(T.whirlWarn + 0.1));
     expect(f.objects(FINAL_OBJECTS.whirlPrefix)[0].templateId).toBe(
@@ -358,31 +430,6 @@ describe('the Heat quarter', () => {
 });
 
 describe('the Quench quarter', () => {
-  it('alone you freeze; together the cold falls', () => {
-    const f = finalFight(5);
-    f.pullIn('quench');
-    const c = heartQuarterSpot('quench');
-    // Two stand apart, three huddle.
-    f.put(f.players[1], c.x + 15, c.z);
-    f.put(f.players[2], c.x - 15, c.z);
-    f.put(f.players[3], c.x, c.z + 2);
-    f.put(f.players[4], c.x + 1, c.z + 2);
-    f.put(f.players[0], c.x - 1, c.z + 2);
-    const ev = f.tick(sec(T.coldMax / T.coldRise + 0.2));
-    expect(aura(f.players[1], FINAL_AURAS.frozen)?.kind).toBe('stun');
-    expect(hits(ev, FINAL_NAMES.frozen, f.pids[1]).length).toBe(1);
-    expect(aura(f.players[3], FINAL_AURAS.frozen)).toBeUndefined();
-    expect(aura(f.players[3], FINAL_AURAS.cold)?.value ?? 0).toBe(0);
-  });
-
-  it("the cold is the Quench quarter's: elsewhere nobody grows cold", () => {
-    const f = finalFight(5);
-    f.pullIn('hammer');
-    spread(f, 'hammer');
-    f.tick(sec(6));
-    for (const p of f.players) expect(aura(p, FINAL_AURAS.frozen)).toBeUndefined();
-  });
-
   it('Heroic: Groaning Ice breaks under the marked; who stays falls Under the Ice', () => {
     const f = finalFight(5);
     f.dev('/dev heart final heroic');
@@ -411,20 +458,72 @@ describe('the Quench quarter', () => {
 });
 
 describe('the Breath quarter', () => {
-  it('Bellows Wind blows everyone toward one side, the rim strikes', () => {
+  it('Dust Devils (playtest 2026-11-19) rise, wander and throw whoever they touch', () => {
+    expect(FINAL_DIFFICULTY.normal.devilCount).toBe(2);
+    expect(FINAL_DIFFICULTY.heroic.devilCount).toBe(3);
     const f = finalFight(5);
     f.pullIn('breath');
-    f.dev('/dev heart final wind 90');
-    f.tick(sec(T.windWarn + 0.2));
-    const w = aura(f.players[1], WIND_DRIFT_AURA);
-    expect(w?.value).toBeCloseTo(Math.PI / 2, 5);
-    expect(w?.value2).toBe(T.windSpeed);
-    // One stands against the rim.
-    f.put(f.players[2], 188 + 58, 172);
-    const ev = f.tick(sec(2.1));
-    expect(hits(ev, FINAL_NAMES.rim, f.pids[2]).length).toBeGreaterThanOrEqual(2);
-    f.tick(sec(T.windBlow));
-    expect(aura(f.players[1], WIND_DRIFT_AURA)).toBeUndefined();
+    f.dev('/dev heart final devils');
+    const devils = f.objects(FINAL_OBJECTS.devilPrefix);
+    expect(devils.length).toBe(FINAL_DIFFICULTY.normal.devilCount);
+    expect(devils[0].templateId).toBe(`${FINAL_OBJECTS.devilPrefix}warn`);
+    // Its warning, then it lives and moves.
+    f.tick(sec(T.devilWarn + 0.1));
+    const d = f.objects(FINAL_OBJECTS.devilPrefix)[0];
+    expect(d.templateId).toBe(`${FINAL_OBJECTS.devilPrefix}live`);
+    const a = f.local(d);
+    f.tick(sec(1));
+    const b = f.local(d);
+    expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeCloseTo(T.devilSpeed, 0);
+    // Stand a raider in it: struck for a little nature and thrown out of it.
+    // (Held in it until struck: a raider it brushed on its way may still be
+    // inside its two-second grace.) Its strike is read off its own cue: the
+    // other devil rises off a hashed player too and may stand close enough to
+    // strike the same tick, so only this devil's blow is counted.
+    const p = f.players[3];
+    let hit: ReturnType<typeof hits> = [];
+    let struck = 0;
+    for (let i = 0; i < sec(T.devilHitEvery + 0.5) && struck === 0; i++) {
+      const here = f.local(d);
+      f.put(p, here.x + 1, here.z);
+      const ev = f.tick(1);
+      struck = ev.filter(
+        (e) =>
+          e.type === 'spellfx' &&
+          e.ability === FINAL_CUES.devil &&
+          e.sourceId === d.id &&
+          e.targetId === p.id,
+      ).length;
+      hit = hits(ev, FINAL_NAMES.devil, p.id);
+    }
+    expect(struck).toBe(1);
+    expect(hit.length).toBeGreaterThanOrEqual(1);
+    expect(hit.length).toBeLessThanOrEqual(FINAL_DIFFICULTY.normal.devilCount);
+    expect(hit[0].amount).toBeGreaterThanOrEqual(Math.round(T.devilMin * 0.9));
+    expect(hit[0].amount).toBeLessThan(T.devilMax * 1.5);
+    f.tick(sec(0.6));
+    const after = f.local(p);
+    const eye = f.local(d);
+    expect(Math.hypot(after.x - eye.x, after.z - eye.z)).toBeGreaterThan(T.devilR);
+    // Gone after its life.
+    f.tick(sec(T.devilLife + 0.5));
+    expect(f.objects(FINAL_OBJECTS.devilPrefix).length).toBe(0);
+  });
+
+  it('Dust Devils come on their own clock while it stands in the Breath', () => {
+    const f = finalFight(5);
+    f.pullIn('breath');
+    let seen = 0;
+    let before = 0;
+    for (let i = 0; i < sec(T.devilFirst + T.devilEvery + 1); i++) {
+      f.tick(1);
+      const n = f
+        .objects(FINAL_OBJECTS.devilPrefix)
+        .filter((o) => o.templateId.endsWith('warn')).length;
+      if (n > before) seen++;
+      before = n;
+    }
+    expect(seen).toBeGreaterThanOrEqual(2);
   });
 
   it('Leaping Bolt leaps through a stack and spares a spread raid', () => {
@@ -498,13 +597,66 @@ describe('the Hammer quarter', () => {
       new Set([f.pids[1], f.pids[2], f.pids[3]]),
     );
     expect(shared[0].amount).toBeLessThan(FINAL_DIFFICULTY.normal.anvilTotal / 3 + 200);
-    // Nobody under it.
+    // Nobody under it: the circle planted 1 s out, everyone runs from it.
     f.dev('/dev heart final anvil', f.pids[1]);
+    f.tick(sec(T.anvilCast - T.anvilLock + 0.2));
     f.put(f.players[1], c.x - 20, c.z);
     f.put(f.players[2], c.x - 20, c.z + 3);
     f.put(f.players[3], c.x - 20, c.z - 3);
-    const miss = hits(f.tick(sec(T.anvilCast + 0.1)), FINAL_NAMES.anvil);
+    const miss = hits(f.tick(sec(T.anvilLock + 0.1)), FINAL_NAMES.anvil);
     expect(miss.length).toBe(5);
+  });
+
+  it("Weight of the Anvil's circle follows its player through the bar, then plants (playtest 2026-11-19)", () => {
+    const f = finalFight(5);
+    f.pullIn('hammer');
+    const c = heartQuarterSpot('hammer');
+    f.put(f.players[1], c.x + 10, c.z);
+    f.dev('/dev heart final anvil', f.pids[1]);
+    const marked = f.players[1];
+    // The mark on its player for the whole bar (their arrow, their alarm).
+    expect(aura(marked, FINAL_AURAS.anvilMark)?.duration).toBe(T.anvilCast);
+    for (const p of f.players.slice(2)) expect(aura(p, FINAL_AURAS.anvilMark)).toBeUndefined();
+    const mark = () => f.local(f.objects(FINAL_OBJECTS.anvilPrefix)[0]);
+    // It walks: the circle rides with them.
+    f.tick(sec(1));
+    f.put(marked, c.x + 4, c.z + 8);
+    f.tick(2);
+    const here = f.local(marked);
+    expect(Math.hypot(mark().x - here.x, mark().z - here.z)).toBeLessThan(0.5);
+    f.put(marked, c.x - 6, c.z + 2);
+    // 22 ticks so far: on to 0.2 s past the lock.
+    f.tick(sec(T.anvilCast - T.anvilLock + 0.2) - 22);
+    const locked = { ...mark() };
+    expect(Math.hypot(locked.x - f.local(marked).x, locked.z - f.local(marked).z)).toBeLessThan(
+      0.5,
+    );
+    // Locked for its last second: it stays where it planted.
+    f.put(marked, c.x - 6, c.z + 12);
+    f.tick(sec(0.5));
+    expect(mark().x).toBeCloseTo(locked.x, 6);
+    expect(mark().z).toBeCloseTo(locked.z, 6);
+    // It falls there, and the mark goes.
+    f.tick(sec(1));
+    expect(f.objects(FINAL_OBJECTS.anvilPrefix).length).toBe(0);
+    expect(aura(marked, FINAL_AURAS.anvilMark)).toBeUndefined();
+  });
+
+  it('Weight of the Anvil comes every 35 s on Normal, 30 on Heroic, 28 on Mythic', () => {
+    expect(FINAL_DIFFICULTY.normal.anvilEvery).toBe(35);
+    expect(FINAL_DIFFICULTY.heroic.anvilEvery).toBe(30);
+    expect(FINAL_DIFFICULTY.mythic.anvilEvery).toBe(28);
+    // A live pull: the next bar 35 s after the first, on its own clock.
+    const f = finalFight(5);
+    f.pullIn('hammer');
+    const starts: number[] = [];
+    for (let i = 0; i < sec(T.anvilFirst + 2 * 35 + 8); i++) {
+      const was = f.state()?.anvil;
+      f.tick();
+      if (!was && f.state()?.anvil) starts.push(i / 20);
+    }
+    expect(starts.length).toBeGreaterThanOrEqual(3);
+    for (let i = 1; i < starts.length; i++) expect(starts[i] - starts[i - 1]).toBeLessThan(35 + 4);
   });
 
   it('Heroic: soakers are Crushed and take the next Anvil three times over; Stone Shell absorbs healing', () => {
@@ -586,7 +738,12 @@ describe('difficulty gating', () => {
     for (const [k, v] of Object.entries(FINAL_DIFFICULTY.heroic))
       if (typeof v === 'boolean' && v)
         expect(FINAL_DIFFICULTY.mythic[k as keyof typeof v], k).toBe(true);
-    expect(run('mythic', 'breath', 16).f.objects(FINAL_OBJECTS.orbPrefix).length).toBe(T.orbCount);
+    // Every orb raised, standing or already taken by someone spread on it.
+    const m = run('mythic', 'breath', 16);
+    const taken = m.ev.filter(
+      (e) => e.type === 'spellfxAt' && e.ability === 'heart_final_orb_taken',
+    ).length;
+    expect(m.f.objects(FINAL_OBJECTS.orbPrefix).length + taken).toBe(T.orbCount);
   });
 });
 
@@ -628,7 +785,7 @@ describe('the headless full fight', () => {
         seen.add(st.zone);
         inZone++;
         // Twenty seconds a quarter, then the tank drags it on.
-        if (inZone > sec(20) && st.rootLeft <= 0) {
+        if (inZone > sec(20)) {
           const target = heartQuarterSpot(order[next % 4]);
           f.put(tank, target.x, target.z);
           const here = f.local(f.boss());
@@ -664,8 +821,7 @@ describe('the headless full fight', () => {
         expect(f.objects(prefix).length, prefix).toBe(0);
       expect(f.objects(HEAT_OBJECTS.fistPrefix).length).toBe(0);
       for (const p of f.players)
-        for (const id of Object.values(FINAL_AURAS))
-          if (id !== WIND_DRIFT_AURA) expect(aura(p, id), id).toBeUndefined();
+        for (const id of Object.values(FINAL_AURAS)) expect(aura(p, id), id).toBeUndefined();
     });
 
   it('a wipe resets the fight: every footprint, mark and bar gone', () => {
@@ -683,7 +839,7 @@ describe('the headless full fight', () => {
     for (const prefix of Object.values(FINAL_OBJECTS))
       expect(f.objects(prefix).length, prefix).toBe(0);
     expect(aura(f.boss(), overloadAuraId('heat'))).toBeUndefined();
-    expect(aura(f.boss(), FINAL_AURAS.root)).toBeUndefined();
+    expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
   });
 });
 
@@ -702,21 +858,26 @@ describe('the dev verbs', () => {
       'fill heat 50',
       'burst',
       'shock',
-      'root',
-      'unroot',
       'fist',
       'whirl',
       'embers',
-      'freeze',
-      'cold 40',
       'ice',
-      'wind 45',
       'bolt',
       'drawn',
       'orbs',
       'tremor',
       'anvil',
       'shell',
+      'wake hammer',
+      'star breath',
+      'pillars 3',
+      'thrum',
+      'charge',
+      'chargedpulse',
+      'sky',
+      'blades',
+      'shatter',
+      'tornado',
     ])
       say(`/dev heart final ${v}`);
     say('/dev heart final');

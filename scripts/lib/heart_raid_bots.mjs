@@ -1130,7 +1130,9 @@ function combatTarget(world, st, b, boss) {
     const tt = b.tankTarget;
     const m =
       typeof tt === 'number'
-        ? (world.obs.ents.get(tt) ?? null)
+        ? // The observer's view, else the tank's own (a raid split out of
+          // one player's interest radius: the Breath's isles).
+          (world.obs.ents.get(tt) ?? b.ents?.get(tt) ?? null)
         : typeof tt === 'string'
           ? world.mobs[tt]
           : null;
@@ -1155,9 +1157,11 @@ function threatOk(world, b, mob) {
   // is everyone's to kill, threat or not.
   if (tankHate <= 0) return true;
   const mine = thr.find(([id]) => id === b.pid)?.[1] ?? 0;
-  // A decent raid rides the threat meter just under the switch (110 percent in
-  // melee, 130 at range).
-  return mine < tankHate * (b.spec.melee ? 1.0 : 1.2) ? true : holdThreat(b);
+  // A decent raid rides the threat meter under the switch (110 percent in
+  // melee, 130 at range) with a margin for a crit: a ranged bot pulling the
+  // final boss through the ring at 0:10 wiped a Heroic run to Heart Unbound
+  // (2026-11-18).
+  return mine < tankHate * (b.spec.melee ? 1.0 : 1.1) ? true : holdThreat(b);
 }
 function holdThreat(b) {
   b.threatHolds = (b.threatHolds ?? 0) + 1;
@@ -1459,7 +1463,7 @@ function kickCoordinator(world, st, bots, boss) {
   const bars = boss.kickables?.(world) ?? [];
   const k = st.kick;
   if (k && !k.done) {
-    const mob = world.obs.ents.get(k.mobId);
+    const mob = world.obs.ents.get(k.mobId) ?? world.allEnts?.get(k.mobId);
     const cur = alive(mob) ? (mob.cast ?? null) : null;
     if (k.sent && hasAura(mob, `${k.ability}_lockout`)) {
       k.done = true;
@@ -1562,7 +1566,7 @@ function pickKicker(world, st, bots, s, exclude = null) {
 
 function doKick(world, st, b) {
   const k = st.kick;
-  const s = world.obs.ents.get(k.mobId);
+  const s = world.obs.ents.get(k.mobId) ?? world.allEnts?.get(k.mobId);
   k.sent = true;
   k.sentAt = Date.now();
   if (k.fumble || !alive(s) || !s.cast) return;

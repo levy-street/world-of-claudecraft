@@ -139,10 +139,9 @@ export function bossTank(s: Pick<FinalScope, 'boss' | 'players'>): Entity | null
   return null;
 }
 
-/** Is the boss being dragged: its root over, its tank standing in another
- *  zone than the one it holds? */
+/** Is the boss being dragged: its tank standing in another zone than the
+ *  one it holds? */
 export function beingDragged(s: FinalScope): boolean {
-  if (s.st.rootLeft > 0) return false;
   // The final phase: it stands in the centre for good (part 2).
   if (s.st.phase.stage === 'final' || s.st.phase.stage === 'collapse') return false;
   const tank = bossTank(s);
@@ -151,12 +150,12 @@ export function beingDragged(s: FinalScope): boolean {
   return heartQuarterAt(p.x, p.z) !== s.st.zone;
 }
 
-/** Is the boss free to begin a bar now? Never while it is being dragged or
- *  in the drag's grace right after its root lets go: a planted bar then is
- *  the boss that will not follow (Jose's playtest of 28 Oct 2026). */
+/** Is the boss free to begin a bar now? Never while it is being dragged: a
+ *  planted bar then is the boss that will not follow (Jose's playtest of 28
+ *  Oct 2026). */
 export function bossFree(s: FinalScope): boolean {
   if (s.st.bar || s.boss.castingAbility !== null) return false;
-  if (s.st.gap > 0 || s.st.dragGrace > 0) return false;
+  if (s.st.gap > 0) return false;
   if (beingDragged(s)) return false;
   return !s.ctx.isStunned(s.boss);
 }
@@ -228,8 +227,9 @@ export function pickPlayers(
   return pickMarkTargets(s.boss, livePlayers(s), count, salt, busy);
 }
 
-// The fight calls no raid warning banner: every mechanic reads in the world,
-// on the Overload panel, on a cast bar or on the marked player's own alert
+// The fight calls no raid warning banner: every mechanic reads in the world
+// (a marked player's own arrow and alarm included; the on-screen alert panel
+// went with Jose's playtest of 2026-11-19), on the Overload panel or a cast bar
 // (the owner's rule of 2026-11-03, applied to the whole raid on 2026-11-09).
 // The boss's voice stays (final_voice.ts: chat and a speech bubble).
 

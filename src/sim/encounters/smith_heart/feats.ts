@@ -16,8 +16,8 @@
 //                        COUNCIL_FEAT_FALL_WINDOW seconds of each other (council.ts
 //                        finishCouncil, on the fight's clock).
 //   The Breath           no raider falls into the void in the fight (breath.ts, from the
-//                        void's own deaths), no Gale Bulwark bursts by itself (every one
-//                        broken by the raid, breath_isles.ts burstBulwark), and the storm
+//                        void's own deaths), Skyrend Nova never runs out (both Stillstones
+//                        stilled in time, breath_isles.ts endNova), and the storm
 //                        broke (the second half).
 //   The Quench           no raider Encased in Rime (quench_cold.ts freezePlayer, every
 //                        freeze's one door), no ice blade's slash strikes anyone
