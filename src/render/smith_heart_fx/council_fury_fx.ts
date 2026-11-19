@@ -73,7 +73,7 @@ varying float vLive;
 void main() {
   float across = abs(vSide);
   float core = 1.0 - smoothstep(0.0, 0.32, across);
-  float halo = pow(1.0 - across, 2.0);
+  float halo = pow(max(1.0 - across, 0.0), 2.0);
   float ends = smoothstep(0.0, 0.12, vT) * (1.0 - smoothstep(0.85, 1.0, vT));
   float a = (core + halo * 0.55) * ends * vLive;
   vec3 col = mix(uColor, uHot, core);
@@ -144,7 +144,8 @@ void main() {
   float tongue = smoothstep(0.45 + y * 0.35, 0.8 + y * 0.15, n + (1.0 - y) * 0.2);
   float core = smoothstep(0.7 + y * 0.2, 0.98, n + (1.0 - y) * 0.2);
   // The heartbeat's band climbing it.
-  float band = exp(-pow((y - fract(uTime * 0.95)) * 7.0, 2.0)) * uBeat * tongue;
+  float bd = (y - fract(uTime * 0.95)) * 7.0;
+  float band = exp(-(bd * bd)) * uBeat * tongue;
   // No hard silhouette (a volume of fire, not a glass tube): it fades out at
   // the column's edges and stays thin where it faces the eye, so the body
   // inside reads through it.
@@ -250,8 +251,8 @@ void main() {
   vec3 n = normalize(vN);
   float lit = 0.35 + 0.65 * clamp(dot(n, normalize(vec3(0.2, 0.9, 0.35))), 0.0, 1.0);
   float face = clamp(abs(dot(n, vView)), 0.0, 1.0);
-  float rim = pow(1.0 - face, 1.4);
-  vec3 body = mix(uRim * 0.55, uHot, pow(face, 3.0) * 0.6) * lit;
+  float rim = pow(max(1.0 - face, 0.0), 1.4);
+  vec3 body = mix(uRim * 0.55, uHot, pow(max(face, 0.0), 3.0) * 0.6) * lit;
   vec3 col = mix(uStone * lit, body, 0.8) + uRim * rim * uGlow * 0.7;
   gl_FragColor = vec4(col * (0.7 + 0.3 * uGlow), 1.0);
   #include <colorspace_fragment>
