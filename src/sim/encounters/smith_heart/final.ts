@@ -62,6 +62,7 @@ import {
   stepDrawn,
   stepOrbs,
 } from './final_breath';
+import { clearElements, elementsDev, elementsReadout, stepElements } from './final_elements';
 import {
   clearAnvil,
   clearHammer,
@@ -152,6 +153,7 @@ import {
   wakeStar,
 } from './final_stars';
 import type { FinalFightState, FinalKitClocks } from './final_state';
+import { freshElements } from './final_strike';
 import { finalSay, freshFinalVoice, stepFinalVoice } from './final_voice';
 import { applyTierHealth, restoreTierHealth, showTierHealth, tierPoolMult } from './tier_health';
 import { applyTierSwing, restoreTierSwing } from './tier_swing';
@@ -244,6 +246,7 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     anvilClock: T.anvilFirst,
     stars: freshStars(),
     cleaveSeen: 0,
+    elements: freshElements(),
     phase: freshPhase(),
     voice: freshFinalVoice(),
   };
@@ -405,6 +408,7 @@ function clearFight(
     clearBreath(s, players);
     clearHammer(s, players);
     clearStars(s, players);
+    clearElements({ ...s, boss }, players);
   }
   for (const p of players) for (const id of PLAYER_MARKS) dropAura(p, id);
   clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
@@ -514,6 +518,7 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   stepAdds(s);
   stepCoals(s);
   stepRings(s);
+  stepElements(s);
   watchFrontal(s);
   if (ph.stage === 'fight') runKit(s);
   else if (ph.stage === 'final') stepFinal(s);
@@ -693,15 +698,8 @@ export function finalDevMechanic(
       return `${all.length} pillars shatter.`;
     }
     case 'sky':
-    case 'strike':
     case 'lightning':
-      if (arg === 'pillar' && here)
-        return skyAtPillar(s, here)
-          ? 'Sky Strike: one strike beside the pillar nearest you (Arcing Stone).'
-          : 'No pillar stands.';
-      return arg === 'here' && here
-        ? `Sky Strike: ${skyVolley(s, here)} strike on you.`
-        : `Sky Strike: ${skyVolley(s)} strikes.`;
+      return skyVerb(s, arg, here);
     case 'blade':
     case 'blades': {
       const marks = arg === 'me' && me ? startBlades(s, me) : startBlades(s);
@@ -730,9 +728,24 @@ export function finalDevMechanic(
       return startAnvil(s, here, me ?? undefined) ? 'Weight of the Anvil: 6 s, on you.' : null;
     case 'shell':
       return `Stone Shell on ${stoneShell(s).length} players.`;
+    case 'strike':
+      // Sky Strike keeps `strike pillar|here`; a bare `strike [n]` is Elemental Strike.
+      if (arg === 'pillar' || arg === 'here') return skyVerb(s, arg, here);
+      return elementsDev(s, verb, arg, arg2, me);
     default:
-      return finalPhaseDev(s, verb, arg, me);
+      return elementsDev(s, verb, arg, arg2, me) ?? finalPhaseDev(s, verb, arg, me);
   }
+}
+
+/** Sky Strike's dev verb (`sky`, `sky here`, `sky pillar`). */
+function skyVerb(s: FinalScope, arg: string | undefined, here?: { x: number; z: number }): string {
+  if (arg === 'pillar' && here)
+    return skyAtPillar(s, here)
+      ? 'Sky Strike: one strike beside the pillar nearest you (Arcing Stone).'
+      : 'No pillar stands.';
+  return arg === 'here' && here
+    ? `Sky Strike: ${skyVolley(s, here)} strike on you.`
+    : `Sky Strike: ${skyVolley(s)} strikes.`;
 }
 
 /** The readout for `/dev heart final` (state at a glance). */
@@ -748,5 +761,5 @@ export function finalReadout(ctx: SimContext, inst: InstanceSlot): string {
   const stars = st.stars.awake.map((v) => `${v} x${starPace({ st }, v)}`).join(', ');
   const charged = st.stars.pillars.filter((p) => p.charged).length;
   const pillars = `${st.stars.pillars.length} pillars (${charged} charged), ${st.stars.shattered} shattered, ${st.stars.thrums} thrums`;
-  return `${head}; in ${st.zone} (base ${st.baseForm ?? 'none'}), stars ${stars || 'none'}, ${pillars}, shaken ${st.shakenLeft.toFixed(0)} s, unbound ${st.unbound}; Overload ${bars}; switches ${st.switches}, bursts ${st.bursts}; ${finalPhaseReadout(ctx, st)}.`;
+  return `${head}; in ${st.zone} (base ${st.baseForm ?? 'none'}), stars ${stars || 'none'}, ${pillars}, shaken ${st.shakenLeft.toFixed(0)} s, unbound ${st.unbound}; Overload ${bars}; switches ${st.switches}, bursts ${st.bursts}; ${elementsReadout({ st })}; ${finalPhaseReadout(ctx, st)}.`;
 }

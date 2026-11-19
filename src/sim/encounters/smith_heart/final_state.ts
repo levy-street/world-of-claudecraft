@@ -6,6 +6,7 @@
 import type { SmithHeartVein } from '../../content/smith_heart_layout';
 import type { HeartQuarterZone } from '../../content/smith_heart_quarters';
 import type { SmithHeartFeatAttempt } from './feat_attempt';
+import type { FinalElementsState } from './final_elements_state';
 import type { FinalDifficulty, FinalPoolKind } from './final_ids';
 import type { FinalStage } from './final_phase_ids';
 import type { FinalVoiceWatch } from './final_voice';
@@ -336,6 +337,8 @@ export interface FinalFightState {
   stars: FinalStarsState;
   /** The frontal's swing count last seen (Mythic's watch). */
   cleaveSeen: number;
+  /** Its own elements (final_strike.ts, final_fusion.ts, final_opposites.ts). */
+  elements: FinalElementsState;
   /** Part 2: the intermissions and the final phase. */
   phase: FinalPhaseState;
   /** What its voice last saw of the fight (final_voice.ts). */

@@ -18,6 +18,8 @@
 //   final burst|shock|root|unroot   the rules now
 //   final <mechanic>            one ability now: fist, whirl (tornado), embers,
 //                               ice, bolt, drawn, orbs, tremor, anvil, shell
+//   final strike [n]            Elemental Strike on its tank n times (the
+//                               stacks of the quarter it stands in)
 //   final wake|star <vein>      a quarter's star wakes (for the rest of the
 //                               fight) / fires now (the rework of 2026-11-18)
 //   final pillars [n|here]      Wake the Stone: n volleys, or one where you stand

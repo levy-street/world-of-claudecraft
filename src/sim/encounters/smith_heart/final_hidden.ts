@@ -32,6 +32,7 @@ import { DT } from '../../types';
 import { clearCastIf } from '../sunken_bastion/claim';
 import { clearAdds, phaseRules } from './final_adds';
 import { clearBreath } from './final_breath';
+import { clearElements } from './final_elements';
 import { clearHammer } from './final_hammer';
 import { clearHeat } from './final_heat';
 import { FINAL_AURAS } from './final_ids';
@@ -97,6 +98,7 @@ export function beginKneel(s: FinalScope): void {
   clearBreath(s, players);
   clearHammer(s, players);
   clearStarsInFlight(s, players);
+  clearElements(s, players);
   clearCastIf(s.boss, C.call);
   dropShield(s);
   dropAura(s.boss, A.fury);
