@@ -62,7 +62,15 @@ import {
   stepDrawn,
   stepOrbs,
 } from './final_breath';
-import { clearElements, elementsDev, elementsReadout, stepElements } from './final_elements';
+import {
+  clearElements,
+  elementsDev,
+  elementsReadout,
+  quarterChanged,
+  stepElements,
+} from './final_elements';
+import { ELEMENT_CASTS } from './final_elements_ids';
+import { fusionHolds, landFusion } from './final_fusion';
 import {
   clearAnvil,
   clearHammer,
@@ -277,7 +285,10 @@ function watchZone(s: FinalScope, first: boolean): void {
   const zone = bossZone(s, first);
   if (!first && zone === s.st.zone) return;
   if (zone !== 'ring' && zone !== s.st.lastQuarter) s.st.kit = freshKit();
-  enterZone(s, zone);
+  const from = s.st.lastQuarter;
+  // A change into a new quarter fuses the one it left with it (never the
+  // pull's first quarter: there is none to leave).
+  if (enterZone(s, zone) && !first && zone !== 'ring') quarterChanged(s, from, zone);
   // Its quarter's star wakes for the rest of the fight (final_stars.ts).
   if (zone !== 'ring') wakeStar(s, zone);
 }
@@ -290,6 +301,7 @@ function landBar(s: FinalScope, castId: string): void {
   if (castId === FINAL_CASTS.fist) landFist(s);
   else if (castId === FINAL_CASTS.bolt) landBolt(s);
   else if (castId === FINAL_CASTS.anvil) landAnvil(s);
+  else if (castId === ELEMENT_CASTS.fusion) landFusion(s);
 }
 
 /** The bar in flight: planted, counting down, landing. A bar cut by anything
@@ -332,6 +344,9 @@ function runKit(s: FinalScope): void {
   // (the bot raids of 2026-11-18: Tremor Cracks laid under the stacked
   // soakers killed the stack): the raid gathers, then the kit comes back.
   if (s.st.anvil) return;
+  // So does Elemental Fusion's (final_fusion.ts): its combo never lands on
+  // the kit's opener.
+  if (fusionHolds(s)) return;
   switch (s.st.zone) {
     case 'heat':
       if (due(s, 'fist', true)) startFist(s);
@@ -411,7 +426,7 @@ function clearFight(
     clearElements({ ...s, boss }, players);
   }
   for (const p of players) for (const id of PLAYER_MARKS) dropAura(p, id);
-  clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
+  clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil, ELEMENT_CASTS.fusion);
   clearRules(boss);
   clearPhaseAuras({ boss });
 }
@@ -566,9 +581,10 @@ export function releaseBarForDev(ctx: SimContext, inst: InstanceSlot): void {
   if (!st.bar) return;
   st.bar = null;
   st.boltTarget = null;
+  st.elements.casting = null;
   clearFist(s);
   clearAnvil(s);
-  clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
+  clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil, ELEMENT_CASTS.fusion);
 }
 
 export function finalScopeForDev(ctx: SimContext, inst: InstanceSlot): FinalScope | null {
@@ -622,7 +638,14 @@ export function finalDevMechanic(
   const clearBar = () => {
     st.bar = null;
     st.gap = 0;
-    clearCastIf(s.boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
+    st.elements.casting = null;
+    clearCastIf(
+      s.boss,
+      FINAL_CASTS.fist,
+      FINAL_CASTS.bolt,
+      FINAL_CASTS.anvil,
+      ELEMENT_CASTS.fusion,
+    );
   };
   switch (verb) {
     case 'fill': {

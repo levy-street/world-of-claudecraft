@@ -34,6 +34,7 @@ import {
   STRIKE_AURAS,
   spireLinks,
 } from '../src/sim/encounters/smith_heart/final_elements_ids';
+import { fireCombo } from '../src/sim/encounters/smith_heart/final_fusion';
 import { FINAL_DIFFICULTY } from '../src/sim/encounters/smith_heart/final_ids';
 import type { FinalScope } from '../src/sim/encounters/smith_heart/final_scope';
 import { elementalStrike, strikeStacks } from '../src/sim/encounters/smith_heart/final_strike';
@@ -383,5 +384,255 @@ describe('Elemental Strike', () => {
     const m = at('mythic');
     expect(h).toBeGreaterThan(n);
     expect(m).toBeGreaterThan(n);
+  });
+});
+
+// ---- Elemental Fusion -----------------------------------------------------------------
+
+/** Carry the boss into `vein` (the raid with it) and hold it there. */
+function carry(f: FinalFight, vein: SmithHeartVein, seconds: number): SimEvent[] {
+  f.dev(`/dev heart final quarter ${vein}`);
+  const q = heartQuarterSpot(vein);
+  f.gather(q.x, q.z, 3);
+  return hold(f, seconds);
+}
+
+describe('Elemental Fusion', () => {
+  it("never on the pull's first quarter", () => {
+    const f = finalFight(6);
+    f.pullIn('heat');
+    const ev = hold(f, 10);
+    expect(f.state()?.elements.fusions).toBe(0);
+    expect(ev.some((e) => e.type === 'spellfx' && e.ability === 'heart_final_fusion_start')).toBe(
+      false,
+    );
+  });
+
+  it("a change into a new quarter: a 3 s bar with both elements, then the pair's combo", () => {
+    const f = finalFight(6);
+    f.pullIn('heat');
+    quiet(f);
+    let ev = carry(f, 'breath', 0.5);
+    const st = f.state();
+    expect(st?.elements.casting).toEqual({ from: 'heat', to: 'breath' });
+    expect(f.boss().castingAbility).toBe(ELEMENT_CASTS.fusion);
+    const fa = aura(f.boss(), ELEMENT_AURAS.fusion);
+    expect(fa).toBeDefined();
+    expect(ev.some((e) => e.type === 'spellfx' && e.ability === 'heart_final_fusion_start')).toBe(
+      true,
+    );
+    ev = hold(f, E.fusionCast);
+    expect(st?.elements.fusions).toBe(1);
+    expect(st?.elements.lastCombo).toBe('firestorm');
+    expect(st?.elements.comboQuarter).toBe('breath');
+    expect(f.objects(ELEMENT_OBJECTS.firePrefix).length).toBe(ELEMENT_DIFFICULTY.normal.fireLanes);
+    expect(aura(f.boss(), ELEMENT_AURAS.fusion)).toBeUndefined();
+  });
+
+  it('the quarter kit holds through the bar (its opener never lands on the combo)', () => {
+    const f = finalFight(6);
+    f.pullIn('heat');
+    quiet(f);
+    carry(f, 'hammer', 0.2);
+    expect(f.state()?.elements.casting).not.toBeNull();
+    // Nothing else is cast through it.
+    for (let i = 0; i < sec(E.fusionCast - 0.4); i++) {
+      hold(f, 0.05);
+      expect(f.boss().castingAbility).toBe(ELEMENT_CASTS.fusion);
+    }
+  });
+
+  it('every pair lays its combo in the quarter it entered', () => {
+    const pairs: [SmithHeartVein, SmithHeartVein, FusionCombo, string][] = [
+      ['heat', 'quench', 'steam', ELEMENT_OBJECTS.steamPrefix],
+      ['heat', 'hammer', 'magma', ''],
+      ['heat', 'breath', 'firestorm', ELEMENT_OBJECTS.firePrefix],
+      ['quench', 'breath', 'hail', ELEMENT_OBJECTS.hailPrefix],
+      ['quench', 'hammer', 'avalanche', ELEMENT_OBJECTS.avalanchePrefix],
+      ['breath', 'hammer', 'spires', ELEMENT_OBJECTS.spirePrefix],
+    ];
+    for (const [from, to, combo, prefix] of pairs) {
+      const f = finalFight(6);
+      f.pullIn(to);
+      quiet(f);
+      const got = fireCombo(scope(f), from, to);
+      expect(got, `${from}+${to}`).toBe(combo);
+      f.tick(sec(0.7));
+      if (combo === 'magma') {
+        const marked = f.players.filter((p) => aura(p, ELEMENT_AURAS.magmaMark));
+        expect(marked.length).toBe(ELEMENT_DIFFICULTY.normal.magmaMarks);
+        continue;
+      }
+      const objs = f.objects(prefix);
+      expect(objs.length, combo).toBeGreaterThan(0);
+      for (const o of objs) {
+        const p = f.local(o);
+        // Lanes stand at their middle and run past the quarter's edge; the
+        // rest stand inside it.
+        if (combo === 'firestorm' || combo === 'avalanche') continue;
+        expect(heartQuarterAt(p.x, p.z), combo).toBe(to);
+      }
+    }
+  });
+
+  it('per tier: more clouds, marks, lanes, stones and spires', () => {
+    for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+      const R = ELEMENT_DIFFICULTY[tier];
+      const f = finalFight(8);
+      if (tier !== 'normal') f.dev(`/dev heart final ${tier}`);
+      f.pullIn('quench');
+      quiet(f);
+      const s = scope(f);
+      fireCombo(s, 'heat', 'quench');
+      expect(f.objects(ELEMENT_OBJECTS.steamPrefix).length, tier).toBe(R.steamClouds);
+      fireCombo(s, 'breath', 'quench');
+      f.tick(1);
+      expect(f.objects(ELEMENT_OBJECTS.hailPrefix).length, tier).toBe(R.hailPerWave);
+      fireCombo(s, 'hammer', 'quench');
+      expect(f.objects(ELEMENT_OBJECTS.avalanchePrefix).length, tier).toBe(R.avalancheLanes);
+      fireCombo(s, 'breath', 'hammer');
+      expect(f.objects(ELEMENT_OBJECTS.spirePrefix).length, tier).toBe(R.spires);
+      fireCombo(s, 'heat', 'breath');
+      expect(f.objects(ELEMENT_OBJECTS.firePrefix).length, tier).toBe(R.fireLanes);
+      fireCombo(s, 'heat', 'hammer');
+      expect(f.players.filter((p) => aura(p, ELEMENT_AURAS.magmaMark)).length, tier).toBe(
+        R.magmaMarks,
+      );
+    }
+  });
+
+  it('Scalding Steam scalds a player inside a live cloud, not one outside', () => {
+    const f = finalFight(6);
+    f.pullIn('quench');
+    quiet(f);
+    fireCombo(scope(f), 'heat', 'quench');
+    f.tick(sec(E.steamWarn + 0.1));
+    const cloud = f.objects(ELEMENT_OBJECTS.steamPrefix)[0];
+    const inside = f.players[2];
+    const outside = f.players[3];
+    let ev: SimEvent[] = [];
+    for (let i = 0; i < sec(2.2); i++) {
+      const c = f.local(cloud);
+      f.put(inside, c.x + 0.5, c.z);
+      f.put(outside, c.x + E.steamR + 6, c.z);
+      ev = ev.concat(f.tick(1));
+    }
+    expect(hits(ev, ELEMENT_NAMES.steam, inside.id).length).toBeGreaterThanOrEqual(2);
+    expect(hits(ev, ELEMENT_NAMES.steam, outside.id).length).toBe(0);
+  });
+
+  it('Magma Rift erupts under its marked players and leaves a lava pool for 20 s', () => {
+    const f = finalFight(6);
+    f.pullIn('hammer');
+    quiet(f);
+    scatter(f);
+    fireCombo(scope(f), 'heat', 'hammer');
+    const marked = f.players.filter((p) => aura(p, ELEMENT_AURAS.magmaMark));
+    const ev = f.tick(sec(E.magmaMarkSeconds + 0.1));
+    for (const p of marked) expect(hits(ev, ELEMENT_NAMES.magma, p.id).length).toBe(1);
+    expect(f.objects(ELEMENT_OBJECTS.lava).length).toBe(marked.length);
+    f.tick(sec(E.lavaLife - 1));
+    expect(f.objects(ELEMENT_OBJECTS.lava).length).toBe(marked.length);
+    f.tick(sec(1.5));
+    expect(f.objects(ELEMENT_OBJECTS.lava).length).toBe(0);
+  });
+
+  it('Firestorm: the wall sweeps its lane after the warning; off the lane is safe', () => {
+    const f = finalFight(6);
+    f.pullIn('breath');
+    quiet(f);
+    fireCombo(scope(f), 'heat', 'breath');
+    const lane = f.objects(ELEMENT_OBJECTS.firePrefix)[0];
+    const L = f.state()?.elements.lanes[0];
+    if (!L || !lane) throw new Error('no lane');
+    const onLane = f.players[2];
+    const offLane = f.players[3];
+    const mid = { x: L.x + Math.sin(L.facing) * 30, z: L.z + Math.cos(L.facing) * 30 };
+    const side = { x: Math.cos(L.facing), z: -Math.sin(L.facing) };
+    const keep = () => {
+      f.put(onLane, mid.x, mid.z);
+      f.put(offLane, mid.x + side.x * (L.half + 4), mid.z + side.z * (L.half + 4));
+    };
+    let ev: SimEvent[] = [];
+    for (let i = 0; i < sec(E.fireWarn - 0.2); i++) {
+      keep();
+      ev = ev.concat(f.tick(1));
+    }
+    expect(hits(ev, ELEMENT_NAMES.firestorm).length).toBe(0);
+    for (let i = 0; i < sec(E.fireLength / E.fireSpeed + 0.6); i++) {
+      keep();
+      ev = ev.concat(f.tick(1));
+    }
+    expect(hits(ev, ELEMENT_NAMES.firestorm, onLane.id).length).toBe(1);
+    expect(hits(ev, ELEMENT_NAMES.firestorm, offLane.id).length).toBe(0);
+  });
+
+  it('Storm Spires: after the charge, lightning strikes whoever stands between two spires', () => {
+    const f = finalFight(6);
+    f.pullIn('hammer');
+    quiet(f);
+    fireCombo(scope(f), 'breath', 'hammer');
+    const g = f.state()?.elements.spires[0];
+    if (!g) throw new Error('no spires');
+    const [A, B] = [g.pts[0], g.pts[1]];
+    const between = f.players[2];
+    const clear = f.players[3];
+    const keep = () => {
+      f.put(between, (A.x + B.x) / 2, (A.z + B.z) / 2);
+      f.put(clear, HEART_ROOM.x, HEART_ROOM.z);
+    };
+    let ev: SimEvent[] = [];
+    for (let i = 0; i < sec(E.spireCharge - 0.2); i++) {
+      keep();
+      ev = ev.concat(f.tick(1));
+    }
+    expect(hits(ev, ELEMENT_NAMES.spire).length).toBe(0);
+    for (let i = 0; i < sec(0.5); i++) {
+      keep();
+      ev = ev.concat(f.tick(1));
+    }
+    expect(hits(ev, ELEMENT_NAMES.spire, between.id).length).toBe(1);
+    expect(hits(ev, ELEMENT_NAMES.spire, clear.id).length).toBe(0);
+    f.tick(sec(2));
+    expect(f.objects(ELEMENT_OBJECTS.spirePrefix).length).toBe(0);
+  });
+
+  it('Mythic: the spires discharge twice; the combos leave a residue on the floor (never on Normal)', () => {
+    for (const tier of ['normal', 'mythic'] as const) {
+      const f = finalFight(6);
+      if (tier === 'mythic') f.dev('/dev heart final mythic');
+      f.pullIn('hammer');
+      quiet(f);
+      fireCombo(scope(f), 'breath', 'hammer');
+      let beams = 0;
+      for (let i = 0; i < sec(E.spireCharge + E.spireGap + 2); i++)
+        for (const e of f.tick(1))
+          if (e.type === 'spellfx' && e.ability === 'heart_final_spire_link') beams++;
+      const links = spireLinks(ELEMENT_DIFFICULTY[tier].spires).length;
+      expect(beams, tier).toBe(links * ELEMENT_DIFFICULTY[tier].spireDischarges);
+      const residue = f.objects(ELEMENT_OBJECTS.residuePrefix).length;
+      if (tier === 'mythic') expect(residue).toBeGreaterThan(0);
+      else expect(residue).toBe(0);
+    }
+  });
+
+  it('never in an intermission or the final phase: a waiting fusion is dropped', () => {
+    const f = finalFight(6);
+    f.pullIn('heat');
+    quiet(f);
+    must(f).elements.pending = { from: 'heat', to: 'hammer' };
+    f.dev('/dev heart final inter70');
+    f.tick(sec(4));
+    expect(f.state()?.phase.stage).not.toBe('fight');
+    expect(f.state()?.elements.pending).toBeNull();
+    expect(f.state()?.elements.fusions).toBe(0);
+    const g = finalFight(6);
+    g.pullIn('heat');
+    g.dev('/dev heart final last');
+    for (let i = 0; i < sec(30) && g.state()?.phase.stage !== 'final'; i++) g.tick(1);
+    expect(g.state()?.phase.stage).toBe('final');
+    must(g).elements.pending = { from: 'heat', to: 'hammer' };
+    g.tick(sec(5));
+    expect(g.state()?.elements.fusions).toBe(0);
   });
 });

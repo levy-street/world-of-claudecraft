@@ -20,6 +20,9 @@
 //                               ice, bolt, drawn, orbs, tremor, anvil, shell
 //   final strike [n]            Elemental Strike on its tank n times (the
 //                               stacks of the quarter it stands in)
+//   final fusion <combo> [now]  Elemental Fusion: its 3 s bar then the combo
+//                               (steam, magma, firestorm, hail, avalanche,
+//                               spires; or two quarters), `now` skips the bar
 //   final wake|star <vein>      a quarter's star wakes (for the rest of the
 //                               fight) / fires now (the rework of 2026-11-18)
 //   final pillars [n|here]      Wake the Stone: n volleys, or one where you stand
