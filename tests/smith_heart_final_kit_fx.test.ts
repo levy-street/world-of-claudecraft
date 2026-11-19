@@ -361,8 +361,9 @@ describe('FinalKitFx over a fake world', () => {
     expect(root).toBeDefined();
     for (let i = 0; i < 10; i++) fx.update(1 / 30);
     // Nine object footprints, the ember's ring, the lightning's reach, the
-    // bolt's target ring and the blade's line: every tier.
-    expect(footprintsShown(root)).toBe(13);
+    // bolt's target ring, the blade's line and the charged pillar's electric
+    // ground (Jose's playtest of 2026-11-19): every tier.
+    expect(footprintsShown(root)).toBe(14);
     expect(visibleNamed(root, 'smithHeartFinalWhirl')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalWhirlCore')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalWhirlSmoke')).toBe(1);
@@ -455,7 +456,7 @@ describe('FinalKitFx over a fake world', () => {
     (world as { entityRosterVersion: number }).entityRosterVersion = 2;
     for (let i = 0; i < 12; i++) fx.update(1 / 30);
     expect(visibleNamed(root, 'smithHeartFinalWhirl')).toBe(0);
-    expect(footprintsShown(root)).toBe(12);
+    expect(footprintsShown(root)).toBe(13);
     // Out of the Heart: everything hides.
     me.pos = { x: o.x - 200, y: 0, z: o.z };
     fx.update(1 / 30);

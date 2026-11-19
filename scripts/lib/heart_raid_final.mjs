@@ -149,6 +149,8 @@ export const final = {
       const pillar = finalPillarOf(t);
       if (pillar) {
         o.pillars.push({ ...at, r: T.pillarR, charged: pillar === 'charged' });
+        // A charged pillar's ground bites every second (2026-11-19): stay off it.
+        if (pillar === 'charged') o.danger.push({ ...at, r: T.chargedZoneR + 1 });
         continue;
       }
       if (t.startsWith(FINAL_OBJECTS.bladePrefix)) {

@@ -112,15 +112,24 @@ describe('the pure rules', () => {
     expect(T.reducedPace).toBeLessThan(1);
   });
 
-  it('Storm-Charged adds up per charged pillar; Normal soft, Heroic harder', () => {
+  it('Storm-Charged adds up per charged pillar; felt on Normal, harder on Heroic', () => {
     expect(chargedPulse(0, 10, 12)).toEqual([0, 0]);
     expect(chargedPulse(3, 10, 12)).toEqual([30, 36]);
     const N = FINAL_DIFFICULTY.normal;
     const H = FINAL_DIFFICULTY.heroic;
-    // Two charged on Normal: under a tenth of a level-20 cloth pool a pulse.
-    expect(chargedPulse(2, N.chargedMin, N.chargedMax)[1] * N.damageMult).toBeLessThan(113);
-    // Four press: more than two empty Overload pulses every four seconds.
-    expect(chargedPulse(4, N.chargedMin, N.chargedMax)[0] * N.damageMult).toBeGreaterThan(80);
+    // Jose's playtest of 2026-11-19: one charged pillar is FELT, 90 to 110 on
+    // Normal (130 to 150 on Heroic) every 5 s; four are urgent (about 400 a
+    // pulse, over a third of a 1,100 pool) yet healable for a while.
+    const one = chargedPulse(1, N.chargedMin, N.chargedMax).map((v) => Math.round(v * N.damageMult));
+    expect(one[0]).toBeGreaterThanOrEqual(89);
+    expect(one[1]).toBeLessThanOrEqual(111);
+    const h1 = chargedPulse(1, H.chargedMin, H.chargedMax).map((v) => Math.round(v * H.damageMult));
+    expect(h1[0]).toBeGreaterThanOrEqual(129);
+    expect(h1[1]).toBeLessThanOrEqual(151);
+    const four = chargedPulse(4, N.chargedMin, N.chargedMax)[1] * N.damageMult;
+    expect(four).toBeGreaterThan(350);
+    expect(four).toBeLessThan(1100 / 2);
+    expect(T.chargedEvery).toBe(5);
     expect(H.chargedMin).toBeGreaterThan(N.chargedMin);
   });
 
@@ -582,5 +591,37 @@ describe('the pours and the end', () => {
       expect(aura(p, FINAL_AURAS.bladeMark)).toBeUndefined();
     }
     void heartQuarterAt;
+  });
+});
+
+describe("Storm-Charged's ground and its felt pulse (playtest 2026-11-19)", () => {
+  it('bites whoever stands within 5.5 yd every second; the pulse strikes and cues every player', () => {
+    const f = finalFight(5);
+    f.pullIn('hammer');
+    still(f);
+    const spot = inQuarter('hammer', 30, -20);
+    raiseAt(f, spot.x, spot.z);
+    f.dev('/dev heart final charge');
+    const pillar = f.state()?.stars.pillars.find((p) => p.charged);
+    expect(pillar).toBeDefined();
+    if (!pillar) return;
+    // One raider inside its ground, the rest well off it.
+    const inside = f.players[2];
+    for (const p of f.players) f.put(p, pillar.x + 15, pillar.z + 4);
+    let ev: SimEvent[] = [];
+    for (let i = 0; i < sec(T.chargedEvery + 0.2); i++) {
+      f.put(inside, pillar.x + T.chargedZoneR - 1, pillar.z);
+      ev = ev.concat(f.tick(1));
+    }
+    const bites = hits(ev, FINAL_NAMES.chargedZone, inside.id);
+    expect(bites.length).toBeGreaterThanOrEqual(Math.floor(T.chargedEvery / T.chargedZoneEvery));
+    for (const p of f.players.filter((q) => q !== inside))
+      expect(hits(ev, FINAL_NAMES.chargedZone, p.id).length).toBe(0);
+    // The pulse: every player struck, each with its hit cue.
+    for (const p of f.players) expect(hits(ev, FINAL_NAMES.charged, p.id).length).toBe(1);
+    const cues = ev.filter(
+      (e) => e.type === 'spellfx' && (e as { ability: string }).ability === FINAL_CUES.chargedHit,
+    );
+    expect(cues.length).toBe(f.players.length);
   });
 });

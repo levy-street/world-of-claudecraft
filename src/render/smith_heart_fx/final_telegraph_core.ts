@@ -29,6 +29,9 @@ export type FinalTelegraphKind =
   | 'whirl'
   // A Breath Dust Devil's moving reach (Jose's playtest of 2026-11-19).
   | 'devil'
+  // A Storm-Charged pillar's electric ground (the same playtest): a hard
+  // edge and crackling cells, its curtain standing on the edge.
+  | 'chargedZone'
   | 'pool'
   | 'ember'
   | 'crack'
@@ -104,6 +107,7 @@ const look = (
 export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTelegraphLook>> = {
   whirl: look('fire', 0.32, 0.5, 1.2, 0.85, { falloff: 0.5, curtain: false }),
   devil: look('storm', 0.28, 0.6, 1.1, 0.8, { curtain: false }),
+  chargedZone: look('storm', 0.5, 1, 0.9, 1, { rim: 1 }),
   pool: look('fire', 0.45, 0.9, 0.5, 0.95),
   ember: look('fire', 0.55, 1, 0.9, 1, { curtain: false }),
   crack: look('frost', 0.62, 1, 0.75, 1, { inward: 1 }),
@@ -134,8 +138,9 @@ export const FINAL_TELEGRAPH_POOLS: Readonly<Record<FinalElement, number>> = {
   frost: 8,
   // Six orbs, two Drawn Lightning marks, the bolt's target, a volley of Sky
   // Strikes and their Arcing Stone rings (two volleys can overlap), and up to
-  // six Dust Devils (two volleys overlapping).
-  storm: 30,
+  // six Dust Devils (two volleys overlapping), and a charged pillar's ground
+  // under each of up to eight pillars.
+  storm: 38,
   // Four tremors, the Anvil, the Crushed, a volley of rises.
   stone: 18,
 };

@@ -2552,9 +2552,14 @@ interacting. What changed:
   of a standing pillar runs into it: Arcing Stone, a 9 yd ring of lightning round
   the pillar on the floor from the moment the strike is laid, lands with it (380 to
   420), and the pillar is left **Storm-Charged** (the owner's call of 2026-11-18):
-  while it stands it pulses the WHOLE raid every 4 s, summed per charged pillar
-  (Normal 26 to 30 a pillar before the tier's x1.15: one or two are healed through,
-  four or more press; Heroic 32 to 36 since the Heroic bot raids of 2026-11-18, 56 to 64 before; Mythic 66 to 74). A Crossing Blade shatters
+  while it stands it pulses the WHOLE raid every 5 s, summed per charged pillar
+  (since Jose's playtest of 2026-11-19, which never noticed it: 90 to 110 a pillar on
+  Normal after its x1.15, 130 to 150 on Heroic, 156 to 180 on Mythic; one is felt,
+  three or four are urgent but healable for a while; a ring races out over the room,
+  a crack of thunder, and each player struck flashes; 26 to 30 every 4 s before it),
+  and its ground is electric: whoever stands within 5.5 yd of it is bitten every
+  second for 50 to 60 nature before the tier's factor (Charged Ground: a hard-edged
+  storm ring on the floor, arcs crawling over it). A Crossing Blade shatters
   every pillar its line crosses (the marked player leads the line through them, the
   charged first). So the order of the quarters is the strategy: wake the Quench (the
   blades) before the storm, or the pillars charge with nothing to break them.

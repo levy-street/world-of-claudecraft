@@ -160,6 +160,8 @@ export interface FinalStarsState {
   /** The marks still to come in this round of blades. */
   bladeQueue: number[];
   chargedTimer: number;
+  /** Seconds to the charged pillars' electric ground's next bite. */
+  zoneTimer: number;
   /** Volleys laid (the hashed picks' salt). */
   volleys: number;
   /** Counters the tests and the readout read. */

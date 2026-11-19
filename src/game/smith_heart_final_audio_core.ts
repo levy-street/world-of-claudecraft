@@ -117,7 +117,14 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
     S('heart_breath_discharge', 1, 'point', 1.1, 0.3),
     S('heart_breath_fork', 0.6, 'point', 0.85, 0.3),
   ],
-  [FINAL_CUES.charged]: [S('heart_breath_fork', 0.45, 'source', 0.8, 0.9)],
+  // The charged pulse (Jose's playtest of 2026-11-19: he never heard it): a
+  // discharge under a crack of thunder, then the hit on each player.
+  [FINAL_CUES.charged]: [
+    S('heart_breath_discharge', 0.9, 'source', 1.1, 0.9),
+    S('heart_breath_fork', 0.7, 'source', 0.8, 0.9),
+  ],
+  [FINAL_CUES.chargedHit]: [S('heart_breath_strike', 0.55, 'target', 1.3, 0.25)],
+  [FINAL_CUES.chargedZone]: [S('heart_breath_fork', 0.4, 'target', 1.4, 0.6)],
   [FINAL_CUES.blade]: [S('heart_quench_slash', 1, 'point', 1, 0.15)],
   // ---- the intermissions ----
   [FINAL_PHASE_CUES.leap]: [S(F('stride'), 1, 'point', 1, 1)],

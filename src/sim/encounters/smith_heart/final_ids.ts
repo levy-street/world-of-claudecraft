@@ -227,6 +227,12 @@ export const FINAL_CUES = {
   arcingStone: 'heart_final_arcing_stone',
   /** A Storm-Charged pillar pulses the raid (spellfx 'nova' on it). */
   charged: 'heart_final_charged_pulse',
+  /** That pulse strikes a player (spellfx 'nova', pillar to them: the hit's
+   *  flash and crack on them). */
+  chargedHit: 'heart_final_charged_hit',
+  /** Its electric ground bites a player standing in it (spellfx 'nova',
+   *  pillar to them). */
+  chargedZone: 'heart_final_charged_zone',
   /** A Crossing Blade flies its line (spellfxAt at the line's middle, half
    *  its length). */
   blade: 'heart_final_crossing_blade',
@@ -276,6 +282,7 @@ export const FINAL_NAMES = {
   strike: 'Breaking Storm',
   arc: 'Arcing Stone',
   charged: 'Storm-Charged',
+  chargedZone: 'Charged Ground',
   blade: 'Crossing Blade',
 } as const;
 
@@ -405,12 +412,13 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pillarCap: 8,
     thrumMin: 330,
     thrumMax: 370,
-    // 26 to 30 a pillar (34 to 40 until the bot raids of 2026-11-18: four
-    // charged pillars outran two healers on top of the Overload pulses), and
-    // no strike seeks the stone on Normal: a pillar charges only when a
-    // marked player stands by it.
-    chargedMin: 26,
-    chargedMax: 30,
+    // 78 to 96 a pillar, 90 to 110 after Normal's x1.15 (Jose's playtest of
+    // 2026-11-19: the old 26 to 30, every 4 s, went unnoticed on a pool of
+    // 1,100; 34 to 40 until the bot raids of 2026-11-18), and no strike seeks
+    // the stone on Normal: a pillar charges only when a marked player stands
+    // by it.
+    chargedMin: 78,
+    chargedMax: 96,
     skyMarks: 1,
     skyPillarSpots: 0,
     bladeMarks: 1,
@@ -457,10 +465,11 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pillarCap: 7,
     thrumMin: 520,
     thrumMax: 580,
-    // 32 to 36 a pillar (56 to 64 until the Heroic bot raids of 2026-11-18:
-    // three or four charged at once outran the healers on top of the Anvil).
-    chargedMin: 32,
-    chargedMax: 36,
+    // 118 to 136 a pillar, 130 to 150 after Heroic's x1.1 (Jose's playtest of
+    // 2026-11-19; 32 to 36 before it, 56 to 64 until the Heroic bot raids of
+    // 2026-11-18).
+    chargedMin: 118,
+    chargedMax: 136,
     skyMarks: 3,
     // None seeks the stone on Heroic either (one until the same raids): a
     // pillar charges when a marked player brings the strike to it; Mythic's
@@ -507,8 +516,10 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pillarCap: 6,
     thrumMin: 640,
     thrumMax: 700,
-    chargedMin: 66,
-    chargedMax: 74,
+    // 120 to 138 a pillar, 156 to 180 after Mythic's x1.3 (66 to 74 until
+    // Jose's playtest of 2026-11-19).
+    chargedMin: 120,
+    chargedMax: 138,
     skyMarks: 3,
     skyPillarSpots: 2,
     bladeMarks: 2,
@@ -626,8 +637,16 @@ export const FINAL_TUNING = {
   pillarClearOfBoss: 9,
   pillarRimPad: 4,
   pillarRingPad: 3,
-  /** A Storm-Charged pillar pulses the raid this often. */
-  chargedEvery: 4,
+  /** A Storm-Charged pillar pulses the raid this often (4 s until Jose's
+   *  playtest of 2026-11-19, now fewer and harder: it must be felt). */
+  chargedEvery: 5,
+  /** Its electric ground (the same playtest): whoever stands within this of
+   *  a charged pillar's centre takes chargedZoneMin to chargedZoneMax nature
+   *  (times the tier's damageMult) every chargedZoneEvery, per pillar. */
+  chargedZoneR: 5.5,
+  chargedZoneEvery: 1,
+  chargedZoneMin: 50,
+  chargedZoneMax: 60,
   /** The Breath's star: Sky Strike. */
   skyFirst: 6,
   skyEvery: 13,
