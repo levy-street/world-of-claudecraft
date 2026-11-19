@@ -32,10 +32,7 @@
 
 import { isLockedOut } from '../../combat/cc';
 import { DT, type Entity } from '../../types';
-import {
-  clearCastIf,
-  dropAuraById,
-} from '../sunken_bastion/claim';
+import { clearCastIf, dropAuraById } from '../sunken_bastion/claim';
 import { stampFloor } from './council_floor_gap';
 import {
   COUNCIL_AURAS,
