@@ -71,19 +71,33 @@ export const RIVER_VEIN_GROOVE = {
 
 /** The dim ribbon's light, as multiples of the vein's colour: the wash across
  *  the groove (`tint`), the halo round the thread between pulses and what a
- *  crest adds (`halo`, `haloPulse`), the thread itself at a crest (`thread`)
- *  and how far it whitens toward its core (`core`). Kept well under the bright
- *  twin's (tests/smith_heart_river_veins.test.ts). */
+ *  crest adds (`halo`, `haloPulse`), the thread itself at a crest (`thread`),
+ *  how far it whitens toward its core (`core`) and how white that core is
+ *  (`white`, a share of white over the vein's colour), and how much brighter a
+ *  bead of the Breath's static burns (`bead`, a share of the thread). Kept well under
+ *  the bright twin's (tests/smith_heart_river_veins.test.ts). */
 export const RIVER_VEIN_LIGHT = {
   tint: 0.08,
   halo: 0.06,
   haloPulse: 0.18,
   thread: 0.5,
   core: 0.35,
+  white: 0.55,
+  bead: 0.2,
 } as const;
 
-/** How white the thread's core is (a share of white over the vein's colour). */
-const CORE_WHITE = 0.55;
+/** The Quench's rime along both lips: where it rises and where it is whole
+ *  (shares of the half width), where it fades at the strip's edge, its frost
+ *  (linear rgb: a cold grey, it is frost and never a light), how far it covers
+ *  what lies under it and how opaque it draws. */
+export const RIVER_VEIN_RIME = {
+  from: 0.52,
+  full: 0.9,
+  fade: 0.93,
+  frost: [0.5, 0.6, 0.7],
+  mix: 0.3,
+  alpha: 0.7,
+} as const;
 
 export const RIVER_VEIN_LOOKS: Readonly<Record<RiverVein, RiverVeinLook>> = {
   // A seam of ore in the quarry's stone: broad, slow, glinting.
@@ -136,9 +150,12 @@ function smooth(a: number, b: number, v: number): number {
 }
 
 /** The dim ribbon's light at `across` (0 its middle, 1 its edge) under a pulse
- *  of brightness `pulse`, the thread on the middle and the lips unragged
- *  (mirrors the shader): `gain` times the vein's colour plus `white`, drawn at
- *  `alpha` over the floor. */
+ *  of brightness `pulse`, at its BRIGHTEST (mirrors the shader with the thread
+ *  on the middle, the lips unragged, the flicker and every noise at one, a
+ *  bead of the Breath's static burning, the Quench's rime whole; the Hammer's
+ *  flecks are left out: sparse glints, each smaller than the thread is wide):
+ *  `gain` times the vein's colour plus `white` (linear luma), drawn at `alpha`
+ *  over the floor. */
 export function riverVeinAcross(
   vein: RiverVein,
   across: number,
@@ -147,18 +164,23 @@ export function riverVeinAcross(
   const L = RIVER_VEIN_LOOKS[vein];
   const G = RIVER_VEIN_GROOVE;
   const K = RIVER_VEIN_LIGHT;
+  const R = RIVER_VEIN_RIME;
   const a = Math.abs(across);
   const groove = 1 - smooth(G.lip, G.edge, a);
   const thread = 1 - smooth(L.thread * 0.4, L.thread, a);
   const halo = 1 - smooth(0.05, 0.55, a);
-  const lit = thread * pulse * K.thread;
+  const lit = thread * pulse * (1 + K.bead * L.crackle) * K.thread;
+  const rime = smooth(R.from, R.full, a) * (1 - smooth(R.fade, 1, a)) * L.rime;
+  const frost = 0.2126 * R.frost[0] + 0.7152 * R.frost[1] + 0.0722 * R.frost[2];
+  const keep = 1 - rime * R.mix;
   return {
     gain:
-      K.tint * groove +
-      halo * halo * (K.halo + K.haloPulse * pulse) +
-      lit * (1 - K.core * CORE_WHITE),
-    white: lit * K.core * CORE_WHITE,
-    alpha: Math.min(1, Math.max(groove * G.cover, halo * 0.65, thread)),
+      (K.tint * groove +
+        halo * halo * (K.halo + K.haloPulse * pulse) +
+        lit * (1 - K.core * K.white)) *
+      keep,
+    white: lit * K.core * K.white * keep + frost * rime * R.mix,
+    alpha: Math.min(1, Math.max(groove * G.cover, halo * 0.65, thread, rime * R.alpha)),
   };
 }
 
@@ -222,18 +244,18 @@ void main() {
   float grain = 1.0 - smoothstep(0.0, 0.2, length(fo * vec2(1.0, 1.6)));
   float glint = 0.5 + 0.5 * sin(uTime * (1.0 + fn * 3.0) + fn * 40.0);
   float fleck = step(0.86, fn) * grain * glint * glint * groove * uKind.x;
-  // The Quench's rime: pale frost along both lips.
-  float rime = smoothstep(0.52, 0.9, a) * (1.0 - smoothstep(0.93, 1.0, a));
+  // The Quench's rime: frost along both lips (RIVER_VEIN_RIME).
+  float rime = smoothstep(${f3(RIVER_VEIN_RIME.from)}, ${f3(RIVER_VEIN_RIME.full)}, a) * (1.0 - smoothstep(${f3(RIVER_VEIN_RIME.fade)}, 1.0, a));
   rime *= (0.55 + 0.45 * vns(vec2(vArc * 4.0, vAcross * 6.0))) * uKind.z;
   // The light (riverVeinAcross): the wash, the halo, the thread whitening to its core.
-  float light = thread * pulse * flick * (1.0 + 0.5 * bead);
+  float light = thread * pulse * flick * (1.0 + ${f3(RIVER_VEIN_LIGHT.bead)} * bead);
   vec3 stone = uGroove * (0.75 + 0.5 * vns(vec2(vArc * 1.5, vAcross * 3.0 + 2.0)));
-  vec3 core = mix(uColor, vec3(1.0), ${f3(CORE_WHITE)});
+  vec3 core = mix(uColor, vec3(1.0), ${f3(RIVER_VEIN_LIGHT.white)});
   vec3 col = stone + uColor * (${f3(RIVER_VEIN_LIGHT.tint)} * groove + halo * halo * (${f3(RIVER_VEIN_LIGHT.halo)} + ${f3(RIVER_VEIN_LIGHT.haloPulse)} * pulse));
   col += mix(uColor, core, ${f3(RIVER_VEIN_LIGHT.core)}) * light * ${f3(RIVER_VEIN_LIGHT.thread)};
   col += mix(uColor, core, 0.4) * fleck * 0.5;
-  col = mix(col, vec3(0.78, 0.9, 1.0), rime * 0.4);
-  float alpha = clamp(max(groove * ${f3(RIVER_VEIN_GROOVE.cover)}, max(halo * 0.65, max(thread, rime * 0.7))), 0.0, 1.0);
+  col = mix(col, vec3(${RIVER_VEIN_RIME.frost.map(f3).join(', ')}), rime * ${f3(RIVER_VEIN_RIME.mix)});
+  float alpha = clamp(max(groove * ${f3(RIVER_VEIN_GROOVE.cover)}, max(halo * 0.65, max(thread, rime * ${f3(RIVER_VEIN_RIME.alpha)}))), 0.0, 1.0);
   gl_FragColor = vec4(col, alpha);
   #include <colorspace_fragment>
 }

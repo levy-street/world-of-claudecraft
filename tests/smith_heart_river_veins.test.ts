@@ -20,6 +20,7 @@ import {
   RIVER_VEIN_GROOVE,
   RIVER_VEIN_LIGHT,
   RIVER_VEIN_LOOKS,
+  RIVER_VEIN_RIME,
   RIVER_VEINS,
   riverVeinAcross,
   riverVeinMaterial,
@@ -80,14 +81,30 @@ describe('the light-rivers as veins of light', () => {
       const G = RIVER_VEIN_GROOVE;
       expect(L.wander * G.reach + L.crackle * G.kink + L.thread).toBeLessThan(G.lip - G.rag);
       expect(u.uLook.value.x).toBe(L.thread);
+      expect(u.uLook.value.y).toBe(L.wander);
       expect(u.uLook.value.z).toBeCloseTo((Math.PI * 2) / L.wavelength, 9);
       expect(u.uLook.value.w).toBe(L.speed);
+      expect(u.uGroove.value.toArray()).toEqual([...L.groove]);
+      expect(u.uKind.value.toArray()).toEqual([L.fleck, L.crackle, L.rime]);
       // One touch of its own each, and only one.
       expect(L.fleck + L.crackle + L.rime).toBe(1);
     }
     expect(RIVER_VEIN_LOOKS.hammer.fleck).toBe(1);
     expect(RIVER_VEIN_LOOKS.breath.crackle).toBe(1);
     expect(RIVER_VEIN_LOOKS.quench.rime).toBe(1);
+    // The shader's groove and wander are these numbers: its two rag noises span
+    // `rag` either way between them, its two wander noises `reach`, its kink `kink`.
+    const G = RIVER_VEIN_GROOVE;
+    const f3 = (v: number) => v.toFixed(3);
+    const frag = riverVeinMaterial('quench').fragmentShader;
+    for (const line of [
+      `float rag = (vns(vec2(vArc * 0.7, 3.1)) - 0.5) * ${f3(G.rag * (4 / 3))} + (vns(vec2(vArc * 2.3, 7.7)) - 0.5) * ${f3(G.rag * (2 / 3))};`,
+      `float groove = 1.0 - smoothstep(${f3(G.lip)} + rag, ${f3(G.edge)}, a);`,
+      `float wob = (vns(vec2(vArc * 0.12, 1.3)) - 0.5) * ${f3(G.reach * (14 / 9))} + (vns(vec2(vArc * 0.5, 9.1)) - 0.5) * ${f3(G.reach * (4 / 9))};`,
+      `wob = wob * uLook.y + (vns(vec2(vArc * 3.1, floor(uTime * 9.0) * 1.7)) - 0.5) * ${f3(G.kink * 2)} * uKind.y;`,
+      'float t = abs(vAcross - wob);',
+    ])
+      expect(frag).toContain(line);
   });
 
   it('runs its pulses toward the guardian and never lets the route go out', () => {
@@ -169,17 +186,39 @@ describe('the light-rivers as veins of light', () => {
       expect(low.gain * Lc + low.white).toBeGreaterThan(peak * 0.8);
       // The dim ribbon is still found from afar: a wash of the vein's colour across
       // the whole groove (what the flat band was), under the thread.
-      const wash = riverVeinAcross(vein, RIVER_VEIN_GROOVE.lip * 0.9, RIVER_VEIN_FLOOR);
+      // (Sampled between the thread's halo and the Quench's rime.)
+      const wash = riverVeinAcross(vein, RIVER_VEIN_RIME.from - 0.02, RIVER_VEIN_FLOOR);
       expect(wash.gain).toBeGreaterThanOrEqual(RIVER_VEIN_LIGHT.tint - 1e-9);
       expect(wash.alpha).toBeCloseTo(RIVER_VEIN_GROOVE.cover, 6);
     }
     expect(RIVER_VEIN_LIGHT.tint).toBeGreaterThan(0.05);
-    // The shader draws the thread at least a pixel and a half wide (a far ribbon
-    // keeps its line), and reads the same light numbers as the twin.
+    // The twin above is the shader's own arithmetic, line for line: the thread never
+    // thinner than a pixel and a half (a far ribbon keeps its line), the halo, the light
+    // with the Breath's bead, the wash, the core, the Quench's frost, the alpha.
+    const f3 = (v: number) => v.toFixed(3);
+    const G = RIVER_VEIN_GROOVE;
+    const K = RIVER_VEIN_LIGHT;
+    const R = RIVER_VEIN_RIME;
     const frag = riverVeinMaterial('breath').fragmentShader;
-    expect(frag).toContain('max(uLook.x, fwidth(vAcross) * 1.5)');
-    expect(frag).toContain(`* light * ${RIVER_VEIN_LIGHT.thread.toFixed(3)}`);
-    expect(frag).toContain(`${RIVER_VEIN_LIGHT.tint.toFixed(3)} * groove`);
+    for (const line of [
+      'float th = min(max(uLook.x, fwidth(vAcross) * 1.5), 0.9);',
+      'float thread = 1.0 - smoothstep(th * 0.4, th, t);',
+      'float halo = 1.0 - smoothstep(0.05, 0.55, t);',
+      `float light = thread * pulse * flick * (1.0 + ${f3(K.bead)} * bead);`,
+      `vec3 core = mix(uColor, vec3(1.0), ${f3(K.white)});`,
+      `vec3 col = stone + uColor * (${f3(K.tint)} * groove + halo * halo * (${f3(K.halo)} + ${f3(K.haloPulse)} * pulse));`,
+      `col += mix(uColor, core, ${f3(K.core)}) * light * ${f3(K.thread)};`,
+      `float rime = smoothstep(${f3(R.from)}, ${f3(R.full)}, a) * (1.0 - smoothstep(${f3(R.fade)}, 1.0, a));`,
+      `col = mix(col, vec3(${R.frost.map(f3).join(', ')}), rime * ${f3(R.mix)});`,
+      `float alpha = clamp(max(groove * ${f3(G.cover)}, max(halo * 0.65, max(thread, rime * ${f3(R.alpha)}))), 0.0, 1.0);`,
+    ])
+      expect(frag).toContain(line);
+    // The flicker and the bead only ever dim or hold the twin's worst case: both are
+    // noises in 0..1 the twin takes at one.
+    expect(frag).toContain('float flick = 0.86 + 0.14 * vns(');
+    expect(frag).toContain('float bead = smoothstep(0.58, 0.9, vns(');
+    // The frost is a cold grey, never a light: under the vein colours' own luma.
+    for (const c of R.frost) expect(c).toBeLessThanOrEqual(0.7);
   });
 
   it('pools the bright ribbon in its channel: full across its middle, no hard edge, no pow', () => {
@@ -194,8 +233,21 @@ describe('the light-rivers as veins of light', () => {
     expect(m.fragmentShader).toContain(
       `float flow = ${RIVER_LIT_POOL.flow.toFixed(2)} + ${RIVER_LIT_POOL.swing.toFixed(2)} * sin(`,
     );
-    expect(m.fragmentShader).toContain(`float streak = ${RIVER_LIT_POOL.streak.toFixed(2)} + `);
+    expect(m.fragmentShader).toContain(
+      `float streak = ${RIVER_LIT_POOL.streak.toFixed(2)} + ${RIVER_LIT_POOL.streakA.toFixed(2)} * s1 * s1 + ${RIVER_LIT_POOL.streakB.toFixed(2)} * s2 * s2;`,
+    );
     expect(m.uniforms.uK.value).toBe(RIVER_LIT_POOL.k);
+    // The hot line and the whole of the colour: the pool multiplies the ribbon AND the
+    // surge (drop it from either and the lips stop feathering).
+    expect(m.fragmentShader).toContain(
+      `float line = 1.0 - smoothstep(0.0, ${RIVER_LIT_POOL.line.toFixed(2)}, a);`,
+    );
+    expect(m.fragmentShader).toContain(
+      `vec3 hot = mix(uColor, vec3(1.0, 0.97, 0.9), ${RIVER_LIT_POOL.white.toFixed(2)});`,
+    );
+    expect(m.fragmentShader).toContain(
+      `vec3 col = uColor * flow * streak * pool * uK + hot * line * ${RIVER_LIT_POOL.hot.toFixed(2)} * flow + hot * head * pool;`,
+    );
     // Feathered to nothing at the strip's edge, full at its middle.
     expect(riverLitAcross(1).gain).toBe(0);
     expect(riverLitAcross(0).gain).toBeGreaterThan(riverLitAcross(0.75).gain);

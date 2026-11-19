@@ -87,7 +87,8 @@ export function riverLitAcross(
   const line = 1 - riverSmooth(0, P.line, a);
   return {
     gain: flow * streak * pool * P.k + line * P.hot * flow * (1 - P.white),
-    white: line * P.hot * flow * P.white,
+    // The hot line's white is (1.0, 0.97, 0.9): its linear luma.
+    white: line * P.hot * flow * P.white * (0.2126 + 0.7152 * 0.97 + 0.0722 * 0.9),
   };
 }
 

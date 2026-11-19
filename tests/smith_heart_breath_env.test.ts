@@ -469,18 +469,30 @@ describe('the Breath painted kit loader', () => {
     // The storm pass (design doc section 5.27): a dark slate under the guardian, its
     // lightning and every telegraph; matte, because a smoother slab under the key threw
     // a white sheen that read as snow.
-    const { kit } = await freshKit();
-    const F = kit.BREATH_ENV_FLOOR;
-    for (const g of F.gain) expect(g).toBeLessThan(0.8);
-    // A neutral slate, never navy: the painting is blue-violet already, so the gain
-    // takes blue back (on the lowest tier, with no grade over it, a bluer gain read navy).
-    expect(F.gain[2]).toBeLessThan(F.gain[0]);
-    expect(F.roughness).toBeGreaterThanOrEqual(0.8);
-    const m = kit.breathEnvFloorMaterial() as THREE.MeshStandardMaterial;
-    expect(m.color.toArray()).toEqual([...F.gain]);
-    if (m.isMeshStandardMaterial) expect(m.roughness).toBe(F.roughness);
-    // One shared material: the terrain's `scoured` tops all draw this object.
-    expect(kit.breathEnvFloorMaterial()).toBe(m);
+    // On both material families: the standard tiers and the Lambert tier.
+    for (const tier of ['ultra', 'low'] as const) {
+      vi.resetModules();
+      const { activateTier } = await import('./helpers/gfx_tier');
+      activateTier(tier);
+      const { GFX } = await import('../src/render/gfx');
+      expect(GFX.standardMaterials).toBe(tier === 'ultra');
+      const kit = await import('../src/render/smith_heart/breath_env_kit');
+      const F = kit.BREATH_ENV_FLOOR;
+      // The authored numbers (the pale slab they replace: gain 1.12, 1.1, 1.0; rough 0.82).
+      expect(F.gain).toEqual([0.62, 0.61, 0.56]);
+      expect(F.roughness).toBe(0.88);
+      for (const g of F.gain) expect(g).toBeLessThan(0.8);
+      // A neutral slate, never navy: the painting is blue-violet already, so the gain
+      // takes blue back (on the lowest tier, with no grade over it, a bluer gain read navy).
+      expect(F.gain[2]).toBeLessThan(F.gain[0]);
+      expect(F.roughness).toBeGreaterThanOrEqual(0.8);
+      const m = kit.breathEnvFloorMaterial() as THREE.MeshStandardMaterial;
+      expect(m.color.toArray()).toEqual([...F.gain]);
+      expect(Boolean(m.isMeshStandardMaterial)).toBe(tier === 'ultra');
+      if (tier === 'ultra') expect(m.roughness).toBe(F.roughness);
+      // One shared material: the terrain's `scoured` tops all draw this object.
+      expect(kit.breathEnvFloorMaterial()).toBe(m);
+    }
   });
 
   it('cuts the stacks away round the camera and lights every painted crystal', async () => {

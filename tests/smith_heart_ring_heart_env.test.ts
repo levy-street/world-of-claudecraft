@@ -4,6 +4,7 @@
 // under; the Heat's set round its hall; the four-way skies over the Heart and the Ring.
 
 import { existsSync, readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { envAreaClip } from '../src/render/smith_heart/env_area_clip';
@@ -27,6 +28,7 @@ import {
   heartRockCoreUniform,
   heartRockHeatOpenUniform,
 } from '../src/render/smith_heart/heart_rock_cutaway';
+import { buildHeartSky } from '../src/render/smith_heart/heart_sky';
 import { heartFloorClearance } from '../src/render/smith_heart/heart_walls_core';
 import { HEAT_ENV_OPEN } from '../src/render/smith_heart/heat_env_plan_core';
 import {
@@ -328,5 +330,22 @@ describe('the four-way skies', () => {
       expect(ringSkyV(up)).toBeLessThanOrEqual(ringSkyV(up - 0.005) + 1e-9);
     // Under the old line alone, everything below `footUp` read one row.
     expect(pressed(0)).toBeGreaterThan(0.995);
+    // The pressed line is the one the owner approved, to the number.
+    expect([S.horizon, S.stretch]).toEqual([1.3, 1.35]);
+    // And the dome's shader runs `ringSkyV`'s arithmetic, line for line.
+    const dome = buildHeartSky({
+      lowGfx: false,
+      ringSky: new THREE.Texture(),
+      onFrame: () => undefined,
+    });
+    const frag = (dome.mesh.material as THREE.ShaderMaterial).fragmentShader;
+    for (const line of [
+      'float upc = max(up, 0.0);',
+      `float vHigh = ${S.horizon.toFixed(3)} - upc * ${S.stretch.toFixed(3)};`,
+      `float vLow = ${S.foot.toFixed(3)} + ${(S.horizon - S.cliff * S.stretch - S.foot).toFixed(4)} * (upc / ${S.cliff.toFixed(3)});`,
+      `float v = clamp(mix(vLow, vHigh, smoothstep(${(S.cliff - S.ease).toFixed(3)}, ${(S.cliff + S.ease).toFixed(3)}, upc)), 0.005, 0.995);`,
+      'vec3 painted = textureLod(uRingSky, vec2(u, v), 0.0).rgb;',
+    ])
+      expect(frag).toContain(line);
   });
 });
