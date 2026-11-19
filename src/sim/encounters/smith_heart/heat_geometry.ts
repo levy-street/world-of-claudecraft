@@ -129,16 +129,22 @@ export function floorReach(x: number, z: number, facing: number, max: number): n
  *  to its rim. The sim's waves and the renderer's lanes both read it. */
 export function laneReach(x: number, z: number, facing: number, max: number): number {
   if (inHearthFloor(x, z)) return floorReach(x, z, facing, max);
+  // On the Anvil the swell rolls all the way to the rim, whatever the Heat
+  // guardian's lane length (Jose's playtest of 2026-11-19: "they die halfway").
+  const reach = ANVIL_LANE_MAX;
   const s = Math.sin(facing);
   const c = Math.cos(facing);
   let d = 0;
   while (
-    d < max &&
+    d < reach &&
     Math.hypot(x + s * (d + 1) - HEART_ROOM.x, z + c * (d + 1) - HEART_ROOM.z) <= HEART_ROOM.r
   )
     d++;
-  return Math.max(1, Math.min(max, d));
+  return Math.max(1, Math.min(reach, d));
 }
+
+/** The longest a swell's lane runs on the Anvil of the World: across it. */
+export const ANVIL_LANE_MAX = 2 * HEART_ROOM.r;
 
 /** Basalt Fist's three Molten Swell bearings from its spot: straight away
  *  from the wellspring and to either side of it (the gap toward the

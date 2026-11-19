@@ -857,7 +857,7 @@ export class HeatFx {
       if (wave) {
         const along =
           (wave.pos.x - s.x) * Math.sin(s.facing) + (wave.pos.z - s.z) * Math.cos(s.facing);
-        if (along < T.laneLength - 0.05) s.rollAt = this.clock - Math.max(0, along) / T.waveSpeed;
+        if (along < s.length - 0.05) s.rollAt = this.clock - Math.max(0, along) / T.waveSpeed;
       }
       const front = swellFront(this.clock - s.rollAt);
       // Ahead of the wall the lane keeps warning at full strength (still on

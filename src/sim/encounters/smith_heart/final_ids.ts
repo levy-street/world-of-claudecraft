@@ -354,6 +354,9 @@ export interface FinalDifficultyRules {
   bladeAim: number;
   /** The Heat's star: Fire Whirls a volley. */
   whirlCount: number;
+  /** Basalt Fist's bar (seconds): 3 on every tier until Jose's playtest of
+   *  2026-11-19 asked for a faster cast; its 16 s cadence unchanged. */
+  fistCast: number;
   /** Weight of the Anvil, its own all fight: seconds between two (the bot
    *  raid of 2026-11-18: every 30 s on Normal outran two healers). */
   anvilEvery: number;
@@ -404,6 +407,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     bladeMarks: 1,
     bladeAim: 4,
     whirlCount: 2,
+    fistCast: 1.9,
     // 35 s (60 until Jose's playtest of 2026-11-19: "it takes too long").
     anvilEvery: 35,
   },
@@ -457,6 +461,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     // Two a volley (three until the same raids: tornadoes caught the raid on
     // its way to the Anvil once all four stars were awake).
     whirlCount: 2,
+    fistCast: 1.7,
     // 30 s (Jose's playtest of 2026-11-19; 45 before it, 36 until the bot
     // raids of 2026-11-18).
     anvilEvery: 30,
@@ -498,6 +503,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     bladeMarks: 2,
     bladeAim: 3,
     whirlCount: 3,
+    fistCast: 1.6,
     // 28 s (32 until Jose's playtest of 2026-11-19), still turning.
     anvilEvery: 28,
   },
@@ -643,7 +649,6 @@ export const FINAL_TUNING = {
   // -- the Heat quarter --
   fistFirst: 5,
   fistEvery: 16,
-  fistCast: 3,
   fistR: 6,
   fistMin: 2200,
   fistMax: 2400,
@@ -657,7 +662,9 @@ export const FINAL_TUNING = {
   whirlWarn: 2,
   whirlLife: 10,
   whirlR: 4,
-  whirlSpeed: 4.5,
+  // 6.3 yd a second (4.5 until Jose's playtest of 2026-11-19: +40 percent,
+  // still under a raider's 7 yd run, so a whirl is outrun sideways).
+  whirlSpeed: 6.3,
   /** A whirl strikes one player at most this often. */
   whirlHitEvery: 1,
   whirlMin: 300,
