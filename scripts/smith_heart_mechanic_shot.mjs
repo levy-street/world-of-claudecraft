@@ -31,9 +31,23 @@ const VIEW = process.env.SHOT_VIEW ?? 'raid';
 const TAG = process.env.SHOT_TAG ?? `${WHAT}_${VIEW}`;
 const SECONDS = Number(
   process.env.SHOT_SECONDS ??
-    { anvil: 9.5, wrath: 7, rush: 10, pillars: 5, storm: 9, blade: 6, tornado: 8, overload: 8 }[
-      WHAT
-    ] ??
+    {
+      anvil: 9.5,
+      wrath: 7,
+      rush: 10,
+      pillars: 5,
+      storm: 9,
+      blade: 6,
+      tornado: 8,
+      overload: 8,
+      fusion_steam: 14,
+      fusion_magma: 11,
+      fusion_firestorm: 12,
+      fusion_hail: 12,
+      fusion_avalanche: 12,
+      fusion_spires: 11,
+      opposites: 11,
+    }[WHAT] ??
     9,
 );
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -42,6 +56,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  *  the boss to stand off from (the witness and the raid stand `standOff`
  *  yards from it on `bearing`, or toward `toward`), the setup and the
  *  trigger. */
+/** Each quarter's floor 30 yd out from the room's middle (instance-local). */
+const QUARTER_SPOTS = {
+  heat: { x: 159.6, z: 162.4 },
+  quench: { x: 216.4, z: 181.6 },
+  breath: { x: 178.4, z: 200.4 },
+  hammer: { x: 197.6, z: 143.6 },
+};
 const PLANS = {
   anvil: {
     tp: 'final',
@@ -187,6 +208,91 @@ const PLANS = {
       '/dev heart final fill heat 60',
     ],
     trigger: ['/dev heart final fill heat 82'],
+  },
+  // The boss's OWN elements (Jose's brief of 2026-11-19 (b)): Elemental
+  // Strike on the witness (its tank) in each quarter's element, Elemental
+  // Fusion's bar and each of its six combos in the quarter it entered, and
+  // Opposing Elements (the boss handed to a raider so the witness can be
+  // marked and see its own arrow).
+  ...Object.fromEntries(
+    ['heat', 'quench', 'breath', 'hammer'].map((v) => [
+      `strike_${v}`,
+      {
+        tp: 'final',
+        fxRoot: 'smith-heart-final-kit-fx',
+        anchor: { x: 128.25, z: 112.25 },
+        toward: { x: 188, z: 172 },
+        bossTemplate: 'heart_masterless_strength',
+        standOff: 9,
+        raid: 4,
+        raidSpread: 4.5,
+        setup: ['/dev heart final reset', `/dev heart final quarter ${v}`, '/dev heart final pull'],
+        // In the quarter (its element), the witness the boss's tank.
+        spot: QUARTER_SPOTS[v],
+        aggroTo: 'me',
+        trigger: [
+          ['/dev heart final strike 1', 1500],
+          ['/dev heart final strike 1', 1500],
+          ['/dev heart final strike 1', 1500],
+          '/dev heart final strike 2',
+        ],
+        views: { close: [0.9, 0.22, 13], raid: [1.0, 0.12, 24] },
+      },
+    ]),
+  ),
+  ...Object.fromEntries(
+    [
+      ['steam', 'quench'],
+      ['magma', 'hammer'],
+      ['firestorm', 'breath'],
+      ['hail', 'breath'],
+      ['avalanche', 'hammer'],
+      ['spires', 'hammer'],
+    ].map(([combo, to]) => [
+      `fusion_${combo}`,
+      {
+        tp: 'final',
+        fxRoot: 'smith-heart-final-kit-fx',
+        anchor: { x: 128.25, z: 112.25 },
+        toward: { x: 188, z: 172 },
+        bossTemplate: 'heart_masterless_strength',
+        standOff: 8,
+        raid: 6,
+        raidSpread: 7,
+        setup: [
+          '/dev heart final reset',
+          `/dev heart final quarter ${to}`,
+          '/dev heart final pull',
+        ],
+        trigger: [`/dev heart final fusion ${combo}`],
+        // Inside the quarter it enters, 30 yd out (the combo lands there).
+        spot: QUARTER_SPOTS[to],
+        views: {
+          high: [0, 1.0, 46],
+          raid: [0.6, 0.3, 32],
+          close: [0.9, 0.3, 18],
+          boss: [0, 0.12, 26],
+        },
+      },
+    ]),
+  ),
+  opposites: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 16,
+    raid: 6,
+    raidSpread: 8,
+    setup: ['/dev heart final reset', '/dev heart final quarter hammer', '/dev heart final pull'],
+    // The boss on Raider1 (its tank): the witness is free to be marked.
+    aggroTo: 0,
+    trigger: ['/dev heart final opposites'],
+    // The marked meet: each walks to its opposite (Fire to Ice, Earth to
+    // Lightning) after a few seconds.
+    steer: 'polarityPairs',
+    views: { high: [0.3, 0.7, 40], raid: [1.0, 0.16, 26], close: [0.9, 0.25, 16] },
   },
   wrath: {
     tp: 'gallery',
@@ -362,6 +468,21 @@ try {
   );
   for (const c of plan.setup) await chat(c, 1200);
   await place();
+  if (plan.aggroTo !== undefined)
+    await page.evaluate(
+      ([tmpl, i]) => {
+        const w = window.__game.world;
+        const id = i === 'me' ? w.playerId : window.__shotRaid?.[i];
+        for (const e of w.entities.values())
+          if (e.kind === 'mob' && e.templateId === tmpl && !e.dead && id !== undefined) {
+            e.threat.set(id, 1e9);
+            e.forcedTargetId = id;
+            e.forcedTargetTimer = 9999;
+            e.aggroTargetId = id;
+          }
+      },
+      [plan.bossTemplate, plan.aggroTo],
+    );
   await sleep(Number(process.env.SHOT_SETTLE ?? 9000));
   await place();
   fs.mkdirSync(OUT, { recursive: true });
@@ -407,6 +528,48 @@ try {
       };
       step();
     });
+  if (plan.steer === 'polarityPairs')
+    await page.evaluate(() => {
+      const w = window.__game.world;
+      const start = Date.now();
+      const step = () => {
+        const t = Date.now() - start;
+        if (t > 9000) return;
+        if (t > 3500) {
+          const marked = [];
+          for (const e of w.entities.values())
+            if (e.kind === 'player' && !e.dead)
+              for (const a of e.auras)
+                if (a.id === 'heart_final_polarity')
+                  marked.push({ e, v: Math.round(a.value ?? 0) });
+          const opp = { 0: 1, 1: 0, 2: 3, 3: 2 };
+          const used = new Set();
+          for (const m of marked) {
+            if (used.has(m.e.id)) continue;
+            const o = marked.find((x) => !used.has(x.e.id) && x !== m && x.v === opp[m.v]);
+            if (!o) continue;
+            used.add(m.e.id);
+            used.add(o.e.id);
+            // The non-witness walks a step toward its partner each beat.
+            const mover = o.e.id === w.playerId ? m.e : o.e;
+            const goal = mover === m.e ? o.e : m.e;
+            const dx = goal.pos.x - mover.pos.x;
+            const dz = goal.pos.z - mover.pos.z;
+            const L = Math.hypot(dx, dz);
+            if (L > 1.5) {
+              const k = Math.min(1, 0.7 / L);
+              const g = w.ctx.groundPos(mover.pos.x + dx * k, mover.pos.z + dz * k);
+              mover.prevPos = { ...mover.pos };
+              mover.pos = { ...g };
+              mover.facing = Math.atan2(dx, dz);
+              w.ctx.rebucket(mover);
+            }
+          }
+        }
+        setTimeout(step, 100);
+      };
+      step();
+    });
   const t0 = Date.now();
   const frames = [];
   while (Date.now() - t0 < SECONDS * 1000) {
@@ -418,7 +581,7 @@ try {
     fs.writeFileSync(file, await page.screenshot({ type: 'jpeg', quality: 90 }));
     frames.push({ file, t });
     // SHOT_PROBE=1: what the look drew a couple of seconds in (a dev read).
-    if (process.env.SHOT_PROBE === '1' && frames.length === 30)
+    if (process.env.SHOT_PROBE === '1' && frames.length === Number(process.env.SHOT_PROBE_AT ?? 30))
       console.log(
         'PROBE',
         await page.evaluate((re) => {

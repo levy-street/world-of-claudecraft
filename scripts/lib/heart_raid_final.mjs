@@ -18,7 +18,16 @@
 // quarter. Reads only what the server sends; the geometry is the sim's own
 // pure module (claim-local).
 //
+// Its own elements (Jose's brief of 2026-11-19 (b)): the tanks swap on
+// Elemental Strike (the generic swap at 4 stacks of any element), the raid
+// keeps 6 yd off a tank carrying 3 or more Static Charge, everyone steps out
+// of each fusion combo's footprints (steam, lava, the Firestorm and Avalanche
+// lanes, the hail, the spires' links), a Magma Rift mark walks away from the
+// raid, and each Opposing Elements mark walks to its paired opposite (the
+// nearest free one), keeping clear of every other mark.
+//
 // IGNORE=drag  the tanks never move the boss on (the key mechanic: Overload)
+// IGNORE=swap  the tanks never swap on Elemental Strike (the tank's death test)
 // START=40     a few seconds into the pull the leader jumps the boss to its
 //              second intermission (/dev heart final inter40): the raid then
 //              plays the 40 percent call and fights on into the 15 percent
@@ -30,6 +39,20 @@ import {
   HEART_QUARTERS,
   heartQuarterSpot,
 } from '../../src/sim/content/smith_heart_quarters';
+import {
+  ELEMENT_AURAS,
+  ELEMENT_OBJECTS,
+  ELEMENT_TUNING as ET,
+  elementLaneOf,
+  hailOf,
+  polaritiesCancel,
+  polarityOf,
+  residueOf,
+  STRIKE_AURAS,
+  spireLinks,
+  spireOf,
+  steamOf,
+} from '../../src/sim/encounters/smith_heart/final_elements_ids';
 import {
   FINAL_AURAS,
   FINAL_CASTS,
@@ -92,6 +115,9 @@ export const final = {
   // The paladin pulls with its 29 yd taunt from a quarter, so the boss walks
   // straight out of the ring (Heart Unbound stacks every second it stays).
   opener: 'ot',
+  // Elemental Strike: the swap at the brief's count, whatever its element.
+  swapAura: IGNORE === 'swap' ? [] : Object.values(STRIKE_AURAS),
+  swapStacks: ET.swapAt,
   resetGrace: 50000,
   setup(diff) {
     const out = ['/dev heart kill guardians', '/dev heart portal', '/dev heart final reset'];
@@ -124,6 +150,7 @@ export const final = {
       blades: [],
       bladeLanes: [],
       rings: [],
+      spires: [],
     };
     // A Quenching Ring's age is ours to keep (its object carries its gaps,
     // not its age): first seen, it was just raised.
@@ -144,6 +171,38 @@ export const final = {
             front: quenchRingFront(age),
             gaps: quenchRingGaps(ring.seed, ring.gaps),
           });
+        continue;
+      }
+      // Its own elements' footprints.
+      if (steamOf(t)) {
+        // A drifting cloud: where it is and a little round it.
+        o.danger.push({ ...at, r: at.r + 1.8 });
+        continue;
+      }
+      if (t === ELEMENT_OBJECTS.lava || residueOf(t)) {
+        o.danger.push({ ...at, r: at.r + 1 });
+        continue;
+      }
+      if (hailOf(t) !== null) {
+        o.danger.push({ ...at, r: at.r + 1 });
+        continue;
+      }
+      const elane =
+        elementLaneOf(ELEMENT_OBJECTS.firePrefix, t) ??
+        elementLaneOf(ELEMENT_OBJECTS.avalanchePrefix, t);
+      if (elane) {
+        const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
+        o.lanes.push({
+          from: add(at, d, -elane.length / 2),
+          to: add(at, d, elane.length / 2),
+          half: elane.half + 1,
+        });
+        continue;
+      }
+      const sp = spireOf(t);
+      if (sp) {
+        o.spires.push({ ...at, ...sp });
+        o.danger.push({ ...at, r: ET.spireR + 0.8 });
         continue;
       }
       const pillar = finalPillarOf(t);
@@ -219,6 +278,16 @@ export const final = {
       }
     }
     for (const id of world.ringBorn.keys()) if (!seenRings.has(id)) world.ringBorn.delete(id);
+    // The Storm Spires' links: a line between each pair the lightning joins.
+    const groups = new Map();
+    for (const sp of o.spires) {
+      if (!groups.has(sp.group)) groups.set(sp.group, []);
+      groups.get(sp.group)[sp.index] = sp;
+    }
+    for (const list of groups.values())
+      for (const [a, b] of spireLinks(list.length))
+        if (list[a] && list[b])
+          o.lanes.push({ from: list[a], to: list[b], half: ET.spireLinkHalf + 1.2 });
 
     world.o = o;
     const b = world.mobs.boss;
@@ -360,6 +429,23 @@ export const final = {
       if (hasAura(p, FINAL_AURAS.drawn)) out.push({ x: p.x, z: p.z, r: (T.drawnReach ?? 8) + 1.5 });
       if (hasAura(p, FINAL_PHASE_AURAS.coal)) out.push({ x: p.x, z: p.z, r: 9.5 });
     }
+    // Static Charge (Elemental Strike in the Breath): a tank carrying 3 or
+    // more arcs to everyone within 6 yd, so the raid keeps off it.
+    for (const p of world.living()) {
+      if (p.pid === b.pid) continue;
+      const sc = auraOf(p, STRIKE_AURAS.breath);
+      if (sc && (sc.stacks ?? 1) >= ET.arcFrom) out.push({ x: p.x, z: p.z, r: ET.arcReach + 1.5 });
+      // A Magma Rift mark erupts under its player.
+      if (hasAura(p, ELEMENT_AURAS.magmaMark)) out.push({ x: p.x, z: p.z, r: ET.magmaR + 1.5 });
+    }
+    // Opposing Elements: never within reach of a mark that is not my partner.
+    if (hasAura(me, ELEMENT_AURAS.polarity)) {
+      const partner = st.polarityPair?.get(b.pid) ?? null;
+      for (const p of world.living()) {
+        if (p.pid === b.pid || p.pid === partner) continue;
+        if (hasAura(p, ELEMENT_AURAS.polarity)) out.push({ x: p.x, z: p.z, r: ET.meetR + 2.5 });
+      }
+    }
     // The Splinter of the Breath on the hunt: its Buffeting Gale strikes
     // everyone but its quarry within 7 yd every second (its tank too).
     const hunter = huntingBreath(world);
@@ -404,6 +490,13 @@ export const final = {
     note(
       `Stars: pillars risen ${st.pillarsSeen ?? 0}, most standing ${st.pillarsMax ?? 0}, most charged ${st.chargedMax ?? 0}, shattered ${st.shattered ?? 0} (charged ${st.chargedShattered ?? 0}), blades ${st.bladesSeen ?? 0}`,
     );
+    note(
+      `Its own elements: most Elemental Strike stacks on a tank ${st.strikeMax ?? 0}; fusions ${
+        Object.entries(st.combos ?? {})
+          .map(([k, v]) => `${k} x${v.n}`)
+          .join(', ') || '-'
+      }; polarity rounds ${st.polarityRounds ?? 0}`,
+    );
   },
   row(world, st) {
     init(st);
@@ -412,6 +505,7 @@ export const final = {
       ['Bursts', String(st.bursts)],
       ['Pillars', `${st.pillarsSeen ?? 0}/${st.shattered ?? 0}`],
       ['Charged', String(st.chargedMax ?? 0)],
+      ['Stacks', String(st.strikeMax ?? 0)],
     ];
   },
 };
@@ -528,6 +622,7 @@ function lowest(world, not) {
 
 function track(world, st) {
   init(st);
+  trackElements(world, st);
   // Weight of the Anvil: how many stood under it as it fell (its mark gone).
   const anvil = world.o?.anvils[0] ?? null;
   if (st.anvilSeen && !anvil) {
@@ -593,6 +688,77 @@ function track(world, st) {
   }
 }
 
+/** Its own elements: the polarity pairs (each mark to the nearest free
+ *  opposite, decided once a round), the strike's stacks and the combos seen. */
+function trackElements(world, st) {
+  const marked = world
+    .living()
+    .map((p) => ({ p, a: auraOf(p, ELEMENT_AURAS.polarity) }))
+    .filter((m) => m.a)
+    .map((m) => ({ p: m.p, el: polarityOf(m.a.value ?? 0) }));
+  if (marked.length === 0) st.polarityPair = null;
+  else {
+    const stale =
+      !st.polarityPair ||
+      marked.some((m) => !st.polarityPair.has(m.p.pid) && !st.polarityAlone?.has(m.p.pid));
+    if (stale) {
+      if (!st.polarityPair) {
+        st.polarityRounds = (st.polarityRounds ?? 0) + 1;
+        log(`POLARITY: ${marked.map((m) => `${m.p.name} ${m.el}`).join(', ')}`);
+      }
+      const pair = new Map();
+      const free = marked.slice().sort((x, y) => x.p.pid - y.p.pid);
+      for (const m of free) {
+        if (pair.has(m.p.pid)) continue;
+        const opp = free
+          .filter((q) => !pair.has(q.p.pid) && q !== m && polaritiesCancel(m.el, q.el))
+          .sort((x, y) => hypot(x.p, m.p) - hypot(y.p, m.p))[0];
+        if (!opp) continue;
+        pair.set(m.p.pid, opp.p.pid);
+        pair.set(opp.p.pid, m.p.pid);
+      }
+      st.polarityPair = pair;
+      st.polarityAlone = new Set(marked.filter((m) => !pair.has(m.p.pid)).map((m) => m.p.pid));
+    }
+  }
+  // The most stacks a tank carried.
+  for (const p of world.living()) {
+    if (!p.tank) continue;
+    for (const id of Object.values(STRIKE_AURAS)) {
+      const a = auraOf(p, id);
+      if (!a) continue;
+      st.strikeMax = Math.max(st.strikeMax ?? 0, a.stacks ?? 1);
+      st.strikeSeen ??= new Map();
+      const key = `${a.stacks ?? 1} ${id.replace('heart_final_strike_', '')}`;
+      if (st.strikeSeen.get(p.pid) !== key) {
+        st.strikeSeen.set(p.pid, key);
+        log(`STRIKE: ${p.name} now ${key}`);
+      }
+    }
+  }
+  // The combos seen (by their objects' first sight; one fusion a burst).
+  st.comboSeen ??= new Set();
+  st.combos ??= {};
+  for (const e of world.obs.ents.values()) {
+    if (e.k !== 'object' || typeof e.tid !== 'string' || st.comboSeen.has(e.id)) continue;
+    const t = e.tid;
+    let kind = null;
+    if (steamOf(t)) kind = 'steam';
+    else if (t === ELEMENT_OBJECTS.lava) kind = 'magma';
+    else if (elementLaneOf(ELEMENT_OBJECTS.firePrefix, t)) kind = 'firestorm';
+    else if (hailOf(t) !== null) kind = 'hail';
+    else if (elementLaneOf(ELEMENT_OBJECTS.avalanchePrefix, t)) kind = 'avalanche';
+    else if (spireOf(t)) kind = 'spires';
+    if (!kind) continue;
+    st.comboSeen.add(e.id);
+    const c = st.combos[kind];
+    if (!c || Date.now() - c.last > 8000) {
+      st.combos[kind] = { n: (c?.n ?? 0) + 1, last: Date.now() };
+      log(`FUSION: ${kind}`);
+    } else c.last = Date.now();
+  }
+}
+
 function duty(world, st, b, me) {
   init(st);
   const o = world.o;
@@ -617,6 +783,21 @@ function duty(world, st, b, me) {
       z: r.z + Math.cos(g) * Math.max(d, r.front + 2),
     };
     if (final.onFloor(world, at)) return { goal: at, tol: 0.8, duty: 'ring gap' };
+  }
+  // Opposing Elements: to my paired opposite (both walk to the middle).
+  if (hasAura(me, ELEMENT_AURAS.polarity)) {
+    const partner = st.polarityPair?.get(b.pid);
+    const q = partner !== undefined ? world.players.get(partner) : null;
+    if (q && alive(q)) {
+      const mid = { x: (me.x + q.x) / 2, z: (me.z + q.z) / 2 };
+      const goal = final.bad(world, st, mid) ? { x: q.x, z: q.z } : mid;
+      return { goal, tol: 0.6, duty: 'polarity: to my opposite' };
+    }
+  }
+  // Magma Rift under me: away from the raid before it erupts.
+  if (hasAura(me, ELEMENT_AURAS.magmaMark)) {
+    const spot = spread(world, st, me, ET.magmaR + 3);
+    if (spot) return { goal: spot, tol: 1, duty: 'magma: away' };
   }
   // Weight of the Anvil: everyone under it (the Crushed, on Heroic, aside).
   const anvil = o.anvils[0];
