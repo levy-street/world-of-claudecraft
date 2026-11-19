@@ -50,8 +50,46 @@ function fourColourUniforms(): Record<string, THREE.IUniform> {
 
 /** The bright ribbon's pool of light (the taste pass, design doc section 5.27):
  *  how far from its middle it stays full (a share of its half width; past it
- *  the lips feather to nothing), the hot line's half width and its strength. */
-export const RIVER_LIT_POOL = { full: 0.5, line: 0.34, hot: 0.4 } as const;
+ *  the lips feather to nothing), the hot line's half width and its strength
+ *  and how white it is, the ribbon's strength, the flow's level and how far
+ *  its bands swing it, the streaks' floor and what two layers add at most. */
+export const RIVER_LIT_POOL = {
+  full: 0.5,
+  line: 0.34,
+  hot: 0.4,
+  white: 0.65,
+  k: 0.95,
+  flow: 0.8,
+  swing: 0.2,
+  streak: 0.74,
+  streakA: 0.5,
+  streakB: 0.3,
+} as const;
+
+function riverSmooth(a: number, b: number, v: number): number {
+  const t = Math.max(0, Math.min(1, (v - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+/** The bright ribbon's light at `across` (0 its middle, 1 its edge) at a flow
+ *  and a streak level (mirrors `heartRiverSurgeMaterial`, the surge apart):
+ *  `gain` times the vein's colour plus `white`, added over the floor. The
+ *  flow's mean is `RIVER_LIT_POOL.flow`; the streaks' mean is their floor
+ *  plus a third of each layer (the mean square of a value noise). */
+export function riverLitAcross(
+  across: number,
+  flow: number = RIVER_LIT_POOL.flow,
+  streak: number = RIVER_LIT_POOL.streak + (RIVER_LIT_POOL.streakA + RIVER_LIT_POOL.streakB) / 3,
+): { gain: number; white: number } {
+  const P = RIVER_LIT_POOL;
+  const a = Math.abs(across);
+  const pool = 1 - riverSmooth(P.full, 1, a);
+  const line = 1 - riverSmooth(0, P.line, a);
+  return {
+    gain: flow * streak * pool * P.k + line * P.hot * flow * (1 - P.white),
+    white: line * P.hot * flow * P.white,
+  };
+}
 
 function additive(name: string, opts: THREE.ShaderMaterialParameters): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
@@ -340,14 +378,15 @@ export function heartCoreMaterial(name: string): THREE.ShaderMaterial {
  * white-hot surge riding at `uHead` (yards) while the light runs, its wake
  * trailing. The light pools in the channel (the taste pass, design doc section
  * 5.27): a hot line down its middle, its lips feathered to nothing, never a
- * flat band with a hard edge. As bright as it was across its middle half.
+ * flat band with a hard edge. Brighter than it was across its middle half and
+ * steadier (the bands swing it less), so a lit vein never reads like a dim one.
  */
 export function heartRiverSurgeMaterial(name: string, color: number): THREE.ShaderMaterial {
   return additive(name, {
     uniforms: {
       uColor: { value: new THREE.Color(color) },
       uHead: { value: -1 },
-      uK: { value: 0.95 },
+      uK: { value: RIVER_LIT_POOL.k },
       uTime: sharedUniforms.uTime,
     },
     vertexShader: /* glsl */ `
@@ -365,18 +404,18 @@ export function heartRiverSurgeMaterial(name: string, color: number): THREE.Shad
       ${NOISE}
       void main() {
         float a = abs(vAcross);
-        float flow = 0.72 + 0.28 * sin(vArc * 0.9 - uTime * 5.0) * sin(vArc * 0.31 - uTime * 2.1 + 1.3);
-        // The light pools in the channel: full across its middle half, feathered
-        // to nothing at the lips, a hotter line down its middle.
+        float flow = ${RIVER_LIT_POOL.flow.toFixed(2)} + ${RIVER_LIT_POOL.swing.toFixed(2)} * sin(vArc * 0.9 - uTime * 5.0) * sin(vArc * 0.31 - uTime * 2.1 + 1.3);
+        // The light pools in the channel (riverLitAcross): full across its middle
+        // half, feathered to nothing at the lips, a hotter line down its middle.
         float pool = 1.0 - smoothstep(${RIVER_LIT_POOL.full.toFixed(2)}, 1.0, a);
         float line = 1.0 - smoothstep(0.0, ${RIVER_LIT_POOL.line.toFixed(2)}, a);
         // Streaks drawn out along the flow, running to the seal with the bands.
         float s1 = vnoise(vec2(vArc * 0.5 - uTime * 3.4, vAcross * 2.4));
         float s2 = vnoise(vec2(vArc * 1.6 - uTime * 6.2, vAcross * 5.0 + 4.0));
-        float streak = 0.74 + 0.5 * s1 * s1 + 0.3 * s2 * s2;
+        float streak = ${RIVER_LIT_POOL.streak.toFixed(2)} + ${RIVER_LIT_POOL.streakA.toFixed(2)} * s1 * s1 + ${RIVER_LIT_POOL.streakB.toFixed(2)} * s2 * s2;
         float d = uHead - vArc;
         float head = uHead < 0.0 ? 0.0 : exp(-d * d * 0.06) * 2.6 + step(0.0, d) * exp(-d * 0.08) * 0.9;
-        vec3 hot = mix(uColor, vec3(1.0, 0.97, 0.9), 0.65);
+        vec3 hot = mix(uColor, vec3(1.0, 0.97, 0.9), ${RIVER_LIT_POOL.white.toFixed(2)});
         vec3 col = uColor * flow * streak * pool * uK + hot * line * ${RIVER_LIT_POOL.hot.toFixed(2)} * flow + hot * head * pool;
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>

@@ -1742,12 +1742,19 @@ own mark, a seam of fire burned into the stone. The other three now follow it.
 
 | Piece | Now | Where |
 |---|---|---|
-| The dim ribbons (the Hammer's, the Breath's, the Quench's) | A groove cut the ribbon's width into the floor, a thread of the vein's own colour wandering down its middle, its glow breathing in pulses that run toward the guardian and never go out; one touch each: the Hammer's ore glints in the groove, the Breath's thread kinks and beads like static, the Quench's lips are rimed | `river_vein_look.ts` `RIVER_VEIN_LOOKS`, `riverVeinPulse` |
-| The bright ribbon (all four) | Its light pooled in the channel: full across its middle half, a hotter line down its middle, streaks drawn out along the flow, its lips feathered to nothing instead of a hard edge | `heart_fx_materials.ts` `heartRiverSurgeMaterial`, `RIVER_LIT_POOL` |
+| The dim ribbons (the Hammer's, the Breath's, the Quench's) | A groove cut the ribbon's width into the floor, a wash of the vein's colour across it (what the flat band was, so it is found from as far), and a thread of that colour wandering down its middle, its glow breathing in pulses that run toward the guardian and never go out, never drawn thinner than a pixel and a half; one touch each: the Hammer's ore glints in the groove, the Breath's thread kinks and beads like static, the Quench's lips are rimed | `river_vein_look.ts` `RIVER_VEIN_LOOKS`, `RIVER_VEIN_LIGHT`, `riverVeinPulse`, `riverVeinAcross` |
+| The bright ribbon (all four) | Its light pooled in the channel: full across its middle half, a hotter line down its middle, streaks drawn out along the flow, its lips feathered to nothing instead of a hard edge; brighter and steadier than the band it replaces | `heart_fx_materials.ts` `heartRiverSurgeMaterial`, `RIVER_LIT_POOL`, `riverLitAcross` |
 
 **Kept.** Every river's line, width, lift and rung (the ground band, under every telegraph),
 the light's run from the arena to the seal and its surge, every tier, the vein colours (never a
-threat colour), the Heat's seam. A dim ribbon still reads dim beside its bright twin.
+threat colour), the Heat's seam.
+
+**Dim against lit.** Which veins are lit is the raid's progress, read off these ribbons, so the
+gap between the two states is pinned, not left to the eye: averaged across the ribbon the bright
+twin adds more than three times the light of the dim one at its brightest (the flat bands stood
+under that), and the dim thread's own crest stays under the bright ribbon's middle. The first
+cut of this pass let the thread peak as bright as the lit ribbon, so the two differed mostly in
+width; the review caught it.
 
 Pinned by `tests/smith_heart_river_veins.test.ts`.
 
