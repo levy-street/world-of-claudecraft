@@ -28,6 +28,7 @@ import {
 import type { Aura, Entity } from '../../sim/types';
 import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { radialGlowTexture } from '../textures';
 import { COUNCIL_AURAS, SOUL_COLORS } from './council_fx_core';
 import { BOND_BODY, type FuryLook, furyLook } from './council_mechanic_look_core';
 import type { CouncilFxHost } from './council_pillars_fx';
@@ -68,19 +69,25 @@ float noise(vec2 p) {
   return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 void main() {
-  float x = vUv.x * 12.0;
+  // Around the column (wrapped: 8 cells round it) and up it.
+  float x = vUv.x * 8.0;
   float y = vUv.y;
-  // Tongues: noise stretched up the column, racing upward.
-  float n = noise(vec2(x, y * 3.0 - uTime * 2.6)) * 0.65
-    + noise(vec2(x * 2.3, y * 6.0 - uTime * 4.1)) * 0.35;
-  float tongue = smoothstep(0.35 + y * 0.45, 0.95, n + (1.0 - y) * 0.35);
+  // Tongues of fire: domain-warped noise stretched up the column, racing up,
+  // each one tapering to a point as it climbs.
+  float warp = noise(vec2(x * 1.3, y * 2.0 - uTime * 0.9)) * 1.4;
+  float n = noise(vec2(x + warp, y * 2.6 - uTime * 2.4)) * 0.6
+    + noise(vec2(x * 2.1 - warp, y * 5.0 - uTime * 3.7)) * 0.4;
+  float tongue = smoothstep(0.45 + y * 0.35, 0.8 + y * 0.15, n + (1.0 - y) * 0.2);
+  float core = smoothstep(0.7 + y * 0.2, 0.98, n + (1.0 - y) * 0.2);
   // The heartbeat's band climbing it.
-  float band = exp(-pow((y - fract(uTime * 0.95)) * 7.0, 2.0)) * uBeat;
-  float foot = (1.0 - smoothstep(0.0, 0.3, y)) * 0.45;
-  float rim = 0.45 + 0.55 * (1.0 - vFace);
-  float a = (tongue * 0.85 + foot + band * 0.6) * rim
-    * pow(max(1.0 - y, 0.0), 1.15) * smoothstep(0.0, 0.03, y);
-  vec3 col = mix(uColor, uHot, clamp(tongue * 0.45 + band * 0.5 + foot, 0.0, 1.0));
+  float band = exp(-pow((y - fract(uTime * 0.95)) * 7.0, 2.0)) * uBeat * tongue;
+  // No hard silhouette (a volume of fire, not a glass tube): it fades out at
+  // the column's edges and stays thin where it faces the eye, so the body
+  // inside reads through it.
+  float soft = smoothstep(0.02, 0.45, vFace) * (0.35 + 0.65 * (1.0 - vFace));
+  float a = (tongue * 0.7 + core * 0.45 + band * 0.5) * soft * smoothstep(0.0, 0.04, y)
+    * pow(max(1.0 - y, 0.0), 0.6);
+  vec3 col = mix(uColor, uHot, clamp(core * 0.8 + band * 0.5, 0.0, 1.0));
   gl_FragColor = vec4(col * uGlow, clamp(a, 0.0, 1.0));
   #include <colorspace_fragment>
 }
@@ -136,8 +143,9 @@ void main() {
 }
 `;
 
-/** A torn shard of quarry stone: dark rock lit from above, its edges burning
- *  in the fury's colour. */
+/** A shard of the fallen one's crystal: a burning spike, white-hot at its
+ *  heart and the fury's colour toward its edges, a dark seam of stone down
+ *  its faces. */
 const SHARD_VERT = /* glsl */ `
 varying vec3 vN;
 varying vec3 vView;
@@ -152,14 +160,18 @@ void main() {
 const SHARD_FRAG = /* glsl */ `
 uniform vec3 uStone;
 uniform vec3 uRim;
+uniform vec3 uHot;
 uniform float uGlow;
 varying vec3 vN;
 varying vec3 vView;
 void main() {
   vec3 n = normalize(vN);
-  float lit = 0.3 + 0.7 * clamp(dot(n, normalize(vec3(0.2, 0.9, 0.35))), 0.0, 1.0);
-  float rim = pow(1.0 - clamp(abs(dot(n, vView)), 0.0, 1.0), 1.6);
-  gl_FragColor = vec4(uStone * lit + uRim * rim * uGlow, 1.0);
+  float lit = 0.35 + 0.65 * clamp(dot(n, normalize(vec3(0.2, 0.9, 0.35))), 0.0, 1.0);
+  float face = clamp(abs(dot(n, vView)), 0.0, 1.0);
+  float rim = pow(1.0 - face, 1.4);
+  vec3 body = mix(uRim * 0.55, uHot, pow(face, 3.0) * 0.6) * lit;
+  vec3 col = mix(uStone * lit, body, 0.8) + uRim * rim * uGlow * 0.7;
+  gl_FragColor = vec4(col * (0.7 + 0.3 * uGlow), 1.0);
   #include <colorspace_fragment>
 }
 `;
@@ -223,6 +235,10 @@ export class CouncilFuryFx {
   private readonly shards: THREE.InstancedMesh;
   private readonly shardMat: THREE.ShaderMaterial;
   private readonly shardCount: number;
+  /** A glow behind the body, throbbing with the heartbeat (it burns). */
+  private readonly glow: THREE.Sprite;
+  private readonly glowMat: THREE.SpriteMaterial;
+  private readonly glowTex: THREE.Texture | null;
   /** The survivor wearing the fury (the scan's find), its role and the
    *  fallen one's, and when its fury woke on the host clock. */
   private id = -1;
@@ -238,7 +254,7 @@ export class CouncilFuryFx {
   constructor(private readonly h: CouncilFxHost) {
     const columnGeo = new THREE.CylinderGeometry(1, 1.25, 1, 48, 1, true).translate(0, 0.5, 0);
     const discGeo = new THREE.CircleGeometry(1, 72);
-    const shardGeo = new THREE.DodecahedronGeometry(0.55, 0).scale(0.8, 1.35, 0.7);
+    const shardGeo = new THREE.OctahedronGeometry(0.55, 0).scale(0.42, 1.5, 0.32);
     h.geometries.push(columnGeo, discGeo, shardGeo);
     this.columnMat = new THREE.ShaderMaterial({
       name: 'smithHeartCouncilFuryColumn',
@@ -282,13 +298,30 @@ export class CouncilFuryFx {
       uniforms: {
         uStone: { value: new THREE.Color(0x3a2c22) },
         uRim: { value: new THREE.Color(SOUL_COLORS.guardian.hex) },
+        uHot: { value: new THREE.Color(HOT.guardian) },
         uGlow: { value: 1.6 },
       },
       vertexShader: SHARD_VERT,
       fragmentShader: SHARD_FRAG,
       toneMapped: false,
     });
-    h.materials.push(this.columnMat, this.sigilMat, this.shardMat);
+    this.glowTex = typeof document !== 'undefined' ? radialGlowTexture() : null;
+    this.glowMat = new THREE.SpriteMaterial({
+      name: 'smithHeartCouncilFuryGlow',
+      map: this.glowTex,
+      color: new THREE.Color(SOUL_COLORS.guardian.hex),
+      transparent: true,
+      depthWrite: false,
+      // Over the body, not hidden behind it: the survivor itself burns in
+      // the fallen one's light (soft, so nothing it covers stops reading).
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+    });
+    this.glow = new THREE.Sprite(this.glowMat);
+    this.glow.renderOrder = 5;
+    this.glow.name = 'smithHeartCouncilFuryGlow';
+    h.materials.push(this.columnMat, this.sigilMat, this.shardMat, this.glowMat);
     this.column = new THREE.Mesh(columnGeo, this.columnMat);
     this.column.name = 'smithHeartCouncilFuryColumn';
     this.sigil = new THREE.Mesh(discGeo, this.sigilMat);
@@ -300,7 +333,7 @@ export class CouncilFuryFx {
     this.shards.name = 'smithHeartCouncilFuryShards';
     this.shards.count = this.shardCount;
     this.shards.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    for (const m of [this.column, this.sigil, this.shards]) {
+    for (const m of [this.column, this.sigil, this.shards, this.glow]) {
       m.visible = false;
       m.frustumCulled = false;
       h.root.add(m);
@@ -393,7 +426,7 @@ export class CouncilFuryFx {
     const height = body.height * look.swell;
     const r = Math.max(2.2, body.height * 0.3) * look.swell;
     this.column.position.set(at.x, y + 0.05, at.z);
-    this.column.scale.set(r, height * 1.25, r);
+    this.column.scale.set(r, height * 1.45, r);
     this.columnMat.uniforms.uGlow.value = look.glow;
     this.columnMat.uniforms.uBeat.value = look.beat;
     this.column.visible = true;
@@ -404,8 +437,13 @@ export class CouncilFuryFx {
     this.sigilMat.uniforms.uBeat.value = look.beat;
     this.sigil.visible = true;
     this.placeShards(at.x, y + height * body.chest, at.z, r, look);
+    const gs = height * (0.95 + 0.1 * look.beat + 0.5 * look.flash);
+    this.glow.position.set(at.x, y + height * 0.55, at.z);
+    this.glow.scale.set(gs, gs * 1.15, 1);
+    this.glowMat.opacity = 0.22 + 0.18 * look.beat + 0.6 * look.flash;
+    this.glow.visible = true;
     // Embers rising off it (cosmetic: thin on the low tier).
-    this.emberAcc += dt * (10 + 30 * look.flash) * this.h.density;
+    this.emberAcc += dt * (18 + 40 * look.flash) * this.h.density;
     _ember.color = this.rgb;
     while (this.emberAcc >= 1) {
       this.emberAcc -= 1;
@@ -434,7 +472,7 @@ export class CouncilFuryFx {
       const bob = Math.sin(now * 1.7 + i * 1.3) * 0.6;
       const d = reach * (0.85 + 0.3 * ((i * 0.618) % 1));
       _pos.set(x + Math.cos(a) * d, y + bob + Math.sin(a) * d * tilt, z + Math.sin(a) * d);
-      const size = (0.75 + 0.6 * ((i * 0.71) % 1)) * (1 + 0.25 * look.beat);
+      const size = (0.6 + 0.55 * ((i * 0.71) % 1)) * (1 + 0.2 * look.beat);
       _s.setScalar(size);
       _e.set(now * (1.1 + (i % 3) * 0.4), now * (0.7 + (i % 4) * 0.3), i * 0.9);
       _q.setFromEuler(_e);
@@ -442,7 +480,7 @@ export class CouncilFuryFx {
       this.shards.setMatrixAt(i, _m);
     }
     this.shards.instanceMatrix.needsUpdate = true;
-    this.shardMat.uniforms.uGlow.value = 1.4 + 1.2 * look.beat + 2 * look.flash;
+    this.shardMat.uniforms.uGlow.value = 1.1 + 0.8 * look.beat + 1.6 * look.flash;
     this.shards.visible = true;
   }
 
@@ -452,11 +490,15 @@ export class CouncilFuryFx {
     if (this.fallen === fallen) return;
     this.fallen = fallen;
     const c = SOUL_COLORS[fallen].hex;
-    this.columnMat.uniforms.uColor.value.setHex(c);
+    // The Singer's sky blue reads weak over the warm quarry: lift it.
+    const lift = fallen === 'singer' ? 2.2 : 1.2;
+    this.columnMat.uniforms.uColor.value.setHex(c).multiplyScalar(lift);
     this.columnMat.uniforms.uHot.value.setHex(HOT[fallen]);
-    this.sigilMat.uniforms.uColor.value.setHex(c);
+    this.sigilMat.uniforms.uColor.value.setHex(c).multiplyScalar(lift);
     this.sigilMat.uniforms.uHot.value.setHex(HOT[fallen]);
     this.shardMat.uniforms.uRim.value.setHex(c);
+    this.shardMat.uniforms.uHot.value.setHex(HOT[fallen]);
+    this.glowMat.color.setHex(c).multiplyScalar(lift);
     rgbOf(c, this.rgb);
   }
 
@@ -468,11 +510,13 @@ export class CouncilFuryFx {
     this.column.visible = false;
     this.sigil.visible = false;
     this.shards.visible = false;
+    this.glow.visible = false;
   }
 
   /** The shards' instance buffer (the host disposes the geometries and
    *  materials). */
   dispose(): void {
     this.shards.dispose();
+    this.glowTex?.dispose();
   }
 }
