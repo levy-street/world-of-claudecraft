@@ -25804,9 +25804,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '交差する刃があなたを貫く線を狙っている：線はあなたを追い、飛ぶ{lock}秒前に固定される。線を柱に通して砕き、それから線から離れること。線上の全員が{min}～{max}の冷気ダメージを受ける。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
   'hudChrome.auraEffect.finalBoss.anvilMark':
     'アンヴィルの重みがあなたを追う：{radius}ヤードの円があなたと共に動き、落ちる{lock}秒前に固定される。レイドをその中に集めること：{total}の物理ダメージが中の全員で分けられ、{fewer}人未満ならそれぞれ1.5倍を受ける。ヒロイック：{heroicTotal}。ミシック：{mythicTotal}。',
-  'hudChrome.finalAlert.bladeTitle': '交差する刃：導け',
-  'hudChrome.finalAlert.bladeLockedTitle': '刃が固定：離れろ！',
-  'hudChrome.finalAlert.skyTitle': '天の一撃があなたに！',
   'hudChrome.auraEffect.finalBoss.underIce': 'スタン中：割れた氷から落ちた。',
   'hudChrome.auraEffect.finalBoss.numbing': '正面攻撃により、{seconds}秒間移動速度が{pct}%低下。',
   'hudChrome.auraEffect.finalBoss.ember':
@@ -25874,9 +25871,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '移動速度が{pct}%低下（{seconds}秒）：焼き入れの環を隙間以外の場所で越えた。',
   'hudChrome.auraEffect.finalBoss.weight':
     '毎秒{total}の物理ダメージ（1スタックにつき{per}）。スタックごとに槌の欠片の攻撃が{step}%重くなる（現在{harder}%）。{seconds}秒間持続。タンクは{swap}スタックで交代する。1スタックごとの被ダメージ増加はヒロイックで{heroicStep}%、ミシックで{mythicStep}%。',
-  'hudChrome.finalAlert.coalTitle': '弾ける炭！',
-  'hudChrome.finalAlert.tetherTitle': '風に繋がれた！',
-  'hudChrome.finalAlert.weightTitle': '募る重み x{stacks}',
   'hudChrome.finalOverload.call': '障壁 {seconds}',
   'hudChrome.finalOverload.enrage': '激昂まで {seconds}',
   'hudChrome.finalOverload.fury': '主なき憤怒 x{stacks}',
@@ -25886,9 +25880,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.striding': '中央へ向かっている',
   'hudChrome.finalOverload.titleCall': '四区画の呼び声',
   'hudChrome.finalOverload.titleFinal': '全区画覚醒',
-  'hudChrome.finalAlert.emberTitle': '燠火の印！',
-  'hudChrome.finalAlert.drawnTitle': '招雷！',
-  'hudChrome.finalAlert.crushedTitle': '押し潰され',
   'hudChrome.auraEffect.seasonalCosmetic': '見た目のみ：戦闘に影響なし',
   'seasonal.event.gourdlight_eve.name': 'ゴードライトの宵',
   'seasonal.trickOrTreat.row': 'トリック・オア・トリート！',

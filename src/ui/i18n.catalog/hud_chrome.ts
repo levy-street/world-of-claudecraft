@@ -10537,19 +10537,7 @@ export const hudChromeStrings = {
     poured: 'Poured in: {elements}',
     pouredTimes: '{quarter} x{times}',
   },
-  // The Masterless Strength's personal alert (src/ui/hud/dungeon/final_alert_view.ts):
-  // short titles only; the cold reuses quenchAlert's. Wordy (M16).
-  finalAlert: {
-    bladeTitle: 'Crossing Blade: lead it',
-    bladeLockedTitle: 'Blade locked: step off!',
-    skyTitle: 'Sky Strike on you!',
-    emberTitle: 'Ember Mark!',
-    drawnTitle: 'Drawn Lightning!',
-    crushedTitle: 'Crushed',
-    coalTitle: 'Bursting Coal!',
-    tetherTitle: 'Wind-Tethered!',
-    weightTitle: 'Mounting Weight x{stacks}',
-  },
+
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
   // Wordy (M16): non-Latin fills in the overlays.
   sanctumAlert: {

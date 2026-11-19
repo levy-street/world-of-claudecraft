@@ -18617,7 +18617,6 @@
   #sanctum-alert,
   #crypt-alert,
   #heart-quench-alert,
-  #heart-final-alert,
   #heart-knot-alert,
   #temple-alert,
   #kit-use-prompt {
@@ -18630,7 +18629,6 @@
   body.show-actionbar3 #sanctum-alert,
   body.show-actionbar3 #crypt-alert,
   body.show-actionbar3 #heart-quench-alert,
-  body.show-actionbar3 #heart-final-alert,
   body.show-actionbar3 #heart-knot-alert,
   body.show-actionbar3 #temple-alert,
   body.show-actionbar3 #kit-use-prompt {
@@ -18643,7 +18641,6 @@
   body.mobile-touch #sanctum-alert,
   body.mobile-touch #crypt-alert,
   body.mobile-touch #heart-quench-alert,
-  body.mobile-touch #heart-final-alert,
   body.mobile-touch #heart-knot-alert,
   body.mobile-touch #temple-alert,
   body.mobile-touch #kit-use-prompt {
@@ -19278,15 +19275,6 @@
     }
   }
 
-  /* ---------- The Smith's Heart's Masterless Strength alert (the cold, the ember, the lightning, Crushed) ---------- */
-  /* Self-mounted by the shared encounter alert painter
-     (encounter_alert_painter.ts) under its own id, from
-     src/ui/hud/dungeon/final_alert_view.ts: what the final fight asks of the
-     local player, on every graphics tier (never hidden by the hints setting).
-     It never takes the pointer. The state is carried by the text too: the
-     cold in the frost tone, freezing and the freeze in the hostile tone, the
-     Ember Mark in the fire tone, Drawn Lightning in the storm's violet,
-     Crushed in the Hammer's gold. */
   /* The Knotted Gale (Mythic, knot_alert_view.ts): Portal A in the storm's teal,
      Portal B in its violet, Portal C in spring green, Portal D in rose (the
      floor's colours), the load in gold, the lip in
@@ -19388,95 +19376,10 @@
   /* The Smith's Heart's short alerts (2026-11-09): a title over the bar and
      its number, no sentence under it. The number (the seconds left, or a
      gauge's value) sits under the bar, in steady-width digits. */
-  #heart-final-alert .fa-bar-label,
   #heart-knot-alert .fa-bar-label {
     font-size: 13px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-  }
-  #heart-final-alert {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    z-index: 30;
-    min-width: 340px;
-    max-width: calc(100vw - 32px);
-    padding: 10px 18px 12px;
-    pointer-events: none;
-    user-select: none;
-    text-align: center;
-    font: inherit;
-    color: var(--color-text-light);
-    border: 2px solid var(--color-debuff-frost);
-    --final-alert-tone: var(--color-debuff-frost);
-  }
-  #heart-final-alert.is-ember {
-    --final-alert-tone: var(--color-debuff-fire);
-  }
-  #heart-final-alert.is-drawn {
-    --final-alert-tone: var(--color-debuff-shadow);
-  }
-  #heart-final-alert.is-crushed,
-  #heart-final-alert.is-weight {
-    --final-alert-tone: var(--color-gold);
-  }
-  #heart-final-alert.is-coal {
-    --final-alert-tone: var(--color-hostile);
-  }
-  #heart-final-alert.is-tether {
-    --final-alert-tone: var(--color-debuff-frost);
-  }
-  #heart-final-alert.is-blade {
-    --final-alert-tone: var(--color-debuff-frost);
-  }
-  #heart-final-alert.is-sky {
-    --final-alert-tone: var(--color-debuff-nature);
-  }
-  #heart-final-alert.is-bladeLocked {
-    --final-alert-tone: var(--color-hostile);
-  }
-  #heart-final-alert {
-    border-color: var(--final-alert-tone);
-  }
-  #heart-final-alert .fa-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--final-alert-tone);
-  }
-  #heart-final-alert .fa-line {
-    font-size: 14px;
-  }
-  #heart-final-alert .fa-hint {
-    display: none;
-  }
-  #heart-final-alert .fa-bar {
-    --bar-h: 14px;
-    --bar-color: var(--final-alert-tone);
-    width: 100%;
-  }
-  #heart-final-alert .fa-fill {
-    width: 0;
-    transition: width 80ms linear;
-  }
-  #heart-final-alert.is-bladeLocked,
-  #heart-final-alert.is-sky,
-  #heart-final-alert.is-ember,
-  #heart-final-alert.is-drawn,
-  #heart-final-alert.is-coal,
-  #heart-final-alert.is-tether {
-    animation: bce-throb 0.9s ease-in-out infinite alternate;
-  }
-  body.mobile-touch #heart-final-alert {
-    min-width: min(340px, calc(100vw - 32px));
-  }
-  @media (prefers-reduced-motion: reduce) {
-    #heart-final-alert {
-      animation: none;
-    }
   }
 
   /* ---------- The Masterless Strength's Overload bars (the raid HUD) ---------- */

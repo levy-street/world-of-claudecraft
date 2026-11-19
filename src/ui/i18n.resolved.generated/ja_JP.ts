@@ -7510,17 +7510,6 @@ export const ja_JP: EnTranslations = {
       "poured": "注がれた元素：{elements}",
       "pouredTimes": "{quarter} x{times}"
     },
-    "finalAlert": {
-      "bladeTitle": "交差する刃：導け",
-      "bladeLockedTitle": "刃が固定：離れろ！",
-      "skyTitle": "天の一撃があなたに！",
-      "emberTitle": "燠火の印！",
-      "drawnTitle": "招雷！",
-      "crushedTitle": "押し潰され",
-      "coalTitle": "弾ける炭！",
-      "tetherTitle": "風に繋がれた！",
-      "weightTitle": "募る重み x{stacks}"
-    },
     "sanctumAlert": {
       "quenchTitle": "焼き入れの水の中だ！",
       "quenchLine": "焼かれて鈍る：一番近い氷か岸まで泳げ",

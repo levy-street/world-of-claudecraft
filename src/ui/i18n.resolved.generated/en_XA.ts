@@ -7510,17 +7510,6 @@ export const en_XA: EnTranslations = {
       "poured": "[Þóúŕéð íñ: {elements}]",
       "pouredTimes": "[{quarter} ẋ{times}]"
     },
-    "finalAlert": {
-      "bladeTitle": "[Çŕóššíñĝ Ɓļáðé: ļéáð íţ]",
-      "bladeLockedTitle": "[Ɓļáðé ļóçķéð: šţéþ óƒƒ!]",
-      "skyTitle": "[Šķý Šţŕíķé óñ ýóú!]",
-      "emberTitle": "[Éɱƀéŕ Ɱáŕķ!]",
-      "drawnTitle": "[Ðŕáŵñ Ļíĝĥţñíñĝ!]",
-      "crushedTitle": "[Çŕúšĥéð]",
-      "coalTitle": "[Ɓúŕšţíñĝ Çóáļ!]",
-      "tetherTitle": "[Ŵíñð-Ţéţĥéŕéð!]",
-      "weightTitle": "[Ɱóúñţíñĝ Ŵéíĝĥţ ẋ{stacks}]"
-    },
     "sanctumAlert": {
       "quenchTitle": "[Íñ ţĥé ɋúéñçĥ-ŵáţéŕ!]",
       "quenchLine": "[Šŵíɱ óñţó íçé óŕ ţĥé šĥóŕé ţó éšçáþé ţĥé ŵáţéŕ ðáɱáĝé áñð šļóŵ]",

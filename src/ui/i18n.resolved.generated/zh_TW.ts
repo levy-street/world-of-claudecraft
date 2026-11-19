@@ -7510,17 +7510,6 @@ export const zh_TW: EnTranslations = {
       "poured": "已注入：{elements}",
       "pouredTimes": "{quarter} x{times}"
     },
-    "finalAlert": {
-      "bladeTitle": "交錯之刃：引導它",
-      "bladeLockedTitle": "冰刃已鎖定：快離開！",
-      "skyTitle": "天落雷擊瞄準了你！",
-      "emberTitle": "餘燼印記！",
-      "drawnTitle": "引雷！",
-      "crushedTitle": "粉碎",
-      "coalTitle": "爆裂煤塊！",
-      "tetherTitle": "風之束縛！",
-      "weightTitle": "漸增重壓 x{stacks}"
-    },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
       "quenchLine": "它會灼燒並減速你：游向最近的冰面或岸邊",

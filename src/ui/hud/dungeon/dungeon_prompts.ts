@@ -13,9 +13,7 @@
 // (temple_alert_view.ts on the same family: Choirmother Selthe's Score, its
 // melody, its answer and her broken voice), the Smith's Heart's Guardian of
 // the Quench's cold bar (quench_alert_view.ts:
-// the player's own gauge, never advisory) and its Masterless Strength's
-// (final_alert_view.ts: the cold, the ember, the lightning, Crushed; never
-// advisory), plus the trash engine's
+// the player's own gauge, never advisory), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
@@ -60,7 +58,6 @@ import {
   usePromptYields,
 } from './dungeon_prompt_policy_core';
 import { EncounterAlert } from './encounter_alert_painter';
-import { buildFinalAlertView, FINAL_ALERT_KINDS } from './final_alert_view';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
 import { HeartOverloadPanel } from './heart_overload_painter';
@@ -152,7 +149,6 @@ export class DungeonPrompts {
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
   private readonly quench: EncounterAlert;
-  private readonly final: EncounterAlert;
   private readonly knot: EncounterAlert;
   private readonly overload: HeartOverloadPanel;
   private readonly overloadView = makeOverloadView();
@@ -176,7 +172,6 @@ export class DungeonPrompts {
     sanctum: false,
     crypt: false,
     quench: false,
-    final: false,
     knot: false,
     temple: false,
     cryptSoft: false,
@@ -217,11 +212,6 @@ export class DungeonPrompts {
         kinds: QUENCH_ALERT_KINDS,
       },
     );
-    this.final = new EncounterAlert(deps, {
-      id: 'heart-final-alert',
-      className: 'ui-panel-strong encounter-alert heart-final-alert',
-      kinds: FINAL_ALERT_KINDS,
-    });
     this.knot = new EncounterAlert(deps, {
       id: 'heart-knot-alert',
       className: 'ui-panel-strong encounter-alert heart-knot-alert',
@@ -320,12 +310,6 @@ export class DungeonPrompts {
       ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
       : HINT_HIDDEN;
     this.quench.paint(quench);
-    // The Masterless Strength's alert: the player's own gauge and marks,
-    // never advisory; its raid HUD beside the slot.
-    const final = dungeonPromptEnabled('final', hints)
-      ? buildFinalAlertView({ auras: p.auras, dead: p.dead })
-      : HINT_HIDDEN;
-    this.final.paint(final);
     // The Knotted Gale's part in the fight (the panel is the throw's button).
     const knot = dungeonPromptEnabled('knot', hints)
       ? buildKnotAlertView({
@@ -337,6 +321,8 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     this.knot.paint(knot);
+    // The Masterless Strength's raid HUD (its Overload bars): no personal
+    // alert since Jose's playtest of 2026-11-19 (its marks read in the world).
     this.overload.paint(buildOverloadView(this.finalScan.frame(f.world), this.overloadView));
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
@@ -356,7 +342,6 @@ export class DungeonPrompts {
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
     slot.quench = quench.visible;
-    slot.final = final.visible;
     slot.knot = knot.visible;
     slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
@@ -387,7 +372,6 @@ export class DungeonPrompts {
     this.sanctum.dispose();
     this.crypt.dispose();
     this.quench.dispose();
-    this.final.dispose();
     this.knot.dispose();
     this.overload.dispose();
     this.temple.dispose();

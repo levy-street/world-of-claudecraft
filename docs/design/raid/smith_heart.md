@@ -2652,12 +2652,16 @@ the wind kernel's aura, told from the Breath guardian's by its tag.
 `heart_overload_painter.ts`): four bars in a row at the top of the screen in their veins'
 colours, the quarter it drinks lit and framed, a bar three quarters full turning hostile and
 throbbing, and under them Taking Root's seconds (or that it can be dragged), Vein-Shaken's
-and Heart Unbound's. A personal alert in the prompts' slot (`final_alert_view.ts`) carries
-the player's cold, Encased in Rime, the Ember Mark, Drawn Lightning and Crushed, each a short
-title over its bar and number with no sentence under it. Both draw on every tier and whatever the hints setting (the player
-steers by them). The fight calls no raid warning banner (the owner's rule of 2026-11-03,
-made whole on 2026-11-09: every mechanic reads in the world, on the Overload panel, on a cast
-bar or on the marked player's own alert; the boss's voice stays in chat). Every tooltip is a
+and Heart Unbound's; it draws on every tier and whatever the hints setting (the raid steers
+by it, a gauge, not a message). Since Jose's playtest of 2026-11-19 the fight puts NO
+personal alert panel on the screen (the old `final_alert_view.ts`, "Crossing Blade: lead it"
+in the middle of the screen, is gone): every mark that singles one player out (Weight of the
+Anvil, Crossing Blade, Sky Strike, Ember Mark, Drawn Lightning, Bursting Coal,
+Wind-Tethered) raises the personal arrow over that player's head, drawn for them alone
+(`src/render/smith_heart_fx/final_arrow_core.ts`), beside its floor telegraph and the
+marked player's own alarm. The fight calls no raid warning banner (the owner's rule of
+2026-11-03, made whole on 2026-11-09: every mechanic reads in the world, on the Overload
+panel or on a cast bar; the boss's voice stays in chat). Every tooltip is a
 `hudChrome.auraEffect.finalBoss.*` key with the live numbers (`src/ui/final_aura_effect.ts`),
 every damage and aura name re-localized (`src/ui/sim_i18n.ts`); the five non-Latin locales
 are filled.
@@ -2733,9 +2737,9 @@ the sim and the painter); the marks as player auras.
 **The HUD** (`heart_overload_view.ts`): through a call the bars hold still and dim, the
 quarters whose Splinters live are lit, and the shield's seconds and the Splinters' count read
 under them; in the final phase the bars are off and the enrage's seconds (then Masterless
-Fury's stacks) read instead; the poured elements read on their own line all fight. The
-personal alert (`final_alert_view.ts`) puts Bursting Coal first, then Wind-Tethered, and tells
-a tank near the swap about Mounting Weight. No raid warnings; tooltips
+Fury's stacks) read instead; the poured elements read on their own line all fight. Bursting
+Coal and Wind-Tethered raise the marked player's own arrow (no panel since 2026-11-19);
+Mounting Weight reads on the tank's own aura bar. No raid warnings; tooltips
 `hudChrome.auraEffect.finalBoss.*` (`src/ui/final_phase_aura_effect.ts`), the five
 non-Latin locales filled.
 

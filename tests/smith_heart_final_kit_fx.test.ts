@@ -162,11 +162,13 @@ describe("the final kits' plan", () => {
     expect(rootRise(0)).toBe(0);
   });
 
-  it("lays Basalt Fist's lanes on the Anvil out to its rim", () => {
+  it("lays Basalt Fist's lanes on the Anvil out to its rim, all the way (playtest 2026-11-19)", () => {
     const spot = { x: HEART_ROOM.x, z: HEART_ROOM.z - 30 };
-    // South, toward the rim 30 yd away: it stops there; north it runs whole.
+    // South, toward the rim 30 yd away: it stops there; north it runs on past
+    // the Heat guardian's own lane length to the far rim, 90 yd off.
     expect(laneReach(spot.x, spot.z, Math.PI, HEAT_TUNING.laneLength)).toBe(30);
-    expect(laneReach(spot.x, spot.z, 0, HEAT_TUNING.laneLength)).toBe(HEAT_TUNING.laneLength);
+    expect(laneReach(spot.x, spot.z, 0, HEAT_TUNING.laneLength)).toBe(90);
+    expect(90).toBeGreaterThan(HEAT_TUNING.laneLength);
   });
 });
 
@@ -366,8 +368,12 @@ describe('FinalKitFx over a fake world', () => {
     expect(visibleNamed(root, 'smithHeartFinalIce')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalShell')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalAnvil')).toBe(1);
-    // The personal arrow: none until a mark singles me out; another player's
-    // anvil mark draws nothing on my screen, mine draws it over my head.
+    // The personal arrow: my Ember Mark raises it over my head (the other
+    // player's Drawn Lightning draws nothing on my screen); without a mark of
+    // mine it goes; another player's anvil mark draws nothing, mine does.
+    expect(visibleNamed(root, 'smithHeartRushArrow')).toBe(1);
+    const ember = me.auras.shift();
+    fx.update(1 / 30);
     expect(visibleNamed(root, 'smithHeartRushArrow')).toBe(0);
     const anvilMark = {
       id: FINAL_AURAS.anvilMark,
@@ -388,6 +394,7 @@ describe('FinalKitFx over a fake world', () => {
     frozen.auras.pop();
     fx.update(1 / 30);
     expect(visibleNamed(root, 'smithHeartRushArrow')).toBe(0);
+    if (ember) me.auras.unshift(ember);
     // A Sky Strike lands: a bolt out of the sky; Arcing Stone rings out.
     const strike = {
       type: 'spellfxAt',
