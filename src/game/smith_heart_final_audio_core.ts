@@ -92,6 +92,11 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
   [FINAL_CUES.arc]: [S('heart_breath_fork', 0.55, 'target', 1.25, 0.25)],
   [FINAL_CUES.orbTaken]: [S(F('orb_take'), 0.9, 'point', 1, 0.15)],
   [FINAL_CUES.orbBurst]: [S('heart_breath_discharge', 1, 'point', 0.9, 0.3)],
+  // A Dust Devil throws its player: the Breath's own toss, a gust over it.
+  [FINAL_CUES.devil]: [
+    S('heart_breath_toss', 0.85, 'target', 1.1, 0.2),
+    S('heart_breath_exhale', 0.4, 'target', 1.3, 0.4),
+  ],
   // ---- the Hammer quarter ----
   [FINAL_CUES.tremor]: [S(F('tremor'), 0.9, 'point', 1, 0.12)],
   [FINAL_CUES.anvil]: [

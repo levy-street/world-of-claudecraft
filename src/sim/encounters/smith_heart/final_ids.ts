@@ -139,6 +139,9 @@ export function finalZoneOf(code: number | undefined): HeartQuarterZone {
 export const FINAL_OBJECTS = {
   /** A Fire Whirl: `<prefix><warn|live>`, moving; its radius in `scale`. */
   whirlPrefix: 'sh_final_whirl_',
+  /** A Dust Devil (the Breath quarter's whirlwind): `<prefix><warn|live>`,
+   *  wandering; its radius in `scale`. */
+  devilPrefix: 'sh_final_devil_',
   /** A burning pool: `<prefix><ember|forge|trail>`; its radius in `scale`. */
   poolPrefix: 'sh_final_pool_',
   /** A Groaning Ice crack: `<prefix><tenths>` to its break. */
@@ -184,6 +187,8 @@ export const FINAL_CUES = {
   unbound: 'heart_final_unbound',
   /** A Fire Whirl strikes a player (spellfx 'nova', whirl to them). */
   whirl: 'heart_final_whirl',
+  /** A Dust Devil throws a player (spellfx 'nova', devil to them). */
+  devil: 'heart_final_devil',
   /** Embers fall at a marked player's feet (spellfxAt). */
   embers: 'heart_final_embers',
   /** The frontal leaves a pool (spellfxAt, Mythic). */
@@ -250,6 +255,7 @@ export const FINAL_NAMES = {
   fist: 'Basalt Fist',
   swell: 'Molten Swell',
   whirl: 'Fire Whirl',
+  devil: 'Dust Devil',
   ember: 'Ember Mark',
   embers: 'Smouldering Embers',
   forgeFire: 'Forge Fire',
@@ -354,6 +360,9 @@ export interface FinalDifficultyRules {
   bladeAim: number;
   /** The Heat's star: Fire Whirls a volley. */
   whirlCount: number;
+  /** The Breath quarter's Dust Devils a volley (Jose's playtest of
+   *  2026-11-19: its whirlwinds were dressing; now they throw). */
+  devilCount: number;
   /** Basalt Fist's bar (seconds): 3 on every tier until Jose's playtest of
    *  2026-11-19 asked for a faster cast; its 16 s cadence unchanged. */
   fistCast: number;
@@ -407,6 +416,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     bladeMarks: 1,
     bladeAim: 4,
     whirlCount: 2,
+    devilCount: 2,
     fistCast: 1.9,
     // 35 s (60 until Jose's playtest of 2026-11-19: "it takes too long").
     anvilEvery: 35,
@@ -461,6 +471,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     // Two a volley (three until the same raids: tornadoes caught the raid on
     // its way to the Anvil once all four stars were awake).
     whirlCount: 2,
+    devilCount: 3,
     fistCast: 1.7,
     // 30 s (Jose's playtest of 2026-11-19; 45 before it, 36 until the bot
     // raids of 2026-11-18).
@@ -503,6 +514,7 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     bladeMarks: 2,
     bladeAim: 3,
     whirlCount: 3,
+    devilCount: 3,
     fistCast: 1.6,
     // 28 s (32 until Jose's playtest of 2026-11-19), still turning.
     anvilEvery: 28,
@@ -704,6 +716,23 @@ export const FINAL_TUNING = {
   // share the quarter, so the bar comes less often).
   boltFirst: 8,
   boltEvery: 14,
+  // The Breath's Dust Devils (Jose's playtest of 2026-11-19: the quarter's
+  // whirlwinds were dressing that did nothing): while it stands in the Breath,
+  // every devilEvery the tier's devilCount rise by hashed players (devilWarn
+  // of warning), then wander the floor (a hashed turn every devilTurnEvery)
+  // for devilLife; whoever one touches is thrown devilKnockback yd out of it
+  // and takes devilMin to devilMax nature, at most once in devilHitEvery.
+  devilFirst: 9,
+  devilEvery: 20,
+  devilWarn: 2,
+  devilLife: 9,
+  devilR: 3.5,
+  devilSpeed: 5,
+  devilTurnEvery: 3,
+  devilHitEvery: 2,
+  devilMin: 130,
+  devilMax: 150,
+  devilKnockback: 8,
   boltCast: 2,
   /** The bolt jumps to every player this near a struck one. */
   boltJump: 6,
@@ -874,6 +903,18 @@ export function whirlTemplate(state: 'warn' | 'live'): string {
 export function whirlOf(templateId: string): 'warn' | 'live' | null {
   if (!templateId.startsWith(FINAL_OBJECTS.whirlPrefix)) return null;
   const s = templateId.slice(FINAL_OBJECTS.whirlPrefix.length);
+  return s === 'warn' || s === 'live' ? s : null;
+}
+
+/** A Dust Devil's template by its state. */
+export function devilTemplate(state: 'warn' | 'live'): string {
+  return `${FINAL_OBJECTS.devilPrefix}${state}`;
+}
+
+/** A Dust Devil's state, or null when the template is not one. */
+export function devilOf(templateId: string): 'warn' | 'live' | null {
+  if (!templateId.startsWith(FINAL_OBJECTS.devilPrefix)) return null;
+  const s = templateId.slice(FINAL_OBJECTS.devilPrefix.length);
   return s === 'warn' || s === 'live' ? s : null;
 }
 

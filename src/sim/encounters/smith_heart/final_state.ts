@@ -47,6 +47,10 @@ export interface FinalWhirl {
   heading: number;
   /** Seconds before it may strike each player again (by id). */
   cooldown: Record<number, number>;
+  /** A Breath Dust Devil (wind: it wanders and throws) rather than a Fire
+   *  Whirl, and the seconds to its next turn. */
+  wind?: boolean;
+  turn?: number;
 }
 
 /** A burning pool (embers, the frontal's forge fire, the Heat Splinter's
@@ -98,6 +102,7 @@ export interface FinalKitClocks {
   orb: number;
   tremor: number;
   shell: number;
+  devil: number;
 }
 
 /** A standing pillar (Wake the Stone): it stays until a blade shatters it. */

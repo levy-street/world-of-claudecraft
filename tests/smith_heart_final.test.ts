@@ -457,6 +457,59 @@ describe('the Quench quarter', () => {
 });
 
 describe('the Breath quarter', () => {
+  it('Dust Devils (playtest 2026-11-19) rise, wander and throw whoever they touch', () => {
+    expect(FINAL_DIFFICULTY.normal.devilCount).toBe(2);
+    expect(FINAL_DIFFICULTY.heroic.devilCount).toBe(3);
+    const f = finalFight(5);
+    f.pullIn('breath');
+    f.dev('/dev heart final devils');
+    const devils = f.objects(FINAL_OBJECTS.devilPrefix);
+    expect(devils.length).toBe(FINAL_DIFFICULTY.normal.devilCount);
+    expect(devils[0].templateId).toBe(`${FINAL_OBJECTS.devilPrefix}warn`);
+    // Its warning, then it lives and moves.
+    f.tick(sec(T.devilWarn + 0.1));
+    const d = f.objects(FINAL_OBJECTS.devilPrefix)[0];
+    expect(d.templateId).toBe(`${FINAL_OBJECTS.devilPrefix}live`);
+    const a = f.local(d);
+    f.tick(sec(1));
+    const b = f.local(d);
+    expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeCloseTo(T.devilSpeed, 0);
+    // Stand a raider in it: struck for a little nature and thrown out of it.
+    // (Held in it until struck: a raider it brushed on its way may still be
+    // inside its two-second grace.)
+    const p = f.players[3];
+    let hit: ReturnType<typeof hits> = [];
+    for (let i = 0; i < sec(T.devilHitEvery + 0.5) && hit.length === 0; i++) {
+      const here = f.local(d);
+      f.put(p, here.x + 1, here.z);
+      hit = hits(f.tick(1), FINAL_NAMES.devil, p.id);
+    }
+    expect(hit.length).toBe(1);
+    expect(hit[0].amount).toBeGreaterThanOrEqual(Math.round(T.devilMin * 0.9));
+    expect(hit[0].amount).toBeLessThan(T.devilMax * 1.5);
+    f.tick(sec(0.6));
+    const after = f.local(p);
+    const eye = f.local(d);
+    expect(Math.hypot(after.x - eye.x, after.z - eye.z)).toBeGreaterThan(T.devilR);
+    // Gone after its life.
+    f.tick(sec(T.devilLife + 0.5));
+    expect(f.objects(FINAL_OBJECTS.devilPrefix).length).toBe(0);
+  });
+
+  it('Dust Devils come on their own clock while it stands in the Breath', () => {
+    const f = finalFight(5);
+    f.pullIn('breath');
+    let seen = 0;
+    let before = 0;
+    for (let i = 0; i < sec(T.devilFirst + T.devilEvery + 1); i++) {
+      f.tick(1);
+      const n = f.objects(FINAL_OBJECTS.devilPrefix).filter((o) => o.templateId.endsWith('warn')).length;
+      if (n > before) seen++;
+      before = n;
+    }
+    expect(seen).toBeGreaterThanOrEqual(2);
+  });
+
   it('Leaping Bolt leaps through a stack and spares a spread raid', () => {
     const stacked = finalFight(5);
     stacked.pullIn('breath');

@@ -56,6 +56,7 @@ import {
   clearBreath,
   drawLightning,
   landBolt,
+  raiseDevils,
   raiseOrbs,
   startBolt,
   stepDrawn,
@@ -207,6 +208,7 @@ export function freshKit(): FinalKitClocks {
     orb: T.orbFirst,
     tremor: T.tremorFirst,
     shell: T.shellFirst,
+    devil: T.devilFirst,
   };
 }
 
@@ -344,6 +346,7 @@ function runKit(s: FinalScope): void {
       return;
     case 'breath':
       if (due(s, 'bolt', true)) startBolt(s);
+      if (due(s, 'devil')) raiseDevils(s);
       if (r.drawnLightning && due(s, 'drawn')) drawLightning(s);
       if (r.stormOrbs && due(s, 'orb')) raiseOrbs(s);
       return;
@@ -652,6 +655,9 @@ export function finalDevMechanic(
     case 'fist':
       clearBar();
       return startFist(s, here) ? 'Basalt Fist: it comes down where you stand in 3 s.' : null;
+    case 'devil':
+    case 'devils':
+      return `${raiseDevils(s)} Dust Devils.`;
     case 'whirl':
     case 'whirls':
     case 'tornado':

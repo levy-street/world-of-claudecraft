@@ -24,6 +24,7 @@ import { SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
 import {
   FINAL_CUES,
   FINAL_OBJECTS,
+  devilOf,
   finalBladeOf,
   finalLaneOf,
   finalPillarOf,
@@ -46,6 +47,10 @@ const smooth = (v: number) => {
 export type FinalObjectKind =
   | 'whirlWarn'
   | 'whirl'
+  // The Breath's Dust Devils (Jose's playtest of 2026-11-19): the fire
+  // tornado recoloured to wind.
+  | 'devilWarn'
+  | 'devil'
   | 'emberPool'
   | 'forgePool'
   | 'crack'
@@ -66,6 +71,8 @@ export function finalObjectKind(templateId: string): FinalObjectKind | null {
   if (!templateId.startsWith('sh_final_')) return null;
   const w = whirlOf(templateId);
   if (w) return w === 'warn' ? 'whirlWarn' : 'whirl';
+  const d = devilOf(templateId);
+  if (d) return d === 'warn' ? 'devilWarn' : 'devil';
   const p = poolOf(templateId);
   if (p) return p === 'ember' ? 'emberPool' : 'forgePool';
   const pillar = finalPillarOf(templateId);
@@ -119,6 +126,11 @@ export const FINAL_KIT_COLORS = {
   storm: [0.72, 0.62, 1.0] as const,
   stone: [0.62, 0.5, 0.32] as const,
   dust: [0.42, 0.38, 0.33] as const,
+  /** The Dust Devils' wind (the fire tornado recoloured): a white core, a
+   *  pale sky blue body, a grey dust sheath. */
+  windCore: [0.96, 0.98, 1.0] as const,
+  wind: [0.66, 0.82, 1.0] as const,
+  windDust: [0.62, 0.62, 0.6] as const,
 } as const;
 
 /** How each footprint draws on the shared floor telegraph (every tier): its
@@ -127,6 +139,8 @@ export const FINAL_KIT_COLORS = {
  *  precedent): stand IN them. */
 export const FINAL_FOOTPRINTS = {
   whirl: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xffb060 },
+  /** A Dust Devil: the threat colour (it throws), a wind-white accent. */
+  devil: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xdcecff },
   pool: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xff8a3a },
   crack: { color: TELEGRAPH_THREAT_COLORS.lethal, accent: 0xbfe6ff },
   tremor: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xe8c070 },
@@ -154,6 +168,7 @@ export const FINAL_FOOTPRINTS = {
 /** The footprints' radii (yards), the sim's own. */
 export const FINAL_REACH = {
   whirl: T.whirlR,
+  devil: T.devilR,
   ember: T.emberR,
   forge: T.forgeFireR,
   crack: T.iceR,
@@ -288,6 +303,7 @@ export const FINAL_FX_PARTICLE_RUNGS: readonly number[] = Object.values(ENGINE_P
 /** The pools (fixed, allocated at build). */
 export const FINAL_KIT_POOLS = {
   whirls: 6,
+  devils: 6,
   orbs: 6,
   ice: 10,
   shells: 6,

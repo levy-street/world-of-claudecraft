@@ -315,7 +315,9 @@ export interface HeartQuarterSeed {
 export const HEART_QUARTER_AIR = {
   // Phase 2M: the room doubled in area; the air keeps its density over it.
   hammer: { grit: 320, dust: 90, chips: 80, stones: 34 },
-  breath: { devils: 8, perDevil: 70, streaks: 120, sheets: 40 },
+  // No dust devils since 2026-11-19 (a whirlwind there is the boss's Dust
+  // Devil now): more streaks and veils carry the wind.
+  breath: { streaks: 200, sheets: 60 },
   quench: { mist: 60, crystals: 190, frost: 260 },
   heat: { embers: 380, haze: 40, flames: 56 },
   sparks: 190,

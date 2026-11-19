@@ -96,6 +96,10 @@ uniform float uCoreK;
 uniform float uSeed;
 uniform vec3 uCore;
 uniform vec3 uFire;
+// 1: a Breath Dust Devil, the same tornado in wind (Jose's playtest of
+// 2026-11-19): white, pale sky blue and grey dust, no ember glow.
+uniform float uWind;
+uniform vec3 uDust;
 varying vec2 vUv;
 varying float vH;
 ${KIT_NOISE}
@@ -113,7 +117,19 @@ void main() {
     // up the flare, an ember glow low in its folds.
     float a = (0.35 + 0.65 * streak) * smoothstep(0.05, 0.55, vUv.y) * lip * 0.8;
     vec3 c = mix(vec3(0.07, 0.05, 0.04), uFire * vec3(0.5, 0.17, 0.05), (1.0 - vUv.y) * 0.6 * streak);
-    gl_FragColor = vec4(c, a * uAlpha);
+    // The wind's sheath: grey dust thick at the foot, paling up the flare.
+    vec3 w = mix(uDust * 0.75, mix(uDust, uFire, 0.35), vUv.y + streak * 0.3);
+    gl_FragColor = vec4(mix(c, w, uWind), a * uAlpha * mix(1.0, 0.7, uWind));
+    return;
+  }
+  if (uWind > 0.5) {
+    // Wind: pale streaks of sky winding up, white in the core's, brightest at
+    // the throat where it scours the floor.
+    float gust = clamp((1.0 - vUv.y) * 0.6 + streak * 0.6 + core * 0.3, 0.0, 1.0);
+    vec3 wc = mix(uFire * 0.55, uFire, smoothstep(0.2, 0.7, gust));
+    wc = mix(wc, uCore, smoothstep(0.7, 1.0, gust) * mix(0.4, 0.8, core));
+    float wb = (0.2 + 0.8 * streak) * lip * foot;
+    gl_FragColor = vec4(wc * (0.5 + 0.4 * gust), wb * uAlpha * mix(0.7, 0.55, core));
     return;
   }
   // Fire: hottest at the throat where it tears the floor, deep red up the
