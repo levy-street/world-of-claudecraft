@@ -1,6 +1,6 @@
 # Smith's Heart: the taste pass
 
-Two presentation-only changes to the raid (design doc section 5.27). Nothing under `src/sim/`
+Three presentation-only changes to the raid (design doc section 5.27). Nothing under `src/sim/`
 or `server/` is touched: no placement, collider, telegraph or timing moved.
 
 Every pair is the same camera on the same spot: one shot of a fixed route through a raid
@@ -34,6 +34,16 @@ runs once a guardian falls pools in its channel with feathered lips.
 - All four veins lit: [before](before-06-ring-rivers-lit.jpg),
   [after](after-06-ring-rivers-lit.jpg). A lit river still reads far brighter than a dim
   one; that gap is pinned in `tests/smith_heart_river_veins.test.ts`.
+
+## The hub's sky under the cliffs' line
+
+The main map's sky panorama is pressed down behind the Ring's cliffs, so wherever the sky
+showed under about 25 degrees (down a vein's mouth, from the Balcony) the dome read the
+painting's last row: a flat brown band. The painting's own low clouds are now eased down to
+the horizon there; over the cliffs nothing moves.
+
+- From the Ring's east rim, west down the Heat's mouth: [before](before-07-hub-sky.jpg),
+  [after](after-07-hub-sky.jpg). (The dim river in the foreground is the second change.)
 
 ## The lowest graphics preset, and a phone
 
