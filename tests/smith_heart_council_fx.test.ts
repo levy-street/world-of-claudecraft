@@ -461,10 +461,44 @@ describe('CouncilFx over a fake world', () => {
     expect(paints()).toBe(before);
     fx.dispose();
   });
+  it("Wake the Stone's mark raises the arrow over the local player alone", () => {
+    const entities = new Map<number, Entity>();
+    const me = entity(1, 'player', 'warrior', 8, -160);
+    const other = entity(2, 'player', 'mage', 0, -150);
+    for (const e of [me, other]) entities.set(e.id, e);
+    const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
+    const scene = new THREE.Scene();
+    const fx = new CouncilFx(scene, () => 0, world);
+    const root = scene.getObjectByName('smith-heart-council-fx');
+    const arrows = () => {
+      const out: THREE.Object3D[] = [];
+      root?.traverse((c) => {
+        if (c.name === 'smithHeartRushArrow' && c.visible) out.push(c);
+      });
+      return out;
+    };
+    // Another player marked: nothing over anyone on my screen.
+    other.auras.push(aura(COUNCIL_AURAS.wakeMark, 4, T.wakeMarkSeconds));
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    expect(arrows().length).toBe(0);
+    // I am marked: the arrow over my head, and still none over the other.
+    me.auras.push(aura(COUNCIL_AURAS.wakeMark, 4, T.wakeMarkSeconds));
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    const shown = arrows();
+    expect(shown.length).toBe(1);
+    expect(shown[0].position.x).toBeCloseTo(me.pos.x, 5);
+    expect(shown[0].position.z).toBeCloseTo(me.pos.z, 5);
+    expect(shown[0].position.y - me.pos.y).toBeGreaterThanOrEqual(RUSH_ARROW.tip);
+    // The mark ends: the arrow goes.
+    me.auras.length = 0;
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    expect(arrows().length).toBe(0);
+    fx.dispose();
+  });
 });
 
 describe("Mountain's Rush's arrow: compiled with the council's gated root", () => {
-  it('both arrow cards are under the root the compile gate receives, hidden until a mark', () => {
+  it('every arrow card is under the root the compile gate receives, hidden until a mark', () => {
     const seen: number[] = [];
     const world = { entities: new Map(), playerId: -1 } as unknown as IWorld;
     new CouncilFx(
@@ -483,6 +517,7 @@ describe("Mountain's Rush's arrow: compiled with the council's gated root", () =
         return Promise.resolve();
       },
     );
-    expect(seen).toEqual([2]);
+    // The Rush's two and Wake the Stone's one (the local player's own).
+    expect(seen).toEqual([3]);
   });
 });
