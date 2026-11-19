@@ -275,9 +275,10 @@ describe('self player context menu', () => {
     });
 
     expect(member.map((action) => action.id)).not.toContain('convert-raid');
-    expect(member.map((action) => action.id)).not.toContain('dungeon-difficulty');
+    expect(member.map((action) => action.id)).not.toContain('dungeon-difficulty-heroic');
+    expect(member.map((action) => action.id)).not.toContain('dungeon-difficulty-normal');
     expect(leader.map((action) => action.id)).toContain('convert-raid');
-    expect(leader.map((action) => action.id)).toContain('dungeon-difficulty');
+    expect(leader.map((action) => action.id)).toContain('dungeon-difficulty-heroic');
   });
 
   it('pins the exact portrait menu for a grouped non-leader', () => {
@@ -293,25 +294,43 @@ describe('self player context menu', () => {
   it('says when the live instances have not reached the selected tier', () => {
     const plain = selfPlayerContextActions({ ...SELF_BASE, isHeroic: true });
     expect(plain.map((action) => action.id)).not.toContain('dungeon-difficulty-status');
+    // With nothing pending, the one difficulty row flips to the other tier.
+    expect(plain.map((action) => action.id).filter((id) => id.startsWith('dungeon-diff'))).toEqual([
+      'dungeon-difficulty-normal',
+    ]);
+    expect(
+      selfPlayerContextActions(SELF_BASE)
+        .map((action) => action.id)
+        .filter((id) => id.startsWith('dungeon-diff')),
+    ).toEqual(['dungeon-difficulty-heroic']);
     const stale = selfPlayerContextActions({
       ...SELF_BASE,
       isHeroic: true,
       unappliedDifficulty: 'normal',
     });
+    // The first row RETRIES the selected tier (it used to flip the selection
+    // back, sending the tier the instances were already on); the second keeps
+    // the live tier.
     expect(stale.map((action) => action.id)).toEqual([
       'dungeon-difficulty-status',
-      'dungeon-difficulty',
+      'dungeon-difficulty-heroic',
+      'dungeon-difficulty-normal',
       'reset-dungeons',
       'close',
     ]);
     expect(stale[0].label).toBe('Heroic selected. Current instances are still Normal.');
-    expect(stale[1].label).toBe('Set Dungeon Difficulty: Normal');
+    expect(stale[1].label).toBe('Set Dungeon Difficulty: Heroic');
+    expect(stale[2].label).toBe('Set Dungeon Difficulty: Normal');
     // The status row is informational: painted aria-disabled with no data-act,
     // so activating it runs nothing; every real action stays actionable.
     expect(stale[0].inert).toBe(true);
     expect(stale.slice(1).every((action) => !action.inert)).toBe(true);
     const back = selfPlayerContextActions({ ...SELF_BASE, unappliedDifficulty: 'heroic' });
     expect(back[0].label).toBe('Normal selected. Current instances are still Heroic.');
+    expect(back.slice(1, 3).map((action) => action.id)).toEqual([
+      'dungeon-difficulty-normal',
+      'dungeon-difficulty-heroic',
+    ]);
     // A grouped non-leader never sees the difficulty rows at all.
     const member = selfPlayerContextActions({
       ...SELF_BASE,
