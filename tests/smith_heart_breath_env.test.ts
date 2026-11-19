@@ -472,6 +472,9 @@ describe('the Breath painted kit loader', () => {
     const { kit } = await freshKit();
     const F = kit.BREATH_ENV_FLOOR;
     for (const g of F.gain) expect(g).toBeLessThan(0.8);
+    // A neutral slate, never navy: the painting is blue-violet already, so the gain
+    // takes blue back (on the lowest tier, with no grade over it, a bluer gain read navy).
+    expect(F.gain[2]).toBeLessThan(F.gain[0]);
     expect(F.roughness).toBeGreaterThanOrEqual(0.8);
     const m = kit.breathEnvFloorMaterial() as THREE.MeshStandardMaterial;
     expect(m.color.toArray()).toEqual([...F.gain]);
