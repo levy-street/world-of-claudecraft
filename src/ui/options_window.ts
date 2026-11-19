@@ -116,6 +116,7 @@ import {
 import type { KeyboardLayer } from './keyboard_map_core';
 import { KeyboardMapWindow } from './keyboard_map_window';
 import { optionsCheckRow, optionsNoteRow, optionsSubheadRow } from './options_check_rows';
+import { closeFctColorsPanel, fctColorsEntryRow, fctColorsPanel } from './options_fct_colors';
 import {
   buildChatTimestampRows,
   buildChatWindowResetRow,
@@ -488,6 +489,7 @@ export class OptionsWindow {
     this.deps.closeOthers();
     this.view = 'main';
     this.frameOptionsId = null;
+    closeFctColorsPanel();
     this.capturingKey = null;
     this.conflictingKey = null;
     this.keybindNote = '';
@@ -658,6 +660,7 @@ export class OptionsWindow {
   // Focus moves to the first entry: the focused control died in the re-render.
   private goBack(): void {
     this.frameOptionsId = null;
+    closeFctColorsPanel();
     audio.click();
     this.view = this.overlayPanels.parentView(this.view);
     this.capturingKey = null;
@@ -1663,6 +1666,7 @@ export class OptionsWindow {
     wireTabStrip(el, 'opt-tab', (id, focusFollow) => {
       this.interfaceTab = id as InterfaceTab;
       this.frameOptionsId = null;
+      closeFctColorsPanel();
       this.render();
       if (focusFollow) focusActiveTab(this.deps.root(), 'opt-tab', 'on');
     });
@@ -1683,6 +1687,7 @@ export class OptionsWindow {
       if (!env.touch && !env.nativeShell) buildInterfaceUnlockRow(body, this.deps);
     }
 
+    if (tab === 'combat' && fctColorsPanel(body, hooks?.fctColors, () => this.render())) return;
     const shownControls = this.frameOptionsId
       ? controls.filter(
           (control) => 'key' in control && frameSettingRelated(this.frameOptionsId!, control.key),
@@ -1706,6 +1711,7 @@ export class OptionsWindow {
         });
       else apply(body, shownControls);
     }
+    if (tab === 'combat') fctColorsEntryRow(body, hooks?.fctColors, () => this.render());
 
     // (The frames tab's Reset Frame Positions row was retired, owner
     // request: the per-frame size resets live in the editor's Frames
@@ -1759,6 +1765,7 @@ export class OptionsWindow {
       hooks.settings.reset(allKeys);
       for (const k of allKeys) hooks.onSettingChange(k, hooks.settings.get(k));
       if (tab === 'frames' && !this.frameOptionsId) this.deps.resetUnitFrames();
+      if (tab === 'combat') hooks.fctColors?.reset();
       this.render();
     });
   }

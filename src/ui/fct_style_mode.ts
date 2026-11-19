@@ -17,3 +17,14 @@ export interface ClassicCombatTextHost {
 export function classicCombatTextOn(doc: ClassicCombatTextHost): boolean {
   return doc.body?.classList?.contains(INTERFACE_BODY_CLASSES.classicCombatText) === true;
 }
+
+/** The body class the touch layout runs under (hud.mobile.css keys every rule off it). */
+const MOBILE_TOUCH_CLASS = 'mobile-touch';
+
+/**
+ * Whether the touch layout is active, so the painter places numbers with the compact
+ * mobile lane geometry that hud.mobile.css animates (false on a host with no body).
+ */
+export function fctMobileTouchOn(doc: ClassicCombatTextHost): boolean {
+  return doc.body?.classList?.contains(MOBILE_TOUCH_CLASS) === true;
+}

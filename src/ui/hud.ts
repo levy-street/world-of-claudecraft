@@ -335,8 +335,9 @@ import {
 import { ErrorToastController } from './error_toast_controller';
 import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
+import type { FctColorHooks } from './fct_colors';
 import { blockFctAmountText } from './fct_core';
-import { fctSpawnShape } from './fct_event';
+import { FctPeriodicTicks, fctIsAbilityHit, fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { ferryBellHomeNoteToOpen, writeEastbrookGuidanceChoice } from './ferry_bell_home_note';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
@@ -1059,6 +1060,7 @@ export interface OptionsHooks {
   perfOverlay: PerfOverlayHooks;
   // UI theming seam — main.ts owns the ThemeStore + live CSS-variable apply.
   theme: ThemeHooks;
+  fctColors?: FctColorHooks; // Combat Text Colors (fct_colors.ts); row hidden when absent
   // Gamepad button-layout seam (the concrete GamepadBindings satisfies it
   // structurally), so the Controller options panel can read & rebind buttons
   // without the HUD importing the manager.
@@ -4694,6 +4696,8 @@ export class Hud {
   // author space (the same zoom correction the old fct() applied). All writes route through
   // the write-elision facet; the per-kind colour is a CSS class token,
   // never an inline hex.
+  // Pairs each DoT tick effect with the damage number it deals (fct_event.ts).
+  private readonly fctTicks = new FctPeriodicTicks();
   private readonly fctPainter = new FctPainter(
     this.writerFacet,
     document.getElementById('ui') as HTMLElement,
@@ -4701,7 +4705,11 @@ export class Hud {
     getUiScale,
     // Tier the pool cap / TTL from the STATIC preset (data-fx-level), never the
     // governor. spawn() reads this per event.
-    { getFxTier: () => this.fxTier(), contactDelaySec: (s) => this.renderer.contactDelayFor(s) },
+    {
+      getFxTier: () => this.fxTier(),
+      contactDelaySec: (s) => this.renderer.contactDelayFor(s),
+      getTextScale: () => this.numericSetting('fctScale'),
+    },
   );
   // Player frame: static name/portrait, cached heraldry and self PvP risk hosts.
   private readonly playerFramePainter = new UnitFramePainter(this.writerFacet, {
@@ -10919,6 +10927,7 @@ export class Hud {
       if (ev.pid !== undefined && ev.pid !== sim.playerId) continue;
       if (ev.type === 'duelEnd' && !duelEndVisibleToViewer(ev, sim.playerId, sim.player.pos))
         continue;
+      if (ev.type === 'spellfx' && ev.fx === 'tick') this.fctTicks.note(ev, now);
       // visual effects (swings, projectiles, glows) — for everyone nearby,
       // not just events involving this player
       this.renderer.handleEvent(ev);
@@ -11025,7 +11034,7 @@ export class Hud {
           const hitShape = this.fctPainter.stagedShape(ev, now, {
             type: 'damage',
             damageKind: ev.kind === 'block' ? 'block' : 'hit',
-            ability: !!ev.ability,
+            ability: fctIsAbilityHit(ev.ability),
             crit: ev.crit,
             isPlayerSource,
             isPlayerOwnedSource,
@@ -11033,6 +11042,7 @@ export class Hud {
             // Nothing got through and the absorb floater above already said so,
             // so the number is suppressed rather than shown as a bare 0.
             fullyAbsorbed: ev.amount === 0 && (ev.absorbed ?? 0) > 0,
+            periodic: this.fctTicks.take(ev, now),
           });
           if (
             hitShape &&
@@ -12279,6 +12289,7 @@ export class Hud {
                 type: 'heal',
                 crit: ev.crit,
                 isPlayerTarget: ev.targetId === sim.playerId,
+                periodic: ev.hot === true,
               });
               if (shape)
                 this.fctPainter.spawn(

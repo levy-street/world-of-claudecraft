@@ -12,16 +12,17 @@
 // projects the head anchor ONCE (renderer.worldToScreen + the getUiScale author-space
 // divide), writes left / top a single time, and leaves the number at that screen position
 // for its ~1.25s life while the CSS @keyframes carry it: straight up under Classic Combat
-// Text, or (the vivid default) an outgoing number arcing out along one of four fan-out
-// lanes while a crit pops in the centre. It does NOT re-project per frame, so a number
+// Text, or (the vivid default) along one of five lanes that fct_layout_core picks so the
+// number clears every floater still on screen (the lane start and any nudge ride the same
+// one-time left / top write). It does NOT re-project per frame, so a number
 // pops over the unit and moves in SCREEN space (it does not slide with the camera), exactly
 // how the classic-era damage numbers read. step() therefore only ages out expired slots;
 // there is no per-frame position write, so an unchanged frame costs nothing.
 //
 // WRITE ROUTING: every DOM write goes through the PainterHost
 // write-elision facet -- setText for the number, toggleClass for the colour token, the crit
-// class and the vivid-look classes (fct-vivid, the fan-out lane, fct-big), setStyleProp for
-// left / top / animation. A node is shown purely by being attached
+// class and the vivid-look classes (fct-vivid, the placed lane, fct-big, fct-pet),
+// setStyleProp for left / top / animation. A node is shown purely by being attached
 // (appendChild) and hidden by being detached (remove() on TTL recycle), so the spawn path
 // makes no display write at all. A no-op frame costs no DOM mutation and the skip-rate holds.
 // The per-kind colour moved off el.style.color
@@ -113,7 +114,7 @@ import {
   type FctEvent,
   type FctKind,
 } from './fct_core';
-import { type FctDriftLane, FctHitScale, fctDriftLane } from './fct_emphasis_core';
+import { FctHitScale } from './fct_emphasis_core';
 import {
   type FctDamageFlavorSource,
   type FctSpawnShape,
@@ -121,8 +122,20 @@ import {
   fctSpawnShape,
   withDamageFlavor,
 } from './fct_event';
+import {
+  FCT_LAYOUT_DESKTOP,
+  FCT_LAYOUT_MOBILE,
+  type FctLane,
+  type FctPlaced,
+  type FctRole,
+  type FctSizeClass,
+  fctBoxSize,
+  fctFontPx,
+  fctLanePrefs,
+  placeFct,
+} from './fct_layout_core';
 import { FctBeatStager, type FctBeatStrike } from './fct_stage_core';
-import { classicCombatTextOn } from './fct_style_mode';
+import { classicCombatTextOn, fctMobileTouchOn } from './fct_style_mode';
 import type { PainterHostWriters } from './painter_host';
 
 /**
@@ -175,10 +188,16 @@ const FCT_CRIT_CLASS = 'crit';
 const FCT_VIVID_CLASS = 'fct-vivid';
 const FCT_OUT_CLASS_PREFIX = 'fct-out-';
 // Every lane paired with its class once at module load, so a spawn builds no strings.
-const FCT_OUT_LANE_CLASSES: ReadonlyArray<readonly [FctDriftLane, string]> = (
-  ['l', 'r', 'll', 'rr'] as const
+// The centre lane has a class too: under the vivid look every placed floater rides exactly
+// one lane keyframe, so the layout core's model of where it is matches what is drawn.
+const FCT_OUT_LANE_CLASSES: ReadonlyArray<readonly [FctLane, string]> = (
+  ['c', 'l', 'r', 'll', 'rr'] as const
 ).map((lane) => [lane, `${FCT_OUT_CLASS_PREFIX}${lane}`] as const);
 const FCT_BIG_CLASS = 'fct-big';
+// A pet's or guardian's hit (vivid only): smaller and dimmer than the player's own.
+const FCT_PET_CLASS = 'fct-pet';
+// A damage-over-time tick (vivid only): smaller and italic, so a tick never reads as a fresh hit.
+const FCT_DOT_CLASS = 'fct-dot';
 // The colour token becomes the class `fct-<token>` (e.g. 'fct-heal'); hud.css maps each to
 // the live hex. Deriving it from the token keeps the painter and the descriptor's token
 // vocabulary (fct_core) in one place rather than duplicating the per-token table.
@@ -193,6 +212,64 @@ function colorClass(token: FctColorToken): string {
   return `${FCT_COLOR_CLASS_PREFIX}${token}`;
 }
 
+/** An XP floater keeps its own pop and only ever sits in the centre. */
+const CENTRE_ONLY: readonly FctLane[] = ['c'];
+
+/**
+ * Who a floater is about (fct_layout_core's FctRole), from its kind: an outgoing hit is
+ * the player's or (flagged) their pet's; an absorb or avoidance word reads as protection
+ * over the player and as the player's own swing over a target.
+ */
+function fctRole(kind: FctKind, isSelf: boolean, pet: boolean): FctRole {
+  switch (kind) {
+    case 'damage-done-ability':
+    case 'damage-done-auto':
+    case 'damage-done-block':
+      return pet ? 'pet' : 'out';
+    case 'damage-taken':
+    case 'damage-taken-block':
+      return 'in';
+    case 'heal':
+      return 'heal';
+    case 'absorb':
+    case 'miss':
+    case 'dodge':
+    case 'resist':
+    case 'evade':
+      return isSelf ? 'guard' : 'out';
+    default:
+      return 'info';
+  }
+}
+
+/**
+ * The size class a vivid floater is drawn at (hud.css owns the px, fct_layout_core mirrors
+ * them for the box estimate): a crit is the one big number; the player's own hits and the
+ * XP reward are a step up; a pet's hit and an avoidance word a step down.
+ */
+function fctSizeClass(kind: FctKind, crit: boolean, pet: boolean, periodic = false): FctSizeClass {
+  // A pet's crit and a DoT tick's crit step up only to the normal hit size: the big number
+  // stays reserved for your own direct crits.
+  if (crit) return pet || periodic ? 'lane' : 'crit';
+  if (periodic) return 'minor';
+  switch (kind) {
+    case 'damage-done-ability':
+    case 'damage-done-auto':
+    case 'damage-done-block':
+      return pet ? 'minor' : 'lane';
+    case 'xp':
+    case 'rested-xp':
+      return 'lane';
+    case 'miss':
+    case 'dodge':
+    case 'resist':
+    case 'evade':
+      return 'minor';
+    default:
+      return 'normal';
+  }
+}
+
 /**
  * One pre-allocated pool slot. `node` is permanent; the rest is rewritten on each spawn.
  * `colorClass` is the colour class currently applied to the node, tracked so a reuse toggles
@@ -200,11 +277,12 @@ function colorClass(token: FctColorToken): string {
  * painter must turn the old class off explicitly). `bornAt` + `ttlMs` drive the TTL recycle.
  * live[] is kept in spawn order, so the array position (not a stored counter) is the FIFO key.
  */
-interface FctSlot {
+interface FctSlot extends FctPlaced {
   readonly node: HTMLElement;
   colorClass: string | null;
-  bornAt: number;
   ttlMs: number;
+  /** Whether the vivid layout placed this floater (only those are layout obstacles). */
+  placed: boolean;
 }
 
 /**
@@ -220,6 +298,8 @@ interface FctPending {
   crit: boolean;
   isSelf: boolean;
   amount: number | undefined;
+  pet: boolean | undefined;
+  periodic: boolean | undefined;
   dueAt: number;
 }
 
@@ -257,6 +337,13 @@ export class FctPainter {
   // outgoing spawn ordinal the left / right fan-out alternates on.
   private readonly hitScale = new FctHitScale();
   private outOrdinal = 0;
+  // Whether the touch layout is on (read per spawn, like isClassic), picking the lane
+  // geometry hud.mobile.css animates; and the Combat Text Size the boxes scale by.
+  private readonly isMobile: () => boolean;
+  private readonly getTextScale: () => number;
+  // The live floaters the vivid layout weighs a new number against, refilled per spawn
+  // into one reused array (never reallocated).
+  private readonly obstacles: FctPlaced[] = [];
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -273,6 +360,10 @@ export class FctPainter {
        *  contact_queue.ts); absent = no contact staging. */
       contactDelaySec?: (strike: FctBeatStrike) => number;
       isClassic?: () => boolean;
+      /** Touch layout on (default: the body's mobile-touch class off the document). */
+      isMobile?: () => boolean;
+      /** Combat Text Size (the fctScale setting, --fct-scale); default 1. */
+      getTextScale?: () => number;
     } = {},
   ) {
     const {
@@ -286,11 +377,15 @@ export class FctPainter {
       // Reads the live body class off the injected document; a fake document with no
       // body reads as the vivid default.
       isClassic = () => classicCombatTextOn(doc),
+      isMobile = () => fctMobileTouchOn(doc),
+      getTextScale = () => 1,
     } = opts;
     this.contactDelaySec = opts.contactDelaySec ?? null;
     this.cap = cap;
     this.getFxTier = getFxTier;
     this.isClassic = isClassic;
+    this.isMobile = isMobile;
+    this.getTextScale = getTextScale;
     // Math.random for the horizontal jitter is allowed on the PAINTER (not the pure core);
     // a test injects a deterministic draw.
     this.random = random;
@@ -302,7 +397,20 @@ export class FctPainter {
       // once at build so the raw per-hit numbers never leak into the a11y tree; the
       // coalesced summary belongs to the #combat-live region, not these nodes.
       node.setAttribute('aria-hidden', 'true');
-      this.free.push({ node, colorClass: null, bornAt: 0, ttlMs: 0 });
+      this.free.push({
+        node,
+        colorClass: null,
+        bornAt: 0,
+        ttlMs: 0,
+        placed: false,
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0,
+        lane: 'c',
+        crit: false,
+        durMs: 0,
+      });
     }
     // Held-entry slots are pre-allocated the same way, so a beat-staged floater costs
     // no object on the event path either.
@@ -314,6 +422,8 @@ export class FctPainter {
         crit: false,
         isSelf: false,
         amount: undefined,
+        pet: undefined,
+        periodic: undefined,
         dueAt: 0,
       });
     }
@@ -424,8 +534,21 @@ export class FctPainter {
     // pressure); the full tier scale is exactly 1, so 1250 * 1 = 1250 is byte-identical.
     slot.ttlMs = d.ttlMs * fctTtlScale(tier);
     this.applyContent(slot, d);
-    this.applyVivid(slot.node, d, classic, bigHit);
-    this.position(slot.node, v, d.jitterOffset, this.getScale());
+    const scale = this.getScale();
+    // Author-space anchor: EXACTLY the live fct() formula (the getUiScale divide is
+    // load-bearing, see position()).
+    const ax = (v.x + d.jitterOffset) / scale;
+    const ay = v.y / scale;
+    if (classic) {
+      // Classic Combat Text: the shipped straight rise from the anchor, untouched.
+      slot.placed = false;
+      this.applyVivid(slot.node, null, false, false, false, false);
+      this.position(slot.node, ax, ay);
+    } else {
+      const lane = this.place(slot, event, d, ax, ay, now);
+      this.applyVivid(slot.node, lane, true, bigHit, event.pet === true, event.periodic === true);
+      this.position(slot.node, slot.x, slot.y);
+    }
     this.mount.appendChild(slot.node); // a detached node becomes visible on attach...
     if (evicted) this.restartAnimation(slot.node); // ...an evicted (attached) one needs the restart.
     this.live.push(slot);
@@ -506,6 +629,8 @@ export class FctPainter {
     slot.crit = event.crit;
     slot.isSelf = event.isSelf;
     slot.amount = event.amount;
+    slot.pet = event.pet;
+    slot.periodic = event.periodic;
     slot.dueAt = dueAt;
     this.insertPending(slot);
   }
@@ -540,6 +665,8 @@ export class FctPainter {
     slot.text = '';
     slot.target = FCT_EMPTY_ANCHOR;
     slot.amount = undefined;
+    slot.pet = undefined;
+    slot.periodic = undefined;
     this.pendingFree.push(slot);
   }
 
@@ -562,28 +689,87 @@ export class FctPainter {
    *  vivid floater, one fan-out lane on an outgoing number (alternating sides, so
    *  consecutive hits never share a lane), and the big-hit flag. Classic turns all of them
    *  off, leaving the node exactly the shipped floater. */
-  private applyVivid(node: HTMLElement, d: FctDescriptor, classic: boolean, bigHit: boolean) {
-    const lane = !classic && d.outgoing ? fctDriftLane(this.outOrdinal++) : null;
-    this.writers.toggleClass(node, FCT_VIVID_CLASS, !classic);
+  private applyVivid(
+    node: HTMLElement,
+    lane: FctLane | null,
+    vivid: boolean,
+    bigHit: boolean,
+    pet: boolean,
+    periodic: boolean,
+  ) {
+    this.writers.toggleClass(node, FCT_VIVID_CLASS, vivid);
     for (let i = 0; i < FCT_OUT_LANE_CLASSES.length; i++) {
       const [l, cls] = FCT_OUT_LANE_CLASSES[i];
       this.writers.toggleClass(node, cls, lane === l);
     }
-    this.writers.toggleClass(node, FCT_BIG_CLASS, !classic && bigHit);
+    this.writers.toggleClass(node, FCT_BIG_CLASS, vivid && bigHit);
+    this.writers.toggleClass(node, FCT_PET_CLASS, vivid && pet);
+    this.writers.toggleClass(node, FCT_DOT_CLASS, vivid && periodic);
   }
 
-  /** Position via left / top in author space: (projected x + jitter) / uiScale and
-   *  y / uiScale, written ONCE at spawn. EXACTLY the live fct() formula -- the getUiScale
-   *  divide is load-bearing because worldToScreen returns the UNZOOMED viewport point while
-   *  #ui is scaled by `zoom`, so an undivided write mispositions whenever uiScale != 1. */
-  private position(
-    node: HTMLElement,
-    v: { x: number; y: number },
-    jitterOffset: number,
-    scale: number,
-  ): void {
-    this.writers.setStyleProp(node, LEFT_PROP, `${(v.x + jitterOffset) / scale}px`);
-    this.writers.setStyleProp(node, TOP_PROP, `${v.y / scale}px`);
+  /**
+   * Vivid placement: ask the layout core for the first lane and nudge whose whole readable
+   * life clears every floater still on screen (fct_layout_core.ts), and record the answer
+   * on the slot so later spawns avoid this one in turn. Returns the lane class to apply, or
+   * null for an XP floater, which keeps its own pop animation (it is still recorded as a
+   * centre obstacle so nothing lands on the reward).
+   */
+  private place(
+    slot: FctSlot,
+    event: FctEvent,
+    d: FctDescriptor,
+    ax: number,
+    ay: number,
+    now: number,
+  ): FctLane | null {
+    const profile = this.isMobile() ? FCT_LAYOUT_MOBILE : FCT_LAYOUT_DESKTOP;
+    const textScale = this.getTextScale();
+    const pet = event.pet === true;
+    const role = fctRole(event.kind, event.isSelf, pet);
+    const ownLane = event.kind !== 'xp' && event.kind !== 'rested-xp';
+    const box = fctBoxSize(
+      d.text,
+      fctFontPx(profile, fctSizeClass(event.kind, d.crit, pet, event.periodic === true), textScale),
+    );
+    const ordinal = role === 'out' || role === 'pet' ? this.outOrdinal++ : 0;
+    this.obstacles.length = 0;
+    for (let i = 0; i < this.live.length; i++) {
+      if (this.live[i].placed) this.obstacles.push(this.live[i]);
+    }
+    const at = placeFct(
+      profile,
+      {
+        x: ax,
+        y: ay,
+        w: box.w,
+        h: box.h,
+        crit: d.crit,
+        durMs: slot.ttlMs,
+        lanes: ownLane ? fctLanePrefs(role, d.crit, ordinal) : CENTRE_ONLY,
+        textScale,
+      },
+      this.obstacles,
+      now,
+    );
+    this.obstacles.length = 0;
+    slot.placed = true;
+    slot.x = at.x;
+    slot.y = at.y;
+    slot.w = box.w;
+    slot.h = box.h;
+    slot.lane = at.lane;
+    slot.crit = d.crit;
+    slot.durMs = slot.ttlMs;
+    return ownLane ? at.lane : null;
+  }
+
+  /** Position via left / top in author space, written ONCE at spawn. The caller divides
+   *  the projected point by getUiScale first (EXACTLY the live fct() formula): that divide
+   *  is load-bearing because worldToScreen returns the UNZOOMED viewport point while #ui is
+   *  scaled by `zoom`, so an undivided write mispositions whenever uiScale != 1. */
+  private position(node: HTMLElement, x: number, y: number): void {
+    this.writers.setStyleProp(node, LEFT_PROP, `${x}px`);
+    this.writers.setStyleProp(node, TOP_PROP, `${y}px`);
   }
 
   /** Replay the CSS rise on a same-tick EVICTED (still-attached) node. A same-tick detach +

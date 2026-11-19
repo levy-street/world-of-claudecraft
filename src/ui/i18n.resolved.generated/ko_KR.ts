@@ -1157,6 +1157,34 @@ export const ko_KR: EnTranslations = {
       "absorbed": "흡수됨 ({amount})",
       "cheap": "비용 감소!"
     },
+    "fctColors": {
+      "title": "전투 문자 색상",
+      "open": "사용자 지정",
+      "back": "뒤로",
+      "resetAll": "모두 초기화",
+      "custom": "사용자 지정",
+      "default": "기본값",
+      "note": "숫자 종류마다 색상을 고르거나 기본값으로 두세요. 소환수, 지속 피해, 지속 치유 색상은 기본 표시에서만 적용됩니다. 클래식 전투 문자는 이 숫자들을 구분하지 않습니다.",
+      "slot": {
+        "white": "일반 공격 (근접, 자동 사격, 마법봉)",
+        "whiteCrit": "일반 공격 치명타",
+        "ability": "기술 피해",
+        "abilityCrit": "기술 치명타",
+        "dot": "지속 피해",
+        "dotCrit": "지속 피해 치명타",
+        "heal": "치유",
+        "healCrit": "치유 치명타",
+        "hot": "지속 치유",
+        "hotCrit": "지속 치유 치명타",
+        "pet": "소환수 공격",
+        "petCrit": "소환수 치명타",
+        "block": "방어된 공격",
+        "avoid": "빗나감, 회피, 막기",
+        "absorb": "흡수",
+        "taken": "받은 피해",
+        "takenCrit": "받은 치명타"
+      }
+    },
     "emotes": {
       "wave": "손인사",
       "laugh": "ㅋㅋ",

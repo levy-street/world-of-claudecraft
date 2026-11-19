@@ -21306,6 +21306,66 @@
     justify-self: end;
     grid-column: 2 / 4;
   }
+  /* Interface > Combat > Combat Text Colors (src/ui/options_fct_colors.ts). Each row:
+     label, a static sample of the real floater, the picker, then Custom / Default. */
+  .fct-colors-head {
+    grid-template-columns: 1fr auto auto;
+  }
+  .fct-colors-list {
+    display: grid;
+    gap: 2px;
+  }
+  .fct-color-row {
+    grid-template-columns: minmax(0, 1fr) 124px 44px auto auto;
+    gap: 8px;
+  }
+  .fct-color-row .set-color {
+    width: 44px;
+    height: 26px;
+    min-height: 26px;
+    grid-column: auto;
+  }
+  .fct-color-sample {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--color-card-inset);
+  }
+  /* The sample is a real .fct node, held still and in flow, at one size so every row
+     lines up (the ! and the glow still mark a crit). */
+  .set-rows .fct-color-row .fct-color-sample .fct.fct-vivid {
+    position: static;
+    translate: none;
+    animation: none;
+    opacity: 1;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .fct-color-choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+  }
+  /* Narrow (phone) options: the label takes its own line above the sample and controls. */
+  @media (max-width: 560px) {
+    .fct-color-row {
+      grid-template-columns: minmax(0, 1fr) 44px auto auto;
+    }
+    .fct-color-row .set-name {
+      grid-column: 1 / -1;
+    }
+  }
+  /* Touch: the picker and both choices keep a 40px target. */
+  body.mobile-touch .fct-color-row .set-color,
+  body.mobile-touch .fct-color-choice {
+    min-height: 40px;
+  }
   .perf-swatches {
     display: flex;
     flex-wrap: wrap;

@@ -812,6 +812,9 @@ const UI_PURE_CORES = [
   'src/ui/fct_core.ts',
   'src/ui/fct_emphasis_core.ts',
   'src/ui/fct_event.ts',
+  // Collision-aware lane + nudge placement for the vivid combat text: pure geometry over
+  // the live floaters the painter hands in, no clock, no DOM, no randomness.
+  'src/ui/fct_layout_core.ts',
   // Which authored contact beat a damage floater rides, and how long it waits. The
   // beat table is INJECTED by the painter (it lives in src/game, a layer a pure core
   // may not import), so this core imports nothing at all.
@@ -3198,6 +3201,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  // Interface > Combat > Combat Text Colors: the entry row and panel mint their own nodes.
+  'src/ui/options_fct_colors.ts',
   // Key Bindings > Keyboard Layout: mints its own nodes; the conversion lives in
   // the registered pure core src/ui/keyboard_layout_convert_core.ts.
   'src/ui/keybind_layout_convert_rows.ts',
@@ -3419,6 +3424,8 @@ const UI_DOM_MODULES = [
   // once in its constructor, the same DOM-owning shape as its sibling above.
   'src/ui/target_swing_timer_bars.ts',
   'src/ui/theme.ts',
+  // Combat Text Colors store: localStorage plus the :root variable / body class publish.
+  'src/ui/fct_colors.ts',
   // The engine indicators' touch drag: pointer events on the frame, a resize
   // listener, localStorage and the document's safe-area probe (the math is the
   // touch_frame_drag_core pure core).

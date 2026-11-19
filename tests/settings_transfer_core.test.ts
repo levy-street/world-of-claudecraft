@@ -343,6 +343,7 @@ describe('settings_transfer_core', () => {
     const EXPECTED_EXPORTABLE = new Set([
       'woc_settings',
       'woc_theme',
+      'woc_fct_colors',
       'woc_keybinds',
       'woc_gamepad',
       'woc_gamepad_xhb',

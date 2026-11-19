@@ -10,7 +10,144 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { type FctSpawnShape, fctSpawnShape } from '../src/ui/fct_event';
+import { AUTO_SHOT_LABEL, WAND_SHOT_LABEL } from '../src/sim/combat/auto_attack';
+import {
+  FCT_TICK_SLOTS,
+  FCT_WHITE_HIT_LABELS,
+  FctPeriodicTicks,
+  type FctSpawnShape,
+  fctIsAbilityHit,
+  fctSpawnShape,
+} from '../src/ui/fct_event';
+
+describe('fctIsAbilityHit: ranged auto-attacks are white hits', () => {
+  it('pins the white-hit labels to the labels the sim stamps on Auto Shot and wand bolts', () => {
+    expect([...FCT_WHITE_HIT_LABELS].sort()).toEqual([AUTO_SHOT_LABEL, WAND_SHOT_LABEL].sort());
+  });
+
+  it('treats Auto Shot, wand bolts and unlabelled melee swings as white hits', () => {
+    expect(fctIsAbilityHit(AUTO_SHOT_LABEL)).toBe(false);
+    expect(fctIsAbilityHit(WAND_SHOT_LABEL)).toBe(false);
+    expect(fctIsAbilityHit(undefined)).toBe(false);
+    expect(fctIsAbilityHit(null)).toBe(false);
+    expect(fctIsAbilityHit('')).toBe(false);
+  });
+
+  it('keeps every other label an ability hit', () => {
+    expect(fctIsAbilityHit('Fevered Draw')).toBe(true);
+    expect(fctIsAbilityHit('Long Draw')).toBe(true);
+  });
+
+  it('floats an Auto Shot as damage-done-auto through the landed-hit arm', () => {
+    const shape = fctSpawnShape({
+      type: 'damage',
+      damageKind: 'hit',
+      ability: fctIsAbilityHit(AUTO_SHOT_LABEL),
+      crit: false,
+      isPlayerSource: true,
+      isPlayerTarget: false,
+    });
+    expect(shape?.kind).toBe('damage-done-auto');
+  });
+
+  it('hud.ts feeds the label through fctIsAbilityHit, not a bare truthiness check', () => {
+    const hud = readFileSync('src/ui/hud.ts', 'utf8');
+    expect(hud).toContain('ability: fctIsAbilityHit(ev.ability),');
+    expect(hud).not.toContain('ability: !!ev.ability,');
+  });
+});
+
+describe('fctSpawnShape: heal-over-time ticks', () => {
+  it('flags a HoT tick periodic and keeps the heal kind', () => {
+    expect(
+      fctSpawnShape({ type: 'heal', crit: false, isPlayerTarget: true, periodic: true }),
+    ).toEqual({ kind: 'heal', isSelf: true, crit: false, periodic: true });
+  });
+
+  it('leaves a direct heal and a heal crit without the periodic key', () => {
+    expect(fctSpawnShape({ type: 'heal', crit: false, isPlayerTarget: false })).toEqual({
+      kind: 'heal',
+      isSelf: false,
+      crit: false,
+    });
+    expect(
+      fctSpawnShape({ type: 'heal', crit: true, isPlayerTarget: false, periodic: false }),
+    ).toEqual({
+      kind: 'heal',
+      isSelf: false,
+      crit: true,
+    });
+  });
+
+  it('hud.ts passes the heal2 hot flag through as periodic', () => {
+    expect(readFileSync('src/ui/hud.ts', 'utf8')).toContain('periodic: ev.hot === true,');
+  });
+});
+
+describe('fctSpawnShape: damage-over-time ticks', () => {
+  const tick = (over: Record<string, unknown> = {}) =>
+    fctSpawnShape({
+      type: 'damage',
+      damageKind: 'hit',
+      ability: true,
+      crit: false,
+      isPlayerSource: true,
+      isPlayerTarget: false,
+      periodic: true,
+      ...over,
+    } as Parameters<typeof fctSpawnShape>[0]);
+
+  it('flags a landed tick you deal, and one you take', () => {
+    expect(tick()).toEqual<FctSpawnShape>({
+      kind: 'damage-done-ability',
+      isSelf: false,
+      crit: false,
+      periodic: true,
+    });
+    expect(
+      tick({ isPlayerSource: false, isPlayerTarget: true, crit: true }),
+    ).toEqual<FctSpawnShape>({ kind: 'damage-taken', isSelf: true, crit: true, periodic: true });
+  });
+
+  it('never flags an avoided tick or a direct hit', () => {
+    expect(tick({ damageKind: 'resist' })).not.toHaveProperty('periodic');
+    expect(tick({ periodic: false })).not.toHaveProperty('periodic');
+    expect(tick({ periodic: undefined })).not.toHaveProperty('periodic');
+  });
+});
+
+describe('FctPeriodicTicks: pairs a DoT tick effect with its damage number', () => {
+  it('marks the next hit between the same source and target in the same drain, once', () => {
+    const ticks = new FctPeriodicTicks();
+    ticks.note({ sourceId: 1, targetId: 2 }, 10);
+    expect(ticks.take({ sourceId: 1, targetId: 3 }, 10)).toBe(false);
+    expect(ticks.take({ sourceId: 1, targetId: 2 }, 10)).toBe(true);
+    expect(ticks.take({ sourceId: 1, targetId: 2 }, 10)).toBe(false);
+  });
+
+  it('pairs two DoTs on one target one for one', () => {
+    const ticks = new FctPeriodicTicks();
+    ticks.note({ sourceId: 1, targetId: 2 }, 10);
+    ticks.note({ sourceId: 1, targetId: 2 }, 10);
+    expect(ticks.take({ sourceId: 1, targetId: 2 }, 10)).toBe(true);
+    expect(ticks.take({ sourceId: 1, targetId: 2 }, 10)).toBe(true);
+    expect(ticks.take({ sourceId: 1, targetId: 2 }, 10)).toBe(false);
+  });
+
+  it('forgets an unpaired tick when the next drain starts', () => {
+    const ticks = new FctPeriodicTicks();
+    ticks.note({ sourceId: 1, targetId: 2 }, 10);
+    expect(ticks.take({ sourceId: 1, targetId: 2 }, 20)).toBe(false);
+  });
+
+  it('stays bounded: a tick past the slots is not marked, never stored', () => {
+    const ticks = new FctPeriodicTicks(2);
+    for (let i = 0; i < 3; i++) ticks.note({ sourceId: i, targetId: 9 }, 10);
+    expect(ticks.take({ sourceId: 2, targetId: 9 }, 10)).toBe(false);
+    expect(ticks.take({ sourceId: 0, targetId: 9 }, 10)).toBe(true);
+    expect(FCT_TICK_SLOTS).toBeGreaterThan(0);
+  });
+});
 
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
@@ -108,7 +245,7 @@ describe('fctSpawnShape: landed hit (damage-done vs damage-taken vs none)', () =
     ).toBeNull();
   });
 
-  it('an owned guardian hit floats as player damage', () => {
+  it('an owned guardian hit floats as player damage, flagged as a pet hit', () => {
     expect(
       fctSpawnShape({
         type: 'damage',
@@ -123,7 +260,22 @@ describe('fctSpawnShape: landed hit (damage-done vs damage-taken vs none)', () =
       kind: 'damage-done-ability',
       isSelf: false,
       crit: false,
+      pet: true,
     });
+  });
+
+  it("the player's own hit carries no pet flag", () => {
+    const shape = fctSpawnShape({
+      type: 'damage',
+      damageKind: 'hit',
+      ability: false,
+      crit: true,
+      isPlayerSource: true,
+      isPlayerOwnedSource: false,
+      isPlayerTarget: false,
+    });
+    expect(shape).toEqual<FctSpawnShape>({ kind: 'damage-done-auto', isSelf: false, crit: true });
+    expect(shape !== null && 'pet' in shape).toBe(false);
   });
 });
 

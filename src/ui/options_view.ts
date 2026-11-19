@@ -1191,8 +1191,9 @@ export function buildInterfaceControls(
       boolToggle(s, 'showFriendlyTrack', 'hudChrome.options.showFriendlyTrack'),
       boolToggle(s, 'showShieldTrack', 'hudChrome.options.showShieldTrack'),
       slider(s, 'fctScale', 'hud.options.fctScale'),
-      // Opt back into the shipped white / gold combat text (the vivid school-coloured
-      // look is the default); directly under the size slider for the same numbers.
+      // Opt back into the shipped white / gold combat text that rises straight up (the
+      // vivid look, with its lanes, pet / DoT / avoidance styling and crit pop, is the
+      // default); directly under the size slider for the same numbers.
       boolToggle(s, 'classicCombatText', 'hudChrome.options.classicCombatText'),
       // The secondary/third bar toggles deliberately have NO menu rows: the
       // plus/minus buttons on the primary action bar are the one control for

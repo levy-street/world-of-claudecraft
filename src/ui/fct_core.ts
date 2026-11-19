@@ -144,6 +144,16 @@ export interface FctEvent {
    * own running average. describeFct ignores it.
    */
   readonly amount?: number;
+  /**
+   * The player's pet or guardian dealt this hit (FctSpawnShape.pet). describeFct ignores
+   * it; the painter reads it for the vivid pet look and the far-lane preference.
+   */
+  readonly pet?: boolean;
+  /**
+   * A damage-over-time tick (FctSpawnShape.periodic). describeFct ignores it; the painter
+   * reads it for the vivid tick look.
+   */
+  readonly periodic?: boolean;
 }
 
 /** Output: the resolved, world-space-plus-screen-offset spawn descriptor the painter draws. */
