@@ -1,5 +1,5 @@
 // The pure outgoing-FCT emphasis model (src/ui/fct_emphasis_core.ts): the big-hit flag
-// against the player's own running average, and the alternating fan-out side.
+// against the player's own running average. (Lane choice lives in fct_layout_core.)
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -7,7 +7,6 @@ import {
   FCT_BIG_HIT_RATIO,
   FCT_BIG_HIT_WARMUP,
   FctHitScale,
-  fctDriftLane,
 } from '../src/ui/fct_emphasis_core';
 
 function warmed(amount: number): FctHitScale {
@@ -56,20 +55,5 @@ describe('FctHitScale: big hits are measured against your own running average', 
     scale.reset();
     expect(scale.average()).toBe(0);
     expect(scale.observe(1000)).toBe(false);
-  });
-});
-
-describe('fctDriftLane: a burst fans out, and consecutive numbers never share a lane', () => {
-  it('deals near-left, near-right, far-left, far-right, then round again', () => {
-    expect([0, 1, 2, 3, 4, 5].map(fctDriftLane)).toEqual(['l', 'r', 'll', 'rr', 'l', 'r']);
-  });
-
-  it('alternates sides on every consecutive pair', () => {
-    const side = (o: number) => fctDriftLane(o)[0];
-    for (let o = 0; o < 16; o++) expect(side(o)).not.toBe(side(o + 1));
-  });
-
-  it('stays in range for a negative ordinal (never undefined)', () => {
-    expect(fctDriftLane(-1)).toBe('rr');
   });
 });

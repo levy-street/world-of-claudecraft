@@ -1,7 +1,7 @@
 // Pure emphasis model for OUTGOING floating combat text: which of the player's hits read
-// as a BIG hit, and which side a number fans out to. Host-agnostic and DETERMINISTIC (NO
-// Math.random, NO clock, NO DOM; registered in UI_PURE_CORES), so a Node test drives it
-// directly and the FCT painter stays a thin consumer.
+// as a BIG hit (where a number rises lives in fct_layout_core.ts). Host-agnostic and
+// DETERMINISTIC (NO Math.random, NO clock, NO DOM; registered in UI_PURE_CORES), so a Node
+// test drives it directly and the FCT painter stays a thin consumer.
 //
 // Why a running average and not a fixed number: a hit is only "big" relative to what the
 // player usually deals. A fixed threshold would flag every level-60 hit and no level-10
@@ -61,22 +61,5 @@ export class FctHitScale {
   }
 }
 
-/**
- * The lane an outgoing number fans out along: near-left, near-right, far-left, far-right.
- * The centre column is deliberately left free for crits, which pop in place as the
- * headline number (hud.css), and for the straight rise of incoming damage over the player.
- */
-export type FctDriftLane = 'l' | 'r' | 'll' | 'rr';
-
-const FCT_DRIFT_LANES: readonly FctDriftLane[] = ['l', 'r', 'll', 'rr'];
-
-/**
- * Deal outgoing numbers into lanes by spawn ordinal: left, right, far left, far right,
- * then round again. A burst of hits (a flurry, an AoE, a DoT ticking under a nuke) spreads
- * into a fan instead of stacking into one column, and because the pattern alternates
- * sides, two consecutive numbers never share a lane, which a random pick does often.
- */
-export function fctDriftLane(ordinal: number): FctDriftLane {
-  const n = FCT_DRIFT_LANES.length;
-  return FCT_DRIFT_LANES[((ordinal % n) + n) % n];
-}
+// The fan-out lane a number rises in is no longer dealt here by a fixed rotation: the
+// collision-aware placement in fct_layout_core.ts picks it against what is on screen.

@@ -441,6 +441,8 @@ function maybeProcSuddenDeath(
 }
 
 export const AUTO_SHOT_LABEL = 'Auto Shot';
+/** The damage label on a wand bolt. Like Auto Shot, the HUD floats it as a white hit. */
+export const WAND_SHOT_LABEL = 'Wand';
 
 export function rangedSwing(
   ctx: SimContext,
@@ -449,7 +451,7 @@ export function rangedSwing(
   ranged: { min: number; max: number; speed: number; wand?: boolean; school?: string },
 ): void {
   const school = ranged.wand ? (ranged.school ?? 'arcane') : 'physical';
-  const label = ranged.wand ? 'Wand' : AUTO_SHOT_LABEL;
+  const label = ranged.wand ? WAND_SHOT_LABEL : AUTO_SHOT_LABEL;
   ctx.emit({
     type: 'spellfx',
     sourceId: attacker.id,

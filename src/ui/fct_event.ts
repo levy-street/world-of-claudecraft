@@ -40,6 +40,12 @@ export type FctSpawnSource =
        * damage simply never got the same guard.
        */
       readonly fullyAbsorbed?: boolean;
+      /**
+       * The hit is a damage-over-time TICK (FctPeriodicTicks pairs it with the aura's
+       * `spellfx` tick event), not a direct hit. A landed tick carries the periodic
+       * flag, which only the vivid look reads.
+       */
+      readonly periodic?: boolean;
     }
   | {
       /**
@@ -54,7 +60,13 @@ export type FctSpawnSource =
       readonly isPlayerSource: boolean;
       readonly isPlayerTarget: boolean;
     }
-  | { readonly type: 'heal'; readonly crit: boolean; readonly isPlayerTarget: boolean }
+  | {
+      readonly type: 'heal';
+      readonly crit: boolean;
+      readonly isPlayerTarget: boolean;
+      /** A heal-over-time tick (the heal2 event's `hot` flag), floated like a DoT tick. */
+      readonly periodic?: boolean;
+    }
   | { readonly type: 'xp' }
   | { readonly type: 'rested-xp' }
   | { readonly type: 'honor' }
@@ -77,6 +89,99 @@ export interface FctSpawnShape {
   readonly delaySec?: number;
   /** The raw amount of an outgoing hit (for the big-hit emphasis); outgoing hits only. */
   readonly amount?: number;
+  /**
+   * A pet or temporary guardian the player owns dealt this, not the player. The vivid
+   * look sets these numbers apart (smaller, a dimmer tint, the far lanes first) so a
+   * pet's swings never read as the player's own hits. Absent on everything else.
+   */
+  readonly pet?: boolean;
+  /**
+   * A damage-over-time tick, not a direct hit (outgoing or incoming). The vivid look sets
+   * ticks in a smaller italic so a DoT never reads as a fresh hit, and a ticking crit
+   * apart from a direct crit. Absent on everything else.
+   */
+  readonly periodic?: boolean;
+}
+
+/**
+ * The damage-event `ability` labels the sim stamps on a plain ranged auto-attack: the
+ * hunter's Auto Shot and the wand bolt (combat/auto_attack.ts AUTO_SHOT_LABEL and
+ * WAND_SHOT_LABEL; tests/fct_event.test.ts pins the two against the sim). Both are white
+ * hits exactly like a melee swing, which carries no label at all, so they float in the
+ * auto-attack colour instead of reading as an ability.
+ */
+export const FCT_WHITE_HIT_LABELS: ReadonlySet<string> = new Set(['Auto Shot', 'Wand']);
+
+/** Whether a damage event's `ability` label marks a real ability (not a white hit). */
+export function fctIsAbilityHit(label: string | null | undefined): boolean {
+  return !!label && !FCT_WHITE_HIT_LABELS.has(label);
+}
+
+/** The two entity ids a damage-over-time tick is keyed by (structural: a spellfx or damage event). */
+export interface FctTickKey {
+  readonly sourceId: number;
+  readonly targetId: number;
+}
+
+/**
+ * How many DoT ticks one event drain can hold unpaired. A bound, not a budget: the arrays
+ * are preallocated and a tick past it is simply not marked (its number reads as a plain hit,
+ * the pre-existing look), never a growing map.
+ */
+export const FCT_TICK_SLOTS = 32;
+
+/**
+ * Pairs each damage-over-time tick with the damage it deals. The sim emits an entity-anchored
+ * `spellfx` with fx 'tick' immediately before every DoT tick's damage event (combat/auras.ts,
+ * affliction.ts and the other periodic paths), and the damage event itself carries no
+ * periodic flag (its shape is pinned by the parity recordings). So the HUD notes each tick
+ * as it drains and the next damage event between the same source and target in the SAME
+ * drain is that tick. ALLOCATION-FREE and CLOCK-FREE like FctBeatStager: fixed arrays, and
+ * the drain is identified by the `now` the caller already stamps its batch with.
+ */
+export class FctPeriodicTicks {
+  private readonly sources: number[] = [];
+  private readonly targets: number[] = [];
+  private used = 0;
+  private frame = Number.NaN;
+
+  constructor(private readonly slots: number = FCT_TICK_SLOTS) {
+    for (let i = 0; i < slots; i++) {
+      this.sources.push(0);
+      this.targets.push(0);
+    }
+  }
+
+  /** Record a DoT tick effect (a `spellfx` with fx 'tick') seen in the drain stamped `now`. */
+  note(tick: FctTickKey, now: number): void {
+    this.sync(now);
+    if (this.used >= this.slots) return;
+    this.sources[this.used] = tick.sourceId;
+    this.targets[this.used] = tick.targetId;
+    this.used++;
+  }
+
+  /**
+   * Whether this damage event is a noted tick, consuming the note when it is, so one tick
+   * effect marks exactly one damage number.
+   */
+  take(hit: FctTickKey, now: number): boolean {
+    this.sync(now);
+    for (let i = 0; i < this.used; i++) {
+      if (this.sources[i] !== hit.sourceId || this.targets[i] !== hit.targetId) continue;
+      this.used--;
+      this.sources[i] = this.sources[this.used];
+      this.targets[i] = this.targets[this.used];
+      return true;
+    }
+    return false;
+  }
+
+  private sync(now: number): void {
+    if (now === this.frame) return;
+    this.frame = now;
+    this.used = 0;
+  }
 }
 
 /**
@@ -122,6 +227,26 @@ export function withDamageFlavor(
  * case always floats. Pure: same input always yields the same shape.
  */
 export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
+  const shape = baseSpawnShape(src);
+  // A landed DoT tick (dealt or taken) and a HoT tick carry the periodic flag; nothing else
+  // does, so every other shape keeps its exact pre-existing form.
+  if (shape !== null && src.type === 'damage' && src.periodic && isLandedHitKind(shape.kind))
+    return { ...shape, periodic: true };
+  if (shape !== null && src.type === 'heal' && src.periodic) return { ...shape, periodic: true };
+  return shape;
+}
+
+function isLandedHitKind(kind: FctKind): boolean {
+  return (
+    kind === 'damage-done-ability' ||
+    kind === 'damage-done-auto' ||
+    kind === 'damage-done-block' ||
+    kind === 'damage-taken' ||
+    kind === 'damage-taken-block'
+  );
+}
+
+function baseSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
   switch (src.type) {
     case 'damage': {
       // A fully soaked hit floats no number on EITHER side: the absorb floater is
@@ -149,17 +274,19 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
       // (isPlayerTarget)` with no else). A shield block takes the SAME role split (it is
       // still a landed hit, just reduced by blockValue) but its own -block kind, so it
       // reads with its own colour/word instead of a plain hit's.
-      if ((src.isPlayerSource || src.isPlayerOwnedSource) && !src.isPlayerTarget)
-        return {
-          kind:
-            src.damageKind === 'block'
-              ? 'damage-done-block'
-              : src.ability
-                ? 'damage-done-ability'
-                : 'damage-done-auto',
-          isSelf: false,
-          crit: src.crit,
-        };
+      if ((src.isPlayerSource || src.isPlayerOwnedSource) && !src.isPlayerTarget) {
+        const kind =
+          src.damageKind === 'block'
+            ? 'damage-done-block'
+            : src.ability
+              ? 'damage-done-ability'
+              : 'damage-done-auto';
+        // A pet's or guardian's hit keeps the player's kind (so Classic Combat Text is
+        // unchanged) and adds the pet flag, which only the vivid look reads.
+        return src.isPlayerSource
+          ? { kind, isSelf: false, crit: src.crit }
+          : { kind, isSelf: false, crit: src.crit, pet: true };
+      }
       if (src.isPlayerTarget)
         return {
           kind: src.damageKind === 'block' ? 'damage-taken-block' : 'damage-taken',

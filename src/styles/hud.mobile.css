@@ -9991,25 +9991,43 @@
   :root[data-fx-level="low"] body.mobile-touch .fct.crit {
     animation-name: fct-rise-mobile;
   }
-  /* Vivid combat text on touch: this layer outranks hud.css, so the vivid lane and
-     big-hit sizes are restated at the compact mobile scale (colours, keyline and crit
-     flare inherit untouched). An outgoing non-crit number fans out along a shorter arc
-     in its lane; a crit keeps the mobile crit pop above; a big hit sits between the two
-     sizes. */
-  @keyframes fct-out-l-mobile {
+  /* Vivid combat text on touch: this layer outranks hud.css whatever the specificity, so
+     every vivid lane, size and crit rule is restated here at the compact mobile scale
+     (colours, italics, keyline and glows inherit untouched). The lane keyframes below are
+     mirrored 1:1 by FCT_LAYOUT_MOBILE in src/ui/fct_layout_core.ts, which places each
+     number clear of the others; like desktop, all five share one vertical profile
+     (-20px by 30%, -64px at the end) and run linear (the timing comes from hud.css). Size
+     says crit and only crit: the big-hit flag is an underglow, never a bigger number. */
+  @keyframes fct-out-c-mobile {
     0% {
       opacity: 1;
       translate: -50% -50%;
     }
     30% {
-      translate: calc(-50% - 20px) calc(-50% - 16px);
+      translate: -50% calc(-50% - 20px);
     }
     60% {
       opacity: 1;
     }
     100% {
       opacity: 0;
-      translate: calc(-50% - 30px) calc(-50% - 58px);
+      translate: -50% calc(-50% - 64px);
+    }
+  }
+  @keyframes fct-out-l-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 8px) calc(-50% - 20px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 14px) calc(-50% - 64px);
     }
   }
   @keyframes fct-out-r-mobile {
@@ -10018,14 +10036,14 @@
       translate: -50% -50%;
     }
     30% {
-      translate: calc(-50% + 20px) calc(-50% - 16px);
+      translate: calc(-50% + 8px) calc(-50% - 20px);
     }
     60% {
       opacity: 1;
     }
     100% {
       opacity: 0;
-      translate: calc(-50% + 30px) calc(-50% - 58px);
+      translate: calc(-50% + 14px) calc(-50% - 64px);
     }
   }
   @keyframes fct-out-ll-mobile {
@@ -10034,14 +10052,14 @@
       translate: -50% -50%;
     }
     30% {
-      translate: calc(-50% - 40px) calc(-50% - 12px);
+      translate: calc(-50% - 12px) calc(-50% - 20px);
     }
     60% {
       opacity: 1;
     }
     100% {
       opacity: 0;
-      translate: calc(-50% - 56px) calc(-50% - 48px);
+      translate: calc(-50% - 20px) calc(-50% - 64px);
     }
   }
   @keyframes fct-out-rr-mobile {
@@ -10050,49 +10068,18 @@
       translate: -50% -50%;
     }
     30% {
-      translate: calc(-50% + 40px) calc(-50% - 12px);
+      translate: calc(-50% + 12px) calc(-50% - 20px);
     }
     60% {
       opacity: 1;
     }
     100% {
       opacity: 0;
-      translate: calc(-50% + 56px) calc(-50% - 48px);
+      translate: calc(-50% + 20px) calc(-50% - 64px);
     }
   }
-  body.mobile-touch .fct.fct-out-l:not(.crit) {
-    font-size: calc(15px * var(--fct-scale, 1));
-    animation-name: fct-out-l-mobile;
-  }
-  body.mobile-touch .fct.fct-out-r:not(.crit) {
-    font-size: calc(15px * var(--fct-scale, 1));
-    animation-name: fct-out-r-mobile;
-  }
-  body.mobile-touch .fct.fct-out-ll:not(.crit) {
-    font-size: calc(15px * var(--fct-scale, 1));
-    animation-name: fct-out-ll-mobile;
-  }
-  body.mobile-touch .fct.fct-out-rr:not(.crit) {
-    font-size: calc(15px * var(--fct-scale, 1));
-    animation-name: fct-out-rr-mobile;
-  }
-  @keyframes fct-vivid-rise-mobile {
+  @keyframes fct-vivid-pop-mobile {
     0% {
-      opacity: 1;
-      translate: -50% -50%;
-    }
-    60% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      translate: -50% calc(-50% - 58px);
-    }
-  }
-  @keyframes fct-vivid-crit-mobile {
-    0% {
-      opacity: 1;
-      translate: -50% -50%;
       scale: 0.7;
     }
     14% {
@@ -10101,30 +10088,77 @@
     28% {
       scale: 1;
     }
-    65% {
-      opacity: 1;
-    }
     100% {
-      opacity: 0;
-      translate: -50% calc(-50% - 62px);
       scale: 1;
     }
   }
-  body.mobile-touch .fct.fct-vivid.fct-damage-taken:not(.crit),
-  body.mobile-touch .fct.fct-vivid.fct-damage-taken-block:not(.crit) {
-    animation-name: fct-vivid-rise-mobile;
+  body.mobile-touch .fct.fct-out-c {
+    animation-name: fct-out-c-mobile;
+  }
+  body.mobile-touch .fct.fct-out-l {
+    animation-name: fct-out-l-mobile;
+  }
+  body.mobile-touch .fct.fct-out-r {
+    animation-name: fct-out-r-mobile;
+  }
+  body.mobile-touch .fct.fct-out-ll {
+    animation-name: fct-out-ll-mobile;
+  }
+  body.mobile-touch .fct.fct-out-rr {
+    animation-name: fct-out-rr-mobile;
+  }
+  body.mobile-touch
+    .fct.fct-vivid:is(.fct-damage-done-ability, .fct-damage-done-auto, .fct-damage-done-block) {
+    font-size: calc(15px * var(--fct-scale, 1));
+  }
+  body.mobile-touch
+    .fct.fct-vivid:is(.fct-miss-self, .fct-miss-other, .fct-dodge-self, .fct-dodge-other) {
+    font-size: calc(12px * var(--fct-scale, 1));
   }
   body.mobile-touch .fct.fct-vivid.crit {
-    animation-name: fct-vivid-crit-mobile;
+    font-size: calc(20px * var(--fct-scale, 1));
   }
-  :root[data-fx-level="low"] body.mobile-touch .fct.fct-vivid.crit {
-    animation-name: fct-vivid-rise-mobile;
+  body.mobile-touch .fct.fct-vivid.fct-pet {
+    font-size: calc(12px * var(--fct-scale, 1));
   }
-  body.mobile-touch .fct.fct-big:not(.crit) {
-    font-size: calc(18px * var(--fct-scale, 1));
+  body.mobile-touch .fct.fct-vivid.fct-pet.crit {
+    font-size: calc(15px * var(--fct-scale, 1));
   }
-  body.mobile-touch .fct.fct-big.crit {
-    font-size: calc(23px * var(--fct-scale, 1));
+  body.mobile-touch .fct.fct-vivid.fct-dot {
+    font-size: calc(12px * var(--fct-scale, 1));
+  }
+  body.mobile-touch .fct.fct-vivid.fct-dot.crit {
+    font-size: calc(15px * var(--fct-scale, 1));
+  }
+  body.mobile-touch .fct.fct-vivid.crit.fct-out-c {
+    animation-name: fct-out-c-mobile, fct-vivid-pop-mobile;
+  }
+  body.mobile-touch .fct.fct-vivid.crit.fct-out-l {
+    animation-name: fct-out-l-mobile, fct-vivid-pop-mobile;
+  }
+  body.mobile-touch .fct.fct-vivid.crit.fct-out-r {
+    animation-name: fct-out-r-mobile, fct-vivid-pop-mobile;
+  }
+  body.mobile-touch .fct.fct-vivid.crit.fct-out-ll {
+    animation-name: fct-out-ll-mobile, fct-vivid-pop-mobile;
+  }
+  body.mobile-touch .fct.fct-vivid.crit.fct-out-rr {
+    animation-name: fct-out-rr-mobile, fct-vivid-pop-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct.fct-vivid.crit.fct-out-c {
+    animation-name: fct-out-c-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct.fct-vivid.crit.fct-out-l {
+    animation-name: fct-out-l-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct.fct-vivid.crit.fct-out-r {
+    animation-name: fct-out-r-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct.fct-vivid.crit.fct-out-ll {
+    animation-name: fct-out-ll-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct.fct-vivid.crit.fct-out-rr {
+    animation-name: fct-out-rr-mobile;
   }
   @keyframes fct-xp-pop-mobile {
     0% {

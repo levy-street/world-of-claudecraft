@@ -56,6 +56,7 @@ const SETTINGS_KEY_PREFIXES = ['woc_target_auras_', 'woc_chat_'] as const;
 const SETTINGS_KEYS = [
   'woc_settings',
   'woc_theme',
+  'woc_fct_colors',
   'woc_keybinds',
   'woc_mobile_chat_bottom',
 ] as const;

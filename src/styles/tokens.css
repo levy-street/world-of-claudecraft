@@ -1328,6 +1328,15 @@
     --color-fct-vivid-ability: #ffc933;
     /* The hot underglow of a hit well above your usual (the big-hit flag). */
     --color-fct-big-flare: #ff7a1a;
+    /* A pet's or guardian's white hit: a dimmer silver, so it never reads as your own. */
+    --color-fct-vivid-pet-auto: #b8b8b8;
+    /* A pet's or guardian's ability hit: a muted khaki, well clear of your saturated gold
+       (and of your own DoT ticks, which keep that gold in italics). */
+    --color-fct-vivid-pet-ability: #c9b37e;
+    /* Miss, Dodge, Parry, Resist and Evade: a cool grey that cannot pass for a white hit. */
+    --color-fct-vivid-avoid: #a3b0c2;
+    /* A blocked hit you landed: steel blue, apart from the near-white of a plain hit. */
+    --color-fct-vivid-block: #86a6ff;
     /* A solid two-pixel keyline plus a soft drop, so a number holds its colour over
        bright snow, grey stone and dark dungeon floor alike (the thin shared outline
        lets it wash out against a mid-grey scene). */

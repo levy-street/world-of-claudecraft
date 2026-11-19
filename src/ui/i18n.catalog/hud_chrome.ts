@@ -576,6 +576,36 @@ export const hudChromeStrings = {
     absorbed: 'Absorbed ({amount})',
     cheap: 'Cheap!',
   },
+  // Interface > Combat > Combat Text Colors (src/ui/options_fct_colors.ts): the entry row,
+  // its button, and the panel's controls. One label per colour slot, in panel order.
+  fctColors: {
+    title: 'Combat Text Colors',
+    open: 'Customize',
+    back: 'Back',
+    resetAll: 'Reset All',
+    custom: 'Custom',
+    default: 'Default',
+    note: 'Pick a color for each kind of number, or leave it on Default. Pet, damage over time and heal over time colors apply to the default look only: Classic Combat Text does not mark those numbers.',
+    slot: {
+      white: 'White Hit (Melee, Auto Shot, Wand)',
+      whiteCrit: 'White Hit Crit',
+      ability: 'Ability Hit',
+      abilityCrit: 'Ability Crit',
+      dot: 'Damage over Time',
+      dotCrit: 'Damage over Time Crit',
+      heal: 'Heal',
+      healCrit: 'Heal Crit',
+      hot: 'Heal over Time',
+      hotCrit: 'Heal over Time Crit',
+      pet: 'Pet Hit',
+      petCrit: 'Pet Crit',
+      block: 'Blocked Hit',
+      avoid: 'Miss, Dodge, Parry',
+      absorb: 'Absorbed',
+      taken: 'Damage Taken',
+      takenCrit: 'Damage Taken Crit',
+    },
+  },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
   // bubble text). Source ids/order mirror OVERHEAD_EMOTES in world_api.ts.
   emotes: {

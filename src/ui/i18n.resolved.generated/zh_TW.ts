@@ -1157,6 +1157,34 @@ export const zh_TW: EnTranslations = {
       "absorbed": "已吸收（{amount}）",
       "cheap": "費用降低!"
     },
+    "fctColors": {
+      "title": "戰鬥文字顏色",
+      "open": "自訂",
+      "back": "返回",
+      "resetAll": "全部重設",
+      "custom": "自訂",
+      "default": "預設",
+      "note": "為每種數字選擇顏色，或保持預設。寵物、持續傷害和持續治療的顏色只在預設樣式中生效：經典戰鬥文字不會區分這些數字。",
+      "slot": {
+        "white": "普通攻擊（近戰、自動射擊、魔杖）",
+        "whiteCrit": "普通攻擊致命一擊",
+        "ability": "技能傷害",
+        "abilityCrit": "技能致命一擊",
+        "dot": "持續傷害",
+        "dotCrit": "持續傷害致命一擊",
+        "heal": "治療",
+        "healCrit": "治療致命一擊",
+        "hot": "持續治療",
+        "hotCrit": "持續治療致命一擊",
+        "pet": "寵物傷害",
+        "petCrit": "寵物致命一擊",
+        "block": "被格擋的攻擊",
+        "avoid": "未命中、閃躲、招架",
+        "absorb": "吸收",
+        "taken": "受到的傷害",
+        "takenCrit": "受到的致命一擊"
+      }
+    },
     "emotes": {
       "wave": "揮手",
       "laugh": "大笑",

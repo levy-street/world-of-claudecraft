@@ -528,6 +528,7 @@ import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { esc } from './ui/esc';
 import { showFatalOverlay } from './ui/fatal_overlay_controller';
+import { createFctColorHooks } from './ui/fct_colors';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { syncBuildInfo, syncFooterLegalLinks } from './ui/footer_shell';
 import {
@@ -1410,6 +1411,7 @@ async function startGame(
     mapMarkerPaletteLifecycle?.notify();
   }
   applyTheme();
+  const fctColorHooks = createFctColorHooks(document); // Interface > Combat Text Colors
   // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
   // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
   // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
@@ -2916,6 +2918,7 @@ async function startGame(
         applyTheme();
       },
     },
+    fctColors: fctColorHooks,
     changeLanguage: (lang, onStatus) => changeLanguage(lang, onStatus),
     refreshWocBalance: (force) => refreshWocBalanceOnDemand(force),
     // Account toggles (deed-broadcast opt-out, queue-pop Discord DM opt-in):

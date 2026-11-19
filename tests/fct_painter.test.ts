@@ -20,6 +20,12 @@ import {
   type FctKind,
 } from '../src/ui/fct_core';
 import type { FctSpawnSource } from '../src/ui/fct_event';
+import {
+  FCT_LANE_EARLY_F,
+  FCT_LAYOUT_DESKTOP,
+  FCT_LAYOUT_MOBILE,
+  type FctLayoutProfile,
+} from '../src/ui/fct_layout_core';
 import { FCT_POOL_CAP, FctPainter, type FctProject } from '../src/ui/fct_painter';
 import { classicCombatTextOn } from '../src/ui/fct_style_mode';
 import type { PainterHostWriters } from '../src/ui/painter_host';
@@ -691,6 +697,7 @@ describe('FctPainter.stagedShape: the damage spawn seam', () => {
       kind: 'damage-done-auto',
       isSelf: false,
       crit: false,
+      pet: true,
     });
   });
 
@@ -1109,7 +1116,12 @@ describe('FctPainter: vivid look and the Classic Combat Text opt-out', () => {
         .filter(([, v]) => v)
         .map(([k]) => k)
         .sort();
-    return { painter, mount, on };
+    // The last value written to a style property of a node (its spawn position).
+    const styleOf = (node: unknown, prop: string) =>
+      facet.calls
+        .filter((c) => c.m === 'setStyleProp' && c.el === node && c.args[0] === prop)
+        .at(-1)?.args[1];
+    return { painter, mount, on, styleOf };
   }
 
   const out = (over: Partial<FctEvent> = {}): FctEvent => ({
@@ -1118,24 +1130,106 @@ describe('FctPainter: vivid look and the Classic Combat Text opt-out', () => {
     ...over,
   });
 
-  it('deals consecutive outgoing hits into the four lanes, exactly one lane each', () => {
-    const { painter, mount, on } = vividPainter();
-    for (let i = 0; i < 5; i++) painter.spawn(out(), 0);
+  it('spreads a same-instant burst over every free lane, then stacks below, never on top', () => {
+    const { painter, mount, on, styleOf } = vividPainter();
+    for (let i = 0; i < 6; i++) painter.spawn(out(), 0);
     const lanes = mount.childNodes.map((n) => on(n).filter((c) => c.startsWith('fct-out-')));
+    // The four side lanes alternate sides, the free centre takes the fifth, and the sixth
+    // only then stacks: in its turn's lane (near-right), one nudge below the second number.
     expect(lanes).toEqual([
       ['fct-out-l'],
       ['fct-out-r'],
       ['fct-out-ll'],
       ['fct-out-rr'],
-      ['fct-out-l'],
+      ['fct-out-c'],
+      ['fct-out-r'],
     ]);
     expect(on(mount.childNodes[0])).toEqual(['fct-damage-done-ability', 'fct-out-l', 'fct-vivid']);
+    const { start } = FCT_LAYOUT_DESKTOP;
+    expect(styleOf(mount.childNodes[0], 'left')).toBe(`${start.l.x}px`);
+    expect(styleOf(mount.childNodes[0], 'top')).toBe(`${start.l.y}px`);
+    expect(styleOf(mount.childNodes[5], 'left')).toBe(`${start.r.x}px`);
+    expect(styleOf(mount.childNodes[5], 'top')).toBe(`${start.r.y + FCT_LAYOUT_DESKTOP.nudgePx}px`);
+    // No two of the six start on the same spot.
+    const spots = mount.childNodes.map((n) => `${styleOf(n, 'left')},${styleOf(n, 'top')}`);
+    expect(new Set(spots).size).toBe(spots.length);
   });
 
-  it('keeps incoming damage in the straight rise (vivid outline, no fan-out lane)', () => {
+  it('puts incoming damage in the centre, a heal on the right and a word over you on the left', () => {
     const { painter, mount, on } = vividPainter();
     painter.spawn(evt({ kind: 'damage-taken', text: '-40', isSelf: true }), 0);
-    expect(on(mount.childNodes[0])).toEqual(['fct-damage-taken', 'fct-vivid']);
+    painter.spawn(evt({ kind: 'heal', text: '+25', isSelf: true }), 0);
+    painter.spawn(evt({ kind: 'dodge', text: 'Dodge', isSelf: true }), 0);
+    expect(on(mount.childNodes[0])).toEqual(['fct-damage-taken', 'fct-out-c', 'fct-vivid']);
+    expect(on(mount.childNodes[1])).toContain('fct-out-r');
+    // The wider word takes the left side: near-left if it fits, far-left if not.
+    const word = on(mount.childNodes[2]);
+    expect(word.includes('fct-out-l') || word.includes('fct-out-ll')).toBe(true);
+  });
+
+  it('gives a crit the centre, and a second crit at once a clear spot of its own', () => {
+    const { painter, mount, on, styleOf } = vividPainter();
+    painter.spawn(out({ crit: true, text: '400!' }), 0);
+    painter.spawn(out({ crit: true, text: '410!' }), 0);
+    expect(on(mount.childNodes[0])).toContain('fct-out-c');
+    expect(on(mount.childNodes[0])).toContain('crit');
+    const a = mount.childNodes.map((n) => `${styleOf(n, 'left')},${styleOf(n, 'top')}`);
+    expect(a[0]).not.toBe(a[1]);
+  });
+
+  it("marks a pet's hit (vivid only) and sends it to a far lane first", () => {
+    const { painter, mount, on } = vividPainter();
+    painter.spawn(out({ pet: true, amount: undefined }), 0);
+    expect(on(mount.childNodes[0])).toContain('fct-pet');
+    expect(on(mount.childNodes[0])).toContain('fct-out-ll');
+    const classic = vividPainter(true);
+    classic.painter.spawn(out({ pet: true, amount: undefined }), 0);
+    expect(classic.on(classic.mount.childNodes[0])).not.toContain('fct-pet');
+  });
+
+  it('marks a DoT tick (vivid only), a ticking crit too, and never a direct hit', () => {
+    const { painter, mount, on } = vividPainter();
+    painter.spawn(out({ periodic: true }), 0);
+    painter.spawn(out({ periodic: true, crit: true, text: '90!' }), 0);
+    painter.spawn(out(), 0);
+    expect(on(mount.childNodes[0])).toContain('fct-dot');
+    expect(on(mount.childNodes[1])).toEqual(expect.arrayContaining(['fct-dot', 'crit']));
+    expect(on(mount.childNodes[2])).not.toContain('fct-dot');
+    const classic = vividPainter(true);
+    classic.painter.spawn(out({ periodic: true }), 0);
+    expect(classic.on(classic.mount.childNodes[0])).not.toContain('fct-dot');
+  });
+
+  it('carries the tick flag through a held (beat-staged) floater', () => {
+    const { painter, mount, on } = vividPainter();
+    painter.spawn(out({ periodic: true, delaySec: 0.2 }), 0);
+    painter.step(200);
+    expect(on(mount.childNodes[0])).toContain('fct-dot');
+  });
+
+  it('places nothing over a floater that has faded out (a number past its life is no obstacle)', () => {
+    const { painter, mount, on } = vividPainter();
+    painter.spawn(out(), 0);
+    painter.step(FCT_TTL_MS);
+    painter.spawn(out(), FCT_TTL_MS);
+    // The first one is gone, so the second takes the first-choice lane of its ordinal.
+    expect(on(mount.childNodes[0])).toContain('fct-out-r');
+  });
+
+  it('places with the compact touch geometry when the touch layout is on', () => {
+    const facet = recordingFacet();
+    const mount = fakeEl('div');
+    const painter = new FctPainter(
+      facet.writers,
+      mount as unknown as HTMLElement,
+      () => ({ x: 0, y: 0, behind: false }),
+      () => 1,
+      { cap: 4, doc: fakeDoc, random: () => 0.5, isClassic: () => false, isMobile: () => true },
+    );
+    painter.spawn(out(), 0);
+    const left = facet.calls.filter((c) => c.m === 'setStyleProp' && c.args[0] === 'left').at(-1)
+      ?.args[1];
+    expect(left).toBe(`${FCT_LAYOUT_MOBILE.start.l.x}px`);
   });
 
   it('keeps a spell hit on the shipped ability token (no elemental colour), through the real stage', () => {
@@ -1215,7 +1309,7 @@ describe('FctPainter: vivid look and the Classic Combat Text opt-out', () => {
       facet.calls.filter((c) => c.m === 'toggleClass' && c.el === node && c.args[0] === cls).at(-1)
         ?.args[1];
     expect(last('fct-vivid')).toBe(false);
-    for (const lane of ['l', 'r', 'll', 'rr']) expect(last(`fct-out-${lane}`)).toBe(false);
+    for (const lane of ['c', 'l', 'r', 'll', 'rr']) expect(last(`fct-out-${lane}`)).toBe(false);
   });
 
   it('a beat-staged (held) outgoing hit keeps its amount through release', () => {
@@ -1283,9 +1377,9 @@ describe('vivid combat text CSS contract', () => {
     }
   });
 
-  const LANES = ['l', 'r', 'll', 'rr'];
+  const LANES = ['c', 'l', 'r', 'll', 'rr'] as const;
 
-  it('drives each fan-out lane from its own STATIC keyframes (no var() inside, compositor-safe)', () => {
+  it('drives each lane from its own STATIC keyframes (no var() inside, compositor-safe)', () => {
     for (const lane of LANES) {
       expect(keyframes(css, `fct-out-${lane}`)).not.toContain('var(');
       expect(keyframes(mobileCss, `fct-out-${lane}-mobile`)).not.toContain('var(');
@@ -1293,22 +1387,114 @@ describe('vivid combat text CSS contract', () => {
         new RegExp(`\\.fct\\.fct-out-${lane} \\{\\s*animation-name: fct-out-${lane};`),
       );
     }
-    expect(keyframes(css, 'fct-vivid-crit')).not.toContain('var(');
+    expect(keyframes(css, 'fct-vivid-pop')).not.toContain('var(');
+    expect(keyframes(mobileCss, 'fct-vivid-pop-mobile')).not.toContain('var(');
+  });
+
+  it('runs every lane linear, so the layout core models its travel exactly', () => {
+    const at = css.indexOf('.fct.fct-out-c,\n  .fct.fct-out-l,');
+    expect(at).toBeGreaterThan(0);
+    expect(css.slice(at, css.indexOf('}', at))).toContain('animation-timing-function: linear;');
+    // A crit's lane travel stays linear; only the layered pop eases.
+    expect(css).toMatch(
+      /\.fct\.fct-vivid\.crit \{[^}]*animation-timing-function: linear, ease-out;/,
+    );
+  });
+
+  // The keyframe translate a lane offset is written as (centring included), regex-escaped.
+  const tx = (d: number) =>
+    d === 0 ? '-50%' : d < 0 ? `calc(-50% - ${-d}px)` : `calc(-50% + ${d}px)`;
+  const esc = (s: string) => s.replace(/[()+]/g, (c) => `\\${c}`);
+  const mirrors = (sheet: string, suffix: string, profile: FctLayoutProfile) => {
+    for (const lane of LANES) {
+      const block = keyframes(sheet, `fct-out-${lane}${suffix}`);
+      for (const p of profile.path[lane]) {
+        if (p.f === 0) continue;
+        const pct = `${Math.round(p.f * 100)}%`;
+        expect(block, `fct-out-${lane}${suffix} at ${pct}`).toMatch(
+          new RegExp(`${pct} \\{[^}]*translate: ${esc(tx(p.dx))} ${esc(tx(p.dy))};`),
+        );
+      }
+    }
+  };
+
+  it('mirrors FCT_LAYOUT_DESKTOP / FCT_LAYOUT_MOBILE in every lane keyframe, 1:1', () => {
+    expect(FCT_LANE_EARLY_F).toBe(0.3);
+    mirrors(css, '', FCT_LAYOUT_DESKTOP);
+    mirrors(mobileCss, '-mobile', FCT_LAYOUT_MOBILE);
+  });
+
+  it('mirrors the layout core font sizes in the vivid size rules', () => {
+    const d = FCT_LAYOUT_DESKTOP.fontPx;
+    expect(css).toMatch(
+      new RegExp(
+        `\\.fct\\.fct-vivid:is\\(\\.fct-damage-done-ability, \\.fct-damage-done-auto, \\.fct-damage-done-block\\) \\{\\s*font-size: calc\\(${d.lane}px`,
+      ),
+    );
+    expect(css).toMatch(
+      new RegExp(`\\.fct\\.fct-vivid\\.crit \\{\\s*font-size: calc\\(${d.crit}px`),
+    );
+    expect(css).toMatch(
+      new RegExp(`\\.fct\\.fct-vivid\\.fct-pet \\{\\s*font-size: calc\\(${d.minor}px`),
+    );
+    const m = FCT_LAYOUT_MOBILE.fontPx;
+    expect(mobileCss).toMatch(
+      new RegExp(
+        `body\\.mobile-touch \\.fct\\.fct-vivid\\.crit \\{\\s*font-size: calc\\(${m.crit}px`,
+      ),
+    );
+    expect(mobileCss).toMatch(
+      new RegExp(
+        `body\\.mobile-touch \\.fct\\.fct-vivid\\.fct-pet \\{\\s*font-size: calc\\(${m.minor}px`,
+      ),
+    );
   });
 
   it('holds full opacity past the midpoint before fading (the grey wash fix)', () => {
-    for (const lane of LANES)
+    for (const lane of LANES) {
       expect(keyframes(css, `fct-out-${lane}`)).toMatch(/60% \{\s*opacity: 1;/);
-    expect(keyframes(css, 'fct-vivid-rise')).toMatch(/60% \{\s*opacity: 1;/);
-    expect(keyframes(css, 'fct-vivid-crit')).toMatch(/65% \{\s*opacity: 1;/);
-    expect(keyframes(mobileCss, 'fct-vivid-rise-mobile')).toMatch(/60% \{\s*opacity: 1;/);
-    expect(keyframes(mobileCss, 'fct-vivid-crit-mobile')).toMatch(/65% \{\s*opacity: 1;/);
+      expect(keyframes(mobileCss, `fct-out-${lane}-mobile`)).toMatch(/60% \{\s*opacity: 1;/);
+    }
   });
 
-  it('keeps every new vivid keyframe static (no var() inside, compositor-safe)', () => {
-    expect(keyframes(css, 'fct-vivid-rise')).not.toContain('var(');
-    expect(keyframes(mobileCss, 'fct-vivid-rise-mobile')).not.toContain('var(');
-    expect(keyframes(mobileCss, 'fct-vivid-crit-mobile')).not.toContain('var(');
+  it('pops a crit over its lane: the pop animates scale / rotate only, never the travel', () => {
+    for (const lane of LANES) {
+      expect(css).toMatch(
+        new RegExp(
+          `\\.fct\\.fct-vivid\\.crit\\.fct-out-${lane} \\{\\s*animation-name: fct-out-${lane}, fct-vivid-pop;`,
+        ),
+      );
+      expect(mobileCss).toMatch(
+        new RegExp(
+          `body\\.mobile-touch \\.fct\\.fct-vivid\\.crit\\.fct-out-${lane} \\{\\s*animation-name: fct-out-${lane}-mobile, fct-vivid-pop-mobile;`,
+        ),
+      );
+    }
+    for (const pop of [
+      keyframes(css, 'fct-vivid-pop'),
+      keyframes(mobileCss, 'fct-vivid-pop-mobile'),
+    ]) {
+      expect(pop).toContain('scale:');
+      expect(pop).not.toContain('translate:');
+      expect(pop).not.toContain('opacity:');
+    }
+  });
+
+  it('sheds only the crit pop at the low tier, keeping each lane travel', () => {
+    for (const lane of LANES) {
+      expect(css).toMatch(
+        new RegExp(
+          `:root\\[data-fx-level="low"\\] \\.fct\\.fct-vivid\\.crit\\.fct-out-${lane} \\{\\s*animation-name: fct-out-${lane};`,
+        ),
+      );
+      expect(mobileCss).toMatch(
+        new RegExp(
+          `:root\\[data-fx-level="low"\\] body\\.mobile-touch \\.fct\\.fct-vivid\\.crit\\.fct-out-${lane} \\{\\s*animation-name: fct-out-${lane}-mobile;`,
+        ),
+      );
+    }
+    // The shipped classic low-tier shed (plain rise, no pop) is untouched.
+    expect(css).toMatch(/:root\[data-fx-level="low"\] \.fct\.crit \{\s*animation-name: fct-rise;/);
   });
 
   it('fits the low-tier vivid animations to the low floater life, so the fade is seen', () => {
@@ -1317,56 +1503,57 @@ describe('vivid combat text CSS contract', () => {
     const at = css.indexOf(':root[data-fx-level="low"]\n    .fct.fct-vivid:is(');
     expect(at).toBeGreaterThan(0);
     const block = css.slice(at, css.indexOf('}', at));
-    for (const cls of [
-      'fct-out-l',
-      'fct-out-r',
-      'fct-out-ll',
-      'fct-out-rr',
-      'crit',
-      'fct-damage-taken',
-      'fct-damage-taken-block',
-    ])
+    for (const cls of ['fct-out-c', 'fct-out-l', 'fct-out-r', 'fct-out-ll', 'fct-out-rr', 'crit'])
       expect(block).toContain(`.${cls}`);
     const seconds = Number(/animation-duration: ([\d.]+)s;/.exec(block)?.[1]);
     expect(seconds * 1000).toBe(FCT_TTL_MS * FCT_TTL_SCALE_LOW);
   });
 
-  it('never lets a vivid crit or incoming hit fall back to the fade-from-frame-one rise', () => {
-    // Low tier sheds only the pop: the vivid crit rides the hold-then-fade rise, and this
-    // rule must outrank the shipped `:root[data-fx-level="low"] .fct.crit` shed.
-    expect(css).toMatch(
-      /:root\[data-fx-level="low"\] \.fct\.fct-vivid\.crit \{\s*animation-name: fct-vivid-rise;/,
-    );
-    expect(mobileCss).toMatch(
-      /:root\[data-fx-level="low"\] body\.mobile-touch \.fct\.fct-vivid\.crit \{\s*animation-name: fct-vivid-rise-mobile;/,
-    );
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch \.fct\.fct-vivid\.crit \{\s*animation-name: fct-vivid-crit-mobile;/,
-    );
-    // Incoming non-crit damage holds too; the :not(.crit) keeps an incoming crit's pop.
-    expect(css).toMatch(
-      /\.fct\.fct-vivid\.fct-damage-taken:not\(\.crit\),\s*\.fct\.fct-vivid\.fct-damage-taken-block:not\(\.crit\) \{\s*animation-name: fct-vivid-rise;/,
-    );
+  it('keeps size for crits alone: the big-hit flag is an underglow, never a bigger number', () => {
+    for (const sel of ['.fct.fct-big {', '.fct.fct-big.crit {']) {
+      const at = css.indexOf(sel);
+      expect(at, sel).toBeGreaterThan(0);
+      expect(css.slice(at, css.indexOf('}', at))).not.toContain('font-size');
+    }
+    expect(mobileCss).not.toMatch(/\.fct-big[^{]*\{[^}]*font-size/);
   });
 
-  it('pops a crit in the centre: the crit rule is declared AFTER every lane rule it ties with', () => {
-    const critAt = css.indexOf('.fct.fct-vivid.crit {');
-    expect(critAt).toBeGreaterThan(0);
-    expect(css.slice(critAt, css.indexOf('}', critAt))).toContain(
-      'animation-name: fct-vivid-crit;',
-    );
-    for (const lane of LANES) expect(css.indexOf(`.fct.fct-out-${lane} {`)).toBeLessThan(critAt);
-    // The shipped low-tier shed (plain rise, no pop) still outranks the vivid crit.
-    expect(css).toMatch(/:root\[data-fx-level="low"\] \.fct\.crit \{\s*animation-name: fct-rise;/);
-  });
-
-  it('restates the fan-out on touch, where the mobile layer outranks hud.css', () => {
+  it('restates every lane on touch, where the mobile layer outranks hud.css', () => {
     for (const lane of LANES)
       expect(mobileCss).toMatch(
         new RegExp(
-          `body\\.mobile-touch \\.fct\\.fct-out-${lane}:not\\(\\.crit\\) \\{[^}]*animation-name: fct-out-${lane}-mobile;`,
+          `body\\.mobile-touch \\.fct\\.fct-out-${lane} \\{\\s*animation-name: fct-out-${lane}-mobile;`,
         ),
       );
+  });
+
+  it('sets avoidance words, pet hits and outgoing blocks apart in their own vivid tokens', () => {
+    expect(css).toMatch(
+      /\.fct\.fct-vivid:is\(\.fct-miss-self, \.fct-miss-other, \.fct-dodge-self, \.fct-dodge-other\) \{\s*color: var\(--color-fct-vivid-avoid\);\s*font-style: italic;/,
+    );
+    expect(css).toMatch(
+      /\.fct\.fct-vivid\.fct-pet\.fct-damage-done-auto \{\s*color: var\(--color-fct-vivid-pet-auto\);/,
+    );
+    expect(css).toMatch(
+      /\.fct\.fct-vivid\.fct-pet\.fct-damage-done-ability \{\s*color: var\(--color-fct-vivid-pet-ability\);/,
+    );
+    expect(css).toMatch(
+      /\.fct\.fct-vivid\.fct-damage-done-block \{\s*color: var\(--color-fct-vivid-block\);/,
+    );
+    const tok = (name: string) => new RegExp(`--${name}:\\s*(#[0-9a-f]{6});`).exec(tokensCss)?.[1];
+    const vivid = [
+      tok('color-fct-vivid-avoid'),
+      tok('color-fct-vivid-pet-auto'),
+      tok('color-fct-vivid-pet-ability'),
+      tok('color-fct-vivid-block'),
+    ];
+    for (const v of vivid) expect(v).toBeDefined();
+    // None of them can pass for a white hit or your own gold ability, or for each other.
+    for (const v of vivid) {
+      expect(v).not.toBe('#ffffff');
+      expect(v).not.toBe(tok('color-fct-vivid-ability'));
+    }
+    expect(new Set(vivid).size).toBe(vivid.length);
   });
 });
 

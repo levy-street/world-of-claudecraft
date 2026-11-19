@@ -1157,6 +1157,34 @@ export const zh_CN: EnTranslations = {
       "absorbed": "已吸收（{amount}）",
       "cheap": "费用降低!"
     },
+    "fctColors": {
+      "title": "战斗文字颜色",
+      "open": "自定义",
+      "back": "返回",
+      "resetAll": "全部重置",
+      "custom": "自定义",
+      "default": "默认",
+      "note": "为每种数字选择颜色，或保持默认。宠物、持续伤害和持续治疗的颜色只在默认样式中生效：经典战斗文字不会区分这些数字。",
+      "slot": {
+        "white": "普通攻击（近战、自动射击、魔杖）",
+        "whiteCrit": "普通攻击暴击",
+        "ability": "技能伤害",
+        "abilityCrit": "技能暴击",
+        "dot": "持续伤害",
+        "dotCrit": "持续伤害暴击",
+        "heal": "治疗",
+        "healCrit": "治疗暴击",
+        "hot": "持续治疗",
+        "hotCrit": "持续治疗暴击",
+        "pet": "宠物伤害",
+        "petCrit": "宠物暴击",
+        "block": "被格挡的攻击",
+        "avoid": "未命中、躲闪、招架",
+        "absorb": "吸收",
+        "taken": "受到的伤害",
+        "takenCrit": "受到的暴击"
+      }
+    },
     "emotes": {
       "wave": "挥手",
       "laugh": "大笑",
