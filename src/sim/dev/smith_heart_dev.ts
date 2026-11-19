@@ -13,8 +13,9 @@
 //                                    Hammer Council; breath, quench,
 //                                    heat), the final boss (final), all four
 //                                    guardians (guardians), one pack (pack h1
-//                                    to h3, r1 to r8, b1 to b3, q1 to q3, f1
-//                                    to f3), every pack (trash), or all
+//                                    to h3, r1 to r4, b1 to b3, q1 to q3, f1
+//                                    to f3), the Ring's four (ring), every pack
+//                                    (trash), or all
 //   /dev heart gates                 open every gate of this run
 //   /dev heart portal                burst the heart seal crystal now (a forced
 //                                    burst: the portal is open for this run
@@ -140,6 +141,7 @@ import {
   SMITH_HEART_DUNGEON,
   SMITH_HEART_FINAL_BOSS,
   SMITH_HEART_GUARDIANS,
+  SMITH_HEART_PACKS,
 } from '../content/smith_heart';
 import { HEARTH_WELL, SMITH_HEART_ANCHORS } from '../content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../data';
@@ -234,7 +236,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | feat <council|breath|quench|heat|final|all> <grant|reset> | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | loot [boss] | gates | portal | seal | pool <k> | arrival | final [pull|reset|death|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | regroup [area] | reset | council [pull|reset|intro|death [guardian|singer]|heroic [on|off]|mythic [on|off]|energy <n>|hp <guardian|singer|both> <pct>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|sky|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
+  '[dev] /dev heart enter [normal] | feat <council|breath|quench|heat|final|all> <grant|reset> | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|singer|council|breath|quench|heat|final|guardians|ring|pack <id>|trash|all> | loot [boss] | gates | portal | seal | pool <k> | arrival | final [pull|reset|death|normal|heroic|mythic|quarter <breath|quench|hammer|heat|ring>|fill [vein|all] [pct]|burst|shock|root|unroot|fist|whirl|embers|freeze|cold <n>|ice|wind [deg]|bolt|drawn|orbs|tremor|anvil|shell] | regroup [area] | reset | council [pull|reset|intro|death [guardian|singer]|heroic [on|off]|mythic [on|off]|energy <n>|hp <guardian|singer|both> <pct>|wrath|weight|rush|wake|rock|bolt|song|resonance [n]|soul <guardian|singer>|soulpip <n>] | breath [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|roar|sky|chain|eye|conductor|tornado|gust [deg]|isles [0|1]|ride [0|1]|home|killisle|bulwark|windworn|heart [2|portal a|b|c|d|carry|burst]] | quench [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|splash|chain [n]|immune|huddle|hole|crack|breath|slash|flurry] | heat [pull|reset|intro|death|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */
@@ -293,6 +295,7 @@ export function killSmithHeartMatching(
   if (
     what !== 'all' &&
     what !== 'trash' &&
+    what !== 'ring' &&
     what !== 'guardians' &&
     what !== 'council' &&
     boss === undefined &&
@@ -308,6 +311,7 @@ export function killSmithHeartMatching(
       (what === 'trash' &&
         spawn.packId !== undefined &&
         spawn.packId !== SMITH_HEART_COUNCIL_PACK) ||
+      (what === 'ring' && SMITH_HEART_PACKS.ring.includes(spawn.packId ?? '')) ||
       (what === 'guardians' && GUARDIAN_IDS.has(spawn.mobId)) ||
       (what === 'council' && COUNCIL_IDS.has(spawn.mobId)) ||
       (boss !== undefined && spawn.mobId === boss) ||

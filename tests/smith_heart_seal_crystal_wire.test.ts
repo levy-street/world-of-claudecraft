@@ -140,6 +140,8 @@ describe('the heart seal crystal over the wire', () => {
     const offDais = SEAL_CRYSTAL_TRIGGER_R + 6;
     displacePlayerForDev(sim.ctx, sim.entities.get(pid) as Entity, o.x, o.z - offDais);
     sim.chat('/dev heart kill guardians', pid);
+    // The Ring's four packs too (the team's doc of 2026-11-17).
+    sim.chat('/dev heart kill trash', pid);
     run(3);
     expect(
       mirroredMarkers().every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT)),

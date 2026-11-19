@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 import {
   SMITH_HEART_DUNGEON,
   SMITH_HEART_GATES,
+  SMITH_HEART_PACKS,
   SMITH_HEART_SEAL_PREFIX,
 } from '../src/sim/content/smith_heart';
 import {
@@ -143,9 +144,13 @@ describe('/dev heart', () => {
 
     dev('/dev heart kill guardians');
     sim.tick();
-    // The Ring holds no packs since the team's review of 2026-11-17: the four
-    // veins alone charge the crystal (15 | the charge bit 128), and the portal
-    // waits for a raider on the dais.
+    // The four veins lit but the Ring's four packs (the team's doc of
+    // 2026-11-17) still stand: dark. Cleared, the crystal charges (15 | the
+    // charge bit 128), and the portal waits for a raider on the dais.
+    expect(smithHeartProgress(sim.ctx, inst).ringClear).toBe(false);
+    expect(smithHeartProgress(sim.ctx, inst).ready).toBe(false);
+    for (const id of SMITH_HEART_PACKS.ring) dev(`/dev heart kill pack ${id}`);
+    sim.tick();
     const masks = sealMasks(sim, inst);
     expect(masks.length).toBeGreaterThan(0);
     expect(masks.every((t) => t === 'smith_heart_seal_143')).toBe(true);
@@ -226,7 +231,7 @@ describe('/dev heart', () => {
     dev('/dev heart seal');
     const lines = logs(sim.tick()).filter((t) => t.startsWith('[dev] Heart seal'));
     expect(lines).toEqual([
-      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear true, ready false, portalOpen false, burst false, awake false.',
+      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear false, ready false, portalOpen false, burst false, awake false.',
     ]);
     dev('/dev heart kill all');
     sim.tick();
@@ -277,7 +282,7 @@ describe('/dev heart', () => {
       mask: 0,
       slabOpen: false,
       sealLit: false,
-      ringClear: true,
+      ringClear: false,
       ready: false,
       portalOpen: false,
     });

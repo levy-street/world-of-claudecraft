@@ -151,6 +151,18 @@ export const RING_PORTAL_LANDING = { x: 0, z: -12, facing: Math.PI } as const;
  *  vein mouths. */
 export const RING_PACK_DEGREES = [30, 60, 105, 125, 235, 255, 300, 330] as const;
 
+/** The Ring's four packs since the team's doc of 2026-11-17 ("remove mobs from
+ *  the outer circle, maybe half them instead"): half the old eight, one in each
+ *  stretch of the Ring between its ways (the Breath's mouth and the North Stair
+ *  at 0, the Quench's and the East Stair at 90, the Heat's and the West Stair
+ *  at 270, the Balcony Stairs' feet at the arc's ends), each at that stretch's
+ *  middle and out toward the rim (`r`), so a raid walking the Ring's inner
+ *  side meets one per stretch and no mouth or stair is ever blocked by one. */
+export const RING_PACKS = {
+  degrees: [45, 114, 246, 315],
+  r: 72.5,
+} as const;
+
 /** A point on the Ring's circle at `deg` (clockwise from north) and radius `r`. */
 export function ringPoint(deg: number, r: number = RING.R): { x: number; z: number } {
   const a = (deg * Math.PI) / 180;
