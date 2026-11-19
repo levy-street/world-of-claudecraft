@@ -1,6 +1,6 @@
 // The Masterless Strength's own elements, as one part of its fight
 // (final.ts calls these): Elemental Strike (final_strike.ts), Elemental
-// Fusion (final_fusion.ts); their
+// Fusion (final_fusion.ts), Opposing Elements (final_opposites.ts); their
 // tick per stage, their end, their dev verbs and their readout.
 
 import type { SmithHeartVein } from '../../content/smith_heart_layout';
@@ -15,12 +15,13 @@ import {
   stepCombos,
   stepFusion,
 } from './final_fusion';
+import { clearOpposites, startOpposites, stepOpposites } from './final_opposites';
 import type { FinalScope } from './final_scope';
 import { bossTank } from './final_scope';
 import { clearStrike, elementalStrike, stepStatic, stepStrike, strikeStacks } from './final_strike';
 
-/** One tick of its own elements: the strike in the quarter fight and the
- *  final phase; the fusion's trigger in the quarter
+/** One tick of its own elements: the strike and the polarity marks in the
+ *  quarter fight and the final phase; the fusion's trigger in the quarter
  *  fight; the combos on the floor always (they run out). */
 export function stepElements(s: FinalScope): void {
   const stage = s.st.phase.stage;
@@ -29,6 +30,7 @@ export function stepElements(s: FinalScope): void {
   stepStatic(s);
   stepFusion(s);
   stepCombos(s);
+  if (live) stepOpposites(s);
 }
 
 /** A change of quarter (final.ts watchZone, the quarter fight only): the
@@ -47,6 +49,7 @@ export function clearElements(
   players: readonly Entity[],
 ): void {
   clearFusion(s, players);
+  clearOpposites(s, players);
   clearStrike(players);
 }
 
@@ -61,7 +64,7 @@ const COMBO_PAIRS: Readonly<Record<FusionCombo, [SmithHeartVein, SmithHeartVein]
   spires: ['breath', 'hammer'],
 };
 
-/** `/dev heart final strike|fusion <combo|a b>`: the reply, or
+/** `/dev heart final strike|fusion <combo|a b>|opposites`: the reply, or
  *  null for another verb. */
 export function elementsDev(
   s: FinalScope,
@@ -103,6 +106,11 @@ export function elementsDev(
         ? `Elemental Fusion (${from} into ${to}): 3 s, then its combo in the ${to} quarter.`
         : null;
     }
+    case 'opposites':
+    case 'polarity': {
+      const marks = startOpposites(s);
+      return `Opposing Elements: ${marks.length} marked (${marks.map((m) => m.polarity).join(', ') || 'none'}).`;
+    }
     default:
       return null;
   }
@@ -111,5 +119,5 @@ export function elementsDev(
 /** The readout's elements half. */
 export function elementsReadout(s: Pick<FinalScope, 'st'>): string {
   const el = s.st.elements;
-  return `strikes ${el.strikes} (next ${el.strikeClock.toFixed(0)} s), fusions ${el.fusions} (last ${el.lastCombo ?? 'none'})`;
+  return `strikes ${el.strikes} (next ${el.strikeClock.toFixed(0)} s), fusions ${el.fusions} (last ${el.lastCombo ?? 'none'}), polarity rounds ${el.rounds} (${el.marks.length} marked, ${el.balanced} balanced, ${el.clashes} clashes, ${el.unbalanced} unbalanced)`;
 }

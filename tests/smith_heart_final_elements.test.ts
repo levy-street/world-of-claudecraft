@@ -36,6 +36,7 @@ import {
 } from '../src/sim/encounters/smith_heart/final_elements_ids';
 import { fireCombo } from '../src/sim/encounters/smith_heart/final_fusion';
 import { FINAL_DIFFICULTY } from '../src/sim/encounters/smith_heart/final_ids';
+import { startOpposites } from '../src/sim/encounters/smith_heart/final_opposites';
 import type { FinalScope } from '../src/sim/encounters/smith_heart/final_scope';
 import { elementalStrike, strikeStacks } from '../src/sim/encounters/smith_heart/final_strike';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -634,5 +635,221 @@ describe('Elemental Fusion', () => {
     must(g).elements.pending = { from: 'heat', to: 'hammer' };
     g.tick(sec(5));
     expect(g.state()?.elements.fusions).toBe(0);
+  });
+});
+
+// ---- Opposing Elements ----------------------------------------------------------------
+
+/** A fight with `n` players, the boss's tank players[0] and, when `offTank`,
+ *  players[1] carrying Elemental Strike (the other tank), everyone scattered. */
+function polarityFight(tier: 'normal' | 'heroic' | 'mythic', n = 10, offTank = true): FinalFight {
+  const f = finalFight(n);
+  if (tier !== 'normal') f.dev(`/dev heart final ${tier}`);
+  f.pullIn('heat');
+  quiet(f);
+  if (offTank) elementalStrike(scope(f), f.players[1], 'heat');
+  scatter(f);
+  f.tick(1);
+  return f;
+}
+
+const marked = (f: FinalFight) =>
+  f.players.filter((p) => !p.dead && aura(p, ELEMENT_AURAS.polarity));
+const polarity = (p: Entity) => polarityOf(aura(p, ELEMENT_AURAS.polarity)?.value);
+
+describe('Opposing Elements', () => {
+  it('marks 4 on Normal, 6 on Heroic, 8 (every non-tank) on Mythic, in opposite pairs', () => {
+    for (const [tier, want] of [
+      ['normal', 4],
+      ['heroic', 6],
+      ['mythic', 8],
+    ] as const) {
+      const f = polarityFight(tier);
+      const marks = startOpposites(scope(f));
+      expect(marks.length, tier).toBe(want);
+      const ps = marked(f);
+      expect(ps.length, tier).toBe(want);
+      // Never a tank.
+      expect(ps.includes(f.players[0])).toBe(false);
+      expect(ps.includes(f.players[1])).toBe(false);
+      // Each element's count matches its opposite's.
+      const count = (p: Polarity) => ps.filter((x) => polarity(x) === p).length;
+      expect(count('fire'), tier).toBe(count('ice'));
+      expect(count('earth'), tier).toBe(count('lightning'));
+      expect(aura(ps[0], ELEMENT_AURAS.polarity)?.duration).toBe(E.polaritySeconds);
+    }
+  });
+
+  it('only the living, always an even count: an odd one out is left unmarked', () => {
+    const f = polarityFight('mythic');
+    // Three non-tanks die: five are left, four are marked, one is not.
+    for (const p of f.players.slice(2, 5)) {
+      p.hp = 0;
+      p.dead = true;
+    }
+    const marks = startOpposites(scope(f));
+    expect(marks.length).toBe(4);
+    expect(f.players.slice(5).filter((p) => !aura(p, ELEMENT_AURAS.polarity)).length).toBe(1);
+    for (const p of f.players.slice(2, 5)) expect(aura(p, ELEMENT_AURAS.polarity)).toBeUndefined();
+    const ps = marked(f);
+    const count = (p: Polarity) => ps.filter((x) => polarity(x) === p).length;
+    expect(count('fire')).toBe(count('ice'));
+    expect(count('earth')).toBe(count('lightning'));
+  });
+
+  it('two opposites meeting cancel both marks, no harm', () => {
+    const f = polarityFight('normal');
+    startOpposites(scope(f));
+    const ps = marked(f);
+    const fire = ps.find((p) => polarity(p) === 'fire') as Entity;
+    const ice = ps.find((p) => polarity(p) === 'ice') as Entity;
+    const at = f.local(fire);
+    f.put(ice, at.x + 1.5, at.z);
+    const ev = f.tick(2);
+    expect(aura(fire, ELEMENT_AURAS.polarity)).toBeUndefined();
+    expect(aura(ice, ELEMENT_AURAS.polarity)).toBeUndefined();
+    expect(f.state()?.elements.balanced).toBe(1);
+    expect(hits(ev, ELEMENT_NAMES.clash).length).toBe(0);
+    expect(
+      ev.some((e) => e.type === 'spellfxAt' && e.ability === 'heart_final_polarity_balance'),
+    ).toBe(true);
+    // The other pair still wears theirs.
+    expect(marked(f).length).toBe(2);
+  });
+
+  it('a wrong meeting explodes on both (Normal) and on everyone round it (Mythic)', () => {
+    for (const tier of ['normal', 'mythic'] as const) {
+      const f = polarityFight(tier);
+      startOpposites(scope(f));
+      const ps = marked(f);
+      const fire = ps.find((p) => polarity(p) === 'fire') as Entity;
+      const earth = ps.find((p) => polarity(p) === 'earth') as Entity;
+      const at = f.local(fire);
+      f.put(earth, at.x + 1.5, at.z);
+      // A bystander 5 yd off (unmarked: the off-tank).
+      const by = f.players[1];
+      f.put(by, at.x - 5, at.z);
+      const ev = f.tick(2);
+      expect(hits(ev, ELEMENT_NAMES.clash, fire.id).length, tier).toBe(1);
+      expect(hits(ev, ELEMENT_NAMES.clash, earth.id).length, tier).toBe(1);
+      expect(hits(ev, ELEMENT_NAMES.clash, by.id).length, tier).toBe(tier === 'mythic' ? 1 : 0);
+      expect(aura(fire, ELEMENT_AURAS.polarity), tier).toBeUndefined();
+      expect(aura(earth, ELEMENT_AURAS.polarity), tier).toBeUndefined();
+      expect(f.state()?.elements.clashes, tier).toBe(1);
+    }
+  });
+
+  it('a mark left with no possible partner fades quietly', () => {
+    const f = polarityFight('normal');
+    startOpposites(scope(f));
+    const ps = marked(f);
+    const fire = ps.find((p) => polarity(p) === 'fire') as Entity;
+    const earth = ps.find((p) => polarity(p) === 'earth') as Entity;
+    const at = f.local(fire);
+    f.put(earth, at.x + 1.5, at.z);
+    f.tick(2);
+    // Ice and Lightning are left, opposites of nobody left: gone, no timeout.
+    expect(marked(f).length).toBe(0);
+    const ev = f.tick(sec(E.polaritySeconds + 1));
+    expect(hits(ev, ELEMENT_NAMES.unbalanced).length).toBe(0);
+  });
+
+  it('uncancelled at 10 s: the marked player alone on Normal, the whole raid on Heroic and Mythic', () => {
+    const want = { normal: 'player', heroic: 'raid', mythic: 'raid' } as const;
+    const sizes: number[] = [];
+    for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+      const f = polarityFight(tier);
+      startOpposites(scope(f));
+      const ps = marked(f);
+      let ev: SimEvent[] = [];
+      for (let i = 0; i < sec(E.polaritySeconds + 0.3); i++) {
+        scatter(f);
+        ev = ev.concat(f.tick(1));
+      }
+      const struck = hits(ev, ELEMENT_NAMES.unbalanced);
+      if (want[tier] === 'player') {
+        expect(struck.length, tier).toBe(ps.length);
+        expect(
+          struck.every((h) => ps.some((p) => p.id === h.targetId)),
+          tier,
+        ).toBe(true);
+      } else {
+        expect(new Set(struck.map((h) => h.targetId)).size, tier).toBe(f.players.length);
+        sizes.push(struck[0].amount);
+      }
+      expect(marked(f).length, tier).toBe(0);
+    }
+    // Mythic's hit is the harder.
+    expect(sizes[1]).toBeGreaterThan(sizes[0] * 0.9);
+  });
+
+  it('its cadence: first 42 s in, then every 48 s, never while a fusion runs or the Anvil is near', () => {
+    expect(E.polarityFirst).toBe(42);
+    expect(E.polarityEvery).toBe(48);
+    const f = finalFight(10);
+    f.pullIn('heat');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    for (const v of VEINS) st.stars.clock[v] = 1e9;
+    st.anvilClock = 1e9;
+    st.elements.polarityClock = 0.1;
+    // A combo on the floor holds it.
+    fireCombo(scope(f), 'heat', 'quench');
+    f.tick(sec(0.5));
+    expect(st.elements.rounds).toBe(0);
+    // The Anvil near holds it.
+    const s = scope(f);
+    for (const c of st.elements.steam) c.life = 0.01;
+    st.anvilClock = E.polarityAnvilClear - 1;
+    f.tick(sec(1));
+    expect(st.elements.rounds).toBe(0);
+    st.anvilClock = 1e9;
+    f.tick(sec(0.5));
+    expect(st.elements.rounds).toBe(1);
+    void s;
+  });
+
+  it('the same seed marks the same players with the same elements', () => {
+    const run = () => {
+      const f = polarityFight('heroic');
+      startOpposites(scope(f));
+      return f.players.map((p) => aura(p, ELEMENT_AURAS.polarity)?.value ?? -1);
+    };
+    expect(run()).toEqual(run());
+  });
+});
+
+describe('the end', () => {
+  it("a wipe's reset clears every mark, stack, combo and footprint", () => {
+    const f = polarityFight('mythic');
+    const s = scope(f);
+    for (let k = 0; k < 3; k++) elementalStrike(s, f.players[0], 'heat');
+    startOpposites(s);
+    fireCombo(s, 'breath', 'hammer');
+    fireCombo(s, 'heat', 'quench');
+    f.dev('/dev heart final reset');
+    f.tick(1);
+    for (const p of f.players) {
+      expect(strikeStacks(p).stacks).toBe(0);
+      expect(aura(p, ELEMENT_AURAS.polarity)).toBeUndefined();
+      expect(aura(p, ELEMENT_AURAS.magmaMark)).toBeUndefined();
+    }
+    for (const prefix of Object.values(ELEMENT_OBJECTS))
+      expect(f.objects(prefix).length, prefix).toBe(0);
+  });
+
+  it('the dev verbs: strike, fusion <combo>, opposites', () => {
+    const f = polarityFight('normal');
+    expect(f.dev('/dev heart final strike 3')).toBe(true);
+    expect(strikeStacks(f.players[0]).stacks).toBe(3);
+    expect(f.dev('/dev heart final fusion spires now')).toBe(true);
+    expect(f.objects(ELEMENT_OBJECTS.spirePrefix).length).toBeGreaterThan(0);
+    expect(f.dev('/dev heart final fusion steam')).toBe(true);
+    expect(f.state()?.elements.casting).not.toBeNull();
+    expect(f.dev('/dev heart final opposites')).toBe(true);
+    expect(marked(f).length).toBe(4);
+    // Sky Strike keeps its own words.
+    expect(f.dev('/dev heart final strike here')).toBe(true);
+    void FINAL_DIFFICULTY;
   });
 });

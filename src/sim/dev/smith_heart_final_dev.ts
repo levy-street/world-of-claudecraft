@@ -23,6 +23,7 @@
 //   final fusion <combo> [now]  Elemental Fusion: its 3 s bar then the combo
 //                               (steam, magma, firestorm, hail, avalanche,
 //                               spires; or two quarters), `now` skips the bar
+//   final opposites             Opposing Elements: a round of polarity marks
 //   final wake|star <vein>      a quarter's star wakes (for the rest of the
 //                               fight) / fires now (the rework of 2026-11-18)
 //   final pillars [n|here]      Wake the Stone: n volleys, or one where you stand
