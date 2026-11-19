@@ -12,6 +12,7 @@ import { enterDungeon, leaveDungeon, resetDungeonInstances } from '../src/sim/in
 import {
   corpseBlocksInstanceReset,
   isPersonalQuestSlot,
+  lootSlotBlocksInstanceReset,
 } from '../src/sim/instances/reset_loot_gate';
 import { BOSS_CORPSE_HOLD_SECONDS } from '../src/sim/mob/boss_corpse_hold';
 import { type InstanceSlot, type PlayerMeta, Sim } from '../src/sim/sim';
@@ -226,34 +227,24 @@ describe('the Crucible difficulty change with an unclaimed quest item on Varkhul
     expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(0);
   });
 
-  it.each<[string, (l: PlayerMeta) => LootSlot[], number]>([
-    ['a shared drop', () => [{ itemId: 'varkhul_forgebreaker', count: 1 }], 0],
+  it.each<[string, (l: PlayerMeta) => LootSlot[]]>([
+    ['a shared drop', () => [{ itemId: 'varkhul_forgebreaker', count: 1 }]],
     [
       'a held roll award',
       (l) => [{ itemId: 'varkhul_forgebreaker', count: 1, personalFor: [l.entityId] }],
-      0,
     ],
     [
       'a held award of a plain Varkhul drop',
       (l) => [{ itemId: 'lastflame_core', count: 1, personalFor: [l.entityId] }],
-      0,
     ],
-    ['copper', () => [], 5],
-  ])(
-    'still refuses while %s remains beside the Ember, and hands nothing out',
-    (_l, extra, copper) => {
-      const { sim, lead, ally, varkhul } = crucibleWithLoot((l, a) => [
-        ...extra(l),
-        ember(a.entityId),
-      ]);
-      varkhul.loot!.copper = copper;
-      sim.setDungeonDifficulty('heroic', lead.entityId);
-      expect(errors(sim)).toContain(LOOT_BLOCKED);
-      expect(liveClaim(sim, IGNIVAR_LIFT_ROOM_ID)?.difficulty).toBe('normal');
-      expect(liveClaim(sim, IGNIVAR_SECOND_WING_ID)).toBeDefined();
-      expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(0);
-    },
-  );
+  ])('still refuses while %s remains beside the Ember, and hands nothing out', (_l, extra) => {
+    const { sim, lead, ally } = crucibleWithLoot((l, a) => [...extra(l), ember(a.entityId)]);
+    sim.setDungeonDifficulty('heroic', lead.entityId);
+    expect(errors(sim)).toContain(LOOT_BLOCKED);
+    expect(liveClaim(sim, IGNIVAR_LIFT_ROOM_ID)?.difficulty).toBe('normal');
+    expect(liveClaim(sim, IGNIVAR_SECOND_WING_ID)).toBeDefined();
+    expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(0);
+  });
 
   it('still refuses while a need-greed roll is open on the corpse', () => {
     const { sim, lead, ally, varkhul } = crucibleWithLoot((_l, a) => [ember(a.entityId)]);
@@ -265,22 +256,26 @@ describe('the Crucible difficulty change with an unclaimed quest item on Varkhul
     expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(0);
   });
 
-  it('still blocks while an unclaimed harvest remains beside a quest slot', () => {
+  it('an unclaimed harvest no longer blocks, beside a quest slot or alone', () => {
     // wild_boar carries both a harvest half and a quest-gated boar_hide entry.
     const { sim, varkhul } = crucibleWithLoot(() => []);
     varkhul.templateId = 'wild_boar';
     varkhul.loot = { copper: 0, items: [{ itemId: 'boar_hide', count: 1, personalFor: [7] }] };
     varkhul.harvestClaimedBy = null;
     expect(isPersonalQuestSlot(varkhul, varkhul.loot.items[0])).toBe(true);
-    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(true);
-    varkhul.harvestClaimedBy = 7;
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(false);
+    // The harvest grace window: the body stays lootable with its loot gone.
+    varkhul.loot = null;
     expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(false);
   });
 
-  it('a lootable corpse with no loot table still blocks (open roll or harvest window)', () => {
+  it('a lootable corpse with no loot left blocks only while a roll is open on it', () => {
     const { sim, varkhul } = crucibleWithLoot(() => []);
     varkhul.loot = null;
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(false);
+    sim.ctx.pendingLootRolls.set(9_999, { mobId: varkhul.id } as never);
     expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(true);
+    sim.ctx.pendingLootRolls.delete(9_999);
   });
 
   it('end to end: a real Varkhul kill, the leader loots, the Ember is left, the change applies', () => {
@@ -329,5 +324,77 @@ describe('the Crucible difficulty change with an unclaimed quest item on Varkhul
     expect(text).toContain(APPLIED);
     expect(liveClaim(sim, IGNIVAR_LIFT_ROOM_ID)?.difficulty).toBe('heroic');
     expect(sim.ctx.countItem(EMBER, ally.entityId)).toBe(1);
+  });
+});
+
+// Loot nobody can or will take before the reaper frees the claim no longer holds
+// the group's difficulty change: leftover copper, a grey drop, and a personal
+// slot whose recipients have all gone offline.
+describe('reset loot gate: loot nobody will take does not block', () => {
+  it('copper alone no longer blocks, and the change applies', () => {
+    const { sim, lead, varkhul } = crucibleWithLoot(() => []);
+    varkhul.loot!.copper = 5_000;
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(false);
+    sim.setDungeonDifficulty('heroic', lead.entityId);
+    expect(errors(sim)).toContain(APPLIED);
+    expect(liveClaim(sim, IGNIVAR_LIFT_ROOM_ID)?.difficulty).toBe('heroic');
+  });
+
+  it('a poor-quality drop does not block, but a common or better one beside it does', () => {
+    const { sim, lead, varkhul } = crucibleWithLoot(() => [{ itemId: 'tangled_weed', count: 3 }]);
+    expect(lootSlotBlocksInstanceReset(sim.ctx, varkhul, varkhul.loot!.items[0])).toBe(false);
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(false);
+    varkhul.loot!.items.push({ itemId: 'varkhul_forgebreaker', count: 1 });
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(true);
+    sim.setDungeonDifficulty('heroic', lead.entityId);
+    expect(errors(sim)).toContain(LOOT_BLOCKED);
+    expect(liveClaim(sim, IGNIVAR_LIFT_ROOM_ID)?.difficulty).toBe('normal');
+  });
+
+  it('a personal slot stops blocking once its recipients are offline or logging out', () => {
+    const { sim, lead, ally, varkhul } = crucibleWithLoot((_l, a) => [
+      { itemId: 'varkhul_forgebreaker', count: 1, personalFor: [a.entityId] },
+    ]);
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(true);
+    ally.leaving = true;
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(false);
+    ally.leaving = false;
+    sim.removePlayer(ally.entityId);
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(false);
+    sim.setDungeonDifficulty('heroic', lead.entityId);
+    expect(errors(sim)).toContain(APPLIED);
+  });
+
+  it('a held roll award keeps blocking while its winner is offline, through the queued retry', () => {
+    // The hold records the winner's durable character, and rebindHeldAwardsOnJoin
+    // re-points the slot when they relog, so a brief disconnect must not let the
+    // reset destroy the item.
+    const { sim, lead, ally, varkhul } = crucibleWithLoot((_l, a) => [
+      { itemId: 'varkhul_forgebreaker', count: 1, personalFor: [a.entityId] },
+    ]);
+    varkhul.heldLootOwners = new Map([[ally.entityId, 4242]]);
+    sim.removePlayer(ally.entityId);
+    expect(corpseBlocksInstanceReset(sim.ctx, varkhul)).toBe(true);
+    sim.setDungeonDifficulty('heroic', lead.entityId);
+    expect(errors(sim)).toContain(LOOT_BLOCKED);
+    expect(sim.ctx.pendingDifficultyChanges.has(lead.entityId)).toBe(true);
+    for (let i = 0; i < 40; i += 1) sim.tick();
+    expect(liveClaim(sim, IGNIVAR_LIFT_ROOM_ID)?.difficulty).toBe('normal');
+    expect(varkhul.loot!.items[0].count).toBe(1);
+  });
+
+  it('a slot with no live count or no recipients never blocks', () => {
+    const { sim, varkhul } = crucibleWithLoot(() => []);
+    const mob = { templateId: varkhul.templateId };
+    expect(
+      lootSlotBlocksInstanceReset(sim.ctx, mob, { itemId: 'varkhul_forgebreaker', count: 0 }),
+    ).toBe(false);
+    expect(
+      lootSlotBlocksInstanceReset(sim.ctx, mob, {
+        itemId: 'varkhul_forgebreaker',
+        count: 1,
+        personalFor: [],
+      }),
+    ).toBe(false);
   });
 });
