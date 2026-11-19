@@ -22,7 +22,9 @@
 //    shimmer on the body and a ring rolling out on each pulse; Mountain's
 //    Rush's mark round its player and the lane the Guardian will charge down
 //    (council_rush_fx.ts), and the red arrow over the marked player for the
-//    whole bar (council_rush_arrow.ts); Hammer's Weight's slam on the tank and its mark
+//    whole bar (council_rush_arrow.ts), and the same arrow over the local
+//    player alone while Wake the Stone has marked them to raise a pillar;
+//    Hammer's Weight's slam on the tank and its mark
 //    at the tank's feet;
 //  - the mythic Quarry Collapse's falling rock;
 //  - the Seam Singer's bolt (an ochre shard), the heroic pillars' pulse
@@ -408,6 +410,10 @@ export class CouncilFx {
   private readonly strike: CouncilStrikeFx;
   /** The red arrow over the Rush's marked player (every tier). */
   private readonly arrow: CouncilRushArrow;
+  /** Wake the Stone's mark: the same arrow over the LOCAL player's head while
+   *  they carry a pillar's rise spot (Jose's playtest of 2026-11-19), drawn
+   *  for them alone (each marked player sees their own). */
+  private readonly wakeArrow: CouncilRushArrow;
   private readonly limitFx: CouncilLimitFx;
   /** The players the Wrath's runes count (refilled at their pace). */
   private readonly limitPlayers: Entity[] = [];
@@ -513,6 +519,14 @@ export class CouncilFx {
     this.shelters = new CouncilShelters(host, this.pillarsFx);
     this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
     this.arrow = new CouncilRushArrow(this.root, this.uTime, this.geometries, this.materials);
+    this.wakeArrow = new CouncilRushArrow(
+      this.root,
+      this.uTime,
+      this.geometries,
+      this.materials,
+      COUNCIL_AURAS.wakeMark,
+      1,
+    );
     this.fury = new CouncilFuryFx(host);
     this.rush = new CouncilRushFx(host, playGesture);
     this.strike = new CouncilStrikeFx(
@@ -906,6 +920,7 @@ export class CouncilFx {
     this.rush.update(dt);
     this.strike.update(dt);
     this.arrow.update(world.entities, this.clock, this.reducedMotion());
+    this.wakeArrow.update(world.entities, this.clock, this.reducedMotion());
     this.audio.update(
       dt,
       (id) => world.entities.get(id),
@@ -930,6 +945,7 @@ export class CouncilFx {
     this.rush.beginScan();
     this.strike.beginScan();
     this.arrow.beginScan();
+    this.wakeArrow.beginScan();
     this.audio.beginScan();
     for (const m of this.marks) m.seen = false;
     for (const r of this.rocks) r.seen = false;
@@ -984,6 +1000,8 @@ export class CouncilFx {
           } else if (a.id === COUNCIL_AURAS.resonance) this.seeRing(e);
           else if (a.id === COUNCIL_AURAS.weight) this.seeWeight(e);
           else if (a.id === COUNCIL_AURAS.rushMark) this.arrow.see(e.id);
+          else if (a.id === COUNCIL_AURAS.wakeMark && e.id === world.playerId)
+            this.wakeArrow.see(e.id);
         }
       }
     }
@@ -995,6 +1013,7 @@ export class CouncilFx {
     this.rush.endScan();
     this.strike.endScan();
     this.arrow.endScan();
+    this.wakeArrow.endScan();
     this.audio.endScan();
     for (const m of this.marks) {
       if (m.playerId >= 0 && !m.seen) this.freeMark(m);

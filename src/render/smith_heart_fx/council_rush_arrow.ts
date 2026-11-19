@@ -14,6 +14,8 @@
 // The Guardian of the Quench's blades reuse it whole (quench_fight_fx.ts, the
 // owner's heroic run of 2026-11-17): the arrow over each player a blade has marked
 // for a slash, on the slash mark's aura (`auraId`, a pool sized to its marks).
+// The council's Wake the Stone marks reuse it too (council_fx.ts, Jose's playtest of
+// 2026-11-19): one card over the LOCAL player alone while they carry a pillar's rise spot.
 //
 // Actionable, so it draws on EVERY tier, the static preset included, and never through
 // the FPS governor; reduced motion holds the bob, pulse and shine (the arrow stays, lit full).
