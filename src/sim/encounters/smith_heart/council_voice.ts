@@ -15,7 +15,8 @@
 //   a kill     a player falls: a living member's kill line, the two in turn,
 //              at most one in SLAY_EVERY seconds (voice_slain.ts)
 //   a fall     the fallen's death line (on mythic its soul's line instead), and
-//              the first survivor's "the stone remembers"
+//              the first survivor's "the stone remembers" followed by its grief
+//              (its own line for the one it lost) as the fury wakes
 //   the end    the last to fall says its defeat line; a wipe, a survivor's
 //
 // Zero rng, no clock but the fight's: every line is ordered and once-gated.
@@ -40,6 +41,7 @@ export type CouncilMoment =
   | 'song'
   | 'death'
   | 'remember'
+  | 'grief'
   | 'soul'
   | 'wipe'
   | 'defeat';
@@ -57,6 +59,7 @@ export const COUNCIL_LINES: Readonly<Record<CouncilRole, Partial<Record<CouncilM
       slay_b: 'One less hand to steal the strength.',
       death: 'My strength... I give it to the stone.',
       remember: 'The stone remembers. What was theirs is mine.',
+      grief: 'You took her song. I will make it a dirge.',
       soul: 'I am the stone now. My wrath has no body left to fail.',
       wipe: 'Dust. As all flesh becomes.',
       defeat: "The Hammer's strength... is yours to carry.",
@@ -71,6 +74,7 @@ export const COUNCIL_LINES: Readonly<Record<CouncilRole, Partial<Record<CouncilM
       slay_b: 'Hear that? One note fewer.',
       death: 'My song... runs into the rock...',
       remember: 'The stone remembers. Listen, it still sings.',
+      grief: 'His strength is mine now. Feel the mountain sing.',
       soul: 'Listen. In the stone, my song never ends.',
       wipe: 'Hush now. The seam is still.',
       defeat: 'The last note... fades.',

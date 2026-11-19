@@ -22599,6 +22599,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_wrath': '山が我に応える！石が匿ってくれるなら隠れるがいい！',
   'hudChrome.council.say.guardian_death': '我が力を……石に託す。',
   'hudChrome.council.say.guardian_remember': '石は覚えている。あの者のものは、今や我がものだ。',
+  'hudChrome.council.say.guardian_grief':
+    'お前たちは彼女の歌を奪った。ならば我がそれを挽歌にしてやろう。',
   'hudChrome.council.say.guardian_soul': '我はもはや石そのもの。我が怒りには、朽ちる体などない。',
   'hudChrome.council.say.guardian_wipe': '塵だ。肉はすべてそうなる。',
   'hudChrome.council.say.guardian_defeat': '槌の力は……お前たちが担え。',
@@ -22606,6 +22608,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_song': '一緒に歌って、そして砕けなさい！',
   'hudChrome.council.say.singer_death': '私の歌が……岩へと流れていく……',
   'hudChrome.council.say.singer_remember': '石は覚えている。聞いて、まだ歌っている。',
+  'hudChrome.council.say.singer_grief': '彼の力は今や私のもの。山が歌うのを感じなさい。',
   'hudChrome.council.say.singer_soul': '聞いて。石の中で、私の歌は終わらない。',
   'hudChrome.council.say.singer_wipe': '静かに。鉱脈は眠ったわ。',
   'hudChrome.council.say.singer_defeat': '最後の音が……消えていく。',
@@ -25802,12 +25805,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{seconds}秒後、あなたの立つ場所に雷が落ちる：{radius}ヤード以内の全員に{min}～{max}の自然ダメージ。その場を離れること。柱から{arcReach}ヤード以内に落ちた雷は柱の周りに弧を描き、柱を嵐に帯電させる。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
   'hudChrome.auraEffect.finalBoss.bladeMark':
     '交差する刃があなたを貫く線を狙っている：線はあなたを追い、飛ぶ{lock}秒前に固定される。線を柱に通して砕き、それから線から離れること。線上の全員が{min}～{max}の冷気ダメージを受ける。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
-  'hudChrome.finalAlert.bladeTitle':
-    '交差する刃：導け',
-  'hudChrome.finalAlert.bladeLockedTitle':
-    '刃が固定：離れろ！',
-  'hudChrome.finalAlert.skyTitle':
-    '天の一撃があなたに！',
+  'hudChrome.finalAlert.bladeTitle': '交差する刃：導け',
+  'hudChrome.finalAlert.bladeLockedTitle': '刃が固定：離れろ！',
+  'hudChrome.finalAlert.skyTitle': '天の一撃があなたに！',
   'hudChrome.auraEffect.finalBoss.underIce': 'スタン中：割れた氷から落ちた。',
   'hudChrome.auraEffect.finalBoss.numbing': '正面攻撃により、{seconds}秒間移動速度が{pct}%低下。',
   'hudChrome.auraEffect.finalBoss.ember':

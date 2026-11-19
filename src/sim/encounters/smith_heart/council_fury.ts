@@ -125,8 +125,11 @@ export function stepFury(s: CouncilScope): number {
       fx: 'nova',
       ability: COUNCIL_CUES.furyWake,
     });
-    // The survivor's recorded line: what was theirs is mine.
+    // The survivor's recorded line, what was theirs is mine, then its grief
+    // for the one it lost (the client queues a raid line behind the one
+    // playing, so the two are heard in turn).
     councilSay(s, fury.survivor, 'remember');
+    councilSay(s, fury.survivor, 'grief');
   }
   if (fury.healLeft <= 0) return 0;
   fury.mendTimer -= DT;

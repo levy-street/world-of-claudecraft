@@ -88,7 +88,7 @@ describe('Hammer Council lines', () => {
         expect(t(councilLineKey(role, moment as CouncilMoment) as never)).toBe(text);
         n++;
       }
-    expect(n).toBe(23);
+    expect(n).toBe(25);
   });
 
   it('the pull: each member once, the Guardian first, a breath apart', () => {
@@ -157,6 +157,36 @@ describe('Hammer Council lines', () => {
     expect(keysOf(yells(f, land(f))).filter((k) => k?.endsWith('_remember'))).toEqual([
       'hudChrome.council.say.guardian_remember',
     ]);
+  });
+
+  it('as the fury wakes the survivor grieves its own lost twin, after the stone remembers', () => {
+    // The Guardian survives: the Singer's song is taken.
+    const g = pulled();
+    g.f.tick(20 * 6);
+    kill(g.f, 'singer');
+    const memory = (ys: Yell[]) => ys.filter((y) => /_(remember|grief)$/.test(y.textKey ?? ''));
+    const gHeard = memory(yells(g.f, land(g.f)));
+    expect(keysOf(gHeard)).toEqual([
+      'hudChrome.council.say.guardian_remember',
+      'hudChrome.council.say.guardian_grief',
+    ]);
+    const gGrief = gHeard[1];
+    expect(gGrief.text).toBe('You took her song. I will make it a dirge.');
+    expect(gGrief.from).toBe(g.f.bodies().guardian?.name);
+    expect(t('hudChrome.council.say.guardian_grief' as never)).toBe(gGrief.text);
+    // The Singer survives: the Guardian's strength is hers.
+    const s = pulled();
+    s.f.tick(20 * 6);
+    kill(s.f, 'guardian');
+    const sHeard = memory(yells(s.f, land(s.f)));
+    expect(keysOf(sHeard)).toEqual([
+      'hudChrome.council.say.singer_remember',
+      'hudChrome.council.say.singer_grief',
+    ]);
+    expect(sHeard[1].text).toBe('His strength is mine now. Feel the mountain sing.');
+    expect(t('hudChrome.council.say.singer_grief' as never)).toBe(sHeard[1].text);
+    // Said once: the fury never grieves again in the same pull.
+    expect(keysOf(yells(s.f, s.f.tick(20 * 10))).filter((k) => k?.endsWith('_grief'))).toEqual([]);
   });
 
   it('a wipe: a survivor says so, once', () => {

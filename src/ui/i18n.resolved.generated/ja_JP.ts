@@ -7332,6 +7332,7 @@ export const ja_JP: EnTranslations = {
         "guardian_slay_b": "力を盗む手が、ひとつ減った。",
         "guardian_death": "我が力を……石に託す。",
         "guardian_remember": "石は覚えている。あの者のものは、今や我がものだ。",
+        "guardian_grief": "お前たちは彼女の歌を奪った。ならば我がそれを挽歌にしてやろう。",
         "guardian_soul": "我はもはや石そのもの。我が怒りには、朽ちる体などない。",
         "guardian_wipe": "塵だ。肉はすべてそうなる。",
         "guardian_defeat": "槌の力は……お前たちが担え。",
@@ -7344,6 +7345,7 @@ export const ja_JP: EnTranslations = {
         "singer_slay_b": "聞こえた？音がひとつ減ったわ。",
         "singer_death": "私の歌が……岩へと流れていく……",
         "singer_remember": "石は覚えている。聞いて、まだ歌っている。",
+        "singer_grief": "彼の力は今や私のもの。山が歌うのを感じなさい。",
         "singer_soul": "聞いて。石の中で、私の歌は終わらない。",
         "singer_wipe": "静かに。鉱脈は眠ったわ。",
         "singer_defeat": "最後の音が……消えていく。"

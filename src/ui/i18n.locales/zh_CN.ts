@@ -23109,6 +23109,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_wrath': '群山回应了我！若岩石肯收留你们，就躲起来吧！',
   'hudChrome.council.say.guardian_death': '我的力量……交给岩石。',
   'hudChrome.council.say.guardian_remember': '岩石铭记。它们的一切，如今归我。',
+  'hudChrome.council.say.guardian_grief': '你们夺走了她的歌。我要让它化作挽歌。',
   'hudChrome.council.say.guardian_soul': '如今我即是岩石。我的怒火再无会倒下的躯体。',
   'hudChrome.council.say.guardian_wipe': '尘土。一切血肉终归如此。',
   'hudChrome.council.say.guardian_defeat': '铁锤之力……由你们来承担。',
@@ -23116,6 +23117,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_song': '与我同唱，然后碎裂吧！',
   'hudChrome.council.say.singer_death': '我的歌……流入了岩石……',
   'hudChrome.council.say.singer_remember': '岩石铭记。听，它仍在歌唱。',
+  'hudChrome.council.say.singer_grief': '他的力量如今归我。感受大山的歌唱吧。',
   'hudChrome.council.say.singer_soul': '听啊。在岩石之中，我的歌永不终结。',
   'hudChrome.council.say.singer_wipe': '嘘。矿脉已归于寂静。',
   'hudChrome.council.say.singer_defeat': '最后一个音……消散了。',
@@ -24465,12 +24467,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '{seconds}秒后闪电会劈在你所站之处：对{radius}码内的所有人造成{min}到{max}点自然伤害。快离开。落在石柱{arcReach}码内的闪电会环绕石柱形成电弧，使其被风暴充能。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.bladeMark':
     '一把交错之刃把它的直线瞄准了你：直线会跟随你，并在飞出前{lock}秒锁定。把直线引过石柱将其击碎，然后离开直线。直线上的所有人受到{min}到{max}点冰霜伤害。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。',
-  'hudChrome.finalAlert.bladeTitle':
-    '交错之刃：引导它',
-  'hudChrome.finalAlert.bladeLockedTitle':
-    '冰刃已锁定：快离开！',
-  'hudChrome.finalAlert.skyTitle':
-    '天落雷击瞄准了你！',
+  'hudChrome.finalAlert.bladeTitle': '交错之刃：引导它',
+  'hudChrome.finalAlert.bladeLockedTitle': '冰刃已锁定：快离开！',
+  'hudChrome.finalAlert.skyTitle': '天落雷击瞄准了你！',
   'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你从碎裂的冰面掉了下去。',
   'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻击减速{pct}%，持续{seconds}秒。',
   'hudChrome.auraEffect.finalBoss.ember':

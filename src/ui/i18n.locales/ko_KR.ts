@@ -22570,6 +22570,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.guardian_wrath': '산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!',
   'hudChrome.council.say.guardian_death': '나의 힘을... 돌에 맡긴다.',
   'hudChrome.council.say.guardian_remember': '돌은 기억한다. 그들의 것은 이제 나의 것이다.',
+  'hudChrome.council.say.guardian_grief':
+    '너희가 그녀의 노래를 빼앗았다. 내가 그것을 만가로 만들어 주마.',
   'hudChrome.council.say.guardian_soul': '이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.',
   'hudChrome.council.say.guardian_wipe': '먼지로다. 모든 살덩이가 그러하듯.',
   'hudChrome.council.say.guardian_defeat': '망치의 힘은... 이제 너희가 짊어져라.',
@@ -22578,6 +22580,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.council.say.singer_song': '나와 함께 노래하고, 부서지세요!',
   'hudChrome.council.say.singer_death': '나의 노래가... 바위로 흘러들어...',
   'hudChrome.council.say.singer_remember': '돌은 기억해요. 들어 봐요, 아직 노래하고 있어요.',
+  'hudChrome.council.say.singer_grief': '그의 힘은 이제 내 것이에요. 산이 노래하는 걸 느껴 봐요.',
   'hudChrome.council.say.singer_soul': '들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.',
   'hudChrome.council.say.singer_wipe': '쉿. 광맥이 잠잠해졌어요.',
   'hudChrome.council.say.singer_defeat': '마지막 음이... 사라져요.',
@@ -25806,12 +25809,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{seconds}초 후 당신이 선 자리에 번개가 떨어집니다: {radius}미터 안의 모두에게 {min}~{max}의 자연 피해. 자리를 벗어나세요. 기둥에서 {arcReach}미터 안에 떨어진 번개는 기둥 주위로 호를 그리며 기둥을 폭풍으로 충전합니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.',
   'hudChrome.auraEffect.finalBoss.bladeMark':
     '교차하는 칼날이 당신을 지나는 선을 겨눕니다: 선은 당신을 따라오다가 날아가기 {lock}초 전에 고정됩니다. 선을 기둥에 통과시켜 부순 뒤 선에서 벗어나세요. 선 위의 모두가 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.',
-  'hudChrome.finalAlert.bladeTitle':
-    '교차하는 칼날: 유도하세요',
-  'hudChrome.finalAlert.bladeLockedTitle':
-    '칼날 고정: 벗어나세요!',
-  'hudChrome.finalAlert.skyTitle':
-    '하늘의 일격이 당신에게!',
+  'hudChrome.finalAlert.bladeTitle': '교차하는 칼날: 유도하세요',
+  'hudChrome.finalAlert.bladeLockedTitle': '칼날 고정: 벗어나세요!',
+  'hudChrome.finalAlert.skyTitle': '하늘의 일격이 당신에게!',
   'hudChrome.auraEffect.finalBoss.underIce': '기절 상태: 깨지는 얼음 아래로 떨어졌습니다.',
   'hudChrome.auraEffect.finalBoss.numbing':
     '정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.',

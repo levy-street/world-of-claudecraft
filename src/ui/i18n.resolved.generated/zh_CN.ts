@@ -7332,6 +7332,7 @@ export const zh_CN: EnTranslations = {
         "guardian_slay_b": "又少了一只偷取力量的手。",
         "guardian_death": "我的力量……交给岩石。",
         "guardian_remember": "岩石铭记。它们的一切，如今归我。",
+        "guardian_grief": "你们夺走了她的歌。我要让它化作挽歌。",
         "guardian_soul": "如今我即是岩石。我的怒火再无会倒下的躯体。",
         "guardian_wipe": "尘土。一切血肉终归如此。",
         "guardian_defeat": "铁锤之力……由你们来承担。",
@@ -7344,6 +7345,7 @@ export const zh_CN: EnTranslations = {
         "singer_slay_b": "听见了吗？少了一个音符。",
         "singer_death": "我的歌……流入了岩石……",
         "singer_remember": "岩石铭记。听，它仍在歌唱。",
+        "singer_grief": "他的力量如今归我。感受大山的歌唱吧。",
         "singer_soul": "听啊。在岩石之中，我的歌永不终结。",
         "singer_wipe": "嘘。矿脉已归于寂静。",
         "singer_defeat": "最后一个音……消散了。"
