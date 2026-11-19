@@ -157,9 +157,11 @@ export const RING_PACK_DEGREES = [30, 60, 105, 125, 235, 255, 300, 330] as const
  *  at 0, the Quench's and the East Stair at 90, the Heat's and the West Stair
  *  at 270, the Balcony Stairs' feet at the arc's ends), each at that stretch's
  *  middle and out toward the rim (`r`), so a raid walking the Ring's inner
- *  side meets one per stretch and no mouth or stair is ever blocked by one. */
+ *  side meets one per stretch and no mouth or stair is ever blocked by one.
+ *  The two southern ones sit a little off their stretch's middle, clear of
+ *  the rim's standing stones (at 112.5 and 247.5). */
 export const RING_PACKS = {
-  degrees: [45, 114, 246, 315],
+  degrees: [45, 120, 240, 315],
   r: 72.5,
 } as const;
 

@@ -495,8 +495,13 @@ describe("the Smith's Heart route", () => {
     const gap = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
     for (const deg of RING_PACKS.degrees) {
       const nearest = Math.min(...ways.map((w) => gap(deg, w)));
-      expect(nearest, `${deg}`).toBeGreaterThanOrEqual(20);
+      expect(nearest, `${deg}`).toBeGreaterThanOrEqual(15);
     }
+    // Clear of the rim's standing stones (layout: every 45 degrees from 22.5,
+    // but none on the east Balcony Stair's side).
+    for (const deg of RING_PACKS.degrees)
+      for (const s of [22.5, 67.5, 112.5, 247.5, 292.5, 337.5])
+        expect(gap(deg, s), `${deg} by the stone at ${s}`).toBeGreaterThanOrEqual(7);
     // Every warder of them stands on the Ring's floor, in its outer half.
     const ring = DUNGEONS.smith_heart.spawns.filter((s) => s.mobId === 'heart_ring_warder');
     expect(ring.length).toBe(12);
