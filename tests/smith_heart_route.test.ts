@@ -46,6 +46,9 @@ import {
   inSmithHeartRoom,
   NORTH_STAIR,
   QUENCH,
+  RING,
+  RING_ARC,
+  RING_PACKS,
   RING_PORTAL,
   RING_PORTAL_LANDING,
   ringPoint,
@@ -473,13 +476,35 @@ describe("the Smith's Heart route", () => {
     expect(far.slice(0, 10)).toEqual([]);
   });
 
-  it('places the eight Ring packs two between each pair of vein mouths', () => {
+  it('places the eight Ring cairns (the old pack spots) two between each pair of vein mouths', () => {
     const between = (a: number, b: number) =>
       RING_PACK_DEGREES.filter((d) => d > a && d < b).length;
     expect(between(0, 90)).toBe(2);
     expect(between(90, 180)).toBe(2);
     expect(between(180, 270)).toBe(2);
     expect(between(270, 360)).toBe(2);
+  });
+
+  it("keeps the Ring's four packs off its ways: one per stretch, out toward the rim", () => {
+    // The team's doc of 2026-11-17: half the old eight. The Ring's ways: the
+    // Breath's mouth and the North Stair (0), the Quench's and the East Stair
+    // (90), the Heat's and the West Stair (270), the Balcony Stairs' feet at the
+    // arc's ends (RING_ARC).
+    const ways = [0, 90, 270, RING_ARC.toDeg - 360, RING_ARC.fromDeg];
+    expect(RING_PACKS.degrees.length).toBe(4);
+    const gap = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
+    for (const deg of RING_PACKS.degrees) {
+      const nearest = Math.min(...ways.map((w) => gap(deg, w)));
+      expect(nearest, `${deg}`).toBeGreaterThanOrEqual(20);
+    }
+    // Every warder of them stands on the Ring's floor, in its outer half.
+    const ring = DUNGEONS.smith_heart.spawns.filter((s) => s.mobId === 'heart_ring_warder');
+    expect(ring.length).toBe(12);
+    for (const s of ring) {
+      const r = Math.hypot(s.x - RING.x, s.z - RING.z);
+      expect(r).toBeGreaterThan(RING.R - 1);
+      expect(r).toBeLessThan(RING.outerR - 1.5);
+    }
   });
 
   it('grows every guardian arena to between 85 and 105 yd across, the Heart to 84+', () => {

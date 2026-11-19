@@ -100,6 +100,9 @@ const SPAWNS = DUNGEON.spawns;
 const FULL_READY = SMITH_HEART_SEAL_FULL | SMITH_HEART_READY_BIT;
 const BURST = FULL_READY | SMITH_HEART_PORTAL_BIT;
 const RING_PACKS = SMITH_HEART_PACKS.ring as string[];
+/** The Ring's own packs (four since the team's doc of 2026-11-17), put back
+ *  after a test that rewrote the list. */
+const RING_KEPT = [...RING_PACKS];
 
 function makeSim(seed = 17): Sim {
   return new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: WORLD, devCommands: true });
@@ -117,6 +120,9 @@ function setup(seed = 17): { sim: Sim; pid: number; inst: InstanceSlot } {
   const pid = sim.addPlayer('warrior', 'Heartwalker');
   expect(enterDungeon(sim.ctx, SMITH_HEART_DUNGEON, pid)).toBe(true);
   const [inst] = claimsOf(sim);
+  // The Ring cleared: this file asks about the veins and the crystal (the
+  // Ring's half of the rule is its own test below).
+  killRing(sim, inst);
   sim.tick();
   return { sim, pid, inst };
 }
@@ -140,6 +146,16 @@ function kill(sim: Sim, inst: InstanceSlot, ids: readonly string[]): void {
     mob.aiState = 'dead';
     mob.inCombat = false;
   });
+}
+
+/** Kill the Ring's packs (this file's setup clears the Ring). */
+function killRing(sim: Sim, inst: InstanceSlot): void {
+  kill(sim, inst, RING_KEPT);
+}
+
+/** Stand Ring packs back up (their own test). */
+function reviveRing(sim: Sim, inst: InstanceSlot, ids: readonly string[]): void {
+  revive(sim, inst, ids);
 }
 
 /** Stand the listed bodies back up (a fight that begins again). */
@@ -214,7 +230,7 @@ function opened(events: SimEvent[], pid: number): number {
 }
 
 afterEach(() => {
-  RING_PACKS.length = 0;
+  RING_PACKS.splice(0, RING_PACKS.length, ...RING_KEPT);
   clearDungeonGateStateForTest();
   clearCombatWallStateForTest();
 });
@@ -331,17 +347,17 @@ describe('READY derives from four veins and a clear Ring, and only then', () => 
   });
 
   it('a Ring with a pack still alive keeps the crystal dark, a clear one charges it', () => {
-    // The Ring holds no packs since the team's review of 2026-11-17: put one of
-    // the Hammer's packs on its list to drive the Ring half of the rule.
-    RING_PACKS.push('h1');
+    // The Ring's four packs (the team's doc of 2026-11-17): one stands again.
+    expect(RING_PACKS.length).toBe(4);
     const { sim, inst } = setup();
+    reviveRing(sim, inst, ['r1']);
     winVeins(sim, inst, SMITH_HEART_VEINS);
     const p = smithHeartProgress(sim.ctx, inst);
     expect(p.sealLit).toBe(true);
     expect(p.ringClear).toBe(false);
     expect(p.ready).toBe(false);
     expect(allAt(sim, inst, SMITH_HEART_SEAL_FULL)).toBe(true);
-    kill(sim, inst, ['h1']);
+    kill(sim, inst, ['r1']);
     sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).ringClear).toBe(true);
     expect(smithHeartProgress(sim.ctx, inst).ready).toBe(true);

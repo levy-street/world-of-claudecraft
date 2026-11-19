@@ -219,13 +219,16 @@ than the veins' rock, and no line of sight crosses from any main-map eye into th
 2. **The Slab** breaks when the whole Hammer Council has fallen; the Slab Stair climbs to **the
    Balcony**, the first view: the Grand Stair falling to the seal on its dais, the Ring
    round it, the three vein mouths.
-3. **The Ring** (eight packs) by the two Balcony Stairs; then in ANY order the
+3. **The Ring** (four packs, half the old eight since the team's doc of 2026-11-17:
+   one in each stretch between its ways, out toward the rim, `RING_PACKS`) by the two
+   Balcony Stairs; then in ANY order the
    **Breath** (to the Storm Cornice), the **Quench** (to the Quench Basin) and the
    **Heat** (to the Hearth), each behind its own three packs.
 4. Each guardian's death lights its vein's **light river**; the river runs to the seal
    and its quarter fills. With all four lit and the Ring clear, the **heart seal
-   crystal** is charged (the Ring holds no packs since 2026-11-17, so the four veins
-   alone charge it).
+   crystal** is charged (the four Ring packs, r1 to r4, must be down too; only the
+   four guardians' deaths light the veins, pinned by
+   `tests/smith_heart_seal_four_bosses.test.ts`).
 5. Down the Grand Stair (or the North, East or West Stair, from the Ring) to the dais:
    the first tick a living player stands on it (the middle circle, the dais's own
    radius) the charged crystal **bursts into the portal**; there is nothing to press
@@ -489,7 +492,7 @@ a burst crystal never stands again.
 | `mask` | lit-vein mask |
 | `slabOpen` | Hammer bit lit: the Slab is split, the Ring and the three veins open |
 | `sealLit` | mask is full: all four colours burn |
-| `ringClear` | packs r1 to r8 are dead (the Ring holds none since 2026-11-17, so this is always true today) |
+| `ringClear` | packs r1 to r4 are dead (the Ring's four since the team's doc of 2026-11-17: at 45, 114, 246 and 315 degrees, 72.5 yd out, the middle of each stretch between the mouths, the stairs and the Balcony Stairs' feet) |
 | `ready` | `sealLit` and `ringClear`: the heart seal crystal is charged (the markers' `SMITH_HEART_READY_BIT`, 128) and a living player stepping onto the dais bursts it |
 | `portalOpen` | the crystal has burst: the markers' kept `SMITH_HEART_PORTAL_BIT` (16), read off the claim's markers so every consumer sees the sticky value (the death checkpoints' Heart point included); set only by the burst (a living player on the dais while charged) or by `/dev heart portal` (a forced burst), never by `sealLit` and `ringClear` alone |
 
