@@ -56,7 +56,7 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 4 | `heart_mountains_rush_mark` | Mountain's Rush | The Guardian charges through where you stand | A stone giant's shoulder charging down a glowing red lane, rubble flying |
 | 5 | `heart_resonance` | Resonance | You ring every second, hurting allies near you | A ringing amber crystal sending gold sound rings outward |
 | 6 | `heart_quarry_collapse` | Quarry Collapse (Mythic) | Stacking raid-wide blows until the Cursed Pillar breaks | A cavern ceiling breaking apart, slabs falling in layers |
-| 7 | `heart_breath_anchor` | Anchored in Calm (buff) | Thessaly's calm: no wind can move you | A planted boot in a still mint circle, the wind curving round it |
+| 7 | `heart_breath_anchor`, `heart_breath_stone_charge` | Anchored in Calm (buff) | Thessaly's calm: no wind can move you | A planted boot in a still mint circle, the wind curving round it |
 | 8 | `heart_breath_calm_spent` | Calm Spent | You cannot be anchored again for a while | The mint ward circle cracked and guttering, wind breaking through |
 | 9 | `heart_breath_pinned` | Pressed to the Rim | Pinned against the rim's wall by the wind | A figure pinned flat against a cliff wall by howling wind |
 | 10 | `heart_breath_drawn_lightning`, `heart_final_drawn` | Drawn Lightning | Lightning strikes follow you / arcs to allies | A cyan lightning bolt drawn down into a raised gauntlet |
@@ -65,11 +65,11 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 13 | `heart_breath_portal_a`, `_b`, `_c`, `_d` | Portal A to D | A portal opens where you stand | A swirling teal wind portal opening on stone |
 | 14 | `heart_breath_laden` | Gale-Laden | You carry the Knotted Gale; throw it into the void | Gauntlets straining to hold a heavy knot of storm wind |
 | 15 | `heart_breath_roar_thrown`, `heart_breath_gale_tossed`, `heart_breath_blow_thrown` | Thrown, Tossed | Flung by the wind; you cannot move until set down | A figure tumbling through the air in a violent gust |
-| 16 | `heart_breath_wind_battered` | Wind-Battered | Tank stacks: each Bellows Blow throws you further | A dented shield hammered by blasts of wind |
+| 16 | `heart_breath_wind_battered`, `heart_breath_squall_ward` | Wind-Battered | Tank stacks: each Bellows Blow throws you further | A dented shield hammered by blasts of wind |
 | 17 | `heart_breath_thunder_laden` | Thunder-Laden | Tank stacks: more magic damage, bolts leap to you | A chestplate crackling with cyan lightning |
 | 18 | `heart_breath_blow_mark` | Bellows Blow | The Guardian's blow throws you off the Cornice | A great stone maw blasting a cone of wind straight out |
 | 19 | `heart_breath_riding_gale` | Riding the Gale | Carried over the void to a floating isle | A figure riding a ribbon of wind over a void toward a floating isle |
-| 20 | `heart_breath_windworn` | Windworn (Mythic) | No Gale Path will carry you for a while | A tattered cloak shredded and frayed by the wind |
+| 20 | `heart_breath_windworn` (retired) | Windworn (Mythic) | No Gale Path will carry you for a while | A tattered cloak shredded and frayed by the wind |
 | 21 | `wind_drift` | Bellows Wind | The wind carries you the way it blows | Sand and wind streaks sweeping hard in one direction over slate |
 | 22 | `wind_draw` | Indrawn Breath | The guardian pulls you toward its maw | Wind streaks spiralling inward into a dark vortex mouth |
 | 23 | `wind_blast` | Summit Roar | The roar's blast drives you away | A shockwave of wind exploding out of a roaring maw |
@@ -107,8 +107,8 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 50 | `heart_rush_shattered`, `heart_rush_exposed` | Shattered Charge | A stone giant reeling from a shattered crimson-magenta pillar |
 | 51 | `heart_council_intro`, `heart_breath_intro`, `heart_quench_intro`, `heart_heat_intro`, `mob_dormant` | Dormant | A stone giant asleep in a spur of rock, a faint light inside |
 | 52 | `heart_breath_storm_unbound` | Storm Unbound | A body of lightning tearing free of its stone |
-| 53 | `heart_breath_swelling_storm` | Swelling Storm | A storm cloud swelling, rings of pressure, lightning |
-| 54 | `heart_breath_gale_bulwark`, `heart_breath_bulwark_hold` | Gale Bulwark | A vortex shield of wind and stone |
+| 53 | `heart_breath_swelling_storm`, `heart_breath_gale_cocoon`, `heart_breath_cocoon_hold` | Swelling Storm | A storm cloud swelling, rings of pressure, lightning |
+| 54 | `heart_breath_gale_bulwark`, `heart_breath_bulwark_hold` (retired) | Gale Bulwark | A vortex shield of wind and stone |
 | 55 | `heart_quench_blades_awake` | The Blades Awake | Four great ice swords rising out of a frozen lake |
 | 56 | `heart_quench_deepening` | Deepening Cold | Icicles growing over a deepening blue frost |
 | 57 | `heart_heat_state` | The First Flame | A white-gold flame burning in a basalt heart |
@@ -124,3 +124,19 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 
 Not painted: `heart_endless_song` (rides a pillar object, never on a frame) and
 `stackpoison_heart_heat_guardian` (already painted, `mob_stack_poison`).
+
+## Amended after the Breath's isle rework
+
+The Guardian of the Breath's isles became a phase at half health
+(`src/sim/encounters/smith_heart/breath_isles.ts`), which removed the Gale Bulwark, its
+hold and Windworn. Their two paintings (rows 20 and 54) left the shipping set with their
+mapping and manifest rows, so 70 paintings ship. The phase's four new unit auras share
+paintings already in the set, which brings the shared aliases to 21 and the ids covered
+to 91:
+
+- `heart_breath_gale_cocoon` and `heart_breath_cocoon_hold` (the guardian, untouchable
+  while Skyrend Nova gathers, held where it began) wear Swelling Storm (row 53).
+- `heart_breath_squall_ward` (the Squall Shieldbearer's frontal ward) wears Wind-Battered
+  (row 16), the shield in the wind.
+- `heart_breath_stone_charge` (a Stillstone's shared Still the Gale channel) wears Anchored
+  in Calm (row 7), Thessaly's calm stilling the wind.
