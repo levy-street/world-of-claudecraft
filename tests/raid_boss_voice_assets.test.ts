@@ -10,6 +10,7 @@ import { VOICE_LINES } from '../src/game/voice_manifest.generated';
 import { IGNIVAR_DIALOGUE_LINES } from '../src/sim/encounters/ignivar_dialogue';
 import {
   SMITH_HEART_VOICE_LINES,
+  SMITH_HEART_VOICE_PENDING,
   SMITH_HEART_VOICES,
 } from '../src/sim/encounters/smith_heart/voice_lines';
 import { VARKHUL_DIALOGUE_LINES } from '../src/sim/encounters/varkhul_dialogue';
@@ -33,12 +34,16 @@ const voiceFiles = execFileSync(
   .sort();
 
 /** The Smith's Heart's own raid voices (Thessaly's folder holds her other
- *  lines too: her raid lines are held by tests/smith_heart_voice.test.ts). */
+ *  lines too: her raid lines are held by tests/smith_heart_voice.test.ts).
+ *  Lines still waiting on a voice pass (SMITH_HEART_VOICE_PENDING) carry no
+ *  clip yet, so the pack is held to every other line. */
 const HEART_PACKS = Object.values(SMITH_HEART_VOICES)
   .filter((voice) => voice !== SMITH_HEART_VOICES.thessaly)
   .map((boss) => ({
     boss,
-    lines: SMITH_HEART_VOICE_LINES.filter((l) => l.voiceNpc === boss).map((l) => l.text),
+    lines: SMITH_HEART_VOICE_LINES.filter(
+      (l) => l.voiceNpc === boss && !SMITH_HEART_VOICE_PENDING.has(l.id),
+    ).map((l) => l.text),
   }));
 
 const PACKS: readonly { boss: string; lines: readonly string[] }[] = [
