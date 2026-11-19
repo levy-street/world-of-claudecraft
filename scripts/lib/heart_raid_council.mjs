@@ -691,6 +691,8 @@ function trackState(world, st) {
   }
   if (!(alive(singer) && singer.cast === CAST.wake)) st.wakeKickLogged = false;
   // Who holds each member (a change logged).
+  const g = world.mobs.guardian;
+  const s = world.mobs.singer;
   for (const r of ROLES) {
     const m = world.mobs[r];
     const on = alive(m) && m.aggro != null ? (world.players.get(m.aggro)?.name ?? '?') : null;
