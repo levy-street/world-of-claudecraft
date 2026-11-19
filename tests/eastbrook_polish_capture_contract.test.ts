@@ -746,7 +746,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
   // Re-minted for the Smith's Heart raid's lava-wave lights, articulated bosses and
   // hidden-until-posed sleeping bosses (renderer.ts). No capture was retaken.
-  'a550bd93d90ea658e322b2b1dc2618a2b753976c90658bcc1dd08288b134345e';
+  // Re-minted for the Smith's Heart raid's light crossfade between its rooms
+  // (renderer.ts). No capture was retaken.
+  '1f64aea8f3d65795831c78f989f7af57c43f103fd269d2cf7f1af4124da232e8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
