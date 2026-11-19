@@ -17,7 +17,11 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph';
 import { FinalKitFx } from '../src/render/smith_heart_fx';
-import { anvilHang } from '../src/render/smith_heart_fx/final_anvil_core';
+import {
+  anvilFollowsLocal,
+  anvilHang,
+  easeToward,
+} from '../src/render/smith_heart_fx/final_anvil_core';
 import {
   FINAL_FOOTPRINTS,
   FINAL_FX_PARTICLE_RUNGS,
@@ -605,6 +609,67 @@ describe('the Breath Dust Devil: the fire tornado in wind (playtest 2026-11-19)'
     (world as { entityRosterVersion: number }).entityRosterVersion = 2;
     for (let i = 0; i < 3; i++) fx.update(1 / 30);
     expect(visibleNamed(root, 'smithHeartFinalDevil')).toBe(0);
+    fx.dispose();
+  });
+});
+
+describe('Weight of the Anvil follows my drawn pose (playtest 2026-11-19)', () => {
+  it('draws my Anvil at me while it follows, the server spot once it plants or for others', () => {
+    expect(anvilFollowsLocal(true, 3, T.anvilLock)).toBe(true);
+    expect(anvilFollowsLocal(true, T.anvilLock - 0.1, T.anvilLock)).toBe(false);
+    expect(anvilFollowsLocal(false, 3, T.anvilLock)).toBe(false);
+    expect(easeToward(0, 14)).toBe(0);
+    expect(easeToward(10, 14)).toBeCloseTo(1, 6);
+    const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
+    const at = (dx: number, dz: number) => ({
+      x: o.x + HEART_ROOM.x + dx,
+      z: o.z + HEART_ROOM.z + dz,
+    });
+    const entities = new Map<number, Entity>();
+    const p = at(10, -20);
+    const mark = {
+      id: FINAL_AURAS.anvilMark,
+      name: 'x',
+      kind: 'internal_cd',
+      remaining: 5,
+      duration: T.anvilCast,
+      value: 0,
+      sourceId: 2,
+    } as Entity['auras'][number];
+    const me = entity(1, 'player', 'warrior', p.x, p.z, { auras: [mark] });
+    entities.set(me.id, me);
+    // The server's circle a step behind me.
+    const late = at(7, -20);
+    entities.set(
+      50,
+      entity(50, 'object', finalTimed(FINAL_OBJECTS.anvilPrefix, T.anvilCast), late.x, late.z, {
+        scale: T.anvilR,
+      }),
+    );
+    const world = {
+      entities,
+      player: me,
+      playerId: me.id,
+      entityRosterVersion: 1,
+    } as unknown as IWorld;
+    const scene = new THREE.Scene();
+    const fx = new FinalKitFx(scene, () => 0, world);
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    const root = scene.getObjectByName('smith-heart-final-kit-fx');
+    let anvil: THREE.Object3D | null = null;
+    root?.traverse((c) => {
+      if (c.name === 'smithHeartFinalAnvil' && c.visible) anvil = c;
+    });
+    const a = anvil as THREE.Object3D | null;
+    expect(a).not.toBeNull();
+    const w = new THREE.Vector3();
+    a?.getWorldPosition(w);
+    expect(Math.hypot(w.x - me.pos.x, w.z - me.pos.z)).toBeLessThan(0.05);
+    // Not mine: the server's spot.
+    me.auras.length = 0;
+    for (let i = 0; i < 40; i++) fx.update(1 / 30);
+    a?.getWorldPosition(w);
+    expect(Math.hypot(w.x - late.x, w.z - late.z)).toBeLessThan(0.05);
     fx.dispose();
   });
 });

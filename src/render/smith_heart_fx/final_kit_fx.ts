@@ -68,7 +68,7 @@ import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { CouncilRushArrow } from './council_rush_arrow';
-import { anvilUnder } from './final_anvil_core';
+import { anvilFollowsLocal, anvilUnder, easeToward } from './final_anvil_core';
 import { FinalAnvilFx } from './final_anvil_fx';
 import { finalArrowMark } from './final_arrow_core';
 import {
@@ -231,6 +231,8 @@ export class FinalKitFx {
    *  (final_arrow_core.ts: the Anvil, the blade, the strike, the embers, the
    *  lightning, the coal, the tether), drawn for them alone. */
   private readonly arrow: CouncilRushArrow;
+  /** Weight of the Anvil's drawn spot (the local follow, its hand-back). */
+  private readonly anvilDraw = { id: -1, x: 0, z: 0, local: false, clock: 0 };
 
   constructor(
     scene: THREE.Scene,
@@ -1137,11 +1139,19 @@ export class FinalKitFx {
         case 'anvil': {
           const boss = this.bossId >= 0 ? world.entities.get(this.bossId) : undefined;
           const total = finalObjectSeconds(e.templateId) || T.anvilCast;
+          // My own Anvil (the playtest of 2026-11-19, the Crossing Blade's
+          // rule): while it follows me it is drawn at my DRAWN pose, the
+          // server's circle a round trip late; once it plants it eases onto
+          // the server's spot.
+          const spot = this.anvilSpot(world, id, x, z, total - age);
+          const ax = spot.x;
+          const az = spot.z;
+          const ay = this.groundY(ax, az);
           const fill =
             boss && boss.castingAbility === FINAL_CASTS.anvil
               ? telegraphFillOf(boss.castRemaining, boss.castTotal > 0 ? boss.castTotal : total)
               : timedFill(age, total);
-          this.foot(id, 'anvil', FINAL_FOOTPRINTS.anvil, x, z, r, fill, true);
+          this.foot(id, 'anvil', FINAL_FOOTPRINTS.anvil, ax, az, r, fill, true);
           // How many stand under it (its runes say whether that is a full share).
           const pts = this.underPts;
           pts.length = 0;
@@ -1156,7 +1166,7 @@ export class FinalKitFx {
             slot.dead = p.dead;
             pts.push(slot);
           }
-          this.anvilFx.hang(id, x, y, z, fill, anvilUnder(pts, x, z, r), r);
+          this.anvilFx.hang(id, ax, ay, az, fill, anvilUnder(pts, ax, az, r), r);
           break;
         }
         // ---- the woken stars ----
@@ -1310,6 +1320,46 @@ export class FinalKitFx {
     this.stars.localBlade(aiming && me ? fxAnchor(me) : null, this.originX, this.originZ);
     for (let i = ice; i < this.ice.length; i++) this.ice[i].visible = false;
     for (let i = shell; i < this.shells.length; i++) this.shells[i].visible = false;
+  }
+
+  /** Where Weight of the Anvil `id` is drawn this frame: at the local
+   *  player's drawn pose while it follows them (they wear its mark and more
+   *  than `anvilLock` of its bar is left), eased onto the server's spot
+   *  (x, z) once it plants or for anyone else's. */
+  private anvilSpot(
+    world: IWorld,
+    id: number,
+    x: number,
+    z: number,
+    left: number,
+  ): { x: number; z: number } {
+    const me = world.entities.get(world.playerId);
+    let mine = false;
+    if (me && !me.dead) for (const a of me.auras) if (a.id === FINAL_AURAS.anvilMark) mine = true;
+    const d = this.anvilDraw;
+    const dt = Math.max(0, this.clock - d.clock);
+    d.clock = this.clock;
+    if (d.id !== id) {
+      d.id = id;
+      d.x = x;
+      d.z = z;
+      d.local = false;
+    }
+    if (me && anvilFollowsLocal(mine, left, T.anvilLock)) {
+      const at = fxAnchor(me);
+      d.x = at.x;
+      d.z = at.z;
+      d.local = true;
+    } else if (d.local) {
+      const k = easeToward(dt, 14);
+      d.x += (x - d.x) * k;
+      d.z += (z - d.z) * k;
+      if (Math.hypot(x - d.x, z - d.z) < 0.02) d.local = false;
+    } else {
+      d.x = x;
+      d.z = z;
+    }
+    return d;
   }
 
   /** The boss: Leaping Bolt's target ring, Heart Unbound's blaze. */
