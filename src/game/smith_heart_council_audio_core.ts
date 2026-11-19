@@ -75,12 +75,11 @@ export const COUNCIL_CUE_SOUNDS: Readonly<Record<string, CouncilSound>> = {
   [COUNCIL_CUES.rushWindup]: S('rush_windup', 1, 'point', 1, 0.3),
   [COUNCIL_CUES.rushImpact]: S('rush_impact', 1, 'point', 1, 0.3),
   // The cursed pillar: the rise's burst, a low dark hum, a soul pillar's
-  // burst as it breaks; the bond's pulse and Resonance's ring, the song's
+  // burst as it breaks; Resonance's ring, the song's
   // hum kept low; the mythic collapse, the rock's impact cooled down.
   [COUNCIL_CUES.cursedRise]: S('pillar_rise', 0.95, 'source', 0.85),
   [COUNCIL_CUES.cursedPulse]: S('pillar_pulse', 0.4, 'source', 0.75, 1.2),
   [COUNCIL_CUES.cursedBreak]: S('soul_burst', 1, 'point', 0.9),
-  [COUNCIL_CUES.bondPulse]: S('bond_pulse', 0.6, 'source', 1, 1),
   [COUNCIL_CUES.resonancePulse]: S('resonance', 0.5, 'source', 1, 0.6),
   [COUNCIL_CUES.quarryCollapse]: S('rock_impact', 0.45, 'point', 1.1, 0.5),
   // The song's pulse grows: songPulseSound below sets its gain and rate.

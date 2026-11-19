@@ -106,19 +106,6 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
       };
     case COUNCIL_AURAS.rushExposed:
       return { key: `${KEY}.rushExposed`, nums: { pct: pct(a.value) } };
-    case COUNCIL_AURAS.bond:
-      return {
-        key: `${KEY}.bond`,
-        nums: {
-          pct: pct(T.bondWard),
-          reach: T.bondReach,
-          every: T.bondPulseEvery,
-          min: tierValue(T.bondPulseMin, NM),
-          max: tierValue(T.bondPulseMax, NM),
-          ...tierRange('heroic', T.bondPulseMin, T.bondPulseMax, HM),
-          growth: pct(T.bondPulseGrowth),
-        },
-      };
     case COUNCIL_AURAS.collapse:
       return {
         key: `${KEY}.collapse`,

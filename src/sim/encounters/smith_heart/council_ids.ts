@@ -154,10 +154,6 @@ export const COUNCIL_AURAS = {
   /** Heroic and Mythic: on the Wrath's caster through its bar: value2 = how
    *  many players one pillar can shield (what the client's runes read). */
   pillarLimit: 'heart_narrow_shelter',
-  /** Bond of the Stone: on both members while they stand within reach of
-   *  each other, far less damage taken (stacks = the raid pulses it has
-   *  sung, value2 = the next pulse's multiplier in tenths). */
-  bond: 'heart_bond_of_the_stone',
   /** Mountain's Rush broke the cursed pillar: the Guardian reels (a stun)
    *  and takes more damage for a while. */
   rushStunned: 'heart_rush_shattered',
@@ -267,8 +263,6 @@ export const COUNCIL_CUES = {
   cursedRise: 'heart_cursed_pillar_rise',
   cursedPulse: 'heart_cursed_pillar_pulse',
   cursedBreak: 'heart_cursed_pillar_break',
-  /** Bond of the Stone pulses (spellfx 'beam' from one member to the other). */
-  bondPulse: 'heart_bond_of_the_stone_pulse',
   /** Resonance rings on its player (spellfx 'nova' on them). */
   resonancePulse: 'heart_resonance_pulse',
   /** Mythic: the Quarry's ceiling sheds a blow (spellfxAt 'burst' on each
@@ -287,7 +281,6 @@ export const COUNCIL_NAMES = {
   rush: "Mountain's Rush",
   cursed: 'Cursed Pillar',
   rushStunned: 'Shattered Charge',
-  bond: 'Bond of the Stone',
   collapse: 'Quarry Collapse',
   bolt: 'Seam Bolt',
   song: 'Song of the Seam',
@@ -584,16 +577,6 @@ export const COUNCIL_TUNING = {
   /** Normal: a Wake's marks or a Rush must be over this long before the
    *  Wrath's bar begins (floorAvoidsWrath). */
   wrathGuardPad: 2,
-  // Bond of the Stone: within this of each other (body to body) both take
-  // this much less, and every few seconds a raid-wide pulse that grows each
-  // time while they stay together (capped); a raid warning at most this often.
-  bondReach: 20,
-  bondWard: 0.8,
-  bondPulseEvery: 3,
-  bondPulseMin: 40,
-  bondPulseMax: 48,
-  bondPulseGrowth: 0.25,
-  bondPulseCap: 6,
   // Wake the Stone (the Seam Singer's, kickable: a kick raises nothing).
   wakeFirst: 20,
   wakeEvery: 30,
@@ -793,14 +776,6 @@ export const COUNCIL_SOUL_TEMPLATES: readonly string[] = COUNCIL_ROLES.flatMap((
     ),
   ),
 );
-
-/** Bond of the Stone's multiplier on its `pulse`-th pulse (0 the first). */
-export function bondPulseMult(pulse: number): number {
-  return Math.min(
-    COUNCIL_TUNING.bondPulseCap,
-    1 + COUNCIL_TUNING.bondPulseGrowth * Math.max(0, pulse),
-  );
-}
 
 /** The Endless Song's multiplier on its `pulse`-th pulse (0 the first). */
 export function endlessSongMult(pulse: number): number {

@@ -12789,7 +12789,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.combustionCrit'
   | 'hudChrome.auraEffect.cooldownCap'
   | 'hudChrome.auraEffect.costTax'
-  | 'hudChrome.auraEffect.council.bond'
   | 'hudChrome.auraEffect.council.collapse'
   | 'hudChrome.auraEffect.council.fury'
   | 'hudChrome.auraEffect.council.intro'

@@ -1625,7 +1625,6 @@ const baseEnTable = {
   // Grieving Fury: the council's survivor (encounters/smith_heart/council_fury.ts).
   'aura.heartGrievingFury': 'Grieving Fury',
   'aura.heartNarrowShelter': 'Narrow Shelter',
-  'aura.heartBondOfTheStone': 'Bond of the Stone',
   'aura.heartShatteredCharge': 'Shattered Charge',
   // The Hammer Vein Warder's ward while it lies dormant and stands up (mob/dormant.ts).
   'aura.heartDormant': 'Dormant',
@@ -27194,7 +27193,6 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Memory of Stone': 'aura.heartMemoryOfStone',
   'Grieving Fury': 'aura.heartGrievingFury',
   'Narrow Shelter': 'aura.heartNarrowShelter',
-  'Bond of the Stone': 'aura.heartBondOfTheStone',
   'Shattered Charge': 'aura.heartShatteredCharge',
   Dormant: 'aura.heartDormant',
   'Bellows Wind': 'aura.heartBellowsWind',

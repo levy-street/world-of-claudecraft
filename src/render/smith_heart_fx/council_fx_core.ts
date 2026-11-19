@@ -71,8 +71,6 @@ export const COUNCIL_FX_COLORS = {
   resonance: 0xf0c070,
   /** Mountain's Rush: the mark and the lane the charge tears through. */
   rush: TELEGRAPH_THREAT_COLORS.lethal,
-  /** Bond of the Stone: the bright gold thread between the two members. */
-  bond: 0xffd25a,
   /** Hammer's Weight: the tank's mark, lethal if not swapped. */
   weight: TELEGRAPH_THREAT_COLORS.lethal,
   /** The pips: lit and spent. */
@@ -481,7 +479,6 @@ export function councilClaims(ability: string | undefined): boolean {
     ability === COUNCIL_CUES.cursedRise ||
     ability === COUNCIL_CUES.cursedPulse ||
     ability === COUNCIL_CUES.cursedBreak ||
-    ability === COUNCIL_CUES.bondPulse ||
     ability === COUNCIL_CUES.resonancePulse ||
     ability === COUNCIL_CUES.quarryCollapse ||
     ability === COUNCIL_CASTS.bolt ||

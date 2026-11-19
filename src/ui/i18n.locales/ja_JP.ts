@@ -22621,8 +22621,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '効果が切れると、槌の守護者は{windup}秒間身構えてから、あなたが立っていた場所を通り抜けて採石場の端まで一直線に突進する。行く手に柱があれば、最初の柱で止まる。呪われた柱へ誘導しよう：柱が砕け、守護者は{stun}秒間スタンし、{exposedSeconds}秒間受けるダメージが{exposed}%増加する。途中に遮蔽用の柱があれば、代わりにその柱が壊される。止まるまでに突進がぶつかった全員が{min}から{max}のダメージを受けて吹き飛ばされる。まだ進路上にいればあなたも同じだ。ミシック：柱に当たらなかった突進は、呪われた柱が砕けるまで採石場の崩落を引き起こす。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
   'hudChrome.auraEffect.council.rushExposed':
     '受けるダメージが{pct}%増加：山の突進が呪われた柱を砕いた。',
-  'hudChrome.auraEffect.council.bond':
-    '槌の評議会のもう一人が{reach}ヤード以内にいる間、受けるダメージが{pct}%減少。{every}秒ごとに石の絆がレイド全体に{min}から{max}のダメージを与え、そのたびに{growth}%増加する。二人を引き離そう。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。',
   'hudChrome.auraEffect.council.collapse':
     '採石場が崩落している：{every}秒ごとにスタック1つにつき{min}から{max}のダメージを受け、そのたびにスタックが1つ増える。呪われた柱が砕けると終わる。',
   'hudChrome.auraEffect.council.pillarLimit':

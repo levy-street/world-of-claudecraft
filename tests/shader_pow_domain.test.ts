@@ -315,7 +315,6 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/smith_heart_fx/breath_isle_phase_glsl.ts': 7,
   'src/render/smith_heart_fx/breath_isles_glsl.ts': 1,
   'src/render/smith_heart_fx/breath_telegraph_glsl.ts': 1,
-  'src/render/smith_heart_fx/council_bond_fx.ts': 5,
   'src/render/smith_heart_fx/council_death_glsl.ts': 1,
   'src/render/smith_heart_fx/council_pillars_fx.ts': 1,
   'src/render/smith_heart_fx/council_shelter_fx.ts': 1,

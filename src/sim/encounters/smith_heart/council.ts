@@ -54,7 +54,6 @@ import { addThreat, clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { regrowHead } from '../drowned_temple/hydra_regrowth';
 import { claimBoss, dropAuraById } from '../sunken_bastion/claim';
-import { clearBond, stepBond } from './council_bond';
 import { carryWrathHold, startFloorMechanics } from './council_floor';
 import { beginFury, clearFury, stepFury } from './council_fury';
 import {
@@ -216,7 +215,6 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     rush: null,
     cursed: null,
     collapse: null,
-    bond: { pulses: 0, timer: T.bondPulseEvery },
     wakeTimer: T.wakeFirst,
     rockTimer: T.rockFirst,
     boltTimer: T.boltFirst,
@@ -276,8 +274,6 @@ function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
   // The Rush dies with the Guardian; his energy waits for the Singer where he
   // left it (she takes it up when his soul reaches her).
   if (role === 'guardian') clearRush(s);
-  // No bond with the fallen: the survivor's ward lifts now.
-  clearBond(s);
   if (survivor) beginFury(s, role, dead);
   // Mythic: its soul takes the most intact pillar (council_soul.ts).
   const soul = survivor && s.rules.soulInTheStone ? takeSoul(s, role, dead) !== null : false;
@@ -442,7 +438,6 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     clearStone(s);
     clearSong(s);
     clearRush(s);
-    clearBond(s);
     clearFury(s);
     clearRubble(ctx, inst, st);
     // The tank keeps no Weight past the fight.
@@ -488,7 +483,6 @@ function finishCouncil(
   clearStone(s);
   clearSong(s);
   clearRush(s);
-  clearBond(s);
   clearRubble(ctx, inst, st);
   clearBars(bodies);
   dropClaimWeight(ctx, inst);
@@ -590,7 +584,6 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   if (rush === 'cursed') countFeat(st);
   else if (rush) breakFeat(st);
   stepCursed(s);
-  stepBond(s);
   fillEnergy(s);
   syncEnergyBars(s);
   stepRises(s);

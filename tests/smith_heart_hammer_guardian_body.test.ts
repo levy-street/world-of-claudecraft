@@ -12,7 +12,7 @@ import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { dungeonCharacterBodyUrls } from '../src/render/characters/rift_body_stream_core';
 import { CONTACT_HOLD_MAX_SEC } from '../src/render/contact_queue';
 import { councilBodyKindOf } from '../src/render/smith_heart_fx/council_bodies_core';
-import { BOND_BODY } from '../src/render/smith_heart_fx/council_mechanic_look_core';
+import { MEMBER_BODY } from '../src/render/smith_heart_fx/council_mechanic_look_core';
 import { MOBS } from '../src/sim/data';
 import { COUNCIL_CASTS, COUNCIL_TUNING } from '../src/sim/encounters/smith_heart/council_ids';
 import type { Entity } from '../src/sim/types';
@@ -64,7 +64,7 @@ describe('the Guardian of the Hammer body', () => {
   });
 
   it('stands at the height the bond, its sigil and the click are anchored to', () => {
-    expect(def.height * mob.scale).toBeCloseTo(BOND_BODY.guardian.height);
+    expect(def.height * mob.scale).toBeCloseTo(MEMBER_BODY.guardian.height);
   });
 
   it('ships every clip its ClipMap names', () => {

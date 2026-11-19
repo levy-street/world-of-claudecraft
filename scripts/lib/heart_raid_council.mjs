@@ -4,8 +4,8 @@
 // Mountain's Wrath (and the Mythic Echo) behind the pillars with Narrow
 // Shelter's limit, Wake the Stone's marks carried to a spot, the Falling Rock
 // shared by three or four, the Resonance spread, Mountain's Rush led through
-// the cursed pillar and its lane left clear, Bond of the Stone broken by the
-// off-tank dragging the Singer away, the kicks on Seam Bolt and the Song,
+// the cursed pillar and its lane left clear, the Singer held apart by the
+// off-tank (her Resonance and Wakes away from the Wrath's cover), the kicks on Seam Bolt and the Song,
 // and on Wake the Stone the cover choice (every risen pillar rings Stone
 // Thrum on the raid: after the pull and after each Wrath the first Wake
 // goes through and the rest are kicked while the standing cover still
@@ -131,7 +131,6 @@ const AURA = {
   rock: 'heart_falling_rock_mark',
   rush: 'heart_mountains_rush_mark',
   resonance: 'heart_resonance',
-  bond: 'heart_bond_of_the_stone',
   stunned: 'heart_rush_shattered',
 };
 const NAMES = {
@@ -141,7 +140,6 @@ const NAMES = {
   tremor: 'Rockfall Tremor',
   rush: "Mountain's Rush",
   cursed: 'Cursed Pillar',
-  bond: 'Bond of the Stone',
   collapse: 'Quarry Collapse',
   resonance: 'Resonance',
 };
@@ -175,7 +173,8 @@ function keeperHit(me) {
   return Math.max(0, WRATH_HIT * 0.8 - 0.45 * (me.mhp ?? 0));
 }
 const RUSH_LANE = 2.5 + 1.0; // half width + girth, and a margin
-const BOND_REACH = 20;
+/** How far apart the keeper holds the Singer from the Guardian. */
+const KEEPER_APART = 20;
 
 const rem = (e, id) => auraOf(e, id)?.rem ?? auraOf(e, id)?.remaining ?? 5;
 
@@ -259,7 +258,7 @@ export const council = {
     const away = unit(world.center, world.obs.self);
     world.home = away;
     // The Guardian just past the middle; the Singer dragged off to one side
-    // well past Bond of the Stone's reach; the raid near the Guardian.
+    // well apart from him; the raid near the Guardian.
     world.tankG = add(world.center, away, -3);
     world.tankS = add(add(world.center, perp(away), 30), away, -4);
     world.anchor = add(world.tankG, away, 4);
@@ -309,7 +308,7 @@ export const council = {
     if (t && t.id === g?.id) return world.tankG;
     // The off-tank waits at the Guardian's back for the swap.
     if (!t && b.offTank && alive(g)) return offTankSpot(world);
-    // The Singer's keeper holds her past the Bond's reach of the Guardian;
+    // The Singer's keeper holds her well apart from the Guardian;
     // once he fell she is brought to the raid's spot.
     if (alive(g) && t) return keeperSpot(world, st);
     return world.tankG;
@@ -398,8 +397,8 @@ export const council = {
       .join(' ');
     const g = world.mobs.guardian;
     const s = world.mobs.singer;
-    const bond = alive(g) && alive(s) ? `${hypot(g, s).toFixed(0)} yd apart` : '-';
-    return `energy ${h ? Math.round(h.res ?? 0) : '-'}; pillars ${coverPillars(world).length}${world.cursed ? ' + cursed' : ''}; bond ${bond}${souls ? `; souls ${souls}` : ''}`;
+    const apart = alive(g) && alive(s) ? `${hypot(g, s).toFixed(0)} yd` : '-';
+    return `energy ${h ? Math.round(h.res ?? 0) : '-'}; pillars ${coverPillars(world).length}${world.cursed ? ' + cursed' : ''}; apart ${apart}${souls ? `; souls ${souls}` : ''}`;
   },
   report(world, st, note) {
     note(`Kill plan: ${SPLIT ? 'split (both together)' : ORDER.join(' > ')}`);
@@ -432,7 +431,7 @@ export const council = {
       `Falling Rocks: ${soaks.length} (${soaks.map((r) => `${r.who}: ${r.soakHits.length} under${r.tremor ? ', TREMOR' : ''}`).join('; ')})`,
     );
     note(
-      `Rushes: ${st.rushes.length} (${st.rushes.map((r) => `${r.who}: ${r.outcome ?? '?'}`).join('; ')}); bond time together ${st.bondTicks ? (st.bondTicks / 10).toFixed(0) : 0} s`,
+      `Rushes: ${st.rushes.length} (${st.rushes.map((r) => `${r.who}: ${r.outcome ?? '?'}`).join('; ')})`,
     );
     note(`Wake the Stone marks: ${st.wakes.length}; Resonance marks: ${st.resonance.length}`);
   },
@@ -469,7 +468,6 @@ function init(st) {
     prevAuras: new Map(),
     echoNext: new Map(),
     rush: null,
-    bondTicks: 0,
     // Wake the Stone's choice: Wraths landed, Wakes let through since the
     // last one, and the kicks the raid chose.
     wrathsLanded: 0,
@@ -692,11 +690,7 @@ function trackState(world, st) {
     );
   }
   if (!(alive(singer) && singer.cast === CAST.wake)) st.wakeKickLogged = false;
-  // Bond of the Stone: the time the two spend together.
-  const g = world.mobs.guardian;
-  const s = world.mobs.singer;
-  if (alive(g) && alive(s) && st.engagedAt && hypot(g, s) < BOND_REACH) st.bondTicks++;
-  // Who holds each member (a change logged: a lost Singer is the Bond).
+  // Who holds each member (a change logged).
   for (const r of ROLES) {
     const m = world.mobs[r];
     const on = alive(m) && m.aggro != null ? (world.players.get(m.aggro)?.name ?? '?') : null;
@@ -1280,7 +1274,7 @@ function inLane(world, st, at) {
 // ---- a bot's duty -----------------------------------------------------------------------
 
 /** The Singer's keeper while both live: the arms warrior holds her alone
- *  past the Bond's reach (Goad, no stance needed), so the two tanks swap
+ *  well apart from him (Goad, no stance needed), so the two tanks swap
  *  the Guardian on Hammer's Weight without ever bringing her along. */
 function keeper(world) {
   const k = world.bots.find((x) => x.spec.key === 'ot' && x.self && !x.self.dead);
@@ -1405,7 +1399,7 @@ function offTankSpot(world) {
 function keeperSpot(world, st) {
   const g = world.mobs.guardian;
   st.keeperSpot ??= world.tankS;
-  if (!alive(g) || hypot(st.keeperSpot, g) >= BOND_REACH + 8) return st.keeperSpot;
+  if (!alive(g) || hypot(st.keeperSpot, g) >= KEEPER_APART + 8) return st.keeperSpot;
   let best = null;
   for (const r of [30, 27, 33]) {
     for (let k = 0; k < 36; k++) {
@@ -1460,9 +1454,9 @@ function keeperDuty(world, st, b, me) {
   if (!alive(s) || !alive(g) || keeper(world) !== b || !st.engagedAt) return null;
   const holding = s.aggro === b.pid;
   const spot = council.tankSpot(world, st, b, s);
-  // Holding her and already past the Bond's reach: stand and hit her (the
+  // Holding her and already apart: stand and hit her (the
   // threat that keeps her); only drag her on while the Guardian is near.
-  const apart = hypot(g, s) >= BOND_REACH + 5;
+  const apart = hypot(g, s) >= KEEPER_APART + 5;
   const goal = !holding
     ? hypot(me, s) > 6
       ? add(s, unit(s, me), 4)
@@ -1511,8 +1505,8 @@ function duty(world, st, b, me) {
   const coverRem = cover ? Math.min(...coverCasts(world).map((c) => c.rem), 99) : 99;
   const rock = st.rock;
   const rockRem = rock ? rem(world.players.get(rock.pid), AURA.rock) : 99;
-  // The Singer's tank keeps her away from the Guardian through a Wrath (the
-  // Bond would cost more than the blast): he takes it in the open.
+  // The Singer's tank keeps her away from the Guardian through a Wrath (her
+  // bars would follow her into the raid's cover): he takes it in the open.
   const singerTank =
     (b.tankTarget === 'singer' || keeper(world) === b) &&
     alive(world.mobs.guardian) &&

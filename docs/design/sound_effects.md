@@ -473,7 +473,7 @@ truth for each key's prompt; the tables above keep the first takes. The rules of
 
 | fight | what is new |
 |---|---|
-| Hammer Council (`smith_heart_council_audio_core.ts`) | Mountain's Rush's wind-up (warning) and impact, Bond of the Stone's pulse, Resonance, Narrow Shelter's strain as a pillar crowds under the Wrath (warning), the marks (Rush, Wake, Rock, Resonance) |
+| Hammer Council (`smith_heart_council_audio_core.ts`) | Mountain's Rush's wind-up (warning) and impact, Resonance, Narrow Shelter's strain as a pillar crowds under the Wrath (warning), the marks (Rush, Wake, Rock, Resonance) |
 | Breath (`smith_heart_breath_audio_core.ts`) | the Knotted Gale (drop, take, carried loop, fuse warning, portals opening and crossed, throw, burst), the Summit Roar and its wave, the isles' rides (up, a loop in the rider's ears, down) and the Bulwark, the marks (Drawn Lightning, the portals) |
 | Quench (`smith_heart_quench_audio_core.ts`) | a slash's line (warning as drawn, a click at its lock, the flight), the cold past half and four fifths in the player's ear, the rime cracking an immunity, The Blades Hunt (its waking and a loop through its bar), the slash mark |
 | Heat (`smith_heart_heat_audio_core.ts`) | every cue its own take (the borrowed layers are gone; the fist and the cinder's burst keep a Council stone layer for weight), Wakefire's build, the Wheel of the Hearth (warning, eruption), the Rolling Cinder's roll loop, Cinder Grip's stacks in the tank's ear (loud from the swap), the marks |
