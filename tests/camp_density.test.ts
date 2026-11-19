@@ -411,17 +411,23 @@ describe('the density model covers the shipped world', () => {
       'dragonkin_egg',
       'gourdlight_swelling_gourd',
       // The Smith's Heart's encounter adds (raised by its fights, never camped):
-      // the final boss's four Splinters, the Breath isles' two, the Heat's four.
+      // the final boss's four Splinters, the Breath isles' adds and Stillstone
+      // (encounters/smith_heart/breath_isle_ids.ts ISLE_MOBS), the Heat's four.
+      'heart_breath_stillstone',
       'heart_final_splinter_breath',
       'heart_final_splinter_hammer',
       'heart_final_splinter_heat',
       'heart_final_splinter_quench',
       'heart_gale_mender',
       'heart_gale_sentinel',
+      'heart_gust_herald',
       'heart_heat_rolling_cinder',
       'heart_heat_seedflame',
       'heart_heat_wellkeeper',
       'heart_heat_wellspawn',
+      'heart_riven_squall',
+      'heart_squall_fragment',
+      'heart_squall_shieldbearer',
       'hoard_abyssal_tentacle',
       'hoard_bloat_cap',
       'hoard_bound_pulsar',
