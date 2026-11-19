@@ -744,7 +744,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // drawn-position hooks). No capture was retaken.
   // Re-minted for the Smith's Heart raid's dormant warders (a sleeping body's heap held
   // until its killing blow) over the Quench queen's renderer wiring. No capture was retaken.
-  '158f70500fec6fac2fae6e98047bc7d940ab56c34758596f7115f88e49628ca1';
+  // Re-minted for the Smith's Heart raid's lava-wave lights, articulated bosses and
+  // hidden-until-posed sleeping bosses (renderer.ts). No capture was retaken.
+  'a550bd93d90ea658e322b2b1dc2618a2b753976c90658bcc1dd08288b134345e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
