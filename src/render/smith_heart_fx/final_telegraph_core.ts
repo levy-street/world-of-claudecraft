@@ -107,7 +107,8 @@ const look = (
 export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTelegraphLook>> = {
   whirl: look('fire', 0.32, 0.5, 1.2, 0.85, { falloff: 0.5, curtain: false }),
   devil: look('storm', 0.28, 0.6, 1.1, 0.8, { curtain: false }),
-  chargedZone: look('storm', 0.5, 1, 0.9, 1, { rim: 1 }),
+  // Its rim only (fill 0): the lightning inside is final_stars_fx.ts's field.
+  chargedZone: look('storm', 0.18, 0.2, 0.9, 0.6, { rim: 1, curtain: false }),
   pool: look('fire', 0.45, 0.9, 0.5, 0.95),
   ember: look('fire', 0.55, 1, 0.9, 1, { curtain: false }),
   crack: look('frost', 0.62, 1, 0.75, 1, { inward: 1 }),

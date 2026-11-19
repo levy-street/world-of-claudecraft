@@ -12,6 +12,10 @@
 //   STAR_RING   a ring racing out over the floor: Arcing Stone's lightning
 //               (forks crackling in the band, `uCrackle` 1), the strike's
 //               flash, a shattered pillar's frost (`uCrackle` 0: a soft band).
+//   FIELD       a Storm-Charged pillar's electric ground (Jose's playtest of
+//               2026-11-19, its polish round): a violet / electric-blue edge
+//               ring, lightning arcs crawling over the floor inside it,
+//               re-struck in quick steps, a faint flickering glow; additive.
 //   COLUMN      a woken quarter's column of light rising off the floor,
 //               flowing upward, its lip ragged, in the quarter's vein.
 
@@ -98,6 +102,39 @@ void main() {
   float body = band * cr + wake * (1.0 - uCrackle * 0.5);
   vec3 col = uColor * body + vec3(1.0) * band * fork * uCrackle * 0.8;
   gl_FragColor = vec4(col * uAlpha, 1.0);
+}
+`;
+
+export const FIELD_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uSeed;
+uniform float uPillar;
+uniform vec3 uEdge;
+uniform vec3 uArc;
+varying vec3 vObj;
+${KIT_NOISE}
+void main() {
+  // The disc is unit: r 0 at the pillar, 1 at the zone's edge.
+  float r = length(vObj.xz);
+  if (r > 1.0) discard;
+  float ang = atan(vObj.z, vObj.x);
+  // Re-struck in quick steps: the arcs jump, the light flickers.
+  float st = floor(uTime * 12.0);
+  float flick = 0.78 + 0.22 * kh(vec2(st, uSeed));
+  // The edge: a bright electric ring, a softer violet halo inside it.
+  float ed = (r - 0.965) / 0.03;
+  float edge = exp(-ed * ed);
+  float halo = smoothstep(0.7, 0.97, r) * (1.0 - smoothstep(0.97, 1.0, r));
+  // Arcs crawling out over the floor from the pillar's foot to the edge:
+  // thin ridged lines on the polar plane, two layers, each re-seeded.
+  vec2 q = vec2(ang * 2.2 + uSeed, r * 3.2 - uTime * 0.6);
+  float a1 = pow(max(kridge(q * 1.7 + vec2(st * 0.37, 0.0)), 0.0), 18.0);
+  float a2 = pow(max(kridge(q * 2.9 + vec2(-st * 0.53, 3.1)), 0.0), 26.0);
+  float arcs = (a1 + 0.8 * a2) * smoothstep(uPillar, uPillar + 0.08, r);
+  // A faint charged glow over the whole ground, breathing with the flicker.
+  float fill = 0.08 + 0.05 * kfbm(vObj.xz * 3.0 + vec2(uTime * 0.7, -uTime * 0.5));
+  vec3 col = uEdge * (edge * 1.6 + halo * 0.35 + fill) + uArc * arcs * 1.4 + vec3(1.0) * arcs * 0.35;
+  gl_FragColor = vec4(col * flick, 1.0);
 }
 `;
 
