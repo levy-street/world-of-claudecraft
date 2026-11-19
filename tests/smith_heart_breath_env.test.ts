@@ -465,6 +465,21 @@ describe('the Breath painted kit loader', () => {
     }
   });
 
+  it('lays the storm slate dark and matte under the fight', async () => {
+    // The storm pass (design doc section 5.27): a dark slate under the guardian, its
+    // lightning and every telegraph; matte, because a smoother slab under the key threw
+    // a white sheen that read as snow.
+    const { kit } = await freshKit();
+    const F = kit.BREATH_ENV_FLOOR;
+    for (const g of F.gain) expect(g).toBeLessThan(0.8);
+    expect(F.roughness).toBeGreaterThanOrEqual(0.8);
+    const m = kit.breathEnvFloorMaterial() as THREE.MeshStandardMaterial;
+    expect(m.color.toArray()).toEqual([...F.gain]);
+    if (m.isMeshStandardMaterial) expect(m.roughness).toBe(F.roughness);
+    // One shared material: the terrain's `scoured` tops all draw this object.
+    expect(kit.breathEnvFloorMaterial()).toBe(m);
+  });
+
   it('cuts the stacks away round the camera and lights every painted crystal', async () => {
     const { kit } = await freshKit();
     const key = (painting: string) => kit.breathEnvMaterial(painting).customProgramCacheKey();

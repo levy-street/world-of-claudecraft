@@ -1705,6 +1705,35 @@ paintings' saturation (the game's grade gives some back), the Ring's darker than
 **Budget.** The two skies are 1.1 MB and 2.3 MB of KTX2, fetched with the kits at the raid's
 door, never at boot.
 
+### 5.27 The taste pass
+
+The owner's ask (2026-11-19): rate the raid as it stands and raise its taste, without touching a
+mechanic. The measure is a fixed camera route through one raid clear (every room and every
+fight, the HUD on, the same spot and angle every run), so a before and an after differ only by
+the change. Nothing here touches `src/sim/`: no placement, collider, telegraph or timing moved.
+
+#### The Breath's storm
+
+Seen still by still beside the other rooms, the Breath was the one vein at a single pale value:
+its floor, its rock and its sky all sat high and close together, so the guardian, its lightning
+and every telegraph had nothing dark to stand against, where the Quench's night and the Heat's
+basalt both sit a value under their guardians. This pass gives the Breath the same footing.
+
+| Piece | Now | Where |
+|---|---|---|
+| The storm's air | A dark slate, neutral (never navy), the far crests sinking into the weather; the sky's horizon is the same colour | `SMITH_HEART_BREATH_FOG` |
+| The storm's light | The key dimmed to an overcast's and the fill thinned, the fill's colour kept the pale neutral grey; the rim raised so a body still reads off the slate | `SMITH_HEART_BREATH_LIGHT` |
+| The scoured floor | The same painting at a gain well under one: a dark storm slate under the guardian, the lightning and every telegraph; matte | `breath_env_kit.ts` `BREATH_ENV_FLOOR` |
+| The sky | The painted deck hung low, its dark bellies at the horizon where a play camera looks, pressed to a thunderhead with its lit tears kept; a cold rift low on the one sun's own bearing | `SMITH_HEART_BREATH_STORM_SKY`, `heart_sky.ts` `breathSky` |
+
+**Kept.** The painting and the kit, every placement, the lightning in the cloud and the distant
+bolts, the gusts, the cloud sea, the open rim and its red edge, the one sun.
+
+**Tried and dropped.** A stronger key over a smoother, wet slab: its sheen read as snow, which is
+the Quench's.
+
+Pinned by `tests/smith_heart_breath_air.test.ts` and `tests/smith_heart_breath_env.test.ts`.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every

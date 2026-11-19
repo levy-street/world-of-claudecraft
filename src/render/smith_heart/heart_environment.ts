@@ -9,10 +9,11 @@
 //     same low warm sun over a neutral grey sky fill, so its shade is a cool
 //     grey and never the storm's saturated blue;
 //   - the Breath (north, climbing to the Storm Cornice) has its own,
-//     `smithHeartBreath` (phase 2G): a cold teal-white storm light breaking
-//     high through the cloud from the north-west over a pale neutral grey
-//     fill, a cool blue-grey storm air that thickens with distance, so the
-//     scoured granite reads pale and its shade a cool grey, never navy;
+//     `smithHeartBreath` (phase 2G): a cold teal-white storm light over a
+//     neutral grey fill, never navy. Since the storm pass (design doc section
+//     5.27) the summit stands under a thunderhead: the key dimmed to an
+//     overcast's, the fill thinned, a dark slate storm air, so the guardian,
+//     the crystal and the lightning are the brightest things on the Cornice;
 //   - the Quench (east, sinking to the Frozen Lake) has its own,
 //     `smithHeartQuench` (phase 2H): a pale cold sun low in the south-east
 //     through a thin high overcast, a pale blue-grey sky fill over a cool
@@ -150,27 +151,49 @@ export function smithHeartCameraInBreath(x: number, z: number): boolean {
   return inBreathLight(x - o.x, z - o.z);
 }
 
-/** The Breath's air (phase 2G): a cool blue-grey storm air, thin across a
- *  landing and the Cornice so a telegraph and the guardian read crisp, the
- *  far crests going pale into it (the summit stands IN the weather). */
-export const SMITH_HEART_BREATH_FOG = { color: 0x707b88, near: 80, far: 560 } as const;
+/** The Breath's air (phase 2G; the storm pass, design doc section 5.27): a dark
+ *  slate storm air, thin across a landing and the Cornice so a telegraph and
+ *  the guardian read crisp, the far crests sinking into the weather (the summit
+ *  stands IN the storm). Neutral, never navy: its blue stays under its red by
+ *  less than the fill's own lean. The sky's horizon is this colour. */
+export const SMITH_HEART_BREATH_FOG = { color: 0x4a5262, near: 70, far: 520 } as const;
 
-/** The Breath's light rig (phase 2G): the storm's light breaking through
- *  high from the north-west, a cold teal-white key; a pale neutral-grey sky
- *  fill (never the borrowed storm's saturated blue, which turned the
- *  scoured rock navy) over a cool grey ground bounce; a teal rim off the
- *  vein's light on every silhouette. The sky's reflection a trace. */
+/** The Breath's light rig (phase 2G): a cold teal-white key; a neutral-grey sky
+ *  fill (never the borrowed storm's saturated blue, which turned the scoured
+ *  rock navy) over a cool grey ground bounce; a teal rim off the vein's light
+ *  on every silhouette. The sky's reflection a trace. The storm pass (design
+ *  doc section 5.27) dimmed the key to an overcast's and thinned the fill, so
+ *  the summit sits a value under its guardian and its lightning; the fill's
+ *  COLOUR stays the pale neutral grey (a darker one read navy), only its
+ *  strength came down, and the rim rose so a body still reads off the slate.
+ *  A stronger key with a smoother floor was tried first and read as snow. */
 export const SMITH_HEART_BREATH_LIGHT = {
-  sun: 2.65,
-  hemi: 2.2,
+  sun: 2.15,
+  hemi: 1.7,
   env: 0.03,
-  rim: 1.5,
-  sunColor: 0xe2eef4,
-  hemiSky: 0x9aa2ae,
-  hemiGround: 0x5e6066,
-  rimColor: 0x9ad6ee,
+  rim: 2.0,
+  sunColor: 0xe6f1ff,
+  hemiSky: 0x8f96a4,
+  hemiGround: 0x55585f,
+  rimColor: 0x9adcf2,
   /** The raid's one sun (`SMITH_HEART_KEY_DIRECTION`). */
   keyDirection: SMITH_HEART_KEY_DIRECTION,
+} as const;
+
+/** The Breath's storm sky (the storm pass, design doc section 5.27), read by the
+ *  dome (`heart_sky.ts`): the painting's v at the horizon (`foot`: its dark
+ *  bellies, never its pale foot haze, reach down to where a play camera looks)
+ *  and how fast it climbs (`rise`); the weight of its shade and of its lit
+ *  tears (`shade`, `lit`: a thunderhead, the tears kept); the cold rift where
+ *  the one sun breaks under the deck (`rift` its light, `riftTop` how high it
+ *  reaches, the sine of the elevation). */
+export const SMITH_HEART_BREATH_STORM_SKY = {
+  foot: 0.6,
+  rise: 0.92,
+  shade: 0.38,
+  lit: 1.06,
+  riftTop: 0.3,
+  rift: [0.56, 0.78, 0.92],
 } as const;
 
 /** The fog state of the Quench (phase 2H). */

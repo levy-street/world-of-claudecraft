@@ -10,7 +10,14 @@ import {
   breathGustAt,
   planBreathAir,
 } from '../src/render/smith_heart/breath_air_core';
-import { SMITH_HEART_BREATH_LIGHT } from '../src/render/smith_heart/heart_environment';
+import {
+  SMITH_HEART_BREATH_FOG,
+  SMITH_HEART_BREATH_LIGHT,
+  SMITH_HEART_BREATH_STORM_SKY,
+  SMITH_HEART_KEY_DIRECTION,
+  SMITH_HEART_RING_FOG,
+  SMITH_HEART_RING_LIGHT,
+} from '../src/render/smith_heart/heart_environment';
 import { BREATH } from '../src/sim/content/smith_heart_layout';
 
 describe("the Breath's air, weather and light", () => {
@@ -44,5 +51,40 @@ describe("the Breath's air, weather and light", () => {
     const [kr, , kb] = rgb(L.sunColor);
     expect(kb).toBeGreaterThanOrEqual(kr);
     expect(L.env).toBeLessThanOrEqual(0.05);
+  });
+
+  it('stands the summit under a thunderhead: darker than the hub, neutral, the rift on the one sun', () => {
+    // The storm pass (design doc section 5.27): the guardian, the crystal and
+    // the lightning are the brightest things on the Cornice.
+    const rgb = (c: number) => [(c >> 16) & 255, (c >> 8) & 255, c & 255];
+    const luma = (c: number) => {
+      const [r, g, b] = rgb(c);
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    // A dark slate storm air, well under the Ring's hub air, and never navy.
+    expect(luma(SMITH_HEART_BREATH_FOG.color)).toBeLessThan(
+      luma(SMITH_HEART_RING_FOG.color) * 0.85,
+    );
+    const [fr, , fb] = rgb(SMITH_HEART_BREATH_FOG.color);
+    expect(fb - fr).toBeLessThan(40);
+    // An overcast's light: the key under the hub's sun, the fill under the key
+    // (a stronger key on this pale stone read as snow).
+    const L = SMITH_HEART_BREATH_LIGHT;
+    expect(L.sun).toBeLessThan(SMITH_HEART_RING_LIGHT.sun);
+    expect(L.hemi).toBeLessThan(L.sun);
+    // A body still reads off the dark slate: its rim over the hub's.
+    expect(L.rim).toBeGreaterThan(SMITH_HEART_RING_LIGHT.rim);
+    // The painted deck hangs low (its dark bellies at the horizon, the painting
+    // spent a third of the way up), pressed to a thunderhead with its tears kept.
+    const S = SMITH_HEART_BREATH_STORM_SKY;
+    expect(S.foot).toBeLessThanOrEqual(0.65);
+    expect(S.foot - 0.7 * S.rise).toBeLessThan(0.05);
+    expect(S.shade).toBeLessThan(0.5);
+    expect(S.lit).toBeGreaterThan(S.shade * 2);
+    // The rift is a COLD light, low, and it sits on the raid's one sun: the
+    // Breath's rig reads the same constant the dome's uniform is built from.
+    expect(S.rift[2]).toBeGreaterThan(S.rift[0]);
+    expect(S.riftTop).toBeLessThan(0.5);
+    expect(L.keyDirection).toBe(SMITH_HEART_KEY_DIRECTION);
   });
 });
