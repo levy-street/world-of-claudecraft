@@ -128,9 +128,9 @@ export const FINAL_KIT_COLORS = {
   dust: [0.42, 0.38, 0.33] as const,
   /** The Dust Devils' wind (the fire tornado recoloured): a white core, a
    *  pale sky blue body, a grey dust sheath. */
-  windCore: [0.96, 0.98, 1.0] as const,
-  wind: [0.66, 0.82, 1.0] as const,
-  windDust: [0.62, 0.62, 0.6] as const,
+  windCore: [0.9, 0.96, 1.0] as const,
+  wind: [0.42, 0.66, 1.0] as const,
+  windDust: [0.5, 0.52, 0.55] as const,
 } as const;
 
 /** How each footprint draws on the shared floor telegraph (every tier): its
