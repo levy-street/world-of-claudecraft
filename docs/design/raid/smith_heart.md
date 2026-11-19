@@ -492,7 +492,7 @@ a burst crystal never stands again.
 | `mask` | lit-vein mask |
 | `slabOpen` | Hammer bit lit: the Slab is split, the Ring and the three veins open |
 | `sealLit` | mask is full: all four colours burn |
-| `ringClear` | packs r1 to r4 are dead (the Ring's four since the team's doc of 2026-11-17: at 45, 114, 246 and 315 degrees, 72.5 yd out, the middle of each stretch between the mouths, the stairs and the Balcony Stairs' feet) |
+| `ringClear` | packs r1 to r4 are dead (the Ring's four since the team's doc of 2026-11-17: at 45, 120, 240 and 315 degrees, 72.5 yd out, about the middle of each stretch between the mouths, the stairs and the Balcony Stairs' feet) |
 | `ready` | `sealLit` and `ringClear`: the heart seal crystal is charged (the markers' `SMITH_HEART_READY_BIT`, 128) and a living player stepping onto the dais bursts it |
 | `portalOpen` | the crystal has burst: the markers' kept `SMITH_HEART_PORTAL_BIT` (16), read off the claim's markers so every consumer sees the sticky value (the death checkpoints' Heart point included); set only by the burst (a living player on the dais while charged) or by `/dev heart portal` (a forced burst), never by `sealLit` and `ringClear` alone |
 
