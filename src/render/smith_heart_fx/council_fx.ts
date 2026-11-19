@@ -861,7 +861,7 @@ export class CouncilFx {
       const src = this.world.entities.get(ev.sourceId);
       this.startStream(ev.sourceId, ev.targetId, null, src ? councilRoleOf(src.templateId) : null);
     } else if (ability === COUNCIL_CUES.furyWake) this.fury.wake(ev.sourceId);
-    else if (ability === COUNCIL_CUES.furyMend) this.fury.mend(ev.sourceId);
+    else if (ability === COUNCIL_CUES.furyHeal) this.fury.heal(ev.sourceId);
     else if (ability === COUNCIL_CUES.soulTake) {
       const src = this.world.entities.get(ev.sourceId);
       const role = src ? councilRoleOf(src.templateId) : null;

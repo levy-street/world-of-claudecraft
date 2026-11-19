@@ -467,7 +467,7 @@ export function councilClaims(ability: string | undefined): boolean {
     ability === COUNCIL_CUES.risenPulse ||
     ability === COUNCIL_CUES.inherit ||
     ability === COUNCIL_CUES.furyWake ||
-    ability === COUNCIL_CUES.furyMend ||
+    ability === COUNCIL_CUES.furyHeal ||
     ability === COUNCIL_CUES.settle ||
     ability === COUNCIL_CUES.soulTake ||
     ability === COUNCIL_CUES.soulPip ||

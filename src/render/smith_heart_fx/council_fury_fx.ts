@@ -11,9 +11,13 @@
 //  - a column of ragged flame-light round the body, climbing past its crown;
 //  - a cracked sigil on the floor under it, its seams burning;
 //  - shards of quarry stone torn loose, orbiting its chest, their edges lit;
-//  - embers rising off it, and each mend beat (COUNCIL_CUES.furyMend) a soft
-//    ring and a breath of light drawn in.
-// It says the survivor is enraged and healing, so the column, the sigil and
+//  - embers rising off it;
+//  - the landing's heal (COUNCIL_CUES.furyHeal, all at once since the
+//    playtest of 2026-11-19): a big healing flash up the whole body (a
+//    column of green-gold light motes, two wide rings in the healing green
+//    and one in the fallen one's colour); the number itself is the HUD's
+//    floating heal text off the sim's `heal` event.
+// It says the survivor is enraged and healed, so the column, the sigil and
 // the swell draw on EVERY tier; only the embers and the shards thin. Built in
 // the constructor under the host's root (the host's one gated attach links
 // every program); fixed pieces, no light, no per-frame allocation; the members
@@ -281,15 +285,19 @@ const _burst = {
   alpha: 1,
   pool: 'glow' as const,
 };
-const _mend = {
-  speed: 0.6,
-  up: 2.2,
-  life: 0.9,
-  size: [1.1, 0.2] as [number, number],
-  color: [1, 0.9, 0.6] as [number, number, number],
-  alpha: 0.9,
+/** The landing heal's motes: a fountain of healing light up the body. */
+const _heal = {
+  speed: 2.4,
+  up: 7,
+  life: 1.5,
+  size: [2.2, 0.3] as [number, number],
+  color: [0.55, 1, 0.5] as [number, number, number],
+  alpha: 1,
   pool: 'glow' as const,
 };
+/** The healing green of its rings and flash. */
+const HEAL_GREEN = 0x7dff8a;
+const HEAL_GOLD = 0xfff2a8;
 
 function furyOf(e: Entity): Aura | undefined {
   const auras: Aura[] = e.auras;
@@ -559,15 +567,22 @@ export class CouncilFuryFx {
     this.h.shakeNear(at.x, at.z, 0.45, 45);
   }
 
-  /** `heart_grieving_fury_mend`: a mend beat on the survivor. */
-  mend(survivorId: number): void {
+  /** `heart_grieving_fury_heal`: the landing heals the survivor at once: a
+   *  big healing flash up the whole body, read from across the Quarry. */
+  heal(survivorId: number): void {
     const e = this.h.entity(survivorId);
     if (!e) return;
+    const role = councilRoleOf(e.templateId) ?? this.role;
     const at = fxAnchor(e);
     const y = this.h.groundY(at.x, at.z);
-    _mend.color = this.rgb;
-    this.h.particles.puff(at.x, y + 1, at.z, 14, _mend);
-    this.h.particles.shockRing(at.x, at.z, HOT[this.fallen ?? 'guardian'], 4.5, 0.45);
+    const height = MEMBER_BODY[role].height;
+    // A fountain of light at the feet, the chest and the crown.
+    this.h.particles.puff(at.x, y + 1, at.z, 40, _heal);
+    this.h.particles.puff(at.x, y + height * MEMBER_BODY[role].chest, at.z, 36, _heal);
+    this.h.particles.puff(at.x, y + height * 0.95, at.z, 24, _heal);
+    this.h.particles.shockRing(at.x, at.z, HEAL_GREEN, 14, 1.1);
+    this.h.particles.shockRing(at.x, at.z, HEAL_GOLD, 9, 0.8);
+    this.h.particles.shockRing(at.x, at.z, HOT[this.fallen ?? 'guardian'], 5.5, 0.55);
   }
 
   /** The body's size against its own: the renderer's display scale reads it

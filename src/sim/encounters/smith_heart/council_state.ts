@@ -17,7 +17,7 @@ export interface CouncilMark {
 }
 
 /** Grieving Fury (council_fury.ts): the fallen one's soul on its way to the
- *  survivor, then the survivor mending and enraged. */
+ *  survivor, then the survivor healed at once and enraged. */
 export interface CouncilFury {
   /** The member that lives on, and the one whose soul it takes. */
   survivor: CouncilRole;
@@ -25,11 +25,10 @@ export interface CouncilFury {
   /** Seconds until the soul lands (0 once it has). */
   arriveIn: number;
   arrived: boolean;
-  /** Health still to mend, and how much each beat mends. */
-  healLeft: number;
-  healEach: number;
-  /** Seconds to the next mend beat. */
-  mendTimer: number;
+  /** Whether the landing heals (false for a member already down at the
+   *  pull), and the health it healed (0 before it lands, or at full). */
+  heals: boolean;
+  healed: number;
 }
 
 /** One player under Resonance (a spread): its time left and the seconds to

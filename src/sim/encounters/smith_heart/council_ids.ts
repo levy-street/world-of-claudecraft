@@ -231,9 +231,9 @@ export const COUNCIL_CUES = {
   /** Grieving Fury wakes on the survivor as the soul lands (spellfx 'nova' on
    *  the survivor). */
   furyWake: 'heart_grieving_fury_wake',
-  /** Grieving Fury mends the survivor, once a second while it heals (spellfx
-   *  'nova' on the survivor). */
-  furyMend: 'heart_grieving_fury_mend',
+  /** Grieving Fury heals the survivor all at once as the soul lands (spellfx
+   *  'nova' on the survivor: the flash; the number rides a `heal` event). */
+  furyHeal: 'heart_grieving_fury_heal',
   /** The council settles after its fall: the risen pillars sink. */
   settle: 'heart_council_settle',
   /** Mythic: a fallen member's soul flows into its pillar (spellfx 'beam',
@@ -355,14 +355,13 @@ export interface CouncilDifficultyRules {
   enrageAfterWraths: number;
   /** Grieving Fury (council_fury.ts, the owner's option B of 2026-11-18):
    *  once the fallen one's soul reaches the survivor (COUNCIL_TUNING
-   *  .furyArrive after the fall) it mends this share of its maximum health
-   *  over `furyHealSeconds`, deals `furyDamage` more damage (Memory of
+   *  .furyArrive after the fall) it heals this share of its maximum health
+   *  at once (the playtest of 2026-11-19), deals `furyDamage` more damage (Memory of
    *  Stone), swings, casts and runs every clock `furyHaste` faster, and takes
    *  up the fallen one's jobs at full strength. A second fall before the soul
-   *  lands costs the raid nothing, one before the mend ends only part of it:
-   *  the fight asks for the two to fall together. */
+   *  lands costs the raid nothing: the fight asks for the two to fall
+   *  together. */
   furyHealPct: number;
-  furyHealSeconds: number;
   furyDamage: number;
   furyHaste: number;
   /** The survivor also takes the fallen one's second job (the Singer the
@@ -412,7 +411,6 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     enrageAfterWraths: 6,
     // Grieving Fury, Normal's gentle one.
     furyHealPct: 0.1,
-    furyHealSeconds: 8,
     furyDamage: 0.2,
     furyHaste: 0.15,
     inheritSecond: false,
@@ -446,9 +444,8 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     risenPulseMin: 12.6,
     risenPulseMax: 14.4,
     enrageAfterWraths: 8,
-    // Grieving Fury: a quarter of its health back in 6 s, and hard.
+    // Grieving Fury: a quarter of its health back at once, and hard.
     furyHealPct: 0.25,
-    furyHealSeconds: 6,
     furyDamage: 0.35,
     furyHaste: 0.3,
     inheritSecond: true,
@@ -481,7 +478,6 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     // tier of gear (was the fourth, 2026-11-12).
     enrageAfterWraths: 6,
     furyHealPct: 0.3,
-    furyHealSeconds: 6,
     furyDamage: 0.4,
     furyHaste: 0.3,
     inheritSecond: true,
@@ -636,9 +632,8 @@ export const COUNCIL_TUNING = {
   resonanceMax: 180,
   // Grieving Fury (each tier's numbers are its COUNCIL_DIFFICULTY row): the
   // seconds the fallen one's soul takes to reach the survivor (the client's
-  // stream flies this long), and the mend's beat.
+  // stream flies this long).
   furyArrive: 3,
-  furyMendEvery: 1,
   /** How much the survivor's body swells under the fury (the client's look). */
   furySwell: 1.15,
   // Heroic: the pillars pulse.

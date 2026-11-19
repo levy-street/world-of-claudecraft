@@ -511,7 +511,7 @@ function beginCouncil(
     st.baseSwings[r] = applyTierSwing(b, swing);
   }
   // A member already down when the pull began (a dev kill) has fallen, and
-  // its soul is already in the survivor (no mend: it fell before the pull).
+  // its soul is already in the survivor (no heal: it fell before the pull).
   for (const r of COUNCIL_ROLES) if (bodies[r] && !living(bodies[r])) st.fallen.push(r);
   if (st.fallen.length > 0) st.firstFallAt = 0;
   const fallen = st.fallen.length === 1 ? st.fallen[0] : null;
@@ -520,7 +520,7 @@ function beginCouncil(
     const fury = beginFury(scopeOf(ctx, inst, st, bodies), fallen, dead);
     if (fury) {
       fury.arriveIn = 0;
-      fury.healLeft = 0;
+      fury.heals = false;
     }
   }
   // Straight after the entrance a pull line it has just said would repeat.
@@ -764,7 +764,7 @@ export function councilReadout(ctx: SimContext, inst: InstanceSlot): string {
   const f = st.fury;
   const fury = f
     ? f.arrived
-      ? `, ${f.survivor} in Grieving Fury (${Math.max(0, Math.round(f.healLeft))} still to mend)`
+      ? `, ${f.survivor} in Grieving Fury (healed ${f.healed})`
       : `, ${f.fallen}'s soul lands on the ${f.survivor} in ${f.arriveIn.toFixed(1)} s`
     : '';
   return `${head}; energy ${Math.round(st.energy)}, wraths ${st.wraths}, fallen ${st.fallen.join(' > ') || 'none'}${fury}${souls}.`;
