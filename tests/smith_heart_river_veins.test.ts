@@ -2,13 +2,15 @@
 // section 5.27; presentation only: river_vein_look.ts, heart_rivers.ts,
 // heart_fx_materials.ts): the Hammer's, the Breath's and the Quench's dim
 // ribbons drawn as a groove with a thread of the vein's own light, on the same
-// line, width and rung as the flat band they replace, their pulses running
-// toward the guardian and never out; the bright twin's light pooled in the
-// channel with feathered lips.
+// line, width and rung as the flat band they replace, lying still until the
+// vein's guardian falls (the owner's call of 2026-11-20) and never out; the
+// bright twin's light, the one that flows, pooled in the channel with
+// feathered lips.
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
+import { sharedUniforms } from '../src/render/gfx';
 import {
   heartRiverSurgeMaterial,
   RIVER_LIT_POOL,
@@ -16,15 +18,15 @@ import {
 } from '../src/render/smith_heart/heart_fx_materials';
 import { buildHeartRivers } from '../src/render/smith_heart/heart_rivers';
 import {
-  RIVER_VEIN_FLOOR,
   RIVER_VEIN_GROOVE,
   RIVER_VEIN_LIGHT,
   RIVER_VEIN_LOOKS,
+  RIVER_VEIN_REST,
   RIVER_VEIN_RIME,
   RIVER_VEINS,
   riverVeinAcross,
   riverVeinMaterial,
-  riverVeinPulse,
+  riverVeinRest,
 } from '../src/render/smith_heart/river_vein_look';
 import { SMITH_HEART_VEIN_COLORS, SMITH_HEART_VEINS } from '../src/sim/content/smith_heart_layout';
 
@@ -82,8 +84,9 @@ describe('the light-rivers as veins of light', () => {
       expect(L.wander * G.reach + L.crackle * G.kink + L.thread).toBeLessThan(G.lip - G.rag);
       expect(u.uLook.value.x).toBe(L.thread);
       expect(u.uLook.value.y).toBe(L.wander);
-      expect(u.uLook.value.z).toBeCloseTo((Math.PI * 2) / L.wavelength, 9);
-      expect(u.uLook.value.w).toBe(L.speed);
+      // Its glow's grain: one stretch of the noise a wavelength long.
+      expect(u.uLook.value.z).toBeCloseTo(1 / L.wavelength, 9);
+      expect(L.wavelength).toBeGreaterThanOrEqual(8);
       expect(u.uGroove.value.toArray()).toEqual([...L.groove]);
       expect(u.uKind.value.toArray()).toEqual([L.fleck, L.crackle, L.rime]);
       // One touch of its own each, and only one.
@@ -101,51 +104,52 @@ describe('the light-rivers as veins of light', () => {
       `float rag = (vns(vec2(vArc * 0.7, 3.1)) - 0.5) * ${f3(G.rag * (4 / 3))} + (vns(vec2(vArc * 2.3, 7.7)) - 0.5) * ${f3(G.rag * (2 / 3))};`,
       `float groove = 1.0 - smoothstep(${f3(G.lip)} + rag, ${f3(G.edge)}, a);`,
       `float wob = (vns(vec2(vArc * 0.12, 1.3)) - 0.5) * ${f3(G.reach * (14 / 9))} + (vns(vec2(vArc * 0.5, 9.1)) - 0.5) * ${f3(G.reach * (4 / 9))};`,
-      `wob = wob * uLook.y + (vns(vec2(vArc * 3.1, floor(uTime * 9.0) * 1.7)) - 0.5) * ${f3(G.kink * 2)} * uKind.y;`,
+      `wob = wob * uLook.y + (vns(vec2(vArc * 3.1, 1.7)) - 0.5) * ${f3(G.kink * 2)} * uKind.y;`,
       'float t = abs(vAcross - wob);',
     ])
       expect(frag).toContain(line);
   });
 
-  it('runs its pulses toward the guardian and never lets the route go out', () => {
+  it('lies still until its guardian falls: no clock in a dim ribbon, the bright twin is what flows', () => {
+    const rivers = buildHeartRivers();
     for (const vein of RIVER_VEINS) {
-      const L = RIVER_VEIN_LOOKS[vein];
-      // Follow one crest: a beat later it sits closer to arc 0 (the arena).
-      const crestNear = (t: number, from: number) => {
-        let best = from;
-        let bv = -1;
-        for (let a = from - L.wavelength / 2; a <= from + L.wavelength / 2; a += 0.01) {
-          const v = riverVeinPulse(vein, a, t);
-          if (v > bv) {
-            bv = v;
-            best = a;
-          }
-        }
-        return best;
-      };
-      const c0 = crestNear(0, 60);
-      const c1 = crestNear(0.5, c0);
-      expect(c1).toBeLessThan(c0);
-      expect(c0 - c1).toBeCloseTo(L.speed * 0.5, 1);
-      let low = 1;
-      let high = 0;
-      for (let a = 0; a < 3 * L.wavelength; a += 0.05) {
-        const v = riverVeinPulse(vein, a, 3);
-        low = Math.min(low, v);
-        high = Math.max(high, v);
-      }
-      // Between two crests the thread dims to its floor, never out.
-      expect(low).toBeGreaterThanOrEqual(RIVER_VEIN_FLOOR - 1e-9);
-      expect(low).toBeLessThan(RIVER_VEIN_FLOOR + 0.01);
-      expect(high).toBeGreaterThan(0.99);
+      // Nothing in the sleeping vein can move: its program reads no clock at all
+      // (no uniform to drive, no `uTime` in either shader).
+      const m = riverVeinMaterial(vein);
+      expect(Object.keys(m.uniforms).sort()).toEqual(['uColor', 'uGroove', 'uKind', 'uLook']);
+      for (const u of Object.values(m.uniforms)) expect(u).not.toBe(sharedUniforms.uTime);
+      for (const src of [m.fragmentShader, m.vertexShader]) expect(src).not.toContain('uTime');
+      // Until the vein lights, the still ribbon is all there is of it: the bright
+      // twin over it draws nothing.
+      const lit = rivers.group.getObjectByName(`river:${vein}:lit`) as THREE.Mesh;
+      expect(lit.geometry.drawRange.count).toBe(0);
+      // And the twin is the one that flows once it runs: on the shared clock.
+      const twin = lit.material as THREE.ShaderMaterial;
+      expect(twin.uniforms.uTime).toBe(sharedUniforms.uTime);
+      expect(twin.fragmentShader).toContain('uTime');
     }
-    expect(RIVER_VEIN_FLOOR).toBeGreaterThanOrEqual(0.4);
-    // The shader runs the same arithmetic as the pure twin.
+    // Asleep, never out: the thread's glow lies uneven between two shares of its
+    // full light, under the one `riverVeinAcross` is measured at.
+    const R = RIVER_VEIN_REST;
+    expect(R.low).toBeGreaterThanOrEqual(0.4);
+    expect(R.high).toBeGreaterThan(R.low);
+    expect(R.high).toBeLessThan(1);
+    expect(riverVeinRest(0)).toBe(R.low);
+    expect(riverVeinRest(1)).toBeCloseTo(R.high, 12);
+    expect(riverVeinRest(0.5)).toBeCloseTo((R.low + R.high) / 2, 12);
+    expect(riverVeinRest(-3)).toBe(R.low);
+    expect(riverVeinRest(7)).toBeCloseTo(R.high, 12);
+    // The shader runs the same arithmetic as the pure twin, on the ribbon's own
+    // yards alone; the flicker, the Breath's beads and the Hammer's glints are
+    // held where they lie.
     const frag = riverVeinMaterial('hammer').fragmentShader;
-    expect(frag).toContain('sin(uLook.z * (vArc + uLook.w * uTime))');
-    expect(frag).toContain(
-      `${RIVER_VEIN_FLOOR.toFixed(3)} + ${(1 - RIVER_VEIN_FLOOR).toFixed(3)} * beat * beat`,
-    );
+    for (const line of [
+      `float glow = ${R.low.toFixed(3)} + ${(R.high - R.low).toFixed(3)} * vns(vec2(vArc * uLook.z, 5.3));`,
+      'float flick = 0.86 + 0.14 * vns(vec2(vArc * 1.7, 0.5));',
+      'float bead = smoothstep(0.58, 0.9, vns(vec2(vArc * 1.3, 2.0))) * uKind.y;',
+      'float glint = 0.5 + 0.5 * sin(fn * 40.0);',
+    ])
+      expect(frag).toContain(line);
   });
 
   it('keeps a dim ribbon dim beside its bright twin: which veins are lit is the progress', () => {
@@ -157,8 +161,8 @@ describe('the light-rivers as veins of light', () => {
     const N = 400;
     for (const vein of RIVER_VEINS) {
       const Lc = luma(SMITH_HEART_VEIN_COLORS[vein]);
-      // The light each carries, averaged across the ribbon: the dim one at a pulse's
-      // crest (its brightest), the bright one at its mean flow.
+      // The light each carries, averaged across the ribbon: the dim one at a full
+      // glow (brighter than it ever lies), the bright one at its mean flow.
       let dim = 0;
       let lit = 0;
       for (let i = 0; i < N; i++) {
@@ -187,7 +191,7 @@ describe('the light-rivers as veins of light', () => {
       // The dim ribbon is still found from afar: a wash of the vein's colour across
       // the whole groove (what the flat band was), under the thread.
       // (Sampled between the thread's halo and the Quench's rime.)
-      const wash = riverVeinAcross(vein, RIVER_VEIN_RIME.from - 0.02, RIVER_VEIN_FLOOR);
+      const wash = riverVeinAcross(vein, RIVER_VEIN_RIME.from - 0.02, RIVER_VEIN_REST.low);
       expect(wash.gain).toBeGreaterThanOrEqual(RIVER_VEIN_LIGHT.tint - 1e-9);
       expect(wash.alpha).toBeCloseTo(RIVER_VEIN_GROOVE.cover, 6);
     }
@@ -204,9 +208,9 @@ describe('the light-rivers as veins of light', () => {
       'float th = min(max(uLook.x, fwidth(vAcross) * 1.5), 0.9);',
       'float thread = 1.0 - smoothstep(th * 0.4, th, t);',
       'float halo = 1.0 - smoothstep(0.05, 0.55, t);',
-      `float light = thread * pulse * flick * (1.0 + ${f3(K.bead)} * bead);`,
+      `float light = thread * glow * flick * (1.0 + ${f3(K.bead)} * bead);`,
       `vec3 core = mix(uColor, vec3(1.0), ${f3(K.white)});`,
-      `vec3 col = stone + uColor * (${f3(K.tint)} * groove + halo * halo * (${f3(K.halo)} + ${f3(K.haloPulse)} * pulse));`,
+      `vec3 col = stone + uColor * (${f3(K.tint)} * groove + halo * halo * (${f3(K.halo)} + ${f3(K.haloGlow)} * glow));`,
       `col += mix(uColor, core, ${f3(K.core)}) * light * ${f3(K.thread)};`,
       `float rime = smoothstep(${f3(R.from)}, ${f3(R.full)}, a) * (1.0 - smoothstep(${f3(R.fade)}, 1.0, a));`,
       `col = mix(col, vec3(${R.frost.map(f3).join(', ')}), rime * ${f3(R.mix)});`,
@@ -214,9 +218,11 @@ describe('the light-rivers as veins of light', () => {
     ])
       expect(frag).toContain(line);
     // The flicker and the bead only ever dim or hold the twin's worst case: both are
-    // noises in 0..1 the twin takes at one.
+    // noises in 0..1 the twin takes at one, and the glow never reaches the one the
+    // twin is measured at.
     expect(frag).toContain('float flick = 0.86 + 0.14 * vns(');
     expect(frag).toContain('float bead = smoothstep(0.58, 0.9, vns(');
+    expect(RIVER_VEIN_REST.high).toBeLessThan(1);
     // The frost is a cold grey, never a light: under the vein colours' own luma.
     for (const c of R.frost) expect(c).toBeLessThanOrEqual(0.7);
   });

@@ -24,8 +24,8 @@ slate, and its painted storm deck hangs low with a cold rift on the raid's one s
 
 Three of the four floor rivers drew as flat translucent bands; the Heat's was already the
 Hearth's seam of fire. The Hammer's, the Breath's and the Quench's are now a groove with a
-thread of the vein's own colour, pulsing toward the guardian, and the bright ribbon that
-runs once a guardian falls pools in its channel with feathered lips.
+thread of the vein's own colour, lying still until its guardian falls, and the bright ribbon
+that runs once a guardian falls pools in its channel with feathered lips.
 
 - The Hammer's river asleep, down the Grand Stair: [before](before-04-grand-stair-river.jpg),
   [after](after-04-grand-stair-river.jpg).

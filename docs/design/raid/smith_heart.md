@@ -1745,7 +1745,7 @@ own mark, a seam of fire burned into the stone. The other three now follow it.
 
 | Piece | Now | Where |
 |---|---|---|
-| The dim ribbons (the Hammer's, the Breath's, the Quench's) | A groove cut the ribbon's width into the floor, a wash of the vein's colour across it (what the flat band was, so it is found from as far), and a thread of that colour wandering down its middle, its glow breathing in pulses that run toward the guardian and never go out, never drawn thinner than a pixel and a half; one touch each: the Hammer's ore glints in the groove, the Breath's thread kinks and beads like static, the Quench's lips are rimed | `river_vein_look.ts` `RIVER_VEIN_LOOKS`, `RIVER_VEIN_LIGHT`, `riverVeinPulse`, `riverVeinAcross` |
+| The dim ribbons (the Hammer's, the Breath's, the Quench's) | A groove cut the ribbon's width into the floor, a wash of the vein's colour across it (what the flat band was, so it is found from as far), and a thread of that colour wandering down its middle, asleep until the vein's guardian falls: nothing in it moves, its glow lies uneven along the line and never goes out, never drawn thinner than a pixel and a half; one touch each: the Hammer's ore glints in the groove, the Breath's thread is kinked and beaded like static caught in a crack, the Quench's lips are rimed | `river_vein_look.ts` `RIVER_VEIN_LOOKS`, `RIVER_VEIN_LIGHT`, `RIVER_VEIN_REST`, `riverVeinAcross` |
 | The bright ribbon (all four) | Its light pooled in the channel: full across its middle half, a hotter line down its middle, streaks drawn out along the flow, its lips feathered to nothing instead of a hard edge; brighter and steadier than the band it replaces | `heart_fx_materials.ts` `heartRiverSurgeMaterial`, `RIVER_LIT_POOL`, `riverLitAcross` |
 
 **Kept.** Every river's line, width, lift and rung (the ground band, under every telegraph),
@@ -1758,6 +1758,13 @@ twin adds more than three times the light of the dim one at its brightest (the f
 under that), and the dim thread's own crest stays under the bright ribbon's middle. The first
 cut of this pass let the thread peak as bright as the lit ribbon, so the two differed mostly in
 width; the review caught it.
+
+**Asleep until the guardian falls** (the owner's call of 2026-11-20). The first cut ran pulses
+along each dim thread toward its guardian and re-kinked the Breath's static several times a
+second, so a vein nobody had won yet already looked alive. A dim ribbon now reads no clock at
+all: its glow, its kinks, its beads and the Hammer's glints are held where they lie. Motion is
+the bright twin's alone, so a river that moves is a river whose guardian has fallen. The Heat's
+seam (section 5.25) is older work and keeps its own pulses.
 
 Pinned by `tests/smith_heart_river_veins.test.ts`.
 
