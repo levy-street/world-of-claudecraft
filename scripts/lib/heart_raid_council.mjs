@@ -94,8 +94,25 @@ function splitTarget(world, b) {
       : pg > ps + lean
         ? 'guardian'
         : 'singer';
+  // The Singer's keeper holds less hate than the main tank: a damage dealer
+  // capped on its pick hits the other one instead of standing idle.
+  const first = pick === 'guardian' ? g : s;
+  const other = pick === 'guardian' ? s : g;
   b.councilSplit = pick;
-  return pick === 'guardian' ? g : s;
+  return threatRoom(world, b, first) || !threatRoom(world, b, other) ? first : other;
+}
+/** Does `b` have threat room on `mob` (under its tank's, the raid's own
+ *  margins: heart_raid_bots.mjs threatOk)? */
+function threatRoom(world, b, mob) {
+  const thr = mob.thr;
+  if (mob.aggro == null || !Array.isArray(thr)) return true;
+  if (mob.aggro === b.pid) return false;
+  let tankHate = 0;
+  for (const [id, v] of thr)
+    if (id !== b.pid && world.players.get(id)?.tank) tankHate = Math.max(tankHate, v);
+  if (tankHate <= 0) return true;
+  const mine = thr.find(([id]) => id === b.pid)?.[1] ?? 0;
+  return mine < tankHate * (b.spec.melee ? 0.9 : 1.0);
 }
 
 const CAST = {
