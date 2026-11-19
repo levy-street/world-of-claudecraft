@@ -17,7 +17,11 @@ import {
   heartQuarterSpot,
   heartRidgeBearingDeg,
 } from '../src/sim/content/smith_heart_quarters';
-import { FINAL_AURAS, FINAL_TUNING as T } from '../src/sim/encounters/smith_heart/final_ids';
+import {
+  FINAL_AURAS,
+  FINAL_DIFFICULTY,
+  FINAL_TUNING as T,
+} from '../src/sim/encounters/smith_heart/final_ids';
 import type { Entity } from '../src/sim/types';
 import { type FinalFight, finalFight } from './helpers/final_fight';
 
@@ -111,7 +115,9 @@ describe('dragging the Masterless Strength (offline, the raid walking)', () => {
         expect(res.seconds, 'never followed').toBeGreaterThanOrEqual(0);
         // (Weight of the Anvil, its own all fight since 2026-11-18, is the
         // longest bar that may be in flight: 6 s.)
-        expect(res.seconds).toBeLessThan(path / 7 + Math.max(T.fistCast, T.anvilCast) + 3);
+        expect(res.seconds).toBeLessThan(
+          path / 7 + Math.max(FINAL_DIFFICULTY.normal.fistCast, T.anvilCast) + 3,
+        );
         expect(res.stuck).toBeLessThan(0.5);
         expect(res.barsWhileDragged).toBe(0);
         // And it took root in the new quarter.

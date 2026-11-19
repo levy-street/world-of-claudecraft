@@ -1,12 +1,15 @@
 // The Masterless Strength's Heat quarter (design doc 7.5): dodge and place.
 // The Guardian of the Heat's fist, compressed.
 //
-//   Basalt Fist     every 16 s (first 5 s into the quarter) a 3 s bar,
+//   Basalt Fist     every 16 s (first 5 s into the quarter) a quick bar (the
+//                   tier's fistCast: 1.9 s Normal, 1.7 Heroic, 1.6 Mythic since
+//                   Jose's playtest of 2026-11-19; 3 s before it),
 //                   planted, its facing on the spot where a hashed player
 //                   (never the tank while anyone else stands) stood: the
 //                   spot's lethal blow, then three Molten Swells roll out
 //                   of it (away from the boss and to either side), the Heat
-//                   guardian's own objects, lanes and numbers.
+//                   guardian's own objects, lanes and numbers, all the way
+//                   to the Anvil's rim (heat_geometry.ts laneReach).
 //   Fire Whirl      the Heat's STAR since the rework of 2026-11-18 (woken
 //                   for the rest of the fight; final_stars.ts runs its
 //                   clock): the tier's count of tall columns of fire rise by
@@ -62,7 +65,7 @@ import {
   standingSpot,
 } from './final_scope';
 import type { FinalPool, FinalSwell } from './final_state';
-import { inWave, laneReach } from './heat_geometry';
+import { ANVIL_LANE_MAX, inWave, laneReach } from './heat_geometry';
 import {
   HEAT_TUNING as H,
   HEAT_CUES,
@@ -88,7 +91,7 @@ export function startFist(s: FinalScope, forced?: FPoint): boolean {
   const obj = spawnFightObject(
     s.ctx,
     s.inst,
-    heatTimed(HEAT_OBJECTS.fistPrefix, T.fistCast),
+    heatTimed(HEAT_OBJECTS.fistPrefix, s.rules.fistCast),
     FINAL_NAMES.fist,
     spot.x,
     spot.z,
@@ -103,7 +106,7 @@ export function startFist(s: FinalScope, forced?: FPoint): boolean {
     const lane = spawnFightObject(
       s.ctx,
       s.inst,
-      swellLaneTemplate('warn', T.fistCast + H.waveDelay),
+      swellLaneTemplate('warn', s.rules.fistCast + H.waveDelay),
       FINAL_NAMES.swell,
       spot.x,
       spot.z,
@@ -113,7 +116,7 @@ export function startFist(s: FinalScope, forced?: FPoint): boolean {
     lanes.push(lane.id);
   }
   st.fist = { objectId: obj.id, x: spot.x, z: spot.z, lanes, bearings };
-  beginBar(s, FINAL_CASTS.fist, T.fistCast, away);
+  beginBar(s, FINAL_CASTS.fist, s.rules.fistCast, away);
   return true;
 }
 
@@ -149,7 +152,8 @@ export function landFist(s: FinalScope): Entity[] {
 }
 
 function stepSwell(s: FinalScope, w: FinalSwell): boolean {
-  const length = laneReach(w.x, w.z, w.facing, H.laneLength);
+  // To the Anvil's rim (laneReach: the whole way since the playtest of 2026-11-19).
+  const length = laneReach(w.x, w.z, w.facing, ANVIL_LANE_MAX);
   if (w.waveId === null) {
     w.delay -= DT;
     if (w.delay > 1e-9) return true;

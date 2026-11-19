@@ -8,7 +8,7 @@
 // full-fight smoke run on every tier.
 
 import { describe, expect, it } from 'vitest';
-import type { SmithHeartVein } from '../src/sim/content/smith_heart_layout';
+import { HEART_ROOM, type SmithHeartVein } from '../src/sim/content/smith_heart_layout';
 import {
   HEART_QUARTER_ORDER,
   heartQuarterAt,
@@ -28,6 +28,7 @@ import {
   pulseScale,
   FINAL_TUNING as T,
 } from '../src/sim/encounters/smith_heart/final_ids';
+import { laneReach } from '../src/sim/encounters/smith_heart/heat_geometry';
 import { HEAT_OBJECTS } from '../src/sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { type FinalFight, finalFight } from './helpers/final_fight';
@@ -305,6 +306,75 @@ describe('the Heat quarter', () => {
     expect(blow[0].amount).toBeGreaterThanOrEqual(T.fistMin);
     f.tick(sec(1));
     expect(f.objects(HEAT_OBJECTS.wave).length).toBe(3);
+  });
+
+  it('Basalt Fist casts fast (playtest 2026-11-19): 1.9 s Normal, 1.7 Heroic, 1.6 Mythic, every 16 s', () => {
+    expect(FINAL_DIFFICULTY.normal.fistCast).toBe(1.9);
+    expect(FINAL_DIFFICULTY.heroic.fistCast).toBe(1.7);
+    expect(FINAL_DIFFICULTY.mythic.fistCast).toBe(1.6);
+    expect(T.fistEvery).toBe(16);
+    for (const tier of ['normal', 'heroic'] as const) {
+      const f = finalFight(5);
+      if (tier === 'heroic') f.dev('/dev heart final heroic');
+      f.pullIn('heat');
+      f.dev('/dev heart final fist', f.pids[2]);
+      expect(f.boss().castTotal).toBeCloseTo(FINAL_DIFFICULTY[tier].fistCast, 5);
+      // Still up a tick before its bar ends; landed (its swells set out) just after.
+      f.tick(sec(FINAL_DIFFICULTY[tier].fistCast) - 2, false);
+      expect(f.objects(HEAT_OBJECTS.fistPrefix).length).toBe(1);
+      f.tick(4, false);
+      expect(f.objects(HEAT_OBJECTS.fistPrefix).length).toBe(0);
+      expect(f.state()?.swells.length).toBe(3);
+    }
+  });
+
+  it("the Molten Swells roll all the way to the Anvil's rim (playtest 2026-11-19)", () => {
+    const f = finalFight(5);
+    f.pullIn('heat');
+    f.dev('/dev heart final fist', f.pids[2]);
+    f.tick(sec(FINAL_DIFFICULTY.normal.fistCast + 0.1), false);
+    const swells = f.state()?.swells ?? [];
+    expect(swells.length).toBe(3);
+    // Each lane runs to the rim: farther than the Heat guardian's own 32 yd
+    // wherever there is room, and its wave ends within a yard of the rim.
+    let far = 0;
+    for (const w of swells) {
+      const reach = laneReach(w.x, w.z, w.facing, 32);
+      const end = { x: w.x + Math.sin(w.facing) * reach, z: w.z + Math.cos(w.facing) * reach };
+      expect(HEART_ROOM.r - Math.hypot(end.x - HEART_ROOM.x, end.z - HEART_ROOM.z)).toBeLessThan(
+        1.01,
+      );
+      if (reach > 32) far++;
+    }
+    expect(far).toBeGreaterThan(0);
+    // A raider at the rim on a lane is still struck.
+    const w = swells[0];
+    const reach = laneReach(w.x, w.z, w.facing, 32);
+    const rim = {
+      x: w.x + Math.sin(w.facing) * (reach - 0.5),
+      z: w.z + Math.cos(w.facing) * (reach - 0.5),
+    };
+    let struck = 0;
+    for (let i = 0; i < sec(14); i++) {
+      f.put(f.players[4], rim.x, rim.z);
+      struck += hits(f.tick(1, false), FINAL_NAMES.swell, f.pids[4]).length;
+    }
+    expect(struck).toBe(1);
+  });
+
+  it("Fire Whirls run 40 percent faster (6.3 yd a second), still under a raider's run", () => {
+    expect(T.whirlSpeed).toBeCloseTo(4.5 * 1.4, 6);
+    expect(T.whirlSpeed).toBeLessThan(7);
+    const f = finalFight(5);
+    f.pullIn('heat');
+    f.dev('/dev heart final whirl');
+    f.tick(sec(T.whirlWarn + 0.1));
+    const w = f.objects(FINAL_OBJECTS.whirlPrefix)[0];
+    const a = f.local(w);
+    f.tick(sec(0.5));
+    const b = f.local(w);
+    // Half a second's run (a turn off the rim aside).
+    expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeCloseTo(T.whirlSpeed * 0.5, 0);
   });
 
   it('Fire Whirls rise, run and strike whoever they touch', () => {

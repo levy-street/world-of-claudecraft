@@ -18,7 +18,11 @@
 
 import { BREATH_CASTS, BREATH_TUNING } from '../../sim/encounters/smith_heart/breath_ids';
 import { ISLE_CASTS } from '../../sim/encounters/smith_heart/breath_isle_ids';
-import { FINAL_CASTS, FINAL_TUNING } from '../../sim/encounters/smith_heart/final_ids';
+import {
+  FINAL_CASTS,
+  FINAL_DIFFICULTY,
+  FINAL_TUNING,
+} from '../../sim/encounters/smith_heart/final_ids';
 import { HEAT_CASTS, HEAT_TUNING } from '../../sim/encounters/smith_heart/heat_ids';
 import { QUENCH_CASTS, QUENCH_TUNING } from '../../sim/encounters/smith_heart/quench_ids';
 import {
@@ -133,7 +137,8 @@ const BASE: ClipMap = {
     [FINAL_CASTS.bolt]: 'Pour',
   },
   castTimeScaleByAbility: {
-    [FINAL_CASTS.fist]: onBarEnd(FINAL_BODY_CLIP.wrath, FINAL_TUNING.fistCast),
+    // Normal's bar (Heroic's and Mythic's are a breath shorter: the slam lands a hair late).
+    [FINAL_CASTS.fist]: onBarEnd(FINAL_BODY_CLIP.wrath, FINAL_DIFFICULTY.normal.fistCast),
     [FINAL_CASTS.anvil]: onBarEnd(FINAL_BODY_CLIP.wrath, FINAL_TUNING.anvilCast),
     [FINAL_CASTS.bolt]: onBarEnd(FINAL_BODY_CLIP.pour, FINAL_TUNING.boltCast),
   },

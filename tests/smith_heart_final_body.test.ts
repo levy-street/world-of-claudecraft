@@ -106,8 +106,11 @@ describe('the Masterless Strength model', () => {
     expect(def.castClipSync).toEqual(
       expect.arrayContaining([FINAL_CASTS.fist, FINAL_CASTS.anvil, FINAL_CASTS.bolt]),
     );
-    // Basalt Fist's 3 s bar: the slam's beat lands on its end.
-    expect(c.castTimeScaleByAbility?.[FINAL_CASTS.fist]).toBeCloseTo(FINAL_BODY_CLIP.wrath / 3, 6);
+    // Basalt Fist's Normal bar (1.9 s since the playtest of 2026-11-19): the slam's beat on its end.
+    expect(c.castTimeScaleByAbility?.[FINAL_CASTS.fist]).toBeCloseTo(
+      FINAL_BODY_CLIP.wrath / 1.9,
+      6,
+    );
   });
 
   it('binds one show and one hide gesture per element body, and the whole model', () => {
