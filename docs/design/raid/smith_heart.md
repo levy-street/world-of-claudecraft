@@ -1453,7 +1453,7 @@ Pinned by `tests/smith_heart_final_room_aaa.test.ts`.
 
 **The fight on the quarters (the final boss, mechanics part 1, 28 Oct 2026).** The room now
 carries its fight: the quarter the boss stands in is the strength it drinks and its kit, the
-four Overload bars, Taking Root on every quarter it enters, Vein Shock on Heroic and Heart
+four Overload bars, Vein Shock on Heroic and Heart
 Unbound in the central ring (above its final 15 percent), each quarter's kit on Normal,
 Heroic and Mythic, its raid HUD and its look on the floor (section 7.5 has the whole of it).
 The geometry core (`heartQuarterAt`) is the fight's own: a zone changes once the boss is 3
@@ -2523,7 +2523,7 @@ the rules `final_rules.ts`, one module per quarter (`final_heat.ts`, `final_quen
 `final_breath.ts`, `final_hammer.ts`), the scope and the leaf. Health 72,000 base (about
 166,000 after the elite factor; 70,000 until the second Heroic pass of 2026-11-05). Its own swing cleave, Forge Fist (110 degrees, 9 yd, every
 third landed swing), is its frontal; the sketch's Forge Wrath and Forge Pour are gone. It
-cannot be controlled or slowed: only its own Taking Root holds it.
+cannot be controlled or slowed: only its own planted bars hold it (no Taking Root since 2026-11-19).
 
 
 **The rework of 2026-11-18 (the team's review of 2026-11-17, the owner's design).**
@@ -2609,7 +2609,7 @@ phase's mix), the rework above wins.
 |---|---|---|
 | Overload | One bar per quarter (every number in one table, `FINAL_OVERLOAD`). The bar of the quarter it stands in fills (empty to full in 60 s, slowed from 40 after Jose's playtest of 28 Oct 2026) and pulses the raid every 4 s, harder the fuller it is (35 to 40 at empty; at full 80 to 91 on Normal, 105 to 120 on Heroic and Mythic before their factor, each tier's `pulseRise`, 45 and 70, since 2026-11-12; 60 to 70 and up to 370 until the bot raid of 2026-11-04, whose pulses alone outran two healers and wiped a raid that moved the boss on time); full, it bursts on everyone and empties: 700 to 800 on Normal (survivable with healing), 1,050 to 1,200 on Heroic (heavy), 4,500 to 5,200 on Mythic (lethal: only a big personal defensive lives, effectively a wipe). The tooltip says which; the Overload panel turns a bar three quarters full hostile (no banner since 2026-11-09). Away from its quarter a bar drains at a third of the fill speed; in the ring nothing fills. Bouncing between two quarters bursts within about two and a half minutes; a rotation through four never passes one visit's fill | `final_ids.ts` `FINAL_OVERLOAD`, `final_rules.ts` |
 | Vein Shock (Heroic, Mythic) | Every quarter change hits the raid (180 to 220) and leaves Vein-Shaken (20 s) on everyone struck; a change while still shaken hits three times as hard | `final_rules.ts` |
-| Taking Root | On entering a NEW quarter (the pull's first one too) it roots for 6 s (Jose's playtest of 2026-11-19 asked why it stood rooted "like 10 s": the 10 s root, and a 6 s Weight of the Anvil begun as the root ran out, held it still for up to 16 s; now no planted bar begins during the root unless it ends inside it, `bossFree`; 10 s before it, 15 in the sketch: Jose's playtest of 28 Oct read it as a boss that will not follow): it cannot be dragged out; back into the quarter it just left (a dip into the ring) it does not root again. The HUD counts the root down, then reads "Can be dragged". Between roots it follows its tank: its long melee reach alone parked it ten yards short of a tank waiting past a ridge, so a free boss whose tank stands in another zone closes to 2 yd of it (`followTank`), and no planted bar begins while it is dragged or in the 3 s after its root lets go. A zone changes once the boss is 2 yd past a ridge's line (1.5 yd past the ring's edge), or at once when its tank already stands in the zone it stepped into, so a boss swaying on a ridge alone never flickers. Pinned walking (never teleporting) over every ridge, both ways, at three radii, offline and through the server's input frames (`tests/smith_heart_final_drag.test.ts`) | `final_rules.ts`, `final_scope.ts` |
+| (Taking Root, removed) | Until Jose's playtest of 2026-11-19 the boss rooted on entering a NEW quarter (10 s, then 6). Removed on every tier the same day ("when you want to move it further it is very annoying"): the boss can be dragged at all times; only a planted bar (the Anvil, Basalt Fist, Leaping Bolt) holds it, for that bar alone, and no planted bar begins while it is dragged. A quarter change shifts the light (`FINAL_CUES.shift`) | `final_rules.ts` |
 | Heart Unbound | In the central ring above 15 percent it gains a stack every second and every second deals 45 to the whole raid for each stack: drag it through, never park it | `final_rules.ts` |
 | The base form | The first quarter it enters is its base form for the fight (the state aura's `value2`; the extra loot item's hook) | `final_rules.ts` |
 | Home | Its home is always its authored spot, the middle of the Anvil facing the terrace (`finalHome`). A reset, a wipe's evade and a fresh claim bring it there with no fight state, no quarter, bar, root or centre stacks; a dev move to a quarter moves the boss, never its home (it used to, which left it walking home to a quarter after a wipe). Pinned offline and over the server's chat path (`tests/smith_heart_final_home.test.ts`) | `final.ts` |
@@ -2629,7 +2629,7 @@ heroic|mythic` switches a run (section 11).
 **What every client reads** (no wire or `IWorld` change; pinned through the real server
 into the online mirror by `tests/smith_heart_final_wire.test.ts`): the zone, the base form
 and the switch mark's seconds on the boss's state aura; the four bars as four auras
-(`value` 0 to 100, `value2` the trend); Taking Root and Heart Unbound as auras; the bars as
+(`value` 0 to 100, `value2` the trend); Heart Unbound as an aura; the bars as
 cast bars (Basalt Fist the Heat guardian's own cast); every footprint as an object (Basalt
 Fist's spot, lanes and waves the Heat guardian's); the marks as player auras; the gale as
 the wind kernel's aura, told from the Breath guardian's by its tag.
@@ -2637,7 +2637,7 @@ the wind kernel's aura, told from the Breath guardian's by its tag.
 **The raid HUD** (`src/ui/hud/dungeon/heart_overload_view.ts`, painted by
 `heart_overload_painter.ts`): four bars in a row at the top of the screen in their veins'
 colours, the quarter it drinks lit and framed, a bar three quarters full turning hostile and
-throbbing, and under them Taking Root's seconds (or that it can be dragged), Vein-Shaken's
+throbbing, and under them Vein-Shaken's
 and Heart Unbound's; it draws on every tier and whatever the hints setting (the raid steers
 by it, a gauge, not a message). Since Jose's playtest of 2026-11-19 the fight puts NO
 personal alert panel on the screen (the old `final_alert_view.ts`, "Crossing Blade: lead it"
@@ -2660,7 +2660,7 @@ turning across the floor, pools of embers and forge fire, frost and shattering i
 streaks and dust racing the way it blows, lightning leaping between bodies, storm orbs
 crackling harder as they near their burst, the great anvil hanging over its mark and dropping
 onto it with a shockwave, tremor cracks spitting grit, stone shells and blocks of ice on
-bodies, Taking Root's spikes of rock round its feet, Heart Unbound's blaze, the switch's
+bodies, Heart Unbound's blaze, the switch's
 shockwave in the four veins' light. The body (`final_fx.ts`) raises its arms over Basalt
 Fist's and the Anvil's bars and slams them down as they land, cups its hands over Leaping
 Bolt, and an Overload Burst throws a wall of the quarter's light over the whole Anvil.
@@ -3072,7 +3072,7 @@ IP-checked in `docs/design/naming-audit.md`). Cosmetic only, like every deed rew
 | `/dev heart final normal`, `heroic`, `mythic` | this run's tier for the fight; a live fight takes it at once |
 | `/dev heart final quarter <zone>` (in a fight) | a quarter change: the boss lets go of its root and its bar and stands in that quarter (it roots again; Heroic shocks the raid) |
 | `/dev heart final fill [breath, quench, hammer, heat, all] [pct]` | set an Overload bar (95 by default; 99 bursts within a second in its quarter) |
-| `/dev heart final burst`, `shock`, `root`, `unroot` | the active bar bursts, a Vein Shock, Taking Root now, the root lets go |
+| `/dev heart final burst`, `shock` | the active bar bursts, a Vein Shock |
 | `/dev heart final <ability>` | one ability now, on any tier: `fist` (on you), `whirl` or `tornado`, `embers`, `ice`, `bolt`, `drawn`, `orbs`, `tremor`, `anvil` (on you), `shell` |
 | `/dev heart final wake <quarter>` | that quarter's star wakes for the rest of the fight (the rework of 2026-11-18) |
 | `/dev heart final star <quarter>` | that quarter's star (waking it) fires now |

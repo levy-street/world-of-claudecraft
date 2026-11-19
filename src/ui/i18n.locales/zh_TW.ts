@@ -24474,8 +24474,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '吐息過載，已滿{value}%。首領站在吐息區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.overloadHammer':
     '重錘過載，已滿{value}%。首領站在重錘區域時它會充能（從空到滿需{fill}秒），並每{every}秒對團隊造成脈衝傷害：空時{min}點，滿時最高{max}點。即將充滿時會警告團隊。充滿時會爆發，對整個團隊造成傷害並清空：普通難度{normalMin}至{normalMax}點（靠治療可以撐過），英雄難度{heroicMin}至{heroicMax}點（很重：先補滿血並使用減傷技能），史詩難度{mythicMin}至{mythicMax}點（致命：只有強力的個人減傷才能存活）。首領離開該區域後，它以三分之一的速度消退。其脈衝在英雄難度造成{heroicPulseMin}到{heroicPulseMax}點傷害，在傳奇難度造成{mythicPulseMin}到{mythicPulseMax}點傷害。',
-  'hudChrome.auraEffect.finalBoss.root':
-    '進入一個區域後紮根{seconds}秒：紮根結束前無法把它拖出去。',
   'hudChrome.auraEffect.finalBoss.unbound':
     '每層每秒對整個團隊造成{per}點傷害（目前{total}點）；站在中央圓環內時每秒獲得一層。把它拖出圓環即可結束。英雄難度：每層{heroicPer}點。傳奇難度：每層{mythicPer}點。',
   'hudChrome.auraEffect.finalBoss.shaken':
@@ -24499,8 +24497,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.quench': '淬火',
   'hudChrome.finalOverload.breath': '吐息',
   'hudChrome.finalOverload.hammer': '重錘',
-  'hudChrome.finalOverload.rooted': '紮根 {seconds}',
-  'hudChrome.finalOverload.free': '可以拖動',
   'hudChrome.finalOverload.shaken': '動搖 {seconds}',
   'hudChrome.finalOverload.unbound': '脫縛 x{stacks}',
   'hudChrome.finalOverload.barAria': '{quarter}過載 百分之{pct}',

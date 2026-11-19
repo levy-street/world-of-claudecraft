@@ -1,6 +1,6 @@
 // The Masterless Strength, part 1 (encounters/smith_heart/final*.ts, design
-// doc 7.5) over a REAL Sim: the four quarter rules (Overload, Vein Shock,
-// Taking Root, Heart Unbound, the base form), the boss following its tank
+// doc 7.5) over a REAL Sim: the quarter rules (Overload, Vein Shock,
+// Heart Unbound, the base form; no Taking Root since 2026-11-19), the boss following its tank
 // across a ridge, each quarter's kit on Normal, Heroic and Mythic (the
 // Quench's cold and the Breath's wind are gone since the rework of
 // 2026-11-18; the woken stars are tests/smith_heart_final_stars.test.ts),
@@ -17,6 +17,7 @@ import {
 import {
   anvilShare,
   FINAL_AURAS,
+  FINAL_CUES,
   FINAL_DIFFICULTY,
   FINAL_NAMES,
   FINAL_OBJECTS,
@@ -107,13 +108,12 @@ describe('the pure rules', () => {
     return peak;
   };
   it('bouncing between two quarters fills a bar to bursting within three minutes', () => {
-    for (const visit of [T.rootSeconds + 4, 20]) expect(peakOf(2, visit, 180), `${visit}`).toBe(1);
+    for (const visit of [10, 20]) expect(peakOf(2, visit, 180), `${visit}`).toBe(1);
   });
   it('a rotation through four quarters never passes one visit, through three it stays clear', () => {
-    for (const visit of [T.rootSeconds + 4, 20, 25])
+    for (const visit of [10, 20, 25])
       expect(peakOf(4, visit, 360), `4 x ${visit}`).toBeLessThan(visit / O.fillSeconds + 0.01);
-    for (const visit of [T.rootSeconds + 4, 20])
-      expect(peakOf(3, visit, 360), `3 x ${visit}`).toBeLessThan(0.9);
+    for (const visit of [10, 20]) expect(peakOf(3, visit, 360), `3 x ${visit}`).toBeLessThan(0.9);
   });
   it('the burst: survivable with healing on Normal, heavy on Heroic, lethal on Mythic', () => {
     // The level-20 cloth reference: about 1,135 to 1,345 health.
@@ -146,13 +146,14 @@ describe('the pure rules', () => {
 });
 
 describe('the quarter rules', () => {
-  it('pulls into its first quarter: that is its base form, and it takes root there', () => {
+  it('pulls into its first quarter: that is its base form, and it never takes root (2026-11-19)', () => {
     const f = finalFight(5);
     f.pullIn('quench');
     const st = f.state();
     expect(st?.zone).toBe('quench');
     expect(st?.baseForm).toBe('quench');
-    expect(aura(f.boss(), FINAL_AURAS.root)?.kind).toBe('root');
+    expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
+    expect(f.boss().auras.some((a) => a.id === 'heart_final_root')).toBe(false);
     const state = aura(f.boss(), FINAL_AURAS.state);
     expect(state?.value).toBe(FINAL_ZONE_CODES.quench);
     expect(state?.value2).toBe(FINAL_ZONE_CODES.quench);
@@ -212,19 +213,12 @@ describe('the quarter rules', () => {
     expect(f.players.every((p) => p.dead)).toBe(true);
   });
 
-  it('roots on entering a quarter, then follows its tank across a ridge', () => {
+  it('never roots on entering a quarter: it follows its tank across a ridge at once', () => {
     const f = finalFight(5);
     f.pullIn('heat');
     const tank = f.players[0];
-    const start = f.local(f.boss());
-    // The tank walks into the Breath quarter while it is rooted: it holds.
+    // The tank walks into the Breath quarter: it follows over the ridge.
     const breath = heartQuarterSpot('breath');
-    f.put(tank, breath.x, breath.z);
-    f.tick(sec(5));
-    const held = f.local(f.boss());
-    expect(Math.hypot(held.x - start.x, held.z - start.z)).toBeLessThan(0.5);
-    expect(f.state()?.zone).toBe('heat');
-    // The root ends: it follows its tank over the ridge into the Breath.
     let ev: SimEvent[] = [];
     for (let i = 0; i < sec(30) && f.state()?.zone !== 'breath'; i++) {
       f.put(tank, breath.x, breath.z);
@@ -235,7 +229,13 @@ describe('the quarter rules', () => {
     expect(st?.switches).toBe(1);
     expect(st?.baseForm).toBe('heat');
     expect(st?.lastQuarter).toBe('breath');
-    expect(aura(f.boss(), FINAL_AURAS.root)).toBeDefined();
+    // No root on the switch (Jose's playtest of 2026-11-19): its light shifts.
+    expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
+    expect(
+      ev.some(
+        (e) => e.type === 'spellfx' && (e as { ability: string }).ability === FINAL_CUES.shift,
+      ),
+    ).toBe(true);
     // Normal: no shockwave on the switch.
     expect(hits(ev, FINAL_NAMES.shock).length).toBe(0);
     // The quarter it drinks reads on the Overload panel, not a banner.
@@ -772,7 +772,7 @@ describe('the headless full fight', () => {
         seen.add(st.zone);
         inZone++;
         // Twenty seconds a quarter, then the tank drags it on.
-        if (inZone > sec(20) && st.rootLeft <= 0) {
+        if (inZone > sec(20)) {
           const target = heartQuarterSpot(order[next % 4]);
           f.put(tank, target.x, target.z);
           const here = f.local(f.boss());
@@ -826,7 +826,7 @@ describe('the headless full fight', () => {
     for (const prefix of Object.values(FINAL_OBJECTS))
       expect(f.objects(prefix).length, prefix).toBe(0);
     expect(aura(f.boss(), overloadAuraId('heat'))).toBeUndefined();
-    expect(aura(f.boss(), FINAL_AURAS.root)).toBeUndefined();
+    expect(f.boss().auras.some((a) => a.kind === 'root')).toBe(false);
   });
 });
 
@@ -845,8 +845,6 @@ describe('the dev verbs', () => {
       'fill heat 50',
       'burst',
       'shock',
-      'root',
-      'unroot',
       'fist',
       'whirl',
       'embers',

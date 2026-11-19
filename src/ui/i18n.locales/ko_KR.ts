@@ -25797,8 +25797,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '숨결의 과부하, {value}% 찼습니다. 우두머리가 숨결 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
   'hudChrome.auraEffect.finalBoss.overloadHammer':
     '망치의 과부하, {value}% 찼습니다. 우두머리가 망치 구역에 서 있는 동안 차오르며(비어 있다가 가득 차기까지 {fill}초), {every}초마다 공격대에 맥동 피해를 줍니다: 비었을 때 {min}, 가득 찼을 때 최대 {max}. 가득 차기 직전에 공격대에 경고합니다. 가득 차면 터져 공격대 전체에 피해를 주고 비워집니다: 일반에서 {normalMin}~{normalMax}(치유로 버틸 수 있음), 영웅에서 {heroicMin}~{heroicMax}(강력함: 체력을 채우고 생존기를 사용), 신화에서 {mythicMin}~{mythicMax}(치명적: 강력한 개인 생존기 없이는 살아남을 수 없음). 구역을 떠나면 3분의 1 속도로 줄어듭니다. 맥동 피해는 영웅에서 {heroicPulseMin}에서 {heroicPulseMax}, 신화에서 {mythicPulseMin}에서 {mythicPulseMax}입니다.',
-  'hudChrome.auraEffect.finalBoss.root':
-    '구역에 들어간 뒤 {seconds}초 동안 뿌리내립니다: 뿌리내림이 끝날 때까지 끌어낼 수 없습니다.',
   'hudChrome.auraEffect.finalBoss.unbound':
     '중첩마다 매초 공격대 전체에 {per}의 피해를 주며(현재 {total}), 중앙 원 안에 서 있는 동안 매초 중첩이 쌓입니다. 원 밖으로 끌어내면 끝납니다. 영웅: 중첩당 {heroicPer}. 신화: 중첩당 {mythicPer}.',
   'hudChrome.auraEffect.finalBoss.shaken':
@@ -25823,8 +25821,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.quench': '담금질',
   'hudChrome.finalOverload.breath': '숨결',
   'hudChrome.finalOverload.hammer': '망치',
-  'hudChrome.finalOverload.rooted': '뿌리내림 {seconds}',
-  'hudChrome.finalOverload.free': '끌 수 있음',
   'hudChrome.finalOverload.shaken': '흔들림 {seconds}',
   'hudChrome.finalOverload.unbound': '풀려남 x{stacks}',
   'hudChrome.finalOverload.barAria': '{quarter} 과부하 {pct}퍼센트',

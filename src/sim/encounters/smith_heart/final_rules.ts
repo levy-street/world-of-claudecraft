@@ -11,12 +11,9 @@
 //   Vein Shock      Heroic and Mythic: every quarter change hits the raid and
 //                   leaves Vein-Shaken (20 s) on everyone struck; a change
 //                   while still shaken hits three times as hard.
-//   Taking Root     on entering a new quarter (the first one too) the boss
-//                   roots for 6 s (10 until Jose's playtest of 2026-11-19:
-//                   it read as a boss stuck for no reason): it cannot be
-//                   dragged out; rock spikes stand round its feet while it holds. Back into the
-//                   quarter it just left (a dip into the ring) it does not.
-//                   Every difficulty.
+//   (Taking Root, the root on entering a new quarter, is gone since Jose's
+//   playtest of 2026-11-19: "when you want to move it further it is very
+//   annoying". The boss is draggable at all times; only a planted bar holds it.)
 //   Heart Unbound   in the central ring above its final phase (15 percent)
 //                   the boss gains a stack every second and pulses the raid
 //                   for each stack: the tanks drag it through, never park it.
@@ -24,7 +21,7 @@
 //                   fight (the state aura carries it: the hook for the form's
 //                   extra loot item, phase 2).
 //
-// Between roots the boss follows its tank (followTank): its long melee reach
+// The boss follows its tank (followTank): its long melee reach
 // alone would park it ten yards short of a tank waiting just past a ridge, so
 // a free boss whose tank stands in another zone closes on it, and no planted
 // bar begins while it is dragged (final_scope.ts bossFree). The kit changes
@@ -71,7 +68,7 @@ import {
 
 /** How far past a ridge's line (yards along the arc) or the ring's edge the
  *  boss must step before the zone it left lets go: a boss swaying on a
- *  ridge never flickers between two quarters (each change roots it and, on
+ *  ridge never flickers between two quarters (each change turns its kit and, on
  *  Heroic, shocks the raid). */
 export const ZONE_HOLD = { ridge: 2, ring: 1.5 } as const;
 
@@ -105,65 +102,7 @@ export function inFinalPhase(s: Pick<FinalScope, 'boss'>): boolean {
   return heartFinalPhase(s.boss.hp, s.boss.maxHp);
 }
 
-// ---- Taking Root ---------------------------------------------------------------------------
-
-/** The boss takes root where it stands. Exported for the dev trigger. */
-export function takeRoot(s: FinalScope): void {
-  const b = s.boss;
-  s.st.rootLeft = T.rootSeconds;
-  s.st.rootAt = { ...b.pos };
-  b.auras = b.auras.filter((a) => a.id !== FINAL_AURAS.root);
-  b.auras.push({
-    id: FINAL_AURAS.root,
-    name: FINAL_NAMES.root,
-    kind: 'root',
-    remaining: T.rootSeconds,
-    duration: T.rootSeconds,
-    value: 0,
-    sourceId: b.id,
-    school: 'nature',
-    undispellable: true,
-    unbreakableControl: true,
-    encounterOwned: true,
-  });
-  cueOn(s, b, FINAL_CUES.root, 'physical');
-}
-
-/** The boss held where it took root (any move this tick undone). */
-export function holdRoot(s: FinalScope): void {
-  const st = s.st;
-  const b = s.boss;
-  const r = st.rootAt;
-  if (st.rootLeft <= 0 || !r || st.bar) return;
-  if (b.pos.x === r.x && b.pos.z === r.z) return;
-  b.pos.x = r.x;
-  b.pos.y = r.y;
-  b.pos.z = r.z;
-  s.ctx.rebucket(b);
-}
-
-/** One tick of the root: its clock, the hold, its end (and the drag's
- *  grace after it). */
-export function stepRoot(s: FinalScope): void {
-  const st = s.st;
-  st.dragGrace = Math.max(0, st.dragGrace - DT);
-  if (st.rootLeft <= 0) return;
-  st.rootLeft = Math.max(0, st.rootLeft - DT);
-  holdRoot(s);
-  if (st.rootLeft <= 1e-9) {
-    endRoot(s);
-    st.dragGrace = T.dragGrace;
-  }
-}
-
-/** The root ends now (its clock, or a dev move). */
-export function endRoot(s: FinalScope): void {
-  s.st.rootLeft = 0;
-  s.st.rootAt = null;
-  dropAura(s.boss, FINAL_AURAS.root);
-}
-
-/** The drag: a free boss (no root, no bar, not held by control) whose tank
+/** The drag: a free boss (no bar, not held by control) whose tank
  *  stands in another zone than the one it holds closes on its tank to
  *  `dragCloseR`, past its long melee reach, so the tank's step over a ridge
  *  always carries it across. Runs after the mob AI, and only when the AI
@@ -171,7 +110,7 @@ export function endRoot(s: FinalScope): void {
 export function followTank(s: FinalScope): void {
   const st = s.st;
   const b = s.boss;
-  if (st.rootLeft > 0 || st.bar || b.castingAbility !== null) return;
+  if (st.bar || b.castingAbility !== null) return;
   if (b.aiState !== 'attack') return;
   if (s.ctx.isStunned(b) || s.ctx.isRooted(b)) return;
   const tank = bossTank(s);
@@ -209,7 +148,7 @@ export function veinShock(s: FinalScope): Entity[] {
 
 /** The boss has entered `zone` (the kit's clocks are the coordinator's).
  *  Returns true when it entered a NEW quarter (a switch, or the pull's
- *  first): only then does it root, shock and warn. Back into the quarter it
+ *  first): only then does it shock and warn (and its quarter's light shift). Back into the quarter it
  *  last stood in (a dip into the ring) it simply drinks on. */
 export function enterZone(s: FinalScope, zone: HeartQuarterZone): boolean {
   const st = s.st;
@@ -224,7 +163,7 @@ export function enterZone(s: FinalScope, zone: HeartQuarterZone): boolean {
   if (st.baseForm === null) st.baseForm = zone;
   st.lastQuarter = zone;
   st.pulseTimer = O.pulseEvery;
-  takeRoot(s);
+  cueOn(s, s.boss, FINAL_CUES.shift, 'physical');
   return true;
 }
 
@@ -376,7 +315,6 @@ export function showState(s: FinalScope, frozen = false): void {
 /** Every rule's aura off the boss (the fight's end). */
 export function clearRules(b: Entity): void {
   dropAura(b, FINAL_AURAS.state);
-  dropAura(b, FINAL_AURAS.root);
   dropAura(b, FINAL_AURAS.unbound);
   for (const vein of HEART_QUARTER_ORDER) dropAura(b, overloadAuraId(vein));
 }

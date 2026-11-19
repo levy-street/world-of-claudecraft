@@ -6082,7 +6082,6 @@ export const hudChromeStrings = {
         "The Breath's Overload, {value}% full. It fills while the boss stands in the Breath quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
       overloadHammer:
         "The Hammer's Overload, {value}% full. It fills while the boss stands in the Hammer quarter (empty to full in {fill} sec) and pulses the raid every {every} sec for {min} damage when empty, up to {max} when full. Near full it warns the raid. Full, it bursts on the whole raid and empties: {normalMin} to {normalMax} damage on Normal (heal through it), {heroicMin} to {heroicMax} on Heroic (heavy: heal up and use defensives), {mythicMin} to {mythicMax} on Mythic (lethal: only a big personal defensive survives it). Away from its quarter it drains at a third of that speed. Its pulses deal {heroicPulseMin} to {heroicPulseMax} on Heroic and {mythicPulseMin} to {mythicPulseMax} on Mythic.",
-      root: 'Rooted for {seconds} sec after entering a quarter: it cannot be dragged out until the root ends.',
       unbound:
         'Deals {per} damage to the whole raid every second for each stack ({total} now) and gains a stack every second while it stands in the central ring. Drag it out of the ring to end it. Heroic: {heroicPer} per stack. Mythic: {mythicPer} per stack.',
       shaken:
@@ -10517,8 +10516,6 @@ export const hudChromeStrings = {
     quench: 'Quench',
     breath: 'Breath',
     hammer: 'Hammer',
-    rooted: 'Rooted {seconds}',
-    free: 'Can be dragged',
     shaken: 'Shaken {seconds}',
     unbound: 'Unbound x{stacks}',
     barAria: '{quarter} Overload {pct} percent',

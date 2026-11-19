@@ -101,8 +101,6 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
   switch (a.id) {
     case FINAL_AURAS.state:
       return stateDescriptor(a);
-    case FINAL_AURAS.root:
-      return { key: `${KEY}.root`, nums: { seconds: T.rootSeconds } };
     case FINAL_AURAS.unbound: {
       const stacks = Math.max(1, Math.round(a.stacks ?? a.value ?? 1));
       return {

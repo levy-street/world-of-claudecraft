@@ -19387,8 +19387,8 @@
      heart_overload_view.ts while the final fight runs: four bars in one row
      at the top of the screen, over the raid warnings, one per quarter in its
      vein's tone, the quarter the boss drinks lit and framed, a bar near its
-     burst throbbing in the hostile tone; the foot says Taking Root's seconds
-     (or that it can be dragged), Vein-Shaken's and Heart Unbound's. Every
+     burst throbbing in the hostile tone; the foot says Vein-Shaken's and
+     Heart Unbound's. Every
      tier, never hidden by the hints setting; it never takes the pointer. The
      state is carried by text too (each bar prints its percent). */
   #heart-overload {
@@ -19484,10 +19484,6 @@
     justify-content: center;
     gap: 12px;
     font-size: 12px;
-  }
-  #heart-overload .ho-root.is-rooted {
-    color: var(--color-gold);
-    font-weight: 700;
   }
   #heart-overload .ho-shaken,
   #heart-overload .ho-unbound {

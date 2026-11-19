@@ -25793,8 +25793,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '息吹の過負荷、{value}%。ボスが息吹の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。脈動のダメージはヒロイックで{heroicPulseMin}から{heroicPulseMax}、ミシックで{mythicPulseMin}から{mythicPulseMax}。',
   'hudChrome.auraEffect.finalBoss.overloadHammer':
     '槌の過負荷、{value}%。ボスが槌の区画に立つ間に溜まり（空から満タンまで{fill}秒）、{every}秒ごとにレイドへ脈動ダメージを与える：空で{min}、満タンで最大{max}。満タン間近になるとレイドに警告する。満タンになると破裂してレイド全体にダメージを与え、空になる：ノーマルで{normalMin}～{normalMax}（回復で耐えられる）、ヒロイックで{heroicMin}～{heroicMax}（重い：回復して防御スキルを使う）、ミシックで{mythicMin}～{mythicMax}（致命的：強力な個人防御スキルがなければ生き残れない）。区画を離れると3分の1の速さで減っていく。脈動のダメージはヒロイックで{heroicPulseMin}から{heroicPulseMax}、ミシックで{mythicPulseMin}から{mythicPulseMax}。',
-  'hudChrome.auraEffect.finalBoss.root':
-    '区画に入ってから{seconds}秒間根付く：根付きが終わるまで引きずり出せない。',
   'hudChrome.auraEffect.finalBoss.unbound':
     'スタック1つごとに毎秒レイド全体へ{per}のダメージ（現在{total}）。中央の円環に立つ間、毎秒スタックが増える。円環から引きずり出せば終わる。ヒロイック：1スタックごとに{heroicPer}。ミシック：1スタックごとに{mythicPer}。',
   'hudChrome.auraEffect.finalBoss.shaken':
@@ -25818,8 +25816,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.quench': '焼き入れ',
   'hudChrome.finalOverload.breath': '息吹',
   'hudChrome.finalOverload.hammer': '槌',
-  'hudChrome.finalOverload.rooted': '根付き {seconds}',
-  'hudChrome.finalOverload.free': '引きずれる',
   'hudChrome.finalOverload.shaken': '揺らぎ {seconds}',
   'hudChrome.finalOverload.unbound': '解放 x{stacks}',
   'hudChrome.finalOverload.barAria': '{quarter}の過負荷 {pct}パーセント',

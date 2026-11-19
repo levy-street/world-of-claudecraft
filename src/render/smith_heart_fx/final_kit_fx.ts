@@ -24,10 +24,10 @@
 //     the orbs (a crackling fresnel shell, a pulsing core, a turning ring),
 //     the great anvil of carved stone and gold crystal hanging over its mark
 //     and dropping onto it, the granite shells, the ice round a frozen
-//     player, Taking Root's spikes, Heart Unbound's blazing ring of the four
+//     player, Heart Unbound's blazing ring of the four
 //     veins, the switch's shockwave racing over the floor in the four veins'
 //     bands.
-// The footprints, the ice, the shells, the anvil, the root's spikes, the
+// The footprints, the ice, the shells, the anvil, the
 // centre's ring, the shockwave and the stars draw on every tier; the
 // footprints' rime, streaks and glints and the particles thin on the low
 // tier and the shakes go under reduced motion.
@@ -82,7 +82,6 @@ import {
   orbBob,
   FINAL_KIT_POOLS as P,
   FINAL_REACH as R,
-  rootRise,
   shockWave,
   timedFill,
   tornadoDebris,
@@ -193,7 +192,6 @@ export class FinalKitFx {
   private readonly shells: THREE.Mesh[] = [];
   private readonly arcsMesh: THREE.InstancedMesh;
   private readonly arcs: Arc[] = [];
-  private readonly spikes: THREE.InstancedMesh;
   /** Weight of the Anvil's whole look past its mark (final_anvil_fx.ts). */
   private readonly anvilFx: FinalAnvilFx;
   /** The players' places this frame for the Anvil's count (pooled). */
@@ -460,21 +458,6 @@ export class FinalKitFx {
     for (let i = 0; i < P.arcs * P.arcSegments; i++)
       this.arcsMesh.setMatrixAt(i, _m.makeScale(0, 0, 0));
     this.root.add(this.arcsMesh);
-    // Taking Root's spikes of rock.
-    const spikeGeo = new THREE.ConeGeometry(0.7, 1, 5).translate(0, 0.5, 0);
-    this.geometries.push(spikeGeo);
-    const spikeMat = new THREE.MeshLambertMaterial({
-      name: 'smithHeartFinalRootSpikes',
-      color: new THREE.Color(...C.stone).multiplyScalar(0.8),
-      flatShading: true,
-    });
-    this.materials.push(spikeMat);
-    this.spikes = new THREE.InstancedMesh(spikeGeo, spikeMat, P.rootSpikes);
-    this.spikes.name = 'smithHeartFinalRootSpikes';
-    this.spikes.frustumCulled = false;
-    this.spikes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    for (let i = 0; i < P.rootSpikes; i++) this.spikes.setMatrixAt(i, _m.makeScale(0, 0, 0));
-    this.root.add(this.spikes);
     // Weight of the Anvil: the great anvil, its countdown, its strike.
     this.anvilFx = new FinalAnvilFx(
       {
@@ -612,7 +595,7 @@ export class FinalKitFx {
         this.dustAt(x, z, 14, 2.6);
         this.particles.shockRing(x, z, 0xe8c070, 9, 0.6);
         this.shake(x, z, 0.2, 60);
-      } else if (ev.ability === FINAL_CUES.root) {
+      } else if (ev.ability === FINAL_CUES.shift) {
         this.dustAt(x, z, 26, 5);
         this.particles.shockRing(x, z, 0xe8c070, 7, 0.6);
         this.shake(x, z, 0.25);
@@ -1329,12 +1312,10 @@ export class FinalKitFx {
     for (let i = shell; i < this.shells.length; i++) this.shells[i].visible = false;
   }
 
-  /** The boss: Leaping Bolt's target ring, Taking Root's spikes, Heart
-   *  Unbound's blaze. */
+  /** The boss: Leaping Bolt's target ring, Heart Unbound's blaze. */
   private paintBoss(world: IWorld): void {
     const boss = this.bossId >= 0 ? world.entities.get(this.bossId) : undefined;
     if (!boss || boss.dead) {
-      this.spikes.visible = false;
       this.unboundRing.visible = false;
       return;
     }
@@ -1350,32 +1331,12 @@ export class FinalKitFx {
         if (this.rand() < 0.7 * this.density) this.sparkAt(tAt.x, tAt.z, C.storm, 1, 1);
       }
     }
-    let root: Entity['auras'][number] | undefined;
     let unbound: Entity['auras'][number] | undefined;
-    for (const a of boss.auras) {
-      if (a.id === FINAL_AURAS.root) root = a;
-      else if (a.id === FINAL_AURAS.unbound) unbound = a;
-    }
+    for (const a of boss.auras) if (a.id === FINAL_AURAS.unbound) unbound = a;
     const bossAt = fxAnchor(boss);
     const x = bossAt.x;
     const z = bossAt.z;
     const y = this.groundY(x, z);
-    const rise = root ? rootRise(root.remaining) : 0;
-    this.spikes.visible = rise > 0.01;
-    if (this.spikes.visible) {
-      for (let i = 0; i < P.rootSpikes; i++) {
-        const a = (i / P.rootSpikes) * Math.PI * 2 + fxHash(i, 9) * 0.4;
-        const rr = 5.4 + fxHash(i, 4) * 1.2;
-        const h = (2.2 + fxHash(i, 2) * 2.2) * rise;
-        _v.set(x + Math.cos(a) * rr, y - 0.4, z + Math.sin(a) * rr);
-        _v2.set(Math.cos(a) * 0.35, 1, Math.sin(a) * 0.35).normalize();
-        _q.setFromUnitVectors(UP, _v2);
-        _m.compose(_v, _q, _s.set(1, Math.max(0.01, h), 1));
-        this.spikes.setMatrixAt(i, _m);
-      }
-      this.spikes.instanceMatrix.needsUpdate = true;
-      if (rise > 0.9 && this.rand() < 0.3 * this.density) this.dustAt(x, z, 1, 6);
-    }
     const stacks = unbound?.stacks ?? 0;
     this.unboundRing.visible = stacks > 0;
     if (stacks > 0) {
@@ -1466,7 +1427,6 @@ export class FinalKitFx {
     for (const m of [...this.ice, ...this.shells]) m.visible = false;
     this.shock.visible = false;
     this.anvilFx.hide();
-    this.spikes.visible = false;
     this.unboundRing.visible = false;
     this.arcsMesh.visible = false;
   }
@@ -1481,7 +1441,6 @@ export class FinalKitFx {
     this.anvilFx.dispose();
     this.kit.dispose();
     this.arcsMesh.dispose();
-    this.spikes.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }

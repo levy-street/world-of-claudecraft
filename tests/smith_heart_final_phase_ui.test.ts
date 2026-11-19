@@ -195,7 +195,6 @@ describe('part 2: the Overload HUD', () => {
     expect(v.title).toBe('Call of the Quarters');
     expect(v.phase).toBe('Shield 31');
     expect(v.splinters).toBe('Splinters 2');
-    expect(v.root).toBe('');
     expect(v.rows.filter((r) => r.awake).map((r) => r.vein)).toEqual(['hammer', 'heat']);
     // A held bar never throbs as if it were about to burst.
     expect(v.rows.some((r) => r.danger || r.active)).toBe(false);

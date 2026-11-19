@@ -59,7 +59,7 @@ export {
   finalDifficulty,
   finalReadout,
   finalScopeForDev,
-  releaseRootForDev,
+  releaseBarForDev,
   resetFinalForDev,
   setFinalDevTier,
   tickFinalBoss,

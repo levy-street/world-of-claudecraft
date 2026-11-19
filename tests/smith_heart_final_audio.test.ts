@@ -103,7 +103,7 @@ describe('smith_heart_final_audio: the plan', () => {
   });
 
   it('the HUD never plays its generic sound over a final cue', () => {
-    for (const cue of [FINAL_CUES.root, FINAL_CUES.bolt, FINAL_PHASE_CUES.shear])
+    for (const cue of [FINAL_CUES.shift, FINAL_CUES.bolt, FINAL_PHASE_CUES.shear])
       for (const fx of ['nova', 'beam'] as const)
         expect(
           spellFxCue({
@@ -122,7 +122,7 @@ describe('smith_heart_final_audio: the plan', () => {
     for (const s of Object.values(FINAL_BAR_SOUNDS)) expect(s.key).toMatch(/charge|warn|gather/);
     expect(FINAL_FOOTPRINT_SOUNDS.tremor?.key).toBe('heart_final_tremor_warn');
     // The quarter change and the Overload's own impacts are the final's takes.
-    expect(FINAL_CUE_SOUNDS[FINAL_CUES.root][0].key).toBe('heart_final_quarter_shift');
+    expect(FINAL_CUE_SOUNDS[FINAL_CUES.shift][0].key).toBe('heart_final_quarter_shift');
     expect(FINAL_CUE_SOUNDS[FINAL_CUES.burst][0].key).toBe('heart_final_overload_burst');
   });
 

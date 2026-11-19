@@ -132,7 +132,6 @@ describe('The Masterless Strength: tooltips', () => {
     expect(bar).toContain(`${n(O.burst.normal.min)} to ${n(O.burst.normal.max)} damage on Normal`);
     expect(bar).toContain(`${n(O.burst.heroic.min)} to ${n(O.burst.heroic.max)} on Heroic (heavy`);
     expect(bar).toContain(`${n(O.burst.mythic.min)} to ${n(O.burst.mythic.max)} on Mythic (lethal`);
-    expect(say({ id: FINAL_AURAS.root, kind: 'root' })).toContain(`${T.rootSeconds} sec`);
     expect(say({ id: FINAL_AURAS.unbound, kind: 'internal_cd', stacks: 3 })).toContain(
       `(${Math.round(T.unboundPerStack * 1.15) * 3} now)`,
     );
@@ -204,11 +203,8 @@ function bossOf(
 }
 
 describe('The Masterless Strength: the Overload bars', () => {
-  it('reads the bars, the quarter it drinks, the danger, the root and the mark', () => {
-    const v = buildOverloadView(
-      bossOf({ heat: 80, quench: 30 }, [{ id: FINAL_AURAS.root, remaining: 9.2 }]),
-      makeOverloadView(),
-    );
+  it('reads the bars, the quarter it drinks, the danger and the mark', () => {
+    const v = buildOverloadView(bossOf({ heat: 80, quench: 30 }), makeOverloadView());
     expect(v.visible).toBe(true);
     const heat = v.rows.find((r) => r.vein === 'heat');
     expect(heat?.pct).toBe(80);
@@ -216,7 +212,6 @@ describe('The Masterless Strength: the Overload bars', () => {
     expect(heat?.danger).toBe(80 >= OVERLOAD_DANGER_AT);
     expect(v.rows.filter((r) => r.active).length).toBe(1);
     expect(v.rows.find((r) => r.vein === 'quench')?.pct).toBe(30);
-    expect(v.root).toBe(t('hudChrome.finalOverload.rooted', { seconds: '10' }));
     expect(v.shaken).toBe(t('hudChrome.finalOverload.shaken', { seconds: '12' }));
     expect(v.unbound).toBe('');
   });
@@ -261,7 +256,6 @@ describe('The Masterless Strength: the Overload bars', () => {
     );
     expect(v.unbound).toBe(t('hudChrome.finalOverload.unbound', { stacks: '4' }));
     expect(v.rows.some((r) => r.active)).toBe(false);
-    expect(v.root).toBe(t('hudChrome.finalOverload.free'));
   });
 
   it('the painter writes nothing on a still frame', () => {

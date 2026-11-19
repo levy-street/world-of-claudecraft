@@ -53,7 +53,6 @@ import {
   quarterBit,
   splinterScale,
 } from './final_phase_ids';
-import { endRoot } from './final_rules';
 import {
   auraOf,
   cueAt,
@@ -137,10 +136,9 @@ export function pinCentre(s: FinalScope): void {
   s.ctx.rebucket(b);
 }
 
-/** Anything it was doing goes: its bar and the bar's footprint, its root. */
+/** Anything it was doing goes: its bar and the bar's footprint. */
 export function dropWhatItHeld(s: FinalScope): void {
   const st = s.st;
-  endRoot(s);
   if (st.bar) {
     st.bar = null;
     st.boltTarget = null;

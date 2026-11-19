@@ -577,7 +577,7 @@ describe('the headless full fight, 100 to 0', () => {
         lastStage = stage;
         if (stage === 'fight') {
           inZone++;
-          if (inZone > sec(18) && st.rootLeft <= 0) {
+          if (inZone > sec(18)) {
             const target = heartQuarterSpot(order[next % 4]);
             f.put(tank, target.x, target.z);
             const here = f.local(b);

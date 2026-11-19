@@ -124,15 +124,11 @@ import {
   bossZone,
   burstBar,
   clearRules,
-  endRoot,
   enterZone,
   followTank,
-  holdRoot,
   showState,
   stepOverload,
-  stepRoot,
   stepUnbound,
-  takeRoot,
   veinShock,
 } from './final_rules';
 import {
@@ -223,9 +219,6 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     lastQuarter: null,
     overload: { breath: 0, quench: 0, hammer: 0, heat: 0 },
     pulseTimer: FINAL_OVERLOAD.pulseEvery,
-    rootLeft: 0,
-    rootAt: null,
-    dragGrace: 0,
     shakenLeft: 0,
     switches: 0,
     bursts: 0,
@@ -322,18 +315,11 @@ function due(s: FinalScope, key: keyof FinalKitClocks, needsBar = false): boolea
   const k = s.st.kit;
   k[key] -= DT;
   if (k[key] > 1e-9) return false;
-  if (needsBar && !bossFree(s, barSeconds(s, key))) {
+  if (needsBar && !bossFree(s)) {
     k[key] = 0;
     return false;
   }
   return true;
-}
-
-/** How long the bar a kit mechanic begins runs (0: no bar). */
-function barSeconds(s: FinalScope, key: keyof FinalKitClocks): number {
-  if (key === 'fist') return s.rules.fistCast;
-  if (key === 'bolt') return T.boltCast;
-  return 0;
 }
 
 /** The active quarter's kit, each mechanic on its clock. */
@@ -371,7 +357,7 @@ function runAnvil(s: FinalScope): void {
   const st = s.st;
   st.anvilClock -= DT;
   if (st.anvilClock > 1e-9) return;
-  if (!bossFree(s, T.anvilCast)) {
+  if (!bossFree(s)) {
     st.anvilClock = 0;
     return;
   }
@@ -509,7 +495,6 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   stepBar(s);
   if (ph.stage === 'fight') {
     ph.unboundGrace = Math.max(0, ph.unboundGrace - DT);
-    stepRoot(s);
     followTank(s);
     watchZone(s, false);
     stepOverload(s);
@@ -536,7 +521,6 @@ export function tickFinalBoss(ctx: SimContext, inst: InstanceSlot): void {
   watchHidden(s);
   watchThresholds(s);
   holdThreshold(s);
-  if (ph.stage === 'fight') holdRoot(s);
   const frozen = rulesFrozen(s);
   if (frozen) holdShaken(s);
   showState(s, frozen);
@@ -567,14 +551,13 @@ function stepStage(s: FinalScope): void {
 
 /** The fight's scope for a dev command or a test (starting the fight state
  *  if none runs yet), or null when the claim holds no living boss. */
-/** A dev move of the boss mid-fight: its root lets go and its bar (and the
- *  bar's footprint) is dropped first, so nothing holds it where it was. */
-export function releaseRootForDev(ctx: SimContext, inst: InstanceSlot): void {
+/** A dev move of the boss mid-fight: its bar (and the bar's footprint) is
+ *  dropped first, so nothing holds it where it was. */
+export function releaseBarForDev(ctx: SimContext, inst: InstanceSlot): void {
   const boss = finalBoss(ctx, inst);
   const st = boss?.smithHeartFinal;
   if (!boss || !st) return;
   const s = scopeOf(ctx, inst, st, boss);
-  endRoot(s);
   if (!st.bar) return;
   st.bar = null;
   st.boltTarget = null;
@@ -653,12 +636,6 @@ export function finalDevMechanic(
     }
     case 'shock':
       return `Vein Shock: ${veinShock(s).length} struck.`;
-    case 'root':
-      takeRoot(s);
-      return `Taking Root: it holds where it stands for ${T.rootSeconds} s.`;
-    case 'unroot':
-      endRoot(s);
-      return 'Taking Root ends.';
     case 'fist':
       clearBar();
       return startFist(s, here) ? 'Basalt Fist: it comes down where you stand in 3 s.' : null;
@@ -771,5 +748,5 @@ export function finalReadout(ctx: SimContext, inst: InstanceSlot): string {
   const stars = st.stars.awake.map((v) => `${v} x${starPace({ st }, v)}`).join(', ');
   const charged = st.stars.pillars.filter((p) => p.charged).length;
   const pillars = `${st.stars.pillars.length} pillars (${charged} charged), ${st.stars.shattered} shattered, ${st.stars.thrums} thrums`;
-  return `${head}; in ${st.zone} (base ${st.baseForm ?? 'none'}), stars ${stars || 'none'}, ${pillars}, root ${st.rootLeft.toFixed(0)} s, shaken ${st.shakenLeft.toFixed(0)} s, unbound ${st.unbound}; Overload ${bars}; switches ${st.switches}, bursts ${st.bursts}; ${finalPhaseReadout(ctx, st)}.`;
+  return `${head}; in ${st.zone} (base ${st.baseForm ?? 'none'}), stars ${stars || 'none'}, ${pillars}, shaken ${st.shakenLeft.toFixed(0)} s, unbound ${st.unbound}; Overload ${bars}; switches ${st.switches}, bursts ${st.bursts}; ${finalPhaseReadout(ctx, st)}.`;
 }

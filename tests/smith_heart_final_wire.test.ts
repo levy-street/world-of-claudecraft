@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 // The Masterless Strength's fight rides existing entity fields only
 // (src/sim/encounters/smith_heart/final_ids.ts): the zone, base form and
-// switch mark on its state aura, the four Overload bars as auras, Taking Root
-// and Heart Unbound as auras, the kits' footprints as objects (Basalt Fist's
+// switch mark on its state aura, the four Overload bars as auras, Heart
+// Unbound as an aura, the kits' footprints as objects (Basalt Fist's
 // spot and lanes the Heat guardian's own), the marks as player auras, the
 // gale as the wind kernel's aura, the bars as cast bars. This drives the REAL
 // server snapshot path into the real online mirror (ClientWorld, on the
@@ -105,10 +105,10 @@ describe('the Masterless Strength over the wire', () => {
     const boss = () => onClient((e) => e.kind === 'mob' && e.templateId === FINAL_BOSS)[0];
     expect(boss()).toBeDefined();
     const serverBoss = sim.entities.get(boss().id);
-    // The state: the Heat, its base form; the root; the four bars.
+    // The state: the Heat, its base form; no root (2026-11-19); the four bars.
     expect(aura(boss(), FINAL_AURAS.state)?.value).toBe(FINAL_ZONE_CODES.heat);
     expect(aura(boss(), FINAL_AURAS.state)?.value2).toBe(FINAL_ZONE_CODES.heat);
-    expect(aura(boss(), FINAL_AURAS.root)).toBeDefined();
+    expect(boss().auras.some((a: { kind: string }) => a.kind === 'root')).toBe(false);
     for (const v of ['heat', 'quench', 'breath', 'hammer'] as const)
       expect(aura(boss(), overloadAuraId(v)), v).toBeDefined();
     run(4);

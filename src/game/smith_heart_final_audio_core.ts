@@ -75,9 +75,9 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
     S(F('overload_burst'), 1, 'source', 1, 1),
     S('heart_council_wrath_blast', 0.4, 'source', 0.85, 1),
   ],
-  // A quarter change: it takes root in the new quarter (every tier); Vein
+  // A quarter change: its new quarter's light shifts (every tier); Vein
   // Shock's wave through the raid on Heroic and Mythic.
-  [FINAL_CUES.root]: [S(F('quarter_shift'), 1, 'source', 1, 0.5)],
+  [FINAL_CUES.shift]: [S(F('quarter_shift'), 1, 'source', 1, 0.5)],
   [FINAL_CUES.shock]: [S(F('vein_shock'), 1, 'point', 1, 0.5)],
   // Heart Unbound ticks every second in the ring: soft, cooled.
   [FINAL_CUES.unbound]: [S(F('unbound'), 0.6, 'source', 1, 0.8)],

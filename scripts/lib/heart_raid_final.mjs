@@ -1,7 +1,7 @@
 // The Masterless Strength's mechanic AI for the raid bots (scripts/heart_raid.mjs
 // BOSS=final; the plumbing is scripts/lib/heart_raid_bots.mjs). The tanks drag
-// the boss round the Anvil's four quarters by their Overload bars (it roots 10 s
-// in each new quarter; it is moved on once its bar fills past two thirds,
+// the boss round the Anvil's four quarters by their Overload bars (no root
+// since 2026-11-19: it can be dragged at any time; it is moved on once its bar fills past two thirds,
 // toward the emptier neighbour, never parked in the ring), the raid follows it
 // and plays each quarter's kit: out of Basalt Fist's spot and lanes, the Fire
 // Whirls, the pools and the cracks, spread for the Leaping Bolt, one player on
@@ -446,14 +446,13 @@ function bar(world, vein) {
 }
 
 /** Where the boss's tank stands: in the quarter it drinks until its bar is
- *  two thirds full (the root held), then the emptier neighbour quarter. */
+ *  two thirds full, then the emptier neighbour quarter. */
 function dragSpot(world, st) {
   init(st);
   const b = world.mobs.boss;
   if (!alive(b)) return world.center;
   if (hasAura(b, FINAL_PHASE_AURAS.shield) || final.isFinalPhase(world)) return b;
   const z = zoneOfBoss(world);
-  const rooted = hasAura(b, FINAL_AURAS.root);
   let target = st.next ?? (z === 'ring' ? lowest(world, null) : z);
   // Heroic: a change while the raid is still Vein-Shaken hits three times
   // as hard, so the tanks wait the mark out unless the bar runs high. The
@@ -463,7 +462,7 @@ function dragSpot(world, st) {
   const shaken = markLeft > 0 || world.living().some((p) => hasAura(p, FINAL_AURAS.shaken));
   // While the mark holds, the tank keeps the boss in the quarter it just
   // entered: no stale drag target and no walk back to the last quarter
-  // after the root (the runs of 2026-11-11 crossed twice inside 20 s and
+  // after it (the runs of 2026-11-11 crossed twice inside 20 s and
   // took Vein Shock three times over). A bar running high still moves it.
   if (HEROIC_PLUS && shaken && z !== 'ring' && bar(world, z) < 75) {
     if (st.next && st.next !== z)
@@ -479,7 +478,6 @@ function dragSpot(world, st) {
   if (
     IGNORE !== 'drag' &&
     z !== 'ring' &&
-    !rooted &&
     (bar(world, z) >= MOVE_AT || hammerDone) &&
     (!shaken || bar(world, z) >= 75) &&
     (!st.next || st.next === z)
