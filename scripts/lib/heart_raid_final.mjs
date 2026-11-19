@@ -53,12 +53,12 @@ import {
   quenchRingGaps,
   quenchRingOf,
 } from '../../src/sim/encounters/smith_heart/final_phase_ids';
+import { laneReach } from '../../src/sim/encounters/smith_heart/heat_geometry';
 import {
   HEAT_OBJECTS,
   HEAT_TUNING,
   swellLaneOf,
 } from '../../src/sim/encounters/smith_heart/heat_ids';
-import { laneReach } from '../../src/sim/encounters/smith_heart/heat_geometry';
 import {
   add,
   alive,
@@ -177,10 +177,7 @@ export const final = {
       else if (t.startsWith(FINAL_OBJECTS.anvilPrefix))
         o.anvils.push({ ...at, r: at.r || T.anvilR });
       else if (t.startsWith(FINAL_OBJECTS.crackPrefix)) o.ice.push({ ...at, r: at.r + 1.2 });
-      else if (
-        t.startsWith(FINAL_OBJECTS.whirlPrefix) ||
-        t.startsWith(FINAL_OBJECTS.devilPrefix)
-      ) {
+      else if (t.startsWith(FINAL_OBJECTS.whirlPrefix) || t.startsWith(FINAL_OBJECTS.devilPrefix)) {
         // A tornado rolls on (6.3 yd a second since 2026-11-19; a Breath Dust
         // Devil 5, wandering): keep clear of where it will be, not only where
         // it is (the Heroic bot raids of 2026-11-18).

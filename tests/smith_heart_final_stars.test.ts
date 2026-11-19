@@ -120,7 +120,9 @@ describe('the pure rules', () => {
     // Jose's playtest of 2026-11-19: one charged pillar is FELT, 90 to 110 on
     // Normal (130 to 150 on Heroic) every 5 s; four are urgent (about 400 a
     // pulse, over a third of a 1,100 pool) yet healable for a while.
-    const one = chargedPulse(1, N.chargedMin, N.chargedMax).map((v) => Math.round(v * N.damageMult));
+    const one = chargedPulse(1, N.chargedMin, N.chargedMax).map((v) =>
+      Math.round(v * N.damageMult),
+    );
     expect(one[0]).toBeGreaterThanOrEqual(89);
     expect(one[1]).toBeLessThanOrEqual(111);
     const h1 = chargedPulse(1, H.chargedMin, H.chargedMax).map((v) => Math.round(v * H.damageMult));

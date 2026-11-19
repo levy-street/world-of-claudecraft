@@ -595,8 +595,7 @@ export class FinalKitFx {
         // Thrown by a Dust Devil: a burst of dust and a pale gust ring.
         this.dustAt(x, z, 18, 2.2);
         this.particles.shockRing(x, z, 0xdcecff, 4.5, 0.4);
-      }
-      else if (ev.ability === FINAL_CUES.shell) this.dustAt(x, z, 10, 1.4);
+      } else if (ev.ability === FINAL_CUES.shell) this.dustAt(x, z, 10, 1.4);
       else if (ev.ability === FINAL_CUES.charged) this.chargedPulse(target);
       else if (ev.ability === FINAL_CUES.chargedHit || ev.ability === FINAL_CUES.chargedZone) {
         // The pulse (or the ground) strikes a player: a violet-white crack on
@@ -605,8 +604,7 @@ export class FinalKitFx {
         this.sparkAt(x, z, C.storm, big ? 16 : 6, big ? 1.5 : 0.9);
         this.particles.shockRing(x, z, 0xe2d4ff, big ? 3 : 1.8, big ? 0.35 : 0.25);
         if (big && source) this.addArc(source.id, target.id);
-      }
-      else if (ev.ability === FINAL_CUES.rise) {
+      } else if (ev.ability === FINAL_CUES.rise) {
         this.dustAt(x, z, 30, 3.5);
         this.particles.shockRing(x, z, 0xe8c070, R.rise * 1.6, 0.5);
         this.shake(x, z, 0.35, 45);

@@ -49,7 +49,11 @@ describe("the colossus's floating rocks", () => {
   it('is what the body effects build their rocks from', () => {
     const src = readFileSync('src/render/smith_heart_fx/final_body_fx.ts', 'utf8');
     expect(src).toContain('const rockGeo = colossusChunk();');
-    expect(src).toContain('vertexColors: true');
+    // Its material is the shared colossus rock's, which reads the chunk's tones.
+    expect(src).toContain("colossusRockMaterial('smithHeartFinalBodyRocks')");
+    const shapes = readFileSync('src/render/smith_heart_fx/final_kit_shapes.ts', 'utf8');
+    const mat = shapes.slice(shapes.indexOf('export function colossusRockMaterial'));
+    expect(mat.slice(0, 400)).toContain('vertexColors: true');
     expect(src).not.toMatch(/IcosahedronGeometry\(1, 0\)/);
   });
 });
