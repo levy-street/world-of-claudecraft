@@ -154,9 +154,14 @@ export function beingDragged(s: FinalScope): boolean {
 /** Is the boss free to begin a bar now? Never while it is being dragged or
  *  in the drag's grace right after its root lets go: a planted bar then is
  *  the boss that will not follow (Jose's playtest of 28 Oct 2026). */
-export function bossFree(s: FinalScope): boolean {
+export function bossFree(s: FinalScope, seconds = 0): boolean {
   if (s.st.bar || s.boss.castingAbility !== null) return false;
   if (s.st.gap > 0 || s.st.dragGrace > 0) return false;
+  // Through Taking Root a bar only begins if it is over before the root lets
+  // go: a planted bar begun as the root ends held the boss still for the
+  // root and the bar together, ten seconds and more (Jose's playtest of
+  // 2026-11-19: "it stays rooted like 10 s, why?").
+  if (s.st.rootLeft > 0 && seconds > s.st.rootLeft + 1e-9) return false;
   if (beingDragged(s)) return false;
   return !s.ctx.isStunned(s.boss);
 }

@@ -538,8 +538,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
  *  the sketch's 40 s fill ran too fast; a full bar on Mythic must be a wipe).
  *
  *  The pace: empty to full in 60 s in its quarter, draining at a third of
- *  that (180 s from full) away from it. With the 10 s root and a drag of a
- *  few seconds, a visit lasts 15 s or more and fills a quarter of the bar:
+ *  that (180 s from full) away from it. With the root (6 s since
+ *  2026-11-19, 10 before) and a drag of a few seconds, a visit lasts 10 to
+ *  15 s or more and fills a sixth to a quarter of the bar:
  *  bouncing between two quarters gains about a sixth of a bar every round
  *  trip and bursts within about two and a half minutes, while a rotation
  *  through all four never climbs past one visit's fill and a rotation
@@ -593,9 +594,11 @@ export const FINAL_TUNING = {
   /** A change while marked hits this many times as hard. */
   shakenMult: 3,
   /** Taking Root: on entering a new quarter (the pull's too), it cannot
-   *  move. 10 s, down from the sketch's 15 (Jose's playtest of 28 Oct 2026:
-   *  the long root read as a boss that will not follow). */
-  rootSeconds: 10,
+   *  move. 6 s since Jose's playtest of 2026-11-19 ("sometimes the boss
+   *  stays rooted a long time, like 10 s, why?"); 10 s before it, down from
+   *  the sketch's 15 on 28 Oct 2026 (the long root read as a boss that will
+   *  not follow). */
+  rootSeconds: 6,
   /** After the root lets go, no planted bar begins for this long: the
    *  tank's window to start the drag. */
   dragGrace: 3,

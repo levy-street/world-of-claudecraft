@@ -12,7 +12,9 @@
 //                   leaves Vein-Shaken (20 s) on everyone struck; a change
 //                   while still shaken hits three times as hard.
 //   Taking Root     on entering a new quarter (the first one too) the boss
-//                   roots for 10 s: it cannot be dragged out. Back into the
+//                   roots for 6 s (10 until Jose's playtest of 2026-11-19:
+//                   it read as a boss stuck for no reason): it cannot be
+//                   dragged out; rock spikes stand round its feet while it holds. Back into the
 //                   quarter it just left (a dip into the ring) it does not.
 //                   Every difficulty.
 //   Heart Unbound   in the central ring above its final phase (15 percent)

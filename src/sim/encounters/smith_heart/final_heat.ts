@@ -30,8 +30,8 @@ import { HEART_ROOM } from '../../content/smith_heart_layout';
 import { DT, type Entity } from '../../types';
 import { clearCastIf } from '../sunken_bastion/claim';
 import {
-  FINAL_AURAS,
   devilTemplate,
+  FINAL_AURAS,
   FINAL_CASTS,
   FINAL_CUES,
   FINAL_NAMES,
