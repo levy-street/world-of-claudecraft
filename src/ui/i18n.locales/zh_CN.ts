@@ -24465,6 +24465,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '{seconds}秒后闪电会劈在你所站之处：对{radius}码内的所有人造成{min}到{max}点自然伤害。快离开。落在石柱{arcReach}码内的闪电会环绕石柱形成电弧，使其被风暴充能。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.bladeMark':
     '一把交错之刃把它的直线瞄准了你：直线会跟随你，并在飞出前{lock}秒锁定。把直线引过石柱将其击碎，然后离开直线。直线上的所有人受到{min}到{max}点冰霜伤害。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。',
+  'hudChrome.auraEffect.finalBoss.anvilMark':
+    '铁砧之重跟随着你：它的{radius}码法圈随你移动，并在落下前{lock}秒固定。让团队聚集在圈内：{total}点物理伤害由圈内所有人分担，少于{fewer}人时每人多承受一半。英雄：{heroicTotal}。史诗：{mythicTotal}。',
   'hudChrome.finalAlert.bladeTitle': '交错之刃：引导它',
   'hudChrome.finalAlert.bladeLockedTitle': '冰刃已锁定：快离开！',
   'hudChrome.finalAlert.skyTitle': '天落雷击瞄准了你！',

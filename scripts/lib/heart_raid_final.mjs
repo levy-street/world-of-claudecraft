@@ -616,6 +616,10 @@ function duty(world, st, b, me) {
   // The bot holding the boss (its aggro): the one who may stay out.
   const mainTank = me.tank && (boss?.aggro === me.pid || me.pid === st.mainTankPid);
   const ringClear = !!anvil && hypot(anvil, world.center) > HEART_QUARTERS.ringR + T.anvilR + 3;
+  // Its circle follows its marked player (Jose's playtest of 2026-11-19): the
+  // marked one holds still so the raid can gather on them.
+  if (anvil && hasAura(me, FINAL_AURAS.anvilMark))
+    return { goal: { x: me.x, z: me.z }, tol: 1.5, duty: 'anvil (marked)' };
   if (anvil && (!mainTank || ringClear) && !hasAura(me, FINAL_AURAS.crushed)) {
     const i = world.bots.indexOf(b);
     return {

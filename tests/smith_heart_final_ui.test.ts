@@ -12,10 +12,12 @@
 //   - the painter writes nothing on a still frame.
 
 import { describe, expect, it } from 'vitest';
+import { FINAL_ARROW_AURAS, finalArrowMark } from '../src/render/smith_heart_fx/final_arrow_core';
 import {
   FINAL_AURAS,
   FINAL_BOSS,
   FINAL_CASTS,
+  FINAL_DIFFICULTY,
   FINAL_NAMES,
   FINAL_ZONE_CODES,
   FINAL_OVERLOAD as O,
@@ -154,6 +156,22 @@ describe('The Masterless Strength: tooltips', () => {
     expect(say({ id: FINAL_AURAS.crushed, kind: 'internal_cd' })).toContain(
       `${T.crushedMult} times`,
     );
+    // Weight of the Anvil's mark (Jose's playtest of 2026-11-19): it follows you, plants, splits.
+    const anvil = say({ id: FINAL_AURAS.anvilMark, kind: 'internal_cd' });
+    expect(anvil).toContain('follows you');
+    expect(anvil).toContain(`${T.anvilR} yd`);
+    expect(anvil).toContain(`plants ${T.anvilLock} sec`);
+    expect(anvil).toContain(String(FINAL_DIFFICULTY.normal.anvilTotal));
+    expect(anvil).not.toMatch(/\{\w+\}/);
+  });
+});
+
+describe("The Masterless Strength: the marked player's own arrow", () => {
+  it('Weight of the Anvil raises it', () => {
+    expect(FINAL_ARROW_AURAS).toContain(FINAL_AURAS.anvilMark);
+    expect(finalArrowMark({ auras: [] })).toBeNull();
+    const a = { id: FINAL_AURAS.anvilMark, remaining: 4, duration: 6 } as Aura;
+    expect(finalArrowMark({ auras: [a] })).toBe(a);
   });
 });
 

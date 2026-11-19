@@ -366,6 +366,28 @@ describe('FinalKitFx over a fake world', () => {
     expect(visibleNamed(root, 'smithHeartFinalIce')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalShell')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalAnvil')).toBe(1);
+    // The personal arrow: none until a mark singles me out; another player's
+    // anvil mark draws nothing on my screen, mine draws it over my head.
+    expect(visibleNamed(root, 'smithHeartRushArrow')).toBe(0);
+    const anvilMark = {
+      id: FINAL_AURAS.anvilMark,
+      name: 'x',
+      kind: 'internal_cd',
+      remaining: 4,
+      duration: T.anvilCast,
+      value: 0,
+      sourceId: 2,
+    } as Entity['auras'][number];
+    frozen.auras.push(anvilMark);
+    fx.update(1 / 30);
+    expect(visibleNamed(root, 'smithHeartRushArrow')).toBe(0);
+    me.auras.push({ ...anvilMark });
+    fx.update(1 / 30);
+    expect(visibleNamed(root, 'smithHeartRushArrow')).toBe(1);
+    me.auras.pop();
+    frozen.auras.pop();
+    fx.update(1 / 30);
+    expect(visibleNamed(root, 'smithHeartRushArrow')).toBe(0);
     // A Sky Strike lands: a bolt out of the sky; Arcing Stone rings out.
     const strike = {
       type: 'spellfxAt',

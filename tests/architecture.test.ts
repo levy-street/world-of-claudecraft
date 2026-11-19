@@ -1160,6 +1160,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/breath_roar_fx_core.ts',
   // which players the Breath's red arrows ride (breath_fight_fx.ts)
   'src/render/smith_heart_fx/breath_arrow_core.ts',
+  'src/render/smith_heart_fx/final_arrow_core.ts',
   // a thrown body's drawn hop off the floor (thrown_hop.ts, the Summit Roar)
   'src/render/thrown_hop_core.ts',
   'src/render/smith_heart_fx/breath_heart_fx_core.ts',

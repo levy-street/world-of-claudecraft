@@ -458,13 +458,66 @@ describe('the Hammer quarter', () => {
       new Set([f.pids[1], f.pids[2], f.pids[3]]),
     );
     expect(shared[0].amount).toBeLessThan(FINAL_DIFFICULTY.normal.anvilTotal / 3 + 200);
-    // Nobody under it.
+    // Nobody under it: the circle planted 1 s out, everyone runs from it.
     f.dev('/dev heart final anvil', f.pids[1]);
+    f.tick(sec(T.anvilCast - T.anvilLock + 0.2));
     f.put(f.players[1], c.x - 20, c.z);
     f.put(f.players[2], c.x - 20, c.z + 3);
     f.put(f.players[3], c.x - 20, c.z - 3);
-    const miss = hits(f.tick(sec(T.anvilCast + 0.1)), FINAL_NAMES.anvil);
+    const miss = hits(f.tick(sec(T.anvilLock + 0.1)), FINAL_NAMES.anvil);
     expect(miss.length).toBe(5);
+  });
+
+  it("Weight of the Anvil's circle follows its player through the bar, then plants (playtest 2026-11-19)", () => {
+    const f = finalFight(5);
+    f.pullIn('hammer');
+    const c = heartQuarterSpot('hammer');
+    f.put(f.players[1], c.x + 10, c.z);
+    f.dev('/dev heart final anvil', f.pids[1]);
+    const marked = f.players[1];
+    // The mark on its player for the whole bar (their arrow, their alarm).
+    expect(aura(marked, FINAL_AURAS.anvilMark)?.duration).toBe(T.anvilCast);
+    for (const p of f.players.slice(2)) expect(aura(p, FINAL_AURAS.anvilMark)).toBeUndefined();
+    const mark = () => f.local(f.objects(FINAL_OBJECTS.anvilPrefix)[0]);
+    // It walks: the circle rides with them.
+    f.tick(sec(1));
+    f.put(marked, c.x + 4, c.z + 8);
+    f.tick(2);
+    const here = f.local(marked);
+    expect(Math.hypot(mark().x - here.x, mark().z - here.z)).toBeLessThan(0.5);
+    f.put(marked, c.x - 6, c.z + 2);
+    // 22 ticks so far: on to 0.2 s past the lock.
+    f.tick(sec(T.anvilCast - T.anvilLock + 0.2) - 22);
+    const locked = { ...mark() };
+    expect(Math.hypot(locked.x - f.local(marked).x, locked.z - f.local(marked).z)).toBeLessThan(
+      0.5,
+    );
+    // Locked for its last second: it stays where it planted.
+    f.put(marked, c.x - 6, c.z + 12);
+    f.tick(sec(0.5));
+    expect(mark().x).toBeCloseTo(locked.x, 6);
+    expect(mark().z).toBeCloseTo(locked.z, 6);
+    // It falls there, and the mark goes.
+    f.tick(sec(1));
+    expect(f.objects(FINAL_OBJECTS.anvilPrefix).length).toBe(0);
+    expect(aura(marked, FINAL_AURAS.anvilMark)).toBeUndefined();
+  });
+
+  it('Weight of the Anvil comes every 35 s on Normal, 30 on Heroic, 28 on Mythic', () => {
+    expect(FINAL_DIFFICULTY.normal.anvilEvery).toBe(35);
+    expect(FINAL_DIFFICULTY.heroic.anvilEvery).toBe(30);
+    expect(FINAL_DIFFICULTY.mythic.anvilEvery).toBe(28);
+    // A live pull: the next bar 35 s after the first, on its own clock.
+    const f = finalFight(5);
+    f.pullIn('hammer');
+    const starts: number[] = [];
+    for (let i = 0; i < sec(T.anvilFirst + 2 * 35 + 8); i++) {
+      const was = f.state()?.anvil;
+      f.tick();
+      if (!was && f.state()?.anvil) starts.push(i / 20);
+    }
+    expect(starts.length).toBeGreaterThanOrEqual(3);
+    for (let i = 1; i < starts.length; i++) expect(starts[i] - starts[i - 1]).toBeLessThan(35 + 4);
   });
 
   it('Heroic: soakers are Crushed and take the next Anvil three times over; Stone Shell absorbs healing', () => {

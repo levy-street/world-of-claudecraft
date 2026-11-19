@@ -25803,6 +25803,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{seconds}秒後、あなたの立つ場所に雷が落ちる：{radius}ヤード以内の全員に{min}～{max}の自然ダメージ。その場を離れること。柱から{arcReach}ヤード以内に落ちた雷は柱の周りに弧を描き、柱を嵐に帯電させる。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
   'hudChrome.auraEffect.finalBoss.bladeMark':
     '交差する刃があなたを貫く線を狙っている：線はあなたを追い、飛ぶ{lock}秒前に固定される。線を柱に通して砕き、それから線から離れること。線上の全員が{min}～{max}の冷気ダメージを受ける。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
+  'hudChrome.auraEffect.finalBoss.anvilMark':
+    'アンヴィルの重みがあなたを追う：{radius}ヤードの円があなたと共に動き、落ちる{lock}秒前に固定される。レイドをその中に集めること：{total}の物理ダメージが中の全員で分けられ、{fewer}人未満ならそれぞれ1.5倍を受ける。ヒロイック：{heroicTotal}。ミシック：{mythicTotal}。',
   'hudChrome.finalAlert.bladeTitle': '交差する刃：導け',
   'hudChrome.finalAlert.bladeLockedTitle': '刃が固定：離れろ！',
   'hudChrome.finalAlert.skyTitle': '天の一撃があなたに！',

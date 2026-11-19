@@ -62,6 +62,7 @@ import {
   stepOrbs,
 } from './final_breath';
 import {
+  clearAnvil,
   clearHammer,
   crackTremors,
   landAnvil,
@@ -138,7 +139,6 @@ import {
   bossFree,
   cueOn,
   dropAura,
-  dropFightObject,
   type FinalScope,
   heartListeners,
   holdPlanted,
@@ -569,8 +569,7 @@ export function releaseRootForDev(ctx: SimContext, inst: InstanceSlot): void {
   st.bar = null;
   st.boltTarget = null;
   clearFist(s);
-  if (st.anvil) dropFightObject(ctx, inst, st.anvil.objectId);
-  st.anvil = null;
+  clearAnvil(s);
   clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
 }
 
@@ -738,7 +737,7 @@ export function finalDevMechanic(
       return `Tremor Cracks under ${crackTremors(s).length} players.`;
     case 'anvil':
       clearBar();
-      return startAnvil(s, here) ? 'Weight of the Anvil: 6 s, on you.' : null;
+      return startAnvil(s, here, me ?? undefined) ? 'Weight of the Anvil: 6 s, on you.' : null;
     case 'shell':
       return `Stone Shell on ${stoneShell(s).length} players.`;
     default:

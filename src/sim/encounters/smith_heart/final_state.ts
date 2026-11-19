@@ -83,6 +83,9 @@ export interface FinalAnvil {
   /** Mythic: its bearing round the boss (radians), turning. */
   angle: number;
   left: number;
+  /** The player its circle follows through the bar (0: none, a dev spot or
+   *  Mythic's turning mark). */
+  targetId: number;
 }
 
 /** The active quarter's kit clocks (fresh on entering a quarter). */
