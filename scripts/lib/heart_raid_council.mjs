@@ -14,7 +14,7 @@
 // its bar. Reads only what the server sends.
 //
 // Grieving Fury (council_fury.ts, 2026-11-18): the first to fall sends its soul
-// to the survivor, which mends, hastens and takes up the fallen one's kit 3 s
+// to the survivor, which heals at once, hastens and takes up the fallen one's kit 3 s
 // later, so the raid brings the two down TOGETHER: by default (ORDER=split)
 // each damage dealer hits whichever member stands higher in health (the melee
 // keep to the Guardian unless the Singer runs ahead), and the last few percent

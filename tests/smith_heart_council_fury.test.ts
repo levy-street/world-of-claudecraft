@@ -1,7 +1,7 @@
 // Grieving Fury (src/sim/encounters/smith_heart/council_fury.ts), the Hammer
 // Council's answer to "kill one, then cruise" (the owner's option B of
 // 2026-11-18) over a REAL Sim claim: for each kill order on each tier the
-// survivor's soul flight, its mend, its fury (Memory of Stone and the haste on
+// survivor's soul flight, its instant heal, its fury (Memory of Stone and the haste on
 // its swings, bars and clocks), the fallen one's kit at full strength, the
 // window that spares a near-together kill, the wipe lifting it all, and
 // determinism. The client's look is pinned at the end (the pure core).
@@ -81,7 +81,7 @@ for (const tier of TIERS) {
   for (const first of ORDERS) {
     const survivor = other(first);
     describe(`Grieving Fury on ${tier}: the ${first} falls first`, () => {
-      it('the soul flies, then the survivor mends its share and wears the fury', () => {
+      it('the soul flies, then the survivor heals its share at once and wears the fury', () => {
         const f = pulled(tier);
         const rules = COUNCIL_DIFFICULTY[tier];
         const s = f.bodies()[survivor] as Entity;
@@ -99,7 +99,7 @@ for (const tier of TIERS) {
         expect(s.hp).toBe(hp0);
         expect(s.auras.some((a) => a.id === COUNCIL_AURAS.fury)).toBe(false);
         expect(s.auras.some((a) => a.id === COUNCIL_AURAS.memory)).toBe(false);
-        // It lands: the wake, the two auras, the mend over its seconds.
+        // It lands: the wake, the two auras, the heal.
         const land = f.tick(4);
         expect(cues(land, COUNCIL_CUES.furyWake).length).toBe(1);
         const fury = s.auras.find((a) => a.id === COUNCIL_AURAS.fury);
@@ -109,22 +109,24 @@ for (const tier of TIERS) {
         const mem = s.auras.find((a) => a.id === COUNCIL_AURAS.memory);
         expect(mem?.kind).toBe('buff_dmg_done');
         expect(mem?.value).toBeCloseTo(rules.furyDamage);
-        const mends = cues(
-          f.tick(Math.ceil(rules.furyHealSeconds * 20) + 2),
-          COUNCIL_CUES.furyMend,
-        );
-        expect(mends.length + cues(land, COUNCIL_CUES.furyMend).length).toBe(
-          Math.round(rules.furyHealSeconds / T.furyMendEvery),
-        );
-        const healed = s.hp - hp0;
-        // Its swing may have nothing to do with its own health: the mend is
-        // the tier's share (rounded up a beat at most).
-        expect(healed).toBeGreaterThanOrEqual(Math.round(s.maxHp * rules.furyHealPct) - 1);
-        expect(healed).toBeLessThanOrEqual(Math.round(s.maxHp * rules.furyHealPct) + 5);
-        // And no more after.
+        // The heal lands with the soul, ALL AT ONCE (the playtest of
+        // 2026-11-19): one flash cue and one floating number on the body.
+        const share = Math.round(s.maxHp * rules.furyHealPct);
+        expect(cues(land, COUNCIL_CUES.furyHeal).length).toBe(1);
+        const heals = land.filter(
+          (e) => e.type === 'heal' && (e as { targetId: number }).targetId === s.id,
+        ) as { amount: number }[];
+        expect(heals.map((h) => h.amount)).toEqual([share]);
+        expect(f.st.fury?.healed).toBe(share);
+        expect(s.hp - hp0).toBe(share);
+        // And nothing more after it: no heal over time.
         const after = s.hp;
-        f.tick(40);
+        const later = f.tick(20 * 10);
         expect(s.hp).toBe(after);
+        expect(cues(later, COUNCIL_CUES.furyHeal).length).toBe(0);
+        expect(
+          later.some((e) => e.type === 'heal' && (e as { targetId: number }).targetId === s.id),
+        ).toBe(false);
       });
 
       it("takes up the fallen one's kit at full strength, hastened", () => {
@@ -197,7 +199,7 @@ for (const tier of TIERS) {
   }
 
   describe(`Grieving Fury on ${tier}: the window`, () => {
-    it('a second kill inside the soul’s flight costs nothing: no mend, no fury', () => {
+    it('a second kill inside the soul’s flight costs nothing: no heal, no fury', () => {
       const f = pulled(tier);
       kill(f, 'guardian');
       f.tick(ARRIVE_TICKS - 10);
@@ -208,17 +210,15 @@ for (const tier of TIERS) {
       expect(cues(ev, COUNCIL_CUES.furyWake).length).toBe(0);
     });
 
-    it('one inside the mend costs only part of it', () => {
+    it('the heal never takes the survivor past full', () => {
       const f = pulled(tier);
-      const rules = COUNCIL_DIFFICULTY[tier];
       const s = f.bodies().singer as Entity;
-      s.hp = Math.round(s.maxHp * 0.3);
+      s.hp = s.maxHp - 10;
       kill(f, 'guardian');
-      const hp0 = s.hp;
-      f.tick(ARRIVE_TICKS + 1 + 20 * 2);
-      const part = s.hp - hp0;
-      expect(part).toBeGreaterThan(0);
-      expect(part).toBeLessThan(Math.round(s.maxHp * rules.furyHealPct) * 0.6);
+      const land = f.tick(ARRIVE_TICKS + 1);
+      expect(s.hp).toBe(s.maxHp);
+      expect(cues(land, COUNCIL_CUES.furyHeal).length).toBe(1);
+      expect(f.st.fury?.healed).toBe(10);
     });
   });
 }

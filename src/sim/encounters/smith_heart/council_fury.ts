@@ -15,13 +15,15 @@
 //                    fallen one's jobs at FULL strength (council_scope.ts
 //                    jobHolder: the Wrath, or the Wake and the song; on
 //                    Heroic and Mythic the Weight or the bolt too).
-//   It mends         from the landing the survivor mends the tier's
-//                    `furyHealPct` of its maximum health over
-//                    `furyHealSeconds`, one beat a second
-//                    (COUNCIL_CUES.furyMend), never past full.
+//   It heals         the same tick the survivor takes back the tier's
+//                    `furyHealPct` of its maximum health AT ONCE (Jose's
+//                    playtest of 2026-11-19: one big heal the raid sees, not a
+//                    trickle), never past full: a `heal` event (the floating
+//                    number every viewer sees) and COUNCIL_CUES.furyHeal (the
+//                    flash on the body).
 //
-// So the second kill inside the soul's flight costs the raid nothing, one
-// inside the mend only part of the health, and a raid that kills one and
+// So the second kill inside the soul's flight costs the raid nothing, and a
+// raid that kills one and
 // strolls to the other fights a healed, enraged boss with both kits: the two
 // must fall together. Normal's numbers are gentle, Heroic's hard (each tier's
 // COUNCIL_DIFFICULTY row). The fury lasts until the fight ends (the kill or
@@ -49,16 +51,13 @@ export function beginFury(s: CouncilScope, fallen: CouncilRole, dead: Entity): C
   const survivor = COUNCIL_ROLES.find((r) => r !== fallen && living(s.bodies[r]));
   const body = survivor ? s.bodies[survivor] : null;
   if (!survivor || !body) return null;
-  const healTotal = Math.round(body.maxHp * s.rules.furyHealPct);
-  const beats = Math.max(1, Math.round(s.rules.furyHealSeconds / T.furyMendEvery));
   s.st.fury = {
     survivor,
     fallen,
     arriveIn: T.furyArrive,
     arrived: false,
-    healLeft: healTotal,
-    healEach: Math.ceil(healTotal / beats),
-    mendTimer: 0,
+    heals: true,
+    healed: 0,
   };
   s.ctx.emit({
     type: 'spellfx',
@@ -105,8 +104,8 @@ function wearFury(s: CouncilScope, body: Entity, fury: CouncilFury): void {
     });
 }
 
-/** One tick of the fury: the soul's flight, its landing, the mend. Returns
- *  the health mended this tick (the tests read it). */
+/** One tick of the fury: the soul's flight and its landing with the heal.
+ *  Returns the health healed this tick (the tests read it). */
 export function stepFury(s: CouncilScope): number {
   const fury = s.st.fury;
   if (!fury) return 0;
@@ -130,23 +129,28 @@ export function stepFury(s: CouncilScope): number {
     // playing, so the two are heard in turn).
     councilSay(s, fury.survivor, 'remember');
     councilSay(s, fury.survivor, 'grief');
+    return fury.heals ? healSurvivor(s, body, fury) : 0;
   }
-  if (fury.healLeft <= 0) return 0;
-  fury.mendTimer -= DT;
-  if (fury.mendTimer > 1e-9) return 0;
-  fury.mendTimer += T.furyMendEvery;
-  const amount = Math.min(fury.healLeft, fury.healEach, body.maxHp - body.hp);
-  fury.healLeft -= fury.healEach;
-  if (amount <= 0) return 0;
+  return 0;
+}
+
+/** The landing's heal: the tier's whole share at once, never past full. */
+function healSurvivor(s: CouncilScope, body: Entity, fury: CouncilFury): number {
+  const amount = Math.max(
+    0,
+    Math.min(Math.round(body.maxHp * s.rules.furyHealPct), body.maxHp - body.hp),
+  );
+  fury.healed = amount;
   body.hp += amount;
   s.ctx.emit({
     type: 'spellfx',
     sourceId: body.id,
     targetId: body.id,
-    school: 'physical',
+    school: 'nature',
     fx: 'nova',
-    ability: COUNCIL_CUES.furyMend,
+    ability: COUNCIL_CUES.furyHeal,
   });
+  if (amount > 0) s.ctx.emit({ type: 'heal', targetId: body.id, amount });
   return amount;
 }
 
