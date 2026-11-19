@@ -851,6 +851,7 @@ import {
 } from './sky';
 import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
+import { HeartEnvFade } from './smith_heart/heart_env_fade';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { enterSpellEvent, leaveSpellEvent } from './spell_effects_switch';
 import { SpiritGrade } from './spirit_grade';
@@ -8673,6 +8674,8 @@ export class Renderer {
   private riftFogAuthored = false;
   /** Read by scenery eligibility; atmosphere updates remain owned here. */
   fogState: FogSceneState = 'outdoor';
+  /** The Smith's Heart's areas cross-fade their fog and light (heart_env_fade.ts). */
+  private readonly heartEnvFade = new HeartEnvFade();
 
   /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
@@ -9062,6 +9065,15 @@ export class Renderer {
     }
     this.riftFogKey = null;
     if (desired !== this.fogState) {
+      const live = {
+        fog,
+        sun: this.sun,
+        hemi: this.hemi,
+        scene: this.scene,
+        rim: sharedUniforms.uRimBoost,
+        rimColor: sharedUniforms.uRimColor,
+      };
+      this.heartEnvFade.capture(this.fogState, desired, live);
       this.fogState = desired;
       applyFogScenePreset(desired, fog, () => valley?.fog ?? this.outdoorFogPreset());
       // interiors must not leak daylight: drop sun + sky ambient + IBL
@@ -9069,8 +9081,10 @@ export class Renderer {
       // The rim glow cranks up instead, silhouettes must split from the murk.
       // Which numbers each state means is interior_light_rig.ts's to own.
       this.applyStateLightRig(desired);
+      this.heartEnvFade.arm();
       return;
     }
+    this.heartEnvFade.update(dt);
     // Outdoors, fog is also the residency boundary. Pull it inward immediately
     // before an unloaded zone can become visible; once that zone has been
     // loaded by the boundary transition, ease the view distance back out.
@@ -9344,6 +9358,7 @@ export class Renderer {
     const blend = t * t * (3 - 2 * t);
     this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
     interiorKeyLightDirection(this.fogState, this.lightDir);
+    this.heartEnvFade.steerKey(this.lightDir);
     setWaterSunDirection(this.lightDir);
     setWaterDayNight(this.dnGrade.fog);
     setFarTerrainNightGrade(this.dnGrade.nightAmt);
