@@ -705,7 +705,7 @@ describe('Opposing Elements', () => {
     const ice = ps.find((p) => polarity(p) === 'ice') as Entity;
     const at = f.local(fire);
     f.put(ice, at.x + 1.5, at.z);
-    const ev = f.tick(2);
+    const ev = f.tick(sec(E.polarityGrace + 0.2));
     expect(aura(fire, ELEMENT_AURAS.polarity)).toBeUndefined();
     expect(aura(ice, ELEMENT_AURAS.polarity)).toBeUndefined();
     expect(f.state()?.elements.balanced).toBe(1);
@@ -729,7 +729,7 @@ describe('Opposing Elements', () => {
       // A bystander 5 yd off (unmarked: the off-tank).
       const by = f.players[1];
       f.put(by, at.x - 5, at.z);
-      const ev = f.tick(2);
+      const ev = f.tick(sec(E.polarityGrace + 0.2));
       expect(hits(ev, ELEMENT_NAMES.clash, fire.id).length, tier).toBe(1);
       expect(hits(ev, ELEMENT_NAMES.clash, earth.id).length, tier).toBe(1);
       expect(hits(ev, ELEMENT_NAMES.clash, by.id).length, tier).toBe(tier === 'mythic' ? 1 : 0);
@@ -737,6 +737,22 @@ describe('Opposing Elements', () => {
       expect(aura(earth, ELEMENT_AURAS.polarity), tier).toBeUndefined();
       expect(f.state()?.elements.clashes, tier).toBe(1);
     }
+  });
+
+  it('no meeting counts in the first 1.5 s: marked side by side, they step apart first', () => {
+    const f = polarityFight('normal');
+    startOpposites(scope(f));
+    const ps = marked(f);
+    const fire = ps.find((p) => polarity(p) === 'fire') as Entity;
+    const earth = ps.find((p) => polarity(p) === 'earth') as Entity;
+    const at = f.local(fire);
+    f.put(earth, at.x + 1.5, at.z);
+    const ev = f.tick(sec(E.polarityGrace - 0.2));
+    expect(hits(ev, ELEMENT_NAMES.clash).length).toBe(0);
+    expect(aura(fire, ELEMENT_AURAS.polarity)).toBeDefined();
+    // Apart again before the grace ends: never a clash.
+    f.put(earth, at.x + 12, at.z);
+    expect(hits(f.tick(sec(1)), ELEMENT_NAMES.clash).length).toBe(0);
   });
 
   it('a mark left with no possible partner fades quietly', () => {
@@ -747,7 +763,7 @@ describe('Opposing Elements', () => {
     const earth = ps.find((p) => polarity(p) === 'earth') as Entity;
     const at = f.local(fire);
     f.put(earth, at.x + 1.5, at.z);
-    f.tick(2);
+    f.tick(sec(E.polarityGrace + 0.2));
     // Ice and Lightning are left, opposites of nobody left: gone, no timeout.
     expect(marked(f).length).toBe(0);
     const ev = f.tick(sec(E.polaritySeconds + 1));

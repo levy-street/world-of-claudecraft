@@ -8,6 +8,8 @@
 //                even count in matching opposite pairs (4 on Normal, 6 on
 //                Heroic, 8 = every non-tank on Mythic); an odd player out is
 //                left unmarked.
+//   Grace        no meeting counts for the first 1.5 s (players marked side
+//                by side step apart first).
 //   Cancel       a marked player who comes within 3 yd of one of the
 //                OPPOSITE element: both marks go in a burst.
 //   Clash        within 3 yd of any other mark (the same element, or the
@@ -117,9 +119,10 @@ function stepRound(s: FinalScope): void {
     if (!worn && p) dropAura(p, ELEMENT_AURAS.polarity);
     return worn;
   });
-  // The meetings, nearest first in id order.
+  // The meetings, nearest first in id order (none through the grace).
   const spent = new Set<number>();
-  for (let i = 0; i < marks.length; i++) {
+  const judging = el.polarityLeft <= E.polaritySeconds - E.polarityGrace + 1e-9;
+  for (let i = 0; i < marks.length && judging; i++) {
     const a = marks[i];
     if (spent.has(a.pid)) continue;
     const pa = s.ctx.entities.get(a.pid) as Entity;
