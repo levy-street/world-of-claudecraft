@@ -11,6 +11,9 @@
 //     broad face to the sky), drawing back as the line locks, then flying it
 //     point first, low, on an eased curve (`bladeFlight`);
 //   - a line's warning fill off its mark's own aura (`laneFill`);
+//   - the local player's own line drawn at their DRAWN pose while it aims
+//     (`localBladeIndex`, `easeHeading`: online the server's line is a round
+//     trip late, so it trailed the player it follows);
 //   - a Storm-Charged pillar's crawling arcs (`chargedArc`);
 //   - the palette and the fixed pools.
 //
@@ -188,6 +191,46 @@ export function laneFill(
   if (state !== 'warn') return 1;
   if (!(markDuration > 0)) return 0.5;
   return clamp01(1 - markRemaining / markDuration);
+}
+
+// ---- the local player's own line (Jose's playtest of 2026-11-19) --------------------------
+
+/** The smallest turn between two headings (radians, 0..PI). */
+export function headingGap(a: number, b: number): number {
+  return Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
+}
+
+/** A server line counts as aimed at the local player while it points within
+ *  this of them (radians: the line is late by a round trip, never by more). */
+export const LOCAL_BLADE_GAP = 0.6;
+
+/** Of the blades still aiming (`from` on the rim, the server's `facing`),
+ *  the one aimed at the local player at (meX, meZ): the least turn from its
+ *  line to them, within LOCAL_BLADE_GAP. -1 for none. */
+export function localBladeIndex(
+  blades: readonly { fromX: number; fromZ: number; facing: number; aiming: boolean }[],
+  meX: number,
+  meZ: number,
+): number {
+  let best = -1;
+  let gap = LOCAL_BLADE_GAP;
+  blades.forEach((b, i) => {
+    if (!b.aiming) return;
+    const g = headingGap(Math.atan2(meX - b.fromX, meZ - b.fromZ), b.facing);
+    if (g <= gap) {
+      gap = g;
+      best = i;
+    }
+  });
+  return best;
+}
+
+/** A heading eased toward `to` at `rate` per second over `dt` (the shortest
+ *  way round): the local line handing back to the server's lock. */
+export function easeHeading(from: number, to: number, rate: number, dt: number): number {
+  const d = Math.atan2(Math.sin(to - from), Math.cos(to - from));
+  const k = 1 - Math.exp(-rate * Math.max(0, dt));
+  return from + d * k;
 }
 
 // ---- the charged pillar ---------------------------------------------------------------

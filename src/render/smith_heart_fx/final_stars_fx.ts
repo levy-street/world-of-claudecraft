@@ -37,6 +37,7 @@
 // rungs (FINAL_KIT_FLOOR: the lanes on `lane`, the rings on `marks`).
 
 import * as THREE from 'three';
+import { lineLength } from '../../sim/encounters/smith_heart/final_blades';
 import { finalLaneOf } from '../../sim/encounters/smith_heart/final_ids';
 import type { Entity } from '../../sim/types';
 import type { TelegraphKit, TelegraphLane, TelegraphStyle } from '../floor_telegraph';
@@ -56,7 +57,10 @@ import {
   boltPath,
   STAR_COLORS as C,
   chargedArc,
+  easeHeading,
+  headingGap,
   laneFill,
+  localBladeIndex,
   STAR_POOLS as P,
   ringWave,
   starHash,
@@ -158,6 +162,9 @@ interface Blade {
   scarUntil: number;
   lastX: number;
   lastZ: number;
+  /** Its line was last drawn at the local player's drawn pose (it eases back
+   *  onto the server's once it stops). */
+  predicted: boolean;
 }
 
 interface Column {
@@ -207,6 +214,15 @@ export class FinalStarsFx {
   private readonly lanes = new Map<number, Entity>();
   private markFill = 0;
   private markDuration = 0;
+  /** The local player's drawn spot while their own line aims (null: none),
+   *  the instance's origin, and the last paint's clock (the hand-back's ease). */
+  private localAt: { x: number; z: number } | null = null;
+  private readonly _localAt = { x: 0, z: 0 };
+  private originX = 0;
+  private originZ = 0;
+  private bladeClock = 0;
+  private readonly aimScan: { fromX: number; fromZ: number; facing: number; aiming: boolean }[] =
+    [];
   private clock = 0;
   private readonly fullerMat: THREE.MeshBasicMaterial;
   private stopWaitingForPaint: (() => void) | null = null;
@@ -360,6 +376,7 @@ export class FinalStarsFx {
         scarUntil: -1,
         lastX: 0,
         lastZ: 0,
+        predicted: false,
       });
     }
     // The painted sword's fuller light (its own, built now: the painted
@@ -412,6 +429,18 @@ export class FinalStarsFx {
     for (const b of this.blades) b.seen = false;
   }
 
+  /** The local player's drawn spot while their own Crossing Blade mark
+   *  aims (world yards), the instance's origin; null otherwise. */
+  localBlade(at: { x: number; z: number } | null, ox: number, oz: number): void {
+    if (at) {
+      this._localAt.x = at.x;
+      this._localAt.z = at.z;
+    }
+    this.localAt = at ? this._localAt : null;
+    this.originX = ox;
+    this.originZ = oz;
+  }
+
   /** The Crossing Blade mark's run down this frame (any player's: one line at
    *  a time); `duration` 0 when nobody wears it. */
   bladeMark(remaining: number, duration: number): void {
@@ -433,6 +462,7 @@ export class FinalStarsFx {
       b.id = e.id;
       b.laneId = -1;
       b.flyAt = -1;
+      b.predicted = false;
       b.scarUntil = -1;
       b.laneState = 'warn';
       b.facing = e.facing;
@@ -963,7 +993,31 @@ export class FinalStarsFx {
 
   private paintBlades(): void {
     const H = this.h;
-    for (const b of this.blades) {
+    const dt = Math.max(0, this.clock - this.bladeClock);
+    this.bladeClock = this.clock;
+    // The local player's own line (the playtest of 2026-11-19): while it aims
+    // it is drawn from its blade to the player's DRAWN pose, the server's line
+    // (a round trip late) only picking which blade is theirs; once it locks it
+    // eases back onto the server's.
+    let mine = -1;
+    if (this.localAt) {
+      // One scratch row a blade, kept (no allocation a frame).
+      while (this.aimScan.length < this.blades.length)
+        this.aimScan.push({ fromX: 0, fromZ: 0, facing: 0, aiming: false });
+      for (let i = 0; i < this.blades.length; i++) {
+        const b = this.blades[i];
+        const lane = b.laneId >= 0 ? this.lanes.get(b.laneId) : undefined;
+        const info = lane ? finalLaneOf(lane.templateId) : null;
+        const row = this.aimScan[i];
+        row.fromX = b.fromX;
+        row.fromZ = b.fromZ;
+        row.facing = lane ? lane.facing : b.facing;
+        row.aiming = b.id >= 0 && b.seen && b.flyAt < 0 && info?.state === 'warn';
+      }
+      mine = localBladeIndex(this.aimScan, this.localAt.x, this.localAt.z);
+    }
+    for (let bi = 0; bi < this.blades.length; bi++) {
+      const b = this.blades[bi];
       if (b.id < 0) {
         // The frost scar a moment after its flight.
         if (b.scarUntil >= this.clock) this.paintScar(b);
@@ -989,7 +1043,22 @@ export class FinalStarsFx {
       if (lane && info) {
         b.length = info.length;
         b.laneState = info.state;
-        if (b.flyAt < 0) b.facing = lane.facing;
+        if (b.flyAt < 0) {
+          const me = bi === mine ? this.localAt : null;
+          if (me) {
+            b.predicted = true;
+            b.facing = Math.atan2(me.x - b.fromX, me.z - b.fromZ);
+            // The full line to the far rim, unless the server cut it short
+            // (Mythic's fallen quarter): then its own length.
+            const from = { x: b.fromX - this.originX, z: b.fromZ - this.originZ };
+            const full = lineLength(from, lane.facing);
+            if (Math.abs(full - info.length) < 0.75) b.length = lineLength(from, b.facing);
+          } else if (b.predicted) {
+            // Handing back to the server's (locked) line: eased, never a snap.
+            b.facing = easeHeading(b.facing, lane.facing, 14, dt);
+            if (headingGap(b.facing, lane.facing) < 0.005) b.predicted = false;
+          } else b.facing = lane.facing;
+        }
       }
       if (!b.seen) {
         // Gone: its flight is done (a frost scar on its line), or its mark fell.

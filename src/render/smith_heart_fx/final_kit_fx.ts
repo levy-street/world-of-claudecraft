@@ -1215,6 +1215,14 @@ export class FinalKitFx {
       }
     }
     this.stars.bladeMark(bladeLeft, bladeTotal);
+    // My own line while it aims: drawn at my DRAWN pose (online the server's
+    // line is a round trip late: Jose's playtest of 2026-11-19).
+    const me = world.entities.get(world.playerId);
+    let aiming = false;
+    if (me && !me.dead)
+      for (const a of me.auras)
+        if (a.id === FINAL_AURAS.bladeMark && (a.value ?? 1) < 2) aiming = true;
+    this.stars.localBlade(aiming && me ? fxAnchor(me) : null, this.originX, this.originZ);
     for (let i = ice; i < this.ice.length; i++) this.ice[i].visible = false;
     for (let i = shell; i < this.shells.length; i++) this.shells[i].visible = false;
   }
