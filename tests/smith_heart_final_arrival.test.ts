@@ -26,6 +26,7 @@ import { gfxInternalsForTest, sharedUniforms } from '../src/render/gfx';
 import {
   clearHeartArrivalLightForTest,
   heartArrivalFlare,
+  heartArrivalRite,
   heartArrivalVein,
 } from '../src/render/smith_heart/heart_arrival_light_core';
 import { heartSealSlotKey, observeHeartSealMask } from '../src/render/smith_heart/heart_seal_core';
@@ -404,6 +405,8 @@ describe('FinalFx plays the arrival', () => {
     s.step(arrivalVeinStart(3) + 0.5 - 0.6);
     expect(shown(s.scene, 'smithHeartArrivalStreams')).toBe(true);
     expect(heartArrivalVein(s.key, 'hammer')).toBeGreaterThan(0.95);
+    // The floor's rite marks (the grooves, the sockets) show while the veins run.
+    expect(heartArrivalRite(s.key)).toBe(1);
     s.step(ARRIVAL_BEAM_PEAK + 0.3 - (arrivalVeinStart(3) + 0.5));
     expect(shown(s.scene, 'smithHeartArrivalSwirl')).toBe(true);
     expect(shown(s.scene, 'smithHeartArrivalCore')).toBe(true);
@@ -420,6 +423,8 @@ describe('FinalFx plays the arrival', () => {
     // Over: the room as it always is.
     expect(heartArrivalVein(s.key, 'hammer')).toBe(1);
     expect(heartArrivalFlare(s.key)).toBe(0);
+    // And the floor's rite marks are gone with it (Jose's playtest of 2026-11-19).
+    expect(heartArrivalRite(s.key)).toBe(0);
     s.fx.dispose();
   });
 

@@ -46,12 +46,13 @@ import {
 import { HAMMER_ENV_PAVED, HAMMER_ENV_STAIRS, hammerEnvPathUv } from './hammer_env_plan_core';
 import { hammerRockPaintLayer } from './hammer_env_rock_paint';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
-import { heartArrivalFlare, heartArrivalVein } from './heart_arrival_light_core';
+import { heartArrivalFlare, heartArrivalRite, heartArrivalVein } from './heart_arrival_light_core';
 import { heartCliffPaint } from './heart_cliff_paint_core';
 import { heartCollapseDim, heartCollapseHeartLevel } from './heart_collapse_core';
 import { buildHeartEnvDress, heartOpenMountainLayer } from './heart_env_dress';
 import { inBreathLight, inHammerSky, inHeatLight, inQuenchLight } from './heart_environment';
 import { heartFinalDarkness } from './heart_final_core';
+import { setHeartFloorRite } from './heart_floor';
 import { ensureHeartFourSky, heartFourSkyTexture, heartRingSkyTexture } from './heart_four_sky';
 import { buildHeartGates } from './heart_gates';
 import { ensureHeartKit, heartKitProgramWarmers, SMITH_HEART_GATE_KIT_URL } from './heart_kit';
@@ -431,6 +432,8 @@ export async function buildSmithHeartInterior(
       for (const v of SMITH_HEART_VEINS) {
         heartKit?.setVein(v, (1 - 0.7 * dark) * heartArrivalVein(slot, v));
       }
+      // The grooves and the sockets only through the arrival and the death.
+      setHeartFloorRite(heartArrivalRite(slot));
       const flare = heartArrivalFlare(slot);
       if (flare > 0) {
         flareDir.x = HEART_ROOM.x - local.x;

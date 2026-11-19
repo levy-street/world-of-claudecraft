@@ -62,6 +62,7 @@ import { setRenderCategory } from '../renderer_diagnostics';
 import { noteHeartArrivalLight } from '../smith_heart/heart_arrival_light_core';
 import { heartCollapseView, noteHeartCollapse } from '../smith_heart/heart_collapse_core';
 import { noteHeartFinalDeath } from '../smith_heart/heart_final_core';
+import { heartFloorRite } from '../smith_heart/heart_floor_rite_core';
 import {
   ensureHeartKit,
   heartKitLoaded,
@@ -78,6 +79,7 @@ import { FinalArrivalBeam, type FinalArrivalFrame } from './final_arrival_beam';
 import {
   ARRIVAL_END,
   ARRIVAL_KNEEL_HEIGHT,
+  ARRIVAL_RISE_AT,
   ARRIVAL_SKIP_SECONDS,
   ARRIVAL_VEINS,
   ARRIVAL_WAVE_AT,
@@ -226,9 +228,13 @@ void main() {
 // ---- per-frame scratch (no allocation a frame) -----------------------------------------------
 
 const _e = new THREE.Euler();
+/** The floor's rite marks rise in and fade out over these (seconds). */
+const RITE_RISE = 0.6;
+const RITE_FADE = 2.5;
 const ARRIVAL_LIGHT = {
   veins: { hammer: 1, breath: 1, quench: 1, heat: 1 } as Record<SmithHeartVein, number>,
   flare: 0,
+  rite: 0,
 };
 
 export class FinalFx {
@@ -714,11 +720,15 @@ export class FinalFx {
       for (let i = 0; i < DEATH_VEINS.length; i++)
         ARRIVAL_LIGHT.veins[DEATH_VEINS[i]] = deathAltarLevel(this.deathT, i);
       ARRIVAL_LIGHT.flare = deathSkyFlare(this.deathT);
+      ARRIVAL_LIGHT.rite = heartFloorRite(this.deathT, DEATH_END, RITE_RISE, RITE_FADE);
       noteHeartArrivalLight(this.slotKey, ARRIVAL_LIGHT);
     } else if (!dead && t < ARRIVAL_END) {
       for (let i = 0; i < ARRIVAL_VEINS.length; i++)
         ARRIVAL_LIGHT.veins[ARRIVAL_VEINS[i]] = arrivalAltarLevel(t, i);
       ARRIVAL_LIGHT.flare = arrivalSkyFlare(t);
+      // The floor's rite marks (the grooves the veins run down, the sockets):
+      // in with the veins, gone as it rises (Jose's playtest of 2026-11-19).
+      ARRIVAL_LIGHT.rite = heartFloorRite(t, ARRIVAL_END, RITE_RISE, ARRIVAL_END - ARRIVAL_RISE_AT);
       noteHeartArrivalLight(this.slotKey, ARRIVAL_LIGHT);
     } else noteHeartArrivalLight(this.slotKey, null);
     const at = fxAnchor(boss);

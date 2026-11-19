@@ -17,7 +17,10 @@
 //   - the four vein grooves carved from each altar to the central ring, swept
 //     like the ridges (heart_vein_groove_core.ts, the arrival's light runs
 //     down them): a dark bed, walls shaded by the painted light, a rolled
-//     lip worn pale, on every tier;
+//     lip worn pale, on every tier, ONLY while the arrival or the death plays
+//     (`uHfRite`, heart_floor_rite_core.ts: Jose's playtest of 2026-11-19);
+//     the arrival's socket pits laid flush into the sheet the rest of the
+//     time (the vertex half);
 //   - wear paths polished pale (round the circle, in from the bridge, along
 //     each groove), soot smudges, dust settled in the joints toward the wall.
 // The arris and the cracks bend the lit normal too (the standard tier), so a
@@ -36,6 +39,7 @@
 // crack has no outline (`heartFloorScar`).
 
 import { HEART_QUARTERS } from '../../sim/content/smith_heart_quarters';
+import { HEART_FLOOR_SOCKETS } from './heart_floor_rite_core';
 import { HEART_VEIN_GROOVE, heartVeinGrooveFlatPhaseDeg } from './heart_vein_groove_core';
 
 /** The look's numbers (yards, shares). */
@@ -74,13 +78,50 @@ const G = HEART_VEIN_GROOVE;
  *  hair): the flat band of one colour laid under each crack's light. */
 const SCAR_Y = 0.036;
 
-/** The vertex half: the room-local point and the face's facing. */
+/** The vertex half: the room-local point and the face's facing, and the
+ *  arrival's sockets laid flush once the rite is over (heart_floor_rite_core.ts:
+ *  a pit's and its broken paving's vertices drop or rise to the sheet, face up,
+ *  in the sheet's own broad paint sampled round it, so the paint below takes
+ *  them as slabs). */
 export const HEART_FLOOR_VERT_HEAD = /* glsl */ `
 varying vec3 vHfP;
-varying float vHfUp;`;
+varying float vHfUp;
+${heartFloorSocketGlsl()}`;
+/** After `#include <color_vertex>`: the socket's mend and its paint. */
+export const HEART_FLOOR_VERT_COLOR = /* glsl */ `
+  hfSockets(position.xz);
+  #if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA )
+  vColor.rgb = mix(vColor.rgb, hfMendCol, hfMendK);
+  #endif`;
+/** After `#include <beginnormal_vertex>`: a mended face looks up. */
+export const HEART_FLOOR_VERT_NORMAL = /* glsl */ `
+  objectNormal = normalize(mix(objectNormal, vec3(0.0, 1.0, 0.0), hfMendK));`;
 export const HEART_FLOOR_VERT_BODY = /* glsl */ `
-  vHfP = position;
-  vHfUp = normal.y;`;
+  transformed.y = mix(transformed.y, ${f(L.sheetY)}, hfMendK);
+  vHfP = transformed;
+  vHfUp = mix(normal.y, 1.0, hfMendK);`;
+
+/** The sockets' mend (vertex): hfMendK how flush (0 the pit as carved, 1
+ *  laid into the sheet: outside the rite), hfMendCol the sheet's paint round
+ *  it. Unrolled over the eleven sockets. */
+export function heartFloorSocketGlsl(): string {
+  const n = HEART_FLOOR_SOCKETS.length;
+  const tests = HEART_FLOOR_SOCKETS.map(
+    (s, i) =>
+      `  if (length(p - vec2(${f(+s.x.toFixed(4))}, ${f(+s.z.toFixed(4))})) < ${f(+s.r.toFixed(4))}) { hfMendK = k; hfMendCol = uHfSockCol[${i}]; return; }`,
+  ).join('\n');
+  return /* glsl */ `
+uniform float uHfRite;
+uniform vec3 uHfSockCol[${n}];
+float hfMendK = 0.0;
+vec3 hfMendCol = vec3(0.0);
+void hfSockets(vec2 p) {
+  float k = 1.0 - uHfRite;
+  hfMendK = 0.0;
+  if (k <= 0.0) return;
+${tests}
+}`;
+}
 
 /** The fragment's helpers (`#include <common>`): hashes, noise, the cells. */
 export function heartFloorFragHead(lowGfx: boolean): string {
@@ -89,6 +130,7 @@ varying vec3 vHfP;
 varying float vHfUp;
 uniform vec4 uHfAwake;
 uniform vec4 uHfFront;
+uniform float uHfRite;
 float hfHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 vec2 hfHash2(vec2 p) {
   return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
@@ -189,7 +231,8 @@ export function heartFloorPaint(lowGfx: boolean): string {
     // The vein groove nearest (signed yards across it) and its carved stretch.
     vec2 gn;
     float gs = hfGroove(p, gn);
-    float gK = smoothstep(${f(G.ringR - 0.4)}, ${f(G.ringR + 0.2)}, r) * (1.0 - smoothstep(${f(G.outerR - 2)}, ${f(G.outerR)}, r));
+    // Only while the rite plays (the arrival, the death): heart_floor_rite_core.ts.
+    float gK = uHfRite * smoothstep(${f(G.ringR - 0.4)}, ${f(G.ringR + 0.2)}, r) * (1.0 - smoothstep(${f(G.outerR - 2)}, ${f(G.outerR)}, r));
     float wear = hfBand(r - 21.0, 3.6);
     wear = max(wear, hfBand(r * hfArc(b, radians(${f(L.bridgeDeg)})), 3.8) * smoothstep(15.0, 22.0, r));
     // Worn along each groove (the feet that walked the rite).

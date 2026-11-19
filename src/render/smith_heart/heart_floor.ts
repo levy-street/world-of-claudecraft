@@ -17,13 +17,17 @@ import { GFX } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
 import { applySurfaceDetail } from '../worn_stone';
 import {
+  HEART_FLOOR_LOOK,
   HEART_FLOOR_NORMAL,
   HEART_FLOOR_ROUGH,
   HEART_FLOOR_VERT_BODY,
+  HEART_FLOOR_VERT_COLOR,
   HEART_FLOOR_VERT_HEAD,
+  HEART_FLOOR_VERT_NORMAL,
   heartFloorFragHead,
   heartFloorPaint,
 } from './heart_floor_glsl';
+import { HEART_FLOOR_SOCKETS, HEART_SOCKET_SAMPLE } from './heart_floor_rite_core';
 
 const mats = new Map<string, THREE.Material>();
 
@@ -32,6 +36,59 @@ const mats = new Map<string, THREE.Material>();
  *  field draws at a time, so one shared pair (heart_quarters.ts writes it). */
 const SCAR_AWAKE = { value: new THREE.Vector4() };
 const SCAR_FRONT = { value: new THREE.Vector4() };
+
+/** How much of the rite marks show (heart_floor_rite_core.ts: the grooves
+ *  and the arrival's sockets, 1 through the arrival or the death, else 0),
+ *  and the sheet's paint round each socket for its mend. */
+const RITE = { value: 0 };
+const SOCKET_PAINT = {
+  value: HEART_FLOOR_SOCKETS.map(() => new THREE.Color(0.42, 0.37, 0.31)),
+};
+
+/** Tell the floor how much of the rite shows (the frame). */
+export function setHeartFloorRite(rite: number): void {
+  const k = Math.round(Math.max(0, Math.min(1, rite)) * 1000) / 1000;
+  if (RITE.value !== k) RITE.value = k;
+}
+
+/** The floor's rite share now (tests). */
+export function heartFloorRiteNow(): number {
+  return RITE.value;
+}
+
+/** Sample the sheet's own broad paint round each socket (the up-facing
+ *  vertices at the sheet's height in a ring just past its mend) from the
+ *  quarters' floor pieces, so a mended socket wears the paint round it. Once,
+ *  at the build; a socket with no sample keeps the warm stone default. */
+export function sampleHeartFloorSockets(
+  pieces: readonly (THREE.BufferGeometry | undefined)[],
+): void {
+  const sums = HEART_FLOOR_SOCKETS.map(() => [0, 0, 0, 0]);
+  for (const g of pieces) {
+    const pos = g?.getAttribute('position');
+    const nrm = g?.getAttribute('normal');
+    const col = g?.getAttribute('color');
+    if (!pos || !nrm || !col) continue;
+    for (let v = 0; v < pos.count; v++) {
+      if (nrm.getY(v) < 0.999 || Math.abs(pos.getY(v) - HEART_FLOOR_LOOK.sheetY) > 0.012) continue;
+      const x = pos.getX(v);
+      const z = pos.getZ(v);
+      for (let i = 0; i < HEART_FLOOR_SOCKETS.length; i++) {
+        const sk = HEART_FLOOR_SOCKETS[i];
+        const d = Math.hypot(x - sk.x, z - sk.z);
+        if (d < sk.r || d > sk.r + HEART_SOCKET_SAMPLE) continue;
+        const s = sums[i];
+        s[0] += col.getX(v);
+        s[1] += col.getY(v);
+        s[2] += col.getZ(v);
+        s[3]++;
+      }
+    }
+  }
+  sums.forEach((s, i) => {
+    if (s[3] > 0) SOCKET_PAINT.value[i].setRGB(s[0] / s[3], s[1] / s[3], s[2] / s[3]);
+  });
+}
 
 /** Tell the floor quarter `i`'s flood (the frame). */
 export function setHeartFloorQuarter(i: number, awake: number, front: number): void {
@@ -45,8 +102,15 @@ function paint(m: THREE.Material, lowGfx: boolean, lit: boolean): void {
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uHfAwake = SCAR_AWAKE;
     shader.uniforms.uHfFront = SCAR_FRONT;
+    shader.uniforms.uHfRite = RITE;
+    shader.uniforms.uHfSockCol = SOCKET_PAINT;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>\n${HEART_FLOOR_VERT_HEAD}`)
+      .replace('#include <color_vertex>', `#include <color_vertex>\n${HEART_FLOOR_VERT_COLOR}`)
+      .replace(
+        '#include <beginnormal_vertex>',
+        `#include <beginnormal_vertex>\n${HEART_FLOOR_VERT_NORMAL}`,
+      )
       .replace('#include <begin_vertex>', `#include <begin_vertex>\n${HEART_FLOOR_VERT_BODY}`);
     let frag = shader.fragmentShader
       .replace('#include <common>', `#include <common>\n${heartFloorFragHead(lowGfx)}`)
