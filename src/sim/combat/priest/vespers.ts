@@ -3,7 +3,7 @@ import { LIVING_COVENANT_MAX_EXTENSION } from '../../content/priest_shadow_tunin
 import { VANGUARD_SHADOW_2PC_SLOW_MULT } from '../../content/vanguard_set_bonuses_a';
 import type { PlayerMeta, ResolvedAbility } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import { type Aura, dist2d, type Entity } from '../../types';
+import type { Aura, Entity } from '../../types';
 import { dismissOwnedGuardians, guardianOf, summonGuardian } from '../guardians';
 import { wearsSetBonus } from '../set_bonus_wearer';
 import { EFFIGY_AURA_ID, GLOOMTITHE_AURA_ID, GLOOMTITHE_MAX_STACKS } from './presentation';

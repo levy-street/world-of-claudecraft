@@ -56,7 +56,7 @@ specialization.
 | Litany of Woe | Existing channel or repeated Shadow pressure. Extends the single-target decay loop without creating another bank. |
 | Effigy | One enemy link per Priest, shown as an attached spectral doll, mask, or woven binding. |
 | Gloomtithe | Five-stack Priest aura built from Effigy decay ticks and Mindfracture. It is not a resource bar. |
-| Tithefiend | One autonomous temporary guardian. Consumes Gloomtithe, attacks the Effigy, echoes suffering, and returns Mana. |
+| Tithefiend | One autonomous temporary guardian. Needs no Gloomtithe, attacks the enemy the priest is fighting (else the Effigy), echoes suffering, and returns Mana. |
 | Gloamveil | Canonical Shadow form and mastery presentation. |
 
 Existing spell ranks, costs, ranges, and baseline effects on `release/v0.29.0` remain canonical
@@ -96,31 +96,30 @@ group.
 - A successful Mindfracture against the Effigy grants one stack.
 - The bank holds up to five stacks and uses a Priest aura rather than another resource bar.
 - The bank has no short expiry while an eligible Effigy exists.
-- At five stacks, Tithefiend receives a persistent action glow.
 - Overflow cannot create hidden stacks or delayed procs.
 
 Exact tick eligibility and duplicate-event suppression require deterministic tests before PBE.
 
 ## Tithefiend contract
 
-- Summon Tithefiend consumes all current Gloomtithe after a valid summon succeeds.
-- More stacks produce a longer-lived or harder-hitting fiend under a monotonic tuning table.
-- The fiend attacks the Effigy, or a deterministic eligible fallback if the Effigy becomes invalid.
-- Each fiend strike returns a small amount of Mana and creates a smaller suffering echo.
+- Call Tithefiend has no prerequisite: it neither needs nor spends Gloomtithe and needs no Dirge
+  target to cast. It always summons at the full tier (the former five-stack fiend).
+- Like a pet, the fiend attacks the enemy the priest is already fighting (a creature with the priest
+  on its hate table, or a player fighting the priest). With no such target it falls back to the
+  Effigy, then the nearest enemy with the priest's Dirge, so it never opens a fight on its own.
+- A strike on an enemy with the priest's Dirge returns a small amount of Mana and creates a smaller
+  suffering echo.
 - The fiend is fire-and-forget. It has no action bar, commands, persistence, or player-controlled
   movement.
 - The summon uses the approved shared guardian primitive rather than the Hunter pet system.
 - Expiry, death, respec, disconnect, and target loss clean up the guardian and its visual state.
-
-The starting PBE decision is whether to summon early for immediate Mana and pressure or wait for a
-five-stack manifestation.
 
 ## Visual language
 
 - Spectral dolls, woven bindings, ritual masks, pins, smoke, and shadow creatures.
 - The Effigy is attached above or around its target and never requires a ground marker.
 - Dirge-linked secondary enemies receive a smaller matching thread or sigil.
-- Gloomtithe uses five persistent aura stages and a full-bank Tithefiend glow.
+- Gloomtithe uses five persistent aura stages and a full-bank marker.
 - Reduced-motion mode retains static Effigy, link, stack, and summon-ready markers.
 - Color is never the only distinction between primary Effigy and secondary links.
 
@@ -159,7 +158,7 @@ current implementation target is `release/v0.29.0`, which remains canonical.
 - Invalid actions cannot establish, move, or duplicate the Effigy.
 - Echoes select targets deterministically and never recurse.
 - Target death transfers the Effigy predictably or preserves the bank through its grace period.
-- Tithefiend consumes the intended bank once and requires no pet controls.
+- Tithefiend spends no Gloomtithe and requires no pet controls.
 - Guardian expiry, death, respec, disconnect, and reconnect cannot strand state.
 - Mobile and reduced-motion players retain every actionable cue.
 - PBE validates single-target damage, linked-target scaling, Mana return, burst, host parity, and

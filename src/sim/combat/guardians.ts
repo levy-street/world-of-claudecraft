@@ -121,14 +121,23 @@ export function summonGuardian(ctx: SimContext, owner: Entity, config: GuardianC
   return guardian;
 }
 
+/** Is the owner already fighting this enemy? A creature counts once the owner is on its
+ *  hate table; a player counts while both are in combat and the player is targeting the
+ *  owner or carries one of the owner's spells. A mere selection, or someone else's
+ *  fight, never counts, so an assist guardian never opens a fight. */
+function ownerIsFighting(owner: Entity, target: Entity): boolean {
+  if (target.kind === 'mob') return target.threat.has(owner.id);
+  if (!owner.inCombat || !target.inCombat) return false;
+  return target.targetId === owner.id || target.auras.some((aura) => aura.sourceId === owner.id);
+}
+
 /** The owner's current target for a pet-style assist guardian: a living enemy of the
- *  owner within `maxRange` of them that the fight has already reached (a creature in
- *  combat, or a player while the owner is in combat), so a mere selection never pulls. */
+ *  owner within `maxRange` of them that the owner is already fighting. */
 function engagedOwnerTarget(ctx: SimContext, owner: Entity, maxRange: number): Entity | null {
   const target = owner.targetId === null ? null : (ctx.entities.get(owner.targetId) ?? null);
   if (!target || target.dead || target.id === owner.id) return null;
   if (!ctx.isHostileTo(owner, target)) return null;
-  if (target.kind === 'mob' ? !target.inCombat : !owner.inCombat) return null;
+  if (!ownerIsFighting(owner, target)) return null;
   if (dist2d(owner.pos, target.pos) > maxRange) return null;
   return target;
 }

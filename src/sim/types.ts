@@ -583,7 +583,7 @@ export type AuraKind =
   | 'winters_chill'
   | 'icicles'
   // Vespers Priest: source-owned self resource built by Mindfracture and
-  // Effigy-bound Dirge ticks, consumed whole by Call Tithefiend.
+  // Effigy-bound Dirge ticks, spent by Void Rupture and Vampiric Touch.
   | 'gloomtithe'
   | 'spirit_bomb_charge'
   // Benison Dawnweave: up to three direct-prayer stacks, consumed by Choirmend.
@@ -7441,7 +7441,7 @@ export interface GuardianState {
   /** Optional owner-scoped aura required on every valid target. */
   requiredTargetAuraId?: string;
   /** Opt-in pet-style assist for a stationary guardian (the Tithefiend): the owner's
-   *  current hostile target in `maxRange`, once the fight has reached it, comes first
+   *  current hostile target in `maxRange`, once the owner is fighting it, comes first
    *  and needs no `requiredTargetAuraId`; the preferred and nearest-enemy fallbacks
    *  keep that aura contract, so the guardian never opens a fight of its own. */
   assistOwnerTarget?: boolean;

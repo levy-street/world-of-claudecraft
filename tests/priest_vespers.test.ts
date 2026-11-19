@@ -7,6 +7,7 @@ import {
   TITHEFIEND_DURATION,
   TITHEFIEND_ECHO_RATE,
   TITHEFIEND_MANA_RETURN_RATE,
+  TITHEFIEND_MAX_RANGE,
   TITHEFIEND_MAX_STACK_DAMAGE_MULT,
   TITHEFIEND_MAX_STACK_SCALE,
   TITHEFIEND_STRIKE_ID,
@@ -19,7 +20,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Entity } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
 type DealDamage = (
   source: Entity | null,
@@ -309,14 +310,15 @@ describe('Vespers baseline loop', () => {
     const resourceBefore = priest.resource;
 
     sim.castAbility('summon_tithefiend', priest.id);
+    // An instant cast commits synchronously: exactly 60 Mana and the full 30 sec.
+    expect(priest.resource).toBe(resourceBefore - 60);
+    expect(priest.cooldowns.get('summon_tithefiend')).toBe(30);
     sim.tick();
 
     const guardian = [...sim.entities.values()].find(
       (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
     );
     if (!guardian?.guardianState) throw new Error('Tithefiend missing');
-    expect(priest.resource).toBeLessThan(resourceBefore);
-    expect(priest.cooldowns.get('summon_tithefiend')).toBeGreaterThan(29);
     expect(guardian.scale).toBe(TITHEFIEND_MAX_STACK_SCALE);
     expect(TITHEFIEND_DURATION).toBe(15);
     expect(guardian.guardianState.remaining).toBeCloseTo(15 - 1 / 20, 6);
@@ -396,6 +398,140 @@ describe('Vespers baseline loop', () => {
     const strikes = events.filter((e) => e.type === 'damage' && e.ability === 'Tithefiend Strike');
     expect(strikes.length).toBeGreaterThan(0);
     expect(strikes.every((e) => e.type === 'damage' && e.targetId === other.id)).toBe(true);
+  });
+
+  it('never attacks a selection the priest is not fighting, and falls back to Dirge', () => {
+    const { sim, priest } = vespersPriest();
+    const selected = addDummy(sim, 9930, priest.pos.x, priest.pos.z + 10);
+    const dirgeTarget = addDummy(sim, 9931, priest.pos.x + 4, priest.pos.z + 10);
+    dirgeTarget.auras.push({
+      id: 'shadow_word_pain',
+      name: 'Dirge of Decay',
+      kind: 'dot',
+      remaining: 60,
+      duration: 60,
+      value: 1,
+      tickInterval: 60,
+      tickTimer: 60,
+      sourceId: priest.id,
+      school: 'shadow',
+    });
+    sim.targetEntity(selected.id, priest.id);
+    sim.castAbility('summon_tithefiend', priest.id);
+    const events: SimEvent[] = [];
+    for (let tick = 0; tick < 60; tick++) {
+      // Someone else's fight: in combat, but the priest is not on its hate table.
+      selected.inCombat = true;
+      selected.threat.set(priest.id + 5000, 50);
+      events.push(...sim.tick());
+    }
+    const strikes = events.filter((e) => e.type === 'damage' && e.ability === 'Tithefiend Strike');
+    expect(strikes.length).toBeGreaterThan(0);
+    expect(strikes.every((e) => e.type === 'damage' && e.targetId === dirgeTarget.id)).toBe(true);
+    expect(selected.threat.has(priest.id)).toBe(false);
+  });
+
+  it.each(['out of range', 'dead', 'friendly'] as const)(
+    'drops an engaged priest target that is %s and falls back to Dirge',
+    (reason) => {
+      const { sim, priest } = vespersPriest();
+      const engaged = addDummy(sim, 9932, priest.pos.x, priest.pos.z + 10);
+      const dirgeTarget = addDummy(sim, 9933, priest.pos.x + 4, priest.pos.z + 10);
+      dirgeTarget.auras.push({
+        id: 'shadow_word_pain',
+        name: 'Dirge of Decay',
+        kind: 'dot',
+        remaining: 60,
+        duration: 60,
+        value: 1,
+        tickInterval: 60,
+        tickTimer: 60,
+        sourceId: priest.id,
+        school: 'shadow',
+      });
+      castAndSettle(sim, priest, engaged, 'mind_blast');
+      expect(engaged.threat.has(priest.id)).toBe(true);
+      if (reason === 'out of range') {
+        engaged.pos = { ...engaged.pos, z: priest.pos.z + TITHEFIEND_MAX_RANGE + 5 };
+      } else if (reason === 'dead') {
+        engaged.dead = true;
+      } else {
+        engaged.hostile = false;
+      }
+      priest.gcdRemaining = 0;
+      priest.resource = priest.maxResource;
+      sim.castAbility('summon_tithefiend', priest.id);
+      const events = Array.from({ length: 60 }, () => sim.tick()).flat();
+      const strikes = events.filter(
+        (e) => e.type === 'damage' && e.ability === 'Tithefiend Strike',
+      );
+      expect(strikes.length).toBeGreaterThan(0);
+      expect(strikes.every((e) => e.type === 'damage' && e.targetId === dirgeTarget.id)).toBe(true);
+    },
+  );
+
+  it('fights a hostile player only once the two of them are fighting', () => {
+    const { sim, priest } = vespersPriest();
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    const foeId = sim.addPlayer('warrior', 'Foe');
+    const foe = sim.entities.get(foeId);
+    if (!foe) throw new Error('foe missing');
+    foe.pos = { ...priest.pos, z: priest.pos.z + 10 };
+    const hostile = ctx.isHostileTo;
+    ctx.isHostileTo = (a, b) =>
+      (a.id === priest.id && b.id === foe.id) || (a.id === foe.id && b.id === priest.id)
+        ? true
+        : hostile(a, b);
+    sim.targetEntity(foe.id, priest.id);
+    sim.castAbility('summon_tithefiend', priest.id);
+    const run = (setup: () => void): number => {
+      let hits = 0;
+      for (let tick = 0; tick < 60; tick++) {
+        setup();
+        hits += sim
+          .tick()
+          .filter(
+            (e) =>
+              e.type === 'damage' && e.ability === 'Tithefiend Strike' && e.targetId === foe.id,
+          ).length;
+      }
+      return hits;
+    };
+    // Selected while the priest fights something else: not a fight with this player.
+    expect(
+      run(() => {
+        priest.inCombat = true;
+        foe.inCombat = true;
+        foe.targetId = null;
+      }),
+    ).toBe(0);
+    // The player turns on the priest: now they are fighting.
+    expect(
+      run(() => {
+        priest.inCombat = true;
+        foe.inCombat = true;
+        foe.targetId = priest.id;
+      }),
+    ).toBeGreaterThan(0);
+  });
+
+  it('gives no echo from a hit on an assist target without the priest Dirge', () => {
+    const { sim, priest } = vespersPriest();
+    const engaged = addDummy(sim, 9934, priest.pos.x, priest.pos.z + 10);
+    const bystander = addDummy(sim, 9935, priest.pos.x + 4, priest.pos.z + 10);
+    castAndSettle(sim, priest, bystander, 'shadow_word_pain');
+    castAndSettle(sim, priest, engaged, 'mind_blast');
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    sim.castAbility('summon_tithefiend', priest.id);
+    const events = Array.from({ length: 60 }, () => sim.tick()).flat();
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'damage' && e.ability === 'Tithefiend Strike' && e.targetId === engaged.id,
+      ),
+    ).toBe(true);
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Effigy Echo')).toBe(false);
   });
 
   it('uses a smaller Tithefiend echo against eligible linked enemies', () => {
