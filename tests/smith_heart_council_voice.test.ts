@@ -131,13 +131,15 @@ describe('Hammer Council lines', () => {
     expect(heard.some((k) => k?.endsWith('_wrath'))).toBe(false);
   });
 
-  it("a fall: its death line and the first survivor's memory; the last says its defeat", () => {
+  it("a fall: its death line, the survivor's memory as its grief lands; the last says its defeat", () => {
     const { f } = pulled();
     f.tick(20 * 6);
-    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual([
-      'hudChrome.council.say.singer_death',
-      'hudChrome.council.say.guardian_remember',
-    ]);
+    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual(['hudChrome.council.say.singer_death']);
+    // The survivor answers as the fallen one's strength reaches it (Grief of
+    // the Stone, council_grief.ts), never before.
+    const flow = Math.round(T.griefFlow * 20);
+    expect(keysOf(yells(f, f.tick(flow - 2)))).toEqual([]);
+    expect(keysOf(yells(f, f.tick(2)))).toEqual(['hudChrome.council.say.guardian_remember']);
     // The second fall is the last: its defeat line.
     expect(keysOf(yells(f, kill(f, 'guardian')))).toEqual([
       'hudChrome.council.say.guardian_defeat',
@@ -147,10 +149,21 @@ describe('Hammer Council lines', () => {
   it('on mythic a fallen member speaks as its soul takes the stone', () => {
     const { f } = pulled('mythic');
     f.tick(20 * 6);
-    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual([
-      'hudChrome.council.say.singer_soul',
+    expect(keysOf(yells(f, kill(f, 'singer')))).toEqual(['hudChrome.council.say.singer_soul']);
+    expect(keysOf(yells(f, f.tick(Math.round(T.griefFlow * 20))))).toEqual([
       'hudChrome.council.say.guardian_remember',
     ]);
+  });
+
+  it('a survivor killed before its grief lands never says it', () => {
+    const { f } = pulled();
+    f.tick(20 * 6);
+    kill(f, 'singer');
+    f.tick(5);
+    expect(keysOf(yells(f, kill(f, 'guardian')))).toEqual([
+      'hudChrome.council.say.guardian_defeat',
+    ]);
+    expect(keysOf(yells(f, f.tick(Math.round(T.griefFlow * 20))))).toEqual([]);
   });
 
   it('a wipe: a survivor says so, once', () => {

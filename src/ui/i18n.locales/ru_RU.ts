@@ -24754,6 +24754,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Когда эффект закончится, на вас упадёт камень: {total} урона делится между всеми в пределах {radius} м. Если под ним меньше {soakers}, каждый получает на {penalty}% больше, а весь рейд получает от {tremorMin} до {tremorMax}. Каждая колонна в пределах {radius} м теряет кусок, так что делите удар подальше от укрытий. Мифический режим: колонна души в пределах {soulReach} м вместо этого теряет метку души и рушится, когда их не останется. Героический и мифический режимы: {heroicTotal} урона на всех и от {heroicTremorMin} до {heroicTremorMax} всему рейду.',
   'hudChrome.auraEffect.council.memory':
     'Наносит на {pct}% больше урона: по {per}% за каждого павшего члена Совета Молота.',
+  'hudChrome.auraEffect.council.enraged':
+    'Когда пал другой член Совета Молота, его сила исцелила этого на {heal}% от максимального здоровья. До конца боя он атакует на {haste}% быстрее, а его атаки и способности наносят на {dmg}% больше урона, кроме Гнева горы, Камнепада и Дрожи камнепада.',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': 'Эхо гнева',
   'abilityUi.cast.heart_endless_song': 'Бесконечная песнь',

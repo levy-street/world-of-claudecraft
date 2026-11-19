@@ -138,14 +138,32 @@ export function pickMarks(
   return out.concat(pickMarkTargets(hasher, s.players, count - out.length, salt + 1, taken));
 }
 
-/** Every mechanic's damage factor: the difficulty's and the body's own. */
+/** Is `body` the enraged survivor (Grief of the Stone landed on it,
+ *  council_grief.ts)? */
+export function enraged(s: Pick<CouncilScope, 'st' | 'bodies'>, body: Entity | null): boolean {
+  const grief = s.st.grief;
+  if (!grief?.landed || !living(body)) return false;
+  return COUNCIL_ROLES.some((r) => r !== grief.fallen && s.bodies[r] === body);
+}
+
+/** Every mechanic's damage factor: the difficulty's and the body's own, and
+ *  an enraged survivor's harder stone (never the lethal punishments: they
+ *  keep punishMult). */
 export function damageMult(s: CouncilScope, body: Entity): number {
-  return s.rules.damageMult * (body.mechanicDamageMult ?? 1);
+  const grief = enraged(s, body) ? 1 + s.rules.enrageDamage : 1;
+  return s.rules.damageMult * (body.mechanicDamageMult ?? 1) * grief;
 }
 
 /** A mechanic's damage roll (the only rng the council draws). */
 export function roll(s: CouncilScope, body: Entity, min: number, max: number): number {
   return Math.max(1, Math.round(s.ctx.rng.range(min, max) * damageMult(s, body)));
+}
+
+/** A fallen member's soul's roll (mythic, council_soul.ts): struck in the
+ *  survivor's name but the soul's own stone, so never the survivor's enrage. */
+export function soulRoll(s: CouncilScope, body: Entity, min: number, max: number): number {
+  const mult = s.rules.damageMult * (body.mechanicDamageMult ?? 1);
+  return Math.max(1, Math.round(s.ctx.rng.range(min, max) * mult));
 }
 
 /** A lethal punishment's damage factor (Mountain's Wrath, Falling Rock): the

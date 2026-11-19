@@ -420,7 +420,9 @@ describe('Hammer Council: the stone remembers', () => {
     f.tick();
   };
 
-  it('the Guardian first: the Singer gains Memory and a shorter, lighter Wrath; no Rush, no Weight', () => {
+  // What the survivor gains once his strength lands (its heal, Enraged and
+  // Hammer's Weight): tests/smith_heart_council_grief.test.ts.
+  it('the Guardian first: the Singer gains Memory and a shorter, lighter Wrath; the Rush dies with him', () => {
     const f = pulled(6);
     kill(f, 'guardian');
     const c = f.bodies().singer as Entity;
@@ -462,14 +464,15 @@ describe('Hammer Council: the stone remembers', () => {
     const before = f.pillars().length;
     f.tick(Math.ceil(T.heirRiseWarn * 20) + 2);
     expect(f.pillars().length).toBeGreaterThan(before);
-    // Her rock, bolt and song die with her on normal.
+    // Her bolt and song die with her (her rock passes to him once her grief
+    // has enraged him: tests/smith_heart_council_grief.test.ts).
     quiet(f.st);
-    f.st.rockTimer = 0;
     f.st.boltTimer = 0;
     f.st.songTimer = 0;
     f.st.songDue = 0;
     f.tick(20 * 3);
-    expect(f.st.rock).toBeNull();
+    expect(g.castingAbility).not.toBe(COUNCIL_CASTS.bolt);
+    expect(g.castingAbility).not.toBe(COUNCIL_CASTS.song);
     expect(f.st.resonance.length).toBe(0);
     kill(f, 'guardian');
     expect(f.state()?.finished).toBe(true);

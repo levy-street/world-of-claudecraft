@@ -22590,6 +22590,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：分け合うダメージは{heroicTotal}、レイド全体へは{heroicTremorMin}から{heroicTremorMax}。',
   'hudChrome.auraEffect.council.memory':
     '与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。',
+  'hudChrome.auraEffect.council.enraged':
+    '槌の評議会のもう一人が倒れたとき、その力がこの者の最大体力の{heal}%を回復させた。戦闘が終わるまで攻撃速度が{haste}%上がり、攻撃と能力のダメージが{dmg}%増加する（山の怒り、落石、落石の揺れを除く）。',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': '怒りの残響',
   'abilityUi.cast.heart_endless_song': '終わらぬ歌',

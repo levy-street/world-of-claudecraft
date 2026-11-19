@@ -3,6 +3,7 @@
 // on), while the painted artwork remains keyed by the source ability ID.
 
 import { resolveMobAuraIconIdentity } from './mob_aura_icon_art';
+import { SMITH_HEART_AURA_ICON_SOURCES } from './smith_heart_aura_art';
 
 export interface AuraIconIdentity {
   id: string;
@@ -218,6 +219,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['wlk_leaden_hex_root_lock', 'wlk_r8_curse_of_exhaustion'],
   ['wlk_leaden_hex_slow', 'wlk_r8_curse_of_exhaustion'],
   ['wlk_shadow_credit', 'wlk_r14_shadow_mastery'],
+  // The Smith's Heart's shared paintings (smith_heart_aura_art.ts): a closed list
+  // of raid aura ids that wear another raid aura's art.
+  ...SMITH_HEART_AURA_ICON_SOURCES,
 ]);
 
 // `pack_frenzy` is also a mob-authored haste buff. Wire id alone cannot assign

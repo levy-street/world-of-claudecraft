@@ -57,6 +57,7 @@ import {
   beginBar,
   type CouncilScope,
   damageMult,
+  enraged,
   jobHolder,
   living,
   memberFree,
@@ -186,11 +187,13 @@ export function stepRises(s: CouncilScope): void {
   }
 }
 
-/** Who drops the rock: the Seam Singer; once she has fallen, nobody, or on
- *  mythic the Guardian (the rock outlives her there). */
+/** Who drops the rock: the Seam Singer; once she has fallen, the Guardian when
+ *  her grief has enraged him (council_grief.ts, every tier) or at once on
+ *  mythic (the rock outlives her there), else nobody. */
 export function rockCaster(s: CouncilScope): CouncilRole | null {
   if (living(s.bodies.singer)) return 'singer';
-  if (s.rules.rockOutlivesSinger && living(s.bodies.guardian)) return 'guardian';
+  const g = s.bodies.guardian;
+  if (living(g) && (s.rules.rockOutlivesSinger || enraged(s, g))) return 'guardian';
   return null;
 }
 

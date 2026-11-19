@@ -274,6 +274,29 @@ const POST_OVERHAUL_RUNTIME_AURA_FAMILY_SOURCES = [
   ['priest_second_verse_scouring_mercy_15', 'smite'],
 ] as const;
 
+// The Smith's Heart's shared paintings (src/ui/smith_heart_aura_art.ts): raid aura
+// ids that wear another raid aura's painting.
+const SMITH_HEART_SHARED_AURA_SOURCES = [
+  ['heart_breath_blow_thrown', 'heart_breath_roar_thrown'],
+  ['heart_breath_bulwark_hold', 'heart_breath_gale_bulwark'],
+  ['heart_breath_gale_tossed', 'heart_breath_roar_thrown'],
+  ['heart_breath_intro', 'heart_council_intro'],
+  ['heart_breath_portal_b', 'heart_breath_portal_a'],
+  ['heart_breath_portal_c', 'heart_breath_portal_a'],
+  ['heart_breath_portal_d', 'heart_breath_portal_a'],
+  ['heart_final_cold', 'heart_quench_cold'],
+  ['heart_final_drawn', 'heart_breath_drawn_lightning'],
+  ['heart_final_frozen', 'heart_quench_frozen'],
+  ['heart_final_phase', 'heart_final_state'],
+  ['heart_final_rising', 'heart_final_shield'],
+  ['heart_final_under_ice', 'heart_quench_trapped'],
+  ['heart_heat_intro', 'heart_council_intro'],
+  ['heart_quench_intro', 'heart_council_intro'],
+  ['heart_quench_rime_slow', 'heart_quench_rime'],
+  ['heart_rush_exposed', 'heart_rush_shattered'],
+  ['mob_dormant', 'heart_council_intro'],
+] as const;
+
 const AURA_RESPONSE_KINDS = new Set(['empowerNext', 'absorb', 'aura', 'echo']);
 
 describe('resolveAuraIconId', () => {
@@ -327,6 +350,7 @@ describe('resolveAuraIconId', () => {
       ...fiestaPowerupSources,
       ...REUSED_PAINTED_RUNTIME_AURA_SOURCES,
       ...POST_OVERHAUL_RUNTIME_AURA_SOURCES,
+      ...SMITH_HEART_SHARED_AURA_SOURCES,
     ]);
     expect([...RUNTIME_AURA_ICON_SOURCE_IDS.entries()].sort()).toEqual(
       [...expected.entries()].sort(),
@@ -336,7 +360,9 @@ describe('resolveAuraIconId', () => {
       POWERUPS.reduce((count, definition) => count + definition.buffs.length, 0),
     );
     expect(REUSED_PAINTED_RUNTIME_AURA_SOURCES).toHaveLength(12);
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(149);
+    expect(SMITH_HEART_SHARED_AURA_SOURCES).toHaveLength(18);
+    // 167: 149 plus the Smith's Heart's 18 shared paintings.
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(167);
     for (const [id, source] of expected) {
       const paintedIdentity = hasAuraImageIdentity(id) ? id : source;
       const imageUrl = auraImageUrl(paintedIdentity);

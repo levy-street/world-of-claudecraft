@@ -415,8 +415,10 @@ export function pulseRadius(pillarR: number): number {
 }
 
 /** The stream of stone light from a fallen member to a survivor: seconds it
- *  takes, and where a mote rides along it at `t` (0 to 1) with a lift. */
-export const INHERIT_SECONDS = 2.2;
+ *  takes (the sim's own: Grief of the Stone lands as it arrives,
+ *  encounters/smith_heart/council_grief.ts), and where a mote rides along it
+ *  at `t` (0 to 1) with a lift. */
+export const INHERIT_SECONDS = T.griefFlow;
 export function inheritArc(
   t: number,
   out: { along: number; lift: number } = { along: 0, lift: 0 },
@@ -452,6 +454,7 @@ export function councilClaims(ability: string | undefined): boolean {
     ability === COUNCIL_CUES.pulse ||
     ability === COUNCIL_CUES.risenPulse ||
     ability === COUNCIL_CUES.inherit ||
+    ability === COUNCIL_CUES.grief ||
     ability === COUNCIL_CUES.settle ||
     ability === COUNCIL_CUES.soulTake ||
     ability === COUNCIL_CUES.soulPip ||

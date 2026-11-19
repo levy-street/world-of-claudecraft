@@ -123,6 +123,11 @@ export const COUNCIL_AURAS = {
   resonance: 'heart_resonance',
   /** On a council member: one stack per fallen member, more damage dealt. */
   memory: 'heart_memory_of_stone',
+  /** Grief of the Stone (council_grief.ts): on the survivor once the fallen
+   *  one's strength reaches it, for the rest of the pull: it attacks faster
+   *  (a `buff_haste`, `value` the swing's multiplier) and its blows and stone
+   *  strike harder (`value2`, the tier's `enrageDamage`). */
+  enraged: 'heart_council_enraged',
   /** Heroic and Mythic: on the Wrath's caster through its bar: value2 = how
    *  many players one pillar can shield (what the client's runes read). */
   pillarLimit: 'heart_narrow_shelter',
@@ -199,8 +204,12 @@ export const COUNCIL_CUES = {
    *  (spellfx 'nova' on each risen pillar that rang; council_risen_pulse.ts). */
   risenPulse: 'heart_council_stone_thrum',
   /** The stone remembers: light from the fallen to each survivor (spellfx
-   *  'beam', source the fallen, target the survivor). */
+   *  'beam', source the fallen, target the survivor). It flies for
+   *  COUNCIL_TUNING.griefFlow, and Grief of the Stone lands with it. */
   inherit: 'heart_council_inherit',
+  /** Grief of the Stone lands: the survivor healed and enraged (spellfx
+   *  'nova' on the survivor; council_grief.ts). */
+  grief: 'heart_council_grief',
   /** The council settles after its fall: the risen pillars sink. */
   settle: 'heart_council_settle',
   /** Mythic: a fallen member's soul flows into its pillar (spellfx 'beam',
@@ -256,6 +265,9 @@ export const COUNCIL_NAMES = {
   song: 'Song of the Seam',
   resonance: 'Resonance',
   memory: 'Memory of Stone',
+  /** Grief of the Stone's aura: the game's shared enrage name (src/ui/sim_i18n.ts
+   *  matches it), so it needs no proper noun of its own. */
+  enraged: 'Enraged',
   pillarLimit: 'Narrow Shelter',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
@@ -348,6 +360,16 @@ export interface CouncilDifficultyRules {
   /** A Rush that hits no pillar sets the Quarry collapsing (mythic) until
    *  the cursed pillar breaks. */
   missCollapse: boolean;
+  /** Grief of the Stone (council_grief.ts, the owner's ask of 2026-11-19):
+   *  the share of its maximum health the survivor is healed for when the
+   *  fallen one's strength reaches it. */
+  griefHeal: number;
+  /** Enraged: how much faster the survivor swings (0.2 is a fifth faster). */
+  enrageHaste: number;
+  /** Enraged: how much harder the survivor's blows (its weapon, so Hammerfall
+   *  and Hammer's Weight) and its ordinary mechanics strike. The lethal
+   *  punishments (the Wraths, Falling Rock and its tremor) keep punishMult. */
+  enrageDamage: number;
 }
 
 export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDifficultyRules>> = {
@@ -382,6 +404,11 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     cursedPulseMin: 7,
     cursedPulseMax: 9,
     missCollapse: false,
+    // Grief of the Stone (2026-11-19, SKETCH): a fifth back, a fifth faster
+    // and harder.
+    griefHeal: 0.2,
+    enrageHaste: 0.2,
+    enrageDamage: 0.2,
   },
   heroic: {
     wakeMarks: 3,
@@ -416,6 +443,9 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     cursedPulseMin: 36,
     cursedPulseMax: 43.2,
     missCollapse: false,
+    griefHeal: 0.25,
+    enrageHaste: 0.3,
+    enrageDamage: 0.3,
   },
   // Everything heroic has, the inheritances stronger, and the souls.
   mythic: {
@@ -446,6 +476,13 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     cursedPulseMin: 48,
     cursedPulseMax: 56,
     missCollapse: true,
+    // A fifth of a pool already 1.65 times Normal's is still the largest heal
+    // (about 45 to 50 s of a 1,500 DPS raid); 0.3 cost 64 to 75 s, all of it
+    // past Mythic's soft enrage, a wipe for a raid 3 percent short of an even
+    // kill (the headless calibration of 2026-11-19, smith_heart.md 7.1).
+    griefHeal: 0.2,
+    enrageHaste: 0.4,
+    enrageDamage: 0.4,
   },
 };
 
@@ -611,6 +648,15 @@ export const COUNCIL_TUNING = {
   resonanceMax: 180,
   // The stone remembers.
   memoryPerFallen: 0.15,
+  /** Grief of the Stone: seconds the fallen one's strength takes to reach
+   *  the survivor (the inheritance's stream, which the renderer flies on this
+   *  clock: council_fx_core.ts INHERIT_SECONDS); the survivor killed sooner is
+   *  never healed. */
+  griefFlow: 2.2,
+  /** The enraged survivor's first inherited move after the grief lands: the
+   *  Guardian's first Falling Rock, the Singer's first Hammer's Weight. */
+  griefRockFirst: 8,
+  griefWeightFirst: 6,
   // Heroic: the pillars pulse.
   pulseEvery: 2,
   pulseReach: 3,

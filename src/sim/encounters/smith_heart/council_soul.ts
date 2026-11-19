@@ -62,7 +62,7 @@ import {
   raisePillar,
   syncPillarWalls,
 } from './council_pillars';
-import { type CouncilScope, damageMult, living, roll } from './council_scope';
+import { type CouncilScope, damageMult, living, soulRoll } from './council_scope';
 import type { CouncilSoul } from './council_state';
 
 /** The soul a pillar holds, by its entity id. */
@@ -243,7 +243,7 @@ export function landEcho(s: CouncilScope, pillar: Entity, source: Entity): numbe
       shields.add(shield.e.id);
       continue;
     }
-    const amount = roll(s, source, T.wrathMin * T.echoShare, T.wrathMax * T.echoShare);
+    const amount = soulRoll(s, source, T.wrathMin * T.echoShare, T.wrathMax * T.echoShare);
     ctx.dealDamage(source, p, amount, false, 'physical', COUNCIL_NAMES.echo, 'hit', true);
     struck++;
   }
@@ -323,7 +323,7 @@ function stepSong(s: CouncilScope, soul: CouncilSoul, pillar: Entity, source: En
   });
   for (const pl of s.players) {
     if (pl.dead) continue;
-    const amount = roll(s, source, T.songPulseMin * mult, T.songPulseMax * mult);
+    const amount = soulRoll(s, source, T.songPulseMin * mult, T.songPulseMax * mult);
     s.ctx.dealDamage(source, pl, amount, false, 'nature', COUNCIL_NAMES.endlessSong, 'hit', true);
   }
   // The pulse count rides an aura on the pillar (an object: never ticked).
