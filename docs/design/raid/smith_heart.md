@@ -2674,6 +2674,107 @@ burned down, the wipe), `tests/smith_heart_final_ui.test.ts`,
 `tests/smith_heart_final_wire.test.ts`, `tests/smith_heart_final_kit_fx.test.ts`,
 `tests/smith_heart_final_fx.test.ts`, `tests/smith_heart_final_dev.test.ts`.
 
+#### Its own elements (Jose's brief of 2026-11-19 (b))
+
+Jose asked for mechanics of the boss's OWN, not only the four quarter kits borrowed from
+the guardians. Three, all elemental, on Normal, Heroic and Mythic. **SKETCH numbers**, all
+in one leaf: `ELEMENT_DIFFICULTY` and `ELEMENT_TUNING` in
+`src/sim/encounters/smith_heart/final_elements_ids.ts`. The code: `final_strike.ts`,
+`final_fusion.ts`, `final_opposites.ts`, tied into the fight by `final_elements.ts`; the
+look `src/render/smith_heart_fx/final_elements_fx.ts` (a part of `FinalKitFx`); the
+tooltips `src/ui/final_elements_aura_effect.ts`. No wire or IWorld change: the client reads
+the auras (stacks in `stacks`, the polarity's element in `value`, the fusion's pair in
+`value`/`value2`), the bar, the objects and the cues. No banner and no centre text: the
+world, the marked player's own arrow and the sound.
+
+- **Elemental Strike, the fight's tank swap.** Every 8 s (every tier; the first 8 s in) it
+  strikes its tank (within 12 yd, never through one of its planted bars) and leaves a 30 s
+  stack of the element of the quarter it stands in; each strike refreshes the stacks and
+  hits harder per stack, and a strike in another element RE-FORGES the stacks into its own
+  (the count carries over, so dragging it on never resets a tank). From 4 stacks the tanks
+  swap: about every 30 s, which lines up with the Overload drag (the fresh tank takes it to
+  the next quarter). In the ring and the 15 percent final phase the strike carries the last
+  quarter it drank (the brief left the choice open; the last quarter keeps the four
+  debuffs readable). The debuffs: **Searing Burn** (Heat: a burn every second per stack),
+  **Biting Frost** (Quench: slower per stack, capped at 45 percent; from 5 stacks every
+  strike freezes the tank solid for 2 s, **Frozen Solid**), **Static Charge** (Breath:
+  magic damage taken up 3 percent per stack; from 3 stacks lightning arcs every 2 s from the
+  tank to every ally within 6 yd, so the melee spreads off it), **Cracked Armor** (Hammer:
+  armour down per stack, never under a quarter of its own). The hit at 1 stack is 330 to
+  370 before the tier's factor, growing per stack by 45 / 60 / 70 percent (Normal / Heroic
+  / Mythic): resolved, about 400, 950 at the swap's 4 stacks and 1,300 at 6 on Normal,
+  which a level-20 tank pool (about 1,700) and its healers carry to the swap and not much
+  past it. The burn: 13 / 17 / 25 a second per stack (halved after the first bot raid of 2026-11-19, where 4 stacks ticked a tank down before the swap); the slow: 8 / 10 / 10 percent per
+  stack; the arc: 173-195 / 220-248 / 299-338 (30 percent more per stack past the third);
+  the armour: 10 / 13 / 15 percent per stack. The look: the element's shell round the
+  tank's body (fire licking up, frost crystals crusting it, violet forks crawling it, stone
+  plates clinging to it), stronger with each stack and pulsing a warning from the swap's
+  count; the debuff with its stack count and its tooltip in the tank's aura bar.
+- **Elemental Fusion, on every quarter change.** When the boss settles into a NEW quarter
+  in the quarter fight (never the pull's first, an intermission or the final phase), it
+  waits until it is free (no planted bar, not being dragged, no Opposing Elements round
+  under way), then a 3 s planted bar (`heart_final_fusion`, its arms out, the two elements
+  swelling in its fists and lightning leaping between them, drawn together at the end) and
+  the pair's combo inside the quarter it entered. The quarter kit holds its clocks through
+  the bar (`runKit`), so a combo never lands on the kit's opener. The same pair gives the
+  same combo whichever way round:
+
+  | Pair | Combo | What players do | Normal / Heroic / Mythic |
+  |---|---|---|---|
+  | Heat + Quench | **Scalding Steam**: thick white clouds drift through the quarter for 13 s and scald inside every second | Stay out of the clouds | 3 / 4 / 5 clouds, 109-126 / 165-187 / 208-234 a second |
+  | Heat + Hammer | **Magma Rift**: players MARKED (arrow) erupt in 3 s for everyone within 3.5 yd, each leaving a black-crusted lava pool for 20 s | Take the mark away from the raid | 3 / 4 / 5 marks, 299-334 / 462-517 / 585-650, pools 92-109 / 154-176 / 195-221 a second |
+  | Heat + Breath | **Firestorm**: a lane rim to rim through a player, then a real wall of flame sweeps it at 28 yd a second | Leave the lane | 1 / 2 / 2 lanes, 437-483 / 572-638 / 988-1,092 |
+  | Quench + Breath | **Hailstorm**: 6 s of hailstones into small circles over the quarter (half on players), each landing 1.2 s after its circle | Watch the floor | 2 / 3 / 4 a wave, 230-259 / 330-374 / 416-468 |
+  | Quench + Hammer | **Avalanche**: ice and rock spikes run from the wall toward the centre in lanes 9.5 yd apart; the gaps are safe | Stand in the gaps | 5 / 6 / 6 lanes, 391-437 / 506-561 / 832-910; Mythic a second wave in the first's gaps |
+  | Breath + Hammer | **Storm Spires**: dark stone spires with violet veins rise and charge for 4 s (the links on the floor from 0.6 s), then lightning leaps spire to spire along every link | Never stand between two spires | 3 / 4 / 4 spires, 368-408 / 473-528 / 728-806; Mythic discharges twice |
+
+  On Mythic every combo leaves an **Elemental Residue** on the floor for 15 s (81-92 /
+  91-104 a second; at most 14 at once); on Normal and Heroic everything is gone when it
+  ends. Each combo's look is its own, never a quarter kit's: the steam thick white, the
+  lava dark orange under a black crust, the Firestorm a wall of flame, the hail white-blue
+  ice balls dropping out of the sky, the Avalanche ice and rock spikes, the spires dark
+  stone with violet lightning. Checked against each quarter's own kit: the combo lands
+  only after the bar, which holds the kit's clocks (the opener never stacks on it), and
+  the woken stars keep their own clocks; the Steam's and the Hail's quarters (the Quench,
+  the Breath) carry the lightest kits, the Avalanche's and the Spires' quarter (the
+  Hammer) waits for the Anvil (the polarity round never runs near it).
+- **Opposing Elements, the polarity pairs.** Every 48 s (the first 42 s in, after the
+  first swap; held while a fusion runs, a bar is planted or Weight of the Anvil is due
+  within 12 s, so it never overlaps the Fusion or the Anvil), living NON-TANK players (never
+  the boss's tank nor a player carrying Elemental Strike) are marked for 10 s: **Fire**,
+  **Ice**, **Earth** or **Lightning**. Fire and Ice are opposites; Earth and Lightning are
+  opposites. Always an even count in matching opposite pairs: 4 on Normal (2 pairs), 6 on
+  Heroic, 8 (every non-tank) on Mythic; with an odd number of free players one is left
+  unmarked, so nobody is ever without a possible partner. A marked player who comes within
+  3 yd of one of the OPPOSITE element cancels both marks in a white-gold burst. Meeting any
+  other mark explodes, after a 1.5 s grace in which no meeting counts (players marked side by side step apart first; the bot raid of 2026-11-19 clashed on the first tick) (**Clashing Elements**: 299-334 to both on Normal, 528-583 to both on
+  Heroic, 910-1,014 to everyone within 8 yd on Mythic). A mark whose every possible partner
+  is gone (dead or spent in a clash) fades quietly. Still worn at 10 s (**Unbalanced
+  Elements**): 598-667 on its player alone (Normal), 330-374 on the whole raid (Heroic),
+  676-754 on the whole raid (Mythic), half as much again for each other mark left. NO
+  tether between partners (Jose: no). Each element reads by SHAPE as well as colour, on
+  every graphics tier (actionable): Fire a flame sigil over the head and flames rising from
+  the feet (orange), Ice a snowflake sigil, frost crystals round the body and cold mist
+  (blue), Earth a mountain sigil and small rocks orbiting (ochre), Lightning a lightning
+  bolt sigil and sparks and arcs crawling over the body (violet). The sigils draw over the
+  world; the marked player also gets the personal arrow (Magma Rift's mark too).
+- **The bots** (`scripts/lib/heart_raid_final.mjs`) swap on 4 stacks of any element
+  (the shared swap, `IGNORE=swap` turns it off), keep 6 yd off a tank carrying 3 or more
+  Static Charge, step out of every combo's footprint (the lanes and the spires' links
+  included), walk a Magma Rift mark away from the raid, and walk each polarity mark to the
+  nearest free opposite (both to the middle), clear of every other mark.
+- **Dev verbs.** `/dev heart final strike [n]` (n strikes on its tank in the quarter's
+  element; `strike here|pillar` stays Sky Strike's), `/dev heart final fusion <steam|magma|
+  firestorm|hail|avalanche|spires> [now]` (its 3 s bar then the combo in the quarter it
+  stands in; `now` skips the bar; or two quarters), `/dev heart final opposites` (a round of
+  marks now). The readout counts the strikes, the fusions and the rounds.
+- **Tests.** `tests/smith_heart_final_elements.test.ts` (the strike's cadence, stacks,
+  element, each debuff and the arc; the fusion only on a quarter change, all six pairs,
+  the combos' hits, the tiers and Mythic's residue; the polarity counts, the even pairing
+  with deaths, non-tanks only, the cancel, the clash, the orphans, the timeout, the
+  cadence; the end), `tests/smith_heart_final_elements_ui.test.ts` (the tooltips, the
+  names, the arrows, the look's plan, the painter over a fake world).
+
 #### Part 2: the intermissions, the poured elements, the final phase
 
 **A PROTOTYPE, numbers unmeasured**, all in one table: `FINAL_PHASES` and
