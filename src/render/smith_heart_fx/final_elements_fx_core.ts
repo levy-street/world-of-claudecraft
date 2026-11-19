@@ -217,7 +217,9 @@ export function fusionOrbLook(fill: number): { size: number; glow: number; draw:
 // ---- the combos -----------------------------------------------------------------------
 
 /** A steam cloud's k-th billow (of n): its offset from the cloud's middle,
- *  its height, its size, all turning slowly. */
+ *  its height, its size, all turning slowly. Three tiers: a wide churning
+ *  foot hugging the floor, a body, and a crown rolling over the top, so the
+ *  cloud stands as a thick column of steam, never a flat puff. */
 export function steamPuff(
   clock: number,
   k: number,
@@ -225,13 +227,20 @@ export function steamPuff(
   radius: number,
   seed: number,
 ): { x: number; y: number; z: number; size: number } {
-  const a = (k / n) * Math.PI * 2 + seed + clock * 0.18 * (k % 2 === 0 ? 1 : -1);
-  const ring = k === 0 ? 0 : radius * (0.35 + 0.35 * ((k * 0.61 + seed) % 1));
+  const tier = k < n * 0.45 ? 0 : k < n * 0.8 ? 1 : 2;
+  const a =
+    (k / n) * Math.PI * 2 * 2.3 + seed + clock * (0.22 - tier * 0.06) * (k % 2 === 0 ? 1 : -1);
+  const spread = tier === 0 ? 0.62 : tier === 1 ? 0.42 : 0.2;
+  const ring = radius * spread * (0.55 + 0.45 * ((k * 0.61 + seed) % 1));
+  const lift = tier === 0 ? 1.4 : tier === 1 ? 4.0 : 6.6;
   return {
     x: Math.cos(a) * ring,
-    y: 1.2 + 1.6 * ((k * 0.43 + seed * 0.3) % 1) + 0.25 * Math.sin(clock * 0.9 + k),
+    y: lift + 0.6 * ((k * 0.43 + seed * 0.3) % 1) + 0.3 * Math.sin(clock * 0.8 + k),
     z: Math.sin(a) * ring,
-    size: radius * (0.9 + 0.5 * ((k * 0.29 + seed * 0.7) % 1)),
+    size:
+      radius *
+      (tier === 0 ? 1.15 : tier === 1 ? 1.05 : 0.85) *
+      (0.85 + 0.3 * ((k * 0.29 + seed * 0.7) % 1)),
   };
 }
 
@@ -297,7 +306,7 @@ export const ELEMENT_FX_POOLS = {
   markPieces: 6,
   /** Steam clouds (Mythic five) and their billows. */
   clouds: 6,
-  billows: 9,
+  billows: 14,
   /** Flame walls (two lanes on Heroic and Mythic). */
   walls: 3,
   /** Hailstones in the air (four a wave, overlapping waves). */

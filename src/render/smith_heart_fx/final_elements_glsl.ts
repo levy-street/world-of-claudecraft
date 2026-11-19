@@ -121,7 +121,47 @@ varying vec2 vUv;
 void main() {
   float r = length(vUv * 2.0 - 1.0);
   float a = pow(max(1.0 - r, 0.0), 2.2) * uAlpha;
-  gl_FragColor = vec4(mix(uColor, vec3(1.0), 0.35 * a) * a, a);
+  gl_FragColor = vec4(mix(uColor, vec3(1.0), 0.12 * a) * a, a);
+}
+`;
+
+export const LAVA_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uAlpha;
+uniform float uSeed;
+varying vec2 vUv;
+${KIT_NOISE}
+float lavaCell(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  float d1 = 8.0;
+  float d2 = 8.0;
+  for (int y = -1; y <= 1; y++) {
+    for (int x = -1; x <= 1; x++) {
+      vec2 g = vec2(float(x), float(y));
+      vec2 o = vec2(kh(i + g), kh(i + g + 17.3));
+      float d = length(g + o - f);
+      if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) { d2 = d; }
+    }
+  }
+  return d2 - d1;
+}
+void main() {
+  vec2 p = vUv * 2.0 - 1.0;
+  float r = length(p);
+  if (r > 1.0) discard;
+  // A black crust broken into plates, the melt glowing in the seams and
+  // welling at the edge, pulsing slowly.
+  float molten = kfbm(p * 2.4 + vec2(uTime * 0.12, uSeed));
+  float e = lavaCell(p * 3.4 + vec2(uSeed * 3.1, uSeed));
+  float seam = 1.0 - smoothstep(0.02, 0.13, e);
+  float pulse = 0.8 + 0.2 * sin(uTime * 2.2 + molten * 7.0);
+  vec3 crust = mix(vec3(0.04, 0.022, 0.018), vec3(0.15, 0.07, 0.04), molten * molten);
+  vec3 melt = mix(vec3(1.0, 0.3, 0.03), vec3(1.0, 0.78, 0.32), smoothstep(0.4, 0.8, molten));
+  float rim = smoothstep(0.8, 0.97, r);
+  vec3 col = mix(crust, melt * pulse * 1.5, clamp(seam + rim * 0.85, 0.0, 1.0));
+  float a = uAlpha * (1.0 - smoothstep(0.95, 1.0, r));
+  gl_FragColor = vec4(col, a);
 }
 `;
 
@@ -135,14 +175,16 @@ ${KIT_NOISE}
 void main() {
   vec2 p = vUv * 2.0 - 1.0;
   float r = length(p);
-  float body = 1.0 - smoothstep(0.25, 1.0, r);
   vec2 q = p * 1.8 + vec2(uSeed * 7.1, uSeed * 3.3);
   float churn = kfbm(q + vec2(uTime * 0.18, -uTime * 0.32));
+  // A ragged, churning edge (never a clean disc).
+  float body = 1.0 - smoothstep(0.2, 0.95, r + (churn - 0.5) * 0.55);
   float fine = kfbm(q * 2.3 - vec2(uTime * 0.4, uTime * 0.1));
-  float m = body * smoothstep(0.22, 0.75, churn * 0.75 + fine * 0.45 + body * 0.35);
-  // Lit from above, a warm scald glowing under it.
-  float lit = 0.78 + 0.22 * (p.y * 0.5 + 0.5) + 0.12 * fine;
-  vec3 col = vec3(0.96, 0.97, 0.99) * lit;
+  float m = body * smoothstep(0.2, 0.7, churn * 0.8 + fine * 0.45 + body * 0.4);
+  // Lit from above (bright crowns, a soft grey underside), so each billow
+  // reads round; a warm scald glowing under it.
+  float lit = 0.66 + 0.34 * smoothstep(-0.9, 0.7, p.y + (churn - 0.5) * 0.6) + 0.1 * fine;
+  vec3 col = vec3(0.97, 0.975, 0.99) * lit;
   col = mix(col, vec3(1.0, 0.82, 0.62), uHot * (1.0 - smoothstep(-1.0, 0.1, p.y)) * 0.45);
   gl_FragColor = vec4(col, clamp(m * uAlpha, 0.0, 0.92));
 }
@@ -183,6 +225,7 @@ export const AURA_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uKind;
 uniform float uStrength;
+uniform float uFill;
 uniform vec3 uColor;
 varying vec3 vObj;
 varying vec3 vN;
@@ -214,7 +257,10 @@ void main() {
   }
   float s = clamp(uStrength, 0.0, 1.5);
   vec3 col = uColor * (fres * 0.9 + pat * 1.3) * (0.5 + 0.7 * s) + vec3(1.0) * pat * pat * 0.35 * s;
-  float a = clamp((fres * 0.55 + pat * 0.9) * (0.35 + 0.65 * s), 0.0, 1.0);
+  // A held orb burns from within: a hot core toward the middle (uFill 1).
+  float core = (1.0 - fres) * uFill;
+  col += mix(uColor, vec3(1.0, 0.97, 0.9), 0.2) * core * (0.75 + 0.4 * pat);
+  float a = clamp((fres * 0.55 + pat * 0.9) * (0.35 + 0.65 * s) + core * 0.9, 0.0, 1.0);
   gl_FragColor = vec4(col * a, a);
 }
 `;

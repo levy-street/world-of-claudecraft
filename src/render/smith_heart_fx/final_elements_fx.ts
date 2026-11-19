@@ -63,6 +63,7 @@ import {
   type TelegraphLane,
   type TelegraphStyle,
 } from '../floor_telegraph';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { FINAL_BODY_HEIGHT, finalBodyPoint } from './final_body_core';
 import {
@@ -89,6 +90,7 @@ import {
   AURA_FRAG,
   BILL_VERT,
   GLOW_FRAG,
+  LAVA_FRAG,
   SIGIL_FRAG,
   SOLID_FRAG,
   SOLID_VERT,
@@ -140,6 +142,8 @@ export interface FinalElementsHost {
   /** A footprint's warning sound as it first appears. */
   sound: (kind: string, x: number, y: number, z: number) => void;
   laneRung: number;
+  /** The lava crust's floor rung (under the fans' glows, over the floor). */
+  crustRung: number;
 }
 
 const T = TELEGRAPH_THREAT_COLORS;
@@ -169,6 +173,9 @@ const _e = new THREE.Euler();
 const _c = new THREE.Color();
 const _a = { x: 0, y: 0, z: 0 };
 const _b = { x: 0, y: 0, z: 0 };
+const _mid = { x: 0, y: 0, z: 0 };
+const _pa = { x: 0, y: 0, z: 0 };
+const _pb = { x: 0, y: 0, z: 0 };
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
 
 interface Uni {
@@ -239,6 +246,8 @@ export class FinalElementsFx {
   private readonly hailBalls: THREE.InstancedMesh;
   private hailUsed = 0;
   private readonly spikes: THREE.InstancedMesh;
+  /** The lava pools' crust discs (Magma Rift). */
+  private readonly crusts: { mesh: THREE.Mesh; u: Uni; id: number; seen: boolean }[] = [];
   private spikeUsed = 0;
   /** The spires seen this frame by group: their places in index order. */
   private readonly groups = new Map<
@@ -284,6 +293,7 @@ export class FinalElementsFx {
         uTime: h.uTime,
         uKind: { value: 0 },
         uStrength: { value: 0 },
+        uFill: { value: 0 },
         uColor: { value: new THREE.Color(C.heat) },
       };
       const m = mesh(
@@ -375,6 +385,7 @@ export class FinalElementsFx {
         uTime: h.uTime,
         uKind: { value: 0 },
         uStrength: { value: 1 },
+        uFill: { value: 1 },
         uColor: { value: new THREE.Color(C.heat) },
       };
       const m = mesh(
@@ -430,6 +441,20 @@ export class FinalElementsFx {
       this.lanes.push({ lane: h.kit.lane(h.laneRung), id: -1, seen: false });
     for (const l of this.lanes) l.lane.group.visible = false;
 
+    // ---- the lava pools' crust ----
+    const disc = new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2);
+    h.geometries.push(disc);
+    for (let i = 0; i < P.lava; i++) {
+      const u: Uni = { uTime: h.uTime, uAlpha: { value: 0 }, uSeed: { value: i * 1.9 } };
+      const m = mesh(
+        disc,
+        shader('smithHeartFinalLavaCrust', u, KIT_UV_VERT, LAVA_FRAG),
+        'smithHeartFinalLavaCrust',
+      );
+      m.renderOrder = floorVfxRenderOrder('encounter', h.crustRung);
+      this.crusts.push({ mesh: m, u, id: -1, seen: false });
+    }
+
     // ---- the Storm Spires ----
     const spireGeo = spireGeometry();
     h.geometries.push(spireGeo);
@@ -471,6 +496,7 @@ export class FinalElementsFx {
     for (const w of this.walls) w.seen = false;
     for (const l of this.lanes) l.seen = false;
     for (const s of this.spires) s.seen = false;
+    for (const c of this.crusts) c.seen = false;
   }
 
   /** Is `templateId` one of the elements' objects? */
@@ -506,10 +532,34 @@ export class FinalElementsFx {
           kind === 'steam',
         );
         break;
-      case 'lava':
+      case 'lava': {
         H.foot(e.id, 'lava', STYLES.lava, at.x, at.z, r, 1, false);
-        this.bubble(at.x, at.z, r, C.fireRgb, 0.9);
+        let c = this.crusts.find((k) => k.id === e.id);
+        if (!c) {
+          c = this.crusts.find((k) => k.id === -1 && !k.seen);
+          if (c) c.id = e.id;
+        }
+        if (c) {
+          c.seen = true;
+          c.mesh.position.set(at.x, H.groundY(at.x, at.z) + 0.05, at.z);
+          c.mesh.scale.setScalar(r * 0.97);
+          c.u.uAlpha.value = Math.min(1, age / 0.4);
+          c.mesh.visible = true;
+        }
+        this.bubble(at.x, at.z, r, C.fireRgb, 1.4);
+        if (H.rand() < 3 * this.dt * H.density)
+          H.particles.puff(at.x, H.groundY(at.x, at.z) + 0.4, at.z, 1, {
+            speed: 0.5,
+            up: 1.8,
+            life: 2.2,
+            size: [1.2, 3.2],
+            color: [0.12, 0.09, 0.08],
+            alpha: 0.4,
+            pool: 'smoke',
+            radius: r * 0.6,
+          });
         break;
+      }
       case 'residueFire':
       case 'residueFrost':
       case 'residueStorm':
@@ -543,6 +593,20 @@ export class FinalElementsFx {
         this.paintSpire(e, kind === 'spireFire', age, since);
         break;
     }
+  }
+
+  /** An orb's place: from its fist toward the middle by `draw` (into `out`). */
+  private orbPos(
+    e: { x: number; y: number; z: number },
+    draw: number,
+    height: number,
+    out: { x: number; y: number; z: number },
+  ): { x: number; y: number; z: number } {
+    const mid = _mid;
+    out.x = e.x + (mid.x - e.x) * draw;
+    out.y = e.y + height * 0.05 + (mid.y - e.y) * draw;
+    out.z = e.z + (mid.z - e.z) * draw;
+    return out;
   }
 
   /** One player this frame: their strike stacks, their polarity, their
@@ -600,47 +664,52 @@ export class FinalElementsFx {
     finalBodyPoint('fistL', at.x, y, at.z, facing, height, _a);
     finalBodyPoint('fistR', at.x, y, at.z, facing, height, _b);
     // Held out and up, drawn in together at the end.
-    const mid = {
-      x: (_a.x + _b.x) / 2,
-      y: Math.max(_a.y, _b.y) + height * 0.12,
-      z: (_a.z + _b.z) / 2,
-    };
-    const ends = [_a, _b];
-    const veins = [from, to];
+    const mid = _mid;
+    mid.x = (_a.x + _b.x) / 2;
+    mid.y = Math.max(_a.y, _b.y) + height * 0.12;
+    mid.z = (_a.z + _b.z) / 2;
     this.fusionAt.x = mid.x;
     this.fusionAt.y = mid.y;
     this.fusionAt.z = mid.z;
     this.fusionAt.from = from;
     this.fusionAt.to = to;
+    // The two elements reaching for each other: lightning between the orbs,
+    // quicker as the bar runs out.
+    if (this.h.rand() < (2 + 10 * fill) * this.dt) {
+      const pa = this.orbPos(_a, look.draw, height, _pa);
+      const pb = this.orbPos(_b, look.draw, height, _pb);
+      this.h.leap(pa.x, pa.y, pa.z, pb.x, pb.y, pb.z, 0.18, 0.9 + 1.2 * (1 - look.draw));
+    }
     for (let i = 0; i < 2; i++) {
       const o = this.orbs[i];
-      const e = ends[i];
-      const px = e.x + (mid.x - e.x) * look.draw;
-      const py = e.y + height * 0.05 + (mid.y - e.y) * look.draw;
-      const pz = e.z + (mid.z - e.z) * look.draw;
+      const vein = i === 0 ? from : to;
+      const op = this.orbPos(i === 0 ? _a : _b, look.draw, height, _pa);
+      const px = op.x;
+      const py = op.y;
+      const pz = op.z;
       const s = look.size * (height / 20);
       o.mesh.position.set(px, py, pz);
       o.mesh.scale.setScalar(s);
       o.mesh.rotation.y = this.clock * (i === 0 ? 1.4 : -1.4);
-      o.u.uKind.value = VEIN_KIND[veins[i]];
+      o.u.uKind.value = VEIN_KIND[vein];
       o.u.uStrength.value = look.glow;
-      (o.u.uColor.value as THREE.Color).setHex(veinColor(veins[i]));
+      (o.u.uColor.value as THREE.Color).setHex(veinColor(vein));
       o.mesh.visible = true;
       o.glow.position.set(px, py, pz);
-      o.glow.scale.setScalar(s * 2.6);
-      (o.gu.uColor.value as THREE.Color).setHex(veinColor(veins[i]));
-      o.gu.uAlpha.value = 0.35 + 0.45 * look.glow;
+      o.glow.scale.setScalar(s * 3.4);
+      (o.gu.uColor.value as THREE.Color).setHex(veinColor(vein));
+      o.gu.uAlpha.value = 0.6 + 0.6 * look.glow;
       o.glow.visible = true;
       // Its element streaming off it.
       if (this.h.rand() < (0.6 + fill) * this.h.density)
         this.h.particles.puff(px, py, pz, 1, {
           speed: 1.5 + 2 * fill,
-          up: veins[i] === 'heat' ? 3 : 0.5,
+          up: vein === 'heat' ? 3 : 0.5,
           life: 0.6,
           size: [0.7, 0.15],
-          color: veinRgb(veins[i]),
+          color: veinRgb(vein),
           alpha: 1,
-          pool: veins[i] === 'heat' ? 'pyre' : 'glow',
+          pool: vein === 'heat' ? 'pyre' : 'glow',
           radius: s * 0.8,
           drag: 1,
         });
@@ -674,6 +743,11 @@ export class FinalElementsFx {
       if (!s.seen) {
         s.id = -1;
         s.mesh.visible = false;
+      }
+    for (const c of this.crusts)
+      if (!c.seen) {
+        c.id = -1;
+        c.mesh.visible = false;
       }
     for (let i = this.shellUsed; i < this.shells.length; i++) this.shells[i].mesh.visible = false;
     for (let i = this.sigilUsed; i < this.sigils.length; i++) this.sigils[i].mesh.visible = false;
@@ -959,23 +1033,27 @@ export class FinalElementsFx {
     }
     c.seen = true;
     const y = H.groundY(x, z);
-    c.u.uAlpha.value = live ? 0.85 : 0.18 + 0.5 * fill;
+    c.u.uAlpha.value = live ? 0.78 : 0.15 + 0.45 * fill;
     for (let k = 0; k < c.billows.length; k++) {
       const b = steamPuff(this.clock, k, c.billows.length, r, c.seed);
       const grow = live ? 1 : 0.4 + 0.6 * fill;
-      c.billows[k].position.set(x + b.x, y + b.y * grow, z + b.z);
-      c.billows[k].scale.setScalar(b.size * grow * 0.75);
+      const size = b.size * (0.55 + 0.45 * grow);
+      // Never cut by the floor: a billow's foot stays over it.
+      c.billows[k].position.set(x + b.x, y + Math.max(b.y * grow, size * 0.62), z + b.z);
+      c.billows[k].scale.setScalar(size);
       c.billows[k].visible = true;
     }
-    if (H.rand() < (live ? 3 : 1) * this.dt * 6 * H.density)
-      H.particles.puff(x + (H.rand() - 0.5) * r * 1.4, y + 0.3, z + (H.rand() - 0.5) * r * 1.4, 1, {
-        speed: 0.5,
-        up: 2.5,
-        life: 2.2,
-        size: [1.4, 3.4],
+    // Steam boiling up off the scald, thick while it is live.
+    const n = Math.round((live ? 26 : 8) * this.dt * H.density + H.rand() * 0.7);
+    for (let i = 0; i < n; i++)
+      H.particles.puff(x + (H.rand() - 0.5) * r * 1.5, y + 0.4, z + (H.rand() - 0.5) * r * 1.5, 1, {
+        speed: 0.6,
+        up: 2.2 + H.rand() * 1.5,
+        life: 2.6,
+        size: [1.8, 4.6],
         color: C.steamRgb,
-        alpha: 0.55,
-        drag: 0.6,
+        alpha: live ? 0.7 : 0.4,
+        drag: 0.5,
       });
   }
 
@@ -1027,7 +1105,8 @@ export class FinalElementsFx {
       const pz = sz + dz * Math.max(0, off);
       const pl = w.planes[k];
       pl.position.set(px, H.groundY(px, pz) - 0.2, pz);
-      pl.rotation.set(0, e.facing + Math.PI / 2, 0);
+      // Its face across the lane (the plane's own normal along its run).
+      pl.rotation.set(0, e.facing, 0);
       pl.scale.set(info.half * 2.2, fw.height * (1 - k * 0.14), 1);
       pl.visible = off > 0;
     }
@@ -1119,7 +1198,7 @@ export class FinalElementsFx {
       const px = sx + dx * d + dz * side;
       const pz = sz + dz * d - dx * side;
       const ice = k % 2 === 0;
-      const hgt = (2.4 + 1.4 * fxHash(e.id, k + 3)) * rise;
+      const hgt = (3.4 + 2.2 * fxHash(e.id, k + 3)) * rise;
       const lean = (fxHash(e.id, k + 5) - 0.5) * 0.5;
       this.piece(
         this.spikes,
@@ -1127,9 +1206,9 @@ export class FinalElementsFx {
         px,
         H.groundY(px, pz) - 0.3,
         pz,
-        ice ? 0.9 : 1.15,
+        ice ? 1.35 : 1.7,
         hgt,
-        ice ? 0.9 : 1.15,
+        ice ? 1.35 : 1.7,
         lean,
         fxHash(e.id, k + 7) * 6,
         -lean,

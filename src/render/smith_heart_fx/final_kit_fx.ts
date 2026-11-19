@@ -563,6 +563,7 @@ export class FinalKitFx {
       wave: (x, z, radius, seconds, color) => this.stars.waveRing(x, z, radius, seconds, color),
       sound: (kind, x, y, z) => this.audio.footprint(kind, x, y, z),
       laneRung: F.lane,
+      crustRung: F.crust,
     });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})

@@ -273,6 +273,9 @@ export const FINAL_KIT_FLOOR = {
   telegraphChar: 13,
   telegraphGlow: 15,
   telegraphCurtain: 17,
+  /** Magma Rift's lava crust (final_elements_fx.ts): over the floor, under
+   *  the switch's shockwave, clear of HeatFx's ladder. */
+  crust: 19,
   shock: 20,
   lane: 22,
   particles: { ring: 24, smoke: 26, fire: 27, glow: 28 },
