@@ -22,9 +22,9 @@
 
 import { SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
 import {
+  devilOf,
   FINAL_CUES,
   FINAL_OBJECTS,
-  devilOf,
   finalBladeOf,
   finalLaneOf,
   finalPillarOf,

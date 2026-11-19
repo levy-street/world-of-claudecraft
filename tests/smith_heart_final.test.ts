@@ -504,7 +504,9 @@ describe('the Breath quarter', () => {
     let before = 0;
     for (let i = 0; i < sec(T.devilFirst + T.devilEvery + 1); i++) {
       f.tick(1);
-      const n = f.objects(FINAL_OBJECTS.devilPrefix).filter((o) => o.templateId.endsWith('warn')).length;
+      const n = f
+        .objects(FINAL_OBJECTS.devilPrefix)
+        .filter((o) => o.templateId.endsWith('warn')).length;
       if (n > before) seen++;
       before = n;
     }

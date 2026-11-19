@@ -587,16 +587,22 @@ export class FinalStarsFx {
       }
       if (H.rand() < 0.7 * H.density) {
         const a = H.rand() * Math.PI * 2;
-        H.particles.puff(e.pos.x + Math.cos(a) * zoneR, y0 + 0.2, e.pos.z + Math.sin(a) * zoneR, 1, {
-          speed: 2.5,
-          up: 1.2,
-          life: 0.25,
-          size: [0.35, 0.05],
-          color: C.charged,
-          alpha: 1,
-          pool: 'glow',
-          gravity: 6,
-        });
+        H.particles.puff(
+          e.pos.x + Math.cos(a) * zoneR,
+          y0 + 0.2,
+          e.pos.z + Math.sin(a) * zoneR,
+          1,
+          {
+            speed: 2.5,
+            up: 1.2,
+            life: 0.25,
+            size: [0.35, 0.05],
+            color: C.charged,
+            alpha: 1,
+            pool: 'glow',
+            gravity: 6,
+          },
+        );
       }
     }
     // Arcs climbing the stone: from low on its face up and round it.

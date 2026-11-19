@@ -81,7 +81,9 @@ describe('the floor painted on its sheet', () => {
     expect(paint).toMatch(/vHfUp/);
     expect(paint).not.toMatch(/modelMatrix|viewMatrix/);
     const { vertex } = compiled(heartFloorMaterial(false));
-    expect(vertex).toMatch(/vHfP = position;/);
+    // The mesh's own (room-local) point, the arrival's sockets laid flush into
+    // it outside the rite (heart_floor_rite_core.ts): still never a world point.
+    expect(vertex).toMatch(/vHfP = transformed;/);
     expect(vertex).not.toMatch(/modelMatrix/);
   });
 

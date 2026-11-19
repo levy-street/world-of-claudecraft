@@ -39,10 +39,10 @@ import { HEAT_FLOOR } from '../src/render/smith_heart_fx/heat_floor_ladder_core'
 import { HEART_ROOM } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
+  devilTemplate,
   FINAL_AURAS,
   FINAL_BOSS,
   FINAL_CASTS,
-  devilTemplate,
   FINAL_CUES,
   FINAL_OBJECTS,
   finalBladeTemplate,
@@ -568,14 +568,22 @@ describe('the Breath Dust Devil: the fire tornado in wind (playtest 2026-11-19)'
     expect(finalObjectKind(devilTemplate('live'))).toBe('devil');
     expect(FINAL_REACH.devil).toBe(T.devilR);
     const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
-    const at = (dx: number, dz: number) => ({ x: o.x + HEART_ROOM.x + dx, z: o.z + HEART_ROOM.z + dz });
+    const at = (dx: number, dz: number) => ({
+      x: o.x + HEART_ROOM.x + dx,
+      z: o.z + HEART_ROOM.z + dz,
+    });
     const entities = new Map<number, Entity>();
     const p = at(0, -30);
     const me = entity(1, 'player', 'warrior', p.x, p.z);
     entities.set(me.id, me);
     const d = at(4, -26);
     entities.set(40, entity(40, 'object', devilTemplate('live'), d.x, d.z, { scale: T.devilR }));
-    const world = { entities, player: me, playerId: me.id, entityRosterVersion: 1 } as unknown as IWorld;
+    const world = {
+      entities,
+      player: me,
+      playerId: me.id,
+      entityRosterVersion: 1,
+    } as unknown as IWorld;
     const scene = new THREE.Scene();
     const fx = new FinalKitFx(scene, () => 0, world);
     for (let i = 0; i < 6; i++) fx.update(1 / 30);
