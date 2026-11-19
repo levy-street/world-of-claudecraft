@@ -26260,6 +26260,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Через {seconds} с молния ударит туда, где вы стоите: от {min} до {max} ед. урона от сил природы всем в радиусе {radius} м. Отойдите. Молния, упавшая в пределах {arcReach} м от столпа, обвивает его дугой и оставляет Заряженным бурей. Героический: от {heroicMin} до {heroicMax} урона. Эпохальный: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.bladeMark':
     'Скрещённый клинок наводит на вас свою линию: она следует за вами и фиксируется за {lock} с до полёта. Проведите линию через столпы, чтобы разбить их, затем сойдите с неё. Все на линии получают от {min} до {max} ед. урона от магии льда. Героический: от {heroicMin} до {heroicMax} урона. Эпохальный: от {mythicMin} до {mythicMax} урона.',
+  'hudChrome.auraEffect.finalBoss.anvilMark':
+    'Тяжесть Наковальни следует за вами: её круг радиусом {radius} м движется вместе с вами и замирает за {lock} сек. до падения. Соберите рейд внутри: {total} физического урона делится между всеми в круге, а если их меньше {fewer}, каждый получает в полтора раза больше. Героический: {heroicTotal}. Эпохальный: {mythicTotal}.',
   'hudChrome.finalAlert.bladeTitle':
     'Скрещённый клинок: ведите',
   'hudChrome.finalAlert.bladeLockedTitle':

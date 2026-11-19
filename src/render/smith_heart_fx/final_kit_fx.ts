@@ -67,8 +67,10 @@ import { GFX, surfaceMat } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { CouncilRushArrow } from './council_rush_arrow';
 import { anvilUnder } from './final_anvil_core';
 import { FinalAnvilFx } from './final_anvil_fx';
+import { finalArrowMark } from './final_arrow_core';
 import {
   FINAL_KIT_COLORS as C,
   FINAL_KIT_FLOOR as F,
@@ -225,6 +227,10 @@ export class FinalKitFx {
   private disposed = false;
   private originX = 0;
   private originZ = 0;
+  /** The personal arrow over the LOCAL player while a mark singles them out
+   *  (final_arrow_core.ts: Weight of the Anvil), drawn for them alone. */
+  private readonly arrow: CouncilRushArrow;
+
   constructor(
     scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
@@ -249,6 +255,14 @@ export class FinalKitFx {
       () => this.reducedMotion(),
       hasDom ? getFlameTex() : null,
       F.particles,
+    );
+    this.arrow = new CouncilRushArrow(
+      this.root,
+      this.uTime,
+      this.geometries,
+      this.materials,
+      finalArrowMark,
+      1,
     );
     // Every footprint: pooled fans per element, each dressed in its paint
     // (a full ring), every tier.
@@ -780,6 +794,11 @@ export class FinalKitFx {
     this.anvilFx.end();
     this.paintMarks(world);
     this.stars.end();
+    // The marked player's own arrow (final_arrow_core.ts).
+    this.arrow.beginScan();
+    if (me && !me.dead && finalArrowMark(me)) this.arrow.see(me.id);
+    this.arrow.endScan();
+    this.arrow.update(world.entities, this.clock, this.reducedMotion());
     this.paintBoss(world);
     for (const el of ELEMENTS)
       for (const s of this.pools[el])
@@ -1311,6 +1330,8 @@ export class FinalKitFx {
 
   private leave(): void {
     this.active = false;
+    this.arrow.beginScan();
+    this.arrow.endScan();
     this.rosterSeen = Number.NaN;
     this.stars.hide();
     for (const el of ELEMENTS)

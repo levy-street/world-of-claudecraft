@@ -174,6 +174,21 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
           ...tiers(T.skyMin, T.skyMax),
         },
       };
+    case FINAL_AURAS.anvilMark: {
+      const total = (t: 'normal' | 'heroic' | 'mythic') =>
+        Math.round(FINAL_DIFFICULTY[t].anvilTotal * FINAL_DIFFICULTY[t].punishMult);
+      return {
+        key: `${KEY}.anvilMark`,
+        nums: {
+          radius: T.anvilR,
+          lock: T.anvilLock,
+          total: total('normal'),
+          fewer: T.anvilMinSoakers,
+          heroicTotal: total('heroic'),
+          mythicTotal: total('mythic'),
+        },
+      };
+    }
     case FINAL_AURAS.bladeMark:
       return {
         key: `${KEY}.bladeMark`,

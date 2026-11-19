@@ -37,6 +37,7 @@ import { HEART_QUARTER_ORDER } from '../../content/smith_heart_quarters';
 import { DT } from '../../types';
 import { clearCastIf, startBar } from '../sunken_bastion/claim';
 import { addBody, addHit, dropAdd, phaseRules, raiseSplinter } from './final_adds';
+import { clearAnvil } from './final_hammer';
 import { clearFist } from './final_heat';
 import { FINAL_AURAS, FINAL_CASTS, FINAL_NAMES } from './final_ids';
 import {
@@ -58,7 +59,6 @@ import {
   cueAt,
   cueOn,
   dropAura,
-  dropFightObject,
   type FinalScope,
   livePlayers,
   putMarker,
@@ -145,8 +145,7 @@ export function dropWhatItHeld(s: FinalScope): void {
     st.bar = null;
     st.boltTarget = null;
     clearFist(s);
-    if (st.anvil) dropFightObject(s.ctx, s.inst, st.anvil.objectId);
-    st.anvil = null;
+    clearAnvil(s);
   }
   clearCastIf(s.boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil);
 }

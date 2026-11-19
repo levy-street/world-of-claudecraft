@@ -25806,12 +25806,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{seconds}초 후 당신이 선 자리에 번개가 떨어집니다: {radius}미터 안의 모두에게 {min}~{max}의 자연 피해. 자리를 벗어나세요. 기둥에서 {arcReach}미터 안에 떨어진 번개는 기둥 주위로 호를 그리며 기둥을 폭풍으로 충전합니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.',
   'hudChrome.auraEffect.finalBoss.bladeMark':
     '교차하는 칼날이 당신을 지나는 선을 겨눕니다: 선은 당신을 따라오다가 날아가기 {lock}초 전에 고정됩니다. 선을 기둥에 통과시켜 부순 뒤 선에서 벗어나세요. 선 위의 모두가 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.',
-  'hudChrome.finalAlert.bladeTitle':
-    '교차하는 칼날: 유도하세요',
-  'hudChrome.finalAlert.bladeLockedTitle':
-    '칼날 고정: 벗어나세요!',
-  'hudChrome.finalAlert.skyTitle':
-    '하늘의 일격이 당신에게!',
+  'hudChrome.auraEffect.finalBoss.anvilMark':
+    '모루의 무게가 당신을 따라옵니다: {radius}미터 원이 당신과 함께 움직이다가 떨어지기 {lock}초 전에 고정됩니다. 공격대를 원 안에 모으세요: {total}의 물리 피해를 안에 있는 모두가 나누어 받으며, {fewer}명 미만이면 각자 1.5배를 받습니다. 영웅: {heroicTotal}. 신화: {mythicTotal}.',
+  'hudChrome.finalAlert.bladeTitle': '교차하는 칼날: 유도하세요',
+  'hudChrome.finalAlert.bladeLockedTitle': '칼날 고정: 벗어나세요!',
+  'hudChrome.finalAlert.skyTitle': '하늘의 일격이 당신에게!',
   'hudChrome.auraEffect.finalBoss.underIce': '기절 상태: 깨지는 얼음 아래로 떨어졌습니다.',
   'hudChrome.auraEffect.finalBoss.numbing':
     '정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.',

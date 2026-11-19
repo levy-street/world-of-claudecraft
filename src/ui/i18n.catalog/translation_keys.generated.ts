@@ -12843,6 +12843,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.elementalTrance'
   | 'hudChrome.auraEffect.energyRegen'
   | 'hudChrome.auraEffect.enrage'
+  | 'hudChrome.auraEffect.finalBoss.anvilMark'
   | 'hudChrome.auraEffect.finalBoss.bladeMark'
   | 'hudChrome.auraEffect.finalBoss.chill'
   | 'hudChrome.auraEffect.finalBoss.coal'

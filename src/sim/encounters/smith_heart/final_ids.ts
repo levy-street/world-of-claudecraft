@@ -107,6 +107,9 @@ export const FINAL_AURAS = {
   /** On players: Crossing Blade, the line runs through them until it locks
    *  (`value` 1 while it aims, 2 once it has locked). */
   bladeMark: 'heart_final_blade_mark',
+  /** On the player Weight of the Anvil follows through its bar (Jose's
+   *  playtest of 2026-11-19): its circle rides with them, then plants. */
+  anvilMark: 'heart_final_anvil_mark',
 } as const;
 
 /** One Overload bar's aura id on the boss (`value` 0 to 100). */
@@ -144,8 +147,8 @@ export const FINAL_OBJECTS = {
   orbPrefix: 'sh_final_orb_',
   /** A Tremor Crack: `<prefix><tenths>` to its eruption. */
   tremorPrefix: 'sh_final_tremor_',
-  /** Weight of the Anvil's mark: `<prefix><tenths>` to its fall (it moves on
-   *  Mythic); its radius in `scale`. */
+  /** Weight of the Anvil's mark: `<prefix><tenths>` to its fall (it follows
+   *  its player, or turns round the boss on Mythic); its radius in `scale`. */
   anvilPrefix: 'sh_final_anvil_',
   /** A standing pillar (Wake the Stone): `<prefix><plain|charged>`, a round
    *  combat wall (instances/combat_wall_state.ts). */
@@ -401,7 +404,8 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     bladeMarks: 1,
     bladeAim: 4,
     whirlCount: 2,
-    anvilEvery: 60,
+    // 35 s (60 until Jose's playtest of 2026-11-19: "it takes too long").
+    anvilEvery: 35,
   },
   heroic: {
     // 1.2 until the Heroic pass of 2026-11-05: the bot raid in the previous
@@ -453,8 +457,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     // Two a volley (three until the same raids: tornadoes caught the raid on
     // its way to the Anvil once all four stars were awake).
     whirlCount: 2,
-    // 45 s (36 until the same raids: two Anvils a minute on top of the stars).
-    anvilEvery: 45,
+    // 30 s (Jose's playtest of 2026-11-19; 45 before it, 36 until the bot
+    // raids of 2026-11-18).
+    anvilEvery: 30,
   },
   mythic: {
     // Its pool Heroic's (x2.28 since 2026-11-16); its damage unchanged.
@@ -493,7 +498,8 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     bladeMarks: 2,
     bladeAim: 3,
     whirlCount: 3,
-    anvilEvery: 32,
+    // 28 s (32 until Jose's playtest of 2026-11-19), still turning.
+    anvilEvery: 28,
   },
 };
 
@@ -732,6 +738,9 @@ export const FINAL_TUNING = {
   anvilFirst: 30,
   anvilCast: 6,
   anvilR: 6,
+  /** Its circle follows its player until this long before it falls, then
+   *  plants (Jose's playtest of 2026-11-19: the raid gathers on them). */
+  anvilLock: 1,
   // Weight of the Anvil's whole blow is each tier's (FINAL_DIFFICULTY
   // anvilTotal): on Heroic and Mythic 660 a body with all ten under it, about
   // 55 percent of a fresh level-20 cloth pool (the raid's soak band: the

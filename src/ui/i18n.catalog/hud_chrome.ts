@@ -6103,6 +6103,8 @@ export const hudChromeStrings = {
         'A Crossing Blade aims its line through you: it follows you, then locks {lock} sec before it flies. Lead the line through the pillars to shatter them, then step off it. Everyone on the line takes {min} to {max} Frost damage. Heroic: {heroicMin} to {heroicMax} damage. Mythic: {mythicMin} to {mythicMax} damage.',
       crushed:
         'Standing under the next Weight of the Anvil within {seconds} sec, you take your share {mult} times over. Let the other group share it.',
+      anvilMark:
+        'Weight of the Anvil follows you: its {radius} yd circle moves with you and plants {lock} sec before it falls. Gather the raid inside it: {total} Physical damage is split between everyone in it, half as much again each with fewer than {fewer}. Heroic: {heroicTotal}. Mythic: {mythicTotal}.',
       // Part 2 (src/ui/final_phase_aura_effect.ts; the numbers are
       // final_phase_ids.ts FINAL_PHASES').
       phaseCall:
