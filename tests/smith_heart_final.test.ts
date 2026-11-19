@@ -477,15 +477,28 @@ describe('the Breath quarter', () => {
     expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeCloseTo(T.devilSpeed, 0);
     // Stand a raider in it: struck for a little nature and thrown out of it.
     // (Held in it until struck: a raider it brushed on its way may still be
-    // inside its two-second grace.)
+    // inside its two-second grace.) Its strike is read off its own cue: the
+    // other devil rises off a hashed player too and may stand close enough to
+    // strike the same tick, so only this devil's blow is counted.
     const p = f.players[3];
     let hit: ReturnType<typeof hits> = [];
-    for (let i = 0; i < sec(T.devilHitEvery + 0.5) && hit.length === 0; i++) {
+    let struck = 0;
+    for (let i = 0; i < sec(T.devilHitEvery + 0.5) && struck === 0; i++) {
       const here = f.local(d);
       f.put(p, here.x + 1, here.z);
-      hit = hits(f.tick(1), FINAL_NAMES.devil, p.id);
+      const ev = f.tick(1);
+      struck = ev.filter(
+        (e) =>
+          e.type === 'spellfx' &&
+          e.ability === FINAL_CUES.devil &&
+          e.sourceId === d.id &&
+          e.targetId === p.id,
+      ).length;
+      hit = hits(ev, FINAL_NAMES.devil, p.id);
     }
-    expect(hit.length).toBe(1);
+    expect(struck).toBe(1);
+    expect(hit.length).toBeGreaterThanOrEqual(1);
+    expect(hit.length).toBeLessThanOrEqual(FINAL_DIFFICULTY.normal.devilCount);
     expect(hit[0].amount).toBeGreaterThanOrEqual(Math.round(T.devilMin * 0.9));
     expect(hit[0].amount).toBeLessThan(T.devilMax * 1.5);
     f.tick(sec(0.6));
