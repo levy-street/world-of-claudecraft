@@ -952,6 +952,35 @@ export class FinalStarsFx {
   }
 
   /** A bolt leaping between two points. */
+  /** A bolt leaping from one point to another (world yards), for the
+   *  kit's other painters (final_elements_fx.ts: Storm Spires, Static
+   *  Charge): `life` seconds, `jag` yards of jitter. */
+  leapBolt(
+    x: number,
+    y: number,
+    z: number,
+    x2: number,
+    y2: number,
+    z2: number,
+    life = 0.3,
+    jag = 0.8,
+  ): void {
+    this.leap(x, y, z, x2, y2, z2, life, jag);
+  }
+
+  /** A floor ring racing out, for the kit's other painters. */
+  waveRing(
+    x: number,
+    z: number,
+    radius: number,
+    seconds: number,
+    color: number,
+    crackle = 0.6,
+    strength = 1,
+  ): void {
+    this.ring(x, z, radius, seconds, color, crackle, strength);
+  }
+
   private leap(
     x: number,
     y: number,

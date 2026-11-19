@@ -1197,6 +1197,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/final_anvil_core.ts',
   'src/render/smith_heart_fx/final_phase_fx_core.ts',
   'src/render/smith_heart_fx/final_stars_fx_core.ts',
+  'src/render/smith_heart_fx/final_elements_fx_core.ts',
   'src/render/smith_heart_fx/final_overload_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',

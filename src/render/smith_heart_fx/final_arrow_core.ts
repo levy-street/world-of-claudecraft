@@ -9,12 +9,17 @@
 //   - the stars' marks: Crossing Blade (its line runs through you) and Sky
 //     Strike (lightning falls where you stand);
 //   - Heroic's Ember Mark and Drawn Lightning;
-//   - part 2's Bursting Coal and Wind-Tethered.
+//   - part 2's Bursting Coal and Wind-Tethered;
+//   - its own elements (Jose's brief of 2026-11-19 (b)): Opposing Elements
+//     (find your opposite) and Magma Rift (a fissure erupts under you).
+// Elemental Strike's stacks are a tank's own debuffs (its aura bar), never an
+// arrow.
 // Crushed and Mounting Weight are a tank's own debuffs (its aura bar), never an
 // arrow.
 // Pure: the painter (final_kit_fx.ts) reads it; tests/smith_heart_final_ui.test.ts
 // pins the list.
 
+import { ELEMENT_AURAS } from '../../sim/encounters/smith_heart/final_elements_ids';
 import { FINAL_AURAS } from '../../sim/encounters/smith_heart/final_ids';
 import { FINAL_PHASE_AURAS } from '../../sim/encounters/smith_heart/final_phase_ids';
 import type { Entity } from '../../sim/types';
@@ -28,6 +33,8 @@ export const FINAL_ARROW_AURAS: readonly string[] = [
   FINAL_AURAS.skyMark,
   FINAL_AURAS.ember,
   FINAL_AURAS.drawn,
+  ELEMENT_AURAS.polarity,
+  ELEMENT_AURAS.magmaMark,
 ];
 
 /** `e`'s arrow mark (the first of FINAL_ARROW_AURAS it wears), else null. */

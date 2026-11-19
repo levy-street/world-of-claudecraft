@@ -75,6 +75,15 @@ describe("the final kits' element telegraphs", () => {
       coal: 'fire',
       pounce: 'storm',
       buffet: 'storm',
+      // Its own elements (final_elements_fx.ts).
+      steam: 'frost',
+      lava: 'fire',
+      magmaMark: 'fire',
+      hail: 'frost',
+      residueFire: 'fire',
+      residueFrost: 'frost',
+      residueStorm: 'storm',
+      residueStone: 'stone',
     };
     for (const [k, el] of Object.entries(want))
       expect(finalTelegraphElement(k as FinalTelegraphKind), k).toBe(el);

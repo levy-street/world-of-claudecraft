@@ -24484,6 +24484,38 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一把交錯之刃把它的直線瞄準了你：直線會跟隨你，並在飛出前{lock}秒鎖定。把直線引過石柱將其擊碎，然後離開直線。直線上的所有人受到{min}到{max}點冰霜傷害。英雄：{heroicMin}到{heroicMax}點傷害。史詩：{mythicMin}到{mythicMax}點傷害。',
   'hudChrome.auraEffect.finalBoss.anvilMark':
     '鐵砧之重跟隨著你：它的{radius}碼法圈隨你移動，並在落下前{lock}秒固定。讓團隊聚集在圈內：{total}點物理傷害由圈內所有人分擔，少於{fewer}人時每人多承受一半。英雄：{heroicTotal}。史詩：{mythicTotal}。',
+  'hudChrome.auraEffect.finalBoss.strikeHeat':
+    '灼燒：你每秒受到{total}點火焰傷害（{stacks}層中每層{per}點）。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。它會附加首領所站區域元素的一層。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄：每層{heroicPer}點，打擊每層強化{heroicGrowth}%。史詩：每層{mythicPer}點，強化{mythicGrowth}%。',
+  'hudChrome.auraEffect.finalBoss.strikeQuench':
+    '刺骨冰霜：移動速度降低{pct}%（{stacks}層中每層{per}%，最多{cap}%）。達到{freeze}層後，每次打擊還會將你凍結{frozen}秒。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄和史詩中，打擊每層分别強化{heroicGrowth}%和{mythicGrowth}%。',
+  'hudChrome.auraEffect.finalBoss.strikeBreath':
+    '靜電：受到的法術傷害提高{pct}%。達到{from}層後，閃電每{arcEvery}秒從你身上躍向{reach}碼內的所有盟友，造成{arcMin}到{arcMax}點自然傷害，之後每層再提高{arcGrowth}%：讓團隊離你{reach}碼以外。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄閃電：{heroicArcMin}到{heroicArcMax}。史詩閃電：{mythicArcMin}到{mythicArcMax}。',
+  'hudChrome.auraEffect.finalBoss.strikeHammer':
+    '碎裂護甲：護甲降低{pct}%（{stacks}層中每層{per}%，不會低於你護甲的{floor}%）。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄：每層{heroicPer}%。史詩：每層{mythicPer}%。',
+  'hudChrome.auraEffect.finalBoss.frozen':
+    '被刺骨冰霜凍結：昏迷{seconds}秒。',
+  'hudChrome.auraEffect.finalBoss.fusionSteam':
+    '熾熱與淬火的元素融合：{seconds}秒後，濃密的灼熱蒸汽雲在它進入的區域升起并四處飄盪，每秒灼傷雲中的人。远離雲團。',
+  'hudChrome.auraEffect.finalBoss.fusionMagma':
+    '熾熱與戰錘的元素融合：{seconds}秒後，岩漿裂隙標記數名玩家；裂縫在每人腳下噴發并留下熔岩池。被標記者請远離團隊。',
+  'hudChrome.auraEffect.finalBoss.fusionFirestorm':
+    '熾熱與氣息的元素融合：{seconds}秒後，一條橫穿大廳的火焰風暴之路被標出，隨後火牆沿路橫掃。離开這條路。',
+  'hudChrome.auraEffect.finalBoss.fusionHail':
+    '淬火與氣息的元素融合：{seconds}秒後，冰雹風暴在它進入的區域持續落下數秒，每顆冰雹落入地面上的小圓圈。離开圓圈。',
+  'hudChrome.auraEffect.finalBoss.fusionAvalanche':
+    '淬火與戰錘的元素融合：{seconds}秒後，冰與岩石的尖刺沿著一條條通道從牆邊衝向中心。站在通道之間的空隙裡。',
+  'hudChrome.auraEffect.finalBoss.fusionSpires':
+    '氣息與戰錘的元素融合：{seconds}秒後，風暴尖塔在它進入的區域升起并充能，隨後閃電沿地面標出的線在尖塔之間跳躍。絕不要站在兩座尖塔之間。',
+  'hudChrome.auraEffect.finalBoss.magmaMark':
+    '岩漿裂隙：{seconds}秒後，裂縫在你腳下噴發，對{radius}碼內的所有人造成{min}到{max}點火焰傷害，并留下燃燒{life}秒的熔岩池（每秒{poolMin}到{poolMax}點火焰傷害）。在噴發前远離團隊。英雄：{heroicMin}到{heroicMax}。史詩：{mythicMin}到{mythicMax}。',
+  'hudChrome.auraEffect.finalBoss.polarityFire':
+    '對立元素，火焰：觸碰帶有寒冰標記的玩家（{meet}碼內）即可消除雙方的標記。觸碰其他任何標記會爆炸，對你們兩人造成{min}到{max}點奧術傷害（史詩中為{clash}碼內所有人）。{seconds}秒內未消除：普通難度對你造成{lateMin}到{lateMax}點奧術傷害；英雄（{heroicLateMin}到{heroicLateMax}）和史詩（{mythicLateMin}到{mythicLateMax}）中對整個團隊造成傷害，每多剩一個其他標記再提高一半。',
+  'hudChrome.auraEffect.finalBoss.polarityIce':
+    '對立元素，寒冰：觸碰帶有火焰標記的玩家（{meet}碼內）即可消除雙方的標記。觸碰其他任何標記會爆炸，對你們兩人造成{min}到{max}點奧術傷害（史詩中為{clash}碼內所有人）。{seconds}秒內未消除：普通難度對你造成{lateMin}到{lateMax}點奧術傷害；英雄（{heroicLateMin}到{heroicLateMax}）和史詩（{mythicLateMin}到{mythicLateMax}）中對整個團隊造成傷害，每多剩一個其他標記再提高一半。',
+  'hudChrome.auraEffect.finalBoss.polarityEarth':
+    '對立元素，大地：觸碰帶有閃電標記的玩家（{meet}碼內）即可消除雙方的標記。觸碰其他任何標記會爆炸，對你們兩人造成{min}到{max}點奧術傷害（史詩中為{clash}碼內所有人）。{seconds}秒內未消除：普通難度對你造成{lateMin}到{lateMax}點奧術傷害；英雄（{heroicLateMin}到{heroicLateMax}）和史詩（{mythicLateMin}到{mythicLateMax}）中對整個團隊造成傷害，每多剩一個其他標記再提高一半。',
+  'hudChrome.auraEffect.finalBoss.polarityLightning':
+    '對立元素，閃電：觸碰帶有大地標記的玩家（{meet}碼內）即可消除雙方的標記。觸碰其他任何標記會爆炸，對你們兩人造成{min}到{max}點奧術傷害（史詩中為{clash}碼內所有人）。{seconds}秒內未消除：普通難度對你造成{lateMin}到{lateMax}點奧術傷害；英雄（{heroicLateMin}到{heroicLateMax}）和史詩（{mythicLateMin}到{mythicLateMax}）中對整個團隊造成傷害，每多剩一個其他標記再提高一半。',
   'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你從碎裂的冰面掉了下去。',
   'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻擊減速{pct}%，持續{seconds}秒。',
   'hudChrome.auraEffect.finalBoss.ember':
@@ -24507,6 +24539,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_call': '四角召喚',
   'abilityUi.cast.heart_final_shearing_blow': '劈裂重擊',
   'abilityUi.cast.heart_final_gale_pounce': '疾風撲擊',
+  'abilityUi.cast.heart_final_fusion': '元素融合',
   'abilityUi.cast.heart_final_rime_toll': '霜凇鐘鳴',
   'abilityUi.cast.heart_breath_cradle_channel': '雷霆搖籃',
   'abilityUi.cast.heart_breath_mending_gale': '癒合之風',

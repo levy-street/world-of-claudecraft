@@ -6101,6 +6101,39 @@ export const hudChromeStrings = {
         'Standing under the next Weight of the Anvil within {seconds} sec, you take your share {mult} times over. Let the other group share it.',
       anvilMark:
         'Weight of the Anvil follows you: its {radius} yd circle moves with you and plants {lock} sec before it falls. Gather the raid inside it: {total} Physical damage is split between everyone in it, half as much again each with fewer than {fewer}. Heroic: {heroicTotal}. Mythic: {mythicTotal}.',
+      // Its own elements (src/ui/final_elements_aura_effect.ts; the numbers
+      // are final_elements_ids.ts ELEMENT_DIFFICULTY's and ELEMENT_TUNING's).
+      strikeHeat:
+        'Searing Burn: you take {total} Fire damage every second ({per} for each of your {stacks} stacks). Every {every} sec Elemental Strike hits the tank for {min} to {max} at one stack, {growth}% more for each stack, and adds a stack of the element of the quarter the boss stands in. The stacks last {seconds} sec after the last strike: at {swap} stacks, let the other tank take the boss. Heroic: {heroicPer} per stack, strikes {heroicGrowth}% harder per stack. Mythic: {mythicPer} per stack, {mythicGrowth}% per stack.',
+      strikeQuench:
+        'Biting Frost: movement speed reduced by {pct}% ({per}% for each of your {stacks} stacks, at most {cap}%). From {freeze} stacks each Elemental Strike also freezes you solid for {frozen} sec. Every {every} sec Elemental Strike hits the tank for {min} to {max} at one stack, {growth}% more for each stack. The stacks last {seconds} sec after the last strike: at {swap} stacks, let the other tank take the boss. Heroic and Mythic strike {heroicGrowth}% and {mythicGrowth}% harder per stack.',
+      strikeBreath:
+        'Static Charge: magic damage taken increased by {pct}%. From {from} stacks, lightning arcs from you every {arcEvery} sec to every ally within {reach} yd for {arcMin} to {arcMax} Nature damage, {arcGrowth}% more for each further stack: keep the raid {reach} yd away. Every {every} sec Elemental Strike hits the tank for {min} to {max} at one stack, {growth}% more for each stack. The stacks last {seconds} sec after the last strike: at {swap} stacks, let the other tank take the boss. Heroic arcs: {heroicArcMin} to {heroicArcMax}. Mythic arcs: {mythicArcMin} to {mythicArcMax}.',
+      strikeHammer:
+        'Cracked Armor: armor reduced by {pct}% ({per}% for each of your {stacks} stacks, never below {floor}% of your armor). Every {every} sec Elemental Strike hits the tank for {min} to {max} at one stack, {growth}% more for each stack. The stacks last {seconds} sec after the last strike: at {swap} stacks, let the other tank take the boss. Heroic: {heroicPer}% per stack. Mythic: {mythicPer}% per stack.',
+      frozen: 'Frozen solid by Biting Frost: stunned for {seconds} sec.',
+      fusionSteam:
+        'Elemental Fusion of the Heat and the Quench: in {seconds} sec thick clouds of Scalding Steam rise in the quarter it entered and drift through it, burning anyone inside every second. Stay out of the clouds.',
+      fusionMagma:
+        'Elemental Fusion of the Heat and the Hammer: in {seconds} sec Magma Rift marks players; a fissure erupts under each of them and leaves a pool of lava. Move the marks away from the raid.',
+      fusionFirestorm:
+        'Elemental Fusion of the Heat and the Breath: in {seconds} sec a Firestorm lane is laid across the room, then a wall of flame sweeps along it. Leave the lane.',
+      fusionHail:
+        'Elemental Fusion of the Quench and the Breath: in {seconds} sec a Hailstorm falls on the quarter it entered for several seconds, each hailstone into a small circle on the floor. Step out of the circles.',
+      fusionAvalanche:
+        'Elemental Fusion of the Quench and the Hammer: in {seconds} sec spikes of ice and stone run from the wall toward the centre in lanes. Stand in the gaps between the lanes.',
+      fusionSpires:
+        'Elemental Fusion of the Breath and the Hammer: in {seconds} sec Storm Spires rise in the quarter it entered and charge, then lightning leaps from spire to spire along the lines shown on the floor. Never stand between two spires.',
+      magmaMark:
+        'Magma Rift: in {seconds} sec a fissure erupts under you for {min} to {max} Fire damage to everyone within {radius} yd, and leaves a pool of lava that burns for {life} sec ({poolMin} to {poolMax} Fire damage a second). Move away from the raid before it erupts. Heroic: {heroicMin} to {heroicMax}. Mythic: {mythicMin} to {mythicMax}.',
+      polarityFire:
+        'Opposing Elements, Fire: touch a player marked Ice (within {meet} yd) to cancel both marks. Touching any other mark explodes for {min} to {max} Arcane damage to both of you (on Mythic, to everyone within {clash} yd). Not cancelled within {seconds} sec: {lateMin} to {lateMax} Arcane damage to you on Normal; to the whole raid on Heroic ({heroicLateMin} to {heroicLateMax}) and Mythic ({mythicLateMin} to {mythicLateMax}), half as much again for each other mark left.',
+      polarityIce:
+        'Opposing Elements, Ice: touch a player marked Fire (within {meet} yd) to cancel both marks. Touching any other mark explodes for {min} to {max} Arcane damage to both of you (on Mythic, to everyone within {clash} yd). Not cancelled within {seconds} sec: {lateMin} to {lateMax} Arcane damage to you on Normal; to the whole raid on Heroic ({heroicLateMin} to {heroicLateMax}) and Mythic ({mythicLateMin} to {mythicLateMax}), half as much again for each other mark left.',
+      polarityEarth:
+        'Opposing Elements, Earth: touch a player marked Lightning (within {meet} yd) to cancel both marks. Touching any other mark explodes for {min} to {max} Arcane damage to both of you (on Mythic, to everyone within {clash} yd). Not cancelled within {seconds} sec: {lateMin} to {lateMax} Arcane damage to you on Normal; to the whole raid on Heroic ({heroicLateMin} to {heroicLateMax}) and Mythic ({mythicLateMin} to {mythicLateMax}), half as much again for each other mark left.',
+      polarityLightning:
+        'Opposing Elements, Lightning: touch a player marked Earth (within {meet} yd) to cancel both marks. Touching any other mark explodes for {min} to {max} Arcane damage to both of you (on Mythic, to everyone within {clash} yd). Not cancelled within {seconds} sec: {lateMin} to {lateMax} Arcane damage to you on Normal; to the whole raid on Heroic ({heroicLateMin} to {heroicLateMax}) and Mythic ({mythicLateMin} to {mythicLateMax}), half as much again for each other mark left.',
       // Part 2 (src/ui/final_phase_aura_effect.ts; the numbers are
       // final_phase_ids.ts FINAL_PHASES').
       phaseCall:

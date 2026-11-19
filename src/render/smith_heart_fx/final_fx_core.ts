@@ -11,6 +11,7 @@
 
 import { SMITH_HEART_FINAL_BOSS, SMITH_HEART_MOBS } from '../../sim/content/smith_heart';
 import { HEART_ROOM } from '../../sim/content/smith_heart_layout';
+import { ELEMENT_CASTS } from '../../sim/encounters/smith_heart/final_elements_ids';
 import { FINAL_CASTS } from '../../sim/encounters/smith_heart/final_ids';
 
 /** The boss whose body this is. */
@@ -26,6 +27,8 @@ export const FINAL_BODY_CASTS: Readonly<Record<string, { pose: 'wrath' | 'pour';
     [FINAL_CASTS.fist]: { pose: 'wrath', slam: true },
     [FINAL_CASTS.anvil]: { pose: 'wrath', slam: true },
     [FINAL_CASTS.bolt]: { pose: 'pour', slam: false },
+    // Elemental Fusion: both elements held out in its fists (final_elements_fx.ts).
+    [ELEMENT_CASTS.fusion]: { pose: 'pour', slam: false },
   };
 
 /** The sim's own numbers (read, never tuned here): Forge Fist's arc and

@@ -22,6 +22,7 @@ import {
   FINAL_TUNING as T,
 } from '../sim/encounters/smith_heart/final_ids';
 import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
+import { finalElementsAuraEffectDescriptor } from './final_elements_aura_effect';
 import { finalPhaseAuraEffectDescriptor } from './final_phase_aura_effect';
 import { tierRange, tierValue } from './heart_tier_damage';
 
@@ -78,6 +79,9 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
   // Part 2 (the intermissions, the poured elements, the final phase).
   const phase = finalPhaseAuraEffectDescriptor(a);
   if (phase) return phase;
+  // Its own elements (Elemental Strike, Elemental Fusion, Opposing Elements).
+  const elements = finalElementsAuraEffectDescriptor(a);
+  if (elements) return elements;
   const overload = a.id ? OVERLOAD_KEYS[a.id] : undefined;
   if (overload)
     return {

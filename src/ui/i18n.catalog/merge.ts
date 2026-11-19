@@ -817,6 +817,7 @@ const mergeStringsEn = {
       heart_final_shearing_blow: 'Shearing Blow',
       heart_final_rime_toll: 'Rime Toll',
       heart_final_gale_pounce: 'Gale Pounce',
+      heart_final_fusion: 'Elemental Fusion',
       heart_gale_bolt: 'Gale Bolt',
       heart_rime_bolt: 'Rime Bolt',
       heart_ember_bolt: 'Ember Bolt',

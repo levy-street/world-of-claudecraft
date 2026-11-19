@@ -25803,6 +25803,38 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '交差する刃があなたを貫く線を狙っている：線はあなたを追い、飛ぶ{lock}秒前に固定される。線を柱に通して砕き、それから線から離れること。線上の全員が{min}～{max}の冷気ダメージを受ける。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
   'hudChrome.auraEffect.finalBoss.anvilMark':
     'アンヴィルの重みがあなたを追う：{radius}ヤードの円があなたと共に動き、落ちる{lock}秒前に固定される。レイドをその中に集めること：{total}の物理ダメージが中の全員で分けられ、{fewer}人未満ならそれぞれ1.5倍を受ける。ヒロイック：{heroicTotal}。ミシック：{mythicTotal}。',
+  'hudChrome.auraEffect.finalBoss.strikeHeat':
+    '灼熱の火傷：毎秒{total}の火炎ダメージを受ける（{stacks}スタックそれぞれにつき{per}）。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。ボスが立つ区画の元素のスタックを付与する。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイック：スタックごとに{heroicPer}、一撃はスタックごとに{heroicGrowth}%強化。ミシック：スタックごとに{mythicPer}、{mythicGrowth}%強化。',
+  'hudChrome.auraEffect.finalBoss.strikeQuench':
+    '刺すような霜：移動速度が{pct}%低下（{stacks}スタックそれぞれにつき{per}%、最大{cap}%）。{freeze}スタック以上では一撃ごとに{frozen}秒間凍りつく。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイックとミシックではスタックごとに{heroicGrowth}%と{mythicGrowth}%強化。',
+  'hudChrome.auraEffect.finalBoss.strikeBreath':
+    '静電気：受ける魔法ダメージが{pct}%増加。{from}スタック以上で、{arcEvery}秒ごとに雷があなたから{reach}ヤード以内の味方全員に走り、{arcMin}～{arcMax}の自然ダメージを与え、さらにスタックごとに{arcGrowth}%増える：レイドを{reach}ヤード離すこと。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイックの雷：{heroicArcMin}～{heroicArcMax}。ミシックの雷：{mythicArcMin}～{mythicArcMax}。',
+  'hudChrome.auraEffect.finalBoss.strikeHammer':
+    '砕けた鎧：アーマーが{pct}%低下（{stacks}スタックそれぞれにつき{per}%、アーマーの{floor}%未満にはならない）。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイック：スタックごとに{heroicPer}%。ミシック：スタックごとに{mythicPer}%。',
+  'hudChrome.auraEffect.finalBoss.frozen':
+    '刺すような霜で凍りついた：{seconds}秒間スタン。',
+  'hudChrome.auraEffect.finalBoss.fusionSteam':
+    '熱と焼き入れの元素融合：{seconds}秒後、入った区画に濃い灼熱の蒸気の雲が立ち昇って漂い、中にいる者を毎秒焼く。雲に入らないこと。',
+  'hudChrome.auraEffect.finalBoss.fusionMagma':
+    '熱とハンマーの元素融合：{seconds}秒後、マグマの裂け目がプレイヤーに印を付け、それぞれの足元で噴き出して溶岩の池を残す。印を受けた者はレイドから離れること。',
+  'hudChrome.auraEffect.finalBoss.fusionFirestorm':
+    '熱と息吹の元素融合：{seconds}秒後、部屋を横切る炎嵐の道が示され、炎の壁がそれに沿って薙ぎ払う。道から出ること。',
+  'hudChrome.auraEffect.finalBoss.fusionHail':
+    '焼き入れと息吹の元素融合：{seconds}秒後、入った区画に数秒間雹嵐が降り、雹は床の小さな円に落ちる。円から出ること。',
+  'hudChrome.auraEffect.finalBoss.fusionAvalanche':
+    '焼き入れとハンマーの元素融合：{seconds}秒後、氷と岩の棘が壁から中心へ道に沿って走る。道と道の間の隙間に立つこと。',
+  'hudChrome.auraEffect.finalBoss.fusionSpires':
+    '息吹とハンマーの元素融合：{seconds}秒後、入った区画に嵐の尖塔がそびえて充電し、床に示された線に沿って雷が尖塔から尖塔へ跳ぶ。二つの尖塔の間に決して立たないこと。',
+  'hudChrome.auraEffect.finalBoss.magmaMark':
+    'マグマの裂け目：{seconds}秒後、あなたの足元で裂け目が噴き出し、{radius}ヤード以内の全員に{min}～{max}の火炎ダメージを与え、{life}秒燃える溶岩の池を残す（毎秒{poolMin}～{poolMax}の火炎ダメージ）。噴き出す前にレイドから離れること。ヒロイック：{heroicMin}～{heroicMax}。ミシック：{mythicMin}～{mythicMax}。',
+  'hudChrome.auraEffect.finalBoss.polarityFire':
+    '対立する元素、火：氷の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、残った他の印ごとに1.5倍になる。',
+  'hudChrome.auraEffect.finalBoss.polarityIce':
+    '対立する元素、氷：火の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、残った他の印ごとに1.5倍になる。',
+  'hudChrome.auraEffect.finalBoss.polarityEarth':
+    '対立する元素、大地：雷の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、残った他の印ごとに1.5倍になる。',
+  'hudChrome.auraEffect.finalBoss.polarityLightning':
+    '対立する元素、雷：大地の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、残った他の印ごとに1.5倍になる。',
   'hudChrome.auraEffect.finalBoss.underIce': 'スタン中：割れた氷から落ちた。',
   'hudChrome.auraEffect.finalBoss.numbing': '正面攻撃により、{seconds}秒間移動速度が{pct}%低下。',
   'hudChrome.auraEffect.finalBoss.ember':
@@ -25826,6 +25858,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_call': '四区画の呼び声',
   'abilityUi.cast.heart_final_shearing_blow': '断ち割る一撃',
   'abilityUi.cast.heart_final_gale_pounce': '疾風の飛びかかり',
+  'abilityUi.cast.heart_final_fusion': 'エレメンタル・フュージョン',
   'abilityUi.cast.heart_final_rime_toll': '霧氷の鐘',
   'abilityUi.cast.heart_breath_cradle_channel': '雷のゆりかご',
   'abilityUi.cast.heart_breath_mending_gale': '癒しの疾風',

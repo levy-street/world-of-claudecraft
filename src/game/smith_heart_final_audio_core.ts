@@ -33,6 +33,11 @@
 // a hard transient.
 
 import {
+  ELEMENT_AURAS,
+  ELEMENT_CASTS,
+  ELEMENT_CUES,
+} from '../sim/encounters/smith_heart/final_elements_ids';
+import {
   FINAL_AURAS,
   FINAL_CASTS,
   FINAL_CUES,
@@ -161,6 +166,54 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
     S(F('quarter_fall'), 1, 'point', 0.85, 1),
     S(F('overload_burst'), 0.6, 'point', 0.8, 1),
   ],
+  // ---- its own elements (Jose's brief of 2026-11-19 (b); final_elements_ids.ts) ----
+  // Elemental Strike: a heavy blow ringing in the element (the metal of it);
+  // Static Charge's arc a short fork; Biting Frost's freeze.
+  [ELEMENT_CUES.strike]: [
+    S('melee_swing_heavy', 0.75, 'target', 0.85, 0.3),
+    S('heart_heat_fist_land', 0.45, 'target', 1.25, 0.3),
+  ],
+  [ELEMENT_CUES.staticArc]: [S('heart_breath_fork', 0.5, 'target', 1.3, 0.15)],
+  [ELEMENT_CUES.frozen]: [S('heart_quench_freeze', 0.9, 'target', 1, 0.5)],
+  // Elemental Fusion: its two elements gathered, then the combo let loose.
+  [ELEMENT_CUES.fusionStart]: [S(F('pour'), 0.85, 'source', 1.1, 1)],
+  [ELEMENT_CUES.fusion]: [
+    S(F('mix_turn'), 1, 'source', 1, 1),
+    S('heart_council_wrath_blast', 0.4, 'source', 1.2, 1),
+  ],
+  [ELEMENT_CUES.steam]: [S('ui_aura_steam_hiss', 0.45, 'target', 0.9, 0.5)],
+  [ELEMENT_CUES.magma]: [
+    S('heart_heat_wheel_erupt', 0.9, 'point', 1, 0.2),
+    S('heart_heat_cinder_burst', 0.55, 'point', 0.9, 0.2),
+  ],
+  [ELEMENT_CUES.firestorm]: [
+    S('heart_heat_flare', 1, 'point', 0.9, 0.3),
+    S('flamestrike', 0.6, 'point', 0.8, 0.3),
+  ],
+  [ELEMENT_CUES.firestormHit]: [S('impact_fire', 0.55, 'target', 1, 0.15)],
+  [ELEMENT_CUES.hail]: [
+    S('impact_frost', 0.55, 'point', 1.15, 0.1),
+    S('heart_quench_shatter', 0.35, 'point', 1.35, 0.1),
+  ],
+  [ELEMENT_CUES.avalanche]: [
+    S('heart_council_rock_fall', 0.85, 'point', 1, 0.2),
+    S('heart_quench_crack', 0.6, 'point', 1.1, 0.2),
+  ],
+  [ELEMENT_CUES.spire]: [
+    S('heart_breath_discharge', 0.8, 'source', 1, 0.15, 'spellfx'),
+    S('heart_breath_strike', 0.5, 'source', 1.15, 0.15, 'spellfx'),
+  ],
+  // Opposing Elements: a clean chime for the opposites cancelling, an
+  // explosion for a wrong meeting, a shock for a mark run out.
+  [ELEMENT_CUES.balance]: [
+    S('heart_council_soul_take', 0.8, 'point', 1.1, 0.2),
+    S('ui_aura_soft_chime', 0.5, 'point', 1, 0.2),
+  ],
+  [ELEMENT_CUES.clash]: [
+    S('heart_council_echo_blast', 1, 'point', 1, 0.2),
+    S('impact_arcane', 0.7, 'point', 0.85, 0.2),
+  ],
+  [ELEMENT_CUES.unbalanced]: [S(F('vein_shock'), 0.8, 'target', 1.1, 0.3)],
 };
 
 /** Is this event's ability one the fight's sound plays (the HUD's generic
@@ -191,6 +244,7 @@ export const FINAL_BAR_SOUNDS: Readonly<Record<string, FinalBarSound>> = {
   [FINAL_CASTS.fist]: { key: 'heart_heat_fist_charge', seconds: 3, gain: 1 },
   [FINAL_CASTS.bolt]: { key: F('bolt_charge'), seconds: 2, gain: 1 },
   [FINAL_CASTS.anvil]: { key: F('anvil_warn'), seconds: 5, gain: 1 },
+  [ELEMENT_CASTS.fusion]: { key: F('bolt_charge'), seconds: 2, gain: 0.9 },
   [FINAL_PHASE_CASTS.shear]: { key: F('shear_warn'), seconds: 2, gain: 1 },
   [FINAL_PHASE_CASTS.toll]: { key: 'heart_quench_wake_charge', seconds: 4, gain: 0.8 },
   [FINAL_PHASE_CASTS.pounce]: { key: 'heart_breath_gather', seconds: 2.5, gain: 0.8 },
@@ -212,7 +266,15 @@ export type FinalFootprintKind =
   | 'crack'
   | 'orb'
   | 'tremor'
-  | 'anvil';
+  | 'anvil'
+  // Its own elements' footprints (render/smith_heart_fx/final_elements_fx_core.ts
+  // elementObjectKind).
+  | 'steamWarn'
+  | 'fireWarn'
+  | 'avalancheWarn'
+  | 'hail'
+  | 'spireCharge'
+  | 'lava';
 
 /** The WARNING a footprint sounds as it appears (null: its cue or bar speaks). */
 export const FINAL_FOOTPRINT_SOUNDS: Readonly<
@@ -222,6 +284,12 @@ export const FINAL_FOOTPRINT_SOUNDS: Readonly<
   crack: { key: 'heart_quench_crack', gain: 0.85, rate: 1 },
   orb: { key: 'heart_breath_knot_spawn', gain: 0.7, rate: 1.25 },
   tremor: { key: F('tremor_warn'), gain: 0.9, rate: 1 },
+  steamWarn: { key: 'ui_aura_steam_hiss', gain: 0.7, rate: 0.75 },
+  fireWarn: { key: 'heart_heat_wheel_warn', gain: 0.85, rate: 1 },
+  avalancheWarn: { key: 'heart_quench_crack', gain: 0.8, rate: 0.85 },
+  hail: { key: 'proj_frost', gain: 0.35, rate: 1.2 },
+  spireCharge: { key: 'heart_council_pillar_rise', gain: 0.85, rate: 1.1 },
+  lava: { key: 'rift_lava_tick', gain: 0.5, rate: 0.9 },
 };
 
 /** The Overload's WARNING: the active bar passing `at` percent (rearmed once
@@ -256,6 +324,9 @@ export const FINAL_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [FINAL_AURAS.bladeMark]: HEART_MARK.frost,
   [FINAL_PHASE_AURAS.coal]: markSound(HEART_MARK.fire, 1, 0.85),
   [FINAL_PHASE_AURAS.tether]: markSound(HEART_MARK.storm, 1, 0.85),
+  // Its own elements: Magma Rift under you, Opposing Elements on you.
+  [ELEMENT_AURAS.magmaMark]: markSound(HEART_MARK.fire, 1, 1.1),
+  [ELEMENT_AURAS.polarity]: markSound(HEART_MARK.storm, 0.9, 1.2),
 };
 
 /** Every sample the fight plays, for preloading once. */

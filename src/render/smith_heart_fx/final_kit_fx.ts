@@ -49,6 +49,7 @@ import {
 } from '../../sim/content/smith_heart_layout';
 import { heartQuarterAt } from '../../sim/content/smith_heart_quarters';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
+import { ELEMENT_AURAS } from '../../sim/encounters/smith_heart/final_elements_ids';
 import {
   FINAL_AURAS,
   FINAL_BOSS,
@@ -71,6 +72,8 @@ import { CouncilRushArrow } from './council_rush_arrow';
 import { anvilFollowsLocal, anvilUnder, easeToward } from './final_anvil_core';
 import { FinalAnvilFx } from './final_anvil_fx';
 import { finalArrowMark } from './final_arrow_core';
+import { FinalElementsFx } from './final_elements_fx';
+import { elementFxClaims, elementObjectKind } from './final_elements_fx_core';
 import {
   FINAL_KIT_COLORS as C,
   FINAL_KIT_FLOOR as F,
@@ -216,6 +219,10 @@ export class FinalKitFx {
   private readonly centre = { x: 0, y: 0, z: 0 };
   /** The woken stars' swords, lines, bolts, rings and columns. */
   private readonly stars: FinalStarsFx;
+  /** Its own elements (final_elements_fx.ts): the strike, the fusion, the
+   *  combos, the polarity marks; and their objects this roster. */
+  private readonly elements: FinalElementsFx;
+  private readonly elementIds: number[] = [];
   /** The bodies a charged pillar's pulse leaps to (pooled). */
   private readonly near: { x: number; y: number; z: number; d: number }[] = [];
   private rosterSeen = Number.NaN;
@@ -537,6 +544,26 @@ export class FinalKitFx {
       bladeFly: T.bladeFly,
       bladeHalf: T.bladeHalf,
     });
+    // Its own elements (Jose's brief of 2026-11-19 (b)), under this root.
+    this.elements = new FinalElementsFx({
+      root: this.root,
+      uTime: this.uTime,
+      particles: this.particles,
+      kit: this.kit,
+      groundY: (x, z) => this.groundY(x, z),
+      rand: () => this.rand(),
+      density: this.density,
+      reducedMotion: () => this.reducedMotion(),
+      shake: (x, z, amount, reach) => this.shake(x, z, amount, reach),
+      geometries: this.geometries,
+      materials: this.materials,
+      foot: (key, kind, style, x, z, radius, fill, moving) =>
+        this.foot(key, kind, style, x, z, radius, fill, moving),
+      leap: (x, y, z, x2, y2, z2, life, jag) => this.stars.leapBolt(x, y, z, x2, y2, z2, life, jag),
+      wave: (x, z, radius, seconds, color) => this.stars.waveRing(x, z, radius, seconds, color),
+      sound: (kind, x, y, z) => this.audio.footprint(kind, x, y, z),
+      laneRung: F.lane,
+    });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -562,6 +589,11 @@ export class FinalKitFx {
     if (!this.world || this.disposed) return false;
     if (ev.type !== 'spellfx' && ev.type !== 'spellfxAt') return false;
     if (this.active) this.audio.event(ev, this.lookup, this.groundAt);
+    // Its own elements' cues (final_elements_fx.ts).
+    if (elementFxClaims(ev.ability)) {
+      if (this.active) this.elements.handle(ev, this.world);
+      return true;
+    }
     if (!finalKitClaims(ev.ability)) return false;
     if (!this.active) return true;
     if (ev.type === 'spellfx') {
@@ -794,7 +826,9 @@ export class FinalKitFx {
     for (const el of ELEMENTS) for (const s of this.pools[el]) s.seen = false;
     this.anvilFx.begin(this.clock, dt);
     this.stars.begin(this.clock);
+    this.elements.begin(this.clock, dt);
     this.paintObjects(world);
+    this.paintElements(world);
     this.anvilFx.end();
     this.paintMarks(world);
     this.stars.end();
@@ -828,6 +862,7 @@ export class FinalKitFx {
     if (world.entityRosterVersion === this.rosterSeen) return;
     this.rosterSeen = world.entityRosterVersion;
     this.objectIds.length = 0;
+    this.elementIds.length = 0;
     this.playerIds.length = 0;
     this.splinterIds.length = 0;
     this.bossId = -1;
@@ -838,7 +873,10 @@ export class FinalKitFx {
         if (this.splinterIds.length < 4) this.splinterIds.push(e.id);
       } else if (e.kind === 'object') {
         const kind = finalObjectKind(e.templateId);
-        if (!kind) continue;
+        if (!kind) {
+          if (elementObjectKind(e.templateId)) this.elementIds.push(e.id);
+          continue;
+        }
         this.objectIds.push(e.id);
         if (!this.seen.has(e.id)) {
           this.seen.set(e.id, { born: this.clock, kind });
@@ -1280,7 +1318,7 @@ export class FinalKitFx {
         } else if (a.id === FINAL_AURAS.bladeMark) {
           bladeLeft = a.remaining;
           bladeTotal = a.duration;
-        } else if (a.id === FINAL_AURAS.underIce) {
+        } else if (a.id === FINAL_AURAS.underIce || a.id === ELEMENT_AURAS.frozen) {
           const m = this.ice[ice++];
           if (m) {
             m.position.set(x, y, z);
@@ -1320,6 +1358,24 @@ export class FinalKitFx {
     this.stars.localBlade(aiming && me ? fxAnchor(me) : null, this.originX, this.originZ);
     for (let i = ice; i < this.ice.length; i++) this.ice[i].visible = false;
     for (let i = shell; i < this.shells.length; i++) this.shells[i].visible = false;
+  }
+
+  /** Its own elements this frame (final_elements_fx.ts): their objects, the
+   *  players' stacks and marks, the boss's fusion. */
+  private paintElements(world: IWorld): void {
+    for (const id of this.elementIds) {
+      const e = world.entities.get(id);
+      if (!e) continue;
+      const kind = elementObjectKind(e.templateId);
+      if (kind) this.elements.seeObject(e, kind);
+    }
+    for (const pid of this.playerIds) {
+      const p = world.entities.get(pid);
+      if (p) this.elements.seePlayer(p);
+    }
+    const boss = this.bossId >= 0 ? world.entities.get(this.bossId) : undefined;
+    if (boss) this.elements.seeBoss(boss);
+    this.elements.end();
   }
 
   /** Where Weight of the Anvil `id` is drawn this frame: at the local
@@ -1456,6 +1512,7 @@ export class FinalKitFx {
     this.arrow.endScan();
     this.rosterSeen = Number.NaN;
     this.stars.hide();
+    this.elements.hide();
     for (const el of ELEMENTS)
       for (const s of this.pools[el]) {
         s.key = 0;
@@ -1488,6 +1545,7 @@ export class FinalKitFx {
     this.root.removeFromParent();
     this.particles.dispose();
     this.stars.dispose();
+    this.elements.dispose();
     this.anvilFx.dispose();
     this.kit.dispose();
     this.arcsMesh.dispose();

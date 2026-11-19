@@ -23,6 +23,7 @@ import {
   overloadPulseSound,
   rebuildDue,
 } from '../src/game/smith_heart_final_audio_core';
+import { ELEMENT_CUES } from '../src/sim/encounters/smith_heart/final_elements_ids';
 import {
   FINAL_AURAS,
   FINAL_CASTS,
@@ -92,7 +93,12 @@ describe('smith_heart_final_audio: the plan', () => {
   it('ships every sample it plays, sounds every cue, and claims exactly its own', () => {
     for (const key of FINAL_SFX_KEYS)
       expect(Object.hasOwn(SFX_CLIPS, key), `${key} in the manifest`).toBe(true);
-    const cues = [...Object.values(FINAL_CUES), ...Object.values(FINAL_PHASE_CUES)];
+    const cues = [
+      ...Object.values(FINAL_CUES),
+      ...Object.values(FINAL_PHASE_CUES),
+      // Its own elements (Jose's brief of 2026-11-19 (b)).
+      ...Object.values(ELEMENT_CUES),
+    ];
     for (const cue of cues) {
       expect(finalSoundClaims(cue), cue).toBe(true);
       expect(FINAL_CUE_SOUNDS[cue].length, cue).toBeGreaterThan(0);

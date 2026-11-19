@@ -55,7 +55,18 @@ export type FinalTelegraphKind =
   | 'shearStone'
   | 'coal'
   | 'pounce'
-  | 'buffet';
+  | 'buffet'
+  // Its own elements (final_elements_fx.ts): a steam cloud's scald, a Magma
+  // Rift's lava pool (the black crust over the melt) and its mark under a
+  // player, a hailstone's circle, Mythic's residue in each element.
+  | 'steam'
+  | 'lava'
+  | 'magmaMark'
+  | 'hail'
+  | 'residueFire'
+  | 'residueFrost'
+  | 'residueStorm'
+  | 'residueStone';
 
 export interface FinalTelegraphLook {
   element: FinalElement;
@@ -128,22 +139,36 @@ export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTel
   coal: look('fire', 0.3, 0.7, 0.6, 0.9, { falloff: 0.6, curtain: false }),
   pounce: look('storm', 0.45, 0.9, 0.9, 1, { curtain: false }),
   buffet: look('storm', 0.22, 0.8, 0.5, 0.7, { rim: 0.85, curtain: false }),
+  // The steam's scald: a pale wet sheen with frost's lines (no curtain: the
+  // billows are its wall, and it drifts).
+  steam: look('frost', 0.18, 0.5, 0.9, 0.55, { rim: 0.9, curtain: false }),
+  // Lava: the deepest char (the black crust) over the molten flow.
+  lava: look('fire', 0.78, 1, 0.45, 1, { falloff: 0.3 }),
+  magmaMark: look('fire', 0.5, 1, 0.8, 1, { curtain: false }),
+  hail: look('frost', 0.5, 0.9, 1.1, 1, { inward: 1, curtain: false }),
+  residueFire: look('fire', 0.4, 0.8, 0.8, 0.7, { rim: 0.7, curtain: false }),
+  residueFrost: look('frost', 0.42, 0.8, 0.8, 0.7, { rim: 0.7, curtain: false }),
+  residueStorm: look('storm', 0.32, 0.8, 0.8, 0.7, { rim: 0.7, curtain: false }),
+  residueStone: look('stone', 0.42, 0.8, 0.8, 0.7, { rim: 0.7, curtain: false }),
 };
 
 /** The dressed fans each element keeps (fixed, allocated at build): the
- *  most of its kinds the kit can show at once, with room to spare. */
+ *  most of its kinds the kit can show at once, with room to spare. The
+ *  boss's own elements add theirs: fire eight lava pools, five magma marks
+ *  and Mythic's residue; frost six steam clouds, fourteen hailstones' circles
+ *  and residue; storm and stone their residue. */
 export const FINAL_TELEGRAPH_POOLS: Readonly<Record<FinalElement, number>> = {
   // Six whirls, ten pools, three ember marks.
-  fire: 22,
+  fire: 22 + 18,
   // Two to four cracks.
-  frost: 8,
+  frost: 8 + 26,
   // Six orbs, two Drawn Lightning marks, the bolt's target, a volley of Sky
   // Strikes and their Arcing Stone rings (two volleys can overlap), and up to
   // six Dust Devils (two volleys overlapping), and a charged pillar's ground
   // under each of up to eight pillars.
-  storm: 38,
+  storm: 38 + 6,
   // Four tremors, the Anvil, the Crushed, a volley of rises.
-  stone: 18,
+  stone: 18 + 4,
 };
 
 /** The element a kind paints in. */

@@ -25807,6 +25807,38 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '교차하는 칼날이 당신을 지나는 선을 겨눕니다: 선은 당신을 따라오다가 날아가기 {lock}초 전에 고정됩니다. 선을 기둥에 통과시켜 부순 뒤 선에서 벗어나세요. 선 위의 모두가 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.',
   'hudChrome.auraEffect.finalBoss.anvilMark':
     '모루의 무게가 당신을 따라옵니다: {radius}미터 원이 당신과 함께 움직이다가 떨어지기 {lock}초 전에 고정됩니다. 공격대를 원 안에 모으세요: {total}의 물리 피해를 안에 있는 모두가 나누어 받으며, {fewer}명 미만이면 각자 1.5배를 받습니다. 영웅: {heroicTotal}. 신화: {mythicTotal}.',
+  'hudChrome.auraEffect.finalBoss.strikeHeat':
+    '작열하는 화상: 매초 {total}의 화염 피해를 받습니다({stacks}중첩마다 {per}). {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 우두머리가 서 있는 구역의 원소 중첩을 부여합니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅: 중첩마다 {heroicPer}, 일격은 중첩마다 {heroicGrowth}% 강화. 신화: 중첩마다 {mythicPer}, {mythicGrowth}% 강화.',
+  'hudChrome.auraEffect.finalBoss.strikeQuench':
+    '살을 에는 서리: 이동 속도가 {pct}% 감소합니다({stacks}중첩마다 {per}%, 최대 {cap}%). {freeze}중첩부터는 일격마다 {frozen}초 동안 얼어붙습니다. {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅과 신화에서는 중첩마다 {heroicGrowth}%와 {mythicGrowth}% 강화됩니다.',
+  'hudChrome.auraEffect.finalBoss.strikeBreath':
+    '정전기: 받는 마법 피해가 {pct}% 증가합니다. {from}중첩부터 {arcEvery}초마다 번개가 당신에게서 {reach}미터 내 모든 아군에게 튀어 {arcMin}~{arcMax}의 자연 피해를 주며, 추가 중첩마다 {arcGrowth}% 강해집니다: 공격대를 {reach}미터 떨어뜨리세요. {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅 번개: {heroicArcMin}~{heroicArcMax}. 신화 번개: {mythicArcMin}~{mythicArcMax}.',
+  'hudChrome.auraEffect.finalBoss.strikeHammer':
+    '갈라진 갑옷: 방어도가 {pct}% 감소합니다({stacks}중첩마다 {per}%, 방어도의 {floor}% 아래로는 내려가지 않음). {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅: 중첩마다 {heroicPer}%. 신화: 중첩마다 {mythicPer}%.',
+  'hudChrome.auraEffect.finalBoss.frozen':
+    '살을 에는 서리에 꽁꽁 얼어붙음: {seconds}초 동안 기절.',
+  'hudChrome.auraEffect.finalBoss.fusionSteam':
+    '열기와 담금질의 원소 융합: {seconds}초 후 들어간 구역에 짙은 끓는 증기 구름이 피어올라 떠다니며, 안에 있는 자를 매초 태웁니다. 구름 밖에 있으세요.',
+  'hudChrome.auraEffect.finalBoss.fusionMagma':
+    '열기와 망치의 원소 융합: {seconds}초 후 마그마 균열이 플레이어들에게 표식을 남기고, 각자의 발밑에서 분출하여 용암 웅덩이를 남깁니다. 표식 대상은 공격대에서 멀어지세요.',
+  'hudChrome.auraEffect.finalBoss.fusionFirestorm':
+    '열기와 숨결의 원소 융합: {seconds}초 후 방을 가로지르는 화염 폭풍의 길이 표시되고, 화염 벽이 그 길을 따라 휩씁니다. 길에서 벗어나세요.',
+  'hudChrome.auraEffect.finalBoss.fusionHail':
+    '담금질과 숨결의 원소 융합: {seconds}초 후 들어간 구역에 몇 초 동안 우박 폭풍이 쏟아지며, 우박은 바닥의 작은 원에 떨어집니다. 원에서 벗어나세요.',
+  'hudChrome.auraEffect.finalBoss.fusionAvalanche':
+    '담금질과 망치의 원소 융합: {seconds}초 후 얼음과 바위 가시가 벽에서 중앙으로 줄지어 달립니다. 줄 사이의 틈에 서세요.',
+  'hudChrome.auraEffect.finalBoss.fusionSpires':
+    '숨결과 망치의 원소 융합: {seconds}초 후 들어간 구역에 폭풍 첨탑이 솟아 충전되고, 바닥에 표시된 선을 따라 번개가 첨탑에서 첨탑으로 뜁니다. 두 첨탑 사이에 절대 서지 마세요.',
+  'hudChrome.auraEffect.finalBoss.magmaMark':
+    '마그마 균열: {seconds}초 후 당신의 발밑에서 균열이 분출하여 {radius}미터 내 모두에게 {min}~{max}의 화염 피해를 주고, {life}초 동안 타오르는 용암 웅덩이를 남깁니다(매초 {poolMin}~{poolMax}의 화염 피해). 분출하기 전에 공격대에서 멀어지세요. 영웅: {heroicMin}~{heroicMax}. 신화: {mythicMin}~{mythicMax}.',
+  'hudChrome.auraEffect.finalBoss.polarityFire':
+    '대립하는 원소, 화염: 얼음 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 남은 다른 표식마다 1.5배가 됩니다.',
+  'hudChrome.auraEffect.finalBoss.polarityIce':
+    '대립하는 원소, 얼음: 화염 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 남은 다른 표식마다 1.5배가 됩니다.',
+  'hudChrome.auraEffect.finalBoss.polarityEarth':
+    '대립하는 원소, 대지: 번개 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 남은 다른 표식마다 1.5배가 됩니다.',
+  'hudChrome.auraEffect.finalBoss.polarityLightning':
+    '대립하는 원소, 번개: 대지 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 남은 다른 표식마다 1.5배가 됩니다.',
   'hudChrome.auraEffect.finalBoss.underIce': '기절 상태: 깨지는 얼음 아래로 떨어졌습니다.',
   'hudChrome.auraEffect.finalBoss.numbing':
     '정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.',
@@ -25831,6 +25863,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.heart_final_call': '네 구역의 부름',
   'abilityUi.cast.heart_final_shearing_blow': '베어 가르는 일격',
   'abilityUi.cast.heart_final_gale_pounce': '돌풍 덮치기',
+  'abilityUi.cast.heart_final_fusion': '원소 융합',
   'abilityUi.cast.heart_final_rime_toll': '서리 종소리',
   'abilityUi.cast.heart_breath_cradle_channel': '천둥의 요람',
   'abilityUi.cast.heart_breath_mending_gale': '치유의 질풍',
