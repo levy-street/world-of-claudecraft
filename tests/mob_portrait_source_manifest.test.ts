@@ -120,7 +120,11 @@ describe('mob portrait source manifest', () => {
     // 379: plus the four Gourdlight Eve encounter bodies.
     // 384: the Smith's Heart final boss's four Splinters and the Breath isle's
     // Gale Sentinel and Gale Mender, less the Slabwright the Council rework cut.
-    expect(liveIds).toHaveLength(384);
+    // 388: the Islands of the Wind's four other adds (Gust Herald, Riven Squall,
+    // Squall Fragment, Squall Shieldbearer). Their Stillstone is no row: its
+    // crystal is baked from the fight painter's own (target_portrait_view.ts
+    // STATIC_MOB_PORTRAIT_URLS, scripts/render_stillstone_portrait.mjs).
+    expect(liveIds).toHaveLength(388);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
