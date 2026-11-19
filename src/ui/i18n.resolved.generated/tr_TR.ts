@@ -4344,6 +4344,8 @@ export const tr_TR: EnTranslations = {
       "resetOccupied": "İçeride hâlâ biri varken örnekleri sıfırlayamazsın.",
       "queuedOccupied": "İçeride hâlâ bir oyuncu veya cesedi bulunduğu için zorluk değişikliği sıraya alındı. Kopyalar boşalınca uygulanacak.",
       "queuedCancelled": "Grup veya lider değiştiği için sıraya alınan zorluk değişikliği iptal edildi.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Bu örnekleri sıfırlamadan önce zindan zorluğunu değiştir. Boş örnekler 5 dakika sonra kendiliğinden sıfırlanır.",
       "resetLoot": "İçeride ganimet kaldığı sürece örnekleri sıfırlayamazsın.",
       "resetConfirmTitle": "Tüm Örnekler Sıfırlansın mı?",

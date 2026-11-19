@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "es_ES": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "fr_FR": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "fr_CA": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "de_DE": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "nl_NL": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "pl_PL": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "id_ID": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "tr_TR": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "sv_SE": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "vi_VN": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ],
+  "da_DK": [
+    "hudChrome.dungeonDifficulty.queuedCooldown",
+    "hudChrome.dungeonDifficulty.queuedLoot"
+  ]
 };

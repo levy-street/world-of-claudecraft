@@ -4344,6 +4344,8 @@ export const es_ES: EnTranslations = {
       "resetOccupied": "No puedes restablecer instancias mientras alguien siga dentro.",
       "queuedOccupied": "Cambio de dificultad en espera porque aún queda alguien o su cadáver dentro. Se aplicará cuando las instancias estén vacías.",
       "queuedCancelled": "Cambio de dificultad pendiente cancelado porque cambió el grupo o su líder.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Cambia la dificultad de la mazmorra antes de restablecer estas instancias. Las instancias vacías se restablecen solas después de 5 minutos.",
       "resetLoot": "No puedes restablecer instancias mientras quede botín dentro.",
       "resetConfirmTitle": "¿Restablecer todas las instancias?",

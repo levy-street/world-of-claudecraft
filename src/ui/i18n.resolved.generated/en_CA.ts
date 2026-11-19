@@ -4344,6 +4344,8 @@ export const en_CA: EnTranslations = {
       "resetOccupied": "You cannot reset instances while someone is still inside.",
       "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
       "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.",
       "resetLoot": "You cannot reset instances while loot remains inside.",
       "resetConfirmTitle": "Reset All Instances?",

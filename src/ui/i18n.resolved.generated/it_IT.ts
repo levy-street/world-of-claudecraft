@@ -4344,6 +4344,8 @@ export const it_IT: EnTranslations = {
       "resetOccupied": "Non puoi reimpostare le istanze mentre c'è ancora qualcuno all'interno.",
       "queuedOccupied": "Cambio di difficoltà in attesa perché qualcuno o il suo cadavere è ancora dentro. Verrà applicato quando le istanze saranno vuote.",
       "queuedCancelled": "Cambio di difficoltà in attesa annullato perché il gruppo o il capogruppo è cambiato.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Cambia la difficoltà del dungeon prima di reimpostare queste istanze. Le istanze vuote si reimpostano automaticamente dopo 5 minuti.",
       "resetLoot": "Non puoi reimpostare le istanze mentre c'è ancora del bottino all'interno.",
       "resetConfirmTitle": "Reimpostare tutte le istanze?",

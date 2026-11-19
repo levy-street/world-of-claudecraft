@@ -4344,6 +4344,8 @@ export const sv_SE: EnTranslations = {
       "resetOccupied": "Du kan inte återställa instanser medan någon fortfarande är kvar inuti.",
       "queuedOccupied": "Svårighetsändringen köades eftersom någon eller någons kropp fortfarande är kvar där inne. Den träder i kraft när instanserna är tomma.",
       "queuedCancelled": "Den köade svårighetsändringen avbröts eftersom gruppen eller ledaren ändrades.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Ändra fängelsehålans svårighetsgrad innan du återställer dessa instanser. Tomma instanser återställs automatiskt efter 5 minuter.",
       "resetLoot": "Du kan inte återställa instanser medan byte finns kvar inuti.",
       "resetConfirmTitle": "Återställ alla instanser?",

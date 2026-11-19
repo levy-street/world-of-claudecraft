@@ -4344,6 +4344,8 @@ export const fr_CA: EnTranslations = {
       "resetOccupied": "Vous ne pouvez pas réinitialiser les instances tant qu'une personne s'y trouve.",
       "queuedOccupied": "Changement de difficulté mis en attente car quelqu'un ou son cadavre est encore à l'intérieur. Il sera appliqué quand les instances seront vides.",
       "queuedCancelled": "Changement de difficulté en attente annulé car le groupe ou son chef a changé.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Changez la difficulté du donjon avant de réinitialiser ces instances. Les instances vides se réinitialisent d'elles-mêmes après 5 minutes.",
       "resetLoot": "Vous ne pouvez pas réinitialiser les instances tant qu'il reste du butin à l'intérieur.",
       "resetConfirmTitle": "Réinitialiser toutes les instances ?",

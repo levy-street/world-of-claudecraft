@@ -4344,6 +4344,8 @@ export const de_DE: EnTranslations = {
       "resetOccupied": "Du kannst Instanzen nicht zurücksetzen, solange sich noch jemand darin befindet.",
       "queuedOccupied": "Schwierigkeitswechsel vorgemerkt, da noch jemand oder dessen Leiche darin ist. Er wird angewendet, sobald die Instanzen leer sind.",
       "queuedCancelled": "Vorgemerkter Schwierigkeitswechsel abgebrochen, da sich Gruppe oder Gruppenleitung geändert hat.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Ändere die Dungeon-Schwierigkeit, bevor du diese Instanzen zurücksetzt. Leere Instanzen werden nach 5 Minuten automatisch zurückgesetzt.",
       "resetLoot": "Du kannst Instanzen nicht zurücksetzen, solange sich noch Beute darin befindet.",
       "resetConfirmTitle": "Alle Instanzen zurücksetzen?",

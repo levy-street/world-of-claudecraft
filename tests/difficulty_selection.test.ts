@@ -6,6 +6,7 @@ import {
 } from '../src/sim/instances/difficulty_selection';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
+import { INSTANCE_EMPTY_TIMEOUT } from '../src/sim/types';
 
 function setup() {
   const sim = new Sim({
@@ -22,6 +23,17 @@ function setup() {
   const inst = sim.instances.find((i) => i.partyKey !== null && i.dungeonId === 'hollow_crypt')!;
   sim.drainEvents();
   return { sim, leader, member, inst };
+}
+// A shared uncommon drop: loot the group may still want, so the reset gate keeps it.
+function strandLoot(sim: Sim, mobId: number) {
+  const mob = sim.entities.get(mobId)!;
+  mob.lootable = true;
+  mob.loot = { copper: 0, items: [{ itemId: 'redbrook_blade', count: 1 }] };
+}
+function takeLoot(sim: Sim, mobId: number) {
+  const mob = sim.entities.get(mobId)!;
+  mob.lootable = false;
+  mob.loot = null;
 }
 function advance(sim: Sim) {
   const events = [];
@@ -54,8 +66,7 @@ describe('difficulty selection through the live Sim', () => {
   it('lets a failed loot switch retry the same selected tier', () => {
     const { sim, leader, member, inst } = setup();
     sim.leaveDungeon(member);
-    const mob = sim.entities.get(inst.mobIds[0])!;
-    mob.lootable = true;
+    strandLoot(sim, inst.mobIds[0]);
     sim.drainEvents();
     sim.setDungeonDifficulty('heroic', leader);
     expect(
@@ -68,7 +79,7 @@ describe('difficulty selection through the live Sim', () => {
         ),
     ).toBe(true);
     expect(inst.difficulty).toBe('normal');
-    mob.lootable = false;
+    takeLoot(sim, inst.mobIds[0]);
     sim.setDungeonDifficulty('heroic', leader);
     expect(inst.difficulty).toBe('heroic');
   });
@@ -76,7 +87,7 @@ describe('difficulty selection through the live Sim', () => {
     const { sim, leader, member, inst } = setup();
     sim.setDungeonDifficulty('heroic', leader);
     sim.drainEvents();
-    sim.entities.get(inst.mobIds[0])!.lootable = true;
+    strandLoot(sim, inst.mobIds[0]);
     sim.leaveDungeon(member);
     expect(
       advance(sim)
@@ -84,9 +95,26 @@ describe('difficulty selection through the live Sim', () => {
         .map((e) => e.text),
     ).toContain('You cannot reset instances while loot remains inside.');
     expect(advance(sim).filter((e) => e.type === 'error')).toEqual([]);
-    sim.entities.get(inst.mobIds[0])!.lootable = false;
+    takeLoot(sim, inst.mobIds[0]);
     advance(sim);
     expect(inst.difficulty).toBe('heroic');
+  });
+  it('applies a loot-queued change once the empty-instance reaper frees the claim', () => {
+    const { sim, leader, member, inst } = setup();
+    sim.leaveDungeon(member);
+    strandLoot(sim, inst.mobIds[0]);
+    sim.setDungeonDifficulty('heroic', leader);
+    expect(sim.ctx.pendingDifficultyChanges.has(leader)).toBe(true);
+    // Nobody inside: the reaper frees the claim after its empty timeout.
+    inst.emptyFor = INSTANCE_EMPTY_TIMEOUT;
+    // The retry runs just before the reaper in the same 1 Hz phase, so the
+    // change lands on the following second.
+    const text = [...advance(sim), ...advance(sim)]
+      .filter((e) => e.type === 'error')
+      .map((e) => e.text);
+    expect(inst.partyKey).toBeNull();
+    expect(text).toContain('Dungeon difficulty set to Heroic.');
+    expect(sim.ctx.pendingDifficultyChanges.size).toBe(0);
   });
   it('cancels a pending switch when its leader leaves the party', () => {
     const { sim, leader, member, inst } = setup();
@@ -170,7 +198,7 @@ describe('difficulty selection through the live Sim', () => {
     sim.removePlayer(leader);
     expect(sim.ctx.pendingDifficultyChanges.size).toBe(0);
   });
-  it('reports the dungeon cooldown without falsely reporting a successful switch', () => {
+  it('queues a cooldown refusal without claiming success, then applies when it ends', () => {
     const { sim, leader, member, inst } = setup();
     sim.leaveDungeon(member);
     sim.setDungeonDifficulty('heroic', leader);
@@ -182,10 +210,20 @@ describe('difficulty selection through the live Sim', () => {
         .drainEvents()
         .filter((e) => e.type === 'error')
         .map((e) => e.text),
-    ).toEqual(['Instances can only be reset once every 5 minutes.']);
+    ).toEqual([
+      'Instances can only be reset once every 5 minutes.',
+      'Difficulty change queued. It will apply when the reset cooldown ends.',
+    ]);
+    expect(sim.ctx.pendingDifficultyChanges.size).toBe(1);
+    inst.resetAvailableAt = sim.time;
+    const applied = advance(sim)
+      .filter((e) => e.type === 'error')
+      .map((e) => e.text);
+    expect(inst.difficulty).toBe('normal');
+    expect(applied).toEqual(['Dungeon difficulty set to Normal.']);
     expect(sim.ctx.pendingDifficultyChanges.size).toBe(0);
   });
-  it('reports a target-tier lockout without claiming success', () => {
+  it('refuses a target-tier lockout without queueing or claiming success', () => {
     const { sim, leader, member, inst } = setup();
     sim.leaveDungeon(member);
     sim.players.get(leader)!.raidLockouts.set('hollow_crypt:heroic', Number.MAX_SAFE_INTEGER);
@@ -198,6 +236,9 @@ describe('difficulty selection through the live Sim', () => {
         .filter((e) => e.type === 'error')
         .map((e) => e.text),
     ).toEqual(['You are locked to Heroic The Hollow Crypt.']);
+    // A lockout can last days: a request queued that long would fire on a group
+    // that has moved on, so it is final, not queued.
+    expect(sim.ctx.pendingDifficultyChanges.size).toBe(0);
   });
   it('switches raid difficulty back immediately, preserving the raid cooldown exemption', () => {
     const { sim, leader, member, inst: dungeon } = setup();
@@ -387,13 +428,13 @@ describe('difficulty selection through the live Sim', () => {
   );
   it('queues occupancy before pre-existing loot and waits for that loot after exit', () => {
     const { sim, leader, member, inst } = setup();
-    sim.entities.get(inst.mobIds[0])!.lootable = true;
+    strandLoot(sim, inst.mobIds[0]);
     sim.setDungeonDifficulty('heroic', leader);
     expect(sim.ctx.pendingDifficultyChanges.size).toBe(1);
     sim.leaveDungeon(member);
     advance(sim);
     expect(inst.difficulty).toBe('normal');
-    sim.entities.get(inst.mobIds[0])!.lootable = false;
+    takeLoot(sim, inst.mobIds[0]);
     advance(sim);
     expect(inst.difficulty).toBe('heroic');
   });
@@ -404,7 +445,7 @@ describe('difficulty selection through the live Sim', () => {
       const { sim, leader, member, inst } = setup();
       sim.leaveDungeon(member);
       expect(sim.unappliedDungeonDifficulty(leader)).toBeNull();
-      if (reason === 'loot') sim.entities.get(inst.mobIds[0])!.lootable = true;
+      if (reason === 'loot') strandLoot(sim, inst.mobIds[0]);
       if (reason === 'cooldown') inst.resetAvailableAt = sim.time + 60;
       if (reason === 'lockout')
         sim.players.get(leader)!.raidLockouts.set('hollow_crypt:heroic', Number.MAX_SAFE_INTEGER);
@@ -415,13 +456,17 @@ describe('difficulty selection through the live Sim', () => {
         cooldown: 'Instances can only be reset once every 5 minutes.',
         lockout: 'You are locked to Heroic The Hollow Crypt.',
       }[reason];
+      const queued = {
+        loot: 'Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.',
+        cooldown: 'Difficulty change queued. It will apply when the reset cooldown ends.',
+      }[reason as 'loot' | 'cooldown'];
       expect(
         sim
           .drainEvents()
           .filter((e) => e.type === 'error')
           .map((e) => e.text),
-      ).toEqual([refusal]);
-      expect(sim.ctx.pendingDifficultyChanges.size).toBe(0);
+      ).toEqual(reason === 'lockout' ? [refusal] : [refusal, queued]);
+      expect(sim.ctx.pendingDifficultyChanges.has(leader)).toBe(reason !== 'lockout');
       expect(inst.difficulty).toBe('normal');
       expect(sim.dungeonDifficulty(leader)).toBe('heroic');
       expect(sim.unappliedDungeonDifficulty(leader)).toBe('normal');
@@ -463,7 +508,7 @@ describe('difficulty selection through the live Sim', () => {
     const inst = sim.instances.find((i) => i.partyKey !== null && i.dungeonId === 'hollow_crypt')!;
     expect(inst.difficulty).toBe('heroic');
     sim.leaveDungeon(solo);
-    sim.entities.get(inst.mobIds[0])!.lootable = true;
+    strandLoot(sim, inst.mobIds[0]);
     sim.setDungeonDifficulty('normal', solo);
     expect(inst.difficulty).toBe('heroic');
     expect(sim.unappliedDungeonDifficulty(solo)).toBe('heroic');

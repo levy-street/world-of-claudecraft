@@ -4344,6 +4344,8 @@ export const cs_CZ: EnTranslations = {
       "resetOccupied": "Instance nelze resetovat, dokud je někdo stále uvnitř.",
       "queuedOccupied": "Změna obtížnosti čeká, protože je někdo nebo jeho tělo stále uvnitř. Provede se po vyprázdnění instancí.",
       "queuedCancelled": "Čekající změna obtížnosti byla zrušena kvůli změně skupiny nebo jejího vůdce.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Před resetováním těchto instancí změň obtížnost dungeonu. Prázdné instance se po 5 minutách resetují samy.",
       "resetLoot": "Instance nelze resetovat, dokud uvnitř zůstává kořist.",
       "resetConfirmTitle": "Resetovat všechny instance?",

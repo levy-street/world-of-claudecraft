@@ -4344,6 +4344,8 @@ export const pt_BR: EnTranslations = {
       "resetOccupied": "Você não pode redefinir instâncias enquanto alguém ainda estiver dentro.",
       "queuedOccupied": "Mudança de dificuldade na fila porque alguém ou seu cadáver ainda está lá dentro. Será aplicada quando as instâncias estiverem vazias.",
       "queuedCancelled": "Mudança de dificuldade pendente cancelada porque o grupo ou o líder mudou.",
+      "queuedCooldown": "Difficulty change queued. It will apply when the reset cooldown ends.",
+      "queuedLoot": "Difficulty change queued. It will apply once the loot inside is taken or the empty instances close.",
       "resetSameDifficulty": "Altere a dificuldade da masmorra antes de redefinir estas instâncias. Instâncias vazias são redefinidas automaticamente após 5 minutos.",
       "resetLoot": "Você não pode redefinir instâncias enquanto houver saque dentro delas.",
       "resetConfirmTitle": "Redefinir todas as instâncias?",
