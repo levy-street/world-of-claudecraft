@@ -30,6 +30,11 @@ import {
   finalObjectSeconds,
   rootRise,
 } from '../src/render/smith_heart_fx/final_kit_fx_core';
+import {
+  easeHeading,
+  headingGap,
+  localBladeIndex,
+} from '../src/render/smith_heart_fx/final_stars_fx_core';
 import { HEAT_FLOOR } from '../src/render/smith_heart_fx/heat_floor_ladder_core';
 import { HEART_ROOM } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -457,5 +462,100 @@ describe('FinalKitFx over a fake world', () => {
     expect(visibleNamed(root, 'smithHeartFinalAnvil')).toBe(0);
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-final-kit-fx')).toBeUndefined();
+  });
+});
+
+describe("Crossing Blade follows the local player's drawn pose (playtest 2026-11-19)", () => {
+  it('picks the line aimed at me and points it at me, not at the late server line', () => {
+    expect(headingGap(0.1, -0.1)).toBeCloseTo(0.2, 9);
+    expect(headingGap(Math.PI - 0.05, -Math.PI + 0.05)).toBeCloseTo(0.1, 9);
+    const blades = [
+      { fromX: 0, fromZ: 0, facing: 0, aiming: true },
+      { fromX: 0, fromZ: 0, facing: Math.PI / 2, aiming: true },
+      { fromX: 0, fromZ: 0, facing: 0.05, aiming: false },
+    ];
+    // Me north-north-east of the blades: the first (north) is mine.
+    expect(localBladeIndex(blades, 3, 20)).toBe(0);
+    // Me east: the second.
+    expect(localBladeIndex(blades, 20, 1)).toBe(1);
+    // Nothing aims within reach of me: none.
+    expect(localBladeIndex(blades, -20, -1)).toBe(-1);
+    // The hand-back eases, the shortest way round, and lands.
+    const half = easeHeading(0, 1, 14, Math.log(2) / 14);
+    expect(half).toBeCloseTo(0.5, 6);
+    expect(headingGap(easeHeading(3, -3, 14, 10), -3)).toBeLessThan(1e-6);
+  });
+
+  it('in the painter: my line turns to where I am drawn while it aims, then hands back on lock', () => {
+    const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
+    const at = (dx: number, dz: number) => ({
+      x: o.x + HEART_ROOM.x + dx,
+      z: o.z + HEART_ROOM.z + dz,
+    });
+    const entities = new Map<number, Entity>();
+    // Me 20 yd east of the room's centre, marked and aiming.
+    const p = at(20, 0);
+    const me = entity(1, 'player', 'warrior', p.x, p.z, {
+      auras: [
+        {
+          id: FINAL_AURAS.bladeMark,
+          name: 'x',
+          kind: 'internal_cd',
+          remaining: 3,
+          duration: 4,
+          value: 1,
+          sourceId: 2,
+        },
+      ] as Entity['auras'],
+    });
+    entities.set(me.id, me);
+    // The blade on the west rim; the server's line still points where I was a
+    // moment ago (a little north of me).
+    const from = at(-HEART_ROOM.r + 1.5, 0);
+    const lateFacing = Math.atan2(20 - (-HEART_ROOM.r + 1.5), 6);
+    const blade = entity(20, 'object', finalBladeTemplate('aim'), from.x, from.z, {
+      facing: lateFacing,
+    });
+    const len = 2 * (HEART_ROOM.r - 1.5);
+    const mid = {
+      x: from.x + Math.sin(lateFacing) * len * 0.5,
+      z: from.z + Math.cos(lateFacing) * len * 0.5,
+    };
+    const lane = entity(21, 'object', finalLaneTemplate('warn', len), mid.x, mid.z, {
+      facing: lateFacing,
+    });
+    entities.set(blade.id, blade);
+    entities.set(lane.id, lane);
+    const world = {
+      entities,
+      player: me,
+      playerId: me.id,
+      entityRosterVersion: 1,
+    } as unknown as IWorld;
+    const scene = new THREE.Scene();
+    const fx = new FinalKitFx(scene, () => 0, world);
+    const root = scene.getObjectByName('smith-heart-final-kit-fx');
+    let holder: THREE.Object3D | null = null;
+    root?.traverse((c) => {
+      if (c.name === 'smithHeartStarBlade' && c.visible) holder = c;
+    });
+    for (let i = 0; i < 6; i++) fx.update(1 / 30);
+    root?.traverse((c) => {
+      if (c.name === 'smithHeartStarBlade' && c.visible) holder = c;
+    });
+    const h = holder as THREE.Object3D | null;
+    expect(h).not.toBeNull();
+    // The blade sits half its length back along its line: its heading is from it to the rim spot.
+    const drawn = Math.atan2(from.x - (h?.position.x ?? 0), from.z - (h?.position.z ?? 0));
+    const toMe = Math.atan2(me.pos.x - from.x, me.pos.z - from.z);
+    expect(headingGap(drawn, toMe)).toBeLessThan(0.01);
+    expect(headingGap(drawn, lateFacing)).toBeGreaterThan(0.05);
+    // Locked: it eases back onto the server's line.
+    me.auras[0].value = 2;
+    lane.templateId = finalLaneTemplate('lock', len);
+    for (let i = 0; i < 30; i++) fx.update(1 / 30);
+    const back = Math.atan2(from.x - (h?.position.x ?? 0), from.z - (h?.position.z ?? 0));
+    expect(headingGap(back, lateFacing)).toBeLessThan(0.01);
+    fx.dispose();
   });
 });
