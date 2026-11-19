@@ -5950,7 +5950,6 @@ export const hudChromeStrings = {
       rushMark:
         'When this ends, the Guardian of the Hammer braces for {windup} sec, then charges in a straight line through where you stood, on to the edge of the Quarry, and stops early at the first pillar in its way. Lead it into the Cursed Pillar: the pillar shatters, the Guardian is stunned for {stun} sec and takes {exposed}% more damage for {exposedSeconds} sec. A sheltering pillar in the way is destroyed instead. Everyone it runs into before it stops takes {min} to {max} damage and is thrown back, you too if you are still on its line. Mythic: a charge that hits no pillar starts the Quarry collapsing until the Cursed Pillar breaks. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
       rushExposed: "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
-      bond: 'Takes {pct}% less damage while the other member of the Hammer Council stands within {reach} yd. Every {every} sec the bond deals {min} to {max} damage to the whole raid, {growth}% more each time. Pull them apart. Heroic and Mythic: {heroicMin} to {heroicMax} damage.',
       collapse:
         'The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.',
       memory:

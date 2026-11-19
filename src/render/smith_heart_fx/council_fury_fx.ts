@@ -30,7 +30,7 @@ import { fxAnchor } from '../attached_fx_anchor';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { radialGlowTexture } from '../textures';
 import { COUNCIL_AURAS, SOUL_COLORS } from './council_fx_core';
-import { BOND_BODY, type FuryLook, furyLook } from './council_mechanic_look_core';
+import { type FuryLook, furyLook, MEMBER_BODY } from './council_mechanic_look_core';
 import type { CouncilFxHost } from './council_pillars_fx';
 
 /** The stone shards torn loose round the survivor (the low tier draws fewer). */
@@ -587,7 +587,7 @@ export class CouncilFuryFx {
     const look = furyLook(this.h.now() - this.wokeAt, _look);
     const at = fxAnchor(e);
     const y = this.h.groundY(at.x, at.z);
-    const body = BOND_BODY[this.role];
+    const body = MEMBER_BODY[this.role];
     const height = body.height * look.swell;
     const r = Math.max(2.2, body.height * 0.3) * look.swell;
     // The Guardian's fury (the Singer's soul) is a storm that hugs his body:
@@ -766,7 +766,7 @@ export class CouncilFuryFx {
   }
 
   private chest(): number {
-    return BOND_BODY[this.role].height * BOND_BODY[this.role].chest;
+    return MEMBER_BODY[this.role].height * MEMBER_BODY[this.role].chest;
   }
 
   private hide(): void {

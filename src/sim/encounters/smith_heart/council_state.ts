@@ -122,9 +122,6 @@ export interface CouncilFightState {
    *  stacks and the seconds to its next blow), until the cursed pillar
    *  breaks; null while it holds. */
   collapse: { stacks: number; timer: number } | null;
-  /** Bond of the Stone: the pulses sung while the two stand together (0
-   *  while apart), the seconds to the next, and when it may warn again. */
-  bond: { pulses: number; timer: number };
   wakeTimer: number;
   rockTimer: number;
   boltTimer: number;

@@ -24,8 +24,7 @@
 //    (council_rush_fx.ts), and the red arrow over the marked player for the
 //    whole bar (council_rush_arrow.ts); Hammer's Weight's slam on the tank and its mark
 //    at the tank's feet;
-//  - Bond of the Stone's gold thread between the two members
-//    (council_bond_fx.ts); the mythic Quarry Collapse's falling rock;
+//  - the mythic Quarry Collapse's falling rock;
 //  - the Seam Singer's bolt (an ochre shard), the heroic pillars' pulse
 //    rings, the inheritance's stream of stone light from the fallen to each
 //    survivor, and the Wrath holder's energy gathering round it.
@@ -69,7 +68,6 @@ import {
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { COUNCIL_GROW } from './council_bodies_core';
-import { CouncilBondFx } from './council_bond_fx';
 import { CouncilFuryFx } from './council_fury_fx';
 import {
   BOLT_SECONDS,
@@ -402,8 +400,6 @@ export class CouncilFx {
   private readonly shelters: CouncilShelters;
   /** The soak's countdown rim, beacon and the rock's shadow. */
   private readonly soak: CouncilSoakFx;
-  /** Bond of the Stone's thread between the two members. */
-  private readonly bond: CouncilBondFx;
   /** Grieving Fury on the survivor (council_fury_fx.ts). */
   private readonly fury: CouncilFuryFx;
   /** Mountain's Rush's lane and impact, the Quarry Collapse's blows. */
@@ -517,7 +513,6 @@ export class CouncilFx {
     this.shelters = new CouncilShelters(host, this.pillarsFx);
     this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
     this.arrow = new CouncilRushArrow(this.root, this.uTime, this.geometries, this.materials);
-    this.bond = new CouncilBondFx(host);
     this.fury = new CouncilFuryFx(host);
     this.rush = new CouncilRushFx(host, playGesture);
     this.strike = new CouncilStrikeFx(
@@ -857,7 +852,6 @@ export class CouncilFx {
     if (ability === COUNCIL_CUES.rise || ability === COUNCIL_CUES.cursedRise)
       this.pillarsFx.rise(ev.sourceId);
     else if (ability === COUNCIL_CUES.cursedPulse) this.pillarsFx.cursedPulse(ev.sourceId);
-    else if (ability === COUNCIL_CUES.bondPulse) this.bond.pulse(ev.sourceId, ev.targetId);
     else if (ability === COUNCIL_CUES.resonancePulse) this.resonancePulse(ev.sourceId);
     else if (ability === COUNCIL_CUES.crack) this.pillarsFx.cracked(ev.sourceId);
     else if (ability === COUNCIL_CUES.pulse) this.pillarsFx.pulse(ev.sourceId);
@@ -908,7 +902,6 @@ export class CouncilFx {
     this.updateStreams(world, dt);
     this.updateEnergy(world, dt);
     this.updateWrathShelters(world);
-    this.bond.update(dt);
     this.fury.update(dt);
     this.rush.update(dt);
     this.strike.update(dt);
@@ -933,7 +926,6 @@ export class CouncilFx {
     // The pillars and the rubble.
     this.pillarsFx.beginScan();
     this.soulFx.beginScan();
-    this.bond.beginScan();
     this.fury.beginScan();
     this.rush.beginScan();
     this.strike.beginScan();
@@ -953,7 +945,6 @@ export class CouncilFx {
           const role = e.dead ? null : councilRoleOf(e.templateId);
           if (role !== null) {
             this.audio.see(e, 'member');
-            this.bond.see(e);
             this.fury.see(e);
             if (role === 'guardian') this.rush.seeGuardian(e);
             this.strike.see(e, role);
@@ -1000,7 +991,6 @@ export class CouncilFx {
     // What the scan no longer saw.
     this.pillarsFx.endScan();
     this.soulFx.endScan();
-    this.bond.endScan();
     this.fury.endScan();
     this.rush.endScan();
     this.strike.endScan();
@@ -1792,7 +1782,6 @@ export class CouncilFx {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
-    this.bond.dispose();
     this.fury.dispose();
     this.strike.dispose();
     this.root.removeFromParent();

@@ -4,7 +4,7 @@
 // and CouncilFx over a fake world (no DOM): it dresses the pillars, draws every
 // mark round its player, claims the council's own cues and disposes; the
 // two-boss rework's looks (Resonance's spread ring, Mountain's Rush's mark and
-// lane, the cursed pillar, Bond of the Stone's thread).
+// lane, the cursed pillar).
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -331,7 +331,7 @@ describe('CouncilFx over a fake world', () => {
     expect(scene.getObjectByName('smith-heart-council-fx')).toBeUndefined();
   });
 
-  it("draws the Rush's lane and mark, the cursed pillar, the bond's thread; claims their cues", () => {
+  it("draws the Rush's lane and mark, the cursed pillar; claims their cues", () => {
     const entities = new Map<number, Entity>();
     const me = entity(1, 'player', 'warrior', 8, -160);
     const marked = entity(2, 'player', 'mage', 0, -150);
@@ -366,8 +366,7 @@ describe('CouncilFx over a fake world', () => {
     expect(shown('smithHeartCouncilPillar')).toBe(1);
     expect(shown('smithHeartPillarPips')).toBe(0);
     expect(shown('smithHeartSoulGlow')).toBe(1);
-    // No bond, no Rush yet.
-    expect(shown('smithHeartCouncilBondThread')).toBe(0);
+    // No Rush yet.
     const paints = () => shown('smithHeartCouncilTelegraph');
     const before = paints();
     // The Guardian marks a player and charges: the mark round them and the lane.
@@ -378,7 +377,6 @@ describe('CouncilFx over a fake world', () => {
       castRemaining: 2,
     });
     marked.auras.push(aura(COUNCIL_AURAS.rushMark, 2, T.rushCast, 0, T.rushHalfWidth));
-    guardian.auras.push(aura(COUNCIL_AURAS.bond, 10, 10));
     for (let i = 0; i < 6; i++) fx.update(1 / 30);
     expect(paints()).toBeGreaterThanOrEqual(before + 2);
     // The red arrow over the marked player, for the whole raid (every tier).
@@ -392,15 +390,8 @@ describe('CouncilFx over a fake world', () => {
     expect(arrowAt?.z).toBeCloseTo(marked.pos.z, 5);
     // Its tip floats clear of the head.
     expect((arrowAt?.y ?? 0) - marked.pos.y).toBeGreaterThanOrEqual(RUSH_ARROW.tip);
-    // The bond: the tether (core, halo, shards) and its aura on both members
-    // (a sigil on the floor, a column of light), every tier.
-    expect(shown('smithHeartCouncilBondThread')).toBe(1);
-    expect(shown('smithHeartCouncilBondCore')).toBe(1);
-    expect(shown('smithHeartCouncilBondHalo')).toBe(1);
-    expect(shown('smithHeartCouncilBondShards')).toBe(1);
-    expect(shown('smithHeartCouncilBondSigil')).toBe(2);
-    expect(shown('smithHeartCouncilBondColumn')).toBe(2);
-    expect(shown('smithHeartCouncilBondChain')).toBe(1);
+    // Bond of the Stone was removed (2026-11-19): no thread between the members.
+    expect(shown('smithHeartCouncilBondThread')).toBe(0);
     const nova = (ability: string, sourceId: number, targetId = sourceId): SimEvent =>
       ({
         type: 'spellfx',
@@ -412,7 +403,6 @@ describe('CouncilFx over a fake world', () => {
       }) as SimEvent;
     const at = (ability: string, x: number, z: number, radius: number): SimEvent =>
       ({ type: 'spellfxAt', x, z, school: 'physical', fx: 'burst', ability, radius }) as SimEvent;
-    expect(fx.handleEvent(nova(COUNCIL_CUES.bondPulse, guardian.id, singer.id))).toBe(true);
     expect(fx.handleEvent(nova(COUNCIL_CUES.cursedPulse, cursed.id))).toBe(true);
     expect(fx.handleEvent(nova(COUNCIL_CUES.resonancePulse, me.id))).toBe(true);
     expect(fx.handleEvent(at(COUNCIL_CUES.quarryCollapse, me.pos.x, me.pos.z, 2))).toBe(true);
@@ -461,14 +451,6 @@ describe('CouncilFx over a fake world', () => {
     for (let i = 0; i < 90; i++) fx.update(1 / 30);
     expect(shown('smithHeartRushScar')).toBe(0);
     expect(shown('smithHeartRushStar')).toBe(0);
-    // The bond breaks when they are pulled apart (neither wears it): every
-    // piece goes the same frame.
-    guardian.auras.length = 0;
-    fx.update(1 / 30);
-    expect(shown('smithHeartCouncilBondThread')).toBe(0);
-    expect(shown('smithHeartCouncilBondSigil')).toBe(0);
-    expect(shown('smithHeartCouncilBondColumn')).toBe(0);
-    expect(shown('smithHeartCouncilBondChain')).toBe(0);
     // A Rush whose Guardian falls mid-run: the locked lane goes that frame,
     // never lit over ground that no longer kills.
     expect(fx.handleEvent(windup)).toBe(true);

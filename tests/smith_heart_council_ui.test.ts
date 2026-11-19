@@ -122,7 +122,7 @@ describe('Hammer Council tooltips and names', () => {
     expect(rushText).toContain(`${Math.round(T.rushExposed * 100)}%`);
     expect(rushText).toContain(String(Math.round(T.rushMin * 1.15)));
     expect(rushText).not.toMatch(/\{\w+\}/);
-    for (const id of [COUNCIL_AURAS.bond, COUNCIL_AURAS.collapse, COUNCIL_AURAS.rushExposed]) {
+    for (const id of [COUNCIL_AURAS.collapse, COUNCIL_AURAS.rushExposed]) {
       const d = auraEffectDescriptor({ id, kind: 'vulnerability', value: 0.5 });
       expect(d?.key, id).toBeDefined();
       expect(t(d?.key as never, d?.nums as never)).not.toMatch(/\{\w+\}/);

@@ -14,9 +14,9 @@
 // SHOT_MYTHIC=1 (the mythic switch on, and only the m* Soul in the Stone
 // shots), SHOT_UI=1 (keep the HUD: the raid warning banners), SHOT_SETTLE
 // (ms to wait for the raid's loading curtain, 9000), SHOT_RUSH_CAM=behind
-// (the Rush shots from behind the Guardian instead of from the side). The b*,
-// c* and w* shots are Bond of the Stone, Mountain's Rush and the columns'
-// warning (entregas consejo_flojos).
+// (the Rush shots from behind the Guardian instead of from the side). The c*
+// and w* shots are Mountain's Rush and the columns' warning (entregas
+// consejo_flojos).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -315,7 +315,7 @@ try {
     await member('heart_hammer_guardian', g[0], g[1], 0);
     await clearGap();
     await chat('/dev heart council rush', 200);
-    // The Singer back to her own tank far off (no bond in the shot).
+    // The Singer back to her own tank far off.
     await raider(1, MID.x - 31, MID.z + 27);
     await member('heart_seam_singer', MID.x - 30, MID.z + 26, 1);
     const target = await page.evaluate(() => {
@@ -651,43 +651,8 @@ try {
       await place([MID.x + 2, MID.z - 20], [MID.x + 2, MID.z], 0.0, 0.3, 20);
       await sleep(13000);
     },
-    // Bond of the Stone (consejo_flojos): the two close together, then
-    // apart inside the reach, then out of it (no tether).
-    async b1_vinculo_juntos() {
-      await reset();
-      await pull();
-      await raider(0, MID.x - 3, MID.z + 1);
-      await raider(1, MID.x + 3, MID.z - 1);
-      await member('heart_hammer_guardian', MID.x - 2.5, MID.z + 1, 0);
-      await member('heart_seam_singer', MID.x + 3, MID.z - 2, 1);
-      for (let i = 2; i < 8; i++) await raider(i, MID.x - 14 - i, MID.z + 10 + (i % 3) * 2);
-      await place([MID.x - 8, MID.z - 9], [MID.x, MID.z], 0.0, 0.78, 26);
-      await sleep(4200);
-    },
-    async b2_vinculo_lejos() {
-      await reset();
-      await pull();
-      await raider(0, MID.x - 9, MID.z + 2);
-      await raider(1, MID.x + 9, MID.z - 2);
-      await member('heart_hammer_guardian', MID.x - 8, MID.z + 2, 0);
-      await member('heart_seam_singer', MID.x + 8, MID.z - 2, 1);
-      for (let i = 2; i < 8; i++) await raider(i, MID.x - 18 - i, MID.z + 14 + (i % 3) * 2);
-      await place([MID.x - 2, MID.z - 12], [MID.x, MID.z], 0.0, 0.9, 32);
-      await sleep(4200);
-    },
-    async b3_vinculo_roto() {
-      await reset();
-      await pull();
-      await raider(0, MID.x - 14, MID.z + 2);
-      await raider(1, MID.x + 14, MID.z - 2);
-      await member('heart_hammer_guardian', MID.x - 13, MID.z + 2, 0);
-      await member('heart_seam_singer', MID.x + 13, MID.z - 2, 1);
-      for (let i = 2; i < 8; i++) await raider(i, MID.x - 18 - i, MID.z + 14 + (i % 3) * 2);
-      await place([MID.x - 2, MID.z - 12], [MID.x, MID.z], 0.0, 0.9, 32);
-      await sleep(4200);
-    },
     // Mountain's Rush (consejo_flojos): the wind-up, the run, the stop on the
-    // cursed pillar. The Singer parked far off (no bond), the raid aside.
+    // cursed pillar. The Singer parked far off, the raid aside.
     // The mark's bar running: the red arrow over the marked player (noche 1112).
     async c0_flecha_marca() {
       await rushScene((st) => !!st.bars?.guardian, 1800);

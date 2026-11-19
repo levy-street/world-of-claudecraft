@@ -1,19 +1,17 @@
-// The Hammer Council's Mountain's Rush, its cursed pillar, Bond of the Stone
-// and the pillar supply (src/sim/encounters/smith_heart/council_rush.ts,
-// council_bond.ts, council_stone.ts) over a REAL Sim claim: the Rush never on a
+// The Hammer Council's Mountain's Rush, its cursed pillar and the pillar
+// supply (src/sim/encounters/smith_heart/council_rush.ts, council_stone.ts) over a REAL Sim claim: the Rush never on a
 // tank; it stops at the FIRST pillar on its line (the cursed one: shattered,
 // the Guardian stunned and exposed; a sheltering one: taken whole, the curse
 // keeps pulsing); a miss tramples its path and, on mythic only, sets the
 // Quarry collapsing until the cursed pillar breaks; the rock never touches the
-// cursed pillar and its pulse is low on normal; Bond of the Stone's ward and
-// growing pulse while the two stand together, gone apart; and the Wake cadence
+// cursed pillar and its pulse is low on normal; no proximity ward between the
+// two members (Bond of the Stone was removed on 2026-11-19); and the Wake cadence
 // giving every Wrath enough shelter for ten (one kicked Wake: normal still
 // survives, heroic is tight, mythic leaves someone out).
 
 import { describe, expect, it } from 'vitest';
 import { HAMMER_PIT } from '../src/sim/content/smith_heart_layout';
 import {
-  bondPulseMult,
   COUNCIL_AURAS,
   COUNCIL_CASTS,
   COUNCIL_CUES,
@@ -482,59 +480,28 @@ describe('Mythic: the Quarry collapses after a miss', () => {
   });
 });
 
-describe('Bond of the Stone', () => {
-  it('together: both take far less damage and the raid pulse grows each time', () => {
+describe('no proximity ward (Bond of the Stone removed, playtest of 2026-11-19)', () => {
+  it('side by side: both take full damage and nothing pulses on the raid', () => {
     const f = pulled(4);
     const b = f.bodies();
     const g = b.guardian as Entity;
     const c = b.singer as Entity;
     plant(f, g, MID.x, MID.z);
-    plant(f, c, MID.x + 8, MID.z);
+    plant(f, c, MID.x + 6, MID.z);
     const ev = f.tick(20 * 13);
     for (const body of [g, c]) {
-      const bond = body.auras.find((a) => a.id === COUNCIL_AURAS.bond);
-      expect(bond?.kind).toBe('shield_wall');
-      expect(bond?.value).toBe(T.bondWard);
+      expect(body.auras.some((a) => a.id === 'heart_bond_of_the_stone')).toBe(false);
+      expect(body.auras.some((a) => a.kind === 'shield_wall')).toBe(false);
+      const hp = body.hp;
+      f.sim.ctx.dealDamage(f.players[0], body, 1000, false, 'physical', 'Test', 'hit', true);
+      expect(hp - body.hp).toBeGreaterThan(500);
     }
-    const p = f.players[1];
-    const pulses = hitsOf(ev, COUNCIL_NAMES.bond, p.id);
-    expect(pulses.length).toBeGreaterThanOrEqual(4);
-    expect(pulses[3]).toBeGreaterThan(pulses[0]);
-    expect(bondPulseMult(3)).toBeCloseTo(1 + 3 * T.bondPulseGrowth);
-    expect(bondPulseMult(999)).toBe(T.bondPulseCap);
-    // The ward: a blow lands at a fifth.
-    const hp = g.hp;
-    f.sim.ctx.dealDamage(f.players[0], g, 1000, false, 'physical', 'Test', 'hit', true);
-    expect(hp - g.hp).toBeLessThanOrEqual(Math.round(1000 * (1 - T.bondWard)) + 1);
-  });
-
-  it('apart: the ward lifts, the pulse stops and its count starts again', () => {
-    const f = pulled(4);
-    const b = f.bodies();
-    const g = b.guardian as Entity;
-    const c = b.singer as Entity;
-    plant(f, g, MID.x, MID.z);
-    plant(f, c, MID.x + 8, MID.z);
-    f.tick(20 * 7);
-    expect(f.st.bond.pulses).toBeGreaterThan(0);
-    plant(f, c, MID.x + T.bondReach + 10, MID.z);
-    // Hold her there (her own AI would walk her back to her tank).
-    let ev: SimEvent[] = [];
-    for (let i = 0; i < 20 * 7; i++) {
-      plant(f, c, MID.x + T.bondReach + 10, MID.z);
-      ev = ev.concat(f.tick());
-    }
-    for (const body of [g, c])
-      expect(body.auras.some((a) => a.id === COUNCIL_AURAS.bond)).toBe(false);
-    expect(f.st.bond.pulses).toBe(0);
-    expect(hitsOf(ev, COUNCIL_NAMES.bond).length).toBe(0);
-    const hp = g.hp;
-    f.sim.ctx.dealDamage(f.players[0], g, 1000, false, 'physical', 'Test', 'hit', true);
-    expect(hp - g.hp).toBeGreaterThan(500);
+    expect(hitsOf(ev, 'Bond of the Stone').length).toBe(0);
+    expect('bond' in f.st).toBe(false);
   });
 });
 
-describe('the lifecycle: nothing of the Rush, the curse or the Bond outlives its fight', () => {
+describe('the lifecycle: nothing of the Rush or the curse outlives its fight', () => {
   /** A mythic pull with a cursed pillar standing, the Quarry collapsing and
    *  the Guardian reeling from an earlier shattered curse. */
   function messy(): Fight {
@@ -567,14 +534,14 @@ describe('the lifecycle: nothing of the Rush, the curse or the Bond outlives its
           id,
         ).toBe(false);
     for (const b of [f.bodies().guardian, f.bodies().singer])
-      for (const id of [COUNCIL_AURAS.bond, COUNCIL_AURAS.rushStunned, COUNCIL_AURAS.rushExposed])
+      for (const id of [COUNCIL_AURAS.rushStunned, COUNCIL_AURAS.rushExposed])
         expect(
           b?.auras.some((a) => a.id === id),
           id,
         ).toBe(false);
   };
 
-  it('a wipe clears the dash, the curse, the collapse, the reel and the bond', () => {
+  it('a wipe clears the dash, the curse, the collapse and the reel', () => {
     const f = messy();
     for (const p of f.players) f.sim.ctx.handleDeath(p, null);
     for (let i = 0; i < 20 * 60 && f.state(); i++) f.sim.tick();
@@ -600,21 +567,6 @@ describe('the lifecycle: nothing of the Rush, the curse or the Bond outlives its
     f.tick();
     expect(f.state()?.finished).toBe(true);
     clean(f);
-  });
-
-  it('a bond worn before its first pulse lifts off the survivor when the other falls', () => {
-    const f = pulled(4);
-    const b = f.bodies();
-    const g = b.guardian as Entity;
-    const c = b.singer as Entity;
-    plant(f, g, MID.x, MID.z);
-    plant(f, c, MID.x + 6, MID.z);
-    f.tick(10);
-    expect(c.auras.some((a) => a.id === COUNCIL_AURAS.bond)).toBe(true);
-    expect(f.st.bond.pulses).toBe(0);
-    f.sim.ctx.handleDeath(g, f.players[0]);
-    f.tick(2);
-    expect(c.auras.some((a) => a.id === COUNCIL_AURAS.bond)).toBe(false);
   });
 
   it('a marked player who leaves the Quarry draws no dash', () => {

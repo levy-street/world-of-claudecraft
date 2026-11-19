@@ -26,7 +26,6 @@ Quench's, then the Heat's, then the Masterless Strength's, then the seal and the
 | `council_song.ts` | The Seam Singer's voice: Seam Bolt, the Song of the Seam (a kick leaves one mark), Resonance (a spread: it rings on every ally near its carrier, never a pillar); a kicked Wake simply raises nothing (`songKicked`). |
 | `council_rush.ts` | The Guardian's charge, Mountain's Rush, and his cursed pillar: the mark (never a tank), the cursed pillar raised with it (one at a time; it pulses on the raid, low on normal; shelters nobody; only the Rush or a Wrath breaks it), the dash along the line through the marked player to the Quarry's edge, stopping at the FIRST pillar on it (cursed: shattered, the Guardian stunned and exposed; a sheltering one: taken whole; none: the path trampled), mythic's Quarry Collapse after a miss. |
 | `council_rush_reach.ts` | PURE over the authored field: how far the Rush's line runs to the Quarry's edge (`rushReach`); the sim's dash and the renderer's lane (`council_fx_core.ts` `rushLaneReach`) share it. |
-| `council_bond.ts` | Bond of the Stone, the separation rule: within `bondReach` of each other both members take far less damage (`shield_wall`) and a raid pulse grows each time; apart, it lifts and its count starts again. |
 | `council_soul.ts` | Mythic only (the prototype behind `/dev heart council mythic`): Soul in the Stone. A fallen member's soul takes the most intact pillar (`soulHost`, `takeSoul`); its pips (`strikeSoulPip`: only the rock), its burst, the last kill's crumble; the Guardian's Echo of Wrath (`landEcho`), the Singer's Endless Song (two souls: the Slabwright's Walking Slab left with it); only the rock strikes a pip; the `soul` and `soulpip` dev verbs. |
 | `council_floor_gap.ts` | Leaf, PURE: the floor gap rule (`floorGap` seconds between two FLOOR mechanics' starts, `FLOOR_PRIORITY`, the wait taken off the next interval: `nextAfterHold`, `runFloorGate`). Imports nothing; every floor start function stamps it (`stampFloor`). |
 | `council_floor.ts` | The floor gap wired to the fight: `startFloorMechanics` starts the Wrath, the Echo, Wake the Stone, Mountain's Rush and the rock through the gate each tick (normal's Wrath guard, `clearOfWrath`: the Wake's marks and the Rush never run into a Wrath); `carryWrathHold` gives a held Wrath its wait back as energy. |
@@ -162,7 +161,7 @@ Rules:
   `tests/smith_heart_pull.test.ts`, `tests/smith_heart_dev.test.ts`,
   `tests/smith_heart_council_mythic.test.ts` (the mythic row and Soul in the Stone),
   `tests/smith_heart_council_rush.test.ts` (Mountain's Rush, the cursed pillar, the mythic
-  collapse, Bond of the Stone, the pillar supply over whole pulls),
+  collapse, no proximity ward, the pillar supply over whole pulls),
   `tests/smith_heart_council_floor_gap.test.ts` (the gap and the Wrath guard),
   `tests/smith_heart_council_pillar_limit.test.ts` (Narrow Shelter's capacity per tier),
   `tests/smith_heart_council_wrath_lethal.test.ts` (the Heroic and Mythic Wrath: who dies, the

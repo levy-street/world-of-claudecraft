@@ -4,7 +4,7 @@
 // by it, cracked by the Falling Rock, falling into rubble, standing whole again
 // on a wipe), the soak's split, Resonance's spread, both kill orders, the
 // heroic pulse and overlap, the Slab and the seal waiting on both, and
-// determinism. Mountain's Rush, the cursed pillar, Bond of the Stone and the
+// determinism. Mountain's Rush, the cursed pillar and the
 // pillar supply: tests/smith_heart_council_rush.test.ts.
 
 import { describe, expect, it } from 'vitest';
