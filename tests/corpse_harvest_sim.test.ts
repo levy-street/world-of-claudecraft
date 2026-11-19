@@ -2569,8 +2569,9 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // Seedflame, Rolling Cinder): 319.
     // The Masterless Strength's four Splinters and the Hammer Council's Stone
     // Prison block, untagged too: 324. The four Halloween encounter templates
-    // are untagged too: 328.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(328);
+    // are untagged too: 328. The Breath's Islands of the Wind phase adds five
+    // untagged encounter bodies (four isle adds and the Stillstone): 333.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(333);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(
