@@ -7511,17 +7511,6 @@ export const da_DK: EnTranslations = {
       "poured": "Poured in: {elements}",
       "pouredTimes": "{quarter} x{times}"
     },
-    "finalAlert": {
-      "bladeTitle": "Crossing Blade: lead it",
-      "bladeLockedTitle": "Blade locked: step off!",
-      "skyTitle": "Sky Strike on you!",
-      "emberTitle": "Ember Mark!",
-      "drawnTitle": "Drawn Lightning!",
-      "crushedTitle": "Crushed",
-      "coalTitle": "Bursting Coal!",
-      "tetherTitle": "Wind-Tethered!",
-      "weightTitle": "Mounting Weight x{stacks}"
-    },
     "sanctumAlert": {
       "quenchTitle": "I kølevandet!",
       "quenchLine": "Svøm op på isen eller bredden for at undslippe vandskaden og sænkningen",

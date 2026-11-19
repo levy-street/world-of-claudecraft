@@ -228,7 +228,8 @@ export class FinalKitFx {
   private originX = 0;
   private originZ = 0;
   /** The personal arrow over the LOCAL player while a mark singles them out
-   *  (final_arrow_core.ts: Weight of the Anvil), drawn for them alone. */
+   *  (final_arrow_core.ts: the Anvil, the blade, the strike, the embers, the
+   *  lightning, the coal, the tether), drawn for them alone. */
   private readonly arrow: CouncilRushArrow;
 
   constructor(

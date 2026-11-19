@@ -7511,17 +7511,6 @@ export const ru_RU: EnTranslations = {
       "poured": "Влито: {elements}",
       "pouredTimes": "{quarter} x{times}"
     },
-    "finalAlert": {
-      "bladeTitle": "Скрещённый клинок: ведите",
-      "bladeLockedTitle": "Клинок зафиксирован: сойдите!",
-      "skyTitle": "Небесный удар на вас!",
-      "emberTitle": "Метка углей!",
-      "drawnTitle": "Притянутая молния!",
-      "crushedTitle": "Раздавлен",
-      "coalTitle": "Взрывной уголь!",
-      "tetherTitle": "Привязан ветром!",
-      "weightTitle": "Нарастающая тяжесть x{stacks}"
-    },
     "sanctumAlert": {
       "quenchTitle": "В закалочной воде!",
       "quenchLine": "Она жжёт и замедляет: плывите к ближайшему льду или на берег",

@@ -8,7 +8,8 @@
 //     mirrored auras the same off a Sim-shaped and a ClientWorld-shaped body,
 //     highlights the quarter it drinks, flags a bar near bursting, says the
 //     root, the switch mark and Heart Unbound, hides out of the fight;
-//   - the personal alert (final_alert_view.ts) keeps its priority;
+//   - no personal alert panel (Jose's playtest of 2026-11-19): the marks read in
+//     the world and in the marked player's own arrow;
 //   - the painter writes nothing on a still frame.
 
 import { describe, expect, it } from 'vitest';
@@ -27,7 +28,6 @@ import {
 import type { Aura, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { castDisplayName } from '../src/ui/cast_display_name';
-import { buildFinalAlertView } from '../src/ui/hud/dungeon/final_alert_view';
 import { HeartOverloadPanel } from '../src/ui/hud/dungeon/heart_overload_painter';
 import {
   buildOverloadView,
@@ -167,8 +167,16 @@ describe('The Masterless Strength: tooltips', () => {
 });
 
 describe("The Masterless Strength: the marked player's own arrow", () => {
-  it('Weight of the Anvil raises it', () => {
-    expect(FINAL_ARROW_AURAS).toContain(FINAL_AURAS.anvilMark);
+  it('every mark that singles one player out raises it; a tank debuff never does', () => {
+    for (const id of [
+      FINAL_AURAS.anvilMark,
+      FINAL_AURAS.bladeMark,
+      FINAL_AURAS.skyMark,
+      FINAL_AURAS.ember,
+      FINAL_AURAS.drawn,
+    ])
+      expect(FINAL_ARROW_AURAS, id).toContain(id);
+    expect(FINAL_ARROW_AURAS).not.toContain(FINAL_AURAS.crushed);
     expect(finalArrowMark({ auras: [] })).toBeNull();
     const a = { id: FINAL_AURAS.anvilMark, remaining: 4, duration: 6 } as Aura;
     expect(finalArrowMark({ auras: [a] })).toBe(a);
@@ -302,26 +310,16 @@ describe('The Masterless Strength: the Overload bars', () => {
   });
 });
 
-describe('The Masterless Strength: the personal alert', () => {
-  const mark = (id: string, remaining = 3, duration = 6) => ({ id, remaining, duration });
-  it('the blade first, then the strike, the ember, the lightning, Crushed', () => {
-    const all = [
-      mark(FINAL_AURAS.crushed),
-      mark(FINAL_AURAS.drawn),
-      mark(FINAL_AURAS.ember),
-      mark(FINAL_AURAS.skyMark),
-      { ...mark(FINAL_AURAS.bladeMark), value: 1 },
-    ];
-    const kinds: string[] = [];
-    for (let i = all.length; i > 0; i--) {
-      const v = buildFinalAlertView({ auras: all.slice(0, i) });
-      kinds.push(v.visible ? v.kind : 'none');
-    }
-    expect(kinds).toEqual(['blade', 'sky', 'ember', 'drawn', 'crushed']);
-    // Locked, the blade says step off.
-    const locked = buildFinalAlertView({ auras: [{ ...mark(FINAL_AURAS.bladeMark), value: 2 }] });
-    expect(locked.visible && locked.kind).toBe('bladeLocked');
-    expect(locked.visible && locked.title).toBe(t('hudChrome.finalAlert.bladeLockedTitle'));
-    expect(buildFinalAlertView({ auras: all, dead: true }).visible).toBe(false);
+describe('The Masterless Strength: no personal alert panel (playtest 2026-11-19)', () => {
+  it('mounts no final alert: every mark reads in the world and the own arrow', async () => {
+    const policy = await import('../src/ui/hud/dungeon/dungeon_prompt_policy_core');
+    expect(Object.keys(policy.DUNGEON_PROMPT_ADVISORY)).not.toContain('final');
+    const fs = await import('node:fs');
+    expect(fs.existsSync('src/ui/hud/dungeon/final_alert_view.ts')).toBe(false);
+    const prompts = fs.readFileSync('src/ui/hud/dungeon/dungeon_prompts.ts', 'utf8');
+    expect(prompts).not.toContain('heart-final-alert');
+    expect(fs.readFileSync('src/styles/components.css', 'utf8')).not.toContain(
+      '#heart-final-alert',
+    );
   });
 });

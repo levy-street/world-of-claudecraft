@@ -731,7 +731,6 @@ const UI_PURE_CORES = [
   // The Smith's Heart's alerts: the Guardian of the Quench's cold bar, the
   // final's, the Knotted Gale's (the Hammer Council has none since 2026-11-17).
   'src/ui/hud/dungeon/quench_alert_view.ts',
-  'src/ui/hud/dungeon/final_alert_view.ts',
   'src/ui/hud/dungeon/knot_alert_view.ts',
   'src/ui/hud/dungeon/heart_overload_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).

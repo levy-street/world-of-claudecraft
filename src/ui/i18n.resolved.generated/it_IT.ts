@@ -7511,17 +7511,6 @@ export const it_IT: EnTranslations = {
       "poured": "Poured in: {elements}",
       "pouredTimes": "{quarter} x{times}"
     },
-    "finalAlert": {
-      "bladeTitle": "Crossing Blade: lead it",
-      "bladeLockedTitle": "Blade locked: step off!",
-      "skyTitle": "Sky Strike on you!",
-      "emberTitle": "Ember Mark!",
-      "drawnTitle": "Drawn Lightning!",
-      "crushedTitle": "Crushed",
-      "coalTitle": "Bursting Coal!",
-      "tetherTitle": "Wind-Tethered!",
-      "weightTitle": "Mounting Weight x{stacks}"
-    },
     "sanctumAlert": {
       "quenchTitle": "Sei nell'acqua refrigerante!",
       "quenchLine": "Nuota sul ghiaccio o a riva per sfuggire ai danni e al rallentamento dell'acqua",

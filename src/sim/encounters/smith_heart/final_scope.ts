@@ -228,8 +228,9 @@ export function pickPlayers(
   return pickMarkTargets(s.boss, livePlayers(s), count, salt, busy);
 }
 
-// The fight calls no raid warning banner: every mechanic reads in the world,
-// on the Overload panel, on a cast bar or on the marked player's own alert
+// The fight calls no raid warning banner: every mechanic reads in the world
+// (a marked player's own arrow and alarm included; the on-screen alert panel
+// went with Jose's playtest of 2026-11-19), on the Overload panel or a cast bar
 // (the owner's rule of 2026-11-03, applied to the whole raid on 2026-11-09).
 // The boss's voice stays (final_voice.ts: chat and a speech bubble).
 

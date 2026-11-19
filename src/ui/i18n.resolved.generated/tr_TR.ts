@@ -7511,17 +7511,6 @@ export const tr_TR: EnTranslations = {
       "poured": "Poured in: {elements}",
       "pouredTimes": "{quarter} x{times}"
     },
-    "finalAlert": {
-      "bladeTitle": "Crossing Blade: lead it",
-      "bladeLockedTitle": "Blade locked: step off!",
-      "skyTitle": "Sky Strike on you!",
-      "emberTitle": "Ember Mark!",
-      "drawnTitle": "Drawn Lightning!",
-      "crushedTitle": "Crushed",
-      "coalTitle": "Bursting Coal!",
-      "tetherTitle": "Wind-Tethered!",
-      "weightTitle": "Mounting Weight x{stacks}"
-    },
     "sanctumAlert": {
       "quenchTitle": "Soğutma suyundasın!",
       "quenchLine": "Su hasarı ve yavaşlatmasından kaçmak için buza veya kıyıya yüz",

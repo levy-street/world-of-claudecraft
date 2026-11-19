@@ -7511,17 +7511,6 @@ export const ko_KR: EnTranslations = {
       "poured": "쏟아부어진 원소: {elements}",
       "pouredTimes": "{quarter} x{times}"
     },
-    "finalAlert": {
-      "bladeTitle": "교차하는 칼날: 유도하세요",
-      "bladeLockedTitle": "칼날 고정: 벗어나세요!",
-      "skyTitle": "하늘의 일격이 당신에게!",
-      "emberTitle": "잉걸불 표식!",
-      "drawnTitle": "끌려오는 번개!",
-      "crushedTitle": "짓눌림",
-      "coalTitle": "터지는 석탄!",
-      "tetherTitle": "바람에 묶임!",
-      "weightTitle": "쌓이는 무게 x{stacks}"
-    },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
       "quenchLine": "불타고 느려진다: 가장 가까운 얼음이나 물가로 헤엄쳐라",

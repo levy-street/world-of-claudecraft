@@ -24467,9 +24467,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一把交错之刃把它的直线瞄准了你：直线会跟随你，并在飞出前{lock}秒锁定。把直线引过石柱将其击碎，然后离开直线。直线上的所有人受到{min}到{max}点冰霜伤害。英雄：{heroicMin}到{heroicMax}点伤害。史诗：{mythicMin}到{mythicMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.anvilMark':
     '铁砧之重跟随着你：它的{radius}码法圈随你移动，并在落下前{lock}秒固定。让团队聚集在圈内：{total}点物理伤害由圈内所有人分担，少于{fewer}人时每人多承受一半。英雄：{heroicTotal}。史诗：{mythicTotal}。',
-  'hudChrome.finalAlert.bladeTitle': '交错之刃：引导它',
-  'hudChrome.finalAlert.bladeLockedTitle': '冰刃已锁定：快离开！',
-  'hudChrome.finalAlert.skyTitle': '天落雷击瞄准了你！',
   'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你从碎裂的冰面掉了下去。',
   'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻击减速{pct}%，持续{seconds}秒。',
   'hudChrome.auraEffect.finalBoss.ember':
@@ -24536,9 +24533,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '移动速度降低{pct}%，持续{seconds}秒：你从缺口以外的地方穿过了淬火之环。',
   'hudChrome.auraEffect.finalBoss.weight':
     '每秒造成{total}点物理伤害（每层{per}点）。每一层都让重锤碎片对你的攻击加重{step}%（当前{harder}%）。持续{seconds}秒；坦克在{swap}层时换坦。英雄难度下每层使其伤害提高{heroicStep}%，史诗难度下为{mythicStep}%。',
-  'hudChrome.finalAlert.coalTitle': '爆裂煤块！',
-  'hudChrome.finalAlert.tetherTitle': '风之束缚！',
-  'hudChrome.finalAlert.weightTitle': '渐增重压 x{stacks}',
   'hudChrome.finalOverload.call': '护盾 {seconds}',
   'hudChrome.finalOverload.enrage': '狂暴倒计时 {seconds}',
   'hudChrome.finalOverload.fury': '无主之怒 x{stacks}',
@@ -24548,9 +24542,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.striding': '正走向中央',
   'hudChrome.finalOverload.titleCall': '四角召唤',
   'hudChrome.finalOverload.titleFinal': '四角皆醒',
-  'hudChrome.finalAlert.emberTitle': '余烬印记！',
-  'hudChrome.finalAlert.drawnTitle': '引雷！',
-  'hudChrome.finalAlert.crushedTitle': '粉碎',
   'hudChrome.auraEffect.seasonalCosmetic': '仅为外观：不影响战斗',
   'seasonal.event.gourdlight_eve.name': '南瓜灯之夜',
   'seasonal.trickOrTreat.row': '不给糖就捣蛋！',

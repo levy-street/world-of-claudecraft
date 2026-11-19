@@ -25809,9 +25809,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '교차하는 칼날이 당신을 지나는 선을 겨눕니다: 선은 당신을 따라오다가 날아가기 {lock}초 전에 고정됩니다. 선을 기둥에 통과시켜 부순 뒤 선에서 벗어나세요. 선 위의 모두가 {min}~{max}의 냉기 피해를 받습니다. 영웅: {heroicMin}~{heroicMax} 피해. 신화: {mythicMin}~{mythicMax} 피해.',
   'hudChrome.auraEffect.finalBoss.anvilMark':
     '모루의 무게가 당신을 따라옵니다: {radius}미터 원이 당신과 함께 움직이다가 떨어지기 {lock}초 전에 고정됩니다. 공격대를 원 안에 모으세요: {total}의 물리 피해를 안에 있는 모두가 나누어 받으며, {fewer}명 미만이면 각자 1.5배를 받습니다. 영웅: {heroicTotal}. 신화: {mythicTotal}.',
-  'hudChrome.finalAlert.bladeTitle': '교차하는 칼날: 유도하세요',
-  'hudChrome.finalAlert.bladeLockedTitle': '칼날 고정: 벗어나세요!',
-  'hudChrome.finalAlert.skyTitle': '하늘의 일격이 당신에게!',
   'hudChrome.auraEffect.finalBoss.underIce': '기절 상태: 깨지는 얼음 아래로 떨어졌습니다.',
   'hudChrome.auraEffect.finalBoss.numbing':
     '정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.',
@@ -25880,9 +25877,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{seconds}초 동안 이동 속도가 {pct}% 감소합니다: 담금질 고리를 틈이 아닌 곳으로 넘었습니다.',
   'hudChrome.auraEffect.finalBoss.weight':
     '매초 {total}의 물리 피해를 입힙니다(중첩당 {per}). 중첩마다 망치의 파편이 당신을 {step}% 더 세게 칩니다(현재 {harder}%). {seconds}초 동안 지속되며, 탱커는 {swap}중첩에서 교대합니다. 중첩당 받는 피해 증가는 영웅에서 {heroicStep}%, 신화에서 {mythicStep}%입니다.',
-  'hudChrome.finalAlert.coalTitle': '터지는 석탄!',
-  'hudChrome.finalAlert.tetherTitle': '바람에 묶임!',
-  'hudChrome.finalAlert.weightTitle': '쌓이는 무게 x{stacks}',
   'hudChrome.finalOverload.call': '보호막 {seconds}',
   'hudChrome.finalOverload.enrage': '격노까지 {seconds}',
   'hudChrome.finalOverload.fury': '주인 없는 분노 x{stacks}',
@@ -25892,9 +25886,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.striding': '중앙으로 이동 중',
   'hudChrome.finalOverload.titleCall': '네 구역의 부름',
   'hudChrome.finalOverload.titleFinal': '모든 구역 각성',
-  'hudChrome.finalAlert.emberTitle': '잉걸불 표식!',
-  'hudChrome.finalAlert.drawnTitle': '끌려오는 번개!',
-  'hudChrome.finalAlert.crushedTitle': '짓눌림',
   'hudChrome.auraEffect.seasonalCosmetic': '외형 전용: 전투에 영향 없음',
   'seasonal.event.gourdlight_eve.name': '고드라이트 축제의 밤',
   'seasonal.trickOrTreat.row': '과자 안 주면 장난칠 거야!',

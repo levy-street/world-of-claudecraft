@@ -26262,12 +26262,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Скрещённый клинок наводит на вас свою линию: она следует за вами и фиксируется за {lock} с до полёта. Проведите линию через столпы, чтобы разбить их, затем сойдите с неё. Все на линии получают от {min} до {max} ед. урона от магии льда. Героический: от {heroicMin} до {heroicMax} урона. Эпохальный: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.anvilMark':
     'Тяжесть Наковальни следует за вами: её круг радиусом {radius} м движется вместе с вами и замирает за {lock} сек. до падения. Соберите рейд внутри: {total} физического урона делится между всеми в круге, а если их меньше {fewer}, каждый получает в полтора раза больше. Героический: {heroicTotal}. Эпохальный: {mythicTotal}.',
-  'hudChrome.finalAlert.bladeTitle':
-    'Скрещённый клинок: ведите',
-  'hudChrome.finalAlert.bladeLockedTitle':
-    'Клинок зафиксирован: сойдите!',
-  'hudChrome.finalAlert.skyTitle':
-    'Небесный удар на вас!',
   'hudChrome.auraEffect.finalBoss.underIce': 'Оглушение: вы провалились сквозь ломающийся лёд.',
   'hudChrome.auraEffect.finalBoss.numbing': 'Скорость передвижения снижена на {pct}% на {seconds} с его фронтальным ударом.',
   'hudChrome.auraEffect.finalBoss.ember': 'Через {seconds} с под ваши ноги упадут угли и будут тлеть {life} с лужей радиусом {radius} м, нанося от {min} до {max} ед. урона от огня в секунду всем внутри. Встаньте с другими отмеченными в один угол, а потом уходите. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
@@ -26322,9 +26316,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.tether': 'Осколок Дыхания охотится на вас {seconds} с Его Бьющий шквал каждую секунду наносит от {min} до {max} ед. урона от сил природы всем остальным в пределах {reach} м от него: уведите его от группы. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.chill': 'Скорость передвижения снижена на {pct}% на {seconds} с: вы пересекли Кольцо закалки вне его просветов.',
   'hudChrome.auraEffect.finalBoss.weight': 'Наносит {total} ед. физического урона в секунду ({per} за заряд). Каждый заряд заставляет Осколок Молота бить вас на {step}% сильнее (сейчас на {harder}%). Длится {seconds} с; танки меняются на {swap} зарядах. Каждый заряд усиливает удары на {heroicStep}% в героическом режиме и на {mythicStep}% в мифическом.',
-  'hudChrome.finalAlert.coalTitle': 'Взрывной уголь!',
-  'hudChrome.finalAlert.tetherTitle': 'Привязан ветром!',
-  'hudChrome.finalAlert.weightTitle': 'Нарастающая тяжесть x{stacks}',
   'hudChrome.finalOverload.call': 'Щит {seconds}',
   'hudChrome.finalOverload.enrage': 'Ярость через {seconds}',
   'hudChrome.finalOverload.fury': 'Ярость без хозяина x{stacks}',
@@ -26334,9 +26325,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finalOverload.striding': 'Идёт в центр',
   'hudChrome.finalOverload.titleCall': 'Зов четвертей',
   'hudChrome.finalOverload.titleFinal': 'Все четверти пробуждены',
-  'hudChrome.finalAlert.emberTitle': 'Метка углей!',
-  'hudChrome.finalAlert.drawnTitle': 'Притянутая молния!',
-  'hudChrome.finalAlert.crushedTitle': 'Раздавлен',
   'hudChrome.auraEffect.seasonalCosmetic': 'Только внешний вид: на бой не влияет',
   'seasonal.event.gourdlight_eve.name': 'Ночь Тыквенных Огней',
   'seasonal.trickOrTreat.row': 'Сладость или гадость!',
