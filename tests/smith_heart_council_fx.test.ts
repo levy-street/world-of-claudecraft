@@ -83,7 +83,7 @@ describe('council_fx_core: integrity on the model', () => {
     expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.wakeMark].color).toBe(TELEGRAPH_THREAT_COLORS.control);
     expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.rockMark].radius).toBe(T.rockRadius);
     expect(COUNCIL_MARK_SPECS[COUNCIL_AURAS.rockMark].gather).toBe(true);
-    expect(RISE_SPOT_SPEC.seconds).toBe(T.heirRiseWarn);
+    expect(RISE_SPOT_SPEC.seconds).toBe(2);
     expect(RISE_SPOT_SPEC.color).toBe(TELEGRAPH_THREAT_COLORS.danger);
     expect(COUNCIL_FX_COLORS.weight).toBe(TELEGRAPH_THREAT_COLORS.lethal);
     expect(pulseRadius(T.columnR)).toBe(T.columnR + T.pulseReach);

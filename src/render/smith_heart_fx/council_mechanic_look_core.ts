@@ -16,6 +16,8 @@
 //    red arrow over the marked player for the whole bar (`rushArrowLook`,
 //    `RUSH_ARROW`: where it floats, its size, its bob and its pulse, faster as
 //    the bar runs out).
+//  - Grieving Fury (encounters/smith_heart/council_fury.ts): the survivor's
+//    swell, its waking flash and its heartbeat (`furyLook`).
 //
 // Every number a player reacts to (the tether showing at all, the scar along the
 // lane the run took) is drawn on every tier; only the motes, the shards and the
@@ -254,5 +256,51 @@ export function rushArrowLook(
   out.y = RUSH_ARROW.tip + RUSH_ARROW.bob * bob;
   out.glow = RUSH_ARROW.glowFloor + (1 - RUSH_ARROW.glowFloor) * pulse;
   out.scale = 1 + RUSH_ARROW.swell * pulse * (0.35 + 0.65 * urgency);
+  return out;
+}
+
+// ---- Grieving Fury (encounters/smith_heart/council_fury.ts) ----------------------------------
+
+/** The fury's look on the survivor: how long the waking flash and the swell
+ *  take (seconds), the swell's overshoot, and the heartbeat's period. */
+export const FURY_LOOK = { wake: 1.4, grow: 0.9, overshoot: 0.06, beat: 1.05 } as const;
+
+export interface FuryLook {
+  /** The body's size against its own (1 to COUNCIL_TUNING.furySwell, a
+   *  breath past it as it grows). */
+  swell: number;
+  /** The column's and the sigil's light (about 1; up to 3 at the wake). */
+  glow: number;
+  /** 0 to 1: the waking flash, gone after FURY_LOOK.wake. */
+  flash: number;
+  /** 0 to 1: the double heartbeat that throbs through it. */
+  beat: number;
+}
+
+/** The fury's look `age` seconds after it woke on the survivor (a negative
+ *  age: not yet). Pure; fills `out`. */
+export function furyLook(
+  age: number,
+  out: FuryLook = { swell: 1, glow: 0, flash: 0, beat: 0 },
+): FuryLook {
+  if (!(age >= 0)) {
+    out.swell = 1;
+    out.glow = 0;
+    out.flash = 0;
+    out.beat = 0;
+    return out;
+  }
+  const g = Math.min(1, age / FURY_LOOK.grow);
+  // Ease out with a small overshoot that settles back to the full swell.
+  const ease = 1 - (1 - g) ** 3;
+  const over = Math.sin(g * Math.PI) * FURY_LOOK.overshoot;
+  out.swell = 1 + (T.furySwell - 1) * ease + over;
+  out.flash = Math.max(0, 1 - age / FURY_LOOK.wake);
+  const phase = (age % FURY_LOOK.beat) / FURY_LOOK.beat;
+  // Two quick throbs and a rest: lub-dub.
+  const lub = Math.exp(-(((phase - 0.08) / 0.06) ** 2));
+  const dub = 0.6 * Math.exp(-(((phase - 0.3) / 0.07) ** 2));
+  out.beat = Math.min(1, lub + dub);
+  out.glow = 0.85 + 0.35 * out.beat + 2.2 * out.flash * out.flash;
   return out;
 }

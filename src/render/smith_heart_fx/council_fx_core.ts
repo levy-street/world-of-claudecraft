@@ -253,11 +253,11 @@ export const COUNCIL_MARK_SPECS: Readonly<Record<string, CouncilMarkSpec>> = {
   },
 };
 
-/** The heir's rising stone: a locked spot, the knockback's radius, its
- *  warning's seconds. */
+/** A locked rising stone (no tier raises one since Grieving Fury; kept for
+ *  the reader): the knockback's radius, its warning's seconds. */
 export const RISE_SPOT_SPEC = {
   radius: T.riseKnockRadius,
-  seconds: T.heirRiseWarn,
+  seconds: 2,
   color: COUNCIL_FX_COLORS.danger,
   accent: COUNCIL_FX_COLORS.ochre,
 } as const;
@@ -430,8 +430,9 @@ export function pulseRadius(pillarR: number): number {
 }
 
 /** The stream of stone light from a fallen member to a survivor: seconds it
- *  takes, and where a mote rides along it at `t` (0 to 1) with a lift. */
-export const INHERIT_SECONDS = 2.2;
+ *  takes (the sim's own flight, Grieving Fury waking as it lands), and where a
+ *  mote rides along it at `t` (0 to 1) with a lift. */
+export const INHERIT_SECONDS = T.furyArrive;
 export function inheritArc(
   t: number,
   out: { along: number; lift: number } = { along: 0, lift: 0 },
@@ -467,6 +468,8 @@ export function councilClaims(ability: string | undefined): boolean {
     ability === COUNCIL_CUES.pulse ||
     ability === COUNCIL_CUES.risenPulse ||
     ability === COUNCIL_CUES.inherit ||
+    ability === COUNCIL_CUES.furyWake ||
+    ability === COUNCIL_CUES.furyMend ||
     ability === COUNCIL_CUES.settle ||
     ability === COUNCIL_CUES.soulTake ||
     ability === COUNCIL_CUES.soulPip ||

@@ -23114,7 +23114,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。',
   'hudChrome.auraEffect.council.rockMark':
     '結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：分擔{heroicTotal}點傷害，全團受到{heroicTremorMin}到{heroicTremorMax}點傷害。',
-  'hudChrome.auraEffect.council.memory': '造成的傷害提高{pct}%：重錘議會每倒下一名成員提高{per}%。',
+  'hudChrome.auraEffect.council.memory':
+    '造成的傷害提高{pct}%：重錘議會中倒下同伴的靈魂在其體內燃燒。',
+  'hudChrome.auraEffect.council.fury':
+    '攻擊、施法及其所有技能的速度提高{pct}%，並以全部威力使用倒下同伴的技能。將兩者同時擊殺即可避免。',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': '怒火迴響',
   'abilityUi.cast.heart_endless_song': '無盡之歌',

@@ -61,6 +61,10 @@ export const COUNCIL_CUE_SOUNDS: Readonly<Record<string, CouncilSound>> = {
   // second off Restless Stone's beat: one brighter hum, cooled the same.
   [COUNCIL_CUES.risenPulse]: S('pillar_pulse', 0.4, 'source', 1.15, 1.2),
   [COUNCIL_CUES.inherit]: S('soul_take', 0.6, 'target', 0.85, 0.5),
+  // Grieving Fury: the soul lands in the survivor with a deep burst; each
+  // mend beat a soft low hum (its own samples, pitched down).
+  [COUNCIL_CUES.furyWake]: S('soul_burst', 1, 'source', 0.78),
+  [COUNCIL_CUES.furyMend]: S('bond_pulse', 0.32, 'source', 0.8, 0.8),
   [COUNCIL_CUES.soulTake]: S('soul_take', 1, 'target'),
   [COUNCIL_CUES.soulPip]: S('soul_pip', 1, 'source'),
   [COUNCIL_CUES.soulBurst]: S('soul_burst', 1, 'point'),

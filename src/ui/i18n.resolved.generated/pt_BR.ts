@@ -4763,7 +4763,8 @@ export const pt_BR: EnTranslations = {
         "rushExposed": "Takes {pct}% more damage: Mountain's Rush shattered the Cursed Pillar.",
         "bond": "Takes {pct}% less damage while the other member of the Hammer Council stands within {reach} yd. Every {every} sec the bond deals {min} to {max} damage to the whole raid, {growth}% more each time. Pull them apart. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "collapse": "The Quarry is collapsing: every {every} sec you take {min} to {max} damage for each stack, and a stack is added each time. It ends when the Cursed Pillar breaks.",
-        "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.",
+        "memory": "Deals {pct}% more damage: the soul of its fallen partner in the Hammer Council burns in it.",
+        "fury": "Attacks, casts and runs every one of its abilities {pct}% faster, and uses its fallen partner's abilities at full strength. Kill the two together to deny it.",
         "pillarLimit": "Each pillar shields at most {limit} players from Mountain's Wrath. With more behind it, each of them takes {share}% of the blast. Anyone it finds unhidden takes {min} to {max} damage on Normal, {heroicMin} to {heroicMax} on Heroic and {mythicMin} to {mythicMax} on Mythic."
       },
       "breathGuardian": {

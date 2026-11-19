@@ -1,7 +1,7 @@
 // Pure plan of the Guardian of the Hammer's two big blows' cast and impact
 // look (council_strike_fx.ts paints it), on top of their telegraphs:
 //   - Mountain's Wrath (encounters/smith_heart/council_wrath.ts): a 4 s bar
-//     (the heir's 3 s), then every player in the Quarry its holder can see is
+//     (shorter under Grieving Fury's haste), then every player in the Quarry is
 //     struck and every pillar shatters. Its telegraph is the trash engine's
 //     sight field and the real shadows behind the pillars (CouncilFx), drawn
 //     on every tier and never touched here;

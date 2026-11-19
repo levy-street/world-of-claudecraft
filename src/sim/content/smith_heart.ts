@@ -429,8 +429,8 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   },
   // The Seam Singer: tall and slender, ochre seam crystals; the caster (Seam
   // Bolt, Song of the Seam, Wake the Stone, Falling Rock). A light melee: her
-  // pressure is her bars. She carries the heir's Wrath declaration (the
-  // Guardian fallen, she takes the Wrath).
+  // pressure is her bars. She carries the Wrath's declaration too (the
+  // Guardian fallen, Grieving Fury hands her his very Wrath).
   heart_seam_singer: {
     ...boss('heart_seam_singer', 'The Seam Singer', 71400, 0xd8a24a, 2.0),
     ccImmune: true,
@@ -440,9 +440,9 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     attackSpeed: 2.2,
     trashKit: {
       nova: councilWrath(
-        COUNCIL_TUNING.heirWrathCast,
-        COUNCIL_TUNING.heirWrathMin,
-        COUNCIL_TUNING.heirWrathMax,
+        COUNCIL_TUNING.wrathCast,
+        COUNCIL_TUNING.wrathMin,
+        COUNCIL_TUNING.wrathMax,
       ),
     },
   },

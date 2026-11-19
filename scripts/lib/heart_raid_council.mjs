@@ -13,8 +13,17 @@
 // Singer's keeper, out in the open with her, braces his defensives through
 // its bar. Reads only what the server sends.
 //
+// Grieving Fury (council_fury.ts, 2026-11-18): the first to fall sends its soul
+// to the survivor, which mends, hastens and takes up the fallen one's kit 3 s
+// later, so the raid brings the two down TOGETHER: by default (ORDER=split)
+// each damage dealer hits whichever member stands higher in health (the melee
+// keep to the Guardian unless the Singer runs ahead), and the last few percent
+// of both go down inside the soul's flight. The survivor's inherited bars are
+// read off whoever casts them (the Guardian's Wake and song are kicked too).
+//
 // IGNORE=cover  the raid never hides from Mountain's Wrath (the key mechanic)
-// ORDER=guardian,singer | singer,guardian  the damage dealers' kill order
+// ORDER=split | guardian,singer | singer,guardian  the damage dealers' plan:
+//               split the damage (default), or kill one then the other
 
 import {
   COUNCIL_REACH,
@@ -47,13 +56,47 @@ import {
 } from './heart_raid_bots.mjs';
 
 const ROLES = ['guardian', 'singer'];
-const ORDER = (process.env.ORDER ?? 'guardian,singer')
-  .toLowerCase()
-  .split(',')
-  .map((s) => s.trim())
-  .filter(Boolean);
+const SPLIT = (process.env.ORDER ?? 'split').toLowerCase() === 'split';
+const ORDER = SPLIT
+  ? ['guardian', 'singer']
+  : (process.env.ORDER ?? '')
+      .toLowerCase()
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
 if (ORDER.length !== ROLES.length || !ROLES.every((r) => ORDER.includes(r)))
-  throw new Error(`ORDER must name guardian and singer once each: ${ORDER}`);
+  throw new Error(`ORDER must be split, or name guardian and singer once each: ${ORDER}`);
+/** Grieving Fury on a member: the haste it runs everything at (1 without). */
+const FURY_AURA = 'heart_grieving_fury';
+function furyHaste(m) {
+  const a = m ? auraOf(m, FURY_AURA) : null;
+  return a && a.value > 1 ? a.value : 1;
+}
+/** The soft enrage's Wrath count per tier (COUNCIL_DIFFICULTY). */
+const ENRAGE_AFTER = { normal: 6, heroic: 8, mythic: 6 }[DIFF];
+/** Split: the member the damage dealers hit, by health (the melee keep to
+ *  the Guardian, where the raid stands, unless the Singer runs 6 points
+ *  ahead; the ranged hit whichever stands higher, 2 points of hysteresis). */
+function splitTarget(world, b) {
+  const g = world.mobs.guardian;
+  const s = world.mobs.singer;
+  if (!alive(g)) return alive(s) ? s : null;
+  if (!alive(s)) return g;
+  const pg = g.hp / Math.max(1, g.mhp);
+  const ps = s.hp / Math.max(1, s.mhp);
+  const lean = b.spec.melee ? 0.06 : 0.02;
+  const was = b.councilSplit ?? 'guardian';
+  const pick =
+    was === 'guardian'
+      ? ps > pg + lean
+        ? 'singer'
+        : 'guardian'
+      : pg > ps + lean
+        ? 'guardian'
+        : 'singer';
+  b.councilSplit = pick;
+  return pick === 'guardian' ? g : s;
+}
 
 const CAST = {
   wrath: 'heart_mountains_wrath',
@@ -257,6 +300,7 @@ export const council = {
   targets(world, st, b) {
     if (keeper(world) === b && alive(world.mobs.guardian) && alive(world.mobs.singer))
       return world.mobs.singer;
+    if (SPLIT && b.spec.role === 'dps') return splitTarget(world, b);
     for (const r of ORDER) if (alive(world.mobs[r])) return world.mobs[r];
     return null;
   },
@@ -298,12 +342,16 @@ export const council = {
     return nextWakeIn(st) < 26;
   },
   kickables(world) {
-    const s = world.mobs.singer;
-    if (!alive(s)) return [];
-    if (s.cast === CAST.wake && world.kickWake && IGNORE !== 'wake')
-      return [{ mob: s, cast: s.cast }];
-    if (s.cast !== CAST.bolt && s.cast !== CAST.song) return [];
-    return [{ mob: s, cast: s.cast }];
+    // The Singer's three, or the Guardian's once Grieving Fury handed them on.
+    const out = [];
+    for (const r of ROLES) {
+      const s = world.mobs[r];
+      if (!alive(s)) continue;
+      if (s.cast === CAST.wake && world.kickWake && IGNORE !== 'wake')
+        out.push({ mob: s, cast: s.cast });
+      else if (s.cast === CAST.bolt || s.cast === CAST.song) out.push({ mob: s, cast: s.cast });
+    }
+    return out;
   },
   stillFor(world, st) {
     const cr = st.activeCover ? Math.min(...coverCasts(world).map((c) => c.rem), 99) : 99;
@@ -337,7 +385,15 @@ export const council = {
     return `energy ${h ? Math.round(h.res ?? 0) : '-'}; pillars ${coverPillars(world).length}${world.cursed ? ' + cursed' : ''}; bond ${bond}${souls ? `; souls ${souls}` : ''}`;
   },
   report(world, st, note) {
-    note(`Kill order: ${ORDER.join(' > ')}`);
+    note(`Kill plan: ${SPLIT ? 'split (both together)' : ORDER.join(' > ')}`);
+    const gd = st.bossDeaths?.guardian;
+    const sd = st.bossDeaths?.singer;
+    if (gd !== undefined && sd !== undefined) {
+      const gap = Math.abs(sd - gd);
+      note(
+        `Second member fell ${gap.toFixed(1)} s after the first (${gap < 3 ? 'inside the soul flight: no Grieving Fury' : 'Grieving Fury woke'})`,
+      );
+    }
     const wrathHits = st.wraths.reduce((a, w) => a + w.hits.length, 0);
     note(
       `Wraths: ${st.wraths.length} (players hit in total: ${wrathHits}; ${st.wraths.map((w, i) => `#${i + 1} ${w.hits.length} hit`).join('; ')})`,
@@ -424,16 +480,15 @@ function wakeChoice(world, st) {
   return nominalToBar(world, st) >= WAKE_EVERY + WAKE_FLOOR + 3;
 }
 /** Seconds to the Wrath's bar on the tier's nominal fill (55 s, two and a
- *  half times faster after the soft enrage's Wraths; the heir's 35 s), not
- *  the smoothed reading, whose jitter right after a Wrath let Wakes through. */
+ *  half times faster after the soft enrage's Wraths, Grieving Fury's haste
+ *  on top), not the smoothed reading, whose jitter right after a Wrath let
+ *  Wakes through. */
 function nominalToBar(world, st) {
   const h = holder(world);
   if (!h) return Number.POSITIVE_INFINITY;
   if (h.cast === CAST.wrath) return 0;
-  const heir = world.roleOfTid[h.tid] !== 'guardian';
-  const enrageAfter = DIFF === 'heroic' ? 8 : 4;
-  let fill = heir ? (DIFF === 'mythic' ? 30 : 35) : 55;
-  if ((st.wrathsLanded ?? 0) >= enrageAfter) fill /= 2.5;
+  let fill = 55 / furyHaste(h);
+  if ((st.wrathsLanded ?? 0) >= ENRAGE_AFTER) fill /= 2.5;
   return (Math.max(0, 100 - (h.res ?? 0)) / 100) * fill;
 }
 /** Seconds to the Seam Singer's next Wake the Stone, as the raid times it:
@@ -724,13 +779,14 @@ function planMechanics(world, st) {
   const coming = [];
   const h = holder(world);
   if (IGNORE !== 'cover' && h && !casts.some((c) => c.kind === 'wrath')) {
-    const heir = world.roleOfTid[h.tid] !== 'guardian';
+    const haste = furyHaste(h);
     const toBar = secondsToBar(world);
     // Heroic and Mythic: the Wrath kills, so the raid starts for its cover a
-    // few seconds sooner (the healers and the far ranged need the walk).
-    const lead = WRATH_LETHAL ? 5 : heir ? 3.2 : 1.8;
+    // few seconds sooner (the healers and the far ranged need the walk); the
+    // fury's hastened bar a breath sooner too.
+    const lead = WRATH_LETHAL ? 5 : haste > 1 ? 3.2 : 1.8;
     if (toBar <= lead)
-      coming.push({ kind: 'wrath', id: h.id, x: h.x, z: h.z, rem: toBar + (heir ? 3 : 4) });
+      coming.push({ kind: 'wrath', id: h.id, x: h.x, z: h.z, rem: toBar + 4 / haste });
   }
   for (const [id, at] of st.echoNext) {
     const p = world.pillars.get(id);
@@ -953,13 +1009,12 @@ function nearestCover(cover, p) {
   return d;
 }
 
-/** Who the Wrath's bar comes from and how long it runs (the heir's is
+/** Who the Wrath's bar comes from and how long it runs (Grieving Fury's is
  *  shorter). */
 function wrathTiming(world) {
   const h = holder(world);
   if (!h) return null;
-  const heir = world.roleOfTid[h.tid] !== 'guardian';
-  const bar = heir ? 3 : 4;
+  const bar = 4 / furyHaste(h);
   const toBar = secondsToBar(world);
   return { h, bar, toBar, toLand: h.cast === CAST.wrath ? (h.castRem ?? 0) : toBar + bar };
 }

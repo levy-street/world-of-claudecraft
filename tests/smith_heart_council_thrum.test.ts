@@ -214,14 +214,14 @@ describe('Stone Thrum: risen pillars ring on the whole raid', () => {
     expect(hitsOf(ev, COUNCIL_NAMES.risenPulse, f.players[0].id).length).toBe(1);
   });
 
-  it("the Guardian's inherited rises ring too (the Singer fallen first costs the raid)", () => {
+  it("the Guardian's inherited Wake rings too (Grieving Fury hands him her pillars)", () => {
     const f = pulled(4);
     f.sim.ctx.handleDeath(f.bodies().singer as Entity, f.players[0]);
-    f.tick();
+    f.tick(Math.ceil(T.furyArrive * 20) + 2);
     quiet(f.st);
     expect(f.dev('/dev heart council wake')).toBe(true);
-    expect(f.st.riseSpots.length).toBeGreaterThan(0);
-    f.tick(Math.ceil((COUNCIL_DIFFICULTY.normal.heirRiseWarn + 0.2) * 20));
+    expect(f.bodies().guardian?.castingAbility).toBe(COUNCIL_CASTS.wake);
+    f.tick(Math.ceil((T.wakeCast + T.wakeMarkSeconds + 0.3) * 20));
     const risen = f.pillars().filter((p) => p.risen);
     expect(risen.length).toBeGreaterThan(0);
     const ev = ring(f);

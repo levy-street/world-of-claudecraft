@@ -22559,7 +22559,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.rockMark':
     '효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 나눠 받는 피해 {heroicTotal}, 공격대 전체 피해 {heroicTremorMin}에서 {heroicTremorMax}.',
   'hudChrome.auraEffect.council.memory':
-    '주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.',
+    '주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 동료의 영혼이 그 안에서 불타고 있습니다.',
+  'hudChrome.auraEffect.council.fury':
+    '공격, 시전, 모든 능력이 {pct}% 빨라지고, 쓰러진 동료의 능력을 최대 위력으로 사용합니다. 둘을 함께 처치하면 막을 수 있습니다.',
   // The Hammer Council's mythic, Soul in the Stone (M16 fills).
   'abilityUi.cast.heart_echo_of_wrath': '분노의 메아리',
   'abilityUi.cast.heart_endless_song': '끝없는 노래',

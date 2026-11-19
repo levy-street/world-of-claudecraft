@@ -18,7 +18,7 @@ import {
 } from './council_floor_gap';
 import { COUNCIL_CASTS, councilFillSeconds, COUNCIL_TUNING as T } from './council_ids';
 import { rushDue, startRush } from './council_rush';
-import { type CouncilScope, jobHolder } from './council_scope';
+import { type CouncilScope, councilHaste, jobHolder } from './council_scope';
 import { guardianSoulReady, startEcho } from './council_soul';
 import type { CouncilFightState } from './council_state';
 import { startRock, startWake } from './council_stone';
@@ -41,21 +41,15 @@ export function clearOfWrath(s: CouncilScope, seconds: number): boolean {
   if (!holder) return true;
   if (s.st.bars[holder.role]?.castId === COUNCIL_CASTS.wrath) return false;
   const per =
-    T.energyMax /
-    councilFillSeconds(
-      holder.heir,
-      s.st.wraths,
-      s.rules.heirFillSeconds,
-      s.rules.enrageAfterWraths,
-    );
+    T.energyMax / councilFillSeconds(s.st.wraths, s.rules.enrageAfterWraths, councilHaste(s));
   const toBar = Math.max(0, T.energyMax - s.st.energy) / per;
   return seconds + T.wrathGuardPad <= toBar + 1e-9;
 }
 
-/** Seconds a Wake puts on the floor before its pillars stand. */
+/** Seconds a Wake puts on the floor before its pillars stand (its bar runs
+ *  faster under Grieving Fury; the marks keep their seconds). */
 export function wakeSeconds(s: CouncilScope): number {
-  const holder = jobHolder(s, 'pillars');
-  return holder?.heir ? s.rules.heirRiseWarn : T.wakeCast + T.wakeMarkSeconds;
+  return T.wakeCast / councilHaste(s) + T.wakeMarkSeconds;
 }
 
 /** Seconds a Rush puts on the floor: its mark, the wind-up and a typical
@@ -94,8 +88,7 @@ export function startFloorMechanics(s: CouncilScope): FloorMechanic[] {
   const started = runFloorGate(st, T.floorGap, DT, candidates);
   for (const key of started) {
     if (key === 'wake') {
-      const every = jobHolder(s, 'pillars')?.heir ? T.heirWakeEvery : T.wakeEvery;
-      st.wakeTimer = nextAfterHold(every, heldOf(st, key), T.floorGap);
+      st.wakeTimer = nextAfterHold(T.wakeEvery, heldOf(st, key), T.floorGap);
     } else if (key === 'rush')
       st.rushTimer = nextAfterHold(T.rushEvery, heldOf(st, key), T.floorGap);
     else if (key === 'rock') st.rockTimer = nextAfterHold(T.rockEvery, heldOf(st, key), T.floorGap);
@@ -111,15 +104,10 @@ export function startFloorMechanics(s: CouncilScope): FloorMechanic[] {
 
 /** A Wrath landed (its energy emptied): the seconds it waited on the gap come
  *  back as energy, so the next one starts on the cadence it had. */
-export function carryWrathHold(
-  st: CouncilFightState,
-  heir: boolean,
-  heirFillSeconds: number,
-  enrageAfter?: number,
-): void {
+export function carryWrathHold(st: CouncilFightState, enrageAfter?: number, haste = 1): void {
   const held = heldOf(st, 'wrath');
   if (held <= 0) return;
-  const fill = councilFillSeconds(heir, st.wraths, heirFillSeconds, enrageAfter);
+  const fill = councilFillSeconds(st.wraths, enrageAfter, haste);
   const next = nextAfterHold(fill, held, T.floorGap);
   st.energy = Math.max(0, Math.min(T.energyMax, T.energyMax * (1 - next / fill)));
 }

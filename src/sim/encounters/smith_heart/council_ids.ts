@@ -19,10 +19,16 @@ export const COUNCIL_SEAM_SINGER = 'heart_seam_singer';
 /** A council member's role (its original job): the Guardian the melee tank
  *  boss, the Seam Singer the caster. */
 export type CouncilRole = 'guardian' | 'singer';
-/** The council's inheritable jobs: the Guardian's energy and Wrath, the
- *  Seam Singer's pillars (Wake the Stone). Mountain's Rush, Hammer's Weight,
- *  the Singer's bolt, song and rock have no heir (the rock but on mythic). */
-export type CouncilJob = 'wrath' | 'pillars';
+/** The council's inheritable jobs (Grieving Fury, council_fury.ts: the
+ *  survivor takes them up at FULL strength once the fallen one's soul reaches
+ *  it): the Guardian's energy and Wrath, the Seam Singer's pillars (Wake the
+ *  Stone) and her song, and on Heroic and Mythic (`inheritSecond`) a second
+ *  each: the Guardian's Hammer's Weight, the Singer's Seam Bolt. Mountain's
+ *  Rush never passes on; the rock only on mythic (`rockOutlivesSinger`). */
+export type CouncilJob = 'wrath' | 'pillars' | 'song' | 'weight' | 'bolt';
+
+/** The jobs a survivor inherits only on a tier with `inheritSecond`. */
+export const COUNCIL_SECOND_JOBS: ReadonlySet<CouncilJob> = new Set<CouncilJob>(['weight', 'bolt']);
 
 /** The roles in roster order (the council's own iteration order). */
 export const COUNCIL_ROLES: readonly CouncilRole[] = ['guardian', 'singer'];
@@ -50,15 +56,31 @@ export const COUNCIL_DEV_CUES = {
 export const JOB_OWNER: Readonly<Record<CouncilJob, CouncilRole>> = {
   wrath: 'guardian',
   pillars: 'singer',
+  song: 'singer',
+  weight: 'guardian',
+  bolt: 'singer',
 };
 
-/** Who takes up a fallen member's job (a weaker form of it): the Singer the
- *  Wrath (a shorter, lighter one), the Guardian the pillars (random players,
- *  a locked spot, about once a Wrath cycle). */
+/** Who takes up a fallen member's job, at full strength (the same bars, the
+ *  same numbers, hastened by Grieving Fury): the other member. */
 export const JOB_HEIRS: Readonly<Record<CouncilJob, readonly CouncilRole[]>> = {
   wrath: ['singer'],
   pillars: ['guardian'],
+  song: ['guardian'],
+  weight: ['singer'],
+  bolt: ['guardian'],
 };
+
+/** Grieving Fury's colour code on its aura (value2): the fallen one's role. */
+export function furyRoleCode(role: CouncilRole): number {
+  return role === 'guardian' ? 0 : 1;
+}
+
+/** The fallen role a Grieving Fury aura's value2 names. Pure (the client's
+ *  look reads it). */
+export function furyFallenOf(value2: number | undefined): CouncilRole {
+  return value2 === 1 ? 'singer' : 'guardian';
+}
 
 /** The role a template plays in the council, or null. Pure. */
 export function councilRoleOf(templateId: string): CouncilRole | null {
@@ -70,7 +92,7 @@ export function councilRoleOf(templateId: string): CouncilRole | null {
 
 /** The cast bars (and the damage names they carry). */
 export const COUNCIL_CASTS = {
-  /** The Guardian's (and its heir's) line-of-sight blast at full energy. The
+  /** The Guardian's (and, after him, the Singer's) blast at full energy. The
    *  shipped id is kept. */
   wrath: 'heart_mountains_wrath',
   /** The tank buster. */
@@ -121,8 +143,14 @@ export const COUNCIL_AURAS = {
   /** Resonance: every second this player rings, hurting each ally within
    *  the ring (value2 = its radius): spread out. */
   resonance: 'heart_resonance',
-  /** On a council member: one stack per fallen member, more damage dealt. */
+  /** On the survivor once the fallen one's soul reaches it (council_fury.ts):
+   *  more damage dealt (value, the tier's `furyDamage`). */
   memory: 'heart_memory_of_stone',
+  /** Grieving Fury, on the survivor beside Memory of Stone: it swings, casts
+   *  and runs its clocks faster (a buff_haste: value = 1 + the tier's
+   *  `furyHaste`; value2 = the fallen one's role, 0 the Guardian, 1 the
+   *  Singer, the colour the client lights it in). */
+  fury: 'heart_grieving_fury',
   /** Heroic and Mythic: on the Wrath's caster through its bar: value2 = how
    *  many players one pillar can shield (what the client's runes read). */
   pillarLimit: 'heart_narrow_shelter',
@@ -159,8 +187,10 @@ export const COUNCIL_RISEN_PREFIX = 'sh_council_risen_';
 export const COUNCIL_CURSED = 'sh_council_cursed';
 /** The rubble a fallen pillar leaves (scale = its radius). */
 export const COUNCIL_RUBBLE = 'sh_council_rubble';
-/** An heir's rising pillar: the 2 s spot locked under a random player
- *  (scale = the knockback radius). */
+/** A locked rising pillar's spot (scale = the knockback radius): the old
+ *  weaker inheritance's random rise, which no tier raises since Grieving Fury
+ *  (2026-11-18: the survivor casts the real Wake the Stone); the ids stay for
+ *  the client's reader and the bots. */
 export const COUNCIL_RISE_SPOT = 'sh_council_rise_spot';
 
 /** A rise spot's template for a warning of `seconds`: the plain id at the
@@ -198,9 +228,16 @@ export const COUNCIL_CUES = {
   /** Stone Thrum: each pillar Wake the Stone raised rings on the whole raid
    *  (spellfx 'nova' on each risen pillar that rang; council_risen_pulse.ts). */
   risenPulse: 'heart_council_stone_thrum',
-  /** The stone remembers: light from the fallen to each survivor (spellfx
-   *  'beam', source the fallen, target the survivor). */
+  /** The stone remembers: the fallen one's soul flies to the survivor
+   *  (spellfx 'beam', source the fallen, target the survivor); it lands
+   *  COUNCIL_TUNING.furyArrive later. */
   inherit: 'heart_council_inherit',
+  /** Grieving Fury wakes on the survivor as the soul lands (spellfx 'nova' on
+   *  the survivor). */
+  furyWake: 'heart_grieving_fury_wake',
+  /** Grieving Fury mends the survivor, once a second while it heals (spellfx
+   *  'nova' on the survivor). */
+  furyMend: 'heart_grieving_fury_mend',
   /** The council settles after its fall: the risen pillars sink. */
   settle: 'heart_council_settle',
   /** Mythic: a fallen member's soul flows into its pillar (spellfx 'beam',
@@ -256,6 +293,7 @@ export const COUNCIL_NAMES = {
   song: 'Song of the Seam',
   resonance: 'Resonance',
   memory: 'Memory of Stone',
+  fury: 'Grieving Fury',
   pillarLimit: 'Narrow Shelter',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
@@ -276,7 +314,7 @@ export const COUNCIL_NAMES = {
 export type CouncilDifficulty = 'normal' | 'heroic' | 'mythic';
 
 export interface CouncilDifficultyRules {
-  /** How many players Wake the Stone marks (and the heir's random rise). */
+  /** How many players Wake the Stone marks (whoever casts it). */
   wakeMarks: number;
   /** Wake the Stone's marks and Mountain's Rush never run into a Wrath (they
    *  wait until it lands); false: they may (heroic). */
@@ -290,7 +328,7 @@ export interface CouncilDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
   /** A lethal punishment's damage factor, in place of damageMult (Mountain's
-   *  Wrath and its heir's, Falling Rock and its tremor): the parse-calibrated
+   *  Wrath, whoever casts it, Falling Rock and its tremor): the parse-calibrated
    *  pass of 2026-11-16 raised the raid's damage and left these where they
    *  were (the tier's old damageMult). */
   punishMult: number;
@@ -308,17 +346,12 @@ export interface CouncilDifficultyRules {
    *  included; a tank under a 40 to 50 percent cut lives on a sliver (with
    *  Memory of Stone too), and an immunity takes none of it. */
   wrathMult: number;
-  /** The inherited Wrath's own factor (the Seam Singer's, the Guardian
-   *  fallen), on top of damageMult: a must-shelter, never a sure kill (on
-   *  Heroic about 80 to 95 percent of a Heroic-geared cloth body with her
-   *  Memory of Stone). */
-  heirWrathMult: number;
   /** Narrow Shelter: the share of the Wrath each player behind a crowded
    *  pillar takes. Heroic and Mythic: about 50 to 65 percent of a
    *  Heroic-geared cloth body, hurting but never a wipe by itself. */
   crowdShare: number;
   /** Stone Thrum (council_risen_pulse.ts): every pillar Wake the Stone (or
-   *  the Guardian as its heir) raised that still stands rings on the whole
+   *  the Guardian after her) raised that still stands rings on the whole
    *  raid every T.risenPulseEvery seconds, this much per pillar (before
    *  damageMult). The carved columns never ring. */
   risenPulseMin: number;
@@ -327,10 +360,21 @@ export interface CouncilDifficultyRules {
    *  (enrageFillMult). Heroic's Wrath kills the unhidden, so its enrage
    *  comes late enough for a decent raid's 6 to 7 minute kill. */
   enrageAfterWraths: number;
-  /** The heir's random rise: seconds of warning on its locked spot. */
-  heirRiseWarn: number;
-  /** The Wrath's heir: seconds its energy takes to fill. */
-  heirFillSeconds: number;
+  /** Grieving Fury (council_fury.ts, the owner's option B of 2026-11-18):
+   *  once the fallen one's soul reaches the survivor (COUNCIL_TUNING
+   *  .furyArrive after the fall) it mends this share of its maximum health
+   *  over `furyHealSeconds`, deals `furyDamage` more damage (Memory of
+   *  Stone), swings, casts and runs every clock `furyHaste` faster, and takes
+   *  up the fallen one's jobs at full strength. A second fall before the soul
+   *  lands costs the raid nothing, one before the mend ends only part of it:
+   *  the fight asks for the two to fall together. */
+  furyHealPct: number;
+  furyHealSeconds: number;
+  furyDamage: number;
+  furyHaste: number;
+  /** The survivor also takes the fallen one's second job (the Singer the
+   *  Guardian's Hammer's Weight, the Guardian her Seam Bolt). */
+  inheritSecond: boolean;
   /** The Guardian keeps casting Falling Rock once the Seam Singer has fallen
    *  (mythic: the rock and Resonance are the only things that break a soul
    *  pillar, so a living member always supplies one of them). */
@@ -366,7 +410,6 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1,
     wrathMult: 1,
-    heirWrathMult: 1,
     crowdShare: 0.5,
     risenPulseMin: 14,
     risenPulseMax: 16,
@@ -374,8 +417,12 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     // 2026-11-16: its +20 percent pools carried the bot raid past the fifth
     // (4:55, the balance pass of 2026-11-12; the fourth, 3:56, before it).
     enrageAfterWraths: 6,
-    heirRiseWarn: 2,
-    heirFillSeconds: 35,
+    // Grieving Fury, Normal's gentle one.
+    furyHealPct: 0.1,
+    furyHealSeconds: 8,
+    furyDamage: 0.2,
+    furyHaste: 0.15,
+    inheritSecond: false,
     rockOutlivesSinger: false,
     soulInTheStone: false,
     pillarLimit: 5,
@@ -398,7 +445,6 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1.18,
     wrathMult: 6.3,
-    heirWrathMult: 2,
     crowdShare: 0.2,
     // Normal's Stone Thrum before the tier's 1.25 (was 19 to 21, which rode
     // 68% over Normal: the balance pass of 2026-11-12), less a tenth since
@@ -407,8 +453,12 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     risenPulseMin: 12.6,
     risenPulseMax: 14.4,
     enrageAfterWraths: 8,
-    heirRiseWarn: 2,
-    heirFillSeconds: 35,
+    // Grieving Fury: a quarter of its health back in 6 s, and hard.
+    furyHealPct: 0.25,
+    furyHealSeconds: 6,
+    furyDamage: 0.35,
+    furyHaste: 0.3,
+    inheritSecond: true,
     rockOutlivesSinger: false,
     soulInTheStone: false,
     pillarLimit: 4,
@@ -431,15 +481,17 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
     // Mythic about 7, the fight's own downtime counted; smith_heart.md).
     healthMult: 1.65,
     wrathMult: 6.3,
-    heirWrathMult: 2,
     crowdShare: 0.2,
     risenPulseMin: 14,
     risenPulseMax: 16,
     // The sixth Wrath (about 5:55): Heroic's health asks no more than a
     // tier of gear (was the fourth, 2026-11-12).
     enrageAfterWraths: 6,
-    heirRiseWarn: 1.5,
-    heirFillSeconds: 30,
+    furyHealPct: 0.3,
+    furyHealSeconds: 6,
+    furyDamage: 0.4,
+    furyHaste: 0.3,
+    inheritSecond: true,
     rockOutlivesSinger: true,
     soulInTheStone: true,
     pillarLimit: 3,
@@ -485,11 +537,6 @@ export const COUNCIL_TUNING = {
   wrathRadius: 45,
   wrathMin: 440,
   wrathMax: 520,
-  /** The heir's shorter Wrath. */
-  heirFillSeconds: 35,
-  heirWrathCast: 3,
-  heirWrathMin: 380,
-  heirWrathMax: 450,
   // Hammer's Weight.
   weightFirst: 10,
   weightEvery: 18,
@@ -553,13 +600,8 @@ export const COUNCIL_TUNING = {
   /** Each Wrath landing brings the next Wake due this soon after it (never
    *  later than its own clock): every Wrath cycle has its Wake. */
   wakeAfterWrath: 6,
-  /** The Guardian's inherited rise (the Singer fallen): its own clock, so
-   *  about once a Wrath cycle (the Wrath's landing brings it due too). */
-  heirWakeEvery: 45,
   wakeCast: 2.5,
   wakeMarkSeconds: 5,
-  /** The heir's rise: random players, the spot locked, this warning. */
-  heirRiseWarn: 2,
   riseKnockRadius: 3,
   riseKnockback: 7,
   riseMin: 120,
@@ -609,8 +651,13 @@ export const COUNCIL_TUNING = {
   resonanceEvery: 1,
   resonanceMin: 150,
   resonanceMax: 180,
-  // The stone remembers.
-  memoryPerFallen: 0.15,
+  // Grieving Fury (each tier's numbers are its COUNCIL_DIFFICULTY row): the
+  // seconds the fallen one's soul takes to reach the survivor (the client's
+  // stream flies this long), and the mend's beat.
+  furyArrive: 3,
+  furyMendEvery: 1,
+  /** How much the survivor's body swells under the fury (the client's look). */
+  furySwell: 1.15,
   // Heroic: the pillars pulse.
   pulseEvery: 2,
   pulseReach: 3,
@@ -691,16 +738,15 @@ export function inCouncilShelter(px: number, pz: number, r: number, x: number, z
   return Math.hypot(x - px, z - pz) <= councilShelterRadius(r) + 1e-6;
 }
 
-/** Seconds the Wrath's energy takes to fill, by holder and Wraths landed
- *  (`heirSeconds` and `enrageAfter`: the difficulty's heir fill and soft
- *  enrage, COUNCIL_DIFFICULTY). */
+/** Seconds the Wrath's energy takes to fill by Wraths landed (`enrageAfter`:
+ *  the difficulty's soft enrage, COUNCIL_DIFFICULTY), before Grieving Fury's
+ *  haste (`haste`, 1 without it). Whoever holds it, the same full fill. */
 export function councilFillSeconds(
-  heir: boolean,
   wraths: number,
-  heirSeconds: number = COUNCIL_TUNING.heirFillSeconds,
   enrageAfter: number = COUNCIL_TUNING.enrageAfterWraths,
+  haste = 1,
 ): number {
-  const base = heir ? heirSeconds : COUNCIL_TUNING.energyFillSeconds;
+  const base = COUNCIL_TUNING.energyFillSeconds / Math.max(1, haste);
   return wraths >= enrageAfter ? base / COUNCIL_TUNING.enrageFillMult : base;
 }
 

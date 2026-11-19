@@ -111,16 +111,17 @@ describe("Smith's Heart Heroic: the Council's soft enrage comes after the lethal
     expect(COUNCIL_DIFFICULTY.mythic.enrageAfterWraths).toBe(6);
     // Each tier's row is what the fight reads: Normal's fourth Wrath no
     // longer fills fast, its fifth does.
-    const normalFill = COUNCIL_TUNING.heirFillSeconds;
-    expect(councilFillSeconds(false, 4, normalFill, 5)).toBe(COUNCIL_TUNING.energyFillSeconds);
-    expect(councilFillSeconds(false, 5, normalFill, 5)).toBe(
+    expect(councilFillSeconds(4, 5)).toBe(COUNCIL_TUNING.energyFillSeconds);
+    expect(councilFillSeconds(5, 5)).toBe(
       COUNCIL_TUNING.energyFillSeconds / COUNCIL_TUNING.enrageFillMult,
     );
     const fill = COUNCIL_TUNING.energyFillSeconds;
     const fast = fill / COUNCIL_TUNING.enrageFillMult;
-    expect(councilFillSeconds(false, 5)).toBe(fast);
-    expect(councilFillSeconds(false, 7, COUNCIL_TUNING.heirFillSeconds, 8)).toBe(fill);
-    expect(councilFillSeconds(false, 8, COUNCIL_TUNING.heirFillSeconds, 8)).toBe(fast);
+    expect(councilFillSeconds(5)).toBe(fast);
+    expect(councilFillSeconds(7, 8)).toBe(fill);
+    expect(councilFillSeconds(8, 8)).toBe(fast);
+    // Grieving Fury's haste fills it faster still.
+    expect(councilFillSeconds(0, 8, 1.3)).toBeCloseTo(fill / 1.3, 9);
   });
 
   it('a Heroic pull keeps the Guardian on its plain fill through its fifth Wrath', () => {

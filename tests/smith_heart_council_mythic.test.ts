@@ -148,8 +148,9 @@ describe('Hammer Council mythic: the switch', () => {
     expect(m.songAfterWrath).toBe(false);
     expect(m.pillarPulse).toBe(true);
     expect(m.damageMult).toBe(h.damageMult);
-    expect(m.heirRiseWarn).toBe(1.5);
-    expect(m.heirFillSeconds).toBe(30);
+    expect(m.furyHealPct).toBeGreaterThanOrEqual(h.furyHealPct);
+    expect(m.furyDamage).toBeGreaterThanOrEqual(h.furyDamage);
+    expect(m.inheritSecond).toBe(true);
     expect(m.rockOutlivesSinger && m.soulInTheStone && m.missCollapse).toBe(true);
     for (const tier of ['normal', 'heroic'] as const) {
       expect(COUNCIL_DIFFICULTY[tier].soulInTheStone).toBe(false);
@@ -437,15 +438,18 @@ describe('Soul in the Stone: the pips', () => {
     expect(ev.some((e) => e.type === 'spellfxAt' && e.ability === 'heart_council_soul_burst')).toBe(
       true,
     );
-    // No Echo ever again; the stacks and the Wrath's heir stay.
+    // No Echo ever again; the fury and the inherited Wrath stay.
     const ev2 = f.tick(20 * (T.echoEvery + T.echoCast + 1));
     expect(hitsOf(ev2, COUNCIL_NAMES.echo).length).toBe(0);
-    expect(f.bodies().singer?.auras.find((a) => a.id === COUNCIL_AURAS.memory)?.stacks).toBe(1);
+    expect(f.bodies().singer?.auras.some((a) => a.id === COUNCIL_AURAS.memory)).toBe(true);
     quiet(f.st);
     f.st.energy = T.energyMax;
     f.tick(2);
     expect(f.bodies().singer?.castingAbility).toBe(COUNCIL_CASTS.wrath);
-    expect(f.bodies().singer?.castTotal).toBe(T.heirWrathCast);
+    expect(f.bodies().singer?.castTotal).toBeCloseTo(
+      T.wrathCast / (1 + COUNCIL_DIFFICULTY.mythic.furyHaste),
+      5,
+    );
   });
 });
 
@@ -498,10 +502,13 @@ describe("Soul in the Stone: the Guardian's Echo of Wrath", () => {
     const c3After = column(f, 4);
     expect(c3After ? c3After.integrity : 0).toBe(c3Before - 1);
     expect(souls(f).find((p) => p.soul === 'singer')?.integrity).toBe(T.soulPips);
-    // About 60 percent of a Wrath (mythic's damage and one Memory stack).
+    // About 60 percent of a Wrath (mythic's damage, and Memory of Stone once
+    // the soul has landed on the survivor).
     const [hit] = hitsOf(ev, COUNCIL_NAMES.echo, exposed.id);
     expect(hit).toBeGreaterThanOrEqual(Math.floor(T.wrathMin * T.echoShare * 1.25));
-    expect(hit).toBeLessThanOrEqual(Math.ceil(T.wrathMax * T.echoShare * 1.25 * 1.15) + 1);
+    expect(hit).toBeLessThanOrEqual(
+      Math.ceil(T.wrathMax * T.echoShare * 1.25 * (1 + COUNCIL_DIFFICULTY.mythic.furyDamage)) + 1,
+    );
     expect(echo.e.castingAbility).toBeNull();
   });
 });
@@ -537,7 +544,9 @@ describe("Soul in the Stone: the Seam Singer's Endless Song", () => {
     ev = f.tick(Math.ceil(T.songPulseEvery * 20));
     const [capped] = hitsOf(ev, COUNCIL_NAMES.endlessSong, p.id);
     expect(capped).toBeLessThanOrEqual(
-      Math.ceil(T.songPulseMax * T.songPulseCap * 1.25 * 1.15) + 1,
+      Math.ceil(
+        T.songPulseMax * T.songPulseCap * 1.25 * (1 + COUNCIL_DIFFICULTY.mythic.furyDamage),
+      ) + 1,
     );
     expect(capped).toBeGreaterThanOrEqual(Math.floor(T.songPulseMin * T.songPulseCap * 1.25));
     expect(song.e.castingAbility).toBe(COUNCIL_CASTS.endlessSong);
@@ -597,22 +606,24 @@ describe('Hammer Council mythic: the rock never stops', () => {
     });
   }
 
-  it('the stronger inheritances: 1.5 s rises and a 30 s fill', () => {
+  it('the stronger fury: the Guardian casts her Wake and her bolt, the Singer his hastened fill', () => {
     const f = pulled(undefined, 8);
     kill(f, 'singer');
+    f.tick(Math.ceil(T.furyArrive * 20) + 2);
+    quiet(f.st);
     f.st.lastFloorAt = null;
     f.st.wakeTimer = 0;
     f.tick();
-    expect(f.st.riseSpots.length).toBeGreaterThan(0);
-    expect(f.st.riseSpots[0].remaining).toBeCloseTo(1.5, 5);
-    const spot = f.sim.ctx.entities.get(f.st.riseSpots[0].objectId);
-    expect(councilRiseSpotSeconds(spot?.templateId ?? '')).toBe(1.5);
+    expect(f.bodies().guardian?.castingAbility).toBe(COUNCIL_CASTS.wake);
     const g = pulled(undefined, 4);
     kill(g, 'guardian');
+    g.tick(Math.ceil(T.furyArrive * 20) + 2);
     g.st.energy = 0;
     g.tick(20 * 15);
-    expect(g.st.energy).toBeGreaterThan(48);
-    expect(g.st.energy).toBeLessThan(52);
+    // 15 s of a 55 s fill, 30 percent faster: about 35.
+    const want = (15 / T.energyFillSeconds) * 100 * (1 + COUNCIL_DIFFICULTY.mythic.furyHaste);
+    expect(g.st.energy).toBeGreaterThan(want - 2);
+    expect(g.st.energy).toBeLessThan(want + 2);
   });
 });
 

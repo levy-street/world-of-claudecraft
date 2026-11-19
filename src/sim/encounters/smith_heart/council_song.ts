@@ -19,8 +19,10 @@
 //   Wake the Stone    her third bar is kickable too (council_stone.ts), but a
 //                     kick there costs the raid its cover: the raid chooses
 //                     what to kick.
-//   No heir           the bolt, the song and Resonance stop with the Singer
-//                     (her pillars pass to the Guardian, council_stone.ts).
+//   Heir              the Singer fallen, once her soul reaches him the
+//                     Guardian sings the SAME song (Grieving Fury,
+//                     council_fury.ts: kickable, hastened, Resonance as hers)
+//                     and on Heroic and Mythic casts her Seam Bolt too.
 //
 // The kick: between two council passes only a player interrupt clears the
 // Singer's bar (bosses take no spell pushback; a reset or a death runs the
@@ -38,14 +40,25 @@ import {
   COUNCIL_ROLES,
   COUNCIL_TUNING as T,
 } from './council_ids';
-import { beginBar, type CouncilScope, living, memberFree, pickMarks, roll } from './council_scope';
+import {
+  beginBar,
+  type CouncilScope,
+  jobHolder,
+  living,
+  memberFree,
+  pickMarks,
+  roll,
+} from './council_scope';
 import { councilSay } from './council_voice';
 import { secondsToNextWrath } from './council_wrath';
 
-/** Seam Bolt: the Singer's own. */
+/** Seam Bolt: the Singer's own (the Guardian's after her on Heroic and
+ *  Mythic, jobHolder 'bolt'). */
 export function startBolt(s: CouncilScope): boolean {
-  const c = s.bodies.singer;
-  if (!living(c) || s.st.quiet > 0 || !memberFree(s, 'singer')) return false;
+  const holder = jobHolder(s, 'bolt');
+  if (!holder) return false;
+  const c = holder.body;
+  if (s.st.quiet > 0 || !memberFree(s, holder.role)) return false;
   // A kick's lockout holds its bolt too.
   if (isLockedOut(c, 'nature')) return false;
   const seen = s.players.filter(
@@ -58,7 +71,7 @@ export function startBolt(s: CouncilScope): boolean {
   const [victim] = pickMarks({ ...s, players: seen }, c, 1);
   s.st.boltTimer = T.boltEvery;
   if (!victim) return false;
-  beginBar(s, 'singer', COUNCIL_CASTS.bolt, T.boltCast, victim.id, false);
+  beginBar(s, holder.role, COUNCIL_CASTS.bolt, T.boltCast, victim.id, holder.heir);
   s.st.kickable = COUNCIL_CASTS.bolt;
   return true;
 }
@@ -98,16 +111,17 @@ function songDue(s: CouncilScope): boolean {
 /** The song comes due on the Singer (exported for the dev trigger, `force`
  *  skipping the timing guard). */
 export function startSong(s: CouncilScope, force = false): boolean {
-  const c = s.bodies.singer;
-  if (!living(c)) return false;
+  const holder = jobHolder(s, 'song');
+  if (!holder) return false;
+  const c = holder.body;
   if (!force && !songDue(s)) return false;
   if (s.st.quiet > 0 || isLockedOut(c, 'nature')) return false;
-  if (!memberFree(s, 'singer')) return false;
+  if (!memberFree(s, holder.role)) return false;
   s.st.songDue = null;
   s.st.songTimer = T.songEvery;
-  beginBar(s, 'singer', COUNCIL_CASTS.song, T.songCast, null, false);
+  beginBar(s, holder.role, COUNCIL_CASTS.song, T.songCast, null, holder.heir);
   s.st.kickable = COUNCIL_CASTS.song;
-  councilSay(s, 'singer', 'song');
+  if (!holder.heir) councilSay(s, holder.role, 'song');
   return true;
 }
 
@@ -116,7 +130,7 @@ export function applyResonance(s: CouncilScope, singer: Entity, count: number): 
   const busy = new Set(s.st.resonance.map((r) => r.playerId));
   const marked = pickMarks(s, singer, count, busy);
   // Normal: it runs out a breath before the next Wrath, whatever the fill
-  // (an heir's soft-enraged Wrath comes sooner).
+  // (a soft-enraged or Grieving Fury's hastened Wrath comes sooner).
   const seconds = s.rules.songAfterWrath
     ? Math.max(3, Math.min(T.resonanceSeconds, secondsToNextWrath(s) - 1.5))
     : T.resonanceSeconds;
@@ -150,7 +164,7 @@ export function songKicked(s: CouncilScope, singer: Entity, castId: string): voi
   // A kicked Wake simply raises nothing (no marks follow it).
   if (castId === COUNCIL_CASTS.song) {
     applyResonance(s, singer, T.songKickedMarks);
-    councilSay(s, 'singer', 'hush');
+    if (singer === s.bodies.singer) councilSay(s, 'singer', 'hush');
   }
 }
 

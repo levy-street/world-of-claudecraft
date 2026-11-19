@@ -173,15 +173,10 @@ export function stepCouncilVoice(s: CouncilScope): void {
   });
 }
 
-/** A member fell (not the last): its own line (its soul's on mythic) and the
- *  first survivor's memory of it. */
+/** A member fell (not the last): its own line (its soul's on mythic). The
+ *  survivor's memory of it waits for the soul to land (council_fury.ts). */
 export function sayFallen(s: CouncilScope, role: CouncilRole, soulTaken: boolean): void {
   councilSay(s, role, soulTaken ? 'soul' : 'death');
-  // A survivor who has not yet said it (the second fall, the other one).
-  const survivor = COUNCIL_ROLES.find(
-    (r) => r !== role && living(s.bodies[r]) && s.st.said[`${r}_remember`] === undefined,
-  );
-  if (survivor) councilSay(s, survivor, 'remember');
 }
 
 /** Watch the Quarry for a player's fall (called every tick of the fight):

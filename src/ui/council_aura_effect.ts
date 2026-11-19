@@ -4,7 +4,8 @@
 // hudChrome.auraEffect.council.* key plus the raw numbers, and the HUD formats
 // the numbers and renders t(key, values). The three player marks ride a
 // zero-value marker kind whose generic line would say nothing true, so each
-// says its rule instead; Memory of Stone says its per-fallen share. Every
+// says its rule instead; Memory of Stone and Grieving Fury say the survivor's
+// share. Every
 // number comes from the council's tuning (src/sim/encounters/smith_heart/
 // council_ids.ts), the same constants the fight reads; Hammer's Weight keeps
 // the generic physical-damage-taken line, which is exactly what it does.
@@ -128,11 +129,12 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           max: tierValue(T.collapseMax, COUNCIL_DIFFICULTY.mythic.damageMult),
         },
       };
+    // Grieving Fury's two (encounters/smith_heart/council_fury.ts): the
+    // damage the survivor's tier gave it, and its haste.
     case COUNCIL_AURAS.memory:
-      return {
-        key: `${KEY}.memory`,
-        nums: { pct: pct(a.value), per: pct(T.memoryPerFallen) },
-      };
+      return { key: `${KEY}.memory`, nums: { pct: pct(a.value) } };
+    case COUNCIL_AURAS.fury:
+      return { key: `${KEY}.fury`, nums: { pct: pct(a.value - 1) } };
     case COUNCIL_AURAS.pillarLimit:
       return {
         key: `${KEY}.pillarLimit`,

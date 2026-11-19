@@ -12,6 +12,7 @@ import { pickMarkTargets, startBar } from '../sunken_bastion/claim';
 import {
   COUNCIL_DIFFICULTY,
   COUNCIL_ROLES,
+  COUNCIL_SECOND_JOBS,
   type CouncilDifficultyRules,
   type CouncilJob,
   type CouncilRole,
@@ -56,20 +57,30 @@ export function living(e: Entity | null): e is Entity {
   return e !== null && !e.dead && e.hp > 0;
 }
 
-/** Who holds a job now: its own member while it lives, else the first living
- *  heir, else nobody. */
+/** Who holds a job now: its own member while it lives, else the survivor
+ *  once Grieving Fury has reached it (the fallen one's soul landed; a second
+ *  job only on a tier with `inheritSecond`), else nobody. */
 export function jobHolder(
-  s: Pick<CouncilScope, 'bodies'>,
+  s: Pick<CouncilScope, 'bodies' | 'st' | 'rules'>,
   job: CouncilJob,
 ): { role: CouncilRole; body: Entity; heir: boolean } | null {
   const own = JOB_OWNER[job];
   const b = s.bodies[own];
   if (living(b)) return { role: own, body: b, heir: false };
+  if (COUNCIL_SECOND_JOBS.has(job) && !s.rules.inheritSecond) return null;
+  const fury = s.st.fury;
+  if (!fury?.arrived) return null;
   for (const r of JOB_HEIRS[job]) {
     const h = s.bodies[r];
-    if (living(h)) return { role: r, body: h, heir: true };
+    if (r === fury.survivor && living(h)) return { role: r, body: h, heir: true };
   }
   return null;
+}
+
+/** Grieving Fury's haste on everything the council runs (its clocks, its
+ *  bars, the Wrath's fill): 1 until the fallen one's soul has landed. */
+export function councilHaste(s: Pick<CouncilScope, 'st' | 'rules'>): number {
+  return s.st.fury?.arrived ? 1 + s.rules.furyHaste : 1;
 }
 
 /** Is this member free to begin a bar now? */
@@ -97,7 +108,8 @@ export function beginBar(
   if (!b) return;
   s.st.casts++;
   s.st.bars[role] = { castId, at: { ...b.pos }, heir, targetId };
-  startBar(b, castId, seconds, targetId);
+  // Grieving Fury casts every bar faster.
+  startBar(b, castId, seconds / councilHaste(s), targetId);
   if (targetId !== null) {
     const t = s.ctx.entities.get(targetId);
     if (t) b.facing = Math.atan2(t.pos.x - b.pos.x, t.pos.z - b.pos.z);

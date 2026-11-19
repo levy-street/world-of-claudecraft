@@ -413,24 +413,28 @@ describe('Hammer Council: Resonance is a spread', () => {
   });
 });
 
-describe('Hammer Council: the stone remembers', () => {
+describe('Hammer Council: the stone remembers (Grieving Fury)', () => {
   const kill = (f: CouncilFight, role: 'guardian' | 'singer') => {
     const b = f.bodies()[role] as Entity;
     f.sim.ctx.handleDeath(b, f.players[0]);
     f.tick();
   };
+  /** Kill one and let its soul land on the survivor. */
+  const killAndLand = (f: CouncilFight, role: 'guardian' | 'singer') => {
+    kill(f, role);
+    f.tick(Math.ceil(T.furyArrive * 20) + 1);
+  };
 
-  it('the Guardian first: the Singer gains Memory and a shorter, lighter Wrath; no Rush, no Weight', () => {
+  it('the Guardian first: the Singer casts his full Wrath; no Rush, and on Normal no Weight', () => {
     const f = pulled(6);
-    kill(f, 'guardian');
+    killAndLand(f, 'guardian');
     const c = f.bodies().singer as Entity;
     const mem = c.auras.find((a) => a.id === COUNCIL_AURAS.memory);
-    expect(mem?.stacks).toBe(1);
-    expect(mem?.value).toBeCloseTo(T.memoryPerFallen);
+    expect(mem?.value).toBeCloseTo(COUNCIL_DIFFICULTY.normal.furyDamage);
     f.dev('/dev heart council wrath');
     expect(c.castingAbility).toBe(COUNCIL_CASTS.wrath);
-    expect(c.castTotal).toBe(T.heirWrathCast);
-    expect(T.heirWrathMax).toBeLessThan(T.wrathMax);
+    // His bar, hastened by Grieving Fury.
+    expect(c.castTotal).toBeCloseTo(T.wrathCast / (1 + COUNCIL_DIFFICULTY.normal.furyHaste), 5);
     expect(f.dev('/dev heart council rush')).toBe(true);
     expect(f.st.rush).toBeNull();
     // Her own kit stays: Wake the Stone is still hers, kickable.
@@ -449,28 +453,35 @@ describe('Hammer Council: the stone remembers', () => {
     expect(f.pillars().length).toBe(columns);
   });
 
-  it('the Singer first: the Guardian gains Memory and raises the pillars itself, less often, on random players', () => {
+  it('the Singer first: the Guardian casts her own Wake the Stone and sings her song', () => {
     const f = pulled(6);
-    kill(f, 'singer');
+    killAndLand(f, 'singer');
     const g = f.bodies().guardian as Entity;
-    expect(g.auras.find((a) => a.id === COUNCIL_AURAS.memory)?.stacks).toBe(1);
+    expect(g.auras.some((a) => a.id === COUNCIL_AURAS.memory)).toBe(true);
+    quiet(f.st);
+    f.st.lastFloorAt = null;
     f.st.wakeTimer = 0;
     f.tick();
-    expect(f.st.riseSpots.length).toBeGreaterThan(0);
-    expect(f.st.wakeTimer).toBeGreaterThan(T.wakeEvery);
-    expect(f.st.wakeTimer).toBeLessThanOrEqual(T.heirWakeEvery);
+    // Her real Wake: the kickable bar on him, then the marks.
+    expect(g.castingAbility).toBe(COUNCIL_CASTS.wake);
+    expect(f.st.kickable).toBe(COUNCIL_CASTS.wake);
+    f.tick(Math.ceil(T.wakeCast * 20) + 1);
+    expect(f.st.wakeMarks.length).toBe(COUNCIL_DIFFICULTY.normal.wakeMarks);
     const before = f.pillars().length;
-    f.tick(Math.ceil(T.heirRiseWarn * 20) + 2);
+    f.tick(Math.ceil(T.wakeMarkSeconds * 20) + 2);
     expect(f.pillars().length).toBeGreaterThan(before);
-    // Her rock, bolt and song die with her on normal.
+    // Her song too (on Normal it follows a Wrath); her rock and bolt die with
+    // her on Normal.
     quiet(f.st);
+    f.tick(20 * 2);
     f.st.rockTimer = 0;
     f.st.boltTimer = 0;
-    f.st.songTimer = 0;
     f.st.songDue = 0;
-    f.tick(20 * 3);
+    f.tick();
+    expect(g.castingAbility).toBe(COUNCIL_CASTS.song);
+    f.tick(Math.ceil(T.songCast * 20) + 1);
+    expect(f.st.resonance.length).toBe(T.songMarks);
     expect(f.st.rock).toBeNull();
-    expect(f.st.resonance.length).toBe(0);
     kill(f, 'guardian');
     expect(f.state()?.finished).toBe(true);
   });
@@ -504,20 +515,21 @@ describe('Hammer Council: difficulty', () => {
     expect(T.songCast + T.resonanceSeconds).toBeLessThan(toNext);
   });
 
-  it("normal: even an heir's soft-enraged Wrath never overlaps the Resonance", () => {
+  it("normal: even the Singer's soft-enraged, hastened Wrath never overlaps the Resonance", () => {
     const f = pulled(5);
     f.sim.ctx.handleDeath(f.bodies().guardian as Entity, f.players[0]);
-    f.tick();
+    f.tick(Math.ceil(T.furyArrive * 20) + 2);
     quiet(f.st);
     f.st.wraths = COUNCIL_DIFFICULTY.normal.enrageAfterWraths;
     f.dev('/dev heart council wrath');
-    f.tick(Math.ceil(T.heirWrathCast * 20) + 2);
+    const haste = 1 + COUNCIL_DIFFICULTY.normal.furyHaste;
+    f.tick(Math.ceil((T.wrathCast / haste) * 20) + 2);
     f.st.wakeTimer = 999;
-    f.tick(Math.ceil((T.songAfterWrath + T.songCast + 0.3) * 20));
+    f.tick(Math.ceil(((T.songAfterWrath + T.songCast) / haste + 0.3) * 20));
     expect(f.st.resonance.length).toBeGreaterThan(0);
     const left = Math.max(...f.st.resonance.map((r) => r.remaining));
-    const per = T.energyMax / (T.heirFillSeconds / T.enrageFillMult);
-    const toNext = (T.energyMax - f.st.energy) / per + T.heirWrathCast;
+    const per = T.energyMax / (T.energyFillSeconds / haste / T.enrageFillMult);
+    const toNext = (T.energyMax - f.st.energy) / per + T.wrathCast / haste;
     expect(left).toBeLessThan(toNext);
   });
 
