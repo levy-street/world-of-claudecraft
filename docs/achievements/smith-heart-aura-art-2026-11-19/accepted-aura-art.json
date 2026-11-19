@@ -9,8 +9,8 @@
   },
   "scope": {
     "encounter": "The Smith's Heart raid",
-    "exactRuntimeAuras": 70,
-    "sharedRuntimeAliases": 21,
+    "exactRuntimeAuras": 69,
+    "sharedRuntimeAliases": 22,
     "runtimeIdsCovered": 91,
     "unpainted": [
       {
@@ -299,7 +299,7 @@
     },
     {
       "auraId": "heart_breath_sky_mark",
-      "runtimeIds": ["heart_breath_sky_mark"],
+      "runtimeIds": ["heart_breath_sky_mark", "heart_final_sky_mark"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_sky_mark.png",
       "sourceBytes": 2393418,
@@ -620,7 +620,7 @@
     },
     {
       "auraId": "heart_quench_cold",
-      "runtimeIds": ["heart_quench_cold", "heart_final_cold"],
+      "runtimeIds": ["heart_quench_cold"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_cold.png",
       "sourceBytes": 2931630,
@@ -672,7 +672,7 @@
     },
     {
       "auraId": "heart_quench_frozen",
-      "runtimeIds": ["heart_quench_frozen", "heart_final_frozen"],
+      "runtimeIds": ["heart_quench_frozen"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_frozen.png",
       "sourceBytes": 2510741,
@@ -776,7 +776,7 @@
     },
     {
       "auraId": "heart_quench_slash_mark",
-      "runtimeIds": ["heart_quench_slash_mark"],
+      "runtimeIds": ["heart_quench_slash_mark", "heart_final_blade_mark"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_slash_mark.png",
       "sourceBytes": 2378704,
@@ -1062,7 +1062,7 @@
     },
     {
       "auraId": "heart_final_crushed",
-      "runtimeIds": ["heart_final_crushed"],
+      "runtimeIds": ["heart_final_crushed", "heart_final_anvil_mark"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_crushed.png",
       "sourceBytes": 2620202,
@@ -1536,32 +1536,6 @@
         }
       ],
       "prompt": "Icon 59, same style as the reference icon, one single picture, not a collage. Name: The Masterless Strength. What it does: the final boss, a stone giant, drinks the strength of one of the four veins at a time. Paint: a four-coloured crystal heart blazing in the chest of a stone giant, its facets glowing ochre, cyan, ice blue and white-gold. Palette: the four vein colours, ochre-gold, storm cyan, ice blue and white-gold, on dark stone. Square, edge to edge, no text, no border.",
-      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
-    },
-    {
-      "auraId": "heart_final_root",
-      "runtimeIds": ["heart_final_root"],
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_root.png",
-      "sourceBytes": 2558377,
-      "sourceSha256": "3e37499d97258949a05c987dd8fa64a732d05dd00db3f7ad066b9dace4c81bbf",
-      "acceptedSha256": "151024167d2e2d2bc53d7df5e12a756b30fca42eb448af81a9436241535819e8",
-      "acceptedBytes": 5976,
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/final_rules.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_final_root."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "prompt": "Icon 60, same style as the reference icon, one single picture, not a collage. Name: Taking Root. What it does: the Masterless Strength takes root in a quarter of the arena and cannot be dragged out until the root ends. Paint: thick stone roots driving down from a giant's stone feet into the cracked floor. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
       "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
     },
     {

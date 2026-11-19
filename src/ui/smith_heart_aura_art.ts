@@ -45,7 +45,6 @@ export const SMITH_HEART_AURA_IMAGE_IDS: readonly string[] = [
   'heart_final_poured_heat',
   'heart_final_poured_quench',
   'heart_final_ring_chill',
-  'heart_final_root',
   'heart_final_shaken',
   'heart_final_shell',
   'heart_final_shield',
@@ -85,7 +84,9 @@ export const SMITH_HEART_AURA_IMAGE_IDS: readonly string[] = [
 /**
  * Raid aura ids that wear another raid aura's painting: [alias, painted source].
  * The four gale portals are one portal; every wind throw is one throw; the final
- * fight's cold, ice and lightning repeat the Quench's and the Breath's; the
+ * fight's ice and lightning repeat the Quench's and the Breath's, and its three
+ * marks wear the paintings they echo (Sky Strike the Breath's, Crossing Blade the
+ * Quench's, Weight of the Anvil the Crushed anvil overhead); the
  * guardians' slumbers are one Dormant, and that includes `mob_dormant`, the
  * dormant ward that only the raid's Hammer Vein Warders wear. The Breath's isle
  * phase reuses its fight's art: the Gale Cocoon (and its root) is the storm
@@ -103,11 +104,12 @@ export const SMITH_HEART_AURA_ICON_SOURCES: readonly (readonly [string, string])
   ['heart_breath_portal_d', 'heart_breath_portal_a'],
   ['heart_breath_squall_ward', 'heart_breath_wind_battered'],
   ['heart_breath_stone_charge', 'heart_breath_anchor'],
-  ['heart_final_cold', 'heart_quench_cold'],
+  ['heart_final_anvil_mark', 'heart_final_crushed'],
+  ['heart_final_blade_mark', 'heart_quench_slash_mark'],
   ['heart_final_drawn', 'heart_breath_drawn_lightning'],
-  ['heart_final_frozen', 'heart_quench_frozen'],
   ['heart_final_phase', 'heart_final_state'],
   ['heart_final_rising', 'heart_final_shield'],
+  ['heart_final_sky_mark', 'heart_breath_sky_mark'],
   ['heart_final_under_ice', 'heart_quench_trapped'],
   ['heart_heat_intro', 'heart_council_intro'],
   ['heart_quench_intro', 'heart_council_intro'],

@@ -5816,36 +5816,6 @@
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
     },
     {
-      "auraId": "heart_final_root",
-      "sourcePack": "smith-heart-aura-art-2026-11-19",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_root.png",
-      "sourceBytes": 2558377,
-      "output": "heart_final_root.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "Thick stone roots driving down from a giant's stone feet into the cracked floor.",
-      "references": [
-        {
-          "path": "public/ui/auras/stomp_stun.webp",
-          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
-        },
-        {
-          "path": "src/sim/encounters/smith_heart/final_rules.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_final_root."
-        },
-        {
-          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
-          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
-        }
-      ],
-      "sourceSha256": "3e37499d97258949a05c987dd8fa64a732d05dd00db3f7ad066b9dace4c81bbf",
-      "acceptedSha256": "151024167d2e2d2bc53d7df5e12a756b30fca42eb448af81a9436241535819e8",
-      "acceptedBytes": 5976,
-      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
-      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
-    },
-    {
       "auraId": "heart_final_unbound",
       "sourcePack": "smith-heart-aura-art-2026-11-19",
       "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_unbound.png",

@@ -60,7 +60,7 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 8 | `heart_breath_calm_spent` | Calm Spent | You cannot be anchored again for a while | The mint ward circle cracked and guttering, wind breaking through |
 | 9 | `heart_breath_pinned` | Pressed to the Rim | Pinned against the rim's wall by the wind | A figure pinned flat against a cliff wall by howling wind |
 | 10 | `heart_breath_drawn_lightning`, `heart_final_drawn` | Drawn Lightning | Lightning strikes follow you / arcs to allies | A cyan lightning bolt drawn down into a raised gauntlet |
-| 11 | `heart_breath_sky_mark` | Sky Strike | Lightning strikes where you stood | A storm cloud over a glowing cyan target, a bolt forming |
+| 11 | `heart_breath_sky_mark`, `heart_final_sky_mark` | Sky Strike | Lightning strikes where you stood | A storm cloud over a glowing cyan target, a bolt forming |
 | 12 | `heart_breath_cradled` | Thunder's Cradle | Lifted and held in the storm, then the discharge | A body held in a cradle of lightning arcs inside a storm cloud |
 | 13 | `heart_breath_portal_a`, `_b`, `_c`, `_d` | Portal A to D | A portal opens where you stand | A swirling teal wind portal opening on stone |
 | 14 | `heart_breath_laden` | Gale-Laden | You carry the Knotted Gale; throw it into the void | Gauntlets straining to hold a heavy knot of storm wind |
@@ -73,13 +73,13 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 21 | `wind_drift` | Bellows Wind | The wind carries you the way it blows | Sand and wind streaks sweeping hard in one direction over slate |
 | 22 | `wind_draw` | Indrawn Breath | The guardian pulls you toward its maw | Wind streaks spiralling inward into a dark vortex mouth |
 | 23 | `wind_blast` | Summit Roar | The roar's blast drives you away | A shockwave of wind exploding out of a roaring maw |
-| 24 | `heart_quench_cold`, `heart_final_cold` | Quenching Cold | Your cold bar; at full you freeze | Frost creeping up a gauntlet's fingers, a deep blue glow |
+| 24 | `heart_quench_cold`, `heart_final_cold` (retired) | Quenching Cold | Your cold bar; at full you freeze | Frost creeping up a gauntlet's fingers, a deep blue glow |
 | 25 | `heart_quench_warmth` | Huddled Warmth (buff) | Huddling with the raid warms you | Three small golden flames huddled in a ring amid blue frost |
-| 26 | `heart_quench_frozen`, `heart_final_frozen` | Encased in Rime | Frozen solid; you take double damage | A figure locked in a faceted block of lake ice |
+| 26 | `heart_quench_frozen`, `heart_final_frozen` (retired) | Encased in Rime | Frozen solid; you take double damage | A figure locked in a faceted block of lake ice |
 | 27 | `heart_quench_brittle` | Frost-Brittle | More damage taken after a shatter | An ice-coated shoulder plate cracking into shards |
 | 28 | `heart_quench_splashed` | Rime Splash | An ally's shattering ice splashed you | A burst of shattering ice shards flying outward |
 | 29 | `heart_quench_trapped`, `heart_final_under_ice` | Under the Ice | Fallen through the ice into freezing water | A hand reaching up out of black water through broken lake ice |
-| 30 | `heart_quench_slash_mark` | Crossing Blade | A blade flies across the lake through you | A great floating ice sword flying along a glowing line |
+| 30 | `heart_quench_slash_mark`, `heart_final_blade_mark` | Crossing Blade | A blade flies across the lake through you | A great floating ice sword flying along a glowing line |
 | 31 | `heart_quench_rime`, `heart_quench_rime_slow` | Living Rime | A crust of rime eats your healing and slows you | Living frost crust growing over a golden heart of healing light |
 | 32 | `heart_quench_tempered` | Rime-Tempered | Tank stacks: cold held high, more frost damage | A steel tower shield sheathed in stacked layers of ice |
 | 33 | `heart_heat_scorched` | Flare-Scorched | More magic damage taken | A scorched, smoking armour plate seared by white-gold flare |
@@ -90,7 +90,7 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 38 | `heart_final_numbing` | Numbing Frost (Mythic) | 75% slower | Boots frozen to the floor in pale crystal |
 | 39 | `heart_final_ember_mark` | Ember Mark (Heroic) | Embers fall at your feet and smoulder | Embers raining down into a smouldering marked pool |
 | 40 | `heart_final_shell` | Stone Shell | A shell that absorbs your healing | A figure encased in a granite shell, ochre light in the cracks |
-| 41 | `heart_final_crushed` | Crushed | The next Anvil hits you three times over | A great stone anvil looming overhead, its crushing shadow |
+| 41 | `heart_final_crushed`, `heart_final_anvil_mark` | Crushed | The next Anvil hits you three times over | A great stone anvil looming overhead, its crushing shadow |
 | 42 | `heart_final_coal` | Bursting Coal | The coal bursts on your allies; leave the group | A cracked glowing coal about to burst, fire leaking |
 | 43 | `heart_final_tethered` | Wind-Tethered | The Splinter of the Breath hunts you | A crackling wind tether binding a figure to a storm-stone beast |
 | 44 | `heart_final_ring_chill` | Quenching Ring | 50% slower: you crossed a ring of frost | A ring of frost freezing the feet that cross it |
@@ -114,7 +114,7 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 57 | `heart_heat_state` | The First Flame | A white-gold flame burning in a basalt heart |
 | 58 | `heart_heat_crust` | Cooling Crust | A molten ball cooling into a hard dark crust |
 | 59 | `heart_final_state`, `heart_final_phase` | The Masterless Strength | A four-coloured crystal heart blazing in a stone chest |
-| 60 | `heart_final_root` | Taking Root | Stone roots driving from giant feet into the floor |
+| 60 | `heart_final_root` (retired) | Taking Root | Stone roots driving from giant feet into the floor |
 | 61 | `heart_final_unbound` | Heart Unbound | The heart crystal overflowing in four colours in a central ring |
 | 62 to 65 | `heart_final_overload_hammer`, `_breath`, `_quench`, `_heat` | Overload | A vein brimming with its element's light (one per vein) |
 | 66 | `heart_final_shield`, `heart_final_rising` | Gathered Strength | A dome of four-coloured light shielding a giant |
@@ -140,3 +140,19 @@ to 91:
   (row 16), the shield in the wind.
 - `heart_breath_stone_charge` (a Stillstone's shared Still the Gale channel) wears Anchored
   in Calm (row 7), Thessaly's calm stilling the wind.
+
+## Amended after the final boss rework
+
+The Masterless Strength's rework (`src/sim/encounters/smith_heart/final.ts` and its
+quarter modules) took away Taking Root and the final fight's own cold and freeze, so the
+Taking Root painting (row 60) left the shipping set with its mapping and manifest rows,
+and `heart_final_cold` and `heart_final_frozen` no longer share rows 24 and 26. That
+leaves 69 paintings. The rework's three new player marks share paintings already in the
+set, which brings the shared aliases to 22 and keeps the ids covered at 91:
+
+- `heart_final_sky_mark` (Sky Strike, lightning falls where the marked player stands)
+  wears the Breath's Sky Strike (row 11).
+- `heart_final_blade_mark` (Crossing Blade, the line runs through the marked player)
+  wears the Quench's Crossing Blade (row 30).
+- `heart_final_anvil_mark` (Weight of the Anvil, its circle follows the marked player)
+  wears Crushed (row 41), the anvil looming overhead.

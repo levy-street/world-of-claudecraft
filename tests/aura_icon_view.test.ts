@@ -287,11 +287,12 @@ const SMITH_HEART_SHARED_AURA_SOURCES = [
   ['heart_breath_portal_d', 'heart_breath_portal_a'],
   ['heart_breath_squall_ward', 'heart_breath_wind_battered'],
   ['heart_breath_stone_charge', 'heart_breath_anchor'],
-  ['heart_final_cold', 'heart_quench_cold'],
+  ['heart_final_anvil_mark', 'heart_final_crushed'],
+  ['heart_final_blade_mark', 'heart_quench_slash_mark'],
   ['heart_final_drawn', 'heart_breath_drawn_lightning'],
-  ['heart_final_frozen', 'heart_quench_frozen'],
   ['heart_final_phase', 'heart_final_state'],
   ['heart_final_rising', 'heart_final_shield'],
+  ['heart_final_sky_mark', 'heart_breath_sky_mark'],
   ['heart_final_under_ice', 'heart_quench_trapped'],
   ['heart_heat_intro', 'heart_council_intro'],
   ['heart_quench_intro', 'heart_council_intro'],
@@ -363,9 +364,9 @@ describe('resolveAuraIconId', () => {
       POWERUPS.reduce((count, definition) => count + definition.buffs.length, 0),
     );
     expect(REUSED_PAINTED_RUNTIME_AURA_SOURCES).toHaveLength(12);
-    expect(SMITH_HEART_SHARED_AURA_SOURCES).toHaveLength(21);
-    // 170: 149 plus the Smith's Heart's 21 shared paintings.
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(170);
+    expect(SMITH_HEART_SHARED_AURA_SOURCES).toHaveLength(22);
+    // 171: 149 plus the Smith's Heart's 22 shared paintings.
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(171);
     for (const [id, source] of expected) {
       const paintedIdentity = hasAuraImageIdentity(id) ? id : source;
       const imageUrl = auraImageUrl(paintedIdentity);
