@@ -4843,7 +4843,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     return this.unappliedInstanceDungeonDifficulty;
   }
   setDungeonDifficulty(difficulty: DungeonDifficulty): void {
-    this.selectedDungeonDifficulty = difficulty;
+    // No optimistic mirror write: a refused change never re-sends `ddiff`, so it would stick.
     this.cmd({ cmd: 'set_dungeon_difficulty', difficulty });
   }
   buyHeroicVendorItem(itemId: string): void {

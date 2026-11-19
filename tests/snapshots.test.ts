@@ -2715,7 +2715,9 @@ describe('dungeon difficulty wire', () => {
     (client as any).applySnapshot(lastSnap(fc.sent));
     expect(client.unappliedDungeonDifficulty()).toBeNull();
 
-    server.sim.entities.get(inst.mobIds[0])!.lootable = true;
+    const corpse = server.sim.entities.get(inst.mobIds[0])!;
+    corpse.lootable = true;
+    corpse.loot = { copper: 0, items: [{ itemId: 'redbrook_blade', count: 1 }] };
     server.handleMessage(
       session,
       JSON.stringify({ t: 'cmd', cmd: 'set_dungeon_difficulty', difficulty: 'heroic' }),
@@ -2730,7 +2732,8 @@ describe('dungeon difficulty wire', () => {
     expect(client.dungeonDifficulty()).toBe('heroic');
     expect(client.unappliedDungeonDifficulty()).toBe('normal');
 
-    server.sim.entities.get(inst.mobIds[0])!.lootable = false;
+    corpse.lootable = false;
+    corpse.loot = null;
     server.handleMessage(
       session,
       JSON.stringify({ t: 'cmd', cmd: 'set_dungeon_difficulty', difficulty: 'heroic' }),
@@ -2742,6 +2745,25 @@ describe('dungeon difficulty wire', () => {
     expect(applied.self.udiff).toBeNull();
     (client as any).applySnapshot(applied);
     expect(client.unappliedDungeonDifficulty()).toBeNull();
+  });
+
+  it('sends a difficulty change without writing the mirror before the server answers', () => {
+    // A refused change (say, leadership moved a moment before) never changes the
+    // server's selection, so `ddiff` is never re-sent; an optimistic write here
+    // would leave the menu showing a tier the server never accepted.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hero');
+    const sent: unknown[] = [];
+    const client = bareClient(session.pid, { cmd: (command: unknown) => sent.push(command) });
+    client.setDungeonDifficulty('heroic');
+    expect(sent).toEqual([{ cmd: 'set_dungeon_difficulty', difficulty: 'heroic' }]);
+    expect(client.dungeonDifficulty()).toBe('normal');
+    // The server's answer is what moves the mirror.
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', ...(sent[0] as object) }));
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.dungeonDifficulty()).toBe('heroic');
   });
 
   it('dispatches set_dungeon_difficulty through the wire and rejects invalid values', () => {
