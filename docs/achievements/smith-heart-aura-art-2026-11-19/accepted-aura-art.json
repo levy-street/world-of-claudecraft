@@ -1,0 +1,1928 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "smith-heart-aura-art-2026-11-19",
+    "acceptedDate": "2026-11-19",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "encounter": "The Smith's Heart raid",
+    "exactRuntimeAuras": 72,
+    "sharedRuntimeAliases": 18,
+    "runtimeIdsCovered": 90,
+    "unpainted": [
+      {
+        "auraId": "heart_endless_song",
+        "reason": "rides a pillar object, never shown on a unit frame"
+      },
+      {
+        "auraId": "stackpoison_heart_heat_guardian",
+        "reason": "already wears the mob_stack_poison painting (mob_aura_icon_art.ts)"
+      }
+    ]
+  },
+  "generationContract": {
+    "builtInImagegenCalls": 74,
+    "acceptedFirstOutputs": 70,
+    "rejectedOutputs": 2,
+    "shipping": {
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "maximumBytes": 15360,
+      "targetBytes": 6144,
+      "alpha": "opaque"
+    }
+  },
+  "assets": [
+    {
+      "auraId": "heart_hammers_weight",
+      "runtimeIds": ["heart_hammers_weight"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_hammers_weight.png",
+      "sourceBytes": 2997675,
+      "sourceSha256": "3e46d5540ea2ad47ceb304ed3f854ab8654f608147f08c18330d98dfc37d46a9",
+      "acceptedSha256": "a02c4d8eb1391680b8c4b64aa7ed3f33b04fa10a2c24ed105f2094969d96ebcd",
+      "acceptedBytes": 5926,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_wrath.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_hammers_weight."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "I'm making buff and debuff icons for my fantasy MMO. The attached image is one of our existing icons. Every icon I ask for in this chat must match its art style exactly: a gritty hand-painted dark fantasy illustration, one bold central subject seen up close, a near-black background with embers and smoke, strong rim light, a hot glow in the element's colour, high contrast so it still reads when shrunk to 40 pixels, the subject filling the square. Always square 1:1, painted edge to edge, no text or letters, no border or frame, no rounded corners, no UI. Make one image per message, straight away, with no questions. Icon 1. Name: Hammer's Weight. What it does: a tank debuff from the Guardian of the Hammer, a stone giant; its crushing blow leaves the tank taking 100% more physical damage until the other tank takes over. Paint: a colossal carved stone hammer slamming down onto a cracked steel shoulder pauldron, ochre-gold light bleeding from the cracks, the plate buckling under the weight. Palette: ochre and gold light on dark stone and steel.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_wake_mark",
+      "runtimeIds": ["heart_wake_mark"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_wake_mark.png",
+      "sourceBytes": 2839810,
+      "sourceSha256": "fad98216971c4796753dea2ef8bf02a8aaee12ac5e10dcfc1443b1ff99ffbd5a",
+      "acceptedSha256": "e331047f96de44459baca09d7940f8b06878a38fe60097c65434e31d9885d489",
+      "acceptedBytes": 5990,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_stone.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_wake_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 2, same style as the reference icon. Name: Wake the Stone. What it does: a mark from the Seam Singer, a stone giant who sings to the rock; when the mark ends, a stone pillar bursts out of the floor exactly where the player stands, throwing everyone near it back. Paint: a jagged stone pillar erupting upward out of a cracked quarry floor from a glowing ochre circle, dust and rock shards flung outward. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_falling_rock_mark",
+      "runtimeIds": ["heart_falling_rock_mark"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_falling_rock_mark.png",
+      "sourceBytes": 2704118,
+      "sourceSha256": "8048c00df132148128514852958d59a9bbce199e314ddf0dece23472f5dc830f",
+      "acceptedSha256": "9aa0f32ea0f3dedafbe7f39c25008f3c4040914f83de7e59d0cbbbb4d03f9e1d",
+      "acceptedBytes": 4838,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_stone.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_falling_rock_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 3, same style as the reference icon. Name: Falling Rock. What it does: a mark from the Seam Singer; a huge rock falls on the marked player, and its damage is shared between everyone standing under it, so allies gather in to soak it together. Paint: a huge boulder plunging from a dark sky straight down onto a glowing gold ring on the ground, motion streaks behind it. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_mountains_rush_mark",
+      "runtimeIds": ["heart_mountains_rush_mark"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_mountains_rush_mark.png",
+      "sourceBytes": 2640015,
+      "sourceSha256": "3f5e2f0569658799cd0a16582157131a59b79b078efa3c3e29da75bb10084399",
+      "acceptedSha256": "c58c1a22e46efd9134457971eeeba9a7a0d25106c342b2fdf5121d29074ba070",
+      "acceptedBytes": 5950,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_rush.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_mountains_rush_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 4, same style as the reference icon. Name: Mountain's Rush. What it does: a mark from the Guardian of the Hammer, a stone giant; it charges in a straight line through the marked player, smashing anyone in its path. Paint: a stone giant's massive shoulder charging forward along a glowing red lane, rubble and dust flying behind it. Palette: ochre and gold light on dark stone, the lane a hot red. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_resonance",
+      "runtimeIds": ["heart_resonance"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_resonance.png",
+      "sourceBytes": 2489815,
+      "sourceSha256": "6a2e70e317d22be351de9f6aac4772fdd3cb6814fec93935f0876c7191decb2a",
+      "acceptedSha256": "554455ce86d70eea8663f8c462e5c46ebcfa818e4405d3790a49d62487aed220",
+      "acceptedBytes": 5978,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_song.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_resonance."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 5, same style as the reference icon. Name: Resonance. What it does: a debuff from the Seam Singer's song; the player rings like struck crystal every second, hurting every ally near them, so they must spread out. Paint: a ringing amber crystal shard vibrating, sending concentric gold sound rings outward. Palette: ochre, amber and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quarry_collapse",
+      "runtimeIds": ["heart_quarry_collapse"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quarry_collapse.png",
+      "sourceBytes": 2644763,
+      "sourceSha256": "f9254e9eb10b013e3ded4cd2c9f7ce50d790b413df709d3c6788144fcdc084cb",
+      "acceptedSha256": "1bd5452c2a662e68c807355e11665f82b0ecca48a3c7d9f4d25ee06826df1280",
+      "acceptedBytes": 5694,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_rush.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quarry_collapse."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 6, same style as the reference icon. Name: Quarry Collapse. What it does: a stacking raid-wide debuff; the quarry's ceiling collapses, striking everyone again and again, harder each time, until the cursed pillar breaks. Paint: a cavern ceiling breaking apart, heavy stone slabs falling in layers through ochre dust. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_anchor",
+      "runtimeIds": ["heart_breath_anchor"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_anchor.png",
+      "sourceBytes": 2771924,
+      "sourceSha256": "8416cea3268a814ab946d3149e745d91cdbafef97b8c72e69d32c388ff1f8663",
+      "acceptedSha256": "f479ce8dc6fb603ae7b3e09fdb173919716203c293e841fb4021b456d8ccf30a",
+      "acceptedBytes": 5106,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_thessaly.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_anchor."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 7, same style as the reference icon. Name: Anchored in Calm. What it does: a protective buff; Captain Thessaly's circle of calm holds the player so no wind, pull, blast or throw can move them. Paint: an armoured boot planted firmly inside a still mint-green circle of calm, howling wind streaks curving around it. Palette: calm mint-green glow inside the circle, storm cyan and white wind outside, on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_calm_spent",
+      "runtimeIds": ["heart_breath_calm_spent"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_calm_spent.png",
+      "sourceBytes": 2460151,
+      "sourceSha256": "25bd53993d3f5202b48beee991bee5e560ecea4be4431a6df0e1d15fa96c422a",
+      "acceptedSha256": "08980e891dd5e757aee0b380ce9b9f9f913abcd693f1516f80d7d5f3c8d1b47c",
+      "acceptedBytes": 4574,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_thessaly.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_calm_spent."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 8, same style as the reference icon. Name: Calm Spent. What it does: a debuff; the player's anchor has run out, and Captain Thessaly's circle of calm cannot anchor them again for a while. Paint: a mint-green ward circle cracked and guttering out, wind streaks breaking through the gaps. Palette: fading mint-green and storm cyan on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_pinned",
+      "runtimeIds": ["heart_breath_pinned"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_pinned.png",
+      "sourceBytes": 2772885,
+      "sourceSha256": "00f72c469fe1a1637402a51ae5e8321f8c97f4f314f778dc25bc6374fd861757",
+      "acceptedSha256": "6a1ae96cbb2a7256a422d55b44e7025765f09aed5395a75983957e1b8b7e2ab4",
+      "acceptedBytes": 5846,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_gale.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_pinned."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 9, same style as the reference icon. Name: Pressed to the Rim. What it does: a debuff from the Guardian of the Breath; the storm wind pins the player against the cliff wall at the edge of the arena, hurting them every second. Paint: a small armoured figure pinned flat against a dark cliff wall by howling cyan-white wind. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_drawn_lightning",
+      "runtimeIds": ["heart_breath_drawn_lightning", "heart_final_drawn"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_drawn_lightning.png",
+      "sourceBytes": 2328076,
+      "sourceSha256": "0d34fda12623417a20531a82d923f2a561ff8b25c6cf4180d699f92aa3dbab67",
+      "acceptedSha256": "9a7ded12e23de41a24a094904d622e04a9648b103bd296f0bef6ff2fdd412d0d",
+      "acceptedBytes": 6104,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_storm.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_drawn_lightning."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 10, same style as the reference icon. Name: Drawn Lightning. What it does: a debuff; the player becomes a lightning conductor, strikes fall where they stand and arc to allies near them. Paint: a forked cyan lightning bolt drawn down into a raised armoured gauntlet, sparks crawling over the metal. Palette: storm cyan and white lightning on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_sky_mark",
+      "runtimeIds": ["heart_breath_sky_mark"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_sky_mark.png",
+      "sourceBytes": 2393418,
+      "sourceSha256": "8272f4278f5c771dd825d0a78f02de4ff52a5b4ef285202d281d8e1a3cc2742c",
+      "acceptedSha256": "d4548aebd3a89c99c078814951b4c249bc77147d2978f82d3f1b634c1ceb58d0",
+      "acceptedBytes": 5242,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_sky.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_sky_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 11, same style as the reference icon. Name: Sky Strike. What it does: a mark; lightning will strike the spot where the player stood in a moment, so they must step out of its circle. Paint: a dark storm cloud above a glowing cyan target circle on slate stone, a lightning bolt about to fall into it. Palette: storm cyan and white light on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_cradled",
+      "runtimeIds": ["heart_breath_cradled"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_cradled.png",
+      "sourceBytes": 2394187,
+      "sourceSha256": "48301d1612fcf1d3abb9112a9dd7ba8e7f885e08c9e67bc57fb3f26d3fa350ca",
+      "acceptedSha256": "3dff913586476ae6a424204159686430b41a9a7875efbd170484a2b3234d4da6",
+      "acceptedBytes": 5988,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_cradle.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_cradled."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 12, same style as the reference icon. Name: Thunder's Cradle. What it does: a debuff; the player is lifted into the storm and held in a cradle of lightning, then the discharge strikes them and everyone beneath them. Paint: a helpless armoured figure held aloft in a cradle of crackling cyan lightning arcs inside a swirling storm cloud. Palette: storm cyan and white lightning on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_portal_a",
+      "runtimeIds": [
+        "heart_breath_portal_a",
+        "heart_breath_portal_b",
+        "heart_breath_portal_c",
+        "heart_breath_portal_d"
+      ],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_portal_a.png",
+      "sourceBytes": 2319361,
+      "sourceSha256": "c85e2a785c8051d69b22bdd839fdb29bad08359bedfa22c3c8b195ec6d73d7b7",
+      "acceptedSha256": "97a3cb316de75d79398cff50664375c7d64bd170fde5db04ab662de5104532d0",
+      "acceptedBytes": 5174,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_heart.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_portal_a."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 13, same style as the reference icon. Name: Gale Portal. What it does: a mark; when it ends a portal of wind opens where the player stands, linked to a partner portal so allies can carry the Knotted Gale across. Paint: a swirling teal wind portal opening on slate stone, a spiral of air and light pulling inward. Palette: teal and storm cyan wind with white light on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_laden",
+      "runtimeIds": ["heart_breath_laden"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_laden.png",
+      "sourceBytes": 2436091,
+      "sourceSha256": "3cb980ea9cf85508df7684499259b753a69b494822e4911bb07e5ac767c19005",
+      "acceptedSha256": "8372f99f991753a65f6b36fb6a981cc0f79403d138d648f3cdd561098eed18f1",
+      "acceptedBytes": 6052,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_heart.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_laden."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 14, same style as the reference icon. Name: Gale-Laden. What it does: a debuff; the player carries the Knotted Gale, a knot of storm wind that must be thrown off the cliff before it bursts. Paint: two armoured gauntlets straining to hold a heavy knotted ball of swirling storm wind crackling with lightning. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_roar_thrown",
+      "runtimeIds": [
+        "heart_breath_roar_thrown",
+        "heart_breath_gale_tossed",
+        "heart_breath_blow_thrown"
+      ],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_roar_thrown.png",
+      "sourceBytes": 2378217,
+      "sourceSha256": "394e303a6deb2bc14263f677663b4e6d2fcf1bbab4bcccf2c71ce3d1125cccba",
+      "acceptedSha256": "e464bbe59ae67a0fc8f367cbbfeec61c10ad3ea2e30054e0b96760034550a70f",
+      "acceptedBytes": 6076,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_roar.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_roar_thrown."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 15, same style as the reference icon. Name: Thrown by the Wind. What it does: a debuff; a violent gust hurls the player through the air, and they cannot move until the wind sets them down. Paint: a small armoured figure tumbling helplessly through the air in a violent gust of wind, streaks of cyan-white air. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_wind_battered",
+      "runtimeIds": ["heart_breath_wind_battered"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_wind_battered.png",
+      "sourceBytes": 2446879,
+      "sourceSha256": "48ff51c848611364f24dc85cf03d3204b111216d1515d66c462f7e282eb922e2",
+      "acceptedSha256": "a78902316663f65dbe186b418a24bca965bbb9eccadddf28e31ddd79d8fb3767",
+      "acceptedBytes": 6024,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_blow.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_wind_battered."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 16, same style as the reference icon. Name: Wind-Battered. What it does: a stacking tank debuff; each Bellows Blow throws the tank further away, so the tanks swap before it throws them off the cliff. Paint: a dented, battered round steel shield being hammered by heavy blasts of wind. Palette: storm cyan and white wind on dark slate and steel; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_thunder_laden",
+      "runtimeIds": ["heart_breath_thunder_laden"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_thunder_laden.png",
+      "sourceBytes": 2349472,
+      "sourceSha256": "1a65a54f26202ea4fb8fd42d1aeb484fd00619f9d43c6b63440a036f1780d8ff",
+      "acceptedSha256": "cfcf133d0d9f5d91a4cf74474c48b727e153d30f426f02d19ca88010daf7f007",
+      "acceptedBytes": 6024,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_blow.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_thunder_laden."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 17, same style as the reference icon. Name: Thunder-Laden. What it does: a stacking tank debuff; the tank takes more magic damage and leaping lightning jumps to them, so the tanks swap. Paint: a heavy armoured chestplate charged with crackling cyan lightning, arcs leaping off its edges. Palette: storm cyan and white lightning on dark slate and steel; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_blow_mark",
+      "runtimeIds": ["heart_breath_blow_mark"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_blow_mark.png",
+      "sourceBytes": 2358666,
+      "sourceSha256": "fa12bb2b2014ae00245d07d1d20c29a1722f87d1c74f7dd442d01e44354ab030",
+      "acceptedSha256": "6a815765790b71fd2262a94182af0affd0cb58b4b5198f086823a2662712e9bd",
+      "acceptedBytes": 5838,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_blow.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_blow_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 18, same style as the reference icon. Name: Bellows Blow. What it does: a mark on the tank; the Guardian of the Breath's great blow will strike them and throw them off the cliff unless they are anchored. Paint: a great stone maw shaped like a bellows blasting a cone of wind straight toward the viewer. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_riding_gale",
+      "runtimeIds": ["heart_breath_riding_gale"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_riding_gale.png",
+      "sourceBytes": 2188016,
+      "sourceSha256": "274dcfe31b424d2120667e5a354d059e967a67d96bc4881a9fef2c7f1c627822",
+      "acceptedSha256": "0caf40133ec69579017526e1bdd942b50e824a8377d3bbaf5f2e6cc4bd0b4656",
+      "acceptedBytes": 5712,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_isles.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_riding_gale."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 19, same style as the reference icon. Name: Riding the Gale. What it does: the wind carries the player over the void on a fixed path to a floating island; they cannot act until it sets them down. Paint: a small armoured figure riding a ribbon of wind over a dark void toward a floating rock island. Palette: teal and storm cyan wind with white light on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_windworn",
+      "runtimeIds": ["heart_breath_windworn"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_windworn.png",
+      "sourceBytes": 2293680,
+      "sourceSha256": "0898ef1024e660dd160b31bb841bebe484b3a26d967375630d488648de5d84b1",
+      "acceptedSha256": "1f6c638768e5bda7d9ebcfedd9cd9061859dd463e6cebc799becdc77b1bdc975",
+      "acceptedBytes": 5334,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_isles.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_windworn."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 20, same style as the reference icon. Name: Windworn. What it does: a debuff; the player is worn out by the wind, and no Gale Path will carry them to the islands until it ends. Paint: a tattered cloak shredded and frayed by the wind, threads streaming away in grey-teal air. Palette: grey-teal and pale cyan wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "wind_drift",
+      "runtimeIds": ["wind_drift"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/wind_drift.png",
+      "sourceBytes": 2247990,
+      "sourceSha256": "90e75a14ab70cef18cf8b3438aae5957ccec829565129f2b83fce543f944ab87",
+      "acceptedSha256": "6898b40138ad940f4efaf90729bd061ca8de131ccc38f3686b6b039be7b9a922",
+      "acceptedBytes": 4938,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/wind_drift.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies wind_drift."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 21, same style as the reference icon. Name: Bellows Wind. What it does: the storm wind carries the player along the way it blows; they must walk against it to hold their ground or be carried off the cliff. Paint: sand and wind streaks sweeping hard in one direction across dark slate, grit flying. Palette: storm cyan and white wind with pale grit on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "wind_draw",
+      "runtimeIds": ["wind_draw"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/wind_draw.png",
+      "sourceBytes": 2198567,
+      "sourceSha256": "48a81d6fbfe294ed09189add51ebbc6cbef1dff55857f5666f6071a2fc8e1fa5",
+      "acceptedSha256": "d3df355f187ab04a3cfd5bdce4d49b95e63a70754479ffeae7eb6f59a6b61fe7",
+      "acceptedBytes": 5426,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/wind_drift.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies wind_draw."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 22, same style as the reference icon. Name: Indrawn Breath. What it does: the Guardian of the Breath draws breath and pulls the player toward its mouth before it roars. Paint: wind streaks spiralling inward toward a dark roaring vortex mouth, debris sucked along. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "wind_blast",
+      "runtimeIds": ["wind_blast"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/wind_blast.png",
+      "sourceBytes": 2298069,
+      "sourceSha256": "d68ae65263edb87305a8c24a113502fe53c87330f0a0dccbf033565b2993c699",
+      "acceptedSha256": "b215b998a9d08cf4a5ab28715a46fbffe9f1254ef4820cc368e90b1257f6c09c",
+      "acceptedBytes": 5862,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/wind_drift.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies wind_blast."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 23, same style as the reference icon. Name: Summit Roar. What it does: the Guardian of the Breath's roar blasts the player away from it; they must run back against it or be carried off the cliff. Paint: a ring-shaped shockwave of wind exploding outward from a roaring stone maw. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_cold",
+      "runtimeIds": ["heart_quench_cold", "heart_final_cold"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_cold.png",
+      "sourceBytes": 2931630,
+      "sourceSha256": "e1cc30a881c9af382ac1f024ea24209d327a8372a5515cddc8f97471509a109f",
+      "acceptedSha256": "3fe092e99dcf4d4053d130791cb899090d59d232c8e731ed67f5872e23c9856d",
+      "acceptedBytes": 4718,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_cold."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 24, same style as the reference icon. Name: Quenching Cold. What it does: the player's cold rises while they stand alone; when it fills they are frozen solid. Huddling with allies and healing warm them. Paint: frost creeping up the fingers of an armoured gauntlet, ice crystals forming, a deep blue cold glow. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_warmth",
+      "runtimeIds": ["heart_quench_warmth"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_warmth.png",
+      "sourceBytes": 2996942,
+      "sourceSha256": "b8dba9ba03b56b5b4d32238d14de779935af20ef529fb97f57d5a81d9e131064",
+      "acceptedSha256": "d4bf986230b96b00a4f372ab78852a5b1e8039eb2999a827f7eb07b720cce1f1",
+      "acceptedBytes": 5950,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_warmth."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 25, same style as the reference icon. Name: Huddled Warmth. What it does: a buff; huddled with the raid, the player's cold falls, but a huddle that stands still too long cracks the ice beneath it. Paint: three small warm golden flames huddled close together in a ring amid blue frost and ice. Palette: warm gold flames against deep ice blue and pale frost on near-black. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_frozen",
+      "runtimeIds": ["heart_quench_frozen", "heart_final_frozen"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_frozen.png",
+      "sourceBytes": 2510741,
+      "sourceSha256": "d0daa3594ad22dd6f5e26c69fdd6f435f9feb36c14b164f092edd3958fe7c263",
+      "acceptedSha256": "51975936b037e94ea3f45379013571d28397025c7e09a2f491c88f572c0e6975",
+      "acceptedBytes": 5936,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_frozen."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 26 again, please: the last version of it came out wrong, it showed flames. Same style as the reference icon. Name: Encased in Rime. What it does: a debuff; the player is frozen solid in rime, unable to act and taking double damage, until the ice shatters. Paint: a whole armoured warrior frozen solid inside a large faceted block of clear blue ice, frost fog and hairline cracks inside the ice. Palette: deep ice blue and pale frost white on near-black. No fire or flames at all in this one. Square, edge to edge, no text, no border.",
+      "review": "Second output accepted; the first output repeated the previous icon (warm flames on ice) instead of a figure frozen in a block of ice. The owner approved the replacement in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_brittle",
+      "runtimeIds": ["heart_quench_brittle"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_brittle.png",
+      "sourceBytes": 2402609,
+      "sourceSha256": "ee78e3c69513d0c5db81c313f02b3dffe6574458d2aff00da32d34f03d69eb19",
+      "acceptedSha256": "8df382efbc3671aa91447c7704099dc0e1c6e4f3369ed36c8bc20cdac0dd8814",
+      "acceptedBytes": 5710,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_brittle."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 27, same style as the reference icon. Name: Frost-Brittle. What it does: a debuff after a shatter; the player is brittle and takes more damage from all sources for a while. Paint: an ice-coated steel shoulder plate cracking apart into brittle shards. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_splashed",
+      "runtimeIds": ["heart_quench_splashed"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_splashed.png",
+      "sourceBytes": 2297340,
+      "sourceSha256": "dd6626ea306db52544ea4ab135b7d928315ad794b72a13ce39290cf2dbf6548a",
+      "acceptedSha256": "f289ffd1ac971337b82f527390a4d51d597793f4639ee1ecc42ee4d5c1bd94ab",
+      "acceptedBytes": 6010,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_splashed."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 28, same style as the reference icon. Name: Rime Splash. What it does: a debuff; a shattering ally's ice splashed the player, raising their cold. Paint: a burst of shattering ice shards and freezing spray flying outward from a frozen explosion. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_trapped",
+      "runtimeIds": ["heart_quench_trapped", "heart_final_under_ice"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_trapped.png",
+      "sourceBytes": 2484570,
+      "sourceSha256": "ab9d3afe94b8d033def4306f46a5b998dae0dc4d61578fbc1576ee0884b2ccc3",
+      "acceptedSha256": "8c84182a88fef138934c9853b0c71d568d4b8c7e097e6f37a820bf1cb8112196",
+      "acceptedBytes": 6114,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_ice.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_trapped."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 29, same style as the reference icon. Name: Under the Ice. What it does: a debuff; the player has fallen through the ice into freezing water and cannot move until they climb out. Paint: an armoured hand reaching up out of black freezing water through a broken hole in lake ice. Palette: deep ice blue and pale frost white on near-black water; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_slash_mark",
+      "runtimeIds": ["heart_quench_slash_mark"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_slash_mark.png",
+      "sourceBytes": 2378704,
+      "sourceSha256": "6b751758d0cbcffab61e33bcd470732a6a152434a9b9712e9935fbbb2b5b9408",
+      "acceptedSha256": "483c69c1a6418f530a7da0acd473fec693699e3a8f541ef1a35ee811259fa1ab",
+      "acceptedBytes": 5566,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_slash.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_slash_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 30, same style as the reference icon. Name: Crossing Blade. What it does: a mark; a great blade of ice will fly across the frozen lake down a line through the player. Paint: a great floating ice sword flying point-first across a frozen lake along a glowing line. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_rime",
+      "runtimeIds": ["heart_quench_rime", "heart_quench_rime_slow"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_rime.png",
+      "sourceBytes": 2364994,
+      "sourceSha256": "b291ce9a1fb426bb74be0c2a2761c565336f11a9f37ea81dc1b5bbf60bd8d5f7",
+      "acceptedSha256": "4bd713005347a4c9d877978391658dd2cf61e1717d54a4175450015c0bcfa116",
+      "acceptedBytes": 5824,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_rime.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_rime."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 31, same style as the reference icon. Name: Living Rime. What it does: a debuff; a living crust of rime absorbs the player's healing and slows them until it is healed through. Paint: a living crust of frost growing over a small golden heart of healing light, choking it. Palette: deep ice blue and pale frost white crust with a small warm golden glow beneath it, on near-black. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_tempered",
+      "runtimeIds": ["heart_quench_tempered"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_tempered.png",
+      "sourceBytes": 2495183,
+      "sourceSha256": "7c666831078f89bcf4e05b1c5b054d742e9237c02a9ca7f4e09c77e1f1760677",
+      "acceptedSha256": "541b02e91d40394b0b991523586f64103434839297bb352a4e1a54f68c3be7ce",
+      "acceptedBytes": 5854,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_temper.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_tempered."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 32, same style as the reference icon. Name: Rime-Tempered. What it does: a stacking tank debuff; the tank's cold is held high and they take more frost damage, so the tanks swap. Paint: a heavy steel tower shield sheathed in thick stacked layers of ice, frost bands building up across its face. Palette: deep ice blue and pale frost white on near-black and steel; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_heat_scorched",
+      "runtimeIds": ["heart_heat_scorched"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_scorched.png",
+      "sourceBytes": 2635522,
+      "sourceSha256": "d46e90cce7bdf1a5d3b8aece01a9f5443928543e24db51d05eda32ca02bf299c",
+      "acceptedSha256": "e0bf7c547cb879950270fed88a1e7c260f943f082053882d227274492f2ddc9e",
+      "acceptedBytes": 5496,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_flare.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_scorched."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 33, same style as the reference icon. Name: Flare-Scorched. What it does: a debuff; the Hearth Flare scorches the player, who takes more magic damage while it lasts. Paint: a scorched, smoking steel armour plate seared by a white-gold flare, glowing burn marks across it. Palette: white-gold flame on black basalt and steel, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_heat_kindling",
+      "runtimeIds": ["heart_heat_kindling"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_kindling.png",
+      "sourceBytes": 2164498,
+      "sourceSha256": "bf7cdf102ed8e8cfadea9821d2ee1d68f768bfe628198b99d8b9d3b98552e36a",
+      "acceptedSha256": "af6a96628eaf54e0c7875bae6faae75983dbe819760dfc8523e3b5df72056c04",
+      "acceptedBytes": 4062,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_wellspawn.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_kindling."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 34, same style as the reference icon. Name: Kindling Mark. What it does: a mark; soon the player trails fire, leaving burning patches behind them, so they must leave the group. Paint: a small white-gold flame kindling on a smouldering scorch mark on black basalt, sparks rising from it, the first wisps of fire about to spread. Palette: white-gold flame on black basalt, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_heat_trailing",
+      "runtimeIds": ["heart_heat_trailing"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_trailing.png",
+      "sourceBytes": 2225325,
+      "sourceSha256": "2b2d8ad991a07fdb58c4834a775ab8294283e696f4d058bc6b1eb1dab06f0539",
+      "acceptedSha256": "cb395b9229c2ab763da105bfaa7f34d3d607b02bf5deeaea101723d56bfeffc6",
+      "acceptedBytes": 4720,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_wellspawn.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_trailing."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 35, same style as the reference icon. Name: Cinder Trail. What it does: a debuff; the player leaves a trail of burning cinder patches that hurt allies and heal enemies. Paint: a trail of burning cinder footprints across dark basalt, embers glowing white-gold. Palette: white-gold flame on black basalt, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_heat_hunted",
+      "runtimeIds": ["heart_heat_hunted"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_hunted.png",
+      "sourceBytes": 2400549,
+      "sourceSha256": "6b7e7b7b7183021195e8f83f34535fefa8a9eb4e7748d1ed8e2af37d02ebd59e",
+      "acceptedSha256": "8ce46fe31c5027d39ce572fceb22142c1d642b81a8d12de52af63c289a53d881",
+      "acceptedBytes": 6088,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_cinders.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_hunted."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 36, same style as the reference icon. Name: Hunted. What it does: a debuff; a Rolling Cinder, a ball of fire, hunts the player and kills them if it reaches them. Paint: a rolling ball of white-gold molten fire bearing down on the viewer across basalt, trailing embers. Palette: white-gold flame on black basalt, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_shaken",
+      "runtimeIds": ["heart_final_shaken"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_shaken.png",
+      "sourceBytes": 2595530,
+      "sourceSha256": "29d43dc3f5883b905ffba37395243421e368792d0068edba56a0e400a228110c",
+      "acceptedSha256": "13368da5b5e9900cd281f0ebdb63ef95756fec8ffed1b5b2603d97c2af6da672",
+      "acceptedBytes": 5890,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_shaken."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 37, same style as the reference icon. Name: Vein-Shaken. What it does: a debuff from the Masterless Strength, the final boss; each time it changes quarter the shockwave hits the player three times as hard. Paint: a shockwave splitting a round stone floor along four glowing veins, one ochre-gold, one storm cyan, one ice blue, one white-gold. Palette: the four vein colours, ochre-gold, storm cyan, ice blue and white-gold, on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_numbing",
+      "runtimeIds": ["heart_final_numbing"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_numbing.png",
+      "sourceBytes": 2628968,
+      "sourceSha256": "8577845c483bc9d4b43cc1542989bd2c88d31f9a08e9cadfad82c6625d838990",
+      "acceptedSha256": "2e3199d3707656fe8bd1e7a084e5d1719756a855b392d7fcdef4353f3afc4bae",
+      "acceptedBytes": 5816,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_quench.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_numbing."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 38, same style as the reference icon. Name: Numbing Frost. What it does: a debuff; the player's movement is slowed by 75% by numbing frost. Paint: a pair of armoured boots frozen to the floor, pale ice crystals climbing up the legs. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_ember_mark",
+      "runtimeIds": ["heart_final_ember_mark"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_ember_mark.png",
+      "sourceBytes": 2144133,
+      "sourceSha256": "c77c29e8ab3d450bc8132568ebb6c1469e5d24e8b09e05f47371ded316a70903",
+      "acceptedSha256": "b7637c61cd9097e01c98f2eee98e97bc6dbfa667ca6e8c0fcbb598b0878028b3",
+      "acceptedBytes": 5644,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_heat.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_ember_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 39, same style as the reference icon. Name: Ember Mark. What it does: a mark; embers fall at the player's feet and smoulder in a burning pool. Paint: glowing embers raining down from above into a smouldering circular pool of fire on dark basalt. Palette: white-gold flame on black basalt, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_shell",
+      "runtimeIds": ["heart_final_shell"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_shell.png",
+      "sourceBytes": 2494659,
+      "sourceSha256": "1ca2e3d2316b98627a0cc509e76c1ed71f84991849dc5bd7ee8df2ea61591291",
+      "acceptedSha256": "a0aa821a82b58ab3e502e4300dc3a314dd68ec0edf4f6c7596892d4a1e883266",
+      "acceptedBytes": 5852,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_hammer.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_shell."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 40, same style as the reference icon. Name: Stone Shell. What it does: a debuff; a shell of stone encases the player and absorbs their healing. Paint: an armoured figure encased in a cracked granite shell, ochre light seeping through the cracks. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_crushed",
+      "runtimeIds": ["heart_final_crushed"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_crushed.png",
+      "sourceBytes": 2620202,
+      "sourceSha256": "f9cdb4f895e353a839e7011f8a61001370406dd91734ebedb0df736948f437ba",
+      "acceptedSha256": "ce900187dd8207fbe8512b71f840fa3c05b2350158a8f46507789ddcb69a9a94",
+      "acceptedBytes": 5880,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_hammer.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_crushed."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 41, same style as the reference icon. Name: Crushed. What it does: a debuff; the next falling anvil hits the player three times as hard, so the other group must share it. Paint: a great stone anvil plunging down from above, its crushing shadow falling over a small armoured figure. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_coal",
+      "runtimeIds": ["heart_final_coal"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_coal.png",
+      "sourceBytes": 2259485,
+      "sourceSha256": "abb1efec6da8762ccde63bd80cc9b6610c7c15ea9f92ee73bf2e5b5fe3a1eb8e",
+      "acceptedSha256": "3d3b4565e005b51496dce834a80f61f1b334e0f3baeb8ad83e1144828fc3d94c",
+      "acceptedBytes": 5932,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_adds.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_coal."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 42, same style as the reference icon. Name: Bursting Coal. What it does: a debuff; a burning coal is about to burst on the player and scorch every ally near them, so they must leave the group. Paint: a single cracked glowing coal about to burst, white-gold fire leaking from its cracks. Palette: white-gold flame on black basalt, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_tethered",
+      "runtimeIds": ["heart_final_tethered"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_tethered.png",
+      "sourceBytes": 2449298,
+      "sourceSha256": "b41faa2b1dd2eff740bca5831509f9edc41b44e724ff59df84d129ec49e83c89",
+      "acceptedSha256": "8ae7c0f2e7be93d32109914a04c410a7b6d00529b70c8c56abbcd41dbc03b2bd",
+      "acceptedBytes": 5976,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_adds.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_tethered."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 43, same style as the reference icon. Name: Wind-Tethered. What it does: a debuff; a storm beast of stone, the Splinter of the Breath, is tethered to the player and hunts them. Paint: a crackling tether of wind binding a small armoured figure to a looming storm-stone beast. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_ring_chill",
+      "runtimeIds": ["heart_final_ring_chill"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_ring_chill.png",
+      "sourceBytes": 2446720,
+      "sourceSha256": "d7bc4b07379cc9ac90bf9ffe741172f216795998fb310cb51ee7757cf4b7640f",
+      "acceptedSha256": "f782a7237fcdbda99c9278890df533b78ba95c104cfc9dfba1170eae05b0b593",
+      "acceptedBytes": 5812,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_adds.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_ring_chill."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 44, same style as the reference icon. Name: Quenching Ring. What it does: a debuff; the player crossed a ring of frost and is slowed. Paint: a glowing ring of frost on a dark stone floor, ice freezing around the armoured feet stepping across it. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_plunge",
+      "runtimeIds": ["heart_final_plunge"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_plunge.png",
+      "sourceBytes": 2204656,
+      "sourceSha256": "64b1d824e7ecfd491a30ec9889aab38a207b20ccc04319713d735dfc309fdeba",
+      "acceptedSha256": "d9c63a0e94a1eb9128cf1a70bdafeeff1bf15c47bd84ac63ea8864e196daa89f",
+      "acceptedBytes": 4614,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_plunge.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_plunge."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 45, same style as the reference icon. Name: Falling. What it does: the floor collapses under the player and they plunge into the abyss. Paint: a small armoured figure falling into a dark abyss among breaking floor stones. Palette: dark stone with faint ochre-gold light from above, deep black below. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_memory_of_stone",
+      "runtimeIds": ["heart_memory_of_stone"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_memory_of_stone.png",
+      "sourceBytes": 2932505,
+      "sourceSha256": "5c76b7fc4a4ae52c5198f12be6e423c6879cbc28a3de7f0165b5ab12bf044daf",
+      "acceptedSha256": "a096d44d16c5cc5d143fc36904a1f737999162b856c7295c9ec5adb1ec1a8183",
+      "acceptedBytes": 5362,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_memory_of_stone."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 46, same style as the reference icon. Name: Memory of Stone. What it does: a buff on a Hammer Council member, a stone giant; it deals more damage for each fallen council member. Paint: a glowing ochre stone tablet carved with the silhouette of a fallen stone guardian, no letters or runes on it. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_council_enraged",
+      "runtimeIds": ["heart_council_enraged"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_council_enraged.png",
+      "sourceBytes": 2571654,
+      "sourceSha256": "62508fac47140cddebecf6716531243f94df89db321e2e251c365e6c3089428a",
+      "acceptedSha256": "bdc3e597e2fcd13d1e1203a3beb580505f6bf1534d1e68fbc07e88139238de91",
+      "acceptedBytes": 5338,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_grief.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_council_enraged."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 47, same style as the reference icon. Name: Enraged. What it does: a buff on the surviving Hammer Council member; its fallen kin's strength healed it, and it now attacks faster and hits harder. Paint: a stone giant's face roaring in fury, its cracks blazing red-molten. Palette: dark stone with blazing red and molten orange light in the cracks. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_narrow_shelter",
+      "runtimeIds": ["heart_narrow_shelter"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_narrow_shelter.png",
+      "sourceBytes": 2418103,
+      "sourceSha256": "8181f215d9cdf22ce882db9cd672bba2123d810ae562cbe93e07bd038639f976",
+      "acceptedSha256": "29b4fc55c073f3305db53c2d5d3b7f2f014c8c7a74a17e8c40cea119810a5b96",
+      "acceptedBytes": 5034,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_wrath.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_narrow_shelter."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 48 again, please: that version came out as a collage of earlier icons. I need one single picture filling the square, not a grid or collage. Same style as the reference icon. Name: Narrow Shelter. What it does: Mountain's Wrath is coming; each stone pillar can only shelter a few players from the blast. Paint: one tall stone pillar seen up close, three small armoured figures crouched in the narrow strip of shadow behind it while a blinding gold blast floods past on both sides. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "Second output accepted; the first output was a collage of three earlier icons instead of one picture. The owner approved the replacement in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_bond_of_the_stone",
+      "runtimeIds": ["heart_bond_of_the_stone"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_bond_of_the_stone.png",
+      "sourceBytes": 2332491,
+      "sourceSha256": "bfdaf12711462fcb4fd67665b8860257b29468c89645e1c6a86a377fa61eb97e",
+      "acceptedSha256": "8e41d7466a1e8c909c66b027f87028ab0ffce5c445004099a73d432bdfb013e9",
+      "acceptedBytes": 5488,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_bond.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_bond_of_the_stone."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 49, same style as the reference icon. Name: Bond of the Stone. What it does: a buff on the two Hammer Council members; while they stand together they take far less damage, so the tanks must pull them apart. Paint: two great stone hands clasped together, bound by a braided gold tether of light. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_rush_shattered",
+      "runtimeIds": ["heart_rush_shattered", "heart_rush_exposed"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_rush_shattered.png",
+      "sourceBytes": 2544393,
+      "sourceSha256": "7939dc6b90421ff365f4be8cd6c9bfd881ba455f1d19e568041d8230b4fd1d07",
+      "acceptedSha256": "53d8519363be59480c8114fa70b464a16ba460626f45b18db71ee0de8f80dcc5",
+      "acceptedBytes": 6004,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_rush.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_rush_shattered."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 50, same style as the reference icon. Name: Shattered Charge. What it does: the Guardian of the Hammer charged into the cursed pillar and shattered it; it is stunned and takes more damage for a while. Paint: a stone giant reeling, dazed, after smashing through a crimson-magenta cursed pillar, shards flying. Palette: ochre and gold light on dark stone, the cursed shards crimson-magenta. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_council_intro",
+      "runtimeIds": [
+        "heart_council_intro",
+        "heart_breath_intro",
+        "heart_quench_intro",
+        "heart_heat_intro",
+        "mob_dormant"
+      ],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_council_intro.png",
+      "sourceBytes": 2306568,
+      "sourceSha256": "e81907ac54ff82c75e34de1b23a7c64e7d0eb857811548595ed73dda4eaf1000",
+      "acceptedSha256": "870f5ec66d5a688d290b6ddd5899dbf58e13e27af4f4fb513a186a391b26114b",
+      "acceptedBytes": 3950,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_intro.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_council_intro."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 51, same style as the reference icon. Name: Dormant. What it does: a guardian of the Smith's Heart sleeps, fused into the mountain, and cannot be harmed until it wakes. Paint: a stone giant asleep, fused into a spur of rock, a faint light glowing deep inside it. Palette: dark stone with a faint ochre-gold inner glow. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_storm_unbound",
+      "runtimeIds": ["heart_breath_storm_unbound"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_storm_unbound.png",
+      "sourceBytes": 2411069,
+      "sourceSha256": "968a5edf5cf4eb7b1841b61c81e37acfa11a83156858792f294b0074e57fbead",
+      "acceptedSha256": "fe0873badb630b1e385cd311091f0f0736aa91e32bac8fca6e337def468c010d",
+      "acceptedBytes": 6130,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_storm.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_storm_unbound."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 52, same style as the reference icon. Name: Storm Unbound. What it does: the Guardian of the Breath, a giant of storm stone, tears open into a body of living lightning. Paint: a body of living lightning tearing free from a cracked shell of storm slate. Palette: storm cyan and white lightning on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_swelling_storm",
+      "runtimeIds": ["heart_breath_swelling_storm"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_swelling_storm.png",
+      "sourceBytes": 2186013,
+      "sourceSha256": "4d150029807f9a276881d4a5cc600952317247616fffb7d68b2db2206693fe48",
+      "acceptedSha256": "7874fdee1d41c50a1497ab0b672c2f9fee41d6ee6db6ddc55a8ad2bcdc4fbd8d",
+      "acceptedBytes": 5248,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_storm.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_swelling_storm."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 53, same style as the reference icon. Name: Swelling Storm. What it does: the storm swells, striking everyone on the cliff harder with every pulse. Paint: a swelling storm cloud growing ever larger, rings of pressure and lightning bursting around it. Palette: storm cyan and white lightning on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_breath_gale_bulwark",
+      "runtimeIds": ["heart_breath_gale_bulwark", "heart_breath_bulwark_hold"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_gale_bulwark.png",
+      "sourceBytes": 2207006,
+      "sourceSha256": "9232a26faefff61df91fb52306c6388e5d349876e1bba657580fa2d3bf42e534",
+      "acceptedSha256": "5c2a21e56641bd1154e080a011fbfde7bd473ece893efae9c128350659a9f997",
+      "acceptedBytes": 5724,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_isles.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_gale_bulwark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 54, same style as the reference icon. Name: Gale Bulwark. What it does: a shield of wind absorbs damage on the Guardian of the Breath while its menders on the floating islands live. Paint: a domed vortex shield of wind and orbiting stones around a dark stone core. Palette: storm cyan and white wind on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_blades_awake",
+      "runtimeIds": ["heart_quench_blades_awake"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_blades_awake.png",
+      "sourceBytes": 2355383,
+      "sourceSha256": "3c2d5063c8d1d75c519c498e86a0eae5619f65acb0ee7c8a23077d8985224faf",
+      "acceptedSha256": "2da89379bec9778eb850f4d5272b377e4efc172ab109966da4d841a9afbdebea",
+      "acceptedBytes": 5578,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_blades.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_blades_awake."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 55, same style as the reference icon. Name: The Blades Awake. What it does: the Smith's four great ice blades are awake and fly across the frozen lake. Paint: four great ice swords rising point-up out of a frozen lake, cold blue light in each. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_quench_deepening",
+      "runtimeIds": ["heart_quench_deepening"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_deepening.png",
+      "sourceBytes": 2402025,
+      "sourceSha256": "5780afe38ba72fec003a8f4276abaa82a6c126a6699427ba07c8aab740fae71d",
+      "acceptedSha256": "1f440fed02d30758fe1a56dd275df4ee3101d506aa8885526345a90ab40dfdf1",
+      "acceptedBytes": 6026,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_deepening."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 56, same style as the reference icon. Name: Deepening Cold. What it does: the frozen lake's cold rises faster as the fight goes on. Paint: long icicles growing down over a deepening blue frost, the cold thickening in layers. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_heat_state",
+      "runtimeIds": ["heart_heat_state"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_state.png",
+      "sourceBytes": 2180814,
+      "sourceSha256": "1f91bf6856b966cb4672c247fa9ea1a89878c9e33e2053971d059a53e0b35ffa",
+      "acceptedSha256": "de42c2f84c29890454f96aa69f9e49573703fc0b2a04c69c0f9d37a12ad467f6",
+      "acceptedBytes": 5100,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_state."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 57, same style as the reference icon. Name: The First Flame. What it does: the Guardian of the Heat, a giant of the first flame, burns in its wellspring. Paint: a white-gold flame burning inside a heart of cracked black basalt. Palette: white-gold flame on black basalt, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_heat_crust",
+      "runtimeIds": ["heart_heat_crust"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_crust.png",
+      "sourceBytes": 2163905,
+      "sourceSha256": "1ec4b660d1aa6338ef1bde34ba755ac904a41f0af2a545e0e67e64fd2d59a135",
+      "acceptedSha256": "85e4542d9bf78046d5cc17de88183767cf4162ed1befe9caa61490784eda9840",
+      "acceptedBytes": 3996,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_cinders.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_crust."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 58, same style as the reference icon. Name: Cooling Crust. What it does: a Rolling Cinder, a ball of fire, has cooled hard and cannot be knocked back for a moment. Paint: a molten ball cooling into a hard dark crust, a faint glow still showing in its cracks. Palette: black basalt crust with faint white-gold and orange glow in the cracks. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_state",
+      "runtimeIds": ["heart_final_state", "heart_final_phase"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_state.png",
+      "sourceBytes": 2582888,
+      "sourceSha256": "bc6ae1f80f81532e383a1ba1a61dd2d5ed34936213b146b0c5efedf6fea82c6b",
+      "acceptedSha256": "7b9e60805bd276988f3018c3850dff719b1369398fc15e45a7d815f4a4eaabeb",
+      "acceptedBytes": 6128,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_state."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 59, same style as the reference icon, one single picture, not a collage. Name: The Masterless Strength. What it does: the final boss, a stone giant, drinks the strength of one of the four veins at a time. Paint: a four-coloured crystal heart blazing in the chest of a stone giant, its facets glowing ochre, cyan, ice blue and white-gold. Palette: the four vein colours, ochre-gold, storm cyan, ice blue and white-gold, on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_root",
+      "runtimeIds": ["heart_final_root"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_root.png",
+      "sourceBytes": 2558377,
+      "sourceSha256": "3e37499d97258949a05c987dd8fa64a732d05dd00db3f7ad066b9dace4c81bbf",
+      "acceptedSha256": "151024167d2e2d2bc53d7df5e12a756b30fca42eb448af81a9436241535819e8",
+      "acceptedBytes": 5976,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_root."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 60, same style as the reference icon, one single picture, not a collage. Name: Taking Root. What it does: the Masterless Strength takes root in a quarter of the arena and cannot be dragged out until the root ends. Paint: thick stone roots driving down from a giant's stone feet into the cracked floor. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_unbound",
+      "runtimeIds": ["heart_final_unbound"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_unbound.png",
+      "sourceBytes": 2420483,
+      "sourceSha256": "2511d5733e03295b2f76e87f4054ae4f702cd576a0ca49218d58a4da7f5d9b46",
+      "acceptedSha256": "48bd54e95091fdecb26ae709b15c181b0927500636441c340076df55cffeaf64",
+      "acceptedBytes": 5956,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_unbound."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 61, same style as the reference icon, one single picture, not a collage. Name: Heart Unbound. What it does: left in the central ring, the Masterless Strength's heart overflows and burns the whole raid more every second. Paint: a crystal heart overflowing with four-coloured light inside a central ring of stone, the light spilling out over the rim. Palette: the four vein colours, ochre-gold, storm cyan, ice blue and white-gold, on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_overload_hammer",
+      "runtimeIds": ["heart_final_overload_hammer"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_overload_hammer.png",
+      "sourceBytes": 2299341,
+      "sourceSha256": "6694887e4a56b8c499ae6f091a9757b04e7065914e47fd8d6475279ffb7af6f7",
+      "acceptedSha256": "b5fe3b83e07ab7968ff4d4ed857bd84b1f0ed4cfcc8cae89a2cd85f93990666b",
+      "acceptedBytes": 5474,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_overload_hammer."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 62, same style as the reference icon, one single picture, not a collage. Name: Overload: the Hammer. What it does: the Hammer vein's power builds inside the Masterless Strength; when the bar is full it bursts. Paint: a thick stone vein brimming with ochre-gold light, its cracks glowing white-hot, about to burst. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_overload_breath",
+      "runtimeIds": ["heart_final_overload_breath"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_overload_breath.png",
+      "sourceBytes": 2342421,
+      "sourceSha256": "65bdb6017e86b1e380c77e87165b6f38af2fd6cc6538d5eea98048f29b7fa983",
+      "acceptedSha256": "f9ca91494237cfe239d8dd5b4f89ff2f851f666ca067522308125a2f6f1039f9",
+      "acceptedBytes": 5880,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_overload_breath."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 63, same style as the reference icon, one single picture, not a collage. Name: Overload: the Breath. What it does: the Breath vein's power builds inside the Masterless Strength; when the bar is full it bursts. Paint: a thick stone vein brimming with crackling cyan storm light, lightning straining at its cracks, about to burst. Palette: storm cyan and white light on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_overload_quench",
+      "runtimeIds": ["heart_final_overload_quench"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_overload_quench.png",
+      "sourceBytes": 2521116,
+      "sourceSha256": "c7480abf0462816e83903a97ef64da200537b17ee2256b1d10425178ebbcf676",
+      "acceptedSha256": "42061d4e7a484a87070f185b6499f08d61ade12b634f1f4c75e959f3ae58f54d",
+      "acceptedBytes": 5934,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_overload_quench."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 64, same style as the reference icon, one single picture, not a collage. Name: Overload: the Quench. What it does: the Quench vein's power builds inside the Masterless Strength; when the bar is full it bursts. Paint: a thick stone vein brimming with deep blue ice light, frost crystals forcing its cracks open, about to burst. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_overload_heat",
+      "runtimeIds": ["heart_final_overload_heat"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_overload_heat.png",
+      "sourceBytes": 2412579,
+      "sourceSha256": "b83ccb347a893c132b8763a56d6405ed68a094839cc9106dfe789d001f08d01e",
+      "acceptedSha256": "134677053812aa4a26bf3580fa2920af5b075cc24d4072b1f6acebe251d10d32",
+      "acceptedBytes": 5978,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_overload_heat."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 65, same style as the reference icon, one single picture, not a collage. Name: Overload: the Heat. What it does: the Heat vein's power builds inside the Masterless Strength; when the bar is full it bursts. Paint: a thick basalt vein brimming with white-gold flame, molten light forcing its cracks open, about to burst. Palette: white-gold flame on black basalt, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_shield",
+      "runtimeIds": ["heart_final_shield", "heart_final_rising"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_shield.png",
+      "sourceBytes": 2547578,
+      "sourceSha256": "256238685d6d6f15d06d2adfc9bb3f5eafedbd0955e06fb3957bde732769c177",
+      "acceptedSha256": "aa760d5cf01890fe8b507a619af96ed0ff761d9c8b9484ba3def8ea003a21bb1",
+      "acceptedBytes": 6048,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_shield."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 66, same style as the reference icon, one single picture, not a collage. Name: Gathered Strength. What it does: the Masterless Strength shields itself in a dome of the four veins while its Splinters live. Paint: a dome of four-coloured light shielding a hunched stone giant inside it. Palette: the four vein colours, ochre-gold, storm cyan, ice blue and white-gold, on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_fury",
+      "runtimeIds": ["heart_final_fury"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_fury.png",
+      "sourceBytes": 2420078,
+      "sourceSha256": "3d3ecc5776101c8c61a9092ce5f89d5b2a57d48dd4701efe8bfeb4834951cbe9",
+      "acceptedSha256": "57f37d4e10e9e8fffaf982d3c3d7fd33e84f9c7d79cdb701a09a00415a96cc9f",
+      "acceptedBytes": 5904,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_last.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_fury."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 67, same style as the reference icon, one single picture, not a collage. Name: Masterless Fury. What it does: the Masterless Strength's last fury burns the whole raid harder with every pulse. Paint: a crowned stone giant's head roaring four-coloured fire. Palette: the four vein colours, ochre-gold, storm cyan, ice blue and white-gold, on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_hidden",
+      "runtimeIds": ["heart_final_hidden"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_hidden.png",
+      "sourceBytes": 2331935,
+      "sourceSha256": "611eed53fd8053d1e9ca8bd4b89c5ff82f003cbe1182584aba82f27215be02d4",
+      "acceptedSha256": "4970cc377930ed1c48ac08fcfc37e3af9a3c38619faf08a432bbb4581339fdaf",
+      "acceptedBytes": 5340,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_hidden.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_hidden."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 68, same style as the reference icon, one single picture, not a collage. Name: Unmade Anvil. What it does: the floor of the Anvil, the final arena, falls away quarter by quarter beneath the raid. Paint: a round stone arena floor breaking apart into four falling quarters over a dark void. Palette: dark stone with ochre-gold light at the broken edges, deep black void below. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_poured_hammer",
+      "runtimeIds": ["heart_final_poured_hammer"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_poured_hammer.png",
+      "sourceBytes": 2781759,
+      "sourceSha256": "51005e11d939f0ce93a376476a258c333158e6a9dba3c0c91777525f20774813",
+      "acceptedSha256": "901b65e780a23b586e7d0e2de76c3f20a676fc131cbe8e28918c7750cc099fdf",
+      "acceptedBytes": 4822,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_poured_hammer."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 69, same style as the reference icon, one single picture, not a collage. Name: Poured Strength: the Hammer. What it does: the Hammer's Splinter poured its strength into the Masterless Strength, the final boss. Paint: a stream of ochre-gold molten stone light pouring down into a stone giant's chest. Palette: ochre and gold light on dark stone. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_poured_breath",
+      "runtimeIds": ["heart_final_poured_breath"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_poured_breath.png",
+      "sourceBytes": 2978157,
+      "sourceSha256": "7663bc690ffbd0ba49d682430d259e0b3312b0ef788c19ec641f6d8f010d846a",
+      "acceptedSha256": "f9e69a20b12976309185fcc2a5cf60dc6465ce26a97ea07c937d73d07042408c",
+      "acceptedBytes": 5736,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_poured_breath."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 70, same style as the reference icon, one single picture, not a collage. Name: Poured Strength: the Breath. What it does: the Breath's Splinter poured its strength into the Masterless Strength, the final boss. Paint: a stream of cyan storm light and lightning pouring down into a stone giant's chest. Palette: storm cyan and white light on dark slate; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_poured_quench",
+      "runtimeIds": ["heart_final_poured_quench"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_poured_quench.png",
+      "sourceBytes": 2416531,
+      "sourceSha256": "7ee8bb38b50fdec7f211783d4dd4140efb0a4dd332056f9105ad6f5d4502e9aa",
+      "acceptedSha256": "560f16794262f494b4ba45cb23d050553397e274f78bdcb7be449d75e80880bd",
+      "acceptedBytes": 5728,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_poured_quench."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 71, same style as the reference icon, one single picture, not a collage. Name: Poured Strength: the Quench. What it does: the Quench's Splinter poured its strength into the Masterless Strength, the final boss. Paint: a stream of deep blue ice light and frost pouring down into a stone giant's chest. Palette: deep ice blue and pale frost white on near-black; no fire. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    },
+    {
+      "auraId": "heart_final_poured_heat",
+      "runtimeIds": ["heart_final_poured_heat"],
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_poured_heat.png",
+      "sourceBytes": 2519863,
+      "sourceSha256": "788dfa9745570860904e89238fb856aa9c6ecbca7bdffaddabda3824e82fcdf4",
+      "acceptedSha256": "dd408266d434a91c5a47e5788dd5d50473cdaa1c69446062c9aeb946b38236bd",
+      "acceptedBytes": 6122,
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_poured_heat."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "prompt": "Icon 72, same style as the reference icon, one single picture, not a collage. Name: Poured Strength: the Heat. What it does: the Heat's Splinter poured its strength into the Masterless Strength, the final boss. Paint: a stream of white-gold flame pouring down into a stone giant's chest. Palette: white-gold flame on black basalt, small molten orange accents. Square, edge to edge, no text, no border.",
+      "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
+    }
+  ]
+}

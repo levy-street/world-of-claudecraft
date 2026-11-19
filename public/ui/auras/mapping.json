@@ -11,7 +11,8 @@
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-elixir-aura-art.json",
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-fear-aura-art.json",
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json",
-    "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json"
+    "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json",
+    "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json"
   ],
   "externalAssets": [
     {
@@ -4103,6 +4104,2166 @@
       "acceptedBytes": 3468,
       "acceptedArtManifest": "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json",
       "sourceProvenance": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/root-special.json"
+    },
+    {
+      "auraId": "heart_hammers_weight",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_hammers_weight.png",
+      "sourceBytes": 2997675,
+      "output": "heart_hammers_weight.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A colossal carved stone hammer slamming down onto a cracked steel shoulder pauldron, ochre-gold light bleeding from the cracks, the plate buckling under the weight.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_wrath.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_hammers_weight."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "3e46d5540ea2ad47ceb304ed3f854ab8654f608147f08c18330d98dfc37d46a9",
+      "acceptedSha256": "a02c4d8eb1391680b8c4b64aa7ed3f33b04fa10a2c24ed105f2094969d96ebcd",
+      "acceptedBytes": 5926,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_wake_mark",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_wake_mark.png",
+      "sourceBytes": 2839810,
+      "output": "heart_wake_mark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A jagged stone pillar erupting upward out of a cracked quarry floor from a glowing ochre circle, dust and rock shards flung outward.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_stone.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_wake_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "fad98216971c4796753dea2ef8bf02a8aaee12ac5e10dcfc1443b1ff99ffbd5a",
+      "acceptedSha256": "e331047f96de44459baca09d7940f8b06878a38fe60097c65434e31d9885d489",
+      "acceptedBytes": 5990,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_falling_rock_mark",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_falling_rock_mark.png",
+      "sourceBytes": 2704118,
+      "output": "heart_falling_rock_mark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A huge boulder plunging from a dark sky straight down onto a glowing gold ring on the ground, motion streaks behind it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_stone.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_falling_rock_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "8048c00df132148128514852958d59a9bbce199e314ddf0dece23472f5dc830f",
+      "acceptedSha256": "9aa0f32ea0f3dedafbe7f39c25008f3c4040914f83de7e59d0cbbbb4d03f9e1d",
+      "acceptedBytes": 4838,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_mountains_rush_mark",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_mountains_rush_mark.png",
+      "sourceBytes": 2640015,
+      "output": "heart_mountains_rush_mark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A stone giant's massive shoulder charging forward along a glowing red lane, rubble and dust flying behind it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_rush.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_mountains_rush_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "3f5e2f0569658799cd0a16582157131a59b79b078efa3c3e29da75bb10084399",
+      "acceptedSha256": "c58c1a22e46efd9134457971eeeba9a7a0d25106c342b2fdf5121d29074ba070",
+      "acceptedBytes": 5950,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_resonance",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_resonance.png",
+      "sourceBytes": 2489815,
+      "output": "heart_resonance.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A ringing amber crystal shard vibrating, sending concentric gold sound rings outward.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_song.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_resonance."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "6a2e70e317d22be351de9f6aac4772fdd3cb6814fec93935f0876c7191decb2a",
+      "acceptedSha256": "554455ce86d70eea8663f8c462e5c46ebcfa818e4405d3790a49d62487aed220",
+      "acceptedBytes": 5978,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quarry_collapse",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quarry_collapse.png",
+      "sourceBytes": 2644763,
+      "output": "heart_quarry_collapse.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A cavern ceiling breaking apart, heavy stone slabs falling in layers through ochre dust.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_rush.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quarry_collapse."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "f9254e9eb10b013e3ded4cd2c9f7ce50d790b413df709d3c6788144fcdc084cb",
+      "acceptedSha256": "1bd5452c2a662e68c807355e11665f82b0ecca48a3c7d9f4d25ee06826df1280",
+      "acceptedBytes": 5694,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_anchor",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_anchor.png",
+      "sourceBytes": 2771924,
+      "output": "heart_breath_anchor.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An armoured boot planted firmly inside a still mint-green circle of calm, howling wind streaks curving around it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_thessaly.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_anchor."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "8416cea3268a814ab946d3149e745d91cdbafef97b8c72e69d32c388ff1f8663",
+      "acceptedSha256": "f479ce8dc6fb603ae7b3e09fdb173919716203c293e841fb4021b456d8ccf30a",
+      "acceptedBytes": 5106,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_calm_spent",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_calm_spent.png",
+      "sourceBytes": 2460151,
+      "output": "heart_breath_calm_spent.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A mint-green ward circle cracked and guttering out, wind streaks breaking through the gaps.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_thessaly.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_calm_spent."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "25bd53993d3f5202b48beee991bee5e560ecea4be4431a6df0e1d15fa96c422a",
+      "acceptedSha256": "08980e891dd5e757aee0b380ce9b9f9f913abcd693f1516f80d7d5f3c8d1b47c",
+      "acceptedBytes": 4574,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_pinned",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_pinned.png",
+      "sourceBytes": 2772885,
+      "output": "heart_breath_pinned.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A small armoured figure pinned flat against a dark cliff wall by howling cyan-white wind.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_gale.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_pinned."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "00f72c469fe1a1637402a51ae5e8321f8c97f4f314f778dc25bc6374fd861757",
+      "acceptedSha256": "6a1ae96cbb2a7256a422d55b44e7025765f09aed5395a75983957e1b8b7e2ab4",
+      "acceptedBytes": 5846,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_drawn_lightning",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_drawn_lightning.png",
+      "sourceBytes": 2328076,
+      "output": "heart_breath_drawn_lightning.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A forked cyan lightning bolt drawn down into a raised armoured gauntlet, sparks crawling over the metal.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_storm.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_drawn_lightning."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "0d34fda12623417a20531a82d923f2a561ff8b25c6cf4180d699f92aa3dbab67",
+      "acceptedSha256": "9a7ded12e23de41a24a094904d622e04a9648b103bd296f0bef6ff2fdd412d0d",
+      "acceptedBytes": 6104,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_sky_mark",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_sky_mark.png",
+      "sourceBytes": 2393418,
+      "output": "heart_breath_sky_mark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A dark storm cloud above a glowing cyan target circle on slate stone, a lightning bolt about to fall into it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_sky.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_sky_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "8272f4278f5c771dd825d0a78f02de4ff52a5b4ef285202d281d8e1a3cc2742c",
+      "acceptedSha256": "d4548aebd3a89c99c078814951b4c249bc77147d2978f82d3f1b634c1ceb58d0",
+      "acceptedBytes": 5242,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_cradled",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_cradled.png",
+      "sourceBytes": 2394187,
+      "output": "heart_breath_cradled.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A helpless armoured figure held aloft in a cradle of crackling cyan lightning arcs inside a swirling storm cloud.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_cradle.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_cradled."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "48301d1612fcf1d3abb9112a9dd7ba8e7f885e08c9e67bc57fb3f26d3fa350ca",
+      "acceptedSha256": "3dff913586476ae6a424204159686430b41a9a7875efbd170484a2b3234d4da6",
+      "acceptedBytes": 5988,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_portal_a",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_portal_a.png",
+      "sourceBytes": 2319361,
+      "output": "heart_breath_portal_a.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A swirling teal wind portal opening on slate stone, a spiral of air and light pulling inward.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_heart.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_portal_a."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "c85e2a785c8051d69b22bdd839fdb29bad08359bedfa22c3c8b195ec6d73d7b7",
+      "acceptedSha256": "97a3cb316de75d79398cff50664375c7d64bd170fde5db04ab662de5104532d0",
+      "acceptedBytes": 5174,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_laden",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_laden.png",
+      "sourceBytes": 2436091,
+      "output": "heart_breath_laden.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Two armoured gauntlets straining to hold a heavy knotted ball of swirling storm wind crackling with lightning.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_heart.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_laden."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "3cb980ea9cf85508df7684499259b753a69b494822e4911bb07e5ac767c19005",
+      "acceptedSha256": "8372f99f991753a65f6b36fb6a981cc0f79403d138d648f3cdd561098eed18f1",
+      "acceptedBytes": 6052,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_roar_thrown",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_roar_thrown.png",
+      "sourceBytes": 2378217,
+      "output": "heart_breath_roar_thrown.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A small armoured figure tumbling helplessly through the air in a violent gust of wind, streaks of cyan-white air.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_roar.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_roar_thrown."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "394e303a6deb2bc14263f677663b4e6d2fcf1bbab4bcccf2c71ce3d1125cccba",
+      "acceptedSha256": "e464bbe59ae67a0fc8f367cbbfeec61c10ad3ea2e30054e0b96760034550a70f",
+      "acceptedBytes": 6076,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_wind_battered",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_wind_battered.png",
+      "sourceBytes": 2446879,
+      "output": "heart_breath_wind_battered.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A dented, battered round steel shield being hammered by heavy blasts of wind.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_blow.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_wind_battered."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "48ff51c848611364f24dc85cf03d3204b111216d1515d66c462f7e282eb922e2",
+      "acceptedSha256": "a78902316663f65dbe186b418a24bca965bbb9eccadddf28e31ddd79d8fb3767",
+      "acceptedBytes": 6024,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_thunder_laden",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_thunder_laden.png",
+      "sourceBytes": 2349472,
+      "output": "heart_breath_thunder_laden.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A heavy armoured chestplate charged with crackling cyan lightning, arcs leaping off its edges.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_blow.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_thunder_laden."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "1a65a54f26202ea4fb8fd42d1aeb484fd00619f9d43c6b63440a036f1780d8ff",
+      "acceptedSha256": "cfcf133d0d9f5d91a4cf74474c48b727e153d30f426f02d19ca88010daf7f007",
+      "acceptedBytes": 6024,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_blow_mark",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_blow_mark.png",
+      "sourceBytes": 2358666,
+      "output": "heart_breath_blow_mark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A great stone maw shaped like a bellows blasting a cone of wind straight toward the viewer.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_blow.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_blow_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "fa12bb2b2014ae00245d07d1d20c29a1722f87d1c74f7dd442d01e44354ab030",
+      "acceptedSha256": "6a815765790b71fd2262a94182af0affd0cb58b4b5198f086823a2662712e9bd",
+      "acceptedBytes": 5838,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_riding_gale",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_riding_gale.png",
+      "sourceBytes": 2188016,
+      "output": "heart_breath_riding_gale.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A small armoured figure riding a ribbon of wind over a dark void toward a floating rock island.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_isles.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_riding_gale."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "274dcfe31b424d2120667e5a354d059e967a67d96bc4881a9fef2c7f1c627822",
+      "acceptedSha256": "0caf40133ec69579017526e1bdd942b50e824a8377d3bbaf5f2e6cc4bd0b4656",
+      "acceptedBytes": 5712,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_windworn",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_windworn.png",
+      "sourceBytes": 2293680,
+      "output": "heart_breath_windworn.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A tattered cloak shredded and frayed by the wind, threads streaming away in grey-teal air.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_isles.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_windworn."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "0898ef1024e660dd160b31bb841bebe484b3a26d967375630d488648de5d84b1",
+      "acceptedSha256": "1f6c638768e5bda7d9ebcfedd9cd9061859dd463e6cebc799becdc77b1bdc975",
+      "acceptedBytes": 5334,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "wind_drift",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/wind_drift.png",
+      "sourceBytes": 2247990,
+      "output": "wind_drift.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Sand and wind streaks sweeping hard in one direction across dark slate, grit flying.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/wind_drift.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies wind_drift."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "90e75a14ab70cef18cf8b3438aae5957ccec829565129f2b83fce543f944ab87",
+      "acceptedSha256": "6898b40138ad940f4efaf90729bd061ca8de131ccc38f3686b6b039be7b9a922",
+      "acceptedBytes": 4938,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "wind_draw",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/wind_draw.png",
+      "sourceBytes": 2198567,
+      "output": "wind_draw.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Wind streaks spiralling inward toward a dark roaring vortex mouth, debris sucked along.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/wind_drift.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies wind_draw."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "48a81d6fbfe294ed09189add51ebbc6cbef1dff55857f5666f6071a2fc8e1fa5",
+      "acceptedSha256": "d3df355f187ab04a3cfd5bdce4d49b95e63a70754479ffeae7eb6f59a6b61fe7",
+      "acceptedBytes": 5426,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "wind_blast",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/wind_blast.png",
+      "sourceBytes": 2298069,
+      "output": "wind_blast.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A ring-shaped shockwave of wind exploding outward from a roaring stone maw.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/wind_drift.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies wind_blast."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "d68ae65263edb87305a8c24a113502fe53c87330f0a0dccbf033565b2993c699",
+      "acceptedSha256": "b215b998a9d08cf4a5ab28715a46fbffe9f1254ef4820cc368e90b1257f6c09c",
+      "acceptedBytes": 5862,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_cold",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_cold.png",
+      "sourceBytes": 2931630,
+      "output": "heart_quench_cold.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Frost creeping up the fingers of an armoured gauntlet, ice crystals forming, a deep blue cold glow.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_cold."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "e1cc30a881c9af382ac1f024ea24209d327a8372a5515cddc8f97471509a109f",
+      "acceptedSha256": "3fe092e99dcf4d4053d130791cb899090d59d232c8e731ed67f5872e23c9856d",
+      "acceptedBytes": 4718,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_warmth",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_warmth.png",
+      "sourceBytes": 2996942,
+      "output": "heart_quench_warmth.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Three small warm golden flames huddled close together in a ring amid blue frost and ice.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_warmth."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "b8dba9ba03b56b5b4d32238d14de779935af20ef529fb97f57d5a81d9e131064",
+      "acceptedSha256": "d4bf986230b96b00a4f372ab78852a5b1e8039eb2999a827f7eb07b720cce1f1",
+      "acceptedBytes": 5950,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_frozen",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_frozen.png",
+      "sourceBytes": 2510741,
+      "output": "heart_quench_frozen.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A whole armoured warrior frozen solid inside a large faceted block of clear blue ice, frost fog and hairline cracks inside the ice.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_frozen."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "d0daa3594ad22dd6f5e26c69fdd6f435f9feb36c14b164f092edd3958fe7c263",
+      "acceptedSha256": "51975936b037e94ea3f45379013571d28397025c7e09a2f491c88f572c0e6975",
+      "acceptedBytes": 5936,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_brittle",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_brittle.png",
+      "sourceBytes": 2402609,
+      "output": "heart_quench_brittle.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An ice-coated steel shoulder plate cracking apart into brittle shards.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_brittle."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "ee78e3c69513d0c5db81c313f02b3dffe6574458d2aff00da32d34f03d69eb19",
+      "acceptedSha256": "8df382efbc3671aa91447c7704099dc0e1c6e4f3369ed36c8bc20cdac0dd8814",
+      "acceptedBytes": 5710,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_splashed",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_splashed.png",
+      "sourceBytes": 2297340,
+      "output": "heart_quench_splashed.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A burst of shattering ice shards and freezing spray flying outward from a frozen explosion.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_splashed."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "dd6626ea306db52544ea4ab135b7d928315ad794b72a13ce39290cf2dbf6548a",
+      "acceptedSha256": "f289ffd1ac971337b82f527390a4d51d597793f4639ee1ecc42ee4d5c1bd94ab",
+      "acceptedBytes": 6010,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_trapped",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_trapped.png",
+      "sourceBytes": 2484570,
+      "output": "heart_quench_trapped.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An armoured hand reaching up out of black freezing water through a broken hole in lake ice.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_ice.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_trapped."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "ab9d3afe94b8d033def4306f46a5b998dae0dc4d61578fbc1576ee0884b2ccc3",
+      "acceptedSha256": "8c84182a88fef138934c9853b0c71d568d4b8c7e097e6f37a820bf1cb8112196",
+      "acceptedBytes": 6114,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_slash_mark",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_slash_mark.png",
+      "sourceBytes": 2378704,
+      "output": "heart_quench_slash_mark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A great floating ice sword flying point-first across a frozen lake along a glowing line.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_slash.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_slash_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "6b751758d0cbcffab61e33bcd470732a6a152434a9b9712e9935fbbb2b5b9408",
+      "acceptedSha256": "483c69c1a6418f530a7da0acd473fec693699e3a8f541ef1a35ee811259fa1ab",
+      "acceptedBytes": 5566,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_rime",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_rime.png",
+      "sourceBytes": 2364994,
+      "output": "heart_quench_rime.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A living crust of frost growing over a small golden heart of healing light, choking it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_rime.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_rime."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "b291ce9a1fb426bb74be0c2a2761c565336f11a9f37ea81dc1b5bbf60bd8d5f7",
+      "acceptedSha256": "4bd713005347a4c9d877978391658dd2cf61e1717d54a4175450015c0bcfa116",
+      "acceptedBytes": 5824,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_tempered",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_tempered.png",
+      "sourceBytes": 2495183,
+      "output": "heart_quench_tempered.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A heavy steel tower shield sheathed in thick stacked layers of ice, frost bands building up across its face.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_temper.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_tempered."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "7c666831078f89bcf4e05b1c5b054d742e9237c02a9ca7f4e09c77e1f1760677",
+      "acceptedSha256": "541b02e91d40394b0b991523586f64103434839297bb352a4e1a54f68c3be7ce",
+      "acceptedBytes": 5854,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_heat_scorched",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_scorched.png",
+      "sourceBytes": 2635522,
+      "output": "heart_heat_scorched.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A scorched, smoking steel armour plate seared by a white-gold flare, glowing burn marks across it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_flare.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_scorched."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "d46e90cce7bdf1a5d3b8aece01a9f5443928543e24db51d05eda32ca02bf299c",
+      "acceptedSha256": "e0bf7c547cb879950270fed88a1e7c260f943f082053882d227274492f2ddc9e",
+      "acceptedBytes": 5496,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_heat_kindling",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_kindling.png",
+      "sourceBytes": 2164498,
+      "output": "heart_heat_kindling.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A small white-gold flame kindling on a smouldering scorch mark on black basalt, sparks rising from it, the first wisps of fire about to spread.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_wellspawn.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_kindling."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "bf7cdf102ed8e8cfadea9821d2ee1d68f768bfe628198b99d8b9d3b98552e36a",
+      "acceptedSha256": "af6a96628eaf54e0c7875bae6faae75983dbe819760dfc8523e3b5df72056c04",
+      "acceptedBytes": 4062,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_heat_trailing",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_trailing.png",
+      "sourceBytes": 2225325,
+      "output": "heart_heat_trailing.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A trail of burning cinder footprints across dark basalt, embers glowing white-gold.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_wellspawn.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_trailing."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "2b2d8ad991a07fdb58c4834a775ab8294283e696f4d058bc6b1eb1dab06f0539",
+      "acceptedSha256": "cb395b9229c2ab763da105bfaa7f34d3d607b02bf5deeaea101723d56bfeffc6",
+      "acceptedBytes": 4720,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_heat_hunted",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_hunted.png",
+      "sourceBytes": 2400549,
+      "output": "heart_heat_hunted.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A rolling ball of white-gold molten fire bearing down on the viewer across basalt, trailing embers.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_cinders.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_hunted."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "6b7e7b7b7183021195e8f83f34535fefa8a9eb4e7748d1ed8e2af37d02ebd59e",
+      "acceptedSha256": "8ce46fe31c5027d39ce572fceb22142c1d642b81a8d12de52af63c289a53d881",
+      "acceptedBytes": 6088,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_shaken",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_shaken.png",
+      "sourceBytes": 2595530,
+      "output": "heart_final_shaken.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A shockwave splitting a round stone floor along four glowing veins, one ochre-gold, one storm cyan, one ice blue, one white-gold.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_shaken."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "29d43dc3f5883b905ffba37395243421e368792d0068edba56a0e400a228110c",
+      "acceptedSha256": "13368da5b5e9900cd281f0ebdb63ef95756fec8ffed1b5b2603d97c2af6da672",
+      "acceptedBytes": 5890,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_numbing",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_numbing.png",
+      "sourceBytes": 2628968,
+      "output": "heart_final_numbing.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A pair of armoured boots frozen to the floor, pale ice crystals climbing up the legs.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_quench.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_numbing."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "8577845c483bc9d4b43cc1542989bd2c88d31f9a08e9cadfad82c6625d838990",
+      "acceptedSha256": "2e3199d3707656fe8bd1e7a084e5d1719756a855b392d7fcdef4353f3afc4bae",
+      "acceptedBytes": 5816,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_ember_mark",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_ember_mark.png",
+      "sourceBytes": 2144133,
+      "output": "heart_final_ember_mark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Glowing embers raining down from above into a smouldering circular pool of fire on dark basalt.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_heat.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_ember_mark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "c77c29e8ab3d450bc8132568ebb6c1469e5d24e8b09e05f47371ded316a70903",
+      "acceptedSha256": "b7637c61cd9097e01c98f2eee98e97bc6dbfa667ca6e8c0fcbb598b0878028b3",
+      "acceptedBytes": 5644,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_shell",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_shell.png",
+      "sourceBytes": 2494659,
+      "output": "heart_final_shell.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An armoured figure encased in a cracked granite shell, ochre light seeping through the cracks.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_hammer.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_shell."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "1ca2e3d2316b98627a0cc509e76c1ed71f84991849dc5bd7ee8df2ea61591291",
+      "acceptedSha256": "a0aa821a82b58ab3e502e4300dc3a314dd68ec0edf4f6c7596892d4a1e883266",
+      "acceptedBytes": 5852,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_crushed",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_crushed.png",
+      "sourceBytes": 2620202,
+      "output": "heart_final_crushed.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A great stone anvil plunging down from above, its crushing shadow falling over a small armoured figure.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_hammer.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_crushed."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "f9cdb4f895e353a839e7011f8a61001370406dd91734ebedb0df736948f437ba",
+      "acceptedSha256": "ce900187dd8207fbe8512b71f840fa3c05b2350158a8f46507789ddcb69a9a94",
+      "acceptedBytes": 5880,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_coal",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_coal.png",
+      "sourceBytes": 2259485,
+      "output": "heart_final_coal.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A single cracked glowing coal about to burst, white-gold fire leaking from its cracks.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_adds.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_coal."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "abb1efec6da8762ccde63bd80cc9b6610c7c15ea9f92ee73bf2e5b5fe3a1eb8e",
+      "acceptedSha256": "3d3b4565e005b51496dce834a80f61f1b334e0f3baeb8ad83e1144828fc3d94c",
+      "acceptedBytes": 5932,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_tethered",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_tethered.png",
+      "sourceBytes": 2449298,
+      "output": "heart_final_tethered.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A crackling tether of wind binding a small armoured figure to a looming storm-stone beast.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_adds.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_tethered."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "b41faa2b1dd2eff740bca5831509f9edc41b44e724ff59df84d129ec49e83c89",
+      "acceptedSha256": "8ae7c0f2e7be93d32109914a04c410a7b6d00529b70c8c56abbcd41dbc03b2bd",
+      "acceptedBytes": 5976,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_ring_chill",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_ring_chill.png",
+      "sourceBytes": 2446720,
+      "output": "heart_final_ring_chill.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A glowing ring of frost on a dark stone floor, ice freezing around the armoured feet stepping across it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_adds.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_ring_chill."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "d7bc4b07379cc9ac90bf9ffe741172f216795998fb310cb51ee7757cf4b7640f",
+      "acceptedSha256": "f782a7237fcdbda99c9278890df533b78ba95c104cfc9dfba1170eae05b0b593",
+      "acceptedBytes": 5812,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_plunge",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_plunge.png",
+      "sourceBytes": 2204656,
+      "output": "heart_final_plunge.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A small armoured figure falling into a dark abyss among breaking floor stones.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_plunge.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_plunge."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "64b1d824e7ecfd491a30ec9889aab38a207b20ccc04319713d735dfc309fdeba",
+      "acceptedSha256": "d9c63a0e94a1eb9128cf1a70bdafeeff1bf15c47bd84ac63ea8864e196daa89f",
+      "acceptedBytes": 4614,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_memory_of_stone",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_memory_of_stone.png",
+      "sourceBytes": 2932505,
+      "output": "heart_memory_of_stone.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A glowing ochre stone tablet carved with the silhouette of a fallen stone guardian, no letters or runes on it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_memory_of_stone."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "5c76b7fc4a4ae52c5198f12be6e423c6879cbc28a3de7f0165b5ab12bf044daf",
+      "acceptedSha256": "a096d44d16c5cc5d143fc36904a1f737999162b856c7295c9ec5adb1ec1a8183",
+      "acceptedBytes": 5362,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_council_enraged",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_council_enraged.png",
+      "sourceBytes": 2571654,
+      "output": "heart_council_enraged.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A stone giant's face roaring in fury, its cracks blazing red-molten.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_grief.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_council_enraged."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "62508fac47140cddebecf6716531243f94df89db321e2e251c365e6c3089428a",
+      "acceptedSha256": "bdc3e597e2fcd13d1e1203a3beb580505f6bf1534d1e68fbc07e88139238de91",
+      "acceptedBytes": 5338,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_narrow_shelter",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_narrow_shelter.png",
+      "sourceBytes": 2418103,
+      "output": "heart_narrow_shelter.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "One tall stone pillar seen up close, three small armoured figures crouched in the narrow strip of shadow behind it while a blinding gold blast floods past on both sides.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_wrath.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_narrow_shelter."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "8181f215d9cdf22ce882db9cd672bba2123d810ae562cbe93e07bd038639f976",
+      "acceptedSha256": "29b4fc55c073f3305db53c2d5d3b7f2f014c8c7a74a17e8c40cea119810a5b96",
+      "acceptedBytes": 5034,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_bond_of_the_stone",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_bond_of_the_stone.png",
+      "sourceBytes": 2332491,
+      "output": "heart_bond_of_the_stone.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Two great stone hands clasped together, bound by a braided gold tether of light.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_bond.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_bond_of_the_stone."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "bfdaf12711462fcb4fd67665b8860257b29468c89645e1c6a86a377fa61eb97e",
+      "acceptedSha256": "8e41d7466a1e8c909c66b027f87028ab0ffce5c445004099a73d432bdfb013e9",
+      "acceptedBytes": 5488,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_rush_shattered",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_rush_shattered.png",
+      "sourceBytes": 2544393,
+      "output": "heart_rush_shattered.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A stone giant reeling, dazed, after smashing through a crimson-magenta cursed pillar, shards flying.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_rush.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_rush_shattered."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "7939dc6b90421ff365f4be8cd6c9bfd881ba455f1d19e568041d8230b4fd1d07",
+      "acceptedSha256": "53d8519363be59480c8114fa70b464a16ba460626f45b18db71ee0de8f80dcc5",
+      "acceptedBytes": 6004,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_council_intro",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_council_intro.png",
+      "sourceBytes": 2306568,
+      "output": "heart_council_intro.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A stone giant asleep, fused into a spur of rock, a faint light glowing deep inside it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/council_intro.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_council_intro."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "e81907ac54ff82c75e34de1b23a7c64e7d0eb857811548595ed73dda4eaf1000",
+      "acceptedSha256": "870f5ec66d5a688d290b6ddd5899dbf58e13e27af4f4fb513a186a391b26114b",
+      "acceptedBytes": 3950,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_storm_unbound",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_storm_unbound.png",
+      "sourceBytes": 2411069,
+      "output": "heart_breath_storm_unbound.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A body of living lightning tearing free from a cracked shell of storm slate.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_storm.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_storm_unbound."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "968a5edf5cf4eb7b1841b61c81e37acfa11a83156858792f294b0074e57fbead",
+      "acceptedSha256": "fe0873badb630b1e385cd311091f0f0736aa91e32bac8fca6e337def468c010d",
+      "acceptedBytes": 6130,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_swelling_storm",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_swelling_storm.png",
+      "sourceBytes": 2186013,
+      "output": "heart_breath_swelling_storm.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A swelling storm cloud growing ever larger, rings of pressure and lightning bursting around it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_storm.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_swelling_storm."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "4d150029807f9a276881d4a5cc600952317247616fffb7d68b2db2206693fe48",
+      "acceptedSha256": "7874fdee1d41c50a1497ab0b672c2f9fee41d6ee6db6ddc55a8ad2bcdc4fbd8d",
+      "acceptedBytes": 5248,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_breath_gale_bulwark",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_breath_gale_bulwark.png",
+      "sourceBytes": 2207006,
+      "output": "heart_breath_gale_bulwark.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A domed vortex shield of wind and orbiting stones around a dark stone core.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/breath_isles.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_breath_gale_bulwark."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "9232a26faefff61df91fb52306c6388e5d349876e1bba657580fa2d3bf42e534",
+      "acceptedSha256": "5c2a21e56641bd1154e080a011fbfde7bd473ece893efae9c128350659a9f997",
+      "acceptedBytes": 5724,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_blades_awake",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_blades_awake.png",
+      "sourceBytes": 2355383,
+      "output": "heart_quench_blades_awake.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Four great ice swords rising point-up out of a frozen lake, cold blue light in each.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_blades.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_blades_awake."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "3c2d5063c8d1d75c519c498e86a0eae5619f65acb0ee7c8a23077d8985224faf",
+      "acceptedSha256": "2da89379bec9778eb850f4d5272b377e4efc172ab109966da4d841a9afbdebea",
+      "acceptedBytes": 5578,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_quench_deepening",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_quench_deepening.png",
+      "sourceBytes": 2402025,
+      "output": "heart_quench_deepening.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Long icicles growing down over a deepening blue frost, the cold thickening in layers.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/quench_cold.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_quench_deepening."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "5780afe38ba72fec003a8f4276abaa82a6c126a6699427ba07c8aab740fae71d",
+      "acceptedSha256": "1f440fed02d30758fe1a56dd275df4ee3101d506aa8885526345a90ab40dfdf1",
+      "acceptedBytes": 6026,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_heat_state",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_state.png",
+      "sourceBytes": 2180814,
+      "output": "heart_heat_state.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A white-gold flame burning inside a heart of cracked black basalt.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_state."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "1f91bf6856b966cb4672c247fa9ea1a89878c9e33e2053971d059a53e0b35ffa",
+      "acceptedSha256": "de42c2f84c29890454f96aa69f9e49573703fc0b2a04c69c0f9d37a12ad467f6",
+      "acceptedBytes": 5100,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_heat_crust",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_heat_crust.png",
+      "sourceBytes": 2163905,
+      "output": "heart_heat_crust.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A molten ball cooling into a hard dark crust, a faint glow still showing in its cracks.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/heat_cinders.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_heat_crust."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "1ec4b660d1aa6338ef1bde34ba755ac904a41f0af2a545e0e67e64fd2d59a135",
+      "acceptedSha256": "85e4542d9bf78046d5cc17de88183767cf4162ed1befe9caa61490784eda9840",
+      "acceptedBytes": 3996,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_state",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_state.png",
+      "sourceBytes": 2582888,
+      "output": "heart_final_state.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A four-coloured crystal heart blazing in the chest of a stone giant, its facets glowing ochre, cyan, ice blue and white-gold.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_state."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "bc6ae1f80f81532e383a1ba1a61dd2d5ed34936213b146b0c5efedf6fea82c6b",
+      "acceptedSha256": "7b9e60805bd276988f3018c3850dff719b1369398fc15e45a7d815f4a4eaabeb",
+      "acceptedBytes": 6128,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_root",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_root.png",
+      "sourceBytes": 2558377,
+      "output": "heart_final_root.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Thick stone roots driving down from a giant's stone feet into the cracked floor.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_root."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "3e37499d97258949a05c987dd8fa64a732d05dd00db3f7ad066b9dace4c81bbf",
+      "acceptedSha256": "151024167d2e2d2bc53d7df5e12a756b30fca42eb448af81a9436241535819e8",
+      "acceptedBytes": 5976,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_unbound",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_unbound.png",
+      "sourceBytes": 2420483,
+      "output": "heart_final_unbound.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A crystal heart overflowing with four-coloured light inside a central ring of stone, the light spilling out over the rim.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_unbound."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "2511d5733e03295b2f76e87f4054ae4f702cd576a0ca49218d58a4da7f5d9b46",
+      "acceptedSha256": "48bd54e95091fdecb26ae709b15c181b0927500636441c340076df55cffeaf64",
+      "acceptedBytes": 5956,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_overload_hammer",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_overload_hammer.png",
+      "sourceBytes": 2299341,
+      "output": "heart_final_overload_hammer.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A thick stone vein brimming with ochre-gold light, its cracks glowing white-hot, about to burst.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_overload_hammer."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "6694887e4a56b8c499ae6f091a9757b04e7065914e47fd8d6475279ffb7af6f7",
+      "acceptedSha256": "b5fe3b83e07ab7968ff4d4ed857bd84b1f0ed4cfcc8cae89a2cd85f93990666b",
+      "acceptedBytes": 5474,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_overload_breath",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_overload_breath.png",
+      "sourceBytes": 2342421,
+      "output": "heart_final_overload_breath.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A thick stone vein brimming with crackling cyan storm light, lightning straining at its cracks, about to burst.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_overload_breath."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "65bdb6017e86b1e380c77e87165b6f38af2fd6cc6538d5eea98048f29b7fa983",
+      "acceptedSha256": "f9ca91494237cfe239d8dd5b4f89ff2f851f666ca067522308125a2f6f1039f9",
+      "acceptedBytes": 5880,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_overload_quench",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_overload_quench.png",
+      "sourceBytes": 2521116,
+      "output": "heart_final_overload_quench.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A thick stone vein brimming with deep blue ice light, frost crystals forcing its cracks open, about to burst.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_overload_quench."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "c7480abf0462816e83903a97ef64da200537b17ee2256b1d10425178ebbcf676",
+      "acceptedSha256": "42061d4e7a484a87070f185b6499f08d61ade12b634f1f4c75e959f3ae58f54d",
+      "acceptedBytes": 5934,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_overload_heat",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_overload_heat.png",
+      "sourceBytes": 2412579,
+      "output": "heart_final_overload_heat.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A thick basalt vein brimming with white-gold flame, molten light forcing its cracks open, about to burst.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_rules.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_overload_heat."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "b83ccb347a893c132b8763a56d6405ed68a094839cc9106dfe789d001f08d01e",
+      "acceptedSha256": "134677053812aa4a26bf3580fa2920af5b075cc24d4072b1f6acebe251d10d32",
+      "acceptedBytes": 5978,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_shield",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_shield.png",
+      "sourceBytes": 2547578,
+      "output": "heart_final_shield.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A dome of four-coloured light shielding a hunched stone giant inside it.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_shield."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "256238685d6d6f15d06d2adfc9bb3f5eafedbd0955e06fb3957bde732769c177",
+      "acceptedSha256": "aa760d5cf01890fe8b507a619af96ed0ff761d9c8b9484ba3def8ea003a21bb1",
+      "acceptedBytes": 6048,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_fury",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_fury.png",
+      "sourceBytes": 2420078,
+      "output": "heart_final_fury.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A crowned stone giant's head roaring four-coloured fire.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_last.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_fury."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "3d3ecc5776101c8c61a9092ce5f89d5b2a57d48dd4701efe8bfeb4834951cbe9",
+      "acceptedSha256": "57f37d4e10e9e8fffaf982d3c3d7fd33e84f9c7d79cdb701a09a00415a96cc9f",
+      "acceptedBytes": 5904,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_hidden",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_hidden.png",
+      "sourceBytes": 2331935,
+      "output": "heart_final_hidden.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A round stone arena floor breaking apart into four falling quarters over a dark void.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_hidden.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_hidden."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "611eed53fd8053d1e9ca8bd4b89c5ff82f003cbe1182584aba82f27215be02d4",
+      "acceptedSha256": "4970cc377930ed1c48ac08fcfc37e3af9a3c38619faf08a432bbb4581339fdaf",
+      "acceptedBytes": 5340,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_poured_hammer",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_poured_hammer.png",
+      "sourceBytes": 2781759,
+      "output": "heart_final_poured_hammer.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A stream of ochre-gold molten stone light pouring down into a stone giant's chest.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_poured_hammer."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "51005e11d939f0ce93a376476a258c333158e6a9dba3c0c91777525f20774813",
+      "acceptedSha256": "901b65e780a23b586e7d0e2de76c3f20a676fc131cbe8e28918c7750cc099fdf",
+      "acceptedBytes": 4822,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_poured_breath",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_poured_breath.png",
+      "sourceBytes": 2978157,
+      "output": "heart_final_poured_breath.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A stream of cyan storm light and lightning pouring down into a stone giant's chest.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_poured_breath."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "7663bc690ffbd0ba49d682430d259e0b3312b0ef788c19ec641f6d8f010d846a",
+      "acceptedSha256": "f9e69a20b12976309185fcc2a5cf60dc6465ce26a97ea07c937d73d07042408c",
+      "acceptedBytes": 5736,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_poured_quench",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_poured_quench.png",
+      "sourceBytes": 2416531,
+      "output": "heart_final_poured_quench.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A stream of deep blue ice light and frost pouring down into a stone giant's chest.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_poured_quench."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "7ee8bb38b50fdec7f211783d4dd4140efb0a4dd332056f9105ad6f5d4502e9aa",
+      "acceptedSha256": "560f16794262f494b4ba45cb23d050553397e274f78bdcb7be449d75e80880bd",
+      "acceptedBytes": 5728,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
+    },
+    {
+      "auraId": "heart_final_poured_heat",
+      "sourcePack": "smith-heart-aura-art-2026-11-19",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_poured_heat.png",
+      "sourceBytes": 2519863,
+      "output": "heart_final_poured_heat.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A stream of white-gold flame pouring down into a stone giant's chest.",
+      "references": [
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "House aura style reference attached to the generation chat: one painted subject seen up close on a near-black ground, a strong rim light and the element glow."
+        },
+        {
+          "path": "src/sim/encounters/smith_heart/final_intermission.ts",
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_poured_heat."
+        },
+        {
+          "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",
+          "role": "The art brief: the census row naming the aura, what it does and the painting subject."
+        }
+      ],
+      "sourceSha256": "788dfa9745570860904e89238fb856aa9c6ecbca7bdffaddabda3824e82fcdf4",
+      "acceptedSha256": "dd408266d434a91c5a47e5788dd5d50473cdaa1c69446062c9aeb946b38236bd",
+      "acceptedBytes": 6122,
+      "acceptedArtManifest": "docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
     }
   ]
 }
