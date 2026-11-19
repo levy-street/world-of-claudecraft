@@ -35,6 +35,66 @@ import type { CouncilFxHost } from './council_pillars_fx';
 
 /** The stone shards torn loose round the survivor (the low tier draws fewer). */
 const SHARDS = 12;
+/** The Singer's storm on the Guardian: lightning arcs crawling over his body,
+ *  each a jagged run of segments, drawn as two crossed ribbons (so it reads
+ *  from every side), re-struck many times a second. */
+const ARCS = 14;
+const ARC_SEGS = 9;
+/** Seconds an arc holds its shape before it re-strikes (the flicker). */
+const ARC_HOLD = 0.11;
+
+/** An arc ribbon: its across-coordinate (-1 to 1), its place along the arc
+ *  (0 to 1) and its own flicker. A white-hot core in a steel-blue halo. */
+const ARC_VERT = /* glsl */ `
+attribute float aSide;
+attribute float aT;
+attribute float aLive;
+varying float vSide;
+varying float vT;
+varying float vLive;
+void main() {
+  vSide = aSide;
+  vT = aT;
+  vLive = aLive;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+const ARC_FRAG = /* glsl */ `
+uniform vec3 uColor;
+uniform vec3 uHot;
+uniform float uGlow;
+varying float vSide;
+varying float vT;
+varying float vLive;
+void main() {
+  float across = abs(vSide);
+  float core = 1.0 - smoothstep(0.0, 0.32, across);
+  float halo = pow(1.0 - across, 2.0);
+  float ends = smoothstep(0.0, 0.12, vT) * (1.0 - smoothstep(0.85, 1.0, vT));
+  float a = (core + halo * 0.55) * ends * vLive;
+  vec3 col = mix(uColor, uHot, core);
+  gl_FragColor = vec4(col * uGlow, clamp(a, 0.0, 1.0));
+  #include <colorspace_fragment>
+}
+`;
+
+/** The scorch under the fury: a dark burn in the floor (normal blending, so
+ *  the light of the sigil over it reads against the warm quarry stone). */
+const SCORCH_FRAG = /* glsl */ `
+uniform float uAlpha;
+varying vec2 vP;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+void main() {
+  float r = length(vP);
+  if (r > 1.0) discard;
+  float ang = atan(vP.y, vP.x);
+  float ragged = 0.82 + 0.12 * sin(ang * 7.0) + 0.06 * sin(ang * 17.0 + 1.3);
+  float burn = 1.0 - smoothstep(ragged * 0.55, ragged, r);
+  float grain = 0.85 + 0.15 * hash(floor(vP * 40.0));
+  gl_FragColor = vec4(vec3(0.03, 0.035, 0.06), burn * uAlpha * grain);
+  #include <colorspace_fragment>
+}
+`;
 
 /** The column: ragged tongues of light climbing an open cylinder (uv.y up),
  *  hottest at its foot, a heartbeat throbbing up it. */
@@ -108,7 +168,9 @@ uniform float uGlow;
 uniform float uBeat;
 uniform vec3 uColor;
 uniform vec3 uHot;
+uniform float uCrack;
 varying vec2 vP;
+float hash1(vec2 p) { return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5453); }
 vec2 hash2(vec2 p) {
   p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
   return fract(sin(p) * 43758.5453);
@@ -135,8 +197,24 @@ void main() {
   float ring = 1.0 - smoothstep(0.0, 0.04, abs(r - 0.95));
   float inner = 1.0 - smoothstep(0.0, 0.03, abs(r - 0.42 - 0.04 * uBeat));
   float fade = 1.0 - smoothstep(0.75, 1.0, r);
-  float v = seam * (0.55 + 0.45 * wave) * fade + ring * 0.9 + inner * 0.55
+  // The storm's floor (uCrack): no tiled seams and no rings, but cracks
+  // burning out of the burn from under the body, forking as they run, each
+  // dying out at its own length; the seams only where a crack passes.
+  float ang = atan(vP.y, vP.x);
+  float k = ang * 9.0 / 6.2832;
+  float lane = floor(k);
+  float jit = (hash1(vec2(lane, 3.0)) - 0.5) * 0.6;
+  float wob = sin(r * 23.0 + lane * 4.1) * 0.06 + sin(r * 51.0 + lane) * 0.025;
+  float dk = abs(fract(k) - 0.5 - jit * 0.5 - wob * 4.0);
+  float reach = 0.55 + 0.4 * hash1(vec2(lane, 7.0));
+  float crack = (1.0 - smoothstep(0.0, 0.035 + 0.02 * (1.0 - r), dk)) * (1.0 - smoothstep(reach - 0.15, reach, r));
+  float fork = seam * step(0.5, hash1(i)) * (1.0 - smoothstep(0.25, 0.8, r));
+  float burning = max(crack, fork * 0.8) * (0.65 + 0.35 * wave);
+  float vSt = burning + (1.0 - smoothstep(0.0, 0.22, r)) * 0.35 * (1.0 + uBeat);
+  float vRune = seam * (0.55 + 0.45 * wave) * fade + ring * 0.9 + inner * 0.55
     + (1.0 - r) * 0.18 * (1.0 + uBeat);
+  float v = mix(vRune, vSt, uCrack);
+  seam = mix(seam, burning, uCrack);
   vec3 col = mix(uColor, uHot, clamp(seam * wave * 0.6 + uBeat * 0.3, 0.0, 1.0));
   gl_FragColor = vec4(col * uGlow, clamp(v, 0.0, 1.0) * smoothstep(1.0, 0.96, r));
   #include <colorspace_fragment>
@@ -181,6 +259,9 @@ const _q = new THREE.Quaternion();
 const _e = new THREE.Euler();
 const _s = new THREE.Vector3();
 const _pos = new THREE.Vector3();
+const _a = new THREE.Vector3();
+const _b = new THREE.Vector3();
+const _c = new THREE.Vector3();
 const _look: FuryLook = { swell: 1, glow: 0, flash: 0, beat: 0 };
 const _ember = {
   speed: 1.2,
@@ -235,6 +316,18 @@ export class CouncilFuryFx {
   private readonly shards: THREE.InstancedMesh;
   private readonly shardMat: THREE.ShaderMaterial;
   private readonly shardCount: number;
+  /** The Singer's storm on the Guardian: the arcs' ribbons, rebuilt in place. */
+  private readonly arcs: THREE.Mesh;
+  private readonly arcMat: THREE.ShaderMaterial;
+  private readonly arcPos: Float32Array;
+  private readonly arcLive: Float32Array;
+  private readonly arcGeo: THREE.BufferGeometry;
+  /** Each arc's points (body-relative unit shell), its strike clock and seed. */
+  private readonly arcPts: Float32Array = new Float32Array(ARCS * (ARC_SEGS + 1) * 3);
+  private readonly arcClock: Float32Array = new Float32Array(ARCS);
+  /** The burn in the floor under the fury. */
+  private readonly scorch: THREE.Mesh;
+  private readonly scorchMat: THREE.ShaderMaterial;
   /** A glow behind the body, throbbing with the heartbeat (it burns). */
   private readonly glow: THREE.Sprite;
   private readonly glowMat: THREE.SpriteMaterial;
@@ -281,6 +374,7 @@ export class CouncilFuryFx {
         uBeat: { value: 0 },
         uColor: { value: new THREE.Color(SOUL_COLORS.guardian.hex) },
         uHot: { value: new THREE.Color(HOT.guardian) },
+        uCrack: { value: 0 },
       },
       vertexShader: SIGIL_VERT,
       fragmentShader: SIGIL_FRAG,
@@ -305,6 +399,70 @@ export class CouncilFuryFx {
       fragmentShader: SHARD_FRAG,
       toneMapped: false,
     });
+    // The arcs: ARCS x ARC_SEGS segments, each two crossed quads.
+    const quads = ARCS * ARC_SEGS * 2;
+    this.arcPos = new Float32Array(quads * 4 * 3);
+    this.arcLive = new Float32Array(quads * 4);
+    const side = new Float32Array(quads * 4);
+    const along = new Float32Array(quads * 4);
+    const idx: number[] = [];
+    for (let a = 0; a < ARCS; a++)
+      for (let s = 0; s < ARC_SEGS; s++)
+        for (let k = 0; k < 2; k++) {
+          const q = (a * ARC_SEGS + s) * 2 + k;
+          const v = q * 4;
+          side.set([-1, 1, -1, 1], v);
+          const t0 = s / ARC_SEGS;
+          const t1 = (s + 1) / ARC_SEGS;
+          along.set([t0, t0, t1, t1], v);
+          idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2);
+        }
+    this.arcGeo = new THREE.BufferGeometry();
+    const posAttr = new THREE.BufferAttribute(this.arcPos, 3);
+    posAttr.setUsage(THREE.DynamicDrawUsage);
+    const liveAttr = new THREE.BufferAttribute(this.arcLive, 1);
+    liveAttr.setUsage(THREE.DynamicDrawUsage);
+    this.arcGeo.setAttribute('position', posAttr);
+    this.arcGeo.setAttribute('aSide', new THREE.BufferAttribute(side, 1));
+    this.arcGeo.setAttribute('aT', new THREE.BufferAttribute(along, 1));
+    this.arcGeo.setAttribute('aLive', liveAttr);
+    this.arcGeo.setIndex(idx);
+    this.arcMat = new THREE.ShaderMaterial({
+      name: 'smithHeartCouncilFuryArc',
+      uniforms: {
+        uColor: { value: new THREE.Color(0x3d7bff) },
+        uHot: { value: new THREE.Color(0xeaf4ff) },
+        uGlow: { value: 1.6 },
+      },
+      vertexShader: ARC_VERT,
+      fragmentShader: ARC_FRAG,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      toneMapped: false,
+    });
+    this.arcs = new THREE.Mesh(this.arcGeo, this.arcMat);
+    this.arcs.name = 'smithHeartCouncilFuryArcs';
+    this.arcs.renderOrder = 4;
+    h.geometries.push(this.arcGeo);
+    this.scorchMat = new THREE.ShaderMaterial({
+      name: 'smithHeartCouncilFuryScorch',
+      uniforms: { uAlpha: { value: 0.6 } },
+      vertexShader: SIGIL_VERT,
+      fragmentShader: SCORCH_FRAG,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
+    });
+    this.scorch = new THREE.Mesh(discGeo, this.scorchMat);
+    this.scorch.name = 'smithHeartCouncilFuryScorch';
+    this.scorch.rotation.x = -Math.PI / 2;
+    // The floor ladder: the burn under, the burning sigil over it.
+    this.scorch.renderOrder = floorVfxRenderOrder('encounter', 9);
     this.glowTex = typeof document !== 'undefined' ? radialGlowTexture() : null;
     this.glowMat = new THREE.SpriteMaterial({
       name: 'smithHeartCouncilFuryGlow',
@@ -321,7 +479,14 @@ export class CouncilFuryFx {
     this.glow = new THREE.Sprite(this.glowMat);
     this.glow.renderOrder = 5;
     this.glow.name = 'smithHeartCouncilFuryGlow';
-    h.materials.push(this.columnMat, this.sigilMat, this.shardMat, this.glowMat);
+    h.materials.push(
+      this.columnMat,
+      this.sigilMat,
+      this.shardMat,
+      this.glowMat,
+      this.arcMat,
+      this.scorchMat,
+    );
     this.column = new THREE.Mesh(columnGeo, this.columnMat);
     this.column.name = 'smithHeartCouncilFuryColumn';
     this.sigil = new THREE.Mesh(discGeo, this.sigilMat);
@@ -333,7 +498,7 @@ export class CouncilFuryFx {
     this.shards.name = 'smithHeartCouncilFuryShards';
     this.shards.count = this.shardCount;
     this.shards.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    for (const m of [this.column, this.sigil, this.shards, this.glow]) {
+    for (const m of [this.column, this.sigil, this.shards, this.glow, this.arcs, this.scorch]) {
       m.visible = false;
       m.frustumCulled = false;
       h.root.add(m);
@@ -425,12 +590,27 @@ export class CouncilFuryFx {
     const body = BOND_BODY[this.role];
     const height = body.height * look.swell;
     const r = Math.max(2.2, body.height * 0.3) * look.swell;
-    this.column.position.set(at.x, y + 0.05, at.z);
-    this.column.scale.set(r, height * 1.45, r);
-    this.columnMat.uniforms.uGlow.value = look.glow;
-    this.columnMat.uniforms.uBeat.value = look.beat;
-    this.column.visible = true;
+    // The Guardian's fury (the Singer's soul) is a storm that hugs his body:
+    // arcs crawling over the stone, never a column over him. The Singer's (the
+    // Guardian's soul) is fire round her.
+    const storm = this.fallen === 'singer';
+    if (storm) {
+      this.column.visible = false;
+      this.placeArcs(dt, at.x, y, at.z, height, look);
+    } else {
+      this.arcs.visible = false;
+      this.column.position.set(at.x, y + 0.05, at.z);
+      this.column.scale.set(r, height * 1.45, r);
+      this.columnMat.uniforms.uGlow.value = look.glow;
+      this.columnMat.uniforms.uBeat.value = look.beat;
+      this.column.visible = true;
+    }
     const sr = r * 2.3 * (1 + 0.05 * look.beat + 0.25 * look.flash);
+    this.scorch.position.set(at.x, y + 0.1, at.z);
+    this.scorch.scale.set(sr * 1.08, sr * 1.08, 1);
+    this.scorchMat.uniforms.uAlpha.value = storm ? 0.85 : 0.4;
+    this.sigilMat.uniforms.uCrack.value = storm ? 1 : 0;
+    this.scorch.visible = true;
     this.sigil.position.set(at.x, y + 0.13, at.z);
     this.sigil.scale.set(sr, sr, 1);
     this.sigilMat.uniforms.uGlow.value = 0.8 * look.glow;
@@ -440,7 +620,8 @@ export class CouncilFuryFx {
     const gs = height * (0.95 + 0.1 * look.beat + 0.5 * look.flash);
     this.glow.position.set(at.x, y + height * 0.55, at.z);
     this.glow.scale.set(gs, gs * 1.15, 1);
-    this.glowMat.opacity = 0.22 + 0.18 * look.beat + 0.6 * look.flash;
+    this.glowMat.opacity =
+      (this.fallen === 'singer' ? 0.36 : 0.22) + 0.18 * look.beat + 0.6 * look.flash;
     this.glow.visible = true;
     // Embers rising off it (cosmetic: thin on the low tier).
     this.emberAcc += dt * (18 + 40 * look.flash) * this.h.density;
@@ -457,6 +638,85 @@ export class CouncilFuryFx {
         _ember,
       );
     }
+  }
+
+  /** The storm's arcs: each runs a jagged way over a shell hugging the body
+   *  (most of them climbing), re-strikes every ARC_HOLD seconds, a few dark
+   *  at any moment so it crackles. More and brighter at the wake. */
+  private placeArcs(
+    dt: number,
+    x: number,
+    y: number,
+    z: number,
+    height: number,
+    look: FuryLook,
+  ): void {
+    // A shell just outside the stone (the Guardian is broad in the shoulders
+    // and fists): the arcs crawl over it, the body hiding the far ones.
+    const R = Math.max(1.8, height * 0.34);
+    const H = height * 0.47;
+    const cy = y + height * 0.52;
+    const P = this.arcPts;
+    const pos = this.arcPos;
+    const live = this.arcLive;
+    const w = Math.max(0.12, height * 0.016) * (1 + 0.6 * look.flash);
+    for (let a = 0; a < ARCS; a++) {
+      this.arcClock[a] -= dt;
+      const base = a * (ARC_SEGS + 1) * 3;
+      if (this.arcClock[a] <= 0) {
+        this.arcClock[a] = ARC_HOLD * (0.6 + 0.8 * this.h.rand());
+        // A new path on the unit shell: an angle round the body and a height.
+        let th = this.h.rand() * Math.PI * 2;
+        let v = -0.85 + this.h.rand() * 1.2;
+        for (let s = 0; s <= ARC_SEGS; s++) {
+          const rr = 1 + (this.h.rand() - 0.5) * 0.18;
+          P[base + s * 3] = Math.cos(th) * rr;
+          P[base + s * 3 + 1] = v;
+          P[base + s * 3 + 2] = Math.sin(th) * rr;
+          th += (this.h.rand() - 0.5) * 0.55;
+          v += 0.06 + (this.h.rand() - 0.35) * 0.22;
+        }
+        // Dark this strike? (about a third are, more at rest, fewer in the wake)
+        const on = this.h.rand() < 0.62 + 0.35 * look.flash ? 1 : 0;
+        const vv = a * ARC_SEGS * 2 * 4;
+        live.fill(on * (0.6 + 0.4 * this.h.rand()), vv, vv + ARC_SEGS * 2 * 4);
+      }
+      for (let s = 0; s < ARC_SEGS; s++) {
+        const i0 = base + s * 3;
+        const i1 = i0 + 3;
+        const ax = x + P[i0] * R;
+        const ay = cy + P[i0 + 1] * H;
+        const az = z + P[i0 + 2] * R;
+        const bx = x + P[i1] * R;
+        const by = cy + P[i1 + 1] * H;
+        const bz = z + P[i1 + 2] * R;
+        _a.set(bx - ax, by - ay, bz - az);
+        // Two crossed ribbons: across the run, flat to the shell, and out of it.
+        _b.set(P[i0], 0, P[i0 + 2]).normalize();
+        _c.crossVectors(_a, _b).normalize().multiplyScalar(w);
+        _b.multiplyScalar(w);
+        for (let k = 0; k < 2; k++) {
+          const off = k === 0 ? _c : _b;
+          const v = ((a * ARC_SEGS + s) * 2 + k) * 4 * 3;
+          pos[v] = ax - off.x;
+          pos[v + 1] = ay - off.y;
+          pos[v + 2] = az - off.z;
+          pos[v + 3] = ax + off.x;
+          pos[v + 4] = ay + off.y;
+          pos[v + 5] = az + off.z;
+          pos[v + 6] = bx - off.x;
+          pos[v + 7] = by - off.y;
+          pos[v + 8] = bz - off.z;
+          pos[v + 9] = bx + off.x;
+          pos[v + 10] = by + off.y;
+          pos[v + 11] = bz + off.z;
+        }
+      }
+    }
+    (this.arcGeo.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+    (this.arcGeo.getAttribute('aLive') as THREE.BufferAttribute).needsUpdate = true;
+    this.arcMat.uniforms.uGlow.value = 1.5 + 0.7 * look.beat + 1.8 * look.flash;
+    this.arcs.visible = true;
   }
 
   /** The shards: orbiting the chest on tilted rings, tumbling, flung wide by
@@ -490,15 +750,18 @@ export class CouncilFuryFx {
     if (this.fallen === fallen) return;
     this.fallen = fallen;
     const c = SOUL_COLORS[fallen].hex;
-    // The Singer's sky blue reads weak over the warm quarry: lift it.
-    const lift = fallen === 'singer' ? 2.2 : 1.2;
+    // The Singer's steel blue over the warm quarry: a deep saturated blue on
+    // a dark burn (never a pale wash, which reads as glass), white-hot cores.
+    const storm = fallen === 'singer';
+    const lift = storm ? 1.4 : 1.2;
+    const deep = storm ? 0x2f6bff : c;
     this.columnMat.uniforms.uColor.value.setHex(c).multiplyScalar(lift);
     this.columnMat.uniforms.uHot.value.setHex(HOT[fallen]);
-    this.sigilMat.uniforms.uColor.value.setHex(c).multiplyScalar(lift);
+    this.sigilMat.uniforms.uColor.value.setHex(deep).multiplyScalar(storm ? 1.6 : lift);
     this.sigilMat.uniforms.uHot.value.setHex(HOT[fallen]);
     this.shardMat.uniforms.uRim.value.setHex(c);
     this.shardMat.uniforms.uHot.value.setHex(HOT[fallen]);
-    this.glowMat.color.setHex(c).multiplyScalar(lift);
+    this.glowMat.color.setHex(storm ? deep : c).multiplyScalar(lift);
     rgbOf(c, this.rgb);
   }
 
@@ -511,6 +774,8 @@ export class CouncilFuryFx {
     this.sigil.visible = false;
     this.shards.visible = false;
     this.glow.visible = false;
+    this.arcs.visible = false;
+    this.scorch.visible = false;
   }
 
   /** The shards' instance buffer (the host disposes the geometries and
