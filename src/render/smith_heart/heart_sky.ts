@@ -403,8 +403,13 @@ vec3 ringFourSky(vec3 d, float up) {
   // explicit level (the wrap's seam has a jump in u a derivative would turn into a line of
   // the smallest mip). No drift: each quarter stays over its vein.
   float u = atan(d.x, d.z) / 6.2831853 + 0.5 + ${HEART_RING_SKY.turn.toFixed(4)};
-  // A KTX2 reads top down: v 0 is the painting's top.
-  float v = clamp(${HEART_RING_SKY.horizon.toFixed(3)} - max(up, 0.0) * ${HEART_RING_SKY.stretch.toFixed(3)}, 0.005, 0.995);
+  // A KTX2 reads top down: v 0 is the painting's top. Over the Ring's cliffs the pressed
+  // line; under them the painting's low clouds eased down to the horizon, never its last
+  // row (heart_four_sky.ts ringSkyV).
+  float upc = max(up, 0.0);
+  float vHigh = ${HEART_RING_SKY.horizon.toFixed(3)} - upc * ${HEART_RING_SKY.stretch.toFixed(3)};
+  float vLow = ${HEART_RING_SKY.foot.toFixed(3)} + ${(HEART_RING_SKY.horizon - HEART_RING_SKY.cliff * HEART_RING_SKY.stretch - HEART_RING_SKY.foot).toFixed(4)} * (upc / ${HEART_RING_SKY.cliff.toFixed(3)});
+  float v = clamp(mix(vLow, vHigh, smoothstep(${(HEART_RING_SKY.cliff - HEART_RING_SKY.ease).toFixed(3)}, ${(HEART_RING_SKY.cliff + HEART_RING_SKY.ease).toFixed(3)}, upc)), 0.005, 0.995);
   vec3 painted = textureLod(uRingSky, vec2(u, v), 0.0).rgb;
   // Overhead the four blend into one colour (the painting's top, all round).
   vec3 zen = (textureLod(uRingSky, vec2(0.125, 0.03), 5.0).rgb

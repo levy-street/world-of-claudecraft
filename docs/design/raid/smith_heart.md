@@ -1758,6 +1758,17 @@ width; the review caught it.
 
 Pinned by `tests/smith_heart_river_veins.test.ts`.
 
+#### The main map's sky under the cliffs' line
+
+The panorama's foot is pressed down behind the Ring's cliffs (section 5.26), which hide the
+sky under about 25 degrees. Down a vein's mouth and from the Balcony the sky does show under
+that line, and there the pressed mapping ran off the painting's last row: a flat brown band
+where the Ring's concept has dusk cloud. Under the cliffs' line the painting's own low clouds
+are now eased down to the horizon (`heart_four_sky.ts` `HEART_RING_SKY` `cliff`, `foot`, `ease`,
+`ringSkyV`; `heart_sky.ts` `ringFourSky`). Over the cliffs nothing moves: the painting sits
+exactly where it did, at the saturation and value the owner set. Pinned by
+`tests/smith_heart_ring_heart_env.test.ts`.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every

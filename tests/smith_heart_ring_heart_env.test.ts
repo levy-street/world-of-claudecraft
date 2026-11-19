@@ -18,6 +18,7 @@ import {
 import {
   HEART_FOUR_SKY,
   HEART_RING_SKY,
+  ringSkyV,
   SMITH_HEART_FOUR_SKY_URL,
   SMITH_HEART_RING_SKY_URL,
 } from '../src/render/smith_heart/heart_four_sky';
@@ -304,5 +305,28 @@ describe('the four-way skies', () => {
     const footUp = (HEART_RING_SKY.horizon - 1) / HEART_RING_SKY.stretch;
     expect(footUp).toBeGreaterThan(Math.sin((5 * Math.PI) / 180));
     expect(footUp).toBeLessThan(Math.sin((25 * Math.PI) / 180));
+  });
+
+  it("eases the panorama's low clouds down under the cliffs' line, and moves nothing over it", () => {
+    // The taste pass (design doc section 5.27): down a vein's mouth or from the Balcony the
+    // sky shows under the Ring's cliffs, where the pressed line ran off the painting's last
+    // row (a flat band).
+    const S = HEART_RING_SKY;
+    const pressed = (up: number) => S.horizon - up * S.stretch;
+    // Over the cliffs (past the easing band) the painting sits exactly where it did.
+    for (const up of [S.cliff + S.ease, 0.55, 0.7, 0.9])
+      expect(ringSkyV(up)).toBeCloseTo(Math.max(0.005, pressed(up)), 9);
+    // The cliffs' line is the Ring's own: about 25 degrees up.
+    expect(S.cliff).toBeCloseTo(Math.sin((25 * Math.PI) / 180), 2);
+    // At the horizon the painting's low clouds, well inside it: never its last row.
+    expect(ringSkyV(0)).toBeCloseTo(S.foot, 9);
+    expect(S.foot).toBeLessThan(0.95);
+    expect(S.foot).toBeGreaterThan(pressed(S.cliff));
+    for (let up = 0; up <= 1; up += 0.01) expect(ringSkyV(up)).toBeLessThan(0.95);
+    // One painting all the way up: it never runs backwards (no mirrored band).
+    for (let up = 0.005; up <= 1; up += 0.005)
+      expect(ringSkyV(up)).toBeLessThanOrEqual(ringSkyV(up - 0.005) + 1e-9);
+    // Under the old line alone, everything below `footUp` read one row.
+    expect(pressed(0)).toBeGreaterThan(0.995);
   });
 });
