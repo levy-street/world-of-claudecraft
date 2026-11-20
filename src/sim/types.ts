@@ -2302,6 +2302,14 @@ export interface MobTemplate {
    * roll still finds the body. Nothing else a `boss` template gets.
    */
   bossCorpseHold?: boolean;
+  /**
+   * The slain body stays standing in its instance until the instance is torn
+   * down: once looted (or once its loot window runs out) it is a plain body,
+   * never lootable, targetable or harvestable again, but still drawn on every
+   * client (mob/boss_corpse_hold.ts corpseStandsUntilTeardown). The Smith's
+   * Heart bosses carry it; inert outside an instance.
+   */
+  corpseStandsInInstance?: boolean;
   rare?: boolean;
   // Explicit tame opt-out for ordinary beasts whose encounter lifecycle must
   // not be replaced by the hunter pet respawn lifecycle.

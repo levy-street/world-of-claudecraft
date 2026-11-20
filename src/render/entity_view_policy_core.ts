@@ -6,6 +6,8 @@
 // distance-cull exemption cannot drift from which objects are actually
 // interact-only raid/dungeon furniture; do not duplicate that predicate here.
 
+import { MOBS } from '../sim/data';
+import { corpseStandsUntilTeardown } from '../sim/mob/boss_corpse_hold';
 import { isInteractOnlyInstanceObject } from '../sim/quest_gated_entity';
 import { corpseHasDecayed } from '../sim/respawn_policy';
 import type { Entity, QuestProgress } from '../sim/types';
@@ -68,7 +70,16 @@ export function entityViewIsAdmitted(
   // view either: left standing for the rest of a long respawn wait (a
   // self-scheduled rare/elite/world boss), it reads as a stuck, warped
   // statue rather than an absent, still-respawning mob.
-  if (entity.kind === 'mob' && corpseHasDecayed(entity.dead, entity.corpseTimer)) return false;
+  // The one exception: a raid set piece (a Smith's Heart boss) whose body
+  // stands, looted and inert, until its instance is torn down
+  // (sim/mob/boss_corpse_hold.ts corpseStandsUntilTeardown). Only its view
+  // survives the decay; everything else (loot, target, cursor) stays refused.
+  if (
+    entity.kind === 'mob' &&
+    corpseHasDecayed(entity.dead, entity.corpseTimer) &&
+    !corpseStandsUntilTeardown(MOBS[entity.templateId], entity)
+  )
+    return false;
   return !questObjectHidden(entity, questLog);
 }
 

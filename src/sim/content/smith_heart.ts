@@ -202,6 +202,11 @@ function boss(id: string, name: string, hp: number, color: number, scale: number
     loot: [],
     scale,
     color,
+    // The body stays in the raid after it is looted, until the instance is
+    // torn down (mob/boss_corpse_hold.ts corpseStandsUntilTeardown): the
+    // Masterless Strength's kneeling husk and the guardians' death poses are
+    // part of the room, not a corpse that pops out four seconds after looting.
+    corpseStandsInInstance: true,
   };
 }
 

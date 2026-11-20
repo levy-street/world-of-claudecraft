@@ -44,6 +44,7 @@ import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { publicInstanceView } from '../item_instance_transfer';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
+import { corpseStandsUntilTeardown } from '../mob/boss_corpse_hold';
 import { corpseKeepsBody } from '../mob/boss_corpse_sink';
 import { isHarvestableCorpse } from '../professions/gathering';
 import type { PlayerMeta } from '../sim';
@@ -1199,6 +1200,14 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
       return;
     }
     mob.lootable = false;
+    // A raid set piece (a Smith's Heart boss) stands as a plain body until its
+    // instance is torn down: straight to the decayed state every consumer reads
+    // as "nothing here", while the view policy keeps drawing it
+    // (mob/boss_corpse_hold.ts corpseStandsUntilTeardown).
+    if (corpseStandsUntilTeardown(MOBS[mob.templateId], mob)) {
+      mob.corpseTimer = 0;
+      return;
+    }
     // A body that sinks out at the end of its window (mob/boss_corpse_sink.ts) keeps
     // lying for the whole of it: nothing left to take, but no four-second vanish either.
     // After the harvest arm above, so a sinking body that still owes a harvest keeps it.
