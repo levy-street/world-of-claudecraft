@@ -7895,6 +7895,75 @@ export const pl_PL: EnTranslations = {
       "toggleAria": "Przełącz między mapą świata a mapą strefy",
       "levels": "Poziomy od {min} do {max}"
     },
+    "raidAtlas": {
+      "canvasAria": "Raid map",
+      "subtitle": "{floor}: {defeated} of {total} bosses defeated",
+      "north": "N",
+      "scale": "{yards} yd",
+      "floorsAria": "Map pages",
+      "floor": {
+        "veins": "The Veins",
+        "heart": "The Heart"
+      },
+      "youAreHere": "You are here",
+      "room": {
+        "cleft": "The Cleft",
+        "gallery": "Hammer Gallery",
+        "quarry": "Smith's Quarry",
+        "balcony": "The Balcony",
+        "ring": "The Ring",
+        "dais": "Seal Dais",
+        "cornice": "Storm Cornice",
+        "bridge": "Wind Bridge",
+        "basin": "Quench Basin",
+        "hearth": "The Hearth",
+        "castingFloor": "Casting Floor",
+        "anvil": "Anvil of the World",
+        "terrace": "Arrival Terrace"
+      },
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "reset": "Show the whole map",
+      "pinTool": "Place pins",
+      "pinToolHint": "Pin tool on: tap or click the map to place a pin",
+      "pinStyle": "Pin style",
+      "pinEdit": "Edit pin",
+      "removePin": "Remove pin",
+      "clearPins": "Remove all pins",
+      "done": "Done",
+      "pinIconsAria": "Pin icon",
+      "pinColorsAria": "Pin colour",
+      "pinIcon": {
+        "star": "Star",
+        "flag": "Flag",
+        "skull": "Skull",
+        "swords": "Swords",
+        "shield": "Shield",
+        "diamond": "Diamond"
+      },
+      "pinColor": {
+        "gold": "Gold",
+        "red": "Red",
+        "blue": "Blue",
+        "green": "Green",
+        "purple": "Purple",
+        "white": "White"
+      },
+      "legendToggle": "Legend",
+      "legend": {
+        "you": "You",
+        "member": "Raid member",
+        "boss": "Boss",
+        "engaged": "Boss in combat",
+        "defeated": "Boss defeated",
+        "portal": "Portal",
+        "entrance": "Entrance",
+        "pin": "Your pin",
+        "river": "Path of light to a guardian"
+      },
+      "hintDesktop": "Scroll to zoom, drag to pan, double-click to zoom in. Right-click the map to place a pin, right-click a pin to remove it, click a pin to restyle it.",
+      "hintTouch": "Pinch to zoom and drag to pan. Turn on the pin tool, then tap the map to place a pin; tap a pin to restyle or remove it."
+    },
     "mapAtlas": {
       "level": "Poziom {level}",
       "landmarkCount": "{count} punkty orientacyjne",

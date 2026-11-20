@@ -15478,6 +15478,448 @@
     clip-path: polygon(0 50%, 50% 0, 100% 50%, 50% 100%);
   }
 
+  /* ---------- raid atlas ---------- */
+  /* The raid atlas (src/ui/hud/raid_atlas/): a raid's illustrated M-map,
+     drawn on its own DPR-sharp canvas that takes the shared map canvas's
+     place while the controller stamps #map-window.raid-atlas-on, with its
+     chrome (page tabs, zoom, pin tools, pin editor, legend) laid over it.
+     The window itself fades and lifts in on open and fades out on close. */
+  @media (prefers-reduced-motion: no-preference) {
+    #map-window {
+      transition:
+        opacity 0.18s ease-out,
+        scale 0.18s ease-out,
+        display 0.18s allow-discrete;
+    }
+    #map-window[style*="display: none"] {
+      opacity: 0;
+      scale: 0.985;
+    }
+    @starting-style {
+      #map-window {
+        opacity: 0;
+        scale: 0.975;
+      }
+    }
+  }
+  #raid-atlas-canvas,
+  .raid-atlas-chrome {
+    display: none;
+  }
+  #map-window.raid-atlas-on #map-canvas,
+  #map-window.raid-atlas-on #map-zoom,
+  #map-window.raid-atlas-on .map-atlas-compass {
+    display: none !important;
+  }
+  #map-window.raid-atlas-on #raid-atlas-canvas {
+    display: block;
+    box-sizing: content-box;
+    width: 560px;
+    height: 560px;
+    border: 2px solid var(--color-raid-atlas-frame-dark);
+    box-shadow: 0 6px 22px var(--color-raid-atlas-frame-dark);
+    touch-action: none;
+    cursor: grab;
+    outline: none;
+  }
+  #map-window.raid-atlas-on #raid-atlas-canvas:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  #map-window.raid-atlas-on #raid-atlas-canvas.is-grabbing {
+    cursor: grabbing;
+  }
+  #map-window.raid-atlas-on #raid-atlas-canvas.is-pinning {
+    cursor: crosshair;
+  }
+  body:not(.mobile-touch) #map-window.raid-atlas-on.window-sized #raid-atlas-canvas {
+    width: calc(var(--map-face) - 4px);
+    height: calc(var(--map-face) - 4px);
+  }
+  /* The chrome lies exactly over the atlas canvas's square (its 2px border
+     included), so every control is placed against the map face. */
+  #map-window.raid-atlas-on .raid-atlas-chrome {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 564px;
+    height: 564px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  body:not(.mobile-touch) #map-window.raid-atlas-on.window-sized .raid-atlas-chrome {
+    width: var(--map-face);
+    height: var(--map-face);
+  }
+  body.mobile-touch #map-window.raid-atlas-on .raid-atlas-chrome {
+    left: var(--window-pad);
+    right: var(--window-pad);
+    top: var(--window-pad);
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    transform: none;
+  }
+  .raid-atlas-chrome > * {
+    pointer-events: auto;
+  }
+  .raid-atlas-btn {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 4px 10px;
+    border: 1px solid var(--color-raid-atlas-gold-deep);
+    background: linear-gradient(
+      180deg,
+      var(--color-raid-atlas-frame-mid),
+      var(--color-raid-atlas-frame-dark)
+    );
+    color: var(--color-raid-atlas-gold-light);
+    font-family: var(--font-display);
+    box-shadow:
+      inset 0 1px 0 var(--color-raid-atlas-gold-deep),
+      0 2px 6px var(--color-raid-atlas-frame-dark);
+  }
+  .raid-atlas-btn:hover:not(:disabled) {
+    border-color: var(--color-raid-atlas-gold);
+    color: var(--color-raid-atlas-gold-white);
+  }
+  .raid-atlas-btn:disabled {
+    opacity: 0.45;
+  }
+  .raid-atlas-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .raid-atlas-floors {
+    position: absolute;
+    top: 52px;
+    left: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  .raid-atlas-floor {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .raid-atlas-floor.is-current {
+    border-color: var(--color-raid-atlas-gold);
+    background: linear-gradient(
+      180deg,
+      var(--color-raid-atlas-gold-deep),
+      var(--color-raid-atlas-frame-dark)
+    );
+    color: var(--color-raid-atlas-gold-white);
+  }
+  .raid-atlas-here {
+    display: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-raid-atlas-glow);
+    box-shadow: 0 0 6px var(--color-raid-atlas-glow);
+  }
+  .raid-atlas-floor.has-player .raid-atlas-here {
+    display: inline-block;
+  }
+  .raid-atlas-zoom {
+    position: absolute;
+    right: 24px;
+    bottom: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .raid-atlas-zoom .raid-atlas-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .raid-atlas-reset-glyph {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    box-shadow:
+      inset 0 0 0 2px var(--color-raid-atlas-frame-dark),
+      inset 0 0 0 4px currentColor;
+  }
+  .raid-atlas-tools {
+    position: absolute;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .raid-atlas-tool-glyph,
+  .raid-atlas-chip-glyph,
+  .raid-atlas-legend-glyph {
+    width: 22px;
+    height: 22px;
+    display: block;
+    flex: none;
+  }
+  .raid-atlas-pin-tool,
+  .raid-atlas-style {
+    width: 40px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .raid-atlas-pin-tool.is-on {
+    border-color: var(--color-raid-atlas-glow);
+    box-shadow:
+      0 0 0 1px var(--color-raid-atlas-glow),
+      0 0 12px var(--color-raid-atlas-glow);
+  }
+  .raid-atlas-legend-btn {
+    height: 36px;
+    font-size: 12px;
+  }
+  .raid-atlas-editor,
+  .raid-atlas-legend {
+    position: absolute;
+    bottom: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    padding: 10px 12px;
+    border: 1px solid var(--color-raid-atlas-gold);
+    background: linear-gradient(
+      180deg,
+      var(--color-raid-atlas-frame-mid),
+      var(--color-raid-atlas-frame-dark)
+    );
+    color: var(--color-raid-atlas-parchment);
+    box-shadow: 0 8px 24px var(--color-raid-atlas-frame-dark);
+    max-width: calc(100% - 40px);
+  }
+  .raid-atlas-editor.is-open,
+  .raid-atlas-legend.is-open {
+    display: block;
+  }
+  .raid-atlas-editor-title {
+    font-family: var(--font-display);
+    color: var(--color-raid-atlas-gold-light);
+    font-size: 13px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .raid-atlas-editor-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .raid-atlas-chip {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .raid-atlas-chip[aria-pressed="true"] {
+    border-color: var(--color-raid-atlas-glow);
+    box-shadow: 0 0 0 2px var(--color-raid-atlas-glow);
+  }
+  .raid-atlas-color::before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--color-raid-atlas-frame-dark);
+    box-shadow: 0 0 0 1px var(--color-raid-atlas-gold);
+  }
+  .raid-atlas-color.is-gold::before {
+    background: var(--color-raid-atlas-pin-gold);
+  }
+  .raid-atlas-color.is-red::before {
+    background: var(--color-raid-atlas-pin-red);
+  }
+  .raid-atlas-color.is-blue::before {
+    background: var(--color-raid-atlas-pin-blue);
+  }
+  .raid-atlas-color.is-green::before {
+    background: var(--color-raid-atlas-pin-green);
+  }
+  .raid-atlas-color.is-purple::before {
+    background: var(--color-raid-atlas-pin-purple);
+  }
+  .raid-atlas-color.is-white::before {
+    background: var(--color-raid-atlas-pin-white);
+  }
+  .raid-atlas-editor-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  .raid-atlas-editor-actions .raid-atlas-btn {
+    font-size: 12px;
+  }
+  .raid-atlas-legend {
+    width: 280px;
+  }
+  .raid-atlas-legend-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+  }
+  .raid-atlas-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .raid-atlas-legend-row:last-child {
+    grid-column: 1 / -1;
+  }
+  .raid-atlas-hint {
+    margin: 8px 0 0;
+    font-size: 11px;
+    line-height: 1.35;
+    font-style: italic;
+    color: var(--color-raid-atlas-parchment-dark);
+  }
+  .raid-atlas-toast {
+    position: absolute;
+    top: 112px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    max-width: calc(100% - 40px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-raid-atlas-gold-light);
+    background: var(--color-raid-atlas-frame-dark);
+    border: 1px solid var(--color-raid-atlas-gold-deep);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .raid-atlas-toast.is-on {
+    opacity: 1;
+  }
+  /* Touch: the map face is small (a 330px sheet, or a square beside a 58px
+     rail in landscape), so the chrome tightens to two rows of 40px targets:
+     the page switch (only the OTHER page shows, so one tap swaps) at the
+     bottom left, the pin tools at the bottom right, zoom up the right edge.
+     The canvas follows the shared map canvas's own touch sizes. */
+  body.mobile-touch #map-window.raid-atlas-on #raid-atlas-canvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #map-window.raid-atlas-on .raid-atlas-chrome {
+    left: var(--window-pad);
+    top: var(--window-pad);
+    width: calc(100% - var(--window-pad) * 2);
+    height: auto;
+    aspect-ratio: 1;
+    transform: none;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch #map-window.raid-atlas-on #raid-atlas-canvas,
+    body.mobile-touch #map-window.raid-atlas-on .raid-atlas-chrome {
+      width: var(--mobile-map-size, 100%);
+      max-width: calc(100% - var(--mobile-map-rail, 0px));
+    }
+    /* Landscape keeps a rail right of the map for the close button: zoom
+       joins it there, off the drawn map. */
+    body.mobile-touch #map-window .raid-atlas-zoom {
+      right: calc(9px - var(--mobile-map-rail, 58px));
+    }
+  }
+  body.mobile-touch .raid-atlas-floors {
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+  }
+  body.mobile-touch .raid-atlas-floor.is-current {
+    display: none;
+  }
+  body.mobile-touch .raid-atlas-floor {
+    font-size: 11px;
+    min-height: 40px;
+    padding: 2px 8px;
+  }
+  body.mobile-touch .raid-atlas-zoom {
+    right: 10px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+  body.mobile-touch .raid-atlas-zoom .raid-atlas-btn,
+  body.mobile-touch .raid-atlas-pin-tool,
+  body.mobile-touch .raid-atlas-style,
+  body.mobile-touch .raid-atlas-legend-btn,
+  body.mobile-touch .raid-atlas-chip {
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch .raid-atlas-editor-actions .raid-atlas-btn {
+    min-height: 40px;
+  }
+  /* The legend toggle shows a glyph on touch (its name stays its label). */
+  body.mobile-touch .raid-atlas-legend-btn {
+    font-size: 0;
+  }
+  body.mobile-touch .raid-atlas-legend-btn::before {
+    content: "?";
+    font-size: 18px;
+  }
+  body.mobile-touch .raid-atlas-tools {
+    left: auto;
+    right: 10px;
+    bottom: 10px;
+    transform: none;
+  }
+  body.mobile-touch .raid-atlas-toast {
+    top: auto;
+    bottom: 58px;
+  }
+  body.mobile-touch .raid-atlas-editor,
+  body.mobile-touch .raid-atlas-legend {
+    bottom: 58px;
+    width: calc(100% - 20px);
+    max-width: none;
+    max-height: calc(100% - 70px);
+    overflow: auto;
+    padding: 8px;
+  }
+  body.mobile-touch .raid-atlas-legend-row {
+    font-size: 11px;
+    gap: 4px;
+  }
+  body.mobile-touch .raid-atlas-legend-list {
+    gap: 2px 8px;
+  }
+  body.mobile-touch .raid-atlas-hint {
+    font-size: 10px;
+    margin-top: 6px;
+  }
+
   /* ---------- Dungeon Finder ---------- */
   /* Closed by default: this @layer components rule outranks `.window { display: none }`
      in @layer layout, so the closed state has to be declared HERE or the empty panel

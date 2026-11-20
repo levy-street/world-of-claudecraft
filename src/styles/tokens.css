@@ -488,6 +488,47 @@
     --color-delve-label: #ffe9a0;
     --color-delve-outline: #000;
 
+    /* the raid atlas (the Smith's Heart's illustrated M-map; resolved once by
+       src/ui/hud/raid_atlas/raid_atlas_painter.ts via getComputedStyle): the
+       parchment and its stains, the inks, each area's wash, each vein's light,
+       the gilded frame and arrow, the boss medallions and the six pin colours. */
+    --color-raid-atlas-parchment: #e8d3a4;
+    --color-raid-atlas-parchment-light: #f6e9c6;
+    --color-raid-atlas-parchment-dark: #b48d55;
+    --color-raid-atlas-stain: #8a6431;
+    --color-raid-atlas-ink: #36210f;
+    --color-raid-atlas-ink-soft: #6e4b28;
+    --color-raid-atlas-abyss: #4a301a;
+    --color-raid-atlas-rock: #9c7a4c;
+    --color-raid-atlas-area-hammer: #d8ad6c;
+    --color-raid-atlas-area-ring: #d3c39d;
+    --color-raid-atlas-area-breath: #b4c7cc;
+    --color-raid-atlas-area-quench: #bcdbe2;
+    --color-raid-atlas-area-heat: #e6ad6a;
+    --color-raid-atlas-area-heart: #e7c47c;
+    --color-raid-atlas-vein-hammer: #b8782a;
+    --color-raid-atlas-vein-breath: #2f8fc8;
+    --color-raid-atlas-vein-quench: #4fb2d8;
+    --color-raid-atlas-vein-heat: #e0761e;
+    --color-raid-atlas-heart-glow: #ff9a3c;
+    --color-raid-atlas-glow: #ffd770;
+    --color-raid-atlas-frame-dark: #1c120a;
+    --color-raid-atlas-frame-mid: #3a2614;
+    --color-raid-atlas-gold-deep: #6e4a1c;
+    --color-raid-atlas-gold: #c49a46;
+    --color-raid-atlas-gold-light: #f6dd96;
+    --color-raid-atlas-gold-white: #fff6d8;
+    --color-raid-atlas-boss: #8c1b14;
+    --color-raid-atlas-boss-engaged: #e2461c;
+    --color-raid-atlas-dead: #6f685d;
+    --color-raid-atlas-portal: #7a4fd0;
+    --color-raid-atlas-pin-gold: #e8b43a;
+    --color-raid-atlas-pin-red: #d1372a;
+    --color-raid-atlas-pin-blue: #3c7ed6;
+    --color-raid-atlas-pin-green: #3c9a48;
+    --color-raid-atlas-pin-purple: #8b4fc9;
+    --color-raid-atlas-pin-white: #f3efe4;
+
     /* painted map of an authored open-air dungeon field (the Sunken Bastion, the
        Hollow Crypt; resolved by field_map_painter.ts via getComputedStyle): the
        sea or the chasm mist, the terraces by ground, the cliffs, walls and

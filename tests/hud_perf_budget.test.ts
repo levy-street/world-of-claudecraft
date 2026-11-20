@@ -976,6 +976,14 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   // the painted plate of an authored open-air field (the Sunken Bastion, the Hollow
   // Crypt): rasterised once per field, caching its one --color-field-map-* resolve
   { file: 'field_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  // The raid atlas (hud/raid_atlas/): the composing painter caches its one
+  // --color-raid-atlas-* and font resolve for the session; the page painter
+  // rasterises the illustrated floor (a plate once per floor, a sharp view once
+  // a zoomed view settles); the glyph painter strokes the arrow, medallions,
+  // pins and frame as vector paths.
+  { file: 'hud/raid_atlas/raid_atlas_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/raid_atlas/raid_atlas_page_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/raid_atlas/raid_atlas_glyph_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
@@ -1046,6 +1054,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // One app-viewport rect when the player starts dragging an aura in setup mode. The cached
   // rect converts pointer moves to persisted normalized X/Y values; the controller owns no
   // clock and performs no layout read during ordinary combat painting.
+  // The raid atlas measures its canvas ONCE per gesture (a wheel notch, a press,
+  // a right-click, a double-click) to turn client coordinates into map pixels;
+  // the pointer moves of a drag or pinch reuse that measure, and no repaint or
+  // frame tick ever reads layout.
+  {
+    file: 'hud/raid_atlas/raid_atlas_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   {
     file: 'aura_overlay_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1 },

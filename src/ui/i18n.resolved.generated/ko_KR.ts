@@ -7895,6 +7895,75 @@ export const ko_KR: EnTranslations = {
       "toggleAria": "세계 지도, 지역 지도, 인스턴스 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     },
+    "raidAtlas": {
+      "canvasAria": "공격대 지도",
+      "subtitle": "{floor}: 우두머리 {total}명 중 {defeated}명 처치",
+      "north": "북",
+      "scale": "{yards}야드",
+      "floorsAria": "지도 페이지",
+      "floor": {
+        "veins": "광맥",
+        "heart": "심장부"
+      },
+      "youAreHere": "현재 위치",
+      "room": {
+        "cleft": "균열",
+        "gallery": "망치 회랑",
+        "quarry": "대장장이의 채석장",
+        "balcony": "발코니",
+        "ring": "고리 회랑",
+        "dais": "봉인의 단",
+        "cornice": "폭풍 절벽",
+        "bridge": "바람의 다리",
+        "basin": "담금질 분지",
+        "hearth": "화덕",
+        "castingFloor": "주조장",
+        "anvil": "세계의 모루",
+        "terrace": "도착 테라스"
+      },
+      "zoomIn": "확대",
+      "zoomOut": "축소",
+      "reset": "지도 전체 보기",
+      "pinTool": "핀 놓기",
+      "pinToolHint": "핀 도구 켜짐: 지도를 탭하거나 클릭해 핀을 놓으세요",
+      "pinStyle": "핀 모양",
+      "pinEdit": "핀 편집",
+      "removePin": "핀 제거",
+      "clearPins": "모든 핀 제거",
+      "done": "완료",
+      "pinIconsAria": "핀 아이콘",
+      "pinColorsAria": "핀 색상",
+      "pinIcon": {
+        "star": "별",
+        "flag": "깃발",
+        "skull": "해골",
+        "swords": "검",
+        "shield": "방패",
+        "diamond": "마름모"
+      },
+      "pinColor": {
+        "gold": "금색",
+        "red": "빨강",
+        "blue": "파랑",
+        "green": "초록",
+        "purple": "보라",
+        "white": "흰색"
+      },
+      "legendToggle": "범례",
+      "legend": {
+        "you": "나",
+        "member": "공격대원",
+        "boss": "우두머리",
+        "engaged": "전투 중인 우두머리",
+        "defeated": "처치한 우두머리",
+        "portal": "차원문",
+        "entrance": "입구",
+        "pin": "내 핀",
+        "river": "수호자에게 이어지는 빛의 길"
+      },
+      "hintDesktop": "휠로 확대와 축소, 드래그로 이동, 더블클릭으로 확대합니다. 지도를 우클릭하면 핀을 놓고, 핀을 우클릭하면 제거하며, 핀을 클릭하면 모양을 바꿉니다.",
+      "hintTouch": "두 손가락으로 확대와 축소, 드래그로 이동합니다. 핀 도구를 켠 뒤 지도를 탭하면 핀을 놓고, 핀을 탭하면 모양을 바꾸거나 제거합니다."
+    },
     "mapAtlas": {
       "level": "레벨 {level}",
       "landmarkCount": "랜드마크 {count}개",

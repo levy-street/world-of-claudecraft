@@ -312,6 +312,15 @@ const UI_PURE_CORES = [
   // The atlas rail width: clamp, drag and key steps (map_rail_resize_controller.ts
   // applies it as --map-rail-width).
   'src/ui/hud/map/map_rail_width_core.ts',
+  // The raid atlas (src/ui/hud/raid_atlas/): its static plan (pages, rooms,
+  // bosses, portals from the raid's content), its camera (zoom and pan as
+  // pure state), the player's pins (edits, hit test, defensive parse), its
+  // palette roles, and its live frame (player, raid, boss states).
+  'src/ui/hud/raid_atlas/raid_atlas_plan_core.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_camera_core.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_pins_core.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_palette_core.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_view.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
@@ -3358,6 +3367,9 @@ const UI_DOM_MODULES = [
   // Hud's map-window sizing wiring: a ResizeObserver over #map-window that
   // re-reads the stored rail width once settings exist.
   'src/ui/hud/map/map_window_sizing_wiring.ts',
+  // The raid atlas's DOM adapter: its own canvas, chrome and input, a
+  // ResizeObserver over the canvas, and the pins' wrapped localStorage access.
+  'src/ui/hud/raid_atlas/raid_atlas_controller.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
   // Mounts the Cartographer's Ink map picker into #prompt-stack.
   'src/ui/hud/treasure/ink_map_picker_controller.ts',

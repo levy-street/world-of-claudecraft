@@ -7895,6 +7895,75 @@ export const zh_TW: EnTranslations = {
       "toggleAria": "在世界地圖、地區地圖與副本地圖之間切換",
       "levels": "等級 {min} 至 {max}"
     },
+    "raidAtlas": {
+      "canvasAria": "團隊副本地圖",
+      "subtitle": "{floor}：已擊敗首領 {defeated}/{total}",
+      "north": "北",
+      "scale": "{yards} 碼",
+      "floorsAria": "地圖頁",
+      "floor": {
+        "veins": "礦脈",
+        "heart": "心臟"
+      },
+      "youAreHere": "你在這裡",
+      "room": {
+        "cleft": "裂隙",
+        "gallery": "鐵鎚長廊",
+        "quarry": "鐵匠採石場",
+        "balcony": "露台",
+        "ring": "環廊",
+        "dais": "封印台",
+        "cornice": "風暴崖簷",
+        "bridge": "風之橋",
+        "basin": "淬火盆地",
+        "hearth": "爐膛",
+        "castingFloor": "鑄造場",
+        "anvil": "世界之砧",
+        "terrace": "抵達平台"
+      },
+      "zoomIn": "放大",
+      "zoomOut": "縮小",
+      "reset": "顯示整張地圖",
+      "pinTool": "放置圖釘",
+      "pinToolHint": "圖釘工具已開啟：點擊地圖即可放置圖釘",
+      "pinStyle": "圖釘樣式",
+      "pinEdit": "編輯圖釘",
+      "removePin": "移除圖釘",
+      "clearPins": "移除所有圖釘",
+      "done": "完成",
+      "pinIconsAria": "圖釘圖示",
+      "pinColorsAria": "圖釘顏色",
+      "pinIcon": {
+        "star": "星",
+        "flag": "旗幟",
+        "skull": "骷髏",
+        "swords": "雙劍",
+        "shield": "盾牌",
+        "diamond": "菱形"
+      },
+      "pinColor": {
+        "gold": "金色",
+        "red": "紅色",
+        "blue": "藍色",
+        "green": "綠色",
+        "purple": "紫色",
+        "white": "白色"
+      },
+      "legendToggle": "圖例",
+      "legend": {
+        "you": "你",
+        "member": "團隊成員",
+        "boss": "首領",
+        "engaged": "戰鬥中的首領",
+        "defeated": "已擊敗的首領",
+        "portal": "傳送門",
+        "entrance": "入口",
+        "pin": "你的圖釘",
+        "river": "通往守護者的光之路"
+      },
+      "hintDesktop": "滾輪縮放，拖曳平移，雙擊放大。右鍵點擊地圖放置圖釘，右鍵點擊圖釘將其移除，單擊圖釘變更樣式。",
+      "hintTouch": "雙指縮放，拖曳平移。開啟圖釘工具後點擊地圖即可放置圖釘；點擊圖釘可變更樣式或將其移除。"
+    },
     "mapAtlas": {
       "level": "等級 {level}",
       "landmarkCount": "{count} 個地標",

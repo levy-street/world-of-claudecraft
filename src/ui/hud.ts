@@ -4597,7 +4597,11 @@ export class Hud {
     this.mapMarkerArt,
     this.mapMarkerProfile,
   );
-  private readonly interiorMaps = new InteriorMapController(this.writerFacet, classCss);
+  private readonly interiorMaps = new InteriorMapController(
+    this.writerFacet,
+    classCss,
+    () => $('#map-window').style.display === 'block' && this.mapLevel === 'instance',
+  );
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
@@ -8672,6 +8676,7 @@ export class Hud {
     // paint call for why).
     this.buffBarPainter.paint(this.buffBarView.tick(p));
     this.debuffBarPainter.paint(this.debuffBarView.tick(p));
+    this.interiorMaps.frame(this.sim); // the raid atlas: smooth zoom and the live arrow
     // Caged or chained in the Sunken Gaol: the prompts, every frame (press feedback, reach).
     this.dungeonPrompts.paint({
       player: p,

@@ -7895,6 +7895,75 @@ export const ja_JP: EnTranslations = {
       "toggleAria": "ワールドマップ、ゾーンマップ、インスタンスマップを切り替える",
       "levels": "レベル {min} から {max}"
     },
+    "raidAtlas": {
+      "canvasAria": "レイドマップ",
+      "subtitle": "{floor}：ボス {total} 体中 {defeated} 体撃破",
+      "north": "北",
+      "scale": "{yards} ヤード",
+      "floorsAria": "マップのページ",
+      "floor": {
+        "veins": "鉱脈",
+        "heart": "心臓部"
+      },
+      "youAreHere": "現在地",
+      "room": {
+        "cleft": "裂け目",
+        "gallery": "ハンマーの回廊",
+        "quarry": "鍛冶師の石切場",
+        "balcony": "バルコニー",
+        "ring": "環状回廊",
+        "dais": "封印の壇",
+        "cornice": "嵐の岩棚",
+        "bridge": "風の橋",
+        "basin": "焼き入れの盆地",
+        "hearth": "炉床",
+        "castingFloor": "鋳造場",
+        "anvil": "世界の金床",
+        "terrace": "到着のテラス"
+      },
+      "zoomIn": "ズームイン",
+      "zoomOut": "ズームアウト",
+      "reset": "マップ全体を表示",
+      "pinTool": "ピンを置く",
+      "pinToolHint": "ピンツール有効：マップをタップまたはクリックしてピンを置く",
+      "pinStyle": "ピンのスタイル",
+      "pinEdit": "ピンを編集",
+      "removePin": "ピンを削除",
+      "clearPins": "すべてのピンを削除",
+      "done": "完了",
+      "pinIconsAria": "ピンのアイコン",
+      "pinColorsAria": "ピンの色",
+      "pinIcon": {
+        "star": "星",
+        "flag": "旗",
+        "skull": "髑髏",
+        "swords": "剣",
+        "shield": "盾",
+        "diamond": "ひし形"
+      },
+      "pinColor": {
+        "gold": "金",
+        "red": "赤",
+        "blue": "青",
+        "green": "緑",
+        "purple": "紫",
+        "white": "白"
+      },
+      "legendToggle": "凡例",
+      "legend": {
+        "you": "自分",
+        "member": "レイドメンバー",
+        "boss": "ボス",
+        "engaged": "戦闘中のボス",
+        "defeated": "撃破したボス",
+        "portal": "ポータル",
+        "entrance": "入口",
+        "pin": "自分のピン",
+        "river": "ガーディアンへ続く光の道"
+      },
+      "hintDesktop": "ホイールでズーム、ドラッグで移動、ダブルクリックで拡大。マップを右クリックでピンを置き、ピンを右クリックで削除、ピンをクリックでスタイルを変更。",
+      "hintTouch": "ピンチでズーム、ドラッグで移動。ピンツールをオンにしてマップをタップするとピンを置けます。ピンをタップするとスタイルの変更や削除ができます。"
+    },
     "mapAtlas": {
       "level": "レベル {level}",
       "landmarkCount": "ランドマーク {count} 個",
