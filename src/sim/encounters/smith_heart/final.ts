@@ -7,7 +7,7 @@
 //                 Unbound in the centre, the base form (final_rules.ts).
 //   Its own       all fight, wherever it stands: Forge Fist (its swing
 //                 cleave, the frontal) and Weight of the Anvil, the fight's
-//                 only group soak (Heroic's Crushed, Mythic's turning Anvil;
+//                 only group soak (Mythic's turning Anvil;
 //                 final_hammer.ts).
 //   The stars     the rework of 2026-11-18: the first time it enters a
 //                 quarter that quarter's guardian's star wakes for the rest
@@ -404,7 +404,6 @@ const PLAYER_MARKS = [
   FINAL_AURAS.bladeMark,
   FINAL_AURAS.ember,
   FINAL_AURAS.drawn,
-  FINAL_AURAS.crushed,
   FINAL_AURAS.shell,
 ] as const;
 

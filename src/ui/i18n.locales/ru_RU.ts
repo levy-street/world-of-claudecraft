@@ -26300,7 +26300,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.ember': 'Через {seconds} с под ваши ноги упадут угли и будут тлеть {life} с лужей радиусом {radius} м, нанося от {min} до {max} ед. урона от огня в секунду всем внутри. Встаньте с другими отмеченными в один угол, а потом уходите. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.drawn': 'Каждую секунду в течение {seconds} с молния бьёт от вас во всех других игроков в пределах {reach} м, нанося каждому от {min} до {max} ед. урона от сил природы. Держитесь в {reach} м от всех. Героический режим: от {heroicMin} до {heroicMax} урона. Мифический режим: от {mythicMin} до {mythicMax} урона.',
   'hudChrome.auraEffect.finalBoss.shell': 'Поглощает следующие {value} ед. исцеления, которые вы получите.',
-  'hudChrome.auraEffect.finalBoss.crushed': 'Если в ближайшие {seconds} с вы встанете под следующую Тяжесть наковальни, ваша доля урона будет в {mult} раза больше. Пусть её примет другая группа.',
   'hudChrome.finalOverload.title': 'Перегрузка',
   'hudChrome.finalOverload.quench': 'Закалка',
   'hudChrome.finalOverload.breath': 'Дыхание',

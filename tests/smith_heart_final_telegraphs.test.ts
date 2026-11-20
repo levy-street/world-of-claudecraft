@@ -62,7 +62,6 @@ describe("the final kits' element telegraphs", () => {
       orb: 'storm',
       tremor: 'stone',
       anvil: 'stone',
-      crushed: 'stone',
       // The woken stars (the rework of 2026-11-18).
       rise: 'stone',
       strike: 'storm',
@@ -95,7 +94,7 @@ describe("the final kits' element telegraphs", () => {
     expect(FINAL_TELEGRAPH_LOOKS.tremor.inward).toBe(0);
     expect(FINAL_TELEGRAPH_LOOKS.bolt.inward).toBe(0);
     // A mark riding a body never carries a curtain (it would jitter).
-    for (const k of ['whirl', 'ember', 'drawn', 'bolt', 'crushed'] as const)
+    for (const k of ['whirl', 'ember', 'drawn', 'bolt'] as const)
       expect(FINAL_TELEGRAPH_LOOKS[k].curtain, k).toBe(false);
     // Every look is drawn on every tier: a real char and a real line.
     for (const [k, L] of Object.entries(FINAL_TELEGRAPH_LOOKS)) {
@@ -126,8 +125,8 @@ describe("the final kits' element telegraphs", () => {
     expect(FINAL_TELEGRAPH_POOLS.storm).toBeGreaterThanOrEqual(
       T.orbCount * 2 + T.drawnMarks + 1 + 2 * (3 + 2) + 2,
     );
-    // Stone: the tremors, the Anvil, the Crushed, a volley of rises.
-    expect(FINAL_TELEGRAPH_POOLS.stone).toBeGreaterThanOrEqual(4 + 1 + 8 + 3);
+    // Stone: the tremors, the Anvil, a volley of rises.
+    expect(FINAL_TELEGRAPH_POOLS.stone).toBeGreaterThanOrEqual(4 + 1 + 8 + 2);
   });
 
   it("dresses a fan's char and glow passes per element on the kit's rungs", () => {

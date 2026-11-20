@@ -16,9 +16,6 @@
 //                        (half as much again each with fewer than three); with
 //                        nobody under it the whole raid takes a heavy blow.
 //                        The fight's ONLY group damage share.
-//   Crushed              Heroic: everyone who shared the Anvil is Crushed for
-//                        30 s; a Crushed player under the next Anvil takes
-//                        their share three times over. Two groups rotate.
 //   Stone Shell          Heroic, every 20 s (first 8 s in): stone closes on
 //                        three hashed players, absorbing their next 600
 //                        healing.
@@ -44,7 +41,6 @@ import {
 } from './final_ids';
 import {
   at,
-  auraOf,
   beginBar,
   cueAt,
   cueOn,
@@ -212,9 +208,8 @@ export function clearAnvil(s: Pick<FinalScope, 'ctx' | 'inst' | 'st'>): void {
   s.st.anvil = null;
 }
 
-/** The Anvil falls: split between everyone under it (Crushed ones three
- *  times over), or the whole raid when nobody stands there. Returns who
- *  shared it. */
+/** The Anvil falls: split evenly between everyone under it, or the whole
+ *  raid when nobody stands there. Returns who shared it. */
 export function landAnvil(s: FinalScope): Entity[] {
   const st = s.st;
   const a = st.anvil;
@@ -239,16 +234,9 @@ export function landAnvil(s: FinalScope): Entity[] {
     return [];
   }
   for (const p of under) {
-    const crushed = s.rules.crushed && auraOf(p, FINAL_AURAS.crushed) !== undefined;
-    const share = anvilShare(under.length, crushed, s.rules.anvilTotal);
+    const share = anvilShare(under.length, s.rules.anvilTotal);
     hit(s, p, roll(s, share * 0.95, share * 1.05, punishMult(s)), FINAL_NAMES.anvil, 'physical');
   }
-  if (s.rules.crushed)
-    for (const p of under)
-      if (!p.dead)
-        putMarker(p, FINAL_AURAS.crushed, FINAL_NAMES.crushed, T.crushedSeconds, s.boss.id, {
-          school: 'physical',
-        });
   return under;
 }
 
@@ -289,7 +277,6 @@ export function clearHammer(
   clearCastIf(s.boss, FINAL_CASTS.anvil);
   for (const p of players) {
     dropAura(p, FINAL_AURAS.anvilMark);
-    dropAura(p, FINAL_AURAS.crushed);
     dropAura(p, FINAL_AURAS.shell);
   }
 }

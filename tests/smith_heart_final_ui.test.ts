@@ -152,9 +152,6 @@ describe('The Masterless Strength: tooltips', () => {
     expect(ember).toContain(`${T.emberMin} to ${T.emberMax} Fire`);
     expect(say({ id: FINAL_AURAS.drawn, kind: 'internal_cd' })).toContain(`${T.drawnReach} yd`);
     expect(say({ id: FINAL_AURAS.shell, kind: 'heal_absorb', value: 600 })).toContain('600');
-    expect(say({ id: FINAL_AURAS.crushed, kind: 'internal_cd' })).toContain(
-      `${T.crushedMult} times`,
-    );
     // Weight of the Anvil's mark (Jose's playtest of 2026-11-19): it follows you, plants, splits.
     const anvil = say({ id: FINAL_AURAS.anvilMark, kind: 'internal_cd' });
     expect(anvil).toContain('follows you');
@@ -175,7 +172,6 @@ describe("The Masterless Strength: the marked player's own arrow", () => {
       FINAL_AURAS.drawn,
     ])
       expect(FINAL_ARROW_AURAS, id).toContain(id);
-    expect(FINAL_ARROW_AURAS).not.toContain(FINAL_AURAS.crushed);
     expect(finalArrowMark({ auras: [] })).toBeNull();
     const a = { id: FINAL_AURAS.anvilMark, remaining: 4, duration: 6 } as Aura;
     expect(finalArrowMark({ auras: [a] })).toBe(a);

@@ -40,7 +40,6 @@ export type FinalTelegraphKind =
   | 'orb'
   | 'tremor'
   | 'anvil'
-  | 'crushed'
   // The woken stars (the rework of 2026-11-18): a pillar's rise in granite,
   // a Sky Strike's white storm spot, Arcing Stone's ring round its pillar.
   | 'rise'
@@ -120,7 +119,7 @@ const look = (
  *  cinder's moving reach, a pool the river's landed flow, an ember mark the
  *  fall's). The lethal crack and the Anvil take the deepest marks; the
  *  marks riding a player (the cold's reach, Drawn Lightning's, the bolt's,
- *  an ember, Crushed) go without a curtain. */
+ *  an ember) go without a curtain. */
 export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTelegraphLook>> = {
   whirl: look('fire', 0.32, 0.5, 1.2, 0.85, { falloff: 0.5, curtain: false }),
   devil: look('storm', 0.28, 0.6, 1.1, 0.8, { curtain: false }),
@@ -134,7 +133,6 @@ export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTel
   orb: look('storm', 0.36, 0.7, 0.9, 0.9),
   tremor: look('stone', 0.58, 0.8, 0.55, 1),
   anvil: look('stone', 0.6, 0.9, 0.32, 1),
-  crushed: look('stone', 0.4, 0.6, 0.9, 0.8, { rim: 0.8, curtain: false }),
   rise: look('stone', 0.55, 0.9, 0.7, 1),
   strike: look('storm', 0.42, 1, 0.8, 1),
   arcRing: look('storm', 0.3, 0.9, 0.35, 1, { rim: 1 }),
@@ -176,7 +174,7 @@ export const FINAL_TELEGRAPH_POOLS: Readonly<Record<FinalElement, number>> = {
   // six Dust Devils (two volleys overlapping), and a charged pillar's ground
   // under each of up to eight pillars.
   storm: 38 + 6,
-  // Four tremors, the Anvil, the Crushed, a volley of rises.
+  // Four tremors, the Anvil, a volley of rises.
   stone: 18 + 4,
 };
 

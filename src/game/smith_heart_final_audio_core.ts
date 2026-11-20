@@ -24,7 +24,7 @@
 //   the Overload   the active bar passing three quarters: a crystal straining
 //   the floor      Mythic's broken Anvil rising back whole after a kill or wipe
 //   the marks      a mark on the local player (Sky Strike, Crossing Blade,
-//                  Ember Mark, Drawn Lightning, Crushed, Bursting Coal,
+//                  Ember Mark, Drawn Lightning, Bursting Coal,
 //                  Wind-Tethered), in their own ear
 //
 // Every sample is the raid's own (`heart_final_*` in scripts/sfx/
@@ -328,7 +328,6 @@ export function rebuildDue(from: number, to: number): boolean {
 export const FINAL_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [FINAL_AURAS.ember]: HEART_MARK.fire,
   [FINAL_AURAS.drawn]: HEART_MARK.storm,
-  [FINAL_AURAS.crushed]: markSound(HEART_MARK.stone, 0.9, 0.85),
   [FINAL_AURAS.skyMark]: markSound(HEART_MARK.storm, 1, 1.1),
   [FINAL_AURAS.bladeMark]: HEART_MARK.frost,
   [FINAL_PHASE_AURAS.coal]: markSound(HEART_MARK.fire, 1, 0.85),

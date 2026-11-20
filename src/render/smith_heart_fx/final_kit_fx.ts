@@ -11,7 +11,7 @@
 //     (lethal, frost creeping in to its break) in frost; a Storm Orb (the
 //     soak's gold), Drawn Lightning's reach and Leaping Bolt's leap in storm;
 //     a Tremor Crack, Weight of the Anvil's mark (the soak's gold, turning on
-//     Mythic) and Crushed in granite; and the woken stars' (the rework of
+//     Mythic) in granite; and the woken stars' (the rework of
 //     2026-11-18): a pillar's rise in granite, a Sky Strike's white storm
 //     spot (colder and whiter than Leaping Bolt's violet reach, so the two
 //     Breath mechanics read apart) and Arcing Stone's big ring round its
@@ -1287,7 +1287,7 @@ export class FinalKitFx {
   }
 
   /** The players' marks: the ember's ring, the lightning's reach, the ice,
-   *  the stone, Crushed. */
+   *  the stone. */
   private paintMarks(world: IWorld): void {
     let ice = 0;
     let shell = 0;
@@ -1335,18 +1335,6 @@ export class FinalKitFx {
             m.rotation.y = this.clock * 0.2 + pid;
             m.visible = true;
           }
-        } else if (a.id === FINAL_AURAS.crushed) {
-          const fill = a.duration > 0 ? 1 - a.remaining / a.duration : 1;
-          this.foot(
-            -(pid * 8 + 4),
-            'crushed',
-            FINAL_FOOTPRINTS.crushed,
-            x,
-            z,
-            R.crushed,
-            fill,
-            true,
-          );
         }
       }
     }

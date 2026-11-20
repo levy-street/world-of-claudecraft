@@ -126,17 +126,19 @@ describe('the pure rules', () => {
     expect(FINAL_DIFFICULTY.mythic.burstTier).toBe('lethal');
   });
 
-  it('the Anvil splits its blow, harder when too few share it, three times for the Crushed', () => {
+  it('the Anvil splits its blow evenly, harder only when too few share it', () => {
     const total = FINAL_DIFFICULTY.heroic.anvilTotal;
-    expect(anvilShare(6, false, total)).toBe(Math.round(total / 6));
-    expect(anvilShare(2, false, total)).toBe(Math.round((total / 2) * 1.5));
-    expect(anvilShare(6, true, total)).toBe(Math.round((total / 6) * T.crushedMult));
+    expect(anvilShare(6, total)).toBe(Math.round(total / 6));
+    expect(anvilShare(2, total)).toBe(Math.round((total / 2) * 1.5));
+    // Heroic's Crushed is gone (Jose, 2026-11-20): the whole raid soaking
+    // every Anvil takes a tenth each, every time.
+    expect(anvilShare(10, total)).toBe(560);
     // The tier's total: Normal 4,200 and Heroic 5,600 since the Anvil came
     // every 35 and 30 s (2026-11-19), Mythic 6,600 (its turning Anvil).
     expect(FINAL_DIFFICULTY.normal.anvilTotal).toBe(4200);
     expect(FINAL_DIFFICULTY.heroic.anvilTotal).toBe(5600);
     expect(FINAL_DIFFICULTY.mythic.anvilTotal).toBe(6600);
-    expect(anvilShare(10, false, FINAL_DIFFICULTY.normal.anvilTotal)).toBe(420);
+    expect(anvilShare(10, FINAL_DIFFICULTY.normal.anvilTotal)).toBe(420);
   });
 
   it('every zone code round-trips through the state aura', () => {
@@ -649,7 +651,7 @@ describe('the Hammer quarter', () => {
     }
   });
 
-  it('Heroic: soakers are Crushed and take the next Anvil three times over; Stone Shell absorbs healing', () => {
+  it('Heroic: the same soakers share every Anvil at the same price (no Crushed); Stone Shell absorbs healing', () => {
     const f = finalFight(5);
     f.dev('/dev heart final heroic');
     f.pullIn('hammer');
@@ -659,10 +661,12 @@ describe('the Hammer quarter', () => {
     f.put(f.players[2], c.x + 10, c.z + 1);
     f.put(f.players[3], c.x + 10, c.z - 1);
     const first = hits(f.tick(sec(T.anvilCast + 0.1)), FINAL_NAMES.anvil, f.pids[1]);
-    expect(aura(f.players[1], FINAL_AURAS.crushed)).toBeDefined();
+    expect(f.players[1].auras.some((a) => a.id === 'heart_final_crushed')).toBe(false);
     f.dev('/dev heart final anvil', f.pids[1]);
     const second = hits(f.tick(sec(T.anvilCast + 0.1)), FINAL_NAMES.anvil, f.pids[1]);
-    expect(second[0].amount).toBeGreaterThan(first[0].amount * 2.5);
+    // The same three under it: the same share, within the roll's spread.
+    expect(second[0].amount).toBeLessThan(first[0].amount * 1.25);
+    expect(second[0].amount).toBeGreaterThan(first[0].amount * 0.8);
     f.dev('/dev heart final shell');
     const shelled = f.players.filter((p) => aura(p, FINAL_AURAS.shell));
     expect(shelled.length).toBeGreaterThanOrEqual(T.shellMarks);

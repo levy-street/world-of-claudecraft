@@ -164,8 +164,6 @@ export const FINAL_FOOTPRINTS = {
   // an ice blue as it aims, a white-hot ice as it locks.
   lane: { color: FINAL_KIT_COLORS.iceLine, accent: 0xd8f2ff },
   laneLocked: { color: FINAL_KIT_COLORS.iceLineLocked, accent: 0xffffff },
-  /** Crushed: you must stay out of the next Anvil. */
-  crushed: { color: TELEGRAPH_THREAT_COLORS.danger, accent: 0xe8c070 },
 } as const;
 
 /** The footprints' radii (yards), the sim's own. */
@@ -185,9 +183,6 @@ export const FINAL_REACH = {
   strike: T.skyR,
   arc: T.arcR,
   bladeHalf: T.bladeHalf,
-  /** Crushed's mark under its player (a body's width: it marks who, not
-   *  where). */
-  crushed: 1.6,
 } as const;
 
 // ---- the timelines -------------------------------------------------------------------

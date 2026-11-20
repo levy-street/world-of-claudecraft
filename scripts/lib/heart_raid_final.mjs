@@ -5,8 +5,8 @@
 // toward the emptier neighbour, never parked in the ring), the raid follows it
 // and plays each quarter's kit: out of Basalt Fist's spot and lanes, the Fire
 // Whirls, the pools and the cracks, spread for the Leaping Bolt, one player on
-// each Storm Orb, everyone under Weight of the Anvil (the Crushed aside on
-// Heroic). The woken stars (the rework of 2026-11-18): out of every pillar's
+// each Storm Orb, everyone under Weight of the Anvil (every tier, every
+// Anvil: Heroic's Crushed was removed on 2026-11-20). The woken stars (the rework of 2026-11-18): out of every pillar's
 // rise, Sky Strike and Arcing Stone ring, never in a Crossing Blade's line;
 // the pillars are walls (walked round, no sight through them); a bot marked
 // for a blade leads its line through the pillars, the Storm-Charged ones
@@ -587,10 +587,9 @@ function dragSpot(world, st) {
     st.next = null;
     target = z;
   }
-  // Heroic's Hammer: the Anvil's soakers stay Crushed 30 s and the next
-  // Anvil falls a tier's anvilEvery later, so the boss leaves the Hammer once one has fallen.
-  // Normal too: every Anvil is a raid-wide soak and a Tremor Crack round,
-  // so one per Hammer visit is the clean rotation.
+  // The next Anvil falls a tier's anvilEvery later, so the boss leaves the
+  // Hammer once one has fallen: every Anvil is a raid-wide soak and a Tremor
+  // Crack round, so one per Hammer visit is the clean rotation.
   const hammerDone = z === 'hammer' && (st.anvilFellAt ?? 0) > (st.zoneAt ?? Date.now());
   if (
     IGNORE !== 'drag' &&
@@ -651,14 +650,11 @@ function track(world, st) {
   if (st.anvilSeen && !anvil) {
     const a = st.anvilSeen;
     const under = world.living().filter((p) => hypot(p, a) <= T.anvilR);
-    const crushed = under.filter((p) => hasAura(p, FINAL_AURAS.crushed)).length;
     const out = world
       .living()
       .filter((p) => hypot(p, a) > T.anvilR)
       .map((p) => `${p.name} ${hypot(p, a).toFixed(0)} yd ${p.bot?.prevDuty ?? '?'}`);
-    log(
-      `ANVIL fell: ${under.length} under (${crushed} already Crushed)${out.length ? `; out: ${out.join(', ')}` : ''}`,
-    );
+    log(`ANVIL fell: ${under.length} under${out.length ? `; out: ${out.join(', ')}` : ''}`);
     st.anvils = (st.anvils ?? 0) + 1;
     st.anvilFellAt = Date.now();
     st.anvilUnder = [...(st.anvilUnder ?? []), under.length];
@@ -822,7 +818,7 @@ function duty(world, st, b, me) {
     const spot = spread(world, st, me, ET.magmaR + 3);
     if (spot) return { goal: spot, tol: 1, duty: 'magma: away' };
   }
-  // Weight of the Anvil: everyone under it (the Crushed, on Heroic, aside).
+  // Weight of the Anvil: everyone under it, on every tier.
   const anvil = o.anvils[0];
   // The off-tank soaks too, and the main tank when the mark lies at the
   // boss's feet: 9,000 split is lethal on cloth with three bodies missing.
@@ -836,7 +832,7 @@ function duty(world, st, b, me) {
   // marked one holds still so the raid can gather on them.
   if (anvil && hasAura(me, FINAL_AURAS.anvilMark))
     return { goal: { x: me.x, z: me.z }, tol: 1.5, duty: 'anvil (marked)' };
-  if (anvil && (!mainTank || ringClear) && !hasAura(me, FINAL_AURAS.crushed)) {
+  if (anvil && (!mainTank || ringClear)) {
     const i = world.bots.indexOf(b);
     return {
       goal: add(anvil, { x: Math.sin(i * 1.3), z: Math.cos(i * 1.3) }, Math.min(3, anvil.r - 2)),

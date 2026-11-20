@@ -25849,8 +25849,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.drawn':
     '{seconds}초 동안 매초 당신에게서 {reach}미터 안의 다른 모든 플레이어에게 번개가 튀어 각각 {min}~{max}의 자연 피해를 줍니다. 모두에게서 {reach}미터 떨어지세요. 영웅: {heroicMin}에서 {heroicMax}의 피해. 신화: {mythicMin}에서 {mythicMax}의 피해.',
   'hudChrome.auraEffect.finalBoss.shell': '다음에 받는 치유 {value}을(를) 흡수합니다.',
-  'hudChrome.auraEffect.finalBoss.crushed':
-    '{seconds}초 안에 다음 모루의 무게 아래에 서면 분담 피해를 {mult}배로 받습니다. 다른 조에게 맡기세요.',
   'hudChrome.finalOverload.title': '과부하',
   'hudChrome.finalOverload.quench': '담금질',
   'hudChrome.finalOverload.breath': '숨결',

@@ -162,8 +162,6 @@ export function finalAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescrip
       };
     case FINAL_AURAS.shell:
       return { key: `${KEY}.shell`, nums: { value: Math.round(a.value ?? T.shellAbsorb) } };
-    case FINAL_AURAS.crushed:
-      return { key: `${KEY}.crushed`, nums: { seconds: T.crushedSeconds, mult: T.crushedMult } };
     case FINAL_AURAS.skyMark:
       return {
         key: `${KEY}.skyMark`,

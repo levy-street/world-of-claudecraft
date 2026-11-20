@@ -96,8 +96,6 @@ export const FINAL_AURAS = {
   drawn: 'heart_final_drawn',
   /** On players (Heroic): Stone Shell (a heal absorb). */
   shell: 'heart_final_shell',
-  /** On players (Heroic): Crushed (a soaker sits the next Anvil out). */
-  crushed: 'heart_final_crushed',
   /** On players: Sky Strike, lightning falls where they stand (its alarm and
    *  arrow drawn for the marked player only). */
   skyMark: 'heart_final_sky_mark',
@@ -271,7 +269,6 @@ export const FINAL_NAMES = {
   tremor: 'Tremor Crack',
   anvil: 'Weight of the Anvil',
   shell: 'Stone Shell',
-  crushed: 'Crushed',
   wake: 'Wake the Stone',
   thrum: 'Stone Thrum',
   pillar: 'Pillar',
@@ -323,8 +320,6 @@ export interface FinalDifficultyRules {
   stormOrbs: boolean;
   /** Hammer: Stone Shell's heal absorbs. */
   stoneShell: boolean;
-  /** Hammer: the Anvil's soakers are Crushed for the next one. */
-  crushed: boolean;
   /** Hammer: the Anvil's mark turns round the boss through its bar. */
   rotatingAnvil: boolean;
   /** Tremor Cracks laid at once. */
@@ -396,7 +391,6 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     drawnLightning: false,
     stormOrbs: false,
     stoneShell: false,
-    crushed: false,
     rotatingAnvil: false,
     tremors: 3,
     pulseRise: 45,
@@ -457,7 +451,6 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     drawnLightning: true,
     stormOrbs: false,
     stoneShell: true,
-    crushed: true,
     rotatingAnvil: false,
     tremors: 4,
     pulseRise: 70,
@@ -512,7 +505,6 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     drawnLightning: true,
     stormOrbs: true,
     stoneShell: true,
-    crushed: true,
     rotatingAnvil: true,
     tremors: 4,
     pulseRise: 70,
@@ -809,10 +801,6 @@ export const FINAL_TUNING = {
   anvilMinSoakers: 3,
   // Nobody under it: the whole raid takes its tier's anvilMissMin to
   // anvilMissMax (FINAL_DIFFICULTY).
-  /** Heroic: a Crushed soaker under the next Anvil takes its share this many
-   *  times over. */
-  crushedSeconds: 30,
-  crushedMult: 3,
   /** Mythic: the mark turns round the boss at this radius and speed. */
   anvilOrbitR: 11,
   anvilOrbitDegPerSec: 25,
@@ -852,13 +840,15 @@ export function overloadStep(fill: number, active: boolean, dt: number): number 
 
 /** What each soaker of Weight of the Anvil takes (pure), before the roll:
  *  the whole split between them, half as much again when too few stand
- *  under it, a Crushed soaker's share `crushedMult` times over. */
-export function anvilShare(soakers: number, crushed: boolean, total: number): number {
+ *  under it. Every soaker takes the same share on every tier (Heroic's
+ *  Crushed, a triple share for the last Anvil's soakers, was removed on
+ *  Jose's call of 2026-11-20: "people can soak without problems"). */
+export function anvilShare(soakers: number, total: number): number {
   const T = FINAL_TUNING;
   const n = Math.max(1, soakers);
   const base = total / n;
   const short = n < T.anvilMinSoakers ? 1.5 : 1;
-  return Math.round(base * short * (crushed ? T.crushedMult : 1));
+  return Math.round(base * short);
 }
 
 /** The pace a woken star runs at (pure): the final phase's share, else full

@@ -16,8 +16,7 @@
 //     playtest of 2026-11-20).
 // Elemental Strike's stacks are a tank's own debuffs (its aura bar), never an
 // arrow.
-// Crushed and Mounting Weight are a tank's own debuffs (its aura bar), never an
-// arrow.
+// Mounting Weight is a tank's own debuff (its aura bar), never an arrow.
 // Pure: the painter (final_kit_fx.ts) reads it; tests/smith_heart_final_ui.test.ts
 // pins the list.
 

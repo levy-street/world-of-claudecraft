@@ -24506,8 +24506,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.drawn':
     '在{seconds}秒内，它每秒从你身上跳向{reach}码内的其他每名玩家，对每人造成{min}至{max}点自然伤害。与所有人保持{reach}码距离。英雄难度：{heroicMin}到{heroicMax}点伤害。史诗难度：{mythicMin}到{mythicMax}点伤害。',
   'hudChrome.auraEffect.finalBoss.shell': '吸收你受到的下{value}点治疗。',
-  'hudChrome.auraEffect.finalBoss.crushed':
-    '{seconds}秒内若站在下一次铁砧之重下，你会承受{mult}倍的分摊伤害。让另一组去分摊。',
   'hudChrome.finalOverload.title': '过载',
   'hudChrome.finalOverload.quench': '淬火',
   'hudChrome.finalOverload.breath': '吐息',

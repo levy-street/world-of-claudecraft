@@ -25844,8 +25844,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.drawn':
     '{seconds}秒間、毎秒あなたから{reach}ヤード以内の他の全プレイヤーへ雷が跳び、それぞれに{min}～{max}の自然ダメージを与える。全員から{reach}ヤード離れよ。ヒロイック：{heroicMin}から{heroicMax}のダメージ。ミシック：{mythicMin}から{mythicMax}のダメージ。',
   'hudChrome.auraEffect.finalBoss.shell': '次に受ける回復{value}を吸収する。',
-  'hudChrome.auraEffect.finalBoss.crushed':
-    '{seconds}秒以内に次の金床の重みの下に立つと、分担ダメージを{mult}倍受ける。もう一方の組に任せよ。',
   'hudChrome.finalOverload.title': '過負荷',
   'hudChrome.finalOverload.quench': '焼き入れ',
   'hudChrome.finalOverload.breath': '息吹',
