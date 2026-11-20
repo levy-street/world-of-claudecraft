@@ -427,8 +427,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     whirlCount: 2,
     devilCount: 2,
     fistCast: 1.9,
-    // 35 s (60 until Jose's playtest of 2026-11-19: "it takes too long").
-    anvilEvery: 35,
+    // 50 s on every tier since Jose's playtest of 2026-11-20 ("it comes too
+    // much"); 35 s from 2026-11-19, 60 before it ("it takes too long").
+    anvilEvery: 50,
   },
   heroic: {
     // 1.2 until the Heroic pass of 2026-11-05: the bot raid in the previous
@@ -485,9 +486,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     whirlCount: 2,
     devilCount: 3,
     fistCast: 1.7,
-    // 30 s (Jose's playtest of 2026-11-19; 45 before it, 36 until the bot
-    // raids of 2026-11-18).
-    anvilEvery: 30,
+    // 50 s since Jose's playtest of 2026-11-20 ("it comes too much"); 30 s
+    // from 2026-11-19, 45 before it, 36 until the bot raids of 2026-11-18.
+    anvilEvery: 50,
   },
   mythic: {
     // Its pool Heroic's (x2.28 since 2026-11-16); its damage unchanged.
@@ -530,8 +531,9 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     whirlCount: 3,
     devilCount: 3,
     fistCast: 1.6,
-    // 28 s (32 until Jose's playtest of 2026-11-19), still turning.
-    anvilEvery: 28,
+    // 50 s since Jose's playtest of 2026-11-20 ("it comes too much"); 28 s
+    // from 2026-11-19, 32 before it. Still turning.
+    anvilEvery: 50,
   },
 };
 

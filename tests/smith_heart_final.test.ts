@@ -629,21 +629,24 @@ describe('the Hammer quarter', () => {
     expect(aura(marked, FINAL_AURAS.anvilMark)).toBeUndefined();
   });
 
-  it('Weight of the Anvil comes every 35 s on Normal, 30 on Heroic, 28 on Mythic', () => {
-    expect(FINAL_DIFFICULTY.normal.anvilEvery).toBe(35);
-    expect(FINAL_DIFFICULTY.heroic.anvilEvery).toBe(30);
-    expect(FINAL_DIFFICULTY.mythic.anvilEvery).toBe(28);
-    // A live pull: the next bar 35 s after the first, on its own clock.
+  it('Weight of the Anvil comes every 50 s on every tier (Jose, 2026-11-20)', () => {
+    expect(FINAL_DIFFICULTY.normal.anvilEvery).toBe(50);
+    expect(FINAL_DIFFICULTY.heroic.anvilEvery).toBe(50);
+    expect(FINAL_DIFFICULTY.mythic.anvilEvery).toBe(50);
+    // A live pull: the next bar 50 s after the first, on its own clock.
     const f = finalFight(5);
     f.pullIn('hammer');
     const starts: number[] = [];
-    for (let i = 0; i < sec(T.anvilFirst + 2 * 35 + 8); i++) {
+    for (let i = 0; i < sec(T.anvilFirst + 2 * 50 + 8); i++) {
       const was = f.state()?.anvil;
       f.tick();
       if (!was && f.state()?.anvil) starts.push(i / 20);
     }
     expect(starts.length).toBeGreaterThanOrEqual(3);
-    for (let i = 1; i < starts.length; i++) expect(starts[i] - starts[i - 1]).toBeLessThan(35 + 4);
+    for (let i = 1; i < starts.length; i++) {
+      expect(starts[i] - starts[i - 1]).toBeGreaterThanOrEqual(50 - 1e-6);
+      expect(starts[i] - starts[i - 1]).toBeLessThan(50 + 4);
+    }
   });
 
   it('Heroic: soakers are Crushed and take the next Anvil three times over; Stone Shell absorbs healing', () => {

@@ -6,8 +6,8 @@
 //                        cracks under three hashed players (four on Heroic);
 //                        2.5 s later each crack erupts (4 yd): step out.
 //   Weight of the Anvil  the boss's OWN since the rework of 2026-11-18: all
-//                        fight (each tier's anvilEvery: 35 s Normal, 30 Heroic,
-//                        28 Mythic since Jose's playtest of 2026-11-19; first 30 s
+//                        fight (each tier's anvilEvery: 50 s on every tier
+//                        since Jose's playtest of 2026-11-20; first 30 s
 //                        in), wherever it stands (its clock is the coordinator's),
 //                        a 6 s bar on a hashed player: a 6 yd circle that FOLLOWS
 //                        them (the anvil mark on them, their personal arrow)

@@ -586,7 +586,7 @@ function dragSpot(world, st) {
     target = z;
   }
   // Heroic's Hammer: the Anvil's soakers stay Crushed 30 s and the next
-  // Anvil falls 25 s later, so the boss leaves the Hammer once one has fallen.
+  // Anvil falls a tier's anvilEvery later, so the boss leaves the Hammer once one has fallen.
   // Normal too: every Anvil is a raid-wide soak and a Tremor Crack round,
   // so one per Hammer visit is the clean rotation.
   const hammerDone = z === 'hammer' && (st.anvilFellAt ?? 0) > (st.zoneAt ?? Date.now());
