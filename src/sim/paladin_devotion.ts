@@ -362,7 +362,9 @@ export function resolveAscensionAbility(
       auraId: 'vowkeeper_strike_absorb',
     });
   } else if (resolved.def.id === 'life_covenant') {
-    effects.push({ type: 'absorb', amount: 120, duration: 6 });
+    // Its own aura id: under the bare ability id the shield would refresh away
+    // the 40% damage reduction buffTarget just applied.
+    effects.push({ type: 'absorb', amount: 120, duration: 6, auraId: 'life_covenant_absorb' });
   } else if (resolved.def.id === 'sacred_challenge') {
     effects.push({ type: 'selfBuff', kind: 'buff_dr', value: 0.15, duration: 4 });
   }
