@@ -4282,6 +4282,7 @@ export const pl_PL: EnTranslations = {
       "reasonCommissionUnavailable": "To zlecenie nie jest już śledzone. Śledź je ponownie z tablicy, jeśli nadal tam jest.",
       "reasonDailyLimit": "Ten przepis został już dziś wykonany.",
       "reasonBatchLimit": "Ten rozmiar partii nie jest już prawidłowy.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} z {required}",
       "materialCarried": "w torbach: {count}",
       "materialStored": "w magazynie: {count}",

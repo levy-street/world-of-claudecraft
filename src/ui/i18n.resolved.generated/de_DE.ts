@@ -4282,6 +4282,7 @@ export const de_DE: EnTranslations = {
       "reasonCommissionUnavailable": "Dieser Auftrag wird nicht mehr verfolgt. Verfolge ihn erneut über das Brett, falls er noch aufgeführt ist.",
       "reasonDailyLimit": "Dieses Rezept wurde heute bereits hergestellt.",
       "reasonBatchLimit": "Diese Stapelgröße ist nicht mehr gültig.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} von {required}",
       "materialCarried": "{count} mitgeführt",
       "materialStored": "{count} eingelagert",

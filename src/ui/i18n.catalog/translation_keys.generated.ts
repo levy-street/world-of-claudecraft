@@ -15296,6 +15296,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.gatheringGoal.materialInaccessible'
   | 'hudChrome.gatheringGoal.materialLine'
   | 'hudChrome.gatheringGoal.materialMissing'
+  | 'hudChrome.gatheringGoal.materialProgress'
   | 'hudChrome.gatheringGoal.materialStored'
   | 'hudChrome.gatheringGoal.payableCraftsLine'
   | 'hudChrome.gatheringGoal.readyHint'

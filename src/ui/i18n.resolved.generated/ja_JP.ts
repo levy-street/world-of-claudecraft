@@ -4282,6 +4282,7 @@ export const ja_JP: EnTranslations = {
       "reasonCommissionUnavailable": "その依頼はもう追跡されていません。まだ掲載されている場合は、ボードから再度追跡してください。",
       "reasonDailyLimit": "そのレシピは本日すでに製作済みです。",
       "reasonBatchLimit": "そのバッチ数はもう無効です。",
+      "materialProgress": "{name}：{carried}/{required}（銀行に+{stored}個）",
       "materialLine": "{name}：{reachable}/{required}",
       "materialCarried": "{count}個を所持",
       "materialStored": "保管庫に{count}個",

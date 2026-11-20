@@ -4282,6 +4282,7 @@ export const zh_CN: EnTranslations = {
       "reasonCommissionUnavailable": "该委托已不再追踪。如果仍在公告栏中列出，请从公告栏重新追踪。",
       "reasonDailyLimit": "该配方今天已经制作过了。",
       "reasonBatchLimit": "该批次数量已不再有效。",
+      "materialProgress": "{name}：{carried}/{required}（银行中另有{stored}个）",
       "materialLine": "{name}：{reachable}/{required}",
       "materialCarried": "随身携带{count}个",
       "materialStored": "仓库中有{count}个",

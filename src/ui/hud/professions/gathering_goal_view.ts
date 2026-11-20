@@ -40,6 +40,10 @@ export interface GatheringGoalMaterialRow {
   readonly reachable: number;
   readonly missing: number;
   readonly inaccessible: number;
+  /** Every copy held in the bags, uncapped (the row's "x" in x/a). */
+  readonly heldCarried: number;
+  /** Every copy held in the bank plus the Materials Vault, uncapped. */
+  readonly heldStored: number;
   /** `reachable >= required`: this row alone contributes nothing to the
    *  panel being blocked. Never implies the overall goal is deliverable
    *  (gold, a station, and bag space are separate concerns this row knows
@@ -124,6 +128,8 @@ function materialRow(
     reachable: material.reachable,
     missing: material.missing,
     inaccessible: material.inaccessible,
+    heldCarried: material.heldCarried,
+    heldStored: material.heldStored,
     satisfied: material.reachable >= material.required,
     sourceFamilyId: hint?.familyId ?? null,
     corpsePreferenceItemId,

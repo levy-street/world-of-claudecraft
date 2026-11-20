@@ -4282,6 +4282,7 @@ export const vi_VN: EnTranslations = {
       "reasonCommissionUnavailable": "Đơn đặt hàng đó không còn được theo dõi. Hãy theo dõi lại từ bảng nếu nó vẫn còn được niêm yết.",
       "reasonDailyLimit": "Hôm nay bạn đã chế tác công thức đó rồi.",
       "reasonBatchLimit": "Kích thước lô đó không còn hợp lệ.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable}/{required}",
       "materialCarried": "Đang mang {count}",
       "materialStored": "{count} trong kho",

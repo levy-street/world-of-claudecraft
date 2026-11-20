@@ -164,6 +164,8 @@ export function gatheringGoalFor(ctx: SimContext, pid: number): GatheringGoalVie
                 reachable: row.reachableCount,
                 missing: row.missingCount,
                 inaccessible: row.inaccessibleCount,
+                heldCarried: row.heldCarriedCount,
+                heldStored: row.heldStoredCount,
               }),
             ),
           ),

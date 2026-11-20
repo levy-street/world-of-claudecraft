@@ -4282,6 +4282,7 @@ export const tr_TR: EnTranslations = {
       "reasonCommissionUnavailable": "Bu sipariş artık takip edilmiyor. Hâlâ listeleniyorsa panodan yeniden takip et.",
       "reasonDailyLimit": "Bu tarif bugün zaten üretildi.",
       "reasonBatchLimit": "Bu parti boyutu artık geçerli değil.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {required} içinden {reachable} erişilebilir",
       "materialCarried": "{count} taşınıyor",
       "materialStored": "Depoda {count}",

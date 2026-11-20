@@ -4282,6 +4282,7 @@ export const ru_RU: EnTranslations = {
       "reasonCommissionUnavailable": "Этот заказ больше не отслеживается. Отследите его снова на доске заказов, если он всё ещё указан там.",
       "reasonDailyLimit": "Этот рецепт уже создавался сегодня.",
       "reasonBatchLimit": "Этот размер партии больше не действителен.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} в банке)",
       "materialLine": "{name}: {reachable} из {required}",
       "materialCarried": "При себе: {count}",
       "materialStored": "На складе: {count}",

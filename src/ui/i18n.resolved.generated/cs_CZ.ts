@@ -4282,6 +4282,7 @@ export const cs_CZ: EnTranslations = {
       "reasonCommissionUnavailable": "Tato zakázka se už nesleduje. Pokud je stále na nástěnce, sleduj ji znovu.",
       "reasonDailyLimit": "Tento recept už byl dnes vyroben.",
       "reasonBatchLimit": "Tato velikost dávky už není platná.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} z {required}",
       "materialCarried": "v brašnách: {count}",
       "materialStored": "ve skladu: {count}",

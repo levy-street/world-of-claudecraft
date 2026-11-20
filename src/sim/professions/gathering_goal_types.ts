@@ -29,6 +29,14 @@ export interface GatheringGoalMaterial {
   readonly missing: number;
   /** Allocated owned units not currently usable for this bill. */
   readonly inaccessible: number;
+  /** EVERY copy of this reagent in the bags (its grade ladder included,
+   *  locked copies included), NOT capped at `required`: the tracker's
+   *  "what you hold" figure. `carried` above is the capped allocation. */
+  readonly heldCarried: number;
+  /** EVERY copy in the personal bank plus the Materials Vault (grade ladder
+   *  included), NOT capped at `required`. `stored` above is the capped
+   *  allocation. */
+  readonly heldStored: number;
 }
 
 export interface GatheringGoalView {

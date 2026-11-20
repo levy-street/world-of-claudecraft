@@ -4282,6 +4282,7 @@ export const da_DK: EnTranslations = {
       "reasonCommissionUnavailable": "Den bestilling spores ikke længere. Spor den igen fra tavlen, hvis den stadig står der.",
       "reasonDailyLimit": "Den opskrift er allerede fremstillet i dag.",
       "reasonBatchLimit": "Den batchstørrelse er ikke længere gyldig.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} af {required}",
       "materialCarried": "{count} bæres",
       "materialStored": "{count} på lager",

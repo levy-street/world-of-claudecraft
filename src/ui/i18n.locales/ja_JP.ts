@@ -13512,6 +13512,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gatheringGoal.reasonDailyLimit': 'そのレシピは本日すでに製作済みです。',
   'hudChrome.gatheringGoal.reasonBatchLimit': 'そのバッチ数はもう無効です。',
   'hudChrome.gatheringGoal.materialLine': '{name}：{reachable}/{required}',
+  'hudChrome.gatheringGoal.materialProgress': '{name}：{carried}/{required}（銀行に+{stored}個）',
   'hudChrome.gatheringGoal.materialCarried': '{count}個を所持',
   'hudChrome.gatheringGoal.materialStored': '保管庫に{count}個',
   'hudChrome.gatheringGoal.materialMissing': '不足 {count}個',

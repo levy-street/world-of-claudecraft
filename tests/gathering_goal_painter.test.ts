@@ -128,6 +128,8 @@ describe('renderGatheringGoalPanel: rendering never invokes tracking or preferen
             reachable: 5,
             missing: 5,
             inaccessible: 0,
+            heldCarried: 2,
+            heldStored: 3,
             satisfied: false,
             sourceFamilyId: 'corpseHarvesting',
             corpsePreferenceItemId: 'rough_hide',
@@ -160,6 +162,8 @@ describe('renderGatheringGoalPanel: exact mixed storage/shortfall/ready statuses
             reachable: 5,
             missing: 0,
             inaccessible: 0,
+            heldCarried: 5,
+            heldStored: 0,
             satisfied: true,
             sourceFamilyId: 'mining',
             corpsePreferenceItemId: null,
@@ -175,7 +179,7 @@ describe('renderGatheringGoalPanel: exact mixed storage/shortfall/ready statuses
     expect(el.querySelector('[data-set-pref]')).toBeNull();
   });
 
-  it('a mixed shortfall-plus-inaccessible row reports BOTH counts and is not satisfied', () => {
+  it('a shortfall-plus-inaccessible row is not satisfied and reads as held/required', () => {
     const el = mount();
     renderGatheringGoalPanel(
       el,
@@ -192,6 +196,8 @@ describe('renderGatheringGoalPanel: exact mixed storage/shortfall/ready statuses
             reachable: 4,
             missing: 6,
             inaccessible: 1,
+            heldCarried: 2,
+            heldStored: 3,
             satisfied: false,
             sourceFamilyId: 'corpseHarvesting',
             corpsePreferenceItemId: 'rough_hide',
@@ -203,8 +209,8 @@ describe('renderGatheringGoalPanel: exact mixed storage/shortfall/ready statuses
     );
     const row = el.querySelector('.gathering-goal-material');
     expect(row?.classList.contains('satisfied')).toBe(false);
-    expect(el.textContent).toMatch(/6/);
-    expect(el.textContent).toMatch(/1/);
+    const line = el.querySelector('.gathering-goal-material-line')?.textContent ?? '';
+    expect(line).toMatch(/: 2\/10 \(\+3 in bank\)$/);
   });
 
   it('storageRestricted renders its own note; a non-restricted goal renders none', () => {
@@ -228,8 +234,8 @@ describe('renderGatheringGoalPanel: exact mixed storage/shortfall/ready statuses
   });
 });
 
-describe('renderGatheringGoalPanel: carried/stored counts and source family labels are rendered', () => {
-  it('renders exact carried and stored counts on every row, not just reachable/required', () => {
+describe('renderGatheringGoalPanel: held/required counts and source family labels are rendered', () => {
+  it('renders "{name}: held/required (+bank in bank)" from the UNCAPPED holdings', () => {
     const el = mount();
     renderGatheringGoalPanel(
       el,
@@ -237,13 +243,16 @@ describe('renderGatheringGoalPanel: carried/stored counts and source family labe
         materials: [
           {
             itemId: 'iron_ore',
-            item: undefined,
+            item: ITEMS.iron_ore,
             required: 12,
+            // The capped allocation (carried/stored) must NOT be what renders.
             carried: 3,
             stored: 4,
             reachable: 5,
-            missing: 7,
-            inaccessible: 0,
+            missing: 5,
+            inaccessible: 2,
+            heldCarried: 30,
+            heldStored: 8,
             satisfied: false,
             sourceFamilyId: 'mining',
             corpsePreferenceItemId: null,
@@ -254,12 +263,12 @@ describe('renderGatheringGoalPanel: carried/stored counts and source family labe
       deps(),
     );
     const line = el.querySelector('.gathering-goal-material-line')?.textContent ?? '';
-    expect(line).toContain('5 of 12');
-    expect(line).toMatch(/3 carried/);
-    expect(line).toMatch(/4 in storage/);
+    expect(line).toBe(`${itemDisplayName(ITEMS.iron_ore)}: 30/12 (+8 in bank)`);
+    // None of the retired breakdown chips survive.
+    expect(line).not.toMatch(/carried|in storage|missing|unavailable for crafting| of /);
   });
 
-  it('renders carried/stored even when both are zero (never omitted as "nothing to say")', () => {
+  it('renders the bank part even when every count is zero (never omitted as "nothing to say")', () => {
     const el = mount();
     renderGatheringGoalPanel(
       el,
@@ -274,6 +283,8 @@ describe('renderGatheringGoalPanel: carried/stored counts and source family labe
             reachable: 0,
             missing: 5,
             inaccessible: 0,
+            heldCarried: 0,
+            heldStored: 0,
             satisfied: false,
             sourceFamilyId: 'mining',
             corpsePreferenceItemId: null,
@@ -284,8 +295,7 @@ describe('renderGatheringGoalPanel: carried/stored counts and source family labe
       deps(),
     );
     const line = el.querySelector('.gathering-goal-material-line')?.textContent ?? '';
-    expect(line).toMatch(/0 carried/);
-    expect(line).toMatch(/0 in storage/);
+    expect(line).toMatch(/: 0\/5 \(\+0 in bank\)$/);
   });
 
   it('renders the localized source family name per material (mining, corpse harvesting)', () => {
@@ -303,6 +313,8 @@ describe('renderGatheringGoalPanel: carried/stored counts and source family labe
             reachable: 5,
             missing: 0,
             inaccessible: 0,
+            heldCarried: 5,
+            heldStored: 0,
             satisfied: true,
             sourceFamilyId: 'mining',
             corpsePreferenceItemId: null,
@@ -317,6 +329,8 @@ describe('renderGatheringGoalPanel: carried/stored counts and source family labe
             reachable: 5,
             missing: 0,
             inaccessible: 0,
+            heldCarried: 5,
+            heldStored: 0,
             satisfied: true,
             sourceFamilyId: 'corpseHarvesting',
             corpsePreferenceItemId: 'rough_hide',
@@ -347,6 +361,8 @@ describe('renderGatheringGoalPanel: carried/stored counts and source family labe
             reachable: 0,
             missing: 1,
             inaccessible: 0,
+            heldCarried: 0,
+            heldStored: 0,
             satisfied: false,
             sourceFamilyId: null,
             corpsePreferenceItemId: null,
@@ -376,6 +392,8 @@ describe('renderGatheringGoalPanel: unknown item ids never leak a raw internal t
             reachable: 0,
             missing: 5,
             inaccessible: 0,
+            heldCarried: 0,
+            heldStored: 0,
             satisfied: false,
             sourceFamilyId: null,
             corpsePreferenceItemId: null,
@@ -467,6 +485,8 @@ describe('renderGatheringGoalPanel: material meta row (family badge + preference
             reachable: 5,
             missing: 5,
             inaccessible: 0,
+            heldCarried: 2,
+            heldStored: 3,
             satisfied: false,
             sourceFamilyId: 'corpseHarvesting',
             corpsePreferenceItemId: 'rough_hide',
@@ -496,6 +516,8 @@ describe('renderGatheringGoalPanel: material meta row (family badge + preference
             reachable: 0,
             missing: 1,
             inaccessible: 0,
+            heldCarried: 0,
+            heldStored: 0,
             satisfied: false,
             sourceFamilyId: null,
             corpsePreferenceItemId: null,
@@ -510,35 +532,6 @@ describe('renderGatheringGoalPanel: material meta row (family badge + preference
 });
 
 describe('renderGatheringGoalPanel: corrected copy', () => {
-  it('the inaccessible-count line never claims every unit is in storage (also covers locked carried slots)', () => {
-    const el = mount();
-    renderGatheringGoalPanel(
-      el,
-      baseModel({
-        materials: [
-          {
-            itemId: 'rough_hide',
-            item: undefined,
-            required: 10,
-            carried: 2,
-            stored: 3,
-            reachable: 4,
-            missing: 6,
-            inaccessible: 1,
-            satisfied: false,
-            sourceFamilyId: 'corpseHarvesting',
-            corpsePreferenceItemId: 'rough_hide',
-            isCurrentHarvestPreference: false,
-          },
-        ],
-      }),
-      deps(),
-    );
-    const line = el.querySelector('.gathering-goal-material-line')?.textContent ?? '';
-    expect(line).toContain('1 unavailable for crafting');
-    expect(line).not.toMatch(/in storage you cannot reach/i);
-  });
-
   it('the commission-unavailable reason tells the player to re-track from the board, never that the order is gone', () => {
     const el = mount();
     renderGatheringGoalPanel(
@@ -578,6 +571,8 @@ describe('renderGatheringGoalPanel: current-harvest-preference selected state', 
             reachable: 5,
             missing: 5,
             inaccessible: 0,
+            heldCarried: 2,
+            heldStored: 3,
             satisfied: false,
             sourceFamilyId: 'corpseHarvesting',
             corpsePreferenceItemId: 'rough_hide',
@@ -611,6 +606,8 @@ describe('renderGatheringGoalPanel: current-harvest-preference selected state', 
             reachable: 5,
             missing: 5,
             inaccessible: 0,
+            heldCarried: 2,
+            heldStored: 3,
             satisfied: false,
             sourceFamilyId: 'corpseHarvesting',
             corpsePreferenceItemId: 'rough_hide',
@@ -657,6 +654,8 @@ describe('renderGatheringGoalPanel: explicit actions fire exactly once', () => {
             reachable: 5,
             missing: 5,
             inaccessible: 0,
+            heldCarried: 2,
+            heldStored: 3,
             satisfied: false,
             sourceFamilyId: 'corpseHarvesting',
             corpsePreferenceItemId: 'rough_hide',
@@ -671,6 +670,8 @@ describe('renderGatheringGoalPanel: explicit actions fire exactly once', () => {
             reachable: 5,
             missing: 0,
             inaccessible: 0,
+            heldCarried: 5,
+            heldStored: 0,
             satisfied: true,
             sourceFamilyId: 'mining',
             corpsePreferenceItemId: null,

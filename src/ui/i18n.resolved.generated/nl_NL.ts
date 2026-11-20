@@ -4282,6 +4282,7 @@ export const nl_NL: EnTranslations = {
       "reasonCommissionUnavailable": "Die opdracht wordt niet langer gevolgd. Volg haar opnieuw vanaf het bord als ze er nog staat.",
       "reasonDailyLimit": "Dat recept is vandaag al vervaardigd.",
       "reasonBatchLimit": "Die partijgrootte is niet langer geldig.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} van {required}",
       "materialCarried": "{count} bij je",
       "materialStored": "{count} in opslag",

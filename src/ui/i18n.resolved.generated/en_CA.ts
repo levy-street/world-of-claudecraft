@@ -4282,6 +4282,7 @@ export const en_CA: EnTranslations = {
       "reasonCommissionUnavailable": "That commission is no longer tracked. Track it again from the board if it is still listed.",
       "reasonDailyLimit": "That recipe has already been crafted today.",
       "reasonBatchLimit": "That batch size is no longer valid.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} of {required}",
       "materialCarried": "{count} carried",
       "materialStored": "{count} in storage",

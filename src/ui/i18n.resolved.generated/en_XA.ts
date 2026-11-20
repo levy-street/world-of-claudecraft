@@ -4282,6 +4282,7 @@ export const en_XA: EnTranslations = {
       "reasonCommissionUnavailable": "[Ţĥáţ çóɱɱíššíóñ íš ñó ļóñĝéŕ ţŕáçķéð. Ţŕáçķ íţ áĝáíñ ƒŕóɱ ţĥé ƀóáŕð íƒ íţ íš šţíļļ ļíšţéð.]",
       "reasonDailyLimit": "[Ţĥáţ ŕéçíþé ĥáš áļŕéáðý ƀééñ çŕáƒţéð ţóðáý.]",
       "reasonBatchLimit": "[Ţĥáţ ƀáţçĥ šížé íš ñó ļóñĝéŕ ʋáļíð.]",
+      "materialProgress": "[{name}: {carried}/{required} (+{stored} íñ ƀáñķ)]",
       "materialLine": "[{name}: {reachable} óƒ {required}]",
       "materialCarried": "[{count} çáŕŕíéð]",
       "materialStored": "[{count} íñ šţóŕáĝé]",

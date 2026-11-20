@@ -4282,6 +4282,7 @@ export const sv_SE: EnTranslations = {
       "reasonCommissionUnavailable": "Den beställningen spåras inte längre. Spåra den igen från tavlan om den fortfarande finns där.",
       "reasonDailyLimit": "Det receptet har redan tillverkats idag.",
       "reasonBatchLimit": "Den batchstorleken är inte längre giltig.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} av {required}",
       "materialCarried": "{count} bärs",
       "materialStored": "{count} i lagring",

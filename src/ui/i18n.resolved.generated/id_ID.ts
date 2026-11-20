@@ -4282,6 +4282,7 @@ export const id_ID: EnTranslations = {
       "reasonCommissionUnavailable": "Komisi itu tidak lagi dilacak. Lacak lagi dari papan jika masih tercantum.",
       "reasonDailyLimit": "Resep itu sudah dibuat hari ini.",
       "reasonBatchLimit": "Ukuran batch itu tidak lagi valid.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} dari {required}",
       "materialCarried": "{count} dibawa",
       "materialStored": "{count} di penyimpanan",

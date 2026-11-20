@@ -4282,6 +4282,7 @@ export const it_IT: EnTranslations = {
       "reasonCommissionUnavailable": "Quella commissione non è più seguita. Seguila di nuovo dal tabellone se è ancora elencata.",
       "reasonDailyLimit": "Quella ricetta è già stata creata oggi.",
       "reasonBatchLimit": "Quella dimensione del lotto non è più valida.",
+      "materialProgress": "{name}: {carried}/{required} (+{stored} in bank)",
       "materialLine": "{name}: {reachable} di {required}",
       "materialCarried": "{count} trasportati",
       "materialStored": "{count} in deposito",

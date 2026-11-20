@@ -63,6 +63,8 @@ describe('trackGatheringRecipe: a count above what is currently craftable', () =
         reachable: 2,
         missing: 4,
         inaccessible: 0,
+        heldCarried: 2,
+        heldStored: 0,
       },
       {
         itemId: 'bone_fragments',
@@ -72,6 +74,8 @@ describe('trackGatheringRecipe: a count above what is currently craftable', () =
         reachable: 4,
         missing: 8,
         inaccessible: 0,
+        heldCarried: 4,
+        heldStored: 0,
       },
       {
         itemId: 'smithing_flux',
@@ -81,8 +85,33 @@ describe('trackGatheringRecipe: a count above what is currently craftable', () =
         reachable: 6,
         missing: 12,
         inaccessible: 0,
+        heldCarried: 6,
+        heldStored: 0,
       },
     ]);
+  });
+
+  it('reports the FULL bag holding beside the capped allocation (more held than the goal needs)', () => {
+    // The reported case: Minor Healing Potion x1 needs 1 linen, 1 leg, 2
+    // herbs, but the player carries 26 / 6 / 23. The allocation stays capped
+    // at the requirement; heldCarried is every copy in the bags.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('linen_scrap', 26, pid);
+    sim.addItem('spider_leg', 6, pid);
+    sim.addItem('silverleaf_herb', 23, pid);
+
+    expect(sim.trackGatheringRecipe('recipe_minor_healing_potion', 1, pid)).toBe(true);
+    const rows = sim.gatheringGoalFor(pid)?.materials ?? [];
+    const byId = new Map(rows.map((row) => [row.itemId, row]));
+    expect(byId.get('linen_scrap')).toMatchObject({ required: 1, carried: 1, heldCarried: 26 });
+    expect(byId.get('spider_leg')).toMatchObject({ required: 1, carried: 1, heldCarried: 6 });
+    expect(byId.get('silverleaf_herb')).toMatchObject({
+      required: 2,
+      carried: 2,
+      heldCarried: 23,
+    });
+    for (const row of rows) expect(row.heldStored).toBe(0);
   });
 
   it('reaches ready once every reagent is fully covered', () => {

@@ -23,6 +23,8 @@ function material(overrides: Partial<GatheringGoalMaterial> = {}): GatheringGoal
     reachable: 0,
     missing: 10,
     inaccessible: 0,
+    heldCarried: 0,
+    heldStored: 0,
     ...overrides,
   };
 }
@@ -156,6 +158,8 @@ describe('buildGatheringGoalPanelModel: material rows echo the sim DTO verbatim 
       reachable: 5,
       missing: 7,
       inaccessible: 2,
+      heldCarried: 30,
+      heldStored: 9,
     });
     const model = buildGatheringGoalPanelModel(
       view({ goal: { kind: 'recipe', recipeId: 'recipe_iron_pick', count: 1 }, materials: [mat] }),
@@ -169,6 +173,31 @@ describe('buildGatheringGoalPanelModel: material rows echo the sim DTO verbatim 
     expect(row.reachable).toBe(5);
     expect(row.missing).toBe(7);
     expect(row.inaccessible).toBe(2);
+    expect(row.heldCarried).toBe(30);
+    expect(row.heldStored).toBe(9);
+  });
+
+  it('satisfied keys off REACHABLE, never the uncapped holding (locked copies do not count)', () => {
+    // Holds 10 of the 10 needed, but only 4 are spendable (the rest locked).
+    const model = buildGatheringGoalPanelModel(
+      view({
+        goal: { kind: 'recipe', recipeId: 'recipe_iron_pick', count: 1 },
+        materials: [
+          material({
+            itemId: 'iron_ore',
+            required: 10,
+            carried: 10,
+            reachable: 4,
+            missing: 0,
+            inaccessible: 6,
+            heldCarried: 10,
+          }),
+        ],
+      }),
+      ITEMS,
+      RECIPE_LOOKUP,
+    );
+    expect(model.materials[0].satisfied).toBe(false);
   });
 
   it.each([

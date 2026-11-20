@@ -4282,6 +4282,7 @@ export const ko_KR: EnTranslations = {
       "reasonCommissionUnavailable": "해당 의뢰는 더 이상 추적되지 않습니다. 아직 게시되어 있다면 게시판에서 다시 추적하세요.",
       "reasonDailyLimit": "해당 제작법은 오늘 이미 제작했습니다.",
       "reasonBatchLimit": "해당 배치 수량은 더 이상 유효하지 않습니다.",
+      "materialProgress": "{name}: {carried}/{required} (은행에 +{stored}개)",
       "materialLine": "{name}: {reachable}/{required}",
       "materialCarried": "소지 {count}개",
       "materialStored": "보관함에 {count}개",

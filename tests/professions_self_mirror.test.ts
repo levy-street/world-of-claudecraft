@@ -110,6 +110,8 @@ function readyRecipeGoal(): unknown {
         reachable: 10,
         missing: 0,
         inaccessible: 0,
+        heldCarried: 6,
+        heldStored: 4,
       },
     ],
     payableCrafts: 5,

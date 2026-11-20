@@ -5162,15 +5162,20 @@ export const hudChromeStrings = {
       'That commission is no longer tracked. Track it again from the board if it is still listed.',
     reasonDailyLimit: 'That recipe has already been crafted today.',
     reasonBatchLimit: 'That batch size is no longer valid.',
+    // One tracked material row: {carried} is EVERY copy in the bags and
+    // {stored} every copy in the bank plus the Materials Vault, both uncapped
+    // (they may exceed {required}); {required} is the goal's full need. The
+    // bank part is always rendered, zero included. Keep the "x/a" shape
+    // compact: the tracker rail is narrow.
+    materialProgress: '{name}: {carried}/{required} (+{stored} in bank)',
+    // RETIRED: no longer rendered since materialProgress replaced the row's
+    // "reachable of required, N carried, N in storage" breakdown. Kept only
+    // because every locale overlay still carries them; drop these together
+    // with the overlay rows at the next release fill.
     materialLine: '{name}: {reachable} of {required}',
-    // Carried and in-storage are ALWAYS rendered (they are the row's own
-    // allocation breakdown, not a warning that only appears on shortfall,
-    // which is what missing/inaccessible below are).
     materialCarried: '{count} carried',
     materialStored: '{count} in storage',
     materialMissing: '{count} missing',
-    // Covers BOTH a stored unit outside this container's reach AND a locked
-    // carried slot: never claim every unit counted here is in storage.
     materialInaccessible: '{count} unavailable for crafting',
     storageRestrictedNote: 'Some materials are in storage you cannot reach from here.',
     payableCraftsLine: 'Enough on hand for {count} more.',

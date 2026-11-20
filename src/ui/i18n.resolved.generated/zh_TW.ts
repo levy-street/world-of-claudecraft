@@ -4282,6 +4282,7 @@ export const zh_TW: EnTranslations = {
       "reasonCommissionUnavailable": "該委託已不再追蹤。如果仍在公告欄中列出，請從公告欄重新追蹤。",
       "reasonDailyLimit": "該配方今天已經製作過了。",
       "reasonBatchLimit": "該批次數量已不再有效。",
+      "materialProgress": "{name}：{carried}/{required}（銀行中另有{stored}個）",
       "materialLine": "{name}：{reachable}/{required}",
       "materialCarried": "隨身攜帶{count}個",
       "materialStored": "倉庫中有{count}個",
