@@ -14,6 +14,10 @@
 import { describe, expect, it } from 'vitest';
 import { finalArrowMark } from '../src/render/smith_heart_fx/final_arrow_core';
 import {
+  newOverloadRingState,
+  overloadRingState,
+} from '../src/render/smith_heart_fx/final_overload_ring_core';
+import {
   FINAL_AURAS,
   FINAL_BOSS,
   FINAL_ZONE_CODES,
@@ -36,10 +40,10 @@ import type { Aura, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { castDisplayName } from '../src/ui/cast_display_name';
 import {
-  buildOverloadView,
-  makeOverloadView,
-  type OverloadBoss,
-} from '../src/ui/hud/dungeon/heart_overload_view';
+  buildFinalPhaseView,
+  type FinalPhaseBoss,
+  makeFinalPhaseView,
+} from '../src/ui/hud/dungeon/heart_final_phase_view';
 import { setLanguage, t } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { finalFight } from './helpers/final_fight';
@@ -165,7 +169,7 @@ describe('part 2: tooltips', () => {
 
 // ---- the HUD ----------------------------------------------------------------------------
 
-function bossAt(stage: keyof typeof FINAL_STAGE_CODES, extra: OverloadBoss['auras'] = []) {
+function bossAt(stage: keyof typeof FINAL_STAGE_CODES, extra: FinalPhaseBoss['auras'] = []) {
   return {
     id: 7,
     templateId: FINAL_BOSS,
@@ -177,61 +181,56 @@ function bossAt(stage: keyof typeof FINAL_STAGE_CODES, extra: OverloadBoss['aura
       { id: overloadAuraId('hammer'), value: 85, value2: 0 },
       ...extra,
     ],
-  } satisfies OverloadBoss;
+  } satisfies FinalPhaseBoss;
 }
 
-describe('part 2: the Overload HUD', () => {
+describe('part 2: the phase readout and the room ring', () => {
   it('a call: the bars held, the Splinters lit, the shield and their count', () => {
     const mask = quarterBit('heat') | quarterBit('hammer');
-    const v = buildOverloadView(
-      bossAt('call', [
-        { id: A.phase, value: FINAL_STAGE_CODES.call, value2: mask, value3: 31 },
-        { id: A.shield, value: 0 },
-      ]),
-      makeOverloadView(),
-    );
-    expect(v.frozen).toBe(true);
-    expect(v.barsOff).toBe(false);
+    const boss = bossAt('call', [
+      { id: A.phase, value: FINAL_STAGE_CODES.call, value2: mask, value3: 31 },
+      { id: A.shield, value: 0 },
+    ]);
+    const v = buildFinalPhaseView(boss, makeFinalPhaseView());
     expect(v.title).toBe('Call of the Quarters');
     expect(v.phase).toBe('Shield 31');
     expect(v.splinters).toBe('Splinters 2');
-    expect(v.rows.filter((r) => r.awake).map((r) => r.vein)).toEqual(['hammer', 'heat']);
-    // A held bar never throbs as if it were about to burst.
-    expect(v.rows.some((r) => r.danger || r.active)).toBe(false);
+    // The room's ring holds its bar, and a held bar never warns.
+    const ring = overloadRingState(boss, true, newOverloadRingState());
+    expect(ring.mode === 'held' || ring.mode === 'off').toBe(true);
+    expect(ring.warn).toBe(false);
   });
 
   it('the final phase: the bars off, the enrage counting down, then the fury', () => {
-    const v = buildOverloadView(
-      bossAt('final', [
-        { id: A.phase, value: FINAL_STAGE_CODES.final, value2: ALL_QUARTERS_MASK, value3: 90 },
-      ]),
-      makeOverloadView(),
-    );
-    expect(v.barsOff).toBe(true);
+    const boss = bossAt('final', [
+      { id: A.phase, value: FINAL_STAGE_CODES.final, value2: ALL_QUARTERS_MASK, value3: 90 },
+    ]);
+    const v = buildFinalPhaseView(boss, makeFinalPhaseView());
+    expect(overloadRingState(boss, true, newOverloadRingState()).mode).toBe('off');
     expect(v.title).toBe('All quarters awake');
     expect(v.phase).toBe('Enrage in 90');
     expect(v.phaseUrgent).toBe(false);
-    const w = buildOverloadView(
+    const w = buildFinalPhaseView(
       bossAt('final', [
         { id: A.phase, value: FINAL_STAGE_CODES.final, value2: ALL_QUARTERS_MASK, value3: 0 },
         { id: A.fury, value: 3 },
       ]),
-      makeOverloadView(),
+      makeFinalPhaseView(),
     );
     expect(w.phase).toBe('Masterless Fury x3');
     expect(w.phaseUrgent).toBe(true);
   });
 
   it('the poured elements read all fight long, twice poured counted', () => {
-    const v = buildOverloadView(
+    const v = buildFinalPhaseView(
       bossAt('fight', [
         { id: A.phase, value: FINAL_STAGE_CODES.fight, value2: 0, value3: 0 },
         { id: pouredAuraId('heat'), value: 1 },
         { id: pouredAuraId('quench'), value: 2 },
       ]),
-      makeOverloadView(),
+      makeFinalPhaseView(),
     );
-    expect(v.frozen).toBe(false);
+    expect(v.title).toBe('');
     expect(v.poured).toContain('Heat');
     expect(v.poured).toContain('Quench x2');
     expect(v.phase).toBe('');

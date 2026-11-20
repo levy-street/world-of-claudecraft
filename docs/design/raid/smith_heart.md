@@ -2635,12 +2635,28 @@ cast bars (Basalt Fist the Heat guardian's own cast); every footprint as an obje
 Fist's spot, lanes and waves the Heat guardian's); the marks as player auras; the gale as
 the wind kernel's aura, told from the Breath guardian's by its tag.
 
-**The raid HUD** (`src/ui/hud/dungeon/heart_overload_view.ts`, painted by
-`heart_overload_painter.ts`): four bars in a row at the top of the screen in their veins'
-colours, the quarter it drinks lit and framed, a bar three quarters full turning hostile and
-throbbing, and under them Vein-Shaken's
-and Heart Unbound's; it draws on every tier and whatever the hints setting (the raid steers
-by it, a gauge, not a message). Since Jose's playtest of 2026-11-19 the fight puts NO
+**The Overload ring in the room's centre** (Jose's brief of 2026-11-20, replacing the
+HUD's four bars; `src/render/smith_heart_fx/final_overload_ring.ts`, its pure plan
+`final_overload_ring_core.ts`, pinned by `tests/smith_heart_overload_ring.test.ts`): a
+great engraved ring inlaid in the floor round the central well, where the boss stands at
+the start, fills like a clock hand's sweep (from the room's north, clockwise) with the bar
+of the quarter the boss drinks, in that quarter's colour (`HEART_QUARTER_PALETTE`: the
+Heat's red-orange, the Quench's ice blue, the Breath's storm violet, the Hammer's sand
+gold); the well's glow and a light column over it rise with it, and the percent and the
+quarter's name stand in the air over the well, facing every camera, so it reads from any
+rim of the room. A quarter change recolours it at once and shows that quarter's own bar.
+From four fifths full it flickers, throws sparks, the rest of the track burns danger-red,
+the label wears a red rim and the warning sounds (the fight's crystal strain, at four
+fifths and again at nine tenths). With the boss in the central ring before its final
+phase the whole ring turns red and pulses, Heart Unbound's stacks over the well. Held and
+dimmed through an intermission, off in the final phase. It draws on every tier (the low
+tier sheds the sparks only; reduced motion keeps a steady light, no flicker), read off the
+same boss auras (no wire or `IWorld` field).
+
+**The raid HUD** (`src/ui/hud/dungeon/heart_final_phase_view.ts`, painted by
+`heart_final_phase_painter.ts`): only what has no place on the floor, at the top of the
+screen: Vein-Shaken's seconds (Heroic) and part 2's clocks below; it draws on every tier
+and whatever the hints setting, and is hidden through part 1 when it has nothing to say. Since Jose's playtest of 2026-11-19 the fight puts NO
 personal alert panel on the screen (the old `final_alert_view.ts`, "Crossing Blade: lead it"
 in the middle of the screen, is gone): every mark that singles one player out (Weight of the
 Anvil, Crossing Blade, Sky Strike, Ember Mark, Drawn Lightning, Bursting Coal,
@@ -2842,9 +2858,9 @@ crosses the wire); the Splinters as real mobs with real cast bars (Rime Toll kic
 Quenching Rings as objects (their gaps hashed from the template's seed, the same function in
 the sim and the painter); the marks as player auras.
 
-**The HUD** (`heart_overload_view.ts`): through a call the bars hold still and dim, the
-quarters whose Splinters live are lit, and the shield's seconds and the Splinters' count read
-under them; in the final phase the bars are off and the enrage's seconds (then Masterless
+**The HUD** (`heart_final_phase_view.ts`): through a call the room's ring holds its bar
+still and dim, and the shield's seconds and the Splinters' count read at the top of the
+screen; in the final phase the ring is off and the enrage's seconds (then Masterless
 Fury's stacks) read instead; the poured elements read on their own line all fight. Bursting
 Coal and Wind-Tethered raise the marked player's own arrow (no panel since 2026-11-19);
 Mounting Weight reads on the tank's own aura bar. No raid warnings; tooltips

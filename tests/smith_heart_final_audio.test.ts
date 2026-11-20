@@ -239,12 +239,13 @@ describe('smith_heart_final_audio: the adapter', () => {
     expect(plays.find((p) => p.key === 'heart_final_shear_warn')).toMatchObject({ x: 3, z: 3 });
   });
 
-  it('warns as the fullest Overload bar passes three quarters, rearmed only once it drains', () => {
+  it('warns as the fullest Overload bar passes four fifths, rearmed only once it drains', () => {
     const { sink, plays } = fakeSink();
     const audio = new FinalAudio(sink);
     const at = (v: number) =>
       withAuras(body(1, 0, 0), [{ id: overloadAuraId('quench'), value: v }]);
-    for (const v of [10, 50, 74, 76, 90, 70, 80, 40, 80]) audio.update(at(v), [], none, null, null);
+    expect(FINAL_OVERLOAD_RISING.at).toBe(80);
+    for (const v of [10, 50, 74, 79, 90, 70, 80, 40, 80]) audio.update(at(v), [], none, null, null);
     expect(plays.filter((p) => p.key === FINAL_OVERLOAD_RISING.key)).toHaveLength(2);
   });
 

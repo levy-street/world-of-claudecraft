@@ -10535,8 +10535,10 @@ export const hudChromeStrings = {
         'Useless... all of them. The Guardians... Varkhul... useless, every one. But you cannot kill the elements. Stone, fire, wind and ice do not die... they wait. We will return... and the mountain will remember your names.',
     },
   },
-  // The Masterless Strength's raid HUD (src/ui/hud/dungeon/heart_overload_view.ts):
-  // the four Overload bars, the root and the switch mark. Wordy (M16).
+  // The Masterless Strength's raid HUD (src/ui/hud/dungeon/heart_final_phase_view.ts):
+  // the switch mark and part 2's clocks; the quarter names also label the room's
+  // Overload ring (src/render/smith_heart_fx/final_overload_ring.ts). title, unbound
+  // and the three aria rows are retired (scripts/i18n_retired_keys.mjs). Wordy (M16).
   finalOverload: {
     kneeling: 'It kneels',
     rising: 'The Heart beats',

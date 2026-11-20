@@ -387,6 +387,15 @@ export const RETIRED_KEYS = [
   'guide.combat.unstuckBody',
   'guide.commandsPage.unstuck',
   'guide.glossary.unstuckDef',
+  // -- The Masterless Strength's Overload bars left the HUD for the room (Jose's brief of
+  // 2026-11-20: the ring round the central well, src/render/smith_heart_fx/
+  // final_overload_ring.ts, shows the bar, its quarter and Heart Unbound's stacks). The
+  // HUD panel that rendered these is now the phase readout alone, with no bar to label.
+  'hudChrome.finalOverload.title',
+  'hudChrome.finalOverload.unbound',
+  'hudChrome.finalOverload.barAria',
+  'hudChrome.finalOverload.activeAria',
+  'hudChrome.finalOverload.groupAria',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

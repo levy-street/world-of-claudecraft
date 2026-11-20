@@ -306,8 +306,11 @@ export const FINAL_FOOTPRINT_SOUNDS: Readonly<
 export const FINAL_OVERLOAD_RISING = {
   key: F('overload_rising'),
   gain: 1,
-  at: 75,
-  rearm: 60,
+  // Four fifths: the room's Overload ring turns to its warning at the same
+  // share (render/smith_heart_fx/final_overload_ring_core.ts warnAt), and
+  // sounds a second, sharper strain at nine tenths.
+  at: 80,
+  rearm: 65,
 } as const;
 
 /** Does a bar going `from` to `to` percent sound the Overload's warning? */

@@ -1,46 +1,36 @@
-// The Masterless Strength's raid HUD: the pure, DOM-free view core of the
-// four Overload bars (heart_overload_painter.ts paints it), read off the
-// boss's auras the sim already mirrors (encounters/smith_heart/final_ids.ts):
-//   - one bar per quarter (the aura's `value`, 0 to 100), in bearing order
-//     (Breath, Quench, Hammer, Heat), the one the boss stands in highlighted
-//     and filling, the others draining; a bar three quarters full is in
-//     danger (its burst is near);
+// The Masterless Strength's raid HUD: the pure, DOM-free view core of its
+// phase readout (heart_final_phase_painter.ts paints it), read off the boss's
+// auras the sim already mirrors (encounters/smith_heart/final_ids.ts and
+// final_phase_ids.ts):
 //   - Vein-Shaken's seconds left (Heroic: the state aura's `value3`), the
 //     window a quarter change hits three times as hard;
-//   - Heart Unbound's stacks while it stands in the central ring;
-//   - part 2 (final_phase_ids.ts, the phase aura): through an intermission
-//     the bars are held (frozen, dimmed), the quarters whose Splinters live
-//     are lit, and the call's seconds and the living Splinters read under
-//     them; in the final phase the bars are off and the soft enrage's
-//     seconds (then Masterless Fury's stacks) read instead; the elements
-//     poured into the boss read on their own line all fight long.
-// Shown while the fight runs (the state aura is on the boss), on every
-// graphics tier and whatever the hints setting: the bars are what the tanks
-// and the raid act on. Allocation-light: one model, its rows reused.
+//   - part 2 (the phase aura): through an intermission the call's seconds
+//     and the living Splinters; the striding, the kneel, the rebirth; in the
+//     final phase the soft enrage's seconds (then Masterless Fury's stacks);
+//     Mythic's collapse, what falls next and when; the elements poured into
+//     the boss on their own line all fight long.
+// The four Overload bars and Heart Unbound's stacks are NOT here any more:
+// they are the room's, the ring round the central well that the whole raid
+// sees (Jose's brief of 2026-11-20; src/render/smith_heart_fx/
+// final_overload_ring.ts). Through part 1 with no switch mark and nothing
+// poured, the readout is hidden.
+// Shown on every graphics tier and whatever the hints setting: these clocks
+// are what the raid acts on. Allocation-light: one model, reused.
 
 import type { SmithHeartVein } from '../../../sim/content/smith_heart_layout';
 import { HEART_QUARTER_ORDER } from '../../../sim/content/smith_heart_quarters';
-import {
-  FINAL_AURAS,
-  FINAL_BOSS,
-  finalZoneOf,
-  overloadAuraId,
-} from '../../../sim/encounters/smith_heart/final_ids';
+import { FINAL_AURAS, FINAL_BOSS } from '../../../sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS,
   FINAL_PHASES,
   finalStageOf,
   hiddenNextOf,
   pouredAuraId,
-  quarterBit,
   veinsOfMask,
 } from '../../../sim/encounters/smith_heart/final_phase_ids';
 import { formatList, formatNumber, t } from '../../i18n';
 
-/** A bar this full (percent) is in danger: its burst is near. */
-export const OVERLOAD_DANGER_AT = 75;
-
-export interface OverloadAura {
+export interface FinalPhaseAura {
   id: string;
   value?: number;
   value2?: number;
@@ -49,50 +39,27 @@ export interface OverloadAura {
   stacks?: number;
 }
 
-export interface OverloadBoss {
+export interface FinalPhaseBoss {
   id: number;
   templateId: string;
   dead?: boolean;
-  auras: readonly OverloadAura[];
+  auras: readonly FinalPhaseAura[];
 }
 
-export interface OverloadRow {
-  vein: SmithHeartVein;
-  label: string;
-  /** 0 to 100. */
-  pct: number;
-  active: boolean;
-  danger: boolean;
-  /** Part 2: its quarter's Splinter lives (an intermission). */
-  awake: boolean;
-  /** The visible percent, locale-formatted (tr_TR "%50", fr_FR "50 %"). */
-  pctText: string;
-  aria: string;
-}
-
-export interface OverloadView {
+export interface FinalPhaseView {
   visible: boolean;
-  rows: OverloadRow[];
-  /** The root's line ('Rooted 12' or 'Can be dragged'). */
+  /** Part 2's heading ('' through part 1). */
+  title: string;
   /** Vein-Shaken's line ('' when none). */
   shaken: string;
-  /** Heart Unbound's line ('' when none). */
-  unbound: string;
-  /** Part 2: the bars held still (an intermission) or off (the final
-   *  phase). */
-  frozen: boolean;
-  barsOff: boolean;
   /** Part 2: the call's or the enrage's line ('' when none), and whether it
    *  is urgent (Masterless Fury, or its last seconds). */
   phase: string;
   phaseUrgent: boolean;
   /** Part 2: the living Splinters' line ('' when none). */
   splinters: string;
-  /** Part 2: the elements poured into it ('' when none). */
+  /** The elements poured into it ('' when none). */
   poured: string;
-  title: string;
-  groupAria: string;
-  activeAria: string;
 }
 
 const LABEL_KEYS: Readonly<Record<SmithHeartVein, string>> = {
@@ -103,105 +70,65 @@ const LABEL_KEYS: Readonly<Record<SmithHeartVein, string>> = {
 };
 
 const whole = (v: number) => formatNumber(Math.max(0, Math.ceil(v)), { maximumFractionDigits: 0 });
+const n = (v: number) => formatNumber(Math.max(0, Math.round(v)), { maximumFractionDigits: 0 });
 
 /** A fresh model (the painter keeps one and passes it back every frame). */
-export function makeOverloadView(): OverloadView {
+export function makeFinalPhaseView(): FinalPhaseView {
   return {
     visible: false,
-    rows: HEART_QUARTER_ORDER.map((vein) => ({
-      vein,
-      label: '',
-      pct: 0,
-      active: false,
-      danger: false,
-      awake: false,
-      pctText: '',
-      aria: '',
-    })),
+    title: '',
     shaken: '',
-    unbound: '',
-    frozen: false,
-    barsOff: false,
     phase: '',
     phaseUrgent: false,
     splinters: '',
     poured: '',
-    title: '',
-    groupAria: '',
-    activeAria: '',
   };
 }
 
-function auraOf(auras: readonly OverloadAura[], id: string): OverloadAura | null {
+function auraOf(auras: readonly FinalPhaseAura[], id: string): FinalPhaseAura | null {
   for (const a of auras) if (a.id === id) return a;
   return null;
 }
 
 /** The view for `boss` (the claim's Masterless Strength, or null), written
  *  into `out`. */
-export function buildOverloadView(boss: OverloadBoss | null, out: OverloadView): OverloadView {
+export function buildFinalPhaseView(
+  boss: FinalPhaseBoss | null,
+  out: FinalPhaseView,
+): FinalPhaseView {
   const state = boss && !boss.dead ? auraOf(boss.auras, FINAL_AURAS.state) : null;
   if (!boss || !state) {
     out.visible = false;
     return out;
   }
-  out.visible = true;
-  const zone = finalZoneOf(state.value);
   const phase = auraOf(boss.auras, FINAL_PHASE_AURAS.phase);
   const stage = finalStageOf(phase?.value);
-  const mask = Math.round(phase?.value2 ?? 0);
-  out.frozen = stage === 'leap' || stage === 'call' || stage === 'finalLeap';
-  out.barsOff =
+  const barsOff =
     stage === 'final' || stage === 'kneel' || stage === 'rebirth' || stage === 'collapse';
-  for (const row of out.rows) {
-    const bar = auraOf(boss.auras, overloadAuraId(row.vein));
-    row.pct = Math.max(0, Math.min(100, Math.round(bar?.value ?? 0)));
-    row.active = row.vein === zone && !out.frozen && !out.barsOff;
-    row.danger = row.pct >= OVERLOAD_DANGER_AT && !out.frozen;
-    row.awake = (mask & quarterBit(row.vein)) !== 0;
-    row.label = t(LABEL_KEYS[row.vein] as never);
-    row.pctText = formatNumber(row.pct / 100, { style: 'percent', maximumFractionDigits: 0 });
-    row.aria = t('hudChrome.finalOverload.barAria', {
-      quarter: row.label,
-      pct: formatNumber(row.pct, { maximumFractionDigits: 0 }),
-    });
-  }
+  const frozen = stage === 'leap' || stage === 'call' || stage === 'finalLeap';
   const shaken = Math.round(state.value3 ?? 0);
   out.shaken =
-    shaken > 0 && !out.barsOff
-      ? t('hudChrome.finalOverload.shaken', { seconds: whole(shaken) })
-      : '';
-  const unbound = auraOf(boss.auras, FINAL_AURAS.unbound);
-  const stacks = Math.round(unbound?.stacks ?? 0);
-  out.unbound =
-    stacks > 0
-      ? t('hudChrome.finalOverload.unbound', {
-          stacks: formatNumber(stacks, { maximumFractionDigits: 0 }),
-        })
-      : '';
+    shaken > 0 && !barsOff ? t('hudChrome.finalOverload.shaken', { seconds: whole(shaken) }) : '';
   phaseLines(boss, stage, phase, out);
-  out.title = out.barsOff
+  out.title = barsOff
     ? stage === 'final' || stage === 'kneel'
       ? t('hudChrome.finalOverload.titleFinal')
       : t('hudChrome.finalOverload.titleUnmade')
-    : out.frozen
+    : frozen
       ? t('hudChrome.finalOverload.titleCall')
-      : t('hudChrome.finalOverload.title');
-  out.groupAria = t('hudChrome.finalOverload.groupAria');
-  const active = out.rows.find((r) => r.active);
-  out.activeAria = active ? t('hudChrome.finalOverload.activeAria', { quarter: active.label }) : '';
+      : '';
+  out.visible = !!(out.title || out.shaken || out.phase || out.splinters || out.poured);
   return out;
 }
 
 /** Part 2's lines: the call and its Splinters, the enrage or the fury, the
  *  poured elements. */
 function phaseLines(
-  boss: OverloadBoss,
+  boss: FinalPhaseBoss,
   stage: ReturnType<typeof finalStageOf>,
-  phase: OverloadAura | null,
-  out: OverloadView,
+  phase: FinalPhaseAura | null,
+  out: FinalPhaseView,
 ): void {
-  const n = (v: number) => formatNumber(Math.max(0, Math.round(v)), { maximumFractionDigits: 0 });
   const secs = Math.max(0, Math.round(phase?.value3 ?? 0));
   out.phase = '';
   out.phaseUrgent = false;
@@ -248,14 +175,13 @@ function phaseLines(
     }
   }
   const poured: string[] = [];
-  for (const row of out.rows) {
-    const p = auraOf(boss.auras, pouredAuraId(row.vein));
+  for (const vein of HEART_QUARTER_ORDER) {
+    const p = auraOf(boss.auras, pouredAuraId(vein));
     const k = p ? Math.round(p.value ?? p.stacks ?? 1) : 0;
     if (k <= 0) continue;
+    const label = t(LABEL_KEYS[vein] as never);
     poured.push(
-      k > 1
-        ? t('hudChrome.finalOverload.pouredTimes', { quarter: row.label, times: n(k) })
-        : row.label,
+      k > 1 ? t('hudChrome.finalOverload.pouredTimes', { quarter: label, times: n(k) }) : label,
     );
   }
   out.poured =
@@ -263,8 +189,8 @@ function phaseLines(
 }
 
 /** The world as the scan reads it. */
-export interface OverloadWorld {
-  entities: ReadonlyMap<number, OverloadBoss & { kind?: string }>;
+export interface FinalPhaseWorld {
+  entities: ReadonlyMap<number, FinalPhaseBoss & { kind?: string }>;
   entityRosterVersion: number;
 }
 
@@ -274,7 +200,7 @@ export class HeartFinalScan {
   private version = Number.NaN;
   private id = -1;
 
-  frame(world: OverloadWorld | null | undefined): OverloadBoss | null {
+  frame(world: FinalPhaseWorld | null | undefined): FinalPhaseBoss | null {
     if (!world) return null;
     if (world.entityRosterVersion !== this.version) {
       this.version = world.entityRosterVersion;

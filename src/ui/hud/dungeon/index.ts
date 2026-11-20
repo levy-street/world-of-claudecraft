@@ -63,15 +63,14 @@ export type { GaolChainDeps } from './gaol_chain_painter';
 export { GaolChainAlert } from './gaol_chain_painter';
 export type { GaolChainInput, GaolChainKind, GaolChainView } from './gaol_chain_view';
 export { buildGaolChainView, wardHealthText, wardHitText } from './gaol_chain_view';
-export type { HeartOverloadDeps } from './heart_overload_painter';
-export { HeartOverloadPanel } from './heart_overload_painter';
-export type { OverloadBoss, OverloadRow, OverloadView } from './heart_overload_view';
+export type { HeartFinalPhaseDeps } from './heart_final_phase_painter';
+export { HeartFinalPhasePanel } from './heart_final_phase_painter';
+export type { FinalPhaseBoss, FinalPhaseView } from './heart_final_phase_view';
 export {
-  buildOverloadView,
+  buildFinalPhaseView,
   HeartFinalScan,
-  makeOverloadView,
-  OVERLOAD_DANGER_AT,
-} from './heart_overload_view';
+  makeFinalPhaseView,
+} from './heart_final_phase_view';
 export type {
   KitUseBody,
   KitUsePromptInput,

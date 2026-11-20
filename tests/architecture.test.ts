@@ -747,7 +747,7 @@ const UI_PURE_CORES = [
   // final's, the Knotted Gale's (the Hammer Council has none since 2026-11-17).
   'src/ui/hud/dungeon/quench_alert_view.ts',
   'src/ui/hud/dungeon/knot_alert_view.ts',
-  'src/ui/hud/dungeon/heart_overload_view.ts',
+  'src/ui/hud/dungeon/heart_final_phase_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.
@@ -1217,6 +1217,7 @@ const RENDER_PURE_CORES = [
   // the torn floor (Jose's playtest of 2026-11-20).
   'src/render/smith_heart_fx/final_avalanche_core.ts',
   'src/render/smith_heart_fx/final_overload_core.ts',
+  'src/render/smith_heart_fx/final_overload_ring_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
   'src/render/smith_heart_fx/breath_isles_fx_core.ts',

@@ -868,17 +868,15 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 8, '.setAttribute': 3 },
     reflowAllow: {},
   },
-  // The Masterless Strength's Overload bars (hud/dungeon/) build their
-  // self-mounted panel skeleton ONCE in ensure (fifteen construction-only
-  // class assignments: the panel, title, row list, each row, label, bar,
-  // fill and percent, the foot and its three lines, and the part-2 phase,
-  // splinters and poured lines; plus the panel's group
-  // role and each bar's three build-time role/range attributes); every
-  // per-frame value (texts, widths, the active and danger classes, the live
-  // aria values, the foot's displays) rides the elided writers.
+  // The Masterless Strength's phase readout (hud/dungeon/) builds its
+  // self-mounted panel skeleton ONCE in ensure (seven construction-only class
+  // assignments: the panel, its title, the foot and its three lines, the
+  // poured line); every per-frame value (texts, the urgent class, the
+  // displays) rides the elided writers. Its Overload bars moved into the
+  // room (the ring round the central well, render/smith_heart_fx/).
   {
-    file: 'hud/dungeon/heart_overload_painter.ts',
-    allow: { '.className': 15, '.setAttribute': 4 },
+    file: 'hud/dungeon/heart_final_phase_painter.ts',
+    allow: { '.className': 7 },
     reflowAllow: {},
   },
   // The death screen's PvP Resurrect button and note (hud/death/): every write,

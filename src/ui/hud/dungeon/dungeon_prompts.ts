@@ -24,9 +24,11 @@
 // scenes off the roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
 // wildheart_alert_scene_core.ts, temple_alert_scene_core.ts, KitUseSceneScan).
 //
-// Beside the slot it paints the Masterless Strength's raid HUD, the four
-// Overload bars at the top of the screen (heart_overload_view.ts and
-// heart_overload_painter.ts), on every tier and whatever the hints setting.
+// Beside the slot it paints the Masterless Strength's raid HUD, its phase
+// readout at the top of the screen (heart_final_phase_view.ts and
+// heart_final_phase_painter.ts: the switch mark and part 2's clocks; the
+// Overload bars are the room's ring now), on every tier and whatever the
+// hints setting.
 //
 // The prompts share one slot over the action bar, so the use prompt gives way
 // to every encounter prompt above it (a strike to dodge or a cage to break
@@ -60,13 +62,13 @@ import {
 import { EncounterAlert } from './encounter_alert_painter';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
-import { HeartOverloadPanel } from './heart_overload_painter';
+import { HeartFinalPhasePanel } from './heart_final_phase_painter';
 import {
-  buildOverloadView,
+  buildFinalPhaseView,
+  type FinalPhaseBoss,
   HeartFinalScan,
-  makeOverloadView,
-  type OverloadBoss,
-} from './heart_overload_view';
+  makeFinalPhaseView,
+} from './heart_final_phase_view';
 import {
   buildKitUsePromptView,
   KIT_USE_PROMPT_KINDS,
@@ -124,7 +126,7 @@ export interface DungeonPromptsFrame {
         WildheartSceneEntity &
         TempleSceneEntity &
         KitUseBody &
-        OverloadBoss
+        FinalPhaseBoss
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
@@ -150,8 +152,8 @@ export class DungeonPrompts {
   private readonly crypt: EncounterAlert;
   private readonly quench: EncounterAlert;
   private readonly knot: EncounterAlert;
-  private readonly overload: HeartOverloadPanel;
-  private readonly overloadView = makeOverloadView();
+  private readonly finalPhase: HeartFinalPhasePanel;
+  private readonly finalPhaseView = makeFinalPhaseView();
   private readonly finalScan = new HeartFinalScan();
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly temple: EncounterAlert;
@@ -217,7 +219,7 @@ export class DungeonPrompts {
       className: 'ui-panel-strong encounter-alert heart-knot-alert',
       kinds: KNOT_ALERT_KINDS,
     });
-    this.overload = new HeartOverloadPanel(deps);
+    this.finalPhase = new HeartFinalPhasePanel(deps);
     this.temple = new EncounterAlert(deps, {
       id: 'temple-alert',
       className: 'ui-panel-strong encounter-alert temple-alert',
@@ -321,9 +323,10 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     this.knot.paint(knot);
-    // The Masterless Strength's raid HUD (its Overload bars): no personal
-    // alert since Jose's playtest of 2026-11-19 (its marks read in the world).
-    this.overload.paint(buildOverloadView(this.finalScan.frame(f.world), this.overloadView));
+    // The Masterless Strength's raid HUD (its phase readout; its Overload
+    // bars are the room's ring): no personal alert since Jose's playtest of
+    // 2026-11-19 (its marks read in the world).
+    this.finalPhase.paint(buildFinalPhaseView(this.finalScan.frame(f.world), this.finalPhaseView));
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
           selfPos: p.pos,
@@ -373,7 +376,7 @@ export class DungeonPrompts {
     this.crypt.dispose();
     this.quench.dispose();
     this.knot.dispose();
-    this.overload.dispose();
+    this.finalPhase.dispose();
     this.temple.dispose();
     this.kitUse.dispose();
   }

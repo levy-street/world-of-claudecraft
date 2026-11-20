@@ -20,10 +20,14 @@
 //    that bar fills, the quarter's wall erupting from three quarters full
 //    (the floor's throb and the landmark's flare are the room's, through
 //    heart_quarters_core.ts `strain`);
+//  - the Overload ring in the room's centre (final_overload_ring.ts, Jose's
+//    brief of 2026-11-20): the bar of the quarter it drinks filling a great
+//    ring round the central well in that quarter's colour, the percent over
+//    the well, the warning from four fifths, the red centre with Heart
+//    Unbound's stacks (the HUD's four bars moved here);
 //  - an Overload Burst: the heart's flash and a wall of the quarter's light
 //    riding out of the body over the whole Anvil on the trash engine's wave
-//    clock, a pulse a low ring of it (the bars themselves are the HUD's, the
-//    floor's light the room's);
+//    clock, a pulse a low ring of it (the floor's light the room's);
 //  - the death (final_death_core.ts, painted by final_death_fx.ts): the
 //    body kneels and its essence tears free: the heart (the Heart kit's
 //    crystal) rips out of its chest and bursts into four comets that race
@@ -119,6 +123,8 @@ import {
   wrathGather,
 } from './final_fx_core';
 import { type FinalOverloadFrame, FinalOverloadFx } from './final_overload_fx';
+import { FinalOverloadRing } from './final_overload_ring';
+import { newOverloadRingState, overloadRingState } from './final_overload_ring_core';
 import { finalPhaseMaskOf } from './final_phase_fx_core';
 
 const C = FINAL_FX_COLORS;
@@ -297,6 +303,10 @@ export class FinalFx {
   private readonly bodyFx: FinalBodyFx;
   /** The Overload in the world: the body's strain, the wall's eruption. */
   private readonly overloadFx: FinalOverloadFx;
+  /** The Overload in the room's centre: the ring round the well, its fill,
+   *  the percent over it, the centre's red (final_overload_ring.ts). */
+  private readonly overloadRing: FinalOverloadRing;
+  private readonly ringState = newOverloadRingState();
   private readonly overloadFrame: FinalOverloadFrame = {
     x: 0,
     y: 0,
@@ -506,6 +516,15 @@ export class FinalFx {
       shakeNear: (x, z, amount) => this.shakeNear(x, z, amount),
       pulseBody: (gesture) => this.bodyFx.pulse(gesture),
     });
+    this.overloadRing = new FinalOverloadRing({
+      root: this.root,
+      particles: this.particles,
+      groundY: (x, z) => this.groundY(x, z),
+      rand: () => this.rand(),
+      low: !this.secondary,
+      reducedMotion: () => this.reducedMotion(),
+      hasDom,
+    });
     this.arrival = new FinalArrivalBeam(this.root, host);
     this.death = new FinalDeathFx(this.root, {
       ...host,
@@ -624,6 +643,7 @@ export class FinalFx {
       if (this.slotKey) noteHeartArrivalLight(this.slotKey, null);
       this.arrival.hide();
       this.death.hide();
+      this.overloadRing.hide();
       this.particles.update(this.clock);
       return;
     }
@@ -794,6 +814,8 @@ export class FinalFx {
     ov.clock = this.clock;
     ov.dt = dt;
     this.overloadFx.update(ov);
+    overloadRingState(boss, engaged && !dead, this.ringState);
+    this.overloadRing.update(this.ringState, o.x, o.z, this.clock, dt);
     this.updateWrath();
     if (this.fistImpactDue > 0 && this.clock >= this.fistImpactDue) {
       this.fistImpactDue = -1;
@@ -997,7 +1019,7 @@ export class FinalFx {
   // ---- the Overload Burst and its pulses ---------------------------------------------------
 
   /** The bar of the quarter it drinks now (0..1; 0 in the ring), off its
-   *  aura (the same `value` the HUD reads). */
+   *  aura (the same `value` the room's Overload ring reads). */
   private drinkingFill(boss: Entity): number {
     if (this.zone === 'ring') return 0;
     const id = overloadAuraId(this.zone);
@@ -1098,6 +1120,7 @@ export class FinalFx {
     this.bodyFx.dispose();
     this.arrival.dispose();
     this.death.dispose();
+    this.overloadRing.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }

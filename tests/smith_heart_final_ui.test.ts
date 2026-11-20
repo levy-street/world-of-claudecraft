@@ -15,6 +15,10 @@
 import { describe, expect, it } from 'vitest';
 import { FINAL_ARROW_AURAS, finalArrowMark } from '../src/render/smith_heart_fx/final_arrow_core';
 import {
+  newOverloadRingState,
+  overloadRingState,
+} from '../src/render/smith_heart_fx/final_overload_ring_core';
+import {
   FINAL_AURAS,
   FINAL_BOSS,
   FINAL_CASTS,
@@ -28,14 +32,13 @@ import {
 import type { Aura, SimEvent } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { castDisplayName } from '../src/ui/cast_display_name';
-import { HeartOverloadPanel } from '../src/ui/hud/dungeon/heart_overload_painter';
+import { HeartFinalPhasePanel } from '../src/ui/hud/dungeon/heart_final_phase_painter';
 import {
-  buildOverloadView,
+  buildFinalPhaseView,
+  type FinalPhaseBoss,
   HeartFinalScan,
-  makeOverloadView,
-  OVERLOAD_DANGER_AT,
-  type OverloadBoss,
-} from '../src/ui/hud/dungeon/heart_overload_view';
+  makeFinalPhaseView,
+} from '../src/ui/hud/dungeon/heart_final_phase_view';
 import { setLanguage, t } from '../src/ui/i18n';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
@@ -182,8 +185,8 @@ describe("The Masterless Strength: the marked player's own arrow", () => {
 
 function bossOf(
   over: Partial<Record<string, number>>,
-  extra: OverloadBoss['auras'] = [],
-): OverloadBoss {
+  extra: FinalPhaseBoss['auras'] = [],
+): FinalPhaseBoss {
   return {
     id: 7,
     templateId: FINAL_BOSS,
@@ -198,18 +201,26 @@ function bossOf(
   };
 }
 
-describe('The Masterless Strength: the Overload bars', () => {
-  it('reads the bars, the quarter it drinks, the danger and the mark', () => {
-    const v = buildOverloadView(bossOf({ heat: 80, quench: 30 }), makeOverloadView());
+describe('The Masterless Strength: the Overload bars moved into the room', () => {
+  it('the ring reads the quarter it drinks, its own bar and its warning', () => {
+    const r = overloadRingState(bossOf({ heat: 80, quench: 30 }), true, newOverloadRingState());
+    expect(r.mode).toBe('fill');
+    expect(r.vein).toBe('heat');
+    expect(r.pct).toBe(80);
+    expect(r.warn).toBe(true);
+  });
+
+  it('the HUD keeps no bars: only the switch mark through part 1', () => {
+    const v = buildFinalPhaseView(bossOf({ heat: 80, quench: 30 }), makeFinalPhaseView());
     expect(v.visible).toBe(true);
-    const heat = v.rows.find((r) => r.vein === 'heat');
-    expect(heat?.pct).toBe(80);
-    expect(heat?.active).toBe(true);
-    expect(heat?.danger).toBe(80 >= OVERLOAD_DANGER_AT);
-    expect(v.rows.filter((r) => r.active).length).toBe(1);
-    expect(v.rows.find((r) => r.vein === 'quench')?.pct).toBe(30);
     expect(v.shaken).toBe(t('hudChrome.finalOverload.shaken', { seconds: '12' }));
-    expect(v.unbound).toBe('');
+    expect(v.title).toBe('');
+    expect(v.phase).toBe('');
+    expect(Object.keys(v)).not.toContain('rows');
+    // No switch mark, nothing poured: nothing on the screen at all.
+    const quiet = bossOf({ heat: 80 });
+    quiet.auras = quiet.auras.map((a) => (a.id === FINAL_AURAS.state ? { ...a, value3: 0 } : a));
+    expect(buildFinalPhaseView(quiet, makeFinalPhaseView()).visible).toBe(false);
   });
 
   it('reads the same off a Sim-shaped and a ClientWorld-shaped body', () => {
@@ -220,15 +231,20 @@ describe('The Masterless Strength: the Overload bars', () => {
       kind: 'mob',
       auras: sim.auras.map((a) => ({ ...a, name: 'x', kind: 'internal_cd', duration: 3600 })),
     };
-    const a = JSON.stringify(buildOverloadView(sim, makeOverloadView()));
-    const b = JSON.stringify(buildOverloadView(client, makeOverloadView()));
+    const a = JSON.stringify(buildFinalPhaseView(sim, makeFinalPhaseView()));
+    const b = JSON.stringify(buildFinalPhaseView(client, makeFinalPhaseView()));
     expect(b).toBe(a);
+    expect(overloadRingState(client, true, newOverloadRingState())).toEqual(
+      overloadRingState(sim, true, newOverloadRingState()),
+    );
   });
 
   it('hides out of the fight and when it falls; the scan finds the boss once a roster', () => {
-    expect(buildOverloadView(null, makeOverloadView()).visible).toBe(false);
-    expect(buildOverloadView({ ...bossOf({}), auras: [] }, makeOverloadView()).visible).toBe(false);
-    expect(buildOverloadView({ ...bossOf({}), dead: true }, makeOverloadView()).visible).toBe(
+    expect(buildFinalPhaseView(null, makeFinalPhaseView()).visible).toBe(false);
+    expect(buildFinalPhaseView({ ...bossOf({}), auras: [] }, makeFinalPhaseView()).visible).toBe(
+      false,
+    );
+    expect(buildFinalPhaseView({ ...bossOf({}), dead: true }, makeFinalPhaseView()).visible).toBe(
       false,
     );
     const boss = { ...bossOf({}), kind: 'mob' };
@@ -239,19 +255,18 @@ describe('The Masterless Strength: the Overload bars', () => {
     expect(scan.frame(world)).toBeNull();
   });
 
-  it('says Heart Unbound in the ring', () => {
-    const v = buildOverloadView(
-      {
-        ...bossOf({}),
-        auras: [
-          { id: FINAL_AURAS.state, value: FINAL_ZONE_CODES.ring },
-          { id: FINAL_AURAS.unbound, stacks: 4 },
-        ],
-      },
-      makeOverloadView(),
-    );
-    expect(v.unbound).toBe(t('hudChrome.finalOverload.unbound', { stacks: '4' }));
-    expect(v.rows.some((r) => r.active)).toBe(false);
+  it('Heart Unbound in the ring reads in the room (the ring red, its stacks), not the HUD', () => {
+    const boss = {
+      ...bossOf({}),
+      auras: [
+        { id: FINAL_AURAS.state, value: FINAL_ZONE_CODES.ring },
+        { id: FINAL_AURAS.unbound, stacks: 4 },
+      ],
+    };
+    const r = overloadRingState(boss, true, newOverloadRingState());
+    expect(r.mode).toBe('centre');
+    expect(r.stacks).toBe(4);
+    expect(buildFinalPhaseView(boss, makeFinalPhaseView()).visible).toBe(false);
   });
 
   it('the painter writes nothing on a still frame', () => {
@@ -268,18 +283,13 @@ describe('The Masterless Strength: the Overload bars', () => {
       },
       () => {},
     );
-    const panel = new HeartOverloadPanel({ layer: () => layer, writers: facet });
-    const view = buildOverloadView(bossOf({ heat: 42 }), makeOverloadView());
+    const panel = new HeartFinalPhasePanel({ layer: () => layer, writers: facet });
+    const view = buildFinalPhaseView(bossOf({ heat: 42 }), makeFinalPhaseView());
     panel.paint(view);
-    const el = layer.querySelector('#heart-overload');
+    const el = layer.querySelector('#heart-final-phase');
     expect(el).not.toBeNull();
-    expect(el?.querySelectorAll('.ho-row').length).toBe(4);
-    expect(el?.querySelector('.ho-row.is-heat.is-active .ho-pct')?.textContent).toBe('42%');
-    // The active quarter is said in text too, not by colour alone.
-    expect(el?.querySelector('.ho-row.is-heat')?.getAttribute('aria-current')).toBe('true');
-    expect(el?.querySelector('.ho-row.is-quench')?.getAttribute('aria-current')).toBe('false');
-    expect(el?.getAttribute('aria-description')).toBe(view.activeAria);
-    expect(view.activeAria).not.toBe('');
+    expect(layer.querySelector('#heart-overload')).toBeNull();
+    expect(el?.querySelector('.hfp-shaken')?.textContent).toBe(view.shaken);
     const before = el?.innerHTML;
     const firstWrites = writes;
     expect(firstWrites).toBeGreaterThan(0);
@@ -289,12 +299,12 @@ describe('The Masterless Strength: the Overload bars', () => {
     });
     if (el)
       obs.observe(el, { attributes: true, childList: true, subtree: true, characterData: true });
-    panel.paint(buildOverloadView(bossOf({ heat: 42 }), view));
+    panel.paint(buildFinalPhaseView(bossOf({ heat: 42 }), view));
     obs.takeRecords();
     expect(mutations).toBe(0);
     expect(writes).toBe(firstWrites);
     expect(el?.innerHTML).toBe(before);
-    panel.paint(buildOverloadView(null, view));
+    panel.paint(buildFinalPhaseView(null, view));
     expect((el as HTMLElement).style.display).toBe('none');
     panel.dispose();
   });

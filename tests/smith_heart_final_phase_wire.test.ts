@@ -23,6 +23,10 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
+import {
+  newOverloadRingState,
+  overloadRingState,
+} from '../src/render/smith_heart_fx/final_overload_ring_core';
 import { FINAL_BOSS } from '../src/sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS as A,
@@ -33,7 +37,10 @@ import {
   finalAddVein,
   pouredAuraId,
 } from '../src/sim/encounters/smith_heart/final_phase_ids';
-import { buildOverloadView, makeOverloadView } from '../src/ui/hud/dungeon/heart_overload_view';
+import {
+  buildFinalPhaseView,
+  makeFinalPhaseView,
+} from '../src/ui/hud/dungeon/heart_final_phase_view';
 import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import { bareClient } from './helpers/bare_client';
 
@@ -125,12 +132,15 @@ describe('the Masterless Strength part 2 over the wire', () => {
     expect(aura(boss(), A.phase)?.value2).toBe(ALL_QUARTERS_MASK);
     expect(aura(boss(), A.phase)?.stacks).toBe(4);
     // The HUD reads the same off the mirror as off the server.
-    const fromServer = buildOverloadView(serverBoss, makeOverloadView());
-    const fromClient = buildOverloadView(boss(), makeOverloadView());
-    expect(fromClient.frozen).toBe(true);
+    const fromServer = buildFinalPhaseView(serverBoss ?? null, makeFinalPhaseView());
+    const fromClient = buildFinalPhaseView(boss(), makeFinalPhaseView());
+    expect(fromClient.title).toBe(fromServer.title);
     expect(fromClient.phase).toBe(fromServer.phase);
     expect(fromClient.splinters).toBe(fromServer.splinters);
-    expect(fromClient.rows.map((r) => r.awake)).toEqual(fromServer.rows.map((r) => r.awake));
+    // The room's ring holds its bar through the call, on both.
+    const ring = overloadRingState(boss(), true, newOverloadRingState());
+    expect(ring.mode === 'held' || ring.mode === 'off').toBe(true);
+    expect(ring).toEqual(overloadRingState(serverBoss ?? null, true, newOverloadRingState()));
     // The Quench Splinter's kickable bar and its ring.
     run(2.5);
     keepNear();
@@ -155,17 +165,18 @@ describe('the Masterless Strength part 2 over the wire', () => {
     for (const v of ['heat', 'quench', 'breath', 'hammer'] as const)
       expect(aura(boss(), pouredAuraId(v))?.value, v).toBe(1);
     expect(aura(boss(), A.shield)).toBeUndefined();
-    expect(buildOverloadView(boss(), makeOverloadView()).poured).not.toBe('');
+    expect(buildFinalPhaseView(boss(), makeFinalPhaseView()).poured).not.toBe('');
     // The final phase: the stage, every quarter awake, the enrage's clock.
     sim.chat('/dev heart final last', a.pid);
     run(3.6);
     expect(aura(boss(), A.phase)?.value).toBe(FINAL_STAGE_CODES.final);
     expect(aura(boss(), A.phase)?.value2).toBe(ALL_QUARTERS_MASK);
     expect(aura(boss(), A.phase)?.value3).toBeGreaterThan(100);
-    expect(buildOverloadView(boss(), makeOverloadView()).barsOff).toBe(true);
+    expect(buildFinalPhaseView(boss(), makeFinalPhaseView()).title).toBe('All quarters awake');
+    expect(overloadRingState(boss(), true, newOverloadRingState()).mode).toBe('off');
     sim.chat('/dev heart final enrage', a.pid);
     run(0.3);
     expect(aura(boss(), A.fury)?.value ?? 0).toBeGreaterThanOrEqual(1);
-    expect(buildOverloadView(boss(), makeOverloadView()).phaseUrgent).toBe(true);
+    expect(buildFinalPhaseView(boss(), makeFinalPhaseView()).phaseUrgent).toBe(true);
   });
 });

@@ -25,6 +25,10 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import {
+  newOverloadRingState,
+  overloadRingState,
+} from '../src/render/smith_heart_fx/final_overload_ring_core';
+import {
   FINAL_AURAS,
   FINAL_BOSS,
   FINAL_CASTS,
@@ -33,7 +37,6 @@ import {
   overloadAuraId,
 } from '../src/sim/encounters/smith_heart/final_ids';
 import { HEAT_OBJECTS } from '../src/sim/encounters/smith_heart/heat_ids';
-import { buildOverloadView, makeOverloadView } from '../src/ui/hud/dungeon/heart_overload_view';
 import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import { bareClient } from './helpers/bare_client';
 
@@ -113,10 +116,13 @@ describe('the Masterless Strength over the wire', () => {
       expect(aura(boss(), overloadAuraId(v)), v).toBeDefined();
     run(4);
     expect(aura(boss(), overloadAuraId('heat'))?.value).toBeGreaterThan(5);
-    // The raid HUD reads the same bars off the mirror as off the server.
-    const fromServer = JSON.stringify(buildOverloadView(serverBoss, makeOverloadView()));
-    const fromClient = JSON.stringify(buildOverloadView(boss(), makeOverloadView()));
-    expect(JSON.parse(fromClient).rows).toEqual(JSON.parse(fromServer).rows);
+    // The room's Overload ring reads the same bar off the mirror as off the
+    // server (the HUD's bars moved into it, no wire field of its own).
+    const fromServer = overloadRingState(serverBoss ?? null, true, newOverloadRingState());
+    const fromClient = overloadRingState(boss(), true, newOverloadRingState());
+    expect(fromClient.mode).toBe('fill');
+    expect(fromClient.vein).toBe('heat');
+    expect(fromClient).toEqual(fromServer);
     // Basalt Fist's spot and lanes (the Heat guardian's objects) and its bar.
     sim.chat('/dev heart final fist', a.pid);
     run(0.3);

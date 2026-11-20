@@ -20059,161 +20059,72 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* ---------- The Masterless Strength's Overload bars (the raid HUD) ---------- */
-  /* Self-mounted by src/ui/hud/dungeon/heart_overload_painter.ts from
-     heart_overload_view.ts while the final fight runs: four bars in one row
-     at the top of the screen, over the raid warnings, one per quarter in its
-     vein's tone, the quarter the boss drinks lit and framed, a bar near its
-     burst throbbing in the hostile tone; the foot says Vein-Shaken's and
-     Heart Unbound's. Every
-     tier, never hidden by the hints setting; it never takes the pointer. The
-     state is carried by text too (each bar prints its percent). */
-  #heart-overload {
+  /* ---------- The Masterless Strength's phase readout (the raid HUD) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/heart_final_phase_painter.ts from
+     heart_final_phase_view.ts: the Heroic switch mark's seconds and part 2's
+     clocks (the call and its Splinters, the enrage or the fury, what falls
+     next) at the top of the screen, and the poured elements. The Overload
+     bars and Heart Unbound's stacks are the room's now (the ring round the
+     central well, src/render/smith_heart_fx/final_overload_ring.ts). Every
+     tier, never hidden by the hints setting; it never takes the pointer. */
+  #heart-final-phase {
     position: absolute;
     left: 50%;
     top: 8px;
     transform: translateX(-50%);
     display: none;
     flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
+    align-items: center;
+    gap: 3px;
     z-index: 31;
-    padding: 6px 12px 8px;
+    padding: 5px 14px 6px;
     max-width: calc(100vw - 32px);
     pointer-events: none;
     user-select: none;
     color: var(--color-text-light);
     border: 1px solid var(--color-gold-700);
   }
-  #heart-overload .ho-title {
+  #heart-final-phase .hfp-title {
     text-align: center;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.08em;
     color: var(--color-gold);
   }
-  #heart-overload .ho-rows {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(72px, 112px));
-    gap: 8px;
-  }
-  #heart-overload .ho-row {
-    --ho-tone: var(--color-gold);
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    align-items: center;
-    gap: 2px 6px;
-    padding: 3px 5px 4px;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    opacity: 0.72;
-  }
-  #heart-overload .ho-row.is-breath {
-    --ho-tone: var(--color-debuff-shadow);
-  }
-  #heart-overload .ho-row.is-quench {
-    --ho-tone: var(--color-debuff-frost);
-  }
-  #heart-overload .ho-row.is-hammer {
-    --ho-tone: var(--color-gold-500);
-  }
-  #heart-overload .ho-row.is-heat {
-    --ho-tone: var(--color-debuff-fire);
-  }
-  #heart-overload .ho-row.is-active {
-    opacity: 1;
-    border-color: var(--ho-tone);
-    box-shadow: 0 0 8px var(--ho-tone);
-  }
-  #heart-overload .ho-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ho-tone);
-  }
-  #heart-overload .ho-pct {
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
-    text-align: right;
-  }
-  #heart-overload .ho-bar {
-    --bar-h: 9px;
-    --bar-color: var(--ho-tone);
-    grid-column: 1 / -1;
-    width: 100%;
-  }
-  #heart-overload .ho-fill {
-    width: 0;
-    transition: width 200ms linear;
-  }
-  #heart-overload .ho-row.is-danger .ho-pct,
-  #heart-overload .ho-row.is-danger .ho-label {
-    color: var(--color-hostile);
-  }
-  #heart-overload .ho-row.is-danger .ho-bar {
-    --bar-color: var(--color-hostile);
-  }
-  #heart-overload .ho-row.is-danger.is-active {
-    animation: bce-throb 0.7s ease-in-out infinite alternate;
-  }
-  #heart-overload .ho-foot {
+  #heart-final-phase .hfp-foot {
     display: flex;
     justify-content: center;
     gap: 12px;
     font-size: 12px;
   }
-  #heart-overload .ho-shaken,
-  #heart-overload .ho-unbound {
+  #heart-final-phase .hfp-shaken {
     color: var(--color-hostile);
     font-weight: 700;
   }
-  /* Part 2: through an intermission the bars hold still (dimmed, no
-     motion) and the quarters whose Splinters live are lit; in the final
-     phase the bars are off and the enrage's line takes their place; the
-     poured elements read on their own line. */
-  #heart-overload.is-frozen .ho-row {
-    opacity: 0.5;
-  }
-  #heart-overload.is-frozen .ho-fill {
-    transition: none;
-  }
-  #heart-overload .ho-row.is-awake {
-    opacity: 1;
-    border-color: var(--ho-tone);
-    box-shadow: 0 0 10px var(--ho-tone);
-  }
-  #heart-overload.is-off .ho-rows {
-    display: none;
-  }
-  #heart-overload .ho-phase {
+  #heart-final-phase .hfp-phase {
     color: var(--color-gold);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
-  #heart-overload .ho-phase.is-urgent {
+  #heart-final-phase .hfp-phase.is-urgent {
     color: var(--color-hostile);
     animation: bce-throb 0.7s ease-in-out infinite alternate;
   }
-  #heart-overload .ho-splinters {
+  #heart-final-phase .hfp-splinters {
     color: var(--color-text-light);
     font-weight: 700;
   }
-  #heart-overload .ho-poured {
+  #heart-final-phase .hfp-poured {
     text-align: center;
     font-size: 12px;
     color: var(--color-debuff-fire);
   }
-  body.mobile-touch #heart-overload {
+  body.mobile-touch #heart-final-phase {
     top: 4px;
-    padding: 4px 8px 6px;
-  }
-  body.mobile-touch #heart-overload .ho-rows {
-    grid-template-columns: repeat(4, minmax(56px, 1fr));
-    gap: 4px;
+    padding: 4px 8px 5px;
   }
   @media (prefers-reduced-motion: reduce) {
-    #heart-overload .ho-row,
-    #heart-overload .ho-phase {
+    #heart-final-phase .hfp-phase {
       animation: none;
     }
   }
