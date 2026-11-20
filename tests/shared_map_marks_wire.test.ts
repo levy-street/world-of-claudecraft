@@ -65,7 +65,7 @@ describe('shared map marks: server wire', () => {
     expect(lastSnap(fb.sent).self).not.toHaveProperty('mmarks');
     cmd(server, sb, { cmd: 'map_mark_clear', symbol: null });
     broadcast(server);
-    expect(lastSnap(fb.sent).self.mmarks).toEqual([]);
+    expect(lastSnap(fb.sent).self.mmarks).toBeNull();
   });
 
   it('drops malformed frames before the sim', () => {

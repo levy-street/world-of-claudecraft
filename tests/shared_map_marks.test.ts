@@ -16,6 +16,7 @@ import {
   SHARED_MAP_MARK_EDITS_PER_WINDOW,
   SHARED_MAP_MARK_MAX_ENTRIES,
   SHARED_MAP_MARK_PAGES,
+  SHARED_MAP_MARK_SENDER_EDITS_PER_WINDOW,
   SharedMapMarks,
 } from '../src/sim/social/shared_map_marks';
 
@@ -172,6 +173,28 @@ describe('shared map marks: the marks themselves', () => {
     expect(marks(sim, a).find((m) => m.symbol === SKULL)?.x).toBe(50);
   });
 
+  it('gives each sender only a share of the group window, so one member cannot starve the rest', () => {
+    const { sim, a, b } = partyInCrypt();
+    for (let i = 0; i < SHARED_MAP_MARK_SENDER_EDITS_PER_WINDOW + 3; i++)
+      sim.placeSharedMapMark(0, i, 0, STAR, a);
+    expect(marks(sim, a)[0].x).toBe(SHARED_MAP_MARK_SENDER_EDITS_PER_WINDOW - 1);
+    sim.placeSharedMapMark(0, 40, 40, SKULL, b);
+    expect(marks(sim, b).find((m) => m.symbol === SKULL)?.x).toBe(40);
+  });
+
+  it('an emptied store keeps its rate window until the claim dies', () => {
+    const { sim, a } = partyInCrypt();
+    sim.placeSharedMapMark(0, 1, 1, STAR, a);
+    sim.clearSharedMapMarks(null, a);
+    expect(store(sim).size).toBe(0);
+    expect(store(sim).windowCount).toBe(1);
+    freeInstance(sim.ctx, claimOf(sim, a));
+    sim.leaveDungeon(a);
+    expect(sim.enterDungeon(DUNGEON, a)).toBe(true);
+    sim.placeSharedMapMark(0, 1, 1, STAR, a);
+    expect(store(sim).windowCount).toBe(1);
+  });
+
   it('draws no rng (cosmetic state)', () => {
     const { sim, a } = partyInCrypt();
     const rng = sim.ctx.rng as unknown as Record<string, unknown>;
@@ -226,8 +249,10 @@ describe('shared map marks: who sees them, and when they go', () => {
     const wire = sim.sharedMapMarksWireFor(a);
     expect(JSON.parse(wire)).toEqual([[SKULL, 1, 4.3, -3]]);
     expect(sim.sharedMapMarksWireFor(b)).toBe(wire);
+    // An emptied entry goes at once: the row is null again, not an empty list.
     sim.clearSharedMapMarks(null, a);
-    expect(sim.sharedMapMarksWireFor(b)).toBe('[]');
+    expect(sim.sharedMapMarksWireFor(b)).toBe('null');
+    expect(store(sim).size).toBe(0);
   });
 
   it('the offline world reads the local player through IWorld', () => {
