@@ -7,7 +7,8 @@
 // the player's pins (persisted per character and raid, storage wrapped).
 //
 // Hud never learns any of this: InteriorMapController routes the plan paint
-// here (`show`), forwards the frame tick (`tick`) and the minimap paint. The
+// here (`show`), forwards the frame tick (`tick`) and the raid's minimap paint
+// (`paintMinimap`: the same page cropped round the player). The
 // atlas is ACTIVE only between a `show` and the moment the map window closes
 // or switches to another level (`host.planShown()` false), which `tick` notices
 // and stands the atlas down on.
@@ -18,6 +19,7 @@
 import type { IWorld } from '../../../world_api';
 import { canvasDpr } from '../../canvas_dpr';
 import { dungeonTitleWithDifficulty } from '../../dungeon_map_painter';
+import { type DungeonMapMarker, DungeonMapViewCore } from '../../dungeon_map_view';
 import { mobDisplayName } from '../../entity_display_core';
 import { formatNumber, t } from '../../i18n';
 import {
@@ -38,6 +40,8 @@ import {
   drawPoi,
   pinIconPath,
 } from './raid_atlas_glyph_painter';
+import { raidAtlasMinimapKey } from './raid_atlas_minimap_core';
+import { RaidAtlasMinimapPainter } from './raid_atlas_minimap_painter';
 import { RaidAtlasPainter } from './raid_atlas_painter';
 import type { RaidAtlasColors } from './raid_atlas_palette_core';
 import {
@@ -85,6 +89,10 @@ const PIN_LIFT_PX = 27;
 const STORE_STYLE_KEY = 'woc.raidAtlas.pinStyle';
 const MAX_DPR = 2.5;
 const KEY_PAN_PX = 60;
+/** The minimap renders its sharp detail tile once the player has stood this
+ *  long (ms); while moving it crops the prewarmed plate. */
+const MINIMAP_SETTLE_MS = 300;
+const NO_MARKS: readonly DungeonMapMarker[] = [];
 /** The live layer's own repaint pace while nothing moves (ms). */
 const LIVE_REPAINT_MS = 120;
 
@@ -154,6 +162,13 @@ export class RaidAtlasController {
   private lastZ = Number.NaN;
   private lastFacing = Number.NaN;
   private prewarmed = 0;
+  private readonly minimap = new RaidAtlasMinimapPainter();
+  private readonly markerView = new DungeonMapViewCore();
+  private minimapKey: string | null = null;
+  private mmX = Number.NaN;
+  private mmZ = Number.NaN;
+  private mmScale = Number.NaN;
+  private mmMovedAt = 0;
   private lastPointerType = 'mouse';
   private readonly pointers = new Map<number, PointerTrack>();
   private pinchDist = 0;
@@ -253,27 +268,88 @@ export class RaidAtlasController {
     this.paint();
   }
 
-  /** The minimap's pins (drawn over the dungeon minimap, inside its rim). */
-  paintMinimapPins(
+  /**
+   * Paint the raid's minimap: the atlas page cropped round the player with
+   * its glyphs at minimap size (raid_atlas_minimap_painter.ts). Returns false
+   * when the raid has no atlas or the stylesheet has not landed yet (the plain
+   * dungeon minimap draws instead). A paint that would draw the same pixels as
+   * the last one is skipped: the canvas keeps them.
+   */
+  paintMinimap(
     ctx: CanvasRenderingContext2D,
     world: IWorld,
     anchor: RaidAtlasAnchor,
     size: number,
+    zoom: number,
     pxPerYard: number,
-  ): void {
+  ): boolean {
     const plan = raidAtlasPlanFor(anchor.dungeonId);
-    if (!plan) return;
-    // Warm one page's plate per minimap paint after entering the raid, so the
-    // first M never pays for it.
+    const colors = this.painter.resolvedColors();
+    const fonts = this.painter.resolvedFonts();
+    if (!plan || !colors || !fonts) return false;
+    const frame = buildRaidAtlasFrame(world, plan, anchor);
+    const floor = raidAtlasFloor(plan, frame.playerFloor ?? defaultRaidAtlasFloor(frame));
+    const plate = this.painter.plateCanvas(plan, floor);
+    // Warm the other pages' plates, one per paint, so the first M and the
+    // first portal hop never pay for them.
     if (this.prewarmed < plan.floors.length) {
       this.painter.prewarm(plan, plan.floors[this.prewarmed]);
-      if (this.painter.resolvedColors()) this.prewarmed++;
+      this.prewarmed++;
     }
+    const marks = this.markerView.minimap(world, size, pxPerYard)?.markers ?? NO_MARKS;
     const pins = this.pinsFor(world, anchor.dungeonId);
-    if (pins.length === 0) return;
     const lx = world.player.pos.x - anchor.originX;
     const lz = world.player.pos.z - anchor.originZ;
-    this.painter.paintMinimapPins(ctx, pins, lx, lz, size, pxPerYard);
+    const now = performance.now();
+    if (
+      Math.abs(lx - this.mmX) > 0.05 ||
+      Math.abs(lz - this.mmZ) > 0.05 ||
+      pxPerYard !== this.mmScale
+    ) {
+      this.mmMovedAt = now;
+      this.mmX = lx;
+      this.mmZ = lz;
+      this.mmScale = pxPerYard;
+    }
+    const settled = now - this.mmMovedAt >= MINIMAP_SETTLE_MS;
+    const dpr = ctx.canvas.width / size;
+    const key = raidAtlasMinimapKey({
+      floor: floor.id,
+      lx,
+      lz,
+      facing: world.player.facing,
+      pxPerYard,
+      backing: ctx.canvas.width,
+      bosses: frame.bosses.map((b) => b.state[0]).join(''),
+      engaged: frame.bosses.some((b) => b.state === 'engaged'),
+      members: frame.members,
+      marks: marks.filter((m) => m.kind === 'mob' || m.kind === 'loot' || m.kind === 'gate'),
+      pins: pins.map((p) => `${p.id}${p.icon[0]}${p.color[0]}`).join('.'),
+      settled,
+      plateReady: plate !== null,
+    });
+    if (key !== null && key === this.minimapKey) return true;
+    this.minimapKey = key;
+    this.minimap.paint(ctx, {
+      plan,
+      floor,
+      frame,
+      marks,
+      pins,
+      lx,
+      lz,
+      size,
+      zoom,
+      pxPerYard,
+      dpr,
+      settled,
+      plate,
+      colors,
+      fonts,
+      classColor: this.host.classColor,
+      clock: now / 1000,
+    });
+    return true;
   }
 
   // ---- lifecycle -----------------------------------------------------------------------

@@ -7,12 +7,16 @@
 //
 // A raid with an illustrated atlas (src/ui/hud/raid_atlas/, the Smith's Heart
 // pilot) draws its plan through the atlas instead of the plain floor plan; the
-// atlas also rides the HUD's frame tick (`frame`) and adds the player's pins to
-// the dungeon minimap.
+// atlas also rides the HUD's frame tick (`frame`) and paints the raid's
+// minimap (the same illustrated page cropped round the player).
 
 import { dungeonInstanceAt } from '../sim/dungeon_floor';
 import type { IWorld } from '../world_api';
-import { DungeonMapPainter, MINIMAP_BASE_SCALE } from './dungeon_map_painter';
+import {
+  DungeonMapPainter,
+  dungeonTitleWithDifficulty,
+  MINIMAP_BASE_SCALE,
+} from './dungeon_map_painter';
 import {
   type DungeonMapModel,
   dungeonMapActive,
@@ -44,7 +48,7 @@ export class InteriorMapController {
   private readonly atlas: RaidAtlasController | null;
 
   constructor(
-    writers: PainterHostWriters,
+    private readonly writers: PainterHostWriters,
     classColor: (cls: string) => string,
     planShown: (() => boolean) | null = null,
   ) {
@@ -62,9 +66,15 @@ export class InteriorMapController {
     zoom: number,
   ): boolean {
     if (dungeonMapActive(world)) {
-      this.dungeon.paintMinimap(ctx, world, zoneLabelEl, size, zoom);
       const anchor = this.atlas ? atlasAnchorAt(world.player.pos.x, world.player.pos.z) : null;
-      if (anchor) this.atlas?.paintMinimapPins(ctx, world, anchor, size, MINIMAP_BASE_SCALE * zoom);
+      if (
+        anchor &&
+        this.atlas?.paintMinimap(ctx, world, anchor, size, zoom, MINIMAP_BASE_SCALE * zoom)
+      ) {
+        this.writers.setText(zoneLabelEl, dungeonTitleWithDifficulty(anchor.dungeonId, world));
+        return true;
+      }
+      this.dungeon.paintMinimap(ctx, world, zoneLabelEl, size, zoom);
       return true;
     }
     if (lastKeepMapActive(world)) {

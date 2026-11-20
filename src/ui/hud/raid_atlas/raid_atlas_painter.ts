@@ -67,8 +67,6 @@ const MEMBER_PX = 6;
 const BOSS_PX = 15;
 const PIN_PX = 26;
 const POI_PX = 9;
-const MINIMAP_PIN_PX = 13;
-const MINIMAP_RIM_INSET = 7;
 /** Minor room names appear once a yard spans this many CSS px. */
 const MINOR_LABEL_SCALE = 1.45;
 /** Boss names appear under their medallion from this scale. */
@@ -163,34 +161,18 @@ export class RaidAtlasPainter {
     return colors.ink ? colors : null;
   }
 
-  /** The player's pins on the dungeon minimap: small pins inside its rim,
-   *  projected like the minimap's own plan (dungeon_map_view.ts: a yard of
-   *  +x moves LEFT, of +z UP, centred on the player at local lx, lz). */
-  paintMinimapPins(
-    ctx: CanvasRenderingContext2D,
-    pins: readonly RaidAtlasPin[],
-    lx: number,
-    lz: number,
-    size: number,
-    pxPerYard: number,
-  ): void {
-    const colors = this.resolvedColors();
-    if (!colors) return;
-    const half = size / 2;
-    const rim = half - MINIMAP_RIM_INSET;
-    const here = raidAtlasFloorOf(lx, lz);
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(half, half, rim, 0, Math.PI * 2);
-    ctx.clip();
-    for (const pin of pins) {
-      if (pin.floor !== here) continue;
-      const x = half - (pin.x - lx) * pxPerYard;
-      const y = half - (pin.z - lz) * pxPerYard;
-      if (Math.hypot(x - half, y - half) > rim + MINIMAP_PIN_PX) continue;
-      drawPin(ctx, colors, x, y, MINIMAP_PIN_PX, pin.icon, pin.color, false);
-    }
-    ctx.restore();
+  /** The resolved fonts, or null before the stylesheet has landed. */
+  resolvedFonts(): RaidAtlasFonts | null {
+    const { colors, fonts } = this.palette();
+    return colors.ink ? fonts : null;
+  }
+
+  /** A floor's whole-page plate (the minimap crops it), rendered on first
+   *  use; null before the stylesheet has landed. */
+  plateCanvas(plan: RaidAtlasPlan, floor: RaidAtlasFloor): HTMLCanvasElement | null {
+    const { colors } = this.palette();
+    if (!colors.ink) return null;
+    return this.plate(plan, floor, colors)?.canvas ?? null;
   }
 
   /** Warm a floor's plate ahead of the first open (one floor per call). */

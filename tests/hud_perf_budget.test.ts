@@ -984,6 +984,9 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/raid_atlas/raid_atlas_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/raid_atlas/raid_atlas_page_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/raid_atlas/raid_atlas_glyph_painter.ts', allow: {}, reflowAllow: {} },
+  // the atlas on the round minimap: blits the prewarmed plate (or one cached
+  // detail tile) on the minimap cadence; the caller skips unchanged paints
+  { file: 'hud/raid_atlas/raid_atlas_minimap_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },

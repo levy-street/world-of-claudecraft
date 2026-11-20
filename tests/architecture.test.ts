@@ -321,6 +321,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/raid_atlas/raid_atlas_pins_core.ts',
   'src/ui/hud/raid_atlas/raid_atlas_palette_core.ts',
   'src/ui/hud/raid_atlas/raid_atlas_view.ts',
+  // The atlas on the round minimap: the page crop, the detail tile, the
+  // room-name policy and the idle-skip key.
+  'src/ui/hud/raid_atlas/raid_atlas_minimap_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
