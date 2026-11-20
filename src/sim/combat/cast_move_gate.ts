@@ -46,8 +46,14 @@ export function abilityCastSurvivesMovement(
 // only, mirroring player_motion's own hasMoveInput (turning in place and jump never
 // count). This is the one thing castAbility needs at press time to know whether the
 // very next movement tick would cancel a cast it is about to start.
+// Opposing keys cancel per axis (forward+back, strafe left+right), exactly as
+// player_motion sums them: they leave a zero wish vector, which counts as no
+// input. Counting it as movement made player_motion normalise that zero vector
+// (0 / 0 = NaN), and the NaN pose guard then snapped the body back to its
+// start-of-tick pose every tick with vy and fallStartY reset: holding both
+// strafe keys mid-air hovered in place and erased fall damage.
 export function hasMovementInput(inp: MoveInput): boolean {
-  return inp.forward || inp.back || inp.strafeLeft || inp.strafeRight;
+  return inp.forward !== inp.back || inp.strafeLeft !== inp.strafeRight;
 }
 
 // The movement-cancel predicate only fires when those held keys would actually
