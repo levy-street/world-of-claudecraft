@@ -303,6 +303,13 @@ export const final = {
   tankSpot(world, st, b, t) {
     // A Splinter is held where it rose (its signature is its quarter's).
     if (t && SPLINTERS.has(t.tid)) return t;
+    // The tank NOT holding the boss waits beside it on its outer side (away
+    // from the central ring), ready for the swap: a taunt from a drag spot
+    // across the room pulled the boss through the ring into Heart Unbound
+    // (the bot raids of 2026-11-20).
+    const boss = world.mobs.boss;
+    if (alive(boss) && boss.aggro !== b.pid && !final.isFinalPhase(world))
+      return add(boss, unit(world.center, boss), 7);
     return dragSpot(world, st);
   },
   // An intermission's Splinters are split between the tanks in turn (the
@@ -356,7 +363,10 @@ export const final = {
     if (!alive(boss) || hypot(boss, world.center) < 4) return null;
     const u = unit(world.center, boss);
     const side = b.spec.key === 'h1' ? 1 : -1;
-    return add(add(world.center, u, 14), { x: -u.z, z: u.x }, side * 4);
+    // Outside the central ring (16 yd): a healer the boss turns on must
+    // never pull it into the ring, where Heart Unbound wipes the raid (the
+    // bot raids of 2026-11-20 after a tank swap).
+    return add(add(world.center, u, HEART_QUARTERS.ringR + 6), { x: -u.z, z: u.x }, side * 4);
   },
   targets(world) {
     const s = world.splinters;
@@ -399,6 +409,17 @@ export const final = {
     const o = world.o;
     if (!o) return false;
     if (!final.onFloor(world, at)) return true;
+    // The quarter fight: nobody stands in the central ring, so a boss that
+    // turns on anyone (a lost aggro, a swap) is never drawn into it.
+    const boss = world.mobs.boss;
+    if (
+      boss &&
+      !final.isFinalPhase(world) &&
+      !hasAura(boss, FINAL_PHASE_AURAS.shield) &&
+      !hasAura(boss, FINAL_PHASE_AURAS.hidden) &&
+      hypot(at, world.center) < HEART_QUARTERS.ringR + 2
+    )
+      return true;
     for (const h of [...o.danger, ...o.ice]) if (hypot(h, at) < h.r) return true;
     for (const ln of o.lanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;
     for (const ln of o.bladeLanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;

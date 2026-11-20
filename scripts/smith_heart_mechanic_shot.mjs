@@ -266,6 +266,7 @@ const PLANS = {
           '/dev heart final pull',
         ],
         trigger: [`/dev heart final fusion ${combo}`],
+        steer: combo === 'steam' ? 'steamClouds' : undefined,
         // Inside the quarter it enters, 30 yd out (the combo lands there).
         spot: QUARTER_SPOTS[to],
         quiet: true,
@@ -554,6 +555,40 @@ try {
         setTimeout(step, 100);
       };
       step();
+    });
+  // The steam: once its clouds rise, the witness stands just off their middle
+  // (so all of them sit in frame), a raider inside the first cloud and one
+  // beside the second.
+  if (plan.steer === 'steamClouds')
+    await page.evaluate(() => {
+      const w = window.__game.world;
+      setTimeout(() => {
+        const clouds = [];
+        for (const e of w.entities.values())
+          if (e.kind === 'object' && e.templateId.startsWith('sh_final_steam_')) clouds.push(e);
+        if (!clouds.length) return;
+        const cx = clouds.reduce((a, c) => a + c.pos.x, 0) / clouds.length;
+        const cz = clouds.reduce((a, c) => a + c.pos.z, 0) / clouds.length;
+        const move = (e, x, z) => {
+          const g = w.ctx.groundPos(x, z);
+          e.pos = { ...g };
+          e.prevPos = { ...g };
+          e.facing = Math.atan2(cx - x, cz - z);
+          e.prevFacing = e.facing;
+          w.ctx.rebucket(e);
+        };
+        const p = w.player;
+        const away = Math.atan2(p.pos.x - cx, p.pos.z - cz);
+        move(p, cx + Math.sin(away) * 24, cz + Math.cos(away) * 24);
+        const raid = window.__shotRaid ?? [];
+        raid.forEach((id, i) => {
+          const e = w.entities.get(id);
+          if (!e) return;
+          const c = clouds[i % clouds.length];
+          const off = i < clouds.length ? 0.5 : 7 + i;
+          move(e, c.pos.x + off, c.pos.z + off * 0.4);
+        });
+      }, 3600);
     });
   if (plan.steer === 'polarityPairs')
     await page.evaluate(() => {
