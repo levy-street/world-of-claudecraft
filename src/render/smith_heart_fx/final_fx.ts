@@ -23,8 +23,9 @@
 //  - the Overload ring in the room's centre (final_overload_ring.ts, Jose's
 //    brief of 2026-11-20): the bar of the quarter it drinks filling a great
 //    ring round the central well in that quarter's colour (no floating text),
-//    the warning from four fifths, the red centre (the HUD's four bars moved
-//    here);
+//    the warning from four fifths, the red centre, and its explosion when a
+//    bar reaches 100 percent (the Overload Burst cue below; the HUD's four
+//    bars moved here);
 //  - an Overload Burst: the heart's flash and a wall of the quarter's light
 //    riding out of the body over the whole Anvil on the trash engine's wave
 //    clock, a pulse a low ring of it (the floor's light the room's);
@@ -523,7 +524,9 @@ export class FinalFx {
       groundY: (x, z) => this.groundY(x, z),
       rand: () => this.rand(),
       low: !this.secondary,
+      share: this.density,
       reducedMotion: () => this.reducedMotion(),
+      flash: (x, y, z, size, span, color, peak) => this.flash(x, y, z, size, span, color, peak),
     });
     this.arrival = new FinalArrivalBeam(this.root, host);
     this.death = new FinalDeathFx(this.root, {
@@ -1038,6 +1041,10 @@ export class FinalFx {
       return;
     }
     this.burstAt = this.clock;
+    // The room's centre ring explodes in the colour of the bar that blew
+    // (the quarter it drank; a dev burst in the ring blows the Heat's, as
+    // the sim's own dev verb does).
+    this.overloadRing.burst(this.ringState.vein ?? (this.zone === 'ring' ? 'heat' : this.zone));
     const y = this.groundY(e.pos.x, e.pos.z);
     this.wrathWall.position.set(e.pos.x, y, e.pos.z);
     (this.wrathMat.uniforms.uGold.value as THREE.Color).copy(this.burstTint);

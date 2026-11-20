@@ -12,7 +12,13 @@
 //     ahead burning red, and a second, sharper crystal strain at nine
 //     tenths from the well (the first, at four fifths, is the fight's own
 //     audio's off the boss: game/smith_heart_final_audio_core.ts);
-//   - the boss in the centre ring: the whole ring red and pulsing.
+//   - the boss in the centre ring: the whole ring red and pulsing;
+//   - a bar reaching 100 percent (the sim's Overload Burst cue, handed in by
+//     FinalFx): the explosion out of the well in the quarter's colour, a
+//     white-hot flash, a shockwave racing out over the floor to the
+//     platform's rim with a faster thin ring ahead of it, the column surging
+//     up its full height, the ring flaring and draining back to empty, a
+//     boom from the well, debris and sparks (the low tier sheds those only).
 // Every tier draws the ring, its fill and colour, the warning's
 // light and the centre's red; the low tier sheds the sparks; reduced motion
 // keeps a steady light (no flicker, no pulse).
@@ -29,9 +35,14 @@ import { HEART_QUARTER_PALETTE, HEART_RING_LOOK } from '../smith_heart/heart_qua
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   easeSweep,
+  newOverloadBurstLook,
   newOverloadRingLook,
+  OVERLOAD_BURST,
   OVERLOAD_RING,
+  type OverloadBurstLook,
   type OverloadRingState,
+  overloadBurstLook,
+  overloadBurstPieces,
   overloadRingLook,
   ringWarnBeat,
 } from './final_overload_ring_core';
@@ -42,9 +53,21 @@ export interface FinalOverloadRingHost {
   particles: EngineParticles;
   groundY: (x: number, z: number) => number;
   rand: () => number;
-  /** The low tier: no sparks. */
+  /** The low tier: no sparks, no debris. */
   low: boolean;
+  /** The tier's share of the cosmetic particles. */
+  share: number;
   reducedMotion: () => boolean;
+  /** One of FinalFx's flash sprites (additive, its radial glow). */
+  flash: (
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    span: number,
+    color: number,
+    peak: number,
+  ) => void;
 }
 
 const RING_VERT = /* glsl */ `
@@ -223,6 +246,8 @@ const COLUMN_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uLevel;
 uniform float uTop;
+uniform float uSurge;
+uniform float uFront;
 uniform vec3 uColor;
 uniform vec3 uHot;
 varying vec2 vUv;
@@ -231,10 +256,67 @@ void main() {
   float y = vUv.y;
   if (y > uTop) discard;
   float top = 1.0 - smoothstep(uTop * 0.55, uTop, y);
-  float strand = 0.55 + 0.45 * sin(vUv.x * 6.2831853 * 3.0 + y * 14.0 - uTime * 2.6);
-  float a = uLevel * top * pow(vRim, 1.4) * strand * (1.0 - y * 0.6);
+  float strand = 0.55 + 0.45 * sin(vUv.x * 6.2831853 * 3.0 + y * 14.0 - uTime * (2.6 + 9.0 * uSurge));
+  // The explosion's surge: the column blazing up its whole height, a
+  // white-hot front climbing it, the strands racing.
+  float front = exp(-pow((y - uFront) * 9.0, 2.0)) * uSurge;
+  float body = uLevel * top * strand * (1.0 - y * 0.6) + uSurge * strand * 1.1 * (1.0 - y * 0.75) + front * 2.2;
+  float a = body * pow(vRim, 1.4 - 0.6 * uSurge);
   if (a <= 0.004) discard;
-  gl_FragColor = vec4(mix(uColor, uHot, 0.35 * (1.0 - y)) * a * 1.4, a);
+  vec3 col = mix(uColor, uHot, clamp(0.35 * (1.0 - y) + 0.55 * uSurge + front, 0.0, 1.0));
+  gl_FragColor = vec4(col * a * 1.4, min(a, 1.0));
+  #include <colorspace_fragment>
+}`;
+
+const SHOCK_VERT = /* glsl */ `
+varying vec2 vP;
+void main() {
+  vP = position.xz;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+// The explosion's floor: one band (room-local yards) from the well's rim out
+// past the platform's, carrying the main shockwave (a white-hot crest in the
+// quarter's colour, a torn scorched wake behind it), the thin faster ring
+// ahead of it, and the flash's light pooled on the floor round the well.
+const SHOCK_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uR1;
+uniform float uA1;
+uniform float uR2;
+uniform float uA2;
+uniform float uW;
+uniform float uFlash;
+uniform float uInner;
+uniform vec3 uColor;
+uniform vec3 uHot;
+varying vec2 vP;
+float sh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float sn(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(sh(i), sh(i + vec2(1.0, 0.0)), f.x), mix(sh(i + vec2(0.0, 1.0)), sh(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+void main() {
+  float r = length(vP);
+  float ang = atan(vP.y, vP.x);
+  // A ragged front: the crest breaks along its length.
+  float rag = (sn(vec2(ang * 14.0, uTime * 2.0)) - 0.5) * uW * 0.55;
+  float d = uR1 + rag - r;
+  // The crest: a coloured glow trailing a thin white-hot leading line.
+  float crest = d > 0.0 ? exp(-pow(d / uW, 2.0)) : exp(-pow(d / (uW * 0.3), 2.0));
+  float core = exp(-pow((d - uW * 0.15) / (uW * 0.28), 2.0));
+  float wake = d > 0.0 ? exp(-d / (uW * 3.0)) * (0.3 + 0.7 * sn(vec2(ang * 22.0, r * 0.6))) : 0.0;
+  float streak = 0.65 + 0.35 * sn(vec2(ang * 60.0, 0.0));
+  float main1 = (crest * (0.75 + 0.5 * streak) + core * 0.6 + wake * 0.22) * uA1;
+  float ring2 = exp(-pow((uR2 - r) / (uW * 0.3), 2.0)) * uA2;
+  float pool = uFlash * exp(-pow(max(r - uInner, 0.0) / 14.0, 2.0)) * 0.9;
+  vec3 col = uColor * (wake * 0.5 * uA1 + pool + crest * streak * 1.5 * uA1)
+    + uHot * (core * 1.6 * uA1 + ring2 * 1.2);
+  float a = clamp(main1 + ring2 + pool, 0.0, 1.0) * smoothstep(uInner, uInner + 1.5, r);
+  if (a <= 0.004) discard;
+  gl_FragColor = vec4(col, a);
   #include <colorspace_fragment>
 }`;
 
@@ -243,6 +325,8 @@ const COLUMN_H = 34;
 const COLUMN_R = 3.4;
 
 const _hot = new THREE.Color();
+/** The explosion's dust (the Anvil's pale granite). */
+const DUST: [number, number, number] = [0.46, 0.4, 0.34];
 const _rgb: [number, number, number] = [1, 1, 1];
 
 export class FinalOverloadRing {
@@ -260,6 +344,20 @@ export class FinalOverloadRing {
   private readonly column: THREE.Mesh;
   private readonly columnMat: THREE.ShaderMaterial;
   private readonly look = newOverloadRingLook();
+  /** The explosion's floor (its own group: it plays out even if the ring
+   *  goes dark under it). */
+  private readonly burstGroup = new THREE.Group();
+  private readonly shock: THREE.Mesh;
+  private readonly shockMat: THREE.ShaderMaterial;
+  private readonly shockGeo: THREE.BufferGeometry;
+  private readonly burstLook = newOverloadBurstLook();
+  /** When the last explosion went off (host clock; -99 none), whether its
+   *  one-off moments are still owed, and its quarter's colours. */
+  private burstAt = -99;
+  private burstPending = false;
+  private burstColor = 0xffffff;
+  private burstHot = 0xffffff;
+  private clock = 0;
   private readonly uTime = { value: 0 };
   private sweep = 0;
   private lastVein: SmithHeartVein | null = null;
@@ -377,6 +475,8 @@ export class FinalOverloadRing {
         uTime: this.uTime,
         uLevel: { value: 0 },
         uTop: { value: 0.2 },
+        uSurge: { value: 0 },
+        uFront: { value: 0 },
         uColor: { value: new THREE.Color(0xffffff) },
         uHot: { value: new THREE.Color(0xffffff) },
       },
@@ -390,6 +490,45 @@ export class FinalOverloadRing {
     this.column.name = 'smithHeartOverloadColumn';
     this.column.frustumCulled = false;
     this.group.add(this.column);
+    // The explosion's floor: a band from the well's rim out past the
+    // platform's (its fronts are uniforms in yards, never a scale), its rings
+    // close enough to lie on the floor's steps once laid (readFloor).
+    const shockGeo = new THREE.RingGeometry(
+      HEART_RING_LOOK.rimOut,
+      OVERLOAD_BURST.shockTo + 10,
+      192,
+      48,
+    ).rotateX(-Math.PI / 2);
+    this.geometries.push(shockGeo);
+    this.shockGeo = shockGeo;
+    this.shockMat = new THREE.ShaderMaterial({
+      name: 'smithHeartOverloadShock',
+      uniforms: {
+        uTime: this.uTime,
+        uR1: { value: 0 },
+        uA1: { value: 0 },
+        uR2: { value: 0 },
+        uA2: { value: 0 },
+        uW: { value: OVERLOAD_BURST.shockWidth },
+        uFlash: { value: 0 },
+        uInner: { value: HEART_RING_LOOK.rimOut },
+        uColor: { value: new THREE.Color(0xffffff) },
+        uHot: { value: new THREE.Color(0xffffff) },
+      },
+      vertexShader: SHOCK_VERT,
+      fragmentShader: SHOCK_FRAG,
+      side: THREE.DoubleSide,
+      ...common,
+    });
+    this.materials.push(this.shockMat);
+    this.shock = new THREE.Mesh(shockGeo, this.shockMat);
+    this.shock.name = 'smithHeartOverloadShock';
+    this.shock.frustumCulled = false;
+    this.shock.renderOrder = floorVfxRenderOrder('encounter', 1);
+    this.burstGroup.name = 'smithHeartOverloadBurst';
+    this.burstGroup.visible = false;
+    this.burstGroup.add(this.shock);
+    h.root.add(this.burstGroup);
     h.root.add(this.group);
   }
 
@@ -397,6 +536,7 @@ export class FinalOverloadRing {
    *  the slot's origin, `clock` and `dt` the host's. */
   update(s: OverloadRingState, ox: number, oz: number, clock: number, dt: number): void {
     this.uTime.value = clock;
+    this.clock = clock;
     const snap = s.mode !== this.lastMode || s.vein !== this.lastVein || this.lastMode === 'off';
     this.sweep = easeSweep(this.sweep, s.mode === 'centre' ? 1 : s.fill, dt, snap);
     const look = overloadRingLook(
@@ -409,6 +549,9 @@ export class FinalOverloadRing {
     );
     const cx = ox + HEART_ROOM.x;
     const cz = oz + HEART_ROOM.z;
+    this.readFloor(cx, cz);
+    const burst = overloadBurstLook(clock - this.burstAt, this.h.reducedMotion(), this.burstLook);
+    this.paintBurst(burst, cx, cz);
     if (look.shown <= 0) {
       this.group.visible = false;
       this.lastMode = s.mode;
@@ -417,20 +560,6 @@ export class FinalOverloadRing {
       return;
     }
     this.group.visible = true;
-    // The floor under the band (the well's own ground sits lower than the
-    // platform round its rim): the highest of a few points on the ring.
-    // Read once per slot (the floor never moves).
-    if (cx * 7919 + cz !== this.floorKey) {
-      this.floorKey = cx * 7919 + cz;
-      const mid = (OVERLOAD_RING.inner + OVERLOAD_RING.outer) / 2;
-      let top = -Infinity;
-      for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
-        top = Math.max(top, this.h.groundY(cx + Math.sin(a) * mid, cz + Math.cos(a) * mid));
-      }
-      this.floorY = top;
-      this.wellY = this.h.groundY(cx, cz);
-    }
     const y = this.floorY;
     this.group.position.set(cx, y + 0.1, cz);
     // The well and the column stand on the well's own floor.
@@ -438,26 +567,36 @@ export class FinalOverloadRing {
     this.well.position.y = wy + 0.15;
     this.column.position.y = wy;
     const u = this.ringMat.uniforms;
+    // Through the explosion the ring keeps the burst quarter's colour while
+    // it drains back to empty round the dial, flaring as it goes.
+    const draining = burst.live && burst.drain > look.sweep && s.mode !== 'centre';
+    const color = draining ? this.burstColor : s.color;
     const hot =
       s.mode === 'centre'
         ? _hot.setHex(0xffb08a)
-        : _hot.setHex(s.vein ? HEART_QUARTER_PALETTE[s.vein].hot : 0xffffff);
-    (u.uColor.value as THREE.Color).setHex(s.color);
+        : _hot.setHex(
+            draining ? this.burstHot : s.vein ? HEART_QUARTER_PALETTE[s.vein].hot : 0xffffff,
+          );
+    (u.uColor.value as THREE.Color).setHex(color);
     (u.uHot.value as THREE.Color).copy(hot);
-    u.uSweep.value = look.sweep;
-    u.uLight.value = look.light;
-    u.uFlicker.value = look.flicker;
-    u.uWarn.value = look.warn;
+    u.uSweep.value = draining ? burst.drain : look.sweep;
+    u.uLight.value = look.light + 0.9 * burst.flare;
+    u.uFlicker.value = burst.live ? 1 : look.flicker;
+    u.uWarn.value = burst.live ? 0 : look.warn;
     u.uCentre.value = s.mode === 'centre' ? 1 : 0;
     u.uPulse.value = look.pulse;
     const w = this.wellMat.uniforms;
-    (w.uColor.value as THREE.Color).setHex(s.color);
-    w.uLevel.value = look.well * look.flicker;
+    (w.uColor.value as THREE.Color).setHex(color);
+    w.uLevel.value = look.well * look.flicker + 1.4 * burst.flare;
     const c = this.columnMat.uniforms;
-    (c.uColor.value as THREE.Color).setHex(s.color);
+    (c.uColor.value as THREE.Color).setHex(color);
     (c.uHot.value as THREE.Color).copy(hot);
     c.uLevel.value = (0.55 + 0.45 * look.column) * look.flicker;
-    c.uTop.value = 0.12 + 0.88 * look.column;
+    c.uTop.value = 0.12 + 0.88 * Math.max(look.column, burst.surge);
+    c.uSurge.value = burst.surge;
+    c.uFront.value = burst.surgeFront;
+    const girth = 1 + 0.55 * burst.surge;
+    this.column.scale.set(girth, 1, girth);
     this.sparks(s, look.sparks, cx, y, cz, dt);
     // The second, sharper warning at nine tenths, from the well (the first,
     // at four fifths, is the fight's own crystal strain off the boss).
@@ -471,6 +610,144 @@ export class FinalOverloadRing {
     this.lastMode = s.mode;
     this.lastVein = s.vein;
     this.lastFill = s.fill;
+  }
+
+  /** The floor under the band (the well's own ground sits lower than the
+   *  platform round its rim): the highest of a few points on the ring. Read
+   *  once per slot (the floor never moves). */
+  private readFloor(cx: number, cz: number): void {
+    if (cx * 7919 + cz === this.floorKey) return;
+    this.floorKey = cx * 7919 + cz;
+    const mid = (OVERLOAD_RING.inner + OVERLOAD_RING.outer) / 2;
+    let top = -Infinity;
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      top = Math.max(top, this.h.groundY(cx + Math.sin(a) * mid, cz + Math.cos(a) * mid));
+    }
+    this.floorY = top;
+    this.wellY = this.h.groundY(cx, cz);
+    // The shockwave's band laid on the floor it races over (the platform
+    // steps down off the ring's dais): each vertex at the ground under it,
+    // once per slot, so the wave hugs the stone instead of floating.
+    const pos = this.shockGeo.getAttribute('position') as THREE.BufferAttribute;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      pos.setY(i, this.h.groundY(cx + x, cz + z) - top);
+    }
+    pos.needsUpdate = true;
+  }
+
+  /** A bar reached 100 percent: the sim's Overload Burst cue (FinalFx reads
+   *  it and names the quarter that blew). Its moments play on the next frame. */
+  burst(vein: SmithHeartVein): void {
+    const pal = HEART_QUARTER_PALETTE[vein];
+    this.burstColor = pal.color;
+    this.burstHot = pal.hot;
+    this.burstAt = this.clock;
+    this.burstPending = true;
+  }
+
+  /** The explosion's floor, and its one-off moments the frame it starts
+   *  (the flashes, the boom, the debris and sparks). */
+  private paintBurst(b: OverloadBurstLook, cx: number, cz: number): void {
+    this.burstGroup.visible = b.live;
+    if (!b.live) {
+      this.burstPending = false;
+      return;
+    }
+    const y = this.floorY;
+    this.burstGroup.position.set(cx, y + 0.14, cz);
+    const u = this.shockMat.uniforms;
+    (u.uColor.value as THREE.Color).setHex(this.burstColor);
+    (u.uHot.value as THREE.Color).setHex(this.burstHot);
+    u.uR1.value = b.shockR;
+    u.uA1.value = b.shockAlpha;
+    u.uR2.value = b.shock2R;
+    u.uA2.value = b.shock2Alpha;
+    u.uFlash.value = b.flash;
+    if (!this.burstPending) return;
+    this.burstPending = false;
+    const H = this.h;
+    const wy = this.wellY;
+    // The flash: a white-hot core over the well in a bloom of the quarter's
+    // colour (every tier; reduced motion keeps it short of a white-out).
+    const peak = H.reducedMotion() ? OVERLOAD_BURST.flashCalm : 1;
+    H.flash(cx, wy + 5, cz, 46, OVERLOAD_BURST.flashSpan + 0.2, this.burstColor, peak);
+    H.flash(cx, wy + 4, cz, 20, OVERLOAD_BURST.flashSpan, 0xfff6e8, peak);
+    H.flash(cx, wy + 22, cz, 26, OVERLOAD_BURST.flashSpan + 0.35, this.burstHot, peak * 0.8);
+    // The boom from the well (the boss's own burst sound is the fight's).
+    sfx.playAt('heart_final_anvil_fall', cx, y + 3, cz, {
+      gain: 1,
+      rate: 0.74,
+      cooldown: 1,
+      priority: true,
+    });
+    this.throwPieces(cx, y, cz, wy);
+  }
+
+  /** The explosion's debris and sparks (cosmetic: none on the low tier). */
+  private throwPieces(cx: number, y: number, cz: number, wy: number): void {
+    const H = this.h;
+    const n = overloadBurstPieces(H.low, H.share);
+    if (n.sparks + n.debris === 0) return;
+    const hot = this.burstHot;
+    _rgb[0] = ((hot >> 16) & 255) / 255;
+    _rgb[1] = ((hot >> 8) & 255) / 255;
+    _rgb[2] = (hot & 255) / 255;
+    const { inner, outer } = OVERLOAD_RING;
+    // Sparks thrown off the ring, out and up, falling back on the floor.
+    for (let i = 0; i < n.sparks; i++) {
+      const a = H.rand() * Math.PI * 2;
+      const r = inner + (outer - inner) * H.rand();
+      const sx = Math.sin(a);
+      const sz = Math.cos(a);
+      H.particles.puff(cx + sx * r, y + 0.4, cz + sz * r, 1, {
+        speed: 16 + 18 * H.rand(),
+        up: 6 + 10 * H.rand(),
+        life: 0.9 + 0.5 * H.rand(),
+        size: [0.5, 0.06],
+        color: _rgb,
+        alpha: 1,
+        pool: 'glow',
+        dir: [sx, 0.35, sz],
+        spread: 0.25,
+        gravity: 14,
+        drag: 0.5,
+      });
+    }
+    // Embers riding the surge up out of the well.
+    const embers = Math.round(n.sparks * 0.35);
+    for (let i = 0; i < embers; i++)
+      H.particles.puff(cx, wy + 1, cz, 1, {
+        speed: 4 + 4 * H.rand(),
+        up: 18 + 16 * H.rand(),
+        life: 1.4,
+        size: [0.7, 0.1],
+        color: _rgb,
+        alpha: 0.9,
+        pool: 'glow',
+        radius: 4,
+        drag: 0.8,
+      });
+    // Debris: dust and grit rolling out over the floor behind the wave.
+    for (let i = 0; i < n.debris; i++) {
+      const a = H.rand() * Math.PI * 2;
+      const sx = Math.sin(a);
+      const sz = Math.cos(a);
+      H.particles.puff(cx + sx * (outer - 0.5), y + 0.6, cz + sz * (outer - 0.5), 1, {
+        speed: 12 + 10 * H.rand(),
+        up: 1 + 2 * H.rand(),
+        life: 1.3 + 0.6 * H.rand(),
+        size: [1.6, 4.2],
+        color: DUST,
+        alpha: 0.55,
+        pool: 'smoke',
+        dir: [sx, 0.05, sz],
+        spread: 0.2,
+        drag: 1.6,
+      });
+    }
   }
 
   /** The warning's sparks: off the hand and the filled arc (none on the low
@@ -516,6 +793,9 @@ export class FinalOverloadRing {
 
   hide(): void {
     this.group.visible = false;
+    this.burstGroup.visible = false;
+    this.burstAt = -99;
+    this.burstPending = false;
     this.lastMode = 'off';
     this.lastVein = null;
     this.lastFill = 0;
@@ -523,6 +803,7 @@ export class FinalOverloadRing {
 
   dispose(): void {
     this.group.removeFromParent();
+    this.burstGroup.removeFromParent();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
   }

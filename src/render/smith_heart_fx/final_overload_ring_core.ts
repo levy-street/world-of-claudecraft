@@ -28,7 +28,7 @@
 //
 // Three-free, DOM-free, deterministic.
 
-import type { SmithHeartVein } from '../../sim/content/smith_heart_layout';
+import { HEART_ROOM, type SmithHeartVein } from '../../sim/content/smith_heart_layout';
 import {
   FINAL_AURAS,
   finalZoneOf,
@@ -249,4 +249,142 @@ export function ringWarnBeat(
 ): boolean {
   if (!vein || vein !== prevVein) return false;
   return prevFill < OVERLOAD_RING.warnAgainAt && fill >= OVERLOAD_RING.warnAgainAt;
+}
+
+// ---- the 100 percent explosion -----------------------------------------------------------
+
+/** The explosion when a bar reaches 100 percent (Jose's playtest of
+ *  2026-11-20: "when it hits 100 it should explode"). The sim's own signal
+ *  drives it: its Overload Burst cue (FINAL_CUES.burst, a `spellfx` nova on
+ *  the boss, final_rules.ts burstBar) as the bar empties and strikes the
+ *  raid, the same event FinalFx already reads for the body's wall of light,
+ *  so offline and online play it alike and nothing new crosses the wire.
+ *  The beats, in seconds from the cue (yards room-local):
+ *    - a white-hot flash over the well, the quarter's colour round it;
+ *    - a shockwave racing out over the floor from the ring's outer edge to
+ *      the platform's rim, a hot crest and a scorched wake; a thinner, faster
+ *      second ring ahead of it;
+ *    - the column surging up its full height, a bright front climbing it;
+ *    - the ring flaring full, holding a breath, then draining back to empty
+ *      round the dial so the raid sees the bar reset;
+ *    - debris and sparks thrown off the ring and up the column (cosmetic:
+ *      the low tier sheds them; the flash, the shockwave, the surge and the
+ *      drain draw on every tier, the raid reads the hit off them). */
+export const OVERLOAD_BURST = {
+  /** The whole explosion, past which it is done. */
+  span: 2.8,
+  /** The flash's rise and its fade. */
+  flashRise: 0.05,
+  flashSpan: 0.55,
+  /** Reduced motion: the flash's peak (no full white-out). */
+  flashCalm: 0.55,
+  /** The main shockwave: where it starts (the ring's outer edge), where it
+   *  ends (the platform's rim), its run, its crest's width (yards). */
+  shockFrom: OVERLOAD_RING.outer,
+  shockTo: HEART_ROOM.r,
+  shockSpan: 1.15,
+  shockWidth: 2.2,
+  /** The second ring: from the well's rim, a little faster. */
+  shock2From: HEART_RING_LOOK.rimOut,
+  shock2Span: 0.8,
+  /** The column's surge: up over this long, fading over the span. */
+  surgeRise: 0.32,
+  surgeSpan: 1.6,
+  /** The ring held full a breath, then drained over this long. */
+  hold: 0.25,
+  drain: 1.05,
+  /** The high tier's debris and sparks (thinned by the tier's share; none
+   *  on the low tier). */
+  debris: 48,
+  sparks: 120,
+} as const;
+
+export interface OverloadBurstLook {
+  /** The explosion is playing. */
+  live: boolean;
+  /** The flash's level (0..1). */
+  flash: number;
+  /** The main shockwave's front (yards from the centre) and its level. */
+  shockR: number;
+  shockAlpha: number;
+  /** The second ring's front and level. */
+  shock2R: number;
+  shock2Alpha: number;
+  /** The column's surge (0..1) and its bright front's height share. */
+  surge: number;
+  surgeFront: number;
+  /** The share of the full ring still lit (1 full, 0 empty): the drain. */
+  drain: number;
+  /** The ring's flare over its own light (0..1). */
+  flare: number;
+}
+
+export function newOverloadBurstLook(): OverloadBurstLook {
+  return {
+    live: false,
+    flash: 0,
+    shockR: 0,
+    shockAlpha: 0,
+    shock2R: 0,
+    shock2Alpha: 0,
+    surge: 0,
+    surgeFront: 0,
+    drain: 0,
+    flare: 0,
+  };
+}
+
+/** The explosion `age` seconds after the cue (negative or past its span:
+ *  not live). `reducedMotion` caps the flash (no white-out); every other
+ *  beat is the same. */
+export function overloadBurstLook(
+  age: number,
+  reducedMotion: boolean,
+  out: OverloadBurstLook,
+): OverloadBurstLook {
+  const B = OVERLOAD_BURST;
+  if (!(age >= 0 && age < B.span)) {
+    out.live = false;
+    out.flash = 0;
+    out.shockAlpha = 0;
+    out.shock2Alpha = 0;
+    out.surge = 0;
+    out.surgeFront = 0;
+    out.drain = 0;
+    out.flare = 0;
+    return out;
+  }
+  out.live = true;
+  const flash =
+    age < B.flashRise ? age / B.flashRise : Math.max(0, 1 - (age - B.flashRise) / B.flashSpan) ** 2;
+  out.flash = flash * (reducedMotion ? B.flashCalm : 1);
+  // The fronts ease out: a slam that slows as it spreads.
+  const k = clamp01(age / B.shockSpan);
+  out.shockR = B.shockFrom + (B.shockTo - B.shockFrom) * (1 - (1 - k) ** 2.4);
+  out.shockAlpha = age < B.shockSpan ? (1 - smooth(0.55, 1, k)) * Math.min(1, age / 0.04) : 0;
+  const k2 = clamp01(age / B.shock2Span);
+  out.shock2R = B.shock2From + (B.shockTo + 6 - B.shock2From) * (1 - (1 - k2) ** 1.8);
+  out.shock2Alpha = age < B.shock2Span ? 0.7 * (1 - k2) : 0;
+  out.surge =
+    age < B.surgeRise
+      ? smooth(0, 1, age / B.surgeRise)
+      : Math.max(0, 1 - (age - B.surgeRise) / (B.surgeSpan - B.surgeRise)) ** 1.5;
+  out.surgeFront = clamp01(age / (B.surgeRise * 1.6));
+  out.drain = age < B.hold ? 1 : 1 - smooth(0, 1, (age - B.hold) / B.drain);
+  out.flare = age < B.hold ? 1 : Math.max(0, 1 - (age - B.hold) / (B.drain * 0.6));
+  return out;
+}
+
+/** How many pieces of debris and sparks the explosion throws: none on the
+ *  low tier (cosmetic), the high tier's count thinned by its share. */
+export function overloadBurstPieces(
+  low: boolean,
+  share: number,
+): { debris: number; sparks: number } {
+  if (low) return { debris: 0, sparks: 0 };
+  const s = Math.max(0, Math.min(1, share));
+  return {
+    debris: Math.round(OVERLOAD_BURST.debris * s),
+    sparks: Math.round(OVERLOAD_BURST.sparks * s),
+  };
 }

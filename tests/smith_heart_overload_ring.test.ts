@@ -15,14 +15,19 @@ import {
 } from '../src/render/smith_heart/heart_quarters_core';
 import {
   easeSweep,
+  newOverloadBurstLook,
   newOverloadRingLook,
   newOverloadRingState,
+  OVERLOAD_BURST,
   OVERLOAD_RING,
   type OverloadRingAura,
+  overloadBurstLook,
+  overloadBurstPieces,
   overloadRingLook,
   overloadRingState,
   ringWarnBeat,
 } from '../src/render/smith_heart_fx/final_overload_ring_core';
+import { HEART_ROOM } from '../src/sim/content/smith_heart_layout';
 import {
   FINAL_AURAS,
   FINAL_ZONE_CODES,
@@ -229,5 +234,70 @@ describe('the Overload ring: its sweep and its warning beats', () => {
     // Into a quarter already past it: the recolour is the cue, no sound.
     expect(ringWarnBeat('hammer', 0.2, 'heat', 0.85)).toBe(false);
     expect(ringWarnBeat(null, 0, null, 0)).toBe(false);
+  });
+});
+
+describe('the Overload ring: the 100 percent explosion', () => {
+  const at = (age: number, reduced = false) =>
+    overloadBurstLook(age, reduced, newOverloadBurstLook());
+
+  it('is not live before the cue or past its span', () => {
+    expect(at(-0.01).live).toBe(false);
+    expect(at(OVERLOAD_BURST.span).live).toBe(false);
+    expect(at(OVERLOAD_BURST.span + 3).flash).toBe(0);
+    expect(at(0).live).toBe(true);
+  });
+
+  it('flashes at once and fades inside its first second', () => {
+    expect(at(OVERLOAD_BURST.flashRise).flash).toBeCloseTo(1);
+    expect(at(0.3).flash).toBeLessThan(at(0.1).flash);
+    expect(at(OVERLOAD_BURST.flashRise + OVERLOAD_BURST.flashSpan).flash).toBe(0);
+  });
+
+  it("races a shockwave from the ring's outer edge to the platform's rim", () => {
+    expect(OVERLOAD_BURST.shockFrom).toBe(OVERLOAD_RING.outer);
+    expect(OVERLOAD_BURST.shockTo).toBe(HEART_ROOM.r);
+    let last = 0;
+    for (let a = 0; a < OVERLOAD_BURST.shockSpan; a += 0.05) {
+      const l = at(a);
+      expect(l.shockR).toBeGreaterThanOrEqual(last);
+      last = l.shockR;
+    }
+    expect(at(0.1).shockAlpha).toBeGreaterThan(0.8);
+    expect(at(OVERLOAD_BURST.shockSpan * 0.999).shockR).toBeGreaterThan(HEART_ROOM.r - 1);
+    expect(at(OVERLOAD_BURST.shockSpan + 0.01).shockAlpha).toBe(0);
+    // The thin ring runs ahead of the main one.
+    expect(at(0.3).shock2R).toBeGreaterThan(at(0.3).shockR);
+  });
+
+  it('surges the column up, then lets it settle', () => {
+    expect(at(OVERLOAD_BURST.surgeRise).surge).toBeCloseTo(1);
+    expect(at(OVERLOAD_BURST.surgeRise * 1.6).surgeFront).toBeCloseTo(1);
+    expect(at(OVERLOAD_BURST.surgeSpan + 0.01).surge).toBe(0);
+  });
+
+  it('holds the ring full a breath, then drains it back to empty', () => {
+    expect(at(0.1).drain).toBe(1);
+    const mid = at(OVERLOAD_BURST.hold + OVERLOAD_BURST.drain / 2).drain;
+    expect(mid).toBeGreaterThan(0.1);
+    expect(mid).toBeLessThan(0.9);
+    expect(at(OVERLOAD_BURST.hold + OVERLOAD_BURST.drain + 0.01).drain).toBe(0);
+  });
+
+  it('reduced motion caps the flash only; every other beat is the same', () => {
+    for (let a = 0; a < OVERLOAD_BURST.span; a += 0.07) {
+      const n = at(a);
+      const r = at(a, true);
+      expect(r.flash).toBeCloseTo(n.flash * OVERLOAD_BURST.flashCalm);
+      expect({ ...r, flash: 0 }).toEqual({ ...n, flash: 0 });
+    }
+  });
+
+  it('the low tier sheds the debris and sparks only (the look has no tier input)', () => {
+    expect(overloadBurstPieces(true, 1)).toEqual({ debris: 0, sparks: 0 });
+    const hi = overloadBurstPieces(false, 1);
+    expect(hi.debris).toBe(OVERLOAD_BURST.debris);
+    expect(hi.sparks).toBe(OVERLOAD_BURST.sparks);
+    expect(overloadBurstPieces(false, 0.5).sparks).toBe(Math.round(OVERLOAD_BURST.sparks / 2));
   });
 });

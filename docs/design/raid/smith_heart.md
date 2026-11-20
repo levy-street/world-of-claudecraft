@@ -2654,7 +2654,18 @@ tier sheds the sparks only; reduced motion keeps a steady light, no flicker), re
 same boss auras (no wire or `IWorld` field). It lights while the fight's state aura stands on the
 boss (`finalFightEngaged`): online a mob's in-combat bit is never mirrored, and reading only
 a cast, a wound or a blow made the ring, its column and the well's glow blink out between
-the boss's blows (Jose's playtest of 2026-11-20).
+the boss's blows (Jose's playtest of 2026-11-20). When a bar reaches 100 percent the ring explodes
+(Jose's playtest of 2026-11-20), driven by the sim's own Overload Burst cue (`FINAL_CUES.burst`,
+the `spellfx` nova `burstBar` emits as the bar empties, the event FinalFx already read for
+the body's wall of light; nothing new on the wire): a white-hot flash over the well in a
+bloom of the quarter's colour, a shockwave racing over the floor from the ring's outer edge
+to the platform's rim (laid on the floor's steps, a thinner faster ring ahead of it), the
+column surging up its full height with a bright front climbing it, the ring flaring, held
+full a breath and drained back to empty round the dial, a boom from the well (the Anvil's
+fall sample, slowed), debris and sparks (`OVERLOAD_BURST`, `overloadBurstLook`). The flash,
+the shockwave, the surge and the drain draw on every tier; the low tier sheds the debris and
+sparks; reduced motion caps the flash. `/dev heart final burst` (or `final fill <vein> 100`)
+sets one off in a pulled fight.
 
 **The raid HUD** (`src/ui/hud/dungeon/heart_final_phase_view.ts`, painted by
 `heart_final_phase_painter.ts`): only what has no place on the floor, at the top of the
