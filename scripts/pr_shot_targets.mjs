@@ -1393,15 +1393,21 @@ async function stageWheelBinds(page) {
 export const TARGETS = [
   // The profession goal tracker's material rows: the reported case (Minor
   // Healing Potion x1 while carrying 26 linen / 6 legs / 23 herbs), plus a few
-  // copies in the bank so the bank figure is nonzero on one row.
+  // copies in the bank so the bank figure is nonzero on one row. Offline
+  // capture: the landing shell's /api polls hang with no API server, so the
+  // load waits for DOMContentLoaded instead of network idle (as weekly-vault).
   {
     key: 'gathering-goal-tracker-rows',
     label: 'Goal tracker: held/required rows with the bank figure',
     when: ['hud/professions/gathering_goal_', 'professions/material_goal_projection'],
     variants: [
-      { key: 'desktop', charClass: 'mage', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'mage', beforeLoad: seedLowGraphicsPreset },
-    ],
+      { key: 'desktop', charClass: 'mage' },
+      { key: 'mobile', mobile: true, charClass: 'mage' },
+    ].map((variant) => ({
+      ...variant,
+      navigationWaitUntil: 'domcontentloaded',
+      beforeLoad: seedLowGraphicsPreset,
+    })),
     async capture(page) {
       await dismissEntryOverlays(page);
       await dismissArrivalGreeting(page);
@@ -1422,6 +1428,13 @@ export const TARGETS = [
       if (!(await pollForSize(page, '#gathering-goal-tracker', 20, 300))) {
         throw new Error('#gathering-goal-tracker did not appear');
       }
+      // The mobile panel is a 40vh scroll box: bring the material rows (the
+      // subject) into its view rather than the header copy above them.
+      await page.evaluate(() =>
+        document
+          .querySelector('#gathering-goal-tracker .gathering-goal-materials')
+          ?.scrollIntoView({ block: 'center' }),
+      );
       await wait(500);
       return { clip: '#gathering-goal-tracker' };
     },
