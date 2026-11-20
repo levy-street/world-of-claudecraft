@@ -324,6 +324,9 @@ const UI_PURE_CORES = [
   // The atlas on the round minimap: the page crop, the detail tile, the
   // room-name policy and the idle-skip key.
   'src/ui/hud/raid_atlas/raid_atlas_minimap_core.ts',
+  // The boss pins as data: faces, portrait URLs, the tooltip model, the hit
+  // test that follows the camera, and the card's placement beside its pin.
+  'src/ui/hud/raid_atlas/raid_atlas_boss_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
@@ -3373,6 +3376,10 @@ const UI_DOM_MODULES = [
   // The raid atlas's DOM adapter: its own canvas, chrome and input, a
   // ResizeObserver over the canvas, and the pins' wrapped localStorage access.
   'src/ui/hud/raid_atlas/raid_atlas_controller.ts',
+  // The bosses' busts: Image loads and a once-made grey canvas per face.
+  'src/ui/hud/raid_atlas/raid_atlas_portraits.ts',
+  // The boss card and the bosses' keyboard focus stops over the atlas.
+  'src/ui/hud/raid_atlas/raid_atlas_boss_pins.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
   // Mounts the Cartographer's Ink map picker into #prompt-stack.
   'src/ui/hud/treasure/ink_map_picker_controller.ts',

@@ -15819,6 +15819,241 @@
   .raid-atlas-toast.is-on {
     opacity: 1;
   }
+  /* The boss pins (raid_atlas_boss_pins.ts): a hand cursor over a portrait
+     medallion, one transparent keyboard focus stop over each (pointer-events
+     off: the canvas keeps every drag and tap), and the boss card, a gilded
+     parchment leaf with the boss's face, name, encounter, state and lore. */
+  #map-window.raid-atlas-on #raid-atlas-canvas.is-over-boss {
+    cursor: pointer;
+  }
+  .raid-atlas-chrome > .raid-atlas-boss-stops {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .raid-atlas-boss-stop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    pointer-events: none;
+    outline: none;
+  }
+  .raid-atlas-boss-stop:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--color-raid-atlas-frame-dark),
+      0 0 0 4px var(--color-border-focus);
+  }
+  .raid-atlas-chrome > .raid-atlas-boss-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    display: none;
+    box-sizing: border-box;
+    width: 272px;
+    padding: 12px 16px 14px;
+    pointer-events: none;
+    color: var(--color-raid-atlas-ink);
+    text-align: center;
+    background: radial-gradient(
+      ellipse at 50% 18%,
+      var(--color-raid-atlas-parchment-light),
+      var(--color-raid-atlas-parchment) 62%,
+      var(--color-raid-atlas-parchment-dark)
+    );
+    border: 2px solid var(--color-raid-atlas-gold);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 1px var(--color-raid-atlas-frame-dark),
+      inset 0 0 0 1px var(--color-raid-atlas-gold-light),
+      inset 0 0 22px var(--color-raid-atlas-stain),
+      0 10px 26px var(--color-raid-atlas-frame-dark);
+  }
+  .raid-atlas-boss-card.is-open {
+    display: block;
+  }
+  .raid-atlas-boss-faces {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 92px;
+    margin: 0 auto 6px;
+  }
+  .raid-atlas-boss-face {
+    box-sizing: border-box;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 3px solid var(--color-raid-atlas-gold);
+    background: radial-gradient(
+      circle at 40% 32%,
+      var(--color-raid-atlas-boss),
+      var(--color-raid-atlas-frame-dark) 78%
+    );
+    box-shadow:
+      0 0 0 1px var(--color-raid-atlas-frame-dark),
+      inset 0 0 0 1px var(--color-raid-atlas-gold-deep),
+      0 4px 10px var(--color-raid-atlas-frame-dark);
+    object-fit: cover;
+  }
+  .raid-atlas-boss-faces.is-council .raid-atlas-boss-face {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 8px;
+  }
+  .raid-atlas-boss-faces.is-council .raid-atlas-boss-face.is-partner {
+    width: 62px;
+    height: 62px;
+    margin: 0 0 0 -16px;
+  }
+  .raid-atlas-boss-card[data-state="engaged"] .raid-atlas-boss-face {
+    border-color: var(--color-raid-atlas-boss-engaged);
+    background: radial-gradient(
+      circle at 40% 32%,
+      var(--color-raid-atlas-boss-engaged),
+      var(--color-raid-atlas-frame-dark) 78%
+    );
+  }
+  .raid-atlas-boss-card[data-state="dead"] .raid-atlas-boss-face {
+    border-color: var(--color-raid-atlas-dead);
+    background: radial-gradient(
+      circle at 40% 32%,
+      var(--color-raid-atlas-dead),
+      var(--color-raid-atlas-frame-mid) 78%
+    );
+    filter: grayscale(1);
+    opacity: 0.8;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .raid-atlas-boss-card[data-state="engaged"] .raid-atlas-boss-face {
+      animation: raid-atlas-boss-burn 1.25s ease-in-out infinite;
+    }
+  }
+  @keyframes raid-atlas-boss-burn {
+    50% {
+      box-shadow:
+        0 0 0 1px var(--color-raid-atlas-frame-dark),
+        0 0 14px 3px var(--color-raid-atlas-boss-engaged);
+    }
+  }
+  .raid-atlas-boss-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    line-height: 1.15;
+    font-weight: 600;
+    color: var(--color-raid-atlas-ink);
+    text-shadow: 0 1px 0 var(--color-raid-atlas-parchment-light);
+  }
+  .raid-atlas-boss-subtitle {
+    margin-top: 2px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    color: var(--color-raid-atlas-ink-soft);
+  }
+  .raid-atlas-boss-state {
+    display: inline-block;
+    margin-top: 7px;
+    padding: 1px 10px 2px;
+    border-radius: 9px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--color-raid-atlas-gold-light);
+    background: var(--color-raid-atlas-frame-mid);
+    border: 1px solid var(--color-raid-atlas-gold-deep);
+  }
+  .raid-atlas-boss-card[data-state="engaged"] .raid-atlas-boss-state {
+    color: var(--color-raid-atlas-gold-white);
+    background: var(--color-raid-atlas-boss);
+    border-color: var(--color-raid-atlas-boss-engaged);
+  }
+  .raid-atlas-boss-card[data-state="dead"] .raid-atlas-boss-state {
+    color: var(--color-raid-atlas-parchment-light);
+    background: var(--color-raid-atlas-dead);
+    border-color: var(--color-raid-atlas-frame-mid);
+  }
+  .raid-atlas-boss-rule {
+    height: 1px;
+    margin: 9px 6px 8px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-raid-atlas-gold-deep) 20%,
+      var(--color-raid-atlas-gold) 50%,
+      var(--color-raid-atlas-gold-deep) 80%,
+      transparent
+    );
+  }
+  .raid-atlas-boss-lore {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 12.5px;
+    line-height: 1.45;
+    text-align: left;
+    color: var(--color-raid-atlas-ink);
+  }
+  /* Touch: the face is a small square, so the card turns into a compact
+     strip across it (the face beside the name, the lore below), set above or
+     below its pin (raidAtlasTooltipPlacement) so the pin stays in sight. */
+  body.mobile-touch .raid-atlas-chrome > .raid-atlas-boss-card {
+    width: calc(100% - 16px);
+    max-width: 340px;
+    padding: 7px 9px 8px;
+    text-align: left;
+  }
+  body.mobile-touch .raid-atlas-chrome > .raid-atlas-boss-card.is-open {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+    align-items: center;
+  }
+  body.mobile-touch .raid-atlas-boss-faces {
+    grid-row: 1 / span 2;
+    height: 50px;
+    margin: 0;
+  }
+  body.mobile-touch .raid-atlas-boss-face {
+    width: 48px;
+    height: 48px;
+    border-width: 2px;
+  }
+  body.mobile-touch .raid-atlas-boss-faces.is-council .raid-atlas-boss-face {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 4px;
+  }
+  body.mobile-touch .raid-atlas-boss-faces.is-council .raid-atlas-boss-face.is-partner {
+    width: 32px;
+    height: 32px;
+    margin: 0 0 0 -12px;
+  }
+  body.mobile-touch .raid-atlas-boss-title {
+    font-size: 13px;
+  }
+  body.mobile-touch .raid-atlas-boss-subtitle {
+    font-size: 10.5px;
+    margin-top: 0;
+  }
+  body.mobile-touch .raid-atlas-boss-state {
+    justify-self: start;
+    margin-top: 3px;
+    padding: 0 8px 1px;
+    font-size: 9.5px;
+  }
+  body.mobile-touch .raid-atlas-boss-rule {
+    grid-column: 1 / -1;
+    margin: 6px 2px 5px;
+  }
+  body.mobile-touch .raid-atlas-boss-lore {
+    grid-column: 1 / -1;
+    font-size: 10.5px;
+    line-height: 1.35;
+  }
   /* Touch: the map face is small (a 330px sheet, or a square beside a 58px
      rail in landscape), so the chrome tightens to two rows of 40px targets:
      the page switch (only the OTHER page shows, so one tap swaps) at the

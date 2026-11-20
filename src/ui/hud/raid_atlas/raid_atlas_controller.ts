@@ -23,6 +23,12 @@ import { type DungeonMapMarker, DungeonMapViewCore } from '../../dungeon_map_vie
 import { mobDisplayName } from '../../entity_display_core';
 import { formatNumber, t } from '../../i18n';
 import {
+  RAID_ATLAS_BOSS_HIT_SLOP,
+  raidAtlasBossAt,
+  raidAtlasBossFaces,
+} from './raid_atlas_boss_core';
+import { RaidAtlasBossPins } from './raid_atlas_boss_pins';
+import {
   fromPage,
   pageSpan,
   pageToScreen,
@@ -33,7 +39,6 @@ import {
   wheelZoomFactor,
 } from './raid_atlas_camera_core';
 import {
-  drawBossMedallion,
   drawMember,
   drawPin,
   drawPlayerArrow,
@@ -42,7 +47,7 @@ import {
 } from './raid_atlas_glyph_painter';
 import { raidAtlasMinimapKey } from './raid_atlas_minimap_core';
 import { RaidAtlasMinimapPainter } from './raid_atlas_minimap_painter';
-import { RaidAtlasPainter } from './raid_atlas_painter';
+import { RaidAtlasPainter, raidAtlasBossRadius } from './raid_atlas_painter';
 import type { RaidAtlasColors } from './raid_atlas_palette_core';
 import {
   addPin,
@@ -66,7 +71,14 @@ import {
   raidAtlasFloor,
   raidAtlasPlanFor,
 } from './raid_atlas_plan_core';
-import { buildRaidAtlasFrame, defaultRaidAtlasFloor } from './raid_atlas_view';
+import { drawBossPortraitMedallion } from './raid_atlas_portrait_glyph';
+import { RaidAtlasPortraits } from './raid_atlas_portraits';
+import {
+  buildRaidAtlasFrame,
+  defaultRaidAtlasFloor,
+  type RaidAtlasBossMark,
+  type RaidAtlasFrame,
+} from './raid_atlas_view';
 
 /** What the atlas asks of its host (Hud, through InteriorMapController). */
 export interface RaidAtlasHost {
@@ -93,6 +105,9 @@ const KEY_PAN_PX = 60;
  *  long (ms); while moving it crops the prewarmed plate. */
 const MINIMAP_SETTLE_MS = 300;
 const NO_MARKS: readonly DungeonMapMarker[] = [];
+/** The atlas canvas's border (components.css): its content box sits this far
+ *  inside the chrome, which lies over the canvas border included. */
+const CANVAS_BORDER_PX = 2;
 /** The live layer's own repaint pace while nothing moves (ms). */
 const LIVE_REPAINT_MS = 120;
 
@@ -163,6 +178,15 @@ export class RaidAtlasController {
   private lastFacing = Number.NaN;
   private prewarmed = 0;
   private readonly minimap = new RaidAtlasMinimapPainter();
+  /** The bosses' faces: a landed bust repaints the map, the legend and the minimap. */
+  private readonly faces = new RaidAtlasPortraits(() => {
+    this.glyphsDrawn = false;
+    this.minimapKey = null;
+    this.paintGlyphs();
+    this.paint();
+  });
+  private bossPins: RaidAtlasBossPins | null = null;
+  private lastFrame: RaidAtlasFrame | null = null;
   private readonly markerView = new DungeonMapViewCore();
   private minimapKey: string | null = null;
   private mmX = Number.NaN;
@@ -236,7 +260,8 @@ export class RaidAtlasController {
     this.pointers.clear();
     this.pinMode = false;
     this.closeEditor();
-    this.canvas?.classList.remove('is-grabbing');
+    this.bossPins?.close();
+    this.canvas?.classList.remove('is-grabbing', 'is-over-boss');
     this.syncChrome();
     this.win?.classList.remove('raid-atlas-on');
   }
@@ -320,7 +345,7 @@ export class RaidAtlasController {
       facing: world.player.facing,
       pxPerYard,
       backing: ctx.canvas.width,
-      bosses: frame.bosses.map((b) => b.state[0]).join(''),
+      bosses: frame.bosses.map((b) => b.state[0]).join('') + this.faces.version,
       engaged: frame.bosses.some((b) => b.state === 'engaged'),
       members: frame.members,
       marks: marks.filter((m) => m.kind === 'mob' || m.kind === 'loot' || m.kind === 'gate'),
@@ -348,6 +373,7 @@ export class RaidAtlasController {
       fonts,
       classColor: this.host.classColor,
       clock: now / 1000,
+      faces: this.faces,
     });
     return true;
   }
@@ -435,7 +461,21 @@ export class RaidAtlasController {
       bossName: mobDisplayName,
       classColor: this.host.classColor,
       clock: now / 1000,
+      faces: this.faces,
+      hoverBoss: this.bossPins?.hovered() ?? null,
     });
+    this.lastFrame = frame;
+    const project = this.projector();
+    if (project)
+      this.bossPins?.follow({
+        floor: floor.id,
+        marks: frame.bosses,
+        project,
+        r: raidAtlasBossRadius(this.side, this.camera.current.zoom),
+        side: this.side,
+        offsetX: CANVAS_BORDER_PX,
+        offsetY: CANVAS_BORDER_PX,
+      });
     this.syncZoomButtons();
     this.syncYouAreHere(frame.playerFloor);
   }
@@ -458,6 +498,11 @@ export class RaidAtlasController {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     const chrome = el('div', 'raid-atlas-chrome', stage);
+    this.bossPins = new RaidAtlasBossPins(
+      chrome,
+      () => this.paint(),
+      () => this.canvas?.focus(),
+    );
 
     // Page tabs.
     const floors = el('div', 'raid-atlas-floors', chrome);
@@ -592,9 +637,9 @@ export class RaidAtlasController {
     const rows: [string, (g: CanvasRenderingContext2D, c: RaidAtlasColors) => void][] = [
       ['you', (g, c) => drawPlayerArrow(g, c, 11, 12, 0, 17)],
       ['member', (g, c) => drawMember(g, c, 11, 11, 5, c.veinBreath, false)],
-      ['boss', (g, c) => drawBossMedallion(g, c, 11, 11, 9, 'alive')],
-      ['engaged', (g, c) => drawBossMedallion(g, c, 11, 11, 9, 'engaged')],
-      ['defeated', (g, c) => drawBossMedallion(g, c, 11, 11, 9, 'dead')],
+      ['boss', (g, c) => this.legendBoss(g, c, 'alive')],
+      ['engaged', (g, c) => this.legendBoss(g, c, 'engaged')],
+      ['defeated', (g, c) => this.legendBoss(g, c, 'dead')],
       ['portal', (g, c) => drawPoi(g, c, 'portal', 11, 11, 8)],
       ['entrance', (g, c) => drawPoi(g, c, 'entrance', 11, 11, 8)],
       ['pin', (g, c) => drawPin(g, c, 11, 20, 16, 'star', 'gold', false)],
@@ -625,6 +670,17 @@ export class RaidAtlasController {
         : 'hudChrome.raidAtlas.hintDesktop',
     );
     this.legend = lg;
+  }
+
+  /** A legend medallion: the final boss's face (the crest until it lands). */
+  private legendBoss(
+    g: CanvasRenderingContext2D,
+    c: RaidAtlasColors,
+    state: 'alive' | 'engaged' | 'dead',
+  ): void {
+    const boss = this.plan?.bosses[this.plan.bosses.length - 1];
+    const face = boss ? this.faces.face(raidAtlasBossFaces(boss)[0]) : null;
+    drawBossPortraitMedallion(g, c, 11, 11, 10, state, face);
   }
 
   private legendRows: {
@@ -902,6 +958,19 @@ export class RaidAtlasController {
       }
       canvas.classList.add('is-grabbing');
     });
+    // A mouse over the map with no button down: the boss pin under it opens
+    // its card (raid_atlas_boss_pins.ts). A drag or a pinch never hovers.
+    canvas.addEventListener('pointermove', (ev) => {
+      if (ev.pointerType !== 'mouse' || this.pointers.size > 0 || !this.bossPins) return;
+      this.measure();
+      const p = this.local(ev);
+      const over = this.bossPins.hover(this.bossUnder(p.x, p.y, 'mouse'));
+      canvas.classList.toggle('is-over-boss', over);
+    });
+    canvas.addEventListener('pointerleave', () => {
+      this.bossPins?.leave();
+      canvas.classList.remove('is-over-boss');
+    });
     canvas.addEventListener('pointermove', (ev) => {
       const track = this.pointers.get(ev.pointerId);
       if (!track) return;
@@ -922,8 +991,10 @@ export class RaidAtlasController {
         this.paint();
         return;
       }
-      if (!this.dragged && Math.hypot(p.x - track.startX, p.y - track.startY) > TAP_TOLERANCE_PX)
+      if (!this.dragged && Math.hypot(p.x - track.startX, p.y - track.startY) > TAP_TOLERANCE_PX) {
         this.dragged = true;
+        this.bossPins?.leave();
+      }
       if (this.dragged) {
         this.camera.panNow(dx, dy, this.side);
         this.paint();
@@ -985,7 +1056,12 @@ export class RaidAtlasController {
       else if (k === 'ArrowRight') this.camera.panNow(-KEY_PAN_PX, 0, this.side);
       else if (k === 'ArrowUp') this.camera.panNow(0, KEY_PAN_PX, this.side);
       else if (k === 'ArrowDown') this.camera.panNow(0, -KEY_PAN_PX, this.side);
-      else handled = false;
+      else if (k === 'Tab' && this.bossPins?.focusFirst(ev.shiftKey)) {
+        // Tab walks onto the bosses (raid_atlas_boss_pins.ts): no repaint.
+        ev.preventDefault();
+        ev.stopPropagation();
+        return;
+      } else handled = false;
       if (!handled) return;
       ev.preventDefault();
       ev.stopPropagation();
@@ -993,9 +1069,21 @@ export class RaidAtlasController {
     });
   }
 
+  /** The boss pin under canvas point (x, y), at the camera's zoom and pan. */
+  private bossUnder(x: number, y: number, pointer: string): RaidAtlasBossMark | null {
+    const project = this.projector();
+    const frame = this.lastFrame;
+    if (!project || !frame) return null;
+    const r = raidAtlasBossRadius(this.side, this.camera.current.zoom);
+    const slop =
+      pointer === 'mouse' ? RAID_ATLAS_BOSS_HIT_SLOP.mouse : RAID_ATLAS_BOSS_HIT_SLOP.touch;
+    return raidAtlasBossAt(frame.bosses, this.floorId, project, x, y, r, slop);
+  }
+
   private tap(x: number, y: number): void {
     const hit = this.pinUnder(x, y);
     if (hit) {
+      this.bossPins?.close();
       this.openEditor(hit.id);
       return;
     }
@@ -1004,7 +1092,11 @@ export class RaidAtlasController {
       this.paint();
       return;
     }
+    // A tap on a boss opens its card, a tap elsewhere closes an open one; the
+    // pin tool keeps every tap for placing pins (its card closes first).
+    if (!this.pinMode && this.bossPins?.tap(this.bossUnder(x, y, this.lastPointerType))) return;
     if (this.pinMode) {
+      this.bossPins?.close();
       this.placePin(x, y);
       this.paint();
     }

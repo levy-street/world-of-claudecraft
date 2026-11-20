@@ -26255,4 +26255,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '휠로 확대와 축소, 드래그로 이동, 더블클릭으로 확대합니다. 지도를 우클릭하면 핀을 놓고, 핀을 우클릭하면 제거하며, 핀을 클릭하면 모양을 바꿉니다.',
   'hudChrome.raidAtlas.hintTouch':
     '두 손가락으로 확대와 축소, 드래그로 이동합니다. 핀 도구를 켠 뒤 지도를 탭하면 핀을 놓고, 핀을 탭하면 모양을 바꾸거나 제거합니다.',
+  'hudChrome.raidAtlas.boss.aria': '우두머리: {name}, {state}',
+  'hudChrome.raidAtlas.boss.state.alive': '생존',
+  'hudChrome.raidAtlas.boss.state.engaged': '전투 중',
+  'hudChrome.raidAtlas.boss.state.dead': '처치됨',
+  'hudChrome.raidAtlas.boss.hammer.title': '망치 평의회',
+  'hudChrome.raidAtlas.boss.hammer.subtitle': '{lead}, {partner}',
+  'hudChrome.raidAtlas.boss.hammer.lore':
+    '살아 있는 돌로 된 두 존재가 산을 빚는 힘인 망치를 나누어 지니고 있다. 주인을 잃은 지금도 그들은 마지막 명령을 맹목적으로 따른다. 채석장에 들어오는 모든 것을 부숴라. 이음매 노래꾼이 노래로 바위를 깨우면 수호자가 그것을 내리친다.',
+  'hudChrome.raidAtlas.boss.breath.subtitle': '풀무의 힘',
+  'hudChrome.raidAtlas.boss.breath.lore':
+    '한때 대장장이의 화로에 바람을 불어 넣던 풀무의 숨결은 이제 북쪽 광맥, 허공 위로 솟은 절벽 끝에서 잠들어 있다. 그 수호자는 살아 있는 바람으로 엮인 화강암과 수정이며, 그 돌풍은 공격대를 돌 위에서 날려 버릴 만큼 강하다.',
+  'hudChrome.raidAtlas.boss.quench.subtitle': '얼어붙은 호수의 여왕',
+  'hudChrome.raidAtlas.boss.quench.lore':
+    '담금질은 칼날을 단단하게 만드는 차가운 물이며, 그 힘은 동쪽 광맥의 얼어붙은 호수 아래에서 잠들어 있다. 그 수호자는 어두운 점판암과 얼음으로 된 거인 여인으로, 서리 왕관을 쓰고 가슴에는 냉기의 별이 타오른다. 그녀는 주먹으로 싸우며, 그 주먹이 내리치는 곳마다 호수가 갈라진다.',
+  'hudChrome.raidAtlas.boss.heat.subtitle': '샘의 거인',
+  'hudChrome.raidAtlas.boss.heat.lore':
+    '화덕에는 대장장이의 가장 오래된 불꽃, 살아 있는 수정과 검은 현무암에 봉인된 백금빛 불이 깃들어 있다. 그 수호자는 샘에 허리까지 잠긴 채 사람 일곱 명만큼 높이 서 있으며 결코 그곳을 떠나지 않는다. 공격대가 불꽃에게 다가가야 한다.',
+  'hudChrome.raidAtlas.boss.final.subtitle': '하나가 된 네 광맥',
+  'hudChrome.raidAtlas.boss.final.lore':
+    '쏜피크가 되어 눕기 전, 대장장이는 봉인이 수백 년을 버티도록 자신의 힘을 넷으로 나누었다. 이곳 세계의 모루에서 네 광맥이 하나의 생각 없는 몸으로 모여들고 있다. 그것은 주인의 마지막 일을 끝내려 한다. 숨 쉬는 모든 것을 안에 둔 채 산을 영원히 봉인하는 일을.',
 };

@@ -18,6 +18,10 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
 | `raid_atlas_painter.ts` | Composition: cached page + marks layer, cached frame layer, live layer per frame. |
 | `raid_atlas_minimap_core.ts` | The minimap's pure decisions: the page crop round the player, the detail tile, room names by zoom, the idle-skip key. |
 | `raid_atlas_minimap_painter.ts` | The page on the round minimap: plate (or one detail tile) blit, burnt rim, glyphs at minimap size, the live marks (mobs, aggro, loot, gates). |
+| `raid_atlas_boss_core.ts` | The boss pins as data: each medallion's faces (a council is one pin with both), the bust URLs, the tooltip model, the hit test through the live camera, the card's placement. |
+| `raid_atlas_portraits.ts` | The bosses' busts loaded once per session (and a once-made grey copy for a defeated boss); `version` moves on each load. |
+| `raid_atlas_portrait_glyph.ts` | The portrait medallion (face in a gilded rim, per state, partner medallion) and the hover halo; the crest medallion stands in until a face lands. |
+| `raid_atlas_boss_pins.ts` | DOM: the boss card (hover, tap, focus) that follows its pin each paint, and one keyboard focus stop per boss. |
 | `raid_atlas_controller.ts` | DOM adapter: its own DPR canvas, chrome, input, wrapped storage; drives the minimap paint. |
 
 ## Contracts
@@ -34,5 +38,12 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
   tile (a few minimap diameters, device density). An unchanged paint is skipped
   (`raidAtlasMinimapKey`); an engaged boss's pulse disables the skip. Every mark the plain
   dungeon minimap showed (mobs, aggro, loot, shut gates, the raid) stays on the atlas minimap.
-- Tests: `tests/raid_atlas.test.ts`, `tests/raid_atlas_minimap.test.ts`, and the routing in
+- Boss portraits are busts of each boss's REAL model, baked by
+  `scripts/raid_atlas/render_boss_portraits.mjs` into `public/ui/raid-atlas/<mobId>.webp` (the
+  mob portrait job builder resolves model, clip and tint; only the bust framing is authored
+  there). A re-skinned boss: re-run it. A new boss needs a FRAMING row (the test pins it).
+- The boss card is the atlas's own (parchment, inside the chrome), not the shared #tooltip:
+  the map owns its input and the card must follow its pin through zoom and pan. The game
+  claims Tab, so the map walks its own focus ring (the map, each boss, back to the map).
+- Tests: `tests/raid_atlas_boss.test.ts`, `tests/raid_atlas.test.ts`, `tests/raid_atlas_minimap.test.ts`, and the routing in
   `tests/interior_map_controller.test.ts`.

@@ -17,9 +17,9 @@
 import type { DungeonMapMarker } from '../../dungeon_map_view';
 import { t } from '../../i18n';
 import { TextSpriteCache } from '../../text_sprite_cache';
+import { raidAtlasBossFaces } from './raid_atlas_boss_core';
 import { pageSpan, toPage } from './raid_atlas_camera_core';
 import {
-  drawBossMedallion,
   drawEngagedPulse,
   drawMember,
   drawPin,
@@ -41,6 +41,8 @@ import { arrowScreenAngle } from './raid_atlas_painter';
 import type { RaidAtlasColors, RaidAtlasFonts } from './raid_atlas_palette_core';
 import type { RaidAtlasPin } from './raid_atlas_pins_core';
 import { type RaidAtlasFloor, type RaidAtlasPlan, raidAtlasFloorAt } from './raid_atlas_plan_core';
+import { drawBossPortraitMedallion } from './raid_atlas_portrait_glyph';
+import type { RaidAtlasFaceSource } from './raid_atlas_portraits';
 import type { RaidAtlasFrame } from './raid_atlas_view';
 
 const TAU = Math.PI * 2;
@@ -49,7 +51,9 @@ const CLIP_INSET = 2;
 /** Marks past this inset from the rim are left off (the ring covers them). */
 const MARK_RIM_INSET = 5;
 const ARROW_PX = 23;
-const BOSS_R = 7;
+/** Large enough for the boss's face to read on the disc (a council shows its
+ *  lead only: a partner face would be a speck at this size). */
+const BOSS_R = 9.5;
 /** A boss body within this many medallion radii of it reads as the medallion. */
 const MEDALLION_COVER = 1.6;
 const POI_R = 5;
@@ -89,6 +93,8 @@ export interface RaidAtlasMinimapInput {
   classColor(cls: string): string;
   /** Seconds, the frame clock (the engaged pulse). */
   clock: number;
+  /** The bosses' faces (a bust that has not landed draws the crest). */
+  faces: RaidAtlasFaceSource;
 }
 
 interface Tile {
@@ -310,7 +316,8 @@ export class RaidAtlasMinimapPainter {
       const p = at(mark.boss.x, mark.boss.z);
       if (!inside(p.sx, p.sy, BOSS_R)) continue;
       if (mark.state === 'engaged') drawEngagedPulse(ctx, c, p.sx, p.sy, BOSS_R, phase);
-      drawBossMedallion(ctx, c, p.sx, p.sy, BOSS_R, mark.state);
+      const [lead] = raidAtlasBossFaces(mark.boss);
+      drawBossPortraitMedallion(ctx, c, p.sx, p.sy, BOSS_R, mark.state, input.faces.face(lead));
     }
 
     // The live marks the dungeon minimap always showed. A boss's own body

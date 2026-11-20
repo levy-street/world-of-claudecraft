@@ -26245,4 +26245,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ホイールでズーム、ドラッグで移動、ダブルクリックで拡大。マップを右クリックでピンを置き、ピンを右クリックで削除、ピンをクリックでスタイルを変更。',
   'hudChrome.raidAtlas.hintTouch':
     'ピンチでズーム、ドラッグで移動。ピンツールをオンにしてマップをタップするとピンを置けます。ピンをタップするとスタイルの変更や削除ができます。',
+  'hudChrome.raidAtlas.boss.aria': 'ボス：{name}、{state}',
+  'hudChrome.raidAtlas.boss.state.alive': '生存',
+  'hudChrome.raidAtlas.boss.state.engaged': '戦闘中',
+  'hudChrome.raidAtlas.boss.state.dead': '撃破済み',
+  'hudChrome.raidAtlas.boss.hammer.title': 'ハンマー評議会',
+  'hudChrome.raidAtlas.boss.hammer.subtitle': '{lead}と{partner}',
+  'hudChrome.raidAtlas.boss.hammer.lore':
+    '生ける石の二体が、山を形づくる力「ハンマー」を分かち合っている。主を失った今も、彼らは最後の命令を盲目的に守り続ける。石切場に踏み入る者をすべて打ち砕け、と。継ぎ目の歌い手が歌で岩を目覚めさせ、守護者がそれを振り下ろす。',
+  'hudChrome.raidAtlas.boss.breath.subtitle': 'ふいごの力',
+  'hudChrome.raidAtlas.boss.breath.lore':
+    'かつて鍛冶師の炉をあおいだふいごの「息吹」は、今は北の鉱脈、虚空にせり出した岩棚の上で眠っている。その守護者は生ける風につながれた花崗岩と水晶の体を持ち、その突風はレイドを石の上から吹き飛ばすほどだ。',
+  'hudChrome.raidAtlas.boss.quench.subtitle': '凍てついた湖の女王',
+  'hudChrome.raidAtlas.boss.quench.lore':
+    '「焼き入れ」とは刃を硬くする冷たい水のこと。その力は東の鉱脈、凍てついた湖の下で眠っている。守り手は暗い粘板岩と氷の巨大な女で、霜の冠をいただき、胸には冷気の星が燃える。彼女は拳で戦い、その一撃が落ちた場所で湖が砕ける。',
+  'hudChrome.raidAtlas.boss.heat.subtitle': '湧き泉の巨人',
+  'hudChrome.raidAtlas.boss.heat.lore':
+    '炉床には鍛冶師の最も古い炎が宿る。生ける水晶と黒い玄武岩に封じられた白金の火だ。その守護者は湧き泉に腰まで浸かって立ち、人の七倍の背丈を持ち、決してそこを離れない。レイドのほうが炎のもとへ行くしかない。',
+  'hudChrome.raidAtlas.boss.final.subtitle': 'ひとつになった四つの鉱脈',
+  'hudChrome.raidAtlas.boss.final.lore':
+    'ソーンピークとなって横たわる前に、鍛冶師は封印が幾世紀も保たれるよう、自らの力を四つに分けた。ここ世界の金床で、四つの鉱脈はひとつの心なき体へと集まりつつある。それは主の最後の仕事を果たそうとしている。息あるものすべてを中に残したまま、山を永遠に封じることを。',
 };

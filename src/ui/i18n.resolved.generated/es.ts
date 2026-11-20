@@ -7962,7 +7962,36 @@ export const es: EnTranslations = {
         "river": "Path of light to a guardian"
       },
       "hintDesktop": "Scroll to zoom, drag to pan, double-click to zoom in. Right-click the map to place a pin, right-click a pin to remove it, click a pin to restyle it.",
-      "hintTouch": "Pinch to zoom and drag to pan. Turn on the pin tool, then tap the map to place a pin; tap a pin to restyle or remove it."
+      "hintTouch": "Pinch to zoom and drag to pan. Turn on the pin tool, then tap the map to place a pin; tap a pin to restyle or remove it.",
+      "boss": {
+        "aria": "Boss: {name}, {state}",
+        "state": {
+          "alive": "Alive",
+          "engaged": "In combat",
+          "dead": "Defeated"
+        },
+        "hammer": {
+          "title": "The Hammer Council",
+          "subtitle": "{lead} and {partner}",
+          "lore": "Two beings of living stone share the Hammer, the strength that shapes the mountain. Without their master they keep his last order with blind force: crush whatever enters the Quarry. The Seam Singer wakes the rock with her song, and the Guardian brings it down."
+        },
+        "breath": {
+          "subtitle": "Strength of the Bellows",
+          "lore": "The Breath of the bellows once fanned the Smith's forge, and now it sleeps in the north vein, high on a cornice over open sky. Its guardian is granite and crystal held together by living wind, and its gales can lift a raid from the stone."
+        },
+        "quench": {
+          "subtitle": "Queen of the Frozen Lake",
+          "lore": "The Quench is the cold water that hardens a blade, and its strength sleeps beneath a frozen lake in the east vein. Its keeper is a giantess of dark slate and ice, crowned in frost, a star of cold blazing in her chest. She fights with her fists, and where she strikes, the lake breaks."
+        },
+        "heat": {
+          "subtitle": "Giant of the Wellspring",
+          "lore": "The Hearth keeps the Smith's oldest flame, white-gold fire sealed in living crystal and black basalt. Its guardian stands waist-deep in the wellspring, as tall as seven men, and never leaves it: the raid must come to the fire."
+        },
+        "final": {
+          "subtitle": "The Four Veins Made One",
+          "lore": "Before he lay down to become Thornpeak, the Smith split his strength in four so his seal would hold for centuries. Here on the Anvil of the World the four veins gather into one mindless body. It means to finish its master's last task: seal the mountain forever, with everything that breathes inside."
+        }
+      }
     },
     "mapAtlas": {
       "level": "Nivel {level}",

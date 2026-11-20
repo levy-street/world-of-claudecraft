@@ -24900,4 +24900,24 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '滚轮缩放，拖动平移，双击放大。右键点击地图放置图钉，右键点击图钉将其移除，单击图钉更改样式。',
   'hudChrome.raidAtlas.hintTouch':
     '双指缩放，拖动平移。开启图钉工具后点击地图即可放置图钉；点击图钉可更改样式或将其移除。',
+  'hudChrome.raidAtlas.boss.aria': '首领：{name}，{state}',
+  'hudChrome.raidAtlas.boss.state.alive': '存活',
+  'hudChrome.raidAtlas.boss.state.engaged': '战斗中',
+  'hudChrome.raidAtlas.boss.state.dead': '已击败',
+  'hudChrome.raidAtlas.boss.hammer.title': '铁锤议会',
+  'hudChrome.raidAtlas.boss.hammer.subtitle': '{lead}与{partner}',
+  'hudChrome.raidAtlas.boss.hammer.lore':
+    '两个活石之躯共享着铁锤之力，那是塑造山脉的力量。失去主人后，它们仍盲目地执行他最后的命令：粉碎一切踏入采石场的人。接缝歌者以歌声唤醒岩石，守护者则将其砸下。',
+  'hudChrome.raidAtlas.boss.breath.subtitle': '风箱之力',
+  'hudChrome.raidAtlas.boss.breath.lore':
+    '风箱之息曾为铁匠的熔炉鼓风，如今沉睡在北方矿脉，高踞于虚空之上的岩檐。它的守护者是由活风束缚的花岗岩与水晶，其狂风足以将整支团队从岩石上卷走。',
+  'hudChrome.raidAtlas.boss.quench.subtitle': '冰封湖之女王',
+  'hudChrome.raidAtlas.boss.quench.lore':
+    '淬火是让刀刃变硬的冷水，其力量沉睡在东方矿脉的冰封湖下。它的守护者是一位由深色板岩与寒冰构成的巨人女王，头戴霜冠，胸中燃着寒冰之星。她以双拳作战，拳落之处，湖面碎裂。',
+  'hudChrome.raidAtlas.boss.heat.subtitle': '泉涌巨人',
+  'hudChrome.raidAtlas.boss.heat.lore':
+    '炉膛守护着铁匠最古老的火焰，那是封存在活水晶与黑玄武岩中的白金之火。它的守护者半身浸在泉涌之中，高如七人，从不离开：团队必须亲自走向火焰。',
+  'hudChrome.raidAtlas.boss.final.subtitle': '四脉归一',
+  'hudChrome.raidAtlas.boss.final.lore':
+    '在躺下化为荆峰之前，铁匠将自己的力量一分为四，好让封印延续数百年。在这世界之砧上，四条矿脉正汇聚成一具没有心智的躯体。它要完成主人最后的工作：将整座山永远封住，连同其中一切会呼吸的生命。',
 };

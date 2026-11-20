@@ -20,6 +20,7 @@
 
 import { formatNumber, t } from '../../i18n';
 import { TextSpriteCache } from '../../text_sprite_cache';
+import { raidAtlasBossFaces } from './raid_atlas_boss_core';
 import {
   pageSpan,
   pageToScreen,
@@ -28,7 +29,6 @@ import {
   viewScale,
 } from './raid_atlas_camera_core';
 import {
-  drawBossMedallion,
   drawBurntEdges,
   drawCartouche,
   drawCompassRose,
@@ -54,6 +54,8 @@ import {
   raidAtlasAreaAt,
   raidAtlasFloorAt as raidAtlasFloorOf,
 } from './raid_atlas_plan_core';
+import { drawBossHoverHalo, drawBossPortraitMedallion } from './raid_atlas_portrait_glyph';
+import type { RaidAtlasFaceSource } from './raid_atlas_portraits';
 import type { RaidAtlasFrame } from './raid_atlas_view';
 
 /** The whole-page plate's long side, device px. */
@@ -64,7 +66,9 @@ const DETAIL_AT = 1.2;
 const FRAME_BAND = 0.024;
 const ARROW_PX = 34;
 const MEMBER_PX = 6;
-const BOSS_PX = 15;
+/** A boss medallion's radius at home zoom (it carries the boss's face, so it
+ *  is the largest mark on the page). */
+const BOSS_PX = 19;
 const PIN_PX = 26;
 const POI_PX = 9;
 /** Minor room names appear once a yard spans this many CSS px. */
@@ -91,6 +95,17 @@ export interface RaidAtlasPaintInput {
   classColor(cls: string): string;
   /** Seconds, the frame clock (only the engaged pulse reads it). */
   clock: number;
+  /** The bosses' faces (busts that have not landed draw the crest). */
+  faces: RaidAtlasFaceSource;
+  /** The encounter whose pin is hovered or focused (its halo), or null. */
+  hoverBoss: string | null;
+}
+
+/** A boss medallion's radius (CSS px) on a canvas of `side` at `zoom`: the
+ *  marks layer paints it and the controller's hit test reads it. */
+export function raidAtlasBossRadius(side: number, zoom: number): number {
+  const unit = side < 420 ? 0.82 : 1;
+  return BOSS_PX * unit * Math.min(1.35, 1 + (zoom - 1) * 0.06);
 }
 
 interface Layer {
@@ -226,6 +241,7 @@ export class RaidAtlasPainter {
       bosses,
       pins,
       input.selectedPin ?? '-',
+      input.faces.version,
     ].join('|');
   }
 
@@ -358,7 +374,7 @@ export class RaidAtlasPainter {
       );
     }
     // Boss medallions (and their names, zoomed in).
-    const bossR = BOSS_PX * unit * Math.min(1.35, 1 + (view.zoom - 1) * 0.06);
+    const bossR = raidAtlasBossRadius(side, view.zoom);
     const bossName = {
       font: `600 ${Math.round((small ? 9.5 : 11) * grow)}px ${fonts.serif}`,
       fill: colors.boss,
@@ -369,7 +385,17 @@ export class RaidAtlasPainter {
     for (const mark of frame.bosses) {
       if (mark.boss.floor !== floor.id) continue;
       const p = at(mark.boss.x, mark.boss.z);
-      drawBossMedallion(ctx, colors, p.sx, p.sy, bossR, mark.state);
+      const [lead, partner] = raidAtlasBossFaces(mark.boss);
+      drawBossPortraitMedallion(
+        ctx,
+        colors,
+        p.sx,
+        p.sy,
+        bossR,
+        mark.state,
+        input.faces.face(lead),
+        partner === undefined ? undefined : input.faces.face(partner),
+      );
       if (s >= BOSS_NAME_SCALE) {
         const style = mark.state === 'dead' ? { ...bossName, fill: colors.dead } : bossName;
         this.labels.draw(
@@ -502,11 +528,13 @@ export class RaidAtlasPainter {
     };
     const unit = side < 420 ? 0.85 : 1;
     const phase = (input.clock * 0.8) % 1;
-    const bossR = BOSS_PX * unit * Math.min(1.35, 1 + (view.zoom - 1) * 0.06);
+    const bossR = raidAtlasBossRadius(side, view.zoom);
     for (const mark of frame.bosses) {
-      if (mark.boss.floor !== floor.id || mark.state !== 'engaged') continue;
+      if (mark.boss.floor !== floor.id) continue;
+      if (mark.state !== 'engaged' && mark.boss.id !== input.hoverBoss) continue;
       const p = at(mark.boss.x, mark.boss.z);
-      drawEngagedPulse(ctx, colors, p.sx, p.sy, bossR, phase);
+      if (mark.boss.id === input.hoverBoss) drawBossHoverHalo(ctx, colors, p.sx, p.sy, bossR);
+      if (mark.state === 'engaged') drawEngagedPulse(ctx, colors, p.sx, p.sy, bossR, phase);
     }
     for (const m of frame.members) {
       if (raidAtlasFloorOf(m.x, m.z) !== floor.id) continue;

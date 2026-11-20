@@ -1115,6 +1115,10 @@ Wars 2).
 | What the Heart Let Go | the entrance's weekly essence quest | KEEP (web-checked 2026-11-11). No exact-phrase game use found (nearest: The Blood of Dawnwalker's "The Heart Wants What It Wants", a different phrase). |
 | Remnant of the Masterless Strength | the final boss's quest drop | KEEP. Plain English around the raid's own boss name. |
 | Coffer of the Highwatch Vigil | the quest's reward chest | KEEP (web-checked 2026-11-11). No exact-phrase hit; plain English around the game's own Highwatch Vigil. |
+| Strength of the Bellows | the Guardian of the Breath's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found (nearest: Reverse: 1999's "Bellows of the Earth", a different phrase). Plain English around the raid's own bellows strength. |
+| Queen of the Frozen Lake | the Guardian of the Quench's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found; the nearest ice queens (Terraria's Ice Queen, Kingdom Rush's Winter Queen, Twilight Forest's Snow Queen) are different names. Plain English around the raid's own Frozen Lake. |
+| Giant of the Wellspring | the Guardian of the Heat's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found. Chosen over a "first flame" phrasing to stay clear of Dark Souls' Kiln of the First Flame. |
+| The Four Veins Made One | the Masterless Strength's subtitle on the raid atlas boss card | KEEP (web-checked 2026-11-20). No exact-phrase game use found; plain English around the raid's own four veins. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
