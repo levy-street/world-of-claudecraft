@@ -375,6 +375,19 @@ describe('decodeGatheringGoalWire', () => {
     }
   });
 
+  it('refuses a holding below its own capped allocation, per side', () => {
+    const base = readyRecipeView() as { materials: Record<string, unknown>[] };
+    const row = base.materials[0]; // carried 6, stored 4
+    expect(
+      decodeGatheringGoalWire({ ...base, materials: [{ ...row, heldCarried: 5 }] }),
+    ).toBeNull();
+    expect(decodeGatheringGoalWire({ ...base, materials: [{ ...row, heldStored: 3 }] })).toBeNull();
+    // Exactly equal is the floor, and decodes.
+    expect(
+      decodeGatheringGoalWire({ ...base, materials: [{ ...row, heldCarried: 6, heldStored: 4 }] }),
+    ).not.toBeNull();
+  });
+
   it('refuses owned (carried+stored) exceeding required', () => {
     const base = readyRecipeView() as { materials: Record<string, unknown>[] };
     const row = base.materials[0];

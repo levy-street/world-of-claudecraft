@@ -63,7 +63,10 @@ time, before the request ever reaches the sim.
 ```
 
 `GatheringGoalView` is the shared DTO at
-`src/sim/professions/gathering_goal_types.ts`. `inspect` and `clear` are
+`src/sim/professions/gathering_goal_types.ts`. Each material row also carries
+the additive display fields `heldCarried`/`heldStored` (uncapped holdings, see
+`docs/prd/intentional-gathering/goal-projection-contract.md`); they leave the
+version at 1 because no existing field changed meaning. `inspect` and `clear` are
 always `ok:true`: neither can be refused by the sim (a read and an
 unconditional clear). A `track_recipe`/`track_commission` refusal is a REAL
 outcome, never `ok:true` on a refused sim action: an unknown recipe, a

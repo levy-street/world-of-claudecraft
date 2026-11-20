@@ -210,7 +210,9 @@ describe('renderGatheringGoalPanel: exact mixed storage/shortfall/ready statuses
     const row = el.querySelector('.gathering-goal-material');
     expect(row?.classList.contains('satisfied')).toBe(false);
     const line = el.querySelector('.gathering-goal-material-line')?.textContent ?? '';
-    expect(line).toMatch(/: 2\/10 \(\+3 in bank\)$/);
+    // The unspendable owned copy is named in text, not by colour alone.
+    expect(line).toMatch(/: 2\/10 \(\+3 in bank\) 1 unavailable for crafting$/);
+    expect(line).not.toMatch(/in storage you cannot reach/i);
   });
 
   it('storageRestricted renders its own note; a non-restricted goal renders none', () => {
@@ -248,9 +250,9 @@ describe('renderGatheringGoalPanel: held/required counts and source family label
             // The capped allocation (carried/stored) must NOT be what renders.
             carried: 3,
             stored: 4,
-            reachable: 5,
+            reachable: 7,
             missing: 5,
-            inaccessible: 2,
+            inaccessible: 0,
             heldCarried: 30,
             heldStored: 8,
             satisfied: false,
@@ -264,7 +266,8 @@ describe('renderGatheringGoalPanel: held/required counts and source family label
     );
     const line = el.querySelector('.gathering-goal-material-line')?.textContent ?? '';
     expect(line).toBe(`${itemDisplayName(ITEMS.iron_ore)}: 30/12 (+8 in bank)`);
-    // None of the retired breakdown chips survive.
+    // None of the retired breakdown chips survive, and with every owned copy
+    // spendable the unavailable note stays off.
     expect(line).not.toMatch(/carried|in storage|missing|unavailable for crafting| of /);
   });
 

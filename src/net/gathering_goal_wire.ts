@@ -99,8 +99,9 @@ function decodeHeldCount(value: unknown, fallback: number): number | null {
  *  (carried+stored) can never exceed required, reachable can never exceed
  *  owned, and missing/inaccessible are the EXACT derived remainders
  *  (required-owned, owned-reachable) rather than merely bounded by them. The
- *  uncapped `heldCarried`/`heldStored` are deliberately NOT bounded by
- *  `required`: holding more than the goal needs is the point of them. */
+ *  uncapped `heldCarried`/`heldStored` are deliberately NOT bounded above by
+ *  `required` (holding more than the goal needs is the point of them), only
+ *  below by their own capped allocation. */
 function decodeMaterial(raw: unknown): GatheringGoalMaterial | null {
   if (!isPlainRecord(raw) || !isCanonicalId(raw.itemId)) return null;
   const { required, carried, stored, reachable, missing, inaccessible } = raw;
@@ -122,6 +123,9 @@ function decodeMaterial(raw: unknown): GatheringGoalMaterial | null {
   const heldCarried = decodeHeldCount(raw.heldCarried, carried);
   const heldStored = decodeHeldCount(raw.heldStored, stored);
   if (heldCarried === null || heldStored === null) return null;
+  // The capped allocation is drawn FROM the holding (same grade ladder), so a
+  // holding below its own allocation is never something the projection sends.
+  if (heldCarried < carried || heldStored < stored) return null;
   return {
     itemId: raw.itemId,
     required,

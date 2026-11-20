@@ -6,6 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { recipeById } from '../src/sim/content/recipes';
+import { GATHERING_GOAL_REFRESH_TICKS } from '../src/sim/professions/gathering_goal_projection';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { runCraft } from './helpers/enchant_family_cast';
@@ -112,6 +113,29 @@ describe('trackGatheringRecipe: a count above what is currently craftable', () =
       heldCarried: 23,
     });
     for (const row of rows) expect(row.heldStored).toBe(0);
+  });
+
+  it('refreshes heldStored after a surplus bank deposit the capped allocation cannot see', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('linen_scrap', 1, pid);
+    sim.addItem('spider_leg', 1, pid);
+    sim.addItem('silverleaf_herb', 2, pid);
+    expect(sim.trackGatheringRecipe('recipe_minor_healing_potion', 1, pid)).toBe(true);
+    const legRow = () =>
+      sim.gatheringGoalFor(pid)?.materials.find((r) => r.itemId === 'spider_leg');
+    expect(legRow()).toMatchObject({ carried: 1, stored: 0, heldCarried: 1, heldStored: 0 });
+
+    // A surplus already covered by the bags: the capped stored stays 0, only
+    // the uncapped holding moves, and it lands once the refresh gate passes.
+    const meta = sim.ctx.players.get(pid);
+    if (!meta) throw new Error('missing meta');
+    meta.bank.inventory = [...meta.bank.inventory, { itemId: 'spider_leg', count: 4 }];
+    meta.vault.stock.spider_leg = 3;
+    meta.bankWireRev++;
+    meta.vaultWireRev++;
+    for (let i = 0; i < GATHERING_GOAL_REFRESH_TICKS; i++) sim.tick();
+    expect(legRow()).toMatchObject({ carried: 1, stored: 0, heldCarried: 1, heldStored: 7 });
   });
 
   it('reaches ready once every reagent is fully covered', () => {

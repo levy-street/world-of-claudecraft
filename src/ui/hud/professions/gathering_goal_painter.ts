@@ -199,6 +199,13 @@ function materialLineHtml(
     required: formatNumber(row.required, { maximumFractionDigits: 0 }),
     stored: formatNumber(row.heldStored, { maximumFractionDigits: 0 }),
   });
+  // Owned copies the bill cannot spend (a locked bag slot, or bank copies:
+  // crafting never draws from the bank). Without this, "6/1" on an
+  // unsatisfied row would be explained by colour alone.
+  const inaccessible =
+    row.inaccessible > 0
+      ? ` ${t('hudChrome.gatheringGoal.materialInaccessible', { count: formatNumber(row.inaccessible, { maximumFractionDigits: 0 }) })}`
+      : '';
   const familyLabel = sourceFamilyLabel(row.sourceFamilyId);
   const familyHtml = familyLabel
     ? `<span class="gathering-goal-material-family">${esc(familyLabel)}</span>`
@@ -234,7 +241,7 @@ function materialLineHtml(
       : '';
   return (
     `<li class="gathering-goal-material${row.satisfied ? ' satisfied' : ''}">` +
-    `<span class="gathering-goal-material-line">${esc(line)}</span>` +
+    `<span class="gathering-goal-material-line">${esc(line)}${esc(inaccessible)}</span>` +
     `${metaHtml}${sourceDisclosureHtml(row, name, expandedSourceItemIds)}</li>`
   );
 }
