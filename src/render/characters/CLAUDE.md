@@ -42,7 +42,10 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   the Rift-only ones (derived from the Rift and Buried Hoard templates, never a
   file name) in two paced lanes (`RiftBodyLanes`: the Rift lane a natural Rift
   needs, the hoard lane only a Buried Hoard needs) that `RiftBodyStreamTrigger`
-  opens on a read treasure map, a reachable entrance, or the player inside;
+  opens on a read treasure map, a reachable entrance, or the player inside; a
+  third, iOS-only isle lane holds the bodies only the Quartered Isle (and Rift
+  content) draws (`isleOnlyBodyLanes`) and opens within `ISLE_STREAM_REACH` of the
+  isle, so they stay out of the post-entry stream;
   dungeon-only actors wait for `prepareDungeonCharacterBodies`, awaited by
   `prepareZoneAt` under the arrival cover and before static interior construction.
   Its content-derived inventory includes encounter summons. Cosmetic buddies

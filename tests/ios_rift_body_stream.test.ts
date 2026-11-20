@@ -26,7 +26,10 @@ import {
 import {
   characterStreamPlan,
   dungeonCharacterBodyUrls,
+  ISLE_STREAM_REACH,
+  isleOnlyBodyLanes,
   isStreamedBodyUrl,
+  nearQuarteredIsle,
   type RiftBodyDemand,
   type RiftBodyLaneHost,
   RiftBodyLanes,
@@ -38,6 +41,8 @@ import {
   riftTemplateIds,
 } from '../src/render/characters/rift_body_stream_core';
 import { BUDDY_MOBS } from '../src/sim/content/buddy_mobs';
+import { QUARTERED_ISLE_ZONE } from '../src/sim/content/quartered_isle';
+import { QUARTERED_ISLE_MOBS } from '../src/sim/content/quartered_isle_mobs';
 import { HOARD_MOBS, RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { HOARD_MIN_LEVEL } from '../src/sim/content/treasure_maps';
 import { DUNGEON_LIST, MOBS, NPCS, RIFT_X_MIN } from '../src/sim/data';
@@ -69,6 +74,7 @@ const rift = riftTemplateIds();
 const nonRiftTemplates = [...new Set([...Object.keys(MOBS), ...mobKeyTemplateIds()])].filter(
   (id) => !rift.has(id),
 );
+const isleTemplates = new Set(Object.keys(QUARTERED_ISLE_MOBS));
 
 describe('the Rift body class is derived from content', () => {
   it('holds exactly the hoard creature bodies the manifest ships today (a deliberate tripwire)', () => {
@@ -113,9 +119,12 @@ describe('the Rift body class is derived from content', () => {
   });
 
   it('never moves a body the overworld draws out of the entry stream', () => {
-    const laneUrls = new Set([...ios.rift, ...ios.hoard]);
+    // The one deliberate exception is the Quartered Isle's lane (pinned in its own
+    // describe below): its templates are skipped here, and no other route may draw
+    // an isle-lane body either.
+    const laneUrls = new Set([...ios.rift, ...ios.hoard, ...ios.isle]);
     const reached: Array<[string, string]> = [];
-    for (const id of nonRiftTemplates) reached.push([id, mobKey(id)]);
+    for (const id of nonRiftTemplates) if (!isleTemplates.has(id)) reached.push([id, mobKey(id)]);
     for (const key of fallbackVisualKeys()) reached.push([`fallback ${key}`, key]);
     for (const id of Object.keys(NPCS)) {
       reached.push([`npc ${id}`, visualKeyFor({ kind: 'npc', templateId: id } as Entity)]);
@@ -263,21 +272,69 @@ describe('the two lanes follow what each kind of content spawns', () => {
   });
 });
 
+describe('the Quartered Isle lane (iOS)', () => {
+  it('holds exactly the bodies only the isle (and Rift content) draws', () => {
+    // A tripwire like the hoard list above: a new isle body, or an isle body the
+    // rest of the overworld starts drawing, fails here until updated on purpose.
+    const expected = [
+      'mob_hoard_rime_elemental',
+      'mob_hoard_hoarfrost_warden',
+      'mob_hoard_ember_fiend',
+      'mob_hoard_magma_brute',
+      'mob_remnant_first_colossus',
+      'mob_rimeglass_bear',
+    ].map((key) => VISUALS[key].url);
+    expect([...ios.isle].sort()).toEqual([...new Set(expected)].sort());
+    // shared with the wider overworld, so they stay in the entry stream
+    for (const id of ['heatsworn_ember', 'heaved_shardling', 'veinback_burrower', 'ember_hound']) {
+      expect(ios.postEntry, id).toContain(VISUALS[mobKey(id)].url);
+    }
+  });
+
+  it('keeps every isle-lane body off every other overworld route', () => {
+    const isleLane = new Set(ios.isle);
+    for (const id of nonRiftTemplates) {
+      if (isleTemplates.has(id)) continue;
+      for (const url of defUrls(VISUALS[mobKey(id)]))
+        expect(isleLane.has(url), `${id} ${url}`).toBe(false);
+    }
+    for (const key of fallbackVisualKeys())
+      for (const url of defUrls(VISUALS[key])) expect(isleLane.has(url), key).toBe(false);
+    // and every streamed body an isle template draws is at entry or in the lane
+    for (const id of isleTemplates) {
+      for (const url of defUrls(VISUALS[mobKey(id)]).filter(isStreamedBodyUrl)) {
+        expect(isleLane.has(url) || ios.postEntry.includes(url), `${id} ${url}`).toBe(true);
+      }
+    }
+  });
+});
+
 describe('the stream plan per profile', () => {
   it('keeps overworld bodies gated on non-iOS while deferring dungeon, Rift, Hoard, and skin assets', () => {
     expect(other.postEntry).toEqual([]);
     expect(other.onDemand).toEqual(ios.onDemand);
-    expect(other.rift).toEqual(ios.rift);
-    expect(other.hoard).toEqual(ios.hoard);
+    // The isle lane is iOS-only; a body it shares with a Rift is in the boot gate
+    // elsewhere (the isle's overworld templates draw it), so only iOS lists it.
+    expect(other.isle).toEqual([]);
+    const isleLane = new Set(ios.isle);
+    expect(other.rift).toEqual(ios.rift.filter((url) => !isleLane.has(url)));
+    expect(other.hoard).toEqual(ios.hoard.filter((url) => !isleLane.has(url)));
     const deferredNonIos = new Set([...skins, ...other.onDemand, ...other.rift, ...other.hoard]);
     expect(other.streamed).toEqual(preload.filter((url) => deferredNonIos.has(url)));
   });
 
   it('assigns every iOS body exactly once to a stream or demand lane', () => {
     expect(ios.streamed).toEqual(preload.filter((url) => skins.has(url) || isStreamedBodyUrl(url)));
-    const all = [...ios.postEntry, ...ios.rift, ...ios.hoard, ...ios.onDemand];
+    // An isle-lane body the isle shares with a Rift also rides its Rift lane, so
+    // either trigger loads it; that is the only body two lanes may hold.
+    const isleLane = new Set(ios.isle);
+    const riftOnly = [...ios.rift, ...ios.hoard].filter((url) => !isleLane.has(url));
+    const all = [...ios.postEntry, ...riftOnly, ...ios.isle, ...ios.onDemand];
     expect(all.sort()).toEqual([...bodies].sort());
     expect(new Set(all).size).toBe(all.length);
+    for (const url of [...ios.rift, ...ios.hoard].filter((u) => isleLane.has(u))) {
+      expect(isleOnlyBodyLanes().get(url), url).not.toBeNull();
+    }
   });
 
   it('defers dungeon actors while keeping shared overworld bodies at entry', () => {
@@ -360,6 +417,7 @@ const flush = () => new Promise<void>((r) => setTimeout(r, 0));
 const demand = (d: Partial<RiftBodyDemand>): RiftBodyDemand => ({
   rift: false,
   hoard: false,
+  isle: false,
   inside: false,
   ...d,
 });
@@ -432,6 +490,27 @@ describe('the lanes are paced behind the post-entry stream', () => {
     lanes.setUrls([], []);
     expect(lanes.pending()).toBe(false);
   });
+
+  it('walks the isle lane only when the isle is asked for, after the Rift lanes', async () => {
+    const h = fakeHost();
+    const lanes = new RiftBodyLanes(h.host);
+    lanes.setUrls(['r1'], [], ['i1', 'r1']);
+    lanes.demand(demand({ rift: true }));
+    h.fetches[0].resolve();
+    await flush();
+    expect(h.fetches.map((f) => f.url)).toEqual(['r1']);
+    expect(lanes.pending()).toBe(true);
+    lanes.demand(demand({ isle: true }));
+    expect(h.fetches.map((f) => f.url)).toEqual(['r1', 'i1']);
+    h.fetches[1].resolve();
+    await flush();
+    // a body shared with the Rift lane is asked again: a resident body resolves at once
+    expect(h.fetches.map((f) => f.url)).toEqual(['r1', 'i1', 'r1']);
+    h.fetches[2].resolve();
+    await flush();
+    expect(lanes.pending()).toBe(false);
+    expect(h.started).toEqual(['rift', 'isle']);
+  });
 });
 
 interface FakeEntity {
@@ -451,6 +530,7 @@ function fakeWorld(
   opts: {
     level?: number;
     x?: number;
+    z?: number;
     riftFloor?: { seed: number } | null;
     map?: boolean;
     roster?: number;
@@ -459,7 +539,7 @@ function fakeWorld(
   return {
     riftFloor: opts.riftFloor ?? null,
     treasureMap: opts.map ? { rarity: 'rare', siteId: 'site' } : null,
-    player: { level: opts.level ?? RIFT_MIN_LEVEL, pos: { x: opts.x ?? 0, z: 0 } },
+    player: { level: opts.level ?? RIFT_MIN_LEVEL, pos: { x: opts.x ?? 0, z: opts.z ?? 0 } },
     entities: new Map(entities.map((e) => [e.id, e])),
     entityRosterVersion: opts.roster ?? 1,
   };
@@ -474,11 +554,11 @@ const entranceAt = (x: number, templateId = 'rift_portal'): FakeEntity => ({
 
 const demandOf = (world: RiftBodyStreamWorld) => {
   const d = new RiftBodyStreamTrigger({ pending: () => true, demand: () => {} }).demandOf(world);
-  return { rift: d.rift, hoard: d.hoard, inside: d.inside };
+  return { rift: d.rift, hoard: d.hoard, isle: d.isle, inside: d.inside };
 };
-const natural = { rift: true, hoard: false, inside: false };
-const hoard = { rift: true, hoard: true, inside: false };
-const none = { rift: false, hoard: false, inside: false };
+const natural = { rift: true, hoard: false, isle: false, inside: false };
+const hoard = { rift: true, hoard: true, isle: false, inside: false };
+const none = { rift: false, hoard: false, isle: false, inside: false };
 
 describe('the trigger', () => {
   it('asks for both lanes from the moment a treasure map is read, at the level that can enter', () => {
@@ -536,6 +616,21 @@ describe('the trigger', () => {
     expect(asked).toEqual([natural]);
   });
 
+  it('asks for the isle lane within ISLE_STREAM_REACH of the Quartered Isle, and no further', () => {
+    const z = QUARTERED_ISLE_ZONE;
+    const south = z.zMin - ISLE_STREAM_REACH;
+    // the reach covers the interest radius, so the lane starts before a camp is in view
+    expect(ISLE_STREAM_REACH).toBeGreaterThan(PLAYER_INTEREST_RADIUS);
+    expect(demandOf(fakeWorld([], { x: 0, z: south }))).toEqual({ ...none, isle: true });
+    expect(demandOf(fakeWorld([], { x: 0, z: south - 1 }))).toEqual(none);
+    expect(demandOf(fakeWorld([], { x: 0, z: (z.zMin + z.zMax) / 2 }))).toEqual({
+      ...none,
+      isle: true,
+    });
+    expect(nearQuarteredIsle(0, 0)).toBe(false);
+    expect(nearQuarteredIsle((z.xMax ?? 0) + ISLE_STREAM_REACH + 1, z.zMin)).toBe(false);
+  });
+
   it('re-lists entrances when the roster changes', () => {
     const trigger = new RiftBodyStreamTrigger({ pending: () => true, demand: () => {} });
     expect(trigger.demandOf(fakeWorld([], { roster: 1 })).rift).toBe(false);
@@ -584,9 +679,11 @@ describe('the client loop wires the trigger', () => {
     // compile gate like every streamed body.
     expect(assetsSource).toContain('postEntryStarted: () => streamedStarted,');
     expect(assetsSource).toContain(
-      'riftLanes.setUrls(initialStreamPlan.rift, initialStreamPlan.hoard);',
+      'riftLanes.setUrls(initialStreamPlan.rift, initialStreamPlan.hoard, initialStreamPlan.isle);',
     );
-    expect(assetsSource).toContain('riftLanes.setUrls(nextPlan.rift, nextPlan.hoard);');
+    expect(assetsSource).toContain(
+      'riftLanes.setUrls(nextPlan.rift, nextPlan.hoard, nextPlan.isle);',
+    );
     expect(assetsSource).toContain(
       'if (streamedUrlSet.has(url) || lazyOnDemandUrls.has(url)) ensureCharacterUrl(url);',
     );

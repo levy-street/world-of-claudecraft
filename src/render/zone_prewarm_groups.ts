@@ -101,13 +101,16 @@ export function buildEntityPrewarmGroup(
     group.add(obj);
     idx++;
   };
-  const build = (templateId: string, copies: number): void => {
+  /** Build a template's copies; true when every one built (or it has no template). */
+  const build = (templateId: string, copies: number): boolean => {
     const template = MOBS[templateId];
-    if (!template) return;
+    if (!template) return true;
+    let built = 0;
     for (let i = 0; i < copies; i++) {
       const entity = h.prewarmEntity('mob', template.id, template.color, template.scale);
-      // A lazily loaded body (the training dummy) is fetched here and warmed by a
-      // later pass instead of throwing out of createCharacterVisual.
+      // A lazily loaded body (the training dummy, an iOS lane body still in flight)
+      // is fetched here and warmed by a later pass instead of throwing out of
+      // createCharacterVisual.
       if (!visualAssetsResident(visualKeyFor(entity))) continue;
       const visual = createCharacterVisual(entity);
       // Assets unavailable: skip the seed so a later zone preparation can retry it.
@@ -116,15 +119,18 @@ export function buildEntityPrewarmGroup(
       if (poolKey) pooled.push({ key: poolKey, visual });
       visual.root.visible = true;
       place(visual.root);
+      built++;
     }
+    return built === copies;
   };
   // Warm only templates that can appear in this zone. The per-template set
-  // persists across transitions, so shared families are paid once per session.
+  // persists across transitions, so shared families are paid once per session;
+  // a template whose body was not resident stays out of it, so the next zone
+  // preparation retries it.
   for (const templateId of h.templateIdsInZone(zone, 'mob')) {
     if (h.prewarmedMobTemplates.has(templateId)) continue;
     const copies = PREWARM_MOB_COMMON_IDS.has(templateId) ? PREWARM_MOB_POOL_COPIES : 1;
-    build(templateId, copies);
-    h.prewarmedMobTemplates.add(templateId);
+    if (build(templateId, copies)) h.prewarmedMobTemplates.add(templateId);
   }
   return { group, pooled };
 }
