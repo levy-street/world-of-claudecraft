@@ -47,7 +47,7 @@ import {
   BATTLE_TRANCE_CHANCE,
   BATTLE_TRANCE_DURATION,
   DT,
-  dist2d,
+  dist3d,
   type Entity,
   MELEE_ARC,
   MELEE_RANGE,
@@ -174,7 +174,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // whose impact aggros, like the spell it accompanies). Otherwise the "Attack on Ability
   // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a mob the
   // instant the cast starts, before anything lands.
-  const d = dist2d(p.pos, t.pos);
+  const d = dist3d(p.pos, t.pos);
   const ranged = rangedAutoProfile(p, r.meta.cls);
   const rangedAutoWouldFire =
     ranged !== undefined && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange);
@@ -258,7 +258,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
   if (p.swingTimer > 0 && (!p.dualWielding || !p.offhandWeapon || p.offhandSwingTimer > 0)) return;
   if (isStunned(p)) return;
   if (isDisarmed(p)) return; // weapon knocked away: no auto-attack swings
-  const d = dist2d(p.pos, t.pos);
+  const d = dist3d(p.pos, t.pos);
   const facingDiff = Math.abs(normAngle(angleTo(p.pos, t.pos) - p.facing));
   if (facingDiff > MELEE_ARC) return;
 

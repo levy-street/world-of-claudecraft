@@ -77,6 +77,7 @@ import {
   DISENCHANT_CAST_ID,
   DT,
   dist2d,
+  dist3d,
   ENCHANT_CAST_ID,
   FACING_HOLD_DIST,
   FISHING_CAST_ID,
@@ -1032,7 +1033,7 @@ function vanishedLowBlowFallbackTarget(
   let nearestDist = Infinity;
   for (const entity of ctx.entities.values()) {
     if (entity.id === p.id || entity.dead || !ctx.isHostileTo(p, entity)) continue;
-    const d = dist2d(p.pos, entity.pos);
+    const d = dist3d(p.pos, entity.pos);
     if (d > MELEE_RANGE || d >= nearestDist) continue;
     nearest = entity;
     nearestDist = d;
@@ -1473,7 +1474,7 @@ export function castAbility(
       return;
     }
     if (!target) return;
-    if (dist2d(p.pos, target.pos) > ability.range) {
+    if (dist3d(p.pos, target.pos) > ability.range) {
       ctx.error(p.id, 'Out of range.');
       return;
     }
@@ -1531,7 +1532,7 @@ export function castAbility(
       ctx.error(p.id, 'You must target an ally.');
       return;
     }
-    const d = dist2d(p.pos, target.pos);
+    const d = dist3d(p.pos, target.pos);
     if (d > Math.max(ability.range, 5)) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -1582,7 +1583,7 @@ export function castAbility(
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
     }
-    const d = dist2d(p.pos, target.pos);
+    const d = dist3d(p.pos, target.pos);
     const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
@@ -1612,7 +1613,7 @@ export function castAbility(
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
     }
-    const d = dist2d(p.pos, target.pos);
+    const d = dist3d(p.pos, target.pos);
     const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
@@ -2586,7 +2587,7 @@ function applyChannelTick(
     return;
   }
   const maxRange = effectivePlayerAttackRange(target, res.def.range, meleeReachActor(ctx, p));
-  if (dist2d(p.pos, target.pos) > maxRange) {
+  if (dist3d(p.pos, target.pos) > maxRange) {
     ctx.error(p.id, 'Out of range.');
     cancelCast(ctx, p);
     return;
@@ -2859,7 +2860,7 @@ function applyAbility(
       return;
     }
     if (!target) return;
-    if (dist2d(p.pos, target.pos) > ability.range + 2) {
+    if (dist3d(p.pos, target.pos) > ability.range + 2) {
       ctx.error(p.id, 'Out of range.');
       return;
     }
@@ -2898,7 +2899,7 @@ function applyAbility(
       return;
     }
     target = friendly;
-    const d = dist2d(p.pos, target.pos);
+    const d = dist3d(p.pos, target.pos);
     if (d > Math.max(ability.range, 5) + 2) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -2933,7 +2934,7 @@ function applyAbility(
       ctx.error(p.id, 'You have no target.');
       return;
     }
-    const d = dist2d(p.pos, target.pos);
+    const d = dist3d(p.pos, target.pos);
     const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
@@ -2949,7 +2950,7 @@ function applyAbility(
       ctx.error(p.id, 'You have no target.');
       return;
     }
-    const d = dist2d(p.pos, target.pos);
+    const d = dist3d(p.pos, target.pos);
     const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');

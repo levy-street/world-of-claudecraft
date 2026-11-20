@@ -44,6 +44,7 @@ import {
   CRAFT_CAST_ID,
   DISENCHANT_CAST_ID,
   dist2d,
+  dist3d,
   ENCHANT_CAST_ID,
   type Entity,
   type EquipSlot,
@@ -576,7 +577,7 @@ export function rangeReadout(ctx: SimContext, self: Entity): string {
   if (self.targetId === null) return 'You have no target.';
   const t = ctx.entities.get(self.targetId);
   if (!t) return 'You have no target.';
-  const d = dist2d(self.pos, t.pos);
+  const d = dist3d(self.pos, t.pos);
   const reach = d <= MELEE_RANGE ? 'in melee range' : 'out of melee range';
   return `Your target ${t.name} is ${Math.round(d)}yd away (${reach}).`;
 }

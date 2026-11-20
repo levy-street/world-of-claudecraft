@@ -33,7 +33,7 @@ import { ITEMS, MOBS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
-import { type Aura, type Entity, MELEE_RANGE } from '../types';
+import { type Aura, dist3d, type Entity, MELEE_RANGE } from '../types';
 import { meleeSwing } from './auto_attack';
 import { isForemanShaped, useBalgathTrinket } from './balgath_trinkets';
 import { isUnbreakableControlAura } from './cc';
@@ -930,7 +930,7 @@ function twinStrike(
   if (findAura(p, TRINKET_AURA.twinStrikeIcd)) return;
   // A ranged shot (a hunter's auto-shot also lands as a weapon hit) never earns
   // a melee swing at a target out of reach.
-  if (Math.hypot(target.pos.x - p.pos.x, target.pos.z - p.pos.z) > MELEE_RANGE + 2) return;
+  if (dist3d(p.pos, target.pos) > MELEE_RANGE + 2) return;
   if (!ctx.rng.chance(passive.chance)) return;
   // The inner cooldown is set BEFORE the extra swing, whose own hit lands back
   // here: it can never chain.

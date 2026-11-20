@@ -12875,6 +12875,17 @@ export function dist2d(a: Vec3, b: Vec3): number {
   return Math.sqrt(dx * dx + dz * dz);
 }
 
+/** Straight-line distance including height. Player attack and spell range is
+ *  measured with this, so a target on a roof above you is as far away as it
+ *  looks: ground distance alone let a player 5 yd out on the street swing at
+ *  someone standing on the rooftop over them. */
+export function dist3d(a: Vec3, b: Vec3): number {
+  const dx = a.x - b.x,
+    dy = a.y - b.y,
+    dz = a.z - b.z;
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+
 export function angleTo(from: Vec3, to: Vec3): number {
   return Math.atan2(to.x - from.x, to.z - from.z);
 }
