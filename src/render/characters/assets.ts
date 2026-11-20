@@ -103,7 +103,9 @@ import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
 import {
+  bodyStreamVerdict,
   characterStreamPlan,
+  dungeonAndBuddyBodyUrls,
   dungeonCharacterBodyUrls,
   RiftBodyLanes,
   RiftBodyStreamTrigger,
@@ -923,6 +925,29 @@ export function visualAssetsResident(key: string, fetch = true): boolean {
     if (!characterRetryArmed.has(url)) ensureCharacterUrl(url);
   }
   return resident;
+}
+
+/** True while a visual key's body is still on the wire and every missing file
+ *  is an ON-DEMAND dungeon or buddy body (dungeonAndBuddyBodyUrls: loaded
+ *  behind a raid's or a dungeon's arrival cover by design;
+ *  rift_body_stream_core.ts bodyStreamVerdict): the world's view factory then
+ *  waits quietly, the fetch kicked here (and asked for again after a failure,
+ *  as visualAssetsResident does), and the caller's retry cooldown builds it
+ *  once it lands. Every other missing file (a WOC base, a lazy cosmetic, a
+ *  preload-set bug) keeps the logged miss (PR 4360 review B1,
+ *  tests/character_visual_fail_soft.test.ts). False when it is resident or
+ *  unknown. */
+export function characterVisualAwaitingStream(key: string): boolean {
+  const def = VISUALS[key];
+  if (!def) return false;
+  const verdict = bodyStreamVerdict(
+    [def.url, ...(def.animUrls ?? [])],
+    characterAssetResident,
+    (url) => streamedUrlSet.has(url) && dungeonAndBuddyBodyUrls().has(url),
+  );
+  if (verdict !== 'await') return false;
+  visualAssetsResident(key);
+  return true;
 }
 
 /**

@@ -449,3 +449,23 @@ export class RiftBodyStreamTrigger {
     return d;
   }
 }
+
+/** How a body's files stand for a build: 'ready' when every file is resident;
+ *  'await' when some are still to arrive and every one of those streams (an
+ *  on-demand dungeon body, a post-entry or Rift-lane body): the build waits
+ *  quietly while its fetch runs; 'miss' when a file that should already be
+ *  resident is not (a real preload-set bug: the build goes on and fails
+ *  loudly, as before). */
+export function bodyStreamVerdict(
+  urls: readonly string[],
+  resident: (url: string) => boolean,
+  streams: (url: string) => boolean,
+): 'ready' | 'await' | 'miss' {
+  let waiting = false;
+  for (const url of urls) {
+    if (resident(url)) continue;
+    if (!streams(url)) return 'miss';
+    waiting = true;
+  }
+  return waiting ? 'await' : 'ready';
+}

@@ -5,7 +5,7 @@
 import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { renderLayerDisabled } from '../render_dev_flags';
 import { logAssetMissOnce } from './asset_miss_log';
-import { type AssembleOptions, modularHeadFor } from './assets';
+import { type AssembleOptions, characterVisualAwaitingStream, modularHeadFor } from './assets';
 import { type CharacterFormKey, characterFormAssetKey } from './form_visual_selection_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
@@ -169,6 +169,11 @@ export function createCharacterVisual(
   const wocFit = formKey ? undefined : VISUALS[key]?.wocCharacter?.fit;
   const wocHeadApp = e.kind === 'player' ? e.modularAppearance : (npcLook?.app ?? null);
   if (wocFit && opts?.fetchStreamed !== false) ensureWocHeadForAppearance(wocFit, wocHeadApp);
+  // A dungeon's or a raid's own body still on the wire (loaded on demand behind its
+  // arrival cover) is waited for quietly: its fetch is kicked and the caller's retry
+  // cooldown builds it once it lands. Every other missing file keeps the logged
+  // fail-soft path below.
+  if (opts?.fetchStreamed !== false && characterVisualAwaitingStream(key)) return null;
   try {
     // The world path, and the only one with a point-light budget: its weapon
     // light is born hidden and the budget decides when it shines. A rig built
