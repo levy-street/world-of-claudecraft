@@ -219,6 +219,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeMobileStationCrafts = EMPTY_MST_CRAFTS;
   c.activeMobileStationCraftsRaw = null;
   c.markers = {};
+  c.sharedMapMarkList = [];
   c.lastSnapAt = 0;
   c.snapInterval = 50;
   c.serverTickHz = null;

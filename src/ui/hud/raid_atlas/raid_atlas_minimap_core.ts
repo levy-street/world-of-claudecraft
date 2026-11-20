@@ -152,6 +152,8 @@ export interface RaidAtlasMinimapState {
   /** Live marks in minimap px (mobs, loot, gates). */
   marks: readonly { kind: string; cx: number; cy: number; aggro?: boolean }[];
   pins: string;
+  /** The group's shared marks (a placed, moved or cleared one repaints). */
+  shared: readonly { symbol: number; floor: string; x: number; z: number }[];
   /** The view settled (a sharp tile may replace the plate). */
   settled: boolean;
   /** Whether the floor's plate is ready (a cold first paint repaints once it is). */
@@ -173,5 +175,6 @@ export function raidAtlasMinimapKey(s: RaidAtlasMinimapState): string | null {
   for (const m of s.members) key += `|m${q(m.x, step)},${q(m.z, step)},${m.cls},${m.dead ? 1 : 0}`;
   for (const m of s.marks)
     key += `|${m.kind[0]}${q(m.cx, 0.25)},${q(m.cy, 0.25)}${m.aggro ? '!' : ''}`;
+  for (const m of s.shared) key += `|s${m.symbol}${m.floor[0]}${m.x},${m.z}`;
   return key;
 }

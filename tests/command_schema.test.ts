@@ -197,8 +197,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Sim.sitOnSeat) on feature/walkable-tavern-aaa: 248/262/14 on its own. Merged with
 // the v0.45.0 integration's 262/276: 263/277/14.
 // Main commands plus Gourdlight Eve trick-or-treat.
-const EXPECTED_SEND_COUNT = 273;
-const EXPECTED_DISPATCH_COUNT = 287;
+// The raid map's shared marks add map_mark_set and map_mark_clear (each sent by
+// ClientWorld and dispatched to the Sim through server/marker_commands.ts): 275/289.
+const EXPECTED_SEND_COUNT = 275;
+const EXPECTED_DISPATCH_COUNT = 289;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -336,7 +338,7 @@ describe('command schema parity (W0b)', () => {
   it('appends courier dispatch as a complete client/server command pair', () => {
     // The integration adds the dungeon guide answer, then the buddy rename command; the
     // Keep main wire tokens in place and append Gourdlight Eve.
-    expect(COMMAND_NAMES.slice(-7)).toEqual([
+    expect(COMMAND_NAMES.slice(-9)).toEqual([
       'courier_dispatch',
       'dungeon_guide_answer',
       'buddy_rename',
@@ -344,6 +346,8 @@ describe('command schema parity (W0b)', () => {
       'sit_seat',
       'guild_buy_cosmetic',
       'trick_or_treat',
+      'map_mark_set',
+      'map_mark_clear',
     ]);
     expect(sendSet.has('guild_buy_cosmetic')).toBe(true);
     expect(dispatchSet.has('guild_buy_cosmetic')).toBe(true);

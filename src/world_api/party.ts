@@ -1,3 +1,4 @@
+import type { SharedMapMark } from '../sim/social/shared_map_marks';
 import type {
   AuraKind,
   MasterLootSettings,
@@ -5,6 +6,8 @@ import type {
   PlayerClass,
   ResourceType,
 } from '../sim/types';
+
+export type { SharedMapMark };
 
 /** A compact aura summary for a party row's mini icon strip. Relevant effects are
  *  selected before the PARTY_MEMBER_AURA_CAP limit is applied. */
@@ -84,4 +87,12 @@ export interface IWorldParty {
   markerFor(entityId: number): number | null;
   setMarker(entityId: number, markerId: number): void;
   clearMarker(entityId: number): void;
+  // Shared raid-map marks (the world-marker half of the raid markers): the group's
+  // marks on its instance's map, one per marker symbol 0..7, in instance-local
+  // yards on a map page. Everyone in the instance copy sees them; in a raid only
+  // the leader edits (src/sim/social/shared_map_marks.ts owns every rule).
+  sharedMapMarks(): readonly SharedMapMark[];
+  placeSharedMapMark(page: number, x: number, z: number, symbol: number): void;
+  // symbol null clears every mark
+  clearSharedMapMarks(symbol: number | null): void;
 }

@@ -111,6 +111,7 @@ describe('raidAtlasMinimapKey', () => {
     members: [{ x: 4, z: -30, cls: 'mage', dead: false }],
     marks: [{ kind: 'mob', cx: 40, cy: 50, aggro: false }],
     pins: '',
+    shared: [{ symbol: 7, floor: 'veins', x: 3, z: -20 }],
     settled: false,
     plateReady: true,
   };
@@ -138,6 +139,9 @@ describe('raidAtlasMinimapKey', () => {
       { marks: [{ kind: 'mob', cx: 40, cy: 50, aggro: true }] },
       { marks: [{ kind: 'loot', cx: 40, cy: 50 }] },
       { pins: '1fb' },
+      { shared: [] },
+      { shared: [{ symbol: 7, floor: 'veins', x: 4, z: -20 }] },
+      { shared: [{ symbol: 0, floor: 'veins', x: 3, z: -20 }] },
       { settled: true },
       { plateReady: false },
     ];

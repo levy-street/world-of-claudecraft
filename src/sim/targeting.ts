@@ -31,6 +31,7 @@ import { gmHiddenFrom } from './gm_presence';
 import { isBuddyMob } from './pet/buddy_ai';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { SharedMapMarks } from './social/shared_map_marks';
 import { orderTabTargets, stepTabTarget, TAB_QUERY_RADIUS, type TabStep } from './tab_target';
 import type { Entity } from './types';
 
@@ -39,8 +40,14 @@ export class Targeting {
   // party-scoped overlay — never read by tick()/obs/persistence. Moved off Sim; the
   // slice's private state, like the PartyMachine's four maps.
   partyMarkers = new Map<number, Map<number, number>>();
+  // The raid map's shared marks (the world-marker half of the raid markers): a
+  // sibling store with its own rules (social/shared_map_marks.ts), held here so
+  // the one party-disband hook clears both marker sets.
+  readonly mapMarks: SharedMapMarks;
 
-  constructor(private readonly ctx: SimContext) {}
+  constructor(private readonly ctx: SimContext) {
+    this.mapMarks = new SharedMapMarks(ctx);
+  }
 
   // ---------------------------------------------------------------------------
   // Target selection (tab / nearest / friendly cycle)
@@ -308,9 +315,10 @@ export class Targeting {
     for (const marks of this.partyMarkers.values()) marks.delete(entityId);
   }
 
-  // Drop a disbanded party's whole raid-marker set (the A1 removeFromParty
-  // disband path calls this through ctx.dropPartyMarkers).
+  // Drop a disbanded party's whole raid-marker set, target and map marks alike
+  // (the A1 removeFromParty disband path calls this through ctx.dropPartyMarkers).
   dropPartyMarkers(partyId: number): void {
     this.partyMarkers.delete(partyId);
+    this.mapMarks.dropParty(partyId);
   }
 }

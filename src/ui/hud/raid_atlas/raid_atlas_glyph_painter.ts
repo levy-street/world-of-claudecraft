@@ -5,6 +5,7 @@
 // frame with its cartouche plate. Each takes a context already scaled to CSS
 // px and the resolved palette; no literal colour, no state.
 
+import { raidMarkerSprite } from '../../icons';
 import { pinColorRole, type RaidAtlasColors } from './raid_atlas_palette_core';
 import type { RaidAtlasPinColor, RaidAtlasPinIcon } from './raid_atlas_pins_core';
 import type { RaidAtlasPoiKind } from './raid_atlas_plan_core';
@@ -330,6 +331,65 @@ function pinIconDetail(ctx: CanvasRenderingContext2D, icon: RaidAtlasPinIcon, r:
  * gilded rim and its icon, a needle, and a soft shadow on the parchment.
  * `selected` lifts it with a bright ring.
  */
+/**
+ * A shared map mark (the group's raid world marker): one of the eight raid
+ * marker symbols, the target markers' own sprite (icons.ts), struck on a dark
+ * gilded token so it stands apart from a player's own teardrop pins and reads
+ * on any parchment. Centred on (x, y), `r` its radius; `hot` rings it (the
+ * symbol the shared tool will place, under the pointer).
+ */
+export function drawSharedMark(
+  ctx: CanvasRenderingContext2D,
+  c: RaidAtlasColors,
+  x: number,
+  y: number,
+  r: number,
+  symbol: number,
+  hot = false,
+): void {
+  ctx.save();
+  // Ground shadow, then the token.
+  ctx.beginPath();
+  ctx.ellipse(x + r * 0.1, y + r * 0.92, r * 0.78, r * 0.26, 0, 0, TAU);
+  ctx.fillStyle = c.frameDark;
+  ctx.globalAlpha = 0.3;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, TAU);
+  ctx.shadowColor = c.frameDark;
+  ctx.shadowBlur = r * 0.45;
+  ctx.shadowOffsetY = r * 0.1;
+  const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r);
+  g.addColorStop(0, c.frameMid);
+  g.addColorStop(1, c.frameDark);
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  // The gilded rim: a dark keyline outside, a bright bead inside.
+  ctx.lineWidth = Math.max(1.6, r * 0.16);
+  ctx.strokeStyle = c.goldDeep;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x, y, r - Math.max(0.8, r * 0.08), 0, TAU);
+  ctx.lineWidth = Math.max(0.8, r * 0.06);
+  ctx.strokeStyle = c.goldLight;
+  ctx.stroke();
+  if (hot) {
+    ctx.beginPath();
+    ctx.arc(x, y, r * 1.28, 0, TAU);
+    ctx.lineWidth = Math.max(1.2, r * 0.1);
+    ctx.strokeStyle = c.goldWhite;
+    ctx.globalAlpha = 0.9;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  const s = r * 1.5;
+  ctx.drawImage(raidMarkerSprite(symbol), x - s / 2, y - s / 2, s, s);
+  ctx.restore();
+}
+
 export function drawPin(
   ctx: CanvasRenderingContext2D,
   c: RaidAtlasColors,

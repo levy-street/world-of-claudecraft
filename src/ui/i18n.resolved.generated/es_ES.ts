@@ -7959,7 +7959,17 @@ export const es_ES: EnTranslations = {
         "portal": "Portal",
         "entrance": "Entrance",
         "pin": "Your pin",
+        "shared": "Raid mark (shared)",
         "river": "Path of light to a guardian"
+      },
+      "shared": {
+        "tool": "Raid marks",
+        "title": "Raid marks",
+        "symbolsAria": "Raid mark symbols",
+        "placeHint": "Tap or click the map to place {marker} for your group. Tap or click a raid mark to remove it.",
+        "clearAll": "Clear all",
+        "noteEditable": "Everyone in your group sees these marks.",
+        "readOnly": "Only the raid leader can place raid marks."
       },
       "hintDesktop": "Scroll to zoom, drag to pan, double-click to zoom in. Right-click the map to place a pin, right-click a pin to remove it, click a pin to restyle it.",
       "hintTouch": "Pinch to zoom and drag to pan. Turn on the pin tool, then tap the map to place a pin; tap a pin to restyle or remove it.",

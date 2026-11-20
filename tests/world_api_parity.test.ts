@@ -302,6 +302,9 @@ export const IWORLD_MEMBERS = [
   { name: 'markerFor', kind: 'method' }, // read-returning (3/6)
   { name: 'setMarker', kind: 'method' },
   { name: 'clearMarker', kind: 'method' },
+  { name: 'sharedMapMarks', kind: 'method' }, // read-returning
+  { name: 'placeSharedMapMark', kind: 'method' },
+  { name: 'clearSharedMapMarks', kind: 'method' },
   { name: 'readyCheckRespond', kind: 'method' },
   { name: 'tradeRequest', kind: 'method' },
   { name: 'tradeAccept', kind: 'method' },
@@ -1031,9 +1034,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Riding ranks (PR 4390) add one method over the release: 466/140/329.
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
     // more: 471/140/331.
-    expect(IWORLD_MEMBERS.length).toBe(471);
+    expect(IWORLD_MEMBERS.length).toBe(474);
     expect(DATA_MEMBERS.length).toBe(140);
-    expect(METHOD_MEMBERS.length).toBe(331);
+    expect(METHOD_MEMBERS.length).toBe(334);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1136,6 +1139,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
+      'clearSharedMapMarks',
       'clueHunt',
       'collectDelveChestLoot',
       'combineMaterialStacks',
@@ -1350,6 +1354,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'pickUpObject',
       'placeFeast',
       'placeMobileStation',
+      'placeSharedMapMark',
       'plantCrop',
       'playCardInDuel',
       'playEmote',
@@ -1435,6 +1440,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sharedMapMarks',
       'sitOnSeat',
       'skullBagAction',
       'slotToolEffect',
@@ -1722,6 +1728,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
+      'clearSharedMapMarks',
       'collectDelveChestLoot',
       'combineMaterialStacks',
       'commendWeeklyQuest',
@@ -1878,6 +1885,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'pickUpObject',
       'placeFeast',
       'placeMobileStation',
+      'placeSharedMapMark',
       'plantCrop',
       'playCardInDuel',
       'playEmote',
@@ -1944,6 +1952,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sharedMapMarks',
       'sitOnSeat',
       'skullBagAction',
       'slotToolEffect',
@@ -2338,6 +2347,9 @@ const FACET_PARTY = [
   'markerFor',
   'setMarker',
   'clearMarker',
+  'sharedMapMarks',
+  'placeSharedMapMark',
+  'clearSharedMapMarks',
   'readyCheckRespond',
 ] as const satisfies readonly (keyof IWorldParty)[];
 type _ExhaustParty = AssertNever<Exclude<keyof IWorldParty, (typeof FACET_PARTY)[number]>>;
@@ -2887,8 +2899,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(471);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(471);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(474);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(474);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

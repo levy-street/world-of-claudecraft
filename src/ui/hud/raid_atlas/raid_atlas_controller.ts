@@ -3,8 +3,11 @@
 // floor plan. It owns its own canvas (DPR-sharp, laid over the shared map
 // canvas, which hides while the atlas shows), its chrome (page tabs, zoom
 // buttons, the pin tool, the pin editor, the legend), its input (wheel zoom
-// about the cursor, drag pan, pinch, double-click, keys, right-click pins) and
-// the player's pins (persisted per character and raid, storage wrapped).
+// about the cursor, drag pan, pinch, double-click, keys, right-click pins), the
+// player's pins (persisted per character and raid, storage wrapped) and the
+// group's shared marks (the raid world markers: IWorld.sharedMapMarks, placed
+// through IWorld and resolved by the server; raid_atlas_shared_marks.ts is
+// their chrome).
 //
 // Hud never learns any of this: InteriorMapController routes the plan paint
 // here (`show`), forwards the frame tick (`tick`) and the raid's minimap paint
@@ -22,6 +25,7 @@ import { dungeonTitleWithDifficulty } from '../../dungeon_map_painter';
 import { type DungeonMapMarker, DungeonMapViewCore } from '../../dungeon_map_view';
 import { mobDisplayName } from '../../entity_display_core';
 import { formatNumber, t } from '../../i18n';
+import { raidMarkerDisplayName } from '../../raid_marker_labels_view';
 import {
   RAID_ATLAS_BOSS_HIT_SLOP,
   raidAtlasBossAt,
@@ -43,11 +47,16 @@ import {
   drawPin,
   drawPlayerArrow,
   drawPoi,
+  drawSharedMark,
   pinIconPath,
 } from './raid_atlas_glyph_painter';
 import { raidAtlasMinimapKey } from './raid_atlas_minimap_core';
 import { RaidAtlasMinimapPainter } from './raid_atlas_minimap_painter';
-import { RaidAtlasPainter, raidAtlasBossRadius } from './raid_atlas_painter';
+import {
+  RAID_ATLAS_SHARED_MARK_PX,
+  RaidAtlasPainter,
+  raidAtlasBossRadius,
+} from './raid_atlas_painter';
 import type { RaidAtlasColors } from './raid_atlas_palette_core';
 import {
   addPin,
@@ -73,6 +82,14 @@ import {
 } from './raid_atlas_plan_core';
 import { drawBossPortraitMedallion } from './raid_atlas_portrait_glyph';
 import { RaidAtlasPortraits } from './raid_atlas_portraits';
+import { RaidAtlasSharedMarkTools } from './raid_atlas_shared_marks';
+import {
+  type RaidAtlasSharedMark,
+  sharedMarkAtScreen,
+  sharedMarkPage,
+  sharedMarksEditable,
+  sharedMarksOnAtlas,
+} from './raid_atlas_shared_marks_core';
 import {
   buildRaidAtlasFrame,
   defaultRaidAtlasFloor,
@@ -98,6 +115,8 @@ export interface RaidAtlasAnchor {
 const TAP_TOLERANCE_PX = 8;
 const PIN_HIT_PX = 15;
 const PIN_LIFT_PX = 27;
+/** Extra px round a shared mark's token that still counts as on it. */
+const SHARED_HIT_SLOP = { mouse: 4, touch: 9 } as const;
 const STORE_STYLE_KEY = 'woc.raidAtlas.pinStyle';
 const MAX_DPR = 2.5;
 const KEY_PAN_PX = 60;
@@ -186,6 +205,10 @@ export class RaidAtlasController {
     this.paint();
   });
   private bossPins: RaidAtlasBossPins | null = null;
+  private sharedTools: RaidAtlasSharedMarkTools | null = null;
+  /** The group's shared marks as last painted, and whether this player may edit them. */
+  private shared: RaidAtlasSharedMark[] = [];
+  private sharedEditable = false;
   private lastFrame: RaidAtlasFrame | null = null;
   private readonly markerView = new DungeonMapViewCore();
   private minimapKey: string | null = null;
@@ -261,6 +284,7 @@ export class RaidAtlasController {
     this.pinMode = false;
     this.closeEditor();
     this.bossPins?.close();
+    this.sharedTools?.setOpen(false);
     this.canvas?.classList.remove('is-grabbing', 'is-over-boss');
     this.syncChrome();
     this.win?.classList.remove('raid-atlas-on');
@@ -323,6 +347,7 @@ export class RaidAtlasController {
     }
     const marks = this.markerView.minimap(world, size, pxPerYard)?.markers ?? NO_MARKS;
     const pins = this.pinsFor(world, anchor.dungeonId);
+    const shared = sharedMarksOnAtlas(plan, world.sharedMapMarks());
     const lx = world.player.pos.x - anchor.originX;
     const lz = world.player.pos.z - anchor.originZ;
     const now = performance.now();
@@ -350,6 +375,7 @@ export class RaidAtlasController {
       members: frame.members,
       marks: marks.filter((m) => m.kind === 'mob' || m.kind === 'loot' || m.kind === 'gate'),
       pins: pins.map((p) => `${p.id}${p.icon[0]}${p.color[0]}`).join('.'),
+      shared,
       settled,
       plateReady: plate !== null,
     });
@@ -361,6 +387,7 @@ export class RaidAtlasController {
       frame,
       marks,
       pins,
+      shared,
       lx,
       lz,
       size,
@@ -442,6 +469,11 @@ export class RaidAtlasController {
     }
     const floor = raidAtlasFloor(plan, this.floorId);
     const floorName = t(floor.labelKey as never);
+    // Shared marks: placed by the player only where they stand in this copy.
+    this.shared = sharedMarksOnAtlas(plan, world.sharedMapMarks());
+    this.sharedEditable =
+      frame.player !== null && sharedMarksEditable(world.partyInfo, world.player.id);
+    this.sharedTools?.sync(this.sharedEditable, this.shared.length);
     this.painter.paint(ctx, {
       plan,
       floor,
@@ -451,6 +483,7 @@ export class RaidAtlasController {
       frame,
       pins: this.pins,
       selectedPin: this.selectedPin,
+      sharedMarks: this.shared,
       settled: !gliding && this.pointers.size === 0,
       title: dungeonTitleWithDifficulty(plan.dungeonId, world),
       subtitle: t('hudChrome.raidAtlas.subtitle', {
@@ -544,6 +577,7 @@ export class RaidAtlasController {
     const toolGlyph = el('canvas', 'raid-atlas-tool-glyph', this.pinToolBtn);
     this.pinToolBtn.addEventListener('click', () => {
       this.pinMode = !this.pinMode;
+      if (this.pinMode) this.sharedTools?.arm(null);
       this.syncChrome();
       if (this.pinMode) this.flash(t('hudChrome.raidAtlas.pinToolHint'));
     });
@@ -554,6 +588,21 @@ export class RaidAtlasController {
       if (this.editor?.classList.contains('is-open') && this.selectedPin === null)
         this.closeEditor();
       else this.openEditor(null);
+    });
+    this.sharedTools = new RaidAtlasSharedMarkTools(tools, chrome, {
+      armed: (symbol) => {
+        if (symbol !== null) {
+          this.pinMode = false;
+          this.flash(
+            t('hudChrome.raidAtlas.shared.placeHint', { marker: raidMarkerDisplayName(symbol) }),
+          );
+        }
+        this.syncChrome();
+      },
+      clearAll: () => {
+        this.world?.clearSharedMapMarks(null);
+        this.paint();
+      },
     });
     this.legendBtn = button('raid-atlas-legend-btn', 'hudChrome.raidAtlas.legendToggle', tools);
     this.legendBtn.textContent = t('hudChrome.raidAtlas.legendToggle');
@@ -643,6 +692,7 @@ export class RaidAtlasController {
       ['portal', (g, c) => drawPoi(g, c, 'portal', 11, 11, 8)],
       ['entrance', (g, c) => drawPoi(g, c, 'entrance', 11, 11, 8)],
       ['pin', (g, c) => drawPin(g, c, 11, 20, 16, 'star', 'gold', false)],
+      ['shared', (g, c) => drawSharedMark(g, c, 11, 11, 9, 7)],
       [
         'river',
         (g, c) => {
@@ -759,7 +809,10 @@ export class RaidAtlasController {
     }
     this.pinToolBtn?.classList.toggle('is-on', this.pinMode);
     this.pinToolBtn?.setAttribute('aria-pressed', String(this.pinMode));
-    this.canvas?.classList.toggle('is-pinning', this.pinMode);
+    this.canvas?.classList.toggle(
+      'is-pinning',
+      this.pinMode || (this.sharedTools?.armed() ?? null) !== null,
+    );
     this.paintGlyphs();
   }
 
@@ -919,6 +972,27 @@ export class RaidAtlasController {
     this.savePins();
   }
 
+  /** The shared mark under canvas point (x, y), or null. */
+  private sharedUnder(x: number, y: number, pointer: string): RaidAtlasSharedMark | null {
+    const project = this.projector();
+    if (!project) return null;
+    const unit = this.side < 420 ? 0.82 : 1;
+    const slop = pointer === 'mouse' ? SHARED_HIT_SLOP.mouse : SHARED_HIT_SLOP.touch;
+    const r = RAID_ATLAS_SHARED_MARK_PX * unit + slop;
+    return sharedMarkAtScreen(this.shared, this.floorId, project, x, y, r);
+  }
+
+  /** Send the armed shared mark to canvas point (x, y); the server resolves it. */
+  private placeSharedMark(symbol: number, x: number, y: number): void {
+    const plan = this.plan;
+    if (!plan || !this.world) return;
+    const floor = raidAtlasFloor(plan, this.floorId);
+    const span = pageSpan(floor.bounds);
+    const page = screenToPage(this.camera.current, span, this.side, x, y);
+    const at = fromPage(floor.bounds, page.u, page.v);
+    this.world.placeSharedMapMark(sharedMarkPage(plan, this.floorId), at.x, at.z, symbol);
+  }
+
   private bindInput(canvas: HTMLCanvasElement): void {
     canvas.addEventListener(
       'wheel',
@@ -1030,6 +1104,12 @@ export class RaidAtlasController {
       if (this.lastPointerType !== 'mouse') return;
       this.measure();
       const p = this.local(ev);
+      // A right-click on a shared mark removes it (for whoever may edit them).
+      const mark = this.sharedEditable ? this.sharedUnder(p.x, p.y, 'mouse') : null;
+      if (mark) {
+        this.world?.clearSharedMapMarks(mark.symbol);
+        return;
+      }
       const hit = this.pinUnder(p.x, p.y);
       if (hit) {
         this.pins = removePin(this.pins, hit.id);
@@ -1081,6 +1161,16 @@ export class RaidAtlasController {
   }
 
   private tap(x: number, y: number): void {
+    // The shared tool armed: a tap on a shared mark removes it, anywhere else
+    // places the armed symbol (the server moves it if it already stands).
+    const armed = this.sharedTools?.armed() ?? null;
+    if (armed !== null && this.sharedEditable) {
+      this.bossPins?.close();
+      const mark = this.sharedUnder(x, y, this.lastPointerType);
+      if (mark) this.world?.clearSharedMapMarks(mark.symbol);
+      else this.placeSharedMark(armed, x, y);
+      return;
+    }
     const hit = this.pinUnder(x, y);
     if (hit) {
       this.bossPins?.close();

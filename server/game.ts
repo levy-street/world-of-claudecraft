@@ -463,6 +463,7 @@ import {
 } from './entity_wire_cache';
 import { observeEventRecords } from './event_record_observers';
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
+import { dispatchMarkerCommand } from './marker_commands';
 import { recordLevelUp } from './progress_events';
 import * as questWire from './quest_command_wire';
 import * as questSnap from './quest_snapshot_wire';
@@ -475,7 +476,7 @@ import { dispatchRiftCommand } from './rift_forge_dispatch';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
 import { emitSelfScalarKeys } from './self_scalar_wire';
-import { duelWire, markersWire, tradeWire } from './self_social_wire';
+import { emitSelfSocialRows } from './self_social_wire';
 import {
   createDepthWarnedSerialWriter,
   createKeyedSerialWriter,
@@ -6948,13 +6949,12 @@ export class GameServer {
         )
           sim.assignMasterLoot(msg.rollId, msg.pids, pid);
         break;
-      // raid/target markers
+      // raid/target markers + the raid map's shared marks (server/marker_commands.ts)
       case 'setMarker':
-        if (typeof msg.id === 'number' && typeof msg.marker === 'number')
-          sim.setMarker(msg.id, msg.marker, pid);
-        break;
       case 'clearMarker':
-        if (typeof msg.id === 'number') sim.clearMarker(msg.id, pid);
+      case 'map_mark_set':
+      case 'map_mark_clear':
+        dispatchMarkerCommand(sim, command, msg, pid);
         break;
       // hunter pets
       case 'pet_abandon':
@@ -8410,10 +8410,8 @@ export class GameServer {
     maybe('offhandWeapon', p.offhandWeapon); // client derives dualWielding as !== null
     selfLap?.('self.timers');
     maybe('party', this.partyWire(anchorSession.pid));
-    // The three pure social rows live in server/self_social_wire.ts.
-    maybe('marks', markersWire(this.sim, anchorSession.pid));
-    maybe('trade', tradeWire(this.sim, anchorSession.pid));
-    maybe('duel', duelWire(this.sim, anchorSession.pid));
+    // The pure social rows (marks, mmarks, trade, duel) live in server/self_social_wire.ts.
+    emitSelfSocialRows(maybe, maybeSerialized, this.sim, anchorSession.pid);
     maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
     // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
     maybe('honor', meta.honor);

@@ -25,6 +25,7 @@ import {
   drawPin,
   drawPlayerArrow,
   drawPoi,
+  drawSharedMark,
 } from './raid_atlas_glyph_painter';
 import {
   minimapBlit,
@@ -43,6 +44,7 @@ import type { RaidAtlasPin } from './raid_atlas_pins_core';
 import { type RaidAtlasFloor, type RaidAtlasPlan, raidAtlasFloorAt } from './raid_atlas_plan_core';
 import { drawBossPortraitMedallion } from './raid_atlas_portrait_glyph';
 import type { RaidAtlasFaceSource } from './raid_atlas_portraits';
+import type { RaidAtlasSharedMark } from './raid_atlas_shared_marks_core';
 import type { RaidAtlasFrame } from './raid_atlas_view';
 
 const TAU = Math.PI * 2;
@@ -59,6 +61,7 @@ const MEDALLION_COVER = 1.6;
 const POI_R = 5;
 const MEMBER_R = 3.4;
 const PIN_PX = 13;
+const SHARED_R = 6.5;
 const MOB_R = 3.4;
 const MOB_AGGRO_R = 4.2;
 const MOB_BOSS_R = 5;
@@ -77,6 +80,8 @@ export interface RaidAtlasMinimapInput {
   /** The dungeon minimap's live marks, already in minimap px. */
   marks: readonly DungeonMapMarker[];
   pins: readonly RaidAtlasPin[];
+  /** The group's shared marks (the raid world markers), every floor. */
+  shared: readonly RaidAtlasSharedMark[];
   /** The player, instance-local (the view's centre). */
   lx: number;
   lz: number;
@@ -342,6 +347,13 @@ export class RaidAtlasMinimapPainter {
       if (inside(p.sx, p.sy, PIN_PX * 0.5)) {
         drawPin(ctx, c, p.sx, p.sy, PIN_PX, pin.icon, pin.color, false);
       }
+    }
+
+    // The group's shared marks, over the pins.
+    for (const mark of input.shared) {
+      if (mark.floor !== floor.id) continue;
+      const p = at(mark.x, mark.z);
+      if (inside(p.sx, p.sy, SHARED_R)) drawSharedMark(ctx, c, p.sx, p.sy, SHARED_R, mark.symbol);
     }
 
     // The raid in class colours.

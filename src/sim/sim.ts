@@ -854,6 +854,7 @@ export { eloDelta } from './social/arena';
 
 import type { FinderListingTag } from './content/dungeon_finder';
 import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
+import { OFFLINE_GUILD_BANK_LOG } from './offline_guild_bank_log';
 import { collectPartyInfo } from './party_frame_info';
 import { DungeonFinderMachine, type FinderConfigureArgs } from './social/dungeon_finder';
 import { seedDungeonFinderDev } from './social/dungeon_finder_dev';
@@ -1870,19 +1871,6 @@ export interface PendingMobRespawn {
 // the shape, so a counter added without a matching zero cannot ship. Re-exported
 // here so headless/env_server.ts's import stays byte-identical.
 export type { RewardCounters };
-
-// The offline guild bank log answer: a FROZEN empty ready view. Offline play
-// never has a guild (guilds live in the server social DB) and there is no
-// bank_ledger to read, so the log is empty rather than loading or refused. One
-// shared frozen instance so the inert facet arm can never be mutated by a
-// caller into a per-Sim divergence.
-const OFFLINE_GUILD_BANK_LOG: import('../world_api').GuildBankLogView = Object.freeze({
-  state: 'ready' as const,
-  kind: 'all' as const,
-  entries: Object.freeze([]) as readonly import('../world_api').GuildBankLogEntry[],
-  more: false,
-  olderPending: false,
-});
 
 // isPetClass relocated to types.ts (P1b; imported in the './types' block above). The
 // cast-toggle predicates (isFormToggle/isToggleBuff/isStealthToggle/preservesStealth/
@@ -9169,6 +9157,18 @@ export class Sim {
 
   markerFor(entityId: number): number | null {
     return this.targeting.markerFor(entityId);
+  }
+  sharedMapMarks(): readonly import('./social/shared_map_marks').SharedMapMark[] {
+    return this.targeting.mapMarks.viewFor(this.primaryId);
+  }
+  placeSharedMapMark(page: number, x: number, z: number, symbol: number, pid?: number): void {
+    this.targeting.mapMarks.place(page, x, z, symbol, pid);
+  }
+  clearSharedMapMarks(symbol: number | null, pid?: number): void {
+    this.targeting.mapMarks.clear(symbol, pid);
+  }
+  sharedMapMarksWireFor(pid: number): string {
+    return this.targeting.mapMarks.wireFor(pid);
   }
 
   // -------------------------------------------------------------------------

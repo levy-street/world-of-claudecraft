@@ -7,7 +7,8 @@
 //                 resolution, a sharp render of just the view replaces it.
 //   the marks     on top of the page and cached with it: the current area's
 //                 glow, the portals, the boss medallions, the room names (at
-//                 screen size, decluttered by zoom), the player's pins.
+//                 screen size, decluttered by zoom), the player's pins and
+//                 the group's shared marks (the raid world markers).
 //   the live      every frame: the raid's class jewels, a fighting boss's
 //                 pulse, the gilded player arrow (smooth with facing).
 //   the frame     cached per size: burnt edges, the gilded frame, the title
@@ -38,6 +39,7 @@ import {
   drawPin,
   drawPlayerArrow,
   drawPoi,
+  drawSharedMark,
 } from './raid_atlas_glyph_painter';
 import { paintRaidAtlasPage } from './raid_atlas_page_painter';
 import {
@@ -56,6 +58,7 @@ import {
 } from './raid_atlas_plan_core';
 import { drawBossHoverHalo, drawBossPortraitMedallion } from './raid_atlas_portrait_glyph';
 import type { RaidAtlasFaceSource } from './raid_atlas_portraits';
+import { type RaidAtlasSharedMark, sharedMarksKey } from './raid_atlas_shared_marks_core';
 import type { RaidAtlasFrame } from './raid_atlas_view';
 
 /** The whole-page plate's long side, device px. */
@@ -70,6 +73,8 @@ const MEMBER_PX = 6;
  *  is the largest mark on the page). */
 const BOSS_PX = 19;
 const PIN_PX = 26;
+/** A shared mark's token radius at home zoom (CSS px). */
+export const RAID_ATLAS_SHARED_MARK_PX = 12;
 const POI_PX = 9;
 /** Minor room names appear once a yard spans this many CSS px. */
 const MINOR_LABEL_SCALE = 1.45;
@@ -87,6 +92,8 @@ export interface RaidAtlasPaintInput {
   frame: RaidAtlasFrame;
   pins: readonly RaidAtlasPin[];
   selectedPin: number | null;
+  /** The group's shared marks (every floor; the page draws its own). */
+  sharedMarks: readonly RaidAtlasSharedMark[];
   /** The view is at rest (no glide, no finger down): render sharp. */
   settled: boolean;
   title: string;
@@ -241,6 +248,7 @@ export class RaidAtlasPainter {
       bosses,
       pins,
       input.selectedPin ?? '-',
+      sharedMarksKey(input.sharedMarks),
       input.faces.version,
     ].join('|');
   }
@@ -421,6 +429,12 @@ export class RaidAtlasPainter {
         pin.color,
         pin.id === input.selectedPin,
       );
+    }
+    // The group's shared marks, over the pins: they are the raid's call.
+    for (const mark of input.sharedMarks) {
+      if (mark.floor !== floor.id) continue;
+      const p = at(mark.x, mark.z);
+      drawSharedMark(ctx, colors, p.sx, p.sy, RAID_ATLAS_SHARED_MARK_PX * unit, mark.symbol);
     }
   }
 

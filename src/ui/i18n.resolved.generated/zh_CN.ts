@@ -7959,7 +7959,17 @@ export const zh_CN: EnTranslations = {
         "portal": "传送门",
         "entrance": "入口",
         "pin": "你的图钉",
+        "shared": "团队标记（共享）",
         "river": "通往守护者的光之路"
+      },
+      "shared": {
+        "tool": "团队标记",
+        "title": "团队标记",
+        "symbolsAria": "团队标记符号",
+        "placeHint": "点击地图为队伍放置{marker}。点击团队标记可将其移除。",
+        "clearAll": "全部清除",
+        "noteEditable": "队伍中的所有人都能看到这些标记。",
+        "readOnly": "只有团队领袖可以放置团队标记。"
       },
       "hintDesktop": "滚轮缩放，拖动平移，双击放大。右键点击地图放置图钉，右键点击图钉将其移除，单击图钉更改样式。",
       "hintTouch": "双指缩放，拖动平移。开启图钉工具后点击地图即可放置图钉；点击图钉可更改样式或将其移除。",

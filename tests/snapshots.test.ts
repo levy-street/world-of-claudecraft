@@ -5895,6 +5895,7 @@ const ALL_DELTA_KEYS = [
   'milestones',
   'mktU',
   'mloot',
+  'mmarks',
   'mntLesson',
   'mntOwn',
   'mntRace',
@@ -6050,6 +6051,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   milestones: 'unlockedMilestones',
   mktU: 'marketCollectPending',
   mloot: 'masterLootPrompts',
+  mmarks: 'sharedMapMarkList',
   mntLesson: 'mountLessonActive',
   mntOwn: 'ownedMounts',
   mntRace: 'mountRaceView',
@@ -6721,7 +6723,11 @@ describe('full self-state snapshot delta fixture', () => {
       // udiff is null while the group's claims match the selection, which a
       // delve-bound fixture always does; its non-null arrival is pinned in the
       // 'dungeon difficulty wire' block above.
-      if (key === 'cvault' || key === 'dgrun' || key === 'udiff') {
+      // mmarks (the raid map's shared marks) is position-exclusive the same way:
+      // marks live on the instance claim the player stands in, so a delve-bound
+      // fixture's first value is the explicit null. Its non-null arrival is
+      // pinned in tests/shared_map_marks_wire.test.ts.
+      if (key === 'cvault' || key === 'dgrun' || key === 'udiff' || key === 'mmarks') {
         expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();
         continue;
       }
@@ -7575,7 +7581,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 136 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 137 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +2: the courier's courierTravelTicks and courierLegTicks (PR 4281), for 124.
@@ -7644,8 +7650,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 125.
     // Courier vault and other-character stores add one owner delta key.
     // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
-    expect(ALL_DELTA_KEYS).toHaveLength(136);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(136);
+    // +1: the raid map's shared marks mmarks (server/self_social_wire.ts), for 137.
+    expect(ALL_DELTA_KEYS).toHaveLength(137);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(137);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7826,7 +7833,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 125.
     // Courier vault and other-character stores add one owner delta key.
     // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
-    expect(scraped.size).toBe(136);
+    // The raid map's shared marks mmarks (self_social_wire.ts) make 137.
+    expect(scraped.size).toBe(137);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

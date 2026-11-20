@@ -1862,7 +1862,9 @@ const MONOLITHS: MonolithRow[] = [
     // Membership boot wiring lives with its service factory.
     // Main ce21c7a66f5 sync: parent pins 9758 (Halloween) and 9693 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 9696,
+    // LOWERED to 9694: the raid-marker cases and the social self rows moved to
+    // server/marker_commands.ts and server/self_social_wire.ts. wc -l.
+    ceiling: 9694,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

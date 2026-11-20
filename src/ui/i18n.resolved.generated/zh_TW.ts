@@ -7959,7 +7959,17 @@ export const zh_TW: EnTranslations = {
         "portal": "傳送門",
         "entrance": "入口",
         "pin": "你的圖釘",
+        "shared": "團隊標記（共享）",
         "river": "通往守護者的光之路"
+      },
+      "shared": {
+        "tool": "團隊標記",
+        "title": "團隊標記",
+        "symbolsAria": "團隊標記符號",
+        "placeHint": "點擊地圖為隊伍放置{marker}。點擊團隊標記可將其移除。",
+        "clearAll": "全部清除",
+        "noteEditable": "隊伍中的所有人都能看到這些標記。",
+        "readOnly": "只有團隊隊長可以放置團隊標記。"
       },
       "hintDesktop": "滾輪縮放，拖曳平移，雙擊放大。右鍵點擊地圖放置圖釘，右鍵點擊圖釘將其移除，單擊圖釘變更樣式。",
       "hintTouch": "雙指縮放，拖曳平移。開啟圖釘工具後點擊地圖即可放置圖釘；點擊圖釘可變更樣式或將其移除。",

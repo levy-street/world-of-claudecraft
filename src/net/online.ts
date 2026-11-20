@@ -174,6 +174,7 @@ import {
   type ReliquaryPageCompletion,
   type ReliquaryRarity,
   type RiftFloorView,
+  type SharedMapMark,
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
@@ -281,6 +282,7 @@ import {
 import { decodeReferralCardsSnapshot } from './referral_cards_wire';
 import { type RiftStateEvent, swapMirroredRiftFloor } from './rift_floor_mirror';
 import { isInputSendBackpressured } from './send_backpressure';
+import { decodeSharedMapMarks } from './shared_map_marks_wire';
 import { snapshotAlpha } from './snapshot_alpha';
 import { applySnapshotHeadSyncs } from './snapshot_head_syncs';
 import {
@@ -1544,6 +1546,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
+  // the raid map's shared marks, from the self-wire `mmarks` (null = none in view)
+  sharedMapMarkList: readonly SharedMapMark[] = [];
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
   // group-visible choices on the open rolls (the vote strip), mirrored from the self-wire
   private lootRollGroup: LootRollGroupStatus[] = [];
@@ -3195,6 +3199,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
+      if (s.mmarks !== undefined) this.sharedMapMarkList = decodeSharedMapMarks(s.mmarks);
       // The own presentation has released the spectate hold, so preference
       // changes made while watching can now pass cmd()'s normal guard.
       if (restoreSessionPreferences) this.resendSessionPreferences();
@@ -4210,6 +4215,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   clearMarker(entityId: number): void {
     this.cmd({ cmd: 'clearMarker', id: entityId });
+  }
+  sharedMapMarks(): readonly SharedMapMark[] {
+    return this.sharedMapMarkList;
+  }
+  placeSharedMapMark(page: number, x: number, z: number, symbol: number): void {
+    this.cmd({ cmd: 'map_mark_set', page, x, z, symbol });
+  }
+  clearSharedMapMarks(symbol: number | null): void {
+    this.cmd({ cmd: 'map_mark_clear', symbol });
   }
   // --- IWorldTrade: trade-window command sends (tradeInfo is a snapshot read). ---
   tradeRequest(targetPid: number): void {

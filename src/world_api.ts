@@ -432,7 +432,12 @@ export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView, MarketSweepQuote } from './world_api/market';
 export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
 export type { MountRaceView } from './world_api/mounts';
-export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
+export type {
+  PartyInfo,
+  PartyMemberAura,
+  PartyMemberInfo,
+  SharedMapMark,
+} from './world_api/party';
 export type {
   CraftingIdentityView,
   CraftResultView,
@@ -1009,6 +1014,10 @@ export const COMMAND_NAMES = [
   'guild_buy_cosmetic',
   // Say trick or treat to an NPC (IWorldSeasonal.trickOrTreat; src/sim/seasonal/).
   'trick_or_treat',
+  // Shared raid-map marks: place or move one symbol, clear one or all
+  // (IWorldParty.placeSharedMapMark / clearSharedMapMarks; src/sim/social/shared_map_marks.ts).
+  'map_mark_set',
+  'map_mark_clear',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1213,6 +1222,9 @@ export const COMMAND_FACETS = {
   masterAssign: 'IWorldParty',
   setMarker: 'IWorldParty',
   clearMarker: 'IWorldParty',
+  // the shared raid-map marks (sharedMapMarks is the `mmarks` self-delta mirror)
+  map_mark_set: 'IWorldParty',
+  map_mark_clear: 'IWorldParty',
   readyrespond: 'IWorldParty',
   // IWorldTrade: peer-to-peer trade-window commands (tradeInfo is a snapshot read,
   // no send).

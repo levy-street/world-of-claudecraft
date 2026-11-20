@@ -15671,7 +15671,8 @@
     flex: none;
   }
   .raid-atlas-pin-tool,
-  .raid-atlas-style {
+  .raid-atlas-style,
+  .raid-atlas-shared-tool {
     width: 40px;
     height: 36px;
     padding: 0;
@@ -15679,7 +15680,8 @@
     align-items: center;
     justify-content: center;
   }
-  .raid-atlas-pin-tool.is-on {
+  .raid-atlas-pin-tool.is-on,
+  .raid-atlas-shared-tool.is-on {
     border-color: var(--color-raid-atlas-glow);
     box-shadow:
       0 0 0 1px var(--color-raid-atlas-glow),
@@ -15689,7 +15691,40 @@
     height: 36px;
     font-size: 12px;
   }
+  /* The group's raid marks: the target markers' sprites (icons.ts) on the tool
+     and the eight symbol chips, apart from the pin tool's gilded teardrops. */
+  .raid-atlas-shared-tool-glyph,
+  .raid-atlas-shared-chip-glyph {
+    width: 22px;
+    height: 22px;
+    display: block;
+    flex: none;
+    filter: drop-shadow(0 1px 1px var(--color-raid-atlas-frame-dark));
+  }
+  .raid-atlas-shared-chip:disabled .raid-atlas-shared-chip-glyph {
+    opacity: 0.55;
+  }
+  .raid-atlas-shared-row {
+    display: grid;
+    grid-template-columns: repeat(4, 34px);
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .raid-atlas-shared-note {
+    margin: 0 0 8px;
+    max-width: 220px;
+    font-size: 11px;
+    line-height: 1.35;
+    text-align: center;
+    font-style: italic;
+    color: var(--color-raid-atlas-parchment-dark);
+  }
+  .raid-atlas-shared.is-read-only .raid-atlas-shared-note {
+    color: var(--color-raid-atlas-gold-light);
+  }
   .raid-atlas-editor,
+  .raid-atlas-shared,
   .raid-atlas-legend {
     position: absolute;
     bottom: 72px;
@@ -15708,6 +15743,7 @@
     max-width: calc(100% - 40px);
   }
   .raid-atlas-editor.is-open,
+  .raid-atlas-shared.is-open,
   .raid-atlas-legend.is-open {
     display: block;
   }
@@ -16107,6 +16143,7 @@
   body.mobile-touch .raid-atlas-zoom .raid-atlas-btn,
   body.mobile-touch .raid-atlas-pin-tool,
   body.mobile-touch .raid-atlas-style,
+  body.mobile-touch .raid-atlas-shared-tool,
   body.mobile-touch .raid-atlas-legend-btn,
   body.mobile-touch .raid-atlas-chip {
     width: 40px;
@@ -16135,6 +16172,7 @@
     bottom: 58px;
   }
   body.mobile-touch .raid-atlas-editor,
+  body.mobile-touch .raid-atlas-shared,
   body.mobile-touch .raid-atlas-legend {
     bottom: 58px;
     width: calc(100% - 20px);
@@ -16142,6 +16180,12 @@
     max-height: calc(100% - 70px);
     overflow: auto;
     padding: 8px;
+  }
+  body.mobile-touch .raid-atlas-shared-row {
+    grid-template-columns: repeat(4, 40px);
+  }
+  body.mobile-touch .raid-atlas-shared-note {
+    max-width: none;
   }
   body.mobile-touch .raid-atlas-legend-row {
     font-size: 11px;

@@ -22,6 +22,8 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
 | `raid_atlas_portraits.ts` | The bosses' busts loaded once per session (and a once-made grey copy for a defeated boss); `version` moves on each load. |
 | `raid_atlas_portrait_glyph.ts` | The portrait medallion (face in a gilded rim, per state, partner medallion) and the hover halo; the crest medallion stands in until a face lands. |
 | `raid_atlas_boss_pins.ts` | DOM: the boss card (hover, tap, focus) that follows its pin each paint, and one keyboard focus stop per boss. |
+| `raid_atlas_shared_marks_core.ts` | The group's shared marks as data: wire page index to floor, the edit right (the sim's `canEditSharedMapMarks`), the hit test, the paint key. |
+| `raid_atlas_shared_marks.ts` | DOM: the shared-marks tool button and its panel (the eight raid-marker symbols, clear all, who sees them or why you cannot set them). |
 | `raid_atlas_controller.ts` | DOM adapter: its own DPR canvas, chrome, input, wrapped storage; drives the minimap paint. |
 
 ## Contracts
@@ -29,8 +31,14 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
 - No literal colour in TS: every colour is a token in `src/styles/tokens.css`.
 - The map window's own canvas hides while `#map-window.raid-atlas-on`; CSS lives in the
   `raid atlas` section of `components.css`.
-- Pins are client-side only (per character and raid). There is no shared map-marker
-  system in the sim; raid-shared marks would need a server seam first.
+- Two mark layers, never merged: the player's PINS are client-side only (per character
+  and raid, teardrops in six icons and colours), while the group's SHARED marks are the
+  raid world markers (the eight target-marker symbols on a dark gilded token), read
+  through `IWorld.sharedMapMarks` and placed through `placeSharedMapMark` /
+  `clearSharedMapMarks`. The sim owns every rule (`src/sim/social/shared_map_marks.ts`:
+  solo and party members edit, a raid only its leader; one mark per symbol per instance
+  claim; bounds, rate window, cleared on disband or a freed claim); the atlas only hides
+  the controls a player may not use. A mark's page is the floor's index in `plan.floors`.
 - A new raid joins by giving `raidAtlasPlanFor` its plan (pages, rooms, bosses, pois) and,
   if its encounters do not use the heart seal, its own boss-state source in the view.
 - The minimap never re-renders the page per paint: it crops the floor's plate, and only once

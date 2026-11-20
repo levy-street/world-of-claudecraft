@@ -327,6 +327,9 @@ const UI_PURE_CORES = [
   // The boss pins as data: faces, portrait URLs, the tooltip model, the hit
   // test that follows the camera, and the card's placement beside its pin.
   'src/ui/hud/raid_atlas/raid_atlas_boss_core.ts',
+  // The group's shared marks (the raid world markers) as data: the page index
+  // to floor mapping, the edit right (the sim's rule), the hit test, the key.
+  'src/ui/hud/raid_atlas/raid_atlas_shared_marks_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
@@ -3381,6 +3384,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/raid_atlas/raid_atlas_portraits.ts',
   // The boss card and the bosses' keyboard focus stops over the atlas.
   'src/ui/hud/raid_atlas/raid_atlas_boss_pins.ts',
+  // The shared raid marks' tool button and symbol panel over the atlas.
+  'src/ui/hud/raid_atlas/raid_atlas_shared_marks.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
   // Mounts the Cartographer's Ink map picker into #prompt-stack.
   'src/ui/hud/treasure/ink_map_picker_controller.ts',

@@ -1,10 +1,12 @@
-// The self snapshot's three pure social rows (`marks`, `trade`, `duel`),
+// The self snapshot's pure social rows (`marks`, `mmarks`, `trade`, `duel`),
 // extracted whole from server/game.ts at Masterwrought phase 12 (the monolith
 // ratchet paid for the perfect_item dispatch case). Each is a plain read over
 // the Sim's own state for ONE viewer, built per session because every row is
 // viewer-relative (my offer versus theirs, the other duelist's name); the
 // party row stays in game.ts, where it rides the per-broadcast projection
 // cache and the session map. Byte-identical to the methods they replace.
+// `mmarks` (the raid map's shared marks) is serialized once per change by the
+// Sim's store and shared by the whole group, so it rides maybeSerialized.
 
 import type { Sim } from '../src/sim/sim';
 
@@ -41,4 +43,18 @@ export function duelWire(sim: Sim, pid: number): unknown {
   if (!d) return null;
   const otherPid = d.a === pid ? d.b : d.a;
   return { otherPid, otherName: sim.meta(otherPid)?.name ?? '?', state: d.state };
+}
+
+/** Emit the social rows in their wire order through the self record's delta
+ *  writers (`maybe` stringifies; `maybeSerialized` diffs a ready string). */
+export function emitSelfSocialRows(
+  maybe: (key: string, value: unknown) => void,
+  maybeSerialized: (key: string, serialized: string) => void,
+  sim: Sim,
+  pid: number,
+): void {
+  maybe('marks', markersWire(sim, pid));
+  maybeSerialized('mmarks', sim.sharedMapMarksWireFor(pid));
+  maybe('trade', tradeWire(sim, pid));
+  maybe('duel', duelWire(sim, pid));
 }

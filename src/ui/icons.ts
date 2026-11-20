@@ -6412,6 +6412,24 @@ function drawRaidMarker(ctx: Ctx, idx: number): void {
   }
 }
 
+// The raid marker `idx` (0..7) as a cached canvas sprite (transparent, one per
+// symbol per session), for canvas painters that draw the same symbols at their
+// own size: the raid atlas's shared map marks (src/ui/hud/raid_atlas/).
+const raidMarkerSprites = new Map<number, HTMLCanvasElement>();
+export function raidMarkerSprite(idx: number): HTMLCanvasElement {
+  const cached = raidMarkerSprites.get(idx);
+  if (cached) return cached;
+  const canvas = document.createElement('canvas');
+  canvas.width = RAID_MARKER_PX * 2;
+  canvas.height = RAID_MARKER_PX * 2;
+  const ctx = getCanvas2d(canvas);
+  ctx.scale((RAID_MARKER_PX * 2) / 100, (RAID_MARKER_PX * 2) / 100);
+  ctx.translate(50, 50);
+  drawRaidMarker(ctx, idx);
+  raidMarkerSprites.set(idx, canvas);
+  return canvas;
+}
+
 // Cached transparent-background PNG data URL for raid marker `idx` (0..7).
 export function raidMarkerDataUrl(idx: number): string {
   const cached = raidMarkerCache.get(idx);
