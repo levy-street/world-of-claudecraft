@@ -12877,6 +12877,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.finalBoss.pouredHammer'
   | 'hudChrome.auraEffect.finalBoss.pouredHeat'
   | 'hudChrome.auraEffect.finalBoss.pouredQuench'
+  | 'hudChrome.auraEffect.finalBoss.rime'
   | 'hudChrome.auraEffect.finalBoss.shaken'
   | 'hudChrome.auraEffect.finalBoss.shell'
   | 'hudChrome.auraEffect.finalBoss.shield'

@@ -292,7 +292,7 @@ describe('Elemental Strike', () => {
     expect(hits(ev, ELEMENT_NAMES.heat, tank.id).length).toBeGreaterThanOrEqual(3);
   });
 
-  it('Biting Frost slows per stack; from 5 stacks every strike freezes the tank for 2 s', () => {
+  it('Biting Frost slows per stack; from 5 stacks a strike plants Hardening Frost: frozen 2 s only if still in it', () => {
     const f = finalFight(6);
     f.pullIn('quench');
     quiet(f);
@@ -304,17 +304,77 @@ describe('Elemental Strike', () => {
     expect(aura(tank, STRIKE_AURAS.quench)?.value).toBeCloseTo(1 - per, 5);
     for (let k = 0; k < 3; k++) elementalStrike(s, tank, 'quench');
     expect(aura(tank, STRIKE_AURAS.quench)?.value).toBeCloseTo(1 - 4 * per, 5);
-    expect(aura(tank, ELEMENT_AURAS.frozen)).toBeUndefined();
+    expect(f.objects(ELEMENT_OBJECTS.rimePrefix).length).toBe(0);
     elementalStrike(s, tank, 'quench');
+    // Never frozen by the strike itself: the ring is planted at its feet and
+    // its wearer carries the mark (their arrow) through the warning.
+    expect(aura(tank, ELEMENT_AURAS.frozen)).toBeUndefined();
+    expect(f.sim.ctx.isStunned(tank)).toBe(false);
+    const ring = f.objects(ELEMENT_OBJECTS.rimePrefix);
+    expect(ring.length).toBe(1);
+    expect(ring[0].scale).toBe(E.rimeR);
+    expect(aura(tank, ELEMENT_AURAS.rime)?.duration).toBe(E.rimeWarn);
+    const at = f.local(tank);
+    f.tick(sec(E.rimeWarn - 0.2));
+    expect(aura(tank, ELEMENT_AURAS.frozen)).toBeUndefined();
+    // Still standing in it as it closes: frozen solid.
+    f.put(tank, at.x, at.z);
+    f.tick(sec(0.3));
     const frozen = aura(tank, ELEMENT_AURAS.frozen);
     expect(frozen?.kind).toBe('stun');
     expect(frozen?.duration).toBe(E.freezeSeconds);
     expect(f.sim.ctx.isStunned(tank)).toBe(true);
+    expect(f.objects(ELEMENT_OBJECTS.rimePrefix).length).toBe(0);
+    expect(aura(tank, ELEMENT_AURAS.rime)).toBeUndefined();
     f.tick(sec(E.freezeSeconds + 0.1));
     expect(aura(tank, ELEMENT_AURAS.frozen)).toBeUndefined();
+    // Stepped out of the next one before it closed: never frozen.
+    f.tick(sec(1));
+    elementalStrike(s, tank, 'quench');
+    expect(f.objects(ELEMENT_OBJECTS.rimePrefix).length).toBe(1);
+    const at2 = f.local(tank);
+    f.put(tank, at2.x + E.rimeR + 1.5, at2.z);
+    f.tick(sec(E.rimeWarn + 0.2));
+    expect(aura(tank, ELEMENT_AURAS.frozen)).toBeUndefined();
+    expect(f.sim.ctx.isStunned(tank)).toBe(false);
+    expect(f.objects(ELEMENT_OBJECTS.rimePrefix).length).toBe(0);
     // The slow never passes its cap.
     for (let k = 0; k < 5; k++) elementalStrike(s, tank, 'quench');
     expect(aura(tank, STRIKE_AURAS.quench)?.value).toBeCloseTo(1 - E.frostSlowCap, 5);
+  });
+
+  it('a tank carrying stacks into the Quench is never frozen on arrival (Jose, 2026-11-20)', () => {
+    // Solo: the only tank, a full count of Searing Burn from the Heat.
+    const f = finalFight(1);
+    f.pullIn('heat');
+    quiet(f);
+    const tank = f.players[0];
+    for (let k = 0; k < 6; k++) elementalStrike(scope(f), tank, 'heat');
+    expect(strikeStacks(tank)).toEqual({ stacks: 6, vein: 'heat' });
+    // The boss drinks the Quench and its strike clock runs live again: the
+    // first strike there re-forges the stacks into frost and freezes nobody.
+    f.dev('/dev heart final quarter quench');
+    const q = heartQuarterSpot('quench');
+    f.gather(q.x, q.z, 2);
+    const st = must(f);
+    st.elements.strikeClock = 0.05;
+    const ev = hold(f, 1);
+    expect(f.state()?.zone).toBe('quench');
+    // (The six direct strikes' events flush with this tick: the frost one is
+    // the live strike.)
+    expect(hits(ev, ELEMENT_NAMES.strike, tank.id).filter((h) => h.school === 'frost').length).toBe(
+      1,
+    );
+    expect(strikeStacks(tank)).toEqual({ stacks: 7, vein: 'quench' });
+    expect(f.objects(ELEMENT_OBJECTS.rimePrefix).length).toBe(0);
+    expect(aura(tank, ELEMENT_AURAS.frozen)).toBeUndefined();
+    // The next strike (8 s on) plants the ring: the freeze is always seen
+    // coming, rimeWarn before it closes.
+    const later = hold(f, E.strikeEvery);
+    expect(hits(later, ELEMENT_NAMES.strike, tank.id).length).toBe(1);
+    expect(f.objects(ELEMENT_OBJECTS.rimePrefix).length).toBe(1);
+    expect(aura(tank, ELEMENT_AURAS.frozen)).toBeUndefined();
+    expect(aura(tank, ELEMENT_AURAS.rime)).toBeDefined();
   });
 
   it('Cracked Armor takes armour per stack, never under its floor', () => {

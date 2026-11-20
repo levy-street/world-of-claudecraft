@@ -11,7 +11,13 @@
 //                 only 30 s after the last strike, the swap's window.
 //   Heat          Searing Burn: a burn every second, per stack.
 //   Quench        Biting Frost: slower per stack; from 5 stacks every strike
-//                 freezes the tank solid for 2 s.
+//                 plants Hardening Frost at the tank's feet: a ring of frost
+//                 closing 3 s later, freezing solid (2 s) whoever still
+//                 stands in it (Jose's playtest of 2026-11-20: the old freeze
+//                 landed with the strike, so a tank carrying stacks into the
+//                 Quench froze the moment the boss arrived). Never on the
+//                 strike that re-forges older stacks into frost: a freeze is
+//                 never the first thing a quarter change does.
 //   Breath        Static Charge: magic damage taken up per stack; from 3
 //                 stacks lightning arcs every 2 s from the tank to every ally
 //                 within 6 yd (the melee spreads off the tank).
@@ -32,6 +38,7 @@ import {
   ELEMENT_NAMES,
   type ElementRules,
   frostSlow,
+  rimeTemplate,
   STRIKE_AURAS,
   strikeScale,
 } from './final_elements_ids';
@@ -41,13 +48,17 @@ import {
   auraOf,
   beamCue,
   bossTank,
+  cueAt,
   cueOn,
   damageMult,
   dropAura,
+  dropFightObject,
   type FinalScope,
   hit,
   livePlayers,
+  putMarker,
   roll,
+  spawnFightObject,
 } from './final_scope';
 
 const VEINS: readonly SmithHeartVein[] = ['heat', 'quench', 'breath', 'hammer'];
@@ -93,6 +104,8 @@ export function elementalStrike(s: FinalScope, tank: Entity, vein = strikeElemen
   const r = elementRules(s);
   const had = strikeStacks(tank);
   const stacks = Math.min(E.stackCap, had.stacks + 1);
+  // Older stacks re-forged into this element by this very strike.
+  const reforged = had.vein !== null && had.vein !== vein;
   for (const v of VEINS) if (v !== vein) dropAura(tank, STRIKE_AURAS[v]);
   const school = SCHOOL[vein];
   cueOn(s, tank, ELEMENT_CUES.strike, school);
@@ -102,7 +115,7 @@ export function elementalStrike(s: FinalScope, tank: Entity, vein = strikeElemen
   hit(s, tank, amount, ELEMENT_NAMES.strike, school);
   if (tank.dead) return stacks;
   putStack(s, tank, vein, stacks, r);
-  if (vein === 'quench' && stacks >= E.freezeAt) freeze(s, tank);
+  if (vein === 'quench' && stacks >= E.freezeAt && !reforged) layRime(s, tank);
   s.st.elements.strikes++;
   return stacks;
 }
@@ -167,6 +180,63 @@ function putStack(
       return;
     }
   }
+}
+
+/** Hardening Frost: a ring of frost planted at the tank's feet, closing
+ *  `rimeWarn` later (one at a time a tank). Exported for the tests. */
+export function layRime(s: FinalScope, tank: Entity): boolean {
+  const el = s.st.elements;
+  if (el.rimes.some((r) => r.pid === tank.id)) return false;
+  const q = at(s, tank);
+  const obj = spawnFightObject(
+    s.ctx,
+    s.inst,
+    rimeTemplate(E.rimeWarn),
+    ELEMENT_NAMES.rime,
+    q.x,
+    q.z,
+    E.rimeR,
+  );
+  el.rimes.push({ objectId: obj.id, pid: tank.id, x: q.x, z: q.z, left: E.rimeWarn });
+  putMarker(tank, ELEMENT_AURAS.rime, ELEMENT_NAMES.rime, E.rimeWarn, s.boss.id, {
+    school: 'frost',
+  });
+  return true;
+}
+
+/** One tick of the rings: each closes at its time, freezing whoever still
+ *  stands in it. Returns who froze. */
+export function stepRimes(s: FinalScope): Entity[] {
+  const el = s.st.elements;
+  if (el.rimes.length === 0) return [];
+  const frozen: Entity[] = [];
+  const keep: typeof el.rimes = [];
+  for (const r of el.rimes) {
+    r.left -= DT;
+    if (r.left > 1e-9) {
+      keep.push(r);
+      continue;
+    }
+    dropFightObject(s.ctx, s.inst, r.objectId);
+    const owner = s.ctx.entities.get(r.pid);
+    if (owner) dropAura(owner, ELEMENT_AURAS.rime);
+    cueAt(s, ELEMENT_CUES.rime, r.x, r.z, E.rimeR, 'frost');
+    for (const p of livePlayers(s)) {
+      const q = at(s, p);
+      if (Math.hypot(q.x - r.x, q.z - r.z) > E.rimeR) continue;
+      freeze(s, p);
+      frozen.push(p);
+    }
+  }
+  el.rimes = keep;
+  return frozen;
+}
+
+/** Every ring gone unclosed (the fight's end). */
+function clearRimes(s: Pick<FinalScope, 'ctx' | 'inst' | 'st'>, players: readonly Entity[]): void {
+  for (const r of s.st.elements.rimes) dropFightObject(s.ctx, s.inst, r.objectId);
+  s.st.elements.rimes = [];
+  for (const p of players) dropAura(p, ELEMENT_AURAS.rime);
 }
 
 /** Biting Frost's freeze: 2 s solid. */
@@ -240,8 +310,12 @@ export function stepStrike(s: FinalScope): number {
   return elementalStrike(s, tank);
 }
 
-/** Every strike debuff gone (the fight's end). */
-export function clearStrike(players: readonly Entity[]): void {
+/** Every strike debuff and ring gone (the fight's end). */
+export function clearStrike(
+  s: Pick<FinalScope, 'ctx' | 'inst' | 'st'>,
+  players: readonly Entity[],
+): void {
+  clearRimes(s, players);
   for (const p of players) {
     for (const v of VEINS) dropAura(p, STRIKE_AURAS[v]);
     dropAura(p, ELEMENT_AURAS.frozen);
@@ -254,6 +328,7 @@ export function freshElements(): FinalElementsState {
     strikeClock: E.strikeFirst,
     strikes: 0,
     arcClock: {},
+    rimes: [],
     pending: null,
     casting: null,
     fusions: 0,

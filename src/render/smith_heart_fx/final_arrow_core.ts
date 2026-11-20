@@ -11,7 +11,9 @@
 //   - Heroic's Ember Mark and Drawn Lightning;
 //   - part 2's Bursting Coal and Wind-Tethered;
 //   - its own elements (Jose's brief of 2026-11-19 (b)): Opposing Elements
-//     (find your opposite) and Magma Rift (a fissure erupts under you).
+//     (find your opposite), Magma Rift (a fissure erupts under you) and
+//     Hardening Frost (its ring closes at your feet: step out; Jose's
+//     playtest of 2026-11-20).
 // Elemental Strike's stacks are a tank's own debuffs (its aura bar), never an
 // arrow.
 // Crushed and Mounting Weight are a tank's own debuffs (its aura bar), never an
@@ -35,6 +37,7 @@ export const FINAL_ARROW_AURAS: readonly string[] = [
   FINAL_AURAS.drawn,
   ELEMENT_AURAS.polarity,
   ELEMENT_AURAS.magmaMark,
+  ELEMENT_AURAS.rime,
 ];
 
 /** `e`'s arrow mark (the first of FINAL_ARROW_AURAS it wears), else null. */

@@ -69,7 +69,7 @@ import {
   quarterChanged,
   stepElements,
 } from './final_elements';
-import { ELEMENT_CASTS } from './final_elements_ids';
+import { ELEMENT_AURAS, ELEMENT_CASTS } from './final_elements_ids';
 import { fusionHolds, landFusion } from './final_fusion';
 import {
   clearAnvil,
@@ -145,6 +145,7 @@ import {
   bossFree,
   cueOn,
   dropAura,
+  dropFightObject,
   type FinalScope,
   heartListeners,
   holdPlanted,
@@ -587,6 +588,29 @@ export function releaseBarForDev(ctx: SimContext, inst: InstanceSlot): void {
   clearCastIf(boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil, ELEMENT_CASTS.fusion);
 }
 
+/** A dev verb takes the bar in flight away to plant its own: the bar's own
+ *  footprint and mark go with it (a Weight of the Anvil or a Basalt Fist
+ *  left with no bar to land it would strand on the floor until the fight's
+ *  end, its mark holding the polarity rounds off). Footprints already
+ *  landed (the Molten Swells) run on. */
+function dropBarForDev(s: FinalScope): void {
+  const st = s.st;
+  st.bar = null;
+  st.gap = 0;
+  st.boltTarget = null;
+  if (st.elements.casting) {
+    st.elements.casting = null;
+    dropAura(s.boss, ELEMENT_AURAS.fusion);
+  }
+  if (st.fist) {
+    dropFightObject(s.ctx, s.inst, st.fist.objectId);
+    for (const id of st.fist.lanes) dropFightObject(s.ctx, s.inst, id);
+    st.fist = null;
+  }
+  clearAnvil(s);
+  clearCastIf(s.boss, FINAL_CASTS.fist, FINAL_CASTS.bolt, FINAL_CASTS.anvil, ELEMENT_CASTS.fusion);
+}
+
 export function finalScopeForDev(ctx: SimContext, inst: InstanceSlot): FinalScope | null {
   const boss = finalBoss(ctx, inst);
   if (!boss || !living(boss)) return null;
@@ -635,18 +659,7 @@ export function finalDevMechanic(
   const o = ctx.instanceOriginOf(inst);
   const here = me ? { x: me.pos.x - o.x, z: me.pos.z - o.z } : undefined;
   const st = s.st;
-  const clearBar = () => {
-    st.bar = null;
-    st.gap = 0;
-    st.elements.casting = null;
-    clearCastIf(
-      s.boss,
-      FINAL_CASTS.fist,
-      FINAL_CASTS.bolt,
-      FINAL_CASTS.anvil,
-      ELEMENT_CASTS.fusion,
-    );
-  };
+  const clearBar = () => dropBarForDev(s);
   switch (verb) {
     case 'fill': {
       const pct = arg2 !== undefined ? Number(arg2) : Number(arg);
@@ -751,6 +764,13 @@ export function finalDevMechanic(
       return startAnvil(s, here, me ?? undefined) ? 'Weight of the Anvil: 6 s, on you.' : null;
     case 'shell':
       return `Stone Shell on ${stoneShell(s).length} players.`;
+    case 'fusion':
+      // Its bar takes the boss's hands: the bar in flight goes first, its
+      // footprint with it (Jose's playtest of 2026-11-20: an Anvil cut by the
+      // fusion's bar was left on the floor with nothing to land it). `now`
+      // plants no bar: whatever is in flight lands as it would.
+      if (arg !== 'now' && arg2 !== 'now') clearBar();
+      return elementsDev(s, verb, arg, arg2, me);
     case 'strike':
       // Sky Strike keeps `strike pillar|here`; a bare `strike [n]` is Elemental Strike.
       if (arg === 'pillar' || arg === 'here') return skyVerb(s, arg, here);

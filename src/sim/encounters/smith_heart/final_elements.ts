@@ -6,7 +6,7 @@
 import type { SmithHeartVein } from '../../content/smith_heart_layout';
 import { HEART_QUARTER_ORDER } from '../../content/smith_heart_quarters';
 import type { Entity } from '../../types';
-import { FUSION_COMBOS, type FusionCombo } from './final_elements_ids';
+import { ELEMENT_TUNING as E, FUSION_COMBOS, type FusionCombo } from './final_elements_ids';
 import {
   clearFusion,
   fireCombo,
@@ -15,10 +15,17 @@ import {
   stepCombos,
   stepFusion,
 } from './final_fusion';
-import { clearOpposites, startOpposites, stepOpposites } from './final_opposites';
+import { clearOpposites, startOppositesForDev, stepOpposites } from './final_opposites';
 import type { FinalScope } from './final_scope';
 import { bossTank } from './final_scope';
-import { clearStrike, elementalStrike, stepStatic, stepStrike, strikeStacks } from './final_strike';
+import {
+  clearStrike,
+  elementalStrike,
+  stepRimes,
+  stepStatic,
+  stepStrike,
+  strikeStacks,
+} from './final_strike';
 
 /** One tick of its own elements: the strike and the polarity marks in the
  *  quarter fight and the final phase; the fusion's trigger in the quarter
@@ -27,6 +34,7 @@ export function stepElements(s: FinalScope): void {
   const stage = s.st.phase.stage;
   const live = stage === 'fight' || stage === 'final';
   if (live) stepStrike(s);
+  stepRimes(s);
   stepStatic(s);
   stepFusion(s);
   stepCombos(s);
@@ -50,7 +58,7 @@ export function clearElements(
 ): void {
   clearFusion(s, players);
   clearOpposites(s, players);
-  clearStrike(players);
+  clearStrike(s, players);
 }
 
 /** The pair that makes a combo (its first two quarters in the table's
@@ -108,7 +116,9 @@ export function elementsDev(
     }
     case 'opposites':
     case 'polarity': {
-      const marks = startOpposites(s);
+      const { marks, echo } = startOppositesForDev(s, me);
+      if (echo)
+        return `Opposing Elements (dev, solo): nobody else can be marked (a round never marks the boss's tank), so you carry ${marks[0].polarity} and a practice echo of ${marks[1].polarity} stands on the floor beside you: walk into it to cancel, or let ${E.polaritySeconds} s run out. Play is unchanged.`;
       return `Opposing Elements: ${marks.length} marked (${marks.map((m) => m.polarity).join(', ') || 'none'}).`;
     }
     default:

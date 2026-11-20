@@ -25806,13 +25806,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.strikeHeat':
     '灼熱の火傷：毎秒{total}の火炎ダメージを受ける（{stacks}スタックそれぞれにつき{per}）。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。ボスが立つ区画の元素のスタックを付与する。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイック：スタックごとに{heroicPer}、一撃はスタックごとに{heroicGrowth}%強化。ミシック：スタックごとに{mythicPer}、{mythicGrowth}%強化。',
   'hudChrome.auraEffect.finalBoss.strikeQuench':
-    '刺すような霜：移動速度が{pct}%低下（{stacks}スタックそれぞれにつき{per}%、最大{cap}%）。{freeze}スタック以上では一撃ごとに{frozen}秒間凍りつく。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイックとミシックではスタックごとに{heroicGrowth}%と{mythicGrowth}%強化。',
+    '刺すような霜：移動速度が{pct}%低下（{stacks}スタックそれぞれにつき{per}%、最大{cap}%）。{freeze}スタック以上では一撃ごとに足元へ固まる霜を置く：{radius}ヤードの氷の輪が{warn}秒後に閉じ、中に残った者を{frozen}秒間凍りつかせる。輪から出ること。古いスタックを霜に変える一撃では置かれない。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイックとミシックではスタックごとに{heroicGrowth}%と{mythicGrowth}%強化。',
   'hudChrome.auraEffect.finalBoss.strikeBreath':
     '静電気：受ける魔法ダメージが{pct}%増加。{from}スタック以上で、{arcEvery}秒ごとに雷があなたから{reach}ヤード以内の味方全員に走り、{arcMin}～{arcMax}の自然ダメージを与え、さらにスタックごとに{arcGrowth}%増える：レイドを{reach}ヤード離すこと。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイックの雷：{heroicArcMin}～{heroicArcMax}。ミシックの雷：{mythicArcMin}～{mythicArcMax}。',
   'hudChrome.auraEffect.finalBoss.strikeHammer':
     '砕けた鎧：アーマーが{pct}%低下（{stacks}スタックそれぞれにつき{per}%、アーマーの{floor}%未満にはならない）。{every}秒ごとにエレメンタル・ストライクがタンクに1スタック時{min}～{max}のダメージを与え、スタックごとに{growth}%増える。スタックは最後の一撃から{seconds}秒続く：{swap}スタックでもう一人のタンクにボスを渡すこと。ヒロイック：スタックごとに{heroicPer}%。ミシック：スタックごとに{mythicPer}%。',
   'hudChrome.auraEffect.finalBoss.frozen':
     '刺すような霜で凍りついた：{seconds}秒間スタン。',
+  'hudChrome.auraEffect.finalBoss.rime':
+    '固まる霜が{seconds}秒後に足元で閉じる：{radius}ヤード以内の者は{frozen}秒間凍りつく。輪から出ること。',
   'hudChrome.auraEffect.finalBoss.fusionSteam':
     '熱と焼き入れの元素融合：{seconds}秒後、入った区画に濃い灼熱の蒸気の雲が立ち昇って漂い、中にいる者を毎秒焼く。雲に入らないこと。',
   'hudChrome.auraEffect.finalBoss.fusionMagma':

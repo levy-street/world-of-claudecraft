@@ -93,6 +93,8 @@ export function finalElementsAuraEffectDescriptor(a: AuraEffectInput): AuraEffec
           cap: pct(E.frostSlowCap),
           freeze: E.freezeAt,
           frozen: E.freezeSeconds,
+          radius: E.rimeR,
+          warn: E.rimeWarn,
         },
       };
     case STRIKE_AURAS.breath:
@@ -127,6 +129,11 @@ export function finalElementsAuraEffectDescriptor(a: AuraEffectInput): AuraEffec
       };
     case ELEMENT_AURAS.frozen:
       return { key: `${KEY}.frozen`, nums: { seconds: E.freezeSeconds } };
+    case ELEMENT_AURAS.rime:
+      return {
+        key: `${KEY}.rime`,
+        nums: { seconds: E.rimeWarn, radius: E.rimeR, frozen: E.freezeSeconds },
+      };
     case ELEMENT_AURAS.fusion: {
       const from = finalZoneOf(a.value);
       const to = finalZoneOf(a.value2 ?? 0);

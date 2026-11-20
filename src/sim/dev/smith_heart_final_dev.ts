@@ -24,6 +24,8 @@
 //                               (steam, magma, firestorm, hail, avalanche,
 //                               spires; or two quarters), `now` skips the bar
 //   final opposites             Opposing Elements: a round of polarity marks
+//                               (alone: you are marked and a practice echo
+//                               of the opposite stands beside you)
 //   final wake|star <vein>      a quarter's star wakes (for the rest of the
 //                               fight) / fires now (the rework of 2026-11-18)
 //   final pillars [n|here]      Wake the Stone: n volleys, or one where you stand

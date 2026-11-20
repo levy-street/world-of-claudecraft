@@ -2698,7 +2698,13 @@ world, the marked player's own arrow and the sound.
   quarter it drank (the brief left the choice open; the last quarter keeps the four
   debuffs readable). The debuffs: **Searing Burn** (Heat: a burn every second per stack),
   **Biting Frost** (Quench: slower per stack, capped at 45 percent; from 5 stacks every
-  strike freezes the tank solid for 2 s, **Frozen Solid**), **Static Charge** (Breath:
+  strike plants **Hardening Frost** at the tank's feet, a 3.5 yd ring of frost that
+  closes 3 s later and freezes whoever still stands in it solid for 2 s, **Frozen
+  Solid**: the tank steps out, and the ring wears the tank's personal arrow and its own
+  sound. Never on the strike that re-forges older stacks into frost, so a tank carrying
+  stacks into the Quench is never frozen on arrival: Jose's playtest of 2026-11-20 found
+  the old freeze, laid by the strike itself, landing the instant the boss entered the
+  Quench), **Static Charge** (Breath:
   magic damage taken up 3 percent per stack; from 3 stacks lightning arcs every 2 s from the
   tank to every ally within 6 yd, so the melee spreads off it), **Cracked Armor** (Hammer:
   armour down per stack, never under a quarter of its own). The hit at 1 stack is 330 to
@@ -2778,7 +2784,11 @@ world, the marked player's own arrow and the sound.
   element; `strike here|pillar` stays Sky Strike's), `/dev heart final fusion <steam|magma|
   firestorm|hail|avalanche|spires> [now]` (its 3 s bar then the combo in the quarter it
   stands in; `now` skips the bar; or two quarters), `/dev heart final opposites` (a round of
-  marks now). The readout counts the strikes, the fusions and the rounds.
+  marks now; with nobody to pair, as solo, the caller is marked and a practice echo of the
+  opposite element stands on the floor beside them, so the round can be seen and cancelled
+  alone; play is unchanged). A dev verb that plants its own bar takes the bar in flight
+  away with its footprint (a Weight of the Anvil cut by `fusion` was left on the floor
+  until 2026-11-20). The readout counts the strikes, the fusions and the rounds.
 - **Tests.** `tests/smith_heart_final_elements.test.ts` (the strike's cadence, stacks,
   element, each debuff and the arc; the fusion only on a quarter change, all six pairs,
   the combos' hits, the tiers and Mythic's residue; the polarity counts, the even pairing

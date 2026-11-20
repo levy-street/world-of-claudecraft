@@ -33,7 +33,9 @@ import {
   ELEMENT_AURAS,
   ELEMENT_CUES,
   ELEMENT_NAMES,
+  echoTemplate,
   POLARITY_CODES,
+  POLARITY_ORDER,
   type Polarity,
   polaritiesCancel,
   polarityCount,
@@ -47,12 +49,15 @@ import {
   cueAt,
   cueOn,
   dropAura,
+  dropFightObject,
   type FinalScope,
   hit,
   livePlayers,
+  onFloor,
   pickPlayers,
   putMarker,
   roll,
+  spawnFightObject,
 } from './final_scope';
 import { elementRules, struckTank } from './final_strike';
 
@@ -103,17 +108,65 @@ export function startOpposites(s: FinalScope): PolarityMark[] {
 }
 
 function clearMarks(s: FinalScope): void {
-  for (const m of s.st.elements.marks) {
-    const p = s.ctx.entities.get(m.pid);
-    if (p) dropAura(p, ELEMENT_AURAS.polarity);
-  }
+  for (const m of s.st.elements.marks) dropMark(s, m);
   s.st.elements.marks = [];
 }
 
-function dropMark(s: FinalScope, m: PolarityMark): void {
+function dropMark(s: Pick<FinalScope, 'ctx' | 'inst'>, m: PolarityMark): void {
+  if (m.echo) {
+    dropFightObject(s.ctx, s.inst, m.pid);
+    return;
+  }
   const p = s.ctx.entities.get(m.pid);
   if (p) dropAura(p, ELEMENT_AURAS.polarity);
 }
+
+/** DEV ONLY (`/dev heart final opposites`): a round as play would lay it,
+ *  or, with nobody to pair (a solo caller is the boss's tank, never in the
+ *  pool), the caller marked and a practice echo of the opposite element set
+ *  on the floor `echoGap` yards off, so the whole round can be seen alone:
+ *  the sigil, the arrow, walking into the echo to cancel, or the timeout.
+ *  Never reached in play. */
+export function startOppositesForDev(
+  s: FinalScope,
+  me: Entity | null,
+): { marks: PolarityMark[]; echo: boolean } {
+  const marks = startOpposites(s);
+  if (marks.length > 0 || !me || me.dead || !s.players.includes(me)) return { marks, echo: false };
+  const el = s.st.elements;
+  const mine = POLARITY_ORDER[(el.rounds - 1) % POLARITY_ORDER.length];
+  const theirs = POLARITY_ORDER.find((q) => polaritiesCancel(mine, q)) ?? 'ice';
+  const q = at(s, me);
+  // Off to the side of the boss's line, on the floor.
+  const b = at(s, s.boss);
+  const away = Math.atan2(q.x - b.x, q.z - b.z) + Math.PI / 2;
+  const spot = onFloor(
+    { x: q.x + Math.sin(away) * ECHO_GAP, z: q.z + Math.cos(away) * ECHO_GAP },
+    3,
+  );
+  const echo = spawnFightObject(
+    s.ctx,
+    s.inst,
+    echoTemplate(theirs),
+    ELEMENT_NAMES.polarity,
+    spot.x,
+    spot.z,
+    1,
+  );
+  putMarker(me, ELEMENT_AURAS.polarity, ELEMENT_NAMES.polarity, E.polaritySeconds, s.boss.id, {
+    value: POLARITY_CODES[mine],
+    school: SCHOOL[mine],
+  });
+  el.marks = [
+    { pid: me.id, polarity: mine },
+    { pid: echo.id, polarity: theirs, echo: true },
+  ];
+  el.polarityLeft = E.polaritySeconds;
+  return { marks: el.marks, echo: true };
+}
+
+/** The dev echo's distance from its caller (yards). */
+const ECHO_GAP = 9;
 
 /** One tick of the round: the meetings, the orphans, the timeout. */
 function stepRound(s: FinalScope): void {
@@ -124,7 +177,7 @@ function stepRound(s: FinalScope): void {
   let marks = el.marks.filter((m) => {
     const p = s.ctx.entities.get(m.pid);
     const worn = !!p && !p.dead;
-    if (!worn && p) dropAura(p, ELEMENT_AURAS.polarity);
+    if (!worn) dropMark(s, m);
     return worn;
   });
   // The meetings, nearest first in id order (none through the grace).
@@ -164,7 +217,7 @@ function stepRound(s: FinalScope): void {
                 const q = at(s, p);
                 return Math.hypot(q.x - mx, q.z - mz) <= E.clashR;
               })
-            : [pa, pb];
+            : [pa, pb].filter((p) => s.players.includes(p));
         for (const p of struck)
           if (!p.dead) hit(s, p, roll(s, r.clashMin, r.clashMax), ELEMENT_NAMES.clash, 'arcane');
       }
@@ -191,7 +244,7 @@ function stepRound(s: FinalScope): void {
   el.unbalanced += marks.length;
   const raid = r.unbalancedOn === 'raid';
   for (const m of marks) {
-    const p = s.ctx.entities.get(m.pid);
+    const p = m.echo ? undefined : s.ctx.entities.get(m.pid);
     if (p) cueOn(s, p, ELEMENT_CUES.unbalanced, 'arcane');
   }
   if (raid) {
@@ -207,7 +260,7 @@ function stepRound(s: FinalScope): void {
       );
   } else
     for (const m of marks) {
-      const p = s.ctx.entities.get(m.pid);
+      const p = m.echo ? undefined : s.ctx.entities.get(m.pid);
       if (p && !p.dead)
         hit(s, p, roll(s, r.unbalancedMin, r.unbalancedMax), ELEMENT_NAMES.unbalanced, 'arcane');
     }
@@ -234,7 +287,11 @@ export function stepOpposites(s: FinalScope): void {
 }
 
 /** Every mark gone (the fight's end). */
-export function clearOpposites(s: Pick<FinalScope, 'st'>, players: readonly Entity[]): void {
+export function clearOpposites(
+  s: Pick<FinalScope, 'ctx' | 'inst' | 'st'>,
+  players: readonly Entity[],
+): void {
+  for (const m of s.st.elements.marks) if (m.echo) dropMark(s, m);
   s.st.elements.marks = [];
   s.st.elements.polarityLeft = 0;
   for (const p of players) dropAura(p, ELEMENT_AURAS.polarity);

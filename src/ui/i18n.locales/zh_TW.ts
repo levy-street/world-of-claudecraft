@@ -24487,13 +24487,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.strikeHeat':
     '灼燒：你每秒受到{total}點火焰傷害（{stacks}層中每層{per}點）。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。它會附加首領所站區域元素的一層。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄：每層{heroicPer}點，打擊每層強化{heroicGrowth}%。史詩：每層{mythicPer}點，強化{mythicGrowth}%。',
   'hudChrome.auraEffect.finalBoss.strikeQuench':
-    '刺骨冰霜：移動速度降低{pct}%（{stacks}層中每層{per}%，最多{cap}%）。達到{freeze}層後，每次打擊還會將你凍結{frozen}秒。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄和史詩中，打擊每層分别強化{heroicGrowth}%和{mythicGrowth}%。',
+    '刺骨冰霜：移動速度降低{pct}%（{stacks}層中每層{per}%，最多{cap}%）。達到{freeze}層後，每次打擊還會在你腳下佈下凝結寒霜：一個{radius}碼的冰環，{warn}秒後閉合，將仍在其中的人凍結{frozen}秒。離開冰環。將舊層數轉化為冰霜的那一擊不會佈下它。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄和史詩中，打擊每層分别強化{heroicGrowth}%和{mythicGrowth}%。',
   'hudChrome.auraEffect.finalBoss.strikeBreath':
     '靜電：受到的法術傷害提高{pct}%。達到{from}層後，閃電每{arcEvery}秒從你身上躍向{reach}碼內的所有盟友，造成{arcMin}到{arcMax}點自然傷害，之後每層再提高{arcGrowth}%：讓團隊離你{reach}碼以外。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄閃電：{heroicArcMin}到{heroicArcMax}。史詩閃電：{mythicArcMin}到{mythicArcMax}。',
   'hudChrome.auraEffect.finalBoss.strikeHammer':
     '碎裂護甲：護甲降低{pct}%（{stacks}層中每層{per}%，不會低於你護甲的{floor}%）。每{every}秒，元素打擊對坦克造成1層時{min}到{max}點傷害，每層提高{growth}%。層數在最後一擊後持續{seconds}秒：達到{swap}層時，讓另一名坦克接手首領。英雄：每層{heroicPer}%。史詩：每層{mythicPer}%。',
   'hudChrome.auraEffect.finalBoss.frozen':
     '被刺骨冰霜凍結：昏迷{seconds}秒。',
+  'hudChrome.auraEffect.finalBoss.rime':
+    '凝結寒霜將在{seconds}秒後於你腳下閉合：{radius}碼內的所有人被凍結{frozen}秒。離開冰環。',
   'hudChrome.auraEffect.finalBoss.fusionSteam':
     '熾熱與淬火的元素融合：{seconds}秒後，濃密的灼熱蒸汽雲在它進入的區域升起并四處飄盪，每秒灼傷雲中的人。远離雲團。',
   'hudChrome.auraEffect.finalBoss.fusionMagma':

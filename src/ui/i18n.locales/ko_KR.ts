@@ -25810,13 +25810,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.strikeHeat':
     '작열하는 화상: 매초 {total}의 화염 피해를 받습니다({stacks}중첩마다 {per}). {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 우두머리가 서 있는 구역의 원소 중첩을 부여합니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅: 중첩마다 {heroicPer}, 일격은 중첩마다 {heroicGrowth}% 강화. 신화: 중첩마다 {mythicPer}, {mythicGrowth}% 강화.',
   'hudChrome.auraEffect.finalBoss.strikeQuench':
-    '살을 에는 서리: 이동 속도가 {pct}% 감소합니다({stacks}중첩마다 {per}%, 최대 {cap}%). {freeze}중첩부터는 일격마다 {frozen}초 동안 얼어붙습니다. {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅과 신화에서는 중첩마다 {heroicGrowth}%와 {mythicGrowth}% 강화됩니다.',
+    '살을 에는 서리: 이동 속도가 {pct}% 감소합니다({stacks}중첩마다 {per}%, 최대 {cap}%). {freeze}중첩부터는 일격마다 발밑에 굳어가는 서리를 남깁니다: {radius}야드 얼음 고리가 {warn}초 후 닫히며 안에 남은 대상을 {frozen}초 동안 얼립니다. 고리 밖으로 나가세요. 기존 중첩을 서리로 바꾸는 일격은 이를 남기지 않습니다. {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅과 신화에서는 중첩마다 {heroicGrowth}%와 {mythicGrowth}% 강화됩니다.',
   'hudChrome.auraEffect.finalBoss.strikeBreath':
     '정전기: 받는 마법 피해가 {pct}% 증가합니다. {from}중첩부터 {arcEvery}초마다 번개가 당신에게서 {reach}미터 내 모든 아군에게 튀어 {arcMin}~{arcMax}의 자연 피해를 주며, 추가 중첩마다 {arcGrowth}% 강해집니다: 공격대를 {reach}미터 떨어뜨리세요. {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅 번개: {heroicArcMin}~{heroicArcMax}. 신화 번개: {mythicArcMin}~{mythicArcMax}.',
   'hudChrome.auraEffect.finalBoss.strikeHammer':
     '갈라진 갑옷: 방어도가 {pct}% 감소합니다({stacks}중첩마다 {per}%, 방어도의 {floor}% 아래로는 내려가지 않음). {every}초마다 원소 일격이 방어 전담에게 1중첩일 때 {min}~{max}의 피해를 주며, 중첩마다 {growth}% 강해집니다. 중첩은 마지막 일격 후 {seconds}초 동안 지속됩니다: {swap}중첩이 되면 다른 방어 전담에게 우두머리를 넘기세요. 영웅: 중첩마다 {heroicPer}%. 신화: 중첩마다 {mythicPer}%.',
   'hudChrome.auraEffect.finalBoss.frozen':
     '살을 에는 서리에 꽁꽁 얼어붙음: {seconds}초 동안 기절.',
+  'hudChrome.auraEffect.finalBoss.rime':
+    '굳어가는 서리가 {seconds}초 후 발밑에서 닫힙니다: {radius}야드 안의 모든 대상이 {frozen}초 동안 얼어붙습니다. 고리 밖으로 나가세요.',
   'hudChrome.auraEffect.finalBoss.fusionSteam':
     '열기와 담금질의 원소 융합: {seconds}초 후 들어간 구역에 짙은 끓는 증기 구름이 피어올라 떠다니며, 안에 있는 자를 매초 태웁니다. 구름 밖에 있으세요.',
   'hudChrome.auraEffect.finalBoss.fusionMagma':

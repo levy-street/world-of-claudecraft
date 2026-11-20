@@ -58,8 +58,12 @@ export const STRIKE_AURAS: Readonly<Record<SmithHeartVein, string>> = {
 };
 
 export const ELEMENT_AURAS = {
-  /** Biting Frost's fifth stack: frozen solid (a stun). */
+  /** Biting Frost's fifth stack: frozen solid (a stun), when its Hardening
+   *  Frost closes on whoever still stands in it. */
   frozen: 'heart_final_strike_frozen',
+  /** Hardening Frost: the tank whose Biting Frost reached the freeze wears it
+   *  through the ring's warning (their arrow: step out). */
+  rime: 'heart_final_rime_mark',
   /** On the boss through the fusion's bar: `value` the quarter it left,
    *  `value2` the one it entered (FINAL_ZONE_CODES). */
   fusion: 'heart_final_fusion',
@@ -151,6 +155,13 @@ export const ELEMENT_OBJECTS = {
   spirePrefix: 'sh_final_spire_',
   /** Mythic's lingering residue: `<prefix><fire|frost|storm|stone>`. */
   residuePrefix: 'sh_final_residue_',
+  /** Hardening Frost's ring, planted at the tank's feet: `<prefix><tenths>`
+   *  of warning (timed). */
+  rimePrefix: 'sh_final_rime_',
+  /** DEV ONLY (`/dev heart final opposites` with nobody to pair): a practice
+   *  echo of the opposite element standing on the floor,
+   *  `<prefix><POLARITY_CODES code>`. Never laid in play. */
+  echoPrefix: 'sh_final_polarity_echo_',
 } as const;
 
 /** The spellfx moments. */
@@ -161,6 +172,8 @@ export const ELEMENT_CUES = {
   staticArc: 'heart_final_static_arc',
   /** Biting Frost freezes the tank solid (spellfx 'nova'). */
   frozen: 'heart_final_frozen_solid',
+  /** Hardening Frost's ring closes (spellfxAt, its radius). */
+  rime: 'heart_final_rime_close',
   /** The fusion's bar begins (spellfx 'nova' on the boss). */
   fusionStart: 'heart_final_fusion_start',
   /** The fusion lands: its combo begins (spellfx 'nova' on the boss). */
@@ -196,6 +209,7 @@ export const ELEMENT_NAMES = {
   breath: 'Static Charge',
   hammer: 'Cracked Armor',
   frozen: 'Frozen Solid',
+  rime: 'Hardening Frost',
   fusion: 'Elemental Fusion',
   steam: 'Scalding Steam',
   magma: 'Magma Rift',
@@ -426,6 +440,13 @@ export const ELEMENT_TUNING = {
   frostSlowCap: 0.45,
   freezeAt: 5,
   freezeSeconds: 2,
+  /** Hardening Frost (Jose's playtest of 2026-11-20: the freeze landed at
+   *  once as the boss entered the Quench): from `freezeAt` a strike plants a
+   *  ring of frost this wide at the tank's feet, closing this long later on
+   *  whoever still stands in it. Never on the strike that re-forges older
+   *  stacks into Biting Frost. */
+  rimeR: 3.5,
+  rimeWarn: 3,
   /** Static Charge: from this many stacks it arcs every `arcEvery` to every
    *  ally within `arcReach` of the tank. */
   arcFrom: 3,
@@ -616,6 +637,26 @@ export function residueOf(templateId: string): 'fire' | 'frost' | 'storm' | 'sto
   if (!templateId.startsWith(ELEMENT_OBJECTS.residuePrefix)) return null;
   const s = templateId.slice(ELEMENT_OBJECTS.residuePrefix.length);
   return s === 'fire' || s === 'frost' || s === 'storm' || s === 'stone' ? s : null;
+}
+
+/** Hardening Frost's ring (timed). */
+export function rimeTemplate(seconds: number): string {
+  return `${ELEMENT_OBJECTS.rimePrefix}${tenths(seconds)}`;
+}
+export function rimeOf(templateId: string): number | null {
+  if (!templateId.startsWith(ELEMENT_OBJECTS.rimePrefix)) return null;
+  const t = Number(templateId.slice(ELEMENT_OBJECTS.rimePrefix.length));
+  return Number.isInteger(t) && t >= 0 ? t / 10 : null;
+}
+
+/** A dev practice echo (its polarity), or null. */
+export function echoTemplate(p: Polarity): string {
+  return `${ELEMENT_OBJECTS.echoPrefix}${POLARITY_CODES[p]}`;
+}
+export function echoOf(templateId: string): Polarity | null {
+  if (!templateId.startsWith(ELEMENT_OBJECTS.echoPrefix)) return null;
+  const c = Number(templateId.slice(ELEMENT_OBJECTS.echoPrefix.length));
+  return Number.isInteger(c) && c >= 0 && c < 4 ? POLARITY_ORDER[c] : null;
 }
 
 /** A hailstone's spot (timed). */

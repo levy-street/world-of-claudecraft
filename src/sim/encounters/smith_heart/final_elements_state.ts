@@ -70,10 +70,22 @@ export interface Hailstone {
   left: number;
 }
 
-/** A player's polarity mark. */
+/** Hardening Frost's ring at a tank's feet, closing. */
+export interface RimeRing {
+  objectId: number;
+  /** The tank it was planted for (their mark). */
+  pid: number;
+  x: number;
+  z: number;
+  left: number;
+}
+
+/** A player's polarity mark (`echo`: DEV ONLY, the mark is a practice echo
+ *  object standing on the floor, never a player). */
 export interface PolarityMark {
   pid: number;
   polarity: Polarity;
+  echo?: true;
 }
 
 export interface FinalElementsState {
@@ -82,6 +94,8 @@ export interface FinalElementsState {
   strikes: number;
   /** Static Charge's arc clock (per tank id). */
   arcClock: Record<number, number>;
+  /** Hardening Frost's rings closing. */
+  rimes: RimeRing[];
   // -- Elemental Fusion --
   /** A fusion waiting for the boss to be free: the quarter it left and the
    *  one it entered. */

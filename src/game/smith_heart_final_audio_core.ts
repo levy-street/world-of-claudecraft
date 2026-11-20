@@ -175,6 +175,11 @@ export const FINAL_CUE_SOUNDS: Readonly<Record<string, readonly FinalSound[]>> =
   ],
   [ELEMENT_CUES.staticArc]: [S('heart_breath_fork', 0.5, 'target', 1.3, 0.15)],
   [ELEMENT_CUES.frozen]: [S('heart_quench_freeze', 0.9, 'target', 1, 0.5)],
+  // Hardening Frost closing on its ring: the ice snapping shut.
+  [ELEMENT_CUES.rime]: [
+    S('heart_quench_crack', 0.8, 'point', 0.8, 0.3),
+    S('impact_frost', 0.5, 'point', 0.9, 0.3),
+  ],
   // Elemental Fusion: its two elements gathered, then the combo let loose.
   [ELEMENT_CUES.fusionStart]: [S(F('pour'), 0.85, 'source', 1.1, 1)],
   [ELEMENT_CUES.fusion]: [
@@ -274,7 +279,8 @@ export type FinalFootprintKind =
   | 'avalancheWarn'
   | 'hail'
   | 'spireCharge'
-  | 'lava';
+  | 'lava'
+  | 'rime';
 
 /** The WARNING a footprint sounds as it appears (null: its cue or bar speaks). */
 export const FINAL_FOOTPRINT_SOUNDS: Readonly<
@@ -290,6 +296,9 @@ export const FINAL_FOOTPRINT_SOUNDS: Readonly<
   hail: { key: 'proj_frost', gain: 0.35, rate: 1.2 },
   spireCharge: { key: 'heart_council_pillar_rise', gain: 0.85, rate: 1.1 },
   lava: { key: 'rift_lava_tick', gain: 0.5, rate: 0.9 },
+  // Hardening Frost planted at the tank's feet: the ice groaning as it
+  // starts to close (Jose's playtest of 2026-11-20: warned, never sudden).
+  rime: { key: 'heart_quench_wake_charge', gain: 0.9, rate: 1.15 },
 };
 
 /** The Overload's WARNING: the active bar passing `at` percent (rearmed once

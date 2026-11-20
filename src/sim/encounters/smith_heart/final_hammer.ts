@@ -168,6 +168,13 @@ export function startAnvil(s: FinalScope, forced?: FPoint, forcedOn?: Entity): b
 export function stepAnvil(s: FinalScope): void {
   const a = s.st.anvil;
   if (!a) return;
+  // Its bar is what lands it: a mark whose bar is gone (taken by another bar)
+  // can never fall, so it goes rather than strand on the floor (Jose's
+  // playtest of 2026-11-20).
+  if (s.st.bar?.castId !== FINAL_CASTS.anvil) {
+    clearAnvil(s);
+    return;
+  }
   a.left = Math.max(0, a.left - DT);
   let spot: FPoint;
   if (s.rules.rotatingAnvil) {
