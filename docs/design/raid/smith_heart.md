@@ -2743,15 +2743,21 @@ world, the marked player's own arrow and the sound.
   within 12 s, so it never overlaps the Fusion or the Anvil), living NON-TANK players (never
   the boss's tank nor a player carrying Elemental Strike) are marked for 10 s: **Fire**,
   **Ice**, **Earth** or **Lightning**. Fire and Ice are opposites; Earth and Lightning are
-  opposites. Always an even count in matching opposite pairs: 4 on Normal (2 pairs), 6 on
-  Heroic, 8 (every non-tank) on Mythic; with an odd number of free players one is left
-  unmarked, so nobody is ever without a possible partner. A marked player who comes within
+  opposites. Always an even count in matching opposite pairs: 4 on Normal (2 pairs); on
+  Heroic and Mythic EVERY living non-tank (the manager's feedback of 2026-11-20; 8 in a
+  ten-player raid); with an odd number of free players exactly one is left unmarked, so
+  nobody is ever without a possible partner. A marked player who comes within
   3 yd of one of the OPPOSITE element cancels both marks in a white-gold burst. Meeting any
   other mark explodes, after a 1.5 s grace in which no meeting counts (players marked side by side step apart first; the bot raid of 2026-11-19 clashed on the first tick) (**Clashing Elements**: 299-334 to both on Normal, 528-583 to both on
   Heroic, 910-1,014 to everyone within 8 yd on Mythic). A mark whose every possible partner
-  is gone (dead or spent in a clash) fades quietly. Still worn at 10 s (**Unbalanced
-  Elements**): 598-667 on its player alone (Normal), 330-374 on the whole raid (Heroic),
-  676-754 on the whole raid (Mythic), half as much again for each other mark left. NO
+  is gone (its partner died, or was spent in a clash) is cleared harmlessly at once, never
+  a clash and never a timeout; while another mark of the opposite element still stands
+  (Heroic and Mythic have several of each) the survivor keeps its mark and pairs with it. Still worn at 10 s (**Unbalanced
+  Elements**): 598-667 on its player alone (Normal); on the whole raid ONCE PER FAILED
+  PAIR (the marks left, two to a pair, rounded up) on Heroic (330-374) and Mythic
+  (884-923). Sized on the real level-20 pools (cloth about 1,040-1,140, plate tanks about
+  1,670-1,740): on Mythic one failed pair leaves a healthy raid alive and hurting, two
+  (about 1,770-1,850) wipe it, tanks included. NO
   tether between partners (Jose: no). Each element reads by SHAPE as well as colour, on
   every graphics tier (actionable): Fire a flame sigil over the head and flames rising from
   the feet (orange), Ice a snowflake sigil, frost crystals round the body and cold mist

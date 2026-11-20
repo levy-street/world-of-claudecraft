@@ -265,7 +265,8 @@ export interface ElementRules {
   clashReach: 'pair' | 'around';
   clashMin: number;
   clashMax: number;
-  /** A mark uncancelled at its end: on its player alone, or on the raid. */
+  /** A mark uncancelled at its end: on its player alone, or on the raid
+   *  once per FAILED PAIR (the marks left, two to a pair, rounded up). */
   unbalancedOn: 'player' | 'raid';
   unbalancedMin: number;
   unbalancedMax: number;
@@ -348,7 +349,9 @@ export const ELEMENT_DIFFICULTY: Readonly<Record<FinalDifficulty, ElementRules>>
     spireMin: 430,
     spireMax: 480,
     residue: false,
-    polarityMarks: 6,
+    // Every living non-tank (the manager's feedback of 2026-11-20), always
+    // an even count: polarityCount drops an odd one out.
+    polarityMarks: 40,
     clashReach: 'pair',
     clashMin: 480,
     clashMax: 530,
@@ -390,13 +393,17 @@ export const ELEMENT_DIFFICULTY: Readonly<Record<FinalDifficulty, ElementRules>>
     spireMin: 560,
     spireMax: 620,
     residue: true,
-    polarityMarks: 8,
+    polarityMarks: 40,
     clashReach: 'around',
     clashMin: 700,
     clashMax: 780,
     unbalancedOn: 'raid',
-    unbalancedMin: 520,
-    unbalancedMax: 580,
+    // Per FAILED PAIR on the whole raid (the manager's feedback of
+    // 2026-11-20): at Mythic's x1.3 about 884-923, so one failed pair leaves
+    // a level-20 cloth pool (about 1,040-1,140) alive and hurting, and two
+    // (about 1,770-1,850) kill even a plate tank (about 1,670-1,740).
+    unbalancedMin: 680,
+    unbalancedMax: 710,
   },
 };
 

@@ -24490,13 +24490,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.magmaMark':
     '岩浆裂隙：{seconds}秒后，裂缝在你脚下喷发，对{radius}码内的所有人造成{min}到{max}点火焰伤害，并留下燃烧{life}秒的熔岩池（每秒{poolMin}到{poolMax}点火焰伤害）。在喷发前远离团队。英雄：{heroicMin}到{heroicMax}。史诗：{mythicMin}到{mythicMax}。',
   'hudChrome.auraEffect.finalBoss.polarityFire':
-    '对立元素，火焰：触碰带有寒冰标记的玩家（{meet}码内）即可消除双方的标记。触碰其他任何标记会爆炸，对你们两人造成{min}到{max}点奥术伤害（史诗中为{clash}码内所有人）。{seconds}秒内未消除：普通难度对你造成{lateMin}到{lateMax}点奥术伤害；英雄（{heroicLateMin}到{heroicLateMax}）和史诗（{mythicLateMin}到{mythicLateMax}）中对整个团队造成伤害，每多剩一个其他标记再提高一半。',
+    '对立元素，火焰：触碰带有寒冰标记的玩家（{meet}码内）即可消除双方的标记。触碰其他任何标记会爆炸，对你们两人造成{min}到{max}点奥术伤害（史诗中为{clash}码内所有人）。{seconds}秒内未消除：普通难度对你造成{lateMin}到{lateMax}点奥术伤害；英雄（{heroicLateMin}到{heroicLateMax}）和史诗（{mythicLateMin}到{mythicLateMax}）中对整个团队造成伤害，每有一对未消除的标记就造成一次。',
   'hudChrome.auraEffect.finalBoss.polarityIce':
-    '对立元素，寒冰：触碰带有火焰标记的玩家（{meet}码内）即可消除双方的标记。触碰其他任何标记会爆炸，对你们两人造成{min}到{max}点奥术伤害（史诗中为{clash}码内所有人）。{seconds}秒内未消除：普通难度对你造成{lateMin}到{lateMax}点奥术伤害；英雄（{heroicLateMin}到{heroicLateMax}）和史诗（{mythicLateMin}到{mythicLateMax}）中对整个团队造成伤害，每多剩一个其他标记再提高一半。',
+    '对立元素，寒冰：触碰带有火焰标记的玩家（{meet}码内）即可消除双方的标记。触碰其他任何标记会爆炸，对你们两人造成{min}到{max}点奥术伤害（史诗中为{clash}码内所有人）。{seconds}秒内未消除：普通难度对你造成{lateMin}到{lateMax}点奥术伤害；英雄（{heroicLateMin}到{heroicLateMax}）和史诗（{mythicLateMin}到{mythicLateMax}）中对整个团队造成伤害，每有一对未消除的标记就造成一次。',
   'hudChrome.auraEffect.finalBoss.polarityEarth':
-    '对立元素，大地：触碰带有闪电标记的玩家（{meet}码内）即可消除双方的标记。触碰其他任何标记会爆炸，对你们两人造成{min}到{max}点奥术伤害（史诗中为{clash}码内所有人）。{seconds}秒内未消除：普通难度对你造成{lateMin}到{lateMax}点奥术伤害；英雄（{heroicLateMin}到{heroicLateMax}）和史诗（{mythicLateMin}到{mythicLateMax}）中对整个团队造成伤害，每多剩一个其他标记再提高一半。',
+    '对立元素，大地：触碰带有闪电标记的玩家（{meet}码内）即可消除双方的标记。触碰其他任何标记会爆炸，对你们两人造成{min}到{max}点奥术伤害（史诗中为{clash}码内所有人）。{seconds}秒内未消除：普通难度对你造成{lateMin}到{lateMax}点奥术伤害；英雄（{heroicLateMin}到{heroicLateMax}）和史诗（{mythicLateMin}到{mythicLateMax}）中对整个团队造成伤害，每有一对未消除的标记就造成一次。',
   'hudChrome.auraEffect.finalBoss.polarityLightning':
-    '对立元素，闪电：触碰带有大地标记的玩家（{meet}码内）即可消除双方的标记。触碰其他任何标记会爆炸，对你们两人造成{min}到{max}点奥术伤害（史诗中为{clash}码内所有人）。{seconds}秒内未消除：普通难度对你造成{lateMin}到{lateMax}点奥术伤害；英雄（{heroicLateMin}到{heroicLateMax}）和史诗（{mythicLateMin}到{mythicLateMax}）中对整个团队造成伤害，每多剩一个其他标记再提高一半。',
+    '对立元素，闪电：触碰带有大地标记的玩家（{meet}码内）即可消除双方的标记。触碰其他任何标记会爆炸，对你们两人造成{min}到{max}点奥术伤害（史诗中为{clash}码内所有人）。{seconds}秒内未消除：普通难度对你造成{lateMin}到{lateMax}点奥术伤害；英雄（{heroicLateMin}到{heroicLateMax}）和史诗（{mythicLateMin}到{mythicLateMax}）中对整个团队造成伤害，每有一对未消除的标记就造成一次。',
   'hudChrome.auraEffect.finalBoss.underIce': '昏迷：你从碎裂的冰面掉了下去。',
   'hudChrome.auraEffect.finalBoss.numbing': '被它的正面攻击减速{pct}%，持续{seconds}秒。',
   'hudChrome.auraEffect.finalBoss.ember':

@@ -25828,13 +25828,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.magmaMark':
     'マグマの裂け目：{seconds}秒後、あなたの足元で裂け目が噴き出し、{radius}ヤード以内の全員に{min}～{max}の火炎ダメージを与え、{life}秒燃える溶岩の池を残す（毎秒{poolMin}～{poolMax}の火炎ダメージ）。噴き出す前にレイドから離れること。ヒロイック：{heroicMin}～{heroicMax}。ミシック：{mythicMin}～{mythicMax}。',
   'hudChrome.auraEffect.finalBoss.polarityFire':
-    '対立する元素、火：氷の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、残った他の印ごとに1.5倍になる。',
+    '対立する元素、火：氷の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、キャンセルされなかったペアごとに1回与える。',
   'hudChrome.auraEffect.finalBoss.polarityIce':
-    '対立する元素、氷：火の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、残った他の印ごとに1.5倍になる。',
+    '対立する元素、氷：火の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、キャンセルされなかったペアごとに1回与える。',
   'hudChrome.auraEffect.finalBoss.polarityEarth':
-    '対立する元素、大地：雷の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、残った他の印ごとに1.5倍になる。',
+    '対立する元素、大地：雷の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、キャンセルされなかったペアごとに1回与える。',
   'hudChrome.auraEffect.finalBoss.polarityLightning':
-    '対立する元素、雷：大地の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、残った他の印ごとに1.5倍になる。',
+    '対立する元素、雷：大地の印を持つプレイヤーに触れると（{meet}ヤード以内）両方の印が消える。他の印に触れると爆発し、二人に{min}～{max}の秘術ダメージを与える（ミシックでは{clash}ヤード以内の全員）。{seconds}秒以内に消せなければ：ノーマルではあなたに{lateMin}～{lateMax}の秘術ダメージ、ヒロイック（{heroicLateMin}～{heroicLateMax}）とミシック（{mythicLateMin}～{mythicLateMax}）ではレイド全体に与え、キャンセルされなかったペアごとに1回与える。',
   'hudChrome.auraEffect.finalBoss.underIce': 'スタン中：割れた氷から落ちた。',
   'hudChrome.auraEffect.finalBoss.numbing': '正面攻撃により、{seconds}秒間移動速度が{pct}%低下。',
   'hudChrome.auraEffect.finalBoss.ember':

@@ -25832,13 +25832,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.finalBoss.magmaMark':
     '마그마 균열: {seconds}초 후 당신의 발밑에서 균열이 분출하여 {radius}미터 내 모두에게 {min}~{max}의 화염 피해를 주고, {life}초 동안 타오르는 용암 웅덩이를 남깁니다(매초 {poolMin}~{poolMax}의 화염 피해). 분출하기 전에 공격대에서 멀어지세요. 영웅: {heroicMin}~{heroicMax}. 신화: {mythicMin}~{mythicMax}.',
   'hudChrome.auraEffect.finalBoss.polarityFire':
-    '대립하는 원소, 화염: 얼음 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 남은 다른 표식마다 1.5배가 됩니다.',
+    '대립하는 원소, 화염: 얼음 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 취소되지 않은 짝마다 한 번씩 줍니다.',
   'hudChrome.auraEffect.finalBoss.polarityIce':
-    '대립하는 원소, 얼음: 화염 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 남은 다른 표식마다 1.5배가 됩니다.',
+    '대립하는 원소, 얼음: 화염 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 취소되지 않은 짝마다 한 번씩 줍니다.',
   'hudChrome.auraEffect.finalBoss.polarityEarth':
-    '대립하는 원소, 대지: 번개 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 남은 다른 표식마다 1.5배가 됩니다.',
+    '대립하는 원소, 대지: 번개 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 취소되지 않은 짝마다 한 번씩 줍니다.',
   'hudChrome.auraEffect.finalBoss.polarityLightning':
-    '대립하는 원소, 번개: 대지 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 남은 다른 표식마다 1.5배가 됩니다.',
+    '대립하는 원소, 번개: 대지 표식을 지닌 플레이어에게 닿으면({meet}미터 이내) 두 표식이 모두 사라집니다. 다른 표식에 닿으면 폭발하여 두 사람에게 {min}~{max}의 비전 피해를 줍니다(신화에서는 {clash}미터 내 모두). {seconds}초 안에 없애지 못하면: 일반에서는 당신에게 {lateMin}~{lateMax}의 비전 피해, 영웅({heroicLateMin}~{heroicLateMax})과 신화({mythicLateMin}~{mythicLateMax})에서는 공격대 전체에 주며, 취소되지 않은 짝마다 한 번씩 줍니다.',
   'hudChrome.auraEffect.finalBoss.underIce': '기절 상태: 깨지는 얼음 아래로 떨어졌습니다.',
   'hudChrome.auraEffect.finalBoss.numbing':
     '정면 공격으로 {seconds}초 동안 이동 속도가 {pct}% 감소합니다.',

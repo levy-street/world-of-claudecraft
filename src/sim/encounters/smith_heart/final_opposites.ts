@@ -5,9 +5,10 @@
 //                marks living NON-TANK players (never its tank, never a
 //                player carrying Elemental Strike), each with an element:
 //                Fire and Ice are opposites, Earth and Lightning. Always an
-//                even count in matching opposite pairs (4 on Normal, 6 on
-//                Heroic, 8 = every non-tank on Mythic); an odd player out is
-//                left unmarked.
+//                even count in matching opposite pairs (4 on Normal; EVERY
+//                living non-tank on Heroic and Mythic, the manager's feedback
+//                of 2026-11-20); with an odd count one player is left
+//                unmarked, so nobody is ever without a possible partner.
 //   Grace        no meeting counts for the first 1.5 s (players marked side
 //                by side step apart first).
 //   Cancel       a marked player who comes within 3 yd of one of the
@@ -15,11 +16,12 @@
 //   Clash        within 3 yd of any other mark (the same element, or the
 //                other pair's): an explosion (both on Normal and Heroic;
 //                everyone within 8 yd on Mythic), both marks gone.
-//   Timeout      a mark still worn after 10 s: on its player (Normal), the
-//                raid (Heroic), harder on the raid (Mythic).
-//   Orphans      a mark whose every possible partner is gone (dead, or
-//                spent in a clash) fades quietly: nobody is ever left with no
-//                partner to find.
+//   Timeout      a mark still worn after 10 s: on its player (Normal); on
+//                the raid once per failed pair (Heroic; Mythic hard enough
+//                that two failed pairs wipe a healthy raid).
+//   Orphans      a mark whose every possible partner is gone (its partner
+//                died, or was spent in a clash) is cleared harmlessly at once:
+//                nobody is ever left holding a mark with no partner to find.
 //   Cadence      the round waits while a fusion runs or the Anvil is near.
 // No tether: the marks read on the bodies (the painter's sigils) and the
 // marked player's own arrow. Deterministic: the picks are hashed; the only
@@ -66,6 +68,12 @@ const SCHOOL: Readonly<Record<Polarity, 'fire' | 'frost' | 'nature' | 'physical'
 export function polarityPool(s: FinalScope): Entity[] {
   const tank = bossTank(s);
   return livePlayers(s).filter((p) => p !== tank && !struckTank(p));
+}
+
+/** The pairs a timeout counts as failed: the marks left, two to a pair,
+ *  rounded up (a lone mark left is a failed pair too). */
+export function failedPairs(marksLeft: number): number {
+  return Math.ceil(Math.max(0, marksLeft) / 2);
 }
 
 /** Begin a round. Returns the marks laid. */
@@ -187,7 +195,8 @@ function stepRound(s: FinalScope): void {
     if (p) cueOn(s, p, ELEMENT_CUES.unbalanced, 'arcane');
   }
   if (raid) {
-    const k = 1 + 0.5 * (marks.length - 1);
+    // Once per failed pair: one hurts, two wipe a healthy raid on Mythic.
+    const k = failedPairs(marks.length);
     for (const p of livePlayers(s))
       hit(
         s,
