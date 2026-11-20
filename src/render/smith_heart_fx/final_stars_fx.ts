@@ -188,6 +188,9 @@ const BOLT_LIFE = 0.75;
 const BOLT_LEADER = 0.07;
 /** How high the storm cloud gathers over a strike (yards). */
 const CLOUD_Y = 22;
+/** A risen pillar's crown over the floor (yards): where a seeking strike's
+ *  leaders reach down to. */
+const PILLAR_CROWN = 9;
 const SCAR_SECONDS = 0.8;
 /** The sword's drawn size over its geometry: its blade some 20 yd, towering
  *  over the raid (the coordinator's review of 2026-11-18: the first cut read
@@ -593,6 +596,37 @@ export class FinalStarsFx {
         pool: 'glow',
         radius: 2.4,
       });
+    // The lightning SEEKS the stone (Jose's playtest of 2026-11-20: the
+    // strike laid beside a pillar must read as coming for it): the storm
+    // gathers over the pillar's crown and its leaders reach down onto the
+    // stone, more often and lower as the strike fills.
+    const crown = y + PILLAR_CROWN;
+    const top = y + CLOUD_Y - 2;
+    if (H.rand() < (0.25 + fill * 0.6) * H.density)
+      H.particles.puff(x + (H.rand() - 0.5) * 5, top, z + (H.rand() - 0.5) * 5, 1, {
+        speed: 1,
+        up: -0.4,
+        life: 1.1,
+        size: [3, 6],
+        color: [0.16, 0.14, 0.26],
+        alpha: 0.5,
+        radius: 1.5,
+        drag: 1,
+      });
+    if (fill > 0.2 && H.rand() < 0.08 + fill * 0.32) {
+      const a = H.rand() * Math.PI * 2;
+      const reach = 0.35 + 0.65 * fill;
+      this.leap(
+        x + Math.cos(a) * 2.5,
+        top,
+        z + Math.sin(a) * 2.5,
+        x + Math.cos(a) * 0.6,
+        top - (top - crown) * reach,
+        z + Math.sin(a) * 0.6,
+        0.12,
+        1.4,
+      );
+    }
   }
 
   /** A Storm-Charged pillar this frame (its crawling arcs). */

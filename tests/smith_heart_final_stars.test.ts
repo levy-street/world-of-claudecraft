@@ -117,19 +117,20 @@ describe('the pure rules', () => {
     expect(chargedPulse(3, 10, 12)).toEqual([30, 36]);
     const N = FINAL_DIFFICULTY.normal;
     const H = FINAL_DIFFICULTY.heroic;
-    // Jose's playtest of 2026-11-19: one charged pillar is FELT, 90 to 110 on
-    // Normal (130 to 150 on Heroic) every 5 s; four are urgent (about 400 a
-    // pulse, over a third of a 1,100 pool) yet healable for a while.
+    // Jose's playtest of 2026-11-19: one charged pillar is FELT, 64 to 76 on
+    // Normal since the lightning seeks the stone there too (2026-11-20; 90 to
+    // 110 before) and 130 to 150 on Heroic every 5 s; four are urgent (about
+    // 300 a pulse) yet healable for a while.
     const one = chargedPulse(1, N.chargedMin, N.chargedMax).map((v) =>
       Math.round(v * N.damageMult),
     );
-    expect(one[0]).toBeGreaterThanOrEqual(89);
-    expect(one[1]).toBeLessThanOrEqual(111);
+    expect(one[0]).toBeGreaterThanOrEqual(63);
+    expect(one[1]).toBeLessThanOrEqual(77);
     const h1 = chargedPulse(1, H.chargedMin, H.chargedMax).map((v) => Math.round(v * H.damageMult));
     expect(h1[0]).toBeGreaterThanOrEqual(129);
     expect(h1[1]).toBeLessThanOrEqual(151);
     const four = chargedPulse(4, N.chargedMin, N.chargedMax)[1] * N.damageMult;
-    expect(four).toBeGreaterThan(350);
+    expect(four).toBeGreaterThan(250);
     expect(four).toBeLessThan(1100 / 2);
     expect(T.chargedEvery).toBe(5);
     expect(H.chargedMin).toBeGreaterThan(N.chargedMin);
@@ -394,6 +395,27 @@ describe('the interactions', () => {
     f.tick(sec(T.skyWarn + 0.1));
     expect(charged(f).length).toBe(0);
   });
+
+  // Jose's playtest of 2026-11-20: "otherwise the pillars make no sense".
+  for (const tier of ['normal', 'heroic', 'mythic'] as const)
+    it(`${tier}: a volley lays its strikes by the stone too, and the pillar is charged`, () => {
+      const f = finalFight(6);
+      if (tier !== 'normal') f.dev(`/dev heart final ${tier}`);
+      f.pullIn('hammer');
+      still(f);
+      const R = FINAL_DIFFICULTY[tier];
+      expect(R.skyPillarSpots).toBe(tier === 'mythic' ? 2 : 1);
+      const at = inQuarter('hammer', 36, 22);
+      const pillar = raiseAt(f, at.x, at.z);
+      // Nobody near the stone: only the seeking strike can reach it.
+      f.gather(inQuarter('hammer', 30, -22).x, inQuarter('hammer', 30, -22).z, 2);
+      f.dev('/dev heart final sky');
+      // The marks and the one by the stone (only one pillar stands).
+      expect(f.objects(FINAL_OBJECTS.strikePrefix).length).toBe(R.skyMarks + 1);
+      expect(f.objects(FINAL_OBJECTS.arcPrefix).length).toBe(1);
+      f.tick(sec(T.skyWarn + 0.1));
+      expect(finalPillarOf(pillar.templateId)).toBe('charged');
+    });
 
   it('every Storm-Charged pillar pulses the whole raid, summed per pillar, while it stands', () => {
     const f = finalFight(6);

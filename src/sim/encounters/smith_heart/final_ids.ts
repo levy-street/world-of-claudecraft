@@ -413,15 +413,18 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     pillarCap: 8,
     thrumMin: 330,
     thrumMax: 370,
-    // 78 to 96 a pillar, 90 to 110 after Normal's x1.15 (Jose's playtest of
-    // 2026-11-19: the old 26 to 30, every 4 s, went unnoticed on a pool of
-    // 1,100; 34 to 40 until the bot raids of 2026-11-18), and no strike seeks
-    // the stone on Normal: a pillar charges only when a marked player stands
-    // by it.
-    chargedMin: 78,
-    chargedMax: 96,
+    // 56 to 66 a pillar, 64 to 76 after Normal's x1.15, since one strike a
+    // volley seeks the stone on Normal too (Jose's playtest of 2026-11-20:
+    // "otherwise the pillars make no sense"): with the stone charged every
+    // volley, the old 78 to 96 (90 to 110, the playtest of 2026-11-19; 26 to
+    // 30 every 4 s went unnoticed, 34 to 40 until the bot raids of
+    // 2026-11-18) about tripled the raid's Storm-Charged damage a minute.
+    chargedMin: 56,
+    chargedMax: 66,
     skyMarks: 1,
-    skyPillarSpots: 0,
+    // One strike a volley laid beside the pillar nearest the boss (none from
+    // the bot raids of 2026-11-18 until Jose's playtest of 2026-11-20).
+    skyPillarSpots: 1,
     bladeMarks: 1,
     bladeAim: 4,
     whirlCount: 2,
@@ -475,10 +478,10 @@ export const FINAL_DIFFICULTY: Readonly<Record<FinalDifficulty, FinalDifficultyR
     chargedMin: 118,
     chargedMax: 136,
     skyMarks: 3,
-    // None seeks the stone on Heroic either (one until the same raids): a
-    // pillar charges when a marked player brings the strike to it; Mythic's
-    // lightning still seeks it.
-    skyPillarSpots: 0,
+    // One seeks the stone again since Jose's playtest of 2026-11-20
+    // ("otherwise the pillars make no sense"; none from the bot raids of
+    // 2026-11-18, one before them); Mythic's two.
+    skyPillarSpots: 1,
     bladeMarks: 2,
     bladeAim: 3.5,
     // Two a volley (three until the same raids: tornadoes caught the raid on

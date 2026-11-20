@@ -231,6 +231,8 @@ export const final = {
       }
       if (t.startsWith(FINAL_OBJECTS.risePrefix)) o.danger.push({ ...at, r: T.riseKnockR + 1.2 });
       else if (t.startsWith(FINAL_OBJECTS.strikePrefix)) o.danger.push({ ...at, r: T.skyR + 1.2 });
+      // Arcing Stone's ring: a pillar about to be charged (a strike seeks the
+      // stone on every tier since 2026-11-20): the raid keeps out of it.
       else if (t.startsWith(FINAL_OBJECTS.arcPrefix)) o.danger.push({ ...at, r: T.arcR + 1.5 });
       else if (t.startsWith(FINAL_OBJECTS.orbPrefix)) o.orbs.push(at);
       else if (t.startsWith(FINAL_OBJECTS.anvilPrefix))

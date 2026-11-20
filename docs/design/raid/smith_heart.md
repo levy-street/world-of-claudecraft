@@ -2544,7 +2544,7 @@ interacting. What changed:
 | Star | Quarter | Full pace (Normal) | Heroic | Mythic |
 |---|---|---|---|---|
 | Wake the Stone (`final_pillars.ts`) | Hammer | every 18 s a volley: a 2 s warning spot under 1 hashed player in the quarters (never the ring), then a pillar bursts out (250 to 290 and a throw to whoever stays). Pillars are round combat walls (bodies and sight) and STAY until a Crossing Blade shatters them. Cap 8 standing; a volley that finds the cap met rings Stone Thrum through every pillar onto the raid (330 to 370) | 2 a volley (3 until the Heroic bot raids of 2026-11-18), cap 7, Thrum 520 to 580 | 3, cap 6, Thrum 640 to 700 |
-| Sky Strike (`final_sky.ts`) | Breath | every 13 s: a strike under 1 hashed player (their own alarm); 2.2 s, 3.5 yd, 300 to 340 | 3 marks (plus 1 laid beside the pillar nearest the boss until the Heroic bot raids of 2026-11-18) | 3 marks, plus 2 laid beside the pillars nearest the boss (the lightning seeks the stone) |
+| Sky Strike (`final_sky.ts`) | Breath | every 13 s: a strike under 1 hashed player (their own alarm); 2.2 s, 3.5 yd, 300 to 340 | 3 marks, plus 1 laid beside the pillar nearest the boss (the lightning seeks the stone; on Normal too, 1 mark plus 1 by the stone, since Jose's playtest of 2026-11-20: "otherwise the pillars make no sense"; none from the Heroic bot raids of 2026-11-18 until then); its leaders reach down from the gathering storm onto the pillar's crown through the warning | 3 marks, plus 2 laid beside the pillars nearest the boss |
 | Crossing Blade (`final_blades.ts`) | Quench | every 15 s a round of 1 blade: a sword of ice rises on the rim beside its mark (30 to 70 degrees round from the mark's bearing, within its online reach) and its line runs from it through the mark to the far rim, following the mark for 4 s and locking 0.8 s before it flies (0.5 s). Everyone on it 300 to 350; it SHATTERS every pillar its line crosses | 2 blades a round, 3.5 s aim | 2 blades, 3 s aim |
 | Fire Whirl (`final_heat.ts`) | Heat | every 15 s, 2 tall turning columns of fire (4 yd, 2 s rise, 10 s run at 6.3 yd a second since Jose's playtest of 2026-11-19, 4.5 before it, 300 to 340 at most once a second) | 2 (3 until the Heroic bot raids of 2026-11-18) | 3 |
 
@@ -2553,8 +2553,9 @@ interacting. What changed:
   the pillar on the floor from the moment the strike is laid, lands with it (380 to
   420), and the pillar is left **Storm-Charged** (the owner's call of 2026-11-18):
   while it stands it pulses the WHOLE raid every 5 s, summed per charged pillar
-  (since Jose's playtest of 2026-11-19, which never noticed it: 90 to 110 a pillar on
-  Normal after its x1.15, 130 to 150 on Heroic, 156 to 180 on Mythic; one is felt,
+  (since Jose's playtest of 2026-11-19, which never noticed it: 64 to 76 a pillar on
+  Normal after its x1.15 since the lightning seeks the stone there too (2026-11-20; 90
+  to 110 before), 130 to 150 on Heroic, 156 to 180 on Mythic; one is felt,
   three or four are urgent but healable for a while; a ring races out over the room,
   a crack of thunder, and each player struck flashes; 26 to 30 every 4 s before it),
   and its ground is electric: whoever stands within 5.5 yd of it is bitten every
