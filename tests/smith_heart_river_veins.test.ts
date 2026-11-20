@@ -128,6 +128,26 @@ describe('the light-rivers as veins of light', () => {
       expect(twin.uniforms.uTime).toBe(sharedUniforms.uTime);
       expect(twin.fragmentShader).toContain('uTime');
     }
+    // Nor does the rivers' own frame driver touch a dim ribbon: its uniforms read
+    // the same before the veins light, as their light runs and long after, and no
+    // per-draw hook stands on its mesh.
+    const dimValues = () =>
+      JSON.stringify(RIVER_VEINS.map((vein) => riverVeinMaterial(vein).uniforms));
+    const before = dimValues();
+    const dark = { portalSince: -1, awakeSince: -1, readySince: -1, exitSince: -1 };
+    rivers.update({ ...dark, mask: 0, since: [-1, -1, -1, -1] });
+    expect(dimValues()).toBe(before);
+    for (const since of [0.4, 3, 600]) {
+      rivers.update({ ...dark, mask: 15, since: [since, since, since, since] });
+      expect(dimValues()).toBe(before);
+    }
+    for (const vein of RIVER_VEINS) {
+      const dim = rivers.group.getObjectByName(`river:${vein}:dim`) as THREE.Mesh;
+      expect(dim.onBeforeRender).toBe(THREE.Object3D.prototype.onBeforeRender);
+      // The bright twin, by now, is drawn: the light has run.
+      const lit = rivers.group.getObjectByName(`river:${vein}:lit`) as THREE.Mesh;
+      expect(lit.geometry.drawRange.count).toBeGreaterThan(0);
+    }
     // Asleep, never out: the thread's glow lies uneven between two shares of its
     // full light, under the one `riverVeinAcross` is measured at.
     const R = RIVER_VEIN_REST;

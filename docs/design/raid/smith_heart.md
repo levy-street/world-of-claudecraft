@@ -2127,10 +2127,11 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   of that side. Six floating isles (`BREATH_ISLES`), three a side, each a stride higher than
   the last, the two groups across the Cornice from each other with the guardian between
   (Jose's call of 2026-11-18): the east chain hugs the east edge over the Heart's crown (bearings
-  66, 91 and 116 from the Cornice's middle, 37, 44 and 51 yd over its floor; swung nine degrees
-  toward the north on 2026-11-20, the owner's call, which is as far from the west chain as the
-  field lets it stand: E1's lip is under a yard inside the field's north bound, and past the
-  crown's ridge an isle would look into the Heart's chamber), the west one curls
+  66, 91 and 116 from the Cornice's middle, 37, 44 and 51 yd over its floor; swung toward the
+  north on 2026-11-20, the owner's call, which is as far from the west chain as the field lets
+  it stand: E1's floor and lip stand hard against the field's north bound
+  (`tests/smith_heart_breath_summit.test.ts`), and past the crown's ridge an isle would look
+  into the Heart's chamber), the west one curls
   round the open south-west rim. Over the crown no isle carves sky out of the rock: the rock
   under each is capped below its crag (`heartIsleRockCap`) and the crown climbs into a ridge
   on the Heart chamber's rim (`heartCrownRidge`), so no isle, ride or rim spot sees into the

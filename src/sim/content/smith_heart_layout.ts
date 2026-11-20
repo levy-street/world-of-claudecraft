@@ -364,13 +364,15 @@ export const BREATH_ISLES: readonly BreathIsle[] = [
   // walked off one is the void's under its floor, breath_geometry.ts
   // fellFromIsle). The west one curls round the open south-west rim toward
   // the climb's head (clear of the climb's floors and the Wind Bridge's air).
-  // Every isle at least 28 yd from every other (each reaches about 13), each
-  // ride about 30 yd.
-  // The east chain swung nine degrees toward the north (the owner's call of
-  // 2026-11-20: as far from the west chain as the field allows). It cannot go
-  // further: E1's lip stands under a yard inside the field's north bound (the
-  // instance slot's band ends twelve yards past it, data.ts instanceSlotForZ),
-  // and past the crown's ridge an isle would look into the Heart's chamber.
+  // Every isle about 28 yd from its chain's next (each reaches about 13: no
+  // floor reaches its neighbour's), each ride about 30 yd.
+  // The east chain swung toward the north (the owner's call of 2026-11-20: as
+  // far from the west chain as the field allows). It cannot go further: E1's
+  // floor and lip stand hard against the field's north bound, just inside the
+  // instance slot's band (data.ts instanceSlotForZ; pinned in
+  // tests/smith_heart_breath_summit.test.ts), and past the crown's ridge an
+  // isle would look into the Heart's chamber
+  // (tests/smith_heart_breath_isle_crown.test.ts).
   isleAtBearing('breath_isle_e1', 66, 64, 37, 'breath_isle_southwest', 0, 0),
   isleAtBearing('breath_isle_e2', 91, 66, 44, 'breath_isle_southeast', 0, 1),
   isleAtBearing('breath_isle_e3', 116, 66, 51, 'breath_isle_southwest', 0, 2),

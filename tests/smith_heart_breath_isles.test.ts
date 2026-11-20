@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { frontWardAmount } from '../src/sim/combat/front_ward';
-import { BREATH, BREATH_ISLES } from '../src/sim/content/smith_heart_layout';
+import { BREATH, BREATH_ISLE_REACH, BREATH_ISLES } from '../src/sim/content/smith_heart_layout';
 import { clearHeart } from '../src/sim/encounters/smith_heart/breath_heart';
 import {
   BREATH_CASTS,
@@ -125,6 +125,16 @@ describe('the Islands of the Wind: the layout', () => {
       expect(sp.pad === null).toBe(sp.step === 2);
       expect(sp.stone === null).toBe(sp.step !== 2);
     });
+    // No isle's floor reaches its neighbour's: every pair stands further apart
+    // than their furthest tongues reach together (about 28 yd for a chain's steps).
+    for (let i = 0; i < BREATH_ISLES.length; i++)
+      for (let j = i + 1; j < BREATH_ISLES.length; j++) {
+        const a = BREATH_ISLES[i];
+        const b = BREATH_ISLES[j];
+        expect(Math.hypot(a.x - b.x, a.z - b.z), `${a.id} ${b.id}`).toBeGreaterThan(
+          BREATH_ISLE_REACH[i] + BREATH_ISLE_REACH[j] + 1,
+        );
+      }
   });
 
   it('the pads and codecs read back; the ride arc is the fixed one', () => {
