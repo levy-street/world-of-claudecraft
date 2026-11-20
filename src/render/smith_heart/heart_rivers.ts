@@ -5,9 +5,10 @@
 // flowing toward the seal, a white-hot surge riding its front (phase 2F).
 // Floor marks on the floor ladder's ground rung, so every telegraph paints
 // over them. Drawn on every tier: the light leading to each guardian is
-// route information. The Heat's dim ribbon is the Hearth's own mark, a seam
-// of fire burned into the stone (heat_route_seam.ts), on the same line,
-// width and rung.
+// route information. No dim ribbon is a flat band: the Heat's is the Hearth's
+// own mark, a seam of fire burned into the stone (heat_route_seam.ts), and the
+// Hammer's, the Breath's and the Quench's are veins of their own light cut
+// into the floor (river_vein_look.ts), each on the same line, width and rung.
 
 import * as THREE from 'three';
 import {
@@ -19,9 +20,7 @@ import {
 } from '../../sim/content/smith_heart_layout';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../../sim/instances/authored_field';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
-import { markSharedMaterial } from '../shared_resource';
 import { heartRiverSurgeMaterial } from './heart_fx_materials';
-import { scaleColor } from './heart_plan_core';
 import {
   heartRiverArcs,
   heartRiverLitSegments,
@@ -30,25 +29,11 @@ import {
 } from './heart_rivers_core';
 import type { HeartSealView } from './heart_seal_core';
 import { heatRouteSeamMaterial } from './heat_route_seam';
+import { riverVeinMaterial } from './river_vein_look';
 
-const dimMaterials = new Map<SmithHeartVein, THREE.MeshBasicMaterial>();
-
-function dimMaterial(vein: SmithHeartVein): THREE.MeshBasicMaterial {
-  let m = dimMaterials.get(vein);
-  if (!m) {
-    const c = SMITH_HEART_VEIN_COLORS[vein];
-    m = new THREE.MeshBasicMaterial({
-      color: scaleColor(c, 0.4),
-      transparent: true,
-      opacity: 0.5,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      name: `smithHeartRiver:${vein}:dim`,
-    });
-    markSharedMaterial(m);
-    dimMaterials.set(vein, m);
-  }
-  return m;
+/** A vein's dim ribbon material: the Hearth's seam, or the vein's own light. */
+function dimMaterial(vein: SmithHeartVein): THREE.ShaderMaterial {
+  return vein === 'heat' ? heatRouteSeamMaterial() : riverVeinMaterial(vein);
 }
 
 function floorAt(x: number, z: number): number | null {
@@ -95,15 +80,10 @@ export function buildHeartRivers(): HeartRivers {
     litGeometry.setAttribute('aSide', new THREE.BufferAttribute(sides, 1));
     litGeometry.computeBoundingSphere();
     litGeometry.setDrawRange(0, 0);
-    // The Heat's seam reads the same yards along and side across.
-    if (vein === 'heat') {
-      dimGeometry.setAttribute('aArc', new THREE.BufferAttribute(arcs.slice(), 1));
-      dimGeometry.setAttribute('aSide', new THREE.BufferAttribute(sides.slice(), 1));
-    }
-    const dim = new THREE.Mesh(
-      dimGeometry,
-      vein === 'heat' ? heatRouteSeamMaterial() : dimMaterial(vein),
-    );
+    // Every dim ribbon's shader reads the same yards along and side across.
+    dimGeometry.setAttribute('aArc', new THREE.BufferAttribute(arcs.slice(), 1));
+    dimGeometry.setAttribute('aSide', new THREE.BufferAttribute(sides.slice(), 1));
+    const dim = new THREE.Mesh(dimGeometry, dimMaterial(vein));
     dim.name = `river:${vein}:dim`;
     dim.renderOrder = floorVfxRenderOrder('ground', 3);
     // The bright ribbon is the slot's own (its surge is this slot's state).

@@ -191,7 +191,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['smithHeartCore', 0x1c1424, 80, 520],
     ['smithHeartHammer', 0x6c6a72, 110, 640],
     ['smithHeartRing', 0x686a72, 120, 700],
-    ['smithHeartBreath', 0x707b88, 80, 560],
+    ['smithHeartBreath', 0x4a5262, 70, 520],
     ['smithHeartQuench', 0x34466a, 70, 520],
     ['smithHeartHeat', 0x3c3038, 70, 480],
     ['drownedTemple', 0x252a4c, 140, 1050],

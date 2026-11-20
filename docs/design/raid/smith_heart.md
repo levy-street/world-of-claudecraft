@@ -1708,6 +1708,77 @@ paintings' saturation (the game's grade gives some back), the Ring's darker than
 **Budget.** The two skies are 1.1 MB and 2.3 MB of KTX2, fetched with the kits at the raid's
 door, never at boot.
 
+### 5.27 The taste pass
+
+The owner's ask (2026-11-19): rate the raid as it stands and raise its taste, without touching a
+mechanic. The measure is a fixed camera route through one raid clear (every room and every
+fight, the HUD on, the same spot and angle every run), so a before and an after differ only by
+the change. Nothing here touches `src/sim/`: no placement, collider, telegraph or timing moved.
+
+#### The Breath's storm
+
+Seen still by still beside the other rooms, the Breath was the one vein at a single pale value:
+its floor, its rock and its sky all sat high and close together, so the guardian, its lightning
+and every telegraph had nothing dark to stand against, where the Quench's night and the Heat's
+basalt both sit a value under their guardians. This pass gives the Breath the same footing.
+
+| Piece | Now | Where |
+|---|---|---|
+| The storm's air | A dark slate, neutral (never navy), the far crests sinking into the weather; the sky's horizon is the same colour | `SMITH_HEART_BREATH_FOG` |
+| The storm's light | The key dimmed to an overcast's and the fill thinned, the fill's colour kept the pale neutral grey; the rim raised so a body still reads off the slate | `SMITH_HEART_BREATH_LIGHT` |
+| The scoured floor | The same painting at a gain well under one: a dark storm slate under the guardian, the lightning and every telegraph; matte | `breath_env_kit.ts` `BREATH_ENV_FLOOR` |
+| The sky | The painted deck hung low, its dark bellies at the horizon where a play camera looks, pressed to a thunderhead with its lit tears kept; a cold rift low on the one sun's own bearing | `SMITH_HEART_BREATH_STORM_SKY`, `heart_sky.ts` `breathSky` |
+
+**Kept.** The painting and the kit, every placement, the lightning in the cloud and the distant
+bolts, the gusts, the cloud sea, the open rim and its red edge, the one sun.
+
+**Tried and dropped.** A stronger key over a smoother, wet slab: its sheen read as snow, which is
+the Quench's.
+
+Pinned by `tests/smith_heart_breath_air.test.ts` and `tests/smith_heart_breath_env.test.ts`.
+
+#### The light-rivers as veins of light
+
+On the route's stills three of the four rivers read as flat translucent bands laid on the floor
+(on the Grand Stair, from above, a wide flat stripe), where the Heat's already was the Hearth's
+own mark, a seam of fire burned into the stone. The other three now follow it.
+
+| Piece | Now | Where |
+|---|---|---|
+| The dim ribbons (the Hammer's, the Breath's, the Quench's) | A groove cut the ribbon's width into the floor, a wash of the vein's colour across it (what the flat band was, so it is found from as far), and a thread of that colour wandering down its middle, asleep until the vein's guardian falls: nothing in it moves, its glow lies uneven along the line and never goes out, never drawn thinner than a pixel and a half; one touch each: the Hammer's ore glints in the groove, the Breath's thread is kinked and beaded like static caught in a crack, the Quench's lips are rimed | `river_vein_look.ts` `RIVER_VEIN_LOOKS`, `RIVER_VEIN_LIGHT`, `RIVER_VEIN_REST`, `riverVeinAcross` |
+| The bright ribbon (all four) | Its light pooled in the channel: full across its middle half, a hotter line down its middle, streaks drawn out along the flow, its lips feathered to nothing instead of a hard edge; brighter and steadier than the band it replaces | `heart_fx_materials.ts` `heartRiverSurgeMaterial`, `RIVER_LIT_POOL`, `riverLitAcross` |
+
+**Kept.** Every river's line, width, lift and rung (the ground band, under every telegraph),
+the light's run from the arena to the seal and its surge, every tier, the vein colours (never a
+threat colour), the Heat's seam.
+
+**Dim against lit.** Which veins are lit is the raid's progress, read off these ribbons, so the
+gap between the two states is pinned, not left to the eye: averaged across the ribbon the bright
+twin adds more than three times the light of the dim one at its brightest (the flat bands stood
+under that), and the dim thread's own crest stays under the bright ribbon's middle. The first
+cut of this pass let the thread peak as bright as the lit ribbon, so the two differed mostly in
+width; the review caught it.
+
+**Asleep until the guardian falls** (the owner's call of 2026-11-20). The first cut ran pulses
+along each dim thread toward its guardian and re-kinked the Breath's static several times a
+second, so a vein nobody had won yet already looked alive. A dim ribbon now reads no clock at
+all: its glow, its kinks, its beads and the Hammer's glints are held where they lie. Motion is
+the bright twin's alone, so a river that moves is a river whose guardian has fallen. The Heat's
+seam (section 5.25) is older work and keeps its own pulses.
+
+Pinned by `tests/smith_heart_river_veins.test.ts`.
+
+#### The main map's sky under the cliffs' line
+
+The panorama's foot is pressed down behind the Ring's cliffs (section 5.26), which hide the
+sky under about 25 degrees. Down a vein's mouth and from the Balcony the sky does show under
+that line, and there the pressed mapping ran off the painting's last row: a flat brown band
+where the Ring's concept has dusk cloud. Under the cliffs' line the painting's own low clouds
+are now eased down to the horizon (`heart_four_sky.ts` `HEART_RING_SKY` `cliff`, `foot`, `ease`,
+`ringSkyV`; `heart_sky.ts` `ringFourSky`). Over the cliffs nothing moves: the painting sits
+exactly where it did, at the saturation and value the owner set. Pinned by
+`tests/smith_heart_ring_heart_env.test.ts`.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -2040,7 +2111,11 @@ Every number is a SKETCH; the tier rows are `ISLE_TIERS` and the shared ones `IS
   of that side. Six floating isles (`BREATH_ISLES`), three a side, each a stride higher than
   the last, the two groups across the Cornice from each other with the guardian between
   (Jose's call of 2026-11-18): the east chain hugs the east edge over the Heart's crown (bearings
-  75, 100 and 125 from the Cornice's middle, 37, 44 and 51 yd over its floor), the west one curls
+  66, 91 and 116 from the Cornice's middle, 37, 44 and 51 yd over its floor; swung toward the
+  north on 2026-11-20, the owner's call, which is as far from the west chain as the field lets
+  it stand: E1's floor and lip stand hard against the field's north bound
+  (`tests/smith_heart_breath_summit.test.ts`), and past the crown's ridge an isle would look
+  into the Heart's chamber), the west one curls
   round the open south-west rim. Over the crown no isle carves sky out of the rock: the rock
   under each is capped below its crag (`heartIsleRockCap`) and the crown climbs into a ridge
   on the Heart chamber's rim (`heartCrownRidge`), so no isle, ride or rim spot sees into the

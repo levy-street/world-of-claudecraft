@@ -188,8 +188,18 @@ export function breathEnvMaterial(painting: string, area?: 'heart'): THREE.Mater
 
 /** The scoured floors' painting: its tile in the field's UV (the `scoured` family lays
  *  one unit every 14 yd, so a repeat of 0.8 tiles the slabs every 17.5 yd) and the gain
- *  over the field's pale vertex paint (its broad drifts break the tile's repeat). */
-export const BREATH_ENV_FLOOR = { repeat: 0.8, gain: [1.12, 1.1, 1.0], relief: 0.7 } as const;
+ *  over the field's pale vertex paint (its broad drifts break the tile's repeat). Since
+ *  the storm pass (design doc section 5.27) the gain sits well under one: a dark storm
+ *  slate under the guardian, its lightning and every telegraph, its blue taken back as
+ *  the old gain took it (the painting is blue-violet: a bluer gain read navy on the
+ *  lowest tier, which has no grade over it). Matte on purpose (`roughness`): a smoother
+ *  slab under the key threw a white sheen that read as snow. */
+export const BREATH_ENV_FLOOR = {
+  repeat: 0.8,
+  gain: [0.62, 0.61, 0.56],
+  relief: 0.7,
+  roughness: 0.88,
+} as const;
 
 /** The Breath's painted floor (the field terrain's `topMaterial` seam, `scoured`). */
 export function breathEnvFloorMaterial(): THREE.Material {
@@ -217,7 +227,7 @@ export function breathEnvFloorMaterial(): THREE.Material {
   const m = GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({
         ...opts,
-        roughness: 0.82,
+        roughness: F.roughness,
         metalness: 0,
         ...(relief
           ? { normalMap: relief, normalScale: new THREE.Vector2(F.relief, F.relief) }

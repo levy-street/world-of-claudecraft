@@ -1,0 +1,285 @@
+// The Hammer's, the Breath's and the Quench's light-rivers (heart_rivers.ts)
+// drawn as veins of their own light cut into the floor, the way the Heat's is
+// the Hearth's seam of fire (heat_route_seam.ts), instead of a flat pale band
+// (the taste pass, design doc section 5.27).
+//
+// What each carries: the route. Every vein's dim ribbon leads from the seal to
+// its guardian (drawn on every tier). Each keeps exactly that line, its width
+// and its rung (the ground band, under every telegraph), and stays as
+// readable: a groove cut the ribbon's width into the stone, a breath of the
+// vein's colour across it (the old band's wash, so it is found from as far),
+// and a thread of that colour wandering down its middle (never a threat
+// colour). The vein is ASLEEP until its guardian falls (the owner's call of
+// 2026-11-20): nothing here moves. Its glow lies uneven along the line, never
+// out, and the thread is never drawn thinner than a pixel and a half, so a far
+// ribbon keeps its line. It stays well under its bright twin
+// (`riverVeinAcross`, pinned against the twin's): which veins are lit is the
+// raid's progress, read off these, and the twin is the one that flows. Each
+// element adds one touch of its own: the Hammer's ore lies glinting in the
+// groove's floor, the Breath's thread is kinked and beaded like static caught
+// in a crack, the Quench's lips are rimed. The bright twin that runs once the
+// guardian falls draws over it.
+//
+// One program, one shared material per vein (one draw per slot, the ribbon's
+// own mesh), built at the interior's build with the ribbons (the interior's
+// compile gate links it). It reads no clock (no `uTime`: a still vein is the
+// point, pinned in tests/smith_heart_river_veins.test.ts); noise on the
+// ribbon's own arc and across (never world coordinates), the vertex through
+// `modelViewMatrix`. No `pow()`: every square is written out.
+
+import * as THREE from 'three';
+import { SMITH_HEART_VEIN_COLORS, type SmithHeartVein } from '../../sim/content/smith_heart_layout';
+import { markSharedMaterial } from '../shared_resource';
+
+/** The veins whose dim ribbon is a vein of light (the Heat's is its seam). */
+export type RiverVein = Exclude<SmithHeartVein, 'heat'>;
+export const RIVER_VEINS: readonly RiverVein[] = ['hammer', 'breath', 'quench'];
+
+export interface RiverVeinLook {
+  /** The cut stone under the light (linear rgb): dark, in the vein's own cast. */
+  readonly groove: readonly [number, number, number];
+  /** The thread's half width (a share of the ribbon's half width). */
+  readonly thread: number;
+  /** How far the thread wanders off the middle (the same share). */
+  readonly wander: number;
+  /** The grain of its uneven glow (yards along the ribbon from one stretch
+   *  to the next). */
+  readonly wavelength: number;
+  /** The element's own touch, each 0 or 1: ore glinting in the groove, the
+   *  thread kinked and beaded like static, rime on the lips. */
+  readonly fleck: number;
+  readonly crackle: number;
+  readonly rime: number;
+}
+
+/** The sleeping thread's glow along the ribbon (a share of its full light):
+ *  uneven from `low` to `high`, a stretch a `wavelength` long, and still. The
+ *  route never goes out, and it never reaches the light `riverVeinAcross` is
+ *  measured at (a glow of one). */
+export const RIVER_VEIN_REST = { low: 0.55, high: 0.85 } as const;
+
+/** The groove across the ribbon (shares of its half width): where its lips
+ *  begin, how far they rag either way, where they end; how much of the floor
+ *  the cut stone covers; how far the thread's noise can carry it (a share of
+ *  `wander`) and how far the Breath's static kinks it. */
+export const RIVER_VEIN_GROOVE = {
+  lip: 0.7,
+  rag: 0.15,
+  edge: 0.98,
+  cover: 0.78,
+  reach: 0.9,
+  kink: 0.13,
+} as const;
+
+/** The dim ribbon's light, as multiples of the vein's colour: the wash across
+ *  the groove (`tint`), the halo round the thread and what its glow adds
+ *  (`halo`, `haloGlow`), the thread itself at full glow (`thread`),
+ *  how far it whitens toward its core (`core`) and how white that core is
+ *  (`white`, a share of white over the vein's colour), and how much brighter a
+ *  bead of the Breath's static burns (`bead`, a share of the thread). Kept well under
+ *  the bright twin's (tests/smith_heart_river_veins.test.ts). */
+export const RIVER_VEIN_LIGHT = {
+  tint: 0.08,
+  halo: 0.06,
+  haloGlow: 0.18,
+  thread: 0.5,
+  core: 0.35,
+  white: 0.55,
+  bead: 0.2,
+} as const;
+
+/** The Quench's rime along both lips: where it rises and where it is whole
+ *  (shares of the half width), where it fades at the strip's edge, its frost
+ *  (linear rgb: a cold grey, it is frost and never a light), how far it covers
+ *  what lies under it and how opaque it draws. */
+export const RIVER_VEIN_RIME = {
+  from: 0.52,
+  full: 0.9,
+  fade: 0.93,
+  frost: [0.5, 0.6, 0.7],
+  mix: 0.3,
+  alpha: 0.7,
+} as const;
+
+export const RIVER_VEIN_LOOKS: Readonly<Record<RiverVein, RiverVeinLook>> = {
+  // A seam of ore in the quarry's stone: broad, its glints lying in the cut.
+  hammer: {
+    groove: [0.075, 0.054, 0.034],
+    thread: 0.15,
+    wander: 0.42,
+    wavelength: 16,
+    fleck: 1,
+    crackle: 0,
+    rime: 0,
+  },
+  // The storm's static caught in a crack: thin, jagged, held.
+  breath: {
+    groove: [0.04, 0.05, 0.066],
+    thread: 0.13,
+    wander: 0.3,
+    wavelength: 11,
+    fleck: 0,
+    crackle: 1,
+    rime: 0,
+  },
+  // Light under the ice: a clean cold line between rimed lips.
+  quench: {
+    groove: [0.034, 0.054, 0.076],
+    thread: 0.17,
+    wander: 0.4,
+    wavelength: 13,
+    fleck: 0,
+    crackle: 0,
+    rime: 1,
+  },
+};
+
+/** The sleeping thread's glow where the shader's noise along the ribbon reads
+ *  `n` (0..1; mirrors the shader): RIVER_VEIN_REST's `low` to its `high`. */
+export function riverVeinRest(n: number): number {
+  const R = RIVER_VEIN_REST;
+  return R.low + (R.high - R.low) * Math.max(0, Math.min(1, n));
+}
+
+function smooth(a: number, b: number, v: number): number {
+  const t = Math.max(0, Math.min(1, (v - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+/** The dim ribbon's light at `across` (0 its middle, 1 its edge) where its
+ *  thread glows at `glow`, at its BRIGHTEST (mirrors the shader with the thread
+ *  on the middle, the lips unragged, the grain and every noise at one, a
+ *  bead of the Breath's static burning, the Quench's rime whole; the Hammer's
+ *  flecks are left out: sparse glints, each smaller than the thread is wide):
+ *  `gain` times the vein's colour plus `white` (linear luma), drawn at `alpha`
+ *  over the floor. */
+export function riverVeinAcross(
+  vein: RiverVein,
+  across: number,
+  glow: number,
+): { gain: number; white: number; alpha: number } {
+  const L = RIVER_VEIN_LOOKS[vein];
+  const G = RIVER_VEIN_GROOVE;
+  const K = RIVER_VEIN_LIGHT;
+  const R = RIVER_VEIN_RIME;
+  const a = Math.abs(across);
+  const groove = 1 - smooth(G.lip, G.edge, a);
+  const thread = 1 - smooth(L.thread * 0.4, L.thread, a);
+  const halo = 1 - smooth(0.05, 0.55, a);
+  const lit = thread * glow * (1 + K.bead * L.crackle) * K.thread;
+  const rime = smooth(R.from, R.full, a) * (1 - smooth(R.fade, 1, a)) * L.rime;
+  const frost = 0.2126 * R.frost[0] + 0.7152 * R.frost[1] + 0.0722 * R.frost[2];
+  const keep = 1 - rime * R.mix;
+  return {
+    gain:
+      (K.tint * groove +
+        halo * halo * (K.halo + K.haloGlow * glow) +
+        lit * (1 - K.core * K.white)) *
+      keep,
+    white: lit * K.core * K.white * keep + frost * rime * R.mix,
+    alpha: Math.min(1, Math.max(groove * G.cover, halo * 0.65, thread, rime * R.alpha)),
+  };
+}
+
+const f3 = (v: number) => v.toFixed(3);
+
+const VERT = /* glsl */ `
+attribute float aArc;
+attribute float aSide;
+varying float vArc;
+varying float vAcross;
+void main() {
+  vArc = aArc;
+  vAcross = aSide;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+const FRAG = /* glsl */ `
+uniform vec3 uColor;
+uniform vec3 uGroove;
+// x the thread's half width, y its wander, z its glow's grain (stretches a yard).
+uniform vec3 uLook;
+// x ore flecks, y static, z rime.
+uniform vec3 uKind;
+varying float vArc;
+varying float vAcross;
+float hs(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vns(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hs(i), hs(i + vec2(1.0, 0.0)), f.x), mix(hs(i + vec2(0.0, 1.0)), hs(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+void main() {
+  float a = abs(vAcross);
+  // The groove: cut the ribbon's width into the floor, its lips ragged.
+  float rag = (vns(vec2(vArc * 0.7, 3.1)) - 0.5) * ${f3(RIVER_VEIN_GROOVE.rag * (4 / 3))} + (vns(vec2(vArc * 2.3, 7.7)) - 0.5) * ${f3(RIVER_VEIN_GROOVE.rag * (2 / 3))};
+  float groove = 1.0 - smoothstep(${f3(RIVER_VEIN_GROOVE.lip)} + rag, ${f3(RIVER_VEIN_GROOVE.edge)}, a);
+  // The thread of light, wandering inside it (never ruler-straight); the
+  // Breath's is kinked like static, held where it lies. Nothing here reads the
+  // clock: the vein is asleep until its guardian falls.
+  float wob = (vns(vec2(vArc * 0.12, 1.3)) - 0.5) * ${f3(RIVER_VEIN_GROOVE.reach * (14 / 9))} + (vns(vec2(vArc * 0.5, 9.1)) - 0.5) * ${f3(RIVER_VEIN_GROOVE.reach * (4 / 9))};
+  wob = wob * uLook.y + (vns(vec2(vArc * 3.1, 1.7)) - 0.5) * ${f3(RIVER_VEIN_GROOVE.kink * 2)} * uKind.y;
+  float t = abs(vAcross - wob);
+  // Never thinner than a pixel and a half: a far ribbon keeps its line.
+  float th = min(max(uLook.x, fwidth(vAcross) * 1.5), 0.9);
+  float thread = 1.0 - smoothstep(th * 0.4, th, t);
+  float halo = 1.0 - smoothstep(0.05, 0.55, t);
+  // Its glow, uneven along the vein and still (riverVeinRest).
+  float glow = ${f3(RIVER_VEIN_REST.low)} + ${f3(RIVER_VEIN_REST.high - RIVER_VEIN_REST.low)} * vns(vec2(vArc * uLook.z, 5.3));
+  float flick = 0.86 + 0.14 * vns(vec2(vArc * 1.7, 0.5));
+  // The Breath's beads: knots of static along the thread.
+  float bead = smoothstep(0.58, 0.9, vns(vec2(vArc * 1.3, 2.0))) * uKind.y;
+  // The Hammer's ore: small round flecks in the groove's floor, each with its
+  // own glint (a round grain in its cell, never the cell itself: a lit cell
+  // read as a dash).
+  vec2 fp = vec2(vArc * 5.0, vAcross * 3.2 + 8.0);
+  float fn = hs(floor(fp));
+  vec2 fo = fract(fp) - 0.5 - (vec2(hs(floor(fp) + 3.3), hs(floor(fp) + 7.1)) - 0.5) * 0.5;
+  float grain = 1.0 - smoothstep(0.0, 0.2, length(fo * vec2(1.0, 1.6)));
+  float glint = 0.5 + 0.5 * sin(fn * 40.0);
+  float fleck = step(0.86, fn) * grain * glint * glint * groove * uKind.x;
+  // The Quench's rime: frost along both lips (RIVER_VEIN_RIME).
+  float rime = smoothstep(${f3(RIVER_VEIN_RIME.from)}, ${f3(RIVER_VEIN_RIME.full)}, a) * (1.0 - smoothstep(${f3(RIVER_VEIN_RIME.fade)}, 1.0, a));
+  rime *= (0.55 + 0.45 * vns(vec2(vArc * 4.0, vAcross * 6.0))) * uKind.z;
+  // The light (riverVeinAcross): the wash, the halo, the thread whitening to its core.
+  float light = thread * glow * flick * (1.0 + ${f3(RIVER_VEIN_LIGHT.bead)} * bead);
+  vec3 stone = uGroove * (0.75 + 0.5 * vns(vec2(vArc * 1.5, vAcross * 3.0 + 2.0)));
+  vec3 core = mix(uColor, vec3(1.0), ${f3(RIVER_VEIN_LIGHT.white)});
+  vec3 col = stone + uColor * (${f3(RIVER_VEIN_LIGHT.tint)} * groove + halo * halo * (${f3(RIVER_VEIN_LIGHT.halo)} + ${f3(RIVER_VEIN_LIGHT.haloGlow)} * glow));
+  col += mix(uColor, core, ${f3(RIVER_VEIN_LIGHT.core)}) * light * ${f3(RIVER_VEIN_LIGHT.thread)};
+  col += mix(uColor, core, 0.4) * fleck * 0.5;
+  col = mix(col, vec3(${RIVER_VEIN_RIME.frost.map(f3).join(', ')}), rime * ${f3(RIVER_VEIN_RIME.mix)});
+  float alpha = clamp(max(groove * ${f3(RIVER_VEIN_GROOVE.cover)}, max(halo * 0.65, max(thread, rime * ${f3(RIVER_VEIN_RIME.alpha)}))), 0.0, 1.0);
+  gl_FragColor = vec4(col, alpha);
+  #include <colorspace_fragment>
+}
+`;
+
+const shared = new Map<RiverVein, THREE.ShaderMaterial>();
+
+/** A vein's shared ribbon material (built with the interior; never disposed by
+ *  a slot's teardown). All three run one program. */
+export function riverVeinMaterial(vein: RiverVein): THREE.ShaderMaterial {
+  const have = shared.get(vein);
+  if (have) return have;
+  const L = RIVER_VEIN_LOOKS[vein];
+  const m = new THREE.ShaderMaterial({
+    name: `smithHeartRiver:${vein}:dim`,
+    uniforms: {
+      uColor: { value: new THREE.Color(SMITH_HEART_VEIN_COLORS[vein]) },
+      uGroove: { value: new THREE.Vector3(...L.groove) },
+      uLook: { value: new THREE.Vector3(L.thread, L.wander, 1 / L.wavelength) },
+      uKind: { value: new THREE.Vector3(L.fleck, L.crackle, L.rime) },
+    },
+    vertexShader: VERT,
+    fragmentShader: FRAG,
+    transparent: true,
+    depthWrite: false,
+    fog: false,
+  });
+  markSharedMaterial(m);
+  shared.set(vein, m);
+  return m;
+}

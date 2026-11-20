@@ -29,7 +29,14 @@ import {
   heartSummitCap,
   heartSummitOpen,
 } from '../src/render/smith_heart/heart_walls_core';
-import { BREATH, BREATH_ISLES, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
+import {
+  BREATH,
+  BREATH_ISLE_LIPS,
+  BREATH_ISLE_REACH,
+  BREATH_ISLES,
+  SMITH_HEART_FIELD,
+} from '../src/sim/content/smith_heart_layout';
+import { CLAIM_HALF_Z } from '../src/sim/encounters/smith_heart/breath_geometry';
 
 const C = BREATH.cornice;
 const at = (deg: number, past: number) => {
@@ -67,6 +74,21 @@ describe('the Storm Cornice: an open summit', () => {
   it('hangs each isle in open air, inside the bounds and the slot band', () => {
     const b = SMITH_HEART_FIELD.bounds;
     BREATH_ISLES.forEach((isle, i) => {
+      // Every isle, over the crown or not: its whole floor (out to its furthest
+      // tongue, never its nominal `r`) and its open lip past that stand inside
+      // the field's bounds, which stand inside the instance slot's band (past it
+      // a body is the next slot's). The east chain's first isle stands hard
+      // against the north bound (the owner's swing of 2026-11-20): a nudge of a
+      // degree further north fails here.
+      const lip = BREATH_ISLE_LIPS[i].r;
+      expect(lip, isle.id).toBeGreaterThan(BREATH_ISLE_REACH[i]);
+      expect(BREATH_ISLE_REACH[i], isle.id).toBeGreaterThan(isle.r);
+      expect(isle.z + lip, isle.id).toBeLessThan(b.maxZ);
+      expect(isle.z - lip, isle.id).toBeGreaterThan(b.minZ);
+      expect(isle.x + lip, isle.id).toBeLessThan(b.maxX);
+      expect(isle.x - lip, isle.id).toBeGreaterThan(b.minX);
+      expect(b.maxZ).toBeLessThan(CLAIM_HALF_Z);
+      expect(b.minZ).toBeGreaterThan(-CLAIM_HALF_Z);
       // An isle over the Heart's crown floats over its capped rock instead
       // (tests/smith_heart_breath_isle_crown.test.ts pins that rule).
       if (heartIsleOverCrown(i)) {
