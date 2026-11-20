@@ -8,7 +8,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { BUDDY_MOBS } from '../src/sim/content/buddy_mobs';
-import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
+import { DEED_ORDER, DEEDS, DEEDS_ERA, SMITH_HEART_DEEDS_HIDDEN } from '../src/sim/content/deeds';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
 import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
@@ -38,6 +38,7 @@ import {
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
 import { RIFT_MOBS } from '../src/sim/content/rift/mobs';
+import { SMITH_HEART_DEED_IDS } from '../src/sim/content/smith_heart_rewards';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
 import {
@@ -153,8 +154,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
     // + Lantern Hall (the Highwatch guild): three contract milestones (5, 10, 25) and the
     // quartermaster's three zero-Renown title feats: 352, 3850.
-    expect(DEED_ORDER.length).toBe(369);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4010);
+    // + the Smith's Heart's seven (the clear 25, five feats at 25, the meta 50; all
+    // hidden while the raid is dev-gated): 376, 4210.
+    expect(DEED_ORDER.length).toBe(376);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4210);
   });
 
   it('ships the audited per-category counts', () => {
@@ -188,7 +191,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +3 the Hollow Crypt wing bosses' encounter deeds.
       // +1 Morthen's Every Candle Lit.
       // +3 Lantern Hall's contract milestones.
-      dungeon: 63,
+      dungeon: 70,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -493,7 +496,32 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'feat_gourdlight_errands',
       'feat_gourdlight_frights',
       'feat_gourdlight_eve_complete',
+      // The Smith's Heart (content/smith_heart_rewards.ts).
+      'dgn_smith_heart',
+      'dgn_heart_council_feat',
+      'dgn_heart_breath_feat',
+      'dgn_heart_quench_feat',
+      'dgn_heart_heat_feat',
+      'dgn_heart_final_feat',
+      'dgn_heart_meta',
     ]);
+    expect(DEEDS.dgn_smith_heart.renown).toBe(25);
+    expect(DEEDS.dgn_smith_heart.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'smith_heart',
+      count: 1,
+    });
+    for (const id of [
+      'dgn_heart_council_feat',
+      'dgn_heart_breath_feat',
+      'dgn_heart_quench_feat',
+      'dgn_heart_heat_feat',
+      'dgn_heart_final_feat',
+    ]) {
+      expect(DEEDS[id].renown, id).toBe(25);
+      expect(DEEDS[id].trigger, id).toEqual({ kind: 'manual' });
+    }
+    expect(DEEDS.dgn_heart_meta.renown).toBe(50);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin.trigger).toEqual({
@@ -1138,7 +1166,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Release merge: retain the release catalogue first and append integration's
   // 33 deeds. Stripping them reproduces the release's frozen digest below.
   // Main's frozen catalog is preserved as the prefix; Halloween appends ten feats.
-  const FROZEN_CATALOG_SHA256 = '6209fd36c03fe4f3d6c8a4ba2966d04b4ba0ba2c21128b82db589c50e24697b2';
+  // Re-baselined for the Smith's Heart's seven appended deeds (no shipped row edited).
+  const FROZEN_CATALOG_SHA256 = '25e1dc779e327ab59670f03df9440a065a4068b409ae5b81f33556741310b0cf';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1219,19 +1248,20 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   //
   // The hard Wisp Maze deed now appends after the World PvP title ladder.
   // Stripping it reproduces the previous 325-deed mint.
+  //
+  // The Smith's Heart's seven append after Gourdlight Eve's ten; the previous mint is
+  // Gourdlight's 6209fd36... literal (rotated down here), and stripping the seven must
+  // reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    'f0b1e522f87715f2ffbf812095ea6fb172aa9116d57c706a9fe65f945b1b482d';
+    '6209fd36c03fe4f3d6c8a4ba2966d04b4ba0ba2c21128b82db589c50e24697b2';
   const APPENDED_SINCE: readonly string[] = [
-    'feat_gourdlight_guise',
-    'feat_old_thatchgrin',
-    'feat_title_gourdlit',
-    'feat_title_trickster',
-    'feat_title_hollow_grinned',
-    'feat_pumpkin_hunter',
-    'feat_gourdlight_doorsteps',
-    'feat_gourdlight_errands',
-    'feat_gourdlight_frights',
-    'feat_gourdlight_eve_complete',
+    'dgn_smith_heart',
+    'dgn_heart_council_feat',
+    'dgn_heart_breath_feat',
+    'dgn_heart_quench_feat',
+    'dgn_heart_heat_feat',
+    'dgn_heart_final_feat',
+    'dgn_heart_meta',
   ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
@@ -1243,8 +1273,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'feat_guild_hallsworn',
-      'feat_guild_of_lantern_hall',
+      'feat_gourdlight_frights',
+      'feat_gourdlight_eve_complete',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1475,12 +1505,14 @@ describe('table shape', () => {
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
     // five-dungeon rework's 24, Morthen's Every Candle Lit, then Lantern Hall's six, the
     // quartermaster's third title last.
-    expect(DEED_ORDER[DEED_ORDER.length - 51]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 42]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 41]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 17]).toBe('dgn_morthen_candlelight');
-    expect(DEED_ORDER[DEED_ORDER.length - 11]).toBe('feat_guild_of_lantern_hall');
-    expect(DEED_ORDER.at(-1)).toBe('feat_gourdlight_eve_complete');
+    expect(DEED_ORDER[DEED_ORDER.length - 58]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 49]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 48]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 24]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 18]).toBe('feat_guild_of_lantern_hall');
+    // Gourdlight Eve's ten, then the Smith's Heart's seven: the meta closes the tail.
+    expect(DEED_ORDER[DEED_ORDER.length - 8]).toBe('feat_gourdlight_eve_complete');
+    expect(DEED_ORDER.at(-1)).toBe('dgn_heart_meta');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -1536,7 +1568,10 @@ describe('table shape', () => {
     for (const def of ALL) {
       const expectFeat = def.id.startsWith('feat_') || OFF_PREFIX_FEATS.has(def.id);
       expect(def.feat === true, def.id).toBe(expectFeat);
-      expect(def.hidden === true, def.id).toBe(def.id.startsWith('hid_'));
+      // The Smith's Heart's deeds are the one off-prefix hidden set: hidden only while the
+      // raid is dev-gated (SMITH_HEART_DEEDS_HIDDEN), visible once it ships.
+      const devGatedHidden = SMITH_HEART_DEEDS_HIDDEN && SMITH_HEART_DEED_IDS.includes(def.id);
+      expect(def.hidden === true, def.id).toBe(def.id.startsWith('hid_') || devGatedHidden);
       if (def.feat) expect(def.renown, def.id).toBe(0);
       expect(def.feat === true && def.hidden === true, `${def.id} both feat and hidden`).toBe(
         false,

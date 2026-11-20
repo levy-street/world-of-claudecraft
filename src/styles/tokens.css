@@ -523,6 +523,12 @@
     --color-field-map-snow: #dfe9f1;
     --color-field-map-ice: #7fb3cf;
     --color-field-map-slate: #4a5058;
+    --color-field-map-quarry: #8a6e4e;
+    --color-field-map-paving: #7d7266;
+    --color-field-map-scoured: #8e9298;
+    --color-field-map-rime: #8a96a6;
+    --color-field-map-lake-ice: #4f7690;
+    --color-field-map-hearth: #4a423c;
     --color-field-map-crevasse: #2e6f9e;
     --color-field-map-crevasse-deep: #0d1f33;
     --color-field-map-wall: #4b433a;
@@ -1312,6 +1318,17 @@
     --color-fct-damage-taken-block: #7ec8e3;
     /* Absorbed damage text keeps the shipped pale blue. */
     --color-fct-absorb: #9fd7ff;
+    /* Heal-absorb overlay on unit-frame health bars (Living Rime, Stone Shell):
+       a dark navy wash that clearly dims the locked health on any bar color,
+       bright ice-white hatching, a bright rime edge where healing bites, an
+       ice-blue frame on the carrier's bar, and the number in an ink outline. */
+    --color-heal-absorb-wash: rgba(8, 22, 48, 0.86);
+    --color-heal-absorb-wash-top: rgba(26, 62, 110, 0.86);
+    --color-heal-absorb-stripe: rgba(228, 246, 255, 0.8);
+    --color-heal-absorb-edge: #f2fbff;
+    --color-heal-absorb-glow: rgba(120, 200, 255, 0.85);
+    --color-heal-absorb-text: #e6f7ff;
+    --color-heal-absorb-chip: #04101f;
     /* Healing combat text keeps the shipped restorative green. */
     --color-fct-heal: #3ce63c;
     /* Experience combat text keeps the shipped violet reward hue. */
@@ -1388,6 +1405,10 @@
     --color-breath-drowning-soft: rgb(255 60 40 / 40%);
     /* Breath text keeps its cool high-contrast parchment tint. */
     --color-breath-label: #eaf4ff;
+    /* The Knotted Gale's second pair of portals (phase 2): Portal C in the
+       storm's spring green, Portal D in its rose, the floor's own colours. */
+    --color-knot-portal-c: #a8ff3e;
+    --color-knot-portal-d: #ff5ab0;
 
     /* chat */
     /* Multiplies the player's chat opacity while the dock is idle. */

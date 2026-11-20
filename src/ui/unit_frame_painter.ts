@@ -48,6 +48,12 @@ const RES_TYPE_CLASSES = ['rage', 'energy', 'focus', 'mana'] as const;
 const EMPTY_RESOURCE_CLASS = 'is-empty';
 // The shield-overlay class (the shield reaches the bar's right edge).
 const OVERSHIELD_CLASS = 'overshield';
+// The heal-absorb overlay: the class that shows it, and the two custom
+// properties hud.css reads for the hatched segment's edges (heal_absorb_bar_view.ts).
+// Exported so the styles test pins the CSS against these exact names.
+export const HEAL_ABSORB_ON_CLASS = 'on';
+export const HEAL_ABSORB_START_PROP = '--heal-absorb-start';
+export const HEAL_ABSORB_END_PROP = '--heal-absorb-end';
 // Frame-state classes target/party need; the player always passes them off.
 const DEAD_CLASS = 'dead';
 const OUT_OF_RANGE_CLASS = 'oor';
@@ -84,6 +90,14 @@ export interface UnitFrameHeraldryElements {
   sealMotif: HTMLElement;
   /** Enlarged motif path behind the name header. */
   headerPattern: HTMLElement;
+}
+
+/** The heal-absorb overlay hosts (heal_absorb_overlay.ts builds them): the root
+ *  carries the on class and the segment-edge custom properties, the text node
+ *  carries the healing-left number. */
+export interface UnitFrameHealAbsorbElements {
+  root: HTMLElement;
+  text: HTMLElement;
 }
 
 /** The DOM element set one unit frame instance paints into. */
@@ -130,6 +144,9 @@ export interface UnitFrameElements {
   raidMarker?: HTMLElement;
   /** The absorb-shield overlay; omitted by a frame with no shield bar (party). */
   absorb?: HTMLElement;
+  /** The heal-absorb overlay; omitted by a frame with no heal-absorb surface
+   *  (target-of-target, pet, focus), which then pays zero writes. */
+  healAbsorb?: UnitFrameHealAbsorbElements;
   /** The resource bar group; omitted by a frame with no resource bar (target). */
   resource?: UnitFrameResourceElements;
 }
@@ -203,6 +220,7 @@ export class UnitFramePainter {
     this.writers.setTransform(this.el.hpFill, this.barScaleX(view.hpFrac));
     if (this.el.hpText) this.writers.setText(this.el.hpText, view.hpText);
     this.paintAbsorb(view);
+    this.paintHealAbsorb(view);
     this.paintResource(view);
     this.paintRaidMarker(view);
     if (this.opts.stateClasses) {
@@ -249,6 +267,20 @@ export class UnitFramePainter {
       absorbSegmentTransform(view.absorbStartFrac, view.absorbSizeFrac, this.barScaleX),
     );
     this.writers.toggleClass(absorb, OVERSHIELD_CLASS, view.absorbOvershield);
+  }
+
+  // The heal-absorb overlay: the on class, the segment edges as two custom
+  // properties (hud.css clips the full-width hatch to them, so the stripes never
+  // squash the way a scaleX segment would), and the healing-left number. The
+  // view caches its strings by quantized value, so a steady frame elides all four.
+  private paintHealAbsorb(view: UnitFrameView): void {
+    const el = this.el.healAbsorb;
+    if (!el) return;
+    const ha = view.healAbsorb;
+    this.writers.toggleClass(el.root, HEAL_ABSORB_ON_CLASS, ha.on);
+    this.writers.setStyleProp(el.root, HEAL_ABSORB_START_PROP, ha.start);
+    this.writers.setStyleProp(el.root, HEAL_ABSORB_END_PROP, ha.end);
+    this.writers.setText(el.text, ha.text);
   }
 
   // The raid-marker badge: shown (display block + the marker's image url) while

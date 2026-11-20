@@ -25,6 +25,7 @@ import { professionImageUrl } from './hud/professions/profession_art';
 import { ITEM_ART_PLACEHOLDERS } from './item_art_placeholders';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
+import { SMITH_HEART_AURA_IMAGE_IDS } from './smith_heart_aura_art';
 import { TRINKET_AURA_IMAGE_URLS } from './trinket_aura_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
@@ -2817,6 +2818,33 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   dgn_crypt_lantern: r('holy', 'holyGold', ['candle', { p: 'shield', ...BR }], ['glow']),
   dgn_crypt_embrace: r('frost', 'ice', ['hand', { p: 'snowflake', ...BR }], ['sparkle']),
   dgn_crypt_rime_path: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
+  // The Guardian of the Quench's Living Rime (encounters/smith_heart/quench_rime.ts):
+  // the crust that drinks healing (a frozen heart, cracking) and its slow.
+  heart_quench_rime: r('frost', 'ice', ['heart', { p: 'snowflake', ...BR }], ['crack']),
+  heart_quench_rime_slow: r('frost', 'ice', ['snowflake', { p: 'boot', ...BR }], ['motion']),
+  // The tank swaps (quench_temper.ts, breath_blow.ts): Rime-Tempered (a
+  // tempered fist in the frost), Wind-Battered (a shield in the wind),
+  // Thunder-Laden (a bolt on a shield), Bellows Blow's mark and throw.
+  heart_quench_tempered: r('frost', 'ice', ['fist', { p: 'snowflake', ...BR }], ['crack']),
+  heart_breath_wind_battered: r(
+    'storm',
+    'silverWhite',
+    ['shield', { p: 'wing', ...BR }],
+    ['motion'],
+  ),
+  heart_breath_thunder_laden: r(
+    'storm',
+    'shadowPurple',
+    ['shield', { p: 'bolt', ...BR }],
+    ['arcs'],
+  ),
+  heart_breath_blow_mark: r(
+    'storm',
+    'silverWhite',
+    ['wing', { p: 'crosshair', ...BR }],
+    ['motion'],
+  ),
+  heart_breath_blow_thrown: r('storm', 'silverWhite', ['wing', { p: 'boot', ...BR }], ['motion']),
   dgn_crypt_bridal_freeze: r(
     'frost',
     'silverWhite',
@@ -5335,6 +5363,8 @@ const AURA_ICON_DIR = '/ui/auras';
 /** Exact aura-art identities whose shipping files live directly under /ui/auras. */
 export const AURA_FILE_IMAGE_IDS: ReadonlySet<string> = new Set([
   ...MOB_AURA_IMAGE_IDS,
+  // The Smith's Heart raid's debuffs and boss auras (smith_heart_aura_art.ts).
+  ...SMITH_HEART_AURA_IMAGE_IDS,
   'affliction_doom',
   'battle_trance',
   'bg_battle_rune',
@@ -5905,6 +5935,15 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'feat_guild_writ_runner',
   'feat_guild_hallsworn',
   'feat_guild_of_lantern_hall',
+  // The Smith's Heart's seven (hidden while the raid is dev-gated): the dungeon crest until
+  // their paintings are commissioned.
+  'dgn_smith_heart',
+  'dgn_heart_council_feat',
+  'dgn_heart_breath_feat',
+  'dgn_heart_quench_feat',
+  'dgn_heart_heat_feat',
+  'dgn_heart_final_feat',
+  'dgn_heart_meta',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

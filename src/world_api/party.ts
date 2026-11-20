@@ -35,6 +35,9 @@ export interface PartyMemberInfo {
   group: 1 | 2;
   /** Remaining absorb-shield total. Optional for compatibility with older snapshots. */
   absorb?: number;
+  /** Remaining heal absorb (healing the member must take before their health
+   *  moves). Omitted when none is up, and by older snapshots. */
+  healAbsorb?: number;
   /** Active specialization role, when known. Older snapshots omit it. */
   role?: 'tank' | 'healer' | 'dps';
   /** Active specialization id, when known. Older snapshots omit it. */

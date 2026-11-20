@@ -3,7 +3,9 @@ import ffmpegPath from 'ffmpeg-static';
 import { describe, expect, it } from 'vitest';
 import {
   buildRaidBossVoiceFilter,
+  buildSmithHeartVoiceFilter,
   RAID_BOSS_VOICE_PROCESSING_PRESETS,
+  SMITH_HEART_CLEAN_VOICE_PRESETS,
 } from '../scripts/voices/raid_boss_voice_processing.mjs';
 
 describe('raid boss voice processing', () => {
@@ -74,6 +76,47 @@ describe('raid boss voice processing', () => {
       );
 
       expect(result.status, result.stderr).toBe(0);
+    },
+  );
+});
+
+describe("the Smith's Heart's clean voice treatments", () => {
+  it.each(SMITH_HEART_CLEAN_VOICE_PRESETS as { id: string }[])(
+    '$id stays clean: no modulation or voice pitch shift, keeps the length',
+    ({ id }) => {
+      const graph = buildSmithHeartVoiceFilter(id);
+      for (const effect of ['tremolo', 'flanger', 'chorus', 'anoisesrc', 'afreqshift'])
+        expect(graph).not.toContain(effect);
+      // The one rate shift is the sub, an octave under the voice.
+      expect(graph.match(/asetrate=/g)).toHaveLength(1);
+      expect(graph).toContain('loudnorm=I=-15:TP=-1.5');
+      // A 1 s tone renders to about 1 s (the room adds its tail only): an
+      // unpinned mix format once made loudnorm's output four times too long.
+      const result = spawnSync(
+        ffmpegPath as string,
+        [
+          '-hide_banner',
+          '-f',
+          'lavfi',
+          '-i',
+          'sine=frequency=180:duration=1:sample_rate=44100',
+          '-filter_complex',
+          graph,
+          '-map',
+          '[out]',
+          '-ar',
+          '44100',
+          '-f',
+          'null',
+          '-',
+        ],
+        { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 },
+      );
+      expect(result.status, result.stderr).toBe(0);
+      const times = [...result.stderr.matchAll(/time=(\d+):(\d+):([\d.]+)/g)].at(-1);
+      const seconds = Number(times?.[1]) * 3600 + Number(times?.[2]) * 60 + Number(times?.[3]);
+      expect(seconds).toBeGreaterThan(0.95);
+      expect(seconds).toBeLessThan(1.6);
     },
   );
 });

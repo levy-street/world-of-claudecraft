@@ -224,12 +224,39 @@ describe('patchOpaqueFragmentNanGuard coverage in stock shaders', () => {
     // a block before the write and never replaces the include, so the guard
     // still runs; tests/cel_shading_core.test.ts pins that it composes with
     // the guard in either order and comes back out leaving the guard intact.
+    // The Smith's Heart rock cutaway also names it: it INSERTS the Hammer vein's far depth fade
+    // (a multiply on outgoingLight) before the include and re-emits the include, so the guard
+    // still scrubs the faded value; the case below pins that on the patched shader.
     expect(naming).toEqual([
       'render/cel_shading.ts',
       'render/cel_shading_core.ts',
       'render/final_color_nan_guard.ts',
       'render/final_color_nan_guard_core.ts',
+      'render/smith_heart/heart_rock_cutaway.ts',
     ]);
+  });
+
+  it('keeps the guarded write in the Smith Heart rock cutaway, its fade before it', async () => {
+    const { applyRockCutaway, heartRockHammerDepthGlsl } = await import(
+      '../src/render/smith_heart/heart_rock_cutaway'
+    );
+    const mat = new THREE.MeshStandardMaterial();
+    applyRockCutaway(mat);
+    const shader = {
+      uniforms: {},
+      vertexShader: THREE.ShaderLib.standard.vertexShader,
+      fragmentShader: THREE.ShaderLib.standard.fragmentShader,
+    } as unknown as THREE.WebGLProgramParametersWithUniforms;
+    mat.onBeforeCompile(shader, {} as THREE.WebGLRenderer);
+    const include = '#include <opaque_fragment>';
+    expect(shader.fragmentShader.split(include).length - 1).toBe(1);
+    expect(shader.fragmentShader.includes(`${heartRockHammerDepthGlsl()}\n${include}`)).toBe(true);
+    const resolved = resolveIncludes(shader.fragmentShader);
+    expect(resolved.split(OPAQUE_WRITE).length - 1).toBe(1);
+    expect(resolved.includes('// WOC_OPAQUE_NAN_GUARD')).toBe(true);
+    expect(resolved.indexOf(heartRockHammerDepthGlsl())).toBeLessThan(
+      resolved.indexOf('// WOC_OPAQUE_NAN_GUARD'),
+    );
   });
 
   it('keeps global chunks patched across profile activation', () => {

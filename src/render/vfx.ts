@@ -31,6 +31,7 @@ import {
   LEGENDARY_REGALIA_GOLD,
   LEGENDARY_REGALIA_RATE_PER_SEC,
 } from './legendary_regalia_core';
+import type { MountSummonFxKind } from './mount_visuals';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
 import { spellEffectsMuted } from './spell_effects_switch';
 import { SwimWakeVfx } from './swim_wake_vfx';
@@ -167,6 +168,9 @@ const SPR = {
   debris: 14,
   ring: 15,
 } as const;
+
+/** A particle sprite by name, for an emitter module outside this file (emitParticle). */
+export type VfxParticleSprite = keyof typeof SPR;
 
 const PALADIN_SPRITES: Record<PaladinSpellVfxSprite, number> = {
   glowSoft: SPR.glowSoft,
@@ -2007,7 +2011,10 @@ export class Vfx {
   /** A quick yellow-orange shimmer ringing a rider as a mount is summoned (and on
    *  a dismount/live swap): tighter and shorter-lived than levelUpPillar so it
    *  reads as a conjure sparkle, not a level-up. Fired on the mountKey-change edge. */
-  mountSummonGlow(targetId: number, summonFx: 'shimmer' | 'lanternBurst' = 'shimmer'): void {
+  mountSummonGlow(targetId: number, summonFx: MountSummonFxKind = 'shimmer'): void {
+    // the Quarryheart Charger plays its own arrival (quarryheart_charger_fx.ts) on the frame its
+    // body first draws, which a lazy GLB can put after this edge: no shimmer of its own here
+    if (summonFx === 'quarryheart') return;
     const at = this.anchor(targetId, 0);
     if (!at) return;
     if (summonFx === 'lanternBurst') {
@@ -2149,6 +2156,45 @@ export class Vfx {
         puff ? SPR.firePuff : SPR.sparkBurst,
       );
     }
+  }
+
+  /** The viewer's reduced-motion setting as of the last cloud update, for an emitter module that
+   *  runs inside the entity sweep (quarryheart_charger_fx.ts) without its own channel to it. */
+  reducedMotionActive = false;
+
+  /** One pooled particle for a bespoke emitter module that keeps its own recipes beside its rig
+   *  (the Quarryheart Charger, quarryheart_charger_fx.ts): the sprite by name, the colour
+   *  already scaled by `particleHdr`. It costs no draw of its own (the shared cloud draws it). */
+  emitParticle(
+    x: number,
+    y: number,
+    z: number,
+    vx: number,
+    vy: number,
+    vz: number,
+    color: THREE.Color,
+    size: number,
+    lifetime: number,
+    gravity: number,
+    sprite: VfxParticleSprite,
+  ): void {
+    this.spawn(x, y, z, vx, vy, vz, color, size, lifetime, gravity, SPR[sprite]);
+  }
+
+  /** How many particles a continuous emitter of `ratePerSecond` releases this frame, scaled by
+   *  the cloud's quality exactly as the built-in auras are (a low tier sheds them first). */
+  particleRate(ratePerSecond: number, dt: number): number {
+    return this.emitCount(ratePerSecond, dt);
+  }
+
+  /** A one-shot burst's count, scaled by the cloud's quality like every built-in burst. */
+  particleBurst(count: number): number {
+    return this.scaledCount(count);
+  }
+
+  /** The HDR multiplier the cloud's own effects use (1 on the no-composer path). */
+  particleHdr(k: number): number {
+    return hdr(k);
   }
 
   /** Cinders shaken out of a carried lantern: they rise, wander and fade; at speed they
@@ -3014,6 +3060,7 @@ export class Vfx {
 
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
+    this.reducedMotionActive = reducedMotion;
     this.drainLifeVfx.update(dt, reducedMotion);
     this.hutFires.update(dt, reducedMotion);
 

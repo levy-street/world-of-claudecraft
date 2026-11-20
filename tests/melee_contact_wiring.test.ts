@@ -165,11 +165,12 @@ describe('one death hold per body, read by the pose, the mount and the wings', (
   });
 
   it('nothing else in the entity pass reads the hold', () => {
-    // One definition and four reads: the pose, the mount (its key and whether it shows) and
-    // the wings. Health, nameplate content, target frames, cast bars and the combat log are
-    // read off the entity elsewhere and never see this local.
-    expect(count(renderer, 'deathHeld')).toBe(5);
-    expect(count(renderer, 'heldUntilCollapse(')).toBe(2);
+    // One definition and five reads: the pose, the mount (its key and whether it shows), the
+    // wings, and a dormant body's sleep (its heap kept until the blade lands). Health,
+    // nameplate content, target frames, cast bars and the combat log are read off the entity
+    // elsewhere and never see this local.
+    expect(count(renderer, 'deathHeld')).toBe(6);
+    expect(count(renderer, 'heldUntilCollapse(')).toBe(3);
     expect(count(renderer, 'collapsed(')).toBe(2);
     // the sloppy pick (renderer.picking) decides its own death from the entity, never the hold
     expect(picking).toContain('const dead = !!e.dead;');

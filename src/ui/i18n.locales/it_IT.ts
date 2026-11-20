@@ -22230,30 +22230,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Chiudi la promozione Invita un amico',
   'hudChrome.wocStore.referralPromo.cta': 'Invita amici',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Avventuratevi insieme',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Due filamenti ritorti di legno nero legati nel ferro, sormontati da una lanterna di ferro aperta che arde di una fiamma crepuscolare viola tra due corna ricurve, con catene che oscillano dalla base.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Ogni lanterna nella sala brilla intensa tranne una. La fiamma crepuscolare è stata accesa per custodire la sala di notte ed emana ombra dove le altre danno luce; Garrick ne regola lo stoppino di persona. Il fumo e il bagliore viola sono soltanto estetici.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Bastone dello Stoppino Crepuscolare',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    "Lama ondulata di acciaio annerito dai bordi roventi, una vena fusa che si ramifica su entrambe le facce, una guardia di fiamme bronzee attorno a una pietra ardente e un'impugnatura rosso sangue.",
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    "La Sala della Lanterna custodisce un focolare mai spento dalla sua fondazione e Garrick Holt giura che questa lama sia stata temprata nelle sue braci. I membri che la portano dicono che l'impugnatura resti calda anche durante la veglia più gelida. Il fuoco lungo i bordi è soltanto estetico.",
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Marchio del Focolare',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     "Ampia lama d'acciaio con una scanalatura di fuoco di lanterna sopito, facce dorate, una lanterna ingabbiata che arde nella guardia e un'impugnatura di cuoio blu.",
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt non vende questa lama a uno sconosciuto. Va ai membri che hanno portato a termine i contratti della Sala della Lanterna settimana dopo settimana, e la consegna sempre con le stesse parole: la lanterna nella guardia è accesa dal focolare della sala, così ovunque la porti, la sala viene con te. Il fuoco nella scanalatura è soltanto estetico. Ciò che conta è la promessa.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lama della Sala della Lanterna',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    "Asta pallida legata d'argento e avvolta di brina luminosa, sormontata da un artiglio d'argento che regge un grande cristallo di luce fredda in una corona di ghiaccio scheggiato, con ghiaccioli appesi al collare.",
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'La guardia invernale della Sala della Lanterna portava bastoni come questo lungo la strada alta, con le sommità accese per i viaggiatori persi nella neve. Garrick ne tiene uno sulla rastrelliera per i membri con sigilli da spendere. La brina e la sua luce fredda sono soltanto estetiche.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Bastone della Luce di Brina',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    "Lunga lama blu mare dai bordi luminosi come onde infrante, un canale tempestoso che racchiude un fulmine biforcuto, un'onda dorata sul ricasso, una pinna lungo un bordo e una guardia di frangenti dorati attorno a una perla della tempesta.",
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    "Una capitana che navigava per la gilda riportò questa lama da una burrasca che le strappò l'albero e lasciò la nave a risuonare come una campana. Garrick la vende solo per sigilli e avverte ogni acquirente che ronza prima di una tempesta. Il fulmine e la luce marina sono soltanto estetici.",
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Cresta di Burrasca',
   'hudChrome.wocStore.subscription.annualClaim': 'Ritira la cavalcatura del pacchetto',
   'hudChrome.wocStore.subscription.annualDelivered':

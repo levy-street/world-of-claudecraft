@@ -43,6 +43,7 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryThrowKnot } from './encounters/smith_heart/breath_heart';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
 import { trySpearWrench } from './encounters/wildheart_basin/zulgar_spear';
 import { tryStartEscort } from './escort';
@@ -51,6 +52,11 @@ import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { mobLootSource } from './loot/awarded_loot_hold';
+import {
+  corpseLootDistance,
+  corpseLootReachBonus,
+  corpseLootScanRadius,
+} from './loot/corpse_loot_reach';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -158,7 +164,9 @@ export function lootCorpse(
     ctx.error(meta.entityId, "You don't have permission to loot that.");
     return false;
   }
-  if (dist2d(reachFrom ?? p.pos, mob.pos) > INTERACT_RANGE) {
+  // A big body is looted from its edge, a Smith's Heart guardian from its coffer's
+  // spot too (loot/corpse_loot_reach.ts): the classic INTERACT_RANGE otherwise.
+  if (corpseLootDistance(mob, reachFrom ?? p.pos) > INTERACT_RANGE) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }
@@ -279,7 +287,7 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
   if (isInRaidInstance(ctx, trigger.pos)) return; // silent: no error toast on a passive walk-by
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot || corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
-  if (dist2d(trigger.pos, mob.pos) > INTERACT_RANGE) return;
+  if (corpseLootDistance(mob, trigger.pos) > INTERACT_RANGE) return;
 
   // ffaUnlocked=false: walk-by may auto-loot the trigger's own tap, their party's tap,
   // an untapped corpse, personal drops, or open-to-all, but NEVER a stranger's corpse
@@ -288,7 +296,7 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
   const rights = corpseLootRights(ctx, mob, meta.entityId, false);
   if (!rights.shared && !rights.personal && !rights.open) return;
   // LOAD-BEARING alignment: this pre-check (rights via the same corpseLootRights
-  // + range via the same INTERACT_RANGE above) is what makes the delegated
+  // + range via the same corpseLootDistance above) is what makes the delegated
   // lootCorpse's "no permission" / "too far" toasts unreachable from this
   // passive pass; only the full-bags toast needs the explicit quiet flag. If
   // either threshold ever diverges from lootCorpse's, the walk-by retry loop
@@ -522,13 +530,22 @@ export function interact(
   // Pinned by Zulgar's Hunting Spear: the press is the victim's own pull on
   // it (only while nobody stands free to help), never anything else.
   if (trySpearWrench(ctx, p)) return;
+  // Carrying a Knotted Gale: the press is the throw (at the lip of a gap).
+  if (tryThrowKnot(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
-    if (
-      target &&
-      dist2d(p.pos, target.pos) <=
-        (forgeStationForEntity(target) ? FORGE_INTERACT_RANGE : INTERACT_RANGE + 2)
-    ) {
+    // A lootable body answers the press measured as its loot is (corpseLootDistance:
+    // a big body's edge, a guardian's coffer spot): the classic + 2 slack for an
+    // ordinary body, none past a big body's own loot reach.
+    const inPress =
+      !!target &&
+      (forgeStationForEntity(target)
+        ? dist2d(p.pos, target.pos) <= FORGE_INTERACT_RANGE
+        : isLootableBody(target)
+          ? corpseLootDistance(target, p.pos) <=
+            INTERACT_RANGE + (corpseLootReachBonus(target) > 0 ? 0 : 2)
+          : dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2);
+    if (target && inPress) {
       // A usable encounter body (the trash engine's G3: the Soul Brazier):
       // the press starts its use, validated here on the authoritative sim.
       if (tryStartKitUse(ctx, target, p)) return;
@@ -612,20 +629,25 @@ export function interact(
   // active begins the walk (escort.ts picks the nearest eligible one).
   if (tryStartEscort(ctx, p, r.meta)) return;
   let bestCorpse: Entity | null = null;
-  let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestCorpseReach = Number.POSITIVE_INFINITY;
   let bestObj: Entity | null = null;
   let bestObjD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestQuestEntity: Entity | null = null;
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
-  ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
-    if (
-      (e.kind === 'mob' || isLootableBody(e)) &&
-      e.lootable &&
-      corpseInteractionAvailability(ctx, e, p.id, true).hasLoot &&
-      d2 < bestCorpseD2
-    ) {
-      bestCorpse = e;
-      bestCorpseD2 = d2;
+  // The scan reaches as far as the widest corpse loot reach (a big body is looted
+  // from its edge, loot/corpse_loot_reach.ts); every other candidate keeps its own
+  // INTERACT_RANGE gate below, and each corpse is gated on its own reach.
+  ctx.grid.forEachInRadius(p.pos.x, p.pos.z, corpseLootScanRadius(p.pos), (e, d2) => {
+    if ((e.kind === 'mob' || isLootableBody(e)) && e.lootable) {
+      const reach = corpseLootDistance(e, p.pos);
+      if (
+        reach < INTERACT_RANGE &&
+        reach < bestCorpseReach &&
+        corpseInteractionAvailability(ctx, e, p.id, true).hasLoot
+      ) {
+        bestCorpse = e;
+        bestCorpseReach = reach;
+      }
     }
     if (
       e.kind === 'object' &&

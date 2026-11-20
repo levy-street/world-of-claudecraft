@@ -24102,30 +24102,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Tutup promosi Ajak Teman',
   'hudChrome.wocStore.referralPromo.cta': 'Undang teman',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Berpetualang bersama',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Dua pilinan kayu hitam terikat besi, bermahkota lentera besi terbuka yang membakar nyala senja ungu di antara dua tanduk melengkung, dengan rantai berayun dari dasarnya.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Setiap lentera di balai menyala terang kecuali satu. Nyala senja dinyalakan untuk menjaga balai pada malam hari, memancarkan bayangan saat yang lain memberi cahaya; Garrick memangkas sumbunya sendiri. Asap dan pendar ungu hanya tampilan.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Tongkat Sumbu Senja',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Bilah baja menghitam bergelombang seperti api dengan tepi sepanas tungku, urat cair bercabang di kedua sisinya, pelindung tangan berupa nyala perunggu mengelilingi batu menyala, gagang merah darah.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Balai Lentera menjaga perapian yang tak pernah padam sejak balai didirikan, dan Garrick Holt bersumpah bilah ini didinginkan dalam baranya. Anggota yang membawanya mengatakan gagang tetap hangat pada penjagaan terdingin. Api di tepinya hanya tampilan.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Cap Perapian',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Bilah baja lebar dengan alur berisi api lentera terpendam, sisi bersepuh emas, lentera berkurung menyala pada pelindung silang, gagang kulit biru.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt tak akan menjual bilah ini kepada orang asing. Bilah diberikan kepada anggota yang memenuhi kontrak Balai Lentera minggu demi minggu, dan ia selalu menyerahkannya dengan kata yang sama: lentera pada pelindung dinyalakan dari perapian balai sendiri, jadi ke mana pun dibawa, balai menyertaimu. Api di alur hanya tampilan. Janjinya yang berarti.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Bilah Balai Lentera',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Batang pucat terikat perak dan dililit embun beku bercahaya, bermahkota cakar perak yang memegang kristal besar bercahaya dingin dalam mahkota pecahan es, dengan es menggantung dari kerahnya.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Penjaga musim dingin Balai Lentera membawa tongkat seperti ini di jalan tinggi, mahkotanya menyala untuk pelancong yang tersesat di salju. Garrick menyimpan satu di rak untuk anggota yang memiliki segel lebih. Embun beku dan cahaya dinginnya hanya tampilan.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Tongkat Cahaya Beku',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Bilah panjang biru laut dengan tepi seterang ombak pecah, saluran badai berisi petir bercabang, gelombang emas di atas pangkal bilah, sirip pada satu tepi, dan pelindung berupa ombak emas mengelilingi mutiara badai.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Kapten yang berlayar untuk guild membawa bilah ini pulang dari badai yang merenggut tiangnya dan membuat kapalnya berdentang seperti lonceng. Garrick hanya menjualnya dengan segel dan memperingatkan setiap pembeli bahwa bilah berdengung sebelum badai. Petir dan cahaya laut hanya tampilan.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Puncak Badai',
   'hudChrome.wocStore.subscription.annualClaim': 'Ambil tunggangan bundel',
   'hudChrome.wocStore.subscription.annualDelivered':

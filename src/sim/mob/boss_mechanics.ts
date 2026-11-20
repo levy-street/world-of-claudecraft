@@ -10,6 +10,7 @@
 // methods on the facade by cast (mob_rally / mob_ward_allies / mob_mend_ally /
 // mob_desperate_heal / mob_warcry / delves / sloomtooth_drowned /
 // summon_threat_seed), the resetNythraxisEncounter precedent.
+
 import { isLockedOut, isSilenced } from '../combat/cc';
 import { isRiftPos, MOBS } from '../data';
 import { onBossAddsSummonedForDeeds } from '../deeds';
@@ -20,6 +21,7 @@ import {
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from '../instances/difficulty';
+import { instanceHalfWidthOf } from '../instances/instance_footprint';
 import { riftMechanicSuppressed, riftRankTemplate, riftRankTuningFor } from '../rift/ranks';
 import { riftInstanceAtPos } from '../rift/runs';
 import type { SimContext } from '../sim_context';
@@ -357,7 +359,10 @@ export function spawnBossAdds(ctx: SimContext, boss: Entity, mobId: string, coun
   const inst = ctx.instances.find((i) => {
     if (i.partyKey === null) return false;
     const o = ctx.instanceOriginOf(i);
-    return Math.abs(boss.pos.x - o.x) < 120 && Math.abs(boss.pos.z - o.z) < 250;
+    return (
+      Math.abs(boss.pos.x - o.x) < instanceHalfWidthOf(i.dungeonId) &&
+      Math.abs(boss.pos.z - o.z) < 250
+    );
   });
   const [topThreatId] = threatEntries(boss, 1)[0] ?? [];
   const victimId = boss.aggroTargetId ?? topThreatId ?? null;

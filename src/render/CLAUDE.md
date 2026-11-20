@@ -245,7 +245,12 @@ Everything else is a sibling module in one of these families:
   markers / AoE rings / ground-aim reticle (`ground_feedback.ts`), the Tab cone overlay
   (`target_cone_overlay.ts`), god-ray shafts (`god_ray_shafts.ts`), and the
   per-biome fog/light/god-ray tables (`outdoor_biome_presets.ts`). A new
-  public picking method lands on its facade, not on `Renderer`.
+  public picking method lands on its facade, not on `Renderer`. An effect that
+  wants a body clickable somewhere else lends it a click proxy through
+  `fx_pick_proxies.ts` (an invisible mesh carrying the BODY's `entityId`, raycast
+  by `pickDirect` beside the capsules): a click on it is a click on that body,
+  never an outcome of its own (the Smith's Heart loot coffer,
+  `smith_heart_fx/loot_coffer_fx.ts`).
 - **Sitting on furniture** (the seats are `src/sim/seat_anchor.ts`): the sim keeps a seated
   body on its seat's STAND spot; `seated_pose.ts` over the pure `seated_pose_core.ts` draws it
   in the seat (the root at the seat anchor, turned to the seat, the rig ROOT lifted onto the

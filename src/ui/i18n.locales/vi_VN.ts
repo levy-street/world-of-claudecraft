@@ -23108,30 +23108,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Đóng Quảng Bá Giới Thiệu Bạn',
   'hudChrome.wocStore.referralPromo.cta': 'Mời Bạn Bè',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Cùng Nhau Phiêu Lưu',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Hai dải gỗ đen xoắn quấn sắt, đỉnh là đèn sắt hở cháy ngọn lửa hoàng hôn tím giữa hai sừng cong, xích đung đưa từ đáy.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Mọi đèn trong sảnh đều sáng trừ một. Lửa hoàng hôn được thắp để giữ sảnh ban đêm, tỏa bóng tối nơi đèn khác tỏa sáng; Garrick tự tay tỉa bấc. Khói và ánh tím chỉ là diện mạo.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Trượng Bấc Hoàng Hôn',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Lưỡi thép đen uốn như lửa, mép nóng như lò, đường nóng chảy phân nhánh hai mặt, chắn tay là lửa đồng quanh đá cháy, chuôi đỏ huyết bò.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Sảnh Đèn Lồng giữ bếp lửa chưa tắt từ ngày xây sảnh, Garrick Holt thề lưỡi này được tôi trong than bếp. Thành viên mang kiếm nói chuôi vẫn ấm trong ca gác lạnh nhất. Lửa dọc mép chỉ là diện mạo.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Ấn Lửa Bếp',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Lưỡi thép rộng với rãnh lửa đèn ủ, má dát vàng, đèn lồng cháy trong chắn ngang, chuôi da xanh.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt không bán lưỡi kiếm này cho người lạ. Nó dành cho thành viên đã hoàn thành hợp đồng Sảnh Đèn Lồng tuần này qua tuần khác, và lần nào trao ông cũng nói: đèn nơi chắn tay được thắp từ bếp sảnh, nên mang nó đi đâu, sảnh cũng theo đó. Lửa trong rãnh chỉ là diện mạo. Lời hứa mới là điều cốt yếu.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lưỡi Kiếm Sảnh Đèn Lồng',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Thân nhạt quấn bạc và sương giá phát sáng, đỉnh là vuốt bạc giữ tinh thể sáng lạnh lớn trong vương miện băng vỡ, nhũ băng rủ từ cổ.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Đội gác mùa đông Sảnh Đèn Lồng từng mang trượng thế này trên đường cao, thắp đỉnh cho lữ khách lạc trong tuyết. Garrick giữ một cây trên giá cho thành viên dư ấn. Sương giá và ánh lạnh chỉ là diện mạo.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Trượng Ánh Sương',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Lưỡi dài xanh biển với mép sáng như sóng vỡ, rãnh bão giữ tia sét chẻ, sóng dát vàng trên đoạn sát chuôi, vây dọc một mép, chắn tay là sóng vỡ dát vàng quanh ngọc bão.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Nữ thuyền trưởng đi biển cho bang hội mang lưỡi kiếm này về từ cơn giông đã lấy cột buồm, để tàu rung như chuông. Garrick chỉ bán lấy ấn, cảnh báo mọi người mua rằng nó ngân trước bão. Sét và ánh biển chỉ là diện mạo.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Đỉnh Giông',
   'hudChrome.wocStore.subscription.annualClaim': 'Nhận Thú Cưỡi Gói',
   'hudChrome.wocStore.subscription.annualDelivered':

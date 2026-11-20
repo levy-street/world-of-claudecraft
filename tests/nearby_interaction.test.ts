@@ -21,6 +21,9 @@ function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entit
     loot: null,
     harvestClaimedBy: null,
     dungeonId: null,
+    // Every live entity carries an aura list (src/net/blank_entity.ts mints
+    // one empty): the usable-body check reads it for the spent/locked markers.
+    auras: [],
     ...overrides,
   } as Entity;
 }

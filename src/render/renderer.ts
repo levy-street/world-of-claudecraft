@@ -160,8 +160,8 @@ import {
   setCharacterCullShadow,
 } from './character_cull_core';
 import {
+  applyCharacterBodyTints,
   type CharacterWeaponAura,
-  characterRuneTintColor,
   characterVeilboundState,
   characterWeaponAuraInto,
   characterWeaponAuraMode,
@@ -380,7 +380,12 @@ import {
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
-import { latchFarLod } from './far_lod_latch';
+import {
+  keepsArticulatedRig,
+  latchFarLod,
+  noteScriptedGesture,
+  scriptedPoseHidden,
+} from './far_lod_latch';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -416,6 +421,7 @@ import { FirstPersonRig } from './first_person_camera';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
 import { applyFloorVfxLayer } from './floor_vfx_layer';
+import { FogSceneFade } from './fog_scene_fade';
 import { applyFogScenePreset, resolveFogScene } from './fog_scene_state';
 import {
   buildFoliage,
@@ -883,6 +889,7 @@ import { refreshTextureAnisotropy } from './texture_anisotropy';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { TextureResidencyLedger } from './texture_residency_ledger';
+import { thrownHopLift } from './thrown_hop';
 import {
   groundSpeedFromFrame,
   hasTravelFormAura,
@@ -2481,6 +2488,7 @@ export class Renderer {
     this.sunDir.copy(SUN_DIR);
     // The boot rig, captured for the editor lighting override to restore.
     this.lightRig = { sun: this.sun, hemi: this.hemi, sunDir: this.sunDir };
+    this.sceneFade = new FogSceneFade(this.scene, this.sun, this.hemi);
     this.authoredLighting.capture(this.lightRig, this.envOutdoorIntensity);
     // A map with authored lighting (the editor's Lighting tab, saved into the
     // document and projected onto WorldContent) applies it from boot: playtest
@@ -3057,7 +3065,7 @@ export class Renderer {
         this.scene,
         this.groundSample,
         this.worldCompileGate(),
-        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture),
+        this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture), (id) => this.views.get(id)?.group.position, this.budgetLights,
       );
     });
     this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
@@ -8554,6 +8562,7 @@ export class Renderer {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return 0;
+    noteScriptedGesture(visual, this.time); // a boss's scripted pose reached this rig
     this.attackTriggerCount++;
     if (!gestureOnly)
       playSkinSwingTrail(this.abilityVfxFx, entityId, this.sim.entities.get(entityId), kind);
@@ -8666,6 +8675,8 @@ export class Renderer {
   private riftFogAuthored = false;
   /** Read by scenery eligibility; atmosphere updates remain owned here. */
   fogState: FogSceneState = 'outdoor';
+  /** How a settle lands: the raid's rooms crossfade (fog_scene_fade.ts). */
+  private sceneFade!: FogSceneFade;
 
   /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
@@ -9050,20 +9061,25 @@ export class Renderer {
         fog.far = style.fog.far;
       }
       this.fogState = 'rift';
+      this.sceneFade.cancel();
       this.applyStateLightRig('rift');
       return;
     }
     this.riftFogKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
-      applyFogScenePreset(desired, fog, () => valley?.fog ?? this.outdoorFogPreset());
-      // interiors must not leak daylight: drop sun + sky ambient + IBL
-      // underground so the torch point lights own the scene; restore outside.
-      // The rim glow cranks up instead, silhouettes must split from the murk.
-      // Which numbers each state means is interior_light_rig.ts's to own.
-      this.applyStateLightRig(desired);
+      this.sceneFade.settle(fogScene.interior, this.lightDir, () => {
+        applyFogScenePreset(desired, fog, () => valley?.fog ?? this.outdoorFogPreset());
+        // interiors must not leak daylight: drop sun + sky ambient + IBL
+        // underground so the torch point lights own the scene; restore outside.
+        // The rim glow cranks up instead, silhouettes must split from the murk.
+        // Which numbers each state means is interior_light_rig.ts's to own;
+        // how the settle lands (the raid's rooms crossfade) fog_scene_fade.ts's.
+        this.applyStateLightRig(desired);
+      });
       return;
     }
+    this.sceneFade.step(dt);
     // Outdoors, fog is also the residency boundary. Pull it inward immediately
     // before an unloaded zone can become visible; once that zone has been
     // loaded by the boundary transition, ease the view distance back out.
@@ -9337,6 +9353,7 @@ export class Renderer {
     const blend = t * t * (3 - 2 * t);
     this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
     interiorKeyLightDirection(this.fogState, this.lightDir);
+    this.sceneFade.keyDirection(this.lightDir);
     setWaterSunDirection(this.lightDir);
     setWaterDayNight(this.dnGrade.fog);
     setFarTerrainNightGrade(this.dnGrade.nightAmt);
@@ -9803,7 +9820,10 @@ export class Renderer {
         // Per-frame visibility follows the create/destroy hysteresis above so
         // rigs at the draw edge do not flicker. The object branch below may
         // still re-hide loot.
-        v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
+        // A boss awaiting its scripted (entrance) pose: hidden until it arrives.
+        v.group.visible =
+          raidEncounterViewVisibleDuringCompile(e, v.compilePending) &&
+          !scriptedPoseHidden(this.activeVisual(v) ?? v, e, this.time);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The
@@ -9817,7 +9837,7 @@ export class Renderer {
         }
         if (shadowsEnabled) {
           // mid-distance rigs keep rendering but leave the shadow pass
-          wantShadow = d2 < shadowRangeSq;
+          wantShadow = d2 < shadowRangeSq || keepsArticulatedRig(e.templateId);
           inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
           v.visual?.setShadow(wantShadow);
           // past the articulated gate the static-pose proxy carries the
@@ -9863,7 +9883,9 @@ export class Renderer {
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
       const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null, v);
-      const { x, y, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const hop = thrownHopLift(v, e.auras, this.time); // a thrown body's arc (thrown_hop.ts)
+      const { x, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
+      const y = rp.y + hop;
       v.group.position.set(x, y, z);
       let facing = rp.facing;
       if (ignivarBossFacingLocked(e)) facing = e.facing;
@@ -10303,7 +10325,7 @@ export class Renderer {
       // Metamorphosis is no longer a tint on the base rig: it has its own lazy
       // CharacterVisual driven by formVisibility.metamorph above.
       active.setAscended(veilboundState !== 'none');
-      active.setRuneTint(characterRuneTintColor(e));
+      applyCharacterBodyTints(active, e, performance.now() / 1000);
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
@@ -10473,9 +10495,10 @@ export class Renderer {
       const airborne =
         !visuallyDead &&
         !swimming &&
-        (animFromDisplay && this.selfRender.predictor && !inRift
-          ? !this.selfRender.predictor.onGround
-          : !e.onGround || v.airborneHeurFrames >= 2);
+        (hop > 0 ||
+          (animFromDisplay && this.selfRender.predictor && !inRift
+            ? !this.selfRender.predictor.onGround
+            : !e.onGround || v.airborneHeurFrames >= 2));
       // Grounded presentation polish, both display-only (see the cores).
       // Vertical smoothing absorbs the step-up the solver performs inside a
       // single tick, so the body strides onto a kerb instead of teleporting up
@@ -10571,7 +10594,7 @@ export class Renderer {
       applyLocoDirection(st, loco, ghostWolf);
       st.dead = visuallyDead;
       st.casting = characterCasting;
-      st.asleep = e.asleep === true; // in bed (mob/slumber.ts): the sleep loop holds
+      st.asleep = heldUntilCollapse(deathHeld, e.asleep === true && !visuallyDead, active.sleeping);
       // Which ability, so the pose layer can tell a drawn shot from a pet
       // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
       st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;

@@ -36,7 +36,18 @@ export type FieldGround =
   // bare slate of Thornpeak.
   | 'snow'
   | 'ice'
-  | 'slate';
+  | 'slate'
+  // The Smith's Heart's Hammer vein: the quarry's cut bedrock, and the
+  // Gallery's worn paving (phase 2E); its Breath vein's storm-scoured pale
+  // granite (phase 2G); its Quench vein's frost-bound granite and the Frozen
+  // Lake's clear ice (phase 2H); its Heat vein's columnar basalt, fire in its
+  // joints (phase 2I).
+  | 'quarry'
+  | 'paving'
+  | 'scoured'
+  | 'rime'
+  | 'lake_ice'
+  | 'hearth';
 
 interface FieldSurfaceBase {
   id: string;
@@ -108,6 +119,12 @@ export interface FieldProp {
   hd?: number;
   /** Visual height of the collider (sight top); defaults to 6. */
   h?: number;
+  /** An encounter owns this prop's solid body (it cracks and falls in a fight
+   *  and stands again on a reset: the Smith's Heart's quarry columns): the
+   *  field builds no collider for it, and a live claim publishes one as a
+   *  combat wall instead (instances/combat_wall_state.ts). Its footprint and
+   *  height still describe the body. */
+  encounterOwned?: boolean;
 }
 
 /** One lighting mood region (render-only: key tint, fog tint, torch colour). */
@@ -133,6 +150,12 @@ export interface AuthoredFieldDef {
   voidHeight: number;
   /** A drop taller than this between neighbouring ground becomes a cliff wall. */
   cliffStep: number;
+  /** Breaks in the walls over the void (the Smith's Heart's Storm Cornice
+   *  gaps): a cliff sample inside one of these discs whose low side is the
+   *  void builds no collider, so a body walks, or is blown, off the lip there
+   *  and falls. The run is still derived (its rock face is drawn), marked
+   *  `open` (cliffs.ts FieldCliffRun). */
+  lipOpenings?: readonly { x: number; z: number; r: number }[];
   /** Ordered: a later surface wins where two overlap. */
   surfaces: readonly FieldSurface[];
   walls: readonly FieldWall[];

@@ -28,6 +28,7 @@ import { MEMBERSHIP_XP_MULTIPLIER } from '../content/membership';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { reflectionIgnoresHit } from '../encounters/drowned_temple/reflection_guard';
+import { heatCinderHitPoints } from '../encounters/smith_heart/heat_cinder_ward';
 import { bastionWardHitPoints } from '../encounters/sunken_bastion/ward_hits';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
@@ -131,6 +132,7 @@ import {
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
 import { formAutoRageMult } from './form_swing';
+import { frontWardAmount } from './front_ward';
 import { clearFieldcraftState } from './hunter_fieldcraft';
 import { lonelySoulDamageMult, lonelySoulPetFloor } from './hunter_lonely_soul';
 import { clearPacklordState } from './hunter_packlord';
@@ -277,6 +279,15 @@ export function dealDamage(
   const bastionWard = bastionWardHitPoints(source, target);
   if (bastionWard !== null) {
     amount = bastionWard;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
+  // The Smith's Heart's Rolling Cinder is a ward while it rolls
+  // (encounters/smith_heart/heat_cinder_ward.ts): a strike lands one point
+  // (the encounter reads it as the hit that knocks it back).
+  const cinderWard = heatCinderHitPoints(source, target, direct);
+  if (cinderWard !== null) {
+    amount = cinderWard;
     resolvedHpLoss = true;
     alreadyFinal = true;
   }
@@ -446,6 +457,10 @@ export function dealDamage(
     for (const a of target.auras) if (a.kind === 'vulnerability') vuln += a.value;
     if (vuln > 0) amount = Math.round(amount * (1 + vuln));
   }
+
+  // A frontal ward (combat/front_ward.ts: the Breath's Squall Shieldbearer)
+  // turns aside a share of a blow struck from inside its front arc.
+  if (!resolvedHpLoss && source && amount > 0) amount = frontWardAmount(target, source, amount);
 
   // Breachmaker only sharpens the originating Warrior's attacks. It must not
   // become a raid-wide vulnerability when another attacker hits the target.
@@ -1527,6 +1542,10 @@ export function handleDeath(
   // Death cannot shed persistent death penalties or encounter-owned unbreakable
   // control. The encounter script remains responsible for releasing its markers.
   e.auras = aurasSurvivingDeath(e.auras);
+  // A dormant mob killed through its ward dies awake: no sleep bit or rise rides its corpse
+  // onto the wire or into the next life (mob/dormant.ts).
+  if (e.asleep) e.asleep = false;
+  if (e.dormantRise) e.dormantRise = 0;
   e.ccDr.clear();
   stopChannelVisual(ctx, e);
   emitRainOfFireStop(ctx, e);

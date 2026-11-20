@@ -2,7 +2,7 @@
 // full-body one-shot keep ownership of the rig while ordinary melee damage is
 // still allowed to resolve underneath them.
 
-import { ABILITIES } from '../../sim/data';
+import { ABILITIES, MOBS } from '../../sim/data';
 import { isBleedContinuation } from '../melee_impact_core';
 import { playerAttackAnimationAlreadyStarted } from './skin_attack';
 import { attackAbilityId } from './weapon_attack_style_core';
@@ -56,6 +56,13 @@ export function isPlayerDamageContinuation(
   );
 }
 
+/** A tick of the on-hit poison a mob of `templateId` lays (MobTemplate.stackPoison, labelled
+ *  with the poison's name), never a swing of its own. */
+export function isMobPoisonTick(templateId?: string, label?: string | null): boolean {
+  if (!templateId || !label) return false;
+  return MOBS[templateId]?.stackPoison?.name === label;
+}
+
 /** This timed, non-projectile cast emits only direct damage at completion.
  * Its clip must release there; ordinary spell hits already released at launch. */
 export function damageCarriesCastRelease(primaryId?: string | null): boolean {
@@ -105,6 +112,10 @@ export function damageEventStartsAttackAnimation(
       return false;
     if (isBleedContinuation(attackAbilityId(abilityLabel ?? null), primaryAbilityId)) return false;
   }
+  // A mob's own on-hit poison (MobTemplate.stackPoison) ticks on its own clock: each tick is the
+  // wound, never another swing (the Splinter of the Hammer's physical Mounting Weight played a
+  // swing on every tick, cutting its Shearing Blow).
+  if (source?.kind === 'mob' && isMobPoisonTick(source.templateId, abilityLabel)) return false;
   const authoredCastOwnsBody =
     source?.kind === 'mob' &&
     source.castingAbility !== null &&

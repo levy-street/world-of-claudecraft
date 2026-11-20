@@ -384,6 +384,88 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/gravewyrm_sanctum/sanctum_lights.ts', layer: 'ground', strict: true },
   { file: 'src/render/gravewyrm_sanctum/sanctum_vault.ts', layer: 'ground', strict: true },
   { file: 'src/render/gravewyrm_sanctum/sanctum_works.ts', layer: 'ground', strict: true },
+  // The Smith's Heart's floor light-rivers and the heart seal's inlay: the
+  // floor's own marks, under every telegraph.
+  { file: 'src/render/smith_heart/heart_rivers.ts', layer: 'ground', strict: true },
+  { file: 'src/render/smith_heart/heart_seal.ts', layer: 'ground', strict: true },
+  // The seal's portal (its floor vortex and shockwave rings, the hop's floor
+  // ring) and the Heart's rune rings: floor marks under every telegraph.
+  { file: 'src/render/smith_heart/heart_portal.ts', layer: 'ground', strict: true },
+  { file: 'src/render/smith_heart/heart_room.ts', layer: 'ground', strict: true },
+  // The Anvil of the World's quarters awake (phase 2K): each quarter's light
+  // washed over its stones, a floor mark one rung over the dais's runes.
+  { file: 'src/render/smith_heart/heart_quarters.ts', layer: 'ground', strict: true },
+  // The Guardian of the Quench's fight on the ice: its floor discs ride the
+  // encounter band; the provisional body's blocks and collars keep the default
+  // order 0 on purpose (scene objects, never floor marks), so not strict.
+  { file: 'src/render/smith_heart_fx/quench_fight_fx.ts', layer: 'encounter', strict: false },
+  { file: 'src/render/smith_heart_fx/quench_frost_fx.ts', layer: 'encounter', strict: false },
+  // The Guardian of the Quench's own body: the rime her steps freeze into the
+  // lake on the band's floor rung, under every telegraph; the Blades Wake's
+  // racing lines on a rung of their own (its column is a body, default order).
+  { file: 'src/render/smith_heart_fx/quench_rime_steps.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/quench_wake_fx.ts', layer: 'encounter', strict: false },
+  // The Guardian of the Heat's fight in the Hearth: the same split, its burn
+  // sheaths ride the bodies at the default order 0.
+  { file: 'src/render/smith_heart_fx/heat_fight_fx.ts', layer: 'encounter', strict: false },
+  // Its parts and its two floor seams: every rung off the Heat's own floor
+  // ladder (heat_floor_ladder_core.ts, pinned untied in
+  // tests/smith_heart_heat_floor.test.ts).
+  { file: 'src/render/smith_heart_fx/heat_well_fx.ts', layer: 'encounter', strict: true },
+  // The lava waves' walls of fire: the foot and the corridors on the Heat's
+  // ladder; the sheets, tongues, embers and haze stand in the air and take
+  // bare orders over every floor band (WALL_AIR_ORDER), so not strict.
+  { file: 'src/render/smith_heart_fx/heat_lava_wall_fx.ts', layer: 'encounter', strict: false },
+  // The Wheel of the Hearth's slices: each floor decal on Wakefire's commuting
+  // rungs (heat_molten_decal.ts); its vents (shimmer, geysers, the flame
+  // sheet) stand in the air on the lava wall's WALL_AIR_ORDER, so not strict.
+  { file: 'src/render/smith_heart_fx/heat_wheel_fx.ts', layer: 'encounter', strict: false },
+  { file: 'src/render/smith_heart_fx/heat_cinder_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/heat_molten_decal.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/heat_telegraph.ts', layer: 'encounter', strict: true },
+  // The Masterless Strength's quarter kits on the Anvil: the gale's rim band
+  // and Heart Unbound's blaze on their own rungs (final_kit_fx_core.ts
+  // FINAL_KIT_FLOOR, pinned untied in tests/smith_heart_final_kit_fx.test.ts);
+  // its whirls, orbs, ice, shells and anvil are bodies at the default order.
+  { file: 'src/render/smith_heart_fx/final_kit_fx.ts', layer: 'encounter', strict: true },
+  // Weight of the Anvil's countdown runes and its strike's scar, on the kit's
+  // own additive rungs (FINAL_KIT_FLOOR.marks, shock); its body, column,
+  // streak, flash and fragments are bodies at the default order.
+  { file: 'src/render/smith_heart_fx/final_anvil_fx.ts', layer: 'encounter', strict: false },
+  // The Breath's Knotted Gale: its floor discs on HEART_FLOOR's own rungs; the ball,
+  // the funnels and the burst are bodies at the default order.
+  { file: 'src/render/smith_heart_fx/breath_heart_fx.ts', layer: 'encounter', strict: false },
+  // The Breath's Summit Roar: its blast ring and wake on the encounter rung;
+  // its whole-screen frost veil is a camera overlay (order 9990), so not strict.
+  { file: 'src/render/smith_heart_fx/breath_roar_fx.ts', layer: 'encounter', strict: false },
+  // The Breath's Islands of the Wind (its 50 percent phase): the isles' rune
+  // rings and the Updrafts' wind discs; each isle's Closing Storm ring; the
+  // Stillstones' rune circles; the Squall Ward's arc on the floor; the cocoon's
+  // rune ring at the guardian's foot (its storm sky is drawn first of the
+  // see-through things and the nova's storm core under its light: two bare
+  // orders off the floor, so not strict).
+  { file: 'src/render/smith_heart_fx/breath_isles_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/breath_isle_storm_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/breath_stillstone_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/breath_isle_adds_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/smith_heart_fx/breath_cocoon_fx.ts', layer: 'encounter', strict: false },
+  // Its element telegraphs (the Quench's frost, the Breath's storm, the
+  // Hammer's granite, the Heat's molten basalt): char, glow and curtain on
+  // the kit's own rungs (FINAL_KIT_FLOOR).
+  { file: 'src/render/smith_heart_fx/final_telegraphs.ts', layer: 'encounter', strict: true },
+  // The Breath's and the Hammer Council's painted telegraphs (lightning, wind,
+  // the calm, split stone, rubble): each glow pass on its owner's glow rung,
+  // over every char rung of that owner (painted_telegraph_core.ts).
+  { file: 'src/render/smith_heart_fx/painted_telegraphs.ts', layer: 'encounter', strict: true },
+  // The Hammer Council survivor's Grieving Fury: its scorch and cracked sigil
+  // on the floor through the ladder; the storm arcs and the body glow stand
+  // up from it and keep bare orders, so not strict.
+  { file: 'src/render/smith_heart_fx/council_fury_fx.ts', layer: 'encounter', strict: false },
+  // The Smith's Heart entrance and death cinematics that lay frost or ember on
+  // the floor through the ladder; their camera flash keeps a bare order.
+  { file: 'src/render/smith_heart_fx/heat_entrance_fx.ts', layer: 'encounter', strict: false },
+  { file: 'src/render/smith_heart_fx/quench_death_fx.ts', layer: 'encounter', strict: false },
+  { file: 'src/render/smith_heart_fx/quench_entrance_fx.ts', layer: 'encounter', strict: false },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];
@@ -398,6 +480,25 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
  * otherwise, so a floor mechanic cannot ship outside the ladder unnoticed.
  */
 const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
+  // The Smith's Heart boss entrance and death cinematics: storms, beams, bolts,
+  // bursts and a full-screen flash ordered among themselves, played while no
+  // floor mechanic is live (before the pull or after the kill)
+  'src/render/smith_heart_fx/breath_death_fx.ts',
+  'src/render/smith_heart_fx/breath_entrance_bolts.ts',
+  'src/render/smith_heart_fx/breath_entrance_fx.ts',
+  'src/render/smith_heart_fx/breath_entrance_storm.ts',
+  'src/render/smith_heart_fx/council_death_fx.ts',
+  'src/render/smith_heart_fx/council_entrance_fx.ts',
+  'src/render/smith_heart_fx/final_arrival_beam.ts',
+  'src/render/smith_heart_fx/final_death_fx.ts',
+  // the Hammer vein's fire bowls: upright flames over bowls on a terrace, never on a floor
+  'src/render/smith_heart/hammer_env_flames.ts',
+  // The Quench's freeze: a crystal of ice round a frozen body, ordered after
+  // the body's own frost shell; a body mesh, never a floor mark
+  'src/render/smith_heart_fx/quench_encase_fx.ts',
+  // The Breath's summit: two decks of cloud sea far below the Cornice, ordered
+  // between themselves (the lower first); scenery in the air, never a floor mark
+  'src/render/smith_heart/breath_summit.ts',
   // the seasonal candle halos: camera-facing sprites at a candle's height, never on
   // the floor (their ground pools take the floor ladder through floorVfxRenderOrder)
   'src/render/seasonal_decor_lights.ts',

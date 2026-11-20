@@ -19,6 +19,7 @@
 // DungeonPrompts.
 
 import { MOBS } from '../../../sim/data';
+import { KIT_USE_SPENT_AURA } from '../../../sim/mob/trash_kit/encounter_use';
 import { isKitUseCast, type KitUseDef } from '../../../sim/types';
 import { castDisplayName } from '../../cast_display_name';
 import { tEntity } from '../../entity_i18n';
@@ -52,6 +53,8 @@ export interface KitUseBody {
   dead?: boolean;
   hp?: number;
   pos: { x: number; z: number };
+  /** Its auras (a spent body wears KIT_USE_SPENT_AURA). */
+  auras?: readonly { id: string }[];
 }
 
 export interface KitUsePromptInput {
@@ -78,9 +81,14 @@ export function kitUseDefOf(body: KitUseBody | null | undefined): KitUseDef | nu
   return MOBS[body.templateId]?.trashKit?.usable ?? null;
 }
 
-/** Alive and usable right now (encounter_use.ts kitUsableNow). */
+/** Alive, usable and not spent right now (encounter_use.ts kitUsableNow). */
 function usableNow(body: KitUseBody): boolean {
-  return !body.dead && (body.hp ?? 1) > 0 && kitUseDefOf(body) !== null;
+  return (
+    !body.dead &&
+    (body.hp ?? 1) > 0 &&
+    kitUseDefOf(body) !== null &&
+    !body.auras?.some((a) => a.id === KIT_USE_SPENT_AURA)
+  );
 }
 
 /** The prompt's copy for one use effect (every key a t() leaf). */
@@ -160,8 +168,10 @@ function timeAria(seconds: number): string {
   });
 }
 
-/** The pick the prompt (and the press ladder, by the same rule) lands on: the
- *  nearest living usable body within `radius`, or null. */
+/** The pick the prompt lands on (the press ladder's own rule, src/game/
+ *  nearby_interaction_core.ts, but for a `promptless` use, which only the
+ *  ladder and a click take): the nearest living, unspent usable body within
+ *  `radius` that wants a prompt, or null. */
 export function nearestUsableBody(
   pos: { x: number; z: number },
   bodies: readonly KitUseBody[],
@@ -171,7 +181,8 @@ export function nearestUsableBody(
   for (const body of bodies) {
     if (!usableNow(body)) continue;
     const def = kitUseDefOf(body);
-    if (!def) continue;
+    // A promptless use offers no prompt (a click on the body starts it).
+    if (!def || def.promptless) continue;
     const distance = Math.hypot(body.pos.x - pos.x, body.pos.z - pos.z);
     if (distance > radius || (best && distance >= best.distance)) continue;
     best = { body, def, distance };
@@ -190,8 +201,11 @@ export function buildKitUsePromptView(input: KitUsePromptInput): KitUsePromptVie
     const remaining = self.castRemaining ?? 0;
     const target = self.castTargetId !== null && self.castTargetId !== undefined;
     const body = target ? input.entity(self.castTargetId as number) : null;
+    const def = kitUseDefOf(body) ?? kitUseDefByCast(castId);
+    // A promptless use (the Stillstone): its cast bar is all that shows.
+    if (def?.promptless) return HIDDEN;
     const title = castDisplayName(castId);
-    const copy = kitUseCopy(kitUseDefOf(body) ?? kitUseDefByCast(castId));
+    const copy = kitUseCopy(def);
     return {
       visible: true,
       kind: 'using',

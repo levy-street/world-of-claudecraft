@@ -23,6 +23,17 @@ export const VOICE_SILENT_DIST = 22;
 export const IGNIVAR_ROOM_WELCOME_VOICE_KEY =
   'yell__the_seal_hears_you_little_embers_step_closer_and_feed_the_la';
 
+/** A distance fade's two radii (yards): full volume within the first,
+ *  silent at the second. */
+export type VoiceFade = readonly [full: number, silent: number];
+
+/** The live gain of a voice source `distance` yards away (null: gone from
+ *  the world, silent), on `fade` (a talked-to NPC's curve by default). */
+export function voiceFadeGain(distance: number | null, fade?: VoiceFade | null): number {
+  if (distance === null) return 0;
+  return fade ? voiceDistanceGain(distance, fade[0], fade[1]) : voiceDistanceGain(distance);
+}
+
 export function voiceDistanceGain(
   dist: number,
   full = VOICE_FULL_DIST,
@@ -33,10 +44,24 @@ export function voiceDistanceGain(
   return (silent - dist) / (silent - full);
 }
 
+/** How a line plays: its gain, and whether it waits for a playing line that
+ *  also queues (an encounter's lines in turn) instead of cutting it off. */
+export interface VoicePlayOptions {
+  gain?: number;
+  queue?: boolean;
+}
+
 interface QueuedVoiceLine {
   lineKey: string;
-  opts?: { gain?: number };
+  opts?: VoicePlayOptions;
+  at: number;
 }
+
+/** A queued line older than this (ms) is dropped: it no longer matches what
+ *  the fight is doing. */
+export const VOICE_QUEUE_STALE_MS = 6000;
+
+const nowMs = (): number => (typeof performance !== 'undefined' ? performance.now() : 0);
 
 export class GameVoice {
   private el: HTMLAudioElement | null = null;
@@ -45,7 +70,10 @@ export class GameVoice {
   private playGain = 1; // per-line gain passed to play()
   private distanceGain = 1; // live distance attenuation (1 = at the NPC)
   private currentKey: string | null = null;
+  private currentQueues = false;
   private queued: QueuedVoiceLine | null = null;
+
+  constructor(private readonly now: () => number = nowMs) {}
 
   private applyVolume(): void {
     if (this.el)
@@ -100,19 +128,24 @@ export class GameVoice {
     this.currentKey = null;
     const next = this.queued;
     this.queued = null;
-    if (next) this.play(next.lineKey, next.opts);
+    if (next && this.now() - next.at <= VOICE_QUEUE_STALE_MS) this.play(next.lineKey, next.opts);
   }
 
   /** Play the clip for a line key, if one exists and voice-over is enabled. */
-  play(lineKey: string, opts?: { gain?: number }): void {
+  play(lineKey: string, opts?: VoicePlayOptions): void {
     if (!this.enabled) return;
     const src = VOICE_LINES[lineKey];
     if (!src) return;
     // The one-time room introduction is longer than the walk to Ignivar's
     // aggro edge. Preserve it for this player and queue the latest encounter
     // line locally instead of delaying simulation or the rest of the raid.
-    if (this.currentKey === IGNIVAR_ROOM_WELCOME_VOICE_KEY && this.isPlaying()) {
-      this.queued = { lineKey, opts };
+    // A queueing line likewise waits for a playing one that queues (the
+    // latest waiting line wins).
+    const waits =
+      this.currentKey === IGNIVAR_ROOM_WELCOME_VOICE_KEY ||
+      (opts?.queue === true && this.currentQueues);
+    if (waits && this.isPlaying()) {
+      this.queued = { lineKey, opts, at: this.now() };
       return;
     }
     this.queued = null;
@@ -120,6 +153,7 @@ export class GameVoice {
     if (!this.el) this.el = new Audio();
     this.el.src = src;
     this.currentKey = lineKey;
+    this.currentQueues = opts?.queue === true;
     this.el.onended = () => this.advanceQueue(lineKey);
     this.playGain = opts?.gain ?? 1;
     this.distanceGain = 1; // a fresh line starts at full: you just clicked the NPC, you are close

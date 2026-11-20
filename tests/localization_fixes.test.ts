@@ -1262,6 +1262,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_return.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/heroic_vendor.ts'), 'utf8'),
+    // The "encounter in progress" door refusal (a released spirit held outside
+    // while a boss fight of its claim runs).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/encounter_lock.ts'), 'utf8'),
     // Overworld portal transitions (the Veiled Hollow cave). The live flavor
     // lines are data-routed (PortalDef enterText/leaveText, matched by the
     // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module

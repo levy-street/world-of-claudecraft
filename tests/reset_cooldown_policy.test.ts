@@ -25,8 +25,10 @@ describe('reset cooldown policy: which claims pay the five-minute Reset All cool
   it('the raid-required rooms skip it on a tier switch: the Nythraxis boss arena and every Ignivar room', () => {
     expect(resetCooldownApplies('nythraxis_boss_arena', false)).toBe(false);
     for (const id of IGNIVAR_RAID_ROOM_IDS) expect(resetCooldownApplies(id, false)).toBe(false);
+    // The Smith's Heart, a ten-player raid, is raid-required too.
+    expect(resetCooldownApplies('smith_heart', false)).toBe(false);
     expect([...RAID_REQUIRED_DUNGEON_IDS].sort()).toEqual(
-      ['nythraxis_boss_arena', ...IGNIVAR_RAID_ROOM_IDS].sort(),
+      ['nythraxis_boss_arena', ...IGNIVAR_RAID_ROOM_IDS, 'smith_heart'].sort(),
     );
   });
 

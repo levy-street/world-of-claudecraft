@@ -28,6 +28,10 @@ export interface WeaponEmissiveWindow {
   whiteL: number;
   /** How much of the score a near-white texel keeps. */
   whiteScale: number;
+  /** How far each glowing texel is graded toward the tint (0 keeps its own colour, 1 is the
+   *  tint). Absent, 0.62: one hue window, one tinted glow. A skin whose window spans several
+   *  painted colours (the Heartmeld Staff's four gems) keeps them apart with a low mix. */
+  tintMix?: number;
 }
 
 /** Working-color-space tint the derived emissive is graded toward (0..1 per
@@ -61,6 +65,7 @@ export function deriveEmissiveTexels(
 ): void {
   const d = emissive;
   const ad = albedo;
+  const mix = emissiveWindow.tintMix ?? 0.62;
   for (let i = 0; i < d.length; i += 4) {
     const r = d[i] / 255;
     const g = d[i + 1] / 255;
@@ -97,9 +102,9 @@ export function deriveEmissiveTexels(
       d[i] = d[i + 1] = d[i + 2] = 0;
     } else {
       // Graded: source color pushed toward the tier tint, scaled by score.
-      d[i] = Math.round(255 * Math.min(1, (r + (tint.r - r) * 0.62) * score));
-      d[i + 1] = Math.round(255 * Math.min(1, (g + (tint.g - g) * 0.62) * score));
-      d[i + 2] = Math.round(255 * Math.min(1, (b + (tint.b - b) * 0.62) * score));
+      d[i] = Math.round(255 * Math.min(1, (r + (tint.r - r) * mix) * score));
+      d[i + 1] = Math.round(255 * Math.min(1, (g + (tint.g - g) * mix) * score));
+      d[i + 2] = Math.round(255 * Math.min(1, (b + (tint.b - b) * mix) * score));
       // De-bake: pull the albedo down where the glow now lives.
       const keep = 1 - 0.72 * score;
       ad[i] = Math.round(ad[i] * keep);
@@ -118,6 +123,8 @@ export function deriveEmissiveTexels(
  * derivation per weapon.
  */
 export function weaponEmissiveSignature(spec: WeaponEmissiveSignatureSpec): string {
+  // tintMix joins the key only when authored, so every existing skin keeps its key
+  const mix = spec.tintMix === undefined ? [] : [spec.tintMix];
   return [
     spec.hue[0],
     spec.hue[1],
@@ -129,6 +136,7 @@ export function weaponEmissiveSignature(spec: WeaponEmissiveSignatureSpec): stri
     spec.intensity,
     spec.pulse,
     spec.pulseHz,
+    ...mix,
   ].join(':');
 }
 

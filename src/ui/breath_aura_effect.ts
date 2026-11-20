@@ -1,0 +1,235 @@
+// What the Smith's Heart's Guardian of the Breath auras DO, for their
+// buff/debuff hover tooltip (docs/design/tooltip-writing.md). A pure
+// descriptor like the rest of aura_effect.ts (which calls this before the
+// generic kind line): it returns a hudChrome.auraEffect.breathGuardian.* key plus the
+// raw numbers, and the HUD formats the numbers and renders t(key, values).
+// The fight's marks ride a quiet `internal_cd` marker (no stat at all), and
+// the lifted player's hold is a stun whose generic line would not say what
+// comes next, so each says its rule instead. Every number comes from the
+// fight's tuning (src/sim/encounters/smith_heart/breath_ids.ts), the same
+// constants the sim reads; the wind's and the pull's speed come off the aura
+// itself (the live value: heroic's wind blows harder). Pinned by
+// tests/smith_heart_breath_ui.test.ts.
+
+import {
+  BREATH_AURAS,
+  BREATH_DIFFICULTY,
+  BREATH_KNOT,
+  BREATH_TUNING as T,
+} from '../sim/encounters/smith_heart/breath_ids';
+import { ISLE_AURAS, ISLE_TIERS } from '../sim/encounters/smith_heart/breath_isle_ids';
+import { WIND_BLAST_AURA, WIND_DRIFT_AURA, WIND_PULL_AURA } from '../sim/wind_drift';
+import type { AuraEffectDescriptor, AuraEffectInput } from './aura_effect';
+import { tierRange, tierValue } from './heart_tier_damage';
+
+const KEY = 'hudChrome.auraEffect.breathGuardian';
+
+const pct = (frac: number): number => Math.round(Math.abs(frac) * 100);
+/** A load's walk with no tier on it (a stale mirror): Mythic's, the slower. */
+const KNOT_WALK = BREATH_KNOT.mythic.walkMult;
+/** Normal's damage factor (x1.15 since the parse-calibrated pass of 2026-11-16). */
+const NM = BREATH_DIFFICULTY.normal.damageMult;
+/** Heroic's damage factor; Mythic shares it (pinned), so one range names both. */
+const HM = BREATH_DIFFICULTY.heroic.damageMult;
+/** The Cradle's discharge rides the lethal-punishment factor (breath_cradle.ts). */
+const NP = BREATH_DIFFICULTY.normal.punishMult;
+const HP = BREATH_DIFFICULTY.heroic.punishMult;
+
+/** The fight's aura's descriptor, or null when `a` is not one of them. */
+export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  switch (a.id) {
+    // The entrance's marker (gathered, or waking): out of reach until the
+    // storm has set it down.
+    case BREATH_AURAS.intro:
+      return { key: `${KEY}.intro`, nums: {} };
+    case WIND_DRIFT_AURA:
+      return {
+        key: `${KEY}.wind`,
+        nums: {
+          speed: a.value2 ?? BREATH_DIFFICULTY.normal.windSpeed,
+          pinMin: tierValue(T.pinMin, NM),
+          pinMax: tierValue(T.pinMax, NM),
+          ...tierRange('heroic', T.pinMin, T.pinMax, HM),
+        },
+      };
+    case WIND_BLAST_AURA:
+      return {
+        key: `${KEY}.blast`,
+        nums: {
+          speed: a.value3 ?? BREATH_DIFFICULTY.normal.blastSpeed,
+          // The tier rides the speed (the wire carries no tier).
+          seconds:
+            a.value3 === BREATH_DIFFICULTY.heroic.blastSpeed
+              ? BREATH_DIFFICULTY.heroic.blastSeconds
+              : BREATH_DIFFICULTY.normal.blastSeconds,
+        },
+      };
+    case WIND_PULL_AURA:
+      return {
+        key: `${KEY}.draw`,
+        nums: {
+          speed: a.value3 ?? BREATH_DIFFICULTY.normal.pullSpeed,
+          min: tierValue(T.vortexMin, NM),
+          max: tierValue(T.vortexMax, NM),
+          tick: T.vortexTick,
+          gustMin: tierValue(T.gustMin, NM),
+          gustMax: tierValue(T.gustMax, NM),
+          throw: BREATH_DIFFICULTY.normal.blastSpeed,
+          heroicThrow: BREATH_DIFFICULTY.heroic.blastSpeed,
+          ...tierRange('heroic', T.vortexMin, T.vortexMax, HM),
+          ...tierRange('heroicGust', T.gustMin, T.gustMax, HM),
+        },
+      };
+    case BREATH_AURAS.pinned:
+      return {
+        key: `${KEY}.pinned`,
+        nums: {
+          min: tierValue(T.pinMin, NM),
+          max: tierValue(T.pinMax, NM),
+          ...tierRange('heroic', T.pinMin, T.pinMax, HM),
+        },
+      };
+    case BREATH_AURAS.portalA:
+      return { key: `${KEY}.portalA` };
+    case BREATH_AURAS.portalB:
+      return { key: `${KEY}.portalB` };
+    case BREATH_AURAS.portalC:
+      return { key: `${KEY}.portalC` };
+    case BREATH_AURAS.portalD:
+      return { key: `${KEY}.portalD` };
+    case BREATH_AURAS.laden:
+      // The tier's walk rides the load's value2 (Heroic 70, Mythic 50); its
+      // value is the pace of the moment, quicker with the wind at the back.
+      return { key: `${KEY}.laden`, nums: { walk: pct(a.value2 ?? KNOT_WALK) } };
+    case BREATH_AURAS.anchor:
+      return { key: `${KEY}.anchor` };
+    case BREATH_AURAS.spent:
+      return { key: `${KEY}.spent` };
+    case BREATH_AURAS.skyMark:
+      return {
+        key: `${KEY}.skyMark`,
+        nums: {
+          warn: T.skyWarn,
+          min: tierValue(T.strikeMin, NM),
+          max: tierValue(T.strikeMax, NM),
+          radius: T.strikeR,
+          ...tierRange('heroic', T.strikeMin, T.strikeMax, HM),
+        },
+      };
+    case BREATH_AURAS.drawn:
+      return {
+        key: `${KEY}.drawn`,
+        nums: {
+          every: T.drawnStrikeEvery,
+          warn: T.drawnWarn,
+          min: tierValue(T.drawnMin, NM),
+          max: tierValue(T.drawnMax, NM),
+          radius: T.drawnR,
+          cmin: tierValue(T.chargedMin, NM),
+          cmax: tierValue(T.chargedMax, NM),
+          charged: T.chargedSeconds,
+          ...tierRange('heroic', T.drawnMin, T.drawnMax, HM),
+          ...tierRange('heroicC', T.chargedMin, T.chargedMax, HM),
+        },
+      };
+    case BREATH_AURAS.cradled:
+      return {
+        key: `${KEY}.cradled`,
+        nums: {
+          hold: T.cradleHold,
+          total: tierValue(BREATH_DIFFICULTY.normal.cradleTotal, NP),
+          heroicTotal: tierValue(BREATH_DIFFICULTY.heroic.cradleTotal, HP),
+          radius: T.cradleR,
+          soakers: BREATH_DIFFICULTY.normal.cradleSoakers,
+          heroicSoakers: BREATH_DIFFICULTY.heroic.cradleSoakers,
+          heroicCount: BREATH_DIFFICULTY.heroic.cradleCount,
+          penalty: pct(T.cradlePenaltyMult - 1),
+          bmin: tierValue(T.backlashMin, NM),
+          bmax: tierValue(T.backlashMax, NM),
+          ...tierRange('heroicB', T.backlashMin, T.backlashMax, HM),
+        },
+      };
+    case ISLE_AURAS.cocoon:
+      return {
+        key: `${KEY}.cocoon`,
+        nums: {
+          share: pct(ISLE_TIERS.normal.novaShare),
+          stilled: Math.max(0, Math.round(a.value ?? 0)),
+        },
+      };
+    case ISLE_AURAS.riding:
+      return { key: `${KEY}.riding` };
+    case ISLE_AURAS.ward:
+      return {
+        key: `${KEY}.ward`,
+        nums: {
+          cut: pct(ISLE_TIERS.normal.wardCut),
+          arc: ISLE_TIERS.normal.wardHalfDeg,
+          heroicCut: pct(ISLE_TIERS.heroic.wardCut),
+        },
+      };
+    case BREATH_AURAS.thrown:
+      return { key: `${KEY}.thrown` };
+    case BREATH_AURAS.blown:
+      return { key: `${KEY}.blown` };
+    // The tank swap (breath_blow.ts): the live tier's numbers ride the auras.
+    case BREATH_AURAS.blowMark:
+      return {
+        key: (a.value2 ?? 0) > 0 ? `${KEY}.blowMarkRuin` : `${KEY}.blowMark`,
+        nums: {
+          yards: Math.round(a.value ?? 0),
+          min: tierValue(T.blowHitMin, NM),
+          max: tierValue(T.blowHitMax, NM),
+          ...tierRange('heroic', T.blowHitMin, T.blowHitMax, HM),
+        },
+      };
+    case BREATH_AURAS.battered:
+      return {
+        key: `${KEY}.battered`,
+        nums: {
+          stacks: Math.max(1, a.stacks ?? 1),
+          next: Math.round(a.value ?? 0),
+          seconds: T.blowStackSeconds,
+          swap: a.value3 ?? BREATH_DIFFICULTY.normal.blowSwap,
+          heroicRuin: BREATH_DIFFICULTY.heroic.blowThrow.length - 1,
+        },
+      };
+    case BREATH_AURAS.thunderLaden: {
+      const stacks = Math.max(1, a.stacks ?? 1);
+      const total = a.value ?? BREATH_DIFFICULTY.normal.thunderPct * stacks;
+      return {
+        key: `${KEY}.thunderLaden`,
+        nums: {
+          stacks,
+          pct: pct(total),
+          per: pct(total / stacks),
+          seconds: T.thunderSeconds,
+          draw: a.value2 ?? BREATH_DIFFICULTY.normal.thunderDraw,
+          swap: a.value3 ?? BREATH_DIFFICULTY.normal.thunderSwap,
+          min: tierValue(T.thunderMin, NM),
+          max: tierValue(T.thunderMax, NM),
+          ...tierRange('heroic', T.thunderMin, T.thunderMax, HM),
+        },
+      };
+    }
+    case BREATH_AURAS.tossed:
+      return { key: `${KEY}.tossed` };
+    case BREATH_AURAS.stormForm:
+      return { key: `${KEY}.stormForm` };
+    case BREATH_AURAS.swell:
+      return {
+        key: `${KEY}.swell`,
+        nums: {
+          every: T.swellEvery,
+          min: tierValue(T.swellMin, NM),
+          max: tierValue(T.swellMax, NM),
+          ...tierRange('heroic', T.swellMin, T.swellMax, HM),
+          growth: pct(BREATH_DIFFICULTY.normal.swellGrowth),
+          heroicGrowth: pct(BREATH_DIFFICULTY.heroic.swellGrowth),
+          stacks: a.stacks ?? 0,
+        },
+      };
+    default:
+      return null;
+  }
+}

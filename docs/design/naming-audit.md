@@ -1083,6 +1083,39 @@ the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild Wars 2).
 | the Gourdsworn | the title of Gourdlight Eve's whole-event meta deed (`feat_gourdlight_eve_complete`, round 12) | KEEP. Quoted exact-phrase searches for "Gourdsworn" and "the Gourdsworn", plus a coined-token search scoped to Wowhead, warcraft.wiki.gg, the RuneScape and OSRS wikis, the FFXIV wiki, the GW2 wiki, UESP, the PoE wiki and the Diablo wiki, returned no hit in any game. The nearest results were different tokens: WoW's "Death Foursworn" achievement, GW2's "Bladesworn" specialization, ESL's "Guildsworn" card and the unrelated games "Godsworn", "Crowsworn" and "Ironsworn". WoW's Hallow's End title is "the Hallowed", a different word; "-sworn" is a shared English suffix. |
 | Gourdlight, Start to Finish / Every Doorstep / At Hester's Beck and Call / Three Towns Startled | the round 12 whole-event meta and its three section Feats | KEEP. Plain English phrases built on this event's own names (Gourdlight, Hester); no coined token beyond those already audited above. |
 
+### The Smith's Heart raid (web-checked 2026-11-05)
+
+The raid's player-visible proper nouns (`src/sim/content/smith_heart.ts` and the
+encounters' `*_ids.ts` name tables). The raid is still dev-gated
+(`SMITH_HEART_PLAYABLE = false`), so these verdicts land before any player sees a name.
+Each distinctive name was searched as an exact phrase on the open web and by its coined
+token against the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild
+Wars 2).
+
+| Name | Where | Verdict |
+|---|---|---|
+| The Smith's Heart | the raid | KEEP. No exact-phrase hit in any game; the nearest is the unrelated title "Smith & Dungeon". Plain English. |
+| The Masterless Strength | the final boss | KEEP. No hit; the nearest is the card game "Masterless", a different name and role. |
+| The Seam Singer | the Hammer Council's second boss | KEEP. No hit in any game wiki. |
+| Wellspawn, Wellkeeper, Seedflame | the Heat guardian's adds | KEEP. No hit for any of the three tokens; nearest are different tokens ("Floraspawn", "Seed of Flame", "Siegespawn"). |
+| Gale Sentinel, Gale Mender, Rolling Cinder | the Breath isles' adds and the Heat's hunting cinder | KEEP. No hit on the wikis above; ESO's "Covenant Mender" and similar share only the generic word. |
+| Splinter of the Heat / Quench / Breath / Hammer | the final boss's adds | KEEP. Plain English built on the raid's own element names. |
+| Mountain's Wrath, Summit Roar, Storm Lance, Forge Fist, Tempering Strike, Bellows Wind | boss abilities | KEEP. Shared fantasy English; no distinctive match in the same role. |
+| Hammerfall | the Hammer Guardian's cleave | KEEP (borderline, recorded for the reviewer). WoW's Hammerfall is an orc town, a different role (a place, not an ability); the game already ships "Hammerfall Meteors" (Varkhul), and the word is shared English (also a band and a novel). |
+| Quarryheart Charger | the raid's reward mount (its meta-achievement's mount) | KEEP (web-checked 2026-11-11). No exact-phrase hit for "Quarryheart Charger" or "Quarryheart Steed", and no hit for the coined token "Quarryheart" on the WoW, RuneScape, FFXIV, GW2, ESO, Diablo or PoE wikis (nearest: Octopath Traveler's "Quarrycrest", a mining town, a different token and role). "Charger" is plain English for a war horse, shared across many games' mount names. "Heartwrought" was considered and dropped: it is an indie game's title. |
+| Reins of the Quarryheart Charger | its reins item | KEEP. The repo's reins pattern around the name above. |
+| Charge Through the Curse | the Hammer Council's encounter deed (every Mountain's Rush shatters the cursed pillar and strikes nobody, the two members fall within 15 s of each other) | KEEP (web-checked 2026-11-11). No exact-phrase game use found; plain English. |
+| Keep Your Feet | the Guardian of the Breath's encounter deed (nobody falls into the void, every Gale Bulwark broken before it bursts) | KEEP (web-checked 2026-11-11). No achievement of that name on the WoW, RuneScape, FFXIV, GW2 or Diablo wikis (nearest: RuneScape's "Keep Your Workstation Clear", GW2's "Boots on the Ground", different phrases). Plain English, and Captain Thessaly's own line in the raid. |
+| No One Left in the Cold | the Guardian of the Quench's encounter deed (nobody Encased in Rime, no ice blade strikes anyone) | KEEP (web-checked 2026-11-11), borderline noted: Frostpunk 2 has "No One Left Behind", a different phrase built on a common idiom; no exact-phrase game use found. |
+| Turn Back the Cinders | the Guardian of the Heat's encounter deed (no Rolling Cinder reaches its quarry) | KEEP (web-checked 2026-11-11). No exact-phrase game use found. |
+| Kept From the Brim | the Masterless Strength's encounter deed (no Overload Burst, no raider dies) | KEEP (web-checked 2026-11-11). No exact-phrase game use found. |
+| Heir to the Smith | the raid's meta deed (all five encounter deeds; pays the Quarryheart Charger) | KEEP (web-checked 2026-11-11). No exact-phrase game use found on the WoW, RuneScape or GW2 achievement lists. |
+| The Heart Stills | the raid's clear deed | KEEP (web-checked 2026-11-11). No exact-phrase game use found (nearest: Wildermyth's "The Unstilled Heart", a different phrase). |
+| Warden Ada Collier | the essence quest's giver at the raid's entrance (the Vigil of Highwatch) | KEEP (web-checked 2026-11-11). No game NPC of that name found; "Collier" is a plain English surname and trade. |
+| What the Heart Let Go | the entrance's weekly essence quest | KEEP (web-checked 2026-11-11). No exact-phrase game use found (nearest: The Blood of Dawnwalker's "The Heart Wants What It Wants", a different phrase). |
+| Remnant of the Masterless Strength | the final boss's quest drop | KEEP. Plain English around the raid's own boss name. |
+| Coffer of the Highwatch Vigil | the quest's reward chest | KEEP (web-checked 2026-11-11). No exact-phrase hit; plain English around the game's own Highwatch Vigil. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

@@ -20,6 +20,7 @@ import {
   deedHeraldryMotifSvg,
   deedHeraldryStyle,
 } from './deed_border_view';
+import { deedCosmeticRewardLine } from './deed_cosmetic_reward';
 import { deedDesc, deedName, deedTitleText } from './deed_i18n';
 import {
   accountDeedsDigest,
@@ -588,6 +589,11 @@ export class DeedsWindow {
       chips.push(
         `<span class="deed-chip deed-title-chip ui-chip">${esc(t('hudChrome.deeds.borderChip'))}</span>`,
       );
+    // The same family again for a cosmetic paid beyond the Book (a weapon appearance, a mount).
+    if (entry.rewardSkinId !== null || entry.rewardMountKey !== null)
+      chips.push(
+        `<span class="deed-chip deed-title-chip ui-chip">${esc(t('hudChrome.deeds.cosmeticChip'))}</span>`,
+      );
     // Feats carry no Renown chip (they are zero Renown by rule).
     if (!entry.feat)
       chips.push(
@@ -611,6 +617,9 @@ export class DeedsWindow {
         )}"><span class="deed-bar ui-bar"><span class="deed-bar-fill ui-bar-fill" style="width:${pct}%"></span></span>` +
         `<span class="deed-progress-text">${esc(progressText)}</span></div>`;
     }
+    // The cosmetic it pays, by name (the muted secondary line's family, as below).
+    const reward = deedCosmeticRewardLine(entry);
+    if (reward !== null) body += `<div class="deed-rarity">${esc(reward)}</div>`;
     // Rarity line: only once a value exists for THIS deed (absent data means
     // no node at all, so offline and fetch-failure renders are unchanged).
     // The render gate is the pure deedRarityFraction, unit-pinned like every

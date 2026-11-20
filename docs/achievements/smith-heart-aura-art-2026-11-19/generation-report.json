@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "batch": "smith-heart-aura-art-2026-11-19",
+  "generator": "OpenAI built-in image generation, through ChatGPT image generation in the owner's account",
+  "conversation": {
+    "imageMessages": 74,
+    "oneImagePerMessage": true,
+    "styleReference": "public/ui/auras/stomp_stun.webp, upscaled to 512px and attached to the first message, which also carried the house style brief",
+    "promptShape": "Icon number, the house style, the aura name, what it does in the fight, the painting subject, the element palette, square, no text, no border."
+  },
+  "rejected": [
+    {
+      "auraId": "heart_quench_frozen",
+      "reason": "the first output repeated the previous icon (warm flames on ice) instead of a figure frozen in a block of ice"
+    },
+    {
+      "auraId": "heart_narrow_shelter",
+      "reason": "the first output was a collage of three earlier icons instead of one picture"
+    }
+  ],
+  "encoding": {
+    "tool": "sharp",
+    "resize": "128x128 cover, lanczos3",
+    "flatten": "#000000, alpha removed",
+    "webp": "quality 76, stepping down by 4 until the file is at or under 6144 bytes, effort 6, smart subsample"
+  },
+  "ownerReview": "The owner reviewed all 72 in an HTML audit (each icon at 128px, 40px and 28px with its number, name, what it does and the aura ids it covers) and approved them on 2026-11-19."
+}

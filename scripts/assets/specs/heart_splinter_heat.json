@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "rigSource": "tmp/asset_src/heart_splinter_heat_woc.glb",
+      "src": "tmp/asset_src/heart_splinter_heat_woc.slim.glb",
+      "out": "models/creatures/heart_splinter_heat.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "IdleFidget",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Turn",
+        "Attack",
+        "Attack2",
+        "Entrance",
+        "Shear",
+        "Throw",
+        "Hit",
+        "Hit2",
+        "Stunned",
+        "Death"
+      ],
+      "dropStillChannels": true,
+      "materialName": "heart_splinter_heat",
+      "maxTex": 1024
+    }
+  ]
+}

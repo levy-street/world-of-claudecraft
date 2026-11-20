@@ -50,6 +50,21 @@ import { VISUALS, visualKeyFor } from './characters/manifest';
 import { type PickRay, rayAimsAtCore } from './pick_aim_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 
+/** The Guardian of the Breath's fight objects (breath_ids.ts BREATH_OBJECTS,
+ *  breath_isle_ids.ts ISLE_OBJECTS: the wind, the calm, the vortex, the
+ *  strikes, the Knotted Gale and its portals, the Updrafts, the rides, each
+ *  isle's Closing Storm) are telegraphs and stepped-into spots, never clicked:
+ *  the sim answers none of them through a click, and their capsules, scaled
+ *  with the object (a Closing Storm by its isle's whole reach), swallowed every
+ *  click on an isle (Jose's playtest of 2026-11-18: the Stillstone and the
+ *  adds behind a ring could not be clicked). A pick ray passes through them. */
+const BREATH_FIGHT_OBJECT_PREFIX = 'sh_breath_';
+
+/** Does a click pass straight through `e` (it is never a click's answer)? */
+export function takesNoClick(e: Pick<Entity, 'kind' | 'templateId'>): boolean {
+  return e.kind === 'object' && e.templateId.startsWith(BREATH_FIGHT_OBJECT_PREFIX);
+}
+
 /** The slice of the world a direct pick reads (IWorld satisfies it). */
 export interface DirectPickWorld {
   entities: Pick<Map<number, Entity>, 'get'>;

@@ -24,6 +24,7 @@ import {
   BUDDY_WORLD_REVEAL_DISTANCE,
   buddyBossDropsFor,
 } from './content/buddy_sources';
+import { instanceHalfWidthOf } from './instances/instance_footprint';
 import { spawnBuddyEntity } from './pet/buddy_ai';
 import type { InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -57,12 +58,13 @@ export function rollBossBuddyDrops(
 }
 
 /** True while the player stands inside any claimed instance's band (the same
- *  120x250 envelope the deed encounter tasks use for instance membership). */
+ *  envelope the deed encounter tasks use: instances/instance_footprint.ts). */
 export function playerInsideInstance(ctx: SimContext, e: Entity): boolean {
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
     const origin = ctx.instanceOriginOf(inst);
-    if (Math.abs(e.pos.x - origin.x) < 120 && Math.abs(e.pos.z - origin.z) < 250) return true;
+    const halfWidth = instanceHalfWidthOf(inst.dungeonId);
+    if (Math.abs(e.pos.x - origin.x) < halfWidth && Math.abs(e.pos.z - origin.z) < 250) return true;
   }
   return false;
 }

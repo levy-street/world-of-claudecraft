@@ -46,11 +46,41 @@ export type MotionState = { deck?: number | null } & Pick<
   | 'mountCastKey'
 >;
 
+/** The mirrored (non-kinematic) fields a frame was predicted FROM, taken
+ *  before its step (the kernel itself changes a few: a glider ends on
+ *  landing, a summon channel breaks on a key). */
+export type MirroredState = Pick<
+  MotionState,
+  | 'auras'
+  | 'ghost'
+  | 'sitting'
+  | 'castingAbility'
+  | 'maxHp'
+  | 'mountKey'
+  | 'mountCastRemaining'
+  | 'mountCastKey'
+>;
+
 export interface PredictionEntry {
   ct: number;
   mi: MoveInput;
   facing: number | null;
   pose: MotionState;
+  /** What the frame was predicted from (replays adopt it). */
+  mirror?: MirroredState;
+}
+
+function mirrorOf(state: MotionState): MirroredState {
+  return {
+    auras: state.auras.slice(),
+    ghost: state.ghost,
+    sitting: state.sitting,
+    castingAbility: state.castingAbility,
+    maxHp: state.maxHp,
+    mountKey: state.mountKey,
+    mountCastRemaining: state.mountCastRemaining,
+    mountCastKey: state.mountCastKey,
+  };
 }
 
 export type PredictionStep = (state: MotionState, frame: PredictionFrame) => void;
@@ -75,8 +105,28 @@ function entryFrame(entry: PredictionEntry): PredictionFrame {
   return { ct: entry.ct, mi: entry.mi, facing: entry.facing };
 }
 
-function stepFrom(state: MotionState, frame: PredictionFrame, stepFn: PredictionStep): MotionState {
+/** The mirrored (non-kinematic) fields a frame was predicted with: the
+ *  auras the kernel reads (an encounter's wind among them, src/sim/
+ *  wind_drift.ts), the ghost, sitting, the cast, the mount. */
+function adoptMirrored(state: MotionState, from: MirroredState): void {
+  state.auras = from.auras.slice();
+  state.ghost = from.ghost;
+  state.sitting = from.sitting;
+  state.castingAbility = from.castingAbility;
+  state.maxHp = from.maxHp;
+  state.mountKey = from.mountKey;
+  state.mountCastRemaining = from.mountCastRemaining;
+  state.mountCastKey = from.mountCastKey;
+}
+
+function stepFrom(
+  state: MotionState,
+  frame: PredictionFrame,
+  stepFn: PredictionStep,
+  mirrored?: MirroredState,
+): MotionState {
   const next = copyMotionState(state);
+  if (mirrored) adoptMirrored(next, mirrored);
   next.prevPos.x = next.pos.x;
   next.prevPos.y = next.pos.y;
   next.prevPos.z = next.pos.z;
@@ -134,6 +184,7 @@ export class PredictionRing {
       mi: { ...entry.mi },
       facing: entry.facing,
       pose: copyMotionState(entry.pose),
+      ...(entry.mirror ? { mirror: entry.mirror } : {}),
     });
     if (this.entries.length > this.capacity) this.entries.shift();
   }
@@ -159,8 +210,9 @@ export function predictTick(
   frame: PredictionFrame,
   stepFn: PredictionStep,
 ): MotionState {
+  const mirror = mirrorOf(state);
   const predicted = stepFrom(state, frame, stepFn);
-  ring.push({ ct: frame.ct, mi: frame.mi, facing: frame.facing, pose: predicted });
+  ring.push({ ct: frame.ct, mi: frame.mi, facing: frame.facing, pose: predicted, mirror });
   return predicted;
 }
 
@@ -197,7 +249,12 @@ export function reconcile(
   applyAuthoritativePose(acknowledged.pose, authoritative);
   let state = acknowledged.pose;
   for (const entry of replayed) {
-    state = stepFrom(state, entryFrame(entry), stepFn);
+    // Each frame replays FROM the mirrored state it was first predicted from
+    // (the auras it knew then, before its own step), never the acknowledged
+    // pose's: a replay that carried the old auras forward would replay a
+    // wind's every tick without it and mismatch the next acknowledgement for
+    // ever.
+    state = stepFrom(state, entryFrame(entry), stepFn, entry.mirror ?? entry.pose);
     entry.pose = state;
   }
   const newHead = replayed[replayed.length - 1]?.pose ?? acknowledged.pose;

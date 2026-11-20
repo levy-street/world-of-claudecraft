@@ -26,6 +26,7 @@
 // its VFX composer versus a rider on a mount with no bloom pass) and the Armory
 // rig is pinned by tests/armory_preview_lifecycle.test.ts. A third preview
 // surface earns the extraction.
+
 import * as THREE from 'three';
 import { CharacterVisual } from './characters';
 import type { AnimState } from './characters/anim_state';
@@ -40,6 +41,7 @@ import { MOUNT_PREVIEW_FOV, mountPreviewFraming } from './mount_preview_framing_
 import { buildMountPrewarmVisual, type MountPrewarmKey, mountPrewarmSpec } from './mount_prewarm';
 import { type MountVisualSpec, mountBobY } from './mount_visuals';
 import { previewPixelRatio } from './preview_pixel_ratio';
+import { previewPrefersReducedMotion } from './preview_reduced_motion';
 import { shaderDebugRequested } from './shader_debug_flag';
 import {
   collectPrewarmTextures,
@@ -377,7 +379,7 @@ function buildMountPreview(
       mount.update(dt, MOUNT_STATE, true);
     }
     if (mode === 'rider') {
-      rider.update(dt, RIDER_STATE, true);
+      rider.update(dt, RIDER_STATE, true, previewPrefersReducedMotion());
       rider.updateWeaponVfx(dt);
       seatRider(lift);
     }

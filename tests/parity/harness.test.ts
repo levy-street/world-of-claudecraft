@@ -200,6 +200,8 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'firebottleCdRemaining', // derived display copy of PlayerMeta.firebottleReadyAt
       'guild',
       'guildTier', // server-set display only (pledge board colour ladder)
+      'healTakenAmount', // one-tick heal tally read by Living Warmth (combat/heal_taken.ts)
+      'healTakenTick',
       'holderBalance',
       'holderTier',
       'mainhandItemId',
@@ -277,6 +279,8 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'damageHistory', // Rewind's ring; only present after a player takes damage
       'castConsumedEmpower', // set only while a cast that consumed an empower resolves
       'castRadiantResonance', // set only while Dawn's Embrace has reserved the proc
+      'healTakenAmount', // the heal tally; only present after a body is healed
+      'healTakenTick',
     ]);
     const optionalMeta = new Set(['characterId', 'lastWhisperFrom', 'petAssistTargetId']);
     for (const k of ENTITY_EXCLUDE) {

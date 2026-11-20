@@ -2,6 +2,7 @@ import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
 import { courierSummon } from '../courier';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
+import { carriesLoad, movesCaster } from './carried_load';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 import { shadowPeriodicHit } from './priest/periodic_crit';
 import { spiritBombCastError } from './priest/spirit_bomb_cast';
@@ -1369,6 +1370,11 @@ export function castAbility(
   // run, and an ability that only gains the charge at a later rank would slip a
   // base-def check. Same list the two friendly-branch gates below read.
   if (res.effects.some((effect) => effect.type === 'charge') && isRooted(p)) {
+    ctx.error(p.id, "Can't move!");
+    return;
+  }
+  // Nor may the Knotted Gale's carrier move except on foot.
+  if (carriesLoad(p) && movesCaster(res.effects)) {
     ctx.error(p.id, "Can't move!");
     return;
   }

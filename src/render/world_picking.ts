@@ -6,13 +6,14 @@
 
 import * as THREE from 'three';
 import type { IWorld } from '../world_api';
+import { fxPickProxies } from './fx_pick_proxies';
 import { resolveGatherNodePick } from './gather_nodes';
 import { isProjectedNameplateAnchorVisible } from './nameplate_projection';
 import type { PlacedAssetsView } from './placed_assets';
 import type { MoverHit } from './placed_movers';
 import type { EntityView } from './renderer';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
-import { resolveWorldDirectPick } from './world_direct_pick';
+import { resolveWorldDirectPick, takesNoClick } from './world_direct_pick';
 
 /** What picking reads from the renderer. */
 export interface WorldPickingHost {
@@ -119,6 +120,12 @@ export class WorldPicking {
     const hits = this.raycastHits;
     hits.length = 0;
     this.raycaster.intersectObjects(this.host.clickTargets(), true, this.raycastHits);
+    // The proxies an effect lends a body (fx_pick_proxies.ts: the Smith's
+    // Heart loot coffer for its corpse). three sorts the whole list, so they
+    // join the capsules' hits nearest first.
+    const lent = fxPickProxies();
+    if (lent.length > 0)
+      this.raycaster.intersectObjects(lent as THREE.Object3D[], false, this.raycastHits);
     const directHitIds = this.directHitIds;
     directHitIds.length = 0;
     for (const hit of hits) {
@@ -136,6 +143,9 @@ export class WorldPicking {
           // click-pickable either (the capsule proxy ignores `visible`): skip it
           // unless the local player is a released spirit.
           if (e?.templateId === 'spirit_healer' && !sim.player?.ghost) break;
+          // A fight's telegraph object takes no click: the ray passes on to
+          // what stands behind it (world_direct_pick.ts takesNoClick).
+          if (e && takesNoClick(e)) break;
           directHitIds.push(id);
           break;
         }

@@ -1,5 +1,6 @@
 import { isLootableBody } from '../sim/corpse_loot_state';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
+import { corpseLootDistance } from '../sim/loot/corpse_loot_reach';
 import { kitUsableNow, kitUseOf } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
@@ -107,7 +108,7 @@ export function resolveNearbyInteractionCandidate(
   const playerId = world.playerId ?? player.id;
   const partyIds = localPartyMemberIds(world.partyInfo);
   let bestCorpse: Entity | null = null;
-  let bestCorpseDistance = INTERACT_RANGE;
+  let bestCorpseDistance = Number.POSITIVE_INFINITY;
   let bestObject: Entity | null = null;
   let bestObjectDistance = INTERACT_RANGE;
   let bestNpc: Entity | null = null;
@@ -152,14 +153,18 @@ export function resolveNearbyInteractionCandidate(
     // A corpse is a candidate only for the ordinary loot this viewer may take
     // (hasLoot, never canOpen): a harvest-only corpse is no candidate here, so
     // it cannot swallow an eligible interaction standing behind it.
-    if (
-      !player.dead &&
-      isLootableBody(entity) &&
-      corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).hasLoot &&
-      distance < bestCorpseDistance
-    ) {
-      bestCorpse = entity;
-      bestCorpseDistance = distance;
+    // The sim's own loot gate: INTERACT_RANGE from a big body's edge or a
+    // guardian's coffer spot (corpseLootDistance).
+    if (!player.dead && isLootableBody(entity)) {
+      const reach = corpseLootDistance(entity, player.pos);
+      if (
+        reach < INTERACT_RANGE &&
+        reach < bestCorpseDistance &&
+        corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).hasLoot
+      ) {
+        bestCorpse = entity;
+        bestCorpseDistance = reach;
+      }
     }
     if (!player.dead && entity.kind === 'object' && entity.templateId.startsWith('delve_')) {
       if (distance < bestDelveDistance) {

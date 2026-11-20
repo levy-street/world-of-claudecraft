@@ -40,10 +40,12 @@ describe('character presentation sleep wiring', () => {
     // now from inside updateMountPresentation: renderer.ts forwards presentation
     // as `present`, and a rig that is not present advances and returns before any
     // per-frame work. A mount that carries a second rig (the rickshaw's puller)
-    // advances that one on the same path, or it freezes while the cart rolls.
+    // advances that one on the same path, or it freezes while the cart rolls. A
+    // mount with a shader body rig (the Quarryheart Charger) keeps its rig's clock
+    // on the same path, its particles off, before the bounded advance.
     expect(renderer).toContain('present: runCharacterPresentation,');
     expect(mountPresentation).toContain(
-      'if (!input.present) {\n      v.mountVisual.advanceOffscreen(dt);\n      updateRickshawPuller(v, dt, input.anim, input.animate, false);\n      return;\n    }',
+      'if (!input.present) {\n      updateQuarryheart(v, input, false);\n      v.mountVisual.advanceOffscreen(dt);\n      updateRickshawPuller(v, dt, input.anim, input.animate, false);\n      return;\n    }',
     );
   });
 

@@ -37,6 +37,7 @@ import {
   DEFAULT_MOUNT,
   DEVELOPER_MOUNTS,
   isDeveloperMount,
+  isSmithsHeartRaidMount,
   MEMBERSHIP_REWARD_MOUNTS,
   MOUNT_KEYS,
   MOUNTS,
@@ -44,6 +45,8 @@ import {
   normalizeMountKey,
   normalizeSelectedMount,
   REFERRAL_REWARD_MOUNTS,
+  SMITHS_HEART_META_MOUNT,
+  SMITHS_HEART_RAID_MOUNTS,
   TRAINING_MOUNT_KEY,
 } from '../src/sim/content/mounts';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
@@ -121,8 +124,9 @@ function ride(sim: Sim, pid: number, key: string): void {
 
 describe('mount catalog', () => {
   it('keeps the horse first and appends the two referral milestone mounts', () => {
-    // Existing mount identities remain stable, including the retired tanks and guild destrier.
-    expect(MOUNT_KEYS).toHaveLength(17);
+    // Existing mount identities remain stable, including the retired tanks and guild destrier,
+    // plus the Smith's Heart raid's reserved reward (the Quarryheart Charger).
+    expect(MOUNT_KEYS).toHaveLength(18);
     // Pinned as a literal: the acquisition sweeps below iterate this list, so a
     // mount dropped from it would silently lose its no-route checks.
     expect(DEVELOPER_MOUNTS).toEqual(['terrorspark_groundshaker', 'referral_tank']);
@@ -165,6 +169,29 @@ describe('mount catalog', () => {
   });
 });
 
+describe("the Smith's Heart raid's reward mount", () => {
+  it('reserves the Quarryheart Charger as the meta-achievement mount, granted by nothing yet', () => {
+    // The literal the achievement step grants: renaming the key or swapping the reward is a
+    // decision made here, never an accident.
+    expect(SMITHS_HEART_META_MOUNT).toBe('quarryheart_charger');
+    expect(SMITHS_HEART_RAID_MOUNTS).toEqual(['quarryheart_charger']);
+    expect(MOUNTS.quarryheart_charger).toEqual({
+      key: 'quarryheart_charger',
+      name: 'Quarryheart Charger',
+      rarity: 'epic',
+    });
+    expect(mountItemId(SMITHS_HEART_META_MOUNT)).toBe('reins_quarryheart_charger');
+    expect(isSmithsHeartRaidMount('quarryheart_charger')).toBe(true);
+    expect(isSmithsHeartRaidMount('lantern_hall_destrier')).toBe(false);
+    expect(isDeveloperMount('quarryheart_charger')).toBe(false);
+    // no quest rewards it either (the vendor, loot, rift and store doors are swept below)
+    for (const quest of Object.values(QUESTS)) {
+      const rewards = JSON.stringify(quest);
+      expect(rewards.includes('reins_quarryheart_charger'), quest.id).toBe(false);
+    }
+  });
+});
+
 describe('mount reins items (the collection: owning the item is owning the mount)', () => {
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
@@ -179,6 +206,8 @@ describe('mount reins items (the collection: owning the item is owning the mount
         isDeveloperMount(key) ||
         MEMBERSHIP_REWARD_MOUNTS.includes(key) ||
         REFERRAL_REWARD_MOUNTS.includes(key) ||
+        // A raid achievement's reward stays with the character who earned it.
+        isSmithsHeartRaidMount(key) ||
         // The permanent Halloween reward remains bound to its earner.
         key === 'emberbristle_broom' ||
         item.seasonalEvent !== undefined
@@ -299,6 +328,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
       if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts
+      if (isSmithsHeartRaidMount(key)) continue; // reserved for the raid's meta-achievement, pinned below
       const itemId = mountItemId(key)!;
       // SEASONAL KEEPSAKE: Hester sells the Emberbristle Broom for five Emberwoven
       // Sheaves, the token Old Thatchgrin (a world boss: personal loot, daily lockout)
@@ -427,69 +457,71 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it.each([...DEVELOPER_MOUNTS, ...MEMBERSHIP_REWARD_MOUNTS, ...REFERRAL_REWARD_MOUNTS])(
-    'keeps %s absent from every normal acquisition table',
-    (mountKey) => {
-      const itemId = mountItemId(mountKey)!;
-      const item = ITEMS[itemId] as MountItemDef;
-      expect(item).toMatchObject({
-        kind: 'mount',
-        mount: mountKey,
-        quality: 'epic',
-        soulbound: true,
-        noDiscard: true,
-        sellValue: 0,
-      });
-      expect(item.buyValue).toBeUndefined();
+  it.each([
+    ...DEVELOPER_MOUNTS,
+    ...MEMBERSHIP_REWARD_MOUNTS,
+    ...REFERRAL_REWARD_MOUNTS,
+    ...SMITHS_HEART_RAID_MOUNTS,
+  ])('keeps %s absent from every normal acquisition table', (mountKey) => {
+    const itemId = mountItemId(mountKey)!;
+    const item = ITEMS[itemId] as MountItemDef;
+    expect(item).toMatchObject({
+      kind: 'mount',
+      mount: mountKey,
+      quality: 'epic',
+      soulbound: true,
+      noDiscard: true,
+      sellValue: 0,
+    });
+    expect(item.buyValue).toBeUndefined();
 
-      for (const mob of Object.values(MOBS)) {
-        expect(
-          mob.loot.some((entry) => entry.itemId === itemId),
-          `${itemId} must not be on ${mob.id}`,
-        ).toBe(false);
-      }
-      for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
-        expect(
-          loot.some((entry) => entry.itemId === itemId),
-          `${itemId} must not be on heroic boss ${bossId}`,
-        ).toBe(false);
-      }
-      expect([
-        ...RIFT_GREEN_MOUNT_REINS,
-        ...RIFT_BLUE_MOUNT_REINS,
-        ...RIFT_EPIC_MOUNT_REINS,
-      ]).not.toContain(itemId);
-      for (const npc of Object.values(NPCS)) {
-        expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
-          itemId,
-        );
-      }
+    for (const mob of Object.values(MOBS)) {
       expect(
-        HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
-        `${itemId} must not be sold by the Heroic Quartermaster`,
-      ).not.toContain(itemId);
-      for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
-        expect(
-          offers.map((offer) => offer.itemId),
-          `${itemId} must not be sold by delve shop ${delveId}`,
-        ).not.toContain(itemId);
-      }
+        mob.loot.some((entry) => entry.itemId === itemId),
+        `${itemId} must not be on ${mob.id}`,
+      ).toBe(false);
+    }
+    for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
       expect(
-        MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
-        `${itemId} must not be seeded by the World Market`,
+        loot.some((entry) => entry.itemId === itemId),
+        `${itemId} must not be on heroic boss ${bossId}`,
+      ).toBe(false);
+    }
+    expect([
+      ...RIFT_GREEN_MOUNT_REINS,
+      ...RIFT_BLUE_MOUNT_REINS,
+      ...RIFT_EPIC_MOUNT_REINS,
+    ]).not.toContain(itemId);
+    for (const npc of Object.values(NPCS)) {
+      expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
+        itemId,
+      );
+    }
+    expect(
+      HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+      `${itemId} must not be sold by the Heroic Quartermaster`,
+    ).not.toContain(itemId);
+    for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
+      expect(
+        offers.map((offer) => offer.itemId),
+        `${itemId} must not be sold by delve shop ${delveId}`,
       ).not.toContain(itemId);
-      for (const quest of Object.values(QUESTS)) {
-        expect(
-          Object.values(quest.itemRewards),
-          `${itemId} must not be rewarded by ${quest.id}`,
-        ).not.toContain(itemId);
-        expect(
-          quest.requiredItems ?? [],
-          `${itemId} must not be required by ${quest.id}`,
-        ).not.toContain(itemId);
-      }
-    },
-  );
+    }
+    expect(
+      MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
+      `${itemId} must not be seeded by the World Market`,
+    ).not.toContain(itemId);
+    for (const quest of Object.values(QUESTS)) {
+      expect(
+        Object.values(quest.itemRewards),
+        `${itemId} must not be rewarded by ${quest.id}`,
+      ).not.toContain(itemId);
+      expect(
+        quest.requiredItems ?? [],
+        `${itemId} must not be required by ${quest.id}`,
+      ).not.toContain(itemId);
+    }
+  });
 
   it('the rift mount tiers pay exactly the heroic rate for the rarity they carry', () => {
     // The rule this protects: a rift must never be a cheaper route to a mount

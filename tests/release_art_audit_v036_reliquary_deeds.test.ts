@@ -211,8 +211,16 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'feat_guild_writ_runner',
       'feat_guild_hallsworn',
       'feat_guild_of_lantern_hall',
+      // The Smith's Heart's seven (hidden while the raid is dev-gated) ride the dungeon crest.
+      'dgn_smith_heart',
+      'dgn_heart_council_feat',
+      'dgn_heart_breath_feat',
+      'dgn_heart_quench_feat',
+      'dgn_heart_heat_feat',
+      'dgn_heart_final_feat',
+      'dgn_heart_meta',
     ]);
-    expect(DEED_ORDER).toHaveLength(369);
+    expect(DEED_ORDER).toHaveLength(376);
     expect(DEED_IMAGE_IDS.size).toBe(356);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

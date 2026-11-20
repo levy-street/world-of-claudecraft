@@ -30,6 +30,7 @@ import {
   CRYPT_RIMESILK_SPIT,
 } from '../../sim/mob/trash_kit/cast_ids';
 import type { Entity, SimEvent } from '../../sim/types';
+import { fxAnchor } from '../attached_fx_anchor';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { anchorWorld, coneSpot, shockwave } from './crypt_creature_fx_core';
 import { drapePolar, HALO_FRAG, NOISE_GLSL, SHOCK_FRAG } from './crypt_fx_floor';
@@ -714,9 +715,10 @@ export class CryptMarkFx implements CryptKitPart {
       this.freeGargoyle(slot);
       return;
     }
+    const eAt = fxAnchor(e);
     const now = h.now();
     const scale = e.scale || 1;
-    const gy = h.groundY(e.pos.x, e.pos.z);
+    const gy = h.groundY(eAt.x, eAt.z);
     const stacks = auraOf(e, CRYPT_GRANITE_SKIN)?.stacks ?? 0;
     const crust = graniteCrust(stacks, this.granite.maxStacks);
     const slamming = now - slot.slamAt < LAYER_SLAM_SECONDS + 0.05;
@@ -730,10 +732,10 @@ export class CryptMarkFx implements CryptKitPart {
     slot.crust.visible = on;
     slot.orbit.visible = on && !!slot.flakes;
     if (on) {
-      slot.crust.position.set(e.pos.x, gy, e.pos.z);
+      slot.crust.position.set(eAt.x, gy, eAt.z);
       slot.crust.rotation.y = e.facing;
       slot.crust.scale.setScalar(scale);
-      slot.orbit.position.set(e.pos.x, gy, e.pos.z);
+      slot.orbit.position.set(eAt.x, gy, eAt.z);
       slot.orbit.scale.setScalar(scale);
       slot.orbit.rotation.y += dt * crust.orbit;
       slot.crustMat.uniforms.uPale.value = crust.pale;
@@ -741,9 +743,9 @@ export class CryptMarkFx implements CryptKitPart {
     }
     // The crust pulse halo, then (while cracked) the beating heat halo.
     const c = scratchPoint;
-    c.x = e.pos.x + Math.sin(e.facing) * GARGOYLE_BODY.forward * scale;
+    c.x = eAt.x + Math.sin(e.facing) * GARGOYLE_BODY.forward * scale;
     c.y = gy + GARGOYLE_BODY.up * scale;
-    c.z = e.pos.z + Math.cos(e.facing) * GARGOYLE_BODY.forward * scale;
+    c.z = eAt.z + Math.cos(e.facing) * GARGOYLE_BODY.forward * scale;
     const cracked = auraOf(e, CRYPT_CRACKED_STONE);
     const pulseAge = now - slot.halo.born;
     let haloAlpha = 0;
@@ -954,8 +956,9 @@ export class CryptMarkFx implements CryptKitPart {
       if (!slot) continue;
       if (!held) slot.born = now - Math.max(0, aura.duration - aura.remaining);
       const g = eyeGlyph(now - slot.born, aura.remaining, now);
-      const gy = h.groundY(e.pos.x, e.pos.z);
-      slot.mesh.position.set(e.pos.x, gy + EYE_LIFT * (e.scale || 1) + g.bob, e.pos.z);
+      const eAt = fxAnchor(e);
+      const gy = h.groundY(eAt.x, eAt.z);
+      slot.mesh.position.set(eAt.x, gy + EYE_LIFT * (e.scale || 1) + g.bob, eAt.z);
       slot.mesh.scale.setScalar(1.15 * g.scale);
       slot.mat.uniforms.uAlpha.value = g.alpha;
       slot.mat.uniforms.uOpen.value = g.open;

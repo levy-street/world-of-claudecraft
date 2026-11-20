@@ -23,7 +23,8 @@ export type MountKey =
   | 'terrorspark_groundshaker'
   | 'nightwing_chimera'
   | 'lantern_hall_destrier'
-  | 'emberbristle_broom';
+  | 'emberbristle_broom'
+  | 'quarryheart_charger';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -145,6 +146,16 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     name: 'Emberbristle Broom',
     rarity: 'common',
   },
+  // The Smith's Heart raid's reward: a war-steed of the Heart, floating quarry-stone plates over a
+  // body of living fire, ice-crystal horns and a mane of wind. RESERVED: the raid's
+  // meta-achievement is its only door (src/sim/smith_heart_feat_rewards.ts;
+  // SMITHS_HEART_RAID_MOUNTS below). Placed before the two referral mounts, which the catalog
+  // pins last.
+  quarryheart_charger: {
+    key: 'quarryheart_charger',
+    name: 'Quarryheart Charger',
+    rarity: 'epic',
+  },
   referral_tank: {
     key: 'referral_tank',
     name: 'Friendship Tank',
@@ -171,6 +182,23 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
 export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker', 'referral_tank'];
+
+/** The Smith's Heart raid's reward mount: the one mount its meta-achievement grants. The
+ *  meta's reward (src/sim/smith_heart_feat_rewards.ts) reads this constant to deliver the reins
+ *  (mountItemId of it); otherwise it is RESERVED, like the raid's weapon appearances (content/weapon_skins.ts
+ *  RESERVED_WEAPON_SKIN_IDS): in the catalog so the renderer, previews and prewarm carry it, on no
+ *  vendor, loot table, rift pool or store. Its reins are soulbound, a raid achievement's reward
+ *  belonging to the character who earned it. */
+export const SMITHS_HEART_META_MOUNT: MountKey = 'quarryheart_charger';
+
+/** Every mount reserved for the Smith's Heart raid's rewards (today, its one meta-achievement
+ *  mount). The acquisition sweeps (tests/mounts.test.ts) hold each of them off every table. */
+export const SMITHS_HEART_RAID_MOUNTS: readonly MountKey[] = [SMITHS_HEART_META_MOUNT];
+
+/** True for a mount the Smith's Heart raid reserves (see SMITHS_HEART_RAID_MOUNTS). */
+export function isSmithsHeartRaidMount(key: string): boolean {
+  return (SMITHS_HEART_RAID_MOUNTS as readonly string[]).includes(key);
+}
 
 /** Paid annual-bundle mounts retain soulbound reins and outlive membership expiry. */
 export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['nightwing_chimera'];

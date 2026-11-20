@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed and the destrier in 408 keys', () => {
+  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed, the destrier, the Smith Heart raid and the Gourdlight Eve cues in 541 keys', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
     // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
@@ -180,9 +180,25 @@ describe('buildManifest', () => {
     // tide-wave boss cues) bring that total to 393 (release/v0.44.0 merge
     // into feature/buried-hoards), the Mirefen tavern's room bed, amb_tavern, makes 394,
     // and the Lantern Hall Destrier's whinny as it rears (mount_neigh_lantern_hall_destrier,
-    // synthesized) makes 408, mount cues 41.
+    // synthesized) makes 395, mount cues 41. The Smith's Heart's Hammer Council adds
+    // its eighteen heart_council_ cues (src/game/smith_heart_council_audio_core.ts):
+    // 413. Its Guardian of the Breath adds fifteen heart_breath_ cues
+    // (src/game/smith_heart_breath_audio_core.ts): 428. Its Guardian of the
+    // Quench adds eleven heart_quench_ cues
+    // (src/game/smith_heart_quench_audio_core.ts): 439. Gourdlight Eve adds
+    // thirteen synthesized cues (scripts/sfx/gourdlight_sfx.mjs): 452. The
+    // Smith's Heart's AAA sound pass (scripts/sfx/smith_heart_mechanic_sfx.mjs)
+    // adds 89: four personal marks, five council, sixteen breath, eight quench,
+    // the Heat's twenty-four (its first own takes) and the final boss's
+    // thirty-two: 541.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(408);
+    expect(keys.size).toBe(541);
+    expect([...keys].filter((key) => key.startsWith('heart_council_'))).toHaveLength(23);
+    expect([...keys].filter((key) => key.startsWith('heart_breath_'))).toHaveLength(31);
+    expect([...keys].filter((key) => key.startsWith('heart_quench_'))).toHaveLength(19);
+    expect([...keys].filter((key) => key.startsWith('heart_heat_'))).toHaveLength(24);
+    expect([...keys].filter((key) => key.startsWith('heart_final_'))).toHaveLength(32);
+    expect([...keys].filter((key) => key.startsWith('heart_mark_'))).toHaveLength(4);
     expect([...keys].filter((key) => key.startsWith('hoard_')).sort()).toEqual([
       'hoard_entrance_hum',
       'hoard_entrance_open',
@@ -293,7 +309,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(408);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(541);
     expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });

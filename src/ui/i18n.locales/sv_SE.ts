@@ -21347,30 +21347,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Stäng kampanjen Värva en vän',
   'hudChrome.wocStore.referralPromo.cta': 'Bjud in vänner',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Äventyra tillsammans',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Två tvinnade strängar av svart trä bundna i järn, krönta av en öppen järnlykta där en violett skymningslåga brinner mellan två böjda horn, med kedjor svängande från bottnen.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Varje lykta i hallen brinner klart utom en. Skymningslågan tändes för att vakta hallen om natten och avger skugga där de andra ger ljus; Garrick ansar själv dess veke. Röken och det violetta skenet är bara ett utseende.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Skymningsvekens stav',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Flamvågig klinga av svärtat stål med smidesheta eggar, en smält söm som förgrenar sig över båda sidorna, ett parerskydd av bronslågor runt en brinnande sten och ett oxblodsrött grepp.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Lykthallen håller en härd som inte slocknat sedan hallen restes, och Garrick Holt svär på att denna klinga härdades i dess kol. Medlemmar som bär den säger att greppet förblir varmt under den kallaste vakt. Elden längs eggarna är bara ett utseende.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Härdbrand',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Bred stålklinga med en blodränna av pyrande lykteld, förgyllda sidor, en burlykta brinnande i parerstången och ett blått lädergrepp.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt säljer inte denna klinga till en främling. Den går till medlemmar som fullgjort Lykthallens kontrakt vecka efter vecka, och han överlämnar den med samma ord varje gång: lyktan i parerskyddet är tänd från hallens egen härd, så vart du än bär den följer hallen med. Elden i blodrännan är bara ett utseende. Löftet är det viktiga.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lykthallens klinga',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Ljust skaft bundet i silver och omvirat av glödande rimfrost, krönt av en silverklo som håller en stor kristall av kallt ljus i en krona av splittrad is, med istappar hängande från kragen.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Lykthallens vintervakt bar stavar som denna längs landsvägen, med kronorna tända för resenärer vilse i snön. Garrick håller en på stället åt medlemmar med sigill över. Frosten och dess kalla ljus är bara ett utseende.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Rimljusets stav',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Lång havsblå klinga med eggar ljusa som brytande bränningar, en stormränna med en kluven blixt, en förgylld våg över klingbasen, en fena längs ena eggen och ett parerskydd av förgyllda bränningar runt en stormpärla.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'En kapten som seglade för gillet tog hem denna klinga från en stormby som tog hennes mast och lämnade skeppet klingande som en klocka. Garrick säljer den bara för sigill och varnar varje köpare för att den surrar före en storm. Blixten och havsljuset är bara ett utseende.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Stormkrön',
   'hudChrome.wocStore.subscription.annualClaim': 'Hämta paketets riddjur',
   'hudChrome.wocStore.subscription.annualDelivered':

@@ -24553,30 +24553,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wildheartAlert.stalkedLine':
     'Uciekaj przed jaguarem, aby uniknąć ugryzień. Odciągnij go od Pogromcy Bestii, aby zerwać Więź stada',
   'hudChrome.wildheartAlert.stalkedTitle': 'Tropiony!',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Dwa skręcone pasma czarnego drewna skute żelazem, zwieńczone otwartą żelazną latarnią z fioletowym płomieniem zmierzchu między dwoma zakręconymi rogami, z łańcuchami zwisającymi z dna.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Każda latarnia sali płonie jasno prócz jednej. Płomień zmierzchu zapalono, by strzegł sali nocą; daje cień tam, gdzie inne dają światło. Garrick sam przycina knot. Dym i fioletowa poświata są tylko wyglądem.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Kostur Zmierzchowego Knota',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Faliste niczym płomień ostrze z czernionej stali o rozżarzonych krawędziach, stopiona żyła rozgałęziona po obu stronach, jelec z brązowych płomieni wokół płonącego kamienia, rękojeść w kolorze wołowej krwi.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'W Sali Latarni płonie palenisko, które nie zgasło od jej powstania, a Garrick Holt przysięga, że ostrze hartowano w jego węglach. Noszący je członkowie mówią, że rękojeść pozostaje ciepła podczas najzimniejszej warty. Ogień na krawędziach jest tylko wyglądem.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Piętno Paleniska',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Szerokie stalowe ostrze ze zbroczem przygaszonego ognia latarni, złocone płazy, latarnia w klatce płonąca w jelcu i rękojeść z niebieskiej skóry.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt nie sprzeda tego ostrza obcemu. Trafia do członków, którzy tydzień po tygodniu wypełniali kontrakty Sali Latarni. Przekazuje je zawsze tymi samymi słowami: latarnię w jelcu zapalono z paleniska sali, więc dokądkolwiek je zaniesiesz, sala pójdzie z tobą. Ogień w zbroczu jest tylko wyglądem. Liczy się obietnica.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Ostrze Sali Latarni',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Jasny trzon okuty srebrem i owinięty świecącym szronem, zwieńczony srebrnym szponem trzymającym wielki kryształ zimnego światła w koronie połamanego lodu, z soplami zwisającymi z kołnierza.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Zimowa straż Sali Latarni niosła takie kostury górskim traktem, z koronami rozświetlonymi dla zagubionych w śniegu podróżnych. Garrick trzyma jeden na stojaku dla członków z nadmiarem pieczęci. Mróz i zimne światło są tylko wyglądem.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Kostur Szronnego Światła',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Długie morskobłękitne ostrze o krawędziach jasnych jak załamujące się fale, burzowy kanał z rozwidloną błyskawicą, złocona fala nad ricasso, płetwa wzdłuż jednej krawędzi i jelec ze złoconych grzywaczy wokół burzowej perły.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Kapitan żeglująca dla gildii przywiozła to ostrze ze szkwału, który zabrał jej maszt i sprawił, że statek dźwięczał jak dzwon. Garrick sprzedaje je tylko za pieczęcie i ostrzega każdego kupca, że brzęczy przed burzą. Błyskawice i morskie światło są tylko wyglądem.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Grzbiet Szkwału',
   'dungeonGuide.drownedTemple.accept.1': 'Dziękuję. Pójdę za tobą i nie będę przeszkadzał.',
   'dungeonGuide.drownedTemple.accept.2': 'Więc wreszcie zejdę. Idź dalej. Nadążę.',

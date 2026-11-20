@@ -432,7 +432,7 @@ describe('the spirit veil on a released spirit', () => {
     const update = vi.fn(() => {
       light.intensity = 1.37;
     });
-    const handle = { group, light, update, setTuning: vi.fn(), dispose: vi.fn() };
+    const handle = { group, light, update, setTuning: vi.fn(), setCalm: vi.fn(), dispose: vi.fn() };
     (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.push(handle);
 
     visual.setGhost(true, 'spirit');
@@ -516,7 +516,7 @@ function weaponSkinHandle(visual: CharacterVisual) {
   const update = vi.fn(() => {
     light.intensity = 1.37;
   });
-  const handle = { group, light, update, setTuning: vi.fn(), dispose: vi.fn() };
+  const handle = { group, light, update, setTuning: vi.fn(), setCalm: vi.fn(), dispose: vi.fn() };
   (visual as unknown as { weaponVfx: unknown[] }).weaponVfx.push(handle);
   return { handle, light, shell, glow, update };
 }

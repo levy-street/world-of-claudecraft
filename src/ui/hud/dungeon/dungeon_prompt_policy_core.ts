@@ -7,12 +7,17 @@
 //    text explaining a mechanic (the Sunken Bastion's crown alert, the
 //    Wildheart Basin's, the Gravewyrm Sanctum's, the Hollow Crypt's and the
 //    Drowned Temple's, soft readouts included). None of them takes a press.
-//    The ACTION prompts are
+//    The Smith's Heart's Hammer Council has no prompt at all since the team's
+//    feedback of 2026-11-17 ("too many on-screen markers"): its marks read in
+//    the world only (docs/design/raid/smith_heart.md 7.1), and neither has the
+//    Masterless Strength since Jose's playtest of 2026-11-19 (its marks read on
+//    the floor and in the marked player's own arrow). The ACTION prompts are
 //    never governed by it: the Iron Cage escape (the panel IS the escape
 //    button), Gaoler Ossick's chain alert (a live gauge the player steers by:
 //    the links left on the anchor and the shackle's reach used, with the
-//    distance), and the use prompt (the panel is the interact press on a
-//    brazier or a candle).
+//    distance), the Smith's Heart's Guardian of the Quench cold bar (the
+//    player's own gauge, steered by the whole fight), and the use prompt (the
+//    panel is the interact press on a brazier or a candle).
 //    It is a player-chosen interface preference, never a graphics-tier knob:
 //    this module takes the setting's own boolean and reads no preset, effects
 //    profile or governor (tests/dungeon_hints_setting.test.ts pins that).
@@ -32,6 +37,8 @@ export type DungeonPromptId =
   | 'wildheart'
   | 'sanctum'
   | 'crypt'
+  | 'quench'
+  | 'knot'
   | 'temple'
   | 'kitUse';
 
@@ -44,6 +51,8 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   wildheart: true,
   sanctum: true,
   crypt: true,
+  quench: false,
+  knot: false,
   temple: true,
   kitUse: false,
 };
@@ -63,6 +72,9 @@ export interface DungeonPromptSlotState {
   wildheart: boolean;
   sanctum: boolean;
   crypt: boolean;
+  /** The Smith's Heart's Guardian of the Quench cold bar. */
+  quench: boolean;
+  knot: boolean;
   temple: boolean;
   /** The showing Crypt alert is a SOFT readout (ignored while crypt is false). */
   cryptSoft: boolean;
@@ -81,6 +93,8 @@ export function usePromptYields(s: DungeonPromptSlotState): boolean {
     (s.wildheart && !s.wildheartSoft) ||
     s.sanctum ||
     (s.crypt && !s.cryptSoft) ||
-    s.temple
+    s.temple ||
+    s.quench ||
+    s.knot
   );
 }

@@ -34,6 +34,7 @@ import { GRAVEWYRM_SANCTUM_MOBS } from '../../sim/content/gravewyrm_sanctum';
 import { HOLLOW_CRYPT_MOBS } from '../../sim/content/hollow_crypt';
 import { HOLLOW_CRYPT_TRASH_MOBS } from '../../sim/content/hollow_crypt_trash';
 import { HOARD_MOBS, RIFT_MOBS } from '../../sim/content/rift/mobs';
+import { SMITH_HEART_MOBS } from '../../sim/content/smith_heart';
 import { SUNKEN_BASTION_MOBS } from '../../sim/content/sunken_bastion';
 import { TEMPLE_DUNGEON_MOBS } from '../../sim/content/temple';
 import { HOARD_MIN_LEVEL } from '../../sim/content/treasure_maps';
@@ -80,6 +81,9 @@ const INTERIOR_MOBS: Readonly<Record<string, Readonly<Record<string, MobTemplate
   gravewyrm_sanctum: GRAVEWYRM_SANCTUM_MOBS,
   drowned_temple: { ...TEMPLE_DUNGEON_MOBS, ...DROWNED_TEMPLE_MOBS },
   wildheart: WILDHEART_MOBS,
+  // The Smith's Heart raid: its own bodies (the final boss) load behind the
+  // raid's arrival cover, never in the iOS post-entry stream.
+  smith_heart: SMITH_HEART_MOBS,
 };
 
 /** Only content-exclusive bodies may leave the automatic overworld stream. */

@@ -46,6 +46,7 @@ import { resetBossRangedMechanics } from './boss_ranged_mechanics';
 import { resetBossSlams } from './boss_slams';
 import { resetBossStarwake } from './boss_starwake';
 import { resetMobCharge } from './charge';
+import { putDormant } from './dormant_state';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
 import { resetRiftMechanicWindups } from './rift_escape_window';
@@ -213,6 +214,10 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   if (mob.templateId === IGNIVAR_BOSS_ID) resetIgnivarEncounter(ctx, mob);
   if (mob.templateId === VARKHUL_BOSS_ID) resetVarkhulEncounter(ctx, mob);
+  // A dormant template (none respawns in place today: the Warders are raid trash) comes back
+  // asleep, ward on, like a fresh spawn (mob/dormant.ts).
+  const dormant = MOBS[mob.templateId]?.dormant;
+  if (dormant) putDormant(mob, dormant);
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (e && e.targetId === mob.id) e.targetId = null;

@@ -21861,30 +21861,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Luk Henvis en ven-tilbud',
   'hudChrome.wocStore.referralPromo.cta': 'Inviter venner',
   'hudChrome.wocStore.referralPromo.eyebrow': 'På eventyr sammen',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'To snoede strenge af sort træ bundet i jern, kronet af en åben jernlygte med en violet skumringsflamme mellem to buede horn og kæder svingende fra bunden.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Alle lygter i hallen brænder klart undtagen én. Skumringsflammen blev tændt for at vogte hallen om natten og afgiver skygge, hvor de andre giver lys; Garrick klipper selv dens væge. Røgen og det violette skær er kun et udseende.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Skumringsvægens stav',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Flammebølget klinge af sværtet stål med smedevarme ægge, en smeltet søm, som forgrener sig over begge sider, en parerstang af bronzeflammer omkring en brændende sten og et okseblodsrødt greb.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Lygtehallen holder et ildsted, som ikke er gået ud, siden hallen blev rejst, og Garrick Holt sværger på, at denne klinge blev hærdet i dets kul. Medlemmer, der bærer den, siger, at grebet holder sig varmt på den koldeste vagt. Ilden langs æggene er kun et udseende.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Arnebrand',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Bred stålklinge med en blodrille af ulmende lygteild, forgyldte sider, en indrammet lygte brændende i parerstangen og et blåt lædergreb.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt sælger ikke denne klinge til en fremmed. Den går til medlemmer, som har gennemført Lygtehallens kontrakter uge efter uge, og han giver den med de samme ord hver gang: lygten i parerstangen er tændt fra hallens eget ildsted, så hvor du end bærer den, følger hallen med. Ilden i blodrillen er kun et udseende. Løftet er det vigtige.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Lygtehallens klinge',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Lyst skaft bundet i sølv og omviklet med glødende rimfrost, kronet af en sølvklo, der holder en stor krystal af koldt lys inde i en krone af splintret is, med istapper hængende fra kraven.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Lygtehallens vintervagt bar stave som denne langs landevejen, med kronerne tændt for rejsende faret vild i sneen. Garrick har en på stativet til medlemmer med segl til overs. Frosten og dens kolde lys er kun et udseende.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Rimlysets stav',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Lang havblå klinge med ægge lyse som brydende brænding, en stormkanal med et kløvet lyn, en forgyldt bølge over klingebasen, en finne langs én æg og et værn af forgyldte brændinger omkring en stormperle.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'En kaptajn, der sejlede for lauget, bragte denne klinge hjem fra en byge, som tog hendes mast og efterlod skibet klingende som en klokke. Garrick sælger den kun for segl og advarer hver køber om, at den summer før en storm. Lynet og havlyset er kun et udseende.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Bygekrone',
   'hudChrome.wocStore.subscription.annualClaim': 'Hent pakkens ridedyr',
   'hudChrome.wocStore.subscription.annualDelivered':

@@ -234,7 +234,7 @@ export function partyFrameSignature(
       if (!config.showSelf) continue;
     }
     const oor = !m.dead && Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd;
-    sig += `${m.pid}:${m.name}:${m.cls}:${m.role ?? ''}:${m.group}:${m.hp}/${m.mhp}:${m.absorb}:${m.res}/${m.mres}:${m.rtype ?? ''}:${m.dead}:${m.inCombat}:${oor ? 1 : 0}:${m.level}:`;
+    sig += `${m.pid}:${m.name}:${m.cls}:${m.role ?? ''}:${m.group}:${m.hp}/${m.mhp}:${m.absorb}:${m.healAbsorb ?? 0}:${m.res}/${m.mres}:${m.rtype ?? ''}:${m.dead}:${m.inCombat}:${oor ? 1 : 0}:${m.level}:`;
     // The aura strip, appended inline (no intermediate array): a joined/left aura,
     // a kind flip, or a sap-sign flip changes the string and repaints the row.
     if (m.auras) {

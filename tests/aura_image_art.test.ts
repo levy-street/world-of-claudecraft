@@ -22,6 +22,8 @@ describe('exact runtime aura paintings', () => {
     'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json';
   const masterwroughtManifest =
     'docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json';
+  const smithHeartManifest =
+    'docs/achievements/smith-heart-aura-art-2026-11-19/accepted-aura-art.json';
   const secondPassManifestSha256 =
     'bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe';
   const externalAuraArt = new Map([
@@ -175,6 +177,33 @@ describe('exact runtime aura paintings', () => {
         prompt: string;
       }>;
     };
+    const smithHeartBytes = readFileSync(path.join(process.cwd(), smithHeartManifest));
+    const smithHeart = JSON.parse(smithHeartBytes.toString('utf8')) as {
+      schemaVersion: number;
+      batch: { id: string; acceptedDate: string; rasterGenerator: string };
+      scope: {
+        exactRuntimeAuras: number;
+        sharedRuntimeAliases: number;
+        runtimeIdsCovered: number;
+      };
+      generationContract: {
+        builtInImagegenCalls: number;
+        acceptedFirstOutputs: number;
+        rejectedOutputs: number;
+      };
+      assets: Array<{
+        auraId: string;
+        runtimeIds: string[];
+        sourceProvenance: string;
+        sourceFile: string;
+        sourceBytes: number;
+        sourceSha256: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+        references: Array<{ path: string; role: string }>;
+        prompt: string;
+      }>;
+    };
     const committed = readdirSync(auraArtDir).sort();
     const committedIds = committed
       .filter((name) => name.endsWith('.webp') && !name.startsWith('mob_'))
@@ -284,12 +313,30 @@ describe('exact runtime aura paintings', () => {
             },
           ] as const,
       ),
+      ...smithHeart.assets.map(
+        (asset) =>
+          [
+            asset.auraId,
+            {
+              auraId: asset.auraId,
+              sourceFile: asset.sourceFile,
+              sourceBytes: asset.sourceBytes,
+              sourceSha256: asset.sourceSha256,
+              acceptedSha256: asset.acceptedSha256,
+              acceptedBytes: asset.acceptedBytes,
+              acceptedArtManifest: smithHeartManifest,
+              references: asset.references.map(({ path: referencePath }) => referencePath),
+              sourceProvenance: asset.sourceProvenance,
+            },
+          ] as const,
+      ),
     ]);
 
     expect(committed.filter((name) => name !== 'mapping.json' && !name.endsWith('.webp'))).toEqual(
       [],
     );
-    expect(expectedIds).toHaveLength(86);
+    // 153: 86 plus the Smith's Heart raid's 67 paintings (smith_heart_aura_art.ts).
+    expect(expectedIds).toHaveLength(153);
     expect(committedIds).toEqual(expectedIds);
     expect(mappedIds).toEqual(expectedIds);
     expect([...acceptedById.keys()].sort()).toEqual(expectedIds);
@@ -373,6 +420,42 @@ describe('exact runtime aura paintings', () => {
       },
     });
     expect(masterwrought.assets).toHaveLength(1);
+    expect(createHash('sha256').update(smithHeartBytes).digest('hex')).toBe(
+      '5979d40e803771e6f15700aaade0b7161cbd57182fde7384426bbbcd15100075',
+    );
+    expect(smithHeart).toMatchObject({
+      schemaVersion: 1,
+      batch: {
+        id: 'smith-heart-aura-art-2026-11-19',
+        acceptedDate: '2026-11-19',
+        rasterGenerator: 'OpenAI built-in image generation',
+      },
+      scope: { exactRuntimeAuras: 67, sharedRuntimeAliases: 23, runtimeIdsCovered: 90 },
+      generationContract: {
+        builtInImagegenCalls: 74,
+        acceptedFirstOutputs: 70,
+        rejectedOutputs: 2,
+      },
+    });
+    expect(smithHeart.assets).toHaveLength(67);
+    expect(smithHeart.assets.flatMap(({ runtimeIds }) => runtimeIds)).toHaveLength(90);
+    for (const asset of smithHeart.assets) {
+      expect(asset.sourceFile, asset.auraId).toBe(
+        `tmp/imagegen/smith-heart-auras-2026-11-19/raw/${asset.auraId}.png`,
+      );
+      expect(asset.runtimeIds[0], asset.auraId).toBe(asset.auraId);
+      expect(asset.sourceBytes, asset.auraId).toBeGreaterThan(0);
+      expect(asset.sourceSha256, asset.auraId).toMatch(/^[0-9a-f]{64}$/);
+      expect(asset.references.length, asset.auraId).toBeGreaterThanOrEqual(2);
+      expect(asset.references.length, asset.auraId).toBeLessThanOrEqual(4);
+      expect(asset.prompt, asset.auraId).toMatch(/\b(text|letters)\b/i);
+      expect(asset.prompt, asset.auraId).toMatch(/\b(border|frame)\b/i);
+      for (const reference of asset.references) {
+        expect(reference.role.length, asset.auraId).toBeGreaterThan(0);
+        expect(trackedPaths.has(reference.path), `${asset.auraId}: ${reference.path}`).toBe(true);
+        expect(existsSync(path.join(process.cwd(), reference.path)), asset.auraId).toBe(true);
+      }
+    }
     for (const asset of [...secondPass.assets, ...elixir.assets, ...fear.assets]) {
       expect(asset.sourceFile, asset.auraId).toMatch(/^tmp\/imagegen\/v039-second-pass\//);
       expect(asset.sourceBytes, asset.auraId).toBeGreaterThan(0);
@@ -402,6 +485,7 @@ describe('exact runtime aura paintings', () => {
         fearManifest,
         mobManifest,
         masterwroughtManifest,
+        smithHeartManifest,
       ]),
     );
     expect(mapping.externalAssets.map(({ auraId, runtimeUrl }) => [auraId, runtimeUrl])).toEqual([

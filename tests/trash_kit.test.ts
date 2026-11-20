@@ -773,7 +773,12 @@ describe('trash kit: an area cast plants its caster', () => {
     const drake = MOBS.crypt_ossuary_drake;
     expect(isPlantedCast(drake, CRYPT_BARROWFLAME_BREATH, false)).toBe(false);
     expect(isPlantedCast(drake, CRYPT_WING_GUST, false)).toBe(true);
-    const others = Object.values(DUNGEONS).filter((d) => !DUNGEON_IDS.includes(d.id));
+    // The Smith's Heart raid opts in too (its area casts plant like the
+    // reworked dungeons'); every other dungeon keeps tracking casts.
+    expect(DUNGEONS.smith_heart.areaCastsPlant).toBe(true);
+    const others = Object.values(DUNGEONS).filter(
+      (d) => !DUNGEON_IDS.includes(d.id) && d.id !== 'smith_heart',
+    );
     expect(others.length).toBeGreaterThan(0);
     for (const d of others) expect(d.areaCastsPlant, d.id).toBeUndefined();
   });

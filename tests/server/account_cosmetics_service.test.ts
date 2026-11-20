@@ -44,10 +44,10 @@ function setup() {
   return { service, sessions, sim };
 }
 
-describe('weapon skins reserved for a future raid', () => {
+describe("the Smith's Heart raid skins (never through the economy or guild lanes)", () => {
   it('never mirrors one the economy ledger grants, nor grants one through the guild ledger', () => {
     const { service, sessions } = setup();
-    expect(RESERVED_WEAPON_SKIN_IDS.length).toBe(4);
+    expect(RESERVED_WEAPON_SKIN_IDS.length).toBe(5);
     service.grantWeaponSkins(7, [...RESERVED_WEAPON_SKIN_IDS, 'not_a_skin']);
     expect(persistWeapon).not.toHaveBeenCalled();
     expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([[], []]);
@@ -63,6 +63,35 @@ describe('weapon skins reserved for a future raid', () => {
     onlineLedger.purchaseWeaponSkin?.('weapon_skin_lantern_hall_sword');
     expect(purchase).toHaveBeenCalledExactlyOnceWith('weapon_skin_lantern_hall_sword');
     expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([[], []]);
+    expect(persistWeapon).not.toHaveBeenCalled();
+  });
+});
+
+describe("the Smith's Heart feat appearances (the deed-earned lane)", () => {
+  it('persists and pushes exactly the appearances the earned feats pay, once', async () => {
+    const { service, sessions } = setup();
+    persistWeapon.mockImplementation(async (_id: number, skins: string[]) => ({
+      ...base(),
+      weaponSkinIds: skins,
+    }));
+    service.grantDeedRewardSkins(7, ['dgn_heart_council_feat', 'prog_veteran', 'dgn_heart_meta']);
+    expect(persistWeapon).toHaveBeenCalledExactlyOnceWith(7, ['seamcaller_maul']);
+    // A second call while the first is still pending writes nothing more.
+    service.grantDeedRewardSkins(7, ['dgn_heart_council_feat']);
+    expect(persistWeapon).toHaveBeenCalledTimes(1);
+    await flush();
+    expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([
+      ['seamcaller_maul'],
+      ['seamcaller_maul'],
+    ]);
+    // Owned now: a join re-derivation over the same deeds is a no-op.
+    service.grantDeedRewardSkins(7, ['dgn_heart_council_feat']);
+    expect(persistWeapon).toHaveBeenCalledTimes(1);
+  });
+
+  it('a deed that pays no appearance writes nothing', () => {
+    const { service } = setup();
+    service.grantDeedRewardSkins(7, ['prog_veteran', 'dgn_heart_meta', 'dgn_smith_heart']);
     expect(persistWeapon).not.toHaveBeenCalled();
   });
 });

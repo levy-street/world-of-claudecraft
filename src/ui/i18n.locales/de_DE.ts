@@ -21867,30 +21867,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.referralPromo.close': 'Freundschaftswerbung schließen',
   'hudChrome.wocStore.referralPromo.cta': 'Freunde einladen',
   'hudChrome.wocStore.referralPromo.eyebrow': 'Gemeinsam Abenteuer erleben',
-  'hudChrome.wocStore.skins.duskwick_staff.look':
-    'Zwei verdrehte Stränge schwarzen Holzes, mit Eisen gebunden, gekrönt von einer offenen Eisenlaterne, in der zwischen zwei gebogenen Hörnern eine violette Dämmerungsflamme brennt; Ketten schwingen von ihrem Boden.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore':
-    'Jede Laterne in der Halle brennt hell, bis auf eine. Die Dämmerungsflamme wurde entzündet, um die Halle nachts zu bewachen. Wo die anderen Licht geben, spendet sie Schatten; Garrick stutzt ihren Docht selbst. Rauch und violetter Schein sind nur Aussehen.',
-  'hudChrome.wocStore.skins.duskwick_staff.name': 'Dämmerdochtstab',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look':
-    'Flammenförmige Klinge aus geschwärztem Stahl mit schmiedeheißen Schneiden, einer verzweigten Schmelzader auf beiden Seiten, einer Parierstange aus Bronzeflammen um einen brennenden Stein und einem ochsenblutroten Griff.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
-    'Die Laternenhalle unterhält ein Herdfeuer, das seit dem Bau der Halle nie erloschen ist, und Garrick Holt schwört, diese Klinge sei in seinen Kohlen abgeschreckt worden. Mitglieder, die sie tragen, sagen, ihr Griff bleibe auf der kältesten Wache warm. Das Feuer an ihren Schneiden ist nur Aussehen.',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Herdbrand',
   'hudChrome.wocStore.skins.lantern_hall_sword.look':
     'Breite Stahlklinge mit glimmendem Laternenfeuer in der Hohlkehle, vergoldeten Flanken, einer brennenden Käfiglaterne in der Parierstange und blauem Ledergriff.',
   'hudChrome.wocStore.skins.lantern_hall_sword.lore':
     'Garrick Holt verkauft diese Klinge keinem Fremden. Sie geht an Mitglieder, die Woche für Woche die Aufträge der Laternenhalle erfüllten, und er übergibt sie immer mit denselben Worten: Die Laterne in der Parierstange ist am eigenen Herd der Halle entzündet; wohin du sie auch trägst, die Halle begleitet dich. Das Feuer in der Hohlkehle ist nur Aussehen. Auf das Versprechen kommt es an.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Klinge der Laternenhalle',
-  'hudChrome.wocStore.skins.rimelight_staff.look':
-    'Blasser Schaft, mit Silber gebunden und leuchtendem Raureif umwunden, gekrönt von einer Silberklaue, die einen großen Kristall kalten Lichts in einer Krone aus gesplittertem Eis hält; Eiszapfen hängen an seinem Kragen.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore':
-    'Die Winterwache der Laternenhalle trug solche Stäbe auf der Hochstraße; ihre Kronen leuchteten für Reisende, die sich im Schnee verirrt hatten. Garrick hält einen im Ständer für Mitglieder mit übrigen Siegeln. Der Frost und sein kaltes Licht sind nur Aussehen.',
   'hudChrome.wocStore.skins.rimelight_staff.name': 'Raureiflichtstab',
-  'hudChrome.wocStore.skins.squallcrest_sword.look':
-    'Lange meerblaue Klinge mit Schneiden hell wie brechende Brandung, einem Sturmkanal mit gegabeltem Blitz, einer vergoldeten Welle über der Fehlschärfe, einer Flosse an einer Schneide und einer Parierstange aus goldenen Brechern um eine Sturmperle.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore':
-    'Eine Kapitänin in Diensten der Gilde brachte diese Klinge aus einer Bö heim, die ihren Mast nahm und ihr Schiff wie eine Glocke nachklingen ließ. Garrick verkauft sie nur für Siegel und warnt jeden Käufer, dass sie vor einem Sturm summt. Der Blitz und das Meereslicht sind nur Aussehen.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': 'Böenkamm',
   'hudChrome.wocStore.subscription.annualClaim': 'Paketreittier abholen',
   'hudChrome.wocStore.subscription.annualDelivered':

@@ -225,6 +225,9 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   cinderbrand: 'VAR_SWORD',
   lantern_hall_sword: 'VAR_SWORD',
   hearthbrand: 'VAR_SWORD',
+  // Seamcaller (the Smith's Heart's Hammer Council maul): a two-hander on the hammer family,
+  // drawn at maul length by its weapon_grip.ts scale
+  seamcaller_maul: 'VAR_HAMMER',
   squallcrest: 'VAR_SWORD',
   rimelight_staff: 'VAR_STAFF',
   duskwick_staff: 'VAR_STAFF',
@@ -2809,6 +2812,16 @@ function buildTintedClone(
         polygonOffsetFactor: s.polygonOffsetFactor,
         polygonOffsetUnits: s.polygonOffsetUnits,
       });
+      // The GLB's material extras survive too (a rig's own per-material data, such as the
+      // Quarryheart Charger's dequantization), and a material whose glow IS its look (extras
+      // lowTierEmissive: the charger's living fire) keeps its emissive map on this tier.
+      mat.userData = { ...s.userData };
+      if ((s.userData as { lowTierEmissive?: boolean }).lowTierEmissive === true && s.emissiveMap) {
+        const lm = mat as THREE.MeshLambertMaterial;
+        lm.emissiveMap = s.emissiveMap;
+        lm.emissive.copy(s.emissive);
+        lm.emissiveIntensity = s.emissiveIntensity;
+      }
       attachGloamClimb(mat); // the Lambert tier's only layer: same climb, no rim
     }
   }

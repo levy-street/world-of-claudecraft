@@ -171,6 +171,9 @@ vi.mock('../src/render/paladin_ascension_visual', () => ({
 vi.mock('../src/render/goblin_rocket_sled_fx', () => ({
   resetGoblinRocketSledProfileCaches: mocks.sledReset,
 }));
+vi.mock('../src/render/quarryheart_charger_fx', () => ({
+  resetQuarryheartProfileCaches: mocks.reset,
+}));
 vi.mock('../src/render/ground_decor_prewarm', () => ({
   clearGroundDecorPrewarmDraws: mocks.reset,
 }));
@@ -311,6 +314,7 @@ describe('graphics profile derived-cache reset', () => {
       'mirefen_tavern',
       'paladin_ascension_visual',
       'goblin_rocket_sled_fx',
+      'quarryheart_charger_fx',
       'ground_decor_prewarm',
     ]);
     expect(() => resetGraphicsProfileDerivedCaches()).not.toThrow();

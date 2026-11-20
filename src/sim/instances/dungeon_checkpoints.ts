@@ -1,9 +1,14 @@
 // Death recovery uses the live claim's retained boss corpses as progress,
 // just like dungeon gates, and the gates' own derived state as the proof that
-// the arena can be walked to. No saved state, tick work, or rng draws.
+// the arena can be walked to. No saved state, tick work, or rng draws. A raid
+// whose rooms fall in any order names its own candidates instead
+// (ORDERED_CHECKPOINTS: the Smith's Heart's last kill, which its seal tick
+// records); the route and arrival rules here apply to them all the same.
 import { isBlocked } from '../colliders';
 import { DUNGEON_CHECKPOINTS, type DungeonCheckpoint } from '../content/dungeon_checkpoints';
+import { SMITH_HEART_DUNGEON } from '../content/smith_heart';
 import { DUNGEONS, instanceOrigin, MOBS } from '../data';
+import { smithHeartCheckpointCandidates } from '../encounters/smith_heart/checkpoint';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS } from '../mob/aggro_ranges';
 import { PATROL_REJOIN_DISTANCE, patrolFlierAloft } from '../mob/patrol';
 import { projectOntoLoop } from '../mob/patrol_route';
@@ -42,7 +47,7 @@ function routeOpen(
   ctx: SimContext,
   inst: InstanceSlot,
   dungeon: DungeonDef,
-  checkpoint: DungeonCheckpoint,
+  checkpoint: Pick<DungeonCheckpoint, 'gates'>,
 ): boolean {
   return checkpoint.gates.every((gateId) => {
     const gate = dungeon.gates?.find((g) => g.id === gateId);
@@ -94,32 +99,30 @@ function patrolLoop(mob: Entity): readonly { x: number; z: number }[] | null {
   return points && points.length > 0 ? points : null;
 }
 
-/** Instance-local arrival. Ordinary entries and unrelated corpses use the door. */
-export function dungeonReentryPoint(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  player: Entity,
-): { x: number; z: number } {
+/**
+ * Raids whose rooms are not cleared in one order answer which rooms to try
+ * themselves, best first (the Smith's Heart: the last guardian killed). The
+ * door side below still applies its route and arrival rules to each, and a
+ * candidate whose own way in is shut (`reachable` false) is passed over.
+ */
+const ORDERED_CHECKPOINTS: Readonly<
+  Record<string, (ctx: SimContext, inst: InstanceSlot) => readonly CheckpointCandidate[]>
+> = {
+  [SMITH_HEART_DUNGEON]: smithHeartCheckpointCandidates,
+};
+
+interface CheckpointCandidate {
+  readonly gates: readonly string[];
+  readonly pos: { readonly x: number; readonly z: number };
+  readonly reachable: boolean;
+}
+
+/** The rooms to try for this claim, best first: a raid's own order, else the
+ *  dungeon table's earned rows from the deepest back. */
+function checkpointCandidates(ctx: SimContext, inst: InstanceSlot): readonly CheckpointCandidate[] {
+  if (Object.hasOwn(ORDERED_CHECKPOINTS, inst.dungeonId))
+    return ORDERED_CHECKPOINTS[inst.dungeonId](ctx, inst);
   const dungeon = DUNGEONS[inst.dungeonId];
-  if (
-    !Object.hasOwn(DUNGEON_CHECKPOINTS, inst.dungeonId) ||
-    inst.partyKey === null ||
-    inst.exitId === null ||
-    !player.dead ||
-    !player.ghost ||
-    !player.corpsePos ||
-    player.corpseInstanceId !== inst.exitId
-  )
-    return dungeon.entry;
-  const checkpoints = DUNGEON_CHECKPOINTS[inst.dungeonId];
-
-  // Include appended encounter adds (Knellwyrm, Bonewalkers, etc.). A return
-  // during a pull never grants a shortcut back into that ongoing fight.
-  for (const id of inst.mobIds) {
-    const mob = ctx.entities.get(id);
-    if (mob && !mob.dead && (mob.inCombat || mob.aiState !== 'idle')) return dungeon.entry;
-  }
-
   const defeated = (bossId: string): boolean => {
     // Static spawn ordinal binds proof to this claim's authored boss rather
     // than an identically named summon or a corpse in a neighbour's slot.
@@ -132,13 +135,48 @@ export function dungeonReentryPoint(
       })
     );
   };
-  const origin = instanceOrigin(dungeon.index, inst.slot);
+  const out: CheckpointCandidate[] = [];
+  const checkpoints = DUNGEON_CHECKPOINTS[inst.dungeonId];
   for (let i = checkpoints.length - 1; i >= 0; i--) {
     const checkpoint = checkpoints[i];
-    if (!checkpoint.bosses.every(defeated)) continue;
+    if (checkpoint.bosses.every(defeated)) out.push({ ...checkpoint, reachable: true });
+  }
+  return out;
+}
+
+/** Instance-local arrival. Ordinary entries and unrelated corpses use the door. */
+export function dungeonReentryPoint(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  player: Entity,
+): { x: number; z: number } {
+  const dungeon = DUNGEONS[inst.dungeonId];
+  if (
+    !(
+      Object.hasOwn(DUNGEON_CHECKPOINTS, inst.dungeonId) ||
+      Object.hasOwn(ORDERED_CHECKPOINTS, inst.dungeonId)
+    ) ||
+    inst.partyKey === null ||
+    inst.exitId === null ||
+    !player.dead ||
+    !player.ghost ||
+    !player.corpsePos ||
+    player.corpseInstanceId !== inst.exitId
+  )
+    return dungeon.entry;
+
+  // Include appended encounter adds (Knellwyrm, Bonewalkers, etc.). A return
+  // during a pull never grants a shortcut back into that ongoing fight.
+  for (const id of inst.mobIds) {
+    const mob = ctx.entities.get(id);
+    if (mob && !mob.dead && (mob.inCombat || mob.aiState !== 'idle')) return dungeon.entry;
+  }
+
+  const origin = instanceOrigin(dungeon.index, inst.slot);
+  for (const checkpoint of checkpointCandidates(ctx, inst)) {
     // A dead boss alone proves nothing about the way in: the arena is offered
     // only while a group could walk to it through its open gates.
-    if (!routeOpen(ctx, inst, dungeon, checkpoint)) continue;
+    if (!checkpoint.reachable || !routeOpen(ctx, inst, dungeon, checkpoint)) continue;
     const pos = ctx.groundPos(origin.x + checkpoint.pos.x, origin.z + checkpoint.pos.z);
     if (isBlocked(ctx.cfg.seed, pos.x, pos.z, PLAYER_BODY_RADIUS)) continue;
     if (

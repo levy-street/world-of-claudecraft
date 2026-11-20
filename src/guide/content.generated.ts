@@ -7785,6 +7785,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Emberbristle Broom"
+      },
+      {
+        "kind": "mount",
+        "name": "Quarryheart Charger"
       }
     ]
   },
