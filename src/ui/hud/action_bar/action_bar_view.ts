@@ -79,7 +79,7 @@ import {
   type AbilityDef,
   type AbilityEffect,
   type AuraKind,
-  dist2d,
+  dist3d,
   type EquipSlot,
   GCD,
   type ItemDef,
@@ -590,7 +590,7 @@ export function createActionBarView(
   return {
     tick(world: ActionBarWorldInput): ActionBarState {
       const { player, target } = world;
-      const tgtDist = target !== null && !target.dead ? dist2d(player.pos, target.pos) : null;
+      const tgtDist = target !== null && !target.dead ? dist3d(player.pos, target.pos) : null;
       // The attacker half of every range question below. Built once per tick
       // and handed to effectivePlayerAttackRange so the bar's out-of-range
       // tint answers exactly what the server's range gate will.

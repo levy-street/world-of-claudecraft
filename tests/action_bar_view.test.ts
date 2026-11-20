@@ -885,7 +885,7 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
       ),
       fakeDeps(),
     );
-    // range 0 -> the out-of-range check uses MELEE_RANGE (dist2d is on the x/z plane).
+    // range 0 -> the out-of-range check uses MELEE_RANGE (straight-line distance, dist3d).
     // Snapshot the primitive each tick: the core reuses the slot object across ticks.
     const far = view.tick(world({ targetPos: { x: MELEE_RANGE + 1, y: 0, z: 0 } })).slots[0]
       .outOfRange;
@@ -893,6 +893,20 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
       .outOfRange;
     expect(far).toBe(true);
     expect(near).toBe(false);
+  });
+
+  it('counts height in the out-of-range tint (a target on a roof above you)', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('mortal_strike', { requiresTarget: true, range: 0 }) }),
+      ),
+      fakeDeps(),
+    );
+    // 3 yd out on the ground in both cases; only the height differs.
+    const roof = view.tick(world({ targetPos: { x: 3, y: 6, z: 0 } })).slots[0].outOfRange;
+    const step = view.tick(world({ targetPos: { x: 3, y: 1, z: 0 } })).slots[0].outOfRange;
+    expect(roof).toBe(true);
+    expect(step).toBe(false);
   });
 
   it('keeps melee actions in range across the enlarged raid-boss footprint', () => {

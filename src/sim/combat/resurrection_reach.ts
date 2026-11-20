@@ -10,7 +10,7 @@
 
 import { entityToBodyLineOfSightClear } from '../line_of_sight_elevation';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, type Vec3 } from '../types';
+import { dist3d, type Entity, type Vec3 } from '../types';
 
 // The reach ceiling for a resurrection with no authored range (the mass
 // resurrections author range 0). An authored range (both single-target rezzes
@@ -35,7 +35,7 @@ export function resurrectionReachError(
   rangeSlack = 0,
 ): ResurrectionReachErrorKind | null {
   const body = resurrectionBodyPos(dead);
-  if (dist2d(caster.pos, body) > maxRange + rangeSlack) return 'range';
+  if (dist3d(caster.pos, body) > maxRange + rangeSlack) return 'range';
   // Reach measures the CORPSE position, not the entity's (a released ghost
   // stands at the graveyard), so it uses the entity-to-body elevation arm.
   // Both ends are players, so only their delve runs can supply interior modules.
