@@ -270,12 +270,15 @@ const PLANS = {
         // Inside the quarter it enters, 30 yd out (the combo lands there).
         spot: QUARTER_SPOTS[to],
         quiet: true,
-        views: {
-          high: [0, 1.0, 46],
-          raid: [0.6, 0.3, 32],
-          close: [0.9, 0.3, 18],
-          boss: [0, 0.12, 26],
-        },
+        views:
+          combo === 'steam'
+            ? { high: [0, 0.72, 42], raid: [0, 0.3, 30], close: [0, 0.22, 22] }
+            : {
+                high: [0, 1.0, 46],
+                raid: [0.6, 0.3, 32],
+                close: [0.9, 0.3, 18],
+                boss: [0, 0.12, 26],
+              },
       },
     ]),
   ),

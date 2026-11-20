@@ -1324,25 +1324,34 @@ export class FinalElementsFx {
       glow.mesh.visible = front > 0.2 && front < info.length;
     }
     // Flame tongues and embers torn off its crest, heat smoke over it.
-    const n = Math.round(90 * this.dt * H.density + H.rand());
+    // The curtain itself: a dense sheet of the engine's flame sprites rising
+    // across the whole lane over the wall's depth (the silhouette of a real
+    // wall of fire, read from far and high), embers torn off the crest.
+    const n = Math.round(300 * this.dt * Math.max(0.5, H.density) + H.rand());
     const px = sx + dx * front;
     const pz = sz + dz * front;
     const py = H.groundY(px, pz);
     for (let i = 0; i < n; i++) {
       const side = (H.rand() * 2 - 1) * info.half;
       const back = H.rand() * depth;
-      const big = H.rand() < 0.45;
-      H.particles.puff(px + dz * side - dx * back, py + 0.3, pz - dx * side - dz * back, 1, {
-        speed: 1.5,
-        up: big ? 7 + H.rand() * 6 : 12 + H.rand() * 6,
-        life: big ? 0.9 : 1.3,
-        size: big ? [3.4, 0.8] : [0.5, 0.1],
-        color: H.rand() < 0.35 ? C.fireCoreRgb : C.fireRgb,
-        alpha: 1,
-        pool: big ? 'pyre' : 'glow',
-        dir: [dx, 0.6, dz],
-        spread: 0.5,
-      });
+      const big = H.rand() < 0.8;
+      H.particles.puff(
+        px + dz * side - dx * back * 0.7,
+        py + 0.4,
+        pz - dx * side - dz * back * 0.7,
+        1,
+        {
+          speed: 0.8,
+          up: big ? 8 + H.rand() * 6 : 13 + H.rand() * 6,
+          life: big ? 0.85 : 1.3,
+          size: big ? [4.6, 1.4] : [0.55, 0.12],
+          color: H.rand() < 0.35 ? C.fireCoreRgb : C.fireRgb,
+          alpha: 1,
+          pool: big ? 'pyre' : 'glow',
+          dir: [dx, 0.6, dz],
+          spread: 0.5,
+        },
+      );
     }
     const smoke = Math.round(24 * this.dt * H.density + H.rand() * 0.6);
     for (let i = 0; i < smoke; i++) {
