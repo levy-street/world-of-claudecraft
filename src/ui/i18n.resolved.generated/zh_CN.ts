@@ -4355,6 +4355,10 @@ export const zh_CN: EnTranslations = {
       "entryMismatchNormal": "此副本的难度为普通。使用“重置所有副本”以开始全新的英雄难度副本。",
       "entryMismatchHeroic": "此副本的难度为英雄。使用“重置所有副本”以开始全新的普通难度副本。"
     },
+    "instanceGroup": {
+      "evictWarning": "你不在此副本的队伍中。你将在 {seconds} 秒后被移出副本。",
+      "evicted": "你已被移出副本，因为你不在其队伍中。"
+    },
     "bags": {
       "membershipSlot": "会员背包栏位",
       "membershipSlotLocked": "开通会员以解锁此背包栏位。",

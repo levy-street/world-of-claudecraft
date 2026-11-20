@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "es_ES": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "fr_FR": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "fr_CA": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "de_DE": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "nl_NL": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "pl_PL": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "id_ID": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "tr_TR": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "sv_SE": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "vi_VN": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ],
+  "da_DK": [
+    "hudChrome.instanceGroup.evictWarning",
+    "hudChrome.instanceGroup.evicted"
+  ]
 };

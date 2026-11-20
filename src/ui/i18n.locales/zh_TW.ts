@@ -5092,6 +5092,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.queuedOccupied':
     '難度變更已加入佇列，因為仍有人或其屍體留在地城副本內。副本清空後將套用變更。',
   'hudChrome.dungeonDifficulty.queuedCancelled': '由於隊伍或隊長發生變更，已取消佇列中的難度變更。',
+  'hudChrome.instanceGroup.evictWarning': '你不在此副本的隊伍中。你將在 {seconds} 秒後被移出副本。',
+  'hudChrome.instanceGroup.evicted': '你已被移出副本，因為你不在其隊伍中。',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     '切換地城難度後才能重置這些副本。空置的地城副本會在5分鐘後自動重置。',
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':

@@ -30803,6 +30803,15 @@ const RULES: Rule[] = [
     build: () => t('hudChrome.dungeonDifficulty.queuedCancelled'),
   },
   {
+    re: /^You are not in this instance's group\. You will be removed from the instance in (\d+) seconds\.$/,
+    build: (m) =>
+      t('hudChrome.instanceGroup.evictWarning', { seconds: formatNumber(Number(m[1])) }),
+  },
+  {
+    re: /^You have been removed from the instance because you are not in its group\.$/,
+    build: () => t('hudChrome.instanceGroup.evicted'),
+  },
+  {
     re: /^Change dungeon difficulty before resetting these instances\. Empty instances reset on their own after 5 minutes\.$/,
     build: () => t('hudChrome.dungeonDifficulty.resetSameDifficulty'),
   },
