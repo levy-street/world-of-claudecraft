@@ -19,8 +19,9 @@
 //     at the sim's own speed, the floor burnt behind it;
 //   - Hailstorm: each stone's small circle filling, the ice ball dropping out
 //     of the sky onto it and shattering;
-//   - Avalanche: its lanes, then spikes of ice and rock bursting up along
-//     each lane behind the front and sinking back;
+//   - Avalanche: its lanes, then the eruption (final_avalanche_fx.ts): ice
+//     crystals and stone blades bursting up behind the front, chunks thrown,
+//     the floor torn open, each spike cracking and crumbling away;
 //   - Storm Spires: dark stone spires rising, their violet veins lighting
 //     from the foot as they charge, the links shown on the floor, lightning
 //     leaping spire to spire on each discharge;
@@ -45,10 +46,13 @@ import {
   ELEMENT_TUNING as E,
   ELEMENT_AURAS,
   ELEMENT_CUES,
+  echoOf,
   elementLaneOf,
   FUSION_COMBOS,
   hailOf,
+  POLARITY_CODES,
   polarityOf,
+  rimeOf,
   STRIKE_AURAS,
   spireLinks,
   spireOf,
@@ -65,6 +69,7 @@ import {
 } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
+import { FinalAvalancheFx } from './final_avalanche_fx';
 import { FINAL_BODY_HEIGHT, finalBodyPoint } from './final_body_core';
 import {
   ELEMENT_FX_COLORS as C,
@@ -81,7 +86,6 @@ import {
   POLARITY_LOOKS,
   STACK_PIP_COLORS,
   sigilLook,
-  spikeRise,
   spireGlow,
   stackPip,
   steamPuff,
@@ -165,6 +169,7 @@ const STYLES = {
   residue: { color: T.danger, accent: 0xffd0a0 },
   fireLane: { color: T.danger, accent: 0xff7a24 },
   avalancheLane: { color: T.danger, accent: 0xbfe6ff },
+  rime: { color: T.danger, accent: 0xbfe6ff },
   link: { color: T.danger, accent: 0xb07cff },
 } as const satisfies Record<string, TelegraphStyle>;
 
@@ -274,10 +279,10 @@ export class FinalElementsFx {
   private readonly splats: { mesh: THREE.Mesh; u: Uni; born: number; alive: boolean }[] = [];
   /** The flame walls' light on the floor (by wall). */
   private readonly wallGlows: { mesh: THREE.Mesh; u: Uni }[] = [];
-  private readonly spikes: THREE.InstancedMesh;
+  /** Avalanche's eruption (its spikes, chunks and scars). */
+  private readonly avalanche: FinalAvalancheFx;
   /** The lava pools' crust discs (Magma Rift). */
   private readonly crusts: { mesh: THREE.Mesh; u: Uni; id: number; seen: boolean }[] = [];
-  private spikeUsed = 0;
   /** Which burn columns were drawn this frame (by tank slot). */
   private readonly burnSeen: boolean[] = [false, false, false];
   /** The spires seen this frame by group: their places in index order. */
@@ -372,9 +377,8 @@ export class FinalElementsFx {
     };
     const crystal = new THREE.OctahedronGeometry(1, 0).scale(0.45, 1.1, 0.45);
     const rock = new THREE.DodecahedronGeometry(1, 0);
-    const spikeGeo = new THREE.ConeGeometry(0.7, 1, 6, 1).translate(0, 0.5, 0);
     const hailGeo = new THREE.IcosahedronGeometry(1, 1);
-    h.geometries.push(crystal, rock, spikeGeo, hailGeo);
+    h.geometries.push(crystal, rock, hailGeo);
     // Searing Burn: a column of flame tongues wrapping the tank (its shape
     // reads where the colour alone would not, in the Heat's own orange).
     const columnGeo = new THREE.CylinderGeometry(1, 0.8, 1, 28, 1, true).translate(0, 0.5, 0);
@@ -443,12 +447,20 @@ export class FinalElementsFx {
       this.hailDiscs.push({ ...hailDisc('smithHeartFinalHailCircle', i), id: -1, seen: false });
     for (let i = 0; i < P.splats; i++)
       this.splats.push({ ...hailDisc('smithHeartFinalHailSplat', i + 30), born: -9, alive: false });
-    this.spikes = instanced(
-      spikeGeo,
-      solid('smithHeartFinalSpikes', 1),
-      P.spikeLanes * P.spikesPerLane,
-      'smithHeartFinalSpikes',
-    );
+    this.avalanche = new FinalAvalancheFx({
+      root: h.root,
+      uTime: h.uTime,
+      particles: h.particles,
+      groundY: h.groundY,
+      rand: h.rand,
+      density: h.density,
+      reducedMotion: h.reducedMotion,
+      shake: h.shake,
+      geometries: h.geometries,
+      materials: h.materials,
+      crustRung: h.crustRung,
+      bodyOrder: BODY_ORDER,
+    });
 
     // ---- the sigils (Opposing Elements) ----
     for (let i = 0; i < P.marks; i++) {
@@ -612,7 +624,7 @@ export class FinalElementsFx {
     this.sigilUsed = 0;
     this.markPieceUsed = 0;
     this.hailUsed = 0;
-    this.spikeUsed = 0;
+    this.avalanche.begin(clock);
     this.fusionSeen = false;
     this.groups.clear();
     for (const c of this.clouds) c.seen = false;
@@ -716,6 +728,26 @@ export class FinalElementsFx {
       case 'spireFire':
         this.paintSpire(e, kind === 'spireFire', age, since);
         break;
+      case 'rime': {
+        // Hardening Frost (Jose's playtest of 2026-11-20): the frost creeping
+        // in over the ring at the sim's radius, the ice pushing up round it.
+        const warn = rimeOf(e.templateId) || E.rimeWarn;
+        const fill = Math.min(1, age / warn);
+        H.foot(e.id, 'crack', STYLES.rime, at.x, at.z, r, fill, false);
+        this.avalanche.rime(at.x, at.z, r, fill, e.id);
+        break;
+      }
+      case 'echo': {
+        // DEV ONLY: a practice echo of an Opposing Elements mark, its sigil
+        // and dress standing on the floor, a soft ring at its feet.
+        const pol = echoOf(e.templateId) ?? 'ice';
+        const left = Math.max(0.05, E.polaritySeconds - age);
+        this.paintPolarity(e, POLARITY_CODES[pol], left, E.polaritySeconds);
+        const beat = Math.floor(age);
+        if (beat !== Math.floor(age - this.dt))
+          H.particles.shockRing(at.x, at.z, POLARITY_LOOKS[pol].color, E.meetR, 0.6);
+        break;
+      }
     }
   }
 
@@ -905,7 +937,7 @@ export class FinalElementsFx {
     this.flush(this.markPieces, this.markPieceUsed);
     this.flush(this.hailBalls, this.hailUsed);
     this.flush(this.hailTrails, this.hailUsed);
-    this.flush(this.spikes, this.spikeUsed);
+    this.avalanche.end();
   }
 
   private flush(m: THREE.InstancedMesh, used: number): void {
@@ -1395,7 +1427,10 @@ export class FinalElementsFx {
         clock: this.clock,
         range: info.length,
       });
-      lane.lane.group.visible = true;
+      // Once the front has run its length the spikes are the danger: the
+      // warning gives the floor back to the torn scar (Jose's playtest of
+      // 2026-11-20).
+      lane.lane.group.visible = !run || since < E.avalancheRun;
     }
     if (!run) {
       // The ground groaning: frost and grit along the lane.
@@ -1412,49 +1447,8 @@ export class FinalElementsFx {
       }
       return;
     }
-    const front = laneFront(since, info.length, E.avalancheRun);
-    const speed = info.length / E.avalancheRun;
-    const n = P.spikesPerLane;
-    for (let k = 0; k < n; k++) {
-      const d = ((k + 0.5) / n) * info.length;
-      const rise = spikeRise(d, front, since - d / speed);
-      if (rise <= 0.01) continue;
-      const i = this.spikeUsed;
-      if (i >= P.spikeLanes * P.spikesPerLane) break;
-      const side = (fxHash(e.id, k) - 0.5) * info.half * 1.1;
-      const px = sx + dx * d + dz * side;
-      const pz = sz + dz * d - dx * side;
-      const ice = k % 2 === 0;
-      const hgt = (3.4 + 2.2 * fxHash(e.id, k + 3)) * rise;
-      const lean = (fxHash(e.id, k + 5) - 0.5) * 0.5;
-      this.piece(
-        this.spikes,
-        i,
-        px,
-        H.groundY(px, pz) - 0.3,
-        pz,
-        ice ? 1.35 : 1.7,
-        hgt,
-        ice ? 1.35 : 1.7,
-        lean,
-        fxHash(e.id, k + 7) * 6,
-        -lean,
-        ice ? 0xa8dcff : 0x6b5a48,
-      );
-      this.spikeUsed++;
-      // The burst as it breaks the floor.
-      if (since - d / speed < this.dt * 1.5)
-        H.particles.puff(px, H.groundY(px, pz) + 0.3, pz, Math.round(5 * H.density) + 1, {
-          speed: 3,
-          up: 5,
-          life: 0.7,
-          size: [0.45, 0.15],
-          color: ice ? C.frostRgb : [0.55, 0.45, 0.35],
-          alpha: 1,
-          pool: ice ? 'glow' : undefined,
-          gravity: 14,
-        });
-    }
+    // The eruption itself (its spikes outlive the sim's lane object).
+    this.avalanche.see(e.id, sx, sz, e.facing, info.length, info.half, E.avalancheRun, since);
   }
 
   private paintHail(e: Entity, x: number, z: number, r: number, age: number): void {
@@ -1721,6 +1715,9 @@ export class FinalElementsFx {
           });
           H.shake(x, z, 0.4, 60);
           break;
+        case ELEMENT_CUES.rime:
+          this.avalanche.rimeClose(x, z, r);
+          break;
         case ELEMENT_CUES.balance: {
           // Two opposites meet: the colours swirl into a white-gold burst.
           fx.puff(x, y + 1.2, z, Math.round(36 * H.density) + 8, {
@@ -1924,20 +1921,15 @@ export class FinalElementsFx {
   }
 
   dispose(): void {
-    for (const m of [
-      this.tankPieces,
-      this.pips,
-      this.markPieces,
-      this.hailBalls,
-      this.hailTrails,
-      this.spikes,
-    ])
+    for (const m of [this.tankPieces, this.pips, this.markPieces, this.hailBalls, this.hailTrails])
       m.dispose();
+    this.avalanche.dispose();
   }
 
   hide(): void {
     this.begin(this.clock, 0);
     this.end();
+    this.avalanche.hide();
     this.born.clear();
     this.stateAt.clear();
     this.lastPulse.clear();

@@ -26,7 +26,6 @@ import {
   hailFall,
   laneFront,
   POLARITY_LOOKS,
-  spikeRise,
   spireGlow,
   strikeAuraLook,
 } from '../src/render/smith_heart_fx/final_elements_fx_core';
@@ -40,10 +39,12 @@ import {
   ELEMENT_DIFFICULTY,
   ELEMENT_NAMES,
   ELEMENT_OBJECTS,
+  echoTemplate,
   elementLaneTemplate,
   hailTemplate,
   POLARITY_CODES,
   residueTemplate,
+  rimeTemplate,
   STRIKE_AURAS,
   spireTemplate,
   steamTemplate,
@@ -105,6 +106,14 @@ describe('the tooltips', () => {
     expect(armor).toContain(`reduced by ${Math.round(2 * N.armorPerStack * 100)}%`);
     expect(armor).toContain(`never below ${Math.round(E.armorFloor * 100)}%`);
     expect(say({ id: ELEMENT_AURAS.frozen, kind: 'stun' })).toContain(`${E.freezeSeconds} sec`);
+    // Hardening Frost (Jose's playtest of 2026-11-20): the frost's tooltip
+    // says the ring and how to avoid it, and the ring's mark says it too.
+    expect(frost).toContain(`a ${E.rimeR} yd ring that closes after ${E.rimeWarn} sec`);
+    expect(frost).toContain('Step out of it');
+    const rime = say({ id: ELEMENT_AURAS.rime, kind: 'internal_cd' });
+    expect(rime).toContain(`in ${E.rimeWarn} sec`);
+    expect(rime).toContain(`within ${E.rimeR} yd`);
+    expect(rime).toContain(`frozen solid for ${E.freezeSeconds} sec`);
   });
 
   it('the fusion names its pair and what comes, one line per combo', () => {
@@ -208,9 +217,6 @@ describe('the pure plan', () => {
     expect(laneFront(99, 108, 108 / E.fireSpeed)).toBe(108);
     expect(hailFall(E.hailWarn, E.hailWarn).shown).toBe(false);
     expect(hailFall(0, E.hailWarn).height).toBeCloseTo(0, 5);
-    expect(spikeRise(10, 5, 0)).toBe(0);
-    expect(spikeRise(10, 12, 0.5)).toBe(1);
-    expect(spikeRise(10, 12, 3)).toBe(0);
     expect(spireGlow(0).links).toBe(false);
     expect(spireGlow(E.spireShowAt + 0.1).links).toBe(true);
     expect(spireGlow(E.spireCharge).veins).toBeGreaterThan(spireGlow(0.5).veins);
@@ -331,6 +337,8 @@ describe('FinalKitFx draws its own elements', () => {
     obj(16, spireTemplate('charge', 1, 3, 1), 40, 30, E.spireR);
     obj(17, spireTemplate('charge', 2, 3, 1), 35, 40, E.spireR);
     obj(18, residueTemplate('storm'), -35, 20, E.residueR);
+    obj(19, rimeTemplate(E.rimeWarn), 10, 10, E.rimeR);
+    obj(20, echoTemplate('fire'), -10, 25, 1);
     const world = {
       entities,
       player: me,
@@ -344,16 +352,23 @@ describe('FinalKitFx draws its own elements', () => {
     for (let i = 0; i < 24; i++) fx.update(1 / 30);
     expect(visibleNamed(root, 'smithHeartFinalStrikeShell')).toBe(1);
     expect(instancesShown(root, 'smithHeartFinalStrikePieces')).toBeGreaterThan(0);
-    // Every marked player's sigil (the local player's too, and Fire's absent value).
-    expect(visibleNamed(root, 'smithHeartFinalSigil')).toBe(2);
+    // Every marked player's sigil (the local player's too, and Fire's absent
+    // value), and the dev echo's.
     // Ice's crystals orbit; Fire wears flames (particles).
     expect(instancesShown(root, 'smithHeartFinalPolarityPieces')).toBe(ELEMENT_FX_POOLS.markPieces);
     expect(visibleNamed(root, 'smithHeartFinalFusionOrb')).toBe(2);
     expect(visibleNamed(root, 'smithHeartFinalFusionGlow')).toBe(2);
     expect(visibleNamed(root, 'smithHeartFinalSteamBillow')).toBe(ELEMENT_FX_POOLS.billows);
     expect(visibleNamed(root, 'smithHeartFinalFlameWall')).toBeGreaterThan(0);
-    expect(instancesShown(root, 'smithHeartFinalSpikes')).toBeGreaterThan(0);
+    // Avalanche's eruption: ice and stone spikes, the torn floor.
+    expect(
+      instancesShown(root, 'smithHeartAvalancheIce') +
+        instancesShown(root, 'smithHeartAvalancheStone'),
+    ).toBeGreaterThan(0);
+    expect(visibleNamed(root, 'smithHeartAvalancheScar')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalSpire')).toBe(3);
+    // The dev echo wears its own sigil (three in all now).
+    expect(visibleNamed(root, 'smithHeartFinalSigil')).toBe(3);
     // The local player's own arrow (Opposing Elements singles them out).
     expect(finalArrowMark(me)).not.toBeNull();
     // Every cue is claimed (no generic burst doubles it).
@@ -385,7 +400,7 @@ describe('FinalKitFx draws its own elements', () => {
     ])
       expect(fx.handleEvent(evAt(cue)), cue).toBe(true);
     // Everything gone with its objects and auras.
-    for (const id of [10, 11, 12, 13, 14, 15, 16, 17, 18]) entities.delete(id);
+    for (const id of [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]) entities.delete(id);
     for (const e of [me, tank, fire, boss]) e.auras = [];
     boss.castingAbility = null;
     (world as unknown as { entityRosterVersion: number }).entityRosterVersion = 2;
@@ -399,7 +414,12 @@ describe('FinalKitFx draws its own elements', () => {
       'smithHeartFinalSpire',
     ])
       expect(visibleNamed(root, name), name).toBe(0);
-    expect(instancesShown(root, 'smithHeartFinalSpikes')).toBe(0);
+    // The Avalanche's spikes crumble on after its lane object goes (never
+    // popping out), then they and the scar are gone.
+    for (let i = 0; i < 30 * 5; i++) fx.update(1 / 30);
+    expect(instancesShown(root, 'smithHeartAvalancheIce')).toBe(0);
+    expect(instancesShown(root, 'smithHeartAvalancheStone')).toBe(0);
+    expect(visibleNamed(root, 'smithHeartAvalancheScar')).toBe(0);
     fx.dispose();
   });
 });

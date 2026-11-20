@@ -432,6 +432,17 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // own additive rungs (FINAL_KIT_FLOOR.marks, shock); its body, column,
   // streak, flash and fragments are bodies at the default order.
   { file: 'src/render/smith_heart_fx/final_anvil_fx.ts', layer: 'encounter', strict: false },
+  // Its own elements: the hail's circles and splats, the flame walls' light
+  // and the lava crust on the kit's crust rung; its shells, walls, spires and
+  // solids stand at BODY_ORDER and the sigils over the world (9000), so not
+  // strict.
+  { file: 'src/render/smith_heart_fx/final_elements_fx.ts', layer: 'encounter', strict: false },
+  // Avalanche's torn floor on the kit's crust rung; its spikes and chunks are
+  // bodies at the host's order.
+  { file: 'src/render/smith_heart_fx/final_avalanche_fx.ts', layer: 'encounter', strict: true },
+  // The Hammer Council's Grieving Fury: its scorch and sigil on the encounter
+  // band; its arcs and glow are airborne pieces at their own orders (4, 5).
+  { file: 'src/render/smith_heart_fx/council_fury_fx.ts', layer: 'encounter', strict: false },
   // The Breath's Knotted Gale: its floor discs on HEART_FLOOR's own rungs; the ball,
   // the funnels and the burst are bodies at the default order.
   { file: 'src/render/smith_heart_fx/breath_heart_fx.ts', layer: 'encounter', strict: false },

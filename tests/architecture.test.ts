@@ -1198,6 +1198,9 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/final_phase_fx_core.ts',
   'src/render/smith_heart_fx/final_stars_fx_core.ts',
   'src/render/smith_heart_fx/final_elements_fx_core.ts',
+  // Avalanche's eruption: the spikes, their burst and crumble, the chunks,
+  // the torn floor (Jose's playtest of 2026-11-20).
+  'src/render/smith_heart_fx/final_avalanche_core.ts',
   'src/render/smith_heart_fx/final_overload_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',

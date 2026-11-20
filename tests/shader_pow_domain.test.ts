@@ -324,6 +324,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/smith_heart_fx/final_fx.ts': 1,
   'src/render/smith_heart_fx/final_arrival_glsl.ts': 6,
   'src/render/smith_heart_fx/final_death_glsl.ts': 2,
+  'src/render/smith_heart_fx/final_elements_glsl.ts': 11,
   'src/render/smith_heart_fx/final_kit_glsl.ts': 5,
   'src/render/smith_heart_fx/final_stars_glsl.ts': 5,
   'src/render/smith_heart_fx/final_phase_glsl.ts': 3,

@@ -9,8 +9,8 @@
 //     elements' orbs swelling through the bar and drawn together at its end;
 //   - the combos: the steam's billows (`steamPuff`), the flame wall's run
 //     along its lane (`laneFront`, the sim's own speed), a hailstone's fall
-//     (`hailFall`), an Avalanche spike's rise and sink behind its front
-//     (`spikeRise`), a spire's charge (`spireGlow`), the links' fill;
+//     (`hailFall`), a spire's charge (`spireGlow`), the links' fill (an
+//     Avalanche's eruption is final_avalanche_core.ts's);
 //   - Opposing Elements: each element's colour and sigil (`POLARITY_LOOKS`:
 //     a flame, a snowflake, a mountain, a lightning bolt, told apart by SHAPE).
 // Every footprint is the sim's exact size; the timings are the sim's
@@ -23,10 +23,12 @@ import {
   ELEMENT_TUNING as E,
   ELEMENT_CUES,
   ELEMENT_OBJECTS,
+  echoOf,
   elementLaneOf,
   hailOf,
   type Polarity,
   residueOf,
+  rimeOf,
   spireOf,
   steamOf,
 } from '../../sim/encounters/smith_heart/final_elements_ids';
@@ -53,7 +55,11 @@ export type ElementObjectKind =
   | 'residueFire'
   | 'residueFrost'
   | 'residueStorm'
-  | 'residueStone';
+  | 'residueStone'
+  // Hardening Frost's ring at a tank's feet (Jose's playtest of 2026-11-20).
+  | 'rime'
+  // DEV ONLY: a practice echo of an Opposing Elements mark.
+  | 'echo';
 
 /** Which of the elements' objects `templateId` is, or null. */
 export function elementObjectKind(templateId: string): ElementObjectKind | null {
@@ -73,6 +79,8 @@ export function elementObjectKind(templateId: string): ElementObjectKind | null 
   if (res === 'frost') return 'residueFrost';
   if (res === 'storm') return 'residueStorm';
   if (res === 'stone') return 'residueStone';
+  if (rimeOf(templateId) !== null) return 'rime';
+  if (echoOf(templateId) !== null) return 'echo';
   return null;
 }
 
@@ -273,16 +281,6 @@ export function hailFall(left: number, warn: number): { height: number; shown: b
   if (left > drop) return { height: HAIL_DROP, shown: false };
   const t = clamp01(1 - left / drop);
   return { height: HAIL_DROP * (1 - t * t), shown: true };
-}
-
-/** An Avalanche spike `d` yards along its lane once the front is at
- *  `front` and the run began `age` seconds ago: its height share 0..1
- *  (bursting up as the front passes, holding, sinking back). */
-export function spikeRise(d: number, front: number, sinceFront: number): number {
-  if (front < d) return 0;
-  if (sinceFront < 0.12) return smooth(sinceFront / 0.12);
-  if (sinceFront < 0.9) return 1;
-  return clamp01(1 - (sinceFront - 0.9) / 0.6);
 }
 
 /** A Storm Spire's charge `age` seconds into its life: its rise out of the
