@@ -38,7 +38,8 @@ const OUT_PX = 192;
  * The bust framing per boss: `aim` and `radius` are shares of the posed
  * height (aim from the feet), `yaw` turns the body further toward the camera,
  * `tilt` lifts the camera over the aim (a share of the framed radius), `dx`
- * slides the aim sideways, `rim` is the back light's colour (each vein's own).
+ * slides the aim sideways, `rim` is the back light's colour (each vein's own), `body` which body a
+ * multi-body rig shows, `key` a warmer key light than the guide's.
  */
 const FRAMING = {
   heart_hammer_guardian: { aim: 0.83, radius: 0.2, yaw: 0.25, rim: 0xffc070 },
@@ -46,7 +47,17 @@ const FRAMING = {
   heart_breath_guardian: { aim: 0.76, radius: 0.245, yaw: 0.35, rim: 0x7fd0ff },
   heart_quench_guardian: { aim: 0.84, radius: 0.17, yaw: 0.45, rim: 0x9ad8ff },
   heart_heat_guardian: { aim: 0.81, radius: 0.235, yaw: 0.3, rim: 0xffe6a0 },
-  heart_masterless_strength: { aim: 0.81, radius: 0.235, yaw: 0.3, rim: 0xffe0b0 },
+  // The base form players meet first and fight in the ring: the Hammer's
+  // golden basalt (final_body_core.ts finalBodyElement('ring')).
+  heart_masterless_strength: {
+    aim: 0.81,
+    radius: 0.235,
+    yaw: 0.3,
+    rim: 0xffd27a,
+    body: 'hammer',
+    // The Heart's forge light: a warm key, so the basalt reads bronze as in the room.
+    key: 0xffc27a,
+  },
 };
 
 mkdirSync(outDir, { recursive: true });

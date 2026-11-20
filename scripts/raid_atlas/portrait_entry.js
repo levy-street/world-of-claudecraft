@@ -8,10 +8,15 @@
 // (buildModel, the posed skin-aware bounds), so the bust is the in-game model,
 // then frames a head-and-shoulders view from the posed bounds: the camera aims
 // at `aim` (a share of the posed height, from the feet) and frames a sphere of
-// `radius` (a share of the posed height). Everything is pinned for
+// `radius` (a share of the posed height); `body` picks one of a multi-body
+// rig's bodies. Everything is pinned for
 // determinism: a fixed canvas, pixel ratio 1, a fixed idle pose time and yaw.
 import * as THREE from 'three';
 import { buildModel, skinAwareBounds } from '../../src/guide/viewer/model';
+import {
+  FINAL_BODY_ELEMENTS,
+  FINAL_BODY_NODES,
+} from '../../src/render/smith_heart_fx/final_body_core';
 
 const SIZE = 768; // supersample; the driver downscales and encodes the shipped WebP
 const BASE_YAW = -0.45; // a soft three-quarter turn
@@ -30,10 +35,10 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 /** The guide turntable's light rig, plus a camera-side fill so a face reads
  *  at map size and a coloured rim that cuts the silhouette off the field. */
-function makeLights(rim) {
+function makeLights(rim, warm) {
   const g = new THREE.Group();
   g.add(new THREE.HemisphereLight(0xffffff, 0x3a3a44, 1.5));
-  const key = new THREE.DirectionalLight(0xfff4e0, 1.9);
+  const key = new THREE.DirectionalLight(warm ?? 0xfff4e0, 1.9);
   key.position.set(3, 6, 4);
   g.add(key);
   const fill = new THREE.DirectionalLight(0xffffff, 0.7);
@@ -50,10 +55,22 @@ window.renderBust = (spec, tint, framing) =>
     buildModel(spec, tint ?? null).then((built) => {
       try {
         const scene = new THREE.Scene();
-        scene.add(makeLights(framing.rim));
+        scene.add(makeLights(framing.rim, framing.key));
         const pivot = new THREE.Group();
         pivot.rotation.y = BASE_YAW + (framing.yaw ?? 0);
         pivot.add(built.root);
+        // A model carrying several bodies on one rig (the Masterless
+        // Strength's four elements, final_body_core.ts) shows only the one
+        // the framing names, the way the game toggles them.
+        if (framing.body) {
+          for (const element of FINAL_BODY_ELEMENTS) {
+            if (element === framing.body) continue;
+            for (const name of FINAL_BODY_NODES[element]) {
+              const node = built.root.getObjectByName(name);
+              if (node) node.visible = false;
+            }
+          }
+        }
         built.root.traverse((o) => {
           if (o.isMesh) o.frustumCulled = false;
         });
