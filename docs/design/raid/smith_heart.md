@@ -2642,13 +2642,13 @@ great engraved ring inlaid in the floor round the central well, where the boss s
 the start, fills like a clock hand's sweep (from the room's north, clockwise) with the bar
 of the quarter the boss drinks, in that quarter's colour (`HEART_QUARTER_PALETTE`: the
 Heat's red-orange, the Quench's ice blue, the Breath's storm violet, the Hammer's sand
-gold); the well's glow and a light column over it rise with it, and the percent and the
-quarter's name stand in the air over the well, facing every camera, so it reads from any
-rim of the room. A quarter change recolours it at once and shows that quarter's own bar.
-From four fifths full it flickers, throws sparks, the rest of the track burns danger-red,
-the label wears a red rim and the warning sounds (the fight's crystal strain, at four
-fifths and again at nine tenths). With the boss in the central ring before its final
-phase the whole ring turns red and pulses, Heart Unbound's stacks over the well. Held and
+gold); the well's glow and a light column over it rise with it. No text floats over the
+well (Jose's playtest of 2026-11-20: no percent, no quarter name, no stack count; the
+ring's sweep and colour alone read). A quarter change recolours it at once and shows that
+quarter's own bar. From four fifths full it flickers, throws sparks, the rest of the track
+burns danger-red and the warning sounds (the fight's crystal strain, at four fifths and
+again at nine tenths). With the boss in the central ring before its final phase the whole
+ring turns red and pulses. Held and
 dimmed through an intermission, off in the final phase. It draws on every tier (the low
 tier sheds the sparks only; reduced motion keeps a steady light, no flicker), read off the
 same boss auras (no wire or `IWorld` field).

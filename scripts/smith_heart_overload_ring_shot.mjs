@@ -1,8 +1,8 @@
 // Evidence captures for the Masterless Strength's Overload ring (the room's
 // centre: src/render/smith_heart_fx/final_overload_ring.ts): the clock ring
 // round the central well filling in the colour of the quarter the boss
-// drinks, its warning from four fifths full, the red centre warning with
-// Heart Unbound's stacks, and a far view from a quarter's rim. Each shot is
+// drinks, its warning from four fifths full, the red centre warning (no
+// floating text), and a far view from a quarter's rim. Each shot is
 // forced through the real dev verbs (`/dev heart final quarter`, `/dev heart
 // final fill`, `/dev heart final root`) in a pulled fight, every other clock
 // of the fight held so the shot shows the ring. Evidence tooling, not a repo

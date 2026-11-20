@@ -16,6 +16,7 @@ import { describe, expect, it } from 'vitest';
 import { FINAL_ARROW_AURAS, finalArrowMark } from '../src/render/smith_heart_fx/final_arrow_core';
 import {
   newOverloadRingState,
+  OVERLOAD_RING,
   overloadRingState,
 } from '../src/render/smith_heart_fx/final_overload_ring_core';
 import {
@@ -255,7 +256,7 @@ describe('The Masterless Strength: the Overload bars moved into the room', () =>
     expect(scan.frame(world)).toBeNull();
   });
 
-  it('Heart Unbound in the ring reads in the room (the ring red, its stacks), not the HUD', () => {
+  it('Heart Unbound in the ring reads in the room (the ring red, no text), not the HUD', () => {
     const boss = {
       ...bossOf({}),
       auras: [
@@ -265,7 +266,7 @@ describe('The Masterless Strength: the Overload bars moved into the room', () =>
     };
     const r = overloadRingState(boss, true, newOverloadRingState());
     expect(r.mode).toBe('centre');
-    expect(r.stacks).toBe(4);
+    expect(r.color).toBe(OVERLOAD_RING.centreColor);
     expect(buildFinalPhaseView(boss, makeFinalPhaseView()).visible).toBe(false);
   });
 

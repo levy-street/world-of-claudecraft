@@ -6,30 +6,24 @@
 //     notches, its rune band, its two grooves), its channel filling like a
 //     clock hand's sweep in the colour of the quarter the boss drinks, a hot
 //     hand at the front;
-//   - the well's glow and a light column over it rising with the fill;
-//   - the percent (and the quarter's name) standing in the air over the
-//     well, facing every camera, so it reads from any rim of the room;
+//   - the well's glow and a light column over it rising with the fill (no
+//     floating text: Jose's playtest of 2026-11-20, the ring alone reads);
 //   - from four fifths full: the flicker, the sparks off the ring, the track
 //     ahead burning red, and a second, sharper crystal strain at nine
 //     tenths from the well (the first, at four fifths, is the fight's own
 //     audio's off the boss: game/smith_heart_final_audio_core.ts);
-//   - the boss in the centre ring: the whole ring red and pulsing, Heart
-//     Unbound's stacks over the well.
-// Every tier draws the ring, its fill and colour, the label, the warning's
+//   - the boss in the centre ring: the whole ring red and pulsing.
+// Every tier draws the ring, its fill and colour, the warning's
 // light and the centre's red; the low tier sheds the sparks; reduced motion
 // keeps a steady light (no flicker, no pulse).
 //
-// Rules (src/render/CLAUDE.md): every material and the label's canvas are
-// built in the constructor under FinalFx's root, before its gated attach (the
-// compile gate links them hidden); no light; the label redraws (one small
-// canvas upload) only when its text or colour changes; no per-frame
-// allocation.
+// Rules (src/render/CLAUDE.md): every material is built in the constructor
+// under FinalFx's root, before its gated attach (the compile gate links them
+// hidden); no light; no texture; no per-frame allocation.
 
 import * as THREE from 'three';
 import { sfx } from '../../game/sfx';
 import { HEART_ROOM, type SmithHeartVein } from '../../sim/content/smith_heart_layout';
-import { formatNumber, getI18nRevision, t } from '../../ui/i18n';
-import { localizeSimAuraName } from '../../ui/sim_i18n';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { HEART_QUARTER_PALETTE, HEART_RING_LOOK } from '../smith_heart/heart_quarters_core';
 import type { EngineParticles } from '../trash_engine_fx/engine_particles';
@@ -39,7 +33,6 @@ import {
   OVERLOAD_RING,
   type OverloadRingState,
   overloadRingLook,
-  ringLabelKind,
   ringWarnBeat,
 } from './final_overload_ring_core';
 
@@ -52,7 +45,6 @@ export interface FinalOverloadRingHost {
   /** The low tier: no sparks. */
   low: boolean;
   reducedMotion: () => boolean;
-  hasDom: boolean;
 }
 
 const RING_VERT = /* glsl */ `
@@ -267,21 +259,12 @@ export class FinalOverloadRing {
   private readonly wellMat: THREE.ShaderMaterial;
   private readonly column: THREE.Mesh;
   private readonly columnMat: THREE.ShaderMaterial;
-  private readonly label: THREE.Sprite;
-  private readonly labelMat: THREE.SpriteMaterial;
-  private readonly canvas: HTMLCanvasElement | null = null;
-  private readonly texture: THREE.CanvasTexture | null = null;
   private readonly look = newOverloadRingLook();
   private readonly uTime = { value: 0 };
   private sweep = 0;
   private lastVein: SmithHeartVein | null = null;
   private lastMode: OverloadRingState['mode'] = 'off';
   private lastFill = 0;
-  private labelText = '';
-  private labelSub = '';
-  private labelColor = -1;
-  private labelWarn = false;
-  private labelRevision = -1;
   /** The floor's height under the band and the well's, per slot. */
   private floorKey = Number.NaN;
   private floorY = 0;
@@ -407,31 +390,6 @@ export class FinalOverloadRing {
     this.column.name = 'smithHeartOverloadColumn';
     this.column.frustumCulled = false;
     this.group.add(this.column);
-    // The label over the well: a small canvas drawn only when it changes.
-    if (h.hasDom) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 256;
-      this.canvas = canvas;
-      this.texture = new THREE.CanvasTexture(canvas);
-      this.texture.colorSpace = THREE.SRGBColorSpace;
-      this.texture.generateMipmaps = true;
-      this.texture.minFilter = THREE.LinearMipmapLinearFilter;
-    }
-    this.labelMat = new THREE.SpriteMaterial({
-      name: 'smithHeartOverloadLabel',
-      map: this.texture,
-      transparent: true,
-      depthWrite: false,
-      fog: false,
-      toneMapped: false,
-    });
-    this.materials.push(this.labelMat);
-    this.label = new THREE.Sprite(this.labelMat);
-    this.label.name = 'smithHeartOverloadLabel';
-    this.label.renderOrder = 10;
-    this.label.visible = false;
-    this.group.add(this.label);
     h.root.add(this.group);
   }
 
@@ -500,7 +458,6 @@ export class FinalOverloadRing {
     (c.uHot.value as THREE.Color).copy(hot);
     c.uLevel.value = (0.55 + 0.45 * look.column) * look.flicker;
     c.uTop.value = 0.12 + 0.88 * look.column;
-    this.paintLabel(s, look.flicker);
     this.sparks(s, look.sparks, cx, y, cz, dt);
     // The second, sharper warning at nine tenths, from the well (the first,
     // at four fifths, is the fight's own crystal strain off the boss).
@@ -514,82 +471,6 @@ export class FinalOverloadRing {
     this.lastMode = s.mode;
     this.lastVein = s.vein;
     this.lastFill = s.fill;
-  }
-
-  /** The label over the well: the percent and the quarter, or Heart
-   *  Unbound's stacks. Redrawn only when its text or colour changes. */
-  private paintLabel(s: OverloadRingState, flicker: number): void {
-    const kind = ringLabelKind(s);
-    this.label.visible = kind !== 'none' && this.texture !== null;
-    if (!this.label.visible) return;
-    const { labelY, labelSize } = OVERLOAD_RING;
-    this.label.position.set(0, labelY, 0);
-    this.label.scale.set(labelSize * 2, labelSize, 1);
-    this.labelMat.opacity = Math.min(1, 0.55 + 0.45 * flicker + (s.mode === 'held' ? -0.3 : 0));
-    const text =
-      kind === 'pct'
-        ? formatNumber(s.pct / 100, { style: 'percent', maximumFractionDigits: 0 })
-        : formatNumber(s.stacks, { maximumFractionDigits: 0 });
-    const sub =
-      kind === 'pct' && s.vein
-        ? t(`hudChrome.finalOverload.${s.vein}` as const)
-        : (localizeSimAuraName('Heart Unbound') ?? '');
-    const revision = getI18nRevision();
-    if (
-      text === this.labelText &&
-      sub === this.labelSub &&
-      s.color === this.labelColor &&
-      s.warn === this.labelWarn &&
-      revision === this.labelRevision
-    )
-      return;
-    this.labelRevision = revision;
-    this.labelText = text;
-    this.labelSub = sub;
-    this.labelColor = s.color;
-    this.labelWarn = s.warn;
-    this.drawLabel(text, sub, s.color, s.warn || s.mode === 'centre');
-  }
-
-  private drawLabel(text: string, sub: string, color: number, danger: boolean): void {
-    const canvas = this.canvas;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx || !this.texture) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const hex = `#${color.toString(16).padStart(6, '0')}`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.lineJoin = 'round';
-    ctx.font = 'bold 150px "Cinzel", "Trajan Pro", Georgia, serif';
-    // A warning (four fifths, or the centre) wears a danger-red rim.
-    if (danger) {
-      ctx.lineWidth = 26;
-      ctx.strokeStyle = 'rgba(255, 40, 20, 0.85)';
-      ctx.strokeText(text, 256, 104, 496);
-    }
-    ctx.lineWidth = 16;
-    ctx.strokeStyle = 'rgba(10, 6, 4, 0.92)';
-    ctx.strokeText(text, 256, 104, 496);
-    ctx.shadowColor = hex;
-    ctx.shadowBlur = 28;
-    ctx.fillStyle = hex;
-    ctx.fillText(text, 256, 104, 496);
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(255, 246, 228, 0.9)';
-    ctx.fillText(text, 256, 104, 496);
-    // The colour over the white core, so the hue still reads.
-    ctx.globalAlpha = 0.55;
-    ctx.fillStyle = hex;
-    ctx.fillText(text, 256, 104, 496);
-    ctx.globalAlpha = 1;
-    if (sub) {
-      ctx.font = 'bold 44px "Cinzel", "Trajan Pro", Georgia, serif';
-      ctx.lineWidth = 9;
-      ctx.strokeText(sub, 256, 214, 480);
-      ctx.fillStyle = hex;
-      ctx.fillText(sub, 256, 214, 480);
-    }
-    this.texture.needsUpdate = true;
   }
 
   /** The warning's sparks: off the hand and the filled arc (none on the low
@@ -644,6 +525,5 @@ export class FinalOverloadRing {
     this.group.removeFromParent();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
-    this.texture?.dispose();
   }
 }

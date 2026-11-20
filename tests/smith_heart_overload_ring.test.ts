@@ -2,7 +2,8 @@
 // (src/render/smith_heart_fx/final_overload_ring_core.ts; Jose's brief of
 // 2026-11-20): the HUD's four bars moved into the world. The ring fills in
 // the colour of the quarter the boss drinks, warns from four fifths, turns
-// red with Heart Unbound's stacks when the boss stands in the centre, holds
+// red when the boss stands in the centre (no floating text since Jose's
+// playtest of 2026-11-20: the state carries no label to draw), holds
 // through an intermission, and is off out of the fight and in the final
 // phase. It is read off the boss's own auras, so a Sim body and a
 // ClientWorld-mirrored one read the same.
@@ -20,7 +21,6 @@ import {
   type OverloadRingAura,
   overloadRingLook,
   overloadRingState,
-  ringLabelKind,
   ringWarnBeat,
 } from '../src/render/smith_heart_fx/final_overload_ring_core';
 import {
@@ -81,18 +81,21 @@ describe('the Overload ring: what it shows', () => {
     expect(read([state('quench'), bar('quench', 100)]).warn).toBe(true);
   });
 
-  it('turns red in the centre ring with Heart Unbound stacks, nothing filling', () => {
-    const s = read([state('ring'), bar('hammer', 55), { id: FINAL_AURAS.unbound, stacks: 4 }]);
+  it('turns red in the centre ring, nothing filling, before and after Heart Unbound lands', () => {
+    const s = read([state('ring'), bar('hammer', 55), { id: FINAL_AURAS.unbound }]);
     expect(s.mode).toBe('centre');
     expect(s.vein).toBeNull();
     expect(s.fill).toBe(0);
-    expect(s.stacks).toBe(4);
     expect(s.color).toBe(OVERLOAD_RING.centreColor);
-    expect(ringLabelKind(s)).toBe('stacks');
-    // Red before the first stack lands too, its count shown from the first.
-    const none = read([state('ring')]);
-    expect(none.mode).toBe('centre');
-    expect(ringLabelKind(none)).toBe('none');
+    expect(read([state('ring')])).toEqual(s);
+  });
+
+  it('carries no floating label: the state is the ring alone', () => {
+    // The percent, the quarter's name and Heart Unbound's count over the
+    // well were removed (Jose's playtest of 2026-11-20).
+    const s = read([state('heat'), bar('heat', 60)]);
+    expect(Object.keys(s).sort()).toEqual(['color', 'fill', 'mode', 'pct', 'vein', 'warn']);
+    expect(Object.keys(OVERLOAD_RING)).not.toContain('labelY');
   });
 
   it('holds the bar dimmed through an intermission, with no warning', () => {
@@ -101,7 +104,6 @@ describe('the Overload ring: what it shows', () => {
       expect(s.mode).toBe('held');
       expect(s.pct).toBe(91);
       expect(s.warn).toBe(false);
-      expect(ringLabelKind(s)).toBe('pct');
     }
     // No red centre through a leap either.
     expect(read([state('ring'), stage('leap')]).mode).toBe('off');
@@ -121,14 +123,12 @@ describe('the Overload ring: what it shows', () => {
   it('reads the same off a Sim-shaped and a ClientWorld-shaped body', () => {
     // The mirror carries the same aura ids and fields (and extra ones).
     const sim = read([state('heat'), bar('heat', 85)]);
+    const mirrored = [
+      { ...state('heat'), stacks: 1, value2: 0 },
+      { ...bar('heat', 85), stacks: 1, value2: 1 },
+    ];
     const mirror = overloadRingState(
-      {
-        dead: false,
-        auras: [
-          { ...state('heat'), stacks: 1 },
-          { ...bar('heat', 85), stacks: 1 },
-        ] as OverloadRingAura[],
-      },
+      { dead: false, auras: mirrored },
       true,
       newOverloadRingState(),
     );
@@ -186,7 +186,7 @@ describe('the Overload ring: how it looks', () => {
       expect(l.sweep).toBeCloseTo(0.95);
       expect(l.warn).toBeGreaterThan(0);
     }
-    const centre = read([state('ring'), { id: FINAL_AURAS.unbound, stacks: 3 }]);
+    const centre = read([state('ring')]);
     const p = new Set<number>();
     for (let t = 0; t < 2; t += 0.05)
       p.add(overloadRingLook(centre, 1, t, false, true, newOverloadRingLook()).pulse);
@@ -194,7 +194,7 @@ describe('the Overload ring: how it looks', () => {
   });
 
   it('the centre lights the whole ring and pulses', () => {
-    const s = read([state('ring'), { id: FINAL_AURAS.unbound, stacks: 3 }]);
+    const s = read([state('ring')]);
     const p = new Set<number>();
     for (let t = 0; t < 2; t += 0.1) {
       const l = overloadRingLook(s, 0, t, false, false, newOverloadRingLook());

@@ -7,21 +7,21 @@
 //     like a clock hand's sweep (0 to 100 percent) in the colour of the
 //     quarter the boss drinks (HEART_QUARTER_PALETTE: the Heat's red-orange,
 //     the Quench's ice blue, the Breath's storm violet, the Hammer's sand
-//     gold), the well's glow and the light column over it rising with it,
-//     and the percent standing in the air over the well;
+//     gold), the well's glow and the light column over it rising with it
+//     (no floating text over the well: Jose's playtest of 2026-11-20, the
+//     ring's sweep and colour alone read);
 //   - from four fifths full (OVERLOAD_RING.warnAt) it flickers, throws sparks
 //     and sounds its warning;
 //   - a quarter change recolours it at once and shows that quarter's own bar;
 //   - with the boss in the centre ring (no quarter: nothing fills), before
-//     the final phase, the ring turns red and pulses (the forbidden centre)
-//     with Heart Unbound's stacks over the well;
+//     the final phase, the ring turns red and pulses (the forbidden centre);
 //   - through an intermission the bar is held (dimmed, no warning); in the
 //     final phase and after it, and out of the fight, it is off.
-// Every level is read off the boss's own auras (the bars, the state, Heart
-// Unbound, the phase: encounters/smith_heart/final_ids.ts and
+// Every level is read off the boss's own auras (the bars, the state, the
+// phase: encounters/smith_heart/final_ids.ts and
 // final_phase_ids.ts), the same fields the HUD read, so offline and online
 // read the same and no wire or IWorld field is new.
-// Fairness: the fill, its colour, the percent, the warning and the centre's
+// Fairness: the fill, its colour, the warning and the centre's
 // red draw on EVERY tier (actionable); the low tier sheds the sparks only;
 // reduced motion trades the flicker and the pulse for a steady brighter
 // light (no strobe), the fill unchanged.
@@ -52,9 +52,6 @@ export const OVERLOAD_RING = {
   centreColor: 0xff2a18,
   /** The held bar's dimming through an intermission. */
   heldDim: 0.45,
-  /** The label's height over the floor (yards) and its size. */
-  labelY: 15,
-  labelSize: 11,
 } as const;
 
 export type OverloadRingMode = 'off' | 'fill' | 'held' | 'centre';
@@ -62,7 +59,6 @@ export type OverloadRingMode = 'off' | 'fill' | 'held' | 'centre';
 export interface OverloadRingAura {
   id: string;
   value?: number;
-  stacks?: number;
 }
 
 export interface OverloadRingBoss {
@@ -81,12 +77,10 @@ export interface OverloadRingState {
   color: number;
   /** Four fifths full or more (never while held). */
   warn: boolean;
-  /** Heart Unbound's stacks (the centre). */
-  stacks: number;
 }
 
 export function newOverloadRingState(): OverloadRingState {
-  return { mode: 'off', vein: null, fill: 0, pct: 0, color: 0xffffff, warn: false, stacks: 0 };
+  return { mode: 'off', vein: null, fill: 0, pct: 0, color: 0xffffff, warn: false };
 }
 
 function auraOf(auras: readonly OverloadRingAura[], id: string): OverloadRingAura | null {
@@ -105,7 +99,6 @@ export function overloadRingState(
   out.fill = 0;
   out.pct = 0;
   out.warn = false;
-  out.stacks = 0;
   out.color = 0xffffff;
   const state = boss && !boss.dead && engaged ? auraOf(boss.auras, FINAL_AURAS.state) : null;
   if (!boss || !state) {
@@ -126,7 +119,6 @@ export function overloadRingState(
     }
     out.mode = 'centre';
     out.color = OVERLOAD_RING.centreColor;
-    out.stacks = Math.max(0, Math.round(auraOf(boss.auras, FINAL_AURAS.unbound)?.stacks ?? 0));
     return out;
   }
   const bar = auraOf(boss.auras, overloadAuraId(zone));
@@ -257,12 +249,4 @@ export function ringWarnBeat(
 ): boolean {
   if (!vein || vein !== prevVein) return false;
   return prevFill < OVERLOAD_RING.warnAgainAt && fill >= OVERLOAD_RING.warnAgainAt;
-}
-
-/** What the label over the well shows: the percent (fill and held), the
- *  stacks (the centre, from the first), or nothing. */
-export function ringLabelKind(s: OverloadRingState): 'pct' | 'stacks' | 'none' {
-  if (s.mode === 'fill' || s.mode === 'held') return 'pct';
-  if (s.mode === 'centre' && s.stacks > 0) return 'stacks';
-  return 'none';
 }

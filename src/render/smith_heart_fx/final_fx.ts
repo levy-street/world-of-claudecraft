@@ -22,9 +22,9 @@
 //    heart_quarters_core.ts `strain`);
 //  - the Overload ring in the room's centre (final_overload_ring.ts, Jose's
 //    brief of 2026-11-20): the bar of the quarter it drinks filling a great
-//    ring round the central well in that quarter's colour, the percent over
-//    the well, the warning from four fifths, the red centre with Heart
-//    Unbound's stacks (the HUD's four bars moved here);
+//    ring round the central well in that quarter's colour (no floating text),
+//    the warning from four fifths, the red centre (the HUD's four bars moved
+//    here);
 //  - an Overload Burst: the heart's flash and a wall of the quarter's light
 //    riding out of the body over the whole Anvil on the trash engine's wave
 //    clock, a pulse a low ring of it (the floor's light the room's);
@@ -304,7 +304,7 @@ export class FinalFx {
   /** The Overload in the world: the body's strain, the wall's eruption. */
   private readonly overloadFx: FinalOverloadFx;
   /** The Overload in the room's centre: the ring round the well, its fill,
-   *  the percent over it, the centre's red (final_overload_ring.ts). */
+   *  the centre's red (final_overload_ring.ts). */
   private readonly overloadRing: FinalOverloadRing;
   private readonly ringState = newOverloadRingState();
   private readonly overloadFrame: FinalOverloadFrame = {
@@ -523,7 +523,6 @@ export class FinalFx {
       rand: () => this.rand(),
       low: !this.secondary,
       reducedMotion: () => this.reducedMotion(),
-      hasDom,
     });
     this.arrival = new FinalArrivalBeam(this.root, host);
     this.death = new FinalDeathFx(this.root, {
