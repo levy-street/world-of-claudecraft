@@ -457,6 +457,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // the calm, split stone, rubble): each glow pass on its owner's glow rung,
   // over every char rung of that owner (painted_telegraph_core.ts).
   { file: 'src/render/smith_heart_fx/painted_telegraphs.ts', layer: 'encounter', strict: true },
+  // The Hammer Council survivor's Grieving Fury: its scorch and cracked sigil
+  // on the floor through the ladder; the storm arcs and the body glow stand
+  // up from it and keep bare orders, so not strict.
+  { file: 'src/render/smith_heart_fx/council_fury_fx.ts', layer: 'encounter', strict: false },
   // The Smith's Heart entrance and death cinematics that lay frost or ember on
   // the floor through the ladder; their camera flash keeps a bare order.
   { file: 'src/render/smith_heart_fx/heat_entrance_fx.ts', layer: 'encounter', strict: false },
