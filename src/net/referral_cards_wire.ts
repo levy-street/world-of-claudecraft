@@ -98,7 +98,7 @@ function notice(v: unknown): v is ReferralNotice {
     case 'move':
       return integer(v.linkId, 1);
     case 'reason':
-      return reason(v.reason);
+      return reason(v.reason) && (v.linkId === undefined || integer(v.linkId, 1));
     case 'completed':
       return text(v.friendName);
     case 'declined':

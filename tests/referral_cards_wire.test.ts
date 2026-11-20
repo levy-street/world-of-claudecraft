@@ -36,8 +36,17 @@ describe('referral cards snapshot decoder', () => {
     { ...snapshot(), links: Array(51).fill(snapshot().links[0]) },
     { ...snapshot(), inviteUrl: 'javascript:alert(1)' },
     { ...snapshot(), notices: [{ id: 'n', type: 'reason', reason: 'future' }] },
+    { ...snapshot(), notices: [{ id: 'n', type: 'reason', reason: 'locked', linkId: 0 }] },
+    { ...snapshot(), notices: [{ id: 'n', type: 'reason', reason: 'locked', linkId: '8' }] },
   ])('rejects malformed boundaries without throwing', (value) => {
     expect(decodeReferralCardsSnapshot(value)).toBeNull();
+  });
+  it('keeps the link a refusal answers, and accepts refusals without one', () => {
+    const notices = [
+      { id: 'a', type: 'reason', reason: 'locked', linkId: 8 },
+      { id: 'b', type: 'reason', reason: 'unavailable' },
+    ] as const;
+    expect(decodeReferralCardsSnapshot({ ...snapshot(), notices })?.notices).toEqual(notices);
   });
   it('refuses another account card or impossible reward masks', () => {
     const wrong = snapshot();

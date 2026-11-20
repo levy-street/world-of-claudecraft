@@ -60,6 +60,11 @@ export class ReferralRewardClaims {
     return rewards;
   }
 
+  /** A refusal of this player's own action on the link: its claim never succeeded. */
+  drop(linkId: number): void {
+    this.pending.delete(linkId);
+  }
+
   clear(): void {
     this.pending.clear();
   }
