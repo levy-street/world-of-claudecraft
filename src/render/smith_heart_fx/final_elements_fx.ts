@@ -72,6 +72,7 @@ import {
   elementObjectKind,
   flameWall,
   fusionOrbLook,
+  HAIL_DROP,
   hailFall,
   laneFront,
   linkFill,
@@ -91,7 +92,9 @@ import {
 import {
   AURA_FRAG,
   BILL_VERT,
+  FLOOR_GLOW_FRAG,
   GLOW_FRAG,
+  HAIL_FRAG,
   LAVA_FRAG,
   SIGIL_FRAG,
   SOLID_FRAG,
@@ -215,6 +218,8 @@ interface Spire {
 
 interface Cloud {
   billows: THREE.Mesh[];
+  /** The dense ground layer the billows rise from, lying on the scald. */
+  floor: THREE.Mesh;
   u: Uni;
   id: number;
   seen: boolean;
@@ -261,6 +266,14 @@ export class FinalElementsFx {
   private readonly spires: Spire[] = [];
   private readonly hailBalls: THREE.InstancedMesh;
   private hailUsed = 0;
+  /** Each falling stone's streak above it. */
+  private readonly hailTrails: THREE.InstancedMesh;
+  /** A hailstone's frost circle filling as it falls (by stone), and the
+   *  frost splats stones leave as they shatter. */
+  private readonly hailDiscs: { mesh: THREE.Mesh; u: Uni; id: number; seen: boolean }[] = [];
+  private readonly splats: { mesh: THREE.Mesh; u: Uni; born: number; alive: boolean }[] = [];
+  /** The flame walls' light on the floor (by wall). */
+  private readonly wallGlows: { mesh: THREE.Mesh; u: Uni }[] = [];
   private readonly spikes: THREE.InstancedMesh;
   /** The lava pools' crust discs (Magma Rift). */
   private readonly crusts: { mesh: THREE.Mesh; u: Uni; id: number; seen: boolean }[] = [];
@@ -307,6 +320,9 @@ export class FinalElementsFx {
       return m;
     };
     const card = new THREE.PlaneGeometry(2, 2);
+    /** A flat card lying on the floor (2 yd across at scale 1). */
+    const flat = new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2);
+    h.geometries.push(flat);
     const ball = new THREE.SphereGeometry(1, 28, 20);
     h.geometries.push(card, ball);
 
@@ -369,6 +385,7 @@ export class FinalElementsFx {
         uAlpha: { value: 0 },
         uSeed: { value: i * 4.1 },
         uWrap: { value: 1 },
+        uBoost: { value: 1 },
       };
       const m = mesh(
         columnGeo,
@@ -406,6 +423,26 @@ export class FinalElementsFx {
       P.hail,
       'smithHeartFinalHail',
     );
+    const trailGeo = new THREE.ConeGeometry(0.5, 1, 8, 1, true).translate(0, 0.5, 0);
+    h.geometries.push(trailGeo);
+    this.hailTrails = instanced(
+      trailGeo,
+      solid('smithHeartFinalHailTrail', 1),
+      P.hail,
+      'smithHeartFinalHailTrail',
+    );
+    const discGeoH = new THREE.CircleGeometry(1, 40).rotateX(-Math.PI / 2);
+    h.geometries.push(discGeoH);
+    const hailDisc = (name: string, i: number) => {
+      const u: Uni = { uFill: { value: 0 }, uAlpha: { value: 0 }, uSeed: { value: i * 1.3 } };
+      const m = mesh(discGeoH, shader(name, u, KIT_UV_VERT, HAIL_FRAG), name);
+      m.renderOrder = floorVfxRenderOrder('encounter', h.crustRung);
+      return { mesh: m, u };
+    };
+    for (let i = 0; i < P.hail; i++)
+      this.hailDiscs.push({ ...hailDisc('smithHeartFinalHailCircle', i), id: -1, seen: false });
+    for (let i = 0; i < P.splats; i++)
+      this.splats.push({ ...hailDisc('smithHeartFinalHailSplat', i + 30), born: -9, alive: false });
     this.spikes = instanced(
       spikeGeo,
       solid('smithHeartFinalSpikes', 1),
@@ -465,24 +502,30 @@ export class FinalElementsFx {
         uTime: h.uTime,
         uAlpha: { value: 0 },
         uSeed: { value: i * 1.7 },
-        uHot: { value: 0.6 },
+        uHot: { value: 0.15 },
       };
       const mat = shader('smithHeartFinalSteam', u, BILL_VERT, STEAM_FRAG);
       const billows: THREE.Mesh[] = [];
       for (let k = 0; k < P.billows; k++)
         billows.push(mesh(card, mat, 'smithHeartFinalSteamBillow'));
-      this.clouds.push({ billows, u, id: -1, seen: false, seed: i * 0.37 });
+      const fogMat = shader('smithHeartFinalSteamFloor', u, WALL_VERT, STEAM_FRAG, {
+        side: THREE.DoubleSide,
+      });
+      const floor = mesh(flat, fogMat, 'smithHeartFinalSteamFloor');
+      this.clouds.push({ billows, floor, u, id: -1, seen: false, seed: i * 0.37 });
     }
 
     // ---- the flame walls ----
     const wallGeo = new THREE.PlaneGeometry(1, 1, 1, 1).translate(0, 0.5, 0);
-    h.geometries.push(wallGeo);
+    const flatWall = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+    h.geometries.push(wallGeo, flatWall);
     for (let i = 0; i < P.walls; i++) {
       const u: Uni = {
         uTime: h.uTime,
         uAlpha: { value: 0 },
         uSeed: { value: i * 5.3 },
         uWrap: { value: 0 },
+        uBoost: { value: 1.25 },
       };
       const mat = shader('smithHeartFinalFlameWall', u, WALL_VERT, WALL_FRAG, {
         blending: THREE.AdditiveBlending,
@@ -491,8 +534,18 @@ export class FinalElementsFx {
       const planes: THREE.Mesh[] = [];
       // Three across the lane (its face, read from along it) and three along
       // it (its flanks, read from the side): a wall of flame from any camera.
-      for (let k = 0; k < 6; k++) planes.push(mesh(wallGeo, mat, 'smithHeartFinalFlameWall'));
+      for (let k = 0; k < 8; k++) planes.push(mesh(wallGeo, mat, 'smithHeartFinalFlameWall'));
       this.walls.push({ planes, u, id: -1, seen: false });
+      const gu: Uni = { uAlpha: { value: 0 }, uColor: { value: new THREE.Color(0xff8a2a) } };
+      const glow = mesh(
+        flatWall,
+        shader('smithHeartFinalFlameWallLight', gu, KIT_UV_VERT, FLOOR_GLOW_FRAG, {
+          blending: THREE.AdditiveBlending,
+        }),
+        'smithHeartFinalFlameWallLight',
+      );
+      glow.renderOrder = floorVfxRenderOrder('encounter', h.crustRung);
+      this.wallGlows.push({ mesh: glow, u: gu });
     }
 
     // ---- the lanes: Firestorm's, Avalanche's, the spires' links ----
@@ -567,6 +620,7 @@ export class FinalElementsFx {
     for (const l of this.lanes) l.seen = false;
     for (const s of this.spires) s.seen = false;
     for (const c of this.crusts) c.seen = false;
+    for (const d of this.hailDiscs) d.seen = false;
   }
 
   /** Is `templateId` one of the elements' objects? */
@@ -797,12 +851,29 @@ export class FinalElementsFx {
       if (!c.seen) {
         c.id = -1;
         for (const b of c.billows) b.visible = false;
+        c.floor.visible = false;
       }
-    for (const w of this.walls)
+    for (const d of this.hailDiscs)
+      if (!d.seen) {
+        d.id = -1;
+        d.mesh.visible = false;
+      }
+    for (const sp of this.splats) {
+      if (!sp.alive) continue;
+      const t = (this.clock - sp.born) / 1.8;
+      if (t >= 1) {
+        sp.alive = false;
+        sp.mesh.visible = false;
+      } else sp.u.uAlpha.value = 0.9 * (1 - t) * (1 - t);
+    }
+    for (let i = 0; i < this.walls.length; i++) {
+      const w = this.walls[i];
       if (!w.seen) {
         w.id = -1;
         for (const p of w.planes) p.visible = false;
+        this.wallGlows[i].mesh.visible = false;
       }
+    }
     this.paintLinks();
     for (const l of this.lanes)
       if (!l.seen) {
@@ -833,6 +904,7 @@ export class FinalElementsFx {
     this.flush(this.pips, this.pipUsed);
     this.flush(this.markPieces, this.markPieceUsed);
     this.flush(this.hailBalls, this.hailUsed);
+    this.flush(this.hailTrails, this.hailUsed);
     this.flush(this.spikes, this.spikeUsed);
   }
 
@@ -1154,24 +1226,31 @@ export class FinalElementsFx {
       const b = steamPuff(this.clock, k, c.billows.length, r, c.seed);
       const grow = live ? 1 : 0.4 + 0.6 * fill;
       const size = b.size * (0.55 + 0.45 * grow);
-      // Never cut by the floor: a billow's foot stays over it.
-      c.billows[k].position.set(x + b.x, y + Math.max(b.y * grow, size * 1.0), z + b.z);
+      // Sitting on the scald: a billow's soft edge just meets the floor.
+      c.billows[k].position.set(x + b.x, y + Math.max(b.y * grow, size * 0.82), z + b.z);
       c.billows[k].scale.setScalar(size);
       c.billows[k].visible = true;
     }
-    // Steam boiling up off the scald, thick while it is live.
-    const n = Math.round((live ? 26 : 8) * this.dt * H.density + H.rand() * 0.7);
-    for (let i = 0; i < n; i++)
-      // Born a body's height up so no puff is ever cut by the floor.
-      H.particles.puff(x + (H.rand() - 0.5) * r * 1.5, y + 2.6, z + (H.rand() - 0.5) * r * 1.5, 1, {
-        speed: 0.6,
-        up: 2.2 + H.rand() * 1.5,
-        life: 2.6,
-        size: [1.8, 4.6],
+    // The dense ground layer lying on the scald.
+    c.floor.position.set(x, y + 0.35, z);
+    c.floor.scale.setScalar(r * (0.75 + 0.35 * grow0(live, fill)));
+    c.floor.visible = true;
+    // Wisps boiling up off the scald, thick while it is live (small at
+    // birth, so the floor never cuts one).
+    const n = Math.round((live ? 34 : 10) * this.dt * H.density + H.rand() * 0.7);
+    for (let i = 0; i < n; i++) {
+      const a = H.rand() * Math.PI * 2;
+      const rr = Math.sqrt(H.rand()) * r * 0.9;
+      H.particles.puff(x + Math.cos(a) * rr, y + 0.9, z + Math.sin(a) * rr, 1, {
+        speed: 0.5,
+        up: 2.4 + H.rand() * 1.8,
+        life: 2.4,
+        size: [0.9, 3.4],
         color: C.steamRgb,
-        alpha: live ? 0.7 : 0.4,
+        alpha: live ? 0.75 : 0.4,
         drag: 0.5,
       });
+    }
   }
 
   private paintFireLane(e: Entity, burn: boolean, age: number, since: number): void {
@@ -1215,52 +1294,69 @@ export class FinalElementsFx {
     w.seen = true;
     const fw = flameWall(since);
     w.u.uAlpha.value = front >= info.length - 0.01 ? Math.max(0, 1 - (since - run) * 4) : fw.alpha;
-    // Three planes across the lane a stride apart (the face) and three along
-    // it behind the front (the flanks and the heart): a wall with depth that
-    // reads from any camera.
+    // Five sheets across the lane over 6 yd of depth (its face, the front
+    // one the tallest), three along it (its flanks and heart, read from the
+    // side): a thick wall of layered flame that reads from any camera.
     const depth = 6;
     for (let k = 0; k < w.planes.length; k++) {
       const pl = w.planes[k];
-      const across = k < 3;
-      const off = across ? front - k * 1.6 : front - depth / 2;
-      const lateral = across ? 0 : (k - 4) * info.half * 0.85;
+      const across = k < 5;
+      const off = across ? front - k * 1.5 : front - depth / 2;
+      const lateral = across ? 0 : (k - 6) * info.half * 0.8;
       const px = sx + dx * Math.max(0, off) + dz * lateral;
       const pz = sz + dz * Math.max(0, off) - dx * lateral;
       pl.position.set(px, H.groundY(px, pz) - 0.2, pz);
       pl.rotation.set(0, across ? e.facing : e.facing + Math.PI / 2, 0);
-      const hgt = fw.height * (across ? 1 - k * 0.12 : k === 4 ? 1.05 : 0.85);
-      pl.scale.set(across ? info.half * 2.2 : Math.min(depth, Math.max(0.5, front)), hgt, 1);
+      const hgt = fw.height * (across ? 1 - k * 0.1 : k === 6 ? 1.05 : 0.85);
+      pl.scale.set(across ? info.half * 2.3 : Math.min(depth, Math.max(0.5, front)), hgt, 1);
       pl.visible = off > 0 || (!across && front > 0.5);
     }
-    // The fire it drags along and the burnt floor behind.
-    const n = Math.round(60 * this.dt * H.density + H.rand());
+    // Its light on the floor: a warm pool under and ahead of it.
+    const wi = this.walls.indexOf(w);
+    const glow = this.wallGlows[wi];
+    if (glow) {
+      const gx = sx + dx * Math.max(0, front - depth / 2);
+      const gz = sz + dz * Math.max(0, front - depth / 2);
+      glow.mesh.position.set(gx, H.groundY(gx, gz) + 0.08, gz);
+      glow.mesh.rotation.set(0, e.facing, 0);
+      glow.mesh.scale.set(info.half * 3.2, 1, depth + 8);
+      glow.u.uAlpha.value = w.u.uAlpha.value * 0.9;
+      glow.mesh.visible = front > 0.2 && front < info.length;
+    }
+    // Flame tongues and embers torn off its crest, heat smoke over it.
+    const n = Math.round(90 * this.dt * H.density + H.rand());
     const px = sx + dx * front;
     const pz = sz + dz * front;
     const py = H.groundY(px, pz);
     for (let i = 0; i < n; i++) {
       const side = (H.rand() * 2 - 1) * info.half;
-      H.particles.puff(px + dz * side, py + 0.3, pz - dx * side, 1, {
+      const back = H.rand() * depth;
+      const big = H.rand() < 0.45;
+      H.particles.puff(px + dz * side - dx * back, py + 0.3, pz - dx * side - dz * back, 1, {
         speed: 1.5,
-        up: 6 + H.rand() * 5,
-        life: 0.8,
-        size: [2.2, 0.6],
-        color: H.rand() < 0.3 ? C.fireCoreRgb : C.fireRgb,
+        up: big ? 7 + H.rand() * 6 : 12 + H.rand() * 6,
+        life: big ? 0.9 : 1.3,
+        size: big ? [3.4, 0.8] : [0.5, 0.1],
+        color: H.rand() < 0.35 ? C.fireCoreRgb : C.fireRgb,
         alpha: 1,
-        pool: 'pyre',
-        dir: [dx, 0.5, dz],
-        spread: 0.4,
+        pool: big ? 'pyre' : 'glow',
+        dir: [dx, 0.6, dz],
+        spread: 0.5,
       });
     }
-    if (H.rand() < 20 * this.dt * H.density)
-      H.particles.puff(px, py + 6, pz, 1, {
+    const smoke = Math.round(24 * this.dt * H.density + H.rand() * 0.6);
+    for (let i = 0; i < smoke; i++) {
+      const side = (H.rand() * 2 - 1) * info.half;
+      H.particles.puff(px + dz * side - dx * 2, py + fw.height * 0.9, pz - dx * side - dz * 2, 1, {
         speed: 1,
-        up: 4,
-        life: 2,
-        size: [3, 6],
-        color: [0.12, 0.1, 0.09],
-        alpha: 0.45,
+        up: 3.5,
+        life: 2.4,
+        size: [3, 7],
+        color: [0.1, 0.08, 0.07],
+        alpha: 0.5,
         pool: 'smoke',
       });
+    }
   }
 
   private paintAvalanche(e: Entity, run: boolean, age: number, since: number): void {
@@ -1355,34 +1451,55 @@ export class FinalElementsFx {
   private paintHail(e: Entity, x: number, z: number, r: number, age: number): void {
     const H = this.h;
     const warn = hailOf(e.templateId) ?? E.hailWarn;
-    H.foot(e.id, 'hail', STYLES.hail, x, z, r, Math.min(1, age / Math.max(0.1, warn)), false);
+    const fill = Math.min(1, age / Math.max(0.1, warn));
+    H.foot(e.id, 'hail', STYLES.hail, x, z, r, fill, false);
+    // Its white-blue circle, the frost creeping in to the middle as it falls.
+    let d = this.hailDiscs.find((k) => k.id === e.id);
+    if (!d) {
+      d = this.hailDiscs.find((k) => k.id === -1 && !k.seen);
+      if (d) d.id = e.id;
+    }
+    if (d) {
+      d.seen = true;
+      d.mesh.position.set(x, H.groundY(x, z) + 0.06, z);
+      d.mesh.scale.setScalar(r);
+      d.u.uFill.value = fill;
+      d.u.uAlpha.value = Math.min(1, age / 0.2);
+      d.mesh.visible = true;
+    }
     const f = hailFall(warn - age, warn);
     if (!f.shown || this.hailUsed >= P.hail) return;
-    const y = H.groundY(x, z) + f.height + 0.6;
-    this.piece(
-      this.hailBalls,
-      this.hailUsed++,
-      x,
-      y,
-      z,
-      0.75,
-      0.9,
-      0.75,
-      this.clock * 3 + e.id,
-      e.id,
-      0,
-      0xcdeeff,
-    );
-    if (H.rand() < 0.8 * H.density)
-      H.particles.puff(x, y + 1, z, 1, {
-        speed: 0.3,
-        up: 6,
-        life: 0.4,
-        size: [0.5, 0.1],
+    const y = H.groundY(x, z) + f.height + 0.7;
+    const i = this.hailUsed++;
+    const spin = this.clock * 4 + e.id;
+    this.piece(this.hailBalls, i, x, y, z, 1.35, 1.55, 1.35, spin, e.id, 0, 0xe8f8ff);
+    // Its streak: a pale cone trailing up behind it, longer as it speeds.
+    const streak = 3 + 7 * (1 - f.height / HAIL_DROP);
+    this.piece(this.hailTrails, i, x, y + 0.7, z, 1.1, streak, 1.1, 0, 0, 0, 0xd8f0ff);
+    if (H.rand() < 1.6 * H.density)
+      H.particles.puff(x, y + 0.8, z, 1, {
+        speed: 0.4,
+        up: 8,
+        life: 0.35,
+        size: [0.7, 0.15],
         color: C.frostRgb,
-        alpha: 0.8,
+        alpha: 0.9,
         pool: 'glow',
+        radius: 0.3,
       });
+  }
+
+  /** A hailstone shatters: its frost splat on the floor, fading. */
+  private splat(x: number, z: number, r: number): void {
+    const sp = this.splats.find((k) => !k.alive) ?? this.splats[0];
+    sp.alive = true;
+    sp.born = this.clock;
+    sp.mesh.position.set(x, this.h.groundY(x, z) + 0.07, z);
+    sp.mesh.scale.setScalar(r * 1.15);
+    sp.mesh.rotation.y = this.h.rand() * Math.PI;
+    sp.u.uFill.value = 1;
+    sp.u.uAlpha.value = 0.9;
+    sp.mesh.visible = true;
   }
 
   private paintSpire(e: Entity, fire: boolean, age: number, since: number): void {
@@ -1561,15 +1678,17 @@ export class FinalElementsFx {
           H.shake(x, z, 0.3, 60);
           break;
         case ELEMENT_CUES.hail:
-          fx.puff(x, y + 0.5, z, Math.round(18 * H.density) + 4, {
-            speed: 5,
-            up: 5,
-            life: 0.7,
-            size: [0.5, 0.15],
-            color: C.frostRgb,
+          // The stone shatters: ice shards thrown out, a frost burst, the splat.
+          this.splat(x, z, r);
+          fx.puff(x, y + 0.6, z, Math.round(34 * H.density) + 8, {
+            speed: 7,
+            up: 6,
+            life: 0.8,
+            size: [0.6, 0.18],
+            color: [0.88, 0.96, 1],
             alpha: 1,
             pool: 'glow',
-            gravity: 16,
+            gravity: 18,
           });
           fx.puff(x, y + 0.4, z, Math.round(5 * H.density) + 1, {
             speed: 1.5,
@@ -1796,7 +1915,14 @@ export class FinalElementsFx {
   }
 
   dispose(): void {
-    for (const m of [this.tankPieces, this.pips, this.markPieces, this.hailBalls, this.spikes])
+    for (const m of [
+      this.tankPieces,
+      this.pips,
+      this.markPieces,
+      this.hailBalls,
+      this.hailTrails,
+      this.spikes,
+    ])
       m.dispose();
   }
 
@@ -1807,6 +1933,11 @@ export class FinalElementsFx {
     this.stateAt.clear();
     this.lastPulse.clear();
   }
+}
+
+/** The steam's ground layer's growth through the warning. */
+function grow0(live: boolean, fill: number): number {
+  return live ? 1 : 0.4 + 0.6 * fill;
 }
 
 /** A Storm Spire: a tall dark obelisk with a broken crown, its foot at 0. */

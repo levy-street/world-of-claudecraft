@@ -165,6 +165,45 @@ void main() {
 }
 `;
 
+/** A hailstone's circle on the floor (and the frost splat it leaves): a
+ *  white-blue ring, the frost creeping in from the rim to the middle as the
+ *  stone falls (uFill), crystal spokes; normal blending. */
+export const HAIL_FRAG = /* glsl */ `
+uniform float uFill;
+uniform float uAlpha;
+uniform float uSeed;
+varying vec2 vUv;
+void main() {
+  vec2 p = vUv * 2.0 - 1.0;
+  float r = length(p);
+  if (r > 1.0) discard;
+  float rim = smoothstep(0.84, 0.95, r) * (1.0 - smoothstep(0.97, 1.0, r));
+  float front = 1.0 - clamp(uFill, 0.0, 1.0);
+  float filled = smoothstep(front - 0.05, front + 0.05, r);
+  float edge = (1.0 - smoothstep(0.0, 0.05, abs(r - front))) * step(0.02, uFill) * (1.0 - step(0.999, uFill));
+  float a = atan(p.y, p.x);
+  float spokes = pow(abs(sin(a * 6.0 + uSeed)), 22.0) * smoothstep(0.08, 0.9, r);
+  float twig = pow(abs(sin(a * 18.0 + uSeed * 2.0)), 40.0) * smoothstep(0.4, 0.95, r);
+  vec3 deep = vec3(0.42, 0.66, 0.95);
+  vec3 ice = vec3(0.86, 0.96, 1.0);
+  vec3 col = mix(deep, ice, clamp(spokes + twig + rim + edge, 0.0, 1.0));
+  float alpha = uAlpha * clamp(rim + edge + filled * (0.45 + 0.4 * (spokes + twig)), 0.0, 1.0);
+  gl_FragColor = vec4(col, alpha);
+}
+`;
+
+/** The flame wall's light on the floor under it: a warm additive glow. */
+export const FLOOR_GLOW_FRAG = /* glsl */ `
+uniform float uAlpha;
+uniform vec3 uColor;
+varying vec2 vUv;
+void main() {
+  vec2 p = vUv * 2.0 - 1.0;
+  float a = pow(max(1.0 - length(p * vec2(1.0, 1.2)), 0.0), 1.6) * uAlpha;
+  gl_FragColor = vec4(uColor * a, a);
+}
+`;
+
 export const STEAM_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uAlpha;
@@ -203,22 +242,29 @@ uniform float uTime;
 uniform float uAlpha;
 uniform float uSeed;
 uniform float uWrap;
+uniform float uBoost;
 varying vec2 vUv;
 ${KIT_NOISE}
 void main() {
   float x = vUv.x;
   float y = vUv.y;
   // Tongues: each column's own height, licking up and down.
-  float h = 0.42 + 0.5 * kfbm(vec2(x * 6.0 + uSeed, uTime * 1.6));
+  float h = 0.3 + 0.65 * kfbm(vec2(x * 7.0 + uSeed, uTime * 1.9));
   float flick = kfbm(vec2(x * 9.0 + uSeed * 3.0, y * 3.0 - uTime * 4.2));
   float shape = smoothstep(h + 0.12, h - 0.25, y + (flick - 0.5) * 0.35);
   // A wall fades at its two ends; a column round a body wraps (uWrap 1).
-  float sides = mix(smoothstep(0.0, 0.08, x) * smoothstep(1.0, 0.92, x), 1.0, uWrap);
+  // Ragged, soft ends (a sheet never shows a straight edge).
+  float endFlick = 0.12 * kn(vec2(y * 4.0 - uTime * 3.0, uSeed));
+  float sides = mix(
+    smoothstep(0.0, 0.28 + endFlick, x) * smoothstep(1.0, 0.72 - endFlick, x),
+    1.0,
+    uWrap
+  );
   float heat = clamp(1.0 - y / max(h, 0.05), 0.0, 1.0);
   vec3 col = mix(vec3(0.55, 0.06, 0.02), vec3(1.0, 0.45, 0.08), smoothstep(0.0, 0.45, heat));
   col = mix(col, vec3(1.0, 0.92, 0.66), smoothstep(0.62, 0.98, heat));
-  col *= 0.75 + 0.6 * flick;
-  float a = shape * sides * uAlpha * (0.65 + 0.35 * flick);
+  col *= (0.75 + 0.6 * flick) * max(uBoost, 1.0);
+  float a = clamp(shape * sides * uAlpha * (0.65 + 0.35 * flick) * max(uBoost, 1.0), 0.0, 1.0);
   gl_FragColor = vec4(col * a, a);
 }
 `;

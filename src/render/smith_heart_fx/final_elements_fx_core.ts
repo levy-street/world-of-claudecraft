@@ -216,6 +216,10 @@ export function fusionOrbLook(fill: number): { size: number; glow: number; draw:
 
 // ---- the combos -----------------------------------------------------------------------
 
+/** The height a hailstone drops from (yards): low enough to cross a raid
+ *  camera's frame for most of its fall. */
+export const HAIL_DROP = 20;
+
 /** A steam cloud's k-th billow (of n): its offset from the cloud's middle,
  *  its height, its size, all turning slowly. Three tiers: a wide churning
  *  foot hugging the floor, a body, and a crown rolling over the top, so the
@@ -227,24 +231,27 @@ export function steamPuff(
   radius: number,
   seed: number,
 ): { x: number; y: number; z: number; size: number } {
-  const tier = k < n * 0.45 ? 0 : k < n * 0.8 ? 1 : 2;
+  // Three tiers sitting ON the scald: a wide dense foot of small billows
+  // over the whole circle, a body, a crown; each rises a little and is
+  // reborn at its foot (the painter keeps every foot over the floor).
+  const tier = k < n * 0.5 ? 0 : k < n * 0.82 ? 1 : 2;
   // Each billow rolls up its tier and is reborn at its foot (the churn of
   // boiling steam): its own phase, swelling then thinning as it climbs.
   const t = (clock * (0.09 + 0.03 * tier) + k * 0.618 + seed) % 1;
   const swell = 0.55 + 0.45 * Math.sin(Math.PI * t);
   const a =
     (k / n) * Math.PI * 2 * 2.3 + seed + clock * (0.22 - tier * 0.06) * (k % 2 === 0 ? 1 : -1);
-  const spread = tier === 0 ? 0.62 : tier === 1 ? 0.42 : 0.2;
+  const spread = tier === 0 ? 0.8 : tier === 1 ? 0.5 : 0.24;
   const ring = radius * spread * (0.55 + 0.45 * ((k * 0.61 + seed) % 1));
-  const lift = tier === 0 ? 1.4 : tier === 1 ? 4.0 : 6.6;
+  const lift = tier === 0 ? 0 : tier === 1 ? 2.4 : 4.2;
   return {
     x: Math.cos(a) * ring,
-    y: lift + 0.6 * ((k * 0.43 + seed * 0.3) % 1) + 2.2 * t,
+    y: lift + 0.5 * ((k * 0.43 + seed * 0.3) % 1) + 1.6 * t,
     z: Math.sin(a) * ring,
     size:
       swell *
       radius *
-      (tier === 0 ? 1.15 : tier === 1 ? 1.05 : 0.85) *
+      (tier === 0 ? 0.5 : tier === 1 ? 0.62 : 0.52) *
       (0.85 + 0.3 * ((k * 0.29 + seed * 0.7) % 1)),
   };
 }
@@ -260,10 +267,12 @@ export function laneFront(age: number, length: number, run: number): number {
  *  the floor (it drops in the last stretch of the warning), and whether it
  *  shows yet. */
 export function hailFall(left: number, warn: number): { height: number; shown: boolean } {
-  const drop = Math.min(warn, 0.55);
-  if (left > drop) return { height: 40, shown: false };
+  // The stone falls the last 0.9 s of its warning from 34 yd (seen
+  // coming), accelerating into its circle.
+  const drop = Math.min(warn, 1.1);
+  if (left > drop) return { height: HAIL_DROP, shown: false };
   const t = clamp01(1 - left / drop);
-  return { height: 40 * (1 - t * t), shown: true };
+  return { height: HAIL_DROP * (1 - t * t), shown: true };
 }
 
 /** An Avalanche spike `d` yards along its lane once the front is at
@@ -297,7 +306,8 @@ export function linkFill(age: number): number {
 
 /** The flame wall's height and its flicker at `t` seconds of its run. */
 export function flameWall(t: number): { height: number; alpha: number } {
-  return { height: 7.5 + 1.2 * Math.sin(t * 9), alpha: smooth(t / 0.15) };
+  // About three times a player's height, licking higher and lower.
+  return { height: 8.5 + 1.2 * Math.sin(t * 9), alpha: smooth(t / 0.15) };
 }
 
 /** The stack count's pips round a tank (one gem per stack, up to the cap):
@@ -332,11 +342,13 @@ export const ELEMENT_FX_POOLS = {
   markPieces: 6,
   /** Steam clouds (Mythic five) and their billows. */
   clouds: 6,
-  billows: 22,
+  billows: 30,
   /** Flame walls (two lanes on Heroic and Mythic). */
   walls: 3,
   /** Hailstones in the air (four a wave, overlapping waves). */
   hail: 14,
+  /** The frost splats hailstones leave (fading). */
+  splats: 10,
   /** Avalanche spikes: lanes (two waves of six) times spikes a lane. */
   spikeLanes: 12,
   spikesPerLane: 12,
