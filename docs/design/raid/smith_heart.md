@@ -2651,7 +2651,10 @@ again at nine tenths). With the boss in the central ring before its final phase 
 ring turns red and pulses. Held and
 dimmed through an intermission, off in the final phase. It draws on every tier (the low
 tier sheds the sparks only; reduced motion keeps a steady light, no flicker), read off the
-same boss auras (no wire or `IWorld` field).
+same boss auras (no wire or `IWorld` field). It lights while the fight's state aura stands on the
+boss (`finalFightEngaged`): online a mob's in-combat bit is never mirrored, and reading only
+a cast, a wound or a blow made the ring, its column and the well's glow blink out between
+the boss's blows (Jose's playtest of 2026-11-20).
 
 **The raid HUD** (`src/ui/hud/dungeon/heart_final_phase_view.ts`, painted by
 `heart_final_phase_painter.ts`): only what has no place on the floor, at the top of the

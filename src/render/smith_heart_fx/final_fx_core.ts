@@ -12,10 +12,33 @@
 import { SMITH_HEART_FINAL_BOSS, SMITH_HEART_MOBS } from '../../sim/content/smith_heart';
 import { HEART_ROOM } from '../../sim/content/smith_heart_layout';
 import { ELEMENT_CASTS } from '../../sim/encounters/smith_heart/final_elements_ids';
-import { FINAL_CASTS } from '../../sim/encounters/smith_heart/final_ids';
+import { FINAL_AURAS, FINAL_CASTS } from '../../sim/encounters/smith_heart/final_ids';
 
 /** The boss whose body this is. */
 export const FINAL_BOSS = SMITH_HEART_FINAL_BOSS;
+/** Whether the boss's fight runs, for everything that lights only in it (the
+ *  Overload ring, the body's strain, the quarter it wakes). The fight's
+ *  state aura decides first: the sim puts it on at the pull and takes it off
+ *  at the fight's end (final_rules.ts showState / clearRules), and it rides
+ *  the wire like any aura. Online a mob's in-combat bit is never mirrored, so
+ *  the older reads alone (a cast, a wound, a blow this second) let a boss at
+ *  full health between its blows read idle for a moment: the ring, its
+ *  column and the well's glow blinked out (Jose's playtest of 2026-11-20).
+ *  `sinceHit`: seconds since a blow was traded with it. */
+export function finalFightEngaged(
+  boss: {
+    inCombat: boolean;
+    castingAbility: string | null;
+    hp: number;
+    maxHp: number;
+    auras: readonly { id: string }[];
+  },
+  sinceHit: number,
+): boolean {
+  for (const a of boss.auras) if (a.id === FINAL_AURAS.state) return true;
+  return boss.inCombat || !!boss.castingAbility || boss.hp < boss.maxHp || sinceHit < 1;
+}
+
 /** The arc cleave's cue (mob_swing.ts emits it as the cleave lands). */
 export const FORGE_FIST_CUE = 'brood_cleave';
 

@@ -118,6 +118,7 @@ import {
   FINAL_FX_COLORS,
   FORGE_FIST_CUE,
   finalBossKit,
+  finalFightEngaged,
   pourGather,
   wrathBlastLook,
   wrathGather,
@@ -682,14 +683,10 @@ export class FinalFx {
     const replaying = !dead && this.deathT >= 0;
     if (!dead && !replaying) this.replayAt = -1;
     noteHeartFinalDeath(this.slotKey, this.deathT >= 0 ? now - this.deathT : null);
-    // The arrival's clock: a heart asleep is -1. Engaged: online a mob's
-    // in-combat bit is not mirrored, so a cast, a wound or a blow traded with
-    // it counts too.
-    const engaged =
-      boss.inCombat ||
-      !!boss.castingAbility ||
-      boss.hp < boss.maxHp ||
-      this.clock - this.bossHitAt < 1;
+    // The arrival's clock: a heart asleep is -1. Engaged: the fight's state
+    // aura first (online a mob's in-combat bit is not mirrored; reading only
+    // a cast, a wound or a blow blinked the room's ring out between blows).
+    const engaged = finalFightEngaged(boss, this.clock - this.bossHitAt);
     let t = this.view.awakeSince;
     if (t < 0) {
       // Fought (or fallen) with no arrival seen (the markers' bit out of
