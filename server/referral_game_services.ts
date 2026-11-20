@@ -811,11 +811,14 @@ export class ReferralGameServices {
   }
   /** An accepted invite between new characters who could start a card together, but
    * whose accounts are not bound friends, explains why no card started. Ordinary
-   * parties, leaves and finder groups stay silent. */
+   * parties, leaves and finder groups stay silent, and so does a member already told
+   * when someone else joins: only the newcomer, or an unbound new partner arriving,
+   * explains again. */
   private explainUnbound(evidence: ReferralEvidence, links: readonly StoredReferral[]): void {
     const eligible = evidence.participants.filter(
       (p) => p.partyId !== null && referralCharacterCanStart(p),
     );
+    const joined = new Set(evidence.joinedPids ?? []);
     const bound = (a: number, b: number) =>
       links.some(
         (row) =>
@@ -827,6 +830,7 @@ export class ReferralGameServices {
         (q) => q.accountId !== p.accountId && q.partyId === p.partyId,
       );
       if (!partners.length || partners.some((q) => bound(p.accountId, q.accountId))) continue;
+      if (!joined.has(p.pid) && !partners.some((q) => joined.has(q.pid))) continue;
       const session = this.host.sessionForAccount(p.accountId, p.characterId);
       if (session && this.valid(session))
         this.notice(session, { type: 'reason', reason: 'newAccountsOnly' });

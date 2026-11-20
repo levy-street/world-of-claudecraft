@@ -431,6 +431,7 @@ describe('referral game host', () => {
       kind: 'party',
       participants: participants(),
       invited: true,
+      joinedPids: [1, 2],
     });
     await flush();
     expect([reasons(100), reasons(200)]).toEqual([0, 0]);
@@ -440,9 +441,40 @@ describe('referral game host', () => {
       kind: 'party',
       participants: participants(),
       invited: true,
+      joinedPids: [1, 2],
     });
     await flush();
     expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+  });
+  it('explains unbound accounts once, not again when someone else joins the party', async () => {
+    const h = setup();
+    await flush();
+    h.store.pairs = vi.fn(async () => []);
+    const reasons = (id: number) =>
+      (h.frames.get(id)?.notices ?? []).filter(
+        (n) => n.type === 'reason' && n.reason === 'newAccountsOnly',
+      ).length;
+    const pair = h.context.characters.map((c, i) => ({ ...c, pid: i + 1 }));
+    const invite = (participants: typeof pair, joinedPids: number[]) => {
+      h.service.observe({
+        type: 'referralEvidence',
+        kind: 'party',
+        participants,
+        invited: true,
+        joinedPids,
+      });
+      return flush();
+    };
+    await invite(pair, [1, 2]);
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // An established character joins: nothing new to explain to the grouped pair.
+    const veteran = { ...pair[1], pid: 3, accountId: 30, characterId: 300, name: 'Vet', level: 20 };
+    await invite([...pair, veteran], [3]);
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // Another new, unbound character joins: each of the pair learns about the newcomer once.
+    const newcomer = { ...pair[1], pid: 4, accountId: 40, characterId: 400, name: 'New' };
+    await invite([...pair, veteran, newcomer], [4]);
+    expect([reasons(100), reasons(200)]).toEqual([2, 2]);
   });
   it('does not explain unbound accounts to bound friends who accept an invite', async () => {
     const h = setup();
