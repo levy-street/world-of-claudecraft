@@ -88,6 +88,8 @@ const RIME_RINGS = 3;
 
 const ICE_COLORS = [0x8fd0ff, 0xa8dcff, 0x7cc4f4, 0xbfe6ff] as const;
 const STONE_COLORS = [0x6b5a48, 0x5d5246, 0x77695a] as const;
+/** Thrown chunks read lighter than the blades (small and against the floor). */
+const CHUNK_COLORS = [0x9c8b76, 0x8d8172, 0xa89a88] as const;
 const FROST_RGB = [0.78, 0.92, 1] as const;
 const DUST_RGB = [0.62, 0.6, 0.58] as const;
 
@@ -376,7 +378,7 @@ export class FinalAvalancheFx {
           _s.set(_d.size, _d.size * 0.8, _d.size * 1.1),
         );
         this.chunks.setMatrixAt(i, _m);
-        this.chunks.setColorAt(i, _c.setHex(ice ? 0xcfeaff : STONE_COLORS[c % 3]));
+        this.chunks.setColorAt(i, _c.setHex(ice ? 0xcfeaff : CHUNK_COLORS[c % 3]));
       }
       const e = spikeEruption(t);
       if (!e.shown) continue;
