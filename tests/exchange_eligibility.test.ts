@@ -206,14 +206,18 @@ describe('the exchange rail refuses exactly what the sibling TRANSFER-lock pipes
 });
 
 describe('the REAL catalog applies collectible transfer policy', () => {
-  it('has a mount item per catalog mount and refuses exclusive membership and referral rewards', () => {
+  it('has a mount item per catalog mount and refuses exclusive membership, referral and raid rewards', () => {
     const mountItems = Object.values(ITEMS).filter((i) => exchangeItemCategory(i) === 'mount');
     // One tradable handle per catalog mount: a mount with no item behind it
     // would be untradable no matter what the policy said.
     expect(mountItems.length).toBe(Object.keys(MOUNTS).length);
     const blocked = mountItems.filter((i) => exchangeHardLock(i, undefined) !== null);
+    // The Quarryheart Charger is the Smith's Heart raid's meta-achievement reward
+    // (content/mounts.ts SMITHS_HEART_META_MOUNT): soulbound to the character who
+    // cleared the raid, like every achievement reward.
     expect(blocked.map((i) => i.id).sort()).toEqual([
       'reins_nightwing_chimera',
+      'reins_quarryheart_charger',
       'reins_referral_raptor',
       'reins_referral_tank',
       'reins_wobbles_slime',

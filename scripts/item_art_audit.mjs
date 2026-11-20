@@ -169,8 +169,12 @@ const build = await buildItemArtAudit({
     // Wobbles the Slime's reins add one owner and one live definition.
     // + the sprite whistle and Lantern Hall seal/reins: 2186 owners / 2215 live items.
     // Recovered Season 2 feral staff and eight jewelry items, each with its own art.
-    catalogCount: 2191,
-    liveItemCount: 2220,
+    // + the Smith's Heart raid's three items, each with its own art
+    // (reins_quarryheart_charger, remnant_of_the_masterless_strength,
+    // coffer_of_the_highwatch_vigil): 2194 owners / 2223 live items, measured with
+    // `node scripts/item_art_audit.mjs --verify-only`.
+    catalogCount: 2194,
+    liveItemCount: 2223,
     // Companion items are removed; only the Infernal Quiver awaits artwork.
     pendingArtCount: 1,
     generatedHeroicDefinitions: 116,

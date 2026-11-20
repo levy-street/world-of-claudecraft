@@ -903,11 +903,14 @@ describe('item-art audit builder', () => {
       // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
       // Release adds five painted owners; measured with --verify-only on the combined tree.
       // Restored feral staff and eight jewelry paintings; measured with --verify-only.
-      catalogSha256: '5ef9cee82541194673dc4768027c5f0b6f0667b11c63f251501db76473f75b58',
-      catalogBytes: 1196985,
+      // 2194 / 2223 with the Smith's Heart raid's three painted items (the Quarryheart
+      // Charger's reins, the Remnant of the Masterless Strength and the Coffer of the
+      // Highwatch Vigil), sha and bytes re-measured with --verify-only on the raid branch.
+      catalogSha256: 'c0bfaf0b9616b04470e99fb4f8e9ceda90cc85ef0cedd147e1f4926c22aa01ff',
+      catalogBytes: 1198646,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2191,
-      liveItemCount: 2220,
+      catalogCount: 2194,
+      liveItemCount: 2223,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -925,7 +928,7 @@ describe('item-art audit builder', () => {
         identity: 45,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '1ce5db8bb37fa5ce649ebbe18dfc23033f71c30674578a65291856e750195d0b',
+      shippingCatalogSha256: '51155edb05aad906170e674436d68eb98ef323da64f81bd3a38c1a2776e6ecc5',
       machineChecksPassed: true,
       verdict: null,
     });
