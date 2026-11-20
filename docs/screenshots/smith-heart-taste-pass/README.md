@@ -45,6 +45,33 @@ the horizon there; over the cliffs nothing moves.
 - From the Ring's east rim, west down the Heat's mouth: [before](before-07-hub-sky.jpg),
   [after](after-07-hub-sky.jpg). (The dim river in the foreground is the second change.)
 
+## The dim rivers lie still
+
+Since 2026-11-20 a dim river no longer moves (the owner's call: a river that moves is a river
+whose guardian has fallen). Its glow, the Breath's kinks and beads and the Hammer's glints are
+held where they lie, and only the bright ribbon flows. A still cannot show that: the after
+frames above caught the dim rivers mid-pulse and read the same in a single frame. It is pinned
+in `tests/smith_heart_river_veins.test.ts` (a dim ribbon's program reads no clock, and the
+rivers' frame driver leaves its uniforms alone).
+
+## The Breath's back isles, swung north
+
+The owner asked for the east chain of the Islands of the Wind opposite the west one. That side
+of the Storm Cornice is the edge of the field and of the instance slot, and past the crown's
+ridge an isle would look into the Heart's chamber, so the chain swings as far as it can
+instead (design doc section 7.2). No mechanic changed: the rides, the adds and the Stillstone
+follow the isles.
+
+- From above, where they were and where they are: [the plan](back-isles-from-above.png).
+- From the Cornice's floor, the same camera on the same build: [before](before-08-back-isles.jpg),
+  [after](after-08-back-isles.jpg).
+- Standing on the first of them in the live phase, its adds risen:
+  [after](after-09-ride-to-first-back-isle.jpg).
+
+Pairs 01 to 07 above were taken before the raid branch's push of 2026-11-18 and 2026-11-19 was
+merged into this change (the Breath's isles phase, the Heat's lava waves, the final boss's
+rework): both sides of each pair predate it.
+
 ## The lowest graphics preset, and a phone
 
 Route information and progress draw on every tier, so both changes were checked where the
