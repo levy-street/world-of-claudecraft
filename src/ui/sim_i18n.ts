@@ -599,6 +599,12 @@ const baseEnTable = {
   'groundPickup.wreckfieldFlotsamCrateEnough': 'You have salvaged all the flotsam Edda marked.',
   'groundPickup.gullhavenWatchbellDeny': "The watchbell answers only the bellkeeper's errand.",
   'groundPickup.gullhavenWatchbellEnough': 'Every coastal watchbell has been rung.',
+  'groundPickup.councilInscriptionDeny':
+    "The inscription is cut deep into the stone. Without the Keeper's errand, there is nothing here to copy.",
+  'groundPickup.councilInscriptionEnough': 'You have copied every council inscription the Keeper asked for.',
+  'groundPickup.colossusMakersMarkDeny':
+    "The maker's mark is worn into the giant's plating. Without a reason to study it, it tells you nothing.",
+  'groundPickup.colossusMakersMarkEnough': "You have already taken a rubbing of the maker's mark.",
   // Item-agnostic: every multi-count `interact` objective credits once per
   // distinct object, so this covers all of them (bells rung, lanterns relit,
   // banners planted, carts righted). Emitted from interactObjectForQuests.

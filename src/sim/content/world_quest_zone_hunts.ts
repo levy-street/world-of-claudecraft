@@ -327,7 +327,7 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     'wq_quartered_heatsworn_embers',
     'quartered_isle',
     20,
-    { x: 201, z: 2255, radius: 36 },
+    { x: 192, z: 2248, radius: 41 },
     'heatsworn_ember',
     6,
   ),

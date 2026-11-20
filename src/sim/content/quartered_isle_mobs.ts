@@ -214,7 +214,7 @@ export const QUARTERED_ISLE_CAMPS: CampDef[] = [
   // the Cinderscar: Embers in the Burnways, Callers beside them, hound packs set back
   // from the Cinderscar road, the Brute alone in the Glassfield
   camp('heatsworn_ember', 184, 2248, 7, 3),
-  camp('heatsworn_ember', 218, 2246, 7, 3),
+  camp('heatsworn_ember', 190, 2224, 7, 3),
   camp('heatsworn_ember', 202, 2270, 7, 3),
   camp('cinderscar_caller', 172, 2202, 6, 2),
   camp('cinderscar_caller', 194, 2188, 6, 2),
