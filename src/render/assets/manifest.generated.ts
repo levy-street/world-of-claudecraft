@@ -572,6 +572,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/orc_hit_variety_anims.glb": "/media/models/creatures/orc_hit_variety_anims.d42d073bedbd.glb",
   "models/creatures/orcenemy.glb": "/media/models/creatures/orcenemy.49c2f413407e.glb",
   "models/creatures/pyre_colossus.glb": "/media/models/creatures/pyre_colossus.5edb7b6c76e6.glb",
+  "models/creatures/remnant_first_colossus.glb": "/media/models/creatures/remnant_first_colossus.1a0c9f5e3f9a.glb",
+  "models/creatures/rimeglass_bear.glb": "/media/models/creatures/rimeglass_bear.860af09f6ea1.glb",
   "models/creatures/sanctum_boneguard.glb": "/media/models/creatures/sanctum_boneguard.f5b2f8006861.glb",
   "models/creatures/sanctum_glacier_splinter.glb": "/media/models/creatures/sanctum_glacier_splinter.6527188b56ed.glb",
   "models/creatures/sanctum_goadsmith.glb": "/media/models/creatures/sanctum_goadsmith.4643ea429aed.glb",

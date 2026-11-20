@@ -71,6 +71,8 @@ def import_glb(path, tag):
 
 def skinned_mesh(objs):
     meshes = [o for o in objs if o.type == 'MESH' and any(m.type == 'ARMATURE' for m in o.modifiers)]
+    if not meshes:  # an unrigged body (the Rimeglass Bear): its one plain mesh
+        meshes = [o for o in objs if o.type == 'MESH']
     if len(meshes) != 1:
         raise RuntimeError(f'expected one skinned mesh, found {[o.name for o in meshes]}')
     return meshes[0]
@@ -93,6 +95,7 @@ def detached_body(src, name):
 def main():
     a = parse()
     model = anatomy.MODELS[a.model]
+    motion.STRIDE = model.get('stride_scale', 1.0)
     clear_scene()
     scene = bpy.context.scene
     scene.render.fps = motion.FPS

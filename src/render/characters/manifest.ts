@@ -4590,6 +4590,17 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     authoredAtlas: true,
   },
+  // The Hoarshelf's Rimeglass Bear: a Tripo body on the wolf rig, re-fitted to
+  // the bear (scripts/assets/rimeglass_bear/), so it plays the wolf clip names.
+  // Its Idle (a breathing sniff) and Attack (a bite) are its own; the gaits and
+  // the death are the wolf's, strides scaled to its shorter legs. Baked frost
+  // texture, so no entity tint.
+  mob_rimeglass_bear: {
+    url: `${CREATURES}/rimeglass_bear.glb`,
+    height: 2.3,
+    clips: WOLF_BAKED,
+    authoredAtlas: true,
+  },
   // Shared fallback rig for the remaining warlock demons. The entity colour
   // and the mob template's scale distinguish their silhouettes.
   mob_demon: {
@@ -8372,7 +8383,7 @@ const MOB_KEYS: Record<string, string> = {
   // The rest of the Quartered Isle's mobs reuse shipped bodies, recoloured by their
   // template colour where the body takes an entity tint (content/quartered_isle_mobs.ts).
   quench_shardling: 'mob_hoard_rime_elemental',
-  rimeglass_bear: 'mob_bear',
+  rimeglass_bear: 'mob_rimeglass_bear',
   warden_of_the_quench: 'mob_hoard_hoarfrost_warden',
   heatsworn_ember: 'mob_emberkin',
   cinderscar_caller: 'mob_hoard_ember_fiend',

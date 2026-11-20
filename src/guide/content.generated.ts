@@ -2856,10 +2856,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "rimeglass_bear",
-        "model": "mob_bear",
-        "tint": "#5a4030",
-        "tintStrength": 0.5,
-        "still": "/guide-stills/mob_bear__5a4030__s50.webp"
+        "model": "mob_rimeglass_bear",
+        "still": "/guide-stills/mob_rimeglass_bear.webp"
       },
       {
         "name": "Shoal Scuttler",
@@ -22824,11 +22822,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "yaw": -1.5707963267948966,
     "tintStrength": 0.35
   },
-  "mob_bear": {
-    "url": "models/creatures/yetialt.glb",
+  "mob_rimeglass_bear": {
+    "url": "models/creatures/rimeglass_bear.glb",
     "idle": "Idle",
-    "height": 2.2,
-    "tintStrength": 0.5
+    "height": 2.3
   },
   "mob_hoard_ember_fiend": {
     "url": "models/creatures/hoard_ember_fiend.glb",

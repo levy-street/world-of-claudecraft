@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a37658d7b7ea0a6fef22cb09f7a8b4b854d402e1dcff228b9a9021433bdcf16a",
+  "rendererFingerprint": "eb4f1e20c43f0d3dec94bdfedc8c3bfc04f20296eb7d37d5881184c6296d46f5",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "linux",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6975598,
-      "sha256": "aa8f477e4f514750ad501c37020f524ffda0fa825c22a7a95260b9573f0b9990",
+      "bytes": 6976973,
+      "sha256": "6768700b761e92fb08987897882ff261b50c05c5ee9c013ad9b80b0e77232af7",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -10382,34 +10382,34 @@
       "id": "rimeglass_bear",
       "family": "beast",
       "finderEncounter": false,
-      "visualKey": "mob_bear",
+      "visualKey": "mob_rimeglass_bear",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/yetialt.glb",
-          "path": "public/models/creatures/yetialt.glb",
-          "bytes": 149784,
-          "sha256": "6c14f370c2aff231186aee084902113e58823e1cd97f5dd9958417c4a9288767"
+          "url": "models/creatures/rimeglass_bear.glb",
+          "path": "public/models/creatures/rimeglass_bear.glb",
+          "bytes": 2051348,
+          "sha256": "860af09f6ea15112efbdea7689b43357af2fdbd95af421e9848f7604245ef678"
         },
         "idle": "Idle",
-        "height": 2.2,
+        "height": 2.3,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.5
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#5a4030",
-        "resolved": "#5a4030",
-        "strength": 0.5
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "9d9c62362e9d5d894cef31ff20e661aadb53eb987384a937bc29d47032e0e75e",
+      "sourceFingerprint": "5c5c7d14f0a9adb2cb458ea86d5f51bcd923ad37c4bb6e1ae95680ad3815aece",
       "output": {
         "path": "public/ui/mobs/rimeglass_bear.webp",
-        "bytes": 1930,
-        "sha256": "d493492ccfde4e608bde39b32bd88c4737912c32a5584370363eafc8bf362fc0"
+        "bytes": 3236,
+        "sha256": "d8d0707c538ab5b57e8417b2029541b5892f4e0239e886eabec3e34836a814df"
       }
     },
     {
