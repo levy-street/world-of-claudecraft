@@ -230,6 +230,7 @@ const PLANS = {
         // In the quarter (its element), the witness the boss's tank.
         spot: QUARTER_SPOTS[v],
         aggroTo: 'me',
+        quiet: true,
         trigger: [
           ['/dev heart final strike 1', 1500],
           ['/dev heart final strike 1', 1500],
@@ -267,6 +268,7 @@ const PLANS = {
         trigger: [`/dev heart final fusion ${combo}`],
         // Inside the quarter it enters, 30 yd out (the combo lands there).
         spot: QUARTER_SPOTS[to],
+        quiet: true,
         views: {
           high: [0, 1.0, 46],
           raid: [0.6, 0.3, 32],
@@ -285,9 +287,15 @@ const PLANS = {
     standOff: 16,
     raid: 6,
     raidSpread: 8,
-    setup: ['/dev heart final reset', '/dev heart final quarter hammer', '/dev heart final pull'],
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final heroic',
+      '/dev heart final quarter hammer',
+      '/dev heart final pull',
+    ],
     // The boss on Raider1 (its tank): the witness is free to be marked.
     aggroTo: 0,
+    quiet: true,
     trigger: ['/dev heart final opposites'],
     // The marked meet: each walks to its opposite (Fire to Ice, Earth to
     // Lightning) after a few seconds.
@@ -468,6 +476,25 @@ try {
   );
   for (const c of plan.setup) await chat(c, 1200);
   await place();
+  // A quiet fight (the boss's own elements' captures): every other clock held
+  // (the stars, the quarter kit, the Anvil, the strike and the polarity
+  // rounds), re-held every half second, so the shot shows the one mechanic.
+  if (plan.quiet)
+    await page.evaluate((tmpl) => {
+      const hold = () => {
+        for (const e of window.__game.world.entities.values()) {
+          const st = e.kind === 'mob' && e.templateId === tmpl ? e.smithHeartFinal : null;
+          if (!st) continue;
+          for (const v of ['heat', 'quench', 'breath', 'hammer']) st.stars.clock[v] = 1e9;
+          st.anvilClock = 1e9;
+          for (const k of Object.keys(st.kit)) if (typeof st.kit[k] === 'number') st.kit[k] = 1e9;
+          st.elements.strikeClock = 1e9;
+          st.elements.polarityClock = 1e9;
+        }
+      };
+      hold();
+      setInterval(hold, 500);
+    }, plan.bossTemplate);
   if (plan.aggroTo !== undefined)
     await page.evaluate(
       ([tmpl, i]) => {

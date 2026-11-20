@@ -18,7 +18,7 @@
 // at the gate); the materials go to the owner's list for its dispose.
 
 import * as THREE from 'three';
-import type { TelegraphFan, TelegraphKit } from '../floor_telegraph';
+import type { TelegraphFan, TelegraphKit, TelegraphLane } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
   FINAL_TELEGRAPH_LOOKS,
@@ -45,6 +45,15 @@ export interface FinalTelegraphFan {
   kind: FinalTelegraphKind | null;
 }
 
+/** A dressed lane of one element (the boss's own combos' lanes and links:
+ *  final_elements_fx.ts), the fan's paint on the kit's lane. */
+export interface FinalTelegraphLane {
+  lane: TelegraphLane;
+  element: FinalElement;
+  look: Record<string, THREE.IUniform<number>>;
+  kind: FinalTelegraphKind | null;
+}
+
 const ELEMENT_DEFINE: Readonly<Record<Exclude<FinalElement, 'fire'>, string>> = {
   frost: 'FT_FROST',
   storm: 'FT_STORM',
@@ -61,6 +70,22 @@ export class FinalTelegraphs {
   /** A pooled fan (a ring at 360) in `element`'s paint. */
   fan(element: FinalElement, rung: number): FinalTelegraphFan {
     const f = this.kit.fan(rung);
+    const look = this.dress(f, element);
+    return { fan: f, element, look, kind: null };
+  }
+
+  /** A pooled lane in `element`'s paint (the same two passes as a fan). */
+  lane(element: FinalElement, rung: number): FinalTelegraphLane {
+    const l = this.kit.lane(rung);
+    const look = this.dress(l, element);
+    return { lane: l, element, look, kind: null };
+  }
+
+  /** Dress a kit footprint (a fan's or a lane's) in `element`'s paint. */
+  private dress(
+    f: Pick<TelegraphFan, 'floor' | 'floorMat' | 'curtain'>,
+    element: FinalElement,
+  ): Record<string, THREE.IUniform<number>> {
     const look: Record<string, THREE.IUniform<number>> = {
       uChar: { value: 0.5 },
       uBody: { value: 1 },
@@ -111,11 +136,11 @@ export class FinalTelegraphs {
     glow.renderOrder = floorVfxRenderOrder('encounter', this.steps.glow);
     f.floor.add(glow);
     if (f.curtain) f.curtain.renderOrder = floorVfxRenderOrder('encounter', this.steps.curtain);
-    return { fan: f, element, look, kind: null };
+    return look;
   }
 
   /** Give a dressed fan its kind's look (no allocation). */
-  setLook(d: FinalTelegraphFan, kind: FinalTelegraphKind): void {
+  setLook(d: FinalTelegraphFan | FinalTelegraphLane, kind: FinalTelegraphKind): void {
     if (d.kind === kind) return;
     const L = FINAL_TELEGRAPH_LOOKS[kind];
     d.kind = kind;
@@ -126,6 +151,7 @@ export class FinalTelegraphs {
     d.look.uCrack.value = L.crack;
     d.look.uRimK.value = L.rim;
     d.look.uInward.value = L.inward;
-    if (d.fan.curtain) d.fan.curtain.visible = L.curtain;
+    const curtain = 'fan' in d ? d.fan.curtain : d.lane.curtain;
+    if (curtain) curtain.visible = L.curtain;
   }
 }

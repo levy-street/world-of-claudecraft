@@ -66,7 +66,13 @@ export type FinalTelegraphKind =
   | 'residueFire'
   | 'residueFrost'
   | 'residueStorm'
-  | 'residueStone';
+  | 'residueStone'
+  // Their lanes (final_elements_fx.ts): Firestorm's in the molten basalt,
+  // Avalanche's in frost creeping toward the centre, the Storm Spires'
+  // links in a crackling storm line.
+  | 'fireLane'
+  | 'avalancheLane'
+  | 'spireLink';
 
 export interface FinalTelegraphLook {
   element: FinalElement;
@@ -150,6 +156,9 @@ export const FINAL_TELEGRAPH_LOOKS: Readonly<Record<FinalTelegraphKind, FinalTel
   residueFrost: look('frost', 0.42, 0.8, 0.8, 0.7, { rim: 0.7, curtain: false }),
   residueStorm: look('storm', 0.32, 0.8, 0.8, 0.7, { rim: 0.7, curtain: false }),
   residueStone: look('stone', 0.42, 0.8, 0.8, 0.7, { rim: 0.7, curtain: false }),
+  fireLane: look('fire', 0.5, 1, 0.55, 1),
+  avalancheLane: look('frost', 0.55, 1, 0.75, 1, { inward: 1 }),
+  spireLink: look('storm', 0.45, 1, 0.9, 1, { curtain: false }),
 };
 
 /** The dressed fans each element keeps (fixed, allocated at build): the

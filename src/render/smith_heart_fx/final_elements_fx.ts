@@ -78,9 +78,11 @@ import {
   orbitPiece,
   ELEMENT_FX_POOLS as P,
   POLARITY_LOOKS,
+  STACK_PIP_COLORS,
   sigilLook,
   spikeRise,
   spireGlow,
+  stackPip,
   steamPuff,
   strikeAuraLook,
   veinColor,
@@ -100,7 +102,8 @@ import {
   WALL_VERT,
 } from './final_elements_glsl';
 import { KIT_UV_VERT } from './final_kit_glsl';
-import type { FinalTelegraphKind } from './final_telegraph_core';
+import type { FinalElement, FinalTelegraphKind } from './final_telegraph_core';
+import type { FinalTelegraphLane, FinalTelegraphs } from './final_telegraphs';
 import { fxHash } from './hammer_fx_core';
 
 /** What FinalKitFx lends its elements' painter. */
@@ -144,6 +147,10 @@ export interface FinalElementsHost {
   laneRung: number;
   /** The lava crust's floor rung (under the fans' glows, over the floor). */
   crustRung: number;
+  /** The kit's element telegraphs: the lanes and links dressed in their
+   *  element's paint (the fans' char rung). */
+  tele: FinalTelegraphs;
+  charRung: number;
 }
 
 const T = TELEGRAPH_THREAT_COLORS;
@@ -183,6 +190,7 @@ interface Uni {
 }
 
 interface LaneSlot {
+  d: FinalTelegraphLane;
   lane: TelegraphLane;
   id: number;
   seen: boolean;
@@ -222,6 +230,11 @@ export class FinalElementsFx {
   private shellUsed = 0;
   private readonly tankPieces: THREE.InstancedMesh;
   private tankPieceUsed = 0;
+  /** Searing Burn's column of flame round the tank's body (by tank slot). */
+  private readonly burnColumns: { mesh: THREE.Mesh; u: Uni }[] = [];
+  /** The stack count's gems orbiting each tank's head. */
+  private readonly pips: THREE.InstancedMesh;
+  private pipUsed = 0;
   private readonly lastPulse = new Map<number, number>();
   // ---- the marks ----
   private readonly sigils: { mesh: THREE.Mesh; u: Uni }[] = [];
@@ -249,6 +262,8 @@ export class FinalElementsFx {
   /** The lava pools' crust discs (Magma Rift). */
   private readonly crusts: { mesh: THREE.Mesh; u: Uni; id: number; seen: boolean }[] = [];
   private spikeUsed = 0;
+  /** Which burn columns were drawn this frame (by tank slot). */
+  private readonly burnSeen: boolean[] = [false, false, false];
   /** The spires seen this frame by group: their places in index order. */
   private readonly groups = new Map<
     number,
@@ -336,6 +351,35 @@ export class FinalElementsFx {
     const spikeGeo = new THREE.ConeGeometry(0.7, 1, 6, 1).translate(0, 0.5, 0);
     const hailGeo = new THREE.IcosahedronGeometry(1, 1);
     h.geometries.push(crystal, rock, spikeGeo, hailGeo);
+    // Searing Burn: a column of flame tongues wrapping the tank (its shape
+    // reads where the colour alone would not, in the Heat's own orange).
+    const columnGeo = new THREE.CylinderGeometry(1, 0.8, 1, 28, 1, true).translate(0, 0.5, 0);
+    h.geometries.push(columnGeo);
+    for (let i = 0; i < P.tanks; i++) {
+      const u: Uni = {
+        uTime: h.uTime,
+        uAlpha: { value: 0 },
+        uSeed: { value: i * 4.1 },
+        uWrap: { value: 1 },
+      };
+      const m = mesh(
+        columnGeo,
+        shader('smithHeartFinalBurnColumn', u, WALL_VERT, WALL_FRAG, {
+          blending: THREE.AdditiveBlending,
+          side: THREE.DoubleSide,
+        }),
+        'smithHeartFinalBurnColumn',
+      );
+      this.burnColumns.push({ mesh: m, u });
+    }
+    const pipGeo = new THREE.OctahedronGeometry(0.16, 0).scale(1, 1.6, 1);
+    h.geometries.push(pipGeo);
+    this.pips = instanced(
+      pipGeo,
+      solid('smithHeartFinalStackPips', 0),
+      P.tanks * P.pips,
+      'smithHeartFinalStackPips',
+    );
     this.tankPieces = instanced(
       crystal,
       solid('smithHeartFinalStrikePieces', 1),
@@ -426,19 +470,36 @@ export class FinalElementsFx {
     const wallGeo = new THREE.PlaneGeometry(1, 1, 1, 1).translate(0, 0.5, 0);
     h.geometries.push(wallGeo);
     for (let i = 0; i < P.walls; i++) {
-      const u: Uni = { uTime: h.uTime, uAlpha: { value: 0 }, uSeed: { value: i * 5.3 } };
+      const u: Uni = {
+        uTime: h.uTime,
+        uAlpha: { value: 0 },
+        uSeed: { value: i * 5.3 },
+        uWrap: { value: 0 },
+      };
       const mat = shader('smithHeartFinalFlameWall', u, WALL_VERT, WALL_FRAG, {
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide,
       });
       const planes: THREE.Mesh[] = [];
-      for (let k = 0; k < 4; k++) planes.push(mesh(wallGeo, mat, 'smithHeartFinalFlameWall'));
+      // Three across the lane (its face, read from along it) and three along
+      // it (its flanks, read from the side): a wall of flame from any camera.
+      for (let k = 0; k < 6; k++) planes.push(mesh(wallGeo, mat, 'smithHeartFinalFlameWall'));
       this.walls.push({ planes, u, id: -1, seen: false });
     }
 
     // ---- the lanes: Firestorm's, Avalanche's, the spires' links ----
-    for (let i = 0; i < P.walls + P.spikeLanes + P.spires; i++)
-      this.lanes.push({ lane: h.kit.lane(h.laneRung), id: -1, seen: false });
+    // Each in its element's paint (never the plain threat orange): the
+    // Firestorm's molten basalt, the Avalanche's frost, the links' storm.
+    const lanePool: [FinalElement, number][] = [
+      ['fire', P.walls],
+      ['frost', P.spikeLanes],
+      ['storm', P.spires + 2],
+    ];
+    for (const [el, n] of lanePool)
+      for (let i = 0; i < n; i++) {
+        const d = h.tele.lane(el, h.charRung);
+        this.lanes.push({ d, lane: d.lane, id: -1, seen: false });
+      }
     for (const l of this.lanes) l.lane.group.visible = false;
 
     // ---- the lava pools' crust ----
@@ -486,6 +547,7 @@ export class FinalElementsFx {
     this.seenNow.clear();
     this.shellUsed = 0;
     this.tankPieceUsed = 0;
+    this.pipUsed = 0;
     this.sigilUsed = 0;
     this.markPieceUsed = 0;
     this.hailUsed = 0;
@@ -750,6 +812,9 @@ export class FinalElementsFx {
         c.mesh.visible = false;
       }
     for (let i = this.shellUsed; i < this.shells.length; i++) this.shells[i].mesh.visible = false;
+    for (let i = 0; i < this.burnColumns.length; i++)
+      if (!this.burnSeen[i]) this.burnColumns[i].mesh.visible = false;
+    this.burnSeen.fill(false);
     for (let i = this.sigilUsed; i < this.sigils.length; i++) this.sigils[i].mesh.visible = false;
     if (!this.fusionSeen)
       for (const o of this.orbs) {
@@ -757,6 +822,7 @@ export class FinalElementsFx {
         o.glow.visible = false;
       }
     this.flush(this.tankPieces, this.tankPieceUsed);
+    this.flush(this.pips, this.pipUsed);
     this.flush(this.markPieces, this.markPieceUsed);
     this.flush(this.hailBalls, this.hailUsed);
     this.flush(this.spikes, this.spikeUsed);
@@ -810,6 +876,48 @@ export class FinalElementsFx {
       sh.mesh.visible = true;
     }
     const rgb = veinRgb(vein);
+    const slot = this.shellUsed - 1;
+    // The count, as gems orbiting over the head: one per stack.
+    for (let k = 0; k < stacks && k < P.pips; k++) {
+      const pp = stackPip(this.clock, k, Math.min(stacks, P.pips));
+      const i = slot * P.pips + k;
+      this.piece(
+        this.pips,
+        i,
+        at.x + Math.cos(pp.angle) * 0.7,
+        y + pp.height,
+        at.z + Math.sin(pp.angle) * 0.7,
+        1,
+        1,
+        1,
+        0,
+        pp.angle,
+        0,
+        STACK_PIP_COLORS[vein],
+      );
+      this.pipUsed = Math.max(this.pipUsed, i + 1);
+    }
+    // Searing Burn: the flame column round the body, taller per stack, its
+    // dark smoke plume over the head (contrast against the Heat's orange).
+    if (vein === 'heat' && slot >= 0 && slot < this.burnColumns.length) {
+      const col = this.burnColumns[slot];
+      col.mesh.position.set(at.x, y - 0.1, at.z);
+      col.mesh.scale.set(look.radius * 0.95, 2.3 + 0.42 * Math.min(stacks, 8), look.radius * 0.95);
+      col.u.uAlpha.value = 0.65 + 0.35 * look.strength;
+      col.mesh.visible = true;
+      this.burnSeen[slot] = true;
+      if (H.rand() < (4 + 3 * stacks) * this.dt * H.density)
+        H.particles.puff(at.x, y + 2.6 + 0.3 * stacks, at.z, 1, {
+          speed: 0.6,
+          up: 2.4,
+          life: 1.8,
+          size: [1.0, 2.8],
+          color: [0.09, 0.07, 0.06],
+          alpha: 0.6,
+          pool: 'smoke',
+          radius: 0.4,
+        });
+    }
     // The pieces it wears: frost crystals crusting it, stone plates clinging.
     if (vein === 'quench' || vein === 'hammer') {
       const base = (this.shellUsed - 1) * P.tankPieces;
@@ -922,7 +1030,7 @@ export class FinalElementsFx {
     if (sg) {
       const s = sigilLook(this.clock, left, total, H.reducedMotion());
       sg.mesh.position.set(at.x, y + s.lift, at.z);
-      sg.mesh.scale.setScalar(s.size * 0.5);
+      sg.mesh.scale.setScalar(s.size * 0.8);
       sg.u.uShape.value = look.shape;
       sg.u.uPulse.value = s.pulse;
       (sg.u.uColor.value as THREE.Color).setHex(look.color);
@@ -1039,14 +1147,15 @@ export class FinalElementsFx {
       const grow = live ? 1 : 0.4 + 0.6 * fill;
       const size = b.size * (0.55 + 0.45 * grow);
       // Never cut by the floor: a billow's foot stays over it.
-      c.billows[k].position.set(x + b.x, y + Math.max(b.y * grow, size * 0.62), z + b.z);
+      c.billows[k].position.set(x + b.x, y + Math.max(b.y * grow, size * 1.0), z + b.z);
       c.billows[k].scale.setScalar(size);
       c.billows[k].visible = true;
     }
     // Steam boiling up off the scald, thick while it is live.
     const n = Math.round((live ? 26 : 8) * this.dt * H.density + H.rand() * 0.7);
     for (let i = 0; i < n; i++)
-      H.particles.puff(x + (H.rand() - 0.5) * r * 1.5, y + 0.4, z + (H.rand() - 0.5) * r * 1.5, 1, {
+      // Born a body's height up so no puff is ever cut by the floor.
+      H.particles.puff(x + (H.rand() - 0.5) * r * 1.5, y + 2.6, z + (H.rand() - 0.5) * r * 1.5, 1, {
         speed: 0.6,
         up: 2.2 + H.rand() * 1.5,
         life: 2.6,
@@ -1066,7 +1175,7 @@ export class FinalElementsFx {
     const dz = Math.cos(e.facing);
     const sx = at.x - dx * info.length * 0.5;
     const sz = at.z - dz * info.length * 0.5;
-    const lane = this.laneFor(e.id);
+    const lane = this.laneFor(e.id, 'fireLane');
     const run = info.length / E.fireSpeed;
     const front = burn ? laneFront(since, info.length, run) : 0;
     if (lane) {
@@ -1098,17 +1207,22 @@ export class FinalElementsFx {
     w.seen = true;
     const fw = flameWall(since);
     w.u.uAlpha.value = front >= info.length - 0.01 ? Math.max(0, 1 - (since - run) * 4) : fw.alpha;
-    // Four planes across the lane, a stride apart along it: a wall with depth.
+    // Three planes across the lane a stride apart (the face) and three along
+    // it behind the front (the flanks and the heart): a wall with depth that
+    // reads from any camera.
+    const depth = 6;
     for (let k = 0; k < w.planes.length; k++) {
-      const off = front - k * 1.3;
-      const px = sx + dx * Math.max(0, off);
-      const pz = sz + dz * Math.max(0, off);
       const pl = w.planes[k];
+      const across = k < 3;
+      const off = across ? front - k * 1.6 : front - depth / 2;
+      const lateral = across ? 0 : (k - 4) * info.half * 0.85;
+      const px = sx + dx * Math.max(0, off) + dz * lateral;
+      const pz = sz + dz * Math.max(0, off) - dx * lateral;
       pl.position.set(px, H.groundY(px, pz) - 0.2, pz);
-      // Its face across the lane (the plane's own normal along its run).
-      pl.rotation.set(0, e.facing, 0);
-      pl.scale.set(info.half * 2.2, fw.height * (1 - k * 0.14), 1);
-      pl.visible = off > 0;
+      pl.rotation.set(0, across ? e.facing : e.facing + Math.PI / 2, 0);
+      const hgt = fw.height * (across ? 1 - k * 0.12 : k === 4 ? 1.05 : 0.85);
+      pl.scale.set(across ? info.half * 2.2 : Math.min(depth, Math.max(0.5, front)), hgt, 1);
+      pl.visible = off > 0 || (!across && front > 0.5);
     }
     // The fire it drags along and the burnt floor behind.
     const n = Math.round(60 * this.dt * H.density + H.rand());
@@ -1150,7 +1264,7 @@ export class FinalElementsFx {
     const dz = Math.cos(e.facing);
     const sx = at.x - dx * info.length * 0.5;
     const sz = at.z - dz * info.length * 0.5;
-    const lane = this.laneFor(e.id);
+    const lane = this.laneFor(e.id, 'avalancheLane');
     if (lane) {
       H.kit.drapeLane(
         lane.lane,
@@ -1327,7 +1441,7 @@ export class FinalElementsFx {
         const B = list[b];
         if (!A || !B) continue;
         const key = -(100000 + group * 16 + a);
-        const lane = this.laneFor(key);
+        const lane = this.laneFor(key, 'spireLink');
         if (!lane) continue;
         const len = Math.hypot(B.x - A.x, B.z - A.z);
         const yaw = Math.atan2(B.x - A.x, B.z - A.z);
@@ -1348,14 +1462,17 @@ export class FinalElementsFx {
     }
   }
 
-  private laneFor(id: number): LaneSlot | null {
+  private laneFor(id: number, kind: 'fireLane' | 'avalancheLane' | 'spireLink'): LaneSlot | null {
+    const el: FinalElement =
+      kind === 'fireLane' ? 'fire' : kind === 'avalancheLane' ? 'frost' : 'storm';
     let l = this.lanes.find((k) => k.id === id);
     if (!l) {
-      l = this.lanes.find((k) => k.id === -1 && !k.seen);
+      l = this.lanes.find((k) => k.id === -1 && !k.seen && k.d.element === el);
       if (!l) return null;
       l.id = id;
     }
     l.seen = true;
+    this.h.tele.setLook(l.d, kind);
     return l;
   }
 
@@ -1671,7 +1788,8 @@ export class FinalElementsFx {
   }
 
   dispose(): void {
-    for (const m of [this.tankPieces, this.markPieces, this.hailBalls, this.spikes]) m.dispose();
+    for (const m of [this.tankPieces, this.pips, this.markPieces, this.hailBalls, this.spikes])
+      m.dispose();
   }
 
   hide(): void {

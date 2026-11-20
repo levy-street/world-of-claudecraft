@@ -202,6 +202,7 @@ export const WALL_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uAlpha;
 uniform float uSeed;
+uniform float uWrap;
 varying vec2 vUv;
 ${KIT_NOISE}
 void main() {
@@ -211,7 +212,8 @@ void main() {
   float h = 0.42 + 0.5 * kfbm(vec2(x * 6.0 + uSeed, uTime * 1.6));
   float flick = kfbm(vec2(x * 9.0 + uSeed * 3.0, y * 3.0 - uTime * 4.2));
   float shape = smoothstep(h + 0.12, h - 0.25, y + (flick - 0.5) * 0.35);
-  float sides = smoothstep(0.0, 0.08, x) * smoothstep(1.0, 0.92, x);
+  // A wall fades at its two ends; a column round a body wraps (uWrap 1).
+  float sides = mix(smoothstep(0.0, 0.08, x) * smoothstep(1.0, 0.92, x), 1.0, uWrap);
   float heat = clamp(1.0 - y / max(h, 0.05), 0.0, 1.0);
   vec3 col = mix(vec3(0.55, 0.06, 0.02), vec3(1.0, 0.45, 0.08), smoothstep(0.0, 0.45, heat));
   col = mix(col, vec3(1.0, 0.92, 0.66), smoothstep(0.62, 0.98, heat));

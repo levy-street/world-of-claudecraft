@@ -564,6 +564,8 @@ export class FinalKitFx {
       sound: (kind, x, y, z) => this.audio.footprint(kind, x, y, z),
       laneRung: F.lane,
       crustRung: F.crust,
+      tele: this.tele,
+      charRung: F.telegraphChar,
     });
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})

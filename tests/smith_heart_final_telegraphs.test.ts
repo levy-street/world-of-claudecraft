@@ -84,6 +84,9 @@ describe("the final kits' element telegraphs", () => {
       residueFrost: 'frost',
       residueStorm: 'storm',
       residueStone: 'stone',
+      fireLane: 'fire',
+      avalancheLane: 'frost',
+      spireLink: 'storm',
     };
     for (const [k, el] of Object.entries(want))
       expect(finalTelegraphElement(k as FinalTelegraphKind), k).toBe(el);

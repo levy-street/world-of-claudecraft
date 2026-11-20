@@ -228,6 +228,10 @@ export function steamPuff(
   seed: number,
 ): { x: number; y: number; z: number; size: number } {
   const tier = k < n * 0.45 ? 0 : k < n * 0.8 ? 1 : 2;
+  // Each billow rolls up its tier and is reborn at its foot (the churn of
+  // boiling steam): its own phase, swelling then thinning as it climbs.
+  const t = (clock * (0.09 + 0.03 * tier) + k * 0.618 + seed) % 1;
+  const swell = 0.55 + 0.45 * Math.sin(Math.PI * t);
   const a =
     (k / n) * Math.PI * 2 * 2.3 + seed + clock * (0.22 - tier * 0.06) * (k % 2 === 0 ? 1 : -1);
   const spread = tier === 0 ? 0.62 : tier === 1 ? 0.42 : 0.2;
@@ -235,9 +239,10 @@ export function steamPuff(
   const lift = tier === 0 ? 1.4 : tier === 1 ? 4.0 : 6.6;
   return {
     x: Math.cos(a) * ring,
-    y: lift + 0.6 * ((k * 0.43 + seed * 0.3) % 1) + 0.3 * Math.sin(clock * 0.8 + k),
+    y: lift + 0.6 * ((k * 0.43 + seed * 0.3) % 1) + 2.2 * t,
     z: Math.sin(a) * ring,
     size:
+      swell *
       radius *
       (tier === 0 ? 1.15 : tier === 1 ? 1.05 : 0.85) *
       (0.85 + 0.3 * ((k * 0.29 + seed * 0.7) % 1)),
@@ -295,10 +300,31 @@ export function flameWall(t: number): { height: number; alpha: number } {
   return { height: 7.5 + 1.2 * Math.sin(t * 9), alpha: smooth(t / 0.15) };
 }
 
+/** The stack count's pips round a tank (one gem per stack, up to the cap):
+ *  the k-th of n's angle and height at `clock`, so the count reads at a
+ *  glance whatever the element (a shape, not only a colour). */
+export function stackPip(clock: number, k: number, n: number): { angle: number; height: number } {
+  return {
+    angle: (k / Math.max(1, n)) * Math.PI * 2 + clock * 1.6,
+    height: 2.35 + 0.08 * Math.sin(clock * 3 + k),
+  };
+}
+
+/** The pips' bright colour per element (white-gold for the Heat, so it
+ *  stands out of the Heat quarter's own orange). */
+export const STACK_PIP_COLORS = {
+  heat: 0xfff0b8,
+  quench: 0xd2f4ff,
+  breath: 0xe6d8ff,
+  hammer: 0xffe0a0,
+} as const;
+
 /** The painter's fixed pools. */
 export const ELEMENT_FX_POOLS = {
   /** Tanks wearing strike stacks (two, a third for a late swap). */
   tanks: 3,
+  /** Stack pips a tank shows (the strike's cap). */
+  pips: 9,
   /** Pieces worn per tank (crystals, plates). */
   tankPieces: 8,
   /** Marked players (Mythic marks eight) and their orbiting pieces. */
@@ -306,7 +332,7 @@ export const ELEMENT_FX_POOLS = {
   markPieces: 6,
   /** Steam clouds (Mythic five) and their billows. */
   clouds: 6,
-  billows: 14,
+  billows: 22,
   /** Flame walls (two lanes on Heroic and Mythic). */
   walls: 3,
   /** Hailstones in the air (four a wave, overlapping waves). */
