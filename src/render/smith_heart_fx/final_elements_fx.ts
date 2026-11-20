@@ -184,6 +184,9 @@ const _mid = { x: 0, y: 0, z: 0 };
 const _pa = { x: 0, y: 0, z: 0 };
 const _pb = { x: 0, y: 0, z: 0 };
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
+/** The draw order of the standing bodies: past the encounter floor band's
+ *  rungs (floorVfxRenderOrder), under the sigils drawn over the world. */
+const BODY_ORDER = 5000;
 
 interface Uni {
   [k: string]: THREE.IUniform;
@@ -295,6 +298,11 @@ export class FinalElementsFx {
       m.name = name;
       m.visible = false;
       m.frustumCulled = false;
+      // Bodies standing off the floor draw AFTER every floor rung: a floor
+      // telegraph (depth-write off, drawn later) must never paint over a
+      // flame wall, a billow or a shell standing on it. Floor pieces set
+      // their own rung after this.
+      m.renderOrder = BODY_ORDER;
       h.root.add(m);
       return m;
     };
