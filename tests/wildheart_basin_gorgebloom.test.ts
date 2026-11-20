@@ -186,6 +186,15 @@ describe('Vine Lash, Gorge and the Bloom Spit', () => {
     const target = f.sim.ctx.entities.get(bloom.castTargetId ?? -1) as Entity;
     expect(target).toBeDefined();
     const yaw = bloom.facing;
+    // The target is picked at random among the raid, and the pull spots are not all
+    // inside the 30 yd lane: stand it two thirds down the lane so the pick (which
+    // moves with the world's shared rng) cannot decide the test.
+    put(
+      f,
+      target,
+      bloom.pos.x - f.ox + Math.sin(yaw) * 20,
+      bloom.pos.z - f.oz + Math.cos(yaw) * 20,
+    );
     // A second player steps into the lane, half way down it.
     const mid = f.others.find((p) => p !== target) as Entity;
     put(f, mid, bloom.pos.x - f.ox + Math.sin(yaw) * 12, bloom.pos.z - f.oz + Math.cos(yaw) * 12);

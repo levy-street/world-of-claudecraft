@@ -1185,9 +1185,9 @@ describe('world-quest zone markers', () => {
       world.player.pos.z = (zone.zMin + zone.zMax) / 2;
       const model = buildOverworldMapModel({ ...input(world, 1), zone });
       expect(model.worldQuests.length, zone.id).toBe(
-        // The Quartered Isle has no world quest until its mobs land in phase 2
-        // (docs/prd/quartered-isle-zone.md), matching tests/world_quests.test.ts.
-        zone.id === 'proving_shore' || zone.id === 'quartered_isle'
+        // The tutorial shore has none; the Quartered Isle gained its zone hunts with
+        // its mobs (content/world_quest_zone_hunts.ts), matching tests/world_quests.test.ts.
+        zone.id === 'proving_shore'
           ? 0
           : zone.id === 'galecrest' || zone.id === 'evergarden'
             ? 2
@@ -1198,8 +1198,8 @@ describe('world-quest zone markers', () => {
         projected++;
       }
     }
-    // 14: Proving Shore left the daily rotation.
-    expect(projected).toBe(14);
+    // 14: Proving Shore left the daily rotation. 15 with the Quartered Isle's hunts.
+    expect(projected).toBe(15);
   });
 
   it('appears from its minimum level in both hosts and changes to active state', () => {
