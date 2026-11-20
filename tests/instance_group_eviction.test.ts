@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, DUNGEONS, dungeonAt } from '../src/sim/data';
+import { dungeonExitStandingPos } from '../src/sim/instances/dungeons';
 import {
   belongsInClaim,
   INSTANCE_EVICTED_TEXT,
   INSTANCE_EVICTION_GRACE_SECONDS,
+  INSTANCE_EVICTION_REMINDER_SECONDS,
   instanceEvictionWarningText,
   outdoorExitSpot,
 } from '../src/sim/instances/instance_group_eviction';
@@ -72,8 +74,13 @@ describe('classic group-instance eviction', () => {
     expect(warned.get(member)).toEqual([WARNING]);
     expect(warned.get(leader)).toBeUndefined();
 
+    // Only the reminders, at 30 and 10 seconds left, before the removal.
     const during = advance(sim, INSTANCE_EVICTION_GRACE_SECONDS - 2);
-    expect(during.get(member)).toBeUndefined();
+    expect(INSTANCE_EVICTION_REMINDER_SECONDS).toEqual([30, 10]);
+    expect(during.get(member)).toEqual([
+      instanceEvictionWarningText(30),
+      instanceEvictionWarningText(10),
+    ]);
     expect(inside(inst, entity(sim, member), sim)).toBe(true);
 
     const after = advance(sim, 2);
@@ -172,6 +179,8 @@ describe('classic group-instance eviction', () => {
     expect(p.corpseInstanceId).toBeNull();
     expect(p.corpsePos?.x).toBeCloseTo(spot.x, 5);
     expect(p.corpsePos?.z).toBeCloseTo(spot.z, 5);
+    // On the surface a living player stands on there, not the bare terrain.
+    expect(p.corpsePos?.y).toBeCloseTo(dungeonExitStandingPos(sim.ctx, spot).y, 5);
     expect(p.ghost).toBe(true);
   });
 
@@ -201,6 +210,97 @@ describe('classic group-instance eviction', () => {
     advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 2);
     expect(inst.difficulty).toBe('heroic');
     expect(sim.ctx.pendingDifficultyChanges.size).toBe(0);
+  });
+
+  describe('leaving the world', () => {
+    it('sets a removed player down outside at once, before the leave save', () => {
+      const { sim, leader, member, inst } = setup();
+      sim.partyKick(member, leader);
+      advance(sim, 5);
+      expect(inside(inst, entity(sim, member), sim)).toBe(true);
+      sim.preparePlayerLeave(member);
+      const p = entity(sim, member);
+      expect(dungeonAt(p.pos.x)).toBeNull();
+      expect(p.instanceEvictIn).toBeUndefined();
+      const saved = sim.serializeCharacter(member);
+      expect(saved && dungeonAt(saved.pos.x)).toBeNull();
+      const spot = outdoorExitSpot(sim.ctx, inst);
+      expect(saved?.pos.x).toBeCloseTo(spot.x, 5);
+      expect(saved?.pos.z).toBeCloseTo(spot.z, 5);
+    });
+
+    it('applies even before the first warning has gone out', () => {
+      const { sim, leader, member } = setup();
+      sim.partyKick(member, leader);
+      sim.preparePlayerLeave(member);
+      expect(dungeonAt(entity(sim, member).pos.x)).toBeNull();
+    });
+
+    it('leaves a player who still belongs to the group where they are', () => {
+      const { sim, member, inst } = setup();
+      sim.preparePlayerLeave(member);
+      expect(inside(inst, entity(sim, member), sim)).toBe(true);
+    });
+
+    it("moves a removed ghost's corpse out with them", () => {
+      const { sim, leader, member } = setup();
+      const p = entity(sim, member);
+      p.dead = true;
+      p.hp = 0;
+      sim.releaseSpirit(member);
+      sim.partyKick(member, leader);
+      sim.preparePlayerLeave(member);
+      expect(p.corpseInstanceId).toBeNull();
+      expect(p.corpsePos && dungeonAt(p.corpsePos.x)).toBeNull();
+    });
+    it('releases an unreleased body at leave and saves the corpse at the door', () => {
+      const { sim, leader, member, inst } = setup();
+      const p = entity(sim, member);
+      p.dead = true;
+      p.hp = 0;
+      sim.partyKick(member, leader);
+      sim.preparePlayerLeave(member);
+      expect(p.ghost).toBe(true);
+      expect(dungeonAt(p.pos.x)).toBeNull();
+      expect(p.corpseInstanceId).toBeNull();
+      const spot = outdoorExitSpot(sim.ctx, inst);
+      expect(p.corpsePos?.x).toBeCloseTo(spot.x, 5);
+      expect(p.corpsePos?.z).toBeCloseTo(spot.z, 5);
+    });
+
+    it('acts once when the leave is prepared twice, as the server does', () => {
+      const { sim, leader, member } = setup();
+      sim.partyKick(member, leader);
+      sim.drainEvents();
+      sim.preparePlayerLeave(member);
+      const at = { ...entity(sim, member).pos };
+      sim.preparePlayerLeave(member);
+      expect(entity(sim, member).pos).toEqual(at);
+      const removed = sim
+        .drainEvents()
+        .filter((e) => e.type === 'error' && e.pid === member && e.text === INSTANCE_EVICTED_TEXT);
+      expect(removed).toHaveLength(1);
+    });
+
+    it('leaves an exempt GM inside at leave', () => {
+      const { sim, leader, member, inst } = setup();
+      sim.setGm(member, true);
+      sim.partyKick(member, leader);
+      sim.preparePlayerLeave(member);
+      expect(inside(inst, entity(sim, member), sim)).toBe(true);
+    });
+
+    it('runs through the offline removePlayer path too', () => {
+      const { sim, leader, member } = setup();
+      sim.partyKick(member, leader);
+      sim.drainEvents();
+      sim.removePlayer(member);
+      const removed = sim
+        .drainEvents()
+        .filter((e) => e.type === 'error' && e.pid === member && e.text === INSTANCE_EVICTED_TEXT);
+      expect(removed).toHaveLength(1);
+      expect(sim.entities.has(member)).toBe(false);
+    });
   });
 
   describe('raid returner exemption (the door return rule, not the bare ledger)', () => {

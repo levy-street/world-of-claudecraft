@@ -93,6 +93,10 @@ import {
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 import { updateInstanceGroupEviction } from './instance_group_eviction';
+
+// Re-exported so the Sim coordinator reaches it through its existing dungeons import.
+export { evictLeaverFromGroupInstance } from './instance_group_eviction';
+
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
 import {
   durableMemberKey,
@@ -934,16 +938,14 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   return true;
 }
 
-/** Stand a player on the outside drop point of a dungeon door (a spot from
- *  dungeonExitSpot or detachFromDungeon), facing away from it. Shared by the
- *  exit portal (leaveDungeon) and the group eviction
- *  (instance_group_eviction.ts). Moves only: the caller detaches first. */
-export function setDownAtDungeonExit(
+/** The standing position at a dungeon door's outside drop point. Also where
+ *  the group eviction lays a removed player's corpse, so it rests on the same
+ *  surface a living player would stand on. */
+export function dungeonExitStandingPos(
   ctx: SimContext,
-  p: Entity,
-  door: { x: number; z: number; facing: number },
-): void {
-  p.pos = ctx.groundPos(door.x, door.z);
+  door: { x: number; z: number },
+): Entity['pos'] {
+  const pos = ctx.groundPos(door.x, door.z);
   // Seat the exit on the real STANDING surface: a placed deck plate at the
   // drop point (the Last Keep's terrace over its stair band) stands proud of
   // the walk-lift ground, and a body set down under its top is embedded in
@@ -954,8 +956,21 @@ export function setDownAtDungeonExit(
   // dungeon exit, not a keep special case): a drop point under a deck is a
   // data fact any door can acquire, and on open ground the query finds no
   // support and changes nothing.
-  const exitDeck = supportHeightAt(ctx.cfg.seed, door.x, door.z, PLAYER_BODY_RADIUS, p.pos.y + 2);
-  if (exitDeck > p.pos.y) p.pos.y = exitDeck;
+  const exitDeck = supportHeightAt(ctx.cfg.seed, door.x, door.z, PLAYER_BODY_RADIUS, pos.y + 2);
+  if (exitDeck > pos.y) pos.y = exitDeck;
+  return pos;
+}
+
+/** Stand a player on the outside drop point of a dungeon door (a spot from
+ *  dungeonExitSpot or detachFromDungeon), facing away from it. Shared by the
+ *  exit portal (leaveDungeon) and the group eviction
+ *  (instance_group_eviction.ts). Moves only: the caller detaches first. */
+export function setDownAtDungeonExit(
+  ctx: SimContext,
+  p: Entity,
+  door: { x: number; z: number; facing: number },
+): void {
+  p.pos = dungeonExitStandingPos(ctx, door);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   settleTeleportArrival(p);

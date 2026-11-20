@@ -16,10 +16,17 @@
 // an earlier room on the way out of it. Such a player is never in the owning
 // group by design. Anywhere else in the run, they are evicted like anyone.
 //
+// The warning repeats at INSTANCE_EVICTION_REMINDER_SECONDS left. A player who
+// leaves the world (logout or disconnect) while they do not belong is set down
+// outside at once (evictLeaverFromGroupInstance, run from preparePlayerLeave,
+// before the leave save): the countdown lives on the entity and a relog makes a
+// new one, so without this a relog would restart the grace every time.
+//
 // A dead player is handled too, since their corpse holds the claim the same way
 // a body does: an unreleased body is released first, and a ghost's corpse that
 // lies inside the claim is moved to the door drop point, where the ghost can
-// still resurrect at it.
+// still resurrect at it. The corpse rests on the door's standing surface
+// (dungeonExitStandingPos), the same one a living player is set down on.
 //
 // The removal ignores the exit seals (the Nythraxis royal door, the Ignivar
 // boss-fight seal) and the Ignivar floor-by-floor exit routing on purpose: a
@@ -40,6 +47,7 @@ import type { Entity } from '../types';
 import {
   detachFromDungeon,
   dungeonExitSpot,
+  dungeonExitStandingPos,
   instanceClaimContains,
   setDownAtDungeonExit,
 } from './dungeons';
@@ -47,6 +55,9 @@ import { isClearedReturnRoom, raidFamilyOf } from './raid_return';
 
 /** How long a removed player has to be re-invited before they are moved out. */
 export const INSTANCE_EVICTION_GRACE_SECONDS = 60;
+
+/** Seconds left at which the warning is repeated. */
+export const INSTANCE_EVICTION_REMINDER_SECONDS: readonly number[] = [30, 10];
 
 /** The player-facing lines. English, re-localized by the client matchers
  *  (src/ui/sim_i18n.ts). */
@@ -119,7 +130,7 @@ function evict(ctx: SimContext, meta: PlayerMeta, p: Entity, inst: InstanceSlot)
     p.corpseInstanceId === inst.exitId &&
     instanceClaimContains(inst, p.corpsePos)
   ) {
-    p.corpsePos = ctx.groundPos(spot.x, spot.z);
+    p.corpsePos = dungeonExitStandingPos(ctx, spot);
     p.corpseInstanceId = null;
   }
   ctx.error(meta.entityId, INSTANCE_EVICTED_TEXT);
@@ -150,8 +161,24 @@ export function updateInstanceGroupEviction(ctx: SimContext): void {
     // than at the mercy of accumulated floating-point sim time.
     if (p.instanceEvictIn > 1) {
       p.instanceEvictIn -= 1;
+      if (INSTANCE_EVICTION_REMINDER_SECONDS.includes(p.instanceEvictIn)) {
+        ctx.error(meta.entityId, instanceEvictionWarningText(p.instanceEvictIn));
+      }
       continue;
     }
     if (evict(ctx, meta, p, inst)) clearTimer(p);
   }
+}
+
+/** A player leaving the world (Sim.preparePlayerLeave, before the leave save)
+ *  inside a group claim they do not belong to is set down outside now, so the
+ *  save records the door and a relog cannot restart the grace. A player who
+ *  still belongs is untouched. Idempotent: once outside, it is a no-op. */
+export function evictLeaverFromGroupInstance(ctx: SimContext, pid: number): void {
+  const meta = ctx.players.get(pid);
+  const p = meta && ctx.entities.get(meta.entityId);
+  if (!meta || !p) return;
+  const inst = claimHeldBy(ctx, p);
+  if (!inst || inst.exitId === null || belongsInClaim(ctx, meta.entityId, p, inst)) return;
+  if (evict(ctx, meta, p, inst)) clearTimer(p);
 }
