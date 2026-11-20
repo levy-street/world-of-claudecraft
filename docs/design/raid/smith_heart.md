@@ -2709,7 +2709,9 @@ world, the marked player's own arrow and the sound.
   the armour: 10 / 13 / 15 percent per stack. The look: the element's shell round the
   tank's body (fire licking up, frost crystals crusting it, violet forks crawling it, stone
   plates clinging to it), stronger with each stack and pulsing a warning from the swap's
-  count; the debuff with its stack count and its tooltip in the tank's aura bar.
+  count; Searing Burn also wraps the tank in a column of flame tongues under a dark smoke
+  plume (its SHAPE reads in the Heat quarter's own orange), and every element shows one
+  bright gem per stack orbiting over the head; the debuff with its stack count and its tooltip in the tank's aura bar.
 - **Elemental Fusion, on every quarter change.** When the boss settles into a NEW quarter
   in the quarter fight (never the pull's first, an intermission or the final phase), it
   waits until it is free (no planted bar, not being dragged, no Opposing Elements round
@@ -2730,7 +2732,9 @@ world, the marked player's own arrow and the sound.
 
   On Mythic every combo leaves an **Elemental Residue** on the floor for 15 s (81-92 /
   91-104 a second; at most 14 at once); on Normal and Heroic everything is gone when it
-  ends. Each combo's look is its own, never a quarter kit's: the steam thick white, the
+  ends. The combos' lanes and the spires' links wear their element's paint on the floor (the
+  Firestorm's molten basalt, the Avalanche's creeping frost, the links' storm), never the
+  plain threat orange. Each combo's look is its own, never a quarter kit's: the steam thick white, the
   lava dark orange under a black crust, the Firestorm a wall of flame, the hail white-blue
   ice balls dropping out of the sky, the Avalanche ice and rock spikes, the spires dark
   stone with violet lightning. Checked against each quarter's own kit: the combo lands
