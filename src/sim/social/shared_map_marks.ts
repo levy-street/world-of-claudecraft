@@ -117,6 +117,9 @@ export function canEditSharedMapMarks(
   return !party || !party.raid || party.leader === pid;
 }
 
+/** The one empty view (frozen): a viewer with no marks reads it every frame. */
+const NO_MARKS: readonly SharedMapMark[] = Object.freeze([]);
+
 function round1(v: number): number {
   return Math.round(v * 10) / 10;
 }
@@ -223,7 +226,7 @@ export class SharedMapMarks {
   /** The marks `pid` sees: its group's, in the instance copy it stands in.
    *  Empty anywhere else. */
   viewFor(pid: number): readonly SharedMapMark[] {
-    return this.visibleEntry(pid)?.marks ?? [];
+    return this.visibleEntry(pid)?.marks ?? NO_MARKS;
   }
 
   /** The self-wire row for `pid`: the visible marks as
