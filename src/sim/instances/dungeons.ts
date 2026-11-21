@@ -137,6 +137,12 @@ export const INSTANCE_CLEARED_EMPTY_TIMEOUT = 15 * 60;
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
   if (party) return `party:${party.id}`;
+  return soloInstanceKeyFor(ctx, pid);
+}
+
+/** The key a claim `pid` made while solo carries (instanceKeyFor's solo arm),
+ *  whether or not `pid` has joined a party since. */
+export function soloInstanceKeyFor(ctx: Pick<SimContext, 'players'>, pid: number): string {
   // Solo instances key on the DURABLE character id when the server supplies one,
   // so a logout, relog, or character-select "Take Over" (each of which mints a
   // new entity id) rejoins the SAME live instance instead of claiming a fresh one

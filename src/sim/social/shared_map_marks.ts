@@ -35,6 +35,7 @@ import {
   instanceClaimContains,
   instanceHalfWidthOf,
   instanceOriginOf,
+  soloInstanceKeyFor,
 } from '../instances/dungeons';
 import { floorHeightAt } from '../physics';
 import type { InstanceSlot, Party } from '../sim';
@@ -260,13 +261,25 @@ export class SharedMapMarks {
     if (this.entries.size === 0) return null;
     const e = this.ctx.entities.get(pid);
     if (!e || !this.ctx.players.has(pid)) return null;
-    const owned = this.byOwner.get(this.ctx.instanceKeyFor(pid));
-    if (!owned) return null;
-    for (const entry of owned) {
-      if (!this.live(entry.inst, entry.claimId, entry.partyKey)) continue;
-      if (instanceClaimContains(entry.inst, e.pos)) return entry;
+    for (const key of this.ownerKeys(pid)) {
+      const owned = this.byOwner.get(key);
+      if (!owned) continue;
+      for (const entry of owned) {
+        if (!this.live(entry.inst, entry.claimId, entry.partyKey)) continue;
+        if (instanceClaimContains(entry.inst, e.pos)) return entry;
+      }
     }
     return null;
+  }
+
+  /** The claim keys `pid`'s group owns: its own instance key and, in a party,
+   *  each member's solo key (a player who entered solo and grouped up inside
+   *  keeps the claim under that solo key; the group still marks it). */
+  private ownerKeys(pid: number): string[] {
+    const keys = [this.ctx.instanceKeyFor(pid)];
+    const party = this.ctx.partyOf(pid);
+    if (party) for (const m of party.members) keys.push(soloInstanceKeyFor(this.ctx, m));
+    return keys;
   }
 
   /** The live claim `pid` stands in and may edit: its group's own claim, with
@@ -278,9 +291,10 @@ export class SharedMapMarks {
     if (!r) return null;
     const self = r.meta.entityId;
     if (!canEditSharedMapMarks(this.ctx.partyOf(self), self)) return null;
-    const key = this.ctx.instanceKeyFor(self);
+    const keys = this.ownerKeys(self);
     for (const inst of this.ctx.instances) {
-      if (inst.partyKey !== key || inst.exitId === null) continue;
+      if (inst.partyKey === null || inst.exitId === null) continue;
+      if (!keys.includes(inst.partyKey)) continue;
       if (instanceClaimContains(inst, r.e.pos)) return { inst, claimId: inst.exitId, self };
     }
     return null;

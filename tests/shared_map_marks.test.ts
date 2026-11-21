@@ -92,6 +92,30 @@ describe('shared map marks: who may edit', () => {
     expect(marks(sim, a)).toEqual([{ symbol: SKULL, page: 0, x: 3.1, z: -12.1 }]);
   });
 
+  it('a player who entered solo and grouped up inside still marks that instance, and the group sees it', () => {
+    // Playtest 2026-11-21: the claim keeps its solo key after the party forms,
+    // so marks were refused without a word.
+    const sim = world();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    expect(sim.enterDungeon(DUNGEON, a)).toBe(true);
+    party(sim, a, b);
+    expect(claimOf(sim, a).partyKey).toMatch(/^solo:/);
+    sim.placeSharedMapMark(0, 10, 20, STAR, a);
+    expect(marks(sim, a)).toEqual([{ symbol: STAR, page: 0, x: 10, z: 20 }]);
+    const pa = sim.entities.get(a)!.pos;
+    const eb = sim.entities.get(b)!;
+    eb.pos = { x: pa.x, y: pa.y, z: pa.z };
+    expect(marks(sim, b)).toEqual(marks(sim, a));
+    // The member may edit too (a 5-player party), on the same solo-keyed claim.
+    sim.placeSharedMapMark(0, 4, 5, SKULL, b);
+    expect(
+      marks(sim, a)
+        .map((m) => m.symbol)
+        .sort(),
+    ).toEqual([STAR, SKULL]);
+  });
+
   it('in a party any member places, and the whole party in the instance sees it', () => {
     const { sim, a, b } = partyInCrypt();
     sim.placeSharedMapMark(0, 10, 20, STAR, b);
