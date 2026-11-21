@@ -84,6 +84,7 @@ async function harness(lang = 'en') {
     comboPips: 0,
     nameOnly: false,
     markerOnly: false,
+    raidMarkOnly: false,
   };
   const resolve = (e: Entity) => {
     painter.resolveContent(state, e, me, plan, false, false);

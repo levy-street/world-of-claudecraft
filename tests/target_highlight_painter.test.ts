@@ -120,6 +120,7 @@ describe('target highlight painter hostility', () => {
         comboPips: 0,
         nameOnly: false,
         markerOnly: false,
+        raidMarkOnly: false,
         noHealthBar: false,
       } satisfies NameplatePlan;
       painter.updateDynamicState(state, target, player, plan, false);
@@ -165,6 +166,7 @@ describe('target highlight painter hostility', () => {
       comboPips: 0,
       nameOnly: false,
       markerOnly: false,
+      raidMarkOnly: false,
       noHealthBar: false,
     } satisfies NameplatePlan;
     painter.updateDynamicState(state, target, player, plan, false);
@@ -192,6 +194,7 @@ describe('target highlight painter hostility', () => {
       comboPips: 0,
       nameOnly: false,
       markerOnly: false,
+      raidMarkOnly: false,
       noHealthBar: false,
     };
     painter.updateDynamicState(state, target, player, plan, false);
@@ -237,6 +240,7 @@ describe('target highlight painter hostility', () => {
         comboPips: 0,
         nameOnly: false,
         markerOnly: false,
+        raidMarkOnly: false,
         noHealthBar: false,
       } satisfies NameplatePlan;
       painter.updateDynamicState(state, target, player, plan, false);

@@ -295,7 +295,7 @@ describe('NPC plates', () => {
     expect(state?.castVisible).toBe(false);
   });
 
-  it('strips a friendly quest-giver mob the same way', () => {
+  it('strips a friendly quest-giver mob the same way, keeping its raid target icon', () => {
     const giver = entity(7);
     giver.hostile = false;
     giver.questIds = ['q_prof_hobby_switch'];
@@ -332,7 +332,9 @@ describe('NPC plates', () => {
     ).states.get(7);
     expect(state?.hpVisible).toBe(false);
     expect(state?.castVisible).toBe(false);
-    expect(state?.raidMarkerUrl).toBe('');
+    // Unlike a true NPC, a friendly quest-giver MOB is a markable wild mob
+    // (src/sim/social/raid_target_marks.ts), so the group's icon still shows.
+    expect(state?.raidMarkerUrl).not.toBe('');
     expect(state?.dots.count).toBe(0);
   });
 
@@ -348,5 +350,34 @@ describe('NPC plates', () => {
     ).states.get(7);
     expect(state?.castVisible).toBe(true);
     expect(state?.raidMarkerUrl).not.toBe('');
+  });
+});
+
+describe('raid target icon over a toggled-off plate', () => {
+  type MarkState = { raidMarkerUrl: string; name: string; hpVisible: boolean };
+  const stateOf = (painter: NameplatePainter, id: number) =>
+    (painter as unknown as { states: Map<number, MarkState> }).states.get(id);
+
+  it('keeps only the floating icon for a marked mob when mob plates are off', () => {
+    let mark: number | null = 5; // square (the skull art needs a real canvas ellipse)
+    const { painter, setShowNameplates } = harness([entity(7), entity(8)], 0, () => mark);
+    setShowNameplates(false);
+    painter.update(true);
+    expect(liveAnchors(painter).map((a) => a.id)).toEqual([7, 8]);
+    const state = stateOf(painter, 7);
+    expect(state?.raidMarkerUrl).not.toBe('');
+    expect(state?.name).toBe('');
+    expect(state?.hpVisible).toBe(false);
+    // the mark clears: the icon-only plate goes away on the very next pass
+    mark = null;
+    painter.update(false);
+    expect(liveAnchors(painter)).toHaveLength(0);
+  });
+
+  it('draws nothing for an unmarked mob when mob plates are off', () => {
+    const { painter, setShowNameplates } = harness([entity(7)]);
+    setShowNameplates(false);
+    painter.update(true);
+    expect(liveAnchors(painter)).toHaveLength(0);
   });
 });

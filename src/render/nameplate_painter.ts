@@ -83,6 +83,7 @@ import {
   type NameplatePlan,
   nameplatePlanInto,
   newNameplatePlan,
+  raidMarkPlateKey,
 } from './nameplate_view';
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, isMobHostileToViewer, mobNameColor } from './reaction';
@@ -254,6 +255,9 @@ export class NameplatePainter {
    *  NPC_NAMEPLATE_RANGE): crossing the range re-resolves the plate the same
    *  frame, so a name never lingers far out or waits to appear up close. */
   private readonly markerOnlyPlates = new Set<number>();
+  // Per plate, the raid target icon and icon-only mode its content was resolved
+  // with (raidMarkPlateKey), so a mark set, moved or cleared re-resolves at once.
+  private readonly raidMarkPlates = new Map<number, number>();
   private readonly traceLabels = new WorldQuestTraceLabels();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
@@ -370,18 +374,19 @@ export class NameplatePainter {
       // the entity is the whole hide, so a gated plate leaves no pick anchor
       // behind, and `standIn` wins over it exactly as it wins over the other
       // nameplate toggles: a body the compile gate is still hiding keeps the
-      // plate that says it is there.
-      if (
+      // plate that says it is there. A unit wearing the group's raid target
+      // icon keeps it floating over its head whatever the toggles say
+      // (NameplatePlan.raidMarkOnly): a direct map lookup, no allocation.
+      const raidMark = entity.kind === 'npc' ? null : this.world.markerFor(id);
+      const friendlyHidden =
         !standIn &&
         isFriendlyNameplateHidden(
           entity,
           world.entities,
           this.isHostilePlayer,
           showFriendlyNameplates,
-        )
-      ) {
-        continue;
-      }
+        );
+      if (friendlyHidden && raidMark === null) continue;
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,
@@ -393,6 +398,8 @@ export class NameplatePainter {
         showPlayerNameplates,
         showPetNames,
         standIn,
+        raidMark !== null,
+        friendlyHidden,
       );
       if (plan.hidden) continue;
 
@@ -427,7 +434,12 @@ export class NameplatePainter {
       // Play Dead (hunter feign death) hides a player's bar the frame it lands.
       const feignFlipped = entity.kind === 'player' && state.hpVisible === shownDead(entity);
       const markerOnlyFlipped = this.markerOnlyPlates.has(id) !== plan.markerOnly;
-      const flipped = pvpFlipped || bountyFlipped || feignFlipped || markerOnlyFlipped;
+      // A raid target icon set, moved or cleared shows the same frame, never on
+      // the tier cadence: it is what the group is told to act on.
+      const raidMarkFlipped =
+        this.raidMarkPlates.get(id) !== raidMarkPlateKey(raidMark, plan.raidMarkOnly);
+      const flipped =
+        pvpFlipped || bountyFlipped || feignFlipped || markerOnlyFlipped || raidMarkFlipped;
       if (!state.initialized || fullPass || plan.urgent || languageChanged || flipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
         // Recorded here, not inside resolveContent's early-returning branches,
@@ -436,9 +448,11 @@ export class NameplatePainter {
         else this.plateBounty.delete(id);
         if (plan.markerOnly) this.markerOnlyPlates.add(id);
         else this.markerOnlyPlates.delete(id);
+        this.raidMarkPlates.set(id, raidMarkPlateKey(raidMark, plan.raidMarkOnly));
       }
-      // A far NPC draws only its quest marker; with none there is no plate.
-      if (plan.markerOnly && !state.marker) continue;
+      // A far NPC draws only its quest marker (or the group's raid target icon);
+      // with neither there is no plate.
+      if (plan.markerOnly && !state.marker && !state.raidMarkerUrl) continue;
 
       const anchor = this.anchorScratch[this.anchorCount];
       if (anchor) {
@@ -590,6 +604,7 @@ export class NameplatePainter {
     this.states.delete(id);
     this.plateBounty.delete(id);
     this.markerOnlyPlates.delete(id);
+    this.raidMarkPlates.delete(id);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       if (anchor.id !== id) continue;
@@ -607,6 +622,7 @@ export class NameplatePainter {
     this.states.clear();
     this.plateBounty.clear();
     this.markerOnlyPlates.clear();
+    this.raidMarkPlates.clear();
     this.paintGate.invalidate();
     this.surface.dispose();
   }
@@ -708,7 +724,12 @@ export class NameplatePainter {
       languageChanged,
     );
 
-    if (plan.nameOnly) {
+    if (plan.raidMarkOnly) {
+      state.emphasis = false;
+      state.comboPips = 0;
+      state.threat = false;
+    }
+    if (plan.nameOnly || plan.raidMarkOnly) {
       state.dots.count = 0;
       state.castVisible = false;
       state.castSource = '';
@@ -750,7 +771,9 @@ export class NameplatePainter {
     state.levelColor = '#fff';
     // A far NPC's marker stands alone above the head, without its role line.
     state.guild =
-      entity.kind === 'npc' && !plan.markerOnly ? (npcRoleLabel(entity.templateId) ?? '') : '';
+      entity.kind === 'npc' && !plan.markerOnly && !plan.raidMarkOnly
+        ? (npcRoleLabel(entity.templateId) ?? '')
+        : '';
     state.guildLabel = '';
     state.guildTier = 0;
     state.title = '';
@@ -768,8 +791,14 @@ export class NameplatePainter {
     state.emoteLabel = '';
     state.friendlyPet = false;
 
-    const raidMark = plan.nameOnly ? null : this.world.markerFor(entity.id);
+    // A true NPC is never markable (src/sim/social/raid_target_marks.ts).
+    const raidMark = entity.kind === 'npc' ? null : this.world.markerFor(entity.id);
     if (raidMark !== null) state.raidMarkerUrl = raidMarkerDataUrl(raidMark);
+    // A plate a nameplate toggle hides keeps only the floating raid target icon.
+    if (plan.raidMarkOnly) {
+      state.badges.length = 0;
+      return;
+    }
 
     let emote = null;
     if (entity.overheadEmoteId) {
