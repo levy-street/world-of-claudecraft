@@ -993,11 +993,19 @@ function duty(world, st, b, me) {
           }
         }
       } else {
+        // Only a pillar the mark can reach before the line locks: the aim
+        // runs the tier's bladeAim from the mark (FINAL_DIFFICULTY), locking
+        // bladeLock before the end. A charged pillar across the room left the
+        // line through nothing and two charged pillars standing (the bot
+        // raids of 2026-11-21).
+        st.bladeSeenAt ??= new Map();
+        if (!st.bladeSeenAt.has(blade.id)) st.bladeSeenAt.set(blade.id, Date.now());
+        const aim = HEROIC_PLUS ? 3.5 : 4;
+        const left = aim - T.bladeLock - (Date.now() - st.bladeSeenAt.get(blade.id)) / 1000;
+        const reach = Math.max(0, left - 0.3) * 6.5;
         const ps = o.pillars
           .slice()
-          .sort(
-            (x, y) => Number(y.charged) - Number(x.charged) || hypot(x, blade) - hypot(y, blade),
-          );
+          .sort((x, y) => Number(y.charged) - Number(x.charged) || hypot(x, me) - hypot(y, me));
         for (const p of ps) {
           // Stand on the ray from the blade through the pillar: just before
           // it or just past it, whichever is nearer (the line runs on through
@@ -1007,7 +1015,9 @@ function duty(world, st, b, me) {
           const past = add(p, d, p.r + 4);
           const before = add(p, d, -(p.r + 3));
           const spots = [past, before]
-            .filter((q) => final.onFloor(world, q) && !final.bad(world, st, q))
+            .filter(
+              (q) => final.onFloor(world, q) && !final.bad(world, st, q) && hypot(q, me) <= reach,
+            )
             .sort((x, y) => hypot(x, me) - hypot(y, me));
           const at = spots[0];
           if (!at) continue;

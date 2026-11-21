@@ -13,7 +13,13 @@ import {
   ELEMENT_TUNING,
   rimeTemplate,
 } from '../src/sim/encounters/smith_heart/final_elements_ids';
-import { FINAL_AURAS, FINAL_ZONE_CODES } from '../src/sim/encounters/smith_heart/final_ids';
+import {
+  FINAL_AURAS,
+  FINAL_TUNING,
+  FINAL_ZONE_CODES,
+  finalBladeTemplate,
+  finalPillarTemplate,
+} from '../src/sim/encounters/smith_heart/final_ids';
 
 type Final = {
   read(world: unknown): void;
@@ -127,5 +133,64 @@ describe('Masterless Strength bots: Hardening Frost', () => {
     expect(sum.rimes).toBe(1);
     expect(sum.freezes).toBe(1);
     expect(sum.unboundMax).toBe(3);
+  });
+});
+
+describe('Masterless Strength bots: Crossing Blade', () => {
+  it('leads the line through a pillar it can reach before the lock, not a charged one across the room', () => {
+    vi.useFakeTimers({ now: 3_000_000 });
+    const { world, tank } = heatFight({ rime: false });
+    // A damage dealer marked for the blade, standing 10 yd off the quarter spot.
+    const me = {
+      pid: 2,
+      name: 'Ivaline',
+      x: tank.x + 10,
+      z: tank.z,
+      auras: [{ id: FINAL_AURAS.bladeMark, value: 1 }],
+      tank: false,
+    };
+    const bot = { pid: 2, name: 'Ivaline', spec: { key: 'mage', role: 'dps' } };
+    world.players.set(2, me);
+    world.living = () => [tank, me];
+    world.bots.push(bot as never);
+    const ents = world.obs.ents;
+    const r = FINAL_TUNING.pillarR;
+    // A plain pillar 6 yd from the mark, a charged one 40 yd away.
+    ents.set(910, {
+      k: 'object',
+      id: 910,
+      tid: finalPillarTemplate('plain'),
+      x: me.x,
+      z: me.z + 6,
+      sc: r,
+    });
+    // The charged one on the same ring round the room's centre, 85 degrees on.
+    const c = world.center;
+    const R = Math.hypot(me.x - c.x, me.z - c.z);
+    const a0 = Math.atan2(me.x - c.x, me.z - c.z) + (85 * Math.PI) / 180;
+    const far = { x: c.x + Math.sin(a0) * R, z: c.z + Math.cos(a0) * R };
+    expect(Math.hypot(far.x - me.x, far.z - me.z)).toBeGreaterThan(30);
+    ents.set(911, {
+      k: 'object',
+      id: 911,
+      tid: finalPillarTemplate('charged'),
+      x: far.x,
+      z: far.z,
+      sc: r,
+    });
+    ents.set(912, {
+      k: 'object',
+      id: 912,
+      tid: finalBladeTemplate('aim'),
+      x: me.x,
+      z: me.z - 20,
+      sc: 1,
+    });
+    final.read(world);
+    const d = final.duty(world, {}, bot, me) as { goal: { x: number; z: number }; duty: string };
+    expect(d.duty).toBe('blade: pillar');
+    // On the plain pillar's ray from the blade, within a few yards of it.
+    expect(Math.abs(d.goal.x - me.x)).toBeLessThan(0.5);
+    expect(Math.hypot(d.goal.x - me.x, d.goal.z - (me.z + 6))).toBeLessThan(r + 5);
   });
 });
