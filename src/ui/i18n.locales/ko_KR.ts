@@ -26255,7 +26255,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidAtlas.shared.tool': '공격대 징표',
   'hudChrome.raidAtlas.shared.title': '공격대 징표',
   'hudChrome.raidAtlas.shared.symbolsAria': '공격대 징표 기호',
-  'hudChrome.raidAtlas.shared.placeHint': '지도를 누르거나 클릭해 파티에 {marker} 징표를 놓습니다. 공격대 징표를 누르거나 클릭하면 지워집니다.',
+  'hudChrome.raidAtlas.shared.placeHint':
+    '지도를 누르거나 클릭해 파티에 {marker} 징표를 놓습니다. 공격대 징표를 누르거나 클릭하면 지워집니다.',
   'hudChrome.raidAtlas.shared.clearAll': '모두 지우기',
   'hudChrome.raidAtlas.shared.noteEditable': '파티원 모두가 이 징표를 봅니다.',
   'hudChrome.raidAtlas.shared.readOnly': '공격대장만 공격대 징표를 놓을 수 있습니다.',

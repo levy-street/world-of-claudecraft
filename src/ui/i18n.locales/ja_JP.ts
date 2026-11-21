@@ -26245,7 +26245,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidAtlas.shared.tool': 'レイドマーク',
   'hudChrome.raidAtlas.shared.title': 'レイドマーク',
   'hudChrome.raidAtlas.shared.symbolsAria': 'レイドマークの記号',
-  'hudChrome.raidAtlas.shared.placeHint': 'マップをタップまたはクリックして、グループに{marker}を置きます。レイドマークをタップまたはクリックすると消えます。',
+  'hudChrome.raidAtlas.shared.placeHint':
+    'マップをタップまたはクリックして、グループに{marker}を置きます。レイドマークをタップまたはクリックすると消えます。',
   'hudChrome.raidAtlas.shared.clearAll': 'すべて消去',
   'hudChrome.raidAtlas.shared.noteEditable': 'グループの全員にこのマークが見えます。',
   'hudChrome.raidAtlas.shared.readOnly': 'レイドマークを置けるのはレイドリーダーだけです。',
