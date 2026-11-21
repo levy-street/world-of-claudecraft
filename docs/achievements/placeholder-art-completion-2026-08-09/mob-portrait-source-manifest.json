@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "1624da225908a4a0cb6adf984bffe4c059809ec4232f4b209c05b193bdf662c5",
+  "rendererFingerprint": "2f537ffb26d548870661c77b8a764e5f1427bab1e01c24ec692c706e15a5532e",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "linux",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 6978094,
-      "sha256": "2e8c421ea101b70a4a46787cd94385541e0ec5611ba716a7cd15dd9dc1b8f8e8",
+      "sha256": "66d22a39ee1bc8c1ac5ce7c804817d8b66903026a5c728b38e1795889350ee21",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -9064,8 +9064,8 @@
         "model": {
           "url": "models/creatures/remnant_first_colossus.glb",
           "path": "public/models/creatures/remnant_first_colossus.glb",
-          "bytes": 1739920,
-          "sha256": "1a0c9f5e3f9a9d34aaab7322f9c479e6d7dcf31672f2c573e5cb72a578c4a78d"
+          "bytes": 848952,
+          "sha256": "15a1864c8658bbc2e52f6fd9331e5ed5a0524b928263ea17f6934685d76882de"
         },
         "idle": "Idle",
         "height": 6.2,
@@ -9082,11 +9082,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "92680710974f244265a508d6d5471a02e833b3129366fd1ab1729a78a845f255",
+      "sourceFingerprint": "ba0ca519b5610afca14790bf1ed107fb3a905ea53730b50a0c64988e907231bc",
       "output": {
         "path": "public/ui/mobs/remnant_first_colossus.webp",
-        "bytes": 3256,
-        "sha256": "0e35d98a13fea65c6feab4112a506a552464160f26d54a2e9d57c78b88db7843"
+        "bytes": 3366,
+        "sha256": "92ed48b99714e480db196a552f97543689d29a61ee9236d786ddc379d66f262a"
       }
     },
     {
@@ -10387,8 +10387,8 @@
         "model": {
           "url": "models/creatures/rimeglass_bear.glb",
           "path": "public/models/creatures/rimeglass_bear.glb",
-          "bytes": 2051348,
-          "sha256": "860af09f6ea15112efbdea7689b43357af2fdbd95af421e9848f7604245ef678"
+          "bytes": 1038048,
+          "sha256": "567106066012c151d7974a67c58afed27b4ee66de540c10f6860f813b2d3c5c2"
         },
         "idle": "Idle",
         "height": 2.3,
@@ -10405,11 +10405,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "5c5c7d14f0a9adb2cb458ea86d5f51bcd923ad37c4bb6e1ae95680ad3815aece",
+      "sourceFingerprint": "e83e9a92d3dc7c1736eb3082304899215fa6186539666262448b8eae541c07c6",
       "output": {
         "path": "public/ui/mobs/rimeglass_bear.webp",
-        "bytes": 3236,
-        "sha256": "d8d0707c538ab5b57e8417b2029541b5892f4e0239e886eabec3e34836a814df"
+        "bytes": 3200,
+        "sha256": "b0b53c39a40872fcce86f5f54646cab0eacb469e5337a95077a0b96cdd72be22"
       }
     },
     {

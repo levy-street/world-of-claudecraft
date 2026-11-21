@@ -40,13 +40,13 @@ blender -b --factory-startup --python scripts/assets/rimeglass_bear/build_rig.py
 blender -b $d/bear.blend --python scripts/assets/rimeglass_bear/clips.py -- --out $d/bear_clips.glb
 ```
 
-Ship it like the other generated creatures: resample, the normal and roughness maps down to
-512 px (the colour stays 1024), KTX2 textures, then meshopt:
+Ship it like the other generated creatures: resample, every map down to the creature norm of
+512 px (a Tripo colour map ships as UASTC, about a byte a pixel, so a 1024 px one alone broke the
+1.5 MB creature cap), KTX2 textures, then meshopt:
 
 ```bash
 npx gltf-transform resample $d/bear_clips.glb $d/a.glb
-npx gltf-transform resize $d/a.glb $d/b1.glb --width 512 --height 512 --pattern "NormalGL*"
-npx gltf-transform resize $d/b1.glb $d/rimeglass_bear.glb --width 512 --height 512 --pattern "*_rough"
+npx gltf-transform resize $d/a.glb $d/rimeglass_bear.glb --width 512 --height 512
 node scripts/assets/compress_glb_textures.mjs $d/rimeglass_bear.glb
 npx gltf-transform meshopt $d/rimeglass_bear.glb public/models/creatures/rimeglass_bear.glb
 ```
