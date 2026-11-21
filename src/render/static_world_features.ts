@@ -26,20 +26,20 @@ import { buildWildheartBasinEntrance } from './wildheart_basin_entrance';
 // (set_piece_occluders.ts); the renderer drives the pass through this module.
 export { updateSetPieceOccluders } from './set_piece_occluders';
 
+function isDoorKept(dungeonId: string): boolean {
+  return !objectRemoved(getActiveWorldContent().objectMoves, 'dungeonDoor', dungeonId);
+}
+
 export function buildStaticWorldFeatures(seed: number) {
   // a rebuilt renderer builds its set pieces afresh: forget the old meshes
   clearSetPieceOccluders();
-  // A Studio map may delete a dungeon door (sim/moved_objects.ts): its
-  // entrance set piece goes with it, exactly as its colliders do.
-  const moves = getActiveWorldContent().objectMoves;
-  const kept = (dungeonId: string): boolean => !objectRemoved(moves, 'dungeonDoor', dungeonId);
   return [
     buildWaterFlora(seed),
     buildFarshoreFeatures(seed),
-    ...(kept(SANCTUM_SEAL_GATE_DUNGEON_ID) ? [buildSanctumSealGate(seed)] : []),
-    ...(kept(SUNKEN_BASTION_ENTRANCE_DUNGEON_ID) ? [buildSunkenBastionEntrance(seed)] : []),
-    ...(kept(HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID) ? [buildHollowCryptEntrance(seed)] : []),
-    ...(kept(DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID) ? [buildDrownedTempleEntrance(seed)] : []),
-    ...(kept(WILDHEART_BASIN_ENTRANCE_DUNGEON_ID) ? [buildWildheartBasinEntrance(seed)] : []),
+    ...(isDoorKept(SANCTUM_SEAL_GATE_DUNGEON_ID) ? [buildSanctumSealGate(seed)] : []),
+    ...(isDoorKept(SUNKEN_BASTION_ENTRANCE_DUNGEON_ID) ? [buildSunkenBastionEntrance(seed)] : []),
+    ...(isDoorKept(HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID) ? [buildHollowCryptEntrance(seed)] : []),
+    ...(isDoorKept(DROWNED_TEMPLE_ENTRANCE_DUNGEON_ID) ? [buildDrownedTempleEntrance(seed)] : []),
+    ...(isDoorKept(WILDHEART_BASIN_ENTRANCE_DUNGEON_ID) ? [buildWildheartBasinEntrance(seed)] : []),
   ];
 }

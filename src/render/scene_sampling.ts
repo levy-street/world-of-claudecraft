@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { registerContextRestoreRebake } from './context_restore_registry';
+import { SceneSampleVisibility } from './scene_sample_visibility';
 
 /** One scene-owned uniform service. The capture below copies the opaque colour
  * and depth out of the framebuffer bound at that moment into its own pair, and
@@ -19,7 +20,7 @@ class SceneSamples {
     uSceneExtent: { value: new THREE.Vector4(1, 1, 1, 1) },
     uSceneClip: { value: new THREE.Vector2(0.1, 1000) },
   };
-  readonly consumers = new Set<THREE.Object3D>();
+  readonly consumers = new Set<THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>>();
 }
 const services = new WeakMap<THREE.Scene, SceneSamples>();
 function samples(scene: THREE.Scene): SceneSamples {
@@ -84,6 +85,7 @@ export class OpaqueSceneCapture {
   private readonly sentinel: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   private disposed = false;
   private suppressed = false;
+  private readonly visibility = new SceneSampleVisibility();
 
   reinitialize(): void {
     if (!this.disposed) this.renderer.initRenderTarget(this.target);
@@ -160,17 +162,7 @@ export class OpaqueSceneCapture {
   private capture(camera: THREE.Camera): void {
     this.begin();
     if (this.disposed || this.suppressed) return;
-    let active = false;
-    for (const mesh of this.service.consumers) {
-      // A visible flag below a hidden or detached pool root is not a draw.
-      let ancestor: THREE.Object3D | null = mesh;
-      while (ancestor?.visible && ancestor !== this.scene) ancestor = ancestor.parent;
-      if (ancestor === this.scene && this.scene.visible && camera.layers.test(mesh.layers)) {
-        active = true;
-        break;
-      }
-    }
-    if (!active) return;
+    if (!this.visibility.hasVisibleConsumer(this.service.consumers, this.scene, camera)) return;
     const source = this.renderer.getRenderTarget();
     if (
       !source?.depthTexture ||

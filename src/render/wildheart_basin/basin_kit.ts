@@ -19,7 +19,6 @@ import * as THREE from 'three';
 import { WILDHEART_BASIN_FIELD } from '../../sim/content/wildheart_basin_layout';
 import { authoredFieldHeight } from '../../sim/instances/authored_field';
 import { loadGltf, releaseGltf } from '../assets/loader';
-import { registerDeferredPreload } from '../assets/preload';
 import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { type BasinKitPlacement, planBasinKitPlacements } from './basin_kit_plan_core';
@@ -110,10 +109,6 @@ function startKitLoad(): Promise<void> {
     });
   return loading;
 }
-
-// World content: fetched on the deferred lane once the game starts, so the
-// first walk into the Idol's maw usually finds the kit already baked.
-if (typeof window !== 'undefined') registerDeferredPreload(() => startKitLoad());
 
 /** Fetch and bake the kit once. Never rejects; resolves within the wait cap
  *  (a later arrival upgrades the stand-ins in place, see buildBasinKitDressing). */

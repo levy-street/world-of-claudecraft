@@ -1,14 +1,14 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-427fa-acea6bfd-9a47fcd-157d-421e9565-e4972e75",
+    "id": "live-42722-5ac5a288-c5a98e78-157d-421e9565-e4972e75",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
     "updatedAt": 0,
     "seed": 20061,
     "parentId": "",
-    "overworldBase": "427fa-acea6bfd-9a47fcd",
+    "overworldBase": "42722-5ac5a288-c5a98e78",
     "overworldRevision": "157d-421e9565-e4972e75"
   },
   "content": {
@@ -442,12 +442,6 @@
       {
         "id": "drakelands",
         "name": "The Drakelands",
-        "riftPortalEligible": true,
-        "riftTierWeights": {
-          "B": 0.45,
-          "A": 0.4,
-          "S": 0.15
-        },
         "zMin": 1820,
         "zMax": 2420,
         "xMin": 180,
@@ -538,12 +532,6 @@
       {
         "id": "frostveil",
         "name": "The Frostveil Reach",
-        "riftPortalEligible": true,
-        "riftTierWeights": {
-          "B": 0.45,
-          "A": 0.4,
-          "S": 0.15
-        },
         "zMin": 1440,
         "zMax": 1960,
         "levelRange": [17, 20],
@@ -620,12 +608,6 @@
       {
         "id": "amberfall",
         "name": "The Amberfall",
-        "riftPortalEligible": true,
-        "riftTierWeights": {
-          "B": 0.15,
-          "A": 0.55,
-          "S": 0.3
-        },
         "zMin": 1820,
         "zMax": 2380,
         "xMin": -540,

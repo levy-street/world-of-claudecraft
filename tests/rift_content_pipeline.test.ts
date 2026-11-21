@@ -7,7 +7,7 @@ import {
   RIFT_MONSTER_BY_ID,
   RIFT_MONSTER_INDEX,
 } from '../src/sim/content/rift/monster_index';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { BUILTIN_WORLD, ZONES, zoneAt } from '../src/sim/data';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import { spawnNaturalRiftPortal } from '../src/sim/rift/portals';
 import { generateRiftFloor } from '../src/sim/rift/rift_gen';
@@ -192,6 +192,38 @@ describe('Rift shared-world persistence', () => {
     expect(portal.riftEventId).toBe(original.eventId);
     expect(portal.pos.x).toBeCloseTo(original.position.x);
     expect(portal.pos.z).toBeCloseTo(original.position.z);
+  });
+
+  it('drops saved northern portals while retaining eligible events and spawn ordinals', () => {
+    const source = makeSim();
+    expect(spawnNaturalRiftPortal(source.ctx, 0)).toBe(true);
+    const now = 1_800_000_000_000;
+    const save = serializeRiftWorldState(source.ctx, now);
+    const eligibleEvent = save.events[0];
+    const northernEvents = ['amberfall', 'frostveil', 'drakelands'].map((id, index) => {
+      const zone = ZONES.find((candidate) => candidate.id === id)!;
+      const position = { x: zone.hub.x, z: zone.hub.z };
+      // Matching coordinates ensure eligibility is the only rejection reason.
+      expect(zoneAt(position.x, position.z).id).toBe(id);
+      return {
+        ...structuredClone(eligibleEvent),
+        eventId: `rift-northern-${id}`,
+        ordinal: index + 1,
+        zoneId: id,
+        zoneName: zone.name,
+        position,
+      };
+    });
+    save.events.push(...northernEvents);
+    save.spawnCount = 4;
+
+    const restored = makeSim();
+    expect(loadRiftWorldState(restored.ctx, save, now + 60_000)).toBe(1);
+    expect(restored.riftEvents.map((event) => event.eventId)).toEqual([eligibleEvent.eventId]);
+    expect(restored.naturalRiftPortals.map((portal) => portal.eventId)).toEqual([
+      eligibleEvent.eventId,
+    ]);
+    expect(restored.riftPortalSpawnCount).toBe(4);
   });
 
   it('drops malformed saved events instead of loading them', () => {

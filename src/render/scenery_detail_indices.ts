@@ -9,7 +9,7 @@ export const scenerySimplifierReady = Promise.all([
   MeshoptSimplifier.ready,
   prepareSceneryBandGeometry(),
 ]);
-export { releaseSceneryTopology } from './scenery_detail_topology';
+export { releaseSceneryTopology, retainSceneryTopology } from './scenery_detail_topology';
 
 /** One model/level per preparation unit, never called from a distance flip.
  * Standard simplification protects UV seams. Palm crowns allow seam collapse,

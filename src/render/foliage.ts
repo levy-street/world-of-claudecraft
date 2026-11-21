@@ -1208,6 +1208,7 @@ interface SpeciesSpec {
 export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'foliage-material-prewarm';
+  group.userData.renderCategory = 'prewarm';
   group.position.set(0, -1000, 0); // off-screen; compileAsync ignores position
   const identity = new THREE.Matrix4();
   const white = new THREE.Color(1, 1, 1);

@@ -27,4 +27,40 @@ describe('static interior loading', () => {
     expect(build).toHaveBeenCalledTimes(2);
     expect(built.has('crypt:0')).toBe(true);
   });
+
+  it('holds dungeon readiness until prepareDungeon settles and shares in-flight builds with schedule', async () => {
+    const built = new Set<string>();
+    let resolveBuild!: () => void;
+    const build = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveBuild = resolve;
+        }),
+    );
+    const tracker = new StaticInteriorTracker(
+      built,
+      build,
+      () => 0,
+      () => {},
+    );
+    const dungeon = { id: 'hollow_crypt', index: 0, interior: 'hollow_crypt' };
+    const progress: Array<[number, number]> = [];
+
+    expect(tracker.isDungeonSettled(dungeon, -1250)).toBe(false);
+    const prepare = tracker.prepareDungeon(dungeon, -1250, (done, total) =>
+      progress.push([done, total]),
+    );
+    tracker.schedule('hollow_crypt:0', 'hollow_crypt', 100300, -1250);
+    await Promise.resolve();
+    expect(build).toHaveBeenCalledTimes(1);
+    expect(tracker.isDungeonSettled(dungeon, -1250)).toBe(false);
+
+    resolveBuild();
+    await prepare;
+    expect(tracker.isDungeonSettled(dungeon, -1250)).toBe(true);
+    expect(progress).toEqual([
+      [0, 1],
+      [1, 1],
+    ]);
+  });
 });

@@ -59,6 +59,7 @@ registerDeferredPreload(() => prepareGreatTreeProfileAssets(GFX));
 export function buildGreatTreePrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'great-tree-material-prewarm';
+  group.userData.renderCategory = 'prewarm';
   group.position.set(0, -1000, 0); // off-screen; compile ignores position
   if (!GFX.surfaceDetail || !greatTreeScene) return group;
   const tree = greatTreeScene.clone(true);

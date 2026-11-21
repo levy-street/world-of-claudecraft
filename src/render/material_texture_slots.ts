@@ -36,11 +36,16 @@ export function materialSlotTextures(material: THREE.Material): THREE.Texture[] 
   return textures;
 }
 
+function isStagedPrewarmSubtree(node: THREE.Object3D): boolean {
+  return node.userData?.renderCategory === 'prewarm' || node.name.endsWith('-prewarm');
+}
+
 /**
  * Collect the slot textures of every material under `obj` into `textures`
- * (deduplicated by the Set). `visibleOnly` walks traverseVisible, so hidden
- * subtrees are skipped: the boot scene collection deliberately mirrors what
- * the initial frame will draw.
+ * (deduplicated by the Set). `visibleOnly` walks visible nodes while skipping
+ * staged prewarm subtrees (`userData.renderCategory === 'prewarm'` or
+ * `*-prewarm`), so the boot scene collection mirrors what the initial frame
+ * will draw even while shader-compile prewarm roots are temporarily shown.
  */
 export function collectObjectTextures(
   obj: THREE.Object3D,
@@ -58,7 +63,15 @@ export function collectObjectTextures(
       for (const texture of materialSlotTextures(material)) textures.add(texture);
     }
   };
-  if (visibleOnly) obj.traverseVisible(collect);
-  else obj.traverse(collect);
+  if (visibleOnly) {
+    const walkVisible = (node: THREE.Object3D): void => {
+      if (!node.visible || isStagedPrewarmSubtree(node)) return;
+      collect(node);
+      for (const child of node.children) walkVisible(child);
+    };
+    walkVisible(obj);
+  } else {
+    obj.traverse(collect);
+  }
   return textures;
 }

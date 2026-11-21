@@ -13,7 +13,6 @@ import type { DungeonLayout } from '../sim/dungeon_layout';
 import { polygonXAtZ } from '../sim/geometry2d';
 import { hash2 } from '../sim/rng';
 import { loadGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { detailedSurfaceMat } from './worn_stone';
@@ -79,10 +78,12 @@ const MARSH_ASSET_SCALE: Record<MarshGlbAnchorKind, { axis: 'x' | 'y'; target: n
 };
 
 const loadedMarshGltf = new Map<MarshGlbAnchorKind, THREE.Group>();
+let marshDressingAssetsPromise: Promise<void> | null = null;
 
-if (typeof window !== 'undefined') {
-  for (const [kind, url] of Object.entries(MARSH_ASSET_URL) as [MarshGlbAnchorKind, string][]) {
-    registerDeferredPreload(() =>
+export function ensureDelveMarshDressingAssets(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  marshDressingAssetsPromise ??= Promise.all(
+    (Object.entries(MARSH_ASSET_URL) as [MarshGlbAnchorKind, string][]).map(([kind, url]) =>
       loadGltf(url).then((gltf) => {
         // The kit is the app-wide cache every placement clones from, and
         // Object3D.clone(true) shares geometry and material BY REFERENCE with
@@ -98,8 +99,14 @@ if (typeof window !== 'undefined') {
         });
         loadedMarshGltf.set(kind, gltf.scene);
       }),
-    );
-  }
+    ),
+  )
+    .then(() => undefined)
+    .catch((err) => {
+      marshDressingAssetsPromise = null;
+      throw err;
+    });
+  return marshDressingAssetsPromise;
 }
 
 function placeLoadedMarshAsset(
