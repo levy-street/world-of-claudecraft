@@ -26,6 +26,15 @@
 // raid, and each Opposing Elements mark walks to its paired opposite (the
 // nearest free one), keeping clear of every other mark.
 //
+// Hardening Frost (2026-11-20): the ring planted at a tank's feet from
+// Biting Frost's fifth stack is a hazard everyone steps out of. Every fresh
+// floor hazard is noticed through the reaction model
+// (scripts/lib/heart_raid_reaction.mjs: 250 to 650 ms, now and then a slip of
+// another 0.9 to 1.8 s), so the raid plays like a competent human raid, not a
+// perfect one. The off-tank waits with a clear line for its taunt (never
+// behind a pillar), the raid soaks the Anvil on the mark's far side from the
+// boss, and a Storm Orb goes to a free damage dealer before a healer.
+//
 // IGNORE=drag  the tanks never move the boss on (the key mechanic: Overload)
 // IGNORE=swap  the tanks never swap on Elemental Strike (the tank's death test)
 // START=40     a few seconds into the pull the leader jumps the boss to its
@@ -48,6 +57,7 @@ import {
   polaritiesCancel,
   polarityOf,
   residueOf,
+  rimeOf,
   STRIKE_AURAS,
   spireLinks,
   spireOf,
@@ -93,10 +103,12 @@ import {
   hypot,
   IGNORE,
   log,
+  rand,
   segDist,
   tankAssign,
   unit,
 } from './heart_raid_bots.mjs';
+import { createReaction } from './heart_raid_reaction.mjs';
 
 const T = FINAL_TUNING;
 /** Where the pull jumps (START=40 or 15; empty: the whole fight). */
@@ -151,6 +163,7 @@ export const final = {
       bladeLanes: [],
       rings: [],
       spires: [],
+      rimes: [],
     };
     // A Quenching Ring's age is ours to keep (its object carries its gaps,
     // not its age): first seen, it was just raised.
@@ -173,6 +186,14 @@ export const final = {
           });
         continue;
       }
+      // Hardening Frost (2026-11-20): a 3.5 yd ring planted at the tank's
+      // feet from Biting Frost's fifth stack, closing 3 s later and freezing
+      // whoever still stands in it: everyone steps out, the tank first.
+      if (rimeOf(t) !== null) {
+        o.rimes.push({ ...at, r: ET.rimeR });
+        o.danger.push({ ...at, r: ET.rimeR + 1 });
+        continue;
+      }
       // Its own elements' footprints.
       if (steamOf(t)) {
         // A drifting cloud: where it is and a little round it.
@@ -193,6 +214,7 @@ export const final = {
       if (elane) {
         const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
         o.lanes.push({
+          id: at.id,
           from: add(at, d, -elane.length / 2),
           to: add(at, d, elane.length / 2),
           half: elane.half + 1,
@@ -222,6 +244,7 @@ export const final = {
         const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
         const from = add(at, d, -lane.length / 2);
         o.bladeLanes.push({
+          id: at.id,
           from,
           to: add(at, d, lane.length / 2),
           half: T.bladeHalf + 1.2,
@@ -263,6 +286,7 @@ export const final = {
       else if (swellLaneOf(t)) {
         const d = { x: Math.sin(at.f), z: Math.cos(at.f) };
         o.lanes.push({
+          id: at.id,
           from: { x: at.x, z: at.z },
           // To the Anvil's rim since 2026-11-19 (laneReach), never the guardian's 32 yd.
           to: add(
@@ -289,7 +313,18 @@ export const final = {
     for (const list of groups.values())
       for (const [a, b] of spireLinks(list.length))
         if (list[a] && list[b])
-          o.lanes.push({ from: list[a], to: list[b], half: ET.spireLinkHalf + 1.2 });
+          o.lanes.push({
+            id: list[a].id,
+            from: list[a],
+            to: list[b],
+            half: ET.spireLinkHalf + 1.2,
+          });
+    // The reaction model: each bot notices a fresh footprint a human-ish
+    // moment after it appears (and now and then late); forget the gone ones.
+    world.react ??= createReaction(rand);
+    const live = new Set();
+    for (const e of world.obs.ents.values()) if (e.k === 'object') live.add(e.id);
+    world.react.prune(live);
 
     world.o = o;
     const b = world.mobs.boss;
@@ -311,7 +346,7 @@ export const final = {
     // (the bot raids of 2026-11-20).
     const boss = world.mobs.boss;
     if (alive(boss) && boss.aggro !== b.pid && !final.isFinalPhase(world))
-      return add(boss, unit(world.center, boss), 7);
+      return standbySpot(world, st, b, boss);
     return dragSpot(world, st);
   },
   // An intermission's Splinters are split between the tanks in turn (the
@@ -422,9 +457,11 @@ export const final = {
       hypot(at, world.center) < HEART_QUARTERS.ringR + 2
     )
       return true;
-    for (const h of [...o.danger, ...o.ice]) if (hypot(h, at) < h.r) return true;
-    for (const ln of o.lanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;
-    for (const ln of o.bladeLanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;
+    const seen = (h) => sees(world, st, h);
+    for (const h of [...o.danger, ...o.ice]) if (seen(h) && hypot(h, at) < h.r) return true;
+    for (const ln of o.lanes) if (seen(ln) && segDist(at, ln.from, ln.to) < ln.half) return true;
+    for (const ln of o.bladeLanes)
+      if (seen(ln) && segDist(at, ln.from, ln.to) < ln.half) return true;
     for (const p of o.pillars) if (hypot(p, at) < p.r + 1) return true;
     const b = world.mobs.boss;
     const hid = b ? auraOf(b, FINAL_PHASE_AURAS.hidden) : null;
@@ -440,7 +477,7 @@ export const final = {
     const out = [];
     const o = world.o;
     if (!o) return out;
-    for (const h of [...o.danger, ...o.ice]) out.push(h);
+    for (const h of [...o.danger, ...o.ice]) if (sees(world, st, h)) out.push(h);
     // The Leaping Bolt and Drawn Lightning: spread from the marked.
     const boss = world.mobs.boss;
     if (boss?.cast === FINAL_CASTS.bolt && boss.castTgt !== b.pid) {
@@ -514,6 +551,9 @@ export const final = {
       `Stars: pillars risen ${st.pillarsSeen ?? 0}, most standing ${st.pillarsMax ?? 0}, most charged ${st.chargedMax ?? 0}, shattered ${st.shattered ?? 0} (charged ${st.chargedShattered ?? 0}), blades ${st.bladesSeen ?? 0}`,
     );
     note(
+      `Heart Unbound: ${st.unboundTicks ?? 0} stacks gained (most ${st.unboundMax ?? 0}); Hardening Frost: ${st.rimes ?? 0} rings, ${st.freezes ?? 0} frozen; late reactions rolled: ${st.slips ?? 0}`,
+    );
+    note(
       `Its own elements: most Elemental Strike stacks on a tank ${st.strikeMax ?? 0}; fusions ${
         Object.entries(st.combos ?? {})
           .map(([k, v]) => `${k} x${v.n}`)
@@ -529,7 +569,34 @@ export const final = {
       ['Pillars', `${st.pillarsSeen ?? 0}/${st.shattered ?? 0}`],
       ['Charged', String(st.chargedMax ?? 0)],
       ['Stacks', String(st.strikeMax ?? 0)],
+      ['Unbound', String(st.unboundMax ?? 0)],
+      ['Frozen', String(st.freezes ?? 0)],
     ];
+  },
+  // The machine-readable side of the report (heart_raid_bots.mjs writes it
+  // beside the fight log as JSON).
+  summary(world, st) {
+    init(st);
+    return {
+      quarters: st.zones,
+      bursts: st.bursts,
+      stages: st.stages,
+      anvils: st.anvils ?? 0,
+      anvilUnder: st.anvilUnder ?? [],
+      pillarsSeen: st.pillarsSeen ?? 0,
+      pillarsMax: st.pillarsMax ?? 0,
+      chargedMax: st.chargedMax ?? 0,
+      shattered: st.shattered ?? 0,
+      blades: st.bladesSeen ?? 0,
+      strikeMax: st.strikeMax ?? 0,
+      combos: Object.fromEntries(Object.entries(st.combos ?? {}).map(([k, v]) => [k, v.n])),
+      polarityRounds: st.polarityRounds ?? 0,
+      unboundGained: st.unboundTicks ?? 0,
+      unboundMax: st.unboundMax ?? 0,
+      rimes: st.rimes ?? 0,
+      freezes: st.freezes ?? 0,
+      slips: st.slips ?? 0,
+    };
   },
 };
 
@@ -560,6 +627,25 @@ function zoneOfBoss(world) {
 function bar(world, vein) {
   const b = world.mobs.boss;
   return auraOf(b, overloadAuraId(vein))?.value ?? 0;
+}
+
+/** The off-tank's spot beside the boss, ready to taunt at the swap: on the
+ *  boss's outer side (away from the central ring), within a warrior's taunt
+ *  reach, with a clear line to it (a Wake the Stone pillar between them
+ *  blocked the taunt and the holder ran to 6 Elemental Strike stacks in the
+ *  bot raids of 2026-11-21), off every hazard. */
+function standbySpot(world, st, b, boss) {
+  const out = unit(world.center, boss);
+  const base = Math.atan2(out.x, out.z);
+  const r = Math.min(7, 5 + (boss.reach ?? 0));
+  for (const da of [0, 0.5, -0.5, 1, -1, 1.5, -1.5]) {
+    const a = base + da;
+    const at = add(boss, { x: Math.sin(a), z: Math.cos(a) }, r);
+    if (!final.onFloor(world, at) || final.bad(world, st, at)) continue;
+    if (final.blocksLine(world, at, boss)) continue;
+    return at;
+  }
+  return add(boss, out, r);
 }
 
 /** Where the boss's tank stands: in the quarter it drinks until its bar is
@@ -659,6 +745,12 @@ function track(world, st) {
     st.anvilFellAt = Date.now();
     st.anvilUnder = [...(st.anvilUnder ?? []), under.length];
   }
+  if (anvil && !st.anvilSeen) {
+    const marked = world.living().find((p) => hasAura(p, FINAL_AURAS.anvilMark));
+    log(
+      `ANVIL marked: ${marked ? `${marked.name}${marked.tank ? ' (tank)' : ''}` : 'nobody (it turns)'}; farthest ${Math.round(Math.max(0, ...world.living().map((p) => hypot(p, anvil))))} yd`,
+    );
+  }
   st.anvilSeen = anvil ? { x: anvil.x, z: anvil.z } : null;
   // The stars: pillars risen and shattered (the charged ones counted), blades.
   const ps = world.o?.pillars ?? [];
@@ -680,6 +772,7 @@ function track(world, st) {
   const bladeIds = new Set((world.o?.blades ?? []).map((x) => x.id));
   for (const id of bladeIds) if (!st.bladeIds?.has(id)) st.bladesSeen = (st.bladesSeen ?? 0) + 1;
   st.bladeIds = bladeIds;
+  trackCounters(world, st);
   const z = zoneOfBoss(world);
   if (z !== st.prevZone && world.mobs.boss?.aggro != null) {
     st.zones.push({ t: fightSec(), zone: z });
@@ -705,6 +798,37 @@ function track(world, st) {
     }
     st.prevStage = key;
   }
+}
+
+/** The counters the report and the JSON summary read: Heart Unbound's
+ *  stacks, Hardening Frost rings and freezes, the reaction model's slips. */
+function trackCounters(world, st) {
+  const b = world.mobs.boss;
+  const ub = b ? auraOf(b, FINAL_AURAS.unbound) : null;
+  const stacks = ub ? Math.round(ub.value ?? ub.stacks ?? 1) : 0;
+  if (stacks > (st.unboundNow ?? 0)) {
+    st.unboundTicks = (st.unboundTicks ?? 0) + 1;
+    st.unboundMax = Math.max(st.unboundMax ?? 0, stacks);
+    log(`HEART UNBOUND: ${stacks} stacks`);
+  }
+  st.unboundNow = stacks;
+  st.rimeIds ??= new Set();
+  for (const r of world.o?.rimes ?? []) {
+    if (st.rimeIds.has(r.id)) continue;
+    st.rimeIds.add(r.id);
+    st.rimes = (st.rimes ?? 0) + 1;
+    log("HARDENING FROST: a ring at the tank's feet");
+  }
+  st.frozenNow ??= new Set();
+  for (const p of world.living()) {
+    const f = hasAura(p, ELEMENT_AURAS.frozen);
+    if (f && !st.frozenNow.has(p.pid)) {
+      st.frozenNow.add(p.pid);
+      st.freezes = (st.freezes ?? 0) + 1;
+      log(`FROZEN: ${p.name} (Hardening Frost closed on them)`);
+    } else if (!f) st.frozenNow.delete(p.pid);
+  }
+  st.slips = world.react?.slips() ?? 0;
 }
 
 /** Its own elements: the polarity pairs (each mark to the nearest free
@@ -780,6 +904,8 @@ function trackElements(world, st) {
 
 function duty(world, st, b, me) {
   init(st);
+  // The bot this tick's hazard checks are for (act() asks duty first).
+  st.viewer = b.spec.key;
   const o = world.o;
   const boss = world.mobs.boss;
   // A Quenching Ring riding out at me: into its nearest gap at my distance
@@ -832,10 +958,17 @@ function duty(world, st, b, me) {
   // marked one holds still so the raid can gather on them.
   if (anvil && hasAura(me, FINAL_AURAS.anvilMark))
     return { goal: { x: me.x, z: me.z }, tol: 1.5, duty: 'anvil (marked)' };
-  if (anvil && (!mainTank || ringClear)) {
+  if (anvil && (!mainTank || ringClear) && sees(world, st, anvil)) {
     const i = world.bots.indexOf(b);
+    // A mark near the boss (its tank marked, the melee's own spot): the raid
+    // gathers on the mark's far side, out of Forge Fist's frontal cone.
+    let ang = i * 1.3;
+    if (alive(boss) && hypot(boss, anvil) < 12) {
+      const away = unit(boss, anvil);
+      ang = Math.atan2(away.x, away.z) + ((i % 7) / 6 - 0.5) * 2.2;
+    }
     return {
-      goal: add(anvil, { x: Math.sin(i * 1.3), z: Math.cos(i * 1.3) }, Math.min(3, anvil.r - 2)),
+      goal: add(anvil, { x: Math.sin(ang), z: Math.cos(ang) }, Math.min(3, anvil.r - 2)),
       tol: 0.8,
       duty: 'anvil',
     };
@@ -891,14 +1024,23 @@ function duty(world, st, b, me) {
       }
     }
   }
-  // A Storm Orb each: the nearest free bot steps on it.
+  // A Storm Orb each: the nearest free bot steps on it, never one already
+  // carrying a mark of its own (the hunt's quarry, a coal, a rift, a
+  // polarity) and a healer only when no damage dealer is free: a healer
+  // pounced on and then sent onto an orb died in the bot raids of 2026-11-21.
   if (o.orbs.length && !me.tank) {
     const taken = new Set();
+    const busy = (q) =>
+      hasAura(q, FINAL_PHASE_AURAS.tether) ||
+      hasAura(q, FINAL_PHASE_AURAS.coal) ||
+      hasAura(q, ELEMENT_AURAS.magmaMark) ||
+      hasAura(q, ELEMENT_AURAS.polarity) ||
+      hasAura(q, FINAL_AURAS.anvilMark);
     for (const orb of o.orbs) {
       const p = world
         .living()
-        .filter((q) => q.bot && !q.tank && !taken.has(q.pid))
-        .sort((x, y) => hypot(x, orb) - hypot(y, orb))[0];
+        .filter((q) => q.bot && !q.tank && !taken.has(q.pid) && !busy(q))
+        .sort((x, y) => Number(x.healer) - Number(y.healer) || hypot(x, orb) - hypot(y, orb))[0];
       if (!p) continue;
       taken.add(p.pid);
       if (p.pid === b.pid) return { goal: orb, tol: 0.6, duty: 'orb' };
@@ -942,6 +1084,12 @@ function duty(world, st, b, me) {
     if (spot) return { goal: spot, tol: 0.8, duty: 'dodge' };
   }
   return null;
+}
+
+/** Has this tick's bot noticed hazard `h` yet (the reaction model)? */
+function sees(world, st, h) {
+  if (!world.react || !st.viewer) return true;
+  return world.react.noticed(st.viewer, h.id, Date.now());
 }
 
 /** The Buffeting Gale's reach (final_phase_ids.ts FINAL_PHASE_TUNING buffetReach). */
