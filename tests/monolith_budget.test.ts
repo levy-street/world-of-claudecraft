@@ -557,7 +557,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 17736 -> 17726: the spell ground aim's construction moved to
     // hud/action_bar/hud_player_ground_aim.ts, paying for the world markers'
     // seam (hud/world_markers/), with the slack banked.
-    ceiling: 17726,
+    // LOWERED 17726 -> 17712: the raid target icon picker moved to
+    // hud/raid_target_menu.ts, paying for the ally marks' menu rows and the
+    // party / target-of-target frame wiring.
+    ceiling: 17712,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

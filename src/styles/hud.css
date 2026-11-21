@@ -13441,6 +13441,28 @@
     box-shadow: 0 0 0 1px var(--color-keyline);
     object-fit: cover;
   }
+  /* The raid target icon the group put on this member (party_frame_row.ts .pfm-mark):
+     seated on the crest's top-right like the target frame's #tf-raid-marker, above
+     the ring. Hidden by the painter while unmarked; never a hit target. */
+  .party-frame .pfm-mark {
+    position: absolute;
+    left: 26px;
+    top: -3px;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px calc(2px * var(--fx-shadow, 1)) var(--color-art-shadow));
+    pointer-events: none;
+    z-index: 3;
+  }
+  /* Compact raid cells drop the crest, so the icon takes the cell's top-right corner. */
+  #party-frames.party-style-raid .party-frame .pfm-mark {
+    left: auto;
+    right: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+  }
   .party-frame .pfm-role {
     display: none;
   }

@@ -47,6 +47,7 @@ import {
   partyFrameHealthText,
   resolvePartyFrameStyle,
 } from './party_frames';
+import { raidMarkerDisplayName } from './raid_marker_labels_view';
 import { unitFrameView } from './unit_frame';
 
 // The class-color custom property the frame's name reads (`color: var(--cls)`); a
@@ -110,6 +111,9 @@ export interface PartyFramesPainterDeps {
   /** The shared aura view/painter deps every row's mini aura strip builds over
    *  (each row owns its own view + painter instance; the deps are the Hud's). */
   partyAuras: PartyRowAuraDeps;
+  /** A raid target icon's art (icons.ts raidMarkerDataUrl, the symbol the
+   *  nameplate floats). Absent (the Edit Frames preview): no icon is drawn. */
+  raidMarkerUrl?: (marker: number) => string;
 }
 
 export class PartyFramesPainter {
@@ -415,6 +419,7 @@ export class PartyFramesPainter {
       // inline, so the two can never drift; every other write it makes is elided
       // to a no-op here because only the language moved.
       this.paintPet(row, row.slot.member);
+      this.paintMark(row, row.slot.member);
     }
     for (const row of this.free) row.relocalize();
     // Re-emit the chip caption in the new language while it is shown (a language
@@ -536,6 +541,7 @@ export class PartyFramesPainter {
     this.writers.setDisplay(row.badges.oor, m.oor ? BADGE_SHOWN : BADGE_HIDDEN);
     this.writers.setDisplay(row.badges.offline, m.connected === 0 ? BADGE_SHOWN : BADGE_HIDDEN);
     this.paintPet(row, m);
+    this.paintMark(row, m);
     // The member's mini aura strip: the row's own keyed aura pool (writes elided
     // inside it). Signature-gated like the rest of this sync, never per frame.
     row.paintAuras(config?.showAuras === false ? [] : (m.auras ?? []));
@@ -562,6 +568,20 @@ export class PartyFramesPainter {
     this.writers.setTransform(row.petFill, `scaleX(${frac.toFixed(PARTY_BAR_SCALE_PRECISION)})`);
     this.writers.toggleClass(row.petBar, PET_DEAD_CLASS, pet.dead);
     this.writers.setText(row.petLabel, this.deps.petLabel(pet.name, frac));
+  }
+
+  // The member's raid target icon. Read off the client-attached `mark` (absent when
+  // unmarked), so an unmarked row only ever holds the hidden, src-less icon.
+  private paintMark(row: PartyRow, m: PartyFrameMember): void {
+    const url = m.mark === undefined ? '' : (this.deps.raidMarkerUrl?.(m.mark) ?? '');
+    this.writers.setDisplay(row.mark, url ? BADGE_SHOWN : BADGE_HIDDEN);
+    if (url) this.writers.setAttr(row.mark, 'src', url);
+    this.writers.setText(
+      row.markLabel,
+      url && m.mark !== undefined
+        ? t('hudChrome.raidTargets.frameMark', { marker: raidMarkerDisplayName(m.mark) })
+        : '',
+    );
   }
 
   private groupLabel(m: PartyFrameMember, raid: boolean): string {

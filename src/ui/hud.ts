@@ -4811,10 +4811,12 @@ export class Hud {
       hpFill: this.totHpEl,
       hpText: this.totHpTextEl,
       resource: { container: this.totResourceEl, fill: this.totResEl, text: this.totResTextEl },
+      raidMarker: $('#totf-raid-marker'),
     },
     {
       shownDisplay: 'flex',
       repaintPortrait: () => this.drawTargetOfTargetPortrait(),
+      raidMarkerUrl: raidMarkerDataUrl,
     },
   );
   // The pet frame is the FOURTH instance of the unit_frame family. Like the
@@ -4909,8 +4911,11 @@ export class Hud {
       chipLabel: () => t('hudChrome.unitFrame.partyChip'),
       onToggleCollapse: () => this.togglePartyCollapsed(),
       partyAuras: this.partyAurasDeps,
+      raidMarkerUrl: raidMarkerDataUrl,
     },
   );
+  // One stable lookup (no per-frame closure): a member's raid target icon.
+  private readonly partyMarkOf = (pid: number): number | null => this.sim.markerFor(pid);
   // The below-target offset painter: measures the target frame plus its
   // #tf-debuffs strip (only when its cheap invalidation key changes) and keeps
   // --party-below-target-bottom on #party-frames current, so the below-target
@@ -8848,6 +8853,7 @@ export class Hud {
             totFrame,
             tot,
             healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3),
+            sim.markerFor(tot.id),
           );
           this.totFramePainter.paint(unitFrameViewInto(this.totFrameBuffer, totFrame));
         }
@@ -16769,6 +16775,7 @@ export class Hud {
       config,
       pets,
       this.sim.player.targetId,
+      this.partyMarkOf,
     );
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
@@ -16779,6 +16786,7 @@ export class Hud {
       undefined,
       config,
       pets,
+      this.partyMarkOf,
     );
     this.partyFramesPainter.sync(others, info.leader, info.raid, config, this.sim.player.targetId);
     // Re-dock the Loot Settings panel below the (just re-synced) party frames when their

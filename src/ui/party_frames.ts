@@ -29,11 +29,20 @@ export const PARTY_FRAME_RANGE_YD = 40;
 /** A member row's data. `pet` is attached CLIENT-SIDE from the entity roster
  *  (findPetsByOwner), not from the party wire: absent when the member has no pet,
  *  when their pet is outside the client's interest scope, or when the Show Pets
- *  display option is off. */
-export type PartyFrameMember = PartyMemberInfo & { oor: boolean; pet?: PartyPetInfo };
+ *  display option is off. `mark` (the raid target icon on the member, 0..7) is
+ *  attached client-side from IWorld.markerFor, absent when unmarked. */
+export type PartyFrameMember = PartyMemberInfo & {
+  oor: boolean;
+  pet?: PartyPetInfo;
+  mark?: number;
+};
 
 /** Owner entity id -> that owner's pet. Built once per repaint by the caller. */
 export type PartyPetMap = ReadonlyMap<number, PartyPetInfo>;
+
+/** A member's raid target icon (IWorld.markerFor over the member pid), or null.
+ *  The caller hands in ONE stable function, never a per-frame closure. */
+export type PartyMarkLookup = (pid: number) => number | null;
 
 /** Same mode table as the player / target frames (hud_frames.ts). */
 export type PartyFrameHealthTextMode = HealthTextMode;
@@ -169,6 +178,7 @@ export function selectPartyFrameMembers(
   rangeYd = PARTY_FRAME_RANGE_YD,
   config: PartyFrameDisplayConfig = DEFAULT_PARTY_FRAME_DISPLAY,
   pets?: PartyPetMap,
+  marks?: PartyMarkLookup,
 ): PartyFrameMember[] {
   return info.members
     .map((member, index) => ({ member, index }))
@@ -188,6 +198,7 @@ export function selectPartyFrameMembers(
     .filter((m) => config.showSelf || m.pid !== playerId)
     .map((m) => {
       const pet = config.showPets ? pets?.get(m.pid) : undefined;
+      const mark = marks?.(m.pid) ?? null;
       return {
         ...m,
         oor:
@@ -195,6 +206,7 @@ export function selectPartyFrameMembers(
           !m.dead &&
           Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd,
         ...(pet ? { pet } : {}),
+        ...(mark !== null ? { mark } : {}),
       };
     });
 }
@@ -225,6 +237,7 @@ export function partyFrameSignature(
   config: PartyFrameDisplayConfig = DEFAULT_PARTY_FRAME_DISPLAY,
   pets?: PartyPetMap,
   targetId?: number | null,
+  marks?: PartyMarkLookup,
 ): string {
   let sig = '';
   let myGroup: 1 | 2 = 1;
@@ -255,6 +268,9 @@ export function partyFrameSignature(
     // cannot inject the delimiters this fold uses.
     const pet = config.showPets ? pets?.get(m.pid) : undefined;
     sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}`;
+    // The raid target icon is client-mirrored state (the self-wire `marks`), not a
+    // party-wire field, so a mark set or cleared moves only this fold.
+    sig += `:M${marks?.(m.pid) ?? ''}`;
     sig += pet ? `:P${pet.id},${pet.name},${pet.hp}/${pet.maxHp},${pet.dead ? 1 : 0}|` : '|';
   }
   return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:T${targetId ?? 0}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.showPets ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;

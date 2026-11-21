@@ -77,6 +77,10 @@ export interface PartyRow {
   incoming: HTMLElement;
   /** The compact raid-cell role swatch; the painter drives its tank/healer/damage class. */
   role: HTMLElement;
+  /** The member's raid target icon (aria-hidden art, hidden when unmarked) and its
+   *  visually-hidden spoken name; the painter drives both. */
+  mark: HTMLElement;
+  markLabel: HTMLElement;
   /** The pet health sliver and its parts; the painter drives all three. */
   petBar: HTMLElement;
   petFill: HTMLElement;
@@ -251,7 +255,18 @@ export function createPartyRow(
   role.className = 'pfm-role';
   role.setAttribute('aria-hidden', 'true');
 
-  nameRow.append(id, meta, group);
+  // The raid target icon the group put on this member (star to skull), beside the
+  // name the way the classic raid frames carry it. The art is decorative; the
+  // visually-hidden label joins the row's accessible name ("Marked: Skull").
+  const mark = doc.createElement('img');
+  mark.className = 'pfm-mark';
+  mark.alt = '';
+  mark.setAttribute('aria-hidden', 'true');
+  mark.style.display = 'none';
+  const markLabel = doc.createElement('span');
+  markLabel.className = 'pfm-mark-label visually-hidden';
+
+  nameRow.append(mark, id, meta, group, markLabel);
 
   const hpBar = doc.createElement('div');
   hpBar.className = 'bar hp ui-bar ui-bar--hp';
@@ -370,6 +385,8 @@ export function createPartyRow(
     rewind,
     incoming,
     role,
+    mark,
+    markLabel,
     petBar,
     petFill,
     petLabel,

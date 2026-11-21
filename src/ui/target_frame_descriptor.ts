@@ -66,8 +66,9 @@ export function fillTargetOfTargetDescriptor(
   d: UnitFrameDescriptor,
   target: Entity,
   healthMode: HealthTextMode,
+  raidMarker: number | null = null,
 ): UnitFrameDescriptor {
-  fillTargetFrameDescriptor(d, target, NO_TITLE, null);
+  fillTargetFrameDescriptor(d, target, NO_TITLE, raidMarker);
   d.hpText = shownAsDead(target)
     ? t('hud.core.dead')
     : unitFrameHealthText(target.hp, target.maxHp, healthMode);

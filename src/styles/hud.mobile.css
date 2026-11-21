@@ -3568,6 +3568,15 @@
     align-items: center;
     min-width: 0;
   }
+  /* The member's raid target icon: the crest goes inline on touch, so the icon
+     takes the row's top-right corner instead of the crest's. */
+  body.mobile-touch #party-frames .party-frame .pfm-mark {
+    left: auto;
+    right: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+  }
   body.mobile-touch #party-frames .pfm-crest {
     position: static;
     left: auto;

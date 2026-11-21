@@ -402,6 +402,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
           toggles++;
         },
         partyAuras: auraDeps,
+        raidMarkerUrl: (marker: number) => `mark:${marker}`,
       },
       fakeDoc,
     );
@@ -438,6 +439,22 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
 
     rowA.fire('click', {});
     expect(targeted).toEqual([2]);
+  });
+
+  it("shows a member's raid target icon and its spoken name, and hides it when cleared", () => {
+    painter.sync([member({ pid: 2, name: 'Alice', mark: 7 } as never)], 1, false);
+    const icon = rows()[0]
+      .childNodes.find((c) => String(c.className).includes('pfm-name'))
+      ?.childNodes.find((c) => String(c.className).includes('pfm-mark'));
+    expect(icon).toBeTruthy();
+    expect(calls).toContainEqual({ m: 'setAttr', el: icon, args: ['src', 'mark:7'] });
+    expect(calls).toContainEqual({ m: 'setDisplay', el: icon, args: [''] });
+    expect(calls).toContainEqual(
+      expect.objectContaining({ m: 'setText', args: ['Marked: Skull'] }),
+    );
+    calls.length = 0;
+    painter.sync([member({ pid: 2, name: 'Alice' })], 1, false);
+    expect(calls).toContainEqual({ m: 'setDisplay', el: icon, args: ['none'] });
   });
 
   it('paints a desktop Party N disclosure through the shared persisted collapse callback', () => {
