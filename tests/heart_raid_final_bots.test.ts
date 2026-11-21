@@ -13,6 +13,7 @@ import {
   ELEMENT_OBJECTS,
   ELEMENT_TUNING,
   rimeTemplate,
+  STRIKE_AURAS,
 } from '../src/sim/encounters/smith_heart/final_elements_ids';
 import {
   FINAL_AURAS,
@@ -284,6 +285,14 @@ describe('Masterless Strength bots: Weight of the Anvil', () => {
     const s = final.duty(f.world, st, f.sb, f.soaker) as Duty;
     expect(s?.duty).toBe('anvil');
     expect(final.bad(f.world, st, s!.goal)).toBe(false);
+  });
+
+  it('a tank whose Static Charge arcs stays out of the soak', () => {
+    const f = anvilFight([], [{ id: STRIKE_AURAS.breath, stacks: ELEMENT_TUNING.arcFrom }]);
+    const st = {};
+    final.duty(f.world, st, f.sb, f.soaker);
+    vi.setSystemTime(4_000_000 + 3000);
+    expect((final.duty(f.world, st, f.sb, f.soaker) as Duty)?.duty).not.toBe('anvil');
   });
 
   it('a Drawn Lightning carrier stays out of the soak, a free raider joins it', () => {

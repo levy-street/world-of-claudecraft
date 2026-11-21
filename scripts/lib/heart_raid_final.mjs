@@ -338,8 +338,22 @@ export const final = {
     return r < HEART_QUARTERS.rimR - 4;
   },
   tankSpot(world, st, b, t) {
-    // A Splinter is held where it rose (its signature is its quarter's).
-    if (t && SPLINTERS.has(t.tid)) return t;
+    // A Splinter is held where it rose (its signature is its quarter's); a
+    // tank whose Static Charge arcs (3 or more stacks, carried into the
+    // intermission) walks it a few yards out of the raid instead: six bots
+    // died to the arcs round a Splinter in the Heroic bot raids of 2026-11-21.
+    if (t && SPLINTERS.has(t.tid)) {
+      const me = world.players.get(b.pid);
+      if (!me || !arcing(me)) return t;
+      const others = world.living().filter((p) => !p.tank);
+      if (!others.length) return t;
+      const mid = {
+        x: others.reduce((a, p) => a + p.x, 0) / others.length,
+        z: others.reduce((a, p) => a + p.z, 0) / others.length,
+      };
+      const away = add(t, unit(mid, t), 6);
+      return final.onFloor(world, away) && !final.bad(world, st, away) ? away : t;
+    }
     // The tank NOT holding the boss waits beside it on its outer side (away
     // from the central ring), ready for the swap: a taunt from a drag spot
     // across the room pulled the boss through the ring into Heart Unbound
@@ -1008,7 +1022,7 @@ function duty(world, st, b, me) {
   // of the soak: its arcs or its burst would land on the whole stack (a
   // Drawn Lightning carrier in the stack took 1,130 and killed a raider in
   // the Heroic bot raids of 2026-11-21); the others share without it.
-  const apart = hasAura(me, FINAL_AURAS.drawn) || hasAura(me, FINAL_PHASE_AURAS.coal);
+  const apart = hasAura(me, FINAL_AURAS.drawn) || hasAura(me, FINAL_PHASE_AURAS.coal) || arcing(me);
   if (anvil && !apart && (!mainTank || ringClear) && sees(world, st, anvil)) {
     const i = world.bots.indexOf(b);
     // A mark near the boss (its tank marked, the melee's own spot): the raid
@@ -1160,6 +1174,12 @@ function duty(world, st, b, me) {
     if (spot) return { goal: spot, tol: 0.8, duty: 'dodge' };
   }
   return null;
+}
+
+/** Is `p` carrying enough Static Charge to arc to allies near it? */
+function arcing(p) {
+  const sc = auraOf(p, STRIKE_AURAS.breath);
+  return !!sc && (sc.stacks ?? 1) >= ET.arcFrom;
 }
 
 /** Has this tick's bot noticed hazard `h` yet (the reaction model)? */
