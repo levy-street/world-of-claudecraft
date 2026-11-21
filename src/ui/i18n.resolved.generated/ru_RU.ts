@@ -8413,6 +8413,14 @@ export const ru_RU: EnTranslations = {
       "readOnly": "Ставить метки местности может только лидер рейда.",
       "bindPlace": "Поставить метку местности: {marker}",
       "bindClear": "Убрать все метки местности"
+    },
+    "raidTargets": {
+      "menuRow": "Метка цели",
+      "menuRowTip": "Повесить над этим существом одну из восьми меток цели. Её видит вся группа, и каждая метка стоит только на одной цели.",
+      "bindCategory": "Метки целей",
+      "bindSet": "Пометить цель: {marker}",
+      "bindClear": "Снять метку с цели",
+      "frameMark": "Метка: {marker}"
     }
   },
   "gatherEvent": {

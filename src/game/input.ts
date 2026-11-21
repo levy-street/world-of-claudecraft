@@ -8,6 +8,7 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { focusTargetAction } from '../ui/focus_targets_core';
 import { worldMarkerActionSymbol } from '../ui/hud/world_markers/world_markers_core';
+import { targetMarkerActionSymbol } from '../ui/raid_target_icons_core';
 import { detectBrowserEngine } from './browser_env';
 import { clampCamPitch } from './camera_pitch_range';
 import { BASE_ZOOM_MAX } from './camera_zoom_ceiling';
@@ -92,6 +93,9 @@ export interface InputCallbacks {
   onFocusTarget?(slot: number, assign: boolean): void;
   /** A world-marker hotkey (0..7 places that symbol, null clears every mark). */
   onWorldMarker?(symbol: number | null): void;
+  /** A raid target icon hotkey on the current target (0..7 marks it with that
+   *  symbol, null clears its mark). */
+  onTargetMarker?(symbol: number | null): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -1273,6 +1277,11 @@ export class Input {
     const marker = worldMarkerActionSymbol(action);
     if (marker !== undefined) {
       this.cb.onWorldMarker?.(marker);
+      return;
+    }
+    const targetMark = targetMarkerActionSymbol(action);
+    if (targetMark !== undefined) {
+      this.cb.onTargetMarker?.(targetMark);
       return;
     }
     const partySlot = partyTargetActionSlot(action);

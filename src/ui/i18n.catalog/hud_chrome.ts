@@ -11861,4 +11861,17 @@ export const hudChromeStrings = {
     bindPlace: 'Place World Marker: {marker}',
     bindClear: 'Clear All World Markers',
   },
+  // The raid target icons on UNITS (src/ui/raid_target_icons_core.ts): the
+  // player-menu row that opens the icon picker, the key-binding section and its
+  // rows, and the party/raid frame icon's spoken name. The symbols' names are
+  // hud.markers.names.*, the picker's own rows hud.markers.*.
+  raidTargets: {
+    menuRow: 'Raid Target Icon',
+    menuRowTip:
+      'Put one of the eight raid target icons over this unit. Your whole group sees it, and each icon sits on one unit at a time.',
+    bindCategory: 'Raid Target Icons',
+    bindSet: 'Mark Target: {marker}',
+    bindClear: 'Clear Target Marker',
+    frameMark: 'Marked: {marker}',
+  },
 };

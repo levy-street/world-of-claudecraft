@@ -628,6 +628,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { openRaidTargetMenu } from './hud/raid_target_menu';
 import { createReferralCardsHud } from './hud/referral_cards/referral_cards_hud_controller';
 import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
 import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
@@ -639,7 +640,7 @@ import { skullBagTooltipLines } from './hud/skull_bag';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
-import { targetFrameMenuKind } from './hud/target_frame_menu';
+import { raidTargetMenuRowHtml, targetFrameMenuKind } from './hud/target_frame_menu';
 import { FerryHudPainter } from './hud/transport';
 import { TreasureMapWindow } from './hud/treasure';
 import { createHudVehicleBar, VehicleActionBarController } from './hud/vehicle';
@@ -873,7 +874,8 @@ import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_g
 import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
-import { RAID_MARKER_LABEL_KEYS, raidMarkerDisplayName } from './raid_marker_labels_view';
+import { RAID_MARKER_LABEL_KEYS } from './raid_marker_labels_view';
+import { offersRaidTargetIcon, raidTargetMarking } from './raid_target_icons_core';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import { RecipePinStore } from './recipe_pins_store';
 import { RecipeTrackerPainter } from './recipe_tracker_painter';
@@ -16856,11 +16858,12 @@ export class Hud {
   private openTargetFrameMenuAt(x: number, y: number, tid = this.sim.player.targetId): void {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (!t) return;
-    const kind = targetFrameMenuKind(t, this.sim.playerId, !!this.sim.partyInfo);
+    const marking = raidTargetMarking(this.sim.partyInfo, this.sim.playerId);
+    const kind = targetFrameMenuKind(t, this.sim.playerId, marking);
     if (kind === 'player') this.openContextMenu(t.id, t.name, x, y);
     else if (kind === 'pet') this.openPetMenu(t.id, t.name, t.dead, x, y);
     else if (kind === 'buddy') this.openBuddyMenu(t.id, entityDisplayName(t), x, y);
-    else if (kind === 'marker') this.openMarkerMenu(t.id, t.name, x, y);
+    else if (kind === 'marker') this.openMarkerMenu(t.id, entityDisplayName(t), x, y);
   }
 
   /**
@@ -16989,6 +16992,7 @@ export class Hud {
     }
     if (isMember || pid === this.sim.playerId)
       html += `<div class="ctx-item" data-act="loot-settings">${esc(t('hudChrome.lootSettings.menuItem'))}</div>`;
+    if (this.raidTargetOffered(ent)) html += raidTargetMenuRowHtml();
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -17018,6 +17022,7 @@ export class Hud {
       else if (act === 'promote') this.sim.partyPromote(pid);
       else if (act === 'kick') this.sim.partyKick(pid);
       else if (act === 'loot-settings') this.openLootSettings();
+      else if (act === 'raid-target') this.openMarkerMenu(pid, name, x, y);
     });
   }
 
@@ -17115,46 +17120,16 @@ export class Hud {
     );
   }
 
-  // Raid/target marker picker for an enemy, opened from its target unit frame.
-  // Party-only (markers are a coordination feature); shows the 8 symbols with a
-  // check on the one currently on this mob, plus localized clear and cancel actions.
+  // The raid target icon picker for one unit (hud/raid_target_menu.ts), and
+  // whether a unit may wear one for this player (the sim's own rule).
   openMarkerMenu(entityId: number, name: string, x: number, y: number): void {
-    if (!this.sim.partyInfo) return;
-    const el = $('#ctx-menu');
-    el.classList.remove(CTX_MENU_PICKER_CLASS);
-    const current = this.sim.markerFor(entityId);
-    let html = `<div class="ctx-title">${esc(name)}</div>`;
-    for (let i = 0; i < RAID_MARKER_LABEL_KEYS.length; i++) {
-      const markerName = raidMarkerDisplayName(i);
-      const aria =
-        current === i
-          ? t('hud.markers.markerSelectedAria', { marker: markerName })
-          : t('hud.markers.markerAria', { marker: markerName });
-      const check = current === i ? `<span class="ctx-selected">${svgIcon('check')}</span>` : '';
-      html += `<div class="ctx-item" role="button" tabindex="0" data-act="m${i}" aria-label="${esc(aria)}"><span class="ctx-mark" style="background-image:url(${raidMarkerDataUrl(i)})"></span>${esc(markerName)}${check}</div>`;
-    }
-    html += `<div class="ctx-item" role="button" tabindex="0" data-act="clear">${esc(t('hud.markers.clear'))}</div>`;
-    html += `<div class="ctx-item" role="button" tabindex="0" data-act="close">${esc(t('hud.markers.cancel'))}</div>`;
-    el.innerHTML = html;
-    this.placePopupAt(el, x, y, 170, 340);
-    el.style.display = 'block';
-    el.querySelectorAll('.ctx-item').forEach((item) => {
-      const activate = () => {
-        const act = (item as HTMLElement).dataset.act;
-        el.style.display = 'none';
-        if (act === 'clear') this.sim.clearMarker(entityId);
-        else if (act?.startsWith('m')) this.sim.setMarker(entityId, Number(act.slice(1)));
-      };
-      item.addEventListener('click', activate);
-      item.addEventListener('keydown', (e) => {
-        if (!(e instanceof KeyboardEvent) || (e.key !== 'Enter' && e.key !== ' ')) return;
-        e.preventDefault();
-        activate();
-      });
-    });
+    openRaidTargetMenu(this, this.sim, entityId, name, x, y);
+  }
+  private raidTargetOffered(e: Entity | undefined): boolean {
+    return !!e && offersRaidTargetIcon(e, raidTargetMarking(this.sim.partyInfo, this.sim.playerId));
   }
 
-  openPetMenu(_entityId: number, name: string, dead: boolean, x: number, y: number): void {
+  openPetMenu(entityId: number, name: string, dead: boolean, x: number, y: number): void {
     const el = $('#ctx-menu');
     el.classList.remove(CTX_MENU_PICKER_CLASS);
     const isWarlock = this.sim.cfg.playerClass === 'warlock';
@@ -17163,6 +17138,7 @@ export class Hud {
     if (dead) html += `<div class="ctx-item" data-act="revive">${esc(t('hud.pet.revive'))}</div>`;
     if (!isWarlock)
       html += `<div class="ctx-item" data-act="abandon">${esc(t('hud.pet.abandon'))}</div>`;
+    if (this.raidTargetOffered(this.sim.entities.get(entityId))) html += raidTargetMenuRowHtml();
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.pet.cancel'))}</div>`;
     el.innerHTML = html;
     el.style.display = 'block';
@@ -17181,6 +17157,8 @@ export class Hud {
             okText: t('hud.pet.renameConfirm'),
             onOk: (value) => this.sim.renamePet(value),
           });
+        } else if (act === 'raid-target') {
+          this.openMarkerMenu(entityId, name, x, y);
         } else if (act === 'revive') {
           this.sim.castAbility('revive_pet');
         } else if (act === 'abandon') {

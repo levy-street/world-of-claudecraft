@@ -1,5 +1,6 @@
 // The keyboard and pad targeting actions main.ts routes (the Tab cycles, the
-// friendly picks, Pet: Mark, and the party target hotkeys), split out of
+// friendly picks, Pet: Mark, the party target hotkeys, and the raid target
+// icon hotkeys), split out of
 // main.ts so it stays a firewall. dispatchTargetingAction is the pad's flat
 // action arm; targetingInputCallbacks is the keyboard arm (the InputCallbacks
 // slice input.ts fires). Both take injected IWorld-shaped bags, never the
@@ -9,6 +10,11 @@ import { focusTargetAction } from '../ui/focus_targets_core';
 import { worldMarkerActionSymbol } from '../ui/hud/world_markers/world_markers_core';
 import { type PartyFrameSettingKey, readPartyFrameDisplayConfig } from '../ui/party_frames';
 import { partyHotkeyTargetId } from '../ui/party_target_hotkeys_core';
+import {
+  raidTargetMarking,
+  targetMarkerActionSymbol,
+  targetMarkerHotkeyCommand,
+} from '../ui/raid_target_icons_core';
 import type { IWorld } from '../world_api';
 import type { InputCallbacks } from './input';
 import { partyTargetActionSlot } from './keybinds';
@@ -23,6 +29,10 @@ export type TargetingWorld = Pick<
   | 'partyInfo'
   | 'playerId'
   | 'player'
+  | 'entities'
+  | 'markerFor'
+  | 'setMarker'
+  | 'clearMarker'
 >;
 
 /** The one Hud call targeting needs: Pet: Mark selects the pet the frame shows. */
@@ -59,6 +69,23 @@ export function targetPartyHotkey(
   return true;
 }
 
+/** A raid target icon hotkey on the current target: 0..7 marks it with that
+ *  symbol (again on a unit that already wears it takes it off, the sim's
+ *  toggle), null clears its mark. raid_target_icons_core.ts decides what is
+ *  sent; the server re-checks every rule. */
+export function targetMarkerHotkey(world: TargetingWorld, symbol: number | null): void {
+  const targetId = world.player.targetId ?? null;
+  const target = targetId === null ? null : world.entities.get(targetId);
+  const command = targetMarkerHotkeyCommand(
+    symbol,
+    target,
+    raidTargetMarking(world.partyInfo, world.playerId),
+    target ? world.markerFor(target.id) : null,
+  );
+  if (command?.kind === 'set') world.setMarker(command.id, command.symbol);
+  else if (command?.kind === 'clear') world.clearMarker(command.id);
+}
+
 /** Route a bound targeting action id (a pad button carrying a keyboard action).
  *  Returns false for an id that is not a targeting action. */
 export function dispatchTargetingAction(
@@ -75,6 +102,11 @@ export function dispatchTargetingAction(
   const marker = worldMarkerActionSymbol(id);
   if (marker !== undefined) {
     hud.worldMarkerHotkey?.(marker);
+    return true;
+  }
+  const targetMark = targetMarkerActionSymbol(id);
+  if (targetMark !== undefined) {
+    targetMarkerHotkey(world, targetMark);
     return true;
   }
   switch (id) {
@@ -116,10 +148,12 @@ export function targetingInputCallbacks(
   | 'onTargetParty'
   | 'onFocusTarget'
   | 'onWorldMarker'
+  | 'onTargetMarker'
 > {
   return {
     onFocusTarget: (slot, assign) => hud.focusTarget?.(slot, assign),
     onWorldMarker: (symbol) => hud.worldMarkerHotkey?.(symbol),
+    onTargetMarker: (symbol) => targetMarkerHotkey(world, symbol),
     onTab: () => world.tabTarget(),
     onTabPrev: () => world.tabTargetPrev(),
     onTargetFriendly: () => world.targetNearestFriendly(),

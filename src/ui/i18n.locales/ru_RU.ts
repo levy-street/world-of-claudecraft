@@ -26725,4 +26725,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldMarkers.readOnly': 'Ставить метки местности может только лидер рейда.',
   'hudChrome.worldMarkers.bindPlace': 'Поставить метку местности: {marker}',
   'hudChrome.worldMarkers.bindClear': 'Убрать все метки местности',
+  'hudChrome.raidTargets.menuRow': 'Метка цели',
+  'hudChrome.raidTargets.menuRowTip': 'Повесить над этим существом одну из восьми меток цели. Её видит вся группа, и каждая метка стоит только на одной цели.',
+  'hudChrome.raidTargets.bindCategory': 'Метки целей',
+  'hudChrome.raidTargets.bindSet': 'Пометить цель: {marker}',
+  'hudChrome.raidTargets.bindClear': 'Снять метку с цели',
+  'hudChrome.raidTargets.frameMark': 'Метка: {marker}',
 };

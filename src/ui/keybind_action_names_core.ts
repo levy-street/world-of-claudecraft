@@ -19,6 +19,7 @@ export const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> =
   'Action Bar': 'hud.keybinds.categories.actionBar',
   Pet: 'hudChrome.keybinds.categoryPet',
   'World Markers': 'hudChrome.worldMarkers.title',
+  'Raid Target Icons': 'hudChrome.raidTargets.bindCategory',
 };
 export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   setFocus1: 'hudChrome.focusTargets.assign',
@@ -36,6 +37,15 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   worldMarker7: 'hudChrome.worldMarkers.bindPlace',
   worldMarker8: 'hudChrome.worldMarkers.bindPlace',
   worldMarkerClear: 'hudChrome.worldMarkers.bindClear',
+  targetMarker1: 'hudChrome.raidTargets.bindSet',
+  targetMarker2: 'hudChrome.raidTargets.bindSet',
+  targetMarker3: 'hudChrome.raidTargets.bindSet',
+  targetMarker4: 'hudChrome.raidTargets.bindSet',
+  targetMarker5: 'hudChrome.raidTargets.bindSet',
+  targetMarker6: 'hudChrome.raidTargets.bindSet',
+  targetMarker7: 'hudChrome.raidTargets.bindSet',
+  targetMarker8: 'hudChrome.raidTargets.bindSet',
+  targetMarkerClear: 'hudChrome.raidTargets.bindClear',
   forward: 'hud.keybinds.actions.forward',
   back: 'hud.keybinds.actions.back',
   turnLeft: 'hud.keybinds.actions.turnLeft',
@@ -126,6 +136,11 @@ export function bindActionDisplayName(
   if (marker)
     return t('hudChrome.worldMarkers.bindPlace', {
       marker: raidMarkerDisplayName(Number(marker[1]) - 1),
+    });
+  const targetMark = /^targetMarker([1-8])$/.exec(actionId);
+  if (targetMark)
+    return t('hudChrome.raidTargets.bindSet', {
+      marker: raidMarkerDisplayName(Number(targetMark[1]) - 1),
     });
   if (!actionId.startsWith('slot')) {
     const key = BIND_ACTION_LABEL_KEYS[actionId];

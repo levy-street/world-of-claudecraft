@@ -8413,6 +8413,14 @@ export const zh_TW: EnTranslations = {
       "readOnly": "只有團隊隊長可以放置地面標記。",
       "bindPlace": "放置地面標記：{marker}",
       "bindClear": "清除所有地面標記"
+    },
+    "raidTargets": {
+      "menuRow": "團隊目標圖示",
+      "menuRowTip": "在此單位頭上放置八個團隊目標圖示之一。你的整個隊伍都能看到，每個圖示同一時間只能標記一個單位。",
+      "bindCategory": "團隊目標圖示",
+      "bindSet": "標記目標：{marker}",
+      "bindClear": "清除目標標記",
+      "frameMark": "已標記：{marker}"
     }
   },
   "gatherEvent": {

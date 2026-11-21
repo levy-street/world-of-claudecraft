@@ -24949,4 +24949,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldMarkers.readOnly': '只有团队领袖可以放置地面标记。',
   'hudChrome.worldMarkers.bindPlace': '放置地面标记：{marker}',
   'hudChrome.worldMarkers.bindClear': '清除所有地面标记',
+  'hudChrome.raidTargets.menuRow': '团队目标图标',
+  'hudChrome.raidTargets.menuRowTip': '在此单位头上放置八个团队目标图标之一。你的整个队伍都能看到，每个图标同一时间只能标记一个单位。',
+  'hudChrome.raidTargets.bindCategory': '团队目标图标',
+  'hudChrome.raidTargets.bindSet': '标记目标：{marker}',
+  'hudChrome.raidTargets.bindClear': '清除目标标记',
+  'hudChrome.raidTargets.frameMark': '已标记：{marker}',
 };

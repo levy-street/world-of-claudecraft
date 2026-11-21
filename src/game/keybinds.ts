@@ -260,6 +260,26 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: [],
   },
+  // The raid target icons on units (src/ui/raid_target_icons_core.ts): put a
+  // symbol on the current target (pressing it again on a unit that already
+  // wears it takes it off), and clear the target's mark. Unbound by default,
+  // as the classic client ships them.
+  ...[1, 2, 3, 4, 5, 6, 7, 8].map(
+    (n): BindAction => ({
+      id: `targetMarker${n}`,
+      label: `Mark Target ${n}`,
+      category: 'Raid Target Icons',
+      kind: 'edge',
+      defaults: [],
+    }),
+  ),
+  {
+    id: 'targetMarkerClear',
+    label: 'Clear Target Marker',
+    category: 'Raid Target Icons',
+    kind: 'edge',
+    defaults: [],
+  },
   {
     id: 'interact',
     label: 'Interact / Loot',

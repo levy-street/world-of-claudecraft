@@ -8413,6 +8413,14 @@ export const ko_KR: EnTranslations = {
       "readOnly": "공격대장만 위치 표시기를 놓을 수 있습니다.",
       "bindPlace": "위치 표시기 놓기: {marker}",
       "bindClear": "위치 표시기 모두 지우기"
+    },
+    "raidTargets": {
+      "menuRow": "공격대 대상 아이콘",
+      "menuRowTip": "이 대상의 머리 위에 여덟 가지 공격대 대상 아이콘 중 하나를 표시합니다. 파티 전체가 볼 수 있으며, 각 아이콘은 한 번에 한 대상에만 표시됩니다.",
+      "bindCategory": "공격대 대상 아이콘",
+      "bindSet": "대상 표시: {marker}",
+      "bindClear": "대상 표시 지우기",
+      "frameMark": "표시됨: {marker}"
     }
   },
   "gatherEvent": {

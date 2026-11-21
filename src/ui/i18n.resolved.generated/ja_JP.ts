@@ -8413,6 +8413,14 @@ export const ja_JP: EnTranslations = {
       "readOnly": "ワールドマーカーを置けるのはレイドリーダーだけです。",
       "bindPlace": "ワールドマーカーを設置：{marker}",
       "bindClear": "ワールドマーカーをすべて消去"
+    },
+    "raidTargets": {
+      "menuRow": "レイドターゲットアイコン",
+      "menuRowTip": "このユニットの頭上に8種類のレイドターゲットアイコンのいずれかを付けます。グループ全員に表示され、各アイコンは同時に1体にしか付けられません。",
+      "bindCategory": "レイドターゲットアイコン",
+      "bindSet": "ターゲットにマーク：{marker}",
+      "bindClear": "ターゲットのマークを消去",
+      "frameMark": "マーク：{marker}"
     }
   },
   "gatherEvent": {

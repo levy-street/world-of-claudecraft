@@ -8413,6 +8413,14 @@ export const tr_TR: EnTranslations = {
       "readOnly": "Only the raid leader can place world markers.",
       "bindPlace": "Place World Marker: {marker}",
       "bindClear": "Clear All World Markers"
+    },
+    "raidTargets": {
+      "menuRow": "Raid Target Icon",
+      "menuRowTip": "Put one of the eight raid target icons over this unit. Your whole group sees it, and each icon sits on one unit at a time.",
+      "bindCategory": "Raid Target Icons",
+      "bindSet": "Mark Target: {marker}",
+      "bindClear": "Clear Target Marker",
+      "frameMark": "Marked: {marker}"
     }
   },
   "gatherEvent": {

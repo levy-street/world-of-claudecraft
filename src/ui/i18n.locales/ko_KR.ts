@@ -26307,4 +26307,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldMarkers.readOnly': '공격대장만 위치 표시기를 놓을 수 있습니다.',
   'hudChrome.worldMarkers.bindPlace': '위치 표시기 놓기: {marker}',
   'hudChrome.worldMarkers.bindClear': '위치 표시기 모두 지우기',
+  'hudChrome.raidTargets.menuRow': '공격대 대상 아이콘',
+  'hudChrome.raidTargets.menuRowTip': '이 대상의 머리 위에 여덟 가지 공격대 대상 아이콘 중 하나를 표시합니다. 파티 전체가 볼 수 있으며, 각 아이콘은 한 번에 한 대상에만 표시됩니다.',
+  'hudChrome.raidTargets.bindCategory': '공격대 대상 아이콘',
+  'hudChrome.raidTargets.bindSet': '대상 표시: {marker}',
+  'hudChrome.raidTargets.bindClear': '대상 표시 지우기',
+  'hudChrome.raidTargets.frameMark': '표시됨: {marker}',
 };
