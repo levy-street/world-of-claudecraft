@@ -221,7 +221,12 @@ export class PartyMachine {
     this.ctx.hillPartyJoin(r.meta.entityId);
     rememberSoulwellPartyEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
-    emitReferralPartyEvidence(this.ctx, party.members, true);
+    emitReferralPartyEvidence(
+      this.ctx,
+      party.members,
+      true,
+      created ? party.members : [r.meta.entityId],
+    );
     this.syncPersistentPaladinPartyAuras(party);
     for (const memberPid of party.members) this.ctx.onDungeonFinderPartyJoined(memberPid);
     // Forming the party is the inviter's join too; the accepter counts on
@@ -575,7 +580,14 @@ export class PartyMachine {
         pid: mPid,
       });
     }
-    emitReferralPartyEvidence(this.ctx, party.members);
+    // Everyone joined this group except a premade base party's own members, who were
+    // already together (merged premades and solo queuers are new to it).
+    emitReferralPartyEvidence(
+      this.ctx,
+      party.members,
+      false,
+      units.flatMap((unit) => (unit === baseUnit && unit.partyId !== null ? [] : unit.members)),
+    );
     return party;
   }
 

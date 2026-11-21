@@ -234,6 +234,196 @@ describe('referral game host', () => {
     });
     expect(h.card().status).toBe('active');
   });
+  /** Party evidence for the pair; `joinedPids` marks who this change brought in
+   * (an accepted invite or a finder group), omitted for leaves and leader changes. */
+  function pairParty(h: ReturnType<typeof setup>, joinedPids?: number[], invited = false) {
+    h.service.observe({
+      type: 'referralEvidence',
+      kind: 'party',
+      participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+      ...(invited ? { invited: true as const } : {}),
+      ...(joinedPids ? { joinedPids } : {}),
+    });
+  }
+  async function activeCardOnAlt(alt: { locked?: boolean; level?: number; tutorial?: boolean }) {
+    const h = setup();
+    await flush();
+    pairParty(h);
+    await flush();
+    for (const session of [h.a, h.b])
+      await h.service.command(session, {
+        type: 'respond',
+        linkId: 20,
+        expectedRevision: h.card().revision,
+        accept: true,
+      });
+    expect(h.card().status).toBe('active');
+    await h.store.mutate(20, 10, (card) => {
+      const state = structuredClone(card);
+      state.participants[0].locked = alt.locked === true;
+      return { state, intents: [] };
+    });
+    // The inviter logs in on another character and groups with the bound friend again.
+    h.service.detach(h.a);
+    h.a.characterId = 101;
+    h.a.name = 'Alt';
+    h.context.characters[0].characterId = 101;
+    h.context.characters[0].name = 'Alt';
+    h.context.characters[0].level = alt.level ?? 1;
+    h.context.characters[0].completedQuestIds = alt.tutorial ? ['q_ps_set_sail'] : [];
+    h.service.attach(h.a);
+    await flush();
+    h.frames.clear();
+    pairParty(h, [1], true);
+    await flush();
+    return h;
+  }
+  const moves = (h: ReturnType<typeof setup>, id: number) =>
+    (h.frames.get(id)?.notices ?? []).filter((n) => n.type === 'move').length;
+  it('offers the card move once when a bound friend groups on an eligible other character', async () => {
+    const h = await activeCardOnAlt({});
+    expect(h.frames.get(101)?.notices.map((n) => n.type)).toEqual(['move']);
+    // Leaves, leader changes and someone else joining do not ask again.
+    pairParty(h);
+    await flush();
+    pairParty(h, [3], true);
+    await flush();
+    expect(moves(h, 101)).toBe(1);
+    // A finder group that brings the pair together again does.
+    pairParty(h, [1, 2]);
+    await flush();
+    expect(moves(h, 101)).toBe(2);
+  });
+  it.each([
+    ['locked', { locked: true }],
+    ['levelTooHigh', { level: 20 }],
+    ['tutorialCompleted', { tutorial: true }],
+  ] as const)(
+    'stays silent when the card cannot move to the other character (%s)',
+    async (reason, alt) => {
+      const h = await activeCardOnAlt(alt);
+      expect(h.frames.get(101)?.links[0].moveReason).toBe(reason);
+      expect(h.frames.get(101)?.notices).toEqual([]);
+      // The friend never acknowledged the original start prompt; nothing new joins it.
+      expect(h.frames.get(200)?.notices.map((n) => n.type)).toEqual(['start']);
+    },
+  );
+  it('re-asks an unanswered card start only when the pair regroups', async () => {
+    const h = setup();
+    await flush();
+    const starts = (id: number) =>
+      (h.frames.get(id)?.notices ?? []).filter((n) => n.type === 'start').length;
+    pairParty(h, [1, 2], true);
+    await flush();
+    expect(h.card().status).toBe('pending');
+    expect([starts(100), starts(200)]).toEqual([1, 1]);
+    pairParty(h);
+    await flush();
+    pairParty(h, [3], true);
+    await flush();
+    expect([starts(100), starts(200)]).toEqual([1, 1]);
+    pairParty(h, [2], true);
+    await flush();
+    expect([starts(100), starts(200)]).toEqual([2, 2]);
+  });
+  it('keeps a queued invite when a later change with the same members arrives before it drains', async () => {
+    const h = setup();
+    await flush();
+    h.context.characters[0].level = 20;
+    const reasons = (id: number) =>
+      (h.frames.get(id)?.notices ?? []).filter((n) => n.type === 'reason').length;
+    // Hold the drain on unrelated evidence so the next two wait in the queue.
+    h.service.observe({
+      type: 'referralEvidence',
+      kind: 'quest',
+      questId: 'q_unrelated',
+      characterId: 100,
+      participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+    });
+    pairParty(h, [2], true);
+    pairParty(h); // a leader change before the queue drains
+    await flush();
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+  });
+  it('never mixes an invite and a finder join that queue for the same members', async () => {
+    const h = setup();
+    await flush();
+    h.context.characters[0].level = 20;
+    const reasons = (id: number) =>
+      (h.frames.get(id)?.notices ?? []).filter((n) => n.type === 'reason').length;
+    h.service.observe({
+      type: 'referralEvidence',
+      kind: 'quest',
+      questId: 'q_unrelated',
+      characterId: 100,
+      participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+    });
+    // Someone else's invite, then a finder group that brings the pair in: neither is an
+    // invite that brought the pair together, so no refusal dialog.
+    pairParty(h, [3], true);
+    pairParty(h, [1, 2]);
+    await flush();
+    expect([reasons(100), reasons(200)]).toEqual([0, 0]);
+    // The pair's own invite, then a finder change that names the same newcomer: the
+    // finder change must not replace the queued invite, so the refusal still comes once.
+    h.service.observe({
+      type: 'referralEvidence',
+      kind: 'quest',
+      questId: 'q_unrelated',
+      characterId: 100,
+      participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+    });
+    pairParty(h, [2], true);
+    pairParty(h, [2]);
+    await flush();
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+  });
+  it('explains why no card started only once per invite that a new character accepts', async () => {
+    const h = setup();
+    await flush();
+    const reasons = (id: number) =>
+      (h.frames.get(id)?.notices ?? []).filter(
+        (n) => n.type === 'reason' && n.reason === 'levelTooHigh',
+      ).length;
+    // `joinedPids` names who the accepted invite brought in; omitted for other changes.
+    const party = (joinedPids?: number[]) => {
+      h.service.observe({
+        type: 'referralEvidence',
+        kind: 'party',
+        participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+        ...(joinedPids ? { invited: true as const, joinedPids } : {}),
+      });
+      return flush();
+    };
+    // Two established characters could never start a card: grouping is not a failed start.
+    h.context.characters[0].level = 20;
+    h.context.characters[1].level = 20;
+    await party([1, 2]);
+    await party();
+    expect([reasons(100), reasons(200)]).toEqual([0, 0]);
+    // A new character grouped with an established one: a leave or a leader change
+    // (party evidence without an invite) stays silent.
+    h.context.characters[1].level = 1;
+    await party();
+    expect([reasons(100), reasons(200)]).toEqual([0, 0]);
+    // Accepting the invite is the one moment the pair is told why no card started.
+    await party([2]);
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    await party();
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // Someone else accepting an invite into their party is not the pair's doing.
+    await party([3]);
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // A finder group brings the pair in without an invite: no refusal dialog.
+    pairParty(h, [1, 2]);
+    await flush();
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // Regrouping later through a fresh invite explains again.
+    await party([1, 2]);
+    expect([reasons(100), reasons(200)]).toEqual([2, 2]);
+    expect(h.card().status).toBe('idle');
+    expect(h.frames.get(100)?.links[0].startReason).toBe('levelTooHigh');
+  });
   it('explains unbound accounts only when new characters accept an invite together', async () => {
     const h = setup();
     await flush();
@@ -254,6 +444,7 @@ describe('referral game host', () => {
       kind: 'party',
       participants: participants(),
       invited: true,
+      joinedPids: [1, 2],
     });
     await flush();
     expect([reasons(100), reasons(200)]).toEqual([0, 0]);
@@ -263,9 +454,40 @@ describe('referral game host', () => {
       kind: 'party',
       participants: participants(),
       invited: true,
+      joinedPids: [1, 2],
     });
     await flush();
     expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+  });
+  it('explains unbound accounts once, not again when someone else joins the party', async () => {
+    const h = setup();
+    await flush();
+    h.store.pairs = vi.fn(async () => []);
+    const reasons = (id: number) =>
+      (h.frames.get(id)?.notices ?? []).filter(
+        (n) => n.type === 'reason' && n.reason === 'newAccountsOnly',
+      ).length;
+    const pair = h.context.characters.map((c, i) => ({ ...c, pid: i + 1 }));
+    const invite = (participants: typeof pair, joinedPids: number[]) => {
+      h.service.observe({
+        type: 'referralEvidence',
+        kind: 'party',
+        participants,
+        invited: true,
+        joinedPids,
+      });
+      return flush();
+    };
+    await invite(pair, [1, 2]);
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // An established character joins: nothing new to explain to the grouped pair.
+    const veteran = { ...pair[1], pid: 3, accountId: 30, characterId: 300, name: 'Vet', level: 20 };
+    await invite([...pair, veteran], [3]);
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+    // Another new, unbound character joins: each of the pair learns about the newcomer once.
+    const newcomer = { ...pair[1], pid: 4, accountId: 40, characterId: 400, name: 'New' };
+    await invite([...pair, veteran, newcomer], [4]);
+    expect([reasons(100), reasons(200)]).toEqual([2, 2]);
   });
   it('does not explain unbound accounts to bound friends who accept an invite', async () => {
     const h = setup();

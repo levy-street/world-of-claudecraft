@@ -661,12 +661,16 @@ export class ReferralGameServices {
       evidence.participants.length > 10
     )
       return;
+    // Who joined, and whether by invite, is part of the identity: a join is never folded
+    // into a plain party change (a leader change before the queue drains), and an invite
+    // join never borrows a finder join's members or the reverse.
+    const joined = [...(evidence.joinedPids ?? [])].sort((a, b) => a - b).join(',');
     const key = `${evidence.participants
       .map((p) => p.characterId)
       .sort((a, b) => a - b)
       .join(
         ',',
-      )}:${evidence.kind}:${evidence.characterId ?? ''}:${evidence.questId ?? ''}:${evidence.dungeonId ?? ''}:${evidence.mobId ?? ''}`;
+      )}:${evidence.kind}:${evidence.characterId ?? ''}:${evidence.questId ?? ''}:${evidence.dungeonId ?? ''}:${evidence.mobId ?? ''}:${evidence.invited ? 'i' : ''}:${joined}`;
     if (!this.pending.has(key) && this.pending.size >= REFERRAL_PENDING_EVIDENCE_MAX) {
       referralDiagnostics.evidenceOverflow++;
       // Fail closed under sustained DB outage instead of acknowledging gameplay
@@ -722,7 +726,14 @@ export class ReferralGameServices {
             };
             const first = row.card.participants[0].accountId;
             if (evidence.kind === 'party') {
-              await this.party(row, context, signal);
+              // Did this change bring one of the pair into the party? Leaves, leader
+              // changes and other members joining leave the pair's prompts alone.
+              const joined = evidence.participants.some(
+                (p) =>
+                  evidence.joinedPids?.includes(p.pid) &&
+                  row.card.participants.some((c) => c.accountId === p.accountId),
+              );
+              await this.party(row, context, signal, joined, evidence.invited === true);
               continue;
             }
             const events: ReferralCardEvent[] = [];
@@ -800,11 +811,14 @@ export class ReferralGameServices {
   }
   /** An accepted invite between new characters who could start a card together, but
    * whose accounts are not bound friends, explains why no card started. Ordinary
-   * parties, leaves and finder groups stay silent. */
+   * parties, leaves and finder groups stay silent, and so does a member already told
+   * when someone else joins: only the newcomer, or an unbound new partner arriving,
+   * explains again. */
   private explainUnbound(evidence: ReferralEvidence, links: readonly StoredReferral[]): void {
     const eligible = evidence.participants.filter(
       (p) => p.partyId !== null && referralCharacterCanStart(p),
     );
+    const joined = new Set(evidence.joinedPids ?? []);
     const bound = (a: number, b: number) =>
       links.some(
         (row) =>
@@ -816,6 +830,7 @@ export class ReferralGameServices {
         (q) => q.accountId !== p.accountId && q.partyId === p.partyId,
       );
       if (!partners.length || partners.some((q) => bound(p.accountId, q.accountId))) continue;
+      if (!joined.has(p.pid) && !partners.some((q) => joined.has(q.pid))) continue;
       const session = this.host.sessionForAccount(p.accountId, p.characterId);
       if (session && this.valid(session))
         this.notice(session, { type: 'reason', reason: 'newAccountsOnly' });
@@ -825,6 +840,8 @@ export class ReferralGameServices {
     row: StoredReferral,
     context: ReferralCardContext,
     signal: AbortSignal,
+    joined: boolean,
+    invited: boolean,
   ): Promise<void> {
     const a = this.host.sessionForAccount(
       context.characters[0].accountId,
@@ -839,7 +856,12 @@ export class ReferralGameServices {
     if (row.card.status === 'idle' && !row.card.declined) {
       const reason = referralStartError(row.card, context);
       if (reason) {
-        this.notifyBoth(row.card, { type: 'reason', reason });
+        // Party evidence also fires on leaves, leader changes and other members joining,
+        // and two established characters could never start a card. Explain a refused
+        // start only when an accepted invite brings one of the pair in and one of them
+        // could start; the card window's Start button covers the rest.
+        if (joined && invited && context.characters.some(referralCharacterCanStart))
+          this.notifyBoth(row.card, { type: 'reason', reason });
         return;
       }
       const started = await this.host.withPermit(
@@ -859,8 +881,10 @@ export class ReferralGameServices {
       );
       this.replace({ ...row, card: started.result.state });
       if (!started.result.error) this.promptBoth(started.result.state, 'start');
-    } else if (row.card.status === 'pending') this.promptBoth(row.card, 'start');
-    else if (row.card.status === 'active') {
+    } else if (row.card.status === 'pending') {
+      // Re-ask an unanswered start only when the pair regroups, not on every party change.
+      if (joined) this.promptBoth(row.card, 'start');
+    } else if (row.card.status === 'active') {
       const reunion = await this.host.withPermit(
         () =>
           this.store.mutate(row.card.linkId, row.card.participants[0].accountId, (card) =>
@@ -874,7 +898,7 @@ export class ReferralGameServices {
       for (const p of row.card.participants) {
         const present = context.characters.find((c) => c.accountId === p.accountId);
         const session = this.host.sessionForAccount(p.accountId, present?.characterId);
-        if (!session || session.characterId === p.characterId) continue;
+        if (!joined || !session || session.characterId === p.characterId) continue;
         const move = transitionReferralCard(
           row.card,
           {
@@ -885,8 +909,10 @@ export class ReferralGameServices {
           },
           context,
         );
-        if (move.error) this.notice(session, { type: 'reason', reason: move.error });
-        else this.notice(session, { type: 'move', linkId: row.card.linkId });
+        // Nobody asked to move here, so a character the card cannot move to is not
+        // an error to raise: the card window's Move button still explains why. The
+        // offer itself is a dialog, so it is made only when the pair regroups.
+        if (!move.error) this.notice(session, { type: 'move', linkId: row.card.linkId });
       }
     }
   }

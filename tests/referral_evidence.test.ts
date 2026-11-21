@@ -18,20 +18,59 @@ function world() {
   return { sim, a, b, ctx: (sim as unknown as { ctx: SimContext }).ctx };
 }
 describe('authoritative referral evidence', () => {
+  it('finder groups name everyone new to the base party as joined', () => {
+    const { sim, a, b, ctx } = world();
+    const add = (cls: 'mage' | 'rogue' | 'hunter', name: string, id: number) => {
+      const pid = sim.addPlayer(cls, name, { characterId: id });
+      sim.meta(pid)!.accountId = id;
+      return pid;
+    };
+    const c = add('mage', 'Three', 33);
+    const d = add('rogue', 'Four', 44);
+    const e = add('hunter', 'Five', 55);
+    // A second premade (c, d) merges into the base premade (a, b), plus one solo (e).
+    sim.partyInvite(d, c);
+    sim.partyAccept(d);
+    const formed = ctx.formDungeonFinderGroup(
+      [
+        { partyId: ctx.partyOf(a)!.id, leaderPid: a, members: [a, b] },
+        { partyId: ctx.partyOf(c)!.id, leaderPid: c, members: [c, d] },
+        { partyId: null, leaderPid: e, members: [e] },
+      ],
+      { raid: false },
+    );
+    expect(formed).not.toBeNull();
+    const evidence = sim.events.filter((ev) => ev.type === 'referralEvidence').at(-1);
+    expect(evidence).not.toHaveProperty('invited');
+    expect(evidence).toMatchObject({ kind: 'party', joinedPids: [c, d, e] });
+  });
   it('party joins capture stable identities, and disband captures loss of party', () => {
     const { sim, a, b } = world();
     const joined = sim.events.find((e) => e.type === 'referralEvidence');
     expect(joined).toMatchObject({
       kind: 'party',
       invited: true,
+      joinedPids: [a, b],
       participants: [
         { accountId: 1, characterId: 11 },
         { accountId: 2, characterId: 22 },
       ],
     });
+    // A later accept names only the newcomer, so the grouped pair is not told again.
+    const c = sim.addPlayer('mage', 'Three', { characterId: 33 });
+    sim.meta(c)!.accountId = 3;
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    expect(sim.events.filter((e) => e.type === 'referralEvidence').at(-1)).toMatchObject({
+      kind: 'party',
+      invited: true,
+      joinedPids: [c],
+    });
+    sim.partyLeave(c);
     sim.partyLeave(b);
     const left = sim.events.filter((e) => e.type === 'referralEvidence').at(-1);
     expect(left).not.toHaveProperty('invited');
+    expect(left).not.toHaveProperty('joinedPids');
     expect(left).toMatchObject({
       kind: 'party',
       participants: expect.arrayContaining([
