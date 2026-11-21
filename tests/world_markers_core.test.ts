@@ -13,12 +13,15 @@ vi.mock('../src/ui/icons', () => ({
 }));
 
 import { readFileSync } from 'node:fs';
+import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer_core';
 import { prewarmResumeIsDebt } from '../src/render/prewarm_policy';
 import { WorldMarkerLayer, worldMarkerPrewarmEntry } from '../src/render/world_markers';
 import {
   createWorldMarkerSlots,
+  createWorldMarkerSymbolPose,
   syncWorldMarkerSlots,
   WORLD_MARKER_BEAM_HEIGHT,
+  WORLD_MARKER_CAMERA_FOV,
   WORLD_MARKER_COLORS,
   WORLD_MARKER_COUNT,
   WORLD_MARKER_DRAPE_REACH,
@@ -28,6 +31,7 @@ import {
   WORLD_MARKER_RINGS,
   WORLD_MARKER_SEGMENTS,
   WORLD_MARKER_SYMBOL_BOB,
+  WORLD_MARKER_SYMBOL_GLOW_OPACITY,
   WORLD_MARKER_SYMBOL_GLOW_SCALE,
   WORLD_MARKER_SYMBOL_LIFT,
   WORLD_MARKER_SYMBOL_SCREEN_MAX,
@@ -35,11 +39,13 @@ import {
   WORLD_MARKER_SYMBOL_SIZE_NEAR,
   WORLD_MARKER_VERTS,
   WorldMarkerChange,
+  worldMarkerClock,
   worldMarkerDiscIndex,
   worldMarkerFlare,
   worldMarkerLook,
   worldMarkerPulse,
   worldMarkerSymbolLift,
+  worldMarkerSymbolPoseInto,
   worldMarkerSymbolSize,
   writeWorldMarkerDrape,
 } from '../src/render/world_markers_core';
@@ -142,7 +148,7 @@ describe('world markers core: motion, scale and tiers', () => {
     const values = samples((t) => worldMarkerFlare(t, 5, false));
     expect(Math.min(...values)).toBeGreaterThanOrEqual(0.86 - 1e-9);
     expect(Math.max(...values)).toBeLessThanOrEqual(1 + 1e-9);
-    // It really moves (a flare, not a steady lamp) and quicker than the pulse.
+    // It really moves (a flare, not a steady lamp).
     expect(Math.max(...values) - Math.min(...values)).toBeGreaterThan(0.08);
     expect(worldMarkerFlare(0, 0, false)).toBeCloseTo(0.93, 9);
     expect(worldMarkerFlare(0.4, 0, false)).not.toBeCloseTo(worldMarkerFlare(0.4, 3, false), 3);
@@ -174,40 +180,57 @@ describe('world markers core: motion, scale and tiers', () => {
     expect(WORLD_MARKER_SYMBOL_SCREEN_MIN).toBe(0.0635);
     expect(WORLD_MARKER_SYMBOL_SCREEN_MAX).toBe(0.15);
     expect(WORLD_MARKER_SYMBOL_GLOW_SCALE).toBe(2.1);
+    expect(WORLD_MARKER_CAMERA_FOV).toBe(60);
     // The near size holds at a middling camera distance.
     expect(worldMarkerSymbolSize(15)).toBe(1.75);
     expect(worldMarkerSymbolSize(25)).toBe(1.75);
     // Up close it shrinks with distance (screen cap), far off it grows (screen floor).
     expect(worldMarkerSymbolSize(6)).toBeCloseTo(0.9, 9);
     expect(worldMarkerSymbolSize(80)).toBeCloseTo(5.08, 9);
-    expect(worldMarkerSymbolSize(Number.NaN)).toBe(0.45);
-    expect(worldMarkerSymbolSize(0)).toBe(0.45);
-    // On a 60 degree camera the screen's height at d is 2 d tan(30): the share
-    // of the screen the symbol fills stays between about 5% and 13%.
-    const screen = (d: number) => worldMarkerSymbolSize(d) / (2 * d * Math.tan(Math.PI / 6));
-    for (let d = 4; d <= 250; d += 1.5) {
-      expect(screen(d)).toBeGreaterThanOrEqual(0.054);
-      expect(screen(d)).toBeLessThanOrEqual(0.131);
+    expect(worldMarkerSymbolSize(Number.NaN)).toBe(0);
+    expect(worldMarkerSymbolSize(0)).toBe(0);
+    // The share of the screen's height the symbol fills (the screen's height
+    // at d is 2 d tan(fov / 2)) stays between about 5% and 13%, at the default
+    // field of view and at both ends of the player's field-of-view slider.
+    for (const fov of [55, 60, 100]) {
+      const half = Math.tan((fov * Math.PI) / 360);
+      const screen = (d: number) => worldMarkerSymbolSize(d, fov) / (2 * d * half);
+      for (let d = 0.5; d <= 250; d += 0.75) {
+        expect(screen(d)).toBeGreaterThanOrEqual(0.054);
+        expect(screen(d)).toBeLessThanOrEqual(0.131);
+      }
     }
+    // A non-finite field of view reads as the default.
+    expect(worldMarkerSymbolSize(80, Number.NaN)).toBe(worldMarkerSymbolSize(80));
     // Bigger than the circle-era symbol (1.2 yards) at a normal camera distance.
     expect(worldMarkerSymbolSize(15)).toBeGreaterThan(1.2 * 1.4);
   });
 
-  it('a low tier sheds only cosmetic light, never the circle or the symbol', () => {
-    expect(worldMarkerLook(false)).toEqual({
-      glow: true,
-      runes: true,
-      beam: true,
-      motes: true,
-      symbolGlow: 1,
-    });
-    expect(worldMarkerLook(true)).toEqual({
-      glow: false,
-      runes: false,
-      beam: false,
-      motes: false,
-      symbolGlow: 0.5,
-    });
+  it('poses the symbol from the camera: size by distance, lift by size, glow by flicker', () => {
+    const pose = createWorldMarkerSymbolPose();
+    const slot = { x: 10, y: 2, z: -4 };
+    // A camera 40 yards out, level with the symbol's resting point.
+    const out = worldMarkerSymbolPoseInto(pose, 50, 2 + 3.2, -4, 60, slot, 0.7, 2, false);
+    expect(out).toBe(pose);
+    expect(pose.size).toBe(worldMarkerSymbolSize(40));
+    expect(pose.y).toBe(2 + worldMarkerSymbolLift(0.7, 2, false, pose.size));
+    expect(pose.glowSize).toBe(pose.size * WORLD_MARKER_SYMBOL_GLOW_SCALE);
+    expect(WORLD_MARKER_SYMBOL_GLOW_OPACITY).toBe(0.85);
+    expect(pose.glowOpacity).toBe(0.85 * worldMarkerFlare(0.7, 2, false));
+    // A wider field of view draws it larger in the world (same screen share).
+    worldMarkerSymbolPoseInto(pose, 50, 5.2, -4, 100, slot, 0.7, 2, false);
+    expect(pose.size).toBeGreaterThan(worldMarkerSymbolSize(40));
+    // Reduced motion: no bob, a steady glow.
+    worldMarkerSymbolPoseInto(pose, 50, 5.2, -4, 60, slot, 0.7, 2, true);
+    expect(pose.glowOpacity).toBe(0.85);
+    expect(pose.y).toBe(2 + worldMarkerSymbolLift(0, 0, true, pose.size));
+    expect(worldMarkerClock(3.5, false)).toBe(3.5);
+    expect(worldMarkerClock(3.5, true)).toBe(0);
+  });
+
+  it('a low tier sheds only cosmetic light, never the circle, the beam or the symbol', () => {
+    expect(worldMarkerLook(false)).toEqual({ glow: true, runes: true, beam: 1, motes: true });
+    expect(worldMarkerLook(true)).toEqual({ glow: false, runes: false, beam: 0.5, motes: false });
   });
 });
 
@@ -277,27 +300,51 @@ describe('world markers layer (Three)', () => {
     expect(l.shown).toBe(0);
   });
 
-  it('a low tier still draws the circle and the symbol (same size, same height), without the beam', () => {
+  it('a low tier draws the circle, a dimmer beam and the same symbol, without motes or runes', () => {
     const { scene, l, camera } = layer(true);
-    expect(named(scene, 'world-marker-beam-')).toHaveLength(0);
-    expect(named(scene, 'world-marker-pool-')).toHaveLength(0);
-    l.update([mark(3, 0, 0, 0)], camera, 0, false);
+    l.update([mark(3, 0, 0, 0)], camera, 0.4, false);
     expect(scene.getObjectByName('world-marker-disc-3')?.visible).toBe(true);
+    const beam = scene.getObjectByName('world-marker-beam-3') as THREE.Mesh;
+    const pool = scene.getObjectByName('world-marker-pool-3') as THREE.Mesh;
+    expect(beam.visible).toBe(true);
+    expect(pool.visible).toBe(true);
+    const beamMat = beam.material as THREE.ShaderMaterial;
+    expect(beamMat.uniforms.uMotes.value).toBe(0);
+    expect(beamMat.uniforms.uFlare.value).toBeCloseTo(0.5 * worldMarkerFlare(0.4, 3, false), 12);
+    expect((pool.material as THREE.ShaderMaterial).uniforms.uFlare.value).toBeCloseTo(
+      0.5 * worldMarkerFlare(0.4, 3, false),
+      12,
+    );
     const lowSprite = scene.getObjectByName('world-marker-symbol-3') as THREE.Sprite;
     expect(lowSprite.visible).toBe(true);
     expect(scene.getObjectByName('world-marker-glow-3')?.visible).toBe(true);
     const high = layer(false);
-    high.l.update([mark(3, 0, 0, 0)], high.camera, 0, false);
+    high.l.update([mark(3, 0, 0, 0)], high.camera, 0.4, false);
     const highSprite = high.scene.getObjectByName('world-marker-symbol-3') as THREE.Sprite;
     expect(lowSprite.position.equals(highSprite.position)).toBe(true);
     expect(lowSprite.scale.equals(highSprite.scale)).toBe(true);
+    // The symbol's glow is part of its legibility: the same on every tier.
     const lowGlow = (scene.getObjectByName('world-marker-glow-3') as THREE.Sprite).material;
     const highGlow = (high.scene.getObjectByName('world-marker-glow-3') as THREE.Sprite).material;
-    expect(lowGlow.opacity).toBeCloseTo(highGlow.opacity * 0.5, 9);
+    expect(lowGlow.opacity).toBe(highGlow.opacity);
+    const highBeam = high.scene.getObjectByName('world-marker-beam-3') as THREE.Mesh;
+    expect((highBeam.material as THREE.ShaderMaterial).uniforms.uMotes.value).toBe(1);
     const mat = (scene.getObjectByName('world-marker-disc-3') as THREE.Mesh)
       .material as THREE.ShaderMaterial;
     expect(mat.uniforms.uGlow.value).toBe(0);
     expect(mat.uniforms.uRunes.value).toBe(0);
+  });
+
+  it('draws the beam under the circle and the symbol over both, on the ground band', () => {
+    const { scene } = layer(false);
+    const order = (name: string) => (scene.getObjectByName(name) as THREE.Object3D).renderOrder;
+    expect(order('world-marker-beam-0')).toBe(floorVfxRenderOrder('ground', 5));
+    expect(order('world-marker-disc-0')).toBe(floorVfxRenderOrder('ground', 6));
+    expect(order('world-marker-pool-0')).toBe(floorVfxRenderOrder('ground', 7));
+    expect(order('world-marker-glow-0')).toBe(floorVfxRenderOrder('ground', 7));
+    expect(order('world-marker-symbol-0')).toBe(floorVfxRenderOrder('ground', 7));
+    // Everything stays under the player band (and so under every telegraph).
+    expect(order('world-marker-symbol-0')).toBeLessThan(floorVfxRenderOrder('player', 0));
   });
 
   it('keeps the symbol a readable size from far off', () => {
@@ -326,6 +373,8 @@ describe('world markers layer (Three)', () => {
       l.update([mark(4, 0, 0, 0)], camera, t, false);
       expect(beamMat.uniforms.uFlare.value).toBe(worldMarkerFlare(t, 4, false));
       expect(poolMat.uniforms.uFlare.value).toBe(worldMarkerFlare(t, 4, false));
+      // Not frozen: the flicker really reaches the GPU each frame.
+      expect(beamMat.uniforms.uFlare.value).not.toBe(1);
       expect(beamMat.uniforms.uTime.value).toBe(t);
       expect(glow.material.opacity).toBeCloseTo(0.85 * worldMarkerFlare(t, 4, false), 9);
     }
@@ -338,10 +387,49 @@ describe('world markers layer (Three)', () => {
     expect(pool.renderOrder).toBeLessThan(10);
   });
 
-  it('a low tier stages only what it draws: disc, glow and symbol per slot', () => {
-    const { l } = layer(true);
-    expect(l.prewarmRoot().children).toHaveLength(24);
-    expect(l.prewarmTextures()).toHaveLength(9);
+  it('stages every live material and texture for the prewarm, on both tiers', () => {
+    for (const lowTier of [false, true]) {
+      const { l } = layer(lowTier);
+      const live = new Set<THREE.Material>();
+      const liveTextures = new Set<THREE.Texture>();
+      l.group.traverse((o) => {
+        const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+        if (!m) return;
+        live.add(m);
+        const map = (m as THREE.SpriteMaterial).map;
+        if (map) liveTextures.add(map);
+      });
+      const staged = new Set<THREE.Material>();
+      l.prewarmRoot().traverse((o) => {
+        const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+        if (m) staged.add(m);
+      });
+      expect(staged).toEqual(live);
+      expect(live.size).toBe(40);
+      expect(new Set(l.prewarmTextures())).toEqual(liveTextures);
+      expect(l.prewarmTextures()).toHaveLength(9);
+    }
+  });
+
+  it('a disposed layer stages nothing and its prewarm units do nothing', async () => {
+    const { l } = layer(false);
+    const uploaded: THREE.Texture[] = [];
+    const compiled: THREE.Object3D[] = [];
+    const entry = worldMarkerPrewarmEntry(l, {
+      prewarmTexture: (t) => uploaded.push(t),
+      compileColor: async (r) => {
+        compiled.push(r);
+      },
+    });
+    const units = entry.resumeUnits();
+    l.dispose();
+    expect(l.isDisposed).toBe(true);
+    expect(l.prewarmTextures()).toEqual([]);
+    for (const u of units) u.run();
+    await entry.resumeProgramUnits()[0].run();
+    await entry.run();
+    expect(uploaded).toEqual([]);
+    expect(compiled).toEqual([]);
   });
 
   it('has a prewarm home: a visible staged twin of every piece, and every symbol texture', async () => {

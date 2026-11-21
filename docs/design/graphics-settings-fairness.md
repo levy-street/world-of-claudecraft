@@ -727,6 +727,19 @@ still updates with the world draw skipped. The alternative it replaces froze all
 Pinned by `tests/context_restore.test.ts` (the bound, the release on a second loss) and
 `tests/presentation_gate.test.ts` (the hold as a second owner the arrival cannot release).
 
+### The raid's world markers keep their beacon on every tier (2026-11-21)
+
+The eight shared world markers (`src/render/world_markers.ts`, decisions in
+`src/render/world_markers_core.ts`) read like flares: a circle on the floor, an additive pool
+of light on it, a beam rising from it, and the marker's symbol floating over a tall head on a
+soft glow. A group positions by them, so `worldMarkerLook` sheds only cosmetic light on low:
+the circle's soft fill, the turning runes and the motes rising in the beam, plus half the
+strength of the pool and the beam. Never shed: the circle and its rim, the beam that ties a
+symbol to its circle, and the symbol itself, posed by `worldMarkerSymbolPoseInto` at the same
+size, height, bob and glow on every tier (its screen-size band follows the player's field of
+view, not the preset). The tier comes from the static preset (`lowGfx`), never the governor.
+Pinned by `tests/world_markers_core.test.ts`.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar

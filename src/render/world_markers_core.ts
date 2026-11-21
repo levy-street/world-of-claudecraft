@@ -13,10 +13,10 @@
 // only how its circle lies on the floor around that point.
 //
 // Positioning information a group plans around: every tier draws the circle,
-// the rim and the symbol at the same size and height. A low tier sheds only
-// the cosmetic light: the soft fill, the floor light pool, the beam and its
-// rising motes, the turning runes, and half the symbol's glow
-// (docs/design/graphics-settings-fairness.md).
+// the rim, the beam that ties the symbol to its circle, and the symbol at the
+// same size and height on its glow. A low tier sheds only cosmetic light: the
+// soft fill, the turning runes, the rising motes, and half the strength of
+// the floor pool and the beam (docs/design/graphics-settings-fairness.md).
 //
 // Three-, DOM- and i18n-free, deterministic (registered in RENDER_PURE_CORES).
 
@@ -63,14 +63,23 @@ const SYMBOL_BOB_HZ = 0.4;
 
 /** The symbol's world size (yards) at a middling camera distance. */
 export const WORLD_MARKER_SYMBOL_SIZE_NEAR = 1.75;
-/** The screen-size band, as world yards per yard of camera distance. With the
- *  world camera's 60 degree vertical field of view the screen's height at
- *  distance d is 2 d tan(30) = 1.155 d, so MIN keeps the symbol at about 5.5%
- *  of the screen's height from across a room and MAX caps it near 13% up close. */
+/** The screen-size band, as world yards per yard of camera distance at the
+ *  world camera's default 60 degree vertical field of view (the screen's
+ *  height at distance d is 2 d tan(30) = 1.155 d): MIN keeps the symbol at
+ *  about 5.5% of the screen's height from across a room and MAX caps it near
+ *  13% up close. worldMarkerSymbolSize rescales both for the live field of
+ *  view, so a player who widens it keeps the same share of the screen. */
 export const WORLD_MARKER_SYMBOL_SCREEN_MIN = 0.0635;
 export const WORLD_MARKER_SYMBOL_SCREEN_MAX = 0.15;
-/** Never smaller than this in the world (yards), whatever the distance. */
-const SYMBOL_SIZE_FLOOR = 0.45;
+/** The field of view the band is tuned at, and the range it accepts. */
+export const WORLD_MARKER_CAMERA_FOV = 60;
+const FOV_MIN = 20;
+const FOV_MAX = 150;
+
+/** The glow behind the symbol at full strength (opacity before the flicker). */
+export const WORLD_MARKER_SYMBOL_GLOW_OPACITY = 0.85;
+/** Each beam's streak phase step per symbol, so eight beams never ripple together. */
+export const WORLD_MARKER_BEAM_PHASE = 0.79;
 
 /** The beacon: the beam's height (yards) and its radii at the floor and top. */
 export const WORLD_MARKER_BEAM_HEIGHT = 6.5;
@@ -253,15 +262,28 @@ export function worldMarkerFlare(time: number, symbol: number, reducedMotion: bo
   );
 }
 
-/** The symbol's world size at `distance` yards from the camera: the near size
- *  inside the screen band, else the band's edge (never below a small floor). */
-export function worldMarkerSymbolSize(distance: number): number {
+/** How much wider the screen sees at `fovDeg` than at the tuned 60 degrees
+ *  (tan of the half angles); a non-finite field of view reads as 60. */
+function fovScale(fovDeg: number): number {
+  const f = Number.isFinite(fovDeg)
+    ? Math.min(FOV_MAX, Math.max(FOV_MIN, fovDeg))
+    : WORLD_MARKER_CAMERA_FOV;
+  return Math.tan((f * Math.PI) / 360) / Math.tan((WORLD_MARKER_CAMERA_FOV * Math.PI) / 360);
+}
+
+/** The symbol's world size at `distance` yards from a camera with vertical
+ *  field of view `fovDeg`: the near size inside the screen band, else the
+ *  band's edge, so it never balloons up close or shrinks to a speck far off. */
+export function worldMarkerSymbolSize(
+  distance: number,
+  fovDeg: number = WORLD_MARKER_CAMERA_FOV,
+): number {
   const d = Number.isFinite(distance) ? Math.max(0, distance) : 0;
-  const size = Math.min(
-    d * WORLD_MARKER_SYMBOL_SCREEN_MAX,
-    Math.max(WORLD_MARKER_SYMBOL_SIZE_NEAR, d * WORLD_MARKER_SYMBOL_SCREEN_MIN),
+  const k = fovScale(fovDeg);
+  return Math.min(
+    d * WORLD_MARKER_SYMBOL_SCREEN_MAX * k,
+    Math.max(WORLD_MARKER_SYMBOL_SIZE_NEAR, d * WORLD_MARKER_SYMBOL_SCREEN_MIN * k),
   );
-  return Math.max(SYMBOL_SIZE_FLOOR, size);
 }
 
 /** The floating symbol's height over the floor at `time` for a symbol drawn
@@ -280,24 +302,74 @@ export function worldMarkerSymbolLift(
   return base + Math.sin(phase) * WORLD_MARKER_SYMBOL_BOB;
 }
 
-/** What a graphics tier draws. The circle, rim and symbol (its size, height
- *  and bob) are never shed; only cosmetic light is. */
+/** One symbol's pose for a frame, written in place (no allocation). */
+export interface WorldMarkerSymbolPose {
+  /** World height of the symbol and its glow. */
+  y: number;
+  /** World size of the symbol (yards). */
+  size: number;
+  /** World size of the glow behind it. */
+  glowSize: number;
+  /** The glow's opacity (with the flare's flicker). */
+  glowOpacity: number;
+}
+
+export function createWorldMarkerSymbolPose(): WorldMarkerSymbolPose {
+  return { y: 0, size: 0, glowSize: 0, glowOpacity: 0 };
+}
+
+/**
+ * Pose the floating symbol of the mark standing at `slot` for a camera at
+ * (camX, camY, camZ) with vertical field of view `fovDeg`: the size from the
+ * distance to the symbol's resting point (so the bob never makes it breathe),
+ * then the lift for that size and the bob, the glow's size and its flickering
+ * opacity.
+ */
+export function worldMarkerSymbolPoseInto(
+  out: WorldMarkerSymbolPose,
+  camX: number,
+  camY: number,
+  camZ: number,
+  fovDeg: number,
+  slot: { x: number; y: number; z: number },
+  time: number,
+  symbol: number,
+  reducedMotion: boolean,
+): WorldMarkerSymbolPose {
+  const dx = camX - slot.x;
+  const dy = camY - (slot.y + WORLD_MARKER_SYMBOL_LIFT);
+  const dz = camZ - slot.z;
+  const size = worldMarkerSymbolSize(Math.sqrt(dx * dx + dy * dy + dz * dz), fovDeg);
+  out.size = size;
+  out.y = slot.y + worldMarkerSymbolLift(time, symbol, reducedMotion, size);
+  out.glowSize = size * WORLD_MARKER_SYMBOL_GLOW_SCALE;
+  out.glowOpacity =
+    WORLD_MARKER_SYMBOL_GLOW_OPACITY * worldMarkerFlare(time, symbol, reducedMotion);
+  return out;
+}
+
+/** The clock the beams' streaks and motes run on: held at 0 under reduced
+ *  motion, so a still beam stays still. */
+export function worldMarkerClock(time: number, reducedMotion: boolean): number {
+  return reducedMotion ? 0 : time;
+}
+
+/** What a graphics tier draws. The circle, rim, beam and symbol (its size,
+ *  height, bob and glow) are never shed; only cosmetic light is. */
 export interface WorldMarkerLook {
   /** The soft fill and outer halo of the circle. */
   glow: boolean;
   /** The turning rune band inside the rim. */
   runes: boolean;
-  /** The beacon: the additive light pool on the floor and the beam of light
-   *  rising from the circle. */
-  beam: boolean;
+  /** The strength (0 to 1) of the beacon: the additive light pool on the
+   *  floor and the beam of light rising from the circle to its symbol. */
+  beam: number;
   /** The motes of light rising inside the beam. */
   motes: boolean;
-  /** The strength of the soft glow behind the symbol (0 to 1). */
-  symbolGlow: number;
 }
 
 export function worldMarkerLook(lowTier: boolean): WorldMarkerLook {
   return lowTier
-    ? { glow: false, runes: false, beam: false, motes: false, symbolGlow: 0.5 }
-    : { glow: true, runes: true, beam: true, motes: true, symbolGlow: 1 };
+    ? { glow: false, runes: false, beam: 0.5, motes: false }
+    : { glow: true, runes: true, beam: 1, motes: true };
 }
