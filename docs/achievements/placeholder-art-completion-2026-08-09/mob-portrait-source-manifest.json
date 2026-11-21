@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "eb4f1e20c43f0d3dec94bdfedc8c3bfc04f20296eb7d37d5881184c6296d46f5",
+  "rendererFingerprint": "1624da225908a4a0cb6adf984bffe4c059809ec4232f4b209c05b193bdf662c5",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "linux",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6976973,
-      "sha256": "6768700b761e92fb08987897882ff261b50c05c5ee9c013ad9b80b0e77232af7",
+      "bytes": 6978094,
+      "sha256": "2e8c421ea101b70a4a46787cd94385541e0ec5611ba716a7cd15dd9dc1b8f8e8",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1359,7 +1359,7 @@
       "id": "cinderscar_caller",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_hoard_ember_fiend",
+      "visualKey": "mob_cinderscar_caller",
       "renderSpec": {
         "model": {
           "url": "models/creatures/hoard_ember_fiend.glb",
@@ -1382,7 +1382,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "808f8858f6744d274cdf131e52c4997fc4b9a41d6c7f5cd0fbae627dbebccf65",
+      "sourceFingerprint": "89ca79333ad327665ea62c62addfb244ef9a3c9ad786b7ab53964c71250728c2",
       "output": {
         "path": "public/ui/mobs/cinderscar_caller.webp",
         "bytes": 2306,

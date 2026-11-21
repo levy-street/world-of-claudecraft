@@ -115,6 +115,20 @@ export const QUARTERED_ISLE_MOBS: Record<string, MobTemplate> = {
     hpBase: 52,
     armorPerLevel: 9, // robed in ash, not stone
     aggroRadius: 12,
+    // A ranged caster (the hostile-caster petSpell path, as the delve casters):
+    // it holds at range and throws a fire bolt. Sized to its melee band's damage
+    // per second at level 20: the melee swing averages 57 every 1.9 s (30 dps);
+    // the bolt rolls 78 to 108 (min/max plus the level terms) every 3 s (31 dps).
+    // The windup lands the release on Spellcast_Shoot's throw (manifest.ts).
+    petSpell: {
+      name: 'Burnway Flare',
+      school: 'fire',
+      min: 62,
+      max: 86,
+      range: 26,
+      every: 3.0,
+      windup: 0.45,
+    },
     loot: REGULAR_LOOT,
     scale: 1,
     color: 0xd8542a,

@@ -3479,8 +3479,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "cinderscar_caller",
-        "model": "mob_hoard_ember_fiend",
-        "still": "/guide-stills/mob_hoard_ember_fiend.webp"
+        "model": "mob_cinderscar_caller",
+        "still": "/guide-stills/mob_cinderscar_caller.webp"
       },
       {
         "name": "Gale Wisp",
@@ -22827,7 +22827,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 2.3
   },
-  "mob_hoard_ember_fiend": {
+  "mob_cinderscar_caller": {
     "url": "models/creatures/hoard_ember_fiend.glb",
     "idle": "Idle",
     "height": 2.9

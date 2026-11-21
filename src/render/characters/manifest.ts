@@ -7341,6 +7341,18 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.25,
   },
+  // The Quartered Isle's Cinderscar Caller: the Ember Fiend's body, but a ranged
+  // caster, so its attack (played on the petSpell windup) is the KayKit spell throw.
+  mob_cinderscar_caller: {
+    url: `${CREATURES}/hoard_ember_fiend.glb`,
+    height: 2.9,
+    clips: {
+      ...kaykit(['Spellcast_Shoot']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
   // The forge brute: a slab of volcanic rock that hits with its fists.
   mob_hoard_magma_brute: {
     url: `${CREATURES}/hoard_magma_brute.glb`,
@@ -8386,7 +8398,7 @@ const MOB_KEYS: Record<string, string> = {
   rimeglass_bear: 'mob_rimeglass_bear',
   warden_of_the_quench: 'mob_hoard_hoarfrost_warden',
   heatsworn_ember: 'mob_emberkin',
-  cinderscar_caller: 'mob_hoard_ember_fiend',
+  cinderscar_caller: 'mob_cinderscar_caller',
   ember_hound: 'mob_wolf',
   the_glassfield_brute: 'mob_hoard_magma_brute',
   heaved_shardling: 'mob_elemental',

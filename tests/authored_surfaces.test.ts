@@ -351,6 +351,8 @@ const AUTHORED_ATLAS_DEFS = [
   // the concept) and the Rimeglass Bear (scripts/assets/rimeglass_bear, a baked frost coat)
   'mob_remnant_first_colossus',
   'mob_rimeglass_bear',
+  // and the Cinderscar Caller: the Ember Fiend's body with its spell-throw attack
+  'mob_cinderscar_caller',
 ];
 
 describe('authored surfaces', () => {
