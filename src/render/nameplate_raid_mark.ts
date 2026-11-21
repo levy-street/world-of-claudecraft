@@ -1,4 +1,5 @@
-// Drawing the raid target icon above a nameplate, and the art it draws: a
+// Drawing the raid target icon on a nameplate (docked beside it, or floating
+// above the head when a toggle hid the plate), and the art it draws: a
 // 128 px sprite (icons.ts raidMarkerSprite) so the large on-screen icon stays
 // crisp at high device pixel ratios, where the 64 px menu art would blur.
 // The size and lift rules are nameplate_raid_mark_core.ts.
@@ -9,9 +10,31 @@
 // shadowed blit per icon is not a per-frame budget concern.
 
 import { raidMarkerSprite } from '../ui/icons';
-import { raidMarkPlateSize } from './nameplate_raid_mark_core';
+import {
+  newRaidMarkPlateBox,
+  type RaidMarkNameRow,
+  type RaidMarkPlateBox,
+  type RaidMarkPlateState,
+  raidMarkPlateBoxInto,
+} from './nameplate_raid_mark_core';
 
 export { raidMarkPlateLift } from './nameplate_raid_mark_core';
+
+// One scratch box: the canvas draws plates one at a time, so placing into it
+// allocates nothing per frame.
+const scratch = newRaidMarkPlateBox();
+
+/** Place this plate's icon (raidMarkPlateBoxInto over the shared scratch box). */
+export function placeRaidMark(
+  state: RaidMarkPlateState,
+  row: RaidMarkNameRow,
+  screenX: number,
+  screenY: number,
+  stackTop: number,
+  viewportHeight: number,
+): RaidMarkPlateBox {
+  return raidMarkPlateBoxInto(scratch, state, row, screenX, screenY, stackTop, viewportHeight);
+}
 
 const plateUrls = new Map<number, string>();
 
@@ -25,24 +48,23 @@ export function raidMarkPlateUrl(idx: number): string {
   return url;
 }
 
-/** Draw the icon centred on `screenX` with its top edge at `top`. A not yet
- *  decoded image (null) draws nothing this frame. */
+/** Draw the icon into its placed box (nameplate_raid_mark_core.ts) and return
+ *  how far it lifts the stack (the box's lift, drawn or not). A not yet
+ *  decoded image (null) or an empty box draws nothing this frame. */
 export function drawRaidMarkPlate(
   ctx: CanvasRenderingContext2D,
   image: HTMLImageElement | null,
-  screenX: number,
-  top: number,
-  viewportHeight: number,
+  box: RaidMarkPlateBox,
   forcedColors: boolean,
-): void {
-  if (!image) return;
-  const size = raidMarkPlateSize(viewportHeight);
+): number {
+  if (!image || box.size <= 0) return box.lift;
   ctx.save();
   ctx.imageSmoothingQuality = 'high';
   if (!forcedColors) {
     ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-    ctx.shadowBlur = Math.round(size * 0.12);
+    ctx.shadowBlur = Math.max(2, Math.round(box.size * 0.12));
   }
-  ctx.drawImage(image, Math.round(screenX - size / 2), Math.round(top), size, size);
+  ctx.drawImage(image, Math.round(box.x), Math.round(box.y), box.size, box.size);
   ctx.restore();
+  return box.lift;
 }

@@ -1228,11 +1228,13 @@ describe('nameplate canvas surface', () => {
     expect(source).toContain('if (state.hpVisible) {\n      y -= 7;');
     expect(NAMEPLATE_MARKER_ROW_HEIGHT).toBe(26);
     expect(source).toContain('if (state.comboPips > 0) {\n      y -= 9;');
-    // The raid target icon lifts by its own size plus a gap (nameplate_raid_mark_core.ts),
-    // in drawBase and in drawEmote's mirror walk alike.
-    expect(source.split('y -= raidMarkPlateLift(state.raidMarkerUrl, this.height);')).toHaveLength(
-      3,
+    // The raid target icon docks BESIDE a shown plate and lifts nothing; only the
+    // floating icon of a toggled-off plate lifts the stack (nameplate_raid_mark_core.ts),
+    // in drawBase (the draw's return) and in drawEmote's mirror walk alike.
+    expect(source).toContain(
+      'y -= drawRaidMarkPlate(ctx, markArt, markBox, this.forcedColorsActive());',
     );
+    expect(source).toContain('y -= raidMarkPlateLift(state, this.height);');
     expect(source).toContain('y -= 47;');
     vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
     vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(30);
@@ -1288,30 +1290,33 @@ describe('nameplate canvas surface', () => {
       cast: castSpy.mock.calls[0]?.[2],
       quest: quest?.[3],
       combo: comboSpy.mock.calls[0]?.[2],
-      raid: raid?.[2] as number | undefined,
       emote: emote?.[2],
     };
-    // 44 px: a 360 px tall view sits on the icon's legibility floor.
-    expect(raid?.[3]).toBe(44);
+    // Docked: 22 px on a 360 px view (the floor), left of the plate's widest part with
+    // a gap, vertically centred on the name-plus-bar block it belongs to.
+    const [, rx, ry, rsize] = raid as unknown as [unknown, number, number, number];
+    expect(rsize).toBe(22);
+    const plateLeft = 320 - Math.max(80, heraldry.plaque.w) / 2;
+    expect(rx + rsize).toBeLessThanOrEqual(Math.min(280, plateLeft));
+    expect(ry + rsize / 2).toBeGreaterThan(plaqueTop);
+    expect(ry + rsize / 2).toBeLessThan((exactY.hp as number) + 4);
     expect(exactY).toEqual({
       guild: 201,
       hp: 203,
       cast: 210,
       quest: 151,
       combo: 121,
-      raid: 71,
-      emote: 28,
+      emote: 78,
     });
     const topToBottom = [
       exactY.emote,
-      exactY.raid,
       exactY.combo,
       exactY.quest,
       exactY.guild,
       exactY.hp,
       exactY.cast,
     ] as number[];
-    expect(new Set(topToBottom).size).toBe(7);
+    expect(new Set(topToBottom).size).toBe(6);
     for (let higher = 0; higher < topToBottom.length; higher++) {
       for (let lower = higher + 1; lower < topToBottom.length; lower++) {
         expect(topToBottom[higher], `slot ${higher} must stay above slot ${lower}`).toBeLessThan(
