@@ -10,6 +10,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { HEART_QUARTERS, heartQuarterSpot } from '../src/sim/content/smith_heart_quarters';
 import {
   ELEMENT_AURAS,
+  ELEMENT_OBJECTS,
   ELEMENT_TUNING,
   rimeTemplate,
 } from '../src/sim/encounters/smith_heart/final_elements_ids';
@@ -260,6 +261,29 @@ describe('Masterless Strength bots: Weight of the Anvil', () => {
     const r = Math.hypot(d!.goal.x - f.carrier.x, d!.goal.z - f.carrier.z);
     expect(r).toBeLessThan(FINAL_TUNING.anvilR);
     expect(r).toBeGreaterThan(ELEMENT_TUNING.magmaR);
+  });
+
+  it('the marked player standing in a lava pool steps off it first, and the raid soaks clear of it', () => {
+    const f = anvilFight([]);
+    f.world.obs.ents.set(930, {
+      k: 'object',
+      id: 930,
+      tid: ELEMENT_OBJECTS.lava,
+      x: f.carrier.x,
+      z: f.carrier.z,
+      sc: 2,
+    });
+    final.read(f.world);
+    const st = {};
+    final.duty(f.world, st, f.cb, f.carrier);
+    final.duty(f.world, st, f.sb, f.soaker);
+    vi.setSystemTime(4_000_000 + 3000);
+    const d = final.duty(f.world, st, f.cb, f.carrier) as Duty;
+    expect(d?.duty).toBe('anvil (marked): off the hazard');
+    expect(Math.hypot(d!.goal.x - f.carrier.x, d!.goal.z - f.carrier.z)).toBeGreaterThan(3);
+    const s = final.duty(f.world, st, f.sb, f.soaker) as Duty;
+    expect(s?.duty).toBe('anvil');
+    expect(final.bad(f.world, st, s!.goal)).toBe(false);
   });
 
   it('a Drawn Lightning carrier stays out of the soak, a free raider joins it', () => {

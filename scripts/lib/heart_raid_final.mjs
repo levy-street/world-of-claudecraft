@@ -371,6 +371,12 @@ export const final = {
   meleeReach() {
     return 7;
   },
+  // A ranged pull walks the boss off its quarter (Vein Shock on Heroic) and
+  // often through the central ring: the casters keep a wider margin under
+  // the tank (a fire mage pulled it four times in 20 s and died on Heroic).
+  threatCap(b) {
+    return b.spec.melee ? 0.95 : 0.85;
+  },
   // The pillars are walls: walked round, and no sight line through them.
   obstacles(world) {
     return (world.o?.pillars ?? []).map((p) => ({ x: p.x, z: p.z, r: p.r + 0.8 }));
@@ -968,8 +974,17 @@ function duty(world, st, b, me) {
   // the soak away from the raid and nobody stood under it (the bot raids of
   // 2026-11-21: 0 under, 1,000 on everyone).
   const anvilNow = o.anvils[0];
-  if (anvilNow && hasAura(me, FINAL_AURAS.anvilMark))
+  // Standing in a hazard (a lava pool, a whirl's path), it first steps to
+  // the nearest clear floor, the circle with it, then holds: the whole raid
+  // stacked on a marked player in a Magma Rift's pool and four died in it
+  // (the Heroic bot raids of 2026-11-21).
+  if (anvilNow && hasAura(me, FINAL_AURAS.anvilMark)) {
+    if (final.bad(world, st, me)) {
+      const spot = spread(world, st, me, 0);
+      if (spot) return { goal: spot, tol: 0.8, duty: 'anvil (marked): off the hazard' };
+    }
     return { goal: { x: me.x, z: me.z }, tol: 1.5, duty: 'anvil (marked)' };
+  }
   // Magma Rift under me: away from the raid before it erupts.
   if (hasAura(me, ELEMENT_AURAS.magmaMark)) {
     const spot = spread(world, st, me, ET.magmaR + 3);
@@ -1008,11 +1023,21 @@ function duty(world, st, b, me) {
     const carrier = world.living().find((p) => hasAura(p, FINAL_AURAS.anvilMark));
     const rift = !!carrier && hasAura(carrier, ELEMENT_AURAS.magmaMark);
     const r = rift ? Math.min(anvil.r - 0.8, ET.magmaR + 1.2) : Math.min(3, anvil.r - 2);
-    return {
-      goal: add(anvil, { x: Math.sin(ang), z: Math.cos(ang) }, r),
-      tol: rift ? 0.5 : 0.8,
-      duty: 'anvil',
-    };
+    // The soak spot itself clear of every other hazard: the first clear one
+    // round the circle from my own bearing (inside it, never in a pool).
+    let goal = add(anvil, { x: Math.sin(ang), z: Math.cos(ang) }, r);
+    if (final.bad(world, st, goal)) {
+      search: for (const rr of [r, Math.max(1, r - 1.5), anvil.r - 1, 0.5])
+        for (let k = 0; k < 16; k++) {
+          const a = ang + ((k % 2 ? 1 : -1) * Math.ceil(k / 2) * Math.PI) / 8;
+          const at = add(anvil, { x: Math.sin(a), z: Math.cos(a) }, rr);
+          if (!final.bad(world, st, at)) {
+            goal = at;
+            break search;
+          }
+        }
+    }
+    return { goal, tol: rift ? 0.5 : 0.8, duty: 'anvil' };
   }
   // Marked for a Crossing Blade: lead the line through the pillars (the
   // Storm-Charged first), then step off it as it locks.

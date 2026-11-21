@@ -1190,7 +1190,10 @@ function threatOk(world, b, mob) {
   // melee, 130 at range) with a margin for a crit: a ranged bot pulling the
   // final boss through the ring at 0:10 wiped a Heroic run to Heart Unbound
   // (2026-11-18).
-  return mine < tankHate * (b.spec.melee ? 1.0 : 1.1) ? true : holdThreat(b);
+  // A boss module may ask for a wider margin (`threatCap(b)`: the final boss,
+  // where one pulled swing walks it through Heart Unbound's ring).
+  const cap = world.boss.threatCap?.(b) ?? (b.spec.melee ? 1.0 : 1.1);
+  return mine < tankHate * cap ? true : holdThreat(b);
 }
 function holdThreat(b) {
   b.threatHolds = (b.threatHolds ?? 0) + 1;
