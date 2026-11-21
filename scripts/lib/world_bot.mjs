@@ -133,7 +133,7 @@ export class WorldBot {
       this.name = mine.name;
       return this.name;
     }
-    for (const suffix of ['', 'a', 'o', 'e', 'yn', 'ar']) {
+    for (const suffix of ['', 'a', 'o', 'e', 'yn', 'ar', 'is', 'en', 'ul', 'or', 'ith', 'wen']) {
       const made = await this.api('POST', '/api/characters', {
         name: this.name + suffix,
         class: this.cls,

@@ -33,6 +33,7 @@
 //   kickables?(world)      [{ mob, cast }] kickable bars now
 //   result?(world, st)     'kill' | 'wipe' | 'reset' | null (default: every body down)
 //   report?(world, st, note) extra summary lines; row?(world, st) extra table cells
+//   summary?(world, st)    the boss's own counters for the JSON written beside the log
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -75,6 +76,8 @@ export const HEROIC_PLUS = DIFF !== 'normal';
  *  raid's clock; 0.65 was the old guess against the assumed 1,170. */
 export const POOL = Number(process.env.POOL ?? 1);
 let seed = Number(process.env.SEED ?? Date.now()) >>> 0;
+/** The run's seed as given (the JSON summary names it). */
+const SEED0 = seed;
 /** mulberry32: the script's own rolls (kick fumbles, reaction times, slips). */
 export function rand() {
   seed = (seed + 0x6d2b79f5) >>> 0;
@@ -899,8 +902,24 @@ function processEvents(world, bots, st) {
           const cause = hit
             ? `${hit.ability} (${hit.amount} from ${hit.from})${burnt ? ', then the Cauterize burn unhealed' : ''}`
             : 'unknown (a fall?)';
-          st.deaths.push({ t: fightSec(), who, cause, ability: hit?.ability ?? 'unknown' });
-          log(`DEATH: ${who} - ${cause}`);
+          // What landed on them in their last 8 s, by source: the recap a
+          // death needs (a pulse is often only the last straw).
+          const recent = {};
+          for (const h of st.hitLog)
+            if (h.who === who && h.at >= now - 8000)
+              recent[h.ability] = (recent[h.ability] ?? 0) + h.amount;
+          const recap = Object.entries(recent)
+            .sort((x, y) => y[1] - x[1])
+            .map(([k, v]) => `${k} ${v}`)
+            .join(', ');
+          st.deaths.push({
+            t: fightSec(),
+            who,
+            cause,
+            ability: hit?.ability ?? 'unknown',
+            last8s: recent,
+          });
+          log(`DEATH: ${who} - ${cause}${recap ? `; last 8 s: ${recap}` : ''}`);
         } else if (world.mobIds.has(ev.entityId)) {
           const role = world.roles.find((r) => world.mobs[r]?.id === ev.entityId);
           if (role && st.bossDeaths[role] === undefined) {
@@ -1727,6 +1746,31 @@ function writeReport(world, st, boss) {
     `${boss.key}_${DIFF}${IGNORE ? `_ignore-${IGNORE}` : ''}${process.env.START ? `_start${process.env.START}` : ''}${POOL !== 1 ? `_pool${POOL}` : ''}_${stamp}${BOT_TAG ? `_${BOT_TAG}` : ''}${REPEAT ? `_try${attempt}` : ''}.txt`,
   );
   fs.writeFileSync(file, `${lines.join('\n')}\n`);
+  // The same fight as JSON beside the log, for runs aggregated over seeds.
+  const roleOf = new Map(world.bots.map((x) => [x.name, x.spec.role]));
+  const json = {
+    boss: boss.key,
+    diff: DIFF,
+    gear: GEAR,
+    pool: POOL,
+    seed: SEED0,
+    ignore: IGNORE || null,
+    result: st.result,
+    seconds: Math.round(dur),
+    bossHp: Object.fromEntries(
+      world.roles.map((r) => [r, st.bossDeaths[r] !== undefined ? 0 : (st.lastHp?.[r] ?? null)]),
+    ),
+    raidDps: Math.round(done / Math.max(1, dur)),
+    raidHps: Math.round(healedTotal / Math.max(1, dur)),
+    deaths: st.deaths.map((d) => ({ ...d, role: roleOf.get(d.who) ?? '?' })),
+    damageTaken: Object.fromEntries(
+      [...st.hitsBy.entries()].map(([k, v]) => [k, { total: v.total, hits: v.n, max: v.max }]),
+    ),
+    kicks: st.kicks.map((k) => k.result),
+    taunts: st.taunts.length,
+    fight: boss.summary?.(world, st) ?? null,
+  };
+  fs.writeFileSync(file.replace(/\.txt$/, '.json'), `${JSON.stringify(json, null, 1)}\n`);
   console.log(`\nfight log written: ${file}`);
   return file;
 }
