@@ -248,7 +248,7 @@ export const BIND_ACTIONS: BindAction[] = [
     (n): BindAction => ({
       id: `worldMarker${n}`,
       label: `Place World Marker ${n}`,
-      category: 'Targeting',
+      category: 'World Markers',
       kind: 'edge',
       defaults: [],
     }),
@@ -256,7 +256,7 @@ export const BIND_ACTIONS: BindAction[] = [
   {
     id: 'worldMarkerClear',
     label: 'Clear All World Markers',
-    category: 'Targeting',
+    category: 'World Markers',
     kind: 'edge',
     defaults: [],
   },

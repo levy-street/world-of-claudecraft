@@ -18,6 +18,7 @@ export const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> =
   Interface: 'hud.keybinds.categories.interface',
   'Action Bar': 'hud.keybinds.categories.actionBar',
   Pet: 'hudChrome.keybinds.categoryPet',
+  'World Markers': 'hudChrome.worldMarkers.title',
 };
 export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   setFocus1: 'hudChrome.focusTargets.assign',
