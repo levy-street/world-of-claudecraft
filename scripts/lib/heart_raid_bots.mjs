@@ -805,7 +805,9 @@ async function fight(world, bots, byKey, boss) {
 function result(world, st, boss) {
   for (const r of world.roles) {
     const m = world.mobs[r];
-    if (m && m.mhp) st.lastHp[r] = alive(m) ? m.hp / m.mhp : 0;
+    // Only while someone stands: a wiped raid's boss evades back to full in
+    // the same snapshot, which read every wipe as "alive at 100%".
+    if (m && m.mhp && world.living().length > 0) st.lastHp[r] = alive(m) ? m.hp / m.mhp : 0;
   }
   const own = boss.result?.(world, st);
   if (own !== undefined && own !== null) return own;
