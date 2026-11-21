@@ -354,12 +354,14 @@ export function resolveAscensionAbility(
       friendlyTargetOnly: true,
     });
     // The damaging cast's mirror of the splash heal: half its damage to every
-    // enemy within 10 m of the target, the target included.
+    // enemy within 10 m of the target, the target included, reduced beyond 5
+    // targets like Final Edict's explosion.
     effects.push({
       type: 'aoeDamage',
       min: 60,
       max: 75,
       radius: 10,
+      softCap: 5,
       centerOnTarget: true,
       hostileTargetOnly: true,
     });

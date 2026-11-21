@@ -440,6 +440,7 @@ describe('Paladin core abilities', () => {
         min: 60,
         max: 75,
         radius: 10,
+        softCap: 5,
         centerOnTarget: true,
         hostileTargetOnly: true,
       },

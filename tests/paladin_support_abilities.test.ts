@@ -996,6 +996,38 @@ describe('Paladin support abilities', () => {
     );
   });
 
+  it('reduces the Ascension Solar Invocation splash beyond 5 enemies', () => {
+    const sim = new Sim({ seed: 141, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const target = hostileNear(sim);
+    target.pos.x = sim.player.pos.x + 20;
+    sim.rebucket(target);
+    const crowd = [1, 2, 3, 4, 5, 6].map((i) => {
+      const mob = createMob(9110 + i, MOBS.ridge_stalker, 20, {
+        x: target.pos.x + (i % 2 === 0 ? 3 : -3),
+        y: target.pos.y,
+        z: target.pos.z + i - 3.5,
+      });
+      mob.maxHp = mob.hp = 1_000_000;
+      (sim as unknown as { addEntity(entity: Entity): void }).addEntity(mob);
+      return mob;
+    });
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+    sim.drainEvents();
+
+    run(sim, target, resolve(sim, 'solar_invocation'));
+
+    // Seven enemies share five full splashes: every splash hit is held to
+    // 5/7 of its roll, under the uncapped 60 floor.
+    for (const mob of crowd) {
+      const loss = mob.maxHp - mob.hp;
+      expect(loss).toBeGreaterThan(0);
+      expect(loss).toBeLessThan(60);
+    }
+  });
+
   it('never splashes damage from a healing Ascension Solar Invocation', () => {
     const sim = new Sim({ seed: 139, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
