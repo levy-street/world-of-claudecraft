@@ -184,7 +184,6 @@ describe('the Heart: the Anvil of the World drawn from its quarter geometry', ()
     }
   });
 });
-})
 
 describe('the rooms: landmarks and line features from their layout records', () => {
   it('draws every dressing piece that has a footprint as a landmark on its page', () => {
