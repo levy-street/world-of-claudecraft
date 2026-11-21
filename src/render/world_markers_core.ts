@@ -169,10 +169,16 @@ export type WorldMarkerFloor = (x: number, z: number, refY: number) => number;
 
 /**
  * Write one disc's draped vertex positions (x, y, z per vertex: the centre,
- * then ring by ring out to the halo's edge) round the mark at (cx, cy, cz).
- * Each vertex sits on the floor under it (lifted), so the circle folds over a
- * step instead of floating off it or sinking into it; a sample that leaves
- * the mark's floor (a wall top, a pit) holds the mark's own height.
+ * then ring by ring out to the halo's edge) round the mark at (cx, cy, cz),
+ * RELATIVE to that point: the disc mesh stands at the mark, so every vertex
+ * stays within a couple of yards of its own origin. Dungeon instances sit a
+ * hundred thousand yards out, where a float32 WORLD vertex is only good to
+ * about 0.008 yd and its view transform wobbles by more than the lift as the
+ * camera turns: the circle z-fought the floor and tore into shifting shards
+ * (see src/render/camera_relative_glsl.ts for the same failure). Each vertex
+ * sits on the floor under it (lifted), so the circle folds over a step
+ * instead of floating off it or sinking into it; a sample that leaves the
+ * mark's floor (a wall top, a pit) holds the mark's own height.
  */
 export function writeWorldMarkerDrape(
   out: Float32Array,
@@ -181,24 +187,20 @@ export function writeWorldMarkerDrape(
   cz: number,
   floor: WorldMarkerFloor,
 ): void {
-  const at = (i: number, x: number, z: number): void => {
-    const h = floor(x, z, cy);
+  const at = (i: number, dx: number, dz: number): void => {
+    const h = floor(cx + dx, cz + dz, cy);
     const y = Number.isFinite(h) && Math.abs(h - cy) <= WORLD_MARKER_DRAPE_REACH ? h : cy;
-    out[i * 3] = x;
-    out[i * 3 + 1] = y + WORLD_MARKER_LIFT;
-    out[i * 3 + 2] = z;
+    out[i * 3] = dx;
+    out[i * 3 + 1] = y - cy + WORLD_MARKER_LIFT;
+    out[i * 3 + 2] = dz;
   };
-  at(0, cx, cz);
+  at(0, 0, 0);
   const outer = WORLD_MARKER_RADIUS * WORLD_MARKER_OUTER;
   for (let r = 1; r <= WORLD_MARKER_RINGS; r++) {
     const radius = (outer * r) / WORLD_MARKER_RINGS;
     for (let k = 0; k < WORLD_MARKER_SEGMENTS; k++) {
       const a = (k / WORLD_MARKER_SEGMENTS) * Math.PI * 2;
-      at(
-        1 + (r - 1) * WORLD_MARKER_SEGMENTS + k,
-        cx + Math.cos(a) * radius,
-        cz + Math.sin(a) * radius,
-      );
+      at(1 + (r - 1) * WORLD_MARKER_SEGMENTS + k, Math.cos(a) * radius, Math.sin(a) * radius);
     }
   }
 }

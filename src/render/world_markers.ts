@@ -54,11 +54,10 @@ import {
 } from './world_markers_core';
 
 const DISC_VERTEX = `
-  uniform vec2 uCenter;
   uniform float uRadius;
   varying vec2 vLocal;
   void main() {
-    vLocal = (position.xz - uCenter) / uRadius;
+    vLocal = position.xz / uRadius;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
@@ -333,12 +332,10 @@ export class WorldMarkerLayer {
     positions.setUsage(THREE.DynamicDrawUsage);
     geometry.setAttribute('position', positions);
     geometry.setIndex(this.index);
-    const center = new THREE.Vector2();
     const discMat = new THREE.ShaderMaterial({
       vertexShader: DISC_VERTEX,
       fragmentShader: DISC_FRAGMENT,
       uniforms: {
-        uCenter: { value: center },
         uRadius: { value: WORLD_MARKER_RADIUS },
         uColor: { value: color },
         uPulse: { value: 1 },
@@ -362,12 +359,11 @@ export class WorldMarkerLayer {
     disc.visible = false;
     this.group.add(disc);
 
-    // The pool shares the disc's drape (and its centre), one rung over it.
+    // The pool shares the disc's drape, one rung over it, on its own mesh at the mark.
     const poolMat = new THREE.ShaderMaterial({
       vertexShader: DISC_VERTEX,
       fragmentShader: POOL_FRAGMENT,
       uniforms: {
-        uCenter: { value: center },
         uRadius: { value: WORLD_MARKER_RADIUS },
         uColor: { value: color },
         uFlare: { value: 1 },
@@ -526,7 +522,10 @@ export class WorldMarkerLayer {
         );
         piece.positions.needsUpdate = true;
         piece.disc.geometry.computeBoundingSphere();
-        (piece.discMat.uniforms.uCenter.value as THREE.Vector2).set(slot.x, slot.z);
+        // The drape is relative to the mark: the mesh stands on it (the pool
+        // rides the same mesh's geometry, so it moves with its own mesh).
+        piece.disc.position.set(slot.x, slot.y, slot.z);
+        piece.pool.position.set(slot.x, slot.y, slot.z);
         piece.beam.position.set(slot.x, slot.y, slot.z);
       }
       piece.disc.visible = slot.shown;

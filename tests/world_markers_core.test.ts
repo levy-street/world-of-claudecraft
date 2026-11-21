@@ -96,23 +96,45 @@ describe('world markers core: the eight slots', () => {
 });
 
 describe('world markers core: the floor drape', () => {
-  it('lays every vertex on the floor under it, lifted, out to the halo edge', () => {
+  it('lays every vertex on the floor under it, lifted, out to the halo edge, relative to the mark', () => {
     const out = new Float32Array(WORLD_MARKER_VERTS * 3);
     // A step: the floor is 0.4 higher east of x = 10.5.
     const floor = (x: number) => (x > 10.5 ? 5.4 : 5);
     writeWorldMarkerDrape(out, 10, 5, 20, floor);
-    expect(out[0]).toBe(10);
-    expect(out[1]).toBeCloseTo(5 + WORLD_MARKER_LIFT, 6);
-    expect(out[2]).toBe(20);
+    // The centre vertex IS the mark's own point (the mesh stands there).
+    expect(out[0]).toBe(0);
+    expect(out[1]).toBeCloseTo(WORLD_MARKER_LIFT, 6);
+    expect(out[2]).toBe(0);
     let farthest = 0;
     for (let i = 0; i < WORLD_MARKER_VERTS; i++) {
       const x = out[i * 3];
       const y = out[i * 3 + 1];
       const z = out[i * 3 + 2];
-      expect(y).toBeCloseTo(floor(x) + WORLD_MARKER_LIFT, 5);
-      farthest = Math.max(farthest, Math.hypot(x - 10, z - 20));
+      expect(y).toBeCloseTo(floor(10 + x) - 5 + WORLD_MARKER_LIFT, 5);
+      farthest = Math.max(farthest, Math.hypot(x, z));
     }
     expect(farthest).toBeCloseTo(WORLD_MARKER_RADIUS * WORLD_MARKER_OUTER, 4);
+  });
+
+  it('keeps every vertex small out in a dungeon band (no float32 wobble against the floor)', () => {
+    // The bug this pins: a world-space drape at x ~ 119000 on an origin mesh
+    // z-fought the floor and tore into shifting shards as the camera turned.
+    const out = new Float32Array(WORLD_MARKER_VERTS * 3);
+    const cx = 119388.37;
+    const cz = -1122.81;
+    const samples: number[][] = [];
+    writeWorldMarkerDrape(out, cx, 41.2, cz, (x, z) => {
+      samples.push([x, z]);
+      return 41.2 + (x - cx) * 0.05;
+    });
+    // It still samples the floor at the real world points round the mark.
+    expect(samples[0]).toEqual([cx, cz]);
+    const reach = WORLD_MARKER_RADIUS * WORLD_MARKER_OUTER;
+    for (let i = 0; i < WORLD_MARKER_VERTS; i++) {
+      expect(Math.abs(out[i * 3])).toBeLessThanOrEqual(reach + 1e-4);
+      expect(Math.abs(out[i * 3 + 1])).toBeLessThanOrEqual(WORLD_MARKER_DRAPE_REACH + 0.1);
+      expect(Math.abs(out[i * 3 + 2])).toBeLessThanOrEqual(reach + 1e-4);
+    }
   });
 
   it('holds the mark height where a sample leaves its floor (a wall top, a pit, a hole)', () => {
@@ -121,7 +143,7 @@ describe('world markers core: the floor drape', () => {
       x > 10.5 ? 5 + WORLD_MARKER_DRAPE_REACH + 2 : x < 9.5 ? Number.NaN : 5;
     writeWorldMarkerDrape(out, 10, 5, 20, floor);
     for (let i = 0; i < WORLD_MARKER_VERTS; i++)
-      expect(out[i * 3 + 1]).toBeCloseTo(5 + WORLD_MARKER_LIFT, 5);
+      expect(out[i * 3 + 1]).toBeCloseTo(WORLD_MARKER_LIFT, 5);
   });
 
   it('indexes a closed disc: a centre fan plus a strip per ring', () => {
@@ -285,12 +307,18 @@ describe('world markers layer (Three)', () => {
     // The pool rides the disc's own drape, one ground rung over it.
     expect(pool.geometry).toBe(disc.geometry);
     expect(pool.renderOrder).toBe(disc.renderOrder + 1);
+    // The disc and its pool stand ON the mark (their drape is relative to it).
+    const pool7 = scene.getObjectByName('world-marker-pool-7') as THREE.Mesh;
+    expect([disc.position.x, disc.position.y, disc.position.z]).toEqual([1, 2, 3]);
+    expect(pool7.position.equals(disc.position)).toBe(true);
     const drapes = floor.mock.calls.length;
     expect(drapes).toBe(WORLD_MARKER_VERTS);
     l.update([mark(7, 1, 2, 3)], camera, 0.5, false);
     expect(floor.mock.calls.length).toBe(drapes);
     l.update([mark(7, 5, 2, 3)], camera, 1, false);
     expect(floor.mock.calls.length).toBe(drapes * 2);
+    expect(disc.position.x).toBe(5);
+    expect(pool7.position.x).toBe(5);
     l.update([], camera, 1.5, false);
     expect(disc.visible).toBe(false);
     expect(sprite.visible).toBe(false);
