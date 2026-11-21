@@ -30,12 +30,7 @@ import { tEntity } from '../ui/entity_i18n';
 import { hillBountyTagLabel } from '../ui/hill_bounty_tag';
 import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
-import {
-  auraImageUrl,
-  cachedProceduralIconDataUrl,
-  proceduralIconDataUrl,
-  raidMarkerDataUrl,
-} from '../ui/icons';
+import { auraImageUrl, cachedProceduralIconDataUrl, proceduralIconDataUrl } from '../ui/icons';
 import { professionTrainerNameplateLabel } from '../ui/profession_trainer_label_core';
 import { localizeSimAuraName } from '../ui/sim_i18n';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
@@ -70,6 +65,7 @@ import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
+import { raidMarkPlateUrl } from './nameplate_raid_mark';
 import { nameplateHasBounty } from './nameplate_tag_fill_core';
 import {
   newTargetOverlay,
@@ -793,7 +789,7 @@ export class NameplatePainter {
 
     // A true NPC is never markable (src/sim/social/raid_target_marks.ts).
     const raidMark = entity.kind === 'npc' ? null : this.world.markerFor(entity.id);
-    if (raidMark !== null) state.raidMarkerUrl = raidMarkerDataUrl(raidMark);
+    if (raidMark !== null) state.raidMarkerUrl = raidMarkPlateUrl(raidMark);
     // A plate a nameplate toggle hides keeps only the floating raid target icon.
     if (plan.raidMarkOnly) {
       state.badges.length = 0;

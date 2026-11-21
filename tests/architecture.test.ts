@@ -1663,6 +1663,7 @@ const RENDER_PURE_CORES = [
   'src/render/resize_coalesce_core.ts',
   'src/render/post_shed_core.ts',
   'src/render/nameplate_view.ts',
+  'src/render/nameplate_raid_mark_core.ts',
   'src/render/nameplate_pick_core.ts',
   'src/render/nameplate_paint_gate_core.ts',
   'src/render/spirit_grade_core.ts',

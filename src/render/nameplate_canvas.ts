@@ -26,6 +26,7 @@ import {
   NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
   NameplateImageCache,
 } from './nameplate_image_cache';
+import { drawRaidMarkPlate, raidMarkPlateLift } from './nameplate_raid_mark';
 
 // Re-exported so the cache's budget stays part of THIS module's published
 // surface, where its callers and tests have always read it.
@@ -432,10 +433,9 @@ export class NameplateCanvasSurface {
       y -= 9;
       this.drawCombo(state.comboPips, screenX, y);
     }
-    if (state.raidMarkerUrl) {
-      y -= 31;
-      this.drawImage(state.raidMarkerUrl, screenX - 15, y, 30, false);
-    }
+    y -= raidMarkPlateLift(state.raidMarkerUrl, this.height);
+    const mark = state.raidMarkerUrl ? this.images.get(state.raidMarkerUrl) : null;
+    drawRaidMarkPlate(ctx, mark, screenX, y, this.height, this.forcedColorsActive());
     // Sits in the empty marker row unless something already fills the stack top.
     const stackTop = state.marker || state.comboPips > 0 || state.raidMarkerUrl;
     if (state.overheadMarker)
@@ -466,7 +466,7 @@ export class NameplateCanvasSurface {
     y -= cooldownRow.nameplateCooldownRowHeight(state.cooldowns);
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.comboPips > 0) y -= 9;
-    if (state.raidMarkerUrl) y -= 31;
+    y -= raidMarkPlateLift(state.raidMarkerUrl, this.height);
     y -= 47;
 
     const emoteStyle = this.configureTextStyle(this.emoteStyle, EMOTE_STYLE.fill);
