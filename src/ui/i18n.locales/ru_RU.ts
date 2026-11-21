@@ -15525,6 +15525,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gatheringGoal.reasonDailyLimit': 'Этот рецепт уже создавался сегодня.',
   'hudChrome.gatheringGoal.reasonBatchLimit': 'Этот размер партии больше не действителен.',
   'hudChrome.gatheringGoal.materialLine': '{name}: {reachable} из {required}',
+  'hudChrome.gatheringGoal.materialProgress': '{name}: {carried}/{required} (+{stored} в банке)',
   'hudChrome.gatheringGoal.materialCarried': 'При себе: {count}',
   'hudChrome.gatheringGoal.materialStored': 'На складе: {count}',
   'hudChrome.gatheringGoal.materialMissing': 'Не хватает: {count}',

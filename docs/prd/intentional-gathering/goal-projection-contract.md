@@ -22,6 +22,12 @@ Shared DTO: src/sim/professions/gathering_goal_types.ts in the shared simulation
 Required bill is sequential. Row counters are allocations TOWARD the goal, not total
 inventory: carried and stored physical units; reachable spendable carried/drawable vault;
 missing uncovered owned shortfall; inaccessible owned units not currently usable.
+Beside them, heldCarried and heldStored are UNCAPPED display totals (every copy across
+the reagent's grade ladder, locked included: bags, then personal bank plus the whole
+Materials Vault); they may exceed required, never feed a bill, and are never below their
+own capped allocation. The tracker row renders "{name}: heldCarried/required (+heldStored
+in bank)". On the wire both are optional: a frame without them decodes with the capped
+carried/stored standing in, so either deploy order stays compatible.
 Ready means materials available, not a guarantee of station/gold/output bag space.
 
 ## Safe commission identity

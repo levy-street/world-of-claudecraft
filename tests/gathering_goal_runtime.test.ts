@@ -6,6 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { recipeById } from '../src/sim/content/recipes';
+import { GATHERING_GOAL_REFRESH_TICKS } from '../src/sim/professions/gathering_goal_projection';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { runCraft } from './helpers/enchant_family_cast';
@@ -63,6 +64,8 @@ describe('trackGatheringRecipe: a count above what is currently craftable', () =
         reachable: 2,
         missing: 4,
         inaccessible: 0,
+        heldCarried: 2,
+        heldStored: 0,
       },
       {
         itemId: 'bone_fragments',
@@ -72,6 +75,8 @@ describe('trackGatheringRecipe: a count above what is currently craftable', () =
         reachable: 4,
         missing: 8,
         inaccessible: 0,
+        heldCarried: 4,
+        heldStored: 0,
       },
       {
         itemId: 'smithing_flux',
@@ -81,8 +86,56 @@ describe('trackGatheringRecipe: a count above what is currently craftable', () =
         reachable: 6,
         missing: 12,
         inaccessible: 0,
+        heldCarried: 6,
+        heldStored: 0,
       },
     ]);
+  });
+
+  it('reports the FULL bag holding beside the capped allocation (more held than the goal needs)', () => {
+    // The reported case: Minor Healing Potion x1 needs 1 linen, 1 leg, 2
+    // herbs, but the player carries 26 / 6 / 23. The allocation stays capped
+    // at the requirement; heldCarried is every copy in the bags.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('linen_scrap', 26, pid);
+    sim.addItem('spider_leg', 6, pid);
+    sim.addItem('silverleaf_herb', 23, pid);
+
+    expect(sim.trackGatheringRecipe('recipe_minor_healing_potion', 1, pid)).toBe(true);
+    const rows = sim.gatheringGoalFor(pid)?.materials ?? [];
+    const byId = new Map(rows.map((row) => [row.itemId, row]));
+    expect(byId.get('linen_scrap')).toMatchObject({ required: 1, carried: 1, heldCarried: 26 });
+    expect(byId.get('spider_leg')).toMatchObject({ required: 1, carried: 1, heldCarried: 6 });
+    expect(byId.get('silverleaf_herb')).toMatchObject({
+      required: 2,
+      carried: 2,
+      heldCarried: 23,
+    });
+    for (const row of rows) expect(row.heldStored).toBe(0);
+  });
+
+  it('refreshes heldStored after a surplus bank deposit the capped allocation cannot see', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('linen_scrap', 1, pid);
+    sim.addItem('spider_leg', 1, pid);
+    sim.addItem('silverleaf_herb', 2, pid);
+    expect(sim.trackGatheringRecipe('recipe_minor_healing_potion', 1, pid)).toBe(true);
+    const legRow = () =>
+      sim.gatheringGoalFor(pid)?.materials.find((r) => r.itemId === 'spider_leg');
+    expect(legRow()).toMatchObject({ carried: 1, stored: 0, heldCarried: 1, heldStored: 0 });
+
+    // A surplus already covered by the bags: the capped stored stays 0, only
+    // the uncapped holding moves, and it lands once the refresh gate passes.
+    const meta = sim.ctx.players.get(pid);
+    if (!meta) throw new Error('missing meta');
+    meta.bank.inventory = [...meta.bank.inventory, { itemId: 'spider_leg', count: 4 }];
+    meta.vault.stock.spider_leg = 3;
+    meta.bankWireRev++;
+    meta.vaultWireRev++;
+    for (let i = 0; i < GATHERING_GOAL_REFRESH_TICKS; i++) sim.tick();
+    expect(legRow()).toMatchObject({ carried: 1, stored: 0, heldCarried: 1, heldStored: 7 });
   });
 
   it('reaches ready once every reagent is fully covered', () => {

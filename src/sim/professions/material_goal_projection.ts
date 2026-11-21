@@ -75,7 +75,7 @@ import {
 import type { InvSlot } from '../types';
 import { planCraftReagentDraw } from './craft_reagent_plan';
 import { holdsSelfSignedInstance, requiredReagentCountFor } from './crafting';
-import { materialGradeIds } from './material_grades';
+import { countAcrossGrades, materialGradeIds } from './material_grades';
 import { countMinusPlanned, planReagentSourceDraw, tallyPlannedTakes } from './reagent_sources';
 import type { ProfessionReagent, ProfessionRecipeRecord } from './types';
 import type { CraftSkillState } from './wheel';
@@ -113,6 +113,14 @@ export interface MaterialGoalReagentRow {
    *  for this reagent across the full `quantity` is genuinely payable now,
    *  not merely owned. */
   readonly materialReady: boolean;
+  /** Every copy of the reagent (across its grade ladder) in the bags, locked
+   *  included, UNCAPPED: unlike `carriedCount` it is not an allocation, so it
+   *  may exceed `requiredCount`, and two rows naming the same material each
+   *  report the full holding. Display only; never feeds a bill. */
+  readonly heldCarriedCount: number;
+  /** The same uncapped holding across the personal bank plus the full
+   *  Materials Vault (special rows included). Display only. */
+  readonly heldStoredCount: number;
 }
 
 export interface ProjectMaterialGoalReagentsInput {
@@ -426,6 +434,7 @@ export function projectMaterialGoalReagents(
     input.bankInventory,
     input.vault,
   );
+  const { bankInventory, carriedInventory, vault } = input;
   const rows: MaterialGoalReagentRow[] = recipe.reagents.map((reagent, i) => {
     const requiredCount = bill.required[i];
     const reachableCount = bill.reachable[i];
@@ -442,6 +451,13 @@ export function projectMaterialGoalReagents(
       missingCount,
       inaccessibleCount,
       materialReady: reachableCount >= requiredCount,
+      heldCarriedCount: countAcrossGrades(reagent.itemId, (id) =>
+        countRawInSlots(carriedInventory, id),
+      ),
+      heldStoredCount: countAcrossGrades(
+        reagent.itemId,
+        (id) => countRawInSlots(bankInventory, id) + vaultStoredCount(vault, id),
+      ),
     };
   });
   return {

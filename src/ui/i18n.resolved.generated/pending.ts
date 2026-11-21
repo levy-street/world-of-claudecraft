@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "es_ES": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "fr_FR": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "fr_CA": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "de_DE": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "nl_NL": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "pl_PL": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "id_ID": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "tr_TR": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "sv_SE": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "vi_VN": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ],
+  "da_DK": [
+    "hudChrome.gatheringGoal.materialProgress"
+  ]
 };

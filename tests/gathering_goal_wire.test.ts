@@ -26,6 +26,9 @@ function readyRecipeView(overrides: Record<string, unknown> = {}): unknown {
         reachable: 10,
         missing: 0,
         inaccessible: 0,
+        // Uncapped holdings: more in the bags than the goal needs.
+        heldCarried: 15,
+        heldStored: 4,
       },
     ],
     payableCrafts: 5,
@@ -339,6 +342,50 @@ describe('decodeGatheringGoalWire', () => {
         ).toBeNull();
       }
     }
+  });
+
+  it('accepts uncapped heldCarried/heldStored above required (holding more is the point)', () => {
+    const base = readyRecipeView() as { materials: Record<string, unknown>[] };
+    const row = { ...base.materials[0], heldCarried: 250, heldStored: 99 };
+    const decoded = decodeGatheringGoalWire({ ...base, materials: [row] });
+    expect(decoded?.materials[0].heldCarried).toBe(250);
+    expect(decoded?.materials[0].heldStored).toBe(99);
+  });
+
+  it('falls back to the capped carried/stored when a pre-held-fields server omits them', () => {
+    const base = readyRecipeView() as { materials: Record<string, unknown>[] };
+    const { heldCarried: _c, heldStored: _s, ...legacyRow } = base.materials[0];
+    const decoded = decodeGatheringGoalWire({ ...base, materials: [legacyRow] });
+    expect(decoded).not.toBeNull();
+    expect(decoded?.materials[0].heldCarried).toBe(6);
+    expect(decoded?.materials[0].heldStored).toBe(4);
+  });
+
+  it('refuses a PRESENT but malformed heldCarried/heldStored', () => {
+    const base = readyRecipeView() as { materials: Record<string, unknown>[] };
+    const row = base.materials[0];
+    for (const field of ['heldCarried', 'heldStored']) {
+      for (const bad of [-1, 1.5, Number.NaN, Infinity, '5', null]) {
+        const patched = { ...row, [field]: bad };
+        expect(
+          decodeGatheringGoalWire({ ...base, materials: [patched] }),
+          `${field}=${String(bad)}`,
+        ).toBeNull();
+      }
+    }
+  });
+
+  it('refuses a holding below its own capped allocation, per side', () => {
+    const base = readyRecipeView() as { materials: Record<string, unknown>[] };
+    const row = base.materials[0]; // carried 6, stored 4
+    expect(
+      decodeGatheringGoalWire({ ...base, materials: [{ ...row, heldCarried: 5 }] }),
+    ).toBeNull();
+    expect(decodeGatheringGoalWire({ ...base, materials: [{ ...row, heldStored: 3 }] })).toBeNull();
+    // Exactly equal is the floor, and decodes.
+    expect(
+      decodeGatheringGoalWire({ ...base, materials: [{ ...row, heldCarried: 6, heldStored: 4 }] }),
+    ).not.toBeNull();
   });
 
   it('refuses owned (carried+stored) exceeding required', () => {

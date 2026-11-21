@@ -190,23 +190,18 @@ function materialLineHtml(
   expandedSourceItemIds: ReadonlySet<string>,
 ): string {
   const name = row.item ? itemDisplayName(row.item) : unavailableMaterialLabel();
-  const line = t('hudChrome.gatheringGoal.materialLine', {
+  // "{name}: x/a (+y in bank)": x and y are the UNCAPPED holdings (every copy
+  // in the bags, every copy in the bank plus Materials Vault), a the goal's
+  // full requirement. The bank figure is always rendered, zero included.
+  const line = t('hudChrome.gatheringGoal.materialProgress', {
     name,
-    reachable: formatNumber(row.reachable, { maximumFractionDigits: 0 }),
+    carried: formatNumber(row.heldCarried, { maximumFractionDigits: 0 }),
     required: formatNumber(row.required, { maximumFractionDigits: 0 }),
+    stored: formatNumber(row.heldStored, { maximumFractionDigits: 0 }),
   });
-  // Carried/stored are the row's own allocation breakdown: always rendered,
-  // never gated on a nonzero count (unlike the shortfall chips below).
-  const carried = ` ${t('hudChrome.gatheringGoal.materialCarried', {
-    count: formatNumber(row.carried, { maximumFractionDigits: 0 }),
-  })}`;
-  const stored = ` ${t('hudChrome.gatheringGoal.materialStored', {
-    count: formatNumber(row.stored, { maximumFractionDigits: 0 }),
-  })}`;
-  const missing =
-    row.missing > 0
-      ? ` ${t('hudChrome.gatheringGoal.materialMissing', { count: formatNumber(row.missing, { maximumFractionDigits: 0 }) })}`
-      : '';
+  // Owned copies the bill cannot spend (a locked bag slot, or bank copies:
+  // crafting never draws from the bank). Without this, "6/1" on an
+  // unsatisfied row would be explained by colour alone.
   const inaccessible =
     row.inaccessible > 0
       ? ` ${t('hudChrome.gatheringGoal.materialInaccessible', { count: formatNumber(row.inaccessible, { maximumFractionDigits: 0 }) })}`
@@ -246,7 +241,7 @@ function materialLineHtml(
       : '';
   return (
     `<li class="gathering-goal-material${row.satisfied ? ' satisfied' : ''}">` +
-    `<span class="gathering-goal-material-line">${esc(line)}${esc(carried)}${esc(stored)}${esc(missing)}${esc(inaccessible)}</span>` +
+    `<span class="gathering-goal-material-line">${esc(line)}${esc(inaccessible)}</span>` +
     `${metaHtml}${sourceDisclosureHtml(row, name, expandedSourceItemIds)}</li>`
   );
 }

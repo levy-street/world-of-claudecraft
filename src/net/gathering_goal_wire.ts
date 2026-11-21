@@ -84,11 +84,24 @@ function decodeIdentity(raw: unknown): GatheringGoalIdentity | null {
   return loaded;
 }
 
+/** The uncapped holding fields (`heldCarried`/`heldStored`): a nonnegative
+ *  safe integer, or ABSENT, in which case the capped allocation stands in so a
+ *  frame from a server that predates the fields still decodes (a forward- and
+ *  backward-compatible addition, never a refusal). Present but malformed
+ *  refuses, like every other count. */
+function decodeHeldCount(value: unknown, fallback: number): number | null {
+  if (value === undefined) return fallback;
+  return isNonNegativeSafeInt(value) ? value : null;
+}
+
 /** Refuses a material row whose counts are not exactly the projection's own
  *  arithmetic: every count is a nonnegative safe integer, owned
  *  (carried+stored) can never exceed required, reachable can never exceed
  *  owned, and missing/inaccessible are the EXACT derived remainders
- *  (required-owned, owned-reachable) rather than merely bounded by them. */
+ *  (required-owned, owned-reachable) rather than merely bounded by them. The
+ *  uncapped `heldCarried`/`heldStored` are deliberately NOT bounded above by
+ *  `required` (holding more than the goal needs is the point of them), only
+ *  below by their own capped allocation. */
 function decodeMaterial(raw: unknown): GatheringGoalMaterial | null {
   if (!isPlainRecord(raw) || !isCanonicalId(raw.itemId)) return null;
   const { required, carried, stored, reachable, missing, inaccessible } = raw;
@@ -107,7 +120,23 @@ function decodeMaterial(raw: unknown): GatheringGoalMaterial | null {
   if (reachable > owned) return null;
   if (missing !== required - owned) return null;
   if (inaccessible !== owned - reachable) return null;
-  return { itemId: raw.itemId, required, carried, stored, reachable, missing, inaccessible };
+  const heldCarried = decodeHeldCount(raw.heldCarried, carried);
+  const heldStored = decodeHeldCount(raw.heldStored, stored);
+  if (heldCarried === null || heldStored === null) return null;
+  // The capped allocation is drawn FROM the holding (same grade ladder), so a
+  // holding below its own allocation is never something the projection sends.
+  if (heldCarried < carried || heldStored < stored) return null;
+  return {
+    itemId: raw.itemId,
+    required,
+    carried,
+    stored,
+    reachable,
+    missing,
+    inaccessible,
+    heldCarried,
+    heldStored,
+  };
 }
 
 /**

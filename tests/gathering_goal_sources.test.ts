@@ -60,6 +60,8 @@ function materialRow(overrides: Partial<GatheringGoalMaterialRow>): GatheringGoa
     reachable: 5,
     missing: 5,
     inaccessible: 0,
+    heldCarried: 2,
+    heldStored: 3,
     satisfied: false,
     sourceFamilyId: 'corpseHarvesting',
     corpsePreferenceItemId: 'rough_hide',

@@ -448,3 +448,81 @@ describe('caller state is never mutated', () => {
     expect(input.drawableVaultStock).toEqual(drawableSnapshot);
   });
 });
+
+describe('uncapped holdings (heldCarriedCount / heldStoredCount)', () => {
+  function onlyRow(input: ProjectMaterialGoalReagentsInput) {
+    const result = projectMaterialGoalReagents(input);
+    if (!result.ok) throw new Error('expected ok projection');
+    expect(result.rows).toHaveLength(1);
+    return result.rows[0];
+  }
+
+  it('reports EVERY carried copy, not the capped allocation, when the bags hold more than needed', () => {
+    const row = onlyRow(
+      baseInput({
+        recipe: makeRecipe([{ itemId: 'spider_leg', count: 1 }]),
+        carriedInventory: [plainSlot('spider_leg', 4), plainSlot('spider_leg', 2)],
+      }),
+    );
+    expect(row.requiredCount).toBe(1);
+    expect(row.carriedCount).toBe(1); // the allocation stays capped
+    expect(row.heldCarriedCount).toBe(6);
+    expect(row.heldStoredCount).toBe(0);
+  });
+
+  it('sums the personal bank AND the whole Materials Vault (special rows included) into heldStored', () => {
+    const row = onlyRow(
+      baseInput({
+        recipe: makeRecipe([{ itemId: 'linen_scrap', count: 2 }]),
+        carriedInventory: [plainSlot('linen_scrap', 1)],
+        bankInventory: [plainSlot('linen_scrap', 5), plainSlot('rough_hide', 9)],
+        vault: {
+          stock: { linen_scrap: 7 },
+          special: [signedSlot('linen_scrap', 3, 'Someone')],
+          upgrades: 0,
+        },
+      }),
+    );
+    expect(row.heldCarriedCount).toBe(1);
+    // 5 bank + 7 compact vault + 3 special vault; the unrelated hide is excluded.
+    expect(row.heldStoredCount).toBe(15);
+    expect(row.storedCount).toBe(1); // capped: 2 required - 1 carried
+  });
+
+  it('counts the fine grade toward its base reagent (the same ladder the craft spends)', () => {
+    const row = onlyRow(
+      baseInput({
+        recipe: makeRecipe([{ itemId: 'silverleaf_herb', count: 2 }]),
+        carriedInventory: [plainSlot('silverleaf_herb', 3), plainSlot('fine_silverleaf_herb', 4)],
+        bankInventory: [plainSlot('fine_silverleaf_herb', 2)],
+      }),
+    );
+    expect(row.heldCarriedCount).toBe(7);
+    expect(row.heldStoredCount).toBe(2);
+  });
+
+  it('counts locked copies as held even though they are not reachable', () => {
+    const row = onlyRow(
+      baseInput({
+        recipe: makeRecipe([{ itemId: 'rough_hide', count: 3 }]),
+        carriedInventory: [lockedSlot('rough_hide', 5)],
+      }),
+    );
+    expect(row.reachableCount).toBe(0);
+    expect(row.heldCarriedCount).toBe(5);
+  });
+
+  it('reports the full holding on EACH row that names the same material', () => {
+    const result = projectMaterialGoalReagents(
+      baseInput({
+        recipe: makeRecipe([
+          { itemId: 'copper_ore', count: 1 },
+          { itemId: 'copper_ore', count: 1 },
+        ]),
+        carriedInventory: [plainSlot('copper_ore', 8)],
+      }),
+    );
+    if (!result.ok) throw new Error('expected ok projection');
+    expect(result.rows.map((r) => r.heldCarriedCount)).toEqual([8, 8]);
+  });
+});

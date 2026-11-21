@@ -13462,6 +13462,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gatheringGoal.reasonDailyLimit': '해당 제작법은 오늘 이미 제작했습니다.',
   'hudChrome.gatheringGoal.reasonBatchLimit': '해당 배치 수량은 더 이상 유효하지 않습니다.',
   'hudChrome.gatheringGoal.materialLine': '{name}: {reachable}/{required}',
+  'hudChrome.gatheringGoal.materialProgress': '{name}: {carried}/{required} (은행에 +{stored}개)',
   'hudChrome.gatheringGoal.materialCarried': '소지 {count}개',
   'hudChrome.gatheringGoal.materialStored': '보관함에 {count}개',
   'hudChrome.gatheringGoal.materialMissing': '부족 {count}개',

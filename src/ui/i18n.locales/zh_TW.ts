@@ -14488,6 +14488,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gatheringGoal.reasonDailyLimit': '該配方今天已經製作過了。',
   'hudChrome.gatheringGoal.reasonBatchLimit': '該批次數量已不再有效。',
   'hudChrome.gatheringGoal.materialLine': '{name}：{reachable}/{required}',
+  'hudChrome.gatheringGoal.materialProgress':
+    '{name}：{carried}/{required}（銀行中另有{stored}個）',
   'hudChrome.gatheringGoal.materialCarried': '隨身攜帶{count}個',
   'hudChrome.gatheringGoal.materialStored': '倉庫中有{count}個',
   'hudChrome.gatheringGoal.materialMissing': '缺少{count}個',
