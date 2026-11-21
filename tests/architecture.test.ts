@@ -330,6 +330,9 @@ const UI_PURE_CORES = [
   // The group's shared marks (the raid world markers) as data: the page index
   // to floor mapping, the edit right (the sim's rule), the hit test, the key.
   'src/ui/hud/raid_atlas/raid_atlas_shared_marks_core.ts',
+  // The rooms' fine detail as a drawing plan: the Anvil's quarters, ridges,
+  // ring, well, altars and grooves, every room's landmarks and line features.
+  'src/ui/hud/raid_atlas/raid_atlas_detail_core.ts',
   'src/ui/hud/world_markers/world_markers_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',

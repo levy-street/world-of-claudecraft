@@ -9,19 +9,24 @@
 // the rock the veins are cut into (a soft umber halo round every floor); the
 // cartographer's hachures down every cliff into the chasm; the floors in their
 // area's wash with a ground texture, an inner bevel and an ink outline; stair
-// treads; pillars and props; the gates; the veins' light-rivers; on the Heart's
-// page the glow of the Smith's heart in the chasm and the four altars.
+// treads; the rooms' fine detail (raid_atlas_detail_core.ts: landmarks, the
+// Anvil's four quarters, ridges, ring, well, altars and grooves); the gates;
+// the veins' light-rivers; on the Heart's page the glow of the Smith's heart.
 //
 // Text-free (labels are the overlay's, at screen size). No literal colour: the
 // caller passes the resolved palette. Deterministic: every jitter is hashed.
 
+import { HEART_RING_LOOK } from '../../../render/smith_heart/heart_quarters_core';
 import {
-  HEART_ALTARS,
-  HEART_ROOM,
-  HEART_ROOM_CHASM_R,
-  SEAL_DAIS,
-} from '../../../sim/content/smith_heart_layout';
+  HEART_VEIN_GROOVE,
+  HEART_VEIN_GROOVE_CURL_DEG,
+} from '../../../render/smith_heart/heart_vein_groove_core';
+import { HEART_ROOM, HEART_ROOM_CHASM_R, SEAL_DAIS } from '../../../sim/content/smith_heart_layout';
 import type { FieldMapSurface } from '../../field_map_view';
+import { type RaidAtlasFloorDetail, raidAtlasFloorDetail } from './raid_atlas_detail_core';
+import { paintDetailStrokes } from './raid_atlas_detail_painter';
+import { paintHeartDetail } from './raid_atlas_heart_painter';
+import { paintDetailGlyphs } from './raid_atlas_landmark_painter';
 import {
   areaColorRole,
   atlasHash01,
@@ -42,6 +47,15 @@ export interface RaidAtlasPageTransform {
   offU: number;
   offV: number;
 }
+
+/** The renderer's measures the Heart's floor plan follows (the well's lip
+ *  and the grooves' curl), so the map and the room cannot drift apart. */
+export const RAID_ATLAS_DETAIL_LOOK = {
+  wellR: HEART_RING_LOOK.wellR,
+  grooveRingR: HEART_VEIN_GROOVE.ringR,
+  grooveCurlDeg: HEART_VEIN_GROOVE_CURL_DEG,
+  grooveEndR: HEART_VEIN_GROOVE.endR,
+} as const;
 
 const GRAIN_TILE = 192;
 const STAIN_COUNT = 46;
@@ -400,6 +414,7 @@ function paintFloors(
   floor: RaidAtlasFloor,
   t: RaidAtlasPageTransform,
   c: RaidAtlasColors,
+  detail: RaidAtlasFloorDetail,
 ): void {
   const field = plan.field;
   const span = Math.max(1, field.heightMax - field.heightMin);
@@ -419,7 +434,8 @@ function paintFloors(
     ctx.fill();
     ctx.save();
     ctx.clip();
-    groundTexture(ctx, s, si, t, c);
+    // The Anvil's ritual rings give way to its quarters' own floor plan.
+    if (!(detail.heart && s.ground === 'ritual')) groundTexture(ctx, s, si, t, c);
     // Inner bevel: the floor's edge darkens into its rim.
     ctx.beginPath();
     tracePolygon(ctx, s.points);
@@ -588,29 +604,6 @@ function paintHeartGlow(ctx: CanvasRenderingContext2D, c: RaidAtlasColors): void
   ctx.globalAlpha = 1;
 }
 
-function paintAltars(
-  ctx: CanvasRenderingContext2D,
-  t: RaidAtlasPageTransform,
-  c: RaidAtlasColors,
-): void {
-  for (const a of HEART_ALTARS) {
-    ctx.beginPath();
-    ctx.arc(a.x, a.z, 3.4, 0, Math.PI * 2);
-    ctx.globalAlpha = 0.9;
-    ctx.fillStyle = c[veinColorRole(a.vein)];
-    ctx.fill();
-    ctx.strokeStyle = c.ink;
-    ctx.lineWidth = Math.max(1.2, 1.5) / t.k;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(a.x, a.z, 5.2, 0, Math.PI * 2);
-    ctx.globalAlpha = 0.6;
-    ctx.strokeStyle = c.goldDeep;
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
-}
-
 /** The seal on its dais: four rings of runes in gold. */
 function paintSeal(
   ctx: CanvasRenderingContext2D,
@@ -658,16 +651,21 @@ export function paintRaidAtlasPage(
   paintParchment(ctx, floor, t, colors, w, h);
   pageSpace(ctx, floor, t);
   const surfaces = surfacesOf(plan, floor);
+  const detail = raidAtlasFloorDetail(floor.id, RAID_ATLAS_DETAIL_LOOK);
   paintRock(ctx, surfaces, t, colors);
   // The heart's glow rises out of the chasm OVER the mountain's shade.
   if (floor.id === 'heart') paintHeartGlow(ctx, colors);
   paintHachures(ctx, plan, floor, t, colors);
-  paintFloors(ctx, plan, floor, t, colors);
+  paintFloors(ctx, plan, floor, t, colors, detail);
+  if (detail.heart) paintHeartDetail(ctx, detail.heart, t, colors);
   paintTreads(ctx, plan, floor, t, colors);
-  paintProps(ctx, plan, floor, t, colors);
+  paintDetailStrokes(ctx, detail, t, colors);
+  // Every dressing piece draws as its own landmark (the plain footprints
+  // stand in only for a page with no detail plan).
+  if (detail.glyphs.length > 0 || detail.heart) paintDetailGlyphs(ctx, detail, t, colors);
+  else paintProps(ctx, plan, floor, t, colors);
   paintGates(ctx, plan, floor, t, colors);
   if (floor.id === 'veins') paintSeal(ctx, t, colors);
   paintRivers(ctx, floor, t, colors);
-  if (floor.id === 'heart') paintAltars(ctx, t, colors);
   ctx.restore();
 }

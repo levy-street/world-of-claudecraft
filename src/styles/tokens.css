@@ -510,6 +510,13 @@
     --color-raid-atlas-vein-breath: #2f8fc8;
     --color-raid-atlas-vein-quench: #4fb2d8;
     --color-raid-atlas-vein-heat: #e0761e;
+    /* The Anvil of the World's quarters (the room's own quarter palette,
+       render/smith_heart/heart_quarters_core.ts HEART_QUARTER_PALETTE; the
+       atlas test pins them equal). */
+    --color-raid-atlas-quarter-hammer: #e0a650;
+    --color-raid-atlas-quarter-breath: #a98cff;
+    --color-raid-atlas-quarter-quench: #6cc8ff;
+    --color-raid-atlas-quarter-heat: #ff5214;
     --color-raid-atlas-heart-glow: #ff9a3c;
     --color-raid-atlas-glow: #ffd770;
     --color-raid-atlas-frame-dark: #1c120a;

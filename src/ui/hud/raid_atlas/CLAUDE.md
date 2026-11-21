@@ -14,6 +14,10 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
 | `raid_atlas_view.ts` | The live frame from IWorld: player, raid, boss states (own body first, then the heart seal markers). |
 | `raid_atlas_palette_core.ts` | Token roles (`--color-raid-atlas-*`) and the art's deterministic hash. |
 | `raid_atlas_page_painter.ts` | The illustrated page (text-free vector art under one transform: plate or sharp view). |
+| `raid_atlas_detail_core.ts` | The rooms' fine detail as a drawing plan: every dressing piece of the field (by kind) as a landmark glyph, the rooms' line features from their layout records, and the Heart's floor plan (the four quarters, ridges, ring, well, altars, grooves) from `smith_heart_quarters.ts`. Each element is `base` or `fine` (fine waits for `RAID_ATLAS_FINE_K` px per yard). |
+| `raid_atlas_heart_painter.ts` | Inks the Heart's floor plan (quarter washes, paving, grooves and their curl, ridges, ring, well, altars). |
+| `raid_atlas_detail_painter.ts` | Inks the rooms' line features (molten run, shorelines, wind, arch, isles, the Ring's processional). |
+| `raid_atlas_landmark_painter.ts` | Inks every landmark glyph by kind. All three draw into the plate, a settled sharp view or the minimap tile alike (never per frame), with the shared pen helpers of `raid_atlas_ink.ts`. |
 | `raid_atlas_glyph_painter.ts` | Arrow, medallions, pins, portals, rose, frame, cartouche (vector, screen size). |
 | `raid_atlas_painter.ts` | Composition: cached page + marks layer, cached frame layer, live layer per frame. |
 | `raid_atlas_minimap_core.ts` | The minimap's pure decisions: the page crop round the player, the detail tile, room names by zoom, the idle-skip key. |
@@ -63,5 +67,9 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
   minimap (`InteriorMapController.minimapTap`, reached from the minimap's own tap binder;
   a mouse click on the minimap keeps opening the map). A tap anywhere else closes it.
 - Counters with a number in them go through `tPlural` (the cartouche's boss total).
-- Tests: `tests/raid_atlas_boss.test.ts`, `tests/raid_atlas.test.ts`, `tests/raid_atlas_minimap.test.ts`, and the routing in
+- The fine detail is read, never placed: a new dressing kind needs its glyph in `glyphOf` (the
+  test fails on any footprint left undrawn); the Heart's quarter washes are the room's own
+  `HEART_QUARTER_PALETTE` as `--color-raid-atlas-quarter-*` tokens (pinned equal), and its well
+  and groove curl follow the renderer's measures through `RAID_ATLAS_DETAIL_LOOK`.
+- Tests: `tests/raid_atlas_boss.test.ts`, `tests/raid_atlas.test.ts`, `tests/raid_atlas_minimap.test.ts`, `tests/raid_atlas_detail.test.ts`, and the routing in
   `tests/interior_map_controller.test.ts`.

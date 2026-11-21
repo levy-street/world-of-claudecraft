@@ -982,6 +982,11 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/raid_atlas/raid_atlas_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/raid_atlas/raid_atlas_page_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/raid_atlas/raid_atlas_glyph_painter.ts', allow: {}, reflowAllow: {} },
+  // the rooms' fine detail (landmarks, the Anvil's quarters), inked into the
+  // same plate or settled view, never per frame
+  { file: 'hud/raid_atlas/raid_atlas_detail_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/raid_atlas/raid_atlas_heart_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/raid_atlas/raid_atlas_landmark_painter.ts', allow: {}, reflowAllow: {} },
   // the atlas on the round minimap: blits the prewarmed plate (or one cached
   // detail tile) on the minimap cadence; the caller skips unchanged paints
   { file: 'hud/raid_atlas/raid_atlas_minimap_painter.ts', allow: {}, reflowAllow: {} },
