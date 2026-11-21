@@ -364,6 +364,19 @@ describe('referral game host', () => {
     pairParty(h, [1, 2]);
     await flush();
     expect([reasons(100), reasons(200)]).toEqual([0, 0]);
+    // The pair's own invite, then a finder change that names the same newcomer: the
+    // finder change must not replace the queued invite, so the refusal still comes once.
+    h.service.observe({
+      type: 'referralEvidence',
+      kind: 'quest',
+      questId: 'q_unrelated',
+      characterId: 100,
+      participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+    });
+    pairParty(h, [2], true);
+    pairParty(h, [2]);
+    await flush();
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
   });
   it('explains why no card started only once per invite that a new character accepts', async () => {
     const h = setup();
