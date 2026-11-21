@@ -996,6 +996,43 @@ describe('Paladin support abilities', () => {
     );
   });
 
+  it('keeps the Ascension Solar Invocation splash on the target when the hit kills it', () => {
+    const sim = new Sim({ seed: 143, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const target = hostileNear(sim);
+    target.pos.x = sim.player.pos.x + 20;
+    sim.rebucket(target);
+    target.maxHp = target.hp = 50;
+    const spawn = (id: number, x: number, z: number) => {
+      const mob = createMob(id, MOBS.ridge_stalker, 20, { x, y: target.pos.y, z });
+      mob.maxHp = mob.hp = 1_000_000;
+      (sim as unknown as { addEntity(entity: Entity): void }).addEntity(mob);
+      return mob;
+    };
+    const besideCaster = spawn(9121, sim.player.pos.x + 2, sim.player.pos.z);
+    const besideTarget = spawn(9122, target.pos.x + 6, target.pos.z);
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+    sim.drainEvents();
+
+    run(sim, target, resolve(sim, 'solar_invocation'));
+
+    // The direct hit kills the target, but the splash still spreads from
+    // where it fell, never from the caster.
+    expect(target.dead).toBe(true);
+    expect(besideTarget.hp).toBeLessThan(besideTarget.maxHp);
+    expect(besideCaster.hp).toBe(besideCaster.maxHp);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'nova',
+        ability: 'solar_invocation',
+        targetId: target.id,
+      }),
+    );
+  });
+
   it('reduces the Ascension Solar Invocation splash beyond 5 enemies', () => {
     const sim = new Sim({ seed: 141, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
