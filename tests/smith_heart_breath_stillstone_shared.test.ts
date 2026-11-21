@@ -42,7 +42,9 @@ function atStone(
     killIsle(f, 2);
   }
   const ps = f.players.slice(0, n);
-  ps.forEach((p, k) => byStone(f, p, k));
+  ps.forEach((p, k) => {
+    byStone(f, p, k);
+  });
   f.tick(2);
   return { f, stone, ps };
 }
