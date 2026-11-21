@@ -939,6 +939,13 @@ function duty(world, st, b, me) {
       return { goal, tol: 0.6, duty: 'polarity: to my opposite' };
     }
   }
+  // Weight of the Anvil's own mark holds still whatever else it carries: its
+  // circle follows that player, so walking off (a Magma Rift mark) dragged
+  // the soak away from the raid and nobody stood under it (the bot raids of
+  // 2026-11-21: 0 under, 1,000 on everyone).
+  const anvilNow = o.anvils[0];
+  if (anvilNow && hasAura(me, FINAL_AURAS.anvilMark))
+    return { goal: { x: me.x, z: me.z }, tol: 1.5, duty: 'anvil (marked)' };
   // Magma Rift under me: away from the raid before it erupts.
   if (hasAura(me, ELEMENT_AURAS.magmaMark)) {
     const spot = spread(world, st, me, ET.magmaR + 3);
@@ -958,7 +965,12 @@ function duty(world, st, b, me) {
   // marked one holds still so the raid can gather on them.
   if (anvil && hasAura(me, FINAL_AURAS.anvilMark))
     return { goal: { x: me.x, z: me.z }, tol: 1.5, duty: 'anvil (marked)' };
-  if (anvil && (!mainTank || ringClear) && sees(world, st, anvil)) {
+  // A mark that must keep apart (Drawn Lightning, a Bursting Coal) stays out
+  // of the soak: its arcs or its burst would land on the whole stack (a
+  // Drawn Lightning carrier in the stack took 1,130 and killed a raider in
+  // the Heroic bot raids of 2026-11-21); the others share without it.
+  const apart = hasAura(me, FINAL_AURAS.drawn) || hasAura(me, FINAL_PHASE_AURAS.coal);
+  if (anvil && !apart && (!mainTank || ringClear) && sees(world, st, anvil)) {
     const i = world.bots.indexOf(b);
     // A mark near the boss (its tank marked, the melee's own spot): the raid
     // gathers on the mark's far side, out of Forge Fist's frontal cone.
@@ -967,9 +979,14 @@ function duty(world, st, b, me) {
       const away = unit(boss, anvil);
       ang = Math.atan2(away.x, away.z) + ((i % 7) / 6 - 0.5) * 2.2;
     }
+    // The mark's carrier also wearing a Magma Rift: stand inside the Anvil
+    // but outside the rift's reach round them until it erupts.
+    const carrier = world.living().find((p) => hasAura(p, FINAL_AURAS.anvilMark));
+    const rift = !!carrier && hasAura(carrier, ELEMENT_AURAS.magmaMark);
+    const r = rift ? Math.min(anvil.r - 0.8, ET.magmaR + 1.2) : Math.min(3, anvil.r - 2);
     return {
-      goal: add(anvil, { x: Math.sin(ang), z: Math.cos(ang) }, Math.min(3, anvil.r - 2)),
-      tol: 0.8,
+      goal: add(anvil, { x: Math.sin(ang), z: Math.cos(ang) }, r),
+      tol: rift ? 0.5 : 0.8,
       duty: 'anvil',
     };
   }

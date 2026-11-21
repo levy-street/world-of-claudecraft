@@ -15,10 +15,12 @@ import {
 } from '../src/sim/encounters/smith_heart/final_elements_ids';
 import {
   FINAL_AURAS,
+  FINAL_OBJECTS,
   FINAL_TUNING,
   FINAL_ZONE_CODES,
   finalBladeTemplate,
   finalPillarTemplate,
+  finalTimed,
 } from '../src/sim/encounters/smith_heart/final_ids';
 
 type Final = {
@@ -192,5 +194,81 @@ describe('Masterless Strength bots: Crossing Blade', () => {
     // On the plain pillar's ray from the blade, within a few yards of it.
     expect(Math.abs(d.goal.x - me.x)).toBeLessThan(0.5);
     expect(Math.hypot(d.goal.x - me.x, d.goal.z - (me.z + 6))).toBeLessThan(r + 5);
+  });
+});
+
+describe('Masterless Strength bots: Weight of the Anvil', () => {
+  /** A soak in flight: the Anvil's circle on a marked damage dealer 12 yd
+   *  off the tank, and a second damage dealer free to soak. */
+  function anvilFight(carrierAuras: object[], soakerAuras: object[] = []) {
+    vi.useFakeTimers({ now: 4_000_000 });
+    const f = heatFight({ rime: false });
+    const carrier = {
+      pid: 2,
+      name: 'Morvane',
+      x: f.tank.x + 12,
+      z: f.tank.z,
+      auras: [{ id: FINAL_AURAS.anvilMark }, ...carrierAuras],
+      tank: false,
+    };
+    const soaker = {
+      pid: 3,
+      name: 'Kesrin',
+      x: f.tank.x + 4,
+      z: f.tank.z + 8,
+      auras: soakerAuras,
+      tank: false,
+    };
+    const cb = { pid: 2, name: 'Morvane', spec: { key: 'lock', role: 'dps' } };
+    const sb = { pid: 3, name: 'Kesrin', spec: { key: 'rogue', role: 'dps' } };
+    f.world.players.set(2, carrier);
+    f.world.players.set(3, soaker);
+    f.world.living = () => [f.tank, carrier, soaker];
+    f.world.bots.push(cb as never, sb as never);
+    f.world.obs.ents.set(920, {
+      k: 'object',
+      id: 920,
+      tid: finalTimed(FINAL_OBJECTS.anvilPrefix, 6),
+      x: carrier.x,
+      z: carrier.z,
+      sc: FINAL_TUNING.anvilR,
+    });
+    final.read(f.world);
+    return { ...f, carrier, soaker, cb, sb };
+  }
+  type Duty = { goal: { x: number; z: number }; duty: string } | null;
+
+  it('the marked player holds still even when a Magma Rift also marks them', () => {
+    const f = anvilFight([{ id: ELEMENT_AURAS.magmaMark }]);
+    const d = final.duty(f.world, {}, f.cb, f.carrier) as Duty;
+    expect(d?.duty).toBe('anvil (marked)');
+    expect(Math.hypot(d!.goal.x - f.carrier.x, d!.goal.z - f.carrier.z)).toBeLessThan(0.01);
+  });
+
+  it("the raid soaks inside the Anvil but outside the carrier's rift", () => {
+    const f = anvilFight([{ id: ELEMENT_AURAS.magmaMark }]);
+    const st = {};
+    final.duty(f.world, st, f.sb, f.soaker);
+    vi.setSystemTime(4_000_000 + 3000);
+    const d = final.duty(f.world, st, f.sb, f.soaker) as Duty;
+    expect(d?.duty).toBe('anvil');
+    const r = Math.hypot(d!.goal.x - f.carrier.x, d!.goal.z - f.carrier.z);
+    expect(r).toBeLessThan(FINAL_TUNING.anvilR);
+    expect(r).toBeGreaterThan(ELEMENT_TUNING.magmaR);
+  });
+
+  it('a Drawn Lightning carrier stays out of the soak, a free raider joins it', () => {
+    const f = anvilFight([], [{ id: FINAL_AURAS.drawn }]);
+    const st = {};
+    final.duty(f.world, st, f.sb, f.soaker);
+    vi.setSystemTime(4_000_000 + 3000);
+    const drawn = final.duty(f.world, st, f.sb, f.soaker) as Duty;
+    expect(drawn?.duty).not.toBe('anvil');
+    f.soaker.auras = [];
+    // Free again, it notices the circle a reaction later and joins.
+    final.duty(f.world, st, f.sb, f.soaker);
+    vi.setSystemTime(4_000_000 + 6000);
+    const free = final.duty(f.world, st, f.sb, f.soaker) as Duty;
+    expect(free?.duty).toBe('anvil');
   });
 });
