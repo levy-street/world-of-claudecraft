@@ -17,13 +17,14 @@ import type { BuddyMenuHost } from './buddy_menu';
 import { raidTargetMenuHtml } from './target_frame_menu';
 
 export function openRaidTargetMenu(
-  host: BuddyMenuHost,
-  world: Pick<IWorld, 'markerFor' | 'setMarker' | 'clearMarker'>,
+  host: Pick<BuddyMenuHost, 'placePopupAt' | 'keepPopupOnScreen' | 'bindContextMenuActions'>,
+  world: Pick<IWorld, 'partyInfo' | 'markerFor' | 'setMarker' | 'clearMarker'>,
   entityId: number,
   name: string,
   x: number,
   y: number,
 ): void {
+  if (!world.partyInfo) return; // marks are a group thing: every row would be refused
   const el = document.querySelector('#ctx-menu') as HTMLElement;
   el.classList.remove(CTX_MENU_PICKER_CLASS);
   el.innerHTML = raidTargetMenuHtml(name, world.markerFor(entityId), raidMarkerDataUrl);
@@ -34,4 +35,8 @@ export function openRaidTargetMenu(
     if (act === 'clear') world.clearMarker(entityId);
     else if (act.startsWith('m')) world.setMarker(entityId, Number(act.slice(1)));
   });
+  // Opened from another menu's row by keyboard, focus would fall to the page:
+  // land it on the symbol the unit wears, else the first one.
+  const selected = el.querySelector<HTMLElement>('.ctx-item:has(.ctx-selected)');
+  (selected ?? el.querySelector<HTMLElement>('.ctx-item'))?.focus();
 }

@@ -640,7 +640,7 @@ import { skullBagTooltipLines } from './hud/skull_bag';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
-import { raidTargetMenuRowHtml, targetFrameMenuKind } from './hud/target_frame_menu';
+import { raidTargetMenuRowHtml, targetFrameMenuKindFor } from './hud/target_frame_menu';
 import { FerryHudPainter } from './hud/transport';
 import { TreasureMapWindow } from './hud/treasure';
 import { createHudVehicleBar, VehicleActionBarController } from './hud/vehicle';
@@ -875,7 +875,7 @@ import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { RAID_MARKER_LABEL_KEYS } from './raid_marker_labels_view';
-import { offersRaidTargetIcon, raidTargetMarking } from './raid_target_icons_core';
+import { offersRaidTargetIconIn, raidTargetPlayerUnit } from './raid_target_icons_core';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import { RecipePinStore } from './recipe_pins_store';
 import { RecipeTrackerPainter } from './recipe_tracker_painter';
@@ -16866,8 +16866,7 @@ export class Hud {
   private openTargetFrameMenuAt(x: number, y: number, tid = this.sim.player.targetId): void {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (!t) return;
-    const marking = raidTargetMarking(this.sim.partyInfo, this.sim.playerId);
-    const kind = targetFrameMenuKind(t, this.sim.playerId, marking);
+    const kind = targetFrameMenuKindFor(t, this.sim);
     if (kind === 'player') this.openContextMenu(t.id, t.name, x, y);
     else if (kind === 'pet') this.openPetMenu(t.id, t.name, t.dead, x, y);
     else if (kind === 'buddy') this.openBuddyMenu(t.id, entityDisplayName(t), x, y);
@@ -17000,7 +16999,8 @@ export class Hud {
     }
     if (isMember || pid === this.sim.playerId)
       html += `<div class="ctx-item" data-act="loot-settings">${esc(t('hudChrome.lootSettings.menuItem'))}</div>`;
-    if (this.raidTargetOffered(ent)) html += raidTargetMenuRowHtml();
+    if (offersRaidTargetIconIn(this.sim, raidTargetPlayerUnit(pid, ent)))
+      html += raidTargetMenuRowHtml();
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -17128,13 +17128,9 @@ export class Hud {
     );
   }
 
-  // The raid target icon picker for one unit (hud/raid_target_menu.ts), and
-  // whether a unit may wear one for this player (the sim's own rule).
+  // The raid target icon picker for one unit (hud/raid_target_menu.ts).
   openMarkerMenu(entityId: number, name: string, x: number, y: number): void {
     openRaidTargetMenu(this, this.sim, entityId, name, x, y);
-  }
-  private raidTargetOffered(e: Entity | undefined): boolean {
-    return !!e && offersRaidTargetIcon(e, raidTargetMarking(this.sim.partyInfo, this.sim.playerId));
   }
 
   openPetMenu(entityId: number, name: string, dead: boolean, x: number, y: number): void {
@@ -17146,7 +17142,8 @@ export class Hud {
     if (dead) html += `<div class="ctx-item" data-act="revive">${esc(t('hud.pet.revive'))}</div>`;
     if (!isWarlock)
       html += `<div class="ctx-item" data-act="abandon">${esc(t('hud.pet.abandon'))}</div>`;
-    if (this.raidTargetOffered(this.sim.entities.get(entityId))) html += raidTargetMenuRowHtml();
+    if (offersRaidTargetIconIn(this.sim, this.sim.entities.get(entityId)))
+      html += raidTargetMenuRowHtml();
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.pet.cancel'))}</div>`;
     el.innerHTML = html;
     el.style.display = 'block';

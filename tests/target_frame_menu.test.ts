@@ -11,6 +11,7 @@ import {
   buddyMenuHtml,
   raidTargetMenuHtml,
   targetFrameMenuKind,
+  targetFrameMenuKindFor,
 } from '../src/ui/hud/target_frame_menu';
 import type { RaidTargetMarking } from '../src/ui/raid_target_icons_core';
 
@@ -68,6 +69,17 @@ describe('targetFrameMenuKind', () => {
     expect(targetFrameMenuKind(unit({}), ME, RAID_MEMBER)).toBeNull();
     expect(targetFrameMenuKind(unit({ dead: true }), ME, PARTY)).toBeNull();
     expect(targetFrameMenuKind(unit({ kind: 'npc', hostile: false }), ME, PARTY)).toBeNull();
+  });
+});
+
+describe('targetFrameMenuKindFor', () => {
+  it('reads the viewer and their party off the world mirror', () => {
+    const world = {
+      playerId: ME,
+      partyInfo: { leader: ME, raid: true, members: [{ pid: ME }, { pid: MATE }] },
+    } as never;
+    expect(targetFrameMenuKindFor(unit({}), world)).toBe('marker');
+    expect(targetFrameMenuKindFor(unit({}), { playerId: ME, partyInfo: null } as never)).toBeNull();
   });
 });
 

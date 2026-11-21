@@ -15,6 +15,7 @@ import {
 import {
   offersRaidTargetIcon,
   raidTargetMarking,
+  raidTargetPlayerUnit,
   TARGET_MARKER_ACTIONS,
   TARGET_MARKER_CLEAR_ACTION,
   targetMarkerActionSymbol,
@@ -60,6 +61,21 @@ describe('raid target marking rule (sim + HUD read one rule)', () => {
     expect(raidTargetMarkable(unit({ dead: true }), inGroup)).toBe(false);
     expect(raidTargetMarkable(unit({ kind: 'npc' }), inGroup)).toBe(false);
     expect(raidTargetMarkable(unit({ kind: 'object' }), inGroup)).toBe(false);
+  });
+
+  it('offers the player row for a group member outside the online interest bubble', () => {
+    // ClientWorld mirrors no entity for a far member; the menu falls back to the pid.
+    const far = raidTargetPlayerUnit(MATE, undefined);
+    expect(far).toEqual({ id: MATE, kind: 'player', dead: false, ownerId: null });
+    expect(offersRaidTargetIcon(far, raidTargetMarking(info(MATE, false), ME))).toBe(true);
+    expect(
+      offersRaidTargetIcon(
+        raidTargetPlayerUnit(OUTSIDER, undefined),
+        raidTargetMarking(info(MATE, false), ME),
+      ),
+    ).toBe(false);
+    const live = unit({ kind: 'player', id: MATE, dead: true });
+    expect(raidTargetPlayerUnit(MATE, live)).toBe(live);
   });
 
   it('offers the rows only with marking rights', () => {

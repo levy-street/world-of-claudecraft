@@ -16,7 +16,7 @@ import {
   raidTargetMarkable,
 } from '../sim/social/raid_target_marks';
 import type { Entity } from '../sim/types';
-import type { PartyInfo } from '../world_api';
+import type { IWorld, PartyInfo } from '../world_api';
 
 /** What the HUD knows about the viewer's marking rights for one decision. */
 export interface RaidTargetMarking {
@@ -39,12 +39,36 @@ export function raidTargetMarking(
   };
 }
 
+/** The unit fields the marking rule reads. */
+export type RaidTargetUnit = Pick<Entity, 'id' | 'kind' | 'dead' | 'ownerId'>;
+
+/** A player menu's unit by pid: the mirrored entity when there is one, else a
+ *  bare player record, because ClientWorld mirrors only the ~120 yd interest
+ *  bubble and a far group member (opened from the party frames) has no entity
+ *  there while the server still accepts the mark. */
+export function raidTargetPlayerUnit(
+  pid: number,
+  entity: RaidTargetUnit | undefined,
+): RaidTargetUnit {
+  return entity ?? { id: pid, kind: 'player', dead: false, ownerId: null };
+}
+
 /** Does the HUD offer the raid target icon rows (menu, hotkeys) on `target`? */
 export function offersRaidTargetIcon(
   target: Pick<Entity, 'id' | 'kind' | 'dead' | 'ownerId'>,
   marking: RaidTargetMarking | null,
 ): boolean {
   return !!marking?.canMark && raidTargetMarkable(target, (pid) => marking.inGroup(pid));
+}
+
+/** offersRaidTargetIcon for the viewer of `world` (a missing unit: no). */
+export function offersRaidTargetIconIn(
+  world: Pick<IWorld, 'partyInfo' | 'playerId'>,
+  target: RaidTargetUnit | undefined,
+): boolean {
+  return (
+    !!target && offersRaidTargetIcon(target, raidTargetMarking(world.partyInfo, world.playerId))
+  );
 }
 
 /** The keybind action ids: "Mark Target: <symbol>" for each of the eight

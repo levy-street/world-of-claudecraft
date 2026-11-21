@@ -9,11 +9,16 @@
 // here without a document.
 
 import type { Entity } from '../../sim/types';
+import type { IWorld } from '../../world_api';
 import { esc } from '../esc';
 import { t } from '../i18n';
 import { isControllableOwnedPet, isOwnBuddy } from '../pet_entity';
 import { RAID_MARKER_LABEL_KEYS, raidMarkerDisplayName } from '../raid_marker_labels_view';
-import { offersRaidTargetIcon, type RaidTargetMarking } from '../raid_target_icons_core';
+import {
+  offersRaidTargetIcon,
+  type RaidTargetMarking,
+  raidTargetMarking,
+} from '../raid_target_icons_core';
 import { svgIcon } from '../ui_icons';
 
 /** Which menu the target frame opens for `target`, or null for a target that
@@ -42,6 +47,18 @@ export function targetFrameMenuKind(
   if (isControllableOwnedPet(target, viewerId)) return 'pet';
   if (isOwnBuddy(target, viewerId)) return 'buddy';
   return offersRaidTargetIcon(target, marking) ? 'marker' : null;
+}
+
+/** targetFrameMenuKind for the viewer of `world` (its pid and party mirror). */
+export function targetFrameMenuKindFor(
+  target: Entity,
+  world: Pick<IWorld, 'playerId' | 'partyInfo'>,
+): ReturnType<typeof targetFrameMenuKind> {
+  return targetFrameMenuKind(
+    target,
+    world.playerId,
+    raidTargetMarking(world.partyInfo, world.playerId),
+  );
 }
 
 /** Rename, the autoloot errand and Cancel. `armed` is the owner's CURRENT
