@@ -15,7 +15,15 @@ export interface ReferralLinkSnapshot {
 
 export type ReferralNotice =
   | { id: string; type: 'start' | 'move'; linkId: number }
-  | { id: string; type: 'reason'; reason: ReferralUiReason }
+  | {
+      id: string;
+      type: 'reason';
+      reason: ReferralUiReason;
+      /** Set only when the reason refuses this player's own start, respond, move or
+       * redeem on that link; unprompted explanations (party changes, outages) and the
+       * summon refusal leave it unset. */
+      linkId?: number;
+    }
   | { id: string; type: 'completed'; friendName: string }
   | { id: string; type: 'declined' }
   | { id: string; type: 'summon'; requestId: string; friendName: string };

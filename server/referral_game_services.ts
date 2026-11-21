@@ -479,7 +479,11 @@ export class ReferralGameServices {
       .get(session.characterId)!
       .page.links.find((r) => r.card.linkId === action.linkId);
     if (!row) {
-      this.notice(session, { type: 'reason', reason: 'newAccountsOnly' });
+      this.notice(session, {
+        type: 'reason',
+        reason: 'newAccountsOnly',
+        linkId: action.linkId,
+      });
       return;
     }
     if (action.type === 'summon') {
@@ -537,13 +541,17 @@ export class ReferralGameServices {
         );
       });
       if (!committed) {
-        this.notice(session, { type: 'reason', reason: 'unavailable' });
+        this.notice(session, { type: 'reason', reason: 'unavailable', linkId: action.linkId });
         return;
       }
       this.updateReady(committed.readyCounts);
       this.replace({ ...row, card: committed.result.state });
       if (committed.result.error)
-        this.notice(session, { type: 'reason', reason: committed.result.error });
+        this.notice(session, {
+          type: 'reason',
+          reason: committed.result.error,
+          linkId: action.linkId,
+        });
       else if (action.type === 'start') this.promptBoth(committed.result.state, 'start');
       else if (action.type === 'respond' && !action.accept && action.confirmDecline)
         this.notifyBoth(committed.result.state, { type: 'declined' });
@@ -562,7 +570,7 @@ export class ReferralGameServices {
         this.host.quarantine(session, 'ambiguous', 'referral reward');
       else if (error instanceof ReferralLeaseLost)
         this.host.quarantine(session, 'fenced', 'referral reward');
-      else this.notice(session, { type: 'reason', reason: 'unavailable' });
+      else this.notice(session, { type: 'reason', reason: 'unavailable', linkId: action.linkId });
       this.host.onError(error);
     } finally {
       if (ownsCritical) this.critical.delete(session.accountId);

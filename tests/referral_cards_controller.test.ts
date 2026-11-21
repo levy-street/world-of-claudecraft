@@ -182,6 +182,43 @@ describe('referral card controller', () => {
     expect(document.querySelector('.referral-celebration')).not.toBeNull();
   });
 
+  it('still celebrates a grant when an unprompted refusal arrives before it', () => {
+    const f = setup();
+    f.card.participants[0].credited = 1;
+    f.controller.open();
+    clickText('Redeem reward');
+    // A party-change explanation, not the answer to this claim, lands first.
+    f.replace({
+      ...f.snapshot,
+      revision: 2,
+      notices: [{ id: 'party-reason', type: 'reason', reason: 'newAccountsOnly' }],
+    });
+    clickText('OK');
+    f.card.participants[0].redeemed = 1;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 3, notices: [] });
+    expect(document.querySelector('.referral-celebration')).not.toBeNull();
+    expect(f.playReward).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops only the claim a refusal answers', () => {
+    const f = setup();
+    f.card.participants[0].credited = 1;
+    f.controller.open();
+    clickText('Redeem reward');
+    // A refusal for another link leaves this claim pending.
+    f.replace({
+      ...f.snapshot,
+      revision: 2,
+      notices: [{ id: 'other-link', type: 'reason', reason: 'notTogether', linkId: 99 }],
+    });
+    clickText('OK');
+    f.card.participants[0].redeemed = 1;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 3, notices: [] });
+    expect(document.querySelector('.referral-celebration')).not.toBeNull();
+  });
+
   it('dismisses an already visible reward when switching characters', () => {
     const f = setup();
     f.card.participants[0].credited = 1;
@@ -246,7 +283,7 @@ describe('referral card controller', () => {
     f.replace({
       ...f.snapshot,
       revision: 2,
-      notices: [{ id: 'failure', type: 'reason', reason: 'unavailable' }],
+      notices: [{ id: 'failure', type: 'reason', reason: 'unavailable', linkId: 8 }],
     });
     clickText('OK');
     f.card.participants[0].redeemed = 1;

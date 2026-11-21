@@ -349,12 +349,15 @@ export class ReferralCardsController {
     )
       this.dismissPrompt();
     this.rewardQueue.push(...this.rewardClaims.observe(snapshot));
-    if (
-      snapshot?.notices.some(
-        (notice) => notice.type === 'reason' && !this.seenPrompts.has(`notice:${notice.id}`),
+    // Only a refusal that answers this player's action on a link cancels that link's
+    // claim; unprompted explanations (party changes, outages) leave claims pending.
+    for (const notice of snapshot?.notices ?? [])
+      if (
+        notice.type === 'reason' &&
+        notice.linkId !== undefined &&
+        !this.seenPrompts.has(`notice:${notice.id}`)
       )
-    )
-      this.rewardClaims.clear();
+        this.rewardClaims.drop(notice.linkId);
     this.rewardQueue = this.rewardQueue.filter(
       (reward) =>
         snapshot?.accountId === reward.accountId && snapshot.characterId === reward.characterId,
