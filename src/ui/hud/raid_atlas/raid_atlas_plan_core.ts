@@ -45,6 +45,7 @@ import {
   type SmithHeartVein,
   smithHeartAreaAt,
 } from '../../../sim/content/smith_heart_layout';
+import { HEART_QUARTER_ORDER, heartQuarterSpot } from '../../../sim/content/smith_heart_quarters';
 import { type FieldMapPlan, fieldMapPlan } from '../../field_map_view';
 
 /** A map page. The Smith's Heart has two, never joined by floor: the veins
@@ -69,8 +70,9 @@ export interface RaidAtlasRoom {
   x: number;
   z: number;
   area: RaidAtlasArea;
-  /** Label weight: a boss room's name is the largest, a passage's the smallest. */
-  rank: 'major' | 'minor';
+  /** Label weight: a boss room's name is the largest, a passage's smaller,
+   *  and a quarter of the Anvil's the small lettering inside its room. */
+  rank: 'major' | 'minor' | 'quarter';
 }
 
 /** One boss medallion: the encounter, where it stands, and the bodies whose
@@ -207,9 +209,24 @@ function buildSmithHeartPlan(): RaidAtlasPlan {
     room('hearth', HEAT.forge.x, HEAT.forge.z - 56, 'major'),
     room('castingFloor', (HEAT.floor.x0 + HEAT.floor.x1) / 2, HEAT.floor.z1 + 9, 'minor'),
   ];
+  // Each quarter of the Anvil lettered in its middle (where the boss stands
+  // for that quarter: smith_heart_quarters.ts heartQuarterSpot), named as the
+  // fight's own HUD names it.
+  const quarterRooms = HEART_QUARTER_ORDER.map((vein): RaidAtlasRoom => {
+    const spot = heartQuarterSpot(vein);
+    return {
+      id: `quarter.${vein}`,
+      labelKey: `hudChrome.finalOverload.${vein}`,
+      x: spot.x,
+      z: spot.z,
+      area: smithHeartAreaAt(spot.x, spot.z),
+      rank: 'quarter',
+    };
+  });
   const heartRooms: RaidAtlasRoom[] = [
     room('anvil', HEART_ROOM.x, HEART_ROOM.z + HEART_ROOM.r + 10, 'major'),
     room('terrace', HEART_TERRACE.x - 8, HEART_TERRACE.z - HEART_TERRACE.r - 10, 'minor'),
+    ...quarterRooms,
   ];
 
   const rivers = SMITH_HEART_VEINS.map((vein) => ({ vein, points: LIGHT_RIVERS[vein] }));

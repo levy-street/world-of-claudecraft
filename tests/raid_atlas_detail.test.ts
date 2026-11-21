@@ -43,6 +43,7 @@ import {
 import { RAID_ATLAS_DETAIL_LOOK } from '../src/ui/hud/raid_atlas/raid_atlas_page_painter';
 import { RAID_ATLAS_COLOR_TOKENS } from '../src/ui/hud/raid_atlas/raid_atlas_palette_core';
 import { raidAtlasFloorAt, raidAtlasPlanFor } from '../src/ui/hud/raid_atlas/raid_atlas_plan_core';
+import { t } from '../src/ui/i18n';
 
 const look = RAID_ATLAS_DETAIL_LOOK;
 const heart = (() => {
@@ -169,7 +170,21 @@ describe('the Heart: the Anvil of the World drawn from its quarter geometry', ()
       expect(a.r).toBe(prop?.r);
     }
   });
+
+  it('letters each quarter with the fight HUD quarter name, inside its quarter', () => {
+    const plan = raidAtlasPlanFor('smith_heart');
+    const floor = plan?.floors.find((f) => f.id === 'heart');
+    const quarters = floor?.rooms.filter((r) => r.rank === 'quarter') ?? [];
+    expect(quarters.map((r) => r.labelKey)).toEqual(
+      HEART_QUARTER_ORDER.map((v) => `hudChrome.finalOverload.${v}`),
+    );
+    for (const [i, r] of quarters.entries()) {
+      expect(heartQuarterAt(r.x, r.z)).toBe(HEART_QUARTER_ORDER[i]);
+      expect(t(r.labelKey as never)).not.toBe(r.labelKey);
+    }
+  });
 });
+})
 
 describe('the rooms: landmarks and line features from their layout records', () => {
   it('draws every dressing piece that has a footprint as a landmark on its page', () => {

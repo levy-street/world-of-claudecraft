@@ -366,8 +366,16 @@ export class RaidAtlasPainter {
       lineWidth: 3.5,
       roundJoin: true,
     };
+    // A quarter of the Anvil: small display capitals, lettered on its wash.
+    const quarter = {
+      font: `600 ${Math.round((small ? 8.5 : 10.5) * grow)}px ${fonts.display}`,
+      fill: colors.inkSoft,
+      stroke: colors.parchmentLight,
+      lineWidth: 3,
+      roundJoin: true,
+    };
     for (const room of floor.rooms) {
-      if (room.rank === 'minor' && s < MINOR_LABEL_SCALE) continue;
+      if (room.rank !== 'major' && s < MINOR_LABEL_SCALE) continue;
       const p = at(room.x, room.z);
       // A name that would sit under the frame band is left off (it reappears as
       // the view brings its room in).
@@ -378,7 +386,7 @@ export class RaidAtlasPainter {
         t(room.labelKey as never),
         p.sx,
         p.sy,
-        room.rank === 'major' ? major : minor,
+        room.rank === 'major' ? major : room.rank === 'quarter' ? quarter : minor,
       );
     }
     // Boss medallions (and their names, zoomed in).
