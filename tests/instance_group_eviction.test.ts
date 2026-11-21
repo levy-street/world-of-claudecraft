@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, DUNGEONS, dungeonAt } from '../src/sim/data';
-import { dungeonExitStandingPos } from '../src/sim/instances/dungeons';
+import { dungeonExitStandingPos, soloInstanceKeyFor } from '../src/sim/instances/dungeons';
 import {
   belongsInClaim,
   INSTANCE_EVICTED_TEXT,
@@ -132,16 +132,99 @@ describe('classic group-instance eviction', () => {
     expect(events.get(member)).toBeUndefined();
   });
 
-  it('removes everyone left inside when the group disbands', () => {
-    const sim = newSim();
-    const leader = sim.addPlayer('warrior', 'Lead');
-    const member = sim.addPlayer('priest', 'Member');
-    sim.partyInvite(member, leader);
-    sim.partyAccept(member);
-    expect(sim.enterDungeon('hollow_crypt', leader)).toBe(true);
-    sim.partyLeave(member);
-    advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 1);
-    expect(dungeonAt(entity(sim, leader).pos.x)).toBeNull();
+  describe('a group that disbands down to one player', () => {
+    /** A duo, both inside the Hollow Crypt. */
+    function duo() {
+      const sim = newSim();
+      const leader = sim.addPlayer('warrior', 'Lead');
+      const member = sim.addPlayer('priest', 'Member');
+      sim.partyInvite(member, leader);
+      sim.partyAccept(member);
+      expect(sim.enterDungeon('hollow_crypt', leader)).toBe(true);
+      expect(sim.enterDungeon('hollow_crypt', member)).toBe(true);
+      const inst = sim.instances.find(
+        (i) => i.partyKey !== null && i.dungeonId === 'hollow_crypt',
+      ) as InstanceSlot;
+      sim.drainEvents();
+      return { sim, leader, member, inst };
+    }
+
+    it('lets the remaining player keep the run when the other leaves', () => {
+      const { sim, leader, member, inst } = duo();
+      sim.partyLeave(member);
+      const events = advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 5);
+      expect(events.get(leader)).toBeUndefined();
+      expect(inside(inst, entity(sim, leader), sim)).toBe(true);
+      expect(dungeonAt(entity(sim, member).pos.x)).toBeNull();
+    });
+
+    it('lets the leader keep the run after kicking the other player', () => {
+      const { sim, leader, member, inst } = duo();
+      sim.partyKick(member, leader);
+      advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 5);
+      expect(inside(inst, entity(sim, leader), sim)).toBe(true);
+      expect(dungeonAt(entity(sim, member).pos.x)).toBeNull();
+    });
+
+    it('lets the remaining player keep the run when the other logs out', () => {
+      const { sim, leader, member, inst } = duo();
+      sim.removePlayer(member);
+      const events = advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 5);
+      expect(events.get(leader)).toBeUndefined();
+      expect(inside(inst, entity(sim, leader), sim)).toBe(true);
+    });
+
+    it('keeps the run theirs after they form a new group', () => {
+      const { sim, leader, member, inst } = duo();
+      sim.partyLeave(member);
+      const friend = sim.addPlayer('mage', 'Friend');
+      sim.partyInvite(friend, leader);
+      sim.partyAccept(friend);
+      advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 5);
+      expect(inside(inst, entity(sim, leader), sim)).toBe(true);
+    });
+
+    it('hands them the run: they can walk out and back into the same claim', () => {
+      const { sim, leader, member, inst } = duo();
+      sim.partyLeave(member);
+      expect(inst.partyKey).toBe(sim.ctx.instanceKeyFor(leader));
+      sim.leaveDungeon(leader);
+      expect(sim.enterDungeon('hollow_crypt', leader)).toBe(true);
+      expect(inside(inst, entity(sim, leader), sim)).toBe(true);
+    });
+
+    it('saves a kicked duo partner who is re-invited within the grace', () => {
+      const { sim, leader, member, inst } = duo();
+      sim.partyKick(member, leader);
+      advance(sim, 10);
+      sim.partyInvite(member, leader);
+      sim.partyAccept(member);
+      const later = advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 5);
+      expect(later.get(member)).toBeUndefined();
+      expect(inside(inst, entity(sim, member), sim)).toBe(true);
+    });
+
+    it('keeps the party key where the player already owns a solo run of that dungeon', () => {
+      const { sim, leader, member, inst } = duo();
+      const own = sim.instances.find(
+        (i) => i !== inst && i.dungeonId === 'hollow_crypt' && i.partyKey === null,
+      ) as InstanceSlot;
+      own.partyKey = soloInstanceKeyFor(sim.ctx, member); // the member's own solo run
+      const partyKey = inst.partyKey;
+      sim.partyLeave(leader);
+      expect(own.partyKey).not.toBe(partyKey);
+      expect(inst.partyKey).toBe(partyKey);
+    });
+
+    it('does not pass a raid on to its last raider', () => {
+      const { sim, leader, member, inst } = duo();
+      // A real conversion needs five; the disband reads only the flag.
+      const party = sim.ctx.partyOf(leader);
+      if (party) party.raid = true;
+      const partyKey = inst.partyKey;
+      sim.partyLeave(member);
+      expect(inst.partyKey).toBe(partyKey);
+    });
   });
 
   it('leaves a solo claim owner alone after they form a party', () => {

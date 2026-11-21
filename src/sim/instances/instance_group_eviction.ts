@@ -8,13 +8,20 @@
 // claim occupied, which held the group's Reset All Instances and any queued
 // difficulty change (difficulty_selection.ts) indefinitely.
 //
-// Only party-keyed claims evict. A solo claim's owner keeps theirs after forming
-// a party (claims are not re-keyed when a group forms), so evicting there would
-// throw a player out of their own run for inviting a friend. Exempt as well: a
-// GM, and a raid returner standing where the door's own return rule admits them
+// A solo claim's owner keeps theirs after forming a party (claims are not
+// re-keyed when a group forms), so evicting them would throw a player out of
+// their own run for inviting a friend; anyone in the owner's current group may
+// stay with them. Exempt as well: a GM, and a raid returner standing where the door's own return rule admits them
 // (raid_return.ts): a room of the run they cleared and are still locked to, or
 // an earlier room on the way out of it. Such a player is never in the owning
 // group by design. Anywhere else in the run, they are evicted like anyone.
+//
+// When a non-raid party disbands down to one player (the others left, were
+// kicked, or logged out, which removes them from the party), that player keeps
+// the run: handRunToLastMember, called from the party disband, re-keys the
+// party's claims to their solo key, so the door, Reset All and difficulty
+// changes treat it as their own. Everyone else who was in the group is still
+// evicted, unless the owner groups with them again.
 //
 // The warning repeats at INSTANCE_EVICTION_REMINDER_SECONDS left. A player who
 // leaves the world (logout or disconnect) while they do not belong is set down
@@ -50,6 +57,7 @@ import {
   dungeonExitStandingPos,
   instanceClaimContains,
   setDownAtDungeonExit,
+  soloInstanceKeyFor,
 } from './dungeons';
 import { isClearedReturnRoom, raidFamilyOf } from './raid_return';
 
@@ -92,9 +100,10 @@ export function belongsInClaim(
   inst: InstanceSlot,
 ): boolean {
   const key = inst.partyKey;
-  if (key === null || !key.startsWith('party:')) return true;
+  if (key === null) return true;
   if (p.gm) return true;
-  if (ctx.instanceKeyFor(pid) === key) return true;
+  if (ctx.instanceKeyFor(pid) === key || soloInstanceKeyFor(ctx, pid) === key) return true;
+  if (!key.startsWith('party:') && groupedWithSoloOwner(ctx, pid, key)) return true;
   const family = raidFamilyOf(inst.dungeonId);
   if (!family) return false;
   // This room or any later one: rooms are listed entrance first, and a returner
@@ -167,6 +176,28 @@ export function updateInstanceGroupEviction(ctx: SimContext): void {
       continue;
     }
     if (evict(ctx, meta, p, inst)) clearTimer(p);
+  }
+}
+
+/** Is this player in the current group of the solo claim's owner? */
+function groupedWithSoloOwner(ctx: SimContext, pid: number, soloKey: string): boolean {
+  const party = ctx.partyOf(pid);
+  if (!party) return false;
+  return party.members.some((m) => m !== pid && soloInstanceKeyFor(ctx, m) === soloKey);
+}
+
+/** A non-raid party disbanded down to one player: hand them every claim the
+ *  party held, re-keyed to their solo key. A dungeon they already hold a solo
+ *  claim for keeps the party key instead (one claim per key and dungeon, the
+ *  same guard the expedition re-key keeps). Call after their party is gone. */
+export function handRunToLastMember(ctx: SimContext, partyKey: string, pid: number): void {
+  const soloKey = soloInstanceKeyFor(ctx, pid);
+  for (const inst of ctx.instances) {
+    if (inst.partyKey !== partyKey) continue;
+    const clash = ctx.instances.some(
+      (other) => other.partyKey === soloKey && other.dungeonId === inst.dungeonId,
+    );
+    if (!clash) inst.partyKey = soloKey;
   }
 }
 
