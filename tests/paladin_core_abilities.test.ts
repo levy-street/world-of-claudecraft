@@ -387,7 +387,12 @@ describe('Paladin core abilities', () => {
     grantDevotion(holy.player, 20);
     activateDivineAscension(holy.player);
     const lifeCovenant = resolve(holy, 'life_covenant');
-    expect(lifeCovenant.effects).toContainEqual({ type: 'absorb', amount: 120, duration: 6 });
+    expect(lifeCovenant.effects).toContainEqual({
+      type: 'absorb',
+      amount: 120,
+      duration: 6,
+      auraId: 'life_covenant_absorb',
+    });
 
     const protection = new Sim({ seed: 23, playerClass: 'paladin', autoEquip: true });
     protection.setPlayerLevel(20);
@@ -404,6 +409,29 @@ describe('Paladin core abilities', () => {
 
     run(protection, hostileNear(protection), sacredChallenge);
     expect(protection.player.paladinDevotion?.ascensionCharges).toBe(5);
+  });
+
+  it('keeps the Ascension Life Covenant shield beside its damage reduction on an ally', () => {
+    const holy = new Sim({ seed: 19, playerClass: 'paladin', autoEquip: true });
+    holy.setPlayerLevel(20);
+    holy.setSpec('holy');
+    grantDevotion(holy.player, 20);
+    activateDivineAscension(holy.player);
+    const allyId = holy.addPlayer('warrior', 'Aldric');
+    const ally = holy.entities.get(allyId);
+    if (!ally) throw new Error('missing ally');
+
+    run(holy, ally, resolve(holy, 'life_covenant'));
+
+    const covenantAuras = ally.auras.filter((aura) => aura.sourceId === holy.playerId);
+    expect(covenantAuras).toContainEqual(
+      expect.objectContaining({ id: 'life_covenant', kind: 'buff_dr', value: 0.4, duration: 6 }),
+    );
+    expect(covenantAuras).toContainEqual(
+      expect.objectContaining({ id: 'life_covenant_absorb', kind: 'absorb', duration: 6 }),
+    );
+    const shield = covenantAuras.find((aura) => aura.kind === 'absorb');
+    expect(shield?.value).toBeGreaterThanOrEqual(120);
   });
 
   it('transforms every marked core ability during Ascension', () => {
