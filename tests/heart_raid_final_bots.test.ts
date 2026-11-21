@@ -7,7 +7,7 @@
 // for the observer's snapshot; the template ids are the sim's own.
 
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { heartQuarterSpot } from '../src/sim/content/smith_heart_quarters';
+import { HEART_QUARTERS, heartQuarterSpot } from '../src/sim/content/smith_heart_quarters';
 import {
   ELEMENT_AURAS,
   ELEMENT_TUNING,
@@ -29,6 +29,11 @@ type Final = {
   duty(world: unknown, st: Record<string, unknown>, b: unknown, me: unknown): unknown;
   bad(world: unknown, st: Record<string, unknown>, at: { x: number; z: number }): boolean;
   summary(world: unknown, st: Record<string, unknown>): Record<string, unknown>;
+  roleSpot(
+    world: unknown,
+    st: Record<string, unknown>,
+    b: unknown,
+  ): { x: number; z: number } | null;
 };
 let final: Final;
 
@@ -270,5 +275,27 @@ describe('Masterless Strength bots: Weight of the Anvil', () => {
     vi.setSystemTime(4_000_000 + 6000);
     const free = final.duty(f.world, st, f.sb, f.soaker) as Duty;
     expect(free?.duty).toBe('anvil');
+  });
+});
+
+describe('Masterless Strength bots: the ranged spot', () => {
+  it('fans the casters round the boss on its outer side, clear of the ring', () => {
+    const { world, boss } = heatFight({ rime: false });
+    const keys = ['mage', 'hunter', 'lock', 'ele'];
+    const bots = keys.map((key, i) => ({ pid: 10 + i, name: key, spec: { key, role: 'dps' } }));
+    world.bots.push(...(bots as never[]));
+    final.read(world);
+    const c = world.center;
+    for (const b of bots.slice(2)) {
+      const at = final.roleSpot(world, {}, b);
+      expect(at).not.toBeNull();
+      // Outside the central ring, within casting reach of the boss, and no
+      // nearer the room's centre than the boss is by more than a few yards.
+      expect(Math.hypot(at!.x - c.x, at!.z - c.z)).toBeGreaterThan(HEART_QUARTERS.ringR + 4);
+      expect(Math.hypot(at!.x - boss.x, at!.z - boss.z)).toBeLessThan(25);
+    }
+    const a = final.roleSpot(world, {}, bots[2])!;
+    const d = final.roleSpot(world, {}, bots[3])!;
+    expect(Math.hypot(a.x - d.x, a.z - d.z)).toBeGreaterThan(3);
   });
 });

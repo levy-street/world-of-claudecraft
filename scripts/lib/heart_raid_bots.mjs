@@ -1174,6 +1174,14 @@ function threatOk(world, b, mob) {
   let tankHate = 0;
   for (const [id, v] of thr)
     if (id !== b.pid && world.players.get(id)?.tank) tankHate = Math.max(tankHate, v);
+  // A tank holding it is the one to stay under, not the highest tank on the
+  // table: after a swap the old tank's threat still tops it and the bots rode
+  // past the new holder (a hunter pulled the final boss through the ring).
+  const holder = world.players.get(mob.aggro);
+  if (holder?.tank) {
+    const held = thr.find(([id]) => id === holder.pid)?.[1] ?? 0;
+    if (held > 0) tankHate = held;
+  }
   // No tank on its table: a loose add (on a healer, on a damage dealer)
   // is everyone's to kill, threat or not.
   if (tankHate <= 0) return true;

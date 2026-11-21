@@ -395,8 +395,32 @@ export const final = {
         return add(q, { x: Math.sin(a), z: Math.cos(a) }, 18 + (q.reach ?? 0));
       }
     }
-    if (b.spec.role !== 'healer') return null;
     const boss = world.mobs.boss;
+    // The ranged stand round the boss on its OUTER side (away from the
+    // central ring), fanned out: the harness's arc keeps one bearing for the
+    // whole fight, which put casters across the ring from a boss in the far
+    // quarter, and a boss that turned on one of them walked through the ring
+    // into Heart Unbound and wiped the raid (the bot raids of 2026-11-21).
+    if (b.spec.role === 'dps' && !b.spec.melee) {
+      if (!alive(boss) || hypot(boss, world.center) < 4 || final.isFinalPhase(world)) return null;
+      if (hasAura(boss, FINAL_PHASE_AURAS.shield)) return null;
+      const ranged = world.bots.filter((x) => x.spec.role === 'dps' && !x.spec.melee);
+      const i = Math.max(0, ranged.indexOf(b));
+      const out = unit(world.center, boss);
+      const base = Math.atan2(out.x, out.z);
+      const fan = ((i + 0.5) / Math.max(1, ranged.length) - 0.5) * 2.4;
+      for (const r of [14, 11, 17]) {
+        const at = add(boss, { x: Math.sin(base + fan), z: Math.cos(base + fan) }, r);
+        if (
+          final.onFloor(world, at) &&
+          hypot(at, world.center) > HEART_QUARTERS.ringR + 4 &&
+          !final.blocksLine(world, at, boss)
+        )
+          return at;
+      }
+      return null;
+    }
+    if (b.spec.role !== 'healer') return null;
     if (!alive(boss) || hypot(boss, world.center) < 4) return null;
     const u = unit(world.center, boss);
     const side = b.spec.key === 'h1' ? 1 : -1;
