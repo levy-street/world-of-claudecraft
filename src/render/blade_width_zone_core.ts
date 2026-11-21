@@ -200,6 +200,15 @@ export const BLADE_COMB_GLSL = `transformed.y *= uBladeSize.x;
             float wocPatch = sin(wocCombXZ.x * 0.17 + sin(wocCombXZ.y * 0.11) * 2.1)
               * sin(wocCombXZ.y * 0.15 + sin(wocCombXZ.x * 0.09) * 1.8);
             vColor.rgb *= 1.0 + uBladePaint.x * wocPatch + wocClump * 0.1 * wocClumpA * wocClumpB;
+            if (uBladePaint.x > 0.0) {
+              // broad sunlit (warm) and shaded (cool) drifts across the field,
+              // plus a little light and dark variety from tuft to tuft
+              float wocDrift = sin(wocCombXZ.x * 0.11 + sin(wocCombXZ.y * 0.07) * 2.1)
+                * cos(wocCombXZ.y * 0.09 - wocCombXZ.x * 0.04);
+              float wocTuft = fract(sin(dot(wocCombXZ, vec2(27.17, 61.73))) * 41231.77);
+              vColor.rgb *= vec3(1.0 + 0.55 * wocDrift, 1.0 + 0.08 * wocDrift, 1.0 - 0.6 * wocDrift)
+                * ((0.9 - 0.12 * wocDrift) * (0.8 + 0.4 * wocTuft));
+            }
             // warm yellow-green tips over the cooler body
             vColor.rgb *= mix(vec3(1.0), vec3(1.3, 1.2, 0.7),
               uBladePaint.y * smoothstep(0.35, 1.0, wocCombH) * (1.0 - 0.75 * wocFarT * step(0.0001, uBladeSize.w)));
@@ -209,7 +218,7 @@ export const BLADE_COMB_GLSL = `transformed.y *= uBladeSize.x;
         #endif`;
 
 // Extra blades and flowers (blade_grass.ts clusterGeometry `extras`): the
-// carpet and band tufts carry six finer blades and one tiny daisy, tagged by
+// carpet and band tufts carry sixteen finer blades and one tiny daisy, tagged by
 // `aBladeKind` (1 extra blade, 2 flower). They collapse to the root unless a
 // zone look turns them on, so stock tufts render the shipped nine blades.
 

@@ -157,9 +157,9 @@ export function mulberry32(seed: number): () => number {
 // `extras` (the carpet and the band only) appends EXTRA_BLADES finer blades and
 // one tiny flower AFTER the shipped blades, tagged per vertex in `aBladeKind`
 // (0 shipped blade, 1 extra blade, 2 flower). The shader collapses both unless
-// a zone look turns them on (blade_width_zone_core.ts uBladeExtra), so every
-// other zone renders the shipped tuft exactly, and the shipped blades consume
-// the rng first, so their shapes never change.
+// a zone look turns them on (blade_width_zone_core.ts uBladeExtra), and the
+// shipped blades consume the rng first, so their shapes never change. The
+// extras geometry also warms its blade tips (the painted meadow's sunlit tips).
 export function clusterGeometry(
   rng: () => number,
   segments: 2 | 3 = 3,
@@ -207,7 +207,10 @@ export function clusterGeometry(
       // all-up normals: blades take the terrain's lighting response, the
       // same trick the card tufts use, so the carpet never shades apart
       // from the ground it grows in
-      colors.push(shade, shade, shade);
+      // the painted carpet and band (extras) warm toward the tip, where the
+      // blade catches the sun; every other cluster user keeps the grey ramp
+      const tw = extras ? t * t : 0;
+      colors.push(shade * (1 + 0.2 * tw), shade * (1 + 0.08 * tw), shade * (1 - 0.4 * tw));
     };
     if (segments === 2) {
       const wMid = w0 * 0.62;

@@ -220,7 +220,7 @@ export const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
 const GRASS_DENSITY_MULT_MAX = Math.max(1, ...Object.values(GRASS_BIOME_DENSITY));
 // Ground flowers never grow in these biomes (the Reach loses them with its
 // grass anchors; the Wraithwood keeps grass but blooms nothing).
-const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
+export const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
 // Field biomes bloom in coarse drifts (the dusk realm's original treatment,
 // extended to the flower-field realms): dense hash-cell fields instead of the
 // sparse one-in-nine anchor blooms.

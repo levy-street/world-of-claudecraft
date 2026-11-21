@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
+import {
+  FLOWERLESS_BIOMES as FOLIAGE_FLOWERLESS,
+  GRASS_BIOME_DENSITY,
+} from '../src/render/foliage';
 import { BIOME_FOG, BIOME_LIGHT } from '../src/render/outdoor_biome_presets';
+import {
+  BLADELESS_BIOMES,
+  FLOWERLESS_BIOMES,
+  STORYBOOK_GRASS_RENDER,
+  storybookGrassForBiome,
+  storybookRampFor,
+} from '../src/render/palette_lab/storybook_grass_core';
 import {
   applyLookPatch,
   cycleLookId,
@@ -22,7 +33,7 @@ import {
   stockLookFor,
   whiteBalanceGains,
 } from '../src/render/palette_lab/zone_look_core';
-import { ZONE_LOOKS } from '../src/render/palette_lab/zone_looks';
+import { STOCK_WITH_GRASS_ID, ZONE_LOOKS } from '../src/render/palette_lab/zone_looks';
 import { BIOME_PALETTE } from '../src/render/terrain_palette';
 import { ZONES } from '../src/sim/data';
 
@@ -317,7 +328,7 @@ describe('Storybook Meadow (Eastbrook, the art bible look)', () => {
   });
 });
 
-describe('painterly render arms stay off outside Eastbrook', () => {
+describe('the storybook meadow grass in every zone', () => {
   const stock = stockLookFor('vale', WATER, BLOOM);
 
   it('stock is the shipped blade, ramp and ink', () => {
@@ -335,31 +346,86 @@ describe('painterly render arms stay off outside Eastbrook', () => {
     expect(look.render.rampSoft).toBeGreaterThan(0);
   });
 
-  it('every other zone default keeps the shipped blade and ramp', () => {
+  it('every grass zone default grows the storybook blades in its own colours', () => {
     for (const [zoneId, lookId] of Object.entries(DEFAULT_ZONE_SELECTIONS)) {
       if (zoneId === 'eastbrook_vale') continue;
+      const biome = ZONES.find((z) => z.id === zoneId)?.biome;
+      if (!biome || BLADELESS_BIOMES.has(biome)) continue;
       const patch = (ZONE_LOOKS[zoneId] ?? []).find((l) => l.id === lookId);
       const look = applyLookPatch(stock, patch!);
-      expect(look.render.bladeWidth, `${zoneId}/${lookId}`).toBe(1);
-      expect(look.render.bladeBase, `${zoneId}/${lookId}`).toBe(1);
-      expect(look.render.rampSoft, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.bladeNear, `${zoneId}/${lookId}`).toBe(1);
-      expect(look.render.carpetGround, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.combLean, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.paintPatch, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.paintTip, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.bladeHeight, `${zoneId}/${lookId}`).toBe(1);
-      expect(look.render.bladeSpread, `${zoneId}/${lookId}`).toBe(1);
-      expect(look.render.bladeExtra, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.flowerShare, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.bladeClump, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.bladeWiden, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.rampStrength, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.bladeSide, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.cloudShadow, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.bladeFar, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.bladeRound, `${zoneId}/${lookId}`).toBe(0);
-      expect(look.render.bandFade, `${zoneId}/${lookId}`).toBe(0);
+      const tag = `${zoneId}/${lookId}`;
+      expect(look.render.bladeWidth, tag).toBe(STORYBOOK_GRASS_RENDER.bladeWidth);
+      expect(look.render.bladeExtra, tag).toBe(1);
+      expect(look.render.rampStrength, tag).toBe(STORYBOOK_GRASS_RENDER.rampStrength);
+      expect(look.render.flowerShare, tag).toBe(
+        FLOWERLESS_BIOMES.has(biome) ? 0 : STORYBOOK_GRASS_RENDER.flowerShare,
+      );
+      // the ramp is the zone's own grass, not Eastbrook's greens
+      const ramp = storybookRampFor(
+        patch?.ground?.grass ?? BIOME_PALETTE[biome].grass,
+        patch?.ground?.grassDark ?? BIOME_PALETTE[biome].grassDark,
+      );
+      expect(look.render.rampShadow, tag).toBe(ramp.rampShadow);
+      expect(look.render.rampLight, tag).toBe(ramp.rampLight);
+      // the grass block never brings the meadow's rim or ink with it
+      expect(look.render.ink, tag).toBe(1);
     }
+  });
+
+  it('bladeless zones keep the shipped blade and ramp', () => {
+    let seen = 0;
+    for (const zone of ZONES) {
+      if (!BLADELESS_BIOMES.has(zone.biome)) continue;
+      for (const patch of ZONE_LOOKS[zone.id] ?? []) {
+        const look = applyLookPatch(stock, patch);
+        const tag = `${zone.id}/${patch.id}`;
+        expect(look.render.bladeExtra, tag).toBe(0);
+        expect(look.render.rampStrength, tag).toBe(0);
+        expect(look.render.paintTip, tag).toBe(0);
+        expect(look.render.bladeFar, tag).toBe(0);
+        seen++;
+      }
+    }
+    expect(seen).toBeGreaterThan(0);
+  });
+
+  it('night defaults grow the storybook blades too', () => {
+    let seen = 0;
+    for (const [zoneId, lookId] of Object.entries(DEFAULT_ZONE_NIGHT_SELECTIONS)) {
+      const biome = ZONES.find((z) => z.id === zoneId)?.biome;
+      if (!biome || BLADELESS_BIOMES.has(biome)) continue;
+      const patch = (ZONE_LOOKS[zoneId] ?? []).find((l) => l.id === lookId);
+      const look = applyLookPatch(stock, patch!);
+      expect(look.render.bladeExtra, `${zoneId}/${lookId}`).toBe(1);
+      seen++;
+    }
+    expect(seen).toBeGreaterThan(0);
+  });
+
+  it('Eastbrook keeps its own authored ramp over the derived one', () => {
+    const patch = (ZONE_LOOKS.eastbrook_vale ?? []).find((l) => l.id === 'storybook-meadow');
+    expect(patch?.render?.rampShadow).toBe(0x2c7442);
+    expect(patch?.render?.rampLight).toBe(0x8ec462);
+    expect(patch?.render?.ink).toBe(0);
+    expect(patch?.render?.rim).toBe(0.3);
+  });
+
+  it('Wraithwood ships the stock look with the storybook grass and nothing else', () => {
+    expect(DEFAULT_ZONE_SELECTIONS.wraithwood).toBe(STOCK_WITH_GRASS_ID);
+    const patch = (ZONE_LOOKS.wraithwood ?? []).find((l) => l.id === STOCK_WITH_GRASS_ID);
+    expect(patch?.grade).toBeUndefined();
+    expect(patch?.ground).toBeUndefined();
+    expect(patch?.sky).toBeUndefined();
+    const p = BIOME_PALETTE.haunt;
+    expect(patch?.render).toEqual(storybookGrassForBiome('haunt', p.grass, p.grassDark));
+  });
+
+  it('the no-blade and no-flower biome lists match the foliage tables', () => {
+    const bladeless = Object.entries(GRASS_BIOME_DENSITY)
+      .filter(([, d]) => d === 0)
+      .map(([b]) => b)
+      .sort();
+    expect([...BLADELESS_BIOMES].sort()).toEqual(bladeless);
+    expect([...FLOWERLESS_BIOMES].sort()).toEqual([...FOLIAGE_FLOWERLESS].sort());
   });
 });

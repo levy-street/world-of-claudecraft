@@ -17,6 +17,9 @@
 // yellow-green in the light and teal-green in the shade, and a grade that
 // lifts the blacks a touch toward the shadow tint instead of crushing them.
 
+import { ZONES } from '../../sim/data';
+import { BIOME_PALETTE } from '../terrain_palette';
+import { STORYBOOK_GRASS_RENDER, storybookGrassForBiome } from './storybook_grass_core';
 import type { LookPatch, LookRender } from './zone_look_core';
 
 // Recurring water sets.
@@ -133,53 +136,29 @@ const STORYBOOK_SKY = {
 };
 const STORYBOOK_MEADOW_GRADE = {
   exposure: 1.0,
-  temperature: 0.06,
+  temperature: 0.02,
   contrast: 1.07,
-  saturation: 0.98,
-  vibrance: 0.12,
+  saturation: 1.12,
+  vibrance: 0.28,
   shadowTint: 0x3c5c9a,
   shadowAmt: 0.12,
   highlightTint: 0xffe8c0,
   highlightAmt: 0.06,
   lift: 0.014,
-  greenHue: -13,
-  greenSat: 1.02,
-  greenVal: 0.96,
+  greenHue: 0,
+  greenSat: 1.15,
+  greenVal: 1.04,
 };
+// The storybook meadow grass (shared with every zone) plus Eastbrook's own
+// rim, canopy and ink, and its authored ramp (a cool teal shadow end).
 const STORYBOOK_MEADOW_RENDER = {
+  ...STORYBOOK_GRASS_RENDER,
   rim: 0.3,
   shadowStrength: 0.8,
-  meadowCoverage: 1,
-  meadowHeight: 0.38,
-  meadowWidth: 1.35,
   canopyLift: 1.35,
   ink: 0,
-  bladeWidth: 0.6,
-  rampSoft: 0.8,
-  bladeBase: 0.72,
-  bladeNear: 0.62,
-  carpetGround: 1,
-  // windswept toward screen-right as seen down the vale road
-  combX: 0.9,
-  combZ: -0.1,
-  combLean: 0.62,
-  combDroop: 0.22,
-  paintPatch: 0.1,
-  paintTip: 0.55,
-  bladeHeight: 0.6,
-  bladeSpread: 1.35,
-  bladeExtra: 1,
-  flowerShare: 0.22,
-  bladeClump: 0.6,
-  bladeWiden: 0.3,
   rampShadow: 0x2c7442,
   rampLight: 0x8ec462,
-  rampStrength: 0.75,
-  bladeSide: 0.7,
-  cloudShadow: 0.24,
-  bladeFar: 3,
-  bladeRound: 0.8,
-  bandFade: 0.85,
 };
 const PLAINS_DUSK_SKY = {
   zenith: 0x5aa2dc,
@@ -1713,6 +1692,14 @@ const CURATED: Readonly<Record<string, readonly LookPatch[]>> = {
   ],
   wraithwood: [
     {
+      // The stock look with the storybook meadow's blades, in this zone's own
+      // grass colours (the grass block is added to every look below; this one
+      // skips the render family, see STOCK_WITH_GRASS_ID).
+      id: 'storybook-grass',
+      name: 'Storybook Grass',
+      note: "The stock look, with the storybook meadow blades in this zone's own colours.",
+    },
+    {
       id: 'grave-mist',
       name: 'Grave Mist',
       note: 'Cold grey-teal fog through dead trunks; lifted, eerie, readable.',
@@ -2406,6 +2393,22 @@ export function renderFamily(zoneId: string, lookId: string): 'day' | 'golden' |
   return 'day';
 }
 
+// Every zone grows the storybook meadow's blades in its own colours
+// (storybook_grass_core.ts), from the look's ground or the stock palette.
+function storybookGrassForLook(zoneId: string, look: LookPatch): Partial<LookRender> {
+  const biome = ZONES.find((z) => z.id === zoneId)?.biome;
+  if (!biome) return {};
+  const stock = BIOME_PALETTE[biome];
+  return storybookGrassForBiome(
+    biome,
+    look.ground?.grass ?? stock.grass,
+    look.ground?.grassDark ?? stock.grassDark,
+  );
+}
+
+/** A look that is the stock look plus the storybook grass, and nothing else. */
+export const STOCK_WITH_GRASS_ID = 'storybook-grass';
+
 const FAMILY_RENDER = { day: DAY_RENDER, golden: GOLDEN_RENDER, moody: MOODY_RENDER } as const;
 
 export const ZONE_LOOKS: Readonly<Record<string, readonly LookPatch[]>> = Object.fromEntries(
@@ -2413,7 +2416,12 @@ export const ZONE_LOOKS: Readonly<Record<string, readonly LookPatch[]>> = Object
     zoneId,
     looks.map((look) => ({
       ...look,
-      render: { ...FAMILY_RENDER[renderFamily(zoneId, look.id)], ...look.render },
+      render: {
+        // the stock-plus-grass look skips the family block: stock render, new blades
+        ...(look.id === STOCK_WITH_GRASS_ID ? {} : FAMILY_RENDER[renderFamily(zoneId, look.id)]),
+        ...storybookGrassForLook(zoneId, look),
+        ...look.render,
+      },
     })),
   ]),
 );

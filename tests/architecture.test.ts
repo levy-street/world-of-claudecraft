@@ -1323,6 +1323,8 @@ const RENDER_PURE_CORES = [
   'src/render/ground_palette_override_core.ts',
   'src/render/meadow_fullness_core.ts',
   'src/render/palette_lab/zone_look_core.ts',
+  // the storybook meadow grass every zone's looks share, ramp from its own tones
+  'src/render/palette_lab/storybook_grass_core.ts',
   'src/render/spell_lab/spell_lab_catalog_core.ts',
   'src/render/ocean/ocean_spectrum_core.ts',
   'src/render/ocean/ocean_foam_core.ts',

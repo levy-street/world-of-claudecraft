@@ -35,4 +35,26 @@ describe('blade cluster extras (finer blades and a flower)', () => {
     expect(across.length).toBe(geo.getAttribute('position').count);
     expect(new Set(across)).toEqual(new Set([-1, 0, 1]));
   });
+
+  it('warms the blade tips on the carpet and band geometry only', () => {
+    const plain = clusterGeometry(mulberry32(7)).getAttribute('color');
+    for (let i = 0; i < plain.count; i++) {
+      // the shared cluster (ground bake, card tufts) keeps its grey ramp
+      expect(plain.getX(i)).toBe(plain.getY(i));
+      expect(plain.getY(i)).toBe(plain.getZ(i));
+    }
+    const painted = clusterGeometry(mulberry32(7), 3, true);
+    const col = painted.getAttribute('color');
+    const pos = painted.getAttribute('position');
+    let warmTips = 0;
+    for (let i = 0; i < col.count; i++) {
+      if (pos.getY(i) === 0) {
+        // roots stay grey
+        expect(col.getX(i)).toBeCloseTo(col.getZ(i), 6);
+      } else if (col.getX(i) > col.getY(i) && col.getY(i) > col.getZ(i)) {
+        warmTips++;
+      }
+    }
+    expect(warmTips).toBeGreaterThan(0);
+  });
 });

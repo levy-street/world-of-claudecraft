@@ -577,6 +577,7 @@ export type LookSelections = Record<string, string>;
 export const DEFAULT_ZONE_SELECTIONS: Readonly<LookSelections> = {
   proving_shore: 'skyward-isles',
   eastbrook_vale: 'storybook-meadow',
+  wraithwood: 'storybook-grass',
   mirefen_marsh: 'jade-wetland',
   thornpeak_heights: 'alpine-clear',
   farshore_isle: 'tropic-lagoon',

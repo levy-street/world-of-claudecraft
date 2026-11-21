@@ -136,6 +136,12 @@ describe('windswept comb, painted field and blade size (zone look arms)', () => 
   it('skips the comb and paint work at the shipped zeros (uniform branches)', () => {
     expect(BLADE_COMB_GLSL).toContain('if (uBladeComb.y > 0.0)');
     expect(BLADE_COMB_GLSL).toContain('if (uBladePaint.x > 0.0 || uBladePaint.y > 0.0)');
+    // the field's warm and cool drifts ride the painted patches: off at stock,
+    // and shared by the carpet and band, which both splice this block
+    const paint = BLADE_COMB_GLSL.indexOf('if (uBladePaint.x > 0.0 || uBladePaint.y > 0.0)');
+    const drift = BLADE_COMB_GLSL.indexOf('float wocDrift');
+    expect(drift).toBeGreaterThan(paint);
+    expect(BLADE_COMB_GLSL.slice(paint, drift)).toContain('if (uBladePaint.x > 0.0) {');
     expect(BLADE_COMB_GLSL.startsWith('transformed.y *= uBladeSize.x;')).toBe(true);
   });
 });
