@@ -1620,6 +1620,8 @@ const RENDER_PURE_CORES = [
   'src/render/gfx_override_core.ts',
   'src/render/goblin_rocket_sled_fx_core.ts',
   'src/render/ground_aim_reticle_core.ts',
+  // the raid's world markers on the floor: slots, drape, pulse, scale, tier look
+  'src/render/world_markers_core.ts',
   'src/render/ignivar_encounter_core.ts',
   'src/render/varkhul_encounter_core.ts',
   'src/render/ignivar_judgment_fire_core.ts',

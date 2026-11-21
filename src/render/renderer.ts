@@ -957,6 +957,7 @@ import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
 import { WorldBossLayer } from './world_boss_layer';
 import { playWorldCueFx } from './world_cue_fx';
 import { WorldGuidance } from './world_guidance';
+import { WorldMarkerLayer, worldMarkerPrewarmEntry, worldMarkerSimFloor } from './world_markers';
 import { WorldPicking } from './world_picking';
 import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
@@ -1427,6 +1428,7 @@ export class Renderer {
   // Null until enabled; once built it is re-draped over the terrain in front of
   // the local player every frame. See target_cone_debug.ts.
   private targetCone: TargetConeOverlay | null = null;
+  private worldMarkers!: WorldMarkerLayer;
   // Click markers, AoE impact rings and the ground-aim reticle (ground_feedback.ts).
   private readonly groundFeedback = new GroundFeedback(
     (x, z) => groundHeight(x, z, this.sim.cfg.seed),
@@ -2974,6 +2976,12 @@ export class Renderer {
     );
     this.groundFeedback.reticle = groundAimReticle;
     setRenderCategory(groundAimReticle.group, 'ui3d');
+    // The raid's world markers on the floor: 8 pooled slots, built hidden here (world_markers.ts).
+    this.worldMarkers = new WorldMarkerLayer(this.scene, {
+      floor: worldMarkerSimFloor(() => this.sim.cfg.seed),
+      lowTier: this.lowGfx,
+      boost: this.lowGfx ? 1 : SELECTION_RING_BOOST,
+    });
     for (let i = 0; i < CLICK_MARKER_POOL; i++) {
       const ring = buildAoeRingMesh(aoeRingGeo);
       this.scene.add(ring);
@@ -3371,6 +3379,7 @@ export class Renderer {
     // pool, texture and material release with the rest of the GPU state.
     bestEffort(() => this.blobShadows?.dispose());
     this.blobShadows = null;
+    bestEffort(() => this.worldMarkers.dispose());
     cleanupErrors.push(...(this.dungeons?.disposeAllInteriorResources().errors ?? []));
     bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
@@ -6476,6 +6485,10 @@ export class Renderer {
           await Promise.all(castVfxUnits().map((unit) => unit.run()));
         },
       },
+      worldMarkerPrewarmEntry(this.worldMarkers, {
+        prewarmTexture: (texture) => this.prewarmTexture(texture),
+        compileColor: (root) => this.compilePrewarmColorPrograms(root, false),
+      }),
       {
         // Rideable mounts: worn by whoever is riding one, so the FIRST
         // sighting of any given mount links its programs the moment it
@@ -11171,6 +11184,12 @@ export class Renderer {
     this.recklessSkulls.update(dt);
     this.fishingBobbers.update(dt, this.sim.entities, this.sim.cfg.seed);
     this.groundFeedback.reticle?.update(dt);
+    this.worldMarkers.update(
+      this.sim.sharedMapMarks(),
+      this.camera,
+      this.time,
+      this.reducedMotion(),
+    );
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.
     if (this.targetCone) {

@@ -98,6 +98,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/camp_braziers.ts', layer: 'ground', strict: true },
   { file: 'src/render/streetlamps.ts', layer: 'ground', strict: true },
   { file: 'src/render/decor_torch_fx.ts', layer: 'ground', strict: true },
+  // the raid's world markers: group positioning marks, under every telegraph
+  { file: 'src/render/world_markers.ts', layer: 'ground', strict: true },
   { file: 'src/render/impact_site.ts', layer: 'ground', strict: true },
   { file: 'src/render/hill_ring.ts', layer: 'ground', strict: true },
   // Gloamveil's shadow pool, its wake and the entry's shock ring: the dark
