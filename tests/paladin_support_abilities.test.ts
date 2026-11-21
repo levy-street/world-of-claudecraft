@@ -927,6 +927,193 @@ describe('Paladin support abilities', () => {
     expect(ally.hp).toBe(1);
   });
 
+  it('splashes half of an offensive Ascension Solar Invocation onto enemies near the target', () => {
+    const sim = new Sim({ seed: 135, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const target = hostileNear(sim);
+    target.pos.x = sim.player.pos.x + 20;
+    sim.rebucket(target);
+    const spawn = (id: number, dx: number) => {
+      const mob = createMob(id, MOBS.ridge_stalker, 20, {
+        x: target.pos.x + dx,
+        y: target.pos.y,
+        z: target.pos.z,
+      });
+      mob.maxHp = mob.hp = 1_000_000;
+      (sim as unknown as { addEntity(entity: Entity): void }).addEntity(mob);
+      return mob;
+    };
+    const nearby = spawn(9102, 6);
+    const far = spawn(9103, -14);
+    const allyId = sim.addPlayer('priest', 'Solar Splash Bystander');
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing Solar Invocation bystander');
+    ally.pos.x = target.pos.x + 2;
+    ally.pos.z = target.pos.z;
+    ally.hp = 1;
+
+    // Outside Ascension only the target is struck.
+    run(sim, target, resolve(sim, 'solar_invocation'));
+    expect(target.hp).toBeLessThan(target.maxHp);
+    expect(nearby.hp).toBe(nearby.maxHp);
+
+    for (const mob of [target, nearby, far]) mob.hp = mob.maxHp;
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+    sim.drainEvents();
+    run(sim, target, resolve(sim, 'solar_invocation'));
+
+    const events = sim.drainEvents();
+    const hits = (id: number) =>
+      events
+        .filter((e) => e.type === 'damage' && e.sourceId === sim.player.id && e.targetId === id)
+        .map((e) => (e.type === 'damage' ? e.amount : 0));
+    // The target takes the direct hit and the splash; a nearby enemy only the
+    // splash, half the direct hit's 120 to 150 (plus a small Spell Power share).
+    const targetHits = hits(target.id).sort((a, b) => a - b);
+    expect(targetHits).toHaveLength(2);
+    expect(targetHits[0]).toBeGreaterThanOrEqual(60);
+    expect(targetHits[0]).toBeLessThan(95);
+    expect(targetHits[1]).toBeGreaterThanOrEqual(120);
+    const nearbyHits = hits(nearby.id);
+    expect(nearbyHits).toHaveLength(1);
+    expect(nearbyHits[0]).toBeGreaterThanOrEqual(60);
+    expect(nearbyHits[0]).toBeLessThan(95);
+    expect(nearby.maxHp - nearby.hp).toBe(nearbyHits[0]);
+    expect(hits(far.id)).toEqual([]);
+    expect(far.hp).toBe(far.maxHp);
+    // The splash only hurts enemies: an ally near the target is not healed.
+    expect(ally.hp).toBe(1);
+    expect(sim.player.paladinDevotion?.ascensionCharges).toBe(4);
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'nova',
+        ability: 'solar_invocation',
+        targetId: target.id,
+      }),
+    );
+  });
+
+  it('keeps the Ascension Solar Invocation splash on the target when the hit kills it', () => {
+    const sim = new Sim({ seed: 143, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const target = hostileNear(sim);
+    target.pos.x = sim.player.pos.x + 20;
+    sim.rebucket(target);
+    target.maxHp = target.hp = 50;
+    const spawn = (id: number, x: number, z: number) => {
+      const mob = createMob(id, MOBS.ridge_stalker, 20, { x, y: target.pos.y, z });
+      mob.maxHp = mob.hp = 1_000_000;
+      (sim as unknown as { addEntity(entity: Entity): void }).addEntity(mob);
+      return mob;
+    };
+    const besideCaster = spawn(9121, sim.player.pos.x + 2, sim.player.pos.z);
+    const besideTarget = spawn(9122, target.pos.x + 6, target.pos.z);
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+    sim.drainEvents();
+
+    run(sim, target, resolve(sim, 'solar_invocation'));
+
+    // The direct hit kills the target, but the splash still spreads from
+    // where it fell, never from the caster.
+    expect(target.dead).toBe(true);
+    expect(besideTarget.hp).toBeLessThan(besideTarget.maxHp);
+    expect(besideCaster.hp).toBe(besideCaster.maxHp);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfx',
+        fx: 'nova',
+        ability: 'solar_invocation',
+        targetId: target.id,
+      }),
+    );
+  });
+
+  it('reduces the Ascension Solar Invocation splash beyond 5 enemies', () => {
+    const sim = new Sim({ seed: 141, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const target = hostileNear(sim);
+    target.pos.x = sim.player.pos.x + 20;
+    sim.rebucket(target);
+    const crowd = [1, 2, 3, 4, 5, 6].map((i) => {
+      const mob = createMob(9110 + i, MOBS.ridge_stalker, 20, {
+        x: target.pos.x + (i % 2 === 0 ? 3 : -3),
+        y: target.pos.y,
+        z: target.pos.z + i - 3.5,
+      });
+      mob.maxHp = mob.hp = 1_000_000;
+      (sim as unknown as { addEntity(entity: Entity): void }).addEntity(mob);
+      return mob;
+    });
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+    sim.drainEvents();
+
+    run(sim, target, resolve(sim, 'solar_invocation'));
+
+    // Seven enemies share five full splashes: every splash hit is held to
+    // 5/7 of its roll, under the uncapped 60 floor.
+    for (const mob of crowd) {
+      const loss = mob.maxHp - mob.hp;
+      expect(loss).toBeGreaterThan(0);
+      expect(loss).toBeLessThan(60);
+    }
+  });
+
+  it('never splashes damage from a healing Ascension Solar Invocation', () => {
+    const sim = new Sim({ seed: 139, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('holy');
+    const allyId = sim.addPlayer('priest', 'Solar Healed Ally');
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing Solar Invocation ally');
+    ally.pos.x = sim.player.pos.x + 20;
+    sim.rebucket(ally);
+    ally.hp = 1;
+    const enemy = hostileNear(sim);
+    enemy.pos.x = ally.pos.x + 3;
+    enemy.pos.z = ally.pos.z;
+    sim.rebucket(enemy);
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+    const rngBefore = JSON.stringify(sim.ctx.rng);
+    const withoutSplash = resolve(sim, 'solar_invocation');
+    const withSplash = { ...withoutSplash };
+    withoutSplash.effects = withoutSplash.effects.filter((effect) => effect.type !== 'aoeDamage');
+    expect(withSplash.effects.some((effect) => effect.type === 'aoeDamage')).toBe(true);
+
+    run(sim, ally, withSplash);
+
+    expect(ally.hp).toBeGreaterThan(1);
+    expect(enemy.hp).toBe(enemy.maxHp);
+    // The skipped splash draws nothing: the same cast without it leaves the
+    // rng exactly where this one did.
+    const rngAfter = JSON.stringify(sim.ctx.rng);
+    const control = new Sim({ seed: 139, playerClass: 'paladin', autoEquip: true });
+    control.setPlayerLevel(20);
+    control.setSpec('holy');
+    const controlAllyId = control.addPlayer('priest', 'Solar Healed Ally');
+    const controlAlly = control.entities.get(controlAllyId);
+    if (!controlAlly) throw new Error('missing control ally');
+    controlAlly.pos.x = control.player.pos.x + 20;
+    control.rebucket(controlAlly);
+    controlAlly.hp = 1;
+    const controlEnemy = hostileNear(control);
+    controlEnemy.pos.x = controlAlly.pos.x + 3;
+    controlEnemy.pos.z = controlAlly.pos.z;
+    control.rebucket(controlEnemy);
+    grantDevotion(control.player, 20);
+    expect(activateDivineAscension(control.player)).toBe(true);
+    expect(JSON.stringify(control.ctx.rng)).toBe(rngBefore);
+    run(control, controlAlly, withoutSplash);
+    expect(JSON.stringify(control.ctx.rng)).toBe(rngAfter);
+  });
+
   it('stacks Devotion Aura by source in the real damage pipeline', () => {
     const sim = new Sim({ seed: 137, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);

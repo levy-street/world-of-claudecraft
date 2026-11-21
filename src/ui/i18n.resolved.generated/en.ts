@@ -17936,7 +17936,7 @@ export const en: EnTranslations = {
       },
       "solar_invocation": {
         "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much, and a damaging cast also deals half as much damage to enemies within 10 m of the target, reduced beyond 5 targets."
       },
       "radiant_devotion": {
         "name": "Radiant Devotion",

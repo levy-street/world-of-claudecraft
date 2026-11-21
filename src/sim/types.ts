@@ -4112,6 +4112,9 @@ export type AbilityEffect =
       radius: number;
       /** Detonate around the selected enemy instead of the caster or ground aim. */
       centerOnTarget?: boolean;
+      /** Only when the cast's target is hostile: a dual-purpose spell's
+       * damaging half (Ascension Solar Invocation), skipped on a healing cast. */
+      hostileTargetOnly?: boolean;
       // The blast can critically strike: ONE crit decision per CAST (a single
       // rng draw once at least one target is struck; fireGuaranteedCrit
       // overrides the outcome), applied to every struck enemy together, and

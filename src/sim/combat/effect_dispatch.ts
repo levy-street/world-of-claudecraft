@@ -2497,6 +2497,9 @@ export function runEffects(
         break;
       }
       case 'aoeDamage': {
+        // A dual-purpose spell's damaging splash: skipped, before any rng
+        // draw, when the cast healed an ally instead.
+        if (eff.hostileTargetOnly && !ascensionFxTargetHostile) break;
         if (ability.id === 'bastion_sweep' && !deferredBastionImpact) {
           const castFacing = p.facing;
           ctx.emit({
@@ -2528,8 +2531,13 @@ export function runEffects(
         }
         // Ground-targeted casts blast where they were aimed; others detonate on
         // the caster. The fx follows the same center (a world-anchored burst for
-        // an aimed blast, the entity-anchored nova otherwise).
-        const aoeCenter = (eff.centerOnTarget ? target?.pos : null) ?? p.castAim ?? p.pos;
+        // an aimed blast, the entity-anchored nova otherwise). A target-centred
+        // blast stays on the cast's own target even when an earlier effect of
+        // the same cast killed it (and nulled `target`): Ascension Solar
+        // Invocation's splash spreads from where its direct hit dropped the
+        // enemy, never from the caster.
+        const aoeAnchor = eff.centerOnTarget ? (target ?? initialTarget) : null;
+        const aoeCenter = aoeAnchor?.pos ?? p.castAim ?? p.pos;
         if (ability.id === 'corpse_explosion' && !sacrificeDominionForCorpseExplosion(ctx, p)) {
           break;
         }
@@ -2570,7 +2578,7 @@ export function runEffects(
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,
-            targetId: eff.centerOnTarget && target ? target.id : p.id,
+            targetId: aoeAnchor ? aoeAnchor.id : p.id,
             school: ability.school,
             fx: 'nova',
             ability: ability.id,
