@@ -234,7 +234,7 @@ function freshState(difficulty: FinalDifficulty): FinalFightState {
     switches: 0,
     bursts: 0,
     unbound: 0,
-    unboundTimer: T.unboundEvery,
+    unboundTimer: T.unboundDelay,
     bar: null,
     gap: 0,
     kit: freshKit(),

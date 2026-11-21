@@ -160,7 +160,7 @@ describe('the Masterless Strength over the wire', () => {
       p.prevPos = { ...p.pos };
       sim.ctx.rebucket(p);
     }
-    run(2.2);
+    run(4.2); // past unboundDelay (3 s)
     expect(aura(boss(), FINAL_AURAS.unbound)?.stacks ?? 0).toBeGreaterThanOrEqual(1);
   });
 });

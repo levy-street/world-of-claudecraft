@@ -29,6 +29,7 @@
 import { HEART_QUARTERS } from '../../content/smith_heart_quarters';
 import { DT, type Entity } from '../../types';
 import { clearCastIf } from '../sunken_bastion/claim';
+import { ELEMENT_AURAS } from './final_elements_ids';
 import {
   anvilShare,
   FINAL_AURAS,
@@ -41,6 +42,7 @@ import {
 } from './final_ids';
 import {
   at,
+  auraOf,
   beginBar,
   cueAt,
   cueOn,
@@ -117,6 +119,15 @@ function orbitSpot(s: FinalScope, angle: number): FPoint {
   return onFloor({ x: b.x + Math.sin(angle) * r, z: b.z + Math.cos(angle) * r }, T.anvilR);
 }
 
+/** The players carrying a Magma Rift mark right now. */
+function riftCarriers(s: FinalScope): Set<number> {
+  const out = new Set<number>();
+  for (const p of livePlayers(s)) {
+    if (auraOf(p, ELEMENT_AURAS.magmaMark) !== undefined) out.add(p.id);
+  }
+  return out;
+}
+
 /** Begin Weight of the Anvil on a hashed player's spot (or `forced`).
  *  Exported for the dev trigger. */
 export function startAnvil(s: FinalScope, forced?: FPoint, forcedOn?: Entity): boolean {
@@ -125,7 +136,9 @@ export function startAnvil(s: FinalScope, forced?: FPoint, forcedOn?: Entity): b
   let aim: FPoint | null = forced ?? null;
   let victim: Entity | null = forcedOn ?? null;
   if (!aim) {
-    [victim] = pickPlayers(s, 1, st.casts + 1001);
+    // Never a Magma Rift carrier: they must run off, not lead the stack
+    // (Jose's playtest call of 2026-11-21).
+    [victim] = pickPlayers(s, 1, st.casts + 1001, riftCarriers(s));
     if (!victim) return false;
     aim = at(s, victim);
   }
@@ -218,7 +231,11 @@ export function landAnvil(s: FinalScope): Entity[] {
   dropFightObject(s.ctx, s.inst, a.objectId);
   dropAnvilMark(s, a.targetId);
   cueAt(s, FINAL_CUES.anvil, a.x, a.z, T.anvilR, 'physical');
+  // A Magma Rift carrier is never struck by the Anvil nor counted in its
+  // split: they cannot soak, so the stack is never asked of them.
+  const rift = riftCarriers(s);
   const under = livePlayers(s).filter((p) => {
+    if (rift.has(p.id)) return false;
     const q = at(s, p);
     return Math.hypot(q.x - a.x, q.z - a.z) <= T.anvilR;
   });

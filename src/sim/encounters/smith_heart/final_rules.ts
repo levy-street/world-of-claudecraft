@@ -232,9 +232,12 @@ export function stepUnbound(s: FinalScope): void {
     st.phase.stage !== 'fight' ||
     st.phase.unboundGrace > 0
   ) {
+    // Out of the ring the first stack waits `unboundDelay` again: a boss
+    // that only brushes or quickly crosses the centre is not punished
+    // (Jose's playtest call of 2026-11-21).
+    st.unboundTimer = T.unboundDelay;
     if (st.unbound > 0 || auraOf(b, FINAL_AURAS.unbound)) {
       st.unbound = 0;
-      st.unboundTimer = 0;
       dropAura(b, FINAL_AURAS.unbound);
     }
     return;

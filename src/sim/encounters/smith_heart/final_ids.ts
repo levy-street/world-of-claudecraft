@@ -600,6 +600,9 @@ export const FINAL_TUNING = {
   /** Heart Unbound: in the central ring above the final phase, a stack every
    *  second and a raid pulse of `unboundPerStack` a stack every second. */
   unboundEvery: 1,
+  /** The first stack lands this long after the boss enters the ring (a
+   *  quick crossing or a brush with the edge costs nothing). */
+  unboundDelay: 3,
   unboundPerStack: 45,
   unboundMax: 20,
   /** A quarter's kit begins this long after the boss enters it. */

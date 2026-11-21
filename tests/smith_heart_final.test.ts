@@ -14,6 +14,7 @@ import {
   heartQuarterAt,
   heartQuarterSpot,
 } from '../src/sim/content/smith_heart_quarters';
+import { ELEMENT_AURAS } from '../src/sim/encounters/smith_heart/final_elements_ids';
 import {
   anvilShare,
   FINAL_AURAS,
@@ -262,13 +263,17 @@ describe('the quarter rules', () => {
     expect(f.state()?.switches).toBe(2);
   });
 
-  it('in the central ring it grows Heart Unbound, a stack a second, harder each pulse', () => {
+  it('in the central ring it grows Heart Unbound after a 3 s grace, a stack a second, harder each pulse', () => {
     const f = finalFight(5);
     f.pullIn('heat');
     f.dev('/dev heart final quarter ring');
     // The tank holds it in the ring.
     f.gather(188, 172, 4);
-    const ev = f.tick(sec(4.1));
+    // The first stack waits unboundDelay (3 s): a quick crossing is free.
+    const early = f.tick(sec(2.9));
+    expect(hits(early, FINAL_NAMES.unbound).length).toBe(0);
+    expect(aura(f.boss(), FINAL_AURAS.unbound)).toBeUndefined();
+    const ev = f.tick(sec(3.2));
     const st = f.state();
     expect(st?.zone).toBe('ring');
     expect(st?.unbound).toBe(4);
@@ -594,6 +599,29 @@ describe('the Hammer quarter', () => {
     f.put(f.players[3], c.x - 20, c.z - 3);
     const miss = hits(f.tick(sec(T.anvilLock + 0.1)), FINAL_NAMES.anvil);
     expect(miss.length).toBe(5);
+  });
+
+  it('Weight of the Anvil never strikes or counts a Magma Rift carrier (playtest 2026-11-21)', () => {
+    const f = finalFight(5);
+    f.pullIn('hammer');
+    const c = heartQuarterSpot('hammer');
+    f.put(f.players[1], c.x + 10, c.z);
+    f.dev('/dev heart final anvil', f.pids[1]);
+    f.put(f.players[2], c.x + 10, c.z + 1);
+    f.put(f.players[3], c.x + 10, c.z - 1);
+    const template = aura(f.players[1], FINAL_AURAS.anvilMark);
+    if (!template) throw new Error('anvil mark');
+    f.players[2].auras.push({
+      ...template,
+      id: ELEMENT_AURAS.magmaMark,
+      remaining: 60,
+      duration: 60,
+    });
+    const ev = f.tick(sec(T.anvilCast + 0.1));
+    const shared = hits(ev, FINAL_NAMES.anvil);
+    expect(new Set(shared.map((d) => d.targetId))).toEqual(new Set([f.pids[1], f.pids[3]]));
+    // The split is between the two real soakers only.
+    expect(shared[0].amount).toBeGreaterThan(FINAL_DIFFICULTY.normal.anvilTotal / 3);
   });
 
   it("Weight of the Anvil's circle follows its player through the bar, then plants (playtest 2026-11-19)", () => {
