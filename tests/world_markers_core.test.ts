@@ -1,9 +1,9 @@
 // @vitest-environment happy-dom
 // The raid's world markers on the floor: the pure core (src/render/world_markers_core.ts:
-// slot folding, the floor drape, pulse, bob, distance scale, the tier look) and the
-// pooled Three layer (src/render/world_markers.ts: eight slots built up front, a mark
-// shows, moves and hides its own slot, an idle frame does nothing, every tier draws
-// the circle and the symbol).
+// slot folding, the floor drape, pulse, flare flicker, bob, lift, the screen-size band,
+// the tier look) and the pooled Three layer (src/render/world_markers.ts: eight slots
+// built up front, a mark shows, moves and hides its own slot, an idle frame does
+// nothing, every tier draws the circle and the symbol at the same size and height).
 
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
@@ -18,6 +18,7 @@ import { WorldMarkerLayer, worldMarkerPrewarmEntry } from '../src/render/world_m
 import {
   createWorldMarkerSlots,
   syncWorldMarkerSlots,
+  WORLD_MARKER_BEAM_HEIGHT,
   WORLD_MARKER_COLORS,
   WORLD_MARKER_COUNT,
   WORLD_MARKER_DRAPE_REACH,
@@ -26,11 +27,16 @@ import {
   WORLD_MARKER_RADIUS,
   WORLD_MARKER_RINGS,
   WORLD_MARKER_SEGMENTS,
+  WORLD_MARKER_SYMBOL_BOB,
+  WORLD_MARKER_SYMBOL_GLOW_SCALE,
   WORLD_MARKER_SYMBOL_LIFT,
+  WORLD_MARKER_SYMBOL_SCREEN_MAX,
+  WORLD_MARKER_SYMBOL_SCREEN_MIN,
+  WORLD_MARKER_SYMBOL_SIZE_NEAR,
   WORLD_MARKER_VERTS,
   WorldMarkerChange,
-  worldMarkerCss,
   worldMarkerDiscIndex,
+  worldMarkerFlare,
   worldMarkerLook,
   worldMarkerPulse,
   worldMarkerSymbolLift,
@@ -46,8 +52,6 @@ describe('world markers core: the eight slots', () => {
     expect(WORLD_MARKER_COLORS).toEqual([
       0xffe23a, 0xff8a2a, 0xd24bff, 0x37d72c, 0xcfe6ff, 0x23b5ff, 0xff3b30, 0xf4f4f4,
     ]);
-    expect(worldMarkerCss(6, 0.5)).toBe('rgba(255, 59, 48, 0.5)');
-    expect(worldMarkerCss(0, 2)).toBe('rgba(255, 226, 58, 1)');
   });
 
   it('shows, moves, keeps and hides a slot per symbol', () => {
@@ -124,28 +128,86 @@ describe('world markers core: the floor drape', () => {
 });
 
 describe('world markers core: motion, scale and tiers', () => {
+  const samples = (f: (t: number) => number) => Array.from({ length: 400 }, (_, i) => f(i * 0.037));
+
   it('pulses softly, out of step per symbol, and holds still under reduced motion', () => {
-    const values = Array.from({ length: 40 }, (_, i) => worldMarkerPulse(i * 0.1, 2, false));
+    const values = samples((t) => worldMarkerPulse(t, 2, false));
     expect(Math.min(...values)).toBeGreaterThanOrEqual(0.82 - 1e-9);
     expect(Math.max(...values)).toBeLessThanOrEqual(1 + 1e-9);
     expect(worldMarkerPulse(0.3, 0, false)).not.toBeCloseTo(worldMarkerPulse(0.3, 4, false), 3);
     expect(worldMarkerPulse(0.3, 0, true)).toBe(1);
+  });
+
+  it('flickers the flare between 0.86 and 1, out of step per symbol, steady under reduced motion', () => {
+    const values = samples((t) => worldMarkerFlare(t, 5, false));
+    expect(Math.min(...values)).toBeGreaterThanOrEqual(0.86 - 1e-9);
+    expect(Math.max(...values)).toBeLessThanOrEqual(1 + 1e-9);
+    // It really moves (a flare, not a steady lamp) and quicker than the pulse.
+    expect(Math.max(...values) - Math.min(...values)).toBeGreaterThan(0.08);
+    expect(worldMarkerFlare(0, 0, false)).toBeCloseTo(0.93, 9);
+    expect(worldMarkerFlare(0.4, 0, false)).not.toBeCloseTo(worldMarkerFlare(0.4, 3, false), 3);
+    expect(worldMarkerFlare(1.3, 6, true)).toBe(1);
+  });
+
+  it('floats the symbol over a tall head, bobbing gently, and holds still under reduced motion', () => {
+    expect(WORLD_MARKER_SYMBOL_LIFT).toBe(3.2);
+    expect(WORLD_MARKER_SYMBOL_BOB).toBe(0.14);
     expect(worldMarkerSymbolLift(1.7, 3, true)).toBe(WORLD_MARKER_SYMBOL_LIFT);
-    expect(Math.abs(worldMarkerSymbolLift(1.7, 3, false) - WORLD_MARKER_SYMBOL_LIFT)).toBeLessThan(
-      0.1,
+    const lifts = samples((t) => worldMarkerSymbolLift(t, 3, false));
+    expect(Math.min(...lifts)).toBeGreaterThanOrEqual(WORLD_MARKER_SYMBOL_LIFT - 0.14 - 1e-9);
+    expect(Math.max(...lifts)).toBeLessThanOrEqual(WORLD_MARKER_SYMBOL_LIFT + 0.14 + 1e-9);
+    expect(Math.max(...lifts) - Math.min(...lifts)).toBeGreaterThan(0.2);
+    // A symbol grown with distance rises by 0.45 of its extra size; a smaller
+    // one (up close) keeps the base lift.
+    expect(worldMarkerSymbolLift(0, 0, true, WORLD_MARKER_SYMBOL_SIZE_NEAR + 2)).toBeCloseTo(
+      WORLD_MARKER_SYMBOL_LIFT + 0.9,
+      9,
     );
+    expect(worldMarkerSymbolLift(0, 0, true, 0.6)).toBe(WORLD_MARKER_SYMBOL_LIFT);
+    expect(worldMarkerSymbolLift(0, 0, true, Number.NaN)).toBe(WORLD_MARKER_SYMBOL_LIFT);
+    // The symbol floats inside the beam, under its top.
+    expect(WORLD_MARKER_SYMBOL_LIFT).toBeLessThan(WORLD_MARKER_BEAM_HEIGHT);
   });
 
-  it('grows the symbol with distance so it stays readable, within a clamp', () => {
-    expect(worldMarkerSymbolSize(0)).toBeCloseTo(1.2, 6);
-    expect(worldMarkerSymbolSize(60)).toBeGreaterThan(worldMarkerSymbolSize(20));
-    expect(worldMarkerSymbolSize(10000)).toBe(3.4);
-    expect(worldMarkerSymbolSize(Number.NaN)).toBeCloseTo(1.2, 6);
+  it('holds the symbol inside a screen-size band: never huge up close, never tiny far off', () => {
+    expect(WORLD_MARKER_SYMBOL_SIZE_NEAR).toBe(1.75);
+    expect(WORLD_MARKER_SYMBOL_SCREEN_MIN).toBe(0.0635);
+    expect(WORLD_MARKER_SYMBOL_SCREEN_MAX).toBe(0.15);
+    expect(WORLD_MARKER_SYMBOL_GLOW_SCALE).toBe(2.1);
+    // The near size holds at a middling camera distance.
+    expect(worldMarkerSymbolSize(15)).toBe(1.75);
+    expect(worldMarkerSymbolSize(25)).toBe(1.75);
+    // Up close it shrinks with distance (screen cap), far off it grows (screen floor).
+    expect(worldMarkerSymbolSize(6)).toBeCloseTo(0.9, 9);
+    expect(worldMarkerSymbolSize(80)).toBeCloseTo(5.08, 9);
+    expect(worldMarkerSymbolSize(Number.NaN)).toBe(0.45);
+    expect(worldMarkerSymbolSize(0)).toBe(0.45);
+    // On a 60 degree camera the screen's height at d is 2 d tan(30): the share
+    // of the screen the symbol fills stays between about 5% and 13%.
+    const screen = (d: number) => worldMarkerSymbolSize(d) / (2 * d * Math.tan(Math.PI / 6));
+    for (let d = 4; d <= 250; d += 1.5) {
+      expect(screen(d)).toBeGreaterThanOrEqual(0.054);
+      expect(screen(d)).toBeLessThanOrEqual(0.131);
+    }
+    // Bigger than the circle-era symbol (1.2 yards) at a normal camera distance.
+    expect(worldMarkerSymbolSize(15)).toBeGreaterThan(1.2 * 1.4);
   });
 
-  it('a low tier sheds only the glow, the column and the runes', () => {
-    expect(worldMarkerLook(false)).toEqual({ glow: true, runes: true, column: true });
-    expect(worldMarkerLook(true)).toEqual({ glow: false, runes: false, column: false });
+  it('a low tier sheds only cosmetic light, never the circle or the symbol', () => {
+    expect(worldMarkerLook(false)).toEqual({
+      glow: true,
+      runes: true,
+      beam: true,
+      motes: true,
+      symbolGlow: 1,
+    });
+    expect(worldMarkerLook(true)).toEqual({
+      glow: false,
+      runes: false,
+      beam: false,
+      motes: false,
+      symbolGlow: 0.5,
+    });
   });
 });
 
@@ -165,7 +227,9 @@ describe('world markers layer (Three)', () => {
     const { scene, l, camera } = layer(false);
     expect(named(scene, 'world-marker-disc-')).toHaveLength(8);
     expect(named(scene, 'world-marker-symbol-')).toHaveLength(8);
-    expect(named(scene, 'world-marker-column-')).toHaveLength(8);
+    expect(named(scene, 'world-marker-pool-')).toHaveLength(8);
+    expect(named(scene, 'world-marker-beam-')).toHaveLength(8);
+    expect(named(scene, 'world-marker-glow-')).toHaveLength(8);
     expect(named(scene, 'world-marker-').every((c) => !c.visible)).toBe(true);
     const before = scene.getObjectByName('world-markers')?.children.length;
     l.update([mark(7, 1, 2, 3), mark(0, -4, 2, 6)], camera, 0, false);
@@ -180,8 +244,24 @@ describe('world markers layer (Three)', () => {
     const sprite = scene.getObjectByName('world-marker-symbol-7') as THREE.Sprite;
     expect(disc.visible).toBe(true);
     expect(sprite.visible).toBe(true);
-    expect(sprite.position.y).toBeGreaterThan(2 + 1.5);
+    // Clearly over a tall head, on its glow, inside its beam.
+    expect(sprite.position.y).toBeGreaterThan(2 + 3);
     expect(sprite.position.x).toBe(1);
+    const glow = scene.getObjectByName('world-marker-glow-7') as THREE.Sprite;
+    expect(glow.visible).toBe(true);
+    expect(glow.position.equals(sprite.position)).toBe(true);
+    expect(glow.scale.x).toBeCloseTo(sprite.scale.x * WORLD_MARKER_SYMBOL_GLOW_SCALE, 9);
+    // Same position, so three breaks the transparent sort tie by id: the glow
+    // must be the older object so it paints first, under the symbol.
+    expect(glow.id).toBeLessThan(sprite.id);
+    const beam = scene.getObjectByName('world-marker-beam-7') as THREE.Mesh;
+    expect(beam.visible).toBe(true);
+    expect([beam.position.x, beam.position.y, beam.position.z]).toEqual([1, 2, 3]);
+    const pool = scene.getObjectByName('world-marker-pool-7') as THREE.Mesh;
+    expect(pool.visible).toBe(true);
+    // The pool rides the disc's own drape, one ground rung over it.
+    expect(pool.geometry).toBe(disc.geometry);
+    expect(pool.renderOrder).toBe(disc.renderOrder + 1);
     const drapes = floor.mock.calls.length;
     expect(drapes).toBe(WORLD_MARKER_VERTS);
     l.update([mark(7, 1, 2, 3)], camera, 0.5, false);
@@ -191,15 +271,29 @@ describe('world markers layer (Three)', () => {
     l.update([], camera, 1.5, false);
     expect(disc.visible).toBe(false);
     expect(sprite.visible).toBe(false);
+    expect(glow.visible).toBe(false);
+    expect(beam.visible).toBe(false);
+    expect(pool.visible).toBe(false);
     expect(l.shown).toBe(0);
   });
 
-  it('a low tier still draws the circle and the symbol, without the column', () => {
+  it('a low tier still draws the circle and the symbol (same size, same height), without the beam', () => {
     const { scene, l, camera } = layer(true);
-    expect(named(scene, 'world-marker-column-')).toHaveLength(0);
+    expect(named(scene, 'world-marker-beam-')).toHaveLength(0);
+    expect(named(scene, 'world-marker-pool-')).toHaveLength(0);
     l.update([mark(3, 0, 0, 0)], camera, 0, false);
     expect(scene.getObjectByName('world-marker-disc-3')?.visible).toBe(true);
-    expect(scene.getObjectByName('world-marker-symbol-3')?.visible).toBe(true);
+    const lowSprite = scene.getObjectByName('world-marker-symbol-3') as THREE.Sprite;
+    expect(lowSprite.visible).toBe(true);
+    expect(scene.getObjectByName('world-marker-glow-3')?.visible).toBe(true);
+    const high = layer(false);
+    high.l.update([mark(3, 0, 0, 0)], high.camera, 0, false);
+    const highSprite = high.scene.getObjectByName('world-marker-symbol-3') as THREE.Sprite;
+    expect(lowSprite.position.equals(highSprite.position)).toBe(true);
+    expect(lowSprite.scale.equals(highSprite.scale)).toBe(true);
+    const lowGlow = (scene.getObjectByName('world-marker-glow-3') as THREE.Sprite).material;
+    const highGlow = (high.scene.getObjectByName('world-marker-glow-3') as THREE.Sprite).material;
+    expect(lowGlow.opacity).toBeCloseTo(highGlow.opacity * 0.5, 9);
     const mat = (scene.getObjectByName('world-marker-disc-3') as THREE.Mesh)
       .material as THREE.ShaderMaterial;
     expect(mat.uniforms.uGlow.value).toBe(0);
@@ -216,11 +310,46 @@ describe('world markers layer (Three)', () => {
     expect(far).toBeGreaterThan(near);
   });
 
+  it('flickers the beacon each frame and lays every light piece additively, without depth writes', () => {
+    const { scene, l, camera } = layer(false);
+    const beam = scene.getObjectByName('world-marker-beam-4') as THREE.Mesh;
+    const pool = scene.getObjectByName('world-marker-pool-4') as THREE.Mesh;
+    const glow = scene.getObjectByName('world-marker-glow-4') as THREE.Sprite;
+    for (const piece of [beam, pool, glow]) {
+      const m = piece.material as THREE.Material;
+      expect(m.blending).toBe(THREE.AdditiveBlending);
+      expect(m.depthWrite).toBe(false);
+    }
+    const beamMat = beam.material as THREE.ShaderMaterial;
+    const poolMat = pool.material as THREE.ShaderMaterial;
+    for (const t of [0.2, 0.55, 1.1]) {
+      l.update([mark(4, 0, 0, 0)], camera, t, false);
+      expect(beamMat.uniforms.uFlare.value).toBe(worldMarkerFlare(t, 4, false));
+      expect(poolMat.uniforms.uFlare.value).toBe(worldMarkerFlare(t, 4, false));
+      expect(beamMat.uniforms.uTime.value).toBe(t);
+      expect(glow.material.opacity).toBeCloseTo(0.85 * worldMarkerFlare(t, 4, false), 9);
+    }
+    // Reduced motion: a steady beacon and a frozen beam.
+    l.update([mark(4, 0, 0, 0)], camera, 2.4, true);
+    expect(beamMat.uniforms.uFlare.value).toBe(1);
+    expect(beamMat.uniforms.uTime.value).toBe(0);
+    // The floor pool stays in the ground band, under every player effect and
+    // every boss telegraph (the player band starts at 10).
+    expect(pool.renderOrder).toBeLessThan(10);
+  });
+
+  it('a low tier stages only what it draws: disc, glow and symbol per slot', () => {
+    const { l } = layer(true);
+    expect(l.prewarmRoot().children).toHaveLength(24);
+    expect(l.prewarmTextures()).toHaveLength(9);
+  });
+
   it('has a prewarm home: a visible staged twin of every piece, and every symbol texture', async () => {
     const { l } = layer(false);
     const root = l.prewarmRoot();
     expect(root.parent).toBeNull();
-    expect(root.children).toHaveLength(24);
+    // Disc, pool, beam, glow and symbol for each of the eight slots.
+    expect(root.children).toHaveLength(40);
     expect(root.children.every((c) => c.visible)).toBe(true);
     const live = new Set<THREE.Material>();
     l.group.traverse((o) => {
@@ -229,7 +358,8 @@ describe('world markers layer (Three)', () => {
     });
     const staged = new Set(root.children.map((o) => (o as THREE.Mesh).material as THREE.Material));
     expect(staged).toEqual(live);
-    expect(l.prewarmTextures()).toHaveLength(8);
+    // The eight symbols plus the one glow they share.
+    expect(l.prewarmTextures()).toHaveLength(9);
     const uploaded: THREE.Texture[] = [];
     const compiled: THREE.Object3D[] = [];
     const entry = worldMarkerPrewarmEntry(l, {
@@ -240,9 +370,9 @@ describe('world markers layer (Three)', () => {
     });
     expect(entry.id).toBe('vfx.world-markers');
     await entry.run();
-    expect(uploaded).toHaveLength(8);
+    expect(uploaded).toHaveLength(9);
     expect(compiled).toEqual([root]);
-    expect(entry.resumeUnits()).toHaveLength(8);
+    expect(entry.resumeUnits()).toHaveLength(9);
     expect(entry.resumeProgramUnits()).toHaveLength(1);
     // A dropped entry's program links resume as debt, never as cosmetic work.
     expect(prewarmResumeIsDebt(`programs.${entry.id}`)).toBe(true);

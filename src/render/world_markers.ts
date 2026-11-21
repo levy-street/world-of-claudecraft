@@ -1,17 +1,22 @@
 // The raid's world markers drawn on the floor (the Three half; every decision
 // is in world_markers_core.ts). One pooled slot per symbol, all built up front
 // at renderer construction and parked hidden in the scene; their programs and
-// symbol textures are warmed by the `vfx.world-markers` prewarm manifest entry
+// textures are warmed by the `vfx.world-markers` prewarm manifest entry
 // (worldMarkerPrewarmEntry below: a staged visible twin of every piece, since
 // a compile walks only visible objects), so the first mark a raid leader drops
-// links nothing and uploads nothing in a live frame: a glowing circle
-// draped over the floor in the marker's colour (fill, rim, keyline, inner
-// ring and a turning rune band, all procedural in one shader), a soft light
-// column, and the marker's own symbol (the target-marker sprite) floating
-// over it, billboarded and scaled with distance so it reads from across a
-// room and from a low camera. No lights, no per-frame allocation: a frame
-// with no marks returns after one fold, a frame with marks writes a few
-// uniforms and sprite transforms.
+// links nothing and uploads nothing in a live frame.
+//
+// Each mark reads as a flare, a beacon of its colour seen from across a room:
+// a glowing circle draped over the floor (fill, rim, keyline, inner ring and a
+// turning rune band, all procedural in one shader), an additive pool of light
+// on the same drape, a soft beam of light rising from the circle (brightest at
+// the floor, fading upward, wavering like a lit flare, with motes of light
+// rising inside it), and the marker's own symbol (the target-marker sprite)
+// floating well over a tall character's head on a soft additive glow,
+// billboarded and held inside a screen-size band so it reads from across a
+// room and from a low camera without ballooning up close. No lights, no
+// per-frame allocation: a frame with no marks returns after one fold, a frame
+// with marks writes a few uniforms and sprite transforms.
 //
 // Reads IWorld.sharedMapMarks only (presentation; the sim owns the marks).
 
@@ -24,16 +29,21 @@ import { setRenderCategory } from './renderer_diagnostics';
 import {
   createWorldMarkerSlots,
   syncWorldMarkerSlots,
+  WORLD_MARKER_BEAM_HEIGHT,
+  WORLD_MARKER_BEAM_RADIUS_BOTTOM,
+  WORLD_MARKER_BEAM_RADIUS_TOP,
   WORLD_MARKER_COLORS,
   WORLD_MARKER_COUNT,
   WORLD_MARKER_RADIUS,
+  WORLD_MARKER_SYMBOL_GLOW_SCALE,
+  WORLD_MARKER_SYMBOL_LIFT,
   WORLD_MARKER_VERTS,
   WorldMarkerChange,
   type WorldMarkerFloor,
   type WorldMarkerLook,
   type WorldMarkerMark,
-  worldMarkerCss,
   worldMarkerDiscIndex,
+  worldMarkerFlare,
   worldMarkerLook,
   worldMarkerPulse,
   worldMarkerSymbolLift,
@@ -93,41 +103,110 @@ const DISC_FRAGMENT = `
   }
 `;
 
-const COLUMN_VERTEX = `
-  varying vec2 vUv;
-  void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-// A soft shaft of the marker's light from the floor to the symbol: brightest
-// at the floor, fading up and to both edges. Additive, so it only brightens.
-const COLUMN_FRAGMENT = `
+// The floor light pool on the circle's own drape: an additive bowl of the
+// marker's light, hottest at the centre with a lift along the rim, so the
+// floor under a flare looks lit. Wavers with the flare.
+const POOL_FRAGMENT = `
   uniform vec3 uColor;
-  uniform float uPulse;
-  varying vec2 vUv;
+  uniform float uFlare;
+  varying vec2 vLocal;
   void main() {
-    float edge = 1.0 - abs(vUv.x * 2.0 - 1.0);
-    float a = pow(edge, 2.2) * pow(1.0 - vUv.y, 1.7) * 0.55 * uPulse;
+    float r = length(vLocal);
+    if (r > 1.32) discard;
+    float core = pow(1.0 - smoothstep(0.0, 1.3, r), 1.35);
+    float d = (r - 0.95) / 0.13;
+    float rim = exp(-d * d);
+    float a = (core * 0.42 + rim * 0.18) * uFlare;
     if (a < 0.003) discard;
-    gl_FragColor = vec4(uColor * a, 1.0);
+    gl_FragColor = vec4(mix(uColor, vec3(1.0), core * 0.12), a);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
 `;
 
-const COLUMN_WIDTH = 0.62;
-const COLUMN_HEIGHT = 2.05;
-const SYMBOL_PX = 192;
+const BEAM_VERTEX = `
+  varying vec2 vUv;
+  varying float vFacing;
+  varying float vDepth;
+  void main() {
+    vUv = uv;
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vec3 n = normalize(normalMatrix * normal);
+    vFacing = abs(dot(n, normalize(-mv.xyz)));
+    vDepth = -mv.z;
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+// The beacon's beam: an open cylinder of the marker's light, both faces
+// additive, so it reads as a volume (thicker through the middle, fading to
+// nothing at the silhouette, so no hard tube edge). Brightest at the floor and fading upward, with slow vertical
+// streaks, a band of light running up it and (where the tier keeps them)
+// motes of light rising inside. It fades out close to the camera, so a
+// camera pulled into a beam is not filled with its colour. uTime is the layer's shared clock (held at 0
+// under reduced motion), uPhase spreads the eight beams apart.
+const BEAM_FRAGMENT = `
+  uniform vec3 uColor;
+  uniform float uFlare;
+  uniform float uTime;
+  uniform float uPhase;
+  uniform float uMotes;
+  uniform float uHeight;
+  varying vec2 vUv;
+  varying float vFacing;
+  varying float vDepth;
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+  }
+  void main() {
+    float h = vUv.y;
+    // Rises out of the floor pool (no hard ring where it meets the floor).
+    float fall = pow(1.0 - h, 1.7) * (0.55 + 0.45 * smoothstep(0.0, 0.06, h));
+    float body = pow(vFacing, 1.6);
+    float ang = vUv.x * 6.2831853;
+    float s = 0.5 + 0.5 * sin(ang * 7.0 + sin(h * 4.0 - uTime * 0.9 + uPhase) * 1.7);
+    float streak = 0.72 + 0.56 * s * s * s;
+    float run = 0.86 + 0.14 * sin(h * 9.0 - uTime * 2.4 + uPhase);
+    float a = fall * body * streak * run * 0.46;
+    // Motes: a sparse grid in yards round the beam, scrolling up.
+    vec2 cs = vec2(0.62, 0.95);
+    vec2 p = vec2(vUv.x * 7.0, h * uHeight - uTime * 0.7 - uPhase);
+    vec2 cell = floor(p / cs);
+    vec2 f = p - cell * cs;
+    vec2 c = cs * (0.25 + 0.5 * vec2(hash(cell), hash(cell + 3.7)));
+    float dm = length(f - c);
+    float twinkle = 0.6 + 0.4 * sin(uTime * 5.0 + hash(cell + 9.1) * 40.0);
+    float mote = (1.0 - smoothstep(0.025, 0.075, dm)) * step(0.55, hash(cell + 1.3));
+    a += mote * twinkle * (1.0 - h) * 0.9 * uMotes;
+    // A camera standing in the beam never sees a wall of colour.
+    a *= uFlare * smoothstep(1.5, 4.5, vDepth);
+    if (a < 0.003) discard;
+    gl_FragColor = vec4(mix(uColor, vec3(1.0), fall * 0.1), min(a, 1.0));
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+  }
+`;
+
+/** The symbol's sprite canvas (px) and the art's share of it (1:1 with the
+ *  target-marker sprite's 128 px canvas; the rest is the drop shadow's room). */
+const SYMBOL_PX = 160;
+const SYMBOL_ART = 0.8;
+const GLOW_PX = 128;
+const BEAM_SEGMENTS = 40;
 const RUNE_SPIN_PER_S = 0.32;
+/** The glow behind the symbol at full strength (opacity before the flicker). */
+const SYMBOL_GLOW_OPACITY = 0.85;
 
 interface MarkerPiece {
   disc: THREE.Mesh;
   discMat: THREE.ShaderMaterial;
   positions: THREE.BufferAttribute;
-  column: THREE.Mesh | null;
-  columnMat: THREE.ShaderMaterial | null;
+  pool: THREE.Mesh | null;
+  poolMat: THREE.ShaderMaterial | null;
+  beam: THREE.Mesh | null;
+  beamMat: THREE.ShaderMaterial | null;
+  glow: THREE.Sprite;
+  glowMat: THREE.SpriteMaterial;
   sprite: THREE.Sprite;
   spriteMat: THREE.SpriteMaterial;
   texture: THREE.CanvasTexture;
@@ -136,7 +215,7 @@ interface MarkerPiece {
 export interface WorldMarkerLayerOptions {
   /** The floor height at (x, z) for a body near refY (the sim's floor query). */
   floor: WorldMarkerFloor;
-  /** The static preset is the low tier (sheds the glow, column and runes). */
+  /** The static preset is the low tier (sheds the beam, pool, motes, runes and fill). */
   lowTier: boolean;
   /** The bloom-edge colour boost the selection rings use (1 on low). */
   boost: number;
@@ -149,64 +228,54 @@ export function worldMarkerSimFloor(seed: () => number): WorldMarkerFloor {
   return (x, z, refY) => floorHeightAt(seed(), x, z, 0, refY + SHARED_MAP_MARK_STEP_REACH);
 }
 
-/** The symbol's sprite art: the target-marker symbol, over a soft halo of its
- *  colour where the tier keeps the glow. Built once per symbol per layer. */
-function symbolCanvas(symbol: number, look: WorldMarkerLook): HTMLCanvasElement {
+/** The symbol's sprite art: the target-marker symbol over a soft dark drop
+ *  shadow, so a pale symbol still reads against its own bright beam. Built
+ *  once per symbol per layer; the same art on every tier. */
+function symbolCanvas(symbol: number): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = SYMBOL_PX;
   canvas.height = SYMBOL_PX;
   const ctx = canvas.getContext('2d');
   if (!ctx) return canvas;
-  const mid = SYMBOL_PX / 2;
-  if (look.column) {
-    const halo = ctx.createRadialGradient(mid, mid, SYMBOL_PX * 0.12, mid, mid, mid);
-    halo.addColorStop(0, worldMarkerCss(symbol, 0.55));
-    halo.addColorStop(0.55, worldMarkerCss(symbol, 0.18));
-    halo.addColorStop(1, worldMarkerCss(symbol, 0));
-    ctx.fillStyle = halo;
-    ctx.fillRect(0, 0, SYMBOL_PX, SYMBOL_PX);
-  }
-  const art = SYMBOL_PX * 0.66;
-  ctx.drawImage(raidMarkerSprite(symbol), mid - art / 2, mid - art / 2, art, art);
+  const art = SYMBOL_PX * SYMBOL_ART;
+  const at = (SYMBOL_PX - art) / 2;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  ctx.shadowBlur = SYMBOL_PX * 0.05;
+  ctx.shadowOffsetY = SYMBOL_PX * 0.012;
+  ctx.drawImage(raidMarkerSprite(symbol), at, at, art, art);
   return canvas;
 }
 
-/** Two crossed vertical quads, base on the floor (uv.y 0) and top at the symbol. */
-function columnGeometry(): THREE.BufferGeometry {
-  const w = COLUMN_WIDTH / 2;
-  const h = COLUMN_HEIGHT;
-  const geometry = new THREE.BufferGeometry();
-  // prettier-ignore
-  const pos = new Float32Array([
-    -w,
-    0,
-    0,
-    w,
-    0,
-    0,
-    w,
-    h,
-    0,
-    -w,
-    h,
-    0,
-    0,
-    0,
-    -w,
-    0,
-    0,
-    w,
-    0,
-    h,
-    w,
-    0,
-    h,
-    -w,
-  ]);
-  const uv = new Float32Array([0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1]);
-  geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-  geometry.setIndex([0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7]);
+/** The soft white glow the eight symbol glows share (tinted per material). */
+function glowCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = GLOW_PX;
+  canvas.height = GLOW_PX;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
+  const mid = GLOW_PX / 2;
+  const g = ctx.createRadialGradient(mid, mid, 0, mid, mid, mid);
+  g.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  g.addColorStop(0.22, 'rgba(255, 255, 255, 0.6)');
+  g.addColorStop(0.55, 'rgba(255, 255, 255, 0.16)');
+  g.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, GLOW_PX, GLOW_PX);
+  return canvas;
+}
+
+/** The beam: an open, slightly tapered cylinder, its base on the floor
+ *  (uv.y 0) and its top at the beam's height (uv.y 1). */
+function beamGeometry(): THREE.BufferGeometry {
+  const geometry = new THREE.CylinderGeometry(
+    WORLD_MARKER_BEAM_RADIUS_TOP,
+    WORLD_MARKER_BEAM_RADIUS_BOTTOM,
+    WORLD_MARKER_BEAM_HEIGHT,
+    BEAM_SEGMENTS,
+    1,
+    true,
+  );
+  geometry.translate(0, WORLD_MARKER_BEAM_HEIGHT / 2, 0);
   geometry.computeBoundingSphere();
   return geometry;
 }
@@ -219,7 +288,10 @@ export class WorldMarkerLayer {
   );
   private readonly pieces: MarkerPiece[] = [];
   private readonly index: THREE.BufferAttribute;
-  private readonly columnGeo: THREE.BufferGeometry | null;
+  private readonly beamGeo: THREE.BufferGeometry | null;
+  private readonly glowTexture: THREE.CanvasTexture;
+  /** One clock every beam reads (written once per frame). */
+  private readonly beamTime = { value: 0 };
   private readonly look: WorldMarkerLook;
   private shownCount = 0;
   private disposed = false;
@@ -232,7 +304,9 @@ export class WorldMarkerLayer {
     this.group.name = 'world-markers';
     this.look = worldMarkerLook(opts.lowTier);
     this.index = new THREE.BufferAttribute(worldMarkerDiscIndex(), 1);
-    this.columnGeo = this.look.column ? columnGeometry() : null;
+    this.beamGeo = this.look.beam ? beamGeometry() : null;
+    this.glowTexture = new THREE.CanvasTexture(glowCanvas());
+    this.glowTexture.colorSpace = THREE.SRGBColorSpace;
     for (let s = 0; s < WORLD_MARKER_COUNT; s++) this.pieces.push(this.buildPiece(s));
     setRenderCategory(this.group, 'ui3d');
     this.scene.add(this.group);
@@ -245,11 +319,12 @@ export class WorldMarkerLayer {
     positions.setUsage(THREE.DynamicDrawUsage);
     geometry.setAttribute('position', positions);
     geometry.setIndex(this.index);
+    const center = new THREE.Vector2();
     const discMat = new THREE.ShaderMaterial({
       vertexShader: DISC_VERTEX,
       fragmentShader: DISC_FRAGMENT,
       uniforms: {
-        uCenter: { value: new THREE.Vector2() },
+        uCenter: { value: center },
         uRadius: { value: WORLD_MARKER_RADIUS },
         uColor: { value: color },
         uPulse: { value: 1 },
@@ -273,26 +348,76 @@ export class WorldMarkerLayer {
     disc.visible = false;
     this.group.add(disc);
 
-    let column: THREE.Mesh | null = null;
-    let columnMat: THREE.ShaderMaterial | null = null;
-    if (this.columnGeo) {
-      columnMat = new THREE.ShaderMaterial({
-        vertexShader: COLUMN_VERTEX,
-        fragmentShader: COLUMN_FRAGMENT,
-        uniforms: { uColor: { value: color }, uPulse: { value: 1 } },
+    let pool: THREE.Mesh | null = null;
+    let poolMat: THREE.ShaderMaterial | null = null;
+    let beam: THREE.Mesh | null = null;
+    let beamMat: THREE.ShaderMaterial | null = null;
+    if (this.beamGeo) {
+      // The pool shares the disc's drape (and its centre), one rung over it.
+      poolMat = new THREE.ShaderMaterial({
+        vertexShader: DISC_VERTEX,
+        fragmentShader: POOL_FRAGMENT,
+        uniforms: {
+          uCenter: { value: center },
+          uRadius: { value: WORLD_MARKER_RADIUS },
+          uColor: { value: color },
+          uFlare: { value: 1 },
+        },
+        transparent: true,
+        forceSinglePass: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        polygonOffsetUnits: -2,
+        side: THREE.DoubleSide,
+      });
+      pool = new THREE.Mesh(geometry, poolMat);
+      pool.name = `world-marker-pool-${symbol}`;
+      pool.renderOrder = floorVfxRenderOrder('ground', 7);
+      pool.visible = false;
+      this.group.add(pool);
+
+      beamMat = new THREE.ShaderMaterial({
+        vertexShader: BEAM_VERTEX,
+        fragmentShader: BEAM_FRAGMENT,
+        uniforms: {
+          uColor: { value: color },
+          uFlare: { value: 1 },
+          uTime: this.beamTime,
+          uPhase: { value: symbol * 0.79 },
+          uMotes: { value: this.look.motes ? 1 : 0 },
+          uHeight: { value: WORLD_MARKER_BEAM_HEIGHT },
+        },
         transparent: true,
         forceSinglePass: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide,
       });
-      column = new THREE.Mesh(this.columnGeo, columnMat);
-      column.name = `world-marker-column-${symbol}`;
-      column.visible = false;
-      this.group.add(column);
+      beam = new THREE.Mesh(this.beamGeo, beamMat);
+      beam.name = `world-marker-beam-${symbol}`;
+      beam.visible = false;
+      this.group.add(beam);
     }
 
-    const texture = new THREE.CanvasTexture(symbolCanvas(symbol, this.look));
+    // The glow is built BEFORE the symbol: the two share a position (so a
+    // transparent sort ties on depth) and three breaks the tie by id, so the
+    // glow always lays its light first and the symbol paints over it crisp.
+    const glowMat = new THREE.SpriteMaterial({
+      map: this.glowTexture,
+      color,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      opacity: SYMBOL_GLOW_OPACITY * this.look.symbolGlow,
+    });
+    const glow = new THREE.Sprite(glowMat);
+    glow.name = `world-marker-glow-${symbol}`;
+    glow.visible = false;
+    this.group.add(glow);
+
+    const texture = new THREE.CanvasTexture(symbolCanvas(symbol));
     texture.colorSpace = THREE.SRGBColorSpace;
     const spriteMat = new THREE.SpriteMaterial({
       map: texture,
@@ -307,8 +432,12 @@ export class WorldMarkerLayer {
       disc,
       discMat,
       positions,
-      column,
-      columnMat,
+      pool,
+      poolMat,
+      beam,
+      beamMat,
+      glow,
+      glowMat,
       sprite,
       spriteMat,
       texture,
@@ -322,8 +451,9 @@ export class WorldMarkerLayer {
 
   /**
    * One frame: fold the live marks into the slots (a placed, moved or cleared
-   * mark re-drapes or hides its slot), then breathe the light and keep each
-   * symbol at a readable size for `camera`. `time` is the renderer clock.
+   * mark re-drapes or hides its slot), then breathe the circle, flicker the
+   * flare and keep each symbol at a readable size and height for `camera`.
+   * `time` is the renderer clock.
    */
   update(
     marks: readonly WorldMarkerMark[],
@@ -336,21 +466,29 @@ export class WorldMarkerLayer {
     if (this.shownCount === 0) return;
     const cam = camera.position;
     const spin = reducedMotion ? 0 : time * RUNE_SPIN_PER_S;
+    this.beamTime.value = reducedMotion ? 0 : time;
+    const glowPeak = SYMBOL_GLOW_OPACITY * this.look.symbolGlow;
     for (let s = 0; s < WORLD_MARKER_COUNT; s++) {
       const slot = this.slots[s];
       if (!slot.shown) continue;
       const piece = this.pieces[s];
-      const pulse = worldMarkerPulse(time, s, reducedMotion);
-      piece.discMat.uniforms.uPulse.value = pulse;
+      piece.discMat.uniforms.uPulse.value = worldMarkerPulse(time, s, reducedMotion);
       piece.discMat.uniforms.uSpin.value = spin;
-      if (piece.columnMat) piece.columnMat.uniforms.uPulse.value = pulse;
-      const y = slot.y + worldMarkerSymbolLift(time, s, reducedMotion);
-      piece.sprite.position.set(slot.x, y, slot.z);
+      const flare = worldMarkerFlare(time, s, reducedMotion);
+      if (piece.poolMat) piece.poolMat.uniforms.uFlare.value = flare;
+      if (piece.beamMat) piece.beamMat.uniforms.uFlare.value = flare;
+      piece.glowMat.opacity = glowPeak * flare;
+      // Size from the distance to the symbol's resting height, then lift.
       const dx = cam.x - slot.x;
-      const dy = cam.y - y;
+      const dy = cam.y - (slot.y + WORLD_MARKER_SYMBOL_LIFT);
       const dz = cam.z - slot.z;
       const size = worldMarkerSymbolSize(Math.sqrt(dx * dx + dy * dy + dz * dz));
+      const y = slot.y + worldMarkerSymbolLift(time, s, reducedMotion, size);
+      piece.sprite.position.set(slot.x, y, slot.z);
       piece.sprite.scale.set(size, size, 1);
+      const glowSize = size * WORLD_MARKER_SYMBOL_GLOW_SCALE;
+      piece.glow.position.set(slot.x, y, slot.z);
+      piece.glow.scale.set(glowSize, glowSize, 1);
     }
   }
 
@@ -371,19 +509,24 @@ export class WorldMarkerLayer {
         piece.positions.needsUpdate = true;
         piece.disc.geometry.computeBoundingSphere();
         (piece.discMat.uniforms.uCenter.value as THREE.Vector2).set(slot.x, slot.z);
-        piece.column?.position.set(slot.x, slot.y, slot.z);
+        piece.beam?.position.set(slot.x, slot.y, slot.z);
       }
       piece.disc.visible = slot.shown;
-      if (piece.column) piece.column.visible = slot.shown;
+      if (piece.pool) piece.pool.visible = slot.shown;
+      if (piece.beam) piece.beam.visible = slot.shown;
+      piece.glow.visible = slot.shown;
       piece.sprite.visible = slot.shown;
       if (slot.shown) shown++;
     }
     this.shownCount = shown;
   }
 
-  /** Every symbol texture (the prewarm entry uploads them under the curtain). */
+  /** Every texture the layer draws with: the eight symbols and the shared
+   *  glow (the prewarm entry uploads them under the curtain). */
   prewarmTextures(): THREE.Texture[] {
-    return this.pieces.map((p) => p.texture);
+    const textures: THREE.Texture[] = this.pieces.map((p) => p.texture);
+    textures.push(this.glowTexture);
+    return textures;
   }
 
   /** A staged, VISIBLE twin of every piece (same geometry, same materials), off
@@ -395,7 +538,9 @@ export class WorldMarkerLayer {
     root.name = 'world-markers-prewarm';
     for (const p of this.pieces) {
       root.add(new THREE.Mesh(p.disc.geometry, p.discMat));
-      if (p.column && p.columnMat) root.add(new THREE.Mesh(p.column.geometry, p.columnMat));
+      if (p.pool && p.poolMat) root.add(new THREE.Mesh(p.pool.geometry, p.poolMat));
+      if (p.beam && p.beamMat) root.add(new THREE.Mesh(p.beam.geometry, p.beamMat));
+      root.add(new THREE.Sprite(p.glowMat));
       root.add(new THREE.Sprite(p.spriteMat));
     }
     this.stagedRoot = root;
@@ -416,14 +561,18 @@ export class WorldMarkerLayer {
     };
     tryRelease(() => this.scene.remove(this.group));
     for (const p of this.pieces) {
-      // The index attribute is shared by all eight discs; a repeat dispose is a no-op.
+      // The index attribute is shared by all eight discs, and each pool rides
+      // its disc's geometry; a repeat dispose is a no-op.
       tryRelease(() => p.disc.geometry.dispose());
       tryRelease(() => p.discMat.dispose());
-      tryRelease(() => p.columnMat?.dispose());
+      tryRelease(() => p.poolMat?.dispose());
+      tryRelease(() => p.beamMat?.dispose());
+      tryRelease(() => p.glowMat.dispose());
       tryRelease(() => p.spriteMat.dispose());
       tryRelease(() => p.texture.dispose());
     }
-    tryRelease(() => this.columnGeo?.dispose());
+    tryRelease(() => this.beamGeo?.dispose());
+    tryRelease(() => this.glowTexture.dispose());
     if (errors.length > 0) throw new AggregateError(errors, 'world markers dispose failed');
   }
 }
@@ -436,10 +585,11 @@ export interface WorldMarkerPrewarmHost {
 
 /**
  * The layer's world-entry prewarm manifest entry (`vfx.world-markers`): upload
- * the eight symbol textures and link the disc, column and sprite programs
- * through the staged twin, behind the loading curtain. A dropped entry resumes
- * its textures as cosmetic units and its programs as debt (`programs.<id>`),
- * so the first mark dropped mid-raid never links in a live frame.
+ * the eight symbol textures and the shared glow, and link the disc, pool,
+ * beam and sprite programs through the staged twin, behind the loading
+ * curtain. A dropped entry resumes its textures as cosmetic units and its
+ * programs as debt (`programs.<id>`), so the first mark dropped mid-raid
+ * never links in a live frame.
  */
 export function worldMarkerPrewarmEntry(layer: WorldMarkerLayer, host: WorldMarkerPrewarmHost) {
   const link = () => host.compileColor(layer.prewarmRoot());
