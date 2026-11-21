@@ -19,8 +19,9 @@ export type ReferralNotice =
       id: string;
       type: 'reason';
       reason: ReferralUiReason;
-      /** Set only when the reason refuses this player's own action on that link;
-       * unprompted explanations (party changes, outages) leave it unset. */
+      /** Set only when the reason refuses this player's own start, respond, move or
+       * redeem on that link; unprompted explanations (party changes, outages) and the
+       * summon refusal leave it unset. */
       linkId?: number;
     }
   | { id: string; type: 'completed'; friendName: string }

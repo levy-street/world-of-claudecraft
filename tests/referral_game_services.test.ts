@@ -298,6 +298,21 @@ describe('referral game host', () => {
       reason: 'staleRevision',
       linkId: 20,
     });
+    // The command never committing, and the store failing, are refusals of it too.
+    h.host.conflict = () => true;
+    await h.service.command(h.a, { type: 'start', linkId: 20, expectedRevision: 0 });
+    expect(h.frames.get(100)?.notices.at(-1)).toMatchObject({
+      reason: 'unavailable',
+      linkId: 20,
+    });
+    h.host.conflict = () => false;
+    vi.mocked(h.store.mutate).mockRejectedValueOnce(new Error('store down'));
+    await h.service.command(h.a, { type: 'start', linkId: 20, expectedRevision: 0 });
+    expect(h.host.onError).toHaveBeenCalled();
+    expect(h.frames.get(100)?.notices.at(-1)).toMatchObject({
+      reason: 'unavailable',
+      linkId: 20,
+    });
   });
   it('consumes cooldown only after the intended recipient consents', async () => {
     const h = setup();
