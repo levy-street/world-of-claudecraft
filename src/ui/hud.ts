@@ -1372,10 +1372,10 @@ export class Hud {
     return this.sim.vehicleSession ? this.vehicleControls.aim : this.worldMarkers.aimOr(spell);
   }
   private readonly playerGroundAim = createHudPlayerGroundAim(this);
-  // The raid's world markers: party-column flyout + ground-click aim (hud/world_markers/).
   private worldMarkerHost: HudWorldMarkers | null = null;
   private get worldMarkers(): HudWorldMarkers {
-    return (this.worldMarkerHost ??= createHudWorldMarkers(this));
+    this.worldMarkerHost ??= createHudWorldMarkers(this); // hud/world_markers/
+    return this.worldMarkerHost;
   }
   /** A world-marker hotkey (0..7 places that symbol at the cursor, null clears all). */
   worldMarkerHotkey(symbol: number | null): void {
