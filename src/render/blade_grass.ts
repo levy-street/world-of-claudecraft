@@ -35,6 +35,7 @@ import {
   BLADE_SIZE_UNIFORM,
   BLADE_WIDTH_GLSL,
   BLADE_WIDTH_UNIFORM,
+  bladeLookReach,
 } from './blade_width_zone_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import {
@@ -71,7 +72,7 @@ import {
   meadowCoverage,
 } from './meadow_tuning';
 import { zoneMeadowCoverage } from './meadow_zone_density_core';
-import { paletteLabPanelEnabled } from './palette_lab';
+import { paletteLabEnabled, paletteLabPanelEnabled } from './palette_lab';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { GRASS_WIND_TIME_SCALE } from './tree_sway';
@@ -158,8 +159,7 @@ export function mulberry32(seed: number): () => number {
 // one tiny flower AFTER the shipped blades, tagged per vertex in `aBladeKind`
 // (0 shipped blade, 1 extra blade, 2 flower). The shader collapses both unless
 // a zone look turns them on (blade_width_zone_core.ts uBladeExtra), and the
-// shipped blades consume the rng first, so their shapes never change. The
-// extras geometry also warms its blade tips (the painted meadow's sunlit tips).
+// shipped blades consume the rng first, so their shapes never change.
 export function clusterGeometry(
   rng: () => number,
   segments: 2 | 3 = 3,
@@ -207,10 +207,9 @@ export function clusterGeometry(
       // all-up normals: blades take the terrain's lighting response, the
       // same trick the card tufts use, so the carpet never shades apart
       // from the ground it grows in
-      // the painted carpet and band (extras) warm toward the tip, where the
-      // blade catches the sun; every other cluster user keeps the grey ramp
-      const tw = extras ? t * t : 0;
-      colors.push(shade * (1 + 0.2 * tw), shade * (1 + 0.08 * tw), shade * (1 - 0.4 * tw));
+      // a grey base-to-tip ramp (0.86 root to 1.1 tip): the painted
+      // meadow's warm tips read it back in the shader (BLADE_COMB_GLSL)
+      colors.push(shade, shade, shade);
     };
     if (segments === 2) {
       const wMid = w0 * 0.62;
@@ -318,7 +317,7 @@ const CLUSTER_SWAY_REACH = 0.085 * ((1 + 0.4) * 0.6 + 0.2 + 0.9) * 1.25 * (1.1 *
  * placement composes. The sector bounding spheres pad by this, so a sector is
  * culled only when every blade in it is genuinely outside the frustum.
  */
-export function clusterPlacementPad(geo: THREE.BufferGeometry): number {
+export function clusterPlacementPad(geo: THREE.BufferGeometry, reachYards = 0): number {
   const pos = geo.getAttribute('position');
   let maxSq = 0;
   for (let i = 0; i < pos.count; i++) {
@@ -328,8 +327,13 @@ export function clusterPlacementPad(geo: THREE.BufferGeometry): number {
     const d = x * x + y * y + z * z;
     if (d > maxSq) maxSq = d;
   }
-  // A palette-lab panel session may stretch clusters up to MEADOW_MAX_STRETCH.
-  const labReach = paletteLabPanelEnabled() ? MEADOW_MAX_STRETCH : 1;
+  // Zone looks (on by default) may stretch and widen clusters out to
+  // `reachYards` from the camera; a palette-lab panel session up to
+  // MEADOW_MAX_STRETCH as well.
+  const labReach = Math.max(
+    paletteLabPanelEnabled() ? MEADOW_MAX_STRETCH : 1,
+    paletteLabEnabled() ? bladeLookReach(reachYards) : 1,
+  );
   return (Math.sqrt(maxSq) + CLUSTER_SWAY_REACH) * CLUSTER_MAX_SCALE * labReach;
 }
 
@@ -511,7 +515,7 @@ export function buildBladeGrass(
     axis: bladeSectorAxis(),
     geometry: geo,
     material: mat,
-    clusterPad: clusterPlacementPad(geo),
+    clusterPad: clusterPlacementPad(geo, RADIUS),
   });
   for (const mesh of sectorPool.meshes) group.add(mesh);
 

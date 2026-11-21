@@ -4,10 +4,12 @@
 
 # src/render/palette_lab/: per-zone palette lab (`?palette=on`)
 
-A dev tool for art direction: walk the world, click a look in the panel, and
-the zone around you changes to it on the spot. Opt-in by URL (`?palette=on`,
-usually beside `?cel=on`); without the flag nothing here loads and every
-shader compiles byte for byte as shipped.
+Each zone's colour look, plus a dev tool for art direction: walk the world,
+click a look in the panel, and the zone around you changes to it on the spot.
+The looks runtime is ON by default for players (`palette_lab_flag.ts`
+`paletteLabEnabled`); `?palette=off` turns it off and every shader compiles
+byte for byte as shipped. The panel is dev-only (`?palette=on`, usually beside
+`?cel=on`).
 
 ## What a look is
 `zone_look_core.ts` `ZoneLook`: ground palette (BIOME_PALETTE's five tones),
@@ -61,6 +63,20 @@ dome's horizon fog band so a deep painted sky reaches the hills. A lowered band
 re-derives the sky after the distant-zone haze tint, so that look gives the tint
 up. Eastbrook's `storybook-meadow` (the default) is the reference user.
 
+## The storybook grass in every zone (`storybook_grass_core.ts`)
+Every zone whose biome grows blades takes Eastbrook's storybook blades (comb,
+clumps, finer blades, flowers, rounded light, warm tips and field drifts, the
+one-hue ramp) in its OWN colours: the ramp ends are derived from the look's
+ground grass tones (or the stock palette), hue kept, lightness and saturation
+moved like Eastbrook's authored ramp. `BLADELESS_BIOMES` (frost, ember, garden)
+take nothing; `FLOWERLESS_BIOMES` show no flowers (both pinned equal to the
+foliage tables). A look's render merges in this order: its render family, then
+the storybook grass block, then the look's own `render` (so Eastbrook keeps its
+authored teal ramp). `STOCK_WITH_GRASS_ID` (`storybook-grass`) is the stock
+look plus the grass and nothing else: it skips the family block (Wraithwood's
+default). Looks stretch and widen tufts, so the carpet and band pad their cull
+bounds by `bladeLookReach` (`../blade_width_zone_core.ts`) whenever looks run.
+
 ## How a click reaches the screen (`palette_lab_runtime.ts`)
 - Shared uniform blocks, written in place: the grade (`palette_grade.ts`, its
   `PALETTE_GRADE` arm in `post_output_grade.ts`, which also hands the look the
@@ -90,8 +106,8 @@ up. Eastbrook's `storybook-meadow` (the default) is the reference user.
   share them, so the runtime writes the row from the zone the player
   stands in. Ground looks are per zone.
 - The stock look is the A/B reference and is never edited (`tweak` refuses it).
-- Panel text is dev-channel English (the perf overlay precedent); it never
-  ships in a normal session.
+- Panel text (look names and notes) is dev-channel English (the perf overlay
+  precedent); the panel never ships in a normal session.
 - Console: `__paletteLab.apply(id)`, `.looks()`, `.tweak({ light: { hemiScale: 3 } })`,
   `.snippet()` (the chosen look as table rows, also behind "Copy look").
 
@@ -101,4 +117,4 @@ solver, the data), `tests/ground_palette_override_core.test.ts`,
 `tests/palette_lab_ground_recolor.test.ts` (an override changes chunk colours
 and nothing else; clearing restores them byte for byte, on both threads),
 `tests/palette_lab_grade.test.ts`, `tests/palette_lab_lighting.test.ts`,
-`tests/meadow_fullness_core.test.ts`.
+`tests/meadow_fullness_core.test.ts`, `tests/storybook_grass_core.test.ts`.

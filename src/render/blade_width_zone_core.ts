@@ -144,12 +144,32 @@ export const BLADE_SIZE_UNIFORM: { value: Float32Array } = { value: BLADE_SIZE_V
  *  widening (0..2) and distance thickening (0..3: tufts far from the camera
  *  spread wider, so fewer of them still close the field, after the Ghost of
  *  Tsushima grass talk; their warm tips also fade so they stop speckling). */
+/** Distance thickening: tufts widen from BLADE_FAR_START to BLADE_FAR_END yards
+ *  from the camera, by up to BLADE_FAR_MAX (the shader below reads these). */
+export const BLADE_FAR_START = 14;
+export const BLADE_FAR_END = 70;
+export const BLADE_FAR_MAX = 3;
+/** The largest blade height or spread scale a zone look may set. */
+export const BLADE_SIZE_MAX = 1.6;
+
+/** The most a zone look can stretch a tuft (xz) at `distance` yards from the
+ *  camera: the largest spread times the largest distance thickening there.
+ *  The carpet and band pad their culling bounds by it. */
+export function bladeLookReach(distance: number): number {
+  const t = Math.min(
+    1,
+    Math.max(0, (distance - BLADE_FAR_START) / (BLADE_FAR_END - BLADE_FAR_START)),
+  );
+  return BLADE_SIZE_MAX * (1 + BLADE_FAR_MAX * t * t * (3 - 2 * t));
+}
+
 export function setBladeSizeZone(height: number, spread: number, widen = 0, far = 0): void {
-  const clamp = (v: number): number => (Number.isFinite(v) ? Math.min(1.6, Math.max(0.3, v)) : 1);
+  const clamp = (v: number): number =>
+    Number.isFinite(v) ? Math.min(BLADE_SIZE_MAX, Math.max(0.3, v)) : 1;
   BLADE_SIZE_VALUES[0] = clamp(height);
   BLADE_SIZE_VALUES[1] = clamp(spread);
   BLADE_SIZE_VALUES[2] = Number.isFinite(widen) ? Math.min(2, Math.max(0, widen)) : 0;
-  BLADE_SIZE_VALUES[3] = Number.isFinite(far) ? Math.min(3, Math.max(0, far)) : 0;
+  BLADE_SIZE_VALUES[3] = Number.isFinite(far) ? Math.min(BLADE_FAR_MAX, Math.max(0, far)) : 0;
 }
 
 /** begin_vertex block (after the width pull, before any fade): comb and paint.
@@ -160,7 +180,7 @@ export const BLADE_COMB_GLSL = `transformed.y *= uBladeSize.x;
         {
           vec2 wocCombXZ = instanceMatrix[3].xz;
           // distance thickening: 0 near, 1 by mid-field
-          float wocFarT = smoothstep(14.0, 70.0, distance(instanceMatrix[3].xyz, cameraPosition));
+          float wocFarT = smoothstep(${BLADE_FAR_START.toFixed(1)}, ${BLADE_FAR_END.toFixed(1)}, distance(instanceMatrix[3].xyz, cameraPosition));
           if (uBladeSize.w > 0.0) transformed.xz *= 1.0 + uBladeSize.w * wocFarT;
           float wocCombJit = fract(sin(dot(wocCombXZ, vec2(12.9898, 78.233))) * 43758.5453);
           float wocCombH = max(position.y, 0.0) * uBladeSize.x;
@@ -200,6 +220,14 @@ export const BLADE_COMB_GLSL = `transformed.y *= uBladeSize.x;
             float wocPatch = sin(wocCombXZ.x * 0.17 + sin(wocCombXZ.y * 0.11) * 2.1)
               * sin(wocCombXZ.y * 0.15 + sin(wocCombXZ.x * 0.09) * 1.8);
             vColor.rgb *= 1.0 + uBladePaint.x * wocPatch + wocClump * 0.1 * wocClumpA * wocClumpB;
+            if (uBladePaint.y > 0.0) {
+              // sunlit tips: warmer toward the tip, read back from the cluster's
+              // grey base-to-tip ramp (blade_grass.ts clusterGeometry: 0.86 at
+              // the root, 1.1 at the tip)
+              float wocTipT = clamp((color.g - 0.86) / 0.24, 0.0, 1.0);
+              float wocTw = wocTipT * wocTipT;
+              vColor.rgb *= vec3(1.0 + 0.2 * wocTw, 1.0 + 0.08 * wocTw, 1.0 - 0.4 * wocTw);
+            }
             if (uBladePaint.x > 0.0) {
               // broad sunlit (warm) and shaded (cool) drifts across the field,
               // plus a little light and dark variety from tuft to tuft

@@ -36,25 +36,22 @@ describe('blade cluster extras (finer blades and a flower)', () => {
     expect(new Set(across)).toEqual(new Set([-1, 0, 1]));
   });
 
-  it('warms the blade tips on the carpet and band geometry only', () => {
-    const plain = clusterGeometry(mulberry32(7)).getAttribute('color');
-    for (let i = 0; i < plain.count; i++) {
-      // the shared cluster (ground bake, card tufts) keeps its grey ramp
-      expect(plain.getX(i)).toBe(plain.getY(i));
-      expect(plain.getY(i)).toBe(plain.getZ(i));
-    }
-    const painted = clusterGeometry(mulberry32(7), 3, true);
-    const col = painted.getAttribute('color');
-    const pos = painted.getAttribute('position');
-    let warmTips = 0;
-    for (let i = 0; i < col.count; i++) {
-      if (pos.getY(i) === 0) {
-        // roots stay grey
-        expect(col.getX(i)).toBeCloseTo(col.getZ(i), 6);
-      } else if (col.getX(i) > col.getY(i) && col.getY(i) > col.getZ(i)) {
-        warmTips++;
+  it('keeps every cluster on the grey base-to-tip ramp the shader reads back', () => {
+    // the painted meadow's warm tips live in the shader behind paintTip
+    // (BLADE_COMB_GLSL), so the geometry stays grey for every look, the ground
+    // bake and the card tufts alike; roots at 0.86, tips at 1.1
+    for (const geo of [clusterGeometry(mulberry32(7)), clusterGeometry(mulberry32(7), 3, true)]) {
+      const col = geo.getAttribute('color');
+      const kind = geo.getAttribute('aBladeKind');
+      const pos = geo.getAttribute('position');
+      for (let i = 0; i < col.count; i++) {
+        if (kind && kind.getX(i) > 1.5) continue; // the flower has its own colours
+        expect(col.getX(i)).toBe(col.getY(i));
+        expect(col.getY(i)).toBe(col.getZ(i));
+        expect(col.getY(i)).toBeGreaterThanOrEqual(0.86 - 1e-6);
+        expect(col.getY(i)).toBeLessThanOrEqual(1.1 + 1e-6);
+        if (pos.getY(i) === 0) expect(col.getY(i)).toBeCloseTo(0.86, 6);
       }
     }
-    expect(warmTips).toBeGreaterThan(0);
   });
 });

@@ -7,14 +7,19 @@ import {
   BLADE_COMB_VALUES,
   BLADE_EXTRA_GLSL,
   BLADE_EXTRA_VALUES,
+  BLADE_FAR_END,
+  BLADE_FAR_MAX,
+  BLADE_FAR_START,
   BLADE_NEAR_GLSL,
   BLADE_NEAR_MIN,
   BLADE_NEAR_UNIFORM,
   BLADE_PAINT_VALUES,
+  BLADE_SIZE_MAX,
   BLADE_SIZE_VALUES,
   BLADE_WIDTH_GLSL,
   BLADE_WIDTH_MIN,
   BLADE_WIDTH_UNIFORM,
+  bladeLookReach,
   CARPET_GROUND_DARK,
   CARPET_GROUND_UNIFORM,
   setBladeBaseZoneShade,
@@ -142,6 +147,11 @@ describe('windswept comb, painted field and blade size (zone look arms)', () => 
     const drift = BLADE_COMB_GLSL.indexOf('float wocDrift');
     expect(drift).toBeGreaterThan(paint);
     expect(BLADE_COMB_GLSL.slice(paint, drift)).toContain('if (uBladePaint.x > 0.0) {');
+    // the warm tips ride paintTip, read back from the grey cluster ramp
+    const tips = BLADE_COMB_GLSL.indexOf('float wocTipT');
+    expect(tips).toBeGreaterThan(paint);
+    expect(BLADE_COMB_GLSL.slice(paint, tips)).toContain('if (uBladePaint.y > 0.0) {');
+    expect(BLADE_COMB_GLSL).toContain('(color.g - 0.86) / 0.24');
     expect(BLADE_COMB_GLSL.startsWith('transformed.y *= uBladeSize.x;')).toBe(true);
   });
 });
@@ -195,5 +205,27 @@ describe('clumping and view-space widening (zone look arms)', () => {
   it('branches both out at zero in GLSL', () => {
     expect(BLADE_COMB_GLSL).toContain('if (wocClump > 0.0)');
     expect(BLADE_COMB_GLSL).toContain('if (uBladeSize.z > 0.0)');
+  });
+});
+
+describe('bladeLookReach (the cull pad for look-stretched tufts)', () => {
+  it('is the largest spread up close and adds the full far widening by its end', () => {
+    expect(bladeLookReach(0)).toBeCloseTo(BLADE_SIZE_MAX, 6);
+    expect(bladeLookReach(BLADE_FAR_START)).toBeCloseTo(BLADE_SIZE_MAX, 6);
+    expect(bladeLookReach(BLADE_FAR_END)).toBeCloseTo(BLADE_SIZE_MAX * (1 + BLADE_FAR_MAX), 6);
+    expect(bladeLookReach(500)).toBeCloseTo(BLADE_SIZE_MAX * (1 + BLADE_FAR_MAX), 6);
+  });
+
+  it('covers the most setBladeSizeZone lets a look ask for', () => {
+    setBladeSizeZone(99, 99, 0, 99);
+    expect(BLADE_SIZE_VALUES[1]).toBeCloseTo(BLADE_SIZE_MAX, 6);
+    expect(BLADE_SIZE_VALUES[3]).toBe(BLADE_FAR_MAX);
+    setBladeSizeZone(1, 1, 0, 0);
+  });
+
+  it('feeds the shader the same distance band', () => {
+    expect(BLADE_COMB_GLSL).toContain(
+      `smoothstep(${BLADE_FAR_START.toFixed(1)}, ${BLADE_FAR_END.toFixed(1)},`,
+    );
   });
 });

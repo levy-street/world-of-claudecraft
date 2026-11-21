@@ -278,7 +278,7 @@ export function buildBladeGrassBand(
     axis: bladeSectorAxis(),
     geometry: geo,
     material: mat,
-    clusterPad: clusterPlacementPad(geo),
+    clusterPad: clusterPlacementPad(geo, RADIUS),
   });
   for (const mesh of sectorPool.meshes) group.add(mesh);
 
