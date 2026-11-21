@@ -573,11 +573,17 @@ describe('Hud ground aim behavior', () => {
 
 describe('Hud ground aim source wiring', () => {
   it('delegates placement projection to the world seam', () => {
-    const source = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    // The spell aim is built by its Hud factory (hud_player_ground_aim.ts).
+    const hud = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain('private readonly playerGroundAim = createHudPlayerGroundAim(this);');
+    const source = readFileSync(
+      join(process.cwd(), 'src/ui/hud/action_bar/hud_player_ground_aim.ts'),
+      'utf8',
+    );
     const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
     expect(code).toContain(
-      'projectPlacement: (id, point) => this.sim.groundAimPlacementPreview(id, point)',
+      'projectPlacement: (id, point) => h.sim.groundAimPlacementPreview(id, point)',
     );
   });
 });

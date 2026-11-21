@@ -554,7 +554,10 @@ const MONOLITHS: MonolithRow[] = [
     // Honor and companions. Measured after recovery integration, zero slack.
     // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
     // Exact combined count; the three seasonal wiring lines are preserved.
-    ceiling: 17736,
+    // LOWERED 17736 -> 17726: the spell ground aim's construction moved to
+    // hud/action_bar/hud_player_ground_aim.ts, paying for the world markers'
+    // seam (hud/world_markers/), with the slack banked.
+    ceiling: 17726,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

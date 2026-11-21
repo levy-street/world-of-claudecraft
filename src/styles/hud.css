@@ -12319,6 +12319,167 @@
     height: 15px;
     flex: none;
   }
+  /* The raid's world markers (src/ui/hud/world_markers/): the party-column
+     button (the boss guide's family) and its flyout of the eight symbols. */
+  .party-world-markers {
+    position: relative;
+    width: 170px;
+  }
+  #party-frames.party-header-collapsed > .party-world-markers {
+    display: none;
+  }
+  .party-world-markers-button {
+    width: 100%;
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 8px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 11px;
+    letter-spacing: 0.25px;
+    cursor: var(--cursor-point);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold) 7%, transparent);
+  }
+  .party-world-markers-button:hover,
+  .party-world-markers-button:focus-visible,
+  .party-world-markers.is-open .party-world-markers-button {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  .party-world-markers.is-armed .party-world-markers-button {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 45%, transparent),
+      0 0 10px color-mix(in srgb, var(--gold) 35%, transparent);
+  }
+  .party-world-markers.is-read-only .party-world-markers-button {
+    opacity: 0.62;
+  }
+  .party-world-markers-glyph {
+    width: 17px;
+    height: 17px;
+    flex: none;
+  }
+  .party-world-markers-label {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .party-world-markers-chevron {
+    width: 0;
+    height: 0;
+    flex: none;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 5px solid currentColor;
+  }
+  .party-world-markers-flyout {
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 0;
+    z-index: 5;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    padding: 7px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+  }
+  .party-world-markers.is-open .party-world-markers-flyout {
+    display: flex;
+  }
+  .party-world-markers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 36px);
+    gap: 5px;
+  }
+  .party-world-markers-tile {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--gold-dim);
+    border-radius: 5px;
+    background: var(--panel-bg);
+    cursor: var(--cursor-point);
+  }
+  .party-world-markers-tile:hover,
+  .party-world-markers-tile:focus-visible {
+    border-color: var(--gold);
+  }
+  .party-world-markers-tile.is-placed {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 8px color-mix(in srgb, var(--gold) 40%, transparent);
+  }
+  .party-world-markers-tile.is-armed {
+    border-color: var(--color-text-light);
+    box-shadow: 0 0 9px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+  .party-world-markers-tile-glyph {
+    width: 26px;
+    height: 26px;
+    opacity: 0.78;
+  }
+  .party-world-markers-tile.is-placed .party-world-markers-tile-glyph,
+  .party-world-markers-tile.is-armed .party-world-markers-tile-glyph {
+    opacity: 1;
+  }
+  .party-world-markers-tile-key {
+    position: absolute;
+    right: 2px;
+    top: 1px;
+    color: var(--color-text-light);
+    font-size: 9px;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .party-world-markers-clear {
+    min-height: 26px;
+    padding: 3px 8px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .party-world-markers-clear:hover:not(:disabled),
+  .party-world-markers-clear:focus-visible {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  .party-world-markers-clear:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .party-world-markers-button:focus-visible,
+  .party-world-markers-tile:focus-visible,
+  .party-world-markers-clear:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    .party-world-markers-tile.is-placed {
+      border-style: double;
+      border-width: 3px;
+    }
+    .party-world-markers-tile.is-armed,
+    .party-world-markers.is-armed .party-world-markers-button {
+      outline: 2px solid Highlight;
+    }
+  }
   #raid-boss-guide-window {
     top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale, 1));
     width: min(820px, calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 24px));

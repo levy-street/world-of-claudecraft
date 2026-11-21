@@ -24948,4 +24948,24 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidAtlas.boss.final.subtitle': '四脈歸一',
   'hudChrome.raidAtlas.boss.final.lore':
     '在躺下化為荊峰之前，鐵匠將自己的力量一分為四，好讓封印延續數百年。在這世界之砧上，四條礦脈正匯聚成一具沒有心智的軀體。它要完成主人最後的工作：將整座山永遠封住，連同其中一切會呼吸的生命。',
+  'hudChrome.worldMarkers.button': '地面標記',
+  'hudChrome.worldMarkers.buttonArmed': '正在放置{marker}',
+  'hudChrome.worldMarkers.title': '地面標記',
+  'hudChrome.worldMarkers.flyoutAria': '地面標記',
+  'hudChrome.worldMarkers.tip':
+    '在地面上為隊伍標出位置：選擇一個標記，然後點擊要放置的地面。此副本中的所有隊友都能在地面和地圖上看到它。',
+  'hudChrome.worldMarkers.tipTouch':
+    '在地面上為隊伍標出位置：選擇一個標記，然後輕觸要放置的地面。此副本中的所有隊友都能在地面和地圖上看到它。',
+  'hudChrome.worldMarkers.tileTip':
+    '點擊它，再點擊地面即可放在那裡。再次放置會移動它。右鍵點擊地面或按 Esc 取消。',
+  'hudChrome.worldMarkers.tileTipTouch': '輕觸它，再輕觸地面即可放在那裡。再次放置會移動它。',
+  'hudChrome.worldMarkers.tileRemove': '右鍵點擊：移除它。',
+  'hudChrome.worldMarkers.tileRemoveTouch': '長按：移除它。',
+  'hudChrome.worldMarkers.tileAria': '{marker}地面標記',
+  'hudChrome.worldMarkers.tileAriaPlaced': '{marker}地面標記，已放置',
+  'hudChrome.worldMarkers.clearAll': '全部清除',
+  'hudChrome.worldMarkers.clearAllTip': '移除你的隊伍在此副本中放置的所有地面標記。',
+  'hudChrome.worldMarkers.readOnly': '只有團隊隊長可以放置地面標記。',
+  'hudChrome.worldMarkers.bindPlace': '放置地面標記：{marker}',
+  'hudChrome.worldMarkers.bindClear': '清除所有地面標記',
 };

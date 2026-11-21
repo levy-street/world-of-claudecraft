@@ -8394,6 +8394,25 @@ export const ko_KR: EnTranslations = {
       "chosen": "주간 퀘스트 수락: {category}",
       "progress": "{label}: {count}/{required}",
       "done": "주간 퀘스트 완료: {category}"
+    },
+    "worldMarkers": {
+      "button": "위치 표시기",
+      "buttonArmed": "{marker} 놓는 중",
+      "title": "위치 표시기",
+      "flyoutAria": "위치 표시기",
+      "tip": "파티를 위해 바닥에 위치를 표시합니다. 표시기를 고른 뒤 놓을 지면을 클릭하세요. 이 인스턴스 안에 있는 파티원 모두가 바닥과 지도에서 볼 수 있습니다.",
+      "tipTouch": "파티를 위해 바닥에 위치를 표시합니다. 표시기를 고른 뒤 놓을 지면을 누르세요. 이 인스턴스 안에 있는 파티원 모두가 바닥과 지도에서 볼 수 있습니다.",
+      "tileTip": "클릭한 다음 지면을 클릭하면 그곳에 놓습니다. 다시 놓으면 옮겨집니다. 지면을 오른쪽 클릭하거나 Esc 키를 누르면 취소합니다.",
+      "tileTipTouch": "누른 다음 지면을 누르면 그곳에 놓습니다. 다시 놓으면 옮겨집니다.",
+      "tileRemove": "오른쪽 클릭: 제거합니다.",
+      "tileRemoveTouch": "길게 누르기: 제거합니다.",
+      "tileAria": "{marker} 위치 표시기",
+      "tileAriaPlaced": "{marker} 위치 표시기, 놓음",
+      "clearAll": "모두 지우기",
+      "clearAllTip": "이 인스턴스에서 파티가 놓은 위치 표시기를 모두 제거합니다.",
+      "readOnly": "공격대장만 위치 표시기를 놓을 수 있습니다.",
+      "bindPlace": "위치 표시기 놓기: {marker}",
+      "bindClear": "위치 표시기 모두 지우기"
     }
   },
   "gatherEvent": {

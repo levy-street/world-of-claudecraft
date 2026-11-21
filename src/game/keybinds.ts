@@ -241,6 +241,25 @@ export const BIND_ACTIONS: BindAction[] = [
       defaults: [`F${n + 1}`],
     }),
   ),
+  // The raid's world markers (src/ui/hud/world_markers/): place each symbol at
+  // the cursor, and clear them all. Unbound by default, as the classic client
+  // ships them; a raid leader binds the ones they use.
+  ...[1, 2, 3, 4, 5, 6, 7, 8].map(
+    (n): BindAction => ({
+      id: `worldMarker${n}`,
+      label: `Place World Marker ${n}`,
+      category: 'Targeting',
+      kind: 'edge',
+      defaults: [],
+    }),
+  ),
+  {
+    id: 'worldMarkerClear',
+    label: 'Clear All World Markers',
+    category: 'Targeting',
+    kind: 'edge',
+    defaults: [],
+  },
   {
     id: 'interact',
     label: 'Interact / Loot',

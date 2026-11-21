@@ -11,7 +11,12 @@
 
 import { canEditSharedMapMarks } from '../../../sim/social/shared_map_marks';
 import type { SharedMapMark } from '../../../world_api';
-import type { RaidAtlasFloorId, RaidAtlasPlan } from './raid_atlas_plan_core';
+import {
+  type RaidAtlasFloorId,
+  type RaidAtlasPlan,
+  raidAtlasFloorAt,
+  raidAtlasPlanFor,
+} from './raid_atlas_plan_core';
 
 export const RAID_ATLAS_SHARED_SYMBOLS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
 
@@ -29,6 +34,13 @@ export function sharedMarkPage(plan: RaidAtlasPlan, floor: RaidAtlasFloorId): nu
     0,
     plan.floors.findIndex((f) => f.id === floor),
   );
+}
+
+/** The wire page of an instance-local point in `dungeonId`: the atlas floor it
+ *  lies on for a raid with an atlas (the world placement's page), else 0. */
+export function raidAtlasPageAt(dungeonId: string, lx: number, lz: number): number {
+  const plan = raidAtlasPlanFor(dungeonId);
+  return plan ? sharedMarkPage(plan, raidAtlasFloorAt(lx, lz)) : 0;
 }
 
 /** The group's marks on the atlas's floors (a page the plan lacks is dropped). */

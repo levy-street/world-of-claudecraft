@@ -8394,6 +8394,25 @@ export const pl_PL: EnTranslations = {
       "chosen": "Tygodniowe zadanie wzięte: {category}",
       "progress": "{label}: {count}/{required}",
       "done": "Tygodniowe zadanie ukończone: {category}"
+    },
+    "worldMarkers": {
+      "button": "World Markers",
+      "buttonArmed": "Placing {marker}",
+      "title": "World Markers",
+      "flyoutAria": "World markers",
+      "tip": "Mark a spot on the floor for your group: pick a marker, then click the ground where it goes. Everyone in your group inside this instance sees it, on the floor and on the map.",
+      "tipTouch": "Mark a spot on the floor for your group: pick a marker, then tap the ground where it goes. Everyone in your group inside this instance sees it, on the floor and on the map.",
+      "tileTip": "Click it, then click the ground to place it there. Placing it again moves it. Right-click the ground or press Escape to cancel.",
+      "tileTipTouch": "Tap it, then tap the ground to place it there. Placing it again moves it.",
+      "tileRemove": "Right-click: remove it.",
+      "tileRemoveTouch": "Press and hold: remove it.",
+      "tileAria": "{marker} world marker",
+      "tileAriaPlaced": "{marker} world marker, placed",
+      "clearAll": "Clear all",
+      "clearAllTip": "Remove every world marker your group has placed in this instance.",
+      "readOnly": "Only the raid leader can place world markers.",
+      "bindPlace": "Place World Marker: {marker}",
+      "bindClear": "Clear All World Markers"
     }
   },
   "gatherEvent": {

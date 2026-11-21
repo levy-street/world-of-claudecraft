@@ -6,6 +6,7 @@
 // concrete worlds. Tests: tests/party_target_hotkeys_core.test.ts.
 
 import { focusTargetAction } from '../ui/focus_targets_core';
+import { worldMarkerActionSymbol } from '../ui/hud/world_markers/world_markers_core';
 import { type PartyFrameSettingKey, readPartyFrameDisplayConfig } from '../ui/party_frames';
 import { partyHotkeyTargetId } from '../ui/party_target_hotkeys_core';
 import type { IWorld } from '../world_api';
@@ -28,6 +29,8 @@ export type TargetingWorld = Pick<
 export interface TargetingHud {
   targetOwnPet(): void;
   focusTarget?(slot: number, assign: boolean): void;
+  /** A world-marker hotkey: 0..7 places that symbol, null clears every mark. */
+  worldMarkerHotkey?(symbol: number | null): void;
 }
 
 /** The party frame display settings (sort mode, Show Self) the F-row reads so
@@ -69,6 +72,11 @@ export function dispatchTargetingAction(
     hud.focusTarget?.(focus.slot, focus.assign);
     return true;
   }
+  const marker = worldMarkerActionSymbol(id);
+  if (marker !== undefined) {
+    hud.worldMarkerHotkey?.(marker);
+    return true;
+  }
   switch (id) {
     case 'target':
       world.tabTarget();
@@ -107,9 +115,11 @@ export function targetingInputCallbacks(
   | 'onTargetPet'
   | 'onTargetParty'
   | 'onFocusTarget'
+  | 'onWorldMarker'
 > {
   return {
     onFocusTarget: (slot, assign) => hud.focusTarget?.(slot, assign),
+    onWorldMarker: (symbol) => hud.worldMarkerHotkey?.(symbol),
     onTab: () => world.tabTarget(),
     onTabPrev: () => world.tabTargetPrev(),
     onTargetFriendly: () => world.targetNearestFriendly(),

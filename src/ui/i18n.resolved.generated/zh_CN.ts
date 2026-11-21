@@ -8394,6 +8394,25 @@ export const zh_CN: EnTranslations = {
       "chosen": "已接取每周任务：{category}",
       "progress": "{label}：{count}/{required}",
       "done": "每周任务完成：{category}"
+    },
+    "worldMarkers": {
+      "button": "地面标记",
+      "buttonArmed": "正在放置{marker}",
+      "title": "地面标记",
+      "flyoutAria": "地面标记",
+      "tip": "在地面上为队伍标出位置：选择一个标记，然后点击要放置的地面。此副本中的所有队友都能在地面和地图上看到它。",
+      "tipTouch": "在地面上为队伍标出位置：选择一个标记，然后轻触要放置的地面。此副本中的所有队友都能在地面和地图上看到它。",
+      "tileTip": "点击它，再点击地面即可放在那里。再次放置会移动它。右键点击地面或按 Esc 取消。",
+      "tileTipTouch": "轻触它，再轻触地面即可放在那里。再次放置会移动它。",
+      "tileRemove": "右键点击：移除它。",
+      "tileRemoveTouch": "长按：移除它。",
+      "tileAria": "{marker}地面标记",
+      "tileAriaPlaced": "{marker}地面标记，已放置",
+      "clearAll": "全部清除",
+      "clearAllTip": "移除你的队伍在此副本中放置的所有地面标记。",
+      "readOnly": "只有团队领袖可以放置地面标记。",
+      "bindPlace": "放置地面标记：{marker}",
+      "bindClear": "清除所有地面标记"
     }
   },
   "gatherEvent": {

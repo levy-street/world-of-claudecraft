@@ -8394,6 +8394,25 @@ export const ja_JP: EnTranslations = {
       "chosen": "週間クエストを受注：{category}",
       "progress": "{label}：{count}/{required}",
       "done": "週間クエスト完了：{category}"
+    },
+    "worldMarkers": {
+      "button": "ワールドマーカー",
+      "buttonArmed": "{marker}を設置中",
+      "title": "ワールドマーカー",
+      "flyoutAria": "ワールドマーカー",
+      "tip": "グループのために床へ目印を置きます。マーカーを選び、置きたい地面をクリックしてください。このインスタンスにいるグループ全員が、床とマップの両方で見られます。",
+      "tipTouch": "グループのために床へ目印を置きます。マーカーを選び、置きたい地面をタップしてください。このインスタンスにいるグループ全員が、床とマップの両方で見られます。",
+      "tileTip": "クリックしてから地面をクリックすると、そこに置きます。もう一度置くと移動します。地面を右クリックするかEscキーでキャンセルします。",
+      "tileTipTouch": "タップしてから地面をタップすると、そこに置きます。もう一度置くと移動します。",
+      "tileRemove": "右クリック：取り除く。",
+      "tileRemoveTouch": "長押し：取り除く。",
+      "tileAria": "{marker}のワールドマーカー",
+      "tileAriaPlaced": "{marker}のワールドマーカー、設置済み",
+      "clearAll": "すべて消去",
+      "clearAllTip": "このインスタンスでグループが置いたワールドマーカーをすべて取り除きます。",
+      "readOnly": "ワールドマーカーを置けるのはレイドリーダーだけです。",
+      "bindPlace": "ワールドマーカーを設置：{marker}",
+      "bindClear": "ワールドマーカーをすべて消去"
     }
   },
   "gatherEvent": {

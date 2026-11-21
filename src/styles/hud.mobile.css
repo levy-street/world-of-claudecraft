@@ -3706,6 +3706,42 @@
   body.mobile-touch #party-frames:not(.party-expanded) .party-boss-guide-button {
     display: none;
   }
+  /* World markers on touch: a 40px button, and a flyout of 44px tiles that opens
+     under it (the ground must stay free to tap once a symbol is armed). */
+  body.mobile-touch .party-world-markers {
+    width: min(344px, calc(100dvw - 30px));
+  }
+  body.mobile-touch #party-frames:not(.party-expanded) .party-world-markers {
+    display: none;
+  }
+  body.mobile-touch .party-world-markers-tile {
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  body.mobile-touch .party-world-markers-button {
+    min-height: 40px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch .party-world-markers-flyout {
+    left: 0;
+    top: calc(100% + 6px);
+  }
+  body.mobile-touch .party-world-markers-grid {
+    grid-template-columns: repeat(4, 44px);
+    gap: 7px;
+  }
+  body.mobile-touch .party-world-markers-tile {
+    width: 44px;
+    height: 44px;
+  }
+  body.mobile-touch .party-world-markers-tile-glyph {
+    width: 30px;
+    height: 30px;
+  }
+  body.mobile-touch .party-world-markers-clear {
+    min-height: 40px;
+  }
   body.mobile-touch .party-boss-guide-button {
     width: min(344px, calc(100dvw - 30px));
     min-height: 40px;

@@ -152,6 +152,9 @@ export class PartyFramesPainter {
   // Contextual raid-boss guide opener, owned by the Hud window controller and
   // seated between member rows and the leader-only loot control.
   private guideControl: HTMLElement | null = null;
+  // The world-marker button and flyout (src/ui/hud/world_markers/), owned by its
+  // controller and seated just above the boss guide.
+  private markerControl: HTMLElement | null = null;
   // The last synced raid flag, so relocalize() can re-emit each pooled row's group
   // label in the new language after an in-game language switch (a switch does not flip
   // partyFrameSignature, so the Hud never re-syncs us, exactly like the badge tooltips).
@@ -282,6 +285,14 @@ export class PartyFramesPainter {
     if (el) this.container.insertBefore(el, this.masterControl);
   }
 
+  /** Set or clear the world-marker control (one stable node, like the guide). */
+  setWorldMarkerControl(el: HTMLElement | null): void {
+    if (this.markerControl === el) return;
+    this.markerControl?.remove();
+    this.markerControl = el;
+    if (el) this.container.insertBefore(el, this.guideControl ?? this.masterControl);
+  }
+
   /** Reconcile the pool to `members` and repaint each in place. Called only when the
    *  party signature changed (the Hud short-circuits an unchanged party before this),
    *  so the reconcile cost is paid only on a real change. */
@@ -382,6 +393,7 @@ export class PartyFramesPainter {
     if (this.header && this.header.el.parentNode === this.container) place(this.header.el);
     if (this.chip && this.chip.el.parentNode === this.container) place(this.chip.el);
     place(wrapper);
+    if (this.markerControl) place(this.markerControl);
     if (this.guideControl) place(this.guideControl);
     if (this.masterControl) place(this.masterControl);
   }
@@ -430,6 +442,8 @@ export class PartyFramesPainter {
     this.masterControl = null;
     this.guideControl?.remove();
     this.guideControl = null;
+    this.markerControl?.remove();
+    this.markerControl = null;
     // Detach the (now empty) rows wrapper too, so a no-party container is truly empty and
     // not a lone wrapper box; the detached wrapper node is kept for reuse when a party
     // re-forms (the pooled rows are re-parented back into it by reconcileOrder).

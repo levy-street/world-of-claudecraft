@@ -407,16 +407,11 @@ import {
 import { bindEmpoweredActionHold } from './hud/action_bar/empowered_hold';
 import {
   type AimPoint,
-  quickGroundTarget,
   resolveGroundAimAbility,
-  selectedGroundAimPoint,
   shouldUseGroundAim,
   XHB_ONLY_AIM_SLOT,
 } from './hud/action_bar/ground_aim';
-import {
-  GroundAimController,
-  type GroundAimReticleView,
-} from './hud/action_bar/ground_aim_controller';
+import type { GroundAimReticleView } from './hud/action_bar/ground_aim_controller';
 import {
   assignAttackSlotAction,
   attackDragDisposition,
@@ -438,6 +433,7 @@ import {
   readDraggedAction,
   writeDraggedAction,
 } from './hud/action_bar/hotbar_drag';
+import { createHudPlayerGroundAim } from './hud/action_bar/hud_player_ground_aim';
 import { itemInBagsLine } from './hud/action_bar/item_bags_line_core';
 import {
   clampMobilePage,
@@ -670,6 +666,7 @@ import {
 } from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
+import { createHudWorldMarkers, type HudWorldMarkers } from './hud/world_markers';
 import { HudFrameGroups, refreshHudFrameGroupLabels } from './hud_frame_groups';
 import { partyFrameGrid, registerHudFrames } from './hud_frame_registry';
 import { healthTextMode, unitFrameCurrentMaxText, unitFrameHealthText } from './hud_frames';
@@ -1369,26 +1366,21 @@ export class Hud {
     this.vehicleBar ??= createHudVehicleBar(this);
     return this.vehicleBar;
   }
+  // The one aim seam: the cannon's, else an armed world marker's, else the spell aim.
   private get groundAim() {
-    return this.sim.vehicleSession ? this.vehicleControls.aim : this.playerGroundAim;
+    const spell = this.playerGroundAim;
+    return this.sim.vehicleSession ? this.vehicleControls.aim : this.worldMarkers.aimOr(spell);
   }
-  private readonly playerGroundAim = new GroundAimController({
-    player: () => this.sim.player,
-    resolveAbility: (id) => resolveGroundAimAbility(this.sim.known, id),
-    seedTargetPoint: () =>
-      selectedGroundAimPoint(
-        this.sim.player,
-        this.sim.entities,
-        this.optionsHooks?.groundAimTargetAttackable,
-      ),
-    fallbackPoint: () => quickGroundTarget(this.sim.player, this.sim.entities),
-    castAt: (id, pt) =>
-      id === 'clockwork_shock_bomb'
-        ? this.sim.useItem(id, { aim: pt })
-        : this.sim.castAbilityAt(id, pt),
-    clearReticle: () => this.renderer.setGroundAimReticle(null),
-    projectPlacement: (id, point) => this.sim.groundAimPlacementPreview(id, point),
-  });
+  private readonly playerGroundAim = createHudPlayerGroundAim(this);
+  // The raid's world markers: party-column flyout + ground-click aim (hud/world_markers/).
+  private worldMarkerHost: HudWorldMarkers | null = null;
+  private get worldMarkers(): HudWorldMarkers {
+    return (this.worldMarkerHost ??= createHudWorldMarkers(this));
+  }
+  /** A world-marker hotkey (0..7 places that symbol at the cursor, null clears all). */
+  worldMarkerHotkey(symbol: number | null): void {
+    this.worldMarkers.controller.hotkey(symbol);
+  }
   private readonly empowerHold = new EmpowerHold();
   private dragAction: {
     action: Exclude<HotbarAction, null>;
@@ -6815,6 +6807,7 @@ export class Hud {
     // locale, so relocalize() clears the latch for exactly one rebuild.
     this.gatheringGoalController.relocalize();
     this.partyFramesPainter.relocalize();
+    this.worldMarkerHost?.controller.relocalize();
     this.readyCheckLeaderWindow.relocalize();
     this.raidBossGuideWindow.relocalize();
     // The world map rasterizes its labels into sprites keyed on the RESOLVED
@@ -16702,6 +16695,7 @@ export class Hud {
     const info = this.sim.partyInfo;
     const dungeonId = info ? (dungeonAt(this.sim.player.pos.x)?.id ?? null) : null;
     this.partyFramesPainter.setGuideControl(this.raidBossGuideWindow.syncAvailability(dungeonId));
+    this.partyFramesPainter.setWorldMarkerControl(this.worldMarkers.controller.sync());
     // Re-seat below the target only when its measured stack overlaps this column.
     const targetShown = !!target && target.kind !== 'object';
     const belowTarget = this.partyBelowTargetPainter.update(

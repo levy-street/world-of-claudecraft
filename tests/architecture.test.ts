@@ -330,6 +330,7 @@ const UI_PURE_CORES = [
   // The group's shared marks (the raid world markers) as data: the page index
   // to floor mapping, the edit right (the sim's rule), the hit test, the key.
   'src/ui/hud/raid_atlas/raid_atlas_shared_marks_core.ts',
+  'src/ui/hud/world_markers/world_markers_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
@@ -3392,6 +3393,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/raid_atlas/raid_atlas_minimap_card.ts',
   // The shared raid marks' tool button and symbol panel over the atlas.
   'src/ui/hud/raid_atlas/raid_atlas_shared_marks.ts',
+  // the raid's world markers: the Hud factory (mints the flyout on document)
+  'src/ui/hud/world_markers/hud_world_markers.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
   // Mounts the Cartographer's Ink map picker into #prompt-stack.
   'src/ui/hud/treasure/ink_map_picker_controller.ts',

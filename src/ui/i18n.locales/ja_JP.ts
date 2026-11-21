@@ -26275,4 +26275,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidAtlas.boss.final.subtitle': 'ひとつになった四つの鉱脈',
   'hudChrome.raidAtlas.boss.final.lore':
     'ソーンピークとなって横たわる前に、鍛冶師は封印が幾世紀も保たれるよう、自らの力を四つに分けた。ここ世界の金床で、四つの鉱脈はひとつの心なき体へと集まりつつある。それは主の最後の仕事を果たそうとしている。息あるものすべてを中に残したまま、山を永遠に封じることを。',
+  'hudChrome.worldMarkers.button': 'ワールドマーカー',
+  'hudChrome.worldMarkers.buttonArmed': '{marker}を設置中',
+  'hudChrome.worldMarkers.title': 'ワールドマーカー',
+  'hudChrome.worldMarkers.flyoutAria': 'ワールドマーカー',
+  'hudChrome.worldMarkers.tip':
+    'グループのために床へ目印を置きます。マーカーを選び、置きたい地面をクリックしてください。このインスタンスにいるグループ全員が、床とマップの両方で見られます。',
+  'hudChrome.worldMarkers.tipTouch':
+    'グループのために床へ目印を置きます。マーカーを選び、置きたい地面をタップしてください。このインスタンスにいるグループ全員が、床とマップの両方で見られます。',
+  'hudChrome.worldMarkers.tileTip':
+    'クリックしてから地面をクリックすると、そこに置きます。もう一度置くと移動します。地面を右クリックするかEscキーでキャンセルします。',
+  'hudChrome.worldMarkers.tileTipTouch':
+    'タップしてから地面をタップすると、そこに置きます。もう一度置くと移動します。',
+  'hudChrome.worldMarkers.tileRemove': '右クリック：取り除く。',
+  'hudChrome.worldMarkers.tileRemoveTouch': '長押し：取り除く。',
+  'hudChrome.worldMarkers.tileAria': '{marker}のワールドマーカー',
+  'hudChrome.worldMarkers.tileAriaPlaced': '{marker}のワールドマーカー、設置済み',
+  'hudChrome.worldMarkers.clearAll': 'すべて消去',
+  'hudChrome.worldMarkers.clearAllTip':
+    'このインスタンスでグループが置いたワールドマーカーをすべて取り除きます。',
+  'hudChrome.worldMarkers.readOnly': 'ワールドマーカーを置けるのはレイドリーダーだけです。',
+  'hudChrome.worldMarkers.bindPlace': 'ワールドマーカーを設置：{marker}',
+  'hudChrome.worldMarkers.bindClear': 'ワールドマーカーをすべて消去',
 };

@@ -41,6 +41,10 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
   solo and party members edit, a raid only its leader; one mark per symbol per instance
   claim; bounds, rate window, cleared on disband or a freed claim); the atlas only hides
   the controls a player may not use. A mark's page is the floor's index in `plan.floors`.
+- The same marks are the raid's world markers: each carries its world point and floor
+  height (`wx`, `y`, `wz`), placed from a ground click too (`src/ui/hud/world_markers/`,
+  `IWorld.placeSharedWorldMark`, page from `raidAtlasPageAt`) and drawn on the floor by
+  `src/render/world_markers.ts`. The map stays both a viewer and a placement surface.
 - A new raid joins by giving `raidAtlasPlanFor` its plan (pages, rooms, bosses, pois) and,
   if its encounters do not use the heart seal, its own boss-state source in the view.
 - The minimap never re-renders the page per paint: it crops the floor's plate, and only once

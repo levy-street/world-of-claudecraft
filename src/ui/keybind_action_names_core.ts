@@ -9,6 +9,7 @@
 // numbered slot label; slot 0 is always Attack.
 
 import { formatNumber, type TranslationKey, t } from './i18n';
+import { raidMarkerDisplayName } from './raid_marker_labels_view';
 
 // Localized labels for the keybind category headers + action rows.
 export const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
@@ -25,6 +26,15 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   targetFocus1: 'hudChrome.focusTargets.target',
   targetFocus2: 'hudChrome.focusTargets.target',
   targetFocus3: 'hudChrome.focusTargets.target',
+  worldMarker1: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker2: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker3: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker4: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker5: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker6: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker7: 'hudChrome.worldMarkers.bindPlace',
+  worldMarker8: 'hudChrome.worldMarkers.bindPlace',
+  worldMarkerClear: 'hudChrome.worldMarkers.bindClear',
   forward: 'hud.keybinds.actions.forward',
   back: 'hud.keybinds.actions.back',
   turnLeft: 'hud.keybinds.actions.turnLeft',
@@ -111,6 +121,11 @@ export function bindActionDisplayName(
   const focusKey = BIND_ACTION_LABEL_KEYS[actionId];
   if (focus && focusKey)
     return t(focusKey, { slot: formatNumber(Number(focus[2]), { maximumFractionDigits: 0 }) });
+  const marker = /^worldMarker([1-8])$/.exec(actionId);
+  if (marker)
+    return t('hudChrome.worldMarkers.bindPlace', {
+      marker: raidMarkerDisplayName(Number(marker[1]) - 1),
+    });
   if (!actionId.startsWith('slot')) {
     const key = BIND_ACTION_LABEL_KEYS[actionId];
     return key ? t(key) : (fallback ?? actionId);

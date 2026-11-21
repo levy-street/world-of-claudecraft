@@ -11,7 +11,7 @@ describe('the HUD vehicle bar factory host seam', () => {
       'private readonly writerFacet = makeWriterFacet(',
       'private optionsHooks: OptionsHooks | null = null;',
       'private peekGuard = new TouchPeekGuard();',
-      'private readonly playerGroundAim = new GroundAimController({',
+      'private readonly playerGroundAim = createHudPlayerGroundAim(this);',
       'private readonly empowerHold = new EmpowerHold();',
       '  attachTooltip(el: HTMLElement, html: () => string, isSpell: () => boolean = () => false): void {',
       'this.vehicleBar ??= createHudVehicleBar(this);',

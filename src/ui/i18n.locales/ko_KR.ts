@@ -26285,4 +26285,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidAtlas.boss.final.subtitle': '하나가 된 네 광맥',
   'hudChrome.raidAtlas.boss.final.lore':
     '쏜피크가 되어 눕기 전, 대장장이는 봉인이 수백 년을 버티도록 자신의 힘을 넷으로 나누었다. 이곳 세계의 모루에서 네 광맥이 하나의 생각 없는 몸으로 모여들고 있다. 그것은 주인의 마지막 일을 끝내려 한다. 숨 쉬는 모든 것을 안에 둔 채 산을 영원히 봉인하는 일을.',
+  'hudChrome.worldMarkers.button': '위치 표시기',
+  'hudChrome.worldMarkers.buttonArmed': '{marker} 놓는 중',
+  'hudChrome.worldMarkers.title': '위치 표시기',
+  'hudChrome.worldMarkers.flyoutAria': '위치 표시기',
+  'hudChrome.worldMarkers.tip':
+    '파티를 위해 바닥에 위치를 표시합니다. 표시기를 고른 뒤 놓을 지면을 클릭하세요. 이 인스턴스 안에 있는 파티원 모두가 바닥과 지도에서 볼 수 있습니다.',
+  'hudChrome.worldMarkers.tipTouch':
+    '파티를 위해 바닥에 위치를 표시합니다. 표시기를 고른 뒤 놓을 지면을 누르세요. 이 인스턴스 안에 있는 파티원 모두가 바닥과 지도에서 볼 수 있습니다.',
+  'hudChrome.worldMarkers.tileTip':
+    '클릭한 다음 지면을 클릭하면 그곳에 놓습니다. 다시 놓으면 옮겨집니다. 지면을 오른쪽 클릭하거나 Esc 키를 누르면 취소합니다.',
+  'hudChrome.worldMarkers.tileTipTouch':
+    '누른 다음 지면을 누르면 그곳에 놓습니다. 다시 놓으면 옮겨집니다.',
+  'hudChrome.worldMarkers.tileRemove': '오른쪽 클릭: 제거합니다.',
+  'hudChrome.worldMarkers.tileRemoveTouch': '길게 누르기: 제거합니다.',
+  'hudChrome.worldMarkers.tileAria': '{marker} 위치 표시기',
+  'hudChrome.worldMarkers.tileAriaPlaced': '{marker} 위치 표시기, 놓음',
+  'hudChrome.worldMarkers.clearAll': '모두 지우기',
+  'hudChrome.worldMarkers.clearAllTip':
+    '이 인스턴스에서 파티가 놓은 위치 표시기를 모두 제거합니다.',
+  'hudChrome.worldMarkers.readOnly': '공격대장만 위치 표시기를 놓을 수 있습니다.',
+  'hudChrome.worldMarkers.bindPlace': '위치 표시기 놓기: {marker}',
+  'hudChrome.worldMarkers.bindClear': '위치 표시기 모두 지우기',
 };
