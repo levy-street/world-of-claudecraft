@@ -353,6 +353,16 @@ export function resolveAscensionAbility(
       centerOnTarget: true,
       friendlyTargetOnly: true,
     });
+    // The damaging cast's mirror of the splash heal: half its damage to every
+    // enemy within 10 m of the target, the target included.
+    effects.push({
+      type: 'aoeDamage',
+      min: 60,
+      max: 75,
+      radius: 10,
+      centerOnTarget: true,
+      hostileTargetOnly: true,
+    });
   } else if (resolved.def.id === 'vowkeeper_strike') {
     effects.push({
       type: 'selfBuff',

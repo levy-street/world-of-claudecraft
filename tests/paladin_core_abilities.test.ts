@@ -435,6 +435,14 @@ describe('Paladin core abilities', () => {
         centerOnTarget: true,
         friendlyTargetOnly: true,
       },
+      {
+        type: 'aoeDamage',
+        min: 60,
+        max: 75,
+        radius: 10,
+        centerOnTarget: true,
+        hostileTargetOnly: true,
+      },
     ]);
     const protection = new Sim({ seed: 43, playerClass: 'paladin', autoEquip: true });
     protection.setPlayerLevel(20);

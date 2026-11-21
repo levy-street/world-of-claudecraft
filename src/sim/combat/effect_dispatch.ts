@@ -2497,6 +2497,9 @@ export function runEffects(
         break;
       }
       case 'aoeDamage': {
+        // A dual-purpose spell's damaging splash: skipped, before any rng
+        // draw, when the cast healed an ally instead.
+        if (eff.hostileTargetOnly && !ascensionFxTargetHostile) break;
         if (ability.id === 'bastion_sweep' && !deferredBastionImpact) {
           const castFacing = p.facing;
           ctx.emit({

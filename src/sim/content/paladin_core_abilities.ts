@@ -192,7 +192,7 @@ const common: AbilityDef[] = [
       { type: 'directDamage', min: 120, max: 150 },
     ],
     description:
-      'Instantly heal an ally for $d or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much.',
+      'Instantly heal an ally for $d or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much, and a damaging cast also deals half as much damage to enemies within 10 m of the target.',
   },
   {
     id: 'recall_the_fallen',
