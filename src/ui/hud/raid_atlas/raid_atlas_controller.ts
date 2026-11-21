@@ -24,7 +24,7 @@ import { canvasDpr } from '../../canvas_dpr';
 import { dungeonTitleWithDifficulty } from '../../dungeon_map_painter';
 import { type DungeonMapMarker, DungeonMapViewCore } from '../../dungeon_map_view';
 import { mobDisplayName } from '../../entity_display_core';
-import { formatNumber, t } from '../../i18n';
+import { formatNumber, t, tPlural } from '../../i18n';
 import { raidMarkerDisplayName } from '../../raid_marker_labels_view';
 import {
   RAID_ATLAS_BOSS_HIT_SLOP,
@@ -50,6 +50,7 @@ import {
   drawSharedMark,
   pinIconPath,
 } from './raid_atlas_glyph_painter';
+import { RaidAtlasMinimapCard, type RaidAtlasMinimapTap } from './raid_atlas_minimap_card';
 import { raidAtlasMinimapKey } from './raid_atlas_minimap_core';
 import { RaidAtlasMinimapPainter } from './raid_atlas_minimap_painter';
 import {
@@ -197,6 +198,9 @@ export class RaidAtlasController {
   private lastFacing = Number.NaN;
   private prewarmed = 0;
   private readonly minimap = new RaidAtlasMinimapPainter();
+  /** The boss card a touch tap opens on the minimap, and the minimap's CSS size. */
+  private readonly minimapCard = new RaidAtlasMinimapCard();
+  private minimapSize = 0;
   /** The bosses' faces: a landed bust repaints the map, the legend and the minimap. */
   private readonly faces = new RaidAtlasPortraits(() => {
     this.glyphsDrawn = false;
@@ -379,7 +383,11 @@ export class RaidAtlasController {
       settled,
       plateReady: plate !== null,
     });
-    if (key !== null && key === this.minimapKey) return true;
+    this.minimapSize = size;
+    if (key !== null && key === this.minimapKey) {
+      this.minimapCard.follow(frame.bosses, (id) => this.minimap.bossSpot(id));
+      return true;
+    }
     this.minimapKey = key;
     this.minimap.paint(ctx, {
       plan,
@@ -402,7 +410,30 @@ export class RaidAtlasController {
       clock: now / 1000,
       faces: this.faces,
     });
+    this.minimapCard.follow(frame.bosses, (id) => this.minimap.bossSpot(id));
     return true;
+  }
+
+  /**
+   * A tap on the round minimap while it shows the atlas. Touch has no hover,
+   * so a TOUCH tap on a boss medallion opens its card beside the minimap, and
+   * the next tap (on it, elsewhere on the minimap, or off it) closes it.
+   * Returns true when the tap was spent here; a mouse click is never spent
+   * (it keeps opening the map).
+   */
+  minimapTap(tap: RaidAtlasMinimapTap, touch: boolean): boolean {
+    if (!touch || this.minimapSize <= 0) return this.minimapCard.tap(tap, 1, () => null);
+    return this.minimapCard.tap(tap, this.minimapSize, (x, y) => {
+      const mark = this.minimap.bossAt(x, y, RAID_ATLAS_BOSS_HIT_SLOP.touch);
+      const spot = mark ? this.minimap.bossSpot(mark.boss.id) : null;
+      return mark && spot ? { mark, spot } : null;
+    });
+  }
+
+  /** The minimap left the atlas (the player left the raid): its card goes. */
+  minimapGone(): void {
+    this.minimapSize = 0;
+    this.minimapCard.close();
   }
 
   // ---- lifecycle -----------------------------------------------------------------------
@@ -486,7 +517,7 @@ export class RaidAtlasController {
       sharedMarks: this.shared,
       settled: !gliding && this.pointers.size === 0,
       title: dungeonTitleWithDifficulty(plan.dungeonId, world),
-      subtitle: t('hudChrome.raidAtlas.subtitle', {
+      subtitle: tPlural('hudChrome.raidAtlas.subtitle', plan.bosses.length, {
         floor: floorName,
         defeated: formatNumber(frame.defeated),
         total: formatNumber(plan.bosses.length),

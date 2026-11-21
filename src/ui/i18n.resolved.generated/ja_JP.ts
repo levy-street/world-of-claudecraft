@@ -7897,7 +7897,10 @@ export const ja_JP: EnTranslations = {
     },
     "raidAtlas": {
       "canvasAria": "レイドマップ",
-      "subtitle": "{floor}：ボス {total} 体中 {defeated} 体撃破",
+      "subtitle": {
+        "one": "{floor}：ボス {total} 体中 {defeated} 体撃破",
+        "other": "{floor}：ボス {total} 体中 {defeated} 体撃破"
+      },
       "north": "北",
       "scale": "{yards} ヤード",
       "floorsAria": "マップのページ",

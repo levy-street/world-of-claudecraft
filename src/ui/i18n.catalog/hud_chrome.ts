@@ -11130,7 +11130,11 @@ export const hudChromeStrings = {
   // M-map, its pages, room names, tools, pin styles and legend.
   raidAtlas: {
     canvasAria: 'Raid map',
-    subtitle: '{floor}: {defeated} of {total} bosses defeated',
+    // The cartouche's progress line: plural on the boss total (tPlural).
+    subtitle: {
+      one: '{floor}: {defeated} of {total} boss defeated',
+      other: '{floor}: {defeated} of {total} bosses defeated',
+    },
     north: 'N',
     scale: '{yards} yd',
     floorsAria: 'Map pages',

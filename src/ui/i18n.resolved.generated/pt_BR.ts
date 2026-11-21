@@ -7897,7 +7897,10 @@ export const pt_BR: EnTranslations = {
     },
     "raidAtlas": {
       "canvasAria": "Raid map",
-      "subtitle": "{floor}: {defeated} of {total} bosses defeated",
+      "subtitle": {
+        "one": "{floor}: {defeated} of {total} boss defeated",
+        "other": "{floor}: {defeated} of {total} bosses defeated"
+      },
       "north": "N",
       "scale": "{yards} yd",
       "floorsAria": "Map pages",

@@ -3384,6 +3384,10 @@ const UI_DOM_MODULES = [
   'src/ui/hud/raid_atlas/raid_atlas_portraits.ts',
   // The boss card and the bosses' keyboard focus stops over the atlas.
   'src/ui/hud/raid_atlas/raid_atlas_boss_pins.ts',
+  // One boss card (the map's and the minimap's), and the minimap's touch card
+  // with its once-per-tap geometry read and its outside-press listener.
+  'src/ui/hud/raid_atlas/raid_atlas_boss_card.ts',
+  'src/ui/hud/raid_atlas/raid_atlas_minimap_card.ts',
   // The shared raid marks' tool button and symbol panel over the atlas.
   'src/ui/hud/raid_atlas/raid_atlas_shared_marks.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',

@@ -21,6 +21,8 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
 | `raid_atlas_boss_core.ts` | The boss pins as data: each medallion's faces (a council is one pin with both), the bust URLs, the tooltip model, the hit test through the live camera, the card's placement. |
 | `raid_atlas_portraits.ts` | The bosses' busts loaded once per session (and a once-made grey copy for a defeated boss); `version` moves on each load. |
 | `raid_atlas_portrait_glyph.ts` | The portrait medallion (face in a gilded rim, per state, partner medallion) and the hover halo; the crest medallion stands in until a face lands. |
+| `raid_atlas_boss_card.ts` | DOM: one boss card (faces, name, subtitle, state, lore; keyed fill, size measured per fill), shared by the map's pins and the minimap's card. |
+| `raid_atlas_minimap_card.ts` | DOM: the minimap's boss card for touch (a tap on a medallion opens it beside the minimap, any other tap closes it); geometry read once per tap. |
 | `raid_atlas_boss_pins.ts` | DOM: the boss card (hover, tap, focus) that follows its pin each paint, and one keyboard focus stop per boss. |
 | `raid_atlas_shared_marks_core.ts` | The group's shared marks as data: wire page index to floor, the edit right (the sim's `canEditSharedMapMarks`), the hit test, the paint key. |
 | `raid_atlas_shared_marks.ts` | DOM: the shared-marks tool button and its panel (the eight raid-marker symbols, clear all, who sees them or why you cannot set them). |
@@ -53,5 +55,9 @@ adds the player's pins to the dungeon minimap; Hud knows none of it.
 - The boss card is the atlas's own (parchment, inside the chrome), not the shared #tooltip:
   the map owns its input and the card must follow its pin through zoom and pan. The game
   claims Tab, so the map walks its own focus ring (the map, each boss, back to the map).
+- Touch has no hover: a tap on a boss medallion opens its card, on the map AND on the
+  minimap (`InteriorMapController.minimapTap`, reached from the minimap's own tap binder;
+  a mouse click on the minimap keeps opening the map). A tap anywhere else closes it.
+- Counters with a number in them go through `tPlural` (the cartouche's boss total).
 - Tests: `tests/raid_atlas_boss.test.ts`, `tests/raid_atlas.test.ts`, `tests/raid_atlas_minimap.test.ts`, and the routing in
   `tests/interior_map_controller.test.ts`.

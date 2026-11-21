@@ -7897,7 +7897,10 @@ export const ko_KR: EnTranslations = {
     },
     "raidAtlas": {
       "canvasAria": "공격대 지도",
-      "subtitle": "{floor}: 우두머리 {total}명 중 {defeated}명 처치",
+      "subtitle": {
+        "one": "{floor}: 우두머리 {total}명 중 {defeated}명 처치",
+        "other": "{floor}: 우두머리 {total}명 중 {defeated}명 처치"
+      },
       "north": "북",
       "scale": "{yards}야드",
       "floorsAria": "지도 페이지",

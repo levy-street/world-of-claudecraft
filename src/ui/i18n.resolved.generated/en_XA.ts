@@ -7897,7 +7897,10 @@ export const en_XA: EnTranslations = {
     },
     "raidAtlas": {
       "canvasAria": "[Ŕáíð ɱáþ]",
-      "subtitle": "[{floor}: {defeated} óƒ {total} ƀóššéš ðéƒéáţéð]",
+      "subtitle": {
+        "one": "[{floor}: {defeated} óƒ {total} ƀóšš ðéƒéáţéð]",
+        "other": "[{floor}: {defeated} óƒ {total} ƀóššéš ðéƒéáţéð]"
+      },
       "north": "[Ñ]",
       "scale": "[{yards} ýð]",
       "floorsAria": "[Ɱáþ þáĝéš]",

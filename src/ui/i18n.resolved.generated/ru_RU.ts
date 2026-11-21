@@ -7897,7 +7897,10 @@ export const ru_RU: EnTranslations = {
     },
     "raidAtlas": {
       "canvasAria": "Карта рейда",
-      "subtitle": "{floor}: повержено боссов {defeated} из {total}",
+      "subtitle": {
+        "one": "{floor}: повержено боссов {defeated} из {total}",
+        "other": "{floor}: повержено боссов {defeated} из {total}"
+      },
       "north": "С",
       "scale": "{yards} ярд.",
       "floorsAria": "Страницы карты",

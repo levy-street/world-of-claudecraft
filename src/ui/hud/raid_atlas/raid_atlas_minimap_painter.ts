@@ -45,7 +45,7 @@ import { type RaidAtlasFloor, type RaidAtlasPlan, raidAtlasFloorAt } from './rai
 import { drawBossPortraitMedallion } from './raid_atlas_portrait_glyph';
 import type { RaidAtlasFaceSource } from './raid_atlas_portraits';
 import type { RaidAtlasSharedMark } from './raid_atlas_shared_marks_core';
-import type { RaidAtlasFrame } from './raid_atlas_view';
+import type { RaidAtlasBossMark, RaidAtlasFrame } from './raid_atlas_view';
 
 const TAU = Math.PI * 2;
 /** The disc's clip inset (the dungeon minimap's). */
@@ -61,7 +61,7 @@ const MEDALLION_COVER = 1.6;
 const POI_R = 5;
 const MEMBER_R = 3.4;
 const PIN_PX = 13;
-const SHARED_R = 6.5;
+const SHARED_R = 7.5;
 const MOB_R = 3.4;
 const MOB_AGGRO_R = 4.2;
 const MOB_BOSS_R = 5;
@@ -114,6 +114,29 @@ export class RaidAtlasMinimapPainter {
   private shade: HTMLCanvasElement | null = null;
   private shadeKey = '';
   private readonly labels = new TextSpriteCache(32);
+  /** Where each boss medallion sat in the last paint (minimap CSS px): the
+   *  touch tap's hit test reads it (a skipped paint leaves the pixels, and so
+   *  the spots, as they were). */
+  private bossSpots: { mark: RaidAtlasBossMark; sx: number; sy: number }[] = [];
+
+  /** The boss medallion under minimap point (x, y) in CSS px, or null. */
+  bossAt(x: number, y: number, slop: number): RaidAtlasBossMark | null {
+    let best: RaidAtlasBossMark | null = null;
+    let bestD = Number.POSITIVE_INFINITY;
+    for (const spot of this.bossSpots) {
+      const d = Math.hypot(spot.sx - x, spot.sy - y) - BOSS_R;
+      if (d <= slop && d < bestD) {
+        best = spot.mark;
+        bestD = d;
+      }
+    }
+    return best;
+  }
+
+  /** Where a boss's medallion sits now (minimap CSS px), or null off the disc. */
+  bossSpot(id: string): { sx: number; sy: number } | null {
+    return this.bossSpots.find((s) => s.mark.boss.id === id) ?? null;
+  }
 
   /** Paint the atlas minimap onto `ctx` (CSS-px transform, `size` square). */
   paint(ctx: CanvasRenderingContext2D, input: RaidAtlasMinimapInput): void {
@@ -316,10 +339,12 @@ export class RaidAtlasMinimapPainter {
 
     // Boss medallions: standing, fighting (with its pulse) or defeated.
     const phase = (input.clock * 0.8) % 1;
+    this.bossSpots = [];
     for (const mark of frame.bosses) {
       if (mark.boss.floor !== floor.id) continue;
       const p = at(mark.boss.x, mark.boss.z);
       if (!inside(p.sx, p.sy, BOSS_R)) continue;
+      this.bossSpots.push({ mark, sx: p.sx, sy: p.sy });
       if (mark.state === 'engaged') drawEngagedPulse(ctx, c, p.sx, p.sy, BOSS_R, phase);
       const [lead] = raidAtlasBossFaces(mark.boss);
       drawBossPortraitMedallion(ctx, c, p.sx, p.sy, BOSS_R, mark.state, input.faces.face(lead));

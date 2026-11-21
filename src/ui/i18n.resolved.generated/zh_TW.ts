@@ -7897,7 +7897,10 @@ export const zh_TW: EnTranslations = {
     },
     "raidAtlas": {
       "canvasAria": "團隊副本地圖",
-      "subtitle": "{floor}：已擊敗首領 {defeated}/{total}",
+      "subtitle": {
+        "one": "{floor}：已擊敗首領 {defeated}/{total}",
+        "other": "{floor}：已擊敗首領 {defeated}/{total}"
+      },
       "north": "北",
       "scale": "{yards} 碼",
       "floorsAria": "地圖頁",

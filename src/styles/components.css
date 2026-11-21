@@ -15720,6 +15720,13 @@
     font-style: italic;
     color: var(--color-raid-atlas-parchment-dark);
   }
+  /* The raid marks panel docks at the map's left edge so the middle of the
+     page, where marks go, stays free to click. */
+  body:not(.mobile-touch) .raid-atlas-shared {
+    left: 18px;
+    bottom: 72px;
+    transform: none;
+  }
   .raid-atlas-shared.is-read-only .raid-atlas-shared-note {
     color: var(--color-raid-atlas-gold-light);
   }
@@ -15883,7 +15890,8 @@
       0 0 0 2px var(--color-raid-atlas-frame-dark),
       0 0 0 4px var(--color-border-focus);
   }
-  .raid-atlas-chrome > .raid-atlas-boss-card {
+  .raid-atlas-chrome > .raid-atlas-boss-card,
+  .raid-atlas-boss-card.is-minimap {
     position: absolute;
     left: 0;
     top: 0;
@@ -15911,6 +15919,11 @@
   }
   .raid-atlas-boss-card.is-open {
     display: block;
+  }
+  /* The minimap's card (raid_atlas_minimap_card.ts) sits beside the round
+     minimap, over the HUD like the shared tooltip. */
+  .raid-atlas-boss-card.is-minimap {
+    z-index: 100;
   }
   .raid-atlas-boss-faces {
     display: flex;
@@ -16036,6 +16049,17 @@
   /* Touch: the face is a small square, so the card turns into a compact
      strip across it (the face beside the name, the lore below), set above or
      below its pin (raidAtlasTooltipPlacement) so the pin stays in sight. */
+  body.mobile-touch .raid-atlas-boss-card.is-minimap {
+    width: min(340px, calc(100vw - 20px));
+    padding: 7px 9px 8px;
+    text-align: left;
+  }
+  body.mobile-touch .raid-atlas-boss-card.is-minimap.is-open {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+    align-items: center;
+  }
   body.mobile-touch .raid-atlas-chrome > .raid-atlas-boss-card {
     width: calc(100% - 16px);
     max-width: 340px;

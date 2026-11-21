@@ -11,6 +11,7 @@ const calls = vi.hoisted(() => ({
   dawnholdMinimap: vi.fn(),
   dawnholdWorld: vi.fn(),
   atlasMinimap: vi.fn(),
+  atlasGone: vi.fn(),
   atlasPaints: true,
 }));
 
@@ -57,6 +58,12 @@ vi.mock('../src/ui/hud/raid_atlas', () => ({
     }
     hide(): void {}
     tick(): void {}
+    minimapGone(): void {
+      calls.atlasGone();
+    }
+    minimapTap(): boolean {
+      return true;
+    }
   },
 }));
 

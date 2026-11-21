@@ -1,7 +1,9 @@
 // The minimap emblem's objective tap. A touch-safe activation keeps the emblem
 // usable while another thumb is steering: a tap on a world-quest or world-boss
-// marker opens the world map on that zone with the quest selected, any other tap
-// toggles the map. Projection and layout are read only on activation, never in
+// marker opens the world map on that zone with the quest selected; inside a raid
+// with an atlas, a touch tap on a boss medallion opens its card instead (and the
+// next tap closes it, InteriorMapController.minimapTap); any other tap toggles
+// the map. Projection and layout are read only on activation, never in
 // the painter. Hud members are private, so the binder takes the Hud untyped; the
 // members it reads are welded to hud.ts in tests/minimap_objective_tap.test.ts.
 import type { IWorld } from '../../../world_api';
@@ -41,6 +43,12 @@ interface MinimapTapHost {
   mapCenter: { x: number; z: number } | null;
   mapPing: { x: number; z: number } | null;
   mapMarkerInteraction: { selectWorldQuest(questId: string | null): boolean };
+  interiorMaps: {
+    minimapTap(
+      tap: { canvas: HTMLCanvasElement; clientX: number; clientY: number },
+      touch: boolean,
+    ): boolean;
+  };
   toggleMap(): void;
   updateMapWindow(): void;
 }
@@ -49,6 +57,9 @@ export function bindMinimapObjectiveTap(mm: HTMLCanvasElement, hud: object): voi
   const h = hud as MinimapTapHost;
   bindTouchTap(mm, (event) => {
     const ev = event as MouseEvent | PointerEvent;
+    const touch = 'pointerType' in ev && ev.pointerType === 'touch';
+    if (h.interiorMaps.minimapTap({ canvas: mm, clientX: ev.clientX, clientY: ev.clientY }, touch))
+      return;
     const rect = mm.getBoundingClientRect();
     const probe =
       minimapMode(h.sim) === 'overworld' ? minimapTapProbe(ev.clientX, ev.clientY, rect, mm) : null;

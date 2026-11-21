@@ -5,7 +5,8 @@
 //
 //   mouse      hovering a medallion opens its card; leaving it closes it
 //   touch      a tap on a medallion opens its card (a tap on the same one,
-//              or anywhere else, closes it); the pin tool keeps its taps
+//              or anywhere else, on the map or off it, closes it); the pin
+//              tool keeps its taps
 //   keyboard   Tab reaches each boss on the open page after the map itself;
 //              focus opens its card, Escape closes it and returns to the map
 //
@@ -20,11 +21,8 @@
 
 import { mobDisplayName } from '../../entity_display_core';
 import { t } from '../../i18n';
-import {
-  type RaidAtlasBossTooltipModel,
-  raidAtlasBossTooltip,
-  raidAtlasTooltipPlacement,
-} from './raid_atlas_boss_core';
+import { RaidAtlasBossCard, raidAtlasBossTitle } from './raid_atlas_boss_card';
+import { raidAtlasBossTooltip, raidAtlasTooltipPlacement } from './raid_atlas_boss_core';
 import type { RaidAtlasFloorId } from './raid_atlas_plan_core';
 import type { RaidAtlasBossMark } from './raid_atlas_view';
 
@@ -55,27 +53,15 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
-function titleOf(model: RaidAtlasBossTooltipModel): string {
-  return model.titleKey ? t(model.titleKey) : (model.names[0] ?? '');
-}
-
 export class RaidAtlasBossPins {
-  private readonly card: HTMLElement;
-  private readonly faces: HTMLElement;
-  private readonly title: HTMLElement;
-  private readonly subtitle: HTMLElement;
-  private readonly stateLine: HTMLElement;
-  private readonly lore: HTMLElement;
+  private readonly card: RaidAtlasBossCard;
   private readonly layer: HTMLElement;
+  /** The map's own surface (canvas and chrome): a tap there is the controller's. */
+  private readonly surface: HTMLElement;
   private readonly stops = new Map<string, HTMLButtonElement>();
   private openId: string | null = null;
   /** Why the card is open: a hover closes on leave, a tap or focus does not. */
   private openBy: 'hover' | 'tap' | 'focus' | null = null;
-  private contentKey = '';
-  private placeKey = '';
-  /** The card's measured size, read once per content change (never per paint). */
-  private cardW = 0;
-  private cardH = 0;
   private readonly stopPlace = new Map<string, string>();
   private readonly stopLabel = new Map<string, string>();
   private geometry: RaidAtlasPinGeometry | null = null;
@@ -90,17 +76,23 @@ export class RaidAtlasBossPins {
     // straight after the map and before the page tabs and tools.
     this.layer = el('div', 'raid-atlas-boss-stops');
     chrome.insertBefore(this.layer, chrome.firstChild);
-    const card = el('div', 'raid-atlas-boss-card', chrome);
-    card.id = CARD_ID;
-    card.setAttribute('role', 'tooltip');
-    this.faces = el('div', 'raid-atlas-boss-faces', card);
-    const head = el('div', 'raid-atlas-boss-head', card);
-    this.title = el('div', 'raid-atlas-boss-title', head);
-    this.subtitle = el('div', 'raid-atlas-boss-subtitle', head);
-    this.stateLine = el('div', 'raid-atlas-boss-state', card);
-    el('div', 'raid-atlas-boss-rule', card);
-    this.lore = el('p', 'raid-atlas-boss-lore', card);
-    this.card = card;
+    this.card = new RaidAtlasBossCard(chrome, 'raid-atlas-boss-card', CARD_ID);
+    this.surface = chrome.parentElement ?? chrome;
+  }
+
+  /** A tap-opened card closes on a press anywhere off the map (a press on the
+   *  map is the controller's tap, which closes it there). Listening only while
+   *  such a card is open, in the capture phase so a HUD button's own handler
+   *  cannot swallow it. */
+  private readonly outsidePress = (ev: Event): void => {
+    const target = ev.target as Node | null;
+    if (target && this.surface.contains(target)) return;
+    this.close();
+  };
+
+  private watchOutside(on: boolean): void {
+    if (on) document.addEventListener('pointerdown', this.outsidePress, true);
+    else document.removeEventListener('pointerdown', this.outsidePress, true);
   }
 
   /** The encounter whose card is open (its pin wears the halo), or null. */
@@ -170,7 +162,8 @@ export class RaidAtlasBossPins {
     stop?.removeAttribute('aria-describedby');
     this.openId = null;
     this.openBy = null;
-    this.card.classList.remove('is-open');
+    this.watchOutside(false);
+    this.card.setOpen(false);
     this.onChange();
   }
 
@@ -199,9 +192,9 @@ export class RaidAtlasBossPins {
     prev?.removeAttribute('aria-describedby');
     this.openId = mark.boss.id;
     this.openBy = by;
+    this.watchOutside(by === 'tap');
     this.stops.get(mark.boss.id)?.setAttribute('aria-describedby', CARD_ID);
-    this.placeKey = '';
-    this.card.classList.add('is-open');
+    this.card.setOpen(true);
     this.fill(mark);
     const g = this.geometry;
     if (g) this.place(g.project(mark.boss.x, mark.boss.z), g);
@@ -209,42 +202,12 @@ export class RaidAtlasBossPins {
   }
 
   private fill(mark: RaidAtlasBossMark): void {
-    const model = raidAtlasBossTooltip(mark, mobDisplayName);
-    const key = `${model.id}|${model.state}`;
-    if (key === this.contentKey) return;
-    this.contentKey = key;
-    this.card.dataset.state = model.state;
-    this.card.dataset.boss = model.id;
-    const imgs = model.portraits.map((src, i) => {
-      const img = document.createElement('img');
-      img.className = i === 0 ? 'raid-atlas-boss-face' : 'raid-atlas-boss-face is-partner';
-      img.src = src;
-      img.alt = '';
-      img.decoding = 'async';
-      return img;
-    });
-    this.faces.replaceChildren(...imgs);
-    this.faces.classList.toggle('is-council', imgs.length > 1);
-    this.title.textContent = titleOf(model);
-    this.subtitle.textContent = t(model.subtitleKey, {
-      lead: model.names[0] ?? '',
-      partner: model.names[1] ?? '',
-    });
-    this.stateLine.textContent = t(model.stateKey);
-    this.lore.textContent = t(model.loreKey);
-    this.cardW = this.card.offsetWidth;
-    this.cardH = this.card.offsetHeight;
-    this.placeKey = '';
+    this.card.fill(mark);
   }
 
   private place(p: { sx: number; sy: number }, g: RaidAtlasPinGeometry): void {
-    const at = raidAtlasTooltipPlacement(p, g.r * 1.2, { w: this.cardW, h: this.cardH }, g.side);
-    const left = Math.round(at.left + g.offsetX);
-    const top = Math.round(at.top + g.offsetY);
-    const key = `${left},${top}`;
-    if (key === this.placeKey) return;
-    this.placeKey = key;
-    this.card.style.transform = `translate(${left}px, ${top}px)`;
+    const at = raidAtlasTooltipPlacement(p, g.r * 1.2, this.card.size(), g.side);
+    this.card.place(at.left + g.offsetX, at.top + g.offsetY);
   }
 
   /** One focus stop per boss of the open page, over its medallion. */
@@ -290,7 +253,10 @@ export class RaidAtlasBossPins {
         const model = raidAtlasBossTooltip(mark, mobDisplayName);
         stop.setAttribute(
           'aria-label',
-          t('hudChrome.raidAtlas.boss.aria', { name: titleOf(model), state: t(model.stateKey) }),
+          t('hudChrome.raidAtlas.boss.aria', {
+            name: raidAtlasBossTitle(model),
+            state: t(model.stateKey),
+          }),
         );
       }
       const x = Math.round(p.sx - g.r + g.offsetX);

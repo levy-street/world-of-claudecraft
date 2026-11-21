@@ -23,7 +23,12 @@ import {
   dungeonMapLocal,
   type MapAnchor,
 } from './dungeon_map_view';
-import { hasRaidAtlas, type RaidAtlasAnchor, RaidAtlasController } from './hud/raid_atlas';
+import {
+  hasRaidAtlas,
+  type RaidAtlasAnchor,
+  RaidAtlasController,
+  type RaidAtlasMinimapTap,
+} from './hud/raid_atlas';
 import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_painter';
 import {
   dawnholdLocal,
@@ -74,9 +79,11 @@ export class InteriorMapController {
         this.writers.setText(zoneLabelEl, dungeonTitleWithDifficulty(anchor.dungeonId, world));
         return true;
       }
+      this.atlas?.minimapGone();
       this.dungeon.paintMinimap(ctx, world, zoneLabelEl, size, zoom);
       return true;
     }
+    this.atlas?.minimapGone();
     if (lastKeepMapActive(world)) {
       this.lastKeep.paintMinimap(ctx, world, zoneLabelEl, size, zoom);
       return true;
@@ -114,6 +121,13 @@ export class InteriorMapController {
       return { title: this.dawnhold.paintWorldMap(ctx, world, size, anchor), model: null };
     }
     return null;
+  }
+
+  /** A tap on the minimap: true when the raid atlas spent it (a boss card
+   *  opened or closed on a touch tap), so the minimap does not also toggle
+   *  the map. */
+  minimapTap(tap: RaidAtlasMinimapTap, touch: boolean): boolean {
+    return this.atlas?.minimapTap(tap, touch) ?? false;
   }
 
   /** The HUD's frame tick (the raid atlas's glide and live layer). */

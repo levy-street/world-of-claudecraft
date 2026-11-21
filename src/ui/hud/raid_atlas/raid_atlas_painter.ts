@@ -74,7 +74,7 @@ const MEMBER_PX = 6;
 const BOSS_PX = 19;
 const PIN_PX = 26;
 /** A shared mark's token radius at home zoom (CSS px). */
-export const RAID_ATLAS_SHARED_MARK_PX = 12;
+export const RAID_ATLAS_SHARED_MARK_PX = 14;
 const POI_PX = 9;
 /** Minor room names appear once a yard spans this many CSS px. */
 const MINOR_LABEL_SCALE = 1.45;

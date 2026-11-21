@@ -5,7 +5,9 @@
 // symbol is armed, open or not) and reports picks through its hooks.
 //
 //   editable    a symbol press arms it (the map's next taps place it; a tap on a
-//               shared mark removes that mark); pressing it again disarms
+//               shared mark removes that mark); pressing it again disarms. On
+//               touch the panel folds away once a symbol is armed, so the map
+//               is free to tap (the lit tool button shows it is still armed)
 //   read-only   the symbols show disabled and the note names the raid leader
 //
 // Every label is a t() key; the symbols' names are the target markers' own
@@ -60,7 +62,9 @@ export class RaidAtlasSharedMarkTools {
     const glyph = el('img', 'raid-atlas-shared-tool-glyph', tool);
     glyph.src = raidMarkerDataUrl(7);
     glyph.alt = '';
-    tool.addEventListener('click', () => this.setOpen(!this.isOpen()));
+    // The tool opens the panel; pressed again (or while folded with a symbol
+    // armed) it closes and disarms.
+    tool.addEventListener('click', () => this.setOpen(!this.isOpen() && this.armedSymbol === null));
     this.toolBtn = tool;
 
     const panel = el('div', 'raid-atlas-shared ui-panel-strong', chrome);
@@ -79,7 +83,11 @@ export class RaidAtlasSharedMarkTools {
       const img = el('img', 'raid-atlas-shared-chip-glyph', b);
       img.src = raidMarkerDataUrl(symbol);
       img.alt = '';
-      b.addEventListener('click', () => this.arm(this.armedSymbol === symbol ? null : symbol));
+      b.addEventListener('click', () => {
+        this.arm(this.armedSymbol === symbol ? null : symbol);
+        if (this.armedSymbol !== null && document.body.classList.contains('mobile-touch'))
+          this.fold();
+      });
       this.symbols.set(symbol, b);
     }
     this.note = el('p', 'raid-atlas-shared-note', panel);
@@ -118,6 +126,12 @@ export class RaidAtlasSharedMarkTools {
     this.toolBtn.setAttribute('aria-expanded', String(open));
     if (open) this.symbols.get(this.armedSymbol ?? 0)?.focus();
     else this.arm(null);
+  }
+
+  /** Hide the panel but keep the armed symbol (touch: the map needs the room). */
+  private fold(): void {
+    this.panel.classList.remove('is-open');
+    this.toolBtn.setAttribute('aria-expanded', 'false');
   }
 
   /** Arm (or disarm) a symbol. */

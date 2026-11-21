@@ -162,3 +162,30 @@ export function raidAtlasTooltipPlacement(
   for (const at of candidates) if (covered(at) < covered(best)) best = at;
   return best;
 }
+
+/** Where the minimap's boss card sits (client px, top-left out): beside the
+ *  round minimap on its open side (left of a disc near the right edge, else
+ *  right of it), vertically centred on the tapped medallion; when neither
+ *  side has room (a narrow portrait phone), below the disc. Always kept
+ *  `gap` px inside the viewport. */
+export function raidAtlasMinimapCardPlacement(
+  pin: { x: number; y: number },
+  disc: { left: number; top: number; right: number; bottom: number },
+  card: { w: number; h: number },
+  viewport: { w: number; h: number },
+  gap = 10,
+): { left: number; top: number } {
+  const clampX = (x: number) =>
+    Math.min(Math.max(gap, x), Math.max(gap, viewport.w - gap - card.w));
+  const clampY = (y: number) =>
+    Math.min(Math.max(gap, y), Math.max(gap, viewport.h - gap - card.h));
+  const top = clampY(pin.y - card.h / 2);
+  const leftSide = disc.left - gap - card.w;
+  const rightSide = disc.right + gap;
+  const roomLeft = leftSide >= gap;
+  const roomRight = rightSide + card.w <= viewport.w - gap;
+  const discMid = (disc.left + disc.right) / 2;
+  if (roomLeft && (discMid > viewport.w / 2 || !roomRight)) return { left: leftSide, top };
+  if (roomRight) return { left: rightSide, top };
+  return { left: clampX(pin.x - card.w / 2), top: clampY(disc.bottom + gap) };
+}
