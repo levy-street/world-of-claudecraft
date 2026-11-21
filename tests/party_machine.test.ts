@@ -31,6 +31,8 @@ function makeCtx() {
 
   const ctx = {
     pendingDifficultyChanges: new Map(),
+    // A disband to one member hands them the party's claims.
+    instances: [],
     get time() {
       return clock.time;
     },

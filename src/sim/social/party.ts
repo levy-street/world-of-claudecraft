@@ -18,6 +18,7 @@
 
 import { cancelPendingDifficultyChange } from '../instances/difficulty_selection';
 import { expeditionFamilyClaims } from '../instances/dungeon_expeditions';
+import { handRunToLastMember } from '../instances/instance_group_eviction';
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import { emitReferralPartyEvidence } from '../referral_evidence';
@@ -664,6 +665,11 @@ export class PartyMachine {
         // in assignMasterLoot. Convert it to need/greed immediately instead.
         revokeMasterLooterAuthority(this.ctx, mPid);
         this.ctx.emit({ type: 'log', text: 'Your party has disbanded.', color: '#aaf', pid: mPid });
+      }
+      // The one player left keeps the group's dungeon runs (a raid's do not
+      // pass on: a player outside any raid group is evicted from it).
+      if (party.members.length === 1 && !party.raid) {
+        handRunToLastMember(this.ctx, `party:${party.id}`, party.members[0]);
       }
       this.parties.delete(party.id);
       this.ctx.dropPartyMarkers(party.id);

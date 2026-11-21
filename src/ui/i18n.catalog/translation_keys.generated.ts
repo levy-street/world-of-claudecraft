@@ -15539,6 +15539,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.hubLesson.reviewComparison'
   | 'hudChrome.hubLesson.target'
   | 'hudChrome.hubLesson.viewBreakdown'
+  | 'hudChrome.instanceGroup.evictWarning'
+  | 'hudChrome.instanceGroup.evicted'
   | 'hudChrome.interfaceTabs.chat'
   | 'hudChrome.interfaceTabs.combat'
   | 'hudChrome.interfaceTabs.frames'

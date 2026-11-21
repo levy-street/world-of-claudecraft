@@ -4355,6 +4355,10 @@ export const ko_KR: EnTranslations = {
       "entryMismatchNormal": "이 인스턴스는 일반 난이도로 설정되어 있습니다. 영웅 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요.",
       "entryMismatchHeroic": "이 인스턴스는 영웅 난이도로 설정되어 있습니다. 일반 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요."
     },
+    "instanceGroup": {
+      "evictWarning": "이 인스턴스의 파티에 속해 있지 않습니다. {seconds}초 후 인스턴스에서 내보내집니다.",
+      "evicted": "이 인스턴스의 파티에 속해 있지 않아 인스턴스에서 내보내졌습니다."
+    },
     "bags": {
       "membershipSlot": "멤버십 가방 칸",
       "membershipSlotLocked": "멤버십으로 이 가방 칸을 잠금 해제하세요.",

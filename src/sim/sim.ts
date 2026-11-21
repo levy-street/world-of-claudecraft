@@ -763,6 +763,7 @@ import {
   DEFAULT_WEEKLY_RAID_LOCKOUT_MS,
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
+  evictLeaverFromGroupInstance,
   inheritDungeonResetLocks as inheritDungeonResetLocksImpl,
   instanceClaimIdAt as instanceClaimIdAtImpl,
   instanceInfoAt as instanceInfoAtImpl,
@@ -3787,10 +3788,10 @@ export class Sim {
       // A disconnect mid-harvest must release the corpse reservation before
       // the leave snapshot/removal, the same idempotent-guard shape as the
       // rain_of_fire cancel above (see cancelCast's releaseCorpseHarvest hook).
-      if (leavingEntity?.castingAbility === CORPSE_HARVEST_CAST_ID) {
+      if (leavingEntity?.castingAbility === CORPSE_HARVEST_CAST_ID)
         cancelCastImpl(this.ctx, leavingEntity);
-      }
     }
+    evictLeaverFromGroupInstance(this.ctx, pid); // before the leave save (instance_group_eviction.ts)
     meta.leaving = true;
     cleanupPriestState(this.ctx, pid);
     const leaving = this.entities.get(pid);
