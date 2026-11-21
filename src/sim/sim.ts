@@ -9146,15 +9146,12 @@ export class Sim {
   markersFor(pid: number): Record<number, number> {
     return this.targeting.markersFor(pid);
   }
-
   setMarker(entityId: number, markerId: number, pid?: number): void {
     this.targeting.setMarker(entityId, markerId, pid);
   }
-
   clearMarker(entityId: number, pid?: number): void {
     this.targeting.clearMarker(entityId, pid);
   }
-
   markerFor(entityId: number): number | null {
     return this.targeting.markerFor(entityId);
   }
@@ -9163,6 +9160,9 @@ export class Sim {
   }
   placeSharedMapMark(page: number, x: number, z: number, symbol: number, pid?: number): void {
     this.targeting.mapMarks.place(page, x, z, symbol, pid);
+  }
+  placeSharedWorldMark(...a: Parameters<Targeting['mapMarks']['placeWorld']>): void {
+    this.targeting.mapMarks.placeWorld(...a);
   }
   clearSharedMapMarks(symbol: number | null, pid?: number): void {
     this.targeting.mapMarks.clear(symbol, pid);

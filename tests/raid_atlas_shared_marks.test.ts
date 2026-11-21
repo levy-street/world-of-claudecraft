@@ -25,9 +25,9 @@ describe('raid atlas shared marks core', () => {
     expect(sharedMarkPage(plan, 'heart')).toBe(1);
     expect(
       sharedMarksOnAtlas(plan, [
-        { symbol: 7, page: 1, x: 3, z: 4 },
-        { symbol: 0, page: 0, x: -1, z: 2 },
-        { symbol: 2, page: 3, x: 0, z: 0 }, // a page this plan does not have
+        { symbol: 7, page: 1, x: 3, z: 4, wx: 0, y: 0, wz: 0 },
+        { symbol: 0, page: 0, x: -1, z: 2, wx: 0, y: 0, wz: 0 },
+        { symbol: 2, page: 3, x: 0, z: 0, wx: 0, y: 0, wz: 0 }, // a page this plan does not have
       ]),
     ).toEqual([
       { symbol: 7, floor: 'heart', x: 3, z: 4 },

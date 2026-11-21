@@ -1,6 +1,7 @@
 // The raid-marker command family off the dispatch switch in server/game.ts:
 // the target markers (setMarker / clearMarker, byte-identical to the cases they
-// replace) and the raid map's shared marks (map_mark_set / map_mark_clear).
+// replace) and the raid's shared marks (map_mark_set from the map,
+// map_mark_place from a ground click in the world, map_mark_clear).
 // This layer only checks wire SHAPE (types, finiteness) and drops anything
 // else; the Sim (src/sim/social/shared_map_marks.ts, src/sim/targeting.ts)
 // owns every rule: group membership, the instance the sender stands in, edit
@@ -9,7 +10,12 @@
 
 import type { Sim } from '../src/sim/sim';
 
-export type MarkerCommand = 'setMarker' | 'clearMarker' | 'map_mark_set' | 'map_mark_clear';
+export type MarkerCommand =
+  | 'setMarker'
+  | 'clearMarker'
+  | 'map_mark_set'
+  | 'map_mark_place'
+  | 'map_mark_clear';
 
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v);
@@ -31,6 +37,10 @@ export function dispatchMarkerCommand(
     case 'map_mark_set':
       if (isInt(msg.page) && isNum(msg.x) && isNum(msg.z) && isInt(msg.symbol))
         sim.placeSharedMapMark(msg.page, msg.x, msg.z, msg.symbol, pid);
+      return;
+    case 'map_mark_place':
+      if (isInt(msg.page) && isNum(msg.x) && isNum(msg.y) && isNum(msg.z) && isInt(msg.symbol))
+        sim.placeSharedWorldMark(msg.page, msg.x, msg.y, msg.z, msg.symbol, pid);
       return;
     case 'map_mark_clear':
       if (msg.symbol === null || isInt(msg.symbol)) sim.clearSharedMapMarks(msg.symbol, pid);

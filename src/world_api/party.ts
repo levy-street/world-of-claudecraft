@@ -87,12 +87,16 @@ export interface IWorldParty {
   markerFor(entityId: number): number | null;
   setMarker(entityId: number, markerId: number): void;
   clearMarker(entityId: number): void;
-  // Shared raid-map marks (the world-marker half of the raid markers): the group's
-  // marks on its instance's map, one per marker symbol 0..7, in instance-local
-  // yards on a map page. Everyone in the instance copy sees them; in a raid only
-  // the leader edits (src/sim/social/shared_map_marks.ts owns every rule).
+  // Shared raid-map marks (the raid's world markers): the group's marks, one per
+  // marker symbol 0..7, each a map page point (instance-local yards) AND its world
+  // point on the floor (wx, y, wz), so the map and the 3D world show one mark.
+  // Everyone in the instance copy sees them; in a raid only the leader edits
+  // (src/sim/social/shared_map_marks.ts owns every rule).
   sharedMapMarks(): readonly SharedMapMark[];
+  // From the map: a page point; the sim resolves the floor height.
   placeSharedMapMark(page: number, x: number, z: number, symbol: number): void;
+  // From the world: a clicked WORLD point (y only picks the floor storey).
+  placeSharedWorldMark(page: number, x: number, y: number, z: number, symbol: number): void;
   // symbol null clears every mark
   clearSharedMapMarks(symbol: number | null): void;
 }

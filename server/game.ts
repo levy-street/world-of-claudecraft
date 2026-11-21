@@ -6949,10 +6949,10 @@ export class GameServer {
         )
           sim.assignMasterLoot(msg.rollId, msg.pids, pid);
         break;
-      // raid/target markers + the raid map's shared marks (server/marker_commands.ts)
-      case 'setMarker':
+      case 'setMarker': // target markers + the raid's shared marks (server/marker_commands.ts)
       case 'clearMarker':
       case 'map_mark_set':
+      case 'map_mark_place':
       case 'map_mark_clear':
         dispatchMarkerCommand(sim, command, msg, pid);
         break;

@@ -4222,6 +4222,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   placeSharedMapMark(page: number, x: number, z: number, symbol: number): void {
     this.cmd({ cmd: 'map_mark_set', page, x, z, symbol });
   }
+  placeSharedWorldMark(page: number, x: number, y: number, z: number, symbol: number): void {
+    this.cmd({ cmd: 'map_mark_place', page, x, y, z, symbol });
+  }
   clearSharedMapMarks(symbol: number | null): void {
     this.cmd({ cmd: 'map_mark_clear', symbol });
   }

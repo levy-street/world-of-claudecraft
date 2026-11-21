@@ -7,7 +7,8 @@
 
 import { describe, expect, it } from 'vitest';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
-import { freeInstance } from '../src/sim/instances/dungeons';
+import { freeInstance, instanceOriginOf } from '../src/sim/instances/dungeons';
+import { floorHeightAt } from '../src/sim/physics';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -17,8 +18,12 @@ import {
   SHARED_MAP_MARK_MAX_ENTRIES,
   SHARED_MAP_MARK_PAGES,
   SHARED_MAP_MARK_SENDER_EDITS_PER_WINDOW,
+  SHARED_MAP_MARK_STEP_REACH,
+  type SharedMapMark,
   SharedMapMarks,
+  sharedMapMarkFloorY,
 } from '../src/sim/social/shared_map_marks';
+import { groundHeight } from '../src/sim/world';
 
 const DUNGEON = 'hollow_crypt';
 const SKULL = 7;
@@ -46,6 +51,10 @@ function claimOf(sim: Sim, pid: number): InstanceSlot {
   return inst;
 }
 
+function originOf(sim: Sim, pid: number): { x: number; z: number } {
+  return instanceOriginOf(claimOf(sim, pid));
+}
+
 /** Two players in one party, both inside the party's crypt claim. */
 function partyInCrypt() {
   const sim = world();
@@ -62,7 +71,10 @@ function partyInCrypt() {
 function store(sim: Sim): SharedMapMarks {
   return (sim as unknown as { targeting: { mapMarks: SharedMapMarks } }).targeting.mapMarks;
 }
-const marks = (sim: Sim, pid: number) => store(sim).viewFor(pid);
+// The map half of each mark (the world half has its own describe below).
+const mapPart = (ms: readonly SharedMapMark[]) =>
+  ms.map(({ symbol, page, x, z }) => ({ symbol, page, x, z }));
+const marks = (sim: Sim, pid: number) => mapPart(store(sim).viewFor(pid));
 
 describe('shared map marks: who may edit', () => {
   it('the rule: solo and party members always, a raid only its leader', () => {
@@ -242,12 +254,14 @@ describe('shared map marks: who sees them, and when they go', () => {
     expect(marks(sim, a)).toEqual([{ symbol: SKULL, page: 0, x: 2, z: 2 }]);
   });
 
-  it('the wire row is [symbol, page, x, z], serialized once and shared by the group', () => {
+  it('the wire row is [symbol, page, x, z, wx, y, wz], serialized once and shared by the group', () => {
     const { sim, a, b } = partyInCrypt();
     expect(sim.sharedMapMarksWireFor(a)).toBe('null');
     sim.placeSharedMapMark(1, 4.25, -3, SKULL, a);
     const wire = sim.sharedMapMarksWireFor(a);
-    expect(JSON.parse(wire)).toEqual([[SKULL, 1, 4.3, -3]]);
+    const o = originOf(sim, a);
+    const y = store(sim).viewFor(a)[0].y;
+    expect(JSON.parse(wire)).toEqual([[SKULL, 1, 4.3, -3, o.x + 4.3, y, o.z - 3]]);
     expect(sim.sharedMapMarksWireFor(b)).toBe(wire);
     // An emptied entry goes at once: the row is null again, not an empty list.
     sim.clearSharedMapMarks(null, a);
@@ -259,7 +273,7 @@ describe('shared map marks: who sees them, and when they go', () => {
     const sim = new Sim({ seed: 9, playerClass: 'warrior', autoEquip: false });
     expect(sim.enterDungeon(DUNGEON)).toBe(true);
     sim.placeSharedMapMark(0, 6, 7, STAR);
-    expect(sim.sharedMapMarks()).toEqual([{ symbol: STAR, page: 0, x: 6, z: 7 }]);
+    expect(mapPart(sim.sharedMapMarks())).toEqual([{ symbol: STAR, page: 0, x: 6, z: 7 }]);
     sim.clearSharedMapMarks(STAR);
     expect(sim.sharedMapMarks()).toEqual([]);
   });
@@ -281,6 +295,7 @@ describe('shared map marks: who sees them, and when they go', () => {
     };
     const ctx = {
       time: 0,
+      cfg: { seed: 42 },
       instances,
       players: { has: () => true },
       entities: { get: (pid: number) => ({ pos: pos(pid) }) },
@@ -298,5 +313,91 @@ describe('shared map marks: who sees them, and when they go', () => {
     instances[0].exitId = null as unknown as number;
     expect(mm.place(0, 1, 1, STAR, n)).toBe(true);
     expect(mm.size).toBe(SHARED_MAP_MARK_MAX_ENTRIES);
+  });
+});
+
+describe('shared map marks: the world half (one mark, two places)', () => {
+  it('a map-placed mark carries its world point and the sim floor height there', () => {
+    const { sim, a } = partyInCrypt();
+    sim.placeSharedMapMark(0, 3.14, -12.06, SKULL, a);
+    const [m] = store(sim).viewFor(a);
+    const o = originOf(sim, a);
+    expect(m.wx).toBeCloseTo(o.x + 3.1, 6);
+    expect(m.wz).toBeCloseTo(o.z - 12.1, 6);
+    const floor = sharedMapMarkFloorY(sim.cfg.seed, m.wx, m.wz, null);
+    expect(m.y).toBeCloseTo(floor, 2);
+    expect(m.y).toBeGreaterThanOrEqual(groundHeight(m.wx, m.wz, sim.cfg.seed) - 0.01);
+  });
+
+  it('a ground click places the mark at that world point, seen by the group on the map too', () => {
+    const { sim, a, b } = partyInCrypt();
+    const o = originOf(sim, a);
+    const py = sim.entities.get(a)?.pos.y ?? 0;
+    sim.placeSharedWorldMark(0, o.x + 5.04, py, o.z + 6.26, STAR, b);
+    expect(marks(sim, a)).toEqual([{ symbol: STAR, page: 0, x: 5, z: 6.3 }]);
+    const [m] = store(sim).viewFor(a);
+    expect(m.wx).toBeCloseTo(o.x + 5, 6);
+    expect(m.wz).toBeCloseTo(o.z + 6.3, 6);
+    expect(m.y).toBeCloseTo(sharedMapMarkFloorY(sim.cfg.seed, m.wx, m.wz, py), 2);
+  });
+
+  it('the map and the world move the same mark (one per symbol)', () => {
+    const { sim, a } = partyInCrypt();
+    const o = originOf(sim, a);
+    sim.placeSharedWorldMark(0, o.x + 1, 0, o.z + 1, SKULL, a);
+    sim.placeSharedMapMark(0, 8, 9, SKULL, a);
+    expect(marks(sim, a)).toEqual([{ symbol: SKULL, page: 0, x: 8, z: 9 }]);
+    sim.placeSharedWorldMark(0, o.x - 4, 0, o.z + 2, SKULL, a);
+    expect(marks(sim, a)).toEqual([{ symbol: SKULL, page: 0, x: -4, z: 2 }]);
+  });
+
+  it('refuses a world point outside the claim, a non-finite height and a raid member', () => {
+    const { sim, a, b } = partyInCrypt();
+    const o = originOf(sim, a);
+    sim.placeSharedWorldMark(0, o.x + 5000, 0, o.z, STAR, a);
+    sim.placeSharedWorldMark(0, o.x, 0, o.z + 400, STAR, a); // the next slot's copy
+    sim.placeSharedWorldMark(0, o.x, Number.NaN, o.z, STAR, a);
+    sim.placeSharedWorldMark(0, o.x, 0, o.z, 8, a);
+    sim.placeSharedWorldMark(SHARED_MAP_MARK_PAGES, o.x, 0, o.z, STAR, a);
+    expect(store(sim).size).toBe(0);
+    const group = sim.partyOf(a);
+    if (!group) throw new Error('no party');
+    group.raid = true;
+    sim.placeSharedWorldMark(0, o.x + 1, 0, o.z + 1, STAR, b);
+    expect(store(sim).size).toBe(0);
+    sim.placeSharedWorldMark(0, o.x + 1, 0, o.z + 1, STAR, a);
+    expect(marks(sim, b)).toHaveLength(1);
+  });
+
+  it('the clicked height only picks the storey: never above it plus a step, never under the floor', () => {
+    const sim = world();
+    const seed = sim.cfg.seed;
+    const o = instanceOrigin(DUNGEONS[DUNGEON].index, 0);
+    const x = o.x + 2;
+    const z = o.z + 3;
+    const ground = groundHeight(x, z, seed);
+    // A hint far overhead still lands on the floor (there is no storey up there).
+    expect(sharedMapMarkFloorY(seed, x, z, ground + 50)).toBeCloseTo(
+      floorHeightAt(seed, x, z, 0, ground + 50 + SHARED_MAP_MARK_STEP_REACH),
+      6,
+    );
+    // A hint under the floor never sinks the mark below it.
+    expect(sharedMapMarkFloorY(seed, x, z, ground - 30)).toBeGreaterThanOrEqual(ground - 1e-6);
+    // No hint reads the bare floor plus a step.
+    expect(sharedMapMarkFloorY(seed, x, z, null)).toBeCloseTo(
+      floorHeightAt(seed, x, z, 0, ground + SHARED_MAP_MARK_STEP_REACH),
+      6,
+    );
+  });
+
+  it('the offline world places from a ground click through IWorld', () => {
+    const sim = new Sim({ seed: 9, playerClass: 'warrior', autoEquip: false });
+    expect(sim.enterDungeon(DUNGEON)).toBe(true);
+    const p = sim.player.pos;
+    sim.placeSharedWorldMark(0, p.x + 2, p.y, p.z - 3, SKULL);
+    const [m] = sim.sharedMapMarks();
+    expect(m.symbol).toBe(SKULL);
+    expect(m.wx).toBeCloseTo(Math.round((p.x + 2) * 10) / 10, 0);
+    expect(m.wz).toBeCloseTo(Math.round((p.z - 3) * 10) / 10, 0);
   });
 });

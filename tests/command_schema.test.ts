@@ -199,8 +199,9 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Main commands plus Gourdlight Eve trick-or-treat.
 // The raid map's shared marks add map_mark_set and map_mark_clear (each sent by
 // ClientWorld and dispatched to the Sim through server/marker_commands.ts): 275/289.
-const EXPECTED_SEND_COUNT = 275;
-const EXPECTED_DISPATCH_COUNT = 289;
+// The world-marker ground click adds map_mark_place the same way: 276/290.
+const EXPECTED_SEND_COUNT = 276;
+const EXPECTED_DISPATCH_COUNT = 290;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -338,7 +339,7 @@ describe('command schema parity (W0b)', () => {
   it('appends courier dispatch as a complete client/server command pair', () => {
     // The integration adds the dungeon guide answer, then the buddy rename command; the
     // Keep main wire tokens in place and append Gourdlight Eve.
-    expect(COMMAND_NAMES.slice(-9)).toEqual([
+    expect(COMMAND_NAMES.slice(-10)).toEqual([
       'courier_dispatch',
       'dungeon_guide_answer',
       'buddy_rename',
@@ -348,6 +349,7 @@ describe('command schema parity (W0b)', () => {
       'trick_or_treat',
       'map_mark_set',
       'map_mark_clear',
+      'map_mark_place',
     ]);
     expect(sendSet.has('guild_buy_cosmetic')).toBe(true);
     expect(dispatchSet.has('guild_buy_cosmetic')).toBe(true);

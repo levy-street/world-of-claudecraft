@@ -1018,6 +1018,8 @@ export const COMMAND_NAMES = [
   // (IWorldParty.placeSharedMapMark / clearSharedMapMarks; src/sim/social/shared_map_marks.ts).
   'map_mark_set',
   'map_mark_clear',
+  // The same marks placed by clicking the ground in the world (IWorldParty.placeSharedWorldMark).
+  'map_mark_place',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1225,6 +1227,7 @@ export const COMMAND_FACETS = {
   // the shared raid-map marks (sharedMapMarks is the `mmarks` self-delta mirror)
   map_mark_set: 'IWorldParty',
   map_mark_clear: 'IWorldParty',
+  map_mark_place: 'IWorldParty',
   readyrespond: 'IWorldParty',
   // IWorldTrade: peer-to-peer trade-window commands (tradeInfo is a snapshot read,
   // no send).

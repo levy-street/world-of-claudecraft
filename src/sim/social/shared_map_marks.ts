@@ -15,6 +15,13 @@
 // goes at once; an entry whose claim is no longer live is invisible at once and
 // pruned on the next edit anywhere.
 //
+// A mark is ONE thing shown in two places: the map reads its page point
+// (instance-local yards), the 3D world draws it on the floor at its world point
+// (wx, y, wz). It can be placed from either: from the map (a page point, whose
+// floor height the sim resolves) or by clicking the ground in the world
+// (placeWorld: a world point plus the clicked height as a hint, which only
+// picks the floor storey; the height is always the sim's own floor query).
+//
 // Cosmetic, session-only state: never read by tick(), obs or persistence, and
 // it draws no rng. Every edit is validated here, so the online server (which
 // runs this same Sim) is authoritative: membership, position, bounds, symbol,
@@ -24,9 +31,15 @@
 //
 // src/sim-pure: no DOM/Three, no Math.random/Date.now.
 
-import { instanceClaimContains, instanceHalfWidthOf } from '../instances/dungeons';
+import {
+  instanceClaimContains,
+  instanceHalfWidthOf,
+  instanceOriginOf,
+} from '../instances/dungeons';
+import { floorHeightAt } from '../physics';
 import type { InstanceSlot, Party } from '../sim';
 import type { SimContext } from '../sim_context';
+import { groundHeight } from '../world';
 
 /** The eight raid-marker symbols (star, circle, diamond, triangle, moon,
  *  square, cross, skull), the target markers' indices. */
@@ -43,13 +56,37 @@ export const SHARED_MAP_MARK_EDIT_WINDOW_S = 4;
 export const SHARED_MAP_MARK_SENDER_EDITS_PER_WINDOW = 8;
 /** The most live entries (instance claims with marks) the store holds. */
 export const SHARED_MAP_MARK_MAX_ENTRIES = 512;
+/** How far over the reference height (the clicked point, or the bare floor
+ *  for a map placement) a standable top still counts as the mark's floor:
+ *  the walking step reach, so a mark lands on a step or a dais, never on a
+ *  storey overhead. */
+export const SHARED_MAP_MARK_STEP_REACH = 0.9;
 
-/** One shared mark: a symbol on a map page point, in instance-local yards. */
+/** One shared mark: a symbol on a map page point (instance-local yards) and
+ *  the same mark's world point on the floor (world yards, `y` the floor
+ *  height the sim resolved). */
 export interface SharedMapMark {
   symbol: number;
   page: number;
   x: number;
   z: number;
+  wx: number;
+  y: number;
+  wz: number;
+}
+
+/** The floor a mark at world (x, z) stands on: the sim's own movement floor
+ *  (terrain, instance floor, standable tops within a step) under `ref`, the
+ *  clicked height when the mark was placed in the world, else the bare
+ *  ground there. Never above ref + the step reach, never below the ground. */
+export function sharedMapMarkFloorY(
+  seed: number,
+  x: number,
+  z: number,
+  ref: number | null,
+): number {
+  const base = ref !== null && Number.isFinite(ref) ? ref : groundHeight(x, z, seed);
+  return floorHeightAt(seed, x, z, 0, base + SHARED_MAP_MARK_STEP_REACH);
 }
 
 interface Entry {
@@ -84,6 +121,10 @@ function round1(v: number): number {
   return Math.round(v * 10) / 10;
 }
 
+function round2(v: number): number {
+  return Math.round(v * 100) / 100;
+}
+
 function recent(times: readonly number[], now: number): number[] {
   return times.filter((t) => now - t < SHARED_MAP_MARK_EDIT_WINDOW_S);
 }
@@ -108,20 +149,49 @@ export class SharedMapMarks {
     return this.windows.size;
   }
 
-  /** Place (or move) `symbol` at instance-local (x, z) on `page`. */
+  /** Place (or move) `symbol` at instance-local (x, z) on `page` (the map's
+   *  placement: the floor height is the bare floor's there). */
   place(page: number, x: number, z: number, symbol: number, pid?: number): boolean {
+    if (!Number.isFinite(x) || !Number.isFinite(z)) return false;
+    return this.put(page, symbol, pid, () => ({ x, z, ref: null }));
+  }
+
+  /** Place (or move) `symbol` at WORLD (x, z), clicked at height `y`, on
+   *  `page` (the world placement). The point must lie in the claim the sender
+   *  stands in; `y` only picks the floor storey (sharedMapMarkFloorY). */
+  placeWorld(page: number, x: number, y: number, z: number, symbol: number, pid?: number): boolean {
+    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) return false;
+    return this.put(page, symbol, pid, (inst) => {
+      const o = instanceOriginOf(inst);
+      return { x: x - o.x, z: z - o.z, ref: y };
+    });
+  }
+
+  /** The shared validation and write of both placements. */
+  private put(
+    page: number,
+    symbol: number,
+    pid: number | undefined,
+    local: (inst: InstanceSlot) => { x: number; z: number; ref: number | null },
+  ): boolean {
     if (!Number.isInteger(symbol) || symbol < 0 || symbol >= SHARED_MAP_MARK_SYMBOLS) return false;
     if (!Number.isInteger(page) || page < 0 || page >= SHARED_MAP_MARK_PAGES) return false;
-    if (!Number.isFinite(x) || !Number.isFinite(z)) return false;
     const at = this.editableClaim(pid);
     if (!at) return false;
-    if (Math.abs(x) >= instanceHalfWidthOf(at.inst.dungeonId)) return false;
-    if (Math.abs(z) >= SHARED_MAP_MARK_REACH_Z) return false;
+    const p = local(at.inst);
+    if (Math.abs(p.x) >= instanceHalfWidthOf(at.inst.dungeonId)) return false;
+    if (Math.abs(p.z) >= SHARED_MAP_MARK_REACH_Z) return false;
     this.prune();
     if (!this.spendEdit(at.inst, at.claimId, at.self)) return false;
     const entry = this.entryFor(at.inst, at.claimId);
     if (!entry) return false;
-    const mark = { symbol, page, x: round1(x), z: round1(z) };
+    const o = instanceOriginOf(at.inst);
+    const lx = round1(p.x);
+    const lz = round1(p.z);
+    const wx = o.x + lx;
+    const wz = o.z + lz;
+    const y = round2(sharedMapMarkFloorY(this.ctx.cfg.seed, wx, wz, p.ref));
+    const mark: SharedMapMark = { symbol, page, x: lx, z: lz, wx, y, wz };
     // A fresh array per edit: a reader holding the last view never sees it change.
     const rest = entry.marks.filter((m) => m.symbol !== symbol);
     entry.marks =
@@ -156,13 +226,16 @@ export class SharedMapMarks {
     return this.visibleEntry(pid)?.marks ?? [];
   }
 
-  /** The self-wire row for `pid`: the visible marks as [symbol, page, x, z]
-   *  rows, or null. Serialized once per change and shared by the group. */
+  /** The self-wire row for `pid`: the visible marks as
+   *  [symbol, page, x, z, wx, y, wz] rows, or null. Serialized once per change
+   *  and shared by the group. */
   wireFor(pid: number): string {
     if (this.entries.size === 0) return 'null';
     const entry = this.visibleEntry(pid);
     if (!entry) return 'null';
-    entry.json ??= JSON.stringify(entry.marks.map((m) => [m.symbol, m.page, m.x, m.z]));
+    entry.json ??= JSON.stringify(
+      entry.marks.map((m) => [m.symbol, m.page, m.x, m.z, m.wx, m.y, m.wz]),
+    );
     return entry.json;
   }
 
