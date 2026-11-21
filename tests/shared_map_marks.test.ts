@@ -114,6 +114,12 @@ describe('shared map marks: who may edit', () => {
         .map((m) => m.symbol)
         .sort(),
     ).toEqual([STAR, SKULL]);
+    // Playtest 2026-11-21: the group breaking up takes its marks with it,
+    // even though the claim itself stays the solo player's.
+    sim.partyLeave(b); // two-player party: disbands
+    expect(sim.partyOf(a)).toBeNull();
+    expect(marks(sim, a)).toEqual([]);
+    expect(store(sim).size).toBe(0);
   });
 
   it('in a party any member places, and the whole party in the instance sees it', () => {

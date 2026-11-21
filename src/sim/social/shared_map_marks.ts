@@ -95,6 +95,9 @@ interface Entry {
   inst: InstanceSlot;
   /** The group that owns these marks (InstanceSlot.partyKey at placement). */
   partyKey: string;
+  /** The group of the last editor (instanceKeyFor at placement): a claim made
+   *  solo and marked after grouping up drops its marks when that group goes. */
+  groupKey: string;
   marks: SharedMapMark[];
   /** The marks as wire JSON, built once per change (serialize-once). */
   json: string | null;
@@ -189,6 +192,7 @@ export class SharedMapMarks {
     if (!this.spendEdit(at.inst, at.claimId, at.self)) return false;
     const entry = this.entryFor(at.inst, at.claimId);
     if (!entry) return false;
+    entry.groupKey = this.ctx.instanceKeyFor(at.self);
     const o = instanceOriginOf(at.inst);
     const lx = round1(p.x);
     const lz = round1(p.z);
@@ -245,9 +249,9 @@ export class SharedMapMarks {
 
   /** A disbanded party's marks go with it. */
   dropParty(partyId: number): void {
-    const owned = this.byOwner.get(`party:${partyId}`);
-    if (!owned) return;
-    for (const entry of [...owned]) {
+    const key = `party:${partyId}`;
+    const gone = [...this.entries.values()].filter((e) => e.partyKey === key || e.groupKey === key);
+    for (const entry of gone) {
       this.drop(entry);
       this.windows.delete(entry.claimId);
     }
@@ -305,7 +309,7 @@ export class SharedMapMarks {
     if (found) return found;
     if (this.entries.size >= SHARED_MAP_MARK_MAX_ENTRIES) return null;
     const partyKey = inst.partyKey ?? '';
-    const entry: Entry = { claimId, inst, partyKey, marks: [], json: null };
+    const entry: Entry = { claimId, inst, partyKey, groupKey: partyKey, marks: [], json: null };
     this.entries.set(claimId, entry);
     const owned = this.byOwner.get(partyKey);
     if (owned) owned.push(entry);
