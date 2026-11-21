@@ -736,6 +736,8 @@ export interface SimContextCallbacks {
   hillPartyJoin(pid: number): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
+  // A member left a surviving party: drop the marks on them and their pets.
+  dropMemberMarkers(partyId: number, pid: number): void;
   // Dungeon Finder formation seam (owned by social/party.ts): merge solo
   // players and whole partial parties into ONE party/raid without synthesizing
   // invite prompts or accept events. Returns the formed party, or null (and
@@ -1762,6 +1764,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     hillPartyDisband: host.hillPartyDisband,
     hillPartyJoin: host.hillPartyJoin,
     dropPartyMarkers: host.dropPartyMarkers,
+    dropMemberMarkers: host.dropMemberMarkers,
     formDungeonFinderGroup: host.formDungeonFinderGroup,
     onMobKilledForQuests: host.onMobKilledForQuests,
     onRecipeCraftedForQuests: host.onRecipeCraftedForQuests,

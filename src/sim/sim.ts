@@ -5419,6 +5419,7 @@ export class Sim {
       // isFriendlyTo/pvpController/stopFollow, which are already bound above (C4a/C1) and
       // stay on Sim.
       dropPartyMarkers: (partyId: number) => sim.targeting.dropPartyMarkers(partyId),
+      dropMemberMarkers: (partyId, pid) => sim.targeting.dropMemberMarkers(partyId, pid),
       // Q1 quest-credit trio now lives in quests/quest_credit.ts; the callbacks route
       // through `sim.ctx` (lazily read at call time, after the ctor sets it). countItem
       // stays on Sim (L2 inventory hub) and is consumed by the collect updater.

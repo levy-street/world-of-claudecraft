@@ -29,14 +29,20 @@ import { corpseInteractionAvailability } from './corpse_interaction';
 import { deadTargetSelectable } from './dead_target';
 import { gmHiddenFrom } from './gm_presence';
 import { isBuddyMob } from './pet/buddy_ai';
-import type { PlayerMeta } from './sim';
+import type { Party, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import {
+  canSetRaidTargets,
+  isRaidTargetSymbol,
+  raidTargetBelongsTo,
+  raidTargetMarkable,
+} from './social/raid_target_marks';
 import { SharedMapMarks } from './social/shared_map_marks';
 import { orderTabTargets, stepTabTarget, TAB_QUERY_RADIUS, type TabStep } from './tab_target';
 import type { Entity } from './types';
 
 export class Targeting {
-  // raid/target markers: partyId -> (enemy entityId -> markerId 0..7). A cosmetic,
+  // raid/target markers: partyId -> (marked entityId -> markerId 0..7). A cosmetic,
   // party-scoped overlay — never read by tick()/obs/persistence. Moved off Sim; the
   // slice's private state, like the PartyMachine's four maps.
   partyMarkers = new Map<number, Map<number, number>>();
@@ -268,21 +274,19 @@ export class Targeting {
   setMarker(entityId: number, markerId: number, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    const party = this.ctx.partyOf(r.meta.entityId);
-    if (!party) {
-      this.ctx.error(r.meta.entityId, 'You must be in a party to use raid markers.');
-      return;
-    }
-    if (!Number.isInteger(markerId) || markerId < 0 || markerId > 7) return;
-    // markable: a live, wild, hostile mob (not players, NPCs, corpses, or pets)
+    const party = this.editableParty(r.meta.entityId);
+    if (!party) return;
+    if (!isRaidTargetSymbol(markerId)) return;
+    // markable: a live wild mob, a group member, or a group member's pet/buddy
+    // (social/raid_target_marks.ts owns the rule; the HUD reads the same one)
     const target = this.ctx.entities.get(entityId);
-    if (target?.kind !== 'mob' || target.dead || !target.hostile || target.ownerId !== null) return;
+    if (!target || !raidTargetMarkable(target, (m) => party.members.includes(m))) return;
     let marks = this.partyMarkers.get(party.id);
     if (!marks) {
       marks = new Map();
       this.partyMarkers.set(party.id, marks);
     }
-    // re-applying the same symbol to the same mob toggles it off
+    // re-applying the same symbol to the same unit toggles it off
     if (marks.get(entityId) === markerId) {
       marks.delete(entityId);
       return;
@@ -297,9 +301,24 @@ export class Targeting {
   clearMarker(entityId: number, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    const party = this.ctx.partyOf(r.meta.entityId);
+    const party = this.editableParty(r.meta.entityId);
     if (!party) return;
     this.partyMarkers.get(party.id)?.delete(entityId);
+  }
+
+  // The actor's party when they may edit its marks, else null after telling
+  // them why (no group, or a raid member who is not its leader).
+  private editableParty(self: number): Party | null {
+    const party = this.ctx.partyOf(self);
+    if (!party) {
+      this.ctx.error(self, 'You must be in a party to use raid markers.');
+      return null;
+    }
+    if (!canSetRaidTargets(party, self)) {
+      this.ctx.error(self, 'You are not the party leader.');
+      return null;
+    }
+    return party;
   }
 
   // The local player's view of one entity's mark (for the renderer). Direct
@@ -313,6 +332,16 @@ export class Targeting {
   // Strip an entity's mark from every party — used when it dies or despawns.
   clearEntityMarker(entityId: number): void {
     for (const marks of this.partyMarkers.values()) marks.delete(entityId);
+  }
+
+  // A member left the party: their own mark and their pets' marks go with
+  // them (a mark on a player lasts until it is cleared or they leave the group).
+  dropMemberMarkers(partyId: number, pid: number): void {
+    const marks = this.partyMarkers.get(partyId);
+    if (!marks) return;
+    for (const eid of [...marks.keys()]) {
+      if (raidTargetBelongsTo(eid, this.ctx.entities.get(eid), pid)) marks.delete(eid);
+    }
   }
 
   // Drop a disbanded party's whole raid-marker set, target and map marks alike

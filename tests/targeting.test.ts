@@ -36,7 +36,12 @@ function ent(partial: Partial<Entity> & { id: number }): Entity {
 function makeCtx() {
   const entities = new Map<number, Entity>();
   const grid = new SpatialGrid();
-  const parties = new Map<number, { id: number }>(); // pid -> party
+  // pid -> party; one shared record per party id so members/leader/raid read live.
+  const parties = new Map<
+    number,
+    { id: number; leader: number; raid: boolean; members: number[] }
+  >();
+  const byId = new Map<number, { id: number; leader: number; raid: boolean; members: number[] }>();
   // pid -> meta, kept STABLE across resolve() calls (mirrors the real Sim,
   // where PlayerMeta is a long-lived per-player record), so a mutation one
   // call makes (e.g. setStopAutoAttackOnTargetSwitch) is visible on the next.
@@ -67,7 +72,16 @@ function makeCtx() {
     isArenaCrossTeam: () => false,
   } as unknown as SimContext;
   const joinParty = (partyId: number, ...pids: number[]) => {
-    for (const pid of pids) parties.set(pid, { id: partyId });
+    let party = byId.get(partyId);
+    if (!party) {
+      party = { id: partyId, leader: pids[0], raid: false, members: [] };
+      byId.set(partyId, party);
+    }
+    for (const pid of pids) {
+      party.members.push(pid);
+      parties.set(pid, party);
+    }
+    return party;
   };
   const add = (e: Entity) => {
     entities.set(e.id, e);
@@ -117,10 +131,11 @@ describe('Targeting: raid marker store', () => {
   it('rejects non-integer / out-of-range marker ids and unmarkable targets', () => {
     const t = makeCtx();
     t.add(ent({ id: 1, kind: 'player' }));
-    t.add(ent({ id: 2, kind: 'player' })); // a player is not markable
+    t.add(ent({ id: 2, kind: 'player' })); // a player OUTSIDE the group
     t.add(ent({ id: 10, dead: true })); // a dead mob is not markable
-    t.add(ent({ id: 11, hostile: false })); // a friendly mob is not markable
-    t.add(ent({ id: 12, ownerId: 1 })); // a pet (owned) is not markable
+    t.add(ent({ id: 12, ownerId: 2 })); // an outsider's pet is not markable
+    t.add(ent({ id: 14, kind: 'npc', hostile: false })); // an NPC is not markable
+    t.add(ent({ id: 15, kind: 'object' })); // nor an object
     t.add(ent({ id: 13, hostile: true })); // markable
     t.joinParty(7, 1);
     const targeting = new Targeting(t.ctx);
@@ -128,10 +143,66 @@ describe('Targeting: raid marker store', () => {
     targeting.setMarker(13, -1, 1);
     targeting.setMarker(13, 1.5, 1);
     expect(targeting.markersFor(1)).toEqual({});
-    for (const bad of [2, 10, 11, 12]) targeting.setMarker(bad, SKULL, 1);
+    for (const bad of [2, 10, 12, 14, 15, 999]) targeting.setMarker(bad, SKULL, 1);
     expect(targeting.markersFor(1)).toEqual({});
     targeting.setMarker(13, SKULL, 1);
     expect(targeting.markersFor(1)).toEqual({ 13: SKULL });
+  });
+
+  it('marks allies: group players (self too), their pets and buddies, and friendly wild mobs', () => {
+    const t = makeCtx();
+    t.add(ent({ id: 1, kind: 'player' }));
+    t.add(ent({ id: 2, kind: 'player', dead: true })); // a dead member keeps markable
+    t.add(ent({ id: 20, ownerId: 2, hostile: false })); // member 2's pet
+    t.add(ent({ id: 21, ownerId: 1, hostile: false })); // my own buddy
+    t.add(ent({ id: 22, ownerId: null, hostile: false })); // a friendly wild ally
+    t.joinParty(7, 1, 2);
+    const targeting = new Targeting(t.ctx);
+    targeting.setMarker(1, 0, 1);
+    targeting.setMarker(2, 1, 1);
+    targeting.setMarker(20, 2, 1);
+    targeting.setMarker(21, 3, 1);
+    targeting.setMarker(22, 4, 1);
+    expect(targeting.markersFor(1)).toEqual({ 1: 0, 2: 1, 20: 2, 21: 3, 22: 4 });
+    // one unit per symbol: square moves from the mob onto a player
+    targeting.setMarker(1, 4, 1);
+    expect(targeting.markersFor(2)).toEqual({ 1: 4, 2: 1, 20: 2, 21: 3 });
+  });
+
+  it('in a raid only the leader may set or clear marks; in a party anyone may', () => {
+    const t = makeCtx();
+    t.add(ent({ id: 1, kind: 'player' }));
+    t.add(ent({ id: 2, kind: 'player' }));
+    t.add(ent({ id: 10 }));
+    const party = t.joinParty(7, 1, 2); // leader 1
+    const targeting = new Targeting(t.ctx);
+    targeting.setMarker(10, SKULL, 2); // party: a member may
+    expect(targeting.markersFor(1)).toEqual({ 10: SKULL });
+    party.raid = true;
+    targeting.clearMarker(10, 2);
+    targeting.setMarker(2, STAR, 2);
+    expect(t.error).toHaveBeenCalledWith(2, 'You are not the party leader.');
+    expect(targeting.markersFor(1)).toEqual({ 10: SKULL });
+    targeting.setMarker(2, STAR, 1); // the raid leader may
+    targeting.clearMarker(10, 1);
+    expect(targeting.markersFor(2)).toEqual({ 2: STAR });
+  });
+
+  it('dropMemberMarkers takes a leaver and their pets off the board, keeping the rest', () => {
+    const t = makeCtx();
+    t.add(ent({ id: 1, kind: 'player' }));
+    t.add(ent({ id: 2, kind: 'player' }));
+    t.add(ent({ id: 20, ownerId: 2, hostile: false }));
+    t.add(ent({ id: 10 }));
+    t.joinParty(7, 1, 2);
+    const targeting = new Targeting(t.ctx);
+    targeting.setMarker(2, 5, 1);
+    targeting.setMarker(20, 6, 1);
+    targeting.setMarker(10, SKULL, 1);
+    targeting.setMarker(1, 3, 1);
+    expect(targeting.markersFor(1)).toEqual({ 1: 3, 2: 5, 10: SKULL, 20: 6 });
+    targeting.dropMemberMarkers(7, 2);
+    expect(targeting.markersFor(1)).toEqual({ 1: 3, 10: SKULL });
   });
 
   it('clearMarker removes one mark; clearEntityMarker strips a dead entity across every party', () => {
