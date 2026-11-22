@@ -1,9 +1,10 @@
 // The ability-material boot stand-ins must draw the SAME programs the live
 // effects draw, tier by tier, and keep them.
 //
-// Four effects had no stand-in of their own: the Divine Ascension crown and
-// seal (built lazily per character view, the crown on the shared surfaceMat,
-// so its program depends on the tier), the Frostglobe (per-instance pooled
+// Four effects had no stand-in of their own: Divine Ascension (built lazily
+// per character view: once a solar crown on the shared surfaceMat, now the
+// column, rune circle, halo, motes and wings, all its own shader materials),
+// the Frostglobe (per-instance pooled
 // materials in FrozenOrbFx, MeshStandard on every tier) and the two meteor
 // rocks (the mage Meteor's pooled rock, the warlock Rain of Fire and Infernal
 // class-field rocks). On ultra the crown linked about 345 ms live on an RTX
@@ -81,26 +82,36 @@ function expectCovered(
 function liveAscensionDraws(characterHeight: number) {
   const view = new THREE.Group();
   const rider = new THREE.Group();
-  const visual = syncPaladinAscensionVisual(
-    null,
+  const plan = { active: true, charges: 3, lastCharge: false };
+  const visual = syncPaladinAscensionVisual(null, view, rider, characterHeight, plan, 0, false);
+  expect(visual).not.toBeNull();
+  // A second frame with Avenging Wrath's wings spread too: Ascension's own pair
+  // and the lower pair are both built, so every wing draw is in the list.
+  syncPaladinAscensionVisual(visual, view, rider, characterHeight, plan, 0.5, false);
+  syncPaladinAscensionVisual(
+    visual,
     view,
     rider,
     characterHeight,
-    { active: true, charges: 3, lastCharge: false },
-    0,
+    { ...plan, wrathWings: true },
+    0.5,
     false,
   );
-  expect(visual).not.toBeNull();
   const draws = [...drawsUnder(view), ...drawsUnder(rider)];
-  // Both crown mesh kinds: the band and rims are Meshes, the prongs and
-  // jewels InstancedMeshes, and three keys instancing into the program.
-  expect(draws.some((draw) => (draw.object as THREE.InstancedMesh).isInstancedMesh)).toBe(true);
-  expect(
-    draws.some(
-      (draw) =>
-        (draw.object as THREE.Mesh).isMesh && !(draw.object as THREE.InstancedMesh).isInstancedMesh,
-    ),
-  ).toBe(true);
+  const names = new Set(draws.map((draw) => draw.object.name));
+  for (const piece of [
+    'paladin-ascension-pillar',
+    'paladin-ascension-ground-seal',
+    'paladin-ascension-halo',
+    'paladin-ascension-motes',
+  ]) {
+    expect(names.has(piece), piece).toBe(true);
+  }
+  // The wings (Avenging Wrath's, borrowed) ride the same rider anchor.
+  expect(rider.getObjectByName('paladin-avenging-wrath')).toBeDefined();
+  // Both draw kinds: the column, circle, halo and wings are Meshes, the motes Points.
+  expect(draws.some((draw) => (draw.object as THREE.Points).isPoints)).toBe(true);
+  expect(draws.some((draw) => (draw.object as THREE.Mesh).isMesh)).toBe(true);
   return { visual: visual as NonNullable<typeof visual>, draws };
 }
 
@@ -150,7 +161,7 @@ describe('ability-material stand-ins draw the live programs', () => {
         expect(GFX.standardMaterials).toBe(tier === 'ultra');
       });
 
-      it('covers the Divine Ascension seal and crown, on any rig height', () => {
+      it('covers the Divine Ascension column, circle, halo, motes and wings, on any rig height', () => {
         activateTier(tier);
         const coverage = sourceCoverage('paladin-ascension');
         for (const height of [1.8, 2.6, 1.1]) {
@@ -177,7 +188,7 @@ describe('ability-material stand-ins draw the live programs', () => {
 });
 
 describe('the Divine Ascension stand-in keeps its programs', () => {
-  it.each(['ultra', 'low'] as const)('%s: a crown teardown disposes no staged material', (tier) => {
+  it.each(['ultra', 'low'] as const)('%s: a live teardown disposes no staged material', (tier) => {
     activateTier(tier);
     const staged = new Set<THREE.Material>();
     for (const draw of drawsUnder(buildAbilityMaterialPrewarmGroup())) staged.add(draw.material);
@@ -186,24 +197,28 @@ describe('the Divine Ascension stand-in keeps its programs', () => {
     for (const material of staged) {
       material.addEventListener('dispose', () => disposed.add(material));
     }
-    // The crown is the surfaceMat cache's shared instance, so the stand-in
-    // wears the very material the live crown draws with: disposing it on a
-    // view teardown would release the program the stand-in exists to keep.
-    const liveCrown = draws.find((draw) => draw.object.name === 'paladin-ascension-crown-band');
-    expect(liveCrown && staged.has(liveCrown.material)).toBe(true);
+    // A live visual draws its own materials (the stand-in keeps the PROGRAMS,
+    // not the instances), so its teardown may dispose them: none of them can be
+    // one the stand-in holds.
+    for (const draw of draws) expect(staged.has(draw.material), draw.object.name).toBe(false);
     visual.dispose();
     expect([...disposed]).toEqual([]);
   });
 
-  it('is rebuilt for a new profile, so it never holds the retired tier material', () => {
+  it('is rebuilt for a new profile, so it never holds a retired profile stand-in', () => {
     activateTier('ultra');
     const source = ABILITY_MATERIAL_SOURCES.find((entry) => entry.id === 'paladin-ascension');
     expect(source).toBeDefined();
+    const ultraRoot = source?.build();
     const ultra = source?.materials() ?? [];
-    expect(ultra.some((material) => material instanceof THREE.MeshStandardMaterial)).toBe(true);
+    expect(ultra.length).toBeGreaterThan(0);
+    // Same profile: the one stand-in, never a second.
+    expect(source?.build()).toBe(ultraRoot);
     activateTier('low');
+    const lowRoot = source?.build();
     const low = source?.materials() ?? [];
-    expect(low.some((material) => material instanceof THREE.MeshLambertMaterial)).toBe(true);
-    expect(low.some((material) => material instanceof THREE.MeshStandardMaterial)).toBe(false);
+    expect(lowRoot).not.toBe(ultraRoot);
+    expect(low.length).toBe(ultra.length);
+    expect(low.some((material) => ultra.includes(material))).toBe(false);
   });
 });

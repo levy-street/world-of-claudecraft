@@ -10390,6 +10390,11 @@ export type SimEvent = { pid?: number } & (
       ability?: string;
       /** Stable semantic variant for an empowered Paladin impact. */
       impact?: 'healing' | 'defensive' | 'offensive' | 'area';
+      /** A taunt's 'selfCast' cue whose target cannot be turned (a player, an
+       * ignoreTaunt add, a training dummy): the renderer shows it fizzle.
+       * Also Oath Chain's 'selfCast' at an enemy its pull will not move (a
+       * boss or a dummy): the chain snaps. Presentation only. */
+      immune?: true;
       /** Lifetime of a persistent visual such as Water Jet's bubble stream. */
       duration?: number;
       range?: number;

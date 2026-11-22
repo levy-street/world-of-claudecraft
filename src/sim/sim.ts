@@ -875,7 +875,7 @@ import { SpatialGrid } from './spatial';
 import { spawnProbeStandsOnFloor } from './spawn_footing';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
-import { addThreat, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
+import { addThreat, TAUNT_FORCE_SECONDS, tauntLeavesMobUnforced, topThreatValue } from './threat';
 import {
   type AbilityDef,
   type ArenaCombatant,
@@ -7071,11 +7071,8 @@ export class Sim {
     // threat (it shows on the meters) but never turns, forces, or fights: without
     // this guard a taunt (or an area taunt like Defiant Bellow in range) force-
     // aggroed it permanently and pinned the attacker in combat forever.
-    if (MOBS[mob.templateId]?.ignoreTaunt || MOBS[mob.templateId]?.dummy) {
-      this.enterCombat(p, mob);
-      return true;
-    }
-    if (p.ownerId !== null && MOBS[mob.templateId]?.boss) {
+    // (A boss taunted by an owned unit, a pet, takes it the same way.)
+    if (tauntLeavesMobUnforced(MOBS[mob.templateId], p.ownerId !== null)) {
       this.enterCombat(p, mob);
       return true;
     }

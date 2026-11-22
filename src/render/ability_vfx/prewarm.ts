@@ -27,6 +27,7 @@ import {
   inCastVfxFamily,
 } from '../cast_vfx_family';
 import { drawProgramSignature } from '../draw_program_signature_core';
+import { sunVerdictMarkTextures } from '../paladin_sun_verdict_visual';
 import { abilityVfxTextures, FLIPBOOK_STYLES, flipbookSheet } from './fx_textures';
 
 export interface AbilityVfxPrewarmTextureStep {
@@ -54,6 +55,9 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
     id: `flipbook:${style}`,
     build: () => [flipbookSheet(style)],
   }));
+  // The Sun God's Verdict brand shares its four mark textures across every
+  // wearer, so they upload here rather than on the first brand.
+  steps.push({ id: 'sun-verdict-mark', build: () => [...sunVerdictMarkTextures()] });
   steps.push({
     id: 'shared-canvases',
     // ~140 KB of small canvases built in one memoized call, so they stay one

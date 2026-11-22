@@ -1210,7 +1210,7 @@ export class PaladinSpellVfxController {
     if (!target) return;
     const ground = this.anchor(effect.targetId, 0.08) ?? target;
     const final = effect.hopIndex >= effect.totalHits - 1;
-    const scale = final ? 1.35 : 1;
+    const scale = final ? 1.65 : 1.3;
     emit(
       this.output,
       final ? 'sunward-impact-final' : 'sunward-impact',
@@ -1255,7 +1255,7 @@ export class PaladinSpellVfxController {
       0.24,
       'ring',
     );
-    const fragments = final ? 10 : 4;
+    const fragments = final ? 10 : 8;
     for (let index = 0; index < fragments; index++) {
       const angle = (index / fragments) * Math.PI * 2 + effect.hopIndex * 0.19;
       const speed = (final ? 3.8 : 2.2) + (index % 3) * 0.35;
@@ -1271,7 +1271,7 @@ export class PaladinSpellVfxController {
         index % 3 === 0 ? WHITE_GOLD : DAWN_GOLD,
         (final ? 0.28 : 0.18) + (index % 2) * 0.05,
         final ? 0.34 : 0.24,
-        final ? 'sparkBurst' : 'sparkle',
+        final ? 'sparkBurst' : 'trace',
         final ? 4.5 : 2.5,
         angle,
       );

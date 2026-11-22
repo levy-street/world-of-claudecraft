@@ -54,11 +54,14 @@ export const ACTIVE_KIT_PRIORITY = GPU_WORK_PRIORITY.BOOT_DEBT;
 export const ACTIVE_KIT_RETRY_DELAYS_MS: readonly number[] = [5_000, 30_000, 120_000];
 interface ActiveKitHost {
   queue: Pick<BackgroundGpuQueue, 'run'>;
-  /** Start (or join) the kit's demand-loaded assets before any unit runs;
-   *  false means the device declined them, so the kit stays cold and no unit
-   *  runs. Absent in tests that inject textures directly. */
+  /** Start (or join) the Warrior kit's demand-loaded assets before any unit
+   *  runs; false means the device declined them, so the kit stays cold and no
+   *  unit runs. Absent in tests that inject textures directly. The Paladin
+   *  kit loads no sheets, so its recipe never asks. */
   assets?(): Promise<boolean>;
-  geometry(kinds: readonly CrestKind[]): readonly PrewarmResumeUnit[];
+  /** The authored preparation units: the Warrior crests for `kinds`, or with
+   *  `kit` 'paladin' the Paladin kit's own pools (`kinds` ignored). */
+  geometry(kinds: readonly CrestKind[], kit?: string): readonly PrewarmResumeUnit[];
   texture(texture: THREE.Texture): void;
 }
 interface Preparation {
@@ -108,6 +111,8 @@ const KIT_SHEETS: readonly (readonly [
 ];
 
 function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
+  if (cls === 'paladin')
+    return state.host.geometry([], 'paladin').filter((unit) => !state.done.has(unit.id));
   if (cls !== 'warrior') return [];
   return [
     ...KIT_SHEETS.map(
@@ -166,13 +171,15 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
   const state = preparations.get(scene);
   if (!state || state.cancelled) return Promise.resolve();
   const selected = cls ?? state.localClass;
-  if (selected !== 'warrior') return Promise.resolve();
+  if (selected !== 'warrior' && selected !== 'paladin') return Promise.resolve();
   state.localClass = selected;
-  if (state.task) return state.task;
+  // A request for the other kit while one runs waits for it, then prepares
+  // its own units (the recipe skips every unit already done).
+  if (state.task) return state.task.then(() => ensureActiveAbilityKit(scene, selected));
   const task = (async () => {
-    // The recipe enumerates units that need the kit's sheets resident, so it
-    // is built only once the demand load has landed.
-    if (state.host.assets && !(await state.host.assets())) return;
+    // The Warrior recipe enumerates units that need the kit's sheets resident,
+    // so it is built only once the demand load has landed.
+    if (selected === 'warrior' && state.host.assets && !(await state.host.assets())) return;
     if (state.cancelled) return;
     const context = state.context;
     for (const unit of recipe(state, selected)) {

@@ -70,6 +70,7 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     const steps = abilityVfxTexturePrewarmSteps();
     expect(steps.map((step) => step.id)).toEqual([
       ...FLIPBOOK_STYLES.map((style) => `flipbook:${style}`),
+      'sun-verdict-mark',
       'shared-canvases',
     ]);
   });

@@ -61,7 +61,7 @@ import type { SimContext } from '../sim_context';
 import { primaryHealingMultiplier } from '../spec_output_tuning';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
-import { hasEscapeStealth } from '../threat';
+import { hasEscapeStealth, tauntLeavesMobUnforced } from '../threat';
 import type { AbilityDef, AbilityEffect, Aura, Entity, Vec3 } from '../types';
 import {
   ALLIED_HEARTHSTONE_CAST_ID,
@@ -234,6 +234,7 @@ import {
   duskhymnChannelStopped,
   hasTithefiendTarget,
 } from './priest/vespers';
+import { isPullEligible } from './pull_eligibility';
 import { swingReadyForQueuedCast } from './queued_cast_swing_yield';
 import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
@@ -3211,7 +3212,16 @@ function applyAbility(
     // pure-utility completions (Armor Shear's sunder, Jawcrack's interrupt,
     // Goad's taunt, stuns/saps/finisher buffs): no damage event, no castFx,
     // nothing. Emit the cue for both, carrying the victim so the painter can
-    // anchor the utility read at the target. Renderer-only; no mechanic.
+    // anchor the utility read at the target. Renderer-only; no mechanic. A
+    // Paladin taunt (Sacred Goad) at a target it cannot turn says so, for the
+    // painter to show it fizzle (the taunt itself still resolves below, unchanged).
+    const tauntImmune =
+      ability.class === 'paladin' &&
+      target !== null &&
+      target !== p &&
+      res.effects.some((eff) => eff.type === 'taunt') &&
+      (target.kind !== 'mob' ||
+        tauntLeavesMobUnforced(MOBS[target.templateId], p.ownerId !== null));
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
@@ -3219,6 +3229,12 @@ function applyAbility(
       school: ability.school,
       fx: 'selfCast',
       ability: ability.id,
+      ...(tauntImmune ? { immune: true as const } : {}),
+      // Oath Chain at an enemy its pull will not move (a boss or a dummy,
+      // pull_eligibility.ts): the painter snaps the chain instead.
+      ...(ability.id === 'oath_chain' && target && target !== p && !isPullEligible(target)
+        ? { immune: true as const }
+        : {}),
     });
   }
   // An instant hostile spell (`projectile: false`) rolls the SAME resist a bolt

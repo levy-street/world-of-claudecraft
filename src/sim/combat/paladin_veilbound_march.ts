@@ -196,5 +196,9 @@ export function completeVeilboundMarch(ctx: SimContext, caster: Entity): void {
     school: 'holy',
     fx: 'nova',
     radius: 10,
+    ability: VEILBOUND_MARCH_ID,
+    // Whose march burst here, emitted in the same tick as the hits above so
+    // the renderer's burst lands with their damage numbers.
+    sourceId: caster.id,
   });
 }

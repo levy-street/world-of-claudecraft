@@ -263,6 +263,27 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/paladin_consecration_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/paladin_aegis_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/paladin_ascension_visual.ts', layer: 'player', strict: true },
+  // The Paladin kit's pooled draws (one additive mesh each, its ground marks,
+  // rune rings and shocks drawn with its airborne pieces): Dawnfall and Final
+  // Edict on the bottom rung, the rest one above, the stack they shipped with.
+  { file: 'src/render/ability_vfx/dawnfall.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/final_edict.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/devotion_rings.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/paladin_mending.ts', layer: 'player', strict: true },
+  // the shared pool behind fifteen Paladin effects (bastion_rite.ts, sunward_disc.ts...)
+  { file: 'src/render/ability_vfx/paladin_quad_pool.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/recall_the_fallen.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/solar_step.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/sun_verdict_lance.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/tolling_hammer.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/valkyrs_calling.ts', layer: 'player', strict: true },
+  { file: 'src/render/ability_vfx/ward_of_faith.ts', layer: 'player', strict: true },
+  // Sundering Gavel: the pooled draw (the block on the floor, the cracks) is on
+  // the ladder; the four solid gavels hang over the target's head on order 4.
+  { file: 'src/render/ability_vfx/sundering_gavel.ts', layer: 'player', strict: false },
+  // Avenging Wrath: the rune band on the ground is on the ladder; the wings stand
+  // behind the shoulders on order 2.
+  { file: 'src/render/paladin_avenging_wrath_visual.ts', layer: 'player', strict: false },
   { file: 'src/render/ring_of_frost_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/frost_nova_root_visual.ts', layer: 'player', strict: true },
   // Spore Burst's splash ring and fill; its floating countdown is a named
@@ -443,7 +464,6 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ice_block_visual.ts',
   'src/render/mage_barrier_visual.ts',
   'src/render/necromancy_army_portal_fx.ts',
-  'src/render/paladin_oath_chain_visual.ts',
   'src/render/weapon_vfx.ts',
   // Ignivar dressing that is not a floor mechanic
   'src/render/ignivar_arena_atmosphere.ts',
@@ -538,6 +558,14 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/campfire_flame.ts',
   'src/render/decals.ts',
   'src/render/fluid_surfaces.ts',
+  // Paladin pieces that never touch the floor: Hammer of Grace's thrown hammer,
+  // shards and helix (no ground mark), Hushbrand's brand, collar and rune band on
+  // the target's body, the shield glow layered over a held shield, and the
+  // Verdict of the Sun God's brand sprite over the target's head.
+  'src/render/ability_vfx/grace_hammer.ts',
+  'src/render/ability_vfx/hushbrand.ts',
+  'src/render/characters/paladin_shield_glow_fx.ts',
+  'src/render/paladin_sun_verdict_visual.ts',
   // Sky: the authored cloud and fog-bank billboards.
   'src/render/clouds.ts',
   // Dev and editor wireframes: the dev-cheat collider overlay and the Tree

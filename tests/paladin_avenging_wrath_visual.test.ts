@@ -2,14 +2,15 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import { ContactQueue, heldUntilCollapse } from '../src/render/contact_queue';
 import {
   type PaladinAvengingWrathVisual,
   syncPaladinAvengingWrathVisual,
 } from '../src/render/paladin_avenging_wrath_visual';
 
-describe('Paladin Zealwing visual', () => {
-  it('keeps two physical golden wings visible and freezes their pose for reduced motion', () => {
+describe('Paladin Avenging Wrath visual', () => {
+  it('unfurls two layered wings of light behind the wearer and holds them still for reduced motion', () => {
     const parent = new THREE.Group();
     const visual = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, false);
     expect(visual).not.toBeNull();
@@ -17,27 +18,110 @@ describe('Paladin Zealwing visual', () => {
 
     const left = parent.getObjectByName('paladin-avenging-wrath-left-wing');
     const right = parent.getObjectByName('paladin-avenging-wrath-right-wing');
-    const feathers = parent.getObjectByName(
-      'paladin-avenging-wrath-left-feathers',
-    ) as THREE.InstancedMesh;
+    const feathers = parent.getObjectByName('paladin-avenging-wrath-left-feathers') as THREE.Mesh;
     expect(left).toBeTruthy();
     expect(right).toBeTruthy();
-    expect(feathers).toBeInstanceOf(THREE.InstancedMesh);
-    expect(feathers.count).toBe(6);
-    expect((feathers.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xffd84a);
+    expect(feathers).toBeInstanceOf(THREE.Mesh);
+    // Mirrored wings share one prepared geometry and one additive light material.
+    const rightFeathers = parent.getObjectByName(
+      'paladin-avenging-wrath-right-feathers',
+    ) as THREE.Mesh;
+    expect(rightFeathers.geometry).toBe(feathers.geometry);
+    expect(left?.scale.x).toBeLessThan(0);
+    expect(right?.scale.x).toBeGreaterThan(0);
+    expect(visual.material.blending).toBe(THREE.AdditiveBlending);
+    expect(visual.material.uniforms.uGold.value.getHex()).toBe(0xffd84a);
+    // Feathers and motes live in the one geometry; no hanging filaments.
+    const kinds = new Set(Array.from(visual.geometry.getAttribute('aKind').array));
+    expect(kinds).toEqual(new Set([0, 1]));
+    // Both wings sit behind the shoulders.
+    expect(left?.position.z).toBeLessThan(0);
+    expect(visual.wingRig.scale.x).toBeCloseTo(1.8 * 0.8);
 
-    const openPose = left?.rotation.z;
-    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0.5, false);
-    expect(left?.rotation.z).not.toBe(openPose);
-    const reducedPose = left?.rotation.z;
+    // Unfurls from tucked to spread, overshoots slightly, then settles and breathes.
+    expect(visual.open).toBe(0);
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0.2, false);
+    const partway = visual.open;
+    expect(partway).toBeGreaterThan(0.3);
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0.2, false);
+    expect(visual.open).toBeGreaterThan(1);
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 1, false);
+    expect(visual.open).toBeCloseTo(1, 1);
+    expect(visual.material.uniforms.uOpen.value).toBe(visual.open);
+
+    const reducedTime = visual.material.uniforms.uTime.value;
     syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0.5, true);
     syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0.5, true);
-    expect(left?.rotation.z).toBe(reducedPose);
+    expect(visual.open).toBe(1);
+    expect(visual.material.uniforms.uTime.value).toBe(reducedTime);
+    expect(left?.rotation.z).toBeCloseTo(0);
 
     const dispose = vi.spyOn(visual.material, 'dispose');
-    expect(syncPaladinAvengingWrathVisual(visual, parent, 1.8, false, 0, false)).toBeNull();
+    // The aura gone, the wings furl away behind the shoulders, then go.
+    expect(syncPaladinAvengingWrathVisual(visual, parent, 1.8, false, 0.2, false)).toBe(visual);
+    expect(visual.furling).toBe(true);
+    expect(visual.open).toBeLessThan(0.9);
+    expect(visual.open).toBeGreaterThan(0.3);
+    expect(dispose).not.toHaveBeenCalled();
+    expect(syncPaladinAvengingWrathVisual(visual, parent, 1.8, false, 0.4, false)).toBeNull();
     expect(parent.getObjectByName('paladin-avenging-wrath')).toBeUndefined();
     expect(dispose).toHaveBeenCalledOnce();
+  });
+
+  it('unfurls again if the aura returns mid-furl, and goes at once for reduced motion or a hand-over', () => {
+    const parent = new THREE.Group();
+    const wrath = [{ id: 'avenging_wrath', kind: 'buff_dmg_done' }];
+    const visual = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 1, false, wrath);
+    if (!visual) throw new Error('missing Avenging Wrath visual');
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 1, false, wrath);
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, false, 0.2, false, []);
+    const furled = visual.open;
+    expect(visual.furling).toBe(true);
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0.2, false, wrath);
+    expect(visual.furling).toBe(false);
+    expect(visual.open).toBeGreaterThan(furled);
+
+    // Reduced motion: no furl.
+    expect(syncPaladinAvengingWrathVisual(visual, parent, 1.8, false, 0, true, [])).toBeNull();
+    // Divine Ascension's pair takes the shoulders: nothing to furl.
+    const next = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 1, false, wrath);
+    syncPaladinAvengingWrathVisual(next, parent, 1.8, true, 1, false, wrath);
+    expect(
+      syncPaladinAvengingWrathVisual(next, parent, 1.8, false, 0, false, [
+        { id: 'divine_ascension', kind: 'internal_cd' },
+      ]),
+    ).toBeNull();
+  });
+
+  it("draws Avenging Wrath's rune band on the ground, but not for wings borrowed without auras", () => {
+    const parent = new THREE.Group();
+    const wrath = [{ id: 'avenging_wrath', kind: 'buff_dmg_done' }];
+    const visual = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, false, wrath);
+    if (!visual) throw new Error('missing Avenging Wrath visual');
+    const band = parent.getObjectByName('paladin-avenging-wrath-rune-band') as THREE.Mesh;
+    expect(band.visible).toBe(true);
+    // On the ground beneath the wings, the same span as Divine Ascension's circle.
+    expect(band.position.y).toBeCloseTo(-1.8 * 0.62 + 0.05);
+    expect(band.scale.x).toBeCloseTo(5.2);
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0.2, false, wrath);
+    expect(visual.runeAge).toBeCloseTo(0.2);
+
+    // Divine Ascension's borrowed pair has no band.
+    const borrowed = new THREE.Group();
+    syncPaladinAvengingWrathVisual(null, borrowed, 1.8, true, 0, false);
+    expect(borrowed.getObjectByName('paladin-avenging-wrath-rune-band')?.visible).toBe(false);
+  });
+
+  it('claims the cast cue so the generic buff wings never double the Seraphic wings', () => {
+    const releaseGesture = vi.fn();
+    const painter = Object.assign(Object.create(AbilityVfx.prototype), {
+      releaseGesture,
+      deps: { fx: {} },
+    }) as AbilityVfx;
+    const event = { sourceId: 1, targetId: 1, school: 'holy', ability: 'avenging_wrath' };
+    expect(painter.handleSpellfx({ ...event, fx: 'selfCast' })).toBe(true);
+    expect(painter.handleSpellfx({ ...event, fx: 'nova' })).toBe(true);
+    expect(releaseGesture).toHaveBeenCalledExactlyOnceWith(1, 'avenging_wrath');
   });
 
   it('is wired into the renderer aura scan and entity visual lifecycle', () => {
@@ -52,6 +136,9 @@ describe('Paladin Zealwing visual', () => {
     expect(renderer).toContain(
       'heldUntilCollapse(deathHeld, !e.dead && hasPaladinWings, !!v.paladinAvengingWrathVisual),',
     );
+    // Valkyr's Calling: the flight wears the wings (and they outlive its aura for the slam).
+    expect(renderer).toContain('if (valkyrElapsed !== null) hasPaladinWings = true;');
+    expect(renderer).toContain('valkyrElapsed,');
   });
 
   it('keeps the wings on a body killed by a blade still in the air, until it collapses', () => {
@@ -91,17 +178,58 @@ describe('Paladin Zealwing visual', () => {
       beat = elapsed;
     }
     expect(dispose).not.toHaveBeenCalled();
-    // the blade lands: the wings go with the collapse
-    expect(frame(1400, killed)).toBeNull();
+    // the blade lands: the wings go with the collapse (furling away from that frame,
+    // or at once while they had barely opened)
+    const furling = (now: number) => {
+      const left = frame(now, killed);
+      return left === null || left.furling;
+    };
+    const gone = (from: number) => {
+      for (let now = from; now < from + 1000; now += 16) if (!frame(now, killed)) return true;
+      return false;
+    };
+    expect(furling(1400)).toBe(true);
+    expect(gone(1416)).toBe(true);
     expect(parent.getObjectByName('paladin-avenging-wrath')).toBeUndefined();
     expect(dispose).toHaveBeenCalledOnce();
     // a paladin killed with no blade in the air loses them on the event, as before
     wings = null;
     const second = frame(2000, { dead: false, hasPaladinWings: true });
     expect(second).not.toBeNull();
-    expect(frame(2016, killed)).toBeNull();
+    expect(furling(2016)).toBe(true);
+    expect(gone(2032)).toBe(true);
     // and a held body that wore none grows none
     queue.note({}, 0.4, PALADIN, 3000);
     expect(frame(3016, killed)).toBeNull();
+  });
+
+  it('re-poses the wings when the aura changes and leaves the defenses to the kit', () => {
+    const parent = new THREE.Group();
+    expect(
+      syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, true, [
+        { id: 'guardian_covenant', kind: 'buff_dr' },
+      ]),
+    ).toBeNull();
+    // Life Covenant holds a shield (life_covenant.ts), not wings.
+    expect(
+      syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, true, [
+        { id: 'life_covenant', kind: 'buff_dr' },
+      ]),
+    ).toBeNull();
+    const visual = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, true, [
+      { id: 'avenging_wrath', kind: 'buff_dmg_done' },
+      { id: 'holy_shield_absorb', kind: 'absorb' },
+      { id: 'bastion_rite', kind: 'buff_dr_phys' },
+    ])!;
+    expect(visual.open).toBe(1);
+    expect(visual.rightWing.scale.x).toBe(1);
+    // The defenses are drawn by the Paladin kit (hallowed_wall.ts,
+    // bastion_rite.ts), not the wing rig: alone they raise nothing here.
+    expect(
+      syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0, true, [
+        { id: 'holy_shield_absorb', kind: 'absorb' },
+      ]),
+    ).toBeNull();
+    expect(syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, true, [])).toBeNull();
   });
 });

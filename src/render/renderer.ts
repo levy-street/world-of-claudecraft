@@ -625,6 +625,7 @@ import {
   type PaladinAscensionVisual,
   syncPaladinAscensionVisual,
 } from './paladin_ascension_visual';
+import { hasAuthoredPaladinAura } from './paladin_aura_vfx_core';
 import {
   type PaladinAvengingWrathVisual,
   syncPaladinAvengingWrathVisual,
@@ -634,6 +635,7 @@ import {
   type PaladinOathChainVisual,
   syncPaladinOathChainVisual,
 } from './paladin_oath_chain_visual';
+import { drivePaladinPresence, holdValkyrFlight } from './paladin_presence';
 import {
   type PaladinSunVerdictAuraSource,
   type PaladinSunVerdictVisualPlan,
@@ -3113,6 +3115,7 @@ export class Renderer {
       painter: {
         spawnAoeRing: (x, z, r, school, color) => this.spawnAoeRing(x, z, r, school, color),
         triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
+        receiveHit: (id) => this.triggerHit(id),
         lightPulse: (id, school, intensity, duration, range) => this.pulseAt(id, school, intensity, duration, range),
         addShake: (amount, x, y, z, crunch) => this.addShake(amount, x, y, z, crunch),
         screenFlash: (strength) => { if (this.post && !this.reducedMotion()) this.post.screenFlash(strength); },
@@ -6425,7 +6428,7 @@ export class Renderer {
       activeKitPrewarmEntry(this.scene, this.sim.cfg.playerClass, {
         queue: this.backgroundGpuWork,
         assets: () => ensureWarriorKitAssets(GFX.constrainedMemory),
-        geometry: (kinds) =>
+        geometry: (kinds, kit?: string) =>
           this.abilityVfxFx.authoredPrewarmUnits(
             {
               properties: liveMaterialProperties(this.webgl),
@@ -6433,6 +6436,7 @@ export class Renderer {
               draw: (group, child) => this.renderBoundedPrewarmRoot(group, child),
             },
             kinds,
+            kit,
           ),
         texture: (texture) => this.prewarmTexture(texture),
       }),
@@ -7344,7 +7348,7 @@ export class Renderer {
           this.vfx.detonate(ev.targetId, ev.school);
           this.pulseAt(ev.targetId, ev.school, 9, 0.5);
         } else if (ev.fx === 'paladinAscensionStart') {
-          // The persistent seal and crown are the complete activation presentation.
+          // The ascension visual plays its own entrance when the plan turns active.
         } else if (ev.fx === 'paladinAscensionImpact') {
           this.vfx.paladinAscensionImpact(ev.sourceId, ev.targetId, ev.impact);
           this.pulseAt(ev.impact === 'area' ? ev.sourceId : ev.targetId, 'holy', 10, 0.5);
@@ -7372,15 +7376,6 @@ export class Renderer {
           }
         } else if (ev.fx === 'paladinBastionSweepImpact') {
           this.vfx.paladinBastionSweepImpact(ev.targetId);
-        } else if (ev.fx === 'paladinDawnfall') {
-          this.triggerAttack(ev.sourceId, ev.ability);
-          this.vfx.paladinDawnfall(ev.sourceId, ev.range ?? 6);
-          this.pulseAt(ev.sourceId, 'holy', 8, 0.45);
-        } else if (ev.fx === 'paladinDawnfallImpact') {
-          this.vfx.paladinDawnfallImpact(ev.targetId);
-        } else if (ev.fx === 'paladinFinalEdict') {
-          this.vfx.paladinFinalEdict(ev.sourceId, ev.targetId);
-          this.pulseAt(ev.targetId, 'holy', 11, 0.4);
         } else if (ev.fx === 'temporalGlyph') {
           // Temporal Echo and resurrection glyphs follow the event's school:
           // Chronomancy stays arcane, Wildwake nature, and the Sunmender rite holy.
@@ -7587,6 +7582,8 @@ export class Renderer {
         }
         break;
       case 'aura': {
+        // Authored Paladin marks and wards own their application/expiry visuals.
+        if (hasAuthoredPaladinAura(ev)) break;
         const tgt = this.sim.entities.get(ev.targetId);
         if (isWarriorFuryAuraEvent(ev, tgt) || this.abilityVfx.onWarriorControlAura(ev, tgt?.auras))
           break;
@@ -9761,6 +9758,8 @@ export class Renderer {
       // a kill's collapse waits for the blade that dealt it, its mount and wings with it
       const deathHeld = isVisuallyDead(e) && !e.ghost && this.contactQueue.holdsDeath(e.id);
       const visuallyDead = collapsed(isVisuallyDead(e) && !e.ghost, deathHeld);
+      const valkyrElapsed = drivePaladinPresence(this.abilityVfxFx, e, isVisuallyDead(e));
+      if (valkyrElapsed !== null) hasPaladinWings = true; // a Valkyr's Calling flight wears them
       const waterJetVisualChannel = this.waterJetVisualChannels.has(e.id);
       // This is the final render-side casting state, including Water Jet's
       // spellfx-driven channel. It feeds both the rig and the fairness carve-out.
@@ -10107,6 +10106,8 @@ export class Renderer {
           heldUntilCollapse(deathHeld, !e.dead && hasPaladinWings, !!v.paladinAvengingWrathVisual),
           dt,
           this.reducedMotion(),
+          e.auras,
+          valkyrElapsed,
         );
         const oathChainSourceEntity =
           oathChainSourceId === null ? undefined : sim.entities.get(oathChainSourceId);
@@ -10236,6 +10237,7 @@ export class Renderer {
       const resolvedForm = resolvedCharacterForm(requestedForm, formReadyMask);
       const formVisibility = characterFormVisibility(resolvedForm);
       applyCharacterFormVisibility(v, formVisibility, v.visualCompilePending);
+      if (v.visual) holdValkyrFlight(v.visual, valkyrElapsed);
       // rideable mount under the player (the lazy form-visual pattern). Mount
       // GLBs are lazyPreload: the first sight of a rider kicks the fetch and
       // the visual appears once ready. A druid form replaces the whole body,
@@ -10567,7 +10569,7 @@ export class Renderer {
       // identically with no wire traffic). Mounted riders never flail:
       // st.airborne is already held false for them.
       v.wasFalling = isFallingAtSpeed(v.wasFalling, st.airborne, vy);
-      st.falling = v.wasFalling;
+      st.falling = v.wasFalling && valkyrElapsed === null;
       applyLocoDirection(st, loco, ghostWolf);
       st.dead = visuallyDead;
       st.casting = characterCasting;
@@ -10918,6 +10920,7 @@ export class Renderer {
       // The rider is placed: carry the body-attached auras to the saddle.
       syncRiderAnchor(v.riderAnchor, v.visual.root);
       const ascensionPlan = paladinAscensionVisualPlanInto(e, this.paladinAscensionPlanScratch);
+      ascensionPlan.local = isSelf;
       v.paladinAscensionVisual = syncPaladinAscensionVisual(
         v.paladinAscensionVisual,
         v.group,

@@ -44,6 +44,17 @@ export const TAUNT_FORCE_SECONDS = 3;
 // two rules agree. Inside a claimed instance slot distance never drops anyone;
 // leaving the slot does (instances/instance_combat_hold.ts).
 export const THREAT_DROP_RANGE = 100;
+
+/** Whether a taunt lifts threat on a mob of `template` but never turns or
+ * forces it (Sim.applyTaunt): an `ignoreTaunt` add, a training dummy, or a
+ * boss taunted by an owned unit (a pet). Pure; the taunt cast cue's `immune`
+ * flag (combat/casting_lifecycle.ts) reads the same rule. */
+export function tauntLeavesMobUnforced(
+  template: { ignoreTaunt?: boolean; dummy?: boolean; boss?: boolean } | undefined,
+  casterOwned: boolean,
+): boolean {
+  return !!template?.ignoreTaunt || !!template?.dummy || (casterOwned && !!template?.boss);
+}
 // Stealth shrinks detection at equal level; higher-level observers pierce it
 // more easily, lower-level observers struggle. Shared by mobs and players.
 export const STEALTH_DETECTION_MULT = 0.25;

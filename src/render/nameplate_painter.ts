@@ -85,6 +85,7 @@ import {
   newNameplatePlan,
 } from './nameplate_view';
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
+import { valkyrFlightElapsed, valkyrVanished } from './paladin_valkyrs_calling_core';
 import { FRIENDLY, isFriendlyPet, isMobHostileToViewer, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 import {
@@ -354,6 +355,9 @@ export class NameplatePainter {
       // The courier guards exist only for a cloaked infiltrator (their bodies are
       // withheld by the renderer gate; the plate must not outlive the body).
       if (shadowGuardHidden(entity, world) || investigationDisguiseHidden(entity, world)) continue;
+      // Valkyr's Calling hides the Paladin in the light mid-flight; the body is
+      // meant to be gone, so no stand-in plate either.
+      if (valkyrVanished(valkyrFlightElapsed(entity))) continue;
       // A compile gate can leave this entity with no body at all (the arrival
       // gate hides the whole group). Its plate is then the only thing that says
       // an enemy is there, so it is forced on over the nameplate toggles for

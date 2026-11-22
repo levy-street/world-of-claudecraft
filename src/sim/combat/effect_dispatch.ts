@@ -469,10 +469,20 @@ function advanceSunGodVerdictForHit(
   target: Entity,
   abilityId: string,
   mark: Aura,
+  triggerRadius?: number,
 ): void {
   const verdict = sunGodVerdictDefinition();
   if (!verdict) return;
-  advanceSunGodVerdict(ctx, caster, target, abilityId, mark, verdict.effect, verdict.name);
+  advanceSunGodVerdict(
+    ctx,
+    caster,
+    target,
+    abilityId,
+    mark,
+    verdict.effect,
+    verdict.name,
+    triggerRadius,
+  );
 }
 
 export function runEffects(
@@ -1385,6 +1395,7 @@ export function runEffects(
             targetId: ally.id,
             school: 'holy',
             fx: 'temporalGlyph',
+            ability: ability.id,
           });
           break;
         }
@@ -2574,6 +2585,11 @@ export function runEffects(
             school: ability.school,
             fx: 'nova',
             ability: ability.id,
+            // Final Edict's Ascension explosion and Solar Invocation's Ascension
+            // splash draw their true reach.
+            ...(ability.id === FINAL_EDICT_ID || ability.id === 'solar_invocation'
+              ? { range: eff.radius }
+              : {}),
           });
         }
         const aoeSpBonus = directHitBonus(
@@ -2714,7 +2730,15 @@ export function runEffects(
           }
         }
         if (sunVerdictHit) {
-          advanceSunGodVerdictForHit(ctx, p, sunVerdictHit.target, ability.id, sunVerdictHit.mark);
+          // The area sentence grows with this Dawnfall's radius (Ascension included).
+          advanceSunGodVerdictForHit(
+            ctx,
+            p,
+            sunVerdictHit.target,
+            ability.id,
+            sunVerdictHit.mark,
+            eff.radius,
+          );
         }
         if (ability.id === DAWNFALL_ID && aoeTargets.length > 0 && !dawnRhythmTriggered) {
           // Zealfire 2pc deepens the paired cut for wearers (dawnRhythmCutSec).
@@ -2901,6 +2925,11 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
           ability: ability.id,
+          // The heal's reach, so the Paladin's authored areas (Radiant Chorus,
+          // Solar Invocation's Ascension splash) show their true extent.
+          ...(ability.id === 'radiant_chorus' || ability.id === 'solar_invocation'
+            ? { range: eff.radius }
+            : {}),
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
         const aoeHealBonus = directHealBonus(p.healPower, res.castTime, true, talentHealMult);

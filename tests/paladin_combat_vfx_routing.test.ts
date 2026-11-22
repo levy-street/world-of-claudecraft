@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, type Mock, vi } from 'vitest';
 import { Renderer } from '../src/render/renderer';
 import type { SimEvent } from '../src/sim/types';
 
@@ -6,6 +6,8 @@ describe('Paladin combat VFX routing', () => {
   it('executes each Paladin spellfx route against the renderer collaborators', () => {
     const triggerAttack = vi.fn();
     const pulseAt = vi.fn();
+    const solarExecution = vi.fn();
+    const releaseGesture = vi.fn();
     const vfx = {
       paladinHolyShock: vi.fn(),
       paladinSunwardDisc: vi.fn(),
@@ -24,9 +26,15 @@ describe('Paladin combat VFX routing', () => {
       triggerAttack,
       pulseAt,
       vfx,
-      // The spec-registry gate runs before the paladin switch; none of these fx
-      // names are registry casts, so the real painter returns false too.
-      abilityVfx: { handleSpellfx: vi.fn(() => false) },
+      abilityVfxFx: { solarExecution },
+      // Final Edict's outcome-aware painter owns its companion before the
+      // legacy routes. Its pairing contract is exercised in final_edict.test.
+      abilityVfx: {
+        handleSpellfx: vi.fn((ev) =>
+          ['paladinFinalEdict', 'paladinDawnfall', 'paladinDawnfallImpact'].includes(ev.fx),
+        ),
+        releaseGesture,
+      },
     } as unknown as Renderer;
     const handle = (event: Record<string, unknown>) =>
       Renderer.prototype.handleEvent.call(renderer, event as SimEvent);
@@ -40,6 +48,15 @@ describe('Paladin combat VFX routing', () => {
       impact: 'healing',
     });
     expect(vfx.paladinHolyShock).toHaveBeenCalledWith(1, 2, 'heal');
+    // The painter is offered the cue first: its Paladin claim owns the cast
+    // gesture (painter.ts paladinSpellfx), so the legacy arm the renderer runs
+    // when the painter declines (a muted caster) only draws the shock.
+    const handleSpellfx = (renderer as unknown as { abilityVfx: { handleSpellfx: Mock } })
+      .abilityVfx.handleSpellfx;
+    expect(handleSpellfx).toHaveBeenCalledWith(expect.objectContaining({ fx: 'paladinHolyShock' }));
+    expect(handleSpellfx.mock.invocationCallOrder[0]).toBeLessThan(
+      vfx.paladinHolyShock.mock.invocationCallOrder[0],
+    );
 
     handle({
       type: 'spellfx',
@@ -95,8 +112,7 @@ describe('Paladin combat VFX routing', () => {
       ability: 'dawnfall',
       range: 8,
     });
-    expect(triggerAttack).toHaveBeenCalledWith(1, 'dawnfall');
-    expect(vfx.paladinDawnfall).toHaveBeenCalledWith(1, 8);
+    expect(vfx.paladinDawnfall).not.toHaveBeenCalled();
 
     handle({
       type: 'spellfx',
@@ -105,7 +121,7 @@ describe('Paladin combat VFX routing', () => {
       targetId: 2,
       school: 'holy',
     });
-    expect(vfx.paladinDawnfallImpact).toHaveBeenCalledWith(2);
+    expect(vfx.paladinDawnfallImpact).not.toHaveBeenCalled();
 
     handle({
       type: 'spellfx',
@@ -114,6 +130,8 @@ describe('Paladin combat VFX routing', () => {
       targetId: 2,
       school: 'holy',
     });
-    expect(vfx.paladinFinalEdict).toHaveBeenCalledWith(1, 2);
+    expect(vfx.paladinFinalEdict).not.toHaveBeenCalled();
+    expect(solarExecution).not.toHaveBeenCalled();
+    expect(releaseGesture).not.toHaveBeenCalled();
   });
 });

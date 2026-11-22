@@ -22,10 +22,7 @@ export function isAvengingWrathAura(aura: Pick<Aura, 'id' | 'kind'>): boolean {
 }
 
 export function isPaladinWingAura(aura: Pick<Aura, 'id' | 'kind'>): boolean {
-  return (
-    isAvengingWrathAura(aura) ||
-    ((aura.id === 'guardian_covenant' || aura.id === 'life_covenant') && aura.kind === 'buff_dr')
-  );
+  return isAvengingWrathAura(aura);
 }
 
 export function characterAvengingWrathActive(e: Entity): boolean {

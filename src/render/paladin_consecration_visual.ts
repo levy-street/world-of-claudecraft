@@ -1,17 +1,36 @@
-// Persistent Consecration presentation. The authoritative zone comes from IWorld,
-// so late-joining and reconnecting clients see the same holy ground as the caster.
+// Persistent Consecration (Holy Ground) presentation. The authoritative zone comes
+// from IWorld, so late-joining and reconnecting clients see the same holy ground as
+// the caster.
 
 import * as THREE from 'three';
 import type { ActiveConsecration } from '../world_api';
+import { GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './ability_vfx/effect_floor';
+import {
+  paladinConsecrationAscendedAt,
+  paladinConsecrationSpecAt,
+} from './ability_vfx/paladin_consecration_spec';
+import { PALADIN_RUNE_GLSL } from './ability_vfx/paladin_runes';
+import { PALADIN_SPEC_EMBLEM_GLSL } from './ability_vfx/paladin_spec_emblems';
+import {
+  bindPaladinSpecIcons,
+  PALADIN_SPEC_ICON_GLSL,
+  paladinSpecIconUniforms,
+} from './ability_vfx/paladin_spec_icons';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 const SEGMENTS = 72;
 const GROUND_LIFT = 0.055;
 const FADE_SECONDS = 0.65;
-const REVEAL_SECONDS = 0.24;
-const PULSE_SECONDS = 1.1;
-const MOTE_COUNT = 12;
-const EDGE_WISP_COUNT = 8;
+/** The holy ground writes itself outward from the Paladin over this long. */
+const REVEAL_SECONDS = 0.35;
+/** The zone ticks once a second; a wave of light runs out with each tick. */
+const TICK_SECONDS = 1;
+const OPENING_SECONDS = 0.6;
+const MOTE_COUNT = 14;
+/** Faithwarden's icon until the cast's note of the caster's spec is found. */
+const DEFAULT_SPEC = 1;
+/** How long a new zone keeps looking for its caster's spec note. */
+const SPEC_SEARCH_SECONDS = 1;
 
 interface AmbientOffset {
   x: number;
@@ -24,18 +43,30 @@ interface AmbientOffset {
 interface ConsecrationVisual {
   root: THREE.Group;
   motes: THREE.InstancedMesh;
-  edgeWisps: THREE.InstancedMesh;
   pulseRing: THREE.Mesh;
   pulseMaterial: THREE.MeshBasicMaterial;
   shimmer: THREE.Mesh;
+  opening: THREE.Mesh;
+  openingMaterial: THREE.ShaderMaterial;
+  /** The tick's wall of holy fire: a unit open cylinder scaled to the wave. */
+  fireWall: THREE.Mesh;
+  fireMaterial: THREE.ShaderMaterial;
+  fireBase: number;
   moteOffsets: readonly AmbientOffset[];
-  edgeOffsets: readonly AmbientOffset[];
   scratch: THREE.Matrix4;
   scratchPosition: THREE.Vector3;
   scratchScale: THREE.Vector3;
   scratchRotation: THREE.Quaternion;
   materials: THREE.MeshBasicMaterial[];
   baseOpacities: number[];
+  /** The shader-drawn ground and rune band, faded through uAlpha. */
+  shaders: THREE.ShaderMaterial[];
+  /** The ground itself, which bears the caster's spec icon. */
+  ground: THREE.ShaderMaterial;
+  /** Whether the caster's spec has been settled (found, or given up on). */
+  specSettled: boolean;
+  /** Ascension empowered it: its fire and pulses burn hotter. */
+  gilded: boolean;
   geometries: THREE.BufferGeometry[];
   qualityObjects: { object: THREE.Object3D; minQuality: number }[];
   radius: number;
@@ -44,6 +75,46 @@ interface ConsecrationVisual {
   lastRemaining: number;
 }
 
+const GROUND_VERTEX = `
+  uniform vec2 uCenter; uniform float uRadius;
+  varying vec2 vLocal;
+  ${GROUND_DEPTH_PULL_GLSL}
+  void main(){
+    vLocal=(position.xz-uCenter)/uRadius;
+    gl_Position=projectionMatrix*groundPulledView(position,${GROUND_DEPTH_PULL.toFixed(2)});
+  }
+`;
+const GROUND_COMMON = `
+  uniform float uTime, uAlpha, uReveal;
+  varying vec2 vLocal;
+  const vec3 GOLD=vec3(1.0,0.82,0.42);
+  const vec3 HOT=vec3(1.0,0.95,0.8);
+  const float PI=3.14159265;
+  float sq(float x){return x*x;}
+  float band(float r,float at,float w){return exp(-sq((r-at)/w));}
+  // The tick's wave front: out from the heart once a second after the opening.
+  float tickPhase(){return fract(uTime/${TICK_SECONDS.toFixed(2)});}
+  float waveFront(){return tickPhase()*1.15;}
+  float fireHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+  float fireNoise(vec2 p){
+    vec2 i=floor(p),f=fract(p);
+    f=f*f*(3.0-2.0*f);
+    return mix(mix(fireHash(i),fireHash(i+vec2(1.0,0.0)),f.x),
+               mix(fireHash(i+vec2(0.0,1.0)),fireHash(i+vec2(1.0,1.0)),f.x),f.y);
+  }
+`;
+
+/**
+ * Holy Ground. The ground itself is drawn in light, draped over the terrain: a
+ * warm radiant field with a white-hot heart, the caster's spec icon
+ * (Faithwarden or Dawnreaver) at the centre, slowly turning sacred geometry (an eight-pointed star of two
+ * squares, a ring and twelve diamond-tipped spokes) inside the shared Paladin
+ * rune band at the rim. It writes itself outward from the Paladin with a
+ * column of light, then with every tick a wave of holy fire runs out from the
+ * heart: a wall of flame sweeping to the rim, embers smouldering behind it,
+ * the geometry lit and the runes flashing.
+ * Motes of light rise across it.
+ */
 export class PaladinConsecrationVisuals {
   private readonly active = new Map<string, ConsecrationVisual>();
   private quality = 1;
@@ -98,6 +169,31 @@ export class PaladinConsecrationVisuals {
     this.active.clear();
   }
 
+  private groundShader(
+    state: ActiveConsecration,
+    radius: number,
+    fragment: string,
+    extra: Record<string, THREE.IUniform> = {},
+  ) {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uCenter: { value: new THREE.Vector2(state.x, state.z) },
+        uRadius: { value: radius },
+        uTime: { value: 0 },
+        uAlpha: { value: 0 },
+        uReveal: { value: 0 },
+        ...extra,
+      },
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+      vertexShader: GROUND_VERTEX,
+      fragmentShader: fragment,
+    });
+  }
+
   private create(state: ActiveConsecration): void {
     const radius = Math.max(0.5, state.radius);
     const centerY = this.groundY(state.x, state.z);
@@ -105,92 +201,177 @@ export class PaladinConsecrationVisuals {
     root.name = 'paladin-consecration';
     const materials: THREE.MeshBasicMaterial[] = [];
     const baseOpacities: number[] = [];
+    const shaders: THREE.ShaderMaterial[] = [];
     const geometries: THREE.BufferGeometry[] = [];
     const qualityObjects: { object: THREE.Object3D; minQuality: number }[] = [];
 
     const addTerrainMesh = (
       geometry: THREE.BufferGeometry,
       name: string,
-      color: number,
-      opacity: number,
-      step: number,
+      material: THREE.Material,
+      renderOrder: number,
     ): THREE.Mesh => {
-      const material = this.material(color, opacity);
       const mesh = new THREE.Mesh(geometry, material);
       mesh.name = name;
-      mesh.renderOrder = floorVfxRenderOrder('player', step);
+      // The authored stack (5 to 11) on the player rung of the floor ladder.
+      mesh.renderOrder = floorVfxRenderOrder('player', renderOrder - 5);
       root.add(mesh);
       geometries.push(geometry);
-      materials.push(material);
-      baseOpacities.push(opacity);
       return mesh;
     };
+    const basic = (color: number, opacity: number): THREE.MeshBasicMaterial => {
+      const material = this.material(color, opacity);
+      materials.push(material);
+      baseOpacities.push(opacity);
+      return material;
+    };
 
+    // The holy ground itself: field, heart, emblem, the sacred geometry and the tick wave.
+    const ground = this.groundShader(
+      state,
+      radius,
+      `
+      ${GROUND_COMMON}
+      ${PALADIN_SPEC_ICON_GLSL}
+      ${PALADIN_SPEC_EMBLEM_GLSL}
+      uniform float uSpec, uGild;
+      void main(){
+        vec2 p=vLocal;
+        float r=length(p);
+        float a=atan(p.y,p.x);
+        float reveal=1.0-smoothstep(uReveal*1.04-0.05,uReveal*1.04,r);
+        float tick=tickPhase();
+        float front=waveFront();
+        float live=step(${REVEAL_SECONDS.toFixed(2)},uTime);
+        // The tick's holy fire: a flickering burning front, embers and scorch
+        // light smouldering behind it.
+        float flick=0.55+0.45*fireNoise(vec2(a*9.0,uTime*7.0));
+        float wave=band(r,front,0.05)*(1.0-tick)*live*flick;
+        float behind=step(r,front)*exp(-(front-r)*7.0)*(1.0-tick)*live;
+        float embers=behind*(0.25+0.75*step(0.72,fireNoise(vec2(a*26.0,r*30.0))))*0.45;
+        float field=0.03+0.1*exp(-r*r*4.0)+band(r,0.985,0.025)*0.3;
+        // Sacred geometry inside the runes, turning slowly: an eight-pointed star
+        // of two squares in single lines, framed by a thin ring, and twelve
+        // straight spokes, long and short by turns, each tipped with a diamond.
+        // The lines flare where the tick's holy fire passes over them.
+        float turn=uTime*0.05;
+        vec2 q=vec2(p.x*cos(turn)-p.y*sin(turn),p.x*sin(turn)+p.y*cos(turn));
+        float starR=0.62;
+        float diamond=abs(abs(q.x)+abs(q.y)-starR);
+        float square=abs(max(abs(q.x),abs(q.y))-starR*0.7071);
+        float star=min(diamond,square);
+        float starLine=exp(-sq(star/0.0065))*smoothstep(0.3,0.33,r);
+        float qa=atan(q.y,q.x);
+        float slot=qa*12.0/(2.0*PI);
+        float index=floor(slot+0.5);
+        float spokeLen=mod(index,2.0)<0.5?0.58:0.5;
+        float across=abs(slot-index)*2.0*PI*r/12.0;
+        float spoke=exp(-sq(across/0.0045))*smoothstep(0.33,0.35,r)*(1.0-smoothstep(spokeLen-0.03,spokeLen,r));
+        float node=1.0-smoothstep(0.0,0.004,abs(r-spokeLen)/0.03+across/0.018-1.0);
+        float frame=band(r,starR+0.03,0.0045);
+        float lines=starLine+spoke*0.9+node+frame*0.8;
+        float veins=lines*(0.3+1.3*exp(-sq((r-front)/0.07))*(1.0-tick)*live);
+        // The caster's spec icon at the heart, from the atlas once it has
+        // loaded and its drawn emblem until then.
+        vec2 e=p/0.26;
+        float emblem;
+        if(uSpecIconsReady>0.5){
+          vec3 icon=paladinSpecIcon(e,uSpec);
+          emblem=(1.0-smoothstep(-0.01,0.02,icon.x))*0.35+(1.0-smoothstep(0.0,0.03,icon.y-0.008));
+        } else {
+          float d=paladinSpecDist(e,uSpec);
+          emblem=(1.0-smoothstep(-0.01,0.01,d))*0.35+(1.0-smoothstep(0.01,0.025,abs(d)));
+        }
+        emblem*=0.6+0.6*exp(-tick*5.0)*live;
+        float hallow=band(r,0.3,0.008)*0.7;
+        // Empowered by Ascension: a gold edge held round the ground, and the
+        // emblem at the heart burning brighter.
+        float gilt=uGild*(band(r,0.985,0.012)*1.4+band(r,0.955,0.006)*0.6);
+        emblem*=1.0+0.5*uGild;
+        float mask=(field+veins+emblem*0.75+hallow+gilt)*reveal+wave*1.15+embers;
+        vec3 color=mix(GOLD,HOT,clamp(exp(-r*r*7.0)*0.6+wave+veins*0.5+emblem*0.4+gilt*0.3,0.0,1.0));
+        color=mix(color,vec3(1.0,0.42,0.1),clamp(embers*1.6+wave*0.35,0.0,0.9));
+        float opacity=uAlpha*mask;
+        if(!(opacity>=0.003)) discard;
+        gl_FragColor=vec4(color,opacity);
+        #include <colorspace_fragment>
+      }
+    `,
+      { ...paladinSpecIconUniforms(), uSpec: { value: DEFAULT_SPEC }, uGild: { value: 0 } },
+    );
+    shaders.push(ground);
     addTerrainMesh(
       this.createTerrainDisc(state.x, state.z, radius, 48),
       'paladin-consecration-base-glow',
-      0xffd86a,
-      0.1,
-      0,
+      ground,
+      5,
     );
+
     qualityObjects.push({
       object: addTerrainMesh(
-        this.createTerrainDisc(state.x, state.z, radius * 0.62, 40),
-        'paladin-consecration-white-hot-center',
-        0xffffdc,
-        0.09,
-        1,
-      ),
-      minQuality: 0.2,
-    });
-    qualityObjects.push({
-      object: addTerrainMesh(
-        this.createTerrainRing(state.x, state.z, radius * 0.17, radius * 0.19),
+        this.createTerrainRing(state.x, state.z, radius * 0.17, radius * 0.185),
         'paladin-consecration-inner-ring',
-        0xffffcf,
-        0.48,
-        3,
+        basic(0xffffcf, 0.28),
+        8,
       ),
       minQuality: 0.25,
     });
     qualityObjects.push({
       object: addTerrainMesh(
-        this.createTerrainRing(state.x, state.z, radius * 0.39, radius * 0.405),
+        this.createTerrainRing(state.x, state.z, radius * 0.595, radius * 0.605),
         'paladin-consecration-middle-ring',
-        0xffe78b,
-        0.32,
-        3,
+        basic(0xffe78b, 0.18),
+        8,
       ),
       minQuality: 0.65,
-    });
-    qualityObjects.push({
-      object: addTerrainMesh(
-        this.createTerrainRing(state.x, state.z, radius * 0.67, radius * 0.682),
-        'paladin-consecration-outer-ring',
-        0xffdb68,
-        0.25,
-        3,
-      ),
-      minQuality: 0.45,
     });
     addTerrainMesh(
       this.createTerrainRing(state.x, state.z, radius * 0.982, radius),
       'paladin-consecration-perimeter',
-      0xffffb5,
-      0.42,
-      4,
+      basic(0xffffb5, 0.42),
+      9,
     );
-    const runeField = addTerrainMesh(
-      this.createTerrainRuneField(state.x, state.z, radius),
-      'paladin-consecration-sun-rune-field',
-      0xffffd1,
-      0.5,
-      3,
-    );
-    runeField.userData.runeSegmentCount = 24;
 
-    const pulseGeometry = new THREE.RingGeometry(0.93, 1, 64);
-    const pulseMaterial = this.material(0xffffd8, 0.42);
+    // The shared Paladin rune band at the rim, writing itself in and flashing
+    // as each tick's wave reaches it.
+    const runes = this.groundShader(
+      state,
+      radius,
+      `
+      ${GROUND_COMMON}
+      ${PALADIN_RUNE_GLSL}
+      void main(){
+        vec2 p=vLocal;
+        float spin=uTime*0.06;
+        float c=cos(spin),s=sin(spin);
+        vec2 q=vec2(c*p.x-s*p.y,s*p.x+c*p.y);
+        float turn=fract(atan(q.y,q.x)/(2.0*PI)+0.25);
+        // Past the seam once fully revealed, so no sliver of the band stays unwritten.
+        float edge=uReveal*1.04;
+        float drawn=1.0-smoothstep(edge-0.03,edge,turn);
+        float tick=tickPhase();
+        float flash=exp(-sq((waveFront()-0.9)/0.1))*(1.0-tick)*step(${REVEAL_SECONDS.toFixed(2)},uTime);
+        // Quiet between ticks, flashing as each wave reaches it.
+        float mask=paladinRuneRing(q,0.84,0.95)*drawn*(0.5+0.9*flash);
+        vec3 color=mix(GOLD,HOT,0.35+flash*0.6);
+        float opacity=uAlpha*mask;
+        if(!(opacity>=0.003)) discard;
+        gl_FragColor=vec4(color,opacity);
+        #include <colorspace_fragment>
+      }
+    `,
+    );
+    shaders.push(runes);
+    const runeField = addTerrainMesh(
+      this.createTerrainRing(state.x, state.z, radius * 0.82, radius * 0.97),
+      'paladin-consecration-sun-rune-field',
+      runes,
+      8,
+    );
+    runeField.userData.runeSegmentCount = 0;
+
+    const pulseGeometry = new THREE.RingGeometry(0.95, 1, 64);
+    const pulseMaterial = this.material(0xffc070, 0.35);
     const pulseRing = new THREE.Mesh(pulseGeometry, pulseMaterial);
     pulseRing.name = 'paladin-consecration-pulse-ring';
     pulseRing.rotation.x = -Math.PI / 2;
@@ -198,30 +379,111 @@ export class PaladinConsecrationVisuals {
     pulseRing.renderOrder = floorVfxRenderOrder('player', 5);
     root.add(pulseRing);
     geometries.push(pulseGeometry);
-    materials.push(pulseMaterial);
-    baseOpacities.push(0.42);
 
     const shimmerGeometry = new THREE.CylinderGeometry(
-      radius * 0.97,
-      radius * 0.91,
-      0.42,
-      32,
+      radius * 0.99,
+      radius * 0.95,
+      0.5,
+      48,
       1,
       true,
     );
-    const shimmerMaterial = this.material(0xffefae, 0.045);
-    const shimmer = new THREE.Mesh(shimmerGeometry, shimmerMaterial);
+    const shimmer = new THREE.Mesh(shimmerGeometry, basic(0xffefae, 0.035));
     shimmer.name = 'paladin-consecration-shimmer';
-    shimmer.position.set(state.x, centerY + 0.23, state.z);
+    shimmer.position.set(state.x, centerY + 0.25, state.z);
     shimmer.renderOrder = floorVfxRenderOrder('player', 2);
     root.add(shimmer);
     qualityObjects.push({ object: shimmer, minQuality: 0.7 });
     geometries.push(shimmerGeometry);
-    materials.push(shimmerMaterial);
-    baseOpacities.push(0.045);
 
-    const moteGeometry = new THREE.SphereGeometry(0.055, 5, 4);
-    const moteMaterial = this.material(0xffffd7, 0.72);
+    // A column of light where the Paladin consecrates the ground.
+    const openingGeometry = new THREE.CylinderGeometry(0.45, 1.1, 10, 32, 1, true);
+    // Soft light, not a solid pipe: fading upward and toward its silhouette edges.
+    const openingMaterial = new THREE.ShaderMaterial({
+      uniforms: { uAlpha: { value: 0 } },
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+      vertexShader: `
+        varying float vUp; varying float vFacing;
+        void main(){
+          vUp=uv.y;
+          vec4 view=modelViewMatrix*vec4(position,1.0);
+          vec3 n=normalize(normalMatrix*normal);
+          vFacing=abs(dot(n,normalize(-view.xyz)));
+          gl_Position=projectionMatrix*view;
+        }`,
+      fragmentShader: `
+        uniform float uAlpha; varying float vUp; varying float vFacing;
+        void main(){
+          float mask=pow(max(1.0-vUp,0.0),1.6)*vFacing*vFacing;
+          float opacity=uAlpha*mask;
+          if(!(opacity>=0.003)) discard;
+          gl_FragColor=vec4(vec3(1.0,0.93,0.72)*1.4,opacity);
+          #include <colorspace_fragment>
+        }`,
+    });
+    const opening = new THREE.Mesh(openingGeometry, openingMaterial);
+    opening.name = 'paladin-consecration-opening';
+    opening.position.set(state.x, centerY + 5, state.z);
+    opening.renderOrder = floorVfxRenderOrder('player', 6);
+    root.add(opening);
+
+    // Each tick's wall of holy fire: flame tongues rising from the wave front,
+    // white-hot at the root, gold in the body, licking orange at the tips.
+    const fireGeometry = new THREE.CylinderGeometry(1, 1, 1, 72, 1, true);
+    const fireMaterial = new THREE.ShaderMaterial({
+      uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 } },
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+      fragmentShader: `
+        uniform float uTime, uAlpha; varying vec2 vUv;
+        float fireHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+        float fireNoise(vec2 p){
+          vec2 i=floor(p),f=fract(p);
+          f=f*f*(3.0-2.0*f);
+          return mix(mix(fireHash(i),fireHash(i+vec2(1.0,0.0)),f.x),
+                     mix(fireHash(i+vec2(0.0,1.0)),fireHash(i+vec2(1.0,1.0)),f.x),f.y);
+        }
+        void main(){
+          float h=vUv.y;
+          // Tongues: noise scrolling upward sets each flame's height around the ring.
+          float n=fireNoise(vec2(vUv.x*26.0,h*2.0-uTime*4.5))*0.55
+            +fireNoise(vec2(vUv.x*71.0,h*3.5-uTime*7.5))*0.45;
+          float top=0.25+n*0.85;
+          float tongue=1.0-smoothstep(top-0.14,top,h);
+          // A hotter core runs up the middle of each tongue.
+          float core=(1.0-smoothstep(top*0.55-0.1,top*0.55,h))*smoothstep(0.35,0.75,n);
+          float root=exp(-h*7.0);
+          float mask=tongue*(0.6+0.5*n)+core*0.5+root*0.7;
+          vec3 color=mix(vec3(1.0,0.96,0.82),vec3(1.0,0.66,0.2),smoothstep(0.0,0.3,h));
+          color=mix(color,vec3(1.0,0.34,0.08),smoothstep(0.3,0.8,h/max(top,0.01)));
+          color=mix(color,vec3(1.0,0.93,0.75),core*0.6);
+          float opacity=uAlpha*mask;
+          if(!(opacity>=0.003)) discard;
+          gl_FragColor=vec4(color*1.7,opacity);
+          #include <colorspace_fragment>
+        }`,
+    });
+    const fireWall = new THREE.Mesh(fireGeometry, fireMaterial);
+    fireWall.name = 'paladin-consecration-fire-wall';
+    fireWall.position.set(state.x, centerY, state.z);
+    fireWall.renderOrder = floorVfxRenderOrder('player', 5);
+    fireWall.visible = false;
+    root.add(fireWall);
+    geometries.push(fireGeometry);
+    geometries.push(openingGeometry);
+
+    const moteGeometry = new THREE.SphereGeometry(0.06, 6, 4);
+    const moteMaterial = basic(0xffffd7, 0.8);
     const motes = new THREE.InstancedMesh(moteGeometry, moteMaterial, MOTE_COUNT);
     motes.name = 'paladin-consecration-motes';
     motes.position.set(state.x, centerY, state.z);
@@ -229,20 +491,6 @@ export class PaladinConsecrationVisuals {
     root.add(motes);
     qualityObjects.push({ object: motes, minQuality: 0.25 });
     geometries.push(moteGeometry);
-    materials.push(moteMaterial);
-    baseOpacities.push(0.72);
-
-    const edgeGeometry = new THREE.ConeGeometry(0.075, 0.5, 5, 1, true);
-    const edgeMaterial = this.material(0xffffbd, 0.52);
-    const edgeWisps = new THREE.InstancedMesh(edgeGeometry, edgeMaterial, EDGE_WISP_COUNT);
-    edgeWisps.name = 'paladin-consecration-edge-wisps';
-    edgeWisps.position.set(state.x, centerY, state.z);
-    edgeWisps.renderOrder = floorVfxRenderOrder('player', 6);
-    root.add(edgeWisps);
-    qualityObjects.push({ object: edgeWisps, minQuality: 0.55 });
-    geometries.push(edgeGeometry);
-    materials.push(edgeMaterial);
-    baseOpacities.push(0.52);
 
     const ambientOffset = (
       index: number,
@@ -262,27 +510,31 @@ export class PaladinConsecrationVisuals {
       };
     };
     const moteOffsets = Array.from({ length: MOTE_COUNT }, (_, index) =>
-      ambientOffset(index, MOTE_COUNT, radius * (0.25 + (index % 4) * 0.14), 0.67),
-    );
-    const edgeOffsets = Array.from({ length: EDGE_WISP_COUNT }, (_, index) =>
-      ambientOffset(index, EDGE_WISP_COUNT, radius * 0.86, 0.91),
+      ambientOffset(index, MOTE_COUNT, radius * (0.2 + (index % 5) * 0.15), 0.67),
     );
 
     const visual: ConsecrationVisual = {
       root,
       motes,
-      edgeWisps,
       pulseRing,
       pulseMaterial,
       shimmer,
+      opening,
+      openingMaterial,
+      fireWall,
+      fireMaterial,
+      fireBase: centerY,
       moteOffsets,
-      edgeOffsets,
       scratch: new THREE.Matrix4(),
       scratchPosition: new THREE.Vector3(),
       scratchScale: new THREE.Vector3(),
       scratchRotation: new THREE.Quaternion(),
       materials,
       baseOpacities,
+      shaders,
+      ground,
+      specSettled: false,
+      gilded: false,
       geometries,
       qualityObjects,
       radius,
@@ -290,6 +542,8 @@ export class PaladinConsecrationVisuals {
       elapsed: Math.max(0, state.duration - state.remaining),
       lastRemaining: state.remaining,
     };
+    materials.push(pulseMaterial);
+    baseOpacities.push(0.3);
     this.applyQuality(visual);
     this.placeAmbient(visual, true);
     this.animate(visual, 0, true);
@@ -315,58 +569,97 @@ export class PaladinConsecrationVisuals {
   }
 
   private animate(visual: ConsecrationVisual, dt: number, reducedMotion: boolean): void {
-    const fade = Math.min(1, Math.max(0, (visual.duration - visual.elapsed) / FADE_SECONDS));
-    const reveal = Math.min(1, visual.elapsed / REVEAL_SECONDS);
-    const breathe = reducedMotion ? 1 : 0.95 + Math.sin(visual.elapsed * Math.PI * 2) * 0.05;
+    const t = visual.elapsed;
+    bindPaladinSpecIcons(visual.ground);
+    if (!visual.specSettled) {
+      // The cast notes the caster's spec where they stood; the zone may open a
+      // frame before or after it.
+      const center = visual.ground.uniforms.uCenter.value as THREE.Vector2;
+      const spec = paladinConsecrationSpecAt(center.x, center.y);
+      if (spec !== null) visual.ground.uniforms.uSpec.value = spec;
+      visual.specSettled = spec !== null || t > SPEC_SEARCH_SECONDS;
+    }
+    if (!visual.gilded && t <= SPEC_SEARCH_SECONDS) {
+      const center = visual.ground.uniforms.uCenter.value as THREE.Vector2;
+      visual.gilded = paladinConsecrationAscendedAt(center.x, center.y);
+    }
+    visual.ground.uniforms.uGild.value = visual.gilded ? 1 : 0;
+    const gild = visual.gilded ? 1.3 : 1;
+    const fade = Math.min(1, Math.max(0, (visual.duration - t) / FADE_SECONDS));
+    const reveal = Math.min(1, t / REVEAL_SECONDS);
+    const breathe = reducedMotion ? 1 : 0.95 + Math.sin(t * Math.PI * 2) * 0.05;
     visual.materials.forEach((material, index) => {
       material.opacity = visual.baseOpacities[index] * fade * reveal * breathe;
     });
+    for (const shader of visual.shaders) {
+      shader.uniforms.uTime.value = reducedMotion ? REVEAL_SECONDS + 0.58 : t;
+      shader.uniforms.uAlpha.value = fade;
+      shader.uniforms.uReveal.value = reveal;
+    }
 
+    // Each tick sends a ring out from the heart; the opening sends the first.
     const phase =
-      visual.elapsed < REVEAL_SECONDS
-        ? visual.elapsed / REVEAL_SECONDS
+      t < REVEAL_SECONDS
+        ? t / REVEAL_SECONDS
         : reducedMotion
           ? 0.58
-          : (visual.elapsed % PULSE_SECONDS) / PULSE_SECONDS;
-    const pulseScale = visual.radius * (0.2 + phase * 0.8);
-    visual.pulseRing.scale.setScalar(pulseScale);
-    visual.pulseMaterial.opacity = 0.42 * fade * reveal * (1 - phase) ** 1.6;
+          : (t % TICK_SECONDS) / TICK_SECONDS;
+    visual.pulseRing.scale.setScalar(visual.radius * (0.15 + phase * 0.95));
+    visual.pulseMaterial.opacity = 0.35 * gild * fade * reveal * (1 - phase) ** 1.6;
+
+    // The wall of holy fire rides the wave out to the rim and burns down.
+    const front = Math.min(1, phase * 1.15);
+    const burning = reducedMotion
+      ? 0
+      : (1 - phase) ** 1.2 * (1 - Math.max(0, phase * 1.15 - 1) * 4);
+    visual.fireWall.visible = burning > 0.01 && front > 0.05;
+    visual.fireWall.scale.set(
+      visual.radius * front,
+      0.9 + 1.1 * (1 - phase),
+      visual.radius * front,
+    );
+    visual.fireWall.position.y = visual.fireBase + visual.fireWall.scale.y / 2;
+    visual.fireMaterial.uniforms.uTime.value = t;
+    // The wall of fire marks each tick's sweep; kept below the full blaze so a
+    // 6 m ring of it every second does not drown the fight inside.
+    visual.fireMaterial.uniforms.uAlpha.value = Math.max(0, burning) * fade * reveal * 0.75 * gild;
+
+    // The column of light at the opening.
+    const open = reducedMotion ? 0 : Math.max(0, 1 - t / OPENING_SECONDS);
+    visual.openingMaterial.uniforms.uAlpha.value = 0.7 * open * open;
+    visual.opening.scale.set(0.6 + 0.4 * open, 1, 0.6 + 0.4 * open);
+
     if (reducedMotion) return;
     if (visual.motes.visible) visual.motes.rotation.y += dt * 0.11;
-    if (visual.edgeWisps.visible) visual.edgeWisps.rotation.y -= dt * 0.045;
     if (visual.shimmer.visible) visual.shimmer.rotation.y += dt * 0.08;
     this.placeAmbient(visual, false);
   }
 
   private placeAmbient(visual: ConsecrationVisual, staticPose: boolean): void {
-    const place = (
-      mesh: THREE.InstancedMesh,
-      offsets: readonly AmbientOffset[],
-      edge: boolean,
-    ): void => {
-      if (!mesh.visible) return;
-      for (let index = 0; index < offsets.length; index++) {
-        const offset = offsets[index];
-        const wave = staticPose ? 0 : Math.sin(visual.elapsed * (edge ? 1.45 : 2.1) + offset.phase);
-        const lift = edge ? 0.2 + wave * 0.07 : 0.32 + wave * 0.18;
-        const scale = offset.scale * (edge ? 0.9 + wave * 0.08 : 0.85 + wave * 0.12);
-        visual.scratchPosition.set(offset.x, offset.y + lift, offset.z);
+    const t = visual.elapsed;
+    if (visual.motes.visible) {
+      // Motes rise through the light and fade as they climb, looping.
+      for (let index = 0; index < visual.moteOffsets.length; index++) {
+        const offset = visual.moteOffsets[index];
+        const climb = staticPose ? 0.4 : (t * 0.45 + offset.phase / 6.28) % 1;
+        const scale = offset.scale * Math.sin(climb * Math.PI);
+        visual.scratchPosition.set(offset.x, offset.y + 0.15 + climb * 2.2, offset.z);
         visual.scratchScale.set(scale, scale, scale);
         visual.scratch.compose(visual.scratchPosition, visual.scratchRotation, visual.scratchScale);
-        mesh.setMatrixAt(index, visual.scratch);
+        visual.motes.setMatrixAt(index, visual.scratch);
       }
-      mesh.instanceMatrix.needsUpdate = true;
-    };
-    place(visual.motes, visual.moteOffsets, false);
-    place(visual.edgeWisps, visual.edgeOffsets, true);
+      visual.motes.instanceMatrix.needsUpdate = true;
+    }
   }
 
   private disposeVisual(visual: ConsecrationVisual): void {
     this.scene.remove(visual.root);
     for (const material of visual.materials) material.dispose();
+    for (const shader of visual.shaders) shader.dispose();
+    visual.openingMaterial.dispose();
+    visual.fireMaterial.dispose();
     for (const geometry of visual.geometries) geometry.dispose();
     visual.motes.dispose();
-    visual.edgeWisps.dispose();
   }
 
   private createTerrainRing(
@@ -388,62 +681,6 @@ export class PaladinConsecrationVisuals {
         const inner = segment * 2;
         indices.push(inner, inner + 1, inner + 2, inner + 1, inner + 3, inner + 2);
       }
-    }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    geometry.setIndex(indices);
-    return geometry;
-  }
-
-  private createTerrainRuneField(x: number, z: number, radius: number): THREE.BufferGeometry {
-    const vertices: number[] = [];
-    const indices: number[] = [];
-    const addRibbon = (
-      startX: number,
-      startZ: number,
-      endX: number,
-      endZ: number,
-      width: number,
-    ): void => {
-      const dx = endX - startX;
-      const dz = endZ - startZ;
-      const length = Math.max(0.001, Math.hypot(dx, dz));
-      const sideX = (-dz / length) * width;
-      const sideZ = (dx / length) * width;
-      const base = vertices.length / 3;
-      for (const [sampleX, sampleZ] of [
-        [startX + sideX, startZ + sideZ],
-        [startX - sideX, startZ - sideZ],
-        [endX + sideX, endZ + sideZ],
-        [endX - sideX, endZ - sideZ],
-      ]) {
-        vertices.push(sampleX, this.groundY(sampleX, sampleZ) + GROUND_LIFT * 1.45, sampleZ);
-      }
-      indices.push(base, base + 1, base + 2, base + 1, base + 3, base + 2);
-    };
-
-    for (let index = 0; index < 12; index++) {
-      const angle = (index / 12) * Math.PI * 2;
-      const alongX = Math.cos(angle);
-      const alongZ = Math.sin(angle);
-      const sideX = -alongZ;
-      const sideZ = alongX;
-      addRibbon(
-        x + alongX * radius * 0.22,
-        z + alongZ * radius * 0.22,
-        x + alongX * radius * 0.9,
-        z + alongZ * radius * 0.9,
-        radius * 0.009,
-      );
-      const crossCenterX = x + alongX * radius * 0.72;
-      const crossCenterZ = z + alongZ * radius * 0.72;
-      addRibbon(
-        crossCenterX - sideX * radius * 0.075,
-        crossCenterZ - sideZ * radius * 0.075,
-        crossCenterX + sideX * radius * 0.075,
-        crossCenterZ + sideZ * radius * 0.075,
-        radius * 0.008,
-      );
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));

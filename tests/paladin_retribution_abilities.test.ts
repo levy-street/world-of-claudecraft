@@ -62,6 +62,34 @@ function advance(sim: Sim, seconds: number): void {
 }
 
 describe('Paladin Retribution abilities', () => {
+  it("brackets Final Edict's Ascension explosion with its real radius and its hits", () => {
+    const sim = makeRet();
+    const target = targetAt(sim, 2);
+    const near = targetAt(sim, 4);
+    sim.targetEntity(target.id);
+    grantDevotion(sim.player, MAX_DEVOTION);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+    sim.drainEvents();
+
+    runEffects(sim, target, 'final_edict');
+
+    const events = sim.drainEvents();
+    const nova = events.findIndex(
+      (ev) => ev.type === 'spellfx' && ev.fx === 'nova' && ev.ability === 'final_edict',
+    );
+    const impact = events.findIndex(
+      (ev) => ev.type === 'spellfx' && ev.fx === 'paladinAscensionImpact',
+    );
+    expect(events[nova]).toMatchObject({ sourceId: sim.playerId, range: 6 });
+    expect(impact).toBeGreaterThan(nova);
+    // Every enemy the explosion strikes is a tagged hit inside the bracket.
+    const struck = events
+      .slice(nova, impact)
+      .filter((ev) => ev.type === 'damage' && ev.abilityId === 'final_edict')
+      .map((ev) => (ev.type === 'damage' ? ev.targetId : -1));
+    expect(struck).toEqual(expect.arrayContaining([target.id, near.id]));
+  });
+
   it('emits Dawnfall windup and per-target impact visuals at its real radius', () => {
     const sim = makeRet();
     const target = targetAt(sim, 2);
