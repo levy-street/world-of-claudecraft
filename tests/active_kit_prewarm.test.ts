@@ -848,7 +848,7 @@ function paladinFixture(localClass: string) {
   const geometryCalls: string[] = [];
   const unit = (id: string): PrewarmResumeUnit => ({ id, run: () => void ran.push(id) });
   const queue = {
-    run: vi.fn(async (work: PrewarmResumeUnit['run']) => {
+    run: vi.fn(async (work: PrewarmResumeUnit['run'], _priority?: number, _id?: string) => {
       await work();
     }),
   };
@@ -973,6 +973,93 @@ it('a context restore prepares every requested kit again, and unbinds the atlas 
     expect(f.entry.progress().planned).toBe(before.planned);
   } finally {
     f.close();
+  }
+});
+
+// Reuben's review of #4796: one class's pending retry must never swallow the
+// other class's first sighting (the painter asks once per class per renderer).
+function failFirst(f: ReturnType<typeof paladinFixture>, prefix: string): void {
+  let failures = 1;
+  f.queue.run.mockImplementation(
+    async (work: PrewarmResumeUnit['run'], _priority?: number, id?: string) => {
+      if (String(id).startsWith(prefix) && failures-- > 0) throw new Error('driver link failed');
+      await work();
+    },
+  );
+}
+
+it.each([
+  ['warrior', 'paladin', 'warrior-crest:a', 'paladin-pool:a'],
+  ['paladin', 'warrior', 'paladin-pool:a', 'warrior-crest:a'],
+] as const)(
+  'a %s kit in backoff never swallows the first %s sighting, and both kits end prepared',
+  async (failing, sighted, failingUnit, sightedUnit) => {
+    vi.useFakeTimers();
+    // A Mage's renderer: both kits arrive only as remote sightings.
+    const f = paladinFixture('mage');
+    try {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      failFirst(f, failingUnit.split(':')[0]);
+      resumeActiveAbilityKit(f.scene, undefined, failing);
+      await settle();
+      expect(f.ran).not.toContain(failingUnit);
+      expect(vi.getTimerCount()).toBe(1);
+      // The other class's first sighting lands inside the five-second backoff.
+      resumeActiveAbilityKit(f.scene, undefined, sighted);
+      await settle();
+      expect(f.ran).toContain(sightedUnit);
+      if (sighted === 'paladin') expect(f.uploads).toContain(f.atlas);
+      // The failed kit's own retry still runs once its backoff ends.
+      await vi.advanceTimersByTimeAsync(ACTIVE_KIT_RETRY_DELAYS_MS[0]);
+      await settle();
+      expect(f.ran).toContain(failingUnit);
+      expect(f.uploads).toContain(f.atlas);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      f.close();
+      vi.useRealTimers();
+    }
+  },
+);
+
+it('keeps each kit on its own backoff: one kit failing does not spend the other kit retries', async () => {
+  vi.useFakeTimers();
+  const f = paladinFixture('mage');
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // The Warrior kit fails every attempt until it gives up.
+    f.queue.run.mockImplementation(
+      async (work: PrewarmResumeUnit['run'], _priority?: number, id?: string) => {
+        if (String(id).startsWith('warrior')) throw new Error('driver link failed');
+        await work();
+      },
+    );
+    resumeActiveAbilityKit(f.scene, undefined, 'warrior');
+    await settle();
+    for (const delay of ACTIVE_KIT_RETRY_DELAYS_MS) {
+      await vi.advanceTimersByTimeAsync(delay);
+      await settle();
+    }
+    expect(vi.getTimerCount()).toBe(0);
+    // A Paladin failing once afterwards still gets its first retry.
+    let paladinFailures = 1;
+    f.queue.run.mockImplementation(
+      async (work: PrewarmResumeUnit['run'], _priority?: number, id?: string) => {
+        if (String(id).startsWith('paladin') && paladinFailures-- > 0)
+          throw new Error('driver link failed');
+        await work();
+      },
+    );
+    resumeActiveAbilityKit(f.scene, undefined, 'paladin');
+    await settle();
+    expect(vi.getTimerCount()).toBe(1);
+    await vi.advanceTimersByTimeAsync(ACTIVE_KIT_RETRY_DELAYS_MS[0]);
+    await settle();
+    expect(f.ran).toEqual(expect.arrayContaining(['paladin-pool:a', 'paladin-pool:b']));
+    expect(f.uploads).toContain(f.atlas);
+  } finally {
+    f.close();
+    vi.useRealTimers();
   }
 });
 

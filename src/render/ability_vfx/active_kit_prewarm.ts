@@ -84,13 +84,18 @@ interface Preparation {
    *  recipe (and its closures); refreshed when a run builds the recipe. */
   planned: Map<string, readonly string[]>;
   task: Promise<void> | null;
+  /** The kit the running task prepares. */
+  taskKit: string | null;
   done: Set<string>;
   cancelled: boolean;
   /** Bumped by a context restore: a unit that finished for an older context
    *  is not recorded as done for this one. */
   context: number;
-  failures: number;
-  retry: ReturnType<typeof setTimeout> | null;
+  /** Failed attempts per kit, each spending its own bounded backoff. */
+  failures: Map<string, number>;
+  /** The pending retry per kit: a Warrior kit in backoff never swallows a
+   *  Paladin sighting (the painter asks once per class), nor the reverse. */
+  retry: Map<string, ReturnType<typeof setTimeout>>;
 }
 const preparations = new WeakMap<object, Preparation>();
 
@@ -196,11 +201,12 @@ export function activeKitPrewarmEntry(scene: object, cls: string, host: ActiveKi
     requested: new Set(),
     planned: new Map(),
     task: null,
+    taskKit: null,
     done: new Set(),
     cancelled: false,
     context: 0,
-    failures: 0,
-    retry: null,
+    failures: new Map(),
+    retry: new Map(),
   };
   preparations.set(scene, state);
   registerContextRestoreReset('active-kit', state, invalidatePreparation);
@@ -230,7 +236,14 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
   state.requested.add(selected);
   // A request for the other kit while one runs waits for it, then prepares
   // its own units (the recipe skips every unit already done).
-  if (state.task) return state.task.then(() => ensureActiveAbilityKit(scene, selected));
+  // A request for the kit already running joins that run (and its outcome).
+  // A request for the other kit waits for it and then runs whichever way it
+  // ended: the other kit's failure is its own, retried on its own backoff.
+  if (state.task) {
+    if (state.taskKit === selected) return state.task;
+    const again = () => ensureActiveAbilityKit(scene, selected);
+    return state.task.then(again, again);
+  }
   const task = (async () => {
     // The recipe enumerates units that need the kit's sheets resident, so it
     // is built only once the demand load has landed. The Warrior's declined
@@ -260,8 +273,11 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
     }
   })();
   state.task = task;
+  state.taskKit = selected;
   const release = () => {
+    if (state.task !== task) return;
     state.task = null;
+    state.taskKit = null;
   };
   void task.then(release, release);
   return task;
@@ -270,31 +286,44 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
 /** Start after the manifest, independently of unrelated retained world work.
  * Errors stay observable by Studio; ordinary gameplay keeps its primary
  * fallback, and a failed preparation asks again on ACTIVE_KIT_RETRY_DELAYS_MS.
- * A request while a retry is pending joins that retry. */
+ * Each kit keeps its own backoff: a request while THAT kit's retry is pending
+ * joins the retry, while a request for the other kit runs at once. */
 export function resumeActiveAbilityKit(
   scene: object,
   afterFirstPaint?: Promise<unknown>,
   cls?: string,
 ): void {
   const state = preparations.get(scene);
-  if (state?.retry) return;
+  const kit = cls ?? state?.localClass;
+  if (state && kit !== undefined && state.retry.has(kit)) return;
   void Promise.resolve(afterFirstPaint)
     .then(() => ensureActiveAbilityKit(scene, cls))
     .catch((error) => {
-      if (!state || state.cancelled || preparations.get(scene) !== state || state.retry) {
+      if (
+        !state ||
+        kit === undefined ||
+        state.cancelled ||
+        preparations.get(scene) !== state ||
+        state.retry.has(kit)
+      ) {
         console.warn('Active ability preparation failed', error);
         return;
       }
-      const delay = ACTIVE_KIT_RETRY_DELAYS_MS[state.failures++];
+      const failures = state.failures.get(kit) ?? 0;
+      state.failures.set(kit, failures + 1);
+      const delay = ACTIVE_KIT_RETRY_DELAYS_MS[failures];
       if (delay === undefined) {
         console.warn('Active ability preparation failed and gave up', error);
         return;
       }
       console.warn(`Active ability preparation failed, retrying in ${delay} ms`, error);
-      state.retry = setTimeout(() => {
-        state.retry = null;
-        resumeActiveAbilityKit(scene, undefined, cls);
-      }, delay);
+      state.retry.set(
+        kit,
+        setTimeout(() => {
+          state.retry.delete(kit);
+          resumeActiveAbilityKit(scene, undefined, cls);
+        }, delay),
+      );
     });
 }
 
@@ -308,9 +337,9 @@ function invalidatePreparation(state: Preparation): void {
   state.context++;
   state.done.clear();
   markPaladinSpecIconsCold();
-  if (state.retry) clearTimeout(state.retry);
-  state.retry = null;
-  state.failures = 0;
+  for (const timer of state.retry.values()) clearTimeout(timer);
+  state.retry.clear();
+  state.failures.clear();
   const rerun = async (): Promise<void> => {
     if (state.cancelled || state.task) return;
     const kits = new Set([state.localClass, ...state.requested]);
@@ -327,8 +356,8 @@ export function cancelActiveAbilityKit(scene: object): void {
   const state = preparations.get(scene);
   if (state) {
     state.cancelled = true;
-    if (state.retry) clearTimeout(state.retry);
-    state.retry = null;
+    for (const timer of state.retry.values()) clearTimeout(timer);
+    state.retry.clear();
   }
   preparations.delete(scene);
 }
