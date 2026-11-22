@@ -54,6 +54,7 @@ export class DynamicHazardPools {
   private readonly slots: Slot[] = [];
   private readonly phase: HazardPoolPhase = { film: 0, body: 0, arming: 0, fade: 0 };
   private readonly placeholder: THREE.BufferGeometry;
+  private disposed = false;
 
   constructor(
     scene: THREE.Object3D,
@@ -72,11 +73,14 @@ export class DynamicHazardPools {
       this.slots.push({ id: null, mesh, mat, ageSec: 0, armSec: 0, goneSec: null, seen: false });
     }
     // Hidden slots still link: the compile walks the whole subtree.
-    void attachSceneGroupGated(scene, this.root, compileGate);
+    void attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed).catch(() => {
+      // Retired before its gate settled: the teardown owns the release.
+    });
   }
 
   /** Reconcile with this frame's rows and advance every live slot. */
   update(pools: readonly HazardPoolView[], dt: number, reducedMotion: boolean): void {
+    if (this.disposed) return;
     if (!reducedMotion) this.time.value += dt;
     for (const slot of this.slots) slot.seen = false;
     for (const pool of pools) {
@@ -148,7 +152,10 @@ export class DynamicHazardPools {
     return n;
   }
 
+  /** Terminal and idempotent: a late update() after this draws nothing. */
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.root.removeFromParent();
     for (const slot of this.slots) {
       if (slot.mesh.geometry !== this.placeholder) slot.mesh.geometry.dispose();

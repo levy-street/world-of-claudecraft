@@ -134,6 +134,14 @@ describe('boss pool wire rows and the online mirror', () => {
     expect(rows).toEqual([{ id: 120, x: 3, z: 4, r: BLACKWATER_MARK_RADIUS }]);
   });
 
+  it('never lets two unstamped marks share an id', () => {
+    const rows = blackwaterMarkPoolInfos([
+      { x: 1, z: 1, remaining: 5, tickTimer: 0.5 },
+      { x: 2, z: 2, remaining: 3, tickTimer: 0.5 },
+    ]);
+    expect(new Set(rows.map((r) => r.id)).size).toBe(2);
+  });
+
   it('ages a pool from first sight, keeps it while listed and forgets it when dropped', () => {
     const mirror = new HazardPoolMirror();
     const row = { id: 77, x: 1, z: 2, r: 4 };

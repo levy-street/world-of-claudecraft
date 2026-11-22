@@ -16,6 +16,7 @@ import {
   placeHazardPools,
 } from '../src/render/hazard_pool';
 import { hazardPoolDiscExtent } from '../src/render/hazard_pool/hazard_pool_core';
+import { materialProgramSignature } from '../src/render/prewarm_policy';
 import { litanyModuleGeometry } from '../src/sim/delve_litany_layout';
 import type { HazardPoolView } from '../src/world_api/dungeons';
 
@@ -181,6 +182,60 @@ describe('dynamic hazard pools', () => {
     expect(u.uBody.value).toBe(1);
     pools.update([pool('a', 2.5)], 0.5, false);
     expect(u.uTime.value).toBe(0.5);
+  });
+});
+
+describe('hazard pool program and lifecycle contracts', () => {
+  it('draws boss pools with the very program the static rooms link (one program to warm)', () => {
+    const group = new THREE.Group();
+    const [staticMesh] = placeHazardPools(group, [{ x: 0, z: 0, r: 4, style: 'marsh' }]);
+    const pools = new DynamicHazardPools(new THREE.Scene(), undefined, () => 0);
+    const slot = pools.root.children[0] as THREE.Mesh;
+    expect(materialProgramSignature(slot.material as THREE.ShaderMaterial)).toBe(
+      materialProgramSignature(staticMesh.material as THREE.ShaderMaterial),
+    );
+    // A claim restyles through uniforms only: the program never changes.
+    const before = materialProgramSignature(slot.material as THREE.ShaderMaterial);
+    pools.update(
+      [{ id: 'a', x: 0, z: 0, r: 4, style: 'ember', ageSec: 2, armSec: 1, lifeSec: 8 }],
+      0.016,
+      false,
+    );
+    expect(materialProgramSignature(slot.material as THREE.ShaderMaterial)).toBe(before);
+  });
+
+  it('keeps its slots hidden behind the compile gate until the gate settles', async () => {
+    let settle!: () => void;
+    const gated: THREE.Object3D[] = [];
+    const gate = (root: THREE.Object3D) => {
+      gated.push(root);
+      return new Promise<void>((r) => {
+        settle = r;
+      });
+    };
+    const scene = new THREE.Scene();
+    const pools = new DynamicHazardPools(scene, gate, () => 0);
+    expect(gated).toEqual([pools.root]);
+    expect(scene.children).toContain(pools.root);
+    expect(pools.root.visible).toBe(false);
+    settle();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(pools.root.visible).toBe(true);
+  });
+
+  it('disposes terminally: idempotent, detached, and a late update draws nothing', () => {
+    const scene = new THREE.Scene();
+    const pools = new DynamicHazardPools(scene, undefined, () => 0);
+    pools.dispose();
+    pools.dispose();
+    expect(scene.children).not.toContain(pools.root);
+    pools.update(
+      [{ id: 'a', x: 0, z: 0, r: 4, style: 'violet', ageSec: 2, armSec: 1, lifeSec: 8 }],
+      0.016,
+      false,
+    );
+    expect(pools.activeCount()).toBe(0);
   });
 });
 

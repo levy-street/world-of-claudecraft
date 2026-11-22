@@ -23,8 +23,19 @@ export const NO_HAZARD_POOLS: readonly HazardPoolView[] = Object.freeze([]);
 export function blackwaterMarkPoolInfos(
   marks: readonly DrownedLitanyBlackwaterMark[],
 ): DelveBossPoolInfo[] {
-  return marks.map((m) => ({ id: m.bornTick ?? -1, x: m.x, z: m.z, r: BLACKWATER_MARK_RADIUS }));
+  if (marks.length === 0) return NO_POOL_INFOS;
+  // A mark without a stamp (none is made today) still gets an id no other
+  // live mark shares, so two pools can never fold into one drawn slot.
+  return marks.map((m, i) => ({
+    id: m.bornTick ?? -(i + 1),
+    x: m.x,
+    z: m.z,
+    r: BLACKWATER_MARK_RADIUS,
+  }));
 }
+
+/** The shared empty wire answer: the server builds the run record per tick. */
+const NO_POOL_INFOS = Object.freeze([]) as unknown as DelveBossPoolInfo[];
 
 /** One Blackwater Mark as a hazard pool row, aged by the caller's clock. */
 export function blackwaterMarkPoolView(pool: DelveBossPoolInfo, ageSec: number): HazardPoolView {

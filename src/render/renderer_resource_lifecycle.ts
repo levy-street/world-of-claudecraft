@@ -28,6 +28,9 @@ export interface RendererPrewarmAndGroundFxOwner<T extends RendererDisposable> {
   // sweep: both had a terminal owner with no production caller.
   frozenOrbFx?: RendererDisposable;
   necromancyArmyPortalFx?: RendererDisposable;
+  /** The boss-dropped tar pool host (hazard_pool/dynamic_pools.ts): its slot
+   *  materials and claimed discs. */
+  hazardPools?: RendererDisposable;
   /** The battleground copies this renderer built, by slot
    *  (battleground_views.ts). Each owns a field's terrain, its paint array
    *  texture, the placement instances, the decals and its share of the
@@ -58,6 +61,7 @@ export function disposeRendererPrewarmAndGroundFx(
   bestEffort(() => resources.farmPatchVisuals?.dispose());
   bestEffort(() => resources.frozenOrbFx?.dispose());
   bestEffort(() => resources.necromancyArmyPortalFx?.dispose());
+  bestEffort(() => resources.hazardPools?.dispose());
   // The live copies release themselves as the session resolves each offer;
   // this is the terminal drain for whatever the teardown catches standing.
   for (const view of resources.bgViews?.values() ?? []) bestEffort(() => view.dispose());

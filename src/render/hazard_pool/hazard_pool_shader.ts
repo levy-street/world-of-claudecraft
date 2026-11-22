@@ -95,8 +95,12 @@ void main() {
   // Yards in from the edge: thin tar near it, dense tar inside.
   float inYd = (edgeR - d) * r;
   float thin = 1.0 - smoothstep(0.0, 1.1, inYd);
-  float edgeVar = smoothstep(0.38, 0.78, hpFbm(vLocal * 0.33 + seed * 1.7));
-  vec2 flow = vec2(uTime * 0.035, -uTime * 0.025);
+  // Cosmetic terms use single-octave noise (the footprint above keeps its fbm).
+  float edgeN = 0.65 * hpNoise(vLocal * 0.33 + seed * 1.7) + 0.35 * hpNoise(vLocal * 0.71 - seed);
+  float edgeVar = smoothstep(0.38, 0.78, edgeN);
+  // Wrapped so a long session never feeds the hash huge arguments.
+  float tw = mod(uTime, 600.0);
+  vec2 flow = vec2(tw * 0.035, -tw * 0.025);
   float n1 = hpFbm(vLocal * 0.45 + seed + flow);
 
   vec3 col = uBase * (0.75 + 0.5 * n1);
@@ -113,7 +117,7 @@ void main() {
   float rip = hpFbm(vLocal * 1.25 + seed + flow * 1.4);
   float sheen = smoothstep(0.40, 0.80, rip);
   col += uSheen * (0.25 + 0.9 * graze) * (0.35 + 0.9 * sheen) * (0.8 + 0.4 * uThick);
-  float streak = hpFbm(vec2(vLocal.x * 0.6, vLocal.y * 2.6) + seed + flow * 2.0);
+  float streak = hpNoise(vec2(vLocal.x * 1.2, vLocal.y * 5.2) + seed + flow * 2.0);
   float glint = smoothstep(0.70, 0.73, streak) * (1.0 - smoothstep(0.73, 0.79, streak));
   glint *= smoothstep(0.55, 0.72, rip);
   col += vec3(0.85, 0.83, 0.90) * glint * (0.35 + 0.25 * uThick);
