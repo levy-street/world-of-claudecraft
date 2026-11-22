@@ -228,6 +228,10 @@ function findAfter(source: string, anchor: string, from: number, label: string):
 export function patchCelDirectionalLightChunk(
   source: string,
   settings: CelShadingSettings,
+  /** Optional per-zone softness: blends the hard band toward a wide smooth
+   *  falloff by this uniform (cel_ramp_soft_zone_core.ts). Absent, the patch is
+   *  the hard ramp byte for byte. */
+  soft?: { uniform: string; expression: (x: string, lit: string) => string },
 ): string {
   if (source.includes(CEL_SHADING_PATCH_MARKER)) return source;
   const section = source.indexOf(DIR_SECTION_ANCHOR);
@@ -242,7 +246,11 @@ export function patchCelDirectionalLightChunk(
   // Declarations sit above `#pragma unroll_loop_start`: three unrolls the loop
   // body without braces, so a declaration inside it would repeat per light.
   const header = `${DIR_DECL_ANCHOR}\t// ${CEL_SHADING_PATCH_MARKER}
-\t#define WOC_CEL_BAND( x ) ${celBandExpression(settings)}
+\t#define WOC_CEL_BAND( x ) ${
+    soft
+      ? `mix( ${celBandExpression(settings)}, ${soft.expression('x', glslFloat(settings.lit))}, ${soft.uniform} )`
+      : celBandExpression(settings)
+  }
 \tfloat wocCelShadow;
 \tfloat wocCelNL;
 `;

@@ -40,6 +40,24 @@ import {
 } from './blade_grass_dense_core';
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
+import {
+  BLADE_BASE_GLSL,
+  BLADE_BASE_UNIFORM,
+  BLADE_COMB_GLSL,
+  BLADE_COMB_UNIFORM,
+  BLADE_EXTRA_GLSL,
+  BLADE_EXTRA_UNIFORM,
+  BLADE_FAR_BLEND_GLSL,
+  BLADE_LIGHT_GLSL,
+  BLADE_PAINT_UNIFORM,
+  BLADE_RAMP_HI_UNIFORM,
+  BLADE_RAMP_LO_UNIFORM,
+  BLADE_ROUND_FRAGMENT_GLSL,
+  BLADE_ROUND_VERTEX_GLSL,
+  BLADE_SIZE_UNIFORM,
+  BLADE_WIDTH_GLSL,
+  BLADE_WIDTH_UNIFORM,
+} from './blade_width_zone_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import {
   eastbrookGrassExclusions,
@@ -79,6 +97,7 @@ import {
   meadowClusterScale,
   meadowCoverage,
 } from './meadow_tuning';
+import { zoneMeadowCoverage } from './meadow_zone_density_core';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 
@@ -128,7 +147,7 @@ export function buildBladeGrassBand(
   const POOL = GRID_W * GRID_W;
 
   const rng = mulberry32(seed ^ 0x6b1a);
-  const geo = clusterGeometry(rng, 2);
+  const geo = clusterGeometry(rng, 2, true);
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 0.92,
@@ -161,6 +180,14 @@ export function buildBladeGrassBand(
     sh.uniforms.uBandFar = uBandFar;
     sh.uniforms.uBaseSink = uBaseSink;
     attachGrassInteractionUniforms(sh.uniforms);
+    sh.uniforms.uBladeWidth = BLADE_WIDTH_UNIFORM;
+    sh.uniforms.uBladeBase = BLADE_BASE_UNIFORM;
+    sh.uniforms.uBladeComb = BLADE_COMB_UNIFORM;
+    sh.uniforms.uBladePaint = BLADE_PAINT_UNIFORM;
+    sh.uniforms.uBladeSize = BLADE_SIZE_UNIFORM;
+    sh.uniforms.uBladeExtra = BLADE_EXTRA_UNIFORM;
+    sh.uniforms.uBladeRampLo = BLADE_RAMP_LO_UNIFORM;
+    sh.uniforms.uBladeRampHi = BLADE_RAMP_HI_UNIFORM;
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -170,7 +197,19 @@ export function buildBladeGrassBand(
         uniform vec4 uGrassMove;
         uniform vec4 uGrassWake;
         uniform float uBandFar;
-        uniform vec3 uBaseSink;`,
+        uniform vec3 uBaseSink;
+        attribute vec3 aBladeSide;
+        uniform float uBladeWidth;
+        uniform float uBladeBase;
+        uniform vec4 uBladeComb;
+        uniform vec4 uBladePaint;
+        uniform vec4 uBladeSize;
+        uniform vec4 uBladeExtra;
+        uniform vec4 uBladeRampLo;
+        uniform vec4 uBladeRampHi;
+        attribute float aBladeKind;
+        attribute float aBladeAcross;
+        varying float vBladeAcross;`,
       )
       .replace(
         '#include <color_vertex>',
@@ -183,18 +222,25 @@ export function buildBladeGrassBand(
           vec3 bandGroundCol = mix(vColor.rgb, instanceColor.rgb * uBaseSink,
             ${MEADOW_BAND_BASE_SINK.toFixed(3)});
           vColor.rgb = mix(bandGroundCol, vColor.rgb, bandBaseT);
-        #endif`,
+        #endif
+        ${BLADE_BASE_GLSL}`,
       )
       .replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>
+        ${BLADE_WIDTH_GLSL}
+        ${BLADE_COMB_GLSL}
+        ${BLADE_LIGHT_GLSL}
+        ${BLADE_FAR_BLEND_GLSL}
+        ${BLADE_ROUND_VERTEX_GLSL}
         #ifdef USE_INSTANCING
           vec3 bgOrigin = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
           // outer fade by scale collapse over the outer band fraction, and
           // the same collapse against the residency-clamped horizon: alpha
           // would need transparency and a sort; shrinking toward the root
           // is invisible in motion
-          float bgFade = 1.0 - smoothstep(uBandFar * ${MEADOW_BAND_FADE_START.toFixed(2)},
+          // a zone look may hold the band at full size further out (uBladeExtra.w)
+          float bgFade = 1.0 - smoothstep(uBandFar * (uBladeExtra.w > 0.0 ? uBladeExtra.w : ${MEADOW_BAND_FADE_START.toFixed(2)}),
             uBandFar, distance(bgOrigin.xz, uPlayerPos));
           transformed *= bgFade;
           // camera-near collapse: blades within a few yards of the eye shrink
@@ -206,16 +252,23 @@ export function buildBladeGrassBand(
           // once the fade has collapsed the blade
           ${bladeSwayGlsl(classicSway)}
           ${grassBladeInteractionGlsl()}
+          ${BLADE_EXTRA_GLSL}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
-    sh.fragmentShader = sh.fragmentShader.replace(
-      '#include <normal_fragment_begin>',
-      `#include <normal_fragment_begin>
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform vec4 uBladeExtra;\nvarying float vBladeAcross;',
+      )
+      .replace(
+        '#include <normal_fragment_begin>',
+        `${BLADE_ROUND_FRAGMENT_GLSL}
+      #include <normal_fragment_begin>
       #ifdef DOUBLE_SIDED
         normal *= faceDirection;
       #endif`,
-    );
+      );
   };
 
   // the carpet's sector split, verbatim: one mesh per sector of the slot grid,
@@ -225,7 +278,7 @@ export function buildBladeGrassBand(
     axis: bladeSectorAxis(),
     geometry: geo,
     material: mat,
-    clusterPad: clusterPlacementPad(geo),
+    clusterPad: clusterPlacementPad(geo, RADIUS),
   });
   for (const mesh of sectorPool.meshes) group.add(mesh);
 
@@ -270,7 +323,11 @@ export function buildBladeGrassBand(
     if (ok) {
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
-      const baseCoverage = meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
+      const baseCoverage = zoneMeadowCoverage(
+        x,
+        z,
+        meadowCoverage(lush) * Math.min(biomeDensity, 1.2),
+      );
       const rd = roadDistance(x, z);
       ok = r1 < baseCoverage;
       if (ok) ok = rd > GRASS_ROAD_INNER_RADIUS;

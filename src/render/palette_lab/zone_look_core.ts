@@ -58,6 +58,11 @@ export interface LookSky {
   cloudKeep: number;
   /** Brightness trim on the solved gradient (1 = exactly the authored colours). */
   intensity: number;
+  /** 0..1: painted cumulus layer over the gradient (palette_sky.ts); 0 is off. */
+  clouds: number;
+  /** Top of the dome horizon fog band as a view elevation (sin of the angle); 0 keeps
+   *  the shipped band. Lower lets a painted sky reach down toward the hills. */
+  band: number;
 }
 
 export interface LookWater {
@@ -120,6 +125,48 @@ export interface LookRender {
   meadowWidth: number;
   /** Tree and bush canopy brightness multiplier (1 is shipped). */
   canopyLift: number;
+  /** Multiplier on the cel look's post ink (1 is shipped, 0 draws no ink). */
+  ink: number;
+  /** Meadow blade width multiplier (1 is shipped; lower is a finer carpet). */
+  bladeWidth: number;
+  /** Cel light ramp softness, 0 (the shipped hard band) to 1 (a soft falloff). */
+  rampSoft: number;
+  /** Meadow blade-root shade multiplier (1 is shipped; lower deepens the roots). */
+  bladeBase: number;
+  /** Near-field meadow shade (1 is shipped; lower darkens grass toward the camera). */
+  bladeNear: number;
+  /** Ground under the near carpet: 0 the shipped pale floor, 1 a darker meadow floor. */
+  carpetGround: number;
+  /** Windswept comb: world direction (x, z), lean strength and droop; 0 lean is upright. */
+  combX: number;
+  combZ: number;
+  combLean: number;
+  combDroop: number;
+  /** Painted field: broad light and dark patch strength, and warm-tip strength. */
+  paintPatch: number;
+  paintTip: number;
+  /** Meadow blade height and cluster spread scales (1, 1 is the shipped cluster). */
+  bladeHeight: number;
+  bladeSpread: number;
+  /** Extra finer blades on (1) or off (0), and the share of tufts showing a flower. */
+  bladeExtra: number;
+  flowerShare: number;
+  /** Clumping 0..1 (tussocks sharing lean, height, shade) and view-space widening 0..2. */
+  bladeClump: number;
+  bladeWiden: number;
+  /** One-hue ramp: shadow and light ends (sRGB hex) and strength 0..1 (0 is stock). */
+  rampShadow: number;
+  rampLight: number;
+  rampStrength: number;
+  /** Blade side-light 0..1 and drifting cloud-shadow strength 0..0.6. */
+  bladeSide: number;
+  cloudShadow: number;
+  /** Distance thickening 0..3 (far tufts spread wider; 0 is stock). */
+  bladeFar: number;
+  /** Rounded-blade lighting 0..1 (lit spine, shaded edges; 0 is stock). */
+  bladeRound: number;
+  /** Mid band fade start as a fraction of its radius (0 keeps the shipped 0.5). */
+  bandFade: number;
 }
 
 export const STOCK_RENDER: LookRender = {
@@ -133,6 +180,32 @@ export const STOCK_RENDER: LookRender = {
   meadowHeight: 1,
   meadowWidth: 1,
   canopyLift: 1,
+  ink: 1,
+  bladeWidth: 1,
+  rampSoft: 0,
+  bladeBase: 1,
+  bladeNear: 1,
+  carpetGround: 0,
+  combX: 0,
+  combZ: 0,
+  combLean: 0,
+  combDroop: 0,
+  paintPatch: 0,
+  paintTip: 0,
+  bladeHeight: 1,
+  bladeSpread: 1,
+  bladeExtra: 0,
+  flowerShare: 0,
+  bladeClump: 0,
+  bladeWiden: 0,
+  rampShadow: 0x000000,
+  rampLight: 0xffffff,
+  rampStrength: 0,
+  bladeSide: 0,
+  cloudShadow: 0,
+  bladeFar: 0,
+  bladeRound: 0,
+  bandFade: 0,
 };
 
 export interface ZoneLook {
@@ -184,6 +257,8 @@ export const STOCK_SKY: LookSky = {
   amount: 0,
   cloudKeep: 1,
   intensity: 1,
+  clouds: 0,
+  band: 0,
 };
 
 interface StockTables {
@@ -480,7 +555,7 @@ export function isNeutralGrade(g: LookGrade): boolean {
 export function skyUniformValues(
   sky: LookSky,
   model: DisplayModel,
-): { zenith: Vec4; horizon: Vec4 } {
+): { zenith: Vec4; horizon: Vec4; clouds: number; band: number } {
   // Solved so the gradient displays as authored under the look's model.
   const z = radianceForDisplay(sky.zenith, model);
   const h = radianceForDisplay(sky.horizon, model);
@@ -488,6 +563,8 @@ export function skyUniformValues(
   return {
     zenith: [z[0] * k, z[1] * k, z[2] * k, sky.amount],
     horizon: [h[0] * k, h[1] * k, h[2] * k, sky.cloudKeep],
+    clouds: sky.clouds,
+    band: sky.band,
   };
 }
 
@@ -499,7 +576,8 @@ export type LookSelections = Record<string, string>;
 /** The chosen default look per zone (day / general). */
 export const DEFAULT_ZONE_SELECTIONS: Readonly<LookSelections> = {
   proving_shore: 'skyward-isles',
-  eastbrook_vale: 'skyward-isles',
+  eastbrook_vale: 'storybook-meadow',
+  wraithwood: 'storybook-grass',
   mirefen_marsh: 'jade-wetland',
   thornpeak_heights: 'alpine-clear',
   farshore_isle: 'tropic-lagoon',

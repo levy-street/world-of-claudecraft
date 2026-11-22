@@ -39,6 +39,21 @@ import { refreshBiomeHazeField } from '../biome_haze_field';
 import { type BiomeHazePreset, hazeLightLevel } from '../biome_haze_field_core';
 import { recolorLiveBladeGrassView } from '../blade_grass';
 import { recolorLiveBladeGrassBandView } from '../blade_grass_band';
+import {
+  hexToLinear,
+  setBladeBaseZoneShade,
+  setBladeCloudZone,
+  setBladeCombZone,
+  setBladeExtraZone,
+  setBladeNearZoneShade,
+  setBladePaintZone,
+  setBladeRampZone,
+  setBladeSizeZone,
+  setBladeWidthZoneScale,
+  setCarpetGroundZone,
+} from '../blade_width_zone_core';
+import { setCelInkZoneScale } from '../cel_ink_zone_scale_core';
+import { setCelRampSoftZone } from '../cel_ramp_soft_zone_core';
 import { celShadingSettings } from '../cel_shading';
 import {
   currentDayNightPhase,
@@ -116,6 +131,23 @@ const LIVE = {
   aoScale: 39,
   shadowStrength: 40,
   canopyLift: 41,
+  clouds: 42,
+  skyBand: 43,
+  ink: 44,
+  bladeWidth: 45,
+  rampSoft: 46,
+  bladeBase: 47,
+  bladeNear: 48,
+  carpetGround: 49,
+  comb: 50,
+  paint: 54,
+  bladeSize: 56,
+  bladeExtra: 58,
+  bladeClump: 60,
+  ramp: 62,
+  bladeFar: 71,
+  bladeRound: 72,
+  bandFade: 73,
 } as const;
 // Leaf and bush materials the canopy lift brightens (GLB material names), and
 // the far sprites that stand in for them, which must move together or the
@@ -562,6 +594,35 @@ class PaletteLabRuntime implements PaletteLabApi {
     const su = paletteSkyUniforms();
     su.uPalSkyZenith.value.fromArray(v, LIVE.zenith);
     su.uPalSkyHorizon.value.fromArray(v, LIVE.horizon);
+    su.uPalClouds.value.x = v[LIVE.clouds];
+    su.uPalClouds.value.y = v[LIVE.skyBand];
+    setCelInkZoneScale(v[LIVE.ink]);
+    setBladeWidthZoneScale(v[LIVE.bladeWidth]);
+    setCelRampSoftZone(v[LIVE.rampSoft]);
+    setBladeBaseZoneShade(v[LIVE.bladeBase]);
+    setBladeNearZoneShade(v[LIVE.bladeNear]);
+    setCarpetGroundZone(v[LIVE.carpetGround]);
+    setBladeCombZone(v[LIVE.comb], v[LIVE.comb + 1], v[LIVE.comb + 2], v[LIVE.comb + 3]);
+    setBladePaintZone(v[LIVE.paint], v[LIVE.paint + 1], v[LIVE.bladeClump]);
+    setBladeSizeZone(
+      v[LIVE.bladeSize],
+      v[LIVE.bladeSize + 1],
+      v[LIVE.bladeClump + 1],
+      v[LIVE.bladeFar],
+    );
+    setBladeRampZone(
+      [v[LIVE.ramp], v[LIVE.ramp + 1], v[LIVE.ramp + 2]],
+      [v[LIVE.ramp + 3], v[LIVE.ramp + 4], v[LIVE.ramp + 5]],
+      v[LIVE.ramp + 6],
+      v[LIVE.ramp + 7],
+    );
+    setBladeCloudZone(v[LIVE.ramp + 8]);
+    setBladeExtraZone(
+      v[LIVE.bladeExtra],
+      v[LIVE.bladeExtra + 1],
+      v[LIVE.bladeRound],
+      v[LIVE.bandFade],
+    );
 
     // Water is one shared material for every sheet, so it wears the look of
     // the zone the player is in (the water in view is almost always local).
@@ -691,6 +752,34 @@ class PaletteLabRuntime implements PaletteLabApi {
       look.render.aoScale,
       look.render.shadowStrength,
       look.render.canopyLift,
+      sky.clouds,
+      sky.band,
+      look.render.ink,
+      look.render.bladeWidth,
+      look.render.rampSoft,
+      look.render.bladeBase,
+      look.render.bladeNear,
+      look.render.carpetGround,
+      look.render.combX,
+      look.render.combZ,
+      look.render.combLean,
+      look.render.combDroop,
+      look.render.paintPatch,
+      look.render.paintTip,
+      look.render.bladeHeight,
+      look.render.bladeSpread,
+      look.render.bladeExtra,
+      look.render.flowerShare,
+      look.render.bladeClump,
+      look.render.bladeWiden,
+      ...hexToLinear(look.render.rampShadow),
+      ...hexToLinear(look.render.rampLight),
+      look.render.rampStrength,
+      look.render.bladeSide,
+      look.render.cloudShadow,
+      look.render.bladeFar,
+      look.render.bladeRound,
+      look.render.bandFade,
     ];
     this.targetCache.set(look, flat);
     return flat;

@@ -188,7 +188,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   // both bases clamped with saturate), and the grade's palette arm beside its
   // shipped curve
   'src/render/palette_lab/lab_lighting.ts': 1,
-  'src/render/palette_lab/palette_sky.ts': 1,
+  'src/render/palette_lab/palette_sky.ts': 2,
   'src/render/post_output_grade.ts': 2,
   // the monument's beam falloff, lantern-halo core and ember climb/core
   // (bases clamped with clamp(x, 0, 1) or max(x, 0))

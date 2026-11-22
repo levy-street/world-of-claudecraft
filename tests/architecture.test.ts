@@ -1323,6 +1323,8 @@ const RENDER_PURE_CORES = [
   'src/render/ground_palette_override_core.ts',
   'src/render/meadow_fullness_core.ts',
   'src/render/palette_lab/zone_look_core.ts',
+  // the storybook meadow grass every zone's looks share, ramp from its own tones
+  'src/render/palette_lab/storybook_grass_core.ts',
   'src/render/spell_lab/spell_lab_catalog_core.ts',
   'src/render/ocean/ocean_spectrum_core.ts',
   'src/render/ocean/ocean_foam_core.ts',
@@ -1426,6 +1428,16 @@ const RENDER_PURE_CORES = [
   // The opt-in cel-shading R&D look (`?cel=on`): URL parse + the toon ramp
   // patch over three's directional light loop.
   'src/render/cel_shading_core.ts',
+  // The per-zone multiplier on the cel post ink a zone look writes.
+  'src/render/cel_ink_zone_scale_core.ts',
+  // The per-zone meadow blade width a zone look writes (blade_grass*.ts read it).
+  'src/render/blade_width_zone_core.ts',
+  // The per-zone cel ramp softness a zone look writes (cel_shading.ts binds it).
+  'src/render/cel_ramp_soft_zone_core.ts',
+  // Cosmetic meadow stone placement (meadow_stones.ts paints it).
+  'src/render/meadow_stones_core.ts',
+  // Per-zone meadow coverage floor (the painterly Eastbrook carpet).
+  'src/render/meadow_zone_density_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',

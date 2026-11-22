@@ -19,6 +19,7 @@ import {
   type WebGLRenderTarget,
 } from 'three';
 import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass.js';
+import { celInkZoneScale } from './cel_ink_zone_scale_core';
 import { PALETTE_GRADE_GLSL, paletteGradeUniforms } from './palette_lab';
 import { CEL_INK_GLSL } from './post_cel_ink_glsl';
 import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
@@ -513,7 +514,8 @@ export class OutputGradePass extends Pass {
     const camera = celInk.camera as PerspectiveCamera;
     // The edge test linearizes a perspective depth buffer; any other camera
     // keeps the saturation and draws no ink.
-    const ink = camera.isPerspectiveCamera ? celInk.ink : 0;
+    // The zone scale lets a painterly zone look draw no ink (cel_ink_zone_scale_core.ts).
+    const ink = camera.isPerspectiveCamera ? celInk.ink * celInkZoneScale() : 0;
     const near = camera.isPerspectiveCamera ? camera.near : 0.1;
     const far = camera.isPerspectiveCamera ? camera.far : 1000;
     this.uniforms.uCelInk.value.set(ink, celInk.saturation, near, far);

@@ -16,6 +16,27 @@ import {
 } from './blade_grass_dense_core';
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
+import {
+  BLADE_BASE_GLSL,
+  BLADE_BASE_UNIFORM,
+  BLADE_COMB_GLSL,
+  BLADE_COMB_UNIFORM,
+  BLADE_EXTRA_GLSL,
+  BLADE_EXTRA_UNIFORM,
+  BLADE_FAR_BLEND_GLSL,
+  BLADE_LIGHT_GLSL,
+  BLADE_NEAR_GLSL,
+  BLADE_NEAR_UNIFORM,
+  BLADE_PAINT_UNIFORM,
+  BLADE_RAMP_HI_UNIFORM,
+  BLADE_RAMP_LO_UNIFORM,
+  BLADE_ROUND_FRAGMENT_GLSL,
+  BLADE_ROUND_VERTEX_GLSL,
+  BLADE_SIZE_UNIFORM,
+  BLADE_WIDTH_GLSL,
+  BLADE_WIDTH_UNIFORM,
+  bladeLookReach,
+} from './blade_width_zone_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import {
   eastbrookGrassExclusions,
@@ -50,7 +71,8 @@ import {
   meadowClusterScale,
   meadowCoverage,
 } from './meadow_tuning';
-import { paletteLabPanelEnabled } from './palette_lab';
+import { zoneMeadowCoverage } from './meadow_zone_density_core';
+import { paletteLabEnabled, paletteLabPanelEnabled } from './palette_lab';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { GRASS_WIND_TIME_SCALE } from './tree_sway';
@@ -103,6 +125,13 @@ export function recolorLiveBladeGrassView(): void {
   liveView?.recolor();
 }
 
+// The finer blades and the flower the carpet and band carry for zone looks
+// that turn them on (clusterGeometry's `extras`).
+const EXTRA_BLADES = 16;
+const EXTRA_BLADE_WIDTH = 0.5;
+const FLOWER_PETALS = 6;
+const FLOWER_RADIUS = 0.13;
+
 // same tiny deterministic PRNG the motes pool uses (module-local there);
 // exported for the mid-band and the ground bake, which reuse the exact
 // cluster look
@@ -125,12 +154,31 @@ export function mulberry32(seed: number): () => number {
 // Exported (geometry unchanged): the mid-band (blade_grass_band.ts) and the
 // ground bake (grass_ground_bake.ts) must use these EXACT clusters so the
 // carpet, the band, and the painted ground are one look by construction.
-export function clusterGeometry(rng: () => number, segments: 2 | 3 = 3): THREE.BufferGeometry {
+//
+// `extras` (the carpet and the band only) appends EXTRA_BLADES finer blades and
+// one tiny flower AFTER the shipped blades, tagged per vertex in `aBladeKind`
+// (0 shipped blade, 1 extra blade, 2 flower). The shader collapses both unless
+// a zone look turns them on (blade_width_zone_core.ts uBladeExtra), and the
+// shipped blades consume the rng first, so their shapes never change.
+export function clusterGeometry(
+  rng: () => number,
+  segments: 2 | 3 = 3,
+  extras = false,
+): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
+  // each vertex's offset from its blade's spine, so a zone look can thin the
+  // blade in the vertex shader (blade_width_zone_core.ts)
+  const sides: number[] = [];
+  const kinds: number[] = [];
+  // signed position across the blade (-1 edge, 0 spine, +1 edge), so the
+  // fragment shader can light a rounded blade (blade_width_zone_core.ts)
+  const across: number[] = [];
   const indices: number[] = [];
   const BLADES = 9;
-  for (let b = 0; b < BLADES; b++) {
+  const total = extras ? BLADES + EXTRA_BLADES : BLADES;
+  for (let b = 0; b < total; b++) {
+    const extra = b >= BLADES;
     // even fan for coverage, jittered so blades overlap into a lush patch clump
     const yaw = (b / BLADES) * Math.PI * 2 + (rng() - 0.5) * 1.4;
     const cos = Math.cos(yaw);
@@ -142,7 +190,7 @@ export function clusterGeometry(rng: () => number, segments: 2 | 3 = 3): THREE.B
     const tilt = 0.08 + rng() * 0.36;
     const bow = 0.12 + rng() * 0.42;
     const len = 0.58 + rng() * 0.52;
-    const w0 = 0.095 + rng() * 0.045;
+    const w0 = (0.095 + rng() * 0.045) * (extra ? EXTRA_BLADE_WIDTH : 1);
     const w1 = w0 * 0.74;
     const w2 = w0 * 0.42;
     const base = positions.length / 3;
@@ -153,9 +201,14 @@ export function clusterGeometry(rng: () => number, segments: 2 | 3 = 3): THREE.B
       // quadratic bend: roots stay planted, tips arc over like real grass
       const lean = (tilt * t + bow * t * t) * len;
       positions.push(ox + px * wx + cos * lean, len * t, oz + pz * wx + sin * lean);
+      sides.push(px * wx, 0, pz * wx);
+      across.push(wx === 0 ? 0 : Math.sign(wx));
+      kinds.push(extra ? 1 : 0);
       // all-up normals: blades take the terrain's lighting response, the
       // same trick the card tufts use, so the carpet never shades apart
       // from the ground it grows in
+      // a grey base-to-tip ramp (0.86 root to 1.1 tip): the painted
+      // meadow's warm tips read it back in the shader (BLADE_COMB_GLSL)
       colors.push(shade, shade, shade);
     };
     if (segments === 2) {
@@ -203,9 +256,45 @@ export function clusterGeometry(rng: () => number, segments: 2 | 3 = 3): THREE.B
       );
     }
   }
+  if (extras) {
+    // one tiny daisy: a small fan of petals around a warm centre, tilted up
+    // toward the sky at mid blade height. Colours are its own (the shader
+    // drops the ground tint for it), white petals and a yellow heart.
+    const base = positions.length / 3;
+    const fx = (rng() - 0.5) * 0.3;
+    const fz = (rng() - 0.5) * 0.3;
+    const fy = 0.5 + rng() * 0.25;
+    const yaw = rng() * Math.PI * 2;
+    const tilt = 0.6;
+    const put = (lx: number, lz: number, r: number, g: number, bl: number): void => {
+      // a disc in its local x/z, tilted about x, then yawed
+      const ty = lz * Math.sin(tilt);
+      const tz = lz * Math.cos(tilt);
+      const rx = lx * Math.cos(yaw) - tz * Math.sin(yaw);
+      const rz = lx * Math.sin(yaw) + tz * Math.cos(yaw);
+      positions.push(fx + rx, fy + ty, fz + rz);
+      colors.push(r, g, bl);
+      sides.push(0, 0, 0);
+      across.push(0);
+      kinds.push(2);
+    };
+    put(0, 0, 1.3, 1.05, 0.35);
+    for (let i = 0; i < FLOWER_PETALS; i++) {
+      const a = (i / FLOWER_PETALS) * Math.PI * 2;
+      put(Math.cos(a) * FLOWER_RADIUS, Math.sin(a) * FLOWER_RADIUS, 1.55, 1.45, 1.12);
+    }
+    for (let i = 0; i < FLOWER_PETALS; i++) {
+      indices.push(base, base + 1 + i, base + 1 + ((i + 1) % FLOWER_PETALS));
+    }
+  }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
   geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+  geo.setAttribute('aBladeSide', new THREE.BufferAttribute(new Float32Array(sides), 3));
+  if (extras) {
+    geo.setAttribute('aBladeKind', new THREE.BufferAttribute(new Float32Array(kinds), 1));
+    geo.setAttribute('aBladeAcross', new THREE.BufferAttribute(new Float32Array(across), 1));
+  }
   geo.setIndex(indices);
   return geo;
 }
@@ -228,7 +317,7 @@ const CLUSTER_SWAY_REACH = 0.085 * ((1 + 0.4) * 0.6 + 0.2 + 0.9) * 1.25 * (1.1 *
  * placement composes. The sector bounding spheres pad by this, so a sector is
  * culled only when every blade in it is genuinely outside the frustum.
  */
-export function clusterPlacementPad(geo: THREE.BufferGeometry): number {
+export function clusterPlacementPad(geo: THREE.BufferGeometry, reachYards = 0): number {
   const pos = geo.getAttribute('position');
   let maxSq = 0;
   for (let i = 0; i < pos.count; i++) {
@@ -238,8 +327,13 @@ export function clusterPlacementPad(geo: THREE.BufferGeometry): number {
     const d = x * x + y * y + z * z;
     if (d > maxSq) maxSq = d;
   }
-  // A palette-lab panel session may stretch clusters up to MEADOW_MAX_STRETCH.
-  const labReach = paletteLabPanelEnabled() ? MEADOW_MAX_STRETCH : 1;
+  // Zone looks (on by default) may stretch and widen clusters out to
+  // `reachYards` from the camera; a palette-lab panel session up to
+  // MEADOW_MAX_STRETCH as well.
+  const labReach = Math.max(
+    paletteLabPanelEnabled() ? MEADOW_MAX_STRETCH : 1,
+    paletteLabEnabled() ? bladeLookReach(reachYards) : 1,
+  );
   return (Math.sqrt(maxSq) + CLUSTER_SWAY_REACH) * CLUSTER_MAX_SCALE * labReach;
 }
 
@@ -315,7 +409,7 @@ export function buildBladeGrass(
   const POOL = GRID_W * GRID_W;
 
   const rng = mulberry32(seed ^ 0x6b1a);
-  const geo = clusterGeometry(rng);
+  const geo = clusterGeometry(rng, 3, true);
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 0.92,
@@ -334,6 +428,15 @@ export function buildBladeGrass(
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uPlayerPos;
     attachGrassInteractionUniforms(sh.uniforms);
+    sh.uniforms.uBladeWidth = BLADE_WIDTH_UNIFORM;
+    sh.uniforms.uBladeBase = BLADE_BASE_UNIFORM;
+    sh.uniforms.uBladeComb = BLADE_COMB_UNIFORM;
+    sh.uniforms.uBladePaint = BLADE_PAINT_UNIFORM;
+    sh.uniforms.uBladeSize = BLADE_SIZE_UNIFORM;
+    sh.uniforms.uBladeExtra = BLADE_EXTRA_UNIFORM;
+    sh.uniforms.uBladeRampLo = BLADE_RAMP_LO_UNIFORM;
+    sh.uniforms.uBladeRampHi = BLADE_RAMP_HI_UNIFORM;
+    sh.uniforms.uBladeNear = BLADE_NEAR_UNIFORM;
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -341,11 +444,34 @@ export function buildBladeGrass(
         uniform float uTime;
         uniform vec2 uPlayerPos;
         uniform vec4 uGrassMove;
-        uniform vec4 uGrassWake;`,
+        uniform vec4 uGrassWake;
+        attribute vec3 aBladeSide;
+        uniform float uBladeWidth;
+        uniform float uBladeBase;
+        uniform vec4 uBladeComb;
+        uniform vec4 uBladePaint;
+        uniform vec4 uBladeSize;
+        uniform vec4 uBladeExtra;
+        uniform vec4 uBladeRampLo;
+        uniform vec4 uBladeRampHi;
+        attribute float aBladeKind;
+        attribute float aBladeAcross;
+        varying float vBladeAcross;
+        uniform float uBladeNear;`,
+      )
+      .replace(
+        '#include <color_vertex>',
+        `#include <color_vertex>
+        ${BLADE_BASE_GLSL}`,
       )
       .replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>
+        ${BLADE_WIDTH_GLSL}
+        ${BLADE_COMB_GLSL}
+        ${BLADE_LIGHT_GLSL}
+        ${BLADE_FAR_BLEND_GLSL}
+        ${BLADE_ROUND_VERTEX_GLSL}
         #ifdef USE_INSTANCING
           vec3 bgOrigin = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
           // outer-ring fade by collapse: alpha would need transparency and a
@@ -359,16 +485,24 @@ export function buildBladeGrass(
             distance(bgOrigin, cameraPosition));
           ${bladeSwayGlsl(classicSway)}
           ${grassBladeInteractionGlsl()}
+          ${BLADE_NEAR_GLSL}
+          ${BLADE_EXTRA_GLSL}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
-    sh.fragmentShader = sh.fragmentShader.replace(
-      '#include <normal_fragment_begin>',
-      `#include <normal_fragment_begin>
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform vec4 uBladeExtra;\nvarying float vBladeAcross;',
+      )
+      .replace(
+        '#include <normal_fragment_begin>',
+        `${BLADE_ROUND_FRAGMENT_GLSL}
+      #include <normal_fragment_begin>
       #ifdef DOUBLE_SIDED
         normal *= faceDirection;
       #endif`,
-    );
+      );
   };
   const uPlayerPos = { value: new THREE.Vector2(1e9, 1e9) };
 
@@ -381,7 +515,7 @@ export function buildBladeGrass(
     axis: bladeSectorAxis(),
     geometry: geo,
     material: mat,
-    clusterPad: clusterPlacementPad(geo),
+    clusterPad: clusterPlacementPad(geo, RADIUS),
   });
   for (const mesh of sectorPool.meshes) group.add(mesh);
 
@@ -425,7 +559,11 @@ export function buildBladeGrass(
       // bare between them (squared for hard patch edges)
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
-      const baseCoverage = meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
+      const baseCoverage = zoneMeadowCoverage(
+        x,
+        z,
+        meadowCoverage(lush) * Math.min(biomeDensity, 1.2),
+      );
       const rd = roadDistance(x, z);
       // higher floor + gain than the tufts: coverage is the carpet's job,
       // the patch structure just modulates it

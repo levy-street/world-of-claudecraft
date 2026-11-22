@@ -107,8 +107,10 @@ import {
 } from './foliage_shadow_core';
 import { foliageShoreSkip } from './foliage_shore_gate_core';
 import {
+  barkAlbedoLift,
   foliageMeshBoundsOr,
   foliageSpotsBounds,
+  LEAF_FLUTTER_GLSL,
   recordFoliageMeshBounds,
   resolveTreeLeafColor,
   sculptFoliageTreeGeometry,
@@ -146,6 +148,7 @@ import {
 } from './ground_decor_prewarm';
 import { ghostHideGeometry, withInstancedDitherFade } from './instanced_dither_fade';
 import { InstancedOccluderGhosts } from './instanced_occluder_ghosts';
+import { buildMeadowStones } from './meadow_stones';
 import {
   advanceInstanceCountInto,
   farFieldDensityFractionForValues,
@@ -217,7 +220,7 @@ export const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
 const GRASS_DENSITY_MULT_MAX = Math.max(1, ...Object.values(GRASS_BIOME_DENSITY));
 // Ground flowers never grow in these biomes (the Reach loses them with its
 // grass anchors; the Wraithwood keeps grass but blooms nothing).
-const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
+export const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
 // Field biomes bloom in coarse drifts (the dusk realm's original treatment,
 // extended to the flower-field realms): dense hash-cell fields instead of the
 // sparse one-in-nine anchor blooms.
@@ -864,7 +867,8 @@ function addWind(mat: THREE.Material, strength: number, upNormalBlend = 0): void
         float windAmt = (sin(uTime * 1.7 + windPhase) + 0.5 * sin(uTime * 3.1 + windPhase * 1.3))
           * windGust * uWindStrength * smoothstep(0.0, 1.0, transformed.y);
         transformed.x += windAmt;
-        transformed.z += windAmt * 0.6;`,
+        transformed.z += windAmt * 0.6;
+        ${LEAF_FLUTTER_GLSL}`,
       );
     sh.fragmentShader = sh.fragmentShader
       .replace(
@@ -994,6 +998,8 @@ function foliageMaterial(
     mat.emissiveMap = std.map;
     mat.emissive.setRGB(...CANOPY_EMISSIVE_FLOOR);
   }
+  const barkLift = barkAlbedoLift(src.name);
+  if (barkLift) (mat as THREE.MeshStandardMaterial).color.multiplyScalar(barkLift);
   applyInstanceCollapse(mat, role);
   // Trunks take the bark family, the shared boulder fields a stronger stone;
   // leaf/flower/mushroom names return null so canopies stay clean. Applied
@@ -3515,6 +3521,7 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
   const session = webgl ? createImpostorSession() : null;
   buildTrees(group, seed, bucketMeshes, treeHideables, session);
   buildDressing(group, seed, bucketMeshes, session);
+  group.add(buildMeadowStones(seed));
   // The sprite swap law engages only once sprite meshes really exist: if the
   // bake throws (a grown kit overflowing the atlas, a lost context) the far
   // field falls back to the lean law instead of collapsing real trees with

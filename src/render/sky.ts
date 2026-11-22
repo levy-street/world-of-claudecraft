@@ -20,6 +20,7 @@ import {
 } from './environment_transition_core';
 import { GFX, type GfxSettings } from './gfx';
 import {
+  PALETTE_CLOUDS_GLSL,
   PALETTE_SKY_DECLARATIONS,
   PALETTE_SKY_GLSL,
   paletteLabEnabled,
@@ -990,7 +991,7 @@ ${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome
     // shows them as flat cutouts against a brighter horizon. Solid to ~6
     // degrees, then fade to clear sky by ~21 degrees for the taller stuff
     // (a neighbor realm's coast trees seen across a strait).
-    c = mix(uFog, c, smoothstep(0.1, 0.36, dir.y));
+${paletteSky ? '    vec3 cPreBand = c;\n' : ''}    c = mix(uFog, c, smoothstep(0.1, 0.36, dir.y));
 ${
   zoneHaze
     ? `    // Distant-zone air on the dome (biome_haze_field.ts): the sky just
@@ -1009,6 +1010,17 @@ ${
       c = mix(c, wocSkyHaze.rgb * uHazeGrade, ${HAZE_SKY_TINT_MAX.toFixed(6)} * wocSkyHaze.a * wocSkyBand);
     }
 `
+    : ''
+}${
+  paletteSky
+    ? `    // A painterly zone look may lower the horizon band (palette_sky.ts): the
+    // sky is re-derived from its pre-band colour with a lower fog band, so the
+    // deep painted sky and its cumulus reach down toward the hills (that look
+    // gives up the distant-zone sky tint above), then the clouds go on top.
+    if (uPalClouds.y > 0.001) {
+      c = mix(uFog, cPreBand, smoothstep(uPalClouds.y * 0.25, uPalClouds.y, dir.y));
+    }
+${PALETTE_CLOUDS_GLSL}`
     : ''
 }    gl_FragColor = vec4(c, 1.0);
     #include <tonemapping_fragment>
