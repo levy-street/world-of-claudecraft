@@ -271,3 +271,30 @@ describe('Balgath eye-crystal rename (Loomshard is a coined word from another ga
     expect(scanned).toBeGreaterThan(50);
   });
 });
+
+describe('Drowned Litany hazard rename (Blackwater to Bogtar, display only)', () => {
+  // The hazard reads as tar, not water, so its display name moved to Bogtar.
+  // Ids stay frozen: blackwater_vanguard_chest, mechanic.blackwaterMark,
+  // sim.delve.nhaliaBlackwaterMark.
+  it('pins the renamed item names', () => {
+    expect(ITEMS.blackwater_vanguard_chest.name).toBe('Bogtar Vanguard Chestguard');
+    expect(ITEMS.litany_shoulder.name).toBe('Bogtar Drift Mantle');
+    expect(en.entities.items.blackwater_vanguard_chest.name).toBe('Bogtar Vanguard Chestguard');
+    expect(en.entities.items.litany_shoulder.name).toBe('Bogtar Drift Mantle');
+  });
+
+  it('pins the renamed mechanic and its log line', () => {
+    expect(en.sim.delve.nhaliaBlackwaterMark).toBe('{name} marks {player} with Bogtar!');
+    const boss = readFileSync(
+      fileURLToPath(new URL('../src/sim/delves/drowned_litany_boss.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(boss).toContain("'Bogtar Mark'");
+    expect(boss).not.toMatch(/'Blackwater Mark'|with Blackwater!/);
+    const runs = readFileSync(
+      fileURLToPath(new URL('../src/sim/delves/runs.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(runs).toContain("'nature', 'Bogtar', 'hit'");
+  });
+});

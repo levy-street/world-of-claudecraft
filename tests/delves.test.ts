@@ -2577,7 +2577,7 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     let clearHits = 0;
     for (let i = 0; i < 60; i++) {
       for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Blackwater')
+        if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Bogtar')
           clearHits++;
       }
     }
@@ -2597,7 +2597,7 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
       let hit = false;
       for (let i = 0; i < 20; i++) {
         for (const ev of sim.tick()) {
-          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Blackwater')
+          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Bogtar')
             hit = true;
         }
       }
@@ -2653,7 +2653,7 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     for (let i = 0; i < ticks; i++) {
       pre?.();
       for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.targetId === sim.playerId && ev.ability === 'Blackwater')
+        if (ev.type === 'damage' && ev.targetId === sim.playerId && ev.ability === 'Bogtar')
           hits++;
       }
     }
@@ -2809,7 +2809,7 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
       let amount = 0;
       for (let i = 0; i < 20 && amount === 0; i++) {
         for (const ev of sim.tick()) {
-          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Blackwater')
+          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Bogtar')
             amount = ev.amount;
         }
       }
@@ -3086,7 +3086,7 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
       let blackwaterHits = 0;
       for (let i = 0; i < 45; i++) {
         for (const ev of sim.tick()) {
-          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Blackwater')
+          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Bogtar')
             blackwaterHits++;
         }
       }

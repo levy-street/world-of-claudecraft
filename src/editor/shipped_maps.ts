@@ -427,7 +427,7 @@ function litanyFeaturePlacements(moduleId: LitanyModuleId): MapPlacement[] {
         lum: hazard.tier === 'shallow' ? 0.2 : 0.1,
         fluidDps: 4,
         fluidFx: 0,
-        name: 'Blackwater',
+        name: 'Bogtar',
         // The fluid surface still renders and playtests. Hiding the placement
         // suppresses only the editor's large translucent transform pad.
         hidden: true,

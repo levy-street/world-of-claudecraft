@@ -4,10 +4,11 @@ Dense, glossy tar on the floor that a player must keep out of. One look and ONE
 shader program for both kinds of pool:
 
 - **Static pools**: a room's authored hazard zones, built with the room (the
-  Drowned Litany's Blackwater today, through `delve_marsh_dressing.ts`
+  Drowned Litany's Bogtar today, whose code and ids keep the historical
+  name Blackwater; through `delve_marsh_dressing.ts`
   `placeMarshBlackwaterPools`).
 - **Dynamic pools**: boss-dropped pools the world lists through
-  `IWorld.activeHazardPools()` (Sister Nhalia's Blackwater Mark today), drawn by
+  `IWorld.activeHazardPools()` (Sister Nhalia's Bogtar Mark today), drawn by
   the one `DynamicHazardPools` host the renderer owns.
 
 A new boss pool needs no new render code: list it from the sim through

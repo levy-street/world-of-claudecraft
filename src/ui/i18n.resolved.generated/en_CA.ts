@@ -14640,7 +14640,7 @@ export const en_CA: EnTranslations = {
       "doorAlreadyOpen": "The door is already open.",
       "companionRankUp": "{name} reaches rank {rank}.",
       "bossChest": "The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.",
-      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
+      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the bogtar. Approach it to begin the rite.",
       "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
       "riteSequencePlaying": "The shrines replay the rite. Wait.",
       "riteCorrect": "A soft chime answers your touch.",
@@ -14686,7 +14686,7 @@ export const en_CA: EnTranslations = {
       "wayOutNotOpen": "The way out is not yet open.",
       "moveCloserStairs": "Move closer to the stairs.",
       "nhaliaCantorShield": "Cantors, hold the note!",
-      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
+      "nhaliaBlackwaterMark": "{name} marks {player} with Bogtar!"
     },
     "factionVendor": {
       "currencyRequired": "You need {amount} {currency} to purchase that."
@@ -14760,7 +14760,7 @@ export const en_CA: EnTranslations = {
     "hard": "Hard",
     "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
     "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
-    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
+    "guideStakes": "A wrong shrine splashes you with bogtar and costs a try. Complete the sequence to open the reliquary.",
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
@@ -14893,14 +14893,14 @@ export const en_CA: EnTranslations = {
       "normal": "The stairwell is cold and dark. Broken saint-stones litter the descent, and a soft bell note hangs in the damp air. Acolyte Tessa whispers, \"The reliquary should not be open this far. Stay close, {playerName}.\"",
       "heroic": "The doors groan shut behind you. Names scrape across the stone like fingernails. Tessa's candle burns blue. \"They are not calling the dead now, {playerName}. They are answering something.\"",
       "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
-      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
+      "litanyHeroic": "Bogtar laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Water seeps through burial shelves, carrying old ash in silver-black streams.",
       "reliquary_bell_niche": "Dozens of handbells hang in silence, each tied with funeral cloth.",
       "reliquary_saintless_hall": "Statues with faces chiseled away with careful hatred.",
       "reliquary_finale": "The buried bell tolls once beneath your boots.",
-      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
+      "litany_sluice": "Moss-choked sluice gates drip bogtar into the old choir crypt.",
       "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
       "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
       "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
@@ -14948,7 +14948,7 @@ export const en_CA: EnTranslations = {
       "edda": {
         "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
         "ally_revive": "Up, now. The marsh does not get you today.",
-        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
+        "combat_start": "Mind the bogtar, {playerName}. The marsh listens.",
         "low_hp": "Steady. My lantern is not out yet.",
         "trap_spotted": "Wait. The reeds are wrong here.",
         "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
@@ -24984,7 +24984,7 @@ export const en_CA: EnTranslations = {
         "name": "Nhalia's Litany Rod"
       },
       "blackwater_vanguard_chest": {
-        "name": "Blackwater Vanguard Chestguard"
+        "name": "Bogtar Vanguard Chestguard"
       },
       "siltstep_leggings": {
         "name": "Siltstep Leggings"
@@ -24996,7 +24996,7 @@ export const en_CA: EnTranslations = {
         "name": "Silt-Walker Greaves"
       },
       "litany_shoulder": {
-        "name": "Blackwater Drift Mantle"
+        "name": "Bogtar Drift Mantle"
       },
       "litany_gloves_rog": {
         "name": "Reed-Bound Handwraps"

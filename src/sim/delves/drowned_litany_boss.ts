@@ -264,7 +264,7 @@ function tickBlackwaterMarkCast(
   });
   ctx.emit({
     type: 'log',
-    text: `${boss.name} marks ${target.name} with Blackwater!`,
+    text: `${boss.name} marks ${target.name} with Bogtar!`,
     color: '#6af',
     entityId: boss.id,
     telegraph: true,
@@ -302,7 +302,7 @@ function tickBlackwaterMarks(
         const dz = p.pos.z - mark.z;
         if (dx * dx + dz * dz > BLACKWATER_MARK_RADIUS * BLACKWATER_MARK_RADIUS) continue;
         const dmg = Math.max(1, Math.round(p.maxHp * pct));
-        ctx.dealDamage(boss, p, dmg, false, 'nature', 'Blackwater Mark', 'hit', true);
+        ctx.dealDamage(boss, p, dmg, false, 'nature', 'Bogtar Mark', 'hit', true);
       }
     }
     live.push(mark);

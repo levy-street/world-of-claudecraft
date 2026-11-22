@@ -123,7 +123,7 @@ describe('shipped map editor catalog', () => {
 
     expect(floorKinds.size).toBeGreaterThan(2);
     expect(visible.some((placement) => placement.assetId === 'dungeon/wall_cracked')).toBe(true);
-    expect(visible.some((placement) => placement.name === 'Blackwater')).toBe(true);
+    expect(visible.some((placement) => placement.name === 'Bogtar')).toBe(true);
     expect(visible.some((placement) => placement.name === 'Dry island')).toBe(true);
   });
 

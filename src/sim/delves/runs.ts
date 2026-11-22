@@ -1381,7 +1381,7 @@ export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
     const tierMult = worstTier === 'deep' ? 2.0 : 0.35;
     const dmg = Math.max(1, Math.round(p.maxHp * basePct * tierMult));
     // Environmental damage: no source, labelled like 'Falling' (sim.ts fall path).
-    ctx.dealDamage(null, p, dmg, false, 'nature', 'Blackwater', 'hit', true);
+    ctx.dealDamage(null, p, dmg, false, 'nature', 'Bogtar', 'hit', true);
   }
 }
 
