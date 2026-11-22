@@ -9,8 +9,11 @@
 //   - Chrome on macOS reports them in points (CSS pixels at 100% zoom).
 //     Measured on a Retina Mac in Chrome: the summed movementX of a drag
 //     equalled the CSS-pixel cursor travel at devicePixelRatio 2, so mouse-look
-//     ran at half the speed it does on Windows. Safari and the Electron shell
-//     on macOS take the same OS event path and are treated the same way.
+//     ran at half the speed it does on Windows. A pointer-locked drag reads
+//     the same scale with raw input (unadjustedMovement, which Mac Chrome
+//     grants) as without it, so the correction applies to both. Safari and
+//     the Electron shell on macOS take the same OS event path and are
+//     treated the same way.
 // By definition devicePixelRatio is exactly the physical-per-CSS-pixel ratio, so
 // on any display where it is not 1 (a retina Mac, a scaled desktop, or any
 // non-100% browser zoom) a CSS-pixel delta is 1/devicePixelRatio of the physical
