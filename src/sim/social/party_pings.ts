@@ -8,8 +8,9 @@
 // every rule. The sender must resolve to a live session; a point must be
 // finite and lie within PARTY_PING_RANGE of the sender (its floor height is
 // the sim's own floor query, the clicked height only picks the storey); a
-// unit must exist, be alive, be in range and not be hidden by stealth from a
-// sender outside its group. A refused ping is dropped silently: the client's
+// unit must exist, be alive, be in range, not be hidden by stealth from a
+// sender outside its group, and not be anything the sender's own snapshot
+// omits (a hidden GM, another group's vault portal). A refused ping is dropped silently: the client's
 // own gates already keep a normal player from sending one.
 //
 // Anti-spam on the SIM clock (never the wall clock): a sender may spend
@@ -28,8 +29,10 @@
 //
 // src/sim-pure: no DOM/Three, no Math.random/Date.now.
 
+import { gmHiddenFrom } from '../gm_presence';
 import type { SimContext } from '../sim_context';
 import type { EntityKind } from '../types';
+import { vaultPortalVisibleToPlayer } from '../vault_visibility';
 import { sharedMapMarkFloorY } from './shared_map_marks';
 
 /** The ping kinds, by wire index. Look Here is the plain ground ping a tap
@@ -72,6 +75,10 @@ export interface PartyPing {
   x: number;
   y: number;
   z: number;
+  /** Set by the online client's mirror only (src/net/party_pings_wire.ts):
+   *  the ping was already live when this client (re)connected, so it draws
+   *  but is not announced again (no sound, no chat line). Never set here. */
+  known?: true;
 }
 
 interface LivePing extends PartyPing {
@@ -142,6 +149,10 @@ export class PartyPings {
       if (!t || t.dead) return false;
       const groupMate = t.id === self || (party?.members.includes(t.id) ?? false);
       if (t.stealthed && !groupMate) return false;
+      // Never what the sender's own snapshot omits: a hidden GM (forged id) or
+      // another group's vault portal would leak its name and spot to the group.
+      if (gmHiddenFrom(this.ctx.entities, r.e, t)) return false;
+      if (!vaultPortalVisibleToPlayer(this.ctx, t, self)) return false;
       point = { x: t.pos.x, y: t.pos.y, z: t.pos.z };
       const name = t.kind === 'player' ? (this.ctx.players.get(t.id)?.name ?? t.name) : t.name;
       unit = { id: t.id, kind: t.kind, template: t.templateId ?? '', name };

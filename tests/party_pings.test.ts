@@ -233,6 +233,33 @@ describe('party pings: validation', () => {
     expect(view(sim, a)[0]).toMatchObject({ target: b, targetKind: 'player', targetName: 'Bet' });
   });
 
+  it('a hidden GM is refused even by a forged id (their name and spot would leak)', () => {
+    const sim = world();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const gm = sim.addPlayer('mage', 'Staffer');
+    const pa = posOf(sim, a);
+    const e = sim.entities.get(gm);
+    if (!e) throw new Error('no player');
+    e.pos = { x: pa.x + 4, y: pa.y, z: pa.z };
+    e.gmHidden = true;
+    expect(store(sim).send(PING_ATTACK, gm, 0, 0, 0, a)).toBe(false);
+    party(sim, a, gm);
+    expect(store(sim).send(PING_ASSIST, gm, 0, 0, 0, a)).toBe(false);
+    expect(view(sim, a)).toHaveLength(0);
+    delete e.gmHidden;
+    expect(store(sim).send(PING_ASSIST, gm, 0, 0, 0, a)).toBe(true);
+  });
+
+  it("another group's vault portal is refused; the sender's own is not", () => {
+    const sim = world();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const mob = besideMob(sim, a);
+    mob.vaultOwnerPid = 987_654;
+    expect(store(sim).send(PING_LOOK, mob.id, 0, 0, 0, a)).toBe(false);
+    mob.vaultOwnerPid = a;
+    expect(store(sim).send(PING_LOOK, mob.id, 0, 0, 0, a)).toBe(true);
+  });
+
   it('a dead sender may still ping (a ghost directs the fight)', () => {
     const sim = world();
     const a = sim.addPlayer('warrior', 'Aleph');
