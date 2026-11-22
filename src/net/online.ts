@@ -263,7 +263,7 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
-import { decodePartyPings } from './party_pings_wire';
+import { decodePartyPings, PartyPingReplayGuard } from './party_pings_wire';
 import { applyPeerMajorCooldownWire } from './peer_major_cooldown_wire';
 import { perfectingCommand } from './perfecting_command';
 import {
@@ -1551,6 +1551,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // the raid map's shared marks, from the self-wire `mmarks` (null = none in view)
   sharedMapMarkList: readonly SharedMapMark[] = [];
   partyPingList: readonly PartyPing[] = []; // the group's pings, from the self-wire `pings`
+  private readonly pingReplay = new PartyPingReplayGuard(); // a (re)join's live pings: no replay
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
   // group-visible choices on the open rolls (the vote strip), mirrored from the self-wire
   private lootRollGroup: LootRollGroupStatus[] = [];
@@ -1817,6 +1818,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       ? `${this.base.replace(/^http/, 'ws')}/ws`
       : buildWebSocketUrl(location.protocol, location.host);
     this.ws = new WebSocket(wsUrl);
+    this.pingReplay.newSession();
     this.ws.onopen = () => {
       this.ws.send(
         JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
@@ -3203,7 +3205,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
       if (s.mmarks !== undefined) this.sharedMapMarkList = decodeSharedMapMarks(s.mmarks);
-      if (s.pings !== undefined) this.partyPingList = decodePartyPings(s.pings);
+      if (s.pings !== undefined)
+        this.partyPingList = this.pingReplay.mark(decodePartyPings(s.pings));
       // The own presentation has released the spectate hold, so preference
       // changes made while watching can now pass cmd()'s normal guard.
       if (restoreSessionPreferences) this.resendSessionPreferences();

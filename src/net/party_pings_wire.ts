@@ -5,6 +5,12 @@
 // ping). Every field is re-validated and a malformed row is DROPPED, so a
 // version-skewed or hostile frame can never put a bad kind or a non-finite
 // point in the world. DOM-free, ClientWorld-free.
+//
+// PartyPingReplayGuard: a fresh session's first self snapshot always carries
+// the row (the server diffs against an empty per-session record), so the
+// pings it holds were sent before this client (re)joined. They are flagged
+// `known`: the world still draws them, but the feed never replays their sound
+// and chat line after a reconnect or a reload.
 
 import { isPingKind, PARTY_PING_GROUP_MAX, type PartyPing } from '../sim/social/party_pings';
 import type { EntityKind } from '../sim/types';
@@ -43,4 +49,27 @@ export function decodePartyPings(raw: unknown): readonly PartyPing[] {
     });
   }
   return out.length > 0 ? out : NONE;
+}
+
+/** Flags the pings already live when a session (re)connected (see the header). */
+export class PartyPingReplayGuard {
+  private baselinePending = true;
+  private known = new Set<number>();
+
+  /** A new socket session: its first `pings` row is the baseline. */
+  newSession(): void {
+    this.baselinePending = true;
+  }
+
+  /** The decoded row with every baseline ping flagged `known`. */
+  mark(pings: readonly PartyPing[]): readonly PartyPing[] {
+    if (this.baselinePending) {
+      this.baselinePending = false;
+      this.known = new Set(pings.map((p) => p.id));
+    } else if (this.known.size > 0) {
+      for (const id of this.known) if (!pings.some((p) => p.id === id)) this.known.delete(id);
+    }
+    if (this.known.size === 0) return pings;
+    return pings.map((p) => (this.known.has(p.id) ? { ...p, known: true as const } : p));
+  }
 }

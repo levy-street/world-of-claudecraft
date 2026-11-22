@@ -69,7 +69,8 @@ export class PingFeedController {
     }
     const at = world.player.pos;
     for (const ping of fresh) {
-      if (!pingInView(ping, at)) continue;
+      // Already live when this client (re)joined: drawn, never announced again.
+      if (ping.known || !pingInView(ping, at)) continue;
       const sound = PING_SOUNDS[ping.kind];
       if (sound) this.deps.sound(sound.key, sound.rate, sound.gain);
       const live = ping.target === null ? undefined : world.entities.get(ping.target);

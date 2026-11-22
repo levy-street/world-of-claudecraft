@@ -6,6 +6,8 @@
 // (src/net/party_pings_wire.ts). The wire strings are pinned as literals: the
 // wire string IS the protocol.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
@@ -20,7 +22,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
-import { decodePartyPings } from '../src/net/party_pings_wire';
+import { decodePartyPings, PartyPingReplayGuard } from '../src/net/party_pings_wire';
 import { PING_ATTACK, PING_LOOK, PING_WARNING } from '../src/sim/social/party_pings';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
@@ -146,5 +148,34 @@ describe('party pings: client decode', () => {
     expect(c.partyPings()).toHaveLength(1);
     c.sendPing(PING_WARNING, null, 1, 2, 3);
     expect(sent).toEqual([{ cmd: 'ping', kind: PING_WARNING, target: null, x: 1, y: 2, z: 3 }]);
+  });
+});
+
+describe('party pings: no replay after a (re)connect', () => {
+  const row = (id: number) => [id, PING_LOOK, 3, 'Jose', 0, 1, 2, 3, '', '', ''];
+
+  it("flags a session's first row known; later pings stay new", () => {
+    const g = new PartyPingReplayGuard();
+    const first = g.mark(decodePartyPings([row(4), row(5)]));
+    expect(first.map((p) => p.known)).toEqual([true, true]);
+    const next = g.mark(decodePartyPings([row(5), row(6)]));
+    expect(next.map((p) => [p.id, p.known === true])).toEqual([
+      [5, true],
+      [6, false],
+    ]);
+    // A reconnect: the new session's first row is the baseline again.
+    g.newSession();
+    const back = g.mark(decodePartyPings([row(6), row(7)]));
+    expect(back.every((p) => p.known === true)).toBe(true);
+    // An empty first row flags nothing, so the next ping is announced.
+    g.newSession();
+    g.mark(decodePartyPings(null));
+    expect(g.mark(decodePartyPings([row(8)]))[0].known).toBeUndefined();
+  });
+
+  it('the ClientWorld guards its mirror and starts a baseline per socket', () => {
+    const src = readFileSync(join(process.cwd(), 'src/net/online.ts'), 'utf8');
+    expect(src).toContain('this.partyPingList = this.pingReplay.mark(decodePartyPings(s.pings));');
+    expect(src).toMatch(/this\.ws = new WebSocket\(wsUrl\);\s+this\.pingReplay\.newSession\(\);/);
   });
 });

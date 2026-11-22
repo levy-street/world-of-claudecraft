@@ -108,6 +108,19 @@ describe('ping feed: sounds', () => {
     }
     expect(keys.size).toBe(PING_KIND_COUNT);
   });
+
+  it('pins the kind-to-sound map (each cue matches its meaning)', () => {
+    const byKind = Object.fromEntries(
+      Array.from({ length: PING_KIND_COUNT }, (_, k) => [k, PING_SOUNDS[k].key]),
+    );
+    expect(byKind).toEqual({
+      0: 'ui_aura_glass_ping', // Look Here
+      1: 'ui_aura_sword_draw', // Attack
+      2: 'ui_aura_hard_bell', // Warning
+      3: 'ui_aura_wind_whoosh', // On My Way
+      4: 'ui_aura_soft_chime', // Assist
+    });
+  });
 });
 
 describe('ping feed: the minimap', () => {

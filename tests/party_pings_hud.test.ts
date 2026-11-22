@@ -261,6 +261,28 @@ describe('ping feed controller', () => {
     expect(marks[0].style.display).toBe('none');
   });
 
+  it('a ping already live at a (re)connect draws on the minimap but never replays', () => {
+    const h = feedHarness();
+    h.state.pings = [ping({ known: true })];
+    h.feed.frame();
+    expect(h.logs).toEqual([]);
+    expect(h.sounds).toEqual([]);
+    expect(h.disc.querySelectorAll('.ping-minimap-mark')).toHaveLength(1);
+    h.state.pings = [ping({ known: true }), ping({ id: 2, kind: PING_ATTACK })];
+    h.feed.frame();
+    expect(h.logs).toEqual(['Jose: Attack']);
+    expect(h.sounds).toEqual(['ui_aura_sword_draw']);
+  });
+
+  it("the sender's own ping sounds and logs on the sender's client too", () => {
+    const h = feedHarness();
+    // The feed never filters by sender: a ping from the local player plays.
+    h.state.pings = [ping({ from: 1, fromName: 'Me', kind: PING_ASSIST })];
+    h.feed.frame();
+    expect(h.sounds).toEqual(['ui_aura_soft_chime']);
+    expect(h.logs).toEqual(['Me: Assist']);
+  });
+
   it('a ping far away neither sounds, logs nor marks the minimap', () => {
     const h = feedHarness();
     h.state.pings = [ping({ x: 5000 })];

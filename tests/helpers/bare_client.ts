@@ -13,6 +13,7 @@ import { emptyBuddySelfMirror } from '../../src/net/buddy_wire';
 import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
 import { GuildBankLogMirror } from '../../src/net/guild_bank_log_mirror';
 import { ClientWorld } from '../../src/net/online';
+import { PartyPingReplayGuard } from '../../src/net/party_pings_wire';
 import { freshAccountLedger } from '../../src/sim/account_ledger';
 import { emptyAllocation, emptyModifiers } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
@@ -221,6 +222,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.markers = {};
   c.sharedMapMarkList = [];
   c.partyPingList = [];
+  c.pingReplay = new PartyPingReplayGuard();
   c.lastSnapAt = 0;
   c.snapInterval = 50;
   c.serverTickHz = null;
