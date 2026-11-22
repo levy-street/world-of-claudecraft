@@ -7,7 +7,6 @@
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { focusTargetAction } from '../ui/focus_targets_core';
-import { detectBrowserEngine } from './browser_env';
 import { clampCamPitch } from './camera_pitch_range';
 import { BASE_ZOOM_MAX } from './camera_zoom_ceiling';
 import { clickClaimedModalFocus } from './click_claimed_focus';
@@ -31,7 +30,11 @@ import {
   shouldReleasePointerLock,
 } from './pointer_lock';
 import { RawPointerLockRequester } from './pointer_lock_request';
-import { LookDeltaGuard, normalizePointerLookDelta } from './pointer_look_delta';
+import {
+  LookDeltaGuard,
+  normalizePointerLookDelta,
+  pointerLookReportsCssPixels,
+} from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
 import { isStaleChromeButton } from './stale_chrome_focus';
 import { wheelCodeForDelta, zoomStepForAction } from './wheel_binds';
@@ -311,14 +314,14 @@ export class Input {
   // mouse-look sensitivity, in radians per pixel of drag; the old fixed value
   // was BASE_LOOK_SENS — setCameraSpeed scales it from the settings menu
   private lookSensitivity = BASE_LOOK_SENS;
-  // Gecko (Firefox) reports movementX/movementY in CSS pixels, not the physical
-  // pixels Chromium reports and the sensitivity is tuned against, so on a HiDPI
-  // display or under page zoom its mouselook runs at the wrong speed (#1834).
-  // Detected once (the engine never changes mid-session) and used to normalize
-  // each delta in onMouseMove; every other engine stays a pass-through.
-  private readonly isGeckoEngine =
-    typeof navigator !== 'undefined' &&
-    detectBrowserEngine(navigator.userAgent || '').engine === 'gecko';
+  // Firefox (#1834) and macOS report movementX/movementY in CSS pixels, not
+  // the physical pixels Windows Chromium reports and the sensitivity is tuned
+  // against, so on a HiDPI display (any Retina Mac) their mouselook ran at the
+  // wrong speed. Detected once (the
+  // engine and OS never change mid-session) and used to normalize each delta in
+  // onMouseMove; Windows and Linux Chromium stay a pass-through.
+  private readonly lookDeltaInCssPixels =
+    typeof navigator !== 'undefined' && pointerLookReportsCssPixels(navigator.userAgent || '');
   private touchMove: TouchMoveInput = {
     forward: false,
     back: false,
@@ -1663,13 +1666,13 @@ export class Input {
     }
     if (this.cb.isCameraMotionLocked?.()) return;
     if (!this.leftDown && !this.rightDown) return;
-    // Normalize the raw movement delta to Chromium's physical-pixel unit so
-    // mouselook keeps the same speed and drag-start feel on Firefox, where the
-    // deltas arrive in CSS pixels (#1834). A no-op on Chromium/WebKit.
+    // Normalize the raw movement delta to the physical-pixel unit so mouselook
+    // keeps the same speed and drag-start feel on Firefox and macOS, where the
+    // deltas arrive in CSS pixels (#1834). A no-op on Windows/Linux Chromium.
     const raw = normalizePointerLookDelta({
       movementX: e.movementX ?? 0,
       movementY: e.movementY ?? 0,
-      isGecko: this.isGeckoEngine,
+      reportsCssPixels: this.lookDeltaInCssPixels,
       devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
     });
     if (raw.dx === 0 && raw.dy === 0) {
