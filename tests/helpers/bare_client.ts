@@ -12,6 +12,7 @@ import { ActionBarLayoutUploader } from '../../src/net/action_bar_upload';
 import { emptyBuddySelfMirror } from '../../src/net/buddy_wire';
 import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
 import { GuildBankLogMirror } from '../../src/net/guild_bank_log_mirror';
+import { HazardPoolMirror } from '../../src/net/hazard_pool_mirror';
 import { ClientWorld } from '../../src/net/online';
 import { freshAccountLedger } from '../../src/sim/account_ledger';
 import { emptyAllocation, emptyModifiers } from '../../src/sim/content/talents';
@@ -274,6 +275,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   // `!== null` gates, where undefined would behave differently.
   c.guildBankInfo = null;
   c.guildBankLogMirror = new GuildBankLogMirror();
+  c.hazardPoolMirror = new HazardPoolMirror();
   c.toolEffectSlots = [];
   c.commissionOrders = [];
   c.socialDirty = false;
