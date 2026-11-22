@@ -20,6 +20,7 @@ export const BIND_CATEGORY_LABEL_KEYS: Partial<Record<string, TranslationKey>> =
   Pet: 'hudChrome.keybinds.categoryPet',
   'World Markers': 'hudChrome.worldMarkers.title',
   'Raid Target Icons': 'hudChrome.raidTargets.bindCategory',
+  Pings: 'hudChrome.pings.bindCategory',
 };
 export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   setFocus1: 'hudChrome.focusTargets.assign',
@@ -46,6 +47,7 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   targetMarker7: 'hudChrome.raidTargets.bindSet',
   targetMarker8: 'hudChrome.raidTargets.bindSet',
   targetMarkerClear: 'hudChrome.raidTargets.bindClear',
+  ping: 'hudChrome.pings.bindPing',
   forward: 'hud.keybinds.actions.forward',
   back: 'hud.keybinds.actions.back',
   turnLeft: 'hud.keybinds.actions.turnLeft',

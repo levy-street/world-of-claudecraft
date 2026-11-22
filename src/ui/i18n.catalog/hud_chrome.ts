@@ -11874,4 +11874,28 @@ export const hudChromeStrings = {
     bindClear: 'Clear Target Marker',
     frameMark: 'Marked: {marker}',
   },
+  // Party pings (src/ui/hud/pings/): the Ping key's binding row, the hold wheel's
+  // four wedges and its cancel centre, each ping kind's name, the party chat line
+  // a ping writes (the sender's name first, a colon, then the callout), and the
+  // Options switch. The sim owns every ping rule (src/sim/social/party_pings.ts).
+  pings: {
+    bindCategory: 'Pings',
+    bindPing: 'Ping',
+    wheelAria: 'Ping wheel',
+    cancel: 'Cancel',
+    kindLook: 'Look Here',
+    kindAttack: 'Attack',
+    kindWarning: 'Warning',
+    kindOnMyWay: 'On My Way',
+    kindAssist: 'Assist',
+    chatPoint: '{name}: {kind}',
+    chatAttackUnit: '{name}: Attack {target}',
+    chatAssistUnit: '{name}: Assist {target}',
+    chatWarningUnit: '{name}: Warning, {target}',
+    chatOnMyWayUnit: '{name}: On my way to {target}',
+    chatLookUnit: '{name}: Look at {target}',
+    enableSetting: 'Enable Pings',
+    enableSettingNote:
+      'Hold the Ping key to open the ping wheel, or tap it to ping what is under the cursor. Only your party or raid sees your pings, at most 4 every 5 seconds. Turning this off also hides every ping from your group: no icon, sound, chat line or minimap mark.',
+  },
 };

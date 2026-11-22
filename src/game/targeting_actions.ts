@@ -41,6 +41,12 @@ export interface TargetingHud {
   focusTarget?(slot: number, assign: boolean): void;
   /** A world-marker hotkey: 0..7 places that symbol, null clears every mark. */
   worldMarkerHotkey?(symbol: number | null): void;
+  /** The party pings' key surface (src/ui/hud/pings/): the Ping key's press and
+   *  release from the keyboard, and the pad's flat press (a ping at the target). */
+  readonly pings?: {
+    key(phase: 'down' | 'up' | 'cancel', x: number, y: number): void;
+    padPing(): void;
+  };
 }
 
 /** The party frame display settings (sort mode, Show Self) the F-row reads so
@@ -110,6 +116,10 @@ export function dispatchTargetingAction(
     return true;
   }
   switch (id) {
+    case 'ping':
+      // A pad button has no cursor and no hold: it pings the current target.
+      hud.pings?.padPing();
+      return true;
     case 'target':
       world.tabTarget();
       return true;
@@ -149,11 +159,13 @@ export function targetingInputCallbacks(
   | 'onFocusTarget'
   | 'onWorldMarker'
   | 'onTargetMarker'
+  | 'onPing'
 > {
   return {
     onFocusTarget: (slot, assign) => hud.focusTarget?.(slot, assign),
     onWorldMarker: (symbol) => hud.worldMarkerHotkey?.(symbol),
     onTargetMarker: (symbol) => targetMarkerHotkey(world, symbol),
+    onPing: (phase, x, y) => hud.pings?.key(phase, x, y),
     onTab: () => world.tabTarget(),
     onTabPrev: () => world.tabTargetPrev(),
     onTargetFriendly: () => world.targetNearestFriendly(),

@@ -381,6 +381,11 @@ export const BOOL_SETTINGS = {
   // local display choice; the server sends raw text and each client decides.
   // (Slurs are blocked server-side regardless and never reach here.)
   filterProfanity: { def: true },
+  // on by default: party pings (the ping wheel, src/ui/hud/pings/). Off disables the
+  // Ping key and its wheel AND hides every ping from this player: no world icon, no
+  // sound, no chat line, no minimap mark (src/game/party_pings_setting.ts). A local
+  // display choice; the server still delivers the group's pings.
+  partyPings: { def: true },
   // off by default: MOBA-style "attack move". When on, one rebindable Attack
   // Move key (default A) walks the player toward the cursor, auto-attacking the
   // enemy under it or the nearest one met along the way. Other movement keys

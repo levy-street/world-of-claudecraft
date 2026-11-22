@@ -280,6 +280,19 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: [],
   },
+  // Party pings (src/ui/hud/pings/): HOLD for the ping wheel, TAP to ping what is
+  // under the cursor. A held action, like the emote wheel, so its press and its
+  // release both reach the HUD. Y is the one bare letter no other default claims
+  // (its Shift layer is Cosmetics, which the ping press steps aside for); G is the
+  // PvP window, and rebinding Ping there takes G from it through the usual
+  // conflict prompt.
+  {
+    id: 'ping',
+    label: 'Ping',
+    category: 'Pings',
+    kind: 'held',
+    defaults: ['KeyY'],
+  },
   {
     id: 'interact',
     label: 'Interact / Loot',

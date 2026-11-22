@@ -337,6 +337,9 @@ const UI_PURE_CORES = [
   // ring, well, altars and grooves, every room's landmarks and line features.
   'src/ui/hud/raid_atlas/raid_atlas_detail_core.ts',
   'src/ui/hud/world_markers/world_markers_core.ts',
+  // Party pings: the wheel's wedges, the key's tap-or-hold rule, the feed's chat/minimap math.
+  'src/ui/hud/pings/ping_wheel_core.ts',
+  'src/ui/hud/pings/ping_feed_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
@@ -1631,6 +1634,8 @@ const RENDER_PURE_CORES = [
   'src/render/ground_aim_reticle_core.ts',
   // the raid's world markers on the floor: slots, drape, pulse, scale, tier look
   'src/render/world_markers_core.ts',
+  // the party pings in the world: palette, slots, anchor, pop, ripple, fade, size
+  'src/render/party_pings_core.ts',
   'src/render/ignivar_encounter_core.ts',
   'src/render/varkhul_encounter_core.ts',
   'src/render/ignivar_judgment_fire_core.ts',
@@ -3406,6 +3411,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/raid_atlas/raid_atlas_shared_marks.ts',
   // the raid's world markers: the Hud factory (mints the flyout on document)
   'src/ui/hud/world_markers/hud_world_markers.ts',
+  // the party pings: the Hud factory (window timers, the clock, the minimap host)
+  'src/ui/hud/pings/hud_pings.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
   // Mounts the Cartographer's Ink map picker into #prompt-stack.
   'src/ui/hud/treasure/ink_map_picker_controller.ts',
@@ -3567,6 +3574,8 @@ const UI_DOM_MODULES = [
   'src/ui/icon_prewarm.ts',
   'src/ui/icon_prewarm_worker.ts',
   'src/ui/icons.ts',
+  // The party ping badges: procedural canvases minted on document, cached.
+  'src/ui/ping_icons.ts',
   'src/ui/inspect_window.ts',
   'src/ui/interface_unlock.ts',
   'src/ui/settings_transfer.ts',

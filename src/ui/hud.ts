@@ -31,12 +31,7 @@ import {
 import { voice, voiceFadeGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState, mountSummonBarState } from '../render/cast_bar';
-import {
-  CharacterPreview,
-  modularKeyFor,
-  modularLookFor,
-  type PreviewFramingName,
-} from '../render/characters';
+import { CharacterPreview, modularKeyFor, modularLookFor } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
 import { npcPortraitSourceFor, playerVisualKey } from '../render/characters/manifest';
 import { helmSlotAvailableForEntity } from '../render/characters/player_look_core';
@@ -86,7 +81,6 @@ import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rul
 import type { FactionId } from '../sim/factions';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MaterialComposition } from '../sim/material_sources';
-import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { PET_MODES } from '../sim/pet/pet_assist';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import {
@@ -414,7 +408,6 @@ import {
 import type { GroundAimReticleView } from './hud/action_bar/ground_aim_controller';
 import {
   assignAttackSlotAction,
-  attackDragDisposition,
   clearHotbarSlot,
   type FreedAttackSlotAbility,
   freedAttackSlotDisplayAbility,
@@ -527,6 +520,7 @@ import {
   type PetBarButtonDeps,
 } from './hud/pet_bar_button';
 import { livingSecondaryPet } from './hud/pet_bar_core';
+import { createHudPings } from './hud/pings';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { commissionOrderResultLine } from './hud/professions/commission_order_feedback';
@@ -956,7 +950,6 @@ import {
   fillTargetFrameDescriptor,
   fillTargetHealthText,
   fillTargetOfTargetDescriptor,
-  targetPortraitKey,
 } from './target_frame_descriptor';
 import { targetOfTargetId } from './target_of_target';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -1374,6 +1367,7 @@ export class Hud {
     return this.sim.vehicleSession ? this.vehicleControls.aim : this.worldMarkers.aimOr(spell);
   }
   private readonly playerGroundAim = createHudPlayerGroundAim(this);
+  readonly pings = createHudPings(this); // hud/pings/: the Ping key, wheel and feed
   private worldMarkerHost: HudWorldMarkers | null = null;
   private get worldMarkers(): HudWorldMarkers {
     this.worldMarkerHost ??= createHudWorldMarkers(this); // hud/world_markers/
@@ -9302,6 +9296,7 @@ export class Hud {
         this.lastMinimapDrawAt = now;
         this.updateMinimap();
       }
+      this.pings.frame(); // the group's pings: sound, chat line, minimap marks
       this.updateClock();
       this.dayNightDial.paint(now);
       this.updateMinimapCoords();

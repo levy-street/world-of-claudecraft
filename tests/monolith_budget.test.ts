@@ -560,7 +560,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 17726 -> 17709: the raid target icon picker moved to
     // hud/raid_target_menu.ts, paying for the ally marks' menu rows and the
     // party / target-of-target frame wiring.
-    ceiling: 17709,
+    // LOWERED 17709 -> 17704 by the party pings: four dead imports went, paying
+    // for the hud/pings/ field, its import and its fast-band tick.
+    ceiling: 17704,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

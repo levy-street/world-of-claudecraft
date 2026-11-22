@@ -650,6 +650,7 @@ import {
   type PaladinSunVerdictVisual,
   syncPaladinSunVerdictVisual,
 } from './paladin_sun_verdict_visual';
+import { PartyPingLayer, partyPingPrewarmEntry } from './party_pings';
 import { projectionScalePixels } from './perceptual_lod_core';
 import { buildPickOnlyObjectBody, isPickOnlyObjectTemplate } from './pick_only_objects';
 import { PlacedAssetsView } from './placed_assets';
@@ -1429,6 +1430,7 @@ export class Renderer {
   // the local player every frame. See target_cone_debug.ts.
   private targetCone: TargetConeOverlay | null = null;
   private worldMarkers!: WorldMarkerLayer;
+  private pings!: PartyPingLayer; // the group's pings in the world (party_pings.ts)
   // Click markers, AoE impact rings and the ground-aim reticle (ground_feedback.ts).
   private readonly groundFeedback = new GroundFeedback(
     (x, z) => groundHeight(x, z, this.sim.cfg.seed),
@@ -2983,6 +2985,7 @@ export class Renderer {
       lowTier: this.lowGfx,
       boost: this.lowGfx ? 1 : SELECTION_RING_BOOST,
     });
+    this.pings = new PartyPingLayer(this.scene, this.lowGfx, (id) => this.views.get(id));
     for (let i = 0; i < CLICK_MARKER_POOL; i++) {
       const ring = buildAoeRingMesh(aoeRingGeo);
       this.scene.add(ring);
@@ -3381,6 +3384,7 @@ export class Renderer {
     bestEffort(() => this.blobShadows?.dispose());
     this.blobShadows = null;
     bestEffort(() => this.worldMarkers.dispose());
+    bestEffort(() => this.pings.dispose());
     cleanupErrors.push(...(this.dungeons?.disposeAllInteriorResources().errors ?? []));
     bestEffort(() => this.scene.clear());
     const webgl = this.webgl as THREE.WebGLRenderer | undefined;
@@ -5977,6 +5981,10 @@ export class Renderer {
       cleanup: () => this.weather.endPrewarm(),
     });
 
+    const overlayPrewarmHost = {
+      prewarmTexture: (texture: THREE.Texture) => this.prewarmTexture(texture),
+      compileColor: (root: THREE.Object3D) => this.compilePrewarmColorPrograms(root, false),
+    };
     const manifest: PrewarmManifestEntry[] = [
       {
         id: 'views.required',
@@ -6486,10 +6494,8 @@ export class Renderer {
           await Promise.all(castVfxUnits().map((unit) => unit.run()));
         },
       },
-      worldMarkerPrewarmEntry(this.worldMarkers, {
-        prewarmTexture: (texture) => this.prewarmTexture(texture),
-        compileColor: (root) => this.compilePrewarmColorPrograms(root, false),
-      }),
+      worldMarkerPrewarmEntry(this.worldMarkers, overlayPrewarmHost),
+      partyPingPrewarmEntry(this.pings, overlayPrewarmHost),
       {
         // Rideable mounts: worn by whoever is riding one, so the FIRST
         // sighting of any given mount links its programs the moment it
@@ -11185,6 +11191,7 @@ export class Renderer {
       this.time,
       this.reducedMotion(),
     );
+    this.pings.update(this.sim.partyPings(), this.camera, this.time, this.reducedMotion());
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.
     if (this.targetCone) {

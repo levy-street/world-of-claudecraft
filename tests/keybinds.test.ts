@@ -241,7 +241,8 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
     expect(kb.actionForCode('KeyU')).toBe('discord');
     expect(kb.actionForCode('KeyT')).toBe('crafting');
-    expect(kb.actionForCode('KeyY')).toBe(null);
+    // Y was the one free bare letter: the Ping key (held; tap or hold for the wheel).
+    expect(kb.actionForCode('KeyY')).toBe('ping');
     // Bare Z sheathes; the Book of Deeds ships on the shifted layer of the same key.
     expect(kb.actionForCode('KeyZ')).toBe('sheathe');
     expect(kb.actionForCode('Shift+KeyZ')).toBe('deeds');
@@ -470,7 +471,7 @@ describe('snapshot / importBindings (hotkey setup export + import)', () => {
     expect(kb.actionForCode('KeyR')).toBe('slot0');
     expect(kb.codeAt('autorun', 0)).toBe(null); // explicitly unbound by the setup
     expect(kb.actionForCode('Space')).toBe('jump'); // the local rebind did not survive
-    expect(kb.actionForCode('KeyY')).toBe(null);
+    expect(kb.actionForCode('KeyY')).toBe('ping'); // Ping, missing from the setup, keeps its default
     expect(kb.actionForCode('KeyW')).toBe('forward'); // missing action keeps its default
     const reloaded = new Keybinds();
     expect(reloaded.snapshot()).toEqual(kb.snapshot());

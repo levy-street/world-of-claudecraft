@@ -12319,6 +12319,187 @@
     height: 15px;
     flex: none;
   }
+  /* Party pings (src/ui/hud/pings/): the hold wheel centred on the cursor (the
+     root is a zero-size anchor moved by transform; everything inside is placed
+     around it) and the badges on the minimap. Kind colours are the ping tokens. */
+  .ping-wheel {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    z-index: 60;
+    pointer-events: none;
+    --ping-wheel-size: 280px;
+  }
+  .ping-wheel .ping-kind-0 {
+    --ping-color: var(--color-ping-look);
+  }
+  .ping-wheel .ping-kind-1 {
+    --ping-color: var(--color-ping-attack);
+  }
+  .ping-wheel .ping-kind-2 {
+    --ping-color: var(--color-ping-warning);
+  }
+  .ping-wheel .ping-kind-3 {
+    --ping-color: var(--color-ping-on-my-way);
+  }
+  .ping-wheel .ping-kind-4 {
+    --ping-color: var(--color-ping-assist);
+  }
+  .ping-wheel-ring {
+    position: absolute;
+    left: calc(var(--ping-wheel-size) / -2);
+    top: calc(var(--ping-wheel-size) / -2);
+    width: var(--ping-wheel-size);
+    height: var(--ping-wheel-size);
+    overflow: visible;
+    filter: drop-shadow(0 4px 14px color-mix(in srgb, var(--color-ping-glass) 70%, transparent));
+  }
+  .ping-wheel.is-open .ping-wheel-ring,
+  .ping-wheel.is-open .ping-wheel-slot {
+    animation: ping-wheel-open calc(150ms * var(--motion-scale, 1)) cubic-bezier(0.2, 1.4, 0.4, 1)
+      both;
+  }
+  @keyframes ping-wheel-open {
+    from {
+      opacity: 0;
+      scale: 0.72;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+  .ping-wheel-backdrop {
+    fill: color-mix(in srgb, var(--color-ping-glass) 58%, transparent);
+    stroke: color-mix(in srgb, var(--gold) 35%, transparent);
+    stroke-width: 1.5;
+  }
+  .ping-wheel-wedge {
+    fill: color-mix(in srgb, var(--ping-color) 16%, var(--color-ping-glass));
+    fill-opacity: 0.86;
+    stroke: color-mix(in srgb, var(--ping-color) 45%, transparent);
+    stroke-width: 1.5;
+    transition:
+      fill calc(90ms * var(--motion-scale, 1)) ease-out,
+      stroke calc(90ms * var(--motion-scale, 1)) ease-out;
+  }
+  .ping-wheel-wedge.is-lit {
+    fill: color-mix(in srgb, var(--ping-color) 62%, var(--color-ping-glass));
+    fill-opacity: 0.95;
+    stroke: color-mix(in srgb, var(--ping-color) 70%, var(--color-text-light));
+    stroke-width: 3;
+    filter: drop-shadow(0 0 10px var(--ping-color));
+  }
+  .ping-wheel-center circle {
+    fill: color-mix(in srgb, var(--color-ping-glass) 82%, transparent);
+    stroke: color-mix(in srgb, var(--gold) 45%, transparent);
+    stroke-width: 1.5;
+  }
+  .ping-wheel-x {
+    fill: none;
+    stroke: color-mix(in srgb, var(--color-text-light) 70%, transparent);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+  .ping-wheel-center.is-lit circle {
+    stroke: var(--color-hostile);
+    stroke-width: 2.5;
+  }
+  .ping-wheel-center.is-lit .ping-wheel-x {
+    stroke: var(--color-text-light);
+  }
+  .ping-wheel-slot {
+    position: absolute;
+    left: -36px;
+    top: -36px;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .ping-wheel-icon {
+    width: 44px;
+    height: 44px;
+    transition: scale calc(90ms * var(--motion-scale, 1)) ease-out;
+  }
+  .ping-wheel-slot.is-lit .ping-wheel-icon {
+    scale: 1.22;
+  }
+  .ping-wheel-label {
+    font: 700 11px / 1.1 var(--font-ui);
+    letter-spacing: 0.3px;
+    color: var(--color-text-light);
+    text-shadow:
+      0 1px 2px var(--color-ping-glass),
+      0 0 4px var(--color-ping-glass);
+    white-space: nowrap;
+  }
+  .ping-wheel-slot.is-lit .ping-wheel-label {
+    color: var(--ping-color);
+  }
+  .ping-wheel-cancel {
+    position: absolute;
+    left: -40px;
+    top: 16px;
+    width: 80px;
+    text-align: center;
+    font: 600 9px / 1 var(--font-ui);
+    color: color-mix(in srgb, var(--color-text-light) 75%, transparent);
+    opacity: 0;
+  }
+  .ping-wheel.is-center .ping-wheel-cancel {
+    opacity: 1;
+  }
+  .ping-minimap-layer {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 162px;
+    height: 162px;
+    pointer-events: none;
+    line-height: 0;
+  }
+  .ping-minimap-mark {
+    position: absolute;
+    left: -9px;
+    top: -9px;
+    width: 18px;
+    height: 18px;
+  }
+  .ping-minimap-mark img {
+    width: 18px;
+    height: 18px;
+    animation: ping-minimap-pulse calc(1100ms * var(--motion-scale, 1)) ease-out infinite;
+  }
+  .ping-minimap-mark.is-edge img {
+    width: 14px;
+    height: 14px;
+    margin: 2px;
+    opacity: 0.85;
+  }
+  @keyframes ping-minimap-pulse {
+    0% {
+      scale: 1.35;
+    }
+    35% {
+      scale: 1;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ping-wheel.is-open .ping-wheel-ring,
+    .ping-wheel.is-open .ping-wheel-slot,
+    .ping-minimap-mark img {
+      animation: none;
+    }
+  }
   /* The raid's world markers (src/ui/hud/world_markers/): the party-column
      button (the boss guide's family) and its flyout of the eight symbols. */
   .party-world-markers {

@@ -8421,6 +8421,25 @@ export const en_XA: EnTranslations = {
       "bindSet": "[Ɱáŕķ Ţáŕĝéţ: {marker}]",
       "bindClear": "[Çļéáŕ Ţáŕĝéţ Ɱáŕķéŕ]",
       "frameMark": "[Ɱáŕķéð: {marker}]"
+    },
+    "pings": {
+      "bindCategory": "[Þíñĝš]",
+      "bindPing": "[Þíñĝ]",
+      "wheelAria": "[Þíñĝ ŵĥééļ]",
+      "cancel": "[Çáñçéļ]",
+      "kindLook": "[Ļóóķ Ĥéŕé]",
+      "kindAttack": "[Áţţáçķ]",
+      "kindWarning": "[Ŵáŕñíñĝ]",
+      "kindOnMyWay": "[Óñ Ɱý Ŵáý]",
+      "kindAssist": "[Áššíšţ]",
+      "chatPoint": "[{name}: {kind}]",
+      "chatAttackUnit": "[{name}: Áţţáçķ {target}]",
+      "chatAssistUnit": "[{name}: Áššíšţ {target}]",
+      "chatWarningUnit": "[{name}: Ŵáŕñíñĝ, {target}]",
+      "chatOnMyWayUnit": "[{name}: Óñ ɱý ŵáý ţó {target}]",
+      "chatLookUnit": "[{name}: Ļóóķ áţ {target}]",
+      "enableSetting": "[Éñáƀļé Þíñĝš]",
+      "enableSettingNote": "[Ĥóļð ţĥé Þíñĝ ķéý ţó óþéñ ţĥé þíñĝ ŵĥééļ, óŕ ţáþ íţ ţó þíñĝ ŵĥáţ íš úñðéŕ ţĥé çúŕšóŕ. Óñļý ýóúŕ þáŕţý óŕ ŕáíð šééš ýóúŕ þíñĝš, áţ ɱóšţ 4 éʋéŕý 5 šéçóñðš. Ţúŕñíñĝ ţĥíš óƒƒ áļšó ĥíðéš éʋéŕý þíñĝ ƒŕóɱ ýóúŕ ĝŕóúþ: ñó íçóñ, šóúñð, çĥáţ ļíñé óŕ ɱíñíɱáþ ɱáŕķ.]"
     }
   },
   "gatherEvent": {

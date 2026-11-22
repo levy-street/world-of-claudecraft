@@ -2902,3 +2902,61 @@ describe('Input mouse-look jump defenses', () => {
     expect(reset).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('Input ping key (held: press and release reach the HUD)', () => {
+  function withPing() {
+    const made = makeInput();
+    const onPing = vi.fn();
+    (made.cb as Record<string, unknown>).onPing = onPing;
+    return { ...made, onPing };
+  }
+
+  it('the bare Y press and its release report the cursor', () => {
+    const { windowListeners, onPing } = withPing();
+    const preventDefault = vi.fn();
+    windowListeners.get('keydown')!({ code: 'KeyY', repeat: false, preventDefault });
+    expect(onPing).toHaveBeenLastCalledWith('down', expect.any(Number), expect.any(Number));
+    expect(preventDefault).toHaveBeenCalled();
+    windowListeners.get('keyup')!({ code: 'KeyY', preventDefault });
+    expect(onPing).toHaveBeenLastCalledWith('up', expect.any(Number), expect.any(Number));
+    expect(onPing).toHaveBeenCalledTimes(2);
+  });
+
+  it('steps aside for Shift+Y (Cosmetics owns that chord)', () => {
+    const { windowListeners, onPing, cb } = withPing();
+    windowListeners.get('keydown')!({
+      code: 'KeyY',
+      shiftKey: true,
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    expect(onPing).not.toHaveBeenCalled();
+    expect(cb.onUiKey).toHaveBeenCalledWith('cosmetics');
+    windowListeners.get('keyup')!({ code: 'KeyY', preventDefault: vi.fn() });
+    expect(onPing).not.toHaveBeenCalled();
+  });
+
+  it('a lost press cancels (focus loss)', () => {
+    const { windowListeners, onPing } = withPing();
+    windowListeners.get('keydown')!({ code: 'KeyY', repeat: false, preventDefault: vi.fn() });
+    windowListeners.get('blur')!({});
+    expect(onPing).toHaveBeenLastCalledWith('cancel', expect.any(Number), expect.any(Number));
+  });
+
+  it('rebound to G it takes G from the PvP window through the usual eviction', () => {
+    const keybinds = new Keybinds();
+    expect(keybinds.findBindConflict('ping', 0, 'KeyG')).toEqual({
+      id: 'arena',
+      index: 0,
+      code: 'KeyG',
+    });
+    expect(keybinds.bind('ping', 0, 'KeyG')).toBe(true);
+    expect(keybinds.codeAt('arena', 0)).toBe(null);
+    const { windowListeners, cb } = makeInput(undefined, keybinds);
+    const onPing = vi.fn();
+    (cb as Record<string, unknown>).onPing = onPing;
+    windowListeners.get('keydown')!({ code: 'KeyG', repeat: false, preventDefault: vi.fn() });
+    expect(onPing).toHaveBeenLastCalledWith('down', expect.any(Number), expect.any(Number));
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('arena');
+  });
+});

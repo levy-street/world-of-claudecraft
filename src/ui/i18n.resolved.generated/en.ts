@@ -8421,6 +8421,25 @@ export const en: EnTranslations = {
       "bindSet": "Mark Target: {marker}",
       "bindClear": "Clear Target Marker",
       "frameMark": "Marked: {marker}"
+    },
+    "pings": {
+      "bindCategory": "Pings",
+      "bindPing": "Ping",
+      "wheelAria": "Ping wheel",
+      "cancel": "Cancel",
+      "kindLook": "Look Here",
+      "kindAttack": "Attack",
+      "kindWarning": "Warning",
+      "kindOnMyWay": "On My Way",
+      "kindAssist": "Assist",
+      "chatPoint": "{name}: {kind}",
+      "chatAttackUnit": "{name}: Attack {target}",
+      "chatAssistUnit": "{name}: Assist {target}",
+      "chatWarningUnit": "{name}: Warning, {target}",
+      "chatOnMyWayUnit": "{name}: On my way to {target}",
+      "chatLookUnit": "{name}: Look at {target}",
+      "enableSetting": "Enable Pings",
+      "enableSettingNote": "Hold the Ping key to open the ping wheel, or tap it to ping what is under the cursor. Only your party or raid sees your pings, at most 4 every 5 seconds. Turning this off also hides every ping from your group: no icon, sound, chat line or minimap mark."
     }
   },
   "gatherEvent": {

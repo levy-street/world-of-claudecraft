@@ -1151,6 +1151,9 @@ export function buildInterfaceControls(
       // note names what stays on screen whatever this is set to.
       boolToggle(s, 'showDungeonHints', 'hudChrome.options.showDungeonHints'),
       note('hudChrome.options.showDungeonHintsNote'),
+      // Party pings (src/ui/hud/pings/): off disables the key and hides others' pings.
+      boolToggle(s, 'partyPings', 'hudChrome.pings.enableSetting'),
+      note('hudChrome.pings.enableSettingNote'),
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
       boolToggle(
         s,
