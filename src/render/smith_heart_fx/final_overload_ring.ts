@@ -108,8 +108,8 @@ void main() {
   float filled = 1.0 - smoothstep(uSweep - aa, uSweep + aa, f);
   if (uSweep >= 0.999) filled = 1.0;
   float band = smoothstep(0.0, 0.04, u) * (1.0 - smoothstep(0.96, 1.0, u));
-  float groove = exp(-pow((u - 0.06) * 30.0, 2.0)) + exp(-pow((u - 0.94) * 30.0, 2.0));
-  float lip = exp(-pow((u - 0.24) * 34.0, 2.0)) + exp(-pow((u - 0.7) * 34.0, 2.0));
+  float groove = exp(-pow(abs((u - 0.06) * 30.0), 2.0)) + exp(-pow(abs((u - 0.94) * 30.0), 2.0));
+  float lip = exp(-pow(abs((u - 0.24) * 34.0), 2.0)) + exp(-pow(abs((u - 0.7) * 34.0), 2.0));
   float chan = smoothstep(0.25, 0.3, u) * (1.0 - smoothstep(0.64, 0.69, u));
   float tk = fract(f * 20.0);
   float tkd = min(tk, 1.0 - tk) * TAU * r / 20.0;
@@ -196,7 +196,7 @@ void main() {
   float behind = fract(uSweep - f + 1.0);
   float hand = filled * exp(-behind * 40.0) * (1.0 - uCentre);
   float flick = 0.75 + 0.25 * sin(f * 90.0 + uTime * 5.0 + vV * 6.0);
-  float h = pow(1.0 - vV, 2.2) * (0.7 + 0.3 * flick) * (1.0 + hand * 2.5);
+  float h = pow(max(1.0 - vV, 0.0), 2.2) * (0.7 + 0.3 * flick) * (1.0 + hand * 2.5);
   float a = filled * h * uLight * uFlicker * mix(0.8, 0.5 + 0.45 * uPulse, uCentre);
   if (a <= 0.004) discard;
   gl_FragColor = vec4(mix(uColor, uHot, 0.25 + 0.5 * hand) * a * 1.3, a);
@@ -259,9 +259,9 @@ void main() {
   float strand = 0.55 + 0.45 * sin(vUv.x * 6.2831853 * 3.0 + y * 14.0 - uTime * (2.6 + 9.0 * uSurge));
   // The explosion's surge: the column blazing up its whole height, a
   // white-hot front climbing it, the strands racing.
-  float front = exp(-pow((y - uFront) * 9.0, 2.0)) * uSurge;
+  float front = exp(-pow(abs((y - uFront) * 9.0), 2.0)) * uSurge;
   float body = uLevel * top * strand * (1.0 - y * 0.6) + uSurge * strand * 1.1 * (1.0 - y * 0.75) + front * 2.2;
-  float a = body * pow(vRim, 1.4 - 0.6 * uSurge);
+  float a = body * pow(max(vRim, 0.0), 1.4 - 0.6 * uSurge);
   if (a <= 0.004) discard;
   vec3 col = mix(uColor, uHot, clamp(0.35 * (1.0 - y) + 0.55 * uSurge + front, 0.0, 1.0));
   gl_FragColor = vec4(col * a * 1.4, min(a, 1.0));
@@ -305,12 +305,12 @@ void main() {
   float rag = (sn(vec2(ang * 14.0, uTime * 2.0)) - 0.5) * uW * 0.55;
   float d = uR1 + rag - r;
   // The crest: a coloured glow trailing a thin white-hot leading line.
-  float crest = d > 0.0 ? exp(-pow(d / uW, 2.0)) : exp(-pow(d / (uW * 0.3), 2.0));
-  float core = exp(-pow((d - uW * 0.15) / (uW * 0.28), 2.0));
+  float crest = d > 0.0 ? exp(-pow(abs(d / uW), 2.0)) : exp(-pow(abs(d / (uW * 0.3)), 2.0));
+  float core = exp(-pow(abs((d - uW * 0.15) / (uW * 0.28)), 2.0));
   float wake = d > 0.0 ? exp(-d / (uW * 3.0)) * (0.3 + 0.7 * sn(vec2(ang * 22.0, r * 0.6))) : 0.0;
   float streak = 0.65 + 0.35 * sn(vec2(ang * 60.0, 0.0));
   float main1 = (crest * (0.75 + 0.5 * streak) + core * 0.6 + wake * 0.22) * uA1;
-  float ring2 = exp(-pow((uR2 - r) / (uW * 0.3), 2.0)) * uA2;
+  float ring2 = exp(-pow(abs((uR2 - r) / (uW * 0.3)), 2.0)) * uA2;
   float pool = uFlash * exp(-pow(max(r - uInner, 0.0) / 14.0, 2.0)) * 0.9;
   vec3 col = uColor * (wake * 0.5 * uA1 + pool + crest * streak * 1.5 * uA1)
     + uHot * (core * 1.6 * uA1 + ring2 * 1.2);

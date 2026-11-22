@@ -114,7 +114,7 @@ const POOL_FRAGMENT = `
   void main() {
     float r = length(vLocal);
     if (r > 1.32) discard;
-    float core = pow(1.0 - smoothstep(0.0, 1.3, r), 1.35);
+    float core = pow(max(1.0 - smoothstep(0.0, 1.3, r), 0.0), 1.35);
     float d = (r - 0.95) / 0.13;
     float rim = exp(-d * d);
     float a = (core * 0.42 + rim * 0.18) * uFlare;
@@ -168,8 +168,8 @@ const BEAM_FRAGMENT = `
     if (near < 0.003) discard;
     float h = vUv.y;
     // Rises out of the floor pool (no hard ring where it meets the floor).
-    float fall = pow(1.0 - h, 1.7) * (0.55 + 0.45 * smoothstep(0.0, 0.06, h));
-    float body = pow(vFacing, 1.6);
+    float fall = pow(max(1.0 - h, 0.0), 1.7) * (0.55 + 0.45 * smoothstep(0.0, 0.06, h));
+    float body = pow(max(vFacing, 0.0), 1.6);
     float ang = vUv.x * 6.2831853;
     float s = 0.5 + 0.5 * sin(ang * 7.0 + sin(h * 4.0 - uTime * 0.9 + uPhase) * 1.7);
     float streak = 0.72 + 0.56 * s * s * s;
