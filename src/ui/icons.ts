@@ -6314,6 +6314,28 @@ function raidSkullPath(ctx: Ctx): void {
   ctx.closePath();
 }
 
+// A crescent moon (Jose's playtest call of 2026-11-22: "a plain crescent"):
+// the outer disc's long arc, then back along the carving disc's inner arc,
+// as ONE closed path so the outline follows the crescent and nothing else.
+// The carve sits up and right, so the horns open toward the upper right.
+function raidCrescentPath(ctx: Ctx): void {
+  const R = 38; // the moon
+  const r = 32; // the carving disc
+  const d = 15; // their centres' distance
+  const tilt = (-25 * Math.PI) / 180;
+  const cx = d * Math.cos(tilt);
+  const cy = d * Math.sin(tilt);
+  const phi = Math.acos((R * R - r * r + d * d) / (2 * d * R));
+  const t1 = tilt + phi;
+  const t2 = tilt - phi;
+  const a1 = Math.atan2(R * Math.sin(t1) - cy, R * Math.cos(t1) - cx);
+  const a2 = Math.atan2(R * Math.sin(t2) - cy, R * Math.cos(t2) - cx);
+  ctx.beginPath();
+  ctx.arc(0, 0, R, t1, t2 + TAU, false); // the long way round, away from the carve
+  ctx.arc(cx, cy, r, a2, a1, true); // the bite's edge, inside the moon
+  ctx.closePath();
+}
+
 // Outline a single closed path, then fill it — the centered stroke leaves a
 // crisp dark border once the fill paints over its inner half.
 function raidStrokeFill(ctx: Ctx, fill: string): void {
@@ -6354,21 +6376,10 @@ function drawRaidMarker(ctx: Ctx, idx: number): void {
       ctx.closePath();
       raidStrokeFill(ctx, fill);
       break;
-    case 4: {
-      // moon — a dark crescent with a slightly inset colored one on top
-      const crescent = (outerR: number, carveX: number, carveR: number): void => {
-        ctx.beginPath();
-        ctx.arc(-4, 0, outerR, 0, TAU, false);
-        ctx.arc(carveX, 0, carveR, 0, TAU, true); // opposite winding carves a bite
-      };
-      crescent(40, 20, 40);
-      ctx.fillStyle = RAID_MARKER_OUTLINE;
-      ctx.fill();
-      crescent(34, 23, 40);
-      ctx.fillStyle = fill;
-      ctx.fill();
+    case 4: // moon: a clean crescent, outlined like the other symbols
+      raidCrescentPath(ctx);
+      raidStrokeFill(ctx, fill);
       break;
-    }
     case 5: // square
       ctx.beginPath();
       ctx.rect(-34, -34, 68, 68);
