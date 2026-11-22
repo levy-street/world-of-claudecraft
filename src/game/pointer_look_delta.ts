@@ -1,30 +1,46 @@
 // Normalize pointer mouse-look deltas to one cross-browser unit.
 //
 // MouseEvent.movementX / movementY are NOT reported in the same unit across
-// engines (w3c/pointerlock#42, #23; w3c/uievents#40):
-//   - Chromium reports them in PHYSICAL device pixels, independent of both the
-//     OS device-scale-factor and the page zoom.
+// engines and platforms (w3c/pointerlock#42, #23; w3c/uievents#40):
+//   - Chromium on Windows and Linux reports them in PHYSICAL device pixels,
+//     independent of both the OS device-scale-factor and the page zoom.
 //   - Gecko (Firefox) reports them in CSS pixels, i.e. physical pixels divided
 //     by devicePixelRatio (which folds in the OS HiDPI scale AND the page zoom).
+//   - Chrome on macOS reports them in points (CSS pixels at 100% zoom).
+//     Measured on a Retina Mac in Chrome: the summed movementX of a drag
+//     equalled the CSS-pixel cursor travel at devicePixelRatio 2, so mouse-look
+//     ran at half the speed it does on Windows. Safari and the Electron shell
+//     on macOS take the same OS event path and are treated the same way.
 // By definition devicePixelRatio is exactly the physical-per-CSS-pixel ratio, so
-// on any display where it is not 1 (a retina Mac, a scaled Windows desktop, or
-// any non-100% browser zoom) the same physical mouse motion yields a Gecko delta
-// that is 1/devicePixelRatio of the Chromium delta, so the camera rotates at the
-// wrong speed there while Chromium feels correct. Mouse-look sensitivity is tuned
-// against the Chromium physical-pixel unit, so we convert Gecko's CSS-pixel delta
-// back to physical pixels by multiplying by devicePixelRatio. Every other engine
-// is a pass-through, so Chromium and WebKit behavior is byte-for-byte unchanged.
+// on any display where it is not 1 (a retina Mac, a scaled desktop, or any
+// non-100% browser zoom) a CSS-pixel delta is 1/devicePixelRatio of the physical
+// delta for the same motion. Mouse-look sensitivity is tuned against the
+// physical-pixel unit, so CSS-pixel deltas are converted back by multiplying by
+// devicePixelRatio. Windows/Linux Chromium is a pass-through, unchanged.
 //
-// Pure and DOM-free (the caller passes the engine flag and the live ratio) so it
+// Pure and DOM-free (the caller passes the unit flag and the live ratio) so it
 // unit-tests without a browser, the same pattern as pointer_lock.ts / click_move.ts.
+
+import { detectBrowserEngine } from './browser_env';
+
+/**
+ * Whether this user agent reports movementX/movementY in CSS pixels rather than
+ * physical pixels: Firefox on every OS, and every engine on macOS. Pure; the
+ * caller reads it once per session (neither the engine nor the OS changes).
+ */
+export function pointerLookReportsCssPixels(userAgent: string): boolean {
+  const ua = userAgent || '';
+  if (detectBrowserEngine(ua).engine === 'gecko') return true;
+  return /Macintosh|Mac OS X/.test(ua) && !/iPhone|iPad|iPod/.test(ua);
+}
 
 export interface PointerLookDeltaInput {
   /** Raw event.movementX. */
   readonly movementX: number;
   /** Raw event.movementY. */
   readonly movementY: number;
-  /** True only for the Gecko/Firefox engine (the one that reports CSS pixels). */
-  readonly isGecko: boolean;
+  /** True when the deltas arrive in CSS pixels (see pointerLookReportsCssPixels). */
+  readonly reportsCssPixels: boolean;
   /** window.devicePixelRatio at read time (OS scale multiplied by page zoom). */
   readonly devicePixelRatio: number;
 }
@@ -35,15 +51,15 @@ export interface PointerLookDelta {
 }
 
 /**
- * Convert a raw movementX/movementY pair into the Chromium physical-pixel unit
- * the mouse-look sensitivity is tuned against. Only Gecko diverges, so for every
- * other engine this returns the deltas unchanged (Chromium/WebKit parity). A
+ * Convert a raw movementX/movementY pair into the physical-pixel unit the
+ * mouse-look sensitivity is tuned against. Deltas already in physical pixels
+ * (Chromium on Windows and Linux) come back unchanged. A
  * non-finite or non-positive ratio falls back to 1 so a bogus reading can never
  * scale the delta to zero (frozen camera) or blow it up.
  */
 export function normalizePointerLookDelta(input: PointerLookDeltaInput): PointerLookDelta {
-  const { movementX, movementY, isGecko, devicePixelRatio } = input;
-  if (!isGecko) return { dx: movementX, dy: movementY };
+  const { movementX, movementY, reportsCssPixels, devicePixelRatio } = input;
+  if (!reportsCssPixels) return { dx: movementX, dy: movementY };
   const dpr = Number.isFinite(devicePixelRatio) && devicePixelRatio > 0 ? devicePixelRatio : 1;
   return { dx: movementX * dpr, dy: movementY * dpr };
 }

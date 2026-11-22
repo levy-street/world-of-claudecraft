@@ -7,7 +7,70 @@ import {
   LOOK_SPIKE_RATIO,
   LookDeltaGuard,
   normalizePointerLookDelta,
+  pointerLookReportsCssPixels,
 } from '../src/game/pointer_look_delta';
+
+// Real user agents, so the detection is pinned against what browsers send.
+const UA = {
+  chromeMac:
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36',
+  safariMac:
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Safari/605.1.15',
+  electronMac:
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) WorldOfClaudeCraft/0.46.0 Chrome/140.0.0.0 Electron/38.0.0 Safari/537.36',
+  firefoxMac:
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0',
+  chromeWindows:
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36',
+  edgeWindows:
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36 Edg/157.0.0.0',
+  firefoxWindows:
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0',
+  iPhoneSafari:
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1',
+  iPadSafari:
+    'Mozilla/5.0 (iPad; CPU OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1',
+  chromeLinux:
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36',
+};
+
+describe('pointerLookReportsCssPixels', () => {
+  it('is true on macOS for every engine (Chrome, Safari, the Electron shell, Firefox)', () => {
+    // Measured on a Retina Mac in Chrome 157: summed movementX equalled the
+    // CSS-pixel cursor travel (ratio 1.00 at devicePixelRatio 2), so macOS
+    // reports points, not the physical pixels Windows Chromium reports.
+    expect(pointerLookReportsCssPixels(UA.chromeMac)).toBe(true);
+    expect(pointerLookReportsCssPixels(UA.safariMac)).toBe(true);
+    expect(pointerLookReportsCssPixels(UA.electronMac)).toBe(true);
+    expect(pointerLookReportsCssPixels(UA.firefoxMac)).toBe(true);
+  });
+
+  it('is true for Firefox on any OS (Gecko reports CSS pixels, #1834)', () => {
+    expect(pointerLookReportsCssPixels(UA.firefoxWindows)).toBe(true);
+  });
+
+  it('is false for Chromium on Windows and Linux (physical pixels, the tuned unit)', () => {
+    expect(pointerLookReportsCssPixels(UA.chromeWindows)).toBe(false);
+    expect(pointerLookReportsCssPixels(UA.edgeWindows)).toBe(false);
+    expect(pointerLookReportsCssPixels(UA.chromeLinux)).toBe(false);
+  });
+
+  it('is false on iOS, whose user agent also says "Mac OS X"', () => {
+    expect(pointerLookReportsCssPixels(UA.iPhoneSafari)).toBe(false);
+    expect(pointerLookReportsCssPixels(UA.iPadSafari)).toBe(false);
+  });
+
+  it('treats an iPad in desktop mode as a Mac (its user agent is identical to Mac Safari)', () => {
+    // Only a pointer-locked mouse or trackpad drag reaches mouse-look there,
+    // and that also reports points, so the Mac correction is the right one.
+    expect(pointerLookReportsCssPixels(UA.safariMac)).toBe(true);
+  });
+
+  it('is false for an empty or unknown user agent (pass-through is the safe default)', () => {
+    expect(pointerLookReportsCssPixels('')).toBe(false);
+    expect(pointerLookReportsCssPixels('curl/8.0')).toBe(false);
+  });
+});
 
 describe('normalizePointerLookDelta', () => {
   it('is identity on Chromium (physical pixels already, any devicePixelRatio)', () => {
@@ -16,7 +79,7 @@ describe('normalizePointerLookDelta', () => {
       normalizePointerLookDelta({
         movementX: 12,
         movementY: -7,
-        isGecko: false,
+        reportsCssPixels: false,
         devicePixelRatio: 2,
       }),
     ).toEqual({ dx: 12, dy: -7 });
@@ -24,7 +87,7 @@ describe('normalizePointerLookDelta', () => {
       normalizePointerLookDelta({
         movementX: 12,
         movementY: -7,
-        isGecko: false,
+        reportsCssPixels: false,
         devicePixelRatio: 1,
       }),
     ).toEqual({ dx: 12, dy: -7 });
@@ -35,7 +98,7 @@ describe('normalizePointerLookDelta', () => {
       normalizePointerLookDelta({
         movementX: 12,
         movementY: -7,
-        isGecko: true,
+        reportsCssPixels: true,
         devicePixelRatio: 1,
       }),
     ).toEqual({ dx: 12, dy: -7 });
@@ -45,7 +108,12 @@ describe('normalizePointerLookDelta', () => {
     // The reported Firefox bug: on a retina/HiDPI display Firefox reports half
     // the delta Chrome does, so multiplying by the ratio restores parity.
     expect(
-      normalizePointerLookDelta({ movementX: 5, movementY: 3, isGecko: true, devicePixelRatio: 2 }),
+      normalizePointerLookDelta({
+        movementX: 5,
+        movementY: 3,
+        reportsCssPixels: true,
+        devicePixelRatio: 2,
+      }),
     ).toEqual({ dx: 10, dy: 6 });
   });
 
@@ -54,7 +122,7 @@ describe('normalizePointerLookDelta', () => {
       normalizePointerLookDelta({
         movementX: 4,
         movementY: 4,
-        isGecko: true,
+        reportsCssPixels: true,
         devicePixelRatio: 1.5,
       }),
     ).toEqual({ dx: 6, dy: 6 });
@@ -66,16 +134,36 @@ describe('normalizePointerLookDelta', () => {
     const chrome = normalizePointerLookDelta({
       movementX: physical,
       movementY: 0,
-      isGecko: false,
+      reportsCssPixels: false,
       devicePixelRatio: dpr,
     });
     const firefox = normalizePointerLookDelta({
       movementX: physical / dpr, // Firefox reports CSS pixels for the same motion
       movementY: 0,
-      isGecko: true,
+      reportsCssPixels: true,
       devicePixelRatio: dpr,
     });
     expect(firefox.dx).toBe(chrome.dx);
+  });
+
+  it('reaches Windows parity on a Retina Mac: Chrome on macOS turns as far as Chrome on Windows', () => {
+    // The Mac bug: the same physical motion gave half the delta on a 2x Mac.
+    const dpr = 2;
+    const physical = 30;
+    const windows = normalizePointerLookDelta({
+      movementX: physical,
+      movementY: physical,
+      reportsCssPixels: pointerLookReportsCssPixels(UA.chromeWindows),
+      devicePixelRatio: dpr,
+    });
+    const mac = normalizePointerLookDelta({
+      movementX: physical / dpr,
+      movementY: physical / dpr,
+      reportsCssPixels: pointerLookReportsCssPixels(UA.chromeMac),
+      devicePixelRatio: dpr,
+    });
+    expect(mac).toEqual(windows);
+    expect(mac).toEqual({ dx: physical, dy: physical });
   });
 
   it('falls back to identity on a non-finite or non-positive ratio (never freezes or blows up the camera)', () => {
@@ -84,7 +172,7 @@ describe('normalizePointerLookDelta', () => {
         normalizePointerLookDelta({
           movementX: 9,
           movementY: 2,
-          isGecko: true,
+          reportsCssPixels: true,
           devicePixelRatio: bad,
         }),
       ).toEqual({ dx: 9, dy: 2 });
