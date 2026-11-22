@@ -58,13 +58,25 @@ describe('Aegis of the First Dawn', () => {
     summonPet(sim.ctx, friend, 'forest_wolf');
     const pet = petOf(sim.ctx, friendId)!;
     pet.pos = { ...sim.player.pos };
+    const protectedNow = (entity: Entity) =>
+      entity.auras.some((a) => a.id.startsWith('aegis_first_dawn_dr:'));
     const los = vi.spyOn(sim.ctx, 'hasLineOfSight');
     sim.castAbility('aegis_first_dawn');
+    // The nonparty ally in the dome is protected; the opponent and the pet are not.
+    expect(protectedNow(friend)).toBe(true);
+    expect(protectedNow(foe)).toBe(false);
     expect(pet.auras.some((a) => a.id.startsWith('aegis_first_dawn_dr:'))).toBe(false);
+    // Line of sight blocked for that tick: the ally loses it...
     los.mockImplementation((source, target) => target.id !== friendId);
     sim.tick();
+    expect(protectedNow(friend)).toBe(false);
+    expect(protectedNow(foe)).toBe(false);
+    // ...and regains it once the dome can see them again.
     los.mockReturnValue(true);
     sim.tick();
+    expect(protectedNow(friend)).toBe(true);
+    expect(protectedNow(foe)).toBe(false);
+    expect(protectedNow(pet)).toBe(false);
     los.mockRestore();
   });
 

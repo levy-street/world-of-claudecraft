@@ -215,9 +215,16 @@ it("bears the caster's spec icon, Faithwarden when the spec is unknown", () => {
 });
 
 it('draws the approved spec icon atlas in the sigil and the ward plates once it has loaded', () => {
-  const png = readFileSync(new URL(`../public${PALADIN_SPEC_ICONS_URL}`, import.meta.url));
+  // A lossless WebP (VP8L): the distance field must survive exactly.
+  const webp = readFileSync(new URL(`../public${PALADIN_SPEC_ICONS_URL}`, import.meta.url));
+  expect(webp.toString('ascii', 0, 4)).toBe('RIFF');
+  expect(webp.toString('ascii', 12, 16)).toBe('VP8L');
+  // VP8L packs (width - 1) and (height - 1) as 14-bit fields after its signature byte.
+  const bits = webp.readUInt32LE(21);
+  const width = (bits & 0x3fff) + 1;
+  const height = ((bits >>> 14) & 0x3fff) + 1;
   // Three icon cells side by side.
-  expect(png.readUInt32BE(16)).toBe(png.readUInt32BE(20) * 3);
+  expect(width).toBe(height * 3);
   const scene = new THREE.Scene();
   const anchor = (_id: number, fraction: number, out = new THREE.Vector3()) =>
     out.set(0, fraction * 2, 0);

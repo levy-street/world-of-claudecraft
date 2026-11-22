@@ -18,6 +18,8 @@ export interface PaladinPresenceFx {
 
 export interface PaladinPresenceEntity {
   id: number;
+  /** The class template: a Paladin is always fed (its casts, its flight). */
+  templateId?: string;
   dead: boolean;
   castingAbility: string | null;
   castRemaining: number;
@@ -82,6 +84,50 @@ export function drivePaladinPresence(
   const flight = valkyrFlightElapsed(e);
   fx.valkyrsCallingFlying?.(e.id, flight !== null && !e.dead);
   return flight;
+}
+
+/**
+ * Whether one of an entity's auras may be a Paladin's: a holy aura, or one a
+ * Paladin put on it (its physical strikes leave marks too). Read inside the
+ * renderer's one aura pass per entity, so the presence pass below can skip
+ * every body no Paladin has touched without a pass of its own.
+ */
+export function paladinSourcedAura(
+  aura: { school: string; sourceId: number },
+  entities: ReadonlyMap<number, { templateId: string }>,
+): boolean {
+  return aura.school === 'holy' || entities.get(aura.sourceId)?.templateId === 'paladin';
+}
+
+/** Bodies fed last frame beyond this many are forgotten at once (despawned
+ * while touched): the cost of the miss is one cleanup pass, never a draw. */
+const FED_CAP = 2048;
+
+/**
+ * drivePaladinPresence for the bodies that need it: a Paladin, or a body
+ * wearing a Paladin's aura (`touched`, from paladinSourcedAura), plus one more
+ * frame for a body that was fed last frame, so a held effect sees its aura go.
+ * Everyone else costs a Set lookup, and the Recall the Fallen death watch,
+ * which listens to every body while it runs.
+ */
+export class PaladinPresenceDriver {
+  private readonly fed = new Set<number>();
+
+  drive(
+    fx: PaladinPresenceFx,
+    e: PaladinPresenceEntity,
+    visuallyDead: boolean,
+    touched: boolean,
+  ): number | null {
+    if (touched || e.templateId === 'paladin') {
+      if (this.fed.size >= FED_CAP && !this.fed.has(e.id)) this.fed.clear();
+      this.fed.add(e.id);
+    } else if (!this.fed.delete(e.id)) {
+      if (fx.recallTheFallenListening()) fx.recallTheFallenWatch(e.id, visuallyDead);
+      return null;
+    }
+    return drivePaladinPresence(fx, e, visuallyDead);
+  }
 }
 
 export interface ValkyrFlightBody {

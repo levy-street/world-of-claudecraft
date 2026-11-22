@@ -336,6 +336,7 @@ export class SunVerdictLance {
         }
       `,
     });
+    material.name = 'sun_verdict_lance:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'sun-verdict-descending-sword';
     this.mesh.userData.renderCategory = 'vfx';
@@ -459,6 +460,9 @@ export class SunVerdictLance {
     }
   }
 
+  /** Per-frame scratch: camera right, up and view direction. */
+  private readonly cameraBasis: number[] = new Array(9).fill(0);
+
   update(dt: number, reduced = false): void {
     if (this.disposed) return;
     this.vertex = 0;
@@ -469,9 +473,23 @@ export class SunVerdictLance {
     const rl = Math.hypot(rx, rz) || 1;
     const hx = rx / rl,
       hz = rz / rl;
-    const cam = e
-      ? [e[0], e[1], e[2], e[4], e[5], e[6], -e[8], -e[9], -e[10]]
-      : [1, 0, 0, 0, 1, 0, 0, 0, -1];
+    const cam = this.cameraBasis;
+    if (e) {
+      cam[0] = e[0];
+      cam[1] = e[1];
+      cam[2] = e[2];
+      cam[3] = e[4];
+      cam[4] = e[5];
+      cam[5] = e[6];
+      cam[6] = -e[8];
+      cam[7] = -e[9];
+      cam[8] = -e[10];
+    } else {
+      cam.fill(0);
+      cam[0] = 1;
+      cam[4] = 1;
+      cam[8] = -1;
+    }
     const length = SUN_VERDICT_LANCE_LENGTH;
     const lanceHalf = (length / BRAND_SPAN) * BRAND_HALF_WIDTH;
     for (const s of this.slots) {

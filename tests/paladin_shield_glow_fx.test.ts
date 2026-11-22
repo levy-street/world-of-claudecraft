@@ -61,6 +61,30 @@ describe("Bastion Sweep's glowing shield layer", () => {
     expect(shield.parent).toBe(hand);
   });
 
+  it('builds its layers hidden ahead of the first glow, and the glow mounts nothing new', () => {
+    const model = new THREE.Group();
+    const hand = new THREE.Group();
+    hand.name = 'handslotl';
+    model.add(hand);
+    const shield = new THREE.Mesh(
+      new THREE.BoxGeometry(0.6, 0.9, 0.1),
+      new THREE.MeshBasicMaterial(),
+    );
+    hand.add(shield);
+    const fx = new PaladinShieldGlowFx(model);
+    fx.prepare();
+    const layer = shield.getObjectByName('paladinShieldGlow') as THREE.Mesh;
+    // Built when the gear is (the rig's compile gate takes it), hidden until lit.
+    expect(layer).toBeDefined();
+    expect(layer.visible).toBe(false);
+    fx.prepare();
+    expect(shield.children.filter((c) => c.name === 'paladinShieldGlow')).toHaveLength(1);
+    fx.update(0.2, 0.8, 0.016);
+    expect(shield.getObjectByName('paladinShieldGlow')).toBe(layer);
+    expect(layer.visible).toBe(true);
+    fx.dispose();
+  });
+
   it('flares as Bastion Rite lands, glows while it holds and fades as it runs out', () => {
     const model = new THREE.Group();
     const hand = new THREE.Group();

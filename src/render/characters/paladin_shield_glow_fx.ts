@@ -104,6 +104,79 @@ const FRAGMENT = `
   }
 `;
 
+/** The glow layer's material: one program for every layer, shield and weapon
+ * alike (the boot stand-in below holds it), per-layer values in its uniforms. */
+function shieldGlowMaterial(
+  mark: number,
+  spec: number,
+  push: number,
+  center: THREE.Vector3,
+  half: THREE.Vector3,
+): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    name: 'paladin_shield_glow_fx:layer',
+    uniforms: {
+      ...paladinSpecIconUniforms(),
+      uGlow: { value: 0 },
+      uFlash: { value: 0 },
+      uTime: { value: 0 },
+      uFront: { value: 1 },
+      uUp: { value: 1 },
+      uMark: { value: mark },
+      uSpec: { value: spec },
+      uPush: { value: push },
+      uCenter: { value: center },
+      uHalf: { value: half },
+    },
+    vertexShader: VERTEX,
+    fragmentShader: FRAGMENT,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
+  });
+}
+
+/**
+ * The boot manifest's stand-in: one hidden layer over a small box (a geometry
+ * with normals, like every layer: one without gets its own normals first),
+ * never disposed, so the layer program is linked behind the loading cover and
+ * stays referenced while live layers come and go with the shields they light.
+ * Registered in ABILITY_MATERIAL_SOURCES.
+ */
+interface PaladinShieldGlowStandIn {
+  root: THREE.Group;
+  materials: THREE.Material[];
+}
+let paladinShieldGlowStandIn: PaladinShieldGlowStandIn | null = null;
+
+export function buildPaladinShieldGlowStandIn(): PaladinShieldGlowStandIn {
+  if (!paladinShieldGlowStandIn) {
+    const root = new THREE.Group();
+    root.name = 'paladin-shield-glow-stand-in';
+    root.visible = false;
+    const material = shieldGlowMaterial(
+      1,
+      FAITHWARDEN,
+      0.01,
+      new THREE.Vector3(),
+      new THREE.Vector3(0.5, 0.5, 0.5),
+    );
+    const layer = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+    layer.name = 'paladinShieldGlow';
+    root.add(layer);
+    paladinShieldGlowStandIn = { root, materials: [material] };
+  }
+  return paladinShieldGlowStandIn;
+}
+
+export function paladinShieldGlowStandInMaterials(): readonly THREE.Material[] {
+  return buildPaladinShieldGlowStandIn().materials;
+}
+
 interface Layer {
   source: THREE.Mesh;
   mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
@@ -155,6 +228,13 @@ export class PaladinShieldGlowFx {
     return held ?? first;
   }
 
+  /** Builds the layers for what the hand holds now, hidden, so a first glow
+   * mounts nothing: the visual calls it once the rig is built and again after
+   * every weapon attach, ahead of the compile gate where the rig is new. */
+  prepare(): void {
+    this.sync();
+  }
+
   /** Lays a layer over every shield mesh in the off hand that has none yet,
    * and drops the layers of shields no longer held. */
   private sync(): void {
@@ -186,30 +266,13 @@ export class PaladinShieldGlowFx {
       const box = geometry.boundingBox ?? new THREE.Box3();
       const center = box.getCenter(new THREE.Vector3());
       const half = box.getSize(new THREE.Vector3()).multiplyScalar(0.5);
-      const material = new THREE.ShaderMaterial({
-        uniforms: {
-          ...paladinSpecIconUniforms(),
-          uGlow: { value: 0 },
-          uFlash: { value: 0 },
-          uTime: { value: 0 },
-          uFront: { value: 1 },
-          uUp: { value: 1 },
-          uMark: { value: this.side === 'left' ? 1 : 0 },
-          uSpec: { value: this.spec },
-          uPush: { value: Math.max(half.x, half.y, half.z) * 0.02 },
-          uCenter: { value: center },
-          uHalf: { value: half },
-        },
-        vertexShader: VERTEX,
-        fragmentShader: FRAGMENT,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        toneMapped: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -2,
-        polygonOffsetUnits: -2,
-      });
+      const material = shieldGlowMaterial(
+        this.side === 'left' ? 1 : 0,
+        this.spec,
+        Math.max(half.x, half.y, half.z) * 0.02,
+        center,
+        half,
+      );
       const layer = new THREE.Mesh(geometry, material);
       layer.name = 'paladinShieldGlow';
       layer.userData.paladinShieldGlow = true;

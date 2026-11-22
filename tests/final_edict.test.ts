@@ -8,6 +8,7 @@ import {
 import * as contact from '../src/render/ability_vfx/contact_assets';
 import { EDICT_SHAPE, FinalEdict } from '../src/render/ability_vfx/final_edict';
 import { AbilityVfx, type AbilityVfxDamageEvent } from '../src/render/ability_vfx/painter';
+import { setPaladinSpecIconsForTest } from '../src/render/ability_vfx/paladin_spec_icons';
 import { collectAbilityVfxCompileTargets } from '../src/render/ability_vfx/prewarm';
 import * as assets from '../src/render/ability_vfx/production_assets';
 import {
@@ -230,6 +231,11 @@ describe('Final Edict confirmed contact', () => {
       queue: queue as never,
       geometry,
       texture: vi.fn(),
+      // The Paladin kit's demand load stands its spec-icon atlas in.
+      paladinAssets: async () => {
+        setPaladinSpecIconsForTest(texture, false);
+        return true;
+      },
     });
     const first = ensureActiveAbilityKit(f.scene, 'warrior');
     const second = ensureActiveAbilityKit(f.scene, 'paladin');
@@ -240,6 +246,7 @@ describe('Final Edict confirmed contact', () => {
     expect(f.host.draw).toHaveBeenCalledTimes(1);
     expect(geometry).toHaveBeenCalledWith([], 'paladin');
     cancelActiveAbilityKit(f.scene);
+    setPaladinSpecIconsForTest(null);
     f.effect.dispose();
     texture.dispose();
     vi.restoreAllMocks();
@@ -250,14 +257,18 @@ describe('Final Edict confirmed contact', () => {
     expect(f.effect.spawn(1, 2, 'damage', false)).toBe(false);
     expect(collectAbilityVfxCompileTargets(f.scene).map((t) => t.object)).toContain(f.effect.mesh);
     const queue = { run: vi.fn(async (run: () => unknown) => run()) };
+    const atlas = new THREE.Texture();
     activeKitPrewarmEntry(f.scene, 'paladin', {
       queue: queue as never,
       geometry: (_kinds, kit) => {
         expect(kit).toBe('paladin');
         return f.effect.preparation.units(f.host);
       },
-      texture: () => {
-        throw new Error('Final Edict needs no textures');
+      // The kit's one texture is its spec-icon atlas.
+      texture: (texture) => expect(texture).toBe(atlas),
+      paladinAssets: async () => {
+        setPaladinSpecIconsForTest(atlas, false);
+        return true;
       },
     });
     await ensureActiveAbilityKit(f.scene);
@@ -269,6 +280,7 @@ describe('Final Edict confirmed contact', () => {
     await ensureActiveAbilityKit(f.scene);
     expect(f.host.draw).toHaveBeenCalledTimes(1);
     cancelActiveAbilityKit(f.scene);
+    setPaladinSpecIconsForTest(null);
     f.effect.dispose();
   });
 });

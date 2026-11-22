@@ -301,6 +301,7 @@ export class SunderingGavel {
         }
       `,
     });
+    material.name = 'sundering_gavel:light';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'sundering-gavel-light';
     this.mesh.userData.renderCategory = 'vfx';
@@ -353,6 +354,7 @@ export class SunderingGavel {
         }
       `,
     });
+    gavelMaterial.name = 'sundering_gavel:gavel';
     for (let i = 0; i < GAVEL_STRIKES; i++) {
       const strikeMaterial = i ? gavelMaterial.clone() : gavelMaterial;
       for (let k = 0; k < GAVEL_COUNT; k++) {
@@ -449,9 +451,10 @@ export class SunderingGavel {
       c[8] = -e[10];
     }
     for (const gavel of this.gavels) gavel.visible = false;
-    this.strikes.forEach((s, i) => {
+    for (let i = 0; i < this.strikes.length; i++) {
+      const s = this.strikes[i];
       if (s.active) this.strike1(s, i, dt, reduced);
-    });
+    }
     for (const h of this.holds) if (h.active) this.hold1(h, dt, reduced);
     this.mesh.geometry.setDrawRange(0, this.vertex);
     this.mesh.visible = this.vertex > 0;

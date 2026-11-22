@@ -144,6 +144,23 @@ export function abilityVfxGateMaterials(root: THREE.Object3D): THREE.Material[] 
  *  other pool, so the unit and the gate entry name the same object. A
  *  `declined` family's drawables never draw on this device, so they get no
  *  unit. */
+/** The userData flag of a drawable whose class kit links it in its own
+ *  recipe (the Paladin kit's pools, active_kit_prewarm.ts): it refuses to draw
+ *  until that recipe ran, so the boot walk below must not link it for every
+ *  class on every device. */
+const OWN_KIT_PREPARATION = 'ownKitPreparation';
+
+/** Marks `root` and its subtree as linked by its kit's own recipe. */
+export function markOwnKitPreparation(root: THREE.Object3D): void {
+  root.traverse((object) => {
+    object.userData[OWN_KIT_PREPARATION] = true;
+  });
+}
+
+function ownKitPreparation(object: THREE.Object3D): boolean {
+  return object.userData?.[OWN_KIT_PREPARATION] === true;
+}
+
 export function collectAbilityVfxCompileTargets(
   root: THREE.Object3D,
   declined: readonly CastVfxFamilyId[] = [],
@@ -152,7 +169,11 @@ export function collectAbilityVfxCompileTargets(
   const gated = CAST_VFX_FAMILIES.filter(({ id }) => !declined.includes(id)).flatMap(({ id }) =>
     pooledPrograms(root, (object) => inCastVfxFamily(object, id), seen),
   );
-  const rest = pooledPrograms(root, (object) => castVfxFamilyBitOf(object) === 0, seen);
+  const rest = pooledPrograms(
+    root,
+    (object) => castVfxFamilyBitOf(object) === 0 && !ownKitPreparation(object),
+    seen,
+  );
   return [...gated, ...rest].map((entry, index) => ({
     id: `${entry.object.name || entry.object.type}:${index}`,
     object: entry.object,

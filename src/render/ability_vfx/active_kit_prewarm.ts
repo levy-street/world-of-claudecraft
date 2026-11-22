@@ -5,6 +5,12 @@ import type { PrewarmManifestEntry } from '../prewarm_entry';
 import type { PrewarmResumeUnit } from '../prewarm_resume';
 import { contactTexture } from './contact_assets';
 import {
+  ensurePaladinSpecIcons,
+  markPaladinSpecIconsCold,
+  markPaladinSpecIconsUploaded,
+  paladinSpecIconsTexture,
+} from './paladin_spec_icons';
+import {
   bakedTexture,
   warriorBloodTexture,
   warriorPressureTexture,
@@ -56,9 +62,11 @@ interface ActiveKitHost {
   queue: Pick<BackgroundGpuQueue, 'run'>;
   /** Start (or join) the Warrior kit's demand-loaded assets before any unit
    *  runs; false means the device declined them, so the kit stays cold and no
-   *  unit runs. Absent in tests that inject textures directly. The Paladin
-   *  kit loads no sheets, so its recipe never asks. */
+   *  unit runs. Absent in tests that inject textures directly. */
   assets?(): Promise<boolean>;
+  /** The Paladin kit's demand load (its spec-icon atlas). Defaults to
+   *  `ensurePaladinSpecIcons`; tests inject their own. */
+  paladinAssets?(): Promise<boolean>;
   /** The authored preparation units: the Warrior crests for `kinds`, or with
    *  `kit` 'paladin' the Paladin kit's own pools (`kinds` ignored). */
   geometry(kinds: readonly CrestKind[], kit?: string): readonly PrewarmResumeUnit[];
@@ -67,7 +75,14 @@ interface ActiveKitHost {
 interface Preparation {
   scene: object;
   host: ActiveKitHost;
+  /** The local player's class: the kit this entry's progress reports. */
   localClass: string;
+  /** Every kit asked for on this renderer (the local one and each remote
+   *  sighting), all prepared again after a context restore. */
+  requested: Set<string>;
+  /** Each kit's full unit-id list, kept so a progress poll never rebuilds the
+   *  recipe (and its closures); refreshed when a run builds the recipe. */
+  planned: Map<string, readonly string[]>;
   task: Promise<void> | null;
   done: Set<string>;
   cancelled: boolean;
@@ -110,10 +125,47 @@ const KIT_SHEETS: readonly (readonly [
   ['active-warrior-crush', 'Warrior crush', () => bakedTexture('warrior_crush')],
 ];
 
+/** The Paladin atlas upload: its own paced unit, like each Warrior sheet. It
+ *  runs after the kit's pools, so an atlas that failed to load fails only this
+ *  unit (the backoff asks again) while the pools are already prepared and the
+ *  binders draw their built-in emblems meanwhile. */
+const PALADIN_SPEC_ICONS_UNIT = 'upload-big:paladin-spec-icons';
+
+function paladinIconUnit(state: Preparation): PrewarmResumeUnit {
+  return {
+    id: PALADIN_SPEC_ICONS_UNIT,
+    synchronous: true,
+    run: () => {
+      const texture = paladinSpecIconsTexture();
+      if (!texture) throw new Error('Paladin spec icons texture was not loaded');
+      state.host.texture(texture);
+      markPaladinSpecIconsUploaded();
+    },
+  };
+}
+
+/** Every unit of a kit's recipe, done or not. */
+function fullRecipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
+  let units: readonly PrewarmResumeUnit[];
+  if (cls === 'paladin') units = [...state.host.geometry([], 'paladin'), paladinIconUnit(state)];
+  else if (cls === 'warrior') units = warriorRecipe(state);
+  else units = [];
+  state.planned.set(
+    cls,
+    units.map((unit) => unit.id),
+  );
+  return units;
+}
+
+function plannedIds(state: Preparation, cls: string): readonly string[] {
+  return state.planned.get(cls) ?? fullRecipe(state, cls).map((unit) => unit.id);
+}
+
 function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
-  if (cls === 'paladin')
-    return state.host.geometry([], 'paladin').filter((unit) => !state.done.has(unit.id));
-  if (cls !== 'warrior') return [];
+  return fullRecipe(state, cls).filter((unit) => !state.done.has(unit.id));
+}
+
+function warriorRecipe(state: Preparation): readonly PrewarmResumeUnit[] {
   return [
     ...KIT_SHEETS.map(
       ([id, name, sheet]): PrewarmResumeUnit => ({
@@ -127,7 +179,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
       }),
     ),
     ...state.host.geometry(ACTIVE_WARRIOR_CRESTS),
-  ].filter((unit) => !state.done.has(unit.id));
+  ];
 }
 
 /** This optional manifest record owns a small local recipe. It does not spend
@@ -135,10 +187,14 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
  * Registration is unconditional, including a skipped constrained entry. */
 export function activeKitPrewarmEntry(scene: object, cls: string, host: ActiveKitHost) {
   cancelActiveAbilityKit(scene);
+  // A new renderer holds none of the previous one's uploads.
+  markPaladinSpecIconsCold();
   const state: Preparation = {
     scene,
     host,
     localClass: cls,
+    requested: new Set(),
+    planned: new Map(),
     task: null,
     done: new Set(),
     cancelled: false,
@@ -155,31 +211,34 @@ export function activeKitPrewarmEntry(scene: object, cls: string, host: ActiveKi
     required: false,
     run: () => {},
     progress: () => {
-      const remaining = recipe(state, state.localClass).length;
-      return {
-        done: state.done.size,
-        planned: state.done.size + remaining,
-        trimmed: remaining > 0,
-      };
+      const ids = plannedIds(state, state.localClass);
+      let done = 0;
+      for (const id of ids) if (state.done.has(id)) done++;
+      return { done, planned: ids.length, trimmed: done < ids.length };
     },
   } satisfies PrewarmManifestEntry;
 }
 
-/** Also selects the current class when Studio reuses a scene for another kit.
- * No visible spawns, catalogue traversal or on-cast uploads occur here. */
+/** Prepares `cls`'s kit (the local class when omitted): the local player's
+ * own, or a remote one the painter sighted. No visible spawns, catalogue
+ * traversal or on-cast uploads occur here. */
 export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<void> {
   const state = preparations.get(scene);
   if (!state || state.cancelled) return Promise.resolve();
   const selected = cls ?? state.localClass;
   if (selected !== 'warrior' && selected !== 'paladin') return Promise.resolve();
-  state.localClass = selected;
+  state.requested.add(selected);
   // A request for the other kit while one runs waits for it, then prepares
   // its own units (the recipe skips every unit already done).
   if (state.task) return state.task.then(() => ensureActiveAbilityKit(scene, selected));
   const task = (async () => {
-    // The Warrior recipe enumerates units that need the kit's sheets resident,
-    // so it is built only once the demand load has landed.
+    // The recipe enumerates units that need the kit's sheets resident, so it
+    // is built only once the demand load has landed. The Warrior's declined
+    // load leaves the whole kit cold; the Paladin's only leaves its atlas
+    // unit unpaid (it fails, and the backoff asks again).
     if (selected === 'warrior' && state.host.assets && !(await state.host.assets())) return;
+    if (selected === 'paladin')
+      await (state.host.paladinAssets ?? ensurePaladinSpecIcons)().catch(() => false);
     if (state.cancelled) return;
     const context = state.context;
     for (const unit of recipe(state, selected)) {
@@ -239,20 +298,24 @@ export function resumeActiveAbilityKit(
     });
 }
 
-/** A WebGL context restore: every unit the recipe ran (sheet uploads,
- *  crest and guard links) belonged to the lost context. Forget them and run
- *  the recipe again once any run in flight has stopped; the prewarms
- *  themselves are reset by their own registrations (GuardPrewarm,
- *  CrestPrewarm), so `recipe()` offers their units again. */
+/** A WebGL context restore: every unit the recipe ran (sheet uploads, the
+ *  Paladin atlas, crest and guard links) belonged to the lost context. Forget
+ *  them and run every requested kit's recipe again once any run in flight has
+ *  stopped; the prewarms themselves are reset by their own registrations
+ *  (GuardPrewarm, CrestPrewarm), so `recipe()` offers their units again. */
 function invalidatePreparation(state: Preparation): void {
   if (state.cancelled) return;
   state.context++;
   state.done.clear();
+  markPaladinSpecIconsCold();
   if (state.retry) clearTimeout(state.retry);
   state.retry = null;
   state.failures = 0;
-  const rerun = (): Promise<void> =>
-    state.cancelled || state.task ? Promise.resolve() : ensureActiveAbilityKit(state.scene);
+  const rerun = async (): Promise<void> => {
+    if (state.cancelled || state.task) return;
+    const kits = new Set([state.localClass, ...state.requested]);
+    await Promise.all([...kits].map((cls) => ensureActiveAbilityKit(state.scene, cls)));
+  };
   void Promise.resolve(state.task)
     .then(rerun, rerun)
     .catch((error) => {

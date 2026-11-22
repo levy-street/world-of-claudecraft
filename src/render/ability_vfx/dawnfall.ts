@@ -257,6 +257,7 @@ export class Dawnfall {
           #include <colorspace_fragment>
         }`,
     });
+    material.name = 'dawnfall:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'dawnfall-holy-light';
     this.mesh.userData.renderCategory = 'vfx';

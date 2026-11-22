@@ -102,6 +102,9 @@ const SHIELD_GLSL = `
  * ricochets on to the next, every bounce a little hotter. After the last it
  * flies home to the Paladin's hand, and their shield flashes as they catch it.
  */
+/** Seconds a struck enemy remembers whose shield struck it, for its bounces. */
+const SUNWARD_OWNER_TTL = 5;
+
 export class SunwardDisc {
   private readonly pool: PaladinQuadPool<'sunward_disc'>;
   private readonly flights: Flight[] = Array.from({ length: DISC_FLIGHTS }, () => ({
@@ -137,6 +140,10 @@ export class SunwardDisc {
   private readonly flashes: Flash[] = [];
   /** Who threw the shield that last struck each enemy, for its bounces. */
   private readonly owners = new Map<number, number>();
+  /** When each owner was noted: a strike's bounces follow it within a
+   *  second, so a note older than SUNWARD_OWNER_TTL is dropped. */
+  private readonly ownerAt = new Map<number, number>();
+  private ownerSweep = 0;
   private readonly from = new THREE.Vector3();
   private readonly at = new THREE.Vector3();
   private clock = 0;
@@ -290,6 +297,7 @@ export class SunwardDisc {
     }
     if (flight) flight.active = false;
     this.owners.set(target, owner);
+    this.ownerAt.set(target, this.clock);
     let slot = this.impacts.find((i) => !i.active);
     if (!slot) {
       slot = this.impacts[0];
@@ -323,6 +331,14 @@ export class SunwardDisc {
   update(dt: number, reduced = false): void {
     dt = Number.isFinite(dt) ? Math.max(0, dt) : 0;
     this.clock += dt;
+    if (this.owners.size > 0 && this.clock >= this.ownerSweep) {
+      this.ownerSweep = this.clock + 1;
+      for (const [id, at] of this.ownerAt)
+        if (this.clock - at > SUNWARD_OWNER_TTL) {
+          this.ownerAt.delete(id);
+          this.owners.delete(id);
+        }
+    }
     const pool = this.pool;
     bindPaladinSpecIcons(pool.mesh.material);
     pool.begin(this.ctx.camera);
@@ -529,6 +545,7 @@ export class SunwardDisc {
     for (const f of this.flashes) noteShieldFlash(f.id, 0);
     this.flashes.length = 0;
     this.owners.clear();
+    this.ownerAt.clear();
     this.pool.clear();
   }
 

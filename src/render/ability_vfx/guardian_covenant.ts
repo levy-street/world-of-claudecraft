@@ -187,6 +187,7 @@ export class GuardianCovenant {
           #include <colorspace_fragment>
         }`,
     });
+    material.name = `guardian_covenant:${this.kind}`;
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name =
       emblem === 'sunmender' ? 'life-covenant-sun-aegis' : 'guardian-covenant-twin-aegis';

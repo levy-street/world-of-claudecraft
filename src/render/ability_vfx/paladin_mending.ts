@@ -120,7 +120,40 @@ function hash(i: number, salt: number): number {
  * of pluses crowns them and settles down over them onto the rune ring and the
  * Dawnreaver emblem burning at their feet, and a flight of pluses rises.
  */
+/** A point on the stream's quadratic bend `b` (start, control, end, packed
+ *  x y z) at `u`, into `out`. */
+function bendAt(b: readonly number[], u: number, out: THREE.Vector3): THREE.Vector3 {
+  const q = 1 - u;
+  return out.set(
+    q * q * b[0] + 2 * q * u * b[3] + u * u * b[6],
+    q * q * b[1] + 2 * q * u * b[4] + u * u * b[7],
+    q * q * b[2] + 2 * q * u * b[5] + u * u * b[8],
+  );
+}
+
+/** A point on one of the mending's two spiral threads at `u`, into `out`. */
+function spiralAt(
+  out: THREE.Vector3,
+  u: number,
+  strand: number,
+  since: number,
+  tx: number,
+  feetY: number,
+  tz: number,
+  height: number,
+): THREE.Vector3 {
+  const ang = strand * Math.PI + u * Math.PI * 3.2 + since * 2;
+  const rad = 0.55 * (1 - u * 0.4);
+  return out.set(
+    tx + Math.cos(ang) * rad,
+    feetY + 0.1 + u * height * 1.15,
+    tz + Math.sin(ang) * rad,
+  );
+}
+
 export class PaladinMending {
+  /** Per-frame scratch: the stream's bend (start, control, end). */
+  private readonly bend: number[] = new Array(9).fill(0);
   readonly mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   readonly preparation: CrestPrewarm<'paladin_mending'>;
   private readonly casters: Caster[] = Array.from({ length: MENDING_CASTERS }, () => ({
@@ -274,6 +307,7 @@ export class PaladinMending {
         }
       `,
     });
+    material.name = 'paladin_mending:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'paladin-mending';
     this.mesh.userData.renderCategory = 'vfx';
@@ -643,14 +677,16 @@ export class PaladinMending {
       const mx = (sx + tx) / 2,
         my = Math.max(sy, ty) + 0.5,
         mz = (sz + tz) / 2;
-      const at = (u: number, out: THREE.Vector3) => {
-        const q = 1 - u;
-        return out.set(
-          q * q * sx + 2 * q * u * mx + u * u * tx,
-          q * q * sy + 2 * q * u * my + u * u * ty,
-          q * q * sz + 2 * q * u * mz + u * u * tz,
-        );
-      };
+      const b = this.bend;
+      b[0] = sx;
+      b[1] = sy;
+      b[2] = sz;
+      b[3] = mx;
+      b[4] = my;
+      b[5] = mz;
+      b[6] = tx;
+      b[7] = ty;
+      b[8] = tz;
       this.time = t;
       const n = MENDING_STREAM_SEGMENTS;
       if (head > tail)
@@ -660,8 +696,8 @@ export class PaladinMending {
           const w0 = 0.16 * Math.sin((i / n) * Math.PI) + 0.03,
             w1 = 0.16 * Math.sin(((i + 1) / n) * Math.PI) + 0.03;
           this.segment(
-            at(u0, this.pointA),
-            at(u1, this.pointB),
+            bendAt(b, u0, this.pointA),
+            bendAt(b, u1, this.pointB),
             u0,
             u1,
             w0,
@@ -674,7 +710,7 @@ export class PaladinMending {
       for (let i = 0; i < 3; i++) {
         const u = head - 0.05 - i * 0.2;
         if (u <= tail) break;
-        const q = at(u, this.pointA);
+        const q = bendAt(b, u, this.pointA);
         this.billboard(q.x, q.y, q.z, 0.17, i % 2 ? IVORY : GOLD, 1, SHAPE.plus);
       }
     }
@@ -703,20 +739,11 @@ export class PaladinMending {
       for (let i = 0; i < n; i++) {
         const u0 = (i / n) * grow,
           u1 = ((i + 1) / n) * grow;
-        const spiral = (u: number, out: THREE.Vector3) => {
-          const ang = strand * Math.PI + u * Math.PI * 3.2 + since * 2;
-          const rad = 0.55 * (1 - u * 0.4);
-          return out.set(
-            tx + Math.cos(ang) * rad,
-            this.feet.y + 0.1 + u * height * 1.15,
-            tz + Math.sin(ang) * rad,
-          );
-        };
         const w0 = 0.085 * (1 - u0 * 0.6),
           w1 = 0.085 * (1 - u1 * 0.6);
         this.segment(
-          spiral(u0, this.pointA),
-          spiral(u1, this.pointB),
+          spiralAt(this.pointA, u0, strand, since, tx, this.feet.y, tz, height),
+          spiralAt(this.pointB, u1, strand, since, tx, this.feet.y, tz, height),
           u0,
           u1,
           w0,

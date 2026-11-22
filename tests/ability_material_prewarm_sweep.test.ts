@@ -109,6 +109,9 @@ const REGISTERED_MODULES = [
   'ignivar_fire_vfx.ts',
   'ring_of_frost_visual.ts',
   'paladin_ascension_visual.ts',
+  'paladin_aegis_visual.ts',
+  'paladin_consecration_visual.ts',
+  'paladin_shield_glow_fx.ts',
   'frozen_orb_fx.ts',
   'mage_ground_fx.ts',
   'warlock_meteor_fx.ts',
@@ -277,9 +280,11 @@ describe('the lazy-material sweep', () => {
     // + the ClaudeCraft Studio import's painted city-clutter bake (PR 4479): 24, 23.
     // Minus Gloamveil's face-veil kit, retired with the veil (the form's look
     // now mints no lazy module cache: gloam_field.ts builds its three
-    // materials in its constructor): 23, 22.
-    expect(hits.length).toBeGreaterThanOrEqual(23);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(22);
+    // materials in its constructor): 23, 22. Plus the Paladin rework's three
+    // per-instance stand-ins (the Aegis dome, the Holy Ground zone, the shield
+    // and weapon glow layer): 26, 25.
+    expect(hits.length).toBeGreaterThanOrEqual(26);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(25);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

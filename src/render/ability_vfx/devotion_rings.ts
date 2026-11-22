@@ -204,6 +204,7 @@ export class DevotionRings {
         }
       `,
     });
+    material.name = 'devotion_rings:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'devotion-rings';
     this.mesh.userData.renderCategory = 'vfx';

@@ -32,6 +32,16 @@ const DEFAULT_SPEC = 1;
 /** How long a new zone keeps looking for its caster's spec note. */
 const SPEC_SEARCH_SECONDS = 1;
 
+// The zone's fixed-shape pieces, one each for every zone and never disposed:
+// the pulse ring (scaled to the wave), the opening column, the unit fire wall,
+// the shimmer (scaled to the radius) and the motes. Only the terrain-draped
+// discs and rings are built per zone, since they follow the ground under it.
+const PULSE_GEOMETRY = new THREE.RingGeometry(0.95, 1, 64);
+const OPENING_GEOMETRY = new THREE.CylinderGeometry(0.45, 1.1, 10, 32, 1, true);
+const FIRE_GEOMETRY = new THREE.CylinderGeometry(1, 1, 1, SEGMENTS, 1, true);
+const SHIMMER_GEOMETRY = new THREE.CylinderGeometry(0.99, 0.95, 0.5, 48, 1, true);
+const MOTE_GEOMETRY = new THREE.SphereGeometry(0.06, 6, 4);
+
 interface AmbientOffset {
   x: number;
   y: number;
@@ -170,12 +180,14 @@ export class PaladinConsecrationVisuals {
   }
 
   private groundShader(
+    name: string,
     state: ActiveConsecration,
     radius: number,
     fragment: string,
     extra: Record<string, THREE.IUniform> = {},
   ) {
     return new THREE.ShaderMaterial({
+      name,
       uniforms: {
         uCenter: { value: new THREE.Vector2(state.x, state.z) },
         uRadius: { value: radius },
@@ -219,8 +231,8 @@ export class PaladinConsecrationVisuals {
       geometries.push(geometry);
       return mesh;
     };
-    const basic = (color: number, opacity: number): THREE.MeshBasicMaterial => {
-      const material = this.material(color, opacity);
+    const basic = (role: string, color: number, opacity: number): THREE.MeshBasicMaterial => {
+      const material = this.material(role, color, opacity);
       materials.push(material);
       baseOpacities.push(opacity);
       return material;
@@ -228,6 +240,7 @@ export class PaladinConsecrationVisuals {
 
     // The holy ground itself: field, heart, emblem, the sacred geometry and the tick wave.
     const ground = this.groundShader(
+      'paladin_consecration:ground',
       state,
       radius,
       `
@@ -311,7 +324,7 @@ export class PaladinConsecrationVisuals {
       object: addTerrainMesh(
         this.createTerrainRing(state.x, state.z, radius * 0.17, radius * 0.185),
         'paladin-consecration-inner-ring',
-        basic(0xffffcf, 0.28),
+        basic('inner-ring', 0xffffcf, 0.28),
         8,
       ),
       minQuality: 0.25,
@@ -320,7 +333,7 @@ export class PaladinConsecrationVisuals {
       object: addTerrainMesh(
         this.createTerrainRing(state.x, state.z, radius * 0.595, radius * 0.605),
         'paladin-consecration-middle-ring',
-        basic(0xffe78b, 0.18),
+        basic('middle-ring', 0xffe78b, 0.18),
         8,
       ),
       minQuality: 0.65,
@@ -328,13 +341,14 @@ export class PaladinConsecrationVisuals {
     addTerrainMesh(
       this.createTerrainRing(state.x, state.z, radius * 0.982, radius),
       'paladin-consecration-perimeter',
-      basic(0xffffb5, 0.42),
+      basic('perimeter', 0xffffb5, 0.42),
       9,
     );
 
     // The shared Paladin rune band at the rim, writing itself in and flashing
     // as each tick's wave reaches it.
     const runes = this.groundShader(
+      'paladin_consecration:runes',
       state,
       radius,
       `
@@ -370,36 +384,26 @@ export class PaladinConsecrationVisuals {
     );
     runeField.userData.runeSegmentCount = 0;
 
-    const pulseGeometry = new THREE.RingGeometry(0.95, 1, 64);
-    const pulseMaterial = this.material(0xffc070, 0.35);
-    const pulseRing = new THREE.Mesh(pulseGeometry, pulseMaterial);
+    const pulseMaterial = this.material('pulse', 0xffc070, 0.35);
+    const pulseRing = new THREE.Mesh(PULSE_GEOMETRY, pulseMaterial);
     pulseRing.name = 'paladin-consecration-pulse-ring';
     pulseRing.rotation.x = -Math.PI / 2;
     pulseRing.position.set(state.x, centerY + GROUND_LIFT * 2.2, state.z);
     pulseRing.renderOrder = floorVfxRenderOrder('player', 5);
     root.add(pulseRing);
-    geometries.push(pulseGeometry);
 
-    const shimmerGeometry = new THREE.CylinderGeometry(
-      radius * 0.99,
-      radius * 0.95,
-      0.5,
-      48,
-      1,
-      true,
-    );
-    const shimmer = new THREE.Mesh(shimmerGeometry, basic(0xffefae, 0.035));
+    const shimmer = new THREE.Mesh(SHIMMER_GEOMETRY, basic('shimmer', 0xffefae, 0.035));
     shimmer.name = 'paladin-consecration-shimmer';
     shimmer.position.set(state.x, centerY + 0.25, state.z);
+    shimmer.scale.set(radius, 1, radius);
     shimmer.renderOrder = floorVfxRenderOrder('player', 2);
     root.add(shimmer);
     qualityObjects.push({ object: shimmer, minQuality: 0.7 });
-    geometries.push(shimmerGeometry);
 
     // A column of light where the Paladin consecrates the ground.
-    const openingGeometry = new THREE.CylinderGeometry(0.45, 1.1, 10, 32, 1, true);
     // Soft light, not a solid pipe: fading upward and toward its silhouette edges.
     const openingMaterial = new THREE.ShaderMaterial({
+      name: 'paladin_consecration:opening',
       uniforms: { uAlpha: { value: 0 } },
       transparent: true,
       depthWrite: false,
@@ -425,7 +429,7 @@ export class PaladinConsecrationVisuals {
           #include <colorspace_fragment>
         }`,
     });
-    const opening = new THREE.Mesh(openingGeometry, openingMaterial);
+    const opening = new THREE.Mesh(OPENING_GEOMETRY, openingMaterial);
     opening.name = 'paladin-consecration-opening';
     opening.position.set(state.x, centerY + 5, state.z);
     opening.renderOrder = floorVfxRenderOrder('player', 6);
@@ -433,8 +437,8 @@ export class PaladinConsecrationVisuals {
 
     // Each tick's wall of holy fire: flame tongues rising from the wave front,
     // white-hot at the root, gold in the body, licking orange at the tips.
-    const fireGeometry = new THREE.CylinderGeometry(1, 1, 1, 72, 1, true);
     const fireMaterial = new THREE.ShaderMaterial({
+      name: 'paladin_consecration:fire-wall',
       uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 } },
       transparent: true,
       depthWrite: false,
@@ -473,24 +477,20 @@ export class PaladinConsecrationVisuals {
           #include <colorspace_fragment>
         }`,
     });
-    const fireWall = new THREE.Mesh(fireGeometry, fireMaterial);
+    const fireWall = new THREE.Mesh(FIRE_GEOMETRY, fireMaterial);
     fireWall.name = 'paladin-consecration-fire-wall';
     fireWall.position.set(state.x, centerY, state.z);
     fireWall.renderOrder = floorVfxRenderOrder('player', 5);
     fireWall.visible = false;
     root.add(fireWall);
-    geometries.push(fireGeometry);
-    geometries.push(openingGeometry);
 
-    const moteGeometry = new THREE.SphereGeometry(0.06, 6, 4);
-    const moteMaterial = basic(0xffffd7, 0.8);
-    const motes = new THREE.InstancedMesh(moteGeometry, moteMaterial, MOTE_COUNT);
+    const moteMaterial = basic('motes', 0xffffd7, 0.8);
+    const motes = new THREE.InstancedMesh(MOTE_GEOMETRY, moteMaterial, MOTE_COUNT);
     motes.name = 'paladin-consecration-motes';
     motes.position.set(state.x, centerY, state.z);
     motes.renderOrder = floorVfxRenderOrder('player', 6);
     root.add(motes);
     qualityObjects.push({ object: motes, minQuality: 0.25 });
-    geometries.push(moteGeometry);
 
     const ambientOffset = (
       index: number,
@@ -557,8 +557,9 @@ export class PaladinConsecrationVisuals {
     }
   }
 
-  private material(color: number, opacity: number): THREE.MeshBasicMaterial {
+  private material(role: string, color: number, opacity: number): THREE.MeshBasicMaterial {
     return new THREE.MeshBasicMaterial({
+      name: `paladin_consecration:${role}`,
       color,
       transparent: true,
       opacity,
@@ -658,6 +659,7 @@ export class PaladinConsecrationVisuals {
     for (const shader of visual.shaders) shader.dispose();
     visual.openingMaterial.dispose();
     visual.fireMaterial.dispose();
+    // Only the per-zone terrain drape: the fixed-shape geometries are shared.
     for (const geometry of visual.geometries) geometry.dispose();
     visual.motes.dispose();
   }
@@ -718,4 +720,47 @@ export class PaladinConsecrationVisuals {
     geometry.setIndex(indices);
     return geometry;
   }
+}
+
+/**
+ * The boot manifest's stand-in: one hidden Holy Ground built from a fixed
+ * state over flat ground, never disposed, so each program a live zone draws
+ * (the ground and rune shaders, the opening column, the fire wall, the
+ * additive rings, shimmer and pulse, the instanced motes) is linked behind the
+ * loading cover and stays referenced for the session. Every live zone mints
+ * its own material instances (their uniforms are per zone) and disposes them
+ * when it ends; with this anchor holding the same programs, a zone's teardown
+ * never releases one and the next cast relinks nothing. Registered in
+ * ABILITY_MATERIAL_SOURCES.
+ */
+interface PaladinConsecrationStandIn {
+  root: THREE.Object3D;
+  materials: THREE.Material[];
+}
+let paladinConsecrationStandIn: PaladinConsecrationStandIn | null = null;
+
+export function buildPaladinConsecrationStandIn(): PaladinConsecrationStandIn {
+  if (!paladinConsecrationStandIn) {
+    const scratch = new THREE.Scene();
+    new PaladinConsecrationVisuals(scratch, () => 0).sync([
+      { id: 'paladin-consecration-stand-in', x: 0, z: 0, radius: 8, duration: 8, remaining: 8 },
+    ]);
+    const root = scratch.children[0];
+    root.removeFromParent();
+    root.name = 'paladin-consecration-stand-in';
+    root.visible = false;
+    const materials: THREE.Material[] = [];
+    root.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material && !Array.isArray(material) && !materials.includes(material)) {
+        materials.push(material);
+      }
+    });
+    paladinConsecrationStandIn = { root, materials };
+  }
+  return paladinConsecrationStandIn;
+}
+
+export function paladinConsecrationStandInMaterials(): readonly THREE.Material[] {
+  return buildPaladinConsecrationStandIn().materials;
 }

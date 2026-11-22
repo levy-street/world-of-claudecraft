@@ -226,6 +226,7 @@ export class SolarStep {
         }
       `,
     });
+    material.name = 'solar_step:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'solar-step';
     this.mesh.userData.renderCategory = 'vfx';

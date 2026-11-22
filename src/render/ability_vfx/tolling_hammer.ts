@@ -289,6 +289,7 @@ export class TollingHammer {
         }
       `,
     });
+    material.name = 'tolling_hammer:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'tolling-hammer';
     this.mesh.userData.renderCategory = 'vfx';

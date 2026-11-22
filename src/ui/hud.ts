@@ -243,6 +243,7 @@ import {
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
+  spellfxAtVoicedFx,
 } from './combat_sfx';
 import { compassView } from './compass';
 import {
@@ -10762,7 +10763,8 @@ export class Hud {
         // one delayed hit): a dedicated recording (Meteor) is the whole read;
         // every other zone stays silent here and keeps its procedural
         // VFX-synth voice (ability_sfx_coverage.ts).
-        if (ev.fx === 'tick') {
+        const voiced = spellfxAtVoicedFx(ev.fx, ev.ability);
+        if (voiced === 'tick') {
           const tickKey = groundTickAbilityCue(ev.ability);
           if (tickKey) this.combat(tickKey, ev.x, sim.player.pos.y, ev.z, 1.0, { cooldown: 0.08 });
           return;
@@ -10780,7 +10782,7 @@ export class Hud {
           this.combat(ev.sfxKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
           return;
         }
-        if (ev.fx !== 'nova') return;
+        if (voiced !== 'nova') return;
         // A per-ability nova recording is the whole read on the aimed path
         // too, at the same 1.0 the entity-anchored spellfx path plays it;
         // the generic burst keeps its school-flavored layer.

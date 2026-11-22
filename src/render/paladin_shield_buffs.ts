@@ -14,7 +14,15 @@ const LAPSE_MS = 1000;
 
 export function noteBastionRiteShield(id: number, left: number, now = performance.now()): void {
   if (!Number.isFinite(id)) return;
-  HELD.set(id, { left: Number.isFinite(left) ? Math.min(1, Math.max(0, left)) : 0, at: now });
+  // Renewed once a frame per wearer: the note is mutated in place.
+  const note = HELD.get(id) ?? { left: 0, at: 0 };
+  note.left = share(left);
+  note.at = now;
+  if (!HELD.has(id)) HELD.set(id, note);
+}
+
+function share(left: number): number {
+  return Number.isFinite(left) ? Math.min(1, Math.max(0, left)) : 0;
 }
 
 /** `id`'s Bastion Rite has ended: its shield is no longer lit. */
@@ -40,7 +48,10 @@ const WALLS = new Map<number, { left: number; at: number }>();
 
 export function noteHallowedWallBlock(id: number, left: number, now = performance.now()): void {
   if (!Number.isFinite(id)) return;
-  WALLS.set(id, { left: Number.isFinite(left) ? Math.min(1, Math.max(0, left)) : 0, at: now });
+  const note = WALLS.get(id) ?? { left: 0, at: 0 };
+  note.left = share(left);
+  note.at = now;
+  if (!WALLS.has(id)) WALLS.set(id, note);
 }
 
 /** `id`'s Hallowed Wall block has ended, or its plates hold the absorb again. */
@@ -68,11 +79,11 @@ export function noteShieldSigil(
   now = performance.now(),
 ): void {
   if (!Number.isFinite(id)) return;
-  SIGILS.set(id, {
-    left: Number.isFinite(left) ? Math.min(1, Math.max(0, left)) : 0,
-    spec,
-    at: now,
-  });
+  const note = SIGILS.get(id) ?? { left: 0, spec: 0, at: 0 };
+  note.left = share(left);
+  note.spec = spec;
+  note.at = now;
+  if (!SIGILS.has(id)) SIGILS.set(id, note);
 }
 
 /** `id`'s shield sigil has faded: its light goes with it. */
@@ -134,7 +145,12 @@ export function noteVowkeeperWeapon(
   flash: number,
   now = performance.now(),
 ): void {
-  if (Number.isFinite(id)) SWINGS.set(id, { glow, flash, at: now });
+  if (!Number.isFinite(id)) return;
+  const note = SWINGS.get(id) ?? { glow: 0, flash: 0, at: 0 };
+  note.glow = glow;
+  note.flash = flash;
+  note.at = now;
+  if (!SWINGS.has(id)) SWINGS.set(id, note);
 }
 
 /** The light on `id`'s weapon through a Vowkeeper Strike, or null when none. */
@@ -157,7 +173,11 @@ export function vowkeeperWeaponGlow(
 const SHIELD_FLASHES = new Map<number, { flash: number; at: number }>();
 
 export function noteShieldFlash(id: number, flash: number, now = performance.now()): void {
-  if (Number.isFinite(id)) SHIELD_FLASHES.set(id, { flash, at: now });
+  if (!Number.isFinite(id)) return;
+  const note = SHIELD_FLASHES.get(id) ?? { flash: 0, at: 0 };
+  note.flash = flash;
+  note.at = now;
+  if (!SHIELD_FLASHES.has(id)) SHIELD_FLASHES.set(id, note);
 }
 
 /** The flash on `id`'s held shield, or null when none. */

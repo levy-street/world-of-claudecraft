@@ -304,6 +304,7 @@ export class WardOfFaith {
         }
       `,
     });
+    material.name = 'ward_of_faith:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = parts === 'plates' ? 'hallowed-wall-plates' : 'ward-of-faith';
     this.mesh.userData.renderCategory = 'vfx';

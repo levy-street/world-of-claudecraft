@@ -190,6 +190,7 @@ export class Hushbrand {
         }
       `,
     });
+    material.name = 'hushbrand:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'hushbrand';
     this.mesh.userData.renderCategory = 'vfx';

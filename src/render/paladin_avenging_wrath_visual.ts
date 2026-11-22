@@ -180,6 +180,7 @@ function buildWingGeometry(): THREE.BufferGeometry {
 
 function wingMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_avenging_wrath:wings',
     uniforms: {
       uOpen: { value: 0 },
       uTime: { value: 0 },
@@ -261,6 +262,7 @@ const RUNE_BAND_SWEEP = 0.45;
  * round into place. */
 function runeBandMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_avenging_wrath:rune-band',
     uniforms: {
       uAge: { value: 0 },
       uTime: { value: 0 },
@@ -331,11 +333,17 @@ function easeOutBack(t: number): number {
   return 1 + (c + 1) * u * u * u + c * u * u;
 }
 
+/** One wing geometry (unit body height) and one rune-band plane for every
+ * wearer, never disposed: a cast attaches meshes over them, it never rebuilds
+ * them, and the boot stand-in (buildPaladinAscensionStandIn) holds them too. */
+const WING_GEOMETRY = buildWingGeometry();
+const RUNE_BAND_GEOMETRY = new THREE.PlaneGeometry(1, 1);
+
 function createPaladinAvengingWrathVisual(
   parent: THREE.Group,
   height: number,
 ): PaladinAvengingWrathVisual {
-  const geometry = buildWingGeometry();
+  const geometry = WING_GEOMETRY;
   const material = wingMaterial();
   const root = new THREE.Group();
   root.name = 'paladin-avenging-wrath';
@@ -362,9 +370,8 @@ function createPaladinAvengingWrathVisual(
   wingRig.add(leftWing, rightWing);
   wingRig.scale.setScalar(height * PALADIN_BODY_FIT.wingScale);
   root.add(wingRig);
-  const runeBandGeometry = new THREE.PlaneGeometry(1, 1);
   const runeBandMat = runeBandMaterial();
-  const runeBand = new THREE.Mesh(runeBandGeometry, runeBandMat);
+  const runeBand = new THREE.Mesh(RUNE_BAND_GEOMETRY, runeBandMat);
   runeBand.name = 'paladin-avenging-wrath-rune-band';
   runeBand.rotation.x = -Math.PI / 2;
   runeBand.renderOrder = floorVfxRenderOrder('player', 0);
@@ -389,8 +396,6 @@ function createPaladinAvengingWrathVisual(
     furling: false,
     dispose() {
       parent.remove(root);
-      geometry.dispose();
-      runeBandGeometry.dispose();
       runeBandMat.dispose();
       material.dispose();
     },

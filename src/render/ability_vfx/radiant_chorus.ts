@@ -86,6 +86,22 @@ interface Ribbon {
  * wide wave across the ground, and a ribbon of light arcs out of the sun to
  * each ally it heals, landing in a bloom.
  */
+/** A point on a ribbon's quadratic arc from `from` over `bend` onto `to`. */
+function ribbonAt(
+  out: THREE.Vector3,
+  u: number,
+  from: THREE.Vector3,
+  bend: THREE.Vector3,
+  to: THREE.Vector3,
+): THREE.Vector3 {
+  const q = 1 - u;
+  return out.set(
+    q * q * from.x + 2 * q * u * bend.x + u * u * to.x,
+    q * q * from.y + 2 * q * u * bend.y + u * u * to.y,
+    q * q * from.z + 2 * q * u * bend.z + u * u * to.z,
+  );
+}
+
 export class RadiantChorus {
   private readonly pool: PaladinQuadPool<'radiant_chorus'>;
   private readonly channels: Channel[] = Array.from({ length: CHORUS_CHANNELS }, () => ({
@@ -117,6 +133,8 @@ export class RadiantChorus {
   private readonly from = new THREE.Vector3();
   private readonly to = new THREE.Vector3();
   private readonly a = new THREE.Vector3();
+  /** Per-frame scratch: a ribbon's arc control point. */
+  private readonly bend = new THREE.Vector3();
   private readonly b = new THREE.Vector3();
   private clock = 0;
   private seed = 0;
@@ -466,21 +484,14 @@ export class RadiantChorus {
       const mx = (this.from.x + this.to.x) / 2 - (dz / dist) * lean,
         my = Math.max(this.from.y, this.to.y) + 0.4 + dist * 0.08,
         mz = (this.from.z + this.to.z) / 2 + (dx / dist) * lean;
-      const at = (u: number, out: THREE.Vector3) => {
-        const q = 1 - u;
-        return out.set(
-          q * q * this.from.x + 2 * q * u * mx + u * u * this.to.x,
-          q * q * this.from.y + 2 * q * u * my + u * u * this.to.y,
-          q * q * this.from.z + 2 * q * u * mz + u * u * this.to.z,
-        );
-      };
+      this.bend.set(mx, my, mz);
       const fade = 1 - ramp(t, CHORUS_REACH + CHORUS_TAIL, CHORUS_RIBBON_DURATION);
       if (head > tail + 0.01) {
         for (let i = 0; i < SEGMENTS; i++) {
           const u0 = tail + ((head - tail) * i) / SEGMENTS,
             u1 = tail + ((head - tail) * (i + 1)) / SEGMENTS;
-          at(u0, this.a);
-          at(u1, this.b);
+          ribbonAt(this.a, u0, this.from, this.bend, this.to);
+          ribbonAt(this.b, u1, this.from, this.bend, this.to);
           pool.time = this.clock * 0.6 + i / SEGMENTS;
           // Thinner toward the tail.
           const w = 0.07 + 0.08 * ((i + 1) / SEGMENTS);
@@ -497,7 +508,7 @@ export class RadiantChorus {
             SHAPE.ribbon,
           );
         }
-        at(head, this.a);
+        ribbonAt(this.a, head, this.from, this.bend, this.to);
         pool.time = 0;
         pool.billboard(
           this.a.x,

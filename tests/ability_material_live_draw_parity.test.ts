@@ -22,11 +22,14 @@ import {
   ABILITY_MATERIAL_SOURCES,
   buildAbilityMaterialPrewarmGroup,
 } from '../src/render/ability_material_prewarm';
+import { PaladinShieldGlowFx } from '../src/render/characters/paladin_shield_glow_fx';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { FrozenOrbFx } from '../src/render/frozen_orb_fx';
 import { GFX } from '../src/render/gfx';
 import { MageGroundFx } from '../src/render/mage_ground_fx';
+import { PaladinAegisVisual } from '../src/render/paladin_aegis_visual';
 import { syncPaladinAscensionVisual } from '../src/render/paladin_ascension_visual';
+import { PaladinConsecrationVisuals } from '../src/render/paladin_consecration_visual';
 import { WarlockMeteorFx } from '../src/render/warlock_meteor_fx';
 import { activateTier, gfxProfileRestorer } from './helpers/gfx_tier';
 import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
@@ -115,6 +118,56 @@ function liveAscensionDraws(characterHeight: number) {
   return { visual: visual as NonNullable<typeof visual>, draws };
 }
 
+function liveAegisDraws() {
+  const visual = new PaladinAegisVisual();
+  visual.update(true, 0.1, false);
+  visual.pulse(true);
+  visual.update(true, 0.1, false);
+  const draws = drawsUnder(visual.group);
+  // The shader pieces are Meshes, the pluses and sparkles Sprites.
+  expect(draws.some((draw) => (draw.object as THREE.Sprite).isSprite)).toBe(true);
+  return { visual, draws };
+}
+
+function liveConsecrationDraws() {
+  const scene = new THREE.Scene();
+  const zones = new PaladinConsecrationVisuals(scene, (x, z) => 0.3 * Math.sin(x + z));
+  zones.sync([{ id: 'zone', x: 4, z: -2, radius: 6, duration: 8, remaining: 7.5 }]);
+  zones.update(0.4);
+  const draws = drawsUnder(scene);
+  // The motes are one InstancedMesh, and three keys instancing into the program.
+  expect(draws.some((draw) => (draw.object as THREE.InstancedMesh).isInstancedMesh)).toBe(true);
+  return { zones, draws };
+}
+
+function liveShieldGlowDraws() {
+  const model = new THREE.Group();
+  for (const [slot, geometry] of [
+    ['handslotl', new THREE.BoxGeometry(0.6, 0.8, 0.1)],
+    ['handslotr', new THREE.CylinderGeometry(0.05, 0.05, 1.2)],
+  ] as const) {
+    const hand = new THREE.Group();
+    hand.name = slot;
+    hand.add(new THREE.Mesh(geometry, new THREE.MeshStandardMaterial()));
+    model.add(hand);
+  }
+  // A held piece with no normals of its own takes a computed set, as live.
+  const bare = new THREE.BufferGeometry().setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3),
+  );
+  model.getObjectByName('handslotl')?.add(new THREE.Mesh(bare, new THREE.MeshBasicMaterial()));
+  const shield = new PaladinShieldGlowFx(model);
+  const weapon = new PaladinShieldGlowFx(model, 'right');
+  shield.prepare();
+  weapon.prepare();
+  shield.update(0.1, 0.6, 1 / 60, 0.5);
+  weapon.drive(0.6, 0.2, 1 / 60);
+  const draws = drawsUnder(model).filter((draw) => draw.object.userData.paladinShieldGlow);
+  expect(draws).toHaveLength(3);
+  return { dispose: () => (shield.dispose(), weapon.dispose()), draws };
+}
+
 function liveFrostglobeDraws() {
   const scene = new THREE.Scene();
   const fx = new FrozenOrbFx(scene, () => 0);
@@ -169,6 +222,27 @@ describe('ability-material stand-ins draw the live programs', () => {
         }
       });
 
+      it('covers the Aegis dome, ground, sign, planted blade, pluses and sparkles', () => {
+        activateTier(tier);
+        const { visual, draws } = liveAegisDraws();
+        expectCovered(sourceCoverage('paladin-aegis'), draws, 'aegis');
+        visual.dispose();
+      });
+
+      it('covers a Holy Ground zone on uneven ground', () => {
+        activateTier(tier);
+        const { zones, draws } = liveConsecrationDraws();
+        expectCovered(sourceCoverage('paladin-consecration'), draws, 'consecration');
+        zones.dispose();
+      });
+
+      it('covers the shield and weapon glow layers', () => {
+        activateTier(tier);
+        const { dispose, draws } = liveShieldGlowDraws();
+        expectCovered(sourceCoverage('paladin-shield-glow'), draws, 'shield glow');
+        dispose();
+      });
+
       it('covers the Frostglobe shell, core, shards and trail', () => {
         activateTier(tier);
         expectCovered(sourceCoverage('frozen-orb'), liveFrostglobeDraws(), 'frostglobe');
@@ -204,6 +278,30 @@ describe('the Divine Ascension stand-in keeps its programs', () => {
     visual.dispose();
     expect([...disposed]).toEqual([]);
   });
+
+  it.each(['ultra', 'low'] as const)(
+    '%s: an Aegis, Holy Ground or glow teardown disposes no staged material',
+    (tier) => {
+      activateTier(tier);
+      const staged = new Set<THREE.Material>();
+      for (const draw of drawsUnder(buildAbilityMaterialPrewarmGroup())) staged.add(draw.material);
+      const disposed = new Set<THREE.Material>();
+      for (const material of staged) {
+        material.addEventListener('dispose', () => disposed.add(material));
+      }
+      const aegis = liveAegisDraws();
+      const zone = liveConsecrationDraws();
+      const glow = liveShieldGlowDraws();
+      for (const draw of [...aegis.draws, ...zone.draws, ...glow.draws]) {
+        expect(staged.has(draw.material), draw.object.name).toBe(false);
+      }
+      aegis.visual.dispose();
+      // The zone runs out: its own materials go, the anchored programs stay.
+      zone.zones.update(60);
+      glow.dispose();
+      expect([...disposed]).toEqual([]);
+    },
+  );
 
   it('is rebuilt for a new profile, so it never holds a retired profile stand-in', () => {
     activateTier('ultra');

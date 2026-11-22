@@ -96,6 +96,22 @@ function ramp(t: number, from: number, to: number): number {
  * round the Paladin as it lands. Travel never predicts a hit; only the
  * authoritative outcome plays the strike.
  */
+/** A point on the healing helix: strand `strand` at `u` (feet to crown). */
+function helixAt(
+  out: THREE.Vector3,
+  strand: number,
+  u: number,
+  spin: number,
+  tx: number,
+  tz: number,
+  foot: number,
+  crown: number,
+): THREE.Vector3 {
+  const turn = u * Math.PI * 3 + strand * Math.PI + spin;
+  const r = 0.78 - 0.3 * u;
+  return out.set(tx + Math.cos(turn) * r, foot + (crown - foot) * u, tz + Math.sin(turn) * r);
+}
+
 export class GraceHammer {
   readonly mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   readonly preparation: CrestPrewarm<'grace_hammer'>;
@@ -237,6 +253,7 @@ export class GraceHammer {
         }
       `,
     });
+    material.name = 'grace_hammer:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'grace-hammer';
     this.mesh.userData.renderCategory = 'vfx';
@@ -766,11 +783,7 @@ export class GraceHammer {
       tail = ramp((since - 0.3) / 0.55, 0, 1);
     if (head > tail + 0.005) {
       const n = GRACE_HELIX_SEGMENTS;
-      const at = (strand: number, u: number, out: THREE.Vector3) => {
-        const turn = u * Math.PI * 3 + strand * Math.PI + since * 4 * motion;
-        const r = 0.78 - 0.3 * u;
-        return out.set(tx + Math.cos(turn) * r, foot + (crown - foot) * u, tz + Math.sin(turn) * r);
-      };
+      const spin = since * 4 * motion;
       this.time = t;
       for (let strand = 0; strand < 2; strand++) {
         const color = strand ? SKY : GOLD;
@@ -780,8 +793,8 @@ export class GraceHammer {
           const w0 = 0.13 * Math.sin((k / n) * Math.PI) + 0.025,
             w1 = 0.13 * Math.sin(((k + 1) / n) * Math.PI) + 0.025;
           this.ribbon(
-            at(strand, u0, this.pointA),
-            at(strand, u1, this.pointB),
+            helixAt(this.pointA, strand, u0, spin, tx, tz, foot, crown),
+            helixAt(this.pointB, strand, u1, spin, tx, tz, foot, crown),
             w0,
             w1,
             u0 * 3,

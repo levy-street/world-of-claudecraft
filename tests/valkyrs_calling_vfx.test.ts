@@ -372,13 +372,15 @@ describe("Valkyr's Calling routing", () => {
       groundYAt: vi.fn(() => 0),
     };
     const triggerAttack = vi.fn(),
-      abilityAudio = vi.fn();
+      abilityAudio = vi.fn(),
+      spawnAoeRing = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
-      deps: { fx, triggerAttack, abilityAudio },
+      deps: { fx, triggerAttack, abilityAudio, spawnAoeRing },
       stats: new Map(),
       spawned: 0,
+      quality: 1,
     }) as AbilityVfx;
-    return { p, fx, triggerAttack, abilityAudio };
+    return { p, fx, triggerAttack, abilityAudio, spawnAoeRing };
   }
   const at = { x: 5, z: 6, school: 'holy', fx: 'nova', sourceId: 1, radius: 8 };
   it('claims the cast, the landing mark and the slam for the flight visual', () => {
@@ -399,5 +401,8 @@ describe("Valkyr's Calling routing", () => {
     expect(f.p.handleSpellfxAt({ ...at, ability: 'valkyrs_calling_impact' })).toBe(true);
     expect(f.fx.valkyrsCallingLand).toHaveBeenCalledExactlyOnceWith(1, 5, 6, 8);
     expect(f.abilityAudio).toHaveBeenCalledOnce();
+    // Both the mark and the slam keep the draped area ring at the true radius.
+    expect(f.spawnAoeRing).toHaveBeenCalledTimes(2);
+    for (const call of f.spawnAoeRing.mock.calls) expect(call.slice(0, 3)).toEqual([5, 6, 8]);
   });
 });

@@ -211,10 +211,13 @@ describe('Verdict authoritative VFX routing', () => {
     };
     const receiveHit = vi.fn(),
       triggerAttack = vi.fn();
+    const spawnAoeRing = vi.fn();
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
-      deps: { fx, receiveHit, triggerAttack },
+      deps: { fx, receiveHit, triggerAttack, spawnAoeRing },
+      quality: 1,
+      spawned: 0,
     }) as AbilityVfx;
-    return { painter, fx, receiveHit, triggerAttack };
+    return { painter, fx, receiveHit, triggerAttack, spawnAoeRing };
   }
   const event = {
     sourceId: 1,
@@ -250,6 +253,9 @@ describe('Verdict authoritative VFX routing', () => {
     ).toBe(true);
     expect(f.fx.dawnfallCast).toHaveBeenCalledTimes(1);
     expect(f.fx.sunVerdictLanceAt).not.toHaveBeenCalled();
+    // The area detonation keeps its draped ring at the true radius.
+    expect(f.spawnAoeRing).toHaveBeenCalledOnce();
+    expect(f.spawnAoeRing.mock.calls[0].slice(0, 3)).toEqual([2, 4, 8]);
   });
   it('keeps application and damage companions from adding generic explosions', () => {
     const f = fixture();

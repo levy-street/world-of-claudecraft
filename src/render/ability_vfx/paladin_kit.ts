@@ -51,6 +51,10 @@ interface KitPart {
  * entity pass feeds their channels and held auras through presence(), and
  * every heal passes through healed().
  */
+/** Seconds after a heal in which a Beacon of Light copy is taken to follow it. */
+const BEACON_COPY_WINDOW = 0.5;
+const LAST_HEAL_CAP = 256;
+
 export class PaladinKit {
   readonly mercyLance: MercyLance;
   readonly dawnsEmbrace: DawnsEmbrace;
@@ -77,6 +81,7 @@ export class PaladinKit {
   /** The last ally each Paladin healed, and when: a beacon's copy flows from it. */
   private readonly lastHeal = new Map<number, { target: number; at: number }>();
   private time = 0;
+  private healSweep = 0;
 
   constructor(ctx: PaladinKitContext) {
     this.mercyLance = new MercyLance(ctx);
@@ -205,11 +210,21 @@ export class PaladinKit {
     if (ability === 'Beacon of Light') {
       // The copy comes straight after the heal it copies.
       const last = this.lastHeal.get(sourceId);
-      const from = last && this.time - last.at < 0.5 ? last.target : sourceId;
+      const from = last && this.time - last.at < BEACON_COPY_WINDOW ? last.target : sourceId;
       this.beaconOfLight.transfer(from, targetId);
       return;
     }
-    this.lastHeal.set(sourceId, { target: targetId, at: this.time });
+    // Every heal from every source lands here: the note is mutated in place,
+    // and update() drops the ones too old for a beacon's copy to follow.
+    const note = this.lastHeal.get(sourceId);
+    if (note) {
+      note.target = targetId;
+      note.at = this.time;
+    } else {
+      // A burst of healers between sweeps: forget them all rather than grow.
+      if (this.lastHeal.size >= LAST_HEAL_CAP) this.lastHeal.clear();
+      this.lastHeal.set(sourceId, { target: targetId, at: this.time });
+    }
     if (ability === 'Radiant Chorus') this.radiantChorus.reach(sourceId, targetId);
     // Ascension's splash heal: each ally it reaches glints.
     if (ability === 'Solar Invocation') this.solarInvocation.reach(sourceId, targetId);
@@ -217,6 +232,11 @@ export class PaladinKit {
 
   update(dt: number, reduced: boolean): void {
     this.time += Number.isFinite(dt) ? Math.max(0, dt) : 0;
+    if (this.lastHeal.size > 0 && this.time >= this.healSweep) {
+      this.healSweep = this.time + 1;
+      for (const [id, note] of this.lastHeal)
+        if (this.time - note.at > BEACON_COPY_WINDOW) this.lastHeal.delete(id);
+    }
     for (const part of this.parts) part.update(dt, reduced);
   }
 

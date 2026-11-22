@@ -162,6 +162,7 @@ export class PaladinCastSigil {
           col=mix(col,ROSE,accent*fill*0.8);
           gl_FragColor=vec4(col,alpha);}`,
     });
+    material.name = 'paladin_cast_sigil:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'paladin-offhand-cast-sigil';
     this.mesh.userData.renderCategory = 'vfx';

@@ -1,3 +1,5 @@
+import { sunGodVerdictAreaRadius } from '../sim/combat/paladin_sun_verdict';
+import { ABILITIES } from '../sim/content/classes';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityEffect } from '../sim/types';
 import { type AbilityScaling, abilityDamageBonus } from './ability_damage';
@@ -26,6 +28,14 @@ export function primaryDamageTooltipRange(
   };
 }
 
+/** Dawnfall's authored radius: the area sentence it triggers spreads from the
+ * marked enemy far enough to cover Dawnfall's whole circle (combat resolves the
+ * same radius through `sunGodVerdictAreaRadius`). */
+function dawnfallRadius(): number | undefined {
+  const effect = ABILITIES.dawnfall?.effects.find((e) => e.type === 'aoeDamage');
+  return effect?.type === 'aoeDamage' ? effect.radius : undefined;
+}
+
 /** Weapon power already rides the swing. Show a percentage and flat bonus so
  * the UI does not add Attack Power a second time or pretend to know mitigation. */
 export function dawnreaverTooltipValues(res: ResolvedAbility, scaling?: AbilityScaling) {
@@ -47,7 +57,7 @@ export function dawnreaverTooltipValues(res: ResolvedAbility, scaling?: AbilityS
           singleMax: Math.round(verdict.singleTargetMax * factor),
           areaMin: Math.round(verdict.areaMin * factor),
           areaMax: Math.round(verdict.areaMax * factor),
-          radius: verdict.areaRadius,
+          radius: sunGodVerdictAreaRadius(verdict, dawnfallRadius()),
           cap: verdict.areaSoftCap,
         }
       : null,

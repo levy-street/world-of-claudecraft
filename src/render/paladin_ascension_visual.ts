@@ -54,6 +54,11 @@ export function ascensionRemovalOrder(slots: number): number[] {
   return order;
 }
 
+/** Copy `source` over the front of `target` in place (a uniform array). */
+function copyInto(target: number[], source: readonly number[]): void {
+  for (let i = 0; i < source.length; i++) target[i] = source[i];
+}
+
 function clamp01(x: number): number {
   return Math.min(1, Math.max(0, x));
 }
@@ -78,6 +83,7 @@ const COMMON_GLSL = `
 /** The column of light that crashes down from the sky onto the Paladin. */
 function pillarMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_ascension:column',
     uniforms: { uDrop: { value: 0 }, uAlpha: { value: 0 }, uTime: { value: 0 } },
     transparent: true,
     depthWrite: false,
@@ -127,6 +133,7 @@ function pillarMaterial(): THREE.ShaderMaterial {
  * round it (paladin_avenging_wrath_visual), so with both the circle is whole. */
 function groundMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_ascension:ground',
     uniforms: {
       uAge: { value: 0 },
       uTime: { value: 0 },
@@ -215,6 +222,7 @@ function groundMaterial(): THREE.ShaderMaterial {
  * round its upper arc for each charge. */
 function haloMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_ascension:halo',
     uniforms: {
       uAge: { value: 0 },
       uTime: { value: 0 },
@@ -299,6 +307,7 @@ function haloMaterial(): THREE.ShaderMaterial {
 /** Motes of light rising round the Paladin. */
 function moteMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_ascension:motes',
     uniforms: {
       uTime: { value: 0 },
       uAlpha: { value: 0 },
@@ -470,6 +479,18 @@ export class PaladinAscensionVisual {
     reducedMotion: boolean,
     hoverTarget: THREE.Object3D | null = null,
   ): void {
+    // Idle: no Ascension, its fade and its wings all done. Nothing to draw or
+    // write until the aura returns (the view keeps the visual once built).
+    if (
+      !plan.active &&
+      !this.wasActive &&
+      this.presence <= 0 &&
+      this.wings === null &&
+      this.furlingWings === null
+    ) {
+      this.group.visible = this.crown.visible = false;
+      return;
+    }
     dt = Number.isFinite(dt) ? Math.max(0, dt) : 0;
     this.clock += dt;
     if (plan.active && !this.wasActive) {
@@ -557,8 +578,8 @@ export class PaladinAscensionVisual {
     ground.uAlpha.value =
       ramp(this.age, ASCENSION_DROP * 0.8, ASCENSION_DROP + 0.05) * this.presence * seen;
     ground.uSlots.value = this.slots;
-    (ground.uOrb.value as number[]).splice(0, this.orbs.length, ...this.orbs);
-    (ground.uPop.value as number[]).splice(0, this.pops.length, ...this.pops);
+    copyInto(ground.uOrb.value as number[], this.orbs);
+    copyInto(ground.uPop.value as number[], this.pops);
     ground.uSpent.value = this.spent;
     ground.uUrgent.value = urgent;
 
@@ -567,7 +588,7 @@ export class PaladinAscensionVisual {
     halo.uTime.value = this.clock;
     halo.uAlpha.value = this.presence * seen;
     halo.uSlots.value = this.slots;
-    (halo.uOrb.value as number[]).splice(0, this.orbs.length, ...this.orbs);
+    copyInto(halo.uOrb.value as number[], this.orbs);
     halo.uUrgent.value = urgent;
     halo.uFlash.value = flash;
     halo.uScale.value =
@@ -575,7 +596,7 @@ export class PaladinAscensionVisual {
       this.size *
       (0.6 + 0.4 * easeOutBack(ramp(this.age, 0.08, 0.5))) *
       (1 + 0.25 * fading);
-    (halo.uPop.value as number[]).splice(0, this.pops.length, ...this.pops);
+    copyInto(halo.uPop.value as number[], this.pops);
     this.halo.position.y = this.height * HALO_HEIGHT + lift;
 
     const motes = this.motes.material.uniforms;

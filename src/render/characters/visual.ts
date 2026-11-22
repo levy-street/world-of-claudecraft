@@ -1819,8 +1819,12 @@ export class CharacterVisual {
       this.mixer.addEventListener('finished', (ev) => this.onFinished(ev.action));
       recordBuildSpan('view-part:mixer', performance.now() - mixerStarted, mixerStarted);
       if (key === 'player_paladin') {
+        // Their layers are built now, hidden, so the view's compile gate takes
+        // them with the rig and a first glow mounts nothing.
         this.shieldGlowFx = new PaladinShieldGlowFx(this.model);
         this.weaponGlowFx = new PaladinShieldGlowFx(this.model, 'right');
+        this.shieldGlowFx.prepare();
+        this.weaponGlowFx.prepare();
       }
       this.rebuildTemplarsVerdictFx();
 
@@ -4847,6 +4851,9 @@ export class CharacterVisual {
     this.syncSpiritVeil();
     this.rebuildWeaponAura();
     this.rebuildTemplarsVerdictFx();
+    // The held gear changed: lay the glow layers over it now, not on its first glow.
+    this.shieldGlowFx?.prepare();
+    this.weaponGlowFx?.prepare();
   }
 
   private rebuildTemplarsVerdictFx(): void {

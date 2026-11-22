@@ -71,6 +71,27 @@ interface Answer {
 }
 
 /** Fixed pools, one prepared material, no texture loads or frame allocations. */
+/** A point on wisp `w`'s path round the wearer at `u`, into `out`. */
+function wispAt(
+  out: THREE.Vector3,
+  u: number,
+  spin: number,
+  tilt: number,
+  w: number,
+  fx: number,
+  fy: number,
+  fz: number,
+  height: number,
+): void {
+  const angle = spin + u * 2.4;
+  const radius = height * (0.46 + 0.05 * Math.sin(u * 5 + w));
+  out.set(
+    fx + Math.sin(angle) * radius,
+    fy + height * (0.2 + u * 0.55 + tilt * 0.15 * Math.sin(angle)),
+    fz + Math.cos(angle) * radius,
+  );
+}
+
 export class DebtOfLight {
   readonly mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   readonly preparation: CrestPrewarm<'debt_of_light'>;
@@ -211,6 +232,7 @@ export class DebtOfLight {
         }
       `,
     });
+    material.name = 'debt_of_light:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'debt-of-light';
     this.mesh.userData.renderCategory = 'vfx';
@@ -577,18 +599,9 @@ export class DebtOfLight {
     for (let w = 0; w < DEBT_WISPS; w++) {
       const spin = (reduced ? 0 : age * 1.3) + w * Math.PI;
       const tilt = w ? -0.35 : 0.35;
-      const point = (u: number, out: THREE.Vector3) => {
-        const angle = spin + u * 2.4;
-        const radius = height * (0.46 + 0.05 * Math.sin(u * 5 + w));
-        out.set(
-          fx + Math.sin(angle) * radius,
-          fy + height * (0.2 + u * 0.55 + tilt * 0.15 * Math.sin(angle)),
-          fz + Math.cos(angle) * radius,
-        );
-      };
       for (let k = 0; k < segments; k++) {
-        point(k / segments, this.source);
-        point((k + 1) / segments, this.head);
+        wispAt(this.source, k / segments, spin, tilt, w, fx, fy, fz, height);
+        wispAt(this.head, (k + 1) / segments, spin, tilt, w, fx, fy, fz, height);
         this.info = 0;
         const a = this.source,
           b = this.head;

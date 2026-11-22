@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { drivePaladinPresence, holdValkyrFlight } from '../src/render/paladin_presence';
+import {
+  drivePaladinPresence,
+  holdValkyrFlight,
+  PaladinPresenceDriver,
+  paladinSourcedAura,
+} from '../src/render/paladin_presence';
 import {
   VALKYR_LAND,
   VALKYR_RETURN,
@@ -100,5 +105,44 @@ describe('Paladin presence', () => {
     body.root.visible = true;
     holdValkyrFlight(body, VALKYR_RETURN);
     expect(body.root.visible).toBe(true);
+  });
+
+  it('skips every body no Paladin touched, feeding each touched one a last frame after', () => {
+    const f = fx();
+    const driver = new PaladinPresenceDriver();
+    const ward = { id: 'divine_protection', kind: 'absorb', remaining: 4, duration: 8, value: 50 };
+    // An untouched body: no presence pass at all.
+    expect(driver.drive(f, { ...idle, templateId: 'warrior' }, false, false)).toBeNull();
+    expect(f.recallTheFallenListening).toHaveBeenCalledTimes(1);
+    expect(f.wardOfFaithHold).not.toHaveBeenCalled();
+    // Touched (a Paladin's ward on it): fed.
+    driver.drive(f, { ...idle, templateId: 'warrior', auras: [ward] }, false, true);
+    expect(f.wardOfFaithHold).toHaveBeenCalledTimes(1);
+    // The ward goes: one more pass, so the held effects see it go, then none.
+    const listened = f.recallTheFallenListening.mock.calls.length;
+    driver.drive(f, { ...idle, templateId: 'warrior' }, false, false);
+    expect(f.recallTheFallenListening.mock.calls.length).toBe(listened + 1);
+    driver.drive(f, { ...idle, templateId: 'warrior' }, false, false);
+    driver.drive(f, { ...idle, templateId: 'warrior' }, false, false);
+    expect(f.recallTheFallenListening.mock.calls.length).toBe(listened + 3);
+    expect(f.wardOfFaithHold).toHaveBeenCalledTimes(1);
+    // A Paladin is always fed, touched or not (its own casts and flight).
+    const flying = { ...idle, templateId: 'paladin', valkyrsCalling: { elapsed: 0.4 } };
+    expect(driver.drive(f, flying, false, false)).toBe(0.4);
+    // The Recall the Fallen death watch still hears an untouched body.
+    const listening = fx(true);
+    driver.drive(listening, { ...idle, id: 30, templateId: 'mage' }, true, false);
+    expect(listening.recallTheFallenWatch).toHaveBeenCalledWith(30, true);
+  });
+
+  it('reads a Paladin touch off one aura: holy, or put there by a Paladin', () => {
+    const entities = new Map([
+      [1, { templateId: 'paladin' }],
+      [2, { templateId: 'warrior' }],
+    ]);
+    expect(paladinSourcedAura({ school: 'holy', sourceId: 99 }, entities)).toBe(true);
+    expect(paladinSourcedAura({ school: 'physical', sourceId: 1 }, entities)).toBe(true);
+    expect(paladinSourcedAura({ school: 'physical', sourceId: 2 }, entities)).toBe(false);
+    expect(paladinSourcedAura({ school: 'fire', sourceId: 99 }, entities)).toBe(false);
   });
 });

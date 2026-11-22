@@ -16,6 +16,7 @@ import {
   mobVoiceCue,
   mobVoiceCueWithFallback,
   mobVoiceFamily,
+  novaAbilityCue,
   nythraxisCalloutCue,
   playerSwingCueForDamage,
   playerVoiceCue,
@@ -23,6 +24,7 @@ import {
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
+  spellfxAtVoicedFx,
   varkhulCalloutCue,
   varkhulCalloutSfxPlan,
   weaponSwingCue,
@@ -490,6 +492,22 @@ describe('combat SFX policy', () => {
     // carries it, see ability_sfx_coverage.ts's PULSE_IMPACT_ABILITIES).
     expect(groundTickAbilityCue('consecration')).toBeNull();
     expect(groundTickAbilityCue(undefined)).toBeNull();
+  });
+
+  it('keeps the Aegis of the First Dawn heal pulses and closing burst voiced as the nova they were', () => {
+    // The rework split the Aegis cues into fx:'tick' (each heal) and fx:'burst'
+    // (completion) for the dome; hud.ts voices them through this mapping, so
+    // they still play the shared nova burst with the holy layer.
+    expect(spellfxAtVoicedFx('tick', 'aegis_first_dawn')).toBe('nova');
+    expect(spellfxAtVoicedFx('burst', 'aegis_first_dawn')).toBe('nova');
+    expect(novaAbilityCue('aegis_first_dawn')).toBe('spell_nova');
+    // Every other cue keeps its own fx: Meteor's tick keeps its recording,
+    // a plain zone tick stays silent, a plain burst stays a burst.
+    expect(spellfxAtVoicedFx('tick', 'meteor')).toBe('tick');
+    expect(spellfxAtVoicedFx('tick', 'consecration')).toBe('tick');
+    expect(spellfxAtVoicedFx('burst', 'abyssal_rift')).toBe('burst');
+    expect(spellfxAtVoicedFx('tick', undefined)).toBe('tick');
+    expect(spellfxAtVoicedFx('nova', 'aegis_first_dawn')).toBe('nova');
   });
 
   it('gives Scorch and Pyroblast their own impact instead of the shared impact_fire', () => {

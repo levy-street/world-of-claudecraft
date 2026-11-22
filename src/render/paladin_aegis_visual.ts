@@ -111,6 +111,7 @@ const SIGN_GEOMETRY = new THREE.PlaneGeometry(1, 1);
  * atlas and always facing the camera; a plain sun disc until it loads. */
 function signMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_aegis:sign',
     uniforms: { ...paladinSpecIconUniforms(), uAlpha: { value: 1 }, uPulse: { value: 0 } },
     transparent: true,
     depthWrite: false,
@@ -157,8 +158,14 @@ function signMaterial(): THREE.ShaderMaterial {
   });
 }
 
-function additiveMaterial(color: number, opacity: number, side: THREE.Side = THREE.DoubleSide) {
+function additiveMaterial(
+  role: string,
+  color: number,
+  opacity: number,
+  side: THREE.Side = THREE.DoubleSide,
+) {
   return new THREE.MeshBasicMaterial({
+    name: `paladin_aegis:${role}`,
     color,
     transparent: true,
     opacity,
@@ -172,6 +179,7 @@ function additiveMaterial(color: number, opacity: number, side: THREE.Side = THR
  * fine ribs rising up it and a band of light climbing it on each pulse. */
 function domeMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_aegis:dome',
     uniforms: {
       uTime: { value: 0 },
       uPulse: { value: 0 },
@@ -225,6 +233,7 @@ function domeMaterial(): THREE.ShaderMaterial {
  * a great sun at its heart, and ripples spreading out across it on each pulse. */
 function groundMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    name: 'paladin_aegis:ground',
     uniforms: {
       uTime: { value: 0 },
       /** Seconds since each of the last three heals' ripples set out. */
@@ -338,7 +347,10 @@ export class PaladinAegisVisual {
     this.dome.renderOrder = floorVfxRenderOrder('player', 0);
     this.group.add(this.dome);
 
-    this.groundRing = new THREE.Mesh(GROUND_RING_GEOMETRY, additiveMaterial(0xffd86a, 0.6));
+    this.groundRing = new THREE.Mesh(
+      GROUND_RING_GEOMETRY,
+      additiveMaterial('ground-ring', 0xffd86a, 0.6),
+    );
     this.groundRing.name = 'paladin-aegis-ground-ring';
     this.groundRing.rotation.x = Math.PI / 2;
     this.groundRing.position.y = 0.06;
@@ -352,7 +364,7 @@ export class PaladinAegisVisual {
     this.ground.renderOrder = floorVfxRenderOrder('player', 1);
     this.group.add(this.ground);
 
-    this.sun = new THREE.Mesh(SUN_GEOMETRY, additiveMaterial(0xfff7d0, 0.92));
+    this.sun = new THREE.Mesh(SUN_GEOMETRY, additiveMaterial('sun', 0xfff7d0, 0.92));
     this.sun.name = 'paladin-aegis-sun';
     this.sun.position.y = 4;
     this.sun.renderOrder = floorVfxRenderOrder('player', 3);
@@ -366,9 +378,9 @@ export class PaladinAegisVisual {
     this.sunHalo.renderOrder = floorVfxRenderOrder('player', 4);
     this.group.add(this.sunHalo);
 
-    const blade = new THREE.Mesh(BLADE_GEOMETRY, additiveMaterial(0xfff4bd, 0.9));
+    const blade = new THREE.Mesh(BLADE_GEOMETRY, additiveMaterial('blade', 0xfff4bd, 0.9));
     blade.position.y = 1.05;
-    const guard = new THREE.Mesh(GUARD_GEOMETRY, additiveMaterial(0xffcc58, 0.9));
+    const guard = new THREE.Mesh(GUARD_GEOMETRY, additiveMaterial('guard', 0xffcc58, 0.9));
     guard.position.y = 0.52;
     this.plantedWeapon.name = 'paladin-aegis-planted-weapon';
     this.plantedWeapon.add(blade, guard);
@@ -377,6 +389,7 @@ export class PaladinAegisVisual {
     for (let index = 0; index < RISING_PLUSES; index++) {
       const plus = new THREE.Sprite(
         new THREE.SpriteMaterial({
+          name: 'paladin_aegis:plus',
           map: PLUS_TEXTURE,
           color: index % 3 === 0 ? 0xffffff : 0xffe39a,
           transparent: true,
@@ -394,6 +407,7 @@ export class PaladinAegisVisual {
       // Green as a heal's sparkles, with a gold one now and then (vfx.healGlow).
       const sparkle = new THREE.Sprite(
         new THREE.SpriteMaterial({
+          name: 'paladin_aegis:sparkle',
           map: SPARKLE_TEXTURE,
           color: new THREE.Color(index % 3 === 2 ? 0xffe9a0 : 0xbaf7a0).multiplyScalar(1.8),
           toneMapped: false,
@@ -543,10 +557,7 @@ export function syncPaladinAegisVisual(
   scene?: THREE.Scene,
 ): PaladinAegisVisual | null {
   let current = visual;
-  if (active && !current) {
-    current = new PaladinAegisVisual();
-    (scene ?? parent).add(current.group);
-  }
+  if (active) current = attachPaladinAegisVisual(current, parent, scene);
   if (current && scene) {
     if (current.group.parent !== scene) scene.add(current.group);
     // Entity view groups are direct scene children; hidden rigs may have frozen matrices.
@@ -556,24 +567,72 @@ export function syncPaladinAegisVisual(
   return current;
 }
 
-/** Claim identified Aegis cues before generic zone rehit/ring dispatch. */
+/** The one way a live Aegis visual is built and attached, for the sync and
+ * the cue router alike: under the caster's view group (or the scene, for the
+ * sync's hidden-rig arm). Its materials' programs are linked at boot by the
+ * stand-in (buildPaladinAegisStandIn, ABILITY_MATERIAL_SOURCES), so the first
+ * cast in view links nothing. */
+function attachPaladinAegisVisual(
+  current: PaladinAegisVisual | null,
+  parent: THREE.Group,
+  scene?: THREE.Scene,
+): PaladinAegisVisual {
+  if (current) return current;
+  const visual = new PaladinAegisVisual();
+  (scene ?? parent).add(visual.group);
+  return visual;
+}
+
+/** Claim identified Aegis cues (each heal of the channel, and the closing
+ * burst) before the generic zone rehit/ring dispatch: the dome pulses, and
+ * the burst flares it as it lets go. A cue never invents an active channel:
+ * only the sync (the caster's live aura) shows the dome itself. */
 export function routePaladinAegisCue(
   event: Extract<SimEvent, { type: 'spellfxAt' }>,
   views: ReadonlyMap<number, { group: THREE.Group; paladinAegisVisual: PaladinAegisVisual | null }>,
-  scene: THREE.Scene,
-  completed?: (sourceId: number) => void,
 ): boolean {
   if (event.ability !== 'aegis_first_dawn' || (event.fx !== 'tick' && event.fx !== 'burst'))
     return false;
-  if (event.fx === 'burst' && event.sourceId !== undefined) completed?.(event.sourceId);
   const view = event.sourceId === undefined ? undefined : views.get(event.sourceId);
   if (view) {
-    if (!view.paladinAegisVisual) {
-      view.paladinAegisVisual = new PaladinAegisVisual();
-      scene.add(view.paladinAegisVisual.group);
-    }
-    view.paladinAegisVisual.group.position.copy(view.group.position);
+    view.paladinAegisVisual = attachPaladinAegisVisual(view.paladinAegisVisual, view.group);
     view.paladinAegisVisual.pulse(event.fx === 'burst');
   }
   return true;
+}
+
+/**
+ * The boot manifest's stand-in: one hidden visual, never disposed, so the
+ * programs a live Aegis draws (the dome, ground and sign shaders, the additive
+ * ring, sun and planted blade, the plus and sparkle sprites) are linked behind
+ * the loading cover and stay referenced for the session, and preparing it
+ * uploads the plus and sparkle textures. The live visual is built per caster
+ * view when the channel first shows. Registered in ABILITY_MATERIAL_SOURCES.
+ */
+interface PaladinAegisStandIn {
+  root: THREE.Group;
+  materials: THREE.Material[];
+}
+let paladinAegisStandIn: PaladinAegisStandIn | null = null;
+
+export function buildPaladinAegisStandIn(): PaladinAegisStandIn {
+  if (!paladinAegisStandIn) {
+    const visual = new PaladinAegisVisual();
+    const root = visual.group;
+    root.name = 'paladin-aegis-stand-in';
+    root.visible = false;
+    const materials: THREE.Material[] = [];
+    root.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material && !Array.isArray(material) && !materials.includes(material)) {
+        materials.push(material);
+      }
+    });
+    paladinAegisStandIn = { root, materials };
+  }
+  return paladinAegisStandIn;
+}
+
+export function paladinAegisStandInMaterials(): readonly THREE.Material[] {
+  return buildPaladinAegisStandIn().materials;
 }

@@ -38,7 +38,6 @@ describe('PaladinAegisVisual', () => {
   });
 
   it('claims only identified Aegis pulse/completion cues and never guesses a missing owner', () => {
-    const scene = new THREE.Scene();
     const view = {
       group: new THREE.Group(),
       paladinAegisVisual: null as PaladinAegisVisual | null,
@@ -54,14 +53,17 @@ describe('PaladinAegisVisual', () => {
       fx: 'tick' as const,
       radius: 10,
     };
-    expect(routePaladinAegisCue({ ...event, ability: 'other' }, views, scene)).toBe(false);
-    expect(routePaladinAegisCue({ ...event, sourceId: undefined }, views, scene)).toBe(true);
+    expect(routePaladinAegisCue({ ...event, ability: 'other' }, views)).toBe(false);
+    expect(routePaladinAegisCue({ ...event, sourceId: undefined }, views)).toBe(true);
     expect(view.paladinAegisVisual).toBeNull();
-    expect(routePaladinAegisCue(event, views, scene)).toBe(true);
+    expect(routePaladinAegisCue(event, views)).toBe(true);
     const visual = view.paladinAegisVisual!;
+    // Built the way the sync builds it: under the caster's view group, never a
+    // bare scene attach.
+    expect(visual.group.parent).toBe(view.group);
     visual.update(false, 0.1, false);
     expect(visual.group.visible).toBe(false); // A pulse cannot invent an active channel.
-    routePaladinAegisCue({ ...event, fx: 'burst' }, views, scene);
+    routePaladinAegisCue({ ...event, fx: 'burst' }, views);
     visual.update(false, 0.1, false);
     expect(visual.group.visible).toBe(true);
     expect(view.paladinAegisVisual).toBe(visual);

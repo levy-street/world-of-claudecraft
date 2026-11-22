@@ -51,6 +51,7 @@ import { PaladinKit, type PaladinKitEntity } from './paladin_kit';
 import { PaladinMending } from './paladin_mending';
 import { paladinSpecEmblemIndex } from './paladin_spec_emblems';
 import { LightPillars } from './pillars';
+import { markOwnKitPreparation } from './prewarm';
 import type { BakedKind, FragmentKind } from './production_assets';
 import { RecallTheFallen } from './recall_the_fallen';
 import {
@@ -125,6 +126,9 @@ const camFwdScratch = new THREE.Vector3();
 // AND head), and the sequencer host delegate must not clobber a reading its
 // caller is still holding.
 const anchorScratchA = new THREE.Vector3();
+/** Seconds the Paladin pools keep updating after their last cue or
+ *  presence: past the longest one-shot (Devotion's 2.2 s ring). */
+const PALADIN_IDLE_GRACE = 10;
 const anchorScratchB = new THREE.Vector3();
 const weaponFaceScratch = new THREE.Matrix4();
 const hostAnchorScratch = new THREE.Vector3();
@@ -492,7 +496,7 @@ export class AbilityVfxFx implements SequencerHost {
   private dawnfall: Dawnfall;
   private sunVerdictLance: SunVerdictLance;
   /** Sentenced targets whose sword could not be drawn yet (unwarmed). */
-  private readonly unwarmedVerdicts = new Set<number>();
+  private readonly verdictsAwaitingSword = new Set<number>();
   private valkyrsCalling: ValkyrsCalling;
   private recallTheFallen: RecallTheFallen;
   private solarStep: SolarStep;
@@ -749,6 +753,9 @@ export class AbilityVfxFx implements SequencerHost {
       tex,
       (id, out) => this.handSample?.(id, 0, out) ?? false,
     );
+    // The Paladin kit's pools: everything they add to the scene is marked so
+    // the boot link walk skips it (prewarm.ts); the kit's own recipe links it.
+    const beforePaladin = new Set(scene.children);
     this.finalEdict = new FinalEdict(
       scene,
       anchor,
@@ -829,6 +836,7 @@ export class AbilityVfxFx implements SequencerHost {
       facing: (id) => this.facingOf?.(id) ?? null,
       isLocal: this.isLocalCaster,
     });
+    for (const child of scene.children) if (!beforePaladin.has(child)) markOwnKitPreparation(child);
     this.crests = new SignatureCrests(scene, this.groundY);
     this.guards = new WarriorGuardPlates(scene);
     this.powerForms = new WarriorPowerForms(scene);
@@ -906,6 +914,14 @@ export class AbilityVfxFx implements SequencerHost {
     this.localPlayerId = id;
   }
   private localPlayerId: (() => number) | null = null;
+  /** Until when (engine time) the Paladin pools update; -1: never woken. */
+  private paladinAwakeUntil = -1;
+
+  /** A Paladin cue, contact or presence this frame: keep the kit's pools
+   *  updating for the next PALADIN_IDLE_GRACE seconds. */
+  wakePaladinKit(): void {
+    this.paladinAwakeUntil = this.time + PALADIN_IDLE_GRACE;
+  }
   private readonly isLocalCaster = (id: number): boolean => {
     const local = this.localPlayerId?.();
     return local === undefined || local === id;
@@ -1608,10 +1624,12 @@ export class AbilityVfxFx implements SequencerHost {
 
   /** The caster's Dawnfall yields to the Verdict blast it pronounced. */
   dawnfallSentenced(source: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.dawnfall.withdraw(source);
   }
 
   dawnfallCast(source: number, radius: number): void {
+    this.wakePaladinKit();
     if (this.disposed || this.dawnfall.spawn(source, radius)) return;
     const at = this.anchor(source, 0.2, anchorScratchA);
     if (at) this.burstAt(at.x, at.y, at.z, 0xe8bb76, 8, 0.4, 'sparks', 0.18);
@@ -1652,27 +1670,31 @@ export class AbilityVfxFx implements SequencerHost {
   /** Drops the Solar Lance on a sentenced target; area sentences pass their
    * radius. It waits over the target for sunVerdictLanceContact. */
   sunVerdictLanceAt(target: number, radius?: number): void {
+    this.wakePaladinKit();
     if (this.disposed || this.sunVerdictLance.spawn(target, radius)) return;
     // Not warmed yet: the confirmed damage gets a plain spark instead.
-    this.unwarmedVerdicts.add(target);
+    this.verdictsAwaitingSword.add(target);
   }
 
   /** The sentence's damage outcome on `target`: the waiting sword strikes,
    * or dissolves in the air when nothing landed. */
   sunVerdictLanceContact(target: number, outcome: EdictOutcome): void {
+    this.wakePaladinKit();
     if (this.disposed || this.sunVerdictLance.contact(target, outcome)) return;
-    if (!this.unwarmedVerdicts.delete(target) || outcome === 'none') return;
+    if (!this.verdictsAwaitingSword.delete(target) || outcome === 'none') return;
     const at = this.anchor(target, 0.6, anchorScratchA);
     if (at) this.burstAt(at.x, at.y, at.z, 0xfff1cc, 6, 0.35, 'sparks', 0.18);
   }
 
   /** Sundering Gavel: the gavel of light swings down on `target`. */
   sunderingGavel(source: number, target: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.gavel.strike(source, target);
   }
 
   /** Once a frame while `target` is stunned by Sundering Gavel. */
   sunderingGavelHold(target: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.gavel.hold(target);
   }
 
@@ -1694,16 +1716,19 @@ export class AbilityVfxFx implements SequencerHost {
 
   /** Ward of Faith cast: its shield plates spin out of the sigil and lock in. */
   wardOfFaithRaise(id: number, spec?: string | null): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.wardOfFaith.raise(id, spec);
   }
 
   /** Once a frame while `id` holds Ward of Faith's absorb. */
   wardOfFaithHold(id: number, value: number, remaining: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.wardOfFaith.hold(id, value, remaining);
   }
 
   /** Once a frame while Mending Light is cast: light gathers in the hands. */
   mendingLightChannel(caster: number, progress: number): void {
+    this.wakePaladinKit();
     if (this.disposed) return;
     this.paladinMending.channel(caster, progress);
     // The sigil stays lit on the raised off-hand beneath the charge.
@@ -1712,66 +1737,79 @@ export class AbilityVfxFx implements SequencerHost {
 
   /** Mending Light released on `target`. */
   mendingLight(source: number, target: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.paladinMending.mend(source, target);
   }
 
   /** Last Rite on `target`. */
   lastRite(source: number, target: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.paladinMending.rite(source, target, this.paladinSpecs.get(source));
   }
 
   /** Requital Aura or a Devotion reached `target`: a rune ring at their feet. */
   devotionRing(kind: DevotionKind, target: number, source?: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.devotionRings.spawn(kind, target, source);
   }
 
   /** Hammer of Grace is hurled; the authoritative outcome decides the strike. */
   graceHammerThrow(source: number, target: number): void {
+    this.wakePaladinKit();
     if (this.disposed || this.graceHammer.throw(source, target)) return;
     const at = this.anchor(source, 0.65, anchorScratchA);
     if (at) this.burstAt(at.x, at.y, at.z, 0xfff1cc, 4, 0.2, 'sparks', 0.15);
   }
 
   graceHammerContact(source: number, target: number, outcome: EdictOutcome): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.graceHammer.contact(source, target, outcome);
   }
 
   /** Hushbrand's gauntlet lands on the enemy. */
   hushbrandStrike(source: number, target: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.hushbrand.strike(source, target);
   }
 
   /** Once per entity per frame: the kit's channels and held auras. */
   paladinKitPresence(e: PaladinKitEntity): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.paladinKit.presence(e);
   }
 
   /** Once a frame while a Hushbrand lockout holds; `left` is the share still to run. */
   hushbrandHold(target: number, left: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.hushbrand.hold(target, left);
   }
 
   /** Solar Step's cast ignites a sun at the feet. */
   solarStepIgnite(id: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.solarStep.ignite(id);
   }
 
   /** Once a frame while the sprint aura is up. */
   solarStepSprint(id: number, steadfast: boolean): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.solarStep.sprint(id, steadfast);
   }
 
   /** Recall the Fallen, once a frame while the rite is cast. */
   recallTheFallenChannel(caster: number, target: number | null, progress: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.recallTheFallen.channel(caster, target, progress);
   }
 
   /** The rite completed over a body (by id), or at a body's point (group rite). */
   recallTheFallenRelease(caster: number, target: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.recallTheFallen.release(caster, target);
   }
 
   recallTheFallenReleaseAt(caster: number, x: number, z: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.recallTheFallen.releaseAt(caster, x, z);
   }
 
@@ -1781,42 +1819,50 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   recallTheFallenWatch(id: number, dead: boolean): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.recallTheFallen.watch(id, dead);
   }
 
   /** Valkyr's Calling takes off; (x, z) is where the flight comes down. */
   valkyrsCallingLaunch(source: number, x: number, z: number, radius: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.valkyrsCalling.launch(source, x, z, radius);
   }
 
   /** Once a frame per Paladin: still in Valkyr's Calling's flight or not. */
   /** Ascension empowered `source`'s Valkyr's Calling landing. */
   gildValkyrsCalling(source: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.valkyrsCalling.gild(source);
   }
 
   valkyrsCallingFlying(source: number, flying: boolean): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.valkyrsCalling.flying(source, flying);
   }
 
   /** Valkyr's Calling touches down: the slam. */
   valkyrsCallingLand(source: number, x: number, z: number, radius: number): void {
+    this.wakePaladinKit();
     if (this.disposed || this.valkyrsCalling.land(source, x, z, radius)) return;
     const y = this.groundY(x, z);
     this.burstAt(x, y + 0.4, z, 0xfff1cc, 10, 0.5, 'sparks', 0.2);
   }
 
   holdDebtOfLight(id: number, strength: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.debtOfLight.hold(id, strength, this.facingAt(id) ?? 0);
   }
 
   holdGuardianCovenant(id: number, value: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.guardianCovenant.hold(id, value, this.facingAt(id) ?? 0);
   }
 
   /** `id` casts Holy Ground: the zone opening where they stand bears their spec icon. */
   /** Ascension empowered `id`'s Holy Ground: the zone there burns hotter. */
   notePaladinConsecrationAscended(id: number): void {
+    this.wakePaladinKit();
     if (this.disposed) return;
     const at = this.anchor(id, 0, anchorScratchA);
     if (at) notePaladinConsecrationAscended(at.x, at.z);
@@ -1824,10 +1870,12 @@ export class AbilityVfxFx implements SequencerHost {
 
   /** Ascension empowered `source`'s Hammer of Wrath in flight. */
   gildTollingHammer(source: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.tollingHammer.gild(source);
   }
 
   notePaladinConsecration(id: number): void {
+    this.wakePaladinKit();
     if (this.disposed) return;
     const spec = paladinSpecEmblemIndex(this.paladinSpecs.get(id), -1);
     const at = spec >= 0 ? this.anchor(id, 0, anchorScratchA) : null;
@@ -1835,6 +1883,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   castPaladinShieldSigil(id: number): void {
+    this.wakePaladinKit();
     if (!this.disposed) this.paladinCastSigil.cast(id, this.paladinSpecs.get(id));
   }
 
@@ -1847,6 +1896,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   tollingHammerThrow(source: number, target: number): void {
+    this.wakePaladinKit();
     if (this.disposed || this.tollingHammer.launch(source, target)) return;
     const at = this.anchor(source, 0.65, anchorScratchA);
     if (at) this.burstAt(at.x, at.y, at.z, 0xe8bb76, 4, 0.2, 'sparks', 0.15);
@@ -1858,6 +1908,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   tollingHammerContact(source: number, target: number, outcome: EdictOutcome): void {
+    this.wakePaladinKit();
     if (this.disposed) return;
     this.tollingHammer.contact(source, target, outcome);
     if (outcome === 'none') return;
@@ -1893,12 +1944,14 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   debtOfLightReturn(source: number, target: number, absorbed: boolean): void {
+    this.wakePaladinKit();
     if (this.disposed || this.debtOfLight.answer(source, target, absorbed)) return;
     const at = this.anchor(target, 0.6, anchorScratchA);
     if (at) this.burstAt(at.x, at.y, at.z, 0xfff1cc, 4, 0.2, 'sparks', 0.16);
   }
 
   dawnfallContact(target: number, outcome: EdictOutcome): void {
+    this.wakePaladinKit();
     if (this.disposed || outcome === 'none' || this.dawnfall.contact(target, outcome)) return;
     const at = this.anchor(target, 0.6, anchorScratchA);
     if (at)
@@ -1913,6 +1966,7 @@ export class AbilityVfxFx implements SequencerHost {
     /** Runs as the blow visibly lands (the recipient's flinch). */
     onLand?: () => void,
   ): void {
+    this.wakePaladinKit();
     if (outcome === 'none' || this.disposed) return;
     const land = () => {
       // A clean hit lands with a jolt, as the weapon comes down.
@@ -1931,12 +1985,14 @@ export class AbilityVfxFx implements SequencerHost {
 
   /** Ascension's Holy explosion around the Paladin, out to `radius` yards. */
   finalEdictVerdict(source: number, radius: number): void {
+    this.wakePaladinKit();
     if (this.disposed) return;
     this.finalEdict.verdict(source, radius);
   }
 
   /** An enemy the Ascension explosion struck. */
   finalEdictAreaHit(source: number, target: number, outcome: EdictOutcome): void {
+    this.wakePaladinKit();
     if (outcome === 'none' || this.disposed || this.finalEdict.areaHit(source, target, outcome))
       return;
     const at = this.anchor(target, 0.62, anchorScratchA);
@@ -2655,7 +2711,9 @@ export class AbilityVfxFx implements SequencerHost {
   warriorRecovery(event: Extract<SimEvent, { type: 'heal2' }>, maxHp: number): boolean {
     // Every heal passes here first: the Paladin kit reacts to its own, unless
     // the Spell Effects option mutes its caster (spell_effects_switch.ts).
-    if (!this.disposed && !spellEffectsMuted(event.sourceId))
+    // A sleeping kit has no Paladin in view to react (each one's presence
+    // keeps it awake), so heals from everyone else cost nothing.
+    if (!this.disposed && this.time <= this.paladinAwakeUntil && !spellEffectsMuted(event.sourceId))
       this.paladinKit.healed(event.sourceId, event.targetId, event.ability);
     return !this.disposed && drawBloodlettingRecovery(this, event, maxHp);
   }
@@ -3039,23 +3097,29 @@ export class AbilityVfxFx implements SequencerHost {
       this.camera,
       camPosScratch,
     );
-    this.finalEdict.update(dt, reducedMotion);
-    this.dawnfall.update(dt, reducedMotion);
-    this.sunVerdictLance.update(dt, reducedMotion);
-    this.valkyrsCalling.update(dt, reducedMotion);
-    this.recallTheFallen.update(dt, reducedMotion);
-    this.solarStep.update(dt, reducedMotion);
-    this.hushbrand.update(dt, reducedMotion);
-    this.paladinKit.update(dt, reducedMotion);
-    this.graceHammer.update(dt, reducedMotion);
-    this.devotionRings.update(dt, reducedMotion);
-    this.paladinMending.update(dt, reducedMotion);
-    this.wardOfFaith.update(dt, reducedMotion);
-    this.gavel.update(dt, reducedMotion);
-    this.debtOfLight.update(dt, reducedMotion);
-    this.tollingHammer.update(dt, reducedMotion);
-    this.guardianCovenant.update(dt, reducedMotion);
-    this.paladinCastSigil.update(dt);
+    // The Paladin kit's pools run only while a Paladin cue or presence woke
+    // them: a session with no Paladin pays one compare a frame. Every effect
+    // they hold is renewed by its presence each frame, and every one-shot ends
+    // well inside the grace, so a pool sleeps only once it has drawn empty.
+    if (this.time <= this.paladinAwakeUntil) {
+      this.finalEdict.update(dt, reducedMotion);
+      this.dawnfall.update(dt, reducedMotion);
+      this.sunVerdictLance.update(dt, reducedMotion);
+      this.valkyrsCalling.update(dt, reducedMotion);
+      this.recallTheFallen.update(dt, reducedMotion);
+      this.solarStep.update(dt, reducedMotion);
+      this.hushbrand.update(dt, reducedMotion);
+      this.paladinKit.update(dt, reducedMotion);
+      this.graceHammer.update(dt, reducedMotion);
+      this.devotionRings.update(dt, reducedMotion);
+      this.paladinMending.update(dt, reducedMotion);
+      this.wardOfFaith.update(dt, reducedMotion);
+      this.gavel.update(dt, reducedMotion);
+      this.debtOfLight.update(dt, reducedMotion);
+      this.tollingHammer.update(dt, reducedMotion);
+      this.guardianCovenant.update(dt, reducedMotion);
+      this.paladinCastSigil.update(dt);
+    }
     this.baked.update(dt, this.camera.quaternion, reducedMotion);
     this.fragments.update(dt, reducedMotion);
     this.rings.update(dt, this.camera.quaternion);
@@ -3121,7 +3185,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.finalEdict.clear();
     this.dawnfall.clear();
     this.sunVerdictLance.clear();
-    this.unwarmedVerdicts.clear();
+    this.verdictsAwaitingSword.clear();
     this.valkyrsCalling.clear();
     this.recallTheFallen.clear();
     this.solarStep.clear();

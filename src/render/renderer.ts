@@ -615,6 +615,7 @@ import { buildPlacedTownViews, type PlacedTownView } from './painted_towns';
 import {
   PALADIN_AEGIS_DOME_RADIUS,
   type PaladinAegisVisual,
+  routePaladinAegisCue,
   syncPaladinAegisVisual,
 } from './paladin_aegis_visual';
 import {
@@ -635,7 +636,7 @@ import {
   type PaladinOathChainVisual,
   syncPaladinOathChainVisual,
 } from './paladin_oath_chain_visual';
-import { drivePaladinPresence, holdValkyrFlight } from './paladin_presence';
+import { holdValkyrFlight, PaladinPresenceDriver, paladinSourcedAura } from './paladin_presence';
 import {
   type PaladinSunVerdictAuraSource,
   type PaladinSunVerdictVisualPlan,
@@ -2034,6 +2035,7 @@ export class Renderer {
     value: 0,
   };
   private readonly priestMarkerStateScratch = emptyPriestMarkerState();
+  private readonly paladinPresence = new PaladinPresenceDriver();
   private readonly paladinAscensionPlanScratch: PaladinAscensionVisualPlan = {
     active: false,
     charges: 0,
@@ -7414,6 +7416,7 @@ export class Renderer {
         if (ev.fx === 'hoardDig') break;
         if (routeBalgathSpellfxAt(ev, this.worldBoss?.fx, () => this.sim.entities.values())) break;
         if (this.scarecrowFx.handleSpellfxAt(ev)) break;
+        if (routePaladinAegisCue(ev, this.views)) break;
         if (ev.fx === 'soulTravel') {
           if (ev.targetId !== undefined) {
             const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
@@ -9709,6 +9712,7 @@ export class Renderer {
       let mageBarrierState: MageBarrierState | null = null;
       let sunVerdictAura: PaladinSunVerdictAuraSource | null = null;
       let hasPaladinWings = false;
+      let paladinTouched = false;
       let oathChainSourceId: number | null = null;
       let characterEffects = 0;
       for (const a of e.auras) {
@@ -9736,6 +9740,7 @@ export class Renderer {
         mageBarrierState ??= mageBarrierStateForAura(a, this.mageBarrierStateScratch);
         sunVerdictAura = selectPaladinSunVerdictAura(sunVerdictAura, a, this.sim.playerId);
         if (isPaladinWingAura(a)) hasPaladinWings = true;
+        paladinTouched ||= paladinSourcedAura(a, sim.entities);
         if (isOathChainAura(a) && oathChainSourceId === null) oathChainSourceId = a.sourceId;
       }
       const requestedForm = requestedCharacterForm(formMask);
@@ -9758,7 +9763,12 @@ export class Renderer {
       // a kill's collapse waits for the blade that dealt it, its mount and wings with it
       const deathHeld = isVisuallyDead(e) && !e.ghost && this.contactQueue.holdsDeath(e.id);
       const visuallyDead = collapsed(isVisuallyDead(e) && !e.ghost, deathHeld);
-      const valkyrElapsed = drivePaladinPresence(this.abilityVfxFx, e, isVisuallyDead(e));
+      const valkyrElapsed = this.paladinPresence.drive(
+        this.abilityVfxFx,
+        e,
+        isVisuallyDead(e),
+        paladinTouched,
+      );
       if (valkyrElapsed !== null) hasPaladinWings = true; // a Valkyr's Calling flight wears them
       const waterJetVisualChannel = this.waterJetVisualChannels.has(e.id);
       // This is the final render-side casting state, including Water Jet's

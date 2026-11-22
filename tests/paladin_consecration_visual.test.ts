@@ -200,10 +200,13 @@ describe('Paladin Consecration ground visual', () => {
 
   it('claims the cast burst and the ticks so no generic dome or rings stack on the ground', () => {
     const releaseGesture = vi.fn(),
-      abilityAudio = vi.fn();
+      abilityAudio = vi.fn(),
+      spawnAoeRing = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
-      deps: { fx: { groundYAt: () => 0 }, abilityAudio },
+      deps: { fx: { groundYAt: () => 0 }, abilityAudio, spawnAoeRing },
       releaseGesture,
+      quality: 1,
+      spawned: 0,
     }) as AbilityVfx;
     const base = { sourceId: 1, targetId: 1, school: 'holy', ability: 'consecration' };
     expect(p.handleSpellfx({ ...base, fx: 'selfCast' })).toBe(true);
@@ -220,7 +223,10 @@ describe('Paladin Consecration ground visual', () => {
         sourceId: 1,
       }),
     ).toBe(true);
-    // The tick keeps its pulse of sound.
+    // The tick keeps its pulse of sound, and the draped area ring: the zone's
+    // footprint is the actionable read, drawn on every tier.
     expect(abilityAudio).toHaveBeenCalledOnce();
+    expect(spawnAoeRing).toHaveBeenCalledOnce();
+    expect(spawnAoeRing.mock.calls[0].slice(0, 3)).toEqual([1, 2, 6]);
   });
 });

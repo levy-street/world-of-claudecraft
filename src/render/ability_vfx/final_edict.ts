@@ -66,6 +66,10 @@ const MAX_VERTICES =
   FINAL_EDICT_WAVE_CAPACITY * FINAL_EDICT_WAVE_VERTICES +
   FINAL_EDICT_STAMP_CAPACITY * FINAL_EDICT_STAMP_VERTICES;
 const CORNERS = [0, -1, 1, -1, 1, 1, 0, -1, 1, 1, 0, 1];
+/** The newest-first slot of oldest-first sample `k` in a path of `last + 1`. */
+function pathIndex(last: number, k: number): number {
+  return (last - Math.min(last, Math.max(0, k))) * 4;
+}
 const UPLOAD_ATTRIBUTES = [
   'position',
   'aColor',
@@ -99,6 +103,10 @@ interface Slot {
   /** The weapon tip's path down the swing, newest first: x, y, z, age. */
   path: Float32Array;
   points: number;
+  /** The caster's weapon sampler, cached for the slot's life (resolving one
+   *  walks the rig), with the elapsed time of its next lookup when missing. */
+  weapon: WeaponAnchorSampler | null;
+  weaponRetry: number;
 }
 
 interface Wave {
@@ -150,6 +158,8 @@ export class FinalEdict {
     onLand: null,
     path: new Float32Array(EDICT_TRAIL.points * 4),
     points: 0,
+    weapon: null,
+    weaponRetry: 0,
   }));
   private readonly waves: Wave[] = Array.from({ length: FINAL_EDICT_WAVE_CAPACITY }, () => ({
     active: false,
@@ -334,6 +344,7 @@ export class FinalEdict {
           #include <colorspace_fragment>
         }`,
     });
+    material.name = 'final_edict:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'final-edict-holy-light';
     this.mesh.userData.renderCategory = 'vfx';
@@ -367,6 +378,8 @@ export class FinalEdict {
     slot.landed = false;
     slot.onLand = onLand ?? null;
     slot.points = 0;
+    slot.weapon = null;
+    slot.weaponRetry = 0;
     this.place(slot);
     return true;
   }
@@ -447,6 +460,7 @@ export class FinalEdict {
   update(dt: number, reducedMotion: boolean): void {
     if (this.disposed) return;
     const step = Math.max(0, dt);
+    this.clock += step;
     this.vertex = 0;
     const v = this.view();
     for (const slot of this.slots) {
@@ -539,16 +553,42 @@ export class FinalEdict {
   /** Camera basis: right, up and viewing direction. Tests without a camera get
    * a fixed front view. */
   private view(): number[] {
+    const v = this.viewBasis;
     const e = this.camera?.matrixWorld.elements;
-    return e
-      ? [e[0], e[1], e[2], e[4], e[5], e[6], -e[8], -e[9], -e[10]]
-      : [1, 0, 0, 0, 1, 0, 0, 0, -1];
+    if (!e) {
+      v.fill(0);
+      v[0] = 1;
+      v[4] = 1;
+      v[8] = -1;
+      return v;
+    }
+    v[0] = e[0];
+    v[1] = e[1];
+    v[2] = e[2];
+    v[3] = e[4];
+    v[4] = e[5];
+    v[5] = e[6];
+    v[6] = -e[8];
+    v[7] = -e[9];
+    v[8] = -e[10];
+    return v;
   }
+  /** Per-frame scratch: the camera basis and the last `across` result. */
+  private readonly viewBasis: number[] = new Array(9).fill(0);
+  private readonly acrossOut: number[] = [0, 0, 0];
+  /** Seconds this effect has run, for the weapon sampler's retry clock. */
+  private clock = 0;
 
   /** The empowered weapon: light gathering on the Paladin's weapon as it is
    * raised, blazing as it lands (their chest when no weapon can be found). */
   private weaponLight(slot: Slot, v: number[], since: number): void {
-    this.tip = this.weapon?.(slot.source, 0)?.(this.weaponAt) === true;
+    if (!slot.weapon && this.clock >= slot.weaponRetry) {
+      slot.weapon = this.weapon?.(slot.source, 0) ?? null;
+      slot.weaponRetry = this.clock + 0.25;
+    }
+    this.tip = slot.weapon?.(this.weaponAt) === true;
+    // A sampler whose weapon is gone is looked up again after the delay.
+    if (!this.tip && slot.weapon) slot.weapon = null;
     const armed = this.tip || this.anchor(slot.source, 0.75, this.weaponAt) !== null;
     const scale = slot.critical ? 1.2 : 1;
     const size = since < 0 ? 0.5 + 0.35 * (1 + since / FINAL_EDICT_LAND) : 0.9;
@@ -649,7 +689,10 @@ export class FinalEdict {
       ay /= speed;
       az /= speed;
       const streak = Math.min(0.7, Math.max(0.2, speed * 0.09)) * 0.5;
-      const [px, py, pz] = this.across(ax, ay, az, v, crit ? 0.07 : 0.06);
+      const p = this.across(ax, ay, az, v, crit ? 0.07 : 0.06);
+      const px = p[0],
+        py = p[1],
+        pz = p[2];
       this.quad(
         hx - ax * streak,
         hy - ay * streak,
@@ -694,11 +737,10 @@ export class FinalEdict {
     const x = Math.min(last, Math.max(0, f * last));
     const i = Math.min(last - 1, Math.floor(x));
     const t = x - i;
-    const index = (k: number) => (last - Math.min(last, Math.max(0, k))) * 4;
-    const a = index(i - 1),
-      b = index(i),
-      c = index(i + 1),
-      d = index(i + 2);
+    const a = pathIndex(last, i - 1),
+      b = pathIndex(last, i),
+      c = pathIndex(last, i + 1),
+      d = pathIndex(last, i + 2);
     const t2 = t * t,
       t3 = t2 * t;
     for (let k = 0; k < 4; k++) {
@@ -730,13 +772,16 @@ export class FinalEdict {
     const shoulder = this.anchor(slot.source, 0.8, this.shoulder);
     // One side for the whole blade, from its middle, so it never twists.
     const mid = (segments >> 1) * 8;
-    const [mx, my, mz] = this.across(
+    const m = this.across(
       b[mid + 8] - b[mid - 8],
       b[mid + 9] - b[mid - 7],
       b[mid + 10] - b[mid - 6],
       v,
       1,
     );
+    const mx = m[0],
+      my = m[1],
+      mz = m[2];
     const flip =
       shoulder &&
       mx * (b[mid] - shoulder.x) + my * (b[mid + 1] - shoulder.y) + mz * (b[mid + 2] - shoulder.z) <
@@ -747,13 +792,16 @@ export class FinalEdict {
       const o = k * 8;
       const prev = Math.max(0, k - 1) * 8,
         next = Math.min(segments, k + 1) * 8;
-      const [nx, ny, nz] = this.across(
+      const n = this.across(
         b[next] - b[prev],
         b[next + 1] - b[prev + 1],
         b[next + 2] - b[prev + 2],
         v,
         flip,
       );
+      const nx = n[0],
+        ny = n[1],
+        nz = n[2];
       const u = k / segments;
       b[o + 4] = nx;
       b[o + 5] = ny;
@@ -816,7 +864,10 @@ export class FinalEdict {
         const tx = -s * ux + c * vx,
           ty = c * vy,
           tz = -s * uz + c * vz;
-        let [nx, ny, nz] = this.across(tx, ty, tz, v, 1);
+        const n = this.across(tx, ty, tz, v, 1);
+        let nx = n[0],
+          ny = n[1],
+          nz = n[2];
         if (nx * rx + ny * ry + nz * rz < 0) {
           nx = -nx;
           ny = -ny;
@@ -957,7 +1008,11 @@ export class FinalEdict {
       py /= length;
       pz /= length;
     }
-    return [px * size, py * size, pz * size];
+    const out = this.acrossOut;
+    out[0] = px * size;
+    out[1] = py * size;
+    out[2] = pz * size;
+    return out;
   }
 
   private billboard(

@@ -417,6 +417,7 @@ export class ValkyrsCalling {
         }
       `,
     });
+    material.name = 'valkyrs_calling:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'valkyrs-calling';
     this.mesh.userData.renderCategory = 'vfx';

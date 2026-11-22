@@ -288,6 +288,7 @@ export class RecallTheFallen {
         }
       `,
     });
+    material.name = 'recall_the_fallen:surface';
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = 'recall-the-fallen';
     this.mesh.userData.renderCategory = 'vfx';

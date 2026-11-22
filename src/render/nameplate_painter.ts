@@ -357,7 +357,8 @@ export class NameplatePainter {
       if (shadowGuardHidden(entity, world) || investigationDisguiseHidden(entity, world)) continue;
       // Valkyr's Calling hides the Paladin in the light mid-flight; the body is
       // meant to be gone, so no stand-in plate either.
-      if (valkyrVanished(valkyrFlightElapsed(entity))) continue;
+      // Only a Paladin flies, so no other body pays the aura walk.
+      if (entity.templateId === 'paladin' && valkyrVanished(valkyrFlightElapsed(entity))) continue;
       // A compile gate can leave this entity with no body at all (the arrival
       // gate hides the whole group). Its plate is then the only thing that says
       // an enemy is there, so it is forced on over the nameplate toggles for

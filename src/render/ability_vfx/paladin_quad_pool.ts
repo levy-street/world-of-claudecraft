@@ -111,6 +111,7 @@ export class PaladinQuadPool<K extends string> {
         }
       `,
     });
+    material.name = `paladin_quad_pool:${kind}`;
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.name = name;
     this.mesh.userData.renderCategory = 'vfx';
@@ -350,8 +351,12 @@ export class PaladinQuadPool<K extends string> {
         a.needsUpdate = true;
       }
     }
-    geometry.setDrawRange(0, this.vertex);
-    this.mesh.visible = this.vertex > 0;
+    // A held piece re-checks its preparation every frame: after a context
+    // restore its programs belong to the lost context until the kit recipe
+    // runs again, so nothing draws until it has.
+    const ready = this.ready();
+    geometry.setDrawRange(0, ready ? this.vertex : 0);
+    this.mesh.visible = ready && this.vertex > 0;
   }
 
   clear(): void {

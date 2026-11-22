@@ -504,6 +504,10 @@ const PULSE_BURST_BY_PALETTE: Record<string, ParticleBurstKind> = {
 // authoring a signature clip cannot silently miss this list.
 export const PET_SIGNATURE_ATTACK_IDS = new Set(['emberkin_felbolt', 'gloomshade_abyssal_chain']);
 
+/** The area ring of a Paladin point cue with no gallery spec (the Valkyr's
+ *  Calling landing marks): the kit's gold. */
+const PALADIN_AREA_GOLD = 0xe8bb76;
+
 /** Requital Aura's reflected spark: the aura's own gold. */
 const REQUITAL_SPARK = 0xffc06a;
 
@@ -1086,7 +1090,10 @@ export class AbilityVfx {
     if (paladinSpec) this.deps.fx.learnPaladinSpec?.(ev.sourceId, paladinSpec);
     // The Paladin kit's own cues. A caster the Spell Effects option mutes
     // takes the release's ordinary path below (spell_effects_switch.ts).
-    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfx(ev)) return true;
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfx(ev)) {
+      this.deps.fx.wakePaladinKit?.();
+      return true;
+    }
     // Physical Warrior ticks are wounds. The wire's tick companion has no
     // ability label, so preserve its recipient cue without an ivory magic puff.
     if (ev.fx === 'tick' && ev.school === 'physical' && this.deps.isWarrior?.(ev.sourceId)) {
@@ -1657,7 +1664,15 @@ export class AbilityVfx {
   handleSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean {
     // The Paladin kit's point cues; a caster the Spell Effects option mutes
     // takes the release's ordinary path below (its area ring included).
-    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfxAt(ev)) return true;
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfxAt(ev)) {
+      this.deps.fx.wakePaladinKit?.();
+      // The kit's own figures are additions to the area read, never its
+      // substitute: a radius-carrying cue draws the draped ring on every tier,
+      // cold or refused, as the Warrior kit's do (ability_vfx/CLAUDE.md).
+      // Recall the Fallen's points mark a returning body, not an area.
+      if (ev.ability !== 'recall_the_fallen') this.spawned += this.paladinAreaTelegraph(ev);
+      return true;
+    }
     if (!ev.ability) return false;
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
     const spec = abilityVfxSpecFor(ev.ability);
@@ -1883,8 +1898,10 @@ export class AbilityVfx {
   private paladinDamage(ev: AbilityVfxDamageEvent): boolean {
     // Veilbound March's final wave: the veil snaps shut on each enemy as its
     // hit lands (the rest of the hit's read runs on unchanged).
-    if (ev.abilityId === 'veilbound_march' && ev.sourceId !== ev.targetId)
+    if (ev.abilityId === 'veilbound_march' && ev.sourceId !== ev.targetId) {
+      this.deps.fx.wakePaladinKit?.();
       this.deps.fx.paladinKit.veilboundMarch.strike(ev.sourceId, ev.targetId);
+    }
     // Requital Aura's reflected blow (only its display name rides the hit): a
     // small spark of holy light on the attacker it strikes, never the aura's
     // whole cast again on the defender.
@@ -2003,7 +2020,10 @@ export class AbilityVfx {
     // The Paladin kit's contacts. Like its cues they wait on no cast family
     // (each pool keeps its own preparation and falls back when cold), while a
     // caster the Spell Effects option mutes takes the release's path below.
-    if (!spellEffectsMuted(ev.sourceId) && this.paladinDamage(ev)) return true;
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinDamage(ev)) {
+      this.deps.fx.wakePaladinKit?.();
+      return true;
+    }
     // Latched on the event's own id, asked for every family its draws below
     // can reach. They resolve the id off the display name whatever the
     // caster's class (a mob's Reaping Arc draws the kit's cleave contact), so
@@ -3024,6 +3044,12 @@ export class AbilityVfx {
    *  comes off the plan (tier-independent by construction), so the same cast
    *  never reads one colour on a held gate and another on an open one.
    *  Returns the primitive count for the dev probe. */
+  private paladinAreaTelegraph(ev: AbilityVfxSpellfxAtEvent): number {
+    const spec = ev.ability ? abilityVfxSpecFor(ev.ability) : undefined;
+    const color = spec ? planCast(spec, this.quality, REFUSED_CAST_TIER).color : PALADIN_AREA_GOLD;
+    return this.areaTelegraph(ev, color);
+  }
+
   private areaTelegraph(ev: AbilityVfxSpellfxAtEvent, colorHex: number): number {
     if (!ev.radius) return 0;
     this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, colorHex);
