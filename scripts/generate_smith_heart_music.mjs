@@ -50,6 +50,43 @@ export const SMITH_HEART_TRACKS = {
     ownTail: true,
     vocals: true,
   },
+  council_guitar: {
+    filename: 'boss_heart_hammer_council.mp3',
+    name: 'The Hammer Council, guitar take with a varied part (Jose 2026-11-22)',
+    prompt:
+      'Fast, epic symphonic metal raid boss battle theme built around a beautiful, memorable, emotional lead ' +
+      'melody: two colossal stone guardians awaken to defend a sacred mountain. The electric guitar keeps ' +
+      'changing and never repeats one riff: galloping heavy riffs in one section, a soaring melodic lead ' +
+      'guitar carrying the main melody in another, harmonized twin guitar lines, a short expressive guitar ' +
+      'solo, then a calmer break with only orchestra and choir before the guitars return. A powerful rock ' +
+      'drum kit with double kick, snare backbeats, crashing cymbals and tom fills, locked with taiko and war ' +
+      'drums. Full orchestra: soaring horns and strings doubling the melody, punchy brass, booming hits, anvil ' +
+      'accents. A deep powerful male choir on open vowels, no words. Heroic, beautiful, heavy and epic, ' +
+      'F minor, 160 BPM. ' +
+      'Full energy from the first bar, no fade-in, no fade-out, no ending: a seamless video game boss loop. ' +
+      'Original composition, cinematic, high fidelity, wide stereo.',
+    music_length_ms: 180000,
+    ownTail: true,
+    vocals: true,
+  },
+  council_mid: {
+    filename: 'boss_heart_hammer_council.mp3',
+    name: 'The Hammer Council, orchestra first with a touch of guitar (Jose 2026-11-22)',
+    prompt:
+      'Fast, epic cinematic orchestral raid boss battle music, a film score and not a metal song: two colossal ' +
+      'stone guardians awaken to defend a sacred mountain. The full symphony orchestra and a deep powerful male ' +
+      'choir on open vowels lead everything, with a beautiful, memorable heroic melody on soaring horns and ' +
+      'strings, punchy brass stabs, fast string runs, booming orchestral hits and anvil accents. A rock drum kit ' +
+      'with double kick, snare and cymbals drives it together with taiko and war drums. A distorted electric ' +
+      'guitar is only a subtle supporting layer, mixed low and behind the orchestra, adding weight on a few big ' +
+      'accents and climaxes and silent for most of the piece; it never plays the melody and never solos. Heroic, ' +
+      'heavy, powerful and epic, F minor, 160 BPM. ' +
+      'Full energy from the first bar, no fade-in, no fade-out, no ending: a seamless video game boss loop. ' +
+      'Original composition, cinematic, high fidelity, wide stereo.',
+    music_length_ms: 180000,
+    ownTail: true,
+    vocals: true,
+  },
   breath: {
     filename: 'boss_heart_breath.mp3',
     name: 'The Guardian of the Breath (wind, the summit, soaring)',
