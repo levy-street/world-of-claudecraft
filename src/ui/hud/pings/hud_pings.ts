@@ -21,7 +21,7 @@ import type { PainterHostWriters } from '../../painter_host';
 import { chatChannelColor } from '../chat/chat_channels';
 import { PingFeedController } from './ping_feed_controller';
 import { PingWheelController } from './ping_wheel_controller';
-import type { PingContext } from './ping_wheel_core';
+import { groundPingContext, PING_GROUND_RAY_REACH, type PingContext } from './ping_wheel_core';
 
 /** The private Hud members the factory reads. */
 interface PingsHost {
@@ -30,7 +30,7 @@ interface PingsHost {
   renderer: {
     picking: {
       pick(x: number, y: number, attackIntent?: boolean): number | null;
-      groundPoint(x: number, y: number, planeY: number): { x: number; z: number } | null;
+      groundHit(x: number, y: number, maxDist: number): { x: number; y: number; z: number } | null;
     };
   };
   minimapZoom: number;
@@ -89,9 +89,10 @@ function buildPings(h: PingsHost): { wheel: PingWheelController; feed: PingFeedC
       const unit = unitContext(world, id);
       if (unit.kind === 'unit') return unit;
     }
-    const py = world.player.pos.y;
-    const g = h.renderer.picking.groundPoint(x, y, py);
-    return g ? { kind: 'ground', x: g.x, y: py, z: g.z } : { kind: 'none' };
+    // The floor actually under the cursor (a ray march, not the flat plane at
+    // the player's feet), so a far or sloped ground ping lands where it points.
+    const hit = h.renderer.picking.groundHit(x, y, PING_GROUND_RAY_REACH);
+    return groundPingContext(hit, world.player.pos);
   };
   const wheel = new PingWheelController({
     doc,

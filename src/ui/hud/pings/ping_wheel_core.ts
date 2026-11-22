@@ -6,6 +6,8 @@
 // caller's.
 
 import {
+  PARTY_PING_RANGE,
+  PARTY_PING_VERTICAL_REACH,
   PING_ASSIST,
   PING_ATTACK,
   PING_LOOK,
@@ -64,6 +66,24 @@ export type PingContext =
   | { kind: 'unit'; id: number; hostile: boolean; x: number; y: number; z: number }
   | { kind: 'ground'; x: number; y: number; z: number }
   | { kind: 'none' };
+
+/** How far along the cursor ray a ground ping looks for the floor (yards):
+ *  the ping range plus room for the camera boom behind the player. */
+export const PING_GROUND_RAY_REACH = PARTY_PING_RANGE * 2;
+
+/** The ground context of a cursor ray's floor hit (null: the ray met nothing,
+ *  a sky pick). A hit the sim would refuse (past the ping range from the
+ *  player, or too far above or below them) is no ping at all, never a
+ *  stand-in spot: the mark only ever lands where the cursor points. */
+export function groundPingContext(
+  hit: { x: number; y: number; z: number } | null,
+  player: { x: number; y: number; z: number },
+): PingContext {
+  if (!hit) return { kind: 'none' };
+  if (Math.hypot(hit.x - player.x, hit.z - player.z) > PARTY_PING_RANGE) return { kind: 'none' };
+  if (Math.abs(hit.y - player.y) > PARTY_PING_VERTICAL_REACH) return { kind: 'none' };
+  return { kind: 'ground', x: hit.x, y: hit.y, z: hit.z };
+}
 
 /** What a tap pings: Attack on an enemy, Assist on a friend, Look Here on
  *  the ground; nothing when the cursor was over nothing. */

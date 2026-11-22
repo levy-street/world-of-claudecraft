@@ -1636,6 +1636,8 @@ const RENDER_PURE_CORES = [
   'src/render/world_markers_core.ts',
   // the party pings in the world: palette, slots, anchor, pop, ripple, fade, size
   'src/render/party_pings_core.ts',
+  // a ground ping's cursor ray marched against the real floor (world_picking.ts groundHit)
+  'src/render/ping_ground_ray_core.ts',
   'src/render/ignivar_encounter_core.ts',
   'src/render/varkhul_encounter_core.ts',
   'src/render/ignivar_judgment_fire_core.ts',
