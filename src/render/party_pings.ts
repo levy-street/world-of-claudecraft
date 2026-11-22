@@ -9,11 +9,13 @@
 // A ping reads as a callout, not a decoration: the ping's badge icon
 // floating over its unit (following it) or over its ground point, held at a
 // readable screen size at any distance and drawn over the world so a wall
-// never hides it, popping in and fading at the end of its life; under it a
-// ground ring in the ping's colour rippling outward, and (shed on the low
-// preset, cosmetic only) a soft glow behind the badge and a thin light stem
-// from the ground up to it. The icon and the ring always draw: what a player
-// reacts to never depends on the graphics preset.
+// never hides it, popping in and fading at the end of its life. A GROUND ping
+// also lays one short ring ripple in its colour at its point (about a second,
+// fading out; a unit ping has none). The ring ignores depth, like the badge,
+// so sloped terrain can never swallow part of it. Shed on the low preset,
+// cosmetic only: a soft glow behind the badge and a thin light stem from a
+// ground ping's point up to it. The icon and the ring draw the same on every
+// preset: what a player reacts to never depends on the graphics preset.
 //
 // Reads IWorld.partyPings only (presentation; the sim owns the pings), and
 // draws nothing while the player has pings turned off (settings.partyPings).
@@ -32,6 +34,7 @@ import {
   PARTY_PING_COLORS,
   PARTY_PING_GROUND_LIFT,
   PARTY_PING_RING_RADIUS,
+  PARTY_PING_RING_S,
   PARTY_PING_SLOTS,
   type PartyPingMark,
   partyPingAlpha,
@@ -40,7 +43,9 @@ import {
   partyPingIconSize,
   partyPingIconY,
   partyPingPop,
+  partyPingRingAlpha,
   partyPingRipple,
+  partyPingShowsRing,
   syncPartyPingSlots,
 } from './party_pings_core';
 import { setRenderCategory } from './renderer_diagnostics';
@@ -193,9 +198,9 @@ export class PartyPingLayer {
       transparent: true,
       forceSinglePass: true,
       depthWrite: false,
-      polygonOffset: true,
-      polygonOffsetFactor: -2,
-      polygonOffsetUnits: -2,
+      // Over the floor it marks: a flat ring on a slope would otherwise sink
+      // into the uphill side (depth state only, the same program).
+      depthTest: false,
       side: THREE.DoubleSide,
     });
     const ring = new THREE.Mesh(this.ringGeo, ringMat);
@@ -274,7 +279,7 @@ export class PartyPingLayer {
   ): void {
     if (this.disposed) return;
     const live = partyPingsEnabled() ? pings : NO_PINGS;
-    if (syncPartyPingSlots(this.slots, live, time)) this.apply();
+    if (syncPartyPingSlots(this.slots, live, time)) this.apply(time);
     if (this.shownCount === 0) return;
     const cam = camera.position;
     const persp = camera as THREE.PerspectiveCamera;
@@ -303,11 +308,15 @@ export class PartyPingLayer {
       piece.icon.position.set(a.x, iconY, a.z);
       piece.icon.scale.set(size, size, 1);
       piece.iconMat.opacity = alpha;
-      piece.ring.position.set(a.x, a.y + 0.06, a.z);
-      const ringScale = PARTY_PING_RING_RADIUS * Math.min(1, 0.4 + pop * 0.6);
-      piece.ring.scale.set(ringScale, ringScale, 1);
-      piece.ringMat.uniforms.uPhase.value = partyPingRipple(age, reducedMotion);
-      piece.ringMat.uniforms.uAlpha.value = alpha;
+      const ringOn = partyPingShowsRing(slot) && age < PARTY_PING_RING_S;
+      if (piece.ring.visible !== ringOn) piece.ring.visible = ringOn;
+      if (ringOn) {
+        piece.ring.position.set(a.x, a.y + 0.06, a.z);
+        const ringScale = PARTY_PING_RING_RADIUS * Math.min(1, 0.4 + pop * 0.6);
+        piece.ring.scale.set(ringScale, ringScale, 1);
+        piece.ringMat.uniforms.uPhase.value = partyPingRipple(age, reducedMotion);
+        piece.ringMat.uniforms.uAlpha.value = partyPingRingAlpha(age);
+      }
       if (!this.lowTier) {
         piece.glow.position.set(a.x, iconY, a.z);
         piece.glow.scale.set(size * 1.6, size * 1.6, 1);
@@ -319,7 +328,7 @@ export class PartyPingLayer {
     }
   }
 
-  private apply(): void {
+  private apply(time: number): void {
     let shown = 0;
     for (let s = 0; s < PARTY_PING_SLOTS; s++) {
       const slot = this.slots[s];
@@ -331,7 +340,8 @@ export class PartyPingLayer {
         piece.glowMat.color.copy(color);
         piece.iconMat.map = this.icons[slot.kind] ?? this.icons[0];
       }
-      piece.ring.visible = on;
+      // The ring shows only through a ground ping's first second (update()).
+      piece.ring.visible = on && partyPingShowsRing(slot) && time - slot.born < PARTY_PING_RING_S;
       piece.icon.visible = on;
       // The cosmetic pieces: a unit ping's stem would cut through its unit.
       piece.glow.visible = on && !this.lowTier;

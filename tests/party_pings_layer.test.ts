@@ -1,7 +1,8 @@
 // @vitest-environment happy-dom
 // The party pings in the world, the pooled Three layer
 // (src/render/party_pings.ts): every slot built up front and hidden, a ping
-// shows its icon and ring (a unit ping following its unit), the cosmetic
+// shows its icon (a unit ping following its unit; only a ground ping lays a
+// short, depth-free ring ripple), the cosmetic
 // glow and stem shed on the low preset while the icon and ring draw the
 // same (graphics fairness), Enable Pings off draws nothing, and the prewarm
 // entry stages every material.
@@ -22,6 +23,8 @@ import { PartyPingLayer, partyPingPrewarmEntry } from '../src/render/party_pings
 import {
   PARTY_PING_HEAD_LIFT,
   PARTY_PING_POP_S,
+  PARTY_PING_RING_RADIUS,
+  PARTY_PING_RING_S,
   PARTY_PING_SLOTS,
   type PartyPingMark,
 } from '../src/render/party_pings_core';
@@ -82,6 +85,21 @@ describe('party ping layer', () => {
     expect(ring.position.y).toBeCloseTo(2, 0);
     expect(icon.scale.x).toBeGreaterThan(0);
     expect((icon.material as THREE.SpriteMaterial).depthTest).toBe(false);
+    // Sloped terrain can never swallow part of the ring: it draws over the floor.
+    expect((ring.material as THREE.ShaderMaterial).depthTest).toBe(false);
+    expect(ring.scale.x).toBeCloseTo(PARTY_PING_RING_RADIUS, 5);
+  });
+
+  it('a ground ring is one short ripple: gone after PARTY_PING_RING_S, the icon stays', () => {
+    const { scene, l, camera } = layer(false);
+    l.update([mark(1)], camera, 0, false);
+    l.update([mark(1)], camera, PARTY_PING_RING_S * 0.5, false);
+    expect(pieces(scene, 'party-ping-ring').filter((c) => c.visible)).toHaveLength(1);
+    l.update([mark(1)], camera, PARTY_PING_RING_S + 0.01, false);
+    expect(pieces(scene, 'party-ping-ring').some((c) => c.visible)).toBe(false);
+    expect(pieces(scene, 'party-ping-icon').filter((c) => c.visible)).toHaveLength(1);
+    l.update([mark(1)], camera, 3, false);
+    expect(pieces(scene, 'party-ping-ring').some((c) => c.visible)).toBe(false);
   });
 
   it('a unit ping follows its unit as this client draws it', () => {
@@ -98,14 +116,17 @@ describe('party ping layer', () => {
     group.position.set(44, 1, 52);
     l.update([mark(1, { kind: PING_ATTACK, target: 7 })], camera, 0.5, false);
     expect(icon.position.x).toBe(44);
-    // A unit ping draws no stem through its unit.
+    // A unit ping draws no stem through its unit, and no ground ring at all.
     expect(pieces(scene, 'party-ping-stem').some((c) => c.visible)).toBe(false);
+    expect(pieces(scene, 'party-ping-ring').some((c) => c.visible)).toBe(false);
+    l.update([mark(1, { kind: PING_ATTACK, target: 7 })], camera, 0.05, false);
+    expect(pieces(scene, 'party-ping-ring').some((c) => c.visible)).toBe(false);
   });
 
   it('the low preset sheds only the glow and stem; the icon and ring draw the same', () => {
     const hi = layer(false);
     const lo = layer(true);
-    for (const t of [0, 1]) {
+    for (const t of [0, 0.5]) {
       hi.l.update([mark(1)], hi.camera, t, false);
       lo.l.update([mark(1)], lo.camera, t, false);
     }

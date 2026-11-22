@@ -45,9 +45,10 @@ export const PARTY_PING_SLOTS = PARTY_PING_GROUP_MAX;
 /** The icon's pop in (seconds) and its fade out at the end of its life. */
 export const PARTY_PING_POP_S = 0.34;
 export const PARTY_PING_FADE_S = 0.5;
-/** The ground ring's ripple period (seconds) and its radius (yards). */
-export const PARTY_PING_RIPPLE_S = 1.15;
-export const PARTY_PING_RING_RADIUS = 1.7;
+/** The ground ring: ONE short ripple (seconds) that fades out, and its radius
+ *  (yards). Only a ground ping draws it; a unit ping is its icon alone. */
+export const PARTY_PING_RING_S = 1;
+export const PARTY_PING_RING_RADIUS = 1.1;
 /** How high a ground ping's icon floats over its point, and how far over a
  *  unit's head a unit ping's icon floats (yards). */
 export const PARTY_PING_GROUND_LIFT = 2.4;
@@ -173,11 +174,27 @@ export function partyPingAlpha(age: number): number {
   return fadeIn * fadeOut;
 }
 
-/** The ground ring's ripple phase 0..1 (0 = a fresh ripple at the centre). */
+/** Whether a slot draws the ground ring: a ground ping does, a unit ping
+ *  (whose icon follows the unit) never does. */
+export function partyPingShowsRing(slot: Pick<PartyPingSlot, 'target'>): boolean {
+  return slot.target === null;
+}
+
+/** The ground ring's ripple phase over its one ripple: 0 (a fresh ripple at
+ *  the centre) to 1 at PARTY_PING_RING_S, held there after. Reduced motion
+ *  holds it still. */
 export function partyPingRipple(age: number, reducedMotion: boolean): number {
   if (reducedMotion) return 0.55;
-  const p = Math.max(0, age) / PARTY_PING_RIPPLE_S;
-  return p - Math.floor(p);
+  return Math.min(1, Math.max(0, age) / PARTY_PING_RING_S);
+}
+
+/** The ground ring's opacity: a fast fade in, then down to 0 at
+ *  PARTY_PING_RING_S (0 from then on: the ring is gone, the icon stays). */
+export function partyPingRingAlpha(age: number): number {
+  if (age < 0 || age >= PARTY_PING_RING_S) return 0;
+  const fadeIn = Math.min(1, age / 0.08);
+  const left = 1 - age / PARTY_PING_RING_S;
+  return fadeIn * left * (2 - left);
 }
 
 /** The icon's world size so it holds PARTY_PING_SCREEN_SHARE of the view at

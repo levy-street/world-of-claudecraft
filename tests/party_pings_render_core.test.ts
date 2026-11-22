@@ -14,6 +14,7 @@ import {
   PARTY_PING_MIN_SIZE,
   PARTY_PING_PLATE_CLEAR,
   PARTY_PING_POP_S,
+  PARTY_PING_RING_S,
   PARTY_PING_SLOTS,
   type PartyPingMark,
   partyPingAlpha,
@@ -22,7 +23,9 @@ import {
   partyPingIconSize,
   partyPingIconY,
   partyPingPop,
+  partyPingRingAlpha,
   partyPingRipple,
+  partyPingShowsRing,
   syncPartyPingSlots,
 } from '../src/render/party_pings_core';
 import {
@@ -110,13 +113,27 @@ describe('party pings render core: motion', () => {
     expect(partyPingAlpha(0)).toBe(0);
   });
 
-  it('the ripple loops 0..1; reduced motion holds it still', () => {
-    for (const age of [0, 0.4, 1.3, 7.9]) {
-      const r = partyPingRipple(age, false);
-      expect(r).toBeGreaterThanOrEqual(0);
-      expect(r).toBeLessThan(1);
-    }
+  it('the ring is one ripple over PARTY_PING_RING_S; reduced motion holds it still', () => {
+    expect(partyPingRipple(0, false)).toBe(0);
+    expect(partyPingRipple(PARTY_PING_RING_S / 2, false)).toBeCloseTo(0.5, 5);
+    expect(partyPingRipple(PARTY_PING_RING_S, false)).toBe(1);
+    // One ripple, never a loop: it holds at 1 after.
+    expect(partyPingRipple(PARTY_PING_RING_S * 3.5, false)).toBe(1);
     expect(partyPingRipple(0.4, true)).toBe(partyPingRipple(2, true));
+  });
+
+  it('the ring fades out to nothing by PARTY_PING_RING_S', () => {
+    expect(partyPingRingAlpha(-0.1)).toBe(0);
+    expect(partyPingRingAlpha(0.1)).toBeGreaterThan(0.8);
+    expect(partyPingRingAlpha(PARTY_PING_RING_S * 0.8)).toBeLessThan(partyPingRingAlpha(0.3));
+    expect(partyPingRingAlpha(PARTY_PING_RING_S)).toBe(0);
+    expect(partyPingRingAlpha(PARTY_PING_LIFETIME_S)).toBe(0);
+    expect(PARTY_PING_RING_S).toBeLessThanOrEqual(1);
+  });
+
+  it('only a ground ping draws the ring; a unit ping is its icon alone', () => {
+    expect(partyPingShowsRing({ target: null })).toBe(true);
+    expect(partyPingShowsRing({ target: 7 })).toBe(false);
   });
 
   it('holds a readable screen share, clamped', () => {
