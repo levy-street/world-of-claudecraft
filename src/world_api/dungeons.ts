@@ -60,7 +60,10 @@ export type HazardPoolStyle = 'marsh' | 'ember' | 'violet';
  * `armSec` window before its first damage tick), stand, and drain.
  * `ageSec` is exact offline; online it is counted from when the client first
  * saw the pool (the client has no server clock), so it can run a round trip
- * late. A pool stays listed for exactly as long as the sim keeps it.
+ * late, and a client that first sees a pool mid-life (a reconnect, a late
+ * interest entry) replays its one-second spill. Accepted: the full footprint
+ * shows from the first frame either way, so where the pool lies is never
+ * wrong. A pool stays listed for exactly as long as the sim keeps it.
  */
 export interface HazardPoolView {
   /** Stable for the pool's whole life; a new pool never reuses a live id. */

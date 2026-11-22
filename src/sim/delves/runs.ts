@@ -1912,7 +1912,9 @@ export function delveRunWire(ctx: SimContext, pid: number): object | null {
     exitPortalOpen: run.exitPortalOpen,
     bountiful: run.bountiful,
     // Display-only pool rows: static per pool, so `drun` resends only when a
-    // pool appears or goes (the self wire is JSON-diffed per tick).
+    // pool appears or goes (the self wire is JSON-diffed per tick). Per-tick
+    // cost is bounded: an early return while no mark is down, else one scan
+    // of this run's mobIds (a delve room's handful) for the boss.
     bossPools: blackwaterMarkPoolInfos(liveBlackwaterMarks(ctx, run)),
   };
 }
