@@ -9939,6 +9939,7 @@ export const fr_FR: EnTranslations = {
       "swimNote": "Nager utilise deux touches : maintenez Space pour remonter et LCtrl pour descendre. Orienter la caméra vers le bas en nageant vers l'avant fait aussi plonger, si bien que vous pouvez piloter votre profondeur avec la vue. LCtrl est la seule touche par défaut qui soit à elle seule une touche modificatrice, et un appui isolé sur une touche modificatrice est ignoré pendant l'assignation des touches, alors choisissez une touche qui n'en est pas une si vous réassignez la touche pour plonger.",
       "bgFlag": "Prendre le drapeau ennemi aux Champs de Thornhollow",
       "attackMove": "Déplacement d'attaque (seulement une fois l'option activée)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Compteurs de dégâts (dégâts, soins et menace)",
       "petMark": "Familier : Marquer, sélectionner votre propre familier (comme cliquer sur son cadre)",
       "targetSelf": "Ciblez-vous",

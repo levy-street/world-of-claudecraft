@@ -392,6 +392,8 @@ export const guideStrings = {
       'Swimming uses two keys: hold Space to rise and LCtrl to sink. Aiming the camera down while you swim forward dives as well, so you can steer your depth with the view. LCtrl is the one default that is a modifier key on its own, and a lone modifier press is ignored while you are binding, so pick a key that is not a modifier if you rebind Swim Down.',
     bgFlag: 'Take the enemy flag in Thornhollow Fields',
     attackMove: 'Attack Move (only once you switch the option on)',
+    // The party pings' held key (src/game/keybinds.ts `ping`, default KeyY).
+    ping: 'Ping: tap to ping what is under the cursor, hold for the ping wheel',
     meters: 'Damage meters (damage, healing, and threat)',
     petMark: 'Pet: Mark, select your own pet (the same as clicking its frame)',
     targetSelf: 'Target yourself',

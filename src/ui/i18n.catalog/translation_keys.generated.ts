@@ -10148,6 +10148,7 @@ export type TranslationKeyFlat =
   | 'guide.controls.onBarBinding'
   | 'guide.controls.petBar'
   | 'guide.controls.petMark'
+  | 'guide.controls.ping'
   | 'guide.controls.professions'
   | 'guide.controls.reliquary'
   | 'guide.controls.runForward'

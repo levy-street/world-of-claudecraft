@@ -44,6 +44,8 @@ const GROUPS: Group[] = [
       { keys: ['Shift+F'], label: 'guide.controls.bgFlag' },
       // Only live while the Attack Move option is on; the note under the tables says so.
       { keys: ['A'], label: 'guide.controls.attackMove' },
+      // Party pings: a held key, tap for a contextual ping, hold for the wheel.
+      { keys: ['Y'], label: 'guide.controls.ping' },
       { keys: ['1', '0'], label: 'guide.controls.abilities' },
     ],
   },

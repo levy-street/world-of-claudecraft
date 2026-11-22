@@ -9939,6 +9939,7 @@ export const it_IT: EnTranslations = {
       "swimNote": "Il nuoto usa due tasti: tieni premuto Spazio per risalire e Ctrl sinistro per scendere. Anche puntare la telecamera verso il basso mentre nuoti in avanti ti fa immergere, così puoi controllare la profondità con la visuale. Ctrl sinistro è l'unico predefinito che è di per sé un tasto modificatore, e una pressione isolata di un modificatore viene ignorata durante l'associazione, quindi scegli un tasto che non sia un modificatore se riassoci Nuota verso il basso.",
       "bgFlag": "Prendi la bandiera nemica ai Campi di Thornhollow",
       "attackMove": "Attacca in Movimento (solo dopo aver attivato l'opzione)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Misuratori danni (danno, cura e minaccia)",
       "petMark": "Famiglio: bersaglia, seleziona il tuo famiglio (equivale a cliccare sul suo riquadro)",
       "targetSelf": "Prendi di mira te stesso",

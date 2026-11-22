@@ -9939,6 +9939,7 @@ export const id_ID: EnTranslations = {
       "swimNote": "Berenang menggunakan dua tombol: tahan Space untuk naik dan LCtrl untuk turun. Mengarahkan kamera ke bawah sambil berenang maju juga membuatmu menyelam, sehingga kamu bisa mengatur kedalamanmu lewat sudut pandang. LCtrl adalah satu-satunya tombol bawaan yang merupakan tombol pengubah tersendiri, dan sebuah penekanan tombol pengubah tunggal diabaikan saat kamu sedang mengikat tombol, jadi pilihlah tombol yang bukan pengubah jika kamu mengikat ulang Berenang Turun.",
       "bgFlag": "Ambil bendera musuh di Medan Thornhollow",
       "attackMove": "Serang Bergerak (hanya setelah kamu mengaktifkan opsinya)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Meter kerusakan (kerusakan, penyembuhan, dan ancaman)",
       "petMark": "Peliharaan: Tandai, pilih peliharaanmu sendiri (sama seperti mengklik bingkainya)",
       "targetSelf": "Targetkan diri Anda sendiri",

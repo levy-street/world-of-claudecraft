@@ -1466,6 +1466,21 @@ describe('Guide deeds cross-page surfaces', () => {
     expect(html).toContain('<kbd>Shift+X</kbd></td><td>The Reliquary</td>');
   });
 
+  it('lists the Ping key on the controls page, matching the in-game default', () => {
+    setLanguage('en');
+    const pingBind = BIND_ACTIONS.find((a) => a.id === 'ping');
+    expect(pingBind?.defaults).toEqual(['KeyY']);
+    expect(pingBind?.kind).toBe('held');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain(
+      '<kbd>Y</kbd></td><td>Ping: tap to ping what is under the cursor, hold for the ping wheel</td>',
+    );
+  });
+
   it('cross-links the deeds catalog from the dungeons page', () => {
     setLanguage('en');
     const html = dungeonsPage.render({
@@ -7010,8 +7025,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // The emote wheel is the one held bind of the set, and the prose says so.
     expect(bind('emoteWheel').kind).toBe('held');
     expect(beat).toContain(`The emote wheel (${key('emoteWheel')}) is the exception: hold its key`);
-    // No bind defaults to Y and no Vale Cup bind exists: the dead entry is gone.
-    expect(BIND_ACTIONS.some((b) => b.defaults.includes('KeyY'))).toBe(false);
+    // No window binds to Y and no Vale Cup bind exists: the dead entry is gone.
+    // Y is now only the held Ping key (the controls page lists it, not this beat).
+    expect(BIND_ACTIONS.filter((b) => b.defaults.includes('KeyY')).map((b) => b.id)).toEqual([
+      'ping',
+    ]);
     expect(BIND_ACTIONS.some((b) => /vale/i.test(b.id) || /vale cup/i.test(b.label))).toBe(false);
     expect(beat).not.toContain('Vale Cup');
     expect(beat).not.toContain('(Y)');

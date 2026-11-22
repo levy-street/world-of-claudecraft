@@ -9939,6 +9939,7 @@ export const es: EnTranslations = {
       "swimNote": "Nadar usa dos teclas: mantén pulsada Espacio para subir y LCtrl para bajar. Apuntar la cámara hacia abajo mientras nadas hacia adelante también te hace bucear, así que puedes controlar tu profundidad con la vista. LCtrl es la única tecla predeterminada que es en sí misma una tecla modificadora, y una pulsación de modificador en solitario se ignora mientras estás asignando teclas, así que elige una tecla que no sea modificadora si reasignas Nadar hacia abajo.",
       "bgFlag": "Toma la bandera enemiga en los Campos Espinosos",
       "attackMove": "Ataque en movimiento (solo tras activar la opción)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Medidores de daño (daño, sanación y amenaza)",
       "petMark": "Mascota: Marcar, selecciona a tu propia mascota (lo mismo que hacer clic en su marco)",
       "targetSelf": "Apunta a ti mismo",

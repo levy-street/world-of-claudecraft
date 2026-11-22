@@ -26322,4 +26322,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pings.enableSetting': 'ピンを有効にする',
   'hudChrome.pings.enableSettingNote':
     'ピンキーを長押しするとピンホイールが開き、軽く押すとカーソルの下にあるものにピンを送ります。ピンが見えるのはあなたのパーティーまたはレイドだけで、5秒ごとに最大4回までです。オフにすると、グループのピンもすべて非表示になります（アイコン、サウンド、チャット行、ミニマップの印）。',
+  'guide.controls.ping': 'ピン：軽く押すとカーソルの下にピン、長押しでピンホイール',
 };

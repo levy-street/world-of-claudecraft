@@ -9939,6 +9939,7 @@ export const cs_CZ: EnTranslations = {
       "swimNote": "Plavání používá dvě klávesy: drž mezerník pro stoupání a LCtrl pro klesání. Míření kamery dolů, zatímco plaveš vpřed, tě taky potopí, takže hloubku můžeš řídit pohledem. LCtrl je jediná výchozí klávesa, která je sama o sobě modifikátor, a osamocené stisknutí modifikátoru se při nastavování vazby ignoruje, takže pokud přenastavuješ Plavat dolů, zvol klávesu, která není modifikátor.",
       "bgFlag": "Vzít nepřátelskou vlajku na Thornhollowských polích",
       "attackMove": "Útočný pohyb (jen po zapnutí této možnosti)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Měřiče (poškození, léčení a hrozba)",
       "petMark": "Mazlíček: Zacílit, vybere tvého vlastního mazlíčka (stejné jako kliknutí na jeho rámeček)",
       "targetSelf": "Zaměřte se na sebe",

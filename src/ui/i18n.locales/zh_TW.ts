@@ -24993,4 +24993,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pings.enableSetting': '啟用信號',
   'hudChrome.pings.enableSettingNote':
     '按住信號鍵開啟信號輪盤，輕按則向游標下的目標發出信號。只有你的隊伍或團隊能看到你的信號，每5秒最多4次。關閉後也會隱藏隊友的所有信號：沒有圖示、聲音、聊天訊息或小地圖標記。',
+  'guide.controls.ping': '信號：輕按向游標下的目標發出信號，按住開啟信號輪盤',
 };

@@ -9939,6 +9939,7 @@ export const sv_SE: EnTranslations = {
       "swimNote": "Simning använder två tangenter: håll Mellanslag intryckt för att stiga och LCtrl för att sjunka. Att rikta kameran nedåt medan du simmar framåt dyker också, så du kan styra ditt djup med vyn. LCtrl är den enda standardtangenten som är en modifierartangent i sig själv, och ett ensamt modifierartryck ignoreras medan du binder om, så välj en tangent som inte är en modifierare om du binder om Simma nedåt.",
       "bgFlag": "Ta fiendens flagga i Törnhålefälten",
       "attackMove": "Anfallsförflyttning (bara sedan du slår på alternativet)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Skademätare (skada, läkning och hot)",
       "petMark": "Djur: Markera, välj ditt eget djur (samma som att klicka på dess ram)",
       "targetSelf": "Rikta in dig på",

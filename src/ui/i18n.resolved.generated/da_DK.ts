@@ -9939,6 +9939,7 @@ export const da_DK: EnTranslations = {
       "swimNote": "Svømning bruger to taster: hold Mellemrum nede for at stige og LCtrl for at synke. At sigte kameraet nedad, mens du svømmer fremad, dykker også, så du kan styre din dybde med udsynet. LCtrl er den ene standardtast, der i sig selv er en modifikatortast, og et enkelt modifikatortryk ignoreres, mens du binder, så vælg en tast, der ikke er en modifikator, hvis du ombinder Svøm Ned.",
       "bgFlag": "Tag fjendens flag i Tornehulemarkerne",
       "attackMove": "Angrebsbevægelse (kun når du har slået indstillingen til)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Skadesmålere (skade, helbredelse og trussel)",
       "petMark": "Kæledyr: Marker, vælg dit eget kæledyr (det samme som at klikke på dets ramme)",
       "targetSelf": "Mål dig selv",

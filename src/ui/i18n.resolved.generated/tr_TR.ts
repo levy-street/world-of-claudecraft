@@ -9939,6 +9939,7 @@ export const tr_TR: EnTranslations = {
       "swimNote": "Yüzmek iki tuş kullanır: yükselmek için Space’i, dalmak için LCtrl’yi basılı tutun. İleri yüzerken kamerayı aşağı doğrultmak da dalmanızı sağlar, böylece derinliğinizi görüşünüzle yönlendirebilirsiniz. LCtrl, tek başına bir değiştirici tuş olan tek varsayılandır, ve atama yaparken tek başına bir değiştirici basışı yok sayılır, bu yüzden Aşağı Yüz’ü yeniden atarsanız değiştirici olmayan bir tuş seçin.",
       "bgFlag": "Dikenvadi Ovası'nda düşman sancağını al",
       "attackMove": "Saldır-Yürü (yalnızca seçenek açıkken)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Hasar sayaçları (hasar, iyileştirme ve tehdit)",
       "petMark": "Yoldaş: Hedefle, kendi yoldaşını seç (çerçevesine tıklamakla aynı)",
       "targetSelf": "Kendinizi hedefleyin",

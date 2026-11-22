@@ -9939,6 +9939,7 @@ export const pl_PL: EnTranslations = {
       "swimNote": "Pływanie korzysta z dwóch klawiszy: przytrzymaj Spację, by się unosić, i LCtrl, by opadać. Skierowanie kamery w dół podczas pływania do przodu również powoduje nurkowanie, więc możesz sterować głębokością samym spojrzeniem. LCtrl to jedyny domyślny klawisz, który sam w sobie jest modyfikatorem, a samo naciśnięcie modyfikatora jest ignorowane podczas przypisywania, więc jeśli zmieniasz klawisz dla Płynięcia w dół, wybierz taki, który nie jest modyfikatorem.",
       "bgFlag": "Zabierz wrogą flagę na Polach Ciernistej Kotliny",
       "attackMove": "Ruch z atakiem (dopiero po włączeniu tej opcji)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Liczniki obrażeń (obrażenia, leczenie i zagrożenie)",
       "petMark": "Zwierzę: Zaznacz, wybierz własne zwierzę (to samo co kliknięcie jego ramki)",
       "targetSelf": "Celuj w siebie",

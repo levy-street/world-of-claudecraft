@@ -9939,6 +9939,7 @@ export const nl_NL: EnTranslations = {
       "swimNote": "Zwemmen gebruikt twee toetsen: houd Spatie ingedrukt om te stijgen en LCtrl om te zinken. De camera omlaag richten terwijl je voorwaarts zwemt, duikt ook, dus je kunt je diepte sturen met het zicht. LCtrl is de enige standaardtoets die op zichzelf een modificatietoets is, en een losse modificatietoets-druk wordt genegeerd tijdens het binden, dus kies een toets die geen modificatietoets is als je Omlaag Zwemmen opnieuw toewijst.",
       "bgFlag": "Neem de vlag van de vijand in Doornholte-Velden",
       "attackMove": "Aanvalsbeweging (alleen zodra je de optie inschakelt)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Schademeters (schade, genezing en dreiging)",
       "petMark": "Huisdier: Markeren, selecteer je eigen huisdier (hetzelfde als op zijn frame klikken)",
       "targetSelf": "Richt je op jezelf",

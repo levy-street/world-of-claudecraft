@@ -9939,6 +9939,7 @@ export const de_DE: EnTranslations = {
       "swimNote": "Schwimmen nutzt zwei Tasten: Halte die Leertaste zum Aufsteigen und die linke Strg-Taste zum Absinken. Die Kamera beim Vorwärtsschwimmen nach unten zu richten, taucht ebenfalls, sodass du deine Tiefe über die Sicht steuern kannst. Die linke Strg-Taste ist die einzige Standardbelegung, die selbst eine Modifikatortaste ist, und ein einzelner Modifikatortastendruck wird beim Belegen ignoriert, wähle also eine Taste, die kein Modifikator ist, wenn du Nach unten schwimmen neu belegst.",
       "bgFlag": "Die gegnerische Flagge in den Thornhollow-Feldern nehmen",
       "attackMove": "Angriffsbewegung (erst, nachdem du die Option aktiviert hast)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Schadensanzeigen (Schaden, Heilung und Bedrohung)",
       "petMark": "Begleiter: Markieren, deinen eigenen Begleiter auswählen (dasselbe wie ein Klick auf sein Porträt)",
       "targetSelf": "Zielen Sie auf sich selbst",

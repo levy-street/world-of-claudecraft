@@ -9939,6 +9939,7 @@ export const vi_VN: EnTranslations = {
       "swimNote": "Bơi lội dùng hai phím: giữ Space để nổi lên và LCtrl để chìm xuống. Hướng máy quay xuống trong khi bơi tới cũng khiến bạn lặn xuống, nên bạn có thể điều khiển độ sâu bằng góc nhìn. LCtrl là phím mặc định duy nhất vốn tự thân là một phím bổ trợ, và một lần nhấn phím bổ trợ đơn lẻ sẽ bị bỏ qua khi bạn đang gán phím, nên hãy chọn một phím không phải phím bổ trợ nếu bạn gán lại Bơi Xuống.",
       "bgFlag": "Cướp cờ địch tại Cánh Đồng Trũng Gai",
       "attackMove": "Di Chuyển Tấn Công (chỉ khi bạn đã bật tùy chọn này)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Bảng thống kê (sát thương, hồi máu, và đe dọa)",
       "petMark": "Thú Cưng: Đánh Dấu, chọn thú cưng của chính bạn (giống hệt việc bấm vào khung của nó)",
       "targetSelf": "Nhắm mục tiêu cho chính bạn",

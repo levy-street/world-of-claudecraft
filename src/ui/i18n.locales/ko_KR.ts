@@ -26332,4 +26332,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pings.enableSetting': '핑 사용',
   'hudChrome.pings.enableSettingNote':
     '핑 키를 누르고 있으면 핑 휠이 열리고, 짧게 누르면 커서 아래에 있는 대상에 핑을 보냅니다. 핑은 파티나 공격대원에게만 보이며 5초마다 최대 4번까지 보낼 수 있습니다. 끄면 그룹의 핑도 모두 숨겨집니다: 아이콘, 소리, 채팅 줄, 미니맵 표시가 나타나지 않습니다.',
+  'guide.controls.ping': '핑: 짧게 누르면 커서 아래에 핑, 길게 누르면 핑 휠',
 };

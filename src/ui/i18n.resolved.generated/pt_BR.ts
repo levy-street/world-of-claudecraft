@@ -9939,6 +9939,7 @@ export const pt_BR: EnTranslations = {
       "swimNote": "Nadar usa duas teclas: mantenha Space pressionado para subir e LCtrl para descer. Apontar a câmera para baixo enquanto nada para frente também mergulha, então você pode direcionar sua profundidade com a visão. LCtrl é o único padrão que é, por si só, uma tecla modificadora, e um simples toque em um modificador é ignorado enquanto você está atribuindo teclas, então escolha uma tecla que não seja modificadora se for reatribuir Nadar para Baixo.",
       "bgFlag": "Pega a bandeira inimiga nos Campos de Thornhollow",
       "attackMove": "Mover e Atacar (somente depois que você ativar a opção)",
+      "ping": "Ping: tap to ping what is under the cursor, hold for the ping wheel",
       "meters": "Medidores de dano (dano, cura e ameaça)",
       "petMark": "Mascote: selecionar, seleciona seu próprio mascote (o mesmo que clicar em seu retrato)",
       "targetSelf": "Mire-se",
