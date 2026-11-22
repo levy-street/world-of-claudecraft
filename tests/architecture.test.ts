@@ -340,6 +340,8 @@ const UI_PURE_CORES = [
   // Party pings: the wheel's wedges, the key's tap-or-hold rule, the feed's chat/minimap math.
   'src/ui/hud/pings/ping_wheel_core.ts',
   'src/ui/hud/pings/ping_feed_core.ts',
+  // the ping's chat callout: its parts, the kind colour class, the unit's reaction
+  'src/ui/hud/pings/ping_chat_line_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',

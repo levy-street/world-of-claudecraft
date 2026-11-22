@@ -13,7 +13,7 @@ import {
   isAttackableEntity,
   type PickInteractionWorld,
 } from '../../../game/interactions';
-import { partyPingsEnabled } from '../../../game/party_pings_setting';
+import { partyPingsChatEnabled, partyPingsEnabled } from '../../../game/party_pings_setting';
 import { sfx } from '../../../game/sfx';
 import type { IWorld } from '../../../world_api';
 import { MINIMAP_BASE_SCALE } from '../../minimap_painter';
@@ -34,7 +34,8 @@ interface PingsHost {
     };
   };
   minimapZoom: number;
-  log(text: string, color?: string, icon?: string, channel?: string): void;
+  log(text: string | readonly Node[], color?: string, icon?: string, channel?: string): void;
+  openChatPlayerContextMenu(name: string, x: number, y: number, opener?: HTMLElement): void;
 }
 
 /** The Hud's one handle on its pings. */
@@ -117,7 +118,20 @@ function buildPings(h: PingsHost): { wheel: PingWheelController; feed: PingFeedC
     writers: h.writerFacet,
     world: () => h.sim,
     enabled: partyPingsEnabled,
-    log: (text) => h.log(text, chatChannelColor('party'), undefined, 'party'),
+    chatEnabled: partyPingsChatEnabled,
+    // The party channel (All and Party tabs), solo too: a solo ping is the
+    // player's own callout and lands where their group's would.
+    log: (nodes) => h.log(nodes, chatChannelColor('party'), undefined, 'party'),
+    attackable: (e) =>
+      isAttackableEntity(
+        e,
+        h.sim.playerId,
+        activePvpOpponentIds(h.sim as unknown as PickInteractionWorld),
+      ),
+    openPlayerMenu: (name, anchor, x, y) => {
+      const r = anchor.getBoundingClientRect();
+      h.openChatPlayerContextMenu(name, x ?? r.left, y ?? r.bottom, anchor);
+    },
     sound: (key, rate, gain) => sfx.playUi(key, { rate, gain, cooldown: 0.08 }),
     minimapScale: () => MINIMAP_BASE_SCALE * h.minimapZoom,
     minimapHost: () => doc.getElementById('minimap-disc'),

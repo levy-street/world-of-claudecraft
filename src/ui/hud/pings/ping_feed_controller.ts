@@ -1,6 +1,8 @@
 // What the group's pings do on this client beyond the world icon (the
 // renderer draws that, render/party_pings.ts): each NEW ping in view plays
-// its kind's sound once and writes its party chat line once, and every live
+// its kind's sound once and writes its chat callout once (ping_chat_line.ts:
+// the kind's badge, the sender, the callout in the kind's colour, the unit's
+// name in its reaction colour; settings.partyPingsChat can drop it), and every live
 // ping in view sits on the minimap as its badge (pulled in to the rim when
 // it lies past it). Every decision is in ping_feed_core.ts.
 //
@@ -15,9 +17,10 @@ import type { PartyPing } from '../../../sim/social/party_pings';
 import type { Entity } from '../../../sim/types';
 import type { PainterHostWriters } from '../../painter_host';
 import { pingIconUrl } from '../../ping_icons';
+import { pingChatLineNodes } from './ping_chat_line';
+import { pingChatLineModel, pingTargetReaction } from './ping_chat_line_core';
 import {
   PING_SOUNDS,
-  pingChatLine,
   pingInView,
   pingMinimapPoint,
   pingTargetName,
@@ -39,8 +42,14 @@ export interface PingFeedDeps {
   world: () => PingFeedWorld;
   /** settings.partyPings. */
   enabled: () => boolean;
-  /** Write one party chat line. */
-  log: (text: string) => void;
+  /** settings.partyPingsChat: whether a ping writes its chat line (default on). */
+  chatEnabled?: () => boolean;
+  /** Write one chat line: its body nodes, and the same line as plain text. */
+  log: (nodes: readonly Node[], plain: string) => void;
+  /** Whether the viewer can attack `e` (the unit name's reaction colour). */
+  attackable?: (e: Entity) => boolean;
+  /** Open the chat player menu for a player name in the line. */
+  openPlayerMenu?: (name: string, anchor: HTMLElement, x?: number, y?: number) => void;
   /** Play a sampled UI cue. */
   sound: (key: string, rate: number, gain: number) => void;
   /** The minimap's pixels per yard right now (base scale times zoom). */
@@ -73,11 +82,29 @@ export class PingFeedController {
       if (ping.known || !pingInView(ping, at)) continue;
       const sound = PING_SOUNDS[ping.kind];
       if (sound) this.deps.sound(sound.key, sound.rate, sound.gain);
-      const live = ping.target === null ? undefined : world.entities.get(ping.target);
-      const name = ping.target === null ? null : pingTargetName(ping, live);
-      this.deps.log(pingChatLine(ping, name));
+      if (this.deps.chatEnabled && !this.deps.chatEnabled()) continue;
+      this.writeLine(ping, world);
     }
     this.paintMinimap(pings, world);
+  }
+
+  private writeLine(ping: PartyPing, world: PingFeedWorld): void {
+    let target: { name: string; reaction: ReturnType<typeof pingTargetReaction> } | null = null;
+    if (ping.target !== null) {
+      const live = world.entities.get(ping.target);
+      const attackable = this.deps.attackable;
+      const reaction = pingTargetReaction(
+        ping.targetKind,
+        live && attackable ? { attackable: attackable(live), hostile: live.hostile } : null,
+      );
+      target = { name: pingTargetName(ping, live), reaction };
+    }
+    const model = pingChatLineModel(ping, target);
+    const nodes = pingChatLineNodes(this.deps.doc, model, {
+      openPlayerMenu: this.deps.openPlayerMenu,
+      targetIsPlayer: ping.targetKind === 'player',
+    });
+    this.deps.log(nodes, model.plain);
   }
 
   private paintMinimap(pings: readonly PartyPing[], world: PingFeedWorld): void {

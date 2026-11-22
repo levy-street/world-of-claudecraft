@@ -14,16 +14,30 @@
 import { SETTINGS_CHANGE_EVENT, Settings } from './settings';
 
 let cached: boolean | null = null;
+let cachedChat: boolean | null = null;
 let watching = false;
+
+function watch(): void {
+  if (watching) return;
+  watching = true;
+  window.addEventListener(SETTINGS_CHANGE_EVENT, () => {
+    cached = null;
+    cachedChat = null;
+  });
+}
 
 export function partyPingsEnabled(): boolean {
   if (typeof window === 'undefined') return new Settings().get('partyPings');
-  if (!watching) {
-    watching = true;
-    window.addEventListener(SETTINGS_CHANGE_EVENT, () => {
-      cached = null;
-    });
-  }
+  watch();
   if (cached === null) cached = new Settings().get('partyPings');
   return cached;
+}
+
+/** "Show Pings in Chat" (settings.partyPingsChat, default on): whether a ping in
+ *  view writes its chat callout line. Read per new ping; cached the same way. */
+export function partyPingsChatEnabled(): boolean {
+  if (typeof window === 'undefined') return new Settings().get('partyPingsChat');
+  watch();
+  if (cachedChat === null) cachedChat = new Settings().get('partyPingsChat');
+  return cachedChat;
 }

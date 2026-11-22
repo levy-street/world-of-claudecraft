@@ -12319,6 +12319,47 @@
     height: 15px;
     flex: none;
   }
+  /* A ping's chat callout (src/ui/hud/pings/ping_chat_line.ts): the kind's badge,
+     the sender, the callout words in the kind's colour token and the unit's name
+     in its reaction colour, so it reads apart from party talk at a glance. */
+  .ping-chat-line.ping-kind-0 {
+    --ping-color: var(--color-ping-look);
+  }
+  .ping-chat-line.ping-kind-1 {
+    --ping-color: var(--color-ping-attack);
+  }
+  .ping-chat-line.ping-kind-2 {
+    --ping-color: var(--color-ping-warning);
+  }
+  .ping-chat-line.ping-kind-3 {
+    --ping-color: var(--color-ping-on-my-way);
+  }
+  .ping-chat-line.ping-kind-4 {
+    --ping-color: var(--color-ping-assist);
+  }
+  .ping-chat-icon {
+    width: 1.25em;
+    height: 1.25em;
+    margin-right: 0.3em;
+    vertical-align: -0.28em;
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--ping-color) 60%, transparent));
+  }
+  .ping-chat-callout {
+    color: var(--ping-color);
+    font-weight: 700;
+  }
+  .ping-chat-target {
+    font-weight: 700;
+  }
+  .ping-chat-target.is-hostile {
+    color: var(--color-hostile);
+  }
+  .ping-chat-target.is-friendly {
+    color: var(--color-friendly);
+  }
+  .ping-chat-target.is-neutral {
+    color: var(--color-neutral);
+  }
   /* Party pings (src/ui/hud/pings/): the hold wheel centred on the cursor (the
      root is a zero-size anchor moved by transform; everything inside is placed
      around it) and the badges on the minimap. Kind colours are the ping tokens. */

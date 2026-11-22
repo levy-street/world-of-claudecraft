@@ -386,6 +386,11 @@ export const BOOL_SETTINGS = {
   // sound, no chat line, no minimap mark (src/game/party_pings_setting.ts). A local
   // display choice; the server still delivers the group's pings.
   partyPings: { def: true },
+  // on by default: each ping in view also writes its callout line in chat
+  // ("Jose: Attack Training Effigy", src/ui/hud/pings/ping_chat_line.ts). Off keeps
+  // the icon, sound and minimap mark and drops only the chat line. Moot while
+  // partyPings is off (nothing from a ping shows then).
+  partyPingsChat: { def: true },
   // off by default: MOBA-style "attack move". When on, one rebindable Attack
   // Move key (default A) walks the player toward the cursor, auto-attacking the
   // enemy under it or the nearest one met along the way. Other movement keys

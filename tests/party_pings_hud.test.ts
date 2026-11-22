@@ -18,6 +18,7 @@ import {
   PING_LOOK,
   PING_WARNING,
 } from '../src/sim/social/party_pings';
+import type { Entity } from '../src/sim/types';
 import { PingFeedController } from '../src/ui/hud/pings/ping_feed_controller';
 import { PingWheelController } from '../src/ui/hud/pings/ping_wheel_controller';
 import {
@@ -221,24 +222,42 @@ function ping(over: Partial<PartyPing> = {}): PartyPing {
 function feedHarness(enabled = true) {
   const disc = document.createElement('div');
   document.body.appendChild(disc);
-  const state = { enabled, pings: [] as PartyPing[] };
+  const state = {
+    enabled,
+    chat: true,
+    pings: [] as PartyPing[],
+    entities: new Map<number, Entity>(),
+    attackable: new Set<number>(),
+  };
   const logs: string[] = [];
+  const lines: HTMLElement[] = [];
   const sounds: string[] = [];
+  const menus: string[] = [];
   const feed = new PingFeedController({
     doc: document,
     writers,
     world: () => ({
       partyPings: () => state.pings,
       player: { pos: { x: 0, z: 0 } },
-      entities: new Map(),
+      entities: state.entities,
     }),
     enabled: () => state.enabled,
-    log: (t) => logs.push(t),
+    chatEnabled: () => state.chat,
+    attackable: (e) => state.attackable.has(e.id),
+    openPlayerMenu: (name) => menus.push(name),
+    log: (nodes, plain) => {
+      const div = document.createElement('div');
+      for (const n of nodes) div.append(n);
+      // The plain text is the line's own text: the announcer reads the same words.
+      expect(div.textContent).toBe(plain);
+      lines.push(div);
+      logs.push(plain);
+    },
     sound: (k) => sounds.push(k),
     minimapScale: () => 1.7,
     minimapHost: () => disc,
   });
-  return { feed, state, logs, sounds, disc };
+  return { feed, state, logs, lines, sounds, menus, disc };
 }
 
 describe('ping feed controller', () => {
@@ -311,7 +330,143 @@ describe('ping feed controller', () => {
   });
 });
 
+function unit(id: number, kind: Entity['kind'], name: string, hostile = false): Entity {
+  return { id, kind, name, hostile, dead: false, pos: { x: 5, y: 0, z: 5 } } as unknown as Entity;
+}
+
+describe('the chat callout line', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('an Attack on a hostile mob: badge, sender, callout in the kind colour, red unit name', () => {
+    const h = feedHarness();
+    h.state.entities.set(7, unit(7, 'mob', 'Ridge Wolf', true));
+    h.state.attackable.add(7);
+    h.state.pings = [ping({ kind: PING_ATTACK, target: 7, targetKind: 'mob', targetName: 'x' })];
+    h.feed.frame();
+    expect(h.logs).toEqual(['Jose: Attack Ridge Wolf']);
+    const line = h.lines[0].querySelector<HTMLElement>('.ping-chat-line');
+    expect(line?.classList.contains('ping-kind-1')).toBe(true);
+    const icon = line?.querySelector<HTMLImageElement>('img.ping-chat-icon');
+    expect(icon?.getAttribute('src')).toBe('data:ping-1');
+    expect(icon?.getAttribute('aria-hidden')).toBe('true');
+    expect(line?.querySelector('.ping-chat-sender')?.textContent).toBe('Jose');
+    expect(line?.querySelector('.ping-chat-callout')?.textContent).toBe('Attack ');
+    const target = line?.querySelector<HTMLElement>('.ping-chat-target');
+    expect(target?.textContent).toBe('Ridge Wolf');
+    expect(target?.classList.contains('is-hostile')).toBe(true);
+    // A mob's name is not a player: it opens no player menu.
+    expect(target?.getAttribute('role')).toBeNull();
+  });
+
+  it('an attackable mob that is not wild hostile reads neutral; a friend green', () => {
+    const h = feedHarness();
+    h.state.entities.set(7, unit(7, 'mob', 'Training Effigy', false));
+    h.state.attackable.add(7);
+    h.state.entities.set(8, unit(8, 'player', 'Bet'));
+    h.state.pings = [
+      ping({ kind: PING_ATTACK, target: 7, targetKind: 'mob' }),
+      ping({ id: 2, kind: PING_ASSIST, target: 8, targetKind: 'player', targetName: 'Bet' }),
+    ];
+    h.feed.frame();
+    expect(h.logs).toEqual(['Jose: Attack Training Effigy', 'Jose: Assist Bet']);
+    const [effigy, bet] = h.lines.map((l) => l.querySelector<HTMLElement>('.ping-chat-target'));
+    expect(effigy?.classList.contains('is-neutral')).toBe(true);
+    expect(bet?.classList.contains('is-friendly')).toBe(true);
+    expect(h.lines[1].querySelector('.ping-chat-line')?.classList.contains('ping-kind-4')).toBe(
+      true,
+    );
+  });
+
+  it('a ground ping is the sender and the callout, nothing else', () => {
+    const h = feedHarness();
+    h.state.pings = [ping({ kind: PING_LOOK })];
+    h.feed.frame();
+    expect(h.logs).toEqual(['Jose: Look Here']);
+    const line = h.lines[0].querySelector<HTMLElement>('.ping-chat-line');
+    expect(line?.classList.contains('ping-kind-0')).toBe(true);
+    expect(line?.querySelector('.ping-chat-target')).toBeNull();
+    expect(line?.querySelector('.ping-chat-callout')?.textContent).toBe('Look Here');
+  });
+
+  it("the sender's name, and a pinged player's, open the player menu like any chat name", () => {
+    const h = feedHarness();
+    h.state.pings = [
+      ping({ kind: PING_ASSIST, target: 8, targetKind: 'player', targetName: 'Bet' }),
+    ];
+    h.feed.frame();
+    const sender = h.lines[0].querySelector<HTMLElement>('.ping-chat-sender');
+    const target = h.lines[0].querySelector<HTMLElement>('.ping-chat-target');
+    expect(sender?.classList.contains('chat-player-name')).toBe(true);
+    expect(sender?.getAttribute('role')).toBe('button');
+    sender?.click();
+    target?.click();
+    expect(h.menus).toEqual(['Jose', 'Bet']);
+  });
+
+  it('solo: your own ping writes its line to yourself', () => {
+    // A solo player's group is themself (the sim's solo:<pid> key): the view
+    // holds their own pings and the feed never filters by sender.
+    const h = feedHarness();
+    h.state.pings = [ping({ from: 1, fromName: 'Me', kind: PING_LOOK })];
+    h.feed.frame();
+    expect(h.logs).toEqual(['Me: Look Here']);
+  });
+
+  it('Show Pings in Chat off: the sound still plays, no line, and no backlog on return', () => {
+    const h = feedHarness();
+    h.state.chat = false;
+    h.state.pings = [ping({ kind: PING_ATTACK })];
+    h.feed.frame();
+    expect(h.sounds).toEqual(['ui_aura_sword_draw']);
+    expect(h.logs).toEqual([]);
+    expect(h.disc.querySelectorAll('.ping-minimap-mark')).toHaveLength(1);
+    h.state.chat = true;
+    h.feed.frame();
+    expect(h.logs).toEqual([]);
+    h.state.pings = [ping({ kind: PING_ATTACK }), ping({ id: 2, kind: PING_WARNING })];
+    h.feed.frame();
+    expect(h.logs).toEqual(['Jose: Warning']);
+  });
+});
+
+describe('solo on the real Sim', () => {
+  it('a solo ground ping reaches the feed and writes its line', async () => {
+    const { Sim } = await import('../src/sim/sim');
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const at = sim.player.pos;
+    sim.sendPing(PING_LOOK, null, at.x + 4, at.y, at.z);
+    const logs: string[] = [];
+    const feed = new PingFeedController({
+      doc: document,
+      writers,
+      world: () => sim,
+      enabled: () => true,
+      log: (_n, plain) => logs.push(plain),
+      sound: () => {},
+      minimapScale: () => 1.7,
+      minimapHost: () => null,
+    });
+    feed.frame();
+    expect(logs).toEqual([`${sim.player.name}: Look Here`]);
+  });
+});
+
 describe('Enable Pings setting', () => {
+  it('Show Pings in Chat defaults on and persists off', () => {
+    const map = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => map.get(k) ?? null,
+      setItem: (k: string, v: string) => map.set(k, v),
+      removeItem: (k: string) => map.delete(k),
+    });
+    expect(new Settings().get('partyPingsChat')).toBe(true);
+    new Settings().set('partyPingsChat', false);
+    expect(new Settings().get('partyPingsChat')).toBe(false);
+    vi.unstubAllGlobals();
+  });
+
   it('defaults on and persists off', () => {
     const map = new Map<string, string>();
     vi.stubGlobal('localStorage', {
@@ -347,6 +502,7 @@ describe('the Hud members the factory reads (welded to hud.ts)', () => {
     expect(hud).toMatch(/writerFacet\b/);
     expect(hud).toContain('private minimapZoom = MINIMAP_ZOOM_DEFAULT;');
     expect(hud).toMatch(/\n {2}log\(\n/);
+    expect(hud).toContain('private openChatPlayerContextMenu(');
   });
   it('composes the pings and ticks them on the fast band', () => {
     expect(hud).toContain('readonly pings = createHudPings(this);');

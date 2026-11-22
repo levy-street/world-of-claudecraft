@@ -943,6 +943,7 @@ const COMBAT_KEYS = [
   'note:hudChrome.options.showDungeonHintsNote',
   // The party pings' switch (off disables the key and hides others' pings), with its note.
   'partyPings',
+  'partyPingsChat',
   'note:hudChrome.pings.enableSettingNote',
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',

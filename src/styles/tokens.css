@@ -177,6 +177,10 @@
     --color-ascension-bonus: #c88ef5;
     --color-hostile: #ff6b5e;
     --color-friendly: #9fdc7f;
+    /* A neutral unit's name (an attackable mob that is not wild hostile): the
+       classic yellow, the same value as the nameplate con yellow in
+       src/render/reaction.ts mobNameColor. */
+    --color-neutral: #ffe97a;
     --color-buff: #3a6ea8;
     --color-debuff: #c0392b;
     /* The operator-applied Cheater tag on a name line. Its own token, not

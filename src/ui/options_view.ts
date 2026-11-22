@@ -1152,7 +1152,11 @@ export function buildInterfaceControls(
       boolToggle(s, 'showDungeonHints', 'hudChrome.options.showDungeonHints'),
       note('hudChrome.options.showDungeonHintsNote'),
       // Party pings (src/ui/hud/pings/): off disables the key and hides others' pings.
-      boolToggle(s, 'partyPings', 'hudChrome.pings.enableSetting'),
+      boolToggle(s, 'partyPings', 'hudChrome.pings.enableSetting', { rerender: true }),
+      // Its chat-line sub-option (the classic chat notification switch), moot while off.
+      boolToggle(s, 'partyPingsChat', 'hudChrome.pings.chatSetting', {
+        disabled: !s.bool('partyPings'),
+      }),
       note('hudChrome.pings.enableSettingNote'),
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
       boolToggle(

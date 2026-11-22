@@ -11888,13 +11888,17 @@ export const hudChromeStrings = {
     kindWarning: 'Warning',
     kindOnMyWay: 'On My Way',
     kindAssist: 'Assist',
-    chatPoint: '{name}: {kind}',
-    chatAttackUnit: '{name}: Attack {target}',
-    chatAssistUnit: '{name}: Assist {target}',
-    chatWarningUnit: '{name}: Warning, {target}',
-    chatOnMyWayUnit: '{name}: On my way to {target}',
-    chatLookUnit: '{name}: Look at {target}',
+    // The chat callout: the frame around the sender and the callout, then the
+    // callout itself for a unit ping ({target} is the unit's name). A ground
+    // ping's callout is just the kind's name above.
+    chatLine: '{name}: {callout}',
+    calloutAttackUnit: 'Attack {target}',
+    calloutAssistUnit: 'Assist {target}',
+    calloutWarningUnit: 'Warning, {target}',
+    calloutOnMyWayUnit: 'On my way to {target}',
+    calloutLookUnit: 'Look at {target}',
     enableSetting: 'Enable Pings',
+    chatSetting: 'Show Pings in Chat',
     enableSettingNote:
       'Hold the Ping key to open the ping wheel, or tap it to ping what is under the cursor. Only your party or raid sees your pings, at most 4 every 5 seconds. Turning this off also hides every ping from your group: no icon, sound, chat line or minimap mark.',
   },

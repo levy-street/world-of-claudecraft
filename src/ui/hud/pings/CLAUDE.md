@@ -12,13 +12,26 @@ party scope); the world icon is the renderer's (`src/render/party_pings.ts`).
   no repeating driver.
 - `ping_feed_core.ts` (pure): new-ping detection, the view range, the chat line keys,
   each kind's sound (existing sampled cues only), the minimap point.
+- `ping_chat_line_core.ts` (pure): the chat callout's parts (sender, the callout
+  words, the unit name and its reaction) from two templates, `chatLine` and the
+  kind's `callout*Unit`, so a locale keeps its own word order; the `.ping-kind-N`
+  colour class; the unit reaction rule (hostile red, friendly green, neutral yellow).
+- `ping_chat_line.ts` (DOM): those parts as nodes: the kind's badge, the sender and a
+  pinged player as clickable chat names (the Hud player menu), the tinted callout.
 - `ping_feed_controller.ts` (DOM): the fast-band tick: sound and chat line once per
-  new ping in view, the badges on the minimap.
+  new ping in view (the line lands on the party channel, solo too), the badges on
+  the minimap.
 - `hud_pings.ts`: the Hud factory (untyped Hud, members welded in
   `tests/party_pings_hud.test.ts`), built lazily. Hud holds one field and one
   fast-band call; main.ts reaches it through `src/game/targeting_actions.ts`.
 
+A ground ping aims with `WorldPicking.groundHit` (`src/render/ping_ground_ray_core.ts`:
+the cursor ray marched against the sim's own floor query), never the flat plane at the
+player's feet that click-to-move uses; `groundPingContext` turns a hit the sim would
+refuse into no ping.
+
 Every surface honours `settings.partyPings` (`src/game/party_pings_setting.ts`):
-off, the key does nothing and nothing from others' pings shows or sounds. The
+off, the key does nothing and nothing from others' pings shows or sounds.
+`settings.partyPingsChat` ("Show Pings in Chat", default on) drops only the chat line. The
 icons are our own procedural badges (`src/ui/ping_icons.ts`); the kind colours
 live in `PARTY_PING_COLORS` and the `--color-ping-*` tokens, pinned equal.

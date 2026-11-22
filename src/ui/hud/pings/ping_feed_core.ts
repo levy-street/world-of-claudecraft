@@ -17,8 +17,7 @@ import {
 import type { Entity } from '../../../sim/types';
 import { entityDisplayName } from '../../entity_display_core';
 import { tEntity } from '../../entity_i18n';
-import { type TranslationKey, t } from '../../i18n';
-import { PING_KIND_LABEL_KEYS } from './ping_wheel_core';
+import { pingChatLineModel } from './ping_chat_line_core';
 
 /** How far from the viewer a ping still sounds, logs and draws (yards). */
 export const PING_VIEW_RANGE = 300;
@@ -59,14 +58,6 @@ export const PING_SOUNDS: Readonly<Record<number, { key: string; rate: number; g
     [PING_ASSIST]: { key: 'ui_aura_soft_chime', rate: 1.1, gain: 0.65 },
   });
 
-const UNIT_LINE_KEYS: Readonly<Record<number, TranslationKey>> = Object.freeze({
-  [PING_LOOK]: 'hudChrome.pings.chatLookUnit',
-  [PING_ATTACK]: 'hudChrome.pings.chatAttackUnit',
-  [PING_WARNING]: 'hudChrome.pings.chatWarningUnit',
-  [PING_ON_MY_WAY]: 'hudChrome.pings.chatOnMyWayUnit',
-  [PING_ASSIST]: 'hudChrome.pings.chatAssistUnit',
-});
-
 /** The localized name of a ping's unit: the live entity's display name when
  *  this client has it, else its template's name (a mob or NPC out of view),
  *  else the raw name the server sent (a player). */
@@ -79,15 +70,11 @@ export function pingTargetName(ping: PartyPing, live: Entity | undefined): strin
   return ping.targetName;
 }
 
-/** The party chat line a ping writes: "Name: Attack Wolf", "Name: Look Here". */
+/** The chat line a ping writes, as plain text: "Name: Attack Wolf", "Name:
+ *  Look Here" (the dressed parts are ping_chat_line_core.ts). */
 export function pingChatLine(ping: PartyPing, targetName: string | null): string {
-  const name = ping.fromName;
-  if (ping.target !== null && targetName) {
-    const key = UNIT_LINE_KEYS[ping.kind] ?? UNIT_LINE_KEYS[PING_LOOK];
-    return t(key, { name, target: targetName });
-  }
-  const kindKey = PING_KIND_LABEL_KEYS[ping.kind] ?? PING_KIND_LABEL_KEYS[PING_LOOK];
-  return t('hudChrome.pings.chatPoint', { name, kind: t(kindKey) });
+  const target = targetName ? { name: targetName, reaction: 'neutral' as const } : null;
+  return pingChatLineModel(ping, target).plain;
 }
 
 /** Where a ping sits on the north-up, player-centred minimap (canvas px,
