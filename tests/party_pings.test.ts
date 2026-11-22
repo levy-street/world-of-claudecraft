@@ -23,7 +23,7 @@ import {
   PING_WARNING,
   pingGroupKey,
 } from '../src/sim/social/party_pings';
-import { DT } from '../src/sim/types';
+import { DT, PLAYER_INTEREST_RADIUS } from '../src/sim/types';
 
 function world() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -231,6 +231,38 @@ describe('party pings: validation', () => {
     expect(store(sim).send(PING_ASSIST, c, 0, 0, 0, a)).toBe(false);
     expect(store(sim).send(PING_ASSIST, b, 0, 0, 0, a)).toBe(true);
     expect(view(sim, a)[0]).toMatchObject({ target: b, targetKind: 'player', targetName: 'Bet' });
+  });
+
+  it('a player or mob past the snapshot interest radius is refused (never seen, never pinged)', () => {
+    const sim = world();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const mob = besideMob(sim, a);
+    const me = sim.entities.get(a);
+    if (!me) throw new Error('no player');
+    // Inside the ground-ping range but past the 90 yd interest radius for mobs and players.
+    me.pos = { x: mob.pos.x + PLAYER_INTEREST_RADIUS + 5, y: mob.pos.y, z: mob.pos.z };
+    expect(PLAYER_INTEREST_RADIUS + 5).toBeLessThan(PARTY_PING_RANGE);
+    expect(store(sim).send(PING_ATTACK, mob.id, 0, 0, 0, a)).toBe(false);
+    me.pos = { x: mob.pos.x + PLAYER_INTEREST_RADIUS - 5, y: mob.pos.y, z: mob.pos.z };
+    expect(store(sim).send(PING_ATTACK, mob.id, 0, 0, 0, a)).toBe(true);
+  });
+
+  it('a stealthed party mate dueling the sender is refused (the duel hides them)', () => {
+    const sim = world();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('rogue', 'Bet');
+    party(sim, a, b);
+    const pa = posOf(sim, a);
+    const e = sim.entities.get(b);
+    if (!e) throw new Error('no player');
+    e.pos = { x: pa.x + 4, y: pa.y, z: pa.z };
+    e.stealthed = true;
+    const duels = (sim as unknown as { ctx: { duels: Map<number, unknown> } }).ctx.duels;
+    duels.set(a, { a, b, state: 'active', timer: 0 });
+    duels.set(b, { a, b, state: 'active', timer: 0 });
+    expect(store(sim).send(PING_ASSIST, b, 0, 0, 0, a)).toBe(false);
+    duels.clear();
+    expect(store(sim).send(PING_ASSIST, b, 0, 0, 0, a)).toBe(true);
   });
 
   it('a hidden GM is refused even by a forged id (their name and spot would leak)', () => {

@@ -31,8 +31,9 @@
 
 import { gmHiddenFrom } from '../gm_presence';
 import type { SimContext } from '../sim_context';
-import type { EntityKind } from '../types';
+import { type EntityKind, PLAYER_INTEREST_RADIUS } from '../types';
 import { vaultPortalVisibleToPlayer } from '../vault_visibility';
+import { duelFor } from './duel';
 import { sharedMapMarkFloorY } from './shared_map_marks';
 
 /** The ping kinds, by wire index. Look Here is the plain ground ping a tap
@@ -46,8 +47,9 @@ export const PING_KIND_COUNT = 5;
 
 /** How long a ping stays up (sim seconds). */
 export const PARTY_PING_LIFETIME_S = 4.5;
-/** How far from the sender a pinged point or unit may be (yards): inside the
- *  server's ~120 yd interest radius, so the sender saw what they pinged. */
+/** How far from the sender a pinged point may be (yards). A pinged player or
+ *  mob must also lie inside PLAYER_INTEREST_RADIUS (the snapshot interest), so
+ *  the sender was sent what they pinged; NPCs and objects ride a wider one. */
 export const PARTY_PING_RANGE = 110;
 /** How far above or below the sender a pinged point or unit may be (yards). */
 export const PARTY_PING_VERTICAL_REACH = 45;
@@ -149,6 +151,18 @@ export class PartyPings {
       if (!t || t.dead) return false;
       const groupMate = t.id === self || (party?.members.includes(t.id) ?? false);
       if (t.stealthed && !groupMate) return false;
+      // A duel hides a stealthed party mate from their opponent too.
+      if (t.stealthed && t.id !== self) {
+        const duel = duelFor(this.ctx, self);
+        if (duel && (duel.a === t.id || duel.b === t.id)) return false;
+      }
+      // Players and mobs reach a snapshot only inside PLAYER_INTEREST_RADIUS
+      // (NPCs and objects farther): never ping a unit the sender was not sent.
+      if (
+        (t.kind === 'player' || t.kind === 'mob') &&
+        Math.hypot(t.pos.x - at.x, t.pos.y - at.y, t.pos.z - at.z) > PLAYER_INTEREST_RADIUS
+      )
+        return false;
       // Never what the sender's own snapshot omits: a hidden GM (forged id) or
       // another group's vault portal would leak its name and spot to the group.
       if (gmHiddenFrom(this.ctx.entities, r.e, t)) return false;
@@ -163,6 +177,9 @@ export class PartyPings {
     if (Math.hypot(point.x - at.x, point.z - at.z) > PARTY_PING_RANGE) return false;
     if (Math.abs(point.y - at.y) > PARTY_PING_VERTICAL_REACH) return false;
     const now = this.ctx.time;
+    // A sender over their budget is refused before the store-wide sweep, so
+    // spamming past the limit costs the server nothing.
+    if (!this.canSpend(self, now)) return false;
     this.pruneAll(now);
     const key = pingGroupKey(party?.id ?? null, self);
     let group = this.groups.get(key);
@@ -272,6 +289,15 @@ export class PartyPings {
     for (const [key, group] of this.groups) if (!this.prune(group, now)) this.groups.delete(key);
     for (const [id, times] of this.sent)
       if (times.every((t) => now - t >= PARTY_PING_WINDOW_S)) this.sent.delete(id);
+  }
+
+  /** Whether `sender` has a ping left in their sliding window (no change). */
+  private canSpend(sender: number, now: number): boolean {
+    const times = this.sent.get(sender);
+    if (!times) return true;
+    let live = 0;
+    for (const t of times) if (now - t < PARTY_PING_WINDOW_S) live++;
+    return live < PARTY_PING_BURST;
   }
 
   /** Spend one ping from `sender`'s sliding window. */
