@@ -16811,10 +16811,7 @@ export class Hud {
     this.ctxMenuOpener = opener;
     const party = this.sim.partyInfo;
     let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm', catalog: this.sim.player.skinCatalog, appearance: this.sim.player.modularAppearance })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
-    // Party membership actions (convert, loot, leave), the dungeon-difficulty
-    // toggle, the reset-dungeons action, and close, resolved by the pure
-    // selfPlayerContextActions. Leaving the party lives here now, not a
-    // permanent button under the party frames.
+    // Party actions, dungeon difficulty, reset and close (selfPlayerContextActions).
     const actions = selfPlayerContextActions({
       inParty: !!party,
       isLeader: party?.leader === this.sim.playerId,
@@ -16827,6 +16824,7 @@ export class Hud {
       const attrs = action.inert ? 'aria-disabled="true"' : `data-act="${action.id}"`;
       html += `<div class="ctx-item" ${attrs}>${esc(action.label)}</div>`;
     }
+    if (offersRaidTargetIconIn(this.sim, this.sim.player)) html += raidTargetMenuRowHtml();
     el.innerHTML = html;
     hydratePortraits(el);
     el.style.display = 'block';
@@ -16842,6 +16840,8 @@ export class Hud {
         this.sim.convertRaidToParty();
         this.socialWindow.selectRaidTab();
       } else if (act === 'loot-settings') this.openLootSettings();
+      else if (act === 'raid-target')
+        this.openMarkerMenu(this.sim.playerId, this.sim.player.name, x, y);
       else if (act === 'leave-party') this.sim.partyLeave();
       else if (act === 'dungeon-difficulty') {
         this.sim.setDungeonDifficulty(
