@@ -4512,6 +4512,26 @@ export const VISUALS: Record<string, VisualDef> = {
       attackByAbility: { emberkin_felbolt: 'Cast' },
     },
   },
+  // The Quartered Isle's Heatsworn Ember: the Emberkin body with its fel green shifted to
+  // fire red and its lit pockets given a red glow map (scripts/assets/heatsworn_ember/).
+  mob_heatsworn_ember: {
+    url: `${CREATURES}/heatsworn_ember.glb`,
+    height: 2.1,
+    authoredAtlas: true,
+    yaw: -Math.PI / 2,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+  },
   // WIP forge mech (mech.glb, Tripo auto-rig on a mixamorig core). It ships only
   // a CRAWL -> STAND UP -> DIE clip set (no idle/walk/attack yet), so idle/walk/
   // run all read as the crawl, StandUp doubles as the attack lunge and the spawn
@@ -8397,7 +8417,7 @@ const MOB_KEYS: Record<string, string> = {
   quench_shardling: 'mob_hoard_rime_elemental',
   rimeglass_bear: 'mob_rimeglass_bear',
   warden_of_the_quench: 'mob_hoard_hoarfrost_warden',
-  heatsworn_ember: 'mob_emberkin',
+  heatsworn_ember: 'mob_heatsworn_ember',
   cinderscar_caller: 'mob_cinderscar_caller',
   ember_hound: 'mob_wolf',
   the_glassfield_brute: 'mob_hoard_magma_brute',

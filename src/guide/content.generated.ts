@@ -3521,8 +3521,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "heatsworn_ember",
-        "model": "mob_emberkin",
-        "still": "/guide-stills/mob_emberkin.webp"
+        "model": "mob_heatsworn_ember",
+        "still": "/guide-stills/mob_heatsworn_ember.webp"
       },
       {
         "name": "Heaved Shardling",
@@ -22826,6 +22826,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/rimeglass_bear.glb",
     "idle": "Idle",
     "height": 2.3
+  },
+  "mob_heatsworn_ember": {
+    "url": "models/creatures/heatsworn_ember.glb",
+    "idle": "Idle",
+    "height": 2.1,
+    "yaw": -1.5707963267948966
   },
   "mob_cinderscar_caller": {
     "url": "models/creatures/hoard_ember_fiend.glb",

@@ -1364,8 +1364,8 @@
         "model": {
           "url": "models/creatures/hoard_ember_fiend.glb",
           "path": "public/models/creatures/hoard_ember_fiend.glb",
-          "bytes": 1972996,
-          "sha256": "8713146041d0ec6eb3d0dff3ff7bdbe127b385205c8f1cdf4a1d86c1856c677a"
+          "bytes": 921756,
+          "sha256": "eec08cc7e1c6a2009c486db38524559c66c16c8aef4595dd478a39013f66e1e2"
         },
         "idle": "Idle",
         "height": 2.9,
@@ -1382,11 +1382,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "89ca79333ad327665ea62c62addfb244ef9a3c9ad786b7ab53964c71250728c2",
+      "sourceFingerprint": "8ac5fedbb35cc4fcec34cbb257e9124c79ede2e69bc734a80e769f010a2ac238",
       "output": {
         "path": "public/ui/mobs/cinderscar_caller.webp",
-        "bytes": 2306,
-        "sha256": "089cc290e93bf10a3f7acc3c6903778320f2cd121dc656eb845d42488e22a8cd"
+        "bytes": 2290,
+        "sha256": "2604a087387c111e3ae68b2bd99f58825026e064b87f8203c6de44cac3c2806d"
       }
     },
     {
@@ -5162,13 +5162,13 @@
       "id": "heatsworn_ember",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_emberkin",
+      "visualKey": "mob_heatsworn_ember",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/emberkin.glb",
-          "path": "public/models/creatures/emberkin.glb",
-          "bytes": 1415428,
-          "sha256": "845af8ccbc2eee155ec3149f95a8309b8f4a61d43bd1ebb9ab822d258e912993"
+          "url": "models/creatures/heatsworn_ember.glb",
+          "path": "public/models/creatures/heatsworn_ember.glb",
+          "bytes": 889588,
+          "sha256": "561c9ce9cc1d9d258bc4af0f3746ff50429faf571e6b639da67e05115a5b092c"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -5185,11 +5185,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "67141ec3a8be93179edd31d8e6a5ea1529534def8b213246cc24baed19c618eb",
+      "sourceFingerprint": "01ca3444d571df9f7e38d1905fdee54a1a252a55ce54f193d7802e81dde6e42d",
       "output": {
         "path": "public/ui/mobs/heatsworn_ember.webp",
-        "bytes": 2028,
-        "sha256": "507b1388afd128d2d66d9b3ef200efa911b8cbe3908c3844c09b3e5bfcbca5de"
+        "bytes": 2066,
+        "sha256": "59c43848aad9be20a676372445de277cba3e815aebd4a704a33d80ff2f0cb5c6"
       }
     },
     {
@@ -9349,8 +9349,8 @@
         "model": {
           "url": "models/creatures/hoard_hoarfrost_warden.glb",
           "path": "public/models/creatures/hoard_hoarfrost_warden.glb",
-          "bytes": 1934580,
-          "sha256": "12746142e61c4e7c8accba47f7a8ae05a4feb02157482f4865a271a5d09e760e"
+          "bytes": 1380796,
+          "sha256": "80f8cf59e6e82a5485834d50f7087561cd7c1a38f5cab635e015bb0a229557e3"
         },
         "idle": "Idle",
         "height": 2.6,
@@ -9367,11 +9367,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c4f777c1626b49f4d3fbf79b07973ce909a61afa58f834b0ce423606b5e39369",
+      "sourceFingerprint": "5532699dc6adfa43987a2888afcefd78c8f99333c0cf9005e3b003f502995ff7",
       "output": {
         "path": "public/ui/mobs/rift_boss_frost.webp",
-        "bytes": 3222,
-        "sha256": "1b476244ac100c6a76669ee8b30c1889b22cf073a094c9f11f7c186fa44aa01d"
+        "bytes": 3508,
+        "sha256": "1d7704bfbcfdcdbb8bfb1df8aa6a9ddedce43a5d1cec454d94544300b932704b"
       }
     },
     {
@@ -9655,8 +9655,8 @@
         "model": {
           "url": "models/creatures/hoard_ember_fiend.glb",
           "path": "public/models/creatures/hoard_ember_fiend.glb",
-          "bytes": 1972996,
-          "sha256": "8713146041d0ec6eb3d0dff3ff7bdbe127b385205c8f1cdf4a1d86c1856c677a"
+          "bytes": 921756,
+          "sha256": "eec08cc7e1c6a2009c486db38524559c66c16c8aef4595dd478a39013f66e1e2"
         },
         "idle": "Idle",
         "height": 2.9,
@@ -9673,11 +9673,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c3783d8c33c870de14da6f90971b11a50aeda7f761dd4986d21b6c5efe9875c2",
+      "sourceFingerprint": "156c52180eb5b92514e06465fb696409a3b0b94084cc5d9008abef574be6bd95",
       "output": {
         "path": "public/ui/mobs/rift_ember_fiend.webp",
-        "bytes": 2074,
-        "sha256": "f5610bf119ffd6a956eceff55af380fe37559b5de948266d7486e74c60f57c0f"
+        "bytes": 2218,
+        "sha256": "66465c1382e5f976ee276bf36660932989746312eaf1c721cd838bd7644cf669"
       }
     },
     {
@@ -9757,8 +9757,8 @@
         "model": {
           "url": "models/creatures/hoard_magma_brute.glb",
           "path": "public/models/creatures/hoard_magma_brute.glb",
-          "bytes": 1944796,
-          "sha256": "474f4608e3358a67d4c307c868a320d29fc0fa55360b50763c6ea660d5bdd3c5"
+          "bytes": 925116,
+          "sha256": "33ac42e51386d2f85fbeb2478e452fb125f4014af7b0774d84a2e254dc241287"
         },
         "idle": "Idle",
         "height": 4.1,
@@ -9775,11 +9775,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3fae7fdf5ebaba1420fef5c34e2f8d2297047d1c246c0127f30bebffa19c118d",
+      "sourceFingerprint": "35e294bb10bb08b976b7d999554804de0ae4e5f7d0514e2ab79bca01e29f8bdc",
       "output": {
         "path": "public/ui/mobs/rift_magma_brute.webp",
-        "bytes": 2296,
-        "sha256": "b16e38edbe77c5af36f8cf8aa2d4bfd87e77420a003b616fcbc6e6fc4cc43628"
+        "bytes": 2724,
+        "sha256": "79119f5c203c606452c27f826a0fb486c7d754f478b13691757f0990fec27fa5"
       }
     },
     {
@@ -11637,8 +11637,8 @@
         "model": {
           "url": "models/creatures/hoard_magma_brute.glb",
           "path": "public/models/creatures/hoard_magma_brute.glb",
-          "bytes": 1944796,
-          "sha256": "474f4608e3358a67d4c307c868a320d29fc0fa55360b50763c6ea660d5bdd3c5"
+          "bytes": 925116,
+          "sha256": "33ac42e51386d2f85fbeb2478e452fb125f4014af7b0774d84a2e254dc241287"
         },
         "idle": "Idle",
         "height": 4.1,
@@ -11655,11 +11655,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3fae7fdf5ebaba1420fef5c34e2f8d2297047d1c246c0127f30bebffa19c118d",
+      "sourceFingerprint": "35e294bb10bb08b976b7d999554804de0ae4e5f7d0514e2ab79bca01e29f8bdc",
       "output": {
         "path": "public/ui/mobs/the_glassfield_brute.webp",
         "bytes": 2724,
-        "sha256": "47ed0023ffb30b7dfc10c21397b8729059c72ef08cb4dceb394e8a2120652665"
+        "sha256": "79119f5c203c606452c27f826a0fb486c7d754f478b13691757f0990fec27fa5"
       }
     },
     {
@@ -14014,8 +14014,8 @@
         "model": {
           "url": "models/creatures/hoard_hoarfrost_warden.glb",
           "path": "public/models/creatures/hoard_hoarfrost_warden.glb",
-          "bytes": 1934580,
-          "sha256": "12746142e61c4e7c8accba47f7a8ae05a4feb02157482f4865a271a5d09e760e"
+          "bytes": 1380796,
+          "sha256": "80f8cf59e6e82a5485834d50f7087561cd7c1a38f5cab635e015bb0a229557e3"
         },
         "idle": "Idle",
         "height": 2.6,
@@ -14032,7 +14032,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "98c0d39ed4109f257401f9c03ae465267dbdceac305bdce809d51599d9ecf354",
+      "sourceFingerprint": "69709d581971dd4ed5a5219a5bb0323c68c2fe04491611b7d088180629511ecd",
       "output": {
         "path": "public/ui/mobs/warden_of_the_quench.webp",
         "bytes": 3568,

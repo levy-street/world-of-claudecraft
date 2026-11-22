@@ -353,6 +353,8 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_rimeglass_bear',
   // and the Cinderscar Caller: the Ember Fiend's body with its spell-throw attack
   'mob_cinderscar_caller',
+  // and the Heatsworn Ember: the Emberkin body recoloured red with a red glow map
+  'mob_heatsworn_ember',
 ];
 
 describe('authored surfaces', () => {
