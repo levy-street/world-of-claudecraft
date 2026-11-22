@@ -2920,10 +2920,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "veinback_burrower",
-        "model": "mob_grubjaw",
-        "tint": "#b08a5a",
-        "tintStrength": 0.04,
-        "still": "/guide-stills/mob_grubjaw__b08a5a__s4.webp"
+        "model": "mob_veinback_burrower",
+        "still": "/guide-stills/mob_veinback_burrower.webp"
       }
     ]
   },
@@ -3530,10 +3528,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "heaved_shardling",
-        "model": "mob_elemental",
-        "tint": "#c8903c",
-        "tintStrength": 0.4,
-        "still": "/guide-stills/mob_elemental__c8903c.webp"
+        "model": "mob_heaved_shardling",
+        "still": "/guide-stills/mob_heaved_shardling.webp"
       },
       {
         "name": "Quench Shardling",
@@ -22837,5 +22833,17 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/hoard_ember_fiend.glb",
     "idle": "Idle",
     "height": 2.9
+  },
+  "mob_heaved_shardling": {
+    "url": "models/creatures/heaved_shardling.glb",
+    "idle": "Idle",
+    "height": 1.4,
+    "yaw": -1.5707963267948966
+  },
+  "mob_veinback_burrower": {
+    "url": "models/creatures/veinback_burrower.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966
   }
 };

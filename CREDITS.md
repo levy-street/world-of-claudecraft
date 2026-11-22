@@ -559,6 +559,10 @@ something this file marks as restricted, ask first: tony@levystreet.com.
 | Stone, snow and sandstone detail baked into the Quartered Isle props above (textures rock_face, rock_face_03, dark_rock_02, snow_02, sandstone_cracks) | Poly Haven | https://polyhaven.com | CC0 | Baked in Blender over the generated textures |
 | Generated creature model + animations (remnant_first_colossus) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (gpt-image-2 concept, Tripo AI 3D multiview, auto-rig + preset retargets; texture projected from the concept and skin weights cleaned in Blender) | Project asset | With the project only |
 | Generated creature model + animations (rimeglass_bear) | World of ClaudeCraft | Project-generated: Tripo AI 3D text-to-model body, texture baked and the wolf rig re-fitted in Blender (scripts/assets/rimeglass_bear), wolf clips carried with an authored idle and bite | Project asset | With the project only |
+| Generated creature model + animations (warden_of_the_quench) | World of ClaudeCraft | Project-generated: Tripo AI 3D image-to-model body from a project concept, Tripo auto-rig with preset retargets, texture baked in Blender (scripts/assets/quartered_isle_creatures) | Project asset | With the project only |
+| Generated creature model + animations (the_glassfield_brute) | World of ClaudeCraft | Project-generated: Tripo AI 3D image-to-model body from a project concept, Tripo auto-rig with preset retargets | Project asset | With the project only |
+| Generated creature model + animations (heaved_shardling) | World of ClaudeCraft | Project-generated: Tripo AI 3D image-to-model body from a project concept, Tripo auto-rig with preset retargets, texture baked in Blender (scripts/assets/quartered_isle_creatures) | Project asset | With the project only |
+| Generated creature model + animations (veinback_burrower) | World of ClaudeCraft | Project-generated: Tripo AI 3D image-to-model body from a project concept, Tripo auto-rig with preset retargets, texture baked in Blender (scripts/assets/quartered_isle_creatures) | Project asset | With the project only |
 
 ### Orbital Lightning
 

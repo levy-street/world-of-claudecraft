@@ -355,6 +355,11 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_cinderscar_caller',
   // and the Heatsworn Ember: the Emberkin body recoloured red with a red glow map
   'mob_heatsworn_ember',
+  // and the Quartered Isle's own Tripo bodies
+  'mob_warden_of_the_quench',
+  'mob_the_glassfield_brute',
+  'mob_heaved_shardling',
+  'mob_veinback_burrower',
 ];
 
 describe('authored surfaces', () => {
