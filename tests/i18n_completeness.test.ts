@@ -213,8 +213,6 @@ describe('i18n whole-catalog completeness', () => {
     const isReleaseLinePendingNonLatin = (key: string) =>
       [
         'hudChrome.framePresets.',
-        // The party ping wheel (src/ui/hud/pings/): English source, fills at release.
-        'hudChrome.pings.',
         'hudChrome.frameMenus.',
         'hudChrome.focusTargets.',
         'hudChrome.meters.',
