@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { WebGLGeometries } from 'three/src/renderers/webgl/WebGLGeometries.js';
 import { describe, expect, it, vi } from 'vitest';
 import { SCENERY_DETAIL_BANDS } from '../src/render/gfx';
+import { GHOST_HIDE_ATTRIBUTE } from '../src/render/instanced_dither_fade';
 import { SceneryDetailSession } from '../src/render/scenery_detail';
 import { inSceneryRegion, sceneryDetailLevel } from '../src/render/scenery_detail_core';
 import {
@@ -404,5 +405,32 @@ describe('scenery detail production policy', () => {
     expect(geometry.index!.array).toEqual(original.index!.array);
     for (const name of ['position', 'normal', 'uv'])
       expect(geometry.attributes[name].array).toEqual(original.attributes[name].array);
+  });
+
+  it('skips per-placement distance math inside safe movement margins and scopes GPU upload ranges to active instances', async () => {
+    const f = fixture([20, 180, 320]);
+    f.geometry.setAttribute(
+      GHOST_HIDE_ATTRIBUTE,
+      new THREE.InstancedBufferAttribute(new Float32Array(3), 1),
+    );
+    const session = new SceneryDetailSession(queue, SCENERY_DETAIL_BANDS.low);
+    session.prepareRoot(f.root);
+    await session.settled();
+    session.update(0, 700);
+    const activeChildren = (f.mesh.children as THREE.InstancedMesh[]).filter((c) => c.count > 0);
+    expect(activeChildren.length).toBeGreaterThan(0);
+    for (const child of activeChildren) {
+      expect(child.instanceMatrix.updateRanges).toEqual([{ start: 0, count: child.count * 16 }]);
+      expect(child.instanceColor!.updateRanges).toEqual([{ start: 0, count: child.count * 3 }]);
+      const hide = child.geometry.getAttribute(GHOST_HIDE_ATTRIBUTE) as THREE.BufferAttribute;
+      expect(hide.updateRanges).toEqual([{ start: 0, count: child.count }]);
+    }
+
+    const spy = vi.spyOn(Math, 'hypot');
+    // Small 1-yard step well inside every placement's margin (nearest boundary is 60 yd vs 20 yd = 40 yd margin)
+    session.update(1, 700);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+    session.dispose();
   });
 });

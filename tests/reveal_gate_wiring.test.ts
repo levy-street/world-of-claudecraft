@@ -391,10 +391,10 @@ describe('reveal gate wiring (source pins)', () => {
       anchor(compileUnits, "id: 'scene',"),
       anchor(compileUnits, 'compileRootDistanceSq(root, options.playerX'),
     );
-    // The scene unit's collector call, whitespace-agnostic: the visible-only
-    // flag is the literal `true` second argument.
+    // The scene collector includes hidden residents only when residentScene is
+    // explicitly requested; bounded entry retains the visible-only collector.
     expect(sweep).toMatch(
-      /compileRoots\(\s*options\.scene\.children\.filter\(\(root\) => !stagedRoots\.has\(root\)\),\s*true,\s*\)/,
+      /compileRoots\(\s*options\.scene\.children\.filter\(\(root\) => !stagedRoots\.has\(root\)\),\s*!options\.residentScene,\s*\)/,
     );
     // The background (idle) zone prepare compiles the shadow-pass depth
     // variant AFTER the colour one, inside the same queue unit.

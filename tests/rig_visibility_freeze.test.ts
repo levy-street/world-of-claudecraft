@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   isRigMatrixFrozen,
   syncRigMatrixFreeze,
@@ -29,6 +29,87 @@ function buildRig(): { scene: THREE.Scene; group: THREE.Group; hand: THREE.Objec
 }
 
 describe('syncRigMatrixFreeze', () => {
+  it('prunes the whole hidden branch from ordinary scene walks', () => {
+    const { scene, group, hand } = buildRig();
+    scene.updateMatrixWorld();
+    const walk = vi.spyOn(hand, 'updateMatrixWorld');
+    syncRigMatrixFreeze(group, false);
+    scene.updateMatrixWorld();
+    scene.updateMatrixWorld();
+    expect(walk).not.toHaveBeenCalled();
+    syncRigMatrixFreeze(group, true);
+    expect(walk).toHaveBeenCalledOnce();
+  });
+
+  it('still honors explicit forced walks while hidden, retaining the frozen flags', () => {
+    const { scene, group, hand } = buildRig();
+    scene.updateMatrixWorld();
+    const walk = vi.spyOn(hand, 'updateMatrixWorld');
+    syncRigMatrixFreeze(group, false);
+    group.position.x = 20;
+    group.updateMatrixWorld(true);
+    expect(walk).toHaveBeenCalledWith(true);
+    expect(group.matrixWorld.elements[12]).toBe(0);
+    expect(isRigMatrixFrozen(group)).toBe(true);
+    expect(hand.matrixAutoUpdate).toBe(false);
+    syncRigMatrixFreeze(group, true);
+    expect(hand.matrixWorld.elements[12]).toBe(20.5);
+  });
+
+  it('restores an inherited subclass method before the reveal refresh', () => {
+    class RigGroup extends THREE.Group {
+      walks = 0;
+      override updateMatrixWorld(force?: boolean): void {
+        this.walks++;
+        super.updateMatrixWorld(force);
+      }
+    }
+    const group = new RigGroup();
+    const original = group.updateMatrixWorld;
+    syncRigMatrixFreeze(group, false);
+    group.updateMatrixWorld();
+    expect(group.walks).toBe(0);
+    syncRigMatrixFreeze(group, true);
+    expect(group.walks).toBe(1);
+    expect(group.updateMatrixWorld).toBe(original);
+    expect(Object.hasOwn(group, 'updateMatrixWorld')).toBe(false);
+  });
+
+  it.each(['reveal', 'teardown'] as const)('restores an own method descriptor on %s', (exit) => {
+    const { group } = buildRig();
+    const update = vi.fn(function (this: THREE.Group, force?: boolean) {
+      THREE.Group.prototype.updateMatrixWorld.call(this, force);
+    });
+    const descriptor = { value: update, writable: false, enumerable: false, configurable: true };
+    Object.defineProperty(group, 'updateMatrixWorld', descriptor);
+    syncRigMatrixFreeze(group, false);
+    group.updateMatrixWorld();
+    expect(update).not.toHaveBeenCalled();
+    if (exit === 'reveal') syncRigMatrixFreeze(group, true);
+    else unfreezeRigMatrices(group);
+    expect(Object.getOwnPropertyDescriptor(group, 'updateMatrixWorld')).toEqual(descriptor);
+    expect(update).toHaveBeenCalledTimes(exit === 'reveal' ? 1 : 0);
+  });
+
+  it('keeps flag-only freezing when an own method cannot be replaced', () => {
+    const { scene, group, hand } = buildRig();
+    scene.updateMatrixWorld();
+    const descriptor = {
+      value: group.updateMatrixWorld,
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    };
+    Object.defineProperty(group, 'updateMatrixWorld', descriptor);
+    syncRigMatrixFreeze(group, false);
+    group.position.x = 12;
+    scene.updateMatrixWorld();
+    expect(hand.matrixWorld.elements[12]).toBe(0.5);
+    syncRigMatrixFreeze(group, true);
+    expect(hand.matrixWorld.elements[12]).toBe(12.5);
+    expect(Object.getOwnPropertyDescriptor(group, 'updateMatrixWorld')).toEqual(descriptor);
+  });
+
   it('stops descendant recomposition while hidden, r185 unconditional recursion included', () => {
     const { scene, group, hand } = buildRig();
     group.position.set(10, 0, 0);
@@ -106,13 +187,22 @@ describe('syncRigMatrixFreeze', () => {
     // A weapon-skin apply landing on a hidden rig.
     const weapon = new THREE.Object3D();
     weapon.position.set(0, 0, 3);
+    const bone = new THREE.Bone();
+    bone.position.y = 2;
+    weapon.add(bone);
     hand.add(weapon);
+    const walk = vi.spyOn(weapon, 'updateMatrixWorld');
     expect(weapon.matrixAutoUpdate).toBe(true);
     group.position.set(7, 0, 0);
     scene.updateMatrixWorld();
+    expect(walk).not.toHaveBeenCalled();
     syncRigMatrixFreeze(group, true);
     expect(weapon.matrixWorld.elements[12]).toBe(7.5);
     expect(weapon.matrixWorld.elements[14]).toBe(3);
+    expect(bone.matrixWorld.elements[12]).toBe(7.5);
+    expect(bone.matrixWorld.elements[13]).toBeCloseTo(3.4);
+    expect(bone.matrixWorld.elements[14]).toBe(3);
+    expect(walk).toHaveBeenCalledOnce();
   });
 
   it('is idempotent per state: repeated hidden calls never re-record or lose flags', () => {

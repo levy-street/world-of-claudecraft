@@ -25,7 +25,7 @@
 // the low tier. Everything is derived from IWorld entity state (cast fields,
 // facing, the dead flag), so offline and online look the same.
 
-import * as THREE from 'three';
+import type * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -38,6 +38,7 @@ import {
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { setRenderCategory } from '../renderer_diagnostics';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import { BASTION_BOSS_TELEGRAPHS, BastionBossFx } from './bastion_boss_fx';
 import { BastionCreatureFx } from './bastion_creature_fx';
 import {
@@ -96,7 +97,7 @@ interface FlashSlot extends TelegraphFan {
 
 export class BastionFx {
   readonly readyForEntry: Promise<void>;
-  private readonly root = new THREE.Group();
+  private readonly root = new VisibleChildrenGroup();
   private readonly specs = bastionTelegraphSpecs();
   private readonly fans: FanSlot[] = [];
   private readonly lanes: LaneSlot[] = [];
@@ -144,7 +145,9 @@ export class BastionFx {
     this.boss = new BastionBossFx(this.root, groundY, world, this.flashesOn);
     // The creatures' own effects (the arbalest's bolts, the Turnkey's lantern)
     // ride the same root and compile gate.
-    const creatures = new THREE.Group();
+    // Painters read IWorld positions, never parked slot matrices. Compilation
+    // still traverses every slot; visible tells compose before their first draw.
+    const creatures = new VisibleChildrenGroup();
     creatures.name = 'sunken-bastion-creature-fx';
     this.root.add(creatures);
     this.creatures = new BastionCreatureFx(creatures, groundY, world, playGesture, reducedMotion);

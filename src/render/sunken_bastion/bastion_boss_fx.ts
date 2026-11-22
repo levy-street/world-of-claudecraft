@@ -41,6 +41,7 @@ import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms } from '../gfx';
 import { radialGlowTexture } from '../textures';
+import { VisibleChildrenGroup } from '../visible_children_group';
 import { setBeaconYaw } from './bastion_beacon';
 import {
   auraReveal,
@@ -236,7 +237,7 @@ function hideReveal(r: RevealSlot): void {
 }
 
 export class BastionBossFx {
-  private readonly root = new THREE.Group();
+  private readonly root = new VisibleChildrenGroup();
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly buttresses: ButtressSlot[] = [];
@@ -292,6 +293,10 @@ export class BastionBossFx {
         withKit: false,
       });
     }
+    // The attach gate runs before any buttress entity arrives. Keep one hidden
+    // slot's real instanced RGB shapes resident so its first colour and shadow
+    // draws reuse prepared programs; the first live buttress reuses this slot.
+    this.buildButtressPieces(this.buttresses[0]);
     // Olen's oath glow and dizzy stars.
     const discGeo = this.geo(new THREE.CircleGeometry(1, 40));
     discGeo.rotateX(-Math.PI / 2);
@@ -493,7 +498,11 @@ export class BastionBossFx {
   }
 
   private buildButtressPieces(slot: ButtressSlot): void {
-    for (const meshes of slot.pieces.values()) for (const m of meshes) slot.group.remove(m);
+    for (const meshes of slot.pieces.values())
+      for (const m of meshes) {
+        slot.group.remove(m);
+        m.dispose();
+      }
     slot.pieces.clear();
     for (const piece of BUTTRESS_PIECES) {
       const baked = bastionKitPiece(piece);

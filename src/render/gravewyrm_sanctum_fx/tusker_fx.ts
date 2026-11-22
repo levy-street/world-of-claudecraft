@@ -38,7 +38,6 @@ import {
 import { DT, type Entity, type SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { loadGltf } from '../assets/loader';
-import { registerDeferredPreload } from '../assets/preload';
 import {
   TUSKER_CHARGE_GESTURE,
   TUSKER_TRACES_GONE_GESTURE,
@@ -96,10 +95,6 @@ function startLoad(): Promise<void> {
     .catch(() => undefined);
   return loading;
 }
-
-// Fetched with the deferred lane at world entry (the Mere Hydra's pattern),
-// so the sledge is cached long before the Sledge Road.
-if (typeof window !== 'undefined') registerDeferredPreload(() => startLoad());
 
 /** What the effects remember of one Tusker between frames. */
 interface Tracker {

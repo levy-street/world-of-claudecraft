@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { treeUrl } from './foliage_field_models';
 import { hoardCavernHeroSpots } from './hoard_cavern_foliage_core';
 import type { HoardValleyPlan } from './hoard_valley_core';
@@ -127,14 +126,23 @@ function bake(scene: THREE.Group): Model {
   };
 }
 
-if (typeof window !== 'undefined') {
-  for (const url of new Set(Object.values(URLS))) {
-    registerDeferredPreload(() =>
+let foliageAssetsPromise: Promise<void> | null = null;
+
+export function ensureHoardCavernFoliageAssets(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  foliageAssetsPromise ??= Promise.all(
+    [...new Set(Object.values(URLS))].map((url) =>
       loadGltf(url).then((gltf) => {
         if (!models.has(url)) models.set(url, bake(gltf.scene));
       }),
-    );
-  }
+    ),
+  )
+    .then(() => undefined)
+    .catch((err) => {
+      foliageAssetsPromise = null;
+      throw err;
+    });
+  return foliageAssetsPromise;
 }
 
 /** Parent owns scene attachment and compile gating; only instance buffers are per visit. */

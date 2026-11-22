@@ -18,7 +18,6 @@
 
 import * as THREE from 'three';
 import { loadGltf, releaseGltf } from '../assets/loader';
-import { registerDeferredPreload } from '../assets/preload';
 import { timeBuildSpan } from '../build_spans';
 import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
@@ -142,9 +141,6 @@ function startKitLoad(): Promise<void> {
   });
   return loading;
 }
-
-// World content: fetched on the deferred lane once the game starts.
-if (typeof window !== 'undefined') registerDeferredPreload(() => startKitLoad());
 
 /** Fetch and bake the kit once. Never rejects; resolves within the wait cap
  *  (a later arrival upgrades the stand-ins in place: upgradeWhenSanctumKitLands). */

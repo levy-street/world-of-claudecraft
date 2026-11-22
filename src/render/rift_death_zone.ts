@@ -50,14 +50,51 @@ import {
   deathZonePlan,
   deathZonePulseSpeed,
   deathZoneSweepScale,
+  type EncounterFxScope,
   FILL_OPACITY,
   RING_MAX_OPACITY,
+  resolveEncounterFxScope,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
 import { SummonRiseFx } from './summon_rise_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { TrashEngineFx } from './trash_engine_fx';
 import { WildheartFx } from './wildheart_basin';
+
+const NOOP_FX = Object.freeze({
+  sync: (): void => {},
+  setTheme: (): void => {},
+  update: (): void => {},
+  dispose: (): void => {},
+  handleEvent: (): boolean => false,
+  bodySwell: (): number => 1,
+}) as unknown as HoardBossFx &
+  HoardBossDressing &
+  HoardEncounterAccents &
+  HoardSpellFx &
+  HoardOrbitalLightning &
+  HoardBoneReaperFx &
+  HoardIceAgeFx &
+  HoardPulsarFx &
+  HoardForgeHammerFx &
+  HoardTentaclesFx &
+  HoardBoulderFx &
+  HoardCocoonFx &
+  HoardGoblinCoinsFx &
+  HoardMimicCoinsFx &
+  CryptTrashFx &
+  BastionFx &
+  TempleFx &
+  DeathBurstFx &
+  WildheartFx &
+  CryptCreatureFx &
+  CryptFinaleFx &
+  MorthenFx &
+  MorthenRiteFx &
+  CryptBossFx &
+  SanctumFx &
+  SanctumBossFx &
+  TrashEngineFx;
 
 const SEGMENTS = 64;
 const BASE_COLOR = 0xff2200;
@@ -89,189 +126,315 @@ interface ZoneVisual {
  * other ground-ring systems (ringOfFrostVisuals, etc.). */
 export class RiftDeathZoneVisuals {
   private readonly zones = new Map<string, ZoneVisual>();
-  private readonly hoardBossFx: HoardBossFx;
+  private activeScope: EncounterFxScope | null = null;
+  private disposed = false;
+  private hoardBossFx: HoardBossFx = NOOP_FX;
   private readonly hoardPresentation: HoardBossPresentation;
   private readonly hoardGestures: HoardBossGestures;
-  private readonly hoardDressing: HoardBossDressing;
-  private readonly hoardAccents: HoardEncounterAccents;
-  private readonly hoardSpells: HoardSpellFx;
-  private readonly hoardOrbital: HoardOrbitalLightning;
-  private readonly hoardBoneReaper: HoardBoneReaperFx;
-  private readonly hoardIceAge: HoardIceAgeFx;
-  private readonly hoardPulsars: HoardPulsarFx;
-  private readonly hoardForgeHammer: HoardForgeHammerFx;
-  private readonly hoardTentacles: HoardTentaclesFx;
-  private readonly hoardBoulder: HoardBoulderFx;
-  private readonly hoardCocoon: HoardCocoonFx;
-  private readonly hoardGoblinCoins: HoardGoblinCoinsFx;
-  private readonly hoardMimicCoins: HoardMimicCoinsFx;
+  private hoardDressing: HoardBossDressing = NOOP_FX;
+  private hoardAccents: HoardEncounterAccents = NOOP_FX;
+  private hoardSpells: HoardSpellFx = NOOP_FX;
+  private hoardOrbital: HoardOrbitalLightning = NOOP_FX;
+  private hoardBoneReaper: HoardBoneReaperFx = NOOP_FX;
+  private hoardIceAge: HoardIceAgeFx = NOOP_FX;
+  private hoardPulsars: HoardPulsarFx = NOOP_FX;
+  private hoardForgeHammer: HoardForgeHammerFx = NOOP_FX;
+  private hoardTentacles: HoardTentaclesFx = NOOP_FX;
+  private hoardBoulder: HoardBoulderFx = NOOP_FX;
+  private hoardCocoon: HoardCocoonFx = NOOP_FX;
+  private hoardGoblinCoins: HoardGoblinCoinsFx = NOOP_FX;
+  private hoardMimicCoins: HoardMimicCoinsFx = NOOP_FX;
   // Dungeon trash telegraphs (the Hollow Crypt's cleaves, breaths, rings, bursts).
-  private readonly cryptTrash: CryptTrashFx;
+  private cryptTrash: CryptTrashFx = NOOP_FX;
   // The Sunken Bastion's trash and boss floor telegraphs.
-  private readonly bastionFx: BastionFx;
+  private bastionFx: BastionFx = NOOP_FX;
   // The Drowned Temple's trash and boss telegraphs, and the Mere Hydra's body.
-  private readonly templeFx: TempleFx;
+  private templeFx: TempleFx = NOOP_FX;
   // The trash kit's death-burst rings (any dungeon's kit mob that bursts).
-  private readonly deathBursts: DeathBurstFx;
+  private deathBursts: DeathBurstFx = NOOP_FX;
   // The Wildheart Basin's telegraphs and creature effects (the Saurian, the trash).
-  private readonly wildheartFx: WildheartFx;
-  private readonly cryptCreatures: CryptCreatureFx;
+  private wildheartFx: WildheartFx = NOOP_FX;
+  private cryptCreatures: CryptCreatureFx = NOOP_FX;
   // The Hollow Crypt finale: Morthen's entrance and the Knellwyrm.
-  private readonly cryptFinale: CryptFinaleFx;
+  private cryptFinale: CryptFinaleFx = NOOP_FX;
   // Morthen the Lich Bishop's own body effects and his stance gestures.
-  private readonly morthenFx: MorthenFx;
+  private morthenFx: MorthenFx = NOOP_FX;
   // Morthen's fight on the Rite Ring (telegraphs, ward, candles, souls, the
   // Grasp) and the Knellwyrm's heroic Burning Knell.
-  private readonly morthenRite: MorthenRiteFx;
+  private morthenRite: MorthenRiteFx = NOOP_FX;
   // The Hollow Crypt's wing bosses: Sexton Marrow, the Lady of the Bonechill,
   // Cantor Ilvane (their telegraphs, hazards and spell effects).
-  private readonly cryptBosses: CryptBossFx;
+  private cryptBosses: CryptBossFx = NOOP_FX;
   // The Gravewyrm Sanctum's telegraphs and creature effects (the Sledge
   // Tusker and its sledge, the trash).
-  private readonly sanctumFx: SanctumFx;
+  private sanctumFx: SanctumFx = NOOP_FX;
   // The Gravewyrm Sanctum's three bosses: chains, plates, meltwater, telegraphs.
-  private readonly sanctumBosses: SanctumBossFx;
+  private sanctumBosses: SanctumBossFx = NOOP_FX;
   // The trash engine's generic pieces in any dungeon (hazard pools, combat
   // walls, walker orbs, the sight-line nova, usable bodies, freeze, brands).
-  private readonly trashEngine: TrashEngineFx;
+  private trashEngine: TrashEngineFx = NOOP_FX;
   // A boss's summoned dead rising as they land, in any zone (summon_rise_fx.ts).
   private readonly summonRise: SummonRiseFx;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
-    compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly world?: IWorld,
-    shake?: (amount: number) => void,
-    reducedMotion?: () => boolean,
-    playGesture?: (entityId: number, gesture: string) => void,
+    private readonly shake?: (amount: number) => void,
+    private readonly reducedMotion?: () => boolean,
+    private readonly playGesture?: (entityId: number, gesture: string) => void,
   ) {
     this.hoardGestures = new HoardBossGestures(world, playGesture);
-    this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
     this.hoardPresentation = new HoardBossPresentation(world, shake);
-    this.hoardDressing = new HoardBossDressing(scene, groundY, world, compileGate, reducedMotion);
-    this.hoardAccents = new HoardEncounterAccents(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-    );
-    this.hoardSpells = new HoardSpellFx(scene, groundY, compileGate, reducedMotion);
-    this.hoardOrbital = new HoardOrbitalLightning(scene, groundY, compileGate, reducedMotion);
-    this.hoardBoneReaper = new HoardBoneReaperFx(scene, groundY, world, compileGate, reducedMotion);
-    this.hoardIceAge = new HoardIceAgeFx(scene, groundY, compileGate, reducedMotion, shake);
-    this.hoardPulsars = new HoardPulsarFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.hoardForgeHammer = new HoardForgeHammerFx(
-      scene,
-      groundY,
-      compileGate,
-      reducedMotion,
-      shake,
-    );
-    this.hoardTentacles = new HoardTentaclesFx(scene, groundY, compileGate, reducedMotion, shake);
-    this.hoardBoulder = new HoardBoulderFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-    );
-    this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
-    this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
-    this.cryptTrash = new CryptTrashFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.bastionFx = new BastionFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      playGesture,
-      reducedMotion,
-      shake,
-    );
-    this.templeFx = new TempleFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      playGesture,
-      shake,
-      reducedMotion,
-    );
-    this.deathBursts = new DeathBurstFx(scene, groundY, world, compileGate);
-    this.wildheartFx = new WildheartFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-      playGesture,
-    );
-    this.cryptCreatures = new CryptCreatureFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-    );
-    this.cryptFinale = new CryptFinaleFx(scene, groundY, world, compileGate, reducedMotion, shake);
-    this.cryptBosses = new CryptBossFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-      playGesture,
-    );
-    this.morthenFx = new MorthenFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-      playGesture,
-    );
-    this.morthenRite = new MorthenRiteFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-      playGesture,
-    );
-    this.sanctumFx = new SanctumFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-      playGesture,
-    );
-    this.sanctumBosses = new SanctumBossFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-      shake,
-      playGesture,
-    );
-    this.hoardGoblinCoins = new HoardGoblinCoinsFx(
-      scene,
-      groundY,
-      world,
-      compileGate,
-      reducedMotion,
-    );
-    this.trashEngine = new TrashEngineFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.summonRise = new SummonRiseFx(playGesture);
+    this.syncScope(world?.player?.pos.x, false);
+  }
+
+  private disposeScope(): void {
+    this.hoardBossFx.dispose();
+    this.hoardDressing.dispose();
+    this.hoardAccents.dispose();
+    this.hoardSpells.dispose();
+    this.hoardOrbital.dispose();
+    this.hoardBoneReaper.dispose();
+    this.hoardIceAge.dispose();
+    this.hoardPulsars.dispose();
+    this.hoardForgeHammer.dispose();
+    this.hoardTentacles.dispose();
+    this.hoardBoulder.dispose();
+    this.hoardCocoon.dispose();
+    this.hoardGoblinCoins.dispose();
+    this.hoardMimicCoins.dispose();
+    this.cryptTrash.dispose();
+    this.bastionFx.dispose();
+    this.templeFx.dispose();
+    this.deathBursts.dispose();
+    this.wildheartFx.dispose();
+    this.cryptCreatures.dispose();
+    this.cryptFinale.dispose();
+    this.cryptBosses.dispose();
+    this.morthenFx.dispose();
+    this.morthenRite.dispose();
+    this.sanctumFx.dispose();
+    this.sanctumBosses.dispose();
+    this.trashEngine.dispose();
+    this.hoardBossFx = NOOP_FX;
+    this.hoardDressing = NOOP_FX;
+    this.hoardAccents = NOOP_FX;
+    this.hoardSpells = NOOP_FX;
+    this.hoardOrbital = NOOP_FX;
+    this.hoardBoneReaper = NOOP_FX;
+    this.hoardIceAge = NOOP_FX;
+    this.hoardPulsars = NOOP_FX;
+    this.hoardForgeHammer = NOOP_FX;
+    this.hoardTentacles = NOOP_FX;
+    this.hoardBoulder = NOOP_FX;
+    this.hoardCocoon = NOOP_FX;
+    this.hoardGoblinCoins = NOOP_FX;
+    this.hoardMimicCoins = NOOP_FX;
+    this.cryptTrash = NOOP_FX;
+    this.bastionFx = NOOP_FX;
+    this.templeFx = NOOP_FX;
+    this.deathBursts = NOOP_FX;
+    this.wildheartFx = NOOP_FX;
+    this.cryptCreatures = NOOP_FX;
+    this.cryptFinale = NOOP_FX;
+    this.cryptBosses = NOOP_FX;
+    this.morthenFx = NOOP_FX;
+    this.morthenRite = NOOP_FX;
+    this.sanctumFx = NOOP_FX;
+    this.sanctumBosses = NOOP_FX;
+    this.trashEngine = NOOP_FX;
+  }
+
+  private syncScope(playerX: number | undefined, hasRiftActivity: boolean): void {
+    if (this.disposed) return;
+    const nextScope = resolveEncounterFxScope(playerX, hasRiftActivity);
+    if (nextScope === this.activeScope) return;
+    this.disposeScope();
+    this.activeScope = nextScope;
+    if (nextScope === null) return;
+    const scene = this.scene;
+    const groundY = this.groundY;
+    const world = this.world;
+    const compileGate = this.compileGate;
+    const shake = this.shake;
+    const reducedMotion = this.reducedMotion;
+    const playGesture = this.playGesture;
+    if (nextScope === 'rift') {
+      this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
+      this.hoardDressing = new HoardBossDressing(scene, groundY, world, compileGate, reducedMotion);
+      this.hoardAccents = new HoardEncounterAccents(
+        scene,
+        groundY,
+        world,
+        compileGate,
+        reducedMotion,
+      );
+      this.hoardSpells = new HoardSpellFx(scene, groundY, compileGate, reducedMotion);
+      this.hoardOrbital = new HoardOrbitalLightning(scene, groundY, compileGate, reducedMotion);
+      this.hoardBoneReaper = new HoardBoneReaperFx(
+        scene,
+        groundY,
+        world,
+        compileGate,
+        reducedMotion,
+      );
+      this.hoardIceAge = new HoardIceAgeFx(scene, groundY, compileGate, reducedMotion, shake);
+      this.hoardPulsars = new HoardPulsarFx(
+        scene,
+        groundY,
+        world,
+        compileGate,
+        reducedMotion,
+        shake,
+      );
+      this.hoardForgeHammer = new HoardForgeHammerFx(
+        scene,
+        groundY,
+        compileGate,
+        reducedMotion,
+        shake,
+      );
+      this.hoardTentacles = new HoardTentaclesFx(scene, groundY, compileGate, reducedMotion, shake);
+      this.hoardBoulder = new HoardBoulderFx(
+        scene,
+        groundY,
+        world,
+        compileGate,
+        reducedMotion,
+        shake,
+      );
+      this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
+      this.hoardGoblinCoins = new HoardGoblinCoinsFx(
+        scene,
+        groundY,
+        world,
+        compileGate,
+        reducedMotion,
+      );
+      this.hoardMimicCoins = new HoardMimicCoinsFx(
+        scene,
+        groundY,
+        world,
+        compileGate,
+        reducedMotion,
+      );
+      return;
+    }
+    this.deathBursts = new DeathBurstFx(scene, groundY, world, compileGate);
+    this.trashEngine = new TrashEngineFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    switch (nextScope) {
+      case 'hollow_crypt':
+        this.cryptTrash = new CryptTrashFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+        );
+        this.cryptCreatures = new CryptCreatureFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+        );
+        this.cryptFinale = new CryptFinaleFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+        );
+        this.cryptBosses = new CryptBossFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+          playGesture,
+        );
+        this.morthenFx = new MorthenFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+          playGesture,
+        );
+        this.morthenRite = new MorthenRiteFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+          playGesture,
+        );
+        break;
+      case 'sunken_bastion':
+        this.bastionFx = new BastionFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          playGesture,
+          reducedMotion,
+          shake,
+        );
+        break;
+      case 'drowned_temple':
+        this.templeFx = new TempleFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          playGesture,
+          shake,
+          reducedMotion,
+        );
+        break;
+      case 'wildheart_basin':
+        this.wildheartFx = new WildheartFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+          playGesture,
+        );
+        break;
+      case 'gravewyrm_sanctum':
+        this.sanctumFx = new SanctumFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+          playGesture,
+        );
+        this.sanctumBosses = new SanctumBossFx(
+          scene,
+          groundY,
+          world,
+          compileGate,
+          reducedMotion,
+          shake,
+          playGesture,
+        );
+        break;
+      case 'dungeon_generic':
+        break;
+    }
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -279,6 +442,7 @@ export class RiftDeathZoneVisuals {
    * is sufficient; two coincident zones on the same tick are collapsed, which is
    * fine for gameplay). */
   sync(zones: readonly RiftBossDeathZoneView[], hoardCues: readonly HoardBossCueView[] = []): void {
+    this.syncScope(this.world?.player?.pos.x, zones.length > 0 || hoardCues.length > 0);
     this.hoardPresentation.sync(hoardCues);
     this.hoardGestures.sync(hoardCues);
     this.hoardBossFx.setTheme(this.world?.riftFloor?.seed);
@@ -321,6 +485,7 @@ export class RiftDeathZoneVisuals {
 
   /** Called each frame with the elapsed frame time in seconds. */
   update(dt: number): void {
+    this.syncScope(this.world?.player?.pos.x, this.zones.size > 0);
     this.hoardBossFx.update(dt);
     this.hoardDressing.update(dt);
     this.hoardAccents.update(dt);
@@ -365,33 +530,9 @@ export class RiftDeathZoneVisuals {
 
   dispose(): void {
     this.sync([]);
-    this.hoardBossFx.dispose();
-    this.hoardDressing.dispose();
-    this.hoardAccents.dispose();
-    this.hoardSpells.dispose();
-    this.hoardOrbital.dispose();
-    this.hoardBoneReaper.dispose();
-    this.hoardIceAge.dispose();
-    this.hoardPulsars.dispose();
-    this.hoardForgeHammer.dispose();
-    this.hoardTentacles.dispose();
-    this.hoardBoulder.dispose();
-    this.hoardCocoon.dispose();
-    this.hoardGoblinCoins.dispose();
-    this.hoardMimicCoins.dispose();
-    this.cryptTrash.dispose();
-    this.bastionFx.dispose();
-    this.templeFx.dispose();
-    this.deathBursts.dispose();
-    this.wildheartFx.dispose();
-    this.cryptCreatures.dispose();
-    this.cryptFinale.dispose();
-    this.cryptBosses.dispose();
-    this.morthenFx.dispose();
-    this.morthenRite.dispose();
-    this.sanctumFx.dispose();
-    this.sanctumBosses.dispose();
-    this.trashEngine.dispose();
+    this.disposed = true;
+    this.activeScope = null;
+    this.disposeScope();
     this.hoardPresentation.dispose();
   }
 
@@ -404,6 +545,7 @@ export class RiftDeathZoneVisuals {
   /** True when a dungeon effect claimed the event outright (the renderer
    *  then skips its generic draw of it). */
   handleEvent(event: SimEvent): boolean {
+    this.syncScope(this.world?.player?.pos.x, this.zones.size > 0);
     this.hoardPresentation.handleEvent(event);
     const crypt = this.cryptTrash.handleEvent(event);
     this.cryptCreatures.handleEvent(event);

@@ -1024,6 +1024,13 @@ function propAsset(key: PropKey): PropAsset {
   return asset;
 }
 
+const livePropMeshMatKeys = new Set<string>();
+const livePropInstancedMatKeys = new Set<string>();
+
+function propMaterialVariantKey(mat: THREE.Material, geo: THREE.BufferGeometry): string {
+  return `${mat.uuid}:${geo.getAttribute('color') ? 'color' : 'plain'}`;
+}
+
 export function buildPropMaterialPrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'prop-material-prewarm';
@@ -1043,10 +1050,10 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     idx++;
   };
   // castShadow so the depth/shadow program variant compiles too (ultra renders a
-  // shadow pass; structures cast shadows live). instanceColor covers the tinted
-  // instance variant the way the live placed props do; the plain InstancedMesh
-  // and Mesh cover the untinted and non-instanced paths.
-  const white = new THREE.Color(1, 1, 1);
+  // shadow pass; structures cast shadows live). Props never set instanceColor,
+  // and when buildProps has recorded which materials draw as Mesh vs
+  // InstancedMesh, only those live draw modes are staged.
+  const hasLiveModes = livePropMeshMatKeys.size > 0 || livePropInstancedMatKeys.size > 0;
   // Prewarm only the props that actually render at the LIVE tier (this runs after
   // initGfxTier via the Renderer, so GFX is authoritative here, unlike the import-time
   // best-guess): low renders the LOW_TIER_PROP_KEYS subset, medium+ renders the full
@@ -1057,27 +1064,23 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   for (const key of prewarmKeys) {
     const asset = propAsset(key);
     for (const part of asset.parts) {
-      const matKey = `${part.mat.uuid}:${part.geo.getAttribute('color') ? 'color' : 'plain'}`;
+      const matKey = propMaterialVariantKey(part.mat, part.geo);
       if (seen.has(matKey)) continue;
       seen.add(matKey);
-      const mesh = new THREE.Mesh(part.geo, part.mat);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      place(mesh);
-      const instanced = new THREE.InstancedMesh(part.geo, part.mat, 1);
-      instanced.setMatrixAt(0, instanceMatrix.identity());
-      instanced.instanceMatrix.needsUpdate = true;
-      instanced.castShadow = true;
-      instanced.receiveShadow = true;
-      place(instanced);
-      const tinted = new THREE.InstancedMesh(part.geo, part.mat, 1);
-      tinted.setMatrixAt(0, instanceMatrix.identity());
-      tinted.setColorAt(0, white);
-      tinted.instanceMatrix.needsUpdate = true;
-      if (tinted.instanceColor) tinted.instanceColor.needsUpdate = true;
-      tinted.castShadow = true;
-      tinted.receiveShadow = true;
-      place(tinted);
+      if (!hasLiveModes || livePropMeshMatKeys.has(matKey)) {
+        const mesh = new THREE.Mesh(part.geo, part.mat);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        place(mesh);
+      }
+      if (!hasLiveModes || livePropInstancedMatKeys.has(matKey)) {
+        const instanced = new THREE.InstancedMesh(part.geo, part.mat, 1);
+        instanced.setMatrixAt(0, instanceMatrix.identity());
+        instanced.instanceMatrix.needsUpdate = true;
+        instanced.castShadow = true;
+        instanced.receiveShadow = true;
+        place(instanced);
+      }
     }
   }
   // moored transport ships draw their own merged, vertex-coloured meshes
@@ -1421,6 +1424,8 @@ export function buildProps(
   world: PropsWorld,
   delveLabel?: (delveId: string) => string,
 ): PropsResult {
+  livePropMeshMatKeys.clear();
+  livePropInstancedMatKeys.clear();
   const seed = world.cfg.seed;
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
@@ -1473,6 +1478,9 @@ export function buildProps(
       const srcMat = mesh.material as THREE.Material;
       if (!keepLiveMeshes.has(mesh) && srcMat.transparent !== true) {
         bakeMeshes.push({ mesh, srcMat });
+        if (!GFX.constrainedMemory) {
+          livePropInstancedMatKeys.add(propMaterialVariantKey(srcMat, mesh.geometry));
+        }
       }
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
@@ -1547,7 +1555,10 @@ export function buildProps(
   ): THREE.Group {
     const a = propAsset(key);
     const holder = new THREE.Group();
-    for (const p of a.parts) holder.add(new THREE.Mesh(p.geo, p.mat));
+    for (const p of a.parts) {
+      livePropMeshMatKeys.add(propMaterialVariantKey(p.mat, p.geo));
+      holder.add(new THREE.Mesh(p.geo, p.mat));
+    }
     holder.position.set(opts.x ?? 0, opts.y ?? 0, opts.z ?? 0);
     if (opts.euler) holder.quaternion.setFromEuler(opts.euler);
     else if (opts.rot) holder.rotation.y = opts.rot;
@@ -2710,6 +2721,7 @@ export function buildProps(
   for (const batch of instanceBatches.values()) {
     const a = propAsset(batch.key);
     for (const part of a.parts) {
+      livePropInstancedMatKeys.add(propMaterialVariantKey(part.mat, part.geo));
       const im = new THREE.InstancedMesh(part.geo, part.mat, batch.mats.length);
       for (let i = 0; i < batch.mats.length; i++) im.setMatrixAt(i, batch.mats[i]);
       im.instanceMatrix.needsUpdate = true;

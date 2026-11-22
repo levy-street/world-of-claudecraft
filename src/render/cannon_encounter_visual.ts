@@ -15,14 +15,16 @@ import { charactersReady } from './characters/assets';
 import { buildDoorBody, buildRiftGateBody } from './door_portal';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { loadStationScene } from './stations';
+import { VisibleChildrenGroup } from './visible_children_group';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
 const PORTAL_LANES = [0.2, 0.5, 0.8] as const;
 
 export class CannonEncounterVisual {
-  readonly group = new THREE.Group();
+  readonly group = new VisibleChildrenGroup();
   readonly readyForEntry: Promise<void>;
-  private readonly content = new THREE.Group();
+  // Parked encounter matrices have no readers; first reveal poses every slot.
+  private readonly content = new VisibleChildrenGroup();
   private readonly materials = worldQuestTraceMaterials();
   private readonly sphere = new THREE.SphereGeometry(1, 8, 6);
   private readonly box = new THREE.BoxGeometry(1, 1, 1);

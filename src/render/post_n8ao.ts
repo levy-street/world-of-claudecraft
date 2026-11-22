@@ -7,6 +7,11 @@ import type {
   WebGLRenderer,
   WebGLRenderTarget,
 } from 'three';
+import {
+  installN8aoPassthrough,
+  type N8AOPassthroughState,
+  renderN8aoPassthrough,
+} from './post_n8ao_passthrough';
 
 interface N8AOFullScreenTriangle {
   material: ShaderMaterial;
@@ -272,14 +277,9 @@ const passthroughQuads = new WeakSet<N8AOFullScreenTriangle>();
 /**
  * The `ao-off` rung of the post shed (post_shed_core.ts): the occlusion
  * quads (depth downsample, evaluate, both denoise iterations) draw nothing
- * while the pass is in passthrough. What the rung sheds is the GPU draws;
- * the package's render() still binds their targets and writes their
- * uniforms (with the per-frame matrix and vector allocations it makes for
- * them, unchanged by the shed), and the composite still runs, reading the
- * AO target post_shed.ts cleared to white once (its depth-aware upsample
- * falls back to the plain sample on a zero weight sum, so a stale
- * downsampled depth cannot darken it), so the beauty passes through
- * unoccluded. Nothing here changes a program or a target size.
+ * while the pass is in passthrough. The normal Combined display uses the
+ * direct beauty path below; keep these guards for the package's debug and
+ * diagnostic display paths, which still sample the white occlusion target.
  */
 function skipWhilePassthrough(
   quad: N8AOFullScreenTriangle | null | undefined,
@@ -302,9 +302,8 @@ function skipWhilePassthrough(
  */
 export class StaticOpaqueN8AOPass extends N8AOPass {
   private resourcesDisposed = false;
-  /** The post shed's `ao-off` rung (post_shed_core.ts): while true the
-   *  occlusion quads skip their draws and the composite reads the AO target
-   *  post_shed.ts cleared to white. Written by post_shed.ts only. */
+  /** The post shed's `ao-off` rung: preserve beauty/depth and bypass AO work.
+   *  Written by post_shed.ts only. */
   occlusionPassthrough = false;
 
   /** The target the composite samples its occlusion from: the one target
@@ -341,6 +340,21 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     // constructor hook avoids two beauty targets and a depth-copy pass.
   }
 
+  override render(
+    renderer: WebGLRenderer,
+    writeBuffer: WebGLRenderTarget,
+    readBuffer: WebGLRenderTarget,
+    deltaTime: number,
+    maskActive: boolean,
+  ): void {
+    if (
+      this.occlusionPassthrough &&
+      renderN8aoPassthrough(this as unknown as N8AOPassthroughState, renderer, writeBuffer)
+    )
+      return;
+    super.render(renderer, writeBuffer, readBuffer, deltaTime, maskActive);
+  }
+
   override configureAOPass(depthBufferType?: number, ortho?: boolean): void {
     assertStaticShaderConfiguration(this.configuration as unknown as N8AOStaticConfiguration);
     super.configureAOPass(depthBufferType, ortho);
@@ -367,6 +381,7 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     const state = this as unknown as N8AOStaticFrameInternals;
     preserveAccumulationQuantization(state.effectCompositerQuad.material);
     guardDegenerateNormal(state.effectCompositerQuad.material);
+    installN8aoPassthrough(state.effectCompositerQuad.material);
     suppressFullCoverageClear(state.effectCompositerQuad);
   }
 

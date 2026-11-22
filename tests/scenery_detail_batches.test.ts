@@ -190,6 +190,8 @@ describe('scenery cell draw consolidation', () => {
     batches.update(f.camera);
     const merged = f.root.getObjectByName('scenery-batched') as THREE.InstancedMesh;
     expect(merged.count).toBe(1);
+    expect(merged.instanceMatrix.updateRanges).toEqual([{ start: 0, count: 16 }]);
+    expect(merged.instanceColor!.updateRanges).toEqual([{ start: 0, count: 3 }]);
     expect(merged.instanceMatrix.array[12]).toBe(2);
     batches.dispose();
   });
