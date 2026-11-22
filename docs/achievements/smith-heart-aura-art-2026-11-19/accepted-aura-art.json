@@ -10,8 +10,8 @@
   "scope": {
     "encounter": "The Smith's Heart raid",
     "exactRuntimeAuras": 67,
-    "sharedRuntimeAliases": 23,
-    "runtimeIdsCovered": 90,
+    "sharedRuntimeAliases": 22,
+    "runtimeIdsCovered": 89,
     "unpainted": [
       {
         "auraId": "heart_endless_song",
@@ -1061,10 +1061,10 @@
       "review": "First output accepted; the owner approved it in the 2026-11-19 audit at 128px, 40px and 28px."
     },
     {
-      "auraId": "heart_final_crushed",
-      "runtimeIds": ["heart_final_crushed", "heart_final_anvil_mark"],
+      "auraId": "heart_final_anvil_mark",
+      "runtimeIds": ["heart_final_anvil_mark"],
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_crushed.png",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_anvil_mark.png",
       "sourceBytes": 2620202,
       "sourceSha256": "f9cdb4f895e353a839e7011f8a61001370406dd91734ebedb0df736948f437ba",
       "acceptedSha256": "ce900187dd8207fbe8512b71f840fa3c05b2350158a8f46507789ddcb69a9a94",
@@ -1076,7 +1076,7 @@
         },
         {
           "path": "src/sim/encounters/smith_heart/final_hammer.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_final_crushed."
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_anvil_mark."
         },
         {
           "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",

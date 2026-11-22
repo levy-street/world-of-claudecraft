@@ -5276,11 +5276,11 @@
       "sourceProvenance": "docs/achievements/smith-heart-aura-art-2026-11-19/generation-report.json"
     },
     {
-      "auraId": "heart_final_crushed",
+      "auraId": "heart_final_anvil_mark",
       "sourcePack": "smith-heart-aura-art-2026-11-19",
-      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_crushed.png",
+      "sourceFile": "tmp/imagegen/smith-heart-auras-2026-11-19/raw/heart_final_anvil_mark.png",
       "sourceBytes": 2620202,
-      "output": "heart_final_crushed.webp",
+      "output": "heart_final_anvil_mark.webp",
       "source": "OpenAI built-in image generation",
       "owner": "World of ClaudeCraft",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
@@ -5292,7 +5292,7 @@
         },
         {
           "path": "src/sim/encounters/smith_heart/final_hammer.ts",
-          "role": "The live mechanic the painting depicts: where the raid applies heart_final_crushed."
+          "role": "The live mechanic the painting depicts: where the raid applies heart_final_anvil_mark."
         },
         {
           "path": "docs/achievements/smith-heart-aura-art-2026-11-19/README.md",

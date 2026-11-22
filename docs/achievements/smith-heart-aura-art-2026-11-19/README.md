@@ -90,7 +90,7 @@ stone). Shipping: 128 px opaque WebP under `public/ui/auras/`, the provenance ga
 | 38 | `heart_final_numbing` | Numbing Frost (Mythic) | 75% slower | Boots frozen to the floor in pale crystal |
 | 39 | `heart_final_ember_mark` | Ember Mark (Heroic) | Embers fall at your feet and smoulder | Embers raining down into a smouldering marked pool |
 | 40 | `heart_final_shell` | Stone Shell | A shell that absorbs your healing | A figure encased in a granite shell, ochre light in the cracks |
-| 41 | `heart_final_crushed`, `heart_final_anvil_mark` | Crushed | The next Anvil hits you three times over | A great stone anvil looming overhead, its crushing shadow |
+| 41 | `heart_final_anvil_mark` (painted as `heart_final_crushed`) | Crushed, now Weight of the Anvil | The next Anvil hits you three times over (as painted); the Anvil's circle follows you (today) | A great stone anvil looming overhead, its crushing shadow |
 | 42 | `heart_final_coal` | Bursting Coal | The coal bursts on your allies; leave the group | A cracked glowing coal about to burst, fire leaking |
 | 43 | `heart_final_tethered` | Wind-Tethered | The Splinter of the Breath hunts you | A crackling wind tether binding a figure to a storm-stone beast |
 | 44 | `heart_final_ring_chill` | Quenching Ring | 50% slower: you crossed a ring of frost | A ring of frost freezing the feet that cross it |
@@ -155,7 +155,8 @@ set, which brings the shared aliases to 22 and keeps the ids covered at 91:
 - `heart_final_blade_mark` (Crossing Blade, the line runs through the marked player)
   wears the Quench's Crossing Blade (row 30).
 - `heart_final_anvil_mark` (Weight of the Anvil, its circle follows the marked player)
-  wears Crushed (row 41), the anvil looming overhead.
+  wore Crushed (row 41), the anvil looming overhead, until it took that painting over
+  (see the last amendment below).
 
 ## Amended after the Hammer Council's survivor rework
 
@@ -166,3 +167,13 @@ and 49) left the shipping set with their mapping and manifest rows, so 67 painti
 `heart_grieving_fury` (the survivor's haste once the fallen one's soul lands) wears the
 Masterless Fury (row 67), a roaring stone head, which brings the shared aliases to 23 and
 the ids covered to 90.
+
+## Amended after Heroic's Crushed left the final boss
+
+Jose's playtest of 2026-11-20 removed Heroic's Crushed from Weight of the Anvil, so
+`heart_final_crushed` is no longer an aura the raid applies. Its painting (row 41, the
+anvil looming overhead) is the anvil mark's own now: the same accepted bytes were renamed
+to `public/ui/auras/heart_final_anvil_mark.webp` and its mapping and manifest rows (and
+the raw source's name) moved to `heart_final_anvil_mark`. No image was regenerated; the
+prompt in the manifest is the one the painting was made from. 67 paintings still ship;
+the shared aliases drop to 22 and the ids covered to 89.

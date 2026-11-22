@@ -55,12 +55,12 @@ const painted = new Set(SMITH_HEART_AURA_IMAGE_IDS);
 const aliases = new Map(SMITH_HEART_AURA_ICON_SOURCES);
 
 describe("Smith's Heart aura art", () => {
-  it('keeps 67 paintings and 23 shared aliases, sorted and disjoint', () => {
+  it('keeps 67 paintings and 22 shared aliases, sorted and disjoint', () => {
     expect(SMITH_HEART_AURA_IMAGE_IDS).toHaveLength(67);
     expect(painted.size).toBe(67);
     expect([...SMITH_HEART_AURA_IMAGE_IDS]).toEqual([...SMITH_HEART_AURA_IMAGE_IDS].sort());
-    expect(SMITH_HEART_AURA_ICON_SOURCES).toHaveLength(23);
-    expect(aliases.size).toBe(23);
+    expect(SMITH_HEART_AURA_ICON_SOURCES).toHaveLength(22);
+    expect(aliases.size).toBe(22);
     for (const [alias, source] of aliases) {
       expect(painted.has(alias), `${alias} is an alias, not a painting`).toBe(false);
       expect(painted.has(source), `${alias} shares a real painting (${source})`).toBe(true);

@@ -421,7 +421,7 @@ describe('exact runtime aura paintings', () => {
     });
     expect(masterwrought.assets).toHaveLength(1);
     expect(createHash('sha256').update(smithHeartBytes).digest('hex')).toBe(
-      '5979d40e803771e6f15700aaade0b7161cbd57182fde7384426bbbcd15100075',
+      '2d2b8ff274378823d4abdd544b7d651bdcff9ba20698806f2c36739de5ec8e0b',
     );
     expect(smithHeart).toMatchObject({
       schemaVersion: 1,
@@ -430,7 +430,7 @@ describe('exact runtime aura paintings', () => {
         acceptedDate: '2026-11-19',
         rasterGenerator: 'OpenAI built-in image generation',
       },
-      scope: { exactRuntimeAuras: 67, sharedRuntimeAliases: 23, runtimeIdsCovered: 90 },
+      scope: { exactRuntimeAuras: 67, sharedRuntimeAliases: 22, runtimeIdsCovered: 89 },
       generationContract: {
         builtInImagegenCalls: 74,
         acceptedFirstOutputs: 70,
@@ -438,7 +438,7 @@ describe('exact runtime aura paintings', () => {
       },
     });
     expect(smithHeart.assets).toHaveLength(67);
-    expect(smithHeart.assets.flatMap(({ runtimeIds }) => runtimeIds)).toHaveLength(90);
+    expect(smithHeart.assets.flatMap(({ runtimeIds }) => runtimeIds)).toHaveLength(89);
     for (const asset of smithHeart.assets) {
       expect(asset.sourceFile, asset.auraId).toBe(
         `tmp/imagegen/smith-heart-auras-2026-11-19/raw/${asset.auraId}.png`,
