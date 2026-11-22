@@ -325,7 +325,7 @@ export class SunderingGavel {
         void main(){vLocal=position;
           vec4 w=modelMatrix*vec4(position,1.0);vWorld=w.xyz;
           vNormal=normalize(mat3(modelMatrix)*normal);
-          gl_Position=projectionMatrix*viewMatrix*w;}
+          gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}
       `,
       fragmentShader: `
         uniform float uAlpha, uFlash;
