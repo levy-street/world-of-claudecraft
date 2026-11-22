@@ -2577,8 +2577,7 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     let clearHits = 0;
     for (let i = 0; i < 60; i++) {
       for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Bogtar')
-          clearHits++;
+        if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Bogtar') clearHits++;
       }
     }
     expect(clearHits).toBe(0);
@@ -2597,8 +2596,7 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
       let hit = false;
       for (let i = 0; i < 20; i++) {
         for (const ev of sim.tick()) {
-          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Bogtar')
-            hit = true;
+          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Bogtar') hit = true;
         }
       }
       return hit;
@@ -2653,8 +2651,7 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     for (let i = 0; i < ticks; i++) {
       pre?.();
       for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.targetId === sim.playerId && ev.ability === 'Bogtar')
-          hits++;
+        if (ev.type === 'damage' && ev.targetId === sim.playerId && ev.ability === 'Bogtar') hits++;
       }
     }
     return hits;
