@@ -33,6 +33,7 @@ import { MOBS, ZONES } from '../src/sim/data';
 import { FINAL_BOSS } from '../src/sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS as A,
+  FINAL_PHASES,
   FINAL_STAGE_CODES,
   type FinalStage,
 } from '../src/sim/encounters/smith_heart/final_phase_ids';
@@ -368,19 +369,21 @@ describe('a stage change crossfades the two loops', () => {
     expect(breath.paused).toBe(true);
   });
 
-  it('the last fifteen opera enters on a held silence, then strikes from its top', () => {
+  it('the hidden phase opera enters on a held silence, then strikes from its top', () => {
     vi.stubGlobal('Audio', FakeAudio);
-    const entry = silentEntryFor(T.finalLast);
-    if (!entry) throw new Error('finalLast makes no silent entry');
+    const entry = silentEntryFor(T.finalHidden);
+    if (!entry) throw new Error('finalHidden makes no silent entry');
     expect(silentEntryFor(T.final)).toBeNull();
+    expect(silentEntryFor(T.finalLast)).toBeNull();
+    expect(entry.outMs + entry.gapMs).toBe(FINAL_PHASES.kneelSeconds * 1000);
     let now = 0;
     const loop = new BossLoopTrack(() => now);
-    loop.retarget(T.final);
+    loop.retarget(T.finalLast);
     const quarters = loop.element() as unknown as FakeAudio;
     void quarters.play();
     loop.setVolume(0.6);
 
-    loop.retarget(T.finalLast);
+    loop.retarget(T.finalHidden);
     const opera = loop.element() as unknown as FakeAudio;
     void opera.play();
     loop.setVolume(0.6);

@@ -14,7 +14,9 @@
 //                        "The Masterless Strength" through the quarter fight
 //                        and its intermissions, "The Last Fifteen" from its
 //                        15 percent stride on, and "The Unmade Anvil", the
-//                        dread of Mythic's hidden phase, from the kneel on.
+//                        Mythic's hidden phase, from the kneel on: an epic
+//                        opera (2026-11-22) that strikes after the kneel's
+//                        held silence.
 // Pure: the instance music decision (instance_music.ts) asks it per engaged
 // entity; the stage is the boss's phase aura, mirrored entity state, so
 // offline and online pick the same cue. A stage change crossfades the two
@@ -23,6 +25,7 @@
 import { FINAL_BOSS } from '../sim/encounters/smith_heart/final_ids';
 import {
   FINAL_PHASE_AURAS,
+  FINAL_PHASES,
   type FinalStage,
   finalStageOf,
 } from '../sim/encounters/smith_heart/final_phase_ids';
@@ -33,8 +36,8 @@ export const SMITH_HEART_BOSS_TRACKS = {
   quench: '/audio/music/boss_heart_quench.mp3?v=03968298d1b1',
   heat: '/audio/music/boss_heart_heat.mp3?v=f955ad643011',
   final: '/audio/music/boss_heart_masterless_strength.mp3?v=a0abdc9f55e3',
-  finalLast: '/audio/music/boss_heart_masterless_last.mp3?v=d7eb2087db15',
-  finalHidden: '/audio/music/boss_heart_masterless_hidden.mp3?v=f96e47ff0f45',
+  finalLast: '/audio/music/boss_heart_masterless_last.mp3?v=8fc9a59e3f09',
+  finalHidden: '/audio/music/boss_heart_masterless_hidden.mp3?v=d7eb2087db15',
 } as const;
 
 /** The raid's bosses (template ids) to their fight cue; the final boss's
@@ -86,10 +89,15 @@ export interface SilentEntry {
   gapMs: number;
 }
 
-/** The last fifteen percent's opera strikes after a held silence as the
- *  boss leaps to the centre (Jose's call of 2026-11-22: no blended join). */
+/** Mythic's hidden phase strikes in its epic opera after the fake death
+ *  (Jose's call of 2026-11-22): the fight track fades as the boss kneels,
+ *  the dark room holds silent through the kneel, and the opera bursts in as
+ *  it rises again. */
 const SILENT_ENTRIES: Readonly<Record<string, SilentEntry>> = {
-  [SMITH_HEART_BOSS_TRACKS.finalLast]: { outMs: 600, gapMs: 1400 },
+  [SMITH_HEART_BOSS_TRACKS.finalHidden]: {
+    outMs: 600,
+    gapMs: FINAL_PHASES.kneelSeconds * 1000 - 600,
+  },
 };
 
 /** The silent entry a cue makes, or null when it crossfades as usual. */

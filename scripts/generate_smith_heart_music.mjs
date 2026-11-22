@@ -74,7 +74,7 @@ export const SMITH_HEART_TRACKS = {
     music_length_ms: 180000,
   },
   final_opera: {
-    filename: 'boss_heart_masterless_last.mp3',
+    filename: 'boss_heart_masterless_hidden.mp3',
     name: 'The Masterless Strength, epic opera take (Jose 2026-11-22)',
     prompt:
       'Fast, intense, relentless epic opera battle music for the final boss of a dark fantasy raid: a colossal ' +
