@@ -26298,7 +26298,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldMarkers.bindPlace': 'ワールドマーカーを設置：{marker}',
   'hudChrome.worldMarkers.bindClear': 'ワールドマーカーをすべて消去',
   'hudChrome.raidTargets.menuRow': 'レイドターゲットアイコン',
-  'hudChrome.raidTargets.menuRowTip': 'このユニットの頭上に8種類のレイドターゲットアイコンのいずれかを付けます。グループ全員に表示され、各アイコンは同時に1体にしか付けられません。',
+  'hudChrome.raidTargets.menuRowTip':
+    'このユニットの頭上に8種類のレイドターゲットアイコンのいずれかを付けます。グループ全員に表示され、各アイコンは同時に1体にしか付けられません。',
   'hudChrome.raidTargets.bindCategory': 'レイドターゲットアイコン',
   'hudChrome.raidTargets.bindSet': 'ターゲットにマーク：{marker}',
   'hudChrome.raidTargets.bindClear': 'ターゲットのマークを消去',

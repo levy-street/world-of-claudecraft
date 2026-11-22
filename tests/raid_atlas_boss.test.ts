@@ -164,7 +164,8 @@ describe('raid atlas boss tooltip model', () => {
     for (const state of ['alive', 'engaged', 'dead'] as const)
       lines.push(t(`hudChrome.raidAtlas.boss.state.${state}`));
     lines.push(t('hudChrome.raidAtlas.boss.aria', { name: 'N', state: 'S' }));
-    for (const line of lines) expect(line).not.toMatch(/[–—]/);
+    const dashes = new RegExp(`[${String.fromCharCode(0x2013, 0x2014)}]`);
+    for (const line of lines) expect(line).not.toMatch(dashes);
     expect(t('hudChrome.raidAtlas.boss.hammer.subtitle', { lead: 'A', partner: 'B' })).toBe(
       'A and B',
     );
