@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   activeKitPrewarmEntry,
   cancelActiveAbilityKit,
@@ -9,8 +9,11 @@ import * as contact from '../src/render/ability_vfx/contact_assets';
 import { EDICT_SHAPE, FinalEdict } from '../src/render/ability_vfx/final_edict';
 import { AbilityVfx, type AbilityVfxDamageEvent } from '../src/render/ability_vfx/painter';
 import { setPaladinSpecIconsForTest } from '../src/render/ability_vfx/paladin_spec_icons';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import { collectAbilityVfxCompileTargets } from '../src/render/ability_vfx/prewarm';
 import * as assets from '../src/render/ability_vfx/production_assets';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import {
   EDICT_STAMP_DURATION,
   EDICT_TRAIL,
@@ -71,6 +74,10 @@ function fixture(camera?: THREE.Camera, groundY?: (x: number, z: number) => numb
   return { scene, positions, anchor, effect, host, prepare, standOn };
 }
 
+// The authored composition; the detail tiers have their own block below.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
+
 const PARTS: EdictPart[] = ['weapon', 'slash', 'flare', 'ring', 'seal', 'spark'];
 const SHAPES = EDICT_SHAPE;
 /** Vertex layout once landed: the weapon, the chop, flare, seal, sparks. */
@@ -105,6 +112,10 @@ describe('Final Edict confirmed contact', () => {
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
       deps: { fx: { finalEdictContact }, receiveHit },
       edictContacts: new FinalEdictContacts(),
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
     }) as AbilityVfx;
     const ev: AbilityVfxDamageEvent = {
       abilityId: 'final_edict',
@@ -163,6 +174,10 @@ describe('Final Edict confirmed contact', () => {
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
       deps: { fx: { finalEdictContact, finalEdictVerdict, finalEdictAreaHit } },
       edictContacts: new FinalEdictContacts(),
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
     }) as AbilityVfx;
     const hit = (targetId: number, amount = 30): AbilityVfxDamageEvent => ({
       abilityId: 'final_edict',
@@ -813,5 +828,82 @@ describe("Final Edict's Ascension explosion", () => {
     expect(f.effect.verdict(1, 6)).toBe(false);
     expect(f.effect.areaHit(1, 2, 'damage')).toBe(false);
     f.effect.dispose();
+  });
+});
+
+describe('Final Edict detail tiers', () => {
+  /** Quads per shape written (with `lit`, only those with any light). */
+  function quads(f: ReturnType<typeof fixture>, lit = false): Map<number, number> {
+    const geometry = f.effect.mesh.geometry;
+    const shapes = geometry.getAttribute('aShape');
+    const alphas = geometry.getAttribute('aAlpha');
+    const seen = new Map<number, number>();
+    for (let i = 0; i < geometry.drawRange.count; i += 6)
+      if (!lit || alphas.getX(i) > 0) seen.set(shapes.getX(i), (seen.get(shapes.getX(i)) ?? 0) + 1);
+    return seen;
+  }
+  async function strike(detail: PaladinVfxDetail, since: number) {
+    setPaladinVfxDetailForTest(detail);
+    const f = fixture();
+    await f.prepare();
+    f.effect.spawn(1, 2, 'damage', false);
+    // A running strike keeps the shape it spawned with.
+    setPaladinVfxDetailForTest('full');
+    f.effect.update(landed(since), false);
+    const seen = quads(f, since > 0.3);
+    f.effect.dispose();
+    return seen;
+  }
+
+  it('keeps the blade and seal on every tier and thins the rest', async () => {
+    const full = await strike('full', 0.02);
+    const light = await strike('light', 0.02);
+    const minimal = await strike('minimal', 0.02);
+    for (const tier of [full, light, minimal]) {
+      expect(tier.get(SHAPES.slash)).toBe(FINAL_EDICT_SLASH_SEGMENTS);
+      expect(tier.get(SHAPES.seal)).toBe(1);
+    }
+    expect(full.get(SHAPES.flare)).toBe(1);
+    expect(full.get(SHAPES.weapon)).toBe(1);
+    // Light: the weapon's light stays, the flare goes, half the sparks.
+    expect(light.get(SHAPES.weapon)).toBe(1);
+    expect(light.has(SHAPES.flare)).toBe(false);
+    expect(light.get(SHAPES.spark) ?? 0).toBeLessThan(full.get(SHAPES.spark) ?? 0);
+    // Minimal: only the blade, the seal and a few sparks.
+    expect(minimal.has(SHAPES.weapon)).toBe(false);
+    expect(minimal.has(SHAPES.flare)).toBe(false);
+    expect(minimal.get(SHAPES.spark) ?? 0).toBeGreaterThan(0);
+    expect(minimal.get(SHAPES.spark) ?? 0).toBeLessThan(light.get(SHAPES.spark) ?? 0);
+    // The seal's fade tail is shorter on the lighter tiers.
+    expect((await strike('full', 0.55)).get(SHAPES.seal)).toBe(1);
+    expect((await strike('minimal', 0.55)).has(SHAPES.seal)).toBe(false);
+  });
+
+  it("draws the explosion's front and reach on every tier, its rays and seals only above minimal", async () => {
+    const explode = async (detail: PaladinVfxDetail) => {
+      setPaladinVfxDetailForTest(detail);
+      const f = fixture();
+      await f.prepare();
+      expect(f.effect.verdict(1, 6)).toBe(true);
+      // Played either way, so the painter never falls back to stock particles.
+      expect(f.effect.areaHit(1, 2, 'damage')).toBe(true);
+      f.effect.update(landed(0.1), false);
+      const seen = quads(f);
+      f.effect.dispose();
+      return seen;
+    };
+    const full = await explode('full');
+    const light = await explode('light');
+    const minimal = await explode('minimal');
+    for (const tier of [full, light, minimal])
+      expect(tier.get(SHAPES.band) ?? 0).toBeGreaterThan(0);
+    expect(full.get(SHAPES.spoke)).toBe(EDICT_WAVE_SPOKES);
+    expect(light.get(SHAPES.spoke)).toBe(EDICT_WAVE_SPOKES);
+    expect(minimal.has(SHAPES.spoke)).toBe(false);
+    expect(full.get(SHAPES.seal)).toBe(1);
+    expect(full.get(SHAPES.flare)).toBe(1);
+    expect(light.get(SHAPES.seal)).toBe(1);
+    expect(light.has(SHAPES.flare)).toBe(false);
+    expect(minimal.has(SHAPES.seal)).toBe(false);
   });
 });

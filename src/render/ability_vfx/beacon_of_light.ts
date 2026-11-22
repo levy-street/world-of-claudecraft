@@ -7,6 +7,19 @@ import {
   type PaladinKitContext,
 } from './paladin_kit_context';
 import { hash01, PaladinQuadPool, ramp } from './paladin_quad_pool';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the beacon column and its falling head, the halo, a copied
+// heal's thread; secondary = the light running out across the ground and the
+// gathering wave closing into the halo; accents = the landing flash, the halo's
+// flare on a copied heal and the flare where a thread meets it (motes scale
+// with count, fade tails with linger).
 
 export const BEACON_MARKS = 8;
 export const BEACON_KINDLES = 4;
@@ -38,17 +51,21 @@ interface Mark {
   /** Seconds since the beacon last passed on healing: the halo flares. */
   flare: number;
   age: number;
+  /** How much of the halo draws, read when it first appeared. */
+  detail: PaladinVfxDetail;
 }
 interface Kindle {
   active: boolean;
   target: number;
   age: number;
+  detail: PaladinVfxDetail;
 }
 interface Thread {
   active: boolean;
   from: number;
   to: number;
   age: number;
+  detail: PaladinVfxDetail;
 }
 
 /**
@@ -70,17 +87,20 @@ export class BeaconOfLight {
     seen: false,
     flare: 99,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly kindles: Kindle[] = Array.from({ length: BEACON_KINDLES }, () => ({
     active: false,
     target: -1,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly threads: Thread[] = Array.from({ length: BEACON_THREADS }, () => ({
     active: false,
     from: -1,
     to: -1,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly feet = new THREE.Vector3();
   private readonly head = new THREE.Vector3();
@@ -165,6 +185,7 @@ export class BeaconOfLight {
     slot.active = true;
     slot.target = target;
     slot.age = 0;
+    slot.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -179,6 +200,7 @@ export class BeaconOfLight {
       slot.target = target;
       slot.presence = 0;
       slot.flare = 99;
+      slot.detail = paladinVfxDetailNow();
       // Did the beacon just come down on them? Then the halo gathers out of it.
       slot.age = this.kindles.some((k) => k.active && k.target === target) ? 0 : HALO_FORM + 1;
     }
@@ -200,6 +222,7 @@ export class BeaconOfLight {
     slot.from = from;
     slot.to = to;
     slot.age = 0;
+    slot.detail = paladinVfxDetailNow();
   }
 
   /** Where the halo floats over `id`. */
@@ -254,7 +277,7 @@ export class BeaconOfLight {
         m.presence * shown * (1 + 0.8 * pulse),
         SHAPE.halo,
       );
-      if (pulse > 0.01)
+      if (pulse > 0.01 && paladinDetailScale(m.detail).accents)
         pool.billboard(
           this.a.x,
           this.a.y + bob,
@@ -268,14 +291,22 @@ export class BeaconOfLight {
     for (const kd of this.kindles) {
       if (!kd.active) continue;
       kd.age += dt;
-      if (kd.age >= BEACON_KINDLE_DURATION || !this.haloAt(kd.target, this.a)) {
+      const scale = paladinDetailScale(kd.detail);
+      // The fade tail after the landing shortens on the lighter tiers.
+      const end =
+        kd.detail === 'full'
+          ? BEACON_KINDLE_DURATION
+          : BEACON_FALL +
+            0.15 +
+            paladinDetailLinger(BEACON_KINDLE_DURATION - BEACON_FALL - 0.15, kd.detail);
+      if (kd.age >= end || !this.haloAt(kd.target, this.a)) {
         kd.active = false;
         continue;
       }
       const t = kd.age;
       const floor = this.ctx.groundY(this.feet.x, this.feet.z);
       const ground = Number.isFinite(floor) ? Math.max(floor, this.feet.y - 0.3) : this.feet.y;
-      const fade = 1 - ramp(t, BEACON_FALL + 0.15, BEACON_KINDLE_DURATION);
+      const fade = 1 - ramp(t, BEACON_FALL + 0.15, end);
       // The beacon: a column from high in the sky down to the ally.
       pool.time = t;
       pool.upright(
@@ -298,26 +329,28 @@ export class BeaconOfLight {
       const since = t - BEACON_FALL;
       // It lands: a flash, light running out across the ground, motes rising.
       pool.time = since;
-      pool.billboard(
-        this.chest.x,
-        this.chest.y,
-        this.chest.z,
-        1.6,
-        KIT_IVORY,
-        Math.exp(-since * 7) * 1.4,
-        SHAPE.flare,
-      );
-      pool.ground(
-        this.feet.x,
-        ground + 0.05,
-        this.feet.z,
-        2.4,
-        KIT_WARM,
-        1 - ramp(since, 0.4, 0.8),
-        SHAPE.ground,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.chest.x,
+          this.chest.y,
+          this.chest.z,
+          1.6,
+          KIT_IVORY,
+          Math.exp(-since * 7) * 1.4,
+          SHAPE.flare,
+        );
+      if (scale.secondary)
+        pool.ground(
+          this.feet.x,
+          ground + 0.05,
+          this.feet.z,
+          2.4,
+          KIT_WARM,
+          1 - ramp(since, 0.4, 0.4 + paladinDetailLinger(0.4, kd.detail)),
+          SHAPE.ground,
+        );
       // The light it leaves gathering into the halo.
-      if (since < HALO_FORM && !reduced) {
+      if (since < HALO_FORM && !reduced && scale.secondary) {
         const close = ramp(since, 0, HALO_FORM);
         const y = this.feet.y + (this.a.y - this.feet.y) * (0.3 + 0.7 * close);
         pool.ground(
@@ -331,8 +364,9 @@ export class BeaconOfLight {
         );
       }
       const motion = reduced ? 0.3 : 1;
-      for (let i = 0; i < MOTES; i++) {
-        const life = 0.55 + 0.35 * hash01(i, 4);
+      const motes = paladinDetailCount(MOTES, kd.detail);
+      for (let i = 0; i < motes; i++) {
+        const life = paladinDetailLinger(0.55 + 0.35 * hash01(i, 4), kd.detail);
         if (since >= life) continue;
         const ang = hash01(i, 1) * Math.PI * 2 + since * 2;
         const rad = 0.25 + 0.55 * hash01(i, 2);
@@ -381,7 +415,8 @@ export class BeaconOfLight {
           SHAPE.thread,
         );
       }
-      pool.billboard(this.a.x, this.a.y, this.a.z, 0.25, KIT_IVORY, fade * 1.1, SHAPE.flare);
+      if (paladinDetailScale(th.detail).accents)
+        pool.billboard(this.a.x, this.a.y, this.a.z, 0.25, KIT_IVORY, fade * 1.1, SHAPE.flare);
     }
     pool.end();
   }

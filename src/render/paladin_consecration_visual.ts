@@ -1,6 +1,15 @@
 // Persistent Consecration (Holy Ground) presentation. The authoritative zone comes
 // from IWorld, so late-joining and reconnecting clients see the same holy ground as
 // the caster.
+//
+// Detail: core = the holy ground itself (field, heart, spec emblem, sacred
+// geometry, the tick's wave and embers drawn in it), the rune band and the
+// perimeter ring; secondary = the inner and middle rings, the pulse ring, the
+// tick's wall of fire and the opening column; accents = the heat shimmer. The
+// rising motes thin with paladinDetailCount; the end fade and the opening
+// column's decay scale with paladinDetailLinger. A zone reads the detail as it
+// opens and keeps it; the renderer's quality floors (setQuality) still apply on
+// top, so a piece draws only while both allow it.
 
 import * as THREE from 'three';
 import type { ActiveConsecration } from '../world_api';
@@ -16,6 +25,13 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './ability_vfx/paladin_spec_icons';
+import { paladinVfxDetailNow } from './ability_vfx/paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './ability_vfx/paladin_vfx_detail_core';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 const SEGMENTS = 72;
@@ -78,7 +94,13 @@ interface ConsecrationVisual {
   /** Ascension empowered it: its fire and pulses burn hotter. */
   gilded: boolean;
   geometries: THREE.BufferGeometry[];
-  qualityObjects: { object: THREE.Object3D; minQuality: number }[];
+  /** Quality-floored pieces; `detailShown` is whether the zone's detail keeps it. */
+  qualityObjects: { object: THREE.Object3D; minQuality: number; detailShown: boolean }[];
+  /** The detail this zone draws at: read as it opens, kept to its end. */
+  detail: PaladinVfxDetail;
+  /** The end fade and the opening column's decay, scaled for the detail. */
+  fadeSeconds: number;
+  openingSeconds: number;
   radius: number;
   duration: number;
   elapsed: number;
@@ -209,13 +231,15 @@ export class PaladinConsecrationVisuals {
   private create(state: ActiveConsecration): void {
     const radius = Math.max(0.5, state.radius);
     const centerY = this.groundY(state.x, state.z);
+    const detail = paladinVfxDetailNow();
+    const scale = paladinDetailScale(detail);
     const root = new THREE.Group();
     root.name = 'paladin-consecration';
     const materials: THREE.MeshBasicMaterial[] = [];
     const baseOpacities: number[] = [];
     const shaders: THREE.ShaderMaterial[] = [];
     const geometries: THREE.BufferGeometry[] = [];
-    const qualityObjects: { object: THREE.Object3D; minQuality: number }[] = [];
+    const qualityObjects: ConsecrationVisual['qualityObjects'] = [];
 
     const addTerrainMesh = (
       geometry: THREE.BufferGeometry,
@@ -328,6 +352,7 @@ export class PaladinConsecrationVisuals {
         8,
       ),
       minQuality: 0.25,
+      detailShown: scale.secondary,
     });
     qualityObjects.push({
       object: addTerrainMesh(
@@ -337,6 +362,7 @@ export class PaladinConsecrationVisuals {
         8,
       ),
       minQuality: 0.65,
+      detailShown: scale.secondary,
     });
     addTerrainMesh(
       this.createTerrainRing(state.x, state.z, radius * 0.982, radius),
@@ -390,6 +416,7 @@ export class PaladinConsecrationVisuals {
     pulseRing.rotation.x = -Math.PI / 2;
     pulseRing.position.set(state.x, centerY + GROUND_LIFT * 2.2, state.z);
     pulseRing.renderOrder = floorVfxRenderOrder('player', 5);
+    pulseRing.visible = scale.secondary;
     root.add(pulseRing);
 
     const shimmer = new THREE.Mesh(SHIMMER_GEOMETRY, basic('shimmer', 0xffefae, 0.035));
@@ -398,7 +425,7 @@ export class PaladinConsecrationVisuals {
     shimmer.scale.set(radius, 1, radius);
     shimmer.renderOrder = floorVfxRenderOrder('player', 2);
     root.add(shimmer);
-    qualityObjects.push({ object: shimmer, minQuality: 0.7 });
+    qualityObjects.push({ object: shimmer, minQuality: 0.7, detailShown: scale.accents });
 
     // A column of light where the Paladin consecrates the ground.
     // Soft light, not a solid pipe: fading upward and toward its silhouette edges.
@@ -433,6 +460,7 @@ export class PaladinConsecrationVisuals {
     opening.name = 'paladin-consecration-opening';
     opening.position.set(state.x, centerY + 5, state.z);
     opening.renderOrder = floorVfxRenderOrder('player', 6);
+    opening.visible = scale.secondary;
     root.add(opening);
 
     // Each tick's wall of holy fire: flame tongues rising from the wave front,
@@ -489,8 +517,10 @@ export class PaladinConsecrationVisuals {
     motes.name = 'paladin-consecration-motes';
     motes.position.set(state.x, centerY, state.z);
     motes.renderOrder = floorVfxRenderOrder('player', 6);
+    // Fewer instances drawn, the same buffer and program.
+    motes.count = paladinDetailCount(MOTE_COUNT, detail);
     root.add(motes);
-    qualityObjects.push({ object: motes, minQuality: 0.25 });
+    qualityObjects.push({ object: motes, minQuality: 0.25, detailShown: true });
 
     const ambientOffset = (
       index: number,
@@ -509,8 +539,11 @@ export class PaladinConsecrationVisuals {
         scale: 0.78 + (index % 3) * 0.12,
       };
     };
+    // The drawn motes share the whole circle: a lighter tier draws fewer of
+    // them spread all the way round, never the first few bunched on one side.
+    const motesShown = Math.max(1, motes.count);
     const moteOffsets = Array.from({ length: MOTE_COUNT }, (_, index) =>
-      ambientOffset(index, MOTE_COUNT, radius * (0.2 + (index % 5) * 0.15), 0.67),
+      ambientOffset(index, motesShown, radius * (0.2 + (index % 5) * 0.15), 0.67),
     );
 
     const visual: ConsecrationVisual = {
@@ -537,6 +570,9 @@ export class PaladinConsecrationVisuals {
       gilded: false,
       geometries,
       qualityObjects,
+      detail,
+      fadeSeconds: paladinDetailLinger(FADE_SECONDS, detail),
+      openingSeconds: paladinDetailLinger(OPENING_SECONDS, detail),
       radius,
       duration: Math.max(0.1, state.duration),
       elapsed: Math.max(0, state.duration - state.remaining),
@@ -552,8 +588,8 @@ export class PaladinConsecrationVisuals {
   }
 
   private applyQuality(visual: ConsecrationVisual): void {
-    for (const { object, minQuality } of visual.qualityObjects) {
-      object.visible = this.quality >= minQuality;
+    for (const { object, minQuality, detailShown } of visual.qualityObjects) {
+      object.visible = detailShown && this.quality >= minQuality;
     }
   }
 
@@ -586,7 +622,7 @@ export class PaladinConsecrationVisuals {
     }
     visual.ground.uniforms.uGild.value = visual.gilded ? 1 : 0;
     const gild = visual.gilded ? 1.3 : 1;
-    const fade = Math.min(1, Math.max(0, (visual.duration - t) / FADE_SECONDS));
+    const fade = Math.min(1, Math.max(0, (visual.duration - t) / visual.fadeSeconds));
     const reveal = Math.min(1, t / REVEAL_SECONDS);
     const breathe = reducedMotion ? 1 : 0.95 + Math.sin(t * Math.PI * 2) * 0.05;
     visual.materials.forEach((material, index) => {
@@ -613,7 +649,8 @@ export class PaladinConsecrationVisuals {
     const burning = reducedMotion
       ? 0
       : (1 - phase) ** 1.2 * (1 - Math.max(0, phase * 1.15 - 1) * 4);
-    visual.fireWall.visible = burning > 0.01 && front > 0.05;
+    visual.fireWall.visible =
+      burning > 0.01 && front > 0.05 && paladinDetailScale(visual.detail).secondary;
     visual.fireWall.scale.set(
       visual.radius * front,
       0.9 + 1.1 * (1 - phase),
@@ -626,7 +663,7 @@ export class PaladinConsecrationVisuals {
     visual.fireMaterial.uniforms.uAlpha.value = Math.max(0, burning) * fade * reveal * 0.75 * gild;
 
     // The column of light at the opening.
-    const open = reducedMotion ? 0 : Math.max(0, 1 - t / OPENING_SECONDS);
+    const open = reducedMotion ? 0 : Math.max(0, 1 - t / visual.openingSeconds);
     visual.openingMaterial.uniforms.uAlpha.value = 0.7 * open * open;
     visual.opening.scale.set(0.6 + 0.4 * open, 1, 0.6 + 0.4 * open);
 
@@ -640,7 +677,7 @@ export class PaladinConsecrationVisuals {
     const t = visual.elapsed;
     if (visual.motes.visible) {
       // Motes rise through the light and fade as they climb, looping.
-      for (let index = 0; index < visual.moteOffsets.length; index++) {
+      for (let index = 0; index < visual.motes.count; index++) {
         const offset = visual.moteOffsets[index];
         const climb = staticPose ? 0.4 : (t * 0.45 + offset.phase / 6.28) % 1;
         const scale = offset.scale * Math.sin(climb * Math.PI);

@@ -2,6 +2,18 @@ import * as THREE from 'three';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { CrestPrewarm } from './crest_prewarm';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the brand stamped on the enemy and the hush sigil held on the
+// chest; secondary = the strike's shock ring and the collar about the throat;
+// accents = the strike's fist flare and the shattered spell's flash (the shards
+// of the broken spell scale with count, the brand's fade tail with linger).
 
 export const HUSH_STRIKES = 6;
 export const HUSH_BRANDS = 8;
@@ -25,6 +37,8 @@ interface Strike {
   source: number;
   target: number;
   age: number;
+  /** How much of the strike draws, read when it landed. */
+  detail: PaladinVfxDetail;
 }
 interface Brand {
   active: boolean;
@@ -34,6 +48,8 @@ interface Brand {
   left: number;
   presence: number;
   age: number;
+  /** How much of the lockout draws, read when it began. */
+  detail: PaladinVfxDetail;
 }
 
 function ramp(t: number, from: number, to: number): number {
@@ -72,6 +88,7 @@ export class Hushbrand {
     source: -1,
     target: -1,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly brands: Brand[] = Array.from({ length: HUSH_BRANDS }, () => ({
     active: false,
@@ -80,6 +97,7 @@ export class Hushbrand {
     left: 1,
     presence: 0,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly positions = new Float32Array(VERTICES * 3);
   private readonly colors = new Float32Array(VERTICES * 3);
@@ -214,6 +232,7 @@ export class Hushbrand {
     slot.source = source;
     slot.target = target;
     slot.age = 0;
+    slot.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -228,6 +247,7 @@ export class Hushbrand {
       slot.target = target;
       slot.presence = 0;
       slot.age = 0;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.seen = true;
     slot.left = Number.isFinite(left) ? Math.min(1, Math.max(0, left)) : 1;
@@ -340,7 +360,10 @@ export class Hushbrand {
     for (const s of this.strikes) {
       if (!s.active) continue;
       s.age += dt;
-      if (s.age >= HUSH_STRIKE_DURATION || !this.anchor(s.target, 0.55, this.at)) {
+      // The brand's fade tail (its second half) shortens on lighter tiers.
+      const settle = HUSH_STRIKE_DURATION * 0.5;
+      const end = settle + paladinDetailLinger(HUSH_STRIKE_DURATION - settle, s.detail);
+      if (s.age >= end || !this.anchor(s.target, 0.55, this.at)) {
         s.active = false;
         continue;
       }
@@ -355,20 +378,23 @@ export class Hushbrand {
         this.at.z += (dz / d) * surface;
       }
       const t = s.age;
-      const fade = 1 - ramp(t, HUSH_STRIKE_DURATION * 0.5, HUSH_STRIKE_DURATION);
+      const fade = 1 - ramp(t, settle, end);
       const size = 0.5 * (1 + 0.5 * Math.exp(-t * 14));
+      const scale = paladinDetailScale(s.detail);
       this.time = t;
       this.billboard(this.at.x, this.at.y, this.at.z, size, GOLD, fade * 1.1, SHAPE.brand);
-      this.billboard(this.at.x, this.at.y, this.at.z, 1.1, GOLD, 1, SHAPE.ring);
-      this.billboard(
-        this.at.x,
-        this.at.y,
-        this.at.z,
-        0.9,
-        IVORY,
-        Math.exp(-t * 10) * 1.2,
-        SHAPE.flare,
-      );
+      if (scale.secondary)
+        this.billboard(this.at.x, this.at.y, this.at.z, 1.1, GOLD, 1, SHAPE.ring);
+      if (scale.accents)
+        this.billboard(
+          this.at.x,
+          this.at.y,
+          this.at.z,
+          0.9,
+          IVORY,
+          Math.exp(-t * 10) * 1.2,
+          SHAPE.flare,
+        );
     }
     for (const b of this.brands) {
       if (!b.active) continue;
@@ -385,14 +411,19 @@ export class Hushbrand {
         z = this.feet.z;
       // Fades out over the last of the lockout.
       const k = b.presence * Math.min(1, b.left / 0.15 + 0.25);
+      const scale = paladinDetailScale(b.detail);
       // The broken spell: a flash and shards thrown out of the hands.
       if (b.age < HUSH_SHATTER_DURATION) {
         const t = b.age;
         const cy = this.feet.y + height * 0.6;
-        this.billboard(x, cy, z, 1.3, IVORY, Math.exp(-t * 9) * 1.3, SHAPE.flare);
+        if (scale.accents)
+          this.billboard(x, cy, z, 1.3, IVORY, Math.exp(-t * 9) * 1.3, SHAPE.flare);
         this.time = t;
         const motion = reduced ? 0.3 : 1;
-        for (let i = 0; i < HUSH_SHARDS; i++) {
+        const shards = paladinDetailCount(HUSH_SHARDS, b.detail);
+        for (let n = 0; n < shards; n++) {
+          // Fewer shards keep the full burst's spread: every k-th one.
+          const i = Math.floor((n * HUSH_SHARDS) / shards);
           const ang = i * 2.399963 + hash(i, 1);
           const speed = (2.2 + 2.4 * hash(i, 2)) * motion;
           const life = 0.35 + 0.2 * hash(i, 3);
@@ -421,20 +452,21 @@ export class Hushbrand {
       const collar = Math.max(0.35, Math.min(1.2, height * 0.24));
       this.time = this.clock;
       const cinch = 1 + 0.6 * Math.exp(-b.age * 8);
-      this.quad(
-        x,
-        neck,
-        z,
-        collar * cinch,
-        0,
-        0,
-        0,
-        0,
-        collar * cinch,
-        GOLD,
-        k * 1.3,
-        SHAPE.collar,
-      );
+      if (scale.secondary)
+        this.quad(
+          x,
+          neck,
+          z,
+          collar * cinch,
+          0,
+          0,
+          0,
+          0,
+          collar * cinch,
+          GOLD,
+          k * 1.3,
+          SHAPE.collar,
+        );
       // The hush stays branded on the chest, inside a turning rune band.
       const chest = this.feet.y + height * 0.55;
       const brand = Math.max(0.3, Math.min(0.7, height * 0.2));

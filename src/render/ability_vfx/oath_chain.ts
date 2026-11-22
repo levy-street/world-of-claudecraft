@@ -8,6 +8,12 @@ import {
 } from './paladin_kit_context';
 import { hash01, PaladinQuadPool, ramp } from './paladin_quad_pool';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 
 export const OATH_TETHERS = 6;
 export const OATH_BINDS = 8;
@@ -27,6 +33,8 @@ const LINK_LENGTH = 0.27;
 /** Enough links for the ability's 30 m reach. */
 const MAX_LINKS = 152;
 const DUST = 4;
+/** On the full effect every MOTE_STRIDE-th link sheds a mote as it shatters. */
+const MOTE_STRIDE = 2;
 const SHAPE = {
   link: 0,
   bar: 1,
@@ -50,6 +58,8 @@ interface Tether {
   breaking: number;
   /** The enemy will not move: the chain strains taut and snaps in the middle. */
   refused: boolean;
+  /** The Paladin detail read when the chain was thrown. */
+  detail: PaladinVfxDetail;
 }
 interface Bind {
   active: boolean;
@@ -61,6 +71,8 @@ interface Bind {
   /** Share of the slow still to run. */
   left: number;
   age: number;
+  /** The Paladin detail read when the bind was first seen. */
+  detail: PaladinVfxDetail;
 }
 
 /**
@@ -78,6 +90,13 @@ interface Bind {
  * The chain is drawn from camera-facing quads: links alternate face-on (an
  * open loop of light) and edge-on (a bright bar), so it reads as interlocking
  * links from any angle.
+ *
+ * Detail: core = every link of the chain, its blazing head in flight, the
+ * shackle and the binding runes; secondary = the furrows dragged through the
+ * ground and the motes they kick up; accents = the flares (caught, bitten,
+ * snapping). The motes the chain shatters into thin with the tier (half on
+ * light, a third on minimal); light drops the flares, minimal the furrows too,
+ * and a fading bind lets go sooner.
  */
 export class OathChain {
   private readonly pool: PaladinQuadPool<'oath_chain'>;
@@ -90,6 +109,7 @@ export class OathChain {
     seen: false,
     breaking: -1,
     refused: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly binds: Bind[] = Array.from({ length: OATH_BINDS }, () => ({
     active: false,
@@ -99,6 +119,7 @@ export class OathChain {
     pulled: true,
     left: 1,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly from = new THREE.Vector3();
   private readonly to = new THREE.Vector3();
@@ -188,6 +209,7 @@ export class OathChain {
     slot.seen = false;
     slot.breaking = -1;
     slot.refused = false;
+    slot.detail = paladinVfxDetailNow();
     return slot;
   }
 
@@ -220,6 +242,7 @@ export class OathChain {
         slot.target = target;
         slot.presence = 0;
         slot.age = 0;
+        slot.detail = paladinVfxDetailNow();
       }
     }
     if (slot) {
@@ -319,6 +342,10 @@ export class OathChain {
       const shown = length * head;
       const count = Math.min(MAX_LINKS, Math.ceil(shown / LINK_SPACING));
       const since = t.age - OATH_THROW;
+      const scale = paladinDetailScale(t.detail);
+      // Every second link sheds a mote as it shatters on the full effect;
+      // lighter tiers shed from fewer links (every fourth, every sixth).
+      const moteEvery = MOTE_STRIDE * Math.round(1 / scale.count);
       // Light reeling along the chain toward the Paladin while it pulls.
       const reel = 1 - ((t.age * 1.6) % 1);
       for (let i = 0; i < count; i++) {
@@ -335,7 +362,7 @@ export class OathChain {
           const dieAt = t.refused ? Math.abs(along - 0.5) * 0.5 : (1 - along) * 0.28;
           alpha = 1 - ramp(t.breaking, dieAt, dieAt + 0.1);
           const flung = t.breaking - dieAt;
-          if (i % 2 === 0 && flung > 0 && flung < 0.3 && !reduced) {
+          if (i % moteEvery === 0 && flung > 0 && flung < 0.3 && !reduced) {
             this.chainPoint(t, along, head, this.a);
             const ang = hash01(i, 3) * Math.PI * 2;
             pool.time = 0;
@@ -387,6 +414,8 @@ export class OathChain {
         this.chainPoint(t, head, head, this.a);
         pool.time = t.age;
         pool.billboard(this.a.x, this.a.y, this.a.z, 0.4, KIT_IVORY, 1.2, SHAPE.flare);
+      } else if (!scale.accents) {
+        // Lighter tiers: no flare as it bites, catches or parts.
       } else if (t.refused) {
         // The head bites but cannot hold: a small glint on the enemy, then a
         // flare where the chain parts.
@@ -431,7 +460,10 @@ export class OathChain {
     }
     for (const b of this.binds) {
       if (!b.active) continue;
-      b.presence = b.seen ? Math.min(1, b.presence + dt * 8) : Math.max(0, b.presence - dt * 3);
+      const scale = paladinDetailScale(b.detail);
+      b.presence = b.seen
+        ? Math.min(1, b.presence + dt * 8)
+        : Math.max(0, b.presence - (dt * 3) / scale.linger);
       b.seen = false;
       b.age += dt;
       if (
@@ -466,6 +498,7 @@ export class OathChain {
         continue;
       }
       // Dragged: furrows behind the feet, away from the Paladin pulling.
+      if (!scale.secondary) continue;
       const tether = this.tetherFor(b.target);
       if (!tether || !this.ctx.anchor(tether.source, 0, this.a)) continue;
       let dx = this.feet.x - this.a.x,
@@ -491,8 +524,9 @@ export class OathChain {
         SHAPE.skid,
       );
       if (reduced) continue;
-      for (let i = 0; i < DUST; i++) {
-        const cycle = (this.clock * 2.4 + i / DUST) % 1;
+      const dust = paladinDetailCount(DUST, b.detail);
+      for (let i = 0; i < dust; i++) {
+        const cycle = (this.clock * 2.4 + i / dust) % 1;
         const side = (hash01(i, 7) - 0.5) * 0.6;
         pool.billboard(
           this.feet.x + dx * cycle * 0.5 - dz * side,

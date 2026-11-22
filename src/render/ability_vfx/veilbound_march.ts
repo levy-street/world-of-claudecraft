@@ -1,6 +1,14 @@
 import * as THREE from 'three';
 import { KIT_FLARE_GLSL, KIT_IVORY, type PaladinKitContext } from './paladin_kit_context';
 import { hash01, PaladinQuadPool, ramp } from './paladin_quad_pool';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+  paladinLingerEnd,
+} from './paladin_vfx_detail_core';
 
 export const VEIL_MARCHERS = 4;
 export const VEIL_MARKS = 12;
@@ -24,6 +32,8 @@ const MOTES = 8;
  * snaps shut on them over the first SNAP of it. */
 const STRIKE = 0.6;
 const SNAP = 0.12;
+/** The burst's ring fades from this long after it breaks. */
+const BURST_FADE = 0.45;
 /** The veil's pale, silvered light. */
 const VEIL = new THREE.Color(0xe9e4ff).multiplyScalar(1.15);
 const VEIL_GOLD = new THREE.Color(0xf6dca0).multiplyScalar(1.2);
@@ -67,6 +77,8 @@ interface Marcher {
   foot: number;
   /** Ascension empowers this march: its burst hauls the marked in. */
   ascended: boolean;
+  /** The Paladin detail read when the march began. */
+  detail: PaladinVfxDetail;
 }
 interface Mark {
   active: boolean;
@@ -83,6 +95,10 @@ interface Mark {
   hx: number;
   hy: number;
   hz: number;
+  /** The Paladin detail read when the mark was first seen, and when the
+   * final wave struck it. */
+  detail: PaladinVfxDetail;
+  strikeDetail: PaladinVfxDetail;
 }
 interface Burst {
   active: boolean;
@@ -90,6 +106,10 @@ interface Burst {
   y: number;
   z: number;
   age: number;
+  /** The Paladin detail read when the veil burst. */
+  detail: PaladinVfxDetail;
+  /** When it ends (the ring's fade tail shortened on lighter tiers). */
+  end: number;
 }
 
 /**
@@ -104,6 +124,13 @@ interface Burst {
  * and snaps shut on every marked enemy it strikes in a ring of light. Both
  * start from the final wave itself (its burst cue and each hit, painter.ts),
  * so they land with its damage numbers, never on a timer of their own.
+ *
+ * Detail: core = the shroud and the veil draping over them, the veiled eye
+ * over each mark, the veil snapping shut on a mark as the final wave strikes
+ * (and Ascension's tether hauling it in), and the burst's ring out to the
+ * wave's reach; secondary = the streamers, the footprints of light and the
+ * ripples; accents = the flares. Light drops the flares and halves the motes;
+ * minimal keeps the core with a third of them, and both fade sooner.
  */
 export class VeilboundMarch {
   private readonly pool: PaladinQuadPool<'veilbound_march'>;
@@ -123,6 +150,7 @@ export class VeilboundMarch {
     walked: 0,
     foot: 0,
     ascended: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly marks: Mark[] = Array.from({ length: VEIL_MARKS }, () => ({
     active: false,
@@ -136,6 +164,8 @@ export class VeilboundMarch {
     hx: 0,
     hy: 0,
     hz: 0,
+    detail: 'full' as PaladinVfxDetail,
+    strikeDetail: 'full' as PaladinVfxDetail,
   }));
   private readonly bursts: Burst[] = Array.from({ length: VEIL_BURSTS }, () => ({
     active: false,
@@ -143,6 +173,8 @@ export class VeilboundMarch {
     y: 0,
     z: 0,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
+    end: VEIL_BURST_DURATION,
   }));
   private readonly at = new THREE.Vector3();
   private readonly feet = new THREE.Vector3();
@@ -264,6 +296,7 @@ ${KIT_FLARE_GLSL}`,
       slot.walked = 0;
       slot.foot = 0;
       slot.ascended = false;
+      slot.detail = paladinVfxDetailNow();
       if (this.ctx.anchor(id, 0, this.feet)) {
         slot.lastX = this.feet.x;
         slot.lastZ = this.feet.z;
@@ -285,6 +318,7 @@ ${KIT_FLARE_GLSL}`,
       slot.presence = 0;
       slot.age = 0;
       slot.strike = -1;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.source = source;
     slot.seen = true;
@@ -312,6 +346,12 @@ ${KIT_FLARE_GLSL}`,
     slot.y = y;
     slot.z = z;
     slot.age = 0;
+    slot.detail = paladinVfxDetailNow();
+    slot.end = paladinLingerEnd(
+      BURST_FADE,
+      VEIL_BURST_DURATION,
+      paladinDetailScale(slot.detail).linger,
+    );
     return true;
   }
 
@@ -329,9 +369,11 @@ ${KIT_FLARE_GLSL}`,
       mk.presence = 0;
       mk.seen = false;
       mk.age = 1;
+      mk.detail = paladinVfxDetailNow();
     }
     mk.source = source;
     mk.strike = 0;
+    mk.strikeDetail = paladinVfxDetailNow();
     const chest = this.ctx.anchor(source, 0.6, this.chest);
     mk.haul =
       chest !== null && this.marchers.some((m) => m.active && m.id === source && m.ascended);
@@ -356,7 +398,10 @@ ${KIT_FLARE_GLSL}`,
     pool.begin(this.ctx.camera);
     for (const m of this.marchers) {
       if (!m.active) continue;
-      m.presence = m.seen ? Math.min(1, m.presence + dt * 4) : Math.max(0, m.presence - dt * 3);
+      const scale = paladinDetailScale(m.detail);
+      m.presence = m.seen
+        ? Math.min(1, m.presence + dt * 4)
+        : Math.max(0, m.presence - (dt * 3) / scale.linger);
       m.seen = false;
       m.age += dt;
       if (
@@ -389,15 +434,16 @@ ${KIT_FLARE_GLSL}`,
           SHAPE.drape,
         );
         pool.time = m.age;
-        pool.billboard(
-          this.chest.x,
-          this.chest.y,
-          this.chest.z,
-          1.4,
-          KIT_IVORY,
-          Math.exp(-m.age * 8) * 1.2,
-          SHAPE.flare,
-        );
+        if (scale.accents)
+          pool.billboard(
+            this.chest.x,
+            this.chest.y,
+            this.chest.z,
+            1.4,
+            KIT_IVORY,
+            Math.exp(-m.age * 8) * 1.2,
+            SHAPE.flare,
+          );
       }
       // The ethereal shroud.
       pool.time = this.clock;
@@ -414,8 +460,8 @@ ${KIT_FLARE_GLSL}`,
       const step = Math.hypot(this.feet.x - m.lastX, this.feet.z - m.lastZ);
       m.lastX = this.feet.x;
       m.lastZ = this.feet.z;
-      if (step < 1.5) m.walked += step;
-      if (m.walked >= STRIDE) {
+      if (step < 1.5 && scale.secondary) m.walked += step;
+      if (m.walked >= STRIDE && scale.secondary) {
         m.walked = 0;
         m.foot = 1 - m.foot;
         const side = m.foot ? 0.13 : -0.13;
@@ -427,12 +473,13 @@ ${KIT_FLARE_GLSL}`,
         m.prints[p + 4] = 0;
         m.nextPrint = (m.nextPrint + 1) % FOOTPRINTS;
       }
+      const printLife = paladinDetailLinger(PRINT_LIFE, m.detail);
       for (let i = 0; i < FOOTPRINTS; i++) {
         const p = i * 5;
         if (m.prints[p + 4] < 0) continue;
         m.prints[p + 4] += dt;
         const age = m.prints[p + 4];
-        if (age >= PRINT_LIFE) {
+        if (age >= printLife) {
           m.prints[p + 4] = -1;
           continue;
         }
@@ -443,14 +490,15 @@ ${KIT_FLARE_GLSL}`,
           m.prints[p + 2],
           0.17,
           i % 2 ? VEIL : VEIL_GOLD,
-          (1 - age / PRINT_LIFE) * Math.min(1, age / 0.08) * 1.1,
+          (1 - age / printLife) * Math.min(1, age / 0.08) * 1.1,
           SHAPE.print,
           Math.PI / 2 - m.prints[p + 3],
         );
       }
       // Motes drifting off the shroud.
+      const motes = paladinDetailCount(MOTES, m.detail);
       if (!reduced)
-        for (let i = 0; i < MOTES; i++) {
+        for (let i = 0; i < motes; i++) {
           const cycle = (this.clock * 0.7 + hash01(i, 4)) % 1;
           const ang = hash01(i, 2) * Math.PI * 2;
           const rad = 0.25 + 0.25 * hash01(i, 3) + cycle * 0.3;
@@ -475,7 +523,7 @@ ${KIT_FLARE_GLSL}`,
         m.trail[2] = this.chest.z;
         m.filled = Math.min(TRAIL, m.filled + 1);
       }
-      for (let s = 0; s < STREAMERS; s++) {
+      for (let s = 0; scale.secondary && s < STREAMERS; s++) {
         const side = s ? 0.2 : -0.2;
         for (let i = 0; i < TRAIL; i++) {
           const point = i % 2 ? this.b : this.a,
@@ -504,7 +552,11 @@ ${KIT_FLARE_GLSL}`,
     }
     for (const mk of this.marks) {
       if (!mk.active) continue;
-      mk.presence = mk.seen ? Math.min(1, mk.presence + dt * 5) : Math.max(0, mk.presence - dt * 3);
+      const scale = paladinDetailScale(mk.detail);
+      const struck = paladinDetailScale(mk.strikeDetail);
+      mk.presence = mk.seen
+        ? Math.min(1, mk.presence + dt * 5)
+        : Math.max(0, mk.presence - (dt * 3) / scale.linger);
       mk.seen = false;
       mk.age += dt;
       if (mk.strike >= 0) mk.strike += dt;
@@ -519,16 +571,18 @@ ${KIT_FLARE_GLSL}`,
       // Marked: a flash and a ripple as the veil runs through them.
       if (mk.age < 0.45) {
         pool.time = mk.age;
-        pool.billboard(
-          this.chest.x,
-          this.chest.y,
-          this.chest.z,
-          1.0,
-          KIT_IVORY,
-          Math.exp(-mk.age * 9) * 1.2,
-          SHAPE.flare,
-        );
-        pool.billboard(this.chest.x, this.chest.y, this.chest.z, 0.9, VEIL, 1, SHAPE.ripple);
+        if (scale.accents)
+          pool.billboard(
+            this.chest.x,
+            this.chest.y,
+            this.chest.z,
+            1.0,
+            KIT_IVORY,
+            Math.exp(-mk.age * 9) * 1.2,
+            SHAPE.flare,
+          );
+        if (scale.secondary)
+          pool.billboard(this.chest.x, this.chest.y, this.chest.z, 0.9, VEIL, 1, SHAPE.ripple);
       }
       pool.time = reduced ? 0.5 : mk.age;
       pool.billboard(
@@ -564,41 +618,46 @@ ${KIT_FLARE_GLSL}`,
           pool.billboard(this.chest.x, this.chest.y, this.chest.z, 1.3, VEIL, 1.2, SHAPE.close);
         }
         pool.time = mk.strike;
-        pool.billboard(
-          this.chest.x,
-          this.chest.y,
-          this.chest.z,
-          1.3,
-          KIT_IVORY,
-          Math.exp(-mk.strike * 8) * 1.4,
-          SHAPE.flare,
-        );
-        pool.billboard(this.chest.x, this.chest.y, this.chest.z, 1.2, VEIL_GOLD, 1, SHAPE.ripple);
+        if (struck.accents)
+          pool.billboard(
+            this.chest.x,
+            this.chest.y,
+            this.chest.z,
+            1.3,
+            KIT_IVORY,
+            Math.exp(-mk.strike * 8) * 1.4,
+            SHAPE.flare,
+          );
+        if (struck.secondary)
+          pool.billboard(this.chest.x, this.chest.y, this.chest.z, 1.2, VEIL_GOLD, 1, SHAPE.ripple);
       }
     }
     for (const b of this.bursts) {
       if (!b.active) continue;
       b.age += dt;
-      if (b.age >= VEIL_BURST_DURATION) {
+      if (b.age >= b.end) {
         b.active = false;
         continue;
       }
       const t = b.age;
       const y = this.floorAt(b.x, b.y, b.z) + 0.01;
+      const scale = paladinDetailScale(b.detail);
       pool.time = t;
-      pool.billboard(b.x, b.y + 1, b.z, 1.8, KIT_IVORY, Math.exp(-t * 7) * 1.3, SHAPE.flare);
-      pool.billboard(b.x, b.y + 1, b.z, 1.6, VEIL, 1, SHAPE.ripple);
+      if (scale.accents)
+        pool.billboard(b.x, b.y + 1, b.z, 1.8, KIT_IVORY, Math.exp(-t * 7) * 1.3, SHAPE.flare);
+      if (scale.secondary) pool.billboard(b.x, b.y + 1, b.z, 1.6, VEIL, 1, SHAPE.ripple);
       pool.ground(
         b.x,
         y,
         b.z,
         VEIL_BURST_REACH,
         VEIL,
-        0.55 * (1 - ramp(t, 0.45, VEIL_BURST_DURATION)),
+        0.55 * (1 - ramp(t, BURST_FADE, b.end)),
         SHAPE.wave,
       );
-      for (let i = 0; i < MOTES; i++) {
-        const life = 0.6 + 0.3 * hash01(i, 4);
+      const motes = paladinDetailCount(MOTES, b.detail);
+      for (let i = 0; i < motes; i++) {
+        const life = paladinDetailLinger(0.6 + 0.3 * hash01(i, 4), b.detail);
         if (t >= life) continue;
         const ang = hash01(i, 1) * Math.PI * 2;
         const rad = (0.6 + 1.6 * hash01(i, 2)) * (reduced ? 0.5 : 1) * ramp(t, 0, 0.3);

@@ -11,6 +11,21 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = Ward of Faith's lattice dome, and Hallowed Wall's ring of six
+// shield plates (every standing plate on every tier: the count reads the absorb
+// left); secondary = the ward's ground ring (rune flash, shock, rim); accents =
+// the sigil's flash, the plates' lock flash, the break flash and each lost
+// plate's flash. The ward's glints and a lost plate's shards are its motes and
+// thin with the mote count; the fold/shatter and the shards' flight scale
+// with the linger.
 
 export const WARD_CAPACITY = 6;
 /** The ward's shield plates; each carries a sixth of the absorb. */
@@ -75,6 +90,12 @@ interface Ward {
   spec: number;
   /** Hallowed Wall empowered by Ascension: gold-rimmed, brighter-edged plates. */
   gilded: boolean;
+  /** How much of the ward draws, read as it is raised (or first seen). */
+  detail: PaladinVfxDetail;
+  /** The fold or shatter for that detail, seconds. */
+  endFor: number;
+  /** A lost plate's shards fly this long at that detail, seconds. */
+  shardLife: number;
 }
 
 function clamp01(x: number): number {
@@ -131,6 +152,9 @@ export class WardOfFaith {
     floor: 0,
     spec: 1,
     gilded: false,
+    detail: 'full' as PaladinVfxDetail,
+    endFor: WARD_END,
+    shardLife: SHARD_LIFE,
   }));
   /** Each Paladin's spec icon, kept from their casts for a ward first seen mid-way. */
   private readonly specs = new Map<number, number>();
@@ -344,6 +368,9 @@ export class WardOfFaith {
     w.floor = Number.NaN;
     w.spec = this.specs.get(id) ?? 1;
     w.gilded = false;
+    w.detail = paladinVfxDetailNow();
+    w.endFor = paladinDetailLinger(WARD_END, w.detail);
+    w.shardLife = paladinDetailLinger(SHARD_LIFE, w.detail);
     return w;
   }
 
@@ -458,7 +485,7 @@ export class WardOfFaith {
       }
     }
     w.seen = false;
-    const endK = w.ending ? clamp01((w.age - w.endAge) / WARD_END) : 0;
+    const endK = w.ending ? clamp01((w.age - w.endAge) / w.endFor) : 0;
     if ((w.ending && endK >= 1) || !this.anchor(w.id, 0, this.feet)) {
       w.active = false;
       return;
@@ -480,23 +507,38 @@ export class WardOfFaith {
       halfH = 0.5 * s * (1.3 / 1.1);
     const sigilY = topY + 0.15 * h;
     const settled = ramp(w.age, 0.25, 0.6);
+    const { accents, secondary } = paladinDetailScale(w.detail);
 
     // The sigil's flash as the plates leave it, and the ward closing.
     this.time = w.age;
-    if (w.age < 0.8 && w.ending === 0)
+    if (w.age < 0.8 && w.ending === 0 && accents)
       this.billboard(cx, sigilY, cz, 0.9 * s, IVORY, Math.exp(-w.age * 5) * 1.2, SHAPE.flare);
     const plates = this.parts === 'plates';
     const locked = w.age - WARD_INTRO;
-    if (plates && locked > 0 && locked < 0.6)
+    if (plates && locked > 0 && locked < 0.6 && accents)
       this.billboard(cx, cy, cz, 1.6 * s, GOLD, Math.exp(-locked * 6) * 0.6, SHAPE.flare);
-    if (w.ending === 2 && endK < 0.5)
+    if (w.ending === 2 && endK < 0.5 && accents)
       this.billboard(cx, cy, cz, 1.6 * s, IVORY, (1 - endK * 2) * 0.6, SHAPE.flare);
 
     if (!plates) {
       // The ground under the ward.
       const groundR = R * 1.35;
       this.param = f;
-      this.quad(cx, w.floor + 0.04, cz, groundR, 0, 0, 0, 0, groundR, GOLD, 1 - endK, SHAPE.ground);
+      if (secondary)
+        this.quad(
+          cx,
+          w.floor + 0.04,
+          cz,
+          groundR,
+          0,
+          0,
+          0,
+          0,
+          groundR,
+          GOLD,
+          1 - endK,
+          SHAPE.ground,
+        );
 
       // The dome: swells and flashes as the ward breaks, fades as it runs out.
       const domeR = 1.25 * s * (1 + (w.ending === 2 ? 0.25 * endK : 0));
@@ -576,8 +618,9 @@ export class WardOfFaith {
   ): void {
     if (reduced) return;
     this.time = w.age;
-    for (let j = 0; j < GLINTS; j++) {
-      const phase = (w.age * (0.35 + fold * 0.8) + j / GLINTS) % 1;
+    const glints = paladinDetailCount(GLINTS, w.detail);
+    for (let j = 0; j < glints; j++) {
+      const phase = (w.age * (0.35 + fold * 0.8) + j / glints) % 1;
       const ang = j * 2.4 + w.age * 0.3;
       const rr = R * (0.85 + 0.3 * hash(j, 1));
       const alpha = Math.sin(phase * Math.PI) * 0.6 * settled * (w.ending === 2 ? 1 - endK : 1);
@@ -603,7 +646,7 @@ export class WardOfFaith {
     R: number,
     s: number,
   ): void {
-    const k = (w.age - w.lostAt[i]) / SHARD_LIFE;
+    const k = (w.age - w.lostAt[i]) / w.shardLife;
     if (k >= 1) return;
     const ang = w.lostAt[i] * SPIN + (i * TAU) / WARD_PANELS;
     const nx = Math.cos(ang),
@@ -612,8 +655,10 @@ export class WardOfFaith {
       pz = cz + nz * R;
     this.time = k;
     this.param = 0;
-    if (k < 0.35) this.billboard(px, cy, pz, 0.6 * s, IVORY, (1 - k / 0.35) * 1.2, SHAPE.flare);
-    for (let j = 0; j < SHARDS; j++) {
+    if (k < 0.35 && paladinDetailScale(w.detail).accents)
+      this.billboard(px, cy, pz, 0.6 * s, IVORY, (1 - k / 0.35) * 1.2, SHAPE.flare);
+    const shards = paladinDetailCount(SHARDS, w.detail);
+    for (let j = 0; j < shards; j++) {
       const spread = (hash(i * 7 + j, 3) - 0.5) * 1.6;
       const dx = nx * Math.cos(spread) - nz * Math.sin(spread),
         dz = nz * Math.cos(spread) + nx * Math.sin(spread);

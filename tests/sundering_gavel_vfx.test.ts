@@ -1,6 +1,8 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import {
   GAVEL_CONTACT,
   GAVEL_CONTACT_MIN,
@@ -12,6 +14,7 @@ import {
   gavelSwing,
   SunderingGavel,
 } from '../src/render/ability_vfx/sundering_gavel';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -70,6 +73,10 @@ function fixture(height = 1.8, distance = 6) {
 function step(effect: SunderingGavel, seconds: number): void {
   for (let t = 0; t < seconds - 1e-6; t += 0.05) effect.update(0.05);
 }
+
+// Node runs at the Medium preset: pin the authored composition.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('Sundering Gavel', () => {
   it('rears the gavels back, then swings them down to land at contact', () => {
@@ -247,6 +254,10 @@ describe('Sundering Gavel', () => {
     const fx = { sunderingGavel: vi.fn() };
     const releaseGesture = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx },
       releaseGesture,
     }) as AbilityVfx;
@@ -255,5 +266,109 @@ describe('Sundering Gavel', () => {
     expect(p.handleSpellfx({ ...ev, fx: 'ccImpact' })).toBe(true);
     expect(releaseGesture).toHaveBeenCalledExactlyOnceWith(1, 'hammer_of_justice');
     expect(fx.sunderingGavel).toHaveBeenCalledExactlyOnceWith(1, 2);
+  });
+});
+
+describe('Sundering Gavel detail', () => {
+  const count = (quads: number[], shape: number) => quads.filter((q) => q === shape).length;
+
+  /** One strike cast at `detail`: what draws as the gavels appear, as they
+   * land, while they dissolve, and how long it lasts. */
+  const strike = async (detail: PaladinVfxDetail) => {
+    const f = fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.strike(1, 2);
+    // A running strike keeps the detail it was cast at.
+    setPaladinVfxDetailForTest('full');
+    f.effect.update(0.05);
+    const appearing = f.quads();
+    // The swing's clock reaches contact at gavelContactTime(6).
+    const contact = gavelContactTime(6);
+    step(f.effect, contact - 0.05);
+    f.effect.update(0.0001);
+    const landed = f.quads();
+    const landedGavels = f.gavels().length;
+    // 0.1 s into the dissolve.
+    step(f.effect, 0.4);
+    const dissolving = f.quads();
+    const dissolvingGavels = f.gavels().length;
+    let life = contact + 0.4;
+    while (f.effect.mesh.visible && life < 3) {
+      f.effect.update(0.01);
+      life += 0.01;
+    }
+    const impactDetail = f.impact.mock.calls[0]?.[3];
+    f.effect.dispose();
+    return { appearing, landed, landedGavels, dissolving, dissolvingGavels, life, impactDetail };
+  };
+
+  /** The shackles held at `detail`, and how long their break plays. */
+  const shackles = async (detail: PaladinVfxDetail) => {
+    const f = fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    for (let t = 0; t < 0.5; t += 0.05) {
+      f.effect.hold(2);
+      f.effect.update(0.05);
+    }
+    const held = f.quads();
+    let release = 0;
+    while (f.effect.mesh.visible && release < 1) {
+      f.effect.update(0.01);
+      release += 0.01;
+    }
+    f.effect.dispose();
+    return { held, release };
+  };
+
+  it('draws the same cross-hammer lighter: the gavels, block and landing flash stay, extras go', async () => {
+    const full = await strike('full');
+    const light = await strike('light');
+    const minimal = await strike('minimal');
+    // Core on every tier: the four gavels, the sounding block, the flash on the joined head.
+    for (const d of [full, light, minimal]) {
+      expect(d.landedGavels).toBe(GAVEL_COUNT);
+      expect(d.dissolvingGavels).toBe(GAVEL_COUNT);
+      expect(count(d.appearing, 1)).toBe(1);
+      expect(count(d.landed, 1)).toBe(1);
+      expect(count(d.landed, 0)).toBeGreaterThanOrEqual(1);
+      expect(count(d.dissolving, 4)).toBeGreaterThan(0);
+    }
+    // Accents: each gavel's appearing flash, only at full.
+    expect(count(full.appearing, 0)).toBe(GAVEL_COUNT);
+    expect(count(light.appearing, 0)).toBe(0);
+    expect(count(minimal.appearing, 0)).toBe(0);
+    // The landing: the joined head's flash (core), the blow's flare on the
+    // head (secondary, kept at light) and its spun gold flare (accent).
+    expect(count(full.landed, 0)).toBe(3);
+    expect(count(light.landed, 0)).toBe(2);
+    expect(count(minimal.landed, 0)).toBe(1);
+    // The dissolve's motes thin with the mote count.
+    expect(count(light.dissolving, 4)).toBeLessThan(count(full.dissolving, 4));
+    expect(count(minimal.dissolving, 4)).toBeLessThan(count(light.dissolving, 4));
+    expect(light.landed.length).toBeLessThan(full.landed.length);
+    expect(minimal.landed.length).toBeLessThan(light.landed.length);
+    // The fade tail shortens; the strike still lands and tells the floor its detail.
+    expect(light.life).toBeLessThan(full.life);
+    expect(minimal.life).toBeLessThan(light.life);
+    expect([full.impactDetail, light.impactDetail, minimal.impactDetail]).toEqual([
+      'full',
+      'light',
+      'minimal',
+    ]);
+  });
+
+  it('keeps both shackles on every tier, the glints only at full, and breaks them sooner when lighter', async () => {
+    const full = await shackles('full');
+    const light = await shackles('light');
+    const minimal = await shackles('minimal');
+    for (const d of [full, light, minimal]) expect(count(d.held, 2)).toBe(2);
+    expect(count(full.held, 3)).toBeGreaterThan(0);
+    expect(count(light.held, 3)).toBe(0);
+    expect(count(minimal.held, 3)).toBe(0);
+    expect(full.release).toBeCloseTo(GAVEL_RELEASE, 1);
+    expect(light.release).toBeLessThan(full.release);
+    expect(minimal.release).toBeLessThan(light.release);
   });
 });

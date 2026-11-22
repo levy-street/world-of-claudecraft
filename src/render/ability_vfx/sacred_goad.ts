@@ -8,6 +8,12 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 
 export const GOADS = 8;
 /** The lance crosses to the enemy in this long. */
@@ -54,6 +60,8 @@ interface Goad {
   sz: number;
   /** The enemy cannot be taunted: the goad cracks and fizzles on it. */
   immune: boolean;
+  /** The Paladin detail read when the goad was called. */
+  detail: PaladinVfxDetail;
 }
 interface Guard {
   active: boolean;
@@ -63,6 +71,8 @@ interface Guard {
   /** Share of the guard left. */
   left: number;
   age: number;
+  /** The Paladin detail read when the guard was first seen. */
+  detail: PaladinVfxDetail;
 }
 
 // A heater shield, p in [-1, 1] with y up. Signed distance, negative inside.
@@ -92,6 +102,13 @@ const SHIELD_GLSL = `
  * the goad still flies and strikes, but the sign cracks apart over their head
  * and sputters out, with no circle and no thread. While Ascension's guard (a
  * 15% damage reduction) holds, a small gold shimmer plays about the Paladin.
+ *
+ * Detail: core = the lance, the shield-shaped burst, the brand over the head
+ * for the whole taunt (the cracked sign on an immune enemy) and the guard's
+ * shimmer; secondary = the call before the Paladin, the motes off the lance's
+ * tail, the challenge circle and the thread home; accents = the flares. Light
+ * drops the flares and halves the sparks, embers and glints; minimal keeps
+ * the core with a third of them.
  */
 export class SacredGoad {
   private readonly pool: PaladinQuadPool<'sacred_goad'>;
@@ -104,6 +121,7 @@ export class SacredGoad {
     sy: 0,
     sz: 0,
     immune: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly guards: Guard[] = Array.from({ length: GOAD_GUARDS }, () => ({
     active: false,
@@ -112,6 +130,7 @@ export class SacredGoad {
     presence: 0,
     left: 1,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly from = new THREE.Vector3();
   private readonly chest = new THREE.Vector3();
@@ -244,6 +263,7 @@ export class SacredGoad {
     slot.sy = this.from.y;
     slot.sz = this.from.z;
     slot.immune = immune;
+    slot.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -259,6 +279,7 @@ export class SacredGoad {
       slot.id = id;
       slot.presence = 0;
       slot.age = 0;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.seen = true;
     slot.left = Number.isFinite(left) ? Math.min(1, Math.max(0, left)) : 1;
@@ -298,6 +319,7 @@ export class SacredGoad {
         continue;
       }
       const t = g.age;
+      const scale = paladinDetailScale(g.detail);
       const haveSource = this.ctx.anchor(g.source, 0.62, this.chest);
       if (!haveSource) this.chest.set(g.sx, g.sy, g.sz);
       let fx = this.at.x - this.chest.x,
@@ -306,7 +328,7 @@ export class SacredGoad {
       fx /= flat;
       fz /= flat;
       // The call: the sign flaring before the Paladin, rings rolling out.
-      if (t < 0.5) {
+      if (t < 0.5 && scale.secondary) {
         pool.time = t;
         pool.billboard(
           this.chest.x + fx * 0.6,
@@ -359,9 +381,10 @@ export class SacredGoad {
           1.3,
           SHAPE.lance,
         );
+        const trail = scale.secondary ? paladinDetailCount(TRAIL, g.detail) : 0;
         if (!reduced)
-          for (let i = 0; i < TRAIL; i++) {
-            const k = (i + 1) / (TRAIL + 1);
+          for (let i = 0; i < trail; i++) {
+            const k = (i + 1) / (trail + 1);
             const along = back * (0.3 + 1.2 * k);
             const ang = hash01(i, 2) * Math.PI * 2 + t * 30;
             const spread = 0.12 * k;
@@ -380,27 +403,29 @@ export class SacredGoad {
       }
       const since = t - GOAD_FLIGHT;
       if (g.immune) {
-        this.fizzle(since, reduced);
+        this.fizzle(since, reduced, g.detail);
         continue;
       }
       const fade = 1 - ramp(since, TAUNT_FORCE_SECONDS - 0.4, TAUNT_FORCE_SECONDS);
       // The strike.
       pool.time = since;
-      pool.billboard(
-        this.at.x,
-        this.at.y,
-        this.at.z,
-        1.1,
-        KIT_IVORY,
-        Math.exp(-since * 9) * 1.3,
-        SHAPE.flare,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.at.x,
+          this.at.y,
+          this.at.z,
+          1.1,
+          KIT_IVORY,
+          Math.exp(-since * 9) * 1.3,
+          SHAPE.flare,
+        );
       this.facing(this.at.x, this.at.y, this.at.z, fx, fz, 1.0, BLAZE, 1.1, SHAPE.burst);
       const motion = reduced ? 0.3 : 1;
-      for (let i = 0; i < SPARKS; i++) {
+      const sparks = paladinDetailCount(SPARKS, g.detail);
+      for (let i = 0; i < sparks; i++) {
         const life = 0.25 + 0.2 * hash01(i, 3);
         if (since >= life) continue;
-        const ang = (i / SPARKS) * Math.PI * 2 + hash01(i, 9);
+        const ang = (i / sparks) * Math.PI * 2 + hash01(i, 9);
         const speed = (2.5 + 2.5 * hash01(i, 4)) * motion;
         const vx = (c[0] * Math.cos(ang) + c[3] * Math.sin(ang)) * speed,
           vy = (c[1] * Math.cos(ang) + c[4] * Math.sin(ang)) * speed,
@@ -435,6 +460,7 @@ export class SacredGoad {
           (0.85 + 0.35 * (1 - ramp(since, 0.5, 1.0)) + (reduced ? 0 : 0.12 * Math.sin(since * 9))),
         SHAPE.brand,
       );
+      if (!scale.secondary) continue;
       // The challenge circle at their feet.
       const floor = this.ctx.groundY(this.feet.x, this.feet.z);
       const y = (Number.isFinite(floor) ? Math.max(floor, this.feet.y - 0.3) : this.feet.y) + 0.05;
@@ -471,20 +497,21 @@ export class SacredGoad {
 
   /** A goad shrugged off (this.at, this.head: the enemy): a weak flare, the
    * sign cracking apart over their head and dying embers dropping away. */
-  private fizzle(since: number, reduced: boolean): void {
+  private fizzle(since: number, reduced: boolean, detail: PaladinVfxDetail): void {
     const pool = this.pool;
     const c = pool.cam;
     const k = Math.min(1, since / GOAD_FIZZLE);
     pool.time = since;
-    pool.billboard(
-      this.at.x,
-      this.at.y,
-      this.at.z,
-      0.7,
-      KIT_IVORY,
-      Math.exp(-since * 12) * 0.8,
-      SHAPE.flare,
-    );
+    if (paladinDetailScale(detail).accents)
+      pool.billboard(
+        this.at.x,
+        this.at.y,
+        this.at.z,
+        0.7,
+        KIT_IVORY,
+        Math.exp(-since * 12) * 0.8,
+        SHAPE.flare,
+      );
     pool.time = k;
     pool.billboard(
       this.head.x,
@@ -497,10 +524,11 @@ export class SacredGoad {
     );
     if (reduced) return;
     // Embers sputtering off the cracked sign and dropping away.
-    for (let i = 0; i < SPARKS; i++) {
+    const embers = paladinDetailCount(SPARKS, detail);
+    for (let i = 0; i < embers; i++) {
       const life = 0.4 + 0.4 * hash01(i, 5);
       if (since >= life) continue;
-      const ang = (i / SPARKS) * Math.PI * 2 + hash01(i, 7);
+      const ang = (i / embers) * Math.PI * 2 + hash01(i, 7);
       const speed = 0.6 + 0.8 * hash01(i, 6);
       const vx = (c[0] * Math.cos(ang) + c[3] * Math.sin(ang)) * speed,
         vz = (c[2] * Math.cos(ang) + c[5] * Math.sin(ang)) * speed;
@@ -522,7 +550,9 @@ export class SacredGoad {
     const pool = this.pool;
     for (const g of this.guards) {
       if (!g.active) continue;
-      g.presence = g.seen ? Math.min(1, g.presence + dt * 5) : Math.max(0, g.presence - dt * 3);
+      g.presence = g.seen
+        ? Math.min(1, g.presence + dt * 5)
+        : Math.max(0, g.presence - (dt * 3) / paladinDetailScale(g.detail).linger);
       g.seen = false;
       g.age += dt;
       if (
@@ -547,8 +577,9 @@ export class SacredGoad {
         SHAPE.shimmer,
       );
       if (reduced) continue;
-      for (let i = 0; i < GUARD_GLINTS; i++) {
-        const cycle = (g.age * 0.6 + i / GUARD_GLINTS) % 1;
+      const glints = paladinDetailCount(GUARD_GLINTS, g.detail);
+      for (let i = 0; i < glints; i++) {
+        const cycle = (g.age * 0.6 + i / glints) % 1;
         const ang = hash01(i, 11) * Math.PI * 2 + g.age * 1.2;
         const rad = 0.42 + 0.08 * hash01(i, 12);
         pool.time = 0;

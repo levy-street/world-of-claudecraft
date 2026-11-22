@@ -17,6 +17,19 @@ import { PALADIN_BODY_FIT } from '../paladin_body_fit';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { CrestPrewarm } from './crest_prewarm';
 import type { GuardianCovenant } from './guardian_covenant';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the kite shield (glass membrane, gold rim, sun heart panel),
+// its five spike cones and the attacker's impact flare; secondary = the wisps
+// swirling round the wearer, the hot inner rim line, the spikes' sheath and
+// lance strips; accents = the sun boss ring and its eight rays, the hot cores
+// of the attacker's burst rays (the rays themselves thin with the mote count).
 
 const CAPACITY = DEBT_CAPACITY * DEBT_VERTEX_BUDGET * 2;
 // Keep the retaliatory layer just ahead of Guardian's bowed face.
@@ -46,11 +59,19 @@ const SHAPE = {
   flare: 7,
 } as const;
 const ATTRIBUTES = ['position', 'aUv', 'aColor', 'aAlpha', 'aShape', 'aInfo'] as const;
+/** The attacker's burst rays at full detail. */
+const BURST_RAYS = 9;
+/** Seconds the released spikes and burst play (debtSpikeRelease reaches zero):
+ *  the core beat, which a lighter tier's shorter linger never cuts. */
+const SPIKE_BEAT = 0.32;
 interface Guard {
   id: number;
   age: number;
   seen: boolean;
   fade: number;
+  /** The fade tail this guard's detail allows, seconds. */
+  fadeTail: number;
+  detail: PaladinVfxDetail;
   strength: number;
   facing: number;
   x: number;
@@ -68,6 +89,9 @@ interface Answer {
   ty: number;
   tz: number;
   absorbed: boolean;
+  detail: PaladinVfxDetail;
+  /** This answer's lifetime: the shield's linger after the spikes, scaled. */
+  life: number;
 }
 
 /** Fixed pools, one prepared material, no texture loads or frame allocations. */
@@ -100,6 +124,8 @@ export class DebtOfLight {
     age: 0,
     seen: false,
     fade: 0,
+    fadeTail: DEBT_FADE_DURATION,
+    detail: 'full' as PaladinVfxDetail,
     strength: 1,
     facing: 0,
     x: 0,
@@ -117,6 +143,8 @@ export class DebtOfLight {
     ty: 0,
     tz: 0,
     absorbed: false,
+    detail: 'full' as PaladinVfxDetail,
+    life: DEBT_RETURN_DURATION,
   }));
   private readonly positions = new Float32Array(CAPACITY * 3);
   private readonly uvs = new Float32Array(CAPACITY * 2);
@@ -135,6 +163,8 @@ export class DebtOfLight {
   private shape: number = SHAPE.line;
   private info = 0;
   private time = 0;
+  /** The layers the slot being written draws (its spawn-time detail). */
+  private scale = paladinDetailScale('full');
   private readonly edgeA = { x: 0, y: 0, z: 0 };
   private readonly edgeB = { x: 0, y: 0, z: 0 };
   private disposed = false;
@@ -259,9 +289,12 @@ export class DebtOfLight {
     if (slot.id !== id) {
       slot.id = id;
       slot.age = 0;
+      // The held guard keeps the detail it was raised at.
+      slot.detail = paladinVfxDetailNow();
+      slot.fadeTail = paladinDetailLinger(DEBT_FADE_DURATION, slot.detail);
     }
     slot.seen = true;
-    slot.fade = DEBT_FADE_DURATION;
+    slot.fade = slot.fadeTail;
     slot.strength = Math.max(1, Math.min(1.5, Number.isFinite(strength) ? strength : 1));
     slot.facing = Number.isFinite(facing) ? facing : 0;
     return true;
@@ -282,6 +315,8 @@ export class DebtOfLight {
     slot.active = true;
     slot.age = 0;
     slot.absorbed = absorbed;
+    slot.detail = paladinVfxDetailNow();
+    slot.life = Math.max(SPIKE_BEAT, paladinDetailLinger(DEBT_RETURN_DURATION, slot.detail));
     slot.sx = this.source.x;
     slot.sy = this.source.y;
     slot.sz = this.source.z;
@@ -472,27 +507,29 @@ export class DebtOfLight {
         i / segments,
         (i + 1) / segments,
       );
-      this.strip(
-        ax,
-        ay,
-        az,
-        bx,
-        by,
-        bz,
-        0.008 * height,
-        HOT,
-        alpha * 1.2,
-        1,
-        i / segments,
-        (i + 1) / segments,
-      );
+      if (this.scale.secondary)
+        this.strip(
+          ax,
+          ay,
+          az,
+          bx,
+          by,
+          bz,
+          0.008 * height,
+          HOT,
+          alpha * 1.2,
+          1,
+          i / segments,
+          (i + 1) / segments,
+        );
     }
     // The inner sun boss remains legible alone; the outer ward owns the combined sun flare.
     this.shape = SHAPE.line;
     this.info = 0;
     const bossY = y + AEGIS_SUN_Y * height;
     const bossZ = (AEGIS_BOW + 0.008) * height;
-    for (let i = 0; i < 16; i++) {
+    const boss = this.scale.accents ? 16 : 0;
+    for (let i = 0; i < boss; i++) {
       const a = (i * Math.PI) / 8,
         b = ((i + 1) * Math.PI) / 8;
       const radius = height * 0.065;
@@ -508,7 +545,8 @@ export class DebtOfLight {
         alpha * (1 - coverage * 0.75),
       );
     }
-    for (let ray = 0; ray < 8; ray++) {
+    const bossRays = this.scale.accents ? 8 : 0;
+    for (let ray = 0; ray < bossRays; ray++) {
       const a = (ray * Math.PI) / 4 + 0.035 * Math.sin(age);
       this.strip(
         x + nx * bossZ,
@@ -578,6 +616,7 @@ export class DebtOfLight {
       // A soft sheath and a hot core; released spikes become lances of light.
       this.shape = SHAPE.line;
       this.info = 0;
+      if (!this.scale.secondary) continue;
       const lance = growth > 0 ? 1.8 : 1;
       this.strip(bx, by, bz, ex, ey, ez, radius * 0.6 * lance, GOLD, spikeAlpha * 0.6, 0);
       this.strip(bx, by, bz, ex, ey, ez, radius * 0.18 * lance, HOT, spikeAlpha, 0);
@@ -647,8 +686,9 @@ export class DebtOfLight {
       const feet = this.source.y;
       s.y = this.source.y + PALADIN_BODY_FIT.shieldCenter * height;
       s.z = this.source.z;
-      const alpha = Math.min(1, s.age / 0.12) * (s.fade / DEBT_FADE_DURATION);
+      const alpha = Math.min(1, s.age / 0.12) * (s.fade / s.fadeTail);
       const cover = this.guardian?.coverage(s.id, dt) ?? 0;
+      this.scale = paladinDetailScale(s.detail);
       const nx = Math.sin(s.facing),
         nz = Math.cos(s.facing);
       this.shield(
@@ -669,13 +709,14 @@ export class DebtOfLight {
         cover,
       );
       // Guardian draws the shared wisps while it covers this wearer.
-      this.wisps(s.x, feet, s.z, height, s.age, alpha * (1 - cover), reduced);
+      if (this.scale.secondary)
+        this.wisps(s.x, feet, s.z, height, s.age, alpha * (1 - cover), reduced);
       s.seen = false;
     }
     for (const s of this.answers) {
       if (!s.active) continue;
       s.age += dt;
-      if (s.age >= DEBT_RETURN_DURATION) {
+      if (s.age >= s.life) {
         s.active = false;
         continue;
       }
@@ -688,8 +729,11 @@ export class DebtOfLight {
       s.sy = this.source.y + PALADIN_BODY_FIT.shieldCenter * height;
       s.sz = this.source.z;
       const dim = s.absorbed ? 0.5 : 1;
-      // The denied hit flashes the shield before it settles and fades.
-      const alpha = debtEnvelope(s.age) * dim * (1 + 1.2 * Math.exp(-s.age * 18));
+      this.scale = paladinDetailScale(s.detail);
+      // The denied hit flashes the shield before it settles and fades (over
+      // this answer's own, possibly shorter, linger).
+      const settle = debtEnvelope(s.age * (DEBT_RETURN_DURATION / s.life));
+      const alpha = settle * dim * (1 + 1.2 * Math.exp(-s.age * 18));
       const dx = s.tx - s.sx,
         dz = s.tz - s.sz,
         d = Math.hypot(dx, dz);
@@ -726,14 +770,16 @@ export class DebtOfLight {
         this.info = 0;
         this.billboard(x, y, z, reduced ? 0.8 : 1.05, HOT, burst * 1.4);
         this.shape = SHAPE.line;
-        for (let ray = 0; ray < 9; ray++) {
+        const rays = paladinDetailCount(BURST_RAYS, s.detail);
+        for (let ray = 0; ray < rays; ray++) {
           const a = ray * 2.399963;
           const length = 1.05 * (reduced ? 0.65 : 1 + s.age * 0.8);
           const rx = Math.cos(a) * length,
             rz = Math.sin(a) * length,
             ry = Math.sin(ray * 4.1) * length;
           this.strip(x, y, z, x + rx, y + ry, z + rz, 0.13, GOLD, burst * 0.8, 0);
-          this.strip(x, y, z, x + rx * 0.78, y + ry * 0.78, z + rz * 0.78, 0.045, HOT, burst, 0);
+          if (this.scale.accents)
+            this.strip(x, y, z, x + rx * 0.78, y + ry * 0.78, z + rz * 0.78, 0.045, HOT, burst, 0);
         }
       }
     }

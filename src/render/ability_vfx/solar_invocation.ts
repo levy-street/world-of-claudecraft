@@ -8,6 +8,21 @@ import {
   type PaladinKitContext,
 } from './paladin_kit_context';
 import { hash01, PaladinQuadPool, ramp } from './paladin_quad_pool';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the ray from the hand, the sun, the shaft of sunlight, the
+// pluses it bursts into on an ally, Ascension's reach ring and the glint on
+// each one it reaches; secondary = the haze about the shaft, the rings sliding
+// down it, the shockwave, the sunburst and the splash thrown up where it lands,
+// the sun's burst ring and the glow where the pluses land; accents = the
+// gathering focus ring, the molten cracks and the flares (embers and pluses
+// scale with count, the shaft's fade tail with linger).
 
 export const INVOCATIONS = 10;
 /** The sun kindles over the target, then its light comes down. */
@@ -65,6 +80,8 @@ interface Invocation {
   /** Ascension's splash around the target, in yards (0: none): healing
    * allies around an ally, or striking enemies around an enemy. */
   splash: number;
+  /** How much of it draws, read when it was invoked. */
+  detail: PaladinVfxDetail;
 }
 
 interface Glint {
@@ -76,6 +93,7 @@ interface Glint {
   at: number;
   /** An ally healed (pluses) or an enemy struck (a searing glint). */
   healing: boolean;
+  detail: PaladinVfxDetail;
 }
 
 // Smooth value noise, for the light streaming down the column.
@@ -115,6 +133,7 @@ export class SolarInvocation {
     healing: true,
     age: 0,
     splash: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly glints: Glint[] = Array.from({ length: SPLASH_GLINTS }, () => ({
     active: false,
@@ -123,6 +142,7 @@ export class SolarInvocation {
     age: 0,
     at: 0,
     healing: true,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly from = new THREE.Vector3();
   private readonly feet = new THREE.Vector3();
@@ -284,6 +304,7 @@ export class SolarInvocation {
     slot.healing = healing;
     slot.age = 0;
     slot.splash = 0;
+    slot.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -326,6 +347,7 @@ export class SolarInvocation {
     glint.target = target;
     glint.age = slot.age;
     glint.healing = slot.healing;
+    glint.detail = slot.detail;
     const reached = Math.min(1, distance / slot.splash);
     // The heal's light runs out from the sun's burst; the strike's from where
     // the shaft lands.
@@ -342,8 +364,14 @@ export class SolarInvocation {
     for (const s of this.slots) {
       if (!s.active) continue;
       s.age += dt;
+      const scale = paladinDetailScale(s.detail);
+      // The column's fade tail shortens on the lighter tiers.
+      const end =
+        s.detail === 'full'
+          ? INVOKE_DURATION
+          : INVOKE_HOLD + 0.2 + paladinDetailLinger(INVOKE_DURATION - INVOKE_HOLD - 0.2, s.detail);
       if (
-        s.age >= INVOKE_DURATION ||
+        s.age >= end ||
         !this.ctx.anchor(s.target, 0, this.feet) ||
         !this.ctx.anchor(s.target, 1, this.head) ||
         !this.ctx.anchor(s.target, 0.55, this.chest)
@@ -375,7 +403,7 @@ export class SolarInvocation {
         }
       }
       if (s.healing) {
-        this.burstIntoPluses(t, reduced, ground);
+        this.burstIntoPluses(t, reduced, ground, s.detail);
         if (s.splash > 0 && t >= INVOKE_BURST) {
           const since = t - INVOKE_BURST;
           pool.time = reduced ? SPLASH_GROW : since;
@@ -385,7 +413,7 @@ export class SolarInvocation {
             this.feet.z,
             s.splash / 0.96,
             KIT_WARM,
-            1 - ramp(since, 0.5, INVOKE_DURATION - INVOKE_BURST),
+            1 - ramp(since, 0.5, end - INVOKE_BURST),
             SHAPE.reach,
           );
         }
@@ -394,7 +422,7 @@ export class SolarInvocation {
       // The sun kindles high above the target.
       const sunY = this.head.y + SUN_LIFT;
       const kindle = reduced ? 1 : ramp(t, 0, INVOKE_KINDLE);
-      const fade = 1 - ramp(t, INVOKE_HOLD + 0.2, INVOKE_DURATION);
+      const fade = 1 - ramp(t, INVOKE_HOLD + 0.2, end);
       pool.time = t;
       pool.billboard(
         this.feet.x,
@@ -406,7 +434,7 @@ export class SolarInvocation {
         SHAPE.sun,
       );
       // Sunlight gathering: a ring closing in on the sun as it kindles.
-      if (t < INVOKE_KINDLE + 0.06) {
+      if (t < INVOKE_KINDLE + 0.06 && scale.accents) {
         pool.time = t;
         pool.billboard(this.feet.x, sunY, this.feet.z, 2.1, tint, 1.2, SHAPE.focus);
       }
@@ -422,7 +450,7 @@ export class SolarInvocation {
           this.feet.z,
           s.splash / 0.96,
           tint,
-          (1 - ramp(since, 0.5, INVOKE_DURATION - INVOKE_KINDLE)) * 0.85,
+          (1 - ramp(since, 0.5, end - INVOKE_KINDLE)) * 0.85,
           SHAPE.reach,
         );
       }
@@ -431,19 +459,20 @@ export class SolarInvocation {
       const midY = ground + reach / 2;
       const wide = SHAFT_HALF_WIDTH;
       pool.time = since;
-      pool.upright(
-        this.feet.x,
-        midY,
-        this.feet.z,
-        wide * 1.5,
-        reach / 2,
-        tint,
-        fade * 0.7,
-        SHAPE.haze,
-      );
+      if (scale.secondary)
+        pool.upright(
+          this.feet.x,
+          midY,
+          this.feet.z,
+          wide * 1.5,
+          reach / 2,
+          tint,
+          fade * 0.7,
+          SHAPE.haze,
+        );
       pool.upright(this.feet.x, midY, this.feet.z, wide, reach / 2, tint, fade * 0.95, SHAPE.beam);
       // Rings of light sliding down the column.
-      if (since < INVOKE_HOLD + 0.15) {
+      if (since < INVOKE_HOLD + 0.15 && scale.secondary) {
         for (let k = 0; k < RINGS; k++) {
           const slide = ((since * (s.healing ? 1.8 : 2.6) + k / RINGS) % 1) ** 1.4;
           const down = Math.max(0.12, slide);
@@ -465,39 +494,45 @@ export class SolarInvocation {
       // Where it lands: a shockwave across the ground, molten cracks, the
       // sunburst, the splash thrown up and a flare.
       pool.time = since;
-      pool.ground(this.feet.x, ground + 0.06, this.feet.z, 3.2, tint, 1, SHAPE.shock);
-      pool.ground(this.feet.x, ground + 0.055, this.feet.z, 2, tint, 1, SHAPE.scorch);
-      pool.ground(
-        this.feet.x,
-        ground + 0.05,
-        this.feet.z,
-        wide * 1.5,
-        tint,
-        1 - ramp(since, 0.4, 0.9),
-        SHAPE.ground,
-      );
-      pool.upright(
-        this.feet.x,
-        ground + height * 0.4,
-        this.feet.z,
-        wide * 1.2,
-        height * 0.4,
-        KIT_IVORY,
-        1.1,
-        SHAPE.splash,
-      );
-      pool.billboard(
-        this.chest.x,
-        this.chest.y,
-        this.chest.z,
-        s.healing ? 1.2 : 1.4,
-        KIT_IVORY,
-        Math.exp(-since * 8) * 1.3,
-        SHAPE.flare,
-      );
+      if (scale.secondary)
+        pool.ground(this.feet.x, ground + 0.06, this.feet.z, 3.2, tint, 1, SHAPE.shock);
+      if (scale.accents)
+        pool.ground(this.feet.x, ground + 0.055, this.feet.z, 2, tint, 1, SHAPE.scorch);
+      if (scale.secondary) {
+        pool.ground(
+          this.feet.x,
+          ground + 0.05,
+          this.feet.z,
+          wide * 1.5,
+          tint,
+          1 - ramp(since, 0.4, 0.4 + paladinDetailLinger(0.5, s.detail)),
+          SHAPE.ground,
+        );
+        pool.upright(
+          this.feet.x,
+          ground + height * 0.4,
+          this.feet.z,
+          wide * 1.2,
+          height * 0.4,
+          KIT_IVORY,
+          1.1,
+          SHAPE.splash,
+        );
+      }
+      if (scale.accents)
+        pool.billboard(
+          this.chest.x,
+          this.chest.y,
+          this.chest.z,
+          s.healing ? 1.2 : 1.4,
+          KIT_IVORY,
+          Math.exp(-since * 8) * 1.3,
+          SHAPE.flare,
+        );
       // Embers: half ride the heat up the column, half are flung from the strike.
       const motion = reduced ? 0.3 : 1;
-      for (let i = 0; i < SPARKS; i++) {
+      const sparks = paladinDetailCount(SPARKS, s.detail);
+      for (let i = 0; i < sparks; i++) {
         const updraft = i % 2 === 0;
         const life = updraft ? 0.5 + 0.35 * hash01(i, 4) : 0.3 + 0.25 * hash01(i, 4);
         const start = updraft ? hash01(i, 8) * 0.3 : 0;
@@ -567,7 +602,8 @@ export class SolarInvocation {
     );
     if (!g.healing) return;
     const fade = 1 - ramp(since, 0.25, SPLASH_GLINT_LIFE);
-    for (let i = 0; i < GLINT_PLUSES; i++) {
+    const pluses = paladinDetailCount(GLINT_PLUSES, g.detail);
+    for (let i = 0; i < pluses; i++) {
       const ang = i * 2.1 + g.target;
       const rise = since * (0.9 + 0.3 * hash01(i, 5));
       pool.time = 0;
@@ -589,8 +625,14 @@ export class SolarInvocation {
    * each landing in a glint, the last in a glow about them and a sunburst at
    * their feet.
    */
-  private burstIntoPluses(t: number, reduced: boolean, ground: number): void {
+  private burstIntoPluses(
+    t: number,
+    reduced: boolean,
+    ground: number,
+    detail: PaladinVfxDetail,
+  ): void {
     const pool = this.pool;
+    const scale = paladinDetailScale(detail);
     const c = pool.cam;
     const sunX = this.feet.x,
       sunY = this.head.y + 1.15,
@@ -613,12 +655,16 @@ export class SolarInvocation {
     }
     const since = t - INVOKE_BURST;
     pool.time = since;
-    pool.billboard(sunX, sunY, sunZ, 1.5, KIT_IVORY, Math.exp(-since * 8) * 1.4, SHAPE.flare);
-    pool.billboard(sunX, sunY, sunZ, 1.2, KIT_WARM, 1 - ramp(since, 0.2, 0.45), SHAPE.burst);
+    if (scale.accents)
+      pool.billboard(sunX, sunY, sunZ, 1.5, KIT_IVORY, Math.exp(-since * 8) * 1.4, SHAPE.flare);
+    if (scale.secondary)
+      pool.billboard(sunX, sunY, sunZ, 1.2, KIT_WARM, 1 - ramp(since, 0.2, 0.45), SHAPE.burst);
     let landed = -1;
     const motion = reduced ? 0.4 : 1;
-    for (let i = 0; i < PLUSES; i++) {
-      const ang = (i / PLUSES) * Math.PI * 2 + (hash01(i, 1) - 0.5) * 0.35;
+    // Fewer pluses on the lighter tiers, still spread all the way round.
+    const pluses = paladinDetailCount(PLUSES, detail);
+    for (let i = 0; i < pluses; i++) {
+      const ang = (i / pluses) * Math.PI * 2 + (hash01(i, 1) - 0.5) * 0.35;
       const reach = (0.75 + 0.45 * hash01(i, 2)) * motion;
       const home = 0.3 + 0.25 * hash01(i, 3);
       const ux = Math.cos(ang),
@@ -659,24 +705,26 @@ export class SolarInvocation {
     // Each plus lands in a glint; the light gathers about the ally.
     if (landed >= 0) {
       pool.time = landed;
-      pool.billboard(
-        this.chest.x,
-        this.chest.y,
-        this.chest.z,
-        1.1,
-        KIT_WARM,
-        Math.exp(-landed * 5) * 1.1,
-        SHAPE.flare,
-      );
-      pool.ground(
-        this.feet.x,
-        ground + 0.05,
-        this.feet.z,
-        1.3,
-        KIT_WARM,
-        1 - ramp(landed, 0.25, 0.6),
-        SHAPE.ground,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.chest.x,
+          this.chest.y,
+          this.chest.z,
+          1.1,
+          KIT_WARM,
+          Math.exp(-landed * 5) * 1.1,
+          SHAPE.flare,
+        );
+      if (scale.secondary)
+        pool.ground(
+          this.feet.x,
+          ground + 0.05,
+          this.feet.z,
+          1.3,
+          KIT_WARM,
+          1 - ramp(landed, 0.25, 0.25 + paladinDetailLinger(0.35, detail)),
+          SHAPE.ground,
+        );
     }
   }
 

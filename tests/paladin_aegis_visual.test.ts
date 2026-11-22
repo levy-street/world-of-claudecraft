@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
 import {
   PALADIN_AEGIS_DOME_RADIUS,
   PALADIN_AEGIS_SUN_OUTLINE,
@@ -8,6 +9,11 @@ import {
   syncPaladinAegisVisual,
 } from '../src/render/paladin_aegis_visual';
 import { syncRigMatrixFreeze } from '../src/render/rig_visibility_freeze';
+
+// Node tests run at the Medium preset; the tests below pin the authored
+// composition (full detail) unless a test names another tier.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('PaladinAegisVisual', () => {
   it('keeps the channel field visible while the caster model is hidden and removes its reach on completion', () => {
@@ -130,6 +136,57 @@ describe('PaladinAegisVisual', () => {
     // Strokes only: no filled rays and no filled disc.
     expect(shader).not.toContain('rayFill');
     expect(shader).not.toContain('1.0-smoothstep(0.15,0.16,r)');
+    visual.dispose();
+  });
+
+  it('draws a thinner dome on lighter tiers: fewer pluses, no sparkles or sun glow, the core kept', () => {
+    const drawn = (detail: 'full' | 'light' | 'minimal') => {
+      setPaladinVfxDetailForTest(detail);
+      const visual = new PaladinAegisVisual();
+      visual.update(true, 0.5, false);
+      const shown = (prefix: string) => {
+        let n = 0;
+        visual.group.traverse((o) => {
+          if (o.name.startsWith(prefix) && o.visible) n++;
+        });
+        return n;
+      };
+      const out = {
+        pluses: shown('paladin-aegis-plus-'),
+        sparkles: shown('paladin-aegis-sparkle-'),
+        ring: shown('paladin-aegis-ground-ring'),
+        sun: shown('paladin-aegis-sun'),
+        core: ['dome', 'ground-runes', 'sun-halo', 'planted-weapon'].every(
+          (name) => visual.group.getObjectByName(`paladin-aegis-${name}`)?.visible,
+        ),
+      };
+      visual.dispose();
+      return out;
+    };
+    const full = drawn('full'),
+      light = drawn('light'),
+      minimal = drawn('minimal');
+    expect(full).toEqual({ pluses: 14, sparkles: 28, ring: 1, sun: 2, core: true });
+    // Light keeps the second ring, halves the pluses, drops the accents.
+    expect(light).toEqual({ pluses: 7, sparkles: 0, ring: 1, sun: 1, core: true });
+    // Minimal keeps only the core: the dome, ground, sign, blade and a few pluses.
+    expect(minimal).toEqual({ pluses: 4, sparkles: 0, ring: 0, sun: 1, core: true });
+  });
+
+  it('holds a channel at the detail it began with and shortens the closing flare on lighter tiers', () => {
+    setPaladinVfxDetailForTest('minimal');
+    const visual = new PaladinAegisVisual();
+    visual.update(true, 0.1, false);
+    // The governor moves mid-channel: the running dome keeps its shape.
+    setPaladinVfxDetailForTest('full');
+    visual.update(true, 0.1, false);
+    expect(visual.group.getObjectByName('paladin-aegis-sparkle-1')?.visible).toBe(false);
+    visual.pulse(true);
+    // Minimal's flare tail is 0.45 of the authored 0.55 s.
+    visual.update(false, 0.2, false);
+    expect(visual.group.visible).toBe(true);
+    visual.update(false, 0.06, false);
+    expect(visual.group.visible).toBe(false);
     visual.dispose();
   });
 });

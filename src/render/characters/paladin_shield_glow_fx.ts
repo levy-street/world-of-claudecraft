@@ -5,7 +5,15 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from '../ability_vfx/paladin_spec_icons';
+import { paladinVfxDetailNow } from '../ability_vfx/paladin_vfx_detail';
+import { type PaladinVfxDetail, paladinDetailScale } from '../ability_vfx/paladin_vfx_detail_core';
 import { SHIELD_SIGN_RISE, SHIELD_SIGN_WIDTH } from '../paladin_shield_buffs';
+
+// Detail: core = the glow layer itself (edges, the spec sign, the bash's build
+// and contact flash, Bastion Rite's steady light and its fade, a Sunward Disc
+// flash): it draws on every tier; secondary = none; accents = the flare as
+// Bastion Rite lands and the rite light's slow breathing. The detail is read as
+// a rite lands and held while it holds.
 
 /** The shield meets its target this far into the bash (Woc_Shield_Bash's
  * contact, WOC_CONTACTS in the game's manifest). */
@@ -207,6 +215,8 @@ export class PaladinShieldGlowFx {
   private riteFlare = 0;
   /** The spec icon burning on the face (PALADIN_SPEC_EMBLEMS index). */
   private spec = FAITHWARDEN;
+  /** The detail the held rite draws at: read as it lands, kept while it holds. */
+  private detail: PaladinVfxDetail = 'full';
 
   constructor(
     private readonly model: THREE.Object3D,
@@ -302,7 +312,11 @@ export class PaladinShieldGlowFx {
   ): void {
     this.spec = spec ?? FAITHWARDEN;
     const step = Math.max(0, dt);
-    if (rite !== null && !this.riteHeld) this.riteFlare = 1;
+    if (rite !== null && !this.riteHeld) {
+      this.detail = paladinVfxDetailNow();
+      if (paladinDetailScale(this.detail).accents) this.riteFlare = 1;
+    }
+    const breathe = paladinDetailScale(this.detail).accents;
     this.riteHeld = rite !== null;
     // Steady while the rite holds, fading over its last fifth.
     const target = rite === null ? 0 : 0.7 * Math.min(1, rite / 0.2 + 0.1);
@@ -311,7 +325,11 @@ export class PaladinShieldGlowFx {
     const bash = paladinShieldGlowPlan(timeSeconds, durationSeconds);
     const kick = flash ?? 0;
     this.drive(
-      Math.max(bash.glow, this.rite * (0.9 + 0.1 * Math.sin(this.elapsed * 2.5)), kick * 0.7),
+      Math.max(
+        bash.glow,
+        this.rite * (breathe ? 0.9 + 0.1 * Math.sin(this.elapsed * 2.5) : 0.9),
+        kick * 0.7,
+      ),
       Math.max(bash.flash, this.riteFlare * 0.85, kick),
       step,
     );

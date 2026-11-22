@@ -4,6 +4,17 @@ import type { VfxAnchorResolver } from '../vfx_anchor';
 import { CrestPrewarm } from './crest_prewarm';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = each blessed member's rune ring with its aura's own figure
+// (one quad, the figure drawn in the ring's shader); secondary = none;
+// accents = none beyond the motes, which thin with paladinDetailCount. Lighter
+// tiers keep the whole ring and shorten its fade tail (paladinDetailLinger).
 
 /** The Paladin's party auras, each with its own ring. */
 export const DEVOTION_KINDS = [
@@ -50,6 +61,21 @@ interface Ring {
   radius: number;
   color: THREE.Color;
   accent: THREE.Color;
+  /** The detail it spawned at, kept for its whole life. */
+  detail: PaladinVfxDetail;
+  /** Seconds it lives: DEVOTION_LIFE, its fade tail shortened on lighter tiers. */
+  life: number;
+  /** Motes rising from it: DEVOTION_MOTES thinned for its detail. */
+  motes: number;
+}
+
+/** When a ring starts to fade, seconds after it lands. */
+const DEVOTION_FADE = DEVOTION_LIFE * 0.6;
+
+/** A ring's life at `detail`: the authored life at full, its fade tail scaled below. */
+function devotionLife(detail: PaladinVfxDetail): number {
+  if (detail === 'full') return DEVOTION_LIFE;
+  return DEVOTION_FADE + paladinDetailLinger(DEVOTION_LIFE - DEVOTION_FADE, detail);
 }
 
 function ramp(t: number, from: number, to: number): number {
@@ -84,6 +110,9 @@ export class DevotionRings {
     radius: 1,
     color: new THREE.Color(),
     accent: new THREE.Color(),
+    detail: 'full',
+    life: DEVOTION_LIFE,
+    motes: DEVOTION_MOTES,
   }));
   private readonly positions = new Float32Array(VERTICES * 3);
   private readonly colors = new Float32Array(VERTICES * 3);
@@ -238,6 +267,10 @@ export class DevotionRings {
     slot.age = 0;
     slot.delay = delay;
     slot.radius = Math.max(0.9, Math.min(2.2, height * 0.55));
+    const detail = paladinVfxDetailNow();
+    slot.detail = detail;
+    slot.life = devotionLife(detail);
+    slot.motes = paladinDetailCount(DEVOTION_MOTES, detail);
     const [color, accent] = PALETTES[kind];
     slot.color.setHex(color).multiplyScalar(1.4);
     slot.accent.setHex(accent).multiplyScalar(1.5);
@@ -300,7 +333,7 @@ export class DevotionRings {
       if (!ring.active) continue;
       ring.age += dt;
       const t = ring.age - ring.delay;
-      if (t >= DEVOTION_LIFE || !this.anchor(ring.target, 0, this.feet)) {
+      if (t >= ring.life || !this.anchor(ring.target, 0, this.feet)) {
         ring.active = false;
         continue;
       }
@@ -310,11 +343,11 @@ export class DevotionRings {
         z = this.feet.z;
       const y = effectFloor(this.groundY?.(x, z), this.feet.y) + 0.04;
       const r = ring.radius * (0.85 + 0.15 * ramp(t, 0, 0.35));
-      const alpha = ramp(t, 0, 0.15) * (1 - ramp(t, DEVOTION_LIFE * 0.6, DEVOTION_LIFE));
+      const alpha = ramp(t, 0, 0.15) * (1 - ramp(t, DEVOTION_FADE, ring.life));
       this.quad(x, y, z, r, 0, 0, 0, 0, r, ring, alpha, ring.kind, t);
       if (reduced) continue;
       // Motes rising from the ring, in the aura's accent.
-      for (let i = 0; i < DEVOTION_MOTES; i++) {
+      for (let i = 0; i < ring.motes; i++) {
         const life = 1.1;
         const tt = t - 0.15 - i * 0.12;
         if (tt < 0 || tt >= life) continue;

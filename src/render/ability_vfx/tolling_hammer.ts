@@ -17,6 +17,20 @@ import { CrestPrewarm } from './crest_prewarm';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
 import { type PaladinLocalProbe, paladinFlash } from './paladin_flash';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the falling hammer of light and the ground under it (the
+// closing reticle, then the three tolls); secondary = the sky streak behind the
+// fall, the pillar of light, the strike flare and the gilded second toll;
+// accents = the flare it bursts from the sky in. Sparks scale with the mote
+// count; the planted hammer's hold, its burn and the toll's fade scale with the
+// linger.
 
 interface Hammer {
   phase: number;
@@ -34,6 +48,8 @@ interface Hammer {
   absorbed: boolean;
   /** Ascension empowered it: a greater hammer, a wider toll. */
   gilded: boolean;
+  /** How much of the strike draws, read when the hit is confirmed. */
+  detail: PaladinVfxDetail;
 }
 const ATTRIBUTES = ['position', 'aColor', 'aAlpha', 'aUv', 'aShape', 'aTime', 'aAux'] as const;
 const CORNERS = [0, -1, 1, -1, 1, 1, 0, -1, 1, 1, 0, 1];
@@ -133,6 +149,7 @@ export class TollingHammer {
     landed: false,
     absorbed: false,
     gilded: false,
+    detail: 'full',
   }));
   private readonly capacity = QUADS_PER_HAMMER * 6 * TOLLING_CAPACITY;
   private readonly positions = new Float32Array(this.capacity * 3);
@@ -161,6 +178,7 @@ export class TollingHammer {
       dx: number,
       dz: number,
       absorbed: boolean,
+      detail: PaladinVfxDetail,
     ) => void,
     private readonly groundY: (x: number, z: number) => number,
     private readonly hand?: (id: number, out: THREE.Vector3) => boolean,
@@ -383,6 +401,7 @@ export class TollingHammer {
     s.floor = s.y = floor;
     s.absorbed = outcome === 'absorb';
     s.landed = false;
+    s.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -543,9 +562,13 @@ export class TollingHammer {
     }
     if (!s.landed && s.age >= TOLLING_DROP) {
       s.landed = true;
-      this.land(s.x, s.floor, s.z, s.dx, s.dz, s.absorbed);
+      this.land(s.x, s.floor, s.z, s.dx, s.dz, s.absorbed, s.detail);
     }
-    if (s.age >= TOLLING_DROP + TOLLING_FADE) {
+    const detail = s.detail;
+    const scale = paladinDetailScale(detail);
+    const fade = paladinDetailLinger(TOLLING_FADE, detail),
+      hold = paladinDetailLinger(TOLLING_HOLD, detail);
+    if (s.age >= TOLLING_DROP + fade) {
       s.phase = 0;
       return;
     }
@@ -562,12 +585,9 @@ export class TollingHammer {
     // White-hot at the strike, charging, then burnt away from the edges.
     const after = Math.max(0, since);
     const strike = since >= 0 ? Math.exp(-after * 6) : 0;
-    const charge =
-      since >= 0
-        ? Math.max(0, Math.min(1, (after - TOLLING_HOLD * 0.4) / (TOLLING_HOLD * 0.6)))
-        : 0;
+    const charge = since >= 0 ? Math.max(0, Math.min(1, (after - hold * 0.4) / (hold * 0.6))) : 0;
     this.time = Math.min(1, 0.25 + (1 - fall) * 0.2 + strike * 0.8 + charge * 0.5);
-    this.aux = since >= TOLLING_HOLD ? Math.min(1, (since - TOLLING_HOLD) / 0.35) : 0;
+    this.aux = since >= hold ? Math.min(1, (since - hold) / paladinDetailLinger(0.35, detail)) : 0;
     this.quad(
       s.x,
       bottom + len,
@@ -582,10 +602,10 @@ export class TollingHammer {
       alpha,
       SHAPE.hammer,
     );
-    if (!reduced) {
+    if (!reduced && scale.secondary) {
       // It bursts out of the sky in a flash, trailing a streak as it falls.
       const sky = s.floor + tollingHeight(0, false) + len;
-      this.flare(s.x, sky, s.z, 3.4, Math.max(0, 1 - s.age / 0.2) * 1.3 * weak);
+      if (scale.accents) this.flare(s.x, sky, s.z, 3.4, Math.max(0, 1 - s.age / 0.2) * 1.3 * weak);
       this.time = s.age;
       const top = bottom + 2 * len;
       const streak = 6 * (since < 0 ? 1 - fall * 0.4 : 0);
@@ -608,14 +628,12 @@ export class TollingHammer {
     const r = TOLL_RADIUS * (s.absorbed ? 0.6 : 1) * (s.gilded ? 1.15 : 1);
     this.time = since;
     const ground =
-      since < 0
-        ? Math.min(1, s.age / 0.05)
-        : 1 - Math.max(0, (after - TOLLING_FADE * 0.7) / (TOLLING_FADE * 0.3));
+      since < 0 ? Math.min(1, s.age / 0.05) : 1 - Math.max(0, (after - fade * 0.7) / (fade * 0.3));
     this.quad(s.x, s.floor + 0.03, s.z, r, 0, 0, 0, 0, r, GOLD, ground * weak, SHAPE.ground);
     if (since < 0) return;
     // Gilded by Ascension: a second toll rolls out just behind the first
     // (more damage, the same single target).
-    if (s.gilded && since > 0.08) {
+    if (s.gilded && since > 0.08 && scale.secondary) {
       this.time = since - 0.08;
       this.quad(
         s.x,
@@ -635,28 +653,31 @@ export class TollingHammer {
     // A pillar of light and a flare at the strike, sparks thrown out. The
     // strike's flash builds and peaks under the shared limit (paladin_flash.ts).
     this.time = s.age;
-    const flash = paladinFlash(since, this.isLocal?.(s.source) ?? true);
-    const pillar = Math.exp(-after * 7) * (reduced ? 0.5 : 0.9) * weak * flash;
-    const pillarHalf = 1.2 * (1 - 0.5 * Math.min(1, after / 0.3));
-    this.quad(
-      s.x,
-      s.floor + 7.03,
-      s.z,
-      0,
-      7,
-      0,
-      hx * pillarHalf,
-      0,
-      hz * pillarHalf,
-      IVORY,
-      pillar,
-      SHAPE.beam,
-    );
-    this.flare(s.x, s.floor + 0.9, s.z, 3.2 * gild, Math.exp(-after * 9) * 1.2 * weak * flash);
+    if (scale.secondary) {
+      const flash = paladinFlash(since, this.isLocal?.(s.source) ?? true);
+      const pillar = Math.exp(-after * 7) * (reduced ? 0.5 : 0.9) * weak * flash;
+      const pillarHalf = 1.2 * (1 - 0.5 * Math.min(1, after / 0.3));
+      this.quad(
+        s.x,
+        s.floor + 7.03,
+        s.z,
+        0,
+        7,
+        0,
+        hx * pillarHalf,
+        0,
+        hz * pillarHalf,
+        IVORY,
+        pillar,
+        SHAPE.beam,
+      );
+      this.flare(s.x, s.floor + 0.9, s.z, 3.2 * gild, Math.exp(-after * 9) * 1.2 * weak * flash);
+    }
     if (reduced) return;
     const k = this.spark,
       c = this.cam;
-    for (let i = 0; i < TOLLING_SPARKS; i++) {
+    const sparks = paladinDetailCount(TOLLING_SPARKS, detail);
+    for (let i = 0; i < sparks; i++) {
       sampleSunVerdictSpark(i, since, false, k);
       if (k.alpha <= 0) continue;
       let ax = k.vx,

@@ -5,6 +5,9 @@ import type * as THREE from 'three';
 // pull's aura. The renderer's per-entity hook below is kept because
 // renderer.ts is at its line cap; it now draws nothing and only lets go of a
 // chain left over from before.
+//
+// Detail: core = none; secondary = none; accents = none. This hook draws
+// nothing on any tier; the chain's tiers are the kit's (ability_vfx/oath_chain.ts).
 
 export interface PaladinOathChainEndpoint {
   x: number;

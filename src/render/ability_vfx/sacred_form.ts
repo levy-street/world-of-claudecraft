@@ -12,11 +12,19 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 
 export const SACRED_FORMS = 8;
 export const SACRED_ENTRANCES = 4;
 export const SACRED_ENTRANCE_DURATION = 1.2;
 const MOTES = 6;
+/** Taking the form: the column and the sign fade from this long in. */
+const ENTRANCE_FADE = 0.5;
 /** How far over the top of the head the halo floats, and its half-size. */
 const HALO_LIFT = 0.28;
 const HALO_SIZE = 0.55;
@@ -29,11 +37,17 @@ interface Form {
   presence: number;
   seen: boolean;
   age: number;
+  /** The Paladin detail read when the form was first held. */
+  detail: PaladinVfxDetail;
 }
 interface Entrance {
   active: boolean;
   id: number;
   age: number;
+  /** The Paladin detail read when the form was taken. */
+  detail: PaladinVfxDetail;
+  /** When the entrance ends (its fade tail shortened on lighter tiers). */
+  end: number;
 }
 
 /**
@@ -44,6 +58,12 @@ interface Entrance {
  * since the form is worn the whole time. A sun halo floats level over their
  * head, closing in from wide as the form is taken: a golden ring with short
  * rays round it, unlike Beacon of Light's plain ring.
+ *
+ * Detail: core = the sign at the feet, the halo and, taking the form, the
+ * column of light rising and the sign flaring; secondary = the ring opening
+ * out on entry; accents = the flare over the head on entry. The drifting motes
+ * thin with the tier (half on light, a third on minimal), and lighter tiers
+ * fade sooner.
  */
 export class SacredForm {
   private readonly pool: PaladinQuadPool<'sacred_form'>;
@@ -53,11 +73,14 @@ export class SacredForm {
     presence: 0,
     seen: false,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly entrances: Entrance[] = Array.from({ length: SACRED_ENTRANCES }, () => ({
     active: false,
     id: -1,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
+    end: SACRED_ENTRANCE_DURATION,
   }));
   private readonly feet = new THREE.Vector3();
   private readonly head = new THREE.Vector3();
@@ -141,6 +164,12 @@ export class SacredForm {
     slot.active = true;
     slot.id = id;
     slot.age = 0;
+    slot.detail = paladinVfxDetailNow();
+    const linger = paladinDetailScale(slot.detail).linger;
+    slot.end =
+      linger === 1
+        ? SACRED_ENTRANCE_DURATION
+        : ENTRANCE_FADE + (SACRED_ENTRANCE_DURATION - ENTRANCE_FADE) * linger;
     return true;
   }
 
@@ -155,6 +184,7 @@ export class SacredForm {
       slot.id = id;
       slot.presence = 0;
       slot.age = 0;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.seen = true;
   }
@@ -172,7 +202,10 @@ export class SacredForm {
     pool.begin(this.ctx.camera);
     for (const f of this.forms) {
       if (!f.active) continue;
-      f.presence = f.seen ? Math.min(1, f.presence + dt * 2) : Math.max(0, f.presence - dt * 3);
+      const scale = paladinDetailScale(f.detail);
+      f.presence = f.seen
+        ? Math.min(1, f.presence + dt * 2)
+        : Math.max(0, f.presence - (dt * 3) / scale.linger);
       f.seen = false;
       f.age += dt;
       if (
@@ -200,7 +233,8 @@ export class SacredForm {
         SHAPE.halo,
       );
       if (reduced) continue;
-      for (let i = 0; i < MOTES; i++) {
+      const motes = paladinDetailCount(MOTES, f.detail);
+      for (let i = 0; i < motes; i++) {
         const cycle = (this.clock * 0.35 + hash01(i, f.id)) % 1;
         const ang = hash01(i, 2) * Math.PI * 2 + cycle;
         const rad = 0.3 + 0.45 * hash01(i, 3);
@@ -220,7 +254,7 @@ export class SacredForm {
       if (!e.active) continue;
       e.age += dt;
       if (
-        e.age >= SACRED_ENTRANCE_DURATION ||
+        e.age >= e.end ||
         !this.ctx.anchor(e.id, 0, this.feet) ||
         !this.ctx.anchor(e.id, 1, this.head)
       ) {
@@ -229,7 +263,8 @@ export class SacredForm {
       }
       const t = e.age;
       const height = Math.max(0.8, this.head.y - this.feet.y);
-      const fade = 1 - ramp(t, 0.5, SACRED_ENTRANCE_DURATION);
+      const scale = paladinDetailScale(e.detail);
+      const fade = 1 - ramp(t, ENTRANCE_FADE, e.end);
       pool.time = t;
       pool.upright(
         this.feet.x,
@@ -241,7 +276,8 @@ export class SacredForm {
         fade,
         SHAPE.rise,
       );
-      pool.ground(this.feet.x, this.floorAt() + 0.01, this.feet.z, 1.6, KIT_WARM, 1, SHAPE.ring);
+      if (scale.secondary)
+        pool.ground(this.feet.x, this.floorAt() + 0.01, this.feet.z, 1.6, KIT_WARM, 1, SHAPE.ring);
       pool.time = reduced ? 0 : this.clock;
       pool.ground(
         this.feet.x,
@@ -252,6 +288,7 @@ export class SacredForm {
         fade * 1.2,
         SHAPE.glyph,
       );
+      if (!scale.accents) continue;
       pool.time = t;
       pool.billboard(
         this.head.x,

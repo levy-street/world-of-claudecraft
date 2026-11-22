@@ -14,6 +14,8 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import { type PaladinVfxDetail, paladinDetailScale } from './paladin_vfx_detail_core';
 
 export const BASTIONS = 8;
 export const BASTION_SHIELDS = 6;
@@ -32,6 +34,8 @@ interface Bastion {
   left: number;
   age: number;
   spin: number;
+  /** The Paladin detail read when the rite was first seen. */
+  detail: PaladinVfxDetail;
 }
 
 // A tower shield: flat top with bevelled corners, straight sides drawing in
@@ -56,6 +60,11 @@ const SHIELD_GLSL = `
  * the rite lands and glows with the Faithwarden's sign while it holds (the
  * character's PaladinShieldGlowFx, told of the rite through
  * paladin_shield_buffs.ts).
+ *
+ * Detail: core = the six tower shields; secondary = the rune circle at their
+ * feet and the dust each throws up as it lands; accents = the landing flares.
+ * Light drops the flares; minimal draws the shields alone and lets them go
+ * sooner when the rite ends.
  */
 export class BastionRite {
   private readonly pool: PaladinQuadPool<'bastion_rite'>;
@@ -67,6 +76,7 @@ export class BastionRite {
     left: 1,
     age: 0,
     spin: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly feet = new THREE.Vector3();
   private clock = 0;
@@ -126,6 +136,7 @@ export class BastionRite {
       slot.presence = 0;
       slot.age = 0;
       slot.spin = this.ctx.facing(id) ?? 0;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.seen = true;
     slot.left = Number.isFinite(left) ? Math.min(1, Math.max(0, left)) : 1;
@@ -140,7 +151,10 @@ export class BastionRite {
     pool.begin(this.ctx.camera);
     for (const b of this.bastions) {
       if (!b.active) continue;
-      b.presence = b.seen ? Math.min(1, b.presence + dt * 8) : Math.max(0, b.presence - dt * 3);
+      const scale = paladinDetailScale(b.detail);
+      b.presence = b.seen
+        ? Math.min(1, b.presence + dt * 8)
+        : Math.max(0, b.presence - (dt * 3) / scale.linger);
       b.seen = false;
       b.age += dt;
       if (!reduced) b.spin += dt * 0.5;
@@ -153,7 +167,8 @@ export class BastionRite {
       const y = Number.isFinite(floor) ? Math.max(floor, this.feet.y - 0.3) : this.feet.y;
       const k = b.presence * Math.min(1, b.left / 0.2 + 0.15);
       pool.time = this.clock;
-      pool.ground(this.feet.x, y + 0.05, this.feet.z, 1.3, KIT_GOLD, k * 0.9, SHAPE.ground);
+      if (scale.secondary)
+        pool.ground(this.feet.x, y + 0.05, this.feet.z, 1.3, KIT_GOLD, k * 0.9, SHAPE.ground);
       for (let i = 0; i < BASTION_SHIELDS; i++) {
         // Two flank the front, so none stands squarely before the Paladin.
         const ang = b.spin + (i / BASTION_SHIELDS) * Math.PI * 2 + Math.PI / BASTION_SHIELDS;
@@ -188,8 +203,9 @@ export class BastionRite {
         const since = b.age - start - BASTION_LAND;
         if (since >= 0 && since < 0.5) {
           pool.time = since;
-          pool.billboard(cx, cy, cz, 0.7, KIT_IVORY, Math.exp(-since * 9) * 1.2, SHAPE.flare);
-          pool.ground(cx, y + 0.04, cz, 0.7, KIT_GOLD, 0.8, SHAPE.dust);
+          if (scale.accents)
+            pool.billboard(cx, cy, cz, 0.7, KIT_IVORY, Math.exp(-since * 9) * 1.2, SHAPE.flare);
+          if (scale.secondary) pool.ground(cx, y + 0.04, cz, 0.7, KIT_GOLD, 0.8, SHAPE.dust);
         }
       }
     }

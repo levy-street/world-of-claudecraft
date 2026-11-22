@@ -7,6 +7,13 @@ import {
   type PaladinKitContext,
 } from './paladin_kit_context';
 import { hash01, PaladinQuadPool, ramp } from './paladin_quad_pool';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+  paladinLingerEnd,
+} from './paladin_vfx_detail_core';
 
 export const SWEEPS = 6;
 export const SWEEP_HITS = 12;
@@ -42,6 +49,10 @@ interface Sweep {
   hitY: number;
   hitZ: number;
   struck: boolean;
+  /** The Paladin detail read when the bash began. */
+  detail: PaladinVfxDetail;
+  /** When it ends (the shockwave's fade tail shortened on lighter tiers). */
+  end: number;
 }
 interface Hit {
   active: boolean;
@@ -50,6 +61,8 @@ interface Hit {
   /** Away from the Paladin who struck, along the ground. */
   dx: number;
   dz: number;
+  /** The Paladin detail read when the blow struck. */
+  detail: PaladinVfxDetail;
 }
 
 // A heater shield in its quad, p in [-1, 1] with y up: a gently arched top,
@@ -77,6 +90,13 @@ const SHIELD_GLSL = `
  * each wider and fainter; a shockwave rolls across the frontal arc, raising
  * dust. Each enemy struck takes a flare and a shield outline, streaks of the blow and
  * sparks flung away from the Paladin.
+ *
+ * Detail: core = the first shield outline driven out, the shockwave across
+ * the arc and each struck enemy's shield outline; secondary = the outlines
+ * following the first and the streaks of the blow; accents = the flares on the
+ * shield and on each enemy. Light drops the flares and halves the motes and
+ * sparks; minimal drives one outline with a third of them, and both let the
+ * shockwave go sooner.
  */
 export class BastionSweep {
   private readonly pool: PaladinQuadPool<'bastion_sweep'>;
@@ -94,6 +114,8 @@ export class BastionSweep {
     hitY: 0,
     hitZ: 0,
     struck: false,
+    detail: 'full' as PaladinVfxDetail,
+    end: SWEEP_DURATION,
   }));
   private readonly hits: Hit[] = Array.from({ length: SWEEP_HITS }, () => ({
     active: false,
@@ -101,6 +123,7 @@ export class BastionSweep {
     age: 0,
     dx: 0,
     dz: 1,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly feet = new THREE.Vector3();
   private readonly at = new THREE.Vector3();
@@ -184,6 +207,12 @@ export class BastionSweep {
     slot.z = this.feet.z;
     slot.chest = this.ctx.anchor(source, 0.55, this.at) ? this.at.y - this.feet.y : 1;
     slot.struck = false;
+    slot.detail = paladinVfxDetailNow();
+    slot.end = paladinLingerEnd(
+      BASH_IMPACT + 0.3,
+      SWEEP_DURATION,
+      paladinDetailScale(slot.detail).linger,
+    );
     return true;
   }
 
@@ -198,6 +227,7 @@ export class BastionSweep {
     slot.active = true;
     slot.target = target;
     slot.age = 0;
+    slot.detail = paladinVfxDetailNow();
     // Knocked away from the Paladin whose bash this is: the newest one.
     let from: Sweep | undefined;
     for (const s of this.sweeps) if (s.active && (!from || s.age < from.age)) from = s;
@@ -248,7 +278,7 @@ export class BastionSweep {
     for (const s of this.sweeps) {
       if (!s.active) continue;
       s.age += dt;
-      if (s.age >= SWEEP_DURATION) {
+      if (s.age >= s.end) {
         s.active = false;
         continue;
       }
@@ -268,9 +298,11 @@ export class BastionSweep {
         s.hitY = at.y;
         s.hitZ = at.z + fz * 0.25;
       }
+      const scale = paladinDetailScale(s.detail);
       const charge = reduced ? 1 : ramp(t, 0, BASH_IMPACT);
+      const motes = paladinDetailCount(MOTES, s.detail);
       if (!reduced && since < 0)
-        for (let i = 0; i < MOTES; i++) {
+        for (let i = 0; i < motes; i++) {
           // Each mote falls in from wide around the shield.
           const cycle = (t * 3 + hash01(i, 4)) % 1;
           const ang = hash01(i, 1) * Math.PI * 2;
@@ -291,17 +323,19 @@ export class BastionSweep {
       if (since < 0) continue;
       // The slam: a flare on the shield.
       pool.time = since;
-      pool.billboard(
-        s.hitX,
-        s.hitY,
-        s.hitZ,
-        1.0,
-        KIT_IVORY,
-        Math.exp(-since * 12) * 1.1,
-        SHAPE.flare,
-      );
+      if (scale.accents)
+        pool.billboard(
+          s.hitX,
+          s.hitY,
+          s.hitZ,
+          1.0,
+          KIT_IVORY,
+          Math.exp(-since * 12) * 1.1,
+          SHAPE.flare,
+        );
       // Outlines of the shield driven out ahead, one after another, wider and fainter.
-      for (let i = 0; i < BOOMS; i++) {
+      const booms = scale.secondary ? BOOMS : 1;
+      for (let i = 0; i < booms; i++) {
         const b = since - i * BOOM_GAP;
         if (b <= 0 || b >= BOOM_LIFE) continue;
         const life = b / BOOM_LIFE;
@@ -329,7 +363,7 @@ export class BastionSweep {
         s.z,
         s.range,
         KIT_GOLD,
-        1.2 * (1 - ramp(t, BASH_IMPACT + 0.3, SWEEP_DURATION)),
+        1.2 * (1 - ramp(t, BASH_IMPACT + 0.3, s.end)),
         SHAPE.wave,
         Math.PI / 2 - s.facing,
       );
@@ -342,20 +376,22 @@ export class BastionSweep {
         continue;
       }
       const t = h.age;
+      const scale = paladinDetailScale(h.detail);
       pool.time = t;
-      pool.billboard(
-        this.at.x,
-        this.at.y,
-        this.at.z,
-        1.0,
-        KIT_IVORY,
-        Math.exp(-t * 10) * 1.3,
-        SHAPE.flare,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.at.x,
+          this.at.y,
+          this.at.z,
+          1.0,
+          KIT_IVORY,
+          Math.exp(-t * 10) * 1.3,
+          SHAPE.flare,
+        );
       pool.billboard(this.at.x, this.at.y, this.at.z, 1.0, KIT_GOLD, 1, SHAPE.ring);
       const motion = reduced ? 0.3 : 1;
       // Streaks of the blow, trailing back toward the Paladin.
-      for (let i = 0; i < STREAKS; i++) {
+      for (let i = 0; scale.secondary && i < STREAKS; i++) {
         const life = 0.18;
         if (t >= life) continue;
         const side = (i - 1) * 0.28,
@@ -379,7 +415,8 @@ export class BastionSweep {
         );
       }
       // Sparks flung away from the Paladin, falling as they go.
-      for (let i = 0; i < SPARKS; i++) {
+      const sparks = paladinDetailCount(SPARKS, h.detail);
+      for (let i = 0; i < sparks; i++) {
         const life = 0.25 + 0.2 * hash01(i, 3);
         if (t >= life) continue;
         const spread = (hash01(i, 9) - 0.5) * 1.6;

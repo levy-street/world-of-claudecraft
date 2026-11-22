@@ -123,7 +123,13 @@ export class PaladinKit {
     return this.parts.flatMap((part) => part.preparation.units(host));
   }
 
-  /** Once per entity per frame: live casts and held auras. */
+  /**
+   * Once per entity per frame: live casts and held auras. Called from the
+   * entity pass, outside any cast's withPaladinCastDetail, so each held effect
+   * a presence starts (a stance, a shield, a bind, a march, a channel) reads
+   * the ambient Paladin detail as its part claims the slot, and keeps it for as
+   * long as the presence holds (paladin_vfx_detail.ts).
+   */
   presence(e: PaladinKitEntity): void {
     if (e.dead) {
       this.marching.delete(e.id);

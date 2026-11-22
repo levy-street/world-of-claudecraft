@@ -1,10 +1,14 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DebtOfLight } from '../src/render/ability_vfx/debt_of_light';
 import { GuardianCovenant } from '../src/render/ability_vfx/guardian_covenant';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import {
   AEGIS_CAPACITY,
+  AEGIS_FADE,
   AEGIS_SHIELD_VERTICES,
   AEGIS_VERTEX_BUDGET,
   isGuardianCovenantAura,
@@ -31,6 +35,10 @@ async function fixture(height = 2.4) {
     },
   };
 }
+
+// Node runs at the Medium preset: pin the authored composition.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('Guardian Covenant Twin Aegis', () => {
   it.each([1.6, 3.2])(
@@ -186,6 +194,10 @@ describe('Guardian Covenant Twin Aegis', () => {
   it('suppresses obsolete cast/aura companions while playing one release gesture', () => {
     const releaseGesture = vi.fn();
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       releaseGesture,
       deps: { fx: { castPaladinShieldSigil: vi.fn() } },
     }) as AbilityVfx;
@@ -203,5 +215,52 @@ describe('Guardian Covenant Twin Aegis', () => {
     });
     expect(isGuardianCovenantAura({ id: 'life_covenant', kind: 'buff_dr' })).toBe(false);
     expect(isGuardianCovenantAura({ id: 'guardian_covenant', kind: 'buff_dmg_done' })).toBe(false);
+  });
+});
+
+describe('Guardian Covenant detail', () => {
+  /** Shield and wisp vertices of one ward raised at `detail`, and how long it
+   * still draws once the aura stops refreshing it. */
+  const ward = async (detail: PaladinVfxDetail) => {
+    const f = await fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.hold(1, 0.2, 0);
+    // The ward keeps the detail it was raised with.
+    setPaladinVfxDetailForTest('full');
+    f.effect.hold(1, 0.2, 0);
+    f.effect.update(0.1, false);
+    const g = f.effect.mesh.geometry;
+    const kinds = g.getAttribute('aKind');
+    let shield = 0,
+      wisps = 0;
+    for (let i = 0; i < g.drawRange.count; i++) kinds.getX(i) ? wisps++ : shield++;
+    const coverage = f.effect.coverage(1);
+    let tail = 0;
+    while (f.effect.mesh.visible && tail < 1) {
+      f.effect.update(0.01, false);
+      tail += 0.01;
+    }
+    f.effect.dispose();
+    return { shield, wisps, coverage, tail };
+  };
+
+  it('keeps the whole shield on every tier and sheds the wisps on lighter ones', async () => {
+    const full = await ward('full');
+    const light = await ward('light');
+    const minimal = await ward('minimal');
+    expect(full.shield).toBe(AEGIS_SHIELD_VERTICES);
+    expect(full.wisps).toBe(AEGIS_VERTEX_BUDGET - AEGIS_SHIELD_VERTICES);
+    // Light: the same shield, the wisps at half their segments.
+    expect(light.shield).toBe(full.shield);
+    expect(light.wisps).toBe(full.wisps / 2);
+    // Minimal: the shield alone, at the reduced-motion tessellation.
+    expect(minimal.shield).toBe(full.shield / 2);
+    expect(minimal.wisps).toBe(0);
+    // A held ward is full coverage on every tier; lighter ones fade out sooner.
+    for (const d of [full, light, minimal]) expect(d.coverage).toBe(1);
+    expect(full.tail).toBeCloseTo(AEGIS_FADE, 1);
+    expect(light.tail).toBeLessThan(full.tail);
+    expect(minimal.tail).toBeLessThan(light.tail);
   });
 });

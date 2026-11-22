@@ -22,6 +22,21 @@ import type { VfxAnchorResolver } from '../vfx_anchor';
 import { CrestPrewarm } from './crest_prewarm';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinDetailScale,
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the Solar Sword itself and the sentence seal over the
+// footprint; secondary = the blazing streak of its fall, the reticle closing on
+// the target, the pillar of light where it strikes, the shards it shatters into
+// and the broken ground of its landing; accents = the strike flare. The sparks
+// and shards scale with count, the seal's fade after the shatter and a withheld
+// sword's dissolve with linger.
 
 const VERTICES = SUN_VERDICT_LANCE_CAPACITY * SUN_VERDICT_LANCE_VERTICES;
 const GOLD = new THREE.Color(0xe8bb76).multiplyScalar(1.3);
@@ -57,6 +72,8 @@ export const SUN_VERDICT_LANCE_HOVER = 2.6;
 export const SUN_VERDICT_LANCE_WAIT = SUN_VERDICT_LANCE_LANDING;
 /** The withheld sword comes apart over this long. */
 export const SUN_VERDICT_LANCE_DISSOLVE = 0.35;
+/** The longest a shattered shard flies (sampleSunVerdictShard's life). */
+const SHARD_LIFE = 0.4;
 const PENDING = 0,
   STRIKE = 1,
   WITHDRAWN = 2;
@@ -77,6 +94,8 @@ interface Slot {
   dissolve: number;
   /** Where the point hung as it began to dissolve, above the floor. */
   tip: number;
+  /** How much of the sentence draws, read when the sword was dropped. */
+  detail: PaladinVfxDetail;
 }
 
 /** Seconds into the fall at which the point is down to `height` above the floor. */
@@ -169,6 +188,7 @@ export class SunVerdictLance {
     hover: SUN_VERDICT_LANCE_HOVER,
     dissolve: -1,
     tip: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly positions = new Float32Array(VERTICES * 3);
   private readonly colors = new Float32Array(VERTICES * 3);
@@ -190,7 +210,13 @@ export class SunVerdictLance {
     private readonly groundY?: (x: number, z: number) => number,
     private readonly camera?: THREE.Camera,
     /** The sword driving into the ground: crack, shockwaves, dust, stones, shake. */
-    private readonly onImpact?: (x: number, y: number, z: number, radius: number) => void,
+    private readonly onImpact?: (
+      x: number,
+      y: number,
+      z: number,
+      radius: number,
+      detail: PaladinVfxDetail,
+    ) => void,
   ) {
     const geometry = new THREE.BufferGeometry();
     for (const [name, data, size] of [
@@ -380,6 +406,7 @@ export class SunVerdictLance {
     slot.target = target;
     slot.verdict = PENDING;
     slot.dissolve = -1;
+    slot.detail = paladinVfxDetailNow();
     const top = this.anchor(target, 1, this.head) ? this.head.y - slot.y + 0.8 : 0;
     slot.hover = Math.min(9, Math.max(SUN_VERDICT_LANCE_HOVER, Number.isFinite(top) ? top : 0));
     return true;
@@ -443,6 +470,8 @@ export class SunVerdictLance {
     alpha: number,
     shape: number,
   ): void {
+    // The authored composition writes every piece; a lighter one skips the dark.
+    if (this.skipDark && !(alpha > 0)) return;
     for (let c = 0; c < 6; c++) {
       const u = CORNERS[c * 2],
         side = CORNERS[c * 2 + 1],
@@ -462,6 +491,8 @@ export class SunVerdictLance {
 
   /** Per-frame scratch: camera right, up and view direction. */
   private readonly cameraBasis: number[] = new Array(9).fill(0);
+  /** Whether the slot being drawn skips unlit pieces (any tier below full). */
+  private skipDark = false;
 
   update(dt: number, reduced = false): void {
     if (this.disposed) return;
@@ -495,29 +526,48 @@ export class SunVerdictLance {
     for (const s of this.slots) {
       if (!s.active) continue;
       s.age += Math.max(0, dt);
+      const full = s.detail === 'full';
+      const detail = paladinDetailScale(s.detail);
+      this.skipDark = !full;
       if (s.verdict === PENDING && s.age >= SUN_VERDICT_LANCE_WAIT) s.verdict = WITHDRAWN;
       if (s.verdict === WITHDRAWN) {
         if (s.dissolve < 0) {
           s.dissolve = 0;
           s.tip = Math.max(sunVerdictLanceTip(s.age, reduced), s.hover);
         } else s.dissolve += Math.max(0, dt);
-        if (s.dissolve >= SUN_VERDICT_LANCE_DISSOLVE) s.active = false;
-        else this.dissolveSword(s, reduced, hx, hz, cam, lanceHalf);
+        if (s.dissolve >= paladinDetailLinger(SUN_VERDICT_LANCE_DISSOLVE, s.detail))
+          s.active = false;
+        else this.dissolveSword(s, reduced, hx, hz, cam, lanceHalf, detail);
         continue;
       }
-      if (s.age >= SUN_VERDICT_LANCE_DURATION) {
+      // Past the shatter the seal's fade runs faster on lighter tiers; the
+      // shards (secondary) still finish their flight where they draw.
+      const sealAge = full
+        ? s.age
+        : s.age <= SHATTER
+          ? s.age
+          : SHATTER + (s.age - SHATTER) / detail.linger;
+      const end = full
+        ? SUN_VERDICT_LANCE_DURATION
+        : Math.max(
+            SHATTER + (SUN_VERDICT_LANCE_DURATION - SHATTER) * detail.linger,
+            detail.secondary ? SHATTER + SHARD_LIFE : 0,
+          );
+      if (s.age >= end) {
         s.active = false;
         continue;
       }
       const age = s.age;
-      const alpha = sunVerdictLanceAlpha(age) * (reduced ? 0.7 : 1);
+      const alpha = sunVerdictLanceAlpha(sealAge) * (reduced ? 0.7 : 1);
       // Waiting on the damage: the sword never reaches the ground.
       const pending = s.verdict === PENDING;
       const since = pending ? -1 : age - SUN_VERDICT_LANCE_LANDING;
       const landed = since >= 0 ? 1 : 0;
       if (landed && !s.landed) {
         s.landed = true;
-        this.onImpact?.(s.x, s.y, s.z, s.radius);
+        // The broken ground, at the strike's detail: its crack and shock on every
+        // tier, the dust and the second shock above minimal, the stones thinned.
+        this.onImpact?.(s.x, s.y, s.z, s.radius, s.detail);
       }
       const drop = sunVerdictLanceTip(age, reduced);
       const tip = s.y + (pending ? Math.max(drop, s.hover) : drop);
@@ -542,7 +592,8 @@ export class SunVerdictLance {
       );
 
       // Blazing streak above it while it falls.
-      const falling = reduced ? 0 : Math.max(0, 1 - age / SUN_VERDICT_LANCE_LANDING);
+      const falling =
+        reduced || !detail.secondary ? 0 : Math.max(0, 1 - age / SUN_VERDICT_LANCE_LANDING);
       this.quad(
         s.x,
         tip + length + 3.5,
@@ -559,13 +610,14 @@ export class SunVerdictLance {
       );
 
       // Reticle closing on the target during the fall.
-      const aim = landed ? 0 : Math.min(1, age / 0.05);
+      const aim = landed || !detail.secondary ? 0 : Math.min(1, age / 0.05);
       const reticle = SUN_VERDICT_LANCE_RADIUS;
       this.quad(s.x, s.y + 0.04, s.z, reticle, 0, 0, 0, 0, reticle, GOLD, aim * 0.9, SHAPE.reticle);
 
       this.time = Math.max(0, since);
       // Pillar of light where it strikes.
-      const pillar = landed * Math.exp(-Math.max(0, since) * 7) * (reduced ? 0.7 : 1.7);
+      const pillar =
+        detail.secondary && landed ? Math.exp(-Math.max(0, since) * 7) * (reduced ? 0.7 : 1.7) : 0;
       const pillarHalf = 1.6 * (1 - 0.5 * Math.min(1, Math.max(0, since) / 0.3));
       this.quad(
         s.x,
@@ -583,7 +635,7 @@ export class SunVerdictLance {
       );
 
       // Strike flare on the blade, clear of the ground.
-      const flare = landed * Math.exp(-Math.max(0, since) * 6) * 1.8;
+      const flare = detail.accents ? landed * Math.exp(-Math.max(0, since) * 6) * 1.8 : 0;
       this.quad(
         s.x,
         s.y + 3.3,
@@ -605,7 +657,10 @@ export class SunVerdictLance {
 
       // Sparks thrown up and out from the strike.
       const k = this.spark;
-      for (let i = 0; i < SUN_VERDICT_LANCE_SPARKS; i++) {
+      const sparks = paladinDetailCount(SUN_VERDICT_LANCE_SPARKS, s.detail);
+      for (let n = 0; n < sparks; n++) {
+        // Fewer sparks keep the full spray's spread: every k-th one.
+        const i = Math.floor((n * SUN_VERDICT_LANCE_SPARKS) / sparks);
         sampleSunVerdictSpark(i, since, reduced, k);
         let ax = k.vx,
           ay = k.vy,
@@ -642,7 +697,9 @@ export class SunVerdictLance {
       // Shards of the lance flung out when it shatters.
       const shard = this.shard;
       this.time = Math.max(0, age - SHATTER);
-      for (let i = 0; i < SUN_VERDICT_LANCE_SHARDS; i++) {
+      const shards = detail.secondary ? paladinDetailCount(SUN_VERDICT_LANCE_SHARDS, s.detail) : 0;
+      for (let n = 0; n < shards; n++) {
+        const i = Math.floor((n * SUN_VERDICT_LANCE_SHARDS) / shards);
         sampleSunVerdictShard(i, age - SHATTER, reduced, length, shard);
         const c = Math.cos(shard.spin),
           sn = Math.sin(shard.spin);
@@ -664,6 +721,7 @@ export class SunVerdictLance {
         );
       }
     }
+    this.skipDark = false;
     this.mesh.geometry.setDrawRange(0, this.vertex);
     this.mesh.visible = this.vertex > 0;
     if (this.vertex)
@@ -684,9 +742,10 @@ export class SunVerdictLance {
     hz: number,
     cam: readonly number[],
     lanceHalf: number,
+    detail: PaladinDetailScale,
   ): void {
     const length = SUN_VERDICT_LANCE_LENGTH;
-    const k = s.dissolve / SUN_VERDICT_LANCE_DISSOLVE;
+    const k = s.dissolve / paladinDetailLinger(SUN_VERDICT_LANCE_DISSOLVE, s.detail);
     const flicker = reduced ? 1 : 0.75 + 0.25 * Math.sin(s.dissolve * 70);
     const fade = (1 - k) ** 1.5 * flicker * (reduced ? 0.7 : 1);
     const tip = s.y + s.tip;
@@ -718,13 +777,16 @@ export class SunVerdictLance {
       0,
       reticle,
       GOLD,
-      (1 - k) * 0.5,
+      detail.secondary ? (1 - k) * 0.5 : 0,
       SHAPE.reticle,
     );
     // Its light breaks away in shards that rise rather than fall.
     const shard = this.shard;
     this.time = s.dissolve;
-    for (let i = 0; i < SUN_VERDICT_LANCE_SHARDS; i++) {
+    // Here the shards are the dissolve itself, so they only thin with count.
+    const shards = paladinDetailCount(SUN_VERDICT_LANCE_SHARDS, s.detail);
+    for (let n = 0; n < shards; n++) {
+      const i = Math.floor((n * SUN_VERDICT_LANCE_SHARDS) / shards);
       sampleSunVerdictShard(i, s.dissolve, true, length, shard);
       const c = Math.cos(shard.spin),
         sn = Math.sin(shard.spin);

@@ -1,6 +1,13 @@
 import * as THREE from 'three';
 import { MAX_ASCENSION_CHARGES } from '../sim/paladin_devotion';
 import { paladinFlash } from './ability_vfx/paladin_flash';
+import { paladinVfxDetailNow } from './ability_vfx/paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './ability_vfx/paladin_vfx_detail_core';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import type { PaladinAscensionVisualPlan } from './paladin_ascension_core';
 import {
@@ -8,6 +15,13 @@ import {
   syncPaladinAvengingWrathVisual,
 } from './paladin_avenging_wrath_visual';
 import { PALADIN_BODY_FIT } from './paladin_body_fit';
+
+// Detail: core = the sun halo with its charge orbs, the inner rune circle with
+// its charge marks, and the wing silhouette (paladin_avenging_wrath_visual's
+// primaries and secondaries); secondary = the column of light crashing down and
+// the wings' coverts; accents = the halo's forming bloom. The rising motes thin
+// with paladinDetailCount and the exit fade scales with paladinDetailLinger.
+// The detail is read as Ascension begins and held until it next begins.
 
 const REFERENCE_HEIGHT = 1.8;
 /** Seconds the column of light takes to crash down on the Paladin. */
@@ -405,6 +419,8 @@ export class PaladinAscensionVisual {
   private spent = 99;
   /** 1 while the Paladin is seen, 0 while vanished mid-flight. */
   private seen = 1;
+  /** The detail this Ascension draws at: read as it begins, kept to its end. */
+  private detail: PaladinVfxDetail = 'full';
 
   constructor(characterHeight: number) {
     this.group.name = 'paladin-ascension-visual';
@@ -495,6 +511,8 @@ export class PaladinAscensionVisual {
     this.clock += dt;
     if (plan.active && !this.wasActive) {
       // Ascending (again): the column crashes down afresh.
+      this.detail = paladinVfxDetailNow();
+      this.motes.geometry.setDrawRange(0, paladinDetailCount(MOTES, this.detail));
       this.age = 0;
       this.slots = Math.max(1, plan.charges);
       this.order = ascensionRemovalOrder(this.slots);
@@ -527,7 +545,9 @@ export class PaladinAscensionVisual {
         : Math.max(0, this.orbs[i] - dt / ORB_FADE);
     }
 
-    this.presence = plan.active ? 1 : Math.max(0, this.presence - dt / ASCENSION_EXIT);
+    this.presence = plan.active
+      ? 1
+      : Math.max(0, this.presence - dt / paladinDetailLinger(ASCENSION_EXIT, this.detail));
     this.seen = plan.vanished
       ? reducedMotion
         ? 0
@@ -570,7 +590,7 @@ export class PaladinAscensionVisual {
       (reducedMotion ? 0.4 : 0.6) *
       flash;
     pillar.uTime.value = this.clock;
-    this.pillar.visible = pillar.uAlpha.value > 0.002;
+    this.pillar.visible = pillar.uAlpha.value > 0.002 && paladinDetailScale(this.detail).secondary;
 
     const ground = this.ground.material.uniforms;
     ground.uAge.value = this.age - ASCENSION_DROP * 0.8;
@@ -590,7 +610,8 @@ export class PaladinAscensionVisual {
     halo.uSlots.value = this.slots;
     copyInto(halo.uOrb.value as number[], this.orbs);
     halo.uUrgent.value = urgent;
-    halo.uFlash.value = flash;
+    // The forming bloom is an accent; the column (secondary) keeps its flash.
+    halo.uFlash.value = paladinDetailScale(this.detail).accents ? flash : 0;
     halo.uScale.value =
       HALO_SCALE *
       this.size *
@@ -632,6 +653,9 @@ export class PaladinAscensionVisual {
       plan.active && shown,
       dt,
       reducedMotion,
+      undefined,
+      null,
+      this.detail,
     );
     const wings = this.wings;
     // Furling once Ascension is over: they hold the pose they furl from.
@@ -668,6 +692,9 @@ export class PaladinAscensionVisual {
           true,
           0,
           reducedMotion,
+          undefined,
+          null,
+          this.detail,
         );
         if (!fresh) return;
         fresh.from = 1;
@@ -764,7 +791,17 @@ export function buildPaladinAscensionStandIn(): PaladinAscensionStandIn {
     const visual = new PaladinAscensionVisual(REFERENCE_HEIGHT);
     root.add(visual.group, visual.crown);
     // Ascension's wings are Avenging Wrath's: one pair built spread, never furled.
-    syncPaladinAvengingWrathVisual(null, visual.crown, REFERENCE_HEIGHT, true, 0, true);
+    syncPaladinAvengingWrathVisual(
+      null,
+      visual.crown,
+      REFERENCE_HEIGHT,
+      true,
+      0,
+      true,
+      undefined,
+      null,
+      'full',
+    );
     const materials: THREE.Material[] = [];
     root.traverse((object) => {
       const material = (object as THREE.Mesh).material;

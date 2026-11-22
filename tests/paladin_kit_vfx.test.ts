@@ -1,16 +1,19 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CastAdmission } from '../src/render/ability_vfx/cast_admission_core';
 import { WALL_RING } from '../src/render/ability_vfx/hallowed_wall';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import { PaladinKit, type PaladinKitEntity } from '../src/render/ability_vfx/paladin_kit';
 import type { PaladinQuadPool } from '../src/render/ability_vfx/paladin_quad_pool';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import { CHORUS_RADIUS } from '../src/render/ability_vfx/radiant_chorus';
 import { GOAD_FIZZLE, GOAD_FLIGHT } from '../src/render/ability_vfx/sacred_goad';
 import { INVOKE_BURST, SPLASH_GLINT_LIFE } from '../src/render/ability_vfx/solar_invocation';
 import { VEIL_TETHER } from '../src/render/ability_vfx/veilbound_march';
 import { VOW_WARD_END, VOW_WARD_RISE } from '../src/render/ability_vfx/vowkeeper_strike';
 import { PLATE_GILDED } from '../src/render/ability_vfx/ward_of_faith';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import {
   bastionRiteShieldLeft,
   heldShieldFlash,
@@ -86,6 +89,10 @@ const aura = (id: string, kind: string, value?: number) => ({
 });
 
 describe('Paladin kit', () => {
+  // Node runs at the Medium preset: pin the authored composition.
+  beforeEach(() => setPaladinVfxDetailForTest('full'));
+  afterEach(() => setPaladinVfxDetailForTest(null));
+
   it('prepares every part before it draws anything', async () => {
     const f = fixture();
     const units = f.kit.units({
@@ -396,6 +403,9 @@ describe('Paladin kit', () => {
   it('routes a Sunward Disc that did nothing to the glance, leaving real hits alone', () => {
     const glance = vi.fn();
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
       deps: { fx: { paladinKit: { sunwardDisc: { glance } } }, anchor: () => null },
       // A hit the kit leaves alone takes the release's path, which admits it
       // through the cast gate first: closed here, so it draws nothing.
@@ -452,6 +462,10 @@ describe('Paladin kit', () => {
     const refuse = vi.fn();
     const releaseGesture = vi.fn();
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx: { paladinKit: { oathChain: { lash, refuse } } } },
       releaseGesture,
     }) as AbilityVfx;
@@ -693,6 +707,10 @@ describe('Paladin kit', () => {
   it('routes the splash to Solar Invocation and gives every spent charge one cue', () => {
     const splash = vi.fn();
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx: { paladinKit: { solarInvocation: { splash } } } },
     }) as AbilityVfx;
     const cue = (fx: string, ability: string, range?: number) =>
@@ -742,6 +760,10 @@ describe('Paladin kit', () => {
     const gildTollingHammer = vi.fn();
     const notePaladinConsecrationAscended = vi.fn();
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: {
         fx: {
           paladinKit: { dawnsEmbrace: { gild } },
@@ -889,6 +911,10 @@ describe('Paladin kit', () => {
     const goad = vi.fn();
     const burst = vi.fn();
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: {
         fx: {
           paladinKit: {
@@ -927,5 +953,469 @@ describe('Paladin kit', () => {
       }),
     ).toBe(true);
     expect(burst).toHaveBeenCalledExactlyOnceWith(1, 4, 5);
+  });
+});
+
+type KitFixture = ReturnType<typeof fixture>;
+type Drawn = Map<number, number>;
+
+const TIERS: readonly PaladinVfxDetail[] = ['full', 'light', 'minimal'];
+const quads = (m: Drawn) => [...m.values()].reduce((a, b) => a + b, 0);
+const n = (m: Drawn, shape: number) => m.get(shape) ?? 0;
+
+/** Plays the same cue on a fresh kit at each detail, returning what it drew. */
+async function atTiers<T>(play: (f: KitFixture) => T): Promise<Record<PaladinVfxDetail, T>> {
+  const out = {} as Record<PaladinVfxDetail, T>;
+  for (const detail of TIERS) {
+    setPaladinVfxDetailForTest(detail);
+    const f = fixture();
+    await f.prepare();
+    out[detail] = play(f);
+    f.kit.dispose();
+  }
+  return out;
+}
+
+/** Each lower tier draws strictly fewer quads than the one above it. */
+function thinsOut(byTier: Record<PaladinVfxDetail, Drawn>, light = true): void {
+  if (light) {
+    expect(quads(byTier.light)).toBeLessThan(quads(byTier.full));
+    expect(quads(byTier.minimal)).toBeLessThan(quads(byTier.light));
+  } else expect(quads(byTier.minimal)).toBeLessThan(quads(byTier.full));
+}
+
+describe('Paladin kit detail tiers', () => {
+  afterEach(() => setPaladinVfxDetailForTest(null));
+
+  it('thins Bastion Rite to its shields: rune circle and dust on light, flares on full only', async () => {
+    const d = await atTiers((f) => {
+      for (let i = 0; i < 4; i++) {
+        f.kit.presence(f.entity(2, [aura('bastion_rite', 'buff_dr_phys')]));
+        f.kit.update(0.1, false);
+      }
+      return f.drawn(f.kit.bastionRite);
+    });
+    thinsOut(d);
+    // The six shields on every tier.
+    for (const tier of TIERS) expect(n(d[tier], 0)).toBe(n(d.full, 0));
+    expect(n(d.full, 0)).toBe(6);
+    expect(n(d.full, 2)).toBeGreaterThan(0);
+    expect(n(d.light, 2)).toBe(0);
+    expect(n(d.light, 1)).toBe(1);
+    expect(n(d.light, 3)).toBeGreaterThan(0);
+    expect(n(d.minimal, 1) + n(d.minimal, 2) + n(d.minimal, 3)).toBe(0);
+  });
+
+  it("keeps Hallowed Wall's plates on every tier and drops its ground ring on minimal", async () => {
+    const wall = [aura('holy_shield', 'buff_block'), aura('holy_shield_absorb', 'absorb', 50)];
+    const d = await atTiers((f) => {
+      f.kit.presence(f.entity(1, wall));
+      f.kit.update(0.1, true);
+      return { ring: f.drawn(f.kit.hallowedWall), plates: f.kit.hallowedWall.plates.standing(1) };
+    });
+    expect(n(d.full.ring, 0)).toBe(1);
+    expect(n(d.light.ring, 0)).toBe(1);
+    expect(n(d.minimal.ring, 0)).toBe(0);
+    for (const tier of TIERS) expect(d[tier].plates).toBe(6);
+  });
+
+  it('binds Life Covenant with one strand and the sigil on minimal, no flare below full', async () => {
+    const d = await atTiers((f) => {
+      f.kit.lifeCovenant.bind(1, 2);
+      for (let i = 0; i < 6; i++) f.kit.update(0.05, false);
+      return f.drawn(f.kit.lifeCovenant);
+    });
+    thinsOut(d);
+    for (const tier of TIERS) expect(n(d[tier], 1)).toBe(1);
+    expect(n(d.full, 2)).toBe(1);
+    expect(n(d.light, 2)).toBe(0);
+    expect(n(d.light, 0)).toBe(n(d.full, 0));
+    expect(n(d.minimal, 0)).toBe(n(d.full, 0) / 2);
+  });
+
+  it('takes Sacred Form with the column and sign on every tier, the ring and flare above minimal', async () => {
+    const entry = await atTiers((f) => {
+      f.kit.sacredForm.enter(2);
+      f.kit.update(0.4, false);
+      return f.drawn(f.kit.sacredForm);
+    });
+    thinsOut(entry);
+    for (const tier of TIERS) {
+      expect(n(entry[tier], 1)).toBe(1);
+      expect(n(entry[tier], 0)).toBe(1);
+    }
+    expect(n(entry.full, 2)).toBe(1);
+    expect(n(entry.light, 2)).toBe(0);
+    expect(n(entry.light, 4)).toBe(1);
+    expect(n(entry.minimal, 4)).toBe(0);
+    // Held: the sign and the halo always, fewer motes drifting up.
+    const held = await atTiers((f) => {
+      for (let i = 0; i < 3; i++) {
+        f.kit.presence(f.entity(2, [aura('sacred_form', 'sacred_form')]));
+        f.kit.update(0.1, false);
+      }
+      return f.drawn(f.kit.sacredForm);
+    });
+    for (const tier of TIERS) {
+      expect(n(held[tier], 0)).toBe(1);
+      expect(n(held[tier], 5)).toBe(1);
+    }
+    expect(n(held.minimal, 3)).toBeLessThan(n(held.full, 3));
+  });
+
+  it("thins Dawn's Embrace through the cast and its healing, pluses on every tier", async () => {
+    const cast = await atTiers((f) => {
+      f.kit.dawnsEmbrace.channel(1, 2, 0.5);
+      f.kit.update(0.05, false);
+      return f.drawn(f.kit.dawnsEmbrace);
+    });
+    thinsOut(cast, false);
+    for (const tier of TIERS) {
+      expect(n(cast[tier], 7)).toBe(1);
+      expect(n(cast[tier], 1)).toBe(n(cast.full, 1));
+    }
+    expect(n(cast.full, 0) + n(cast.full, 2)).toBe(2);
+    expect(n(cast.minimal, 0) + n(cast.minimal, 2)).toBe(0);
+    expect(n(cast.minimal, 5)).toBeLessThan(n(cast.full, 5));
+    const healed = await atTiers((f) => {
+      f.kit.dawnsEmbrace.embrace(1, 2);
+      f.kit.update(0.6, false);
+      return f.drawn(f.kit.dawnsEmbrace);
+    });
+    thinsOut(healed);
+    expect(n(healed.full, 3)).toBeGreaterThan(0);
+    expect(n(healed.light, 3)).toBe(0);
+    expect(n(healed.light, 4)).toBe(1);
+    expect(n(healed.minimal, 4)).toBe(0);
+    expect(n(healed.minimal, 6)).toBeGreaterThan(0);
+    expect(n(healed.minimal, 6)).toBeLessThan(n(healed.light, 6));
+  });
+
+  it('thins Radiant Chorus: the sun, burst, reach wave and ribbons stay, the rest sheds', async () => {
+    const cast = await atTiers((f) => {
+      f.kit.radiantChorus.channel(1, 0.5);
+      f.kit.update(0.05, false);
+      return f.drawn(f.kit.radiantChorus);
+    });
+    thinsOut(cast);
+    for (const tier of TIERS) expect(n(cast[tier], 7)).toBe(1);
+    expect(n(cast.light, 0)).toBe(1);
+    expect(n(cast.minimal, 0) + n(cast.minimal, 10)).toBe(0);
+    expect(n(cast.minimal, 1)).toBeLessThan(n(cast.full, 1));
+    const burst = await atTiers((f) => {
+      f.kit.radiantChorus.release(1);
+      f.kit.healed(1, 2, 'Radiant Chorus');
+      f.kit.update(0.05, false);
+      return f.drawn(f.kit.radiantChorus);
+    });
+    thinsOut(burst);
+    for (const tier of TIERS) {
+      expect(n(burst[tier], 8)).toBe(1);
+      expect(n(burst[tier], 2)).toBe(n(burst.full, 2));
+    }
+    expect(n(burst.full, 3)).toBe(2);
+    expect(n(burst.light, 3)).toBe(0);
+    expect(n(burst.light, 6)).toBe(2);
+    expect(n(burst.minimal, 6)).toBe(1);
+    expect(n(burst.minimal, 9)).toBeLessThan(n(burst.light, 9));
+  });
+
+  it('keeps the Sacred Goad lance, burst and brand on every tier, the call and circle above minimal', async () => {
+    const d = await atTiers((f) => {
+      f.kit.sacredGoad.goad(1, 3);
+      f.kit.update(0.05, false);
+      const call = f.drawn(f.kit.sacredGoad);
+      for (let i = 0; i < 4; i++) f.kit.update(0.05, false);
+      return { call, struck: f.drawn(f.kit.sacredGoad) };
+    });
+    for (const tier of TIERS) {
+      expect(n(d[tier].call, 0)).toBe(1);
+      expect(n(d[tier].struck, 3)).toBe(1);
+      expect(n(d[tier].struck, 1)).toBeGreaterThanOrEqual(1);
+    }
+    // The brand over the head; above minimal the call's sign still fades too.
+    expect(n(d.minimal.struck, 1)).toBe(1);
+    expect(n(d.light.struck, 1)).toBe(2);
+    expect(n(d.minimal.call, 5) + n(d.minimal.call, 1) + n(d.minimal.call, 7)).toBe(0);
+    expect(n(d.full.struck, 2)).toBe(1);
+    expect(n(d.light.struck, 2)).toBe(0);
+    expect(n(d.light.struck, 6)).toBe(1);
+    expect(n(d.minimal.struck, 6) + n(d.minimal.struck, 4)).toBe(0);
+    thinsOut({ full: d.full.struck, light: d.light.struck, minimal: d.minimal.struck });
+  });
+
+  it('lands the Vowkeeper starburst on every tier, shaft and shock above minimal', async () => {
+    const d = await atTiers((f) => {
+      f.kit.vowkeeperStrike.strike(1, 3, 'damage');
+      f.kit.update(0.05, false);
+      return f.drawn(f.kit.vowkeeperStrike);
+    });
+    thinsOut(d);
+    for (const tier of TIERS) expect(n(d[tier], 0)).toBe(1);
+    expect(n(d.full, 2)).toBe(1);
+    expect(n(d.light, 2)).toBe(0);
+    expect(n(d.light, 6) + n(d.light, 5)).toBe(2);
+    expect(n(d.minimal, 6) + n(d.minimal, 5)).toBe(0);
+    expect(n(d.minimal, 4)).toBeGreaterThan(0);
+  });
+
+  it('flies the bare Sunward Disc on minimal and bursts it without the flare below full', async () => {
+    const d = await atTiers((f) => {
+      f.kit.sunwardDisc.hurl(1, 3);
+      f.kit.update(0.05, false);
+      const flight = f.drawn(f.kit.sunwardDisc);
+      f.kit.sunwardDisc.strike(1, 3, 0, 2);
+      f.kit.update(0.05, false);
+      return { flight, impact: f.drawn(f.kit.sunwardDisc) };
+    });
+    for (const tier of TIERS) {
+      expect(n(d[tier].flight, 0)).toBe(1);
+      expect(n(d[tier].impact, 3)).toBe(1);
+    }
+    expect(n(d.light.flight, 1)).toBe(1);
+    expect(n(d.minimal.flight, 1) + n(d.minimal.flight, 5)).toBe(0);
+    expect(n(d.full.impact, 2)).toBe(1);
+    expect(n(d.light.impact, 2)).toBe(0);
+    thinsOut({ full: d.full.flight, light: d.light.flight, minimal: d.minimal.flight });
+    thinsOut({ full: d.full.impact, light: d.light.impact, minimal: d.minimal.impact });
+  });
+
+  it('drives one Bastion Sweep outline on minimal and drops the flares below full', async () => {
+    const d = await atTiers((f) => {
+      f.kit.bastionSweep.sweep(1, 8, 180, 0);
+      f.kit.update(0.1, false);
+      const windup = f.drawn(f.kit.bastionSweep);
+      for (let i = 0; i < 3; i++) f.kit.update(0.1, false);
+      f.kit.bastionSweep.strike(3);
+      f.kit.update(0.02, false);
+      return { windup, blow: f.drawn(f.kit.bastionSweep) };
+    });
+    expect(n(d.minimal.windup, 6)).toBeLessThan(n(d.full.windup, 6));
+    expect(n(d.minimal.windup, 6)).toBeGreaterThan(0);
+    for (const tier of TIERS) {
+      expect(n(d[tier].blow, 1)).toBe(1);
+      expect(n(d[tier].blow, 3)).toBe(1);
+      expect(n(d[tier].blow, 5)).toBeGreaterThan(0);
+    }
+    expect(n(d.full.blow, 5)).toBe(n(d.light.blow, 5));
+    expect(n(d.minimal.blow, 5)).toBe(1);
+    expect(n(d.full.blow, 2)).toBe(2);
+    expect(n(d.light.blow, 2)).toBe(0);
+    thinsOut({ full: d.full.blow, light: d.light.blow, minimal: d.minimal.blow });
+  });
+
+  it('holds every Oath Chain link and the shackle on every tier, the furrow above minimal', async () => {
+    const pulled = { ...aura('oath_chain_pull', 'forced_move'), sourceId: 1 };
+    const slowed = { ...aura('oath_chain_slow', 'slow'), sourceId: 1 };
+    const d = await atTiers((f) => {
+      f.kit.oathChain.lash(1, 3);
+      for (let i = 0; i < 6; i++) {
+        f.kit.presence(f.entity(3, [pulled]));
+        f.kit.update(0.05, false);
+      }
+      const held = f.drawn(f.kit.oathChain);
+      let motes = 0;
+      for (let i = 0; i < 10; i++) {
+        f.kit.presence(f.entity(3, [slowed]));
+        f.kit.update(0.05, false);
+        motes += n(f.drawn(f.kit.oathChain), 5);
+      }
+      return { held, motes };
+    });
+    for (const tier of TIERS) {
+      expect(n(d[tier].held, 0) + n(d[tier].held, 1)).toBe(n(d.full.held, 0) + n(d.full.held, 1));
+      expect(n(d[tier].held, 3)).toBe(1);
+    }
+    expect(n(d.full.held, 2)).toBe(1);
+    expect(n(d.light.held, 2)).toBe(0);
+    expect(n(d.light.held, 6)).toBe(1);
+    expect(n(d.minimal.held, 6)).toBe(0);
+    thinsOut({ full: d.full.held, light: d.light.held, minimal: d.minimal.held });
+    // The chain still shatters into motes on every tier, fewer of them.
+    expect(d.minimal.motes).toBeGreaterThan(0);
+    expect(d.minimal.motes).toBeLessThan(d.light.motes);
+    expect(d.light.motes).toBeLessThan(d.full.motes);
+  });
+
+  it('keeps the Veilbound shroud, eye, snap and reach ring on every tier, the streamers above minimal', async () => {
+    const marched = aura('veilbound_march', 'buff_speed');
+    const marked = aura('veilbound_mark', 'dot');
+    const d = await atTiers((f) => {
+      for (let i = 0; i < 6; i++) {
+        f.kit.presence(f.entity(1, [marched]));
+        f.kit.presence(f.entity(2, [marked]));
+        f.kit.update(0.05, false);
+      }
+      const marching = f.drawn(f.kit.veilboundMarch);
+      f.kit.veilboundMarch.strike(1, 2);
+      f.kit.veilboundMarch.burst(1, 0, 0);
+      f.kit.presence(f.entity(2, [marked]));
+      f.kit.update(0.016, false);
+      return { marching, struck: f.drawn(f.kit.veilboundMarch) };
+    });
+    for (const tier of TIERS) {
+      expect(n(d[tier].marching, 8)).toBe(1);
+      expect(n(d[tier].marching, 1)).toBe(1);
+      expect(n(d[tier].struck, 7)).toBe(1);
+      expect(n(d[tier].struck, 3)).toBe(1);
+    }
+    expect(n(d.light.marching, 0)).toBe(n(d.full.marching, 0));
+    expect(n(d.minimal.marching, 0)).toBe(0);
+    expect(n(d.full.struck, 2)).toBeGreaterThan(0);
+    expect(n(d.light.struck, 2)).toBe(0);
+    expect(n(d.light.struck, 9)).toBeGreaterThan(0);
+    expect(n(d.minimal.struck, 9)).toBe(0);
+    thinsOut({ full: d.full.marching, light: d.light.marching, minimal: d.minimal.marching });
+    thinsOut({ full: d.full.struck, light: d.light.struck, minimal: d.minimal.struck });
+  });
+
+  it('keeps a held effect at the detail its presence started with', async () => {
+    // Taken at minimal, Sacred Form keeps its thinned motes when the detail
+    // rises mid-hold; a form taken afresh draws the full set.
+    setPaladinVfxDetailForTest('minimal');
+    const f = fixture();
+    await f.prepare();
+    const hold = (frames: number) => {
+      for (let i = 0; i < frames; i++) {
+        f.kit.presence(f.entity(2, [aura('sacred_form', 'sacred_form')]));
+        f.kit.update(0.1, false);
+      }
+      return n(f.drawn(f.kit.sacredForm), 3);
+    };
+    const thin = hold(3);
+    // A third of the form's six motes.
+    expect(thin).toBe(2);
+    setPaladinVfxDetailForTest('full');
+    expect(hold(1)).toBe(2);
+    for (let i = 0; i < 10; i++) {
+      f.kit.presence(f.entity(2));
+      f.kit.update(0.1, false);
+    }
+    expect(f.drawn(f.kit.sacredForm).size).toBe(0);
+    expect(hold(3)).toBeGreaterThan(thin);
+  });
+});
+
+describe('Paladin kit detail tiers: heals and lances', () => {
+  afterEach(() => setPaladinVfxDetailForTest(null));
+
+  it('brings the Beacon of Light down as one column on every tier, its ground light and wave above minimal', async () => {
+    // Shapes: 0 halo, 1 beacon, 2 wave, 3 flare, 4 ground, 5 thread, 6 mote.
+    const landing = await atTiers((f) => {
+      f.kit.beaconOfLight.kindle(2);
+      for (let i = 0; i < 6; i++) f.kit.update(0.05, false);
+      return f.drawn(f.kit.beaconOfLight);
+    });
+    thinsOut(landing);
+    for (const tier of TIERS) expect(n(landing[tier], 1)).toBe(1);
+    expect(n(landing.full, 3)).toBe(1);
+    expect(n(landing.light, 3)).toBe(0);
+    for (const shape of [2, 4]) {
+      expect(n(landing.full, shape)).toBe(1);
+      expect(n(landing.light, shape)).toBe(1);
+      expect(n(landing.minimal, shape)).toBe(0);
+    }
+    expect(n(landing.full, 6)).toBe(10);
+    expect(n(landing.light, 6)).toBe(5);
+    expect(n(landing.minimal, 6)).toBe(3);
+    // A copied heal: the halo and the thread on every tier, the flares on full only.
+    const copy = await atTiers((f) => {
+      f.kit.presence(f.entity(3, [aura('beacon_of_light', 'beacon_of_light')]));
+      f.kit.healed(1, 2, 'Mending Light');
+      f.kit.healed(1, 3, 'Beacon of Light');
+      f.kit.update(0.1, false);
+      return f.drawn(f.kit.beaconOfLight);
+    });
+    thinsOut(copy, false);
+    for (const tier of TIERS) {
+      expect(n(copy[tier], 0)).toBe(1);
+      expect(n(copy[tier], 5)).toBe(n(copy.full, 5));
+    }
+    expect(n(copy.full, 5)).toBeGreaterThan(0);
+    expect(n(copy.full, 3)).toBeGreaterThanOrEqual(1);
+    expect(n(copy.light, 3)).toBe(0);
+  });
+
+  it('forms and hurls the same Mercy Lance on every tier, its streaks, crit ring and shards above minimal', async () => {
+    // Shapes: 0 lance, 1 streak, 2 flare, 3 ring, 4 shard, 5 mote.
+    const forming = await atTiers((f) => {
+      f.kit.presence(
+        f.entity(1, [], {
+          castingAbility: 'mercy_lance',
+          castTotal: 1.75,
+          castRemaining: 0.8,
+          castTargetId: 3,
+        }),
+      );
+      f.kit.update(0.05, false);
+      return f.drawn(f.kit.mercyLance);
+    });
+    for (const tier of TIERS) expect(n(forming[tier], 0)).toBe(1);
+    expect(n(forming.full, 2)).toBe(1);
+    expect(n(forming.light, 2)).toBe(0);
+    expect(n(forming.light, 5)).toBeLessThan(n(forming.full, 5));
+    expect(n(forming.minimal, 5)).toBeLessThan(n(forming.light, 5));
+    // A critical strike, driven through.
+    const strike = await atTiers((f) => {
+      expect(f.kit.mercyLance.strike(1, 3, 'damage', true)).toBe(true);
+      for (let i = 0; i < 4; i++) f.kit.update(0.05, false);
+      return f.drawn(f.kit.mercyLance);
+    });
+    thinsOut(strike);
+    for (const tier of TIERS) {
+      expect(n(strike[tier], 0)).toBe(1);
+      expect(n(strike[tier], 3)).toBeGreaterThanOrEqual(1);
+    }
+    expect(n(strike.full, 2)).toBe(1);
+    expect(n(strike.light, 2)).toBe(0);
+    expect(n(strike.full, 3)).toBe(2);
+    expect(n(strike.light, 3)).toBe(2);
+    expect(n(strike.minimal, 3)).toBe(1);
+    expect(n(strike.light, 1)).toBe(n(strike.full, 1));
+    expect(n(strike.minimal, 1)).toBe(0);
+    expect(n(strike.full, 4)).toBe(10);
+    expect(n(strike.light, 4)).toBe(5);
+    expect(n(strike.minimal, 4)).toBe(0);
+  });
+
+  it('pours the same Solar Invocation shaft on every tier and bursts it into fewer pluses below full', async () => {
+    // Shapes: 1 sun, 2 beam, 3 haze, 4 ground, 5 flare, 6 spark, 7 ring,
+    // 8 splash, 9 plus, 10 burst, 11 shock, 12 scorch.
+    const strike = await atTiers((f) => {
+      expect(f.kit.solarInvocation.invoke(1, 3, false)).toBe(true);
+      f.kit.update(0.25, false);
+      return f.drawn(f.kit.solarInvocation);
+    });
+    thinsOut(strike);
+    for (const tier of TIERS) {
+      expect(n(strike[tier], 1)).toBe(1);
+      expect(n(strike[tier], 2)).toBe(1);
+    }
+    for (const shape of [3, 4, 8, 11]) {
+      expect(n(strike.full, shape)).toBe(1);
+      expect(n(strike.light, shape)).toBe(1);
+      expect(n(strike.minimal, shape)).toBe(0);
+    }
+    expect(n(strike.full, 7)).toBe(n(strike.light, 7));
+    expect(n(strike.minimal, 7)).toBe(0);
+    for (const shape of [5, 12]) {
+      expect(n(strike.full, shape)).toBe(1);
+      expect(n(strike.light, shape)).toBe(0);
+    }
+    expect(n(strike.light, 6)).toBeLessThan(n(strike.full, 6));
+    expect(n(strike.minimal, 6)).toBeLessThan(n(strike.light, 6));
+    const heal = await atTiers((f) => {
+      expect(f.kit.solarInvocation.invoke(1, 2, true)).toBe(true);
+      f.kit.update(INVOKE_BURST + 0.1, false);
+      return f.drawn(f.kit.solarInvocation);
+    });
+    thinsOut(heal);
+    expect(n(heal.full, 9)).toBe(14);
+    expect(n(heal.light, 9)).toBe(7);
+    expect(n(heal.minimal, 9)).toBe(4);
+    expect(n(heal.full, 5)).toBe(1);
+    expect(n(heal.light, 5)).toBe(0);
+    expect(n(heal.light, 10)).toBe(1);
+    expect(n(heal.minimal, 10)).toBe(0);
   });
 });

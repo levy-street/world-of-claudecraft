@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   DEVOTION_KINDS,
   DEVOTION_LIFE,
@@ -8,6 +8,9 @@ import {
   isDevotionKind,
 } from '../src/render/ability_vfx/devotion_rings';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 
 function fixture() {
   const scene = new THREE.Scene();
@@ -56,6 +59,9 @@ function fixture() {
 }
 
 describe('Requital Aura and the Devotions', () => {
+  beforeEach(() => setPaladinVfxDetailForTest('full'));
+  afterEach(() => setPaladinVfxDetailForTest(null));
+
   it('knows the five party auras', () => {
     expect([...DEVOTION_KINDS].sort()).toEqual(
       [
@@ -116,6 +122,10 @@ describe('Requital Aura and the Devotions', () => {
     const fx = { castPaladinShieldSigil: vi.fn(), devotionRing: vi.fn() };
     const releaseGesture = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx },
       releaseGesture,
     }) as AbilityVfx;
@@ -147,6 +157,10 @@ describe('Requital Aura and the Devotions', () => {
     const sequenceInstant = vi.fn();
     const anchor = vi.fn(() => ({ x: 1, y: 2, z: 3 }));
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx: { sequenceInstant }, vfx: { burst }, anchor },
     }) as AbilityVfx;
     // The defender (1) reflects onto the attacker (7); only the name rides it.
@@ -166,5 +180,41 @@ describe('Requital Aura and the Devotions', () => {
     // A blow fully avoided shows nothing.
     expect(p.onDamage({ ...hit, amount: 0, kind: 'miss' })).toBe(true);
     expect(burst).toHaveBeenCalledOnce();
+  });
+
+  it('draws lighter at lower detail: the same ring, fewer motes, a shorter fade', async () => {
+    // Quads drawn (ring, motes) once every mote is up, and how long the ring lasts.
+    const run = async (detail: PaladinVfxDetail) => {
+      setPaladinVfxDetailForTest(detail);
+      const f = fixture();
+      await f.prepare();
+      f.effect.spawn('radiant_devotion', 1, 1);
+      for (let t = 0; t < 0.9; t += 0.05) f.effect.update(0.05);
+      const g = f.effect.mesh.geometry;
+      const shape = g.getAttribute('aShape');
+      let motes = 0;
+      for (let i = 0; i < g.drawRange.count; i += 6) if (shape.getX(i) > 4.5) motes++;
+      const ring = f.rings();
+      let life = 0.9;
+      while (f.effect.mesh.visible && life < DEVOTION_LIFE + 1) {
+        f.effect.update(0.05);
+        life += 0.05;
+      }
+      f.effect.dispose();
+      return { ring, motes, life };
+    };
+    const full = await run('full');
+    const light = await run('light');
+    const minimal = await run('minimal');
+    // The core ring with its figure draws on every tier.
+    for (const tier of [full, light, minimal])
+      expect(tier.ring.map((r) => r.shape)).toEqual([DEVOTION_KINDS.indexOf('radiant_devotion')]);
+    expect(full.motes).toBe(6);
+    expect(light.motes).toBeLessThan(full.motes);
+    expect(light.motes).toBeGreaterThan(0);
+    expect(minimal.motes).toBeLessThan(light.motes);
+    expect(minimal.motes).toBeGreaterThan(0);
+    expect(light.life).toBeLessThan(full.life);
+    expect(minimal.life).toBeLessThan(light.life);
   });
 });

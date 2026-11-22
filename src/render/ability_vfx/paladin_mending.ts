@@ -7,6 +7,21 @@ import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect
 import { HEAL_PLUS_GLSL, HEAL_PLUS_QUAD } from './heal_plus';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
 import { PALADIN_SPEC_EMBLEM_GLSL, paladinSpecEmblemIndex } from './paladin_spec_emblems';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = Mending Light's charging plus over the head, its stream and
+// the plus sigil on the ally; Last Rite's plus in the off-hand, its beam, the
+// halo of pluses and the rune sigil at the ally's feet; secondary = the glow
+// behind the charge, the ring and the two mending threads on the ally, the
+// gathering glow in the off-hand and the pillar from the sky; accents = the
+// landing and release flares (gathering, riding and rising pluses scale with
+// count, the blooms' fade tails with linger).
 
 export const MENDING_CASTERS = 6;
 export const MENDING_CASTS = 8;
@@ -67,6 +82,8 @@ interface Caster {
   tickAt: number;
   rate: number;
   presence: number;
+  /** How much of the charge draws, read when the cast began. */
+  detail: PaladinVfxDetail;
 }
 interface Cast {
   active: boolean;
@@ -74,6 +91,7 @@ interface Cast {
   target: number;
   age: number;
   self: boolean;
+  detail: PaladinVfxDetail;
 }
 interface Rite {
   active: boolean;
@@ -84,6 +102,7 @@ interface Rite {
   floor: number;
   /** PALADIN_SPEC_EMBLEMS index of the caster's spec. */
   spec: number;
+  detail: PaladinVfxDetail;
 }
 
 function ramp(t: number, from: number, to: number): number {
@@ -166,6 +185,7 @@ export class PaladinMending {
     tickAt: 0,
     rate: 0,
     presence: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly casts: Cast[] = Array.from({ length: MENDING_CASTS }, () => ({
     active: false,
@@ -173,6 +193,7 @@ export class PaladinMending {
     target: -1,
     age: 0,
     self: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly rites: Rite[] = Array.from({ length: MENDING_RITES }, () => ({
     active: false,
@@ -182,6 +203,7 @@ export class PaladinMending {
     self: false,
     floor: 0,
     spec: 1,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly positions = new Float32Array(VERTICES * 3);
   private readonly colors = new Float32Array(VERTICES * 3);
@@ -333,6 +355,7 @@ export class PaladinMending {
       slot.id = caster;
       slot.presence = 0;
       slot.shown = -1;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.seen = true;
     slot.progress = Number.isFinite(progress) ? Math.min(1, Math.max(0, progress)) : 0;
@@ -364,6 +387,7 @@ export class PaladinMending {
     slot.target = target;
     slot.age = 0;
     slot.self = source === target;
+    slot.detail = paladinVfxDetailNow();
     // The gathered light is spent.
     const caster = this.casters.find((c) => c.active && c.id === source);
     if (caster) caster.active = false;
@@ -384,6 +408,7 @@ export class PaladinMending {
     slot.age = 0;
     slot.self = source === target;
     slot.spec = paladinSpecEmblemIndex(spec);
+    slot.detail = paladinVfxDetailNow();
     slot.floor = effectFloor(this.groundY?.(this.feet.x, this.feet.z), this.feet.y);
     return true;
   }
@@ -607,7 +632,10 @@ export class PaladinMending {
     // Each plus's single flight from its own random place round the charge,
     // and a gentle swell of the big plus as each arrives.
     let swell = 0;
-    for (let i = 0; i < MENDING_GATHER_PLUSES; i++) {
+    // The lighter tiers draw fewer of them, still spread through the whole cast.
+    const pluses = paladinDetailCount(MENDING_GATHER_PLUSES, s.detail);
+    for (let j = 0; j < pluses; j++) {
+      const i = Math.floor((j * MENDING_GATHER_PLUSES) / pluses);
       const flight = gatherFlight(i);
       const since = p - gatherStart(i) - flight;
       swell += Math.exp(-(((since - 0.02) / 0.05) ** 2));
@@ -632,15 +660,16 @@ export class PaladinMending {
       );
     }
     swell = Math.min(1, swell);
-    this.billboard(
-      x,
-      y,
-      z,
-      0.3 + 0.4 * p + 0.05 * swell,
-      IVORY,
-      k * (0.45 + 0.5 * p + 0.25 * swell),
-      SHAPE.flare,
-    );
+    if (paladinDetailScale(s.detail).secondary)
+      this.billboard(
+        x,
+        y,
+        z,
+        0.3 + 0.4 * p + 0.05 * swell,
+        IVORY,
+        k * (0.45 + 0.5 * p + 0.25 * swell),
+        SHAPE.flare,
+      );
     this.time = this.clock;
     this.billboard(
       x,
@@ -657,7 +686,13 @@ export class PaladinMending {
   private mending(s: Cast, dt: number, reduced: boolean): void {
     s.age += dt;
     const travel = s.self ? 0 : MENDING_TRAVEL;
-    if (s.age >= travel + MENDING_BLOOM || !this.anchor(s.target, 0, this.feet)) {
+    const scale = paladinDetailScale(s.detail);
+    // The bloom fades sooner on the lighter tiers.
+    const bloom =
+      s.detail === 'full'
+        ? MENDING_BLOOM
+        : MENDING_BLOOM * 0.55 + paladinDetailLinger(MENDING_BLOOM * 0.45, s.detail);
+    if (s.age >= travel + bloom || !this.anchor(s.target, 0, this.feet)) {
       s.active = false;
       return;
     }
@@ -707,7 +742,8 @@ export class PaladinMending {
             SHAPE.ribbon,
           );
         }
-      for (let i = 0; i < 3; i++) {
+      const riders = paladinDetailCount(3, s.detail);
+      for (let i = 0; i < riders; i++) {
         const u = head - 0.05 - i * 0.2;
         if (u <= tail) break;
         const q = bendAt(b, u, this.pointA);
@@ -717,10 +753,10 @@ export class PaladinMending {
     const since = t - travel;
     if (since < 0) return;
     // The mending lands: a flash, a plus sigil and a halo on the ally.
-    const fade = 1 - ramp(since, MENDING_BLOOM * 0.55, MENDING_BLOOM);
-    this.billboard(tx, ty, tz, 1.1, IVORY, Math.exp(-since * 8), SHAPE.flare);
+    const fade = 1 - ramp(since, MENDING_BLOOM * 0.55, bloom);
+    if (scale.accents) this.billboard(tx, ty, tz, 1.1, IVORY, Math.exp(-since * 8), SHAPE.flare);
     this.time = since;
-    this.billboard(tx, ty, tz, 0.9, GOLD, fade * 0.9, SHAPE.ring);
+    if (scale.secondary) this.billboard(tx, ty, tz, 0.9, GOLD, fade * 0.9, SHAPE.ring);
     this.billboard(
       tx,
       ty + 0.1 + since * 0.4,
@@ -730,7 +766,7 @@ export class PaladinMending {
       fade,
       SHAPE.plus,
     );
-    if (reduced) return;
+    if (reduced || !scale.secondary) return;
     // Two threads of light spiral up around them, mending.
     this.time = this.clock;
     const n = MENDING_THREAD_SEGMENTS;
@@ -759,7 +795,12 @@ export class PaladinMending {
   /** Last Rite: beam, the great plus, pillar, ground sigil and a flight of pluses. */
   private lastRite(s: Rite, dt: number, reduced: boolean): void {
     s.age += dt;
-    if (s.age >= LAST_RITE_DURATION || !this.anchor(s.target, 0, this.feet)) {
+    const scale = paladinDetailScale(s.detail);
+    // Its fade tail shortens on the lighter tiers.
+    const full = LAST_RITE_DURATION - LAST_RITE_WINDUP;
+    const life =
+      s.detail === 'full' ? full : full * 0.6 + paladinDetailLinger(full * 0.4, s.detail);
+    if (s.age >= LAST_RITE_WINDUP + life || !this.anchor(s.target, 0, this.feet)) {
       s.active = false;
       return;
     }
@@ -774,22 +815,22 @@ export class PaladinMending {
       if (hand) {
         const k = ramp(s.age, 0, LAST_RITE_WINDUP);
         this.time = this.clock;
-        this.billboard(
-          this.from.x,
-          this.from.y,
-          this.from.z,
-          0.4 + 0.6 * k,
-          IVORY,
-          0.4 + k,
-          SHAPE.flare,
-        );
+        if (scale.secondary)
+          this.billboard(
+            this.from.x,
+            this.from.y,
+            this.from.z,
+            0.4 + 0.6 * k,
+            IVORY,
+            0.4 + k,
+            SHAPE.flare,
+          );
         this.billboard(this.from.x, this.from.y, this.from.z, 0.2 + 0.25 * k, GOLD, k, SHAPE.plus);
       }
       return;
     }
     const t = s.age - LAST_RITE_WINDUP;
-    const life = LAST_RITE_DURATION - LAST_RITE_WINDUP;
-    const fade = 1 - ramp(t, life * 0.6, life);
+    const fade = 1 - ramp(t, full * 0.6, life);
     // A thick beam of light from the off-hand.
     if (!s.self && t < 0.5 && hand) {
       this.time = t;
@@ -797,7 +838,7 @@ export class PaladinMending {
       const w = 0.32 * (1 - ramp(t, 0.15, 0.5));
       this.segment(this.from, this.to, 0, 1, w, w, IVORY, 1, SHAPE.beam);
     }
-    if (hand && t < 0.5)
+    if (hand && t < 0.5 && scale.accents)
       this.billboard(
         this.from.x,
         this.from.y,
@@ -810,8 +851,9 @@ export class PaladinMending {
     // The pillar of light from the sky.
     this.time = t;
     const pillar = ramp(t, 0, 0.1) * (1 - ramp(t, 0.5, 1.1));
-    this.pillar(x, z, s.floor + 0.02, s.floor + 16, 1.2 * (1 - 0.4 * ramp(t, 0, 0.8)), pillar);
-    this.billboard(x, chest, z, 2.2, IVORY, Math.exp(-t * 6) * 1.3, SHAPE.flare);
+    if (scale.secondary)
+      this.pillar(x, z, s.floor + 0.02, s.floor + 16, 1.2 * (1 - 0.4 * ramp(t, 0, 0.8)), pillar);
+    if (scale.accents) this.billboard(x, chest, z, 2.2, IVORY, Math.exp(-t * 6) * 1.3, SHAPE.flare);
     // A halo of pluses crowns them, spinning, then settles down over them to the runes.
     const appear = ramp(t, 0.05, 0.3);
     const settle = ramp(t, 0.7, 1.15);
@@ -835,7 +877,7 @@ export class PaladinMending {
     }
     // It lands with a flash at their feet.
     const landed = ramp(t, 1.05, 1.5);
-    if (landed > 0)
+    if (landed > 0 && scale.accents)
       this.billboard(
         x,
         s.floor + 0.35,
@@ -851,9 +893,10 @@ export class PaladinMending {
     this.quad(x, s.floor + 0.04, z, r, 0, 0, 0, 0, r, GOLD, fade, SHAPE.sigil + s.spec);
     if (reduced) return;
     // A flight of pluses rising all around them.
-    for (let i = 0; i < LAST_RITE_PLUSES; i++) {
+    const rising = paladinDetailCount(LAST_RITE_PLUSES, s.detail);
+    for (let i = 0; i < rising; i++) {
       const start = 0.15 + 0.05 * (i % 6);
-      const life = 1.1 + 0.3 * hash(i, 1);
+      const life = paladinDetailLinger(1.1 + 0.3 * hash(i, 1), s.detail);
       const tt = t - start;
       if (tt < 0 || tt >= life) continue;
       const ang = i * 2.399963;

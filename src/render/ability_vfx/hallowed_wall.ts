@@ -3,6 +3,8 @@ import { forgetHallowedWallBlock, noteHallowedWallBlock } from '../paladin_shiel
 import type { CrestPrewarmHost } from './crest_prewarm';
 import { KIT_GOLD, type PaladinKitContext } from './paladin_kit_context';
 import { PaladinQuadPool } from './paladin_quad_pool';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import { type PaladinVfxDetail, paladinDetailScale } from './paladin_vfx_detail_core';
 import { WardOfFaith } from './ward_of_faith';
 
 export const WALLS = 8;
@@ -25,6 +27,8 @@ interface Wall {
   span: number;
   /** Empowered by Ascension: a gold rim on each plate, a brighter edge. */
   gilded: boolean;
+  /** The Paladin detail read when the wall rose (or was cast again). */
+  detail: PaladinVfxDetail;
 }
 
 /**
@@ -38,6 +42,10 @@ interface Wall {
  * while it stands, the ring runs out again; empowered by Ascension (its
  * stronger block and absorb), every plate is gilded with a gold rim and a
  * brighter edge and the ring burns brighter.
+ *
+ * Detail: core = the ring of shield plates (ward_of_faith.ts, drawn on every
+ * tier); secondary = the threat ring running out across the ground; accents =
+ * none of its own. Light keeps both; minimal draws the plates alone.
  */
 export class HallowedWall {
   private readonly pool: PaladinQuadPool<'hallowed_wall'>;
@@ -50,6 +58,7 @@ export class HallowedWall {
     age: 0,
     span: 1,
     gilded: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   /** Ascension cues that came before their wall's aura: seconds waited. */
   private readonly pendingGild = new Map<number, number>();
@@ -89,6 +98,7 @@ export class HallowedWall {
       slot.age = 0;
       slot.span = Math.max(1, remaining);
       slot.gilded = false;
+      slot.detail = paladinVfxDetailNow();
       // Just raised: the plates spin out of the sigil (Faithwarden's sign).
       this.plates.raise(id, 'protection');
     }
@@ -113,6 +123,8 @@ export class HallowedWall {
     slot.age = 0;
     slot.span = 0;
     slot.gilded = false;
+    // A new cast: its ring draws at this cast's detail.
+    slot.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -140,7 +152,7 @@ export class HallowedWall {
         continue;
       }
       w.seen = false;
-      if (w.age < WALL_RING) {
+      if (w.age < WALL_RING && paladinDetailScale(w.detail).secondary) {
         const floor = this.ctx.groundY(this.feet.x, this.feet.z);
         const y = Number.isFinite(floor) ? Math.max(floor, this.feet.y - 0.3) : this.feet.y;
         pool.time = w.age;

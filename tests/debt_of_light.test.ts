@@ -1,7 +1,10 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DebtOfLight } from '../src/render/ability_vfx/debt_of_light';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import {
   DEBT_CAPACITY,
   DEBT_VERTEX_BUDGET,
@@ -30,6 +33,9 @@ async function fixture() {
   };
 }
 describe('Debt of Light', () => {
+  // Node runs at the Medium preset: pin the authored composition.
+  beforeEach(() => setPaladinVfxDetailForTest('full'));
+  afterEach(() => setPaladinVfxDetailForTest(null));
   it('suppresses generic aura swirls for Debt while preserving other buffs', () => {
     const buffSwirl = vi.fn();
     const renderer = {
@@ -166,6 +172,10 @@ describe('Debt of Light', () => {
     const fx = { debtOfLightReturn: vi.fn(), castPaladinShieldSigil: vi.fn() },
       receiveHit = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx, receiveHit },
       releaseGesture: vi.fn(),
     }) as AbilityVfx;
@@ -196,5 +206,51 @@ describe('Debt of Light', () => {
       [1, 2, true],
     ]);
     expect(receiveHit).toHaveBeenCalledOnce();
+  });
+  it('draws a lighter Debt on lower detail: the shield, spikes and flare stay, layers thin out', async () => {
+    const shapesAt = async (detail: PaladinVfxDetail, answer: boolean) => {
+      setPaladinVfxDetailForTest(detail);
+      const f = await fixture();
+      await f.prepare();
+      if (answer) f.effect.answer(1, 4);
+      else f.effect.hold(1);
+      f.effect.update(0.05, false);
+      const g = f.effect.mesh.geometry;
+      const shape = g.getAttribute('aShape');
+      const total = g.drawRange.count;
+      const counts = new Map<number, number>();
+      for (let i = 0; i < g.drawRange.count; i++)
+        counts.set(shape.getX(i), (counts.get(shape.getX(i)) ?? 0) + 1);
+      // The answer's lingering shield: still up at 0.4 s only at full.
+      f.effect.update(0.35, false);
+      const lingers = f.effect.mesh.visible;
+      f.effect.dispose();
+      return { total, counts, lingers };
+    };
+    const held = {
+      full: await shapesAt('full', false),
+      light: await shapesAt('light', false),
+      minimal: await shapesAt('minimal', false),
+    };
+    expect(held.light.total).toBeLessThan(held.full.total);
+    expect(held.minimal.total).toBeLessThan(held.light.total);
+    // Core: membrane (1), rim (3), spike cones (4) and the sun heart (5) on every tier.
+    for (const tier of Object.values(held))
+      for (const core of [1, 3, 4, 5]) expect(tier.counts.get(core) ?? 0).toBeGreaterThan(0);
+    // Secondary: the wisps (6) keep on light, drop on minimal.
+    expect(held.full.counts.get(6) ?? 0).toBeGreaterThan(0);
+    expect(held.light.counts.get(6)).toBe(held.full.counts.get(6));
+    expect(held.minimal.counts.get(6) ?? 0).toBe(0);
+    // Accents: the boss ring and rays (lines, 0) go below full.
+    expect(held.light.counts.get(0) ?? 0).toBeLessThan(held.full.counts.get(0) ?? 0);
+    const answered = {
+      full: await shapesAt('full', true),
+      minimal: await shapesAt('minimal', true),
+    };
+    expect(answered.minimal.total).toBeLessThan(answered.full.total);
+    // The attacker's impact flare (7) still lands; the shield lingers less.
+    expect(answered.minimal.counts.get(7) ?? 0).toBeGreaterThan(0);
+    expect(answered.full.lingers).toBe(true);
+    expect(answered.minimal.lingers).toBe(false);
   });
 });

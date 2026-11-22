@@ -15,6 +15,12 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 
 export const DISC_FLIGHTS = 12;
 export const DISC_IMPACTS = 12;
@@ -55,6 +61,8 @@ interface Flight {
   /** Seconds since the disc arrived (it holds for its impact cue). */
   arrived: number;
   spin: number;
+  /** The Paladin detail read when this leg was thrown (a leg home keeps its strike's). */
+  detail: PaladinVfxDetail;
 }
 interface Impact {
   active: boolean;
@@ -72,6 +80,8 @@ interface Impact {
   x: number;
   y: number;
   z: number;
+  /** The Paladin detail read when the blow fell. */
+  detail: PaladinVfxDetail;
 }
 interface Flash {
   id: number;
@@ -101,6 +111,12 @@ const SHIELD_GLSL = `
  * reaches takes a flare, a shield-shaped burst and a spray of sparks before it
  * ricochets on to the next, every bounce a little hotter. After the last it
  * flies home to the Paladin's hand, and their shield flashes as they catch it.
+ *
+ * Detail: core = the spinning shield, the shield-shaped burst on each enemy
+ * and a resisted blow's glint; secondary = the trail of light behind the
+ * shield and the motes streaming along it; accents = the flares of the strike
+ * and the catch. Light drops the flares and halves the motes and sparks;
+ * minimal flies the bare shield and bursts with a third of the sparks.
  */
 /** Seconds a struck enemy remembers whose shield struck it, for its bounces. */
 const SUNWARD_OWNER_TTL = 5;
@@ -122,6 +138,7 @@ export class SunwardDisc {
     dz: 1,
     arrived: -1,
     spin: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly impacts: Impact[] = Array.from({ length: DISC_IMPACTS }, () => ({
     active: false,
@@ -135,6 +152,7 @@ export class SunwardDisc {
     x: 0,
     y: 0,
     z: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   /** The held shield's flashes, on the throw and the catch. */
   private readonly flashes: Flash[] = [];
@@ -221,6 +239,7 @@ export class SunwardDisc {
     x: number,
     y: number,
     z: number,
+    detail: PaladinVfxDetail,
   ): void {
     let slot = this.flights.find((f) => !f.active);
     if (!slot) {
@@ -238,6 +257,7 @@ export class SunwardDisc {
     slot.x = x;
     slot.y = y;
     slot.z = z;
+    slot.detail = detail;
   }
 
   private flash(id: number): void {
@@ -264,7 +284,16 @@ export class SunwardDisc {
       if (!struck) return false;
       this.from.set(struck.x, struck.y, struck.z);
     }
-    this.newFlight(source, target, owner, false, this.from.x, this.from.y, this.from.z);
+    this.newFlight(
+      source,
+      target,
+      owner,
+      false,
+      this.from.x,
+      this.from.y,
+      this.from.z,
+      paladinVfxDetailNow(),
+    );
     return true;
   }
 
@@ -313,6 +342,7 @@ export class SunwardDisc {
     slot.x = this.at.x;
     slot.y = this.at.y;
     slot.z = this.at.z;
+    slot.detail = paladinVfxDetailNow();
     // The last hit: home at once; otherwise after a wait, unless it bounces.
     slot.homeIn = count > 0 && slot.level >= count - 1 ? 0.1 : DISC_RETURN_WAIT;
   }
@@ -384,7 +414,8 @@ export class SunwardDisc {
           f.active = false;
           this.flash(f.target);
           pool.time = 0;
-          pool.billboard(this.at.x, this.at.y, this.at.z, 0.8, KIT_IVORY, 1.2, SHAPE.flare);
+          if (paladinDetailScale(f.detail).accents)
+            pool.billboard(this.at.x, this.at.y, this.at.z, 0.8, KIT_IVORY, 1.2, SHAPE.flare);
           continue;
         }
         // Arrived: hold out of sight a moment for the impact cue.
@@ -395,6 +426,7 @@ export class SunwardDisc {
       }
       pool.time = reduced ? 0.4 : f.spin;
       pool.billboard(f.x, f.y, f.z, 0.72, KIT_WARM, 1.25, SHAPE.disc);
+      if (!paladinDetailScale(f.detail).secondary) continue;
       const trail = Math.min(f.age * PROJECTILE_SPEED, 2.6);
       pool.time = 0;
       pool.beam(
@@ -409,9 +441,10 @@ export class SunwardDisc {
         0.9,
         SHAPE.trail,
       );
+      const motes = paladinDetailCount(MOTES, f.detail);
       if (!reduced)
-        for (let i = 0; i < MOTES; i++) {
-          const back = trail * (0.15 + 0.85 * ((i + ((this.clock * 3) % 1)) / MOTES));
+        for (let i = 0; i < motes; i++) {
+          const back = trail * (0.15 + 0.85 * ((i + ((this.clock * 3) % 1)) / motes));
           const ang = hash01(i, 5) * Math.PI * 2 + this.clock * 4;
           const off = 0.12 * (back / Math.max(trail, 0.01));
           pool.billboard(
@@ -437,7 +470,7 @@ export class SunwardDisc {
       }
       if (im.sendHome && im.age >= im.homeIn) {
         im.sendHome = false;
-        this.newFlight(im.target, im.owner, im.owner, true, im.x, im.y, im.z);
+        this.newFlight(im.target, im.owner, im.owner, true, im.x, im.y, im.z, im.detail);
       }
       const shown = im.age;
       if (shown >= DISC_IMPACT_DURATION && !im.sendHome) {
@@ -446,6 +479,7 @@ export class SunwardDisc {
       }
       // An enemy out of view shows nothing, but the shield still comes home.
       if (!seen || shown >= DISC_IMPACT_DURATION) continue;
+      const scale = paladinDetailScale(im.detail);
       if (im.glance) {
         // Glanced off: a small hard glint where it skipped and a few sparks
         // kicked away, no burst.
@@ -461,7 +495,8 @@ export class SunwardDisc {
           SHAPE.flare,
         );
         const motion = reduced ? 0.3 : 1;
-        for (let i = 0; i < GLANCE_SPARKS; i++) {
+        const glanceSparks = paladinDetailCount(GLANCE_SPARKS, im.detail);
+        for (let i = 0; i < glanceSparks; i++) {
           const life = 0.12 + 0.06 * hash01(i, 7);
           if (shown >= life) continue;
           const ang = i * 2.399963 + hash01(i, 9);
@@ -491,15 +526,16 @@ export class SunwardDisc {
       // Every bounce strikes for the same, less than the first impact.
       const heat = im.level > 0 ? 0.85 : 1;
       pool.time = shown;
-      pool.billboard(
-        this.at.x,
-        this.at.y,
-        this.at.z,
-        1.3 * heat,
-        KIT_IVORY,
-        Math.exp(-shown * 10) * 1.3,
-        SHAPE.flare,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.at.x,
+          this.at.y,
+          this.at.z,
+          1.3 * heat,
+          KIT_IVORY,
+          Math.exp(-shown * 10) * 1.3,
+          SHAPE.flare,
+        );
       pool.billboard(
         this.at.x,
         this.at.y,
@@ -510,7 +546,8 @@ export class SunwardDisc {
         SHAPE.burst,
       );
       const motion = reduced ? 0.3 : 1;
-      for (let i = 0; i < SPARKS; i++) {
+      const sparks = paladinDetailCount(SPARKS, im.detail);
+      for (let i = 0; i < sparks; i++) {
         const life = 0.25 + 0.15 * hash01(i, 3);
         if (shown >= life) continue;
         const ang = i * 2.399963 + hash01(i, im.level + 1);

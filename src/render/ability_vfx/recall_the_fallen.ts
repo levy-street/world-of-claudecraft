@@ -5,6 +5,20 @@ import { CrestPrewarm } from './crest_prewarm';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
 import { PALADIN_SPEC_EMBLEM_GLSL, paladinSpecEmblemIndex } from './paladin_spec_emblems';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the rune circle writing itself and blazing, the thread from
+// the praying hands, the soul's flight, the waiting sigil, and on the return
+// the rune ring at their feet and the halo; secondary = the light falling on
+// the body, the glow in the hands, the soul's trail, the pillar and the falling
+// feathers on the return; accents = the flares and the sparks of the release
+// (the soul's motes scale with count, the return's fade tail with linger).
 
 export const RECALL_CASTERS = 4;
 export const RECALL_SOULS = 8;
@@ -57,6 +71,8 @@ interface Caster {
   bodyY: number;
   bodyZ: number;
   hasBody: boolean;
+  /** How much of the rite draws, read when its slot was claimed. */
+  detail: PaladinVfxDetail;
 }
 interface Soul {
   active: boolean;
@@ -65,6 +81,7 @@ interface Soul {
   x: number;
   y: number;
   z: number;
+  detail: PaladinVfxDetail;
 }
 interface Pending {
   caster: number;
@@ -76,6 +93,7 @@ interface Arrival {
   active: boolean;
   id: number;
   age: number;
+  detail: PaladinVfxDetail;
 }
 
 function ramp(t: number, from: number, to: number): number {
@@ -112,6 +130,7 @@ export class RecallTheFallen {
     bodyY: 0,
     bodyZ: 0,
     hasBody: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly souls: Soul[] = Array.from({ length: RECALL_SOULS }, () => ({
     active: false,
@@ -120,11 +139,13 @@ export class RecallTheFallen {
     x: 0,
     y: 0,
     z: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly arrivals: Arrival[] = Array.from({ length: RECALL_ARRIVALS }, () => ({
     active: false,
     id: -1,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly pending: Pending[] = [];
   private readonly deadSeen = new Map<number, boolean>();
@@ -322,6 +343,7 @@ export class RecallTheFallen {
     slot.presence = 0;
     slot.release = -1;
     slot.hasBody = false;
+    slot.detail = paladinVfxDetailNow();
     return slot;
   }
 
@@ -373,6 +395,7 @@ export class RecallTheFallen {
     soul.x = x;
     soul.y = floor;
     soul.z = z;
+    soul.detail = paladinVfxDetailNow();
     const wait = this.pending.find((w) => w.caster === caster);
     if (wait) {
       wait.age = 0;
@@ -411,6 +434,7 @@ export class RecallTheFallen {
       arrival.active = true;
       arrival.id = id;
       arrival.age = 0;
+      arrival.detail = paladinVfxDetailNow();
       return true;
     }
     return false;
@@ -665,6 +689,7 @@ export class RecallTheFallen {
       }
     }
     if (!s.hasBody) return;
+    const scale = paladinDetailScale(s.detail);
     this.emblem = paladinSpecEmblemIndex(this.specOf?.(s.id));
     const k = s.presence;
     const prog = casting ? s.progress : 1;
@@ -684,8 +709,9 @@ export class RecallTheFallen {
     this.time = this.clock;
     const shaftHalf = casting ? 0.35 + 0.55 * prog : 1.3 * (1 - 0.6 * Math.min(1, after / 0.4));
     const shaft = casting ? k * (0.15 + 0.4 * prog) : Math.exp(-after * 3.5) * 1.1;
-    this.beam(x, z, y + 0.02, y + 14, shaftHalf, hx, hz, shaft);
+    if (scale.secondary) this.beam(x, z, y + 0.02, y + 14, shaftHalf, hx, hz, shaft);
     if (!casting) {
+      if (!scale.accents) return;
       this.flare(x, y + 0.8, z, 2.6, Math.exp(-after * 8) * 1.3);
       for (let i = 0; i < 12; i++) {
         const life = 0.5 + 0.3 * hash(i, 1);
@@ -710,7 +736,8 @@ export class RecallTheFallen {
       return;
     }
     // Motes of the soul lifting from the body.
-    for (let i = 0; i < RECALL_MOTES; i++) {
+    const motes = paladinDetailCount(RECALL_MOTES, s.detail);
+    for (let i = 0; i < motes; i++) {
       const phase = (this.clock * 0.35 * motion + hash(i, 4)) % 1;
       const ang = i * 2.399963 + this.clock * 1.1 * motion;
       const out = 0.25 + 0.5 * (1 - phase) * hash(i, 5);
@@ -725,13 +752,14 @@ export class RecallTheFallen {
     }
     // The praying hands glow and a thread of light runs to the fallen.
     if (!this.anchor(s.id, 0.62, this.hand)) return;
-    this.flare(
-      this.hand.x,
-      this.hand.y,
-      this.hand.z,
-      0.55,
-      k * (0.5 + 0.2 * Math.sin(this.clock * 5)),
-    );
+    if (scale.secondary)
+      this.flare(
+        this.hand.x,
+        this.hand.y,
+        this.hand.z,
+        0.55,
+        k * (0.5 + 0.2 * Math.sin(this.clock * 5)),
+      );
     if (reduced) return;
     const ex = x,
       ey = y + 0.35,
@@ -855,7 +883,8 @@ export class RecallTheFallen {
     const arrived = Math.max(0, s.age - dur);
     const alpha = Math.min(1, s.age / 0.1) * (1 - arrived / 0.25);
     this.flare(x, y, z, u < 1 ? 0.7 : 0.7 + arrived * 6, alpha * 1.3);
-    if (!reduced && u < 1) this.streak(x, y, z, vx, vy, vz, 1.4, 0.16, GOLD, alpha * 0.9);
+    if (!reduced && u < 1 && paladinDetailScale(s.detail).secondary)
+      this.streak(x, y, z, vx, vy, vz, 1.4, 0.16, GOLD, alpha * 0.9);
   }
 
   private drawArrival(
@@ -867,7 +896,13 @@ export class RecallTheFallen {
     reduced: boolean,
   ): void {
     a.age += dt;
-    if (a.age >= RECALL_ARRIVAL_DURATION || !this.anchor(a.id, 0, this.at)) {
+    const scale = paladinDetailScale(a.detail);
+    const full = a.detail === 'full';
+    // The return's fade tail shortens on the lighter tiers.
+    const end = full
+      ? RECALL_ARRIVAL_DURATION
+      : 1 + paladinDetailLinger(RECALL_ARRIVAL_DURATION - 1, a.detail);
+    if (a.age >= end || !this.anchor(a.id, 0, this.at)) {
       a.active = false;
       return;
     }
@@ -880,29 +915,31 @@ export class RecallTheFallen {
     const drop = Math.min(1, t / 0.18);
     const pillar = (1 - ramp(t, 0.3, 1.1)) * 1.1;
     this.time = this.clock;
-    this.beam(
-      x,
-      z,
-      y + 0.02 + (1 - drop) * 12,
-      y + 16,
-      1.1 * (1 - 0.6 * ramp(t, 0, 0.8)),
-      hx,
-      hz,
-      pillar,
-    );
-    this.flare(x, y + 1, z, 2.4, Math.exp(-t * 6) * drop * 1.2);
+    if (scale.secondary)
+      this.beam(
+        x,
+        z,
+        y + 0.02 + (1 - drop) * 12,
+        y + 16,
+        1.1 * (1 - 0.6 * ramp(t, 0, 0.8)),
+        hx,
+        hz,
+        pillar,
+      );
+    if (scale.accents) this.flare(x, y + 1, z, 2.4, Math.exp(-t * 6) * drop * 1.2);
     this.time = t;
-    this.ground(x, y + 0.04, z, 1.6, MODE.arrival, 1);
+    this.ground(x, y + 0.04, z, 1.6, MODE.arrival, full ? 1 : 1 - ramp(t, 1, end));
     // A halo settles over the head and fades.
     this.time = t;
     this.aux = MODE.halo;
-    const halo = ramp(t, 0.1, 0.35) * (1 - ramp(t, 1, RECALL_ARRIVAL_DURATION));
+    const halo = ramp(t, 0.1, 0.35) * (1 - ramp(t, 1, end));
     const hy = top + 0.35 + 0.4 * (1 - ramp(t, 0.1, 0.5));
     this.quad(x, hy, z, 0.42, 0, 0, 0, 0, 0.42, IVORY, halo, SHAPE.ground);
     if (reduced) return;
     // Motes rising around them and feathers drifting down.
-    for (let i = 0; i < RECALL_MOTES; i++) {
-      const life = 0.9 + 0.5 * hash(i, 7);
+    const motes = paladinDetailCount(RECALL_MOTES, a.detail);
+    for (let i = 0; i < motes; i++) {
+      const life = paladinDetailLinger(0.9 + 0.5 * hash(i, 7), a.detail);
       const tt = t - 0.1 * hash(i, 8);
       if (tt < 0 || tt >= life) continue;
       const ang = i * 2.399963 + tt * 2;
@@ -915,6 +952,7 @@ export class RecallTheFallen {
         Math.sin((tt / life) * Math.PI),
       );
     }
+    if (!scale.secondary) return;
     const c = this.cam;
     for (let i = 0; i < RECALL_FEATHERS; i++) {
       const life = 1.2;

@@ -1,7 +1,10 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Dawnfall } from '../src/render/ability_vfx/dawnfall';
 import { AbilityVfx, type AbilityVfxDamageEvent } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import {
   DAWNFALL_BEAM_LANDING,
   DAWNFALL_CAST_CAPACITY,
@@ -38,6 +41,10 @@ function fixture(groundY: (x: number, z: number) => number = () => 0, feet?: num
   };
   return { scene, effect, prepare, host };
 }
+// The authored composition; the detail tiers have their own block below.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
+
 describe('Dawnfall authoritative routing', () => {
   function painterFixture() {
     const fx = { dawnfallCast: vi.fn(), dawnfallContact: vi.fn() };
@@ -45,6 +52,10 @@ describe('Dawnfall authoritative routing', () => {
       receiveHit = vi.fn();
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
       deps: { fx, triggerAttack, receiveHit },
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
     }) as AbilityVfx;
     return { painter, fx, triggerAttack, receiveHit };
   }
@@ -301,5 +312,81 @@ describe('Dawnfall prepared bounded geometry', () => {
     expect(dawnfallRadius(Number.NaN)).toBe(6);
     expect(dawnfallRadius(Infinity)).toBe(6);
     expect(dawnfallRadius(-2)).toBe(0.1);
+  });
+});
+
+describe('Dawnfall detail tiers', () => {
+  // Shader shapes (dawnfall.ts SHAPE).
+  const EMBLEM_CORE = 6,
+    RING = 3,
+    BEAM = 2,
+    FLARE = 4,
+    POOL = 9,
+    EMBLEM_GLOW = 5,
+    FLASH = 10,
+    EMBER = 7,
+    WAVE = 8,
+    STREAK = 0;
+  async function cast(detail: PaladinVfxDetail) {
+    setPaladinVfxDetailForTest(detail);
+    const f = fixture();
+    await f.prepare();
+    expect(f.effect.spawn(1, 6)).toBe(true);
+    expect(f.effect.contact(2, 'damage')).toBe(true);
+    // A running cast keeps the shape it spawned with.
+    setPaladinVfxDetailForTest('full');
+    // Early in the fall, while the victim's contact still plays.
+    f.effect.update(0.05, false);
+    const geometry = f.effect.mesh.geometry;
+    const shapes = geometry.getAttribute('aShape');
+    const quads = new Map<number, number>();
+    for (let i = 0; i < geometry.drawRange.count; i += 6)
+      quads.set(shapes.getX(i), (quads.get(shapes.getX(i)) ?? 0) + 1);
+    const vertices = geometry.drawRange.count;
+    let frames = 0;
+    while (f.effect.mesh.visible && frames < 100) {
+      f.effect.update(0.02, false);
+      frames++;
+    }
+    f.effect.dispose();
+    return { quads, frames, vertices };
+  }
+
+  it('keeps the rune circle and the pillar core on every tier and thins the rest', async () => {
+    const full = await cast('full');
+    const light = await cast('light');
+    const minimal = await cast('minimal');
+    const floor = 8 * 8;
+    for (const tier of [full, light, minimal]) {
+      expect(tier.quads.get(EMBLEM_CORE)).toBe(floor);
+      expect(tier.quads.get(RING)).toBe(floor);
+      expect(tier.quads.get(BEAM) ?? 0).toBeGreaterThanOrEqual(1);
+      expect(tier.quads.get(FLARE) ?? 0).toBeGreaterThanOrEqual(1);
+    }
+    expect(full.quads.get(BEAM)).toBe(2);
+    expect(full.quads.get(FLASH)).toBe(floor);
+    expect(full.quads.get(FLARE)).toBe(2);
+    // Light: the pool, the emblem glow, the wide pillar and the crests stay;
+    // the flash, the landing flare and half the embers go.
+    expect(light.quads.get(POOL)).toBe(floor);
+    expect(light.quads.get(EMBLEM_GLOW)).toBe(floor);
+    expect(light.quads.get(BEAM)).toBe(2);
+    expect(light.quads.get(WAVE)).toBe(full.quads.get(WAVE));
+    expect(light.quads.has(FLASH)).toBe(false);
+    expect(light.quads.get(FLARE)).toBe(1);
+    expect(light.quads.get(EMBER) ?? 0).toBeLessThan(full.quads.get(EMBER) ?? 0);
+    expect(light.quads.get(STREAK)).toBe(1);
+    expect(full.quads.get(STREAK)).toBe(2);
+    // Minimal: only the core and a few embers.
+    for (const shape of [POOL, EMBLEM_GLOW, FLASH, WAVE])
+      expect(minimal.quads.has(shape)).toBe(false);
+    expect(minimal.quads.get(BEAM)).toBe(1);
+    expect(minimal.quads.get(EMBER) ?? 0).toBeGreaterThan(0);
+    expect(minimal.quads.get(EMBER) ?? 0).toBeLessThan(light.quads.get(EMBER) ?? 0);
+    expect(light.vertices).toBeLessThan(full.vertices);
+    expect(minimal.vertices).toBeLessThan(light.vertices);
+    // Shorter fade tails end the lighter casts sooner.
+    expect(light.frames).toBeLessThan(full.frames);
+    expect(minimal.frames).toBeLessThan(light.frames);
   });
 });

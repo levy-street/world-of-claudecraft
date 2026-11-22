@@ -1,6 +1,8 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import {
   RECALL_ARRIVAL_DURATION,
   RECALL_CIRCLE_RADIUS,
@@ -8,6 +10,7 @@ import {
   RECALL_RELEASE_DURATION,
   RecallTheFallen,
 } from '../src/render/ability_vfx/recall_the_fallen';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 
 function fixture() {
   const scene = new THREE.Scene();
@@ -47,6 +50,10 @@ function fixture() {
 function step(effect: RecallTheFallen, seconds: number): void {
   for (let t = 0; t < seconds - 1e-6; t += 0.05) effect.update(0.05);
 }
+
+// Node runs at the Medium preset: pin the authored composition.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('Recall the Fallen rite', () => {
   it('writes the rite around the body while cast and lets it go when the cast stops', async () => {
@@ -125,6 +132,10 @@ describe('Recall the Fallen routing', () => {
     const fx = { recallTheFallenRelease: vi.fn(), recallTheFallenReleaseAt: vi.fn() };
     const releaseGesture = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx },
       releaseGesture,
     }) as AbilityVfx;
@@ -145,5 +156,99 @@ describe('Recall the Fallen routing', () => {
       }),
     ).toBe(true);
     expect(fx.recallTheFallenReleaseAt).toHaveBeenCalledExactlyOnceWith(1, 5, 6);
+  });
+});
+
+describe('Recall the Fallen detail', () => {
+  /** Quads drawn this frame, by shape (0 ground, 1 beam, 2 flare, 3 spark,
+   * 4 feather, 5 thread). */
+  const counts = (effect: RecallTheFallen) => {
+    const g = effect.mesh.geometry;
+    const shape = g.getAttribute('aShape');
+    const out = new Map<number, number>();
+    for (let i = 0; i < g.drawRange.count; i += 6) {
+      const s = Math.round(shape.getX(i));
+      out.set(s, (out.get(s) ?? 0) + 1);
+    }
+    return out;
+  };
+  const total = (m: Map<number, number>) => [...m.values()].reduce((a, b) => a + b, 0);
+
+  /** The whole rite at `detail`: the cast, the release, and the return. */
+  const rite = async (detail: PaladinVfxDetail) => {
+    const f = fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.channel(1, 2, 0.6);
+    // A later detail change never reshapes a running rite.
+    setPaladinVfxDetailForTest('full');
+    f.effect.update(0.05);
+    const cast = counts(f.effect);
+    f.effect.channel(1, 2, 0.99);
+    setPaladinVfxDetailForTest(detail);
+    f.effect.release(1, 2);
+    setPaladinVfxDetailForTest('full');
+    f.effect.update(0.05);
+    const release = counts(f.effect);
+    step(f.effect, RECALL_RELEASE_DURATION);
+    // The return is greeted from the frame loop: it reads the ambient detail.
+    setPaladinVfxDetailForTest(detail);
+    f.effect.watch(2, true);
+    f.effect.watch(2, false);
+    f.where.set(2, [0.6, 0]);
+    f.effect.update(0.05);
+    setPaladinVfxDetailForTest('full');
+    step(f.effect, 0.2);
+    const arrival = counts(f.effect);
+    let tail = 0;
+    while (f.effect.mesh.visible && tail < 3) {
+      f.effect.update(0.02);
+      tail += 0.02;
+    }
+    f.effect.dispose();
+    return { cast, release, arrival, tail };
+  };
+
+  it('writes, releases and greets with the same rite thinner at light and minimal', async () => {
+    const full = await rite('full');
+    const light = await rite('light');
+    const minimal = await rite('minimal');
+    // Core on every tier: the rune circle, the thread from the hands, the
+    // soul's flight, and on the return the rune ring and the halo.
+    for (const d of [full, light, minimal]) {
+      expect(d.cast.get(0)).toBe(1);
+      expect(d.cast.get(5) ?? 0).toBeGreaterThan(0);
+      expect(d.release.get(0)).toBe(1);
+      expect(d.release.get(2) ?? 0).toBeGreaterThanOrEqual(1);
+      expect(d.arrival.get(0)).toBe(2);
+    }
+    // Full: the light on the body, the release flare and sparks, the soul's
+    // trail, and the pillar, flare and feathers of the return.
+    expect(full.cast.get(1)).toBe(1);
+    expect(full.release.get(3)).toBe(13);
+    expect(full.arrival.get(1)).toBe(1);
+    expect(full.arrival.get(4) ?? 0).toBeGreaterThan(0);
+    // Light keeps the shaft, the soul's trail, the pillar and the feathers,
+    // drops the release sparks and thins the motes.
+    expect(light.cast.get(1)).toBe(1);
+    expect(light.release.get(3)).toBe(1);
+    expect(light.arrival.get(1)).toBe(1);
+    expect(light.arrival.get(4)).toBe(full.arrival.get(4));
+    expect(light.cast.get(2) ?? 0).toBeLessThan(full.cast.get(2) ?? 0);
+    expect(light.arrival.get(2) ?? 0).toBeLessThan(full.arrival.get(2) ?? 0);
+    // Minimal: the core alone.
+    expect(minimal.cast.get(1)).toBeUndefined();
+    expect(minimal.release.get(1)).toBeUndefined();
+    expect(minimal.release.get(3)).toBeUndefined();
+    expect(minimal.arrival.get(1)).toBeUndefined();
+    expect(minimal.arrival.get(4)).toBeUndefined();
+    expect(minimal.cast.get(2) ?? 0).toBeLessThan(light.cast.get(2) ?? 0);
+    for (const k of ['cast', 'release', 'arrival'] as const) {
+      expect(total(light[k])).toBeLessThan(total(full[k]));
+      expect(total(minimal[k])).toBeLessThan(total(light[k]));
+    }
+    // The return fades sooner.
+    expect(light.tail).toBeLessThan(full.tail);
+    expect(minimal.tail).toBeLessThan(light.tail);
   });
 });

@@ -1,13 +1,20 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import { ContactQueue, heldUntilCollapse } from '../src/render/contact_queue';
 import {
   type PaladinAvengingWrathVisual,
   syncPaladinAvengingWrathVisual,
 } from '../src/render/paladin_avenging_wrath_visual';
+
+// Node tests run at the Medium preset; the tests below pin the authored
+// composition (full detail) unless a test names another tier.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('Paladin Avenging Wrath visual', () => {
   it('unfurls two layered wings of light behind the wearer and holds them still for reduced motion', () => {
@@ -117,6 +124,10 @@ describe('Paladin Avenging Wrath visual', () => {
     const painter = Object.assign(Object.create(AbilityVfx.prototype), {
       releaseGesture,
       deps: { fx: {} },
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
     }) as AbilityVfx;
     const event = { sourceId: 1, targetId: 1, school: 'holy', ability: 'avenging_wrath' };
     expect(painter.handleSpellfx({ ...event, fx: 'selfCast' })).toBe(true);
@@ -231,5 +242,63 @@ describe('Paladin Avenging Wrath visual', () => {
       ]),
     ).toBeNull();
     expect(syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, true, [])).toBeNull();
+  });
+
+  it('draws thinner wings on lighter tiers through the same buffers and program', () => {
+    const wrath = [{ id: 'avenging_wrath', kind: 'buff_dmg_done' }];
+    const drawn = (detail: 'full' | 'light' | 'minimal') => {
+      setPaladinVfxDetailForTest(detail);
+      const parent = new THREE.Group();
+      const visual = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, false, wrath);
+      if (!visual) throw new Error('missing Avenging Wrath visual');
+      const feathers = parent.getObjectByName('paladin-avenging-wrath-left-feathers') as THREE.Mesh;
+      const geometry = feathers.geometry;
+      const vertices = geometry.index?.count ?? geometry.getAttribute('position').count;
+      const kinds = new Set<number>();
+      const kind = geometry.getAttribute('aKind');
+      for (let i = 0; i < vertices; i++) kinds.add(kind.getX(geometry.index?.getX(i) ?? i));
+      const out = {
+        quads: vertices / 6,
+        band: parent.getObjectByName('paladin-avenging-wrath-rune-band')?.visible,
+        wings: parent.getObjectByName('paladin-avenging-wrath-left-wing')?.visible,
+        motes: kinds.has(1),
+        program: visual.material.fragmentShader,
+        buffers: geometry.getAttribute('aRoot'),
+      };
+      visual.dispose();
+      return out;
+    };
+    const full = drawn('full'),
+      light = drawn('light'),
+      minimal = drawn('minimal');
+    expect(full.quads).toBe(57);
+    // Light keeps the coverts and the band, half the motes.
+    expect(light.quads).toBe(50);
+    expect(light.band).toBe(true);
+    // Minimal keeps the silhouette (primaries and secondaries) and a few motes.
+    expect(minimal.quads).toBe(23);
+    expect(minimal.band).toBe(false);
+    for (const tier of [full, light, minimal]) {
+      expect(tier.wings).toBe(true);
+      expect(tier.motes).toBe(true);
+      // One shared attribute buffer and the same shader on every tier.
+      expect(tier.buffers).toBe(full.buffers);
+      expect(tier.program).toBe(full.program);
+    }
+  });
+
+  it('keeps the wings at the detail they were built with and furls them faster on lighter tiers', () => {
+    const wrath = [{ id: 'avenging_wrath', kind: 'buff_dmg_done' }];
+    setPaladinVfxDetailForTest('minimal');
+    const parent = new THREE.Group();
+    const visual = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 1, false, wrath);
+    if (!visual) throw new Error('missing Avenging Wrath visual');
+    setPaladinVfxDetailForTest('full');
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 1, false, wrath);
+    expect(visual.detail).toBe('minimal');
+    expect(parent.getObjectByName('paladin-avenging-wrath-rune-band')?.visible).toBe(false);
+    // Minimal's furl is 0.45 of the authored half second.
+    expect(syncPaladinAvengingWrathVisual(visual, parent, 1.8, false, 0.1, false, [])).toBe(visual);
+    expect(syncPaladinAvengingWrathVisual(visual, parent, 1.8, false, 0.15, false, [])).toBeNull();
   });
 });

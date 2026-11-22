@@ -12,8 +12,26 @@ import { CrestPrewarm } from './crest_prewarm';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
 import { type PaladinLocalProbe, paladinFlash } from './paladin_flash';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 import type { BakedKind, FragmentKind } from './production_assets';
 import type { CrestKind } from './signature_shapes';
+
+// Detail: core = the launch's ground burst and the column the Paladin rises
+// through, the landing mark, the burning trail of the dive, and the slam's
+// shockwave and slash; secondary = the rings of air at the push-off, the light
+// pouring down from the rising body, the streak into the sky and the falling
+// feathers, the sky's shaft and rays on the landing, the Ascension second shock,
+// the slam's pillar and rays, and the dust and stone of both ends of the flight;
+// accents = every flare (the charge, the push-off, the weapon glint, the vanish,
+// the return and the slam). The motes and sparks (and the feathers) scale with
+// count, the launch glow's, the feathers', the slam's and a cancelled flight's
+// fades with linger.
 
 /** The debris half of the flight: dust, stone and camera weight. */
 export interface ValkyrGroundHost {
@@ -159,6 +177,8 @@ interface Slot {
   cancelled: number;
   /** Empowered by Ascension: a second, golden shock follows the slam. */
   gilded: boolean;
+  /** How much of the flight draws, read when it was first seen. */
+  detail: PaladinVfxDetail;
 }
 
 function ramp(t: number, from: number, to: number): number {
@@ -208,6 +228,7 @@ export class ValkyrsCalling {
     flew: false,
     cancelled: -1,
     gilded: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly positions = new Float32Array(VERTICES * 3);
   private readonly colors = new Float32Array(VERTICES * 3);
@@ -220,6 +241,8 @@ export class ValkyrsCalling {
   private vertex = 0;
   /** The fade of the slot being drawn (a cancelled flight's). */
   private dim = 1;
+  /** Whether the slot being drawn shows its flares (accents). */
+  private accents = true;
   private time = 0;
   private disposed = false;
 
@@ -465,6 +488,7 @@ export class ValkyrsCalling {
     slot.flew = true;
     slot.cancelled = -1;
     slot.gilded = false;
+    slot.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -483,6 +507,7 @@ export class ValkyrsCalling {
       slot.fromX = x;
       slot.fromZ = z;
       slot.fromY = this.floorAt(x, z);
+      slot.detail = paladinVfxDetailNow();
     }
     slot.age = Math.max(slot.age, VALKYR_LAND);
     slot.since = 0;
@@ -510,8 +535,13 @@ export class ValkyrsCalling {
     if (!h) return;
     // The ground cracks under the push-off, grit is blown out in every
     // direction, a slower cloud hangs where they left, and stones are kicked
-    // loose.
+    // loose. The crack and the push-off's weight stay on every tier; the slabs,
+    // dust and cloud are secondary, and the stones thin.
     h.decalXZ?.(s.fromX, s.fromZ, 2.4, 0xffffff, 'leap_fracture', 1.2);
+    if (!paladinDetailScale(s.detail).secondary) {
+      h.shakeAt(s.fromX, s.fromY, s.fromZ, 0.3, true);
+      return;
+    }
     h.crestAt?.(s.fromX, s.fromY, s.fromZ, 0.45, 1, 0x746b60, 0xd9c7a2, 'leap_rupture', 0, 0.7);
     for (let k = 0; k < 8; k++) {
       const angle = (k * Math.PI) / 4 + 0.3;
@@ -537,7 +567,7 @@ export class ValkyrsCalling {
           s.fromY + 0.15,
           z,
           STONE,
-          6,
+          paladinDetailCount(6, s.detail),
           1.8,
           Math.sin(angle),
           Math.cos(angle),
@@ -556,8 +586,26 @@ export class ValkyrsCalling {
       scale = r / 6;
     // The ground itself breaks: a fracture decal and slabs heaved up (the
     // Heroic Leap rupture, sized to the slam), dust thrown out in a ring,
-    // stones flung, and a cloud left hanging over the crater.
+    // stones flung, and a cloud left hanging over the crater. The fracture is
+    // the landing's core on every tier (as the fx.ts landings keep their
+    // crack); the slabs, dust and cloud are secondary, the stones thin.
     h.decalXZ?.(s.toX, s.toZ, r * 0.8, 0xffffff, 'leap_fracture', 1.4);
+    if (!paladinDetailScale(s.detail).secondary) {
+      h.fragmentsAt(
+        'stone_chip',
+        s.toX,
+        s.toY + 0.2,
+        s.toZ,
+        STONE,
+        paladinDetailCount(12, s.detail),
+        3.2,
+        0,
+        0,
+        1.1,
+      );
+      h.shakeAt(s.toX, s.toY, s.toZ, 0.5, true);
+      return;
+    }
     h.crestAt?.(s.toX, s.toY, s.toZ, scale * 0.7, 1, 0x746b60, 0xd9c7a2, 'leap_rupture', 0, 0.9);
     for (let k = 0; k < 8; k++) {
       const angle = (k * Math.PI) / 4 + Math.sin(k * 3.7) * 0.1;
@@ -583,7 +631,7 @@ export class ValkyrsCalling {
         s.toY + 0.25,
         z,
         STONE,
-        5,
+        paladinDetailCount(5, s.detail),
         1.9,
         Math.sin(angle),
         Math.cos(angle),
@@ -606,7 +654,18 @@ export class ValkyrsCalling {
         0,
       );
     }
-    h.fragmentsAt('stone_chip', s.toX, s.toY + 0.2, s.toZ, STONE, 12, 3.2, 0, 0, 1.1);
+    h.fragmentsAt(
+      'stone_chip',
+      s.toX,
+      s.toY + 0.2,
+      s.toZ,
+      STONE,
+      paladinDetailCount(12, s.detail),
+      3.2,
+      0,
+      0,
+      1.1,
+    );
     h.shakeAt(s.toX, s.toY, s.toZ, 0.5, true);
   }
 
@@ -719,16 +778,25 @@ export class ValkyrsCalling {
       if (!s.active) continue;
       s.age += step;
       if (s.since >= 0) s.since += step;
+      const detail = paladinDetailScale(s.detail);
+      const cancelFade = paladinDetailLinger(VALKYR_CANCEL_FADE, s.detail);
       if (s.cancelled >= 0) {
         s.cancelled += step;
-        if (s.cancelled >= VALKYR_CANCEL_FADE) {
+        if (s.cancelled >= cancelFade) {
           s.active = false;
           continue;
         }
       }
-      this.dim = s.cancelled >= 0 ? 1 - s.cancelled / VALKYR_CANCEL_FADE : 1;
+      this.dim = s.cancelled >= 0 ? 1 - s.cancelled / cancelFade : 1;
+      this.accents = detail.accents;
+      // The slam's fade tail (its last 45 percent) shortens on lighter tiers.
+      const settle = VALKYR_IMPACT_DURATION * 0.55;
+      const impactEnd =
+        s.detail === 'full'
+          ? VALKYR_IMPACT_DURATION
+          : settle + paladinDetailLinger(VALKYR_IMPACT_DURATION - settle, s.detail);
       // Done after the slam settles, or a flight that never landed (cancelled).
-      if (s.since >= VALKYR_IMPACT_DURATION || (s.since < 0 && s.age > VALKYR_LAND + 0.6)) {
+      if (s.since >= impactEnd || (s.since < 0 && s.age > VALKYR_LAND + 0.6)) {
         s.active = false;
         continue;
       }
@@ -761,7 +829,10 @@ export class ValkyrsCalling {
         const pulse = 0.75 + 0.25 * Math.sin(a * (12 + 34 * charge));
         const core = s.bodyY + h * 0.4;
         this.flare(s.bodyX, core, s.bodyZ, 1 + 1.4 * charge, cam, IVORY, charge * pulse * 0.75);
-        for (let i = 0; i < CHARGE_MOTES; i++) {
+        const motes = paladinDetailCount(CHARGE_MOTES, s.detail);
+        for (let n = 0; n < motes; n++) {
+          // Fewer motes keep the full swirl's spread: every k-th one.
+          const i = Math.floor((n * CHARGE_MOTES) / motes);
           const life = 0.3 + 0.12 * hash(i, 23);
           const k = ((a + hash(i, 24) * life) % life) / life;
           const ang = i * 2.399963 + k * 2.4;
@@ -785,7 +856,8 @@ export class ValkyrsCalling {
       // --- Departure -------------------------------------------------------
       this.time = a - VALKYR_LAUNCH;
       const departed = Math.max(0, a - VALKYR_LAUNCH);
-      const glow = ramp(a, 0, 0.08) * (1 - ramp(departed, 0.6, 1.4));
+      const glowEnd = s.detail === 'full' ? 1.4 : 0.6 + 0.8 * detail.linger;
+      const glow = ramp(a, 0, 0.08) * (1 - ramp(departed, 0.6, glowEnd));
       const L = LAUNCH_SIZE;
       this.quad(s.fromX, s.fromY + 0.04, s.fromZ, L, 0, 0, 0, 0, L, GOLD, glow, SHAPE.launch);
       if (a >= VALKYR_LAUNCH) {
@@ -800,7 +872,8 @@ export class ValkyrsCalling {
           IVORY,
           Math.exp(-departed * 12) * 1.2,
         );
-        for (let i = 0; i < LAUNCH_BOOMS; i++) {
+        const booms = detail.secondary ? LAUNCH_BOOMS : 0;
+        for (let i = 0; i < booms; i++) {
           const t = departed - i * 0.05;
           if (t < 0 || t > 0.26) continue;
           this.time = t;
@@ -815,7 +888,8 @@ export class ValkyrsCalling {
       this.beam(s.fromX, s.fromZ, s.fromY, s.fromY + 18, 0.75, hx, hz, GOLD, column * 0.8);
       // Light pouring down from the rising body to the ground.
       const pour = ramp(a, VALKYR_LAUNCH, VALKYR_LAUNCH + 0.06) * (1 - ramp(a, VALKYR_VANISH, 0.7));
-      for (let i = 0; i < TAKEOFF_RAYS; i++) {
+      const takeoffRays = detail.secondary ? TAKEOFF_RAYS : 0;
+      for (let i = 0; i < takeoffRays; i++) {
         const ang = i * 2.399963 + 0.5;
         const off = 0.18 + 0.28 * hash(i, 1);
         const top = Math.max(s.fromY + 0.5, s.bodyY + h * (0.1 + 0.25 * hash(i, 2)));
@@ -832,7 +906,9 @@ export class ValkyrsCalling {
         );
       }
       // Sparks thrown up from the launch.
-      for (let i = 0; i < TAKEOFF_SPARKS; i++) {
+      const takeoffSparks = paladinDetailCount(TAKEOFF_SPARKS, s.detail);
+      for (let n = 0; n < takeoffSparks; n++) {
+        const i = Math.floor((n * TAKEOFF_SPARKS) / takeoffSparks);
         const life = 0.4 + 0.2 * hash(i, 5);
         const t = departed;
         if (a < VALKYR_LAUNCH || t >= life) continue;
@@ -864,7 +940,7 @@ export class ValkyrsCalling {
       this.flare(s.bodyX, s.bodyY + h * 1.16, s.bodyZ, glintSize, cam, IVORY, glint * 1.2);
       // Gone into the light: a flash and a streak shot up into the sky.
       const vanish = s.vanished && s.since < 0 ? Math.max(0, a - VALKYR_VANISH) : -1;
-      if (vanish >= 0) {
+      if (vanish >= 0 && detail.secondary) {
         const flash = Math.exp(-vanish * 9);
         this.flare(s.goneX, s.goneY, s.goneZ, 2.6, cam, IVORY, flash * 1.0);
         const streak = Math.exp(-vanish * 7);
@@ -881,8 +957,10 @@ export class ValkyrsCalling {
           streak * 1.4,
         );
         // Feathers drifting down from where they vanished.
-        for (let i = 0; i < FEATHERS; i++) {
-          const life = 1.2 + 0.5 * hash(i, 8);
+        const feathers = paladinDetailCount(FEATHERS, s.detail);
+        for (let n = 0; n < feathers; n++) {
+          const i = Math.floor((n * FEATHERS) / feathers);
+          const life = (1.2 + 0.5 * hash(i, 8)) * detail.linger;
           const t = vanish;
           if (t >= life) continue;
           const ang = i * 2.399963 + 1.1;
@@ -926,7 +1004,7 @@ export class ValkyrsCalling {
       this.quad(s.toX, s.toY + 0.05, s.toZ, r, 0, 0, 0, 0, r, GOLD, mark * 0.85, SHAPE.mark);
       // Light from the sky onto the landing: a soft shaft and a few rays.
       const shaft =
-        s.since < 0
+        s.since < 0 && detail.secondary
           ? ramp(a, VALKYR_VANISH, VALKYR_VANISH + 0.4) *
             (0.5 + 0.5 * ramp(a, VALKYR_RETURN, VALKYR_LAND))
           : 0;
@@ -960,7 +1038,7 @@ export class ValkyrsCalling {
       // --- The slam ----------------------------------------------------------
       if (s.since >= 0) {
         const t = s.since;
-        const fade = 1 - ramp(t, VALKYR_IMPACT_DURATION * 0.55, VALKYR_IMPACT_DURATION);
+        const fade = 1 - ramp(t, settle, impactEnd);
         this.time = t;
         this.quad(
           s.toX,
@@ -978,7 +1056,7 @@ export class ValkyrsCalling {
         );
         // Gilded by Ascension: a second, golden shock rolls out behind the
         // first, to the same edge (more damage, the same reach).
-        if (s.gilded && t > 0.1) {
+        if (s.gilded && t > 0.1 && detail.secondary) {
           this.time = t - 0.1;
           this.quad(s.toX, s.toY + 0.06, s.toZ, r, 0, 0, 0, 0, r, GOLD, fade * 0.75, SHAPE.impact);
           this.time = t;
@@ -1015,12 +1093,13 @@ export class ValkyrsCalling {
         );
         // The slam's flash builds and peaks under the shared limit (paladin_flash.ts).
         const flash = paladinFlash(t, this.isLocal?.(s.source) ?? true);
-        const pillar = Math.exp(-t * 6) * (reduced ? 0.5 : 0.85) * flash;
+        const pillar = detail.secondary ? Math.exp(-t * 6) * (reduced ? 0.5 : 0.85) * flash : 0;
         const pillarHalf = 1.4 * (1 - 0.55 * Math.min(1, t / 0.35));
         this.beam(s.toX, s.toZ, s.toY, s.toY + 16, pillarHalf, hx, hz, IVORY, pillar);
         this.flare(s.toX, s.toY + 1.1, s.toZ, 4, cam, IVORY, Math.exp(-t * 9) * 1.1 * flash);
         // Rays of light bursting up as the shock passes over them.
-        for (let i = 0; i < IMPACT_RAYS; i++) {
+        const impactRays = detail.secondary ? IMPACT_RAYS : 0;
+        for (let i = 0; i < impactRays; i++) {
           const ang = i * 2.399963 + 0.2;
           const at = r * (0.22 + 0.5 * hash(i, 17));
           const when = (at / r) * 0.3;
@@ -1038,7 +1117,9 @@ export class ValkyrsCalling {
             ray * 1.1,
           );
         }
-        for (let i = 0; i < IMPACT_SPARKS; i++) {
+        const impactSparks = paladinDetailCount(IMPACT_SPARKS, s.detail);
+        for (let n = 0; n < impactSparks; n++) {
+          const i = Math.floor((n * IMPACT_SPARKS) / impactSparks);
           const life = 0.45 + 0.25 * hash(i, 20);
           if (t >= life) continue;
           const ang = i * 2.399963;
@@ -1059,6 +1140,7 @@ export class ValkyrsCalling {
       }
     }
     this.dim = 1;
+    this.accents = true;
     this.mesh.geometry.setDrawRange(0, this.vertex);
     this.mesh.visible = this.vertex > 0;
     if (this.vertex)
@@ -1079,6 +1161,8 @@ export class ValkyrsCalling {
     color: THREE.Color,
     alpha: number,
   ): void {
+    // Every flare is an accent.
+    if (!this.accents) return;
     this.quad(
       x,
       y,

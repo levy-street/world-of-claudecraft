@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Dawnfall } from '../src/render/ability_vfx/dawnfall';
 import {
   PALADIN_FLASH_ONSET,
@@ -7,6 +7,7 @@ import {
   PALADIN_FLASH_PEAK,
   paladinFlash,
 } from '../src/render/ability_vfx/paladin_flash';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
 import { TollingHammer } from '../src/render/ability_vfx/tolling_hammer';
 import { ValkyrsCalling } from '../src/render/ability_vfx/valkyrs_calling';
 import { DAWNFALL_BEAM_LANDING } from '../src/render/dawnfall_core';
@@ -15,6 +16,10 @@ import {
   PaladinAscensionVisual,
 } from '../src/render/paladin_ascension_visual';
 import { TOLLING_DROP } from '../src/render/tolling_hammer_core';
+
+// The authored composition: the flash limit is pinned on the full effects.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 const FRAME = 1 / 60;
 const LOCAL = 1;

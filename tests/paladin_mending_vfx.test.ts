@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import {
   LAST_RITE_DURATION,
@@ -11,6 +11,9 @@ import {
   MENDING_TRAVEL,
   PaladinMending,
 } from '../src/render/ability_vfx/paladin_mending';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 
 function fixture() {
   const scene = new THREE.Scene();
@@ -50,6 +53,10 @@ function fixture() {
 function step(effect: PaladinMending, seconds: number): void {
   for (let t = 0; t < seconds - 1e-6; t += 0.05) effect.update(0.05);
 }
+
+// Node runs at the Medium preset: pin the authored composition.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('Mending Light', () => {
   it('charges light and pluses over the head through the cast, and lets go when it stops', async () => {
@@ -207,6 +214,10 @@ describe('Last Rite', () => {
     const fx = { mendingLight: vi.fn(), lastRite: vi.fn(), castPaladinShieldSigil: vi.fn() };
     const releaseGesture = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx },
       releaseGesture,
     }) as AbilityVfx;
@@ -218,5 +229,126 @@ describe('Last Rite', () => {
     expect(releaseGesture).toHaveBeenCalledTimes(2);
     // Both cast with the off-hand sigil.
     expect(fx.castPaladinShieldSigil).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('Mending detail', () => {
+  /** Quads drawn this frame, by shape (0 flare, 1 plus, 2 ring, 3 ribbon,
+   * 4 beam, 5 halo, 6+ sigil). */
+  const counts = (effect: PaladinMending) => {
+    const g = effect.mesh.geometry;
+    const shape = g.getAttribute('aShape');
+    const out = new Map<number, number>();
+    for (let i = 0; i < g.drawRange.count; i += 6)
+      out.set(shape.getX(i), (out.get(shape.getX(i)) ?? 0) + 1);
+    return out;
+  };
+  const total = (m: Map<number, number>) => [...m.values()].reduce((a, b) => a + b, 0);
+  /** How long until nothing draws. */
+  const tail = (effect: PaladinMending) => {
+    let t = 0;
+    while (effect.mesh.visible && t < 4) {
+      effect.update(0.02);
+      t += 0.02;
+    }
+    return t;
+  };
+
+  const mending = async (detail: PaladinVfxDetail) => {
+    const f = fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.channel(1, 0.5);
+    // A later detail change never reshapes a running effect.
+    setPaladinVfxDetailForTest('full');
+    f.effect.update(0.05);
+    const charge = counts(f.effect);
+    f.effect.channel(1, 0.6);
+    setPaladinVfxDetailForTest(detail);
+    f.effect.mend(1, 2);
+    setPaladinVfxDetailForTest('full');
+    step(f.effect, MENDING_TRAVEL + 0.3);
+    const bloom = counts(f.effect);
+    const out = { charge, bloom, tail: tail(f.effect) };
+    f.effect.dispose();
+    return out;
+  };
+
+  it('charges and blooms the same Mending Light thinner at light and minimal', async () => {
+    const full = await mending('full');
+    const light = await mending('light');
+    const minimal = await mending('minimal');
+    // Core on every tier: the charging plus (with fewer pluses spiralling in)
+    // and the plus sigil on the ally.
+    for (const d of [full, light, minimal]) {
+      expect(d.charge.get(1) ?? 0).toBeGreaterThanOrEqual(2);
+      expect(d.bloom.get(1)).toBe(1);
+    }
+    // Full: the glow behind the charge, the ring and the mending threads.
+    expect(full.charge.get(0)).toBe(1);
+    expect(full.bloom.get(2)).toBe(1);
+    expect(full.bloom.get(3) ?? 0).toBeGreaterThan(0);
+    // Light keeps those layers and thins the gathering pluses.
+    expect(light.charge.get(0)).toBe(1);
+    expect(light.bloom.get(2)).toBe(1);
+    expect(light.bloom.get(3)).toBe(full.bloom.get(3));
+    expect(light.charge.get(1) ?? 0).toBeLessThan(full.charge.get(1) ?? 0);
+    // Minimal: the core alone.
+    expect(minimal.charge.get(0)).toBeUndefined();
+    expect(minimal.bloom.get(2)).toBeUndefined();
+    expect(minimal.bloom.get(3)).toBeUndefined();
+    expect(minimal.charge.get(1) ?? 0).toBeLessThan(light.charge.get(1) ?? 0);
+    expect(total(light.bloom)).toBeLessThan(total(full.bloom));
+    expect(total(minimal.bloom)).toBeLessThan(total(light.bloom));
+    // The bloom fades sooner.
+    expect(light.tail).toBeLessThan(full.tail);
+    expect(minimal.tail).toBeLessThan(light.tail);
+  });
+
+  const rite = async (detail: PaladinVfxDetail) => {
+    const f = fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.rite(1, 2);
+    setPaladinVfxDetailForTest('full');
+    f.effect.update(0.1);
+    const windup = counts(f.effect);
+    step(f.effect, LAST_RITE_WINDUP);
+    const opening = counts(f.effect);
+    step(f.effect, 0.5);
+    const crown = counts(f.effect);
+    const out = { windup, opening, crown, tail: tail(f.effect) };
+    f.effect.dispose();
+    return out;
+  };
+
+  it('draws the same Last Rite thinner at light and minimal', async () => {
+    const full = await rite('full');
+    const light = await rite('light');
+    const minimal = await rite('minimal');
+    // Core on every tier: the plus in the off-hand, the beam, the halo of
+    // pluses and the rune sigil.
+    for (const d of [full, light, minimal]) {
+      expect(d.windup.get(1)).toBe(1);
+      expect(d.opening.get(4) ?? 0).toBeGreaterThanOrEqual(1);
+      expect(d.opening.get(5)).toBe(1);
+      expect(d.opening.get(7)).toBe(1);
+      expect(d.crown.get(1) ?? 0).toBeGreaterThan(0);
+    }
+    // Full: the gathering glow, the beam AND the pillar, and the flares.
+    expect(full.windup.get(0)).toBe(1);
+    expect(full.opening.get(4)).toBe(2);
+    expect(full.opening.get(0) ?? 0).toBeGreaterThan(0);
+    // Light keeps the glow and the pillar, drops the flares, thins the pluses.
+    expect(light.windup.get(0)).toBe(1);
+    expect(light.opening.get(4)).toBe(2);
+    expect(light.opening.get(0)).toBeUndefined();
+    expect(light.crown.get(1) ?? 0).toBeLessThan(full.crown.get(1) ?? 0);
+    // Minimal: no glow, no pillar.
+    expect(minimal.windup.get(0)).toBeUndefined();
+    expect(minimal.opening.get(4)).toBe(1);
+    expect(minimal.crown.get(1) ?? 0).toBeLessThan(light.crown.get(1) ?? 0);
+    expect(light.tail).toBeLessThan(full.tail);
+    expect(minimal.tail).toBeLessThan(light.tail);
   });
 });

@@ -7,6 +7,21 @@ import type { VfxAnchorResolver } from '../vfx_anchor';
 import { CrestPrewarm, type CrestPrewarmHost } from './crest_prewarm';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the four solid gavels landing as one cross-hammer, the
+// sounding block of runes (its shock is the block's own shader), the flash on
+// the joined head as they land, and the stun's two rune shackles; secondary =
+// the blow's flare on the target's head; accents = each gavel's appearing
+// flash, the blow's spun gold flare and the glints circling the stunned head.
+// The motes the hammer dissolves into scale with the mote count; the strike's
+// fade tail (after the hop) and the shackles' release scale with the linger.
 
 export const GAVEL_STRIKES = 6;
 export const GAVEL_HOLDS = 8;
@@ -65,6 +80,8 @@ interface Strike {
   floor: number;
   /** The heading the gavels are set round (the view's, else towards the caster). */
   bearing: number;
+  /** How much of the strike draws, read as it is cast. */
+  detail: PaladinVfxDetail;
 }
 interface Hold {
   active: boolean;
@@ -73,6 +90,21 @@ interface Hold {
   presence: number;
   /** Seconds since the stun lifted, or -1 while it holds. */
   release: number;
+  /** How much of the shackles draws, read as the stun takes hold. */
+  detail: PaladinVfxDetail;
+  /** The shackles' break for that detail, seconds. */
+  releaseFor: number;
+}
+
+/** The strike's clock from the hop's end on: the dissolve after it. */
+const GAVEL_TAIL = 0.5;
+
+/** The swing's clock `t` with its fade tail (everything after GAVEL_TAIL)
+ * played over `linger` of its authored length, so a lighter strike keeps the
+ * whole chop and hop and dissolves sooner. */
+export function gavelTailPhase(t: number, linger: number): number {
+  if (t <= GAVEL_TAIL || !(linger > 0) || linger >= 1) return t;
+  return GAVEL_TAIL + (t - GAVEL_TAIL) / linger;
 }
 
 function clamp01(x: number): number {
@@ -189,6 +221,7 @@ export class SunderingGavel {
     landed: false,
     floor: 0,
     bearing: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly holds: Hold[] = Array.from({ length: GAVEL_HOLDS }, () => ({
     active: false,
@@ -196,6 +229,8 @@ export class SunderingGavel {
     seen: false,
     presence: 0,
     release: -1,
+    detail: 'full' as PaladinVfxDetail,
+    releaseFor: GAVEL_RELEASE,
   }));
   private readonly positions = new Float32Array(VERTICES * 3);
   private readonly colors = new Float32Array(VERTICES * 3);
@@ -219,8 +254,9 @@ export class SunderingGavel {
     private readonly anchor: VfxAnchorResolver,
     private readonly groundY?: (x: number, z: number) => number,
     private readonly camera?: THREE.Camera,
-    /** The blow landing: the ground's crack, dust and stones (x, floor y, z). */
-    private readonly onImpact?: (x: number, y: number, z: number) => void,
+    /** The blow landing: the ground's crack, dust and stones (x, floor y, z),
+     * with the detail the strike was cast at. */
+    private readonly onImpact?: (x: number, y: number, z: number, detail: PaladinVfxDetail) => void,
   ) {
     const geometry = new THREE.BufferGeometry();
     for (const [name, array, size] of [
@@ -404,6 +440,7 @@ export class SunderingGavel {
         : 0,
     );
     s.landed = false;
+    s.detail = paladinVfxDetailNow();
     s.floor = effectFloor(this.groundY?.(this.feet.x, this.feet.z), this.feet.y);
     // Set square to the view (the camera's heading), so from above the
     // handles make a plus and on screen none comes end-on.
@@ -428,6 +465,8 @@ export class SunderingGavel {
       h.id = target;
       h.presence = 0;
       h.release = -1;
+      h.detail = paladinVfxDetailNow();
+      h.releaseFor = paladinDetailLinger(GAVEL_RELEASE, h.detail);
     }
     h.seen = true;
   }
@@ -470,7 +509,8 @@ export class SunderingGavel {
 
   private strike1(s: Strike, slot: number, dt: number, reduced: boolean): void {
     s.age += dt;
-    const t = gavelPhase(s.age, s.contact);
+    const scale = paladinDetailScale(s.detail);
+    const t = gavelTailPhase(gavelPhase(s.age, s.contact), scale.linger);
     if (t >= GAVEL_LIFE || !this.anchor(s.target, 0, this.feet)) {
       s.active = false;
       return;
@@ -488,7 +528,7 @@ export class SunderingGavel {
     const since = t - GAVEL_CONTACT;
     if (since >= 0 && !s.landed) {
       s.landed = true;
-      this.onImpact?.(x, s.floor, z);
+      this.onImpact?.(x, s.floor, z, s.detail);
     }
     // The sounding block beneath the target.
     const blockR = 1.15 * sc;
@@ -514,6 +554,7 @@ export class SunderingGavel {
         (1 - appear) * 0.6 + (since >= 0 ? Math.exp(-since * 10) * 0.8 : 0);
     }
     const fade = ramp(t, 0.5, 1.0);
+    const motes = paladinDetailCount(MOTES, s.detail);
     for (let k = 0; k < GAVEL_COUNT; k++) {
       const bearing = s.bearing + (k * Math.PI * 2) / GAVEL_COUNT;
       const dx = Math.cos(bearing),
@@ -563,7 +604,7 @@ export class SunderingGavel {
       // A flash where each appears.
       this.param = 0;
       this.time = t;
-      if (t < 0.12)
+      if (t < 0.12 && scale.accents)
         this.billboard(
           headX,
           headY,
@@ -575,8 +616,8 @@ export class SunderingGavel {
         );
       // Dissolving upward in motes.
       if (reduced || fade <= 0) continue;
-      for (let i = 0; i < MOTES; i++) {
-        const u = (i + 0.5) / MOTES;
+      for (let i = 0; i < motes; i++) {
+        const u = (i + 0.5) / motes;
         const n = k * MOTES + i;
         const across = (hash(n, 1) - 0.5) * 0.5,
           out = u * GRIP;
@@ -604,8 +645,9 @@ export class SunderingGavel {
         Math.exp(-since * 14) * 0.9,
         SHAPE.flare,
       );
-    if (since >= 0 && since < 0.5) {
+    if (since >= 0 && since < 0.5 && scale.secondary)
       this.billboard(x, topY + 0.05, z, 1.2 * gs, IVORY, Math.exp(-since * 8) * 1.0, SHAPE.flare);
+    if (since >= 0 && since < 0.5 && scale.accents) {
       this.billboard(
         x,
         topY + 0.05,
@@ -624,7 +666,7 @@ export class SunderingGavel {
     h.seen = false;
     if (h.release >= 0) h.release += dt;
     else h.presence = Math.min(1, h.presence + dt * 6);
-    if (h.release >= GAVEL_RELEASE || !this.anchor(h.id, 0, this.feet)) {
+    if (h.release >= h.releaseFor || !this.anchor(h.id, 0, this.feet)) {
       h.active = false;
       return;
     }
@@ -633,7 +675,7 @@ export class SunderingGavel {
     const sc = height / 1.8;
     const x = this.feet.x,
       z = this.feet.z;
-    const out = h.release >= 0 ? ramp(h.release, 0, GAVEL_RELEASE) : 0;
+    const out = h.release >= 0 ? ramp(h.release, 0, h.releaseFor) : 0;
     const alpha = h.presence * (1 - out);
     // Two shackles of runes counter-rotating round chest and knee; when the
     // stun lifts they snap outward and fade.
@@ -658,7 +700,7 @@ export class SunderingGavel {
         SHAPE.band,
       );
     }
-    if (reduced) return;
+    if (reduced || !paladinDetailScale(h.detail).accents) return;
     // Glints circling the head.
     for (let i = 0; i < GLINTS; i++) {
       const ang = this.clock * 3 + (i * Math.PI * 2) / GLINTS;

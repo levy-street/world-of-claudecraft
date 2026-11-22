@@ -1,12 +1,15 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import {
   SOLAR_IGNITE_DURATION,
   SOLAR_PRINT_LIFE,
   SOLAR_STRIDE,
   SolarStep,
 } from '../src/render/ability_vfx/solar_step';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 
 function fixture() {
   const scene = new THREE.Scene();
@@ -50,6 +53,10 @@ function run(f: ReturnType<typeof fixture>, seconds: number, speed: number, stea
 }
 
 describe('Solar Step sprint', () => {
+  // Node runs at the Medium preset: pin the authored composition.
+  beforeEach(() => setPaladinVfxDetailForTest('full'));
+  afterEach(() => setPaladinVfxDetailForTest(null));
+
   it('needs preparation, ignites a sun at the feet and burns out after the cast', async () => {
     const f = fixture();
     expect(f.effect.ignite(1)).toBe(false);
@@ -104,11 +111,66 @@ describe('Solar Step sprint', () => {
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
       deps: { fx },
       releaseGesture,
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
     }) as AbilityVfx;
     const ev = { sourceId: 1, targetId: 1, school: 'holy', ability: 'solar_step' };
     expect(p.handleSpellfx({ ...ev, fx: 'selfCast' })).toBe(true);
     expect(p.handleSpellfx({ ...ev, fx: 'buffApply' })).toBe(true);
     expect(fx.solarStepIgnite).toHaveBeenCalledExactlyOnceWith(1);
     expect(releaseGesture).toHaveBeenCalledOnce();
+  });
+});
+
+describe('Solar Step detail tiers', () => {
+  afterEach(() => setPaladinVfxDetailForTest(null));
+
+  const TIERS: readonly PaladinVfxDetail[] = ['full', 'light', 'minimal'];
+  const quads = (m: Map<number, number>) => [...m.values()].reduce((a, b) => a + b, 0);
+
+  it('keeps the sun-prints, ignition and glow on every tier, the ribbon above minimal', async () => {
+    const ignition = {} as Record<PaladinVfxDetail, Map<number, number>>;
+    const sprint = {} as Record<PaladinVfxDetail, Map<number, number>>;
+    for (const detail of TIERS) {
+      setPaladinVfxDetailForTest(detail);
+      const lit = fixture();
+      await lit.prepare();
+      lit.effect.ignite(1);
+      lit.effect.update(0.05);
+      ignition[detail] = lit.counts();
+      lit.effect.dispose();
+      const f = fixture();
+      await f.prepare();
+      run(f, 0.6, 17.5);
+      sprint[detail] = f.counts();
+      f.effect.dispose();
+    }
+    for (const detail of TIERS) {
+      // The ignition sun and the runner's glow (one flare) on every tier.
+      expect(ignition[detail].get(1)).toBe(1);
+      expect(ignition[detail].get(4)).toBe(detail === 'full' ? 2 : 1);
+      expect(sprint[detail].get(0) ?? 0).toBeGreaterThan(0);
+    }
+    expect(sprint.full.get(0) ?? 0).toBeGreaterThan(3);
+    expect(sprint.light.get(3) ?? 0).toBeGreaterThan(3);
+    expect(sprint.minimal.get(3) ?? 0).toBe(0);
+    // Embers thin: about half on light, a third on minimal.
+    expect(sprint.light.get(5) ?? 0).toBeLessThan(sprint.full.get(5) ?? 0);
+    expect(sprint.minimal.get(5) ?? 0).toBeLessThan(sprint.light.get(5) ?? 0);
+    expect(sprint.minimal.get(5) ?? 0).toBeGreaterThan(0);
+    expect(quads(sprint.light)).toBeLessThan(quads(sprint.full));
+    expect(quads(sprint.minimal)).toBeLessThan(quads(sprint.light));
+  });
+
+  it('cools the prints sooner on minimal', async () => {
+    setPaladinVfxDetailForTest('minimal');
+    const f = fixture();
+    await f.prepare();
+    run(f, 0.3, 17.5);
+    for (let t = 0; t < SOLAR_PRINT_LIFE * 0.45 + 0.1; t += 0.05) f.effect.update(0.05);
+    expect(f.counts().get(0) ?? 0).toBe(0);
+    f.effect.dispose();
   });
 });

@@ -3,6 +3,12 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { CrestPrewarm } from './crest_prewarm';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 
 export const SOLAR_RUNNERS = 6;
 /** Stride between sun-prints, in yards, and how long one burns. */
@@ -47,6 +53,8 @@ interface Runner {
   trail: Float32Array;
   points: number;
   emberDebt: number;
+  /** The Paladin detail read when the runner was first seen (the cast or the sprint). */
+  detail: PaladinVfxDetail;
 }
 interface Print {
   x: number;
@@ -54,6 +62,8 @@ interface Print {
   z: number;
   heading: number;
   age: number;
+  /** How long this print burns (shorter on lighter tiers). */
+  life: number;
 }
 interface Ember {
   x: number;
@@ -76,6 +86,12 @@ function ramp(t: number, from: number, to: number): number {
  * ground, embers kick up behind the heels and a comet ribbon of light streams
  * from the body. Steadfast Step's slow immunity shows as a turning ring of
  * gold at the feet. One pooled draw, textureless, no per-frame allocations.
+ *
+ * Detail: core = the sun-prints, the ignition sun at the feet, the sunlight
+ * the runner burns with and the steadfast ring; secondary = the comet ribbon;
+ * accents = the ignition's flare. The embers thin with the tier (half on light,
+ * a third on minimal), and lighter tiers let the prints cool and the runner's
+ * light go sooner.
  */
 export class SolarStep {
   readonly mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
@@ -97,6 +113,7 @@ export class SolarStep {
     trail: new Float32Array(SOLAR_TRAIL_POINTS * 4),
     points: 0,
     emberDebt: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly prints: Print[] = [];
   private readonly printPool: Print[] = Array.from({ length: SOLAR_PRINTS }, () => ({
@@ -105,6 +122,7 @@ export class SolarStep {
     z: 0,
     heading: 0,
     age: 0,
+    life: SOLAR_PRINT_LIFE,
   }));
   private readonly embers: Ember[] = [];
   private readonly emberPool: Ember[] = Array.from({ length: SOLAR_EMBERS }, () => ({
@@ -258,6 +276,7 @@ export class SolarStep {
     slot.stride = 0;
     slot.points = 0;
     slot.emberDebt = 0;
+    slot.detail = paladinVfxDetailNow();
     return slot;
   }
 
@@ -359,12 +378,12 @@ export class SolarStep {
     for (let i = this.prints.length - 1; i >= 0; i--) {
       const p = this.prints[i];
       p.age += dt;
-      if (p.age >= SOLAR_PRINT_LIFE) {
+      if (p.age >= p.life) {
         this.printPool.push(p);
         this.prints.splice(i, 1);
         continue;
       }
-      const fade = 1 - ramp(p.age, SOLAR_PRINT_LIFE * 0.4, SOLAR_PRINT_LIFE);
+      const fade = 1 - ramp(p.age, p.life * 0.4, p.life);
       const fx = Math.sin(p.heading) * 0.6,
         fz = Math.cos(p.heading) * 0.6;
       this.time = p.age;
@@ -411,7 +430,10 @@ export class SolarStep {
   }
 
   private run(r: Runner, dt: number, reduced: boolean): void {
-    r.presence = r.seen ? Math.min(1, r.presence + dt * 6) : Math.max(0, r.presence - dt * 3);
+    const scale = paladinDetailScale(r.detail);
+    r.presence = r.seen
+      ? Math.min(1, r.presence + dt * 6)
+      : Math.max(0, r.presence - (dt * 3) / scale.linger);
     r.seen = false;
     if (r.ignite >= 0) r.ignite += dt;
     const igniting = r.ignite >= 0 && r.ignite < SOLAR_IGNITE_DURATION;
@@ -453,12 +475,13 @@ export class SolarStep {
         p.y = r.floor;
         p.heading = r.heading;
         p.age = 0;
+        p.life = paladinDetailLinger(SOLAR_PRINT_LIFE, r.detail);
         this.prints.push(p);
       }
     }
     // Embers kicked up behind the heels while running.
     if (!reduced && k > 0.3 && running) {
-      r.emberDebt += dt * 40;
+      r.emberDebt += dt * 40 * scale.count;
       while (r.emberDebt >= 1) {
         r.emberDebt -= 1;
         const m = this.emberPool.pop() ?? this.embers.shift();
@@ -495,11 +518,13 @@ export class SolarStep {
     trail[3] = 0;
     while (r.points > 1 && trail[(r.points - 1) * 4 + 3] > SOLAR_TRAIL_SECONDS) r.points--;
     const height = this.anchor(r.id, 0.5, this.at) ? this.at.y - y : 0.9;
-    if (!reduced) this.ribbon(r, height, k);
+    if (!reduced && scale.secondary) this.ribbon(r, height, k);
     // The ignition sun at the feet, and a flare at the heart.
     if (igniting) {
       this.time = r.ignite;
       this.quad(x, r.floor + 0.04, z, 2.3, 0, 0, 0, 0, 2.3, GOLD, 1.2, SHAPE.ignite);
+    }
+    if (igniting && scale.accents) {
       const cam = this.cam;
       const size = 1.8,
         flare = Math.exp(-r.ignite * 7) * 1.4;

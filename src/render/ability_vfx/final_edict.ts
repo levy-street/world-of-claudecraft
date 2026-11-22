@@ -5,6 +5,7 @@ import {
   EDICT_STAMP_DURATION,
   EDICT_STAMP_SCALE,
   EDICT_TRAIL,
+  EDICT_WAVE,
   EDICT_WAVE_EDGE_SEGMENTS,
   EDICT_WAVE_SHOCK_SEGMENTS,
   EDICT_WAVE_SPOKES,
@@ -40,6 +41,19 @@ import type { VfxAnchorResolver } from '../vfx_anchor';
 import type { WeaponAnchorSampler } from '../weapon_trail_anchor';
 import { CrestPrewarm } from './crest_prewarm';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the blade of light (the weapon's path or the clip's arc), the
+// seal stamped under the victim, an absorbed verdict's shield ring, and the
+// Ascension shockwave's front and held reach; secondary = the light gathering
+// on the weapon, the explosion's sun rays and the seals stamped under each
+// enemy it strikes; accents = the contact flares (the sparks scale with count,
+// the seal's and the held reach's fade tails with linger).
 
 // Additive light in the shared Paladin palette. Nothing here darkens the scene.
 const COLORS = {
@@ -107,6 +121,8 @@ interface Slot {
    *  walks the rig), with the elapsed time of its next lookup when missing. */
   weapon: WeaponAnchorSampler | null;
   weaponRetry: number;
+  /** How much of the strike draws, read when it resolved. */
+  detail: PaladinVfxDetail;
 }
 
 interface Wave {
@@ -118,6 +134,7 @@ interface Wave {
   /** The Paladin's displayed feet, for raised floors. */
   feet: number;
   radius: number;
+  detail: PaladinVfxDetail;
 }
 
 interface Stamp {
@@ -133,6 +150,13 @@ interface Stamp {
   fx: number;
   fz: number;
   absorbed: boolean;
+  detail: PaladinVfxDetail;
+}
+
+/** `age` with its tail past `from` run faster by 1 / `linger`: a lighter tier
+ * plays the same envelope with a shorter fade. Identity at linger 1. */
+function lingerAge(age: number, from: number, linger: number): number {
+  return linger >= 1 || age <= from ? age : from + (age - from) / linger;
 }
 
 /** One bounded draw, no textures, lights, camera impulses or cast-time assets.
@@ -160,6 +184,7 @@ export class FinalEdict {
     points: 0,
     weapon: null,
     weaponRetry: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly waves: Wave[] = Array.from({ length: FINAL_EDICT_WAVE_CAPACITY }, () => ({
     active: false,
@@ -169,6 +194,7 @@ export class FinalEdict {
     z: 0,
     feet: 0,
     radius: FINAL_EDICT_WAVE_RADIUS,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly stamps: Stamp[] = Array.from({ length: FINAL_EDICT_STAMP_CAPACITY }, () => ({
     active: false,
@@ -182,6 +208,7 @@ export class FinalEdict {
     fx: 0,
     fz: 1,
     absorbed: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly positions = new Float32Array(MAX_VERTICES * 3);
   private readonly colors = new Float32Array(MAX_VERTICES * 3);
@@ -380,6 +407,7 @@ export class FinalEdict {
     slot.points = 0;
     slot.weapon = null;
     slot.weaponRetry = 0;
+    slot.detail = paladinVfxDetailNow();
     this.place(slot);
     return true;
   }
@@ -398,6 +426,7 @@ export class FinalEdict {
     wave.z = feet.z;
     wave.feet = feet.y;
     wave.radius = radius > 0 ? radius : FINAL_EDICT_WAVE_RADIUS;
+    wave.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -406,6 +435,10 @@ export class FinalEdict {
   areaHit(sourceId: number, targetId: number, outcome: EdictOutcome): boolean {
     if (this.disposed || outcome === 'none' || !this.preparation.ready('final_edict')) return false;
     if (!this.anchor(targetId, 0.62, this.target)) return false;
+    const detail = paladinVfxDetailNow();
+    // The stamped seals are a secondary layer: the lightest tier lets the
+    // shockwave alone carry the explosion (still played, so no fallback).
+    if (!paladinDetailScale(detail).secondary) return true;
     let wave: Wave | null = null;
     for (const w of this.waves)
       if (w.active && w.source === sourceId && (!wave || w.age < wave.age)) wave = w;
@@ -414,6 +447,7 @@ export class FinalEdict {
     stamp.age = wave ? wave.age : 0;
     stamp.target = targetId;
     stamp.absorbed = outcome === 'absorb';
+    stamp.detail = detail;
     const dx = wave ? this.target.x - wave.x : 0;
     const dz = wave ? this.target.z - wave.z : 1;
     const distance = Math.hypot(dx, dz);
@@ -517,7 +551,12 @@ export class FinalEdict {
     for (const wave of this.waves) {
       if (!wave.active) continue;
       wave.age += step;
-      const since = wave.age - FINAL_EDICT_LAND;
+      // The held reach fades sooner on lighter tiers (its front races out the same).
+      const since = lingerAge(
+        wave.age - FINAL_EDICT_LAND,
+        EDICT_WAVE.grow,
+        paladinDetailScale(wave.detail).linger,
+      );
       if (since >= FINAL_EDICT_WAVE_DURATION) {
         wave.active = false;
         continue;
@@ -527,7 +566,7 @@ export class FinalEdict {
     for (const stamp of this.stamps) {
       if (!stamp.active) continue;
       stamp.age += step;
-      const since = stamp.age - stamp.at;
+      const since = lingerAge(stamp.age - stamp.at, 0.2, paladinDetailScale(stamp.detail).linger);
       if (since >= EDICT_STAMP_DURATION) {
         stamp.active = false;
         continue;
@@ -589,6 +628,8 @@ export class FinalEdict {
     this.tip = slot.weapon?.(this.weaponAt) === true;
     // A sampler whose weapon is gone is looked up again after the delay.
     if (!this.tip && slot.weapon) slot.weapon = null;
+    // The tip still feeds the blade's path; only its light is secondary.
+    if (!paladinDetailScale(slot.detail).secondary) return;
     const armed = this.tip || this.anchor(slot.source, 0.75, this.weaponAt) !== null;
     const scale = slot.critical ? 1.2 : 1;
     const size = since < 0 ? 0.5 + 0.35 * (1 + since / FINAL_EDICT_LAND) : 0.9;
@@ -610,16 +651,17 @@ export class FinalEdict {
   private absorb(slot: Slot, v: number[], age: number): void {
     this.time = age;
     // A shield ping: the verdict was caught, so no blade and no seal.
-    this.billboard(
-      slot.x,
-      slot.y,
-      slot.z,
-      v,
-      0.45,
-      'hot',
-      edictAlpha('flare', age, false) * 0.45,
-      SHAPE.flare,
-    );
+    if (paladinDetailScale(slot.detail).accents)
+      this.billboard(
+        slot.x,
+        slot.y,
+        slot.z,
+        v,
+        0.45,
+        'hot',
+        edictAlpha('flare', age, false) * 0.45,
+        SHAPE.flare,
+      );
     this.billboard(
       slot.x,
       slot.y,
@@ -635,6 +677,7 @@ export class FinalEdict {
   private strike(slot: Slot, v: number[], age: number, reduced: boolean): void {
     const crit = slot.critical;
     const scale = crit ? 1.2 : 1;
+    const detail = paladinDetailScale(slot.detail);
     const fx = slot.fx,
       fz = slot.fz;
     const sx = -fz,
@@ -646,16 +689,17 @@ export class FinalEdict {
     else this.slash(slot, v, scale, reduced, age);
 
     this.time = reduced ? 0.3 : age;
-    this.billboard(
-      slot.x,
-      slot.y,
-      slot.z,
-      v,
-      0.95 * scale,
-      'hot',
-      edictAlpha('flare', age, crit),
-      SHAPE.flare,
-    );
+    if (detail.accents)
+      this.billboard(
+        slot.x,
+        slot.y,
+        slot.z,
+        v,
+        0.95 * scale,
+        'hot',
+        edictAlpha('flare', age, crit),
+        SHAPE.flare,
+      );
 
     // The edict's seal, stamped on the ground beneath the victim, its sword
     // planted along the blow.
@@ -670,13 +714,16 @@ export class FinalEdict {
       sx * seal,
       sz * seal,
       'gold',
-      edictAlpha('seal', age, crit),
+      edictAlpha('seal', lingerAge(age, 0.3, detail.linger), crit),
       SHAPE.seal,
     );
 
     // Sparks: thrown onward through the victim, each streak along its flight.
     const s = this.spark;
-    for (let i = 0; i < FINAL_EDICT_SPARKS; i++) {
+    const sparks = paladinDetailCount(FINAL_EDICT_SPARKS, slot.detail);
+    for (let n = 0; n < sparks; n++) {
+      // Fewer sparks keep the full spray's spread: every k-th one.
+      const i = Math.floor((n * FINAL_EDICT_SPARKS) / sparks);
       sampleEdictSpark(i, age, reduced, crit, s);
       const hx = slot.x + fx * s.forward + sx * s.side;
       const hy = slot.y + s.up;
@@ -900,7 +947,8 @@ export class FinalEdict {
     this.time = age;
     // Sun rays behind the front.
     const inner = wave.radius * 0.12;
-    for (let i = 0; i < EDICT_WAVE_SPOKES; i++) {
+    const spokes = paladinDetailScale(wave.detail).secondary ? EDICT_WAVE_SPOKES : 0;
+    for (let i = 0; i < spokes; i++) {
       const a = (i / EDICT_WAVE_SPOKES) * Math.PI * 2 + 0.13;
       const cx = Math.cos(a),
         cz = Math.sin(a);
@@ -980,6 +1028,7 @@ export class FinalEdict {
       alpha * 0.85,
       SHAPE.seal,
     );
+    if (!paladinDetailScale(stamp.detail).accents) return;
     this.billboard(
       stamp.x,
       stamp.y,

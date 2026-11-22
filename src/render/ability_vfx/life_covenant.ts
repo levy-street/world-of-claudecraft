@@ -8,6 +8,8 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import { type PaladinVfxDetail, paladinDetailScale } from './paladin_vfx_detail_core';
 
 export const COVENANT_BONDS = 6;
 /** The bond reaches the ally after this long, then lets go. */
@@ -23,6 +25,10 @@ interface Bond {
   source: number;
   target: number;
   age: number;
+  /** The Paladin detail read when the covenant was sworn. */
+  detail: PaladinVfxDetail;
+  /** When the bond lets go (its fade tail shortened on lighter tiers). */
+  end: number;
 }
 
 /**
@@ -31,6 +37,11 @@ interface Bond {
  * covenant takes. While the covenant holds, the ally
  * bears Guardian Covenant's shield of light with the Sunmender's sign at its
  * heart (guardian_covenant.ts).
+ *
+ * Detail: core = one strand of the bond and the ward sigil; secondary = the
+ * second strand twisting about it; accents = the flare as the covenant takes.
+ * Light drops the flare; minimal draws a single strand and the sigil, both
+ * fading sooner. The held shield (guardian_covenant.ts) is not drawn here.
  */
 export class LifeCovenant {
   private readonly pool: PaladinQuadPool<'life_covenant'>;
@@ -39,6 +50,8 @@ export class LifeCovenant {
     source: -1,
     target: -1,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
+    end: COVENANT_BOND_DURATION,
   }));
   /** The shield held while the covenant lasts. */
   readonly ward: GuardianCovenant;
@@ -100,6 +113,14 @@ export class LifeCovenant {
     slot.source = source;
     slot.target = target;
     slot.age = 0;
+    slot.detail = paladinVfxDetailNow();
+    const linger = paladinDetailScale(slot.detail).linger;
+    // The fade tail after the bond takes, shortened on lighter tiers.
+    const fadeFrom = COVENANT_REACH + 0.15;
+    slot.end =
+      linger === 1
+        ? COVENANT_BOND_DURATION
+        : fadeFrom + (COVENANT_BOND_DURATION - fadeFrom) * linger;
     return true;
   }
 
@@ -140,7 +161,7 @@ export class LifeCovenant {
       if (!b.active) continue;
       b.age += dt;
       if (
-        b.age >= COVENANT_BOND_DURATION ||
+        b.age >= b.end ||
         !this.ctx.anchor(b.target, 0.6, this.to) ||
         !this.ctx.anchor(b.source, 0.62, this.from)
       ) {
@@ -149,7 +170,8 @@ export class LifeCovenant {
       }
       const t = b.age;
       const head = reduced ? 1 : ramp(t / COVENANT_REACH, 0, 1);
-      const fade = 1 - ramp(t, COVENANT_REACH + 0.15, COVENANT_BOND_DURATION);
+      const scale = paladinDetailScale(b.detail);
+      const fade = 1 - ramp(t, COVENANT_REACH + 0.15, b.end);
       if (b.source !== b.target) {
         // Two strands twisting about each other from the Paladin to the ally.
         const dx = this.to.x - this.from.x,
@@ -158,7 +180,10 @@ export class LifeCovenant {
         const len = Math.hypot(dx, dz) || 1;
         const sx = -dz / len,
           sz = dx / len;
-        for (const phase of [0, Math.PI]) {
+        // The second strand is the secondary layer: one alone still binds.
+        const strands = scale.secondary ? 2 : 1;
+        for (let n = 0; n < strands; n++) {
+          const phase = n * Math.PI;
           for (let i = 0; i < SEGMENTS; i++) {
             const u0 = (head * i) / SEGMENTS,
               u1 = (head * (i + 1)) / SEGMENTS;
@@ -190,18 +215,19 @@ export class LifeCovenant {
           this.to.z,
           0.7,
           KIT_WARM,
-          (1 - ramp(since, 0.3, 0.6)) * 1.2,
+          (1 - ramp(since, 0.3, 0.3 + 0.3 * scale.linger)) * 1.2,
           SHAPE.sigil,
         );
-        pool.billboard(
-          this.to.x,
-          this.to.y,
-          this.to.z,
-          1.1,
-          KIT_IVORY,
-          Math.exp(-since * 8) * 1.2,
-          SHAPE.flare,
-        );
+        if (scale.accents)
+          pool.billboard(
+            this.to.x,
+            this.to.y,
+            this.to.z,
+            1.1,
+            KIT_IVORY,
+            Math.exp(-since * 8) * 1.2,
+            SHAPE.flare,
+          );
       }
     }
     pool.end();

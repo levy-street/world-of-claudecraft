@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import {
   CAST_SIGIL_DURATION,
@@ -14,12 +14,17 @@ import {
   PALADIN_SPEC_ICONS_URL,
   setPaladinSpecIconsForTest,
 } from '../src/render/ability_vfx/paladin_spec_icons';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import { WardOfFaith } from '../src/render/ability_vfx/ward_of_faith';
 import {
   clearBastionRiteShields,
   shieldBlockLeft,
   shieldSigilSpec,
 } from '../src/render/paladin_shield_buffs';
+
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 it('tracks the actual offhand, deduplicates overlapping casts and expires without a lingering emblem', () => {
   const hand = new THREE.Vector3(2, 3, 4);
@@ -266,4 +271,65 @@ it("knows the local player's spec before their first cast, so the first sigil is
   // Every frame, no cast needed (and a respec is picked up the same way).
   painter.update(1 / 60);
   expect(fx.learnPaladinSpec).toHaveBeenCalledExactlyOnceWith(7, 'retribution');
+});
+
+it('draws lighter at lower detail: the same icon, a quicker release, and minimal leaves the shield unlit', () => {
+  const shield = Object.assign(() => true, {
+    frame: (out: THREE.Matrix4) => {
+      out.makeBasis(
+        new THREE.Vector3(0, 0, -1),
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(1, 0, 0),
+      );
+      out.setPosition(1, 1.2, 0.5);
+      return true;
+    },
+    faceHalf: () => 0.25,
+    faceDepth: () => 0.1,
+  });
+  // The quads drawn while lit, whether the shield lit, and how long it shows.
+  const run = (detail: PaladinVfxDetail) => {
+    clearBastionRiteShields();
+    setPaladinVfxDetailForTest(detail);
+    const camera = new THREE.PerspectiveCamera();
+    camera.position.set(5, 1.2, 0.5);
+    camera.lookAt(1, 1.2, 0.5);
+    camera.updateMatrixWorld(true);
+    const effect = new PaladinCastSigil(
+      new THREE.Scene(),
+      camera,
+      (_id, fraction, out = new THREE.Vector3()) => out.set(0, fraction * 2, 0),
+      (_id, _which, out) => {
+        out.set(0.2, 2, 0);
+        return true;
+      },
+      () => shield,
+    );
+    vi.spyOn(effect.preparation, 'ready').mockReturnValue(true);
+    effect.cast(1, 'holy');
+    effect.update(0.3);
+    const quads = effect.mesh.geometry.drawRange.count / 6;
+    const lit = shieldBlockLeft(1) !== null;
+    let shown = 0.3;
+    while (effect.mesh.visible && shown < 2) {
+      effect.update(0.01);
+      shown += 0.01;
+    }
+    effect.dispose();
+    clearBastionRiteShields();
+    return { quads, lit, shown };
+  };
+  const full = run('full');
+  const light = run('light');
+  const minimal = run('minimal');
+  // The sigil is the core: one icon quad on every tier.
+  for (const tier of [full, light, minimal]) expect(tier.quads).toBe(1);
+  // The shield's light is secondary: kept at light, gone at minimal.
+  expect(full.lit).toBe(true);
+  expect(light.lit).toBe(true);
+  expect(minimal.lit).toBe(false);
+  // The release lingers less on each lighter tier.
+  expect(full.shown).toBeCloseTo(CAST_SIGIL_DURATION, 1);
+  expect(light.shown).toBeLessThan(full.shown);
+  expect(minimal.shown).toBeLessThan(light.shown);
 });

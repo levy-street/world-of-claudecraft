@@ -1,7 +1,10 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import { TollingHammer } from '../src/render/ability_vfx/tolling_hammer';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import {
   TOLLING_CAPACITY,
   TOLLING_DROP,
@@ -39,6 +42,10 @@ async function fixture() {
     },
   };
 }
+
+// Node runs at the Medium preset: pin the authored composition.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('Tolling Hammer', () => {
   it('requires preparation and a confirmed outcome before the overhead strike', async () => {
@@ -128,6 +135,10 @@ describe('Tolling Hammer', () => {
     const receiveHit = vi.fn(),
       releaseGesture = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx, receiveHit },
       releaseGesture,
     }) as AbilityVfx;
@@ -181,5 +192,77 @@ describe('headFirstTurn', () => {
     };
     expect(await tolls(false)).toBe(1);
     expect(await tolls(true)).toBe(2);
+  });
+});
+
+describe('Tolling Hammer detail', () => {
+  /** Quads per shape of one gilded strike at `detail`, sampled while the
+   * hammer falls and just after it strikes. */
+  const strike = async (detail: PaladinVfxDetail) => {
+    const f = await fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.launch(1, 2);
+    f.effect.contact(1, 2, 'damage');
+    // A later detail change never reshapes a running strike.
+    setPaladinVfxDetailForTest('full');
+    f.effect.gild(1);
+    const count = () => {
+      const g = f.effect.mesh.geometry;
+      const shape = g.getAttribute('aShape');
+      const out = [0, 0, 0, 0, 0, 0];
+      for (let i = 0; i < g.drawRange.count; i += 6) out[shape.getX(i)]++;
+      return out;
+    };
+    f.effect.update(0.1, false);
+    const falling = count();
+    f.effect.update(TOLLING_DROP - 0.1 + 0.12, false);
+    const struck = count();
+    const total = struck.reduce((a, b) => a + b, 0);
+    // The strike's tail: how long until nothing draws.
+    let tail = 0;
+    while (f.effect.mesh.visible && tail < 2) {
+      f.effect.update(0.02, false);
+      tail += 0.02;
+    }
+    f.effect.dispose();
+    return { falling, struck, total, tail };
+  };
+
+  it('draws the same hammer and toll lighter at light and minimal', async () => {
+    const full = await strike('full');
+    const light = await strike('light');
+    const minimal = await strike('minimal');
+    // Core: the hammer and the ground (reticle, then the toll) on every tier.
+    for (const d of [full, light, minimal]) {
+      expect(d.falling[0]).toBe(1);
+      expect(d.falling[5]).toBe(1);
+      expect(d.struck[0]).toBe(1);
+      expect(d.struck[5]).toBeGreaterThan(0);
+      expect(d.struck[4]).toBeGreaterThan(0);
+    }
+    // Full: the sky flare and streak as it falls; the gilded second toll,
+    // pillar and strike flare at the strike.
+    expect(full.falling[3]).toBe(1);
+    expect(full.falling[2]).toBe(1);
+    expect(full.struck[5]).toBe(2);
+    expect(full.struck[2]).toBe(1);
+    expect(full.struck[3]).toBe(1);
+    // Light keeps the secondary layers, drops the sky flare and thins the sparks.
+    expect(light.falling[3]).toBe(0);
+    expect(light.falling[2]).toBe(1);
+    expect(light.struck[5]).toBe(2);
+    expect(light.struck[2]).toBe(1);
+    expect(light.struck[4]).toBeLessThan(full.struck[4]);
+    // Minimal keeps only the core and a third of the sparks.
+    expect(minimal.falling[3] + minimal.falling[2]).toBe(0);
+    expect(minimal.struck[5]).toBe(1);
+    expect(minimal.struck[2] + minimal.struck[3]).toBe(0);
+    expect(minimal.struck[4]).toBeLessThan(light.struck[4]);
+    expect(light.total).toBeLessThan(full.total);
+    expect(minimal.total).toBeLessThan(light.total);
+    // Shorter lingers.
+    expect(light.tail).toBeLessThan(full.tail);
+    expect(minimal.tail).toBeLessThan(light.tail);
   });
 });

@@ -4,6 +4,13 @@ import { headFirstTurn } from '../tolling_hammer_core';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { CrestPrewarm } from './crest_prewarm';
 import { HEAL_PLUS_GLSL, HEAL_PLUS_QUAD } from './heal_plus';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 import {
   HAMMER_HALF_LENGTH,
   HAMMER_HALF_WIDTH,
@@ -38,6 +45,14 @@ export const GRACE_HELIX_SEGMENTS = 14;
 const TRAIL_SPARKS = 4;
 /** Ghosts behind each shard on its way home. */
 const MOTE_GHOSTS = 3;
+
+// Detail: core = the hammer (thrown and stamping in), the gold ring of the
+// blow and the shards of grace going home; secondary = the trail and its twin
+// helix, the ring at the hand, the sky ring of the blow, the ghosts behind each
+// shard, the ring and helix of grace round the Paladin; accents = the flares,
+// the starburst, the sparkles the trail sheds, each shard's landing flash and
+// the pluses rising at home (shards scale with count, the bloom's fade with
+// linger).
 
 /** In flight: hammer, release flare and ring, trail, the helix, sparkles.
  * After the hit: flare, rays, two rings, the hammer, the shards and their
@@ -79,6 +94,8 @@ interface Grace {
   dx: number;
   dz: number;
   absorbed: boolean;
+  /** How much of it draws, read when it was thrown (or struck unseen). */
+  detail: PaladinVfxDetail;
 }
 
 function ramp(t: number, from: number, to: number): number {
@@ -126,6 +143,7 @@ export class GraceHammer {
     dx: 0,
     dz: 1,
     absorbed: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly positions = new Float32Array(VERTICES * 3);
   private readonly colors = new Float32Array(VERTICES * 3);
@@ -282,6 +300,7 @@ export class GraceHammer {
     s.dx = (this.aim.x - s.x) / d;
     s.dz = (this.aim.z - s.z) / d;
     s.absorbed = false;
+    s.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -297,8 +316,11 @@ export class GraceHammer {
     }
     if (!this.preparation.ready('grace_hammer') || !this.anchor(target, 0.6, this.aim))
       return false;
+    // A strike whose throw was never seen spawns here; a seen one keeps its throw's detail.
+    const unseen = !s;
     if (!s) s = this.slots.find((slot) => slot.phase === 0);
     if (!s) return false;
+    if (unseen) s.detail = paladinVfxDetailNow();
     if (this.anchor(source, 0.6, this.origin)) {
       const d = Math.hypot(this.aim.x - this.origin.x, this.aim.z - this.origin.z) || 1;
       s.dx = (this.aim.x - this.origin.x) / d;
@@ -560,20 +582,23 @@ export class GraceHammer {
     if (distance - step <= 0.6) return;
     // Head first along the flight, never spinning.
     this.hammer(s.x, s.y, s.z, headFirstTurn(this.cam, s.dx, s.dz), THROWN_SCALE, 0.35, 1);
+    const scale = paladinDetailScale(s.detail);
     // The release: a flare and a ring of light at the hand.
     const release = Math.max(0, 1 - s.age / 0.15);
-    this.billboard(this.origin.x, this.origin.y, this.origin.z, 0.9, SKY, release, SHAPE.flare);
+    if (scale.accents)
+      this.billboard(this.origin.x, this.origin.y, this.origin.z, 0.9, SKY, release, SHAPE.flare);
     this.time = s.age;
-    this.billboard(
-      this.origin.x,
-      this.origin.y,
-      this.origin.z,
-      0.75,
-      GOLD,
-      1 - ramp(s.age, 0.12, 0.32),
-      SHAPE.ring,
-    );
-    if (reduced) return;
+    if (scale.secondary)
+      this.billboard(
+        this.origin.x,
+        this.origin.y,
+        this.origin.z,
+        0.75,
+        GOLD,
+        1 - ramp(s.age, 0.12, 0.32),
+        SHAPE.ring,
+      );
+    if (reduced || !scale.secondary) return;
     const c = this.cam;
     const trail = Math.min(s.age * GRACE_SPEED, 3.2);
     const half = trail / 2;
@@ -619,6 +644,7 @@ export class GraceHammer {
       }
     }
     // Sparkles shed along the way, drifting off the line.
+    if (!scale.accents) return;
     for (let i = 0; i < TRAIL_SPARKS; i++) {
       const back = 0.45 + i * 0.7;
       if (back >= trail) break;
@@ -638,7 +664,14 @@ export class GraceHammer {
   }
 
   private strike(s: Grace, reduced: boolean): void {
-    if (s.age >= GRACE_DURATION || !this.anchor(s.target, 0.6, this.aim)) {
+    const scale = paladinDetailScale(s.detail);
+    // The bloom at home fades sooner on the lighter tiers.
+    const bloom =
+      s.detail === 'full'
+        ? GRACE_BLOOM
+        : GRACE_BLOOM * 0.55 + paladinDetailLinger(GRACE_BLOOM * 0.45, s.detail);
+    const duration = s.detail === 'full' ? GRACE_DURATION : GRACE_SCATTER + GRACE_RETURN + bloom;
+    if (s.age >= duration || !this.anchor(s.target, 0.6, this.aim)) {
       s.phase = 0;
       return;
     }
@@ -651,19 +684,21 @@ export class GraceHammer {
       z = this.aim.z;
     // The blow: a white flare, a starburst and two rings, gold then sky.
     this.time = t;
-    this.billboard(x, y, z, 1.2, IVORY, Math.exp(-t * 14) * 1.3 * weak, SHAPE.flare);
-    this.billboard(
-      x,
-      y,
-      z,
-      2.1,
-      GOLD,
-      Math.exp(-t * 4) * weak * (1 - ramp(t, 0.22, 0.45)),
-      SHAPE.rays,
-      t * 0.8 * motion,
-    );
+    if (scale.accents) {
+      this.billboard(x, y, z, 1.2, IVORY, Math.exp(-t * 14) * 1.3 * weak, SHAPE.flare);
+      this.billboard(
+        x,
+        y,
+        z,
+        2.1,
+        GOLD,
+        Math.exp(-t * 4) * weak * (1 - ramp(t, 0.22, 0.45)),
+        SHAPE.rays,
+        t * 0.8 * motion,
+      );
+    }
     this.billboard(x, y, z, 1.3, GOLD, weak * (1 - ramp(t, 0.16, 0.36)), SHAPE.ring);
-    if (t >= 0.08) {
+    if (t >= 0.08 && scale.secondary) {
       this.time = t - 0.08;
       this.billboard(x, y, z, 1.8, SKY, weak * 0.8 * (1 - ramp(t, 0.24, 0.46)), SHAPE.ring);
     }
@@ -690,7 +725,8 @@ export class GraceHammer {
     const sl = Math.hypot(sx, sz) || 1;
     sx /= sl;
     sz /= sl;
-    const count = s.absorbed ? GRACE_MOTES / 2 : GRACE_MOTES;
+    const count = paladinDetailCount(s.absorbed ? GRACE_MOTES / 2 : GRACE_MOTES, s.detail);
+    const ghosts = scale.secondary ? MOTE_GHOSTS : 0;
     let landed = -1;
     for (let i = 0; i < count; i++) {
       const gold = i % 2 === 0;
@@ -738,7 +774,7 @@ export class GraceHammer {
       const mx = (qx + tx) / 2 + sx * side,
         my = Math.max(qy, ty) + lift,
         mz = (qz + tz) / 2 + sz * side;
-      for (let g = MOTE_GHOSTS; g >= 0; g--) {
+      for (let g = ghosts; g >= 0; g--) {
         const e = ramp(v - g * 0.045, 0, 1);
         if (g > 0 && v - g * 0.045 <= 0) continue;
         const q = 1 - e;
@@ -759,7 +795,7 @@ export class GraceHammer {
     }
     if (!home || s.absorbed) return;
     // Each shard lands with a flash.
-    if (landed >= 0 && t - landed < 0.3) {
+    if (landed >= 0 && t - landed < 0.3 && scale.accents) {
       this.billboard(
         tx,
         ty,
@@ -774,7 +810,8 @@ export class GraceHammer {
     // small pluses rise.
     const since = t - GRACE_SCATTER - GRACE_RETURN;
     if (since < 0) return;
-    const fade = 1 - ramp(since, GRACE_BLOOM * 0.55, GRACE_BLOOM);
+    const fade = 1 - ramp(since, GRACE_BLOOM * 0.55, bloom);
+    if (!scale.secondary) return;
     this.time = since;
     this.billboard(tx, ty, tz, 0.85, SKY, weak * 0.7 * (1 - ramp(since, 0.15, 0.4)), SHAPE.ring);
     const foot = this.anchor(s.source, 0.04, this.pointA)?.y ?? ty - 1.1;
@@ -807,6 +844,7 @@ export class GraceHammer {
         }
       }
     }
+    if (!scale.accents) return;
     for (let i = 0; i < GRACE_BLOOM_PLUSES; i++) {
       const ang = (i / GRACE_BLOOM_PLUSES) * Math.PI * 2 + 0.4;
       const rise = since * 1.6 * motion;

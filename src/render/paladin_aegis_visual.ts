@@ -6,8 +6,22 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './ability_vfx/paladin_spec_icons';
+import { paladinVfxDetailNow } from './ability_vfx/paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './ability_vfx/paladin_vfx_detail_core';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { PALADIN_BODY_FIT } from './paladin_body_fit';
+
+// Detail: core = the dome, the ground's rune circle and sun outline, the
+// Sunmender's sign, the planted blade and the rising pluses (thinned with
+// paladinDetailCount, never below one); secondary = the turning torus ring at
+// the rim; accents = the heal sparkles round each plus and the soft sun glow
+// behind the sign. The closing flare's tail scales with paladinDetailLinger.
+// The detail is read as a channel begins and held for that channel.
 
 export const PALADIN_AEGIS_DOME_RADIUS = 10;
 const TAU = Math.PI * 2;
@@ -17,6 +31,8 @@ const RISING_PLUSES = 14;
 const SPARKLES_PER_PLUS = 2;
 /** The channel's length: the dawn sun climbs across it. */
 const CHANNEL_SECONDS = 5;
+/** Seconds the sign flares as the dome lets go, at full detail. */
+const COMPLETION_SECONDS = 0.55;
 /** The ground sun is only a faint outline, so the dome and the Paladin's
  * raised weapon carry the moment: the brightness of its strokes. */
 export const PALADIN_AEGIS_SUN_OUTLINE = 0.3;
@@ -335,6 +351,11 @@ export class PaladinAegisVisual {
   /** Seconds since each of the last three heals: their ripples spread across the ground. */
   private readonly ripples = new THREE.Vector3(99, 99, 99);
   private completionRemaining = 0;
+  /** This channel's closing flare length (COMPLETION_SECONDS, scaled for detail). */
+  private completionSeconds = COMPLETION_SECONDS;
+  /** The detail this channel draws at: read as it begins, kept to its end. */
+  private detail: PaladinVfxDetail = 'full';
+  private wasActive = false;
   private disposed = false;
   private readonly ownedMaterials = new Set<THREE.Material>();
 
@@ -438,7 +459,10 @@ export class PaladinAegisVisual {
     if (r.x >= r.y && r.x >= r.z) r.x = 0;
     else if (r.y >= r.z) r.y = 0;
     else r.z = 0;
-    if (completed) this.completionRemaining = 0.55;
+    if (completed) {
+      this.completionSeconds = paladinDetailLinger(COMPLETION_SECONDS, this.detail);
+      this.completionRemaining = this.completionSeconds;
+    }
   }
 
   update(active: boolean, dt: number, reducedMotion: boolean, parentScale = 1): void {
@@ -448,14 +472,18 @@ export class PaladinAegisVisual {
     const r = this.ripples;
     r.set(Math.min(99, r.x + seconds), Math.min(99, r.y + seconds), Math.min(99, r.z + seconds));
     this.completionRemaining = Math.max(0, this.completionRemaining - seconds);
+    // A channel beginning reads its detail once and keeps it to the end.
+    if (active && !this.wasActive) this.detail = paladinVfxDetailNow();
+    this.wasActive = active;
+    const scale = paladinDetailScale(this.detail);
+    const plusCount = paladinDetailCount(RISING_PLUSES, this.detail);
     this.group.visible = active || this.completionRemaining > 0;
-    this.dome.visible =
-      this.groundRing.visible =
-      this.ground.visible =
-      this.plantedWeapon.visible =
-        active;
-    for (const plus of this.pluses) plus.visible = active;
-    for (const sparkle of this.sparkles) sparkle.visible = active;
+    this.dome.visible = this.ground.visible = this.plantedWeapon.visible = active;
+    this.groundRing.visible = active && scale.secondary;
+    for (let index = 0; index < this.pluses.length; index++)
+      this.pluses[index].visible = active && index < plusCount;
+    for (const sparkle of this.sparkles) sparkle.visible = active && scale.accents;
+    this.sun.visible = scale.accents;
     if (!active) this.standing = 0;
     if (!this.group.visible) return;
     this.group.scale.setScalar(parentScale > 0 ? 1 / parentScale : 1);
@@ -485,7 +513,7 @@ export class PaladinAegisVisual {
       (reducedMotion ? 1 : 1 + Math.sin(this.time * 5) * 0.08) * (0.8 + 0.4 * rise),
     );
     bindPaladinSpecIcons(this.sunHalo.material);
-    const finish = this.completionRemaining / 0.55;
+    const finish = this.completionRemaining / this.completionSeconds;
     this.sunHalo.material.uniforms.uAlpha.value = active ? 1 : finish;
     this.sunHalo.material.uniforms.uPulse.value = pulse;
     // The sun is a soft glow behind the sign.
@@ -498,7 +526,7 @@ export class PaladinAegisVisual {
     this.plantedWeapon.rotation.y = phase * 0.3;
 
     // Pluses of healing rising through the dome, swelling with each heal.
-    for (let index = 0; index < this.pluses.length; index++) {
+    for (let index = 0; index < plusCount; index++) {
       const plus = this.pluses[index];
       const seed = (index * 0.618034) % 1;
       const cycle = (this.time * 0.22 + seed) % 1;
@@ -508,6 +536,7 @@ export class PaladinAegisVisual {
       plus.material.opacity = Math.sin(cycle * Math.PI) * (0.45 + pulse * 0.35);
       plus.scale.setScalar((0.5 + 0.2 * seed) * (1 + pulse * 0.25));
       // Its sparkles drift up around and just behind it, twinkling.
+      if (!scale.accents) continue;
       for (let k = 0; k < SPARKLES_PER_PLUS; k++) {
         const sparkle = this.sparkles[index * SPARKLES_PER_PLUS + k];
         const lag = (k + 1) * 0.045;

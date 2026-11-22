@@ -15,6 +15,19 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the spec icon quad itself, over the off-hand or on the
+// shield's face (drawn on every tier); secondary = the held shield lighting
+// beneath a shield-borne sigil (noteShieldSigil); accents = none (the glow and
+// the igniting front are the icon's own shader). Lighter tiers play the
+// release (the swell and fade after CAST_SIGIL_SWELL) faster, by
+// paladinDetailLinger, and minimal leaves the shield unlit.
 
 type HandSample = (id: number, hand: 0 | 1, out: THREE.Vector3) => boolean;
 /** The shield `id` holds in the off hand, or null when they hold none. */
@@ -73,6 +86,10 @@ export class PaladinCastSigil {
     spec: 1,
     /** The shield it is borne on, resolved as it ignites (null: none held). */
     shield: null as WeaponAnchorSampler | null,
+    /** The detail it ignited at, kept until it fades. */
+    detail: 'full' as PaladinVfxDetail,
+    /** How fast its release plays: 1 at full, faster on a shorter linger. */
+    tailRate: 1,
   }));
   private readonly face = new THREE.Matrix4();
   private readonly faceRight = new THREE.Vector3();
@@ -191,6 +208,7 @@ export class PaladinCastSigil {
     slot.held = false;
     slot.spec = paladinSpecEmblemIndex(spec);
     slot.shield = this.shieldOf?.(id) ?? null;
+    this.ignite(slot);
     return true;
   }
 
@@ -207,9 +225,17 @@ export class PaladinCastSigil {
       slot.held = true;
       slot.spec = paladinSpecEmblemIndex(spec);
       slot.shield = this.shieldOf?.(id) ?? null;
+      this.ignite(slot);
     }
     slot.touched = true;
     return true;
+  }
+
+  /** A sigil igniting reads its detail once and keeps it until it fades. */
+  private ignite(slot: { detail: PaladinVfxDetail; tailRate: number }): void {
+    const detail = paladinVfxDetailNow();
+    slot.detail = detail;
+    slot.tailRate = detail === 'full' ? 1 : 1 / paladinDetailLinger(1, detail);
   }
 
   private letGo(slot: { age: number; held: boolean }): void {
@@ -228,7 +254,8 @@ export class PaladinCastSigil {
       if (slot.id < 0) continue;
       if (slot.held && !slot.touched) this.letGo(slot);
       slot.touched = false;
-      slot.age += Math.max(0, dt);
+      const step = Math.max(0, dt);
+      slot.age += slot.age >= CAST_SIGIL_SWELL ? step * slot.tailRate : step;
       if (slot.held) slot.age = Math.min(slot.age, CAST_SIGIL_LIT);
       if (
         slot.age >= CAST_SIGIL_DURATION ||
@@ -267,7 +294,8 @@ export class PaladinCastSigil {
         this.eye.setFromMatrixPosition(this.camera.matrixWorld);
         right = this.faceRight;
         up = this.faceUp;
-        noteShieldSigil(slot.id, 1 - slot.age / CAST_SIGIL_DURATION, slot.spec);
+        if (paladinDetailScale(slot.detail).secondary)
+          noteShieldSigil(slot.id, 1 - slot.age / CAST_SIGIL_DURATION, slot.spec);
       } else if (this.sampleHand?.(slot.id, 1, this.hand)) {
         if (slot.shield) forgetShieldSigil(slot.id);
         this.hand.y += height * PALADIN_BODY_FIT.sigilLift;

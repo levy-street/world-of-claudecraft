@@ -1,11 +1,13 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import {
   PALADIN_SPEC_EMBLEMS,
   PALADIN_SPEC_SIGNATURES,
   paladinSpecEmblemIndex,
 } from '../src/render/ability_vfx/paladin_spec_emblems';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import {
   PLATE_REACH,
   WARD_END,
@@ -52,6 +54,10 @@ function holdFor(effect: WardOfFaith, seconds: number, value: number, remaining 
     effect.update(0.05);
   }
 }
+
+// Node runs at the Medium preset: pin the authored composition.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('Ward of Faith and Hallowed Wall shields', () => {
   it("Ward of Faith closes its dome over the Paladin, without Hallowed Wall's plates", async () => {
@@ -176,5 +182,95 @@ describe('Ward of Faith and Hallowed Wall shields', () => {
     expect(emblem()).toEqual([PALADIN_SPEC_EMBLEMS.indexOf('holy')]);
     expect(paladinSpecEmblemIndex('arms')).toBe(1);
     f.effect.dispose();
+  });
+});
+
+describe('Ward of Faith and Hallowed Wall detail', () => {
+  /** Ward of Faith raised at `detail`: its quads per shape once the dome has
+   * closed, and how long it takes to go once the aura ends. */
+  const ward = async (detail: PaladinVfxDetail) => {
+    const f = fixture('ward');
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.raise(1);
+    // A raised ward keeps the detail it was raised at.
+    setPaladinVfxDetailForTest('full');
+    holdFor(f.effect, 0.65, 100);
+    const shapes = [0, 1, 2, 3, 4, 5].map((k) => f.count(k));
+    const total = shapes.reduce((a, b) => a + b, 0);
+    let end = 0;
+    while (f.effect.mesh.visible && end < 2) {
+      f.effect.update(0.01);
+      end += 0.01;
+    }
+    f.effect.dispose();
+    return { shapes, total, end };
+  };
+
+  /** Hallowed Wall's plates raised at `detail`, worn to 60 percent: what
+   * draws as two plates shatter, and how long their shards fly. */
+  const plates = async (detail: PaladinVfxDetail) => {
+    const f = fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.raise(1);
+    setPaladinVfxDetailForTest('full');
+    holdFor(f.effect, WARD_INTRO + 0.2, 100);
+    holdFor(f.effect, 0.1, 60);
+    const shapes = [0, 1, 2, 3, 4, 5].map((k) => f.count(k));
+    let flight = 0.1;
+    while (f.count(4) > 0 && flight < 2) {
+      holdFor(f.effect, 0.05, 60);
+      flight += 0.05;
+    }
+    f.effect.dispose();
+    return { shapes, flight };
+  };
+
+  it('keeps the dome on every tier, the ground ring at light, and thins the rest', async () => {
+    const full = await ward('full');
+    const light = await ward('light');
+    const minimal = await ward('minimal');
+    // Core: the dome.
+    for (const d of [full, light, minimal]) expect(d.shapes[1]).toBe(1);
+    // Accents: the sigil's flash, only at full.
+    expect(full.shapes[3]).toBe(1);
+    expect(light.shapes[3]).toBe(0);
+    expect(minimal.shapes[3]).toBe(0);
+    // Secondary: the ground ring, kept at light.
+    expect(full.shapes[2]).toBe(1);
+    expect(light.shapes[2]).toBe(1);
+    expect(minimal.shapes[2]).toBe(0);
+    // The glints thin with the mote count.
+    expect(light.shapes[5]).toBeLessThan(full.shapes[5]);
+    expect(light.shapes[5]).toBeGreaterThan(0);
+    expect(minimal.shapes[5]).toBeLessThan(light.shapes[5]);
+    expect(minimal.shapes[5]).toBeGreaterThan(0);
+    expect(light.total).toBeLessThan(full.total);
+    expect(minimal.total).toBeLessThan(light.total);
+    // It goes sooner once the aura ends.
+    expect(full.end).toBeCloseTo(WARD_END, 1);
+    expect(light.end).toBeLessThan(full.end);
+    expect(minimal.end).toBeLessThan(light.end);
+  });
+
+  it('keeps every standing plate on every tier; the flashes go and the shards thin', async () => {
+    const full = await plates('full');
+    const light = await plates('light');
+    const minimal = await plates('minimal');
+    // Core: the four plates still standing tell the absorb left on every tier.
+    for (const d of [full, light, minimal]) {
+      expect(d.shapes[0]).toBe(4);
+      expect(d.shapes[4]).toBeGreaterThan(0);
+    }
+    // Accents: the lock flash and each lost plate's flash, only at full.
+    expect(full.shapes[3]).toBeGreaterThan(0);
+    expect(light.shapes[3]).toBe(0);
+    expect(minimal.shapes[3]).toBe(0);
+    expect(light.shapes[4]).toBeLessThan(full.shapes[4]);
+    expect(minimal.shapes[4]).toBeLessThan(light.shapes[4]);
+    // The shards fly a shorter way.
+    expect(light.flight).toBeLessThan(full.flight);
+    expect(minimal.flight).toBeLessThan(light.flight);
   });
 });

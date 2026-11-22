@@ -1109,6 +1109,7 @@ const RENDER_PURE_CORES = [
   'src/render/tolling_hammer_core.ts',
   'src/render/guardian_covenant_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
+  'src/render/ability_vfx/paladin_vfx_detail_core.ts',
   'src/render/ability_vfx/signature_core.ts',
   'src/render/ability_vfx/warrior_attention_core.ts',
   'src/render/ability_vfx/warrior_insult_core.ts',

@@ -50,6 +50,12 @@ import {
 import { PaladinKit, type PaladinKitEntity } from './paladin_kit';
 import { PaladinMending } from './paladin_mending';
 import { paladinSpecEmblemIndex } from './paladin_spec_emblems';
+import { setPaladinVfxQuality } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 import { LightPillars } from './pillars';
 import { markOwnKitPreparation } from './prewarm';
 import type { BakedKind, FragmentKind } from './production_assets';
@@ -746,6 +752,8 @@ export class AbilityVfxFx implements SequencerHost {
     /** Whether `id` holds a shield in the off hand. */
     private heldShield?: (id: number) => boolean,
   ) {
+    // A rebuilt renderer starts ungoverned; never the old engine's quality.
+    setPaladinVfxQuality(this.qualityLevel);
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(
       scene,
@@ -764,8 +772,12 @@ export class AbilityVfxFx implements SequencerHost {
       (id, hand) => this.weaponAnchor?.(id, hand) ?? null,
     );
     this.dawnfall = new Dawnfall(scene, anchor, camera, groundY, this.isLocalCaster);
-    this.sunVerdictLance = new SunVerdictLance(scene, anchor, groundY, camera, (x, y, z, radius) =>
-      this.sunVerdictSwordLanding(x, y, z, radius),
+    this.sunVerdictLance = new SunVerdictLance(
+      scene,
+      anchor,
+      groundY,
+      camera,
+      (x, y, z, radius, detail) => this.sunVerdictSwordLanding(x, y, z, radius, detail),
     );
     // The flight's debris rides this engine's own pools through closures, so
     // the flight holds none of them itself (each pool keeps one owner).
@@ -791,8 +803,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.hushbrand = new Hushbrand(scene, anchor, camera);
     this.devotionRings = new DevotionRings(scene, anchor, groundY, camera);
     this.wardOfFaith = new WardOfFaith(scene, anchor, groundY, camera);
-    this.gavel = new SunderingGavel(scene, anchor, groundY, camera, (x, y, z) =>
-      this.sunderingGavelImpact(x, y, z),
+    this.gavel = new SunderingGavel(scene, anchor, groundY, camera, (x, y, z, detail) =>
+      this.sunderingGavelImpact(x, y, z, detail),
     );
     this.paladinMending = new PaladinMending(
       scene,
@@ -821,7 +833,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.tollingHammer = new TollingHammer(
       scene,
       anchor,
-      (x, y, z, dx, dz, absorbed) => this.tollingHammerLanding(x, y, z, dx, dz, absorbed),
+      (x, y, z, dx, dz, absorbed, detail) =>
+        this.tollingHammerLanding(x, y, z, dx, dz, absorbed, detail),
       groundY,
       (id, out) => this.handSample?.(id, 0, out) ?? false,
       camera,
@@ -1603,6 +1616,7 @@ export class AbilityVfxFx implements SequencerHost {
 
   setQuality(q: number): void {
     this.qualityLevel = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
+    setPaladinVfxQuality(this.qualityLevel);
   }
 
   /** The caster's Dawnfall yields to the Verdict blast it pronounced. */
@@ -1633,20 +1647,31 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   /** The Solar Sword driving into the ground: the earth breaks around it. */
-  private sunVerdictSwordLanding(x: number, y: number, z: number, radius: number): void {
+  /** The ground under a landing Paladin blow follows the strike's detail
+   *  (paladin_vfx_detail_core.ts): the crack and the main ground shock are
+   *  its core on every tier; the dust is a secondary layer; the stones thin. */
+  private sunVerdictSwordLanding(
+    x: number,
+    y: number,
+    z: number,
+    radius: number,
+    detail: PaladinVfxDetail = 'full',
+  ): void {
     const floor = (Number.isFinite(y) ? y : this.groundY(x, z)) + 0.085;
     if (!Number.isFinite(floor)) return;
     const size = Math.max(1, radius / 1.8);
+    const scale = paladinDetailScale(detail);
     this.decals.spawn(x, floor, z, 6.5 * size, 0xfff1cc, 'crack', 1.6);
     this.paladinGroundShock(x, floor, z, 11 * size, 0xe8bb76, 0.6, 1.2);
-    this.paladinGroundShock(x, floor, z, 6 * size, 0xfff1cc, 0.35, 1);
-    for (let k = 0; k < 6; k++) {
+    if (scale.secondary) this.paladinGroundShock(x, floor, z, 6 * size, 0xfff1cc, 0.35, 1);
+    for (let k = 0; scale.secondary && k < 6; k++) {
       const angle = (k * Math.PI) / 3 + 0.3;
       const px = x + Math.sin(angle) * 1.4 * size,
         pz = z + Math.cos(angle) * 1.4 * size;
       this.bakedAt('shout_dust', px, floor, pz, 4.2 * size, 0xb09a78, 0xf6e4c2, 0.7, 0, 0, angle);
     }
-    this.fragmentsAt('stone_chip', x, floor + 0.3, z, 0xb8a88c, 18, 3.2, 0, 0, 1.2, true);
+    const chips = paladinDetailCount(18, detail);
+    this.fragmentsAt('stone_chip', x, floor + 0.3, z, 0xb8a88c, chips, 3.2, 0, 0, 1.2, true);
     this.shakeAt(x, floor, z, 0.4, true);
   }
 
@@ -1682,18 +1707,24 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   /** The gavel landing: a crack in the ground, dust, stones kicked loose. */
-  private sunderingGavelImpact(x: number, y: number, z: number): void {
+  private sunderingGavelImpact(
+    x: number,
+    y: number,
+    z: number,
+    detail: PaladinVfxDetail = 'full',
+  ): void {
     const floor = (Number.isFinite(y) ? y : this.groundY(x, z)) + 0.085;
     if (!Number.isFinite(floor)) return;
     this.decals.spawn(x, floor, z, 2.8, 0xfff1cc, 'crack', 1.4);
     this.paladinGroundShock(x, floor, z, 4.2, 0xe8bb76, 0.45, 1);
-    for (let k = 0; k < 3; k++) {
+    for (let k = 0; paladinDetailScale(detail).secondary && k < 3; k++) {
       const angle = (k * Math.PI * 2) / 3 + 0.5;
       const px = x + Math.sin(angle) * 0.7,
         pz = z + Math.cos(angle) * 0.7;
       this.bakedAt('shout_dust', px, floor, pz, 2.4, 0xb09a78, 0xf6e4c2, 0.5, 0, 0, angle);
     }
-    this.fragmentsAt('stone_chip', x, floor + 0.2, z, 0xb8a88c, 8, 1.8, 0, 0, 0.8, true);
+    const chips = paladinDetailCount(8, detail);
+    this.fragmentsAt('stone_chip', x, floor + 0.2, z, 0xb8a88c, chips, 1.8, 0, 0, 0.8, true);
     this.shakeAt(x, floor, z, 0.16, true);
   }
 
@@ -1908,6 +1939,7 @@ export class AbilityVfxFx implements SequencerHost {
     dx: number,
     dz: number,
     absorbed: boolean,
+    detail: PaladinVfxDetail = 'full',
   ): void {
     const floor = (Number.isFinite(y) ? y : this.groundY(x, z)) + 0.085;
     if (!Number.isFinite(floor)) return;
@@ -1916,13 +1948,14 @@ export class AbilityVfxFx implements SequencerHost {
     this.decals.spawn(x, floor, z, absorbed ? 2.4 : 4.2, 0xfff1cc, 'crack', 1.1);
     this.paladinGroundShock(x, floor, z, absorbed ? 4 : 6.5, 0xe8bb76, 0.5, 1);
     if (absorbed) return;
-    for (let k = 0; k < 4; k++) {
+    for (let k = 0; paladinDetailScale(detail).secondary && k < 4; k++) {
       const angle = (k * Math.PI) / 2 + Math.atan2(dx, dz) + 0.4;
       const px = x + Math.sin(angle) * 0.9,
         pz = z + Math.cos(angle) * 0.9;
       this.bakedAt('shout_dust', px, floor, pz, 3.2, 0xb09a78, 0xf6e4c2, 0.55, 0, 0, angle);
     }
-    this.fragmentsAt('stone_chip', x, floor + 0.2, z, 0xb8a88c, 10, 2.2, dx, dz, 0.8, true);
+    const chips = paladinDetailCount(10, detail);
+    this.fragmentsAt('stone_chip', x, floor + 0.2, z, 0xb8a88c, chips, 2.2, dx, dz, 0.8, true);
     this.shakeAt(x, floor, z, 0.22, true);
   }
 

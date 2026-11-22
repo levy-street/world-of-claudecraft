@@ -1,5 +1,12 @@
 import * as THREE from 'three';
 import { PALADIN_RUNE_GLSL } from './ability_vfx/paladin_runes';
+import { paladinVfxDetailNow } from './ability_vfx/paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './ability_vfx/paladin_vfx_detail_core';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { PALADIN_BODY_FIT } from './paladin_body_fit';
 import {
@@ -11,6 +18,15 @@ import {
 
 const GOLD = 0xffd84a;
 const IVORY = 0xfff1cc;
+
+// Detail: core = the wing silhouette (the primaries and the hanging
+// secondaries); secondary = the two rows of coverts layered over the wing bone
+// and Avenging Wrath's rune band on the ground; accents = none beyond the
+// drifting wing motes, which thin with paladinDetailCount. The furl's tail
+// scales with paladinDetailLinger. Lighter tiers draw the SAME wing geometry's
+// attributes through an index of fewer quads (one shared buffer, one program),
+// so a lighter wing is a thinner wing, never a different one. The detail is
+// read as the wings are built (an aura appears) and held for their life.
 
 /** Seraphic Ascendance: two great wings of golden light behind the Paladin.
  * Each wing is layered feathers (long primaries at the hand, hanging
@@ -41,10 +57,17 @@ export interface PaladinAvengingWrathVisual {
   runeAge: number;
   /** The wings are folding away behind the shoulders, their aura gone. */
   furling: boolean;
+  /** The detail these wings draw at: read as they were built, kept for life. */
+  detail: PaladinVfxDetail;
   dispose(): void;
 }
 
 const KIND = { feather: 0, mote: 1 } as const;
+/** The wing's quads, in the order buildWingGeometry lays them down. */
+const PRIMARIES = 9;
+const SECONDARIES = 10;
+const COVERTS = 24;
+const WING_MOTES = 14;
 /** Valkyr's Calling: the wings hold spread through the slam, then fade. */
 const FLIGHT_LINGER = 0.55;
 /** Seconds the wings take to furl away behind the shoulders. */
@@ -100,7 +123,7 @@ function quad(
 function buildWingGeometry(): THREE.BufferGeometry {
   const b: Builder = { root: [], dir: [], size: [], uv: [], kind: [], phase: [], layer: [] };
   // Primaries fan from hanging to up-and-out at the hand tip.
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < PRIMARIES; i++) {
     const t = i / 8;
     quad(
       b,
@@ -115,7 +138,7 @@ function buildWingGeometry(): THREE.BufferGeometry {
     );
   }
   // Secondaries hang long from the forearm.
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < SECONDARIES; i++) {
     const t = i / 9;
     quad(
       b,
@@ -147,7 +170,7 @@ function buildWingGeometry(): THREE.BufferGeometry {
       );
     }
   // Motes drifting up through the wing.
-  for (let m = 0; m < 14; m++) {
+  for (let m = 0; m < WING_MOTES; m++) {
     const s = ((m * 0.618) % 1) * 0.9 + 0.08;
     const [x, y, z] = arm(s);
     quad(
@@ -339,11 +362,43 @@ function easeOutBack(t: number): number {
 const WING_GEOMETRY = buildWingGeometry();
 const RUNE_BAND_GEOMETRY = new THREE.PlaneGeometry(1, 1);
 
+/** A lighter wing: the full wing's own attribute objects (one GPU buffer each,
+ * shared) drawn through an index of the quads `detail` keeps: the silhouette
+ * always, the coverts while secondary layers draw, and the first share of the
+ * motes. Built once at module load, never disposed. */
+function wingDetailGeometry(detail: PaladinVfxDetail): THREE.BufferGeometry {
+  const quads: number[] = [];
+  for (let q = 0; q < PRIMARIES + SECONDARIES; q++) quads.push(q);
+  if (paladinDetailScale(detail).secondary)
+    for (let q = 0; q < COVERTS; q++) quads.push(PRIMARIES + SECONDARIES + q);
+  const motes = paladinDetailCount(WING_MOTES, detail);
+  for (let m = 0; m < motes; m++) quads.push(PRIMARIES + SECONDARIES + COVERTS + m);
+  const index: number[] = [];
+  for (const q of quads) for (let v = 0; v < 6; v++) index.push(q * 6 + v);
+  const g = new THREE.BufferGeometry();
+  for (const name of Object.keys(WING_GEOMETRY.attributes))
+    g.setAttribute(name, WING_GEOMETRY.getAttribute(name));
+  g.setIndex(index);
+  g.boundingSphere = WING_GEOMETRY.boundingSphere?.clone() ?? null;
+  return g;
+}
+const WING_GEOMETRIES: Record<PaladinVfxDetail, THREE.BufferGeometry> = {
+  full: WING_GEOMETRY,
+  light: wingDetailGeometry('light'),
+  minimal: wingDetailGeometry('minimal'),
+};
+
+/** The wing geometry a wearer at `detail` draws (tests: its quad count). */
+export function paladinWingGeometryFor(detail: PaladinVfxDetail): THREE.BufferGeometry {
+  return WING_GEOMETRIES[detail];
+}
+
 function createPaladinAvengingWrathVisual(
   parent: THREE.Group,
   height: number,
+  detail: PaladinVfxDetail,
 ): PaladinAvengingWrathVisual {
-  const geometry = WING_GEOMETRY;
+  const geometry = WING_GEOMETRIES[detail];
   const material = wingMaterial();
   const root = new THREE.Group();
   root.name = 'paladin-avenging-wrath';
@@ -394,6 +449,7 @@ function createPaladinAvengingWrathVisual(
     runeBand,
     runeAge: 0,
     furling: false,
+    detail,
     dispose() {
       parent.remove(root);
       runeBandMat.dispose();
@@ -412,7 +468,7 @@ function furlWings(visual: PaladinAvengingWrathVisual, dt: number): boolean {
     visual.elapsed = 0;
   }
   visual.elapsed += Math.max(0, dt);
-  const t = Math.min(1, visual.elapsed / WING_FURL);
+  const t = Math.min(1, visual.elapsed / paladinDetailLinger(WING_FURL, visual.detail));
   visual.open = visual.from * (1 - t * t * (3 - 2 * t));
   const uniforms = visual.material.uniforms;
   uniforms.uOpen.value = visual.open;
@@ -431,6 +487,9 @@ export function syncPaladinAvengingWrathVisual(
   reducedMotion: boolean,
   auras?: ReadonlyArray<{ id: string; kind: string }>,
   flightElapsed: number | null = null,
+  /** The detail new wings draw at (Divine Ascension passes its own); omitted,
+   *  the ambient detail as they appear. A live pair keeps the one it was built at. */
+  detail?: PaladinVfxDetail,
 ): PaladinAvengingWrathVisual | null {
   let wrath = !auras && active,
     flight = false;
@@ -474,7 +533,8 @@ export function syncPaladinAvengingWrathVisual(
     current.furling = false;
     current.opening = Number.NaN;
   }
-  const visual = current ?? createPaladinAvengingWrathVisual(parent, height);
+  const visual =
+    current ?? createPaladinAvengingWrathVisual(parent, height, detail ?? paladinVfxDetailNow());
   visual.root.position.y = height * PALADIN_BODY_FIT.wingRoot;
   visual.wingRig.scale.setScalar(height * PALADIN_BODY_FIT.wingScale);
   // Valkyr's Calling: out of sight mid-flight, back fully spread for the dive.
@@ -485,8 +545,8 @@ export function syncPaladinAvengingWrathVisual(
   visual.leftWing.scale.set(-1, 1, 1);
   visual.rightWing.scale.set(1, 1, 1);
   // The rune band is Avenging Wrath's own: only its aura draws it, not wings
-  // borrowed without auras (Divine Ascension's pair).
-  const runeBand = wrath && auras !== undefined;
+  // borrowed without auras (Divine Ascension's pair). A secondary layer.
+  const runeBand = wrath && auras !== undefined && paladinDetailScale(visual.detail).secondary;
   // Out of sight mid-flight, the band goes with the Paladin as the wings do.
   visual.runeBand.visible = runeBand && !valkyrVanished(soaring);
   visual.runeAge = runeBand ? visual.runeAge + Math.max(0, dt) : 0;

@@ -1,12 +1,15 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import {
   SUN_VERDICT_LANCE_DISSOLVE,
   SUN_VERDICT_LANCE_HOVER,
   SUN_VERDICT_LANCE_WAIT,
   SunVerdictLance,
 } from '../src/render/ability_vfx/sun_verdict_lance';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import {
   SUN_VERDICT_LANCE_CAPACITY,
   SUN_VERDICT_LANCE_DURATION,
@@ -55,6 +58,10 @@ function fixture() {
     },
   };
 }
+// The authored composition; the detail tiers have their own block below.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
+
 describe('Solar Lance sentence', () => {
   it('releases all resources even when preparation cleanup throws', () => {
     const f = fixture();
@@ -216,6 +223,10 @@ describe('Verdict authoritative VFX routing', () => {
       deps: { fx, receiveHit, triggerAttack, spawnAoeRing },
       quality: 1,
       spawned: 0,
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
     }) as AbilityVfx;
     return { painter, fx, receiveHit, triggerAttack, spawnAoeRing };
   }
@@ -280,5 +291,114 @@ describe('Verdict authoritative VFX routing', () => {
     f.painter.onDamage({ ...damage, amount: 0, absorbed: 400 });
     expect(f.fx.sunVerdictLanceContact).toHaveBeenLastCalledWith(2, 'absorb');
     expect(f.receiveHit).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Solar Lance detail tiers', () => {
+  // Shader shapes (sun_verdict_lance.ts SHAPE).
+  const LANCE = 0,
+    STREAK = 1,
+    FLARE = 2,
+    SEAL = 3,
+    SPARK = 4,
+    RETICLE = 5,
+    PILLAR = 6,
+    SHARD = 7;
+  /** Lit quads per shape at `at` seconds, plus the frames the sentence lasts. */
+  async function sentence(detail: PaladinVfxDetail, at: number) {
+    setPaladinVfxDetailForTest(detail);
+    const f = fixture();
+    await f.prepare();
+    f.effect.spawn(2);
+    f.effect.contact(2, 'damage');
+    // A running sentence keeps the shape it was dropped with.
+    setPaladinVfxDetailForTest('full');
+    f.effect.update(at);
+    const g = f.effect.mesh.geometry;
+    const shapes = g.getAttribute('aShape');
+    const alphas = g.getAttribute('aAlpha');
+    const quads = new Map<number, number>();
+    for (let i = 0; i < g.drawRange.count; i += 6)
+      if (alphas.getX(i) > 0) quads.set(shapes.getX(i), (quads.get(shapes.getX(i)) ?? 0) + 1);
+    let frames = 0;
+    while (f.effect.mesh.visible && frames < 100) {
+      f.effect.update(0.02);
+      frames++;
+    }
+    const impacts = f.impact.mock.calls.length;
+    const impactDetail = f.impact.mock.calls[0]?.[4];
+    f.effect.dispose();
+    return { quads, frames, impacts, impactDetail };
+  }
+
+  it('keeps the sword and its seal on every tier and thins the strike around them', async () => {
+    const at = SUN_VERDICT_LANCE_LANDING + 0.03;
+    const full = await sentence('full', at);
+    const light = await sentence('light', at);
+    const minimal = await sentence('minimal', at);
+    for (const tier of [full, light, minimal]) {
+      expect(tier.quads.get(LANCE)).toBe(1);
+      expect(tier.quads.get(SEAL)).toBe(1);
+      expect(tier.quads.get(SPARK) ?? 0).toBeGreaterThan(0);
+    }
+    expect(full.quads.get(FLARE)).toBe(1);
+    expect(full.quads.get(PILLAR)).toBe(1);
+    expect(full.impacts).toBe(1);
+    expect(full.impactDetail).toBe('full');
+    // Light: the pillar and the broken ground stay, the flare goes, half the sparks.
+    expect(light.quads.get(PILLAR)).toBe(1);
+    expect(light.quads.has(FLARE)).toBe(false);
+    expect(light.impacts).toBe(1);
+    expect(light.quads.get(SPARK) ?? 0).toBeLessThan(full.quads.get(SPARK) ?? 0);
+    // Minimal: the sword, the seal and a few sparks; the ground still breaks,
+    // told the strike's detail so it lays only its crack, shock and fewer stones.
+    for (const shape of [FLARE, PILLAR, STREAK, RETICLE])
+      expect(minimal.quads.has(shape)).toBe(false);
+    expect(minimal.impacts).toBe(1);
+    expect(minimal.impactDetail).toBe('minimal');
+    expect(minimal.quads.get(SPARK) ?? 0).toBeLessThan(light.quads.get(SPARK) ?? 0);
+    // The fall's streak and reticle are secondary: drawn above minimal only.
+    const falling = await sentence('light', 0.05);
+    expect(falling.quads.get(STREAK)).toBe(1);
+    expect(falling.quads.get(RETICLE)).toBe(1);
+    // The shatter's shards thin on light and are gone on minimal.
+    const shatter = SUN_VERDICT_LANCE_LANDING + 0.45;
+    const fullShards = (await sentence('full', shatter)).quads.get(SHARD) ?? 0;
+    const lightShards = (await sentence('light', shatter)).quads.get(SHARD) ?? 0;
+    expect(lightShards).toBeGreaterThan(0);
+    expect(lightShards).toBeLessThan(fullShards);
+    expect((await sentence('minimal', shatter)).quads.has(SHARD)).toBe(false);
+    // The seal's fade after the shatter is shorter on minimal.
+    expect(minimal.frames).toBeLessThan(full.frames);
+  });
+
+  it('dissolves a withheld sword sooner and thinner on the lighter tiers', async () => {
+    const withheld = async (detail: PaladinVfxDetail) => {
+      setPaladinVfxDetailForTest(detail);
+      const f = fixture();
+      await f.prepare();
+      f.effect.spawn(2);
+      f.effect.contact(2, 'none');
+      f.effect.update(0.05);
+      const d = f.drawn();
+      const g = f.effect.mesh.geometry;
+      const vertices = g.drawRange.count;
+      let frames = 0;
+      while (f.effect.mesh.visible && frames < 100) {
+        f.effect.update(0.02);
+        frames++;
+      }
+      f.effect.dispose();
+      return { shapes: d.shapes, vertices, frames };
+    };
+    const full = await withheld('full');
+    const minimal = await withheld('minimal');
+    expect(full.shapes.has(LANCE)).toBe(true);
+    expect(minimal.shapes.has(LANCE)).toBe(true);
+    expect(minimal.shapes.has(SHARD)).toBe(true);
+    expect(full.shapes.has(RETICLE)).toBe(true);
+    expect(minimal.shapes.has(RETICLE)).toBe(false);
+    expect(minimal.vertices).toBeLessThan(full.vertices);
+    expect(minimal.frames).toBeLessThan(full.frames);
   });
 });

@@ -1,10 +1,16 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
 import {
   PALADIN_SHIELD_GLOW_CONTACT,
   PaladinShieldGlowFx,
   paladinShieldGlowPlan,
 } from '../src/render/characters/paladin_shield_glow_fx';
+
+// Node tests run at the Medium preset; the tests below pin the authored
+// composition (full detail) unless a test names another tier.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe("Bastion Sweep's glowing shield layer", () => {
   it('builds through the windup, flashes on contact and is gone by the end', () => {
@@ -127,5 +133,51 @@ describe("Bastion Sweep's glowing shield layer", () => {
     expect(first.getObjectByName('paladinShieldGlow')).toBeUndefined();
     expect(second.getObjectByName('paladinShieldGlow')).toBeDefined();
     fx.dispose();
+  });
+
+  it('lights the shield on every tier and drops the rite flare and breathing below full', () => {
+    const drawn = (detail: 'full' | 'light' | 'minimal') => {
+      setPaladinVfxDetailForTest(detail);
+      const model = new THREE.Group();
+      const hand = new THREE.Group();
+      hand.name = 'handslotl';
+      model.add(hand);
+      const shield = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.9, 0.1));
+      hand.add(shield);
+      const fx = new PaladinShieldGlowFx(model);
+      const layer = () => shield.getObjectByName('paladinShieldGlow') as THREE.Mesh;
+      const u = () => (layer().material as THREE.ShaderMaterial).uniforms;
+      fx.update(null, 0, 0.016, 1);
+      const landing = { visible: layer().visible, flash: u().uFlash.value as number };
+      const glows: number[] = [];
+      for (let i = 0; i < 40; i++) {
+        fx.update(null, 0, 0.05, 1);
+        glows.push(u().uGlow.value as number);
+      }
+      const late = glows.slice(-10);
+      // A bash still flashes on contact: that is the glow itself, never an accent.
+      fx.update(null, 0, 0.05, null);
+      for (let i = 0; i < 40; i++) fx.update(null, 0, 0.05, null);
+      fx.update(PALADIN_SHIELD_GLOW_CONTACT + 0.01, 0.8, 0.016);
+      const out = {
+        landing,
+        held: Math.min(...late) > 0.5,
+        breathing: Math.max(...late) - Math.min(...late) > 0.001,
+        contact: (u().uFlash.value as number) > 0.5 && layer().visible,
+      };
+      fx.dispose();
+      return out;
+    };
+    const full = drawn('full');
+    expect(full.landing.visible).toBe(true);
+    expect(full.landing.flash).toBeGreaterThan(0.7);
+    expect(full).toMatchObject({ held: true, breathing: true, contact: true });
+    for (const detail of ['light', 'minimal'] as const) {
+      const lighter = drawn(detail);
+      // The glow layer is core: it draws as the rite lands, flare or not.
+      expect(lighter.landing.visible).toBe(true);
+      expect(lighter.landing.flash).toBe(0);
+      expect(lighter).toMatchObject({ held: true, breathing: false, contact: true });
+    }
   });
 });

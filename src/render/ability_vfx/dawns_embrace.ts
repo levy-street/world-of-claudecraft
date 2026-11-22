@@ -9,6 +9,13 @@ import {
   type PaladinKitContext,
 } from './paladin_kit_context';
 import { hash01, PaladinQuadPool, ramp } from './paladin_quad_pool';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+  paladinLingerEnd,
+} from './paladin_vfx_detail_core';
 
 export const EMBRACE_CHANNELS = 6;
 export const EMBRACES = 8;
@@ -29,6 +36,8 @@ const SEGMENTS = 32;
 const TURNS = 1.25;
 const MOTES = 10;
 const PLUSES = 8;
+/** Each plus of healing rises over this long. */
+const PLUS_LIFE = 0.8;
 const STREAM_SEGMENTS = 12;
 const STREAM_PLUSES = 3;
 /** How high over the top of the Paladin's head the sun kindles. */
@@ -56,6 +65,8 @@ interface Channel {
   presence: number;
   seen: boolean;
   spin: number;
+  /** The Paladin detail read when the cast was first seen. */
+  detail: PaladinVfxDetail;
 }
 interface Embrace {
   active: boolean;
@@ -65,6 +76,10 @@ interface Embrace {
   spin: number;
   /** Ascension empowered it: the dawn breaks in full, gilded. */
   gilded: boolean;
+  /** The Paladin detail read when the cast completed. */
+  detail: PaladinVfxDetail;
+  /** The healing's bloom on the ally, from the stream landing until it ends. */
+  bloom: number;
 }
 
 /**
@@ -78,6 +93,14 @@ interface Embrace {
  * a flare, a wave across the ground and pluses of healing spiralling up about
  * them. Cast on themselves, the healing takes on the Paladin as the strands
  * burst.
+ *
+ * Detail: core = the sun over the Paladin, the strands of dawn light, the
+ * stream to the ally and the pluses of healing spiralling up about them;
+ * secondary = the sunrise on the ground, the column within the strands and the
+ * waves across the ground where the healing takes (the gilded second wave
+ * with them); accents = the flares and the pluses riding the stream. Light
+ * drops the accents and halves the motes and pluses; minimal keeps the core
+ * with a third of them, and both shorten the fades.
  */
 export class DawnsEmbrace {
   private readonly pool: PaladinQuadPool<'dawns_embrace'>;
@@ -89,6 +112,7 @@ export class DawnsEmbrace {
     presence: 0,
     seen: false,
     spin: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly embraces: Embrace[] = Array.from({ length: EMBRACES }, () => ({
     active: false,
@@ -97,6 +121,8 @@ export class DawnsEmbrace {
     age: 0,
     spin: 0,
     gilded: false,
+    detail: 'full' as PaladinVfxDetail,
+    bloom: EMBRACE_BLOOM,
   }));
   private readonly feet = new THREE.Vector3();
   private readonly head = new THREE.Vector3();
@@ -196,6 +222,7 @@ export class DawnsEmbrace {
       slot.caster = caster;
       slot.presence = 0;
       slot.spin = 0;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.seen = true;
     slot.target = on;
@@ -220,6 +247,16 @@ export class DawnsEmbrace {
     slot.target = on;
     slot.age = 0;
     slot.gilded = false;
+    slot.detail = paladinVfxDetailNow();
+    // A shorter bloom on lighter tiers, never cutting the last plus short.
+    const linger = paladinDetailScale(slot.detail).linger;
+    slot.bloom =
+      linger === 1
+        ? EMBRACE_BLOOM
+        : Math.max(
+            EMBRACE_BLOOM * linger,
+            0.05 * (paladinDetailCount(PLUSES, slot.detail) - 1) + PLUS_LIFE,
+          );
     // The strands carry on from where the cast left them.
     const held = this.channels.find((c) => c.active && c.caster === caster);
     slot.spin = held ? held.spin : 0;
@@ -346,8 +383,9 @@ export class DawnsEmbrace {
   }
 
   /** The stream of dawn light from the Paladin to the ally, its head at
-   * `head` and tail at `tail` of the way there, pluses riding it. */
-  private stream(head: number, tail: number): void {
+   * `head` and tail at `tail` of the way there, pluses riding it (`pluses`:
+   * the tier draws its accents). */
+  private stream(head: number, tail: number, pluses: boolean): void {
     head = Math.min(1, head);
     tail = Math.max(0, tail);
     if (head <= tail) return;
@@ -374,7 +412,7 @@ export class DawnsEmbrace {
         SHAPE.stream,
       );
     }
-    for (let i = 0; i < STREAM_PLUSES; i++) {
+    for (let i = 0; pluses && i < STREAM_PLUSES; i++) {
       const u = head - 0.05 - i * 0.2;
       if (u <= tail) break;
       this.streamPoint(u, this.a);
@@ -408,20 +446,22 @@ export class DawnsEmbrace {
       }
       const k = c.presence;
       const grow = c.progress;
+      const scale = paladinDetailScale(c.detail);
       // Drawing in tight about the Paladin, spinning faster, as the cast ends.
       const drawIn = reduced ? 0 : ramp(grow, DRAW_IN, 1);
       if (!reduced) c.spin += dt * (0.8 + 1.6 * grow + 7 * drawIn);
       // The sunrise spreading across the ground.
       pool.time = grow;
-      pool.ground(
-        this.feet.x,
-        this.floorAt(0.05),
-        this.feet.z,
-        2.3,
-        KIT_WARM,
-        k * (0.45 + 0.4 * grow),
-        SHAPE.dawn,
-      );
+      if (scale.secondary)
+        pool.ground(
+          this.feet.x,
+          this.floorAt(0.05),
+          this.feet.z,
+          2.3,
+          KIT_WARM,
+          k * (0.45 + 0.4 * grow),
+          SHAPE.dawn,
+        );
       // The sun kindling over their head, growing as the cast builds.
       pool.time = c.spin;
       pool.billboard(
@@ -437,18 +477,20 @@ export class DawnsEmbrace {
       const reach = reduced ? 1 : 0.08 + 0.92 * ramp(grow, 0, 0.92);
       this.strands(c.spin, reach, 0.85 - 0.4 * drawIn, height, 0, k * (0.8 + 0.5 * grow), flow);
       pool.time = 0;
-      pool.upright(
-        this.feet.x,
-        this.feet.y + (height * reach) / 2 + 0.1,
-        this.feet.z,
-        0.5,
-        (height * reach) / 2 + 0.25,
-        KIT_GOLD,
-        k * grow * 0.35,
-        SHAPE.column,
-      );
+      if (scale.secondary)
+        pool.upright(
+          this.feet.x,
+          this.feet.y + (height * reach) / 2 + 0.1,
+          this.feet.z,
+          0.5,
+          (height * reach) / 2 + 0.25,
+          KIT_GOLD,
+          k * grow * 0.35,
+          SHAPE.column,
+        );
       if (!reduced) {
-        for (let i = 0; i < MOTES; i++) {
+        const motes = paladinDetailCount(MOTES, c.detail);
+        for (let i = 0; i < motes; i++) {
           const cycle = (this.clock * 0.6 + hash01(i, 4)) % 1;
           const ang = hash01(i, 1) * Math.PI * 2 + cycle * 1.5;
           const rad = 0.25 + 0.4 * hash01(i, 2);
@@ -470,29 +512,38 @@ export class DawnsEmbrace {
       const self = e.source === e.target;
       const travel = self ? 0 : EMBRACE_TRAVEL;
       const casterHeight = this.body(e.source);
-      if (e.age >= EMBRACE_WRAP + travel + EMBRACE_BLOOM || !casterHeight) {
+      if (e.age >= EMBRACE_WRAP + travel + e.bloom || !casterHeight) {
         e.active = false;
         continue;
       }
       const t = e.age;
+      const scale = paladinDetailScale(e.detail);
       // About the Paladin: drawn in tight from the cast, burst open and fade.
       const open = reduced ? 0 : ramp(t, EMBRACE_WRAP, EMBRACE_WRAP + 0.5);
       const opened = 1 - (1 - open) * (1 - open);
       if (!reduced) e.spin += dt * (2 + 8 * (1 - open));
       const radius = 0.45 + 1.5 * opened;
-      const strandFade = (1 - ramp(t, EMBRACE_WRAP + 0.05, EMBRACE_WRAP + 0.55)) * 1.2;
+      const strandFade =
+        (1 -
+          ramp(
+            t,
+            EMBRACE_WRAP + 0.05,
+            paladinLingerEnd(EMBRACE_WRAP + 0.05, EMBRACE_WRAP + 0.55, scale.linger),
+          )) *
+        1.2;
       this.strands(e.spin, 1, radius, casterHeight, 0.4 * opened, strandFade, flow);
       // The sunrise on the ground fades as the dawn is gathered.
       pool.time = 1;
-      pool.ground(
-        this.feet.x,
-        this.floorAt(0.05),
-        this.feet.z,
-        2.3,
-        KIT_WARM,
-        1.2 * (1 - ramp(t, 0.1, 0.6)),
-        SHAPE.dawn,
-      );
+      if (scale.secondary)
+        pool.ground(
+          this.feet.x,
+          this.floorAt(0.05),
+          this.feet.z,
+          2.3,
+          KIT_WARM,
+          1.2 * (1 - ramp(t, 0.1, paladinLingerEnd(0.1, 0.6, scale.linger))),
+          SHAPE.dawn,
+        );
       // The sun flares as the dawn is released out of it, then fades.
       this.crown.set(this.head.x, this.head.y + SUN_LIFT, this.head.z);
       const burst = t - EMBRACE_WRAP;
@@ -504,52 +555,57 @@ export class DawnsEmbrace {
         this.crown.z,
         1.03 * (1 + 0.35 * flash),
         KIT_WARM,
-        1.3 * (1 - ramp(burst, 0.2, 0.75)),
+        1.3 * (1 - ramp(burst, 0.2, paladinLingerEnd(0.2, 0.75, scale.linger))),
         SHAPE.sun,
       );
       if (burst < 0) continue;
       const gild = e.gilded ? 1.3 : 1;
       pool.time = burst;
-      pool.billboard(
-        this.crown.x,
-        this.crown.y,
-        this.crown.z,
-        1.4 * gild,
-        KIT_IVORY,
-        flash * 1.2,
-        SHAPE.flare,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.crown.x,
+          this.crown.y,
+          this.crown.z,
+          1.4 * gild,
+          KIT_IVORY,
+          flash * 1.2,
+          SHAPE.flare,
+        );
       const height = this.body(e.target);
       if (!height) {
         e.active = false;
         continue;
       }
-      if (!self && burst < travel + 0.15) this.stream(burst / travel, (burst - 0.12) / travel);
+      if (!self && burst < travel + 0.15)
+        this.stream(burst / travel, (burst - 0.12) / travel, scale.accents);
       const since = burst - travel;
       if (since < 0) continue;
       // The healing takes on the ally.
       pool.time = since;
-      pool.billboard(
-        this.chest.x,
-        this.chest.y,
-        this.chest.z,
-        1.6 * gild,
-        KIT_IVORY,
-        Math.exp(-since * 7) * 1.4,
-        SHAPE.flare,
-      );
-      pool.ground(this.feet.x, this.floorAt(0.06), this.feet.z, 2.6, KIT_WARM, 0.9, SHAPE.wave);
+      if (scale.accents)
+        pool.billboard(
+          this.chest.x,
+          this.chest.y,
+          this.chest.z,
+          1.6 * gild,
+          KIT_IVORY,
+          Math.exp(-since * 7) * 1.4,
+          SHAPE.flare,
+        );
+      if (scale.secondary)
+        pool.ground(this.feet.x, this.floorAt(0.06), this.feet.z, 2.6, KIT_WARM, 0.9, SHAPE.wave);
       // Gilded by Ascension: a second, wider wave of gold follows the first.
-      if (e.gilded && since > 0.1) {
+      if (e.gilded && scale.secondary && since > 0.1) {
         pool.time = since - 0.1;
         pool.ground(this.feet.x, this.floorAt(0.065), this.feet.z, 3.8, KIT_GOLD, 1, SHAPE.wave);
       }
       // Pluses of healing spiralling up about them.
-      for (let i = 0; i < PLUSES; i++) {
+      const pluses = paladinDetailCount(PLUSES, e.detail);
+      for (let i = 0; i < pluses; i++) {
         const s = since - 0.05 * i;
-        const life = 0.8;
+        const life = PLUS_LIFE;
         if (s <= 0 || s >= life) continue;
-        const ang = (i / PLUSES) * Math.PI * 2 + s * 2.4 + e.spin * 0.2;
+        const ang = (i / pluses) * Math.PI * 2 + s * 2.4 + e.spin * 0.2;
         const rad = 0.6 + 0.3 * s;
         pool.time = 0;
         pool.billboard(

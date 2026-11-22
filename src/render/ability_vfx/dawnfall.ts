@@ -26,6 +26,19 @@ import { DAWNREAVER_EMBLEM_GLSL } from './dawnreaver_emblem';
 import { effectFloor, GROUND_DEPTH_PULL, GROUND_DEPTH_PULL_GLSL } from './effect_floor';
 import { type PaladinLocalProbe, paladinFlash } from './paladin_flash';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the rune circle and the emblem's hot core on the ground, and
+// the hot core of the falling pillar (a contact's flare and upright streak);
+// secondary = the light pool, the emblem's glow, the pillar's wide glow and the
+// three breaking crests; accents = the landing flash and flare (a contact's
+// cross streak). The embers scale with count, the ground layers' and embers'
+// fade tails with linger.
 
 // Additive light, like the other Paladin effects: hot ivory, gold, a dim
 // bronze fill and a dawn-rose rim. Nothing here darkens the ground.
@@ -41,6 +54,32 @@ const HOT = 0,
   IVORY = 3,
   ROSE = 4;
 const CORNERS = [0, -1, 1, -1, 1, 1, 0, -1, 1, 1, 0, 1];
+/** A contact's flare plays out over this long. */
+const CONTACT_DURATION = 0.25;
+/** Fade ends (seconds after landing) of the ground layers and the embers. */
+const POOL_END = 0.74,
+  GLOW_END = 0.62,
+  CORE_END = 0.74,
+  RING_END = 0.7,
+  EMBER_END = 0.5;
+/** The latest an ember starts to rise, after landing. */
+const EMBER_LAUNCH = 0.26;
+/** The crests' last light, after landing (the third one's local fade). */
+const CREST_END = 0.44 + (DAWNFALL_WAVE_CRESTS - 1) * 0.055;
+/** How long a cast lives at `detail`: the full composition keeps its authored
+ * span; a lighter one ends once its shortened tails have faded. */
+function dawnfallCastEnd(detail: PaladinVfxDetail): number {
+  if (detail === 'full') return DAWNFALL_DURATION;
+  const scale = paladinDetailScale(detail);
+  const tail = Math.max(
+    Math.max(POOL_END, CORE_END, RING_END) * scale.linger,
+    scale.secondary ? CREST_END : 0,
+    EMBER_LAUNCH + EMBER_END * scale.linger,
+    // The pillar's descent is the core beat: never cut short.
+    0.52 - DAWNFALL_BEAM_LANDING,
+  );
+  return Math.min(DAWNFALL_DURATION, DAWNFALL_BEAM_LANDING + tail);
+}
 const CAPACITY = DAWNFALL_CAST_CAPACITY * DAWNFALL_VERTICES + DAWNFALL_CONTACT_CAPACITY * 18;
 const ATTRIBUTES = ['position', 'aColor', 'aUv', 'aAlpha', 'aShape', 'aGround', 'aTime'] as const;
 // Shader shapes. Floor layers read their uv as the footprint in [-1, 1].
@@ -70,6 +109,10 @@ interface Slot {
   z: number;
   radius: number;
   absorb: boolean;
+  /** How much of the effect draws, read when it spawned. */
+  detail: PaladinVfxDetail;
+  /** Seconds the slot lives (DAWNFALL_DURATION at full detail). */
+  end: number;
 }
 function slots(count: number): Slot[] {
   return Array.from({ length: count }, () => ({
@@ -83,11 +126,14 @@ function slots(count: number): Slot[] {
     z: 0,
     radius: 6,
     absorb: false,
+    detail: 'full' as PaladinVfxDetail,
+    end: DAWNFALL_DURATION,
   }));
 }
 /** Fixed cast/contact pools share one prepared draw. Geometry is world anchored,
  * and the contact pool cannot evict an area blast in a crowded fight. Every live
- * slot writes a fixed vertex count; the shader animates from `aTime`. */
+ * slot writes a fixed vertex count for its detail; the shader animates from
+ * `aTime`. */
 export class Dawnfall {
   readonly mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   readonly preparation: CrestPrewarm<'dawnfall'>;
@@ -330,6 +376,10 @@ export class Dawnfall {
         }
     }
     slot.absorb = absorb;
+    slot.detail = paladinVfxDetailNow();
+    slot.end = contact
+      ? CONTACT_DURATION * paladinDetailScale(slot.detail).linger
+      : dawnfallCastEnd(slot.detail);
     return true;
   }
   private terrainAt(slot: Slot, x: number, z: number): number {
@@ -491,7 +541,11 @@ export class Dawnfall {
   }
   private embers(slot: Slot, age: number, reduced: boolean): void {
     const r = slot.radius;
-    for (let mote = 0; mote < DAWNFALL_MOTES; mote++) {
+    const count = paladinDetailCount(DAWNFALL_MOTES, slot.detail);
+    const fade = EMBER_END * paladinDetailScale(slot.detail).linger;
+    for (let n = 0; n < count; n++) {
+      // Fewer embers keep the full scatter: every k-th one.
+      const mote = Math.floor((n * DAWNFALL_MOTES) / count);
       if (reduced && mote % 2) continue;
       // Golden-angle scatter; each ember lifts as the first crest passes it.
       const angle = mote * 2.399963 + 0.4;
@@ -515,7 +569,7 @@ export class Dawnfall {
         size,
         size * 5,
         mote % 4 === 0 ? ROSE : mote % 2 ? HOT : GOLD,
-        dawnfallEnvelope(life, 0.5) * (big ? 1.4 : 1.1),
+        dawnfallEnvelope(life, fade) * (big ? 1.4 : 1.1),
         SHAPE.ember,
         ground,
       );
@@ -527,11 +581,13 @@ export class Dawnfall {
     for (const slot of this.casts) {
       if (!slot.active) continue;
       slot.age += Math.max(0, dt);
-      if (slot.age >= DAWNFALL_DURATION) {
+      if (slot.age >= slot.end) {
         slot.active = false;
         continue;
       }
       const age = slot.age - DAWNFALL_BEAM_LANDING;
+      const detail = paladinDetailScale(slot.detail);
+      const linger = detail.linger;
       // Reduced motion shows the settled sigil: no sweeps, reveals or flash front.
       this.time = reduced ? Math.max(age, 0.3) : age;
       const gather = reduced ? 0 : dawnfallGather(age) * 0.55;
@@ -539,25 +595,42 @@ export class Dawnfall {
       // the descending pillar's hot core does from the cast's first frame.
       const local = this.isLocal?.(slot.owner) ?? true;
       const flash = paladinFlash(age, local);
+      if (detail.secondary) {
+        this.floor(
+          slot,
+          0.14,
+          0.99,
+          GOLD,
+          Math.max(dawnfallEnvelope(age, POOL_END * linger) * 0.75, gather),
+          SHAPE.pool,
+        );
+        this.floor(
+          slot,
+          0.18,
+          0.86,
+          GOLD,
+          dawnfallEnvelope(age, GLOW_END * linger) * 0.9,
+          SHAPE.emblemGlow,
+        );
+      }
       this.floor(
         slot,
-        0.14,
-        0.99,
-        GOLD,
-        Math.max(dawnfallEnvelope(age, 0.74) * 0.75, gather),
-        SHAPE.pool,
-      );
-      this.floor(slot, 0.18, 0.86, GOLD, dawnfallEnvelope(age, 0.62) * 0.9, SHAPE.emblemGlow);
-      this.floor(slot, 0.2, 0.86, HOT, dawnfallEnvelope(age, 0.74) * 1.1, SHAPE.emblemCore);
-      this.floor(slot, 0.21, 0.998, GOLD, dawnfallEnvelope(age, 0.7), SHAPE.ring);
-      this.floor(
-        slot,
-        0.22,
-        0.99,
+        0.2,
+        0.86,
         HOT,
-        reduced ? 0 : dawnfallEnvelope(age, 0.36) * 1.2 * flash,
-        SHAPE.flash,
+        dawnfallEnvelope(age, CORE_END * linger) * 1.1,
+        SHAPE.emblemCore,
       );
+      this.floor(slot, 0.21, 0.998, GOLD, dawnfallEnvelope(age, RING_END * linger), SHAPE.ring);
+      if (detail.accents)
+        this.floor(
+          slot,
+          0.22,
+          0.99,
+          HOT,
+          reduced ? 0 : dawnfallEnvelope(age, 0.36) * 1.2 * flash,
+          SHAPE.flash,
+        );
       // The hammer reaches its raised pose as the light arrives at the feet.
       sampleDawnfallBeam(slot.age, reduced, this.beamPose);
       this.time = reduced ? 0 : age;
@@ -565,21 +638,23 @@ export class Dawnfall {
       // flare; the square root keeps a 20-yard sentence from a wall of light.
       const scale = Math.sqrt(Math.max(1, slot.radius / 6));
       const thin = dawnfallBeamWidth(age) * scale;
-      this.beam(slot, 2.2 * thin, GOLD, this.beamPose.alpha * 0.45);
+      if (detail.secondary) this.beam(slot, 2.2 * thin, GOLD, this.beamPose.alpha * 0.45);
       this.beam(slot, 0.5 * thin, HOT, this.beamPose.alpha * 1.6 * paladinFlash(slot.age, local));
-      this.quad(
-        slot,
-        0,
-        0.9 * scale,
-        0,
-        3.4 * scale,
-        3.4 * scale,
-        HOT,
-        dawnfallFlare(age) * (reduced ? 0.5 : 1.3) * flash,
-        SHAPE.flare,
-      );
+      if (detail.accents)
+        this.quad(
+          slot,
+          0,
+          0.9 * scale,
+          0,
+          3.4 * scale,
+          3.4 * scale,
+          HOT,
+          dawnfallFlare(age) * (reduced ? 0.5 : 1.3) * flash,
+          SHAPE.flare,
+        );
       this.time = age;
-      for (let crest = 0; crest < DAWNFALL_WAVE_CRESTS; crest++) {
+      const crests = detail.secondary ? DAWNFALL_WAVE_CRESTS : 0;
+      for (let crest = 0; crest < crests; crest++) {
         sampleDawnfallWave(age, slot.radius, reduced, this.wavePose, crest);
         this.wave(slot, crest);
       }
@@ -588,16 +663,17 @@ export class Dawnfall {
     for (const slot of this.contacts) {
       if (!slot.active) continue;
       slot.age += Math.max(0, dt);
-      if (slot.age >= 0.25) {
+      if (slot.age >= slot.end) {
         slot.active = false;
         continue;
       }
       this.time = slot.age;
-      const fade = dawnfallEnvelope(slot.age, 0.25) * (slot.absorb ? 0.4 : 0.9),
+      const fade = dawnfallEnvelope(slot.age, slot.end) * (slot.absorb ? 0.4 : 0.9),
         size = slot.absorb ? 0.5 : 1;
       this.quad(slot, 0, 0, 0, size * 1.5, size * 1.5, GOLD, fade, SHAPE.flare);
       this.quad(slot, 0, 0, 0, size * 0.15, size * 2, HOT, fade, SHAPE.streak);
-      this.quad(slot, 0, 0, 0, size * 1.3, size * 0.13, IVORY, fade * 0.7, SHAPE.streak);
+      if (paladinDetailScale(slot.detail).accents)
+        this.quad(slot, 0, 0, 0, size * 1.3, size * 0.13, IVORY, fade * 0.7, SHAPE.streak);
     }
     this.mesh.visible = this.vertex > 0;
     this.mesh.geometry.setDrawRange(0, this.vertex);

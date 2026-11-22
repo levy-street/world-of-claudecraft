@@ -1,6 +1,19 @@
 import * as THREE from 'three';
 import { KIT_FLARE_GLSL, KIT_GOLD, KIT_IVORY, type PaladinKitContext } from './paladin_kit_context';
 import { hash01, PaladinQuadPool, ramp } from './paladin_quad_pool';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the lance (forming and hurled) and the ring at the wound;
+// secondary = the streak of its flight, the light bursting out behind, the
+// critical strike's second ring and the shard spray; accents = the spark at the
+// forming tip and the strike's flare (the motes drawn in scale with count, the
+// embedded lance's fade with linger).
 
 export const MERCY_CHANNELS = 6;
 export const MERCY_STRIKES = 8;
@@ -27,6 +40,8 @@ interface Channel {
   presence: number;
   seen: boolean;
   age: number;
+  /** How much of the lance draws, read when the cast began. */
+  detail: PaladinVfxDetail;
 }
 interface Strike {
   active: boolean;
@@ -44,6 +59,7 @@ interface Strike {
   dx: number;
   dy: number;
   dz: number;
+  detail: PaladinVfxDetail;
 }
 
 // The lance: an ivory spine, swept flame barbs and a faceted leaf blade.
@@ -88,6 +104,7 @@ export class MercyLance {
     presence: 0,
     seen: false,
     age: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly strikes: Strike[] = Array.from({ length: MERCY_STRIKES }, () => ({
     active: false,
@@ -103,6 +120,7 @@ export class MercyLance {
     dx: 0,
     dy: 0,
     dz: 1,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly from = new THREE.Vector3();
   private readonly to = new THREE.Vector3();
@@ -181,6 +199,7 @@ export class MercyLance {
       slot.caster = caster;
       slot.presence = 0;
       slot.age = 0;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.seen = true;
     slot.target = target;
@@ -215,6 +234,7 @@ export class MercyLance {
     slot.dx = this.dir.x;
     slot.dy = this.dir.y;
     slot.dz = this.dir.z;
+    slot.detail = paladinVfxDetailNow();
     // The held lance has been thrown.
     const held = this.channels.find((c) => c.active && c.caster === source);
     if (held) held.active = false;
@@ -308,7 +328,8 @@ export class MercyLance {
       );
       // Motes of light drawn in along the lance as it forms.
       if (!reduced) {
-        for (let i = 0; i < MOTES; i++) {
+        const motes = paladinDetailCount(MOTES, c.detail);
+        for (let i = 0; i < motes; i++) {
           const cycle = (this.clock * 1.4 + hash01(i, c.caster)) % 1;
           const along = 1 - (0.15 + 0.8 * hash01(i, 7)) * build;
           const lx = this.tip.x - this.dir.x * LENGTH * along,
@@ -329,6 +350,7 @@ export class MercyLance {
         }
       }
       // A spark at the forming tip.
+      if (!paladinDetailScale(c.detail).accents) continue;
       pool.time = 0;
       pool.billboard(
         this.tip.x,
@@ -343,7 +365,14 @@ export class MercyLance {
     for (const s of this.strikes) {
       if (!s.active) continue;
       s.age += dt;
-      if (s.age >= MERCY_STRIKE_DURATION || !this.ctx.anchor(s.target, 0.6, this.to)) {
+      const scale = paladinDetailScale(s.detail);
+      // The embedded lance burns away sooner on the lighter tiers.
+      const burnEnd =
+        s.detail === 'full'
+          ? MERCY_EMBED + 0.15
+          : MERCY_EMBED * 0.6 + paladinDetailLinger(MERCY_EMBED * 0.4 + 0.15, s.detail);
+      const end = s.detail === 'full' ? MERCY_STRIKE_DURATION : MERCY_FLIGHT + burnEnd + 0.1;
+      if (s.age >= end || !this.ctx.anchor(s.target, 0.6, this.to)) {
         s.active = false;
         continue;
       }
@@ -366,12 +395,12 @@ export class MercyLance {
         ty = s.sy + (ey - s.sy) * flying,
         tz = s.sz + (ez - s.sz) * flying;
       const after = Math.max(0, t - MERCY_FLIGHT);
-      const fade = 1 - ramp(after, MERCY_EMBED * 0.6, MERCY_EMBED + 0.15);
+      const fade = 1 - ramp(after, MERCY_EMBED * 0.6, burnEnd);
       const weak = s.absorbed ? 0.6 : 1;
       // The lance itself, white-hot in flight, cooling where it is driven in.
       this.drawLance(tx, ty, tz, hx, hy, hz, 1, Math.max(0.2, 1 - after * 2), fade);
       // The streak of its flight.
-      if (t < MERCY_FLIGHT + 0.2) {
+      if (t < MERCY_FLIGHT + 0.2 && scale.secondary) {
         const trail = 1 - ramp(t, MERCY_FLIGHT, MERCY_FLIGHT + 0.2);
         pool.time = 0;
         pool.beam(s.sx, s.sy, s.sz, tx, ty, tz, 0.2, KIT_GOLD, trail * 0.9, SHAPE.streak);
@@ -381,17 +410,19 @@ export class MercyLance {
       // behind, and a spray of shards.
       const crit = s.critical ? 1.3 : 1;
       pool.time = after;
-      pool.billboard(
-        this.to.x,
-        this.to.y,
-        this.to.z,
-        1.3 * crit,
-        KIT_IVORY,
-        Math.exp(-after * 9) * 1.4 * weak,
-        SHAPE.flare,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.to.x,
+          this.to.y,
+          this.to.z,
+          1.3 * crit,
+          KIT_IVORY,
+          Math.exp(-after * 9) * 1.4 * weak,
+          SHAPE.flare,
+        );
       pool.billboard(this.to.x, this.to.y, this.to.z, 1.2 * crit, KIT_GOLD, weak, SHAPE.ring);
       // A critical strike: a second, wider ring of gold breaks out behind it.
+      if (!scale.secondary) continue;
       if (s.critical && after > 0.06) {
         pool.time = after - 0.06;
         pool.billboard(this.to.x, this.to.y, this.to.z, 2.1, KIT_GOLD, 1.1, SHAPE.ring);
@@ -414,7 +445,8 @@ export class MercyLance {
       }
       const motion = reduced ? 0.3 : 1;
       const c = pool.cam;
-      for (let i = 0; i < MERCY_SHARDS; i++) {
+      const shards = paladinDetailCount(MERCY_SHARDS, s.detail);
+      for (let i = 0; i < shards; i++) {
         const life = 0.3 + 0.2 * hash01(i, 3);
         if (after >= life) continue;
         const ang = i * 2.399963 + hash01(i, 1);

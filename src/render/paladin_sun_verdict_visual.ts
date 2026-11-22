@@ -1,5 +1,13 @@
 import * as THREE from 'three';
+import { paladinVfxDetailNow } from './ability_vfx/paladin_vfx_detail';
+import { type PaladinVfxDetail, paladinDetailScale } from './ability_vfx/paladin_vfx_detail_core';
 import type { PaladinSunVerdictVisualPlan } from './paladin_sun_verdict_core';
+
+// Detail: core = the spear and the two charge wings (they say how many charges
+// the mark holds, so they draw on every tier); secondary = none; accents = the
+// sentence flash (the white star of the third charge, a render-only flash after
+// the sentence has landed) and the brand's flicker and breathing. The detail is
+// read as the mark appears and held while it stays.
 
 // Solar Lance brand, drawn as glowing light: a slim diamond-tipped spear for the
 // mark, a small pair of curved flame wings for the first charge and a larger
@@ -116,6 +124,9 @@ export class PaladinSunVerdictVisual {
   private readonly base = sprite(TEXTURES[0]);
   private readonly segments = TEXTURES.slice(1).map(sprite);
   private elapsed = 0;
+  private wasActive = false;
+  /** The detail this mark draws at: read as it appears, kept while it stays. */
+  private detail: PaladinVfxDetail = 'full';
   constructor(characterHeight: number) {
     this.group.name = 'paladin-sun-verdict-visual';
     this.group.position.y = characterHeight + 1.1;
@@ -130,15 +141,21 @@ export class PaladinSunVerdictVisual {
   update(plan: PaladinSunVerdictVisualPlan, dt: number, reducedMotion: boolean): void {
     this.group.visible = plan.active;
     this.group.userData.charges = plan.charges;
+    if (plan.active && !this.wasActive) this.detail = paladinVfxDetailNow();
+    this.wasActive = plan.active;
     if (!plan.active) return;
+    const accents = paladinDetailScale(this.detail).accents;
+    // A lighter mark holds still: its breathing and flicker are accents.
+    const steady = reducedMotion || !accents;
     if (!reducedMotion) this.elapsed += Math.max(0, dt);
-    const pulse = reducedMotion ? 1 : 1 + Math.sin(this.elapsed * 3) * 0.025;
+    const pulse = steady ? 1 : 1 + Math.sin(this.elapsed * 3) * 0.025;
     this.group.scale.setScalar(pulse);
     // The brand burns brighter as the sentence nears.
-    const shimmer = reducedMotion ? 1 : 0.9 + 0.1 * Math.sin(this.elapsed * 5.3);
+    const shimmer = steady ? 1 : 0.9 + 0.1 * Math.sin(this.elapsed * 5.3);
     this.base.material.opacity = (plan.imminent ? 1 : 0.85) * shimmer;
     for (let i = 0; i < this.segments.length; i++) {
-      this.segments[i].visible = i < plan.charges;
+      // The last segment is the sentence flash: an accent.
+      this.segments[i].visible = i < plan.charges && (accents || i < this.segments.length - 1);
       this.segments[i].material.opacity = 0.95 * shimmer;
     }
   }

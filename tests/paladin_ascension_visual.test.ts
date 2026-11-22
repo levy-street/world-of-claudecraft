@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
 import {
   ASCENSION_ENTRANCE,
   ASCENSION_EXIT,
@@ -23,6 +24,11 @@ function requiredObject(visual: PaladinAscensionVisual, name: string): Shaded {
   if (!object) throw new Error(`missing ${name}`);
   return object as Shaded;
 }
+
+// Node tests run at the Medium preset; the tests below pin the authored
+// composition (full detail) unless a test names another tier.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('PaladinAscensionVisual', () => {
   it('is a pillar of light, a ground rune circle, a sun halo and rising motes', () => {
@@ -396,5 +402,55 @@ describe('PaladinAscensionVisual', () => {
     expect(place).toBeGreaterThan(0);
     expect(mount).toBeGreaterThan(0);
     expect(sync).toBeGreaterThan(Math.max(place, mount));
+  });
+
+  it('draws a lighter Ascension on lighter tiers: the halo, circle and wing silhouette kept', () => {
+    const drawn = (detail: 'full' | 'light' | 'minimal') => {
+      setPaladinVfxDetailForTest(detail);
+      const visual = new PaladinAscensionVisual(1.8);
+      visual.update(ACTIVE_PLAN, 0, false);
+      visual.update(ACTIVE_PLAN, 0.1, false);
+      const motes = requiredObject(visual, 'paladin-ascension-motes');
+      const halo = requiredObject(visual, 'paladin-ascension-halo');
+      const feathers = visual.crown.getObjectByName(
+        'paladin-avenging-wrath-left-feathers',
+      ) as THREE.Mesh;
+      const wingVertices = feathers.geometry.index?.count ?? feathers.geometry.drawRange.count;
+      const out = {
+        pillar: requiredObject(visual, 'paladin-ascension-pillar').visible,
+        motes: Math.min(motes.geometry.drawRange.count, 28),
+        bloom: (halo.material.uniforms.uFlash.value as number) > 0,
+        core:
+          halo.visible &&
+          requiredObject(visual, 'paladin-ascension-ground-seal').visible &&
+          feathers.parent?.visible === true,
+        wingQuads: Math.min(wingVertices, 57 * 6) / 6,
+      };
+      visual.dispose();
+      return out;
+    };
+    const full = drawn('full'),
+      light = drawn('light'),
+      minimal = drawn('minimal');
+    expect(full).toEqual({ pillar: true, motes: 28, bloom: true, core: true, wingQuads: 57 });
+    // Light keeps the column and the coverts, halves the motes, drops the bloom.
+    expect(light).toEqual({ pillar: true, motes: 14, bloom: false, core: true, wingQuads: 50 });
+    // Minimal: the halo, the circle and the wing silhouette (primaries and
+    // secondaries) with a few motes; no column, no coverts.
+    expect(minimal).toEqual({ pillar: false, motes: 8, bloom: false, core: true, wingQuads: 23 });
+  });
+
+  it('keeps the detail an Ascension began with and shortens its exit fade on lighter tiers', () => {
+    setPaladinVfxDetailForTest('minimal');
+    const visual = new PaladinAscensionVisual(1.8);
+    visual.update(ACTIVE_PLAN, 0, false);
+    setPaladinVfxDetailForTest('full');
+    visual.update(ACTIVE_PLAN, ASCENSION_ENTRANCE, false);
+    expect(requiredObject(visual, 'paladin-ascension-motes').geometry.drawRange.count).toBe(8);
+    visual.update(INACTIVE_PLAN, 0, false);
+    // Minimal's exit is 0.45 of the authored fade.
+    visual.update(INACTIVE_PLAN, ASCENSION_EXIT * 0.5, false);
+    expect(visual.group.visible).toBe(false);
+    visual.dispose();
   });
 });

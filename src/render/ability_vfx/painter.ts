@@ -75,6 +75,11 @@ import { isDevotionKind } from './devotion_rings';
 import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
 import { PALADIN_SPEC_SIGNATURES } from './paladin_spec_emblems';
+import {
+  enterPaladinCast,
+  exitPaladinCast,
+  setPaladinCastTierResolver,
+} from './paladin_vfx_detail';
 
 interface VfxPoint {
   x: number;
@@ -619,6 +624,9 @@ export class AbilityVfx {
     );
     // The Paladin kit's big flashes dim for other casters (paladin_flash.ts).
     deps.fx.setLocalPlayer?.(deps.localPlayerId ?? null);
+    // A Paladin spawn inside a cue bracket asks this painter's spam budget for
+    // its caster's tier (paladin_vfx_detail.ts); the last painter built wins.
+    setPaladinCastTierResolver((casterId) => this.paladinCastTier(casterId));
   }
 
   /** The reads a player acts on that this painter draws past a closed gate
@@ -663,6 +671,51 @@ export class AbilityVfx {
       tier = this.budget.admit(casterId, nowSec);
     }
     return this.biasFor(casterId, tier);
+  }
+
+  /** The spam budget's tier for a Paladin cue, read WITHOUT charging: the
+   *  kit's cues pick their detail before the painter knows they are claimed
+   *  (paladin_vfx_detail.ts); a claimed cast is charged after the dispatch. */
+  private paladinCastTier(casterId: number | undefined): 0 | 1 | 2 {
+    if (casterId === undefined) return 0;
+    return this.biasFor(casterId, this.budget.peek(casterId, this.now()));
+  }
+
+  // Each Paladin dispatch runs inside a cast bracket: a Paladin spawn inside it
+  // reads the caster's budget tier, resolved only if one asks
+  // (paladin_vfx_detail.ts). No closure and no budget read for an event no
+  // Paladin effect claims, though every class's events pass through here.
+  private paladinSpellfxCue(ev: AbilityVfxSpellfxEvent): boolean {
+    enterPaladinCast(ev.sourceId);
+    try {
+      return this.paladinSpellfx(ev);
+    } finally {
+      exitPaladinCast();
+    }
+  }
+
+  private paladinSpellfxAtCue(ev: AbilityVfxSpellfxAtEvent): boolean {
+    enterPaladinCast(ev.sourceId);
+    try {
+      return this.paladinSpellfxAt(ev);
+    } finally {
+      exitPaladinCast();
+    }
+  }
+
+  private paladinDamageCue(ev: AbilityVfxDamageEvent): boolean {
+    enterPaladinCast(ev.sourceId);
+    try {
+      return this.paladinDamage(ev);
+    } finally {
+      exitPaladinCast();
+    }
+  }
+
+  /** Charge a claimed Paladin cast once per (caster, ability) window, like
+   *  every other class's cast, so a crowd of Paladins degrades the kit. */
+  private chargePaladinCast(casterId: number | undefined, abilityId: string | undefined): void {
+    if (casterId !== undefined && abilityId) this.castTier(casterId, abilityId);
   }
 
   private biasFor(casterId: number, tier: 0 | 1 | 2): 0 | 1 | 2 {
@@ -1090,7 +1143,10 @@ export class AbilityVfx {
     if (paladinSpec) this.deps.fx.learnPaladinSpec?.(ev.sourceId, paladinSpec);
     // The Paladin kit's own cues. A caster the Spell Effects option mutes
     // takes the release's ordinary path below (spell_effects_switch.ts).
-    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfx(ev)) {
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfxCue(ev)) {
+      // A claimed cast charges the shared spam budget like every other
+      // class's cast; a tick (Consecration's pulse, an aura's beat) does not.
+      if (ev.fx !== 'tick') this.chargePaladinCast(ev.sourceId, ev.ability);
       this.deps.fx.wakePaladinKit?.();
       return true;
     }
@@ -1664,7 +1720,9 @@ export class AbilityVfx {
   handleSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean {
     // The Paladin kit's point cues; a caster the Spell Effects option mutes
     // takes the release's ordinary path below (its area ring included).
-    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfxAt(ev)) {
+    // Point cues are a cast's follow-through (an impact, a placed zone, a
+    // tick): they read the caster's budget tier but never charge it.
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinSpellfxAtCue(ev)) {
       this.deps.fx.wakePaladinKit?.();
       // The kit's own figures are additions to the area read, never its
       // substitute: a radius-carrying cue draws the draped ring on every tier,
@@ -2020,7 +2078,7 @@ export class AbilityVfx {
     // The Paladin kit's contacts. Like its cues they wait on no cast family
     // (each pool keeps its own preparation and falls back when cold), while a
     // caster the Spell Effects option mutes takes the release's path below.
-    if (!spellEffectsMuted(ev.sourceId) && this.paladinDamage(ev)) {
+    if (!spellEffectsMuted(ev.sourceId) && this.paladinDamageCue(ev)) {
       this.deps.fx.wakePaladinKit?.();
       return true;
     }

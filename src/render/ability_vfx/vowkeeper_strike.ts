@@ -8,6 +8,12 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
 
 export const VOW_STRIKES = 8;
 /** The impact lands when the swing peaks, at the latest this long after the hit. */
@@ -66,6 +72,8 @@ interface Strike {
   lastY: number;
   lastZ: number;
   tracked: boolean;
+  /** The Paladin detail read when the hit came. */
+  detail: PaladinVfxDetail;
 }
 
 /**
@@ -76,6 +84,13 @@ interface Strike {
  * the weapon flares, a starburst of light breaks over the enemy, a short shaft
  * of light hammers down onto them and a shock ring runs out at their feet,
  * sparks flying.
+ *
+ * Detail: core = the starburst over the enemy (and Ascension's vow-ward, one
+ * shell on every tier); secondary = the ribbon trailing the weapon, the shaft
+ * of light and the shock ring at their feet; accents = the flare. The weapon's
+ * own glow (paladin_shield_buffs.ts) plays on every tier. Light drops the
+ * flare and halves the sparks; minimal keeps the starburst with a third of
+ * them.
  */
 export class VowkeeperStrike {
   private readonly pool: PaladinQuadPool<'vowkeeper_strike'>;
@@ -94,6 +109,7 @@ export class VowkeeperStrike {
     lastY: 0,
     lastZ: 0,
     tracked: false,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly at = new THREE.Vector3();
   private readonly feet = new THREE.Vector3();
@@ -215,6 +231,7 @@ export class VowkeeperStrike {
     slot.speed = 0;
     slot.peak = 0;
     slot.tracked = false;
+    slot.detail = paladinVfxDetailNow();
     return true;
   }
 
@@ -270,6 +287,7 @@ export class VowkeeperStrike {
       this.follow(s, dt);
       if (s.impact < 0 && (reduced || s.age >= VOW_SWING_MAX)) s.impact = 0;
       const weak = s.absorbed ? 0.6 : 1;
+      const scale = paladinDetailScale(s.detail);
       // The weapon blazing through the swing, flaring as the blow lands.
       const t = s.impact;
       noteVowkeeperWeapon(
@@ -279,7 +297,7 @@ export class VowkeeperStrike {
       );
       // The weapon's trail.
       const p = s.path;
-      for (let i = 0; i < s.points - 1; i++) {
+      for (let i = 0; scale.secondary && i < s.points - 1; i++) {
         const a0 = p[i * 4 + 3],
           a1 = p[i * 4 + 7];
         if (a1 >= TRAIL_LIFE) break;
@@ -301,15 +319,16 @@ export class VowkeeperStrike {
       if (t < 0) continue;
       // The smite: a flare and a starburst over the enemy.
       pool.time = t;
-      pool.billboard(
-        this.at.x,
-        this.at.y,
-        this.at.z,
-        1.1,
-        KIT_IVORY,
-        Math.exp(-t * 11) * 1.4 * weak,
-        SHAPE.flare,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.at.x,
+          this.at.y,
+          this.at.z,
+          1.1,
+          KIT_IVORY,
+          Math.exp(-t * 11) * 1.4 * weak,
+          SHAPE.flare,
+        );
       pool.billboard(
         this.at.x,
         this.at.y,
@@ -321,7 +340,7 @@ export class VowkeeperStrike {
         0.4,
       );
       // A shaft of light hammering down onto them.
-      if (t < 0.4) {
+      if (t < 0.4 && scale.secondary) {
         const h = this.head.y - this.feet.y;
         pool.upright(
           this.feet.x,
@@ -337,13 +356,15 @@ export class VowkeeperStrike {
       // The shock at their feet.
       const floor = this.ctx.groundY(this.feet.x, this.feet.z);
       const y = (Number.isFinite(floor) ? Math.max(floor, this.feet.y - 0.3) : this.feet.y) + 0.05;
-      pool.ground(this.feet.x, y, this.feet.z, 1.4, KIT_GOLD, weak, SHAPE.shock);
+      if (scale.secondary)
+        pool.ground(this.feet.x, y, this.feet.z, 1.4, KIT_GOLD, weak, SHAPE.shock);
       // Sparks thrown off the blow.
       const motion = reduced ? 0.3 : 1;
-      for (let i = 0; i < SPARKS; i++) {
+      const sparks = paladinDetailCount(SPARKS, s.detail);
+      for (let i = 0; i < sparks; i++) {
         const life = 0.25 + 0.25 * hash01(i, 3);
         if (t >= life) continue;
-        const ang = (i / SPARKS) * Math.PI * 2 + hash01(i, 1) * 0.5;
+        const ang = (i / sparks) * Math.PI * 2 + hash01(i, 1) * 0.5;
         const speed = (2.5 + 3 * hash01(i, 2)) * motion;
         const vx = (c[0] * Math.cos(ang) + c[3] * Math.sin(ang)) * speed,
           vy = (c[1] * Math.cos(ang) + c[4] * Math.sin(ang)) * speed,

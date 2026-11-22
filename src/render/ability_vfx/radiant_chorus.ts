@@ -9,6 +9,13 @@ import {
 } from './paladin_kit_context';
 import { hash01, PaladinQuadPool, ramp } from './paladin_quad_pool';
 import { PALADIN_RUNE_GLSL } from './paladin_runes';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailCount,
+  paladinDetailScale,
+  paladinLingerEnd,
+} from './paladin_vfx_detail_core';
 
 export const CHORUS_CHANNELS = 4;
 export const CHORUS_RELEASES = 4;
@@ -58,6 +65,8 @@ interface Channel {
   age: number;
   /** The sun's rays, turning faster as it charges. */
   spin: number;
+  /** The Paladin detail read when the cast was first seen. */
+  detail: PaladinVfxDetail;
 }
 interface Release {
   active: boolean;
@@ -67,6 +76,8 @@ interface Release {
   charge: number;
   /** The heal's reach: the wave runs out to it. */
   radius: number;
+  /** The Paladin detail read when the sun burst. */
+  detail: PaladinVfxDetail;
 }
 interface Ribbon {
   active: boolean;
@@ -74,6 +85,10 @@ interface Ribbon {
   target: number;
   age: number;
   seed: number;
+  /** The Paladin detail read when the ribbon set out. */
+  detail: PaladinVfxDetail;
+  /** When it ends (its fade tail shortened on lighter tiers). */
+  end: number;
 }
 
 /**
@@ -85,6 +100,14 @@ interface Ribbon {
  * from it and a spray of pluses of healing drifting down over the group, a
  * wide wave across the ground, and a ribbon of light arcs out of the sun to
  * each ally it heals, landing in a bloom.
+ *
+ * Detail: core = the charging sun and the choir's small suns rising into it,
+ * the burst ring, the pluses of healing, the wave out to the heal's edge and
+ * a ribbon landing in a bloom on each ally healed; secondary = the rune circle
+ * underfoot, the rings closing on the sun with the beat and the second wave
+ * inside the first; accents = the flares (the burst's and each ribbon head's).
+ * Light drops the flares and halves the voices, motes and pluses; minimal
+ * keeps the core with a third of them, and both shorten the fades.
  */
 /** A point on a ribbon's quadratic arc from `from` over `bend` onto `to`. */
 function ribbonAt(
@@ -112,6 +135,7 @@ export class RadiantChorus {
     seen: false,
     age: 0,
     spin: 0,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly releases: Release[] = Array.from({ length: CHORUS_RELEASES }, () => ({
     active: false,
@@ -119,6 +143,7 @@ export class RadiantChorus {
     age: 0,
     charge: 1,
     radius: CHORUS_RADIUS,
+    detail: 'full' as PaladinVfxDetail,
   }));
   private readonly ribbons: Ribbon[] = Array.from({ length: CHORUS_RIBBONS }, () => ({
     active: false,
@@ -126,6 +151,8 @@ export class RadiantChorus {
     target: -1,
     age: 0,
     seed: 0,
+    detail: 'full' as PaladinVfxDetail,
+    end: CHORUS_RIBBON_DURATION,
   }));
   private readonly feet = new THREE.Vector3();
   private readonly chest = new THREE.Vector3();
@@ -228,6 +255,7 @@ export class RadiantChorus {
       slot.presence = 0;
       slot.age = 0;
       slot.spin = 0;
+      slot.detail = paladinVfxDetailNow();
     }
     slot.seen = true;
     slot.progress = Number.isFinite(progress) ? Math.min(1, Math.max(0, progress)) : 0;
@@ -247,6 +275,7 @@ export class RadiantChorus {
     const held = this.channels.find((c) => c.active && c.caster === caster);
     slot.charge = held ? Math.max(0.5, held.progress) : 1;
     slot.radius = CHORUS_RADIUS;
+    slot.detail = paladinVfxDetailNow();
     // The sun bursts rather than fading out with the channel.
     if (held) held.active = false;
     return true;
@@ -273,6 +302,12 @@ export class RadiantChorus {
     slot.target = target;
     slot.age = 0;
     slot.seed = this.seed++;
+    slot.detail = paladinVfxDetailNow();
+    slot.end = paladinLingerEnd(
+      CHORUS_REACH + CHORUS_TAIL,
+      CHORUS_RIBBON_DURATION,
+      paladinDetailScale(slot.detail).linger,
+    );
     return true;
   }
 
@@ -309,17 +344,19 @@ export class RadiantChorus {
       }
       const k = ch.presence;
       const charge = ch.progress;
+      const scale = paladinDetailScale(ch.detail);
       if (!reduced) ch.spin += dt * (1 + 2.5 * charge);
       pool.time = ch.age;
-      pool.ground(
-        this.feet.x,
-        this.floorAt(0.05),
-        this.feet.z,
-        3.4,
-        KIT_GOLD,
-        k * (0.5 + 0.6 * charge),
-        SHAPE.ground,
-      );
+      if (scale.secondary)
+        pool.ground(
+          this.feet.x,
+          this.floorAt(0.05),
+          this.feet.z,
+          3.4,
+          KIT_GOLD,
+          k * (0.5 + 0.6 * charge),
+          SHAPE.ground,
+        );
       // The sun charging: swelling and brightening, its rays turning faster.
       const throb = reduced ? 0 : Math.sin(this.clock * (6 + 10 * charge)) * 0.04 * charge;
       pool.time = ch.spin;
@@ -333,7 +370,7 @@ export class RadiantChorus {
         SHAPE.sun,
       );
       // Light closing in on the sun with each beat.
-      if (!reduced) {
+      if (!reduced && scale.secondary) {
         const beat = (ch.age / BEAT) % 1;
         pool.time = 0;
         pool.billboard(
@@ -347,11 +384,11 @@ export class RadiantChorus {
         );
       }
       // The choir: small suns spiralling up from about the Paladin into the sun.
-      for (let i = 0; i < CHORUS_VOICES; i++) {
-        const cycle = reduced ? 0.35 : (this.clock * 0.8 + i / CHORUS_VOICES) % 1;
+      const voices = paladinDetailCount(CHORUS_VOICES, ch.detail);
+      for (let i = 0; i < voices; i++) {
+        const cycle = reduced ? 0.35 : (this.clock * 0.8 + i / voices) % 1;
         const rise = cycle * cycle;
-        const ang =
-          (i / CHORUS_VOICES) * Math.PI * 2 + cycle * 2.2 + (reduced ? 0 : this.clock * 0.4);
+        const ang = (i / voices) * Math.PI * 2 + cycle * 2.2 + (reduced ? 0 : this.clock * 0.4);
         const rad = 1.0 * (1 - rise);
         pool.time = this.clock;
         pool.billboard(
@@ -365,7 +402,8 @@ export class RadiantChorus {
         );
       }
       if (!reduced) {
-        for (let i = 0; i < MOTES; i++) {
+        const motes = paladinDetailCount(MOTES, ch.detail);
+        for (let i = 0; i < motes; i++) {
           const cycle = (this.clock * 0.55 + hash01(i, 5)) % 1;
           const ang = hash01(i, 2) * Math.PI * 2 + cycle * 2.5;
           const rad = 0.45 + 0.55 * hash01(i, 3);
@@ -394,17 +432,19 @@ export class RadiantChorus {
         continue;
       }
       const t = r.age;
+      const scale = paladinDetailScale(r.detail);
       const size = 0.75 + 0.25 * r.charge;
       pool.time = t;
-      pool.billboard(
-        this.sun.x,
-        this.sun.y,
-        this.sun.z,
-        2.4 * size,
-        KIT_IVORY,
-        Math.exp(-t * 6) * 1.15,
-        SHAPE.flare,
-      );
+      if (scale.accents)
+        pool.billboard(
+          this.sun.x,
+          this.sun.y,
+          this.sun.z,
+          2.4 * size,
+          KIT_IVORY,
+          Math.exp(-t * 6) * 1.15,
+          SHAPE.flare,
+        );
       pool.billboard(
         this.sun.x,
         this.sun.y,
@@ -417,15 +457,17 @@ export class RadiantChorus {
       // Pluses of healing sprayed out of the sun, slowing, then drifting down
       // over the group as they fade.
       const motion = reduced ? 0.5 : 1;
-      for (let i = 0; i < CHORUS_PLUSES; i++) {
-        const ang = (i / CHORUS_PLUSES) * Math.PI * 2 + hash01(i, 7) * 0.6;
+      const pluses = paladinDetailCount(CHORUS_PLUSES, r.detail);
+      const plusesGone = paladinLingerEnd(0.7, CHORUS_RELEASE_DURATION, scale.linger);
+      for (let i = 0; i < pluses; i++) {
+        const ang = (i / pluses) * Math.PI * 2 + hash01(i, 7) * 0.6;
         const tilt = -0.35 + 0.95 * hash01(i, 8);
         const speed = (4 + 2.4 * hash01(i, 9)) * motion;
         // Out fast, slowing: distance travelled under a strong drag.
         const out = (speed / 2.2) * (1 - Math.exp(-t * 2.2));
         const fall = reduced ? 0 : 0.9 * t * t;
         const horizontal = Math.cos(tilt) * out;
-        const fade = Math.min(1, t / 0.06) * (1 - ramp(t, 0.7, CHORUS_RELEASE_DURATION));
+        const fade = Math.min(1, t / 0.06) * (1 - ramp(t, 0.7, plusesGone));
         pool.time = 0;
         pool.billboard(
           this.sun.x + Math.cos(ang) * horizontal,
@@ -450,6 +492,7 @@ export class RadiantChorus {
         0.6,
         SHAPE.wave,
       );
+      if (!scale.secondary) continue;
       pool.time = t + 0.12;
       pool.ground(
         this.feet.x,
@@ -465,7 +508,7 @@ export class RadiantChorus {
       if (!rb.active) continue;
       rb.age += dt;
       if (
-        rb.age >= CHORUS_RIBBON_DURATION ||
+        rb.age >= rb.end ||
         !this.sunAt(rb.source, this.from) ||
         !this.ctx.anchor(rb.target, 0.55, this.to)
       ) {
@@ -485,7 +528,7 @@ export class RadiantChorus {
         my = Math.max(this.from.y, this.to.y) + 0.4 + dist * 0.08,
         mz = (this.from.z + this.to.z) / 2 + (dx / dist) * lean;
       this.bend.set(mx, my, mz);
-      const fade = 1 - ramp(t, CHORUS_REACH + CHORUS_TAIL, CHORUS_RIBBON_DURATION);
+      const fade = 1 - ramp(t, CHORUS_REACH + CHORUS_TAIL, rb.end);
       if (head > tail + 0.01) {
         for (let i = 0; i < SEGMENTS; i++) {
           const u0 = tail + ((head - tail) * i) / SEGMENTS,
@@ -508,17 +551,19 @@ export class RadiantChorus {
             SHAPE.ribbon,
           );
         }
-        ribbonAt(this.a, head, this.from, this.bend, this.to);
-        pool.time = 0;
-        pool.billboard(
-          this.a.x,
-          this.a.y,
-          this.a.z,
-          0.35,
-          KIT_IVORY,
-          fade * (head < 1 ? 1 : 0.4),
-          SHAPE.flare,
-        );
+        if (paladinDetailScale(rb.detail).accents) {
+          ribbonAt(this.a, head, this.from, this.bend, this.to);
+          pool.time = 0;
+          pool.billboard(
+            this.a.x,
+            this.a.y,
+            this.a.z,
+            0.35,
+            KIT_IVORY,
+            fade * (head < 1 ? 1 : 0.4),
+            SHAPE.flare,
+          );
+        }
       }
       if (t >= CHORUS_REACH) {
         pool.time = t - CHORUS_REACH;

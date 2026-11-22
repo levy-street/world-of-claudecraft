@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   GRACE_CAPACITY,
   GRACE_DURATION,
@@ -15,6 +15,9 @@ import {
   GraceHammer,
 } from '../src/render/ability_vfx/grace_hammer';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import { PROJECTILE_SPEED } from '../src/sim/projectile_travel';
 
 function fixture() {
@@ -57,6 +60,10 @@ function fixture() {
 function step(effect: GraceHammer, seconds: number, reduced = false): void {
   for (let t = 0; t < seconds - 1e-6; t += 0.05) effect.update(0.05, reduced);
 }
+
+// Node runs at the Medium preset: pin the authored composition.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 describe('Hammer of Grace', () => {
   it('flies at the projectile speed, never predicting a hit, and retires on arrival', async () => {
@@ -174,6 +181,10 @@ describe('Hammer of Grace', () => {
     const receiveHit = vi.fn(),
       releaseGesture = vi.fn();
     const p = Object.assign(Object.create(AbilityVfx.prototype), {
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
       deps: { fx, receiveHit },
       releaseGesture,
     }) as AbilityVfx;
@@ -189,5 +200,89 @@ describe('Hammer of Grace', () => {
       [1, 2, 'absorb'],
     ]);
     expect(receiveHit).toHaveBeenCalledOnce();
+  });
+});
+
+describe('Hammer of Grace detail', () => {
+  /** Quads per shape through one throw and hit at `detail`: in flight, at the
+   * blow, the shards on their way home, and the bloom round the Paladin. */
+  const cast = async (detail: PaladinVfxDetail) => {
+    const f = fixture();
+    await f.prepare();
+    setPaladinVfxDetailForTest(detail);
+    f.effect.throw(1, 2);
+    // A later detail change never reshapes the running hammer.
+    setPaladinVfxDetailForTest('full');
+    f.effect.update(0.05);
+    const release = f.shapes();
+    step(f.effect, 0.25);
+    const flight = f.shapes();
+    f.effect.contact(1, 2, 'damage');
+    f.effect.update(0.05);
+    const blow = f.shapes();
+    step(f.effect, GRACE_SCATTER + GRACE_STAGGER * GRACE_MOTES - 0.05);
+    const homing = f.shapes();
+    step(f.effect, GRACE_RETURN * 0.9);
+    const bloom = f.shapes();
+    let tail = 0;
+    while (f.effect.mesh.visible && tail < 3) {
+      f.effect.update(0.02);
+      tail += 0.02;
+    }
+    f.effect.dispose();
+    const total = (m: Map<number, number>) => [...m.values()].reduce((a, b) => a + b, 0);
+    return {
+      release,
+      flight,
+      blow,
+      homing,
+      bloom,
+      tail,
+      quads: total(release) + total(flight) + total(homing),
+    };
+  };
+
+  it('throws the same hammer and brings the grace home lighter at light and minimal', async () => {
+    const full = await cast('full');
+    const light = await cast('light');
+    const minimal = await cast('minimal');
+    const shards = (m: Map<number, number>) =>
+      (m.get(GRACE_SHAPE.plus) ?? 0) + (m.get(GRACE_SHAPE.spark) ?? 0);
+    // Core on every tier: the hammer in flight and stamping in, the ring of
+    // the blow and the shards going home.
+    for (const d of [full, light, minimal]) {
+      expect(d.flight.get(GRACE_SHAPE.hammer)).toBe(1);
+      expect(d.blow.get(GRACE_SHAPE.hammer)).toBe(1);
+      expect(d.blow.get(GRACE_SHAPE.ring)).toBeGreaterThanOrEqual(1);
+      expect(shards(d.homing)).toBeGreaterThan(0);
+    }
+    // Full: the release flare, the trail's twin helix, the starburst, the
+    // ghosts behind the shards and the helix round the Paladin.
+    expect(full.release.get(GRACE_SHAPE.flare)).toBe(1);
+    expect(full.flight.get(GRACE_SHAPE.strand)).toBe(2 * GRACE_TRAIL_SEGMENTS);
+    expect(full.blow.get(GRACE_SHAPE.rays)).toBe(1);
+    expect(full.homing.get(GRACE_SHAPE.mote) ?? 0).toBeGreaterThan(0);
+    expect(full.bloom.get(GRACE_SHAPE.strand) ?? 0).toBeGreaterThan(4);
+    // Light keeps the trail, ghosts and helix, drops the flares and starburst,
+    // and thins the shards.
+    expect(light.release.get(GRACE_SHAPE.flare)).toBeUndefined();
+    expect(light.release.get(GRACE_SHAPE.ring)).toBe(1);
+    expect(light.flight.get(GRACE_SHAPE.strand)).toBe(2 * GRACE_TRAIL_SEGMENTS);
+    expect(light.blow.get(GRACE_SHAPE.rays)).toBeUndefined();
+    expect(light.homing.get(GRACE_SHAPE.mote) ?? 0).toBeGreaterThan(0);
+    expect(light.bloom.get(GRACE_SHAPE.strand) ?? 0).toBeGreaterThan(4);
+    expect(shards(light.homing)).toBeLessThan(shards(full.homing));
+    // Minimal: only the core, no trail, ghosts or helix.
+    expect(minimal.flight.get(GRACE_SHAPE.strand)).toBeUndefined();
+    expect(minimal.flight.get(GRACE_SHAPE.beam)).toBeUndefined();
+    expect(minimal.release.get(GRACE_SHAPE.ring)).toBeUndefined();
+    expect(minimal.homing.get(GRACE_SHAPE.mote)).toBeUndefined();
+    expect(minimal.bloom.get(GRACE_SHAPE.strand)).toBeUndefined();
+    expect(shards(minimal.homing)).toBeLessThan(shards(light.homing));
+    // Strictly less each step down, and the bloom fades sooner.
+    expect(light.quads).toBeLessThan(full.quads);
+    expect(minimal.quads).toBeLessThan(light.quads);
+    expect(light.tail).toBeLessThan(full.tail);
+    expect(minimal.tail).toBeLessThan(light.tail);
   });
 });

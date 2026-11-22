@@ -22,6 +22,19 @@ import {
   PALADIN_SPEC_ICON_GLSL,
   paladinSpecIconUniforms,
 } from './paladin_spec_icons';
+import { paladinVfxDetailNow } from './paladin_vfx_detail';
+import {
+  type PaladinVfxDetail,
+  paladinDetailLinger,
+  paladinDetailScale,
+} from './paladin_vfx_detail_core';
+
+// Detail: core = the bowed kite shield with its spec emblem (minimal draws it at
+// the reduced-motion tessellation, the same whole shape); secondary = the two
+// ribbons of light swirling round the wearer (light draws them at half their
+// segments); accents = none drawn as pieces (the rim runner, ripple and twinkle
+// are terms of the shield's own program). The expiry fade scales with the
+// linger, and coverage() reads against it so Debt's rim still returns smoothly.
 
 const CAPACITY = AEGIS_CAPACITY * AEGIS_VERTEX_BUDGET;
 const QUAD = [0, 1, 2, 0, 2, 3];
@@ -66,6 +79,10 @@ interface Aegis {
   z: number;
   height: number;
   answerFacing: number | null;
+  /** How much of the ward draws, read when it is raised on a wearer. */
+  detail: PaladinVfxDetail;
+  /** The expiry fade for that detail, seconds. */
+  fadeMax: number;
 }
 
 /** One prepared mesh and fixed recipients; snapshot refreshes own the true lifetime. */
@@ -85,6 +102,8 @@ export class GuardianCovenant {
     z: 0,
     height: 2,
     answerFacing: null,
+    detail: 'full',
+    fadeMax: AEGIS_FADE,
   }));
   private readonly positions = new Float32Array(CAPACITY * 3);
   private readonly uvs = new Float32Array(CAPACITY * 3);
@@ -216,11 +235,13 @@ export class GuardianCovenant {
       slot.id = id;
       slot.age = 0;
       slot.answerFacing = null;
+      slot.detail = paladinVfxDetailNow();
+      slot.fadeMax = paladinDetailLinger(AEGIS_FADE, slot.detail);
     }
     const strength = value >= 0.29 ? 1.35 : 1;
     slot.strength = slot.seen ? Math.max(slot.strength, strength) : strength;
     slot.seen = true;
-    slot.fade = AEGIS_FADE;
+    slot.fade = slot.fadeMax;
     slot.facing = Number.isFinite(facing) ? facing : 0;
     return true;
   }
@@ -230,7 +251,7 @@ export class GuardianCovenant {
     if (this.disposed) return 0;
     dt = Number.isFinite(dt) ? Math.max(0, dt) : 0;
     for (const s of this.slots)
-      if (s.id === id) return Math.max(0, (s.fade - (s.seen ? 0 : dt)) / AEGIS_FADE);
+      if (s.id === id) return Math.max(0, (s.fade - (s.seen ? 0 : dt)) / s.fadeMax);
     return 0;
   }
 
@@ -271,7 +292,7 @@ export class GuardianCovenant {
 
   /** Ribbons of light swirling round the wearer, widened toward the camera. */
   private wisps(s: Aegis, alpha: number, reduced: boolean): void {
-    const segments = reduced ? AEGIS_WISP_SEGMENTS / 2 : AEGIS_WISP_SEGMENTS;
+    const segments = reduced || s.detail !== 'full' ? AEGIS_WISP_SEGMENTS / 2 : AEGIS_WISP_SEGMENTS;
     const e = this.camera?.matrixWorld.elements;
     const vx = e ? -e[8] : 0,
       vy = e ? -e[9] : 0,
@@ -324,7 +345,6 @@ export class GuardianCovenant {
     this.vertex = 0;
     this.mesh.material.uniforms.uTime.value = reduced ? 0 : this.time;
     if (this.kind === 'life_covenant_ward') bindPaladinSpecIcons(this.mesh.material);
-    const segments = reduced ? AEGIS_SEGMENTS / 2 : AEGIS_SEGMENTS;
     for (const s of this.slots) {
       if (s.id < 0) continue;
       s.age += dt;
@@ -340,9 +360,10 @@ export class GuardianCovenant {
       s.height = Math.max(0.6, Math.min(6, this.head.y - this.feet.y));
       const alpha =
         Math.min(1, s.age / 0.12) *
-        (s.fade / AEGIS_FADE) *
+        (s.fade / s.fadeMax) *
         s.strength *
         (0.74 + 0.55 * Math.max(0, 1 - s.age / 0.65));
+      const segments = reduced || s.detail === 'minimal' ? AEGIS_SEGMENTS / 2 : AEGIS_SEGMENTS;
       // Shared radial rings keep the bowed surface and ivory rim in one draw.
       for (let ring = 0; ring < AEGIS_RINGS; ring++)
         for (let segment = 0; segment < segments; segment++)
@@ -361,7 +382,7 @@ export class GuardianCovenant {
               alpha,
             );
           }
-      this.wisps(s, alpha * 0.8, reduced);
+      if (paladinDetailScale(s.detail).secondary) this.wisps(s, alpha * 0.8, reduced);
       s.seen = false;
       s.answerFacing = null;
     }

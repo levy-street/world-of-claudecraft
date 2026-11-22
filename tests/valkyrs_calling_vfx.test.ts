@@ -1,12 +1,15 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { setPaladinVfxDetailForTest } from '../src/render/ability_vfx/paladin_vfx_detail';
+import type { PaladinVfxDetail } from '../src/render/ability_vfx/paladin_vfx_detail_core';
 import {
   VALKYR_CANCEL_FADE,
   VALKYR_CAPACITY,
   VALKYR_QUADS,
   ValkyrsCalling,
 } from '../src/render/ability_vfx/valkyrs_calling';
+import { AbilityVfxBudget } from '../src/render/ability_vfx_core';
 import { syncPaladinAvengingWrathVisual } from '../src/render/paladin_avenging_wrath_visual';
 import {
   VALKYR_IMPACT_DURATION,
@@ -58,6 +61,10 @@ function fixture() {
     },
   };
 }
+
+// The authored composition; the detail tiers have their own block below.
+beforeEach(() => setPaladinVfxDetailForTest('full'));
+afterEach(() => setPaladinVfxDetailForTest(null));
 
 /** Steps a flight to `until` seconds in 50 ms ticks. */
 function fly(effect: ValkyrsCalling, from: number, until: number): void {
@@ -379,6 +386,10 @@ describe("Valkyr's Calling routing", () => {
       stats: new Map(),
       spawned: 0,
       quality: 1,
+      // The painter reads the cast budget for every Paladin cue.
+      budget: new AbilityVfxBudget(),
+      castChargeAt: new Map(),
+      now: () => 0,
     }) as AbilityVfx;
     return { p, fx, triggerAttack, abilityAudio, spawnAoeRing };
   }
@@ -404,5 +415,122 @@ describe("Valkyr's Calling routing", () => {
     // Both the mark and the slam keep the draped area ring at the true radius.
     expect(f.spawnAoeRing).toHaveBeenCalledTimes(2);
     for (const call of f.spawnAoeRing.mock.calls) expect(call.slice(0, 3)).toEqual([5, 6, 8]);
+  });
+});
+
+describe("Valkyr's Calling detail tiers", () => {
+  // Shader shapes (valkyrs_calling.ts SHAPE).
+  const LAUNCH = 0,
+    MARK = 1,
+    IMPACT = 2,
+    BEAM = 3,
+    FLARE = 4,
+    SPARK = 5,
+    FEATHER = 6,
+    SLASH = 7,
+    BOOM = 8;
+  /** Quads per shape at each phase of one flight spawned at `detail`. */
+  async function flight(detail: PaladinVfxDetail) {
+    setPaladinVfxDetailForTest(detail);
+    const f = fixture();
+    await f.prepare();
+    f.effect.launch(1, 10, 4, 8);
+    // A running flight keeps the shape it launched with.
+    setPaladinVfxDetailForTest('full');
+    const quads = () => {
+      const geometry = f.effect.mesh.geometry;
+      const shape = geometry.getAttribute('aShape');
+      const seen = new Map<number, number>();
+      for (let i = 0; i < geometry.drawRange.count; i += 6)
+        seen.set(shape.getX(i), (seen.get(shape.getX(i)) ?? 0) + 1);
+      return seen;
+    };
+    fly(f.effect, 0, VALKYR_LAUNCH - 0.05);
+    const charge = quads();
+    fly(f.effect, VALKYR_LAUNCH - 0.05, VALKYR_LAUNCH + 0.05);
+    const launch = quads();
+    fly(f.effect, VALKYR_LAUNCH + 0.05, VALKYR_VANISH + 0.3);
+    const gone = quads();
+    fly(f.effect, VALKYR_VANISH + 0.3, VALKYR_LAND);
+    f.effect.land(1, 10, 4, 8);
+    f.effect.update(0.05);
+    const slam = quads();
+    let frames = 0;
+    while (f.effect.mesh.visible && frames < 100) {
+      f.effect.update(0.05);
+      frames++;
+    }
+    const host = {
+      baked: f.host.bakedAt.mock.calls.length,
+      fragments: f.host.fragmentsAt.mock.calls.length,
+      decals: f.host.decalXZ.mock.calls.length,
+      shakes: f.host.shakeAt.mock.calls.length,
+    };
+    f.effect.dispose();
+    return { charge, launch, gone, slam, frames, host };
+  }
+  const total = (m: Map<number, number>) => [...m.values()].reduce((a, b) => a + b, 0);
+
+  it('keeps the launch, the mark, the dive and the slam on every tier and thins the rest', async () => {
+    const full = await flight('full');
+    const light = await flight('light');
+    const minimal = await flight('minimal');
+    for (const tier of [full, light, minimal]) {
+      expect(tier.charge.get(LAUNCH)).toBe(1);
+      expect(tier.gone.get(MARK)).toBe(1);
+      expect(tier.slam.get(IMPACT)).toBe(1);
+      expect(tier.slam.get(SLASH)).toBe(1);
+      // The slam's weight is kept even where its debris is not.
+      expect(tier.host.shakes).toBe(2);
+    }
+    // Light drops every flare, halves the motes and sparks, keeps the rest.
+    expect(full.charge.get(FLARE)).toBe(1);
+    for (const phase of ['charge', 'launch', 'gone', 'slam'] as const)
+      expect(light[phase].has(FLARE)).toBe(false);
+    expect(light.charge.get(SPARK) ?? 0).toBeLessThan(full.charge.get(SPARK) ?? 0);
+    expect(light.slam.get(SPARK) ?? 0).toBeLessThan(full.slam.get(SPARK) ?? 0);
+    expect(light.launch.get(BOOM)).toBe(full.launch.get(BOOM));
+    expect(light.gone.get(FEATHER) ?? 0).toBeGreaterThan(0);
+    expect(light.gone.get(FEATHER) ?? 0).toBeLessThan(full.gone.get(FEATHER) ?? 0);
+    expect(light.slam.get(BEAM)).toBe(full.slam.get(BEAM));
+    expect(light.host).toEqual(full.host);
+    // Minimal keeps only the core shapes: no air rings, feathers, sky light,
+    // pillar, rays or debris, and a few sparks.
+    expect(minimal.launch.has(BOOM)).toBe(false);
+    expect(minimal.gone.has(FEATHER)).toBe(false);
+    expect(minimal.slam.has(FLARE)).toBe(false);
+    expect(minimal.slam.get(SPARK) ?? 0).toBeGreaterThan(0);
+    expect(minimal.slam.get(SPARK) ?? 0).toBeLessThan(light.slam.get(SPARK) ?? 0);
+    expect(minimal.slam.has(BEAM)).toBe(false);
+    // The ground still cracks at the push-off and the slam, with a few stones,
+    // but no slabs, dust or cloud.
+    expect(minimal.host.baked).toBe(0);
+    expect(minimal.host.decals).toBe(2);
+    expect(minimal.host.fragments).toBe(1);
+    for (const phase of ['charge', 'launch', 'gone', 'slam'] as const) {
+      expect(total(light[phase])).toBeLessThan(total(full[phase]));
+      expect(total(minimal[phase])).toBeLessThan(total(light[phase]));
+    }
+    // The slam's fade tail is shorter on the lighter tiers.
+    expect(light.frames).toBeLessThan(full.frames);
+    expect(minimal.frames).toBeLessThan(light.frames);
+  });
+
+  it("plays a landing seen without its launch at the landing's own detail", async () => {
+    setPaladinVfxDetailForTest('minimal');
+    const f = fixture();
+    await f.prepare();
+    expect(f.effect.land(3, 1, 1, 8)).toBe(true);
+    f.effect.update(0.05);
+    const shapes = f.shapes();
+    expect(shapes.has(IMPACT)).toBe(true);
+    expect(shapes.has(SLASH)).toBe(true);
+    expect(shapes.has(FLARE)).toBe(false);
+    expect(shapes.has(BEAM)).toBe(false);
+    // Its fracture and a few stones, no slabs or dust.
+    expect(f.host.fragmentsAt).toHaveBeenCalledOnce();
+    expect(f.host.fragmentsAt.mock.calls[0]?.[5]).toBe(4);
+    expect(f.host.bakedAt).not.toHaveBeenCalled();
+    f.effect.dispose();
   });
 });
