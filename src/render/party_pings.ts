@@ -38,6 +38,7 @@ import {
   partyPingAnchorInto,
   partyPingBob,
   partyPingIconSize,
+  partyPingIconY,
   partyPingPop,
   partyPingRipple,
   syncPartyPingSlots,
@@ -298,7 +299,8 @@ export class PartyPingLayer {
       const pop = partyPingPop(age, reducedMotion);
       const dist = Math.hypot(a.x - cam.x, a.iconY - cam.y, a.z - cam.z);
       const size = partyPingIconSize(dist, fov) * pop;
-      piece.icon.position.set(a.x, a.iconY, a.z);
+      const iconY = partyPingIconY(a, slot, partyPingIconSize(dist, fov));
+      piece.icon.position.set(a.x, iconY, a.z);
       piece.icon.scale.set(size, size, 1);
       piece.iconMat.opacity = alpha;
       piece.ring.position.set(a.x, a.y + 0.06, a.z);
@@ -307,11 +309,11 @@ export class PartyPingLayer {
       piece.ringMat.uniforms.uPhase.value = partyPingRipple(age, reducedMotion);
       piece.ringMat.uniforms.uAlpha.value = alpha;
       if (!this.lowTier) {
-        piece.glow.position.set(a.x, a.iconY, a.z);
-        piece.glow.scale.set(size * 1.9, size * 1.9, 1);
+        piece.glow.position.set(a.x, iconY, a.z);
+        piece.glow.scale.set(size * 1.6, size * 1.6, 1);
         piece.glowMat.opacity = 0.55 * alpha;
         piece.stem.position.set(a.x, a.y, a.z);
-        piece.stem.scale.set(1, Math.max(0.01, a.iconY - a.y - size * 0.45), 1);
+        piece.stem.scale.set(1, Math.max(0.01, iconY - a.y - size * 0.45), 1);
         piece.stemMat.uniforms.uAlpha.value = alpha;
       }
     }

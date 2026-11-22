@@ -12,6 +12,7 @@ import {
   PARTY_PING_HEAD_LIFT,
   PARTY_PING_MAX_SIZE,
   PARTY_PING_MIN_SIZE,
+  PARTY_PING_PLATE_CLEAR,
   PARTY_PING_POP_S,
   PARTY_PING_SLOTS,
   type PartyPingMark,
@@ -19,6 +20,7 @@ import {
   partyPingAnchorInto,
   partyPingColorCss,
   partyPingIconSize,
+  partyPingIconY,
   partyPingPop,
   partyPingRipple,
   syncPartyPingSlots,
@@ -147,6 +149,16 @@ describe('party pings render core: anchor', () => {
     // Out of view: it stays where the unit stood when pinged.
     const b = partyPingAnchorInto(createPartyPingAnchor(), slot, null, 0);
     expect(b.x).toBe(5);
+  });
+
+  it('a unit ping icon rises clear of its nameplate by its own size; a ground one does not', () => {
+    const [slot] = createPartyPingSlots();
+    Object.assign(slot, { id: 1, target: 9 });
+    const a = partyPingAnchorInto(createPartyPingAnchor(), slot, { x: 0, y: 0, z: 0, top: 2 }, 0);
+    expect(partyPingIconY(a, slot, 4)).toBeCloseTo(a.iconY + 4 * PARTY_PING_PLATE_CLEAR, 9);
+    slot.target = null;
+    const g = partyPingAnchorInto(createPartyPingAnchor(), slot, null, 0);
+    expect(partyPingIconY(g, slot, 4)).toBe(g.iconY);
   });
 
   it('anchors far from the world origin exactly (the raid sits ~119k yd out)', () => {

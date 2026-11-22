@@ -91,7 +91,8 @@ describe('party ping layer', () => {
     l.update([mark(1, { kind: PING_ATTACK, target: 7 })], camera, 0, false);
     const icon = pieces(scene, 'party-ping-icon').find((c) => c.visible) as THREE.Sprite;
     expect(icon.position.x).toBe(40);
-    expect(icon.position.y).toBeCloseTo(1 + 2 + PARTY_PING_HEAD_LIFT, 0);
+    // Over the head, and lifted clear of the unit's nameplate.
+    expect(icon.position.y).toBeGreaterThan(1 + 2 + PARTY_PING_HEAD_LIFT);
     group.position.set(44, 1, 52);
     l.update([mark(1, { kind: PING_ATTACK, target: 7 })], camera, 0.5, false);
     expect(icon.position.x).toBe(44);

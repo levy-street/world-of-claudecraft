@@ -51,7 +51,11 @@ export const PARTY_PING_RING_RADIUS = 1.7;
 /** How high a ground ping's icon floats over its point, and how far over a
  *  unit's head a unit ping's icon floats (yards). */
 export const PARTY_PING_GROUND_LIFT = 2.4;
-export const PARTY_PING_HEAD_LIFT = 1.1;
+export const PARTY_PING_HEAD_LIFT = 0.7;
+/** A unit ping's icon also rises by this share of its own drawn size, so its
+ *  lower edge clears the unit's nameplate at any distance (the plate is a fixed
+ *  screen height, and the icon holds a fixed screen share). */
+export const PARTY_PING_PLATE_CLEAR = 1.05;
 /** The icon's screen share (of the view height) and its world-size clamp. */
 export const PARTY_PING_SCREEN_SHARE = 0.05;
 export const PARTY_PING_MIN_SIZE = 0.9;
@@ -218,6 +222,12 @@ export function partyPingAnchorInto(
     out.iconY = slot.y + PARTY_PING_GROUND_LIFT + bob;
   }
   return out;
+}
+
+/** The icon's height this frame: the anchor's, plus (for a unit ping, whose
+ *  unit wears a nameplate) a lift by its drawn `size` that clears the plate. */
+export function partyPingIconY(anchor: PartyPingAnchor, slot: PartyPingSlot, size: number): number {
+  return slot.target === null ? anchor.iconY : anchor.iconY + size * PARTY_PING_PLATE_CLEAR;
 }
 
 /** The icon's gentle float (yards), off on reduced motion. */
