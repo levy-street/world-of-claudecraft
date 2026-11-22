@@ -47,6 +47,36 @@ export interface RiftBossDeathZoneView {
   total: number;
 }
 
+/** The look a hazard pool is drawn with (src/render/hazard_pool/). `marsh` and
+ *  `ember` are the Drowned Litany's static shallow and deep Blackwater; `violet`
+ *  is a boss-dropped pool. A new boss pool reuses one or adds a style there. */
+export type HazardPoolStyle = 'marsh' | 'ember' | 'violet';
+
+/**
+ * One live boss-dropped ground pool near the local player: a static circle on
+ * the floor that a boss mechanic placed and the sim damages on its own clock.
+ * Read-only presentation: the sim decides every hit; this only says where the
+ * pool lies and how old it is, so the renderer can show it spill (the
+ * `armSec` window before its first damage tick), stand, and drain.
+ * `ageSec` is exact offline; online it is counted from when the client first
+ * saw the pool (the client has no server clock), so it can run a round trip
+ * late. A pool stays listed for exactly as long as the sim keeps it.
+ */
+export interface HazardPoolView {
+  /** Stable for the pool's whole life; a new pool never reuses a live id. */
+  id: string;
+  x: number;
+  z: number;
+  /** The damage radius in yards: the drawn tar always covers it. */
+  r: number;
+  style: HazardPoolStyle;
+  ageSec: number;
+  /** Seconds from placement to its first damage tick. */
+  armSec: number;
+  /** The pool's authored lifetime in seconds. */
+  lifeSec: number;
+}
+
 /** One authoritative Buried Hoard boss telegraph on the local player's floor. */
 export interface HoardBossCueView {
   instanceId: number;
@@ -147,6 +177,10 @@ export interface IWorldDungeons {
   // Live Buried Hoard boss telegraphs on the current floor. This stateful seam
   // keeps actionable warnings correct after reconnects and late interest entry.
   hoardBossCues(): HoardBossCueView[];
+  // Live boss-dropped ground pools near the local player (today Sister Nhalia's
+  // Blackwater Mark in the Drowned Litany). Empty when none is down. The
+  // renderer's hazard pool host draws each one (src/render/hazard_pool/).
+  activeHazardPools(): readonly HazardPoolView[];
   // Milliseconds remaining before the current rift's backing world event stops
   // admitting new parties (see closeNaturalRiftPortal in sim/rift/portals.ts: an
   // already in-progress run plays out past this deadline, only the overworld

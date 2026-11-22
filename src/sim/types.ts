@@ -13782,6 +13782,9 @@ export interface DrownedLitanyBlackwaterMark {
   z: number;
   remaining: number;
   tickTimer: number;
+  /** The tick it was placed on: a display identity for the drawn pool
+   *  (sim/delves/boss_pool_views.ts). No mechanic reads it. */
+  bornTick?: number;
 }
 
 /** A single Tolling Bell projectile entity in flight (entity id + expiry timer). */

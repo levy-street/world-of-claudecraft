@@ -221,7 +221,7 @@ export function dungeonTorchLightColor(variant: DungeonInteriorVariant): number 
 // still reads clearly against them. See marshMaterial() for how the tint is
 // applied to a clone of the shared pack material, never the source itself.
 const MARSH_WALL_TINT = 0x5a6a52;
-const MARSH_FLOOR_TINT = 0x3c3830;
+const MARSH_FLOOR_TINT = 0x5a5446;
 
 // The Drowned Court (arena_drowned) uses the same clone-and-tint trick to
 // read as a moonlit flooded ruin instead of a recolored Coliseum: cold
@@ -807,9 +807,7 @@ export class DungeonInteriors {
         }
         if (opts?.hazards?.length) {
           if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
-            placeMarshBlackwaterPools(group, opts.hazards, (x, z, color, y, scale) =>
-              this.addTorchGlow(group, x, z, color, y, scale),
-            );
+            placeMarshBlackwaterPools(group, opts.hazards);
           } else {
             this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'blackwater');
           }

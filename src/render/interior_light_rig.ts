@@ -26,6 +26,7 @@ export type FogSceneState =
   | 'ignivar'
   | 'varkhul'
   | 'delve'
+  | 'litany'
   | 'yumiMaze'
   | 'battleground'
   | 'underwater'
@@ -201,6 +202,19 @@ const DAWNHOLD_SUN_COLOR = 0xffe4b0;
 const DAWNHOLD_HEMI_SKY_COLOR = 0xf2fadc;
 const DAWNHOLD_HEMI_GROUND_COLOR = 0x53603a;
 
+// The Drowned Litany: a flooded marsh crypt. Still dark, but lifted off the
+// generic delve rig (which crushed its stone to black on the low tier, where
+// Lambert stone has no rim and the torches run a quarter strength) under a
+// cool marsh-teal grade, so the floor, the dry stones and the tar pools read.
+// Scoped to the Litany's delve band only; every other delve keeps DUNGEON_*.
+const LITANY_SUN_INTENSITY = 0.9;
+const LITANY_HEMI_INTENSITY = 1.0;
+const LITANY_ENV_INTENSITY = 0.12;
+const LITANY_RIM_BOOST = 2.3;
+const LITANY_SUN_COLOR = 0xd6e4d4;
+const LITANY_HEMI_SKY_COLOR = 0x7e9a8c;
+const LITANY_HEMI_GROUND_COLOR = 0x22302a;
+
 export interface InteriorLightTargets {
   sun: THREE.DirectionalLight;
   hemi: THREE.HemisphereLight;
@@ -255,6 +269,7 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
     state === 'ignivar' ||
     state === 'varkhul' ||
     state === 'delve' ||
+    state === 'litany' ||
     state === 'yumiMaze' ||
     state === 'rift' ||
     state === 'lastkeep' ||
@@ -286,6 +301,7 @@ export function applyInteriorLightRig(
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
   const nythraxisSanctum = state === 'nythraxis';
+  const litanyMarsh = state === 'litany';
   const ignivarForge = state === 'ignivarApproach' || state === 'ignivar' || state === 'varkhul';
   const underground =
     state === 'dungeon' ||
@@ -309,11 +325,13 @@ export function applyInteriorLightRig(
                 ? LASTKEEP_SUN_INTENSITY
                 : dawnholdDay
                   ? DAWNHOLD_SUN_INTENSITY
-                  : nythraxisSanctum
-                    ? NYTHRAXIS_SUN_INTENSITY
-                    : underground
-                      ? DUNGEON_SUN_INTENSITY
-                      : outdoor.sunIntensity;
+                  : litanyMarsh
+                    ? LITANY_SUN_INTENSITY
+                    : nythraxisSanctum
+                      ? NYTHRAXIS_SUN_INTENSITY
+                      : underground
+                        ? DUNGEON_SUN_INTENSITY
+                        : outdoor.sunIntensity;
   targets.hemi.intensity = mazeNight
     ? YUMI_MAZE_HEMI_INTENSITY
     : cryptMoon
@@ -330,11 +348,13 @@ export function applyInteriorLightRig(
                 ? LASTKEEP_HEMI_INTENSITY
                 : dawnholdDay
                   ? DAWNHOLD_HEMI_INTENSITY
-                  : nythraxisSanctum
-                    ? NYTHRAXIS_HEMI_INTENSITY
-                    : underground
-                      ? DUNGEON_HEMI_INTENSITY
-                      : outdoor.hemiIntensity;
+                  : litanyMarsh
+                    ? LITANY_HEMI_INTENSITY
+                    : nythraxisSanctum
+                      ? NYTHRAXIS_HEMI_INTENSITY
+                      : underground
+                        ? DUNGEON_HEMI_INTENSITY
+                        : outdoor.hemiIntensity;
   targets.scene.environmentIntensity = mazeNight
     ? YUMI_MAZE_ENV_INTENSITY
     : cryptMoon
@@ -351,11 +371,13 @@ export function applyInteriorLightRig(
                 ? LASTKEEP_ENV_INTENSITY
                 : dawnholdDay
                   ? DAWNHOLD_ENV_INTENSITY
-                  : nythraxisSanctum
-                    ? NYTHRAXIS_ENV_INTENSITY
-                    : underground
-                      ? DUNGEON_ENV_INTENSITY
-                      : outdoor.envIntensity;
+                  : litanyMarsh
+                    ? LITANY_ENV_INTENSITY
+                    : nythraxisSanctum
+                      ? NYTHRAXIS_ENV_INTENSITY
+                      : underground
+                        ? DUNGEON_ENV_INTENSITY
+                        : outdoor.envIntensity;
   targets.rim.value = mazeNight
     ? YUMI_MAZE_RIM_BOOST
     : cryptMoon
@@ -372,11 +394,13 @@ export function applyInteriorLightRig(
                 ? LASTKEEP_RIM_BOOST
                 : dawnholdDay
                   ? DAWNHOLD_RIM_BOOST
-                  : nythraxisSanctum
-                    ? NYTHRAXIS_RIM_BOOST
-                    : underground
-                      ? DUNGEON_RIM_BOOST
-                      : 1;
+                  : litanyMarsh
+                    ? LITANY_RIM_BOOST
+                    : nythraxisSanctum
+                      ? NYTHRAXIS_RIM_BOOST
+                      : underground
+                        ? DUNGEON_RIM_BOOST
+                        : 1;
   // The rim tint defaults cool everywhere; the forge applier below re-grades
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
@@ -419,6 +443,10 @@ export function applyInteriorLightRig(
     targets.sun.color.setHex(DAWNHOLD_SUN_COLOR);
     targets.hemi.color.setHex(DAWNHOLD_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(DAWNHOLD_HEMI_GROUND_COLOR);
+  } else if (litanyMarsh) {
+    targets.sun.color.setHex(LITANY_SUN_COLOR);
+    targets.hemi.color.setHex(LITANY_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(LITANY_HEMI_GROUND_COLOR);
   } else if (nythraxisSanctum) {
     targets.sun.color.setHex(NYTHRAXIS_SUN_COLOR);
     targets.hemi.color.setHex(NYTHRAXIS_HEMI_SKY_COLOR);

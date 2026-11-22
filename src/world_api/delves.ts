@@ -31,6 +31,20 @@ export interface DelveRunInfo {
   bountiful: boolean;
   /** The Drowned Reliquary Rite finale state, or null while no rite is up. */
   rite: DelveRiteInfo | null;
+  /** Live boss-dropped pools in this run (Sister Nhalia's Blackwater Marks),
+   * for display only. Static per pool so the self wire resends only when one
+   * appears or goes; absent from a server that predates the field. */
+  bossPools?: DelveBossPoolInfo[];
+}
+
+/** One boss-dropped pool on the delve run wire: where it lies, never its clock
+ * (a per-tick value would resend the whole run record every tick). */
+export interface DelveBossPoolInfo {
+  /** The sim tick it was placed on: unique for the pool's life. */
+  id: number;
+  x: number;
+  z: number;
+  r: number;
 }
 
 // Render-safe projection of an active lockpicking attempt. Only ever holds cells

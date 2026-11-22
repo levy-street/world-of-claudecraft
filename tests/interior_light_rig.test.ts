@@ -22,6 +22,7 @@ describe('isOpenAirFogState', () => {
       'temple',
       'nythraxis',
       'delve',
+      'litany',
       'yumiMaze',
       'underwater',
       'rift',
@@ -47,6 +48,7 @@ describe('isOpenAirFogState', () => {
       'ignivar',
       'varkhul',
       'delve',
+      'litany',
       'yumiMaze',
       'rift',
       'lastkeep',
@@ -61,6 +63,36 @@ describe('isOpenAirFogState', () => {
       expect(out.z).toBeLessThan(-0.3);
     }
     expect(interiorKeyLightDirection('outdoor', out)).toBe(false);
+  });
+
+  it('lifts the Drowned Litany above the shared delve rig under its own cool marsh grade, at any world hour', () => {
+    const make = () => ({
+      sun: new THREE.DirectionalLight(0x111122, 0.1),
+      hemi: new THREE.HemisphereLight(0x111122, 0x050508, 0.1),
+      scene: new THREE.Scene(),
+      rim: { value: 1 },
+      rimColor: { value: new THREE.Color() },
+    });
+    const night = { sunIntensity: 0.15, hemiIntensity: 0.12, envIntensity: 0.02 };
+    const noon = { sunIntensity: 2.5, hemiIntensity: 0.9, envIntensity: 0.6 };
+    const delve = make();
+    applyInteriorLightRig('delve', delve, night);
+    const litany = make();
+    applyInteriorLightRig('litany', litany, night);
+    expect(litany.sun.intensity).toBeGreaterThan(delve.sun.intensity);
+    expect(litany.hemi.intensity).toBeGreaterThan(delve.hemi.intensity);
+    // Still a dark interior: well under the open-air daylight legs.
+    expect(litany.sun.intensity).toBeLessThan(noon.sunIntensity);
+    expect(litany.hemi.intensity).toBeLessThan(1.2);
+    // Cool marsh grade: the hemisphere sky is green-teal, not the delve's violet-grey.
+    expect(litany.hemi.color.g).toBeGreaterThan(litany.hemi.color.r);
+    expect(litany.hemi.color.getHex()).not.toBe(delve.hemi.color.getHex());
+    // Its own fixed rig, never the outdoor legs.
+    const litanyNoon = make();
+    applyInteriorLightRig('litany', litanyNoon, noon);
+    expect(litanyNoon.sun.intensity).toBe(litany.sun.intensity);
+    expect(litanyNoon.hemi.intensity).toBe(litany.hemi.intensity);
+    expect(litanyNoon.scene.environmentIntensity).toBe(litany.scene.environmentIntensity);
   });
 
   it('settles Nythraxis, underground dungeons, Yumi maze, and rifts with consistent raid/dungeon lighting regardless of outdoor night', () => {

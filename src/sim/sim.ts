@@ -257,6 +257,7 @@ import * as deedsMod from './deeds';
 import { createDeedRuntime, type DeedRuntime, freshDeedStats } from './deeds';
 import { restoreBookOfDeeds, runBookOfDeedsJoinRetro, savedBookOfDeeds } from './deeds_restore';
 import * as companionMod from './delves/companion';
+import { blackwaterMarkPoolsForPlayer } from './delves/drowned_litany_boss';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
 import { CASCADE_SCENARIO } from './dev/cascade_playtest';
@@ -810,6 +811,7 @@ import {
   hoardBossCueViewsForPlayer,
   leaveRift as leaveRiftImpl,
   liftRiftEntities as liftRiftEntitiesImpl,
+  riftBossDeathZonesForPlayer,
   riftInstanceAtPos,
   riftOpenTreasure as riftOpenTreasureImpl,
   tickRiftBossDeathZones as tickRiftBossDeathZonesImpl,
@@ -11003,11 +11005,10 @@ export class Sim {
   private riftFloorViewTick = -1;
   private riftFloorView: import('../world_api/dungeons').RiftFloorView | null = null;
   riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
-    const p = this.entities.get(this.primaryId);
-    if (!p) return [];
-    const inst = riftInstanceAtPos(this.ctx, p.pos);
-    if (!inst || inst.partyKey === null) return [];
-    return inst.bossDeathZones;
+    return riftBossDeathZonesForPlayer(this.ctx, this.primaryId);
+  }
+  activeHazardPools(): readonly import('../world_api/dungeons').HazardPoolView[] {
+    return blackwaterMarkPoolsForPlayer(this.ctx, this.primaryId);
   }
   hoardBossCues(): import('../world_api/dungeons').HoardBossCueView[] {
     return hoardBossCueViewsForPlayer(this.ctx, this.primaryId);

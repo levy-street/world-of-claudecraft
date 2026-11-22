@@ -231,6 +231,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // rings and particle pools; all on the encounter band.
   { file: 'src/render/trash_engine_fx/engine_particles.ts', layer: 'encounter', strict: true },
   { file: 'src/render/trash_engine_fx/engine_hazards.ts', layer: 'encounter', strict: true },
+  // Hazard pool tar, static dressing and boss-dropped (hazard_pool/CLAUDE.md).
+  { file: 'src/render/hazard_pool/static_pools.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/hazard_pool/dynamic_pools.ts', layer: 'encounter', strict: true },
   { file: 'src/render/trash_engine_fx/engine_walls.ts', layer: 'encounter', strict: true },
   { file: 'src/render/trash_engine_fx/engine_walkers.ts', layer: 'encounter', strict: true },
   { file: 'src/render/trash_engine_fx/engine_nova.ts', layer: 'encounter', strict: true },
@@ -450,7 +453,6 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ignivar_mist_gate.ts',
   'src/render/ignivar_model_vfx.ts',
   // static dungeon, zone and town dressing, water and sky
-  'src/render/delve_marsh_dressing.ts',
   'src/render/dungeon.ts',
   'src/render/fenbridge_town.ts',
   'src/render/frost_sky.ts',

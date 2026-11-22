@@ -72,10 +72,12 @@ import {
   type RiteIntensity,
   type Vec3,
 } from '../types';
+import { blackwaterMarkPoolInfos } from './boss_pool_views';
 import { bringPetToOwner, stowPetUnlessKept } from './delve_pet';
 import {
   clearDrownedLitanyBossState,
   initDrownedLitanyBossState,
+  liveBlackwaterMarks,
   tickDrownedLitanyBoss,
 } from './drowned_litany_boss';
 import {
@@ -1909,6 +1911,9 @@ export function delveRunWire(ctx: SimContext, pid: number): object | null {
     completed: run.completed,
     exitPortalOpen: run.exitPortalOpen,
     bountiful: run.bountiful,
+    // Display-only pool rows: static per pool, so `drun` resends only when a
+    // pool appears or goes (the self wire is JSON-diffed per tick).
+    bossPools: blackwaterMarkPoolInfos(liveBlackwaterMarks(ctx, run)),
   };
 }
 
