@@ -436,6 +436,7 @@ export type {
   PartyInfo,
   PartyMemberAura,
   PartyMemberInfo,
+  PartyPing,
   SharedMapMark,
 } from './world_api/party';
 export type {
@@ -1020,6 +1021,8 @@ export const COMMAND_NAMES = [
   'map_mark_clear',
   // The same marks placed by clicking the ground in the world (IWorldParty.placeSharedWorldMark).
   'map_mark_place',
+  // A party ping from the ping wheel (IWorldParty.sendPing; src/sim/social/party_pings.ts).
+  'ping',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1228,6 +1231,7 @@ export const COMMAND_FACETS = {
   map_mark_set: 'IWorldParty',
   map_mark_clear: 'IWorldParty',
   map_mark_place: 'IWorldParty',
+  ping: 'IWorldParty',
   readyrespond: 'IWorldParty',
   // IWorldTrade: peer-to-peer trade-window commands (tradeInfo is a snapshot read,
   // no send).

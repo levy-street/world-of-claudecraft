@@ -5904,6 +5904,7 @@ const ALL_DELTA_KEYS = [
   'ncd',
   'offhandWeapon',
   'party',
+  'pings',
   'prk',
   'prof',
   'ptime',
@@ -6059,6 +6060,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   mres: 'maxResource',
   mst: 'activeMobileStationCrafts',
   party: 'partyInfo',
+  pings: 'partyPingList',
   prk: 'prestigeRank',
   prof: 'professionsState',
   ptime: 'playtimeSeconds',
@@ -6726,8 +6728,11 @@ describe('full self-state snapshot delta fixture', () => {
       // mmarks (the raid map's shared marks) is position-exclusive the same way:
       // marks live on the instance claim the player stands in, so a delve-bound
       // fixture's first value is the explicit null. Its non-null arrival is
-      // pinned in tests/shared_map_marks_wire.test.ts.
-      if (key === 'cvault' || key === 'dgrun' || key === 'udiff' || key === 'mmarks') {
+      // pinned in tests/shared_map_marks_wire.test.ts. pings (the group's party
+      // pings) is null until someone pings; its arrival is pinned in
+      // tests/party_pings_wire.test.ts.
+      const gatedNull = ['cvault', 'dgrun', 'udiff', 'mmarks', 'pings'];
+      if (gatedNull.includes(key)) {
         expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();
         continue;
       }
@@ -7651,8 +7656,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Courier vault and other-character stores add one owner delta key.
     // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
     // +1: the raid map's shared marks mmarks (server/self_social_wire.ts), for 137.
-    expect(ALL_DELTA_KEYS).toHaveLength(137);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(137);
+    // +1: the group's party pings (server/self_social_wire.ts), for 138.
+    expect(ALL_DELTA_KEYS).toHaveLength(138);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(138);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7834,7 +7840,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Courier vault and other-character stores add one owner delta key.
     // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
     // The raid map's shared marks mmarks (self_social_wire.ts) make 137.
-    expect(scraped.size).toBe(137);
+    // The party pings (self_social_wire.ts) make 138.
+    expect(scraped.size).toBe(138);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

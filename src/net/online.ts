@@ -165,6 +165,7 @@ import {
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
+  type PartyPing,
   PET_SPECIAL_WIRE_VERSION,
   type PlayerProfessionsView,
   type RaidLockout,
@@ -262,6 +263,7 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { decodePartyPings } from './party_pings_wire';
 import { applyPeerMajorCooldownWire } from './peer_major_cooldown_wire';
 import { perfectingCommand } from './perfecting_command';
 import {
@@ -1548,6 +1550,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
   // the raid map's shared marks, from the self-wire `mmarks` (null = none in view)
   sharedMapMarkList: readonly SharedMapMark[] = [];
+  partyPingList: readonly PartyPing[] = []; // the group's pings, from the self-wire `pings`
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
   // group-visible choices on the open rolls (the vote strip), mirrored from the self-wire
   private lootRollGroup: LootRollGroupStatus[] = [];
@@ -3200,6 +3203,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
       if (s.mmarks !== undefined) this.sharedMapMarkList = decodeSharedMapMarks(s.mmarks);
+      if (s.pings !== undefined) this.partyPingList = decodePartyPings(s.pings);
       // The own presentation has released the spectate hold, so preference
       // changes made while watching can now pass cmd()'s normal guard.
       if (restoreSessionPreferences) this.resendSessionPreferences();
@@ -4227,6 +4231,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   clearSharedMapMarks(symbol: number | null): void {
     this.cmd({ cmd: 'map_mark_clear', symbol });
+  }
+  partyPings(): readonly PartyPing[] {
+    return this.partyPingList;
+  }
+  sendPing(kind: number, target: number | null, x: number, y: number, z: number): void {
+    this.cmd({ cmd: 'ping', kind, target, x, y, z });
   }
   // --- IWorldTrade: trade-window command sends (tradeInfo is a snapshot read). ---
   tradeRequest(targetPid: number): void {

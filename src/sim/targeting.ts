@@ -31,6 +31,7 @@ import { gmHiddenFrom } from './gm_presence';
 import { isBuddyMob } from './pet/buddy_ai';
 import type { Party, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { PartyPings } from './social/party_pings';
 import {
   canSetRaidTargets,
   isRaidTargetSymbol,
@@ -50,9 +51,13 @@ export class Targeting {
   // sibling store with its own rules (social/shared_map_marks.ts), held here so
   // the one party-disband hook clears both marker sets.
   readonly mapMarks: SharedMapMarks;
+  // The group's pings (social/party_pings.ts): held here for the same reason,
+  // so the one disband hook clears them with the marks.
+  readonly pings: PartyPings;
 
   constructor(private readonly ctx: SimContext) {
     this.mapMarks = new SharedMapMarks(ctx);
+    this.pings = new PartyPings(ctx);
   }
 
   // ---------------------------------------------------------------------------
@@ -344,10 +349,11 @@ export class Targeting {
     }
   }
 
-  // Drop a disbanded party's whole raid-marker set, target and map marks alike
+  // Drop a disbanded party's whole raid-marker set, target and map marks alike, and its pings
   // (the A1 removeFromParty disband path calls this through ctx.dropPartyMarkers).
   dropPartyMarkers(partyId: number): void {
     this.partyMarkers.delete(partyId);
     this.mapMarks.dropParty(partyId);
+    this.pings.dropParty(partyId);
   }
 }

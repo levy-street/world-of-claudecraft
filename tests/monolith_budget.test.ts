@@ -1324,7 +1324,10 @@ const MONOLITHS: MonolithRow[] = [
     // riding progression lives in riding_training.ts. wc -l on the merged tree.
     // 11485 after the courier full-bank sync (PR 4598). wc -l.
     // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 11410,
+    // LOWERED 11410 -> 11398 by the party pings: the dead partyIncomingHeals (the party
+    // frames read party_frame_info.ts partyFrameIncomingHeals) went, paying for the
+    // three ping delegates over social/party_pings.ts. wc -l, exact count.
+    ceiling: 11398,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

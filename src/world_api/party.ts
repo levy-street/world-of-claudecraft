@@ -1,3 +1,4 @@
+import type { PartyPing } from '../sim/social/party_pings';
 import type { SharedMapMark } from '../sim/social/shared_map_marks';
 import type {
   AuraKind,
@@ -7,7 +8,7 @@ import type {
   ResourceType,
 } from '../sim/types';
 
-export type { SharedMapMark };
+export type { PartyPing, SharedMapMark };
 
 /** A compact aura summary for a party row's mini icon strip. Relevant effects are
  *  selected before the PARTY_MEMBER_AURA_CAP limit is applied. */
@@ -99,4 +100,10 @@ export interface IWorldParty {
   placeSharedWorldMark(page: number, x: number, y: number, z: number, symbol: number): void;
   // symbol null clears every mark
   clearSharedMapMarks(symbol: number | null): void;
+  // Party pings (the ping wheel): the group's live pings, solo only your own
+  // (src/sim/social/party_pings.ts owns every rule: range, rate limit, expiry).
+  partyPings(): readonly PartyPing[];
+  // Ping `kind` (PING_LOOK..PING_ASSIST) at unit `target`, or at the world
+  // point (x, y, z) when target is null (y only picks the floor storey).
+  sendPing(kind: number, target: number | null, x: number, y: number, z: number): void;
 }

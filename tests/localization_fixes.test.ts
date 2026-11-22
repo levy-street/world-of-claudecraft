@@ -1816,6 +1816,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'map_objectives_hooks.ts',
       'map_objectives_run.ts',
       'party.ts',
+      'party_pings.ts',
       'pull_timer.ts',
       'queue_rewards.ts',
       'raid_target_marks.ts',

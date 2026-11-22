@@ -306,6 +306,8 @@ export const IWORLD_MEMBERS = [
   { name: 'placeSharedMapMark', kind: 'method' },
   { name: 'placeSharedWorldMark', kind: 'method' },
   { name: 'clearSharedMapMarks', kind: 'method' },
+  { name: 'partyPings', kind: 'method' }, // read-returning
+  { name: 'sendPing', kind: 'method' },
   { name: 'readyCheckRespond', kind: 'method' },
   { name: 'tradeRequest', kind: 'method' },
   { name: 'tradeAccept', kind: 'method' },
@@ -1036,9 +1038,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
     // more: 471/140/331.
     // The raid's world markers add placeSharedWorldMark (method): 475/140/335.
-    expect(IWORLD_MEMBERS.length).toBe(475);
+    // The party pings add partyPings and sendPing (methods): 477/140/337.
+    expect(IWORLD_MEMBERS.length).toBe(477);
     expect(DATA_MEMBERS.length).toBe(140);
-    expect(METHOD_MEMBERS.length).toBe(335);
+    expect(METHOD_MEMBERS.length).toBe(337);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1342,6 +1345,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInvite',
       'partyKick',
       'partyLeave',
+      'partyPings',
       'partyPromote',
       'partyTradeMsRemaining',
       'pendingBuddies',
@@ -1422,6 +1426,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'sendPing',
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
@@ -1875,6 +1880,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInvite',
       'partyKick',
       'partyLeave',
+      'partyPings',
       'partyPromote',
       'partyTradeMsRemaining',
       'pendingBuddies',
@@ -1935,6 +1941,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'sendPing',
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
@@ -2355,6 +2362,8 @@ const FACET_PARTY = [
   'placeSharedMapMark',
   'placeSharedWorldMark',
   'clearSharedMapMarks',
+  'partyPings',
+  'sendPing',
   'readyCheckRespond',
 ] as const satisfies readonly (keyof IWorldParty)[];
 type _ExhaustParty = AssertNever<Exclude<keyof IWorldParty, (typeof FACET_PARTY)[number]>>;
@@ -2905,8 +2914,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
     // Plus the world markers' placeSharedWorldMark.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(475);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(475);
+    // Plus the party pings' partyPings and sendPing.
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(477);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(477);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

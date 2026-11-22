@@ -6,7 +6,8 @@
 // party row stays in game.ts, where it rides the per-broadcast projection
 // cache and the session map. Byte-identical to the methods they replace.
 // `mmarks` (the raid map's shared marks) is serialized once per change by the
-// Sim's store and shared by the whole group, so it rides maybeSerialized.
+// Sim's store and shared by the whole group, so it rides maybeSerialized; the
+// group's party pings (`pings`, src/sim/social/party_pings.ts) the same way.
 
 import type { Sim } from '../src/sim/sim';
 
@@ -55,6 +56,7 @@ export function emitSelfSocialRows(
 ): void {
   maybe('marks', markersWire(sim, pid));
   maybeSerialized('mmarks', sim.sharedMapMarksWireFor(pid));
+  maybeSerialized('pings', sim.partyPingsWireFor(pid));
   maybe('trade', tradeWire(sim, pid));
   maybe('duel', duelWire(sim, pid));
 }

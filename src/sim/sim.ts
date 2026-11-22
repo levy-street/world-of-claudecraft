@@ -9171,6 +9171,16 @@ export class Sim {
   sharedMapMarksWireFor(pid: number): string {
     return this.targeting.mapMarks.wireFor(pid);
   }
+  // The group's pings (social/party_pings.ts owns every rule; the wire reads targeting.pings).
+  partyPings(): readonly import('./social/party_pings').PartyPing[] {
+    return this.targeting.pings.viewFor(this.primaryId);
+  }
+  sendPing(...a: Parameters<Targeting['pings']['send']>): void {
+    this.targeting.pings.send(...a);
+  }
+  partyPingsWireFor(pid: number): string {
+    return this.targeting.pings.wireFor(pid);
+  }
 
   // -------------------------------------------------------------------------
   // Duels
@@ -10383,28 +10393,6 @@ export class Sim {
   }
 
   // UI-facing info objects (the same shapes the server sends over the wire)
-  partyIncomingHeals(memberIds: readonly number[]): Map<number, number> {
-    const members = new Set(memberIds);
-    const incoming = new Map<number, number>();
-    for (const casterId of memberIds) {
-      const caster = this.entities.get(casterId);
-      if (!caster?.castingAbility || caster.castTargetId === null) continue;
-      if (!members.has(caster.castTargetId)) continue;
-      const ability = this.players
-        .get(casterId)
-        ?.known.find((known) => known.def.id === caster.castingAbility);
-      if (!ability) continue;
-      let amount = 0;
-      for (const effect of ability.effects) {
-        if (effect.type === 'heal') amount += Math.round((effect.min + effect.max) / 2);
-        else if (effect.type === 'hot') amount += effect.total;
-      }
-      if (amount > 0)
-        incoming.set(caster.castTargetId, (incoming.get(caster.castTargetId) ?? 0) + amount);
-    }
-    return incoming;
-  }
-
   get partyInfo(): import('../world_api').PartyInfo | null {
     return collectPartyInfo(this.ctx);
   }
