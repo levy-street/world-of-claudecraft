@@ -33,7 +33,7 @@ export const SMITH_HEART_BOSS_TRACKS = {
   quench: '/audio/music/boss_heart_quench.mp3?v=03968298d1b1',
   heat: '/audio/music/boss_heart_heat.mp3?v=f955ad643011',
   final: '/audio/music/boss_heart_masterless_strength.mp3?v=a0abdc9f55e3',
-  finalLast: '/audio/music/boss_heart_masterless_last.mp3?v=8fc9a59e3f09',
+  finalLast: '/audio/music/boss_heart_masterless_last.mp3?v=d7eb2087db15',
   finalHidden: '/audio/music/boss_heart_masterless_hidden.mp3?v=f96e47ff0f45',
 } as const;
 
@@ -76,6 +76,25 @@ export function smithHeartStageTrack(entity: StagedBossEntity): string | null {
  *  through the aggro-gap grace. */
 export function isSmithHeartBoss(templateId: string): boolean {
   return Object.hasOwn(SMITH_HEART_BOSS_TRACK_URLS, templateId);
+}
+
+/** How a cue enters over a fight track that is already sounding, when it
+ *  does not crossfade: the old track fades out over outMs, the fight holds
+ *  silent for gapMs, then the cue strikes from its first bar. */
+export interface SilentEntry {
+  outMs: number;
+  gapMs: number;
+}
+
+/** The last fifteen percent's opera strikes after a held silence as the
+ *  boss leaps to the centre (Jose's call of 2026-11-22: no blended join). */
+const SILENT_ENTRIES: Readonly<Record<string, SilentEntry>> = {
+  [SMITH_HEART_BOSS_TRACKS.finalLast]: { outMs: 600, gapMs: 1400 },
+};
+
+/** The silent entry a cue makes, or null when it crossfades as usual. */
+export function silentEntryFor(url: string): SilentEntry | null {
+  return Object.hasOwn(SILENT_ENTRIES, url) ? SILENT_ENTRIES[url] : null;
 }
 
 /** Whether a cue is one of the final boss's stage cues. */

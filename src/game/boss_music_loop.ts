@@ -8,9 +8,11 @@
 // BOSS_TRACK_URLS; every other boss fight keeps the shared default loop.
 // Switching from one playing track to another (a staged boss's next cue,
 // smith_heart_boss_music.ts) crossfades the two streamed elements instead of
-// cutting.
+// cutting, unless the next cue makes a silent entry (silentEntryFor): then
+// the old one fades out, the fight holds silent, and the cue strikes from
+// its first bar.
 
-import { SMITH_HEART_BOSS_TRACK_URLS } from './smith_heart_boss_music';
+import { SMITH_HEART_BOSS_TRACK_URLS, silentEntryFor } from './smith_heart_boss_music';
 
 /** The shared boss-fight loop every boss without its own track plays. */
 export const DEFAULT_BOSS_TRACK_URL = '/audio/dungeon-boss-fight.mp3';
@@ -48,6 +50,8 @@ export const BOSS_TRACK_CROSSFADE_MS = 2500;
 interface FadingElement {
   el: HTMLAudioElement;
   startedAt: number;
+  /** How long this one takes to fade out. */
+  ms: number;
 }
 
 const wallClock = (): number => (typeof performance !== 'undefined' ? performance.now() : 0);
@@ -63,6 +67,8 @@ export class BossLoopTrack {
   private fading: FadingElement[] = [];
   /** When the current element's fade-in began, or null for full level. */
   private fadeInFrom: number | null = null;
+  /** Until when a silent entry holds the current element mute, or null. */
+  private holdUntil: number | null = null;
   private buffer: AudioBuffer | null = null;
   private source: AudioBufferSourceNode | null = null;
   private loading = false;
@@ -85,9 +91,17 @@ export class BossLoopTrack {
     if (streamsToPause) for (const stream of streamsToPause) stream.el?.pause();
     if (url === this.url) return;
     const playing = this.el !== null && !this.el.paused;
-    if (playing && this.el) {
+    const entry = silentEntryFor(url);
+    this.holdUntil = null;
+    if (playing && this.el && entry) {
+      // A silent entry: the old track fades out, then a held silence, then
+      // the cue strikes at full level from its top.
+      this.fading.push({ el: this.el, startedAt: this.now(), ms: entry.outMs });
+      this.fadeInFrom = null;
+      this.holdUntil = this.now() + entry.outMs + entry.gapMs;
+    } else if (playing && this.el) {
       // A track already sounding hands over under a crossfade.
-      this.fading.push({ el: this.el, startedAt: this.now() });
+      this.fading.push({ el: this.el, startedAt: this.now(), ms: BOSS_TRACK_CROSSFADE_MS });
       this.fadeInFrom = this.now();
     } else {
       this.el?.pause();
@@ -122,11 +136,20 @@ export class BossLoopTrack {
       rampIn = Math.min(1, (now - this.fadeInFrom) / BOSS_TRACK_CROSSFADE_MS);
       if (rampIn >= 1) this.fadeInFrom = null;
     }
-    if (this.el) this.el.volume = clampVolume(target * Math.sin((rampIn * Math.PI) / 2));
+    if (this.holdUntil !== null && this.el) {
+      if (now < this.holdUntil) {
+        this.el.volume = 0;
+      } else {
+        // The silence is over: the cue strikes from its first bar.
+        this.holdUntil = null;
+        seekToStart(this.el);
+        this.el.volume = clampVolume(target);
+      }
+    } else if (this.el) this.el.volume = clampVolume(target * Math.sin((rampIn * Math.PI) / 2));
     if (this.fading.length === 0) return;
     const still: FadingElement[] = [];
     for (const f of this.fading) {
-      const t = Math.min(1, (now - f.startedAt) / BOSS_TRACK_CROSSFADE_MS);
+      const t = Math.min(1, (now - f.startedAt) / f.ms);
       if (t >= 1) {
         releaseElement(f.el);
         continue;
@@ -151,17 +174,12 @@ export class BossLoopTrack {
     for (const f of this.fading) releaseElement(f.el);
     this.fading = [];
     this.fadeInFrom = null;
+    this.holdUntil = null;
   }
 
   /** Back to the top, for a fresh dungeon run. */
   rewind(): void {
-    if (this.el) {
-      try {
-        this.el.currentTime = 0;
-      } catch {
-        /* browser may reject seeking before metadata */
-      }
-    }
+    if (this.el) seekToStart(this.el);
     this.dropFading();
     this.stopSource();
   }
@@ -205,6 +223,14 @@ export class BossLoopTrack {
     }
     this.source.disconnect();
     this.source = null;
+  }
+}
+
+function seekToStart(el: HTMLAudioElement): void {
+  try {
+    el.currentTime = 0;
+  } catch {
+    /* browser may reject seeking before metadata */
   }
 }
 

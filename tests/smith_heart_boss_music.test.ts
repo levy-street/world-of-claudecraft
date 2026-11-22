@@ -24,6 +24,7 @@ import {
 } from '../src/game/instance_music';
 import {
   SMITH_HEART_BOSS_TRACK_URLS,
+  silentEntryFor,
   smithHeartStageTrack,
   SMITH_HEART_BOSS_TRACKS as T,
 } from '../src/game/smith_heart_boss_music';
@@ -287,6 +288,7 @@ class FakeAudio {
   loop = false;
   preload = '';
   src: string | null;
+  currentTime = 0;
   constructor(src: string) {
     this.src = src;
     FakeAudio.made.push(this);
@@ -314,16 +316,16 @@ describe('a stage change crossfades the two loops', () => {
     vi.stubGlobal('Audio', FakeAudio);
     let now = 0;
     const loop = new BossLoopTrack(() => now);
-    loop.retarget(T.final);
+    loop.retarget(T.council);
     const first = loop.element() as unknown as FakeAudio;
     void first.play();
     loop.setVolume(0.6);
     expect(first.volume).toBeCloseTo(0.6);
 
-    loop.retarget(T.finalLast);
+    loop.retarget(T.breath);
     const next = loop.element() as unknown as FakeAudio;
     expect(next).not.toBe(first);
-    expect(next.src).toBe(T.finalLast);
+    expect(next.src).toBe(T.breath);
     expect(loop.fadingCount).toBe(1);
     loop.setVolume(0.6);
     expect(next.volume).toBeCloseTo(0);
@@ -364,5 +366,45 @@ describe('a stage change crossfades the two loops', () => {
     loop.pause();
     expect(loop.fadingCount).toBe(0);
     expect(breath.paused).toBe(true);
+  });
+
+  it('the last fifteen opera enters on a held silence, then strikes from its top', () => {
+    vi.stubGlobal('Audio', FakeAudio);
+    const entry = silentEntryFor(T.finalLast);
+    if (!entry) throw new Error('finalLast makes no silent entry');
+    expect(silentEntryFor(T.final)).toBeNull();
+    let now = 0;
+    const loop = new BossLoopTrack(() => now);
+    loop.retarget(T.final);
+    const quarters = loop.element() as unknown as FakeAudio;
+    void quarters.play();
+    loop.setVolume(0.6);
+
+    loop.retarget(T.finalLast);
+    const opera = loop.element() as unknown as FakeAudio;
+    void opera.play();
+    loop.setVolume(0.6);
+    expect(opera.volume).toBe(0);
+    expect(quarters.volume).toBeCloseTo(0.6);
+
+    // The quarters track is gone after its short fade; the opera still holds.
+    now = entry.outMs;
+    loop.setVolume(0.6);
+    expect(quarters.paused).toBe(true);
+    expect(loop.fadingCount).toBe(0);
+    opera.currentTime = 1.2;
+    now = entry.outMs + entry.gapMs - 1;
+    loop.setVolume(0.6);
+    expect(opera.volume).toBe(0);
+
+    // Silence over: full level at once, rewound to its first bar.
+    now = entry.outMs + entry.gapMs;
+    loop.setVolume(0.6);
+    expect(opera.volume).toBeCloseTo(0.6);
+    expect(opera.currentTime).toBe(0);
+    opera.currentTime = 5;
+    now += 1000;
+    loop.setVolume(0.6);
+    expect(opera.currentTime).toBe(5);
   });
 });

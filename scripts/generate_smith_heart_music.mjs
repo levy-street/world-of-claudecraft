@@ -73,6 +73,25 @@ export const SMITH_HEART_TRACKS = {
       'theme, swirling strings, shifting elemental colours, grand, heroic and dangerous, D minor, 134 BPM. ',
     music_length_ms: 180000,
   },
+  final_opera: {
+    filename: 'boss_heart_masterless_last.mp3',
+    name: 'The Masterless Strength, epic opera take (Jose 2026-11-22)',
+    prompt:
+      'Fast, intense, relentless epic opera battle music for the final boss of a dark fantasy raid: a colossal ' +
+      'threat is arriving and something enormous and heavy is about to break loose. Dense, busy, layered ' +
+      'arrangement with many instruments playing at once and constantly moving: furious staccato string ' +
+      'ostinatos, racing violin runs, pounding taiko and war drums in driving rhythms, booming orchestral hits, ' +
+      'huge brass stabs and horn calls, low trombone and tuba blasts, deep braams, anvil strikes, cathedral ' +
+      'organ, rising tension that keeps building. A powerful operatic choir sings rhythmic, aggressive, active ' +
+      'lines that keep changing: punchy staccato chants, call and response between sopranos and basses, soaring ' +
+      'high soprano phrases, dramatic leaps, the melody always on the move, never one held note, only open ' +
+      'vowels, no words. Dark, menacing, apocalyptic, unstoppable, D minor, 160 BPM. ' +
+      'Full energy from the first bar, no fade-in, no fade-out, no ending: a seamless video game boss loop. ' +
+      'Original composition, cinematic trailer power, high fidelity, wide stereo.',
+    music_length_ms: 180000,
+    ownTail: true,
+    vocals: true,
+  },
   final_last: {
     filename: 'boss_heart_masterless_last.mp3',
     name: 'The Masterless Strength, its last 15 percent (the climax)',
@@ -149,7 +168,7 @@ async function generateTake(track, outPath, xiKey) {
     body: JSON.stringify({
       prompt: promptFor(track),
       music_length_ms: track.music_length_ms,
-      force_instrumental: true,
+      force_instrumental: !track.vocals,
     }),
   });
   if (!response.ok) {
