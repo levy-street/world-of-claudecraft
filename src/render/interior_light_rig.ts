@@ -18,6 +18,7 @@ import {
   SMITH_HEART_CORE_LIGHT,
   SMITH_HEART_HAMMER_LIGHT,
   SMITH_HEART_HEAT_LIGHT,
+  SMITH_HEART_KEY_DIRECTION,
   SMITH_HEART_QUENCH_LIGHT,
   SMITH_HEART_RING_LIGHT,
 } from './smith_heart/heart_environment';
@@ -226,35 +227,11 @@ export interface InteriorLightTargets {
   rimColor: { value: { setHex(value: number): unknown } };
 }
 
-/** Where the Smith's Heart's key comes from: high over the Heart's oculus. */
-export const SMITH_HEART_CORE_KEY_DIRECTION = new THREE.Vector3(
-  ...SMITH_HEART_CORE_LIGHT.keyDirection,
-).normalize();
-
-/** Where the Ring's key comes from: the same low sun, a little higher. */
-export const SMITH_HEART_RING_KEY_DIRECTION = new THREE.Vector3(
-  ...SMITH_HEART_RING_LIGHT.keyDirection,
-).normalize();
-
-/** Where the Breath's key comes from: high in the north-west, the storm's
- *  light breaking through. */
-export const SMITH_HEART_BREATH_KEY_DIRECTION = new THREE.Vector3(
-  ...SMITH_HEART_BREATH_LIGHT.keyDirection,
-).normalize();
-
-/** Where the Quench's key comes from: low in the south-east over the lake. */
-export const SMITH_HEART_QUENCH_KEY_DIRECTION = new THREE.Vector3(
-  ...SMITH_HEART_QUENCH_LIGHT.keyDirection,
-).normalize();
-
-/** Where the Heat's key comes from: low in the west, the Hearth's side. */
-export const SMITH_HEART_HEAT_KEY_DIRECTION = new THREE.Vector3(
-  ...SMITH_HEART_HEAT_LIGHT.keyDirection,
-).normalize();
-
-/** Where the Hammer vein's key comes from: low in the west down the fissure. */
-export const SMITH_HEART_HAMMER_KEY_DIRECTION = new THREE.Vector3(
-  ...SMITH_HEART_HAMMER_LIGHT.keyDirection,
+/** Where every Smith's Heart room's key comes from: the raid's one sun
+ *  (`SMITH_HEART_KEY_DIRECTION`, low in the south-east), so walking between
+ *  rooms never moves a shadow. */
+export const SMITH_HEART_KEY_LIGHT_DIRECTION = new THREE.Vector3(
+  ...SMITH_HEART_KEY_DIRECTION,
 ).normalize();
 
 /** The outdoor rig legs, graded per frame by the renderer before the call. */
@@ -280,28 +257,15 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
     out.copy(SUNKEN_BASTION_SUN_DIRECTION);
     return true;
   }
-  if (state === 'smithHeartCore') {
-    out.copy(SMITH_HEART_CORE_KEY_DIRECTION);
-    return true;
-  }
-  if (state === 'smithHeartHammer') {
-    out.copy(SMITH_HEART_HAMMER_KEY_DIRECTION);
-    return true;
-  }
-  if (state === 'smithHeartRing') {
-    out.copy(SMITH_HEART_RING_KEY_DIRECTION);
-    return true;
-  }
-  if (state === 'smithHeartBreath') {
-    out.copy(SMITH_HEART_BREATH_KEY_DIRECTION);
-    return true;
-  }
-  if (state === 'smithHeartQuench') {
-    out.copy(SMITH_HEART_QUENCH_KEY_DIRECTION);
-    return true;
-  }
-  if (state === 'smithHeartHeat') {
-    out.copy(SMITH_HEART_HEAT_KEY_DIRECTION);
+  if (
+    state === 'smithHeartCore' ||
+    state === 'smithHeartHammer' ||
+    state === 'smithHeartRing' ||
+    state === 'smithHeartBreath' ||
+    state === 'smithHeartQuench' ||
+    state === 'smithHeartHeat'
+  ) {
+    out.copy(SMITH_HEART_KEY_LIGHT_DIRECTION);
     return true;
   }
   if (state === 'drownedTemple') {

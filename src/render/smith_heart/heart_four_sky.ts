@@ -41,8 +41,12 @@ export const HEART_FOUR_SKY = {
 
 /** How the dome wraps the main map's panorama, v = `horizon` - up * `stretch` (v 0 the
  *  painting's top): the Ring's cliffs hide the sky under about 25 degrees, so the
- *  painting's foot is pressed down behind them and its clouds fill the band over them;
- *  `turn` the
+ *  painting's foot is pressed down behind them and its clouds fill the band over them.
+ *  Under the cliffs' line (`cliff`, the up component; seen down a vein's mouth or from the
+ *  Balcony, where the sky does show) that line would run off the painting's last row, a
+ *  flat band, so there the painting's own low clouds are eased down to the horizon
+ *  instead (`foot` the v at the horizon, `ease` the band round `cliff` the two meet over:
+ *  `ringSkyV`); over the cliffs nothing moves. `turn` the
  *  share of a turn the painting is rotated by (each quarter over its vein's way out),
  *  `zenith` the elevation band (the up component) over which the four blend into one
  *  colour, `grade` its value, `sat` its saturation, `stars` the twinkle, `flash` the
@@ -50,6 +54,9 @@ export const HEART_FOUR_SKY = {
 export const HEART_RING_SKY = {
   horizon: 1.3,
   stretch: 1.35,
+  cliff: 0.42,
+  foot: 0.9,
+  ease: 0.08,
   turn: 0,
   zenith: [0.55, 0.88],
   grade: 0.78,
@@ -57,6 +64,19 @@ export const HEART_RING_SKY = {
   stars: 0.35,
   flash: 0.45,
 } as const;
+
+/** The panorama's v at an elevation `up` (its up component, 0 the horizon; mirrors the
+ *  dome's shader): the pressed line over the Ring's cliffs, the painting's low clouds
+ *  eased down under them. */
+export function ringSkyV(up: number): number {
+  const S = HEART_RING_SKY;
+  const u = Math.max(up, 0);
+  const high = S.horizon - u * S.stretch;
+  const low = S.foot + (S.horizon - S.cliff * S.stretch - S.foot) * (u / S.cliff);
+  const t = Math.max(0, Math.min(1, (u - (S.cliff - S.ease)) / (2 * S.ease)));
+  const k = t * t * (3 - 2 * t);
+  return Math.max(0.005, Math.min(0.995, low + (high - low) * k));
+}
 
 /** How long the interior waits for it before building with the procedural night. */
 const WAIT_MS = 8000;

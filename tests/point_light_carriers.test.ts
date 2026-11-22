@@ -679,6 +679,10 @@ describe('every point-light producer is a carrier source', () => {
       // The Breath guardian's wind volume: a mesh hook sorting its billows from the view
       // camera, never a scene.
       'render/smith_heart_fx/breath_wind_volume.ts: this.mesh',
+      // The Smith's Heart's loot coffer: mesh hooks on its two iron meshes, each
+      // carrying the heart's spot into the drawing camera's view space, never a scene.
+      'render/smith_heart_fx/loot_coffer_fx.ts: body',
+      'render/smith_heart_fx/loot_coffer_fx.ts: lid',
       // The sprite buddy's flame meshes step and upload their own uniforms.
       'render/sprites_buddy_flame.ts: mesh',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to

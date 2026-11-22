@@ -9,6 +9,8 @@
 // edge, the rift palette override, the lowGfx light-rig guard, and the whole
 // outdoor residency clamp that grades fog.far per frame once 'outdoor' has
 // settled); this module owns the resolution and the settled preset values.
+// How a settle lands (at once, or crossfaded between the Smith's Heart's rooms)
+// is fog_scene_fade.ts's.
 import { dungeonAt, isArenaPos, isBgPos, isDelvePos, isYumiMazePos } from '../sim/data';
 import { waterLevelAt } from '../sim/world';
 import { SANCTUM_FOG_COLOR } from './gravewyrm_sanctum/sanctum_plan_core';

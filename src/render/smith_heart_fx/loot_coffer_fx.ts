@@ -330,7 +330,7 @@ export class LootCofferFx {
     // The heart's position in view space, written once a frame per coffer
     // from the camera that draws it (both iron meshes share the uniform).
     const heart = new THREE.Vector3();
-    const heartToView: THREE.Object3D['onBeforeRender'] = (_r, _s2, camera) => {
+    const heartToView = (_r: THREE.WebGLRenderer, _s2: THREE.Scene, camera: THREE.Camera): void => {
       (iron.uniforms.uHeart.value as THREE.Vector3)
         .copy(heart)
         .applyMatrix4(camera.matrixWorldInverse);

@@ -13,9 +13,11 @@
 //     muted dusk panorama, each vein's quarter round the horizon over its
 //     way out from the Ring, all four blended into one colour overhead.
 //   - over the Breath (phase 2G), the storm seen from the summit IN it:
-//     paler and lower, a rolling deck racing in from the north-west, the
-//     key's light breaking through it in a bright rift, lightning walking
-//     the cloud and, every few seconds, a bolt standing in the distance.
+//     a rolling deck racing in from the north-west, the key's light breaking
+//     through it in a bright rift, lightning walking the cloud and, every few
+//     seconds, a bolt standing in the distance. Since the storm pass (design
+//     doc section 5.27) its painted deck hangs low as a dark thunderhead, and
+//     the rift is a cold blaze low on the one sun's own bearing.
 //   - over the Quench (phase 2H), the sky seen up out of the cold: calm, a
 //     pale overcast thinning to a wash of cold blue overhead, high thin
 //     veils drifting slow, the low pale sun in the south-east behind them
@@ -43,6 +45,8 @@ import { SUNKEN_BASTION_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import {
   SMITH_HEART_BREATH_FOG,
+  SMITH_HEART_BREATH_LIGHT,
+  SMITH_HEART_BREATH_STORM_SKY,
   SMITH_HEART_HAMMER_FOG,
   SMITH_HEART_HEAT_FOG,
   SMITH_HEART_HEAT_LIGHT,
@@ -50,6 +54,8 @@ import {
   SMITH_HEART_QUENCH_LIGHT,
 } from './heart_environment';
 import { HEART_FOUR_SKY, HEART_RING_SKY } from './heart_four_sky';
+
+const STORM = SMITH_HEART_BREATH_STORM_SKY;
 
 export interface HeartSkyOptions {
   lowGfx: boolean;
@@ -99,6 +105,7 @@ uniform float uFlare;
 uniform vec3 uFlareDir;
 uniform float uBreath;
 uniform vec3 uBreathHorizon;
+uniform vec3 uBreathSun;
 uniform float uQuench;
 uniform vec3 uQuenchHorizon;
 uniform vec3 uQuenchSun;
@@ -113,6 +120,13 @@ uniform float uHammer;
 uniform sampler2D uHammerSky;
 uniform vec3 uHammerHorizon;
 uniform float uBreathPainted;
+// The Breath's storm pass (heart_environment.ts SMITH_HEART_BREATH_STORM_SKY).
+const float BREATH_SKY_FOOT = ${STORM.foot.toFixed(3)};
+const float BREATH_SKY_RISE = ${STORM.rise.toFixed(3)};
+const float BREATH_SKY_SHADE = ${STORM.shade.toFixed(3)};
+const float BREATH_SKY_LIT = ${STORM.lit.toFixed(3)};
+const float BREATH_SKY_RIFT_TOP = ${STORM.riftTop.toFixed(3)};
+const vec3 BREATH_SKY_RIFT = vec3(${STORM.rift.map((v) => v.toFixed(3)).join(', ')});
 uniform sampler2D uBreathSky;
 uniform float uFourPainted;
 uniform sampler2D uFourSky;
@@ -208,9 +222,26 @@ vec3 breathSky(vec3 d, float up) {
     // lightning below walks it as it walked the procedural deck.
     float u = atan(d.x, d.z) / 6.2831853 + 0.5 + uTime * 0.0016;
     // A glTF texture reads top down: v 0 is the painting's top, the zenith's deck.
-    float v = clamp(0.82 - max(up, 0.0) * 1.2, 0.005, 0.995);
+    // The deck hangs LOW (the storm pass): the painting's dark bellies reach down to
+    // the horizon, where a play camera looks, and its pale foot haze stays under it.
+    float v = clamp(BREATH_SKY_FOOT - max(up, 0.0) * BREATH_SKY_RISE, 0.005, 0.995);
     vec3 painted = textureLod(uBreathSky, vec2(u, v), 0.0).rgb;
+    // Thunderhead weight: the painting's shade pressed down, its lit tears kept.
+    float pv = dot(painted, vec3(0.299, 0.587, 0.114));
+    painted *= mix(BREATH_SKY_SHADE, BREATH_SKY_LIT, smoothstep(0.24, 0.7, pv));
     col = mix(uBreathHorizon, painted, smoothstep(-0.03, 0.09, up));
+    // The rift where the one sun breaks under the deck: a cold blaze low on its own
+    // bearing and a breath of it round the key itself (squares written out: no pow).
+    vec3 sunFlat = normalize(vec3(uBreathSun.x, 0.0, uBreathSun.z));
+    float toward = max(dot(normalize(vec3(d.x, 0.0001, d.z)), sunFlat), 0.0);
+    float t2 = toward * toward;
+    float low = 1.0 - smoothstep(0.02, BREATH_SKY_RIFT_TOP, up);
+    float t4 = t2 * t2;
+    float rift = t4 * t4 * t2 * low * smoothstep(-0.03, 0.05, up);
+    float kd = max(dot(d, uBreathSun), 0.0);
+    float k2 = kd * kd;
+    float k4 = k2 * k2;
+    col += BREATH_SKY_RIFT * (rift * 0.9 + k4 * k4 * 0.35);
     cloud = 0.6;
   } else if (up > -0.08) {
     vec2 uv = d.xz / (up + 0.14);
@@ -372,8 +403,13 @@ vec3 ringFourSky(vec3 d, float up) {
   // explicit level (the wrap's seam has a jump in u a derivative would turn into a line of
   // the smallest mip). No drift: each quarter stays over its vein.
   float u = atan(d.x, d.z) / 6.2831853 + 0.5 + ${HEART_RING_SKY.turn.toFixed(4)};
-  // A KTX2 reads top down: v 0 is the painting's top.
-  float v = clamp(${HEART_RING_SKY.horizon.toFixed(3)} - max(up, 0.0) * ${HEART_RING_SKY.stretch.toFixed(3)}, 0.005, 0.995);
+  // A KTX2 reads top down: v 0 is the painting's top. Over the Ring's cliffs the pressed
+  // line; under them the painting's low clouds eased down to the horizon, never its last
+  // row (heart_four_sky.ts ringSkyV).
+  float upc = max(up, 0.0);
+  float vHigh = ${HEART_RING_SKY.horizon.toFixed(3)} - upc * ${HEART_RING_SKY.stretch.toFixed(3)};
+  float vLow = ${HEART_RING_SKY.foot.toFixed(3)} + ${(HEART_RING_SKY.horizon - HEART_RING_SKY.cliff * HEART_RING_SKY.stretch - HEART_RING_SKY.foot).toFixed(4)} * (upc / ${HEART_RING_SKY.cliff.toFixed(3)});
+  float v = clamp(mix(vLow, vHigh, smoothstep(${(HEART_RING_SKY.cliff - HEART_RING_SKY.ease).toFixed(3)}, ${(HEART_RING_SKY.cliff + HEART_RING_SKY.ease).toFixed(3)}, upc)), 0.005, 0.995);
   vec3 painted = textureLod(uRingSky, vec2(u, v), 0.0).rgb;
   // Overhead the four blend into one colour (the painting's top, all round).
   vec3 zen = (textureLod(uRingSky, vec2(0.125, 0.03), 5.0).rgb
@@ -531,6 +567,9 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
       uFlareDir: { value: new THREE.Vector3(0, 1, 0) },
       uBreath: { value: 0 },
       uBreathHorizon: { value: new THREE.Color(SMITH_HEART_BREATH_FOG.color) },
+      uBreathSun: {
+        value: new THREE.Vector3(...SMITH_HEART_BREATH_LIGHT.keyDirection).normalize(),
+      },
       uQuench: { value: 0 },
       uQuenchHorizon: { value: new THREE.Color(SMITH_HEART_QUENCH_FOG.color) },
       uQuenchSun: {

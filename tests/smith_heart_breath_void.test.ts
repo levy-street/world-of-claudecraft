@@ -8,7 +8,12 @@
 // one in the void, and is put back where it stood when a step takes it off.
 
 import { describe, expect, it } from 'vitest';
-import { BREATH, CORNICE_GAPS, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
+import {
+  BREATH,
+  BREATH_ISLES,
+  CORNICE_GAPS,
+  SMITH_HEART_FIELD,
+} from '../src/sim/content/smith_heart_layout';
 import {
   fellFromCornice,
   gapAt,
@@ -17,6 +22,7 @@ import {
   onCorniceApproach,
   voidCorpseSpot,
 } from '../src/sim/encounters/smith_heart';
+import { isleAt } from '../src/sim/encounters/smith_heart/breath_isle_geometry';
 import { authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 import { breathFight } from './helpers/breath_fight';
 
@@ -128,6 +134,54 @@ describe('the void over a real Sim', () => {
   });
 });
 
+describe('the void under the east isles over a real Sim', () => {
+  it("a body walked north off the first east isle, hard by the field's edge, is the void's", () => {
+    const f = breathFight(2, 23);
+    const w = f.players[1];
+    const e1 = BREATH_ISLES[0];
+    f.put(w, e1.x, e1.z + 3);
+    expect(isleAt(f.local(w).x, f.local(w).z)).toBe(0);
+    expect(w.pos.y).toBeCloseTo(e1.h, 0);
+    // North: toward the field's bound, the side the swing of 2026-11-20 brought
+    // this isle hard against.
+    w.facing = 0;
+    const meta = f.sim.players.get(w.id);
+    if (!meta) throw new Error('meta');
+    meta.moveInput.forward = true;
+    let north = f.local(w).z;
+    for (let i = 0; i < 20 * 12 && !w.dead; i++) {
+      f.tick(1, false);
+      if (!w.dead) north = Math.max(north, f.local(w).z);
+    }
+    meta.moveInput.forward = false;
+    expect(w.dead).toBe(true);
+    // It walked off past the isle's floor, and the void took it inside this
+    // claim's own band (never a body lost in the next slot's).
+    expect(north).toBeGreaterThan(e1.z + 6);
+    expect(inClaimBand(north)).toBe(true);
+    // Laid back on the Cornice's floor, where a resurrection stands.
+    const at = f.local(w);
+    expect(inBreathArena(at.x, at.z)).toBe(true);
+    expect(w.pos.y).toBeGreaterThan(C.h - 1);
+  });
+
+  it('the guardian drops a target fallen past the east rim, beyond the isles that hang there', () => {
+    const f = breathFight(2, 23);
+    f.dev('/dev heart breath pull');
+    f.tick(2);
+    const boss = f.boss();
+    const fallen = f.players[1];
+    const out = { x: C.x + C.rx + 45, z: C.z };
+    expect(authoredFieldSurfaceAt(SMITH_HEART_FIELD, out.x, out.z)).toBeFalsy();
+    expect(isleAt(out.x, out.z)).toBe(-1);
+    f.put(fallen, out.x, out.z);
+    fallen.pos.y = SMITH_HEART_FIELD.voidHeight;
+    boss.threat.set(fallen.id, 5);
+    f.tick(1, false);
+    expect(boss.threat.has(fallen.id)).toBe(false);
+  });
+});
+
 describe('the tether over a real Sim', () => {
   it('keeps a target on the climb, drops one in the void, puts a stray step back', () => {
     const f = breathFight(3, 23);
@@ -138,7 +192,11 @@ describe('the tether over a real Sim', () => {
     const c = lowClimb();
     f.put(onClimb, c.x, c.z);
     boss.threat.set(onClimb.id, 5);
-    f.put(fallen, C.x + C.rx + 25, C.z);
+    // Out past the south rim, over no floor at all (an isle hangs past the
+    // east rim: a body set under one stands on its floor, never in the void).
+    const out = { x: C.x + 30, z: C.z - C.rz - 25 };
+    expect(authoredFieldSurfaceAt(SMITH_HEART_FIELD, out.x, out.z)).toBeFalsy();
+    f.put(fallen, out.x, out.z);
     fallen.pos.y = SMITH_HEART_FIELD.voidHeight;
     boss.threat.set(fallen.id, 5);
     f.tick(1, false);

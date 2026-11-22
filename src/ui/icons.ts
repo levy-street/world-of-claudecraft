@@ -25,6 +25,7 @@ import { professionImageUrl } from './hud/professions/profession_art';
 import { ITEM_ART_PLACEHOLDERS } from './item_art_placeholders';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
+import { SMITH_HEART_AURA_IMAGE_IDS } from './smith_heart_aura_art';
 import { TRINKET_AURA_IMAGE_URLS } from './trinket_aura_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
@@ -5362,6 +5363,8 @@ const AURA_ICON_DIR = '/ui/auras';
 /** Exact aura-art identities whose shipping files live directly under /ui/auras. */
 export const AURA_FILE_IMAGE_IDS: ReadonlySet<string> = new Set([
   ...MOB_AURA_IMAGE_IDS,
+  // The Smith's Heart raid's debuffs and boss auras (smith_heart_aura_art.ts).
+  ...SMITH_HEART_AURA_IMAGE_IDS,
   'affliction_doom',
   'battle_trance',
   'bg_battle_rune',

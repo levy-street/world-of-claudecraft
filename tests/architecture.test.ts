@@ -243,6 +243,9 @@ const UI_PURE_CORES = [
   'src/ui/final_aura_effect.ts',
   'src/ui/final_phase_aura_effect.ts',
   'src/ui/heart_tier_damage.ts',
+  // The Smith's Heart's painted aura art: the ids with their own painting and the
+  // aliases that share one (pure data folded into icons.ts and aura_icon_view.ts).
+  'src/ui/smith_heart_aura_art.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
@@ -1122,7 +1125,6 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_walls_core.ts',
   'src/render/smith_heart/heart_rivers_core.ts',
   'src/render/smith_heart/heart_seal_core.ts',
-  'src/render/smith_heart/heart_env_fade_core.ts',
   'src/render/smith_heart/ring_crystal_core.ts',
   'src/render/smith_heart/heart_gates_core.ts',
   'src/render/smith_heart/heart_sightline_core.ts',
@@ -1621,6 +1623,8 @@ const RENDER_PURE_CORES = [
   'src/render/terrain_detail_shed_core.ts',
   'src/render/frost_ice_fields_core.ts',
   'src/render/frost_sky_fade_core.ts',
+  // the fog scene's crossfade between the Smith's Heart's rooms (fog_scene_fade.ts)
+  'src/render/fog_scene_fade_core.ts',
   'src/render/gfx_aa_policy_core.ts',
   'src/render/gfx_override_core.ts',
   'src/render/goblin_rocket_sled_fx_core.ts',
@@ -1809,6 +1813,7 @@ const BARE_NAMED = [
   'src/ui/final_aura_effect.ts',
   'src/ui/final_phase_aura_effect.ts',
   'src/ui/heart_tier_damage.ts',
+  'src/ui/smith_heart_aura_art.ts',
   'src/ui/trinket_aura_art.ts',
   'src/ui/ability_tooltip_lines.ts',
   'src/ui/banner_queue.ts',
@@ -3000,6 +3005,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
+  'src/ui/smith_heart_aura_art.ts',
   'src/ui/store_purchase_intent.ts',
   'src/ui/swing_timer.ts',
   'src/ui/system_text_i18n.ts',
