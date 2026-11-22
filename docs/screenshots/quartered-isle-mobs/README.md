@@ -6,6 +6,7 @@ Captured in the offline client at the lowest graphics preset, daylight, HUD hidd
 | File | Shows |
 |---|---|
 | `desktop-<mob>.png` | before idle, after idle, after mid-fight (1280x760 frames) |
+| `after-desktop-deaths.png` | the four new bodies dead: each topples flat (Warden, Brute, Shardling, Burrower) |
 | `before-mobile.png`, `after-mobile.png` | the six mobs idle, landscape 932x430 |
 
 Mobs: Warden of the Quench, the Glassfield Brute, Heaved Shardling and Veinback Burrower

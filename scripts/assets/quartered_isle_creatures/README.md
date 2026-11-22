@@ -16,6 +16,7 @@ Jump). The rig rests facing +x, so each visual carries `yaw: -Math.PI / 2`.
 | File | Job |
 |---|---|
 | `bake.py` | Blender bake of the base colour (grain, frost, strata or fur strands, AO, edge highlights) and a glow map from the lit colours; one `mode` per creature |
+| `topple_death.py` | replaces the Death clip: Tripo's `defeat_02` is a stagger that ends standing, so the new one keeps its opening and topples the rig over backward around its feet |
 | `apply_bake.mjs` | puts the baked maps on the rigged GLB at 512 px, or with `- -` only resizes Tripo's maps |
 
 ## Rebuild
@@ -34,8 +35,9 @@ Then, from the repo root, with Blender 5.x and KTX-Software 4.3+ (`ktx`) on PATH
 ```bash
 j=tmp/asset_pipeline/<job id>; d=tmp/newmobs; s=scripts/assets/quartered_isle_creatures
 blender -b --factory-startup --python $s/bake.py -- $j/raw.glb $d/<key>_base.png $d/<key>_em.png <mode>
-node $s/apply_bake.mjs $j/<key>.glb $d/<key>_base.png $d/<key>_em.png $d/<key>.glb
-# the Brute: node $s/apply_bake.mjs $j/the_glassfield_brute.glb - - $d/the_glassfield_brute.glb
+blender -b --factory-startup --python $s/topple_death.py -- $j/<key>.glb $d/topple_<key>.glb
+node $s/apply_bake.mjs $d/topple_<key>.glb $d/<key>_base.png $d/<key>_em.png $d/<key>.glb
+# the Brute: node $s/apply_bake.mjs $d/topple_the_glassfield_brute.glb - - $d/the_glassfield_brute.glb
 node scripts/assets/compress_glb_textures.mjs $d/<key>.glb
 npx gltf-transform resample $d/<key>.glb $d/r.glb
 npx gltf-transform meshopt $d/r.glb public/models/creatures/<key>.glb

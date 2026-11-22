@@ -118,7 +118,7 @@ const CAM = {
   cinderscar_caller: 8,
 };
 // The Embers sit in the Burnways' dips: look down into them over the near rim.
-const PITCH = { heatsworn_ember: 0.5 };
+const PITCH = { heatsworn_ember: 0.5, veinback_burrower: 0.45 };
 
 for (const templateId of MOBS) {
   await chat('/dev noaggro');

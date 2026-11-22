@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "08e93e370543906aed5cae0f4708a6d01bced2462e7ed6b19fb55ed8025ea852",
+  "rendererFingerprint": "4803ac8282455d48a5423fb2278d2e3f0a90054a1850a3efe8c5aad216f1f792",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "linux",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6978222,
-      "sha256": "e158049e0fb77fd026b98ef612732631aa051b70eb3fde7a9f34136139d5f08a",
+      "bytes": 6978664,
+      "sha256": "dcb4e0221df85ee75adc73c68ddc145f06ed7d494e1ac77d74d16fdbb45147ff",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5201,8 +5201,8 @@
         "model": {
           "url": "models/creatures/heaved_shardling.glb",
           "path": "public/models/creatures/heaved_shardling.glb",
-          "bytes": 937176,
-          "sha256": "47654201f12b1abcab9ab4c321c406d8d035022ebc83b65d57d8a6e4859c0875"
+          "bytes": 897544,
+          "sha256": "4686d50238c82a3d8d4bdfa314bfaf37fbf22785b5347116f3ecc053ac3ba85e"
         },
         "idle": "Idle",
         "height": 1.4,
@@ -5219,11 +5219,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "612ba9640e6fb7fd7107776a11f7477e893ebaf25b8bba30b0800c50e1a6b296",
+      "sourceFingerprint": "e7652acea8c99108297d6d847df736391b66e1adf52bff2ca493607cee6791e7",
       "output": {
         "path": "public/ui/mobs/heaved_shardling.webp",
-        "bytes": 3412,
-        "sha256": "2000abe500ab0db0d8132bee4e6dedcc6a0def193c9114859f30c1a3928d96da"
+        "bytes": 3314,
+        "sha256": "8bc334b8b3a08a8e81af3a02643c9f5a4e1be759ea31a1d8a33088188c521788"
       }
     },
     {
@@ -11637,8 +11637,8 @@
         "model": {
           "url": "models/creatures/the_glassfield_brute.glb",
           "path": "public/models/creatures/the_glassfield_brute.glb",
-          "bytes": 844188,
-          "sha256": "f80547490f11bc27e4573831e71dda70552ba5a8a6050198b737c694c57177e2"
+          "bytes": 806528,
+          "sha256": "cb567ed602923f9f23e3789b2e243da1d4a0fce68ea64220671055e7d83fe077"
         },
         "idle": "Idle",
         "height": 4.1,
@@ -11655,11 +11655,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "156240f42881e144577e9d23f291438cd76acd1fbb4f8b5a114a7a921c858f27",
+      "sourceFingerprint": "e2c3a4b85690a30512ee53e93f91cf158e225b50a04b99e1b9ae1aaa25020468",
       "output": {
         "path": "public/ui/mobs/the_glassfield_brute.webp",
-        "bytes": 3256,
-        "sha256": "f38741b2d7f29adc538eb7cee1dc4b0d1d0f251d5c71ded67d6967b5b5537de8"
+        "bytes": 3264,
+        "sha256": "a2562225252835eb0a14dc4a3216086a5aee80743db33585bef4a618ec054d16"
       }
     },
     {
@@ -13596,8 +13596,8 @@
         "model": {
           "url": "models/creatures/veinback_burrower.glb",
           "path": "public/models/creatures/veinback_burrower.glb",
-          "bytes": 889660,
-          "sha256": "4853f1d649d65148cc673e86edbdbe9176e5402f985bdba43c5f334084078e67"
+          "bytes": 850588,
+          "sha256": "efbf284f303daa60e672593e88a35e4cb05c29075808c371979aebb3a0ff76ff"
         },
         "idle": "Idle",
         "height": 2.6,
@@ -13614,11 +13614,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "dd824e5cd4dac733fc06928d3c7ad551f7b51186bc485932da0d8f0648b4262d",
+      "sourceFingerprint": "221275c05a1db55543d20e4aab48fd91002f68a5a49940a8887e4852c788ca6a",
       "output": {
         "path": "public/ui/mobs/veinback_burrower.webp",
-        "bytes": 2402,
-        "sha256": "d6ba8c17553dda21ccb04f71230a1cf6d205ab5b47147d91c8bf8ee4ac9db1ff"
+        "bytes": 2512,
+        "sha256": "d6fed55a087ed2c4fb7b0459d6afa2f348606fa6c7e1d688cb6a6b8e23b88de7"
       }
     },
     {
@@ -14014,8 +14014,8 @@
         "model": {
           "url": "models/creatures/warden_of_the_quench.glb",
           "path": "public/models/creatures/warden_of_the_quench.glb",
-          "bytes": 997236,
-          "sha256": "307c7a39aaf8a73e4f43642084c73c4f5d44c5435c89a51af7e494775675192c"
+          "bytes": 961156,
+          "sha256": "89da1f0699c955c690cf26cb1c8526e82da3b61230837b7b7a7822a96c913285"
         },
         "idle": "Idle",
         "height": 2.6,
@@ -14032,11 +14032,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "aa6168c9b41cc77c9027fabea53a57542b85f47b0ea226446a4227edcb91e5ba",
+      "sourceFingerprint": "ffd0147d660c9a9d6f733e28800f2a66cc47ddc2235516303d73173f1e9b8df6",
       "output": {
         "path": "public/ui/mobs/warden_of_the_quench.webp",
-        "bytes": 3728,
-        "sha256": "d736fff94ce51cacf245c31c391d7890e2d6c34353764356d82582ab367c6ea9"
+        "bytes": 3666,
+        "sha256": "bc6b1189197e8218ba0872570f9faef968a24ecef76de8fc80752a964b1cd3fd"
       }
     },
     {
