@@ -493,7 +493,8 @@ describe('world markers layer (Three)', () => {
     // A dropped entry's program links resume as debt, never as cosmetic work.
     expect(prewarmResumeIsDebt(`programs.${entry.id}`)).toBe(true);
     const renderer = readFileSync(`${process.cwd()}/src/render/renderer.ts`, 'utf8');
-    expect(renderer).toContain('worldMarkerPrewarmEntry(this.worldMarkers, {');
+    // The host is shared with the party pings' entry (render/party_pings.ts).
+    expect(renderer).toContain('worldMarkerPrewarmEntry(this.worldMarkers, overlayPrewarmHost),');
     expect(renderer).toContain('bestEffort(() => this.worldMarkers.dispose());');
   });
 });

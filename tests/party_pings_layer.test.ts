@@ -6,6 +6,7 @@
 // same (graphics fairness), Enable Pings off draws nothing, and the prewarm
 // entry stages every material.
 
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -24,6 +25,7 @@ import {
   PARTY_PING_SLOTS,
   type PartyPingMark,
 } from '../src/render/party_pings_core';
+import { prewarmResumeIsDebt } from '../src/render/prewarm_policy';
 import { PING_ATTACK, PING_LOOK } from '../src/sim/social/party_pings';
 
 const mark = (id: number, over: Partial<PartyPingMark> = {}): PartyPingMark => ({
@@ -143,6 +145,13 @@ describe('party ping layer', () => {
     expect(roots[0].children).toHaveLength(PARTY_PING_SLOTS * 4);
     expect(entry.resumeUnits()).toHaveLength(6);
     expect(entry.resumeProgramUnits()).toHaveLength(1);
+    // A dropped entry's program links resume as debt, never as cosmetic work.
+    expect(prewarmResumeIsDebt(`programs.${entry.id}`)).toBe(true);
+    // The renderer builds it, prewarms it beside the world markers and disposes it.
+    const renderer = readFileSync(`${process.cwd()}/src/render/renderer.ts`, 'utf8');
+    expect(renderer).toContain('partyPingPrewarmEntry(this.pings, overlayPrewarmHost),');
+    expect(renderer).toContain('bestEffort(() => this.pings.dispose());');
+    expect(renderer).toContain('this.pings.update(this.sim.partyPings(),');
     l.dispose();
     expect(l.isDisposed).toBe(true);
     expect(entry.resumeUnits()).toHaveLength(0);
