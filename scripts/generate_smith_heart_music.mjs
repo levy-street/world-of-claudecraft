@@ -33,6 +33,23 @@ export const SMITH_HEART_TRACKS = {
       'percussion hits, tectonic and earthy, D minor, 128 BPM, rising tension in waves. ',
     music_length_ms: 180000,
   },
+  council_drums: {
+    filename: 'boss_heart_hammer_council.mp3',
+    name: 'The Hammer Council, a new fast theme with a drum kit (Jose 2026-11-22)',
+    prompt:
+      'A brand new, fast, hard-hitting epic orchestral raid boss battle theme with its own ' +
+      'memorable heroic melody: two colossal stone guardians awaken to defend a sacred mountain. A powerful rock ' +
+      'drum kit drives it from the first bar: double kick drum gallops, punchy snare backbeats, crashing cymbals ' +
+      'and fast tom fills, locked with taiko and big war drums. No guitars at all. Driving low cellos, basses and tubas, ' +
+      'soaring horn melody, punchy brass stabs, fast string runs, booming orchestral hits, metallic anvil ' +
+      'accents. A deep powerful male choir chants rhythmic lines on open vowels, no words, the phrases always ' +
+      'moving and changing. Energetic, heavy, thrilling and epic, F minor, 160 BPM. ' +
+      'Full energy from the first bar, no fade-in, no fade-out, no ending: a seamless video game boss loop. ' +
+      'Original composition, cinematic, high fidelity, wide stereo.',
+    music_length_ms: 180000,
+    ownTail: true,
+    vocals: true,
+  },
   breath: {
     filename: 'boss_heart_breath.mp3',
     name: 'The Guardian of the Breath (wind, the summit, soaring)',

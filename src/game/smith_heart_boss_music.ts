@@ -2,7 +2,8 @@
 // 7): one fight cue per encounter, and the final boss's cue following its
 // stage. Generated with scripts/generate_smith_heart_music.mjs and mastered
 // into seamless loops with scripts/master_music_loop.mjs (CREDITS.md):
-//   the Hammer Council   "Stone That Answers": war drums, low brass, a deep
+//   the Hammer Council   "Stone That Answers" (rewritten 2026-11-22): a rock
+//                        drum kit at 160 BPM, war drums, low brass, a deep
 //                        choir, the quarry's grinding ostinato;
 //   the Breath           "Over the Cornice": rushing strings and flutes, horns
 //                        soaring over thunder;
@@ -31,7 +32,7 @@ import {
 } from '../sim/encounters/smith_heart/final_phase_ids';
 
 export const SMITH_HEART_BOSS_TRACKS = {
-  council: '/audio/music/boss_heart_hammer_council.mp3?v=905c8cf2605c',
+  council: '/audio/music/boss_heart_hammer_council.mp3?v=fa71bd8d9141',
   breath: '/audio/music/boss_heart_breath.mp3?v=d12e1281cd15',
   quench: '/audio/music/boss_heart_quench.mp3?v=03968298d1b1',
   heat: '/audio/music/boss_heart_heat.mp3?v=f955ad643011',
