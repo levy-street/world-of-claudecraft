@@ -166,7 +166,7 @@ ${KIT_FLARE_GLSL}`,
           float taut=clamp(t/0.08,0.0,1.0);
           float shown=1.0-smoothstep(taut-0.05,taut,1.0-vUv.x);
           float core=exp(-vUv.y*vUv.y*30.0);
-          float flow=pow(0.5+0.5*sin((vUv.x*5.0-t*7.0)*6.2831853),3.0);
+          float flow=pow(max(0.5+0.5*sin((vUv.x*5.0-t*7.0)*6.2831853),0.0),3.0);
           float ends=smoothstep(0.0,0.06,vUv.x)*smoothstep(1.0,0.9,vUv.x);
           mask=(exp(-vUv.y*vUv.y*4.0)*(0.25+0.45*flow)+core*0.9)*shown*ends;
           color=mix(vColor,HOT,core*0.5);

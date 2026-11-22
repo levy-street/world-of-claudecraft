@@ -242,7 +242,15 @@ describe('Dawnreaver complete-hit damage tuning', () => {
           if (!mark) throw new Error('missing live Verdict mark');
           mark.value = 2;
           mark.stacks = 2;
-          return cast(sim, finisher).filter((event) => event.ability === 'Verdict of the Sun God');
+          // Only the rig's ten wolves: the Dawnfall-sized sentence (12 m) also
+          // reaches the starting area's training dummy 10 m away.
+          const rigIds = new Set(targets.map((target) => target.id));
+          return cast(sim, finisher).filter(
+            (event) =>
+              event.ability === 'Verdict of the Sun God' &&
+              event.targetId !== undefined &&
+              rigIds.has(event.targetId),
+          );
         } finally {
           spy?.mockRestore();
         }

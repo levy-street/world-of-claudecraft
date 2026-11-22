@@ -76,7 +76,7 @@ const FRAGMENT = `
   void main(){
     // Edges catch the light: brightest where the shield turns from view.
     float facing=abs(dot(normalize(vViewNormal),normalize(vViewDir)));
-    float rim=pow(1.0-facing,2.2);
+    float rim=pow(max(1.0-facing,0.0),2.2);
     // The spec sign on the shield's face (the Faithwarden's unless a cast sigil
     // bears another), in its own plane (local x across, y up), on the front
     // face only.

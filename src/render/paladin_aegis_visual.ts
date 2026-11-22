@@ -210,7 +210,7 @@ function domeMaterial(): THREE.ShaderMaterial {
         float h=clamp(vPoint.y/${PALADIN_AEGIS_DOME_RADIUS.toFixed(1)},0.0,1.0);
         float ang=atan(vPoint.z,vPoint.x);
         // Rim light where the shell is seen edge on; nearly clear face on.
-        float rim=pow(1.0-vFacing,3.0);
+        float rim=pow(max(1.0-vFacing,0.0),3.0);
         // Fine ribs rising up the shell, fading toward the crown.
         float ribs=pow(max(cos(ang*16.0),0.0),80.0)*(1.0-smoothstep(0.55,0.95,h));
         // A warm band of dawn light about the base.

@@ -109,7 +109,7 @@ function pillarMaterial(): THREE.ShaderMaterial {
         float head=exp(-sq((vUv.y-front)*40.0))*(1.0-step(0.999,uDrop));
         // A soft core seen through the column, brightest at its middle and
         // falling away to the sides, so it reads as light, not a solid slab.
-        float core=pow(vFacing,7.0);
+        float core=pow(max(vFacing,0.0),7.0);
         float streaks=0.7+0.3*sin(vUv.x*60.0+vUv.y*8.0-uTime*6.0);
         float base=exp(-vUv.y*6.0)*0.6;
         // The column thins away up into the sky, so it reads as a shaft of

@@ -91,7 +91,7 @@ const NOISE_GLSL = `
   // ground), narrowing away to a thread as it ends.
   float siWidth(float down,float t,float top){
     float collapse=1.0-smoothstep(${INVOKE_HOLD.toFixed(2)},${(INVOKE_HOLD + 0.3).toFixed(2)},t);
-    return mix(top,1.0,pow(down,0.7))*mix(0.1,1.0,collapse);
+    return mix(top,1.0,pow(max(down,0.0),0.7))*mix(0.1,1.0,collapse);
   }
 `;
 
@@ -188,7 +188,7 @@ export class SolarInvocation {
           float grow=clamp(t/0.18,0.0,1.0);
           float up=vUv.x;
           float across=vUv.y;
-          float streaks=pow(0.5+0.5*cos(across*11.0+siNoise(vec2(across*4.0,0.0))*2.0),6.0);
+          float streaks=pow(max(0.5+0.5*cos(across*11.0+siNoise(vec2(across*4.0,0.0))*2.0),0.0),6.0);
           float reach=0.25+0.75*grow;
           float rise=smoothstep(reach,reach-0.45,up);
           float foot=exp(-up*up*30.0)*1.2;

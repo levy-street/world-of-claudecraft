@@ -59,7 +59,7 @@ const LANCE_GLSL = `
       *step(0.57,u)*step(u,0.998);
     // Two swept prongs peel back from the blade's root like sacred fire.
     float g=clamp((u-0.38)/0.23,0.0,1.0);
-    float sweep=0.09+0.77*pow(1.0-g,0.7);
+    float sweep=0.09+0.77*pow(max(1.0-g,0.0),0.7);
     float guard=exp(-sq((abs(v)-sweep)/(0.018+0.065*g)))
       *smoothstep(0.38,0.42,u)*(1.0-smoothstep(0.59,0.62,u));
     vec2 q=vec2((u-0.03)*19.0,v*2.0);

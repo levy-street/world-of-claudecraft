@@ -97,7 +97,7 @@ export const PALADIN_SPEC_EMBLEM_GLSL = `
     vec2 q=p-c;
     float a=atan(q.y,q.x);
     float t=clamp((a-a0)/(a1-a0),0.0,1.0);
-    float d=abs(length(q)-R)-w*pow(sin(3.14159*t),0.7);
+    float d=abs(length(q)-R)-w*pow(max(sin(3.14159*t),0.0),0.7);
     return max(d,max(a0-a,a-a1)*R);
   }
   float sunmenderDist(vec2 p){

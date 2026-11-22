@@ -297,7 +297,7 @@ function runeBandMaterial(): THREE.ShaderMaterial {
         float runes=paladinRuneRing(q,0.74,0.9)*flicker;
         // Two arcs of light running round the band.
         float a=atan(p.y,p.x);
-        float glint=pow(0.5+0.5*cos(2.0*(a-uTime*0.9)),18.0)*smoothstep(0.72,0.76,r)*(1.0-smoothstep(0.9,0.94,r));
+        float glint=pow(max(0.5+0.5*cos(2.0*(a-uTime*0.9)),0.0),18.0)*smoothstep(0.72,0.76,r)*(1.0-smoothstep(0.9,0.94,r));
         // A soft glow under the runes.
         float haze=exp(-runeSq((r-0.82)/0.1))*0.12;
         // A double rim, fine ticks between.
