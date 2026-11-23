@@ -8,18 +8,31 @@ import {
   POOL_FLAMES as L,
   poolFlameHeat,
   poolFlameHeight,
+  poolTongueReach,
+  poolTongueSpread,
 } from '../src/render/smith_heart_fx/final_pool_flames_core';
+import { ELEMENT_TUNING as E } from '../src/sim/encounters/smith_heart/final_elements_ids';
 import { FINAL_TUNING as T } from '../src/sim/encounters/smith_heart/final_ids';
 import { FINAL_PHASES } from '../src/sim/encounters/smith_heart/final_phase_ids';
 
 describe('the pools fire', () => {
   it('holds every pool the fight can burn at once', () => {
     expect(L.pools).toBeGreaterThanOrEqual(T.poolCap + FINAL_PHASES.trailCap);
+    // Magma Rift's lava pools ride the same pool (a pool past the cap keeps
+    // its floor warning, only its fire is dropped).
+    expect(L.pools).toBeGreaterThanOrEqual(T.poolCap + FINAL_PHASES.trailCap + 6);
   });
 
-  it('never stands wider than the sim radius', () => {
+  it('never stands wider than the sim radius (foot, width and lean)', () => {
     expect(L.reach).toBeGreaterThan(0);
     expect(L.reach).toBeLessThan(1);
+    // Every pool the fight lays: the Ember Mark's, Forge Fire's, the Cinder
+    // Trail's and Magma Rift's.
+    for (const r of [T.emberR, T.forgeFireR, FINAL_PHASES.trailR, E.magmaR]) {
+      const h = poolFlameHeight(r);
+      expect(poolTongueReach(r, h) + poolTongueSpread(h), `r ${r}`).toBeLessThanOrEqual(r + 1e-9);
+      expect(poolTongueReach(r, h), `r ${r}`).toBeGreaterThan(0);
+    }
   });
 
   it('catches as the pool lands, then burns steady', () => {

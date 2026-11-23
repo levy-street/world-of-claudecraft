@@ -303,9 +303,10 @@ export class FinalFirestormFx {
     sinceBurn: number,
     room: { x: number; z: number; r: number },
   ): void {
-    let s = this.slots.find((k) => k.id === id);
+    let s: Slot | undefined;
+    for (const k of this.slots) if (k.id === id) s = k;
     if (!s) {
-      s = this.slots.find((k) => k.id === -1);
+      for (const k of this.slots) if (!s && k.id === -1) s = k;
       if (!s) {
         s = this.slots[0];
         for (const k of this.slots) if (k.burnAt < s.burnAt) s = k;
@@ -353,8 +354,8 @@ export class FinalFirestormFx {
       }
     });
     s.trailBase.needsUpdate = true;
-    // The floor grid (a little past the lane's edges, so the edge line is
-    // whole; the shader draws nothing past it but the line's glow).
+    // The floor grid (a little past the lane's edges so the edge line is
+    // whole; the shader discards everything past the sim's half width).
     const fp = s.floorPos.array as Float32Array;
     const fl = s.floorLane.array as Float32Array;
     const across = L.floorAcross;

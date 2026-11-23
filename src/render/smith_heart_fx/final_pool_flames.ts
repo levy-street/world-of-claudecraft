@@ -36,17 +36,24 @@ void main() {
   vUv = vec2(position.x + 0.5, position.y + 0.5);
   vSeed = aTongue.z;
   float a = aTongue.x * 6.2831853;
-  float out_ = sqrt(aTongue.y) * ${POOL_FLAMES.reach.toFixed(3)} * aPool.w;
-  vec3 foot = aPool.xyz + vec3(sin(a) * out_, 0.0, cos(a) * out_);
   float period = 0.8 + 0.9 * fract(aTongue.z * 7.31);
   float ph = fract(uTime / period + aTongue.z * 3.7);
   float grow = sin(min(ph, 0.75) / 0.75 * 3.14159);
   float lift = smoothstep(0.62, 1.0, ph) * 0.5;
   // Lower toward the pool's edge (a mound of fire, not a hedge).
   float edge = 1.0 - 0.45 * aTongue.y;
-  float hgt = aFlame.y * edge * (0.45 + 0.55 * fract(aTongue.z * 13.7)) * (0.35 + 0.65 * grow) * aFlame.x;
+  // Uneven: a few tall licks over a carpet of low ones.
+  float tall = fract(aTongue.z * 13.7);
+  float hgt = aFlame.y * edge * (0.3 + 0.7 * tall * tall) * (0.5 + 0.5 * grow) * aFlame.x;
   vAlpha = aFlame.x * (1.0 - smoothstep(0.62, 0.92, ph)) * smoothstep(0.0, 0.1, ph);
   if (vAlpha <= 0.002 || hgt < 0.05) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  // Its foot no further out than keeps its whole flame inside the sim's
+  // radius (poolTongueReach in final_pool_flames_core.ts, at its tallest).
+  float hMax = aFlame.y;
+  float spread = (0.35 + hMax * 0.75) * 1.2 * 0.5 * 0.8 + hMax * 0.22;
+  float reach = max(0.0, min(aPool.w * ${POOL_FLAMES.reach.toFixed(3)}, aPool.w - spread));
+  float out_ = sqrt(aTongue.y) * reach;
+  vec3 foot = aPool.xyz + vec3(sin(a) * out_, 0.0, cos(a) * out_);
   vec3 base = foot + vec3(0.0, -0.1 + lift * hgt * 0.8, 0.0);
   float v = vUv.y;
   vec3 up = vec3(0.0, hgt, 0.0);
@@ -61,7 +68,7 @@ void main() {
   float sBend = sin(v * 5.2 - uTime * 3.6 + s) * (0.6 + 0.4 * sin(uTime * 1.3 + s * 0.7));
   float flick = sin(uTime * 9.3 + s * 2.1) * 0.5 + sin(uTime * 13.7 + s * 3.3) * 0.3;
   spine += side * (sBend * 0.14 * v + flick * 0.1 * v * v * v) * hgt;
-  float width = hgt * (0.5 + 0.2 * fract(aTongue.z * 3.3)) * (1.0 - 0.45 * lift);
+  float width = (0.35 + hgt * 0.75) * (0.8 + 0.4 * fract(aTongue.z * 3.3)) * (1.0 - 0.45 * lift);
   vec3 w = spine + side * position.x * width;
   gl_Position = projectionMatrix * wocCamRelView(w);
 }
@@ -82,7 +89,7 @@ void main() {
   vLife = life;
   vSpark = 0.0;
   float a = aEmber.x * 6.2831853;
-  float out_ = sqrt(aEmber.y) * ${POOL_FLAMES.reach.toFixed(3)} * aPool.w;
+  float out_ = sqrt(aEmber.y) * ${POOL_FLAMES.reach.toFixed(3)} * aPool.w * 0.8;
   float hgt = life * (2.5 + 4.0 * fract(aEmber.z * 2.3));
   float curl = sin(uTime * 1.3 + aEmber.z * 40.0 + hgt * 0.5) * (0.3 + hgt * 0.12);
   vec3 p = aPool.xyz + vec3(sin(a) * out_ + curl, 0.3 + hgt, cos(a) * out_ - curl * 0.6);
@@ -97,6 +104,8 @@ void main() {
 interface Slot {
   id: number;
   seen: boolean;
+  /** The heat last written (a steady pool is not re-uploaded). */
+  heat: number;
 }
 
 export interface PoolFlamesHost {
@@ -126,7 +135,7 @@ export class FinalPoolFlames {
     const L = POOL_FLAMES;
     this.perTongue = h.detail ? L.tongues : L.tonguesLow;
     this.perEmber = h.detail ? L.embers : L.embersLow;
-    for (let i = 0; i < L.pools; i++) this.slots.push({ id: -1, seen: false });
+    for (let i = 0; i < L.pools; i++) this.slots.push({ id: -1, seen: false, heat: -1 });
     const quad = new THREE.PlaneGeometry(1, 1, 1, 8);
     const tg = new THREE.InstancedBufferGeometry();
     tg.index = quad.index;
@@ -153,7 +162,7 @@ export class FinalPoolFlames {
     const ramp = fireRampGlsl('fireRamp');
     const tMat = new THREE.ShaderMaterial({
       name: 'smithHeartFinalPoolFlames',
-      uniforms: { uTime: h.uTime, uHeat: { value: 0.92 } },
+      uniforms: { uTime: h.uTime, uHeat: { value: 0.82 } },
       vertexShader: TONGUE_VERT,
       fragmentShader: wallTongueFrag(ramp),
       transparent: true,
@@ -216,13 +225,22 @@ export class FinalPoolFlames {
   /** A burning pool this frame: its centre on the floor, the sim's radius,
    *  how long it has burnt. */
   see(id: number, x: number, y: number, z: number, r: number, age: number): void {
-    let i = this.slots.findIndex((s) => s.id === id);
-    if (i < 0) i = this.slots.findIndex((s) => s.id === -1 && !s.seen);
+    let i = -1;
+    for (let k = 0; k < this.slots.length && i < 0; k++) if (this.slots[k].id === id) i = k;
+    for (let k = 0; k < this.slots.length && i < 0; k++)
+      if (this.slots[k].id === -1 && !this.slots[k].seen) i = k;
     if (i < 0) return;
     const s = this.slots[i];
+    const heat = poolFlameHeat(age);
+    const fresh = s.id !== id;
     s.id = id;
     s.seen = true;
-    this.write(i, x, y, z, r, poolFlameHeat(age), poolFlameHeight(r));
+    // Written when it takes the pool and while its fire catches; a steady
+    // pool costs no upload.
+    if (fresh || heat !== s.heat) {
+      s.heat = heat;
+      this.write(i, x, y, z, r, heat, poolFlameHeight(r));
+    }
   }
 
   private write(i: number, x: number, y: number, z: number, r: number, heat: number, h: number) {
@@ -262,6 +280,7 @@ export class FinalPoolFlames {
       }
       if (s.id !== -1) {
         s.id = -1;
+        s.heat = -1;
         this.write(i, 0, 0, 0, 0, 0, 0);
       }
     }

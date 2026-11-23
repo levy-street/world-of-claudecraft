@@ -14,7 +14,8 @@
 //     the burnt lane behind with glowing cracks, and one crisp hot line on
 //     each of the lane's two edges (the danger edge, on EVERY tier).
 //
-// Binding (readability): the wall never stands past the sim's front (the sim
+// Binding (readability): the wall's body never stands past the sim's front
+// (only a few cosmetic sparks fly ahead, inside the warned lane; the sim
 // strikes from the lane's start to `front`, `half` either side), its sheets
 // span exactly the lane's width, and nothing is drawn off the Anvil's floor.
 // Every time and size is the sim's (final_elements_ids.ts ELEMENT_TUNING) or

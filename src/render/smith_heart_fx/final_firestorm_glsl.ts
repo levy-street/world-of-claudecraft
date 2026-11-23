@@ -95,6 +95,8 @@ void main() {
   if (onFloor < 0.01) discard;
   float along = vLane.y;
   float across = abs(vLane.x);
+  // Nothing past the sim's lane: its half width across, its two ends along.
+  if (across > 1.0 || along < 0.0 || along > uLength) discard;
   float yards = (1.0 - across) * uHalf;
   float ahead = along - uFrontAlong;
   float behind = -ahead;
@@ -113,7 +115,9 @@ void main() {
   float flare = smoothstep(0.55, 0.85, ffbm(q * 0.45 + vec2(0.0, -uTime * 0.6))) * heat * flick;
   float m = max(seam * (0.62 + 0.38 * flow), burnt * max(crack * (0.25 + 0.6 * heat) * flick, flare * 0.7));
   vec3 col = burnRamp(clamp(m, 0.0, 1.0)) * 1.2;
-  float a = burnt * mix(0.8, 0.94, seam) * uChar;
+  // Translucent enough that another floor warning under the burnt lane
+  // still reads (graphics never hide a mark a player reacts to).
+  float a = burnt * mix(0.5, 0.8, seam) * uChar;
   // Ahead: the floor lit by the fire coming (a warm wash, no hard line).
   float light = (1.0 - smoothstep(0.0, ${L.lightAhead.toFixed(2)}, ahead)) * step(0.0, ahead) * uBurn;
   light *= step(along, uLength + 0.5);
@@ -126,7 +130,7 @@ void main() {
   col = mix(col, uEdge * 1.5, max(edge, edgeGlow * (1.0 - a)));
   a = max(a, max(edge * 0.95, edgeGlow));
   // Ragged ends inside the lane's length.
-  a *= smoothstep(-0.6, 0.6, along) * (1.0 - smoothstep(uLength - 0.6, uLength + 0.4, along));
+  a *= smoothstep(0.0, 0.6, along) * (1.0 - smoothstep(uLength - 0.6, uLength, along));
   gl_FragColor = vec4(col, clamp(a * onFloor, 0.0, 0.96));
 }
 `;
