@@ -17,6 +17,7 @@
 
 import { ENCHANTS } from '../sim/content/enchants';
 import { isItemLocked } from '../sim/item_lock';
+import { isPlainCopy } from '../sim/item_plain_copy';
 import type { MaterialComposition } from '../sim/material_sources';
 import { isDisenchantable, isEnchantedInstance } from '../sim/professions/enchanting';
 import { isSalvageable } from '../sim/professions/salvage';
@@ -209,14 +210,18 @@ export function isSpecialCopy(instance: ItemInstancePayload | undefined): boolea
 }
 
 /** Whether the copy the destructive action WOULD consume is special, so the
- *  confirm escalates to the stronger warning. Both actions prefer a PLAIN
- *  fungible copy first, so a player holding any plain copy is never warned
- *  (that plain copy is what dies): do not scare someone holding a plain copy
- *  plus a masterwork copy. Only when no fungible copy exists does the action
- *  reach for an instanced copy, and we warn iff THAT copy is special. Mirrors
+ *  confirm escalates to the stronger warning. A slot-targeted destroy passes
+ *  only the selected copy (bag_item_action_menu.ts confirmDestroy), so the
+ *  walk below judges that copy alone. Untargeted, every action prefers a PLAIN
+ *  copy first (payload-free, or carrying only its tracked identity: an
+ *  ordinary epic, sim/item_plain_copy.ts isPlainCopy, the same read the
+ *  walks use), so a player holding any plain copy is never warned (that
+ *  plain copy is what dies): do not scare someone holding a plain copy plus
+ *  a masterwork copy. Only when no plain copy exists does the action reach
+ *  for an instanced copy, and we warn iff THAT copy is special. Mirrors
  *  the sim's removal order (highest inventory index first among matching
  *  copies):
- *   - salvage (items.ts removePreferFungible): once fungible is exhausted the
+ *   - salvage (items.ts removePreferFungible): once plain is exhausted the
  *     highest-index instanced copy of ANY kind is taken (enchanted included).
  *   - disenchant (professions/enchanting.ts resolveDisenchant): the
  *     highest-index NON-enchanted instanced copy is taken first
@@ -230,7 +235,7 @@ export function destroyConsumesSpecialCopy(
   action: 'disenchant' | 'salvage' | 'sunder',
   copies: readonly BagCopy[],
 ): boolean {
-  if (copies.some((copy) => !copy.instance)) return false;
+  if (copies.some((copy) => isPlainCopy(copy.instance))) return false;
   const skipsEnchanted = action === 'disenchant' || action === 'sunder';
   for (let i = copies.length - 1; i >= 0; i--) {
     const instance = copies[i].instance;
