@@ -443,13 +443,15 @@ describe('recordDeedUnlocks (batch drain)', () => {
   it('a rejected batch logs, never breaks the tail, and the join reconcile replays the same ids', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     insertDeedsMock.mockRejectedValueOnce(new Error('db down'));
-    expect(() => recordDeedUnlocks({ characterId: 1, accountId: 1 }, ['a', 'b'])).not.toThrow();
+    // Real catalog ids: the reconcile replays live catalog ids only.
+    const ids = ['prog_veteran', 'prog_first_steps'];
+    expect(() => recordDeedUnlocks({ characterId: 1, accountId: 1 }, ids)).not.toThrow();
     // The FIFO tail survived: the login reconcile heals by replaying the ids.
-    reconcileCharacterDeeds({ characterId: 1, accountId: 1 }, ['a', 'b']);
+    reconcileCharacterDeeds({ characterId: 1, accountId: 1 }, ids);
     await deedRecordsIdle();
     expect(errorSpy).toHaveBeenCalledWith('character_deeds batch write failed:', expect.any(Error));
     expect(insertDeedsMock).toHaveBeenCalledTimes(2);
-    expect([...insertDeedsMock.mock.calls[1][1]]).toEqual(['a', 'b']); // reconcile replay
+    expect([...insertDeedsMock.mock.calls[1][1]]).toEqual(ids); // reconcile replay
     // The rejected batch never told Steam; the heal is Steam-invisible until the
     // account's reconcile-on-link (the reconcile itself is a DB write only).
     expect(onDeedRecordedMock).not.toHaveBeenCalled();
