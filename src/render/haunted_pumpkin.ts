@@ -3,7 +3,11 @@ import { GOURDLIGHT_EVE_ID } from '../sim/content/gourdlight_eve';
 import { hauntedPumpkinForEntity } from '../sim/seasonal';
 import type { Entity } from '../sim/types';
 import type { IWorld } from '../world_api';
-import { hauntedPumpkinGlow } from './haunted_pumpkin_core';
+import {
+  HAUNTED_PUMPKIN_HEIGHT,
+  HAUNTED_PUMPKIN_SCALE,
+  hauntedPumpkinGlow,
+} from './haunted_pumpkin_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { gourdlightAssets, type SeasonalPart } from './seasonal_decor_assets';
 import { markOwnedMaterial, markSharedGeometry } from './shared_resource';
@@ -20,30 +24,44 @@ const discoveryPosition = new THREE.Vector3();
 
 /** Reuses the already-prewarmed particle atlas and bounded Vfx pools. The
  * layered ignition has an amber flame core, spectral wisps circling upward,
- * then a delayed shower of embers. No new materials, textures or lights. */
+ * then a delayed shower of embers, each lifted with the pumpkin's size so the
+ * flame still sits in its cavity. No new materials, textures or lights. */
 function ignitePumpkin(vfx: DiscoveryVfx, entity: Entity): void {
-  discoveryPosition.set(entity.pos.x, entity.pos.y + 0.28, entity.pos.z);
+  const s = HAUNTED_PUMPKIN_SCALE;
+  discoveryPosition.set(entity.pos.x, entity.pos.y + 0.28 * s, entity.pos.z);
   vfx.burst(discoveryPosition, 'fire', 32, 0.65, 0xff8a22, 0.7);
   vfx.buffSwirl(entity.id, 0x81efbc);
   vfx.burstLater(
     0.12,
     entity.pos.x,
-    entity.pos.y + 0.45,
+    entity.pos.y + 0.45 * s,
     entity.pos.z,
     'arcane',
     22,
     0.45,
     0x81efbc,
   );
-  vfx.burstLater(0.28, entity.pos.x, entity.pos.y + 0.62, entity.pos.z, 'holy', 16, 0.35, 0xffba57);
+  vfx.burstLater(
+    0.28,
+    entity.pos.x,
+    entity.pos.y + 0.62 * s,
+    entity.pos.z,
+    'holy',
+    16,
+    0.35,
+    0xffba57,
+  );
 }
 
 /** Independent materials: discovery must never light another player's pumpkin
  * or modify the city's shared, flickering candles. Geometry stays kit-owned.
+ * The whole group is scaled up (HAUNTED_PUMPKIN_SCALE), so the pick volume and
+ * the nameplate height grow with it and the kit geometry stays untouched.
  * The renderer gates this complete object through its existing live-view gate. */
 export function buildHauntedPumpkinParts(parts: readonly SeasonalPart[]) {
   const group = new THREE.Group();
   group.name = 'haunted-pumpkin';
+  group.scale.setScalar(HAUNTED_PUMPKIN_SCALE);
   const materials: GlowMaterial[] = [];
   const clones = new Map<THREE.Material, THREE.Material>();
   for (const part of parts) {
@@ -69,7 +87,7 @@ export function buildHauntedPumpkinParts(parts: readonly SeasonalPart[]) {
     group.add(mesh);
   }
   states.set(group, { found: null, materials });
-  return { group, height: 0.9 };
+  return { group, height: HAUNTED_PUMPKIN_HEIGHT };
 }
 
 /** No event, no fetch. A cold kit is retried by the normal missing-view scan. */
@@ -98,8 +116,9 @@ export function syncHauntedPumpkin(
   const pumpkin = hauntedPumpkinForEntity(entity);
   const found = pumpkin !== undefined && world.hauntedPumpkinsFound.includes(pumpkin.id);
   if (found && state.found === false && !reducedMotion && vfx) ignitePumpkin(vfx, entity);
-  if (!found && state.found === false) return;
   state.found = found;
+  // Written every frame in both states: the beacon breathes until found, the
+  // candle flickers after. A handful of scalar writes per visible pumpkin.
   for (const material of state.materials) {
     material.emissiveIntensity = hauntedPumpkinGlow(material.name, found, time, reducedMotion);
   }

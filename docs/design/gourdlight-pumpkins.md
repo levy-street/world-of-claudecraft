@@ -2,9 +2,17 @@
 
 The collection in `src/sim/content/gourdlight_pumpkins.ts` covers the normal
 overworld zones. Tutorial, dungeon, raid and battleground spaces are excluded.
-Pumpkins use the existing seasonal city's carved pumpkin model, with personal
-materials: an undiscovered pumpkin is dark, and a discovered pumpkin stays lit
-for its finder. City decorations are independent and grant no collection credit.
+Pumpkins use the existing seasonal city's carved pumpkin model, scaled up
+(`HAUNTED_PUMPKIN_SCALE` in `src/render/haunted_pumpkin_core.ts`) so a hunt
+pumpkin reads as a quest object from a distance rather than street dressing,
+with personal materials: an undiscovered pumpkin breathes a soft, slow beacon
+through its whole rind (`hauntedPumpkinBeacon`, one period of a few seconds in
+the kit's own candle colour, so it reads from any side and never washes out on
+the Lambert tier by day), and a discovered pumpkin stays candle-lit for its finder
+with the light back in the carved face. Reduced motion holds the beacon at its
+mid level instead of pulsing. Both states read the same at every graphics tier
+and in daylight. City decorations are independent, keep their natural size and
+nervous candle flicker, and grant no collection credit.
 
 The ordinary object interaction validates the active event, living character,
 reach, inventory capacity and previous discovery on the authoritative simulation.

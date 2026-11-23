@@ -76,18 +76,29 @@ try {
       ),
     { timeout: 30000 },
   );
-  const pumpkinId = await page.evaluate(() => {
-    const { sim, input } = window.__game;
-    const pumpkin = sim.entities.get(-910001);
-    const player = sim.player;
-    player.pos = { ...sim.groundPos(pumpkin.pos.x + 2.3, pumpkin.pos.z + 1.4) };
-    player.prevPos = { ...player.pos };
-    player.facing = player.prevFacing = 0;
-    input.camDist = 5;
-    input.camPitch = 0.6;
-    input.camYaw = Math.PI;
-    return pumpkin.id;
-  });
+  // Framing: the player stands PLAYER_DX, PLAYER_DZ from the pumpkin (default
+  // beside it), the chase camera at CAM_DIST and CAM_PITCH. Size comparisons set
+  // the player behind the pumpkin (negative offsets) so it sits in front of them.
+  const pumpkinId = await page.evaluate(
+    ({ camDist, camPitch, dx, dz }) => {
+      const { sim, input } = window.__game;
+      const pumpkin = sim.entities.get(-910001);
+      const player = sim.player;
+      player.pos = { ...sim.groundPos(pumpkin.pos.x + dx, pumpkin.pos.z + dz) };
+      player.prevPos = { ...player.pos };
+      player.facing = player.prevFacing = 0;
+      input.camDist = camDist;
+      input.camPitch = camPitch;
+      input.camYaw = Math.PI;
+      return pumpkin.id;
+    },
+    {
+      camDist: Number(process.env.CAM_DIST ?? 5),
+      camPitch: Number(process.env.CAM_PITCH ?? 0.6),
+      dx: Number(process.env.PLAYER_DX ?? 2.3),
+      dz: Number(process.env.PLAYER_DZ ?? 1.4),
+    },
+  );
   await page.waitForFunction(
     (id) => {
       const view = window.__game.renderer.views.get(id);

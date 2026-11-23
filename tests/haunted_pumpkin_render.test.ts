@@ -1,6 +1,15 @@
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { hauntedPumpkinGlow } from '../src/render/haunted_pumpkin_core';
+import {
+  HAUNTED_PUMPKIN_BEACON_MID,
+  HAUNTED_PUMPKIN_BEACON_PERIOD,
+  HAUNTED_PUMPKIN_BEACON_RIND_SHARE,
+  HAUNTED_PUMPKIN_BEACON_SWING,
+  HAUNTED_PUMPKIN_HEIGHT,
+  HAUNTED_PUMPKIN_SCALE,
+  hauntedPumpkinBeacon,
+  hauntedPumpkinGlow,
+} from '../src/render/haunted_pumpkin_core';
 import { disposeUnsharedMeshResources, isSharedGeometry } from '../src/render/shared_resource';
 import { GOURDLIGHT_EVE_ID } from '../src/sim/content/gourdlight_eve';
 import type { Entity } from '../src/sim/types';
@@ -67,8 +76,16 @@ describe('haunted pumpkin personal render state', () => {
       expect(bMaterial.emissiveIntensity).toBe(0);
       expect(source.emissiveIntensity).toBe(9);
       expect(aMaterial.emissive.getHex()).toBe(0xff8800);
+      // Still to find: the beacon at its mid level (time 0) in the kit's own warm
+      // tint, the source and the other viewer never touched.
       syncHauntedPumpkin(a.group, { hauntedPumpkinsFound: [] }, entity);
-      expect(aMaterial.emissiveIntensity).toBe(0);
+      expect(aMaterial.emissiveIntensity).toBe(HAUNTED_PUMPKIN_BEACON_MID);
+      expect(aMaterial.emissive.getHex()).toBe(0xff8800);
+      expect(bMaterial.emissiveIntensity).toBe(0);
+      expect(source.emissive.getHex()).toBe(0xff8800);
+      // Found again: the lit level comes back.
+      syncHauntedPumpkin(a.group, { hauntedPumpkinsFound: ['test-pumpkin'] }, entity);
+      expect(aMaterial.emissiveIntensity).toBe(1.4);
       expect(isSharedGeometry(geometry)).toBe(true);
       const disposed = vi.fn();
       aMaterial.addEventListener('dispose', disposed);
@@ -103,12 +120,110 @@ describe('haunted pumpkin personal render state', () => {
     material.dispose();
   });
 
-  it('keeps stems dark and all glow surfaces fully off before discovery', () => {
-    for (const name of ['GourdGlow', 'GourdInner', 'GourdFlesh', 'GourdLitSkin']) {
-      expect(hauntedPumpkinGlow(name, false)).toBe(0);
-      expect(hauntedPumpkinGlow(name, true)).toBeGreaterThan(0);
+  it('keeps stems dark, the carved face softer before discovery, and the rind carrying the beacon', () => {
+    for (const name of ['GourdGlow', 'GourdInner', 'GourdFlesh']) {
+      const beacon = hauntedPumpkinGlow(name, false, 0, true);
+      expect(beacon).toBeGreaterThan(0);
+      expect(beacon).toBeLessThan(hauntedPumpkinGlow(name, true, 0, true));
     }
+    // the rind is what reads from behind: a real share while still to find, the
+    // faint candle bleed once lit
+    const rindBeacon = hauntedPumpkinGlow('GourdLitSkin', false, 0, true);
+    expect(rindBeacon).toBeCloseTo(
+      (HAUNTED_PUMPKIN_BEACON_RIND_SHARE / 1.4) * HAUNTED_PUMPKIN_BEACON_MID,
+      10,
+    );
+    expect(rindBeacon).toBeGreaterThan(0.3);
+    expect(hauntedPumpkinGlow('GourdLitSkin', true, 0, true)).toBe(0.04);
+    expect(hauntedPumpkinGlow('GourdStem', false)).toBe(0);
     expect(hauntedPumpkinGlow('GourdStem', true)).toBe(0);
+    // the candle core carries the beacon itself; the rest keep their share of it
+    expect(hauntedPumpkinGlow('GourdGlow', false, 0.7)).toBe(hauntedPumpkinBeacon(0.7));
+    expect(hauntedPumpkinGlow('GourdInner', false, 0.7)).toBeCloseTo(
+      hauntedPumpkinBeacon(0.7) / 1.4,
+      10,
+    );
+  });
+
+  it('breathes the undiscovered beacon slowly and softly, and holds it still with reduced motion', () => {
+    const values = Array.from({ length: 280 }, (_, i) => hauntedPumpkinBeacon(i / 100));
+    expect(Math.min(...values)).toBeCloseTo(
+      HAUNTED_PUMPKIN_BEACON_MID - HAUNTED_PUMPKIN_BEACON_SWING,
+      3,
+    );
+    expect(Math.max(...values)).toBeCloseTo(
+      HAUNTED_PUMPKIN_BEACON_MID + HAUNTED_PUMPKIN_BEACON_SWING,
+      3,
+    );
+    expect(Math.min(...values)).toBeGreaterThan(0.3);
+    expect(Math.max(...values)).toBeLessThan(1.4);
+    // one slow period, never a flicker
+    expect(HAUNTED_PUMPKIN_BEACON_PERIOD).toBeGreaterThanOrEqual(2);
+    expect(hauntedPumpkinBeacon(1.1 + HAUNTED_PUMPKIN_BEACON_PERIOD)).toBeCloseTo(
+      hauntedPumpkinBeacon(1.1),
+      10,
+    );
+    expect(hauntedPumpkinBeacon(HAUNTED_PUMPKIN_BEACON_PERIOD / 4)).toBeCloseTo(
+      HAUNTED_PUMPKIN_BEACON_MID + HAUNTED_PUMPKIN_BEACON_SWING,
+      10,
+    );
+    for (const t of [0, 0.3, 1.7, 9.2]) {
+      expect(hauntedPumpkinBeacon(t, true)).toBe(HAUNTED_PUMPKIN_BEACON_MID);
+    }
+  });
+
+  it('stands well above the city kit pumpkin, with the pick group and nameplate height scaled together', () => {
+    expect(HAUNTED_PUMPKIN_SCALE).toBeGreaterThanOrEqual(2);
+    expect(HAUNTED_PUMPKIN_HEIGHT).toBeCloseTo(0.9 * HAUNTED_PUMPKIN_SCALE, 10);
+    const material = new THREE.MeshLambertMaterial({ name: 'GourdGlow', emissive: 0xff8800 });
+    const geometry = new THREE.BoxGeometry();
+    const built = buildHauntedPumpkinParts([{ geometry, material }]);
+    expect(built.group.scale.toArray()).toEqual([
+      HAUNTED_PUMPKIN_SCALE,
+      HAUNTED_PUMPKIN_SCALE,
+      HAUNTED_PUMPKIN_SCALE,
+    ]);
+    expect(built.height).toBe(HAUNTED_PUMPKIN_HEIGHT);
+    // the size lives on the group: the mesh keeps the shared kit geometry, unscaled
+    const mesh = built.group.children[0] as THREE.Mesh;
+    expect(mesh.geometry).toBe(geometry);
+    expect(mesh.scale.toArray()).toEqual([1, 1, 1]);
+    kit.get.mockReturnValue({ decor: { pumpkin_lit: [{ geometry, material }] } });
+    const live = buildHauntedPumpkin(
+      { activeSeasonalEvent: GOURDLIGHT_EVE_ID, hauntedPumpkinsFound: [] },
+      entity,
+    );
+    expect(live?.height).toBe(HAUNTED_PUMPKIN_HEIGHT);
+    expect(live?.group.scale.x).toBe(HAUNTED_PUMPKIN_SCALE);
+    for (const view of [built, live]) {
+      if (view) disposeUnsharedMeshResources(view.group, { materials: true });
+    }
+    geometry.dispose();
+    material.dispose();
+  });
+
+  it('breathes per frame before discovery on the personal clone only', () => {
+    const material = new THREE.MeshStandardMaterial({ name: 'GourdGlow', emissive: 0xff8800 });
+    const geometry = new THREE.BoxGeometry();
+    const a = buildHauntedPumpkinParts([{ geometry, material }]);
+    const clone = (a.group.children[0] as THREE.Mesh).material as THREE.MeshStandardMaterial;
+    syncHauntedPumpkin(a.group, { hauntedPumpkinsFound: [] }, entity, 0);
+    const atRest = clone.emissiveIntensity;
+    syncHauntedPumpkin(
+      a.group,
+      { hauntedPumpkinsFound: [] },
+      entity,
+      HAUNTED_PUMPKIN_BEACON_PERIOD / 4,
+    );
+    expect(clone.emissiveIntensity).toBeGreaterThan(atRest);
+    expect(clone.emissiveIntensity).toBe(hauntedPumpkinBeacon(HAUNTED_PUMPKIN_BEACON_PERIOD / 4));
+    syncHauntedPumpkin(a.group, { hauntedPumpkinsFound: [] }, entity, 5, true);
+    expect(clone.emissiveIntensity).toBe(HAUNTED_PUMPKIN_BEACON_MID);
+    expect(material.emissiveIntensity).toBe(1);
+    expect(material.emissive.getHex()).toBe(0xff8800);
+    disposeUnsharedMeshResources(a.group, { materials: true });
+    geometry.dispose();
+    material.dispose();
   });
 
   it('plays layered ignition once on new discovery, without replay on restored state', () => {
@@ -122,6 +237,17 @@ describe('haunted pumpkin personal render state', () => {
     expect(fx.burst).toHaveBeenCalledOnce();
     expect(fx.buffSwirl).toHaveBeenCalledWith(entity.id, 0x81efbc);
     expect(fx.burstLater).toHaveBeenCalledTimes(2);
+    // the flame and its wisps rise with the pumpkin's size, so they stay in its cavity
+    const flameAt = fx.burst.mock.calls[0][0] as THREE.Vector3;
+    expect(flameAt.y).toBeCloseTo(entity.pos.y + 0.28 * HAUNTED_PUMPKIN_SCALE, 10);
+    expect(fx.burstLater.mock.calls[0][2]).toBeCloseTo(
+      entity.pos.y + 0.45 * HAUNTED_PUMPKIN_SCALE,
+      10,
+    );
+    expect(fx.burstLater.mock.calls[1][2]).toBeCloseTo(
+      entity.pos.y + 0.62 * HAUNTED_PUMPKIN_SCALE,
+      10,
+    );
     const b = buildHauntedPumpkinParts([{ geometry, material }]);
     syncHauntedPumpkin(b.group, { hauntedPumpkinsFound: ['test-pumpkin'] }, entity, 3, false, fx);
     expect(fx.burst).toHaveBeenCalledOnce();
