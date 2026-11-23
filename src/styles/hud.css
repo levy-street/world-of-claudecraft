@@ -5758,6 +5758,10 @@
       box-shadow: var(--glow-gold);
     }
   }
+  /* An unbound action (the Boss Guide ships with no key) draws no empty cap. */
+  .micro-btn .keybind:empty {
+    display: none;
+  }
   .micro-btn .keybind {
     position: absolute;
     bottom: -3px;
@@ -12184,8 +12188,33 @@
   #party-frames.party-header-collapsed #party-frame-header .ui-icon {
     transform: none;
   }
-  #party-frames.party-header-collapsed > :is(.party-rows, .party-boss-guide-button, .party-loot) {
+  #party-frames.party-header-collapsed > :is(.party-rows, .party-loot) {
     display: none;
+  }
+  /* The room's boss guide button, its own movable and scalable frame (the
+     "Unlock interface" row bossGuideButton). Stock seat: top centre, clear of
+     the buff row beside the minimap. Hidden outside an instance that ships a
+     guide; editing force-shows it as a dimmed placeholder like the other empty
+     frames. */
+  #boss-guide-launcher {
+    position: absolute;
+    left: calc(50% - 85px);
+    top: 12px;
+    display: flex;
+    z-index: 19;
+  }
+  #boss-guide-launcher.is-empty {
+    display: none;
+  }
+  /* The Edit Frames toolbar (#interface-edit-controls) covers the top centre
+     while arranging, so an unmoved launcher steps below it (the hill bar's
+     shape); a saved spot writes its own inline top and wins. */
+  body.interface-unlocked #boss-guide-launcher.tf-unlocked {
+    display: flex !important;
+    opacity: 0.55;
+    min-width: 170px;
+    min-height: 30px;
+    top: 64px;
   }
   .party-boss-guide-button {
     width: 170px;
@@ -12222,6 +12251,32 @@
     width: 15px;
     height: 15px;
     flex: none;
+  }
+  #raid-boss-guide-window .rbg-source-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 0 0 8px;
+  }
+  #raid-boss-guide-window .rbg-source-tab {
+    min-height: 26px;
+    padding: 3px 10px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  #raid-boss-guide-window .rbg-source-tab:hover,
+  #raid-boss-guide-window .rbg-source-tab.active {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  #raid-boss-guide-window .rbg-source-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   #raid-boss-guide-window {
     top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale, 1));

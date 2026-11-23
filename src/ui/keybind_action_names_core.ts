@@ -97,6 +97,7 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   harvestJournal: 'hudChrome.harvestJournal.title',
   perfecting: 'hudChrome.perfecting.title',
   lootExplorer: 'hudChrome.lootExplorer.title',
+  bossGuide: 'hudChrome.raidBossGuide.title',
 };
 
 /** The localized name of a bind action for prompts and rows. `fallback` is the

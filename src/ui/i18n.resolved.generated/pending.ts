@@ -9,25 +9,115 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "es_ES": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "fr_FR": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "fr_CA": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "de_DE": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "nl_NL": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "pl_PL": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "id_ID": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "tr_TR": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "sv_SE": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "vi_VN": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "da_DK": [
+    "guide.controls.unbound",
+    "guide.interfacePage.framesGovernedBossGuide",
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ]
 };

@@ -2,9 +2,11 @@
 
 One window, `src/ui/raid_boss_guide_window.ts` (`#raid-boss-guide-window`), paints
 any journal SOURCE: the raid guide (`raid_boss_guide_view.ts`, unchanged, wrapped by
-`RAID_JOURNAL_SOURCE`) or a dungeon page from this directory. It opens from the party
-frames' guide button inside the instance and from the Dungeon Finder's boss list
-(`openJournal`), so the page can be read before the run.
+`RAID_JOURNAL_SOURCE`) or a dungeon page from this directory. It opens from the room's
+guide button inside the instance (its own movable, scalable frame, `#boss-guide-launcher`,
+the `bossGuideButton` row of the Unlock interface mode), from the side menu's
+`#mm-bossguide` anywhere (`openBrowser`, with a picker over `JOURNAL_SOURCES`), and from
+the Dungeon Finder's boss list (`openJournal`), so a page can be read before the run.
 
 | Module | Role |
 |---|---|
@@ -12,7 +14,7 @@ frames' guide button inside the instance and from the Dungeon Finder's boss list
 | `journal_tuning.ts` | Per-difficulty numbers through the sim's own difficulty stamp (`applyDungeonMobTuning` on a scratch mob): `tierDamage`, `tierScaled`, `heroicMechanicScale`. Never retype a multiplier. |
 | `journal_sections.ts` | Markup helper (strings only, never DOM): the dungeon-only sections (role tips, key choices, the Heroic callout, rank chips, tier marks, the two-tier damage line). A DOM touch here would need a `UI_DOM_MODULES` row. |
 | `journal_model_spec.ts` | The boss's real in-game model (`mobVisualKey` + `VISUALS`) reduced to the guide viewer's spec, mirroring `scripts/wiki/build_content.mjs`. A body the standalone viewer cannot build (split WOC body, bodyless) returns null and the page keeps its portrait with no WebGL context. The model controller releases, on close, the GLB files the journal was the first to load. |
-| `registry.ts` | `DUNGEON_JOURNALS`: one row per dungeon page. |
+| `registry.ts` | `DUNGEON_JOURNALS`: one row per dungeon page; `JOURNAL_SOURCES`: the raid guide then every dungeon page, the window's picker order. |
 | `dungeons/<dungeon>.ts` | Data-as-code, one file per dungeon: bosses in route order (minibosses included), phases, mechanics, tips, choices, heroic notes. |
 
 ## Adding or changing a dungeon page
@@ -29,5 +31,5 @@ frames' guide button inside the instance and from the Dungeon Finder's boss list
 - `tests/boss_journal_view.test.ts` runs over EVERY registered journal (finder bosses present
   and in order, every key resolves with no placeholder left, cast names, kicks, heroic marks,
   the in-game model); add a per-dungeon facts block for the numbers players misread.
-- The window polls `syncAvailability` from the party frames: an unchanged room and run
+- The HUD polls `syncAvailability` every frame (it seats and shows or hides the launcher): an unchanged room and run
   (`IWorld.dungeonRun` is reference-stable) must stay a no-op (`tests/boss_journal_window.test.ts`).

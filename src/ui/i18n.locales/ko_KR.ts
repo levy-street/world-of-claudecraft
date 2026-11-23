@@ -9549,6 +9549,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mount': '탑승 / 하차',
   'guide.controls.calendar': '이벤트 달력',
   'guide.controls.dungeonFinder': '던전 찾기',
+  'guide.controls.unbound': '미지정',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities':
     '행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)',
@@ -10911,6 +10912,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nythraxisCallout.crownEndures': '굴하지 않는 왕관! 나이트락시스가 격노합니다!',
   'hudChrome.raidBossGuide.title': '우두머리 공략',
   'hudChrome.raidBossGuide.button': '공략: {boss}',
+  'hudChrome.raidBossGuide.sourcesLabel': '공략 목록',
+  'hudChrome.raidBossGuide.sourceRaids': '공격대',
+  'hudChrome.interfaceUnlock.frameNames.bossGuide': '우두머리 공략',
   'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': '우두머리 공략 닫기',
   'hudChrome.raidBossGuide.bossesLabel': '공격대 우두머리',
@@ -21466,6 +21470,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.priest.bombLabel': '헌납 폭탄',
   'guide.interfacePage.framesGovernedPriest':
     '프레임 편집으로 암흑 사제의 암흑 십일조와 헌납 폭탄 메달도 이동할 수 있습니다.',
+  'guide.interfacePage.framesGovernedBossGuide':
+    '프레임 편집으로 우두머리 공략 버튼도 옮길 수 있습니다. 이 버튼은 공략이 있는 공격대나 던전 안에서만 나타나며, 잠금을 풀면 이름표가 붙어 공략 전에 미리 배치할 수 있습니다. 측면 메뉴의 우두머리 공략 버튼으로는 어디서든 모든 공략을 열 수 있습니다.',
   'hudChrome.priest.gloomtitheStatus': '암흑 십일조 {value} / {max}',
   'hudChrome.priest.bombStatus': '헌납 폭탄 충전 {value} / {max}',
   'hudChrome.priest.bombReady': '준비 완료',

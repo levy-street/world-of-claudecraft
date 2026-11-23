@@ -11506,6 +11506,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mount': 'Сесть / Спешиться',
   'guide.controls.calendar': 'Календарь событий',
   'guide.controls.dungeonFinder': 'Поиск подземелий',
+  'guide.controls.unbound': 'Не назначено',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities':
     'Использовать способности панели команд (цифровой ряд; вторая панель — на цифровом блоке)',
@@ -12907,6 +12908,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nythraxisCallout.crownEndures': 'Корона выстоит! Нитраксис в ярости!',
   'hudChrome.raidBossGuide.title': 'Тактика на босса',
   'hudChrome.raidBossGuide.button': 'Тактика: {boss}',
+  'hudChrome.raidBossGuide.sourcesLabel': 'Тактики',
+  'hudChrome.raidBossGuide.sourceRaids': 'Рейды',
+  'hudChrome.interfaceUnlock.frameNames.bossGuide': 'Тактика на босса',
   'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': 'Закрыть тактику',
   'hudChrome.raidBossGuide.bossesLabel': 'Рейдовые боссы',
@@ -23633,6 +23637,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.priest.gloomtitheLabel': 'Мрачная десятина',
   'hudChrome.priest.bombLabel': 'Бомба подношения',
   'guide.interfacePage.framesGovernedPriest': 'Редактирование рамок также позволяет перемещать медальон жреца Тьмы с Мрачной десятиной и Бомбой подношения.',
+  'guide.interfacePage.framesGovernedBossGuide':
+    'В режиме редактирования рамок можно двигать и кнопку тактики на босса. Она появляется только в рейде или подземелье, для которых есть тактика; пока рамки разблокированы, на ней видна подпись с названием, так что её можно поставить заранее. Кнопка тактики на боковой панели открывает любую тактику где угодно.',
   'hudChrome.priest.gloomtitheStatus': 'Мрачная десятина: {value} из {max}',
   'hudChrome.priest.bombStatus': 'Заряды Бомбы подношения: {value} из {max}',
   'hudChrome.priest.bombReady': 'Готова',

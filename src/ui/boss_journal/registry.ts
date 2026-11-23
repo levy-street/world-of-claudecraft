@@ -6,7 +6,12 @@ import { GRAVEWYRM_SANCTUM_JOURNAL } from './dungeons/gravewyrm_sanctum';
 import { HOLLOW_CRYPT_JOURNAL } from './dungeons/hollow_crypt';
 import { SUNKEN_BASTION_JOURNAL } from './dungeons/sunken_bastion';
 import { WILDHEART_BASIN_JOURNAL } from './dungeons/wildheart_basin';
-import { type DungeonJournalDef, dungeonJournalSource, type JournalSource } from './journal_view';
+import {
+  type DungeonJournalDef,
+  dungeonJournalSource,
+  type JournalSource,
+  RAID_JOURNAL_SOURCE,
+} from './journal_view';
 
 export const DUNGEON_JOURNALS: readonly DungeonJournalDef[] = [
   HOLLOW_CRYPT_JOURNAL,
@@ -24,3 +29,7 @@ const SOURCES = new Map<string, JournalSource>(
 export function dungeonJournalSourceFor(dungeonId: string): JournalSource | null {
   return SOURCES.get(dungeonId) ?? null;
 }
+
+/** Every guide the journal window can browse, in picker order: the raid guide,
+ *  then each dungeon page in finder order. */
+export const JOURNAL_SOURCES: readonly JournalSource[] = [RAID_JOURNAL_SOURCE, ...SOURCES.values()];

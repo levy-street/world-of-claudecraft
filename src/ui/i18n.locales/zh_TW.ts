@@ -10860,6 +10860,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mount': '騎乘 / 下騎',
   'guide.controls.calendar': '活動日曆',
   'guide.controls.dungeonFinder': '地城搜尋器',
+  'guide.controls.unbound': '未綁定',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities': '使用動作列技能（數字鍵列；第二條動作列位於數字鍵盤上）',
   'guide.controls.groupPet': '寵物指令',
@@ -12128,6 +12129,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nythraxisCallout.crownEndures': '王冠永存！尼思拉克西斯狂暴了！',
   'hudChrome.raidBossGuide.title': '首領指南',
   'hudChrome.raidBossGuide.button': '指南: {boss}',
+  'hudChrome.raidBossGuide.sourcesLabel': '指南',
+  'hudChrome.raidBossGuide.sourceRaids': '團隊副本',
+  'hudChrome.interfaceUnlock.frameNames.bossGuide': '首領指南',
   'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': '關閉首領指南',
   'hudChrome.raidBossGuide.bossesLabel': '團隊副本首領',
@@ -22094,6 +22098,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.priest.bombLabel': '獻納靈魂炸彈',
   'guide.interfacePage.framesGovernedPriest':
     '編輯框架還可移動暗影牧師顯示幽暗什一與獻納靈魂炸彈的徽章。',
+  'guide.interfacePage.framesGovernedBossGuide':
+    '「編輯框架」同樣可以移動「首領指南」按鈕。該按鈕只會在擁有指南的團隊副本或地城中出現；解鎖時它會顯示名稱標籤，方便你在開打之前擺好位置。側邊欄上的「首領指南」按鈕可以隨時隨地開啟所有指南。',
   'hudChrome.priest.gloomtitheStatus': '幽暗什一：{value} / {max}',
   'hudChrome.priest.bombStatus': '獻納靈魂炸彈充能：{value} / {max}',
   'hudChrome.priest.bombReady': '就緒',

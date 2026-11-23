@@ -9594,6 +9594,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mount': '騎乗 / 降車',
   'guide.controls.calendar': 'イベントカレンダー',
   'guide.controls.dungeonFinder': 'ダンジョンファインダー',
+  'guide.controls.unbound': '未設定',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities':
     'アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）',
@@ -10936,6 +10937,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nythraxisCallout.crownEndures': '王冠不滅！ナイスラクシスが激怒した！',
   'hudChrome.raidBossGuide.title': 'ボス攻略',
   'hudChrome.raidBossGuide.button': '攻略: {boss}',
+  'hudChrome.raidBossGuide.sourcesLabel': '攻略ガイド',
+  'hudChrome.raidBossGuide.sourceRaids': 'レイド',
+  'hudChrome.interfaceUnlock.frameNames.bossGuide': 'ボス攻略',
   'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': 'ボス攻略を閉じる',
   'hudChrome.raidBossGuide.bossesLabel': 'レイドボス',
@@ -21504,6 +21508,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.priest.bombLabel': '献納の爆弾',
   'guide.interfacePage.framesGovernedPriest':
     'フレーム編集では、シャドウプリーストの闇の献納と献納の爆弾を表示するメダリオンも移動できます。',
+  'guide.interfacePage.framesGovernedBossGuide':
+    '「フレーム編集」ではボス攻略ボタンも動かせます。このボタンは攻略のあるレイドやダンジョンの中でだけ表示されます。ロック解除中は名前タグが付くので、挑む前に配置できます。サイドレールのボス攻略ボタンからは、どこにいてもすべての攻略を開けます。',
   'hudChrome.priest.gloomtitheStatus': '闇の献納 {value} / {max}',
   'hudChrome.priest.bombStatus': '献納の爆弾のチャージ {value} / {max}',
   'hudChrome.priest.bombReady': '準備完了',
