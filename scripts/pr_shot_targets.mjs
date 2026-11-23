@@ -1391,6 +1391,54 @@ async function stageWheelBinds(page) {
 }
 
 export const TARGETS = [
+  // A Crucible sigil's bag tooltip: a warrior holds the Mantle Sigil of the
+  // Anvil (warrior is one of its three classes) and hovers it in the real bag
+  // grid with a real mouse hover. The after leg shows the purpose line naming
+  // the quartermaster, his raid entrance, and the Shoulder slot; on the base
+  // tree the same recipe shoots the bare tooltip. Desktop only: on the touch
+  // HUD a bag long-press arms the item drag (touch_item_drag.ts), which cancels
+  // the tooltip peek, so there is no plain bag tooltip to shoot there.
+  {
+    key: 'sigil-redeem-tooltip',
+    label: 'Crucible sigil tooltip: who takes it, where, and the slot it buys',
+    when: ['sigil_redeem_tooltip'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Thorgar', beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page, variant) {
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        window.__game?.sim?.addItem('sigil_anvil_shoulder', 1);
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      const cell = '#bags .bag-item[data-coach-item="sigil_anvil_shoulder"]';
+      if (!(await pollForSize(page, cell))) throw new Error('sigil bag cell never painted');
+      await triggerRowBreakdown(page, cell, variant);
+      if (!(await pollForSize(page, '#tooltip', 10, 200))) throw new Error('no sigil tooltip');
+      const tip = await page.evaluate(() => {
+        const r = document.querySelector('#tooltip').getBoundingClientRect();
+        return {
+          x: r.x,
+          y: r.y,
+          w: r.width,
+          h: r.height,
+          text: document.querySelector('#tooltip').innerText,
+        };
+      });
+      console.log(`sigil tooltip (${variant?.key}): ${tip.text.replace(/\n/g, ' | ')}`);
+      const pad = 10;
+      return {
+        clip: {
+          x: Math.max(0, tip.x - pad),
+          y: Math.max(0, tip.y - pad),
+          width: tip.w + pad * 2,
+          height: tip.h + pad * 2,
+        },
+      };
+    },
+  },
   // The self portrait menu's dungeon difficulty rows after a refused change: the
   // group keeps a live Normal claim on its five-minute reset cooldown, so picking
   // Heroic is refused but stays selected, and the menu says the instances are
