@@ -16516,7 +16516,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta',
   'hudChrome.auraEffect.oldBlood':
-    'Sangue Antigo: estágio {stacks} de {max}. Na Forma de Gato, cada tique dos seus sangramentos adiciona 1, no máximo uma vez a cada 2 s; na Forma de Bruin, cada acerto de Garras Varredoras e Esmaga-Ossos adiciona 1. Com {max}: Mordida Sanguinária se torna Colheita Vermelha na Forma de Gato, Esmaga-Ossos se torna Quebra-Medula na Forma de Bruin',
+    'Sangue Antigo: estágio {stacks} de {max}. Na Forma de Gato, cada tique dos seus sangramentos adiciona 1, no máximo uma vez a cada 3 s, e cada acerto de Bote Furtivo e Bote adiciona 1; na Forma de Bruin, cada acerto de Garras Varredoras e Esmaga-Ossos adiciona 1. Com {max}: Mordida Sanguinária se torna Colheita Vermelha na Forma de Gato, Esmaga-Ossos se torna Quebra-Medula na Forma de Bruin',
   'abilityUi.cast.sundering': 'Dissipação',
   'hud.core.mapMarkerLabels.farmPatch': 'Canteiros',
   'hud.logs.keptLockedMany': '{count} cópias bloqueadas mantidas.',
@@ -17381,7 +17381,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Esfola o inimigo por dano da arma mais {damage} e causa {overTime} de dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.',
   'entities.abilities.rake.specNote_feral':
-    'Na Forma de Gato, os tiques dos seus sangramentos adicionam Sangue Antigo (máx. 3, no máximo 1 a cada 2 s), e seus sangramentos podem ser críticos, com cada crítico de sangramento restaurando 3 de energia.',
+    'Na Forma de Gato, os tiques dos seus sangramentos adicionam Sangue Antigo (máx. 3, no máximo 1 a cada 3 s), e seus sangramentos podem ser críticos, com cada crítico de sangramento restaurando 5 de energia.',
   'entities.abilities.reaping_command.description':
     'Gasta 2 Fragmentos de Alma para comandar todos os servos mortos-vivos a golpear em uníssono. Guardas Tumulares provocam e se preparam, Guerreiros imobilizam, Magos de Ossos expõem defesas mágicas, e a Asa Tumular dilacera todos os inimigos atingidos.',
   'entities.abilities.reaping_command.name': 'Comando Ceifador',

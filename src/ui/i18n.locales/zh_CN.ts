@@ -18349,7 +18349,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '消耗1枚灵魂碎片，将一名永久骷髅战士加入你的2槽统御。只能有一名为你效命。它每6秒对附近敌人造成45%的顺劈伤害，收割号令会使目标减速40%，持续4秒。',
   'entities.abilities.raise_skeletal_warrior.name': '唤醒骷髅战士',
   'entities.abilities.rake.specNote_feral':
-    '豹形态下，你的流血效果每次跳动都会累积古血（最多3层，每2秒最多1层），并且你的流血效果可以造成暴击，每次流血暴击恢复3点能量。',
+    '豹形态下，你的流血效果每次跳动都会累积古血（最多3层，每3秒最多1层），并且你的流血效果可以造成暴击，每次流血暴击恢复5点能量。',
   'entities.abilities.reaping_command.description':
     '消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击。墓卫嘲讽并防御，骷髅战士牵制目标，骸骨法师暴露魔法防御，墓翼撕裂所有被击中的敌人。',
   'entities.abilities.reaping_command.name': '收割号令',
@@ -19428,7 +19428,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '储存你和亡灵造成伤害的 {storedPct}%，并额外储存灵魂长枪伤害的 {lancePct}%；再次施放引爆。目标死亡时在 {radius} 码内爆炸并生成 1 个灵魂碎片',
   'hudChrome.auraEffect.nextAttackCrit': '下一次攻击必定暴击',
   'hudChrome.auraEffect.oldBlood':
-    '古血：第{stacks}/{max}层。豹形态下，你的流血效果每次跳动累积1层，每2秒最多1次；巨熊形态下，横扫利爪与碎骨击每次命中累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
+    '古血：第{stacks}/{max}层。豹形态下，你的流血效果每次跳动累积1层，每3秒最多1次，匿袭与扑击每次命中也累积1层；巨熊形态下，横扫利爪与碎骨击每次命中累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
   'hudChrome.auraEffect.overpowerCharge': '{stacks} 层充能：下一次致残打击伤害提高 {pct}%',
   'hudChrome.auraEffect.perfectMoment': '以太飞弹不会消耗奥术充能',
   'hudChrome.auraEffect.petDamage': '宠物造成的伤害提高 {pct}%',

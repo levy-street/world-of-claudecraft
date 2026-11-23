@@ -4843,7 +4843,7 @@ export const fr_FR: EnTranslations = {
       "coldsightRead": "Votre prochain Tir long inflige {longDrawPct}% de dégâts supplémentaires, ou votre prochain Tir funeste en inflige {fellShotPct}% de plus",
       "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
       "moontide": "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
-      "oldBlood": "Sang ancien : cran {stacks} sur {max}. En Forme de chat, chaque tic de vos saignements en ajoute 1, au plus une fois toutes les 2 s ; en Forme de Bruin, chaque coup porté de Griffes balayantes et de Brise-os en ajoute 1. À {max} : Morsure sanglante devient Moisson rouge en Forme de chat, Brise-os devient Brise-moelle en Forme de Bruin",
+      "oldBlood": "Sang ancien : cran {stacks} sur {max}. En Forme de chat, chaque tic de vos saignements en ajoute 1, au plus une fois toutes les 3 s, et chaque coup porté de Frappe furtive et de Bond en ajoute 1 ; en Forme de Bruin, chaque coup porté de Griffes balayantes et de Brise-os en ajoute 1. À {max} : Morsure sanglante devient Moisson rouge en Forme de chat, Brise-os devient Brise-moelle en Forme de Bruin",
       "verdance": "Verdoyance : cran {stacks} sur {max}. Chaque Soin de spores, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
       "freeExecute": "Votre prochaine capacité d'exécution éligible ne coûte rien",
       "resourceSap": "Restaure {value} de votre ressource actuelle toutes les {interval} s",
@@ -19238,7 +19238,7 @@ export const fr_FR: EnTranslations = {
       "rake": {
         "name": "Écorcher",
         "description": "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et inflige {overTime} points de dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de chat uniquement.",
-        "specNote_feral": "En Forme de chat, les tics de vos saignements ajoutent du Sang ancien (maximum 3, au plus 1 toutes les 2 s), et vos saignements peuvent infliger des coups critiques, chaque critique de saignement rendant 3 points d'énergie."
+        "specNote_feral": "En Forme de chat, les tics de vos saignements ajoutent du Sang ancien (maximum 3, au plus 1 toutes les 3 s), et vos saignements peuvent infliger des coups critiques, chaque critique de saignement rendant 5 points d'énergie."
       },
       "revive_pet": {
         "name": "Rafistoler",

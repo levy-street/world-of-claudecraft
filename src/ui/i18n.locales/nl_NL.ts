@@ -16143,7 +16143,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit',
   'hudChrome.auraEffect.oldBlood':
-    'Oud Bloed: stadium {stacks} van {max}. In Katgedaante voegt elke tik van je bloedingen er 1 toe, hoogstens eens per 2 sec; in Bruingedaante voegt elke gelande treffer van Vegende Klauwen en Botverbrijzelen er 1 toe. Bij {max}: Bloedbeet wordt Rode Oogst in Katgedaante, Botverbrijzelen wordt Mergbreker in Bruingedaante',
+    'Oud Bloed: stadium {stacks} van {max}. In Katgedaante voegt elke tik van je bloedingen er 1 toe, hoogstens eens per 3 sec, en elke gelande treffer van Sluipslag en Uitval voegt er 1 toe; in Bruingedaante voegt elke gelande treffer van Vegende Klauwen en Botverbrijzelen er 1 toe. Bij {max}: Bloedbeet wordt Rode Oogst in Katgedaante, Botverbrijzelen wordt Mergbreker in Bruingedaante',
   'hudChrome.auraEffect.verdance':
     'Groenkracht: stadium {stacks} van {max}. Elke Sporenheling, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei',
   'sim.rift.allUnstable': 'Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.',
@@ -16726,7 +16726,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Vilt de vijand voor wapenschade plus {damage} en veroorzaakt {overTime} bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Katgedaante.',
   'entities.abilities.rake.specNote_feral':
-    'In Katgedaante voegen de tikken van je bloedingen Oud Bloed toe (max 3, hoogstens 1 per 2 sec), en je bloedingen kunnen kritiek treffen, waarbij elke kritieke bloedingstik 3 energie herstelt.',
+    'In Katgedaante voegen de tikken van je bloedingen Oud Bloed toe (max 3, hoogstens 1 per 3 sec), en je bloedingen kunnen kritiek treffen, waarbij elke kritieke bloedingstik 5 energie herstelt.',
   'entities.abilities.reaping_command.description':
     'Besteedt 2 Zielfragmenten om elke ondode dienaar te bevelen gelijktijdig toe te slaan. Grafwachten tarten en schrap zich, Skeletkrijgers zetten vast, Botmagiërs stellen magische verdediging bloot, en Grafvleugels verscheuren alle geraakte vijanden.',
   'entities.abilities.reaping_command.name': 'Oogstbevel',

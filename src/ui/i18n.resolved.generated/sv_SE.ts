@@ -4843,7 +4843,7 @@ export const sv_SE: EnTranslations = {
       "coldsightRead": "Ditt nästa Långdrag orsakar {longDrawPct}% mer skada, eller ditt nästa Olycksskott orsakar {fellShotPct}% mer",
       "duskEconomy": "Förmågor kostar {pct}% mindre energi",
       "moontide": "Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den",
-      "oldBlood": "Gammalt Blod: steg {stacks} av {max}. I kattform lägger varje tick från dina blödningar till 1, högst en gång per 2 sek; i Bruinform lägger varje träffande slag med Svepande klor och Benkross till 1. Vid {max}: Blodsbett blir Röd Skörd i kattform, Benkross blir Märgbräckare i Bruinform",
+      "oldBlood": "Gammalt Blod: steg {stacks} av {max}. I kattform lägger varje tick från dina blödningar till 1, högst en gång per 3 sek, och varje träffande slag med Smyghugg och Utfall lägger till 1; i Bruinform lägger varje träffande slag med Svepande klor och Benkross till 1. Vid {max}: Blodsbett blir Röd Skörd i kattform, Benkross blir Märgbräckare i Bruinform",
       "verdance": "Grönska {stacks}/{max}. Varje Sporemending, Andra blomningen eller Vildläkning du kastar ger 1, och varje Grönska förkortar Vildläknings kasttid. Vid {max} blir Snabb läkning Överblomning",
       "freeExecute": "Din nästa kvalificerade avrättningsförmåga kostar ingenting",
       "resourceSap": "Återställer {value} av din nuvarande resurs var {interval}:e sek",
@@ -19238,7 +19238,7 @@ export const sv_SE: EnTranslations = {
       "rake": {
         "name": "Flå",
         "description": "Flå fienden för vapenskada plus {damage} och orsaka {overTime} blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.",
-        "specNote_feral": "I kattform lägger dina blödningars tick till Gammalt Blod (max 3, högst 1 per 2 sek), och dina blödningar kan träffa kritiskt, där varje kritiskt blödningstick återställer 3 energi."
+        "specNote_feral": "I kattform lägger dina blödningars tick till Gammalt Blod (max 3, högst 1 per 3 sek), och dina blödningar kan träffa kritiskt, där varje kritiskt blödningstick återställer 5 energi."
       },
       "revive_pet": {
         "name": "Lappa ihop",

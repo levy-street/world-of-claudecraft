@@ -16258,7 +16258,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den',
   'hudChrome.auraEffect.oldBlood':
-    'Gammalt Blod: steg {stacks} av {max}. I kattform lägger varje tick från dina blödningar till 1, högst en gång per 2 sek; i Bruinform lägger varje träffande slag med Svepande klor och Benkross till 1. Vid {max}: Blodsbett blir Röd Skörd i kattform, Benkross blir Märgbräckare i Bruinform',
+    'Gammalt Blod: steg {stacks} av {max}. I kattform lägger varje tick från dina blödningar till 1, högst en gång per 3 sek, och varje träffande slag med Smyghugg och Utfall lägger till 1; i Bruinform lägger varje träffande slag med Svepande klor och Benkross till 1. Vid {max}: Blodsbett blir Röd Skörd i kattform, Benkross blir Märgbräckare i Bruinform',
   'hudChrome.auraEffect.verdance':
     'Grönska {stacks}/{max}. Varje Sporemending, Andra blomningen eller Vildläkning du kastar ger 1, och varje Grönska förkortar Vildläknings kasttid. Vid {max} blir Snabb läkning Överblomning',
   'hudChrome.continentMap.levels': 'Nivåer {min} till {max}',
@@ -16554,7 +16554,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Flå fienden för vapenskada plus {damage} och orsaka {overTime} blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.',
   'entities.abilities.rake.specNote_feral':
-    'I kattform lägger dina blödningars tick till Gammalt Blod (max 3, högst 1 per 2 sek), och dina blödningar kan träffa kritiskt, där varje kritiskt blödningstick återställer 3 energi.',
+    'I kattform lägger dina blödningars tick till Gammalt Blod (max 3, högst 1 per 3 sek), och dina blödningar kan träffa kritiskt, där varje kritiskt blödningstick återställer 5 energi.',
   'entities.abilities.reaping_command.description':
     'Förbrukar 2 Själfragment för att befalla varje odöd tjänare att slå i samklang. Graveguards hånar och spänner sig, Skeletal Warriors förlångsammar sina mål, Bone Mages exponerar magiska försvar, och Gravvinge sliter i alla träffade fiender.',
   'entities.abilities.reaping_command.name': 'Skördande befallning',

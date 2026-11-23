@@ -4843,7 +4843,7 @@ export const id_ID: EnTranslations = {
       "coldsightRead": "Tarikan Panjangmu berikutnya menghasilkan {longDrawPct}% lebih banyak kerusakan, atau Tembakan Jatuhmu berikutnya menghasilkan {fellShotPct}% lebih banyak",
       "duskEconomy": "Kemampuan menghabiskan {pct}% lebih sedikit energi",
       "moontide": "Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya",
-      "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Dalam Wujud Kucing, setiap detak pendarahanmu menambah 1, paling banyak sekali setiap 2 detik; dalam Wujud Bruin, setiap serangan Cakar Menyapu dan Remuk Tulang yang kena menambah 1. Pada {max}: Gigitan Berdarah menjadi Panen Merah dalam Wujud Kucing, Remuk Tulang menjadi Pematah Sumsum dalam Wujud Bruin",
+      "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Dalam Wujud Kucing, setiap detak pendarahanmu menambah 1, paling banyak sekali setiap 3 detik, dan setiap serangan Terkaman Senyap dan Terkaman yang kena menambah 1; dalam Wujud Bruin, setiap serangan Cakar Menyapu dan Remuk Tulang yang kena menambah 1. Pada {max}: Gigitan Berdarah menjadi Panen Merah dalam Wujud Kucing, Remuk Tulang menjadi Pematah Sumsum dalam Wujud Bruin",
       "verdance": "Kehijauan: tahap {stacks} dari {max}. Setiap Pemulihan Spora, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya",
       "freeExecute": "Kemampuan eksekusi berikutnya yang memenuhi syarat tidak memakan biaya apa pun",
       "resourceSap": "Memulihkan {value} dari sumber dayamu saat ini setiap {interval} dtk",
@@ -19238,7 +19238,7 @@ export const id_ID: EnTranslations = {
       "rake": {
         "name": "Kupasan",
         "description": "Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan {overTime} kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Kucing.",
-        "specNote_feral": "Dalam Wujud Kucing, setiap detak pendarahanmu menambah Darah Tua (maks 3, paling banyak 1 setiap 2 detik), dan pendarahanmu dapat menjadi kritis, dengan setiap kritis pendarahan memulihkan 3 energi."
+        "specNote_feral": "Dalam Wujud Kucing, setiap detak pendarahanmu menambah Darah Tua (maks 3, paling banyak 1 setiap 3 detik), dan pendarahanmu dapat menjadi kritis, dengan setiap kritis pendarahan memulihkan 5 energi."
       },
       "revive_pet": {
         "name": "Obati",

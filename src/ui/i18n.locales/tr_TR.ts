@@ -16258,7 +16258,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar',
   'hudChrome.auraEffect.oldBlood':
-    'Kadim Kan: aşama {stacks} / {max}. Kedi Formunda kanamalarının her tiki 1 ekler, 2 saniyede en fazla bir kez; Bruin Formunda isabet eden her Süpüren Pençeler ve Kemik Kıran vuruşu 1 ekler. {max} olduğunda: Kedi Formunda Kanlı Isırık Kızıl Hasata, Bruin Formunda Kemik Kıran İlik Kırana dönüşür',
+    'Kadim Kan: aşama {stacks} / {max}. Kedi Formunda kanamalarının her tiki 1 ekler, 3 saniyede en fazla bir kez, ve isabet eden her Sinsi Darbe ve Atılış vuruşu 1 ekler; Bruin Formunda isabet eden her Süpüren Pençeler ve Kemik Kıran vuruşu 1 ekler. {max} olduğunda: Kedi Formunda Kanlı Isırık Kızıl Hasata, Bruin Formunda Kemik Kıran İlik Kırana dönüşür',
   'hudChrome.auraEffect.verdance':
     "Yeşillik: aşama {stacks} / {max}. Kullandığın her Spor Şifası, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
   'hudChrome.continentMap.levels': 'Seviye {min} ile {max} arası',
@@ -16556,7 +16556,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca {overTime} kanama hasarı verir. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
   'entities.abilities.rake.specNote_feral':
-    'Kedi Formunda kanamalarının her tiki Kadim Kan ekler (en fazla 3, 2 saniyede en fazla 1) ve kanamaların kritik vurabilir; her kanama kritiği 3 enerji geri kazandırır.',
+    'Kedi Formunda kanamalarının her tiki Kadim Kan ekler (en fazla 3, 3 saniyede en fazla 1) ve kanamaların kritik vurabilir; her kanama kritiği 5 enerji geri kazandırır.',
   'entities.abilities.reaping_command.description':
     '2 Ruh Parçası harcayarak tüm ölü hizmetkarlara birlikte vurma emri verir. Mezar Muhafızları kışkırtır ve hazırlanır, Savaşçılar sabitler, Kemik Büyücüler büyü savunmalarını açığa çıkarır ve Mezar Kanadı vurduğu tüm düşmanları parçalar.',
   'entities.abilities.reaping_command.name': 'Hasat Emri',

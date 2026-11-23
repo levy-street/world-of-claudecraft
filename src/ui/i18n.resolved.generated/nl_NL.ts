@@ -4843,7 +4843,7 @@ export const nl_NL: EnTranslations = {
       "coldsightRead": "Je volgende Lange Trek richt {longDrawPct}% meer schade aan, of je volgende Onheilsschot richt {fellShotPct}% meer aan",
       "duskEconomy": "Vaardigheden kosten {pct}% minder energie",
       "moontide": "Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit",
-      "oldBlood": "Oud Bloed: stadium {stacks} van {max}. In Katgedaante voegt elke tik van je bloedingen er 1 toe, hoogstens eens per 2 sec; in Bruingedaante voegt elke gelande treffer van Vegende Klauwen en Botverbrijzelen er 1 toe. Bij {max}: Bloedbeet wordt Rode Oogst in Katgedaante, Botverbrijzelen wordt Mergbreker in Bruingedaante",
+      "oldBlood": "Oud Bloed: stadium {stacks} van {max}. In Katgedaante voegt elke tik van je bloedingen er 1 toe, hoogstens eens per 3 sec, en elke gelande treffer van Sluipslag en Uitval voegt er 1 toe; in Bruingedaante voegt elke gelande treffer van Vegende Klauwen en Botverbrijzelen er 1 toe. Bij {max}: Bloedbeet wordt Rode Oogst in Katgedaante, Botverbrijzelen wordt Mergbreker in Bruingedaante",
       "verdance": "Groenkracht: stadium {stacks} van {max}. Elke Sporenheling, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei",
       "freeExecute": "Je volgende in aanmerking komende afmaakvaardigheid kost niets",
       "resourceSap": "Herstelt {value} van je huidige hulpbron elke {interval} sec",
@@ -19238,7 +19238,7 @@ export const nl_NL: EnTranslations = {
       "rake": {
         "name": "Villen",
         "description": "Vilt de vijand voor wapenschade plus {damage} en veroorzaakt {overTime} bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Katgedaante.",
-        "specNote_feral": "In Katgedaante voegen de tikken van je bloedingen Oud Bloed toe (max 3, hoogstens 1 per 2 sec), en je bloedingen kunnen kritiek treffen, waarbij elke kritieke bloedingstik 3 energie herstelt."
+        "specNote_feral": "In Katgedaante voegen de tikken van je bloedingen Oud Bloed toe (max 3, hoogstens 1 per 3 sec), en je bloedingen kunnen kritiek treffen, waarbij elke kritieke bloedingstik 5 energie herstelt."
       },
       "revive_pet": {
         "name": "Oplappen",

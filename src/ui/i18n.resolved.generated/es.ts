@@ -4843,7 +4843,7 @@ export const es: EnTranslations = {
       "coldsightRead": "Tu siguiente Tiro largo inflige un {longDrawPct}% más de daño, o tu siguiente Tiro aciago inflige un {fellShotPct}% más",
       "duskEconomy": "Las habilidades cuestan un {pct}% menos de energía",
       "moontide": "Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta",
-      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. En Forma felina, cada tic de tus sangrados añade 1, como mucho una vez cada 2 s; en Forma de Bruin, cada golpe conectado de Zarpas Barredoras y Rompehuesos añade 1. Con {max}: Mordisco Sangriento se convierte en Cosecha Roja en Forma felina y Rompehuesos se convierte en Quiebramédula en Forma de Bruin",
+      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. En Forma felina, cada tic de tus sangrados añade 1, como mucho una vez cada 3 s, y cada golpe conectado de Golpe Sigiloso y Embestida felina añade 1; en Forma de Bruin, cada golpe conectado de Zarpas Barredoras y Rompehuesos añade 1. Con {max}: Mordisco Sangriento se convierte en Cosecha Roja en Forma felina y Rompehuesos se convierte en Quiebramédula en Forma de Bruin",
       "verdance": "Verdor {stacks}/{max}. Cada Remiendo de Esporas, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración",
       "freeExecute": "Tu próxima facultad de ejecución válida no cuesta recursos",
       "resourceSap": "Restaura {value} de tu recurso actual cada {interval} s",
@@ -19238,7 +19238,7 @@ export const es: EnTranslations = {
       "rake": {
         "name": "Desollar",
         "description": "Desuella al enemigo por daño de arma más {damage} y causa {overTime} de daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma felina.",
-        "specNote_feral": "En Forma felina, los tics de tus sangrados añaden Sangre Antigua (máx. 3, como mucho 1 cada 2 s), y tus sangrados pueden ser críticos; cada crítico de sangrado restaura 3 de energía."
+        "specNote_feral": "En Forma felina, los tics de tus sangrados añaden Sangre Antigua (máx. 3, como mucho 1 cada 3 s), y tus sangrados pueden ser críticos; cada crítico de sangrado restaura 5 de energía."
       },
       "revive_pet": {
         "name": "Remendar",

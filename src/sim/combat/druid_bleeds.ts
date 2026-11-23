@@ -20,7 +20,7 @@
 // - Weeping Wounds: three or more of your bleeds on a target cut its healing
 //   taken by 20% (a short mortal_wound refreshed by applications and ticks).
 // - Bloodscent: your Cat bleeds can critically strike, and each bleed crit
-//   restores 3 energy.
+//   restores 5 energy.
 // - Lynxblood: bleeds applied while it is up deal 20% more for their whole
 //   duration (snapshotted into the tick value at application).
 // - Open Veins (row 14, the option id that used to be Blooddrunk): Bloodrift
@@ -84,7 +84,7 @@ export const WEEPING_WOUNDS_MIN_BLEEDS = 3;
 // below three loses the debuff within a tick.
 export const WEEPING_WOUNDS_DURATION = 3.5;
 
-export const BLOODSCENT_ENERGY = 3;
+export const BLOODSCENT_ENERGY = 5;
 
 export const LYNXBLOOD_AURA_ID = 'tigers_fury';
 export const LYNXBLOOD_BLEED_MULT = 1.2;
@@ -422,7 +422,7 @@ export function feralBleedTickRate(ctx: SimContext, victim: Entity, aura: Aura):
 
 /** Bloodscent: a feral druid's Cat bleed tick rolls the druid's melee crit
  *  (one rng draw, only for those ticks); a crit doubles the tick like a melee
- *  crit and restores 3 energy. Every other tick passes through untouched and
+ *  crit and restores 5 energy. Every other tick passes through untouched and
  *  draws nothing. */
 export function feralBleedPeriodicHit(
   ctx: SimContext,

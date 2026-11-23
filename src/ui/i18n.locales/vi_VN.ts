@@ -16137,7 +16137,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó',
   'hudChrome.auraEffect.oldBlood':
-    'Huyết Cổ {stacks}/{max}. Ở Hình Mèo, mỗi nhịp chảy máu của bạn cộng 1, nhiều nhất một lần mỗi 2 giây; ở Hình Bruin, mỗi đòn trúng của Vuốt Quét Ngang và Nghiền Xương cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin',
+    'Huyết Cổ {stacks}/{max}. Ở Hình Mèo, mỗi nhịp chảy máu của bạn cộng 1, nhiều nhất một lần mỗi 3 giây, và mỗi đòn trúng của Đòn Lẻn Vồ và Lao Vồ cộng 1; ở Hình Bruin, mỗi đòn trúng của Vuốt Quét Ngang và Nghiền Xương cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin',
   'hudChrome.auraEffect.verdance':
     'Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai',
   'hudChrome.continentMap.levels': 'Cấp {min} đến {max}',
@@ -16620,7 +16620,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây {overTime} sát thương chảy máu trong 18 giây. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.',
   'entities.abilities.rake.specNote_feral':
-    'Ở Hình Mèo, mỗi nhịp chảy máu của bạn thêm Huyết Cổ (tối đa 3, nhiều nhất 1 mỗi 2 giây), và hiệu ứng chảy máu của bạn có thể chí mạng, mỗi lần chảy máu chí mạng hồi 3 năng lượng.',
+    'Ở Hình Mèo, mỗi nhịp chảy máu của bạn thêm Huyết Cổ (tối đa 3, nhiều nhất 1 mỗi 3 giây), và hiệu ứng chảy máu của bạn có thể chí mạng, mỗi lần chảy máu chí mạng hồi 5 năng lượng.',
   'entities.abilities.reaping_command.description':
     'Tiêu hao 2 Mảnh Linh Hồn để ra lệnh cho mọi thuộc hạ Bất Tử đồng loạt tấn công. Vệ Mộ khiêu khích và gồng mình, Chiến Binh ghim chặt, Pháp Sư Xương phơi bày phòng ngự phép, và Cánh Mộ xé toạc mọi kẻ địch bị đánh trúng.',
   'entities.abilities.reaping_command.name': 'Mệnh Lệnh Gặt Hái',

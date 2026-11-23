@@ -16947,7 +16947,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
   'hudChrome.auraEffect.oldBlood':
-    'Sang ancien : cran {stacks} sur {max}. En Forme de chat, chaque tic de vos saignements en ajoute 1, au plus une fois toutes les 2 s ; en Forme de Bruin, chaque coup porté de Griffes balayantes et de Brise-os en ajoute 1. À {max} : Morsure sanglante devient Moisson rouge en Forme de chat, Brise-os devient Brise-moelle en Forme de Bruin',
+    'Sang ancien : cran {stacks} sur {max}. En Forme de chat, chaque tic de vos saignements en ajoute 1, au plus une fois toutes les 3 s, et chaque coup porté de Frappe furtive et de Bond en ajoute 1 ; en Forme de Bruin, chaque coup porté de Griffes balayantes et de Brise-os en ajoute 1. À {max} : Morsure sanglante devient Moisson rouge en Forme de chat, Brise-os devient Brise-moelle en Forme de Bruin',
   'hudChrome.auraEffect.verdance':
     "Verdoyance : cran {stacks} sur {max}. Chaque Soin de spores, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
   'hudChrome.riftTracker.title': 'Faille',
@@ -17154,7 +17154,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et inflige {overTime} points de dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de chat uniquement.",
   'entities.abilities.rake.specNote_feral':
-    "En Forme de chat, les tics de vos saignements ajoutent du Sang ancien (maximum 3, au plus 1 toutes les 2 s), et vos saignements peuvent infliger des coups critiques, chaque critique de saignement rendant 3 points d'énergie.",
+    "En Forme de chat, les tics de vos saignements ajoutent du Sang ancien (maximum 3, au plus 1 toutes les 3 s), et vos saignements peuvent infliger des coups critiques, chaque critique de saignement rendant 5 points d'énergie.",
   'entities.abilities.reaping_command.description':
     "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés.",
   'entities.abilities.reaping_command.name': 'Commandement de la moisson',

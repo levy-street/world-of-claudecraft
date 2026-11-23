@@ -472,6 +472,7 @@ describe('classifyDiff', () => {
       'src/sim/combat/poison_coating.ts',
       'src/ui/ability_imbue_text.ts',
       'src/sim/combat/shaman_thundercall_kit.ts',
+      'src/sim/combat/druid_bleeds.ts',
     ]) {
       const plan = classifyDiff([file]);
       expect(
@@ -497,6 +498,13 @@ describe('classifyDiff', () => {
       'thundercall-stormbreak',
       'thundercall-earthen-jolt',
       'thundercall-magma-burst-mobile',
+      'wildfang-flense',
+      'wildfang-rendclaw',
+      'wildfang-scratch',
+      'wildfang-slinkstrike',
+      'wildfang-bloodrift',
+      'wildfang-lynxblood',
+      'wildfang-rendclaw-mobile',
     ]);
     // The tooltip is the point, so the recipe must hover the row and prove the
     // shared #tooltip actually painted rather than shooting the row alone.

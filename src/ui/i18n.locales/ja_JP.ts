@@ -17528,7 +17528,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '魂の欠片を1個消費し、永続する骸骨戦士を2枠のドミニオンに加える。同時に従えるのは1体まで。6秒ごとに周囲へ45%の薙ぎ払いダメージを与え、リーピング・コマンドでは対象を4秒間40%減速させる。',
   'entities.abilities.raise_skeletal_warrior.name': '骸骨戦士の召喚',
   'entities.abilities.rake.specNote_feral':
-    'キャットフォーム中、自分の出血ダメージが発生するたびに古き血を蓄える（最大3、2秒ごとに最大1）。さらに自分の出血がクリティカルになるようになり、出血のクリティカルごとにエネルギーを3回復する。',
+    'キャットフォーム中、自分の出血ダメージが発生するたびに古き血を蓄える（最大3、3秒ごとに最大1）。さらに自分の出血がクリティカルになるようになり、出血のクリティカルごとにエネルギーを5回復する。',
   'entities.abilities.reaping_command.description':
     '魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。',
   'entities.abilities.reaping_command.name': '刈り取りの号令',
@@ -18679,7 +18679,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する',
   'hudChrome.auraEffect.nextAttackCrit': '次の攻撃が必ずクリティカルになる',
   'hudChrome.auraEffect.oldBlood':
-    '古き血：{stacks}/{max}段階。キャットフォームでは自分の出血ダメージが発生するたびに1段階蓄える（2秒ごとに最大1回）。ブルーインフォームでは薙ぎ払う爪と骨砕きの命中ごとに1段階蓄える。{max}段階で、キャットフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する',
+    '古き血：{stacks}/{max}段階。キャットフォームでは自分の出血ダメージが発生するたびに1段階蓄え（3秒ごとに最大1回）、忍び強襲とランジの命中ごとにも1段階蓄える。ブルーインフォームでは薙ぎ払う爪と骨砕きの命中ごとに1段階蓄える。{max}段階で、キャットフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する',
   'hudChrome.auraEffect.overpowerCharge':
     'チャージ{stacks}：次のメイミング・ストライクのダメージが{pct}%増加する',
   'hudChrome.auraEffect.perfectMoment': 'エーテル・ダーツが秘術チャージを消費しない',

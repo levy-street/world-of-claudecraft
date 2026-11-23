@@ -15919,7 +15919,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den',
   'hudChrome.auraEffect.oldBlood':
-    'Gammelt Blod: trin {stacks} af {max}. I Katteform tilføjer hvert tik fra dine blødninger 1, højst én gang hvert 2. sek.; i Bruin-form tilføjer hvert slag med Fejende Kløer og Knogleknus, der rammer, 1. Ved {max}: Blodbid bliver til Rød Høst i Katteform, og Knogleknus bliver til Marvbrækker i Bruin-form',
+    'Gammelt Blod: trin {stacks} af {max}. I Katteform tilføjer hvert tik fra dine blødninger 1, højst én gang hvert 3. sek., og hvert slag med Luskeslag og Spring, der rammer, tilføjer 1; i Bruin-form tilføjer hvert slag med Fejende Kløer og Knogleknus, der rammer, 1. Ved {max}: Blodbid bliver til Rød Høst i Katteform, og Knogleknus bliver til Marvbrækker i Bruin-form',
   'hudChrome.auraEffect.verdance':
     'Grønske {stacks}/{max}. Hver Sporeheling, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring',
   'sim.rift.allUnstable': 'Alle rifter er ustabile lige nu. Prøv igen senere.',
@@ -16499,7 +16499,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Flæns fjenden for våbenskade plus {damage} og giv {overTime} blødningsskade over 18 sek. Giver 1 combopoint. Kun i Katteform.',
   'entities.abilities.rake.specNote_feral':
-    'I Katteform tilføjer dine blødningers tik Gammelt Blod (maks. 3, højst 1 hvert 2. sek.), og dine blødninger kan ramme kritisk, hvor hvert kritisk blødningstik gendanner 3 energi.',
+    'I Katteform tilføjer dine blødningers tik Gammelt Blod (maks. 3, højst 1 hvert 3. sek.), og dine blødninger kan ramme kritisk, hvor hvert kritisk blødningstik gendanner 5 energi.',
   'entities.abilities.reaping_command.description':
     'Bruger 2 Sjælesplinter for at befale alle udøde tjenere at slå til i samlet flok. Gravvogtere håner og forbereder sig, Krigere fastholder, Knoglemagikere blotter magiske forsvar, og Gravvingen flænger alle ramte fjender.',
   'entities.abilities.reaping_command.name': 'Høstende befaling',

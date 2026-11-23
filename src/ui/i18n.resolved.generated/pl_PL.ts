@@ -4843,7 +4843,7 @@ export const pl_PL: EnTranslations = {
       "coldsightRead": "Twój następny Długi naciąg zadaje o {longDrawPct}% więcej obrażeń albo twój następny Plugawy strzał zadaje o {fellShotPct}% więcej",
       "duskEconomy": "Umiejętności kosztują o {pct}% mniej energii",
       "moontide": "Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają",
-      "oldBlood": "Stara Krew: stopień {stacks} z {max}. W postaci kota każde tiknięcie twoich krwawień dodaje 1, najwyżej raz na 2 sek.; w Postaci Bruina każde trafienie Zamaszystymi pazurami i Kruszeniem kości dodaje 1. Przy {max}: Krwawe ukąszenie zmienia się w Czerwone Żniwa w postaci kota, a Kruszenie kości w Łamacz szpiku w Postaci Bruina",
+      "oldBlood": "Stara Krew: stopień {stacks} z {max}. W postaci kota każde tiknięcie twoich krwawień dodaje 1, najwyżej raz na 3 sek., a każde trafienie Skradającym ciosem i Wypadem dodaje 1; w Postaci Bruina każde trafienie Zamaszystymi pazurami i Kruszeniem kości dodaje 1. Przy {max}: Krwawe ukąszenie zmienia się w Czerwone Żniwa w postaci kota, a Kruszenie kości w Łamacz szpiku w Postaci Bruina",
       "verdance": "Zieleń {stacks}/{max}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu lub Dzikiego ukojenia dodaje 1, a każdy punkt skraca czas rzucania Dzikiego ukojenia. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit",
       "freeExecute": "Twoja następna dostępna zdolność dobijająca nic nie kosztuje",
       "resourceSap": "Przywraca {value} twojego obecnego zasobu co {interval} s",
@@ -19238,7 +19238,7 @@ export const pl_PL: EnTranslations = {
       "rake": {
         "name": "Zdzieranie",
         "description": "Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj {overTime} obrażeń od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci kota.",
-        "specNote_feral": "W postaci kota tiknięcia twoich krwawień dodają Starą Krew (maks. 3, najwyżej 1 co 2 sek.), a twoje krwawienia mogą trafiać krytycznie; każde krytyczne krwawienie przywraca 3 energii."
+        "specNote_feral": "W postaci kota tiknięcia twoich krwawień dodają Starą Krew (maks. 3, najwyżej 1 co 3 sek.), a twoje krwawienia mogą trafiać krytycznie; każde krytyczne krwawienie przywraca 5 energii."
       },
       "revive_pet": {
         "name": "Opatrzenie",

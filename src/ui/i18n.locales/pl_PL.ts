@@ -16374,7 +16374,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają',
   'hudChrome.auraEffect.oldBlood':
-    'Stara Krew: stopień {stacks} z {max}. W postaci kota każde tiknięcie twoich krwawień dodaje 1, najwyżej raz na 2 sek.; w Postaci Bruina każde trafienie Zamaszystymi pazurami i Kruszeniem kości dodaje 1. Przy {max}: Krwawe ukąszenie zmienia się w Czerwone Żniwa w postaci kota, a Kruszenie kości w Łamacz szpiku w Postaci Bruina',
+    'Stara Krew: stopień {stacks} z {max}. W postaci kota każde tiknięcie twoich krwawień dodaje 1, najwyżej raz na 3 sek., a każde trafienie Skradającym ciosem i Wypadem dodaje 1; w Postaci Bruina każde trafienie Zamaszystymi pazurami i Kruszeniem kości dodaje 1. Przy {max}: Krwawe ukąszenie zmienia się w Czerwone Żniwa w postaci kota, a Kruszenie kości w Łamacz szpiku w Postaci Bruina',
   'hudChrome.auraEffect.verdance':
     'Zieleń {stacks}/{max}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu lub Dzikiego ukojenia dodaje 1, a każdy punkt skraca czas rzucania Dzikiego ukojenia. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit',
   'hudChrome.continentMap.levels': 'Poziomy od {min} do {max}',
@@ -16671,7 +16671,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj {overTime} obrażeń od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
   'entities.abilities.rake.specNote_feral':
-    'W postaci kota tiknięcia twoich krwawień dodają Starą Krew (maks. 3, najwyżej 1 co 2 sek.), a twoje krwawienia mogą trafiać krytycznie; każde krytyczne krwawienie przywraca 3 energii.',
+    'W postaci kota tiknięcia twoich krwawień dodają Starą Krew (maks. 3, najwyżej 1 co 3 sek.), a twoje krwawienia mogą trafiać krytycznie; każde krytyczne krwawienie przywraca 5 energii.',
   'entities.abilities.reaping_command.description':
     'Zużywa 2 Odłamki Duszy, rozkazując wszystkim nieumarłym sługom uderzyć jednocześnie. Grobowi Strażnicy prowokują i przygotowują się na cios, Wojownicy przygważdżają, Kościani Magowie obnażają magiczne osłony, a Grobowe Skrzydło rozrywa wszystkich trafionych wrogów.',
   'entities.abilities.reaping_command.name': 'Rozkaz Żniw',

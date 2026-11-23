@@ -6084,7 +6084,7 @@ export const hudChromeStrings = {
     moontide:
       'Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3',
     oldBlood:
-      'Old Blood {stacks}/{max}. In Cat Form your bleed ticks add 1, at most once every 2 sec; in Bruin Form landed Sweeping Claws and Bonecrush hits each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
+      'Old Blood {stacks}/{max}. In Cat Form your bleed ticks add 1, at most once every 3 sec, and landed Slinkstrike and Lunge hits each add 1; in Bruin Form landed Sweeping Claws and Bonecrush hits each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:
       "Verdance {stacks}/{max}. Each Sporemending, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
     freeExecute: 'Your next eligible execute ability costs nothing',

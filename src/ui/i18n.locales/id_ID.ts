@@ -16262,7 +16262,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya',
   'hudChrome.auraEffect.oldBlood':
-    'Darah Tua: tahap {stacks} dari {max}. Dalam Wujud Kucing, setiap detak pendarahanmu menambah 1, paling banyak sekali setiap 2 detik; dalam Wujud Bruin, setiap serangan Cakar Menyapu dan Remuk Tulang yang kena menambah 1. Pada {max}: Gigitan Berdarah menjadi Panen Merah dalam Wujud Kucing, Remuk Tulang menjadi Pematah Sumsum dalam Wujud Bruin',
+    'Darah Tua: tahap {stacks} dari {max}. Dalam Wujud Kucing, setiap detak pendarahanmu menambah 1, paling banyak sekali setiap 3 detik, dan setiap serangan Terkaman Senyap dan Terkaman yang kena menambah 1; dalam Wujud Bruin, setiap serangan Cakar Menyapu dan Remuk Tulang yang kena menambah 1. Pada {max}: Gigitan Berdarah menjadi Panen Merah dalam Wujud Kucing, Remuk Tulang menjadi Pematah Sumsum dalam Wujud Bruin',
   'hudChrome.auraEffect.verdance':
     'Kehijauan: tahap {stacks} dari {max}. Setiap Pemulihan Spora, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya',
   'hudChrome.continentMap.levels': 'Level {min} hingga {max}',
@@ -16745,7 +16745,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan {overTime} kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Kucing.',
   'entities.abilities.rake.specNote_feral':
-    'Dalam Wujud Kucing, setiap detak pendarahanmu menambah Darah Tua (maks 3, paling banyak 1 setiap 2 detik), dan pendarahanmu dapat menjadi kritis, dengan setiap kritis pendarahan memulihkan 3 energi.',
+    'Dalam Wujud Kucing, setiap detak pendarahanmu menambah Darah Tua (maks 3, paling banyak 1 setiap 3 detik), dan pendarahanmu dapat menjadi kritis, dengan setiap kritis pendarahan memulihkan 5 energi.',
   'entities.abilities.reaping_command.description':
     'Menghabiskan 2 Serpihan Jiwa untuk memerintahkan setiap abdi mayat hidup menyerang secara serentak. Penjaga Kubur memancing perhatian dan bersiaga, Warrior menahan, Penyihir Tulang membuka pertahanan sihir, dan Sayap Kubur merobek semua musuh yang terkena.',
   'entities.abilities.reaping_command.name': 'Perintah Penuaian',

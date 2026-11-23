@@ -4843,7 +4843,7 @@ export const de_DE: EnTranslations = {
       "coldsightRead": "Euer nächster Langer Zug verursacht {longDrawPct}% mehr Schaden, oder Euer nächster Unheilsschuss verursacht {fellShotPct}% mehr",
       "duskEconomy": "Fähigkeiten kosten {pct}% weniger Energie",
       "moontide": "Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr",
-      "oldBlood": "Altes Blut: Stufe {stacks} von {max}. In Katzengestalt fügt jeder Tick Eurer Blutungen 1 hinzu, höchstens einmal alle 2 Sek.; in Bruin-Gestalt fügt jeder gelandete Treffer von Fegende Klauen und Knochenmalmer 1 hinzu. Bei {max}: Blutbiss wird in Katzengestalt zu Rote Ernte, Knochenmalmer wird in Bruin-Gestalt zu Markbrecher",
+      "oldBlood": "Altes Blut: Stufe {stacks} von {max}. In Katzengestalt fügt jeder Tick Eurer Blutungen 1 hinzu, höchstens einmal alle 3 Sek., und jeder gelandete Treffer von Schleichschlag und Ansprung fügt 1 hinzu; in Bruin-Gestalt fügt jeder gelandete Treffer von Fegende Klauen und Knochenmalmer 1 hinzu. Bei {max}: Blutbiss wird in Katzengestalt zu Rote Ernte, Knochenmalmer wird in Bruin-Gestalt zu Markbrecher",
       "verdance": "Grünkraft: Stufe {stacks} von {max}. Jede Sporenheilung, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.",
       "freeExecute": "Eure nächste berechtigte Hinrichtungsfähigkeit kostet nichts",
       "resourceSap": "Stellt alle {interval} Sek. {value} Eurer aktuellen Ressource wieder her",
@@ -19238,7 +19238,7 @@ export const de_DE: EnTranslations = {
       "rake": {
         "name": "Schinden",
         "description": "Schindet den Gegner für Waffenschaden plus {damage} und verursacht {overTime} Blutungsschaden über 18 Sek. Gewährt 1 Combopunkt. Nur in Katzengestalt.",
-        "specNote_feral": "In Katzengestalt fügen Eure Blutungsticks Altes Blut hinzu (max. 3, höchstens 1 alle 2 Sek.), und Eure Blutungen können kritisch treffen, wobei jeder kritische Blutungstreffer 3 Energie wiederherstellt."
+        "specNote_feral": "In Katzengestalt fügen Eure Blutungsticks Altes Blut hinzu (max. 3, höchstens 1 alle 3 Sek.), und Eure Blutungen können kritisch treffen, wobei jeder kritische Blutungstreffer 5 Energie wiederherstellt."
       },
       "revive_pet": {
         "name": "Zusammenflicken",

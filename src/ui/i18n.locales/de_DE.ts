@@ -15312,7 +15312,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr',
   'hudChrome.auraEffect.oldBlood':
-    'Altes Blut: Stufe {stacks} von {max}. In Katzengestalt fügt jeder Tick Eurer Blutungen 1 hinzu, höchstens einmal alle 2 Sek.; in Bruin-Gestalt fügt jeder gelandete Treffer von Fegende Klauen und Knochenmalmer 1 hinzu. Bei {max}: Blutbiss wird in Katzengestalt zu Rote Ernte, Knochenmalmer wird in Bruin-Gestalt zu Markbrecher',
+    'Altes Blut: Stufe {stacks} von {max}. In Katzengestalt fügt jeder Tick Eurer Blutungen 1 hinzu, höchstens einmal alle 3 Sek., und jeder gelandete Treffer von Schleichschlag und Ansprung fügt 1 hinzu; in Bruin-Gestalt fügt jeder gelandete Treffer von Fegende Klauen und Knochenmalmer 1 hinzu. Bei {max}: Blutbiss wird in Katzengestalt zu Rote Ernte, Knochenmalmer wird in Bruin-Gestalt zu Markbrecher',
   'hudChrome.auraEffect.verdance':
     'Grünkraft: Stufe {stacks} von {max}. Jede Sporenheilung, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.',
   'abilityUi.cast.rift_arcane_execution': 'Leerenriss',
@@ -17027,7 +17027,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Schindet den Gegner für Waffenschaden plus {damage} und verursacht {overTime} Blutungsschaden über 18 Sek. Gewährt 1 Combopunkt. Nur in Katzengestalt.',
   'entities.abilities.rake.specNote_feral':
-    'In Katzengestalt fügen Eure Blutungsticks Altes Blut hinzu (max. 3, höchstens 1 alle 2 Sek.), und Eure Blutungen können kritisch treffen, wobei jeder kritische Blutungstreffer 3 Energie wiederherstellt.',
+    'In Katzengestalt fügen Eure Blutungsticks Altes Blut hinzu (max. 3, höchstens 1 alle 3 Sek.), und Eure Blutungen können kritisch treffen, wobei jeder kritische Blutungstreffer 5 Energie wiederherstellt.',
   'entities.abilities.reaping_command.description':
     'Verbraucht 2 Seelenfragmente, um jedem untoten Diener zu befehlen, gemeinsam zuzuschlagen. Grabwächter verspotten und wappnen sich, Skelettkrieger fesseln, Knochenmagier legen magische Abwehr offen, und die Grabschwinge zerreißt alle getroffenen Gegner.',
   'entities.abilities.reaping_command.name': 'Erntebefehl',

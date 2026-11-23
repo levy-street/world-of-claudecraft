@@ -4843,7 +4843,7 @@ export const cs_CZ: EnTranslations = {
       "coldsightRead": "Tvůj příští Dlouhý nátah způsobí o {longDrawPct}% vyšší poškození, nebo tvůj příští Padlý výstřel o {fellShotPct}% vyšší",
       "duskEconomy": "Schopnosti stojí o {pct}% méně energie",
       "moontide": "Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá",
-      "oldBlood": "Stará krev: stupeň {stacks} z {max}. V kočičí podobě přidá každý tik tvého krvácení 1, nejvýše jednou za 2 s; v Medvědí podobě přidá každý zásah Rozmáchlými drápy a Drcením kostí 1. Při {max}: Krvavý skus se v kočičí podobě změní na Rudou sklizeň a Drcení kostí se v Medvědí podobě změní na Lámání morku",
+      "oldBlood": "Stará krev: stupeň {stacks} z {max}. V kočičí podobě přidá každý tik tvého krvácení 1, nejvýše jednou za 3 s, a každý zásah Plíživým úderem a Výpadem přidá 1; v Medvědí podobě přidá každý zásah Rozmáchlými drápy a Drcením kostí 1. Při {max}: Krvavý skus se v kočičí podobě změní na Rudou sklizeň a Drcení kostí se v Medvědí podobě změní na Lámání morku",
       "verdance": "Zeleň {stacks}/{max}. Každé seslání Divokého květu, Druhého květu nebo Divokého zhojení přidá 1 a každá Zeleň zkrátí seslání Divokého zhojení. Při {max} se Rychlé zhojení mění v Překvět",
       "freeExecute": "Tvá příští způsobilá dorážecí schopnost nic nestojí",
       "resourceSap": "Obnoví {value} tvého aktuálního zdroje každých {interval} s",
@@ -19238,7 +19238,7 @@ export const cs_CZ: EnTranslations = {
       "rake": {
         "name": "Stažení z kůže",
         "description": "Rozpárej nepřítele za poškození zbraně plus {damage} a způsob {overTime} poškození krvácením během 18 s. Udělí 1 combo bod. Pouze v kočičí podobě.",
-        "specNote_feral": "V kočičí podobě přidávají tiky tvého krvácení Starou krev (max 3, nejvýše 1 za 2 s) a tvá krvácení mohou kriticky zasáhnout, přičemž každý kritický tik krvácení obnoví 3 energie."
+        "specNote_feral": "V kočičí podobě přidávají tiky tvého krvácení Starou krev (max 3, nejvýše 1 za 3 s) a tvá krvácení mohou kriticky zasáhnout, přičemž každý kritický tik krvácení obnoví 5 energie."
       },
       "revive_pet": {
         "name": "Ošetření",

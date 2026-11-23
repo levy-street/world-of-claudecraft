@@ -4843,7 +4843,7 @@ export const pt_BR: EnTranslations = {
       "coldsightRead": "Seu próximo Tiro longo causa {longDrawPct}% a mais de dano, ou seu próximo Tiro funesto causa {fellShotPct}% a mais",
       "duskEconomy": "As habilidades custam {pct}% menos energia",
       "moontide": "Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta",
-      "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Na Forma de Gato, cada tique dos seus sangramentos adiciona 1, no máximo uma vez a cada 2 s; na Forma de Bruin, cada acerto de Garras Varredoras e Esmaga-Ossos adiciona 1. Com {max}: Mordida Sanguinária se torna Colheita Vermelha na Forma de Gato, Esmaga-Ossos se torna Quebra-Medula na Forma de Bruin",
+      "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Na Forma de Gato, cada tique dos seus sangramentos adiciona 1, no máximo uma vez a cada 3 s, e cada acerto de Bote Furtivo e Bote adiciona 1; na Forma de Bruin, cada acerto de Garras Varredoras e Esmaga-Ossos adiciona 1. Com {max}: Mordida Sanguinária se torna Colheita Vermelha na Forma de Gato, Esmaga-Ossos se torna Quebra-Medula na Forma de Bruin",
       "verdance": "Verdor {stacks}/{max}. Cada Cura de Esporos, Segundo Florescer ou Cura Selvagem que você lançar adiciona 1, e cada ponto encurta o lançamento de Cura Selvagem. Com {max}, Recuperação Rápida vira Superflorescência",
       "freeExecute": "Sua próxima habilidade de execução elegível não custa nada",
       "resourceSap": "Restaura {value} do seu recurso atual a cada {interval} s",
@@ -19238,7 +19238,7 @@ export const pt_BR: EnTranslations = {
       "rake": {
         "name": "Esfolar",
         "description": "Esfola o inimigo por dano da arma mais {damage} e causa {overTime} de dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.",
-        "specNote_feral": "Na Forma de Gato, os tiques dos seus sangramentos adicionam Sangue Antigo (máx. 3, no máximo 1 a cada 2 s), e seus sangramentos podem ser críticos, com cada crítico de sangramento restaurando 3 de energia."
+        "specNote_feral": "Na Forma de Gato, os tiques dos seus sangramentos adicionam Sangue Antigo (máx. 3, no máximo 1 a cada 3 s), e seus sangramentos podem ser críticos, com cada crítico de sangramento restaurando 5 de energia."
       },
       "revive_pet": {
         "name": "Remendar",

@@ -4843,7 +4843,7 @@ export const da_DK: EnTranslations = {
       "coldsightRead": "Dit næste Langtræk giver {longDrawPct}% mere skade, eller dit næste Skæbneskud giver {fellShotPct}% mere",
       "duskEconomy": "Evner koster {pct}% mindre energi",
       "moontide": "Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den",
-      "oldBlood": "Gammelt Blod: trin {stacks} af {max}. I Katteform tilføjer hvert tik fra dine blødninger 1, højst én gang hvert 2. sek.; i Bruin-form tilføjer hvert slag med Fejende Kløer og Knogleknus, der rammer, 1. Ved {max}: Blodbid bliver til Rød Høst i Katteform, og Knogleknus bliver til Marvbrækker i Bruin-form",
+      "oldBlood": "Gammelt Blod: trin {stacks} af {max}. I Katteform tilføjer hvert tik fra dine blødninger 1, højst én gang hvert 3. sek., og hvert slag med Luskeslag og Spring, der rammer, tilføjer 1; i Bruin-form tilføjer hvert slag med Fejende Kløer og Knogleknus, der rammer, 1. Ved {max}: Blodbid bliver til Rød Høst i Katteform, og Knogleknus bliver til Marvbrækker i Bruin-form",
       "verdance": "Grønske {stacks}/{max}. Hver Sporeheling, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring",
       "freeExecute": "Din næste kvalificerede henrettelsesevne koster ingenting",
       "resourceSap": "Genopretter {value} af din nuværende ressource hvert {interval}. sek",
@@ -19238,7 +19238,7 @@ export const da_DK: EnTranslations = {
       "rake": {
         "name": "Flæns",
         "description": "Flæns fjenden for våbenskade plus {damage} og giv {overTime} blødningsskade over 18 sek. Giver 1 combopoint. Kun i Katteform.",
-        "specNote_feral": "I Katteform tilføjer dine blødningers tik Gammelt Blod (maks. 3, højst 1 hvert 2. sek.), og dine blødninger kan ramme kritisk, hvor hvert kritisk blødningstik gendanner 3 energi."
+        "specNote_feral": "I Katteform tilføjer dine blødningers tik Gammelt Blod (maks. 3, højst 1 hvert 3. sek.), og dine blødninger kan ramme kritisk, hvor hvert kritisk blødningstik gendanner 5 energi."
       },
       "revive_pet": {
         "name": "Lappe sammen",

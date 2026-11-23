@@ -16180,7 +16180,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá',
   'hudChrome.auraEffect.oldBlood':
-    'Stará krev: stupeň {stacks} z {max}. V kočičí podobě přidá každý tik tvého krvácení 1, nejvýše jednou za 2 s; v Medvědí podobě přidá každý zásah Rozmáchlými drápy a Drcením kostí 1. Při {max}: Krvavý skus se v kočičí podobě změní na Rudou sklizeň a Drcení kostí se v Medvědí podobě změní na Lámání morku',
+    'Stará krev: stupeň {stacks} z {max}. V kočičí podobě přidá každý tik tvého krvácení 1, nejvýše jednou za 3 s, a každý zásah Plíživým úderem a Výpadem přidá 1; v Medvědí podobě přidá každý zásah Rozmáchlými drápy a Drcením kostí 1. Při {max}: Krvavý skus se v kočičí podobě změní na Rudou sklizeň a Drcení kostí se v Medvědí podobě změní na Lámání morku',
   'hudChrome.auraEffect.verdance':
     'Zeleň {stacks}/{max}. Každé seslání Divokého květu, Druhého květu nebo Divokého zhojení přidá 1 a každá Zeleň zkrátí seslání Divokého zhojení. Při {max} se Rychlé zhojení mění v Překvět',
   'hudChrome.continentMap.levels': 'Úrovně {min} až {max}',
@@ -16475,7 +16475,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Rozpárej nepřítele za poškození zbraně plus {damage} a způsob {overTime} poškození krvácením během 18 s. Udělí 1 combo bod. Pouze v kočičí podobě.',
   'entities.abilities.rake.specNote_feral':
-    'V kočičí podobě přidávají tiky tvého krvácení Starou krev (max 3, nejvýše 1 za 2 s) a tvá krvácení mohou kriticky zasáhnout, přičemž každý kritický tik krvácení obnoví 3 energie.',
+    'V kočičí podobě přidávají tiky tvého krvácení Starou krev (max 3, nejvýše 1 za 3 s) a tvá krvácení mohou kriticky zasáhnout, přičemž každý kritický tik krvácení obnoví 5 energie.',
   'entities.abilities.reaping_command.description':
     'Spotřebuje 2 Úlomky duše a přikáže všem nemrtvým služebníkům udeřit společně. Hrobové stráže provokují a připraví se, Bojovníci připoutají, Kostění mágové odhalí magické obrany a Hrobové křídlo roztrhá všechny zasažené nepřátele.',
   'entities.abilities.reaping_command.name': 'Příkaz sklizně',

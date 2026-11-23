@@ -18352,7 +18352,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '消耗1枚靈魂碎片，將一名永久骷髏戰士加入你的2槽統御。只能有一名為你效命。它每6秒對附近敵人造成45%的順劈傷害，收割號令會使目標緩速40%，持續4秒。',
   'entities.abilities.raise_skeletal_warrior.name': '喚醒骷髏戰士',
   'entities.abilities.rake.specNote_feral':
-    '貓形態下，你的流血效果每次跳動都會累積古血（最多 3 層，每 2 秒最多 1 層），且你的流血效果可以造成致命一擊，每次流血致命一擊恢復 3 點能量。',
+    '貓形態下，你的流血效果每次跳動都會累積古血（最多 3 層，每 3 秒最多 1 層），且你的流血效果可以造成致命一擊，每次流血致命一擊恢復 5 點能量。',
   'entities.abilities.reaping_command.description':
     '消耗2枚靈魂碎片，命令所有亡靈僕從同時攻擊。墓衛嘲諷並防禦，骷髏戰士牽制目標，骸骨法師暴露魔法防禦，墓翼撕裂所有被擊中的敵人。',
   'entities.abilities.reaping_command.name': '收割號令',
@@ -19433,7 +19433,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '儲存你和不死僕從造成傷害的 {storedPct}%，並額外儲存靈魂長槍傷害的 {lancePct}%；再次施放引爆。目標死亡時在 {radius} 碼內爆炸並產生 1 個靈魂碎片',
   'hudChrome.auraEffect.nextAttackCrit': '下一次攻擊必定造成致命一擊',
   'hudChrome.auraEffect.oldBlood':
-    '古血：第{stacks}/{max}層。貓形態下，你的流血效果每次跳動累積1層，每2秒最多1次；巨熊形態下，橫掃利爪與碎骨擊每次命中累積1層。達到{max}層時：貓形態下血噬變為血收，巨熊形態下碎骨擊變為碎髓',
+    '古血：第{stacks}/{max}層。貓形態下，你的流血效果每次跳動累積1層，每3秒最多1次，匿蹤突襲與撲擊每次命中也累積1層；巨熊形態下，橫掃利爪與碎骨擊每次命中累積1層。達到{max}層時：貓形態下血噬變為血收，巨熊形態下碎骨擊變為碎髓',
   'hudChrome.auraEffect.overpowerCharge': '{stacks} 層充能：下一次致殘打擊傷害提高 {pct}%',
   'hudChrome.auraEffect.perfectMoment': '乙太飛彈不會消耗秘法充能',
   'hudChrome.auraEffect.petDamage': '寵物造成的傷害提高 {pct}%',

@@ -6853,7 +6853,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Flense the enemy for weapon damage plus $d and cause $o bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
     specNotes: {
       feral:
-        'In Cat Form your bleed ticks add Old Blood (max 3, at most 1 every 2 sec), and your bleeds can critically strike, each bleed crit restoring 3 energy.',
+        'In Cat Form your bleed ticks add Old Blood (max 3, at most 1 every 3 sec), and your bleeds can critically strike, each bleed crit restoring 5 energy.',
     },
   },
   claw: {

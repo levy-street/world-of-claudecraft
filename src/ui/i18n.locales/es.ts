@@ -16719,7 +16719,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta',
   'hudChrome.auraEffect.oldBlood':
-    'Sangre Antigua: fase {stacks} de {max}. En Forma felina, cada tic de tus sangrados añade 1, como mucho una vez cada 2 s; en Forma de Bruin, cada golpe conectado de Zarpas Barredoras y Rompehuesos añade 1. Con {max}: Mordisco Sangriento se convierte en Cosecha Roja en Forma felina y Rompehuesos se convierte en Quiebramédula en Forma de Bruin',
+    'Sangre Antigua: fase {stacks} de {max}. En Forma felina, cada tic de tus sangrados añade 1, como mucho una vez cada 3 s, y cada golpe conectado de Golpe Sigiloso y Embestida felina añade 1; en Forma de Bruin, cada golpe conectado de Zarpas Barredoras y Rompehuesos añade 1. Con {max}: Mordisco Sangriento se convierte en Cosecha Roja en Forma felina y Rompehuesos se convierte en Quiebramédula en Forma de Bruin',
   'hudChrome.auraEffect.verdance':
     'Verdor {stacks}/{max}. Cada Remiendo de Esporas, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración',
   'hudChrome.riftTracker.title': 'Brecha',
@@ -16869,7 +16869,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Desuella al enemigo por daño de arma más {damage} y causa {overTime} de daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma felina.',
   'entities.abilities.rake.specNote_feral':
-    'En Forma felina, los tics de tus sangrados añaden Sangre Antigua (máx. 3, como mucho 1 cada 2 s), y tus sangrados pueden ser críticos; cada crítico de sangrado restaura 3 de energía.',
+    'En Forma felina, los tics de tus sangrados añaden Sangre Antigua (máx. 3, como mucho 1 cada 3 s), y tus sangrados pueden ser críticos; cada crítico de sangrado restaura 5 de energía.',
   'entities.abilities.regrowth.description':
     'Sana a un objetivo amistoso por {damage} y una cantidad adicional a lo largo de 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.',
   'entities.abilities.regrowth.specNote_restoration':

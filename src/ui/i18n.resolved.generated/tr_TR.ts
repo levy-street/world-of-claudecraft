@@ -4843,7 +4843,7 @@ export const tr_TR: EnTranslations = {
       "coldsightRead": "Sonraki Uzun Çekişin %{longDrawPct} daha fazla hasar verir veya sonraki Düşüş Atışın %{fellShotPct} daha fazla verir",
       "duskEconomy": "Yetenekler {pct}% daha az enerji harcar",
       "moontide": "Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar",
-      "oldBlood": "Kadim Kan: aşama {stacks} / {max}. Kedi Formunda kanamalarının her tiki 1 ekler, 2 saniyede en fazla bir kez; Bruin Formunda isabet eden her Süpüren Pençeler ve Kemik Kıran vuruşu 1 ekler. {max} olduğunda: Kedi Formunda Kanlı Isırık Kızıl Hasata, Bruin Formunda Kemik Kıran İlik Kırana dönüşür",
+      "oldBlood": "Kadim Kan: aşama {stacks} / {max}. Kedi Formunda kanamalarının her tiki 1 ekler, 3 saniyede en fazla bir kez, ve isabet eden her Sinsi Darbe ve Atılış vuruşu 1 ekler; Bruin Formunda isabet eden her Süpüren Pençeler ve Kemik Kıran vuruşu 1 ekler. {max} olduğunda: Kedi Formunda Kanlı Isırık Kızıl Hasata, Bruin Formunda Kemik Kıran İlik Kırana dönüşür",
       "verdance": "Yeşillik: aşama {stacks} / {max}. Kullandığın her Spor Şifası, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
       "freeExecute": "Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz",
       "resourceSap": "Her {interval} sn'de mevcut kaynağının {value} kadarını geri kazandırır",
@@ -19238,7 +19238,7 @@ export const tr_TR: EnTranslations = {
       "rake": {
         "name": "Deri Yüzme",
         "description": "Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca {overTime} kanama hasarı verir. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.",
-        "specNote_feral": "Kedi Formunda kanamalarının her tiki Kadim Kan ekler (en fazla 3, 2 saniyede en fazla 1) ve kanamaların kritik vurabilir; her kanama kritiği 3 enerji geri kazandırır."
+        "specNote_feral": "Kedi Formunda kanamalarının her tiki Kadim Kan ekler (en fazla 3, 3 saniyede en fazla 1) ve kanamaların kritik vurabilir; her kanama kritiği 5 enerji geri kazandırır."
       },
       "revive_pet": {
         "name": "Yarasını Sar",

@@ -17474,7 +17474,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '영혼 조각 1개를 소모해 영구적인 해골 전사를 2칸 지배에 추가합니다. 하나만 섬길 수 있습니다. 6초마다 주변 적에게 45% 휩쓸기 피해를 주며, 수확 명령 시 대상을 4초 동안 40% 느려지게 합니다.',
   'entities.abilities.raise_skeletal_warrior.name': '해골 전사 일으키기',
   'entities.abilities.rake.specNote_feral':
-    '표범 변신 상태에서 자신의 출혈 효과가 피해를 줄 때마다 오랜 피가 쌓입니다(최대 3단계, 2초마다 최대 1단계). 또한 출혈 효과가 치명타로 적중할 수 있으며, 출혈 치명타마다 기력을 3 회복합니다.',
+    '표범 변신 상태에서 자신의 출혈 효과가 피해를 줄 때마다 오랜 피가 쌓입니다(최대 3단계, 3초마다 최대 1단계). 또한 출혈 효과가 치명타로 적중할 수 있으며, 출혈 치명타마다 기력을 5 회복합니다.',
   'entities.abilities.reaping_command.description':
     '영혼 조각 2개를 소모해 모든 언데드 하수인이 일제히 공격하게 합니다. 무덤수호병은 도발하고 방어하며, 해골 전사는 발을 묶고, 뼈 마법사는 마법 방어를 노출하며, 무덤날개는 적중한 모든 적을 찢습니다.',
   'entities.abilities.reaping_command.name': '수확의 명령',
@@ -18626,7 +18626,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '당신과 언데드가 준 피해의 {storedPct}%와 영혼 창 피해의 추가 {lancePct}%를 저장합니다. 다시 사용하면 폭발합니다. 죽으면 {radius}미터 내에서 폭발하고 영혼 조각 1개를 생성합니다',
   'hudChrome.auraEffect.nextAttackCrit': '다음 공격이 반드시 치명타로 적중합니다',
   'hudChrome.auraEffect.oldBlood':
-    '오랜 피: {stacks}/{max}단계. 표범 변신 상태에서는 자신의 출혈 효과가 피해를 줄 때마다 1단계가 쌓이며(2초마다 최대 1회), 큰곰 변신 상태에서는 휩쓰는 발톱과 뼈 분쇄가 적중할 때마다 1단계가 쌓입니다. {max}단계에서 표범 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다',
+    '오랜 피: {stacks}/{max}단계. 표범 변신 상태에서는 자신의 출혈 효과가 피해를 줄 때마다 1단계가 쌓이며(3초마다 최대 1회), 살금 기습과 도약 습격이 적중할 때마다 1단계가 쌓입니다. 큰곰 변신 상태에서는 휩쓰는 발톱과 뼈 분쇄가 적중할 때마다 1단계가 쌓입니다. {max}단계에서 표범 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다',
   'hudChrome.auraEffect.overpowerCharge':
     '충전 {stacks}중첩: 다음 치명타 일격의 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.perfectMoment': '에테르 화살이 비전 충전을 소모하지 않습니다',

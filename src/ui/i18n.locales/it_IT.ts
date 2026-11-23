@@ -16603,7 +16603,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono',
   'hudChrome.auraEffect.oldBlood':
-    'Sangue Antico: stadio {stacks} di {max}. In Forma del Gatto ogni tick dei tuoi sanguinamenti ne aggiunge 1, al massimo una volta ogni 2 sec; in Forma di Bruin ogni colpo a segno di Artigli Falcianti e Frantumaossa ne aggiunge 1. A {max}: Morso Cruento diventa Mietitura Rossa in Forma del Gatto, Frantumaossa diventa Spezzamidollo in Forma di Bruin',
+    'Sangue Antico: stadio {stacks} di {max}. In Forma del Gatto ogni tick dei tuoi sanguinamenti ne aggiunge 1, al massimo una volta ogni 3 sec, e ogni colpo a segno di Colpo Strisciante e Balzo ne aggiunge 1; in Forma di Bruin ogni colpo a segno di Artigli Falcianti e Frantumaossa ne aggiunge 1. A {max}: Morso Cruento diventa Mietitura Rossa in Forma del Gatto, Frantumaossa diventa Spezzamidollo in Forma di Bruin',
   'abilityUi.cast.sundering': 'Frantumare',
   'hud.core.mapMarkerLabels.farmPatch': 'Aiuole',
   'hud.logs.keptLockedMany': 'Conservate {count} copie bloccate.',
@@ -17469,7 +17469,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     "Scarnifica il nemico per danni dell'arma più {damage} e causa {overTime} danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
   'entities.abilities.rake.specNote_feral':
-    'In Forma del Gatto i tick dei tuoi sanguinamenti aggiungono Sangue Antico (massimo 3, al massimo 1 ogni 2 sec) e i tuoi sanguinamenti possono essere critici: ogni critico da sanguinamento ripristina 3 energia.',
+    'In Forma del Gatto i tick dei tuoi sanguinamenti aggiungono Sangue Antico (massimo 3, al massimo 1 ogni 3 sec) e i tuoi sanguinamenti possono essere critici: ogni critico da sanguinamento ripristina 5 energia.',
   'entities.abilities.reaping_command.description':
     "Spende 2 Frammenti d'Anima per comandare ogni servitore non morto a colpire all'unisono. I Guardiani Sepolcrali provocano e si preparano, i Guerrieri bloccano, i Maghi d'Ossa espongono le difese magiche, e l'Ala Sepolcrale lacera tutti i nemici colpiti.",
   'entities.abilities.reaping_command.name': 'Comando della Mietitura',
