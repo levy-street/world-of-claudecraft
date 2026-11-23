@@ -1415,7 +1415,8 @@ describe('Paladin kit detail tiers: heals and lances', () => {
     expect(n(heal.minimal, 9)).toBe(4);
     expect(n(heal.full, 5)).toBe(1);
     expect(n(heal.light, 5)).toBe(0);
-    expect(n(heal.light, 10)).toBe(1);
-    expect(n(heal.minimal, 10)).toBe(0);
+    // The sun bursting into its pluses is its core beat: drawn on every tier,
+    // so a lighter tier's sun never just vanishes.
+    for (const tier of ['full', 'light', 'minimal'] as const) expect(n(heal[tier], 10)).toBe(1);
   });
 });

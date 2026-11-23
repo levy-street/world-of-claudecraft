@@ -16,11 +16,11 @@ import {
   paladinDetailScale,
 } from './paladin_vfx_detail_core';
 
-// Detail: core = the ray from the hand, the sun, the shaft of sunlight, the
-// pluses it bursts into on an ally, Ascension's reach ring and the glint on
-// each one it reaches; secondary = the haze about the shaft, the rings sliding
-// down it, the shockwave, the sunburst and the splash thrown up where it lands,
-// the sun's burst ring and the glow where the pluses land; accents = the
+// Detail: core = the ray from the hand, the sun and its burst, the shaft of
+// sunlight, the pluses it bursts into on an ally, Ascension's reach ring and
+// the glint on each one it reaches; secondary = the haze about the shaft, the
+// rings sliding down it, the shockwave, the sunburst and the splash thrown up
+// where it lands, and the glow where the pluses land; accents = the
 // gathering focus ring, the molten cracks and the flares (embers and pluses
 // scale with count, the shaft's fade tail with linger).
 
@@ -657,8 +657,9 @@ export class SolarInvocation {
     pool.time = since;
     if (scale.accents)
       pool.billboard(sunX, sunY, sunZ, 1.5, KIT_IVORY, Math.exp(-since * 8) * 1.4, SHAPE.flare);
-    if (scale.secondary)
-      pool.billboard(sunX, sunY, sunZ, 1.2, KIT_WARM, 1 - ramp(since, 0.2, 0.45), SHAPE.burst);
+    // The sun breaking into its pluses is the sun's own last beat: core on
+    // every tier, or a lighter tier's sun would simply vanish at the burst.
+    pool.billboard(sunX, sunY, sunZ, 1.2, KIT_WARM, 1 - ramp(since, 0.2, 0.45), SHAPE.burst);
     let landed = -1;
     const motion = reduced ? 0.4 : 1;
     // Fewer pluses on the lighter tiers, still spread all the way round.
