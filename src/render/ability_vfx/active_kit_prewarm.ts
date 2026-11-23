@@ -1,4 +1,5 @@
 import type * as THREE from 'three';
+import { bitmapSheetReleased, restoreBitmapSheet } from '../assets/bitmap_sheet_release';
 import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../background_gpu_queue';
 import { registerContextRestoreReset } from '../context_restore_registry';
 import type { PrewarmManifestEntry } from '../prewarm_entry';
@@ -168,13 +169,24 @@ const PALADIN_BORROWED_SHEETS = new Set([
   'active-warrior-rock',
 ]);
 
-function sheetUnit(
-  state: Preparation,
-  [id, name, sheet]: (typeof KIT_SHEETS)[number],
-): PrewarmResumeUnit {
+/** A sheet upload, plus the decode it needs first when an earlier renderer's
+ *  upload released the sheet's image. The decode lives HERE, with the upload
+ *  that follows it, and never in the page-wide demand load: a sheet this
+ *  renderer already uploaded (its unit done, whichever kit ran it) is never
+ *  decoded again, so it is never left dirty with no upload scheduled. */
+interface SheetUnit extends PrewarmResumeUnit {
+  /** The re-decode, or null when the sheet holds its image (no wait at all). */
+  restore(): Promise<void> | null;
+}
+
+function sheetUnit(state: Preparation, [id, name, sheet]: (typeof KIT_SHEETS)[number]): SheetUnit {
   return {
     id: `upload-big:${id}`,
     synchronous: true,
+    restore: () => {
+      const texture = sheet();
+      return texture && bitmapSheetReleased(texture) ? restoreBitmapSheet(texture) : null;
+    },
     run: () => {
       const texture = sheet();
       if (!texture) throw new Error(`${name} texture was not loaded`);
@@ -314,6 +326,12 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
     const context = state.context;
     for (const unit of recipe(state, selected)) {
       if (state.cancelled || state.context !== context) return;
+      // A released sheet decodes off the main thread before its paced upload.
+      const restoring = 'restore' in unit ? (unit as SheetUnit).restore() : null;
+      if (restoring) {
+        await restoring;
+        if (state.cancelled || state.context !== context) return;
+      }
       await state.host.queue.run(
         () => {
           if (!state.cancelled) return unit.run();

@@ -129,17 +129,20 @@ describe('the Warrior kit loader, split by piece', () => {
     expect(loadBitmapTexture).toHaveBeenCalledTimes(11);
   });
 
-  it('decodes a released borrowed sheet again for a rebuilt renderer', async () => {
+  it('never decodes a sheet again from the loader alone', async () => {
+    // Re-decoding belongs to the upload that needs it (the recipe), never to
+    // a demand load that schedules no upload (Reuben's review of 78a2a12ebb).
     loadBitmapTexture.mockImplementation(
       async () => new THREE.Texture({ width: 4, height: 4, close: vi.fn() } as never),
     );
     await ensureWarriorKitAssets(false, PALADIN_BORROWED_PIECES);
     const dust = bakedTexture('shout_dust') as THREE.Texture;
     dust.onUpdate?.(dust);
-    expect(dust.source.dataReady).toBe(false);
+    const version = dust.version;
     await ensureWarriorKitAssets(false, PALADIN_BORROWED_PIECES);
-    expect(dust.source.dataReady).toBe(true);
-    expect(loadBitmapTexture).toHaveBeenCalledTimes(4);
+    await ensureWarriorKitAssets(false);
+    expect(dust.version).toBe(version);
+    expect(loadBitmapTexture).toHaveBeenCalledTimes(11);
     loadBitmapTexture.mockImplementation(async () => new THREE.Texture());
   });
 
@@ -153,7 +156,7 @@ describe('the Warrior kit loader, split by piece', () => {
 });
 
 /** A real engine behind the real active-kit recipe, on a fake GPU host. */
-function rig(localClass: string, options: { constrained?: boolean } = {}) {
+function rig(localClass: string, options: { constrained?: boolean; upload?: boolean } = {}) {
   installCastVfxCanvasStub();
   const scene = new THREE.Scene();
   const resident = new Set<THREE.Texture>();
@@ -200,7 +203,11 @@ function rig(localClass: string, options: { constrained?: boolean } = {}) {
       return true;
     },
     geometry: (kinds, kit) => fx.authoredPrewarmUnits(gpu, kinds, kit),
-    texture: (texture) => void resident.add(texture),
+    texture: (texture) => {
+      resident.add(texture);
+      // A real upload: three calls onUpdate, which releases a bitmap sheet.
+      if (options.upload) texture.onUpdate?.(texture);
+    },
   });
   const pools = fx as unknown as {
     baked: { slots: { active: boolean }[] };
@@ -364,6 +371,71 @@ describe('a renderer that sights both kits', () => {
       expect(warrior).toContain('crest-upload:blood_cut');
     } finally {
       r.close();
+    }
+  });
+});
+
+describe('sheets another kit already uploaded on this renderer', () => {
+  const bitmaps = () =>
+    loadBitmapTexture.mockImplementation(
+      async () => new THREE.Texture({ width: 4, height: 4, close: vi.fn() } as never),
+    );
+  const shared = () =>
+    [bakedTexture('smoke'), bakedTexture('shout_dust'), warriorRockTexture()] as THREE.Texture[];
+
+  it.each([
+    ['warrior', 'paladin'],
+    ['paladin', 'warrior'],
+  ] as const)(
+    'the %s kit first: the %s sighting never decodes a shared sheet again or leaves it dirty',
+    async (first, second) => {
+      bitmaps();
+      const r = rig('mage', { upload: true });
+      try {
+        await ensureActiveAbilityKit(r.scene, first);
+        // Every shared sheet was uploaded here, which released its image.
+        for (const sheet of shared()) expect(sheet.source.dataReady, sheet.name).toBe(false);
+        const versions = shared().map((sheet) => sheet.version);
+        const decodes = loadBitmapTexture.mock.calls.length;
+        const uploads = r.ran.length;
+        await ensureActiveAbilityKit(r.scene, second);
+        expect(shared().map((sheet) => sheet.version)).toEqual(versions);
+        for (const sheet of shared()) expect(sheet.source.dataReady, sheet.name).toBe(false);
+        // The second kit decodes only sheets it uploads itself, never the shared three.
+        const fresh = loadBitmapTexture.mock.calls.slice(decodes).map((call) => String(call[0]));
+        for (const url of [BAKED_URLS.smoke, BAKED_URLS.shout_dust, ROCK_URL])
+          expect(fresh, url).not.toContain(url);
+        for (const id of ['upload-big:active-smoke', 'upload-big:active-shout-dust'])
+          expect(r.ran.slice(uploads)).not.toContain(id);
+      } finally {
+        r.close();
+        loadBitmapTexture.mockImplementation(async () => new THREE.Texture());
+      }
+    },
+  );
+
+  it('a rebuilt renderer decodes the released sheets again in its own uploads', async () => {
+    bitmaps();
+    const first = rig('paladin', { upload: true });
+    await ensureActiveAbilityKit(first.scene);
+    first.close();
+    for (const sheet of shared()) expect(sheet.source.dataReady, sheet.name).toBe(false);
+    const decodes = loadBitmapTexture.mock.calls.length;
+    const rebuilt = rig('paladin', { upload: true });
+    try {
+      await ensureActiveAbilityKit(rebuilt.scene);
+      // Each borrowed sheet was decoded once more, by the unit that uploads it.
+      expect(loadBitmapTexture.mock.calls.length - decodes).toBe(3);
+      expect(rebuilt.ran).toEqual(
+        expect.arrayContaining([
+          'upload-big:active-smoke',
+          'upload-big:active-shout-dust',
+          'upload-big:active-warrior-rock',
+        ]),
+      );
+    } finally {
+      rebuilt.close();
+      loadBitmapTexture.mockImplementation(async () => new THREE.Texture());
     }
   });
 });

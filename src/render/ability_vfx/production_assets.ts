@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { armBitmapSheetRelease, restoreBitmapSheet } from '../assets/bitmap_sheet_release';
+import { armBitmapSheetRelease } from '../assets/bitmap_sheet_release';
 import { loadBitmapTexture, loadGltf, loadKtx2Texture, releaseGltf } from '../assets/loader';
 import { ensureContactSheets } from './contact_assets';
 
@@ -121,11 +121,15 @@ export function ensureWarriorKitAssets(
   constrainedMemory: boolean,
   pieces?: readonly WarriorKitPiece[],
 ): Promise<boolean> {
+  // Loading only. A sheet an earlier renderer's upload released is decoded
+  // again by the recipe unit that uploads it on THIS renderer
+  // (active_kit_prewarm.ts sheetUnit), never here: a re-decode with no
+  // upload scheduled after it leaves the sheet dirty for a live draw.
   if (pieces) {
     if (constrainedMemory) return Promise.resolve(false);
-    return loadPieces(pieces).then(() => restorePieces(pieces));
+    return loadPieces(pieces).then(() => true);
   }
-  if (assetsTask && assetsState === 'ready') return restorePieces(WHOLE_KIT);
+  if (assetsTask && assetsState === 'ready') return Promise.resolve(true);
   if (assetsTask) return assetsTask;
   if (constrainedMemory) {
     assetsState = 'declined';
@@ -146,9 +150,6 @@ export function ensureWarriorKitAssets(
   return assetsTask;
 }
 
-/** Each piece's image sheets, kept so a later request decodes the released
- *  ones again for a rebuilt renderer. */
-const pieceSheets = new Map<WarriorKitPiece, THREE.Texture>();
 const pieceTasks = new Map<WarriorKitPiece, Promise<void>>();
 
 async function imageSheet(
@@ -158,20 +159,7 @@ async function imageSheet(
 ): Promise<THREE.Texture> {
   const texture = (await loadBitmapTexture(url, { srgb })).clone();
   armBitmapSheetRelease(texture, () => loadBitmapTexture(url, { srgb }));
-  pieceSheets.set(piece, texture);
   return texture;
-}
-
-/** Decodes again every sheet of `pieces` an earlier renderer's upload
- *  released, so this renderer's kit recipe uploads real texels. */
-async function restorePieces(pieces: readonly WarriorKitPiece[]): Promise<boolean> {
-  await Promise.all(
-    pieces.map((piece) => {
-      const sheet = pieceSheets.get(piece);
-      return sheet ? restoreBitmapSheet(sheet) : undefined;
-    }),
-  );
-  return true;
 }
 
 function loadPieces(pieces: readonly WarriorKitPiece[]): Promise<void> {
@@ -263,7 +251,6 @@ export const productionAssetInternalsForTest = {
   urls: [...Object.values(BAKED_URLS), PRESSURE_URL, BLOOD_URL, STEEL_URL, ROCK_URL, FRAGMENT_URL],
   reset(): void {
     textures.clear();
-    pieceSheets.clear();
     pieceTasks.clear();
     geometry.clear();
     rockTexture = steelTexture = bloodTexture = pressureTexture = null;

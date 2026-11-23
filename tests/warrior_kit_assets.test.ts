@@ -59,6 +59,7 @@ import {
   warriorRockTexture,
   warriorSteelTexture,
 } from '../src/render/ability_vfx/production_assets';
+import { bitmapSheetReleased, restoreBitmapSheet } from '../src/render/assets/bitmap_sheet_release';
 import * as loader from '../src/render/assets/loader';
 
 const loadTexture = vi.mocked(loader.loadTexture);
@@ -137,8 +138,14 @@ describe('ensureWarriorKitAssets', () => {
     for (const texture of sheets) texture.onUpdate?.(texture);
     for (const image of bitmaps) expect(image.close).toHaveBeenCalledTimes(1);
     expect(sheets.every((texture) => bitmaps.includes(texture.image as never))).toBe(false);
-    // A rebuilt renderer's kit asks again before its recipe uploads anything.
+    // A later demand load decodes nothing: a re-decode with no upload after it
+    // would leave a sheet dirty for a live draw (Reuben's review of #4796).
     await expect(ensureWarriorKitAssets(false)).resolves.toBe(true);
+    expect(loadBitmapTexture).toHaveBeenCalledTimes(11);
+    // A rebuilt renderer's recipe decodes each released sheet in the unit that
+    // uploads it (active_kit_prewarm.ts sheetUnit), through restoreBitmapSheet.
+    for (const texture of sheets) expect(bitmapSheetReleased(texture)).toBe(true);
+    await Promise.all(sheets.map((texture) => restoreBitmapSheet(texture)));
     expect(loadBitmapTexture).toHaveBeenCalledTimes(22);
     for (const texture of sheets) {
       expect(bitmaps.slice(11)).toContain(texture.image);
