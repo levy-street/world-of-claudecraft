@@ -1438,7 +1438,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  'c8b2222aabd919559058947ae9382e07770a32f3fb5c9e94e5e11f285a5d297c';
+  // Re-minted for the Quartered Isle's iOS prewarm wait (renderer wiring). No capture was retaken.
+  '6594adab918ee51fb1d4661457f4a6c2eddc615f4178b511e580bdb8af89cf04';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1496,7 +1497,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted for v0.45.4 graphics and dungeon loading optimizations in renderer.ts.
   // No capture was retaken.
-  '296e8abfd972ce668e0f61986ecbf9b124a32db32b299721868c9d8e8ac456fb';
+  // Re-minted for the Quartered Isle's iOS prewarm wait (renderer wiring). No capture was retaken.
+  '2f668867dbc8aa5fee120fa3e56e014fcca4e54822ef58da56f6217e769c5f22';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2905,7 +2907,8 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
       // v0.45.4 graphics and dungeon loading optimizations in renderer.ts:
       // recomputed from the swept evidence. No capture was retaken.
-    ).toBe('6c5eb34015408f1ff1d7f2e44596c7f0676a2e3136a8f0b2de12c65f3e5a17fe');
+      // Re-minted for the Quartered Isle's iOS prewarm wait (renderer wiring). No capture was retaken.
+    ).toBe('d0060245c1bfb44c4ea59e9c10f384b604856c9dcfca7a893ba4028fba99730d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
