@@ -1668,6 +1668,8 @@ function sanitizeCamp(v: unknown): CampDef | null {
   const questNotes = str(c.questNotes, '').slice(0, MAX_AUTHORING_NOTES_LENGTH);
   if (aiNotes) camp.aiNotes = aiNotes;
   if (questNotes) camp.questNotes = questNotes;
+  // Private rng sub-stream choice (CampDef.offStream); booleans only, absent stays absent.
+  if (typeof c.offStream === 'boolean') camp.offStream = c.offStream;
   return camp;
 }
 
