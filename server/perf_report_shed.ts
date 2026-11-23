@@ -38,6 +38,7 @@ export const RAW_SUMMARY_KNOWN_KEYS = [
   'rendererQualityBuckets',
   'rendererDrawingBuffer',
   'rendererDiagnostics',
+  'rendererDrawCensus',
   'rendererPrewarmSummary',
   'rendererPrewarm',
   'rendererGpuQueue',
@@ -255,6 +256,12 @@ const RUNGS: readonly ShedRung[] = [
   // a wedged queue and a slow entry are exactly what a truncated report must
   // still carry.
   dropKey('rendererGpuQueue'),
+  // Bounded on ingest to two samples of three short ranked lists of plain-id
+  // labels (perf_report_draw_census.ts): about 2 KB on a real report and
+  // under 5 KB at its hard maximum (pinned by tests/perf_report_draw_census).
+  // It is the only attribution for a draw-call regression, which is exactly
+  // the kind of heavy session whose report sheds the most.
+  dropKey('rendererDrawCensus'),
   dropKey('entryReveal'),
   dropKey('windows'),
   dropKey('rendererPhaseMs'),

@@ -908,6 +908,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // the production draw census's ranking and rolling peak (draw_census.ts)
+  'src/render/draw_census_core.ts',
   // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
   'src/render/mount_embers_core.ts',
   // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)

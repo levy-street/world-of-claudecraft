@@ -725,6 +725,11 @@ function payloadFromSnapshot(
         dynamicResolution: renderer.drawingBuffer.dynamicResolution,
       },
       rendererDiagnostics: renderer.renderDiagnostics,
+      // WHAT the draws were, beside rendererCalls' how many: the latest and
+      // the 5-minute peak idle-time scene census, ranked by render category
+      // and by top-level scene node (src/render/draw_census_core.ts). Small
+      // and bounded, so it rides the shed ladder's core tail.
+      rendererDrawCensus: renderer.drawCensus,
       // The summary above is the whole prewarm payload. The live stats object
       // used to ride along beside it as `rendererPrewarm`, from before the
       // summary existed; nothing reads it back out of storage, and once its

@@ -2141,6 +2141,8 @@ export class Renderer {
       textures: this.webgl.info.memory.textures,
     }),
     scene: () => this.scene,
+    camera: () => this.camera,
+    censusSkip: () => this.underworld.active,
     generation: () => this.lifecycleGeneration,
     shutdown: () => this.shutdownStarted,
   });
@@ -4489,6 +4491,7 @@ export class Renderer {
       phaseMs: this.rendererPhaseStats(),
       nameplates: this.nameplatePainter.paintStats(),
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
+      drawCensus: this.renderDiagnostics.drawCensus(),
       lastFrame: snapshotRendererFrameStats(this.lastFrameStats),
       prewarm: this.lastPrewarmStats,
       castVfx: this.castVfxReadiness.snapshot(),

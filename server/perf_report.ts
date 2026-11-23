@@ -10,6 +10,7 @@ import { glLaptop, glModel } from './gpu_model_bucket';
 import { clientPerfMetricsSink } from './http/client_perf_metrics';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
+import { sanitizeDrawCensus } from './perf_report_draw_census';
 import {
   sanitizeBootPhases,
   sanitizeCadence,
@@ -781,6 +782,9 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const drawingBuffer = sanitizeDrawingBuffer(parsed.rendererDrawingBuffer);
     if (drawingBuffer) parsed.rendererDrawingBuffer = drawingBuffer;
     else delete parsed.rendererDrawingBuffer;
+    const drawCensus = sanitizeDrawCensus(parsed.rendererDrawCensus);
+    if (drawCensus) parsed.rendererDrawCensus = drawCensus;
+    else delete parsed.rendererDrawCensus;
     const postRevealLinks = sanitizePostRevealLinks(parsed.postRevealLinks);
     if (postRevealLinks) parsed.postRevealLinks = postRevealLinks;
     else delete parsed.postRevealLinks;

@@ -3,12 +3,15 @@
 // first-seen materials and first-visible objects). Dev-only and localhost
 // gated; the sampled walk runs on idle time, never inside a frame. Extracted
 // from renderer.ts behind a small host seam (the monolith ratchet); the
-// renderer owns one instance and feeds it per-frame timestamps.
+// renderer owns one instance and feeds it per-frame timestamps. It also paces
+// the always-on production draw census (draw_census.ts), which is not gated.
 //
 // English output by design: this feeds the ?perf overlay and hitchReport(),
 // a dev diagnostic under the src/game CLAUDE.md perf-overlay carve-out.
 
 import type * as THREE from 'three';
+import { DrawCensusSampler } from './draw_census';
+import type { DrawCensusSnapshot } from './draw_census_core';
 
 export const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -121,6 +124,12 @@ export interface RenderDiagnosticsHost {
   /** Live program and texture counters (the renderer maps webgl.info). */
   counters(): { programs: number; textures: number };
   scene(): THREE.Object3D;
+  /** The main camera, for the production draw census's frustum and layer
+   *  tests (draw_census.ts). Absent in a host that never renders. */
+  camera?(): THREE.Camera;
+  /** True while the drawn scene differs from the idle-time scene graph
+   *  (the underworld mask); the draw census skips that walk. */
+  censusSkip?(): boolean;
   /** Lifecycle generation, read at SCHEDULE time: a queued idle sample from
    *  a dead generation must never write into the next one's snapshot. */
   generation(): number;
@@ -145,11 +154,28 @@ export class RenderDiagnostics {
   private readonly knownVisibleObjects = new Set<string>();
   private lastPrograms = 0;
   private lastTextures = 0;
+  // The always-on half: a slow idle-time draw census that runs on every
+  // build (the beacon's `rendererDrawCensus`), unlike the ?perfTrace census
+  // below, which stays dev and localhost only.
+  private readonly census: DrawCensusSampler;
 
   constructor(
     private readonly host: RenderDiagnosticsHost,
     readonly enabled = localRenderDiagnosticsEnabled(),
-  ) {}
+  ) {
+    this.census = new DrawCensusSampler({
+      scene: () => host.scene(),
+      camera: () => host.camera?.() ?? null,
+      skip: () => host.censusSkip?.() ?? false,
+      generation: () => host.generation(),
+      shutdown: () => host.shutdown(),
+      scheduleIdle: (run, timeoutMs) => (host.scheduleIdle ?? defaultScheduleIdle)(run, timeoutMs),
+    });
+  }
+
+  drawCensus(): DrawCensusSnapshot {
+    return this.census.current();
+  }
 
   current(): RenderDiagnosticsSnapshot {
     return this.snapshot;
@@ -282,6 +308,7 @@ export class RenderDiagnostics {
   }
 
   forFrame(now: number, force = false): RenderDiagnosticsSnapshot {
+    this.census.forFrame(now);
     if (!this.enabled) return this.snapshot;
     if (force) {
       this.collect();
