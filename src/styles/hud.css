@@ -5758,6 +5758,10 @@
       box-shadow: var(--glow-gold);
     }
   }
+  /* An unbound action (the Boss Guide ships with no key) draws no empty cap. */
+  .micro-btn .keybind:empty {
+    display: none;
+  }
   .micro-btn .keybind {
     position: absolute;
     bottom: -3px;

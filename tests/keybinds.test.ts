@@ -194,6 +194,11 @@ describe('registry', () => {
     expect(lootExplorer?.category).toBe('Interface');
     expect(lootExplorer?.kind).toBe('edge');
     expect(lootExplorer?.defaults).toEqual(['Shift+KeyO']);
+    // The Boss Guide is a rebindable Interface toggle that ships with no key.
+    const bossGuide = BIND_ACTIONS.find((a) => a.id === 'bossGuide');
+    expect(bossGuide?.category).toBe('Interface');
+    expect(bossGuide?.kind).toBe('edge');
+    expect(bossGuide?.defaults).toEqual([]);
   });
 
   it('gives every shipped default code to exactly one action per layer', () => {

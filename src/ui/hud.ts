@@ -3202,7 +3202,7 @@ export class Hud {
     $('#mm-wiki')?.addEventListener('click', () => this.openWiki());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
-    $('#mm-bossguide')?.addEventListener('click', () => this.raidBossGuideWindow.openBrowser());
+    $('#mm-bossguide')?.addEventListener('click', () => this.toggleBossGuide());
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-wocmarket')?.addEventListener('click', () => this.toggleWocMarket());
@@ -15495,6 +15495,10 @@ export class Hud {
 
   toggleLootExplorer(): void {
     this.lootExplorerWindow.toggle();
+  }
+
+  toggleBossGuide(): void {
+    this.raidBossGuideWindow.openBrowser();
   }
 
   toggleCosmetics(): void {

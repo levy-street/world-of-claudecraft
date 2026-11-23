@@ -362,6 +362,9 @@ export const guideStrings = {
     mount: 'Mount / Dismount',
     calendar: 'Event Calendar',
     dungeonFinder: 'Dungeon Finder',
+    // The keycap for an action that ships with no default key (the Boss
+    // Guide): set one under Key Bindings. Wordy (M16): fills ride along.
+    unbound: 'Unbound',
     discord: 'Discord',
     abilities: 'Use action bar abilities (the number row; a second bar sits on the numpad)',
     targetPrev: 'Cycle target backward',
@@ -796,6 +799,11 @@ export const guideStrings = {
     // hudChrome.options values. Wordy (M16): non-Latin fills ride along.
     framesGovernedPriest:
       "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+    // The Boss Guide button ('bossGuideButton', #boss-guide-launcher) left the
+    // party frames for a frame of its own. Own key for the same reason as the
+    // aura tracks. Wordy (M16): non-Latin fills ride along.
+    framesGovernedBossGuide:
+      'Edit Frames also loosens the Boss Guide button, which appears only inside a raid or dungeon that has a guide; it wears its name chip while it is loose, so you can place it before the run. The Boss Guide button on the side rail opens every guide from anywhere.',
     framesGovernedResourceAndHill:
       'Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.',
 

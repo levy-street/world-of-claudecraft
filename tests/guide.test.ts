@@ -210,6 +210,7 @@ import {
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 import { itemStrings } from '../src/ui/i18n.catalog/items';
 import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
+import { BIND_ACTION_LABEL_KEYS } from '../src/ui/keybind_action_names_core';
 import type {
   MapGatherNodeMarker,
   MapWindowMode,
@@ -1713,8 +1714,21 @@ describe('Guide controls reference completeness', () => {
       titleKey: 'guide.nav.controls',
     });
     const kbds = new Set([...html.matchAll(/<kbd>([^<]+)<\/kbd>/g)].map((m) => m[1]));
-    const missing = BIND_ACTIONS.filter(
-      (a) => a.category === 'Interface' && !a.defaults.some((code) => kbds.has(keyLabel(code))),
+    // An action that ships unbound has no keycap: its row says Unbound beside
+    // the action's own Key Bindings name instead.
+    const unboundRow = (id: string): boolean => {
+      const key = BIND_ACTION_LABEL_KEYS[id];
+      return (
+        !!key &&
+        html.includes(`<kbd>${esc(t('guide.controls.unbound'))}</kbd></td><td>${esc(t(key))}</td>`)
+      );
+    };
+    const missing = BIND_ACTIONS.filter((a) =>
+      a.category !== 'Interface'
+        ? false
+        : a.defaults.length === 0
+          ? !unboundRow(a.id)
+          : !a.defaults.some((code) => kbds.has(keyLabel(code))),
     ).map((a) => a.id);
     expect(missing).toEqual([]);
     // Anti-vacuous: the scrape really read keycaps, and the two shifted rows
@@ -6754,6 +6768,8 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       // guide.interfacePage.framesGovernedResourceAndHill.
       playerResource: 'your resource bar',
       hillBar: 'the King of the Hill bar',
+      // guide.interfacePage.framesGovernedBossGuide.
+      bossGuideButton: 'the Boss Guide button',
     };
     expect(Object.keys(phraseFor).sort()).toEqual(HUD_FRAME_SPECS.map((s) => s.id).sort());
     for (const spec of HUD_FRAME_SPECS) {

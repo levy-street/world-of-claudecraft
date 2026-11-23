@@ -10858,6 +10858,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mount': '骑乘 / 下骑',
   'guide.controls.calendar': '活动日历',
   'guide.controls.dungeonFinder': '地下城查找器',
+  'guide.controls.unbound': '未绑定',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities': '使用动作条技能（数字键行；第二条动作条位于小键盘）',
   'guide.controls.groupPet': '宠物指令',
@@ -22081,6 +22082,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.priest.bombLabel': '献纳灵魂炸弹',
   'guide.interfacePage.framesGovernedPriest':
     '编辑框架还可移动暗影牧师显示幽暗什一和献纳灵魂炸弹的徽章。',
+  'guide.interfacePage.framesGovernedBossGuide':
+    '“编辑框体”同样可以移动“首领指南”按钮。该按钮只会在拥有指南的团队副本或地下城中出现；解锁时它会显示名称标签，方便你在开打之前摆好位置。侧边栏上的“首领指南”按钮可以随时随地打开所有指南。',
   'hudChrome.priest.gloomtitheStatus': '幽暗什一：{value} / {max}',
   'hudChrome.priest.bombStatus': '献纳灵魂炸弹充能：{value} / {max}',
   'hudChrome.priest.bombReady': '就绪',

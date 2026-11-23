@@ -26,6 +26,7 @@ export const SIDE_BUTTONS: readonly [selector: string, action: string, labelKey:
     ['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],
     ['#mm-arena', 'arena', 'hudChrome.pvp.launcherTitle'],
     ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
+    ['#mm-bossguide', 'bossGuide', 'hudChrome.raidBossGuide.title'],
     ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
     ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
     ['#mm-social', 'social', 'hud.social.friendsTab'],

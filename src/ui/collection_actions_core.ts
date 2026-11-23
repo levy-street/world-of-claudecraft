@@ -7,6 +7,7 @@ export interface CollectionActionsHost {
   toggleHarvestJournal(): void;
   togglePerfecting(): void;
   toggleLootExplorer(): void;
+  toggleBossGuide(): void;
 }
 const COLLECTION_ACTIONS = {
   deeds: 'toggleDeeds',
@@ -16,6 +17,7 @@ const COLLECTION_ACTIONS = {
   harvestJournal: 'toggleHarvestJournal',
   perfecting: 'togglePerfecting',
   lootExplorer: 'toggleLootExplorer',
+  bossGuide: 'toggleBossGuide',
 } as const;
 export function dispatchCollectionAction(action: string, host: CollectionActionsHost): boolean {
   if (!Object.hasOwn(COLLECTION_ACTIONS, action)) return false;

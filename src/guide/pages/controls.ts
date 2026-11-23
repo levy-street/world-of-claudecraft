@@ -71,6 +71,8 @@ const GROUPS: Group[] = [
       { keys: ['Shift+T'], label: 'hudChrome.perfecting.title' },
       { keys: ['O'], label: 'controls.friends' },
       { keys: ['Shift+O'], label: 'hudChrome.lootExplorer.title' },
+      // Ships unbound: the player sets a key under Key Bindings.
+      { keys: ['guide.controls.unbound'], label: 'hudChrome.raidBossGuide.title' },
       { keys: ['G'], label: 'guide.controls.arena' },
       { keys: ['`'], label: 'guide.controls.mount' },
       { keys: ['K'], label: 'guide.controls.leaderboard' },

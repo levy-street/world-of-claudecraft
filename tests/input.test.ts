@@ -1558,6 +1558,22 @@ describe('Input Harvest Journal, Perfecting, and Loot Explorer keybinds', () => 
     expect(cb.onUiKey).toHaveBeenCalledWith('lootExplorer');
   });
 
+  it("dispatches onUiKey('bossGuide') once the player binds a key to it", () => {
+    // Ships unbound: no chord opens it until the Key Bindings panel assigns one.
+    const kb = new Keybinds();
+    expect(kb.codesForAction('bossGuide')).toEqual([]);
+    expect(kb.bind('bossGuide', 0, 'Shift+KeyB')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({
+      code: 'KeyB',
+      repeat: false,
+      shiftKey: true,
+    });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('bossGuide');
+  });
+
   it('cancels the default action so the newly-focused search box does not also receive this keydown as typed text', () => {
     // Regression: opening the Loot Explorer autofocuses its search input as a
     // side effect of this very keydown (loot_explorer_window.ts `open()`).

@@ -425,6 +425,16 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyO'],
   },
+  // The Boss Guide (the side menu's #mm-bossguide). Ships UNBOUND: every
+  // shifted letter a player would guess already belongs to another window, so
+  // the player picks their own key in the Key Bindings panel.
+  {
+    id: 'bossGuide',
+    label: 'Boss Guide',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: [],
+  },
   // Cosmetics uses Shift+Y; Shift+K belongs to the Harvest Journal.
   {
     id: 'cosmetics',
