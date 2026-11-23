@@ -4791,6 +4791,7 @@ export const fr_CA: EnTranslations = {
       "cooldownCap": "{used} sur {cap} s de réduction de temps de recharge utilisés dans cette fenêtre",
       "bruinRushWindow": "La Forme de chat ne coûte aucun mana et cloue la cible de votre Ruée de Bruin, la ralentissant de {pct}% pendant {sec} s",
       "funeralHarvestLock": "Moisson funéraire ne peut pas encore créer un autre Fragment d'âme",
+      "redTorrent": "Les tics de vos saignements sur la cible de votre Moisson rouge sont {pct}% plus rapides",
       "effigyPlankHide": "Détourne {pct}% de chaque coup jusqu'à ce qu'une estocade de la Pique d'éclat éteigne la lanterne dans son œil",
       "effigyLanternOut": "La lanterne du Contremaître de paille est éteinte pour vous : vos coups et ceux de votre familier ignorent sa Peau de planches et infligent tous leurs dégâts",
       "leadenHexLock": "Hex de plomb ne peut pas encore enraciner cette cible de nouveau",
@@ -4842,7 +4843,7 @@ export const fr_CA: EnTranslations = {
       "coldsightRead": "Votre prochain Tir long inflige {longDrawPct}% de dégâts supplémentaires, ou votre prochain Tir funeste en inflige {fellShotPct}% de plus",
       "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
       "moontide": "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
-      "oldBlood": "Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme",
+      "oldBlood": "Sang ancien : cran {stacks} sur {max}. En Forme de chat, chaque tic de vos saignements en ajoute 1, au plus une fois toutes les 2 s ; en Forme de Bruin, chaque coup porté de Griffes balayantes et de Brise-os en ajoute 1. À {max} : Morsure sanglante devient Moisson rouge en Forme de chat, Brise-os devient Brise-moelle en Forme de Bruin",
       "verdance": "Verdoyance : cran {stacks} sur {max}. Chaque Soin de spores, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
       "freeExecute": "Votre prochaine capacité d'exécution éligible ne coûte rien",
       "resourceSap": "Restaure {value} de votre ressource actuelle toutes les {interval} s",
@@ -18415,17 +18416,17 @@ export const fr_CA: EnTranslations = {
       "claw": {
         "name": "Griffe lacérante",
         "description": "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de chat uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien (maximum 3)."
+        "specNote_feral": "Chaque coup porté ajoute une charge de Lambeaux, un saignement de 12 points de dégâts en 8 s par charge (5 charges au maximum). Une nouvelle charge réinitialise la durée."
       },
       "scratch": {
         "name": "Griffure",
         "description": "Griffe les cibles proches dans un rayon de 6 m pour les dégâts de l'arme plus {damage}. Accorde 1 point de combo par cible touchée. Révèle les ennemis camouflés dans le balayage. Forme féline uniquement.",
-        "specNote_feral": "Chaque coup réussi ajoute 1 Sang ancien (3 au maximum)."
+        "specNote_feral": "Chaque ennemi touché saigne aussi sous l'effet de Plaie de griffure : 12 points de dégâts en 6 s."
       },
       "ferocious_bite": {
         "name": "Morsure sanglante",
         "description": "Technique de finition qui inflige {damage}. Forme de chat uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe plus puissante qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure de l’énergie."
+        "specNote_feral": "Inflige 15% de dégâts supplémentaires pour chacun de vos saignements sur la cible et ramène votre Faille sanglante à sa durée maximale. À 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe qui prolonge vos Écorcher et Faille sanglante, accélère de 50% les tics de vos saignements sur la cible pendant 8 s, et restaure de l'énergie."
       },
       "swipe": {
         "name": "Griffes balayantes",
@@ -18480,11 +18481,11 @@ export const fr_CA: EnTranslations = {
       },
       "pounce": {
         "name": "Frappe furtive",
-        "description": "Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond."
+        "description": "Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo et, en Farouche, inflige Lacère-gorge, un saignement de 72 points de dégâts en 12 s. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond."
       },
       "lunge": {
         "name": "Bond",
-        "description": "Bondit sur un ennemi jusqu'à 12 m, inflige 60% des dégâts de l'arme et octroie 1 point de combo. Forme de chat uniquement."
+        "description": "Prend la Forme de chat si ce n'est pas déjà le cas, puis bondit sur un ennemi jusqu'à 25 m. À l'arrivée, inflige 60% des dégâts de l'arme et confère 1 point de combo ; un bond interrompu rembourse son temps de recharge. Utilisable sous n'importe quelle forme."
       },
       "hamstring_bite": {
         "name": "Mise à terre",
@@ -18496,12 +18497,13 @@ export const fr_CA: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sang de lynx",
-        "description": "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de chat uniquement."
+        "description": "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de chat uniquement.",
+        "specNote_feral": "Les saignements que vous appliquez pendant sa durée infligent 20% de dégâts supplémentaires pendant toute leur durée."
       },
       "rip": {
         "name": "Faille sanglante",
         "description": "Coup de grâce qui fait saigner la cible toutes les 2 s pendant 24 s : 72 dégâts plus 48 par point de combo dépensé (5 points : {damage} au total). Forme de chat uniquement.",
-        "specNote_feral": "Le coup porté ajoute 1 Sang ancien (maximum 3)."
+        "specNote_feral": "Tant que 3 de vos saignements ou plus sont sur une cible, elle subit Plaies suintantes : 20% de soins reçus en moins."
       },
       "mortal_strike": {
         "name": "Frappe mutilante",
@@ -18718,7 +18720,7 @@ export const fr_CA: EnTranslations = {
       },
       "redharvest": {
         "name": "Moisson rouge",
-        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo."
+        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, prolonge vos Écorcher et Faille sanglante sur la cible de 4 s (jusqu'à 8 s chacun), accélère de 50% les tics de vos saignements sur la cible pendant 8 s (Torrent rouge) et rend {rage} points d'énergie. Fonctionne sans aucun point de combo."
       },
       "marrowbreak": {
         "name": "Brise-moelle",
@@ -19236,7 +19238,7 @@ export const fr_CA: EnTranslations = {
       "rake": {
         "name": "Écorcher",
         "description": "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et inflige {overTime} points de dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de chat uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien (maximum 3)."
+        "specNote_feral": "En Forme de chat, les tics de vos saignements ajoutent du Sang ancien (maximum 3, au plus 1 toutes les 2 s), et vos saignements peuvent infliger des coups critiques, chaque critique de saignement rendant 3 points d'énergie."
       },
       "revive_pet": {
         "name": "Rafistoler",

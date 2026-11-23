@@ -4791,6 +4791,7 @@ export const pl_PL: EnTranslations = {
       "cooldownCap": "Wykorzystano {used} z {cap} s skrócenia czasu odnowienia w tym oknie",
       "bruinRushWindow": "Postać kota nie kosztuje many i przygważdża cel twojej Szarży Bruina, spowalniając go o {pct}% na {sec} sek.",
       "funeralHarvestLock": "Pogrzebowe Żniwo nie może jeszcze stworzyć kolejnego Odłamka Duszy",
+      "redTorrent": "Twoje krwawienia na celu Czerwonych Żniw tykają o {pct}% szybciej",
       "effigyPlankHide": "Odbija {pct}% każdego ciosu, dopóki pchnięcie Odłamkową Piką nie zgasi latarni w jego oku",
       "effigyLanternOut": "Latarnia Słomianego Nadzorcy jest dla ciebie zgaszona: twoje ciosy i ciosy twojego zwierzaka ignorują Skórę z desek i trafiają z pełną siłą",
       "leadenHexLock": "Ołowiana Klątwa nie może jeszcze ponownie unieruchomić tego celu",
@@ -4842,7 +4843,7 @@ export const pl_PL: EnTranslations = {
       "coldsightRead": "Twój następny Długi naciąg zadaje o {longDrawPct}% więcej obrażeń albo twój następny Plugawy strzał zadaje o {fellShotPct}% więcej",
       "duskEconomy": "Umiejętności kosztują o {pct}% mniej energii",
       "moontide": "Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają",
-      "oldBlood": "Stara Krew: stopień {stacks} z {max}. Trafione ciosy kota i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości",
+      "oldBlood": "Stara Krew: stopień {stacks} z {max}. W postaci kota każde tiknięcie twoich krwawień dodaje 1, najwyżej raz na 2 sek.; w Postaci Bruina każde trafienie Zamaszystymi pazurami i Kruszeniem kości dodaje 1. Przy {max}: Krwawe ukąszenie zmienia się w Czerwone Żniwa w postaci kota, a Kruszenie kości w Łamacz szpiku w Postaci Bruina",
       "verdance": "Zieleń {stacks}/{max}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu lub Dzikiego ukojenia dodaje 1, a każdy punkt skraca czas rzucania Dzikiego ukojenia. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit",
       "freeExecute": "Twoja następna dostępna zdolność dobijająca nic nie kosztuje",
       "resourceSap": "Przywraca {value} twojego obecnego zasobu co {interval} s",
@@ -18415,17 +18416,17 @@ export const pl_PL: EnTranslations = {
       "claw": {
         "name": "Szarpiący pazur",
         "description": "Rozerwij wroga pazurami za obrażenia broni plus {damage}. Przyznaje 1 punkt combo. Tylko w Postaci kota.",
-        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew (maks. 3)."
+        "specNote_feral": "Każdy trafiony cios dodaje ładunek Strzępów, krwawienia zadającego 12 obrażeń w ciągu 8 sek. na ładunek (maks. 5 ładunków). Nowy ładunek odnawia czas trwania."
       },
       "scratch": {
         "name": "Drapnięcie",
         "description": "Przeciągnij pazurami przez pobliskie cele w promieniu 6 jardów, zadając obrażenia broni plus {damage}. Każdy trafiony cel daje 1 punkt kombinacji. Ujawnia skradających się wrogów w obszarze zamachu. Tylko w Postaci kota.",
-        "specNote_feral": "Każde trafienie dodaje 1 Starą Krew (maks. 3)."
+        "specNote_feral": "Każdy trafiony wróg dodatkowo krwawi od Rany z drapnięcia: 12 obrażeń w ciągu 6 sek."
       },
       "ferocious_bite": {
         "name": "Krwawe ukąszenie",
         "description": "Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci kota.",
-        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na silniejszy cios, dodatkowo natychmiast zadają wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywracają energię."
+        "specNote_feral": "Zadaje o 15% więcej obrażeń za każde twoje krwawienie na celu i odnawia twoją Krwawą szczelinę do pełnego czasu trwania. Przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na cios wydłużający twoje Zdzieranie i Krwawą szczelinę, przyspieszający o 50% tiknięcia twoich krwawień na celu na 8 sek. i przywracający energię."
       },
       "swipe": {
         "name": "Zamaszyste pazury",
@@ -18480,11 +18481,11 @@ export const pl_PL: EnTranslations = {
       },
       "pounce": {
         "name": "Skradający cios",
-        "description": "Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci kota. Poza skradaniem ten przycisk to Wypad."
+        "description": "Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji, a w specjalizacji Dzika natura zadaje Rozszarpane gardło, krwawienie zadające 72 obrażenia w ciągu 12 sek. Tylko w postaci kota. Poza skradaniem ten przycisk to Wypad."
       },
       "lunge": {
         "name": "Wypad",
-        "description": "Rzucasz się na wroga oddalonego o maksymalnie 12 jardów, zadając 60% obrażeń broni i przyznając 1 punkt kombinacji. Tylko w postaci kota."
+        "description": "Przyjmujesz postać kota, jeśli jeszcze w niej nie jesteś, a potem rzucasz się na wroga oddalonego o maksymalnie 25 jardów. Po dotarciu zadajesz 60% obrażeń broni i otrzymujesz 1 punkt kombinacji; przerwany wypad zwraca czas odnowienia. Można używać w dowolnej postaci."
       },
       "hamstring_bite": {
         "name": "Obalenie",
@@ -18496,12 +18497,13 @@ export const pl_PL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Rysia krew",
-        "description": "Natychmiast przywraca {rage} energii i zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci kota."
+        "description": "Natychmiast przywraca {rage} energii i zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci kota.",
+        "specNote_feral": "Krwawienia nałożone w czasie jego działania zadają o 20% więcej obrażeń przez cały swój czas trwania."
       },
       "rip": {
         "name": "Krwawa szczelina",
         "description": "Cios kończący wywołujący krwawienie co 2 s przez 24 s: 72 obrażenia plus 48 za wydany punkt kombinacji (5 punktów: łącznie {damage}). Tylko w Postaci kota.",
-        "specNote_feral": "Trafiony cios dodaje 1 Starą Krew (maks. 3)."
+        "specNote_feral": "Dopóki na celu są co najmniej 3 twoje krwawienia, cierpi on od Sączących się ran: otrzymuje o 20% mniej leczenia."
       },
       "mortal_strike": {
         "name": "Okaleczające uderzenie",
@@ -18718,7 +18720,7 @@ export const pl_PL: EnTranslations = {
       },
       "redharvest": {
         "name": "Czerwone Żniwa",
-        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo."
+        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, wydłuża twoje Zdzieranie i Krwawą szczelinę na celu o 4 sek. (do 8 sek. każde), przyspiesza o 50% tiknięcia twoich krwawień na celu na 8 sek. (Czerwony Potok) i przywraca {rage} energii. Działa bez punktów combo."
       },
       "marrowbreak": {
         "name": "Łamacz szpiku",
@@ -19236,7 +19238,7 @@ export const pl_PL: EnTranslations = {
       "rake": {
         "name": "Zdzieranie",
         "description": "Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj {overTime} obrażeń od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci kota.",
-        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew (maks. 3)."
+        "specNote_feral": "W postaci kota tiknięcia twoich krwawień dodają Starą Krew (maks. 3, najwyżej 1 co 2 sek.), a twoje krwawienia mogą trafiać krytycznie; każde krytyczne krwawienie przywraca 3 energii."
       },
       "revive_pet": {
         "name": "Opatrzenie",

@@ -6388,19 +6388,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'まだキャットフォームでなければ変身してから、15秒間移動速度が50%上昇する疾走を行います。どの形態でも使用可能。即時で、グローバルクールダウンは発生しません。',
   'entities.abilities.pounce.name': '忍び強襲',
   'entities.abilities.lunge.description':
-    '最大12メートル先の敵に飛びかかり、武器ダメージの60%を与えてコンボポイントを1獲得する。キャットフォーム時のみ使用可能。',
+    'キャットフォームでなければ変身してから、最大25メートル先の敵に飛びかかる。到達時に武器ダメージの60%を与え、コンボポイントを1獲得する。途中で中断された場合は再使用時間が戻る。どの形態でも使用可能。',
   'entities.abilities.lunge.name': 'ランジ',
   'entities.abilities.hamstring_bite.description':
     '対象を1秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：6秒）。キャットフォーム時のみ使用可能。',
   'entities.abilities.hamstring_bite.name': 'テイクダウン',
   'entities.abilities.pounce.description':
-    '隠密状態から放つ先制攻撃で、対象を2秒間スタンさせます。コンボポイントを1獲得します。キャットフォーム専用。 ステルス状態でない場合、このボタンはランジになる。',
+    '隠密状態から放つ先制攻撃で、対象を2秒間スタンさせます。コンボポイントを1獲得し、フェラルでは喉裂きを与えます。喉裂きは12秒かけて72ダメージを与える出血です。キャットフォーム専用。ステルス状態でない場合、このボタンはランジになる。',
   'entities.abilities.insect_swarm.name': '刺す虫の群れ',
   'entities.abilities.insect_swarm.description':
     '敵が虫の群れに襲われ、12秒かけて{damage}の自然ダメージを受けます。',
   'entities.abilities.tigers_fury.name': '山猫の血',
   'entities.abilities.tigers_fury.description':
     'エネルギーを{rage}回復し、攻撃力を{duration}秒間{buff}上昇させます。キャットフォーム専用。',
+  'entities.abilities.tigers_fury.specNote_feral':
+    '効果中に付与した出血は、その効果時間全体を通じて与えるダメージが20%増加する。',
   'entities.abilities.rip.name': '血裂',
   'entities.abilities.rip.description':
     'フィニッシュ技。標的に2秒ごと、24秒間出血させます。72ダメージに消費コンボポイントごと48を加算します（5ポイントで合計{damage}）。キャットフォーム専用。',
@@ -17353,8 +17355,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.description':
     '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
   'entities.abilities.cinderhide.name': '燼皮',
-  'entities.abilities.claw.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
-  'entities.abilities.scratch.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.claw.specNote_feral':
+    '命中した攻撃ごとにずた裂きを1スタック付与する。1スタックにつき8秒かけて12ダメージを与える出血（最大5スタック）。新たなスタックで効果時間が更新される。',
+  'entities.abilities.scratch.specNote_feral':
+    '命中した敵それぞれにスクラッチ傷の出血も与える：6秒かけて12ダメージ。',
   'entities.abilities.cold_focus.description':
     '12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）',
   'entities.abilities.cold_focus.name': '冷徹集中',
@@ -17402,7 +17406,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。',
   'entities.abilities.faithforged_guard.name': '聖光の負債',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：古き血を消費した強力な噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを回復する。',
+    '対象にかかっている自分の出血1つにつきダメージが15%増加し、血裂の効果時間を最大まで更新する。古き血が3のとき、このボタンは血の収穫に変化する：古き血を消費する一撃で、皮剥ぎと血裂を延長し、対象にかかっている自分の出血のダメージ間隔を8秒間50%速め、エネルギーを回復する。',
   'entities.abilities.fieldcraft_reentry.description':
     'パッシブ：狩猟の勢いがあると、離脱跳躍は次の腹裂きの一撃または血鉤を12秒間強化します。腹裂きの一撃は1段階ごとに15%ダメージ増加。血鉤は18から24の追加物理ダメージを与え、1段階ごとに15%、さらに遠隔攻撃力で増加します。3段階でいずれかの攻撃が狩猟の勢いを消費します。（生存）',
   'entities.abilities.fieldcraft_reentry.name': '再突入準備',
@@ -17523,7 +17527,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.description':
     '魂の欠片を1個消費し、永続する骸骨戦士を2枠のドミニオンに加える。同時に従えるのは1体まで。6秒ごとに周囲へ45%の薙ぎ払いダメージを与え、リーピング・コマンドでは対象を4秒間40%減速させる。',
   'entities.abilities.raise_skeletal_warrior.name': '骸骨戦士の召喚',
-  'entities.abilities.rake.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.rake.specNote_feral':
+    'キャットフォーム中、自分の出血ダメージが発生するたびに古き血を蓄える（最大3、2秒ごとに最大1）。さらに自分の出血がクリティカルになるようになり、出血のクリティカルごとにエネルギーを3回復する。',
   'entities.abilities.reaping_command.description':
     '魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。',
   'entities.abilities.reaping_command.name': '刈り取りの号令',
@@ -17531,13 +17536,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '死亡したグループメンバーを、体力とマナが35%の状態であなたのそばに蘇生する。レベル16以上のサンメンダーは代わりに、グループの30ヤード以内で視線の通る倒れたメンバー全員を呼び戻す。',
   'entities.abilities.recall_the_fallen.name': '倒れし者の呼び戻し',
   'entities.abilities.redharvest.description':
-    '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
+    '古き血を3消費する：{damage}のダメージを与え、対象の皮剥ぎと血裂をそれぞれ4秒延長し（それぞれ最大8秒）、対象にかかっている自分の出血のダメージ間隔を8秒間50%速め（赤き奔流）、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
   'entities.abilities.redharvest.name': '血の収穫',
   'entities.abilities.regrowth.specNote_restoration':
     '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。',
   'entities.abilities.rejuvenation.specNote_restoration':
     '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。翠成が3段階のとき、スウィフトメンドは満開に変化する。',
-  'entities.abilities.rip.specNote_feral': '命中した一撃が古き血を1蓄える（最大3）。',
+  'entities.abilities.rip.specNote_feral':
+    '対象に自分の出血が3つ以上かかっている間、対象は滲む傷を受ける：受ける回復量が20%減少する。',
   'entities.abilities.ruinous_brand.description':
     '敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。破滅の矢の反響も、追加のクリティカルダメージ倍率を伴わずにクリティカルヒットとして扱われます。',
   'entities.abilities.ruinous_brand.name': '破滅の烙印',
@@ -18649,6 +18655,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeExecute': '次の対象となる処刑アビリティはコストを消費しない',
   'hudChrome.auraEffect.funeralHarvestLock':
     'フューネラル・ハーベストはまだ次の魂の欠片を生成できない',
+  'hudChrome.auraEffect.redTorrent':
+    '血の収穫の対象にかかっている自分の出血のダメージ間隔が{pct}%速くなる',
   'hudChrome.auraEffect.galeheartWeapon':
     'ウォースピリットの{steps}連撃サイクルを完了すると、その一撃が{count}回反響し、それぞれダメージの{pct}%の自然ダメージを与える',
   'hudChrome.auraEffect.gloam':
@@ -18671,7 +18679,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する',
   'hudChrome.auraEffect.nextAttackCrit': '次の攻撃が必ずクリティカルになる',
   'hudChrome.auraEffect.oldBlood':
-    '古き血：{stacks}/{max}段階。裂き爪・皮剥ぎ・血の亀裂・血噛み・薙ぎ払う爪・骨砕きの命中ごとに1段階蓄える。{max}段階で、キャットフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する',
+    '古き血：{stacks}/{max}段階。キャットフォームでは自分の出血ダメージが発生するたびに1段階蓄える（2秒ごとに最大1回）。ブルーインフォームでは薙ぎ払う爪と骨砕きの命中ごとに1段階蓄える。{max}段階で、キャットフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する',
   'hudChrome.auraEffect.overpowerCharge':
     'チャージ{stacks}：次のメイミング・ストライクのダメージが{pct}%増加する',
   'hudChrome.auraEffect.perfectMoment': 'エーテル・ダーツが秘術チャージを消費しない',

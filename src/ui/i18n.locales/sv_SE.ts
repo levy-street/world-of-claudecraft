@@ -8014,10 +8014,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förvandlar fienden till en padda i upp till {duration} sek. Paddan vandrar omkring och läks snabbt. All skada bryter effekten. Endast bestar och humanoider.',
   'entities.abilities.polymorph.name': 'Förhäxa',
   'entities.abilities.pounce.description':
-    'En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng. Endast i kattform. Utanför smyg är den här knappen Utfall.',
+    'En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng och öppnar som Vild Strupriv, en blödning på 72 skada över 12 sek. Endast i kattform. Utanför smyg är den här knappen Utfall.',
   'entities.abilities.pounce.name': 'Smyghugg',
   'entities.abilities.lunge.description':
-    'Kasta dig mot en fiende upp till 12 m bort, tillfoga 60% vapenskada och ge 1 kombopoäng. Endast i kattform.',
+    'Byt till kattform om du inte redan är i den och kasta dig sedan mot en fiende upp till 25 m bort. Vid ankomsten tillfogas 60% vapenskada och 1 kombopoäng ges; ett avbrutet utfall återbetalar sin nedkylning. Kan användas i alla former.',
   'entities.abilities.lunge.name': 'Utfall',
   'entities.abilities.hamstring_bite.description':
     'Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek). Endast i kattform.',
@@ -8137,6 +8137,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.name': 'Skälvande slag',
   'entities.abilities.tigers_fury.description':
     'Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast kattform.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Blödningar du lägger på medan den varar gör 20% mer skada under hela sin varaktighet.',
   'entities.abilities.tigers_fury.name': 'Lodjursblod',
   'entities.abilities.travel_form.description':
     'Skiftar omedelbart till en snabb Fleetform, ökar förflyttningshastigheten med 40 % och tar bort brytbara rotbindningar och nedsaktningar. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet.',
@@ -16247,7 +16249,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar 3 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Sporemending på målet.',
   'entities.abilities.redharvest.name': 'Röd Skörd',
   'entities.abilities.redharvest.description':
-    'Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng.',
+    'Förbrukar dina 3 Gammalt Blod: ett slag för {damage}, förlänger dina Flå och Blodsspricka på målet med 4 sek (upp till 8 sek vardera), får dina blödningar på målet att ticka 50% snabbare i 8 sek (Röd Ström) och återställer {rage} energi. Fungerar utan kombopoäng.',
   'entities.abilities.sunlance.name': 'Solspår',
   'entities.abilities.sunlance.description':
     'Förbrukar dina 3 Månflod för ett slag som ger {damage} naturskada plus en brännskada på {overTime} under 9 sek och återställer 35 mana: manavalet. Månsvall förbrukar samma 3 Månflod, så välj ett.',
@@ -16256,7 +16258,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den',
   'hudChrome.auraEffect.oldBlood':
-    'Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross',
+    'Gammalt Blod: steg {stacks} av {max}. I kattform lägger varje tick från dina blödningar till 1, högst en gång per 2 sek; i Bruinform lägger varje träffande slag med Svepande klor och Benkross till 1. Vid {max}: Blodsbett blir Röd Skörd i kattform, Benkross blir Märgbräckare i Bruinform',
   'hudChrome.auraEffect.verdance':
     'Grönska {stacks}/{max}. Varje Sporemending, Andra blomningen eller Vildläkning du kastar ger 1, och varje Grönska förkortar Vildläknings kasttid. Vid {max} blir Snabb läkning Överblomning',
   'hudChrome.continentMap.levels': 'Nivåer {min} till {max}',
@@ -16459,7 +16461,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.',
   'entities.abilities.claw.specNote_feral':
-    'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
+    'Varje träffande slag lägger till en stapel Slamsor, en blödning på 12 skada över 8 sek per stapel (max 5 staplar). En ny stapel förnyar varaktigheten.',
   'entities.abilities.cold_blood.description':
     'Fokuserar ditt dödliga uppsåt så att dina nästa 5 attacker blir kritiska träffar. (Knifework-motorn)',
   'entities.abilities.corpse_explosion.description':
@@ -16494,7 +16496,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Avslutande drag som orsakar {damage}. Endast i Kattform.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett kraftigare slag som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer energi.',
+    'Gör 15% mer skada för varje blödning du har på målet och förnyar din Blodsspricka till full varaktighet. Vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett slag som förlänger dina Flå och Blodsspricka, får dina blödningar på målet att ticka 50% snabbare i 8 sek och återställer energi.',
   'entities.abilities.funeral_harvest.description':
     'När en fiende som nyligen skadats av dig eller dina odöda dör får du 1 Själfragment. Detta kan inträffa högst en gång var 3:e sek.',
   'entities.abilities.funeral_harvest.name': 'Begravningsskörd',
@@ -16552,7 +16554,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Flå fienden för vapenskada plus {damage} och orsaka {overTime} blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.',
   'entities.abilities.rake.specNote_feral':
-    'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
+    'I kattform lägger dina blödningars tick till Gammalt Blod (max 3, högst 1 per 2 sek), och dina blödningar kan träffa kritiskt, där varje kritiskt blödningstick återställer 3 energi.',
   'entities.abilities.reaping_command.description':
     'Förbrukar 2 Själfragment för att befalla varje odöd tjänare att slå i samklang. Graveguards hånar och spänner sig, Skeletal Warriors förlångsammar sina mål, Bone Mages exponerar magiska försvar, och Gravvinge sliter i alla träffade fiender.',
   'entities.abilities.reaping_command.name': 'Skördande befallning',
@@ -16565,7 +16567,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar. Vid 3 Grönska blir Snabb läkning Överblomning.',
   'entities.abilities.rip.description':
     'Avslutande attack som får målet att blöda varannan sekund i 24 sek: 72 skada plus 48 per förbrukad kombopoäng (5 poäng: {damage} totalt). Endast i Kattform.',
-  'entities.abilities.rip.specNote_feral': 'Det landade slaget lägger till 1 Gammalt Blod (max 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Så länge 3 eller fler av dina blödningar finns på ett mål lider det av Vätskande Sår: 20% mindre mottagen helning.',
   'entities.abilities.ruinous_brand.description':
     'Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål. Fördärvsbult-ekon räknas också som kritiska träffar, utan ytterligare multiplikator för kritisk skada.',
   'entities.abilities.ruinous_brand.name': 'Förödande brännmärke',
@@ -16703,6 +16706,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeExecute': 'Din nästa kvalificerade avrättningsförmåga kostar ingenting',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Begravningsskörd kan inte skapa ännu ett Själfragment än',
+  'hudChrome.auraEffect.redTorrent':
+    'Dina blödningar på målet för din Röd Skörd tickar {pct}% snabbare',
   'hudChrome.auraEffect.galeheartWeapon':
     'Att fullborda {steps}-slags Krigsandens kadens ekar slaget {count} gånger för {pct}% av dess skada som naturskada',
   'hudChrome.auraEffect.healEcho': 'Att falla under {threshold}% hälsa återställer {value} hälsa',
@@ -20076,7 +20081,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scratch.description':
     'Klös igenom närliggande mål inom 6 yards och ge vapenskada plus {damage}. Ger 1 kombopoäng per träffat mål. Avslöjar smygande fiender inom svepet. Endast i Kattform.',
   'entities.abilities.scratch.name': 'Klös',
-  'entities.abilities.scratch.specNote_feral': 'Varje träff ger 1 Gammalt Blod (högst 3).',
+  'entities.abilities.scratch.specNote_feral':
+    'Varje fiende den träffar blöder också av Klössår: 12 skada över 6 sek.',
   'entities.abilities.spore_burst.description':
     'Frammanar en sporfylld svamp i målområdet. Efter {duration} sek brister den och läker allierade för {healing} samt ger fiender inom 8 yards {damage} naturskada.',
   'entities.abilities.spore_burst.name': 'Sporutbrott',

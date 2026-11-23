@@ -4791,6 +4791,7 @@ export const zh_TW: EnTranslations = {
       "cooldownCap": "此時間窗已使用 {used}/{cap} 秒冷卻縮減",
       "bruinRushWindow": "貓形態無需法力，並釘制你的巨熊衝鋒目標，使其減速 {pct}%，持續 {sec} 秒",
       "funeralHarvestLock": "葬禮收割暫時無法再次產生靈魂碎片",
+      "redTorrent": "你在血收目標身上的流血效果跳動速度提高 {pct}%",
       "effigyPlankHide": "擋掉每次攻擊的 {pct}%，直到碎晶長矛的突刺熄滅它眼中的燈籠",
       "effigyLanternOut": "對你而言，稻草工頭的燈籠已經熄滅：你和你寵物的攻擊無視其木板之皮，全額命中",
       "leadenHexLock": "鉛沉妖術暫時無法再次定身此目標",
@@ -4842,7 +4843,7 @@ export const zh_TW: EnTranslations = {
       "coldsightRead": "你的下一次長弓引射造成的傷害提高{longDrawPct}%，或你的下一次凶厲射擊造成的傷害提高{fellShotPct}%",
       "duskEconomy": "技能的能量消耗降低{pct}%",
       "moontide": "月潮：第{stacks}/{max}層。月翼形態下，狂野奔雷、隕天術與月種的施法各累積1層。達到{max}層時，月種變為月湧、隕天術變為日醒，使用任一個都會耗盡全部3層",
-      "oldBlood": "古血：第{stacks}/{max}層。裂爪、剮擊、血裂、血噬、橫掃利爪與碎骨擊的命中各累積1層。達到{max}層時：貓形態下血噬變為血收，巨熊形態下碎骨擊變為碎髓",
+      "oldBlood": "古血：第{stacks}/{max}層。貓形態下，你的流血效果每次跳動累積1層，每2秒最多1次；巨熊形態下，橫掃利爪與碎骨擊每次命中累積1層。達到{max}層時：貓形態下血噬變為血收，巨熊形態下碎骨擊變為碎髓",
       "verdance": "繁茂：第{stacks}/{max}層。每施放一次孢癒術、再度綻放或荒野癒合累積1層，每層都會縮短荒野癒合的施法時間。達到{max}層時，迅癒變為盛放",
       "freeExecute": "下一個符合條件的斬殺技能不消耗資源",
       "resourceSap": "每 {interval} 秒恢復 {value} 點目前資源",
@@ -18415,17 +18416,17 @@ export const zh_TW: EnTranslations = {
       "claw": {
         "name": "裂爪",
         "description": "用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。僅限貓形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
+        "specNote_feral": "每次命中的攻擊疊加 1 層撕碎，每層為一個在 8 秒內造成 12 點傷害的流血效果（最多 5 層）。疊加新的一層會重置持續時間。"
       },
       "scratch": {
         "name": "抓撓",
         "description": "抓撓 6 碼內的附近目標，造成武器傷害加 {damage}。每命中一個目標獎勵 1 個連擊點。使範圍內潛行的敵人現形。僅限貓形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
+        "specNote_feral": "每個被擊中的敵人還會受到抓傷流血效果：在 6 秒內造成 12 點傷害。"
       },
       "ferocious_bite": {
         "name": "血噬",
         "description": "終結技，造成 {damage}。僅限貓形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為血收：消耗古血發動更強的撕咬，立即引爆你的剮擊與血裂的剩餘傷害，並恢復能量。"
+        "specNote_feral": "目標身上每有一個你的流血效果，造成的傷害提高 15%，並將你的血隙重置為完整持續時間。古血達 3 層時，此按鈕變為血收：消耗古血發動一次打擊，延長你的剮擊與血隙，使你在目標身上的流血效果跳動速度提高 50%，持續 8 秒，並恢復能量。"
       },
       "swipe": {
         "name": "橫掃利爪",
@@ -18480,11 +18481,11 @@ export const zh_TW: EnTranslations = {
       },
       "pounce": {
         "name": "匿蹤突襲",
-        "description": "一個潛行開場技，昏迷目標 2 秒。獎勵 1 個連擊點。僅限貓形態。 未隱匿時，此按鈕為撲擊。"
+        "description": "一個潛行開場技，昏迷目標 2 秒。獎勵 1 個連擊點，野性專精下還會施加裂喉，一個在 12 秒內造成 72 點傷害的流血效果。僅限貓形態。未隱匿時，此按鈕為撲擊。"
       },
       "lunge": {
         "name": "撲擊",
-        "description": "撲向最遠 12 碼外的敵人，造成 60% 武器傷害並獲得 1 個連擊點。僅限貓形態。"
+        "description": "若尚未處於貓形態則先變為貓形態，然後撲向最遠 25 碼外的敵人。抵達時造成 60% 武器傷害並獲得 1 個連擊點；撲擊中途被打斷會返還其冷卻時間。任何形態下皆可使用。"
       },
       "hamstring_bite": {
         "name": "撲倒",
@@ -18496,12 +18497,13 @@ export const zh_TW: EnTranslations = {
       },
       "tigers_fury": {
         "name": "猞猁血之力",
-        "description": "湧起{rage}點能量，並使攻擊強度提高 {buff}，持續 {duration} 秒。僅限貓形態。"
+        "description": "湧起{rage}點能量，並使攻擊強度提高 {buff}，持續 {duration} 秒。僅限貓形態。",
+        "specNote_feral": "持續期間施加的流血效果在其整個持續時間內造成的傷害提高 20%。"
       },
       "rip": {
         "name": "血隙",
         "description": "終結技，使目標每2秒流血一次，持續24秒：造成72點傷害，每消耗1個連擊點額外增加48點（5個連擊點共{damage}點）。僅限貓形態。",
-        "specNote_feral": "命中的一擊累積 1 層古血（最多 3 層）。"
+        "specNote_feral": "目標身上有 3 個或更多你的流血效果時，會受到滲血傷口影響：受到的治療降低 20%。"
       },
       "mortal_strike": {
         "name": "致殘打擊",
@@ -18718,7 +18720,7 @@ export const zh_TW: EnTranslations = {
       },
       "redharvest": {
         "name": "血收",
-        "description": "消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復{rage}點能量。沒有連擊點也能使用。"
+        "description": "消耗3層古血：造成{damage}點傷害，將你在目標身上的剮擊與血隙各延長 4 秒（每個最多延長 8 秒），使你在目標身上的流血效果跳動速度提高 50%，持續 8 秒（赤紅奔流），並恢復{rage}點能量。沒有連擊點也能使用。"
       },
       "marrowbreak": {
         "name": "碎髓",
@@ -19236,7 +19238,7 @@ export const zh_TW: EnTranslations = {
       "rake": {
         "name": "剮擊",
         "description": "撕裂敵人，造成武器傷害外加 {damage} 點，並在 18 秒內造成 {overTime} 點流血傷害。給予 1 點連擊點。僅限貓形態。",
-        "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
+        "specNote_feral": "貓形態下，你的流血效果每次跳動都會累積古血（最多 3 層，每 2 秒最多 1 層），且你的流血效果可以造成致命一擊，每次流血致命一擊恢復 3 點能量。"
       },
       "revive_pet": {
         "name": "修補",

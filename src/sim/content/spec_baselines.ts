@@ -270,9 +270,14 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'maul', dmgPct: 0.35 },
-        { ability: 'claw', dmgPct: 0.15 },
+        // Feral bleed rework: Rendclaw and Scratch gave up their +15% (they now
+        // plant Tatter and Scratch Wound, combat/druid_bleeds.ts) and Gorebite
+        // starts 30% lower because it gains 15% per bleed on the target. These
+        // rows are the Monte Carlo tuning knobs for the direct-to-bleed shift.
+        { ability: 'claw', dmgPct: 0 },
         // Scratch copies Rendclaw's damage profile, baseline row included.
-        { ability: 'scratch', dmgPct: 0.15 },
+        { ability: 'scratch', dmgPct: 0 },
+        { ability: 'ferocious_bite', dmgPct: -0.3 },
         { ability: 'swipe', dmgPct: 0.2 },
       ],
     },

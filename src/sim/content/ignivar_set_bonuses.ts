@@ -1116,13 +1116,12 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
     {
       pieces: 4,
       // Redharvest plants a fresh Flense on the target: aura-only, applied at
-      // the druidEngineOnCast redharvest branch (which runs AFTER runEffects,
-      // so the consumeDot cash-out has already been paid: no double billing).
-      // The replant mirrors the real dot application's value arithmetic
+      // the druidEngineOnCast redharvest branch (which runs AFTER runEffects).
+      // Since the feral bleed rework Redharvest no longer consumes Flense, so
+      // the replant only lands when it is longer than the Flense already
+      // there. It mirrors the real dot application's value arithmetic
       // (replantFlense in combat/druid_engines.ts) but awards no combo point
-      // and banks no Old Blood (the landed-strike hook never fires). The
-      // Blooddrunk tick-banking row makes the finisher self-sustaining for
-      // that build, the set doc's prominent tuning flag. Draws no rng.
+      // and never fires the landed-strike hook. Draws no rng.
       effect: {},
     },
   ],

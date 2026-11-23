@@ -5,8 +5,8 @@
 // read; 4pc is a dmgPct pair on Moonsurge and Sunwake sized DELIVERED (0.3075
 // against the 1.23 committed baseline: 0.08 spec floor plus the 0.15 Moonrage
 // mastery). Wildfang 2pc rewrites Redharvest's resolved energy restore
-// (floor(x1.5): 22/33/45 by rank); 4pc replants a fresh Flense after the
-// consumeDot cash-out, aura-only. Cinderbark 2pc is the one wearer-only rng
+// (floor(x1.5): 22/33/45 by rank); 4pc replants a fresh Flense when the
+// target has none (or a shorter one), aura-only. Cinderbark 2pc is the one wearer-only rng
 // draw of the wave (a 30 percent extra Old Blood roll per landed Sweeping
 // Claws, flag-gated so non-wearers draw nothing); 4pc is a dmgPct row sized
 // DELIVERED (0.495 against the v0.42.0 Wildfang-raised 1.65 Primal Heart
@@ -137,7 +137,7 @@ function settleProjectiles(sim: Sim): void {
 function bankOldBlood(sim: Sim, stacksWanted: number): void {
   const current = sim.player.auras.find((aura) => aura.id === OLD_BLOOD_ID)?.stacks ?? 0;
   for (let i = current; i < stacksWanted; i++) {
-    druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'claw');
+    druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'maul');
   }
 }
 
@@ -418,6 +418,11 @@ describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
     sim.castAbility('rake');
     const realCast = expectDefined(ownDot(target, sim.player.id, 'rake'));
     const realCastAura = { ...realCast };
+    // Since the feral bleed rework Redharvest extends Flense instead of
+    // cashing it out, so a live Flense already outlasts a fresh one and the
+    // replant would be skipped. Let it fall off first: the replant then has
+    // to plant a full one from scratch.
+    target.auras.splice(target.auras.indexOf(realCast), 1);
     bankOldBlood(sim, 3);
     readyCast(sim, 'ferocious_bite');
     sim.player.comboPoints = 1;
@@ -434,7 +439,7 @@ describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
   it('the replant matches a REAL Flense application tick for tick (no arithmetic drift)', () => {
     const bent = redharvestReplant(true);
     const replanted = expectDefined(bent.replanted);
-    // The consumeDot cash-out removed the live bleed; this aura is the fresh
+    // The live bleed was removed before the cast; this aura is the fresh
     // replant. Deep-compare the WHOLE aura (progress fields zeroed) against
     // the real cast's shape: replantFlense hand-mirrors the effect_dispatch
     // dot arm, so a field the real arm gains (leechPct, a rider) that the
@@ -546,7 +551,7 @@ describe('Cinderbark 2pc: Sweeping Claws may bank an additional Old Blood', () =
   it('other Old Blood strikes never roll (the bend is Sweeping Claws only)', () => {
     const sim = bearWithTarget(618, true);
     const spy = vi.spyOn(ctxOf(sim).rng, 'chance').mockReturnValue(false);
-    druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'claw');
+    druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'maul');
     druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'maul');
     const rolls = spy.mock.calls
       .map(([p]) => p)

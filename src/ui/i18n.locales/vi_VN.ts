@@ -8196,10 +8196,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Biến kẻ địch thành một con cóc trong tối đa {duration} giây. Con cóc đi lang thang và hồi máu rất nhanh. Mọi sát thương sẽ phá vỡ hiệu ứng. Chỉ với quái thú và nhân hình.',
   'entities.abilities.polymorph.name': 'Mê Hoặc',
   'entities.abilities.pounce.description':
-    'Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Mèo. Khi không ẩn thân, nút này là Lao Vồ.',
+    'Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn và, khi là Hoang Dã, mở Xé Họng, một hiệu ứng chảy máu gây 72 sát thương trong 12 giây. Chỉ dùng được ở Hình Mèo. Khi không ẩn thân, nút này là Lao Vồ.',
   'entities.abilities.pounce.name': 'Đòn Lẻn Vồ',
   'entities.abilities.lunge.description':
-    'Lao vào kẻ địch cách xa tới 12 thước, gây 60% sát thương vũ khí và nhận 1 điểm combo. Chỉ dùng được ở Hình Mèo.',
+    'Chuyển sang Hình Mèo nếu bạn chưa ở dạng đó, rồi lao vào kẻ địch cách xa tới 25 thước. Khi tới nơi, gây 60% sát thương vũ khí và nhận 1 điểm liên hoàn; cú lao bị cắt ngang sẽ hoàn lại thời gian hồi chiêu. Dùng được ở mọi hình dạng.',
   'entities.abilities.lunge.name': 'Lao Vồ',
   'entities.abilities.hamstring_bite.description':
     'Chiêu kết liễu làm choáng mục tiêu trong 1 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 6 giây). Chỉ dùng được ở Hình Mèo.',
@@ -8320,6 +8320,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.name': 'Đòn Chấn Rung',
   'entities.abilities.tigers_fury.description':
     'Tạo ra {rage} năng lượng và tăng sức mạnh tấn công thêm {buff} trong {duration} giây. Chỉ trong Hình Mèo.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Các hiệu ứng chảy máu bạn gây ra trong thời gian hiệu lực gây thêm 20% sát thương trong suốt thời gian tồn tại của chúng.',
   'entities.abilities.tigers_fury.name': 'Huyết Linh Miêu',
   'entities.abilities.travel_form.description':
     'Biến hình ngay lập tức thành Hình Thần Tốc nhanh nhẹn, tăng tốc độ di chuyển 40% và loại bỏ các hiệu ứng trói chân và làm chậm có thể phá vỡ. Bạn không thể dùng kỹ năng khác khi đang biến hình, nhưng có thể biến hình dù đang hay không đang chiến đấu, lý tưởng để chạy trốn. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn.',
@@ -16126,7 +16128,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiêu 3 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Chữa Lành Bào Tử mới lên mục tiêu.',
   'entities.abilities.redharvest.name': 'Thu Hoạch Đỏ',
   'entities.abilities.redharvest.description':
-    'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn.',
+    'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, kéo dài Lóc Xé và Vết Nứt Máu của bạn trên mục tiêu thêm 4 giây (tối đa 8 giây mỗi hiệu ứng), khiến các hiệu ứng chảy máu của bạn trên mục tiêu gây sát thương nhanh hơn 50% trong 8 giây (Dòng Thác Đỏ) và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn.',
   'entities.abilities.sunlance.name': 'Vệt Dương',
   'entities.abilities.sunlance.description':
     'Tiêu 3 Triều Nguyệt của bạn cho một đòn gây {damage} sát thương Tự Nhiên cộng thêm {overTime} thiêu đốt trong 9 giây, và hồi 35 mana: lựa chọn mana. Nguyệt Trào cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một.',
@@ -16135,7 +16137,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó',
   'hudChrome.auraEffect.oldBlood':
-    'Huyết Cổ {stacks}/{max}. Đòn trúng từ Vuốt Xé, Lóc Xé, Vết Nứt Máu, Cắn Xé Máu, Vuốt Quét Ngang và Nghiền Xương mỗi lần cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin',
+    'Huyết Cổ {stacks}/{max}. Ở Hình Mèo, mỗi nhịp chảy máu của bạn cộng 1, nhiều nhất một lần mỗi 2 giây; ở Hình Bruin, mỗi đòn trúng của Vuốt Quét Ngang và Nghiền Xương cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin',
   'hudChrome.auraEffect.verdance':
     'Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai',
   'hudChrome.continentMap.levels': 'Cấp {min} đến {max}',
@@ -16525,7 +16527,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.name': 'Da Than Hồng',
   'entities.abilities.claw.description':
     'Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.',
-  'entities.abilities.claw.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
+  'entities.abilities.claw.specNote_feral':
+    'Mỗi đòn đánh trúng thêm một tầng Xé Tơi, một hiệu ứng chảy máu gây 12 sát thương trong 8 giây mỗi tầng (tối đa 5 tầng). Tầng mới làm mới thời gian hiệu lực.',
   'entities.abilities.cold_blood.description':
     'Tập trung sát ý để 5 đòn tấn công tiếp theo của bạn chắc chắn chí mạng. (động cơ Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -16559,7 +16562,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.description': 'Giảm giáp của mục tiêu {damage}% trong 40 giây.',
   'entities.abilities.ferocious_bite.description': 'Đòn kết liễu gây {damage}. Chỉ trong Hình Mèo.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng.',
+    'Gây thêm 15% sát thương cho mỗi hiệu ứng chảy máu của bạn trên mục tiêu và làm mới Vết Nứt Máu của bạn về toàn bộ thời gian hiệu lực. Ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một đòn đánh kéo dài Lóc Xé và Vết Nứt Máu của bạn, khiến các hiệu ứng chảy máu của bạn trên mục tiêu gây sát thương nhanh hơn 50% trong 8 giây, và hồi năng lượng.',
   'entities.abilities.funeral_harvest.description':
     'Khi một kẻ địch vừa bị bạn hoặc thuộc hạ Bất Tử của bạn gây sát thương chết đi, bạn nhận 1 Mảnh Linh Hồn. Điều này có thể xảy ra một lần mỗi 3 giây.',
   'entities.abilities.funeral_harvest.name': 'Thu Hoạch Tang Lễ',
@@ -16616,7 +16619,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.name': 'Triệu Hồi Chiến Binh Xương',
   'entities.abilities.rake.description':
     'Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây {overTime} sát thương chảy máu trong 18 giây. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.',
-  'entities.abilities.rake.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
+  'entities.abilities.rake.specNote_feral':
+    'Ở Hình Mèo, mỗi nhịp chảy máu của bạn thêm Huyết Cổ (tối đa 3, nhiều nhất 1 mỗi 2 giây), và hiệu ứng chảy máu của bạn có thể chí mạng, mỗi lần chảy máu chí mạng hồi 3 năng lượng.',
   'entities.abilities.reaping_command.description':
     'Tiêu hao 2 Mảnh Linh Hồn để ra lệnh cho mọi thuộc hạ Bất Tử đồng loạt tấn công. Vệ Mộ khiêu khích và gồng mình, Chiến Binh ghim chặt, Pháp Sư Xương phơi bày phòng ngự phép, và Cánh Mộ xé toạc mọi kẻ địch bị đánh trúng.',
   'entities.abilities.reaping_command.name': 'Mệnh Lệnh Gặt Hái',
@@ -16629,7 +16633,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Mỗi lần thi triển thêm 1 Sắc Xanh (tối đa 3), kể cả khi làm mới một chồi hoa đang còn hiệu lực. Ở 3 Sắc Xanh, Hồi Phục Nhanh trở thành Mãn Khai.',
   'entities.abilities.rip.description':
     'Đòn kết thúc khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 72 sát thương cộng 48 mỗi điểm liên kích tiêu hao (5 điểm: tổng {damage}). Chỉ ở Hình Mèo.',
-  'entities.abilities.rip.specNote_feral': 'Đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Khi mục tiêu có từ 3 hiệu ứng chảy máu của bạn trở lên, nó chịu Vết Thương Rỉ Máu: giảm 20% lượng hồi máu nhận được.',
   'entities.abilities.ruinous_brand.description':
     'Đóng dấu một kẻ địch trong 15 giây. 3 phép trực tiếp tiếp theo của bạn sẽ vọng lại 25% sát thương lên kẻ địch bị đóng dấu, hoặc sao chép 50% sát thương vào nó khi được thi triển lên mục tiêu khác. Tiếng vọng của Tia Hủy Diệt cũng được tính là đòn chí mạng, nhưng không nhân thêm hệ số sát thương chí mạng khác.',
   'entities.abilities.ruinous_brand.name': 'Dấu Ấn Diệt Vong',
@@ -16767,6 +16772,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formShadow': 'Hình Gloamveil: sát thương Bóng Tối tăng {pct}%',
   'hudChrome.auraEffect.freeExecute': 'Kỹ năng kết liễu hợp lệ tiếp theo của bạn không tốn gì',
   'hudChrome.auraEffect.funeralHarvestLock': 'Thu Hoạch Tang Lễ chưa thể tạo thêm Mảnh Linh Hồn',
+  'hudChrome.auraEffect.redTorrent':
+    'Hiệu ứng chảy máu của bạn trên mục tiêu Thu Hoạch Đỏ gây sát thương nhanh hơn {pct}%',
   'hudChrome.auraEffect.galeheartWeapon':
     'Hoàn tất chuỗi {steps} đòn của Nhịp Chiến Hồn sẽ vọng lại đòn đánh {count} lần với {pct}% sát thương dưới dạng sát thương Thiên Nhiên',
   'hudChrome.auraEffect.healEcho': 'Máu giảm xuống dưới {threshold}% sẽ hồi {value} máu',
@@ -20125,7 +20132,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scratch.description':
     'Cào qua các mục tiêu gần trong 6 mét, gây sát thương vũ khí cộng {damage}. Nhận 1 điểm liên kích cho mỗi mục tiêu trúng đòn. Làm lộ kẻ địch tàng hình trong vùng quét. Chỉ dùng ở Hình Mèo.',
   'entities.abilities.scratch.name': 'Cào',
-  'entities.abilities.scratch.specNote_feral': 'Mỗi đòn trúng thêm 1 Huyết Cổ (tối đa 3).',
+  'entities.abilities.scratch.specNote_feral':
+    'Mỗi kẻ địch bị đánh trúng cũng chảy máu vì Vết Cào: 12 sát thương trong 6 giây.',
   'entities.abilities.spore_burst.description':
     'Triệu hồi nấm bùng nổ tại vùng mục tiêu. Sau {duration} giây, nấm nổ, hồi {healing} máu cho đồng minh và gây {damage} sát thương Thiên Nhiên lên địch trong 8 mét.',
   'entities.abilities.spore_burst.name': 'Bùng Nổ Bào Tử',

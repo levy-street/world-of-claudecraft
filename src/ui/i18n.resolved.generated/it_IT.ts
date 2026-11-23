@@ -4791,6 +4791,7 @@ export const it_IT: EnTranslations = {
       "cooldownCap": "{used} di {cap} sec di riduzione del tempo di recupero usati in questa finestra",
       "bruinRushWindow": "La Forma del Gatto non costa mana e blocca il bersaglio della vostra Carica di Bruin, rallentandolo del {pct}% per {sec} sec",
       "funeralHarvestLock": "Raccolto Funebre non può ancora creare un altro Frammento d'Anima",
+      "redTorrent": "I tuoi sanguinamenti sul bersaglio della tua Mietitura Rossa ticchettano il {pct}% più velocemente",
       "effigyPlankHide": "Respinge il {pct}% di ogni colpo finché un affondo della picca di schegge non spegne la lanterna nel suo occhio",
       "effigyLanternOut": "Per te la lanterna del Caposquadra di paglia è spenta: i tuoi colpi e quelli del tuo famiglio ignorano la Pelle d'Assi e infliggono danni pieni",
       "leadenHexLock": "Maleficio Plum beo non può ancora radicare di nuovo questo bersaglio",
@@ -4842,7 +4843,7 @@ export const it_IT: EnTranslations = {
       "coldsightRead": "Il tuo prossimo Tiro lungo infligge il {longDrawPct}% di danni in più, oppure il tuo prossimo Tiro funesto ne infligge il {fellShotPct}% in più",
       "duskEconomy": "Le abilità costano il {pct}% di energia in meno",
       "moontide": "Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono",
-      "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Gatto e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
+      "oldBlood": "Sangue Antico: stadio {stacks} di {max}. In Forma del Gatto ogni tick dei tuoi sanguinamenti ne aggiunge 1, al massimo una volta ogni 2 sec; in Forma di Bruin ogni colpo a segno di Artigli Falcianti e Frantumaossa ne aggiunge 1. A {max}: Morso Cruento diventa Mietitura Rossa in Forma del Gatto, Frantumaossa diventa Spezzamidollo in Forma di Bruin",
       "verdance": "Verzura {stacks}/{max}. Ogni Cura delle Spore, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
       "freeExecute": "La tua prossima abilità di esecuzione idonea non costa nulla",
       "resourceSap": "Ripristina {value} della tua risorsa attuale ogni {interval} sec",
@@ -18415,17 +18416,17 @@ export const it_IT: EnTranslations = {
       "claw": {
         "name": "Artiglio Lacerante",
         "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Gatto.",
-        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
+        "specNote_feral": "Ogni colpo a segno aggiunge un accumulo di Brandelli, un sanguinamento da 12 danni in 8 sec per accumulo (massimo 5 accumuli). Un nuovo accumulo rinnova la durata."
       },
       "scratch": {
         "name": "Graffio",
         "description": "Graffia i bersagli vicini entro 6 m, infliggendo danni dell'arma più {damage}. Fornisce 1 punto combo per bersaglio colpito. Rivela i nemici furtivi nell'area spazzata. Solo in Forma Felina.",
-        "specNote_feral": "Ogni colpo riuscito aggiunge 1 Sangue Antico (massimo 3)."
+        "specNote_feral": "Ogni nemico colpito sanguina anche con Ferita da Graffio: 12 danni in 6 sec."
       },
       "ferocious_bite": {
         "name": "Morso Cruento",
         "description": "Mossa finale che infligge {damage}. Solo Forma del Gatto.",
-        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo più forte che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina energia."
+        "specNote_feral": "Infligge il 15% di danni in più per ogni tuo sanguinamento sul bersaglio e riporta la tua Faglia Sanguigna alla durata piena. A 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo che prolunga Scarnificare e Faglia Sanguigna, fa ticchettare i tuoi sanguinamenti sul bersaglio il 50% più velocemente per 8 sec e ripristina energia."
       },
       "swipe": {
         "name": "Artigli Falcianti",
@@ -18480,11 +18481,11 @@ export const it_IT: EnTranslations = {
       },
       "pounce": {
         "name": "Colpo Strisciante",
-        "description": "Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Gatto. Fuori dalla furtività questo pulsante è Balzo."
+        "description": "Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo e, da Ferino, apre Gola Squarciata, un sanguinamento da 72 danni in 12 sec. Solo Forma del Gatto. Fuori dalla furtività questo pulsante è Balzo."
       },
       "lunge": {
         "name": "Balzo",
-        "description": "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Gatto."
+        "description": "Assumi la Forma del Gatto se non ci sei già, poi balza su un nemico fino a 25 metri di distanza. All'arrivo infligge il 60% del danno dell'arma e conferisce 1 punto combo; un balzo interrotto rimborsa il suo tempo di recupero. Utilizzabile in qualsiasi forma."
       },
       "hamstring_bite": {
         "name": "Atterramento",
@@ -18496,12 +18497,13 @@ export const it_IT: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangue di Lince",
-        "description": "Sprigiona {rage} energia e aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Gatto."
+        "description": "Sprigiona {rage} energia e aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Gatto.",
+        "specNote_feral": "I sanguinamenti che applichi mentre è attivo infliggono il 20% di danni in più per tutta la loro durata."
       },
       "rip": {
         "name": "Faglia Sanguigna",
         "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 s per 24 s: 72 danni più 48 per punto combo consumato (5 punti: {damage} totali). Solo in Forma del Gatto.",
-        "specNote_feral": "Il colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
+        "specNote_feral": "Finché sul bersaglio ci sono 3 o più tuoi sanguinamenti, subisce Ferite Stillanti: riceve il 20% di cure in meno."
       },
       "mortal_strike": {
         "name": "Colpo Mutilante",
@@ -18718,7 +18720,7 @@ export const it_IT: EnTranslations = {
       },
       "redharvest": {
         "name": "Mietitura Rossa",
-        "description": "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo."
+        "description": "Consuma 3 Sangue Antico: colpisce per {damage}, prolunga Scarnificare e Faglia Sanguigna sul bersaglio di 4 sec (fino a 8 sec ciascuno), fa ticchettare i tuoi sanguinamenti sul bersaglio il 50% più velocemente per 8 sec (Torrente Rosso) e ripristina {rage} energia. Funziona anche senza punti combo."
       },
       "marrowbreak": {
         "name": "Spezzamidollo",
@@ -19236,7 +19238,7 @@ export const it_IT: EnTranslations = {
       "rake": {
         "name": "Scarnificare",
         "description": "Scarnifica il nemico per danni dell'arma più {damage} e causa {overTime} danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
-        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
+        "specNote_feral": "In Forma del Gatto i tick dei tuoi sanguinamenti aggiungono Sangue Antico (massimo 3, al massimo 1 ogni 2 sec) e i tuoi sanguinamenti possono essere critici: ogni critico da sanguinamento ripristina 3 energia."
       },
       "revive_pet": {
         "name": "Rattoppare",

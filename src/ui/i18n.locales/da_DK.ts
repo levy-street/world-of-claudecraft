@@ -7995,10 +7995,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forvandler fjenden til en tudse i op til {duration} sek. Tudsen vandrer omkring og helbredes hurtigt. Enhver skade bryder effekten. Kun bæster og humanoider.',
   'entities.abilities.polymorph.name': 'Forheks',
   'entities.abilities.pounce.description':
-    'En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint. Kun i Katteform. Uden sneg-tilstand er denne knap Spring.',
+    'En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint og åbner som Forvildet Struberive, en blødning på 72 skade over 12 sek. Kun i Katteform. Uden sneg-tilstand er denne knap Spring.',
   'entities.abilities.pounce.name': 'Luskeslag',
   'entities.abilities.lunge.description':
-    'Spring mod en fjende op til 12 m væk, påfør 60% våbenskade og giv 1 kombopoint. Kun i Katteform.',
+    'Skift til Katteform, hvis du ikke allerede er i den, og spring så mod en fjende op til 25 m væk. Ved ankomst påføres 60% våbenskade og gives 1 kombopoint; et afbrudt spring refunderer sin nedkøling. Kan bruges i enhver form.',
   'entities.abilities.lunge.name': 'Spring',
   'entities.abilities.hamstring_bite.description':
     'Afsluttende manøvre, der bedøver målet i 1 sek. plus 1 sek. pr. combopoint (5 combopoint: 6 sek.). Kun i Katteform.',
@@ -8118,6 +8118,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.name': 'Rystende Slag',
   'entities.abilities.tigers_fury.description':
     'Frembringer {rage} energi og øger angrebskraft med {buff} i {duration} sek. Kun i Katteform.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Blødninger, du påfører, mens den varer, giver 20% mere skade i hele deres varighed.',
   'entities.abilities.tigers_fury.name': 'Losblod',
   'entities.abilities.travel_form.description':
     'Skift øjeblikkeligt til en hurtig Fleet-form, der øger bevægelseshastighed med 40% og fjerner brydelige rodfæstninger og hastighedsnedsættelser. Du kan ikke bruge andre evner, mens du er forvandlet, men kan skifte ind eller ud af kamp, ideelt til at flygte. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed.',
@@ -15908,7 +15910,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forbruger 3 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Sporeheling på målet.',
   'entities.abilities.redharvest.name': 'Rød Høst',
   'entities.abilities.redharvest.description':
-    'Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint.',
+    'Forbruger dine 3 Gammelt Blod: et slag for {damage}, forlænger dine Flæns og Blodrevne på målet med 4 sek. (op til 8 sek. hver), får dine blødninger på målet til at tikke 50% hurtigere i 8 sek. (Rød Strøm) og gendanner {rage} energi. Virker uden kombopoint.',
   'entities.abilities.sunlance.name': 'Solspor',
   'entities.abilities.sunlance.description':
     'Forbruger dine 3 Måneflod til et slag med {damage} naturskade plus en forbrænding på {overTime} over 9 sek. og gendanner 35 mana: manavalget. Månebølge forbruger de samme 3 Måneflod, så vælg et.',
@@ -15917,7 +15919,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den',
   'hudChrome.auraEffect.oldBlood':
-    'Gammelt Blod: trin {stacks} af {max}. Landede Katte- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus',
+    'Gammelt Blod: trin {stacks} af {max}. I Katteform tilføjer hvert tik fra dine blødninger 1, højst én gang hvert 2. sek.; i Bruin-form tilføjer hvert slag med Fejende Kløer og Knogleknus, der rammer, 1. Ved {max}: Blodbid bliver til Rød Høst i Katteform, og Knogleknus bliver til Marvbrækker i Bruin-form',
   'hudChrome.auraEffect.verdance':
     'Grønske {stacks}/{max}. Hver Sporeheling, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring',
   'sim.rift.allUnstable': 'Alle rifter er ustabile lige nu. Prøv igen senere.',
@@ -16404,7 +16406,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Klo fjenden for våbenskade plus {damage}. Giver 1 combopoint. Kun i Katteform.',
   'entities.abilities.claw.specNote_feral':
-    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3).',
+    'Hvert slag, der rammer, tilføjer en stak Pjalter, en blødning på 12 skade over 8 sek. pr. stak (maks. 5 stakke). En ny stak fornyer varigheden.',
   'entities.abilities.cold_blood.description':
     'Fokuserer din dræberinstinkt, så dine næste 5 angreb rammer kritisk. (Knifework-motoren)',
   'entities.abilities.corpse_explosion.description':
@@ -16439,7 +16441,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Afsluttende manøvre, der giver {damage}. Kun i Katteform.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et kraftigere slag, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner energi.',
+    'Giver 15% mere skade for hver af dine blødninger på målet og fornyer din Blodrevne til fuld varighed. Ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et slag, der forlænger dine Flæns og Blodrevne, får dine blødninger på målet til at tikke 50% hurtigere i 8 sek. og gendanner energi.',
   'entities.abilities.funeral_harvest.description':
     'Når en fjende, du eller dine udøde for nylig har skadet, dør, får du 1 Sjælesplint. Dette kan ske højst én gang hvert 3. sek.',
   'entities.abilities.funeral_harvest.name': 'Begravelseshøst',
@@ -16497,7 +16499,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Flæns fjenden for våbenskade plus {damage} og giv {overTime} blødningsskade over 18 sek. Giver 1 combopoint. Kun i Katteform.',
   'entities.abilities.rake.specNote_feral':
-    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3).',
+    'I Katteform tilføjer dine blødningers tik Gammelt Blod (maks. 3, højst 1 hvert 2. sek.), og dine blødninger kan ramme kritisk, hvor hvert kritisk blødningstik gendanner 3 energi.',
   'entities.abilities.reaping_command.description':
     'Bruger 2 Sjælesplinter for at befale alle udøde tjenere at slå til i samlet flok. Gravvogtere håner og forbereder sig, Krigere fastholder, Knoglemagikere blotter magiske forsvar, og Gravvingen flænger alle ramte fjender.',
   'entities.abilities.reaping_command.name': 'Høstende befaling',
@@ -16510,7 +16512,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Hver kastning giver 1 Grønske (maks. 3), også når den fornyer en blomstring, der allerede virker. Ved 3 Grønske bliver Hurtig heling til Overblomstring.',
   'entities.abilities.rip.description':
     'Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek.: 72 skade plus 48 pr. brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.',
-  'entities.abilities.rip.specNote_feral': 'Det ramte slag tilføjer 1 Gammelt Blod (maks. 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Mens 3 eller flere af dine blødninger er på et mål, lider det af Væskende Sår: 20% mindre modtaget helbredelse.',
   'entities.abilities.ruinous_brand.description':
     'Brænder en fjende i 15 sek. Dine næste 3 direkte besværgelser ekkoer for 25% skade mod den brændemærkede fjende, eller kopierer 50% skade til den, når de kastes mod et andet mål. Undergangslyn-ekkoer tæller også som kritiske træffere, uden endnu en kritisk skademultiplikator.',
   'entities.abilities.ruinous_brand.name': 'Ødelæggende brændemærke',
@@ -16649,6 +16652,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeExecute': 'Din næste kvalificerede henrettelsesevne koster ingenting',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Begravelseshøst kan ikke skabe endnu en Sjælesplint lige nu',
+  'hudChrome.auraEffect.redTorrent':
+    'Dine blødninger på målet for din Rød Høst tikker {pct}% hurtigere',
   'hudChrome.auraEffect.galeheartWeapon':
     'At fuldføre Krigsåndens {steps}-træfs kadence ekkoer slaget {count} gange for {pct}% af dets skade som naturskade',
   'hudChrome.auraEffect.healEcho':
@@ -20037,7 +20042,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Riv gennem nærliggende mål inden for 6 yards for våbenskade plus {damage}. Giver 1 kombopoint pr. ramt mål. Afslører snigende fjender i området. Kun i Katteform.',
   'entities.abilities.scratch.name': 'Krads',
   'entities.abilities.scratch.specNote_feral':
-    'Hvert træffende slag giver 1 Gammelt Blod (maks. 3).',
+    'Hver fjende, det rammer, bløder også af Kradssår: 12 skade over 6 sek.',
   'entities.abilities.spore_burst.description':
     'Fremkalder en sporeknold i målområdet. Efter {duration} sek. brister den, heler allierede for {healing} og giver fjender inden for 8 yards {damage} naturskade.',
   'entities.abilities.spore_burst.name': 'Sporebrist',

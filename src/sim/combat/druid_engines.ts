@@ -18,6 +18,13 @@ import { primaryHealingMultiplier } from '../spec_output_tuning';
 import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
+import {
+  feralBleedOnLandedStrike,
+  feralBleedOnTick,
+  feralBleedTickBanksOldBlood,
+  OPEN_VEINS_TALENT_ID,
+  openRedTorrent,
+} from './druid_bleeds';
 import { LUNGE_ID, startLunge } from './druid_lunge';
 import {
   GROVEHEART_BOON_ICD_KEY,
@@ -69,7 +76,10 @@ export const DRUID_TALENT_IDS = {
   longstride: 'dru_r5_ferocity',
   skylark: 'dru_r5_natures_bounty',
   highmoonTithe: 'dru_r14_moonfury',
-  blooddrunk: 'dru_r14_savage_fury',
+  // The row 14 Wildfang option: Blooddrunk until the feral bleed rework made
+  // bleed-tick Old Blood baseline in Cat Form; the slot is now Open Veins
+  // (combat/druid_bleeds.ts), same option id so saved allocations resolve.
+  openVeins: OPEN_VEINS_TALENT_ID,
   seedspread: 'dru_r14_empowered_touch',
   naturesFury: 'dru_r20_improved_hurricane',
   wildApex: 'dru_r20_berserk',
@@ -152,27 +162,13 @@ const FORM_ABILITY_IDS = new Set([
   'sporemender_form',
 ]);
 const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
-// Every landed feral strike that banks one Old Blood. Slinkstrike ('pounce')
-// and Lunge joined the list in the v0.43 feral pass: the stealth opener banks
-// on the tick its stun lands (the stun arm of effect_dispatch.ts reports here
-// beside the combo point it already pays), and Lunge banks on ARRIVAL, when
-// its parked strike actually rolls through ctx.meleeSwing (combat/
-// druid_lunge.ts). A Lunge that ends short strikes nothing and so banks
-// nothing, exactly as it awards no combo point. The OLD_BLOOD_STAGES cap of 3
-// holds for both through addStage. Scratch (combat/druid_scratch.ts) banks
-// once per LANDED swing through the same meleeSwing hook, so a sweep that
-// lands on three enemies fills the bank in one press.
-const OLD_BLOOD_STRIKE_IDS = new Set([
-  'claw',
-  'rake',
-  'rip',
-  'ferocious_bite',
-  'maul',
-  'swipe',
-  'scratch',
-  'pounce',
-  'lunge',
-]);
+// Every landed feral strike that banks one Old Blood. Since the feral bleed
+// rework only the Bruin strikes bank on a hit: Cat Form banks from its own
+// bleed ticks instead (druidEngineOnBleedTick, at most one Old Blood every
+// OLD_BLOOD_BLEED_ICD seconds, combat/druid_bleeds.ts), so the Cat payoff
+// tracks how many bleeds are running rather than how many buttons were
+// pressed. The OLD_BLOOD_STAGES cap of 3 holds through addStage.
+const OLD_BLOOD_STRIKE_IDS = new Set(['maul', 'swipe']);
 const VERDANCE_SOWING_IDS = new Set(['rejuvenation', 'regrowth']);
 
 // Banked Verdance on this actor. Reads the aura list by kind only (the same
@@ -455,19 +451,19 @@ export function druidEngineOnCast(
     if (selectedRow(ctx, player, DRUID_TALENT_IDS.naturesFury)) {
       setBank(ctx, player, OLD_BLOOD_ID, 'Old Blood', 'old_blood', 1);
     }
-    // Wildfang 4pc: Redharvest plants a fresh Flense on the target. This
-    // funnel runs AFTER runEffects (onCastCompleted), so the consumeDot
-    // cash-out already paid and removed the old bleed: no double billing.
-    // The replant is aura-only: no combo point, and the landed-strike hook
-    // never fires, so it banks no Old Blood. Draws no rng.
-    if (
-      abilityId === 'redharvest' &&
-      target &&
-      !target.dead &&
-      ctx.isHostileTo(player, target) &&
-      wearsSetBonus(ctx, player, 'wildfang_emberhide', 4)
-    ) {
-      replantFlense(ctx, player, target);
+    if (abilityId === 'redharvest' && target && !target.dead && ctx.isHostileTo(player, target)) {
+      // Red Torrent: Redharvest no longer cashes the bleeds out; it speeds
+      // every bleed of yours on the target for 8 sec (the extendDot rows on
+      // the ability already lengthened Flense and Bloodrift). Draws no rng.
+      openRedTorrent(ctx, player, target);
+      // Wildfang 4pc: Redharvest plants a fresh Flense on the target when that
+      // is longer than the one already there (a Flense the extension pushed
+      // to a full duration or past it is kept). This funnel runs AFTER
+      // runEffects (onCastCompleted). The replant is aura-only: no combo
+      // point, and the landed-strike hook never fires. Draws no rng.
+      if (wearsSetBonus(ctx, player, 'wildfang_emberhide', 4)) {
+        replantFlense(ctx, player, target);
+      }
     }
     return;
   }
@@ -499,8 +495,13 @@ export function druidEngineOnLandedStrike(
   ctx: SimContext,
   player: Entity,
   abilityId?: string,
+  target?: Entity | null,
 ): void {
-  if (!abilityId || !OLD_BLOOD_STRIKE_IDS.has(abilityId)) return;
+  if (!abilityId) return;
+  // Cat Form bleed riders (Tatter, Scratch Wound, Gorebite's Bloodrift
+  // refresh, combat/druid_bleeds.ts): feral-gated inside, no rng.
+  feralBleedOnLandedStrike(ctx, player, abilityId, target);
+  if (!OLD_BLOOD_STRIKE_IDS.has(abilityId)) return;
   const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
   if (meta?.cls !== 'druid' || specOf(ctx, player) !== 'feral') return;
   addStage(ctx, player, OLD_BLOOD_ID, 'Old Blood', 'old_blood', OLD_BLOOD_STAGES);
@@ -518,18 +519,22 @@ export function druidEngineOnLandedStrike(
   }
 }
 
-export function druidEngineOnBleedTick(ctx: SimContext, source: Entity | null, aura: Aura): void {
-  if (
-    !source ||
-    source.dead ||
-    aura.school !== 'physical' ||
-    (aura.id !== 'rake' && aura.id !== 'rip') ||
-    specOf(ctx, source) !== 'feral' ||
-    !selectedRow(ctx, source, DRUID_TALENT_IDS.blooddrunk)
-  ) {
+// A Cat bleed tick: banks Old Blood (baseline since the feral bleed rework,
+// at most once per OLD_BLOOD_BLEED_ICD across all of the druid's bleeds, Cat
+// Form only) and keeps Weeping Wounds up while three or more bleeds run.
+export function druidEngineOnBleedTick(
+  ctx: SimContext,
+  source: Entity | null,
+  aura: Aura,
+  victim: Entity,
+): void {
+  if (!source || source.dead || aura.school !== 'physical' || specOf(ctx, source) !== 'feral') {
     return;
   }
-  addStage(ctx, source, OLD_BLOOD_ID, 'Old Blood', 'old_blood', OLD_BLOOD_STAGES);
+  feralBleedOnTick(ctx, source, victim);
+  if (feralBleedTickBanksOldBlood(source, aura)) {
+    addStage(ctx, source, OLD_BLOOD_ID, 'Old Blood', 'old_blood', OLD_BLOOD_STAGES);
+  }
 }
 
 export function druidEngineCombatState(ctx: SimContext, player: Entity): void {
@@ -621,6 +626,10 @@ function replantFlense(ctx: SimContext, player: Entity, target: Entity): void {
   const resolved = ctx.resolvedAbility('rake', player.id);
   const dot = resolved?.effects.find((effect) => effect.type === 'dot');
   if (!resolved || !dot || dot.type !== 'dot') return;
+  const current = target.auras.find(
+    (aura) => aura.kind === 'dot' && aura.id === 'rake' && aura.sourceId === player.id,
+  );
+  if (current && current.remaining >= dot.duration) return;
   const mods = ctx.playerMods(meta);
   const dotBase = Math.max(1, Math.round(dot.total / (dot.duration / dot.interval)));
   const dotSp = dotTickBonus(

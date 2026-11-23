@@ -198,10 +198,11 @@ describe('replacement rank resolution', () => {
     expect(refundOf(r2).amount).toBe(22);
   });
 
-  it('keeps both consumeDot arms and the bank requirement at every rank', () => {
+  it('keeps both extendDot arms (feral bleed rework) at every rank', () => {
     for (const level of [5, 10, 20]) {
       const out = resolveActionReplacement(resolved('ferocious_bite'), feralActor(level));
-      const dots = out.effects.filter((effect) => effect.type === 'consumeDot');
+      expect(out.effects.some((effect) => effect.type === 'consumeDot')).toBe(false);
+      const dots = out.effects.filter((effect) => effect.type === 'extendDot');
       expect(dots.map((effect) => (effect as { dot: string }).dot).sort()).toEqual(['rake', 'rip']);
     }
   });

@@ -59,7 +59,7 @@ describe("Nature's Echo", () => {
       }
     ).ctx;
     for (let strike = 0; strike < 3; strike++) {
-      druidEngineOnLandedStrike(engineCtx, player, 'claw');
+      druidEngineOnLandedStrike(engineCtx, player, 'maul');
     }
     onCastCompleted(engineCtx, player, 'redharvest');
 

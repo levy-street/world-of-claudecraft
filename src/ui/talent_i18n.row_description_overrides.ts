@@ -111,7 +111,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       'La Oleada Lunar y la Estela Solar también restauran cada una un 15% de tu maná máximo.',
     dru_r14_savage_fury:
-      'Cada pulso de tus sangrados de Desollar y Desgarrar también añade 1 de Sangre Antigua.',
+      'Tu Grieta Sangrienta también hace que el objetivo reciba un 15% más de daño de sangrado mientras dure.',
     dru_r20_berserk:
       'Oleada Lunar, Estela Solar, Cosecha Roja, Quiebramédula y Sobrefloración son un 25% más fuertes.',
     dru_r20_tranquility:
@@ -242,7 +242,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       'Oleada Lunar y Estela Solar también restauran cada una un 15% de tu maná máximo.',
     dru_r14_savage_fury:
-      'Cada tic de tus sangrados de Desollar y Desgarrar también añade 1 de Sangre Antigua.',
+      'Tu Grieta Sangrienta también hace que el objetivo reciba un 15% más de daño de sangrado mientras dure.',
     dru_r20_berserk:
       'Oleada Lunar, Estela Solar, Cosecha Roja, Quiebramédula y Sobrefloración son un 25% más fuertes.',
     dru_r20_tranquility:
@@ -369,7 +369,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       'Déferlante lunaire et Sillage solaire restaurent chacun aussi 15% de votre mana maximum.',
     dru_r14_savage_fury:
-      "Chaque tic de vos saignements d'Écorcher et de Lacération ajoute aussi 1 Sang ancien.",
+      "Votre Faille sanglante fait aussi subir à la cible 15% de dégâts de saignement supplémentaires tant qu'elle dure.",
     dru_r20_berserk:
       'Déferlante lunaire, Sillage solaire, Moisson rouge, Brise-moelle et Surfloraison sont 25% plus puissants.',
     dru_r20_tranquility:
@@ -497,7 +497,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       'Déferlante lunaire et Sillage solaire restaurent chacun aussi 15% de votre mana maximum.',
     dru_r14_savage_fury:
-      "Chaque pulsation de vos saignements d'Écorcher et de Lacération ajoute aussi 1 Sang ancien.",
+      "Votre Faille sanglante fait aussi subir à la cible 15% de dégâts de saignement supplémentaires tant qu'elle dure.",
     dru_r20_berserk:
       'Déferlante lunaire, Sillage solaire, Moisson rouge, Brise-moelle et Surfloraison sont 25% plus puissants.',
     dru_r20_tranquility:
@@ -623,7 +623,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       'Ondata Lunare e Scia Solare ripristinano ciascuna anche il 15% del tuo mana massimo.',
     dru_r14_savage_fury:
-      'Ogni tick dei tuoi sanguinamenti di Scarnificare e Squartare aggiunge anche 1 Sangue Antico.',
+      'La tua Faglia Sanguigna fa anche subire al bersaglio il 15% di danni da sanguinamento in più finché dura.',
     dru_r20_berserk:
       'Ondata Lunare, Scia Solare, Mietitura Rossa, Spezzamidollo e Sovrafioritura sono il 25% più potenti.',
     dru_r20_tranquility:
@@ -750,7 +750,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       'Mondwoge und Sonnenspur stellen jeweils außerdem 15% Eures maximalen Manas wieder her.',
     dru_r14_savage_fury:
-      'Jeder Tick Eurer Schinden- und Zerfetzen-Blutungen fügt außerdem 1 Altes Blut hinzu.',
+      'Euer Blutriss lässt das Ziel außerdem 15% mehr Blutungsschaden erleiden, solange er anhält.',
     dru_r20_berserk:
       'Mondwoge, Sonnenspur, Rote Ernte, Markbrecher und Überblüte sind 25% stärker.',
     dru_r20_tranquility:
@@ -874,7 +874,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Cada ponto de raiva gasto reduz em 0,1 s a recarga das suas principais habilidades ofensivas, até 10 s a cada 30 s.',
     dru_r14_moonfury: 'Onda Lunar e Despertar Solar também restauram 15% da sua mana máxima cada.',
     dru_r14_savage_fury:
-      'Cada tique dos seus sangramentos de Esfolar e Rasgar também adiciona 1 de Sangue Antigo.',
+      'Sua Fenda Sangrenta também faz o alvo sofrer 15% a mais de dano de sangramento enquanto durar.',
     dru_r20_berserk:
       'Onda Lunar, Despertar Solar, Colheita Vermelha, Quebra-Medula e Superflorescência ficam 25% mais fortes.',
     dru_r20_tranquility:
@@ -1004,7 +1004,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       '«Лунный всплеск» и «Пробуждение солнца» также восстанавливают по 15% вашей максимальной маны.',
     dru_r14_savage_fury:
-      'Каждый тик кровотечений от «Свежевания» и «Кровавого разлома» также добавляет 1 стадию Старой крови.',
+      'Ваш Кровавый разлом, пока действует, также повышает получаемый целью урон от кровотечений на 15%.',
     dru_r20_berserk:
       '«Лунный всплеск», «Пробуждение солнца», «Кровавая жатва», «Дробление костей» и «Сверхцветение» становятся сильнее на 25%.',
     dru_r20_tranquility:
@@ -1127,7 +1127,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Každý bod zuřivosti, který utratíš, zkracuje cooldown tvých hlavních útočných schopností o 0,1 s, nejvýše 10 s každých 30 s.',
     dru_r14_moonfury: 'Měsíční vzedmutí i Sluneční vzedmutí navíc obnoví 15 % tvé maximální many.',
     dru_r14_savage_fury:
-      'Každý tik tvého krvácení ze Stažení z kůže a Roztržení navíc přidá 1 Starou krev.',
+      'Tvá Krvavá trhlina navíc způsobí, že cíl po celou dobu jejího trvání utrpí o 15 % vyšší poškození z krvácení.',
     dru_r20_berserk:
       'Měsíční vzedmutí, Sluneční vzedmutí, Rudá sklizeň, Lámání morku a Překvět jsou o 25 % silnější.',
     dru_r20_tranquility:
@@ -1248,7 +1248,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Elk punt woede dat je uitgeeft verkort de herlaaditijd van je grote aanvalsvaardigheden met 0,1 sec, tot maximaal 10 sec elke 30 sec.',
     dru_r14_moonfury: 'Maangolf en Zonnespoor herstellen elk ook 15% van je maximale mana.',
     dru_r14_savage_fury:
-      'Elke tik van je Villen- en Verscheuren-bloedingen voegt ook 1 Oud Bloed toe.',
+      'Je Bloedscheur laat het doelwit ook 15% meer bloedingsschade oplopen zolang hij duurt.',
     dru_r20_berserk: 'Maangolf, Zonnespoor, Rode Oogst, Mergbreker en Overbloei zijn 25% sterker.',
     dru_r20_tranquility:
       'Elke 1 Maanvloed, Oud Bloed of Groenkracht die je krijgt, herstelt 2% van je maximale mana, 5 energie of 3 woede, overeenkomend met je huidige gedaante.',
@@ -1372,7 +1372,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       'Księżycowy przybór i Słoneczny ślad dodatkowo przywracają po 15% twojej maksymalnej many.',
     dru_r14_savage_fury:
-      'Każde tiknięcie twoich krwawień ze Zdzierania i Rozszarpania dodaje też 1 Starą Krew.',
+      'Twoja Krwawa szczelina sprawia też, że cel otrzymuje o 15% więcej obrażeń od krwawienia, dopóki trwa.',
     dru_r20_berserk:
       'Księżycowy przybór, Słoneczny ślad, Czerwone Żniwa, Łamacz szpiku i Nadrozkwit są o 25% silniejsze.',
     dru_r20_tranquility:
@@ -1498,7 +1498,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_moonfury:
       'Gelombang Rembulan dan Jejak Surya masing-masing juga memulihkan 15% dari mana maksimummu.',
     dru_r14_savage_fury:
-      'Setiap denyut pendarahan Kupasan dan Robekanmu juga menambah 1 Darah Tua.',
+      'Celah Darah milikmu juga membuat target menerima 15% kerusakan pendarahan lebih besar selama efeknya berlangsung.',
     dru_r20_berserk:
       'Gelombang Rembulan, Jejak Surya, Panen Merah, Pematah Sumsum, dan Mekar Raya menjadi 25% lebih kuat.',
     dru_r20_tranquility:
@@ -1617,7 +1617,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_colossal_might:
       'Harcadığın her öfke puanı, büyük saldırı yeteneklerinin bekleme süresini 0,1 saniye kısaltır; 30 saniyede en fazla 10 saniye.',
     dru_r14_moonfury: "Ay Kabarışı ve Güneş İzi ayrıca azami mananın %15'ini geri kazandırır.",
-    dru_r14_savage_fury: 'Deri Yüzme ve Parçalama kanamalarının her turu da 1 Kadim Kan ekler.',
+    dru_r14_savage_fury:
+      'Kanlı Yarığın ayrıca sürdüğü müddetçe hedefin %15 daha fazla kanama hasarı almasını sağlar.',
     dru_r20_berserk:
       'Ay Kabarışı, Güneş İzi, Kızıl Hasat, İlik Kıran ve Taşkın Çiçeklenme %25 daha güçlüdür.',
     dru_r20_tranquility:
@@ -1738,7 +1739,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Varje raserienhet du förbrukar kortar ned nedkylningen på dina stora anfallsförmågor med 0,1 sek, högst 10 sek var 30:e sek.',
     dru_r14_moonfury: 'Månsvall och Solspår återställer även 15% av din maximala mana vardera.',
     dru_r14_savage_fury:
-      'Varje tick av dina blödningar från Flå och Riv upp lägger också till 1 Gammalt Blod.',
+      'Din Blodsspricka får också målet att ta 15% mer blödningsskada så länge den varar.',
     dru_r20_berserk: 'Månsvall, Solspår, Röd Skörd, Märgbräckare och Överblomning är 25% starkare.',
     dru_r20_tranquility:
       'Varje 1 Månflod, Gammalt Blod eller Grönska du får återställer 2% av din maximala mana, 5 energi eller 3 raseri, i enlighet med din nuvarande form.',
@@ -1856,7 +1857,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_colossal_might:
       'Mỗi điểm nộ bạn tiêu tốn rút ngắn 0,1 giây thời gian hồi chiêu của các kỹ năng tấn công chủ lực, tối đa 10 giây mỗi 30 giây.',
     dru_r14_moonfury: 'Nguyệt Trào và Vệt Dương mỗi cái cũng hồi thêm 15% mana tối đa của bạn.',
-    dru_r14_savage_fury: 'Mỗi nhịp chảy máu của Lóc Xé và Xé Rách cũng thêm 1 Huyết Cổ.',
+    dru_r14_savage_fury:
+      'Vết Nứt Máu của bạn cũng khiến mục tiêu nhận thêm 15% sát thương chảy máu trong suốt thời gian hiệu lực.',
     dru_r20_berserk: 'Nguyệt Trào, Vệt Dương, Thu Hoạch Đỏ, Đoạn Tủy, và Mãn Khai mạnh hơn 25%.',
     dru_r20_tranquility:
       'Mỗi 1 điểm Triều Nguyệt, Huyết Cổ, hoặc Sắc Xanh bạn nhận được sẽ hồi 2% mana tối đa, 5 năng lượng, hoặc 3 nộ khí, tùy theo hình dạng hiện tại của bạn.',
@@ -1977,7 +1979,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Hvert raserispunkt du bruger, reducerer afkølingen på dine store angrebsevner med 0,1 sek., op til 10 sek. hvert 30. sek.',
     dru_r14_moonfury: 'Månebølge og Solspor genopretter hver også 15% af din maksimale mana.',
     dru_r14_savage_fury:
-      'Hver tik af dine Flæns- og Sønderriv-blødninger tilføjer også 1 Gammelt Blod.',
+      'Din Blodrevne får også målet til at tage 15% mere blødningsskade, så længe den varer.',
     dru_r20_berserk: 'Månebølge, Solspor, Rød Høst, Marvbrækker og Overblomstring er 25% stærkere.',
     dru_r20_tranquility:
       'Hver 1 Måneflod, Gammelt Blod eller Grønske, du får, genopretter 2% af din maksimale mana, 5 energi eller 3 raseri, alt efter din nuværende form.',
@@ -2093,7 +2095,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       '你每消耗1点怒气，主要进攻技能的冷却时间缩短0.1秒，每30秒最多减少10秒。',
     dru_r14_empowered_touch: '盛放会为每个被其收取持续治疗效果的盟友重新施加一次孢愈术。',
     dru_r14_moonfury: '月涌和日醒还会各自恢复你最大法力值的 15%。',
-    dru_r14_savage_fury: '你的剐削与割裂流血效果的每次跳动都会额外产生 1 点古血。',
+    dru_r14_savage_fury: '你的血隙还会使目标在其持续期间受到的流血伤害提高 15%。',
     dru_r20_berserk: '月涌、日醒、血收、碎髓和盛放的效果强度提高 25%。',
     dru_r20_tranquility:
       '你每获得 1 点月潮、古血或繁茂，就会根据当前形态恢复最大法力值的 2%、5 点能量或 3 点怒气。',
@@ -2201,7 +2203,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       '你每消耗1點怒氣，主要進攻技能的冷卻時間縮短0.1秒，每30秒最多縮短10秒。',
     dru_r14_empowered_touch: '盛放會為每位被其收取持續治療效果的盟友重新施加一次孢癒術。',
     dru_r14_moonfury: '月湧與日醒都會額外恢復你最大法力值的 15%。',
-    dru_r14_savage_fury: '你的剮擊與割裂流血效果每次造成傷害時，都會額外增加 1 層古血。',
+    dru_r14_savage_fury: '你的血隙還會使目標在其持續期間受到的流血傷害提高 15%。',
     dru_r20_berserk: '月湧、日醒、血收、碎髓與盛放的效果提高 25%。',
     dru_r20_tranquility:
       '你每獲得 1 層月潮、古血或繁茂，會依你目前的形態恢復最大法力值的 2%、5 點能量，或 3 點怒氣。',
@@ -2309,7 +2311,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     dru_r14_empowered_touch:
       '満開が回復効果を刈り取った味方全員に、新たなスポアメンディングを付与します。',
     dru_r14_moonfury: 'ムーンサージと陽醒は、それぞれ使用時に最大マナの15%も回復する。',
-    dru_r14_savage_fury: '皮剥ぎと血の亀裂の出血ダメージが発生するたびに、古き血を1蓄える。',
+    dru_r14_savage_fury: '血裂が持続している間、対象が受ける出血ダメージも15%増加する。',
     dru_r20_berserk: 'ムーンサージ、陽醒、血の収穫、骨髄砕き、満開の効果が25%強化される。',
     dru_r20_tranquility:
       '月潮、古き血、翠成のいずれかを1獲得するたびに、現在のフォームに応じて最大マナの2%、エネルギーを5、または怒りを3回復する。',
@@ -2423,7 +2425,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       '소비한 분노 1포인트마다 주요 공격 기술의 재사용 대기시간이 0.1초 단축됩니다. 30초마다 최대 10초까지 줄어듭니다.',
     dru_r14_empowered_touch: '만개가 치유 효과를 거둔 모든 아군에게 새로운 포자치유를 적용합니다.',
     dru_r14_moonfury: '달의 격동과 해돋움은 사용할 때마다 최대 마나의 15%도 함께 회복시켜 줍니다.',
-    dru_r14_savage_fury: '저미기와 찢기의 출혈 효과가 틱마다 오랜 피를 1단계 추가로 쌓습니다.',
+    dru_r14_savage_fury: '피의 균열이 지속되는 동안 대상이 받는 출혈 피해도 15% 증가합니다.',
     dru_r20_berserk: '달의 격동, 해돋움, 피의 수확, 골수분쇄, 만개의 효과가 25% 강력해집니다.',
     dru_r20_tranquility:
       '달물결, 오랜 피, 푸른 생장을 1 얻을 때마다 현재 변신 형태에 맞춰 최대 마나의 2%, 기력 5, 또는 분노 3을 회복합니다.',

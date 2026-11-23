@@ -9645,19 +9645,21 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Assuma a Forma de Gato se necessário, depois corra com 50% mais velocidade por 15 s. Utilizável em qualquer forma. Instantâneo e não ativa a recarga global.',
   'entities.abilities.pounce.name': 'Bote Furtivo',
   'entities.abilities.lunge.description':
-    'Dá um bote em um inimigo a até 12 m, causando 60% do dano da arma e concedendo 1 ponto de combo. Apenas Forma de Gato.',
+    'Assume a Forma de Gato se ainda não estiver nela e dá um bote em um inimigo a até 25 m. Ao chegar, causa 60% do dano da arma e concede 1 ponto de combo; um bote interrompido devolve sua recarga. Utilizável em qualquer forma.',
   'entities.abilities.lunge.name': 'Bote',
   'entities.abilities.hamstring_bite.description':
     'Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s). Apenas Forma de Gato.',
   'entities.abilities.hamstring_bite.name': 'Derrubada',
   'entities.abilities.pounce.description':
-    'Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo. Apenas Forma de Gato. Fora da furtividade, este botão é Bote.',
+    'Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo e, como Feral, abre Rasga-garganta, um sangramento de 72 de dano ao longo de 12 s. Apenas Forma de Gato. Fora da furtividade, este botão é Bote.',
   'entities.abilities.insect_swarm.name': 'Enxame Ferroante',
   'entities.abilities.insect_swarm.description':
     'O inimigo é atacado por um enxame de insetos, sofrendo {damage} de dano de Natureza ao longo de 12 s.',
   'entities.abilities.tigers_fury.name': 'Sangue de Lince',
   'entities.abilities.tigers_fury.description':
     'Gera {rage} de energia e aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Gato.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Sangramentos que você aplicar enquanto durar causam 20% a mais de dano por toda a duração deles.',
   'entities.abilities.rip.name': 'Fenda Sangrenta',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
@@ -16505,7 +16507,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome 3 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Cura de Esporos novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
-    'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura {rage} de energia. Funciona sem pontos de combo.',
+    'Consome seus 3 de Sangue Antigo: golpeia por {damage}, prolonga seus Esfolar e Fenda Sangrenta no alvo em 4 s (até 8 s cada), faz seus sangramentos no alvo darem tiques 50% mais rápido por 8 s (Torrente Vermelha) e restaura {rage} de energia. Funciona sem pontos de combo.',
   'entities.abilities.sunlance.name': 'Esteira Solar',
   'entities.abilities.sunlance.description':
     'Consome seus 3 de Maré Lunar para um golpe de {damage} de dano de Natureza mais uma queimadura de {overTime} ao longo de 9 s, e restaura 35 de mana: a escolha de mana. Onda Lunar consome os mesmos 3 de Maré Lunar, então escolha um.',
@@ -16514,7 +16516,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta',
   'hudChrome.auraEffect.oldBlood':
-    'Sangue Antigo: estágio {stacks} de {max}. Golpes conectados de Gato e Bruin compartilham este banco; com {max}, Mordida Sanguinária ou Esmaga-Ossos se transforma',
+    'Sangue Antigo: estágio {stacks} de {max}. Na Forma de Gato, cada tique dos seus sangramentos adiciona 1, no máximo uma vez a cada 2 s; na Forma de Bruin, cada acerto de Garras Varredoras e Esmaga-Ossos adiciona 1. Com {max}: Mordida Sanguinária se torna Colheita Vermelha na Forma de Gato, Esmaga-Ossos se torna Quebra-Medula na Forma de Bruin',
   'abilityUi.cast.sundering': 'Dissipação',
   'hud.core.mapMarkerLabels.farmPatch': 'Canteiros',
   'hud.logs.keptLockedMany': '{count} cópias bloqueadas mantidas.',
@@ -17285,7 +17287,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.name': 'Pele de Escórias',
   'entities.abilities.claw.description':
     'Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Gato.',
-  'entities.abilities.claw.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
+  'entities.abilities.claw.specNote_feral':
+    'Cada acerto adiciona um acúmulo de Farrapos, um sangramento de 12 de dano ao longo de 8 s por acúmulo (máx. 5 acúmulos). Um novo acúmulo renova a duração.',
   'entities.abilities.cold_blood.description':
     'Concentra sua intenção mortal para que seus próximos 5 ataques sejam acertos críticos. (assinatura de Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -17320,7 +17323,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Movimento finalizador que causa {damage}. Apenas Forma de Gato.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em uma mordida mais forte que também causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, e restaura energia.',
+    'Causa 15% a mais de dano para cada um dos seus sangramentos no alvo e renova sua Fenda Sangrenta para a duração total. Com 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em um golpe que prolonga seus Esfolar e Fenda Sangrenta, faz seus sangramentos no alvo darem tiques 50% mais rápido por 8 s e restaura energia.',
   'entities.abilities.funeral_harvest.description':
     'Quando um inimigo recentemente ferido por você ou por seus mortos-vivos morre, você ganha 1 Fragmento de Alma. Isso pode ocorrer uma vez a cada 3 s.',
   'entities.abilities.funeral_harvest.name': 'Colheita Fúnebre',
@@ -17377,7 +17380,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.name': 'Erguer Guerreiro Esquelético',
   'entities.abilities.rake.description':
     'Esfola o inimigo por dano da arma mais {damage} e causa {overTime} de dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.',
-  'entities.abilities.rake.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
+  'entities.abilities.rake.specNote_feral':
+    'Na Forma de Gato, os tiques dos seus sangramentos adicionam Sangue Antigo (máx. 3, no máximo 1 a cada 2 s), e seus sangramentos podem ser críticos, com cada crítico de sangramento restaurando 3 de energia.',
   'entities.abilities.reaping_command.description':
     'Gasta 2 Fragmentos de Alma para comandar todos os servos mortos-vivos a golpear em uníssono. Guardas Tumulares provocam e se preparam, Guerreiros imobilizam, Magos de Ossos expõem defesas mágicas, e a Asa Tumular dilacera todos os inimigos atingidos.',
   'entities.abilities.reaping_command.name': 'Comando Ceifador',
@@ -17390,7 +17394,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Cada lançamento adiciona 1 de Verdor (máx. 3), inclusive ao renovar uma floração que já está ativa. Com 3 de Verdor, Recuperação Rápida se torna Superflorescência.',
   'entities.abilities.rip.description':
     'Golpe final que faz o alvo sangrar a cada 2 s por 24 s: 72 de dano mais 48 por ponto de combo gasto (5 pontos: {damage} no total). Apenas na Forma de Gato.',
-  'entities.abilities.rip.specNote_feral': 'O acerto adiciona 1 de Sangue Antigo (máx. 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Enquanto 3 ou mais dos seus sangramentos estiverem em um alvo, ele sofre Feridas Gotejantes: 20% menos cura recebida.',
   'entities.abilities.ruinous_brand.description':
     'Marca um inimigo por 15 s. Seus próximos 3 feitiços diretos ecoam por 25% de dano contra o inimigo marcado, ou copiam 50% de dano para ele quando conjurados contra outro alvo. Ecos de Seta da Ruína também contam como acertos críticos, sem outro multiplicador de dano crítico.',
   'entities.abilities.ruinous_brand.name': 'Marca Ruinosa',
@@ -17529,6 +17534,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeExecute': 'Sua próxima habilidade de execução elegível não custa nada',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Colheita Fúnebre ainda não pode criar outro Fragmento de Alma',
+  'hudChrome.auraEffect.redTorrent':
+    'Seus sangramentos no alvo da sua Colheita Vermelha dão tiques {pct}% mais rápido',
   'hudChrome.auraEffect.galeheartWeapon':
     'Completar a cadência de {steps} golpes do Espírito Guerreiro faz o golpe ecoar {count} vezes por {pct}% do seu dano como dano de Natureza',
   'hudChrome.auraEffect.healEcho': 'Cair abaixo de {threshold}% de vida restaura {value} de vida',
@@ -20332,7 +20339,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scratch.description':
     'Arranha os alvos próximos em até 6 m, causando dano da arma mais {damage}. Concede 1 ponto de combo por alvo atingido. Revela inimigos furtivos na varredura. Apenas na Forma Felina.',
   'entities.abilities.scratch.name': 'Arranhão',
-  'entities.abilities.scratch.specNote_feral': 'Cada acerto adiciona 1 Sangue Antigo (máximo 3).',
+  'entities.abilities.scratch.specNote_feral':
+    'Cada inimigo atingido também sangra com Ferida de Arranhão: 12 de dano ao longo de 6 s.',
   'entities.abilities.spore_burst.description':
     'Invoca um cogumelo explosivo na área alvo. Após {duration} s ele explode, curando aliados em {healing} e causando {damage} de dano de Natureza aos inimigos em até 8 m.',
   'entities.abilities.spore_burst.name': 'Explosão de Esporos',

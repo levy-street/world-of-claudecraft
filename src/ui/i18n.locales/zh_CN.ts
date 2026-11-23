@@ -7749,19 +7749,21 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '若当前不是豹形态，先切换为豹形态，再冲刺，使移动速度提高50%，持续15秒。任何形态下均可使用。瞬发，不触发公共冷却。',
   'entities.abilities.pounce.name': '匿袭',
   'entities.abilities.lunge.description':
-    '扑向最远12码外的敌人，造成60%武器伤害并获得1个连击点。仅限豹形态使用。',
+    '如果尚未处于豹形态则先变为豹形态，然后扑向最远25码外的敌人。抵达时造成60%武器伤害并获得1个连击点；扑击中途被打断会返还其冷却时间。任何形态下均可使用。',
   'entities.abilities.lunge.name': '扑击',
   'entities.abilities.hamstring_bite.description':
     '终结技，昏迷目标 1 秒外加每点连击点 1 秒（5 点连击点：6 秒）。仅限豹形态使用。',
   'entities.abilities.hamstring_bite.name': '扑倒',
   'entities.abilities.pounce.description':
-    '一个潜行开场技，昏迷目标 2 秒。奖励 1 个连击点。仅限豹形态。 未潜行时，此按钮为扑击。',
+    '一个潜行开场技，昏迷目标 2 秒。奖励 1 个连击点，野性专精下还会施加裂喉，一个在 12 秒内造成 72 点伤害的流血效果。仅限豹形态。未潜行时，此按钮为扑击。',
   'entities.abilities.insect_swarm.name': '蜇刺虫群',
   'entities.abilities.insect_swarm.description':
     '敌人被虫群侵袭，在 12 秒内受到 {damage} 点自然伤害。',
   'entities.abilities.tigers_fury.name': '豹血',
   'entities.abilities.tigers_fury.description':
     '涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限豹形态。',
+  'entities.abilities.tigers_fury.specNote_feral':
+    '持续期间施加的流血效果在其整个持续时间内造成的伤害提高20%。',
   'entities.abilities.rip.name': '血隙',
   'entities.abilities.rip.description':
     '终结技，使目标每2秒流血一次，持续24秒：造成72点伤害，每消耗1个连击点额外增加48点（5个连击点共{damage}点）。仅限豹形态。',
@@ -18175,8 +18177,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.description':
     '使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。',
   'entities.abilities.cinderhide.name': '熔渣皮肤',
-  'entities.abilities.claw.specNote_feral': '每次命中累积1层古血（最多3层）。',
-  'entities.abilities.scratch.specNote_feral': '每次命中累积1层古血（最多3层）。',
+  'entities.abilities.claw.specNote_feral':
+    '每次命中叠加1层撕碎，每层为一个在8秒内造成12点伤害的流血效果（最多5层）。叠加新的一层会刷新持续时间。',
+  'entities.abilities.scratch.specNote_feral':
+    '每个被击中的敌人还会受到抓伤流血效果：在6秒内造成12点伤害。',
   'entities.abilities.cold_focus.description':
     '持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）',
   'entities.abilities.cold_focus.name': '冷静专注',
@@ -18224,7 +18228,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。',
   'entities.abilities.faithforged_guard.name': '圣光之债',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '每次命中累积1层古血；古血达到3层时，此按钮变为血收：消耗古血发动一次更强的撕咬，立即引爆你的剐削与血裂的全部剩余伤害，同时恢复能量。',
+    '目标身上每有一个你的流血效果，造成的伤害提高15%，并将你的血隙刷新为完整持续时间。古血达到3层时，此按钮变为血收：消耗古血发动一次打击，延长你的剐削与血隙，使你在目标身上的流血效果跳动速度提高50%，持续8秒，并恢复能量。',
   'entities.abilities.fieldcraft_reentry.description':
     '被动：拥有狩猎势能时，断迹使你的下一次剖膛一击或血钩获得强化，持续12秒。剖膛一击每层增伤15%。血钩额外造成18至24点物理伤害，该伤害每层提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（生存）',
   'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
@@ -18344,7 +18348,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.description':
     '消耗1枚灵魂碎片，将一名永久骷髅战士加入你的2槽统御。只能有一名为你效命。它每6秒对附近敌人造成45%的顺劈伤害，收割号令会使目标减速40%，持续4秒。',
   'entities.abilities.raise_skeletal_warrior.name': '唤醒骷髅战士',
-  'entities.abilities.rake.specNote_feral': '每次命中累积1层古血（最多3层）。',
+  'entities.abilities.rake.specNote_feral':
+    '豹形态下，你的流血效果每次跳动都会累积古血（最多3层，每2秒最多1层），并且你的流血效果可以造成暴击，每次流血暴击恢复3点能量。',
   'entities.abilities.reaping_command.description':
     '消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击。墓卫嘲讽并防御，骷髅战士牵制目标，骸骨法师暴露魔法防御，墓翼撕裂所有被击中的敌人。',
   'entities.abilities.reaping_command.name': '收割号令',
@@ -18352,13 +18357,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使一名死亡的小队成员回到你身边复活，并恢复 35% 的生命值和法力值。16 级或以上的黎明愈者则会改为呼唤小队中 30 码内且在你视线内的所有阵亡成员回到你身边复活。',
   'entities.abilities.recall_the_fallen.name': '唤回逝者',
   'entities.abilities.redharvest.description':
-    '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。',
+    '消耗你的3层古血：造成{damage}点伤害，将你在目标身上的剐削与血隙各延长4秒（每个最多延长8秒），使你在目标身上的流血效果跳动速度提高50%，持续8秒（赤红奔流），并恢复{rage}点能量。无需连击点也可使用。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.regrowth.specNote_restoration':
     '每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。',
   'entities.abilities.rejuvenation.specNote_restoration':
     '每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。繁茂达到3层时，迅捷治愈变为盛放。',
-  'entities.abilities.rip.specNote_feral': '命中的这一击累积1层古血（最多3层）。',
+  'entities.abilities.rip.specNote_feral':
+    '目标身上有3个或更多你的流血效果时，会受到渗血伤口影响：受到的治疗降低20%。',
   'entities.abilities.ruinous_brand.description':
     '为敌人烙印15秒。你接下来的3个直接法术会对被烙印的敌人回响25%的伤害；若对其他目标施放，则会向其复制50%的伤害。毁灭箭的回响伤害同样视为暴击，但不会因此再叠加额外的暴击伤害加成。',
   'entities.abilities.ruinous_brand.name': '毁灭烙印',
@@ -19401,6 +19407,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formShadow': '幽幕形态：暗影伤害提高 {pct}%',
   'hudChrome.auraEffect.freeExecute': '下一个符合条件的斩杀技能不消耗资源',
   'hudChrome.auraEffect.funeralHarvestLock': '葬礼收割暂时无法再次生成灵魂碎片',
+  'hudChrome.auraEffect.redTorrent': '你在血收目标身上的流血效果跳动速度提高{pct}%',
   'hudChrome.auraEffect.galeheartWeapon':
     '完成战魂的{steps}连击节奏后，该次打击回响{count}次，每次造成其伤害{pct}%的自然伤害',
   'hudChrome.auraEffect.gloam':
@@ -19421,7 +19428,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '储存你和亡灵造成伤害的 {storedPct}%，并额外储存灵魂长枪伤害的 {lancePct}%；再次施放引爆。目标死亡时在 {radius} 码内爆炸并生成 1 个灵魂碎片',
   'hudChrome.auraEffect.nextAttackCrit': '下一次攻击必定暴击',
   'hudChrome.auraEffect.oldBlood':
-    '古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
+    '古血：第{stacks}/{max}层。豹形态下，你的流血效果每次跳动累积1层，每2秒最多1次；巨熊形态下，横扫利爪与碎骨击每次命中累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
   'hudChrome.auraEffect.overpowerCharge': '{stacks} 层充能：下一次致残打击伤害提高 {pct}%',
   'hudChrome.auraEffect.perfectMoment': '以太飞弹不会消耗奥术充能',
   'hudChrome.auraEffect.petDamage': '宠物造成的伤害提高 {pct}%',

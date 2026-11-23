@@ -8297,10 +8297,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verandert de vijand in een pad gedurende maximaal {duration} sec. De pad dwaalt rond en geneest snel. Elke schade verbreekt het effect. Alleen beesten en humanoïden.',
   'entities.abilities.polymorph.name': 'Beheksen',
   'entities.abilities.pounce.description':
-    'Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op. Alleen in Katsgedaante. Buiten sluiptocht is deze knop Uitval.',
+    'Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op en opent met de specialisatie Wild Keelrijt, een bloeding van 72 schade over 12 sec. Alleen in Katgedaante. Buiten sluiptocht is deze knop Uitval.',
   'entities.abilities.pounce.name': 'Sluipslag',
   'entities.abilities.lunge.description':
-    'Verander in Katsgedaante als je dat nog niet bent en stort je dan op een vijand op maximaal 25 yard afstand. Bij aankomst doe je 60% wapenschade, krijg je 1 combopunt en met de specialisatie Wild voeg je 1 Oud Bloed toe (max 3). Een voortijdig afgebroken Uitval herstelt de herlaadtijd. Bruikbaar in elke gedaante.',
+    'Verander in Katgedaante als je dat nog niet bent en stort je dan op een vijand op maximaal 25 yard afstand. Bij aankomst doe je 60% wapenschade en krijg je 1 combopunt; een voortijdig afgebroken Uitval herstelt de herlaadtijd. Bruikbaar in elke gedaante.',
   'entities.abilities.lunge.name': 'Uitval',
   'entities.abilities.hamstring_bite.description':
     'Afmaakactie die het doelwit verdooft voor 1 sec plus 1 sec per combopunt (5 combopunten: 6 sec). Alleen in Katsgedaante.',
@@ -8422,6 +8422,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.name': 'Schuddende Klap',
   'entities.abilities.tigers_fury.description':
     'Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Katgedaante.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Bloedingen die je aanbrengt terwijl het actief is, doen hun hele duur 20% meer schade.',
   'entities.abilities.tigers_fury.name': 'Lynxbloed',
   'entities.abilities.travel_form.description':
     'Verander ogenblikkelijk in een snelle Fleetgedaante, verhoog je bewegingssnelheid met 40% en verwijder breekbare wortels en vertragingen. Je kunt geen andere vaardigheden gebruiken terwijl je veranderd bent, maar je kunt in of buiten gevecht van gedaante wisselen, ideaal om te ontsnappen. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid.',
@@ -16132,7 +16134,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verbruikt 3 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Sporenheling op het doelwit.',
   'entities.abilities.redharvest.name': 'Rode Oogst',
   'entities.abilities.redharvest.description':
-    'Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten.',
+    'Verbruikt je 3 Oud Bloed: een slag voor {damage}, verlengt je Villen en Bloedscheur op het doelwit met 4 sec (tot 8 sec elk), laat je bloedingen op het doelwit 8 sec lang 50% sneller tikken (Rode Stroom) en herstelt {rage} energie. Werkt ook zonder combopunten.',
   'entities.abilities.sunlance.name': 'Zonnespoor',
   'entities.abilities.sunlance.description':
     'Verbruikt je 3 Maanvloed voor een slag van {damage} Natuur-schade plus een brandwond van {overTime} over 9 sec, en herstelt 35 mana: de manakeuze. Maangolf verbruikt dezelfde 3 Maanvloed, dus kies er een.',
@@ -16141,7 +16143,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit',
   'hudChrome.auraEffect.oldBlood':
-    'Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen',
+    'Oud Bloed: stadium {stacks} van {max}. In Katgedaante voegt elke tik van je bloedingen er 1 toe, hoogstens eens per 2 sec; in Bruingedaante voegt elke gelande treffer van Vegende Klauwen en Botverbrijzelen er 1 toe. Bij {max}: Bloedbeet wordt Rode Oogst in Katgedaante, Botverbrijzelen wordt Mergbreker in Bruingedaante',
   'hudChrome.auraEffect.verdance':
     'Groenkracht: stadium {stacks} van {max}. Elke Sporenheling, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei',
   'sim.rift.allUnstable': 'Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.',
@@ -16629,7 +16631,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.name': 'Sintelhuid',
   'entities.abilities.claw.description':
     'Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Katgedaante.',
-  'entities.abilities.claw.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
+  'entities.abilities.claw.specNote_feral':
+    'Elke slag die raakt voegt een stapel Flarden toe, een bloeding van 12 schade over 8 sec per stapel (max 5 stapels). Een nieuwe stapel ververst de duur.',
   'entities.abilities.cold_blood.description':
     'Focust je moordlust zodat je volgende 5 aanvallen kritieke treffers zijn. (Knifework-motor)',
   'entities.abilities.corpse_explosion.description':
@@ -16665,7 +16668,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Afmaakactie die {damage} veroorzaakt. Alleen in Katgedaante.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een krachtigere slag die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en energie herstelt.',
+    'Doet 15% meer schade voor elke bloeding van jou op het doelwit en ververst je Bloedscheur tot de volledige duur. Bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een slag die je Villen en Bloedscheur verlengt, je bloedingen op het doelwit 8 sec lang 50% sneller laat tikken en energie herstelt.',
   'entities.abilities.funeral_harvest.description':
     'Wanneer een vijand die onlangs door jou of je ondoden is beschadigd sterft, krijg je 1 Zielfragment. Dit kan hoogstens eenmaal per 3 sec gebeuren.',
   'entities.abilities.funeral_harvest.name': 'Begrafenisoogst',
@@ -16722,7 +16725,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.name': 'Wek skeletkrijger',
   'entities.abilities.rake.description':
     'Vilt de vijand voor wapenschade plus {damage} en veroorzaakt {overTime} bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Katgedaante.',
-  'entities.abilities.rake.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
+  'entities.abilities.rake.specNote_feral':
+    'In Katgedaante voegen de tikken van je bloedingen Oud Bloed toe (max 3, hoogstens 1 per 2 sec), en je bloedingen kunnen kritiek treffen, waarbij elke kritieke bloedingstik 3 energie herstelt.',
   'entities.abilities.reaping_command.description':
     'Besteedt 2 Zielfragmenten om elke ondode dienaar te bevelen gelijktijdig toe te slaan. Grafwachten tarten en schrap zich, Skeletkrijgers zetten vast, Botmagiërs stellen magische verdediging bloot, en Grafvleugels verscheuren alle geraakte vijanden.',
   'entities.abilities.reaping_command.name': 'Oogstbevel',
@@ -16735,7 +16739,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Elke spreuk voegt 1 Groenkracht toe (max 3), ook als hij een bloei vernieuwt die al actief is. Bij 3 Groenkracht wordt Snelle genezing Overbloei.',
   'entities.abilities.rip.description':
     'Afmaker die het doel elke 2 sec gedurende 24 sec laat bloeden: 72 schade plus 48 per verbruikt combopunt (5 punten: {damage} totaal). Alleen in Katgedaante.',
-  'entities.abilities.rip.specNote_feral': 'De gelande treffer voegt 1 Oud Bloed toe (max 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Zolang 3 of meer van je bloedingen op een doelwit staan, lijdt het aan Druipende Wonden: 20% minder ontvangen genezing.',
   'entities.abilities.ruinous_brand.description':
     "Brandmerkt een vijand gedurende 15 sec. Je volgende 3 directe spreuken weerklinken voor 25% schade tegen de gebrandmerkte vijand, of kopiëren 50% schade naar hem wanneer ze tegen een ander doelwit worden gespreukt. Ruinenschicht-echo's gelden ook als kritieke treffers, zonder een extra kritieke-schademultiplier.",
   'entities.abilities.ruinous_brand.name': 'Verderfelijk brandmerk',
@@ -16877,6 +16882,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je volgende in aanmerking komende afmaakvaardigheid kost niets',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Begrafenisoogst kan nog geen ander Zielfragment creëren',
+  'hudChrome.auraEffect.redTorrent':
+    'Je bloedingen op het doelwit van je Rode Oogst tikken {pct}% sneller',
   'hudChrome.auraEffect.galeheartWeapon':
     'Het voltooien van de {steps}-treffer Krijgsgeestcadans laat de slag {count} keer weerklinken voor {pct}% van zijn schade als Natuurschade',
   'hudChrome.auraEffect.healEcho':
@@ -20311,7 +20318,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Krab door nabije doelen binnen 6 yard voor wapenschade plus {damage}. Geeft 1 combopunt per geraakt doel. Onthult sluipende vijanden in de zwaai. Alleen in Katgedaante.',
   'entities.abilities.scratch.name': 'Krab',
   'entities.abilities.scratch.specNote_feral':
-    'Elke geraakte slag voegt 1 Oud Bloed toe (maximaal 3).',
+    'Elke vijand die het raakt bloedt ook door Krabwond: 12 schade over 6 sec.',
   'entities.abilities.spore_burst.description':
     'Roept een sporenbarster op in het doelgebied. Na {duration} sec barst hij, geneest bondgenoten voor {healing} en brengt vijanden binnen 8 yard {damage} Natuurschade toe.',
   'entities.abilities.spore_burst.name': 'Sporenexplosie',

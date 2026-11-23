@@ -4791,6 +4791,7 @@ export const sv_SE: EnTranslations = {
       "cooldownCap": "{used} av {cap} sek nedkylningsreduktion använd i detta fönster",
       "bruinRushWindow": "Kattform kostar ingen mana och håller fast målet för er Bruinrusning, vilket saktar ner det med {pct}% i {sec} sek",
       "funeralHarvestLock": "Begravningsskörd kan inte skapa ännu ett Själfragment än",
+      "redTorrent": "Dina blödningar på målet för din Röd Skörd tickar {pct}% snabbare",
       "effigyPlankHide": "Avvärjer {pct}% av varje slag tills en stöt med Skärvpiken släcker lyktan i dess öga",
       "effigyLanternOut": "Halmförmannens lykta är släckt för dig: dina och ditt husdjurs slag ignorerar dess plankhud och gör full skada",
       "leadenHexLock": "Blytung förbannelse kan inte rota fast detta mål igen än",
@@ -4842,7 +4843,7 @@ export const sv_SE: EnTranslations = {
       "coldsightRead": "Ditt nästa Långdrag orsakar {longDrawPct}% mer skada, eller ditt nästa Olycksskott orsakar {fellShotPct}% mer",
       "duskEconomy": "Förmågor kostar {pct}% mindre energi",
       "moontide": "Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den",
-      "oldBlood": "Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross",
+      "oldBlood": "Gammalt Blod: steg {stacks} av {max}. I kattform lägger varje tick från dina blödningar till 1, högst en gång per 2 sek; i Bruinform lägger varje träffande slag med Svepande klor och Benkross till 1. Vid {max}: Blodsbett blir Röd Skörd i kattform, Benkross blir Märgbräckare i Bruinform",
       "verdance": "Grönska {stacks}/{max}. Varje Sporemending, Andra blomningen eller Vildläkning du kastar ger 1, och varje Grönska förkortar Vildläknings kasttid. Vid {max} blir Snabb läkning Överblomning",
       "freeExecute": "Din nästa kvalificerade avrättningsförmåga kostar ingenting",
       "resourceSap": "Återställer {value} av din nuvarande resurs var {interval}:e sek",
@@ -18415,17 +18416,17 @@ export const sv_SE: EnTranslations = {
       "claw": {
         "name": "Rivklo",
         "description": "Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.",
-        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
+        "specNote_feral": "Varje träffande slag lägger till en stapel Slamsor, en blödning på 12 skada över 8 sek per stapel (max 5 staplar). En ny stapel förnyar varaktigheten."
       },
       "scratch": {
         "name": "Klös",
         "description": "Klös igenom närliggande mål inom 6 yards och ge vapenskada plus {damage}. Ger 1 kombopoäng per träffat mål. Avslöjar smygande fiender inom svepet. Endast i Kattform.",
-        "specNote_feral": "Varje träff ger 1 Gammalt Blod (högst 3)."
+        "specNote_feral": "Varje fiende den träffar blöder också av Klössår: 12 skada över 6 sek."
       },
       "ferocious_bite": {
         "name": "Blodsbett",
         "description": "Avslutande drag som orsakar {damage}. Endast i Kattform.",
-        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett kraftigare slag som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer energi."
+        "specNote_feral": "Gör 15% mer skada för varje blödning du har på målet och förnyar din Blodsspricka till full varaktighet. Vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett slag som förlänger dina Flå och Blodsspricka, får dina blödningar på målet att ticka 50% snabbare i 8 sek och återställer energi."
       },
       "swipe": {
         "name": "Svepande klor",
@@ -18480,11 +18481,11 @@ export const sv_SE: EnTranslations = {
       },
       "pounce": {
         "name": "Smyghugg",
-        "description": "En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng. Endast i kattform. Utanför smyg är den här knappen Utfall."
+        "description": "En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng och öppnar som Vild Strupriv, en blödning på 72 skada över 12 sek. Endast i kattform. Utanför smyg är den här knappen Utfall."
       },
       "lunge": {
         "name": "Utfall",
-        "description": "Kasta dig mot en fiende upp till 12 m bort, tillfoga 60% vapenskada och ge 1 kombopoäng. Endast i kattform."
+        "description": "Byt till kattform om du inte redan är i den och kasta dig sedan mot en fiende upp till 25 m bort. Vid ankomsten tillfogas 60% vapenskada och 1 kombopoäng ges; ett avbrutet utfall återbetalar sin nedkylning. Kan användas i alla former."
       },
       "hamstring_bite": {
         "name": "Nedtagning",
@@ -18496,12 +18497,13 @@ export const sv_SE: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Lodjursblod",
-        "description": "Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast kattform."
+        "description": "Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast kattform.",
+        "specNote_feral": "Blödningar du lägger på medan den varar gör 20% mer skada under hela sin varaktighet."
       },
       "rip": {
         "name": "Blodsspricka",
         "description": "Avslutande attack som får målet att blöda varannan sekund i 24 sek: 72 skada plus 48 per förbrukad kombopoäng (5 poäng: {damage} totalt). Endast i Kattform.",
-        "specNote_feral": "Det landade slaget lägger till 1 Gammalt Blod (max 3)."
+        "specNote_feral": "Så länge 3 eller fler av dina blödningar finns på ett mål lider det av Vätskande Sår: 20% mindre mottagen helning."
       },
       "mortal_strike": {
         "name": "Stympande hugg",
@@ -18718,7 +18720,7 @@ export const sv_SE: EnTranslations = {
       },
       "redharvest": {
         "name": "Röd Skörd",
-        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng."
+        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage}, förlänger dina Flå och Blodsspricka på målet med 4 sek (upp till 8 sek vardera), får dina blödningar på målet att ticka 50% snabbare i 8 sek (Röd Ström) och återställer {rage} energi. Fungerar utan kombopoäng."
       },
       "marrowbreak": {
         "name": "Märgbräckare",
@@ -19236,7 +19238,7 @@ export const sv_SE: EnTranslations = {
       "rake": {
         "name": "Flå",
         "description": "Flå fienden för vapenskada plus {damage} och orsaka {overTime} blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.",
-        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
+        "specNote_feral": "I kattform lägger dina blödningars tick till Gammalt Blod (max 3, högst 1 per 2 sek), och dina blödningar kan träffa kritiskt, där varje kritiskt blödningstick återställer 3 energi."
       },
       "revive_pet": {
         "name": "Lappa ihop",

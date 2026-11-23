@@ -6000,6 +6000,8 @@ export const hudChromeStrings = {
     bruinRushWindow:
       'Cat Form costs no mana and Pins your Bruin Rush target, slowing it by {pct}% for {sec} sec',
     funeralHarvestLock: 'Funeral Harvest cannot create another Soul Fragment yet',
+    // wordy (M16): filled in the five non-Latin locales in this change.
+    redTorrent: 'Your bleeds on your Redharvest target tick {pct}% faster',
     // The drill yard's effigy (src/sim/muster_effigy.ts): its plank hide, and a player's
     // own window on it once a Shardpike thrust has put its lantern out.
     effigyPlankHide:
@@ -6082,7 +6084,7 @@ export const hudChromeStrings = {
     moontide:
       'Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3',
     oldBlood:
-      'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
+      'Old Blood {stacks}/{max}. In Cat Form your bleed ticks add 1, at most once every 2 sec; in Bruin Form landed Sweeping Claws and Bonecrush hits each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:
       "Verdance {stacks}/{max}. Each Sporemending, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
     freeExecute: 'Your next eligible execute ability costs nothing',

@@ -6852,7 +6852,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Flense the enemy for weapon damage plus $d and cause $o bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
     specNotes: {
-      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+      feral:
+        'In Cat Form your bleed ticks add Old Blood (max 3, at most 1 every 2 sec), and your bleeds can critically strike, each bleed crit restoring 3 energy.',
     },
   },
   claw: {
@@ -6872,7 +6873,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 55 }] }],
     description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Cat Form only.',
     specNotes: {
-      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+      feral:
+        'Each hit that lands adds a stack of Tatter, a bleed of 12 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
     },
   },
   scratch: {
@@ -6908,7 +6910,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Scratch through nearby targets within 6 yards for weapon damage plus $d. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
     specNotes: {
-      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+      feral: 'Each enemy it hits also bleeds with Scratch Wound: 12 damage over 6 sec.',
     },
   },
   ferocious_bite: {
@@ -6931,7 +6933,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Finishing move that causes $d. Cat Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
+        'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 50% faster for 8 sec, and restores energy.',
     },
   },
   swipe: {
@@ -7185,7 +7187,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // pounce id; Lunge is never learned as a second action.
     actionReplacement: { abilityId: 'lunge', absentAuraKind: 'stealth' },
     description:
-      'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge.',
+      'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, opens Throatrake, a bleed of 72 damage over 12 sec. Cat Form only. Out of stealth this button is Lunge.',
   },
   lunge: {
     id: 'lunge',
@@ -7222,7 +7224,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // the cooldown back. LUNGE_WEAPON_MULT there owns the 60.
     effects: [{ type: 'charge' }],
     description:
-      'Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form.',
+      'Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Usable in any form.',
   },
   hamstring_bite: {
     id: 'hamstring_bite',
@@ -7281,10 +7283,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     requiresForm: 'cat',
     effects: [
-      { type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 },
+      // 10 sec (was 6, the feral bleed rework): long enough to reapply every
+      // bleed inside the window, which Wildfang snapshots at +20%
+      // (combat/druid_bleeds.ts LYNXBLOOD_BLEED_MULT).
+      { type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 10 },
       { type: 'gainResource', amount: 30 },
     ],
     description: 'Surges 30 energy and increases attack power by $b for $t sec. Cat Form only.',
+    specNotes: {
+      feral: 'Bleeds you apply while it lasts deal 20% more damage for their whole duration.',
+    },
   },
   rip: {
     id: 'rip',
@@ -7307,7 +7315,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: $d total). Cat Form only.',
     specNotes: {
-      feral: 'The landed hit adds 1 Old Blood (max 3).',
+      feral:
+        'While 3 or more of your bleeds are on a target, it suffers Weeping Wounds: 20% less healing taken.',
     },
   },
 
@@ -8360,8 +8369,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     comboOptional: true,
     effects: [
       { type: 'finisherDamage', base: 35, perCombo: 20, variance: 6 },
-      { type: 'consumeDot', dot: 'rake' },
-      { type: 'consumeDot', dot: 'rip' },
+      { type: 'extendDot', dot: 'rake', seconds: 4, maxBonus: 8 },
+      { type: 'extendDot', dot: 'rip', seconds: 4, maxBonus: 8 },
       { type: 'gainResource', amount: 15 },
     ],
     ranks: [
@@ -8371,8 +8380,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 35,
         effects: [
           { type: 'finisherDamage', base: 52, perCombo: 32, variance: 8 },
-          { type: 'consumeDot', dot: 'rake' },
-          { type: 'consumeDot', dot: 'rip' },
+          { type: 'extendDot', dot: 'rake', seconds: 4, maxBonus: 8 },
+          { type: 'extendDot', dot: 'rip', seconds: 4, maxBonus: 8 },
           { type: 'gainResource', amount: 22 },
         ],
       },
@@ -8382,14 +8391,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 35,
         effects: [
           { type: 'finisherDamage', base: 70, perCombo: 43, variance: 10 },
-          { type: 'consumeDot', dot: 'rake' },
-          { type: 'consumeDot', dot: 'rip' },
+          { type: 'extendDot', dot: 'rake', seconds: 4, maxBonus: 8 },
+          { type: 'extendDot', dot: 'rip', seconds: 4, maxBonus: 8 },
           { type: 'gainResource', amount: 30 },
         ],
       },
     ],
     description:
-      'Spends your 3 Old Blood: strike for $d, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore energy. Works with zero combo points.',
+      'Spends your 3 Old Blood: strike for $d, lengthen your Flense and Bloodrift on the target by 4 sec (up to 8 sec each), make your bleeds on the target tick 50% faster for 8 sec (Red Torrent), and restore energy. Works with zero combo points.',
   },
   marrowbreak: {
     id: 'marrowbreak',

@@ -6341,19 +6341,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '표범 변신 상태가 아니면 먼저 변신한 뒤 15초 동안 이동 속도가 50% 증가하는 질주를 합니다. 어떤 변신 상태에서도 사용 가능합니다. 즉시 시전하며 전역 재사용 대기시간을 유발하지 않습니다.',
   'entities.abilities.pounce.name': '살금 기습',
   'entities.abilities.lunge.description':
-    '최대 12yd 떨어진 적에게 달려들어 무기 공격력의 60%만큼 피해를 입히고 연계 점수 1을 얻습니다. 표범 변신 상태에서만 사용 가능.',
+    '표범 변신 상태가 아니라면 먼저 변신한 뒤, 최대 25yd 떨어진 적에게 달려듭니다. 도착하면 무기 공격력의 60%만큼 피해를 입히고 연계 점수 1점을 얻습니다. 도중에 끊기면 재사용 대기시간이 반환됩니다. 모든 형태에서 사용 가능.',
   'entities.abilities.lunge.name': '도약 습격',
   'entities.abilities.hamstring_bite.description':
     '대상을 1초에 더해 연계 점수 하나당 1초 기절시키는 마무리 기술입니다 (연계 점수 5: 6초). 표범 변신 상태에서만 사용 가능.',
   'entities.abilities.hamstring_bite.name': '쓰러뜨리기',
   'entities.abilities.pounce.description':
-    '은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻습니다. 표범 변신 전용. 은신 상태가 아니면 이 버튼은 도약 습격이 됩니다.',
+    '은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻으며, 야성 전문화에서는 12초에 걸쳐 72의 피해를 입히는 출혈 효과인 목 찢기를 겁니다. 표범 변신 전용. 은신 상태가 아니면 이 버튼은 도약 습격이 됩니다.',
   'entities.abilities.insect_swarm.name': '쏘는 벌레 떼',
   'entities.abilities.insect_swarm.description':
     '적이 곤충 떼에 휩싸여 12초에 걸쳐 {damage}의 자연 피해를 입습니다.',
   'entities.abilities.tigers_fury.name': '스라소니의 피',
   'entities.abilities.tigers_fury.description':
     '기력을 {rage}만큼 즉시 회복하고 전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 표범 변신 전용.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    '지속되는 동안 건 출혈 효과는 전체 지속시간 동안 피해가 20% 증가합니다.',
   'entities.abilities.rip.name': '피의 균열',
   'entities.abilities.rip.description':
     '마무리 일격으로 대상을 24초 동안 2초마다 출혈시킵니다. 피해 72에 소모한 연계 점수당 48을 더합니다(5점: 총 {damage}). 표범 변신 전용.',
@@ -17297,9 +17299,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.description':
     '피부를 식은 용암 찌꺼기처럼 10초 동안 굳혀 받는 모든 피해를 25% 감소시킵니다.',
   'entities.abilities.cinderhide.name': '잿가죽',
-  'entities.abilities.claw.specNote_feral': '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
+  'entities.abilities.claw.specNote_feral':
+    '적중한 공격마다 갈가리 찢기를 1중첩 쌓습니다. 중첩당 8초에 걸쳐 12의 피해를 입히는 출혈 효과입니다(최대 5중첩). 새 중첩이 쌓이면 지속시간이 초기화됩니다.',
   'entities.abilities.scratch.specNote_feral':
-    '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
+    '적중한 각 적에게 할퀸 상처 출혈도 일으킵니다: 6초에 걸쳐 12의 피해.',
   'entities.abilities.cold_focus.description':
     '12초 동안 정밀 사격이 더 많은 집중을 생성하고, 장궁 당기기가 더 빠르고 저렴해집니다. (냉철한 시야 상징)',
   'entities.abilities.cold_focus.name': '냉정한 집중',
@@ -17347,7 +17350,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '8초 동안 다음에 받는 적의 공격에 응답합니다. 최대 {buff}의 피해를 막고 같은 양을 신성 피해로 공격자에게 되돌려주며, 헌신을 1 얻습니다. 한 번의 공격에만 응답합니다. 승천은 응답할 수 있는 양을 50% 증가시킵니다.',
   'entities.abilities.faithforged_guard.name': '빛의 빚',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 오랜 피를 소모하는 더 강력한 물어뜯기로, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히고 기력을 회복합니다.',
+    '대상에 걸린 자신의 출혈 효과 하나당 피해가 15% 증가하며, 피의 균열의 지속시간을 최대로 초기화합니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 오랜 피를 소모하는 일격으로, 자신의 저미기와 피의 균열을 연장하고 대상에 걸린 자신의 출혈 효과가 8초 동안 50% 더 빠르게 피해를 주게 하며 기력을 회복합니다.',
   'entities.abilities.fieldcraft_reentry.description':
     '지속 효과: 사냥의 기세가 있을 때 흔적 끊기가 다음 내장 가르기나 피갈고리를 12초 동안 강화합니다. 내장 가르기는 중첩당 피해가 15% 증가합니다. 피갈고리는 추가 물리 피해 18~24를 주며 이 피해는 중첩당 15% 및 원거리 전투력에 따라 증가합니다. 3중첩이면 두 공격 중 어느 것이든 사냥의 기세를 소모합니다. (생존)',
   'entities.abilities.fieldcraft_reentry.name': '재진입 준비',
@@ -17470,7 +17473,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.description':
     '영혼 조각 1개를 소모해 영구적인 해골 전사를 2칸 지배에 추가합니다. 하나만 섬길 수 있습니다. 6초마다 주변 적에게 45% 휩쓸기 피해를 주며, 수확 명령 시 대상을 4초 동안 40% 느려지게 합니다.',
   'entities.abilities.raise_skeletal_warrior.name': '해골 전사 일으키기',
-  'entities.abilities.rake.specNote_feral': '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
+  'entities.abilities.rake.specNote_feral':
+    '표범 변신 상태에서 자신의 출혈 효과가 피해를 줄 때마다 오랜 피가 쌓입니다(최대 3단계, 2초마다 최대 1단계). 또한 출혈 효과가 치명타로 적중할 수 있으며, 출혈 치명타마다 기력을 3 회복합니다.',
   'entities.abilities.reaping_command.description':
     '영혼 조각 2개를 소모해 모든 언데드 하수인이 일제히 공격하게 합니다. 무덤수호병은 도발하고 방어하며, 해골 전사는 발을 묶고, 뼈 마법사는 마법 방어를 노출하며, 무덤날개는 적중한 모든 적을 찢습니다.',
   'entities.abilities.reaping_command.name': '수확의 명령',
@@ -17478,13 +17482,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '죽은 파티원을 당신 곁에서 생명력과 마나가 35%인 상태로 되살립니다. 레벨 16 이상의 태양 치유사는 대신 파티에서 30야드 내 시야가 닿는 쓰러진 모든 구성원을 불러 되살립니다.',
   'entities.abilities.recall_the_fallen.name': '쓰러진 자 소환',
   'entities.abilities.redharvest.description':
-    '오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히며, 두 출혈 효과를 제거하고 기력을 {rage}만큼 회복합니다. 연계 점수가 없어도 사용할 수 있습니다.',
+    '오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 대상에 걸린 자신의 저미기와 피의 균열을 4초 연장하며(각각 최대 8초), 대상에 걸린 자신의 출혈 효과가 8초 동안 50% 더 빠르게 피해를 주게 하고(붉은 격류), 기력을 {rage}만큼 회복합니다. 연계 점수가 없어도 사용할 수 있습니다.',
   'entities.abilities.redharvest.name': '피의 수확',
   'entities.abilities.regrowth.specNote_restoration':
     '시전할 때마다 푸른 생장이 1단계 쌓입니다(최대 3단계). 이미 효과가 지속 중인 개화를 갱신해도 쌓입니다.',
   'entities.abilities.rejuvenation.specNote_restoration':
     '시전할 때마다 푸른 생장이 1단계 쌓입니다(최대 3단계). 이미 효과가 지속 중인 개화를 갱신해도 쌓입니다. 푸른 생장 3단계에서 신속한 치유가 만개로 변합니다.',
-  'entities.abilities.rip.specNote_feral': '적중하면 오랜 피가 1단계 쌓입니다(최대 3단계).',
+  'entities.abilities.rip.specNote_feral':
+    '대상에게 자신의 출혈 효과가 3개 이상 걸려 있는 동안 대상은 흐르는 상처에 걸립니다: 받는 치유량 20% 감소.',
   'entities.abilities.ruinous_brand.description':
     '적에게 15초 동안 낙인을 새깁니다. 다음 3회의 직접 주문은 낙인이 새겨진 적에게 25%의 피해로 메아리치며, 다른 대상에게 시전하면 그 피해의 50%를 낙인이 새겨진 적에게도 입힙니다. 파멸 화살의 메아리는 추가적인 치명타 피해 배수 없이 치명타로도 처리됩니다.',
   'entities.abilities.ruinous_brand.name': '파멸의 낙인',
@@ -18594,6 +18599,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formShadow': '어스름장막 변신: 암흑 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.freeExecute': '다음 적용 가능한 처형 기술이 자원을 소모하지 않습니다',
   'hudChrome.auraEffect.funeralHarvestLock': '장례 수확이 아직 다음 영혼 조각을 생성할 수 없습니다',
+  'hudChrome.auraEffect.redTorrent':
+    '피의 수확 대상에 걸린 자신의 출혈 효과가 {pct}% 더 빠르게 피해를 줍니다',
   'hudChrome.auraEffect.galeheartWeapon':
     '{steps}회 타격의 전쟁정령 리듬을 완성하면 그 일격이 {count}번 메아리쳐 각각 피해의 {pct}%만큼 자연 피해를 입힙니다',
   'hudChrome.auraEffect.gloam':
@@ -18619,7 +18626,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '당신과 언데드가 준 피해의 {storedPct}%와 영혼 창 피해의 추가 {lancePct}%를 저장합니다. 다시 사용하면 폭발합니다. 죽으면 {radius}미터 내에서 폭발하고 영혼 조각 1개를 생성합니다',
   'hudChrome.auraEffect.nextAttackCrit': '다음 공격이 반드시 치명타로 적중합니다',
   'hudChrome.auraEffect.oldBlood':
-    '오랜 피: {stacks}/{max}단계. 가르는 발톱, 저미기, 피의 균열, 유혈 물어뜯기, 휩쓰는 발톱, 뼈 분쇄의 적중한 공격이 각각 1단계를 쌓습니다. {max}단계에서 표범 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다',
+    '오랜 피: {stacks}/{max}단계. 표범 변신 상태에서는 자신의 출혈 효과가 피해를 줄 때마다 1단계가 쌓이며(2초마다 최대 1회), 큰곰 변신 상태에서는 휩쓰는 발톱과 뼈 분쇄가 적중할 때마다 1단계가 쌓입니다. {max}단계에서 표범 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다',
   'hudChrome.auraEffect.overpowerCharge':
     '충전 {stacks}중첩: 다음 치명타 일격의 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.perfectMoment': '에테르 화살이 비전 충전을 소모하지 않습니다',

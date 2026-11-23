@@ -4791,6 +4791,7 @@ export const nl_NL: EnTranslations = {
       "cooldownCap": "{used} van {cap} sec afkoeltijdvermindering gebruikt in dit venster",
       "bruinRushWindow": "Katsgedaante kost geen mana en pint het doelwit van uw Bruin-stormloop vast, wat het {sec} sec lang {pct}% vertraagt",
       "funeralHarvestLock": "Begrafenisoogst kan nog geen ander Zielfragment creëren",
+      "redTorrent": "Je bloedingen op het doelwit van je Rode Oogst tikken {pct}% sneller",
       "effigyPlankHide": "Weert {pct}% van elke slag af totdat een stoot met een Schervenpiek de lantaarn in zijn oog dooft",
       "effigyLanternOut": "De lantaarn van de Strovoorman is voor jou uit: jouw slagen en die van je huisdier negeren zijn Plankenhuid en raken volledig",
       "leadenHexLock": "Loden vloek kan dit doelwit nog niet opnieuw vastwortelen",
@@ -4842,7 +4843,7 @@ export const nl_NL: EnTranslations = {
       "coldsightRead": "Je volgende Lange Trek richt {longDrawPct}% meer schade aan, of je volgende Onheilsschot richt {fellShotPct}% meer aan",
       "duskEconomy": "Vaardigheden kosten {pct}% minder energie",
       "moontide": "Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit",
-      "oldBlood": "Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen",
+      "oldBlood": "Oud Bloed: stadium {stacks} van {max}. In Katgedaante voegt elke tik van je bloedingen er 1 toe, hoogstens eens per 2 sec; in Bruingedaante voegt elke gelande treffer van Vegende Klauwen en Botverbrijzelen er 1 toe. Bij {max}: Bloedbeet wordt Rode Oogst in Katgedaante, Botverbrijzelen wordt Mergbreker in Bruingedaante",
       "verdance": "Groenkracht: stadium {stacks} van {max}. Elke Sporenheling, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei",
       "freeExecute": "Je volgende in aanmerking komende afmaakvaardigheid kost niets",
       "resourceSap": "Herstelt {value} van je huidige hulpbron elke {interval} sec",
@@ -18415,17 +18416,17 @@ export const nl_NL: EnTranslations = {
       "claw": {
         "name": "Rijtklauw",
         "description": "Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Katgedaante.",
-        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe (max 3)."
+        "specNote_feral": "Elke slag die raakt voegt een stapel Flarden toe, een bloeding van 12 schade over 8 sec per stapel (max 5 stapels). Een nieuwe stapel ververst de duur."
       },
       "scratch": {
         "name": "Krab",
         "description": "Krab door nabije doelen binnen 6 yard voor wapenschade plus {damage}. Geeft 1 combopunt per geraakt doel. Onthult sluipende vijanden in de zwaai. Alleen in Katgedaante.",
-        "specNote_feral": "Elke geraakte slag voegt 1 Oud Bloed toe (maximaal 3)."
+        "specNote_feral": "Elke vijand die het raakt bloedt ook door Krabwond: 12 schade over 6 sec."
       },
       "ferocious_bite": {
         "name": "Bloedbeet",
         "description": "Afmaakactie die {damage} veroorzaakt. Alleen in Katgedaante.",
-        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een krachtigere slag die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en energie herstelt."
+        "specNote_feral": "Doet 15% meer schade voor elke bloeding van jou op het doelwit en ververst je Bloedscheur tot de volledige duur. Bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een slag die je Villen en Bloedscheur verlengt, je bloedingen op het doelwit 8 sec lang 50% sneller laat tikken en energie herstelt."
       },
       "swipe": {
         "name": "Vegende Klauwen",
@@ -18480,11 +18481,11 @@ export const nl_NL: EnTranslations = {
       },
       "pounce": {
         "name": "Sluipslag",
-        "description": "Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op. Alleen in Katsgedaante. Buiten sluiptocht is deze knop Uitval."
+        "description": "Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op en opent met de specialisatie Wild Keelrijt, een bloeding van 72 schade over 12 sec. Alleen in Katgedaante. Buiten sluiptocht is deze knop Uitval."
       },
       "lunge": {
         "name": "Uitval",
-        "description": "Verander in Katsgedaante als je dat nog niet bent en stort je dan op een vijand op maximaal 25 yard afstand. Bij aankomst doe je 60% wapenschade, krijg je 1 combopunt en met de specialisatie Wild voeg je 1 Oud Bloed toe (max 3). Een voortijdig afgebroken Uitval herstelt de herlaadtijd. Bruikbaar in elke gedaante."
+        "description": "Verander in Katgedaante als je dat nog niet bent en stort je dan op een vijand op maximaal 25 yard afstand. Bij aankomst doe je 60% wapenschade en krijg je 1 combopunt; een voortijdig afgebroken Uitval herstelt de herlaadtijd. Bruikbaar in elke gedaante."
       },
       "hamstring_bite": {
         "name": "Neerhalen",
@@ -18496,12 +18497,13 @@ export const nl_NL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Lynxbloed",
-        "description": "Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Katgedaante."
+        "description": "Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Katgedaante.",
+        "specNote_feral": "Bloedingen die je aanbrengt terwijl het actief is, doen hun hele duur 20% meer schade."
       },
       "rip": {
         "name": "Bloedscheur",
         "description": "Afmaker die het doel elke 2 sec gedurende 24 sec laat bloeden: 72 schade plus 48 per verbruikt combopunt (5 punten: {damage} totaal). Alleen in Katgedaante.",
-        "specNote_feral": "De gelande treffer voegt 1 Oud Bloed toe (max 3)."
+        "specNote_feral": "Zolang 3 of meer van je bloedingen op een doelwit staan, lijdt het aan Druipende Wonden: 20% minder ontvangen genezing."
       },
       "mortal_strike": {
         "name": "Verminkende Slag",
@@ -18718,7 +18720,7 @@ export const nl_NL: EnTranslations = {
       },
       "redharvest": {
         "name": "Rode Oogst",
-        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten."
+        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage}, verlengt je Villen en Bloedscheur op het doelwit met 4 sec (tot 8 sec elk), laat je bloedingen op het doelwit 8 sec lang 50% sneller tikken (Rode Stroom) en herstelt {rage} energie. Werkt ook zonder combopunten."
       },
       "marrowbreak": {
         "name": "Mergbreker",
@@ -19236,7 +19238,7 @@ export const nl_NL: EnTranslations = {
       "rake": {
         "name": "Villen",
         "description": "Vilt de vijand voor wapenschade plus {damage} en veroorzaakt {overTime} bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Katgedaante.",
-        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe (max 3)."
+        "specNote_feral": "In Katgedaante voegen de tikken van je bloedingen Oud Bloed toe (max 3, hoogstens 1 per 2 sec), en je bloedingen kunnen kritiek treffen, waarbij elke kritieke bloedingstik 3 energie herstelt."
       },
       "revive_pet": {
         "name": "Oplappen",

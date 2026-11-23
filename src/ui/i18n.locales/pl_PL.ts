@@ -8221,10 +8221,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przemienia wroga w ropuchę na nawet {duration} sek. Ropucha błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy.',
   'entities.abilities.polymorph.name': 'Zauroczenie',
   'entities.abilities.pounce.description':
-    'Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci kota. Poza skradaniem ten przycisk to Wypad.',
+    'Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji, a w specjalizacji Dzika natura zadaje Rozszarpane gardło, krwawienie zadające 72 obrażenia w ciągu 12 sek. Tylko w postaci kota. Poza skradaniem ten przycisk to Wypad.',
   'entities.abilities.pounce.name': 'Skradający cios',
   'entities.abilities.lunge.description':
-    'Rzucasz się na wroga oddalonego o maksymalnie 12 jardów, zadając 60% obrażeń broni i przyznając 1 punkt kombinacji. Tylko w postaci kota.',
+    'Przyjmujesz postać kota, jeśli jeszcze w niej nie jesteś, a potem rzucasz się na wroga oddalonego o maksymalnie 25 jardów. Po dotarciu zadajesz 60% obrażeń broni i otrzymujesz 1 punkt kombinacji; przerwany wypad zwraca czas odnowienia. Można używać w dowolnej postaci.',
   'entities.abilities.lunge.name': 'Wypad',
   'entities.abilities.hamstring_bite.description':
     'Umiejętność kończąca, która ogłusza cel na 1 sekundę plus 1 sekundę za punkt combo (5 punktów combo: 6 sekund). Tylko w postaci kota.',
@@ -8345,6 +8345,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.name': 'Trzęsący cios',
   'entities.abilities.tigers_fury.description':
     'Natychmiast przywraca {rage} energii i zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci kota.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Krwawienia nałożone w czasie jego działania zadają o 20% więcej obrażeń przez cały swój czas trwania.',
   'entities.abilities.tigers_fury.name': 'Rysia krew',
   'entities.abilities.travel_form.description':
     'Natychmiast przemienia cię w szybką, rączą postać, zwiększając szybkość poruszania się o 40% i usuwając zrywalne unieruchomienia i spowolnienia. Po przemianie nie możesz używać innych zdolności, ale możesz się przemieniać w walce i poza nią, co czyni ją idealną do ucieczki. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu.',
@@ -16363,7 +16365,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Zarodnikowe gojenie na celu.',
   'entities.abilities.redharvest.name': 'Czerwone Żniwa',
   'entities.abilities.redharvest.description':
-    'Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo.',
+    'Zużywa twoje 3 Starej Krwi: cios za {damage}, wydłuża twoje Zdzieranie i Krwawą szczelinę na celu o 4 sek. (do 8 sek. każde), przyspiesza o 50% tiknięcia twoich krwawień na celu na 8 sek. (Czerwony Potok) i przywraca {rage} energii. Działa bez punktów combo.',
   'entities.abilities.sunlance.name': 'Słoneczny ślad',
   'entities.abilities.sunlance.description':
     'Zużywa twoje 3 Księżycowego przypływu na cios zadający {damage} obrażeń natury oraz podpalenie zadające {overTime} w ciągu 9 s i przywraca 35 many: wybór many. Księżycowy przybór zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
@@ -16372,7 +16374,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają',
   'hudChrome.auraEffect.oldBlood':
-    'Stara Krew: stopień {stacks} z {max}. Trafione ciosy kota i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości',
+    'Stara Krew: stopień {stacks} z {max}. W postaci kota każde tiknięcie twoich krwawień dodaje 1, najwyżej raz na 2 sek.; w Postaci Bruina każde trafienie Zamaszystymi pazurami i Kruszeniem kości dodaje 1. Przy {max}: Krwawe ukąszenie zmienia się w Czerwone Żniwa w postaci kota, a Kruszenie kości w Łamacz szpiku w Postaci Bruina',
   'hudChrome.auraEffect.verdance':
     'Zieleń {stacks}/{max}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu lub Dzikiego ukojenia dodaje 1, a każdy punkt skraca czas rzucania Dzikiego ukojenia. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit',
   'hudChrome.continentMap.levels': 'Poziomy od {min} do {max}',
@@ -16575,7 +16577,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.name': 'Żarowa Skóra',
   'entities.abilities.claw.description':
     'Rozerwij wroga pazurami za obrażenia broni plus {damage}. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
-  'entities.abilities.claw.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.claw.specNote_feral':
+    'Każdy trafiony cios dodaje ładunek Strzępów, krwawienia zadającego 12 obrażeń w ciągu 8 sek. na ładunek (maks. 5 ładunków). Nowy ładunek odnawia czas trwania.',
   'entities.abilities.cold_blood.description':
     'Skupia twój morderczy zamiar, dzięki czemu twoje następne 5 ataków to trafienia krytyczne. (silnik Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -16610,7 +16613,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci kota.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na silniejszy cios, dodatkowo natychmiast zadają wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywracają energię.',
+    'Zadaje o 15% więcej obrażeń za każde twoje krwawienie na celu i odnawia twoją Krwawą szczelinę do pełnego czasu trwania. Przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na cios wydłużający twoje Zdzieranie i Krwawą szczelinę, przyspieszający o 50% tiknięcia twoich krwawień na celu na 8 sek. i przywracający energię.',
   'entities.abilities.funeral_harvest.description':
     'Gdy umiera wróg, któremu niedawno zadałeś obrażenia ty lub twoi nieumarli, zyskujesz 1 Odłamek Duszy. Może się to zdarzyć najwyżej raz na 3 sekundy.',
   'entities.abilities.funeral_harvest.name': 'Pogrzebowe Żniwo',
@@ -16667,7 +16670,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.name': 'Wskrześ Szkieletowego Wojownika',
   'entities.abilities.rake.description':
     'Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj {overTime} obrażeń od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
-  'entities.abilities.rake.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.rake.specNote_feral':
+    'W postaci kota tiknięcia twoich krwawień dodają Starą Krew (maks. 3, najwyżej 1 co 2 sek.), a twoje krwawienia mogą trafiać krytycznie; każde krytyczne krwawienie przywraca 3 energii.',
   'entities.abilities.reaping_command.description':
     'Zużywa 2 Odłamki Duszy, rozkazując wszystkim nieumarłym sługom uderzyć jednocześnie. Grobowi Strażnicy prowokują i przygotowują się na cios, Wojownicy przygważdżają, Kościani Magowie obnażają magiczne osłony, a Grobowe Skrzydło rozrywa wszystkich trafionych wrogów.',
   'entities.abilities.reaping_command.name': 'Rozkaz Żniw',
@@ -16680,7 +16684,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa. Przy 3 Zieleni Szybkie uzdrowienie zmienia się w Nadrozkwit.',
   'entities.abilities.rip.description':
     'Cios kończący wywołujący krwawienie co 2 s przez 24 s: 72 obrażenia plus 48 za wydany punkt kombinacji (5 punktów: łącznie {damage}). Tylko w Postaci kota.',
-  'entities.abilities.rip.specNote_feral': 'Trafiony cios dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Dopóki na celu są co najmniej 3 twoje krwawienia, cierpi on od Sączących się ran: otrzymuje o 20% mniej leczenia.',
   'entities.abilities.ruinous_brand.description':
     'Naznacza wroga na 15 sekund. Twoje następne 3 bezpośrednie zaklęcia odbijają się za 25% obrażeń w naznaczonego wroga, albo kopiują na niego 50% obrażeń, gdy rzucone są na inny cel. Echa Pocisku Ruiny również liczą się jako trafienia krytyczne, bez dodatkowego mnożnika obrażeń krytycznych.',
   'entities.abilities.ruinous_brand.name': 'Niszczycielskie Piętno',
@@ -16821,6 +16826,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Twoja następna dostępna zdolność dobijająca nic nie kosztuje',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Pogrzebowe Żniwo nie może jeszcze stworzyć kolejnego Odłamka Duszy',
+  'hudChrome.auraEffect.redTorrent':
+    'Twoje krwawienia na celu Czerwonych Żniw tykają o {pct}% szybciej',
   'hudChrome.auraEffect.galeheartWeapon':
     'Ukończenie {steps}-ciosowej kadencji Ducha Wojny odbija cios {count} razy za {pct}% jego obrażeń jako obrażenia od Natury',
   'hudChrome.auraEffect.healEcho': 'Spadek poniżej {threshold}% zdrowia przywraca {value} zdrowia',
@@ -20209,7 +20216,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scratch.description':
     'Przeciągnij pazurami przez pobliskie cele w promieniu 6 jardów, zadając obrażenia broni plus {damage}. Każdy trafiony cel daje 1 punkt kombinacji. Ujawnia skradających się wrogów w obszarze zamachu. Tylko w Postaci kota.',
   'entities.abilities.scratch.name': 'Drapnięcie',
-  'entities.abilities.scratch.specNote_feral': 'Każde trafienie dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.scratch.specNote_feral':
+    'Każdy trafiony wróg dodatkowo krwawi od Rany z drapnięcia: 12 obrażeń w ciągu 6 sek.',
   'entities.abilities.spore_burst.description':
     'Przywołuje zarodnikową narośl we wskazanym obszarze. Po {duration} s narośl wybucha, lecząc sojuszników o {healing} i zadając wrogom w promieniu 8 jardów {damage} obrażeń od natury.',
   'entities.abilities.spore_burst.name': 'Wybuch zarodników',

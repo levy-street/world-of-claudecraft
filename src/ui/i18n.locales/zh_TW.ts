@@ -7750,19 +7750,21 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '若目前不是貓形態，先切換為貓形態，再衝刺，使移動速度提高50%，持續15秒。任何形態下均可使用。瞬發，不觸發公共冷卻。',
   'entities.abilities.pounce.name': '匿蹤突襲',
   'entities.abilities.lunge.description':
-    '撲向最遠 12 碼外的敵人，造成 60% 武器傷害並獲得 1 個連擊點。僅限貓形態。',
+    '若尚未處於貓形態則先變為貓形態，然後撲向最遠 25 碼外的敵人。抵達時造成 60% 武器傷害並獲得 1 個連擊點；撲擊中途被打斷會返還其冷卻時間。任何形態下皆可使用。',
   'entities.abilities.lunge.name': '撲擊',
   'entities.abilities.hamstring_bite.description':
     '終結技，昏迷目標 1 秒外加每點連擊點 1 秒（5 點連擊點：6 秒）。僅限貓形態。',
   'entities.abilities.hamstring_bite.name': '撲倒',
   'entities.abilities.pounce.description':
-    '一個潛行開場技，昏迷目標 2 秒。獎勵 1 個連擊點。僅限貓形態。 未隱匿時，此按鈕為撲擊。',
+    '一個潛行開場技，昏迷目標 2 秒。獎勵 1 個連擊點，野性專精下還會施加裂喉，一個在 12 秒內造成 72 點傷害的流血效果。僅限貓形態。未隱匿時，此按鈕為撲擊。',
   'entities.abilities.insect_swarm.name': '螫刺蟲群',
   'entities.abilities.insect_swarm.description':
     '敵人被蟲群侵襲，在 12 秒內受到 {damage} 點自然傷害。',
   'entities.abilities.tigers_fury.name': '猞猁血之力',
   'entities.abilities.tigers_fury.description':
     '湧起{rage}點能量，並使攻擊強度提高 {buff}，持續 {duration} 秒。僅限貓形態。',
+  'entities.abilities.tigers_fury.specNote_feral':
+    '持續期間施加的流血效果在其整個持續時間內造成的傷害提高 20%。',
   'entities.abilities.rip.name': '血隙',
   'entities.abilities.rip.description':
     '終結技，使目標每2秒流血一次，持續24秒：造成72點傷害，每消耗1個連擊點額外增加48點（5個連擊點共{damage}點）。僅限貓形態。',
@@ -18178,8 +18180,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.description':
     '使皮膚硬化為冷卻的熔渣，持續10秒，受到的所有傷害降低25%。',
   'entities.abilities.cinderhide.name': '熔渣皮膚',
-  'entities.abilities.claw.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
-  'entities.abilities.scratch.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
+  'entities.abilities.claw.specNote_feral':
+    '每次命中的攻擊疊加 1 層撕碎，每層為一個在 8 秒內造成 12 點傷害的流血效果（最多 5 層）。疊加新的一層會重置持續時間。',
+  'entities.abilities.scratch.specNote_feral':
+    '每個被擊中的敵人還會受到抓傷流血效果：在 6 秒內造成 12 點傷害。',
   'entities.abilities.cold_focus.description':
     '持續 12 秒，審慎射擊產生更多集中值，蓄力長射的速度更快、消耗更低。（冷視招牌技能）',
   'entities.abilities.cold_focus.name': '冷靜專注',
@@ -18227,7 +18231,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在 8 秒內，你受到的下一次敵人攻擊將被回敬：至多抵消 {buff} 點傷害，並以等量神聖傷害返還給攻擊者，同時你獲得 1 點虔誠。只回敬一次攻擊。昇華使可回敬的數值提高 50%。',
   'entities.abilities.faithforged_guard.name': '聖光之債',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為血收：消耗古血發動更強的撕咬，立即引爆你的剮擊與血裂的剩餘傷害，並恢復能量。',
+    '目標身上每有一個你的流血效果，造成的傷害提高 15%，並將你的血隙重置為完整持續時間。古血達 3 層時，此按鈕變為血收：消耗古血發動一次打擊，延長你的剮擊與血隙，使你在目標身上的流血效果跳動速度提高 50%，持續 8 秒，並恢復能量。',
   'entities.abilities.fieldcraft_reentry.description':
     '被動：擁有狩獵動能時，斷跡使你的下一次剖膛打擊或血鉤獲得強化，持續12秒。剖膛打擊每層增傷15%。血鉤額外造成18至24點物理傷害，該傷害每層提高15%，並隨遠程攻擊強度提高。達到3層時，任一攻擊都會消耗狩獵動能。（生存）',
   'entities.abilities.fieldcraft_reentry.name': '蓄勢再入',
@@ -18347,7 +18351,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.description':
     '消耗1枚靈魂碎片，將一名永久骷髏戰士加入你的2槽統御。只能有一名為你效命。它每6秒對附近敵人造成45%的順劈傷害，收割號令會使目標緩速40%，持續4秒。',
   'entities.abilities.raise_skeletal_warrior.name': '喚醒骷髏戰士',
-  'entities.abilities.rake.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
+  'entities.abilities.rake.specNote_feral':
+    '貓形態下，你的流血效果每次跳動都會累積古血（最多 3 層，每 2 秒最多 1 層），且你的流血效果可以造成致命一擊，每次流血致命一擊恢復 3 點能量。',
   'entities.abilities.reaping_command.description':
     '消耗2枚靈魂碎片，命令所有亡靈僕從同時攻擊。墓衛嘲諷並防禦，骷髏戰士牽制目標，骸骨法師暴露魔法防禦，墓翼撕裂所有被擊中的敵人。',
   'entities.abilities.reaping_command.name': '收割號令',
@@ -18355,13 +18360,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使一名死亡的隊伍成員回到你身邊復活，並恢復 35% 的生命值和法力值。16 級或以上的黎明癒者則會改為呼喚隊伍中 30 碼內且在你視線內的所有陣亡成員回到你身邊復活。',
   'entities.abilities.recall_the_fallen.name': '喚回逝者',
   'entities.abilities.redharvest.description':
-    '消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復{rage}點能量。沒有連擊點也能使用。',
+    '消耗3層古血：造成{damage}點傷害，將你在目標身上的剮擊與血隙各延長 4 秒（每個最多延長 8 秒），使你在目標身上的流血效果跳動速度提高 50%，持續 8 秒（赤紅奔流），並恢復{rage}點能量。沒有連擊點也能使用。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.regrowth.specNote_restoration':
     '每次施放累積 1 層繁茂（最多 3 層），刷新仍在生效的綻放也算。',
   'entities.abilities.rejuvenation.specNote_restoration':
     '每次施放累積 1 層繁茂（最多 3 層），刷新仍在生效的綻放也算。繁茂達 3 層時，迅癒變為盛放。',
-  'entities.abilities.rip.specNote_feral': '命中的一擊累積 1 層古血（最多 3 層）。',
+  'entities.abilities.rip.specNote_feral':
+    '目標身上有 3 個或更多你的流血效果時，會受到滲血傷口影響：受到的治療降低 20%。',
   'entities.abilities.ruinous_brand.description':
     '為敵人烙印15秒。你接下來的3個直接法術會對被烙印的敵人回響25%的傷害；若對其他目標施放，則會向其複製50%的傷害。毀滅箭的回響同樣視為爆擊，但不會有額外的爆擊傷害加成。',
   'entities.abilities.ruinous_brand.name': '毀滅烙印',
@@ -19406,6 +19412,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formShadow': '幽幕形態：暗影傷害提高 {pct}%',
   'hudChrome.auraEffect.freeExecute': '下一個符合條件的斬殺技能不消耗資源',
   'hudChrome.auraEffect.funeralHarvestLock': '葬禮收割暫時無法再次產生靈魂碎片',
+  'hudChrome.auraEffect.redTorrent': '你在血收目標身上的流血效果跳動速度提高 {pct}%',
   'hudChrome.auraEffect.galeheartWeapon':
     '完成戰魂的{steps}連擊節奏後，該次打擊迴響{count}次，每次造成其傷害{pct}%的自然傷害',
   'hudChrome.auraEffect.gloam':
@@ -19426,7 +19433,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '儲存你和不死僕從造成傷害的 {storedPct}%，並額外儲存靈魂長槍傷害的 {lancePct}%；再次施放引爆。目標死亡時在 {radius} 碼內爆炸並產生 1 個靈魂碎片',
   'hudChrome.auraEffect.nextAttackCrit': '下一次攻擊必定造成致命一擊',
   'hudChrome.auraEffect.oldBlood':
-    '古血：第{stacks}/{max}層。裂爪、剮擊、血裂、血噬、橫掃利爪與碎骨擊的命中各累積1層。達到{max}層時：貓形態下血噬變為血收，巨熊形態下碎骨擊變為碎髓',
+    '古血：第{stacks}/{max}層。貓形態下，你的流血效果每次跳動累積1層，每2秒最多1次；巨熊形態下，橫掃利爪與碎骨擊每次命中累積1層。達到{max}層時：貓形態下血噬變為血收，巨熊形態下碎骨擊變為碎髓',
   'hudChrome.auraEffect.overpowerCharge': '{stacks} 層充能：下一次致殘打擊傷害提高 {pct}%',
   'hudChrome.auraEffect.perfectMoment': '乙太飛彈不會消耗秘法充能',
   'hudChrome.auraEffect.petDamage': '寵物造成的傷害提高 {pct}%',

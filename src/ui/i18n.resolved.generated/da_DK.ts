@@ -4791,6 +4791,7 @@ export const da_DK: EnTranslations = {
       "cooldownCap": "{used} af {cap} sek. nedkølingsreduktion brugt i dette vindue",
       "bruinRushWindow": "Katteform koster ingen mana og fastholder målet for jeres Bruin-storm, hvilket nedsætter dets hastighed med {pct}% i {sec} sek.",
       "funeralHarvestLock": "Begravelseshøst kan ikke skabe endnu en Sjælesplint lige nu",
+      "redTorrent": "Dine blødninger på målet for din Rød Høst tikker {pct}% hurtigere",
       "effigyPlankHide": "Afværger {pct}% af hvert slag, indtil et stød med Skårpiken slukker lygten i dens øje",
       "effigyLanternOut": "Halmformandens lygte er slukket for dig: dine og dit kæledyrs slag ignorerer dens Plankehud og rammer med fuld kraft",
       "leadenHexLock": "Blytung forbandelse kan ikke rodfæste dette mål igen lige nu",
@@ -4842,7 +4843,7 @@ export const da_DK: EnTranslations = {
       "coldsightRead": "Dit næste Langtræk giver {longDrawPct}% mere skade, eller dit næste Skæbneskud giver {fellShotPct}% mere",
       "duskEconomy": "Evner koster {pct}% mindre energi",
       "moontide": "Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den",
-      "oldBlood": "Gammelt Blod: trin {stacks} af {max}. Landede Katte- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus",
+      "oldBlood": "Gammelt Blod: trin {stacks} af {max}. I Katteform tilføjer hvert tik fra dine blødninger 1, højst én gang hvert 2. sek.; i Bruin-form tilføjer hvert slag med Fejende Kløer og Knogleknus, der rammer, 1. Ved {max}: Blodbid bliver til Rød Høst i Katteform, og Knogleknus bliver til Marvbrækker i Bruin-form",
       "verdance": "Grønske {stacks}/{max}. Hver Sporeheling, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring",
       "freeExecute": "Din næste kvalificerede henrettelsesevne koster ingenting",
       "resourceSap": "Genopretter {value} af din nuværende ressource hvert {interval}. sek",
@@ -18415,17 +18416,17 @@ export const da_DK: EnTranslations = {
       "claw": {
         "name": "Flængeklo",
         "description": "Klo fjenden for våbenskade plus {damage}. Giver 1 combopoint. Kun i Katteform.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3)."
+        "specNote_feral": "Hvert slag, der rammer, tilføjer en stak Pjalter, en blødning på 12 skade over 8 sek. pr. stak (maks. 5 stakke). En ny stak fornyer varigheden."
       },
       "scratch": {
         "name": "Krads",
         "description": "Riv gennem nærliggende mål inden for 6 yards for våbenskade plus {damage}. Giver 1 kombopoint pr. ramt mål. Afslører snigende fjender i området. Kun i Katteform.",
-        "specNote_feral": "Hvert træffende slag giver 1 Gammelt Blod (maks. 3)."
+        "specNote_feral": "Hver fjende, det rammer, bløder også af Kradssår: 12 skade over 6 sek."
       },
       "ferocious_bite": {
         "name": "Blodbid",
         "description": "Afsluttende manøvre, der giver {damage}. Kun i Katteform.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et kraftigere slag, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner energi."
+        "specNote_feral": "Giver 15% mere skade for hver af dine blødninger på målet og fornyer din Blodrevne til fuld varighed. Ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et slag, der forlænger dine Flæns og Blodrevne, får dine blødninger på målet til at tikke 50% hurtigere i 8 sek. og gendanner energi."
       },
       "swipe": {
         "name": "Fejende Kløer",
@@ -18480,11 +18481,11 @@ export const da_DK: EnTranslations = {
       },
       "pounce": {
         "name": "Luskeslag",
-        "description": "En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint. Kun i Katteform. Uden sneg-tilstand er denne knap Spring."
+        "description": "En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint og åbner som Forvildet Struberive, en blødning på 72 skade over 12 sek. Kun i Katteform. Uden sneg-tilstand er denne knap Spring."
       },
       "lunge": {
         "name": "Spring",
-        "description": "Spring mod en fjende op til 12 m væk, påfør 60% våbenskade og giv 1 kombopoint. Kun i Katteform."
+        "description": "Skift til Katteform, hvis du ikke allerede er i den, og spring så mod en fjende op til 25 m væk. Ved ankomst påføres 60% våbenskade og gives 1 kombopoint; et afbrudt spring refunderer sin nedkøling. Kan bruges i enhver form."
       },
       "hamstring_bite": {
         "name": "Nedlæggelse",
@@ -18496,12 +18497,13 @@ export const da_DK: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Losblod",
-        "description": "Frembringer {rage} energi og øger angrebskraft med {buff} i {duration} sek. Kun i Katteform."
+        "description": "Frembringer {rage} energi og øger angrebskraft med {buff} i {duration} sek. Kun i Katteform.",
+        "specNote_feral": "Blødninger, du påfører, mens den varer, giver 20% mere skade i hele deres varighed."
       },
       "rip": {
         "name": "Blodrevne",
         "description": "Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek.: 72 skade plus 48 pr. brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.",
-        "specNote_feral": "Det ramte slag tilføjer 1 Gammelt Blod (maks. 3)."
+        "specNote_feral": "Mens 3 eller flere af dine blødninger er på et mål, lider det af Væskende Sår: 20% mindre modtaget helbredelse."
       },
       "mortal_strike": {
         "name": "Lemlæstende Slag",
@@ -18718,7 +18720,7 @@ export const da_DK: EnTranslations = {
       },
       "redharvest": {
         "name": "Rød Høst",
-        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint."
+        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, forlænger dine Flæns og Blodrevne på målet med 4 sek. (op til 8 sek. hver), får dine blødninger på målet til at tikke 50% hurtigere i 8 sek. (Rød Strøm) og gendanner {rage} energi. Virker uden kombopoint."
       },
       "marrowbreak": {
         "name": "Marvbrækker",
@@ -19236,7 +19238,7 @@ export const da_DK: EnTranslations = {
       "rake": {
         "name": "Flæns",
         "description": "Flæns fjenden for våbenskade plus {damage} og giv {overTime} blødningsskade over 18 sek. Giver 1 combopoint. Kun i Katteform.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3)."
+        "specNote_feral": "I Katteform tilføjer dine blødningers tik Gammelt Blod (maks. 3, højst 1 hvert 2. sek.), og dine blødninger kan ramme kritisk, hvor hvert kritisk blødningstik gendanner 3 energi."
       },
       "revive_pet": {
         "name": "Lappe sammen",

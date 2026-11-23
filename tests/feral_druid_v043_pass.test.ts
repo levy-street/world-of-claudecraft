@@ -1,6 +1,7 @@
 // The v0.43 Wildfang pass, one suite per change:
 //   1. every melee attack a feral druid makes reaches 1 yd further
-//   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3)
+//   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3); the feral bleed
+//      rework retired that (Cat bleeds bank instead, Slinkstrike opens Throatrake)
 //   3. Nature's Boon: a landed autoattack has a 1-in-15 chance to arm one free
 //      Wildbloom (any form, 50% stronger) OR Oakhide (Bruin only, 25%
 //      stronger) for 10 sec
@@ -133,10 +134,6 @@ function armBoon(sim: Sim): void {
   }
 }
 
-function stacks(player: Entity, id: string): number {
-  return player.auras.find((aura) => aura.id === id)?.stacks ?? 0;
-}
-
 function aura(player: Entity, id: string): Aura | undefined {
   return player.auras.find((entry) => entry.id === id);
 }
@@ -235,33 +232,21 @@ describe('1. Wildfang reach: +1 yd on melee attacks', () => {
   });
 });
 
-describe('2. Slinkstrike and Lunge bank Old Blood', () => {
-  it('banks one stage each, capped at three', () => {
+// Since the feral bleed rework Cat Form strikes bank no Old Blood (its bleed
+// ticks do, tests/feral_bleed_rework.test.ts); the opener plants Throatrake.
+describe('2. Slinkstrike and Lunge (feral bleed rework)', () => {
+  it('bank no Old Blood on a landed hit', () => {
     const { sim, player } = rig('feral');
     const ctx = rawCtx(sim);
 
     druidEngineOnLandedStrike(ctx, player, 'pounce');
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(1);
     druidEngineOnLandedStrike(ctx, player, 'lunge');
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(2);
-    druidEngineOnLandedStrike(ctx, player, 'pounce');
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(3);
-    // The cap is the existing OLD_BLOOD_STAGES, not a second number.
+    expect(player.auras.some((entry) => entry.id === OLD_BLOOD_ID)).toBe(false);
+    // The cap is unchanged for the Bruin strikes that still bank.
     expect(OLD_BLOOD_STAGES).toBe(3);
-    druidEngineOnLandedStrike(ctx, player, 'lunge');
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(OLD_BLOOD_STAGES);
   });
 
-  it('stays feral-only: the other druid specs bank nothing', () => {
-    for (const spec of ['balance', 'restoration'] as const) {
-      const { sim, player } = rig(spec);
-      druidEngineOnLandedStrike(rawCtx(sim), player, 'pounce');
-      druidEngineOnLandedStrike(rawCtx(sim), player, 'lunge');
-      expect(player.auras.some((entry) => entry.id === OLD_BLOOD_ID)).toBe(false);
-    }
-  });
-
-  it('banks through the real Slinkstrike cast, on the tick its stun lands', () => {
+  it('opens Throatrake through the real Slinkstrike cast, on the tick its stun lands', () => {
     const { sim, player } = rig('feral');
     player.auras.push(formAura(player, 'form_cat'));
     player.auras.push(formAura(player, 'stealth'));
@@ -271,8 +256,12 @@ describe('2. Slinkstrike and Lunge bank Old Blood', () => {
     for (let tick = 0; tick < 4; tick++) sim.tick();
 
     expect(mob.auras.some((entry) => entry.kind === 'stun')).toBe(true);
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(1);
-    // The combo point the opener already paid is untouched by the new bank.
+    expect(
+      mob.auras.some(
+        (entry) =>
+          entry.id === 'throatrake' && entry.kind === 'dot' && entry.sourceId === player.id,
+      ),
+    ).toBe(true);
     expect(player.comboPoints).toBe(1);
   });
 });

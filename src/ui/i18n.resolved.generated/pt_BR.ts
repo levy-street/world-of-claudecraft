@@ -4791,6 +4791,7 @@ export const pt_BR: EnTranslations = {
       "cooldownCap": "{used} de {cap} s de redução de recarga usados nesta janela",
       "bruinRushWindow": "A Forma de Gato não custa mana e fixa o alvo da vossa Investida de Bruin, reduzindo sua velocidade em {pct}% por {sec} s",
       "funeralHarvestLock": "Colheita Fúnebre ainda não pode criar outro Fragmento de Alma",
+      "redTorrent": "Seus sangramentos no alvo da sua Colheita Vermelha dão tiques {pct}% mais rápido",
       "effigyPlankHide": "Desvia {pct}% de cada golpe até uma estocada de Pique de Estilhaços apagar a lanterna no olho",
       "effigyLanternOut": "A lanterna do Capataz de Palha está apagada para você: seus golpes e os do seu mascote ignoram a Couraça de tábuas e causam dano completo",
       "leadenHexLock": "Maldição Chúmbea ainda não pode enraizar este alvo novamente",
@@ -4842,7 +4843,7 @@ export const pt_BR: EnTranslations = {
       "coldsightRead": "Seu próximo Tiro longo causa {longDrawPct}% a mais de dano, ou seu próximo Tiro funesto causa {fellShotPct}% a mais",
       "duskEconomy": "As habilidades custam {pct}% menos energia",
       "moontide": "Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta",
-      "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Golpes conectados de Gato e Bruin compartilham este banco; com {max}, Mordida Sanguinária ou Esmaga-Ossos se transforma",
+      "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Na Forma de Gato, cada tique dos seus sangramentos adiciona 1, no máximo uma vez a cada 2 s; na Forma de Bruin, cada acerto de Garras Varredoras e Esmaga-Ossos adiciona 1. Com {max}: Mordida Sanguinária se torna Colheita Vermelha na Forma de Gato, Esmaga-Ossos se torna Quebra-Medula na Forma de Bruin",
       "verdance": "Verdor {stacks}/{max}. Cada Cura de Esporos, Segundo Florescer ou Cura Selvagem que você lançar adiciona 1, e cada ponto encurta o lançamento de Cura Selvagem. Com {max}, Recuperação Rápida vira Superflorescência",
       "freeExecute": "Sua próxima habilidade de execução elegível não custa nada",
       "resourceSap": "Restaura {value} do seu recurso atual a cada {interval} s",
@@ -18415,17 +18416,17 @@ export const pt_BR: EnTranslations = {
       "claw": {
         "name": "Garra Dilacerante",
         "description": "Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Gato.",
-        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo (máx. 3)."
+        "specNote_feral": "Cada acerto adiciona um acúmulo de Farrapos, um sangramento de 12 de dano ao longo de 8 s por acúmulo (máx. 5 acúmulos). Um novo acúmulo renova a duração."
       },
       "scratch": {
         "name": "Arranhão",
         "description": "Arranha os alvos próximos em até 6 m, causando dano da arma mais {damage}. Concede 1 ponto de combo por alvo atingido. Revela inimigos furtivos na varredura. Apenas na Forma Felina.",
-        "specNote_feral": "Cada acerto adiciona 1 Sangue Antigo (máximo 3)."
+        "specNote_feral": "Cada inimigo atingido também sangra com Ferida de Arranhão: 12 de dano ao longo de 6 s."
       },
       "ferocious_bite": {
         "name": "Mordida Sanguinária",
         "description": "Movimento finalizador que causa {damage}. Apenas Forma de Gato.",
-        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em uma mordida mais forte que também causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, e restaura energia."
+        "specNote_feral": "Causa 15% a mais de dano para cada um dos seus sangramentos no alvo e renova sua Fenda Sangrenta para a duração total. Com 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em um golpe que prolonga seus Esfolar e Fenda Sangrenta, faz seus sangramentos no alvo darem tiques 50% mais rápido por 8 s e restaura energia."
       },
       "swipe": {
         "name": "Garras Varredoras",
@@ -18480,11 +18481,11 @@ export const pt_BR: EnTranslations = {
       },
       "pounce": {
         "name": "Bote Furtivo",
-        "description": "Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo. Apenas Forma de Gato. Fora da furtividade, este botão é Bote."
+        "description": "Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo e, como Feral, abre Rasga-garganta, um sangramento de 72 de dano ao longo de 12 s. Apenas Forma de Gato. Fora da furtividade, este botão é Bote."
       },
       "lunge": {
         "name": "Bote",
-        "description": "Dá um bote em um inimigo a até 12 m, causando 60% do dano da arma e concedendo 1 ponto de combo. Apenas Forma de Gato."
+        "description": "Assume a Forma de Gato se ainda não estiver nela e dá um bote em um inimigo a até 25 m. Ao chegar, causa 60% do dano da arma e concede 1 ponto de combo; um bote interrompido devolve sua recarga. Utilizável em qualquer forma."
       },
       "hamstring_bite": {
         "name": "Derrubada",
@@ -18496,12 +18497,13 @@ export const pt_BR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangue de Lince",
-        "description": "Gera {rage} de energia e aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Gato."
+        "description": "Gera {rage} de energia e aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Gato.",
+        "specNote_feral": "Sangramentos que você aplicar enquanto durar causam 20% a mais de dano por toda a duração deles."
       },
       "rip": {
         "name": "Fenda Sangrenta",
         "description": "Golpe final que faz o alvo sangrar a cada 2 s por 24 s: 72 de dano mais 48 por ponto de combo gasto (5 pontos: {damage} no total). Apenas na Forma de Gato.",
-        "specNote_feral": "O acerto adiciona 1 de Sangue Antigo (máx. 3)."
+        "specNote_feral": "Enquanto 3 ou mais dos seus sangramentos estiverem em um alvo, ele sofre Feridas Gotejantes: 20% menos cura recebida."
       },
       "mortal_strike": {
         "name": "Golpe Mutilador",
@@ -18718,7 +18720,7 @@ export const pt_BR: EnTranslations = {
       },
       "redharvest": {
         "name": "Colheita Vermelha",
-        "description": "Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura {rage} de energia. Funciona sem pontos de combo."
+        "description": "Consome seus 3 de Sangue Antigo: golpeia por {damage}, prolonga seus Esfolar e Fenda Sangrenta no alvo em 4 s (até 8 s cada), faz seus sangramentos no alvo darem tiques 50% mais rápido por 8 s (Torrente Vermelha) e restaura {rage} de energia. Funciona sem pontos de combo."
       },
       "marrowbreak": {
         "name": "Quebra-Medula",
@@ -19236,7 +19238,7 @@ export const pt_BR: EnTranslations = {
       "rake": {
         "name": "Esfolar",
         "description": "Esfola o inimigo por dano da arma mais {damage} e causa {overTime} de dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.",
-        "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo (máx. 3)."
+        "specNote_feral": "Na Forma de Gato, os tiques dos seus sangramentos adicionam Sangue Antigo (máx. 3, no máximo 1 a cada 2 s), e seus sangramentos podem ser críticos, com cada crítico de sangramento restaurando 3 de energia."
       },
       "revive_pet": {
         "name": "Remendar",

@@ -1960,14 +1960,20 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'engine_economy',
-      decision: 'Moongrove refunds, bleed-fed Old Blood, or wider Overbloom replanting',
+      decision: 'Moongrove refunds, deeper bleeds, or wider Overbloom replanting',
       options: [
         {
+          // Was Blooddrunk (bleed ticks bank Old Blood). The feral bleed rework
+          // made that baseline in Cat Form, so the slot keeps its option id (saved
+          // allocations still resolve) and became Open Veins: Bloodrift applies a
+          // bleed_vuln debuff for as long as it lasts (combat/druid_bleeds.ts,
+          // OPEN_VEINS_BLEED_VULN reads the same 15%).
           id: 'dru_r14_savage_fury',
-          name: 'Blooddrunk',
-          description: 'Each tick of your Flense and Bloodrift bleeds also adds 1 Old Blood.',
+          name: 'Open Veins',
+          description:
+            'Your Bloodrift also makes the target take 15% more bleed damage for as long as it lasts.',
           icon: 'rip',
-          effect: { intrinsic: { mechanic: 'druid_blooddrunk', metrics: { oldBloodPerTick: 1 } } },
+          effect: { intrinsic: { mechanic: 'druid_open_veins', metrics: { pct: 0.15 } } },
         },
         {
           id: 'dru_r14_moonfury',
