@@ -6403,7 +6403,6 @@ async function refreshCharacters(): Promise<void> {
       // No characters on this realm, drop straight into the create screen.
       listEl.innerHTML = `<li class="char-list-message">${esc(t('character.noneYet'))}</li>`;
       show('#charcreate-panel');
-      return;
     }
     for (const c of chars) {
       const row = document.createElement('li');
@@ -6470,7 +6469,7 @@ async function refreshCharacters(): Promise<void> {
         // selectRow() call, so redesigning the new row still works.
         redesignEditor.close(false);
         // Deselect other characters
-        document.querySelectorAll('#char-list .char-row').forEach((r) => {
+        document.querySelectorAll('#char-list .char-row:not(.char-empty-slot)').forEach((r) => {
           r.classList.remove('sel');
           r.setAttribute('aria-selected', 'false');
         });
@@ -6527,7 +6526,7 @@ async function refreshCharacters(): Promise<void> {
 
     listEl.insertAdjacentHTML(
       'beforeend',
-      membershipSlotsHtml(chars, api.characterMembership.active),
+      membershipSlotsHtml(chars, api.characterMembership.active, api.characterLimit),
     );
     ($('#btn-new-character') as HTMLButtonElement).disabled = !canCreateMembershipCharacter(
       chars,
@@ -6536,11 +6535,12 @@ async function refreshCharacters(): Promise<void> {
     );
     hydratePortraits(listEl);
 
-    // Select first character by default if present, else show a default showcase.
-    const firstRow = listEl.querySelector('.char-row') as HTMLElement | null;
+    // Select the first character. An empty roster already opened creation,
+    // which owns the preview, so the default showcase must not override it.
+    const firstRow = listEl.querySelector('.char-row:not(.char-empty-slot)') as HTMLElement | null;
     if (firstRow) {
       firstRow.click();
-    } else {
+    } else if (chars.length > 0) {
       previewClassBody('warrior');
     }
   } catch (err) {
@@ -9730,7 +9730,7 @@ function wireStartScreens(): Promise<void> {
         x.classList.remove('sel');
         x.setAttribute('aria-pressed', 'false');
       });
-      document.querySelectorAll('#char-list .char-row').forEach((r) => {
+      document.querySelectorAll('#char-list .char-row:not(.char-empty-slot)').forEach((r) => {
         r.classList.remove('sel');
         r.setAttribute('aria-selected', 'false');
       });
@@ -9756,7 +9756,7 @@ function wireStartScreens(): Promise<void> {
         window.clearTimeout(hoverTimeouts['charcreate-class-details']);
         hoverTimeouts['charcreate-class-details'] = null;
       }
-      document.querySelectorAll('#char-list .char-row').forEach((r) => {
+      document.querySelectorAll('#char-list .char-row:not(.char-empty-slot)').forEach((r) => {
         r.classList.remove('sel');
         r.setAttribute('aria-selected', 'false');
       });

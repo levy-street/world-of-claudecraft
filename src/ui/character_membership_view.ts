@@ -1,9 +1,11 @@
+import { MEMBERSHIP_CHARACTER_SLOTS } from '../membership_contract';
 import type { PlayerClass } from '../sim/types';
 import { deleteCharButtonHtml } from './char_delete_button';
 import { type CharselectHintSource, charselectHintsHtml } from './charselect_hints';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { t } from './i18n';
+import { svgIcon } from './ui_icons';
 
 interface RosterCharacter extends CharselectHintSource {
   class: PlayerClass;
@@ -31,7 +33,7 @@ export function characterRowHtml(c: RosterCharacter, portraitHtml: string, nowMs
       : c.online
         ? `<span class="char-actions"><button class="btn take-over-btn" title="${esc(t('character.takeOverConfirm'))}" aria-label="${esc(t('character.takeOverConfirm'))}">${esc(t('character.takeOver'))}</button>${rerollHtml}${deleteHtml}</span>`
         : `<span class="char-actions"><button class="btn enter-world-btn">${esc(t('auth.enterWorld'))}</button>${rerollHtml}${deleteHtml}</span>`;
-  return `${portraitHtml}<div class="char-id"><span class="char-name">${esc(c.name)}</span><span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(status)}</span>${hintsHtml}</div>${actions}`;
+  return `${portraitHtml}<div class="char-id"><span class="char-name">${c.membershipLocked ? svgIcon('lock', { cls: 'char-slot-lock' }) : ''}${esc(c.name)}</span><span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(status)}</span>${hintsHtml}</div>${actions}`;
 }
 
 export function canCreateMembershipCharacter(
@@ -46,14 +48,20 @@ export function canCreateMembershipCharacter(
 export function membershipSlotsHtml(
   characters: readonly { membershipLocked?: boolean; membershipSlot?: boolean }[],
   active: boolean,
+  limit: number,
 ): string {
-  const count = active
-    ? Math.max(0, 20 - characters.length)
-    : Math.max(0, 10 - characters.filter((character) => character.membershipSlot).length);
-  const label = t(active ? 'character.emptySlot' : 'character.membershipSlots');
-  return Array.from(
-    { length: count },
-    () =>
-      `<li class="char-row membership-slot${active ? '' : ' membership-locked'}" role="option" aria-disabled="true" aria-selected="false"><span class="char-sub">${esc(label)}</span></li>`,
-  ).join('');
+  const premiumOccupied = characters.filter((character) => character.membershipSlot).length;
+  const baseLimit = limit - (active ? MEMBERSHIP_CHARACTER_SLOTS : 0);
+  const baseEmpty = Math.max(0, baseLimit - (characters.length - premiumOccupied));
+  const premiumEmpty = Math.max(0, MEMBERSHIP_CHARACTER_SLOTS - premiumOccupied);
+  const row = (premium: boolean) => {
+    const locked = premium && !active;
+    const label = t(locked ? 'character.membershipSlots' : 'character.emptySlot');
+    const icon = locked ? svgIcon('lock', { cls: 'char-slot-lock' }) : '';
+    return `<li class="char-row char-empty-slot${premium ? ' membership-slot' : ''}${locked ? ' membership-locked' : ''}">${icon}<span class="char-sub">${esc(label)}</span></li>`;
+  };
+  return (
+    Array.from({ length: baseEmpty }, () => row(false)).join('') +
+    Array.from({ length: premiumEmpty }, () => row(true)).join('')
+  );
 }
