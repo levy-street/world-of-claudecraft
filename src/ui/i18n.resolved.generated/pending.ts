@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "es_ES": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "fr_FR": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "fr_CA": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "de_DE": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "nl_NL": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "pl_PL": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "id_ID": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "tr_TR": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "sv_SE": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "vi_VN": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ],
+  "da_DK": [
+    "hudChrome.lootExplorer.category.world_boss",
+    "hudChrome.lootExplorer.encounterAll",
+    "hudChrome.lootExplorer.encounterWholeInstance",
+    "hudChrome.lootExplorer.filterEncounterAria"
+  ]
 };

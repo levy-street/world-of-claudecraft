@@ -26575,6 +26575,10 @@
     min-width: 100px;
     font-size: 13px;
   }
+  /* Boss names run long: the Encounter dropdown takes its own wider share. */
+  .loot-explorer-filter--encounter {
+    flex: 2 1 200px;
+  }
   .loot-explorer-search:focus-visible,
   .loot-explorer-filter:focus-visible,
   .loot-explorer-tab:focus-visible,

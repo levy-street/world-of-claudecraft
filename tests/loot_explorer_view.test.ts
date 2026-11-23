@@ -54,6 +54,7 @@ describe('buildLootExplorerIndex', () => {
     const expected: LootExplorerCategory[] = [
       'raid',
       'dungeon',
+      'world_boss',
       'open_world',
       'rift',
       'vendor',

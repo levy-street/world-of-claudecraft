@@ -9,6 +9,15 @@ browsable flat ("By Item") or grouped by encounter/difficulty ("By
 Encounter"). Pure view core (`loot_explorer_view.ts`) + thin painter
 (`loot_explorer_window.ts`), the deeds/reliquary/dungeon-finder family.
 
+## Encounter narrowing
+Raid, Dungeon, and World Boss sources get an Encounter dropdown whose options
+(each instance, then its bosses in Dungeon Finder progression order) and the
+"By Encounter" card order (a boss's Normal card directly before its Heroic)
+come from the pure `loot_explorer_encounter_core.ts`. The filter itself
+(`encounter` on `LootExplorerFilters`) lives in the view core and narrows both
+tabs; it is ignored outside those three categories and resets on a category
+change.
+
 ## Static content only, deliberately
 A content browser, not live world state (mirrors the maintainer-facing
 `scripts/export_loot_spreadsheet.mjs`), so per the Dungeon Finder precedent
@@ -19,7 +28,7 @@ Do not add one speculatively.
 `LootExplorerCategory` mirrors `ReliquarySourceKind` (`src/sim/content/reliquary.ts`)
 where they overlap: `raid`/`dungeon` classify off the Dungeon Finder's
 authored `FinderActivity.kind`, never spawn lists; `delve` off each
-`DelveDef.bosses` list; `open_world` is the fallback; `rift` reads the two
+`DelveDef.bosses` list; `world_boss` off the `worldBoss` template flag; `open_world` is the fallback; `rift` reads the two
 rank pool functions in `src/sim/rift/loot_pools.ts` (C = normal pool, B/A/S
 share the heroic pool). Normal/heroic rows mirror the roller's own gate
 (`lootEntryRollsOnClaim`) so a row never advertises a drop a kill cannot roll.

@@ -38,6 +38,7 @@ import {
 export type LootExplorerCategory =
   | 'raid'
   | 'dungeon'
+  | 'world_boss'
   | 'delve'
   | 'open_world'
   | 'rift'
@@ -50,6 +51,7 @@ export type LootExplorerCategory =
 export const LOOT_EXPLORER_CATEGORIES: readonly LootExplorerCategory[] = [
   'raid',
   'dungeon',
+  'world_boss',
   'delve',
   'open_world',
   'rift',
@@ -60,13 +62,29 @@ export const LOOT_EXPLORER_CATEGORIES: readonly LootExplorerCategory[] = [
   'starting_equipment',
 ];
 
+/** The categories whose sources are bosses: these get the Encounter
+ *  dropdown (loot_explorer_encounter_core.ts builds its options). */
+export type EncounterFilterCategory = 'raid' | 'dungeon' | 'world_boss';
+
+export const ENCOUNTER_FILTER_CATEGORIES: readonly EncounterFilterCategory[] = [
+  'raid',
+  'dungeon',
+  'world_boss',
+];
+
+export function isEncounterFilterCategory(
+  category: LootExplorerCategory | 'all',
+): category is EncounterFilterCategory {
+  return (ENCOUNTER_FILTER_CATEGORIES as readonly string[]).includes(category);
+}
+
 /** Rift clear rank the pool pays out at; distinct from DungeonDifficulty
  *  because a rift has four ranks, not two. */
 export type RiftRank = 'C' | 'B' | 'A' | 'S';
 
 export interface LootExplorerSource {
   category: LootExplorerCategory;
-  /** mobId (raid/dungeon/delve/open_world), npcId (vendor), questId
+  /** mobId (raid/dungeon/world_boss/delve/open_world), npcId (vendor), questId
    *  (quest_reward/quest_objective), itemId (ground_object), class id
    *  (starting_equipment), or the rift rank letter (rift). */
   sourceId: string;
@@ -233,6 +251,8 @@ export function buildLootExplorerIndex(): LootExplorerIndex {
     } else if (delveId) {
       category = 'delve';
       contextId = delveId;
+    } else if (mob.worldBoss) {
+      category = 'world_boss';
     } else {
       category = 'open_world';
     }
@@ -334,6 +354,34 @@ export interface LootExplorerFilters {
   requiredClass: PlayerClass | 'all';
   statKey: (typeof STAT_KEYS)[number] | 'all';
   quality: NonNullable<ItemDef['quality']> | 'all';
+  /** Narrows a boss category to one instance (`instance:<dungeonId>`, trash
+   *  included) or one boss (`mob:<mobId>`, every difficulty). Ignored unless
+   *  `category` is an EncounterFilterCategory, so a stale value can never
+   *  empty an unrelated category. */
+  encounter: LootExplorerEncounterFilter;
+}
+
+export type LootExplorerEncounterFilter = 'all' | `instance:${string}` | `mob:${string}`;
+
+export function instanceEncounterFilter(dungeonId: string): LootExplorerEncounterFilter {
+  return `instance:${dungeonId}`;
+}
+
+export function mobEncounterFilter(mobId: string): LootExplorerEncounterFilter {
+  return `mob:${mobId}`;
+}
+
+/** Whether one source passes the encounter filter (the caller has already
+ *  narrowed it to the filter's category). */
+export function sourceMatchesEncounter(
+  source: LootExplorerSource,
+  encounter: LootExplorerEncounterFilter,
+): boolean {
+  if (encounter === 'all') return true;
+  if (encounter.startsWith('instance:')) {
+    return source.contextId === encounter.slice('instance:'.length);
+  }
+  return source.sourceId === encounter.slice('mob:'.length);
 }
 
 export const LOOT_EXPLORER_DEFAULT_FILTERS: LootExplorerFilters = {
@@ -341,6 +389,7 @@ export const LOOT_EXPLORER_DEFAULT_FILTERS: LootExplorerFilters = {
   requiredClass: 'all',
   statKey: 'all',
   quality: 'all',
+  encounter: 'all',
 };
 
 /** Filters the index to items matching every active facet. Text search is
@@ -362,6 +411,12 @@ export function filterLootExplorerItems(
     if (filters.statKey !== 'all' && !item.statKeys.includes(filters.statKey)) continue;
     const sources = item.sources.filter((s) => {
       if (filters.category !== 'all' && s.category !== filters.category) return false;
+      if (
+        isEncounterFilterCategory(filters.category) &&
+        !sourceMatchesEncounter(s, filters.encounter)
+      ) {
+        return false;
+      }
       if (
         filters.requiredClass !== 'all' &&
         s.restrictedToClass &&

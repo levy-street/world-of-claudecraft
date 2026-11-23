@@ -520,6 +520,7 @@ const UI_PURE_CORES = [
   'src/ui/controller_options_view.ts',
   'src/ui/options_view.ts',
   'src/ui/hud/loot_explorer/loot_explorer_view.ts',
+  'src/ui/hud/loot_explorer/loot_explorer_encounter_core.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
   'src/ui/hud/vendor/crucible_vendor_view.ts',

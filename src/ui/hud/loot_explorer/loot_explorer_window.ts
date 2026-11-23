@@ -43,16 +43,25 @@ import { focusActiveTab, wireTabStrip } from '../../tab_strip_painter';
 import { tabStripHtml, tabStripModel } from '../../tab_strip_view';
 import { svgIcon } from '../../ui_icons';
 import {
+  lootExplorerEncounterGroups,
+  sortLootExplorerEncounters,
+} from './loot_explorer_encounter_core';
+import {
   buildLootExplorerIndex,
+  type EncounterFilterCategory,
   filterLootExplorerItems,
   groupLootExplorerBySource,
+  instanceEncounterFilter,
+  isEncounterFilterCategory,
   LOOT_EXPLORER_CATEGORIES,
   LOOT_EXPLORER_DEFAULT_FILTERS,
   type LootExplorerCategory,
   type LootExplorerEncounter,
+  type LootExplorerEncounterFilter,
   type LootExplorerFilters,
   type LootExplorerItem,
   type LootExplorerSource,
+  mobEncounterFilter,
 } from './loot_explorer_view';
 
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
@@ -79,6 +88,7 @@ function sourceLine(source: LootExplorerSource): string {
   switch (source.category) {
     case 'raid':
     case 'dungeon':
+    case 'world_boss':
     case 'open_world': {
       const mobName = tEntity({ kind: 'mob', id: source.sourceId, field: 'name' });
       const context = source.contextId
@@ -265,6 +275,47 @@ function optionsHtml<T extends string>(
   );
 }
 
+function encounterOption(
+  value: LootExplorerEncounterFilter,
+  selected: LootExplorerEncounterFilter,
+  label: string,
+): string {
+  return `<option value="${esc(value)}"${value === selected ? ' selected' : ''}>${esc(label)}</option>`;
+}
+
+/** The Encounter dropdown for a boss category: one optgroup per raid or
+ *  dungeon (its whole-instance option, then each boss in progression order),
+ *  or a flat boss list for world bosses. Every label resolves through the
+ *  entity name resolver. */
+function encounterSelectHtml(
+  category: EncounterFilterCategory,
+  selected: LootExplorerEncounterFilter,
+): string {
+  const groups = lootExplorerEncounterGroups(buildLootExplorerIndex(), category);
+  const mobName = (id: string) => tEntity({ kind: 'mob', id, field: 'name' });
+  let options = encounterOption('all', selected, t('hudChrome.lootExplorer.encounterAll'));
+  for (const group of groups) {
+    const bosses = group.bossMobIds
+      .map((id) => encounterOption(mobEncounterFilter(id), selected, mobName(id)))
+      .join('');
+    if (!group.contextId) {
+      options += bosses;
+      continue;
+    }
+    const instance = tEntity({ kind: 'dungeon', id: group.contextId, field: 'name' });
+    options +=
+      `<optgroup label="${esc(instance)}">` +
+      encounterOption(
+        instanceEncounterFilter(group.contextId),
+        selected,
+        t('hudChrome.lootExplorer.encounterWholeInstance', { name: instance }),
+      ) +
+      bosses +
+      `</optgroup>`;
+  }
+  return `<select class="loot-explorer-filter loot-explorer-filter--encounter" data-filter="encounter" data-focus-key="filter:encounter" aria-label="${esc(t('hudChrome.lootExplorer.filterEncounterAria'))}">${options}</select>`;
+}
+
 export class LootExplorerWindow {
   private opened = false;
   private tab: LootExplorerTab = 'items';
@@ -320,16 +371,7 @@ export class LootExplorerWindow {
    *  tabs, and body alike), not just the body panel renderBody() targets. */
   relocalize(): void {
     if (!this.opened) return;
-    const el = this.deps.root();
-    const focusKey = captureFocusKey(el);
-    this.render();
-    if (focusKey) {
-      restoreFirstEnabled([
-        findFocusKey(el, focusKey),
-        findFocusKey(el, 'search'),
-        findFocusKey(el, 'close'),
-      ]);
-    }
+    this.renderKeepingFocus();
   }
 
   private setSearch(value: string): void {
@@ -342,7 +384,29 @@ export class LootExplorerWindow {
     value: LootExplorerFilters[K],
   ): void {
     this.filters = { ...this.filters, [key]: value };
+    if (key === 'category') {
+      // The Encounter dropdown belongs to one category: drop the old pick and
+      // rebuild the toolbar so the dropdown appears, swaps its list, or goes.
+      this.filters.encounter = 'all';
+      this.renderKeepingFocus();
+      return;
+    }
     this.renderBody();
+  }
+
+  /** Full render() that carries the focused control across by its
+   *  data-focus-key (render() replaces the toolbar too, not just the body). */
+  private renderKeepingFocus(): void {
+    const el = this.deps.root();
+    const focusKey = captureFocusKey(el);
+    this.render();
+    if (focusKey) {
+      restoreFirstEnabled([
+        findFocusKey(el, focusKey),
+        findFocusKey(el, 'search'),
+        findFocusKey(el, 'close'),
+      ]);
+    }
   }
 
   private matchesSearch(item: LootExplorerItem): boolean {
@@ -367,6 +431,9 @@ export class LootExplorerWindow {
       `<div class="loot-explorer-toolbar">` +
       `<input type="search" class="loot-explorer-search" data-search data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.lootExplorer.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.lootExplorer.searchAria'))}">` +
       `<select class="loot-explorer-filter" data-filter="category" data-focus-key="filter:category" aria-label="${esc(t('hudChrome.lootExplorer.filterCategoryAria'))}">${optionsHtml(LOOT_EXPLORER_CATEGORIES, this.filters.category, (c) => t(categoryLabelKey(c)))}</select>` +
+      (isEncounterFilterCategory(this.filters.category)
+        ? encounterSelectHtml(this.filters.category, this.filters.encounter)
+        : '') +
       `<select class="loot-explorer-filter" data-filter="requiredClass" data-focus-key="filter:requiredClass" aria-label="${esc(t('hudChrome.lootExplorer.filterClassAria'))}">${optionsHtml(ALL_CLASSES, this.filters.requiredClass, (c) => tEntity({ kind: 'class', id: c, field: 'name' }))}</select>` +
       `<select class="loot-explorer-filter" data-filter="statKey" data-focus-key="filter:statKey" aria-label="${esc(t('hudChrome.lootExplorer.filterStatAria'))}">${optionsHtml(STAT_FILTER_KEYS, this.filters.statKey, (s) => t(statNameKey(s) as TranslationKey))}</select>` +
       `<select class="loot-explorer-filter" data-filter="quality" data-focus-key="filter:quality" aria-label="${esc(t('hudChrome.lootExplorer.filterQualityAria'))}">${optionsHtml(['poor', 'common', 'uncommon', 'rare', 'epic', 'legendary'] as const, this.filters.quality, (q) => t(ITEM_QUALITY_LABEL_KEYS[q]))}</select>` +
@@ -437,7 +504,7 @@ export class LootExplorerWindow {
       }
       count = items.length;
     } else {
-      const encounters = groupLootExplorerBySource(items);
+      const encounters = sortLootExplorerEncounters(groupLootExplorerBySource(items));
       const cards = encounters.map((enc) => encounterCardHtml(enc, this.deps)).join('');
       body.innerHTML =
         cards || `<div class="loot-explorer-empty">${esc(t('hudChrome.lootExplorer.empty'))}</div>`;

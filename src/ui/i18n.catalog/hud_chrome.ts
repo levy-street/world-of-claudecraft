@@ -11189,12 +11189,19 @@ export const hudChromeStrings = {
     filterClassAria: 'Class',
     filterStatAria: 'Stat',
     filterQualityAria: 'Quality',
+    filterEncounterAria: 'Encounter',
     filterAll: 'All',
+    // The Encounter dropdown (raid, dungeon, and world boss sources only):
+    // its default option, and the per-instance option covering every boss
+    // and trash mob there. {name} is the resolved dungeon or raid name.
+    encounterAll: 'All encounters',
+    encounterWholeInstance: 'All of {name}',
     tabItems: 'By Item',
     tabEncounters: 'By Encounter',
     category: {
       raid: 'Raid',
       dungeon: 'Dungeon',
+      world_boss: 'World Boss',
       delve: 'Delve',
       open_world: 'Open World',
       rift: 'Rift',

@@ -1,19 +1,31 @@
 export {
+  type LootExplorerEncounterGroup,
+  lootExplorerEncounterGroups,
+  sortLootExplorerEncounters,
+} from './loot_explorer_encounter_core';
+export {
   buildDungeonKind,
   buildLootExplorerIndex,
   buildMobToDelve,
   buildMobToDungeon,
+  ENCOUNTER_FILTER_CATEGORIES,
+  type EncounterFilterCategory,
   filterLootExplorerItems,
   groupLootExplorerBySource,
+  instanceEncounterFilter,
+  isEncounterFilterCategory,
   LOOT_EXPLORER_CATEGORIES,
   LOOT_EXPLORER_DEFAULT_FILTERS,
   type LootExplorerCategory,
   type LootExplorerEncounter,
+  type LootExplorerEncounterFilter,
   type LootExplorerFilters,
   type LootExplorerIndex,
   type LootExplorerItem,
   type LootExplorerSource,
+  mobEncounterFilter,
   type RiftRank,
   resetLootExplorerIndexCache,
+  sourceMatchesEncounter,
 } from './loot_explorer_view';
 export { LootExplorerWindow, type LootExplorerWindowDeps } from './loot_explorer_window';
