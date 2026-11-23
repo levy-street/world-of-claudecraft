@@ -148,7 +148,7 @@ describe('2. Scratch', () => {
   it("carries Rendclaw's Wildfang baseline damage row", () => {
     const feral = SPEC_BASELINES.druid?.feral;
     const row = (id: string) => feral?.ability?.find((entry) => entry.ability === id);
-    expect(row('claw')?.dmgPct).toBe(-0.25);
+    expect(row('claw')?.dmgPct).toBe(-0.4);
     expect(row('scratch')).toEqual({ ...row('claw'), ability: 'scratch' });
   });
 

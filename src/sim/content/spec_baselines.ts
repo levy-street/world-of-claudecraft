@@ -271,19 +271,20 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [
         { ability: 'maul', dmgPct: 0.35 },
         // Feral bleed rework (combat/druid_bleeds.ts). These rows are additive
-        // with the spec's +50% physical and +15% offensive bonuses. Rendclaw and
-        // Scratch went from +15% to -25% (they now plant Tatter and Scratch
-        // Wound); Gorebite -40% because it gains 15% per bleed on the target;
-        // Bloodrift -45% because Redharvest now keeps combo points, so every
-        // Bloodrift is a 5-point one that Redharvest extends and Gorebite
-        // refreshes for the whole fight. Sized by the Monte Carlo pass E1 (L20
-        // Nythraxis-armor dummy, 120 sec, 10 seeds): about 190 DPS against 170
-        // for the pre-rework kit and a 145 to 190 peer band.
-        { ability: 'claw', dmgPct: -0.25 },
+        // with the spec's +50% physical and +15% offensive bonuses. The rework is
+        // sized to be DPS-neutral against the pre-rework Cat kit: it changes how
+        // the damage arrives (bleeds instead of Redharvest cash-outs), not how
+        // much. Rendclaw and Scratch now plant Tatter and Scratch Wound; Gorebite
+        // gains 15% per bleed on the target; Bloodrift is always a 5-point bleed
+        // that Redharvest extends and Gorebite refreshes for the whole fight.
+        // Monte Carlo pass F1 (L20 Nythraxis-armor dummy, 120 sec, the same 10
+        // seeds as the pre-rework baseline): 171.4 DPS against 170.4.
+        { ability: 'claw', dmgPct: -0.4 },
         // Scratch copies Rendclaw's damage profile, baseline row included.
-        { ability: 'scratch', dmgPct: -0.25 },
-        { ability: 'ferocious_bite', dmgPct: -0.4 },
-        { ability: 'rip', dmgPct: -0.45 },
+        { ability: 'scratch', dmgPct: -0.4 },
+        { ability: 'rake', dmgPct: -0.3 },
+        { ability: 'ferocious_bite', dmgPct: -0.55 },
+        { ability: 'rip', dmgPct: -0.7 },
         { ability: 'swipe', dmgPct: 0.2 },
       ],
     },
