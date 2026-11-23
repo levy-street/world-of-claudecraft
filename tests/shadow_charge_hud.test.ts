@@ -273,4 +273,42 @@ describe('Shadow Priest charge HUD', () => {
     expect(css).not.toContain('--player-frame-scale');
     expect(css).toContain('.priest-charge-frame.hud-frame-detached');
   });
+
+  it('autoscales the mobile medallion from one viewport unit, touch size at most', () => {
+    const css = readFileSync(new URL('../src/styles/hud.priest.css', import.meta.url), 'utf8');
+    const block = (selector: string) => {
+      // The last standalone rule: an earlier match can be a selector list
+      // (the shared tap-target floor) that ends with the same selector.
+      const at = css.lastIndexOf(`\n  ${selector} {`);
+      expect(at, `${selector} rule`).toBeGreaterThan(-1);
+      return css.slice(at, css.indexOf('}', at));
+    };
+    const unit = 'var(--priest-charge-mobile-unit)';
+    const frame = block('body.mobile-touch .priest-charge-frame');
+    // One unit: the stock touch pixel from a 500px short edge up, shrinking
+    // with the short edge below it, floored so the counts stay legible.
+    expect(frame).toContain('--priest-charge-mobile-unit: clamp(0.75px, 0.2vmin, 1px)');
+    expect(frame).toContain(`width: calc(156 * ${unit})`);
+    expect(frame).toContain(`min-height: calc(132 * ${unit})`);
+    // Scaled, never hidden: the frame's display stays with the painter.
+    expect(frame).not.toContain('display');
+    expect(block('body.mobile-touch .priest-bomb-meter')).toContain(`width: calc(96 * ${unit})`);
+    expect(block('body.mobile-touch .priest-bomb-orb')).toContain(
+      `--disc-size: calc(66 * ${unit})`,
+    );
+    expect(block('body.mobile-touch .priest-bomb-header .priest-charge-count')).toContain(
+      `font-size: calc(14 * ${unit})`,
+    );
+    expect(block('body.mobile-touch .priest-gloom-meter .priest-charge-count')).toContain(
+      `font-size: calc(11 * ${unit} / var(--priest-touch-scale))`,
+    );
+    expect(block('body.mobile-touch .priest-gloom-pip')).toContain(`width: calc(16 * ${unit})`);
+    // The tap-target floor never shrinks with the art.
+    const meters = css.match(
+      /body\.mobile-touch \.priest-gloom-meter,\s*body\.mobile-touch \.priest-bomb-meter\s*\{([^}]+)\}/,
+    )?.[1];
+    expect(meters).not.toContain('--priest-charge-mobile-unit');
+    // One declaration only, so no later rule quietly re-sizes the unit.
+    expect(css.match(/--priest-charge-mobile-unit:/g)).toHaveLength(1);
+  });
 });
