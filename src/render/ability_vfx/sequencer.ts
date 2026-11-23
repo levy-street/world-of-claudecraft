@@ -1282,24 +1282,11 @@ export class ArchetypeSequencer {
       );
       n++;
     }
-    // buff-block casts light the caster's body (the gallery casterGlowV on
-    // buff impact); instant no-aura buffs like Blood Toll get their red read
-    // from exactly this pulse
-    if (spec.buff !== undefined || arch === 'buff') {
+    // Only morph form transitions pulse the caster's body rim; offensive hits
+    // and ordinary buffs leave character materials untinted.
+    if (spec.buff?.style === 'morph') {
       const rim = spec.rim ? abilityHexColor(spec.rim) : slot.color;
-      host.glowPulse(
-        slot.casterId,
-        rim,
-        (spec.buff?.shellDur ? 2 : 1.3) * cs,
-        !!spec.buff?.shellDur,
-      );
-      n++;
-    }
-    // receiver feedback (the gallery targetGlow 2.6*cs): the victim's rig
-    // flashes in the hit color and fast-decays - the body itself sells the
-    // contact. Targeted, non-gentle hits only; never the caster.
-    if (!gentle && slot.targetId >= 0 && slot.targetId !== slot.casterId) {
-      host.glowPulse(slot.targetId, slot.color, 1.2 * cs, false);
+      host.glowPulse(slot.casterId, rim, (spec.buff.shellDur ? 2 : 1.3) * cs, !!spec.buff.shellDur);
       n++;
     }
     // impact light pulse (in a daylight scene the lit ground carries most of

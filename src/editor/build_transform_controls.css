@@ -1,0 +1,47 @@
+.ed-build-transform {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: var(--ed-panel-2);
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-radius);
+}
+
+.ed-build-transform-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ed-build-transform-row button {
+  min-height: 36px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.ed-build-transform-readout,
+.ed-build-transform-hint {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ed-build-transform-readout {
+  font-variant-numeric: tabular-nums;
+}
+
+.ed-build-transform-hint {
+  color: var(--ed-muted);
+  font-size: 11px;
+}
+
+.ed-build-transform :is(button, input):focus-visible {
+  outline: 2px solid var(--ed-focus);
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .ed-build-transform-row button,
+  .ed-build-transform .ed-check {
+    min-height: 44px;
+  }
+}

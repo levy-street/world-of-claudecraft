@@ -15,6 +15,7 @@ import {
   type ActionBarLayoutForm,
   type ActionBarLayoutProfile,
   type ActionBarLayoutRestore,
+  type ActionBarSlotAction,
   actionBarLayoutIsEmpty,
   resolveActionBarLayoutProfile,
   sanitizeActionBarLayout,
@@ -138,7 +139,7 @@ export function applyActionBarLayout(
     const formLayout = clean.forms[form];
     if (!formLayout) continue;
     const key = actionBarSlotMapKey(playerClass, playerName, profile, form);
-    const bar: HotbarAction[] = Array.from(
+    const bar: (ActionBarSlotAction | null)[] = Array.from(
       { length: Math.min(formLayout.bar.length, ACTION_BAR_ABILITY_SLOTS) },
       (_, i) => formLayout.bar[i] ?? null,
     );
@@ -157,7 +158,7 @@ export function applyActionBarLayout(
     for (const [spec, specLayout] of Object.entries(clean.specs)) {
       if (!specLayout) continue;
       const key = actionBarSlotMapKey(playerClass, playerName, profile, 'normal', spec);
-      const bar: HotbarAction[] = Array.from(
+      const bar: (ActionBarSlotAction | null)[] = Array.from(
         { length: Math.min(specLayout.bar.length, ACTION_BAR_ABILITY_SLOTS) },
         (_, i) => specLayout.bar[i] ?? null,
       );

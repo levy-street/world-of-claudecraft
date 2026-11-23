@@ -9,9 +9,11 @@ import { MOBS } from '../sim/data';
 import { dungeonInstanceAt } from '../sim/dungeon_floor';
 import { DUNGEON_WALL_HW, type DungeonLayout } from '../sim/dungeon_layout';
 import { IGNIVAR_GATE_LOCKED_TEMPLATE } from '../sim/ignivar_raid_ids';
+import { dungeonGateStateOf } from '../sim/instances/dungeon_gates';
 import { authoredWallSegments } from '../sim/rift/authored';
 import { PLAYER_INTEREST_RADIUS } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { type FieldMapPlan, fieldMapForInterior } from './field_map_view';
 
 const PLAN_MARGIN_YD = DUNGEON_WALL_HW + 2;
 const MINIMAP_RIM_INSET = 7;
@@ -68,6 +70,12 @@ export type DungeonMapMarker =
 export interface DungeonMapStaticGeometry {
   /** Exact authoritative layout used to derive this draw model. */
   sourceLayout: DungeonLayout;
+  /** The painted plan of an authored open-air field (field_map_view.ts), drawn
+   *  as one plate into `fieldRect` instead of the room plan; null for a room
+   *  interior. */
+  field: FieldMapPlan | null;
+  /** Where the field plate lands on this canvas (its bounds, projected). */
+  fieldRect: { x: number; y: number; w: number; h: number } | null;
   canvasWidth: number;
   canvasHeight: number;
   /** Instance-local bounds, including a small wall-safe framing margin. */
@@ -102,6 +110,8 @@ export interface MapAnchor {
 
 export interface DungeonMapLocal {
   dungeonId: string;
+  /** The DungeonDef.interior key (an authored field draws its painted plan). */
+  interior: string;
   layout: DungeonLayout;
   originX: number;
   originZ: number;
@@ -133,7 +143,8 @@ interface LocalPlan {
   walls: LocalWall[];
   doors: LocalPoint[][];
   obstacles: LocalCircle[];
-  dais: LocalCircle;
+  dais: LocalCircle | null;
+  field: FieldMapPlan | null;
 }
 
 interface Projection {
@@ -141,8 +152,39 @@ interface Projection {
   point: (x: number, z: number) => DungeonMapPoint;
 }
 
-const planCache = new WeakMap<DungeonLayout, LocalPlan>();
-const projectedGeometryCache = new WeakMap<DungeonLayout, Map<string, DungeonMapStaticGeometry>>();
+const planCache = new WeakMap<object, LocalPlan>();
+const projectedGeometryCache = new WeakMap<object, Map<string, DungeonMapStaticGeometry>>();
+
+/** The object a frame's plan is cached under: its authored field's painted
+ *  plan when the interior is an open-air field (several fields share the
+ *  fallback room layout), else its room layout. */
+function planKeyOf(frame: { interior: string; layout: DungeonLayout }): object {
+  return fieldMapForInterior(frame.interior) ?? frame.layout;
+}
+
+/** The plan of an authored open-air field: its painted plate carries the
+ *  ground; the bounds frame it. */
+function fieldPlanFor(field: FieldMapPlan): LocalPlan {
+  const cached = planCache.get(field);
+  if (cached) return cached;
+  const plan: LocalPlan = {
+    bounds: { ...field.bounds },
+    floors: [],
+    walls: [],
+    doors: [],
+    obstacles: [],
+    dais: null,
+    field,
+  };
+  planCache.set(field, plan);
+  return plan;
+}
+
+/** The plan for an instance frame (a field plate or a room plan). */
+function planForFrame(frame: { interior: string; layout: DungeonLayout }): LocalPlan {
+  const field = fieldMapForInterior(frame.interior);
+  return field ? fieldPlanFor(field) : planFor(frame.layout);
+}
 
 function rectPoints(x0: number, x1: number, z0: number, z1: number): LocalPoint[] {
   return [
@@ -217,6 +259,7 @@ function planFor(layout: DungeonLayout): LocalPlan {
     doors,
     obstacles,
     dais: { ...layout.dais },
+    field: null,
   };
   planCache.set(layout, plan);
   return plan;
@@ -228,6 +271,7 @@ export function dungeonMapLocal(x: number, z: number): DungeonMapLocal | null {
   if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
   return {
     dungeonId: frame.dungeonId,
+    interior: frame.interior,
     layout: frame.layout,
     originX: frame.ox,
     originZ: frame.oz,
@@ -242,6 +286,12 @@ export function dungeonMapLocal(x: number, z: number): DungeonMapLocal | null {
 function sameInstance(local: { originX: number; originZ: number }, x: number, z: number): boolean {
   const frame = dungeonInstanceAt(x, z);
   return frame !== null && frame.ox === local.originX && frame.oz === local.originZ;
+}
+
+/** A dungeon gate or seal that still bars the way (an open one draws nothing). */
+function gateShut(templateId: string): boolean {
+  const state = dungeonGateStateOf(templateId);
+  return state === 'closed' || state === 'sealed';
 }
 
 /** Shared branch guard for the M-map and minimap. */
@@ -271,7 +321,7 @@ function collectMarkers(
     const point = projection.point(entity.pos.x - local.originX, entity.pos.z - local.originZ);
     if (!visible(point)) continue;
     if (entity.kind === 'object') {
-      if (entity.templateId === IGNIVAR_GATE_LOCKED_TEMPLATE) {
+      if (entity.templateId === IGNIVAR_GATE_LOCKED_TEMPLATE || gateShut(entity.templateId)) {
         markers.push({ kind: 'gate', ...point });
       } else if (entity.templateId === 'dungeon_exit' || entity.templateId === 'dungeon_door') {
         markers.push({ kind: 'exit', ...point });
@@ -331,12 +381,23 @@ function projectStaticGeometry(
   canvasHeight: number,
   cacheKey: string | null,
 ): DungeonMapStaticGeometry {
+  const key = planKeyOf(local);
   if (cacheKey) {
-    const cached = projectedGeometryCache.get(local.layout)?.get(cacheKey);
+    const cached = projectedGeometryCache.get(key)?.get(cacheKey);
     if (cached) return cached;
   }
+  const corner = projection.point(plan.bounds.maxX, plan.bounds.maxZ);
   const geometry: DungeonMapStaticGeometry = {
     sourceLayout: local.layout,
+    field: plan.field,
+    fieldRect: plan.field
+      ? {
+          x: corner.cx,
+          y: corner.cy,
+          w: (plan.bounds.maxX - plan.bounds.minX) * projection.scale,
+          h: (plan.bounds.maxZ - plan.bounds.minZ) * projection.scale,
+        }
+      : null,
     canvasWidth,
     canvasHeight,
     bounds: plan.bounds,
@@ -351,16 +412,19 @@ function projectStaticGeometry(
       const point = projection.point(obstacle.x, obstacle.z);
       return { ...point, r: obstacle.r * projection.scale };
     }),
-    dais: (() => {
-      const point = projection.point(plan.dais.x, plan.dais.z);
-      return { ...point, r: plan.dais.r * projection.scale };
-    })(),
+    dais: plan.dais
+      ? (() => {
+          const dais = plan.dais;
+          const point = projection.point(dais.x, dais.z);
+          return { ...point, r: dais.r * projection.scale };
+        })()
+      : null,
   };
   if (cacheKey) {
-    let byKey = projectedGeometryCache.get(local.layout);
+    let byKey = projectedGeometryCache.get(key);
     if (!byKey) {
       byKey = new Map();
-      projectedGeometryCache.set(local.layout, byKey);
+      projectedGeometryCache.set(key, byKey);
     }
     byKey.set(cacheKey, geometry);
   }
@@ -379,7 +443,7 @@ function buildModel(
   const at = anchor ?? world.player.pos;
   const local = dungeonMapLocal(at.x, at.z);
   if (!local) return null;
-  const plan = planFor(local.layout);
+  const plan = planForFrame(local);
   const projection = projectionFor(local, plan);
   const visible = visibleFor(projection);
   const geometry = projectStaticGeometry(
@@ -436,7 +500,7 @@ export function buildDungeonMinimapPaintModel(
 ): DungeonMinimapPaintModel | null {
   const local = dungeonMapLocal(world.player.pos.x, world.player.pos.z);
   if (!local) return null;
-  const plan = planFor(local.layout);
+  const plan = planForFrame(local);
   const spanX = plan.bounds.maxX - plan.bounds.minX;
   const spanZ = plan.bounds.maxZ - plan.bounds.minZ;
   const projection: Projection = {
@@ -592,7 +656,7 @@ class DungeonMarkerBuffer {
       } else if (cx < 0 || cx > canvasSize || cy < 0 || cy > canvasSize) continue;
 
       if (entity.kind === 'object') {
-        if (entity.templateId === IGNIVAR_GATE_LOCKED_TEMPLATE) {
+        if (entity.templateId === IGNIVAR_GATE_LOCKED_TEMPLATE || gateShut(entity.templateId)) {
           this.next('gate', cx, cy);
         } else if (entity.templateId === 'dungeon_exit' || entity.templateId === 'dungeon_door') {
           this.next('exit', cx, cy);
@@ -654,9 +718,9 @@ export class DungeonMapViewCore {
   private readonly worldMarkers = new DungeonMarkerBuffer();
   private minimapModel: DungeonMinimapPaintModel | null = null;
   private worldModel: DungeonMapModel | null = null;
-  private minimapLayout: DungeonLayout | null = null;
+  private minimapLayout: object | null = null;
   private minimapScale = Number.NaN;
-  private worldLayout: DungeonLayout | null = null;
+  private worldLayout: object | null = null;
   private worldSize = Number.NaN;
   private worldPad = Number.NaN;
 
@@ -664,10 +728,10 @@ export class DungeonMapViewCore {
     const player = world.player;
     const frame = dungeonInstanceAt(player.pos.x, player.pos.z);
     if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
-    const plan = planFor(frame.layout);
+    const plan = planForFrame(frame);
     if (
       !this.minimapModel ||
-      this.minimapLayout !== frame.layout ||
+      this.minimapLayout !== planKeyOf(frame) ||
       this.minimapScale !== pxPerYard
     ) {
       const cold = buildDungeonMinimapPaintModel(world, canvasSize, pxPerYard);
@@ -683,7 +747,7 @@ export class DungeonMapViewCore {
       } else {
         this.minimapModel.staticGeometry = cold.staticGeometry;
       }
-      this.minimapLayout = frame.layout;
+      this.minimapLayout = planKeyOf(frame);
       this.minimapScale = pxPerYard;
     }
 
@@ -716,10 +780,10 @@ export class DungeonMapViewCore {
     const at = anchor ?? world.player.pos;
     const frame = dungeonInstanceAt(at.x, at.z);
     if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
-    const plan = planFor(frame.layout);
+    const plan = planForFrame(frame);
     if (
       !this.worldModel ||
-      this.worldLayout !== frame.layout ||
+      this.worldLayout !== planKeyOf(frame) ||
       this.worldSize !== canvasSize ||
       this.worldPad !== pad
     ) {
@@ -737,9 +801,11 @@ export class DungeonMapViewCore {
         this.worldModel.doors = cold.doors;
         this.worldModel.obstacles = cold.obstacles;
         this.worldModel.dais = cold.dais;
+        this.worldModel.field = cold.field;
+        this.worldModel.fieldRect = cold.fieldRect;
         this.worldModel.staticGeometry = cold.staticGeometry;
       }
-      this.worldLayout = frame.layout;
+      this.worldLayout = planKeyOf(frame);
       this.worldSize = canvasSize;
       this.worldPad = pad;
     }

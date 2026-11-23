@@ -3,7 +3,6 @@
 // from players, escapes 20 seconds after the first blow (or after two minutes
 // untouched), and pays everyone in the room the room chest's copper if killed.
 import { describe, expect, it, vi } from 'vitest';
-import { VAULT_GUEST_PAYOUTS_PER_CYCLE } from '../src/sim/content/treasure_maps';
 import { riftInstanceOrigin } from '../src/sim/data';
 import { HOARD_GOBLIN_ESCAPE_CAST } from '../src/sim/rift/hoard_control_cast_ids';
 import {
@@ -61,14 +60,14 @@ describe('the Coinsack Scurrier', () => {
     const { inst, goblin } = hoard();
     expect(goblin?.templateId).toBe(HOARD_GOBLIN_TEMPLATE_ID);
     expect(inst.mobIds).not.toContain(goblin!.id);
-    expect(goblin!.maxHp).toBe(hoardGoblinHealth(goblin!.level, 1));
+    expect(goblin!.maxHp).toBe(hoardGoblinHealth(goblin!.level, inst.vault!.rarity));
     expect(goblin!.hp).toBe(goblin!.maxHp);
   });
 
-  it('is sized for the head count and paid at the room chest rate', () => {
+  it('is sized for the fixed rarity budget and paid at the room chest rate', () => {
     // A lone reader at level 20: about 15 seconds of steady damage.
-    expect(hoardGoblinHealth(20, 1)).toBe(1200);
-    expect(hoardGoblinHealth(20, 5)).toBe(3000);
+    expect(hoardGoblinHealth(20, 'common')).toBe(1200);
+    expect(hoardGoblinHealth(20, 'rare')).toBe(3000);
     // The casket's level-20 copper (6g) times each rarity's chest share.
     expect(hoardGoblinCopper(20, 'common')).toBe(18_000);
     expect(hoardGoblinCopper(20, 'rare')).toBe(36_000);
@@ -180,8 +179,8 @@ describe('the Coinsack Scurrier', () => {
     expect(inst.hoardGoblin?.settled).toBe(true);
   });
 
-  it('pays a guest like the chest does: nothing once the cycle cap is spent', () => {
-    for (const spent of [0, VAULT_GUEST_PAYOUTS_PER_CYCLE]) {
+  it('pays a guest even after three hoards in the same cycle', () => {
+    for (const spent of [0, 3, 4]) {
       const { sim, inst, goblin } = hoard();
       const meta = sim.ctx.players.get(sim.player.id)!;
       // Seat the player as a guest in someone else's hoard.
@@ -191,10 +190,9 @@ describe('the Coinsack Scurrier', () => {
       const copper = meta.copper;
       sim.ctx.handleDeath(goblin!, sim.player);
       run(sim, 1);
-      expect(meta.copper - copper, `guest with ${spent} payouts spent`).toBe(
-        spent === 0 ? hoardGoblinCopper(sim.player.level, 'rare') : 0,
+      expect(meta.copper - copper, `guest with ${spent} prior payouts`).toBe(
+        hoardGoblinCopper(sim.player.level, 'rare'),
       );
-      // The goblin reads the cap, it never spends it.
       expect(meta.vaultGuestPayouts).toBe(spent);
     }
   });

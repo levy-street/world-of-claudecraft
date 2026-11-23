@@ -30,7 +30,12 @@ export interface PoolableVisual {
  * - NPC `skin` STAYS in the key: it picks a texture atlas at construction and
  *   the per-frame diff only reacts to live changes, so a cross-skin reuse
  *   would keep the wrong atlas. The skin set is small and static, so keys
- *   stay bounded.
+ *   stay bounded. (A world NPC rides a WOC class body, whose skin slots are all
+ *   null, no alternate atlas, so the term is constant for it; it still decides a
+ *   stock-rig body.)
+ * An NPC's authored look (characters/npc_looks.ts) needs no term of its own:
+ * it is a pure function of the templateId, so a pooled body can only ever be
+ * handed back to the NPC it was built for.
  */
 export function characterVisualPoolKey(
   e: Pick<Entity, 'kind' | 'templateId' | 'skin'>,

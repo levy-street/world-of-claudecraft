@@ -8,15 +8,19 @@
 // fractions and preformatted text, the "Dead" readout, the classic empty resource
 // rail for a resource-less or dead target, the pre-localized title decoration
 // (memoized by the caller behind a language + title signature), the Cheater tag,
+// the King of the Hill bounty tag leading the name,
 // the player-kind-gated Book of Deeds border slug, the id-keyed portrait gate,
 // and the party-scoped raid marker read from IWorld.markerFor at the call site
 // (so a marked mob shows the same symbol on the frame as on its nameplate).
 
+import { isPlayingDead } from '../sim/combat/hunter_play_dead';
 import type { Entity } from '../sim/types';
 import { cheaterTagLabel } from './cheater_tag';
 import { deedTargetBorderSlug } from './deed_border_view';
 import type { TitledNameDecoration } from './deed_i18n';
 import { entityDisplayName } from './entity_display_core';
+import { hillBountyTagLabel } from './hill_bounty_tag';
+import { wardHealthText } from './hud/dungeon/gaol_chain_view';
 import { type HealthTextMode, unitFrameCurrentMaxText, unitFrameHealthText } from './hud_frames';
 import { t } from './i18n';
 import type { UnitFrameDescriptor } from './unit_frame';
@@ -38,6 +42,25 @@ export function targetPortraitKey(target: Entity): string {
 
 const NO_TITLE = { pre: '', post: '' };
 
+/** Dead for display: really dead, or a hunter playing dead (feign death draws
+ *  as a corpse with empty bars to every viewer while the entity stays alive). */
+export function shownAsDead(target: Entity): boolean {
+  return target.dead || isPlayingDead(target);
+}
+
+/** The target frame's health text under the viewer's health-text option. */
+export function fillTargetHealthText(
+  d: UnitFrameDescriptor,
+  target: Entity,
+  healthMode: HealthTextMode,
+): void {
+  const dead = shownAsDead(target);
+  d.hpText = dead
+    ? t('hud.core.dead')
+    : (wardHealthText(target) ?? unitFrameHealthText(target.hp, target.maxHp, healthMode));
+  d.showAbsorbText = !dead && healthMode !== 0;
+}
+
 /** The compact frame shares the target's health and resource rules. */
 export function fillTargetOfTargetDescriptor(
   d: UnitFrameDescriptor,
@@ -45,7 +68,7 @@ export function fillTargetOfTargetDescriptor(
   healthMode: HealthTextMode,
 ): UnitFrameDescriptor {
   fillTargetFrameDescriptor(d, target, NO_TITLE, null);
-  d.hpText = target.dead
+  d.hpText = shownAsDead(target)
     ? t('hud.core.dead')
     : unitFrameHealthText(target.hp, target.maxHp, healthMode);
   d.levelText = null;
@@ -66,23 +89,26 @@ export function fillTargetFrameDescriptor(
   raidMarker: number | null,
 ): UnitFrameDescriptor {
   d.present = true;
-  d.hpFrac = target.hp / Math.max(1, target.maxHp);
-  d.hpText = target.dead ? t('hud.core.dead') : unitFrameCurrentMaxText(target.hp, target.maxHp);
-  d.showAbsorbText = !target.dead;
+  const dead = shownAsDead(target);
+  d.hpFrac = dead ? 0 : target.hp / Math.max(1, target.maxHp);
+  d.hpText = dead ? t('hud.core.dead') : unitFrameCurrentMaxText(target.hp, target.maxHp);
+  d.showAbsorbText = !dead;
   // The target's power bar (classic target frame): players and caster
   // mobs show their mana/rage/energy; a resource-less target (a plain
   // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass
   // buckets null with mana), so every type class turns off and the
   // rail renders EMPTY (zero fill, no text) but stays visible, the
   // classic look where the frame never changes height. Dead: same.
-  const noResource = target.dead || !target.resourceType;
+  const noResource = dead || !target.resourceType;
   d.resourceKind = noResource ? 'none' : target.resourceType;
   d.resFrac = noResource ? 0 : target.resource / Math.max(1, target.maxResource);
   d.resText = noResource
     ? ''
     : unitFrameCurrentMaxText(Math.round(target.resource), target.maxResource);
   d.levelText = String(target.level);
-  d.name = entityDisplayName(target);
+  // The King of the Hill bounty leads the name, as on the nameplate (one helper).
+  const bounty = hillBountyTagLabel(target);
+  d.name = bounty ? `${bounty} ${entityDisplayName(target)}` : entityDisplayName(target);
   d.titlePre = title.pre;
   d.titlePost = title.post;
   // The operator-applied Cheater tag (src/sim/moderation/). Resolved every
@@ -97,7 +123,7 @@ export function fillTargetFrameDescriptor(
   // mob still redraws), widened by the helm bit for a player: see
   // targetPortraitKey.
   d.portraitKey = targetPortraitKey(target);
-  d.absorb = target.dead ? null : target;
+  d.absorb = dead ? null : target;
   d.dead = false;
   d.outOfRange = false;
   d.raidMarker = raidMarker;

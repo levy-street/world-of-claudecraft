@@ -162,11 +162,8 @@ export interface MobileControlCallbacks {
   onReliquary(): void;
   /** Open the Loot Explorer window, folded into the More tray on mobile. */
   onLootExplorer(): void;
-  /** Mount / dismount from the More tray. Dismounts instantly when riding;
-   *  when unmounted, summons the player's first owned mount directly (no
-   *  action-bar or bag detour needed), or falls back to the shared toggle's
-   *  no-op / riding-trained toast when nothing is owned. See
-   *  src/ui/mount_quick_summon.ts for the decision. */
+  /** Use the shared riding toggle from the More tray: dismount instantly or
+   *  summon the trained ride with the selected cosmetic. */
   onMountToggle(): void;
   /** Open the Professions window, folded into the More tray on mobile. */
   onProfessions(): void;
@@ -563,7 +560,7 @@ export class MobileControls {
     const musicBtn = document.getElementById('mobile-music');
     this.bindButton('mobile-music', () => {
       const on = this.callbacks.onMusic();
-      // mirror the desktop #mm-music control: a diagonal slash (.mm-muted) signals
+      // A diagonal slash (.mm-muted) signals
       // "off", rather than dimming the note
       musicBtn?.classList.toggle('mm-muted', !on);
     });

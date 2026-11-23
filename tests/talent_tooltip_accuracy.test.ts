@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { DUSK_ECONOMY_LINGER_SEC } from '../src/sim/combat/rogue_talents';
 import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { ABILITIES } from '../src/sim/content/classes';
+import { SHADOW_CHOIR_HEAL_FRACTION } from '../src/sim/content/priest_shadow_tuning';
 import { ROW_TREES, TALENTS } from '../src/sim/content/talents';
 import {
   AEGIS_OF_DEVOTION_DR,
@@ -17,7 +18,7 @@ import {
   STANCE_MASTERY_GUARDED_HP_PCT,
 } from '../src/sim/types';
 import { tEntity } from '../src/ui/entity_i18n';
-import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
+import { ensureLocaleLoaded, formatNumber, setLanguage, supportedLanguages } from '../src/ui/i18n';
 import { grantAbilityValues, tTalent } from '../src/ui/talent_i18n';
 
 // English row prose is authored alongside the canonical effect; localized tooltips are
@@ -164,6 +165,55 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     expect(mastery).toContain('at least 20%');
   });
 
+  it.each(supportedLanguages)(
+    'renders Mass Barrier base absorb in the real talent description (%s)',
+    async (lang) => {
+      const choice = CHOICE_ROWS.mage.rows
+        .flatMap((row) => [...row.options])
+        .find((option) => option.id === 'mag_r17_mass_barrier');
+      if (!choice) throw new Error('missing mag_r17_mass_barrier');
+
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      try {
+        const rendered = tTalent({ kind: 'talentChoice', choice, field: 'description' });
+        // Talent planning previews use the authored base, not a character's gear or mastery.
+        expect(rendered).toContain(formatNumber(250));
+        expect(rendered).toContain(formatNumber(15));
+        expect(rendered).not.toMatch(/\$[A-Za-z0-9_]+|\{[A-Za-z0-9_]+\}/);
+        if (lang === 'en') expect(rendered).toContain('each absorbing 250 damage for 15 sec');
+      } finally {
+        setLanguage('en');
+      }
+    },
+  );
+
+  it.each(supportedLanguages)(
+    'preserves single-target shield description amounts (%s)',
+    async (lang) => {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      try {
+        for (const [id, amount] of [
+          ['power_word_shield', 48],
+          ['ice_barrier', 50],
+          ['temporal_barrier', 55],
+        ] as const) {
+          const rendered = tEntity({
+            kind: 'ability',
+            id,
+            field: 'description',
+            values: grantAbilityValues(id),
+          });
+          expect(rendered, id).toContain(formatNumber(amount));
+          expect(rendered, id).not.toMatch(/\$[A-Za-z0-9_]+|\{[A-Za-z0-9_]+\}/);
+        }
+      } finally {
+        setLanguage('en');
+      }
+    },
+  );
+
   it('renders Warded source-health scaling in non-English tooltips', async () => {
     const warded = CHOICE_ROWS.mage.rows
       .flatMap((row) => [...row.options])
@@ -242,6 +292,7 @@ const PCT_FIELDS = new Set([
   'benisonAbsorbCapPct',
   'doctrineConversionPct',
   'shieldHealPct',
+  'bombResidualPct',
   'splashHealPct',
   'tithefiendDamagePct',
   'tithefiendDurationPct',
@@ -313,6 +364,7 @@ const PCT_FIELDS = new Set([
   'focusGenerationPct',
   'damageReductionPct',
   'fallbackDamageReductionPct',
+  'noPetDamagePct',
   'petHealPct',
   'cooldownRefundPct',
   'petHealthFloorPct',
@@ -534,6 +586,15 @@ function legitNumbers(effect: unknown): Set<number> {
           out.add(Math.round((value / MAX_DEVOTION) * 100));
           out.add(MAX_DEVOTION);
         }
+        // Incarnate Spirit retains the bomb's radius and five-target soft cap
+        // (spirit_bomb_completion / spirit_bomb_residual), alongside its fraction.
+        if (key === 'bombResidualPct') {
+          const blast = ABILITIES.spirit_bomb.effects.find((fx) => fx.type === 'aoeDamage');
+          if (blast) {
+            out.add(blast.radius);
+            if (blast.softCap !== undefined) out.add(blast.softCap);
+          }
+        }
         if (key === 'bonusCharges') out.add(value + 1);
         // A slow mult also legitimizes the stated slow percentage (mult 0.5 = 50%).
         if (key === 'mult' && value > 0 && value < 1) out.add(Math.round((1 - value) * 100));
@@ -613,6 +674,14 @@ function legitNumbers(effect: unknown): Set<number> {
     // The tooltip also appends the granted ability's planning metadata line
     // (cost, cast or channel, range, cooldown), so those numbers are real too.
     const def = ABILITIES[grantId];
+    // The authored grant copy also names its Shadow-specific behavior. Stilled
+    // Mind waives Mana, not Void Rupture's aura charges; Shadow Choir converts
+    // actual health loss through shadow_talents.healFromShadowChoir.
+    if (grantId === 'inner_focus') {
+      const charges = ABILITIES.void_rupture.requiresAuraStacks;
+      if (charges !== undefined) out.add(charges);
+    }
+    if (grantId === 'choir_of_deliverance') out.add(SHADOW_CHOIR_HEAL_FRACTION * 100);
     for (const value of [
       def.cost,
       def.castTime,
@@ -814,7 +883,7 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(render('warrior', 'war_row_bloodbath')).toContain('25%');
     const survival = render('hunter', 'survival.mastery');
     expect(survival).toContain('Agility');
-    expect(survival).toContain('15%');
+    expect(survival).toContain('20%');
     // Balance pass: Quickblood is the evasive-skirmisher mastery now.
     expect(survival).toContain('dodge chance by 4%');
   });

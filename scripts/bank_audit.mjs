@@ -25,8 +25,9 @@
 //
 // THE PERSONAL CONTAINER additionally carries the bank SOCKET STORE (Bank
 // Storage phase 07): 'unlock_socket' rows replay the copper ladder (the Nth
-// unlock per character costs exactly the Nth BANK_SOCKET_PRICES entry, at most
-// four ever) against state.bank.unlockedSockets, and 'socket_bag' /
+// unlock per character costs exactly the Nth BANK_SOCKET_PRICES entry, or the
+// Nth entry of a BANK_SOCKET_RETIRED_PRICES ladder, at most four ever)
+// against state.bank.unlockedSockets, and 'socket_bag' /
 // 'unsocket_bag' rows replay the socketed-bag multiset against
 // state.bank.socketBags, in maps SEPARATE from the slot replay's (a bag can
 // legitimately sit in a slot AS an item or in a socket AS capacity, so a
@@ -110,14 +111,17 @@
 // auditBank is pure and DB-free.
 //
 // Usage: node scripts/bank_audit.mjs
+// Run from a full checkout after pnpm install --frozen-lockfile (including
+// devDependencies). The CLI bundles the canonical source projection once with
+// the existing esbuild dependency before opening its read-only DB transaction.
 // Exits 1 when any finding exists, 0 when clean.
 
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Pool } from 'pg';
 
 // The guild slot ladder's valid purchased_slots_after values, mirrored from
 // GUILD_BANK_RUNG_SLOTS / GUILD_BANK_LADDER_POSITIONS in src/sim/guild_bank.ts
-// (this script stays dependency-free of the TS sim; tests/bank_audit.test.ts
+// (the pure checker does not import the TS sim; tests/bank_audit.test.ts
 // pins the two declarations in lockstep). open_bank (rung 0) always lands on
 // the opened base; a guild buy_slots (rungs 1+) always lands on a later
 // ladder position.
@@ -160,14 +164,21 @@ const GUILD_BUY_POSITION_SET = new Set(GUILD_BUY_POSITIONS);
 // carries the rung REACHED, so the integers 1 through this are the only honest
 // values a writer can emit. Lockstep-pinned against the sim ladder by
 // tests/bank_audit.test.ts, the KNOWN_CONTAINERS discipline.
-export const VAULT_MAX_RUNG = 5;
+export const VAULT_MAX_RUNG = 10;
 
 // The bank bag-socket ladder (BANK_SOCKET_PRICES in src/sim/bank.ts),
 // mirrored dependency-free like the guild ladder and the vault rung above and
 // lockstep-pinned by tests/bank_audit.test.ts. A legitimate unlock history is
 // a PREFIX of this list: the Nth unlock_socket row per character costs exactly
 // the Nth price, and a fifth row has no honest price at all.
-export const BANK_SOCKET_PRICES = [1000000, 2000000, 3500000, 5000000];
+export const BANK_SOCKET_PRICES = [750000, 1000000, 1250000, 1500000];
+
+// Socket ladders that were live before a compiled retune. A row is honest when
+// it carries the Nth price of the CURRENT ladder or of any retired one, since
+// an unlock bought before the retune keeps the price it was charged; mixed
+// histories (unlock 1 at a retired price, unlock 2 at the current) are fine.
+// Append the outgoing ladder here whenever BANK_SOCKET_PRICES changes.
+export const BANK_SOCKET_RETIRED_PRICES = [[1000000, 2000000, 3500000, 5000000]];
 
 // The op vocabulary this audit's shape chain handles (checkRowShape): the
 // dependency-free mirror of server/db.ts BankLedgerRow.op, the same
@@ -477,6 +488,22 @@ function isExactVaultSpecialIdentity(value) {
   );
 }
 
+// The one identity a craft_consume row may carry: the exact special wrapper
+// around a payload holding nothing but a non-empty signer, with no crafted
+// marker (server/bank_ledger.ts buildVaultCraftConsumeLedgerRows).
+function isSignerOnlyVaultIdentity(value) {
+  if (!isExactVaultSpecialIdentity(value) || value.craftedRecipeId !== null) return false;
+  const payload = value.instance;
+  if (payload === null) return false;
+  const keys = Object.keys(payload);
+  return (
+    keys.length === 1 &&
+    keys[0] === 'signer' &&
+    typeof payload.signer === 'string' &&
+    payload.signer !== ''
+  );
+}
+
 function itemIdFromKey(key) {
   try {
     return JSON.parse(key)[0];
@@ -575,13 +602,15 @@ function socketStateMultiset(bank) {
 }
 
 // The item multiset a bank currently holds (summed by key over its inventory).
-function stateMultiset(bank) {
+function stateMultiset(bank, projectSlot = (slot) => [slot]) {
   const m = new Map();
   const inv = Array.isArray(bank.inventory) ? bank.inventory : [];
   for (const slot of inv) {
     if (!slot || typeof slot !== 'object') continue;
-    const key = multisetKey(slot.itemId, slot.instance);
-    m.set(key, (m.get(key) ?? 0) + Number(slot.count ?? 0));
+    for (const row of projectSlot(slot)) {
+      const key = multisetKey(row.itemId, row.instance);
+      m.set(key, (m.get(key) ?? 0) + Number(row.count ?? 0));
+    }
   }
   return m;
 }
@@ -611,7 +640,9 @@ function checkRowShape(row, findings) {
   };
   // craft_consume (Bank Storage Phase 04) is an item op with exactly the
   // deposit/withdraw row shape: vault stock consumed in place by a completed
-  // craft, one row per material id, positive count, no copper.
+  // craft, one row per planned take (a take that reaches the crafter's own
+  // signed units writes a signer-keyed row beside its pooled one), positive
+  // count, no copper.
   if (
     row.op === 'deposit' ||
     row.op === 'withdraw' ||
@@ -964,15 +995,18 @@ function checkRowShape(row, findings) {
     });
   }
   // Vault item evidence is either pooled null or the exact versioned special
-  // wrapper. Craft consumption can only draw pooled stock, and purchases carry
-  // no item identity, so both of those ops require null specifically.
+  // wrapper. Craft consumption draws pooled stock plus, since crafts may spend
+  // the crafter's OWN signed units, the signer-only identity those units key
+  // under (nothing else: no payload, no crafted marker). Purchases carry no item
+  // identity, so buy_slots requires null specifically.
   const vaultInstanceAllowed =
     row.instance == null ||
-    ((row.op === 'deposit' || row.op === 'withdraw') && isExactVaultSpecialIdentity(row.instance));
+    ((row.op === 'deposit' || row.op === 'withdraw') &&
+      isExactVaultSpecialIdentity(row.instance)) ||
+    (row.op === 'craft_consume' && isSignerOnlyVaultIdentity(row.instance));
   if (
     container === 'vault' &&
-    (!vaultInstanceAllowed ||
-      ((row.op === 'craft_consume' || row.op === 'buy_slots') && row.instance != null))
+    (!vaultInstanceAllowed || (row.op === 'buy_slots' && row.instance != null))
   ) {
     findings.push({
       ...base,
@@ -998,7 +1032,7 @@ function checkRowShape(row, findings) {
 // The pure checker. `ledgerRows` are bank_ledger rows (snake_case, id-ascending
 // preferred but re-sorted here); `characters` are { id, realm, state } records.
 // Returns findings [{ container, realm, characterId, kind, detail }].
-export function auditBank({ ledgerRows, characters, guildBanks }) {
+export function auditBank({ ledgerRows, characters, guildBanks, projectPersonalSlot }) {
   const findings = [];
   const rows = [...ledgerRows].sort((a, b) => Number(a.id) - Number(b.id));
 
@@ -1248,7 +1282,10 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
               kind: 'socket_unlock_past_ladder',
               detail: `unlock_socket row ${row.id} is unlock ${unlockRows + 1} but the ladder has ${BANK_SOCKET_PRICES.length} rungs`,
             });
-          } else if (Number(row.copper_delta) !== -expected) {
+          } else if (
+            Number(row.copper_delta) !== -expected &&
+            !BANK_SOCKET_RETIRED_PRICES.some((l) => Number(row.copper_delta) === -l[unlockRows])
+          ) {
             findings.push({
               ...base,
               kind: 'bad_socket_price',
@@ -1343,7 +1380,7 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
     }
 
     const net = personalNet.get(character.id) ?? new Map();
-    const stateM = stateMultiset(effectiveBank);
+    const stateM = stateMultiset(effectiveBank, projectPersonalSlot);
     const keys = new Set([...net.keys(), ...stateM.keys()]);
     for (const key of keys) {
       const ledgerCount = net.get(key) ?? 0;
@@ -1809,6 +1846,23 @@ async function main() {
     );
   }
 
+  // Compile the existing pure projection once, before opening a database
+  // connection. This keeps CLI and live audit identity identical without a
+  // second hardcoded item catalog or a committed generated artifact.
+  const { build } = await import('esbuild');
+  const projectionBundle = await build({
+    entryPoints: [
+      fileURLToPath(new URL('../server/personal_bank_source_projection.ts', import.meta.url)),
+    ],
+    bundle: true,
+    write: false,
+    platform: 'node',
+    format: 'esm',
+  });
+  const { personalBankSourceProjection } = await import(
+    `data:text/javascript;base64,${Buffer.from(projectionBundle.outputFiles[0].text).toString('base64')}`
+  );
+
   // A bounded statement timeout so a runaway seq scan on a large ledger can
   // never hold a production connection open indefinitely (this is an offline
   // operator tool pointed at a quiesced realm; failing loudly beats camping a
@@ -1873,7 +1927,12 @@ async function main() {
     const characters = chars.rows.map((r) => ({ id: r.id, realm: r.realm, state: r.state }));
     // Guild books for the guild-container reconciliation (Guild Bank Phase 3).
     const banks = await client.query('SELECT guild_id, realm, data FROM guild_banks');
-    const findings = auditBank({ ledgerRows: ledger.rows, characters, guildBanks: banks.rows });
+    const findings = auditBank({
+      ledgerRows: ledger.rows,
+      characters,
+      guildBanks: banks.rows,
+      projectPersonalSlot: personalBankSourceProjection,
+    });
     console.log(formatReport(ledger.rows, findings));
 
     // The storage-purchase arm. DEGRADE, never die, on the same terms as the

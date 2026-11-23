@@ -690,15 +690,29 @@ describe('fire-light adoption sink', () => {
       expect(isSanctioned(bypass), `the scan accepts a bypass: ${bypass.trim()}`).toBe(false);
     }
 
-    const reaches = renderer
+    // The one positional raw handoff, declared rather than pattern-matched: the
+    // DungeonInteriors construction in ensureDungeons passes the raw registry
+    // (plus its rank-dirty hook) for the world editor's KEYED interior rebuild,
+    // which has to splice exactly its own lights back out, the same reason the
+    // battleground takes it. Lights still JOIN through the sink argument above
+    // it. Exactly one bare line, inside that method only.
+    const dungeonStart = renderer.indexOf('  private ensureDungeons(): DungeonInteriors {');
+    const dungeonEnd = renderer.indexOf('\n  }\n', dungeonStart);
+    expect(dungeonStart).toBeGreaterThan(massHide);
+    const dungeonBody = renderer.slice(dungeonStart, dungeonEnd);
+    expect(dungeonBody.match(/^\s*this\.fireLights,$/gm)).toHaveLength(1);
+    expect(dungeonBody).toContain('this.fireLightAdopter.sink,');
+    const outsideDungeons = renderer.slice(0, dungeonStart) + renderer.slice(dungeonEnd);
+    const reaches = outsideDungeons
       .slice(massHide + MASS_HIDE.length)
       .split('\n')
       .filter((line) => /\bfireLights\b/.test(line));
-    // The carrier sources (a read-only list the carriers pack from), the
-    // prune, the two raw handoffs (battleground, budget pass), the sink
-    // handoff, and the station-props adoption loop. A floor keeps the loop from
-    // passing vacuously if the name ever moves wholesale.
-    expect(reaches).toHaveLength(6);
+    // The carrier sources (a read-only list the carriers pack from), the two
+    // prunes (interior retire, the editor's fluid-pool rebuild), the two raw
+    // handoffs (battleground, budget pass), the sink handoff, and the
+    // station-props adoption loop. A floor keeps the loop from passing
+    // vacuously if the name ever moves wholesale.
+    expect(reaches).toHaveLength(7);
     for (const line of reaches) {
       expect(isSanctioned(line), `unsanctioned reach past the adoption seam: ${line.trim()}`).toBe(
         true,

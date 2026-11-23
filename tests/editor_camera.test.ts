@@ -55,14 +55,51 @@ describe('EditorCamera.fly (WASD) agrees with nudgeDelta on "right"', () => {
   });
 });
 
+describe('EditorCamera drag directions (uninverted default)', () => {
+  // The editor ships UNINVERTED (panInverted false). In that baseline a drag
+  // maps to the camera like this, and "Invert camera" mirrors all of it:
+  //   horizontal - the view swings with the cursor (orbit yaw DECREASES on a
+  //                rightward drag), and pan moves the camera, not the ground;
+  //   vertical   - dragging down tilts the view down (pitch decreases), and
+  //                pan grabs the ground.
+  it('ships with invert off', () => {
+    expect(new EditorCamera().panInverted).toBe(false);
+  });
+
+  it('a rightward orbit drag swings the view left (yaw decreases), and invert mirrors it', () => {
+    const cam = new EditorCamera();
+    cam.yaw = 0;
+    cam.orbit(10, 0);
+    expect(cam.yaw).toBeLessThan(0);
+
+    const inverted = new EditorCamera();
+    inverted.panInverted = true;
+    inverted.yaw = 0;
+    inverted.orbit(10, 0);
+    expect(inverted.yaw).toBeCloseTo(-cam.yaw, 12);
+  });
+
+  it('a downward orbit drag tilts down (pitch decreases)', () => {
+    const cam = new EditorCamera();
+    const before = cam.pitch;
+    cam.orbit(0, 10);
+    expect(cam.pitch).toBeLessThan(before);
+  });
+
+  it('free-fly look swings with the cursor too, opposite the orbit sign', () => {
+    const cam = new EditorCamera();
+    cam.yaw = 0;
+    cam.look(10, 0);
+    expect(cam.yaw).toBeGreaterThan(0);
+  });
+});
+
 describe('EditorCamera.pan (drag) uses the true right vector', () => {
-  // pan() is "grab the ground and drag it": dragging right must move the
-  // target toward the world point that follows the cursor, i.e. the
-  // NEGATIVE of the true right vector (the opposite sign relationship from
-  // fly(), which moves the camera itself toward +right on D). Pinned here
-  // against an independently re-derived formula (not imported from source)
-  // using the true right vector cross(forward, up) = (-cos yaw, 0, sin yaw),
-  // so this test still fails if the same sign bug is reintroduced.
+  // Re-derived independently of the source: the camera basis (screen-right
+  // cross(forward, up) = (-cos yaw, 0, sin yaw), screen-up from the pitch),
+  // the documented 0.00135 pixel gain, and the uninverted gesture mapping
+  // (horizontal straight through, vertical negated). A sign regression in
+  // pan() still fails here.
   it.each([0, 0.7, Math.PI / 2, NORTH_UP_YAW, 4.2])(
     'matches the true-right-vector pan formula at yaw=%p',
     (yaw) => {
@@ -72,21 +109,25 @@ describe('EditorCamera.pan (drag) uses the true right vector', () => {
       const before = cam.target.clone();
       cam.pan(10, -6);
       const dx = cam.target.x - before.x;
+      const dy = cam.target.y - before.y;
       const dz = cam.target.z - before.z;
 
-      const speed = cam.dist * 0.0016;
-      const fx = Math.sin(yaw);
-      const fz = Math.cos(yaw);
-      const rxTrue = -Math.cos(yaw);
-      const rzTrue = Math.sin(yaw);
-      const expectedDx = (-10 * rxTrue + -6 * fx) * speed;
-      const expectedDz = (-10 * rzTrue + -6 * fz) * speed;
-      expect(dx).toBeCloseTo(expectedDx, 10);
-      expect(dz).toBeCloseTo(expectedDz, 10);
+      const k = cam.dist * 0.00135 * cam.panSpeedMul;
+      const rx = -Math.cos(yaw);
+      const rz = Math.sin(yaw);
+      const sp = Math.sin(cam.pitch);
+      const ux = Math.sin(yaw) * sp;
+      const uy = Math.cos(cam.pitch);
+      const uz = Math.cos(yaw) * sp;
+      const px = 10; // horizontal: through as-is
+      const py = 6; // vertical: negated (drag up grabs the ground upward)
+      expect(dx).toBeCloseTo((-px * rx + py * ux) * k, 10);
+      expect(dy).toBeCloseTo(py * uy * k, 10);
+      expect(dz).toBeCloseTo((-px * rz + py * uz) * k, 10);
     },
   );
 
-  it('at yaw 0 (facing +z), dragging right pulls the ground toward the cursor (target moves +x)', () => {
+  it('at yaw 0 (facing +z), dragging right moves the pivot +x with the cursor', () => {
     const cam = new EditorCamera();
     cam.yaw = 0;
     cam.target.set(0, 0, 0);

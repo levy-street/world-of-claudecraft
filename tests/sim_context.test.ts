@@ -8,8 +8,10 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
+import { freshMusterArmy } from '../src/sim/mirefen_muster';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
+import { freshSeasonalWorldState } from '../src/sim/seasonal';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { SpatialGrid } from '../src/sim/spatial';
@@ -150,6 +152,7 @@ const CALLBACK_KEYS = [
   'lockoutNowMs',
   'raidResetMs',
   'weeklyRaidResetMs',
+  'dayNightPhase',
   'instanceKeyFor',
   'instanceOriginOf',
   'instanceClaimIdAt',
@@ -157,6 +160,7 @@ const CALLBACK_KEYS = [
   'leaveDungeon',
   'resetDungeonInstances',
   'inheritDungeonResetLocks',
+  'onDungeonFinderPartyJoined',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'awardHeroicMarks',
@@ -310,6 +314,8 @@ function makeFakeHost() {
     players: new Map(),
     masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
+    graveyards: [],
+    playerStart: { x: 0, z: 0 },
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),
@@ -325,6 +331,7 @@ function makeFakeHost() {
     instances: [],
     riftInstances: [],
     riftPortalIds: null,
+    pendingDifficultyChanges: new Map(),
     dungeonResetLocks: new Map(),
     arenaMatches: new Map(),
     duels: new Map(),
@@ -351,16 +358,21 @@ function makeFakeHost() {
     bgMatches: new Map(),
     worldPvpDisabled: false,
     hillState: { active: null, window: 0, plan: null, attempts: 0, retryAt: 0, passTick: 0 },
+    seasonal: freshSeasonalWorldState(),
     hillProbe: { wet: () => false, steep: () => false, blocked: () => false, zoneIdAt: () => null },
     worldPvpBooks: {
       recentDamage: new Map(),
       recentSupport: new Map(),
+      lastFightAt: new Map(),
       paidDeaths: new Set(),
+      spoils: new Map(),
       killsByPair: new Map(),
       zoneOf: new Map(),
       nextDisarmAt: Number.POSITIVE_INFINITY,
       zonePassTick: Number.NEGATIVE_INFINITY,
       sweptAtTick: 0,
+      nextPayoutAt: Number.POSITIVE_INFINITY,
+      forfeitVictim: null,
     },
     bgBusySlots: new Set(),
     bgOutcomes: [],
@@ -393,6 +405,7 @@ function makeFakeHost() {
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],
+    musterArmy: freshMusterArmy(),
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
@@ -405,7 +418,10 @@ function makeFakeHost() {
     grantDeed: vi.fn(() => true),
     emit: vi.fn(),
     error: vi.fn(),
-    reserveVaultConsumption: vi.fn(() => ({ commit: vi.fn(), cancel: vi.fn() })),
+    reserveVaultConsumption: vi.fn(() => ({
+      commit: vi.fn(),
+      cancel: vi.fn(),
+    })),
     dealDamage: vi.fn(),
     handleDeath: vi.fn(),
     cancelCast: vi.fn(),
@@ -459,6 +475,8 @@ function makeFakeHost() {
     clearEntityMarker: vi.fn(),
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
+    hillPartyDisband: vi.fn(),
+    hillPartyJoin: vi.fn(),
     dropPartyMarkers: vi.fn(),
     formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
@@ -482,6 +500,7 @@ function makeFakeHost() {
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
     weeklyRaidResetMs: vi.fn((nowMs: number) => nowMs),
+    dayNightPhase: vi.fn(() => null),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     instanceClaimIdAt: vi.fn(() => null),
@@ -489,9 +508,11 @@ function makeFakeHost() {
     leaveDungeon: vi.fn(),
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
+    emitRiftDeparture: vi.fn(),
     riftOpenTreasure: vi.fn(),
     resetDungeonInstances: vi.fn(),
     inheritDungeonResetLocks: vi.fn(),
+    onDungeonFinderPartyJoined: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
@@ -683,7 +704,11 @@ describe('createSimContext (isolated, fake host)', () => {
     const ctx = createSimContext(host);
     expect(ctx.guildBanks).toBe(host.guildBanks);
     host.guildBanks.set(3, { treasury: 0, inventory: [], purchasedSlots: 0 });
-    expect(ctx.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
+    expect(ctx.guildBanks.get(3)).toEqual({
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
   });
 
   it('passes every callback through to the host by identity (no rewrapping)', () => {
@@ -781,7 +806,12 @@ describe('Sim.ctx (real seam delegation)', () => {
       const sim = makeSim(7);
       for (let i = 0; i < 40; i++) sim.tick();
       const p = sim.entities.get(sim.primaryId) as Entity;
-      return { time: sim.ctx.time, tick: sim.ctx.tickCount, hp: p.hp, pos: { ...p.pos } };
+      return {
+        time: sim.ctx.time,
+        tick: sim.ctx.tickCount,
+        hp: p.hp,
+        pos: { ...p.pos },
+      };
     };
     expect(run()).toEqual(run());
   });

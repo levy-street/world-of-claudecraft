@@ -196,6 +196,47 @@ describe('talents_window: W7 visible footer actions', () => {
   });
 });
 
+describe('talents_window: spec card baseline line', () => {
+  function openSpecTab(cls: 'rogue' | 'warrior'): HTMLElement {
+    const root = document.createElement('div');
+    root.id = 'talents-window';
+    root.style.display = 'none';
+    document.body.appendChild(root);
+    new TalentsWindow(
+      stubDeps({
+        root: () => root,
+        playerClass: () => cls,
+        playerLevel: () => 60,
+        currentAllocation: () => ({ spec: null, rows: {} }),
+        activeLoadout: () => -1,
+        loadouts: () => [],
+        currentBar: () => [],
+        captureFocus: () => null,
+      }),
+    ).open();
+    return root;
+  }
+
+  it('shows each rogue spec its own hidden AP and crit floor', () => {
+    const root = openSpecTab('rogue');
+    const lines = Array.from(root.querySelectorAll('.ts-panel .ts-det-baseline'));
+    expect(lines).toHaveLength(3);
+    for (const line of lines) {
+      expect(line.querySelector('b')?.textContent).toBe('Specialization bonus');
+    }
+    const [knifework, thuggery, skulduggery] = lines.map((line) => line.textContent ?? '');
+    expect(knifework).toContain('Increases attack power by 57%.');
+    expect(thuggery).toContain('Increases attack power by 20%.');
+    expect(skulduggery).toContain('Increases critical strike chance by 10%.');
+  });
+
+  it('adds no line for a class without a baseline', () => {
+    const root = openSpecTab('warrior');
+    expect(root.querySelectorAll('.ts-panel').length).toBeGreaterThan(0);
+    expect(root.querySelector('.ts-det-baseline')).toBeNull();
+  });
+});
+
 // W20: the painter still stamps `.active` on the current loadout row, but the
 // rule that painted `.tal-lo-row.active .tal-lo-pick` was deleted with the legacy
 // menu look, so the active build was indistinguishable from the others.

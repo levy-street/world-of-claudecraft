@@ -13,13 +13,16 @@ import {
   preloadInternalsForTest,
   registerPreload,
 } from '../src/render/assets/preload';
+import { stripComments } from './helpers/strip_comments';
 
 const read = (path: string): string => readFileSync(new URL(path, import.meta.url), 'utf8');
 const mainSource = read('../src/main.ts');
 const assetsSource = read('../src/render/characters/assets.ts');
+const streamCoreSource = read('../src/render/characters/rift_body_stream_core.ts');
 const visualSource = read('../src/render/characters/visual.ts');
 const portraitSource = read('../src/render/characters/portrait.ts');
 const portraitChipSource = read('../src/ui/portrait_chip.ts');
+const hudSource = read('../src/ui/hud.ts');
 const vfxSource = read('../src/render/vfx.ts');
 
 describe('entry probe covers the await window', () => {
@@ -101,6 +104,24 @@ describe('tight-memory residency diet', () => {
     expect(startAt).toBeGreaterThan(revealAt);
   });
 
+  it('never starts the schedule through a graphics rebuild when none was running', () => {
+    // The tight profile never starts the schedule at boot, so the rebuild
+    // restart must be conditional on a live one, or a rebuild would warm the
+    // portrait catalog on tight after all.
+    const resetAt = hudSource.indexOf('resetGraphicsPreviewContexts(): void {');
+    expect(resetAt).toBeGreaterThan(-1);
+    const reset = hudSource.slice(resetAt, hudSource.indexOf('\n  }', resetAt));
+    expect(reset).toContain(
+      'this.restartPreviewPrewarmAfterGraphicsRebuild = this.previewPrewarmHandle !== null;',
+    );
+    const restoreAt = hudSource.indexOf('restoreGraphicsPreviewContexts(): void {');
+    expect(restoreAt).toBeGreaterThan(-1);
+    const restore = hudSource.slice(restoreAt, hudSource.indexOf('\n  }', restoreAt));
+    const gateAt = restore.indexOf('if (this.restartPreviewPrewarmAfterGraphicsRebuild) {');
+    expect(gateAt).toBeGreaterThan(-1);
+    expect(restore.indexOf('this.startPostEntryPreviewPrewarm(false)')).toBeGreaterThan(gateAt);
+  });
+
   it('keeps the curtain-side paperdoll shell build inside the tight-memory gate', () => {
     const callAt = mainSource.indexOf('hud.prewarmCharPreviewShell()');
     expect(callAt).toBeGreaterThan(-1);
@@ -136,8 +157,19 @@ describe('deferred cosmetic skin atlases', () => {
     // (early-outs before building anything).
     expect(portraitSource).toContain('const atlasPending = ensureSkinTexture(visualKey, skin);');
     expect(portraitSource).toContain('if (!atlasPending) return false;');
-    expect(portraitSource).toContain('if (trackSkinAtlasPending(visualKey, skin)) return null;');
-    expect(portraitSource).toContain('atlasPending: () => trackSkinAtlasPending(visualKey, skin),');
+    // (and, for a WOC body, until its streamed base, library, kit and the head
+    // files its look draws have landed: trackWocFilesPending, the same
+    // null-and-notify contract; the post-entry prewarm only ASKS,
+    // wocFilesResident, so it never fetches every class set)
+    expect(portraitSource).toContain(
+      'if (trackSkinAtlasPending(visualKey, skin) || trackWocFilesPending(visualKey, skin, headLook)) {\n' +
+        '    return null;\n' +
+        '  }',
+    );
+    expect(portraitSource).toContain(
+      'atlasPending: () =>\n' +
+        '      trackSkinAtlasPending(visualKey, skin) || !wocFilesResident(visualKey, headSig ? head : null),',
+    );
     expect(portraitChipSource).toContain('onPortraitUpdate((visualKey, skin) => {');
     expect(mainSource).toContain('refreshStartSkinPickerPortraits(');
   });
@@ -245,8 +277,11 @@ describe('post-entry mob-body streaming', () => {
   // through the fail-soft view-create seam (#2079).
   // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
   it('keeps desktop mobs critical, bulk-streams only iOS mobs, and leaves skins on demand', () => {
-    expect(assetsSource).toContain(
-      "const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];",
+    // The split itself (which bodies, which lane, per profile) is behavior
+    // pinned in tests/ios_rift_body_stream.test.ts; these pins keep assets.ts
+    // consuming it.
+    expect(streamCoreSource).toContain(
+      "export const STREAMED_BODY_URL_PREFIXES: readonly string[] = [\n  'models/creatures/',\n  'models/buddies/',\n  'models/chars/enemies/',\n];",
     );
     // Weapon SKINS stream (cosmetic, degradable); the BASE item weapons do not,
     // so the player's own hands are never empty at spawn and the degrade path
@@ -258,15 +293,10 @@ describe('post-entry mob-body streaming', () => {
       'const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));',
     );
     expect(assetsSource).toContain(
-      'streamedSkinUrls.has(url) ||\n      (profile.iosMemoryProfile && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)))',
+      'return characterStreamPlan(allPreloadUrls, streamedSkinUrls, profile.iosMemoryProfile);',
     );
-    expect(assetsSource).toContain('let streamedUrls = streamedCharacterUrlsFor(GFX);');
-    expect(assetsSource).toContain(
-      'let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);',
-    );
-    expect(assetsSource).toContain(
-      'return urls.filter((url) => STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)));',
-    );
+    expect(assetsSource).toContain('let streamedUrls = initialStreamPlan.streamed;');
+    expect(assetsSource).toContain('let postEntryStreamUrls = initialStreamPlan.postEntry;');
     expect(assetsSource).toContain('for (const url of postEntryStreamUrls) {');
     expect(assetsSource).toContain('return postEntryStreamUrls.length;');
     expect(assetsSource).not.toContain('for (const url of streamedUrls) {');
@@ -329,6 +359,35 @@ describe('post-entry mob-body streaming', () => {
     expect(assetsSource).toContain(
       'if (streamedUrlSet.has(url) || lazyOnDemandUrls.has(url)) ensureCharacterUrl(url);',
     );
+  });
+
+  it('queues the stream as background loads, behind any file somebody needs now', () => {
+    // About 140 creature GLBs land in the loader's queue at first paint here, two at a
+    // time on a phone. As plain loads they stood in front of every file a player needed
+    // right then (an armor set, a hairstyle, a mount) for as long as the stream took.
+    // Behaviour: tests/character_stream_priority.test.ts and
+    // tests/render_asset_load_priority.test.ts.
+    const code = stripComments(assetsSource);
+    const start = code.indexOf('export function startStreamedCharacterPreloads()');
+    const body = code.slice(start, code.indexOf('\n}\n', start));
+    expect(start).toBeGreaterThan(-1);
+    expect(body).toContain("void prepareCharacterUrl(url, 'background').catch(() => undefined);");
+    // the one ask in the stream: no arm of it asks at demand priority
+    expect(body.match(/prepareCharacterUrl\(/g)).toHaveLength(1);
+  });
+
+  it('awaits the player bodies in the deferred lane, never on the launcher', () => {
+    // The WOC entry files (both fits' base and library, both head cores) are awaited
+    // before the Renderer exists, so no player body waits on a download in the world. They
+    // ride the DEFERRED lane: fetched eagerly they would download and decode on the home
+    // screen, the spike this suite guards against. tests/woc_entry_preload.test.ts drives
+    // the lane; this pins the registration it drives.
+    const code = stripComments(assetsSource);
+    expect(code).toContain(
+      'registerDeferredPreload(() => loadWocEntryFiles((url) => prepareCharacterUrl(url)));',
+    );
+    // that registration is the only place the task is started from
+    expect(code.match(/loadWocEntryFiles\(/g)).toHaveLength(1);
   });
 
   it('starts the stream at first paint, not inside the entry gate', () => {

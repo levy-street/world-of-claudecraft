@@ -60,4 +60,13 @@ await esbuild.build({
   alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
 });
 
+await esbuild.build({
+  entryPoints: ['scripts/migrate_release_gifts.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  external: ['pg-native'],
+  outfile: 'dist-server/migrate_release_gifts.cjs',
+});
+
 console.log(`[build:server] bot detector: ${usePrivate ? 'private' : 'stub (no-op)'}`);

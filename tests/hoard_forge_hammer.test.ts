@@ -203,7 +203,7 @@ describe('the cast, authoritative', () => {
     run(entry.sim, entry.boss, 0.4);
     const views = hoardBossCueViews(entry.inst);
     const carrier = views.find((cue) => cue.variant === 'ember-hammer');
-    expect(carrier?.total).toBeCloseTo(forgeCastTotalSec(3), 9);
+    expect(carrier?.total).toBeCloseTo(forgeCastTotalSec(4), 9);
     // The first shadow is already down, under the player.
     expect(strikes(entry.inst)).toHaveLength(1);
     const first = strikes(entry.inst)[0];
@@ -295,7 +295,7 @@ describe('the cast, authoritative', () => {
     expect(events2.some((e) => e.type === 'damage')).toBe(false);
   });
 
-  it('strikes more for a rarer hoard and, slowly, for a bigger party: never harder', () => {
+  it('keeps the five-player strike budget when one player enters a legendary hoard', () => {
     expect(forgeStrikeCount(0, 1)).toBe(3);
     expect(forgeStrikeCount(0, 3)).toBe(3);
     expect(forgeStrikeCount(0, 4)).toBe(4);
@@ -304,12 +304,12 @@ describe('the cast, authoritative', () => {
     const solo = encounter('legendary');
     cast(solo);
     const seen = new Set<number>();
-    run(solo.sim, solo.boss, forgeCastTotalSec(4) - 0.3, () => {
+    run(solo.sim, solo.boss, forgeCastTotalSec(5, 2) - 0.3, () => {
       solo.sim.player.hp = solo.sim.player.maxHp;
       for (const cue of strikes(solo.inst)) seen.add(cue.cueId);
     });
-    // A lone player in a legendary hoard: four strikes, one hammer.
-    expect(seen.size).toBe(4);
+    // The fixed legendary budget: five strikes from each of two hammers.
+    expect(seen.size).toBe(10);
   });
 
   it('starts every strike at its FULL life, so a client clock starts where the sim does', () => {
@@ -374,10 +374,10 @@ describe('the cast, authoritative', () => {
     // never two blows in the same instant.
     expect(forgeBeatSec(2)).toBeCloseTo(FORGE_HAMMER.beatSec / 2, 9);
     expect(forgeBeatSec(2)).toBeGreaterThan(1);
-    // A small party in the same hoard keeps to one hammer.
+    // The same hoard keeps both hammers with fewer entrants.
     const solo = encounter('legendary');
     cast(solo);
-    expect(solo.inst.hoardBoss?.forgeHammer?.hammers).toBe(1);
+    expect(solo.inst.hoardBoss?.forgeHammer?.hammers).toBe(2);
   });
 
   it('draws no rng, and leaves nothing behind when the fight resets mid-cast', () => {

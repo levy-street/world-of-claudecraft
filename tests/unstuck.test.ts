@@ -1053,6 +1053,36 @@ describe('unstuck area identity', () => {
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
   });
 
+  it('uses the trapped battleground player team when choosing the safe graveyard', () => {
+    const { sim, match } = activeBattleground();
+    const pid = required(match.teams[1][0], 'azure battleground player');
+    const player = forceBattlegroundWallTrap(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+
+    const resolved = resolvePosition(sim.cfg.seed, player.pos.x, player.pos.z, PLAYER_BODY_RADIUS);
+    expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeLessThanOrEqual(
+      1e-6,
+    );
+    const azurePlot = BG_GRAVEYARDS[1];
+    expect(Math.abs(player.pos.x - (origin.x + azurePlot.x))).toBeLessThanOrEqual(azurePlot.hw);
+    expect(Math.abs(player.pos.z - (origin.z + azurePlot.z))).toBeLessThanOrEqual(azurePlot.hd);
+  });
+
   it('accepts a battleground perimeter-wall trap beyond the playable footprint margin', () => {
     const { sim, match, pid } = activeBattleground();
     const player = required(sim.entities.get(pid), 'battleground player');

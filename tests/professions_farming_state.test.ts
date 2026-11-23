@@ -11,6 +11,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { FARM_BED_IDS, FARM_CROP_IDS, FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { BUILTIN_WORLD } from '../src/sim/data';
+import { farmPatchesFor } from '../src/sim/moved_objects';
 import {
   countDroppedHiddenSlots,
   deriveHiddenSlots,
@@ -903,11 +905,11 @@ describe('the save round trip through a real Sim', () => {
 
   it('serves the static patch table by reference, deep-frozen', () => {
     const { sim } = load(baseState());
-    expect(sim.farmPatches).toBe(FARM_PATCHES);
+    expect(sim.farmPatches).toBe(farmPatchesFor(BUILTIN_WORLD.objectMoves, FARM_PATCHES));
     // By-reference sharing across the seam is only safe because the table is
     // FROZEN at runtime (readonly types erase): array, patch, beds, bed.
-    expect(Object.isFrozen(FARM_PATCHES)).toBe(true);
-    for (const patch of FARM_PATCHES) {
+    expect(Object.isFrozen(sim.farmPatches)).toBe(true);
+    for (const patch of sim.farmPatches) {
       expect(Object.isFrozen(patch)).toBe(true);
       expect(Object.isFrozen(patch.beds)).toBe(true);
       for (const bed of patch.beds) expect(Object.isFrozen(bed)).toBe(true);

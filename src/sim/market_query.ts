@@ -216,7 +216,13 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   // (the 'pattern' arm above), so quest and mount are the whole bucket again.
   // Neither may be left reachable through 'All' alone (pinned by the sweep in
   // tests/market_filters.test.ts, which sees only the live catalog).
-  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
+  if (filter === 'other')
+    return (
+      item.kind === 'quest' ||
+      item.kind === 'mount' ||
+      item.kind === 'buddy' ||
+      item.kind === 'buddy_cosmetic'
+    );
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.

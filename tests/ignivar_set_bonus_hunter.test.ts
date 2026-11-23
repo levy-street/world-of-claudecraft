@@ -37,6 +37,7 @@ import {
 } from '../src/sim/content/ignivar_set_bonuses';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import { computeCharacterModifiers } from '../src/sim/set_bonus_mods';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -517,17 +518,15 @@ describe('Slagsnare 4pc: the Woundrend preserve and its 8 sec lockout', () => {
     onFieldcraftWeaponStrike(ctx, hunter, target, 'mongoose_bite', 100);
     const momentum = expectDefined(hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID));
     expect(momentum.stacks).toBe(3);
-    // The :227 refresh restarted the window before the preserve, so the kept
-    // stacks carry the full 8 sec the lockout mirrors.
-    expect(momentum.remaining).toBe(momentum.duration);
+    // Momentum is a persistent bank since the Fieldcraft rework: the kept
+    // stacks never age, only the 8 sec lockout does.
+    expect(isPersistentEngineAura(momentum.id)).toBe(true);
     const lockout = expectDefined(
       hunter.auras.find((aura) => aura.id === SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID),
     );
     expect(lockout.duration).toBe(SLAGSNARE_4PC_MOMENTUM_ICD_SEC);
-    // The R3 wording alignment: the lockout MATCHES the Momentum window.
-    expect(lockout.duration).toBe(momentum.duration);
-    // The payoff stays at 3-stack value (0.15 per stack on the dealt 100).
-    expect(dealDamageCalls).toContainEqual({ ability: 'Hunting Momentum', amount: 45 });
+    // The payoff stays at full-bank value (+60% of the dealt 100).
+    expect(dealDamageCalls).toContainEqual({ ability: 'Hunting Momentum', amount: 60 });
 
     // Inside the lockout the next Woundrend consume SPENDS the stacks.
     onFieldcraftWeaponStrike(ctx, hunter, target, 'mongoose_bite', 100);

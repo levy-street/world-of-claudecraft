@@ -5,7 +5,15 @@ import {
   gearedArrivalFixtureManifest,
   gearedArrivalFixtureSha256,
 } from '../scripts/profiler/geared_arrival_fixture.mjs';
-import { DEFAULT_APPEARANCE, normalizeAppearance } from '../src/render/characters/modular';
+import {
+  DEFAULT_APPEARANCE,
+  normalizeAppearance,
+  wocHeadLookOf,
+} from '../src/render/characters/modular';
+import {
+  resolveWocHeadLook,
+  wocHeadTypeForGender,
+} from '../src/render/characters/woc_head_catalog';
 import { weaponTypeForItem } from '../src/sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import { ITEMS } from '../src/sim/data';
@@ -17,7 +25,7 @@ describe('geared arrival fixture', () => {
     const right = gearedArrivalFixtureManifest(20);
     expect(left).toEqual(right);
     expect(gearedArrivalFixtureSha256(20)).toBe(
-      'efe08bfca55303cab4a69fef6d272ba659ea44b80959a9c52bb490c8c819851d',
+      'ade3d342785b24aa6ef91ed06d26747c60af15ab9998118361519b43bc87b880',
     );
     for (const bot of left) {
       expect(sanitizeAppearance(bot.appearance)).toEqual(bot.appearance);
@@ -28,6 +36,11 @@ describe('geared arrival fixture', () => {
   it('uses real renderer ids instead of values that silently clamp to defaults', () => {
     for (const bot of gearedArrivalFixtureManifest(20)) {
       expect(normalizeAppearance(bot.appearance)).toEqual(bot.appearance);
+      // the WOC head picks are the bot's OWN head type's, so none resolves
+      // back to a default on the body it wears
+      const head = wocHeadLookOf(bot.appearance);
+      const type = wocHeadTypeForGender(bot.appearance.gender);
+      expect(resolveWocHeadLook(type, head), `bot ${bot.index}`).toEqual(head);
     }
   });
 

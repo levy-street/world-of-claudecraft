@@ -9,13 +9,25 @@
 //
 // Data-as-code: plain exported records, no engine logic (content CLAUDE.md).
 
+import { NYTHRAXIS_BONE_STORM_ENABLED } from '../nythraxis_bone_storm';
 import { type DungeonDifficulty, NYTHRAXIS_ADDS_ENABLED, type PlayerClass } from '../types';
 import type { Role } from './talents';
 
 // Structured listing tags: the only "description" a premade listing carries.
 // Free-form listing text is deliberately unsupported (no moderation surface).
-export type FinderListingTag = 'first_run' | 'quest_run' | 'full_clear' | 'learning' | 'fast_run';
+// `guild_only` is not a purpose chip: it marks a Guild Party, whose every
+// member must share the leader's guild (enforced by the finder machine).
+export type FinderListingTag =
+  | 'first_run'
+  | 'quest_run'
+  | 'full_clear'
+  | 'learning'
+  | 'fast_run'
+  | 'guild_only';
 
+export const FINDER_GUILD_TAG: FinderListingTag = 'guild_only';
+
+// The purpose chips the create form offers (the Guild Party flag has its own toggle).
 export const FINDER_LISTING_TAGS: readonly FinderListingTag[] = [
   'first_run',
   'quest_run',
@@ -25,7 +37,7 @@ export const FINDER_LISTING_TAGS: readonly FinderListingTag[] = [
 ];
 
 export function isFinderListingTag(value: unknown): value is FinderListingTag {
-  return (FINDER_LISTING_TAGS as readonly unknown[]).includes(value);
+  return value === FINDER_GUILD_TAG || (FINDER_LISTING_TAGS as readonly unknown[]).includes(value);
 }
 
 // Stable slot order for deterministic role assignment and display.
@@ -35,11 +47,9 @@ export function isFinderRole(value: unknown): value is Role {
   return (FINDER_ROLE_ORDER as readonly unknown[]).includes(value);
 }
 
-// Below FIRST_TALENT_LEVEL there is no specialization, so finder roles come
-// from this fixed class-capability table. From the spec unlock (FIRST_TALENT_LEVEL) on, the selected role
-// must match the active specialization's role instead (see compatibleFinderRoles
-// in ../social/dungeon_finder.ts).
-export const FINDER_PRE_SPEC_ROLES: Record<Role, readonly PlayerClass[]> = {
+// Finder roles express the jobs a class can offer, at every level. Selecting
+// a role never changes or requires an active talent specialization.
+export const FINDER_CLASS_ROLES: Record<Role, readonly PlayerClass[]> = {
   tank: ['warrior', 'paladin', 'druid'],
   healer: ['paladin', 'priest', 'shaman', 'druid'],
   dps: ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'],
@@ -59,6 +69,13 @@ export interface FinderComposition {
 // window localizes as hudChrome.finder.mech.<key>.
 export interface FinderEncounter {
   mobId: string;
+  // A boss made of several placed bodies (the Mere Hydra's three heads) lists
+  // the OTHER ones here. The encounter is over only when `mobId` and every
+  // body named here are dead in the same claim (the heads grow back until all
+  // three are down). `mobId` stays the encounter's one identity everywhere: its
+  // display name, its portrait, its loot tables and its row in the run's
+  // objectives (src/sim/instances/dungeon_run.ts), so these ids are never shown.
+  otherBodyIds?: readonly string[];
   final?: boolean;
   // Spawned by a scripted interaction (crypt relics / ritual circle) rather
   // than standing in the spawn list.
@@ -110,24 +127,143 @@ const FIVE_MAN: FinderComposition = { tank: 1, healer: 1, dps: 3 };
 const TEN_RAID: FinderComposition = { tank: 2, healer: 2, dps: 6 };
 
 const HOLLOW_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'sexton_marrow', mechanics: [] },
-  { mobId: 'morthen', final: true, mechanics: ['shadow_pulse'] },
+  // The rework's route (hollow_crypt.md): two wing bosses, the choir, the ring.
+  // The wing bosses' cores are their encounter modules (encounters/hollow_crypt).
+  {
+    mobId: 'sexton_marrow',
+    mechanics: ['crypt_shovelful', 'crypt_measured_for_the_grave', 'crypt_burial_toll'],
+  },
+  {
+    mobId: 'rimeweb',
+    mechanics: [
+      'crypt_brides_lament',
+      'crypt_frozen_embrace',
+      'crypt_rime_path',
+      'crypt_bridal_freeze',
+    ],
+  },
+  {
+    mobId: 'cantor_ilvane',
+    mechanics: [
+      'crypt_dirge_of_the_hollow',
+      'crypt_harmony',
+      'crypt_bone_organ',
+      'crypt_crescendo',
+    ],
+  },
+  // Morthen's three-act rite (encounters/hollow_crypt/morthen*.ts).
+  {
+    mobId: 'morthen',
+    final: true,
+    mechanics: [
+      'crypt_morthen_shadow_pulse',
+      'crypt_gravecall',
+      'crypt_rite_of_the_unquiet',
+      'crypt_reap_the_unquiet',
+    ],
+  },
+];
+
+// The heroic tier adds each boss's heroic twists (its own array, so the
+// normal preview never carries them); Morthen's line also carries the
+// Knellwyrm's heroic Burning Knell (the wyrm has no finder row of its own).
+const HOLLOW_CRYPT_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'sexton_marrow',
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[0].mechanics, 'crypt_marrow_heroic'],
+  },
+  {
+    mobId: 'rimeweb',
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[1].mechanics, 'crypt_lady_heroic'],
+  },
+  {
+    mobId: 'cantor_ilvane',
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[2].mechanics, 'crypt_ilvane_heroic'],
+  },
+  {
+    ...HOLLOW_CRYPT_ENCOUNTERS[3],
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[3].mechanics, 'crypt_morthen_heroic'],
+  },
 ];
 
 const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'knight_commander_olen', mechanics: ['reaping_arc'] },
-  { mobId: 'vael_the_mistcaller', final: true, mechanics: ['mist_surge', 'summons_adds'] },
+  // The rework's route (sunken_bastion.md): the bastion, the gaol (its
+  // Turnkey miniboss, then Ossick), the crown.
+  {
+    mobId: 'knight_commander_olen',
+    mechanics: [
+      'hallowed_brine',
+      'rebounding_bulwark',
+      'tide_sentence',
+      'unbroken_oath',
+      'reaping_arc',
+    ],
+  },
+  { mobId: 'gaol_turnkey', mechanics: ['iron_cage', 'summons_adds'] },
+  { mobId: 'gaoler_ossick', mechanics: ['drowned_anchor', 'shackle_pair', 'summons_adds'] },
+  {
+    mobId: 'vael_the_mistcaller',
+    final: true,
+    mechanics: ['fog_veil', 'reaper_behind', 'mist_surge', 'summons_adds'],
+  },
 ];
 
 const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'choirmother_selthe', mechanics: [] },
-  { mobId: 'ysolei', final: true, mechanics: ['lunar_tide', 'summons_adds', 'enrage'] },
+  // The rework's route (drowned_temple.md): the choir, the moon pool, the
+  // prism, the altar.
+  { mobId: 'choirmother_selthe', mechanics: ['chorus_and_solo', 'the_score'] },
+  // The Mere Hydra (encounters/drowned_temple/mere_hydra.ts) stands between
+  // Selthe's Court Stairs and the Prism Stair, which rises only once its three
+  // heads are down (the prism_stair_rise gate). One boss, three bodies: the
+  // centre head is its identity (it carries the fight's loot tables and the
+  // name every head wears), the other two are its further bodies.
+  {
+    mobId: 'mere_hydra_head_center',
+    otherBodyIds: ['mere_hydra_head_left', 'mere_hydra_head_right'],
+    mechanics: ['hydra_three_elements', 'hydra_tsunami', 'hydra_combined_breath', 'hydra_regrowth'],
+  },
+  { mobId: 'tideglass_colossus', mechanics: ['tideglass_reflections'] },
+  {
+    mobId: 'ysolei',
+    final: true,
+    mechanics: ['rising_tide', 'undertow', 'lunar_tide', 'summons_adds', 'enrage'],
+  },
 ];
 
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'korgath_the_bound', mechanics: ['shuddering_stomp', 'enrage'] },
-  { mobId: 'grand_necromancer_velkhar', mechanics: ['summons_adds'] },
-  { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['grave_inferno', 'enrage'] },
+  {
+    mobId: 'korgath_the_bound',
+    mechanics: ['seal_shackles', 'chain_strain', 'korgath_stomp', 'enrage'],
+  },
+  {
+    mobId: 'grand_necromancer_velkhar',
+    mechanics: [
+      'waking_thaw',
+      'summons_adds',
+      'unquenched_held',
+      'soulfire_trench',
+      'shadow_volley',
+    ],
+  },
+  {
+    mobId: 'korzul_the_gravewyrm',
+    final: true,
+    mechanics: ['grave_inferno', 'enrage', 'grave_breath', 'plate_floor', 'wyrm_flights'],
+  },
+];
+
+// The heroic tier adds each boss's heroic twists (its own array, so the normal
+// preview never carries them).
+const GRAVEWYRM_SANCTUM_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'korgath_the_bound',
+    mechanics: [...GRAVEWYRM_SANCTUM_ENCOUNTERS[0].mechanics, 'rerivet_last_link'],
+  },
+  {
+    mobId: 'grand_necromancer_velkhar',
+    mechanics: [...GRAVEWYRM_SANCTUM_ENCOUNTERS[1].mechanics, 'warm_hands_twice_woken'],
+  },
+  GRAVEWYRM_SANCTUM_ENCOUNTERS[2],
 ];
 
 const NYTHRAXIS_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
@@ -166,7 +302,8 @@ const NYTHRAXIS_RAID_MECHANICS: readonly string[] = [
   'deathless_rage',
   'wardstones',
   'kings_wrath',
-  'bone_storm',
+  // Bone Storm is retired from play; the finder follows the same switch.
+  ...(NYTHRAXIS_BONE_STORM_ENABLED ? ['bone_storm'] : []),
   'crown_endures',
 ];
 
@@ -191,18 +328,38 @@ const NYTHRAXIS_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
   },
 ];
 
+// The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
+// section 5): the three boss cores replace the old trash rows; heroic adds each
+// boss's twists (its own array, so the normal preview never carries them).
 const WILDHEART_BASIN_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'wildheart_stalker', mechanics: [] },
-  { mobId: 'wildheart_ravager', mechanics: ['bloodmane_rend', 'tusk_sweep'] },
-  { mobId: 'wildheart_hexcaller', mechanics: ['ancestral_sap'] },
   {
     mobId: 'wildheart_beastmaster',
-    mechanics: ['call_of_the_hunt', 'thickhide_ward', 'beast_pit_quake'],
+    mechanics: ['pack_bond', 'stalk', 'shared_health', 'beast_pit_quake'],
+  },
+  {
+    mobId: 'the_gorgebloom',
+    mechanics: ['seed_rain', 'pollinate', 'vine_lash', 'gorge'],
   },
   {
     mobId: 'wildheart_high_priest',
     final: true,
-    mechanics: ['wildheart_pulse', 'jaguar_roar', 'enrage'],
+    mechanics: ['spirit_of_the_hunt', 'wildheart_pulse', 'jaguar_roar', 'enrage'],
+  },
+];
+
+const WILDHEART_BASIN_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'wildheart_beastmaster',
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[0].mechanics, 'heel_frenzied_bond'],
+  },
+  {
+    mobId: 'the_gorgebloom',
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[1].mechanics, 'burrowing_seeds'],
+  },
+  {
+    mobId: 'wildheart_high_priest',
+    final: true,
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[2].mechanics, 'twin_prey_ambush'],
   },
 ];
 
@@ -320,7 +477,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'hollow_crypt',
-    encounters: HOLLOW_CRYPT_ENCOUNTERS,
+    encounters: HOLLOW_CRYPT_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {
@@ -362,7 +519,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'gravewyrm_sanctum',
-    encounters: GRAVEWYRM_SANCTUM_ENCOUNTERS,
+    encounters: GRAVEWYRM_SANCTUM_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {
@@ -390,7 +547,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'wildheart_basin',
-    encounters: WILDHEART_BASIN_ENCOUNTERS,
+    encounters: WILDHEART_BASIN_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {
@@ -473,6 +630,11 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     lockoutDungeonIds: ['ignivar_inner_crucible'],
   },
 ];
+
+/** Every placed body of an encounter: the boss itself, then its further ones. */
+export function finderEncounterBodyIds(encounter: FinderEncounter): readonly string[] {
+  return encounter.otherBodyIds ? [encounter.mobId, ...encounter.otherBodyIds] : [encounter.mobId];
+}
 
 const ACTIVITY_BY_ID = new Map<string, FinderActivity>(FINDER_ACTIVITIES.map((a) => [a.id, a]));
 

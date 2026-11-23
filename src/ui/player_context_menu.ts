@@ -4,6 +4,7 @@ import {
   type StreamerPlatform,
   streamerLinkList,
 } from '../sim/account_flair';
+import type { DungeonDifficulty } from '../sim/types';
 import { type TranslationKey, t } from './i18n';
 import type { UiIconName } from './ui_icons';
 
@@ -30,6 +31,8 @@ export interface PlayerContextAction<TId extends string = PlayerContextActionId>
   icon?: UiIconName;
   /** the external URL a stream-link row opens (already normalized) */
   href?: string;
+  /** an informational row: painted aria-disabled with no action to run */
+  inert?: boolean;
 }
 
 export interface ChatPlayerContextState {
@@ -54,6 +57,7 @@ export type SelfPlayerContextActionId =
   | 'loot-settings'
   | 'leave-party'
   | 'dungeon-difficulty'
+  | 'dungeon-difficulty-status'
   | 'reset-dungeons'
   | 'close';
 
@@ -63,6 +67,8 @@ export interface SelfPlayerContextState {
   isRaid: boolean;
   partySize: number;
   isHeroic: boolean;
+  /** The tier the live instances still run on when the selection has not reached them. */
+  unappliedDifficulty?: DungeonDifficulty | null;
 }
 
 /** Build the classic player-portrait menu. Party membership owns the Leave Party
@@ -82,6 +88,19 @@ export function selfPlayerContextActions(
     actions.push({ id: 'leave-party', label: t('hud.social.leaveParty') });
   }
   if (!state.inParty || state.isLeader) {
+    // A refused or queued change keeps the selection for new instances and a
+    // later Reset, so say plainly when the live instances have not switched.
+    if (state.unappliedDifficulty) {
+      actions.push({
+        id: 'dungeon-difficulty-status',
+        inert: true,
+        label: t(
+          state.unappliedDifficulty === 'heroic'
+            ? 'hudChrome.dungeonDifficulty.unappliedHeroic'
+            : 'hudChrome.dungeonDifficulty.unappliedNormal',
+        ),
+      });
+    }
     actions.push({
       id: 'dungeon-difficulty',
       label: t(

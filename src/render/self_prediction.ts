@@ -2,8 +2,10 @@ import type { InputTickFrame } from '../game/input_tick_sampler';
 import { type MovementWireClient, MovementWireGlue } from '../game/movement_wire_glue';
 import type { DelveMotionState } from '../sim/delves/geometry';
 import { DT, type Entity, type FerryDeckMirror, type MoveInput } from '../sim/types';
+import type { RiftFloorView } from '../world_api/dungeons';
 import { type ClientDelveMotionState, createClientPlayerMotionDeps } from './client_player_motion';
 import { createDeckAwareStep } from './deck_prediction';
+import { withRiftLift } from './self_motion_rift_lift';
 import {
   copyMotionState,
   type MotionState,
@@ -28,6 +30,9 @@ export interface SelfPredictionWire extends MovementWireClient {
   /** The ferry timetable at the newest snapshot (IWorld.ferryView): its
    *  schedule clock times the deck-aware prediction. */
   ferryView?(): { clock: number } | null;
+  /** The mirrored rift floor (IWorld.riftFloor): its raised tier is lifted
+   *  around every predicted step, as the server lifts it (withRiftLift). */
+  readonly riftFloor?: RiftFloorView | null;
   netPipeline(): {
     noteReconcileOutcome(outcome: 'match' | 'replayed' | 'ignore' | 'stale' | 'suspend'): void;
   };
@@ -117,7 +122,10 @@ export class MovementPredictionPipeline {
       (): ClientDelveMotionState | null =>
         this.delve.delveRun ? { run: this.delve.delveRun, solids: this.delve.delveSolids } : null,
     );
-    this.stepFn = createDeckAwareStep(deps, (ct) => this.clockFor(ct));
+    this.stepFn = withRiftLift(
+      createDeckAwareStep(deps, (ct) => this.clockFor(ct)),
+      () => this.wire?.riftFloor ?? null,
+    );
     this.wireGlue.onFrame = (frame) => this.predictFrame(frame);
     this.wireGlue.onNegotiated = () => this.reset();
   }

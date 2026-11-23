@@ -18,12 +18,14 @@
 // tests/ability_damage.test.ts and tests/v042_balance_tooltips.test.ts;
 // hud.ts is the thin consumer.
 import type { AbilityOutputScaling } from '../sim/ability_output_scaling';
+import { hunterTrapBleedAmounts } from '../sim/combat/hunter_trap_bleed';
 import { benisonPrayerHealingMultiplier } from '../sim/combat/priest/benison_dawnweave';
 import type { ResolvedAbility } from '../sim/sim';
 import {
   abilityScalingPower,
   absorbBonus,
   channelTickBonus,
+  coefficientCastTime,
   directHealBonus,
   directHitBonus,
   dotTickBonus,
@@ -109,8 +111,10 @@ export function abilityDamageBonus(
         ? channelTickBonus(power, def, out.damage)
         : directHitBonus(power, def, res.castTime, true, out.damage);
     case 'groundAoE':
+    case 'sporeBurst':
       // Each ground pulse is an AoE hit: effect_dispatch snapshots
-      // directHitBonus(..., aoe) into the zone's spBonus at cast time.
+      // directHitBonus(..., aoe) into the zone's spBonus at cast time (Spore
+      // Burst's damage half snapshots the same rider).
       return directHitBonus(power, def, res.castTime, true, out.damage);
     case 'valkyrsCalling':
       // The delayed landing owns its authored range in the movement system.
@@ -134,9 +138,12 @@ export function abilityDamageBonus(
       return 0;
     case 'heal':
       // Combat adds the direct-heal rider (full cast-time coefficient off Spell
-      // Power, no AP scale-down) to every direct heal in effect_dispatch.
-      return directHealBonus(scaling.healPower, res.castTime, false, out.healing);
+      // Power, no AP scale-down) to every direct heal in effect_dispatch,
+      // reading the same coefficient cast time (Verdance keeps Wildmend's).
+      return directHealBonus(scaling.healPower, coefficientCastTime(res), false, out.healing);
     case 'absorb':
+    case 'aoeAllyAbsorb':
+      // Mass Barrier adds the same caster-side rider to each shielded ally.
       return absorbBonus(scaling.healPower, eff.spellPowerCoeff ?? 0, out.absorb);
     case 'hot': {
       // A HoT that rides a direct heal (Regrowth) does NOT scale in combat (the
@@ -174,6 +181,19 @@ export function abilityDamageBonus(
     default:
       return 0;
   }
+}
+
+/** Bear Trap's complete rounded bleed, from the same tick rounding as combat.
+ *  Its custom effect snapshots Ranged AP directly rather than spell coefficients. */
+export function abilityBearTrapBleedTotal(
+  effect: Extract<AbilityEffect, { type: 'hunterBearTrap' }>,
+  scaling?: AbilityScaling,
+): number {
+  return hunterTrapBleedAmounts({
+    total: effect.bleedTotal + (scaling?.rangedPower ?? 0) * effect.rangedPowerCoeff,
+    duration: effect.bleedDuration,
+    interval: effect.bleedInterval,
+  }).total;
 }
 
 /** The v0.42 primary-healing spec factor (Spiritmend, Sunmender, Groveheart;
@@ -265,6 +285,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
+      eff.type === 'sporeBurst' ||
       eff.type === 'aoeHeal' ||
       eff.type === 'chainHeal' ||
       eff.type === 'aoeRoot' ||
@@ -279,6 +300,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'faerieFire' ||
       eff.type === 'lifeTap' ||
       eff.type === 'hunterBloodhook' ||
+      eff.type === 'hunterBearTrap' ||
       eff.type === 'hunterStampede' ||
       eff.type === 'afflictionLitany',
   );
@@ -288,7 +310,11 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
 export function abilitySecondaryEffect(res: ResolvedAbility): AbilityEffect | undefined {
   return res.effects.find(
     (eff) =>
-      eff.type === 'dot' || eff.type === 'hot' || eff.type === 'absorb' || eff.type === 'imbue',
+      eff.type === 'dot' ||
+      eff.type === 'hot' ||
+      eff.type === 'absorb' ||
+      eff.type === 'aoeAllyAbsorb' ||
+      eff.type === 'imbue',
   );
 }
 
@@ -349,6 +375,8 @@ export function abilityDurationValue(res: ResolvedAbility): number | null {
     // seconds (Moonseed is the only extendDot user): $t prints the RESOLVED
     // maxBonus, so the Moonscorch 2pc's 12 shows live for wearers (base 6).
     if (eff.type === 'extendDot') return eff.maxBonus;
+    // Spore Burst's $t is the mushroom's fuse, placement to burst.
+    if (eff.type === 'sporeBurst') return eff.fuse;
     if ('duration' in eff && typeof eff.duration === 'number') return eff.duration;
   }
   return null;

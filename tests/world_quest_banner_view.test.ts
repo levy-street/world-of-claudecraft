@@ -8,7 +8,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
-import { BannerQueue } from '../src/ui/banner_queue';
+import { AMBIENT_MAX_DEFER_MS, BANNER_ADVANCE_GAP_MS, BannerQueue } from '../src/ui/banner_queue';
 import {
   WORLD_QUEST_BANNER_MS,
   worldQuestBannerModel,
@@ -87,9 +87,8 @@ describe('world quest banner: the timing half of the collision rule', () => {
   });
 
   it('holds for less than the ambient deferral window, so a parked zone name is never aged out', () => {
-    const hud = read('src/ui/hud.ts');
-    const gap = Number(/const BANNER_ADVANCE_GAP_MS = (\d+);/.exec(hud)?.[1]);
-    const maxDefer = Number(/const AMBIENT_MAX_DEFER_MS = (\d+);/.exec(hud)?.[1]);
+    const gap = BANNER_ADVANCE_GAP_MS;
+    const maxDefer = AMBIENT_MAX_DEFER_MS;
     expect(gap).toBeGreaterThan(0);
     expect(maxDefer).toBeGreaterThan(0);
     expect(WORLD_QUEST_BANNER_MS + gap).toBeLessThan(maxDefer);

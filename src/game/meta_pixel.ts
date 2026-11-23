@@ -26,3 +26,38 @@ export function trackMetaPixel(
   if (options) fbq('trackCustom', eventName, data ?? {}, options);
   else fbq('trackCustom', eventName, data ?? {});
 }
+
+/** Marks a link whose clicks already report, so a second pass binds nothing. */
+const TRACKED_LINK_ATTR = 'data-woc-click-tracked';
+
+/**
+ * Report clicks on the page's GitHub and Discord links as custom events. Safe to run
+ * more than once: the landing-first boot (src/ui/landing_first.ts) binds them before
+ * the client loads and main.ts binds again at boot. Moved out of src/main.ts.
+ */
+export function trackCommunityLinkClicks(root: ParentNode = document): void {
+  root.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
+    if (link.hasAttribute(TRACKED_LINK_ATTR)) return;
+    let url: URL;
+    try {
+      url = new URL(link.href);
+    } catch {
+      return;
+    }
+    const host = url.hostname.toLowerCase();
+    const isGitHub = host === 'github.com' || host.endsWith('.github.com');
+    const isDiscord =
+      host === 'discord.gg' ||
+      host.endsWith('.discord.gg') ||
+      host === 'discord.com' ||
+      host.endsWith('.discord.com');
+    if (!isGitHub && !isDiscord) return;
+    link.setAttribute(TRACKED_LINK_ATTR, '');
+    link.addEventListener('click', () => {
+      trackMetaPixel(isGitHub ? 'GitHubClick' : 'DiscordClick', {
+        url: url.toString(),
+        path: url.pathname,
+      });
+    });
+  });
+}

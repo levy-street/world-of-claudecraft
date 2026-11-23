@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
-import { terrainSteepnessAt, terrainWallStandoff, terrainWallStandoffPass } from '../src/sim/world';
+import { terrainWallStandoff, terrainWallStandoffPass } from '../src/sim/wall_standoff';
+import { terrainSteepnessAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // terrainWallStandoff pushes a player's body off nearby steep terrain in a

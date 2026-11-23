@@ -35,3 +35,18 @@ export function buildRiftFloorView(ctx: SimContext): RiftFloorView | null {
     tier: inst.tier,
   };
 }
+
+// Milliseconds remaining before the current rift's backing event stops admitting
+// parties (null outside a rift, or for a dev-spawned rift with no
+// backing RiftEvent). Sim-clock arithmetic only (event.expiresAt and ctx.time are
+// both sim-clock seconds), recomputed fresh on every call so a repeated read ticks
+// down like raidLockouts() does, with no caching to go stale between ticks.
+export function riftEventMsRemainingFor(
+  ctx: SimContext,
+  view: RiftFloorView | null,
+): number | null {
+  if (!view || view.eventId === null) return null;
+  const event = ctx.riftEvents.find((candidate) => candidate.eventId === view.eventId);
+  if (!event) return null;
+  return Math.max(0, Math.round((event.expiresAt - ctx.time) * 1000));
+}

@@ -3,12 +3,19 @@ import { describe, expect, it } from 'vitest';
 
 const foliage = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
 const blades = readFileSync(new URL('../src/render/blade_grass.ts', import.meta.url), 'utf8');
+const bladeBand = readFileSync(
+  new URL('../src/render/blade_grass_band.ts', import.meta.url),
+  'utf8',
+);
 const canopy = readFileSync(new URL('../src/render/canopy_detail.ts', import.meta.url), 'utf8');
 
 describe('foliage GPU optimization production wiring', () => {
   it('omits all-up normal buffers only where the exact constant-normal patch is live', () => {
     expect(blades).not.toContain("setAttribute('normal'");
     expect(blades).toContain('patchConstantUpNormalVertexShader(sh.vertexShader)');
+    expect(blades).toContain('normal *= faceDirection;');
+    expect(bladeBand).toContain('patchConstantUpNormalVertexShader(sh.vertexShader)');
+    expect(bladeBand).toContain('normal *= faceDirection;');
 
     expect(foliage).toContain("geo.deleteAttribute('normal');");
     expect(foliage).toContain("flowerGeo.deleteAttribute('normal');");

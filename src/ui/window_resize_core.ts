@@ -1,6 +1,7 @@
 // Pure geometry for the shared window-resize affordance (the south-east corner
-// grip every movable .window.panel gets from src/ui/window_resize.ts). DOM-free
-// so Vitest drives it directly: the controller feeds it plain numbers.
+// grip every movable .window.panel gets from src/ui/window_resize.ts, plus the
+// north-west grip a bottom-anchored window opts into). DOM-free so Vitest drives
+// it directly: the controller feeds it plain numbers.
 //
 // Space conventions mirror window_drag.ts and Hud.setWindowPixelPosition:
 // pointer clientX/clientY and getBoundingClientRect() arrive in *visual* (zoomed)
@@ -27,9 +28,19 @@ export const RESIZE_ENGAGE_SLOP = 4;
  *  plain corner tap must never freeze the window's CSS-managed size. */
 export const RESIZE_ENGAGE_SLOP_TOUCH = 10;
 
+/** Which corner a resize drags: the shared SE grip, or the NW grip a
+ *  bottom-anchored window carries (it grows up and left, keeping its bottom-right
+ *  corner where it is). */
+export type ResizeCorner = 'se' | 'nw';
+
 export interface CornerRect {
   right: number;
   bottom: number;
+}
+
+export interface TopLeftCornerRect {
+  left: number;
+  top: number;
 }
 
 /**
@@ -43,6 +54,20 @@ export interface CornerRect {
  */
 export function isInResizeCorner(rect: CornerRect, x: number, y: number, band: number): boolean {
   return x >= rect.right - band && y >= rect.bottom - band && x <= rect.right && y <= rect.bottom;
+}
+
+/**
+ * True when a pointer falls inside the window's NW resize corner, the mirror of
+ * isInResizeCorner: the controller passes the CLIENT-box top-left, so the
+ * border itself stays outside the band.
+ */
+export function isInTopLeftResizeCorner(
+  rect: TopLeftCornerRect,
+  x: number,
+  y: number,
+  band: number,
+): boolean {
+  return x >= rect.left && y >= rect.top && x <= rect.left + band && y <= rect.top + band;
 }
 
 export interface ResizeSessionStart {
@@ -80,4 +105,30 @@ export function resizedWindowSize(
     width: Math.round(Math.min(maxWidth, Math.max(limits.minWidth, start.width + dx))),
     height: Math.round(Math.min(maxHeight, Math.max(limits.minHeight, start.height + dy))),
   };
+}
+
+/**
+ * New window box for a pointer drag of (dx, dy) author px on the given corner.
+ * The SE corner keeps left/top and defers to resizedWindowSize. The NW corner
+ * keeps the bottom-right corner fixed: dragging up or left grows the window,
+ * clamped so the new top-left stays `margin` inside the viewport, and the same
+ * minimum-size floor applies.
+ */
+export function resizedWindowRect(
+  start: ResizeSessionStart,
+  dx: number,
+  dy: number,
+  corner: ResizeCorner,
+  limits: ResizeLimits,
+): { left: number; top: number; width: number; height: number } {
+  if (corner === 'se') {
+    return { left: start.left, top: start.top, ...resizedWindowSize(start, dx, dy, limits) };
+  }
+  const right = start.left + start.width;
+  const bottom = start.top + start.height;
+  const maxWidth = Math.max(limits.minWidth, right - limits.margin);
+  const maxHeight = Math.max(limits.minHeight, bottom - limits.margin);
+  const width = Math.round(Math.min(maxWidth, Math.max(limits.minWidth, start.width - dx)));
+  const height = Math.round(Math.min(maxHeight, Math.max(limits.minHeight, start.height - dy)));
+  return { left: right - width, top: bottom - height, width, height };
 }

@@ -9,12 +9,12 @@
 // cache/queue state machine live in asset_thumbs_core.ts.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
-import { loadGltf, releaseGltf } from '../render/assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from '../render/assets/loader';
 import { hideBlackPointLights } from '../render/point_light_carriers';
 import { assetById } from './asset_catalog.generated';
 import { hashHue, ThumbBook, thumbPose } from './asset_thumbs_core';
+import { localAssetUrl } from './local_assets';
 import { userAssetPath } from './user_assets';
 
 // 2x the cell's 72x54 CSS size for crisp thumbnails on HiDPI screens.
@@ -50,7 +50,7 @@ let pumpScheduled = false;
 
 /** Resolve an asset id to its GLB URL the same way placement rendering does. */
 function assetGlbPath(assetId: string): string | null {
-  return userAssetPath(assetId) ?? assetById(assetId)?.path ?? null;
+  return localAssetUrl(assetId) ?? userAssetPath(assetId) ?? assetById(assetId)?.path ?? null;
 }
 
 function ensureGl(): GlHost | null {
@@ -163,7 +163,7 @@ async function snapshot(assetId: string): Promise<void> {
     callbacks.delete(assetId);
     return;
   }
-  let gltf: GLTF;
+  let gltf: LoadedGltf;
   try {
     gltf = await loadGltf(path);
   } catch {

@@ -39,6 +39,14 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { FOCUS_POINT_BUDGET, type RespecPaymentTier } from '../src/sim/professions/focus';
 import type { TownFocusPendingView } from '../src/sim/professions/town_focus_pending';

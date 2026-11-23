@@ -65,6 +65,27 @@ describe('Shadeslip steps to friend or foe', () => {
     expect(after).toBeCloseTo(1.5, 1);
   });
 
+  it('spends two charges, refuses a third step, then recharges through normal ticks', () => {
+    const { sim, rogue, ally, rogueId } = makePair();
+    sim.targetEntity(ally.id, rogueId);
+    for (let use = 0; use < 2; use++) {
+      teleport(sim, rogue, 200, 0);
+      sim.castAbility('shadowstep', rogueId);
+      expect(errors(sim.tick())).toEqual([]);
+      expect(dist2d(rogue.pos, ally.pos)).toBeCloseTo(1.5, 1);
+      for (let tick = 0; tick < 40; tick++) sim.tick();
+    }
+    teleport(sim, rogue, 200, 0);
+    sim.castAbility('shadowstep', rogueId);
+    expect(errors(sim.tick()).length).toBeGreaterThan(0);
+    expect(dist2d(rogue.pos, ally.pos)).toBeCloseTo(12, 1);
+    // No charge/cooldown edits: let the actual 24-second recharge elapse.
+    for (let tick = 0; tick < 480; tick++) sim.tick();
+    sim.castAbility('shadowstep', rogueId);
+    expect(errors(sim.tick())).toEqual([]);
+    expect(dist2d(rogue.pos, ally.pos)).toBeCloseTo(1.5, 1);
+  });
+
   it('still steps to a hostile mob, unchanged', () => {
     const { sim, rogue, rogueId } = makePair();
     const mob = createMob(31_000, MOBS.forest_wolf, 10, { x: 200, y: 0, z: 0 });

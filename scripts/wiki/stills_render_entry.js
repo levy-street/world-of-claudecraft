@@ -11,6 +11,7 @@
 // pose time, and a fixed three-quarter yaw, so reruns produce the same framing.
 import * as THREE from 'three';
 import { buildModel, skinAwareBounds } from '../../src/guide/viewer/model';
+import { STILL_FOCUS } from './stills_focus';
 
 const SIZE = 512; // supersample; the driver downscales and encodes the shipped WebP
 const STILL_YAW = -0.6; // radians; a three-quarter portrait reads better than dead-on
@@ -70,7 +71,7 @@ window.renderStill = (spec, tint) =>
         // to the model's ACTUAL posed bounds (yaw included), so a rig the idle clip flings far
         // from its bind box is still centered.
         const pivot = new THREE.Group();
-        pivot.rotation.y = STILL_YAW;
+        pivot.rotation.y = STILL_YAW + (STILL_FOCUS[spec.url]?.yaw ?? 0);
         pivot.add(built.root);
         // Skinned rigs frustum-cull by a bind-pose sphere that can sit off the posed mesh;
         // disabling the cull guarantees the model is drawn (the game does the same).
@@ -88,11 +89,28 @@ window.renderStill = (spec, tint) =>
         const radius = bounds.getBoundingSphere(new THREE.Sphere()).radius || built.radius || 1;
 
         const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 1000);
-        // Lift the framing center a touch so the subject sits slightly low with headroom above.
-        // frameCamera keeps the camera level with the center, so this reframes vertically; it is
-        // not a downward tilt.
-        center.y += radius * 0.08;
-        frameCamera(camera, radius, center);
+        const focus = STILL_FOCUS[spec.url];
+        const aim = focus ? built.root.getObjectByName(focus.bone) : null;
+        let extra = null;
+        if (focus && aim) {
+          // A head-focused portrait (stills_focus.js): aim at the posed bone, frame tight.
+          const r = radius * focus.radius;
+          aim.getWorldPosition(center);
+          center.y += r * focus.lift;
+          frameCamera(camera, r, center);
+          if (focus.rim) {
+            extra = new THREE.DirectionalLight(focus.rim.color, focus.rim.intensity);
+            extra.position.set(...focus.rim.from).add(center);
+            extra.target.position.copy(center);
+            scene.add(extra, extra.target);
+          }
+        } else {
+          // Lift the framing center a touch so the subject sits slightly low with headroom
+          // above. frameCamera keeps the camera level with the center, so this reframes
+          // vertically; it is not a downward tilt.
+          center.y += radius * 0.08;
+          frameCamera(camera, radius, center);
+        }
 
         renderer.render(scene, camera);
         const url = renderer.domElement.toDataURL('image/png');

@@ -61,3 +61,10 @@ export function buildContentSecurityPolicy(options?: {
   scriptHashes?: string[];
 }): string;
 export function withCspHeader(response: Response, csp: string): Response;
+export const EXTERNAL_DOCUMENT_PATHS: Set<string>;
+export function isExternalDocumentUrl(urlString: string): boolean;
+export function toCanonicalExternalUrl(
+  urlString: string,
+  _appOrigin?: string,
+  apiOrigin?: string,
+): string;

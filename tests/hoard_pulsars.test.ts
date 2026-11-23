@@ -547,11 +547,20 @@ describe('determinism and the wire', () => {
 describe('an orb is a real target, under the real mob AI', () => {
   it('shot from range for a whole phase it never turns immune, and it dies to damage', () => {
     const entry = encounter();
+    // Survive the full-party boss stats while testing the orb's real AI.
+    entry.sim.player.maxHp = 1_000_000;
+    entry.sim.player.hp = entry.sim.player.maxHp;
     unbind(entry);
     const orb = orbsOf(entry)[0];
     // A caster's spot: far outside any melee reach of a mob that cannot move.
     const stand = { ...entry.sim.player.pos, x: orb.pos.x, z: orb.pos.z - 22 };
     entry.sim.player.targetId = orb.id;
+    // The shooter has to outlive the phase. The loop refills it every tick, but
+    // the hoard's own trash swings at it too (the real mob AI), and one of
+    // their critical strikes is worth more than a bare level 20 warrior's whole
+    // pool. A dead shooter leaves the orb nobody to fight, so it evades, which
+    // is not the claim here: the pool is made too deep for any one hit to end.
+    entry.sim.player.maxHp = 1_000_000;
     let last = orb.hp;
     let landed = 0;
     // The WHOLE sim ticks here (mob AI, leash and stall logic included), and the

@@ -9,6 +9,7 @@ import {
   type ArmoryPreviewHandle,
   type ArmoryPreviewMode,
   type ArmorySceneKey,
+  armoryPreviewReady,
   createArmoryPreview,
 } from '../render/armory_preview';
 import type { PreviewAppearance } from '../render/characters';
@@ -150,19 +151,7 @@ export class ArmoryInspect {
     document.body.appendChild(overlay);
     this.overlay = overlay;
     overlay.querySelector('[data-armory-close]')?.addEventListener('click', () => this.close());
-    const stage = this.ensureStage();
-    const slot = overlay.querySelector<HTMLElement>('[data-armory-stage-slot]');
-    if (stage && slot) {
-      this.paintStageControls();
-      stage.style.height = '';
-      slot.replaceWith(stage);
-      stage.removeAttribute('aria-hidden');
-      this.preview?.setAppearance(this.deps.appearance());
-      this.preview?.setScene(this.sceneKey);
-      this.preview?.setMode(this.mode);
-      this.preview?.setSkin(row.skin.id);
-      this.preview?.setActive(true);
-    }
+    this.mountStage(row);
     this.paintActions();
     this.syncToggles();
     (overlay.querySelector('[data-armory-close]') as HTMLElement | null)?.focus();
@@ -192,8 +181,38 @@ export class ArmoryInspect {
     this.openerFocus = null;
   }
 
+  /** Put the live viewport in the open overlay's stage slot (again once a streamed body
+   *  lands: the overlay opens at once and the viewport joins it). */
+  private mountStage(row: ArmorySkinRow): void {
+    const stage = this.ensureStage();
+    const slot = this.overlay?.querySelector<HTMLElement>('[data-armory-stage-slot]');
+    if (!stage || !slot) return;
+    this.paintStageControls();
+    stage.style.height = '';
+    slot.replaceWith(stage);
+    stage.removeAttribute('aria-hidden');
+    this.preview?.setAppearance(this.deps.appearance());
+    this.preview?.setScene(this.sceneKey);
+    this.preview?.setMode(this.mode);
+    this.preview?.setSkin(row.skin.id);
+    this.preview?.setActive(true);
+  }
+
+  private stageWaiting = false;
+
   private ensureStage(): HTMLElement | null {
     if (this.stage) return this.stage;
+    // the try-on body may still be streaming: build nothing (a rig built early throws
+    // after its WebGL context exists) and mount once it lands, if still open
+    if (this.stageWaiting) return null;
+    const ready = armoryPreviewReady(this.deps.appearance(), () => {
+      this.stageWaiting = false;
+      if (this.overlay && this.row) this.mountStage(this.row);
+    });
+    if (!ready) {
+      this.stageWaiting = true;
+      return null;
+    }
     const touch = document.body.classList.contains('mobile-touch');
     const parkedSize = armoryPreviewParkingSize(window.innerWidth, window.innerHeight, touch);
     const parking = document.createElement('div');

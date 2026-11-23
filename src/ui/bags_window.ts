@@ -18,7 +18,7 @@
 // (not a literal white hex).
 
 import { audio } from '../game/audio';
-import { BACKPACK_SLOTS, bagSlotsOf, stackSizeOf } from '../sim/bags';
+import { BACKPACK_SLOTS, BAG_SOCKETS, bagSlotsOf, stackSizeOf } from '../sim/bags';
 import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
@@ -56,6 +56,7 @@ import {
   bagItemAction,
   bagNoMatchKind,
   bagQualityKey,
+  bagReorderBlockedByLock,
   bagShiftLinks,
   bagSlotsLineKey,
   bagSortSignature,
@@ -87,6 +88,8 @@ import {
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
+import { SkullBagPaneController } from './hud/skull_bag';
+import { pickInkMap } from './hud/treasure';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
@@ -101,6 +104,10 @@ import {
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import {
+  marketConsumableSellChoice,
+  marketConsumableSellSources,
+} from './market_consumable_sources_view';
+import {
   bagMaterialDepositSelection,
   type MaterialStorageDestination,
 } from './material_source_storage_actions';
@@ -112,6 +119,7 @@ import {
   openMaterialSourcesForRow,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
+import { createMembershipBagSocket } from './membership_bag_socket';
 import type { PainterHostPresentation } from './painter_host';
 import { BAG_ITEM_ROW_ATTR } from './panel_key_guard';
 import {
@@ -143,7 +151,7 @@ const SORT_SETTLE_STAGGER_CAP = 20;
 // an orphaned aria-modal dialog floating over the closed window (the show* paths
 // already clear a prior same-type prompt with these classes).
 const BAG_PROMPT_SELECTOR =
-  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt, .trade-offer-prompt';
+  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt, .trade-offer-prompt, .tmap-ink-prompt';
 // Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
 // which hide #bags without running close(): they must not strand a still-visible
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
@@ -400,6 +408,11 @@ export class BagsWindow {
   // cleared on leave/focusout, programmatic tooltip hide, rebuild, and close so
   // a stale class never sticks after the cell is torn down.
   private readonly trackerHighlight = new BagQuestTrackerHighlight(document);
+  /** The Skull Bag's sub-inventory pane, docked under the grid while open. */
+  private readonly skullBagPane = new SkullBagPaneController({
+    world: () => this.deps.world(),
+    focusAfterClose: () => this.deps.root().querySelector<HTMLElement>('[data-close]')?.focus(),
+  });
 
   // One-shot sort settle animation. Armed by the sort button; the NEXT grid
   // paint whose INVENTORY signature (bagSortSignature: id, count, cell hint)
@@ -438,6 +451,9 @@ export class BagsWindow {
    * live search.
    */
   refreshIfChanged(): void {
+    // The Skull Bag pane keeps its own signature: a skull looted straight into
+    // the bag moves nothing in the bags themselves.
+    this.skullBagPane.refreshIfChanged();
     const el = this.deps.root();
     if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper))
       return;
@@ -506,6 +522,7 @@ export class BagsWindow {
     // an orphaned aria-modal dialog floating over the closed window, then clear the inert
     // it set: a hidden window must never stay inert or the next open shows a dead grid.
     dismissBagPrompts(el);
+    this.skullBagPane.close();
     el.style.display = 'none';
     el.inert = false;
     this.clearTrackerHighlight();
@@ -570,6 +587,7 @@ export class BagsWindow {
     this.fillGrid(grid);
     el.appendChild(grid);
     grid.scrollTop = prevScrollTop;
+    this.skullBagPane.mount(el);
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money ui-money';
     el.appendChild(moneyRow);
@@ -673,7 +691,7 @@ export class BagsWindow {
         `<div class="tt-title">${esc(t('hudChrome.bags.backpack'))}</div><div class="tt-sub">${esc(t('itemUi.tooltip.bagSlots', { slots: formatNumber(model.backpackSlots, { maximumFractionDigits: 0 }) }))}</div>`,
     );
     bar.appendChild(backpack);
-    for (const socket of model.sockets) {
+    for (const socket of model.sockets.slice(0, BAG_SOCKETS)) {
       const item = socket.itemId ? ITEMS[socket.itemId] : undefined;
       if (item) {
         const btn = document.createElement('button');
@@ -715,6 +733,15 @@ export class BagsWindow {
         bar.appendChild(emptySocket);
       }
     }
+    const memberSocket = createMembershipBagSocket(world, {
+      itemIcon: this.deps.itemIcon,
+      itemTooltip: this.deps.itemTooltip,
+      attachTooltip: this.deps.attachTooltip,
+      hideTooltip: this.deps.hideTooltip,
+      repaint: () => this.render(),
+    });
+    memberSocket.dataset.focusKey = `bagsocket:${BAG_SOCKETS}`;
+    bar.appendChild(memberSocket);
     const counter = document.createElement('span');
     counter.className = `bag-capacity${model.used > model.capacity ? ' over' : ''}`;
     const split = carriedPools(world.bags, world.inventory);
@@ -1094,7 +1121,7 @@ export class BagsWindow {
       // masterwork > quest seal > fine seal > enchanted / signed / bound >
       // generic wedge. The fine rim/wash is independent of which seal wins the
       // corner (a masterwork fine stack keeps its rim).
-      const glyphKind = bagInstanceGlyphKind(s.instance);
+      const glyphKind = bagInstanceGlyphKind(s.instance, s.materialSources);
       const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
       const locked = isItemLocked(s.instance);
       row.style.setProperty('--bag-slot-quality', qColor);
@@ -1504,7 +1531,7 @@ export class BagsWindow {
     // tooltip is mouse-only, and the two channels must agree (the glyph
     // aria-key rule above). The def-free glyph kind rides the same aria keys
     // the known cell uses, with the unknown label as the item token.
-    const glyphKind = bagInstanceGlyphKind(s.instance);
+    const glyphKind = bagInstanceGlyphKind(s.instance, s.materialSources);
     row.setAttribute(
       'aria-label',
       glyphKind
@@ -1695,7 +1722,14 @@ export class BagsWindow {
       this.deps.showError(t('hudChrome.bags.reorderNeedsRecent'));
       return;
     }
-    this.deps.world().moveInventoryItem(from, to);
+    const world = this.deps.world();
+    // A locked stack is pinned to its cell on both ends of a drag; the sim
+    // refuses silently, so say why here instead of a drag that snaps back.
+    if (bagReorderBlockedByLock(world.inventory, world.bagCapacity, from, to)) {
+      this.deps.showError(t('hudChrome.bags.reorderLocked'));
+      return;
+    }
+    world.moveInventoryItem(from, to);
     audio.click();
     this.deps.hideTooltip();
     this.render();
@@ -1768,8 +1802,8 @@ export class BagsWindow {
   // use/equip binding), so the two can never drift apart.
   private runBagAction(item: (typeof ITEMS)[string], s: InvSlot, ev: MouseEvent): void {
     const action = bagItemAction(
-      // The vault arm needs the honest-set membership the info shape cannot
-      // carry (it has no id); every other arm ignores the extra field.
+      // The vault arm needs the honest-set membership, which the bare id
+      // cannot answer here; every other arm ignores the extra field.
       { ...item, vaultMaterial: vaultMaterialIds().has(s.itemId) },
       this.bagMode(),
       s.instance,
@@ -1814,9 +1848,31 @@ export class BagsWindow {
       case 'marketSellBlockedBound':
         this.deps.showError(t('hud.errors.marketListBound'));
         return;
-      case 'marketSell':
+      case 'marketSell': {
+        const sourced = marketConsumableSellSources(s);
+        const sources = sourced?.materialSources;
+        if (sourced && sources) {
+          const stage = (selected: typeof sources) => {
+            if (!this.deps.isMarketSell()) return;
+            const choice = marketConsumableSellChoice(sourced, selected);
+            if (choice) this.deps.stageMarketSell(s.itemId, choice.instance);
+          };
+          if (sources.length === 1) stage([{ source: sources[0].source, count: 1 }]);
+          else
+            this.deps.openMaterialSources?.({
+              itemName: itemDisplayName(item),
+              sources,
+              limit: 1,
+              stepSize: 1,
+              opener: ev.currentTarget instanceof HTMLElement ? ev.currentTarget : this.deps.root(),
+              associatedOwners: [this.deps.root()],
+              onConfirm: (selected) => stage(selected.sources),
+            });
+          break;
+        }
         this.deps.stageMarketSell(s.itemId, s.instance);
         break;
+      }
       case 'vendorSellBlocked':
         this.deps.showError(t('itemUi.tooltip.cannotVendor'));
         return;
@@ -1942,6 +1998,10 @@ export class BagsWindow {
         this.render();
         break;
       }
+      case 'openSkullBag':
+        this.skullBagPane.toggle();
+        this.render();
+        break;
       case 'placeFeast': {
         // The shared feast (Farming Phase 12): the click is the PLACE verb,
         // never plain useItem. The server spends the bag item and spawns the
@@ -1969,6 +2029,12 @@ export class BagsWindow {
         if (!item || !this.deps.useGatherTool(item)) {
           const at = this.copyRefFor(s);
           if (!at) return;
+          // Cartographer's Ink asks which treasure map it is for first.
+          const ink = { slotIndex: at.slotIndex, inertRoot: this.deps.root() };
+          if (pickInkMap(this.deps.world(), s.itemId, ink)) {
+            this.deps.hideTooltip();
+            break;
+          }
           this.deps.world().useItem(s.itemId, at);
         }
         this.render();

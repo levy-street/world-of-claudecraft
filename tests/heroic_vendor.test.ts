@@ -1,11 +1,14 @@
 // The Heroic Quartermaster: the item-level/budget pins for the jewelry stock,
-// the server-authoritative buy path (marks debit from bags, range, stock,
+// the server-authoritative buy path (marks debit from the currency balance, range, stock,
 // space refusals), the pure shop view, and the realm-reset reward and deed
 // telemetry contract on awardHeroicMarks. The equip mechanics of the jewelry itself live in
 // tests/equip_jewelry.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import {
+  HEROIC_DUNGEON_TUNING,
+  HEROIC_MARK_CURRENCY_ID,
+} from '../src/sim/content/dungeon_difficulty';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { HEROIC_VENDOR_ITEMS, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import {
@@ -89,6 +92,8 @@ describe('heroic vendor stock: item-level and budget pins', () => {
         `${offer.itemId} is neither gear, a material, a pattern nor a seed`,
       ).toContain(ITEMS[offer.itemId]?.kind);
     }
+    // The Loot Goblin whistle row left with the account-wide buddy rework
+    // (1896839827c, merged at 7bc9c74af57), so the count is back to 29.
     expect(nonGear.length, 'one core plus twenty patterns plus eight seeds').toBe(29);
     for (const offer of gearOffers) {
       const item = ITEMS[offer.itemId];
@@ -101,10 +106,15 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       // Deliberately tradeable (maintainer ruling 2026-08-28): the Crucible
       // tier binds its vendor gear, but this jewelry shipped tradeable and
       // the live economy is built around that; the pin keeps a future
-      // vendor-gear-binds sweep from silently rebinding it. The trinket is
-      // new, not shipped jewelry, and binds like every trinket does.
-      expect(item.soulbound, offer.itemId).toBe(item.slot === 'trinket' ? true : undefined);
+      // vendor-gear-binds sweep from silently rebinding it. Wayfarer's
+      // Lodestone is also tradable; only PvP vendor trinkets bind.
+      expect(item.soulbound, offer.itemId).toBeUndefined();
     }
+  });
+
+  it('no longer sells the retired Loot Goblin companion', () => {
+    expect(HEROIC_VENDOR_STOCK.some((o) => o.itemId === 'whistle_loot_goblin')).toBe(false);
+    expect(HEROIC_VENDOR_STOCK.some((o) => ITEMS[o.itemId]?.kind === 'buddy')).toBe(false);
   });
 
   it('sells the Wyrmfall Core catch-up row at the ring price point', () => {
@@ -122,14 +132,14 @@ describe('heroic vendor stock: item-level and budget pins', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'CoreBuyer');
     atQuartermaster(sim, pid);
-    sim.addItem(HEROIC_MARK_ITEM_ID, 13, pid);
+    sim.addItem(HEROIC_MARK_CURRENCY_ID, 13, pid);
     sim.buyHeroicVendorItem('wyrmfall_core', pid);
     expect(sim.countItem('wyrmfall_core', pid)).toBe(1);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+    expect(sim.meta(pid)!.heroicMarks).toBe(1);
     // Short one mark: refused, nothing granted, nothing debited.
     sim.buyHeroicVendorItem('wyrmfall_core', pid);
     expect(sim.countItem('wyrmfall_core', pid)).toBe(1);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+    expect(sim.meta(pid)!.heroicMarks).toBe(1);
   });
 
   // Masterwrought phase 11 (masterwrought R8's deterministic pillar): the eight
@@ -304,16 +314,16 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       const sim = makeSim();
       const pid = sim.addPlayer('warrior', 'PatternBuyer');
       atQuartermaster(sim, pid);
-      sim.addItem(HEROIC_MARK_ITEM_ID, 13, pid);
+      sim.addItem(HEROIC_MARK_CURRENCY_ID, 13, pid);
       sim.buyHeroicVendorItem('pattern_ironhusk_flask', pid);
       expect(sim.countItem('pattern_ironhusk_flask', pid)).toBe(1);
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+      expect(sim.meta(pid)!.heroicMarks).toBe(1);
       // Short one mark: refused, nothing granted, nothing debited. The
       // refusal is affordability only; owning a copy never blocks a second
       // purchase (duplicates are purchasable BY DESIGN, see the stock note).
       sim.buyHeroicVendorItem('pattern_ironhusk_flask', pid);
       expect(sim.countItem('pattern_ironhusk_flask', pid)).toBe(1);
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+      expect(sim.meta(pid)!.heroicMarks).toBe(1);
     });
   });
 
@@ -366,14 +376,14 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       const sim = makeSim();
       const pid = sim.addPlayer('warrior', 'SeedBuyer');
       atQuartermaster(sim, pid);
-      sim.addItem(HEROIC_MARK_ITEM_ID, 13, pid);
+      sim.addItem(HEROIC_MARK_CURRENCY_ID, 13, pid);
       sim.buyHeroicVendorItem(upperSeedIds[0], pid);
       expect(sim.countItem(upperSeedIds[0], pid)).toBe(1);
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+      expect(sim.meta(pid)!.heroicMarks).toBe(1);
       // Short one mark: refused, nothing granted, nothing debited.
       sim.buyHeroicVendorItem(upperSeedIds[0], pid);
       expect(sim.countItem(upperSeedIds[0], pid)).toBe(1);
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+      expect(sim.meta(pid)!.heroicMarks).toBe(1);
     });
   });
 
@@ -385,23 +395,28 @@ describe('heroic vendor stock: item-level and budget pins', () => {
     }
   });
 
-  it('marks stack so a vendor price fits in the bags', () => {
-    expect(ITEMS[HEROIC_MARK_ITEM_ID].stackSize).toBe(20);
+  it('marks are a currency: a grant credits the balance and takes no bag slot', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Saver');
+    const slots = sim.meta(pid)!.inventory.length;
+    sim.addItem(HEROIC_MARK_CURRENCY_ID, 16, pid);
+    expect(sim.meta(pid)!.heroicMarks).toBe(16);
+    expect(sim.meta(pid)!.inventory).toHaveLength(slots);
   });
 });
 
 describe('heroic vendor buy path', () => {
-  it('debits the marks from the bags and grants the item', () => {
+  it('debits the marks from the balance and grants the item', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Buyer');
     atQuartermaster(sim, pid);
-    sim.addItem(HEROIC_MARK_ITEM_ID, 15, pid);
+    sim.addItem(HEROIC_MARK_CURRENCY_ID, 15, pid);
     sim.drainEvents();
 
     sim.buyHeroicVendorItem('seal_of_the_nine_oaths', pid);
 
     expect(sim.countItem('seal_of_the_nine_oaths', pid)).toBe(1);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(3); // 15 - 12
+    expect(sim.meta(pid)!.heroicMarks).toBe(3); // 15 - 12
     expect(
       (sim.drainEvents() as any[]).some(
         (e) => e.type === 'vendor' && e.action === 'buy' && e.itemId === 'seal_of_the_nine_oaths',
@@ -409,24 +424,37 @@ describe('heroic vendor buy path', () => {
     ).toBe(true);
   });
 
+  it('sells at exactly the price, spending the balance to zero', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Exact');
+    atQuartermaster(sim, pid);
+    sim.addItem(HEROIC_MARK_CURRENCY_ID, 12, pid);
+    sim.drainEvents();
+
+    sim.buyHeroicVendorItem('seal_of_the_nine_oaths', pid);
+
+    expect(sim.countItem('seal_of_the_nine_oaths', pid)).toBe(1);
+    expect(sim.meta(pid)!.heroicMarks).toBe(0);
+  });
+
   it('refuses when the buyer cannot afford the price, without debiting', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Broke');
     atQuartermaster(sim, pid);
-    sim.addItem(HEROIC_MARK_ITEM_ID, 11, pid);
+    sim.addItem(HEROIC_MARK_CURRENCY_ID, 11, pid);
     sim.drainEvents();
 
     sim.buyHeroicVendorItem('seal_of_the_nine_oaths', pid);
 
     expect(sim.countItem('seal_of_the_nine_oaths', pid)).toBe(0);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(11);
+    expect(sim.meta(pid)!.heroicMarks).toBe(11);
     expect(errorTexts(sim)).toContain('You need 12 Heroic Marks to buy Seal of the Nine Oaths.');
   });
 
   it('refuses away from the quartermaster and for junk item ids', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Faraway');
-    sim.addItem(HEROIC_MARK_ITEM_ID, 20, pid);
+    sim.addItem(HEROIC_MARK_CURRENCY_ID, 20, pid);
     sim.drainEvents();
 
     // Spawn position is nowhere near Highwatch.
@@ -438,14 +466,14 @@ describe('heroic vendor buy path', () => {
     sim.buyHeroicVendorItem('healing_potion', pid); // real item, not in stock
     sim.buyHeroicVendorItem('no_such_item', pid);
     expect(errorTexts(sim)).toContain('That item is not sold here.');
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(20);
+    expect(sim.meta(pid)!.heroicMarks).toBe(20);
   });
 
   it('refuses with full bags and keeps the marks', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Packrat');
     atQuartermaster(sim, pid);
-    sim.addItem(HEROIC_MARK_ITEM_ID, 12, pid);
+    sim.addItem(HEROIC_MARK_CURRENCY_ID, 12, pid);
     // Fill every remaining bag slot with non-stacking items.
     for (let i = 0; i < 40 && sim.canAddItem('worn_sword', 1, pid); i++)
       sim.addItem('worn_sword', 1, pid);
@@ -455,7 +483,7 @@ describe('heroic vendor buy path', () => {
     sim.buyHeroicVendorItem('seal_of_the_nine_oaths', pid);
 
     expect(sim.countItem('seal_of_the_nine_oaths', pid)).toBe(0);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(12);
+    expect(sim.meta(pid)!.heroicMarks).toBe(12);
   });
 });
 
@@ -502,15 +530,14 @@ describe('heroic mark reward persistence', () => {
     sim.utcDay = '2026-07-07';
     const pid = sim.addPlayer('warrior', 'Daily');
     const morthen = killHeroicMorthen(sim, pid);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+    expect(sim.meta(pid)!.heroicMarks).toBe(1);
     expect(
-      ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID),
+      ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_CURRENCY_ID),
     ).toBe(false);
 
     const state = sim.serializeCharacter(pid);
-    expect(state?.inventory).toEqual(
-      expect.arrayContaining([expect.objectContaining({ itemId: HEROIC_MARK_ITEM_ID, count: 1 })]),
-    );
+    expect(state?.heroicMarks).toBe(1);
+    expect(state?.inventory.some((s) => s.itemId === HEROIC_MARK_CURRENCY_ID)).toBe(false);
     // Deed telemetry persists beside the mark but never gates mark income.
     expect(state?.heroicDaily).toEqual({ date: 'reset:1', marked: ['hollow_crypt'] });
   });
@@ -538,7 +565,7 @@ describe('heroic mark reward persistence', () => {
     sim.awardHeroicMarks(morthen, [meta]);
 
     expect(sim.utcDay).toBe('2026-07-07');
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(2);
+    expect(sim.meta(pid)!.heroicMarks).toBe(2);
     expect(meta.heroicDaily.date).toBe('reset:2');
     expect([...meta.heroicDaily.marked]).toEqual(['hollow_crypt']);
   });

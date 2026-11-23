@@ -18,9 +18,19 @@ const mobileCss = readFileSync(join(root, 'src/styles/hud.mobile.css'), 'utf8');
 const indexHtml = readFileSync(join(root, 'index.html'), 'utf8');
 const playHtml = readFileSync(join(root, 'play.html'), 'utf8');
 
-// The desktop #map-canvas rule block (components.css), up to its closing brace.
-const rule = componentsCss.slice(componentsCss.indexOf('#map-canvas {'));
+// The desktop #map-canvas rule block (components.css), up to its closing brace:
+// the standalone selector, not the resized-window rule that also ends in
+// `#map-canvas {` (anchored at the line start so a compound selector never wins).
+const ruleStart = componentsCss.search(/^\s*#map-canvas \{/m);
+const rule = componentsCss.slice(ruleStart);
 const desktopRule = rule.slice(0, rule.indexOf('}'));
+// A player-resized desktop map (the shared grip stamps .window-sized) sizes the
+// canvas to the stage's square face instead; map_canvas_size_controller.ts
+// follows the backing store, so 1:1 still holds there.
+const sizedRuleStart = componentsCss.indexOf(
+  'body:not(.mobile-touch) #map-window.window-sized #map-canvas {',
+);
+const sizedRule = componentsCss.slice(sizedRuleStart, componentsCss.indexOf('}', sizedRuleStart));
 // The canvas backing store width from the markup (the pixel resolution the map
 // paints into): <canvas id="map-canvas" width="560" ...>. Both game entries carry
 // their own canvas, so pin both so a drift in only one entry cannot slip through.
@@ -50,6 +60,13 @@ describe('map canvas scales with the UI scale (issue 1559)', () => {
     // The global reset is border-box; a plain width:560px would shrink the content
     // box by the 2px border and downscale the backing. content-box keeps it 1:1.
     expect(desktopRule).toMatch(/\bbox-sizing:\s*content-box/);
+  });
+
+  it('a resized desktop map fills the stage face, square, outside the 2px border', () => {
+    expect(ruleStart).toBeGreaterThanOrEqual(0);
+    expect(sizedRuleStart).toBeGreaterThanOrEqual(0);
+    expect(sizedRule).toContain('width: calc(var(--map-face) - 4px)');
+    expect(sizedRule).toContain('height: calc(var(--map-face) - 4px)');
   });
 
   it('mobile still overrides the canvas to fill its responsive window', () => {

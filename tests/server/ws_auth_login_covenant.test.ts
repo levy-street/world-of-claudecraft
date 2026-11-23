@@ -97,12 +97,13 @@ function setup() {
   const ws = new FakeWs();
   // characterId is what the kick is keyed on; the rest of the ws_auth suite
   // omits it, which is why its ~30 joins kick with `undefined`.
-  const session = { pid: 1, characterId: CHARACTER, tag: 'covenant-session' };
+  const session = { pid: 1, characterId: CHARACTER, tag: 'covenant-session', ws };
   const game = {
     isIpBlocked: vi.fn(() => false),
     countIpSessions: vi.fn(() => 0),
     hasSessionForCharacter: vi.fn(() => false),
     join: vi.fn(() => session),
+    drainBuddyGrants: vi.fn(async () => {}),
     clients: { size: 1 },
     sim: { resetDay: '2026-09-24' },
     handleMessage: vi.fn(),
@@ -154,7 +155,6 @@ function setup() {
     acquireCharacterLease: vi.fn(async () => true),
     releaseCharacterLease: vi.fn(async () => {}),
     bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
-    guestPayoutsForCycle: vi.fn(async () => 0),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),

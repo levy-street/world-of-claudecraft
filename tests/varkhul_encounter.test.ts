@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isPlayerRemovableAura } from '../src/sim/aura_classify';
+import { DUNGEONS } from '../src/sim/data';
 import {
   clearVarkhulEncounterAuras,
   resetVarkhulEncounter,
@@ -1596,6 +1597,53 @@ describe('Varkhul encounter behavior', () => {
 });
 
 describe('Varkhul empty-raid reset and terminal wipe', () => {
+  it('resets a damaged pull when its last raider retreats to the room entrance', () => {
+    const { sim, boss } = claimedEncounter(520);
+    updateVarkhulEncounter(sim.ctx, boss);
+    boss.hp = Math.floor(boss.maxHp * 0.8);
+    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
+    if (!instance) throw new Error('Inner Crucible instance disappeared');
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const entry = DUNGEONS[IGNIVAR_SECOND_WING_ID].entry;
+    sim.player.pos = sim.ctx.groundPos(origin.x + entry.x, origin.z + entry.z + 1);
+    sim.player.prevPos = { ...sim.player.pos };
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.hp).toBe(boss.maxHp);
+    expect(boss.varkhul).toBeUndefined();
+    expect(boss.inCombat).toBe(false);
+    expect(boss.pos).toEqual(boss.spawnPos);
+    expect(boss.aggroTargetId).toBeNull();
+    sim.tick();
+    expect(boss.hp).toBe(boss.maxHp);
+    expect(boss.inCombat).toBe(false);
+    expect(boss.aggroTargetId).toBeNull();
+  });
+
+  it('keeps the pull active while another raider remains in the arena', () => {
+    const { sim, boss } = claimedEncounter(521);
+    const raider = addEncounterPlayer(sim, boss, 'Arena Raider');
+    updateVarkhulEncounter(sim.ctx, boss);
+    boss.hp = Math.floor(boss.maxHp * 0.8);
+    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
+    if (!instance) throw new Error('Inner Crucible instance disappeared');
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const entry = DUNGEONS[IGNIVAR_SECOND_WING_ID].entry;
+    sim.player.pos = sim.ctx.groundPos(origin.x + entry.x, origin.z + entry.z + 1);
+    sim.player.prevPos = { ...sim.player.pos };
+    const visitor = addEncounterPlayer(sim, boss, 'Entry Visitor');
+    visitor.pos = { ...sim.player.pos };
+    visitor.prevPos = { ...visitor.pos };
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.hp).toBe(Math.floor(boss.maxHp * 0.8));
+    expect(boss.inCombat).toBe(true);
+    expect(boss.varkhul?.attemptParticipantIds).toContain(raider.id);
+    expect(boss.varkhul?.attemptParticipantIds).not.toContain(visitor.id);
+  });
+
   it('performs exactly one home reset for an all-dead raid and stops consuming rng', () => {
     const { sim, boss } = claimedEncounter(52);
     updateVarkhulEncounter(sim.ctx, boss);

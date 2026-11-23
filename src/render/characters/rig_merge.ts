@@ -36,6 +36,13 @@
 // re-runs vertex skinning for each pass, but uploads a changed texture only once.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import {
+  carryGeometryLod,
+  geometryLodLevelOf,
+  geometryLodSourceOf,
+  geometryLodVariant,
+  mergeGeometryLod,
+} from '../assets/geometry_lod';
 import { morphTargetDictionaryOf, morphUnionPlan } from './morph_union_core';
 
 /** Bind matrices must match to this tolerance for two parts to be mergeable. */
@@ -174,6 +181,12 @@ export function rebakeGeometry(
   m: THREE.Matrix4,
   plan?: MorphRebakePlan,
 ): THREE.BufferGeometry {
+  // a part drawn at a coarser level is rebaked from its source (its levels carried) and drawn at
+  // that level again (assets/geometry_lod.ts)
+  const level = geometryLodLevelOf(geo);
+  if (level !== 'lod0') {
+    return geometryLodVariant(rebakeGeometry(geometryLodSourceOf(geo), m, plan), level);
+  }
   const out = new THREE.BufferGeometry();
   const normalMatrix = new THREE.Matrix3().getNormalMatrix(m);
   const linear = new THREE.Matrix3().setFromMatrix4(m);
@@ -258,6 +271,8 @@ export function rebakeGeometry(
     for (let i = 0; i < src.count; i++) arr[i] = src.getX(i);
     out.setIndex(new THREE.BufferAttribute(arr, 1));
   }
+  // the vertices keep their order: the coarser levels hold as they are (assets/geometry_lod.ts)
+  carryGeometryLod(geo, out);
   return out;
 }
 
@@ -370,6 +385,15 @@ export interface MergeSkinnedPartsOptions {
   partitionKey?: (mesh: THREE.SkinnedMesh) => string;
 }
 
+/** Original mesh names represented by a merged draw, retained through body
+ *  cloning so part selectors can still account for every constituent. */
+export function skinnedPartNames(object: THREE.Object3D): readonly string[] {
+  const names: unknown = object.userData.mergedSkinnedPartNames;
+  return Array.isArray(names) && names.every((name) => typeof name === 'string')
+    ? names
+    : [object.name];
+}
+
 /**
  * Merge every mergeable group of skinned body parts under `root` in place.
  *
@@ -445,9 +469,10 @@ export function mergeSkinnedParts(
       if (keys.some((k) => k !== keys[0])) continue;
     }
 
+    // folded from each part's SOURCE (its level 0), its coarser levels merged beside it below
     const geometries = parts.map((part, i) =>
       rebakeGeometry(
-        part.geometry,
+        geometryLodSourceOf(part.geometry),
         transforms[i],
         union
           ? { names: union.names, sourceIndex: union.sourceIndex[i], kinds, relative }
@@ -460,9 +485,18 @@ export function mergeSkinnedParts(
     const geo = mergeGeometries(geometries, false);
     for (const g of geometries) g.dispose();
     if (!geo) continue;
+    // each part's coarser levels, offset exactly as mergeGeometries offsets its index
+    mergeGeometryLod(
+      geo,
+      parts.map((part) => ({ geometry: part.geometry })),
+    );
     if (morphed.length > 0) geo.morphTargetsRelative = relative;
 
-    const merged = new THREE.SkinnedMesh(geo, canon.material);
+    // drawn at the level the canonical part drew (level 0 on every path that merges today)
+    const merged = new THREE.SkinnedMesh(
+      geometryLodVariant(geo, geometryLodLevelOf(canon.geometry)),
+      canon.material,
+    );
     merged.name = `${canon.name}_bodymerged`;
     if (union && union.names.length > 0) {
       // The constructor's updateMorphTargets names targets off the ATTRIBUTES
@@ -482,7 +516,10 @@ export function mergeSkinnedParts(
     merged.frustumCulled = canon.frustumCulled;
     merged.renderOrder = canon.renderOrder;
     merged.layers.mask = canon.layers.mask;
-    merged.userData = { ...canon.userData };
+    merged.userData = {
+      ...canon.userData,
+      mergedSkinnedPartNames: [...new Set(parts.flatMap(skinnedPartNames))],
+    };
     merged.bind(canon.skeleton, canon.bindMatrix);
     canon.parent?.add(merged);
     for (const p of parts) p.removeFromParent();

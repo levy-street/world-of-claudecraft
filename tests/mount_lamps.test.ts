@@ -113,6 +113,24 @@ describe('mount lamps', () => {
     expect(new Set(flame).size).toBeGreaterThan(1);
   });
 
+  it('flares every lamp on a summon and settles back to the plain flame', () => {
+    const lamps = attachMountLamps(
+      rigWith('lantern_l'),
+      specWith([{ bone: 'lantern_l', offset: [0, 0, 0], flicker: 'steady', intensity: 10 }]),
+    )!;
+    updateMountLamps(lamps, 0.5, 0);
+    expect(lamps.lights[0].intensity).toBeCloseTo(34, 6); // 3.4x the burning level
+    updateMountLamps(lamps, 0.5, 0.5);
+    const mid = lamps.lights[0].intensity;
+    expect(mid).toBeLessThan(34);
+    expect(mid).toBeGreaterThan(10);
+    // no summon seen (the default): the plain level, exactly
+    updateMountLamps(lamps, 0.5);
+    expect(lamps.lights[0].intensity).toBe(10);
+    updateMountLamps(lamps, 0.5, 3);
+    expect(lamps.lights[0].intensity).toBe(10);
+  });
+
   it('detaches and empties every parallel array on dispose', () => {
     const rig = rigWith('lens');
     const lamps = attachMountLamps(rig, specWith([{ bone: 'lens', offset: [0, 0, 0] }]))!;

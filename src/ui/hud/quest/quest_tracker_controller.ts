@@ -1,11 +1,12 @@
 import { CLUE_HUNTS_BY_ID } from '../../../sim/content/clue_hunts';
 import { WISP_MAZE_QUEST_ID } from '../../../sim/content/world_quest_wisp_maze';
-import { QUESTS, WORLD_QUESTS_BY_ID } from '../../../sim/data';
+import { QUESTS, WORLD_QUESTS_BY_ID, zoneAt } from '../../../sim/data';
 import { questObjectiveRequired } from '../../../sim/types';
 import { wispMazeActionsLocked } from '../../../sim/wisp_maze_action_lock';
 import { positionInWorldQuestArea } from '../../../sim/world_quest_area';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
+import { HAUNTED_PUMPKIN_TRACKER_ID, hauntedPumpkinTrackerRow } from '../../haunted_pumpkin_view';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
@@ -14,6 +15,7 @@ import { type QuestTrackingState, sharedQuestTracking } from '../../quest_tracki
 import { forgeInstructionLines } from '../../world_quest_forge_view';
 import { gliderInstructionLines } from '../../world_quest_glider_view';
 import { investigationInstructionLines } from '../../world_quest_investigation_view';
+import { worldQuestReadsCompleted } from '../../world_quest_progress_state';
 import { shadowInstructionLines } from '../../world_quest_shadow_view';
 import { worldQuestTraceProgressInstruction } from '../../world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
@@ -27,6 +29,7 @@ import {
   questTrackerSections,
   type TrackedQuest,
 } from './quest_tracker';
+import { weeklyQuestTrackerRow } from './weekly_quest_tracker_view';
 import { buildWispMazeHud, type WispMazeHudController } from './wisp_maze_hud_controller';
 import { createWorldQuestTrackerVisibility } from './world_quest_tracker_visibility';
 
@@ -48,13 +51,24 @@ export interface QuestTrackerControllerDeps {
   element: HTMLElement;
   document: Document;
   world(): Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'> &
-    Partial<Pick<IWorld, 'abandonQuest' | 'clueHunt'>>;
+    Partial<
+      Pick<
+        IWorld,
+        'abandonQuest' | 'clueHunt' | 'activeSeasonalEvent' | 'hauntedPumpkinsFound' | 'weeklyQuest'
+      >
+    >;
   /** Injectable tracking set; production leaves it out and shares the HUD's one. */
   tracking?: QuestTrackingState;
   settings: QuestTrackerSettingsPort;
   questTitle(questId: string): string;
   objectiveLabel(questId: string, objectiveIndex: number): string;
   click(): void;
+  /**
+   * The group dungeon run as a strip page, or null outside one
+   * (hud/dungeon dungeonStripQuest). TOUCH ONLY: on desktop the run has a
+   * tracker of its own at the top of the stack, so it never joins these rows.
+   */
+  dungeonRow?(): TrackedQuest | null;
 }
 
 /** Owns quest tracker projection, collapse persistence, and elided DOM updates.
@@ -83,6 +97,9 @@ export class QuestTrackerController {
   // tracker rewrote itself each update and the pulse strobed as it was
   // stripped and re-added in a fight.
   private lastHtml: string | null = null;
+  /** The dungeon strip page seen on the previous update: its first sighting
+   *  takes the strip once (see update). An id, never text. */
+  private lastDungeonRowId: string | null = null;
   /** A live movement lesson must remain readable. While it is present its
    *  section's header is a truthful disabled control and cannot mutate the
    *  saved choice. Null when no lesson holds a section open. */
@@ -177,8 +194,12 @@ export class QuestTrackerController {
         (!!progress.wispMaze && !progress.wispMaze.paused && progress.wispMaze.phase !== 'won') ||
         progress.glider?.phase === 'countdown' ||
         progress.glider?.phase === 'flying';
+      // The daily reward stays complete during practice, but an active lesson
+      // still needs its live instructions until the player leaves or finishes.
+      const practicingLesson = progress.state === 'active' && (lessonRunning || !!progress.shadow);
       const complete =
-        progress.state === 'completed' &&
+        worldQuestReadsCompleted(progress) &&
+        !practicingLesson &&
         !(progress.wispMaze && progress.wispMaze.phase !== 'won') &&
         progress.glider?.phase !== 'countdown' &&
         progress.glider?.phase !== 'flying';
@@ -228,7 +249,7 @@ export class QuestTrackerController {
                     quest.objective.type === 'tracing'
                       ? worldQuestTraceProgressInstruction(progress, quest)
                       : worldQuestObjectiveLabel(progress.questId),
-                  current: Math.min(progress.count, quest.count),
+                  current: complete ? quest.count : Math.min(progress.count, quest.count),
                   total: quest.count,
                   ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
                 },
@@ -264,6 +285,18 @@ export class QuestTrackerController {
         ],
       });
     }
+    const weeklyQuest = weeklyQuestTrackerRow(world.weeklyQuest);
+    if (weeklyQuest) quests.push(weeklyQuest);
+    // The zone lookup only runs while an event is open: closed, the row is absent anyway
+    // and the per-frame update stays free of it.
+    const pumpkinRow = world.activeSeasonalEvent
+      ? hauntedPumpkinTrackerRow(
+          world.activeSeasonalEvent,
+          world.hauntedPumpkinsFound ?? [],
+          zoneAt(world.player.pos.x, world.player.pos.z).id,
+        )
+      : null;
+    if (pumpkinRow) quests.push(pumpkinRow);
     // A section with no rows paints no header, so a stale collapse there would
     // hide the next row to arrive behind a header the player never saw close:
     // clear it once, per section.
@@ -278,6 +311,19 @@ export class QuestTrackerController {
     // On touch the strip IS the tracker: the right-anchored markup is hidden in
     // hud.mobile.css, so rendering it would be a string build a phone never sees.
     if (this.strip?.active() === true) {
+      // The dungeon run joins the strip as a page of its own, AFTER the quests:
+      // the selection is positional, so a page that came and went at the front
+      // would shift every quest under the player's thumb. It takes the strip
+      // ONCE, on the tick it first appears (stepping into the dungeon), and is
+      // an ordinary page after that: the player can cycle away, and a boss
+      // falling brings it back through the strip's own progress jump (which a
+      // quest that progressed on the same tick still wins, being listed first).
+      const dungeon = this.deps.dungeonRow?.() ?? null;
+      if (dungeon) {
+        quests.push(dungeon);
+        if (dungeon.id !== this.lastDungeonRowId) focusQuestId ??= dungeon.id;
+      }
+      this.lastDungeonRowId = dungeon ? dungeon.id : null;
       this.strip.update(quests, now, focusQuestId);
       this.paintedSections = new Set();
       if (this.deps.element.innerHTML !== '') this.deps.element.innerHTML = '';
@@ -430,10 +476,15 @@ export class QuestTrackerController {
       // World quests list in their own section; this guard keeps any world
       // quest id that reaches this list plain text (it has no log entry).
       const worldQuest = ownEntry(WORLD_QUESTS_BY_ID, quest.id);
-      const behavior = !worldQuest
-        ? ` role="button" tabindex="0" data-quest="${esc(quest.id)}"`
-        : '';
-      rows += `<div class="qt-title ui-cin"${behavior}><span class="qt-num ui-badge ui-num">${esc(this.number(quest.number))}</span>${esc(quest.title)}${this.completeTag(quest.complete)}</div>`;
+      const behavior =
+        !worldQuest && quest.number > 0
+          ? ` role="button" tabindex="0" data-quest="${esc(quest.id)}"`
+          : '';
+      const badge =
+        quest.number > 0
+          ? `<span class="qt-num ui-badge ui-num">${esc(this.number(quest.number))}</span>`
+          : '';
+      rows += `<div class="qt-title ui-cin"${behavior}>${badge}${esc(quest.title)}${this.completeTag(quest.complete)}</div>`;
       for (const objective of quest.objectives) {
         if (objective.instruction) {
           // A movement lesson instruction is shown in full, with no count.

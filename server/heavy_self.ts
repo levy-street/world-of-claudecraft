@@ -153,6 +153,9 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   // stream, so listing them would only buy a redundant heavy re-serialize.
   'guild_bank_deposit',
   'guild_bank_withdraw',
+  // The Skull Bag's store and take rewrite the carried inventory (store
+  // splices every plain skull stack, take addStacks them back).
+  'skull_bag',
   'pet_feed',
   'dev_give',
   'dev_level',

@@ -46,7 +46,7 @@ export class Rng {
   chance(p: number): boolean {
     return this.next() < p;
   }
-  pick<T>(arr: T[]): T {
+  pick<T>(arr: readonly T[]): T {
     return arr[Math.floor(this.next() * arr.length)];
   }
 }

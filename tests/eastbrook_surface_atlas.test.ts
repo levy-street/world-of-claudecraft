@@ -42,6 +42,30 @@ function sourceAsset(name = 'TownOpaque'): THREE.Group {
   return group;
 }
 
+// Added 2026-10 for the Tidehold rebuild (src/render/eastbrook_placed_building.ts):
+// every layout building is a PLACED model under /models/tidehold/ now, drawn
+// with its own painted materials. Its stand-in carries what such a material
+// carries and the atlas pipeline's does not: its OWN colour map and no vertex
+// colours, on a shell with a footing below the ground line and a table under
+// a G_INT furniture node. Handing it the vertex-coloured, map-less sourceAsset
+// above would pass the Low audit below by accident.
+const PLACED_ASSET_PREFIX = '/models/tidehold/';
+const PLACED_FIXTURE_MESH_COUNT = 2;
+
+function placedSourceAsset(ownMap: THREE.Texture): THREE.Group {
+  const group = new THREE.Group();
+  const walls = new THREE.MeshStandardMaterial({ color: 0xffffff, map: ownMap });
+  walls.name = 'PlacedWalls';
+  group.add(new THREE.Mesh(new THREE.BoxGeometry(6, 5, 4).translate(1, 1.75, 0), walls));
+  const interior = new THREE.Group();
+  interior.name = 'G_INT_furniture';
+  const props = new THREE.MeshStandardMaterial({ color: 0x664422, map: ownMap });
+  props.name = 'PlacedProps';
+  interior.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), props));
+  group.add(interior);
+  return group;
+}
+
 function atlasMaps(root: THREE.Object3D, atlas: THREE.Texture): THREE.Texture[] {
   const maps: THREE.Texture[] = [];
   root.traverse((object) => {
@@ -116,8 +140,19 @@ describe('Eastbrook shared surface atlas', () => {
   it('binds the same map to town, Armoury, and chest on Low while preserving vertex colors', () => {
     setStandardMaterials(false);
     const atlas = new THREE.Texture();
+    const placedMap = new THREE.Texture();
+    const placedUrls = EASTBROOK_TOWN_ASSET_URLS.filter((url) =>
+      url.startsWith(PLACED_ASSET_PREFIX),
+    );
+    expect(placedUrls).toHaveLength(6);
     const townSources = new Map(
-      EASTBROOK_TOWN_ASSET_URLS.map((url) => [url, sourceAsset()] as const),
+      EASTBROOK_TOWN_ASSET_URLS.map(
+        (url) =>
+          [
+            url,
+            url.startsWith(PLACED_ASSET_PREFIX) ? placedSourceAsset(placedMap) : sourceAsset(),
+          ] as const,
+      ),
     );
     const town = eastbrookTownInternalsForTest.buildFromSources(townSources, () => 0, true, atlas);
     const armoury = eastbrookGrandArmouryInternalsForTest.buildArmouryFromSource(
@@ -141,10 +176,15 @@ describe('Eastbrook shared surface atlas', () => {
     // remaining atlas binding is the merged eastbrookTownMicroOpaqueBatch
     // (the wells, stalls, benches and fences): 2 became 1. The Armoury and the
     // banker chest are untouched, so their bindings hold at 1 each.
+    // Re-checked 2026-10 for the Tidehold rebuild: six placed buildings
+    // replaced the eleven kit shells (src/render/eastbrook_placed_building.ts).
+    // They bind their own painted maps, never the atlas, so the town's count
+    // holds at 1.
     const expectedBindings = [1, 1, 1];
 
     expect(maps.length).toBeGreaterThan(0);
     expect(new Set(maps)).toEqual(new Set([atlas]));
+    let placedMeshes = 0;
     for (let rootIndex = 0; rootIndex < roots.length; rootIndex++) {
       const root = roots[rootIndex];
       expect(root.userData.eastbrookSurfaceAtlas).toEqual({
@@ -157,18 +197,37 @@ describe('Eastbrook shared surface atlas', () => {
         // Kit buildings (the KTX2 kit-building path) carry their own palette
         // maps instead of atlas vertex colors; on Low they must still be
         // Lambert, which is the tier contract this audit guards.
+        // Placed buildings (the Tidehold rebuild) keep their own textures the
+        // same way and take the same exemption, found by the building group's
+        // userData.assetUrl. Exempt from the atlas rule only: Lambert on Low
+        // is still required of them, and the map they carry must be their
+        // model's own, never the town atlas.
         let kitAncestor = false;
+        let placedAncestor = false;
         for (let node: THREE.Object3D | null = object; node; node = node.parent) {
           const assetId = node.userData?.assetId as string | undefined;
           if (assetId?.startsWith('/models/biome/')) kitAncestor = true;
+          const assetUrl = node.userData?.assetUrl as string | undefined;
+          if (assetUrl?.startsWith(PLACED_ASSET_PREFIX)) placedAncestor = true;
         }
         const material = object.material as THREE.MeshLambertMaterial;
         expect(material).toBeInstanceOf(THREE.MeshLambertMaterial);
         if (kitAncestor) return;
+        if (placedAncestor) {
+          placedMeshes++;
+          expect(root).toBe(town.group);
+          expect(material.map).toBe(placedMap);
+          expect(material.map).not.toBe(atlas);
+          expect(material.vertexColors).toBe(false);
+          return;
+        }
         expect(material.vertexColors).toBe(true);
         if (material.map) expect(material.map).toBe(atlas);
       });
     }
+    // The exemption is exercised, by every mesh of every placed building: it
+    // is what lets their own-map, vertex-colour-free materials through.
+    expect(placedMeshes).toBe(placedUrls.length * PLACED_FIXTURE_MESH_COUNT);
   });
 
   it('uses the shared map with restrained authored roughness on Standard without color-map aliasing', () => {

@@ -1,22 +1,24 @@
-// The shader corpus record, as background GPU work. Reading a linked
-// program's sources back from the driver (getAttachedShaders,
-// getShaderSource, the attribute walk) is a synchronous round trip that
-// waits for the GPU to finish the frame in flight, and the whole record used
-// to do it for every program of the session in one idle callback: about
-// 1.1 s of main thread on an Intel HD 530 (a 237 ms long task on a desktop
-// iGPU), the window's only long task, 25 s into play. The record is now a
-// client of the renderer's background GPU queue (src/render/CLAUDE.md, "GPU
-// work: every new producer is a client of the scheduler"): one unit per
-// BATCH of program reads, one per JSON chunk encoded, one per chunk fed to
-// the gzip stream, each at the BACKGROUND priority under its own label kind, so
-// the queue's per-frame budget learns what a unit costs on this machine and
-// admits what the frame can carry, behind every live gate. A read unit is a
-// batch, not a program, because the first driver query of a frame waits for
-// the GPU process to catch up with the commands already submitted (measured
-// at 3 to 5 ms per frame on a desktop iGPU with vsync off) while every query
-// after it is cheap: one program per unit paid that wait once per program
-// (1029 ms of getShaderParameter over the record against 77 ms in one shot),
-// a batch pays it once per batch.
+// The shader corpus record, as background GPU work. Each program's sources
+// are read off the shader handles three keeps on its program entry
+// (`vertexShader`, `fragmentShader`) with getShaderSource, plus the attribute
+// walk for the location-0 bind: once a program's link has resolved, every one
+// of those calls is answered inside the page (the browser's WebGL wrappers and
+// the command buffer client's program tables), measured so on Chromium even
+// for programs three has linked but not used yet. A link still pending when
+// the walk reaches it is the one wait left.
+// History: the first queued version found the stages with getAttachedShaders
+// and getShaderParameter(SHADER_TYPE), and that query IS a round trip: it
+// waits until the GPU process has executed every command already submitted.
+// On an Intel HD 530 whose renderer outran its GPU process each read unit paid
+// that whole backlog, about 440 ms; the handle read returns the same sources.
+// Before that, the whole record ran in one idle callback: about 1.1 s of main
+// thread on the HD 530. The record stays a client of the renderer's
+// background GPU queue (src/render/CLAUDE.md, "GPU work: every new producer
+// is a client of the scheduler"): one unit per BATCH of program reads, one
+// per JSON chunk encoded, one per chunk fed to the gzip stream, each at the
+// BACKGROUND priority under its own label kind, so the budget prices each
+// kind on this machine and admits what the frame can carry, behind every
+// live gate.
 // The bytes stored are exactly the ones the single-shot record produced: the
 // same programs in the same order and the same JSON text (pinned byte for
 // byte against the single-shot encoder in Node; the gzip stream is the
@@ -42,12 +44,11 @@ export interface CorpusRecordQueue {
 
 /** Cosmetic, deferred work: below every prewarm debt and every live gate. */
 export const CORPUS_RECORD_PRIORITY = GPU_WORK_PRIORITY.BACKGROUND;
-/** Programs read per queue unit: enough to amortize the per-frame drain the
- *  first read waits for, few enough that a unit stays inside one frame on
- *  the HD 530 (about 1.7 ms per program there). */
+/** Programs read per queue unit: bounds how many units the record takes, and
+ *  what one unit can pay if a program's link is still pending. */
 export const CORPUS_READ_BATCH = 8;
 /** Three label KINDS (the part before the colon), so the budget prices a
- *  driver read-back, a JSON encode and a gzip feed separately; the instance
+ *  source read, a JSON encode and a gzip feed separately; the instance
  *  after the colon names the read batch or the chunk, so the queue's
  *  slowest-unit readouts say which one cost the frame. */
 export const CORPUS_READ_KIND = 'corpus-read';
@@ -83,26 +84,31 @@ function index0AttributeOf(gl: CorpusGl, program: WebGLProgram): string {
   return '';
 }
 
-/** One program's sources off the context, or null for an entry with no
- *  linked program, no attached shaders, or a missing stage. */
+/** What `programSourcesOfEntry` reads off one of three's program entries
+ *  (`renderer.info.programs`, three's WebGLProgram wrapper). */
+interface ProgramEntryHandles {
+  program?: unknown;
+  vertexShader?: unknown;
+  fragmentShader?: unknown;
+}
+
+/** One program's sources off three's own shader handles, or null for an entry
+ *  with no linked program, a missing handle, or an empty stage. */
 export function programSourcesOfEntry(gl: CorpusGl, entry: unknown): ShaderProgramSources | null {
-  const program = (entry as { program?: unknown } | null)?.program;
+  const handles = entry as ProgramEntryHandles | null;
   // The walk spans frames; a material disposed meanwhile has had its wrapper's
-  // `.program` nulled by three's destroy() right after deleteProgram, so this
-  // check is what skips it (no isProgram query: that is one more synchronous
-  // round trip per program, of the class this record exists to avoid).
-  if (!program) return null;
-  const shaders = gl.getAttachedShaders(program as WebGLProgram);
-  if (!shaders) return null;
-  let vertex = '';
-  let fragment = '';
-  for (const shader of shaders) {
-    const source = gl.getShaderSource(shader) ?? '';
-    if (gl.getShaderParameter(shader, gl.SHADER_TYPE) === gl.VERTEX_SHADER) vertex = source;
-    else fragment = source;
-  }
+  // `.program` nulled by three's destroy() right after deleteProgram, and its
+  // shaders may have been freed with it, so this check comes before any source
+  // read (no isProgram query: that one waits on the GPU process).
+  if (!handles?.program || !handles.vertexShader || !handles.fragmentShader) return null;
+  const vertex = gl.getShaderSource(handles.vertexShader as WebGLShader) ?? '';
+  const fragment = gl.getShaderSource(handles.fragmentShader as WebGLShader) ?? '';
   if (!vertex || !fragment) return null;
-  return { vertex, fragment, index0Attribute: index0AttributeOf(gl, program as WebGLProgram) };
+  return {
+    vertex,
+    fragment,
+    index0Attribute: index0AttributeOf(gl, handles.program as WebGLProgram),
+  };
 }
 
 function contextLost(gl: CorpusGl): boolean {

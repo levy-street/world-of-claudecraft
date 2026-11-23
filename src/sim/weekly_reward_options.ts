@@ -54,8 +54,12 @@ export function weeklyRewardTableOptions(
   choice: WeeklyChoice,
   cls: PlayerClass,
   level: number,
+  lootSpec?: string,
 ): WeeklyRewardTableOption[] {
-  return weeklyFilterTablesByLevel(weeklyRewardTableCandidates(batch, choice, cls), level);
+  return weeklyFilterTablesByLevel(
+    weeklyRewardTableCandidates(batch, choice, cls, lootSpec),
+    level,
+  );
 }
 
 export function weeklyFilterTablesByLevel(tables: WeeklyRewardTableOption[], level: number) {
@@ -70,16 +74,17 @@ export function weeklyRewardTableCandidates(
   batch: WeeklyVaultBatch,
   choice: WeeklyChoice,
   cls: PlayerClass,
+  lootSpec?: string,
 ): WeeklyRewardTableOption[] {
   if (!needsWeeklyBossTable(choice.pool)) {
     const reserved = new Set(batch.choices.map((entry) => entry.itemId));
-    const items = weeklyLootPool(choice.pool, cls, batch.raidUnlocks).filter(
+    const items = weeklyLootPool(choice.pool, cls, batch.raidUnlocks, lootSpec).filter(
       (id) => !reserved.has(id),
     );
     return items.length ? [{ id: choice.pool, kind: 'pool', items }] : [];
   }
   const groups = new Map<string, WeeklyRewardTableOption>();
-  for (const table of weeklyAvailableBossTables(batch, choice, cls)) {
+  for (const table of weeklyAvailableBossTables(batch, choice, cls, lootSpec)) {
     const items = table.items;
     if (!items.length) continue;
     const id = table.category === 'dungeon' ? table.dungeonId : table.bossId;

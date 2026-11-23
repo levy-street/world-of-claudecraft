@@ -9,6 +9,7 @@ import type { RiftFloorView } from '../world_api';
 import { themedRoomProfile } from './hoard_room_kit_core';
 import { bossRoomThemeFor } from './hoard_room_themes_core';
 import {
+  type HoardValleyZoneId,
   type HoardValleyZoneProfile,
   hoardValleyProfile,
   isHoardValleyZoneId,
@@ -23,7 +24,13 @@ const SKY_ANCHORS = Object.freeze({
   wraithwood: { x: 398, z: 1662 },
   palmreach: { x: -402, z: 750 },
   galecrest: { x: 480, z: 326 },
-});
+  eastbrook_vale: { x: -10, z: -21 },
+  mirefen_marsh: { x: 52, z: 305 },
+  thornpeak_heights: { x: -76, z: 699 },
+  veiled_hollow: { x: -116, z: 1006 },
+  evergarden: { x: 324, z: 851 },
+  farshore_isle: { x: 367, z: 25 },
+} satisfies Record<HoardValleyZoneId, { x: number; z: number }>);
 
 export interface HoardValleyEnvironment {
   floor: RiftFloorPlan;

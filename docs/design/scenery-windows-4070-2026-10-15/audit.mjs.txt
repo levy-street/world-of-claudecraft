@@ -1,0 +1,42 @@
+import fs from 'node:fs';
+import {valid} from '../../scripts/scenery_review/checks.mjs';
+const root='tmp/scenery-review';
+const directory='windows-2026-10-14T20-00-14.839Z';
+const data=JSON.parse(fs.readFileSync(`${root}/${directory}/results.json`));
+const issues=[];
+const keys=new Set();
+const expectedGpu=/RTX\s*4070\s+Laptop/i;
+let windows=0, frames=0, multiple=0, skips=0;
+for(const row of data.rows){
+  const key=[row.tier,row.order,row.mode,row.scene].join('/');
+  const require=(ok,message)=>{if(!ok)issues.push({key,message});};
+  require(!keys.has(key),'Duplicate matrix row'); keys.add(key);
+  require(row.samples.length===2,'Expected two windows');
+  require(fs.existsSync(`${root}/${directory}/${key.replaceAll('/','-')}.webp`),'Missing screenshot');
+  for(const audit of [row.before,row.after]){
+    require(!audit.detail?.pending,'Pending scenery detail');
+    require(row.tier==='low'||audit.identityFailures===0,'Material identity failure');
+    require(row.mode==='existing'?audit.detail===null:!!audit.detail,'Incorrect scenery arm');
+    require(row.tier==='low'||row.mode==='existing'||audit.detail.emptyDrawGuard,'Missing empty draw guard');
+  }
+  for(const sample of row.samples){
+    windows++;frames+=sample.submitted;multiple+=sample.multiple;skips+=sample.skips;
+    require(valid(sample,row.before.snapshot,expectedGpu),'Benchmark validator rejected accepted window');
+    require(sample.multiple===0&&sample.skips===0,'Callback accounting does not match one submitted frame');
+    require(sample.frames.length===sample.submitted&&sample.callbacks===sample.submitted,'Frame array count mismatch');
+    require(sample.elapsedMs>=20000,'Short measurement window');
+    require(sample.frames.every(x=>Number.isFinite(x)&&x>0),'Invalid frame interval');
+    const target=row.scene==='thornpeak'?{x:30,z:700}:{x:-352,z:806};
+    for(const point of [sample.start,...sample.points,sample.end]){
+      require(point.player.x===target.x&&point.player.z===target.z,'Wrong stationary location');
+      require(point.scale===1&&point.postRung==='full','Unexpected scale or post-processing rung');
+    }
+  }
+}
+const missing=[];
+for(const tier of ['low','medium','high','ultra','insane'])for(const order of ['forward','reverse'])for(const mode of ['existing','updated'])for(const scene of ['thornpeak','beach']){
+  const key=[tier,order,mode,scene].join('/');if(!keys.has(key))missing.push(key);
+}
+const out={at:new Date().toISOString(),source:`${directory}/results.json`,complete:data.complete,rows:data.rows.length,windows,submittedFrames:frames,multiple,skips,excludedBlocks:data.excluded.length,pageErrors:data.errors,consoleErrors:data.consoleErrors.length,missing,issues,pass:data.complete&&data.rows.length===40&&windows===80&&!missing.length&&!issues.length&&!data.errors.length};
+fs.writeFileSync(`${root}/audit.json`,JSON.stringify(out,null,2));
+console.log(JSON.stringify(out,null,2));

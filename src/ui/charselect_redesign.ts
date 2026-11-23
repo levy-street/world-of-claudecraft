@@ -26,7 +26,12 @@ import {
 } from '../render/characters/modular';
 import type { RosterLookRow } from '../render/characters/player_look_core';
 import type { PlayerClass } from '../sim/types';
-import { type AppearanceCustomizer, mountAppearanceCustomizer } from './appearance_customizer';
+import {
+  type AppearanceCustomizer,
+  type AppearanceEditorStage,
+  mountAppearanceEditor,
+  usesWocHeadBuilder,
+} from './appearance_editor_mount';
 import { forgetAppearancePanel, noteAppearancePanelMounted } from './appearance_panel_locale';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { t } from './i18n';
@@ -65,6 +70,9 @@ export interface RedesignEditorDeps {
   refreshRoster(): Promise<void>;
   /** Map a rejected save to a sentence a player can read. */
   errorText(err: unknown): string;
+  /** The shared 3D stage, read live: the face builder eases it to the face
+   *  close-up while a face category is open (optional; no stage, no zoom). */
+  stage?: () => AppearanceEditorStage | null;
 }
 
 /** The panel id the locale probe tracks this editor's customizer under. */
@@ -108,7 +116,10 @@ export class CharselectRedesignEditor {
    *  while the helm is hidden. */
   private loadout(c: RedesignTarget): ArmorLoadout {
     const full = fullSet(classArmorSet(c.class));
-    return this.helmHidden ? { ...full, head: null } : full;
+    // A WOC body is always previewed bare-headed: the face builder has no helm
+    // row, and the face being redesigned must show. Preview only; Save still
+    // posts the character's own helm preference.
+    return this.helmHidden || usesWocHeadBuilder(c.class) ? { ...full, head: null } : full;
   }
 
   /** Push the current draft onto the 3D stage. Safe to call at any time; a
@@ -214,8 +225,9 @@ export class CharselectRedesignEditor {
     const title = document.getElementById('charselect-reroll-title');
     if (title) title.textContent = t('character.redesignTitle', { name: c.name });
     this.ui?.destroy();
-    this.ui = mountAppearanceCustomizer(host, {
+    this.ui = mountAppearanceEditor(host, c.class, {
       value: this.draft,
+      stage: this.deps.stage,
       onChange: (next) => {
         this.draft = next;
         this.drivePreview();

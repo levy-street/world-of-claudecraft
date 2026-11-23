@@ -18,6 +18,10 @@ export const PERF_ATTRIB_KNOB_CASES = [
   { knob: 'terrainRelief', gfxo: 'terrainRelief:0' },
   { knob: 'bladeCarpetRadius', gfxo: 'bladeCarpetRadius:0' },
   { knob: 'cliffScree', gfxo: 'cliffScree:0' },
+  { knob: 'cityClutter', gfxo: 'cityClutter:0' },
+  // The low-preset ring radius, paired with its flag the way canopyDetailTaps is:
+  // city_clutter.ts consults both, so this row tightens the ring to the low radius.
+  { knob: 'cityClutterRadius', gfxo: 'cityClutterRadius:30' },
   { knob: 'canopyDetail', gfxo: 'canopyDetail:0' },
   // Each row carries its LOW-preset value, so this one is 0: it sheds the
   // canopy taps while leaving the layer's textures resident, which the
@@ -33,6 +37,13 @@ export const PERF_ATTRIB_KNOB_CASES = [
   { knob: 'terrainSplat', gfxo: 'terrainSplat:0' },
   { knob: 'maxPointLights', gfxo: 'maxPointLights:6' },
   { knob: 'farCharacterAnimScale', gfxo: 'farCharacterAnimScale:1' },
+  // The Low scenery levers (scenery_detail.ts and static_instance_cells.ts):
+  // the distance bands, the far geometry LOD swap distance, the coconut batch
+  // grid, and the Low readability lift on the hemisphere and sun.
+  { knob: 'sceneryDetail', gfxo: 'sceneryDetail:1' },
+  { knob: 'sceneryGeometryLodDistance', gfxo: 'sceneryGeometryLodDistance:180' },
+  { knob: 'coconutCellSize', gfxo: 'coconutCellSize:128' },
+  { knob: 'lowReadabilityLighting', gfxo: 'lowReadabilityLighting:1' },
 ];
 
 export const PERF_ATTRIB_COMBINED_CASES = [

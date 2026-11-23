@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, resolvePosition, supportHeightAt } from '../src/sim/colliders';
-import { STATIONS } from '../src/sim/content/professions';
-import { NPCS, OVERWORLD_GRAVEYARDS, PLAYER_START } from '../src/sim/data';
+import { getActiveWorldContent, NPCS, OVERWORLD_GRAVEYARDS, PLAYER_START } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics';
 import { GRAVE_COUNT, graveHeight, graveOffset } from '../src/sim/prop_layout';
 import { STATION_PROP_SIZES, townPropPlacements } from '../src/sim/town_props';
 import { groundHeight } from '../src/sim/world';
 
-const anchors = () => STATIONS.map((st) => ({ type: st.type, x: st.pos.x, z: st.pos.z }));
+// Use the same relocated service anchors as the renderer and collider builder.
+const stations = () => getActiveWorldContent().services?.stations ?? [];
+const anchors = () => stations().map((st) => ({ type: st.type, x: st.pos.x, z: st.pos.z }));
 const townNpcs = () => {
   const out: { x: number; z: number }[] = [];
   for (const npc of Object.values(NPCS)) {
@@ -97,7 +98,7 @@ describe('town furniture is traversable, not a maze of walls', () => {
     // The anchor prop sits ON the station position, which is also where the
     // proximity gate measures from: a body must still be able to stand within
     // interaction range of it rather than being pushed out of reach.
-    for (const st of STATIONS) {
+    for (const st of stations()) {
       const near = resolvePosition(SEED, st.pos.x + 2.2, st.pos.z, R);
       const dist = Math.hypot(near.x - st.pos.x, near.z - st.pos.z);
       expect(dist, st.id).toBeLessThan(4);

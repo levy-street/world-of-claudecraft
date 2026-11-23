@@ -10,6 +10,14 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { audio } from '../src/game/audio';
 import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
 import { deedName } from '../src/ui/deed_i18n';
@@ -756,6 +764,7 @@ describe('touch long-press peek', () => {
       painter.match(
         /if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}/g,
       )?.length,
+      // Watch, title and border.
     ).toBe(3);
     // Association, not just count: the guard is the FIRST statement of each
     // action handler specifically, never merely present somewhere in the file.

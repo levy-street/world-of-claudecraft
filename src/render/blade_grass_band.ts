@@ -22,16 +22,49 @@
 // blade root is, by construction, the same colour as the pixel under it.
 
 import * as THREE from 'three';
-import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
-import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
-import { clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass';
+import {
+  getActiveWorldContent,
+  isBuiltinWorldActive,
+  isBuiltinWorldContent,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
+import { grassClearedAt } from '../sim/grass_clear';
+import { roadDistance, terrainCutAtHeight, terrainHeight, zoneBiomeAt } from '../sim/world';
+import { bladeSwayGlsl, clusterGeometry, clusterPlacementPad, mulberry32 } from './blade_grass';
+import {
+  activateDenseSlot,
+  type DenseSlotState,
+  deactivateDenseSlot,
+} from './blade_grass_dense_core';
 import { toroidalCell } from './blade_grass_pool_core';
 import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
-import { insideGrassHubExclusion } from './foliage_core';
+import {
+  eastbrookGrassExclusions,
+  insideAnyBuildingFootprint,
+  insideEastbrookGrassExclusion,
+  insideGrassHubExclusion,
+  insidePavedGrassExclusion,
+} from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
+import { foliageShoreSkip } from './foliage_shore_gate_core';
 import { GFX, sharedUniforms } from './gfx';
+import {
+  createGrassEdgeTaperContext,
+  GRASS_HUB_INNER_RADIUS,
+  GRASS_ROAD_INNER_RADIUS,
+  grassEdgeCoverageScale,
+  grassEdgeHeightScale,
+  grassEdgeTaperAt,
+  grassEdgeWidthScale,
+} from './grass_edge_taper_core';
 import { getGrassGroundBake } from './grass_ground_bake';
+import {
+  attachGrassInteractionUniforms,
+  grassBladeInteractionGlsl,
+} from './grass_interaction_core';
 import {
   GRASS_PAINT_TRIM,
   MEADOW_BAND_BASE_RECOVER_Y,
@@ -40,6 +73,11 @@ import {
   MEADOW_BAND_FADE_START,
   MEADOW_BAND_PLACE_BUDGET,
   MEADOW_BAND_RADIUS,
+  MEADOW_CAMERA_CLEAR_FAR,
+  MEADOW_CAMERA_CLEAR_NEAR,
+  meadowClusterHeight,
+  meadowClusterScale,
+  meadowCoverage,
 } from './meadow_tuning';
 import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
@@ -54,12 +92,24 @@ export interface BladeGrassBandView {
    * uses: dungeons and interiors never draw the band.
    */
   update(px: number, pz: number, bandFar: number, outdoor: boolean): void;
+  /** Palette lab: re-place every slot (same spots, fresh ground colour) over
+   *  the next frames at the normal placement budget. Nothing hides meanwhile:
+   *  a slot keeps its old tint until its turn. */
+  recolor(): void;
+}
+
+// The live view, so the palette lab can recolour it without a renderer field
+// (a graphics rebuild constructs a new one, which replaces this).
+let liveView: BladeGrassBandView | null = null;
+export function recolorLiveBladeGrassBandView(): void {
+  liveView?.recolor();
 }
 
 export function buildBladeGrassBand(
   seed: number,
   initialPx: number,
   initialPz: number,
+  forceEditorCarpet = false,
 ): BladeGrassBandView {
   const group = new THREE.Group();
   group.name = 'bladeGrassBand';
@@ -67,15 +117,18 @@ export function buildBladeGrassBand(
   // carpet keep their existing look. ?meadowband=off is the dev
   // perf-attribution kill switch.
   const RADIUS = MEADOW_BAND_RADIUS;
-  if (GFX.bladeCarpetRadius <= 0 || renderLayerDisabled('meadowband')) {
-    return { group, update: () => undefined };
+  if ((GFX.bladeCarpetRadius <= 0 && !forceEditorCarpet) || renderLayerDisabled('meadowband')) {
+    // A tier without the carpet still replaces the live view, so a rebuild
+    // never keeps the old carpet's buffers reachable from here.
+    liveView = { group, update: () => undefined, recolor: () => undefined };
+    return liveView;
   }
   const CELL = MEADOW_BAND_CELL;
   const GRID_W = Math.ceil((RADIUS * 2) / CELL);
   const POOL = GRID_W * GRID_W;
 
   const rng = mulberry32(seed ^ 0x6b1a);
-  const geo = clusterGeometry(rng);
+  const geo = clusterGeometry(rng, 2);
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 0.92,
@@ -98,17 +151,24 @@ export function buildBladeGrassBand(
         )
       : new THREE.Vector3(0.62, 0.62, 0.62),
   };
+  // Resolved once at build, like the near carpet (bladeSwayGlsl).
+  const classicSway = isBuiltinWorldActive();
+  mat.customProgramCacheKey = () =>
+    `${mat.onBeforeCompile.toString()}|blade-sway:${classicSway ? 'classic' : 'wind'}`;
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uPlayerPos;
     sh.uniforms.uBandFar = uBandFar;
     sh.uniforms.uBaseSink = uBaseSink;
+    attachGrassInteractionUniforms(sh.uniforms);
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
         `#include <common>
         uniform float uTime;
         uniform vec2 uPlayerPos;
+        uniform vec4 uGrassMove;
+        uniform vec4 uGrassWake;
         uniform float uBandFar;
         uniform vec3 uBaseSink;`,
       )
@@ -137,15 +197,25 @@ export function buildBladeGrassBand(
           float bgFade = 1.0 - smoothstep(uBandFar * ${MEADOW_BAND_FADE_START.toFixed(2)},
             uBandFar, distance(bgOrigin.xz, uPlayerPos));
           transformed *= bgFade;
-          // the carpet's sway, verbatim: one meadow, one wind
-          float bgPhase = bgOrigin.x * 1.7 + bgOrigin.z * 2.3;
-          float bgSway = (sin(uTime * 2.1 + bgPhase) + 0.4 * sin(uTime * 3.7 + bgPhase * 1.31))
-            * 0.085 * position.y * position.y;
-          transformed.x += bgSway;
-          transformed.z += bgSway * 0.7;
+          // camera-near collapse: blades within a few yards of the eye shrink
+          // to their roots, so a low chase camera never looks through a wall
+          // of oversized near blades (the painted-meadow trick)
+          transformed *= smoothstep(${MEADOW_CAMERA_CLEAR_NEAR.toFixed(1)}, ${MEADOW_CAMERA_CLEAR_FAR.toFixed(1)},
+            distance(bgOrigin, cameraPosition));
+          // the carpet's sway, shared: one meadow, one wind; branched around
+          // once the fade has collapsed the blade
+          ${bladeSwayGlsl(classicSway)}
+          ${grassBladeInteractionGlsl()}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
+    sh.fragmentShader = sh.fragmentShader.replace(
+      '#include <normal_fragment_begin>',
+      `#include <normal_fragment_begin>
+      #ifdef DOUBLE_SIDED
+        normal *= faceDirection;
+      #endif`,
+    );
   };
 
   // the carpet's sector split, verbatim: one mesh per sector of the slot grid,
@@ -176,6 +246,19 @@ export function buildBladeGrassBand(
     return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
   };
 
+  const activeContent = getActiveWorldContent();
+  const townExclusions = eastbrookGrassExclusions(
+    activeContent.props.buildings,
+    isBuiltinWorldContent(activeContent),
+    activeContent.services?.noticeboards ?? [],
+  );
+  const edgeTaperCtx = createGrassEdgeTaperContext(
+    activeContent.zones,
+    townExclusions,
+    activeContent.props.buildings,
+    activeContent.grassClear,
+  );
+
   // The carpet's placeSlot, at the band's cell size: same coverage gate,
   // same road/water/slope/hub rules, same size classes, same tint. The two
   // systems must stay one look; if a rule changes there, change it here.
@@ -187,28 +270,42 @@ export function buildBladeGrassBand(
     if (ok) {
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
-      ok = r1 < (0.44 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
-      if (ok) ok = roadDistance(x, z) > 2.4;
-      if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
+      const baseCoverage = meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
+      const rd = roadDistance(x, z);
+      ok = r1 < baseCoverage;
+      if (ok) ok = rd > GRASS_ROAD_INNER_RADIUS;
+      // The maker's painted no-grass discs, same as the near carpet: a city
+      // floor has to be clear in BOTH bands or the meadow reappears the moment
+      // the player steps back from it.
+      if (ok) ok = !grassClearedAt(activeContent.grassClear, x, z);
+      if (ok) ok = !insideGrassHubExclusion(activeContent.zones, x, z, GRASS_HUB_INNER_RADIUS);
+      if (ok) ok = !insidePavedGrassExclusion(x, z);
+      if (ok) ok = !insideEastbrookGrassExclusion(townExclusions, x, z, 0.85);
+      if (ok) ok = !insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85);
       if (ok) {
         const h = terrainHeight(x, z, seed);
-        ok = h > WATER_LEVEL + 1.4;
+        ok = !foliageShoreSkip(x, z, h, seed);
+        // no band tufts floating over a boolean cut (mirrors the near carpet)
+        if (ok) ok = !terrainCutAtHeight(x, z, h);
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
-          const lushHere = 0.5 + lush * 0.6;
-          let s = (0.22 + hash(ci, cj, 3) * 0.34) * lushHere;
-          const rTuft = hash(ci, cj, 4);
-          if (rTuft < 0.1) s *= 1.5 + rTuft * 3.0;
-          q.setFromAxisAngle(up, r1 * 12.9);
-          const rLean = hash(ci, cj, 5);
-          leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
-          q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
-          const hJit = 0.82 + hash(ci, cj, 6) * 0.36;
-          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5) * hJit, s));
-          groundGrassColorAt(x, z, seed, c);
-          c.multiplyScalar(1.18);
-          sectorPool.place(slot, m, c);
-          return;
+          const edgeTaper = grassEdgeTaperAt(edgeTaperCtx, x, z, rd);
+          if (r1 < baseCoverage * grassEdgeCoverageScale(edgeTaper)) {
+            const baseScale = meadowClusterScale(lush, hash(ci, cj, 3), hash(ci, cj, 4));
+            const s = baseScale * grassEdgeWidthScale(edgeTaper);
+            q.setFromAxisAngle(up, r1 * 12.9);
+            const rLean = hash(ci, cj, 5);
+            leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
+            q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
+            const sy =
+              meadowClusterHeight(baseScale, lush, hash(ci, cj, 6)) *
+              grassEdgeHeightScale(edgeTaper);
+            m.compose(v.set(x, h - 0.02, z), q, sv.set(s, sy, s));
+            groundGrassColorAt(x, z, seed, c);
+            c.multiplyScalar(1.18);
+            sectorPool.place(slot, m, c);
+            return;
+          }
         }
       }
     }
@@ -248,9 +345,14 @@ export function buildBladeGrassBand(
   let lastBaseI = initialBaseI;
   let lastBaseJ = initialBaseJ;
   let pending = false;
+  let fastRefill = false;
 
-  return {
+  const view: BladeGrassBandView = {
     group,
+    recolor(): void {
+      slotCell.fill(0x7fffffff);
+      pending = true;
+    },
     update(px: number, pz: number, bandFar: number, outdoor: boolean): void {
       group.visible = outdoor;
       if (!outdoor) return;
@@ -259,14 +361,23 @@ export function buildBladeGrassBand(
       const baseI = Math.floor(px / CELL) - (GRID_W >> 1);
       const baseJ = Math.floor(pz / CELL) - (GRID_W >> 1);
       if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
+      if (Math.abs(baseI - lastBaseI) >= GRID_W || Math.abs(baseJ - lastBaseJ) >= GRID_W) {
+        fastRefill = true;
+      }
       lastBaseI = baseI;
       lastBaseJ = baseJ;
       // re-placed slots this frame. Ranges are queued per sector, never
       // cleared here: the renderer clears them after it actually uploads, so
       // a skipped frame keeps its pending spans alive.
-      pending = scanTargetBlock(baseI, baseJ, MEADOW_BAND_PLACE_BUDGET);
+      const budget = fastRefill
+        ? Math.max(MEADOW_BAND_PLACE_BUDGET, Math.ceil(POOL / 4))
+        : MEADOW_BAND_PLACE_BUDGET;
+      pending = scanTargetBlock(baseI, baseJ, budget);
+      if (!pending) fastRefill = false;
       sectorPool.queueUploads();
       sectorPool.syncSectors();
     },
   };
+  liveView = view;
+  return view;
 }

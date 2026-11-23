@@ -80,7 +80,7 @@ function radialBandGeometry(
   return geometry;
 }
 
-function arrowsGeometry(): THREE.BufferGeometry {
+function arrowsGeometry(radius = VARKHUL_SHARED_PYRE_RADIUS): THREE.BufferGeometry {
   const positions: number[] = [];
   const indices: number[] = [];
   const arrows = 8;
@@ -90,8 +90,8 @@ function arrowsGeometry(): THREE.BufferGeometry {
     const forwardZ = Math.cos(angle);
     const tangentX = Math.cos(angle);
     const tangentZ = -Math.sin(angle);
-    const tipRadius = VARKHUL_SHARED_PYRE_RADIUS * 0.53;
-    const baseRadius = VARKHUL_SHARED_PYRE_RADIUS * 0.78;
+    const tipRadius = radius * 0.53;
+    const baseRadius = radius * 0.78;
     const vertex = positions.length / 3;
     positions.push(
       forwardX * tipRadius,
@@ -112,7 +112,7 @@ function arrowsGeometry(): THREE.BufferGeometry {
   return geometry;
 }
 
-function swirlGeometry(): THREE.BufferGeometry {
+function swirlGeometry(radius = VARKHUL_SHARED_PYRE_RADIUS): THREE.BufferGeometry {
   const positions: number[] = [];
   const indices: number[] = [];
   const arms = 3;
@@ -121,8 +121,8 @@ function swirlGeometry(): THREE.BufferGeometry {
     for (let index = 0; index < segments; index++) {
       const progressA = index / segments;
       const progressB = (index + 1) / segments;
-      const radiusA = 0.9 + progressA * (VARKHUL_SHARED_PYRE_RADIUS * 0.72 - 0.9);
-      const radiusB = 0.9 + progressB * (VARKHUL_SHARED_PYRE_RADIUS * 0.72 - 0.9);
+      const radiusA = 0.9 + progressA * (radius * 0.72 - 0.9);
+      const radiusB = 0.9 + progressB * (radius * 0.72 - 0.9);
       const angleA = (arm / arms) * Math.PI * 2 + progressA * Math.PI * 1.55;
       const angleB = (arm / arms) * Math.PI * 2 + progressB * Math.PI * 1.55;
       const halfWidth = 0.1;
@@ -150,7 +150,10 @@ function swirlGeometry(): THREE.BufferGeometry {
   return geometry;
 }
 
-function occupancyGeometry(requiredPlayers: number): THREE.BufferGeometry {
+function occupancyGeometry(
+  requiredPlayers: number,
+  empty: THREE.Color = EMPTY_COLOR,
+): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];
@@ -175,8 +178,7 @@ function occupancyGeometry(requiredPlayers: number): THREE.BufferGeometry {
       0.105,
       centerZ + half,
     );
-    for (let index = 0; index < 4; index++)
-      colors.push(EMPTY_COLOR.r, EMPTY_COLOR.g, EMPTY_COLOR.b);
+    for (let index = 0; index < 4; index++) colors.push(empty.r, empty.g, empty.b);
     indices.push(vertex, vertex + 1, vertex + 2, vertex, vertex + 2, vertex + 3);
   }
   const geometry = new THREE.BufferGeometry();
@@ -260,57 +262,100 @@ function callInBeacon(): THREE.Group {
   return beacon;
 }
 
+/**
+ * The look of one shared-soak marker. The default is the Shared Pyre's fire; Balgath's
+ * Barrow Burden (balgath_ranged_fx.ts) passes its own brown palette and radius and swaps
+ * the fire call-in for its dust vortex, so both soaks share one marker mechanism.
+ */
+export interface SoakTelegraphStyle {
+  radius: number;
+  fill: number;
+  fillOpacity: number;
+  rim: number;
+  swirl: number;
+  arrows: number;
+  timer: number;
+  ready: number;
+  occupied: number;
+  empty: number;
+  /** The Shared Pyre's flame and beacon call-in. Off for a soak with its own call-in. */
+  fireCallIn: boolean;
+}
+
+export const IGNIVAR_SOAK_DEFAULT_STYLE: Readonly<SoakTelegraphStyle> = Object.freeze({
+  radius: VARKHUL_SHARED_PYRE_RADIUS,
+  fill: 0xb85a08,
+  fillOpacity: 0.16,
+  rim: 0xffcf58,
+  swirl: 0xff8f1f,
+  arrows: 0xffe29a,
+  timer: 0xfff0ae,
+  ready: 0xfff4bd,
+  occupied: 0xffd36a,
+  empty: 0x58210c,
+  fireCallIn: true,
+});
+
 export function buildIgnivarSoakTelegraph(
   requiredPlayers = VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+  style: Readonly<SoakTelegraphStyle> = IGNIVAR_SOAK_DEFAULT_STYLE,
 ): THREE.Group {
   const occupancySlots = Math.max(1, Math.floor(requiredPlayers));
+  const radius = style.radius;
   const root = new THREE.Group();
   root.name = IGNIVAR_SOAK_VISUAL_NAME;
   root.userData.renderCategory = 'ui3d';
   root.userData.requiredPlayers = occupancySlots;
   root.userData.occupancySlots = occupancySlots;
+  if (style !== IGNIVAR_SOAK_DEFAULT_STYLE) {
+    root.userData.occupiedColor = new THREE.Color(style.occupied);
+    root.userData.emptyColor = new THREE.Color(style.empty);
+  }
 
   const fill = new THREE.Mesh(
-    discGeometry(VARKHUL_SHARED_PYRE_RADIUS, 64, 0.04),
-    material(0xb85a08, 0.16),
+    discGeometry(radius, 64, 0.04),
+    material(style.fill, style.fillOpacity),
   );
   fill.name = IGNIVAR_SOAK_FILL_NAME;
   fill.renderOrder = floorVfxRenderOrder('encounter', 1);
   const rim = new THREE.Mesh(
-    radialBandGeometry(VARKHUL_SHARED_PYRE_RADIUS - 0.22, VARKHUL_SHARED_PYRE_RADIUS, 64, 0.064),
-    material(0xffcf58, 0.94),
+    radialBandGeometry(radius - 0.22, radius, 64, 0.064),
+    material(style.rim, 0.94),
   );
   rim.name = IGNIVAR_SOAK_RIM_NAME;
   rim.renderOrder = floorVfxRenderOrder('encounter', 4);
-  const swirl = new THREE.Mesh(swirlGeometry(), material(0xff8f1f, 0.44));
+  const swirl = new THREE.Mesh(swirlGeometry(radius), material(style.swirl, 0.44));
   swirl.name = IGNIVAR_SOAK_SWIRL_NAME;
   swirl.renderOrder = floorVfxRenderOrder('encounter', 2);
-  const arrows = new THREE.Mesh(arrowsGeometry(), material(0xffe29a, 0.86));
+  const arrows = new THREE.Mesh(arrowsGeometry(radius), material(style.arrows, 0.86));
   arrows.name = IGNIVAR_SOAK_ARROWS_NAME;
   arrows.renderOrder = floorVfxRenderOrder('encounter', 3);
   const occupancyMaterial = material(0xffffff, 0.96);
   occupancyMaterial.vertexColors = true;
-  const occupancy = new THREE.Mesh(occupancyGeometry(occupancySlots), occupancyMaterial);
+  const occupancy = new THREE.Mesh(
+    occupancyGeometry(occupancySlots, root.userData.emptyColor ?? EMPTY_COLOR),
+    occupancyMaterial,
+  );
   occupancy.name = IGNIVAR_SOAK_OCCUPANCY_NAME;
   occupancy.renderOrder = floorVfxRenderOrder('encounter', 5);
   const timer = new THREE.Mesh(
-    radialBandGeometry(
-      VARKHUL_SHARED_PYRE_RADIUS - 0.48,
-      VARKHUL_SHARED_PYRE_RADIUS - 0.32,
-      64,
-      0.082,
-    ),
-    material(0xfff0ae, 0.74),
+    radialBandGeometry(radius - 0.48, radius - 0.32, 64, 0.082),
+    material(style.timer, 0.74),
   );
   timer.name = IGNIVAR_SOAK_TIMER_NAME;
   timer.renderOrder = floorVfxRenderOrder('encounter', 5);
   timer.userData.fullIndexCount = timer.geometry.index?.count ?? 0;
-  const ready = new THREE.Mesh(radialBandGeometry(0.4, 0.82, 32, 0.112), material(0xfff4bd, 0.98));
+  const ready = new THREE.Mesh(
+    radialBandGeometry(0.4, 0.82, 32, 0.112),
+    material(style.ready, 0.98),
+  );
   ready.name = IGNIVAR_SOAK_READY_NAME;
   ready.renderOrder = floorVfxRenderOrder('encounter', 6);
   ready.visible = false;
 
-  root.add(fill, swirl, arrows, rim, timer, occupancy, callInFlame(), callInBeacon(), ready);
+  root.add(fill, swirl, arrows, rim, timer, occupancy);
+  if (style.fireCallIn) root.add(callInFlame(), callInBeacon());
+  root.add(ready);
   root.visible = false;
   return root;
 }
@@ -348,7 +393,10 @@ export function syncIgnivarSoakTelegraph(
     const colors = occupancy.geometry.getAttribute('color') as THREE.BufferAttribute;
     const occupancySlots = Math.max(1, Math.floor(Number(root.userData.occupancySlots ?? 4)));
     for (let slot = 0; slot < occupancySlots; slot++) {
-      const color = slot < root.userData.playersInside ? OCCUPIED_COLOR : EMPTY_COLOR;
+      const color =
+        slot < root.userData.playersInside
+          ? (root.userData.occupiedColor ?? OCCUPIED_COLOR)
+          : (root.userData.emptyColor ?? EMPTY_COLOR);
       for (let vertex = 0; vertex < 4; vertex++)
         colors.setXYZ(slot * 4 + vertex, color.r, color.g, color.b);
     }

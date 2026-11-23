@@ -1,8 +1,16 @@
 import * as THREE from 'three';
-import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import {
+  DUNGEON_X_THRESHOLD,
+  getActiveWorldContent,
+  isBuiltinWorldActive,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { GFX } from './gfx';
+import { moteKeepOutFade } from './motes_keepout_core';
 
 // ---------------------------------------------------------------------------
 // Ambient motes — a render-only field of drifting airborne specks (pollen in
@@ -100,6 +108,13 @@ export function buildMotes(seed: number): MotesView {
 
   const positions = new Float32Array(count * 3);
   const colors = new Float32Array(count * 3);
+  // each mote's biome tint at full strength; `colors` is this scaled by the
+  // keep-out fade (motes_keepout_core.ts), so a mote drifting through the
+  // player's own column fades out instead of sitting on them as a light ball.
+  // Additive blending, so a black vertex colour draws nothing: no program change.
+  const baseColors = new Float32Array(count * 3);
+  // the fade last written per mote (-1 forces the next write)
+  const fadeNow = new Float32Array(count).fill(-1);
   // per-mote animation state: drift phase, bob amplitude, base ground height
   const phase = new Float32Array(count);
   const bobAmp = new Float32Array(count);
@@ -110,6 +125,18 @@ export function buildMotes(seed: number): MotesView {
 
   const tmpColor = new THREE.Color();
   let colorsDirty = false;
+
+  // Park an unusable mote: it keeps its last position, so its colour goes to black
+  // (draws nothing under additive blending) or a leftover speck could sit in the
+  // player's column unfaded. place() resets fadeNow, so a later re-home restores it.
+  function park(i: number): void {
+    baseY[i] = -1e6;
+    colors[i * 3] = 0;
+    colors[i * 3 + 1] = 0;
+    colors[i * 3 + 2] = 0;
+    fadeNow[i] = 0;
+    colorsDirty = true;
+  }
 
   // (re)home a single mote to a random spot inside the ring around the player,
   // re-sampling terrain + biome tint. Returns false when the spot is unusable
@@ -133,10 +160,10 @@ export function buildMotes(seed: number): MotesView {
     positions[i * 3 + 1] = h + bobAmp[i];
     positions[i * 3 + 2] = z;
     tmpColor.setHex(MOTE_TINT[biome]);
-    colors[i * 3] = tmpColor.r;
-    colors[i * 3 + 1] = tmpColor.g;
-    colors[i * 3 + 2] = tmpColor.b;
-    colorsDirty = true;
+    baseColors[i * 3] = tmpColor.r;
+    baseColors[i * 3 + 1] = tmpColor.g;
+    baseColors[i * 3 + 2] = tmpColor.b;
+    fadeNow[i] = -1; // the update below writes the faded colour this frame
     return true;
   }
 
@@ -144,7 +171,8 @@ export function buildMotes(seed: number): MotesView {
   const positionAttribute = new THREE.BufferAttribute(positions, 3).setUsage(
     THREE.DynamicDrawUsage,
   );
-  const colorAttribute = new THREE.BufferAttribute(colors, 3);
+  // re-uploaded whenever a mote's keep-out fade moves (motes_keepout_core.ts)
+  const colorAttribute = new THREE.BufferAttribute(colors, 3).setUsage(THREE.DynamicDrawUsage);
   geo.setAttribute('position', positionAttribute);
   geo.setAttribute('color', colorAttribute);
 
@@ -171,6 +199,12 @@ export function buildMotes(seed: number): MotesView {
   return {
     group,
     update(px: number, pz: number, dt: number): void {
+      // The shipped world's ambience only: an authored map opts in
+      // (TerrainStyle.motes), so a maker's city carries no stray gold specks.
+      if (!isBuiltinWorldActive() && getActiveWorldContent().terrainStyle?.motes !== true) {
+        group.visible = false;
+        return;
+      }
       if (px > DUNGEON_X_THRESHOLD) {
         group.visible = false; // dungeons live outside the strip — no motes indoors
         seeded = false;
@@ -179,7 +213,7 @@ export function buildMotes(seed: number): MotesView {
       group.visible = true;
       if (!seeded) {
         for (let i = 0; i < count; i++) {
-          if (!place(i, px, pz)) baseY[i] = -1e6; // park unusable motes far below
+          if (!place(i, px, pz)) park(i); // park unusable motes far below
         }
         seeded = true;
       }
@@ -190,7 +224,7 @@ export function buildMotes(seed: number): MotesView {
         const dz = homeZ[i] - pz;
         if (dx * dx + dz * dz > RADIUS * RADIUS) {
           if (!place(i, px, pz)) {
-            baseY[i] = -1e6;
+            park(i);
             continue;
           }
         }
@@ -199,6 +233,18 @@ export function buildMotes(seed: number): MotesView {
         positions[i * 3] = homeX[i] + Math.sin(ph) * 0.5;
         positions[i * 3 + 1] = baseY[i] + bobAmp[i] + Math.sin(ph * 1.3) * 0.35;
         positions[i * 3 + 2] = homeZ[i] + Math.cos(ph * 0.8) * 0.5;
+        // Write-elided: only a mote whose keep-out fade moved rewrites its colour,
+        // so only the few motes drifting inside the ramp band ever re-upload.
+        const fade = moteKeepOutFade(positions[i * 3] - px, positions[i * 3 + 2] - pz);
+        // (the ends always land exactly, so a mote never parks at a near-zero glow)
+        const prev = fadeNow[i];
+        if (fade !== prev && (Math.abs(fade - prev) > 0.01 || fade === 0 || fade === 1)) {
+          fadeNow[i] = fade;
+          colors[i * 3] = baseColors[i * 3] * fade;
+          colors[i * 3 + 1] = baseColors[i * 3 + 1] * fade;
+          colors[i * 3 + 2] = baseColors[i * 3 + 2] * fade;
+          colorsDirty = true;
+        }
       }
       positionAttribute.needsUpdate = true;
       if (colorsDirty) {

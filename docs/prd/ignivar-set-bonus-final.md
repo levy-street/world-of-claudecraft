@@ -33,10 +33,12 @@ rider "Damage taken no longer delays your spellcasting."; marked [rider].
   the declared set fantasy; furious_mending is a FLOOR (max(pct, 0.2)),
   so the 4pc is inert inside that 10s window, stated honestly.
   Same-change: "30 percent chance" copy x3 + "3 percent" copy + locales.]
-- Forgewall 2pc: "Iron Resolve converts rage at 5 absorb per point
-  instead of 4." [absorbSpentResource mult; one-line scaleEffect
-  extension; no cross-class collateral. Same-change: "4 damage per rage"
-  copy x2 + locales.]
+- Forgewall 2pc: "Iron Resolve's shield absorbs 25% of your maximum
+  health instead of 20%." [buffPct 0.25 on the resolved absorb
+  casterMaxHpPct (applyTalentMods' buffPct absorb arm); no cross-class
+  collateral. Amended when Iron Resolve moved from a spend-all rage shield
+  (4 absorb per rage, 5 for wearers) to a flat 20 rage shield worth 20
+  percent of max health; `FORGEWALL_2PC_SHIELD_PCT_MAX` pins the number.]
 - Forgewall 4pc: "Casting Shieldcrack reduces Iron Resolve's remaining
   cooldown by 2 sec." [2 not 3: Colossal Might compounding at 3 drove
   the effective cooldown under the 10s absorb, destroying the undrained

@@ -13,17 +13,24 @@ import { type DayNightDevHud, tryDayNightDevCommand } from './daynight_dev_comma
 import { tryIgnivarPlacerCommand } from './ignivar_placer';
 
 export interface DevChatHookDeps {
-  hud: DayNightDevHud & { log(text: string, color?: string): void };
+  hud: DayNightDevHud & {
+    log(text: string, color?: string): void;
+    devCommandsAvailable?: boolean;
+  };
   renderer: {
     scene: THREE.Scene;
     worldCompileGate(): ((target: THREE.Object3D) => Promise<unknown>) | undefined;
   };
   world: QuestPlacerWorld & { player: Entity | undefined; chat(text: string): void };
+  /** The offline world: its sim and its sky share ONE clock, so `/dev servertime` is
+   *  answered here like /daynight (daynight_dev_command.ts). Online it goes to the server. */
+  offline?: boolean;
 }
 
 export function tryDevChatHooks(raw: string, deps: DevChatHookDeps): boolean {
-  if (!import.meta.env.DEV) return false;
-  if (tryDayNightDevCommand(raw, deps.hud)) return true;
+  const devAllowed = import.meta.env.DEV || deps.hud.devCommandsAvailable === true;
+  if (!devAllowed) return false;
+  if (tryDayNightDevCommand(raw, deps.hud, devAllowed, deps.offline === true)) return true;
   return tryIgnivarPlacerCommand(raw, {
     scene: deps.renderer.scene,
     compilePreview: deps.renderer.worldCompileGate(),

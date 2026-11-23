@@ -58,7 +58,7 @@ describe('mob/locomotion: recoverFromFlee (pure helper, no ctx)', () => {
 describe('mob/locomotion: resetEvadingMob', () => {
   it('full-heals, drops combat, clears threat/auras, and re-arms the telegraph timers', () => {
     const sim = makeSim();
-    const mob = createMob(900001, MOBS.korgath_the_bound, 20, { x: 0, y: 0, z: 0 }) as AnyEntity;
+    const mob = createMob(900001, MOBS.ossuary_sentinel, 20, { x: 0, y: 0, z: 0 }) as AnyEntity;
     (sim as any).addEntity(mob);
     mob.hp = 1;
     mob.aiState = 'evade';
@@ -85,7 +85,7 @@ describe('mob/locomotion: resetEvadingMob', () => {
     expect(mob.hasFled).toBe(false);
     expect(mob.auras.length).toBe(0);
     expect(mob.threat.size).toBe(0);
-    expect(mob.stompTimer).toBe(MOBS.korgath_the_bound.stomp!.every);
+    expect(mob.stompTimer).toBe(MOBS.ossuary_sentinel.stomp!.every);
   });
 });
 

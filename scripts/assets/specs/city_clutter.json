@@ -1,0 +1,15 @@
+{
+  "defaults": { "type": "static" },
+  "items": [
+    { "src": "tmp/asset_src/clutter/tile_broken.glb", "out": "models/clutter/tile_broken.glb" },
+    { "src": "tmp/asset_src/clutter/tile_shards.glb", "out": "models/clutter/tile_shards.glb" },
+    { "src": "tmp/asset_src/clutter/pebbles.glb", "out": "models/clutter/pebbles.glb" },
+    { "src": "tmp/asset_src/clutter/stones.glb", "out": "models/clutter/stones.glb" },
+    { "src": "tmp/asset_src/clutter/letter.glb", "out": "models/clutter/letter.glb" },
+    { "src": "tmp/asset_src/clutter/paper_scraps.glb", "out": "models/clutter/paper_scraps.glb" },
+    { "src": "tmp/asset_src/clutter/leaves.glb", "out": "models/clutter/leaves.glb" },
+    { "src": "tmp/asset_src/clutter/straw.glb", "out": "models/clutter/straw.glb" },
+    { "src": "tmp/asset_src/clutter/splinters.glb", "out": "models/clutter/splinters.glb" },
+    { "src": "tmp/asset_src/clutter/pot_shards.glb", "out": "models/clutter/pot_shards.glb" }
+  ]
+}

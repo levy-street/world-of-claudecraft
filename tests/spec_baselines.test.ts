@@ -72,10 +72,9 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   // 0.08 -> 0.04, ambush's own dmgPct 0.16 -> 0 (removed). Straight reductions
   // of existing legacy fields; no offense-only component involved.
   'rogue/subtlety': {
-    stats: { agi: 7, crit: 0.1, dodge: 0.05 },
+    stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.45 },
     global: { meleeDmgPct: 0.04 },
     abilities: {
-      stealth: { cooldownPct: -0.7 },
       backstab: { dmgPct: 0.16 },
     },
   },
@@ -117,6 +116,8 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
       chain_lightning: { castPct: -0.333333 },
       earth_shock: { dmgPct: 0.18, costPct: -0.15 },
       flame_shock: { costPct: -0.2 },
+      // v0.45.0 rotation fix: Magma Burst takes Arc Bolt's Mana discount.
+      lava_burst: { costPct: -0.35 },
     },
   },
   'shaman/enhancement': {
@@ -182,6 +183,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     abilities: {
       maul: { dmgPct: 0.35 },
       claw: { dmgPct: 0.15 },
+      scratch: { dmgPct: 0.15 },
       swipe: { dmgPct: 0.2 },
     },
   },
@@ -376,8 +378,8 @@ describe('v0.28 passive restoration hotfix', () => {
       return sim.player.attackPower;
     };
     const bare = apFor(null);
-    for (const spec of ['assassination', 'combat']) {
-      // apPct is 0.20 to 0.36 across these specs, plus crit/flat AP (combat's flat
+    for (const spec of ['assassination', 'combat', 'subtlety']) {
+      // apPct is 0.20 to 0.57 across these specs, plus crit/flat AP (combat's flat
       // AP 24 carries it over the floor even at the lower apPct); both clear a 1.3x
       // AP floor over the spec-less rogue. A dropped apPct wiring fails here.
       expect(apFor(spec), spec).toBeGreaterThan(bare * 1.3);
@@ -389,9 +391,10 @@ describe('v0.28 passive restoration hotfix', () => {
     // Skulduggery numeric budget removed subtlety's apPct entirely (0.12 -> 0),
     // so the agi-7 stat alone now carries the whole delta over bare: 125. A
     // dropped agi row would read back at bare (118). Re-pin with the values on
-    // the next re-band.
+    // the next re-band. The rogue tweak pass re-bands it: apPct 0 -> 0.45 puts
+    // subtlety back over the 1.3x floor above, and the exact pin moves to 181.
     expect(bare).toBe(118);
-    expect(apFor('subtlety'), 'subtlety').toBe(125);
+    expect(apFor('subtlety'), 'subtlety').toBe(181);
   });
 
   it('adds no baseline when no specialization is selected', () => {

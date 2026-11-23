@@ -172,6 +172,7 @@ describe('horizon apron draws as frustum-cullable blocks', () => {
       // One vertex buffer: the blocks index into the SAME upload, so the
       // build-time bake and the editor refit still write through all of them.
       expect(block.geometry.attributes.position).toBe(position);
+      // Under the zone sheets' order (it discards inside them; see water.ts).
       expect(block.renderOrder).toBeLessThan(0);
       const box = block.geometry.boundingBox;
       expect(box, 'a block without bounds can never be culled').not.toBeNull();

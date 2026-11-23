@@ -1,10 +1,23 @@
-// Nature's Boon, the Wildfang autoattack passive (v0.43 feral pass).
+// Nature's Boon, the Wildfang autoattack passive (v0.43 feral pass), and its
+// Groveheart twin (Groveheart rework pass 2).
 //
-// Every LANDED melee auto-attack a committed feral druid makes has a 1-in-15
-// chance to arm one free spell for 10 seconds, which at Cat Form's fixed 1.0
-// sec swing reads as about one proc every 15 seconds. The armed window covers
-// BOTH members at once and the player chooses which to spend it on: whichever
-// of Wildbloom or Oakhide is cast first consumes it, and the other reverts.
+// Wildfang: every LANDED melee auto-attack a committed feral druid makes can
+// arm one free spell for 10 seconds, at about 4 procs per minute in every
+// form: the per-swing chance scales with the swing's base interval (the
+// classic procs-per-minute shape), so Cat Form's fixed 1.0 sec swing and
+// Bruin Form's faster-than-weapon swing land the same rate. The armed window
+// covers BOTH members at once and the player chooses which to spend it on:
+// whichever of Wildbloom or Oakhide is cast first consumes it, and the other
+// reverts. Every proc also clears Oakhide's cooldown, so a window that lands
+// while Oakhide is cooling down can still be spent on it.
+//
+// Groveheart: every tick of a heal-over-time effect a committed restoration
+// druid owns has a 10% chance (behind a 10 sec internal cooldown, so the rate
+// holds near 2 per minute however many HoTs are out) to arm a caster window
+// covering Spore Burst: free, 25% stronger, and castable in any form.
+//
+// Moongrove: every completed Wildbolt or Skyfall cast has the same 10% chance
+// behind its own 10 sec internal cooldown to arm Spore Burst.
 //
 // Two things make the window worth having in a form, and both are deliberate:
 //
@@ -32,35 +45,71 @@
 // Cinderbark 2pc precedent in druid_engines.ts). It is one draw per landed
 // MELEE auto-attack, never per ability swing and never per wand bolt.
 import type { SimContext } from '../sim_context';
-import type { Entity } from '../types';
+import type { Aura, Entity } from '../types';
+import { baseSwingSpeed, CAT_FORM_SWING_SPEED } from './form_swing';
 
 export const NATURES_BOON_ID = 'natures_boon';
 /** The English aura name. Localized at the client through the sim_i18n
  *  matcher, like every other sim-emitted aura name. */
 export const NATURES_BOON_NAME = "Nature's Boon";
-/** Per landed auto-attack. */
-// Tuned to land a proc roughly every 15 sec. Cat Form swings at a fixed 1.0 sec
-// (combat/form_swing.ts CAT_FORM_SWING_SPEED), so one landed auto-attack per
-// second makes 1-in-15 the rate that reads as "about every 15 seconds". Bruin
-// Form swings on the equipped weapon's slower speed, so a bear procs it
-// correspondingly less often; the chance is per SWING, not per second.
-export const NATURES_BOON_CHANCE = 1 / 15;
+/** Wildfang procs per minute of landed auto-attacks, in every form. */
+export const NATURES_BOON_PPM = 4;
+/** The per-swing chance at a given base swing interval: PPM times the swing's
+ *  seconds over 60, so a slower swing rolls a bigger chance and the per-minute
+ *  rate holds (combat/form_swing.ts baseSwingSpeed: Cat Form's fixed 1.0 sec,
+ *  Bruin Form's half-weapon interval, the weapon's own speed otherwise). */
+export function naturesBoonChanceAt(swingSeconds: number): number {
+  return (NATURES_BOON_PPM * swingSeconds) / 60;
+}
+/** The Cat Form per-swing chance (1 in 15 at the fixed 1.0 sec swing), the
+ *  number the Wildfang spec text advertises as "about every 15 sec". */
+export const NATURES_BOON_CHANCE = naturesBoonChanceAt(CAT_FORM_SWING_SPEED);
+/** Groveheart: per tick of an owned heal-over-time effect. */
+export const GROVEHEART_BOON_TICK_CHANCE = 0.1;
+/** Groveheart: no second proc for this long after one lands. */
+export const GROVEHEART_BOON_ICD = 10;
+/** procState.icds key for the Groveheart internal cooldown. */
+export const GROVEHEART_BOON_ICD_KEY = 'dru_grove_natures_boon';
+/** Moongrove: per completed Wildbolt or Skyfall cast. */
+export const MOONGROVE_BOON_CAST_CHANCE = 0.1;
+/** Moongrove: no second proc for this long after one lands. */
+export const MOONGROVE_BOON_ICD = 10;
+/** procState.icds key for the Moongrove internal cooldown. */
+export const MOONGROVE_BOON_ICD_KEY = 'dru_moon_natures_boon';
+/** The casts that roll the Moongrove chance: Wildbolt and Skyfall. */
+const MOONGROVE_BOON_TRIGGER_IDS: ReadonlySet<string> = new Set(['wrath', 'starfire']);
+/** The ability whose cooldown every Wildfang proc clears. */
+export const OAKHIDE_ID = 'barkskin';
 /** An armed window also makes its spell 25% stronger. */
 export const NATURES_BOON_POWER = 1.25;
+/** The Wildbloom arm of the window is 50% stronger (a heal payoff tuned above
+ *  the Oakhide arm), read through naturesBoonPowerFor like the base power. */
+export const NATURES_BOON_WILDBLOOM_POWER = 1.5;
 /** How long the armed window lasts, in seconds. */
 export const NATURES_BOON_DURATION = 10;
 
-/** The spells the window pays for: Wildbloom (`rejuvenation`) in any form, and
+/** The spells the window pays for: Sporemending (`rejuvenation`) in any form, and
  *  Oakhide (`barkskin`) in Bruin Form only. Both are armed together and the
  *  first one cast wins, so the window is a choice between a heal and a
  *  mitigation cooldown rather than a free nuke. Both are authored instant, so
- *  nothing here has to touch cast time. */
+ *  only the Groveheart window (Wildmend) touches cast time. */
 // Aura.empowerAbilities is a MUTABLE string[] that applyAura stores by
 // reference, so every armed window gets its own copy. Handing out this module
 // constant instead would share one array across every player and every Sim in
 // the process, which is exactly the module-holds-state trap src/sim/CLAUDE.md
 // warns about.
 export const NATURES_BOON_ABILITIES: readonly string[] = ['rejuvenation', 'barkskin'];
+/** The spell a Groveheart window pays for: Spore Burst. */
+export const GROVEHEART_BOON_ABILITIES: readonly string[] = ['spore_burst'];
+/** The spell a Moongrove window pays for: Spore Burst, already instant. */
+export const MOONGROVE_BOON_ABILITIES: readonly string[] = ['spore_burst'];
+const ANY_BOON_ABILITY: ReadonlySet<string> = new Set([
+  ...NATURES_BOON_ABILITIES,
+  ...GROVEHEART_BOON_ABILITIES,
+  ...MOONGROVE_BOON_ABILITIES,
+]);
+/** Every spell any window can pay for (the action bar watches these). */
+export const ALL_NATURES_BOON_ABILITIES: readonly string[] = [...ANY_BOON_ABILITY];
 
 /** Members the window only pays for while the druid is a bear. Oakhide is a
  *  Bruin mitigation cooldown, so a free one out of Bruin Form would be a free
@@ -70,9 +119,6 @@ export const NATURES_BOON_ABILITIES: readonly string[] = ['rejuvenation', 'barks
  *  else. */
 const NATURES_BOON_BEAR_ONLY: ReadonlySet<string> = new Set(['barkskin']);
 const BEAR_FORM_KIND = 'form_bear';
-function boonAbilityList(): string[] {
-  return [...NATURES_BOON_ABILITIES];
-}
 
 /** Structural, so both a sim Aura and the action bar's mirrored aura fit. */
 interface BoonAura {
@@ -100,9 +146,11 @@ export function naturesBoonFormAllows(
 /** The multiplier an armed window puts on its spell's magnitudes, applied to a
  *  COPY of the resolved ability before its effects resolve (the consumeOverload
  *  shape in combat/casting_lifecycle.ts). 1 when no window covers this cast, so
- *  an ordinary Wildbloom or Oakhide is untouched. */
+ *  an ordinary Sporemending or Oakhide is untouched. Sporemending takes its own
+ *  stronger multiplier; every other member takes the base power. */
 export function naturesBoonPowerFor(auras: readonly BoonAura[], abilityId: string): number {
-  return naturesBoonArmedFor(auras, abilityId) ? NATURES_BOON_POWER : 1;
+  if (!naturesBoonArmedFor(auras, abilityId)) return 1;
+  return abilityId === 'rejuvenation' ? NATURES_BOON_WILDBLOOM_POWER : NATURES_BOON_POWER;
 }
 
 /** Is a Nature's Boon window armed for this exact ability right now? The one
@@ -112,7 +160,7 @@ export function naturesBoonArmedFor(
   auras: readonly BoonAura[],
   abilityId: string | undefined,
 ): boolean {
-  if (abilityId === undefined || !NATURES_BOON_ABILITIES.includes(abilityId)) return false;
+  if (abilityId === undefined || !ANY_BOON_ABILITY.has(abilityId)) return false;
   if (!naturesBoonFormAllows(auras, abilityId)) return false;
   return auras.some(
     (aura) =>
@@ -123,20 +171,33 @@ export function naturesBoonArmedFor(
   );
 }
 
-/** Is this player a committed feral druid? The gate that must pass BEFORE the
- *  roll, so nobody else's rng stream moves. */
-function isWildfangDruid(ctx: SimContext, player: Entity): boolean {
+/** The cast time an armed Groveheart window leaves on its spell. Current
+ *  Groveheart boon spells are already instant, but the shared resolution chain
+ *  keeps this hook so any future cast-time member agrees across tooltip, action
+ *  bar, and server cast start. */
+export function naturesBoonCastTime(
+  auras: readonly BoonAura[],
+  abilityId: string,
+  castTime: number,
+): number {
+  if (castTime <= 0 || !GROVEHEART_BOON_ABILITIES.includes(abilityId)) return castTime;
+  return naturesBoonArmedFor(auras, abilityId) ? 0 : castTime;
+}
+
+/** Is this player a committed druid of the given spec? The gate that must
+ *  pass BEFORE the roll, so nobody else's rng stream moves. */
+function isDruidOfSpec(ctx: SimContext, player: Entity, spec: string): boolean {
   if (player.kind !== 'player') return false;
   const meta = ctx.players.get(player.id);
   if (!meta || meta.cls !== 'druid') return false;
-  return ctx.playerMods(meta).spec === 'feral';
+  return ctx.playerMods(meta).spec === spec;
 }
 
 /** Arm the window, replacing any window already running (a fresh proc refreshes
  *  the 10 sec rather than stacking). Both arms emit the proc flash: a refresh
  *  is a proc the player can see and act on (a fresh 10 sec), so a silent one
  *  would read as the window quietly outliving its timer. */
-function armNaturesBoon(ctx: SimContext, player: Entity): void {
+function armNaturesBoon(ctx: SimContext, player: Entity, abilities: readonly string[]): void {
   const existing = player.auras.find(
     (aura) => aura.id === NATURES_BOON_ID && aura.sourceId === player.id,
   );
@@ -144,7 +205,7 @@ function armNaturesBoon(ctx: SimContext, player: Entity): void {
     existing.kind = 'next_cast_free';
     existing.remaining = NATURES_BOON_DURATION;
     existing.duration = NATURES_BOON_DURATION;
-    existing.empowerAbilities = boonAbilityList();
+    existing.empowerAbilities = [...abilities];
   } else {
     ctx.applyAura(player, {
       id: NATURES_BOON_ID,
@@ -155,7 +216,7 @@ function armNaturesBoon(ctx: SimContext, player: Entity): void {
       value: 0,
       sourceId: player.id,
       school: 'nature',
-      empowerAbilities: boonAbilityList(),
+      empowerAbilities: [...abilities],
     });
   }
   ctx.emit({
@@ -167,11 +228,62 @@ function armNaturesBoon(ctx: SimContext, player: Entity): void {
   });
 }
 
-/** The landed-auto-attack hook (combat/auto_attack.ts). Rolls the 1-in-15 only
- *  for a committed feral druid; everybody else returns before touching the
- *  rng. */
+/** The landed-auto-attack hook (combat/auto_attack.ts). Rolls the
+ *  swing-scaled chance only for a committed feral druid; everybody else
+ *  returns before touching the rng. A proc also clears Oakhide's cooldown. */
 export function naturesBoonOnAutoAttack(ctx: SimContext, player: Entity): void {
-  if (!isWildfangDruid(ctx, player)) return;
-  if (!ctx.rng.chance(NATURES_BOON_CHANCE)) return;
-  armNaturesBoon(ctx, player);
+  if (!isDruidOfSpec(ctx, player, 'feral')) return;
+  if (!ctx.rng.chance(naturesBoonChanceAt(baseSwingSpeed(player)))) return;
+  armNaturesBoon(ctx, player, NATURES_BOON_ABILITIES);
+  player.cooldowns.delete(OAKHIDE_ID);
+}
+
+/** Roll a caster spec's chance behind its internal cooldown. The cooldown is
+ *  checked BEFORE the roll, so a druid inside it draws nothing. */
+function rollCasterBoon(
+  ctx: SimContext,
+  player: Entity,
+  icdKey: string,
+  icd: number,
+  chance: number,
+  abilities: readonly string[],
+): void {
+  if (player.procState?.icds[icdKey] !== undefined) return;
+  if (!ctx.rng.chance(chance)) return;
+  if (!player.procState) player.procState = { counters: {}, icds: {} };
+  player.procState.icds[icdKey] = icd;
+  armNaturesBoon(ctx, player, abilities);
+}
+
+/** The completed-cast hook (combat/talent_procs.ts onCastCompleted). A
+ *  committed balance druid's Wildbolt or Skyfall rolls the Moongrove chance;
+ *  every other cast and every other player returns before the rng. */
+export function naturesBoonOnCast(ctx: SimContext, player: Entity, abilityId: string): void {
+  if (!MOONGROVE_BOON_TRIGGER_IDS.has(abilityId)) return;
+  if (!isDruidOfSpec(ctx, player, 'balance')) return;
+  rollCasterBoon(
+    ctx,
+    player,
+    MOONGROVE_BOON_ICD_KEY,
+    MOONGROVE_BOON_ICD,
+    MOONGROVE_BOON_CAST_CHANCE,
+    MOONGROVE_BOON_ABILITIES,
+  );
+}
+
+/** The heal-over-time tick hook (combat/auras.ts). A committed restoration
+ *  druid's own HoT tick rolls the Groveheart chance when the internal cooldown
+ *  is clear; the gate and the cooldown check both pass BEFORE the roll, so no
+ *  other player's stream moves and a druid inside the cooldown draws nothing. */
+export function naturesBoonOnHotTick(ctx: SimContext, source: Entity | null, aura: Aura): void {
+  if (!source || source.dead || aura.kind !== 'hot' || aura.sourceId !== source.id) return;
+  if (!isDruidOfSpec(ctx, source, 'restoration')) return;
+  rollCasterBoon(
+    ctx,
+    source,
+    GROVEHEART_BOON_ICD_KEY,
+    GROVEHEART_BOON_ICD,
+    GROVEHEART_BOON_TICK_CHANCE,
+    GROVEHEART_BOON_ABILITIES,
+  );
 }

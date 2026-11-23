@@ -4,6 +4,8 @@
 // It is Three/DOM/i18n-free and writes into a caller-owned plan so the painter
 // can reuse one object across every building and frame.
 
+import { occluderFadesDisabled } from './occluder_fade_core';
+
 export interface EastbrookRoofVisibilityTarget {
   x: number;
   z: number;
@@ -13,6 +15,9 @@ export interface EastbrookRoofVisibilityTarget {
   sine: number;
   topY: number;
   cullRadius: number;
+  /** A building with an open doorway the player walks into
+   *  (eastbrook_layout.ts `walkIn`). */
+  walkIn?: boolean;
 }
 
 export interface EastbrookRoofVisibilityPlan {
@@ -114,12 +119,16 @@ export function eastbrookCameraSegmentHitsRoof(
   camY: number,
   camZ: number,
 ): boolean {
-  if (
-    (eyeY < target.topY && pointInsideRoof(target, eyeX, eyeZ)) ||
-    (camY < target.topY && pointInsideRoof(target, camX, camZ))
-  ) {
-    return true;
-  }
+  if (occluderFadesDisabled()) return false;
+  const eyeInside = eyeY < target.topY && pointInsideRoof(target, eyeX, eyeZ);
+  const cameraInside = camY < target.topY && pointInsideRoof(target, camX, camZ);
+  // A walk-in building is a room the player stands in: while the camera is in
+  // there too, nothing of the building stands between them, so it stays solid
+  // (the same rule as Fenbridge's, fenbridge_town_visibility_core.ts). A
+  // camera that ends up outside its walls or over its roof line still fades
+  // it, so the player is never lost behind a wall.
+  if (target.walkIn && eyeInside) return !cameraInside;
+  if (eyeInside || cameraInside) return true;
   const entry = segmentRoofEntry(target, eyeX, eyeZ, camX, camZ);
   return entry >= 0 && entry <= 1 && eyeY + (camY - eyeY) * entry < target.topY;
 }
@@ -140,8 +149,10 @@ export function eastbrookRoofVisibilityPlanInto(
   eyeY: number,
   eyeZ: number,
   fogFar: number,
+  cullX = camX,
+  cullZ = camZ,
 ): EastbrookRoofVisibilityPlan {
-  out.visible = eastbrookFogVisible(camX, camZ, target.x, target.z, fogFar, target.cullRadius);
+  out.visible = eastbrookFogVisible(cullX, cullZ, target.x, target.z, fogFar, target.cullRadius);
   if (!out.visible) {
     out.hidden = wasHidden;
     out.hiddenChanged = false;

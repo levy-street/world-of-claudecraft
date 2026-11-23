@@ -644,6 +644,105 @@
       "source": "Owner-provided original artwork",
       "owner": "Levy Street account",
       "license": "Owner-provided artwork, used with permission (Levy Street), rights reserved"
+    },
+    {
+      "abilityId": "lunge",
+      "output": "lunge.webp",
+      "sourcePack": "missing-skills-v045-2026-10-22",
+      "sourceFile": "tmp/imagegen/v045-skills/originals/lunge.png",
+      "source": "OpenAI built-in image generation; one separate generation per ability",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A powerful golden-brown lynx with black ear tufts and amber eyes launching forward in a long horizontal leap, forepaws reaching with claws, compressed hindquarters and a short tail. A bold green arc and speed streaks behind it communicate an immediate gap-closing pounce. One lynx, no humanoid and no other animal.",
+      "generationPrompt": "Use case: stylized-concept. Asset type: one borderless square hand-painted fantasy MMORPG ability icon for World of ClaudeCraft, lunge. Subject and mechanic: A powerful golden-brown lynx with black ear tufts and amber eyes launching forward in a long horizontal leap, forepaws reaching with claws, compressed hindquarters and a short tail. A bold green arc and speed streaks behind it communicate an immediate gap-closing pounce. One lynx, no humanoid and no other animal. Palette: golden fur, forest green motion and dark teal shadows. Rich painterly fantasy illustration, dramatic lighting, one dominant bold action silhouette filling 80 percent of frame, crisp focal edges, quieter peripheral atmosphere. Entire subject inside frame with safe margin, legible at 22 and 32 pixels, opaque full-square background. Fresh original composition. No text, letters, numerals, watermark, logo, UI border, frame, rarity chrome, flat vector glyph, collage or sprite sheet. Output square 1024x1024.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/cat_form.webp",
+          "role": "Visual identity/style review anchor, not an image-edit input",
+          "sha256": "b44b297c23f8680adea35187964c8d4836f585d5cb16e75a6e69160ca17bb504"
+        },
+        {
+          "path": "public/ui/skills/druid/pounce.webp",
+          "role": "Visual identity/style review anchor, not an image-edit input",
+          "sha256": "2786e05605f52987caf23a717a65eb7425abf86ae7f63981407f5a3402ac4c53"
+        },
+        {
+          "path": "public/ui/courier/donkey.webp",
+          "role": "Visual identity/style review anchor, not an image-edit input",
+          "sha256": "e64a307fb593151bdebe77fb5010b13631d356e4cf6ac6c06cee82862a3097ce"
+        },
+        {
+          "path": "public/ui/items/clockwork_shock_bomb.webp",
+          "role": "Visual identity/style review anchor, not an image-edit input",
+          "sha256": "b29424c6a7c17325cfc0d9d99d9c715a99353d918a9d2d08ae5c92f21f36a2cf"
+        }
+      ],
+      "provenanceRecord": "docs/achievements/missing-skills-v045-2026-10-22/accepted-art.json"
+    },
+    {
+      "abilityId": "hamstring_bite",
+      "output": "hamstring_bite.webp",
+      "sourcePack": "missing-skills-v045-2026-10-22",
+      "sourceFile": "tmp/imagegen/v045-skills/originals/hamstring_bite.png",
+      "source": "OpenAI built-in image generation; one separate generation per ability",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A close-up golden-brown lynx with black ear tufts driving one forceful clawed forepaw down onto an enemy's dark leather armored shoulder, with a single bright amber impact burst and small stylized stun sparks above the impact. Emphasize a stunning takedown, not eating or a bite. No visible enemy face, no blood or gore; one readable paw-strike action.",
+      "generationPrompt": "Use case: stylized-concept. Asset type: one borderless square hand-painted fantasy MMORPG ability icon for World of ClaudeCraft, hamstring_bite. Subject and mechanic: A close-up golden-brown lynx with black ear tufts driving one forceful clawed forepaw down onto an enemy's dark leather armored shoulder, with a single bright amber impact burst and small stylized stun sparks above the impact. Emphasize a stunning takedown, not eating or a bite. No visible enemy face, no blood or gore; one readable paw-strike action. Palette: golden fur, warm amber impact and deep burgundy shadows. Rich painterly fantasy illustration, dramatic lighting, one dominant bold action silhouette filling 80 percent of frame, crisp focal edges, quieter peripheral atmosphere. Entire subject inside frame with safe margin, legible at 22 and 32 pixels, opaque full-square background. Fresh original composition. No text, letters, numerals, watermark, logo, UI border, frame, rarity chrome, flat vector glyph, collage or sprite sheet. Output square 1024x1024.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/cat_form.webp",
+          "role": "Visual identity/style review anchor, not an image-edit input",
+          "sha256": "b44b297c23f8680adea35187964c8d4836f585d5cb16e75a6e69160ca17bb504"
+        },
+        {
+          "path": "public/ui/skills/druid/pounce.webp",
+          "role": "Visual identity/style review anchor, not an image-edit input",
+          "sha256": "2786e05605f52987caf23a717a65eb7425abf86ae7f63981407f5a3402ac4c53"
+        },
+        {
+          "path": "public/ui/courier/donkey.webp",
+          "role": "Visual identity/style review anchor, not an image-edit input",
+          "sha256": "e64a307fb593151bdebe77fb5010b13631d356e4cf6ac6c06cee82862a3097ce"
+        },
+        {
+          "path": "public/ui/items/clockwork_shock_bomb.webp",
+          "role": "Visual identity/style review anchor, not an image-edit input",
+          "sha256": "b29424c6a7c17325cfc0d9d99d9c715a99353d918a9d2d08ae5c92f21f36a2cf"
+        }
+      ],
+      "provenanceRecord": "docs/achievements/missing-skills-v045-2026-10-22/accepted-art.json"
+    },
+    {
+      "abilityId": "sporemender_form",
+      "sourcePack": "owner-provided",
+      "sourceFile": "owner-provided Sporemender concept sheet (the Heal panel, cropped to a square with the label row trimmed off), re-encoded to 128px WebP by scripts/convert_skill_icons_webp.mjs",
+      "output": "sporemender_form.webp",
+      "source": "Owner-provided original artwork",
+      "owner": "Levy Street account",
+      "license": "Owner-provided artwork, used with permission (Levy Street), rights reserved"
+    },
+    {
+      "abilityId": "spore_burst",
+      "sourcePack": "woc_tripo_spore_burst_icon_2026_10_12",
+      "sourceFile": "public/ui/skills/druid/spore_burst.png (Tripo text-to-image 2048px, cropped inside its painted frame to the square art and resized to 512px, converted in place by assets:skills, original deleted)",
+      "output": "spore_burst.webp",
+      "source": "Tripo AI text-to-image",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A dark sage-green mushroom with cream spots bursting open in a cloud of glowing cream and lime-green spores.",
+      "generationPrompt": "Square fantasy MMO spell icon, painted digital art, no border, no text. A small round dark sage-green mushroom with large cream spots and a cream rim, bursting open in an explosion of glowing cream and lime-green spores and pollen, radiant light rays, swirling green magical energy, dark forest-green background with vignette, vivid glow, high contrast, centered composition, filling the frame."
+    },
+    {
+      "abilityId": "natures_boon",
+      "sourcePack": "woc_tripo_spore_burst_icon_2026_10_12",
+      "sourceFile": "public/ui/skills/druid/natures_boon.png (Tripo text-to-image 2048px, center-cropped and resized to 512px, converted in place by assets:skills, original deleted)",
+      "output": "natures_boon.webp",
+      "source": "Tripo AI text-to-image",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Glowing leaf-and-vine druid hands cradling a golden-green sprouting seed of light.",
+      "generationPrompt": "Square fantasy MMO passive spell icon, painted digital art, no border, no frame, no text. A cupped pair of glowing green druid hands made of leaves and vines, cradling a bright golden-green seed of light that sprouts a small luminous leaf, swirling motes of lime-green and gold nature magic, dark forest-green background with vignette, soft radiant glow, high contrast, centered composition filling the frame."
     }
   ],
   "deferredStayProcedural": {},

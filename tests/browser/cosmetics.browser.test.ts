@@ -1,7 +1,9 @@
 // Real painter, shipped CSS, and account fixtures for the new cosmetics dialog.
+// Before-change UI evidence: docs/screenshots/clue-character-panel/current-polish-keyboard-focus.png
+// and docs/screenshots/clue-character-panel/current-polish-mobile-tabs.png.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
-import { MOUNT_SKIN_IDS } from '../../src/sim/content/mount_skins';
+import { ALL_MOUNT_SKIN_IDS, MOUNT_SKIN_IDS } from '../../src/sim/content/mount_skins';
 import { CosmeticsWindow } from '../../src/ui/hud/cosmetics/cosmetics_window';
 import { axeSeriousViolations, cleanup, formatViolations, host, stubDeps } from './_harness';
 
@@ -19,11 +21,18 @@ function mountWindow() {
       skinCatalog: 'class',
       skin: 0,
       mountSkinId: null as string | null,
+      buddyKey: '',
     },
-    ownedMounts: () => ['valorsteed'],
+    ownedMounts: () => [],
+    ownedBuddies: () => ['horse'],
+    pendingBuddies: () => [],
+    summonBuddy: vi.fn((key: string) => {
+      world.player.buddyKey = world.player.buddyKey === key ? '' : key;
+    }),
     accountCosmetics: {
       completedQuestIds: [],
       mountSkinIds: [...MOUNT_SKIN_IDS],
+      collectibleMountSkinIds: ['valorsteed', 'grag_bear', 'stormfeather_griffin'],
       weaponSkinIds: ['ice_fang_sword'],
       weaponSkinLoadout: {},
       mechChromaIds: ['amber_crimson'],
@@ -52,6 +61,12 @@ describe('cosmetics accessibility and interaction', () => {
       win.open(tab);
       await document.fonts.ready;
       expect.soft(root.scrollWidth, tab).toBeLessThanOrEqual(root.clientWidth + 1);
+      if (tab === 'mounts' && (size.width === 1366 || size.width === 390)) {
+        root.querySelector<HTMLElement>('.cos-body')!.scrollTop = 0;
+        await page.screenshot({
+          path: `../../docs/screenshots/cosmetics-window/mounts-after-${size.mobile ? 'mobile' : 'desktop'}.png`,
+        });
+      }
       const cards = root.querySelectorAll<HTMLElement>('.cos-card');
       expect(cards.length).toBeGreaterThan(0);
       if (tab !== 'mech') expect(root.querySelectorAll('.cos-card img').length).toBeGreaterThan(0);
@@ -78,7 +93,36 @@ describe('cosmetics accessibility and interaction', () => {
       }
     }
   });
-  it.each(['mounts', 'skins', 'mech'] as const)(
+  it('keeps all four tabs and buddy summon controls reachable without dragging on narrow portrait', async () => {
+    await page.viewport(320, 640);
+    document.body.classList.add('mobile-touch');
+    const { root, world, win } = mountWindow();
+    win.open('buddies');
+    const tabs = root.querySelectorAll<HTMLElement>('.cos-tab');
+    expect(tabs).toHaveLength(4);
+    for (const tab of tabs) {
+      const bounds = tab.getBoundingClientRect();
+      expect(bounds.left).toBeGreaterThanOrEqual(0);
+      expect(bounds.right).toBeLessThanOrEqual(320);
+      expect(bounds.height).toBeGreaterThanOrEqual(40);
+    }
+    expect(root.scrollWidth).toBeLessThanOrEqual(root.clientWidth);
+    expect(root.querySelector('[data-buddy-drag], [draggable="true"]')).toBeNull();
+    expect(root.querySelectorAll('.cos-scope-account')).toHaveLength(4);
+    expect(root.querySelector('.cos-scope-character')).toBeNull();
+    expect(root.textContent).not.toContain('Drag to action bar');
+    const control = () =>
+      root.querySelector<HTMLButtonElement>('[data-act="summon-buddy"][data-id="horse"]')!;
+    expect(control().getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
+    expect(control().getBoundingClientRect().width).toBeGreaterThanOrEqual(40);
+    control().click();
+    expect(world.player.buddyKey).toBe('horse');
+    expect(control().textContent).toBe('Dismiss');
+    control().click();
+    expect(world.player.buddyKey).toBe('');
+    expect(control().textContent).toBe('Summon');
+  });
+  it.each(['mounts', 'skins', 'mech', 'buddies'] as const)(
     '%s has a named dialog and no serious WCAG violations',
     async (tab) => {
       await page.viewport(1280, 900);
@@ -101,7 +145,7 @@ describe('cosmetics accessibility and interaction', () => {
     expect(document.activeElement).toBe(control());
     expect(control().dataset.act).toBe('takeoff-mount');
     await page.screenshot({
-      path: '../../docs/screenshots/clue-character-panel/current-polish-keyboard-focus.png',
+      path: '../../docs/screenshots/cosmetics-window/mounts-after-keyboard-focus.png',
     });
     world.accountCosmetics.mountSkinIds = ['mech_bird'];
     win.refreshIfChanged();
@@ -111,6 +155,27 @@ describe('cosmetics accessibility and interaction', () => {
     expect(document.activeElement).toBe(control());
     expect(control().dataset.act).toBe('wear-mount');
   });
+  it('wears a skin held by an alternate character and removes the action after its last item is gone', async () => {
+    await page.viewport(1280, 900);
+    const { root, world, win } = mountWindow();
+    expect(root.querySelectorAll('.cos-mount').length).toBe(ALL_MOUNT_SKIN_IDS.length - 2);
+    expect(root.querySelector('[data-id="terrorspark_groundshaker"]')).toBeNull();
+    expect(root.querySelector('[data-id="drakemaw_raptor"]')).toBeNull();
+    const wear = root.querySelector<HTMLButtonElement>(
+      '[data-act="wear-mount"][data-id="grag_bear"]',
+    )!;
+    wear.scrollIntoView({ block: 'center', behavior: 'instant' });
+    await userEvent.click(wear);
+    expect(world.player.mountSkinId).toBe('grag_bear');
+    expect(root.querySelector('[data-card="grag_bear"]')?.classList.contains('worn')).toBe(true);
+    world.accountCosmetics.collectibleMountSkinIds = ['valorsteed'];
+    world.player.mountSkinId = null;
+    win.refreshIfChanged();
+    expect(root.querySelector('[data-act="wear-mount"][data-id="grag_bear"]')).toBeNull();
+    expect(root.querySelector('[data-act="takeoff-mount"][data-id="grag_bear"]')).toBeNull();
+    expect(root.querySelector('[data-card="grag_bear"]')?.classList.contains('owned')).toBe(false);
+  });
+
   it('makes every mount skin reachable with Wear and Take off on short mobile landscape', async () => {
     await page.viewport(844, 390);
     document.body.classList.add('mobile-touch');
@@ -124,9 +189,9 @@ describe('cosmetics accessibility and interaction', () => {
       expect(tab.getBoundingClientRect().width).toBeGreaterThanOrEqual(40);
     }
     await page.screenshot({
-      path: '../../docs/screenshots/clue-character-panel/current-polish-mobile-tabs.png',
+      path: '../../docs/screenshots/cosmetics-window/mounts-after-mobile-landscape.png',
     });
-    for (const id of MOUNT_SKIN_IDS) {
+    for (const id of [...MOUNT_SKIN_IDS, ...world.accountCosmetics.collectibleMountSkinIds]) {
       const button = root.querySelector<HTMLButtonElement>(
         `[data-act="wear-mount"][data-id="${id}"]`,
       )!;
@@ -138,6 +203,8 @@ describe('cosmetics accessibility and interaction', () => {
       expect(world.player.mountSkinId).toBeNull();
     }
     // One wear plus one take-off per live skin.
-    expect(world.changeMountSkin).toHaveBeenCalledTimes(MOUNT_SKIN_IDS.length * 2);
+    expect(world.changeMountSkin).toHaveBeenCalledTimes(
+      (MOUNT_SKIN_IDS.length + world.accountCosmetics.collectibleMountSkinIds.length) * 2,
+    );
   });
 });

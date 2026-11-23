@@ -170,7 +170,8 @@ cents of gpt-image-2.
 ### 7. rig-manual (zero-cost local rigging onto the KayKit skeleton)
 ```
 node scripts/asset_pipeline/pipeline.mjs rig-manual --raw <raw.glb> --name <snake_case> \
-  [--reference public/models/chars/players/knight.glb] [--pre-rotated] [--job id]
+  [--reference public/models/chars/players/knight.glb] [--pre-rotated] \
+  [--rigid-head-from <frac> [--rigid-head-blend <frac>]] [--job id]
 ```
 Skips Tripo's rig + retarget entirely: the raw generated mesh (every skinmodel
 job keeps its `raw.glb`) is transformed into the reference rig's BIND space
@@ -185,8 +186,16 @@ vertices must be authored in the space of inverse(IBM) (the rig's REST pose is
 NOT its bind pose; using rest-world coordinates shreds every animated frame),
 and the raw mesh must be a T-pose. Best on humanoids whose proportions are
 close to the reference (the skinmodel lane's redesigns are, by construction);
-review the clip previews for weight bleed on outlier silhouettes. Run `qa
---job` after, like every lane.
+review the clip previews for weight bleed on outlier silhouettes. An oversized head
+silhouette (a mushroom cap, a big helm) whose rim overhangs the shoulders picks up arm
+weight and bends with every swing: `--rigid-head-from <frac>` binds every vertex above
+that fraction of the fitted height to the head joint outright (blended over
+`--rigid-head-blend`, default 0.03, below it); set it at the chin line, or at the
+scarf line on a short-torso chibi, where the KayKit shoulders sit at face height and
+a cut at the chin lets them shear the face. A very short torso is a poor fit for
+this lane altogether: the borrowed shoulder pivot sits far above the real shoulder,
+so relaxed poses fold the arms into the body. Sporemender Form hit exactly that and
+shipped on Tripo's own fitted rig instead. Run `qa --job` after, like every lane.
 
 ## Fit Studio (designer anchors for modular hair + piercings)
 ```
@@ -379,6 +388,18 @@ y=0 base, required clips, in-place clips. Hard errors block; warnings ship but a
   regen). Never hand-edit `src/render/assets/manifest.generated.ts` (root invariant).
 - CREDITS.md attribution is auto-appended by `--apply` (idempotent).
 - `npm run asset:budget` is the advisory whole-tree size check; keep it in mind.
+
+## Multiview (Smart Mesh P2.0)
+The art team's model step builds from separate front, left and back views of a T-pose
+concept (not one sheet): `tripo.generateModelFromViews({ views: { front, left, back } })`
+posts to `/generation/multiview-to-model` on `MODEL_P2` (`P2-20260801`, Tripo Studio's
+"Smart Mesh P2.0") with `face_limit` (aim 3,000 to 5,000 for a mob; P2 takes 48 to 50,000
+triangles), `textureSize` (`texture_size`, the map's edge in pixels: the art guide asks for
+1024; `texture_quality` is one of fast, standard, detailed, extreme) and optional `quad`
+(P2 only; P1 rejects it). Front is required; the order is fixed by `MULTIVIEW_ANGLES`.
+The model ids the v3 API accepts are listed by its own error for an unknown `model`
+(P1-20260311, P2-20260801, v2.5-20250123, v3.0-20250812, v3.1-20260211 as of 2026-10-09);
+the legacy `api.tripo3d.ai/v2` task endpoint does NOT know P2.
 
 ## Costs and limits (Tripo, July 2026)
 | Operation | Credits |

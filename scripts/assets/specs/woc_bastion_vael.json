@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/bastion_vael_woc.glb",
+      "out": "models/creatures/woc_bastion_vael.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Attack2",
+        "Hit",
+        "Death",
+        "Cast",
+        "ScytheSweep",
+        "Emerge",
+        "Hymn",
+        "Vanish"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

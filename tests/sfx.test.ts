@@ -1,7 +1,15 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { mountAudioKey } from '../src/game/mount_audio_key';
 import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
+import {
+  newTavernAmbienceMix,
+  TAVERN_AMBIENCE_CLEAR_HZ,
+  TAVERN_AMBIENCE_INSIDE_GAIN,
+  tavernAmbienceMix,
+} from '../src/game/tavern_ambience_core';
+import { TAVERN_FLOOR_Y, TAVERN_ORIGIN, tavernToWorld } from '../src/sim/content/mirefen_tavern';
 import { MOUNT_SKIN_IDS, RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
@@ -35,13 +43,20 @@ interface FakeSource {
 // skins (src/sim/content/mount_skins.ts mountPresentationKey). Audio keys off
 // the presentation key, so a skin owns its own cue set exactly like a mount.
 const MOUNT_AUDIO_KEYS: readonly string[] = [...MOUNT_KEYS, ...MOUNT_SKIN_IDS];
-const FOOTFALL_MOUNTS = new Set(['lanternback_troll', 'chimeglass_tortoise']);
+// Wobbles the Slime (a developer mount) borrows the footfall too until a
+// bespoke squelch is generated for it.
+const FOOTFALL_MOUNTS = new Set([
+  'lanternback_troll',
+  'chimeglass_tortoise',
+  'nightwing_chimera',
+  'wobbles_slime',
+]);
 // A mount with a continuous loop (the rickshaw's mount_loop_ cue) gets no
 // per-stride one-shot either: mountRun no-ops for it by design (see its own
 // comment in sfx.ts), checking the real SFX_CLIPS catalog for a mount_loop_*
 // entry, so it is excluded from the stride coverage below rather than asserted
 // against a source mountRun never actually plays.
-const CUSTOM_STRIDE_MOUNTS = MOUNT_AUDIO_KEYS.filter(
+const CUSTOM_STRIDE_MOUNTS = [...new Set(MOUNT_AUDIO_KEYS.map(mountAudioKey))].filter(
   (mountKey) => !FOOTFALL_MOUNTS.has(mountKey) && !(`mount_loop_${mountKey}` in SFX_CLIPS),
 );
 // SFX_CLIPS is a generated object LITERAL type, so a mount_run_ key that is
@@ -122,6 +137,22 @@ function installAudioStub(): void {
     createGain() {
       return {
         gain: param(),
+        connect(n: unknown) {
+          return n;
+        },
+        disconnect() {},
+      };
+    }
+    createBiquadFilter() {
+      return {
+        type: '',
+        Q: { value: 1 },
+        frequency: {
+          value: 350,
+          setTargetAtTime(value: number) {
+            this.value = value;
+          },
+        },
         connect(n: unknown) {
           return n;
         },
@@ -483,6 +514,24 @@ describe('isBuffered/preload', () => {
 });
 
 describe('mount running audio', () => {
+  it("referral placeholders play their models' gait and engine audio", () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    for (const [key, source] of [
+      ['referral_raptor', 'drakemaw_raptor'],
+      ['referral_tank', 'terrorspark_groundshaker'],
+    ]) {
+      expect(mountAudioKey(key)).toBe(source);
+      nowT += 0.5;
+      sfx.mountRun(0, 0, 0, key, 'grass', true);
+      expect(sources.at(-1)?.buffer).toBe(buffers.get(`mount_run_${source}`));
+    }
+    expect(mountAudioKey('valorsteed')).toBe('valorsteed');
+    expect(mountAudioKey('not_a_mount')).toBe('not_a_mount');
+    expect(sfx.mountEngine(0, 0, 0, 'referral_tank', true, 999)).toBe(true);
+    expect(sfx.mountEngine(0, 0, 0, 'referral_raptor', true, 998)).toBe(false);
+    sfx.mountEngineReset(999);
+    sfx.mountEngineReset(998);
+  });
   it('ships one generated manifest entry for every catalog mount', () => {
     // Engine mounts use mount_run_ as the sustain take of an authored
     // windup/loop/winddown set. Those entries genuinely run through
@@ -1399,5 +1448,101 @@ describe('mount idle hum + mount-aware jump/land (the Mech Bird take set)', () =
 
     sfx.movement('land', 0, 0, 0, false, 'valorsteed');
     expect(lastSource().buffer).toBe(GENERIC_LAND_BUF);
+  });
+});
+
+describe('amb_tavern: the tavern bed follows the listener through its lowpass', () => {
+  const TAVERN = {
+    id: 'world:tavern:mirefen',
+    kind: 'tavern' as const,
+    x: TAVERN_ORIGIN.x,
+    y: TAVERN_FLOOR_Y + 2,
+    z: TAVERN_ORIGIN.z,
+  };
+  interface TavernSlot {
+    panner: unknown;
+    target: number;
+    filter?: { type: string; frequency: { value: number } };
+  }
+  const slot = () => (sfx as unknown as { loops: Map<string, TavernSlot> }).loops.get(TAVERN.id);
+  const listen = (lx: number, lz: number) => {
+    const w = tavernToWorld(lx, lz);
+    sfx.setListener(w.x, TAVERN_FLOOR_Y + 3, w.z, 0, 0, 1);
+    sfx.ambience('marsh', false, null, false, 0, [TAVERN]);
+  };
+
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('amb_tavern', { duration: 43.6 });
+    sfx.unloop(TAVERN.id, 0);
+  });
+
+  it('plays inside non-positional at the core gain, then clear through a lowpass', () => {
+    listen(0, 0);
+    expect(slot()?.panner).toBeNull();
+    const gain = SFX_CLIPS.amb_tavern.gain;
+    expect(slot()?.target).toBeCloseTo(
+      (Math.round(TAVERN_AMBIENCE_INSIDE_GAIN * 400) / 400) * gain,
+      6,
+    );
+    // the next frame runs it through the lowpass, at the core's clear cutoff
+    listen(0, 0);
+    expect(slot()?.filter?.type).toBe('lowpass');
+    expect(slot()?.filter?.frequency.value).toBeCloseTo(TAVERN_AMBIENCE_CLEAR_HZ, 0);
+  });
+
+  it('muffles it outside by the door and stops it far down the road', () => {
+    listen(0, 0);
+    listen(0, 16);
+    const w = tavernToWorld(0, 16);
+    const mix = tavernAmbienceMix(w.x, TAVERN_FLOOR_Y + 3, w.z, newTavernAmbienceMix());
+    expect(slot()?.filter?.frequency.value).toBeCloseTo(mix.cutoffHz, 0);
+    expect(mix.cutoffHz).toBeLessThan(TAVERN_AMBIENCE_CLEAR_HZ / 4);
+    listen(0, 80);
+    expect(slot()).toBeUndefined();
+  });
+
+  // The camera trails the player: walking in through the door leaves it clamped in the
+  // doorway behind them (outside the rooms by the core's plan), so a bed decided from the
+  // camera stayed the muffled door spill the whole time the player stood in the hall. Like
+  // the biome beds, the room bed follows where the player stands (the avatar's eye).
+  it('follows the avatar, not the camera trailing it in the doorway', () => {
+    const cam = tavernToWorld(0, 13.6);
+    const hall = tavernToWorld(0, 4);
+    const eye = { x: hall.x, y: TAVERN_FLOOR_Y + 2, z: hall.z };
+    const frame = () => {
+      sfx.setListener(cam.x, TAVERN_FLOOR_Y + 5, cam.z, -1, 0, 0);
+      sfx.ambience('marsh', false, null, false, 0, [TAVERN], eye);
+    };
+    frame();
+    frame();
+    const gain = SFX_CLIPS.amb_tavern.gain;
+    expect(slot()?.target).toBeCloseTo(
+      (Math.round(TAVERN_AMBIENCE_INSIDE_GAIN * 400) / 400) * gain,
+      6,
+    );
+    expect(slot()?.filter?.frequency.value).toBeCloseTo(TAVERN_AMBIENCE_CLEAR_HZ, 0);
+    // and the other way round: the player outside down the road with the camera swung
+    // over the roof into the hall hears the road, not the room
+    const road = tavernToWorld(0, 80);
+    sfx.setListener(hall.x, TAVERN_FLOOR_Y + 5, hall.z, 1, 0, 0);
+    sfx.ambience('marsh', false, null, false, 0, [TAVERN], {
+      x: road.x,
+      y: TAVERN_FLOOR_Y + 2,
+      z: road.z,
+    });
+    expect(slot()).toBeUndefined();
+  });
+
+  it('the renderer hands the ambience the avatar eye it samples the biome beds at', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain('updateCameraAudioListener(this, this.cameraLookAt);');
+    const src = readFileSync(
+      new URL('../src/render/camera_audio_listener.ts', import.meta.url),
+      'utf8',
+    );
+    expect(src).toMatch(
+      /sink\.ambience\(\s*amb\.biome,\s*amb\.inDungeon,\s*amb\.precip,\s*amb\.nearWater,\s*0,\s*points,\s*eye,?\s*\)/,
+    );
   });
 });

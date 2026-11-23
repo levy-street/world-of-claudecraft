@@ -18,8 +18,11 @@
 // direct-call list is exactly the regression this guards.
 
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ITEMS, NPCS } from '../src/sim/data';
+import { itemDisplayName } from '../src/ui/entity_i18n';
+import { Hud } from '../src/ui/hud';
+import { formatMoney, formatNumber } from '../src/ui/i18n';
 import { readMethodCallSites } from './helpers/method_call_sites';
 
 const HUD_PATH = new URL('../src/ui/hud.ts', import.meta.url);
@@ -54,6 +57,38 @@ const CONFIRMED_PURCHASES = [
 ] as const;
 
 describe('Warfare purchases are gated behind the confirm dialog', () => {
+  it('quotes the actual currency through the live HUD and buys only after acceptance', () => {
+    const gold = Object.values(ITEMS).find(
+      (item) => item.set === 'warfare_furyforged' && (item.buyValue ?? 0) > 0,
+    );
+    expect(gold).toBeDefined();
+    if (!gold) throw new Error('Missing Season 1 gold fixture');
+    const honor = ITEMS.vanguard_warrior_arms_helmet;
+    const cases = [
+      { id: gold.id, name: itemDisplayName(gold), price: formatMoney(gold.buyValue!, 'long') },
+      {
+        id: honor.id,
+        name: itemDisplayName(honor),
+        price: `${formatNumber(honor.priceHonor!)} Honor`,
+      },
+      { id: 'companion_horse', name: 'Tug, the Warhorse', price: '10,000 Honor' },
+    ];
+    for (const offer of cases) {
+      const buyItem = vi.fn();
+      const confirmDialog = vi.fn();
+      const hud = Object.assign(Object.create(Hud.prototype), {
+        sim: { buyItem },
+        confirmDialog,
+      }) as { requestWarfarePurchase(npcId: number, itemId: string): void };
+      hud.requestWarfarePurchase(42, offer.id);
+      expect(confirmDialog).toHaveBeenCalledOnce();
+      expect(confirmDialog.mock.calls[0][1]).toContain(`Buy ${offer.name} for ${offer.price}?`);
+      expect(buyItem).not.toHaveBeenCalled();
+      confirmDialog.mock.calls[0][4]();
+      expect(buyItem).toHaveBeenCalledExactlyOnceWith(42, offer.id);
+    }
+  });
+
   it.each(CONFIRMED_PURCHASES)(
     'routes the $label buy through confirmDialog, never calling $command directly',
     ({ method, command }) => {

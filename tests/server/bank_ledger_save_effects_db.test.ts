@@ -9,6 +9,10 @@ const h = vi.hoisted(() => {
   const bootCalls: string[] = [];
   const bootQuery = vi.fn((sql: string, values?: unknown[]) => {
     bootCalls.push(String(sql));
+    // Empty legacy edge tables still return a completed checkpoint row.
+    if (String(sql).includes('UPDATE account_social_migration_progress SET')) {
+      return Promise.resolve({ rows: [{ complete: true }], rowCount: 1 });
+    }
     if (String(sql).includes("to_regclass('public.rate_limits')")) {
       return Promise.resolve({ rows: [{ reg: 'public.rate_limits' }], rowCount: 1 });
     }
@@ -22,7 +26,7 @@ const h = vi.hoisted(() => {
     // the guard DDL): an honest answer here, or the boot wiring test would be
     // exercising a capability refusal it never means to drive.
     if (String(sql).includes("current_setting('woc.material_source_writer'")) {
-      return Promise.resolve({ rows: [{ capability: '1' }], rowCount: 1 });
+      return Promise.resolve({ rows: [{ capability: '2' }], rowCount: 1 });
     }
     return Promise.resolve({ rows: [], rowCount: 0 });
   });
@@ -1032,7 +1036,7 @@ describe('bank ledger receipt schema boot wiring', () => {
     // answer that probe too, not bypass it.
     h.pool.query.mockImplementation((sql: string) => {
       if (String(sql).includes("current_setting('woc.material_source_writer'")) {
-        return Promise.resolve({ rows: [{ capability: '1' }], rowCount: 1 });
+        return Promise.resolve({ rows: [{ capability: '2' }], rowCount: 1 });
       }
       return Promise.resolve({ rows: [], rowCount: 0 });
     });
@@ -1055,7 +1059,8 @@ describe('bank ledger receipt schema boot wiring', () => {
     // never lands in bootCalls), and only THEN the growth budget fragment.
     const storage = h.bootCalls.indexOf(STORAGE_PURCHASE_SCHEMA);
     expect(storage).toBeGreaterThanOrEqual(0);
-    expect(h.bootCalls.indexOf(MATERIAL_SOURCE_CAPABILITY_PROBE_SQL)).toBe(storage + 1);
+    expect(h.bootCalls.indexOf(MATERIAL_SOURCE_CAPABILITY_PROBE_SQL)).toBeLessThan(core);
+    expect(h.bootCalls.lastIndexOf(MATERIAL_SOURCE_CAPABILITY_PROBE_SQL)).toBe(storage + 1);
     expect(h.bootCalls.indexOf(MATERIAL_SOURCE_WRITER_GUARD_SQL)).toBe(storage + 2);
     expect(growthBudget).toBe(storage + 3);
     // The growth fragment is followed by ONE single-statement counter readback

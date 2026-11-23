@@ -110,6 +110,14 @@ export const guideStrings = {
     communityWiki: 'Community Wiki',
     rights: 'World of ClaudeCraft',
     linksLabel: 'Play and community links',
+    // Player-guide links (the English /mmorpgs, /games-like pages beside the game).
+    guidesLabel: 'Player guides',
+    guideFree: 'Free MMORPGs',
+    guideGamesLikeWow: 'Games like WoW',
+    guideBest: 'Best MMORPGs',
+    guideNew: 'New MMORPGs',
+    guideBrowser: 'Browser MMORPGs',
+    guideGamesLikeDiablo: 'Games like Diablo',
   },
 
   // Language picker.
@@ -489,7 +497,7 @@ export const guideStrings = {
     // Non-graphics options: the Audio tab and the live language picker.
     audioTitle: 'Sound and language',
     audioBody:
-      "The options window is not all pixels. Audio holds three volume sliders, for sound effects, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
+      "The options window is not all pixels. Audio holds four volume sliders, for sound effects, ambience, music, and voice, plus a music on and off switch and four switches for the sounds that most often wear thin: NPC voices, footsteps, interface sounds, and click feedback. The Interface panel's General tab carries a language picker that relocalizes the whole interface on the spot, no reload needed, and a theme picker for the window dressing.",
     autolootBody:
       "Prefer not to click every corpse? Walk-by Autoloot, on the Interface panel's Combat tab and off by default, scoops the loot from your own kills as you walk past them.",
     // The two panels the tables do not cover (Auras, Performance Overlay), named
@@ -524,6 +532,8 @@ export const guideStrings = {
     rowTouchLookSpeed:
       'The same thing for swipe-look, and it only appears when you are on a touchscreen.',
     rowFullscreen: 'Fills the whole screen with the game.',
+    rowSpellEffects:
+      'The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.',
     rowWaterRipples:
       'Wakes and ripples that spread out behind you as you swim. Off by default, and the one water effect that costs real frames; splashes and bubbles are unaffected either way.',
     rowOverflowXp:
@@ -586,7 +596,7 @@ export const guideStrings = {
     ifAuraBarBelowFrame:
       'Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.',
     ifTargetAurasBelowFrame:
-      "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "Hangs the target frame's buff and debuff strip below the frame, under the target's name and health bar, instead of above it: the classic layout. On its stock seat the target frame (with your cast bar and swing timers) rises by one strip row so the strip's first row clears the action bar; a frame you have moved stays where you put it.",
     ifAlwaysShowAllBuffs:
       'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
     ifShowAuraCaster:
@@ -612,6 +622,8 @@ export const guideStrings = {
     ifStickyTarget:
       'Keeps your current target when you click on empty ground, instead of clearing it.',
     ifFctScale: 'The size of the damage and healing numbers that float off your target.',
+    ifClassicCombatText:
+      'Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.',
     ifExtraBars:
       'Reveals a second action bar row, and a third once the second is on. The slots stay reachable by their keybinds even while the rows are hidden.',
     ifHideUnused: 'Hides empty action slots so only the buttons you actually use are drawn.',
@@ -658,7 +670,7 @@ export const guideStrings = {
     // Death and recovery: light penalty, no lost progress.
     deathTitle: 'When you fall',
     deathBody:
-      "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
+      "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance or, in most dungeons, in the arena of the last boss your group has already beaten when the way there is safe. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
     // Threat: how an enemy picks who to hit (src/sim/threat.ts, and the healing
     // split in src/sim/combat/heal.ts, which keys on the HEALED target's hate
     // tables, not on party membership).
@@ -764,6 +776,12 @@ export const guideStrings = {
     // for the same reason as the aura tracks. Wordy (M16): non-Latin fills ride along.
     framesGovernedTalkingHead:
       "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+    // The Shardpike bar (src/ui/hud/shardpike/) joined HUD_FRAME_SPECS with the
+    // Balgath world boss. Own key for the same reason as the two above: a
+    // reword of framesGovernedExtra would go stale in every non-Latin fill.
+    // Wordy (M16): the five non-Latin fills land in this same change.
+    framesGovernedShardpike:
+      'Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.',
     // The mouseover tooltip's movable seat (interface_unlock_core.ts
     // 'unitTooltip', unit_tooltip_seat.ts) joined HUD_FRAME_SPECS with the
     // player card's title, guild, and spec lines (player_tooltip_view.ts).
@@ -772,6 +790,14 @@ export const guideStrings = {
     // along.
     framesGovernedUnitTooltip:
       "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
+    // The detachable resource bar ('playerResource') and the King of the Hill
+    // bar ('hillBar') joined HUD_FRAME_SPECS together. Own key for the same
+    // reason as the aura tracks; the option names are the live
+    // hudChrome.options values. Wordy (M16): non-Latin fills ride along.
+    framesGovernedPriest:
+      "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+    framesGovernedResourceAndHill:
+      'Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.',
 
     barsTitle: 'Bars, timers, and combat text',
     barsBody:
@@ -816,6 +842,15 @@ export const guideStrings = {
     // is a standing tracker regardless of where it is earned.
     hubPracticeTrackerBody:
       'Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.',
+
+    // The dungeon objectives tracker (src/ui/hud/dungeon/dungeon_tracker_*):
+    // added ALONGSIDE the trackers above for the same reason, and it is also
+    // this page's prose for its HUD_FRAME_SPECS row. The rows are the sim's own
+    // boss list (src/sim/instances/dungeon_run.ts), so nothing here names a
+    // dungeon or a boss. Wordy (M16): the five non-Latin fills land in this
+    // same change.
+    dungeonTrackerBody:
+      "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
 
     chatTitle: 'The chat box',
     chatBody:
@@ -1000,7 +1035,11 @@ export const guideStrings = {
     // world PvP and free-for-all zones need no flag), so this row is its
     // reworded successor and `pvp` is retired in scripts/i18n_retired_keys.mjs.
     pvpZones:
-      'World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.',
+      'World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and entering an active King of the Hill circle raises your flag; switching off takes 5 minutes.',
+    presence:
+      'Who sees you online in friends lists, your guild roster and /who: /presence everyone (the default), /presence friends (only players on your friends list), or /presence none. Hidden, they see no online dot, zone or map position for you, though whispers and invites still reach you; your party always sees you. A plain /presence tells you which is set.',
+    flair:
+      'Shows or hides your Discord role for other players, meaning your colored name, role tag and verified chat tag: /flair on shows it, /flair off hides it, and a plain /flair tells you which is set. Needs a linked Discord account.',
     listings:
       'Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.',
     buyback: 'What you sold to a vendor recently and could still buy back.',
@@ -1049,7 +1088,7 @@ export const guideStrings = {
       'Every dungeon with the zone its door sits in and the party size it is built for, plus the difficulty you are currently set to.',
     dungeonMode: 'Switch your dungeons between the normal and heroic difficulty.',
     dungeonReset:
-      'Abandon your own empty instances, which is what you do after changing difficulty.',
+      'Abandon your own empty instances so your next run starts fresh, at the same difficulty or a new one.',
 
     // Recovery and presence
     groupRecovery: 'Recovery and presence',
@@ -1210,7 +1249,8 @@ export const guideStrings = {
     chronicleDef:
       "A zone's own collection of deeds, gathered into chapters by a local Chronicler. You can work through the chapters in whatever order suits you.",
     // Delve Marks are a per-character counter spent in the delve shop and on
-    // companion upgrades; Heroic Marks are the heroic dungeon item currency.
+    // companion upgrades; Heroic Marks are the heroic dungeon counter, spent at
+    // the heroic quartermaster.
     marksTerm: 'Delve Marks and Heroic Marks',
     marksDef:
       'The two rewards the repeatable endgame pays besides loot. Delves pay Delve Marks, which buy gear from the delve shop and upgrade your companion; heroic dungeons pay Heroic Marks, which buy gear from the heroic quartermaster.',
@@ -1219,7 +1259,7 @@ export const guideStrings = {
       'What fighting other players pays out: arena victories, Thornhollow Fields wins, and honorable kills all add to it. You spend it on the Warfare sets.',
     warfareTerm: 'Warfare',
     warfareDef:
-      'The gear side of player-versus-player. A quartermaster sells sets of Warfare armor for Honor, and the Warfare rating they carry counts only in fights against other players.',
+      'The gear side of player-versus-player. The quartermasters sell sets of Warfare armor, the newest season for Honor and the last season for gold, and the Warfare rating they carry counts only in fights against other players.',
     // Swim fatigue out on the open sea (src/sim/fatigue.ts): warning, grace,
     // then rising unavoidable damage until you head back toward land.
     fatigueTerm: 'Fatigue',
@@ -1379,7 +1419,7 @@ export const guideStrings = {
     formsAutoUnshift:
       'A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.',
     formsMoonwing:
-      'A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.',
+      'A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. Like the Groveheart Sporemender Form, it keeps your spells, and your wand works only in those two shapes or your normal caster form.',
     // The Cat engage loop (Wildfang kit pass 2): names the abilities, never
     // their numbers, so the sentence stays spoiler-safe. The key name predates
     // the Cat Form rename; the English follows the rename and the overlays
@@ -1393,6 +1433,8 @@ export const guideStrings = {
         'The melee damage shape: energy and combo points, like a rogue, and much less threat.',
       form_travel:
         'The travelling shape: far quicker across the ground, but no other abilities until you shift out.',
+      form_sporemender:
+        'The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana.',
     },
     // The summon spell's own kit line. Water Jet is the PET's pet-bar command, not this
     // spell, so it renders as a paragraph under the row instead of as this line.
@@ -1405,6 +1447,7 @@ export const guideStrings = {
       form_bear: 'Bruin Form',
       form_cat: 'Cat Form',
       form_travel: 'Fleet Form',
+      form_sporemender: 'Sporemender Form',
     },
   },
   // Deprecated: short fantasy hooks. The class index and class page now use the canonical
@@ -1652,44 +1695,42 @@ export const guideStrings = {
   },
 
   // World / zones.
-  // Mounts & Riding: the riding lesson, summoning a mount, the speed tiers, and the
+  // Mounts & Riding: character training, account cosmetic collection, and the
   // show-jumping race at the stables.
   mountsPage: {
     // Mounts and riding. Curated prose, no generated roster: the content generator emits no
     // mount data, and a hand-typed list would drift and would have to name the two catalog
     // mounts with no player-facing acquisition path (src/sim/content/mounts.ts). Spoiler-safe:
-    // no move-speed percentages, no drop rates, no per-boss mount table, no race time budget.
-    // The plain gates a player is told in game (level 20, 80 gold, 10 gold) are published.
+    // No drop rates, per-boss mount tables, or race time budgets. Public training
+    // speeds and fees shown by the trainer are published from the live rules.
     heading: 'Mounts and riding',
     intro:
-      'A mount is a faster way across the world, and that is all it is. You learn to ride at the stables, buy your first set of reins, and every road after that is shorter.',
+      'Choose a mount appearance, learn riding at the stables, and travel faster across the world. Your training sets the pace; every mount appearance is cosmetic.',
     whatHeading: 'What a mount is',
     whatBody:
-      'A mount is a beast you ride, and what it gives you is speed. No armor, no damage, no stats: it carries you over the ground faster, and springs a little higher when you jump, and that is the whole of the bargain. Every mount in the game is a ground mount, so there is no flying, and none of them swim.',
+      'Mounts are cosmetic appearances worn over your trained ride. They grant no armor, damage, or combat stats. Riding training increases ground travel speed and mounted jumps clear more height. Every mount stays on the ground, and none can swim.',
     learnHeading: 'Learning to ride',
     // Two paragraphs (paras()): the 80g skill purchase first, then the quest, which is only
     // pickable after it (zone3.ts q_riding_lessons requiresRidingTrained). {level} is
     // formatNumber(MOUNT_TRAIN_MIN_LEVEL) from the page module.
     learnBody:
-      'Riding is a skill you buy once, and it opens at level {level}. Marla Hitchen, the stablemaster, keeps the Galecrest Stables out on the downs, and she sells Riding Training for 80 gold. That one purchase is what lets you sit a mount at all, and it stays with you for good.\n\nOnce you have it, Marla has a quest for you: Riding Lessons. Take it, follow the marker to the glowing square behind the start arch, and press Start Race. She lends you a training Valorsteed for the lesson, so the lesson itself costs you nothing. Ride the course, finish it, and go back to her for your coin and experience. The lent steed goes back in the barn afterward, so the lesson teaches you the seat rather than handing you a horse.',
+      "Riding opens at level {level}. Stablemaster Marla Hitchen sells Riding Training for 80 gold at the Galecrest Stables. Basic training grants {basicSpeed}% faster mounted movement. Once you have learned it, Marla also sells Advanced Riding Training for {advancedFee} gold, raising mounted movement to {advancedSpeed}% faster. Each rank belongs to the character who learns it.\n\nAfter learning basic riding, take Marla's Riding Lessons quest and follow the marker to the glowing square behind the start arch. Press Start Race to borrow the training Valorsteed. Finish the course and return for your coin and experience. The borrowed horse returns to the barn when the lesson ends.",
     whereHeading: 'Where to find her',
     whereBody:
       'The Galecrest Stables are marked on the map of The Galecrest, out on the downs between the Shear and the Wreckfields. Marla stands beside the barn, facing the race yard.',
     firstHeading: 'Your first mount',
     firstBody:
-      'The Valorsteed is the only mount sold anywhere in the world. Once you have learned Riding, Marla will sell you the Reins of the Valorsteed for 10 gold, and those reins are yours to keep. Every other mount is earned out in the world, so the horse is where nearly every rider starts.',
+      'Marla sells the Reins of the Valorsteed for 10 gold after you learn Riding. Holding the reins unlocks the horse appearance in Cosmetics for every character on your account. Riding training already lets you summon a mount without carrying reins, so choose the horse or another owned appearance when you want a different look.',
     rideHeading: 'Getting on and getting off',
-    // Two paragraphs. The keybind sentence is scoped to desktop on purpose: the shared toggle
-    // only ever dismounts (or calls the lesson steed), while the mobile More-tray button also
-    // summons through the reins item.
+    // Both desktop and mobile summon the trained ride wearing the selected cosmetic.
     rideBody:
-      'There is no mount window and no favorite to set, because the reins are the mount. Use a set of reins from your bags or from an action bar slot and you ride that mount. Summoning takes a moment, a short call rather than an instant one, so it will not save you from a bad pull. Getting off is instant and never blocked.\n\nUse the reins you are already riding and you put that mount away. Use a different set while mounted and you swap straight to it, with nothing to summon in between. The Mount and Dismount key, the backquote key by default, only ever gets you off: it is the way down, not the way up. The one exception is the riding lesson, where that same key calls the steed Marla lends you, since a borrowed horse has no reins to click. On a phone or tablet, the Mount button in the More tray works both ways, though it calls the first set of reins sitting in your bags rather than one you pick, so tap the reins themselves when you want a particular mount.',
+      'Open Cosmetics and choose an appearance on its Mounts tab. The Mount / Dismount key, the backquote key by default, summons your trained mount wearing that appearance. The mobile Mount button does the same. Summoning takes a short channel; getting off is instant. You can change the appearance while mounted without changing your riding speed.\n\nYou can also use reins from your bags or an action bar to select that appearance and summon. Using the appearance you are already riding puts the mount away. Banked or alternate-character reins unlock the same cosmetic without needing to be carried by the rider.',
     breaksHeading: 'What puts you back on your feet',
     breaksBody:
       'Water always wins. Ride into anything deep enough to swim in and you are down at once, because no ground mount swims, and dying drops you where you fall. You cannot call one while you are in combat, while you are dead or making your way back as a spirit, or at any point during a Thornhollow Fields match, which is fought on foot from the form-up to the final hold: if you were riding while you waited, being seated into the match puts you down with it. Walking into combat or into water partway through a summon cancels it as well.\n\nMost of what you do puts you down too. Swinging at something, starting a cast, harvesting a node, fishing, crafting, enchanting, salvaging, and recharging a profession tool all dismount you the moment you start, so expect to hop off at every vein. Calling a mount also drops any shapeshift form you are holding: you are never both shifted and mounted.',
-    speedHeading: 'Speed and tiers',
+    speedHeading: 'Riding speed and training',
     speedBody:
-      'Speed is the only thing that separates one mount from another. The Valorsteed you buy from Marla sets the base pace, and the mounts you collect out in the world ride above it: the rarer the reins, the quicker the ride, in a few clear steps rather than a smooth slide. There is no second rank of riding to train and no upgrade to buy afterward. You pay for Riding once, and from then on the reins you used decide how fast you travel.',
+      "Basic Riding Training gives {basicSpeed}% faster mounted movement. Advanced Riding Training gives {advancedSpeed}% faster mounted movement and costs {advancedFee} gold from Marla. Every mount appearance uses the same speed for the character's training rank, regardless of rarity or source. Store skins use that training speed too.",
     collectHeading: 'Where the rarer mounts come from',
     collectBody:
       "Beyond Marla's counter, reins are found rather than bought. They come off the last bosses of the five-player dungeons and the raid on heroic, and out of rift clears, where the harder the rift you finish the rarer the reins it can leave behind. They are rare finds by design and no run promises one, so the kind way to hunt a mount is to bring the hunt along on the runs you were making anyway. This page will not tell you which mount hangs on which boss: that part is yours to find out.",
@@ -1698,7 +1739,7 @@ export const guideStrings = {
       "The show-jumping course in Marla's paddock is open to anyone, any time, not only during the lesson. Sit a mount, stand on the glowing square behind the arch, and press Start Race. A countdown holds you still, then the clock runs: clear all seven jumps and ride back out through the arch before it runs down.\n\nA jump only counts if you are genuinely in the air over the bar, so an easy ride-through clears nothing. You may take them in any order and from either side, and a missed one is not the end of the world: circle back and take it again. Dying, getting off, or leaving the paddock ends the attempt, and so does letting the clock run out, which sets you down out of the saddle where you stand; cancelling it yourself just stops the clock. Nothing stops you starting another. There is no fee, no cooldown, and no prize beyond the time itself, and any number of riders can run the course at once without getting in each other's way.",
     goodsHeading: 'Reins are ordinary goods',
     goodsBody:
-      'A mount is an item, which makes it something the economy can move. You own a mount for as long as its reins sit in your bags or your bank, though banked reins keep the mount yours without letting you ride it: to call the beast you have to be carrying the reins. Player reins carry no soulbind, so they trade, travel by mail, and list on the World Market like any other find, unless the item itself says otherwise. Two things are worth knowing before you part with one: no merchant will ever buy a set of reins back, so a mount is a purchase you keep or pass on rather than cash out, and if the reins leave your bags and your bank both while you are riding, traded away, mailed off, or sold on the market, the mount goes with them and you are set down where you stand.',
+      "Collectible mount appearances remain available across your account while at least one matching reins item is in any character's bags or personal bank. Trading, mailing, listing, selling, or otherwise removing the last qualifying item removes the appearance from Cosmetics. A rider wearing it returns to the default horse appearance and stays mounted at their trained speed.\n\nPlayer reins can be traded, mailed, and listed on the World Market unless the item says otherwise. The horse reins can also be sold to a merchant for 10 gold. Other reins retain their own item sale restrictions. Store mount skins remain account cosmetics independent of reins items.",
   },
 
   worldPage: {
@@ -1995,9 +2036,9 @@ export const guideStrings = {
     templeBody:
       'A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.',
     sanctumBody:
-      "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
+      "A hidden glacier high on Thornpeak, where a dragon lies frozen in the ice and the cult burns stolen souls to thaw it. Descend from the high pass past ice towers, the Smith's broken chains and the cult's fires to the frozen lake at the glacier's foot.",
     wildheartBody:
-      'A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.',
+      'A hidden jungle caldera behind the Sunken Idol, ringed by cliffs and loud with waterfalls. Wade the river ford, hunt through the terraces and the falls, cross the ruined colony and climb the stepped shrine under a colossal stone jaguar.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',
@@ -2015,11 +2056,11 @@ export const guideStrings = {
     heroicLockoutBody:
       "Normal dungeons can be run all day. Heroic asks patience: the final boss kill locks everyone in the run to one heroic clear of that dungeon per day, and the raid keeps a daily lockout for each difficulty. On a live realm every daily lockout clears together at the realm's own nightly reset hour, so a clear taken just before that hour and one taken just after fall on two different days; play offline in your browser instead and a lockout simply runs out a day after your own kill. A cleared five-player run stays open to its own party for corpse runs and loot, so nobody is locked away from what they earned there. The raid is stricter: once its kill locks you the door stays shut until the reset, and the only way back through it is a corpse run by someone who fell in the very run that locked them, so a living raider who walks out has walked out for the day. Collect your spoils before you leave the arena. Every one of these lockouts belongs to the character that earned it, so a clear on your main leaves your other characters free.",
 
-    // Reset All Instances: the difficulty-transition escape hatch. Spoiler-safe: no exact
+    // Reset All Instances: start a run fresh, same difficulty or a new one. Spoiler-safe: no exact
     // cooldown or timer lengths in the prose.
     resetTitle: 'Resetting your instances',
     resetBody:
-      'Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top, but it skips the cooldown between resets: a raid that picked the wrong tier, or bounced off Heroic, can switch back at once, since its own lockout is what limits repeat runs.',
+      'Empty claimed runs linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset, and the next run starts fresh at your current difficulty. Switching difficulty does the same for runs on the old difficulty. A reset works only while nobody, living or fallen, remains inside, and only once every corpse in there has been looted clean. It never shortens a lockout: a locked heroic or raid stays locked until its reset, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top, and a raid switching tier skips the cooldown: a raid that picked the wrong tier, or bounced off Heroic, can switch back at once, since its own lockout is what limits repeat runs.',
 
     // Standalone, spoiler-safe lore for the Drowned Temple card (the goddess twist and any
     // boss names are withheld).
@@ -2260,7 +2301,7 @@ export const guideStrings = {
     // anywhere; the successor warfareBodyStatsStay scopes the nothing to the set bonuses and says
     // so, keeping every earlier sentence byte for byte.
     warfareBodyStatsStay:
-      "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
+      "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster. One exception works everywhere: two pieces of any of these sets also stop damage from delaying your spellcasting.",
     warfareTradeBody:
       'That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.',
     // Phase 20 wiki completeness audit (2026-09-03): the successor of warfareTradeBody, retired in
@@ -2276,6 +2317,9 @@ export const guideStrings = {
     vanguardHeading: 'Vanguard gear: Warfare Season 2',
     vanguardBody:
       "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid.",
+    // Warfare Season 2 combat ratings and jewelry (owner request, 2026-10-02).
+    vanguardStatsBody:
+      'Unlike the original tier, Vanguard gear also carries combat ratings: each Vanguard armor piece, weapon and necklace has Crit Rating or Haste Rating, and the spellcaster and healer pieces add Spell Power or Healing Power. The Vanguard rings and necklaces are sold beside the weapons, and every class can wear them. Two of the Vanguard melee rings give exactly the Hit Rating that removes the base chance of your attacks missing a player of your own level, and two spellcasting rings do the same for your spells being resisted. Auto-attacks while dual-wielding keep their extra miss chance. The healer ring carries Haste Rating instead.',
   },
 
   // The Thornhollow Fields 5v5 capture-the-flag battleground page
@@ -2304,26 +2348,41 @@ export const guideStrings = {
     // non-Latin overlay already carries a reviewed translation of the old claim,
     // and rewording an already-translated value never marks it pending again.
     introZones:
-      'Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.',
+      'Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. The Proving Shore is the only sanctuary, where no world fighting happens at all, and the three northernmost zones use the same opt-in flag rules as the rest of the world. Entering an active King of the Hill circle raises your flag automatically. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.',
     zonesHeading: 'Where world PvP happens',
     zonesBody:
-      'The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.',
+      'The Proving Shore is the only sanctuary: no world PvP happens there, and you cannot raise your flag. An existing flag stays on, but its played-time title progress pauses until you leave. Everywhere else, including the Drakelands, the Frostveil Reach and the Amberfall, only flagged players can fight. Entering an active King of the Hill circle automatically raises your flag if you meet the normal level requirement. The warning circle does not flag you. Leaving the active circle keeps your flag up; use /pvp off to start the normal five-minute countdown, which cannot finish while you are inside an active hill or still in combat.',
     flagBodyAid:
       'Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.',
     stakesUnflaggedTake:
       'Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.',
     stakesBodyFlagged:
-      'When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.',
+      'When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. An unflagged player cannot be attacked in the open world. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.',
     hillHeading: 'King of the Hill',
     hillBody:
-      'Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
+      'Every two hours, a hill rises in the Drakelands, the Frostveil Reach or the Amberfall. The realm receives a fifteen-minute warning, and the circle is marked on open ground. The hill stays active for thirty minutes. Entering the active circle raises your World PvP flag under the normal level rules, including for raid members. The party with the most eligible players inside takes the hill after a minute of unbroken majority; a lone player counts as a party of one, but raid members and players below the PvP level requirement cannot capture or earn hill Honor. Each holder standing inside earns Honor at an increasing rate. Payouts and their ramp are faster, preserving the total Honor of the former forty-five-minute event. A change of holder restarts the ramp. Leaving the circle keeps your flag up; /pvp off uses the normal five-minute delay and cannot finish inside an active hill or during combat. The hill bar shows control, numbers and capture progress; /hill reports its location.',
     limitsBodyHour:
       'Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.',
     // Successors (2026-09-25): hillBody said a full hold pays a little under one
-    // battleground win, but the hold now ramps (hill_rules.ts hillHonorPerPayout);
+    // battleground win, but the hold now ramps (the 2026-09-25 hold ramp);
     // limitsBodyHour gains the raid rule (world_pvp_rules.ts worldPvpGroupEarns).
     hillBodyRamp:
       'Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
+    // Successor (2026-10-12): the capture now takes 30 seconds, a rival only pauses
+    // it, a lone holder keeps the hill when they form a party, the realm gets
+    // five-minute standings, and the longest hold can pay a Weekly Vault PvP win.
+    // (hill_rules.ts HILL_CAPTURE_SECONDS, hillProgressStep; hill.ts
+    // reconcileHolder; hill_ranking.ts HILL_VAULT_MIN_HOLD_SECONDS).
+    hillBodyPause:
+      'Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
+    // Successor (2026-10-14): flat payout, retaining all capture, pause and Vault rules.
+    hillBodyFlat:
+      'Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the northern zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
+    // Successor (2026-10-27): the v0.44.1 schedule restored, a hill every two
+    // hours standing thirty minutes (hill_rules.ts HILL_WINDOW_SECONDS,
+    // HILL_DURATION_SECONDS); the flat payout now totals about two wins.
+    hillBodyTwoHour:
+      'Once every two hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the northern zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for thirty minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as two battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
     limitsBodyRaids:
       "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid.",
   },
@@ -2616,6 +2675,7 @@ export const guideStrings = {
     formBear: 'Bruin Form',
     formCat: 'Cat Form',
     formTravel: 'Fleet Form',
+    formSporemender: 'Sporemender Form',
     groupCreatures: 'Creatures',
     groupPets: 'Warlock Demons',
     pickerLabel: 'Choose a model to view',
@@ -2759,7 +2819,7 @@ export const guideStrings = {
     // The two gear sources the page never named: Honor (the Warfare stores) and
     // rift clears. Vendor names and towns only, no prices or stat budgets.
     sourcesHonor:
-      'Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores that Honor alone buys: whole armor families, jewelry, and weapons no coin merchant carries. The arena page covers how the Honor itself is earned.',
+      'Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores: the newest season of armor and weapons, sold for Honor alone, beside the armor families, jewelry, and weapons of the last season, now sold for gold. The arena page covers how the Honor itself is earned.',
     sourcesRifts:
       'Rifts add one more source once you are at the level cap, and a rift is a race: the group that clears one first wins its rewards. That first clear pays gear on top of everything else the run leaves behind, including a Riftbound band cut to your class role, a ring you will not find anywhere else in the world. A group that finishes second still finishes its own run and keeps the credit for the clear; what it forfeits are the first-clear rewards. The rifts page covers the race itself.',
     // Bind on trade: the per-copy lock in src/sim/item_instance_transfer.ts. An
@@ -3520,9 +3580,9 @@ export const guideStrings = {
         "A commission is a craft made for someone. When crafting a weapon, armor piece, or held off-hand (a potion cannot carry a bond), the crafter can flag the craft as a commission: the finished piece behaves normally in the maker's own hands, but the moment it changes hands in a trade it binds to the person who received it. That is the Maker's Bond: the buyer gets their piece, and the piece cannot be passed on or resold.\n\nBonds are not forever, just expensive. Any station master will unbind a bound piece while you stand at their station (a mobile station never offers the service), for a fee set by the item's quality: 25 silver uncommon, 1 gold rare, 4 gold epic, with a legendary paying the epic rate and a commissioned common piece the uncommon one.\n\nThe fee buys a clean slate, not a cure: the piece is still a commission, so it binds again to whoever receives it in the next trade, and everything else about it, signature, masterwork, and enchants, survives untouched.",
       provenanceHeading: 'Signed work',
       provenanceBody:
-        "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
       provenanceBodyUndiscounted:
-        "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
       collectorsHeading: 'Collectors, trophies, and the price of a story',
       collectorsBody:
         "Vendors are blind to provenance: a signed item sells to an NPC for exactly its plain price. The premium on a signature exists only between players, which is precisely what makes it interesting: a stack of windfall ore signed by a famous gatherer, a Prime Cut from a lucky harvest, a masterwork blade naming a crafter who has since retired, all cost whatever someone's memory says they are worth.\n\nThe Book of Deeds leans into the same instinct: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, and Glimmer of Hope are zero-Renown collector's marks that exist purely to prove a moment happened to you. Keep the item that earned the deed and you hold the receipt. None of this is power; provenance buys no stats and wins no fights, it is the game's paper trail of good days.",
@@ -3609,7 +3669,7 @@ export const guideStrings = {
       // PR3 reword; locale follow-up is recorded in the intentional-gathering reword ledger.
       a3: "They are two separate actions on the same body. Everything a corpse holds, coin and drops plus any harvestable components, opens in the same loot window, but the interact key and Take Loot collect only the ordinary loot, which follows the normal loot rules. Harvesting is the professions side, stripping materials off the carcass itself: it needs a Field Kit in your bags, carried rather than spent, and its own Harvest command, a 1.5-second cast rather than an instant grant. What the cast extracts is your harvest preference, set from the kit, the Professions window, or the corpse's own Change option: it defaults to taking everything the body offers, and pressing Apply saves a choice to concentrate on one material instead, which can earn it a finer grade when doing so leaves the body's other workable materials ungathered. If the body does not carry your chosen material, the cast refuses rather than falling back to the rest, until you change your preference.\n\nHarvesting is single use: each corpse can be harvested exactly once, online included. Whoever earned the kill, and their party if grouped, hold first claim on it for ten seconds; after that it opens to whoever starts the cast first, and that reservation locks out everyone else until it finishes, is cancelled, or the body expires. Your Town Focus shapes what you get regardless of preference: while standing in a town hub you can spread 10 focus points across the component types you care about, and each focused component rolls a better tier (every 5 points bumps it a step, at most two steps) and yields more (10 percent per point). Unfocused components are never made worse.",
       q4: 'Why is my Ironbark Log signed?',
-      a4: 'You hit a windfall. Roughly 1 harvest in 90 triggers a rare gather event (ancient heartwood on a tree, a pristine vein on ore, a moonlit bloom on herbs): it multiplies the yield five times, signs every unit with your name, and announces the find to the whole zone. A rare or better rarity roll on an ordinary harvest signs the yield too.\n\nSigned materials are worth keeping or selling dear: holding any signed copy of a needed reagent at the bench adds 2 percentage points to the masterwork chance. They can share a compatible stack with plain material or units from other collectors and signers without losing any mark; the stack keeps each source and count separately.',
+      a4: 'You hit a windfall. Roughly 1 harvest in 90 triggers a rare gather event (ancient heartwood on a tree, a pristine vein on ore, a moonlit bloom on herbs): it multiplies the yield five times, signs every unit with your name, and announces the find to the whole zone. A rare or better rarity roll on an ordinary harvest signs the yield too.\n\nSigned materials are worth keeping or selling dear: holding any signed copy of a needed reagent, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points to the masterwork chance. They can share a compatible stack with plain material or units from other collectors and signers without losing any mark; the stack keeps each source and count separately.',
       q5: 'Which commissioned pieces can I unbind, and what does it cost?',
       a5: "Walk to any crafting station with the piece in your bags and pay the master. The fee follows the item's quality: 25 silver for an uncommon piece, 1 gold for a rare, 4 gold for an epic; a legendary pays the epic rate, and a commissioned common piece pays the uncommon rate. It must be a real station: a mobile station never offers the service.\n\nA piece with any Perfecting rank or the Perfected stamp cannot be unbound. That includes a commissioned piece made with a masterwork head start. A failed first Perfecting attempt that leaves rank zero can still be unbound for the usual fee.\n\nThe piece remains a commission after unbinding, so it binds again to whoever receives it in the next trade. If several bound copies share a stack, one copy is peeled off and unbound per payment.",
       q6: 'Where do I learn recipes, and what do they cost?',
@@ -3688,6 +3748,11 @@ export const guideStrings = {
     junkTitle: 'Clearing out junk',
     junkBody:
       "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
+    // Successor of junkBody (retired in scripts/i18n_retired_keys.mjs): plain
+    // gray junk no longer records a buyback row (items.ts skipsVendorBuyback),
+    // so the Sell Junk sweep is final and the page says so.
+    junkBodyFinal:
+      "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
 
     // Direct player-to-player trading.
     tradeTitle: 'Trading with other players',
@@ -3723,7 +3788,7 @@ export const guideStrings = {
     // Both honor quartermasters share one stock; every Warfare piece is soulbound
     // and records no buyback. What and where only: the arena page owns the detail.
     honorBody:
-      'Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the Warfare armor families, jewelry, and weapons that Honor alone buys. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.',
+      'Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the newest season of Warfare armor and weapons sells for Honor alone, while the armor families, jewelry, and weapons of the last season sell for gold. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.',
     // Pointer only: the guild vault (src/sim/guild_bank.ts) rides a tab on the
     // same bank window. The social page owns the detail (fees, slots, ranks).
     guildBankNote:
@@ -4046,7 +4111,7 @@ export const guideStrings = {
     // states in game. {level} = the riding requirement.
     ridingTitle: 'Learning to ride',
     ridingBody:
-      'Riding is one of the things waiting at the end of the climb. At level {level} a stablemaster will teach you the skill for a serious sum of gold, and a lesson out on the training course earns you your first set of reins. A mount grants no power at all; it simply makes the world smaller, which after a long walk north is its own kind of reward.',
+      "At level {level}, Stablemaster Marla teaches basic riding for gold and offers an advanced rank afterward. Training determines mounted speed. Choose your mount appearance in Cosmetics; collectible appearances are shared while their reins remain in any character's bags or bank.",
   },
 
   // Generic placeholder for sections still being written (build scaffolding).

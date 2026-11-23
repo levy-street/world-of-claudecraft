@@ -289,6 +289,38 @@ describe('self player context menu', () => {
       }).map((action) => action.id),
     ).toEqual(['loot-settings', 'leave-party', 'close']);
   });
+
+  it('says when the live instances have not reached the selected tier', () => {
+    const plain = selfPlayerContextActions({ ...SELF_BASE, isHeroic: true });
+    expect(plain.map((action) => action.id)).not.toContain('dungeon-difficulty-status');
+    const stale = selfPlayerContextActions({
+      ...SELF_BASE,
+      isHeroic: true,
+      unappliedDifficulty: 'normal',
+    });
+    expect(stale.map((action) => action.id)).toEqual([
+      'dungeon-difficulty-status',
+      'dungeon-difficulty',
+      'reset-dungeons',
+      'close',
+    ]);
+    expect(stale[0].label).toBe('Heroic selected. Current instances are still Normal.');
+    expect(stale[1].label).toBe('Set Dungeon Difficulty: Normal');
+    // The status row is informational: painted aria-disabled with no data-act,
+    // so activating it runs nothing; every real action stays actionable.
+    expect(stale[0].inert).toBe(true);
+    expect(stale.slice(1).every((action) => !action.inert)).toBe(true);
+    const back = selfPlayerContextActions({ ...SELF_BASE, unappliedDifficulty: 'heroic' });
+    expect(back[0].label).toBe('Normal selected. Current instances are still Heroic.');
+    // A grouped non-leader never sees the difficulty rows at all.
+    const member = selfPlayerContextActions({
+      ...SELF_BASE,
+      inParty: true,
+      partySize: 3,
+      unappliedDifficulty: 'normal',
+    });
+    expect(member.map((action) => action.id)).not.toContain('dungeon-difficulty-status');
+  });
 });
 
 // The streamer links are operator-entered text that ends up in window.open on every

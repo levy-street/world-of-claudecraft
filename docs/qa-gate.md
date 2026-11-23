@@ -228,6 +228,22 @@ its affected set with the given paths themselves; the property is pinned by exec
 `tests/ci_shard_plan.test.ts`). The entry regenerates the generated artifacts once per
 job before spawning, since `npx vitest` has no npm lifecycle.
 
+**The related walk's heap.** Before running anything, `vitest related` walks the import
+graph of EVERY collected test file in the main process. Stock vitest does that for all of
+them at once and keeps each file's whole dependency Set alive until the last walk ends,
+so its heap grows with test files times graph size; on this suite it crossed the runner's
+default heap and every selective shard died with exit 134 before any test reported. The
+Vitest-only plugin `scripts/lib/vitest_bounded_related.mjs` (registered in
+`vite.config.ts` under `VITEST`) replaces that one selection method with the same
+predicate walked in bounded batches, one boolean per file, and no walk for a file that is
+itself a related path (the floor seeds); the selected set is unchanged. Pinned by
+`tests/vitest_bounded_related.test.ts`, which also proves the override is live in the run,
+and each related run logs one `[bounded-related]` line. It is pinned to the vitest release
+it was verified against (`VERIFIED_VITEST_VERSION`) and refuses to install on any other,
+so a vitest bump fails every run at startup until the stock method is re-checked. Because
+it decides the selective test set, it is a selection pipeline file: a PR touching it runs
+the full suite.
+
 **The real-SQL arm.** The shard gates and nightly's full suite each carry a per-job
 Postgres service and a job-level `TEST_DATABASE_URL`, so the pg integration suites
 (which skip green without the variable) actually run at the merge bar: the
@@ -463,7 +479,8 @@ decision locally: `TEST_MODE=... CHANGED_FILES='[...]' node scripts/ci_shard_tes
 --shard=1/8 --plan-only` (`--plan-only` spawns nothing, so it works on any platform;
 the real run path is POSIX-only by design). Pins: `tests/ci_test_select.test.ts`,
 `tests/ci_shard_plan.test.ts`, `tests/ci_selection_pipeline.test.ts` (the trigger list
-matches the pipeline's real import closure), and the workflow shape in
+matches the pipeline's real import closure, rooted at the two CI entries plus the
+selection plugins `vite.config.ts` registers), and the workflow shape in
 `tests/ci_workflow.test.ts`.
 
 What the selective PR tier still cannot prove: the merge-result INTERACTION between

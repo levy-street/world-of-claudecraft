@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ABILITIES } from '../src/sim/content/classes';
+import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { ActionBarWorldInput } from '../src/ui/hud/action_bar/action_bar_view';
 import {
@@ -9,6 +10,10 @@ import {
   type CooldownManagerWorld,
 } from '../src/ui/hud/cooldown_manager/cooldown_manager_controller';
 import { CooldownManagerSettingsPanel } from '../src/ui/hud/cooldown_manager/cooldown_manager_settings';
+import {
+  type CooldownTooltipHost,
+  cooldownTooltipHtml,
+} from '../src/ui/hud/cooldown_manager/cooldown_manager_wiring';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 
 // Additive, never bare: only the canvas-touching iconDataUrl is stubbed (the
@@ -45,18 +50,24 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
   const known = ['rake', 'claw', 'ferocious_bite', ...(opts.extra ?? [])].map(resolved);
   const world = {
     cfg: { playerClass: 'druid' },
-    player: { name: 'Bob', inCombat: opts.inCombat ?? false },
+    player: { name: 'Bob', inCombat: opts.inCombat ?? false, pos: { x: 0 } },
     known,
     entities: new Map(),
     resolvedAbility: (id: string) => known.find((ability) => ability.def.id === id) ?? null,
-  } as unknown as CooldownManagerWorld & { player: { inCombat: boolean } };
+  } as unknown as CooldownManagerWorld & { player: { inCombat: boolean; pos: { x: number } } };
   const cues: [string, number][] = [];
   let auraGlow: ReadonlySet<string> = new Set();
+  const tooltips = new Map<HTMLElement, () => string>();
+  const tooltipHtml = vi.fn((id: string) => id);
+  const hideTooltip = vi.fn();
   const controller = new CooldownManagerController({
     world,
     writers,
     playCue: (id, volume) => cues.push([id, volume]),
     auraGlowIds: () => auraGlow,
+    attachTooltip: (element, html) => tooltips.set(element, html),
+    tooltipHtml,
+    hideTooltip,
   });
   const cooldowns = new Map<string, number>();
   const snapshot = {
@@ -87,6 +98,9 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
     cooldowns,
     snapshot,
     cues,
+    tooltips,
+    tooltipHtml,
+    hideTooltip,
     setAuraGlow: (ids: string[]) => {
       auraGlow = new Set(ids);
     },
@@ -95,6 +109,74 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
 }
 
 describe('CooldownManagerController', () => {
+  it('dismisses a hovered tooltip when its icon is hidden or rebuilt', () => {
+    const { controller, hooks, snapshot, layer, hideTooltip } = rig();
+    const group = hooks.addGroup('line');
+    hooks.assign('rake', group);
+    controller.paint(snapshot);
+    layer().querySelector('.cdm-btn')?.dispatchEvent(new MouseEvent('mouseenter'));
+    hooks.patchLayout({ enabled: false });
+    controller.paint(snapshot);
+    expect(hideTooltip).toHaveBeenCalledTimes(1);
+    controller.paint(snapshot);
+    expect(hideTooltip).toHaveBeenCalledTimes(1);
+    hooks.patchLayout({ enabled: true });
+    controller.paint(snapshot);
+    layer().querySelector('.cdm-btn')?.dispatchEvent(new MouseEvent('mouseenter'));
+    hooks.assign('claw', group);
+    expect(hideTooltip).toHaveBeenCalledTimes(2);
+  });
+
+  it('attaches a lazy tooltip to every tracked icon after group rebuilds', () => {
+    const { hooks, layer, tooltips, tooltipHtml } = rig();
+    const group = hooks.addGroup('line');
+    hooks.assign('rake', group);
+    hooks.assign('kind:old_blood', group);
+    const buttons = Array.from(layer().querySelectorAll<HTMLElement>('.cdm-btn'));
+    expect(tooltipHtml).not.toHaveBeenCalled();
+    expect(buttons.map((button) => tooltips.get(button)?.())).toEqual(['rake', 'kind:old_blood']);
+    hooks.patchGroup(group!, { orientation: 'vertical' });
+    const rebuilt = layer().querySelector<HTMLElement>('.cdm-btn')!;
+    expect(rebuilt).not.toBe(buttons[0]);
+    tooltipHtml.mockReturnValue('live tooltip');
+    expect(tooltips.get(rebuilt)?.()).toBe('live tooltip');
+  });
+
+  it('resolves spell replacements and refreshed aura details at hover time', () => {
+    const { world } = rig();
+    const abilityTooltip = vi.fn((ability: ResolvedAbility) => ability.def.id);
+    const host: CooldownTooltipHost = {
+      abilityTooltip,
+      aurasView: { auraName: (aura) => aura.name, auraEffectHtml: (aura) => String(aura.value) },
+      aurasPainter: {
+        attachTooltip: () => {},
+        renderTooltip: (name, remaining, effect, toggle) =>
+          `${name}:${remaining}:${effect}:${toggle}`,
+      },
+    };
+    expect(cooldownTooltipHtml(world, 'rake', host)).toBe('rake');
+    const replacement = resolved('claw');
+    world.resolvedAbility = () => replacement;
+    expect(cooldownTooltipHtml(world, 'rake', host)).toBe('claw');
+    const aura = {
+      id: 'old_blood',
+      kind: 'old_blood' as const,
+      name: 'Old Blood',
+      value: 2,
+      remaining: 12,
+    };
+    Object.assign(world.player, { auras: [aura] });
+    expect(cooldownTooltipHtml(world, 'kind:old_blood', host)).toContain('Old Blood:12:2:');
+    aura.remaining = 5;
+    aura.value = 3;
+    expect(cooldownTooltipHtml(world, 'aura:old_blood', host)).toContain('Old Blood:5:3:');
+    expect(cooldownTooltipHtml(world, 'aura:missing', host)).toBe('');
+    Object.assign(world.player, { auras: [] });
+    expect(cooldownTooltipHtml(world, 'kind:old_blood', host)).toContain('tt-title');
+    world.resolvedAbility = () => null;
+    expect(cooldownTooltipHtml(world, 'missing', host)).toBe('');
+  });
+
   it('builds one floating group per kind with explicit grid cells, aria-hidden', () => {
     const { hooks, layer } = rig();
     const line = hooks.addGroup('line') as string;
@@ -268,18 +350,21 @@ describe('CooldownManagerController', () => {
       entities: [],
       activeAimSlot: null,
       wornTrinketId: null,
+      pet: null,
     };
     const refreshed = Object.keys(sample).filter((key) => key !== 'entities');
     expect([...COOLDOWN_WORLD_FIELDS].sort()).toEqual(refreshed.sort());
   });
 
-  it('hides a group by its visibility rule and shows every group while placing', () => {
+  it('hides a group by its ticked combat state and place, and shows all while placing', () => {
     const { hooks, controller, snapshot, world, layer } = rig();
     const always = hooks.addGroup('single') as string;
     const combat = hooks.addGroup('single') as string;
     const hidden = hooks.addGroup('single') as string;
-    hooks.patchGroup(combat, { visibility: 'combat' });
-    hooks.patchGroup(hidden, { visibility: 'hidden' });
+    const instance = hooks.addGroup('single') as string;
+    hooks.patchGroup(combat, { showOutOfCombat: false });
+    hooks.patchGroup(hidden, { showOutOfCombat: false, showInCombat: false });
+    hooks.patchGroup(instance, { showInWorld: false });
     const shown = () =>
       Array.from(layer().querySelectorAll<HTMLElement>('.cdm-group'))
         .filter((g) => g.style.display !== 'none')
@@ -289,14 +374,106 @@ describe('CooldownManagerController', () => {
     world.player.inCombat = true;
     controller.paint(snapshot);
     expect(shown()).toEqual([always, combat]);
+    // Step onto the instance plane (a dungeon, raid, delve, rift or the arena).
+    world.player.pos.x = DUNGEON_X_THRESHOLD + 900;
+    controller.paint(snapshot);
+    expect(shown()).toEqual([always, combat, instance]);
+    world.player.inCombat = false;
+    controller.paint(snapshot);
+    expect(shown()).toEqual([always, instance]);
+    world.player.pos.x = DUNGEON_X_THRESHOLD;
+    controller.paint(snapshot);
+    expect(shown()).toEqual([always]);
     hooks.setPlacement(true);
     controller.paint(snapshot);
-    expect(shown()).toEqual([always, combat, hidden]);
+    expect(shown()).toEqual([always, combat, hidden, instance]);
     expect(layer().classList.contains('placement')).toBe(true);
     hooks.patchLayout({ enabled: false });
     hooks.setPlacement(false);
     controller.paint(snapshot);
     expect(layer().style.display).toBe('none');
+  });
+
+  it('reads a pre-checkmark save from storage: hidden stays a sound-only route', () => {
+    localStorage.setItem(
+      'woc_cooldown_manager:druid:Bob',
+      JSON.stringify({
+        groups: [{ id: 'g1', kind: 'single', spells: ['rake'], visibility: 'hidden' }],
+        spells: { rake: { soundId: CUE, soundVolume: 0.4, onlyWhenReady: true } },
+      }),
+    );
+    const { hooks, controller, snapshot, cues, cooldowns, layer } = rig();
+    expect(hooks.groups()[0]).toMatchObject({
+      showOutOfCombat: false,
+      showInCombat: false,
+      showInWorld: true,
+      showInInstances: true,
+    });
+    expect(hooks.getSpell('rake')).toMatchObject({ showReady: true, showNotReady: false });
+    // Patching another field keeps the migrated choice.
+    hooks.patchSpell('rake', { soundVolume: 0.6 });
+    expect(hooks.getSpell('rake')).toMatchObject({ showNotReady: false, soundVolume: 0.6 });
+    controller.paint(snapshot);
+    expect(layer().querySelector<HTMLElement>('.cdm-group')?.style.display).toBe('none');
+    cooldowns.set('rake', 5);
+    controller.paint(snapshot);
+    cooldowns.delete('rake');
+    controller.paint(snapshot);
+    expect(cues).toEqual([[CUE, 0.6]]);
+  });
+
+  it('mutes an instance-only group outside instances: no cue, no hotbar glow', () => {
+    const { hooks, controller, snapshot, cues, world, cooldowns } = rig();
+    const id = hooks.addGroup('single') as string;
+    hooks.assign('rake', id);
+    hooks.patchSpell('rake', { soundId: CUE, soundVolume: 0.5, hotbarGlow: true });
+    hooks.patchGroup(id, { showInWorld: false });
+    const cycle = () => {
+      cooldowns.set('rake', 5);
+      controller.paint(snapshot);
+      cooldowns.delete('rake');
+      controller.paint(snapshot);
+    };
+    controller.paint(snapshot);
+    cycle();
+    expect(cues).toEqual([]);
+    expect([...controller.readyGlowAbilityIds()]).toEqual([]);
+    // Inside an instance the same group sounds and lights the bar.
+    world.player.pos.x = DUNGEON_X_THRESHOLD + 900;
+    controller.paint(snapshot);
+    // Entering while already ready replays no stale edge.
+    expect(cues).toEqual([]);
+    expect([...controller.readyGlowAbilityIds()]).toEqual(['rake']);
+    cycle();
+    expect(cues).toEqual([[CUE, 0.5]]);
+    // A group hidden by its combat row alone still sounds (a sound-only route).
+    hooks.patchGroup(id, { showOutOfCombat: false, showInCombat: false, showInWorld: true });
+    world.player.pos.x = 0;
+    cycle();
+    expect(cues).toHaveLength(2);
+  });
+
+  it('shows a buff reminder lit while the aura is missing and hides it once up', () => {
+    const { controller, hooks, snapshot, layer, cues } = rig();
+    const id = hooks.addGroup('single') as string;
+    expect(hooks.assign('kind:old_blood', id)).toBe(true);
+    hooks.patchSpell('kind:old_blood', { showReady: false, soundId: CUE });
+    const auras = (snapshot.player as unknown as { auras: unknown[] }).auras;
+    const btn = () => layer().querySelector<HTMLElement>('.cdm-btn');
+    controller.paint(snapshot);
+    expect(btn()?.style.visibility).toBe('');
+    expect(btn()?.classList.contains('is-ready')).toBe(true);
+    expect(btn()?.classList.contains('is-on')).toBe(true);
+    expect(btn()?.classList.contains('is-proc')).toBe(true);
+    expect(btn()?.classList.contains('is-unusable')).toBe(false);
+    auras.push({ id: 'old_blood', kind: 'old_blood', value: 0, stacks: 1, remaining: 12 });
+    controller.paint(snapshot);
+    expect(btn()?.style.visibility).toBe('hidden');
+    expect(cues).toEqual([]);
+    auras.length = 0;
+    controller.paint(snapshot);
+    expect(btn()?.style.visibility).toBe('');
+    expect(cues).toEqual([[CUE, 0.7]]);
   });
 
   it('restyles a group in place for appearance changes and re-cells it for layout ones', () => {
@@ -348,8 +525,13 @@ describe('CooldownManagerSettingsPanel', () => {
     expect(root.querySelectorAll('.cdm-group-card')).toHaveLength(3);
     // A single button has no orientation, direction or padding to choose.
     const [single, grid] = Array.from(root.querySelectorAll<HTMLElement>('.cdm-group-card'));
-    expect(single.querySelectorAll('select')).toHaveLength(1);
-    expect(grid.querySelectorAll('select')).toHaveLength(3);
+    expect(single.querySelectorAll('select')).toHaveLength(0);
+    expect(grid.querySelectorAll('select')).toHaveLength(2);
+    // When and where it shows are checkmark rows on every card, not a select.
+    for (const card of [single, grid]) {
+      expect(card.querySelectorAll('fieldset.cdm-check-row')).toHaveLength(2);
+      expect(card.querySelectorAll('input[type="checkbox"]')).toHaveLength(4);
+    }
   });
 
   it('lists the whole castable spellbook as Not Displayed until a spell is placed', () => {
@@ -401,7 +583,81 @@ describe('CooldownManagerSettingsPanel', () => {
     const card = root.querySelector<HTMLElement>('.cdm-detail-card');
     expect(card?.textContent).toContain('Alert at Stacks');
     expect(card?.textContent).not.toContain('Hotbar Glow');
-    expect(card?.textContent).toContain('Only Show While Active');
+    expect(card?.querySelector('legend')?.textContent).toBe('Show Button While the Aura Is');
+    expect(
+      Array.from(card?.querySelectorAll('.cdm-check') ?? []).map((label) => label.textContent),
+    ).toEqual(['Active', 'Missing']);
+  });
+
+  it('ticks a group into instances only, and the checkmarks combine', () => {
+    const { root, hooks, settings } = panel();
+    const id = hooks.addGroup('line') as string;
+    settings.render(root);
+    const box = (key: string) =>
+      root.querySelector<HTMLInputElement>(`[data-focus-key="cdm-${key}:${id}"]`);
+    const labels = Array.from(root.querySelectorAll('.cdm-group-card .cdm-check')).map(
+      (label) => label.textContent,
+    );
+    expect(labels).toEqual(['Out of Combat', 'In Combat', 'Open World', 'Instances']);
+    const world = box('showInWorld');
+    if (!world) throw new Error('no Open World box');
+    expect(world.checked).toBe(true);
+    world.checked = false;
+    world.dispatchEvent(new Event('change'));
+    expect(hooks.groups()[0]).toMatchObject({
+      showOutOfCombat: true,
+      showInCombat: true,
+      showInWorld: false,
+      showInInstances: true,
+    });
+    // The rebuild keeps focus on the box just ticked.
+    expect(document.activeElement).toBe(box('showInWorld'));
+    const ooc = box('showOutOfCombat');
+    if (!ooc) throw new Error('no Out of Combat box');
+    ooc.checked = false;
+    ooc.dispatchEvent(new Event('change'));
+    expect(hooks.groups()[0]).toMatchObject({ showOutOfCombat: false, showInWorld: false });
+    expect(box('showInCombat')?.checked).toBe(true);
+  });
+
+  it('turns an aura into a buff reminder from its card and explains it', () => {
+    const { root, hooks, settings } = panel();
+    const id = hooks.addGroup('line') as string;
+    hooks.assign('kind:old_blood', id);
+    settings.render(root);
+    chips(root, id)[0].click();
+    const active = root.querySelector<HTMLInputElement>('[data-focus-key="cdm-detail-showReady"]');
+    if (!active) throw new Error('no Active box');
+    active.checked = false;
+    active.dispatchEvent(new Event('change'));
+    expect(hooks.getSpell('kind:old_blood')).toMatchObject({
+      showReady: false,
+      showNotReady: true,
+    });
+    const card = root.querySelector<HTMLElement>('.cdm-detail-card');
+    expect(card?.textContent).toContain('Buff reminder');
+    expect(card?.textContent).toContain('Light Up While Missing');
+    expect(card?.textContent).not.toContain('Light Up When Ready');
+  });
+
+  it('gives a spell card Ready and Not Ready checkmarks', () => {
+    const { root, hooks, settings } = panel();
+    const id = hooks.addGroup('line') as string;
+    hooks.assign('rake', id);
+    settings.render(root);
+    chips(root, id)[0].click();
+    const card = root.querySelector<HTMLElement>('.cdm-detail-card');
+    expect(
+      Array.from(card?.querySelectorAll('.cdm-check') ?? []).map((label) => label.textContent),
+    ).toEqual(['Ready', 'Not Ready']);
+    const notReady = root.querySelector<HTMLInputElement>(
+      '[data-focus-key="cdm-detail-showNotReady"]',
+    );
+    if (!notReady) throw new Error('no Not Ready box');
+    notReady.checked = false;
+    notReady.dispatchEvent(new Event('change'));
+    expect(hooks.getSpell('rake')).toMatchObject({ showReady: true, showNotReady: false });
+    expect(root.querySelector('.cdm-detail-card')?.textContent).not.toContain('Buff reminder');
   });
 
   it('moves a spell by drag and drop onto a group section', () => {

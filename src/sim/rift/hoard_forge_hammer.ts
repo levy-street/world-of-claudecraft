@@ -26,6 +26,7 @@ import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   hoardIntensity,
   hoardMechanicDamage,
+  hoardPlayerBudget,
   hoardPressure,
 } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
@@ -111,7 +112,8 @@ export function tickHoardForgeHammer(
   // Enough players in a rare enough hoard, and a SECOND hammer joins: the two
   // alternate, so a new shadow appears while the last ring is still spreading.
   hammer.hammers = hoardIntensity(inst.vault, living) >= HOARD_DOUBLE_MECHANIC_INTENSITY ? 2 : 1;
-  hammer.strikes = forgeStrikeCount(pressure.extra, living) * hammer.hammers;
+  hammer.strikes =
+    forgeStrikeCount(pressure.extra, hoardPlayerBudget(inst.vault, living)) * hammer.hammers;
   hammer.beats = 0;
   hammer.lastX = Number.NaN;
   hammer.lastZ = Number.NaN;

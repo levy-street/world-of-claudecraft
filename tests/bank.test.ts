@@ -30,6 +30,7 @@ import { STORAGE_SKUS } from '../src/sim/content/storage_charters';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { isMaterialItemId } from '../src/sim/material_ids';
 import { Sim } from '../src/sim/sim';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type {
   Entity,
   InvSlot,
@@ -59,11 +60,8 @@ const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'] 
 // lets one stand in for the other in a capacity fixture without re-deriving a
 // single number (the premise is pinned below, not assumed).
 const MATERIAL = 'wolf_fang'; // kind 'junk' AND a recipe reagent
-const NON_MATERIAL = 'baked_bread'; // kind 'food', so structurally never a material
-// The Sim-driven arms need a non-material the character does NOT already carry:
-// baked_bread is every class's starting ration (5 loaves), which would collide
-// with each fixture's own counts. Spitted Boar Haunch is the same kind and cap.
-const NON_MATERIAL_SIM = 'roasted_boar';
+const NON_MATERIAL = 'stag_antler'; // Non-reagent vendor junk, outside source accounting.
+const NON_MATERIAL_SIM = 'amber_hide'; // Same cap and absent from starter inventory.
 
 // Exact per-unit provenance, written as LITERALS a test owns. Never derived by
 // calling the production normalizer: an expectation computed from the code under
@@ -186,13 +184,15 @@ describe('fixture premises (the material split this suite is built on)', () => {
     // The cap that lets the two stand in for each other, pinned as a literal on
     // both sides (20 is the default for every kind outside the unstacked family).
     expect(stackSizeOf(ITEMS[MATERIAL])).toBe(20);
+    expect(isStackProvenanceItemId(NON_MATERIAL)).toBe(false);
+    expect(isStackProvenanceItemId(NON_MATERIAL_SIM)).toBe(false);
     expect(stackSizeOf(ITEMS[NON_MATERIAL])).toBe(20);
     expect(stackSizeOf(ITEMS[NON_MATERIAL_SIM])).toBe(20);
-    // WHY each non-material can never drift into the material set: the
-    // derivation keeps only kind 'junk' ids, whatever table names them.
+    // Junk membership alone does not make a material: the reagent registry
+    // must actually include it. Vendor trash remains outside source accounting.
     expect(ITEMS[MATERIAL].kind).toBe('junk');
-    expect(ITEMS[NON_MATERIAL].kind).toBe('food');
-    expect(ITEMS[NON_MATERIAL_SIM].kind).toBe('food');
+    expect(ITEMS[NON_MATERIAL].kind).toBe('junk');
+    expect(ITEMS[NON_MATERIAL_SIM].kind).toBe('junk');
     // The filler gear every capacity fixture packs containers with is outside
     // the material set too, so a gear-filled container never accidentally
     // exercises the source-aware packing path.
@@ -401,57 +401,57 @@ describe('deposit rules', () => {
     expect(carried[0].materialSources).toEqual(mixed);
   });
 
-  it('round-trips a whole LOCKED material stack as ONE bank slot, never one per unit', () => {
-    // Locking a stack is one flag over its WHOLE count (item_lock.ts
-    // setItemLocked locks every unit in place, no split); a deposit into the
-    // bank must land it as ONE slot carrying the full count, not one slot per
-    // unit (the material_stack_packing.ts perFreshSlot regression a player hit
-    // locking a stack of 20 and depositing it).
-    const sim = makeSim();
-    const m = meta(sim);
-    sim.addItem(MATERIAL, 20);
-    const idx = m.inventory.findIndex((s) => s.itemId === MATERIAL);
-    sim.setItemLocked(MATERIAL, true, sim.playerId, idx);
-    expect(m.inventory[idx].instance).toEqual({ locked: true });
+  it('refuses to deposit a LOCKED stack, material or not, mutating nothing', () => {
+    // The lock pins a copy to its bag cell (inventory_order.ts), so it never
+    // leaves for the bank: refused aloud, bags and bank untouched.
+    for (const itemId of [MATERIAL, NON_MATERIAL_SIM]) {
+      const sim = makeSim();
+      const m = meta(sim);
+      sim.addItem(itemId, 20);
+      const idx = m.inventory.findIndex((s) => s.itemId === itemId);
+      sim.setItemLocked(itemId, true, sim.playerId, idx);
+      const before = JSON.stringify({ inv: m.inventory, bank: m.bank.inventory });
+      sim.drainEvents();
 
-    sim.bankDeposit(idx);
+      sim.bankDeposit(idx);
 
-    const banked = m.bank.inventory.filter((s) => s.itemId === MATERIAL);
-    expect(banked).toHaveLength(1);
-    expect(banked[0].count).toBe(20);
-    expect(banked[0].instance).toEqual({ locked: true });
-
-    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.itemId === MATERIAL));
-    const carried = m.inventory.filter((s) => s.itemId === MATERIAL);
-    expect(carried).toHaveLength(1);
-    expect(carried[0].count).toBe(20);
-    expect(carried[0].instance).toEqual({ locked: true });
+      expect(
+        sim
+          .drainEvents()
+          .some(
+            (e) =>
+              e.type === 'error' &&
+              e.text === 'That item is locked and cannot be stored in the bank.',
+          ),
+        itemId,
+      ).toBe(true);
+      expect(JSON.stringify({ inv: m.inventory, bank: m.bank.inventory }), itemId).toBe(before);
+    }
   });
 
-  it('round-trips a whole LOCKED non-material stack as ONE bank slot too (bags.ts sibling fix)', () => {
-    // The non-material twin of the case above: bags.ts countFit/addStacked
-    // had the identical fresh-slot-sizing bug for a locked stackable item
-    // that is NOT a material (a food/consumable stack here), since it is a
-    // separate code path from the material packing core.
-    const sim = makeSim();
-    const m = meta(sim);
-    sim.addItem(NON_MATERIAL_SIM, 20);
-    const idx = m.inventory.findIndex((s) => s.itemId === NON_MATERIAL_SIM);
-    sim.setItemLocked(NON_MATERIAL_SIM, true, sim.playerId, idx);
-    expect(m.inventory[idx].instance).toEqual({ locked: true });
+  it('withdraws a legacy LOCKED bank row as ONE carried stack, never one per unit', () => {
+    // A save from before the deposit refusal can still hold a locked row. The
+    // fresh-slot-sizing fix (material_stack_packing.ts perFreshSlot, and its
+    // bags.ts countFit/addStacked sibling for a non-material) must still land
+    // the whole count as ONE carried slot, not one slot per unit.
+    for (const itemId of [MATERIAL, NON_MATERIAL_SIM]) {
+      const sim = makeSim();
+      const m = meta(sim);
+      m.inventory.length = 0;
+      m.bank.inventory.push({
+        itemId,
+        count: 20,
+        instance: { locked: true },
+        ...(itemId === MATERIAL ? { materialSources: unrecorded(20) } : {}),
+      });
 
-    sim.bankDeposit(idx);
+      sim.bankWithdraw(0);
 
-    const banked = m.bank.inventory.filter((s) => s.itemId === NON_MATERIAL_SIM);
-    expect(banked).toHaveLength(1);
-    expect(banked[0].count).toBe(20);
-    expect(banked[0].instance).toEqual({ locked: true });
-
-    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.itemId === NON_MATERIAL_SIM));
-    const carried = m.inventory.filter((s) => s.itemId === NON_MATERIAL_SIM);
-    expect(carried).toHaveLength(1);
-    expect(carried[0].count).toBe(20);
-    expect(carried[0].instance).toEqual({ locked: true });
+      const carried = m.inventory.filter((s) => s.itemId === itemId);
+      expect(carried, itemId).toHaveLength(1);
+      expect(carried[0].count, itemId).toBe(20);
+      expect(carried[0].instance, itemId).toEqual({ locked: true });
+    }
   });
 
   it('a differently-signed deposit still lands in its own bank slot', () => {
@@ -1500,6 +1500,7 @@ describe('persistence and back-compat', () => {
     // shape. The one-time conversion of a LEGACY sourceless row is a different
     // question, asked by its own case below rather than by weakening this
     // comparison (nothing is stripped from either side here).
+    m.inventory = [{ itemId: 'baked_bread', count: 5, materialSources: unrecorded(5) }];
     m.bank.inventory = [
       { itemId: 'wolf_fang', count: 12, materialSources: unrecorded(12) },
       { itemId: 'linen_scrap', count: 4, materialSources: unrecorded(4) },
@@ -1545,11 +1546,15 @@ describe('persistence and back-compat', () => {
     // deep-equal test that only ever looked at already-canonical stock.
     const sim = makeSim();
     const m = meta(sim);
+    m.inventory = [{ itemId: 'baked_bread', count: 5, materialSources: unrecorded(5) }];
     m.bank.inventory = [
       { itemId: 'wolf_fang', count: 12 },
       { itemId: 'worn_sword', count: 1, instance: { signer: 'Cyd' } },
     ];
     const s1 = sim.serializeCharacter(sim.playerId)!;
+    // The current serializer emits canonical sources. Construct historical
+    // input explicitly so this remains a test of the legacy LOAD boundary.
+    s1.bank!.inventory = structuredClone(m.bank.inventory);
     // Non-vacuity: the FIRST save really is the legacy shape. Without this the
     // conversion assertion below could be comparing canonical stock to itself.
     expect(s1.bank!.inventory[0].materialSources).toBeUndefined();
@@ -1934,11 +1939,11 @@ describe('sanitizeBankState', () => {
       sanitizeBankState({ inventory: [], purchasedSlots: 0, bonusSlots: n }).bonusSlots;
     expect(bs(-4)).toBe(0);
     expect(bs(5)).toBe(5);
-    expect(bs(16)).toBe(16); // the ceiling itself is admitted...
-    expect(bs(17)).toBe(16); // ...and anything past it clamps (tampered-save capacity mint)
-    expect(bs(9999)).toBe(16);
+    expect(bs(36)).toBe(36); // the ceiling itself is admitted...
+    expect(bs(37)).toBe(36); // ...and anything past it clamps (tampered-save capacity mint)
+    expect(bs(9999)).toBe(36);
     expect(bs(7.9)).toBe(7); // floored, like purchasedSlots
-    expect(BANK_MAX_BONUS_SLOTS).toBe(16); // 2 email + 2 discord + 2 wallet + 10 referral
+    expect(BANK_MAX_BONUS_SLOTS).toBe(36); // Existing 16 plus permanent 20 from stamp cards.
   });
 });
 
@@ -2260,14 +2265,14 @@ describe('server-stamped bank bonus', () => {
     { id: 'referral', slots: 6, maxSlots: 10, count: 3, cap: 5 },
   ];
 
-  it('clampBonusSlots pins the [0, 16] registry ceiling as literals', () => {
+  it('clampBonusSlots pins the [0, 36] registry ceiling as literals', () => {
     expect(clampBonusSlots(-3)).toBe(0);
     expect(clampBonusSlots(0)).toBe(0);
     expect(clampBonusSlots(10.9)).toBe(10);
-    expect(clampBonusSlots(16)).toBe(16);
-    expect(clampBonusSlots(17)).toBe(16);
+    expect(clampBonusSlots(36)).toBe(36);
+    expect(clampBonusSlots(37)).toBe(36);
     expect(clampBonusSlots(Number.NaN)).toBe(0);
-    expect(clampBonusSlots(Number.POSITIVE_INFINITY)).toBe(16);
+    expect(clampBonusSlots(Number.POSITIVE_INFINITY)).toBe(36);
     expect(clampBonusSlots('junk')).toBe(0);
   });
 

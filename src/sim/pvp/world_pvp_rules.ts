@@ -44,6 +44,24 @@ export const WORLD_PVP_KILL_HONOR = 10;
  *  killing blow does not count as having helped (the battleground's window). */
 export const WORLD_PVP_ASSIST_WINDOW = 10;
 
+/** How long the gold of a FORFEITED fight waits before it reaches the winner
+ *  (owner tuning: "transfer it after 5 minutes"). A player who leaves the world
+ *  (a logout, a closed client, a dropped connection, a takeover from another
+ *  login) while a world fight is live inside WORLD_PVP_ASSIST_WINDOW dies to
+ *  their opponent on the spot: the honor and the kill/death record land at
+ *  once, the stake leaves the leaver's purse at once, and the stake reaches the
+ *  winner this long after (world_pvp_forfeit.ts, world_pvp_payouts.ts). */
+export const WORLD_PVP_FORFEIT_PAYOUT_SECONDS = 5 * 60;
+
+/** How long a world fight keeps a departing player's body in the world, in sim
+ *  seconds since their last world-hostile hit, taken or dealt (owner tuning:
+ *  "logging out when you have been in combat in the past few minutes should
+ *  make it so your character remains in world for a while like if you had
+ *  closed the tab"). A logout inside it is held like a closed client, for the
+ *  linkdead grace, and while it is open no other character on the account can
+ *  displace the held body (world_pvp_forfeit.ts worldPvpHoldsDeparture). */
+export const WORLD_PVP_DEPARTURE_HOLD_WINDOW = 3 * 60;
+
 /** A victim more than this many levels BELOW a contributor is "grey" to them:
  *  that contributor takes neither honor nor gold from the kill, and the victim
  *  is not charged that contributor's share. The classic grey-kill rule, and the

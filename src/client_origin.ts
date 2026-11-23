@@ -8,6 +8,11 @@ export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
 /** The public Marketplace terms page, for shells whose origin is not the site
  *  (the wallet-connect modal's terms link and src/ui/terms_link.ts share it). */
 export const CANONICAL_TERMS_URL = 'https://worldofclaudecraft.com/terms';
+/** The public Privacy Policy page, for shells whose origin is not the site. */
+export const CANONICAL_PRIVACY_URL = 'https://worldofclaudecraft.com/privacy';
+/** The public Whitepaper PDF, for shells whose origin is not the site. */
+export const CANONICAL_WHITEPAPER_URL =
+  'https://worldofclaudecraft.com/World-of-ClaudeCraft-Whitepaper-v1.0.pdf';
 /** The playable client (not the marketing root), for shells whose origin is
  *  not the site (src/ui/woc_market_link.ts's desktop-shell browser hand-off). */
 export const CANONICAL_WOC_MARKET_URL = 'https://worldofclaudecraft.com/play';

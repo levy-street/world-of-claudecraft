@@ -1,5 +1,6 @@
-// The raised-tier Y lift the server applies inside a rift, for the display-only
-// self-motion predictor (self_motion.ts). Mirrors the exact strip/reapply pair
+// The raised-tier Y lift the server applies inside a rift, for both display
+// predictors: the legacy self-motion one (self_motion.ts) and the reconciling
+// one (self_prediction.ts, through withRiftLift below). Mirrors the exact strip/reapply pair
 // Sim.updatePlayerMovement and updateRiftTriggers run around the movement kernel
 // each tick (src/sim/rift/runs.ts riftPlayerLift, generateRiftFloor + riftLiftAt),
 // using the same pure generator so the predicted pose stands on a platform or
@@ -11,6 +12,7 @@ import { isRiftPos, RIFT_REGION_HALF_X, RIFT_REGION_HALF_Z } from '../sim/data';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../sim/rift/types';
 import type { RiftFloorView } from '../world_api/dungeons';
+import type { PredictionStep } from './self_prediction_core';
 
 /** Resolve the descriptor into the same cached RiftFloorPlan generateRiftFloor
  *  hands the server, ONCE per predictor step() call. A step touches the lift
@@ -50,4 +52,33 @@ export function riftLiftFor(
   const localZ = z - origin.z;
   if (Math.abs(localX) > RIFT_REGION_HALF_X || Math.abs(localZ) > RIFT_REGION_HALF_Z) return 0;
   return riftLiftAt(plan, localX, localZ);
+}
+
+/** The reconciling predictor's kernel step (self_prediction.ts), wrapped in the
+ *  same raised-tier strip and reapply the server runs around that kernel each
+ *  tick: Sim.updatePlayerMovement takes the lift at the pre-move spot off the
+ *  feet (player_movement_modes.ts), the kernel integrates against the flat
+ *  floor, and updateRiftTriggers adds the lift back at the post-move spot. The
+ *  bare step saw a body a whole deck height above the flat floor under it,
+ *  read that as a ledge and dropped it through the deck (a live report in a
+ *  raised Buried Hoard cave: the player sank under the deck, camera and all).
+ *  Replay needs the identical arithmetic for an exact match, so the lift is
+ *  read through riftLiftFor, the same field the server samples. A body in a
+ *  sailing ship's frame (`deck`) is never in a rift and steps untouched. */
+export function withRiftLift(
+  step: PredictionStep,
+  riftFloor: () => RiftFloorView | null,
+): PredictionStep {
+  return (state, frame) => {
+    const view = riftFloor();
+    if (!view || (state.deck ?? null) !== null) {
+      step(state, frame);
+      return;
+    }
+    const plan = resolvedRiftFloorPlan(view);
+    const lift = riftLiftFor(plan, view.origin, state.pos.x, state.pos.z);
+    if (lift !== 0) state.pos.y -= lift;
+    step(state, frame);
+    state.pos.y += riftLiftFor(plan, view.origin, state.pos.x, state.pos.z);
+  };
 }

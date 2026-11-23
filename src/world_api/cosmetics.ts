@@ -12,6 +12,9 @@ export interface AccountCosmetics {
   // mirrored from the economy service's grant ledger. The WORN skin is per
   // character (Entity.mountSkinId), not account state, so it is not here.
   mountSkinIds: string[];
+  // Revocable looks backed by reins held in any character's bags or personal bank.
+  // This is a host projection, never a permanent purchase or character-save field.
+  collectibleMountSkinIds?: string[];
 }
 
 export interface IWorldCosmetics {

@@ -6,19 +6,20 @@
 // hydrates: while the character GLBs are still preloading the chip shows the
 // class crest as a placeholder and upgrades to the real portrait once ready.
 
-import { modularVisualKey } from '../render/characters/manifest';
+import { type BodyPick, modularVisualKey, playerVisualKey } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import {
   cachedPortraitByKey,
   composedPortraitKey,
   isComposedPortraitKey,
+  isHeadPortraitKey,
   modularPortraitDataUrl,
   onPortraitsReady,
   onPortraitUpdate,
   type PortraitFraming,
-  playerPortraitDataUrl,
   portraitsReady,
   visualPortraitDataUrl,
+  visualPortraitKey,
 } from '../render/characters/portrait';
 import type { PlayerClass, SkinCatalog } from '../sim/types';
 import {
@@ -73,6 +74,53 @@ export interface PortraitChipOpts {
    *  class-atlas index, and any `look` is ignored (the world shows the mech,
    *  so the chip must too). */
   catalog?: SkinCatalog;
+  /** The character's stored appearance (their `app`, the character's own DB
+   *  column), even when no look composes: it picks the male or female body of a
+   *  fixed WOC class AND the modular head that body's headshot wears, so the
+   *  chip shows THEIR hair, beard, face and colours rather than the body's
+   *  default head (portrait.ts visualPortraitDataUrl). */
+  appearance?: BodyPick;
+}
+
+/** What a pending HEAD-keyed chip re-asks with: a WOC body in its player's own
+ *  head is keyed by that head (portrait.ts visualPortraitKey), and an appearance
+ *  does not fit in a data attribute, so the builder files the request here under
+ *  the key the chip carries and hydratePortraits re-asks through it (which kicks
+ *  the capture a chip built before the assets were ready never started).
+ *  Bounded like the per-player half of the portrait cache it feeds: the oldest
+ *  request leaves first, and a chip whose request aged out keeps its crest. */
+interface HeadChipRequest {
+  readonly visualKey: string;
+  readonly skin: number;
+  readonly framing: PortraitFraming;
+  readonly head: BodyPick;
+}
+
+/** The request registry's cap: the portrait cache's per-player cap (portrait.ts
+ *  MODULAR_PORTRAIT_CACHE_MAX), a raid plus headroom. A literal, not the import:
+ *  the HUD suites mock the portrait module without it, and this is module scope. */
+export const HEAD_CHIP_REQUESTS_MAX = 48;
+const headChipRequests = new Map<string, HeadChipRequest>();
+
+function rememberHeadChip(key: string, request: HeadChipRequest): void {
+  headChipRequests.delete(key);
+  headChipRequests.set(key, request);
+  while (headChipRequests.size > HEAD_CHIP_REQUESTS_MAX) {
+    const oldest = headChipRequests.keys().next().value;
+    if (oldest === undefined) break;
+    headChipRequests.delete(oldest);
+  }
+}
+
+/** A head-keyed chip's portrait: the live getter re-asked with the appearance its
+ *  builder filed (a hit, or a miss that kicks the capture), else a peek at the
+ *  key alone. Null while the capture runs, and for a chip whose request aged out,
+ *  which keeps its crest rather than wear a face that is not that player's. */
+function headChipUrl(key: string | undefined): string | null {
+  if (!key) return null;
+  const request = headChipRequests.get(key);
+  if (!request) return cachedPortraitByKey(key);
+  return visualPortraitDataUrl(request.visualKey, request.skin, request.framing, request.head);
 }
 
 /** Class crest data URL — the placeholder before the 3D portrait is ready and
@@ -98,6 +146,13 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
     catalog = 'class',
   } = opts;
   const mech = catalog === 'mech';
+  const visualKey = mech ? 'player_mech' : playerVisualKey(cls, opts.appearance);
+  // A class body in its player's OWN head (a WOC body with a custom head) keys
+  // its portrait on that head; a default head keys like no head at all, so a
+  // stock chip is unchanged.
+  const headKey =
+    mech || look ? null : visualPortraitKey(visualKey, skin, framing, opts.appearance);
+  const head = headKey !== null && isHeadPortraitKey(headKey) ? opts.appearance : undefined;
   // A composed chip is never `deferSource`: that path re-derives the URL in
   // hydratePortraits from data attributes alone, and a look does not fit in
   // one. It is only used for dense repeated grids of OTHER players anyway.
@@ -107,7 +162,7 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
       ? modularPortraitDataUrl(modularVisualKey(cls), look, framing)
       : deferSource
         ? null
-        : playerPortraitDataUrl(cls, skin, framing);
+        : visualPortraitDataUrl(visualKey, skin, framing, head);
   const src = deferSource ? null : (portrait ?? crestUrl(cls));
   const source = src ? ` src="${src}"` : '';
   const crestId = `class_${cls}`;
@@ -129,15 +184,21 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   // themselves (the sheet, the roster row) do so as well.
   const composedKey =
     !mech && look && !portrait ? composedPortraitKey(modularVisualKey(cls), look, framing) : null;
+  // A pending head-keyed chip waits on its key the same way, through the request
+  // filed for hydratePortraits (see HeadChipRequest).
+  const pendingHeadKey = head !== undefined && (deferSource || !portrait) ? headKey : null;
+  if (pendingHeadKey) rememberHeadChip(pendingHeadKey, { visualKey, skin, framing, head });
   const composed = composedKey
     ? ` data-portrait-composed="1" data-portrait-key="${esc(composedKey)}"`
-    : '';
+    : pendingHeadKey
+      ? ` data-portrait-head="1" data-portrait-key="${esc(pendingHeadKey)}"`
+      : '';
   const alt = esc(t('character.portraitAlt', { name }));
   const badgeHtml = badge
     ? `<img class="portrait-badge" src="${crestUrl(cls)}" ${fallbackAttrs} alt="" aria-hidden="true" draggable="false">`
     : '';
   return (
-    `<span class="portrait-chip portrait-${variant}${fallbackCls}" data-class="${cls}" data-cls="${cls}" data-skin="${skin}" data-catalog="${catalog}" data-framing="${framing}"${pending}${composed}>` +
+    `<span class="portrait-chip portrait-${variant}${fallbackCls}" data-class="${cls}" data-cls="${cls}" data-skin="${skin}" data-catalog="${catalog}" data-visual-key="${visualKey}" data-framing="${framing}"${pending}${composed}>` +
     `<span class="portrait-ring"><img class="portrait-img"${source}${portraitFallbackAttrs} alt="${alt}" loading="lazy" decoding="async" draggable="false"></span>` +
     badgeHtml +
     `</span>`
@@ -148,7 +209,7 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
  *  portrait. Safe to call repeatedly; a no-op until assets are ready. */
 export function hydratePortraits(
   root: ParentNode = document,
-  onlyClass?: PlayerClass,
+  onlyVisualKey?: string,
   onlySkin?: number,
 ): void {
   hydrateCrestImageFallbacks(root);
@@ -160,12 +221,16 @@ export function hydratePortraits(
     const cls = chip.dataset.cls as PlayerClass | undefined;
     if (!cls) return;
     const skin = Number(chip.dataset.skin ?? 0) || 0;
-    if (onlyClass && (cls !== onlyClass || skin !== onlySkin)) return;
+    const visualKey =
+      chip.dataset.visualKey ??
+      (chip.dataset.catalog === 'mech' ? 'player_mech' : playerVisualKey(cls, null));
+    if (onlyVisualKey && (visualKey !== onlyVisualKey || skin !== onlySkin)) return;
     const framing = (chip.dataset.framing as PortraitFraming | undefined) ?? 'headshot';
-    const url =
-      chip.dataset.catalog === 'mech'
-        ? visualPortraitDataUrl('player_mech', skin, framing)
-        : playerPortraitDataUrl(cls, skin, framing);
+    // A head-keyed chip re-asks with the appearance its builder filed: the data
+    // attributes alone would re-derive the body's DEFAULT head.
+    const url = chip.dataset.portraitHead
+      ? headChipUrl(chip.dataset.portraitKey)
+      : visualPortraitDataUrl(visualKey, skin, framing);
     if (!url) return;
     const img = chip.querySelector<HTMLImageElement>('.portrait-img');
     if (img) {
@@ -209,11 +274,5 @@ onPortraitUpdate((_visualKey, _skin, key) => {
 });
 onPortraitUpdate((visualKey, skin) => {
   if (!visualKey.startsWith('player_')) return;
-  // A mech chip carries the WEARER's class in data-cls and the chroma in
-  // data-skin, so no class filter can name it: rehydrate the whole page.
-  if (visualKey === 'player_mech') {
-    hydratePortraits(document);
-    return;
-  }
-  hydratePortraits(document, visualKey.slice('player_'.length) as PlayerClass, skin);
+  hydratePortraits(document, visualKey, skin);
 });

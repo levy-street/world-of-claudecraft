@@ -1,0 +1,142 @@
+{
+  "mode": "Live offline renderer dispatch, real GPU frames; range/event ownership verified separately by regression tests",
+  "rows": [
+    {
+      "key": "player_hunter",
+      "clip": "1H_Chop",
+      "time": 0.1666000000000022,
+      "weight": 1
+    },
+    {
+      "key": "player_hunter",
+      "clip": "Ranged_Shoot",
+      "time": 0.1833000000000029,
+      "weight": 1,
+      "kind": "ranged"
+    },
+    {
+      "key": "player_hunter_female",
+      "clip": "1H_Chop",
+      "time": 0.1498999999999978,
+      "weight": 1
+    },
+    {
+      "key": "player_hunter_female",
+      "clip": "Ranged_Shoot",
+      "time": 0.18340000000000145,
+      "weight": 1,
+      "kind": "ranged"
+    },
+    {
+      "key": "player_warrior",
+      "clip": "1H_Chop",
+      "time": 0.15,
+      "weight": 1
+    },
+    {
+      "key": "player_warrior_female",
+      "clip": "1H_Chop",
+      "time": 0.14990000000000148,
+      "weight": 1
+    },
+    {
+      "key": "player_paladin",
+      "clip": "1H_Chop",
+      "time": 0.14990000000000148,
+      "weight": 1
+    },
+    {
+      "key": "player_paladin_female",
+      "clip": "1H_Chop",
+      "time": 0.15000000000000002,
+      "weight": 1
+    },
+    {
+      "key": "player_rogue",
+      "clip": "1H_Chop",
+      "time": 0.1666999999999971,
+      "weight": 1
+    },
+    {
+      "key": "player_rogue_female",
+      "clip": "1H_Chop",
+      "time": 0.15,
+      "weight": 1
+    },
+    {
+      "key": "player_mage",
+      "clip": "2H_Chop",
+      "time": 0.16659999999999858,
+      "weight": 1
+    },
+    {
+      "key": "player_mage",
+      "clip": "Cast_Shoot",
+      "time": 0.18339999999999418,
+      "weight": 1,
+      "kind": "wand"
+    },
+    {
+      "key": "player_mage_female",
+      "clip": "2H_Chop",
+      "time": 0.15,
+      "weight": 1
+    },
+    {
+      "key": "player_mage_female",
+      "clip": "Cast_Shoot",
+      "time": 0.18340000000000145,
+      "weight": 1,
+      "kind": "wand"
+    },
+    {
+      "key": "player_priest",
+      "clip": "2H_Chop",
+      "time": 0.1666999999999971,
+      "weight": 1
+    },
+    {
+      "key": "player_priest_female",
+      "clip": "2H_Chop",
+      "time": 0.15,
+      "weight": 1
+    },
+    {
+      "key": "player_shaman",
+      "clip": "1H_Chop",
+      "time": 0.16660000000000585,
+      "weight": 1
+    },
+    {
+      "key": "player_shaman_female",
+      "clip": "1H_Chop",
+      "time": 0.14990000000000148,
+      "weight": 1
+    },
+    {
+      "key": "player_warlock",
+      "clip": "1H_Chop",
+      "time": 0.15000000000000002,
+      "weight": 1
+    },
+    {
+      "key": "player_warlock_female",
+      "clip": "1H_Chop",
+      "time": 0.15000000000000002,
+      "weight": 1
+    },
+    {
+      "key": "player_druid",
+      "clip": "2H_Chop",
+      "time": 0.15,
+      "weight": 1
+    },
+    {
+      "key": "player_druid_female",
+      "clip": "2H_Chop",
+      "time": 0.16659999999999853,
+      "weight": 1
+    }
+  ],
+  "errors": []
+}

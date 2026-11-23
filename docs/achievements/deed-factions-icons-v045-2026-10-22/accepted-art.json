@@ -1,0 +1,713 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-factions-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 7,
+    "removedCategoryFallbacks": [
+      "prog_rift_watch_trusted",
+      "prog_church_order_trusted",
+      "prog_automatons_trusted",
+      "prog_rift_watch_champion",
+      "prog_church_order_champion",
+      "prog_automatons_champion",
+      "prog_faction_champion_all"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "prog_rift_watch_trusted",
+      "family": "deed-factions",
+      "batchId": "deed-factions-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/prog_rift_watch_trusted.webp",
+      "canonicalDisplayName": "Trusted by the Rift Watch",
+      "acceptedSha256": "399f867f34ef912c07ff2a149dfde391b7467204652a6021a1ac8643fb095e3f",
+      "acceptedBytes": 7736,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-factions/originals/prog_rift_watch_trusted.png",
+        "sha256": "8542c3292d9fda233fb9437713f381d634f836d4bc62e47a14892e21f17f5f13",
+        "bytes": 1852729,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-factions/masters/prog_rift_watch_trusted.png",
+        "sha256": "733cc0a9f7b9970fc5238a3ecb5b791b51de05e0a6c15669cef26f7db79aeadf",
+        "bytes": 403860,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Trusted by the Rift Watch (prog_rift_watch_trusted). Subject: A luminous turquoise oval rift ring of pale silver metal with a single small cyan diamond at its crown, mounted over a folded deep teal watch-banner. Two small clasped gauntlet shapes at the bottom suggest earned trust, ring dominant, silver and sea turquoise. Simple practical metalwork, no crown and no laurel. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/currency/rift_watch_mark.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd"
+          },
+          {
+            "path": "public/ui/currency/church_order_crest.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65"
+          },
+          {
+            "path": "public/ui/currency/automaton_cog.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts faction-standing definitions; src/sim/factions.ts; existing currency symbols",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "prog_rift_watch_trusted",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [67, 80, 1186, 1121],
+          "framedSubject": [448, 417],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-factions-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-factions-icons-v045/prog_rift_watch_trusted-desktop.png",
+          "docs/screenshots/deed-factions-icons-v045/prog_rift_watch_trusted-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_church_order_trusted",
+      "family": "deed-factions",
+      "batchId": "deed-factions-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/prog_church_order_trusted.webp",
+      "canonicalDisplayName": "Trusted by the Church Order",
+      "acceptedSha256": "c0946a9d501f3c09dad100f966412b93426f2819561049d87eef167a6ba64690",
+      "acceptedBytes": 7016,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-factions/originals/prog_church_order_trusted.png",
+        "sha256": "d183c2ec119abb8594d91b4dd426f4188bf2f06250897fb34a448a5bb76b3fa6",
+        "bytes": 2234457,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-factions/masters/prog_church_order_trusted.png",
+        "sha256": "edc623f957a81d105a5fc718693eacaab046c5689957aa9d5d5de196dbe35ede",
+        "bytes": 432022,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Trusted by the Church Order (prog_church_order_trusted). Subject: A warm gold circular chapel sun pendant divided by a simple equal-armed cross, suspended on a short string of pale prayer beads over folded ivory cloth. Sun pendant dominant, honey-gold light and cream-white linen, humble silver fittings, a compact devotional emblem. No lettering, no crown and no laurel. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/currency/rift_watch_mark.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd"
+          },
+          {
+            "path": "public/ui/currency/church_order_crest.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65"
+          },
+          {
+            "path": "public/ui/currency/automaton_cog.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts faction-standing definitions; src/sim/factions.ts; existing currency symbols",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "prog_church_order_trusted",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [69, 76, 1183, 1191],
+          "framedSubject": [415, 415],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-factions-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-factions-icons-v045/prog_church_order_trusted-desktop.png",
+          "docs/screenshots/deed-factions-icons-v045/prog_church_order_trusted-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_automatons_trusted",
+      "family": "deed-factions",
+      "batchId": "deed-factions-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/prog_automatons_trusted.webp",
+      "canonicalDisplayName": "Trusted by the Automatons",
+      "acceptedSha256": "72cae8630dd29c1c8397bc74714f80be72a2413a391a3094ead720afc7da8ab7",
+      "acceptedBytes": 7152,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-factions/originals/prog_automatons_trusted.png",
+        "sha256": "3a636ac7fc158f4a521748494e8c1a428e12cd2010be7b2c0c569be4e25b367e",
+        "bytes": 1972411,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-factions/masters/prog_automatons_trusted.png",
+        "sha256": "07f0f52e4c29209db0e5a2be4324b2d7d4d9f9d74d7cac13a4c518c5480b1320",
+        "bytes": 413126,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Trusted by the Automatons (prog_automatons_trusted). Subject: A sturdy weathered brass cogwheel surrounding a round glowing amber energy core, backed by a short folded charcoal workshop banner. Two small iron riveted plates clasp the lower gear, precision machined teeth and copper fittings. Cog and amber core dominant, practical bronze and dark iron, no crown and no laurel. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/currency/rift_watch_mark.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd"
+          },
+          {
+            "path": "public/ui/currency/church_order_crest.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65"
+          },
+          {
+            "path": "public/ui/currency/automaton_cog.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts faction-standing definitions; src/sim/factions.ts; existing currency symbols",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "prog_automatons_trusted",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [79, 129, 1173, 1124],
+          "framedSubject": [436, 397],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-factions-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-factions-icons-v045/prog_automatons_trusted-desktop.png",
+          "docs/screenshots/deed-factions-icons-v045/prog_automatons_trusted-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_rift_watch_champion",
+      "family": "deed-factions",
+      "batchId": "deed-factions-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/prog_rift_watch_champion.webp",
+      "canonicalDisplayName": "Champion of the Rift Watch",
+      "acceptedSha256": "1e27aea5c95332dd17351b9ed94532293874beb4805271038a869f69781721b3",
+      "acceptedBytes": 8434,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-factions/originals/prog_rift_watch_champion.png",
+        "sha256": "2a38312dc2f79c6446924a29da15c8f0c3d5cd691609361b7f453d7636dd28d0",
+        "bytes": 2008467,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-factions/masters/prog_rift_watch_champion.png",
+        "sha256": "34ed62fd2f1dab1a6b94d3499c9d146014c082ae0b857313cce9c4b883f9e927",
+        "bytes": 393901,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Champion of the Rift Watch (prog_rift_watch_champion). Subject: A luminous silver turquoise oval rift ring with one bright cyan diamond at its crown, held between a rich pair of golden laurel branches and backed by a proud deep teal watch-banner. Ring dominant, brilliant cyan inner light, silver metal and gilt ornament. A small faceted diamond-shaped gold finial tops the banner, no writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/currency/rift_watch_mark.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd"
+          },
+          {
+            "path": "public/ui/currency/church_order_crest.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65"
+          },
+          {
+            "path": "public/ui/currency/automaton_cog.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts faction-standing definitions; src/sim/factions.ts; existing currency symbols",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "prog_rift_watch_champion",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [71, 34, 1183, 1211],
+          "framedSubject": [423, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-factions-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-factions-icons-v045/prog_rift_watch_champion-desktop.png",
+          "docs/screenshots/deed-factions-icons-v045/prog_rift_watch_champion-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_church_order_champion",
+      "family": "deed-factions",
+      "batchId": "deed-factions-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/prog_church_order_champion.webp",
+      "canonicalDisplayName": "Champion of the Church Order",
+      "acceptedSha256": "faab2025e6fc9421750e1dedbb0d97014d7b67b98d7acdf1c3ae7d1e48e8f0ea",
+      "acceptedBytes": 8700,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-factions/originals/prog_church_order_champion.png",
+        "sha256": "5a9804351ec0910c53d02a533f1a8c99241f01eedd8f4cf41cced450cd8caca6",
+        "bytes": 1991900,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-factions/masters/prog_church_order_champion.png",
+        "sha256": "a4a90a822a097e523add8db1df5824760c856318f83c038db9b74a808a341d85",
+        "bytes": 413908,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Champion of the Church Order (prog_church_order_champion). Subject: A radiant golden circular chapel sun medallion divided by a simple equal-armed cross, framed by two rich gold laurel branches over a proud ivory-and-gold sanctuary banner. A few pale prayer beads drape below the sun. Sun dominant, warm dawn glow, white linen and gleaming gold, polished gemstone accents, no writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/currency/rift_watch_mark.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd"
+          },
+          {
+            "path": "public/ui/currency/church_order_crest.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65"
+          },
+          {
+            "path": "public/ui/currency/automaton_cog.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts faction-standing definitions; src/sim/factions.ts; existing currency symbols",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "prog_church_order_champion",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [117, 52, 1134, 1199],
+          "framedSubject": [397, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-factions-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-factions-icons-v045/prog_church_order_champion-desktop.png",
+          "docs/screenshots/deed-factions-icons-v045/prog_church_order_champion-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_automatons_champion",
+      "family": "deed-factions",
+      "batchId": "deed-factions-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/prog_automatons_champion.webp",
+      "canonicalDisplayName": "Champion of the Automatons",
+      "acceptedSha256": "b1522b7c67cbe4d7e729d4f0f18c5d914195e91521809de62e38aa8d76f310e0",
+      "acceptedBytes": 7828,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-factions/originals/prog_automatons_champion.png",
+        "sha256": "6bda8f0397d2e151bf69fad012e48479dcad63306c55f447f15d7c984501245a",
+        "bytes": 2300303,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-factions/masters/prog_automatons_champion.png",
+        "sha256": "103ecffa827651da500e993687ed8efbe6c96b0e18249e32eb3d158c14f0db5e",
+        "bytes": 420809,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Champion of the Automatons (prog_automatons_champion). Subject: A grand dark iron and polished brass cogwheel with a bright round amber energy core, framed by two rich gold laurel branches over a proud charcoal-and-copper workshop banner. Small interlocking secondary gear details below, cog and core dominant, machined bronze, dark iron and warm gold. No writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/currency/rift_watch_mark.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd"
+          },
+          {
+            "path": "public/ui/currency/church_order_crest.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65"
+          },
+          {
+            "path": "public/ui/currency/automaton_cog.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts faction-standing definitions; src/sim/factions.ts; existing currency symbols",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "prog_automatons_champion",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [58, 67, 1194, 1173],
+          "framedSubject": [426, 414],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-factions-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-factions-icons-v045/prog_automatons_champion-desktop.png",
+          "docs/screenshots/deed-factions-icons-v045/prog_automatons_champion-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "prog_faction_champion_all",
+      "family": "deed-factions",
+      "batchId": "deed-factions-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/prog_faction_champion_all.webp",
+      "canonicalDisplayName": "Champion of Every Banner",
+      "acceptedSha256": "42d9f97620eeeff6e5888904aebe9de601b4093da2374d4788d40f493e4240ec",
+      "acceptedBytes": 10794,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-factions/originals/prog_faction_champion_all.png",
+        "sha256": "814842d7d8c2c7c392fa4e6d7f4ed0491381942e0829febd000493e54ce36bd8",
+        "bytes": 2308586,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-factions/masters/prog_faction_champion_all.png",
+        "sha256": "0e9558bee46220bdc2d4331d38ea72e5dec6a03f3900b615e8f6834daaf5f682",
+        "bytes": 438123,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Champion of Every Banner (prog_faction_champion_all). Subject: Three proud compact banners standing together inside one rich golden laurel wreath: left deep teal banner with a luminous cyan oval rift ring and diamond emblem; centre ivory banner with a golden circular sun divided by an equal-armed cross; right charcoal banner with a brass cogwheel and amber centre. Exactly three separate banners, all three faction emblems visible and equal in prominence, crossed short silver poles below, celebratory golden highlights, no writing or numbers. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/currency/rift_watch_mark.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "f3482bcabc765aedfef2f326c4996821f33ecad8b37c84136df0c678f6ecdacd"
+          },
+          {
+            "path": "public/ui/currency/church_order_crest.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "fa9332ba194d2099e1e8b1f87263cb00dfab939943cd49097d0a8e3d3cd1ab65"
+          },
+          {
+            "path": "public/ui/currency/automaton_cog.webp",
+            "role": "Project-owned faction currency symbol reviewed visually for motif and palette; not an image-edit input",
+            "sha256": "456434f5e071a95005d0e094df18a88d49324293f787a6cab02e21075347ee14"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts faction-standing definitions; src/sim/factions.ts; existing currency symbols",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "prog_faction_champion_all",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [35, 49, 1218, 1191],
+          "framedSubject": [448, 432],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-factions-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-factions-icons-v045/prog_faction_champion_all-desktop.png",
+          "docs/screenshots/deed-factions-icons-v045/prog_faction_champion_all-mobile.png"
+        ]
+      }
+    }
+  ],
+  "perceptualReview": {
+    "candidateCount": 1,
+    "disposition": "Retain the Rift Watch Trusted/Champion pair. Both intentionally share the cyan rift identity; Trusted has plain silver fittings and clasped gauntlets, Champion has broad gold laurels and banner finials. Distinction reviewed at 128, 48, 40, 32 and 22px. Shipping hashes are different."
+  }
+}

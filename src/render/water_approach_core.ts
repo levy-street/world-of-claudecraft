@@ -20,7 +20,7 @@ export const WATER_APPROACH_PITCH = 12;
  *  full cycle of the disc finish before the fastest mover crosses one lattice
  *  cell at a low frame rate: a slower cycle lets the moving disc skip the same
  *  world point cycle after cycle, so a pond can go unseen until reached. */
-export const WATER_APPROACH_READS_PER_CALL = 5;
+export const WATER_APPROACH_READS_PER_CALL = 6;
 
 /** The sim's waterline read (`waterLevelAt`): -Infinity off water. */
 export type WaterLevelAt = (x: number, z: number, seed: number) => number;

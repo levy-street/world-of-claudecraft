@@ -13,6 +13,7 @@ import { WISP_MAZE_NPC_ID, WISP_MAZE_QUEST_ID } from './content/world_quest_wisp
 import { WORLD_QUESTS_BY_ID } from './content/world_quests';
 import { startSelectedGliderCourse } from './glider_course_selection';
 import type { SimContext } from './sim_context';
+import { worldQuestsBlocked } from './world_quest_block';
 import { dismountForWorldQuestInstructor } from './world_quest_mount_gate';
 import { startWispMaze } from './world_quest_wisp_maze';
 import { hasActiveWorldQuest, updateWorldQuests } from './world_quests';
@@ -62,6 +63,9 @@ export function startWorldQuestActivity(
   const resolved = ctx.resolve(pid);
   if (!resolved) return;
   const { meta, e: player } = resolved;
+  // The difficulty pick is the instructor talk by another door: an
+  // operator-blocked account (world_quest_block.ts) opens nothing here either.
+  if (worldQuestsBlocked(meta)) return;
   const quest = Object.hasOwn(WORLD_QUESTS_BY_ID, questId) ? WORLD_QUESTS_BY_ID[questId] : null;
   if (!quest || quest.objective.type !== 'wisp_maze') return;
   // Entering the area on foot or by teleport may not have run the area sweep yet.

@@ -354,9 +354,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 140,
   },
   // Riding Training: the stablemaster's service entry. Buying it never puts an
-  // item in the bags; items.ts buyItem delegates to learnRiding (80 gold,
-  // level 20, once), which sets PlayerMeta.ridingTrained. The buyValue mirrors
-  // RIDING_SKILL_FEE_COPPER so the vendor window shows the real price.
+  // item in the bags; buyItem delegates to learnRiding. The vendor resolves
+  // the next rank's price: 80 gold for basic, then 1000 gold for advanced riding.
   riding_training: {
     id: 'riding_training',
     name: 'Riding Training',
@@ -373,18 +372,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // (src/sim/mounts.ts mountOwned), and like every player reins it can trade
   // hands. The buy path's mountOwned gate therefore only stops duplicates in
   // your own containers: buy, give away, buy again is allowed, making this an
-  // elastic market good with a 10g vendor floor (deliberate; no copper mint,
-  // since it never sells back). noVendorSell + sellValue 0: an accidental
-  // 0-copper sale that buyback rotation could eat would destroy the mount.
+  // elastic market good with a 10g vendor floor. Selling the last account copy
+  // revokes its cosmetic until the reins are acquired again (including buyback).
   reins_valorsteed: {
     id: 'reins_valorsteed',
     name: 'Reins of the Valorsteed',
     kind: 'mount',
     mount: 'valorsteed',
     quality: 'common',
-    noVendorSell: true,
     noDiscard: true,
-    sellValue: 0,
+    sellValue: 100_000, // Full refund for duplicate purchases before account-wide cosmetics.
     buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
@@ -412,11 +409,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     sellValue: 0,
   },
-  // Developer-only mount. It is intentionally absent from vendors, quests,
-  // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
-  // /dev give reins_terrorspark_groundshaker while the feature remains under development.
-  // Unlike the player reins it STAYS soulbound: it has no acquisition path, so
-  // tradability would turn a dev grant into an economy leak.
+  // Retired annual placeholder: keep existing saved keys usable and soulbound.
   reins_terrorspark_groundshaker: {
     id: 'reins_terrorspark_groundshaker',
     name: 'Ignition Key: Dreadspark Groundshaker',
@@ -424,15 +417,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     mount: 'terrorspark_groundshaker',
     quality: 'epic',
     soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
   // The Rift Watch's Champion mount: sold by Quartermaster Vaelen in
   // Drifthaven behind Champion standing (content/faction_vendors.ts,
-  // docs/design/factions.md). Priced at the classic epic-mount ratio, ten
-  // times the Valorsteed's 10 gold, with the 80 gold riding lesson already
-  // paid. An ordinary player reins: transferable like every other, never
-  // vendor-sold back, and the standing gate sits on the PURCHASE.
+  // docs/design/factions.md). Priced in Rift Watch marks, never coin: buyValue
+  // is 0 and the faction gate carries the Champion mark cost, like every other
+  // quartermaster row. An ordinary player reins: transferable like every
+  // other, never vendor-sold back, and the standing gate sits on the PURCHASE.
   reins_avian_strider: {
     id: 'reins_avian_strider',
     name: 'Reins of the Viridian Valestrider',
@@ -442,7 +436,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
-    buyValue: 1_000_000, // 100 gold in copper
+    buyValue: 0,
+  },
+  // Annual membership reward, delivered only after verified payment. It can never leave the
+  // account: the same protected flags as referral reins, plus an account mount entitlement.
+  reins_nightwing_chimera: {
+    id: 'reins_nightwing_chimera',
+    name: 'Reins of the Nightwing Chimaera',
+    kind: 'mount',
+    mount: 'nightwing_chimera',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    noMarketList: true,
+    noSalvage: true,
+    sellValue: 0,
   },
   // Legacy cosmetic reins; same inert, discardable treatment as mech_bird.
   reins_rallycart_rxt: {
@@ -1995,8 +2004,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: false,
   },
   // Cartographer's Ink (content/treasure_maps.ts): every faction quartermaster
-  // sells it for their currency; using it redraws the READ treasure map one
-  // rarity finer (1, 3 or 8 inks by the map's current rarity).
+  // sells it for their currency; using it asks which held treasure map to
+  // redraw one rarity finer (TREASURE_MAP_UPGRADE_INKS by its current rarity).
   cartographers_ink: {
     id: 'cartographers_ink',
     name: "Cartographer's Ink",
@@ -2030,9 +2039,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noMarketList: true,
     noDiscard: false,
   },
-  // Heroic-dungeon participation token: the final boss of a heroic instance
-  // directly awards marks to every eligible participant (awardHeroicMarks in
-  // src/sim/instances/dungeons.ts). Not vendorable; a spend sink ships later.
   // The weekly emissary's reward chest (src/sim/weekly_quests.ts): opening it
   // (src/sim/emissary_cache.ts) hands over one Normal raid piece for the
   // owner's class plus a few Heroic Marks. Bound to the earner like a mark.
@@ -2046,13 +2052,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     soulbound: true,
   },
+  // RETIRED as a bag item: Heroic Marks are now a PlayerMeta currency
+  // (src/sim/heroic_marks.ts). The def stays because the id shipped (saves,
+  // mail parcels and durable vault claims still name it) and because the hub
+  // receipt, the Ravenpost parcel row and the currency art read its name and
+  // icon; no grant can stack it, since the inventory hub credits the counter
+  // and a load folds any legacy stack into it.
   heroic_mark: {
     id: 'heroic_mark',
     name: 'Heroic Mark',
     kind: 'tool',
     quality: 'rare',
-    // Currency-like: marks stack so saving toward a 12-16 mark vendor price
-    // (content/heroic_vendor.ts) does not eat a bag slot per mark.
     stackSize: 20,
     sellValue: 0,
     // Bound to the earner: marks can only be spent at the Heroic Quartermaster,
@@ -3000,6 +3010,38 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'poor',
     sellValue: 8,
+  },
+  // World PvP trophy (src/sim/pvp/world_pvp_spoils.ts): the killing blow of a
+  // flagged-vs-flagged world kill loots the loser's skull from their body. All
+  // skulls share one stack that records whose each one is, the way a gathered
+  // material records its gatherer (src/sim/pvp/world_pvp_trophy.ts). A keepsake
+  // with no vendor price, so camping an alt for skulls can never mint gold.
+  pvp_trophy_skull: {
+    id: 'pvp_trophy_skull',
+    name: 'Trophy Skull',
+    kind: 'junk',
+    // Common, not grey: a provenance-tracked stack is a material, and grey
+    // trash is never one (tests/material_taxonomy.test.ts).
+    quality: 'common',
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  // The Skull Bag (src/sim/pvp/skull_bag.ts): a sub-inventory sold by both
+  // honor quartermasters that holds any number of trophy skulls outside the bag
+  // pools. Clicking it opens its own window; carrying it sends looted skulls
+  // straight in. One cell, never socketed (so not kind 'bag'), soulbound like
+  // every honor purchase, and one per character.
+  pvp_skull_bag: {
+    id: 'pvp_skull_bag',
+    name: 'Skull Bag',
+    kind: 'junk',
+    // Epic like every honor quartermaster row (tests/reliquary_content.test.ts).
+    quality: 'epic',
+    unique: true,
+    soulbound: true,
+    stackSize: 1,
+    priceHonor: 500,
+    sellValue: 0,
   },
   // Vendor food nerf (11n-D-13): was ABOVE crafted pan_seared_perch 90 (a
   // negative margin); 90 / 1.10, bottom tercile, floored; crafted margin

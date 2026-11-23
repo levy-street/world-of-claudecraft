@@ -120,6 +120,31 @@ describe('egg crack, hatch, and ripple', () => {
     expect(sim.entities.get(egg.id)).toBeDefined();
   });
 
+  it('each shell bursts in its own school: the dragonkin egg in fire, the rime egg sac in frost', () => {
+    const burstOf = (templateId: string): string | undefined => {
+      const sim = makeSim();
+      const egg = spawn(sim, templateId, 30, 0, 8);
+      (sim as any).dealDamage(
+        null,
+        egg,
+        Math.max(1, egg.hp),
+        false,
+        'physical',
+        'test',
+        'hit',
+        true,
+      );
+      // the cracked shell hatches on the next tick, whose events tick() returns
+      const burst = (sim.tick() as any[]).find(
+        (ev: any) =>
+          ev.type === 'spellfxAt' && ev.fx === 'burst' && ev.x === egg.pos.x && ev.z === egg.pos.z,
+      );
+      return burst?.school;
+    };
+    expect(burstOf('dragonkin_egg')).toBe('fire');
+    expect(burstOf('rime_egg_sac')).toBe('frost');
+  });
+
   it('an egg FIAT-flagged dead stays inert; only a real death cracks it', () => {
     const sim = makeSim();
     const egg = spawn(sim, 'dragonkin_egg', 30, 0);

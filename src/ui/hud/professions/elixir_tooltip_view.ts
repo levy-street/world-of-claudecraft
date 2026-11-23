@@ -27,6 +27,8 @@ const ELIXIR_STAT_KEYS: Partial<Record<AuraKind, TranslationKey>> = {
   buff_sta: 'itemUi.stats.sta',
   buff_int: 'itemUi.stats.int',
   buff_agi: 'itemUi.stats.agi',
+  buff_str: 'itemUi.stats.str',
+  buff_spi: 'itemUi.stats.spi',
   buff_armor: 'itemUi.stats.armor',
   buff_ap: 'itemUi.stats.attackPower',
 };

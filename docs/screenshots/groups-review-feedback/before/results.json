@@ -1,0 +1,46 @@
+[
+  {
+    "name": "desktop",
+    "baseline": true,
+    "scale": 1,
+    "safeAreaChecked": false,
+    "target": null,
+    "friend": 1011,
+    "floating": true,
+    "music": true,
+    "mobile": false
+  },
+  {
+    "name": "desktop-scaled",
+    "baseline": true,
+    "scale": 1.25,
+    "safeAreaChecked": false,
+    "target": null,
+    "friend": 1011,
+    "floating": true,
+    "music": true,
+    "mobile": false
+  },
+  {
+    "name": "mobile-landscape",
+    "baseline": true,
+    "scale": 1,
+    "safeAreaChecked": true,
+    "target": 1011,
+    "friend": 1011,
+    "floating": true,
+    "music": true,
+    "mobile": true
+  },
+  {
+    "name": "mobile-scaled",
+    "baseline": true,
+    "scale": 1.25,
+    "safeAreaChecked": true,
+    "target": 1011,
+    "friend": 1011,
+    "floating": true,
+    "music": true,
+    "mobile": true
+  }
+]

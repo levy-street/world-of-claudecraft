@@ -95,6 +95,13 @@ export const NYTHRAXIS_GRAVE_ERUPTION_MIN_SEPARATION = 5;
  * pinned body (owner playtest, 2026-09-04).
  */
 export const NYTHRAXIS_GRAVE_ERUPTION_IMPALED_CLEARANCE = NYTHRAXIS_GRAVE_ERUPTION_RADIUS * 2;
+/**
+ * No circle ever opens in the area directly around a hall pillar: every
+ * circle's centre stays this far from a pillar's centre, so the 3 yd ring's
+ * edge keeps about 3 yd of open floor off the pillar base (owner call,
+ * 2026-10-02).
+ */
+export const NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE = NYTHRAXIS_GRAVE_ERUPTION_RADIUS + 4;
 
 const ERUPTION_CANDIDATES = 32;
 const ERUPTION_TARGET_SCATTER_MAX = 9;
@@ -281,6 +288,18 @@ function clearOfAvoid(point: NythraxisGravePoint, avoid: readonly NythraxisGrave
   );
 }
 
+/** True when a point keeps the pillar clearance from every pillar centre. */
+export function clearOfNythraxisPillars(
+  point: NythraxisGravePoint,
+  pillars: readonly NythraxisGravePoint[],
+): boolean {
+  return pillars.every(
+    (pillar) =>
+      Math.hypot(point.x - pillar.x, point.z - pillar.z) >=
+      NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE,
+  );
+}
+
 function ringFallbackPoint(
   castKey: number,
   origin: NythraxisGravePoint,
@@ -310,11 +329,13 @@ function fallbackPattern(
  * position, typically) is validated against the FINAL point at every stage,
  * so a caller whose eligible-target filtering still lets an anchor land on an
  * avoided spot (e.g. every free raider stacked on the one impaled) never
- * gets a circle there: with no `avoid` list this is a no-op and the pattern
- * is byte-identical to before. When `avoid` is non-empty and truly no
+ * gets a circle there: with no `avoid` and no `pillars` list this is a no-op
+ * and the pattern is byte-identical to before. When `avoid` is non-empty and truly no
  * candidate anywhere clears it, that ONE slot is skipped (fewer circles)
  * rather than ever placing fire on an avoided point; other slots are
- * unaffected, so the mechanic is never starved without need.
+ * unaffected, so the mechanic is never starved without need. `pillars`
+ * (hall pillar centres) is a hard keep-out on the same terms: every final
+ * point, the ring fallback included, keeps NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE.
  */
 export function nythraxisGraveEruptionPattern(
   castKey: number,
@@ -322,7 +343,12 @@ export function nythraxisGraveEruptionPattern(
   count: number,
   targets: readonly NythraxisGraveTarget[],
   avoid: readonly NythraxisGravePoint[] = [],
+  pillars: readonly NythraxisGravePoint[] = [],
 ): NythraxisGravePoint[] {
+  const fits = (candidate: NythraxisGravePoint, placed: readonly NythraxisGravePoint[]) =>
+    clearOfPlaced(candidate, placed) &&
+    clearOfAvoid(candidate, avoid) &&
+    clearOfNythraxisPillars(candidate, pillars);
   const placed: NythraxisGravePoint[] = [];
   for (let eruptionIndex = 0; eruptionIndex < count; eruptionIndex++) {
     let point: NythraxisGravePoint | null = null;
@@ -331,25 +357,26 @@ export function nythraxisGraveEruptionPattern(
       const candidate = anchor
         ? anchoredCandidate(castKey, eruptionIndex, attempt, anchor, origin)
         : freeCandidate(castKey, eruptionIndex, attempt, origin);
-      if (!clearOfPlaced(candidate, placed) || !clearOfAvoid(candidate, avoid)) continue;
+      if (!fits(candidate, placed)) continue;
       point = candidate;
       break;
     }
     if (!point && anchor) {
       for (let attempt = 0; attempt < ERUPTION_CANDIDATES; attempt++) {
         const candidate = freeCandidate(castKey, eruptionIndex, attempt, origin);
-        if (!clearOfPlaced(candidate, placed) || !clearOfAvoid(candidate, avoid)) continue;
+        if (!fits(candidate, placed)) continue;
         point = candidate;
         break;
       }
     }
     if (!point) {
-      if (avoid.length === 0) return fallbackPattern(castKey, origin, count);
+      if (avoid.length === 0 && pillars.length === 0)
+        return fallbackPattern(castKey, origin, count);
       // Every candidate for this slot cleared placed circles but not the
-      // avoid list (or vice versa): try the deterministic ring fallback for
-      // just this slot, still avoid-checked, before giving up on it.
+      // avoid or pillar list (or vice versa): try the deterministic ring
+      // fallback for just this slot, still checked, before giving up on it.
       const fallback = ringFallbackPoint(castKey, origin, count, eruptionIndex);
-      if (clearOfPlaced(fallback, placed) && clearOfAvoid(fallback, avoid)) point = fallback;
+      if (fits(fallback, placed)) point = fallback;
     }
     if (!point) continue;
     placed.push(point);

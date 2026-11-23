@@ -156,13 +156,15 @@ export function crossHotbarResolvers(
  * stance-style abilities follow, known at level one yet unbound and so
  * unreachable on a pad. Lives here rather than inline at the call site so
  * src/ui/hud.ts carries a call, not a shape (the crossHotbarResolvers pattern).
+ * A pet-command slot seeds an empty cell: the pad reaches pet commands through
+ * its own pet binds, and a cross hotbar cell holds only abilities and items.
  */
 export function crossHotbarSeedActions(
-  bar: readonly CrossHotbarOverlayAction[],
+  bar: readonly ({ type: 'ability' | 'item' | 'pet'; id: string } | null)[],
   known: readonly ResolvedAbility[],
 ): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
   return {
-    bar: bar.map((a) => (a ? { type: a.type, id: a.id } : null)),
+    bar: bar.map((a) => (a && a.type !== 'pet' ? { type: a.type, id: a.id } : null)),
     extras: [
       CROSS_HOTBAR_ATTACK_ID,
       ...known.filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup)).map((k) => k.def.id),

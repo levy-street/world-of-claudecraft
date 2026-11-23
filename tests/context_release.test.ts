@@ -1,7 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   installWebGLContextRelease,
+  markPageDisposable,
+  registerPageTeardown,
   releaseTrackedWebGLContexts,
+  retirePageAndClose,
+  retirePageAndReplace,
+  runPageTeardowns,
   trackWebGLContext,
 } from '../src/render/context_release';
 
@@ -107,5 +112,127 @@ describe('context_release', () => {
 
     expect(a.forceContextLoss).not.toHaveBeenCalled();
     expect(a.dispose).not.toHaveBeenCalled();
+  });
+
+  it('retires a disposable heavy page even when pagehide says it was cached', () => {
+    releaseTrackedWebGLContexts();
+    runPageTeardowns();
+    const target = new EventTarget();
+    const reload = vi.fn();
+    const a = fakeHolder();
+    const teardown = vi.fn();
+    trackWebGLContext(a);
+    registerPageTeardown(teardown);
+
+    markPageDisposable(target, { reload });
+    installWebGLContextRelease(target);
+    target.dispatchEvent(pagehide(true));
+
+    expect(a.forceContextLoss).toHaveBeenCalledTimes(1);
+    expect(a.dispose).toHaveBeenCalledTimes(1);
+    expect(teardown).toHaveBeenCalledTimes(1);
+  });
+
+  it('reloads a disposable page if a browser restores it from the bfcache anyway', () => {
+    const target = new EventTarget();
+    const reload = vi.fn();
+    markPageDisposable(target, { reload });
+
+    target.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: true }));
+    target.dispatchEvent(Object.assign(new Event('pageshow'), { persisted: false }));
+
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it('runs registered page teardowns and swallows a failing one', () => {
+    runPageTeardowns(); // drain any prior registrations
+    const good = vi.fn();
+    const bad = vi.fn(() => {
+      throw new Error('teardown blew up');
+    });
+    const other = vi.fn();
+    registerPageTeardown(good);
+    registerPageTeardown(bad);
+    registerPageTeardown(other);
+
+    expect(() => runPageTeardowns()).not.toThrow();
+    expect(good).toHaveBeenCalledTimes(1);
+    expect(bad).toHaveBeenCalledTimes(1);
+    expect(other).toHaveBeenCalledTimes(1);
+
+    // Drained callbacks must not run again when an explicit navigation cleanup
+    // is followed by the browser's pagehide event.
+    runPageTeardowns();
+    expect(good).toHaveBeenCalledTimes(1);
+    expect(bad).toHaveBeenCalledTimes(1);
+    expect(other).toHaveBeenCalledTimes(1);
+  });
+
+  it('unregisters a teardown so it no longer runs', () => {
+    const fn = vi.fn();
+    const off = registerPageTeardown(fn);
+    off();
+    runPageTeardowns();
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('retires resources before replacing the heavy page history entry', () => {
+    releaseTrackedWebGLContexts();
+    runPageTeardowns();
+    const order: string[] = [];
+    trackWebGLContext({
+      forceContextLoss: () => order.push('lose-context'),
+      dispose: () => order.push('dispose-context'),
+    });
+    registerPageTeardown(() => order.push('teardown'));
+    const target = { replace: (url: string | URL) => order.push(`replace:${url}`) };
+
+    retirePageAndReplace('/editor.html', target);
+
+    expect(order).toEqual(['lose-context', 'dispose-context', 'teardown', 'replace:/editor.html']);
+  });
+
+  it('retires resources before closing a disposable playtest tab', () => {
+    releaseTrackedWebGLContexts();
+    runPageTeardowns();
+    const order: string[] = [];
+    trackWebGLContext({
+      forceContextLoss: () => order.push('lose-context'),
+      dispose: () => order.push('dispose-context'),
+    });
+    registerPageTeardown(() => order.push('teardown'));
+
+    retirePageAndClose({ close: () => order.push('close') });
+
+    expect(order).toEqual(['lose-context', 'dispose-context', 'teardown', 'close']);
+  });
+
+  it('runs teardowns (audio close) alongside the GL release on a real teardown', () => {
+    releaseTrackedWebGLContexts();
+    const target = new EventTarget();
+    const gl = fakeHolder();
+    const audioClose = vi.fn();
+    trackWebGLContext(gl);
+    const off = registerPageTeardown(audioClose);
+
+    installWebGLContextRelease(target);
+    target.dispatchEvent(pagehide(false));
+
+    expect(gl.forceContextLoss).toHaveBeenCalledTimes(1);
+    expect(audioClose).toHaveBeenCalledTimes(1);
+    off();
+  });
+
+  it('skips teardowns too when the page is only frozen (persisted === true)', () => {
+    releaseTrackedWebGLContexts();
+    const target = new EventTarget();
+    const audioClose = vi.fn();
+    const off = registerPageTeardown(audioClose);
+
+    installWebGLContextRelease(target);
+    target.dispatchEvent(pagehide(true));
+
+    expect(audioClose).not.toHaveBeenCalled();
+    off();
   });
 });

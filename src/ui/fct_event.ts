@@ -75,6 +75,43 @@ export interface FctSpawnShape {
    * every other floater in the game.
    */
   readonly delaySec?: number;
+  /** The raw amount of an outgoing hit (for the big-hit emphasis); outgoing hits only. */
+  readonly amount?: number;
+}
+
+/**
+ * The damage-event field the vivid look reads beyond the discrimination: the hit's raw
+ * amount. Structural, so the hud.ts spawn site hands in the damage SimEvent it already has
+ * (both an offline Sim event and a ClientWorld-mirrored one carry `amount`).
+ */
+export interface FctDamageFlavorSource {
+  readonly amount?: number;
+}
+
+/**
+ * Stamp the amount of the local player's OWN outgoing hit onto its spawn shape, so the
+ * painter can weigh the hit against the player's running average. `ownHit` says the local
+ * player dealt it directly: a pet's or guardian's hit carries no amount, so it neither feeds
+ * nor trips the big-hit emphasis.
+ * Every other shape (an avoidance word, incoming damage, a heal, null) passes
+ * through unchanged: incoming damage keeps its one hostile red on purpose, because "you are
+ * being hurt" must read the same whatever hurt you. Pure: same input, same output.
+ */
+export function withDamageFlavor(
+  shape: FctSpawnShape | null,
+  ev: FctDamageFlavorSource,
+  ownHit = true,
+): FctSpawnShape | null {
+  if (shape === null) return null;
+  if (!ownHit) return shape;
+  if (
+    shape.kind !== 'damage-done-ability' &&
+    shape.kind !== 'damage-done-auto' &&
+    shape.kind !== 'damage-done-block'
+  ) {
+    return shape;
+  }
+  return { ...shape, amount: ev.amount };
 }
 
 /**

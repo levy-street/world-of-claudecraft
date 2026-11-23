@@ -18,6 +18,10 @@ export const INTERFACE_BODY_CLASSES = {
   // The HUD hook for Colorblind Mode; the 3D hazard palette is the renderer's
   // setHazardPaletteMode, driven from the same applySetting branch.
   colorblindMode: 'colorblind-mode',
+  // Interface > Combat > Classic Combat Text: the FCT painter reads this class
+  // per spawn (src/ui/fct_style_mode.ts) and, when set, keeps the shipped white /
+  // gold numbers instead of the vivid school colours and emphasis.
+  classicCombatText: 'classic-combat-text',
 } as const satisfies Partial<Record<BoolSettingKey, string>>;
 
 export type InterfaceBodyClassSetting = keyof typeof INTERFACE_BODY_CLASSES;

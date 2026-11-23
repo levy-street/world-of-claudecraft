@@ -1,3 +1,4 @@
+import { membershipWeaponShape } from './membership_weapon';
 import {
   ALL_CLASSES,
   ALL_EQUIP_SLOTS,
@@ -347,6 +348,12 @@ export function displacedSlotForEquip(
   cls: PlayerClass,
   spec?: string | null,
 ): EquipSlot | null {
+  item = membershipWeaponShape(item, cls, spec);
+  const originalLookup = lookup;
+  lookup = (id) => {
+    const def = originalLookup(id);
+    return def ? membershipWeaponShape(def, cls, spec) : undefined;
+  };
   if (slot === 'offhand') {
     if (!occupiesHand(item)) return null;
     const mainhand = equipment.mainhand ? lookup(equipment.mainhand) : undefined;
@@ -413,6 +420,10 @@ export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
 }
 
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
+  // A quest implement is wieldable by EVERYONE, ahead of every proficiency gate below
+  // (including the rogue two-hander ban): those gates protect combat identity, and a
+  // questTool item has none to protect; locking one out gates a MECHANIC, not power.
+  if (item.questTool) return true;
   // Class-locked gear (Warfare Season 2 spec sets) honors its class list before
   // any armor-type or weapon rule, so another class can never wear it.
   if (item.classLocked && !(item.requiredClass ?? []).includes(cls)) return false;
@@ -446,6 +457,7 @@ export function canEquipItemInSlot(
   slot: EquipSlot,
   spec?: string | null,
 ): boolean {
+  item = membershipWeaponShape(item, cls, spec);
   if (!canEquipItem(cls, item)) return false;
   if (item.kind === 'armor') {
     if (item.slot === 'ring') return slot === 'ring1' || slot === 'ring2';

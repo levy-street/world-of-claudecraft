@@ -76,6 +76,8 @@ function makeRig(
     appVw?: string;
     appVh?: string;
     safeAreaPx?: string;
+    /** Per-side insets, for the one-sided notch a real landscape phone has. */
+    sides?: Partial<Record<'top' | 'right' | 'bottom' | 'left', string>>;
     tapMenus?: boolean;
     anchorRole?: TapMenuAnchorRole;
   } = {},
@@ -85,8 +87,8 @@ function makeRig(
   host.style.setProperty('--radial-margin', '6px');
   host.style.setProperty('--app-vw', options.appVw ?? '400px');
   host.style.setProperty('--app-vh', options.appVh ?? '300px');
-  for (const side of ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']) {
-    host.style.setProperty(side, options.safeAreaPx ?? '0px');
+  for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+    host.style.setProperty(`padding-${side}`, options.sides?.[side] ?? options.safeAreaPx ?? '0px');
   }
   document.body.append(host);
 
@@ -346,38 +348,60 @@ describe('RadialGesture: the clamp box', () => {
     expect(rig.gesture.placement()?.originY).toBe(200);
   });
 
-  // The overlay carries the device safe area as PADDING, and its petals are
-  // absolutely positioned children, so what the painter writes is resolved
-  // against the PADDING box rather than the viewport. The gesture layer
-  // therefore measures in that frame. NOT coverable by the real-browser suite:
-  // env(safe-area-inset-*) resolves to 0 on a headless desktop viewport, so only
-  // a stubbed computed style can drive the nonzero arm at all.
-  it('seats the petals in the overlay padding-box frame, so the inset never displaces them', () => {
+  // The overlay carries the device safe area as PADDING. That padding only
+  // shrinks the box the radial is CLAMPED into: its petals are absolutely
+  // positioned children, whose left/top resolve from the overlay's padding
+  // EDGE (the viewport origin), so the origin comes back in viewport
+  // coordinates. Reading the padding as an offset pushed every petal a whole
+  // inset off its button (tests/browser/mobile_menu_control.browser.test.ts pins
+  // the same frame for the strip in real layout).
+  it('seats the petals on the button in viewport coordinates, whatever the inset', () => {
     const rig = makeRig({ appVw: '400px', appVh: '600px', safeAreaPx: '44px' });
     // Button 1 is seated at (200,180)-(240,220), so its centre is (220,200) in
     // VIEWPORT coordinates and nothing about it is near a clamp here.
     down(rig, 1, 1, 220, 200);
     move(rig, 1, 1, 220 + FLICK_PX, 200);
-    // The painter writes these into a padding box that starts 44px in on both
-    // axes, so the cluster lands back on the button's real centre: 176 + 44 =
-    // 220 and 156 + 44 = 200. Written in viewport coordinates it would have been
-    // pushed a whole inset off the control it belongs to.
-    expect(rig.gesture.placement()?.originX).toBe(220 - 44);
-    expect(rig.gesture.placement()?.originY).toBe(200 - 44);
+    // The painter's coordinates resolve from the overlay's padding edge, so the
+    // cluster sits on the button's own centre. The old padding-box frame wrote
+    // (176, 156), which rendered a whole inset up and left of the button.
+    expect(rig.gesture.placement()?.originX).toBe(220);
+    expect(rig.gesture.placement()?.originY).toBe(200);
+  });
+
+  // One-sided insets tell the axes and the sides apart, which the symmetric
+  // cases cannot: a left/right or top/bottom swap would pass them.
+  it('clamps against the one side that carries an inset', () => {
+    const right = makeRig({
+      appVw: '400px',
+      appVh: '300px',
+      sides: { right: '30px', bottom: '20px' },
+    });
+    down(right, 0, 1, 380, 200);
+    move(right, 0, 1, 380 + FLICK_PX, 200);
+    // Box 0..370 by 0..280 with a reach of 80: the origin clamps to 290 by 200.
+    expect(right.gesture.placement()?.originX).toBe(290);
+    expect(right.gesture.placement()?.originY).toBe(200);
+
+    const left = makeRig({ appVw: '400px', appVh: '300px', sides: { left: '30px', top: '20px' } });
+    down(left, 0, 1, 380, 200);
+    move(left, 0, 1, 380 + FLICK_PX, 200);
+    // Box 30..400 by 20..300: the origin clamps to 400 - 80 = 320, and the
+    // button's own centre (200) is already inside 20 + 80..300 - 80.
+    expect(left.gesture.placement()?.originX).toBe(320);
+    expect(left.gesture.placement()?.originY).toBe(200);
   });
 
   it('reserves the safe-area inset ONCE, never twice', () => {
     const rig = makeRig({ appVw: '400px', appVh: '300px', safeAreaPx: '30px' });
     down(rig, 0, 1, 380, 200);
     move(rig, 0, 1, 380 + FLICK_PX, 200);
-    // The clamp box is the app box minus both insets (400 - 60 = 340 wide,
-    // 300 - 60 = 240 tall) and the margin stays the stylesheet's own 6px, so the
-    // reach is 54 + 20 + 6 = 80 and the origin clamps to 340 - 80 = 260 by
-    // 240 - 80 = 160. Rendered that is 290 by 190, exactly one reach inside the
-    // safe area. Folding the inset into the margin INSTEAD (the old max(6, 30))
-    // wrote 296 into a box already offset by 30, spending the inset twice.
-    expect(rig.gesture.placement()?.originX).toBe(260);
-    expect(rig.gesture.placement()?.originY).toBe(160);
+    // The clamp box is the app box minus both insets (30..370 wide, 30..270
+    // tall) and the margin stays the stylesheet's own 6px, so the reach is
+    // 54 + 20 + 6 = 80 and the origin clamps to 370 - 80 = 290 by 270 - 80 =
+    // 190: exactly one reach inside the safe area. Folding the inset into the
+    // margin INSTEAD (the old max(6, 30)) would spend it twice.
+    expect(rig.gesture.placement()?.originX).toBe(290);
+    expect(rig.gesture.placement()?.originY).toBe(190);
   });
 });
 

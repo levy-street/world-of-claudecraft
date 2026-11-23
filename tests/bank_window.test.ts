@@ -27,6 +27,10 @@ const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url)
 const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const lifecycle = readFileSync(
+  new URL('../src/ui/bank_window_lifecycle.ts', import.meta.url),
+  'utf8',
+);
 const mainSrc = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8');
@@ -314,8 +318,14 @@ describe('bank_window: hud.ts wiring', () => {
   });
 
   it('toggles the bank-open docking body class on open and close', () => {
-    expect(hud).toContain("classList.add('bank-open')");
-    expect(hud).toContain("classList.remove('bank-open')");
+    expect(lifecycle).toContain("classes.toggle('bank-open', tab !== 'rewards')");
+    expect(lifecycle).toContain("classes.remove('bank-open', 'weekly-vault-open')");
+    expect(hud).toMatch(
+      /openBankCompanion\(\s*this\.bankWindow,\s*\$\('#bags'\),\s*\(\) => this\.bagsWindow\.close\(\),\s*\(\) => this\.renderBags\(\),\s*tab,?\s*\)/,
+    );
+    expect(hud).toMatch(
+      /closeBankBags\(\s*\$\('#bags'\),\s*\(\) => this\.cancelPetFeed\(\),\s*\(\) => this\.renderBags\(\),?\s*\)/,
+    );
   });
 
   it('re-renders the open bank on a language switch and refreshes it on the slow band', () => {
@@ -340,7 +350,7 @@ describe('bank_window: hud.ts wiring', () => {
     // precedence (vendor first) strands the bank at half-width with its x-btn
     // hidden and no touch close affordance.
     expect(hud).toMatch(
-      /openBank\(tab\?: 'rewards'\): void \{[\s\S]{0,600}?if \(this\.vendorOpen\) this\.closeVendor\(\);[\s\S]{0,600}?classList\.toggle\('bank-open', tab !== 'rewards'\)/,
+      /openBank\(tab\?: 'rewards'\): void \{[\s\S]{0,600}?if \(this\.vendorOpen\) this\.closeVendor\(\);[\s\S]{0,600}?openBankCompanion\(/,
     );
     expect(hud).toMatch(
       /openVendor\(npcId: number, opener\?: HTMLElement \| null\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
@@ -357,7 +367,7 @@ describe('bank_window: hud.ts wiring', () => {
       /openHeroicVendor\(npcId: number, opener\?: HTMLElement \| null\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
     );
     expect(hud).toMatch(
-      /openBank\(tab\?: 'rewards'\): void \{[\s\S]{0,600}?if \(this\.openHeroicVendorNpcId !== null\) this\.closeHeroicVendor\(\);[\s\S]{0,600}?classList\.toggle\('bank-open', tab !== 'rewards'\)/,
+      /openBank\(tab\?: 'rewards'\): void \{[\s\S]{0,600}?if \(this\.openHeroicVendorNpcId !== null\) this\.closeHeroicVendor\(\);[\s\S]{0,600}?openBankCompanion\(/,
     );
   });
 
@@ -367,7 +377,10 @@ describe('bank_window: hud.ts wiring', () => {
     // #prompt-stack that promptModalOpen() keeps gating game keys on. Both sites
     // (closeVendor and onBankClosed) must remove the prompt node, not just clear inert.
     const sites = hud.match(/dismissBagPrompts\(\);\s*const bags = \$\('#bags'\);/g) ?? [];
-    expect(sites.length).toBe(2);
+    expect(sites.length).toBe(1);
+    expect(lifecycle).toMatch(
+      /if \(closeMobileBags\) \{\s*dismissBagPrompts\(\);\s*bags\.style\.display = 'none';/,
+    );
   });
 });
 
@@ -1077,14 +1090,15 @@ describe('standalone weekly vault host', () => {
       hud.indexOf("  openBank(tab?: 'rewards')"),
       hud.indexOf('  closeBank():'),
     );
-    expect(open).toContain("if (tab === 'rewards') this.bagsWindow.close();");
-    expect(open).toContain("classList.toggle('bank-open', tab !== 'rewards')");
-    expect(open.indexOf("if (tab === 'rewards') return;")).toBeLessThan(
-      open.indexOf('this.renderBags()'),
+    expect(open).toContain('openBankCompanion(');
+    expect(lifecycle).toContain("if (tab === 'rewards') closeBags();");
+    expect(lifecycle).toContain("classes.toggle('bank-open', tab !== 'rewards')");
+    expect(lifecycle.indexOf("if (tab === 'rewards') return;")).toBeLessThan(
+      lifecycle.indexOf('  renderBags();'),
     );
     expect(hud).toContain(
       "if (document.body.classList.contains('weekly-vault-open')) this.closeBank();",
     );
-    expect(hud).toContain("classList.remove('bank-open', 'weekly-vault-open')");
+    expect(lifecycle).toContain("classes.remove('bank-open', 'weekly-vault-open')");
   });
 });

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { updateAuras } from '../src/sim/combat/auras';
 import { meleeSwing, rangedSwing, tryPlayerSwing } from '../src/sim/combat/auto_attack';
-import { NATURES_BOON_CHANCE } from '../src/sim/combat/druid_natures_boon';
+import { naturesBoonChanceAt } from '../src/sim/combat/druid_natures_boon';
 import { runWeaponProcs } from '../src/sim/combat/equip_procs';
-import { baseSwingSpeed } from '../src/sim/combat/form_swing';
+import { BEAR_FORM_SWING_MULT, baseSwingSpeed } from '../src/sim/combat/form_swing';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
@@ -97,12 +97,19 @@ describe("Last Flame's Zeal", () => {
     },
   );
 
+  // Cat autos roll at the fixed paw cadence (a slow stat stick must not
+  // multiply the frequency of the fast paw swings); a cat SPECIAL rolls at the
+  // carried weapon's own speed like every other class's specials, since its
+  // rate is gated by energy, never by swing speed. Bear autos use their
+  // half-weapon cadence, while bear specials still use the weapon speed. Hasted
+  // either way: the roll reads the un-hasted base.
   it.each([
-    ['form_cat', 1],
-    ['form_bear', 3.4],
+    ['form_cat', 1, 3.4],
+    // Bruin Form swings at half the weapon's speed (Groveheart rework pass 2).
+    ['form_bear', 3.4 * BEAR_FORM_SWING_MULT, 3.4],
   ] as const)(
-    'uses the un-hasted natural weapon speed for %s autos and specials',
-    (form, speed) => {
+    'uses the un-hasted roll speed for %s autos (%s) and specials (%s)',
+    (form, speed, specialSpeed) => {
       const sim = new Sim({ seed: 44, playerClass: 'druid', autoEquip: false });
       sim.setPlayerLevel(20);
       const source = sim.player;
@@ -150,7 +157,7 @@ describe("Last Flame's Zeal", () => {
         abilityId: 'claw',
         normalizedInstant: true,
       });
-      expect(chance.mock.calls.at(-1)?.[0]).toBe(speed / 60);
+      expect(chance.mock.calls.at(-1)?.[0]).toBe(specialSpeed / 60);
       next.mockRestore();
       chance.mockRestore();
     },
@@ -531,7 +538,7 @@ describe("Last Flame's Zeal", () => {
   // break it silently.
   describe.each([
     ['cat_form', 'form_cat', 1],
-    ['bear_form', 'form_bear', 2.9],
+    ['bear_form', 'form_bear', 2.9 * BEAR_FORM_SWING_MULT],
   ] as const)('through a real %s cast', (abilityId, formKind, speed) => {
     function shiftedFeral() {
       const sim = new Sim({
@@ -547,7 +554,7 @@ describe("Last Flame's Zeal", () => {
       const meta = sim.players.get(source.id)!;
       meta.equipment.mainhand = 'gnarled_staff';
       meta.equipmentInstance.mainhand = { enchant: ENCHANT };
-      // Bear keeps the staff's own base speed on the roll; cat ignores it.
+      // Bear swings at half the staff's own base speed; cat ignores it.
       expect(ITEMS.gnarled_staff.weapon?.speed).toBe(2.9);
       recalcPlayerStats(source, 'druid', meta.equipment, meta.talentMods, meta.equipmentInstance);
       const target = trainingTarget(sim, 10_000_000);
@@ -574,7 +581,7 @@ describe("Last Flame's Zeal", () => {
       // White crit, Wildfang Nature's Boon, then exactly ONE enchant roll at
       // the form speed. This still catches a duplicated Last Flame roll.
       expect(chance).toHaveBeenCalledTimes(3);
-      expect(chance.mock.calls[1]?.[0]).toBe(NATURES_BOON_CHANCE);
+      expect(chance.mock.calls[1]?.[0]).toBe(naturesBoonChanceAt(speed));
       expect(chance.mock.calls[2]?.[0]).toBe(speed / 60);
       expect(source.swingTimer).toBeCloseTo(speed, 10);
       const buff = source.auras.find((aura) => aura.id === ENCHANT);

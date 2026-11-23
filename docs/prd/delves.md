@@ -72,7 +72,7 @@ Quests are one-time; dungeons are 25–45 minute social commitments. Players lev
 - Replayable 10–20 min modular instances with seeded module order and spawn variants.
 - Normal + Heroic tiers with thematic affixes (Crypt slice: 1 affix on Heroic).
 - Delve Marks meta currency + companion upgrade ranks (Acolyte Tessa).
-- Solo companion support (healer); pet stow/restore for hunter/warlock.
+- Solo companion support (healer); hunter and warlock pets fight inside the delve, the mage's Water Elemental stows/restores.
 - Definitive death/wipe rules, daily XP/Mark efficiency caps.
 - Online/offline identical behavior; full i18n in Phase 4.
 
@@ -117,9 +117,9 @@ Quests are one-time; dungeons are 25–45 minute social commitments. Players lev
 
 ### 6.4 Pet stow & restore (definitive)
 
-- **FR-4.1** On `enterDelve`: **Hunter** — serialize live pet to `PetState` on `PlayerMeta` / run stash, despawn pet entity. **Warlock** — despawn demon pet entity. Stowed state survives module transitions.
-- **FR-4.2** On `leaveDelve` and `completeDelve`: restore hunter pet from stashed `PetState` via existing `restorePet()` (~L2675). Warlock demon respawns per normal class rules on exit.
-- **FR-4.3** Delve companion (`companion_tessa`) uses separate spawn path; does not conflict with stowed hunter pet.
+- **FR-4.1** On `enterDelve`: **Hunter / warlock**: the live pet comes along (`delveKeepsPet`, `src/sim/delves/delve_pet.ts`) and is set down beside its owner on every delve teleport (entry, module advance, exit, eject); it walks its owner's run for room collision and heels in a straight line there (the path planner does not know the run's seeded rooms), and the in-delve respawn or a dead member's eject hands back the pet the death took. A pet any class summons inside a delve is carried the same way. **Frost mage**: serialize the live pet into `delvePetStash` and despawn it. Stowed state survives module transitions.
+- **FR-4.2** On `leaveDelve` and `completeDelve`: restore a stowed pet from `delvePetStash` via `restorePet()`.
+- **FR-4.3** Delve companion (`companion_tessa`) uses a separate spawn path and fights alongside a hunter's or warlock's pet; pet lookups (`petOf`) exclude the companion.
 - **FR-4.4** Block `enterDelve` if pet state cannot be stowed (document edge case: pet in unrecoverable state — treat as despawn + restore attempt on exit).
 
 ### 6.5 Daily limits (definitive)
@@ -429,14 +429,14 @@ All strings via `t('delveUi.*')` + `entity_i18n` manifest entries for NPCs/mobs/
 
 ### 12.1 Unit (`tests/`)
 - `tests/delves.test.ts`: `delveOrigin` band ≥ 3600; same seed → same modules; enter/leave; completion grants marks; death respawn 50% HP; second death ejects; daily reset.
-- `tests/delve_companion.test.ts`: solo spawn, healer tick, pet stow/restore.
+- `tests/delve_companion.test.ts`: solo spawn, healer tick; `tests/delve_pet.test.ts`: hunter and warlock pets kept across delve teleports, the mage elemental stowed.
 - Extend `tests/snapshots.test.ts` for new `self` fields when wired.
 
 ### 12.2 E2E
 - `scripts/delve_crypt.mjs` (Phase 4): enter from Halven, complete Normal, verify boss telegraphs.
 
 ### 12.3 Manual
-1. Enter delve solo — Tessa spawns; hunter pet stowed.
+1. Enter delve solo: Tessa spawns; hunter and warlock pets come along, mage elemental stowed.
 2. Die once — module entry respawn 50% HP.
 3. Die twice — eject to Halven, no chest.
 4. Complete Heroic with affix — blue candle intro, marks per daily rules.
@@ -453,7 +453,7 @@ All strings via `t('delveUi.*')` + `entity_i18n` manifest entries for NPCs/mobs/
 | hud.ts merge conflicts | Defer full UI to PR 4; tracker-only in PR 1–2 |
 | RNG pollution | Run-local `Rng(seed)` for picks |
 | Quest cross-credit | Separate band + boss ids; test `q_sexton` isolation |
-| Pet + companion overlap | Stow on enter, restore on leave/complete |
+| Pet + companion overlap | Hunter and warlock pets coexist with the companion (petOf excludes the companion); other pets stow on enter, restore on leave/complete |
 
 ---
 

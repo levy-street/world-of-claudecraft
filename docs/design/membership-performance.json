@@ -1,0 +1,40 @@
+{
+  "fixture": "local warm Node, concurrent full test suite, timings are diagnostic",
+  "results": [
+    {
+      "name": "bank-view-json-100",
+      "iterations": 300,
+      "meanMs": 0.06034099999999986,
+      "p95Ms": 0.1342000000000212,
+      "maxMs": 0.6854999999999905
+    },
+    {
+      "name": "inventory-reconcile-100",
+      "iterations": 300,
+      "meanMs": 0.2561743333333341,
+      "p95Ms": 0.40980000000001837,
+      "maxMs": 0.7699000000000069
+    },
+    {
+      "name": "bank-view-json-1000",
+      "iterations": 300,
+      "meanMs": 0.358480999999998,
+      "p95Ms": 0.5844999999999914,
+      "maxMs": 0.8961999999999648
+    },
+    {
+      "name": "inventory-reconcile-1000",
+      "iterations": 300,
+      "meanMs": 2.583691666666659,
+      "p95Ms": 3.3350000000000364,
+      "maxMs": 5.280399999999872
+    },
+    {
+      "name": "unchanged-renewal-10000-bank-rows",
+      "iterations": 10000,
+      "meanMs": 0.00017722999999928107,
+      "p95Ms": 0.0003000000001520675,
+      "maxMs": 0.013100000000122236
+    }
+  ]
+}

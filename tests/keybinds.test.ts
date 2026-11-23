@@ -476,6 +476,85 @@ describe('snapshot / importBindings (hotkey setup export + import)', () => {
     expect(reloaded.snapshot()).toEqual(kb.snapshot());
   });
 
+  it('remembers the layout a setup was converted to, until a Reset or a plain import', () => {
+    const fr = { id: 'azerty-fr', keptMovement: true };
+    const kb = new Keybinds('char:1');
+    expect(kb.convertedLayout()).toBe(null);
+    kb.importBindings({ map: ['Semicolon', null] }, fr);
+    expect(kb.convertedLayout()).toEqual(fr);
+    // Persisted with the profile under its own key, outside the action rows
+    // and the snapshot (so a hotkey export code never carries it).
+    const stored = JSON.parse(localStorage.getItem('woc_keybinds:char:1') ?? '{}');
+    expect(stored.__layout).toEqual({ id: 'azerty-fr', keptMovement: true });
+    const reloaded = new Keybinds('char:1');
+    expect(reloaded.convertedLayout()).toEqual(fr);
+    expect(reloaded.codeAt('map', 0)).toBe('Semicolon');
+    expect(reloaded.snapshot().__layout).toBeUndefined();
+    // A rebind keeps it: the setup still follows that layout.
+    reloaded.bind('bags', 0, 'KeyI');
+    expect(new Keybinds('char:1').convertedLayout()).toEqual(fr);
+    // An imported code (no layout) and a Reset both clear it.
+    reloaded.importBindings({ map: ['KeyM', null] });
+    expect(new Keybinds('char:1').convertedLayout()).toBe(null);
+    expect(
+      JSON.parse(localStorage.getItem('woc_keybinds:char:1') ?? '{}').__layout,
+    ).toBeUndefined();
+    reloaded.importBindings({ map: ['Semicolon', null] }, fr);
+    reloaded.reset();
+    expect(new Keybinds('char:1').convertedLayout()).toBe(null);
+  });
+
+  it('reads a record written by an earlier session, and drops a malformed one', () => {
+    localStorage.setItem(
+      'woc_keybinds:char:2',
+      JSON.stringify({
+        map: ['Semicolon', null],
+        __repaired: true,
+        __layout: { id: 'dvorak', keptMovement: false },
+      }),
+    );
+    expect(new Keybinds('char:2').convertedLayout()).toEqual({
+      id: 'dvorak',
+      keptMovement: false,
+    });
+    for (const bad of [
+      42,
+      'azerty-fr',
+      ['dvorak', true],
+      { id: 'dvorak' },
+      { keptMovement: true },
+    ]) {
+      localStorage.setItem(
+        'woc_keybinds:char:3',
+        JSON.stringify({ map: ['KeyM', null], __repaired: true, __layout: bad }),
+      );
+      const kb = new Keybinds('char:3');
+      expect(kb.convertedLayout(), JSON.stringify(bad)).toBe(null);
+      // The bindings themselves still load.
+      expect(kb.codeAt('map', 0)).toBe('KeyM');
+    }
+  });
+
+  it('hands out a copy of the record, not the live one', () => {
+    const kb = new Keybinds('char:4');
+    const record = { id: 'colemak', keptMovement: true };
+    kb.importBindings({}, record);
+    record.id = 'dvorak';
+    const read = kb.convertedLayout();
+    if (read) read.keptMovement = false;
+    expect(kb.convertedLayout()).toEqual({ id: 'colemak', keptMovement: true });
+  });
+
+  it('a fresh character seeded from the legacy profile inherits its converted layout', () => {
+    new Keybinds().importBindings(
+      { map: ['Semicolon', null] },
+      { id: 'azerty-be', keptMovement: true },
+    );
+    const fresh = new Keybinds('char:new');
+    expect(fresh.codeAt('map', 0)).toBe('Semicolon');
+    expect(fresh.convertedLayout()).toEqual({ id: 'azerty-be', keptMovement: true });
+  });
+
   it('importBindings runs the stored-profile validation: unknown, reserved, duplicate', () => {
     const kb = new Keybinds();
     kb.importBindings({
@@ -502,7 +581,10 @@ describe('snapshot / importBindings (hotkey setup export + import)', () => {
     expect(kb.codeAt('strafeLeft', 0)).toBe(null);
     // A string that is not a combo (no keydown could ever produce it) is skipped,
     // so a crafted code cannot park garbage in a slot or reach a DOM lookup.
-    kb.importBindings({ slot3: ['Digit1"]', 'shift+KeyA'], slot4: ['Ctrl+Shift+KeyA', null] });
+    kb.importBindings({
+      slot3: ['Digit1"]', 'shift+KeyA'],
+      slot4: ['Ctrl+Shift+KeyA', null],
+    });
     expect(kb.codeAt('slot3', 0)).toBe(null);
     expect(kb.codeAt('slot3', 1)).toBe(null);
     expect(kb.codeAt('slot4', 0)).toBe('Ctrl+Shift+KeyA');
@@ -918,15 +1000,25 @@ describe('modifier combos', () => {
     expect(makeCombo('KeyF', { ctrl: true, alt: false, shift: true })).toBe('Ctrl+Shift+KeyF');
     // Meta (Cmd on macOS / Win key) folds in last, so Cmd+1 is its own chord; a
     // bare 1 stays byte-identical because an omitted/false meta changes nothing.
-    expect(makeCombo('Digit1', { ctrl: false, alt: false, shift: false, meta: true })).toBe(
-      'Meta+Digit1',
-    );
+    expect(
+      makeCombo('Digit1', {
+        ctrl: false,
+        alt: false,
+        shift: false,
+        meta: true,
+      }),
+    ).toBe('Meta+Digit1');
     expect(makeCombo('KeyA', { ctrl: true, alt: false, shift: true, meta: true })).toBe(
       'Ctrl+Shift+Meta+KeyA',
     );
-    expect(makeCombo('Digit1', { ctrl: false, alt: false, shift: false, meta: false })).toBe(
-      'Digit1',
-    );
+    expect(
+      makeCombo('Digit1', {
+        ctrl: false,
+        alt: false,
+        shift: false,
+        meta: false,
+      }),
+    ).toBe('Digit1');
   });
 
   it('splits a combo back into its code and modifiers', () => {
@@ -940,8 +1032,18 @@ describe('modifier combos', () => {
       shift: true,
       meta: false,
     });
-    expect(comboMods('Digit1')).toEqual({ ctrl: false, alt: false, shift: false, meta: false });
-    expect(comboMods('Meta+Digit1')).toEqual({ ctrl: false, alt: false, shift: false, meta: true });
+    expect(comboMods('Digit1')).toEqual({
+      ctrl: false,
+      alt: false,
+      shift: false,
+      meta: false,
+    });
+    expect(comboMods('Meta+Digit1')).toEqual({
+      ctrl: false,
+      alt: false,
+      shift: false,
+      meta: true,
+    });
   });
 
   it('identifies the bare modifier keys', () => {

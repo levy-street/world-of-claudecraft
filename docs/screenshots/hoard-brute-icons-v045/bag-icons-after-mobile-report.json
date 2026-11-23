@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/rare_breastplate_tectonic_might.webp",
+    "http://localhost:5194/ui/items/rare_band_mountains_weight.webp",
+    "http://localhost:5194/ui/items/rare_monolithic_shoulderguards.webp",
+    "http://localhost:5194/ui/items/rare_earthshaker_warboots.webp",
+    "http://localhost:5194/ui/items/breastplate_tectonic_might.webp",
+    "http://localhost:5194/ui/items/band_mountains_weight.webp",
+    "http://localhost:5194/ui/items/monolithic_shoulderguards.webp",
+    "http://localhost:5194/ui/items/earthshaker_warboots.webp",
+    "http://localhost:5194/ui/items/legendary_breastplate_tectonic_might.webp",
+    "http://localhost:5194/ui/items/legendary_band_mountains_weight.webp",
+    "http://localhost:5194/ui/items/legendary_monolithic_shoulderguards.webp",
+    "http://localhost:5194/ui/items/legendary_earthshaker_warboots.webp"
+  ],
+  "allDecoded": true
+}

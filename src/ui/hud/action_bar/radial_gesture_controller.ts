@@ -171,11 +171,10 @@ function readPx(value: string): number {
  *  custom property comes back unresolved, see above), so the overlay carries the
  *  insets as padding, which is a real property and does resolve to px.
  *
- *  That padding is NOT inert: every petal is an absolutely positioned child of
- *  the overlay, so the left/top the painter writes resolves against the overlay's
- *  PADDING box. These four numbers are therefore the offset between the viewport
- *  and the frame the petals are actually seated in, which is why measure() works
- *  in that frame rather than in viewport coordinates. */
+ *  That padding does NOT move the petals: an absolutely positioned child's
+ *  left/top is measured from the overlay's padding EDGE, the outer edge of the
+ *  padding, so the painter's coordinates are viewport coordinates whatever the
+ *  inset. These four numbers only shrink the box the radial is clamped into. */
 interface EdgeInsets {
   top: number;
   right: number;
@@ -528,21 +527,20 @@ export class RadialGesture {
    *  layout, gated to an opening (a drag's reveal or a tap-mode press) rather
    *  than per frame.
    *
-   *  WHY THE FRAME IS THE OVERLAY'S PADDING BOX, not the viewport: the petals are
-   *  absolutely positioned children of the overlay, so the coordinates the painter
-   *  writes are resolved against its padding box, and the safe-area inset the
-   *  overlay carries as padding is exactly the offset between the two. Measuring
-   *  in viewport coordinates displaced every petal by that inset on a notched
-   *  device, and folding the same inset into the clamp margin counted it twice.
-   *  Shifting the anchor and shrinking the clamp box here counts it once, and
-   *  leaves the margin the stylesheet's own literal clearance INSIDE the safe
-   *  area. */
+   *  The radial is CLAMPED in the safe-area box (the app box minus the insets
+   *  the overlay carries as padding), so the margin stays the stylesheet's own
+   *  literal clearance inside the safe area and the inset is counted once. The
+   *  origin is then translated back by the insets, because the painter's
+   *  coordinates resolve from the overlay's padding EDGE, which is the viewport
+   *  origin, not from inside the padding. Leaving it in the clamp frame pushed
+   *  every petal a whole inset off the button it belongs to on a notched or
+   *  edge-to-edge device. */
   private measure(btn: HTMLElement): RadialPlacement {
     const rect = btn.getBoundingClientRect();
     const style = getComputedStyle(this.deps.metricsHost);
     const petalSize = rect.width > 0 ? rect.width : FALLBACK_PETAL_SIZE_PX;
     const inset = readInsets(style);
-    return placeRadial({
+    const placement = placeRadial({
       buttonCx: rect.x + rect.width / 2 - inset.left,
       buttonCy: rect.y + rect.height / 2 - inset.top,
       viewportWidth:
@@ -553,6 +551,11 @@ export class RadialGesture {
       petalHalf: petalSize / 2,
       margin: readMetric(style, EDGE_MARGIN_PROP, FALLBACK_MARGIN_PX),
     });
+    return {
+      ...placement,
+      originX: placement.originX + inset.left,
+      originY: placement.originY + inset.top,
+    };
   }
 
   private onMove(e: PointerEvent): void {

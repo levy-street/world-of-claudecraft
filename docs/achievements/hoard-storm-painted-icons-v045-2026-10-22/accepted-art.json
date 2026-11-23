@@ -1,0 +1,945 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "hoard-storm-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rare_storm_tuned_buckler",
+      "family": "hoard-storm",
+      "tier": "Tarnished",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_storm_tuned_buckler.webp",
+      "canonicalDisplayName": "Tarnished Storm-Tuned Buckler",
+      "acceptedSha256": "f24c9fde2aed1eb72c275cc93e1472fb716b1346abc3707fc79e3dcb7b185f9d",
+      "acceptedBytes": 3870,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/rare_storm_tuned_buckler.png",
+        "sha256": "435117ca7a260047e1bb2157660fa103d80fc61910a49f8c4052e11852ee10d3",
+        "bytes": 2528528,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/rare_storm_tuned_buckler.png",
+        "sha256": "4370bfc408577e6b62ca3953507118142bf9abb3c6a444127b736f8597542961",
+        "bytes": 543046,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "b8becfd5e4d675332d3c68141c37eb0c457e945e2366e705865ce31bf6275b62",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Storm-Tuned Buckler (rare_storm_tuned_buckler) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete compact ROUND buckler shield in three-quarter view, dark storm-blue metal face, thick raised metal rim and a central circular boss bearing a bold pale-blue lightning bolt. A practical small round buckler with visible depth, three broad radial reinforcing ribs and restrained electric glow in the boss. Follow its authored buckler identity, not the old generic kite-shield placeholder. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings, worn desaturated storm-blue material, plain broad edges and a small muted blue lightning focal accent. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/rare_storm_tuned_buckler.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "b8becfd5e4d675332d3c68141c37eb0c457e945e2366e705865ce31bf6275b62"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_hauberk_tempest_gale",
+      "family": "hoard-storm",
+      "tier": "Tarnished",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_hauberk_tempest_gale.webp",
+      "canonicalDisplayName": "Tarnished Hauberk of the Tempest Gale",
+      "acceptedSha256": "db70c60debbe29087fcc4996f1ddc909689b0b2e5a7021bba52b6f557135b1ee",
+      "acceptedBytes": 3844,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/rare_hauberk_tempest_gale.png",
+        "sha256": "9bed345ab2186128ab0fffc2abc6226b0d20e9bf89e7b9b400878c76b686d9fe",
+        "bytes": 2655735,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/rare_hauberk_tempest_gale.png",
+        "sha256": "2d8d667af795132be0d7d21550dd425f902f23fc0ea8c7636574a9c1d390734d",
+        "bytes": 542749,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "e8f6c37f79e2e08738d5385c75c5c8c84dc2438cb6a5340d67c66d23b7e08537",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Hauberk of the Tempest Gale (rare_hauberk_tempest_gale) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty storm-blue MAIL hauberk, torso-length coat with short sleeves and linked metal rings over dark navy padding, split lower hem, broad reinforced collar, a bold pale-blue lightning-bolt clasp at the chest and narrow metal waist band. Clearly flexible chainmail construction, no rigid plate breastplate, no wearer. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings, worn desaturated storm-blue material, plain broad edges and a small muted blue lightning focal accent. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/rare_hauberk_tempest_gale.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "e8f6c37f79e2e08738d5385c75c5c8c84dc2438cb6a5340d67c66d23b7e08537"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_gale_strider_boots",
+      "family": "hoard-storm",
+      "tier": "Tarnished",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_gale_strider_boots.webp",
+      "canonicalDisplayName": "Tarnished Gale-Strider Boots",
+      "acceptedSha256": "8dad8e73ab05a61eefa7f961c86eab2500c5c578ce7db9e0f6be32e0de152eb3",
+      "acceptedBytes": 3472,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/rare_gale_strider_boots.png",
+        "sha256": "3022ba5ecdf36576e96092d5ff2968abdee1bc05d8743af098323fb13dae0368",
+        "bytes": 2379332,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/rare_gale_strider_boots.png",
+        "sha256": "1526aac99d98bc48116178de95fb1bea2ddb7e9f8dbc0f545534a555456f9031",
+        "bytes": 522518,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "b7f18e0dcd0e8bc66110064e7690d2e2682c55ba6684e03f2c48874f9133d03e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Gale-Strider Boots (rare_gale_strider_boots) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of storm-blue LEATHER boots, supple fitted shafts with folded upper cuffs, visibly stitched panels, low sturdy soles, rounded toes and a small pale-blue lightning-bolt emblem on each outer ankle. One boot in front and its matching partner behind, wind-swept curved cuff profile, no metal greaves. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings, worn desaturated storm-blue material, plain broad edges and a small muted blue lightning focal accent. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/rare_gale_strider_boots.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "b7f18e0dcd0e8bc66110064e7690d2e2682c55ba6684e03f2c48874f9133d03e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_tempest_strike_grips",
+      "family": "hoard-storm",
+      "tier": "Tarnished",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_tempest_strike_grips.webp",
+      "canonicalDisplayName": "Tarnished Tempest-Strike Grips",
+      "acceptedSha256": "15229e7e7a6a886b43ec65502b27768020982f0fbebc96afbdd3b097a9d8eaf3",
+      "acceptedBytes": 3902,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/rare_tempest_strike_grips.png",
+        "sha256": "d26581875a5f8f8a10b7191cdeb52e59dca22fc6a20982be2d28575d0959388b",
+        "bytes": 2549560,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/rare_tempest_strike_grips.png",
+        "sha256": "ce0d216b76c2f1ea7ecf71e13dbb1f444190fdbabcb226ed4fc22133bbf0189b",
+        "bytes": 530337,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "5aebb93a0099ce6d80367dfe798c4e3a99326b2da6e701aa013c19ecea977ba6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Tempest-Strike Grips (rare_tempest_strike_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of storm-blue MAIL gloves with five articulated fingers per glove, fine linked metal rings on the back and fingers over dark navy leather, broad wrist cuffs with pale-blue lightning-bolt clasps, restrained blue electric gleam along the knuckles. One glove in front and partner behind, no living hands, mail rather than solid plate gauntlets. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings, worn desaturated storm-blue material, plain broad edges and a small muted blue lightning focal accent. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/rare_tempest_strike_grips.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "5aebb93a0099ce6d80367dfe798c4e3a99326b2da6e701aa013c19ecea977ba6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "storm_tuned_buckler",
+      "family": "hoard-storm",
+      "tier": "Epic",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/storm_tuned_buckler.webp",
+      "canonicalDisplayName": "Storm-Tuned Buckler",
+      "acceptedSha256": "70df9515de10935b4014cf6c88ce043231bec2b559bf873038ace6a5cd5412c1",
+      "acceptedBytes": 4100,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/storm_tuned_buckler.png",
+        "sha256": "1955bf75cd03c2fcdf4edba67deb8a40424330e9faa61b2f128f3624dcf53cdb",
+        "bytes": 2487913,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/storm_tuned_buckler.png",
+        "sha256": "021c8c148bf5652d1551841192df1d16462d1b37437453e192df50d328e1f3ef",
+        "bytes": 560488,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "6bcb38b1ab6a2650af131bee81f76c2ab2a9b91eb7742b4ddc8062f3ef0120ce",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Storm-Tuned Buckler (storm_tuned_buckler) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete compact ROUND buckler shield in three-quarter view, dark storm-blue metal face, thick raised metal rim and a central circular boss bearing a bold pale-blue lightning bolt. A practical small round buckler with visible depth, three broad radial reinforcing ribs and restrained electric glow in the boss. Follow its authored buckler identity, not the old generic kite-shield placeholder. Tier finish: Well-kept masterwork: bright silver fittings, rich storm-blue and navy material, clean angular edges, vivid pale-blue lightning accents with restrained glow. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/storm_tuned_buckler.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "6bcb38b1ab6a2650af131bee81f76c2ab2a9b91eb7742b4ddc8062f3ef0120ce"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "hauberk_tempest_gale",
+      "family": "hoard-storm",
+      "tier": "Epic",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/hauberk_tempest_gale.webp",
+      "canonicalDisplayName": "Hauberk of the Tempest Gale",
+      "acceptedSha256": "18c53f797535133e3fdc4c804907023854a5f4ac14806d74d5be173d567fe7d9",
+      "acceptedBytes": 4516,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/hauberk_tempest_gale.png",
+        "sha256": "954a5227614ea5b479ff7db7905dba14fa00caf4f78588afe6c183b54e66c3ad",
+        "bytes": 2577084,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/hauberk_tempest_gale.png",
+        "sha256": "008247727a509f8abfa865ff7617d391a6707a04a6241fd64dc86022a5c320ab",
+        "bytes": 537258,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "d05989ada809d2fe23cf11db39d789c22bfc234612bf192e5a00cfa97a37ab27",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Hauberk of the Tempest Gale (hauberk_tempest_gale) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty storm-blue MAIL hauberk, torso-length coat with short sleeves and linked metal rings over dark navy padding, split lower hem, broad reinforced collar, a bold pale-blue lightning-bolt clasp at the chest and narrow metal waist band. Clearly flexible chainmail construction, no rigid plate breastplate, no wearer. Tier finish: Well-kept masterwork: bright silver fittings, rich storm-blue and navy material, clean angular edges, vivid pale-blue lightning accents with restrained glow. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/hauberk_tempest_gale.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "d05989ada809d2fe23cf11db39d789c22bfc234612bf192e5a00cfa97a37ab27"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gale_strider_boots",
+      "family": "hoard-storm",
+      "tier": "Epic",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gale_strider_boots.webp",
+      "canonicalDisplayName": "Gale-Strider Boots",
+      "acceptedSha256": "a0b35882326a1856a59d0aa9d8f653f6b05286486a1561ecb1c26400ec42507e",
+      "acceptedBytes": 3734,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/gale_strider_boots.png",
+        "sha256": "7ee9d6da16e2ccfc31c1b47928cbc6528e0309b2c3c0638ee03219b54cd69d3f",
+        "bytes": 2277981,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/gale_strider_boots.png",
+        "sha256": "b8990bd1b4c0206f54bcd88ff69cbbe8bf2e842887dbcf59a816c6392ba338b3",
+        "bytes": 517636,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "d986274be59c97cda2d891bc3e4368aff067b783c88828b9aa9635ae7c2f1299",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gale-Strider Boots (gale_strider_boots) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of storm-blue LEATHER boots, supple fitted shafts with folded upper cuffs, visibly stitched panels, low sturdy soles, rounded toes and a small pale-blue lightning-bolt emblem on each outer ankle. One boot in front and its matching partner behind, wind-swept curved cuff profile, no metal greaves. Tier finish: Well-kept masterwork: bright silver fittings, rich storm-blue and navy material, clean angular edges, vivid pale-blue lightning accents with restrained glow. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/gale_strider_boots.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "d986274be59c97cda2d891bc3e4368aff067b783c88828b9aa9635ae7c2f1299"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "tempest_strike_grips",
+      "family": "hoard-storm",
+      "tier": "Epic",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/tempest_strike_grips.webp",
+      "canonicalDisplayName": "Tempest-Strike Grips",
+      "acceptedSha256": "372462b05ab3c51e0bf180b2103202b978463fda3c03ddeab5b9b50d5a756163",
+      "acceptedBytes": 4994,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/tempest_strike_grips.png",
+        "sha256": "bac9a3dc768f2c2ee0b82e29e664b09b624914934fa0163d627df951279c8061",
+        "bytes": 2551573,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/tempest_strike_grips.png",
+        "sha256": "6d643f575f1042ba2b783df20c0a140eec16e37807957bd5de9eeeea0fb112e8",
+        "bytes": 575945,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "1f932578eb23938a3dff9b7422f9e8e789f50acd109144651c23903dd33bf8bc",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tempest-Strike Grips (tempest_strike_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of storm-blue MAIL gloves with five articulated fingers per glove, fine linked metal rings on the back and fingers over dark navy leather, broad wrist cuffs with pale-blue lightning-bolt clasps, restrained blue electric gleam along the knuckles. One glove in front and partner behind, no living hands, mail rather than solid plate gauntlets. Tier finish: Well-kept masterwork: bright silver fittings, rich storm-blue and navy material, clean angular edges, vivid pale-blue lightning accents with restrained glow. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/tempest_strike_grips.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "1f932578eb23938a3dff9b7422f9e8e789f50acd109144651c23903dd33bf8bc"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_storm_tuned_buckler",
+      "family": "hoard-storm",
+      "tier": "Sovereign",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_storm_tuned_buckler.webp",
+      "canonicalDisplayName": "Sovereign Storm-Tuned Buckler",
+      "acceptedSha256": "4f26f5b68f72301a564bf21598bb472d99056d022d2eadcec3b5e8ee18cfbecc",
+      "acceptedBytes": 4636,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/legendary_storm_tuned_buckler.png",
+        "sha256": "dd815c1735ed2abda2851b6a69e288d3131999f0d25ad06e893554a73b818f88",
+        "bytes": 2499973,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/legendary_storm_tuned_buckler.png",
+        "sha256": "dff3081972874c1a62ff8c30ce2e9d6e6d0dbd98f2ff286e6bd21cc35197e532",
+        "bytes": 558827,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "ef499ec9af7c0e91ef908d69cf7c31890bba80c41f3e3b3c2d060affd79c7c9d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Storm-Tuned Buckler (legendary_storm_tuned_buckler) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete compact ROUND buckler shield in three-quarter view, dark storm-blue metal face, thick raised metal rim and a central circular boss bearing a bold pale-blue lightning bolt. A practical small round buckler with visible depth, three broad radial reinforcing ribs and restrained electric glow in the boss. Follow its authored buckler identity, not the old generic kite-shield placeholder. Tier finish: Regal highest-tier craftsmanship: warm gold fittings, deep royal-blue and navy material, broad elegant angular gold lightning ornament and brighter contained electric-blue focal accents. Gold ornament is part of the object, never a surrounding frame. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/legendary_storm_tuned_buckler.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "ef499ec9af7c0e91ef908d69cf7c31890bba80c41f3e3b3c2d060affd79c7c9d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_hauberk_tempest_gale",
+      "family": "hoard-storm",
+      "tier": "Sovereign",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_hauberk_tempest_gale.webp",
+      "canonicalDisplayName": "Sovereign Hauberk of the Tempest Gale",
+      "acceptedSha256": "189c82e0a831df149035e7c07434dce7897c230079a7ef8ef9665bb928f66ed9",
+      "acceptedBytes": 5092,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/legendary_hauberk_tempest_gale.png",
+        "sha256": "fa43f3991cff40493239719b2f085950127342cded2e5f0f8ac4d990215e3224",
+        "bytes": 2628275,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/legendary_hauberk_tempest_gale.png",
+        "sha256": "972edc7acd7c898763bd60ddbf592c08a4e82f68abab4c5c87d7dc0192780cfb",
+        "bytes": 576887,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "6d9600ff586cc69f6eb76da8bcaa8999a539c6d16692e82583cf7ca884d5a03c",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Hauberk of the Tempest Gale (legendary_hauberk_tempest_gale) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty storm-blue MAIL hauberk, torso-length coat with short sleeves and linked metal rings over dark navy padding, split lower hem, broad reinforced collar, a bold pale-blue lightning-bolt clasp at the chest and narrow metal waist band. Clearly flexible chainmail construction, no rigid plate breastplate, no wearer. Tier finish: Regal highest-tier craftsmanship: warm gold fittings, deep royal-blue and navy material, broad elegant angular gold lightning ornament and brighter contained electric-blue focal accents. Gold ornament is part of the object, never a surrounding frame. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/legendary_hauberk_tempest_gale.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "6d9600ff586cc69f6eb76da8bcaa8999a539c6d16692e82583cf7ca884d5a03c"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_gale_strider_boots",
+      "family": "hoard-storm",
+      "tier": "Sovereign",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_gale_strider_boots.webp",
+      "canonicalDisplayName": "Sovereign Gale-Strider Boots",
+      "acceptedSha256": "327bedb1976a7e090bc7cf52769b0ed2d6f0ddb37d2d29d82ff6757ae795bfa5",
+      "acceptedBytes": 4478,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/legendary_gale_strider_boots.png",
+        "sha256": "47e122fe8eea0ad2457b7162444682dadf87283847b5823096b7502d587181fd",
+        "bytes": 2386646,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/legendary_gale_strider_boots.png",
+        "sha256": "88c33983751e6943d050dc6b5a9af2e4d11a12567996d417b794595d997dfa5b",
+        "bytes": 558153,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "b532577575af7d3158d6eafc2854ba122cc3bf0c5596d808908f6fc04a050093",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Gale-Strider Boots (legendary_gale_strider_boots) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of storm-blue LEATHER boots, supple fitted shafts with folded upper cuffs, visibly stitched panels, low sturdy soles, rounded toes and a small pale-blue lightning-bolt emblem on each outer ankle. One boot in front and its matching partner behind, wind-swept curved cuff profile, no metal greaves. Tier finish: Regal highest-tier craftsmanship: warm gold fittings, deep royal-blue and navy material, broad elegant angular gold lightning ornament and brighter contained electric-blue focal accents. Gold ornament is part of the object, never a surrounding frame. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/legendary_gale_strider_boots.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "b532577575af7d3158d6eafc2854ba122cc3bf0c5596d808908f6fc04a050093"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_tempest_strike_grips",
+      "family": "hoard-storm",
+      "tier": "Sovereign",
+      "batch": "hoard-storm-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_tempest_strike_grips.webp",
+      "canonicalDisplayName": "Sovereign Tempest-Strike Grips",
+      "acceptedSha256": "2fcbcb649db304bf74cf16bf235b539a432777160c9079c1125f7d9aa99a37ac",
+      "acceptedBytes": 5086,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-storm/originals/legendary_tempest_strike_grips.png",
+        "sha256": "4e5232eff8edd7937cace3f5d097dbaf5cdbf4578684b9e859bea85a0a287d0d",
+        "bytes": 2516946,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-storm/masters/legendary_tempest_strike_grips.png",
+        "sha256": "f7188640ac11c0ab0113315df541b116db9355b04c54dce51a3143dc36a2ef65",
+        "bytes": 536713,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "53252e06402b841b578e927163208453bfdafa2a62821f4ee494e9e310c65c46",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Tempest-Strike Grips (legendary_tempest_strike_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of storm-blue MAIL gloves with five articulated fingers per glove, fine linked metal rings on the back and fingers over dark navy leather, broad wrist cuffs with pale-blue lightning-bolt clasps, restrained blue electric gleam along the knuckles. One glove in front and partner behind, no living hands, mail rather than solid plate gauntlets. Tier finish: Regal highest-tier craftsmanship: warm gold fittings, deep royal-blue and navy material, broad elegant angular gold lightning ornament and brighter contained electric-blue focal accents. Gold ornament is part of the object, never a surrounding frame. Tempest Vharok family: navy, storm blue, silver and electric-blue lightning motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark navy-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-storm/superseded/legendary_tempest_strike_grips.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "53252e06402b841b578e927163208453bfdafa2a62821f4ee494e9e310c65c46"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-storm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-storm-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ],
+  "identityReview": {
+    "storm_tuned_buckler": "Canonical name and the former generator subject description both specify a buckler. Replaced the generic kite-shaped placeholder with a compact round buckler in all tiers. Preserve the storm-blue face, lightning boss and tier finish. Authority: src/sim/content/hoard_loot.ts and scripts/generate_hoard_loot_icons.mjs."
+  },
+  "perceptualReview": {
+    "candidatePairs": [
+      {
+        "left": "item:hauberk_tempest_gale",
+        "right": "item:legendary_hauberk_tempest_gale",
+        "hammingDistance": 3,
+        "meanAbsoluteDifference": 0.035376,
+        "structuralSimilarity": 0.830274,
+        "luminanceSimilarity": 0.867714,
+        "edgeSimilarity": 0.784515,
+        "cropFraction": 0,
+        "cropDirection": "none"
+      },
+      {
+        "left": "item:hauberk_tempest_gale",
+        "right": "item:rare_hauberk_tempest_gale",
+        "hammingDistance": 3,
+        "meanAbsoluteDifference": 0.035927,
+        "structuralSimilarity": 0.825695,
+        "luminanceSimilarity": 0.86908,
+        "edgeSimilarity": 0.772668,
+        "cropFraction": 0.03,
+        "cropDirection": "left-cropped"
+      }
+    ],
+    "disposition": "Two candidates compare related Hauberk of the Tempest Gale tiers. All are independently generated chainmail coats with a consistent cut: Tarnished has plain pitted trim and muted padding, Epic adds clean silver angular trim and blue lightning embroidery, Sovereign adds gold lightning ornament and richer blue padding. Reviewed originals and small-size sheet; retain each authored tier painting. No exact duplicates."
+  }
+}

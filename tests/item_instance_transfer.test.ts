@@ -2,7 +2,7 @@
 // (src/sim/item_instance_transfer.ts): the pipe lock predicate, the public
 // display trim, the payload-matching escrow removal, and the persisted-escrow
 // sanitizer. The trim allowlist is cross-pinned to the eqi wire's projection
-// (server/game.ts identityFields), the enchant_apply_view.test.ts precedent:
+// (server/entity_wire.ts identityFields), the enchant_apply_view.test.ts precedent:
 // widen both or neither.
 
 import { readFileSync } from 'node:fs';

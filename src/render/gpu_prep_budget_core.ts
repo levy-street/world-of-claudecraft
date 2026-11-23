@@ -147,6 +147,11 @@ export interface GpuPrepAdmitInput {
   /** An arrival curtain covers the world: the cover rule below decides, and
    *  the frame budget is not consulted at all. */
   cover?: boolean;
+  /** The cover is a WebGL context restore's world-draw hold
+   *  (context_restore.ts): only the 3D view is withheld and the HUD keeps
+   *  painting, so what the cover rule admits still takes its turn under the
+   *  frame budget instead of all of it running in one task. */
+  coverPaced?: boolean;
   /** The candidate's queue priority. Read only by the cover rule
    *  (gpuPrepCoverAdmits); the ordinary path decides on `cls`. */
   priority?: number;
@@ -360,9 +365,8 @@ export function createGpuPrepBudget(config?: Partial<GpuPrepBudgetConfig>): GpuP
       // impose. Nothing below is consulted, so the frame's first-sample and
       // progress slots stay unspent for the frames that do need them.
       if (input.cover === true) {
-        return gpuPrepCoverAdmits(input.priority)
-          ? admitted('cover', predictedMs)
-          : deferred('cover-not-arrival', predictedMs);
+        if (!gpuPrepCoverAdmits(input.priority)) return deferred('cover-not-arrival', predictedMs);
+        if (input.coverPaced !== true) return admitted('cover', predictedMs);
       }
       if (input.cls === 'actionable') return admitted('actionable-floor', predictedMs);
       const deferredFrames = Number.isFinite(input.deferredFrames) ? input.deferredFrames : 0;

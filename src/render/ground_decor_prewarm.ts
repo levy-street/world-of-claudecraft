@@ -14,7 +14,7 @@
 // grass card, 66.0 ms on the uncapped one and 207.4 ms on the night-accent
 // glow, and the same grass pair had escaped into LIVE frames a day earlier.
 //
-// The pattern is character_effect_prewarm.ts's: hidden twins wearing the LIVE
+// The pattern is occluder_ghost_prewarm.ts's: hidden twins wearing the LIVE
 // material and the LIVE geometry, staged inside an existing prewarm group (the
 // foliage material group, whose manifest entry already links its children one
 // per unit), never a lane of their own. Sharing the material is what makes the

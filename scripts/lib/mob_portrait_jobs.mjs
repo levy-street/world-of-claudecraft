@@ -103,7 +103,19 @@ function attachmentRecord(repoRoot, attachment, assetCache) {
   };
 }
 
-function specFor(def) {
+/** A split WOC body's other files (src/render/characters/woc_armor_core.ts): its clip
+ *  library and its default kit's armor files at the medium tier, the guide viewer's
+ *  (scripts/wiki/build_content.mjs), so a portrait is the dressed, posed body. */
+function wocFilesFor(def, wocArmorPackUrl) {
+  if (!def.wocCharacter) return null;
+  const sets = [...new Set(Object.values(def.wocCharacter.items).map((item) => item.set))];
+  return {
+    animUrls: [...(def.animUrls ?? [])],
+    armor: sets.map((set) => wocArmorPackUrl(def.wocCharacter.fit, set, 'medium')),
+  };
+}
+
+function specFor(def, wocArmorPackUrl) {
   const spec = { url: def.url, idle: def.clips?.idle ?? null, height: def.height };
   if (def.yaw) spec.yaw = def.yaw;
   if (def.hover) spec.hover = def.hover;
@@ -111,6 +123,8 @@ function specFor(def) {
   if (def.attach) spec.attach = def.attach;
   if (def.weaponFix) spec.weaponFix = def.weaponFix;
   if (def.tint !== undefined) spec.tintStrength = def.tintStrength ?? 0.4;
+  const woc = wocFilesFor(def, wocArmorPackUrl);
+  if (woc) Object.assign(spec, woc);
   return spec;
 }
 
@@ -119,6 +133,8 @@ async function loadPortraitData(repoRoot) {
     export { FINDER_ACTIVITIES } from './src/sim/content/dungeon_finder.ts';
     export { MOBS } from './src/sim/data.ts';
     export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
+    export { wocArmorPackUrl } from './src/render/characters/woc_armor_core.ts';
+    export { targetPortraitUrl } from './src/ui/target_portrait_view.ts';
   `;
   const built = await esbuild.build({
     stdin: {
@@ -137,7 +153,7 @@ async function loadPortraitData(repoRoot) {
   return import(dataUrl);
 }
 
-function sourceRecord(repoRoot, mob, visualKey, def, assetCache) {
+function sourceRecord(repoRoot, mob, visualKey, def, assetCache, wocArmorPackUrl) {
   const tintSource = def.tint === undefined ? 'none' : def.tint === 'entity' ? 'entity' : 'fixed';
   const resolvedTint =
     tintSource === 'none' ? null : tintSource === 'entity' ? (mob.color ?? null) : def.tint;
@@ -155,6 +171,12 @@ function sourceRecord(repoRoot, mob, visualKey, def, assetCache) {
     weaponFix: def.weaponFix ?? null,
     tintStrength,
   };
+  // Only a split WOC body carries these, so every other row's fingerprint is unchanged.
+  const woc = wocFilesFor(def, wocArmorPackUrl);
+  if (woc) {
+    renderSpec.animations = woc.animUrls.map((url) => publicAssetDigest(repoRoot, url, assetCache));
+    renderSpec.armor = woc.armor.map((url) => publicAssetDigest(repoRoot, url, assetCache));
+  }
   const tint = {
     source: tintSource,
     authored: tintSource === 'entity' ? 'entity' : colorHex(def.tint),
@@ -169,7 +191,8 @@ function sourceRecord(repoRoot, mob, visualKey, def, assetCache) {
 }
 
 export async function buildMobPortraitJobs(repoRoot) {
-  const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor } = await loadPortraitData(repoRoot);
+  const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor, wocArmorPackUrl, targetPortraitUrl } =
+    await loadPortraitData(repoRoot);
   const assetCache = new Map();
   const jobs = new Map();
 
@@ -184,7 +207,7 @@ export async function buildMobPortraitJobs(repoRoot) {
     const visualKey = visualKeyFor({ kind: 'mob', templateId: mobId, family: mob.family });
     const def = VISUALS[visualKey];
     if (!def) throw new Error(`no visual for portrait mob ${mobId} (visual key ${visualKey})`);
-    const source = sourceRecord(repoRoot, mob, visualKey, def, assetCache);
+    const source = sourceRecord(repoRoot, mob, visualKey, def, assetCache, wocArmorPackUrl);
     const tint =
       def.tint === undefined ? null : def.tint === 'entity' ? (mob.color ?? null) : def.tint;
     jobs.set(mobId, {
@@ -192,7 +215,7 @@ export async function buildMobPortraitJobs(repoRoot) {
       finder,
       family: mob.family,
       visualKey,
-      spec: specFor(def),
+      spec: specFor(def, wocArmorPackUrl),
       tint,
       renderSpec: source.renderSpec,
       tintRecord: source.tint,
@@ -203,7 +226,12 @@ export async function buildMobPortraitJobs(repoRoot) {
   for (const activity of FINDER_ACTIVITIES) {
     for (const encounter of activity.encounters) addJob(encounter.mobId, true);
   }
-  for (const mobId of Object.keys(MOBS)) addJob(mobId, false);
+  // Static buddy headshots are shared by target frames and Cosmetics. Only bake
+  // the mob portraits the live resolver actually consumes, never duplicate them.
+  for (const mobId of Object.keys(MOBS)) {
+    if (targetPortraitUrl(mobId, true) === `/ui/mobs/${encodeURIComponent(mobId)}.webp`)
+      addJob(mobId, false);
+  }
   return [...jobs.values()];
 }
 

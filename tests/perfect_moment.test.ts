@@ -28,8 +28,8 @@ function ctxOf(sim: Sim): SimContext {
   return (sim as unknown as { ctx: SimContext }).ctx;
 }
 
-function chronoMage(level = 20) {
-  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
+function chronoMage(level = 20, seed = 41) {
+  const sim = new Sim({ seed, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.setSpec('arcane')).toBe(true);
   sim.tick();
@@ -121,7 +121,11 @@ describe('Perfect Moment window', () => {
   });
 
   it('after the window closes, the dump consumes charges again', () => {
-    const { sim, p } = chronoMage();
+    // Seed hunted so the real Arcane Surge that rebuilds the charge lands (a
+    // resisted cast leaves 0). Seed 41 started resisting it once the Mirefen
+    // mudfin huts became solid walls: the camp murlocs' wander settles on other
+    // ticks and shifts the shared stream. Seed 42 lands it.
+    const { sim, p } = chronoMage(20, 42);
     const mob = addHostile(sim);
     sim.targetEntity(mob.id);
     sim.castAbility('perfect_moment');

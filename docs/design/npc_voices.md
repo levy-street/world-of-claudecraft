@@ -9,14 +9,20 @@ given gear (helmet + cape, staff, axe, crossbow). See
 `src/render/characters/manifest.ts` (`NPC_KEYS` → `VISUALS`) and the per-zone
 content files (`src/sim/content/zone1.ts`, `zone2.ts`, `zone3.ts`, `temple.ts`).
 
+Since 2026-10 that paragraph is history. Every NPC now wears an authored face on
+the body of a player class, bare headed, in that class's kit
+(`src/render/characters/npc_looks.ts`). The **Visual** lines below describe the
+stock body each voice was cast against; they are kept as casting context and are
+not what the game draws today.
+
 Each entry below grounds the voice in what actually defines that NPC's look —
 body archetype, tint color, weapon/silhouette — plus its role and its in-game
 greeting line (the strongest signal for personality and cadence). The **voice
 test** is a single sentence chosen to exercise the voice's signature timbre,
 pacing, and attitude.
 
-Most NPCs added after the starter zones carry no `NPC_KEYS` entry at all, so they
-render as the shared villager body tinted with their signature colour. For those
+Most NPCs added after the starter zones carried no `NPC_KEYS` entry at all, so they
+rendered as the shared villager body tinted with their signature colour. For those
 the load-bearing grounding is the tint, the title, the zone, and above all the
 character's own written dialogue: read the quest text before writing a voice.
 

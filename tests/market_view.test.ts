@@ -425,21 +425,18 @@ describe('market_view: collect states', () => {
     expect(body.rows[0].count).toBe(3);
   });
 
-  // A 1-copper listing nets 0 after the Merchant's cut: gold-only emptiness would
-  // hide the ledger row entirely, and the tab would never offer "Collect All" to
-  // clear it, even though its rows are shown on the History tab, not here.
-  it('is NOT empty when a zero-proceeds sale is the only thing waiting', () => {
+  // The sale ledger is History and outlives the gold it brought in, so a seller
+  // who already collected (or whose only sale netted 0 copper) has nothing here.
+  it('is empty when sale history is all that remains', () => {
     const body = buildMarketCollect(
       info({
         collectionSales: [
           { itemId: 'wolf_fang', count: 1, price: 1, proceeds: 0, buyerName: 'Buyer' },
+          { itemId: 'bone_fragments', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
         ],
       }),
     );
-    expect(body.state).toBe('items');
-    if (body.state !== 'items') return;
-    expect(body.proceeds).toBe(0);
-    expect(body.rows).toEqual([]);
+    expect(body).toEqual({ state: 'empty' });
   });
 
   it('counts the collect badge: a proceeds purse plus each returned stack', () => {
@@ -458,7 +455,7 @@ describe('market_view: collect states', () => {
     ).toBe(3);
   });
 
-  it('counts the purse ONCE however many sales fill it, and once for a 0-copper sale', () => {
+  it('counts the purse ONCE however many sales fill it, and never for history alone', () => {
     const sales = [
       { itemId: 'wolf_fang', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
       { itemId: 'bone_fragments', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
@@ -467,7 +464,7 @@ describe('market_view: collect states', () => {
     expect(marketCollectBadgeCount(info({ collectionCopper: 380, collectionSales: sales }))).toBe(
       1,
     );
-    // A sale that netted no copper still fills the purse slot: the tab has a row.
+    // Collected (or 0-copper) sales are History only: no purse, no badge.
     expect(
       marketCollectBadgeCount(
         info({
@@ -477,7 +474,7 @@ describe('market_view: collect states', () => {
           ],
         }),
       ),
-    ).toBe(1);
+    ).toBe(0);
   });
 });
 

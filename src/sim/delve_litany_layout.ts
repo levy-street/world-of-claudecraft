@@ -1,5 +1,5 @@
 // The Drowned Litany: irregular marsh-ruin room geometry (sim layer, no Three.js).
-import type { Collider } from './colliders';
+import type { LayoutCollider } from './colliders';
 import {
   DUNGEON_END_WALL_HW,
   DUNGEON_WALL_HW,
@@ -144,8 +144,8 @@ function litanyRoom(def: LitanyRoomDef): LitanyModuleGeometry {
   };
 }
 
-function legacyRectShellColliders(geo: LitanyModuleGeometry): Collider[] {
-  const out: Collider[] = [];
+function legacyRectShellColliders(geo: LitanyModuleGeometry): LayoutCollider[] {
+  const out: LayoutCollider[] = [];
   const sideZ = (geo.zMin + geo.zMax) / 2;
   const sideHd = (geo.zMax - geo.zMin) / 2;
   for (const sx of [-geo.wallX, geo.wallX]) {
@@ -224,7 +224,7 @@ export function polygonWallSegments(points: readonly Point2D[]): LitanyWallSegme
  * {x:cos(rot), z:-sin(rot)} is the world direction of local +x), so
  * rot = atan2(-edgeDz, edgeDx) points the OBB's long axis along the edge:
  * the same atan2(-dz, dx) convention colliders.ts already uses for fences. */
-export function polygonShellColliders(points: readonly Point2D[]): Collider[] {
+export function polygonShellColliders(points: readonly Point2D[]): LayoutCollider[] {
   return polygonWallSegments(points).map((segment) => ({
     type: 'obb',
     x: segment.x,
@@ -235,13 +235,13 @@ export function polygonShellColliders(points: readonly Point2D[]): Collider[] {
   }));
 }
 
-function shellColliders(geo: LitanyModuleGeometry): Collider[] {
+function shellColliders(geo: LitanyModuleGeometry): LayoutCollider[] {
   if (geo.walkable.length) return polygonShellColliders(geo.walkable[0].points);
   return legacyRectShellColliders(geo);
 }
 
-function interiorColliders(geo: LitanyModuleGeometry, includeHazards: boolean): Collider[] {
-  const out: Collider[] = [];
+function interiorColliders(geo: LitanyModuleGeometry, includeHazards: boolean): LayoutCollider[] {
+  const out: LayoutCollider[] = [];
   for (const s of geo.stubs) out.push({ type: 'obb', x: s.x, z: s.z, hw: s.hw, hd: s.hd, rot: 0 });
   for (const p of geo.pillars) out.push({ type: 'circle', x: p.x, z: p.z, r: PILLAR_COLLIDER_R });
   for (const t of geo.tombs)
@@ -908,14 +908,14 @@ export function litanyModuleGeometry(moduleId: LitanyModuleId): LitanyModuleGeom
 }
 
 /** Movement + shell collision for a Litany module. */
-export function litanyModuleColliders(moduleId: LitanyModuleId): Collider[] {
+export function litanyModuleColliders(moduleId: LitanyModuleId): LayoutCollider[] {
   const geo = litanyModuleGeometry(moduleId);
   if (!geo) return [];
   return [...shellColliders(geo), ...interiorColliders(geo, true)];
 }
 
 /** Tall obstacles that block ranged line of sight (excludes shallow Blackwater). */
-export function litanyModuleLosColliders(moduleId: LitanyModuleId): Collider[] {
+export function litanyModuleLosColliders(moduleId: LitanyModuleId): LayoutCollider[] {
   const geo = litanyModuleGeometry(moduleId);
   if (!geo) return [];
   return [...shellColliders(geo), ...interiorColliders(geo, false)];

@@ -1,8 +1,9 @@
 // Pure view-core for the Target dots frame (#target-dots): the multi-target
 // tracker for every debuff the LOCAL player currently has out, one row per
-// (enemy, aura) pair. DOM/Three/i18n-free so it unit-tests directly; the painter
-// turns these rows into pooled DOM and localizes the names. Registered in
-// UI_PURE_CORES; tested in tests/target_dots_view.test.ts.
+// (enemy, aura) pair, where an enemy is a mob or a hostile player. DOM/Three/i18n-free
+// so it unit-tests directly; the painter turns these rows into pooled DOM and
+// localizes the names. Registered in UI_PURE_CORES; tested in
+// tests/target_dots_view.test.ts.
 //
 // CLASS-AGNOSTIC BY CONSTRUCTION. The selection rule is ownership plus harm, never
 // an ability list: an aura qualifies when the host's isOwn predicate says the local
@@ -13,6 +14,13 @@
 // in this file. It deliberately shows only the player's OWN debuffs: the group's are
 // already on the target frame strip, and mixing them back in is the clutter this
 // frame exists to escape.
+//
+// ENEMIES ARE MOBS AND HOSTILE PLAYERS. A player counts while the host's
+// isHostilePlayer verdict says the local player may attack them right now (a duel,
+// a battleground, a ranked arena, or open-world PvP under the /pvp flag), so the
+// dots a player puts on an opposing player track exactly like the ones on a mob.
+// Friendly players never qualify: a harmful-classified lockout the player causes on
+// an ally (Bloodlust's shared exhaustion on the whole party) is not a refresh target.
 //
 // ORDER IS STABLE ON PURPOSE. Rows group by enemy (the current target first, then by
 // entity id) and sort by aura id inside a group, never by remaining time. Sorting by
@@ -109,6 +117,11 @@ export interface TargetDotsDeps<TEntity extends TargetDotsEntityInput = TargetDo
   targetName(entity: TEntity): string;
   /** Artwork identity for this aura. */
   iconKey(aura: TargetDotsAuraInput): string;
+  /** May the local player attack this PLAYER right now (duel, battleground, arena,
+   *  or open-world PvP under the /pvp flag)? The host's one shared verdict
+   *  (src/ui/pvp_hostile_core.ts), never re-derived here. It must answer false for
+   *  the local player and for corpses. Absent, no player is ever trackable. */
+  isHostilePlayer?(entity: TEntity): boolean;
 }
 
 export interface TargetDotsInput<TEntity extends TargetDotsEntityInput = TargetDotsEntityInput> {
@@ -125,11 +138,28 @@ export interface TargetDotsViewCore<TEntity extends TargetDotsEntityInput = Targ
   tick(input: TargetDotsInput<TEntity>): TargetDotsState;
 }
 
-/** Is this entity something the player can have a debuff out on? Players are
- *  excluded: a duel or a battleground debuff belongs to the unit frames, and a
- *  world-PvP tracker is a separate decision nobody has asked for. */
-function isTrackableTarget(entity: TargetDotsEntityInput): boolean {
-  return entity.kind === 'mob' && !entity.dead && entity.auras.length > 0;
+/** Does this aura earn a row: the local player's own, harmful, and still running? */
+function isListedAura(aura: TargetDotsAuraInput, deps: Pick<TargetDotsDeps, 'isOwn'>): boolean {
+  return deps.isOwn(aura) && isDebuffAura(aura.kind, aura.value) && aura.remaining > 0;
+}
+
+/** Is this entity an enemy the player can have a debuff out on? A living mob, or
+ *  a living player the host's hostility verdict names (PvP: duel, battleground,
+ *  arena, open-world /pvp). The verdict is the full pair rule and nearly every
+ *  player carries a buff, so it is asked only about a player already carrying one
+ *  of our listed auras: a crowd of strangers costs an ownership scan per frame,
+ *  never a verdict each. */
+function isTrackableTarget<TEntity extends TargetDotsEntityInput>(
+  entity: TEntity,
+  deps: TargetDotsDeps<TEntity>,
+): boolean {
+  if (entity.dead || entity.auras.length === 0) return false;
+  if (entity.kind === 'mob') return true;
+  if (entity.kind !== 'player' || deps.isHostilePlayer === undefined) return false;
+  for (const aura of entity.auras) {
+    if (isListedAura(aura, deps)) return deps.isHostilePlayer(entity);
+  }
+  return false;
 }
 
 function newRow(): TargetDotRow {
@@ -213,7 +243,7 @@ export function createTargetDotsView<TEntity extends TargetDotsEntityInput>(
       primary.length = 0;
       others.length = 0;
       for (const entity of input.entities) {
-        if (!isTrackableTarget(entity)) continue;
+        if (!isTrackableTarget(entity, deps)) continue;
         if (input.targetId !== null && entity.id === input.targetId) primary.push(entity);
         else others.push(entity);
       }
@@ -232,10 +262,7 @@ export function createTargetDotsView<TEntity extends TargetDotsEntityInput>(
           // happened to apply them in.
           auraScratch.length = 0;
           for (const aura of entity.auras) {
-            if (!deps.isOwn(aura)) continue;
-            if (!isDebuffAura(aura.kind, aura.value)) continue;
-            if (aura.remaining <= 0) continue;
-            auraScratch.push(aura);
+            if (isListedAura(aura, deps)) auraScratch.push(aura);
           }
           auraScratch.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
           let previousId = '';

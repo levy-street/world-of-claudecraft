@@ -57,6 +57,7 @@ const terrainAt = (x: number, z: number): number => terrainHeight(x, z, S);
 /** Clearance between a circle and a collider (negative = overlap). */
 function clearance(x: number, z: number, r: number, c: Collider): number {
   if (c.type === 'circle') return Math.hypot(x - c.x, z - c.z) - c.r - r;
+  if (c.type === 'prism') throw new Error('unexpected prism collider');
   const cos = Math.cos(-c.rot);
   const sin = Math.sin(-c.rot);
   const lx = (x - c.x) * cos + (z - c.z) * sin;
@@ -271,7 +272,12 @@ describe('Wyrmwatch cliff harbor: what stays clear', () => {
     for (const c of wyrmwatchHarborColliders(S)) {
       for (const h of hull) {
         expect(
-          clearance(c.x, c.z, c.type === 'circle' ? c.r : Math.max(c.hw, c.hd), h),
+          clearance(
+            c.x,
+            c.z,
+            c.type === 'circle' ? c.r : c.type === 'obb' ? Math.max(c.hw, c.hd) : c.br,
+            h,
+          ),
         ).toBeGreaterThan(5);
       }
     }

@@ -169,7 +169,7 @@ function land(
     ctx.dealDamage(
       caster,
       player,
-      hoardMechanicDamage(inst, HOARD_LIGHTNING_STRIKE.damageFraction),
+      hoardMechanicDamage(inst, HOARD_LIGHTNING_STRIKE.damageFraction, 'add'),
       false,
       'nature',
       'Lightning Strike',

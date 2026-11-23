@@ -8,12 +8,14 @@
 // tab reads as a sibling of the Thornhollow Fields panel, not a new dialect.
 
 import { audio } from '../../../game/audio';
+import { WORLD_PVP_TITLE_THRESHOLDS } from '../../../sim/pvp/world_pvp_rewards_rules';
 import type { IWorld } from '../../../world_api';
 import { clockSeconds } from '../../clock_seconds_core';
 import { durationText } from '../../duration_text';
 import { esc } from '../../esc';
 import { focusKeyAttr } from '../../focus_restore';
-import { formatMoney, formatNumber, t } from '../../i18n';
+import { formatList, formatMoney, formatNumber, getLanguage, t } from '../../i18n';
+import type { PainterHostWriters } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import type { WorldPvpWindowView } from './world_pvp_window_view';
 
@@ -28,6 +30,12 @@ const pct = (whole: number): string =>
 export function disarmClockText(seconds: number): string {
   const whole = Math.max(0, Math.floor(seconds));
   return `${num(Math.floor(whole / 60))}:${clockSeconds(whole % 60, true)}`;
+}
+
+/** Played-time progress as h:mm, including the sub-hour remainder. */
+function rewardClockText(seconds: number): string {
+  const whole = Math.max(0, Math.floor(seconds));
+  return `${num(Math.floor(whole / 3600))}:${clockSeconds(Math.floor(whole / 60) % 60, true)}`;
 }
 
 /** Focus keys, so a rebuild (once a second while disarming, and the flip into
@@ -75,6 +83,17 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
     `</div>`;
   const stakes = view.stakes;
   const stakeRows = [
+    t('hudChrome.worldPvp.rewardTitles', {
+      thresholds: formatList(
+        WORLD_PVP_TITLE_THRESHOLDS.map(({ hours }) =>
+          formatNumber(hours > 24 ? hours / 24 : hours, {
+            style: 'unit',
+            unit: hours > 24 ? 'day' : 'hour',
+            unitDisplay: 'long',
+          }),
+        ),
+      ),
+    }),
     // Where you can fight at all (the three zone policies), then what raises
     // the flag for you, then what a kill moves, then how to put it back down.
     t('hudChrome.worldPvp.groundSanctuary'),
@@ -87,6 +106,7 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
       cap: formatMoney(stakes.stakeCapCopper),
       percent: pct(stakes.stakePercent),
     }),
+    t('hudChrome.worldPvp.spoilsLine'),
     t('hudChrome.worldPvp.noStakeLine'),
     t('hudChrome.worldPvp.noTakeLine'),
     t('hudChrome.worldPvp.honorLine', { honor: num(stakes.killHonor) }),
@@ -104,10 +124,12 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
   return (
     `<div class="arena-layout"><section class="arena-overview">` +
     blurb +
+    `<div class="bg-note" data-pvp-reward-progress>${esc(rewardProgressText(view))}</div>` +
     status +
     // The action sits right under the status it acts on, and above the record,
     // so it is on screen without scrolling on a landscape phone.
     actionHtml(view) +
+    `<div class="bg-note" data-pvp-reward-progress>${esc(rewardProgressText(view))}</div>` +
     stats +
     `</section><section class="arena-ladders">` +
     `<div class="bg-sub">${esc(t('hudChrome.worldPvp.title'))}</div>` +
@@ -117,6 +139,62 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
 }
 
 type LiveView = Extract<WorldPvpWindowView, { kind: 'live' }>;
+
+const REWARD_PAUSE_KEYS = {
+  dead: 'hudChrome.worldPvp.rewardPausedDead',
+  instance: 'hudChrome.worldPvp.rewardPausedInstance',
+  sanctuary: 'hudChrome.worldPvp.rewardPaused',
+} as const;
+
+function rewardProgressText(view: LiveView): string {
+  const key = view.rewardPause
+    ? REWARD_PAUSE_KEYS[view.rewardPause]
+    : 'hudChrome.worldPvp.rewardProgress';
+  return t(key, { time: rewardClockText(view.rewardSeconds) });
+}
+
+/** Cached node and inputs for the separately patched progress line. */
+export interface WorldPvpRewardProgressState {
+  node: HTMLElement;
+  minute: number;
+  pause: LiveView['rewardPause'];
+  language: ReturnType<typeof getLanguage>;
+}
+
+/** Bind once after a full-panel rebuild; the markup already carries this text. */
+export function bindWorldPvpRewardProgress(
+  el: HTMLElement,
+  view: WorldPvpWindowView,
+): WorldPvpRewardProgressState | null {
+  if (view.kind !== 'live') return null;
+  const node = el.querySelector<HTMLElement>('[data-pvp-reward-progress]');
+  return node
+    ? {
+        node,
+        minute: Math.floor(view.rewardSeconds / 60),
+        pause: view.rewardPause,
+        language: getLanguage(),
+      }
+    : null;
+}
+
+/** Unchanged polls skip all DOM and localization work. Changed text uses the
+ *  shared host writers, with no DOM read to decide whether a write is needed. */
+export function updateWorldPvpRewardProgress(
+  state: WorldPvpRewardProgressState | null,
+  view: WorldPvpWindowView,
+  writers: Pick<PainterHostWriters, 'setText'>,
+): void {
+  if (!state || view.kind !== 'live') return;
+  const minute = Math.floor(view.rewardSeconds / 60);
+  const language = getLanguage();
+  if (minute === state.minute && view.rewardPause === state.pause && language === state.language)
+    return;
+  state.minute = minute;
+  state.pause = view.rewardPause;
+  state.language = language;
+  writers.setText(state.node, rewardProgressText(view));
+}
 
 /** The flag-down sentence. Free-for-all ground has its own, because standing
  *  there is the consent: the generic one would promise an immunity the ground
@@ -150,13 +228,13 @@ function groundHtml(view: LiveView): string {
 
 function actionHtml(view: LiveView): string {
   const hint = `<div class="bg-note">${esc(t('hudChrome.worldPvp.commandHint'))}</div>`;
-  if (view.action === 'realmOff') {
+  if (view.action === 'realmOff' || view.action === 'sanctuary') {
     // The reason sits under the button, where the level requirement does, so a
     // dead control is never unexplained. No command hint: /pvp is refused on
     // this realm too, so pointing at it would only lead to an error line.
     return (
       `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red${INERT_CLASS}" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}${INERT_ATTR}>${esc(t('hudChrome.worldPvp.enable'))}</button>` +
-      `<div class="bg-note bg-level-req">${esc(t('hudChrome.worldPvp.realmDisabled'))}</div></div>`
+      `<div class="bg-note bg-level-req">${esc(t(view.action === 'sanctuary' ? 'hudChrome.worldPvp.zoneSanctuary' : 'hudChrome.worldPvp.realmDisabled'))}</div></div>`
     );
   }
   if (view.action === 'locked') {

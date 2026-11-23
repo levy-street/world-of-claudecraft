@@ -16,6 +16,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 
 vi.mock('../../src/render/armory_preview', () => ({
+  // The inspect overlay asks whether the try-on body is resident before it
+  // builds a stage (a WOC base streams on first use). The stubbed stage needs
+  // no files, so it is always ready.
+  armoryPreviewReady: () => true,
   createArmoryPreview: () => ({
     setActive() {},
     setAppearance() {},

@@ -61,6 +61,9 @@ const OFFENSIVE_SPEC_TUNING: Partial<Record<PlayerClass, Record<string, Offensiv
     // so the spec's share of the total arrives through AP and the physical
     // abilities alone.
     assassination: { physical: 0.1 },
+    // Skulduggery: the rogue tweak pass's +25% (0.04 legacy + 0.10 here =
+    // 0.14 total); AP is a stats.apPct edit (0 -> 0.45).
+    subtlety: { physical: 0.1 },
   },
   hunter: {
     // Fieldcraft: survival offensive ability bonus (0.30 legacy + 0.15 here
@@ -118,6 +121,15 @@ export function offensiveAbilityBonus(
   return bonus ?? 0;
 }
 
+/** The raw offense-only row for one spec, for display (the spec card's
+ *  Specialization bonus line). Undefined for every untuned spec. */
+export function offensiveSpecTuningFor(
+  cls: PlayerClass,
+  spec: string,
+): Readonly<OffensiveSpecTuning> | undefined {
+  return OFFENSIVE_SPEC_TUNING[cls]?.[spec];
+}
+
 /** The explicit destruction-only Pyre Aura pet bonus (combat/destruction.ts).
  *  Zero for every class/spec other than committed destruction. */
 export function petOffenseMultiplier(cls: PlayerClass, spec: string | null): number {
@@ -144,7 +156,7 @@ export function disciplineWandOffenseMultiplier(): number {
 export function primaryHealingMultiplier(cls: PlayerClass, spec: string | null): number {
   if (cls === 'shaman' && spec === 'restoration') return 1.1;
   if (cls === 'paladin' && spec === 'holy') return 1.1;
-  // Together with corrected Wildbloom replants: +19.9% across the paired engine profiles.
+  // Together with corrected Sporemending replants: +19.9% across the paired engine profiles.
   if (cls === 'druid' && spec === 'restoration') return 1.05;
   return 1;
 }

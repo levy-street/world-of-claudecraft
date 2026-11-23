@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { ZONES } from '../src/sim/data';
+import { isBlocked } from '../src/sim/colliders';
+import { setActiveWorldContent, ZONES } from '../src/sim/data';
 import {
+  devTownLanding,
   devTownList,
   devTownSlug,
   devTownTargets,
   resolveDevTown,
 } from '../src/sim/dev/town_teleport';
+import { PAINTED_TOWNS } from '../src/sim/painted_towns';
+import { distancePointToObb } from '../src/sim/placed_town_kit';
 import { Sim } from '../src/sim/sim';
-import type { ZoneDef } from '../src/sim/types';
+import type { WorldContent, ZoneDef } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function makeSim(devCommands: boolean): Sim {
@@ -116,6 +120,29 @@ describe('dev town resolver (pure)', () => {
   });
 });
 
+describe('dev town landing (pure)', () => {
+  // Turned a quarter: its 8 yd width runs along z, so its walls cover x 8 to 12
+  // and z 16 to 24 (unturned they would cover x 6 to 14 and z 18 to 22).
+  const building = {
+    position: { x: 10, z: 20 },
+    rotation: Math.PI / 2,
+    nativeDimensions: { width: 8, depth: 4 },
+    frontStandingPoint: { x: 4, z: 20 },
+  };
+
+  it('steps out to the door of a building whose turned walls stand on the hub', () => {
+    const landing = devTownLanding({ x: 10, z: 23 }, [building]);
+    expect(landing).toEqual({ x: 4, z: 20 });
+    expect(landing).not.toBe(building.frontStandingPoint);
+  });
+
+  it('keeps the hub when no wall stands on it', () => {
+    // inside the unturned box only: the turn is honoured
+    expect(devTownLanding({ x: 13, z: 20 }, [building])).toEqual({ x: 13, z: 20 });
+    expect(devTownLanding({ x: 10, z: 23 }, [])).toEqual({ x: 10, z: 23 });
+  });
+});
+
 describe('/dev town', () => {
   it('teleports to the named hub through the shared dev displacement', () => {
     const sim = makeSim(true);
@@ -219,5 +246,54 @@ describe('/dev town', () => {
     const sim = makeSim(true);
     sim.chat('/dev');
     expect(texts(sim).some((text) => text.includes('/dev town'))).toBe(true);
+  });
+
+  // Bridgemere's painted rebuild stands its island inn on the hub
+  // (sim/painted_towns/bridgemere.ts): the jump lands on the inn's door step.
+  const islandInn = PAINTED_TOWNS.flatMap((town) => town.buildings).find(
+    (building) => building.id === 'bridgemere_island_inn',
+  );
+
+  it("lands at the door of the building that stands on the hub: Bridgemere's island inn", () => {
+    if (!islandInn) throw new Error('no island inn');
+    const hub = hubOf('willowfen');
+    expect(distancePointToObb(hub, islandInn.footprint), 'the inn stands on the hub').toBe(0);
+    const sim = makeSim(true);
+    sim.chat('/dev town bridgemere');
+    const after = playerPos(sim);
+    expect(after.x).toBeCloseTo(islandInn.frontStandingPoint.x, 5);
+    expect(after.z).toBeCloseTo(islandInn.frontStandingPoint.z, 5);
+    expect(distancePointToObb(after, islandInn.footprint)).toBeGreaterThan(1);
+    expect(isBlocked(42, after.x, after.z, 0.5), 'the door step is open ground').toBe(false);
+    expect(texts(sim).some((text) => text.includes('[dev] Teleported to Bridgemere'))).toBe(true);
+  });
+
+  it('lands on the hub itself in a world that does not stand that building', () => {
+    // the command reads the ACTIVE world (its zones and its buildings)
+    const world: WorldContent = {
+      ...EMPTY_TEST_WORLD,
+      props: {
+        ...EMPTY_TEST_WORLD.props,
+        buildings: EMPTY_TEST_WORLD.props.buildings.filter(
+          (building) => building.id !== 'bridgemere_island_inn',
+        ),
+      },
+    };
+    setActiveWorldContent(world);
+    try {
+      const sim = new Sim({
+        seed: 42,
+        playerClass: 'warrior',
+        autoEquip: true,
+        devCommands: true,
+        world,
+      });
+      sim.chat('/dev town bridgemere');
+      const hub = hubOf('willowfen');
+      expect(playerPos(sim).x).toBeCloseTo(hub.x, 5);
+      expect(playerPos(sim).z).toBeCloseTo(hub.z, 5);
+    } finally {
+      setActiveWorldContent(null);
+    }
   });
 });

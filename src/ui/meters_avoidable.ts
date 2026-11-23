@@ -17,6 +17,11 @@ const AVOIDABLE_ABILITY_NAMES = new Set<string>([
 
   // Korzul / Gravewyrm encounter
   'Grave Inferno',
+  'Grave Breath',
+  'Tail Sweep',
+  'Plunging Fire',
+  'Crashing Descent',
+  'Quench-Water',
   'Void Zone',
   'Necrotic Spit',
 

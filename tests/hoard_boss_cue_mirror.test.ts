@@ -54,6 +54,15 @@ describe('Buried Hoard boss cue mirror', () => {
     expect(mirror.views()[0]).toMatchObject({ variant: 'storm-static', targetId: 42 });
   });
 
+  it('clear drops every cue (the mirrored rift floor was reset)', () => {
+    const mirror = new HoardBossCueMirror(() => 1_000);
+    mirror.apply(warning());
+    mirror.apply(warning({ cueId: 4 }));
+    expect(mirror.views()).toHaveLength(2);
+    mirror.clear();
+    expect(mirror.views()).toEqual([]);
+  });
+
   it('counts events down and replaces a warning with its hazard phase', () => {
     let now = 1_000;
     const mirror = new HoardBossCueMirror(() => now);

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "exp_the_last_keep",
+    "src": "http://localhost:5194/ui/deeds/exp_the_last_keep.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "exp_dawnhold_castle",
+    "src": "http://localhost:5194/ui/deeds/exp_dawnhold_castle.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "soc_strongbox_outfitter",
+    "src": "http://localhost:5194/ui/deeds/soc_strongbox_outfitter.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "soc_four_bags_deep",
+    "src": "http://localhost:5194/ui/deeds/soc_four_bags_deep.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "prog_ready_for_an_adventure",
+    "src": "http://localhost:5194/ui/deeds/prog_ready_for_an_adventure.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

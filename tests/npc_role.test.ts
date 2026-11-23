@@ -65,6 +65,12 @@ describe('npcRoleFor', () => {
     expect(npcRoleFor(def({ vendorItems: ['no_such_item'] }))).toBeNull();
   });
 
+  it('reads an innkeeper as one, whatever fare she also sells', () => {
+    expect(npcRoleFor(NPCS.innkeeper_maudie)).toBe('innkeeper');
+    expect(npcRoleFor(def({ innkeeper: true, vendorItems: ['tough_jerky'] }))).toBe('innkeeper');
+    expect(npcRoleFor(def({ vendorItems: ['tough_jerky'] }))).toBe('foodVendor');
+  });
+
   it('is deterministic across the whole NPC table', () => {
     const run = () => Object.values(NPCS).map((n) => [n.id, npcRoleFor(n)] as const);
     expect(run()).toEqual(run());

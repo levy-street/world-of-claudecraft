@@ -1,8 +1,9 @@
 // Masterwork proc model (Professions 2.0). The output quality roll is
 // retired from the craft path: every successful craft yields its recipe's
-// declared output deterministically, and the ONLY output-side randomness is a
+// declared output deterministically, and the output-side randomness is a
 // single masterwork proc draw (crafting.ts keeps that draw at the exact
-// position the old roll occupied, one draw per successful craft). A proc mints
+// position the old roll occupied, one draw per successful craft), plus the
+// equipment copy's permanent loot-quality draw at grant time. A proc mints
 // a masterwork instance whose bonus stats are BAKED from the item budget at
 // craft time; it is add-only, never a downgrade of the declared output.
 //

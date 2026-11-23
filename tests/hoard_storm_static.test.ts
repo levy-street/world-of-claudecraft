@@ -118,7 +118,8 @@ describe('Hoard Tempest static', () => {
       Math.round(
         HOARD_REFERENCE_HEALTH *
           HOARD_STATIC_DAMAGE_FRACTION *
-          HOARD_RARITY_PRESSURE.legendary.damage,
+          HOARD_RARITY_PRESSURE.legendary.damage *
+          0.7,
       ),
     );
     expect(damage.mock.calls[0][2]).toBeLessThan(sim.player.maxHp);

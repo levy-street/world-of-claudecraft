@@ -13,6 +13,11 @@
 // or bounced off Heroic: one Normal to Heroic switch left the whole group
 // unable to switch again for five minutes.
 //
+// That exemption covers difficulty TRANSITIONS only. A same-difficulty reset
+// (the Reset All Instances button with no tier change) re-spawns the raid's
+// trash with no kill and so no lockout to throttle it, so it pays the
+// cooldown like every other claim.
+//
 // Kept as its own leaf so the reset loop stays a thin consumer: the predicate
 // is pinned directly in tests/reset_cooldown_policy.test.ts and through
 // resetDungeonInstances in tests/dungeons.test.ts ("raid lockout gate").
@@ -28,8 +33,9 @@ export const RAID_REQUIRED_DUNGEON_IDS: ReadonlySet<string> = new Set([
 ]);
 
 /** Does a Reset All Instances replacement claim for this dungeon carry the
- *  five-minute reset cooldown? True for every standard dungeon; false for
- *  the raid rooms, whose own lockouts are the rate limit. */
-export function resetCooldownApplies(dungeonId: string): boolean {
-  return !RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);
+ *  five-minute reset cooldown? True for every standard dungeon, and for any
+ *  claim rebuilt at its old difficulty; false only for a raid room switching
+ *  tier, whose own lockouts are the rate limit. */
+export function resetCooldownApplies(dungeonId: string, sameDifficulty: boolean): boolean {
+  return sameDifficulty || !RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);
 }

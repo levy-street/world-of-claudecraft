@@ -63,6 +63,8 @@ export interface ChatWindowControllerDeps {
   showError(text: string): void;
   /** Open the Social window's Who tab with a server-side filter; false offline. */
   openWhoTab(filter: string): boolean;
+  /** Open the Groups window (the bare `/lfg` command). */
+  openGroupFinder(): void;
   afterTabShown?(pane: HTMLElement): void;
 }
 
@@ -195,6 +197,11 @@ export class ChatWindowController {
   maybeHandleLocalChatCommand(raw: string): boolean {
     const whoFilter = parseWhoCommand(raw);
     if (whoFilter !== null && this.deps.openWhoTab(whoFilter)) return true;
+    // A bare `/lfg` opens the Groups window; `/lfg <message>` still talks in the LFG channel.
+    if (/^\/lfg\s*$/i.test(raw.trim())) {
+      this.deps.openGroupFinder();
+      return true;
+    }
     return this.maybeHandleQuestShareCommand(raw);
   }
 

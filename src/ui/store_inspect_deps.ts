@@ -79,9 +79,13 @@ export function mountInspectDeps(seams: StoreInspectSeams): MountInspectDeps {
     row: (skinId) => {
       const world = seams.world();
       return mountInspectRow(skinId, seams.spend.mounts.rowById(skinId), {
-        ownedMountSkinIds: world.accountCosmetics.mountSkinIds,
+        ownedMountSkinIds: [
+          ...world.accountCosmetics.mountSkinIds,
+          ...(world.accountCosmetics.collectibleMountSkinIds ?? []),
+          ...world.ownedMounts(),
+        ],
         wornMountSkinId: world.player.mountSkinId ?? null,
-        ownsAnyMount: world.ownedMounts().length > 0,
+        ownsAnyMount: true,
       });
     },
     requestBuy: (skinId) => seams.spend.mounts.request(skinId),

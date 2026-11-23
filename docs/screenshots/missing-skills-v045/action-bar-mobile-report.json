@@ -1,0 +1,66 @@
+{
+  "ids": [
+    "courier",
+    "lunge",
+    "hamstring_bite",
+    "clockwork_shock_bomb"
+  ],
+  "slots": [
+    {
+      "slot": "0",
+      "html": "<button class=\"action-btn ui-socket empty\" data-hotbar-slot=\"0\" draggable=\"true\"><span class=\"icon-label ui-socket-art\"></span><span class=\"item-count ui-socket-count\"></span><span class=\"keybind ui-socket-key\">1</span><div class=\"cd-overlay ui-socket-cd\"></div><div class=\"recharge-overlay\"></div><div class=\"cdtext ui-socket-cd-text\"></div></button>"
+    },
+    {
+      "slot": "1",
+      "html": "<button class=\"action-btn ui-socket empty\" data-hotbar-slot=\"1\" draggable=\"true\"><span class=\"icon-label ui-socket-art\"></span><span class=\"item-count ui-socket-count\"></span><span class=\"keybind ui-socket-key\">2</span><div class=\"cd-overlay ui-socket-cd\"></div><div class=\"recharge-overlay\"></div><div class=\"cdtext ui-socket-cd-text\"></div></button>"
+    },
+    {
+      "slot": "2",
+      "html": "<button class=\"action-btn ui-socket empty\" data-hotbar-slot=\"2\" draggable=\"true\"><span class=\"icon-label ui-socket-art\"></span><span class=\"item-count ui-socket-count\"></span><span class=\"keybind ui-socket-key\">3</span><div class=\"cd-overlay ui-socket-cd\"></div><div class=\"recharge-overlay\"></div><div class=\"cdtext ui-socket-cd-text\"></div></button>"
+    },
+    {
+      "slot": "3",
+      "html": "<button class=\"action-btn ui-socket empty\" data-hotbar-slot=\"3\" draggable=\"true\"><span class=\"icon-label ui-socket-art\"></span><span class=\"item-count ui-socket-count\"></span><span class=\"keybind ui-socket-key\">4</span><div class=\"cd-overlay ui-socket-cd\"></div><div class=\"recharge-overlay\"></div><div class=\"cdtext ui-socket-cd-text\"></div></button>"
+    },
+    {
+      "slot": "4",
+      "html": "<button class=\"action-btn ui-socket empty\" data-hotbar-slot=\"4\" draggable=\"true\"><span class=\"icon-label ui-socket-art\"></span><span class=\"item-count ui-socket-count\"></span><span class=\"keybind ui-socket-key\">5</span><div class=\"cd-overlay ui-socket-cd\"></div><div class=\"recharge-overlay\"></div><div class=\"cdtext ui-socket-cd-text\"></div></button>"
+    }
+  ],
+  "actions": [
+    {
+      "type": "ability",
+      "id": "courier"
+    },
+    {
+      "type": "ability",
+      "id": "lunge"
+    },
+    {
+      "type": "ability",
+      "id": "hamstring_bite"
+    },
+    {
+      "type": "ability",
+      "id": "clockwork_shock_bomb"
+    }
+  ],
+  "images": [
+    {
+      "background": "url(\"http://localhost:5194/ui/skills/warrior/courier.webp\")",
+      "visible": true
+    },
+    {
+      "background": "url(\"http://localhost:5194/ui/skills/druid/lunge.webp\")",
+      "visible": true
+    },
+    {
+      "background": "url(\"http://localhost:5194/ui/skills/druid/hamstring_bite.webp\")",
+      "visible": true
+    },
+    {
+      "background": "url(\"http://localhost:5194/ui/skills/warrior/clockwork_shock_bomb.webp\")",
+      "visible": true
+    }
+  ]
+}

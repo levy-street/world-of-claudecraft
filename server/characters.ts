@@ -1,3 +1,4 @@
+import { membershipWeaponDisplayId } from '../src/sim/membership_weapon';
 // Owner-gated character surface, ported onto RouteDefs.
 //
 // The account-scoped character endpoints move off the inline handleApi ladder in
@@ -42,6 +43,13 @@
 // takes no req/res and is the one authority; the client never decides ownership.
 
 import type * as http from 'node:http';
+import {
+  MEMBERSHIP_OFF,
+  type MembershipSnapshot,
+  membershipActive,
+  membershipCharacterLimit,
+  membershipCharacterLocked,
+} from '../src/membership_contract';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
 import { activeRaidLockouts } from '../src/sim/raid_lockout_state';
@@ -97,8 +105,13 @@ import {
 import { requireOwned } from './http/middleware/require_owned';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { isUniqueViolation, json, moderationErrorBody } from './http_util';
+import { getMembership } from './membership_service';
 import { countOfflineFenceRefusal } from './offline_fence_refusals';
 import { REALM } from './realm';
+import {
+  REFERRAL_CHARACTER_BONUS,
+  referralCapacityEarned,
+} from './referral_account_entitlements_db';
 
 // ---------------------------------------------------------------------------
 // Ported response bodies (the exact legacy { error } identities). Named constants so
@@ -256,6 +269,8 @@ function useRuntime(): CharactersRuntime {
 
 const REAL_CHARACTERS_DB = {
   accountAndScopeForToken,
+  getMembership,
+  referralCapacityEarned,
   loadAccountCosmetics,
   loadAccountLedgerKeys: accountLedgerKeysFor,
   moderationStatusForAccount,
@@ -346,7 +361,8 @@ export function withCreationHelm(state: CharacterState, helmHidden: boolean): Ch
   return state;
 }
 
-/** Whether this character still holds its one-shot redesign token. Two ways in,
+/** Whether this character still holds its one-shot redesign token. An explicit
+ *  release grant overrides an earlier spend. Otherwise there are two legacy ways in,
  *  and the token is what makes it one-shot either way:
  *   - CREATED INSIDE THE FREE WINDOW (before APPEARANCE_REROLL_CUTOFF). Every
  *     character that existed when the creator shipped gets one redesign on the
@@ -359,6 +375,7 @@ export function withCreationHelm(state: CharacterState, helmHidden: boolean): Ch
  *  Mirrors consumeAppearanceReroll's WHERE arm, which is the authority; decided
  *  server-side so the list payload is the single truth the roster button reads. */
 function appearanceRerollAvailable(c: CharacterRow): boolean {
+  if (c.appearance_reroll_granted) return true;
   if (c.appearance_reroll_used) return false;
   if (c.appearance === null || c.appearance === undefined) return true;
   const created = c.created_at ? new Date(c.created_at).getTime() : Number.NaN;
@@ -384,11 +401,19 @@ export function buildCharacterList(
   isOnline: (characterId: number) => boolean,
   weaponSkinLoadout: Record<string, string>,
   nowMs: number = Date.now(),
+  membership: MembershipSnapshot = MEMBERSHIP_OFF,
+  referralCapacity = false,
 ): unknown {
   return {
     realm: REALM,
+    membership: { active: membershipActive(membership, nowMs), expiresAt: membership.expiresAt },
+    characterLimit:
+      membershipCharacterLimit(membership, nowMs) +
+      (referralCapacity ? REFERRAL_CHARACTER_BONUS : 0),
     characters: chars.map((c) => ({
       id: c.id,
+      membershipSlot: c.membership_slot === true,
+      membershipLocked: membershipCharacterLocked(c.membership_slot, membership, nowMs),
       name: c.name,
       class: c.class,
       level: c.level,
@@ -400,18 +425,34 @@ export function buildCharacterList(
       // Keep the migrated RouteDef byte-identical with the retained legacy arm:
       // character select renders the same body and held items as the live world.
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-      mainhandItemId: c.state?.equipment?.mainhand ?? null,
-      offhandItemId: c.state?.equipment?.offhand ?? null,
+      mainhandItemId: membershipWeaponDisplayId(
+        c.state?.equipment?.mainhand ?? null,
+        c.class,
+        c.state?.talents?.spec,
+      ),
+      offhandItemId: membershipWeaponDisplayId(
+        c.state?.equipment?.offhand ?? null,
+        c.class,
+        c.state?.talents?.spec,
+      ),
       // The account's active Armory weapon skin for THIS character's class and
       // held hands (the same shared rule the world and paperdoll use), so
       // the char-select turntable matches the in-world render. Loadout is
       // account state; resolution is per character.
       weaponSkinId: resolveActiveWeaponSkin(
         c.class,
-        c.state?.equipment?.mainhand ?? null,
+        membershipWeaponDisplayId(
+          c.state?.equipment?.mainhand ?? null,
+          c.class,
+          c.state?.talents?.spec,
+        ),
         weaponSkinLoadout,
         c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-        c.state?.equipment?.offhand ?? null,
+        membershipWeaponDisplayId(
+          c.state?.equipment?.offhand ?? null,
+          c.class,
+          c.state?.talents?.spec,
+        ),
       ),
       // The authored modular look (null = pre-creator character, legacy rig).
       // Re-validated here the same way the join path does (ws_auth.ts
@@ -711,7 +752,20 @@ async function meCharactersHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const chars = await charactersDb.listCharacters(ctxAccountId(ctx));
   const cosmetics = await charactersDb.loadAccountCosmetics(ctxAccountId(ctx));
-  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline, cosmetics.weaponSkinLoadout));
+  const membership = await charactersDb.getMembership(ctxAccountId(ctx));
+  const referralCapacity = await charactersDb.referralCapacityEarned(ctxAccountId(ctx));
+  json(
+    ctx.res,
+    200,
+    buildCharacterList(
+      chars,
+      rt.isCharacterOnline,
+      cosmetics.weaponSkinLoadout,
+      Date.now(),
+      membership,
+      referralCapacity,
+    ),
+  );
 }
 
 /** GET /api/characters: full-session list (byte-identical body to me/characters). */
@@ -719,7 +773,20 @@ async function listCharactersHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const chars = await charactersDb.listCharacters(ctxAccountId(ctx));
   const cosmetics = await charactersDb.loadAccountCosmetics(ctxAccountId(ctx));
-  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline, cosmetics.weaponSkinLoadout));
+  const membership = await charactersDb.getMembership(ctxAccountId(ctx));
+  const referralCapacity = await charactersDb.referralCapacityEarned(ctxAccountId(ctx));
+  json(
+    ctx.res,
+    200,
+    buildCharacterList(
+      chars,
+      rt.isCharacterOnline,
+      cosmetics.weaponSkinLoadout,
+      Date.now(),
+      membership,
+      referralCapacity,
+    ),
+  );
 }
 
 /** POST /api/characters: validate, create the capped character, reclaim a freed name once. */

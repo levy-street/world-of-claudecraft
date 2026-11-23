@@ -1,0 +1,2858 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/render_finder_portraits.mjs",
+  "rendererFingerprint": "e8e93e5e46d03d6a0e7d67d9d26f2575b1e2fca683abbc277154bec43427b383",
+  "renderEnv": {
+    "schemaVersion": 1,
+    "platform": "win32",
+    "arch": "x64",
+    "gpuVendor": "Google Inc. (Google)",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "154",
+    "browserVersion": "Edg/154.0.4258.62",
+    "requestedBackend": "swiftshader",
+    "fingerprint": "04a5c1851d9e9c277dd6de4cae5e56afae22c5cc793b00f37e35af4536bdd2f4"
+  },
+  "portraits": [
+    {
+      "id": "acolyte_tessa",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "ancient_guardian",
+      "sourceFingerprint": "61c63943abb8771f49939d04bd843473169daaee2ddf436062bba4c326bdff6f",
+      "output": {
+        "bytes": 2852,
+        "sha256": "e632bb8eea4a7c1dbf6151605d2ce6790049da81884f84071c58273283ce6466"
+      }
+    },
+    {
+      "id": "apprentice_wren",
+      "sourceFingerprint": "1306b907fe1f92744b11d83437e24380d2b0e1051c3624faa0a2790a042de695",
+      "output": {
+        "bytes": 2856,
+        "sha256": "644d7519428301f9f018c7ccf4a2f2a23b21320706dd9084303d2b97d9158750"
+      }
+    },
+    {
+      "id": "ashbone_raider",
+      "sourceFingerprint": "6312c51b16609b502839f36416fb533bb5f6dceb3395bdd6abe1485f9dc7f78c",
+      "output": {
+        "bytes": 2840,
+        "sha256": "ae6012e7bdfbaffa2750de19ab6fb6bfe2d6be62d112946fbdd4a40145872533"
+      }
+    },
+    {
+      "id": "ashbone_warcaller",
+      "sourceFingerprint": "a24536a0635c75bbc3700ef06338a4420c1a5cfa5a96d5fc88233e3d98665089",
+      "output": {
+        "bytes": 2826,
+        "sha256": "444412b858792dcb845a44d2e2c6afe1668ac8f298b1052430a103e9d8a7e7c9"
+      }
+    },
+    {
+      "id": "aurelhorn",
+      "sourceFingerprint": "494e9eb9d309e6d39e62653293b1962588081fde0bf7cf9d3d45b034b771abe0",
+      "output": {
+        "bytes": 2822,
+        "sha256": "89958e42949e1f42635776d28d883fb035f681fa1960ffd60008a9f24a94e3c5"
+      }
+    },
+    {
+      "id": "balgath_cyclops",
+      "sourceFingerprint": "3ce325a2db26c402bf836d7b9f632d8d49a3183102d04259f571bffcf2b23399",
+      "output": {
+        "bytes": 2470,
+        "sha256": "8557cc13e48a873d4e9412c67e5e6b5dfee5e961ff0cf94841a16a75a584cd9b"
+      }
+    },
+    {
+      "id": "barnacle_crawler",
+      "sourceFingerprint": "7c51c54d6e75c8091edb6d6f0895bde75ef54e042fe25a088d7003935537225e",
+      "output": {
+        "bytes": 2316,
+        "sha256": "2b22f4890af23ac79c5a6878c6af3d0021ac4c73441efd7626e7b8e740304c87"
+      }
+    },
+    {
+      "id": "barrow_king",
+      "sourceFingerprint": "594f44dfd5c475f6f0d80988683fc107d736a2462d75a57f7da67cbc23dee2cf",
+      "output": {
+        "bytes": 2328,
+        "sha256": "6e8437b8c41837bc0ec9ce17e4d05693e08f403828e72c307e923801cfd973de"
+      }
+    },
+    {
+      "id": "barrow_wight",
+      "sourceFingerprint": "06d23bcb1273c93990cdd3a3e8282e098835e02329e9202001882a06278e36f5",
+      "output": {
+        "bytes": 2768,
+        "sha256": "42af25603e7b36751e4f3a3c85167ec9e390a5d6981d9408a61ff05b4d13bf1f"
+      }
+    },
+    {
+      "id": "basin_raptor",
+      "sourceFingerprint": "dd1f316d9e37ea35da7ff74dc19fb712ad8063d2d616c8f78d0b8bd9bc178e29",
+      "output": {
+        "bytes": 2310,
+        "sha256": "5c3821b9e59c3090e46d8cb7317cfd6037fc126ec14a8feac3c19bf13f520519"
+      }
+    },
+    {
+      "id": "bastion_drowned_anchor",
+      "sourceFingerprint": "9215049ef76eae054624e09795d3efb697431ffb835bc44e0993ef4c5e9bf2b8",
+      "output": {
+        "bytes": 1664,
+        "sha256": "8752c02705794e686307a275f1cdb520f634b4ea27ecd922e1382cdb4a664c0f"
+      }
+    },
+    {
+      "id": "bastion_gaol_cage",
+      "sourceFingerprint": "e1643febcf389257223f754ef6902fcb52d222fbccbffdf4590f5b5fae0f157a",
+      "output": {
+        "bytes": 2296,
+        "sha256": "e7dadbae7eac0b683373778ff03e8d728a1a2f9c5eb8570d6bbfece01a2a9c33"
+      }
+    },
+    {
+      "id": "bastion_revenant",
+      "sourceFingerprint": "cca6a5ec1203ea0181ae3d614b1555eaf1b50f457081f6e96f5836024dfb7c98",
+      "output": {
+        "bytes": 2316,
+        "sha256": "5756df4b0074c95c596eb3262e6ef2af88cfcc82974020f8000e9eb0fb0db8b0"
+      }
+    },
+    {
+      "id": "bastion_warhound",
+      "sourceFingerprint": "f6e6ca2df0116c4d6769c23cc44cfeec595657376da37e74868157744cab647b",
+      "output": {
+        "bytes": 1970,
+        "sha256": "be2aaaf80493d45f3c5730bf20af13e1d71f2f288995e4503f8c71cf9693fdac"
+      }
+    },
+    {
+      "id": "bog_bloat",
+      "sourceFingerprint": "a7f20cf3c7cf6b81c469aa91c3e53b4722a3e71b6a9e06c72e420afcaf50af33",
+      "output": {
+        "bytes": 1794,
+        "sha256": "675e5c8bfaa405792f643fc426b364eb7e59709c551e33162e26d66c4f7f6d2c"
+      }
+    },
+    {
+      "id": "bogtoad",
+      "sourceFingerprint": "c8d5ae4af7b2c8114504643dc26919b339ddb3eec39668f495732bc4bc0d4039",
+      "output": {
+        "bytes": 1858,
+        "sha256": "b5ecbb01a36f1aa03094efd54b79962ba3985d8ec8b5bc70f42bc159b0c80f7d"
+      }
+    },
+    {
+      "id": "bonechill_widow",
+      "sourceFingerprint": "5157d4a1cf7d753e8a11c086625daa40acc5311928ed30db0480a1c6e0970a44",
+      "output": {
+        "bytes": 1760,
+        "sha256": "63510898c18f42cb81346aa2c8d5f1e58f50941a76119028e8f354bdda4b11df"
+      }
+    },
+    {
+      "id": "boneclad_revenant",
+      "sourceFingerprint": "f52bd345882351a8db3da547280175d1fa2e6dff56fa6c49294b3b517c1efaa8",
+      "output": {
+        "bytes": 2284,
+        "sha256": "7048cc6c4731b76c20f67c9fd8f42aec78a44b69265388b22ef4f5c597ec47cc"
+      }
+    },
+    {
+      "id": "bound_guardian",
+      "sourceFingerprint": "ce635733b6fee3a9a0d3f869dc2cd9709138d221650da960471d62c22e332d99",
+      "output": {
+        "bytes": 2770,
+        "sha256": "88b963dbd7edcf2cadb6056b2c70edf9193176a82b320bf6251b74885e1cba4a"
+      }
+    },
+    {
+      "id": "bound_soul",
+      "sourceFingerprint": "1d93a3b986d0fd4e39d5c69b286e4a146e26b89fe5d6df84224150bab2f64fae",
+      "output": {
+        "bytes": 2746,
+        "sha256": "64180fe2add5dd918cd853a0586237a579c19161f385ad7cbac8a1e1ed0dabc2"
+      }
+    },
+    {
+      "id": "brakka_wallbreaker",
+      "sourceFingerprint": "17e6b188b1ac7d21245ff163efd5a4ca48590ebc561e22aae08db33388b9cda8",
+      "output": {
+        "bytes": 2384,
+        "sha256": "399b71e1bedc4d96c81dcc9df695225e5f409e7068bf90bdaed0c59c2b31936f"
+      }
+    },
+    {
+      "id": "breach_wretch",
+      "sourceFingerprint": "cb035fbe4bf0b29df950547e32fe4a0d656236ba05ed42dda1b3535f93e009db",
+      "output": {
+        "bytes": 1666,
+        "sha256": "b6fdd777507a714fe00dd6635535f38dde194c3d7d4c1fead226b7e8d68e21e9"
+      }
+    },
+    {
+      "id": "broodsworn_goadsmith",
+      "sourceFingerprint": "7232d279b204b7d3ee58f757de61326723056e7b9d7f7d6fa6dc7c24cf474157",
+      "output": {
+        "bytes": 1824,
+        "sha256": "a2c664ae74d86ded347c57f2f23c7407b260a912e3e7d390c0889c0a389c5df9"
+      }
+    },
+    {
+      "id": "broodsworn_pyre_tender",
+      "sourceFingerprint": "18a86f9fe5613b0ddc2d8f76af2a0abcd434ea58f38bb06348cf8ee333e8bb14",
+      "output": {
+        "bytes": 2302,
+        "sha256": "544603b68506dc2d6a7de55bf6e384273daf2bde6636358c4f1bd1832e2e6cf3"
+      }
+    },
+    {
+      "id": "broodsworn_thawcaller",
+      "sourceFingerprint": "461379c6b03d30639e523107c17ded0b3f1331bdba1baa7b0930b3eacee0c757",
+      "output": {
+        "bytes": 2438,
+        "sha256": "db37b8447f54e72f0365566fa837fabf36382f4858e5557b15f8738f62ed11fd"
+      }
+    },
+    {
+      "id": "brutok_skullsmasher",
+      "sourceFingerprint": "b4bbcc775cb6ab33bfa1a51c1f347856fe16236cfea4391833875dddab7d7be4",
+      "output": {
+        "bytes": 2388,
+        "sha256": "5f9aff841ff73029306d6fde7e5e82b4ae843e205edb07591f19a97fd3e32660"
+      }
+    },
+    {
+      "id": "candlewright_acolyte",
+      "sourceFingerprint": "67a457e51353192a94657a29c43a7bcbfcc29e1775d8490eb88899cd41eae398",
+      "output": {
+        "bytes": 2858,
+        "sha256": "5cd95e3ee8741d235fd2fe1467811f708db25b639fb8f2dcafe5e2e4089eac50"
+      }
+    },
+    {
+      "id": "canopy_weaver",
+      "sourceFingerprint": "bd0feb975f11519f7177e14935a8edc003e38bc5d0f2471f685cc9bc76ed8b27",
+      "output": {
+        "bytes": 1690,
+        "sha256": "0ef42ddb01857368a65577e173d66862d2b6dc4792f38e46672ac43c21b6930e"
+      }
+    },
+    {
+      "id": "cantor_ilvane",
+      "sourceFingerprint": "0d18a35c34ebb6ae7c0a9db8d3ba73eaa3f74ccbd3c2925942ac4641ad372d88",
+      "output": {
+        "bytes": 2780,
+        "sha256": "3d338714e802fb46cddb91ec94bf5e9ce753b7f6384c7a31277a1853aded89ac"
+      }
+    },
+    {
+      "id": "captain_verlan",
+      "sourceFingerprint": "8699c2ce4df3d71f47fc5abdfea944a5776d3f1988aca44db6eff4d29e88f58a",
+      "output": {
+        "bytes": 2712,
+        "sha256": "002311936ff6522fdd1c634da3da3fef43b58988066ce176467fe3fcbc3620b0"
+      }
+    },
+    {
+      "id": "castaway_navigator",
+      "sourceFingerprint": "3a1a92d04d1a614553070e5f4ac90a671a8a40adbe829328a0738b596689a980",
+      "output": {
+        "bytes": 2196,
+        "sha256": "56ee641a3769222428de3ad5dcab643f909f0880fe546768a189971b034600a3"
+      }
+    },
+    {
+      "id": "choir_thrall",
+      "sourceFingerprint": "c53614e4af32ae37bdd317cc0920eca0087457aeeb038ba020134798a002ddba",
+      "output": {
+        "bytes": 1450,
+        "sha256": "96bc3cad58b72386b372c5d7763b70631d9a3501adda8736dc0c7b47779e6011"
+      }
+    },
+    {
+      "id": "choirmother_selthe",
+      "sourceFingerprint": "01c787c5ef48a45d1673b315a0d3db62b92f2defd0a5d6c38ebae6813734f6f8",
+      "output": {
+        "bytes": 3600,
+        "sha256": "abe2f47ba0f1d8d9d61c76274f33021c87526505141e6490663df6d0e381fe1d"
+      }
+    },
+    {
+      "id": "cindraleth_maw_matriarch",
+      "sourceFingerprint": "fbb90a118c02d617d1fd6009448f7423f2a4603d31e95cf4a079568b2823e10c",
+      "output": {
+        "bytes": 2416,
+        "sha256": "d557b16d20c41285ecda9da867a183342f9f3f19d3622f451bebfbf35b4f74dd"
+      }
+    },
+    {
+      "id": "corrupted_priest_malric",
+      "sourceFingerprint": "3f4197e07ec5856b43fb8dd24ba90af1548cbccfa426104ba5cf8aafde286489",
+      "output": {
+        "bytes": 2694,
+        "sha256": "b64d342bd1a41960b075c11d892f1f65cd5645277649729dd86d527ecdf27249"
+      }
+    },
+    {
+      "id": "corrupted_sporeling",
+      "sourceFingerprint": "aa0c50d1706fd8cde5dcd82f3c3ebd6f6a278f5a48ff5a1e3291a2fe082f47cb",
+      "output": {
+        "bytes": 1494,
+        "sha256": "5983311229b06f9fd6c528d7354d76b90de4af82827360e4f0bfa06c804c1849"
+      }
+    },
+    {
+      "id": "crypt_bone_brute",
+      "sourceFingerprint": "6221e592846397a812a7e50ed166cbc6cf44c01edccbd41b53176a32671aa182",
+      "output": {
+        "bytes": 2918,
+        "sha256": "5d86f87844f1d238b14f611a3725953e8891df220765efdd2e23514b3c409c10"
+      }
+    },
+    {
+      "id": "crypt_bone_minion",
+      "sourceFingerprint": "2a2517122d0f455addb51ee6d5f4925e743db16d51902cbe2dea9bd3c750df6b",
+      "output": {
+        "bytes": 2842,
+        "sha256": "26f7faa6fc68312c6308974e23e313bb5158f5de392e90dfe43c510a5328417c"
+      }
+    },
+    {
+      "id": "crypt_bone_pile",
+      "sourceFingerprint": "aa4c2693edd7a2c0455f3957867b0017b06578fb663d9f06acb1aa51eee47a63",
+      "output": {
+        "bytes": 2776,
+        "sha256": "78cfa1d48804f3673cc8bf80286b02f13266076ab98296a95a01c489afb79cbc"
+      }
+    },
+    {
+      "id": "crypt_carrion_crow",
+      "sourceFingerprint": "a730dd51566f4961fdf2175ba5bf99e814b58cdce6f348b17a044a70ef68c39f",
+      "output": {
+        "bytes": 1528,
+        "sha256": "c848089b7f1b6118969bbfa2e5256d0a63806acceb0e0fc0b3cc8c47a2589b82"
+      }
+    },
+    {
+      "id": "crypt_chapel_gargoyle",
+      "sourceFingerprint": "7d01f5eeca2cf6b4c9e5d2725d2337f6b642df6f9a3a586f925678b11730f5f4",
+      "output": {
+        "bytes": 2152,
+        "sha256": "ceb14a77d74a257f1dba64c6efb77434408c905fecc0409bdb42ac305e1af42c"
+      }
+    },
+    {
+      "id": "crypt_crow_caller",
+      "sourceFingerprint": "6febc35336c7e1c4ba1bdb13b33150b7c2123189003cf59509dae7b67843e10f",
+      "output": {
+        "bytes": 1858,
+        "sha256": "784e51e9b150989ab2ddec45d1a6e092de2e0c2a5cf9e524061f78b02b855c3b"
+      }
+    },
+    {
+      "id": "crypt_gravecaller_adept",
+      "sourceFingerprint": "aa64a50b6ca3154eabfca3b3f13fa79fcba135b9b80f8932478e3031c349b830",
+      "output": {
+        "bytes": 2182,
+        "sha256": "659490df96bd5418808af5bd8c058f041e0fd7a7ff53c59163d56a15d1f8371f"
+      }
+    },
+    {
+      "id": "crypt_gravecaller_necromancer",
+      "sourceFingerprint": "6548b1f6fcf4210d90a8fa7692e6a56684439ab195a4c3fad049b4c5b7764ceb",
+      "output": {
+        "bytes": 2676,
+        "sha256": "3fe533bb521ca8885ed8ebb323f74eb3d65417945516a24c5ef08325d6140906"
+      }
+    },
+    {
+      "id": "crypt_knellwyrm",
+      "sourceFingerprint": "4e69ad0929fdf136a39722950b6fb85b81741db3e9b6428bcf3f85de1ef74134",
+      "output": {
+        "bytes": 2394,
+        "sha256": "1e9029d1b710874ce2a33e2432352a8cb525cf2e86a8bfca1b83640daa8fd586"
+      }
+    },
+    {
+      "id": "crypt_ossuary_cutthroat",
+      "sourceFingerprint": "c9c047fb859e2c2e5dcda70d9dd22f42890d490f96fb28265ff457a8d647695b",
+      "output": {
+        "bytes": 2532,
+        "sha256": "8c0a15b541e1a1131a51be6d6659b941947a0748703b7e6516067dabece963bf"
+      }
+    },
+    {
+      "id": "crypt_ossuary_drake",
+      "sourceFingerprint": "8fa4864c8760f8e11b5ecaa98a1ba0d491581f1734dde3d5861a0ac448c3d381",
+      "output": {
+        "bytes": 2570,
+        "sha256": "d939394c7a168f8841d07dc7f92aad5662059e5b280e8fa3e13f54f8ebdef567"
+      }
+    },
+    {
+      "id": "crypt_ossuary_warrior",
+      "sourceFingerprint": "9863ba612ee6166893b24e7490d2796d620f384e050e6c72e0c06352eb64c452",
+      "output": {
+        "bytes": 2314,
+        "sha256": "aa6343297951a3fdf7601a61650b5253bc923d9a94cdc7d11e3a762d90f285a2"
+      }
+    },
+    {
+      "id": "crypt_remembrance_candle",
+      "sourceFingerprint": "cbc4f323da1b1e02e73385cda5de94f49b2488348d0ae9d30e7c86c6268ca1d9",
+      "output": {
+        "bytes": 2774,
+        "sha256": "9b8b7a78fe2c5c5f28c5b881dc09097094a1802f9408adba708d27fc9f1706ea"
+      }
+    },
+    {
+      "id": "crypt_shambler",
+      "sourceFingerprint": "354aa45ab9ce7bca8992dd812dd5eab82f8ee8c46a4ca49c7cac089a160bc3ae",
+      "output": {
+        "bytes": 2532,
+        "sha256": "edd3ecc88996f5f514301b71f1069d5a423a1aa0ad26bbfc1e8bd159f2e43bb6"
+      }
+    },
+    {
+      "id": "deacon_varric",
+      "sourceFingerprint": "37f6ab61f9ae2572e9bcf8c2ccaeb89844bcad960582f549f97bc6ac4f3f10df",
+      "output": {
+        "bytes": 2198,
+        "sha256": "7670ed52e48bdc34a69f15e3bda4f03ae4c740ad3f9169e1b94ba3df48e4c683"
+      }
+    },
+    {
+      "id": "deacon_voss",
+      "sourceFingerprint": "c5152e9c6abf5ced4589b1e2ee72050df1fa91febba28d98ced80ff4ff3f06e4",
+      "output": {
+        "bytes": 2140,
+        "sha256": "bc405227737c9a494c68588acabb050edc15a6182252dc300b10a76561ac8482"
+      }
+    },
+    {
+      "id": "deathstalker_voss",
+      "sourceFingerprint": "20713630b86285c3433670ccf42d891245ecd2f51c7cfa2730249116a0f0d99f",
+      "output": {
+        "bytes": 2530,
+        "sha256": "453d846678fdf431f479f3b81d9e9dd7e76225a907177e67a3ce86a4e617e357"
+      }
+    },
+    {
+      "id": "deepfen_murloc",
+      "sourceFingerprint": "e23f26420d9949881f7df35a07fb1e1f871233aa7af8335d2bfd39259ddf3d8f",
+      "output": {
+        "bytes": 1758,
+        "sha256": "d770587186f5704b24c8f28383e25dc16f25cd23c8b234ab8ee7605cc8ed7cfa"
+      }
+    },
+    {
+      "id": "deepfen_spearjaw",
+      "sourceFingerprint": "4c60c116a7b76cdd0994dd774ebc227f528701525dec163d687f989a7b286201",
+      "output": {
+        "bytes": 1608,
+        "sha256": "1f543465605ecdd815f6e34c20390a26a7548d51aba0aa01ae3a489bb45a019d"
+      }
+    },
+    {
+      "id": "deeprock_kobold",
+      "sourceFingerprint": "d4079f0e6e13d7c3e941c3752d46f4ac32d71d18fe28c639b7025ed2a22011e3",
+      "output": {
+        "bytes": 1700,
+        "sha256": "92f6823474cfa6721fce9cbb16b74d684bcd0dc96d6ab3f9ef7ea71f06648d96"
+      }
+    },
+    {
+      "id": "derelict_mech",
+      "sourceFingerprint": "dee6974093bc5666f48727f9af4621e56948bbb473ee72301e5b0f41ea5b1316",
+      "output": {
+        "bytes": 1594,
+        "sha256": "dd765c53d90c1c870e552d869d3da2763c966e402b922b579ebb4b5a08cb8aba"
+      }
+    },
+    {
+      "id": "downs_bandit",
+      "sourceFingerprint": "9da432220776a23186325f6149bf94f38cce337b09cefc512424f50fcfd7d805",
+      "output": {
+        "bytes": 1712,
+        "sha256": "8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c"
+      }
+    },
+    {
+      "id": "dragonkin_broodguard",
+      "sourceFingerprint": "57830d8686808bd3ec10ec5e1f2dd004407bb058f25fc27601c74d135cd1682f",
+      "output": {
+        "bytes": 2032,
+        "sha256": "1cb138ec817c70017393f9d1d2c046ee8942e04c5f8afc26e1a592c091459d66"
+      }
+    },
+    {
+      "id": "dragonkin_egg",
+      "sourceFingerprint": "f0acdf88bc4605820abaef1e8cf2a7d517bbcd97a105d3cf419a1712193d6ed3",
+      "output": {
+        "bytes": 2120,
+        "sha256": "8781fa012b2a17a5e5afb2a7c24cff9cef69723c118a652091e3dfabc81bfa29"
+      }
+    },
+    {
+      "id": "dragonkin_whelp",
+      "sourceFingerprint": "cb8582a78066c7c450927d23526f02ea7bd1b16817196715d74b5328bb8db19e",
+      "output": {
+        "bytes": 2032,
+        "sha256": "8ee32a955fc37555d750acb00e6c48974c0623edd4e3c6d6bf53a5f6b9e76053"
+      }
+    },
+    {
+      "id": "drakemaw_broodlord",
+      "sourceFingerprint": "1df350045541bdf3b0fa4c66ef6bf555e265f7b1fe9652eacd7727e8e86354c8",
+      "output": {
+        "bytes": 2408,
+        "sha256": "bf396c1c03ad199c67783124128850afe8f1be390de0244171146d8458473493"
+      }
+    },
+    {
+      "id": "drowned_cantor",
+      "sourceFingerprint": "cd7988ce628ef30ab2969f707515f05c70bec04a874403aea5eafb9e51598dac",
+      "output": {
+        "bytes": 2068,
+        "sha256": "5eae92692776e78001e346fe773e51d16fc8021e2429b691755adedbf1d7a50c"
+      }
+    },
+    {
+      "id": "drowned_dead",
+      "sourceFingerprint": "6060337f7d2493f368665655645a66b5ef77111dcb9a75ef903e9f3b91a178a2",
+      "output": {
+        "bytes": 2782,
+        "sha256": "8e3f45c995cb35d720c9f604756ce221ae889391e68b965e1eda1685c8f45a09"
+      }
+    },
+    {
+      "id": "drowned_deckhand",
+      "sourceFingerprint": "4e84901f5e2d641bb00995baa9d6f2f1fc645e5576e8ffd43ef56ac08f81d239",
+      "output": {
+        "bytes": 2780,
+        "sha256": "91e8c1283f706236b3e36c34a042938bf642cc4f733da89674cbb49361dff33a"
+      }
+    },
+    {
+      "id": "drowned_pilgrim",
+      "sourceFingerprint": "02208d22975a0fd0fc4ec98e67d1616a5bc0531ca5d2e16e01b7cb9760314a33",
+      "output": {
+        "bytes": 2794,
+        "sha256": "5360785b355f9c4bb64876e37a4a50abe44b9d6883f84ecaa1857e3c77531a9e"
+      }
+    },
+    {
+      "id": "drowned_sergeant",
+      "sourceFingerprint": "df45c124569b75638a7c3358c217ba0e5eb707e4fcc5b0ef4c12a22652603c20",
+      "output": {
+        "bytes": 2272,
+        "sha256": "a306248c2c51c62110d4a3b6d10b37a11966eb8c4e1910c6d8890f33656e2bcc"
+      }
+    },
+    {
+      "id": "drowned_templeguard",
+      "sourceFingerprint": "65bb71470a8ee56357ef9e955d4dd95e114f1538feffe663ccfa6d462a833acd",
+      "output": {
+        "bytes": 3520,
+        "sha256": "a76534389dec9c7617b94308072f15f18e39ffaa0af70cd4a758e16c6db2592a"
+      }
+    },
+    {
+      "id": "drowned_thrall",
+      "sourceFingerprint": "a703d94d5380918333fd6598b3d3de067c6c7e93c8dad03b208412303b06c5cf",
+      "output": {
+        "bytes": 2724,
+        "sha256": "f8ede52a7ca163a7fe81794106c32efcab9d89c7959b62b8b6f14babbacd20ca"
+      }
+    },
+    {
+      "id": "drowned_votary",
+      "sourceFingerprint": "90d70e8d52071559e127fe1d122e9cd88c0ae077f15edf3da9e7609a203f93e9",
+      "output": {
+        "bytes": 2722,
+        "sha256": "7656fda376273ba977fbedd319470e8564248b8ef5843c905a306fc6ddf20692"
+      }
+    },
+    {
+      "id": "drowned_warlord",
+      "sourceFingerprint": "d6d315d94ba8c2810f3aeed5b81683778276eceae2c8cb87f5ba544e5adc49a3",
+      "output": {
+        "bytes": 2754,
+        "sha256": "73297b2f2c49f00335c2bba78a25d17d95bb523b5cd06818eaeab045e0c4a56b"
+      }
+    },
+    {
+      "id": "drowned_watchman",
+      "sourceFingerprint": "07b566e5e14f6040e4a5ec301c912328cb733240a2d2e62fab2dabd33766b4c6",
+      "output": {
+        "bytes": 2028,
+        "sha256": "b6f50c33c528f1ec461e5bee05fe7ea2bd1468353c337613bf3c2a86b4ae33cb"
+      }
+    },
+    {
+      "id": "drowsy_croaker",
+      "sourceFingerprint": "42ab304c431dcf9adf22cc4ba3ef2925b384aa8cd396c22393a8c9d67302ccec",
+      "output": {
+        "bytes": 1840,
+        "sha256": "46570e1af656c3b9e9428ee39ebac2682ed063e52bef25513a918f0d8cda2baf"
+      }
+    },
+    {
+      "id": "dune_troll",
+      "sourceFingerprint": "6309a82974d08c383504bf1c7707c0e994b652132243af69bf6620ea733a50b9",
+      "output": {
+        "bytes": 2088,
+        "sha256": "4c3ad4a04ac63857aabd3af88aaaffb7b215bb684b0171349d363fdbc2c2c67e"
+      }
+    },
+    {
+      "id": "duskwisp",
+      "sourceFingerprint": "9b720b2da2b25976b8794cbe0da0b48869a209fec6132e900c5ebf2a8167f3b9",
+      "output": {
+        "bytes": 1862,
+        "sha256": "de772cd8ac15e0cfa4f001d0911465abe0883ca3c11dde3e763a38eff95abdf4"
+      }
+    },
+    {
+      "id": "eastbrook_freight_caravan",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "edda_reedhand",
+      "sourceFingerprint": "f9b040c9557240d35709355f145fe3328de55a86cb06298d8e2284e6c02572de",
+      "output": {
+        "bytes": 2412,
+        "sha256": "4240aac838340755e76ae231e4fc7e5a7cceb42bf60a881954a08090bb800238"
+      }
+    },
+    {
+      "id": "emberkin",
+      "sourceFingerprint": "37514330c6a7f8f1ae956851b4050e050b1ee8b3f827b6cd7ae1e10e955ea1de",
+      "output": {
+        "bytes": 1856,
+        "sha256": "07c7b5a05987873ec38245836913202ddcd4474824745a9eecab4637c4d051cd"
+      }
+    },
+    {
+      "id": "emberwing_drake",
+      "sourceFingerprint": "d9767ad92fdd887dd5a6cc551f53ca556f17ff78043e94349165c16b2c147af2",
+      "output": {
+        "bytes": 2264,
+        "sha256": "90a1e52efccf3a50680934088cfac53e4bd0ddfc284c105645ccfcd55033ddf0"
+      }
+    },
+    {
+      "id": "fallen_captain_aldren",
+      "sourceFingerprint": "cf8b560d359c0275a698c506228dbc73720ff589165e44474d4c06650c182038",
+      "output": {
+        "bytes": 2300,
+        "sha256": "c3868cdd08c85b6bf1942609e812433518da87dea1b2709517df5b53391a013c"
+      }
+    },
+    {
+      "id": "fanglord_jaguar",
+      "sourceFingerprint": "a93140612bf9138034df30c960c5b0457b717eba06bc8eb0165224b810e76fd4",
+      "output": {
+        "bytes": 2720,
+        "sha256": "e12a623bf73e9a5d9913539682939da53191b2ed2a948f0d1c0a57611b433e5f"
+      }
+    },
+    {
+      "id": "fen_sprite",
+      "sourceFingerprint": "b8befc38f702831232bf24ef301c528aa60b4d71858c4a9161a666e99ae2e881",
+      "output": {
+        "bytes": 1688,
+        "sha256": "3f1c378547f3a490f673583a82981efdb22f066823e4f7936089b2e3d9a3ee07"
+      }
+    },
+    {
+      "id": "fen_troll",
+      "sourceFingerprint": "697c4ddb3ece6a698d1320b319781e69f0ddbd1a417ade264b2d2ab65960e8c3",
+      "output": {
+        "bytes": 2046,
+        "sha256": "9929f94ecdf15e4f9ee3d2bf1cbd365a4de6734b3b002950d8721f6eba537399"
+      }
+    },
+    {
+      "id": "fenbridge_infiltrator",
+      "sourceFingerprint": "6060337f7d2493f368665655645a66b5ef77111dcb9a75ef903e9f3b91a178a2",
+      "output": {
+        "bytes": 2782,
+        "sha256": "8e3f45c995cb35d720c9f604756ce221ae889391e68b965e1eda1685c8f45a09"
+      }
+    },
+    {
+      "id": "fisher_bram",
+      "sourceFingerprint": "3a1a92d04d1a614553070e5f4ac90a671a8a40adbe829328a0738b596689a980",
+      "output": {
+        "bytes": 2196,
+        "sha256": "56ee641a3769222428de3ad5dcab643f909f0880fe546768a189971b034600a3"
+      }
+    },
+    {
+      "id": "fogbound_arbalest",
+      "sourceFingerprint": "bae6d1c462c6bfe02fa590eb1842298dd0ab0875656747f99fe9e60c2a11a272",
+      "output": {
+        "bytes": 2080,
+        "sha256": "98824d2abdee3a3982d45915ad2d90f6b0899526ed0a85895225a18f489b57cd"
+      }
+    },
+    {
+      "id": "forest_wolf",
+      "sourceFingerprint": "e033ddc7be001f0300ac90137fbe1b40ad0504158511205888c92c142df63264",
+      "output": {
+        "bytes": 1824,
+        "sha256": "0c86184b43b1a77083f488c1a87e41ad20fbb7b5b91417368383ad18a82264c1"
+      }
+    },
+    {
+      "id": "friendly_player_dummy",
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "bytes": 1772,
+        "sha256": "3a78d883931c3bbe4b2429f5f4dd53f14b9e7fab612af8f4000b0923ee0b7519"
+      }
+    },
+    {
+      "id": "frostmane_yeti",
+      "sourceFingerprint": "7bf76cb394cb8f09d60ec27d276b8e36314485f234b8ebe2454c49eae3fa4e75",
+      "output": {
+        "bytes": 2000,
+        "sha256": "968b2e8bbda45f294ec8a731e10979fdc9e771133c04501643d1c27eeffd6f2f"
+      }
+    },
+    {
+      "id": "frostveil_supply_caravan",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "gale_wisp",
+      "sourceFingerprint": "abcdf0177008405a4cf5dc293bf584b1df23ea1882e8e9bfa36428f58dfe5c1b",
+      "output": {
+        "bytes": 2128,
+        "sha256": "e56deb44dfe3097dc0f74b4f740d4a174fb6711ecc119fe24062447cc34812c1"
+      }
+    },
+    {
+      "id": "gaol_turnkey",
+      "sourceFingerprint": "25ad873fab2368b02a5a9bcc25d1a91a57e89e68f612cfb12588d0f7f7648014",
+      "output": {
+        "bytes": 1618,
+        "sha256": "a5d79b416c299c53f1d2d3bb6f3af136c547ba66941d7e06c7a3f687be4af34b"
+      }
+    },
+    {
+      "id": "gaoler_ossick",
+      "sourceFingerprint": "c4a48914b7d4099141403a59b769412ecfe166b6f204e6dcb8ed30283d90f15a",
+      "output": {
+        "bytes": 2326,
+        "sha256": "00a2a7a25b7250209b04a4ba6c594bfd36b225d519d35f9ada2568948d29964c"
+      }
+    },
+    {
+      "id": "gilded_stag",
+      "sourceFingerprint": "ecb6209bf00702cc418404e0d6853b2edda87a60c28cabe5d375c4cf689437f5",
+      "output": {
+        "bytes": 2172,
+        "sha256": "2637ed3a6ae9f5fd1ea21b720c899c497c95b26293fe53f60e87ba30db7499e9"
+      }
+    },
+    {
+      "id": "glacier_splinter",
+      "sourceFingerprint": "2786d995e215b95fb45be48aff4e188109638dad9bfd552a453570bfe97d756b",
+      "output": {
+        "bytes": 3560,
+        "sha256": "e62ee77e601473cc9362c11bf0d5177f59728ed15894ae1b0cf81832fb650280"
+      }
+    },
+    {
+      "id": "gleamstag",
+      "sourceFingerprint": "e7d2f39406fd839e0a5033b7f8b58a632e53cfe6e8f45967f6f1077885c048ff",
+      "output": {
+        "bytes": 2628,
+        "sha256": "b157c9162324669c743b26446b48ffc9d7571e92b8fccf1fffc26b204df08090"
+      }
+    },
+    {
+      "id": "glimmermere_wader",
+      "sourceFingerprint": "f98587ae49017dbbf19f5061ddd737f26f84fed1dcfabf33a4eb0bdf89856a37",
+      "output": {
+        "bytes": 1738,
+        "sha256": "a3c64ca10c5f780e8359dff8a4e8d12b8e7745b61489f1f6a442b7f1c041cef9"
+      }
+    },
+    {
+      "id": "glimmerscale_lurker",
+      "sourceFingerprint": "af2fd351526b7817b618ce14cbfecc85819ef5a1832568c7861cb7a2a54e6e81",
+      "output": {
+        "bytes": 1820,
+        "sha256": "1aeda2f014fc67ad3bcfe04f6965ef6cafb38a36ac4734e2bdff6ba65e0ce2d6"
+      }
+    },
+    {
+      "id": "glimmerwisp",
+      "sourceFingerprint": "664655b90882d6a00c538c49f641294ebb440276b508eb2a21dd8e800ed9528f",
+      "output": {
+        "bytes": 2150,
+        "sha256": "e4db7c141d63ca468183daee1a32936986db54f99916557949afcc6f76fa2901"
+      }
+    },
+    {
+      "id": "gloam_fox",
+      "sourceFingerprint": "989c02070d03b9eeb8a41ed2db166e5b606254d5cdea8eb6e982d27d9cbe9917",
+      "output": {
+        "bytes": 1962,
+        "sha256": "adc2cec1cd38dda8bba6479d02f0c5fbc53d33cd153d9126b1340ea7cbb6f2bc"
+      }
+    },
+    {
+      "id": "gloam_strider",
+      "sourceFingerprint": "075333c06c5848cc4a447485aeec96e6912e8519c17293e7b9c81cad732e3c16",
+      "output": {
+        "bytes": 1598,
+        "sha256": "3834841dafb520f4dd40eb42ec4a232500e39ae0152f2c41b6c6194c354c9af1"
+      }
+    },
+    {
+      "id": "gloomshade",
+      "sourceFingerprint": "ca7dd27429b29be37459c4ea0b92ee4f2adfc4a8dbad1d3edab94506d69f2fc2",
+      "output": {
+        "bytes": 2592,
+        "sha256": "cd597bbcaaa87921305c3973216c8430524174c4990885239274675af9f3a4e4"
+      }
+    },
+    {
+      "id": "gorrak",
+      "sourceFingerprint": "5680cd00806ae784399b25b7e9e99b42d9b51cac7049dad6d0c999e3fc1a3e81",
+      "output": {
+        "bytes": 2516,
+        "sha256": "cd406e2eb83e3c74b5e19113e14aaffc4e5917a02f28f300d5be6878bf0707de"
+      }
+    },
+    {
+      "id": "grand_necromancer_velkhar",
+      "sourceFingerprint": "9cc917fb26af40dc344725f963805b09f81ba1fd716f879a5d961d49d182da3b",
+      "output": {
+        "bytes": 2176,
+        "sha256": "59f21ec32b3f5c9f87bacf83588755d3392c0c3e9ee6a61f6e636242dfc06059"
+      }
+    },
+    {
+      "id": "grave_silt_bulwark",
+      "sourceFingerprint": "3d39a2ad5e8524e9a4030a11a2df8b71c66c69931180b7a6a436704862e69b49",
+      "output": {
+        "bytes": 2400,
+        "sha256": "49462c2baa94ab2a1d664a97983376c5c187f156f20a9f23b268a7759c0729e9"
+      }
+    },
+    {
+      "id": "gravecaller_cultist",
+      "sourceFingerprint": "eaa3ea8b7a8e46d2ddc5b727c09429b47ab3969f33efb099c499e76dcb68212b",
+      "output": {
+        "bytes": 2130,
+        "sha256": "16b8856fc33813698b79165d8342f4cddd6f1e9f4b4cd497382887dd43939909"
+      }
+    },
+    {
+      "id": "gravecaller_mender",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "gravecaller_summoner",
+      "sourceFingerprint": "54855323730d6eee59c03becaa303b333404892141ad9ef9bdbbe14e8003ccab",
+      "output": {
+        "bytes": 2152,
+        "sha256": "95c50e118d13052056634c535d3517b394fc4e5d3801d0ab6dfef3d238422b27"
+      }
+    },
+    {
+      "id": "gravedigger_mosley",
+      "sourceFingerprint": "3a1a92d04d1a614553070e5f4ac90a671a8a40adbe829328a0738b596689a980",
+      "output": {
+        "bytes": 2196,
+        "sha256": "56ee641a3769222428de3ad5dcab643f909f0880fe546768a189971b034600a3"
+      }
+    },
+    {
+      "id": "graveguard",
+      "sourceFingerprint": "76dc2103e032148d6aebcee7ef2af92aa70940ff6eacb5c70d4cb0e9405c9c3d",
+      "output": {
+        "bytes": 2320,
+        "sha256": "115007d981972dc46e448bfa706df8e82500f8f11c2630435e7e663fab575039"
+      }
+    },
+    {
+      "id": "gravenbark_shambler",
+      "sourceFingerprint": "1d739235c146fe4a5742e01c488756225ecd6687fcf665bcfa98c5ebaa35b0b7",
+      "output": {
+        "bytes": 1618,
+        "sha256": "d97820c40201e1107be1cd72db7a71b3e60a386dea63e98169e1be559e7b5b32"
+      }
+    },
+    {
+      "id": "great_saurian",
+      "sourceFingerprint": "f879d9f89d411a2ab333304e5686020f6e623fdd005abef09849e1e910192fab",
+      "output": {
+        "bytes": 2506,
+        "sha256": "6fc08c97cf369d974d63e0e407f6b81a5a287f0639b4c8e0a5c9b730737f7868"
+      }
+    },
+    {
+      "id": "grix_the_tunnelking",
+      "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
+      "output": {
+        "bytes": 2756,
+        "sha256": "40911b84821b29c8b6b54641f43d0919798a2a4abb42490248b28f181d2b1399"
+      }
+    },
+    {
+      "id": "grubjaw",
+      "sourceFingerprint": "4fafc2b9a27054ffc9474187838ad4091de525a2be9ecad696a5f850b2de75c5",
+      "output": {
+        "bytes": 2164,
+        "sha256": "0fc867ac1c3e9f0fb012472143c9a5258793348d1060750be159d593539d0455"
+      }
+    },
+    {
+      "id": "harvest_sprite",
+      "sourceFingerprint": "957b6ae15256764a970928e8a77a099a9636965bf22db56c6971564cdd19231e",
+      "output": {
+        "bytes": 1752,
+        "sha256": "5168f406c69e6470249d7bdbbd9c3742b603d497aac9719754d147df977937bd"
+      }
+    },
+    {
+      "id": "healing_dummy_caster",
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "bytes": 1772,
+        "sha256": "3a78d883931c3bbe4b2429f5f4dd53f14b9e7fab612af8f4000b0923ee0b7519"
+      }
+    },
+    {
+      "id": "healing_dummy_ranger",
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "bytes": 1772,
+        "sha256": "3a78d883931c3bbe4b2429f5f4dd53f14b9e7fab612af8f4000b0923ee0b7519"
+      }
+    },
+    {
+      "id": "healing_dummy_scout",
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "bytes": 1772,
+        "sha256": "3a78d883931c3bbe4b2429f5f4dd53f14b9e7fab612af8f4000b0923ee0b7519"
+      }
+    },
+    {
+      "id": "healing_dummy_soldier",
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "bytes": 1772,
+        "sha256": "3a78d883931c3bbe4b2429f5f4dd53f14b9e7fab612af8f4000b0923ee0b7519"
+      }
+    },
+    {
+      "id": "healing_dummy_tank",
+      "sourceFingerprint": "55d10c68776144c21a92c3422b2cb0deb1bd71397381f8c38bdc888153796f5d",
+      "output": {
+        "bytes": 1762,
+        "sha256": "d2c2d550dbb31b97be04cc46277cc9aa7f8fe13f3094b515bef89a1dec68284c"
+      }
+    },
+    {
+      "id": "hedge_gnome",
+      "sourceFingerprint": "9da432220776a23186325f6149bf94f38cce337b09cefc512424f50fcfd7d805",
+      "output": {
+        "bytes": 1712,
+        "sha256": "8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c"
+      }
+    },
+    {
+      "id": "hedge_knight",
+      "sourceFingerprint": "8fcc11ed0d016fd378776558bbf057b546172a78157a9af430679a7bb15cb0b5",
+      "output": {
+        "bytes": 2210,
+        "sha256": "0155fbb2ea5295ec4dbd809b366fa605ca110ef97a39549eec08d4bea8bfa6c7"
+      }
+    },
+    {
+      "id": "heroic_boss_dummy",
+      "sourceFingerprint": "da1c7342d9c1815c8b3d83b1b0098b141127797d4b324e9f74ce1db12c179892",
+      "output": {
+        "bytes": 1832,
+        "sha256": "19066cd1480b231863e5917a6c6fa61094641f6185dd4d90c17697c1f4664132"
+      }
+    },
+    {
+      "id": "hoard_abyssal_tentacle",
+      "sourceFingerprint": "ccd8676fdbd339a0889655bd59f7e68d3eafa7e32ff49e6ed1a50e7df80a9cde",
+      "output": {
+        "bytes": 2640,
+        "sha256": "297daa7db277505a98a5b9d7d17af09a0c71fb36279c31c153f2d8207ed2c914"
+      }
+    },
+    {
+      "id": "hoard_bat_swarmling",
+      "sourceFingerprint": "640f4840479a44a43f1cf22743929f9ce0c37edc87492d41492651f3e3665ec3",
+      "output": {
+        "bytes": 1982,
+        "sha256": "1006a340f4795538afd9f179dd85efe1e9b4b6fd59d0800971a638be1b8523ed"
+      }
+    },
+    {
+      "id": "hoard_bloat_cap",
+      "sourceFingerprint": "aa5b984c443c8a2699a5479df738e83848cee38d1f5879de8dbbc6b0022ae7ca",
+      "output": {
+        "bytes": 1906,
+        "sha256": "d26b1ce92f3439b34a09144dedc2c9e77eb5cc49d722f43bf227d4be7251b623"
+      }
+    },
+    {
+      "id": "hoard_boss_bat",
+      "sourceFingerprint": "a5c5d31e48bbe6ff9dc75cebe01530b8e280f2e3bdf1c0e0b1d7de6ecc3af6e5",
+      "output": {
+        "bytes": 2076,
+        "sha256": "7cdae7c003c7011ec155f7cc303bc5243e310fcd3825cbefea0c740f9c14579b"
+      }
+    },
+    {
+      "id": "hoard_boss_mimic",
+      "sourceFingerprint": "c9fb063a3176e62cb859f071eb19d2cb4701fda7ed57991badb620bfbf0807a4",
+      "output": {
+        "bytes": 2548,
+        "sha256": "075e6f818cbb1ed2f2c022cc76083cd7dcbf69e818f1473566931a8cf3e9b28d"
+      }
+    },
+    {
+      "id": "hoard_boss_mole",
+      "sourceFingerprint": "427b5f52f10d0e761d83935b9f3143aa5f4d314fc7c76d11137e78bc4b069eb4",
+      "output": {
+        "bytes": 2368,
+        "sha256": "cfff25a0bc716d9e6ee0ef96cd266290dad870bb6f30d7a36c06c293c8e60694"
+      }
+    },
+    {
+      "id": "hoard_boss_mushroom",
+      "sourceFingerprint": "01104371015ac85c1b79ea2cfaafe575d08635d85d644c9548bee0376af4ee31",
+      "output": {
+        "bytes": 3266,
+        "sha256": "41c382af7af85f3ce471425da69e7096d6a10900c3256ce5cbe5144670ff8c33"
+      }
+    },
+    {
+      "id": "hoard_bound_pulsar",
+      "sourceFingerprint": "e5762411a85dd9d6643b6e5b57b64533acb3e7a4a23189e7bbe0d5c0cc83c67a",
+      "output": {
+        "bytes": 1674,
+        "sha256": "981d4167f4072a7402e9ca349a49f5e95f88f474d8436eb8fa51f17603755cd3"
+      }
+    },
+    {
+      "id": "hoard_brood_cocoon",
+      "sourceFingerprint": "6f215e8e4088c076515f75d911754ee27cb45be14f9153ca191f9b3f6bb787c3",
+      "output": {
+        "bytes": 2410,
+        "sha256": "51a7008ecb6e28fb79232d2e4a96d337643b136c648e38b3791a58a4565e3211"
+      }
+    },
+    {
+      "id": "hoard_brood_egg",
+      "sourceFingerprint": "d36ce145a86b1de13aaa44407e6f04f154de46ec20ff8ea917029e5bf5822ee7",
+      "output": {
+        "bytes": 2252,
+        "sha256": "2e4d6a0264b5d9c6eb92474bdbb5de352341dbc0aeb2ff1ef8cc10f330eba8a5"
+      }
+    },
+    {
+      "id": "hoard_brood_hatchling",
+      "sourceFingerprint": "302f479b67ff4220308f4836992b9baf96f26eec8c8fddd618132a278b7b5749",
+      "output": {
+        "bytes": 1828,
+        "sha256": "4d9f7a927b426e6924cd25df7fae38645f6e551535e6ec2e7d10f0729212039d"
+      }
+    },
+    {
+      "id": "hoard_coinsack_scurrier",
+      "sourceFingerprint": "196c11c9073ebd7cb1e4a54bc826cff98bd39caabe1ef23d1d33d94a89e8b72c",
+      "output": {
+        "bytes": 2780,
+        "sha256": "bea4a026cafd2e81387caae7057010f9fdaf296fa1e8ae44dbc5fc2392f3d5e4"
+      }
+    },
+    {
+      "id": "hoard_healing_tide_totem",
+      "sourceFingerprint": "d6b3df1ff5ff84c495fcf5d557939f4b990c5b3057874fe48cf390019a816dd4",
+      "output": {
+        "bytes": 2150,
+        "sha256": "4e35eeadaab8d10a6cca0e79f9f081353282eaccd43e7bba8dd2dc8afa803f42"
+      }
+    },
+    {
+      "id": "hoard_silk_cocoon",
+      "sourceFingerprint": "d088b9ca5b437b0274a66beb0f866bcb4a11e222f2ac318fd7bdb6f09902522e",
+      "output": {
+        "bytes": 2044,
+        "sha256": "7516820e3b7395d6a191e6ad5c5158ddd19bc0f9e587c6bdcffcb808b5d40f1e"
+      }
+    },
+    {
+      "id": "hoard_sporeling",
+      "sourceFingerprint": "50dea2028995fe37fdd7946de44dc6be28be66f1def3d0040dc16fb28091b30f",
+      "output": {
+        "bytes": 3120,
+        "sha256": "0c53e400426a8e417e9d5e628db02727e28d6f09593a537b2be5edf24a62e623"
+      }
+    },
+    {
+      "id": "hollow_acolyte",
+      "sourceFingerprint": "555a4eb8b64adebc47a1c69ea4fcca16eb9406bb8499d24328f3752786d9c2be",
+      "output": {
+        "bytes": 2206,
+        "sha256": "258aa8b913b4fe84c001e9f7f15bc671ef8656250d0717727ccca8c6ec64c13e"
+      }
+    },
+    {
+      "id": "hollow_chorister",
+      "sourceFingerprint": "d5be20a639c275b28a3cb272b09bf548260c2b3a90ce398cde58a5dd13a18221",
+      "output": {
+        "bytes": 2588,
+        "sha256": "95ba02dd3dc7838411403c77fa7426c9e32067db8e71efdb431dd5cdf8f90867"
+      }
+    },
+    {
+      "id": "hollow_gravedigger",
+      "sourceFingerprint": "fcda45c3d97b73d612701453f998a091e7388ec95ebddfa8253dc141947e27fb",
+      "output": {
+        "bytes": 2762,
+        "sha256": "73571073b9015a87518442e5e4d9c9fd8dbec9a0f208ce7f7a6d538e3c503de5"
+      }
+    },
+    {
+      "id": "howdah_hexcaller",
+      "sourceFingerprint": "288049247f3d0c62d24d8d0a72653c67e8e0d4704e0b5f04799d4319423e0a95",
+      "output": {
+        "bytes": 3160,
+        "sha256": "95b29436819733d44b8d5e2cf526baab23e1f1ff6b2703928026484d5c4c0708"
+      }
+    },
+    {
+      "id": "hub_healing_dummy",
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "bytes": 1772,
+        "sha256": "3a78d883931c3bbe4b2429f5f4dd53f14b9e7fab612af8f4000b0923ee0b7519"
+      }
+    },
+    {
+      "id": "hub_training_dummy",
+      "sourceFingerprint": "2b45c3ab5c106f0bcda1101a6c31f56a61148e76d43ecec1fa0444b51ba64ac6",
+      "output": {
+        "bytes": 1792,
+        "sha256": "3d2b84687d58cab79f273735154816cd1cc870b02f76ee9d852f3d7d3d8dc55a"
+      }
+    },
+    {
+      "id": "ice_wisp",
+      "sourceFingerprint": "b7086ce51ffe94ee6c03f73bd9a93641c59015722f68116bc5d16d277ca1612c",
+      "output": {
+        "bytes": 1672,
+        "sha256": "3cfe7d4bd1c0be2b5495aa366ccbf069b4faa5416cd5041359d5055789ac822c"
+      }
+    },
+    {
+      "id": "ice_wraith",
+      "sourceFingerprint": "1c331896b8d6e4e22ae3129c5392957121823dc069ba809bccf79dc37eddb7f0",
+      "output": {
+        "bytes": 2992,
+        "sha256": "c4e804d1b7ebc5242f81a7e9118913d7e7549762a94f072dde73602f5f6b30ea"
+      }
+    },
+    {
+      "id": "idol_guardian",
+      "sourceFingerprint": "a9f067ed819544d90b5bc5a4f463a464fb8edb6357611c80c779c3021d233ed7",
+      "output": {
+        "bytes": 2834,
+        "sha256": "6afb10a16bed499721f8e12c89d83cd2724a83ba99acddc2fa30fc1c7b1edcb5"
+      }
+    },
+    {
+      "id": "ignivar_cinder_artificer",
+      "sourceFingerprint": "ac182348126ac080c3bca146f16e4af96aed4558fb71ba3879efa4870a222902",
+      "output": {
+        "bytes": 2204,
+        "sha256": "dbca3f0e4a605b172714526f4b6f71e616899c9d7fc364818423807aea9ad924"
+      }
+    },
+    {
+      "id": "ignivar_crucible_warden",
+      "sourceFingerprint": "905cf139af1f401835f37e3015c319cc93452f5af9675b1160a66ff1145d5369",
+      "output": {
+        "bytes": 2712,
+        "sha256": "f0a76549a7f13961604ca2fdfec5314b81727c978504460050739f3d610b3d50"
+      }
+    },
+    {
+      "id": "ignivar_ember_sentinel",
+      "sourceFingerprint": "deabc374783072a48e4836bc0b170dd50e49105b4112bec8814454e5a92fca50",
+      "output": {
+        "bytes": 2260,
+        "sha256": "fda61ce3ead5f04d35bfd960235a1679c58069001b1f7aa68e765cdd88a27523"
+      }
+    },
+    {
+      "id": "ignivar_heart_of_the_end",
+      "sourceFingerprint": "ea3ad642b5bf35c1aec8ce14bcbc25954097dbf13d6db7b5653dcddfa014ec94",
+      "output": {
+        "bytes": 2662,
+        "sha256": "d6c8c62c96febd17ecf3257f685724d8b8c5252d4d1675acd829d6b3b220c1d2"
+      }
+    },
+    {
+      "id": "ignivar_herald_of_the_last_flame",
+      "sourceFingerprint": "c108d109f45326ad6a09a91f13991b30927d84a3273d5454e52118f9cad4f44f",
+      "output": {
+        "bytes": 2376,
+        "sha256": "c52ebff1bf3d7058ddccc96ba53d04a454d479862916271a1d63c76ed82a34a7"
+      }
+    },
+    {
+      "id": "ironvein_foreman",
+      "sourceFingerprint": "680b401700cf946d9690c5f74fb0ccd9fb74b42541a600d343bf8917d0829858",
+      "output": {
+        "bytes": 1692,
+        "sha256": "63a6ba20e36f3b8a05e445c7f5a686f333beea0651775862855facc61243e88c"
+      }
+    },
+    {
+      "id": "ironvein_sapper",
+      "sourceFingerprint": "2693a4ba049f7f402c10e1a91aa6cec0f9ad6a6724066e22bfd587a29695c039",
+      "output": {
+        "bytes": 1716,
+        "sha256": "377d1c34130b6ab283611c6ef2e902624aa1234c1c9aa773e906abec281fdb09"
+      }
+    },
+    {
+      "id": "knight_commander_olen",
+      "sourceFingerprint": "541b9e0f7c6cb5f816994a114dcae9eb9ccc6d8cc8ed20ff76deb15e4c672f42",
+      "output": {
+        "bytes": 2356,
+        "sha256": "fd93c134e6e63d650ebbd92b05cea39aea641029e8c37cffe8359f606751b4d6"
+      }
+    },
+    {
+      "id": "korgath_the_bound",
+      "sourceFingerprint": "8851b569e25f335a030cf24d92bf540e9cd5a6dc93fcd6dc8d44351536e8d297",
+      "output": {
+        "bytes": 2934,
+        "sha256": "8a3d14396b4560e1859949d1f96ea9a6a3379464a6e4b6fc7a1732abd6b5631a"
+      }
+    },
+    {
+      "id": "korzul_the_gravewyrm",
+      "sourceFingerprint": "c0ee19f51cb70bd5a62a3475993d74c7573cc9793910db0efc456c4ef0de7c9f",
+      "output": {
+        "bytes": 2372,
+        "sha256": "277ddb2d9322cee43923c1b240190302932fbb742a931ebdde7a4faf70875372"
+      }
+    },
+    {
+      "id": "lagoon_snapper",
+      "sourceFingerprint": "21c4e6a54c4f7c5b3066fd98d340bea4e35331229fd2523848939ef0150c0157",
+      "output": {
+        "bytes": 2436,
+        "sha256": "fee1b3b71199c40d7bd0204bbcf05af0cbbe4c807b374a2f584a5a7624b4a71e"
+      }
+    },
+    {
+      "id": "lily_wisp",
+      "sourceFingerprint": "48f6a19516a4afe9f269ab9a4a8e9d9e456c65bdbceb6a0cf35fd967f0bc075f",
+      "output": {
+        "bytes": 1730,
+        "sha256": "71b48c8e7257bb99e55681f11f914dd7863cd05153f85b7ec0ffd1767537b472"
+      }
+    },
+    {
+      "id": "marrow_restless_bones",
+      "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
+      "output": {
+        "bytes": 2824,
+        "sha256": "23eef46230cb81625896e76c42e92aa5f4dbd665a481b3354890d0dafd730605"
+      }
+    },
+    {
+      "id": "marrowlord_varkas",
+      "sourceFingerprint": "0eb028160ba1181f910e1254da5525112679fed19b6044b6aafb6179fd91b03f",
+      "output": {
+        "bytes": 2338,
+        "sha256": "73b1b1171aca5591e5728d34b0cbb1edb54d0a0595f9c82c3f7230d2452f0751"
+      }
+    },
+    {
+      "id": "mere_hydra_head_center",
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "bytes": 3546,
+        "sha256": "c7cb8ef4645fd948fd87219d6061f874353e9292bd6611f2c8f2a83fef4d3701"
+      }
+    },
+    {
+      "id": "mere_hydra_head_left",
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "bytes": 3546,
+        "sha256": "c7cb8ef4645fd948fd87219d6061f874353e9292bd6611f2c8f2a83fef4d3701"
+      }
+    },
+    {
+      "id": "mere_hydra_head_right",
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "bytes": 3546,
+        "sha256": "c7cb8ef4645fd948fd87219d6061f874353e9292bd6611f2c8f2a83fef4d3701"
+      }
+    },
+    {
+      "id": "mere_lurker",
+      "sourceFingerprint": "9c5f884b7f04a298c7b5b4b99c8bbb3bd11ce37bf86e885ba7755d53b00e116d",
+      "output": {
+        "bytes": 1916,
+        "sha256": "5ea2fe8f6953714463a3438cbf20299d1eeac480557c1c8311603eeea44eb567"
+      }
+    },
+    {
+      "id": "mire_prowler",
+      "sourceFingerprint": "e1b4b7c59b4d85f358400a311e96aa69866324f6b1f2b2daa43ec50e51cdaaa3",
+      "output": {
+        "bytes": 1818,
+        "sha256": "7a630561f0dd825442c465b8045adb7bb6d186f4f9e8d5176644d0e859b5b6c7"
+      }
+    },
+    {
+      "id": "mire_widow",
+      "sourceFingerprint": "1565161d6df612ac3e6e6c17fbdb6299292d200aad7689e6baee1508de845fdc",
+      "output": {
+        "bytes": 1546,
+        "sha256": "ff44b5da890ca12e20f04b697fe82baa915bc3b357c54d9110cf62cd96606e4f"
+      }
+    },
+    {
+      "id": "mirefen_broodmother",
+      "sourceFingerprint": "9d7bbbb78dea35e9b7b6ecb4831e8b1cea102583464051fe65d69892736d13dc",
+      "output": {
+        "bytes": 1652,
+        "sha256": "8ab2a2833f4b3698772344f0794d5d2dd2795ebebcae4a9bca139b1901324afa"
+      }
+    },
+    {
+      "id": "mirefen_widowling",
+      "sourceFingerprint": "669698ab3bfa546c92414ab56e10637b199735b3560bf40cea20c966ec499647",
+      "output": {
+        "bytes": 1684,
+        "sha256": "fdfd3f9f7400dda45adb70aeca74313bf41f774f6384d31db3bd2ab5ae11aa8a"
+      }
+    },
+    {
+      "id": "mirejaw_frenzy",
+      "sourceFingerprint": "6656adbd3ca8fe9b38da681d5c4364427839945c150c2f0b5b4e2ad4d15f5d88",
+      "output": {
+        "bytes": 1840,
+        "sha256": "bd72a3d135075d15fa98ba6ab9a603233d39d8704b392e037ff2b16910e7fa18"
+      }
+    },
+    {
+      "id": "mirejaw_the_ravenous",
+      "sourceFingerprint": "6656adbd3ca8fe9b38da681d5c4364427839945c150c2f0b5b4e2ad4d15f5d88",
+      "output": {
+        "bytes": 1840,
+        "sha256": "bd72a3d135075d15fa98ba6ab9a603233d39d8704b392e037ff2b16910e7fa18"
+      }
+    },
+    {
+      "id": "mister_crabs",
+      "sourceFingerprint": "d9b51b2795eccc1807d3ce2d9b9b8271f76204002d8ade7c3fca934916365625",
+      "output": {
+        "bytes": 2190,
+        "sha256": "800918d7db72d0401600a62681c479d784fecf69bcc6197e41f9fae4f6bdc59f"
+      }
+    },
+    {
+      "id": "mistweaver",
+      "sourceFingerprint": "62d1f4d52e6e32e93db4061e6fcece8d54062c0372828dc791ebf7ce9713c6d5",
+      "output": {
+        "bytes": 2370,
+        "sha256": "114e9b9aaeb3cbd77c05952c7e6b26637c0cda25af4e44c22f78896a4bed8d39"
+      }
+    },
+    {
+      "id": "mogger",
+      "sourceFingerprint": "54b9b8b14eae4864ae83ad629ef185c37ae34a19b234297e744d8f675b08a2bc",
+      "output": {
+        "bytes": 2574,
+        "sha256": "b3dd9f30c4bf7d6527d868f9fac79262c3c96afbece752c573e55f1b132507cb"
+      }
+    },
+    {
+      "id": "mogger_lackey",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "moonfleece_grazer",
+      "sourceFingerprint": "afae5a12eed56e08ecbed814b6f68645772320af608b65937892e9f3a0c43483",
+      "output": {
+        "bytes": 1452,
+        "sha256": "0b5f107c06003cc26e97699ec217421c91d275c57ed2e3d1e337cc18cba1ae10"
+      }
+    },
+    {
+      "id": "moonlit_siren",
+      "sourceFingerprint": "dda01e26d762733b440456acd9df698a6a05229708390233b5e27073ad24584d",
+      "output": {
+        "bytes": 3346,
+        "sha256": "6ed35f21f25056a0abe6124616c549cb4d7f64d22054e3dcbcd41a59db30106a"
+      }
+    },
+    {
+      "id": "moonspawn",
+      "sourceFingerprint": "1aa23a5931bee1aed11569fe3be99be368f4ffe87e29f9ec2bf909e3ffe11f37",
+      "output": {
+        "bytes": 3530,
+        "sha256": "d8b0fcb16e8bf21705d5e8b70e9fd08575e7a97a811a0d9f709bb7c268aa27ff"
+      }
+    },
+    {
+      "id": "moor_ram",
+      "sourceFingerprint": "8042f655ae218f964b46cba65aefa9262276caa26e6b853eeaec13823df1a610",
+      "output": {
+        "bytes": 1470,
+        "sha256": "183f8d414c0d8780975e3d1a5ac52977c98a43a449233873456a6c19e8f748dd"
+      }
+    },
+    {
+      "id": "morthen",
+      "sourceFingerprint": "b3ea439a1061f5eb3de36cb041b4f9f68c8945cc4234af5ba3d115fe8b3cbf26",
+      "output": {
+        "bytes": 2360,
+        "sha256": "7e87af9f76c6572356a696ea89c25a1d5b88132eba25239b505aef87c99f153b"
+      }
+    },
+    {
+      "id": "mudfin_murloc",
+      "sourceFingerprint": "551fb5de52948e20da32c0b74593cb959b6ae815684a0e31cb2243354054683b",
+      "output": {
+        "bytes": 1882,
+        "sha256": "cf42681e3eac97cc30e2ebaddefca33f34842c46be567c8e6d4f6b5dfaa20c39"
+      }
+    },
+    {
+      "id": "mushroom_pixie",
+      "sourceFingerprint": "8ae67cb4021bc80265408b580d63195847f10f7e11af3f6a936cca89e101e870",
+      "output": {
+        "bytes": 2456,
+        "sha256": "ed0bded6bf666f1d651bbd6e742e3c0846ddff3d336b3515afcf3d4edc3753c3"
+      }
+    },
+    {
+      "id": "muster_chaplain",
+      "sourceFingerprint": "9d729c99a3cbba2ede5b2650902c8508a448e9c3b6bcb9b7de8b72ab54e25a51",
+      "output": {
+        "bytes": 2210,
+        "sha256": "bef6ec117e6812c97cec67496535e749761495dc22ef44020c3d49f91bb39dfa"
+      }
+    },
+    {
+      "id": "muster_drillmaster",
+      "sourceFingerprint": "67de3bb62f8d1679528fb9a8d1ce06f4d809486da1aa5306d977a98dae7717cb",
+      "output": {
+        "bytes": 2242,
+        "sha256": "79dbde70fb7bdaf318c93069250a984429430b3c319ab1b279e29ceb480b3d39"
+      }
+    },
+    {
+      "id": "muster_effigy",
+      "sourceFingerprint": "0d93eb5e5f78b2213ee3b476715358ff89ad1ed70afa0d6e40fa499a941dbb8f",
+      "output": {
+        "bytes": 3816,
+        "sha256": "f6e2389f82f237b37580aa69c7df258b2321ac0a8b03da11fde20f05039467ba"
+      }
+    },
+    {
+      "id": "muster_footman",
+      "sourceFingerprint": "016d1490ad15101f2c074393099bf882d1f5536a55e5eaf76200b4e1c32a9086",
+      "output": {
+        "bytes": 2494,
+        "sha256": "7e5a31262a4acec830d9b97ca61083c39f136777b363bc1cf9e9bd9f9ca9fdaf"
+      }
+    },
+    {
+      "id": "muster_sergeant",
+      "sourceFingerprint": "c289a7d01b8196580fa71bfb32c39d7b86c40ed417b775b2ae2bb22d7565279c",
+      "output": {
+        "bytes": 2106,
+        "sha256": "bc42a56ea46ba0ef68669ba6df93e03592c3b1252352763b80282435484c8a2c"
+      }
+    },
+    {
+      "id": "necromancy_bone_mage",
+      "sourceFingerprint": "a871b80e65654961d1204757e6926ae3d6324f813222114304118479f7456d60",
+      "output": {
+        "bytes": 2234,
+        "sha256": "49cd165232bccc9023efb8bb13cd9c5de0595c96afe046ec199b98f515402e28"
+      }
+    },
+    {
+      "id": "necromancy_gravewing",
+      "sourceFingerprint": "038b3f2553d81a4373e93733fff792cd056dca01d7fd09c00c000c8fa4caaf9d",
+      "output": {
+        "bytes": 2588,
+        "sha256": "6cba05f61a45412977ddfc519fd73d064e8bdee572ebeeb4b673a45a2a1f6c9d"
+      }
+    },
+    {
+      "id": "necromancy_skeletal_warrior",
+      "sourceFingerprint": "bf2198d09351b19170955448e1e8f63e12abf1449bc17dcca3c3750220e0f362",
+      "output": {
+        "bytes": 2810,
+        "sha256": "7f8448896adc20cea4cb062a831e2ff566c0b4338bca696b387b5eb1e90214cd"
+      }
+    },
+    {
+      "id": "nhalia_mourner",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "nightkin_stargazer",
+      "sourceFingerprint": "5cab4fcf97eea1e185b7bea27a0d146329a344f05b0b29a7eaafea9ed9ccff70",
+      "output": {
+        "bytes": 1630,
+        "sha256": "07c4aae666a439c0feb5b20eace07f9008a680a79eab0961e7c25fee051b7b6e"
+      }
+    },
+    {
+      "id": "normal_boss_dummy",
+      "sourceFingerprint": "f812d654f4fbd72e10b9e81eea38e32c671c6a5be5d7df50e542050ac2d341e1",
+      "output": {
+        "bytes": 1734,
+        "sha256": "399a7cfb5ade49b0a2101cd424bf96ea696e74c31afc26c4c8ec9f81d677137d"
+      }
+    },
+    {
+      "id": "nythraxis_bone_spike",
+      "sourceFingerprint": "03d1558d14ddcc771e567e959becbda5710dd1078a4145fd0bde7141531b688c",
+      "output": {
+        "bytes": 1530,
+        "sha256": "04ebfffd1a470b5f6fcc4343672885218a6a8c7a1393c0927e07972c8cfd9bd0"
+      }
+    },
+    {
+      "id": "nythraxis_heroic_priest_add",
+      "sourceFingerprint": "9904ddfd327046a993e0ddc2049a082a569d9f5a85586fc4feae33c68d5a9875",
+      "output": {
+        "bytes": 2626,
+        "sha256": "3461b83a3715374b23280aec440c49e7786f05c2e1a9d728cdaeaa8cc79f74eb"
+      }
+    },
+    {
+      "id": "nythraxis_heroic_rogue_add",
+      "sourceFingerprint": "79285356f8cb67bf9c79ba31a5c02de84c717211716bf7082c2a9e2a723b3a29",
+      "output": {
+        "bytes": 2508,
+        "sha256": "fa4d69b68d622b4e62b58c613af00d9ae6564ce27bd413c490bdecdb4f303b2e"
+      }
+    },
+    {
+      "id": "nythraxis_heroic_warrior_add",
+      "sourceFingerprint": "15a9ba1994093dfd3d4471548d0949ccd93de4a0b8785e0ea37607a738cefd51",
+      "output": {
+        "bytes": 2290,
+        "sha256": "e267ece86bc88e6de7abb8debb0c84984f4bffc2bfeb7b40487c08af3ba2a8e2"
+      }
+    },
+    {
+      "id": "nythraxis_scourge_of_thornpeak",
+      "sourceFingerprint": "aa8b952f12c1e72852c11ea6ef2ef9e2f90dad36ad9649eb0f7e38542f9c3ca7",
+      "output": {
+        "bytes": 2764,
+        "sha256": "87e39fe4f6d955eaa69e619103287e652943a5ab5ee2fed3bfa460d613f1ffd8"
+      }
+    },
+    {
+      "id": "nythraxis_skeleton_warrior",
+      "sourceFingerprint": "15a9ba1994093dfd3d4471548d0949ccd93de4a0b8785e0ea37607a738cefd51",
+      "output": {
+        "bytes": 2290,
+        "sha256": "e267ece86bc88e6de7abb8debb0c84984f4bffc2bfeb7b40487c08af3ba2a8e2"
+      }
+    },
+    {
+      "id": "ogre_crusher",
+      "sourceFingerprint": "784b48f069f27d00cb74bef308cb2cb6ff0e59604c24018acdc8eb8233ab2cd8",
+      "output": {
+        "bytes": 2386,
+        "sha256": "ba0484398d5ac1e13d2c762e9a944c9f4bacd54f3c7d075637f0388396dd34fc"
+      }
+    },
+    {
+      "id": "ogre_sledge_hauler",
+      "sourceFingerprint": "386acd868da6ead8571262ce8e102e672b8c61f873b480d3a26a19dded1b79e2",
+      "output": {
+        "bytes": 3292,
+        "sha256": "730b7ff817f0c13e44ab7f65b0b1c822846143e07fccb3de6a936892458b127e"
+      }
+    },
+    {
+      "id": "old_cragmaw",
+      "sourceFingerprint": "9d9c62362e9d5d894cef31ff20e661aadb53eb987384a937bc29d47032e0e75e",
+      "output": {
+        "bytes": 1738,
+        "sha256": "97d3590c5150fb2c0c77ed51ffc2448d9d2d17a498c9d95fc1d90197f5f87de2"
+      }
+    },
+    {
+      "id": "old_greyjaw",
+      "sourceFingerprint": "72c1fdff96d0f6a368720e97d0a401e43e66d9b73e14abafae21741a4c725324",
+      "output": {
+        "bytes": 2006,
+        "sha256": "d7f0c0e9a263db57f8e61d10f9fce2d57d5c20470b3d50cfaeada5da19802fa1"
+      }
+    },
+    {
+      "id": "old_marrowshell",
+      "sourceFingerprint": "56b55e0083ddb0c25aee478c4534e5b2884ed21d8bb5662a4093ce0b5be375d7",
+      "output": {
+        "bytes": 2066,
+        "sha256": "39b5e33b2f137ea508cbfef3c67e3a5135b5a31310172670f4b64baab96cdf9d"
+      }
+    },
+    {
+      "id": "orchard_treant",
+      "sourceFingerprint": "cab66f4375f2d2a8b121a4e4723879a45694d3fb83b6fa782682c398311b7bd6",
+      "output": {
+        "bytes": 2104,
+        "sha256": "9c2e442a2ad5e0859553a3a7e93edc9e78ae4f09d729da8a5c2fe06ffcf1896d"
+      }
+    },
+    {
+      "id": "ossuary_sentinel",
+      "sourceFingerprint": "fd3b1d3c56f65eee8933945bbef1d7c69ec86a5df7c1378d0ae568729c6544e6",
+      "output": {
+        "bytes": 2818,
+        "sha256": "b1355486f18f62f957d1c7f52bc3c7b59b12fdb7b3492b396d098eea15a46b9a"
+      }
+    },
+    {
+      "id": "pale_choir_acolyte",
+      "sourceFingerprint": "9cd85c3dceec9b5b1ef9829d98b991601599f93ff90dbcce9067d44e7657fd1f",
+      "output": {
+        "bytes": 3310,
+        "sha256": "e9165c24157fee9aa29dac94c92c1c624181c98bbdf62b2abce6f24bc8518d7b"
+      }
+    },
+    {
+      "id": "pale_huntsman",
+      "sourceFingerprint": "71f823ff7d64b9b72328ab456a3e915abe694d7577dc59ec643917df6422e27a",
+      "output": {
+        "bytes": 2564,
+        "sha256": "91eae8e2a6bee93640bf327562d69af6d732271057f8040c71fa9202fe42573e"
+      }
+    },
+    {
+      "id": "pearlguard_sentinel",
+      "sourceFingerprint": "35f4fd65f6ca63a3dc1bf9831db4f7a796dad8f5e95b30fc31090471b8c242e3",
+      "output": {
+        "bytes": 2146,
+        "sha256": "aab42314731f70e74c8557f202df5b289d39436a30d8be37aa0cd45cc9df8e5a"
+      }
+    },
+    {
+      "id": "pyre_colossus",
+      "sourceFingerprint": "9543027f2d0927ff688b05dcba243ff4d1701a4105384257a2bf613e82704783",
+      "output": {
+        "bytes": 2204,
+        "sha256": "04cbbc71cf9d4dc8561ccdbfd192ed2b022c5a69068424f82d614e1b5b40b2ea"
+      }
+    },
+    {
+      "id": "raised_bonewalker",
+      "sourceFingerprint": "cb77a564fa1dc66b589659ec5bc17e661cc51586b715abb39fa3608a1785912a",
+      "output": {
+        "bytes": 2660,
+        "sha256": "600c9d14934d4efc80a7bf15d2023824ee869260583ae771747fc7f5d1a10694"
+      }
+    },
+    {
+      "id": "reedbound_acolyte",
+      "sourceFingerprint": "4667fee0fd2eee319adeac890d411780ed7f28524506732717e1bc1e5ad06126",
+      "output": {
+        "bytes": 2130,
+        "sha256": "1c0260c84fa8cdff3d2503c7f692b60d9b6ca1c931bcee9bf15b0f7177c48cb1"
+      }
+    },
+    {
+      "id": "reliquary_bonewalker",
+      "sourceFingerprint": "20d06d20a8ed31e84b277128dcbc551f1c9700a100c5699ce9ba895979c17b1b",
+      "output": {
+        "bytes": 2794,
+        "sha256": "0f42e307da20fa2c63bd608102fbff94430c0c007f952b32c891ae19eeb0e577"
+      }
+    },
+    {
+      "id": "reliquary_funeral_ringer",
+      "sourceFingerprint": "5b12bb757a84f19cc9a444ec74b10a8c5eae522003d47a7d0cb358e43f40aa08",
+      "output": {
+        "bytes": 2240,
+        "sha256": "80b3e639bccd1a6b9462893b41cf7bd65ca4a5db443adc95f1b9621c1bea5333"
+      }
+    },
+    {
+      "id": "reliquary_gravecall_acolyte",
+      "sourceFingerprint": "2df5a042979d1fa5ff1e0f9c7d44d0a07d0e31ec67b39a19248bfe12691ce1c7",
+      "output": {
+        "bytes": 2062,
+        "sha256": "5123b1b5c057138e1d758f8ffead054f2498c10b0e471a1e5513b378b6022ad3"
+      }
+    },
+    {
+      "id": "reliquary_ledger_wraith",
+      "sourceFingerprint": "d704a1bc447e36ddcd1af412b50f89653792444aff18b586030eb4fb33e850f7",
+      "output": {
+        "bytes": 2644,
+        "sha256": "73bcdc313e093492d6c54bd619b24158d4b00f2b07575f32421e1fecdb9acb75"
+      }
+    },
+    {
+      "id": "reliquary_saintless_effigy",
+      "sourceFingerprint": "50c8e331648ce6237c79c7b8a3deee1dc94e979ea11c243d9bd86c055e87e369",
+      "output": {
+        "bytes": 2268,
+        "sha256": "b96f59f1d4ceaf545b79ce1bbf92abdca50ec731307781d1a0c35ac0641a043f"
+      }
+    },
+    {
+      "id": "restless_bones",
+      "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
+      "output": {
+        "bytes": 2824,
+        "sha256": "23eef46230cb81625896e76c42e92aa5f4dbd665a481b3354890d0dafd730605"
+      }
+    },
+    {
+      "id": "ridge_stalker",
+      "sourceFingerprint": "8af1837aeff637d8122095d63ee7c7ce0b066a7b0ce29305fdb09a08d02e0902",
+      "output": {
+        "bytes": 1840,
+        "sha256": "4d6eac26cb086269a9843b9cb3da91de91fa58e55085afb8651890236ec749a8"
+      }
+    },
+    {
+      "id": "rift_boneclad",
+      "sourceFingerprint": "616a16a44224f50e0af58870b35d9f020689f1b6cb3942fb229e0c9d564002f4",
+      "output": {
+        "bytes": 2780,
+        "sha256": "a5ff017e139467244949387515b393b348bbbc19f0708d91874d26c3baed6def"
+      }
+    },
+    {
+      "id": "rift_bonewalker",
+      "sourceFingerprint": "f03c004f0931165a6f4b3b58ee466ed2264d3f816446f55016fa5eb9b2155cdd",
+      "output": {
+        "bytes": 2818,
+        "sha256": "b00652adcc84d90babad10cb789d33909d918592cf595119d3990cd4b331e537"
+      }
+    },
+    {
+      "id": "rift_boss_arcane",
+      "sourceFingerprint": "3131e92b28fb30a2a461e7b1f1fb5ffd1f0f934f18f6ba529a2c63ed35a3bf75",
+      "output": {
+        "bytes": 1944,
+        "sha256": "b043910c215974e8e81b677e827ad59b2b82971f64ccf163cdc920728af01512"
+      }
+    },
+    {
+      "id": "rift_boss_brute",
+      "sourceFingerprint": "90af9202386f33e3b289a569088da3c4577286ec9e784d25e78456d1896ad3f0",
+      "output": {
+        "bytes": 2420,
+        "sha256": "7492c00bd77fa7f2fab0d81a9688fb2e51e5fe3d675b7b514f684da1dec583ca"
+      }
+    },
+    {
+      "id": "rift_boss_ember",
+      "sourceFingerprint": "59c924bbdf0a964470268d142a91f383beab64d0cf6261519ea27172bfabd4ae",
+      "output": {
+        "bytes": 2518,
+        "sha256": "6a6f0ec8a89c1a3950afcc44a8be040a1a979f88beacd701fa75d3cf6249be9e"
+      }
+    },
+    {
+      "id": "rift_boss_frost",
+      "sourceFingerprint": "c4f777c1626b49f4d3fbf79b07973ce909a61afa58f834b0ce423606b5e39369",
+      "output": {
+        "bytes": 3222,
+        "sha256": "1b476244ac100c6a76669ee8b30c1889b22cf073a094c9f11f7c186fa44aa01d"
+      }
+    },
+    {
+      "id": "rift_boss_necro",
+      "sourceFingerprint": "fc6a0eb898a41d5e178efe0e55b0b5c21c5a076ea53f1e13a4960f72d60a3a6c",
+      "output": {
+        "bytes": 2802,
+        "sha256": "ba764f2eb89f5109c13b056a8fb740b9d3fb31b2e45ba14bf5b6c6c7d10411b5"
+      }
+    },
+    {
+      "id": "rift_boss_pitlord",
+      "sourceFingerprint": "ba35837c70b66b3cd69dfb07082ccddbc03904746379f4ef2522ca7f72934e84",
+      "output": {
+        "bytes": 2068,
+        "sha256": "fd5de4dc66bfe10f6bcaeeadb539f4443dc140ec12badc2eec0be4e77b425b99"
+      }
+    },
+    {
+      "id": "rift_boss_ritualist",
+      "sourceFingerprint": "0f0bf297f22ef5bbbee367edafbba15ec20648bd82f0f9addd5ab59b41871bd6",
+      "output": {
+        "bytes": 2270,
+        "sha256": "86c730fc4c517fa9c1d429504360333b5415f3c8cd3e81b1a891e9887c9058e5"
+      }
+    },
+    {
+      "id": "rift_boss_storm",
+      "sourceFingerprint": "90589ee1c60bcc2201fb2e61b0fcd77dae6f387307d227170b547e19039b05b9",
+      "output": {
+        "bytes": 2500,
+        "sha256": "10977902dbcb268c2c88b340844333744c74beb1c4d47f2eb3344f637afbdec5"
+      }
+    },
+    {
+      "id": "rift_boss_tide",
+      "sourceFingerprint": "17c3b6289ffe9345aa33f55bddf3efcf10c064795d6aac70b0c9d51901d86dbb",
+      "output": {
+        "bytes": 2238,
+        "sha256": "ff4236304d9035e8d17f6e21d94242d1a28938f9c3334797d03efe8e050e7093"
+      }
+    },
+    {
+      "id": "rift_boss_venom",
+      "sourceFingerprint": "3a8e911982e74762bf05fa2c48c2af0c90714232db3c247a4173f444911505ac",
+      "output": {
+        "bytes": 1784,
+        "sha256": "e1a45b50340f04aa25fac0d8ea4de6f361a2798f8c509c79fd46f15499596162"
+      }
+    },
+    {
+      "id": "rift_deep_lurker",
+      "sourceFingerprint": "8b7f7aeb406b868bd4fcb2fa61e50171181389f0449f4c507dc0fdeb8277ab5c",
+      "output": {
+        "bytes": 1680,
+        "sha256": "31329bbd123b7b03064d03c54ddc80f59f41cafec232f0e2df4f1b123cee04fb"
+      }
+    },
+    {
+      "id": "rift_dread_stalker",
+      "sourceFingerprint": "e39466c488bd23e705a5666730c03161f6d3c997deec971d7f59bea667dfea93",
+      "output": {
+        "bytes": 1744,
+        "sha256": "d0b5460790864b9014128b59a6b05a581919f69c1322b134c4dab7c7317478da"
+      }
+    },
+    {
+      "id": "rift_ember_fiend",
+      "sourceFingerprint": "c3783d8c33c870de14da6f90971b11a50aeda7f761dd4986d21b6c5efe9875c2",
+      "output": {
+        "bytes": 2074,
+        "sha256": "f5610bf119ffd6a956eceff55af380fe37559b5de948266d7486e74c60f57c0f"
+      }
+    },
+    {
+      "id": "rift_frost_revenant",
+      "sourceFingerprint": "53012bf5f64e93e36a124cf5f7ac8aad59f9b51303f182373c2f1898f5db9da6",
+      "output": {
+        "bytes": 2358,
+        "sha256": "5dcbbef60e32e03319a65aa631717dd4cc763babcdef2a5ee9ca8f5f30739821"
+      }
+    },
+    {
+      "id": "rift_hellguard",
+      "sourceFingerprint": "ee81a079ae5c2701ca81d31968feee67ac97d46ea86c234ba4f0cf5c2273825d",
+      "output": {
+        "bytes": 2048,
+        "sha256": "bf39dad9406224f09db89ef4fb6e714df9f070dcfe5a077d5f577751911f3fd5"
+      }
+    },
+    {
+      "id": "rift_magma_brute",
+      "sourceFingerprint": "3fae7fdf5ebaba1420fef5c34e2f8d2297047d1c246c0127f30bebffa19c118d",
+      "output": {
+        "bytes": 2296,
+        "sha256": "b16e38edbe77c5af36f8cf8aa2d4bfd87e77420a003b616fcbc6e6fc4cc43628"
+      }
+    },
+    {
+      "id": "rift_marrow_golem",
+      "sourceFingerprint": "b49110e86826d341287a330f8f3a09a6beb784a4e18d794327a4b8e5e67ac44e",
+      "output": {
+        "bytes": 2944,
+        "sha256": "d30619668bdbd928ddbff07c89fb6805a901d38d9381ff4df59aed9de6db4035"
+      }
+    },
+    {
+      "id": "rift_marrow_troll",
+      "sourceFingerprint": "989d3588d6b2dff30cef12ed4894b75659a4d87bde986eb6f942b73c2fb3a04d",
+      "output": {
+        "bytes": 2036,
+        "sha256": "ca3a3685bbef80a5ad9cf62c668f1602e8085fe7c7872e040ec3adfacb600e50"
+      }
+    },
+    {
+      "id": "rift_pact_acolyte",
+      "sourceFingerprint": "d9c724c6ae38632b6da5744c3a25aa4681028384667d3e656d03486333f66abc",
+      "output": {
+        "bytes": 2134,
+        "sha256": "0d4d0f000e8e32efa7b1814f894302c33864357d5e3545b4659f38b866174913"
+      }
+    },
+    {
+      "id": "rift_rime_elemental",
+      "sourceFingerprint": "36f3709e710cd64840f3237af8e3b7037175d173bca00bfc82a00124728e80d1",
+      "output": {
+        "bytes": 1926,
+        "sha256": "a09786e734e51e297d20eb425625c5c7c40f27c98e022f3f60577865c45f6deb"
+      }
+    },
+    {
+      "id": "rift_spawnling",
+      "sourceFingerprint": "9fca12053d166c1fb5dc2c3c6fc870b06546619f86747c06584be7bfcd8ce5f8",
+      "output": {
+        "bytes": 1768,
+        "sha256": "a7961c4cc78054eba9bf4470c5c43a2176559cf55fdb74b5bfb3f80e6915ab2e"
+      }
+    },
+    {
+      "id": "rift_stone_ogre",
+      "sourceFingerprint": "0ba29760cd0032d555eae8cbc0865bf72c7e449915880cc1ab1ae1f82763c2de",
+      "output": {
+        "bytes": 2438,
+        "sha256": "7bab858d2f88dc9138cdd150d0ee4a919dce34271dc5f140614d84e2698bf1fc"
+      }
+    },
+    {
+      "id": "rift_storm_caller",
+      "sourceFingerprint": "8cf942b5274c0cad5fe8a4797291ba5b32de7112c6ef36b4b1b63b4cd413a716",
+      "output": {
+        "bytes": 2508,
+        "sha256": "482ec64ce77d7e24212eb43edbc3755104b09c8bea86a327e0b5f66f15cbc8db"
+      }
+    },
+    {
+      "id": "rift_stormscale",
+      "sourceFingerprint": "4dd93f0152b1ecff12b82bc7991613e319477c7e2e73d11bedffb9927e05ff70",
+      "output": {
+        "bytes": 1986,
+        "sha256": "2ec408116aa3ae076acc119b72cd487e18352e8dac44b3fa6e80d04acd4a3c65"
+      }
+    },
+    {
+      "id": "rift_thornback",
+      "sourceFingerprint": "ec1e8b85ff5d44f8a1a4acb5a1291d5745a353ee8a0a7cd4d5fe2fc61d194889",
+      "output": {
+        "bytes": 2668,
+        "sha256": "07e1ffd98732cec5a2cff5ba0fc16d390caa4ac0796b4c555d613ec6022759d8"
+      }
+    },
+    {
+      "id": "rift_tide_thrall",
+      "sourceFingerprint": "fb2b85aebbf2e70f5a8627aafeec4d238a463b729144e3f26e6d518fdd6e3573",
+      "output": {
+        "bytes": 2234,
+        "sha256": "9731548025605f51fd9d292daf336b11d1633d0025fd0fe95c5e2a8311d16a4e"
+      }
+    },
+    {
+      "id": "rift_venom_weaver",
+      "sourceFingerprint": "62813c8e3dd3aaae8f8727dd6e6fbc730d83612beed507cb3da7e0eede884380",
+      "output": {
+        "bytes": 1820,
+        "sha256": "829deed19e5f7b8834fc27b871e56921ea3f6d892166c8e16b3a19e2806a6b7a"
+      }
+    },
+    {
+      "id": "rift_void_acolyte",
+      "sourceFingerprint": "b92bc6f5e9999c82268737d59afcfaeb252779e0ab17ab17dc0de9a2ab823973",
+      "output": {
+        "bytes": 2006,
+        "sha256": "4fc3b10e22d99c6851fdf65454fb4906113b1f7036e639941f3e5d5dfdc8a0ff"
+      }
+    },
+    {
+      "id": "riftspawn",
+      "sourceFingerprint": "a7dae98779a9ddee9cdc3a75a704a242a37df367973476204ad6cb96869d46d2",
+      "output": {
+        "bytes": 1752,
+        "sha256": "ad4f55b959cb1735ae129301b500c146eb1c754233c5ab5b3768fcc59fe20381"
+      }
+    },
+    {
+      "id": "rime_egg_sac",
+      "sourceFingerprint": "707a31fb8e4fba4ba73865807c324f791b9271ede1a1a0a01fcd4306dea1ab5b",
+      "output": {
+        "bytes": 1806,
+        "sha256": "9e652555d84de4b5a940e2baf84f38e826a90c53d1f7b81985bf72bf25cce6b1"
+      }
+    },
+    {
+      "id": "rime_elemental",
+      "sourceFingerprint": "54696fda48eadef33372f8b3ef039404481c9558987cc75ba2d8a3095cdeb4cd",
+      "output": {
+        "bytes": 1970,
+        "sha256": "e1595d570816675754c59e492d56daf29755aa72c7d42c4040c61b4b19732a81"
+      }
+    },
+    {
+      "id": "rime_whelp",
+      "sourceFingerprint": "1648f0ec6ba9db4bc60307bca3f2519c35781b39bd17d18474dbe516c63fab63",
+      "output": {
+        "bytes": 2466,
+        "sha256": "759fd0745b46b969d3e15c5fcbc7d3ada40077c8d52f9d284168776f6c3fe440"
+      }
+    },
+    {
+      "id": "rimeweb",
+      "sourceFingerprint": "47d8bfcfeaf1babf8b8777f4b411aeb3280d8a5d4fdb84fe5dc1fbadfa7fe25f",
+      "output": {
+        "bytes": 2078,
+        "sha256": "bd8a59537122686f420d3eacc09f6d10e7b6ef0490c649a4b0a2cf17ebec3112"
+      }
+    },
+    {
+      "id": "rimeweb_hatchling",
+      "sourceFingerprint": "5157d4a1cf7d753e8a11c086625daa40acc5311928ed30db0480a1c6e0970a44",
+      "output": {
+        "bytes": 1760,
+        "sha256": "63510898c18f42cb81346aa2c8d5f1e58f50941a76119028e8f354bdda4b11df"
+      }
+    },
+    {
+      "id": "rimeweb_spinner",
+      "sourceFingerprint": "a8713eb6046a805c178d1c1ef35f8e347795943d349ccd4bbedf727fe92f172e",
+      "output": {
+        "bytes": 1812,
+        "sha256": "e45b808e429b20016af93271198a658992f18ed3b49f1dbbdb6f843f7e5dfde3"
+      }
+    },
+    {
+      "id": "sanctum_boneguard",
+      "sourceFingerprint": "10406e38e1d0ec058b9f77b0123653e7deccd38b4dbd31085263eae59464f611",
+      "output": {
+        "bytes": 2588,
+        "sha256": "4b04728c992a2b31e379a8de26a1e610426f8e19bbfe486d981403b15839eeb4"
+      }
+    },
+    {
+      "id": "sanctum_drakonid",
+      "sourceFingerprint": "4ec890e505c7effb1ec09bfd15c0d8c536284a56021993a56df07324b3f0fd16",
+      "output": {
+        "bytes": 2280,
+        "sha256": "4d71524d468e15221f89909bc624799b36da7f7193530ac500f349b2d71b7170"
+      }
+    },
+    {
+      "id": "sanctum_shackle_anvil",
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "bytes": 2950,
+        "sha256": "0c0192d21a435bab459088903b4ec783a5d173acf5e1196f69092f3499ed9ad7"
+      }
+    },
+    {
+      "id": "sanctum_shackle_bellows",
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "bytes": 2950,
+        "sha256": "0c0192d21a435bab459088903b4ec783a5d173acf5e1196f69092f3499ed9ad7"
+      }
+    },
+    {
+      "id": "sanctum_shackle_hammer",
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "bytes": 2950,
+        "sha256": "0c0192d21a435bab459088903b4ec783a5d173acf5e1196f69092f3499ed9ad7"
+      }
+    },
+    {
+      "id": "sanctum_shackle_tongs",
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "bytes": 2950,
+        "sha256": "0c0192d21a435bab459088903b4ec783a5d173acf5e1196f69092f3499ed9ad7"
+      }
+    },
+    {
+      "id": "sethrael_palecoil",
+      "sourceFingerprint": "22eedc82ff2476286863035d3d214d1d219fc330afcadfdc78d49dbc2338be53",
+      "output": {
+        "bytes": 2188,
+        "sha256": "a22f4b4216900a8e328da638705923c8d1f7f6967c81089b0679419582653586"
+      }
+    },
+    {
+      "id": "sexton_marrow",
+      "sourceFingerprint": "246ce277297008e314821b4dee303f3fdca1f540ea3cdee0e1dfee86146ecadd",
+      "output": {
+        "bytes": 2392,
+        "sha256": "6624dcc15368572becaf96d403e9eb031387a7acaf043bb505f07d7be9b59589"
+      }
+    },
+    {
+      "id": "shackled_prisoner",
+      "sourceFingerprint": "ce2d5b06c70f06558248f74027a98359053f8737760f629d0a84178c7202bfa9",
+      "output": {
+        "bytes": 2304,
+        "sha256": "537fa99a76a4acbebc1136ad12b10c0658cd1485a3cca6f672c030006d930c73"
+      }
+    },
+    {
+      "id": "shardlord_kazzix",
+      "sourceFingerprint": "642adec63d608a9ce149793272177044b433d330d161b6cf8d11786732e55c50",
+      "output": {
+        "bytes": 1978,
+        "sha256": "d5c9dab5316a2e5b5fb05267c151b2485bb1a1fb5ae90933bb5576c92665cebd"
+      }
+    },
+    {
+      "id": "shoal_scuttler",
+      "sourceFingerprint": "66cd6a9301e330fc24b9dfeb7769b177fe8b4693f9674d8474ef8c40d2b5d5aa",
+      "output": {
+        "bytes": 2052,
+        "sha256": "cd3c82f3a09f2fcb5cde081955a33277097a0432823b300d867f4d2dcbaff685"
+      }
+    },
+    {
+      "id": "shore_scuttler",
+      "sourceFingerprint": "5410bf927da41fef18efaec05fbd45e67553daa2cf80644d204ae2136d061cb4",
+      "output": {
+        "bytes": 2066,
+        "sha256": "b9375c333b12f7e8c5ca47df180dd156f5b80e79f6cd2e4f8d31828b1931baa1"
+      }
+    },
+    {
+      "id": "sister_nhalia",
+      "sourceFingerprint": "d764570adfe68afcb8a75361808ae53ed5b7bb4f0570da94069314aa0ce4aacf",
+      "output": {
+        "bytes": 2114,
+        "sha256": "9d8650c869616e8cbf89a0e599ab9da5f574130519d557f9fadddb3188d2adcf"
+      }
+    },
+    {
+      "id": "sister_nhalia_drowned_canticle",
+      "sourceFingerprint": "4fe5bc3750d4ad72e298d88f69954b289d09229f4199ea7a9905e64037876c81",
+      "output": {
+        "bytes": 2104,
+        "sha256": "2b387755ff729d14b5c53dc79a8081454dee101a4ac0ac13f40b515aa5257db5"
+      }
+    },
+    {
+      "id": "sledge_tusker",
+      "sourceFingerprint": "abb3333470ee0203fe0d5cec9bef43bc123fa05c77a495a0a78e40618ef2bca4",
+      "output": {
+        "bytes": 2514,
+        "sha256": "dce80848749ca8134bb388e774ce4e36ee4a27ab55ae5afe270c5764108a1bb9"
+      }
+    },
+    {
+      "id": "sloomtooth_the_drowned",
+      "sourceFingerprint": "675eddac7949be307bd4ac244c9a33c5b5c3f1a212385f9e9dc12b6c9ddb69d5",
+      "output": {
+        "bytes": 1738,
+        "sha256": "ccfbc539fc49a2afd9b67416e5bbbc115d36fd9534b5e8bfeee129c626749ac9"
+      }
+    },
+    {
+      "id": "snowdrift_wolf",
+      "sourceFingerprint": "c9eebda31b0b3d2a4290e31160adf2985c52fc3a89ba2e03e98d71daad5f5f61",
+      "output": {
+        "bytes": 1976,
+        "sha256": "9ac8afbfc351eb3b0ee7f1d64827bee2e1e39fa32ea02c86b5396c6211dc86f5"
+      }
+    },
+    {
+      "id": "soul_brazier",
+      "sourceFingerprint": "739d68ca367f5ea5d761d0d7854a498eb9d7444185b22572722fdb4f3b3ddc06",
+      "output": {
+        "bytes": 1564,
+        "sha256": "d470db2a1303c2722b3dc12434a3e43100715e1400e2c6aabec37965522891a2"
+      }
+    },
+    {
+      "id": "spider_egg",
+      "sourceFingerprint": "d36ce145a86b1de13aaa44407e6f04f154de46ec20ff8ea917029e5bf5822ee7",
+      "output": {
+        "bytes": 2252,
+        "sha256": "2e4d6a0264b5d9c6eb92474bdbb5de352341dbc0aeb2ff1ef8cc10f330eba8a5"
+      }
+    },
+    {
+      "id": "spider_egg_sac",
+      "sourceFingerprint": "1c79f13de45d4ee58aac797b2513ce219cc014d5b0b3d461d742fd189b31648a",
+      "output": {
+        "bytes": 2258,
+        "sha256": "144b606172574a2d10dd9394e67b290522bd8ab9c184d2c6256535181824773a"
+      }
+    },
+    {
+      "id": "spore_toad",
+      "sourceFingerprint": "2f08ec1085d43ea371897f413c65946d2f06ce3bc0873be4459d7a0def116cbc",
+      "output": {
+        "bytes": 2598,
+        "sha256": "05135b8ed34c028f6834a01c8348f4658c5cf6e07ad4d1d1dbd458a6041afb9a"
+      }
+    },
+    {
+      "id": "sporeling_gatherer",
+      "sourceFingerprint": "c72c8e80b251026fe30ff478863d4253ca252ed16e338f531df73f4a85ca143a",
+      "output": {
+        "bytes": 1652,
+        "sha256": "8804dab7a14ae106c4c9386bc5a006fc499722934fdd2977fc39fe339847459b"
+      }
+    },
+    {
+      "id": "stable_horse",
+      "sourceFingerprint": "3fe703a9c2a9787974b3df54ba1ec8407099d8e42539a624eac5c50a123f452e",
+      "output": {
+        "bytes": 1964,
+        "sha256": "12d707cdaf5a53a62c91feca27e85b6ac24fe4b706c2ae8f73e505a4360e3b41"
+      }
+    },
+    {
+      "id": "stormcrag_elemental",
+      "sourceFingerprint": "da80b39fba2d6db10a966e201ad3b4a7b7bbd39634466554bdcfb20bdd631c0f",
+      "output": {
+        "bytes": 1962,
+        "sha256": "5cc072d36c8fac84c26e619b8dbe2f81c17eef7dbb350af09382c2671d00075f"
+      }
+    },
+    {
+      "id": "sump_troll_devourer",
+      "sourceFingerprint": "63a41994e7e93d0f62ed3e62f3600d7bdc45d9fef8c87aca3e29d34a1dd582c4",
+      "output": {
+        "bytes": 2056,
+        "sha256": "17920e59615cbe3248ee00b25feb2fb587e8f428cd5bb07890b2c63a31ddd710"
+      }
+    },
+    {
+      "id": "sunbone_dread_totem",
+      "sourceFingerprint": "f3150988e12fab02760205fe96ce05dee8da108247426d2d6c4542587cbb781f",
+      "output": {
+        "bytes": 2528,
+        "sha256": "e35a52527f9b7a4e977a962cc2718b53c90496f828ed25a832851210c5a47af9"
+      }
+    },
+    {
+      "id": "sunbone_totem",
+      "sourceFingerprint": "37b443acdafa6383c3dab3a4c1eb20f7976fe03db915502f55c6813f3ce68ef4",
+      "output": {
+        "bytes": 2556,
+        "sha256": "044d3084cbe96ab752df1797a0f34224560d542382b7e8c55a2a1cd39895ab21"
+      }
+    },
+    {
+      "id": "sunbone_totem_binder",
+      "sourceFingerprint": "187f41af9a1c1ee9fde09f8b8485b841708342fd1e3b62cbf1671865287df643",
+      "output": {
+        "bytes": 2984,
+        "sha256": "fe09ff14dfa882d912a2e66b996d40ab8ca7d771151421bb48311819d1b36940"
+      }
+    },
+    {
+      "id": "sundered_horror",
+      "sourceFingerprint": "bfd6a45fe0213b7d1ab4c7cbab84b66bb56d1b033e3c1ea1742df9d08a12daf2",
+      "output": {
+        "bytes": 2404,
+        "sha256": "fec7eac3615c4f62745f92014284fbe6d08ec7847891ddf9ba2183d4ec1e95f2"
+      }
+    },
+    {
+      "id": "terrace_howler",
+      "sourceFingerprint": "81e52142fbe236eb5b6d7572fe343c48eda5b4adfc7a7e0475a626192e06bdf8",
+      "output": {
+        "bytes": 1924,
+        "sha256": "ab589c6489af04c92795461eee5747db3ed98fd23e19fb11211188f434fae476"
+      }
+    },
+    {
+      "id": "the_gorgebloom",
+      "sourceFingerprint": "b53fdb29f7b13526ed5df71cce5d3d11599162b615817ffe217f80eea97cef53",
+      "output": {
+        "bytes": 2170,
+        "sha256": "5b8df5fa68d4b735fc71995fd7492dd34e5c78ad73088b83387aab3945272cf3"
+      }
+    },
+    {
+      "id": "the_meredark",
+      "sourceFingerprint": "d44ead74aae8c48612c3f9353768507bc1fa0c54ebb79adc2420e18070d86233",
+      "output": {
+        "bytes": 1820,
+        "sha256": "b14db6ec964ea25c6de9b588ade5da44e702b93fa5a270751751322170e8a616"
+      }
+    },
+    {
+      "id": "the_topiary_bull",
+      "sourceFingerprint": "7031e81fb88a32ce2d57c05c8bcf8a5cd945b8239973a07106376df0543e3c5a",
+      "output": {
+        "bytes": 1544,
+        "sha256": "eab512ca1429ba41daf054a30d1c06c3aaa847656dedf130ce8efeac86f93e8d"
+      }
+    },
+    {
+      "id": "the_wreck_warden",
+      "sourceFingerprint": "b15002baa899163f99ee3cef440038aa244445c16d23b172da3c903df364ddcb",
+      "output": {
+        "bytes": 2576,
+        "sha256": "2216319bb00c82dc6f121135776c77656925075511df2b29a3ec08d8d871a8e4"
+      }
+    },
+    {
+      "id": "thicket_boar",
+      "sourceFingerprint": "66f18f088572b2c9aba37e7a67ca0afb5db3351a29db17fdb0de09f0be5985da",
+      "output": {
+        "bytes": 2770,
+        "sha256": "7ff23e9b55487595675d79e972c69026131cb0fa0a7bf8dcc986c047b4cb48fb"
+      }
+    },
+    {
+      "id": "thorn_sprout",
+      "sourceFingerprint": "edbb0eab3cba403032f01db1784b02214c278a4d458eb85ac9187e71ff232b9b",
+      "output": {
+        "bytes": 3180,
+        "sha256": "7f9f27664bb3870d4ad4c320f02624a094219bece1236577ebbe57e483974d97"
+      }
+    },
+    {
+      "id": "thornpeak_ogre",
+      "sourceFingerprint": "bff7ca75c928b3dc7484d8a59f1525522d039d85b951c0309a9ff068e10adbec",
+      "output": {
+        "bytes": 2436,
+        "sha256": "1bd9f3f2b3f89748031db3f74d1d2f5a99640548966068135a1461bb98d2b121"
+      }
+    },
+    {
+      "id": "threnos_first_voice",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "thunzharr_stormling",
+      "sourceFingerprint": "a9c9c0baa8eb01297eab2ff891d4bfe064f746d29813679f2a381798fc622a15",
+      "output": {
+        "bytes": 1996,
+        "sha256": "f6ddf3f50dafbed1effe9bc061eaf76980daca7c8d9e91a003683f7aa3b5143b"
+      }
+    },
+    {
+      "id": "thunzharr_waking_peak",
+      "sourceFingerprint": "35620a2ccdf09386916722951b8fc9ac8642ad66b585511b3335a154eac1b41d",
+      "output": {
+        "bytes": 1972,
+        "sha256": "7ba9151944d5b8d7f9a22a0163d55e768f13ded634c14bf3c234f76dfb438de7"
+      }
+    },
+    {
+      "id": "tide_scuttler",
+      "sourceFingerprint": "f0efc1346c9252a3737430ff6a22cef3a2ff6565b94a29fc5a94970df09991f9",
+      "output": {
+        "bytes": 2334,
+        "sha256": "5ee5968c03351c419c3fdce770e9979d95dda9018e43e470bd92ede71c1e7eb0"
+      }
+    },
+    {
+      "id": "tidebound_acolyte",
+      "sourceFingerprint": "bb37e47536191d48cdc4a31a01d3e3cbf7ecb41d15fd4f102da5e78c66ec50a8",
+      "output": {
+        "bytes": 2156,
+        "sha256": "83a53555106bb97b552cfc4bd3706f73726de0f098eb1a31d2ed678b177659d7"
+      }
+    },
+    {
+      "id": "tideglass_colossus",
+      "sourceFingerprint": "80bb3a30af1023bc99b5db42c2236b0e4eb418f9291dc1fe7499e5f9ecd07664",
+      "output": {
+        "bytes": 4296,
+        "sha256": "ef80213d3fce35f67798eba65b20660e6928ffb925fcba224d29e20b0d562a38"
+      }
+    },
+    {
+      "id": "tideglass_reflection",
+      "sourceFingerprint": "33d9757449bcec9031002b2585b8238e0cbbea2df47b48e17a9eac4f31e6beff",
+      "output": {
+        "bytes": 2054,
+        "sha256": "f87b34237b41257c55881680eefc187119e305a77747e0f9f04cbed511273b09"
+      }
+    },
+    {
+      "id": "tideglass_reflection_druid",
+      "sourceFingerprint": "2d982ea1b651e6a15f7f113c2a17e060e9509cc9b33c9965abb61bff4ff158eb",
+      "output": {
+        "bytes": 2102,
+        "sha256": "a032c0de8bcbfb20544b4886c07829a8c9016ef4c85d3d40ca1cbb6d291c894d"
+      }
+    },
+    {
+      "id": "tideglass_reflection_hunter",
+      "sourceFingerprint": "66f49deac73891136aa2645506326de26e84b25791280c9c70475cdcab0d8042",
+      "output": {
+        "bytes": 2580,
+        "sha256": "c96572cfd8ce839986e32aa711096dd1b7f1944d470fa44b77cb91c9ee344d5a"
+      }
+    },
+    {
+      "id": "tideglass_reflection_mage",
+      "sourceFingerprint": "f6b5d062325143ce6be687bb8ed3941fbdd65a970f649e54c15873c6d07eb3c9",
+      "output": {
+        "bytes": 2108,
+        "sha256": "f89a0f1e1b02d172b2c8a8256709a7c00c354ba30a1a24d7d791d96523b146e6"
+      }
+    },
+    {
+      "id": "tideglass_reflection_paladin",
+      "sourceFingerprint": "47aeae666306560184feb76340ebe89b602e8881754645bc10da8473dcdf4c5d",
+      "output": {
+        "bytes": 2492,
+        "sha256": "7f09dda92ad1157456a9af5bbec674a0f462d1979c2d3dadd9595f3315db700d"
+      }
+    },
+    {
+      "id": "tideglass_reflection_priest",
+      "sourceFingerprint": "55bd9cae3cf08874bb70aed9ff82cbf621679db491324d2d15e74bc2df043df5",
+      "output": {
+        "bytes": 2108,
+        "sha256": "f89a0f1e1b02d172b2c8a8256709a7c00c354ba30a1a24d7d791d96523b146e6"
+      }
+    },
+    {
+      "id": "tideglass_reflection_rogue",
+      "sourceFingerprint": "ef35cbc5ee38034478406173ed1d12785249d6c043550e475dfd1bf66f0b2af0",
+      "output": {
+        "bytes": 2056,
+        "sha256": "4f0fa0a5eaceedfd630e3c1f74de8f7797162d061e5b8356b0664f9cf95fff30"
+      }
+    },
+    {
+      "id": "tideglass_reflection_shaman",
+      "sourceFingerprint": "323414ccfbb6a0ea7867fa966df5ad90448fd6ca0e8649c194de4284a67fa86b",
+      "output": {
+        "bytes": 2532,
+        "sha256": "4956ab89e30ba6134f9a7046e7076e5986b3a916a480d33f9811385d2564dd72"
+      }
+    },
+    {
+      "id": "tideglass_reflection_warlock",
+      "sourceFingerprint": "951882d99aef4817af8db2d37a704ab8ab676119a453d4564626d7a14001d9a9",
+      "output": {
+        "bytes": 2352,
+        "sha256": "16d1281183582e1865dbcbdc1824476033222746292dcf43a8b2b99b2e5d1b3a"
+      }
+    },
+    {
+      "id": "tideglass_reflection_warrior",
+      "sourceFingerprint": "33d9757449bcec9031002b2585b8238e0cbbea2df47b48e17a9eac4f31e6beff",
+      "output": {
+        "bytes": 2054,
+        "sha256": "f87b34237b41257c55881680eefc187119e305a77747e0f9f04cbed511273b09"
+      }
+    },
+    {
+      "id": "tidewisp",
+      "sourceFingerprint": "4d169866151e956839c68f3fdd22bc2a2379eb487c5144a4a9c8e0e0cd986fdb",
+      "output": {
+        "bytes": 2190,
+        "sha256": "32cfbf0088fd881293cdfa4f3cf1f33b1da7ab4f1692448d227d2ff7d80f0087"
+      }
+    },
+    {
+      "id": "tolling_bell",
+      "sourceFingerprint": "f3d377ffdff58198a067aaff429cd0272732c2f3d13ee0b51c0bc54ee77e2433",
+      "output": {
+        "bytes": 1564,
+        "sha256": "291634f76d6b5b2b0ee52777404f8ea3ba424ed35cb4d67ab5a7cd7bd933f9d9"
+      }
+    },
+    {
+      "id": "topiary_stag",
+      "sourceFingerprint": "39405ae6cd7aa314ae75a67530bbedf3524606107c1fb6fcd79d5570c86802d2",
+      "output": {
+        "bytes": 1926,
+        "sha256": "9283fd9cab1a89a7e3277c23378c982a53716baf379071668652536c6e0ab261"
+      }
+    },
+    {
+      "id": "topiary_wolf",
+      "sourceFingerprint": "fceb8e7950b5d709ea39d5d7d0a74028701b26cd92ca06b754307ba22f379a43",
+      "output": {
+        "bytes": 1810,
+        "sha256": "9baf724d551d018481adba526f14fb9f5fcee3f35a8a6ec95758b6d239273b9d"
+      }
+    },
+    {
+      "id": "training_dummy",
+      "sourceFingerprint": "2b45c3ab5c106f0bcda1101a6c31f56a61148e76d43ecec1fa0444b51ba64ac6",
+      "output": {
+        "bytes": 1792,
+        "sha256": "3d2b84687d58cab79f273735154816cd1cc870b02f76ee9d852f3d7d3d8dc55a"
+      }
+    },
+    {
+      "id": "training_effigy",
+      "sourceFingerprint": "e1dccb172f7d36ec3c89bf242071bfb6b0c7d567ff86f9d5df691bc9389b86c7",
+      "output": {
+        "bytes": 1774,
+        "sha256": "d0b03609a4e345157e950c1ea9ab79672db38b028ca9f7995d89e1ea97fc079d"
+      }
+    },
+    {
+      "id": "treant_elder",
+      "sourceFingerprint": "2cdaae6f3c5d040ba74821b47236599703a55515a54e2e9b674cc862446183f2",
+      "output": {
+        "bytes": 1820,
+        "sha256": "fa2e4fb1a2cbb7d2e02128e0ad1af8d1a744aaedc12c745bd9d9058c248747d5"
+      }
+    },
+    {
+      "id": "tunnel_rat",
+      "sourceFingerprint": "820c237cca9f63dfd62ee7459dd0a9c220558db87ee0d0cd5cde52b78e231610",
+      "output": {
+        "bytes": 2452,
+        "sha256": "9d6744eeb16b9ac07e2171214abe2acbdde02c46f6e96f6e96ec977571adb640"
+      }
+    },
+    {
+      "id": "turretback_hermit",
+      "sourceFingerprint": "37350f0b78476aeea63b923dd96d4ad9d5674e96fdc3e6d78796bbfb3a6d5050",
+      "output": {
+        "bytes": 2226,
+        "sha256": "885ca6291460e6b78723062d343619c21b90d64f9866705255b5d51d4ecb1767"
+      }
+    },
+    {
+      "id": "vael_fog_shade",
+      "sourceFingerprint": "bc28feec43652168c035bd2cb0a3eab5d1459f0a5f0c18891e76ca4070df5ae8",
+      "output": {
+        "bytes": 1710,
+        "sha256": "774fcf6315403beb4eb17cc73647ec6bbe9aae8a4f6c1562a8573b6d43872d7a"
+      }
+    },
+    {
+      "id": "vael_the_mistcaller",
+      "sourceFingerprint": "bc28feec43652168c035bd2cb0a3eab5d1459f0a5f0c18891e76ca4070df5ae8",
+      "output": {
+        "bytes": 1710,
+        "sha256": "774fcf6315403beb4eb17cc73647ec6bbe9aae8a4f6c1562a8573b6d43872d7a"
+      }
+    },
+    {
+      "id": "vale_bandit",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "varkas_boneguard",
+      "sourceFingerprint": "b6c76e7ed755ae0b6548421763cac5deaf02c160a11e5bedf5a2bc85ff0d1ef4",
+      "output": {
+        "bytes": 2818,
+        "sha256": "40b1f2fb8e1dd9b7d22ae2f8887ed4fd592039207224d0d911b68c816f3f4b69"
+      }
+    },
+    {
+      "id": "varkhul_forgefather_of_the_last_flame",
+      "sourceFingerprint": "a1b01f3bd947684ddc20c92d46e4c7c96b25b7422ec0690f4cccb5bdafd27d3e",
+      "output": {
+        "bytes": 3354,
+        "sha256": "1ad569115e901dd1c2ec75ecaf154872fc477964eb381a2501ec32708d2ad917"
+      }
+    },
+    {
+      "id": "veiled_doe",
+      "sourceFingerprint": "8de69b954423f6319a41e4a67a9a15189f16695b0de4afd408735bdb8d9b54fb",
+      "output": {
+        "bytes": 1812,
+        "sha256": "da819e76a7f34d74a6adac167303bfcdd8217922313b66b3d07ca540522dd6ca"
+      }
+    },
+    {
+      "id": "veiled_stag",
+      "sourceFingerprint": "cc21f64e4650e65594a377dd1f802797af3162061aa8aaa4b76fc60d1bdabede",
+      "output": {
+        "bytes": 2532,
+        "sha256": "ec27b7684e3b0a207f783a3bda359c871171fb2008c8086819ad9ae2e5f01549"
+      }
+    },
+    {
+      "id": "vine_lasher",
+      "sourceFingerprint": "41061d02eb706721628aab3ebc3f38ecdab8fc7752dfb2cde2e9121f31887e2d",
+      "output": {
+        "bytes": 2302,
+        "sha256": "0538ab4baadf9f60b392cf48e557e00b408c8a81ebb35a62629a334909f7245d"
+      }
+    },
+    {
+      "id": "vision_aldren_warrior",
+      "sourceFingerprint": "ee70fdd7d44ed0351158acb68a2585677871b001603c57daa800d04fcc1efd54",
+      "output": {
+        "bytes": 2212,
+        "sha256": "de16bfc18de1b1dd8bf069457c19b89b1db1be7f1bdd8d21ff1f1ae89cec053b"
+      }
+    },
+    {
+      "id": "vision_deathstalker_voss",
+      "sourceFingerprint": "3a1a92d04d1a614553070e5f4ac90a671a8a40adbe829328a0738b596689a980",
+      "output": {
+        "bytes": 2196,
+        "sha256": "56ee641a3769222428de3ad5dcab643f909f0880fe546768a189971b034600a3"
+      }
+    },
+    {
+      "id": "vision_malric_mage",
+      "sourceFingerprint": "a834c4ef23294d515403b28addb8e71187cf554d6e8d80e3773f626a7466451a",
+      "output": {
+        "bytes": 2880,
+        "sha256": "e855d63f7ed1178e959d702f9304c774be376b9a4a976ccb1755f6716dedba18"
+      }
+    },
+    {
+      "id": "void_stalker",
+      "sourceFingerprint": "0616ef7b82bae498a417f8ff03e723ebd214fd772bbf439b691b072de996675c",
+      "output": {
+        "bytes": 1820,
+        "sha256": "6d8007fc91a4678cf86d4a99c79ef519678fcb0e9f39f7f20e502ff8460a4432"
+      }
+    },
+    {
+      "id": "voskar_emberwing",
+      "sourceFingerprint": "3540232320d8dbbab6f231493da3994db689cff8052cfed6e6e2150d59c653be",
+      "output": {
+        "bytes": 2276,
+        "sha256": "af386251d8dec833a6252a4d7fc190b6f9423209da813c9ffa4b617ff3b9bb9e"
+      }
+    },
+    {
+      "id": "waking_warden",
+      "sourceFingerprint": "dca980f6ee4d0dc0bcde6bdb8d85a9d71c9e6ca27355a3955a8096c3c3ab3b11",
+      "output": {
+        "bytes": 2822,
+        "sha256": "0e6bd28dda80c284c50d64743333b719e206b8179b3b84ff44f643e1c6bcc3c7"
+      }
+    },
+    {
+      "id": "warlock_imp",
+      "sourceFingerprint": "d5faeacdef6bccff455ac71af189ce54efacb477f9da3e5518326f322f0ee49a",
+      "output": {
+        "bytes": 2172,
+        "sha256": "7815c281a5a033356a0f93f1997248557459e6e50884f488fef75befe1f2f351"
+      }
+    },
+    {
+      "id": "warlock_voidwalker",
+      "sourceFingerprint": "c0aa3b2901b3c3f228b4b00de3a5c78d123b40c2fc1c567f4009b0198582d7fb",
+      "output": {
+        "bytes": 1772,
+        "sha256": "3ccc32d3a398bcc42db31843010cbfc59bb42baa60440204c281b59f78059f8c"
+      }
+    },
+    {
+      "id": "warlord_drogmar",
+      "sourceFingerprint": "b956face7162a619116a9e431a42b8c484bdde9173d071be2cb76d9d8978f20b",
+      "output": {
+        "bytes": 2338,
+        "sha256": "01237399bbf191f5fa46b521d9bdb71b2e2a27fd22c3576554cb965b0b5293a2"
+      }
+    },
+    {
+      "id": "water_elemental",
+      "sourceFingerprint": "2fb1fcf255a7121dfc23071eea85ef7178a54bbd0e7cae167e02284fafa873ab",
+      "output": {
+        "bytes": 2200,
+        "sha256": "39b66146015a40c5fb0cd9cb16589f80b65653f0c1f10c8cb6eed5ebc242a8ea"
+      }
+    },
+    {
+      "id": "webwood_spider",
+      "sourceFingerprint": "6b24737f485a350bec3ab6387b6355f7baceeceff75c46431fe8b2844d3458cc",
+      "output": {
+        "bytes": 1516,
+        "sha256": "ed3f8ad8970b410d3faa6f58819211a49bf9f44c562eace093eb2ea170d5f9f1"
+      }
+    },
+    {
+      "id": "widow_hatchling",
+      "sourceFingerprint": "8b940d99c4c01769048fb2db1acbbbd095568e475507e16a2431899b3b663139",
+      "output": {
+        "bytes": 1536,
+        "sha256": "226e2ec1fda1cab26bd3912bf2c15a1b9b74b56256a7bc1d4cc3c721a611d5e6"
+      }
+    },
+    {
+      "id": "widowsilk_spinner",
+      "sourceFingerprint": "2de5548a06f6c8c5c1b9c36db8e92fbe945154c86f47399e6be84f51d55379f0",
+      "output": {
+        "bytes": 1534,
+        "sha256": "1de9ee718a14c9fe77459e7fa728aaf1b94a579a335e54b88f195c779910e744"
+      }
+    },
+    {
+      "id": "wild_boar",
+      "sourceFingerprint": "951d84dc27cf080fa36f5f602f8728c9fe2da070b6beb5d4fb30a6da588bfc19",
+      "output": {
+        "bytes": 2782,
+        "sha256": "f09a2ab1c150719a71fcf3d1ae5d4dfbb3fcc6aae564fa63d4323331e092badc"
+      }
+    },
+    {
+      "id": "wildheart_beastmaster",
+      "sourceFingerprint": "03eb6f68b1fea7b4e263fde7cb5965a3f16f2bc6d309b22c8171f47001423659",
+      "output": {
+        "bytes": 3168,
+        "sha256": "994e3d3eae86a8962cee9ee09fc4b1cc9999a53163414267dccd94c5a32f0759"
+      }
+    },
+    {
+      "id": "wildheart_hexcaller",
+      "sourceFingerprint": "429116bbd70dc6c987264887d3677dd52cb3ed503d364ebc5da64e4b869e2360",
+      "output": {
+        "bytes": 3210,
+        "sha256": "cba8ce6ea945f281bab01c3defcd94290bd8756ac0cbad14a6df41524b330ce6"
+      }
+    },
+    {
+      "id": "wildheart_high_priest",
+      "sourceFingerprint": "119fe85f7e322bd33f8a8dfe2aa8447ca8ff6a9422ed7841d286bdda21cd85dd",
+      "output": {
+        "bytes": 3550,
+        "sha256": "a751b06c76da4080623185c3c9ca148f6884be4dc771bb9b6d4bcfe8aa5681a2"
+      }
+    },
+    {
+      "id": "wildheart_ravager",
+      "sourceFingerprint": "157004661e66d007f69d190081688b8b4f8a2c5934b97905e5fd1280698c6bad",
+      "output": {
+        "bytes": 3432,
+        "sha256": "de2170e747407445c8fdbbcd1848ed46f8f64b8447e291ed36175783804d16be"
+      }
+    },
+    {
+      "id": "wildheart_stalker",
+      "sourceFingerprint": "8566b5949a1b9a4f6cfe84d3f07a6d78a8bc35220e964b9080cbf5e797c1dbed",
+      "output": {
+        "bytes": 2124,
+        "sha256": "b1e2e308fb24fd8749cd6e5caab52dbe2d0c9fd463ed3c11db3c560595eae23b"
+      }
+    },
+    {
+      "id": "willow_sprite",
+      "sourceFingerprint": "836bd08aac06acc5a9d1609a7b5fa13081b90ebe2e54e3dd2dbd1298881e9005",
+      "output": {
+        "bytes": 1724,
+        "sha256": "b766e56fd7817a91616c6832f76d565a30fbda2c879a76f5e55a4957ef773eb2"
+      }
+    },
+    {
+      "id": "willowfen_remedy_caravan",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "wood_wraith",
+      "sourceFingerprint": "d9e1e5b72c8e8b97e9e8fda201523eec2533bec8d9eb237ee78866c11727ad52",
+      "output": {
+        "bytes": 1538,
+        "sha256": "75273f3234d55b83178b1a9d6a73c045ea62364f354df283a12adf3aa2240f82"
+      }
+    },
+    {
+      "id": "wraithbinder_maldrec",
+      "sourceFingerprint": "3de4c55c6e71c1dd0d95893263b0a1ba261ef16736db495f6258d1a9fd1a2504",
+      "output": {
+        "bytes": 2742,
+        "sha256": "9ff3dab2452bf3e5d6859177a08498ea63c65cb1c567d4c96fb10656aa23457f"
+      }
+    },
+    {
+      "id": "wreck_thief",
+      "sourceFingerprint": "9da432220776a23186325f6149bf94f38cce337b09cefc512424f50fcfd7d805",
+      "output": {
+        "bytes": 1712,
+        "sha256": "8aae9d814e1047bf7c038d18483fb836b323ee445cc7b00eabe1b3d917a21e1c"
+      }
+    },
+    {
+      "id": "wyrmcult_necromancer",
+      "sourceFingerprint": "6214edd42be9419e66beb928d4e4b3d2f6fde163ac839cb41b7f62247a92ca37",
+      "output": {
+        "bytes": 2130,
+        "sha256": "e3c5c45fe7cb489b12d6b74fb1fc42c02081d25669082b8f60bf965c5ad150cc"
+      }
+    },
+    {
+      "id": "wyrmcult_zealot",
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
+      "id": "ysolei",
+      "sourceFingerprint": "9195d03436ee50cc7728522e57e7c1ae052fad3f630e287ed2acefbb28d3e8d4",
+      "output": {
+        "bytes": 3462,
+        "sha256": "71a04ea49352be968b189e88eb019164b1bb48197d8d11afe2762e4db7999f6c"
+      }
+    },
+    {
+      "id": "yumi_cat",
+      "sourceFingerprint": "7ac9443703bf832ca187499a6c8a6fcbee45e476903d4778faa80e7e7530ee36",
+      "output": {
+        "bytes": 3052,
+        "sha256": "c44b751db74d69ddb68f1faf99073071c87d1b7369bc13ad780f813cae1bd393"
+      }
+    }
+  ]
+}

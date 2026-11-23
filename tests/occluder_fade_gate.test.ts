@@ -480,6 +480,7 @@ describe('wiring (source pins)', () => {
       'src/render/props.ts',
       'src/render/eastbrook_town.ts',
       'src/render/fenbridge_town.ts',
+      'src/render/placed_town_buildings.ts',
       'src/render/hollow_gates.ts',
     ]) {
       const src = read(file);

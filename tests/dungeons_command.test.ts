@@ -31,7 +31,7 @@ describe('/dungeons command', () => {
       'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
     );
     expect(texts[texts.length - 1]).toBe(
-      'Use /dungeon reset to abandon your empty instances after changing difficulty.',
+      'Use /dungeon reset to abandon your empty instances and start them fresh.',
     );
   });
 

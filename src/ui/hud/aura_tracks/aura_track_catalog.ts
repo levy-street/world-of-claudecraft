@@ -192,7 +192,7 @@ interface BespokeEffectAura {
 //  - Temporal Echo marks an ally and converts a fraction of the mage's Arcane
 //    damage into healing on them (combat/chronomancy.ts) rather than ticking a
 //    stored total, so it is authored as its own effect type and never matched
-//    `type === 'hot'` the way Wildbloom and Renew do.
+//    `type === 'hot'` the way Sporemending and Renew do.
 //  - Hourglass of Suspension grants a short stasis to the caster or a group ally.
 //    `stasis` is already a GUARD_KIND (it is what puts Cold Coffin in a track),
 //    but the effect record never spells it out, so the kind sets never saw it.

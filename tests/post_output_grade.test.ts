@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { CEL_INK_GLSL } from '../src/render/post_cel_ink_glsl';
 import { FINITE_GUARD_GLSL } from '../src/render/post_finite_guard_glsl';
 import { OUTPUT_GRADE_FRAGMENT_SHADER, OutputGradePass } from '../src/render/post_output_grade';
 
@@ -15,7 +16,7 @@ describe('fused output and grade shader', () => {
     const liftAt = shader.indexOf('c = pow(max(vec3(0.0), c * GAIN + LIFT), GAMMA);');
     const curveAt = shader.indexOf('c = mix(c, c * c * (3.0 - 2.0 * c), 0.23);');
     const saturationAt = shader.indexOf('c = mix(vec3(l), c, 1.07);');
-    const vignetteAt = shader.indexOf('c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);');
+    const vignetteAt = shader.indexOf('c *= 1.0 - 0.08 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);');
     const grainAt = shader.indexOf(
       'c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;',
     );
@@ -246,5 +247,79 @@ describe('fused output and grade shader', () => {
     // One texel of the READ target, which is what the rendered sub-rect is made
     // of, so the taps stay a texel apart at every region scale.
     expect(antialiased.uniforms.uInputTexelSize.value.toArray()).toEqual([1 / 64, 1 / 32]);
+  });
+});
+
+describe('cel ink arm on the output grade (`?cel=on`)', () => {
+  const fakeRenderer = (pixelRatio: number) =>
+    ({
+      autoClear: true,
+      outputColorSpace: THREE.SRGBColorSpace,
+      toneMapping: THREE.ACESFilmicToneMapping,
+      toneMappingExposure: 1,
+      autoClearColor: true,
+      autoClearDepth: true,
+      autoClearStencil: false,
+      setRenderTarget: vi.fn(),
+      clear: vi.fn(),
+      getPixelRatio: () => pixelRatio,
+    }) as unknown as THREE.WebGLRenderer;
+
+  it('compiles only under CEL_INK, after the grain and before the spirit drain', () => {
+    const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
+    const grainAt = shader.indexOf(
+      'c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;',
+    );
+    const armAt = shader.indexOf('c = celInkApply(c, inputUv, uInputUvRect.zw);');
+    const spiritAt = shader.indexOf('if (uSpirit > 0.0) {');
+    expect(armAt).toBeGreaterThan(grainAt);
+    expect(spiritAt).toBeGreaterThan(armAt);
+    expect(shader.lastIndexOf('#ifdef CEL_INK', armAt)).toBeGreaterThan(grainAt);
+    expect(shader).toContain(`#ifdef CEL_INK\n  ${CEL_INK_GLSL}\n  #endif`);
+  });
+
+  it('clamps every ink tap into the rendered sub-rect so the region cannot bleed', () => {
+    expect(CEL_INK_GLSL).toContain('celInvDist(clamp(uv - o, vec2(0.0), uvMax))');
+    expect(CEL_INK_GLSL).toContain('celInvDist(clamp(uv + o, vec2(0.0), uvMax))');
+  });
+
+  it('defines CEL_INK and feeds depth, tap and camera only when the ink is on', () => {
+    const write = new THREE.WebGLRenderTarget(16, 8);
+    const read = new THREE.WebGLRenderTarget(16, 8);
+    const depth = new THREE.WebGLRenderTarget(200, 100, {
+      depthTexture: new THREE.DepthTexture(200, 100),
+    });
+    const camera = new THREE.PerspectiveCamera(60, 2, 0.2, 3000);
+
+    const stock = new OutputGradePass({ value: 0 });
+    vi.spyOn(stock.fsQuad, 'render').mockImplementation(() => {});
+    stock.render(fakeRenderer(2), write, read);
+    expect(stock.material.defines).not.toHaveProperty('CEL_INK');
+    expect(stock.uniforms.tCelDepth.value).toBeNull();
+
+    const inked = new OutputGradePass({ value: 0 }, null, {
+      celInk: { depthTarget: () => depth, camera, ink: 0.85, saturation: 1.12, inkWidth: 1.5 },
+    });
+    vi.spyOn(inked.fsQuad, 'render').mockImplementation(() => {});
+    inked.render(fakeRenderer(2), write, read);
+    expect(inked.material.defines).toHaveProperty('CEL_INK', '');
+    expect(inked.uniforms.tCelDepth.value).toBe(depth.depthTexture);
+    // inkWidth x pixel ratio, over the DEPTH target's own size (not the read buffer's).
+    expect(inked.uniforms.uCelTap.value.toArray()).toEqual([3 / 200, 3 / 100]);
+    expect(inked.uniforms.uCelInk.value.toArray()).toEqual([0.85, 1.12, 0.2, 3000]);
+
+    const ortho = new OutputGradePass({ value: 0 }, null, {
+      celInk: {
+        depthTarget: () => depth,
+        camera: new THREE.OrthographicCamera(),
+        ink: 0.85,
+        saturation: 1.12,
+        inkWidth: 1,
+      },
+    });
+    vi.spyOn(ortho.fsQuad, 'render').mockImplementation(() => {});
+    ortho.render(fakeRenderer(1), write, read);
+    expect(ortho.uniforms.uCelInk.value.x).toBe(0);
+    expect(ortho.uniforms.uCelInk.value.y).toBe(1.12);
   });
 });

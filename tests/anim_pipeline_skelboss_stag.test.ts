@@ -66,7 +66,8 @@ describe('skel_boss bespoke attack (issue #2889)', () => {
   });
 
   it('delve_skel_varric (the other Taunt-flourish skeleton_mage.glb boss) still shares the plain chop', () => {
-    const varricBlock = manifestBlock('delve_skel_varric: {', 'skel_minion: {');
+    // ends at the next def, the minion (one line since it became the art guide's skeleton)
+    const varricBlock = manifestBlock('delve_skel_varric: {', '  skel_minion: ');
     expect(varricBlock).toContain("clips: skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'),");
     expect(varricBlock).not.toContain('SkelBoss_Attack');
   });

@@ -13,7 +13,11 @@ const GIVERS = [
   'fisherman_brandt',
 ] as const;
 const SQUARE_CENTER = { x: -14, z: -102 };
-const SQUARE_ENTRY = { x: -4.5, z: -101.5 };
+// Where a player walks into the civic square from the north road: the
+// point the tutorial ferry used to land on. The ferry now sets graduates down
+// on the quay (FERRY_BELL_TOWN_LANDING) and the golden guidance walks them up,
+// so the square's own entry is pinned here as a literal.
+const SQUARE_ENTRY = { x: -6, z: -97.5 };
 
 describe('Eastbrook starter combat quest group', () => {
   it('spreads the givers around the town square with generous spacing', () => {

@@ -6,11 +6,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   FINDER_ACTIVITIES,
-  FINDER_PRE_SPEC_ROLES,
+  FINDER_CLASS_ROLES,
   finderActivity,
+  finderEncounterBodyIds,
 } from '../src/sim/content/dungeon_finder';
 import { FIRST_TALENT_LEVEL, type Role, TALENTS } from '../src/sim/content/talents';
-import { DUNGEONS } from '../src/sim/data';
+import { DUNGEONS, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   assignFinderRoles,
@@ -74,7 +75,7 @@ const errorsFor = (events: SimEvent[], pid: number) =>
     .filter((e) => e.type === 'error' && e.pid === pid)
     .map((e) => (e as { text: string }).text);
 
-// A standard eligible five for the Hollow Crypt (levels 7-10, spec roles).
+// A standard eligible five for the Hollow Crypt (levels 7-10).
 function queueFive(sim: Sim): Joined {
   const pids = addPlayers(sim, [
     { cls: 'warrior', roles: ['tank'], level: 8 },
@@ -160,14 +161,99 @@ describe('finder catalogue metadata', () => {
     }
   });
 
-  it('every catalogued dungeon id and encounter mob id exists in the content tables', async () => {
-    const { DUNGEONS, MOBS } = await import('../src/sim/data');
+  it('every catalogued dungeon id and encounter mob id exists in the content tables', () => {
     for (const a of FINDER_ACTIVITIES) {
       expect(DUNGEONS[a.dungeonId], a.dungeonId).toBeDefined();
       expect(DUNGEONS[a.entranceDungeonId], a.entranceDungeonId).toBeDefined();
       for (const e of a.encounters) expect(MOBS[e.mobId], e.mobId).toBeDefined();
       expect(a.encounters.some((e) => e.final)).toBe(true);
     }
+  });
+
+  it('lists the Mere Hydra as the second Drowned Temple boss on both difficulties', () => {
+    for (const id of ['drowned_temple_normal', 'drowned_temple_heroic']) {
+      const a = finderActivity(id);
+      // Route order: the Prism Stair to the Colossus rises only once the
+      // Hydra's pack is dead (the prism_stair_rise gate, pinned below).
+      expect(
+        a?.encounters.map((e) => e.mobId),
+        id,
+      ).toEqual(['choirmother_selthe', 'mere_hydra_head_center', 'tideglass_colossus', 'ysolei']);
+      expect(
+        a?.encounters.filter((e) => e.final).map((e) => e.mobId),
+        id,
+      ).toEqual(['ysolei']);
+      const hydra = a?.encounters[1];
+      expect(hydra?.otherBodyIds, id).toEqual(['mere_hydra_head_left', 'mere_hydra_head_right']);
+      expect(hydra?.mechanics, id).toEqual([
+        'hydra_three_elements',
+        'hydra_tsunami',
+        'hydra_combined_breath',
+        'hydra_regrowth',
+      ]);
+      expect(hydra ? finderEncounterBodyIds(hydra) : [], id).toEqual([
+        'mere_hydra_head_center',
+        'mere_hydra_head_left',
+        'mere_hydra_head_right',
+      ]);
+    }
+    // The Finder shows the encounter under its own mob's name, and that name
+    // is the boss's, never a head's.
+    expect(MOBS.mere_hydra_head_center.name).toBe('Mere Hydra');
+    // Where it sits on the route, from the dungeon's own gates and placements.
+    const temple = DUNGEONS.drowned_temple;
+    const stair = temple.gates?.find((g) => g.id === 'prism_stair_rise');
+    expect(stair?.packs).toContain('hydra');
+    const hydraPack = temple.spawns.filter((s) => s.packId === 'hydra').map((s) => s.mobId);
+    expect(hydraPack.sort()).toEqual([
+      'mere_hydra_head_center',
+      'mere_hydra_head_left',
+      'mere_hydra_head_right',
+    ]);
+    // Selthe's kill opens the Court Stairs toward the pool; the Colossus's
+    // ward sits past the stair the Hydra's death raises.
+    expect(temple.gates?.find((g) => g.id === 'court_stair_west')?.bosses).toEqual([
+      'choirmother_selthe',
+    ]);
+    expect(temple.gates?.find((g) => g.id === 'prism_ward')?.sealWhileEngaged).toBe(
+      'tideglass_colossus',
+    );
+  });
+
+  it('a boss of several bodies names real, distinct bodies its own dungeon places once', () => {
+    const several: string[] = [];
+    for (const a of FINDER_ACTIVITIES) {
+      const owned = new Set<string>();
+      for (const e of a.encounters) {
+        const bodies = finderEncounterBodyIds(e);
+        expect(bodies[0]).toBe(e.mobId);
+        if (e.otherBodyIds === undefined) {
+          expect(bodies).toEqual([e.mobId]);
+          continue;
+        }
+        several.push(`${a.id}:${e.mobId}`);
+        expect(e.otherBodyIds.length, `${a.id}/${e.mobId}`).toBeGreaterThan(0);
+        expect(new Set(bodies).size, `${a.id}/${e.mobId} distinct`).toBe(bodies.length);
+        for (const bodyId of bodies) {
+          expect(MOBS[bodyId], bodyId).toBeDefined();
+          // Every body wears the boss's name, so no surface can show another.
+          expect(MOBS[bodyId].name, bodyId).toBe(MOBS[e.mobId].name);
+          expect(
+            DUNGEONS[a.dungeonId].spawns.filter((sp) => sp.mobId === bodyId).length,
+            `${a.id}: ${bodyId} placements`,
+          ).toBe(1);
+          expect(owned.has(bodyId), `${a.id}: ${bodyId} in one encounter`).toBe(false);
+          owned.add(bodyId);
+        }
+      }
+      // No other encounter of the activity is one of those bodies.
+      for (const e of a.encounters)
+        if (e.otherBodyIds === undefined) expect(owned.has(e.mobId), e.mobId).toBe(false);
+    }
+    expect(several).toEqual([
+      'drowned_temple_normal:mere_hydra_head_center',
+      'drowned_temple_heroic:mere_hydra_head_center',
+    ]);
   });
 
   it('the raid entrance points at the Abandoned Crypt overworld door', () => {
@@ -205,13 +291,13 @@ describe('finder catalogue metadata', () => {
       'grave_eruption',
       'wardstones',
       'kings_wrath',
-      'bone_storm',
       'crown_endures',
     ]) {
       expect(normalMechanics, m).toContain(m);
       expect(heroicMechanics, m).toContain(m);
     }
-    for (const add of ['raise_fallen', 'deathless_court']) {
+    // Bone Storm is retired from play, so neither tier advertises it.
+    for (const add of ['raise_fallen', 'deathless_court', 'bone_storm']) {
       expect(normalMechanics, add).not.toContain(add);
       expect(heroicMechanics, add).not.toContain(add);
     }
@@ -256,15 +342,21 @@ describe('finder catalogue metadata', () => {
       expect(a?.kind).toBe('dungeon');
       expect(a?.dungeonId).toBe('wildheart_basin');
       expect(a?.entranceDungeonId).toBe('wildheart_basin');
+      // The rework: the three boss cores (design section 5), no trash rows.
       expect(a?.encounters.map((e) => e.mobId)).toEqual([
-        'wildheart_stalker',
-        'wildheart_ravager',
-        'wildheart_hexcaller',
         'wildheart_beastmaster',
+        'the_gorgebloom',
         'wildheart_high_priest',
       ]);
       expect(a?.encounters.at(-1)?.final).toBe(true);
     }
+    // Heroic adds each boss's twists; the normal preview never carries them.
+    const twists = ['heel_frenzied_bond', 'burrowing_seeds', 'twin_prey_ambush'];
+    const normalMechs = normal?.encounters.flatMap((e) => e.mechanics) ?? [];
+    for (const t of twists) expect(normalMechs).not.toContain(t);
+    heroic?.encounters.forEach((e, i) => {
+      expect(e.mechanics).toContain(twists[i]);
+    });
     expect(normal?.lockout).toBe('none');
     expect(heroic?.lockout).toBe('daily');
   });
@@ -299,22 +391,21 @@ describe('compatibleFinderRoles', () => {
   });
 
   it('every class can dps below 5 (table completeness)', () => {
-    expect(FINDER_PRE_SPEC_ROLES.dps).toHaveLength(9);
+    expect(FINDER_CLASS_ROLES.dps).toHaveLength(9);
   });
 
-  it('from level 5 the active spec role is the only compatible role', () => {
-    expect(compatibleFinderRoles('warrior', 5, 'tank')).toEqual(['tank']);
-    expect(compatibleFinderRoles('warrior', 10, 'tank')).toEqual(['tank']);
-    expect(compatibleFinderRoles('druid', 20, 'healer')).toEqual(['healer']);
-    expect(compatibleFinderRoles('druid', 20, 'tank')).toEqual(['tank', 'dps']);
+  it('keeps class roles available regardless of the active specialization', () => {
+    expect(compatibleFinderRoles('warrior', 5, 'tank')).toEqual(['tank', 'dps']);
+    expect(compatibleFinderRoles('warrior', 10, 'dps')).toEqual(['tank', 'dps']);
+    expect(compatibleFinderRoles('druid', 20, 'healer')).toEqual(['tank', 'healer', 'dps']);
+    expect(compatibleFinderRoles('druid', 20, 'tank')).toEqual(['tank', 'healer', 'dps']);
     expect(compatibleFinderRoles('mage', 20, 'dps')).toEqual(['dps']);
   });
 
-  it('no active spec at level 5+ means no compatible roles; level 4 is not spec-gated', () => {
-    expect(compatibleFinderRoles('warrior', 5, null)).toEqual([]);
-    expect(compatibleFinderRoles('warrior', 10, null)).toEqual([]);
-    expect(compatibleFinderRoles('druid', 20, null)).toEqual([]);
-    // One level below the unlock the class table still applies unspecced.
+  it('allows class roles without an active specialization at every level', () => {
+    expect(compatibleFinderRoles('warrior', 5, null)).toEqual(['tank', 'dps']);
+    expect(compatibleFinderRoles('warrior', 10, null)).toEqual(['tank', 'dps']);
+    expect(compatibleFinderRoles('druid', 20, null)).toEqual(['tank', 'healer', 'dps']);
     expect(compatibleFinderRoles('warrior', 4, null)).toEqual(['tank', 'dps']);
   });
 });
@@ -456,33 +547,26 @@ describe('automatic queue', () => {
     expect(sim.dungeonFinderInfoFor(high)?.queue).toBeNull();
   });
 
-  it('level 5+ without an active spec can neither select roles nor queue', () => {
+  it('allows roles and level-eligible queues without an active specialization', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'NoSpec');
     sim.setPlayerLevel(20, pid);
     sim.dungeonFinderSetRoles(['tank'], pid);
     sim.dungeonFinderQueueJoin(['hollow_crypt_heroic'], pid);
-    const events = tickAll(sim, 1);
-    expect(errorsFor(events, pid)).toContain('Choose a specialization to use the Dungeon Finder.');
-    expect(sim.dungeonFinderInfoFor(pid)?.eligibleRoles).toEqual([]);
-    expect(sim.dungeonFinderInfoFor(pid)?.queue).toBeNull();
-    // The gate starts exactly at the spec unlock (level 5)...
-    const atFive = sim.addPlayer('warrior', 'AtFive');
-    sim.setPlayerLevel(5, atFive);
-    sim.dungeonFinderSetRoles(['tank'], atFive);
-    const eventsAtFive = tickAll(sim, 1);
-    expect(errorsFor(eventsAtFive, atFive)).toContain(
-      'Choose a specialization to use the Dungeon Finder.',
-    );
-    expect(sim.dungeonFinderInfoFor(atFive)?.eligibleRoles).toEqual([]);
-    // ...and level 4 is NOT spec-gated: the class table applies unspecced.
-    const atFour = sim.addPlayer('warrior', 'AtFour');
-    sim.setPlayerLevel(4, atFour);
-    sim.dungeonFinderSetRoles(['tank'], atFour);
-    const eventsAtFour = tickAll(sim, 1);
-    expect(errorsFor(eventsAtFour, atFour)).toEqual([]);
-    expect(sim.dungeonFinderInfoFor(atFour)?.eligibleRoles).toEqual(['tank', 'dps']);
-    expect(sim.dungeonFinderInfoFor(atFour)?.roles).toEqual(['tank']);
+    expect(errorsFor(tickAll(sim, 1), pid)).toEqual([]);
+    expect(sim.dungeonFinderInfoFor(pid)?.eligibleRoles).toEqual(['tank', 'dps']);
+    expect(sim.dungeonFinderInfoFor(pid)?.queue?.activities).toEqual(['hollow_crypt_heroic']);
+    for (const level of [4, 5]) {
+      const low = sim.addPlayer('warrior', `Level${level}`);
+      sim.setPlayerLevel(level, low);
+      sim.dungeonFinderSetRoles(['tank'], low);
+      expect(errorsFor(tickAll(sim, 1), low)).toEqual([]);
+      expect(sim.dungeonFinderInfoFor(low)?.roles).toEqual(['tank']);
+      sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], low);
+      expect(errorsFor(tickAll(sim, 1), low)).toContain(
+        'You do not meet the level range for that activity.',
+      );
+    }
   });
 
   it('rejects a role outside the class capability table', () => {
@@ -493,7 +577,7 @@ describe('automatic queue', () => {
     sim.dungeonFinderSetRoles(['tank'], pid);
     const events = tickAll(sim, 1);
     expect(errorsFor(events, pid)).toContain('You cannot fill that role.');
-    // From the spec unlock the active spec's role is the whole capability set.
+    // A specialization cannot grant roles unsupported by the class.
     const specced = sim.addPlayer('mage', 'M2');
     sim.setPlayerLevel(8, specced);
     sim.setSpec(specIdFor('mage', 'dps'), specced);
@@ -502,11 +586,10 @@ describe('automatic queue', () => {
     expect(errorsFor(eventsSpecced, specced)).toContain('You cannot fill that role.');
   });
 
-  it('assigns exactly one role to a multi-role selection (the active spec narrows it)', () => {
+  it('assigns exactly one role to a multi-role selection according to group composition', () => {
     const sim = makeSim();
-    // A druid picks both tank and healer below the spec unlock; the sticky
-    // selection survives leveling up, but from level 5 the active spec is the
-    // whole capability set, so it collapses to one role at match time.
+    // The druid can offer both roles at every level; the group needs a healer
+    // because its warrior already fills the tank slot.
     const druid = sim.addPlayer('druid', 'P0');
     sim.setPlayerLevel(4, druid);
     sim.dungeonFinderSetRoles(['tank', 'healer'], druid);
@@ -521,7 +604,7 @@ describe('automatic queue', () => {
     const pids = [druid, ...rest];
     for (const pid of pids) sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pid);
     tickAll(sim, 1);
-    // The restoration spec restricts the tank+healer selection to healing.
+    // The warrior fills Tank, so the matcher assigns the druid to Healer.
     expect(sim.dungeonFinderInfoFor(pids[0])?.proposal?.role).toBe('healer');
     expect(sim.dungeonFinderInfoFor(pids[1])?.proposal?.role).toBe('tank');
   });

@@ -9,6 +9,7 @@ import {
   kickPlayer,
   liftChatMute,
   moderateDailyRewardsIp,
+  reactivateAccount,
   resetChatStrikes,
   resetPassword,
   suspendCustom,
@@ -55,6 +56,21 @@ describe('moderation_actions', () => {
     expect(body.reason).toBe('harassment');
     expect(new Date(body.expiresAt).getTime()).toBeGreaterThan(Date.now());
     expect(built.pending.danger).toBeUndefined();
+  });
+
+  it('builds a reason-required reactivate request against the audited endpoint', () => {
+    expect(reactivateAccount(42, '')).toEqual({ errorKey: 'alert.noteRequired' });
+    const built = reactivateAccount(42, 'deactivated by accident');
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.title).toBe('Confirm reactivation');
+    expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/reactivate');
+    expect(built.pending.body).toEqual({ reason: 'deactivated by accident' });
+    expect(built.pending.danger).toBeUndefined();
+    expect(built.pending.rows.map((row) => row.value)).toEqual([
+      '#42',
+      "Undo the player's own deactivation and restore login access",
+      'deactivated by accident',
+    ]);
   });
 
   it('marks ban as danger and posts to the ban endpoint', () => {

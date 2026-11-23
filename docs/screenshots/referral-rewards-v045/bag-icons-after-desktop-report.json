@@ -1,0 +1,15 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/reins_referral_raptor.webp",
+    "http://localhost:5194/ui/items/referral_satchel.webp",
+    "http://localhost:5194/ui/items/referral_hollow_charm.webp",
+    "http://localhost:5194/ui/items/referral_fog_charm.webp",
+    "http://localhost:5194/ui/items/reins_referral_tank.webp"
+  ],
+  "allDecoded": true
+}

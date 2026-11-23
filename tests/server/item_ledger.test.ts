@@ -202,6 +202,9 @@ describe('item_ledger_db', () => {
     expect(ITEM_LEDGER_SCHEMA).toContain('CREATE TABLE IF NOT EXISTS item_ledger');
     expect(ITEM_LEDGER_SCHEMA).toContain('item_ledger_guid');
     expect(ITEM_LEDGER_SCHEMA).toContain('item_ledger_character');
+    const schema = ITEM_LEDGER_SCHEMA.replace(/\s+/g, ' ');
+    expect(schema).toContain('ON item_ledger(realm, id);');
+    expect(schema).toContain('ON item_ledger(realm, item_id, id);');
     // The ON DELETE SET NULL account_id foreign key needs its own index, or an
     // account delete scans the whole multi-year ledger.
     expect(ITEM_LEDGER_SCHEMA.replace(/\s+/g, ' ')).toContain(

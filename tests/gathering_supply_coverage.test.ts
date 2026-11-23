@@ -167,6 +167,7 @@ import {
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { gatherToolTier } from '../src/sim/professions/tools';
 import { TIER_SKILL_STEP, tierForSkill } from '../src/sim/professions/wheel';
+import { WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS } from '../src/sim/pvp/world_pvp_trophy';
 
 // THE SUPPLY DERIVATION MOVED OUT AT masterwrought Phase 11k, and the move is
 // why this file no longer carries it. The provisioning wiki page became a
@@ -560,11 +561,20 @@ describe('masterwrought R21: the world eats what the gathering families supply',
     // staged ahead of its own recipes has no consumer yet BY CONSTRUCTION,
     // and the arm after this one pins that it really has none.
     const recipePending = new Set<string>(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS);
+    // Provenance trophies (the World PvP skull) are ruled in for their
+    // per-unit source buckets, never as reagents: a keepsake is not dead
+    // content for lacking a recipe. Named, and counted exactly below.
+    const trophies = new Set<string>(WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS);
+    let trophiesExempted = 0;
     const orphans: string[] = [];
     let exempted = 0;
     for (const id of [...MATERIAL_ITEM_IDS].sort()) {
       if (recipePending.has(id)) {
         exempted++;
+        continue;
+      }
+      if (trophies.has(id)) {
+        trophiesExempted++;
         continue;
       }
       const consumers = consumptionIdsFor(id).reduce(
@@ -590,6 +600,7 @@ describe('masterwrought R21: the world eats what the gathering families supply',
     // block, never to widen this number.
     // Core of the Last Flame now has live raid recipes; no staged exemption remains.
     expect(exempted).toBe(0);
+    expect(trophiesExempted).toBe(trophies.size);
     // Subject non-vacuity: the material set is the live derived one, and it
     // is not empty (tests/material_taxonomy.test.ts pins its exact members).
     expect(MATERIAL_ITEM_IDS.size).toBeGreaterThan(0);

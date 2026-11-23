@@ -8,11 +8,12 @@ import { describe, expect, it } from 'vitest';
 import { INSTANCE_X_BASE, WORLD_MAX_Z, ZONES } from '../src/sim/data';
 import { worldPvpZonePolicyAt, worldPvpZonePolicyOf } from '../src/sim/pvp/world_pvp_zones';
 
-const SANCTUARIES = ['eastbrook_vale', 'proving_shore'];
-const FREE_FOR_ALL = ['drakelands', 'frostveil', 'amberfall'];
+const SANCTUARIES = ['proving_shore'];
+const FREE_FOR_ALL: string[] = [];
+const HILL_ZONES = ['drakelands', 'frostveil', 'amberfall'];
 
 describe('the zone table', () => {
-  it('pins the two sanctuaries and the three free-for-all zones', () => {
+  it('pins the only sanctuary and no permanent free-for-all zones', () => {
     expect(ZONES.filter((z) => z.worldPvp === 'sanctuary').map((z) => z.id)).toEqual(SANCTUARIES);
     expect(ZONES.filter((z) => z.worldPvp === 'ffa').map((z) => z.id)).toEqual(FREE_FOR_ALL);
     // Every other zone is contested (no field at all, never a third value).
@@ -22,21 +23,21 @@ describe('the zone table', () => {
     }
   });
 
-  it('the sanctuaries are the tutorial island and the starter zone', () => {
+  it('the only sanctuary is the tutorial island', () => {
     for (const id of SANCTUARIES) {
       const zone = ZONES.find((z) => z.id === id);
       expect(zone?.levelRange[0]).toBe(1);
     }
   });
 
-  it('the free-for-all set is the top row of the map: the three zones reaching furthest north', () => {
+  it('the three northern hill zones use the ordinary contested policy', () => {
     const northmost = [...ZONES].sort((a, b) => b.zMax - a.zMax);
     expect(
       northmost
         .slice(0, 3)
         .map((z) => z.id)
         .sort(),
-    ).toEqual([...FREE_FOR_ALL].sort());
+    ).toEqual([...HILL_ZONES].sort());
     // Exactly these three carry the policy: no other zone is free-for-all.
     expect(
       ZONES.filter((z) => z.worldPvp === 'ffa')
@@ -49,7 +50,7 @@ describe('the zone table', () => {
 describe('worldPvpZonePolicyOf / worldPvpZonePolicyAt', () => {
   it('reads the record, and treats no record as contested', () => {
     expect(worldPvpZonePolicyOf(ZONES.find((z) => z.id === 'proving_shore'))).toBe('sanctuary');
-    expect(worldPvpZonePolicyOf(ZONES.find((z) => z.id === 'drakelands'))).toBe('ffa');
+    expect(worldPvpZonePolicyOf(ZONES.find((z) => z.id === 'drakelands'))).toBe('contested');
     expect(worldPvpZonePolicyOf(ZONES.find((z) => z.id === 'thornpeak_heights'))).toBe('contested');
     expect(worldPvpZonePolicyOf(null)).toBe('contested');
     expect(worldPvpZonePolicyOf(undefined)).toBe('contested');

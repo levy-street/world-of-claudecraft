@@ -6,6 +6,7 @@ import { EASTBROOK_LAYOUT, localToWorld } from '../sim/eastbrook_layout';
 import { surfaceMat } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
+import { activeWorldPromoted } from './promoted_scenery_gate';
 
 // Pinned against the generated geometry by weekly_vault_building.test.ts.
 export const WEEKLY_VAULT_TRIANGLES = 4572;
@@ -116,6 +117,13 @@ export function buildEastbrookWeeklyVault(groundAt: (x: number, z: number) => nu
     parts[m].push(new THREE.BoxGeometry(w, h, d).translate(x, y, z));
   const entrance = localToWorld(layout, layout.rot, 0, layout.d / 2);
   const y = groundAt(entrance.x, entrance.z);
+  // A document that owns the vault as a placement (promotedScenery.eastbrookVault)
+  // draws and moves that one. The town keeps the hall's slot, so its building
+  // lists stay aligned, but the slot is an empty group with nothing to fade.
+  if (activeWorldPromoted('eastbrookVault')) {
+    group.name = 'eastbrookWeeklyVaultStoodDown';
+    return { group, hideTarget: vaultHideTarget(group, mats, y) };
+  }
   // Substantial buried footing covers the site's shallow grade without floating edges.
   box(0, 14, 1.8, 12, 0, -0.55, 0);
   box(0, 13.5, 7.8, 11.4, 0, 4, 0);
@@ -232,21 +240,25 @@ export function buildEastbrookWeeklyVault(groundAt: (x: number, z: number) => nu
   group.add(door);
   group.position.set(layout.x, y, layout.z);
   group.rotation.y = layout.rot;
+  return { group, hideTarget: vaultHideTarget(group, mats, y) };
+}
+
+/** The hall's entry in the town's roof-hide list: its footprint and the fade
+ *  materials of what was built (none when the hall stood down). */
+function vaultHideTarget(group: THREE.Group, mats: OccluderFadeMat[], groundY: number) {
+  const layout = EASTBROOK_LAYOUT.weeklyVault;
   return {
     group,
-    hideTarget: {
-      group,
-      mats,
-      hidden: false,
-      alpha: 1,
-      x: layout.x,
-      z: layout.z,
-      halfWidth: layout.w / 2,
-      halfDepth: layout.d / 2,
-      cosine: Math.cos(layout.rot),
-      sine: Math.sin(layout.rot),
-      topY: y + layout.height,
-      cullRadius: Math.hypot(layout.w / 2, layout.d / 2),
-    },
+    mats,
+    hidden: false,
+    alpha: 1,
+    x: layout.x,
+    z: layout.z,
+    halfWidth: layout.w / 2,
+    halfDepth: layout.d / 2,
+    cosine: Math.cos(layout.rot),
+    sine: Math.sin(layout.rot),
+    topY: groundY + layout.height,
+    cullRadius: Math.hypot(layout.w / 2, layout.d / 2),
   };
 }

@@ -17,13 +17,15 @@
 // `src/sim`-pure: no DOM/render/ui/game/net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Draws no rng.
 
+import { bagCapacity } from './bags';
+import { pinStackToCurrentCell } from './inventory_order';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import { selectedInventorySlot } from './item_copy_ref';
 import { isItemLocked } from './item_lock_flag';
-import { isMaterialItemId } from './material_ids';
 import { takeMaterialInventoryForHub } from './material_inventory_hub';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import type { InvSlot, ItemInstancePayload } from './types';
 
 // The predicate itself lives in the dependency-free leaf so exchange_eligibility
@@ -106,7 +108,7 @@ export function removeUnlockedFromSlots(
   count: number,
 ): ItemInstancePayload[] {
   const removed: ItemInstancePayload[] = [];
-  if (isMaterialItemId(itemId) && count > 0) {
+  if (isStackProvenanceItemId(itemId) && count > 0) {
     takeMaterialInventoryForHub(inventory, itemId, count);
     return removed;
   }
@@ -169,12 +171,17 @@ export function setItemLocked(
   // flips the lock on an id-mate the player never clicked.
   const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex, anchor);
   if (!selected) return { ok: false, itemId, locked, reason: 'not_held' };
-  if (isItemLocked(selected.instance) === locked) return { ok: true, itemId, locked };
+  if (isItemLocked(selected.instance) === locked) {
+    if (locked) pinStackToCurrentCell(meta.inventory, bagCapacity(meta.bags), selected);
+    return { ok: true, itemId, locked };
+  }
   if (!locked && selected.instance) {
     const { locked: _drop, ...rest } = selected.instance;
     selected.instance = Object.keys(rest).length > 0 ? rest : undefined;
   } else {
     selected.instance = { ...selected.instance, locked };
+    // Locking also pins the stack to the cell it sits in (inventory_order.ts).
+    pinStackToCurrentCell(meta.inventory, bagCapacity(meta.bags), selected);
   }
   ctx.onInventoryChangedForQuests?.(meta);
   return { ok: true, itemId, locked };

@@ -13,7 +13,10 @@
 // consecration (7 to 11) painted over Ignivar's soak telegraph (2 to 7).
 //
 // The ladder, bottom to top:
-//   ground     the world's own marks: blob shadows, torch pools, scorch decals
+//   ground     the world's own marks: blob shadows, torch pools, scorch decals;
+//              its top rung is the one dark stain a character lays under
+//              itself (the Shadow priest's pool), over the world's marks and
+//              under everything a player casts
 //   player     class ability ground VFX: auras, decals, shock rings, runes
 //   encounter  boss and encounter mechanics: telegraphs, soaks, hazards, zones
 //   reticle    the player's own ground aim guide and click feedback (additive,
@@ -47,7 +50,7 @@ export const FLOOR_VFX_LAYER_BASE: Readonly<Record<FloorVfxLayer, number>> = {
 
 /** How many consecutive orders (steps) each band owns. */
 export const FLOOR_VFX_LAYER_SPAN: Readonly<Record<FloorVfxLayer, number>> = {
-  ground: 8,
+  ground: 9,
   player: 10,
   encounter: 30,
   reticle: 4,

@@ -1,0 +1,334 @@
+// Ship the Blender-authored Mirefen tavern (scripts/assets/mirefen_tavern/): validate the
+// exported hierarchy, materials and root extras, stamp the source fingerprint, embed the
+// painted maps (textures.json: the painted town's Fenrire look, tex/) at each texture
+// tier, then prune, dedup and meshopt it into public/models/props/mirefen_tavern.glb and its
+// texture-tier files, mirefen_tavern.half.glb and mirefen_tavern.quarter.glb (the same model
+// with every map at half and at a quarter of its size; src/render/placed_texture_tier_core.ts
+// picks the file a profile loads). Never flatten or join: the runtime
+// (src/render/mirefen_tavern.ts) keeps or sheds the named tier parts and cuts the named shell
+// parts away for the camera.
+//
+//   npx tsx scripts/assets/mirefen_tavern/layout.ts
+//   blender --background --python scripts/assets/mirefen_tavern/build_tavern.py
+//   KTX_BIN="C:\Program Files\KTX-Software\bin" node scripts/assets/mirefen_tavern/build.mjs
+//   node scripts/build_media_manifest.mjs generate
+//
+// The maps leave as KTX2 the way scripts/assets/compress_glb_textures.mjs encodes every
+// shipped GLB's maps (normal maps UASTC, the rest ETC1S, mipmapped), so that step finds
+// nothing left to do here. It needs the `ktx` tool of KTX-Software 4.3 or later on PATH, or
+// its bin folder in KTX_BIN. A painted material's kit normal strength is baked into its normal
+// map (the runtime draws every normal map at scale 1), and its extras carry the factor its
+// vertex colours are multiplied back by (VERTEX_COLOUR_SCALE). The UVs stay float (they
+// repeat far past [0, 1]): a KHR_texture_transform to quantize them would make three's loader
+// clone every map, and a clone keeps its transcoded mips resident (assets/ktx2_mip_release.ts).
+import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { dedup, meshopt, prune } from '@gltf-transform/functions';
+import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const HERE = 'scripts/assets/mirefen_tavern';
+const TEXTURES = JSON.parse(readFileSync(path.join(ROOT, HERE, 'textures.json'), 'utf8'));
+
+/** Every map file textures.json names, relative to the repo root. */
+const MAP_FILES = Object.values(TEXTURES.materials).flatMap((spec) =>
+  [spec.color, spec.normal].filter(Boolean).map((file) => `${HERE}/${file}`),
+);
+
+export const MIREFEN_TAVERN_ASSET = {
+  source: `${HERE}/mirefen_tavern_source.glb`,
+  target: 'public/models/props/mirefen_tavern.glb',
+  /** The texture tiers: the file suffix and the colour and normal map sizes of each. */
+  tiers: TEXTURES.tiers,
+  /** The fingerprinted inputs: the Blender sources (and the ferry's shared shiplib they
+   *  build with), the sim layout they read, the painted maps and their table, and this
+   *  builder. */
+  inputs: [
+    `${HERE}/mirefen_tavern_source.glb`,
+    `${HERE}/build_tavern.py`,
+    `${HERE}/inn_kit.py`,
+    `${HERE}/inn_hall.py`,
+    `${HERE}/inn_roof.py`,
+    `${HERE}/inn_tower.py`,
+    `${HERE}/inn_wing.py`,
+    `${HERE}/inn_porch.py`,
+    `${HERE}/inn_interior.py`,
+    `${HERE}/inn_props.py`,
+    `${HERE}/props/props_data.json`,
+    `${HERE}/inn_furnish.py`,
+    `${HERE}/inn_lights.py`,
+    `${HERE}/inn_grounds.py`,
+    `${HERE}/tavern_dog.py`,
+    `${HERE}/tavern_texture.py`,
+    `${HERE}/layout.json`,
+    `${HERE}/textures.json`,
+    ...MAP_FILES,
+    'scripts/assets/eastbrook_ferry/shiplib.py',
+    `${HERE}/build.mjs`,
+  ],
+  /** Named nodes the runtime depends on. */
+  requiredNodes: [
+    'MirefenTavern_ROOT',
+    'TavernFrame',
+    'TavernFurnishings',
+    'TavernLights',
+    'TavernGrounds',
+    'TavernDog',
+    'HallWallFront',
+    'HallWallFrontLeft',
+    'HallWallFrontRight',
+    'HallWallBack',
+    'HallWallLeft',
+    'HallWallRight',
+    'HallRoof',
+    'WingWallEast',
+    'WingWallBack',
+    'WingWallWest',
+    'WingRoof',
+    'TowerWall',
+    'TowerRoof',
+    'HallPorch',
+    'BarPillar',
+    'TavernTrim',
+    'TavernClutter',
+  ],
+  materials: [
+    'TavernCloth',
+    'TavernDressed',
+    'TavernFloor',
+    'TavernGlow',
+    'TavernMetal',
+    'TavernPlain',
+    'TavernPlaster',
+    'TavernProps',
+    'TavernRoof',
+    'TavernStone',
+    'TavernTimber',
+  ],
+  /** The materials that wear a painted map (textures.json), the rest draw untextured. */
+  painted: Object.keys(TEXTURES.materials).sort(),
+};
+
+/** sRGB to linear, one channel. */
+function srgbToLinear(c) {
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
+/** The linear factor a painted material multiplies its vertex colour by: tavern_texture.py
+ *  stores a painted face's colour under textures.json's headroom (room for the warm light to
+ *  lift the paint above the map), and the Blender export ships a stored colour v as
+ *  srgbToLinear(v), so a tint of 1 draws as the map itself under this factor. Written into each
+ *  painted material's extras (src/render/vertex_colour_glb_parts.ts reads it). */
+export const VERTEX_COLOUR_SCALE = Number((1 / srgbToLinear(1 / TEXTURES.headroom)).toFixed(6));
+
+/** The file a texture tier ships as. */
+export function tierTarget(tier, asset = MIREFEN_TAVERN_ASSET) {
+  const suffix = asset.tiers[tier].suffix;
+  return asset.target.replace(/\.glb$/, `${suffix}.glb`);
+}
+
+export function sourceFingerprint(asset = MIREFEN_TAVERN_ASSET, root = ROOT) {
+  const hash = createHash('sha256');
+  for (const file of asset.inputs) {
+    // Text inputs hash with normalized line endings so a Windows checkout and a Linux
+    // checkout agree; the source GLB and the maps are binary and hash byte for byte.
+    const bytes = readFileSync(path.join(root, file));
+    const body = /\.(glb|jpg|png)$/.test(file)
+      ? bytes
+      : Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'));
+    hash.update(file).update('\0').update(body).update('\0');
+  }
+  return hash.digest('hex');
+}
+
+/** The exact Sharp runtime gltf-transform's CLI owns (a second Sharp in one Windows process
+ *  loads a second libvips and fails), and its KTX2 encoder; see compress_glb_textures.mjs. */
+async function textureTools() {
+  const rootRequire = createRequire(import.meta.url);
+  const cliRequire = createRequire(rootRequire.resolve('@gltf-transform/cli'));
+  const sharp = (await import(pathToFileURL(cliRequire.resolve('sharp')).href)).default;
+  if (process.env.KTX_BIN && !process.env.PATH?.includes(process.env.KTX_BIN)) {
+    process.env.PATH = `${process.env.PATH ?? ''}${path.delimiter}${process.env.KTX_BIN}`;
+  }
+  const { Mode, toktx } = await import('@gltf-transform/cli');
+  return { sharp, Mode, toktx };
+}
+
+/** A colour map `width` by `height`, as PNG. */
+async function colorMap(sharp, file, width, height) {
+  return sharp(file).resize(width, height, { kernel: 'lanczos3' }).png().toBuffer();
+}
+
+/** A normal map with its kit strength baked in (x and y scaled, renormalized), at `size`,
+ *  as PNG. */
+async function normalMap(sharp, file, strength, size) {
+  const { data, info } = await sharp(file)
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const out = Buffer.alloc(info.width * info.height * 3);
+  for (let i = 0; i < info.width * info.height; i++) {
+    const x = (data[i * info.channels] / 255) * 2 - 1;
+    const y = (data[i * info.channels + 1] / 255) * 2 - 1;
+    const z = (data[i * info.channels + 2] / 255) * 2 - 1;
+    const sx = x * strength;
+    const sy = y * strength;
+    const sz = Math.max(z, 0.05);
+    const k = 1 / Math.hypot(sx, sy, sz);
+    out[i * 3] = Math.round((sx * k * 0.5 + 0.5) * 255);
+    out[i * 3 + 1] = Math.round((sy * k * 0.5 + 0.5) * 255);
+    out[i * 3 + 2] = Math.round((sz * k * 0.5 + 0.5) * 255);
+  }
+  return sharp(out, { raw: { width: info.width, height: info.height, channels: 3 } })
+    .resize(size, size, { kernel: 'lanczos3' })
+    .png()
+    .toBuffer();
+}
+
+/** A repeat's UVs land on a grid of this many steps (a texel of the full tier's 1024 map:
+ *  nothing a player could see), and each primitive's UVs are shifted by whole repeats to start
+ *  at 0 (the map repeats, so it draws the same): snapped float UVs compress to well under two
+ *  thirds of their raw stream under meshopt. */
+export const UV_STEPS_PER_REPEAT = 1024;
+
+function snapUvs(uv) {
+  const array = uv.getArray();
+  let minU = Number.POSITIVE_INFINITY;
+  let minV = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < array.length; i += 2) {
+    minU = Math.min(minU, array[i]);
+    minV = Math.min(minV, array[i + 1]);
+  }
+  const shiftU = Math.floor(minU);
+  const shiftV = Math.floor(minV);
+  const out = new Float32Array(array.length);
+  for (let i = 0; i < array.length; i += 2) {
+    out[i] = Math.round((array[i] - shiftU) * UV_STEPS_PER_REPEAT) / UV_STEPS_PER_REPEAT;
+    out[i + 1] = Math.round((array[i + 1] - shiftV) * UV_STEPS_PER_REPEAT) / UV_STEPS_PER_REPEAT;
+  }
+  uv.setArray(out);
+}
+
+export async function buildMirefenTavern(tier = 'full', asset = MIREFEN_TAVERN_ASSET, root = ROOT) {
+  const sizes = asset.tiers[tier];
+  if (!sizes) throw new Error(`No texture tier ${tier}`);
+  await Promise.all([MeshoptEncoder.ready, MeshoptDecoder.ready]);
+  const { sharp, Mode, toktx } = await textureTools();
+  const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
+    'meshopt.encoder': MeshoptEncoder,
+    'meshopt.decoder': MeshoptDecoder,
+  });
+  io.setLogger({ debug() {}, info() {}, warn() {}, error: (m) => console.error(m) });
+  const doc = await io.read(path.join(root, asset.source));
+  const gltf = doc.getRoot();
+  const names = new Set(gltf.listNodes().map((node) => node.getName()));
+  const missing = asset.requiredNodes.filter((name) => !names.has(name));
+  if (missing.length) throw new Error(`Tavern source is missing nodes: ${missing.join(', ')}`);
+  // (keep the UVs: no map is attached yet, so a plain prune would drop every TEXCOORD_0)
+  await doc.transform(prune({ keepExtras: true, keepLeaves: true, keepAttributes: true }));
+  const materials = gltf
+    .listMaterials()
+    .map((material) => material.getName())
+    .sort();
+  if (JSON.stringify(materials) !== JSON.stringify(asset.materials)) {
+    throw new Error(`Unexpected tavern materials: ${materials.join(', ')}`);
+  }
+  if (
+    gltf.listTextures().length ||
+    gltf.listCameras().length ||
+    gltf.listSkins().length ||
+    gltf.listAnimations().length
+  ) {
+    throw new Error('The tavern source exports map-free, camera-free, unskinned and still');
+  }
+  const extras = gltf.listScenes()[0]?.listChildren()[0]?.getExtras() ?? {};
+  if (!extras.mirefenTavern) throw new Error('MirefenTavern_ROOT lost its extras');
+  // the painted maps onto their materials; only a painted face keeps its UVs. Every colour is
+  // the vertex colour (times the map): the exporter leaves its socket's grey as the factor.
+  for (const material of gltf.listMaterials()) {
+    material.setBaseColorFactor([1, 1, 1, 1]);
+    const name = material.getName();
+    const spec = TEXTURES.materials[name];
+    if (!spec) continue;
+    // its vertex colours sit under the headroom: the runtime multiplies them back
+    material.setExtras({ ...material.getExtras(), vertexColourScale: VERTEX_COLOUR_SCALE });
+    // (a map's `scale`, [across, down], multiplies its tier's colour size: the props' atlas
+    // packs many maps)
+    const [sx, sy] = spec.scale ?? [1, 1];
+    const color = doc
+      .createTexture(`${name}_color`)
+      .setImage(
+        await colorMap(
+          sharp,
+          path.join(root, HERE, spec.color),
+          sizes.color * sx,
+          sizes.color * sy,
+        ),
+      )
+      .setMimeType('image/png');
+    material.setBaseColorTexture(color);
+    if (spec.normal) {
+      const normal = doc
+        .createTexture(`${name}_normal`)
+        .setImage(
+          await normalMap(
+            sharp,
+            path.join(root, HERE, spec.normal),
+            spec.normalStrength,
+            sizes.normal,
+          ),
+        )
+        .setMimeType('image/png');
+      material.setNormalTexture(normal).setNormalScale(1);
+    }
+    material.setRoughnessFactor(spec.roughness).setMetallicFactor(0);
+  }
+  for (const mesh of gltf.listMeshes()) {
+    for (const prim of mesh.listPrimitives()) {
+      const name = prim.getMaterial()?.getName() ?? '';
+      const uv = prim.getAttribute('TEXCOORD_0');
+      if (asset.painted.includes(name)) {
+        if (!uv) throw new Error(`${mesh.getName()}: ${name} has no UVs`);
+        // (an atlas's UVs lie in [0, 1] and quantize as they are: a repeat's grid would move them)
+        if (!TEXTURES.materials[name].atlas) snapUvs(uv);
+      } else if (uv) {
+        prim.setAttribute('TEXCOORD_0', null);
+      }
+    }
+  }
+  gltf.setExtras({ sourceFingerprint: sourceFingerprint(asset, root), authoring: 'Blender' });
+  await doc.transform(
+    prune({ keepExtras: true, keepLeaves: true }),
+    dedup(),
+    // the scripts/assets/compress_glb_textures.mjs routing: normal maps UASTC, the rest ETC1S
+    toktx({
+      mode: Mode.UASTC,
+      slots: /^(normalTexture|occlusionTexture)$/,
+      jobs: 2,
+      encoder: sharp,
+    }),
+    toktx({ mode: Mode.ETC1S, jobs: 2, encoder: sharp }),
+    meshopt({ encoder: MeshoptEncoder, level: 'high' }),
+  );
+  const left = gltf.listTextures().filter((texture) => texture.getMimeType() !== 'image/ktx2');
+  if (left.length)
+    throw new Error(`Maps left unencoded: ${left.map((t) => t.getName()).join(', ')}`);
+  return io.writeBinary(doc);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  for (const tier of Object.keys(MIREFEN_TAVERN_ASSET.tiers)) {
+    const bytes = await buildMirefenTavern(tier);
+    const target = tierTarget(tier);
+    mkdirSync(path.dirname(path.join(ROOT, target)), { recursive: true });
+    writeFileSync(path.join(ROOT, target), bytes);
+    console.log(
+      `${target}: ${bytes.length} bytes, sha256 ${createHash('sha256').update(bytes).digest('hex')}`,
+    );
+  }
+}

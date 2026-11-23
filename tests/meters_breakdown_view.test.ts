@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  abilityDetailStats,
   BREAKDOWN_GROUP_ROW_CAP,
   BREAKDOWN_ROW_CAP,
   type BreakdownEntry,
@@ -158,5 +159,73 @@ describe('grouped hover breakdown (per-contributor subtotals)', () => {
     const model = buildGroupedMeterBreakdown([entry('Aimed Shot', 0)], 10);
     expect(model.total).toBe(0);
     expect(model.groups).toEqual([]);
+  });
+});
+
+// The ability drill-down subtitle. A heal entry's `amount` is already the
+// EFFECTIVE heal (the sim clamps heal2 amount to missing hp and reports the
+// excess as a separate `overheal`), so the subtitle must not subtract overheal
+// again, and the overheal share is of total output (effective + overheal).
+describe('meters ability detail stats', () => {
+  it('reports a heal entry amount as effective, never subtracting overheal twice', () => {
+    const stats = abilityDetailStats({
+      ability: 'Flash of Light',
+      petName: null,
+      amount: 600,
+      overheal: 200,
+      hits: 4,
+      crits: 1,
+    });
+    expect(stats.effective).toBe(600);
+    expect(stats.overheal).toBe(200);
+    // 200 of 800 total output was wasted: 25%, not 200 / 600.
+    expect(stats.overhealShare).toBe(0.25);
+    expect(stats.critShare).toBe(0.25);
+  });
+
+  it('reports a full overheal as 100% with zero effective', () => {
+    const stats = abilityDetailStats({ ability: 'Renew', petName: null, amount: 0, overheal: 90 });
+    expect(stats.effective).toBe(0);
+    expect(stats.overhealShare).toBe(1);
+  });
+
+  it('guards the empty heal (no output at all) to a zero overheal share', () => {
+    const stats = abilityDetailStats({ ability: 'Renew', petName: null, amount: 0 });
+    expect(stats.overheal).toBe(0);
+    expect(stats.overhealShare).toBe(0);
+  });
+
+  it('derives hits, crits, average and the min/max range for a damage entry', () => {
+    const stats = abilityDetailStats({
+      ability: 'Fireball',
+      petName: null,
+      amount: 1000,
+      hits: 3,
+      crits: 1,
+      minHit: 250,
+      maxHit: 450,
+    });
+    expect(stats.hits).toBe(3);
+    expect(stats.crits).toBe(1);
+    expect(stats.critShare).toBeCloseTo(1 / 3);
+    expect(stats.avg).toBe(333);
+    expect(stats.minHit).toBe(250);
+    expect(stats.maxHit).toBe(450);
+  });
+
+  it('falls back to one hit and the average for a bare entry without counters', () => {
+    const stats = abilityDetailStats({ ability: null, petName: null, amount: 120 });
+    expect(stats.hits).toBe(1);
+    expect(stats.crits).toBe(0);
+    expect(stats.critShare).toBe(0);
+    expect(stats.avg).toBe(120);
+    expect(stats.minHit).toBe(120);
+    expect(stats.maxHit).toBe(120);
+  });
+
+  it('keeps a zero-hit entry from dividing by zero', () => {
+    const stats = abilityDetailStats({ ability: 'Kick', petName: null, amount: 0, hits: 0 });
+    expect(stats.critShare).toBe(0);
+    expect(stats.avg).toBe(0);
   });
 });

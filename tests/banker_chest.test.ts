@@ -184,11 +184,14 @@ describe('banker chest model and placement', () => {
     ]);
 
     const expectedOffsets: Record<string, readonly [number, number]> = {
-      // The bank facade stands directly behind Fernando, so his behind-side
-      // candidates sample blocked and the chest takes the pushed-out front
-      // corner. Petra's rebuilt exterior teller likewise keeps the bank facade
-      // directly behind her, so its first fully clear spot is also in front.
-      bursar_fernando: [2.0, 0.9],
+      // Re-pinned 2026-10 for the Tidehold rebuild: Fernando stands out on the
+      // forecourt of the painted bank now, six yards off its front wall, so
+      // the ground behind him is open and the chest takes the FIRST candidate,
+      // behind and beside him (the kit town hall's facade stood directly
+      // behind him and pushed it to the front corner). Petra's rebuilt exterior
+      // teller still keeps the bank facade directly behind her, so her first
+      // fully clear spot is in front.
+      bursar_fernando: [1.15, -1.6],
       bursar_petra_vell: [2.0, 0.9],
       bursar_aldous_crane: [2.0, 0.9],
     };
@@ -246,11 +249,11 @@ describe('banker chest model and placement', () => {
     const chest = attachBankerChestToNpcView(viewGroup, entity, TEST_WORLD_SEED);
     if (!chest) throw new Error('built-in banker chest was not attached');
     expect(chest.parent).toBe(viewGroup);
-    // Fernando's chest resolves to the pushed-out front corner (the bank
-    // facade blocks his behind-side candidates), matching the sim's solid
-    // collider spot exactly.
-    expect(chest.position.x).toBe(2.0);
-    expect(chest.position.z).toBeGreaterThan(0);
+    // Fernando's chest resolves behind and beside him (open forecourt since
+    // the Tidehold rebuild, see the placement pin above), matching the sim's
+    // solid collider spot exactly.
+    expect(chest.position.x).toBe(1.15);
+    expect(chest.position.z).toBeLessThan(0);
     expect(chest.rotation.y).toBe(0);
     expect(clickTargets).toEqual([clickProxy]);
     expect(clickProxy.getObjectByName('bankerChestDecoration')).toBeUndefined();

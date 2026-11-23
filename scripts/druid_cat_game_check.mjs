@@ -325,7 +325,8 @@ try {
     (error) =>
       error.type === 'console' &&
       (/\/api\/(site-presence|project-stats)$/.test(error.url ?? '') ||
-        /^character visual unavailable, skipping view \((npc_modular_walking_staff|mob_training_dummy)\): Error: character asset not preloaded:/.test(
+        // the Training Dummy's body, and the walking staff an NPC holds on its class body
+        /^character visual unavailable, skipping view \((?:mob_training_dummy\): Error: character asset not preloaded:|player_[a-z_]+\): Error: character asset not preloaded: \S*brasscrown_walking_staff\.glb)/.test(
           error.text,
         )),
   );

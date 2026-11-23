@@ -41,6 +41,7 @@
 // one shell module sanctioned for process execution.
 
 const { spawnDetachedSelf } = require('./gpu_preference.cjs');
+const { appendEnabledFeatures, ENABLE_FEATURES_SWITCH } = require('./chromium_features.cjs');
 
 /** What the player can ask for (Graphics > System); 'auto' is the shipped default. */
 const GPU_BACKEND_SETTINGS = ['auto', 'vulkan', 'opengl'];
@@ -323,14 +324,20 @@ function explicitGpuBackendLaunch(environment, prefs) {
  * for a `parallel` one, plus what the policy says this card needs on Vulkan
  * (`cardSwitches`, the policy's `vulkanSwitches`: the AMD DRM-format-modifier
  * workaround); nothing for 'default'. The card's switches ride EVERY Vulkan launch,
- * Auto or explicit: they follow the hardware, never the mode. Must run before app
+ * Auto or explicit: they follow the hardware, never the mode. The feature set is MERGED
+ * into `enable-features` (electron/chromium_features.cjs), never appended as a second
+ * value that would replace another lever's features. Must run before app
  * 'ready' (Chromium reads its command line there), which is why main.cjs calls it at
  * module scope right after the discrete-GPU force.
  */
 function applyGpuBackendSwitches(app, launch, cardSwitches = []) {
   if (launch?.backend !== 'vulkan') return;
   for (const [name, value] of VULKAN_BACKEND_SWITCHES) {
-    app.commandLine.appendSwitch(name, value);
+    if (name === ENABLE_FEATURES_SWITCH) {
+      appendEnabledFeatures(app.commandLine, value.split(','));
+    } else {
+      app.commandLine.appendSwitch(name, value);
+    }
   }
   if (launch.parallel === true) {
     app.commandLine.appendSwitch(...VULKAN_PARALLEL_COMPILE_SWITCH);

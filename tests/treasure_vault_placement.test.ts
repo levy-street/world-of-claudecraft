@@ -36,6 +36,7 @@ describe('buried hoard placement', () => {
     const addEntity = vi.fn();
     const consume = vi.fn();
     const ctx = {
+      lockoutNowMs: () => 0,
       cfg: { seed: WORLD_SEED },
       groundPos: (x: number, z: number) => ({ x, y: Number.NaN, z }),
       emit,

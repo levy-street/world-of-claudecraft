@@ -195,7 +195,7 @@ describe('the cocoon in the fight', () => {
     expect(aura?.unbreakableControl).toBe(true);
     const [mob] = cocoonMobs(entry);
     expect(mob.pos.x).toBeCloseTo(target.pos.x, 3);
-    expect(mob.maxHp).toBe(cocoonHealth(entry.boss.maxHp, 2));
+    expect(mob.maxHp).toBe(cocoonHealth(entry.boss.maxHp, 4));
     expect(entry.inst.mobIds).toContain(mob.id);
     expect(entry.boss.summonedIds).toContain(mob.id);
   });
@@ -321,7 +321,7 @@ describe('the cocoon in the fight', () => {
     run(entry.sim, entry.boss, COCOON.warningSec + DT);
     expect(wrapped(entry)).toHaveLength(2);
     expect(everyone(entry).length - wrapped(entry).length).toBe(2);
-    for (const mob of cocoonMobs(entry)) expect(mob.maxHp).toBe(cocoonHealth(entry.boss.maxHp, 2));
+    for (const mob of cocoonMobs(entry)) expect(mob.maxHp).toBe(cocoonHealth(entry.boss.maxHp, 3));
     const calm = encounter('rare');
     addAllies(calm, 3);
     cast(calm);

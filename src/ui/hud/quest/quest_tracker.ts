@@ -26,7 +26,8 @@ export interface TrackedObjective {
 
 export interface TrackedQuest {
   id: string;
-  /** 1-based acceptance-order number, matching the world map's badges. */
+  /** 1-based acceptance-order number, matching the world map's badges.
+   *  Zero for a supplemental row with no quest-log entry or map badge. */
   number: number;
   /** Already-localized quest title. */
   title: string;

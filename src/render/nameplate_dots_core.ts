@@ -63,6 +63,9 @@ export interface NameplateDotAura {
   duration?: number;
   permanent?: boolean;
   school?: string;
+  /** Applications on a stacking debuff (Armor Shear, Sunder). Absent or 1 on
+   *  everything that does not stack. */
+  stacks?: number;
   /** The caster, for the host's isOwn predicate. Optional because an older
    *  server's mirror omits it; a missing caster is never "own". */
   sourceId?: number;
@@ -70,7 +73,7 @@ export interface NameplateDotAura {
 
 /** One resolved icon slot.
  *
- *  The first five fields are written by nameplateDotsInto. The last two are
+ *  The fields up to `stacks` are written by nameplateDotsInto. The rest are
  *  written ONLY by the painter, on the same cadence it resolves the rest of the
  *  plate's artwork and text (the `guildLabel` precedent in nameplate_canvas.ts):
  *  keeping them on the slot is what lets the draw path stay allocation-free,
@@ -86,6 +89,10 @@ export interface NameplateDotSlot {
    *  that rule reads as never expiring. */
   duration: number;
   decimals: 0 | 1;
+  /** The stack badge count, 0 when the aura does not stack past one: the same
+   *  rule the target frame strip and the Target dots frame badge on, so a
+   *  five-stack Armor Shear reads as 5 on every surface that shows it. */
+  stacks: number;
   /** PAINTER-WRITTEN: artwork resolved from `iconKey`, '' while unresolved. */
   iconUrl: string;
   /** PAINTER-WRITTEN: the localized countdown, '' while unresolved. */
@@ -94,6 +101,13 @@ export interface NameplateDotSlot {
    *  from, so the painter can skip re-formatting a number that has not moved at
    *  the precision it draws. NaN while unresolved. */
   timeValue: number;
+  /** PAINTER-WRITTEN: the localized stack count, '' when `stacks` is 0 or while
+   *  unresolved. */
+  stacksText: string;
+  /** PAINTER-WRITTEN: the `stacks` value `stacksText` was formatted from, so a
+   *  steady count is formatted once rather than once a frame. NaN while
+   *  unresolved. */
+  stacksValue: number;
 }
 
 /** Slots plus the count actually filled. Owned and reused by the painter. */
@@ -118,9 +132,12 @@ function newSlot(): NameplateDotSlot {
     remaining: 0,
     duration: 0,
     decimals: 0,
+    stacks: 0,
     iconUrl: '',
     timeText: '',
     timeValue: Number.NaN,
+    stacksText: '',
+    stacksValue: Number.NaN,
   };
 }
 
@@ -167,14 +184,16 @@ export function nameplateDotsInto(
     if (best === null) break;
     const slot = out.slots[written] ?? newSlot();
     out.slots[written] = slot;
-    // Recycling a slot onto a different aura invalidates BOTH painter-resolved
-    // fields, so the painter re-resolves instead of drawing the previous aura's
-    // icon or its countdown (the pooled-record staleness trap auras_painter
-    // documents).
+    // Recycling a slot onto a different aura invalidates EVERY painter-resolved
+    // field, so the painter re-resolves instead of drawing the previous aura's
+    // icon, countdown or stack count (the pooled-record staleness trap
+    // auras_painter documents).
     if (slot.iconKey !== best.id) {
       slot.iconUrl = '';
       slot.timeText = '';
       slot.timeValue = Number.NaN;
+      slot.stacksText = '';
+      slot.stacksValue = Number.NaN;
     }
     slot.iconKey = best.id;
     slot.school = best.school ?? '';
@@ -182,6 +201,7 @@ export function nameplateDotsInto(
     slot.remaining = Math.max(0, best.remaining);
     slot.duration = best.permanent === true ? 0 : (best.duration ?? 0);
     slot.decimals = slot.remaining < NAMEPLATE_DOT_DECIMAL_BELOW_SEC ? 1 : 0;
+    slot.stacks = best.stacks !== undefined && best.stacks > 1 ? best.stacks : 0;
     previousId = best.id;
     written++;
   }

@@ -63,7 +63,10 @@ import {
 } from '../src/sim/encounters/ignivar';
 import { IGNIVAR_DIALOGUE } from '../src/sim/encounters/ignivar_dialogue';
 import { polygonContainsPoint } from '../src/sim/geometry2d';
-import { IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../src/sim/ignivar_arena';
+import {
+  IGNIVAR_WATER_CONDUIT_TEMPLATES,
+  ignivarConduitStateForTemplate,
+} from '../src/sim/ignivar_arena';
 import {
   IGNIVAR_FORGE_CHAINS_ATTACH_GRACE_SECONDS,
   IGNIVAR_FORGE_CHAINS_AURA_ID,
@@ -173,6 +176,16 @@ function addEncounterPlayer(
   player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z + 2 };
   player.prevPos = { ...player.pos };
   return player;
+}
+
+// Brand never targets the player Ignivar is attacking, so a test that wants
+// the local player branded hands aggro to a stand-in main tank first.
+function handAggroToStandInTank(sim: Sim, boss: Entity): Entity {
+  const tank = addEncounterPlayer(sim, boss, 'Stand-in Tank', 'warrior');
+  tank.devGod = true;
+  boss.aggroTargetId = tank.id;
+  boss.threat.set(tank.id, 1e9);
+  return tank;
 }
 
 function applyIgnivarBrand(player: Entity, boss: Entity): void {
@@ -745,7 +758,7 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FORGE_STRIKE_EVERY).toBe(14);
     expect(IGNIVAR_FORGE_STRIKE_MAX_HP).toBe(0.35);
     expect(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS).toBe(6);
-    expect(IGNIVAR_FIRST_FORGE_WAVE_SECONDS).toBe(50);
+    expect(IGNIVAR_FIRST_FORGE_WAVE_SECONDS).toBe(24);
     expect(IGNIVAR_FORGE_WAVE_EVERY).toBe(60);
     expect(IGNIVAR_FORGE_WAVE_WINDUP_SECONDS).toBe(2.5);
     expect(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS).toBe(3);
@@ -980,20 +993,160 @@ describe('Ignivar encounter', () => {
     expect(forgeWaveCadenceTrace(418)).toEqual(first);
     expect(first).toEqual([
       {
-        startTick: 1101,
-        endTick: 1211,
-        facingSlot: 0,
+        startTick: 523,
+        endTick: 633,
+        facingSlot: 3,
         windupFrames: 50,
         activeFrames: 60,
       },
       {
-        startTick: 2380,
-        endTick: 2490,
-        facingSlot: 4,
+        startTick: 1802,
+        endTick: 1912,
+        facingSlot: 3,
         windupFrames: 50,
         activeFrames: 60,
       },
     ]);
+  });
+
+  // Live parses showed the opening Forge Wave landing about 8.5 seconds into
+  // the second Water Conduit's cleanse window on both difficulties: the
+  // knockback threw branded players out of the pool and its damage stacked on
+  // Cleansing Backlash. The opening wave must resolve before that Torrent.
+  it.each([
+    ['normal', claimedEncounter],
+    ['heroic', claimedHeroicEncounter],
+  ] as const)(
+    'resolves the opening %s Forge Wave before the second Searing Torrent',
+    (_, claim) => {
+      const { sim, boss } = claim(418);
+      const party = [
+        sim.player,
+        addEncounterPlayer(sim, boss, 'Opening Two'),
+        addEncounterPlayer(sim, boss, 'Opening Three'),
+        addEncounterPlayer(sim, boss, 'Opening Four'),
+      ];
+      let torrentStarts = 0;
+      let secondTorrentTick = -1;
+      let waveEndTick = -1;
+      let previous: string | null = null;
+      for (let tick = 0; tick < 3_000 && secondTorrentTick < 0; tick++) {
+        for (const player of party) {
+          player.hp = player.maxHp;
+          player.dead = false;
+        }
+        updateIgnivarEncounter(sim.ctx, boss);
+        const casting = boss.castingAbility ?? null;
+        if (casting === IGNIVAR_FRONTAL_CAST_ID && previous !== IGNIVAR_FRONTAL_CAST_ID) {
+          torrentStarts++;
+          if (torrentStarts === 2) secondTorrentTick = tick;
+        }
+        if (previous === IGNIVAR_FORGE_WAVE_CAST_ID && casting !== IGNIVAR_FORGE_WAVE_CAST_ID) {
+          if (waveEndTick < 0) waveEndTick = tick;
+        }
+        previous = casting;
+      }
+      expect(secondTorrentTick).toBeGreaterThan(0);
+      expect(waveEndTick).toBeGreaterThan(0);
+      expect(waveEndTick).toBeLessThan(secondTorrentTick);
+    },
+  );
+
+  // Every later wave hit the same seam: the Torrent wins a near tie, major
+  // ability spacing holds the wave six seconds behind it, and the windup puts
+  // its impact 8.5 seconds into the cleanse window. No wave may overlap an
+  // active Water Conduit at any point of a long pull.
+  it.each([
+    ['normal', claimedEncounter, false],
+    ['heroic', claimedHeroicEncounter, true],
+  ] as const)('never runs a %s Forge Wave while a Water Conduit is active', (_, claim, holds) => {
+    const { sim, boss } = claim(418);
+    const tank = sim.player;
+    const party = [
+      tank,
+      addEncounterPlayer(sim, boss, 'Window Two'),
+      addEncounterPlayer(sim, boss, 'Window Three'),
+      addEncounterPlayer(sim, boss, 'Window Four'),
+    ];
+    const conduits = [...sim.entities.values()].filter(
+      (e) => ignivarConduitStateForTemplate(e.templateId) !== null,
+    );
+    expect(conduits).toHaveLength(4);
+    let activations = 0;
+    let waves = 0;
+    let overlapTicks = 0;
+    let heldTicks = 0;
+    let wasOpen = false;
+    let wasWave = false;
+    for (let tick = 0; tick < 6_000; tick++) {
+      for (const player of party) {
+        player.hp = player.maxHp;
+        player.dead = false;
+      }
+      // Hold the tank on the ray toward the next ready conduit so every
+      // Searing Torrent opens a real cleanse window.
+      const next = conduits.find((c) => c.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.ready);
+      if (next) {
+        const dx = next.pos.x - boss.pos.x;
+        const dz = next.pos.z - boss.pos.z;
+        const len = Math.hypot(dx, dz);
+        tank.pos = {
+          x: boss.pos.x + (dx / len) * 2,
+          y: boss.pos.y,
+          z: boss.pos.z + (dz / len) * 2,
+        };
+        tank.prevPos = { ...tank.pos };
+      }
+      updateIgnivarEncounter(sim.ctx, boss);
+      if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+      const open = conduits.some((c) => c.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.active);
+      const wave =
+        boss.ignivar.forgeWaveWindupRemaining > 0 || boss.ignivar.forgeWaveActiveRemaining > 0;
+      if (open && !wasOpen) activations++;
+      if (wave && !wasWave) waves++;
+      if (open && wave) overlapTicks++;
+      if (open && !wave && boss.ignivar.forgeWaveTimer <= 0) heldTicks++;
+      wasOpen = open;
+      wasWave = wave;
+    }
+    expect(activations).toBe(4);
+    expect(waves).toBeGreaterThanOrEqual(4);
+    expect(overlapTicks).toBe(0);
+    // Heroic's later Torrent cadence makes a wave come due inside a window at
+    // this seed, so the hold itself is exercised rather than only the opener.
+    if (holds) expect(heldTicks).toBeGreaterThan(0);
+  });
+
+  it('holds a due Forge Wave while a conduit is active and releases it on close', () => {
+    const { sim, boss, conduit } = claimedEncounter();
+    prepareConduitCleanse(sim, boss, conduit);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    boss.ignivar.forgeWaveTimer = 0;
+    boss.ignivar.conduitTimers.north_west = 1;
+    let openTicks = 0;
+    while (conduit.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.active && openTicks < 40) {
+      expect(boss.ignivar.forgeWaveWindupRemaining).toBe(0);
+      updateIgnivarEncounter(sim.ctx, boss);
+      openTicks++;
+    }
+    expect(openTicks).toBeGreaterThanOrEqual(19);
+    expect(conduit.templateId).toBe(IGNIVAR_WATER_CONDUIT_TEMPLATES.cooldown);
+    // The conduit pass runs before the wave check, so the wave starts on the
+    // same tick the window closes.
+    expect(boss.ignivar.forgeWaveWindupRemaining).toBeGreaterThan(0);
+  });
+
+  it('does not hold Forge Wave on a timer left by a conduit outside the encounter', () => {
+    const { sim, boss, conduit } = claimedEncounter();
+    prepareConduitCleanse(sim, boss, conduit);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    // A stale entry the conduit pass can no longer visit must not stall the
+    // wave for the rest of the pull.
+    conduit.pos = { ...conduit.pos, x: conduit.pos.x + 10 };
+    boss.ignivar.forgeWaveTimer = 0;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(boss.ignivar.conduitTimers.north_west).toBe(5);
+    expect(boss.ignivar.forgeWaveWindupRemaining).toBeGreaterThan(0);
   });
 
   it('warns before three rays rotate, damages crossings, and reverses the next cast', () => {
@@ -1723,10 +1876,12 @@ describe('Ignivar encounter', () => {
     const activeTankMeta = sim.players.get(sim.player.id);
     if (!activeTankMeta) throw new Error('Active tank metadata is missing');
     activeTankMeta.talentMods.role = 'tank';
+    activeTankMeta.talentMods.spec = 'prot';
     const offTank = addEncounterPlayer(sim, boss, 'Off Tank', 'paladin');
     const offTankMeta = sim.players.get(offTank.id);
     if (!offTankMeta) throw new Error('Off tank metadata is missing');
     offTankMeta.talentMods.role = 'tank';
+    offTankMeta.talentMods.spec = 'protection';
     const firstNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate One');
     const secondNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate Two', 'mage');
     updateIgnivarEncounter(sim.ctx, boss);
@@ -1764,6 +1919,7 @@ describe('Ignivar encounter', () => {
       const activeTankMeta = sim.players.get(sim.player.id);
       if (!activeTankMeta) throw new Error('Active tank metadata is missing');
       activeTankMeta.talentMods.role = 'tank';
+      activeTankMeta.talentMods.spec = 'prot';
       const eligible = Array.from({ length: nonTankCount }, (_, index) =>
         addEncounterPlayer(sim, boss, `Brand RNG Candidate ${index}`, 'mage'),
       );
@@ -1793,6 +1949,7 @@ describe('Ignivar encounter', () => {
 
   it('ramps each uncleansed Brand tick from one to three stacks without exceeding the cap', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -1826,6 +1983,7 @@ describe('Ignivar encounter', () => {
 
   it('does not reset an uncleansed Brand when that player is selected again', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -2299,6 +2457,7 @@ describe('Ignivar encounter', () => {
 
   it('runs the encounter through the production mob tick dispatcher', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     sim.player.devGod = true;
 
     for (let i = 0; i < 45; i++) sim.tick();
@@ -2953,6 +3112,7 @@ describe('Ignivar encounter', () => {
 
   it('removes encounter-owned player auras immediately when leaving the development raid', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
@@ -3766,6 +3926,7 @@ describe('Ignivar encounter', () => {
 
   it('keeps the Apocalypse add stationary and non-attacking while Ignivar stays active', () => {
     const { sim, boss } = claimedEncounter();
+    handAggroToStandInTank(sim, boss);
     sim.player.devGod = true;
     boss.hp = Math.floor(boss.maxHp * IGNIVAR_APOCALYPSE_HP_THRESHOLD);
     updateIgnivarEncounter(sim.ctx, boss);

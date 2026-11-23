@@ -4,11 +4,15 @@ import { EntryDetailHorizonAdmission } from '../src/render/entry_detail_horizon'
 import {
   advanceEntryDetailHorizon,
   createEntryDetailHorizonState,
+  ENTRY_DETAIL_HORIZON_FAR_HEADROOM_MS,
   ENTRY_DETAIL_HORIZON_HEADROOM_MS,
+  ENTRY_DETAIL_HORIZON_SHED_FRAMES,
+  ENTRY_DETAIL_HORIZON_SHED_MS,
   ENTRY_DETAIL_HORIZON_STABLE_FRAMES,
   ENTRY_DETAIL_HORIZON_STEPS,
   entrySceneryCullFar,
 } from '../src/render/entry_detail_horizon_core';
+import { sceneryFar } from '../src/render/scenery_detail';
 
 describe('entry detail horizon admission', () => {
   it('starts with a useful near field rather than the full 700-yard detail bill', () => {
@@ -150,6 +154,58 @@ describe('entry detail horizon admission', () => {
     expect(state.cap).toBe(ENTRY_DETAIL_HORIZON_STEPS[1]);
   });
 
+  it('requires high-refresh headroom to expand beyond 360 yards and sheds back to 360 yards under sustained load', () => {
+    const admission = new EntryDetailHorizonAdmission(700);
+    admission.arm(700, true);
+    // 17 ms (~58.8 FPS) opens the 240 -> 360 yd ring, then holds at 360 yd.
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_STABLE_FRAMES * 4; i++) {
+      admission.advanceFromFrame(true, 700, null, 700, ENTRY_DETAIL_HORIZON_FAR_HEADROOM_MS + 4.5);
+    }
+    expect(admission.snapshot()).toMatchObject({
+      active: true,
+      cap: 360,
+      sceneryCap: 360,
+      holdReason: 'frame',
+    });
+
+    // High-refresh headroom (<= 12.5 ms) expands through 520 yd to 700 yd (complete).
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_STABLE_FRAMES * 2; i++) {
+      admission.advanceFromFrame(true, 700, null, 700, 10);
+    }
+    expect(admission.snapshot()).toMatchObject({
+      active: false,
+      cap: 700,
+      sceneryCap: null,
+      holdReason: 'advanced',
+    });
+
+    // Returning to a heavy zone (> 18.5 ms) sheds 700 -> 520 -> 360 yd and floors at 360 yd
+    // without touching compile records.
+    const poisonRecords = new Proxy([] as never[], {
+      get() {
+        throw new Error('settled horizon scanned compile records during shed');
+      },
+    });
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_SHED_FRAMES; i++) {
+      admission.advanceFromFrame(true, 700, poisonRecords, 700, ENTRY_DETAIL_HORIZON_SHED_MS + 2);
+    }
+    expect(admission.snapshot()).toMatchObject({
+      active: true,
+      cap: 520,
+      sceneryCap: 520,
+      holdReason: 'frame',
+    });
+    for (let i = 0; i < ENTRY_DETAIL_HORIZON_SHED_FRAMES * 3; i++) {
+      admission.advanceFromFrame(true, 700, poisonRecords, 700, ENTRY_DETAIL_HORIZON_SHED_MS + 2);
+    }
+    expect(admission.snapshot()).toMatchObject({
+      active: true,
+      cap: 360,
+      sceneryCap: 360,
+      holdReason: 'frame',
+    });
+  });
+
   describe('scenery cull far while the horizon expands', () => {
     const healthy = { targetFar: 700, compileReady: true, terrainReadyFar: 700, frameMs: 10 };
     const ringOne = (): ReturnType<typeof createEntryDetailHorizonState> => {
@@ -213,7 +269,15 @@ describe('entry detail horizon admission', () => {
       expect(admission.snapshot().sceneryCap).toBeNull();
     });
 
-    it('is what the renderer hands the four reveal-gated painters at both frame sites', () => {
+    it('preserves the entry admission cap through the scenery-distance adapter', () => {
+      const admission = new EntryDetailHorizonAdmission(700);
+      expect(sceneryFar(admission, 574)).toBe(574);
+      admission.arm(700, true);
+      expect(sceneryFar(admission, 574)).toBe(240);
+      expect(sceneryFar(admission, 120)).toBe(120);
+    });
+
+    it('composes scenery distance with the entry horizon at both frame sites', () => {
       const source = readFileSync('src/render/renderer.ts', 'utf8')
         .replace(/\/\*[\s\S]*?\*\//g, '')
         .replace(/\/\/[^\n]*/g, '');
@@ -223,23 +287,27 @@ describe('entry detail horizon admission', () => {
         source.indexOf('this.fish.update(', prewarmStart),
       );
       const liveStart = source.indexOf(
-        'const sceneryFar = this.entryDetailHorizon.sceneryCullFar(fogFar);',
+        'const sceneryFar = sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar);',
       );
       expect(liveStart).toBeGreaterThan(prewarmStart);
       const liveFrame = source.slice(liveStart, source.indexOf('this.fish.update(', liveStart));
-      const painters = ['propsView', 'eastbrookTownView', 'fenbridgeTownView', 'foliage'];
+      // The rebuilt towns (Eastbrook, Fenbridge, Highwatch) are one painter:
+      // a loop over the town views at each frame site.
+      const painters = ['this.propsView', 'town', 'this.foliage'];
       for (const painter of painters) {
-        const inPrewarm = prewarmFrame.slice(prewarmFrame.indexOf(`this.${painter}.update(`));
+        const inPrewarm = prewarmFrame.slice(prewarmFrame.indexOf(`${painter}.update(`));
         expect(inPrewarm.slice(0, inPrewarm.indexOf(');'))).toContain(
-          'this.entryDetailHorizon.sceneryCullFar(fogFar)',
+          'sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar)',
         );
-        const inLive = liveFrame.slice(liveFrame.indexOf(`this.${painter}.update(`));
+        const inLive = liveFrame.slice(liveFrame.indexOf(`${painter}.update(`));
         expect(inLive.slice(0, inLive.indexOf(');'))).toContain('sceneryFar');
       }
-      // Exactly the four painters, no raw fogFar left in their calls, at each site.
-      expect(prewarmFrame.split('this.entryDetailHorizon.sceneryCullFar(fogFar)').length - 1).toBe(
-        painters.length,
-      );
+      expect(prewarmFrame).toContain('for (const town of this.townViews) {');
+      expect(liveFrame).toContain('for (const town of this.townViews) {');
+      // Exactly the three painters, no raw fogFar left in their calls, at each site.
+      expect(
+        prewarmFrame.split('sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar)').length - 1,
+      ).toBe(painters.length);
       expect(liveFrame.split('sceneryFar,').length - 1).toBe(painters.length);
       // Terrain keeps the wide cull far at both sites: the same literal call, twice.
       const terrainCall =

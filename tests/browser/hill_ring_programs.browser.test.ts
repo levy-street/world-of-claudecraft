@@ -43,7 +43,9 @@ function hill(over: Partial<HillInfo> = {}): HillInfo {
     yourCount: 0,
     challenger: 'none',
     challengerCount: 0,
+    rivalCount: 0,
     contest: 0,
+    contestPaused: false,
     ...over,
   };
 }

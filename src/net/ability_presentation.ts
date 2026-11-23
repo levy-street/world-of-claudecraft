@@ -6,6 +6,7 @@ import {
   type SavedLoadout,
   type TalentAllocation,
 } from '../sim/content/talents';
+import { membershipAbilities } from '../sim/membership_abilities';
 import { computeCharacterModifiers } from '../sim/set_bonus_mods';
 import { mergeAugmentMods } from '../sim/social/fiesta';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
@@ -31,6 +32,7 @@ export function buildClientAbilityPresentation(
   current: PresentationState,
   wire: TalentWire | null | undefined,
   augments: string[],
+  membershipActive = false,
 ) {
   let { talents, loadouts, activeLoadout } = current;
   if (wire) {
@@ -53,6 +55,9 @@ export function buildClientAbilityPresentation(
     loadouts,
     activeLoadout,
     mods,
-    known: abilitiesKnownAt(cls, level, mods, current.questsDone),
+    known: membershipAbilities(
+      abilitiesKnownAt(cls, level, mods, current.questsDone),
+      membershipActive,
+    ),
   };
 }

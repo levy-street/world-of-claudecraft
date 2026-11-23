@@ -225,7 +225,11 @@ describe('forgefather fortress bake', () => {
     // the deck edge). Drive the real movement kernel over the flights in both
     // directions; reaching the far end proves every gate now yields to a
     // band-carried walker.
-    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      autoEquip: true,
+    });
     // temple entrance stair: down to the plaza, up to the court decks
     expect(kernelWalk(sim, 477.5, 2168.15, 5.76, -1, 0).pos.x).toBeLessThan(466);
     expect(kernelWalk(sim, 464, 2168.15, 2.3, 1, 0).pos.x).toBeGreaterThan(475);
@@ -241,7 +245,11 @@ describe('forgefather fortress bake', () => {
     // plate of the span; a standable deck within a step of the hooves is dry
     // footing. Ride from the strand mouth onto the decks, then along the span
     // over open water.
-    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      autoEquip: true,
+    });
     const mouth = kernelWalk(sim, 444, 2181, 2.0, 0, 1, 'valorsteed');
     expect(mouth.pos.z, 'the ride reaches the bridge decks').toBeGreaterThan(2192);
     const span = kernelWalk(sim, 452, 2193, -1.63, 1, 0, 'valorsteed');
@@ -301,7 +309,8 @@ describe('forgefather fortress bake', () => {
         (collider) =>
           collider.x === placement.x &&
           collider.z === placement.z &&
-          (collider.type === 'circle' || collider.rot === placement.ry),
+          (collider.type === 'circle' ||
+            (collider.type === 'obb' && collider.rot === placement.ry)),
       );
       expect(hit, `${placement.key} at (${placement.x}, ${placement.z}) must not block`).toBe(
         undefined,

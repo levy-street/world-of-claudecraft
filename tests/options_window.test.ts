@@ -2,14 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { INTERFACE_OFF_MENU_KEYS } from '../src/ui/interface_reset_keys';
 import { keybindDeviceNoteKeys } from '../src/ui/keybind_device_notes_core';
-import { OptionsWindow } from '../src/ui/options_window';
-
+import { KEYBIND_PANEL_SETTING_KEYS } from '../src/ui/keybind_panel_settings';
 // Source-level guards for the options painter. The pure control descriptors +
 // the per-kind dispatch coercion are unit-tested in options_view.test.ts; here we
 // pin the no-magic-values contract, the tier boundary
 // the changeLanguage hardening (PR #730), the WCAG 2.2 AA focus-return +
 // roles/aria, the bug-report + keybind dispatch, and that the window stays cold
 // (never wired into the per-frame Hud.update path).
+import { OptionsWindow } from '../src/ui/options_window';
+
 const painter = readFileSync(new URL('../src/ui/options_window.ts', import.meta.url), 'utf8');
 // The Auras and Cooldown Manager sub-panels the window composes.
 const overlayPanels = readFileSync(
@@ -125,7 +126,14 @@ describe('options_window: hotkey setup row', () => {
       painter.indexOf('private transferControls('),
     );
     expect(rows).toContain('buildKeybindCode(this.deps.keybinds().snapshot())');
-    expect(rows).toContain('importBindings(parsed.binds)');
+    // Import and the layout converter share one live apply.
+    expect(rows).toContain(
+      "this.applyKeybindSetup(parsed.binds, t('hudChrome.keybindTransfer.imported'));",
+    );
+    expect(rows).toContain('this.deps.keybinds().importBindings(binds, layout ?? null);');
+    expect(rows).toContain(
+      'buildKeybindLayoutConvertRow(body, this.deps, (...a) => this.applyKeybindSetup(...a));',
+    );
     expect(rows).toContain("'hudChrome.keybindTransfer.wrongKind'");
     // The hollow-code refusal lives in the core (pinned in
     // tests/keybind_transfer_core.test.ts); the panel hands it the registry ids.
@@ -1030,6 +1038,8 @@ describe('options_window: off-menu reset keys are pinned per tab', () => {
       'focusTarget2Height',
       'focusTarget3Width',
       'focusTarget3Height',
+      'playerFrameResourceWidth',
+      'playerFrameResourceHeight',
       'showPetFrame',
       'showEmptyFocusFrames',
       'partyFrameWidth',
@@ -1060,15 +1070,43 @@ describe('options_window: off-menu reset keys are pinned per tab', () => {
 });
 
 // Key Bindings' Reset to Defaults used to reset only the rebindable key-code
-// map (Keybinds.reset()), silently leaving the six GameSettings toggles the
-// same panel renders (mouse camera, click-to-move + its mouse button, attack
-// move, left-handed touch) untouched. The profanity filter moved to Interface >
-// Chat, so it is deliberately NOT in this list any more.
+// map (Keybinds.reset()), silently leaving the GameSettings toggles the same
+// panel renders untouched. Those keys now live in KEYBIND_PANEL_SETTING_KEYS
+// (src/ui/keybind_panel_settings.ts). The profanity filter moved to Interface
+// > Chat, so it is deliberately NOT in this list any more.
 describe('options_window: Key Bindings Reset to Defaults also resets its own toggles', () => {
-  it('names the same six setting keys the panel renders via settingToggleKeybind/clickMoveMouseButtonRow', () => {
+  it('names the same setting keys the panel renders via settingToggleKeybind/clickMoveMouseButtonRow', () => {
+    expect(KEYBIND_PANEL_SETTING_KEYS).toEqual([
+      'mouseCamera',
+      'lockCursorOnRotate',
+      'rawMouseInput',
+      'clickToMove',
+      'clickToMoveButton',
+      'attackMove',
+      'leftHandedTouch',
+    ]);
     expect(painter).toContain(
-      "const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [\n  'mouseCamera',\n  'lockCursorOnRotate',\n  'clickToMove',\n  'clickToMoveButton',\n  'attackMove',\n  'leftHandedTouch',\n];",
+      "import { KEYBIND_PANEL_SETTING_KEYS } from './keybind_panel_settings';",
     );
+    // Every listed toggle has its row (clickToMoveButton is the button row).
+    // Comments are stripped so a commented-out row cannot satisfy the pin.
+    const start = painter.indexOf('private renderKeybinds(): void {');
+    const body = painter
+      .slice(start, painter.indexOf('\n  }\n', start))
+      .replace(/^\s*\/\/.*$/gm, '');
+    for (const key of KEYBIND_PANEL_SETTING_KEYS.filter((k) => k !== 'clickToMoveButton')) {
+      expect(body).toContain(`'${key}'`);
+    }
+    expect(body).toContain('this.clickMoveMouseButtonRow(rail);');
+    expect(body).toContain("t('hudChrome.options.rawMouseInput')");
+    expect(body).toContain("t('hudChrome.options.keybindHelpRawMouseInput')");
+    // Raw Mouse Input sits right under the lock it depends on.
+    const lock = body.indexOf("'lockCursorOnRotate'");
+    const raw = body.indexOf("'rawMouseInput'");
+    const clickToMove = body.indexOf("'clickToMove'");
+    expect(lock).toBeGreaterThan(-1);
+    expect(raw).toBeGreaterThan(lock);
+    expect(clickToMove).toBeGreaterThan(raw);
   });
 
   it("renderKeybinds' reset handler resets the keybind map AND the panel's own settings, then re-applies them", () => {

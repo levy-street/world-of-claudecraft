@@ -1,0 +1,16 @@
+.ed-brush-shape .ed-row {
+  flex-wrap: wrap;
+}
+
+.ed-brush-shape button {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (pointer: coarse) {
+  .ed-brush-shape button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

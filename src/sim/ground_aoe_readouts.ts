@@ -1,10 +1,15 @@
 // IWorld combat-facet readouts over the live ground-AoE list: project the
 // persistent ground effects (frost rings, temporal hourglasses,
-// consecrations) into the presentation arrays render/ui consume through the
+// consecrations, spore bursters) into the presentation arrays render/ui consume through the
 // seam. Every collector is a pure read (no rng, no mutation, no tick-phase
 // work); Sim keeps thin getters that delegate here so the IWorld surface
 // resolves unchanged.
-import type { ActiveConsecration, ActiveFrostRing, ActiveTemporalHourglass } from '../world_api';
+import type {
+  ActiveConsecration,
+  ActiveFrostRing,
+  ActiveSporeBurst,
+  ActiveTemporalHourglass,
+} from '../world_api';
 import type { GroundAoE } from './entity_roster';
 
 export function collectActiveFrostRings(groundAoEs: readonly GroundAoE[]): ActiveFrostRing[] {
@@ -59,4 +64,22 @@ export function collectActiveConsecrations(groundAoEs: readonly GroundAoE[]): Ac
     });
   }
   return consecrations;
+}
+
+export function collectActiveSporeBursts(groundAoEs: readonly GroundAoE[]): ActiveSporeBurst[] {
+  const bursts: ActiveSporeBurst[] = [];
+  for (const effect of groundAoEs) {
+    const burst = effect.sporeBurst;
+    if (!burst || effect.remaining <= 0) continue;
+    bursts.push({
+      id: burst.id,
+      x: effect.pos.x,
+      z: effect.pos.z,
+      radius: effect.radius,
+      duration: burst.fuse,
+      remaining: effect.remaining,
+      sourceId: effect.sourceId,
+    });
+  }
+  return bursts;
 }

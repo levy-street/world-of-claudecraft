@@ -238,6 +238,7 @@ function harness(targets: Entity[]) {
     camera,
     world,
     layer: document.createElement('div'),
+    showPetNames: () => false,
     getViewport: () => VIEWPORT,
     getDevicePixelRatio: () => 1,
     showNameplates: () => true,

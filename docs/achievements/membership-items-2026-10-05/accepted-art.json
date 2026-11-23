@@ -1,0 +1,368 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "membership-items-2026-10-05",
+    "acceptedDate": "2026-10-05",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "membership_helmet",
+      "runtimeUrl": "/ui/items/membership_helmet.webp",
+      "acceptedSha256": "6d255522c53abfa154ff9dadd91b2911694ebf2d861a03332cab5e04c378474d",
+      "acceptedBytes": 3236,
+      "original": {
+        "path": "tmp/membership-art/originals/membership_helmet.png",
+        "sha256": "c67e26dfab7430e6a4d1362213b51eac9b160c7084faf6f8d0acfb9ba07faf8c",
+        "bytes": 2368554,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-art/masters/membership_helmet.png",
+        "sha256": "8842fb62ff7d71b4de105c87b259a7381b2cf6e13f07050725e9700a4ed93eff",
+        "bytes": 557878,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "One complete closed helmet, no head or face",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Use case: stylized-concept. Asset type: square opaque World of ClaudeCraft inventory icon, contract woc-item-icon-v1. Generate exactly ONE image of the Membership helmet item. Subject: One complete closed helmet, no head or face. This belongs to one cohesive adaptive membership armour set: brushed silver, muted antique-gold edging, deep midnight-blue padded fabric, simple geometric ornament. Classic dark-fantasy MMORPG hand-painted inventory illustration, tactile materials, crisp focal edges, soft peripheral brushwork. Warm key light top-left, cool deep shadow bottom-right. Center complete silhouette at 70 percent square fill with safe margins on every side. Opaque deep charcoal and umber painted vignette ground with contact shadow, never flat black. Readable at 22px and within a circular crop. One inventory subject only, natural pair allowed as specified. No text, letters, numbers, symbols resembling writing, UI border, frame, watermark, transparency, mannequin, body, hands holding it, cropped parts, collage or split sheet. Square 1024x1024.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master with Sharp, then the repository assets:items converter at quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-items-2026-10-05/small-size-review.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "membership_shoulder",
+      "runtimeUrl": "/ui/items/membership_shoulder.webp",
+      "acceptedSha256": "0dcd9995eec1cf5b8f6f2f9cc6d2b0db9342f50ae02fb6114f5968dace03fa7e",
+      "acceptedBytes": 2858,
+      "original": {
+        "path": "tmp/membership-art/originals/membership_shoulder.png",
+        "sha256": "d2118c903ebbf9a770b16b9d44493870ff9846aaec747e58af91327ea4941480",
+        "bytes": 2156864,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-art/masters/membership_shoulder.png",
+        "sha256": "091f149908e75f1537b3d6fa9e58fea3cc3322d97994febcc5ea186d385186a9",
+        "bytes": 495548,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "A compact natural pair of symmetrical pauldrons, no wearer or torso",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Use case: stylized-concept. Asset type: square opaque World of ClaudeCraft inventory icon, contract woc-item-icon-v1. Generate exactly ONE image of the Membership shoulder item. Subject: A compact natural pair of symmetrical pauldrons, no wearer or torso. This belongs to one cohesive adaptive membership armour set: brushed silver, muted antique-gold edging, deep midnight-blue padded fabric, simple geometric ornament. Classic dark-fantasy MMORPG hand-painted inventory illustration, tactile materials, crisp focal edges, soft peripheral brushwork. Warm key light top-left, cool deep shadow bottom-right. Center complete silhouette at 70 percent square fill with safe margins on every side. Opaque deep charcoal and umber painted vignette ground with contact shadow, never flat black. Readable at 22px and within a circular crop. One inventory subject only, natural pair allowed as specified. No text, letters, numbers, symbols resembling writing, UI border, frame, watermark, transparency, mannequin, body, hands holding it, cropped parts, collage or split sheet. Square 1024x1024.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master with Sharp, then the repository assets:items converter at quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-items-2026-10-05/small-size-review.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "membership_chest",
+      "runtimeUrl": "/ui/items/membership_chest.webp",
+      "acceptedSha256": "48d40ceeffd44e72c5e71e3a4675e7bd257045f0cfac37e798f7193f501f513d",
+      "acceptedBytes": 3924,
+      "original": {
+        "path": "tmp/membership-art/originals/membership_chest.png",
+        "sha256": "4b1d43a1e2d5c6ed3ff2da1fa2cbe7833fdd3ba35eb460eb10b11df71b3f7600",
+        "bytes": 2345588,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-art/masters/membership_chest.png",
+        "sha256": "bded8ec42ef141d0e1604016cd710e96e74283cb6fbf502971fbfb2d1b0c4022",
+        "bytes": 560221,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "One front-facing cuirass with padded cloth inset, no body or mannequin",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Use case: stylized-concept. Asset type: square opaque World of ClaudeCraft inventory icon, contract woc-item-icon-v1. Generate exactly ONE image of the Membership chest item. Subject: One front-facing cuirass with padded cloth inset, no body or mannequin. This belongs to one cohesive adaptive membership armour set: brushed silver, muted antique-gold edging, deep midnight-blue padded fabric, simple geometric ornament. Classic dark-fantasy MMORPG hand-painted inventory illustration, tactile materials, crisp focal edges, soft peripheral brushwork. Warm key light top-left, cool deep shadow bottom-right. Center complete silhouette at 70 percent square fill with safe margins on every side. Opaque deep charcoal and umber painted vignette ground with contact shadow, never flat black. Readable at 22px and within a circular crop. One inventory subject only, natural pair allowed as specified. No text, letters, numbers, symbols resembling writing, UI border, frame, watermark, transparency, mannequin, body, hands holding it, cropped parts, collage or split sheet. Square 1024x1024.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master with Sharp, then the repository assets:items converter at quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-items-2026-10-05/small-size-review.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "membership_waist",
+      "runtimeUrl": "/ui/items/membership_waist.webp",
+      "acceptedSha256": "038b7906c5b89e4afcd0b01f99157c514bc9116de75331696fceb21412e57da3",
+      "acceptedBytes": 3324,
+      "original": {
+        "path": "tmp/membership-art/originals/membership_waist.png",
+        "sha256": "79fb3580fba608e8647c75173e657f7cc4c2c24729304f063451bd8d5dacfae3",
+        "bytes": 2280700,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-art/masters/membership_waist.png",
+        "sha256": "aca87334bca7072f3b0a928b60e4ce54996eceb8d9abcd3e2dccfc4f95a0df7b",
+        "bytes": 516232,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "One substantial leather girdle with ornate central silver buckle",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Use case: stylized-concept. Asset type: square opaque World of ClaudeCraft inventory icon, contract woc-item-icon-v1. Generate exactly ONE image of the Membership waist item. Subject: One substantial leather girdle with ornate central silver buckle. This belongs to one cohesive adaptive membership armour set: brushed silver, muted antique-gold edging, deep midnight-blue padded fabric, simple geometric ornament. Classic dark-fantasy MMORPG hand-painted inventory illustration, tactile materials, crisp focal edges, soft peripheral brushwork. Warm key light top-left, cool deep shadow bottom-right. Center complete silhouette at 70 percent square fill with safe margins on every side. Opaque deep charcoal and umber painted vignette ground with contact shadow, never flat black. Readable at 22px and within a circular crop. One inventory subject only, natural pair allowed as specified. No text, letters, numbers, symbols resembling writing, UI border, frame, watermark, transparency, mannequin, body, hands holding it, cropped parts, collage or split sheet. Square 1024x1024.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master with Sharp, then the repository assets:items converter at quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-items-2026-10-05/small-size-review.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "membership_legs",
+      "runtimeUrl": "/ui/items/membership_legs.webp",
+      "acceptedSha256": "e1a80e560e6629b2bf707879bd95527ffc3b12610462047fc8fd0fc9a613d5fc",
+      "acceptedBytes": 2860,
+      "original": {
+        "path": "tmp/membership-art/originals/membership_legs.png",
+        "sha256": "45fa875f003ece64e0ba9d80098b83d2be38b04b1d5efa9ace20f230c9c639be",
+        "bytes": 2152532,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-art/masters/membership_legs.png",
+        "sha256": "1284feacf741b39ee27b6cfb16c23123a2ab91f81a116192c4aad66185375330",
+        "bytes": 509391,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "One complete joined pair of articulated legguards, no boots or mannequin",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Use case: stylized-concept. Asset type: square opaque World of ClaudeCraft inventory icon, contract woc-item-icon-v1. Generate exactly ONE image of the Membership legs item. Subject: One complete joined pair of articulated legguards, no boots or mannequin. This belongs to one cohesive adaptive membership armour set: brushed silver, muted antique-gold edging, deep midnight-blue padded fabric, simple geometric ornament. Classic dark-fantasy MMORPG hand-painted inventory illustration, tactile materials, crisp focal edges, soft peripheral brushwork. Warm key light top-left, cool deep shadow bottom-right. Center complete silhouette at 70 percent square fill with safe margins on every side. Opaque deep charcoal and umber painted vignette ground with contact shadow, never flat black. Readable at 22px and within a circular crop. One inventory subject only, natural pair allowed as specified. No text, letters, numbers, symbols resembling writing, UI border, frame, watermark, transparency, mannequin, body, hands holding it, cropped parts, collage or split sheet. Square 1024x1024.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master with Sharp, then the repository assets:items converter at quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-items-2026-10-05/small-size-review.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "membership_gloves",
+      "runtimeUrl": "/ui/items/membership_gloves.webp",
+      "acceptedSha256": "81a26bea545ec4cbc428079a644ddc10dd404a6a06640a3e559118a97de04ff1",
+      "acceptedBytes": 3732,
+      "original": {
+        "path": "tmp/membership-art/originals/membership_gloves.png",
+        "sha256": "739654538bc6754745ee42cfd0c20f98b79133d135f5fae952903b94ce77a39d",
+        "bytes": 2456019,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-art/masters/membership_gloves.png",
+        "sha256": "7a9df2ed9db60e2f852c315f89728373239e10c1a382cd8cd7879f803ceaeeb4",
+        "bytes": 560248,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "One compact natural pair of gauntlets, no hands or wearer",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Use case: stylized-concept. Asset type: square opaque World of ClaudeCraft inventory icon, contract woc-item-icon-v1. Generate exactly ONE image of the Membership gloves item. Subject: One compact natural pair of gauntlets, no hands or wearer. This belongs to one cohesive adaptive membership armour set: brushed silver, muted antique-gold edging, deep midnight-blue padded fabric, simple geometric ornament. Classic dark-fantasy MMORPG hand-painted inventory illustration, tactile materials, crisp focal edges, soft peripheral brushwork. Warm key light top-left, cool deep shadow bottom-right. Center complete silhouette at 70 percent square fill with safe margins on every side. Opaque deep charcoal and umber painted vignette ground with contact shadow, never flat black. Readable at 22px and within a circular crop. One inventory subject only, natural pair allowed as specified. No text, letters, numbers, symbols resembling writing, UI border, frame, watermark, transparency, mannequin, body, hands holding it, cropped parts, collage or split sheet. Square 1024x1024.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master with Sharp, then the repository assets:items converter at quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-items-2026-10-05/small-size-review.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "membership_feet",
+      "runtimeUrl": "/ui/items/membership_feet.webp",
+      "acceptedSha256": "31ef72f69aea80b737aef84704ff6b8f2f213f421146c0243f07d63c8156e837",
+      "acceptedBytes": 3474,
+      "original": {
+        "path": "tmp/membership-art/originals/membership_feet.png",
+        "sha256": "7989fd71298a027f164bbf0efce9b7a6b62bf46832112412c0b0f5f15c58dbfa",
+        "bytes": 2218465,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-art/masters/membership_feet.png",
+        "sha256": "2275d1b7f12cd5741f95b6fae3f5871378183077632872908100aea92ccb4c48",
+        "bytes": 563836,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "One compact natural pair of armored boots, no legs or wearer",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Use case: stylized-concept. Asset type: square opaque World of ClaudeCraft inventory icon, contract woc-item-icon-v1. Generate exactly ONE image of the Membership feet item. Subject: One compact natural pair of armored boots, no legs or wearer. This belongs to one cohesive adaptive membership armour set: brushed silver, muted antique-gold edging, deep midnight-blue padded fabric, simple geometric ornament. Classic dark-fantasy MMORPG hand-painted inventory illustration, tactile materials, crisp focal edges, soft peripheral brushwork. Warm key light top-left, cool deep shadow bottom-right. Center complete silhouette at 70 percent square fill with safe margins on every side. Opaque deep charcoal and umber painted vignette ground with contact shadow, never flat black. Readable at 22px and within a circular crop. One inventory subject only, natural pair allowed as specified. No text, letters, numbers, symbols resembling writing, UI border, frame, watermark, transparency, mannequin, body, hands holding it, cropped parts, collage or split sheet. Square 1024x1024.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master with Sharp, then the repository assets:items converter at quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-items-2026-10-05/small-size-review.png"
+      }
+    },
+    {
+      "kind": "item",
+      "id": "membership_token",
+      "runtimeUrl": "/ui/items/membership_token.webp",
+      "acceptedSha256": "a830b3b9657fb9c806bddef0bc50b9e4fc5dd289fd77d28dce363a6646cd3c6c",
+      "acceptedBytes": 3228,
+      "original": {
+        "path": "tmp/membership-art/originals/membership_token.png",
+        "sha256": "7881138929c14c46d733d730c9df9f9ea1a0521bab562bd87dd7ea0eae5d7323",
+        "bytes": 2349871,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "source": {
+        "path": "tmp/membership-art/masters/membership_token.png",
+        "sha256": "db93a98c1e7b39db9762781afe6b2c20c14400b7ea65c3eae3390b5b215c1501",
+        "bytes": 537184,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "intendedVisualSubject": "One physical silver membership medallion with a simple raised hourglass emblem, no writing",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "attempt": 1,
+        "retries": 0,
+        "prompt": "Use case: stylized-concept. Asset type: square opaque World of ClaudeCraft inventory icon, contract woc-item-icon-v1. Generate exactly ONE image of the Membership token item. Subject: One physical silver membership medallion with a simple raised hourglass emblem, no writing. This belongs to one cohesive adaptive membership armour set: brushed silver, muted antique-gold edging, deep midnight-blue padded fabric, simple geometric ornament. Classic dark-fantasy MMORPG hand-painted inventory illustration, tactile materials, crisp focal edges, soft peripheral brushwork. Warm key light top-left, cool deep shadow bottom-right. Center complete silhouette at 70 percent square fill with safe margins on every side. Opaque deep charcoal and umber painted vignette ground with contact shadow, never flat black. Readable at 22px and within a circular crop. One inventory subject only, natural pair allowed as specified. No text, letters, numbers, symbols resembling writing, UI border, frame, watermark, transparency, mannequin, body, hands holding it, cropped parts, collage or split sheet. Square 1024x1024.",
+        "references": []
+      },
+      "processing": "Square 512px sRGB master with Sharp, then the repository assets:items converter at quality 82, smartSubsample and effort 6 to 128px WebP.",
+      "review": {
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscale": 28,
+        "circularCrop": 64,
+        "reviewer": "Codex visual inspection",
+        "evidence": "docs/achievements/membership-items-2026-10-05/small-size-review.png"
+      }
+    }
+  ]
+}

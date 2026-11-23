@@ -1,3 +1,4 @@
+import { applyLinkedMapTerrain, authoredSlateBase, inLinkedMapRect } from './authored_terrain_base';
 import { bgFieldHeightLocal } from './battleground_field';
 import { BORDER_EDGES } from './border_edges';
 import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
@@ -5,6 +6,7 @@ import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import { VALE_BAYS, VALE_LAND_LOBES } from './content/vale_coast';
 import {
+  authoredMapActive,
   bgOriginAt,
   CAMPS,
   COLUMN_ZONES,
@@ -17,6 +19,7 @@ import {
   instanceOrigin,
   instanceSlotForZ,
   isBgPos,
+  overworldTerrainPadsActive,
   STRIP_MAX_X,
   STRIP_MIN_X,
   STRIP_ZONES,
@@ -30,7 +33,7 @@ import {
 } from './data';
 import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight, onHarborPlanks } from './deck_surfaces';
-import { isExcludedDecoration } from './decoration_exclusions';
+import { isCuratedGardenScatter, isExcludedDecoration } from './decoration_exclusions';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import { applyEastbrookVaultPad } from './eastbrook_vault_terrain';
@@ -44,7 +47,10 @@ import {
 import { applyFarshoreShipwreckShore } from './farshore_shipwreck_shore';
 import { GALE_DECK_FREEBOARD } from './gale_harbor';
 import { applyGliderApproachPath } from './glider_approach_path';
+import { instancedFieldHeight } from './instances/authored_field/registry';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
+import { decksMayStand, placementRampFloorAt, WALK_DECK_REACH } from './placement_ramps';
+import { planeFloorAt } from './plane_floor';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import { carveSeaChannels } from './sea_channels';
@@ -54,6 +60,7 @@ import {
   calmSkirtWidth,
   collectCalmAnchorPads,
 } from './terrain_calm_anchors';
+import { applyEditLayer } from './terrain_edit_layer';
 import {
   buildTerrainRegionIndex,
   TERRAIN_APPLIER,
@@ -65,9 +72,8 @@ import {
 } from './terrain_region_index';
 import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
 import { applyGardenwalkWestPass, applyThornpeakPocketGrade } from './thornpeak_walk_grades';
-import type { BiomeId, HeightStamp, ZoneDef } from './types';
+import type { BiomeId, ZoneDef } from './types';
 import { overworldWalkSurface } from './walk_lifts';
-import { wildheartFieldHeight } from './wildheart_field';
 import { applyWispMazePad } from './wisp_maze_ground';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -137,9 +143,19 @@ export function isOpenSeaAt(x: number, z: number, seed: number): boolean {
   // waterline contour ever sees the quantization, where the water is ankle
   // deep and every consumer no-ops anyway.
   const content = getActiveWorldContent();
-  if (seed !== seaCellSeed || content !== seaCellContent) {
+  // The LEVEL is part of the key, not just the content object. The editor's
+  // water slider mutates the active content IN PLACE (app.ts syncWaterToActive,
+  // deliberately, so terrainHeight/waterLevel see it without a clone), so the
+  // identity check below never fires for a level change and every cell would
+  // keep the sea/dry bit it got at the old waterline: raising the level flooded
+  // nothing, lowering it drained nothing, and waterLevelAt kept answering
+  // -Infinity over ground the new level covers. That is the whole of "adjusting
+  // the water level does not adjust the water level".
+  const level = waterLevel();
+  if (seed !== seaCellSeed || content !== seaCellContent || level !== seaCellLevel) {
     seaCellSeed = seed;
     seaCellContent = content;
+    seaCellLevel = level;
     seaCellCache.clear();
   }
   const cx = Math.floor(x);
@@ -155,6 +171,7 @@ export function isOpenSeaAt(x: number, z: number, seed: number): boolean {
 }
 let seaCellSeed = Number.NaN;
 let seaCellContent: unknown = null;
+let seaCellLevel = Number.NaN;
 const seaCellCache = new Map<number, boolean>();
 
 // The water surface height AT this location: waterLevel() inside a declared
@@ -168,25 +185,6 @@ const seaCellCache = new Map<number, boolean>();
 export function waterLevelAt(x: number, z: number, seed: number): number {
   if (isInWaterBody(x, z)) return waterLevel();
   return isOpenSeaAt(x, z, seed) ? waterLevel() : -Infinity;
-}
-
-/** True when an authored height stamp reaches (x, z). Empty in the built-in
- *  world (its only stamp is the off-world jail pad), so this costs nothing
- *  there; on a custom map it is the same bucketed index applyEditLayer uses. */
-export function inAuthoredHeightStamp(x: number, z: number): boolean {
-  const edits = getActiveWorldContent().terrainEdits;
-  if (!edits || edits.length === 0) return false;
-  let index = terrainEditIndexCache.get(edits);
-  if (!index || index.length !== edits.length) {
-    index = buildTerrainEditIndex(edits);
-    terrainEditIndexCache.set(edits, index);
-  }
-  const hit = (e: HeightStamp): boolean => (x - e.x) ** 2 + (z - e.z) ** 2 < e.radius ** 2;
-  if (index.linear) return edits.some(hit);
-  const bucket = index.buckets.get(
-    `${Math.floor(x / EDIT_INDEX_CELL)},${Math.floor(z / EDIT_INDEX_CELL)}`,
-  );
-  return bucket ? bucket.some((i) => hit(edits[i])) : false;
 }
 
 // NOTE: the player-only sea-aware water seam (playerWaterLevelAt /
@@ -950,6 +948,12 @@ const PALM_NATIVE_H = [2.685, 2.689, 3.587];
 const PALM_TRUNK_R = 0.17; // native trunk radius (all three ~equal)
 const PALM_TARGET_H = 9; // rendered trunk height at size factor 1.0
 
+/** Rendered trunk height of one palm, so the editor can seat a placement (or a
+ *  collider) on the same height the renderer draws. */
+export function reachPalmRenderedHeight(palm: Pick<ReachPalm, 'variant' | 'scale'>): number {
+  return PALM_NATIVE_H[palm.variant] * palm.scale;
+}
+
 let reachPalmCache: { seed: number; spots: ReachPalm[] } | null = null;
 
 export function reachPalmSpots(seed: number): ReachPalm[] {
@@ -971,6 +975,7 @@ export function reachPalmSpots(seed: number): ReachPalm[] {
     return reachDeckClear(x, z, 1.5);
   };
   const push = (x: number, z: number, y: number, sizeF: number): void => {
+    if (isExcludedDecoration(x, z)) return; // an authored clearing (decoration_exclusions.ts)
     const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
     const scale = (PALM_TARGET_H / PALM_NATIVE_H[variant]) * sizeF;
     spots.push({
@@ -1212,7 +1217,7 @@ const GARDEN_LAND_LOBES = [
 // the pad-flattening loop in terrainHeight so no bed sinks into a slope.
 // Every satellite ANCHORS to its parent square bed (ax, az), so a whole
 // ensemble levels to one shared terrace height and overlapping pads never
-// fight. The render plan (garden_parterre_core PARTERRE_PLOTS) and the
+// fight. The plot table (garden_parterre_plots PARTERRE_PLOTS) and the
 // collide decor entries (content/evergarden decorProps) carry the SAME
 // sites; the parterre test pins all three against each other.
 export interface GardenBedPad {
@@ -2828,6 +2833,7 @@ export function inFatigueFreeWater(x: number, z: number): boolean {
 // is the world's actual end again.
 export function inHollowOpenSea(x: number, z: number): boolean {
   if (x > DUNGEON_X_THRESHOLD) return false;
+  if (inLinkedMapRect(x, z)) return false; // a linked map's rect is ground
   // the Mirrorshallow: enclosed lake water, never open sea
   if (Math.hypot(x - 152, z - 1112) < 42) return false;
   // every designed crossing corridor (the moats, the straits' channel and
@@ -3471,123 +3477,8 @@ function baseHeight(
   return carveSeaChannels(x, z, h, WATER_LEVEL);
 }
 
-// ---------------------------------------------------------------------------
-// The custom-map edit layer (the sculpt brushes), applied to the height computed
-// so far. Stamps apply in array order; pure data, no RNG, so the sim and renderer
-// agree. `add` stamps add a falloff-weighted delta; `level` stamps pull the height
-// toward the absolute height `delta` (flatten/plateau/terrace). The built-in world
-// has no terrainEdits, so the heightfield is unchanged.
-//
-// Stamps are looked up through a coarse spatial bucket index (cell 32yd; each
-// stamp registered in every cell its radius's bounding box touches) instead of a
-// linear scan: the render chunk rebuilder samples the height 5x per vertex, so
-// with the 4000-stamp cap the linear scan grows editor brush cost with session
-// length. Determinism contract: candidates for a query point are iterated in
-// ascending original array index (each bucket is built in index order and a stamp
-// appears at most once per bucket), so float addition order is bit-identical to
-// the linear scan. The index is a pure cache keyed by the terrainEdits array
-// reference + length; it is rebuilt when either differs and cleared by
-// invalidateTerrainEditIndex() for same-length in-place mutations.
-// ---------------------------------------------------------------------------
-
-const EDIT_INDEX_CELL = 32; // yards per bucket cell
-// A stamp this large would touch an unbounded number of cells; index none and
-// fall back to the (bit-identical) linear scan. The document sanitizer caps
-// stamp radius at 200, so this only guards hostile in-memory content.
-const EDIT_INDEX_MAX_RADIUS = 4096;
-
-interface TerrainEditIndex {
-  length: number;
-  linear: boolean; // true = do not use buckets, scan the array
-  buckets: Map<string, number[]>; // "cx,cz" -> ascending stamp indices
-}
-
-let terrainEditIndexCache = new WeakMap<HeightStamp[], TerrainEditIndex>();
-
-// Clears the edit-layer index cache. The editor MUST call this after a
-// splice-style in-place mutation that keeps the array reference and length
-// (e.g. replacing a stamp); push/pop/reassignment are picked up automatically
-// via the length + reference key. The exact export name is a contract with the
-// editor lane: do not rename.
-export function invalidateTerrainEditIndex(): void {
-  terrainEditIndexCache = new WeakMap();
-}
-
-function buildTerrainEditIndex(edits: HeightStamp[]): TerrainEditIndex {
-  const buckets = new Map<string, number[]>();
-  for (let i = 0; i < edits.length; i++) {
-    const e = edits[i];
-    if (e.radius <= 0) continue; // the scan skips these too; no cell to register
-    // A non-finite stamp (NaN poisons the scan; Infinity reaches everywhere)
-    // or an absurd radius cannot be bucketed: reproduce the linear scan's
-    // exact semantics by not indexing at all.
-    if (
-      !Number.isFinite(e.radius) ||
-      e.radius > EDIT_INDEX_MAX_RADIUS ||
-      !Number.isFinite(e.x) ||
-      !Number.isFinite(e.z)
-    ) {
-      return { length: edits.length, linear: true, buckets: new Map() };
-    }
-    // One guard cell on every side: sqrt rounding can put a point with
-    // d < radius up to ~1 ulp outside the bbox cells at an exact cell
-    // boundary. Extra candidates are harmless (applyStamp re-checks d).
-    const c0 = Math.floor((e.x - e.radius) / EDIT_INDEX_CELL) - 1;
-    const c1 = Math.floor((e.x + e.radius) / EDIT_INDEX_CELL) + 1;
-    const r0 = Math.floor((e.z - e.radius) / EDIT_INDEX_CELL) - 1;
-    const r1 = Math.floor((e.z + e.radius) / EDIT_INDEX_CELL) + 1;
-    for (let r = r0; r <= r1; r++) {
-      for (let c = c0; c <= c1; c++) {
-        const key = `${c},${r}`;
-        let bucket = buckets.get(key);
-        if (!bucket) {
-          bucket = [];
-          buckets.set(key, bucket);
-        }
-        bucket.push(i); // outer loop is ascending i, so each bucket stays sorted
-      }
-    }
-  }
-  return { length: edits.length, linear: false, buckets };
-}
-
-// One stamp's contribution, shared verbatim by the indexed and linear paths so
-// they are bit-identical.
-function applyStamp(e: HeightStamp, x: number, z: number, h: number): number {
-  if (e.radius <= 0) return h;
-  const dx = x - e.x;
-  const dz = z - e.z;
-  const d = Math.sqrt(dx * dx + dz * dz);
-  if (d >= e.radius) return h;
-  const t = d / e.radius; // 0 at centre, 1 at edge
-  // 'flat' = full delta out to the edge; 'smooth' = eased taper to 0.
-  const w = e.falloff === 'flat' ? 1 : 1 - smoothstep(0, 1, t);
-  if (e.mode === 'level') return lerp(h, e.delta, w);
-  return h + e.delta * w;
-}
-
-function applyEditLayer(x: number, z: number, h0: number): number {
-  const edits = getActiveWorldContent().terrainEdits;
-  if (!edits || edits.length === 0) return h0;
-  let index = terrainEditIndexCache.get(edits);
-  if (!index || index.length !== edits.length) {
-    index = buildTerrainEditIndex(edits);
-    terrainEditIndexCache.set(edits, index);
-  }
-  let h = h0;
-  if (index.linear) {
-    for (const e of edits) h = applyStamp(e, x, z, h);
-    return h;
-  }
-  const key = `${Math.floor(x / EDIT_INDEX_CELL)},${Math.floor(z / EDIT_INDEX_CELL)}`;
-  const bucket = index.buckets.get(key);
-  if (!bucket) return h0;
-  // Any stamp with d < radius has |x - e.x| < radius, so its bounding-box cells
-  // cover the query cell: the bucket holds every contributing stamp, in
-  // ascending array index, exactly once.
-  for (const i of bucket) h = applyStamp(edits[i], x, z, h);
-  return h;
-}
+// The custom-map edit layer (sculpt brushes) lives in terrain_edit_layer.ts.
+export { inAuthoredHeightStamp, invalidateTerrainEditIndex } from './terrain_edit_layer';
 
 // The Highwatch stables paddock plateau (STABLE_FLAT): the worked yard leveled
 // to one height so the show-jumping course sits on fair, flat ground. The
@@ -3821,6 +3712,31 @@ function applyReachPoolWalkwayBed(x: number, z: number, h: number): number {
 // the raised boss dais where the room stacks one), the walkable Vale Cup
 // grandstand lift, raised docks, and custom-map sculpt edits.
 export function groundHeight(x: number, z: number, seed: number): number {
+  return groundHeightFor(x, z, seed, undefined);
+}
+
+/** groundHeight for a BODY whose feet were at `prevY`: walkable decks and
+ *  plane floors more than WALK_DECK_REACH above the feet are ignored, so a
+ *  swimmer under a bridge span or a walker under a gallery keeps the real
+ *  ground beneath them. The height-blind groundHeight stays the answer for
+ *  spawns, teleports and anything without a body. */
+export function groundHeightAtBody(
+  x: number,
+  z: number,
+  seed: number,
+  prevY: number,
+  deckReach = WALK_DECK_REACH,
+): number {
+  return groundHeightFor(x, z, seed, prevY, deckReach);
+}
+
+function groundHeightFor(
+  x: number,
+  z: number,
+  seed: number,
+  prevY: number | undefined,
+  deckReach = WALK_DECK_REACH,
+): number {
   if (isBgPos(x)) {
     // The battleground band is the one instanced region with REAL terrain:
     // the Thornhollow field's sculpted heightfield, identical for sim,
@@ -3830,9 +3746,12 @@ export function groundHeight(x: number, z: number, seed: number): number {
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const dungeon = dungeonAt(x);
-    if (dungeon?.interior === 'wildheart') {
+    // Open-air fields (Wildheart, the Hollow Crypt): the interior's own
+    // height function (instances/authored_field/registry.ts).
+    const fieldHeight = dungeon ? instancedFieldHeight(dungeon.interior) : null;
+    if (dungeon && fieldHeight) {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
-      return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
+      return DUNGEON_FLOOR_Y + fieldHeight(x - origin.x, z - origin.z);
     }
     if (dungeon?.interior === 'lastkeep') {
       // The Last Keep's authored rooms carry per-room lifts (door ramps
@@ -3862,18 +3781,59 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // The Old Beacon's stair, the Last Keep's walls and flights, and the
   // Forgefather stair ramps all ride the same idiom, summed by the
   // walk_lifts leaf: raised walkable ground the render terrain never sees.
-  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed));
-  return Math.max(
+  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed), seed);
+  const content = getActiveWorldContent();
+  let h = Math.max(
     terrain,
     dockSurfaceHeight(
       x,
       z,
       (sx, sz) => terrainHeight(sx, sz, seed),
       WATER_LEVEL,
-      getActiveWorldContent().props.docks,
+      content.props.docks,
     ),
   );
+  // Editor-authored walkable floors, both raised ground rather than blockers, so
+  // they belong here and not in the collider set:
+  //   ramp decks    a placement's stair treads / rampart walk (placement_ramps),
+  //                 authored on the asset or live in a Collision Master session
+  //                 (without them a maker's stairs are walk-through decoration).
+  //   plane volumes the editor's 'collider/plane' primitive (a bridge deck, a
+  //                 second storey, a sloped ramp): never a blocker, it carries a body.
+  if (!decksMayStand(content, x, z)) return h; // no placements, volumes or walk-in town floor
+  const rampFloor = placementRampFloorAt(content, seed, x, z, prevY, deckReach);
+  if (rampFloor > h) h = rampFloor;
+  const reach = prevY === undefined ? Number.POSITIVE_INFINITY : prevY + deckReach;
+  for (const v of content.colliderVolumes ?? []) {
+    if (v.kind !== 'plane') continue;
+    // The floor at the plane centre: detached anchor or live terrain, plus the
+    // gizmo Y-lift, plus the size offset, matching the editor overlay
+    // (viewport colliderVolumeMesh) so a raised deck collides where it is drawn.
+    const planeBase =
+      (v.detached ? (v.groundY ?? 0) : terrainHeight(v.x, v.z, seed)) + (v.offsetY ?? 0) + v.sizeY;
+    const floor = planeFloorAt(v, x - v.x, z - v.z, planeBase);
+    if (floor === null || floor > reach) continue; // off it, or a storey over the body's head
+    if (floor > h) h = floor;
+  }
+  return h;
 }
+
+// The second ground sheet (cave tube floors, terrain cuts and carves) binds to
+// groundHeight/terrainHeight in its own module; re-exported for every importer.
+export {
+  cameraSheetMaxDist,
+  groundHeightNear,
+  mobGroundHeight,
+  onCaveSheet,
+  onUnderSheet,
+  sheetCeilingAt,
+  sheetGroundHeight,
+  sheetMouthStepOk,
+  sheetStepMismatch,
+  sheetWallBlocksStep,
+  terrainCutAt,
+  terrainCutAtHeight,
+} from './ground_sheet_queries';
 
 export function terrainHeight(x: number, z: number, seed: number): number {
   return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed));
@@ -3881,18 +3841,18 @@ export function terrainHeight(x: number, z: number, seed: number): number {
 
 // The finished overworld height as the GENERATOR alone authors it: the full
 // unpadded chain and every authored pad, with only the custom-map sculpt-edit
-// layer skipped. This is the ground truth for "did the world's own shaping
-// carve below the waterline here" (isOpenSeaAt), so an author's sunken stamp
-// (#1518) can never read as sea. For the built-in world (no terrainEdits) it
-// equals terrainHeight exactly.
+// layer skipped. The ground truth for "did the world's own shaping carve below
+// the waterline here" (isOpenSeaAt), so an author's sunken stamp (#1518) never
+// reads as sea. For the built-in world (no terrainEdits) it IS terrainHeight.
 export function terrainHeightSansEdits(x: number, z: number, seed: number): number {
   return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed, true));
 }
 
-// The authored pad chain over the unpadded height (keep-site pad, pool
-// walkway bed, garden/gale pads): one shared body so terrainHeight and
-// terrainHeightSansEdits can never drift.
+// The authored pad chain over the unpadded height (keep-site pad, pool walkway
+// bed, garden/gale pads), one body so terrainHeight and terrainHeightSansEdits
+// never drift. Shipped-world ground only (map_presentation usesOverworldTerrainPads).
 function applyTerrainPads(x: number, z: number, seed: number, h0: number): number {
+  if (!overworldTerrainPadsActive()) return h0;
   let h = calmForce === null ? applyFarshoreShipwreckShore(x, z, h0) : h0;
   // Ease only the walking trail on the existing western mountain.
   h = applyGliderApproachPath(x, z, h);
@@ -3910,7 +3870,6 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
   h = applyReachPoolWalkwayBed(x, z, h);
   // Dawnhold Castle's garden pad, same late application.
   h = applyDawnholdPad(x, z, h);
-  // the Drakelands' headland barracks, graded the same way
   // Level pads under the Evergarden's modeled flower beds, applied over the
   // FINISHED height (the garden seam reshapes the lawn per position, so an
   // early flatten would drift apart again): each bed ensemble sits flush on
@@ -4068,6 +4027,11 @@ function borderSeaGate(x: number, z: number): number {
 }
 
 function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = false): number {
+  const content = getActiveWorldContent(); // Studio slate / linked map: never built-in
+  if (content.presentationMode !== undefined) {
+    const slate = authoredSlateBase(x, z, seed, baseHeight);
+    if (slate !== undefined) return skipEdits ? slate : applyEditLayer(x, z, slate);
+  }
   const region = terrainRegionAt(x, z);
   let h = baseHeight(x, z, seed, region);
 
@@ -4221,7 +4185,10 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   // A missing bit means the entire guarded cell is outside the applier's
   // declared support. That applier would return exact +0 or the unchanged h,
   // so each skip is bit-identical. Contributing paths keep their old order.
-  if (terrainRegionHas(region, TERRAIN_APPLIER.mirefenImpactCrater)) {
+  // The Mirefen crater bowl belongs to the built-in world only: an authored
+  // map over its coordinates keeps flat ground (its scorch and rocks are
+  // gated the same way in the renderer).
+  if (terrainRegionHas(region, TERRAIN_APPLIER.mirefenImpactCrater) && !authoredMapActive()) {
     h += mirefenImpactCraterOffset(x, z);
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.hollowShaping)) {
@@ -4530,12 +4497,8 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
     ? stableFlattenWeight(x, z)
     : 0;
   if (stable > 0) h = lerp(h, STABLE_FLAT.height, stable);
-  // The custom-map sculpt edits are the LAST word over the finished overworld
-  // height (the editor's height stamps; a no-op for the built-in world, which has
-  // no terrainEdits). Kept in terrainHeight so the render mesh (which samples
-  // terrainHeight) and the sim's groundHeight both see the edited ground.
-  // skipEdits serves terrainHeightSansEdits (the open-sea predicate) alone:
-  // every gameplay and render height keeps the edited ground.
+  // A linked map's terrain in its rect, then the sculpt edits as the LAST word.
+  if (content.linkedMap) h = applyLinkedMapTerrain(x, z, seed, h, baseHeight);
   return skipEdits ? h : applyEditLayer(x, z, h);
 }
 
@@ -4653,88 +4616,6 @@ export function terrainDownhill(
   const mag = Math.hypot(hx, hz);
   if (mag < 1e-6) return null;
   return { x: -hx / mag, z: -hz / mag };
-}
-
-// Ring samples for the wall standoff below. 8 covers the body circle evenly
-// without being a hot-loop cost (the caller only runs it for grounded overworld
-// players).
-const WALL_STANDOFF_SAMPLES = 8;
-
-// A single ring-sample-and-nudge pass, capped at one body radius of push (see
-// `terrainWallStandoff` below for why it must be iterated rather than trusted
-// to converge in one call, and why the caller must accept a push that only
-// REDUCES steepness rather than requiring it clear `maxSlope` outright).
-export function terrainWallStandoffPass(
-  x: number,
-  z: number,
-  seed: number,
-  radius: number,
-  maxSlope: number,
-): { x: number; z: number } {
-  const h0 = groundHeight(x, z, seed);
-  const wallRise = radius * maxSlope; // the most a climbable slope rises over `radius`
-  let pushX = 0;
-  let pushZ = 0;
-  for (let k = 0; k < WALL_STANDOFF_SAMPLES; k++) {
-    const a = (k / WALL_STANDOFF_SAMPLES) * Math.PI * 2;
-    const sx = Math.sin(a);
-    const sz = Math.cos(a);
-    const rise = groundHeight(x + sx * radius, z + sz * radius, seed) - h0;
-    if (rise > wallRise) {
-      // horizontal setback that would make this direction merely climbable,
-      // capped at the body radius (a face closer than `radius` reads as a huge
-      // rise; one exactly at `radius` contributes nothing)
-      const setback = Math.min((rise - wallRise) / maxSlope, radius);
-      pushX -= sx * setback;
-      pushZ -= sz * setback;
-    }
-  }
-  if (pushX === 0 && pushZ === 0) return { x, z };
-  const mag = Math.hypot(pushX, pushZ);
-  const scale = Math.min(mag, radius) / mag; // total nudge never exceeds one body radius
-  return { x: x + pushX * scale, z: z + pushZ * scale };
-}
-
-// The most passes `terrainWallStandoff` will take to converge. Mirrors the
-// 3-iteration prop/OBB push-out loop in `colliders.ts`'s `resolveAgainst`.
-const WALL_STANDOFF_ITERATIONS = 3;
-
-// Push a body of `radius` out of terrain steeper than `maxSlope` so the
-// character model does not sink into a cliff face. Movement collision samples
-// only the center point (the climb gate blocks the center from CLIMBING a wall,
-// but nothing keeps the body's WIDTH clear of one), so standing at or strafing
-// along the foot of a near-vertical wall buries the model's near side. This
-// samples the heightfield on a ring at the body radius; any direction rising
-// faster than a climbable slope is a wall within reach, and the center is nudged
-// directly away from it, toward the lower walkable side. Pure and deterministic;
-// returns the input unchanged on open or merely-sloped ground (no ring sample
-// exceeds a climbable rise there), so it is a near-no-op away from the walls.
-//
-// A single pass can leave the pushed point still reading as a wall in a
-// CONCAVE pocket (a ridge/rim corner or a coastline notch wrapping more than
-// half the sample ring): one pass's push, capped at one body radius, is not
-// always enough to clear it. The caller (`stepPlayerMotion`) only ever
-// committed the result when it stopped reading as steep, so an unconverged
-// single pass silently no-ops right where standoff is needed most, leaving
-// the player permanently wedged. Iterating a few passes lets each subsequent
-// ring sample, now centered on the partially-pushed point, see less of the
-// wall, converging out of the pocket instead of stalling on it.
-export function terrainWallStandoff(
-  x: number,
-  z: number,
-  seed: number,
-  radius: number,
-  maxSlope: number,
-): { x: number; z: number } {
-  let cx = x;
-  let cz = z;
-  for (let iter = 0; iter < WALL_STANDOFF_ITERATIONS; iter++) {
-    const next = terrainWallStandoffPass(cx, cz, seed, radius, maxSlope);
-    if (next.x === cx && next.z === cz) break;
-    cx = next.x;
-    cz = next.z;
-  }
-  return { x: cx, z: cz };
 }
 
 // ---------------------------------------------------------------------------
@@ -4883,6 +4764,29 @@ export interface Decoration {
   scale: number;
   variant: number;
   biome: BiomeId;
+  /** Render-side marker: this record mirrors an editable PLACEMENT and feeds
+   *  ONLY the far-field sprite impostors, the near real model is the
+   *  placement itself (placed_assets caps it at the same handoff plane), so
+   *  a converted tree renders at distance exactly like a procedural one. */
+  farOnly?: boolean;
+  /** With farOnly: the exact sprite species (the placement names its model,
+   *  so the biome/hash routing procedural records go through must not
+   *  re-guess it). */
+  farSpecies?: 'pine' | 'oak' | 'twisted' | 'dead' | 'rock';
+}
+
+/** Stable identity of one procedural decoration, as persisted in a map
+ *  document's `decorationExclusions` (the editor's remove-tree/rock brush).
+ *  Same shape as `groundDressingKey`, keyed on the anchor position. */
+export function decorationKey(decoration: Pick<Decoration, 'kind' | 'x' | 'z'>): string {
+  return `${decoration.kind}:${decoration.x.toFixed(3)}:${decoration.z.toFixed(3)}`;
+}
+
+function withoutEditorExcludedDecorations(decorations: Decoration[]): Decoration[] {
+  const excluded = getActiveWorldContent().decorationExclusions;
+  if (!excluded || excluded.length === 0) return decorations;
+  const keys = new Set(excluded);
+  return decorations.filter((decoration) => !keys.has(decorationKey(decoration)));
 }
 
 // Shared by render scatter and its collision grid; independent of terrain shaping.
@@ -4905,6 +4809,43 @@ export const BIOME_BY_ID: BiomeId[] = [
   'volcano',
   'cave',
 ];
+
+// Every BiomeId, as a runtime list. A ZONE's biome may be any of these, the
+// realm biomes (frost, dusk, ember, ...) drive palettes, sky features (the
+// Frostveil's aurora), and ambient weather, and a zone carrying one round-trips
+// through a saved map even though no brush paints it. Validating a zone against
+// BIOME_BY_ID instead silently downgraded every realm zone to 'vale' on export.
+export const ALL_BIOME_IDS: readonly BiomeId[] = [
+  'vale',
+  'marsh',
+  'peaks',
+  'beach',
+  'desert',
+  'volcano',
+  'cave',
+  'dusk',
+  'ember',
+  'frost',
+  'amber',
+  'fen',
+  'night',
+  'haunt',
+  'jungle',
+  'garden',
+  'gale',
+];
+
+// The persisted paint id at (x,z), including custom swatches. Renderers that
+// support custom textures need the raw id rather than the built-in biome below.
+export function paintedCellIdAt(x: number, z: number): number | null {
+  const bp = getActiveWorldContent().biomePaint;
+  if (!bp) return null;
+  const c = Math.floor((x - bp.originX) / bp.cell);
+  const r = Math.floor((z - bp.originZ) / bp.cell);
+  if (c < 0 || c >= bp.cols || r < 0 || r >= bp.rows) return null;
+  const id = bp.ids[r * bp.cols + c];
+  return id === 255 ? null : id;
+}
 
 // The painted biome at (x,z), or null if unpainted / no paint layer. Cheap grid
 // lookup; absent for the built-in world (getActiveWorldContent has no biomePaint).
@@ -5051,7 +4992,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * DECORATION_STEP;
   const x = gx + ox,
     z = gz + oz;
-  if (isExcludedDecoration(x, z)) return null;
+  if (isExcludedDecoration(x, z) || isCuratedGardenScatter(kind, x, z, zoneBiomeAt)) return null;
   // The Galecrest paddock is a worked yard and race course. Keep the same
   // deterministic decoration field out of its apron so no tree becomes an
   // invisible obstacle across a jump line.
@@ -5150,6 +5091,10 @@ export function generateDecorationsInBounds(
   bounds: { minX: number; maxX: number; minZ: number; maxZ: number },
 ): Decoration[] {
   if (bounds.minX > bounds.maxX || bounds.minZ > bounds.maxZ) return [];
+  // Same gate as generateDecorations above, and it has to be here too: the
+  // COLLIDER field reads this function, so suppressing only the render would
+  // leave the player walking into invisible trees.
+  if (getActiveWorldContent().decorationsMode === 'empty') return [];
   const xCount = decorationAnchorCount(DECORATION_X_START, DECORATION_X_END);
   const zCount = decorationAnchorCount(DECORATION_Z_START, DECORATION_Z_END);
   const first = (value: number, start: number, count: number): number =>
@@ -5165,10 +5110,16 @@ export function generateDecorationsInBounds(
   const zEnd = end(bounds.maxZ, DECORATION_Z_START, zCount);
   const out: Decoration[] = [];
   appendDecorationRange(out, seed, xFirst, xEnd, zFirst, zEnd, bounds);
-  return out;
+  return withoutEditorExcludedDecorations(out);
 }
 
 export function generateDecorations(seed: number): Decoration[] {
+  // decorationsMode 'empty' means the maker converted the whole procedural
+  // field into editable placements and now owns it. Ground dressing has always
+  // honoured that (ground_dressing.ts); the TREE and ROCK scatter did not, so a
+  // fully converted map kept ~1000 procedural trees standing that no tool could
+  // select, "a few trees are still not editable". Gate both the same way.
+  if (getActiveWorldContent().decorationsMode === 'empty') return [];
   const out: Decoration[] = [];
   appendDecorationRange(
     out,
@@ -5178,5 +5129,5 @@ export function generateDecorations(seed: number): Decoration[] {
     0,
     decorationAnchorCount(DECORATION_Z_START, DECORATION_Z_END),
   );
-  return out;
+  return withoutEditorExcludedDecorations(out);
 }

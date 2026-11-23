@@ -11,6 +11,7 @@ import { REALM } from './realm';
 import { KeyedSerialWriteAborted } from './serial_writer';
 import type { StorageAppliedEffect } from './storage_purchase_db';
 import { commitVaultDirectClaim, type VaultDirectClaimResult } from './vault_direct_claim';
+import { type PreparedVaultReward, prepareVaultRewardTracking } from './vault_reward_tracking';
 import type { VaultRewardClaim } from './vault_rewards_db';
 import type { CharacterSaveArgs } from './woc_market_character_save';
 
@@ -71,7 +72,10 @@ export function claimVaultRewardForSession(
         bankLedgerSnapshot: snap.bankLedgerSnapshot,
       };
       let result: VaultDirectClaimResult;
+      let preparedReward: PreparedVaultReward | undefined;
       try {
+        const prepared = prepareVaultRewardTracking(host.sim.ctx, session.pid, claim);
+        if (!prepared) return 'retry';
         result = await host.withPermit(
           () =>
             commit(
@@ -89,10 +93,18 @@ export function claimVaultRewardForSession(
                     bankLedgerSaveEffects(snap.bankLedgerSnapshot),
                   ),
               },
-              { realm: REALM, attemptId, claim, owner, state: snap.state },
+              {
+                realm: REALM,
+                attemptId,
+                claim,
+                owner,
+                state: snap.state,
+                preparedItems: prepared.items,
+              },
             ),
           controller.signal,
         );
+        if (result === 'delivered') preparedReward = prepared;
       } catch (error) {
         if (
           controller.signal.aborted &&
@@ -123,14 +135,14 @@ export function claimVaultRewardForSession(
             session.pid,
             inst.vault.rarity,
             reward,
-            owner,
-            claim.guestCycle,
             true,
+            preparedReward?.items,
           )
         ) {
           host.quarantine(session.pid, claim.characterId, 'ambiguous', 'vault reward projection');
           throw new Error('vault reward committed but live projection unavailable');
         }
+        for (const event of preparedReward?.events ?? []) host.sim.ctx.emit(event);
         session.lastSave = Date.now();
       }
       return result;

@@ -266,6 +266,38 @@ class Lab {
 }
 
 describe('SelfMotionPredictor', () => {
+  it('refreshes riding training on the persistent actor when advanced training arrives', () => {
+    const lab = new Lab(100);
+    lab.self.mountKey = 'valorsteed';
+    lab.self.ridingTier = 1;
+    const referenceSelf = { ...lab.self, ridingTier: 2 as const };
+    const reference = new SelfMotionPredictor(SEED, lab.srv.riftCollisionToken);
+    const frame: SelfMotionFrame = {
+      enabled: true,
+      moveInput: mi(),
+      displayFacing: 0,
+      echoMs: 100,
+      jitterMs: 0,
+      alpha: 1,
+      frameDt: 0.05,
+      snapAgeMs: 0,
+      snapIntervalMs: SNAP_MS,
+      riftFloor: null,
+      delveRun: null,
+      delveSolids: [],
+    };
+    lab.predictor.step(lab.self, frame);
+    reference.step(referenceSelf, frame);
+    lab.self.ridingTier = 2;
+    frame.moveInput = mi({ forward: true });
+    lab.predictor.step(lab.self, frame);
+    reference.step(referenceSelf, frame);
+    const upgraded = lab.predictor.step(lab.self, frame);
+    const alreadyAdvanced = reference.step(referenceSelf, frame);
+    expect(upgraded).toEqual(alreadyAdvanced);
+    expect((upgraded?.z ?? 0) - lab.self.pos.z).toBeCloseTo(RUN_SPEED * 2.1 * 0.05);
+    expect(lab.self.pos).toEqual(lab.srv.player.pos);
+  });
   it('recognizes only the local completed-unstuck event as an authoritative discontinuity', () => {
     const completed = {
       type: 'unstuck',
@@ -356,15 +388,18 @@ describe('SelfMotionPredictor', () => {
     expect(lab.srv.player.pos.z).toBeCloseTo(-1000, 3);
   });
 
-  // Running into a blocker (the Grand Armoury's flat south face at z = -12) is
-  // the case the predictor must NOT "correct": the
-  // display stops at the wall a full echo before the server does, and that is
-  // right. Stripping the lead against the lagging anchor teleports the avatar
+  // Running into a blocker (the Fallen Chapel's south gable wall, the
+  // gable_wall_w collider in sim/hollow_crypt_entrance.ts at world (85.925, 68),
+  // whose flat south face stands at z = 67.32) is the case the predictor must
+  // NOT "correct". Re-staged 2026-10: the lanes ran at x 17.5 into the Wolf Run
+  // barracks until the genshin artstyle merge (8bff2cec638) cleared it, which
+  // left them running into open ground. The display stops at the wall a full
+  // echo before the server does, and that is right. Stripping the lead against the lagging anchor teleports the avatar
   // backward by RUN_SPEED x echo on the contact frame. A normal forward step at
   // 60 fps is RUN_SPEED/60 = 0.117 yd, so any backward frame step of that order
   // reads as a snap; the leash + divergence servo alone keep it sub-centimeter.
   it.each([100, 200, 300])('does not snap the pose backward on contact at %ims echo', (lagMs) => {
-    const lab = new Lab(lagMs, FRAME_MS, { start: { x: 17.5, z: -16 }, facing: 0 });
+    const lab = new Lab(lagMs, FRAME_MS, { start: { x: 85.92, z: 61.5 }, facing: 0 });
     lab.frame();
     lab.frame();
     lab.setInput(mi({ forward: true }));
@@ -385,7 +420,7 @@ describe('SelfMotionPredictor', () => {
   });
 
   it('never renders the pose through a blocker it is running into', () => {
-    const lab = new Lab(200, FRAME_MS, { start: { x: 17.5, z: -16 }, facing: 0 });
+    const lab = new Lab(200, FRAME_MS, { start: { x: 85.92, z: 61.5 }, facing: 0 });
     lab.frame();
     lab.frame();
     lab.setInput(mi({ forward: true }));
@@ -404,7 +439,7 @@ describe('SelfMotionPredictor', () => {
   });
 
   it('holds a settled pose while forward is held against a wall', () => {
-    const lab = new Lab(120, FRAME_MS, { start: { x: 17.5, z: -14.2 }, facing: 0 });
+    const lab = new Lab(120, FRAME_MS, { start: { x: 85.92, z: 63.3 }, facing: 0 });
     lab.setInput(mi({ forward: true }));
     for (let i = 0; i < 60; i++) lab.frame(); // run in and settle
 

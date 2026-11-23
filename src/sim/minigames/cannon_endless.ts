@@ -10,7 +10,7 @@
 //
 // Pure helpers over the encounter state: no rng, no clock.
 
-import { CANNON_WAVES } from '../content/cannon_encounter';
+import { CANNON_ENEMIES, CANNON_WAVES } from '../content/cannon_encounter';
 import type { CannonEncounterState, CannonResult, CannonSpawnDef } from '../types';
 
 export const CANNON_ENDLESS = Object.freeze({
@@ -71,3 +71,16 @@ export function beginCannonEndless(
 export function cannonEndlessAtCap(state: Pick<CannonEncounterState, 'wave' | 'endless'>): boolean {
   return cannonEndlessRound(state) >= CANNON_ENDLESS.maxRounds;
 }
+
+/** The most health any enemy can spawn with: the toughest authored enemy at the
+ *  last round the cap lets start. Wire validation bounds a forged payload with
+ *  this, never the game: a tighter literal once dropped the whole session on the
+ *  client at the third round (the commander outgrew it) while the server run went on. */
+export const CANNON_MAX_ENEMY_HP = Math.round(
+  Math.max(...Object.values(CANNON_ENEMIES).map((enemy) => enemy.hp)) *
+    cannonEndlessHpScale(CANNON_ENDLESS.maxRounds),
+);
+
+/** The most enemies alive at once: a wave only ends when its field is empty,
+ *  and every endless round replays one authored pattern. */
+export const CANNON_MAX_LIVE_ENEMIES = Math.max(...CANNON_WAVES.map((wave) => wave.length));

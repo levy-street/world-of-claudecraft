@@ -46,6 +46,9 @@ export interface MountViewState extends RickshawMountViewState {
   mountCompilePending: boolean;
   /** Resolved seat bone, cached across frames (cleared on a mount swap). */
   mountSeatBone: THREE.Object3D | null;
+  /** performance.now() seconds of the last summon edge (syncMountTransitionFx), for a mount
+   *  whose summon burst flares its own lamps; unset until a summon is seen. */
+  mountSummonAt?: number;
 }
 
 /** Renderer services the lifecycle needs. ONE instance per renderer, never
@@ -296,7 +299,12 @@ export interface MountTransitionInputs {
  * Returns the next `wasMountCasting` latch for the caller to store.
  */
 export function syncMountTransitionFx(
-  v: { lastMountKey: string; lastMountLook?: string; wasMountCasting: boolean },
+  v: {
+    lastMountKey: string;
+    lastMountLook?: string;
+    wasMountCasting: boolean;
+    mountSummonAt?: number;
+  },
   x: MountTransitionInputs,
 ): boolean {
   // idle -> summoning edge (mountCastKey set): play the arm-raise call pose for
@@ -331,7 +339,11 @@ export function syncMountTransitionFx(
     // or dismount), and a swap would carry the old moving state into the new
     // mount, skipping its windup.
     x.engineReset();
-    if (x.mountKey !== '') x.summonCall();
+    if (x.mountKey !== '') {
+      x.summonCall();
+      // the clock a lamp-bearing mount's summon flare runs from (mount_presentation.ts)
+      v.mountSummonAt = performance.now() / 1000;
+    }
     // Warm the new mount's movement clips right away too (the cast-edge call
     // above may not have run for a live swap): a cold first ride otherwise
     // plays the windup through

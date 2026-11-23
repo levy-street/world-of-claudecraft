@@ -94,172 +94,143 @@ export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
 
 // Spec-card presentation for the Specialization screen. Keyed by class, then spec id:
 // spec ids are NOT globally unique (paladin/priest both have "holy", shaman/druid both
-// have "restoration"), so a flat spec-id map cannot cover all 27 specs. `primaryStat`
-// is the attribute the spec scales with (a StatId reused for its localized itemUi.stats.*
-// label; melee AP is str-driven for warrior/paladin/shaman/druid, agi-driven kits and
-// ranged AP for rogue/hunter, spell power is int, see src/sim/entity.ts); `complexity`
+// have "restoration"), so a flat spec-id map cannot cover all 27 specs. The card's
+// primary stat is read from SPEC_PRIMARY_STAT (src/sim/content/spec_primary_stat.ts),
+// the one table every gear source shares; `complexity`
 // is an owner-tunable designer call; `examples` are 3-4 real ability ids that showcase
 // the spec (each must exist in ABILITIES, belong to the class, and be offered by the
 // spec; enforced by tests/charselect_class_details.test.ts). A spec absent here renders
 // the basic card (icon + name + role) with no detail rows, so coverage must stay total.
 export type SpecComplexity = 'low' | 'medium' | 'high';
 export interface SpecCardInfo {
-  primaryStat: 'str' | 'agi' | 'int' | 'spi' | 'sta';
   complexity: SpecComplexity;
   examples: string[];
 }
 export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> = {
   warrior: {
     arms: {
-      primaryStat: 'str',
       complexity: 'medium',
       examples: ['mortal_strike', 'overpower', 'sweeping_strikes', 'execute'],
     },
     fury: {
-      primaryStat: 'str',
       complexity: 'high',
       examples: ['bloodthirst', 'raging_gale', 'red_harvest', 'whirlwind'],
     },
     prot: {
-      primaryStat: 'str',
       complexity: 'medium',
       examples: ['shield_slam', 'revenge', 'thunder_clap', 'sunder_armor'],
     },
   },
   paladin: {
     holy: {
-      primaryStat: 'int',
       complexity: 'low',
       examples: ['holy_light', 'dawns_embrace', 'radiant_chorus', 'lay_on_hands'],
     },
     protection: {
-      primaryStat: 'str',
       complexity: 'medium',
       examples: ['bastion_sweep', 'oath_chain', 'holy_shield', 'consecration'],
     },
     retribution: {
-      primaryStat: 'str',
       complexity: 'low',
       examples: ['final_edict', 'sun_gods_verdict', 'hammer_of_wrath', 'avenging_wrath'],
     },
   },
   hunter: {
     beast_mastery: {
-      primaryStat: 'agi',
       complexity: 'low',
       examples: ['pack_command', 'unleash_beast', 'bestial_wrath', 'tame_beast'],
     },
     marksmanship: {
-      primaryStat: 'agi',
       complexity: 'medium',
       examples: ['measured_shot', 'aimed_shot', 'rapid_fire', 'cold_focus'],
     },
     survival: {
-      primaryStat: 'agi',
       complexity: 'high',
       examples: ['bloodhook', 'raptor_strike', 'mongoose_bite', 'shrapnel_charge'],
     },
   },
   rogue: {
     assassination: {
-      primaryStat: 'agi',
       complexity: 'medium',
       examples: ['cold_blood', 'ambush', 'rupture', 'deadly_poison'],
     },
     combat: {
-      primaryStat: 'agi',
       complexity: 'low',
       examples: ['blade_flurry', 'sinister_strike', 'adrenaline_rush', 'eviscerate'],
     },
     subtlety: {
-      primaryStat: 'agi',
       complexity: 'high',
       examples: ['hemorrhage', 'cheap_shot', 'vanish', 'sap'],
     },
   },
   priest: {
     discipline: {
-      primaryStat: 'int',
       complexity: 'high',
       examples: ['power_infusion', 'power_word_shield', 'power_word_fortitude', 'smite'],
     },
     holy: {
-      primaryStat: 'int',
       complexity: 'low',
       examples: ['holy_nova', 'heal', 'flash_heal', 'renew'],
     },
     shadow: {
-      primaryStat: 'int',
       complexity: 'medium',
       examples: ['shadowform', 'shadow_word_pain', 'mind_blast', 'mind_flay'],
     },
   },
   shaman: {
     elemental: {
-      primaryStat: 'int',
       complexity: 'medium',
       examples: ['elemental_mastery', 'lightning_bolt', 'earth_shock', 'earthquake'],
     },
     enhancement: {
-      primaryStat: 'str',
       complexity: 'medium',
       examples: ['stormstrike', 'rockbiter_weapon', 'galeheart_weapon', 'lightning_shield'],
     },
     restoration: {
-      primaryStat: 'int',
       complexity: 'low',
       examples: ['chain_heal', 'healing_wave', 'ghost_wolf'],
     },
   },
   mage: {
     fire: {
-      primaryStat: 'int',
       complexity: 'high',
       examples: ['fireball', 'pyroblast', 'combustion', 'meteor'],
     },
     frost: {
-      primaryStat: 'int',
       complexity: 'medium',
       examples: ['frostbolt', 'ice_lance', 'frozen_orb', 'frost_nova'],
     },
     arcane: {
-      primaryStat: 'int',
       complexity: 'high',
       examples: ['temporal_mend', 'temporal_cascade', 'temporal_rewind', 'temporal_hourglass'],
     },
   },
   warlock: {
     affliction: {
-      primaryStat: 'int',
       complexity: 'high',
       examples: ['evil_eye', 'needle_of_fate', 'sentence', 'litany_of_guilt'],
     },
     demonology: {
-      primaryStat: 'int',
       complexity: 'high',
       examples: ['soul_harvest', 'raise_bone_mage', 'army_of_the_dead', 'metamorphosis'],
     },
     destruction: {
-      primaryStat: 'int',
       complexity: 'low',
       examples: ['conflagrate', 'immolate', 'shadowburn', 'rain_of_fire'],
     },
   },
   druid: {
     balance: {
-      primaryStat: 'int',
       complexity: 'low',
       examples: ['moonkin_form', 'wrath', 'starfire', 'moonfire'],
     },
     feral: {
-      primaryStat: 'str',
       complexity: 'medium',
       examples: ['feral_charge', 'bear_form', 'maul', 'swipe'],
     },
     restoration: {
-      primaryStat: 'int',
       complexity: 'medium',
-      examples: ['swiftmend', 'rejuvenation', 'regrowth', 'healing_touch'],
+      examples: ['sporemender_form', 'swiftmend', 'rejuvenation', 'regrowth'],
     },
   },
 };

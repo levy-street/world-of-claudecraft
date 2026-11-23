@@ -188,9 +188,9 @@ describe('the boulder numbers (pure, shared with the renderer)', () => {
 });
 
 describe('the boulder in the fight', () => {
-  it('alone: nobody is rooted, the lane runs past the player, and a sidestep dodges it', () => {
+  it('common: nobody is rooted, the lane runs past the player, and a sidestep dodges it', () => {
     for (const dodge of [true, false]) {
-      const entry = encounter();
+      const entry = encounter('common');
       const events = cast(entry);
       expect(events.some((e) => e.type === 'log' && /Get out of its way/.test(e.text))).toBe(true);
       expect(marked(entry)).toHaveLength(0);
@@ -233,7 +233,7 @@ describe('the boulder in the fight', () => {
   it('hits a flat amount: stamina survives it, a thin body does not', () => {
     const lost: number[] = [];
     for (const health of [GEARED_HEALTH, 2000, 600]) {
-      const entry = encounter();
+      const entry = encounter('common');
       entry.sim.player.maxHp = health;
       entry.sim.player.hp = health;
       cast(entry);

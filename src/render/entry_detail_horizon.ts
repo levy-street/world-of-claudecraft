@@ -5,9 +5,10 @@
 import {
   advanceEntryDetailHorizon,
   createEntryDetailHorizonState,
-  ENTRY_DETAIL_HORIZON_HEADROOM_MS,
+  ENTRY_DETAIL_HORIZON_SHED_MS,
   ENTRY_DETAIL_HORIZON_STEPS,
   type EntryDetailHorizonState,
+  entryDetailHorizonHeadroomMs,
   entrySceneryCullFar,
 } from './entry_detail_horizon_core';
 import { type InitialFrameCompileRecord, initialFrameDeferral } from './initial_frame_core';
@@ -49,6 +50,7 @@ export interface EntryDetailHorizonSnapshot {
 export class EntryDetailHorizonAdmission {
   private state: EntryDetailHorizonState;
   private active = false;
+  private compileSettled = false;
   private demand: number;
   private armedAtMs: number | null = null;
   private holdReason: EntryDetailHorizonHoldReason = 'inactive';
@@ -65,6 +67,7 @@ export class EntryDetailHorizonAdmission {
   arm(liveFar: number, enabled: boolean): number {
     if (!enabled) {
       this.active = false;
+      this.compileSettled = false;
       this.demand = liveFar;
       this.armedAtMs = null;
       this.holdReason = 'inactive';
@@ -73,6 +76,7 @@ export class EntryDetailHorizonAdmission {
     }
     this.state = createEntryDetailHorizonState(this.targetFar);
     this.active = !this.state.complete;
+    this.compileSettled = false;
     this.demand = this.state.cap;
     this.armedAtMs = this.now();
     this.holdReason = this.active ? 'stabilizing' : 'complete';
@@ -88,16 +92,27 @@ export class EntryDetailHorizonAdmission {
     frameMs: number,
     externallyPaced = false,
   ): number {
-    // Entry completion is permanent. Avoid walking the retained diagnostics
-    // lifecycle or allocating a LinkDebt/sample on every later outdoor frame.
-    if (!enabled || !this.active) {
+    // Disarmed or healthy completed horizons avoid walking retained compile
+    // diagnostics or allocating a sample on every outdoor frame.
+    if (!enabled || this.armedAtMs === null) {
       this.demand = targetFar;
       return this.demand;
     }
+    if (
+      !this.active &&
+      this.state.stableFrames === 0 &&
+      (externallyPaced || !Number.isFinite(frameMs) || frameMs <= ENTRY_DETAIL_HORIZON_SHED_MS)
+    ) {
+      this.demand = targetFar;
+      return this.demand;
+    }
+    const compileReady =
+      this.compileSettled || records === null || initialFrameDeferral(records) === null;
+    if (compileReady) this.compileSettled = true;
     return this.advance({
       enabled,
       targetFar,
-      compileReady: records === null || initialFrameDeferral(records) === null,
+      compileReady,
       terrainReadyFar,
       frameMs,
       externallyPaced,
@@ -105,14 +120,18 @@ export class EntryDetailHorizonAdmission {
   }
 
   private advance(sample: EntryDetailHorizonSample): number {
-    if (sample.enabled && this.active) {
+    if (sample.enabled && (this.active || this.armedAtMs !== null)) {
       const previousCap = this.state.cap;
-      this.holdReason = this.reasonFor(sample);
+      const wasActive = this.active;
+      if (wasActive) this.holdReason = this.reasonFor(sample);
       this.state = advanceEntryDetailHorizon(this.state, sample);
       this.active = !this.state.complete;
       if (this.state.cap > previousCap) {
         this.transitions.push({ from: previousCap, to: this.state.cap, atMs: this.now() });
         this.holdReason = 'advanced';
+      } else if (this.state.cap < previousCap) {
+        this.transitions.push({ from: previousCap, to: this.state.cap, atMs: this.now() });
+        this.holdReason = 'frame';
       } else if (!this.active) {
         this.holdReason = 'complete';
       }
@@ -126,7 +145,8 @@ export class EntryDetailHorizonAdmission {
     if (sample.terrainReadyFar < this.nextCap(sample.targetFar)) return 'terrain';
     if (
       !sample.externallyPaced &&
-      (!Number.isFinite(sample.frameMs) || sample.frameMs > ENTRY_DETAIL_HORIZON_HEADROOM_MS)
+      (!Number.isFinite(sample.frameMs) ||
+        sample.frameMs > entryDetailHorizonHeadroomMs(this.state.step))
     ) {
       return 'frame';
     }
@@ -157,7 +177,7 @@ export class EntryDetailHorizonAdmission {
       sceneryCap: this.active ? this.state.cap : null,
       targetFar: this.targetFar,
       nextCap: this.active ? this.nextCap(this.targetFar) : null,
-      stableFrames: this.state.stableFrames,
+      stableFrames: Math.max(0, this.state.stableFrames),
       armedAtMs: this.armedAtMs,
       holdReason: this.holdReason,
       transitions: this.transitions.slice(),

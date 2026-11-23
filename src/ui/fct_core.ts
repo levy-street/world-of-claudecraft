@@ -89,6 +89,17 @@ export type FctColorToken =
   | 'self-note';
 
 /**
+ * The OUTGOING damage kinds: the floaters the local player (or a guardian they own)
+ * dealt. The vivid look fans these out sideways so a burst of hits does not stack into
+ * one unreadable column; incoming damage keeps the straight rise over the player.
+ */
+const OUTGOING_FCT_KINDS: ReadonlySet<FctKind> = new Set<FctKind>([
+  'damage-done-ability',
+  'damage-done-auto',
+  'damage-done-block',
+]);
+
+/**
  * The minimal entity shape the anchor is read from. Structural on purpose so the core
  * reads identically off an offline Sim entity and an online ClientWorld-mirror entity
  * (parity): both expose pos.{x,y,z} and a numeric scale, and nothing else
@@ -127,6 +138,12 @@ export interface FctEvent {
    * floater is described and projected when it is finally released, not when it was queued.
    */
   readonly delaySec?: number;
+  /**
+   * The raw damage amount of an outgoing hit, carried beside the localized text so the
+   * painter's big-hit emphasis (fct_emphasis_core.ts) can compare it with the player's
+   * own running average. describeFct ignores it.
+   */
+  readonly amount?: number;
 }
 
 /** Output: the resolved, world-space-plus-screen-offset spawn descriptor the painter draws. */
@@ -148,6 +165,8 @@ export interface FctDescriptor {
   readonly jitterOffset: number;
   /** Lifetime in ms before the painter evicts the entry (the live setTimeout removal). */
   readonly ttlMs: number;
+  /** Whether this is an outgoing damage number (the vivid look fans these out sideways). */
+  readonly outgoing: boolean;
 }
 
 // --- Named constants (no magic values in the descriptor math). Each
@@ -227,5 +246,6 @@ export function describeFct(event: FctEvent, jitter01: number): FctDescriptor {
     anchor: { x: pos.x, y: pos.y + FCT_ANCHOR_HEAD_OFFSET * scale, z: pos.z },
     jitterOffset: jitter01 * FCT_JITTER_RANGE - FCT_JITTER_RANGE / 2,
     ttlMs: event.kind === 'xp' || event.kind === 'rested-xp' ? FCT_XP_TTL_MS : FCT_TTL_MS,
+    outgoing: OUTGOING_FCT_KINDS.has(event.kind),
   };
 }

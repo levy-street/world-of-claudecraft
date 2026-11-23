@@ -110,8 +110,7 @@ export const CI_LONG_SUITES = Object.freeze([
   // leg instead of the lane; a graph member like audit_conservation runs via
   // the unfiltered related leg either way). The chronomancy
   // suite split three ways and only its balance-targets file stays lane-listed
-  // (the heal-parity and Cascada pieces shard, like the warlock sustain
-  // suite's per-spec pieces, both pending a per-piece in-shard measurement).
+  // (the heal-parity and Cascada pieces shard).
   // druid_balance_probe stays WHOLE: its cost is one matrix test whose
   // bestDruidBuilds assertions are an argmax across capstones, so a
   // per-capstone split would weaken the winner selection it pins.
@@ -140,6 +139,14 @@ export const CI_LONG_SUITES = Object.freeze([
   'tests/owned_class_balance_role_bands.test.ts',
   'tests/owned_class_raid_armor_avoidance.test.ts',
   'tests/owned_class_raid_sustain_bands.test.ts',
+  // The warlock sustain per-spec anchors and five-minute windows (remeasured
+  // in-shard on full-mode run 40304367651 after the 2026-08-23 warlock
+  // viability round doubled each anchor's scope: demonology 306.3 s,
+  // destruction 282.4 s, affliction 193.9 s, five_minute_windows 177.6 s).
+  'tests/warlock_anchor_affliction.test.ts',
+  'tests/warlock_anchor_demonology.test.ts',
+  'tests/warlock_anchor_destruction.test.ts',
+  'tests/warlock_five_minute_windows.test.ts',
 ]);
 
 /**
@@ -148,7 +155,9 @@ export const CI_LONG_SUITES = Object.freeze([
  * clock is roughly half of the single-job lane's. Halves are balanced by
  * MEASURED post-diet suite duration, not file count (re-balanced 2026-08-13
  * from the per-file durations in the harness-split PR after the owned-class
- * pair became nine single-responsibility files; re-derive from the lane job
+ * pair became nine single-responsibility files, and updated 2026-10-27 from
+ * full-mode run 40304367651 when the four warlock balance suites joined:
+ * half A 1571.7 s, half B 1479.8 s; re-derive from the lane job
  * logs whenever a member's cost moves). The shard legs keep excluding the
  * full CI_LONG_SUITES union, so the a/b assignment can rebalance freely
  * without touching the shard side. tests/ci_shard_plan.test.ts pins the
@@ -162,6 +171,8 @@ const CI_LONG_SUITE_HALF_A = Object.freeze([
   'tests/owned_class_balance_healer_probes.test.ts',
   'tests/owned_class_balance_role_bands.test.ts',
   'tests/owned_class_raid_armor_avoidance.test.ts',
+  'tests/warlock_anchor_affliction.test.ts',
+  'tests/warlock_five_minute_windows.test.ts',
 ]);
 
 // Half b is DERIVED (the union minus half a), so a lane file excluded from

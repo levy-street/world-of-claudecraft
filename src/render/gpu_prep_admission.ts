@@ -7,6 +7,7 @@
 // never learns what a class is and the core never learns what a queue unit is.
 import { arrivalCoverActive } from './arrival_cover';
 import type { GpuWorkAdmission } from './background_gpu_queue';
+import { contextRestorePacingActive } from './context_restore_hold';
 import {
   type GpuPrepBudget,
   gpuPrepClassForPriority,
@@ -32,6 +33,7 @@ export function createGpuPrepAdmission(budget: GpuPrepBudget): GpuWorkAdmission 
         cls: gpuPrepClassForPriority(candidate.priority),
         deferredFrames: candidate.deferredFrames,
         cover: arrivalCoverActive(),
+        coverPaced: contextRestorePacingActive(),
         priority: candidate.priority,
       }).admit;
     },

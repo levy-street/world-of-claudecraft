@@ -17,6 +17,12 @@ import type { CensusRecord } from './contract';
 /** Per-batch statement timeout; each batch is small by construction. */
 const CENSUS_BATCH_TIMEOUT_MS = 15_000;
 export const CENSUS_BATCH_SIZE = 500;
+/**
+ * Retries per RUN, shared by every batch: one transient stall must not
+ * discard the whole day's snapshot, but a systemic slow plan must still fail
+ * fast instead of retrying every batch on the pool shared with the world loop.
+ */
+export const CENSUS_RUN_RETRIES = 3;
 
 /** The lifetime counters worth carrying (the scout allowlist). */
 const COUNTER_KEYS = [
@@ -39,6 +45,15 @@ const COUNTER_KEYS = [
  * characters. Session durations are clamped to [0, 86400] per row, and the
  * play_session_totals rollup term keeps lifetime playtime identical after the
  * retention sweep folds old sessions forward (the listCharacters precedent).
+ *
+ * The session lateral MUST carry the account_id term: play_sessions has no
+ * character_id index for ended sessions (play_sessions_open_character is
+ * partial on ended_at IS NULL), so without it every character seq-scans the
+ * whole session table and a batch grows with the realm's lifetime session
+ * count until it hits the statement timeout. With it, the lateral is an
+ * index probe on play_sessions_account. Sessions are written under the
+ * character's own account and characters never change account, so the term
+ * filters nothing out (listCharacters reads sessions the same way).
  */
 export const CENSUS_SQL = `SELECT c.id, c.name, c.class, c.level,
             jsonb_build_object(
@@ -68,7 +83,7 @@ export const CENSUS_SQL = `SELECT c.id, c.name, c.class, c.level,
        SELECT SUM(LEAST(GREATEST(EXTRACT(EPOCH FROM (s.ended_at - s.started_at)), 0), 86400))::bigint AS playtime,
               COUNT(*)::int AS sessions
        FROM play_sessions s
-       WHERE s.character_id = c.id AND s.ended_at IS NOT NULL
+       WHERE s.account_id = c.account_id AND s.character_id = c.id AND s.ended_at IS NOT NULL
      ) p ON TRUE
      LEFT JOIN play_session_totals totals
        ON totals.character_id = c.id AND totals.account_id = c.account_id
@@ -76,14 +91,52 @@ export const CENSUS_SQL = `SELECT c.id, c.name, c.class, c.level,
      ORDER BY c.id
      LIMIT $3`;
 
-export async function loadCensusRows(realm: string, snapshotDate: string): Promise<CensusRecord[]> {
+export async function loadCensusRows(
+  realm: string,
+  snapshotDate: string,
+  onRetry: () => void = () => undefined,
+): Promise<CensusRecord[]> {
+  return walkCensusBatches(
+    async (lastId) => {
+      const res = await runWithStatementTimeout(CENSUS_BATCH_TIMEOUT_MS, (query) =>
+        query(CENSUS_SQL, [realm, lastId, CENSUS_BATCH_SIZE]),
+      );
+      return res.rows as CensusRowRaw[];
+    },
+    snapshotDate,
+    onRetry,
+  );
+}
+
+/** Reads the keyset batch after `lastId`. */
+export type CensusBatchFetch = (lastId: number) => Promise<CensusRowRaw[]>;
+
+/**
+ * The keyset walk. A failed batch is retried at the same keyset while the
+ * run's CENSUS_RUN_RETRIES budget lasts, so a lock wait or IO stall costs a
+ * retry instead of the whole day (the exporter's day memory means a failed
+ * run is not retried until tomorrow). Once the budget is spent the failure
+ * throws, to the exporter's failure counter. `onRetry` feeds the retry metric.
+ */
+export async function walkCensusBatches(
+  fetchBatch: CensusBatchFetch,
+  snapshotDate: string,
+  onRetry: () => void = () => undefined,
+): Promise<CensusRecord[]> {
   const out: CensusRecord[] = [];
   let lastId = 0;
+  let retriesLeft = CENSUS_RUN_RETRIES;
   for (;;) {
-    const res = await runWithStatementTimeout(CENSUS_BATCH_TIMEOUT_MS, (query) =>
-      query(CENSUS_SQL, [realm, lastId, CENSUS_BATCH_SIZE]),
-    );
-    const rows = res.rows as CensusRowRaw[];
+    let rows: CensusRowRaw[];
+    try {
+      rows = await fetchBatch(lastId);
+    } catch (e) {
+      if (retriesLeft === 0) throw e;
+      retriesLeft--;
+      onRetry();
+      console.warn(`[parse] census batch after id ${lastId} failed, retrying:`, e);
+      continue;
+    }
     for (const row of rows) out.push(toCensusRecord(row, snapshotDate));
     if (rows.length < CENSUS_BATCH_SIZE) break;
     lastId = Number(rows[rows.length - 1]?.id);

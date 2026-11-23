@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Het Wildhartbekken',
-    desc: 'Kenmerkende wapens van Zulgar en de Slagtandheer Beestenmeester.',
+    desc: 'Kenmerkende wapens van de Hoektandheer Beestenmeester, de Vreetbloem en Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroïsch: Het Wildhartbekken',
-    desc: 'Alleen heroïsch verkrijgbare epics van Zulgar, Stem van het Bekken.',
+    desc: 'Alleen op Heroïsch verkrijgbare epische voorwerpen en sieraden van de Hoektandheer Beestenmeester, de Vreetbloem en Zulgar, Stem van het Bekken.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, de Ontwakende Piek',
     desc: 'Persoonlijke epische buit van de wereldbaas van de Ontwakende Piek.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, de Begraven Opzichter',
+    desc: 'Buit teruggesleept uit de grafheuvels van Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Het Ingestorte Reliekschrijn',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Oorlogsvoeringgalerij',
-    desc: 'De vijf strijduitrustingen van Oorlogsvoering, stuk voor stuk met eer verdiend.',
+    desc: 'De vijf Oorlogvoeringsstrijdkits van het eerste seizoen, nu stuk voor stuk voor goud verkocht.',
   },
   conquerors_warfare_armory: {
     name: 'Oorlogsvoeringwapenkamer',
-    desc: 'Sieraden en wapens van Oorlogsvoering, gekocht met zwaarbevochten eer.',
+    desc: 'Sieraden, wapens en goederen van Oorlogsvoering, gekocht met zwaarbevochten eer.',
   },
   conquerors_vanguard_gallery: {
     name: 'Voorhoedegalerij',

@@ -434,4 +434,24 @@ describe('zone-scoped sky assets', () => {
     expect(rt.dispose).toHaveBeenCalled();
     expect(envRTs.size).toBe(0);
   });
+
+  it('streams 1k KTX2 dome skies on Low graphics and evicts non-active biomes', async () => {
+    const sky = await import('../src/render/sky');
+    const view = sky.buildSky(true, new THREE.Vector3(90, 140, 50), 0, 0);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(loadKtx2Texture).toHaveBeenCalledWith('/env/vale_day_1k.ktx2', { large: true });
+    expect(sky.residentSkyBiomes()).toEqual([]);
+
+    view.setCameraPos(0, 400, 0);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(loadKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_1k.ktx2', { large: true });
+    expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/vale_day_1k.ktx2');
+
+    view.dispose();
+    expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_1k.ktx2');
+  });
 });

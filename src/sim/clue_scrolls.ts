@@ -42,6 +42,7 @@ import type { SimContext } from './sim_context';
 import { rollTreasureMapRarity } from './treasure_vault';
 import { dist2d, type Entity, INTERACT_RANGE } from './types';
 import { playerActiveWorldQuests } from './world_quest_reroll';
+import { grantWorldQuestRewardItems } from './world_quest_reward_mail';
 import { ALWAYS_ACTIVE_WORLD_QUEST_IDS } from './world_quest_rotation';
 
 /** The persisted hunt cursor: which authored hunt, and the index of the step
@@ -135,8 +136,8 @@ export function canHoldAnotherClueScroll(ctx: SimContext, meta: PlayerMeta): boo
 /**
  * The completion arm of creditWorldQuest calls this right after the turn-in
  * lands. Pays at most once per cycle: the cycle is marked paid BEFORE the bag
- * check, so a lost treasure map (bags full) is lost for the day, as the
- * design page says, and never re-rolls on the next turn-in.
+ * check, and a map the bags cannot hold is posted to the Ravenpost instead
+ * (world_quest_reward_mail.ts), so it never re-rolls on the next turn-in.
  */
 export function maybeAwardClueScroll(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   if (player.level < CLUE_SCROLL_MIN_LEVEL) return;
@@ -148,12 +149,8 @@ export function maybeAwardClueScroll(ctx: SimContext, meta: PlayerMeta, player: 
   // The rarity is always drawn, so the rng sequence never depends on bag space.
   const rarity = rollTreasureMapRarity(ctx);
   const itemId = TREASURE_MAP_ITEM_IDS[rarity];
-  if (canAddItem(meta.inventory, bagPools(meta.bags), itemId, 1)) {
-    ctx.addItem(itemId, 1, pid);
-    ctx.emit({ type: 'treasureMapEarned', rarity, pid });
-  } else {
-    ctx.emit({ type: 'treasureMapLost', pid });
-  }
+  grantWorldQuestRewardItems(ctx, meta, [{ itemId, count: 1 }]);
+  ctx.emit({ type: 'treasureMapEarned', rarity, pid });
 }
 
 // ---------------------------------------------------------------------------
@@ -205,7 +202,9 @@ export function advanceClueHunt(ctx: SimContext, meta: PlayerMeta): void {
   ctx.emit({ type: 'clueHuntStep', huntId: active.def.id, step: active.index, total, pid });
   if (hunt.step >= total) {
     meta.clueHunt = null;
-    ctx.addItem(TREASURE_CASKET_ITEM_ID, 1, pid);
+    // The hunt is spent the moment it ends, so a casket the full bags cannot
+    // hold is posted to the Ravenpost rather than forced past the capacity.
+    grantWorldQuestRewardItems(ctx, meta, [{ itemId: TREASURE_CASKET_ITEM_ID, count: 1 }]);
     ctx.emit({ type: 'clueHuntDone', huntId: active.def.id, pid });
     awardClueHuntStanding(ctx, meta, active.def);
   }

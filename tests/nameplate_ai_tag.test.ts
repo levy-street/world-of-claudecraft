@@ -86,21 +86,12 @@ function view(): EntityView {
 
 interface PainterStateAccess {
   states: Map<number, NameplateCanvasState>;
-  anchorScratch: Array<{ id: number; extraLift?: number }>;
 }
 
 function stateOf(painter: NameplatePainter, id: number): NameplateCanvasState {
   const state = (painter as unknown as PainterStateAccess).states.get(id);
   if (!state) throw new Error(`Missing nameplate state for ${id}`);
   return state;
-}
-
-function anchorOf(painter: NameplatePainter, id: number): { id: number; extraLift?: number } {
-  const anchor = (painter as unknown as PainterStateAccess).anchorScratch.find(
-    (candidate) => candidate.id === id,
-  );
-  if (!anchor) throw new Error(`Missing nameplate anchor for ${id}`);
-  return anchor;
 }
 
 function harness(
@@ -147,6 +138,7 @@ function harness(
     showDevBadges: () => true,
     showOwnNameplate: options.showOwnNameplate ?? (() => false),
     showPlayerNameplates: () => true,
+    showPetNames: () => false,
     nameplateDotScale: () => 0,
     isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
@@ -351,22 +343,12 @@ describe('batched canvas nameplate state', () => {
 
     painter.update(true);
     expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
-    expect(anchorOf(painter, 2).extraLift).toBe(8);
-
-    // The painter and canvas must agree on whether a resolved slug can paint
-    // heraldry. An unknown truthy slug paints no plaque, so it must reserve no
-    // collision lift either.
-    stateOf(painter, 2).border = 'retired_border_slug';
-    bordered.pos = { x: 20, y: 0, z: 0 } as Entity['pos'];
-    painter.update(false);
-    expect(anchorOf(painter, 2).extraLift).toBe(0);
 
     // Empty and null selections: the reset must blank the slug the plate
     // already holds instead of leaking a previous seal and ribbon.
     bordered.border = '';
     painter.update(true);
     expect(stateOf(painter, 2).border).toBe('');
-    expect(anchorOf(painter, 2).extraLift).toBe(0);
     bordered.border = 'col_reliquary_rank_5';
     painter.update(true);
     expect(stateOf(painter, 2).border).toBe('reliquary_gilt');

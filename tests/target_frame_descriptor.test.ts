@@ -6,10 +6,12 @@
 // field this extraction added: the party raid marker the frame now shows.
 
 import { beforeAll, describe, expect, it } from 'vitest';
+import { DROWNED_ANCHOR_ID } from '../src/sim/encounters/sunken_bastion/ids';
 import type { Entity } from '../src/sim/types';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import {
   fillTargetFrameDescriptor,
+  fillTargetHealthText,
   fillTargetOfTargetDescriptor,
   targetPortraitKey,
 } from '../src/ui/target_frame_descriptor';
@@ -70,6 +72,26 @@ const NO_TITLE = { pre: '', post: '' };
 beforeAll(async () => {
   await ensureLocaleLoaded('en');
   setLanguage('en');
+});
+
+describe('merged health-label rules', () => {
+  it('keeps ward links across health-text options and gives death display precedence', () => {
+    const target = entity({ id: 1, templateId: DROWNED_ANCHOR_ID, hp: 9, maxHp: 12 });
+    const descriptor = blank();
+    for (const mode of [0, 1, 2] as const) {
+      fillTargetHealthText(descriptor, target, mode);
+      expect(descriptor.hpText).toBe('9 of 12 links');
+    }
+    target.dead = true;
+    fillTargetHealthText(descriptor, target, 1);
+    expect(descriptor.hpText).toBe('Dead');
+    expect(descriptor.showAbsorbText).toBe(false);
+    target.dead = false;
+    target.auras = [{ kind: 'feign_death' } as Entity['auras'][number]];
+    fillTargetHealthText(descriptor, target, 1);
+    expect(descriptor.hpText).toBe('Dead');
+    expect(descriptor.showAbsorbText).toBe(false);
+  });
 });
 
 describe('targetPortraitKey', () => {

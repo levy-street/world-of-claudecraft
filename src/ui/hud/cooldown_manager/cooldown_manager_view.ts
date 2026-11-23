@@ -33,7 +33,8 @@ export interface CooldownButtonState {
    *  re-resolves the icon only when this changes. */
   iconKey: string;
   visible: boolean;
-  /** Pressable now: known, affordable, off cooldown (the GCD is ignored). */
+  /** Lit: a spell is pressable now (known, affordable, off cooldown; the GCD is
+   *  ignored), an aura is up, and a buff reminder is missing its aura. */
   ready: boolean;
   /** The button currently casts a different spell than the one picked. */
   transformed: boolean;
@@ -71,6 +72,11 @@ export interface CooldownManagerTickOpts {
   /** Placement preview (Options > Cooldown Manager is open): every known
    *  tracked spell shows, even one set to appear only when ready. */
   preview: boolean;
+  /** Per tracked entry (setTracked order): true while its group is off where the
+   *  player stands, so it plays no cue and lights no hotbar glow. Its edge is
+   *  still recorded, so re-entering the group's place never replays a stale
+   *  one. Absent or short: nothing is muted. */
+  muted?: readonly boolean[];
 }
 
 export interface CooldownManagerViewDeps {
@@ -129,6 +135,15 @@ function makeButton(baseId: string): CooldownButtonState {
   };
 }
 
+/** An aura entry with only "missing" ticked is a buff reminder: it lights,
+ *  pulses and chimes while the aura is MISSING, the inverse of an ordinary aura
+ *  button, and hides once the aura is up. */
+export function cooldownAuraReminder(
+  config: Pick<CooldownSpellConfig, 'showReady' | 'showNotReady'>,
+): boolean {
+  return config.showNotReady && !config.showReady;
+}
+
 /** Ready means the button would cast if pressed now, ignoring only the GCD. A
  *  charge-pool spell is ready while any charge is stored (the action bar folds
  *  that into `usable`); every other spell also needs its cooldown finished. */
@@ -160,6 +175,8 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
   let configs: CooldownSpellConfig[] = [];
   let cues: (string | null)[] = [];
   let auraRules: (CooldownManagerTrackedSpell['aura'] | undefined)[] = [];
+  /** Per tracked entry: an aura entry set up as a buff reminder. */
+  let reminders: boolean[] = [];
   /** Per tracked entry: its slot in the inner action-bar view, -1 for an aura. */
   let barIndex: number[] = [];
   let bar: ActionBarView | null = null;
@@ -177,6 +194,7 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
       configs = spells.map((spell) => spell.config);
       cues = spells.map((spell) => spell.cue);
       auraRules = spells.map((spell) => spell.aura);
+      reminders = spells.map((spell) => !!spell.aura && cooldownAuraReminder(spell.config));
       const spellEntries = spells.filter((spell) => !spell.aura);
       let next = 0;
       barIndex = spells.map((spell) => (spell.aura ? -1 : next++));
@@ -225,10 +243,18 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
           current = tickSpell(button, slot, config, dead, opts.preview);
         }
 
-        // Death forgets every edge, and so does a spell the current build does
-        // not know, so the first frame back only records: otherwise resurrecting,
-        // or a spec swap, respec or level-up that teaches several spells already
-        // off cooldown, would chime every one of them at once.
+        // A buff reminder is the one exception to forgetting on death: it holds
+        // an unlit edge instead, so resurrecting without the buff chimes once
+        // (the moment the reminder matters most). Login still only records,
+        // because a never-observed entry has no edge at all.
+        if (dead && rule && reminders[i]) {
+          edges.set(button.baseId, null);
+          continue;
+        }
+        // Death forgets every other edge, and so does a spell the current build
+        // does not know, so the first frame back only records: otherwise
+        // resurrecting, or a spec swap, respec or level-up that teaches several
+        // spells already off cooldown, would chime every one of them at once.
         if (dead || (!rule && button.abilityId === null)) {
           edges.delete(button.baseId);
           continue;
@@ -236,8 +262,11 @@ export function createCooldownManagerView(deps: CooldownManagerViewDeps): Cooldo
         const previous = edges.get(button.baseId);
         edges.set(button.baseId, current);
         const cueId = cues[i];
+        const muted = opts.muted?.[i] === true;
+        if (muted) button.hotbarGlow = false;
         if (
           opts.soundsAllowed &&
+          !muted &&
           cueId !== null &&
           cooldownCueFires(button.baseId, previous, current)
         ) {
@@ -282,17 +311,21 @@ function tickSpell(
       : 0;
   button.cdText = known ? slot.cdText : '';
   button.count = known && slot.isCharges ? slot.count : '';
-  button.visible = known && (preview || !config.onlyWhenReady || ready);
+  button.visible = known && (preview || (ready ? config.showReady : config.showNotReady));
   return ready ? abilityId : null;
 }
 
 /**
  * One AURA entry (an engine bank, a proc, a buff) from the player's live auras.
- * It is "up" (ready: lit, and the cue edge) once the aura is on the player with
- * at least `alertStacks` stacks (0 means as soon as it appears); reaching a
- * stack goal above 1 also pulses it, the way a transform does. The button shows
- * the stack count and the seconds left; an absent aura is dimmed like a spell
- * the player cannot cast. Returns its ready key.
+ * It is "up" once the aura is on the player with at least `alertStacks` stacks
+ * (0 means as soon as it appears). An ordinary aura button is lit (and its cue
+ * edge fires) while up; reaching a stack goal above 1 also pulses it, the way a
+ * transform does, and an absent aura is dimmed like a spell the player cannot
+ * cast. A buff REMINDER (only "missing" ticked) inverts that: it is lit, pulses
+ * with the glow switch on, and chimes while the aura is NOT up, and hides once
+ * it is; a dead player is never reminded (they cannot rebuff), but resurrecting
+ * without the aura chimes it once (see the edge rule in tick). The button shows
+ * the stack count and the seconds left. Returns its lit key.
  */
 function tickAura(
   button: CooldownButtonState,
@@ -313,21 +346,23 @@ function tickAura(
   const present = aura !== undefined && !dead;
   const stacks = aura?.stacks ?? 1;
   const goal = Math.max(1, config.alertStacks);
-  const ready = present && stacks >= goal;
+  const up = present && stacks >= goal;
+  const reminder = cooldownAuraReminder(config);
+  const lit = reminder ? !up && !dead : up;
   button.abilityId = null;
   button.iconKey = rule.iconKey;
-  button.ready = ready;
+  button.ready = lit;
   button.transformed = false;
-  button.proc = ready && config.alertStacks > 1;
-  button.glow = ready && config.glowWhenReady;
+  button.glow = lit && config.glowWhenReady;
+  button.proc = reminder ? button.glow : up && config.alertStacks > 1;
   button.hotbarGlow = false;
-  button.unusable = !present;
+  button.unusable = reminder ? !lit : !present;
   button.outOfRange = false;
   button.cooldownPercent = 0;
   const remaining = present ? (aura?.remaining ?? 0) : 0;
   button.cdText =
     remaining > 1 && remaining < AURA_TIMER_CEILING_SEC ? formatCount(Math.ceil(remaining)) : '';
   button.count = present && stacks > 1 ? formatCount(stacks) : '';
-  button.visible = preview || !config.onlyWhenReady || ready;
-  return ready ? button.baseId : null;
+  button.visible = preview || (up ? config.showReady : config.showNotReady && !(reminder && dead));
+  return lit ? button.baseId : null;
 }

@@ -12,6 +12,7 @@ import { ALL_RECIPES as ALL_RECIPES_VIA_DATA } from '../src/sim/data';
 import { craftIdsForMaterialItem } from '../src/sim/material_profession_affinity';
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
+import { WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS } from '../src/sim/pvp/world_pvp_trophy';
 
 // The ONE sanctioned exception to the no-orphan-reagents census below:
 // farming's materials, exempt STRUCTURALLY rather than by an enumerated
@@ -323,8 +324,12 @@ describe('craftIdsForMaterialItem', () => {
     // pending list the moment a live recipe names it.
     const pending = new Set<string>(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS);
     let exempted = 0;
+    // Provenance trophies (the World PvP skull) are ruled in for their source
+    // buckets, never as reagents, so no craft consumes them by design.
+    const trophies = new Set<string>(WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS);
     for (const itemId of MATERIAL_ITEM_IDS) {
       if (pending.has(itemId)) continue;
+      if (trophies.has(itemId)) continue;
       if (COMMAND_CONSUMED_FARM_MATERIALS.has(itemId)) {
         exempted++;
         continue;

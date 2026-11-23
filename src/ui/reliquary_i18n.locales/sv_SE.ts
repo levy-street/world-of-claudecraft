@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Vildhjärtats bassäng',
-    desc: 'Utmärkande vapen från Zulgar och Huggtandsherren, djurens mästare.',
+    desc: 'Signaturvapen från Bettherren bestmästaren, Frossblomman och Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisk: Vildhjärtats bassäng',
-    desc: 'Episka föremål enbart från heroiskt läge, från Zulgar, Bassängens röst.',
+    desc: 'Episka föremål och smycken enbart från heroiskt läge, från Bettherren bestmästaren, Frossblomman och Zulgar, bassängens röst.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, den vaknande toppen',
     desc: 'Personligt episkt byte från den vaknande toppens världsboss.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, den Begravde Förmannen',
+    desc: 'Byte som släpats upp ur gravhögarna i Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Det rasade relikvariet',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Krigföringsgalleri',
-    desc: 'De fem stridsutrustningarna för Krigföring, förtjänade del för del med ära.',
+    desc: 'De fem Krigsförings stridsutrustningarna från första säsongen, nu sålda bit för bit för guld.',
   },
   conquerors_warfare_armory: {
     name: 'Krigföringens vapenkammare',
-    desc: 'Smycken och vapen för Krigföring, köpta för hårt vunnen ära.',
+    desc: 'Smycken, vapen och varor för Krigföring, köpta för hårt vunnen ära.',
   },
   conquerors_vanguard_gallery: {
     name: 'Förtruppsgalleri',

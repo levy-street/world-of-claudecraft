@@ -4,6 +4,10 @@
 // fields expose the cast bar and conduit template swaps to every client, while
 // the renderer derives the cone, brand circles, and water zone from that state.
 
+import {
+  beginSpiritBombRaidPull,
+  resetSpiritBombRaidPull,
+} from '../combat/priest/spirit_bomb_raid';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
@@ -79,6 +83,7 @@ import {
 } from '../types';
 import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
 import { attemptLost } from './attempt_wipe';
+import { committedTankIds } from './committed_tanks';
 import { resolveEncounterWipe } from './encounter_wipe';
 import {
   IGNIVAR_DIALOGUE,
@@ -215,14 +220,6 @@ function playersInEncounter(ctx: SimContext, boss: Entity, includeDead = false):
   }
   players.sort((a, b) => a.id - b.id);
   return players;
-}
-
-function tankIds(ctx: SimContext): Set<number> {
-  const result = new Set<number>();
-  for (const meta of ctx.players.values()) {
-    if (meta.talentMods.role === 'tank') result.add(meta.entityId);
-  }
-  return result;
 }
 
 function conduitEntities(ctx: SimContext, boss: Entity): Map<IgnivarConduitId, Entity> {
@@ -656,7 +653,10 @@ function updateForgeJudgment(
 }
 
 function castBrandOfThePyre(ctx: SimContext, boss: Entity, players: readonly Entity[]): void {
-  const tanks = tankIds(ctx);
+  const tanks = committedTankIds(ctx);
+  // The player Ignivar is attacking is never branded, even out of a tank
+  // form or posture (a Feral main tank who drops Bruin Form).
+  if (boss.aggroTargetId !== null) tanks.add(boss.aggroTargetId);
   const livingCount = players.filter((player) => !player.dead).length;
   const candidates = players.filter((player) => !player.dead && !tanks.has(player.id));
   const drawSlots = Math.min(IGNIVAR_BRAND_TARGETS_NORMAL, livingCount);
@@ -1393,6 +1393,13 @@ function updateConduitStates(
   }
 }
 
+function ignivarAnyConduitActive(conduits: ReadonlyMap<IgnivarConduitId, Entity>): boolean {
+  for (const conduit of conduits.values()) {
+    if (conduit.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.active) return true;
+  }
+  return false;
+}
+
 function startFrontal(boss: Entity, target: Entity, st: IgnivarEncounterState): void {
   st.frontalFacing = Math.atan2(target.pos.x - boss.pos.x, target.pos.z - boss.pos.z);
   st.frontalCastRemaining = IGNIVAR_FRONTAL_CAST_SECONDS;
@@ -1494,6 +1501,7 @@ function releaseFrontal(
 }
 
 export function resetIgnivarEncounter(ctx: SimContext, boss: Entity): void {
+  resetSpiritBombRaidPull(boss);
   const rotatingRaysBossFacing =
     boss.ignivar &&
     (boss.ignivar.rotatingRaysWindupRemaining > 0 || boss.ignivar.rotatingRaysActiveRemaining > 0)
@@ -1638,6 +1646,7 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
   boss.aggroTargetId = target.id;
   boss.inCombat = true;
   boss.aiState = 'attack';
+  beginSpiritBombRaidPull(ctx, boss);
 
   const heroic = encounterInstance(ctx, boss)?.difficulty === 'heroic';
   if (heroic && st.forgeChainsPlayerIds !== null) {
@@ -1781,7 +1790,10 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
       startRotatingRays(ctx, boss, target, st);
       return;
     }
-    if (st.forgeWaveTimer <= CAST_COMPLETE_EPS) {
+    // Hold a due wave until every active Water Conduit closes, so its
+    // knockback never throws branded players out of a cleanse window. Reads
+    // the live conduits, not conduitTimers, so a stale timer cannot stall it.
+    if (st.forgeWaveTimer <= CAST_COMPLETE_EPS && !ignivarAnyConduitActive(conduits)) {
       startForgeWave(ctx, boss, st);
       return;
     }

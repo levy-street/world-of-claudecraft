@@ -18,6 +18,7 @@ import { terrainHeight } from '../sim/world';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { EMISSIVE_LIGHT, GFX } from './gfx';
 import { buildDrapedGlowGeometry, type GlowPatchSite } from './ground_glow_patch';
+import { MUSTER_TORCH_FLAME_HEIGHT, renderDecorProps } from './muster_camps';
 import { hasNightLightField, registerStaticNightLights } from './night_light_field';
 import { radialGlowTexture } from './textures';
 
@@ -34,12 +35,22 @@ export interface DecorTorchFxView {
   update(glow: number, time: number): void;
 }
 
-/** decorProps keys this pass treats as burning torch posts. */
-export const LIT_DECOR_KEYS: ReadonlySet<string> = new Set(['kcasTorch', 'kcasTorchMounted']);
+/** decorProps keys this pass treats as burning torch posts (the Mirefen muster
+ *  camps' torches join through the same decor walk, src/render/muster_camps.ts). */
+export const LIT_DECOR_KEYS: ReadonlySet<string> = new Set([
+  'kcasTorch',
+  'kcasTorchMounted',
+  'musterTorch',
+]);
 
 /** Where the torch head's flame sits above the seated base at decor scale 1
  *  (the castle's mounted torches put theirs at +2.4 for scale 1.5). */
 export const TORCH_FLAME_HEIGHT = 1.6;
+
+/** Per-key flame heights where a torch model's cup is not at TORCH_FLAME_HEIGHT. */
+const FLAME_HEIGHT_BY_KEY: Readonly<Record<string, number>> = {
+  musterTorch: MUSTER_TORCH_FLAME_HEIGHT,
+};
 
 const FLAME_COLOR = 0xffaa33;
 const FLAME_EMISSIVE = 0xff6600;
@@ -80,10 +91,12 @@ interface TorchSite {
 export function planDecorTorches(seed = 0): TorchSite[] {
   const content = getActiveWorldContent();
   const sites: TorchSite[] = [];
-  for (const d of content.props.decorProps ?? []) {
+  for (const d of renderDecorProps(content, seed, !GFX.standardMaterials)) {
     if (!LIT_DECOR_KEYS.has(d.key)) continue;
     const s = d.scale ?? 1;
-    sites.push({ x: d.x, y: terrainHeight(d.x, d.z, seed) + TORCH_FLAME_HEIGHT * s, z: d.z });
+    const flame = (FLAME_HEIGHT_BY_KEY[d.key] ?? TORCH_FLAME_HEIGHT) * s;
+    const base = terrainHeight(d.x, d.z, seed) - (d.sink ?? 0);
+    sites.push({ x: d.x, y: base + flame, z: d.z });
   }
   return sites;
 }

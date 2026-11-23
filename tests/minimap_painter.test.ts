@@ -112,6 +112,7 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
     // suite.
     expect(code.match(/this\.resolveColors\(\)/g) ?? []).toHaveLength(2);
     const drawMarkersBody = sliceFrom(code, 'private drawMarkers(');
+    expect(drawMarkersBody.length).toBeGreaterThan(0);
     expect(drawMarkersBody).not.toContain('resolveColors');
   });
 
@@ -504,6 +505,7 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
     clearRect(): void {},
     save(): void {},
     restore(): void {},
+    setLineDash(): void {},
     beginPath(): void {
       pathStart = null;
       pending.length = 0;
@@ -710,6 +712,59 @@ afterEach(() => {
 });
 
 describe('minimap_painter: tiny procedural symbols carry identity without hue', () => {
+  it('keeps an off-screen hill circle in place while drawing its skull on the rim', () => {
+    const trace = drawSymbols([
+      {
+        kind: 'hill',
+        mx: -20,
+        my: 80,
+        radius: 50,
+        phase: 'active',
+        skull: { mx: 12, my: 80 },
+      },
+    ]);
+    expect(trace.strokedArcs).toContainEqual({
+      x: -20,
+      y: 80,
+      radius: 50,
+      strokeStyle: 'paint:worldQuestAvailable',
+      lineWidth: 2,
+    });
+    expect(trace.filledArcs[0]).toMatchObject({ x: 12, y: 80, radius: 8 });
+  });
+  it('draws the actual hill radius with a skull centred inside it on both profiles', () => {
+    for (const profile of ['standard', 'compact'] as const) {
+      const trace = drawSymbols(
+        [{ kind: 'hill', mx: 70, my: 80, radius: 50, phase: 'active' }],
+        profile,
+      );
+      expect(trace.strokedArcs).toContainEqual({
+        x: 70,
+        y: 80,
+        radius: 50,
+        strokeStyle: 'paint:worldQuestAvailable',
+        lineWidth: 2,
+      });
+      // Filled badge, cranium, two sockets; no text-font skull fallback.
+      expect(trace.filledArcs).toHaveLength(4);
+      expect(trace.filledArcs[0]).toMatchObject({
+        x: 70,
+        y: 80,
+        radius: profile === 'compact' ? 6 : 8,
+      });
+    }
+  });
+
+  it('distinguishes the warning skull with an outer ring', () => {
+    const trace = drawSymbols([{ kind: 'hill', mx: 70, my: 80, radius: 50, phase: 'warning' }]);
+    expect(trace.strokedArcs).toContainEqual({
+      x: 70,
+      y: 80,
+      radius: 11,
+      strokeStyle: 'paint:worldQuestAvailable',
+      lineWidth: 2,
+    });
+  });
   it('draws the world boss as an outlined badge with a skull silhouette', () => {
     const trace = drawSymbols([
       { kind: 'world-boss', mx: 20, my: 30, bossId: 'boss', zoneId: 'zone' },

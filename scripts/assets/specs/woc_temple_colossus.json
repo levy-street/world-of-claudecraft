@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/temple_colossus_woc.glb",
+      "out": "models/creatures/woc_temple_colossus.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Hit",
+        "Attack",
+        "Attack2",
+        "Flare",
+        "Lance",
+        "Slam",
+        "PrismPulse",
+        "Cast",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

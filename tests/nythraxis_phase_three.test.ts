@@ -12,6 +12,7 @@ import {
   NYTHRAXIS_BONE_SLAM_CAST_ID,
   NYTHRAXIS_BONE_STORM_AURA_ID,
   NYTHRAXIS_BONE_STORM_CAST_ID,
+  NYTHRAXIS_BONE_STORM_ENABLED,
   NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
   NYTHRAXIS_BONE_STORM_RADIUS,
   NYTHRAXIS_BONE_STORM_SECONDS,
@@ -131,8 +132,11 @@ describe("Nythraxis The King's Wrath (phase 3 entry)", () => {
       );
       expect(callouts('kingsWrath').length, difficulty).toBe(10);
       // The first storm is armed on entry; the same tick's cast block already
-      // counted it down once.
-      expect(st.boneStormTimer, difficulty).toBeCloseTo(NYTHRAXIS_BONE_STORM_FIRST_SECONDS - DT, 9);
+      // counted it down once. Retired from play, the arm never counts down.
+      expect(st.boneStormTimer, difficulty).toBeCloseTo(
+        NYTHRAXIS_BONE_STORM_FIRST_SECONDS - (NYTHRAXIS_BONE_STORM_ENABLED ? DT : 0),
+        9,
+      );
     }
   });
 
@@ -182,7 +186,11 @@ describe("Nythraxis The King's Wrath (phase 3 entry)", () => {
   });
 });
 
-describe('Nythraxis Bone Storm', () => {
+// Bone Storm is retired from play (NYTHRAXIS_BONE_STORM_ENABLED): the storm
+// suites below run only while the switch is on, and come back with it.
+const describeStorm = describe.skipIf(!NYTHRAXIS_BONE_STORM_ENABLED);
+
+describeStorm('Nythraxis Bone Storm', () => {
   it('begins in phase 3 once no major owns his body, and marks him', () => {
     const { ctx, boss, st, callouts, aura } = setup();
     st.boneStormTimer = DT / 2;
@@ -490,7 +498,7 @@ describe('Nythraxis Bone Storm', () => {
   });
 });
 
-describe('Nythraxis Bone Storm vs other majors (same-tick admission overlap)', () => {
+describeStorm('Nythraxis Bone Storm vs other majors (same-tick admission overlap)', () => {
   it('blocks Deathless Rage and Soul Rend admission the tick Bone Storm begins', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       // Exact repro: Bone Storm and Deathless Rage simultaneously due, with
@@ -522,7 +530,7 @@ describe('Nythraxis Bone Storm vs other majors (same-tick admission overlap)', (
   });
 });
 
-describe('Nythraxis Bone Storm releases live Soul Rend marks', () => {
+describeStorm('Nythraxis Bone Storm releases live Soul Rend marks', () => {
   // Bug report (HC Nythraxis, 2026-09): the storm began while the raid was
   // stacked for Soul Rend and the whirl plus the opening slam killed the
   // whole huddle. Soul Rend says stack, Bone Storm says spread; they cannot

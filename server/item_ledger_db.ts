@@ -17,8 +17,8 @@
 // argument is validated here (a rejected row logs, it never throws into the
 // game loop). Retention: registered on the retention sweep (server/main.ts)
 // under ITEM_LEDGER_RETENTION_DAYS, default DEFAULT_ITEM_LEDGER_RETENTION_DAYS
-// in server/http/config.ts (0 keeps forever); the intake is bounded by epic
-// and legendary drop rates, far below any per-character event burst.
+// in server/http/config.ts (0 keeps forever). Transfers and modifications
+// can repeat without new drops; item_ledger.ts bounds the pending write queue.
 
 import type { Pool } from 'pg';
 import { ITEM_TRACKED_KINDS, type ItemTrackedKind } from '../src/sim/item_provenance';
@@ -62,6 +62,11 @@ CREATE INDEX IF NOT EXISTS item_ledger_account
   ON item_ledger(account_id) WHERE account_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS item_ledger_item
   ON item_ledger(item_id, id);
+-- Realm-scoped pages must not walk the retained history of other realms.
+CREATE INDEX IF NOT EXISTS item_ledger_realm
+  ON item_ledger(realm, id);
+CREATE INDEX IF NOT EXISTS item_ledger_realm_item
+  ON item_ledger(realm, item_id, id);
 `;
 
 export const ITEM_LEDGER_MAX_LIMIT = 200;

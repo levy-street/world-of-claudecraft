@@ -32,10 +32,13 @@ function seatBoneSpec(): MountVisualSpec {
     bobIdle: false,
     bobShape: 'hop',
     fx: 'slime',
+    embers: null,
+    summonFx: 'shimmer',
     lamps: [],
     seatBone: { bone: 'chair', offset: [0, 0, 0] },
     glows: [],
     ride: null,
+    rear: false,
   };
 }
 
@@ -114,7 +117,7 @@ function inputs(
     present: true,
     animate: true,
     vfx,
-    enginePhase: null,
+    audio: { sink: null, id: 0, self: false },
     groundSample: () => 0,
     dt: 1 / 20,
     ...overrides,
@@ -174,6 +177,7 @@ describe('borrowRiderLocomotion', () => {
       falling: true,
       backwards: true,
       reverseBackpedal: true,
+      strafe: 'left',
       dead: true,
       casting: true,
       spinning: true,
@@ -206,6 +210,7 @@ describe('borrowRiderLocomotion', () => {
       running: true,
       airborne: true,
       backwards: true,
+      strafe: 'left',
       swimming: true,
     });
     // Rider-only facts never reach the mount's gait clips.

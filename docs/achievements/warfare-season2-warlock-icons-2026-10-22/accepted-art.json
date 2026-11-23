@@ -1,0 +1,1018 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-warlock-icons-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 15,
+    "completeSets": 3,
+    "remainingSeason2Armor": 15,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_affliction_helmet",
+      "family": "affliction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_affliction_helmet.webp",
+      "canonicalDisplayName": "Dreadquill Hood",
+      "acceptedSha256": "59eb2fb830b91b7b29fdc908845e78426f521ade4c915f14a8cabd4bddb488cc",
+      "acceptedBytes": 3174,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_affliction_helmet.png",
+        "sha256": "91d3aedf85d2f1b045bc5d5bf1aa509b35e282a4fe074ecb95facc65efc0091e",
+        "bytes": 2491851,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_affliction_helmet.png",
+        "sha256": "d7f7df849c7d960cafde5585d7161b0b8275b88d4ce2c2834d0226dd4c03feba",
+        "bytes": 509790,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Dreadquill Hood: empty angular cloth hood with dark green rim and a small violet clasp. Coordinated affliction Warlock CLOTH set: muted deep moss-green and black woven cloth with narrow tarnished-silver trim. Layered quill-shaped fabric tabs, tiny dark violet stones and stitched thorn ornament, worn edges; no real feathers or living creatures. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_affliction_shoulder",
+      "family": "affliction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_affliction_shoulder.webp",
+      "canonicalDisplayName": "Dreadquill Mantle",
+      "acceptedSha256": "3707e37ead0f5db3d096e4e4f0d2b06ee3e0e5f5e72babee41faab7df6ae10fd",
+      "acceptedBytes": 3368,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_affliction_shoulder.png",
+        "sha256": "cc8ab8bd9bfe2102cb3df334fdccb7049971ae5816397e99ab7fc81d65d99013",
+        "bytes": 2649512,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_affliction_shoulder.png",
+        "sha256": "d7c2df9cdd11974fe962aa9040fae11d79e59c960351841901002e84d1463b06",
+        "bytes": 510593,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Dreadquill Mantle: broad short mantle made of layered quill-shaped cloth tabs, no torso. Coordinated affliction Warlock CLOTH set: muted deep moss-green and black woven cloth with narrow tarnished-silver trim. Layered quill-shaped fabric tabs, tiny dark violet stones and stitched thorn ornament, worn edges; no real feathers or living creatures. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_affliction_chest",
+      "family": "affliction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_affliction_chest.webp",
+      "canonicalDisplayName": "Dreadquill Robe",
+      "acceptedSha256": "29c7995110c8277508b28996d966dd363ac0bc7840266541569396f72a0de174",
+      "acceptedBytes": 3538,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_affliction_chest.png",
+        "sha256": "7e15bb40d97076a88e2e73c3d8c7f2872f3e65adceb0a3dbe059cbc83ef98c9a",
+        "bytes": 2499932,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_affliction_chest.png",
+        "sha256": "24aa6b3100804b8a240d85aea078d51c1d87672aa8d91c00f7d0f1fb624bb6d7",
+        "bytes": 553935,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Dreadquill Robe: complete empty floor-length robe with green central panels, black layered sleeves and a narrow silver-clasp sash. Coordinated affliction Warlock CLOTH set: muted deep moss-green and black woven cloth with narrow tarnished-silver trim. Layered quill-shaped fabric tabs, tiny dark violet stones and stitched thorn ornament, worn edges; no real feathers or living creatures. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_affliction_legs",
+      "family": "affliction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_affliction_legs.webp",
+      "canonicalDisplayName": "Dreadquill Leggings",
+      "acceptedSha256": "4f1390f9a7d12da9c48af329ffe3dd139fe887f191744fc94abbeadf005e1fc8",
+      "acceptedBytes": 2968,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_affliction_legs.png",
+        "sha256": "a98e7f6cc11d6a5237f3e42f9c89ba88d59014b2f4babd18942dbdb32cf64010",
+        "bytes": 2337986,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_affliction_legs.png",
+        "sha256": "94f54119529099839b74fd0a088d13268bf943ce0e9cf655e4e194e915d0c035",
+        "bytes": 506834,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Dreadquill Leggings: pair of black cloth leggings with green quill-shaped side drapes and silver-edged cuffs, separated legs, no boots. Coordinated affliction Warlock CLOTH set: muted deep moss-green and black woven cloth with narrow tarnished-silver trim. Layered quill-shaped fabric tabs, tiny dark violet stones and stitched thorn ornament, worn edges; no real feathers or living creatures. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_affliction_gloves",
+      "family": "affliction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_affliction_gloves.webp",
+      "canonicalDisplayName": "Dreadquill Handwraps",
+      "acceptedSha256": "f4bdb20a9f40ac5fe998121c12ccbbdd638ebcabbdf7a6c5b6daf5274a92fcb0",
+      "acceptedBytes": 3358,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_affliction_gloves.png",
+        "sha256": "4675552c9c44d4ec1e3a4e0354073203909af31a60d7a7ba2172f6c187a53023",
+        "bytes": 2651488,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_affliction_gloves.png",
+        "sha256": "76bacc127b7f48998b0dea2ef443bb4a66005393a5d2f0139ff62804d0361665",
+        "bytes": 534568,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Dreadquill Handwraps: pair of empty fully wrapped cloth gloves with green quill-shaped cuffs, five covered fingers each. Coordinated affliction Warlock CLOTH set: muted deep moss-green and black woven cloth with narrow tarnished-silver trim. Layered quill-shaped fabric tabs, tiny dark violet stones and stitched thorn ornament, worn edges; no real feathers or living creatures. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_demonology_helmet",
+      "family": "demonology",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_demonology_helmet.webp",
+      "canonicalDisplayName": "Marrowbound Cowl",
+      "acceptedSha256": "b8572a0a87843d8067a400fc6bd3322765631699464d04cf3b6a7d5db5497df7",
+      "acceptedBytes": 3096,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_demonology_helmet.png",
+        "sha256": "c1d5272705ab37537b407748a5c0fbc24971432e803759538c21eb26c74db0fb",
+        "bytes": 2583213,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_demonology_helmet.png",
+        "sha256": "a28718fa16a9840b7c5e5821d7083efc800bc64dc6b053b0b8d4449e0a3881d2",
+        "bytes": 526076,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Marrowbound Cowl: empty burgundy cloth hood with a short ivory arch-shaped brow ornament and charcoal lining. Coordinated demonology Warlock CLOTH set: dusty burgundy and charcoal woven cloth with restrained aged ivory bone-shaped toggles and small dark iron clasps. Curved rib-like ivory ornaments lie over soft fabric, no plate armor, no gore, no full skeleton or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_demonology_shoulder",
+      "family": "demonology",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_demonology_shoulder.webp",
+      "canonicalDisplayName": "Marrowbound Spaulders",
+      "acceptedSha256": "cd6c52515229ff5ae92908265d762c08b9b64743764fd3da429e706a31c3e26e",
+      "acceptedBytes": 3606,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_demonology_shoulder.png",
+        "sha256": "4fa035502d68815d9e0ac4101aafcad73d89990c6d0082e8a62b45cbc2deb729",
+        "bytes": 2383813,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_demonology_shoulder.png",
+        "sha256": "60c57795497cd4ea2310285a4d7a066707b79316a2e27cb40a1928d33528f2b3",
+        "bytes": 539863,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Marrowbound Spaulders: pair of padded burgundy cloth shoulder guards with restrained curved ivory rib ornaments, no torso. Coordinated demonology Warlock CLOTH set: dusty burgundy and charcoal woven cloth with restrained aged ivory bone-shaped toggles and small dark iron clasps. Curved rib-like ivory ornaments lie over soft fabric, no plate armor, no gore, no full skeleton or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_demonology_chest",
+      "family": "demonology",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_demonology_chest.webp",
+      "canonicalDisplayName": "Marrowbound Robe",
+      "acceptedSha256": "322c2f863c84bb978d94cc01fbff132e20a1f8732b456d32803ad5dcde330f19",
+      "acceptedBytes": 3384,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_demonology_chest.png",
+        "sha256": "9ba5679282401f0e435feda96159cc8882ea9f36d7dcde707491a9e826afb909",
+        "bytes": 2362388,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_demonology_chest.png",
+        "sha256": "3c902f7445873ab8cb67a6c1a2b0165d3c065ab5050b7b36ecedf847846aaab5",
+        "bytes": 537569,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Marrowbound Robe: complete empty floor-length burgundy robe with charcoal sleeves, narrow ivory rib clasps across the chest and a soft folded sash. Coordinated demonology Warlock CLOTH set: dusty burgundy and charcoal woven cloth with restrained aged ivory bone-shaped toggles and small dark iron clasps. Curved rib-like ivory ornaments lie over soft fabric, no plate armor, no gore, no full skeleton or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_demonology_legs",
+      "family": "demonology",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_demonology_legs.webp",
+      "canonicalDisplayName": "Marrowbound Leggings",
+      "acceptedSha256": "9b418f01a5bc13017dc424546372c16b4bae314641cc1ed9e24d94ef1032d626",
+      "acceptedBytes": 2748,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_demonology_legs.png",
+        "sha256": "931991b9911ad0157a52b8d0b575e4c2a23388d2259a5bef4bb43c141278fd38",
+        "bytes": 2219946,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_demonology_legs.png",
+        "sha256": "bfafdc3bce74d622fd25755e21919f4f7b8165dda99cc1d989c95d62bbc18889",
+        "bytes": 510261,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Marrowbound Leggings: pair of burgundy cloth leggings with charcoal hip panels, ivory toggles and wrapped cuffs, separated legs, no boots. Coordinated demonology Warlock CLOTH set: dusty burgundy and charcoal woven cloth with restrained aged ivory bone-shaped toggles and small dark iron clasps. Curved rib-like ivory ornaments lie over soft fabric, no plate armor, no gore, no full skeleton or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_demonology_gloves",
+      "family": "demonology",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_demonology_gloves.webp",
+      "canonicalDisplayName": "Marrowbound Grips",
+      "acceptedSha256": "90e25c17963ac0058da000570f40acfac58d94b054e338e2581803f1d421085a",
+      "acceptedBytes": 3368,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_demonology_gloves.png",
+        "sha256": "e31cd9a2a280d1b2dce7fd5a1bcd349ad03ecc695852a6899d1ee7cc43805dc1",
+        "bytes": 2394666,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_demonology_gloves.png",
+        "sha256": "a69e4c56c92cc15d513bf6021c936a2f8c206042d3957b77cb139300ac7fbe35",
+        "bytes": 527065,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Marrowbound Grips: pair of empty charcoal woven gloves with burgundy cuffs and small ivory finger-back ornaments, five covered fingers each. Coordinated demonology Warlock CLOTH set: dusty burgundy and charcoal woven cloth with restrained aged ivory bone-shaped toggles and small dark iron clasps. Curved rib-like ivory ornaments lie over soft fabric, no plate armor, no gore, no full skeleton or skulls. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_destruction_helmet",
+      "family": "destruction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_destruction_helmet.webp",
+      "canonicalDisplayName": "Slagcrown Hood",
+      "acceptedSha256": "e508261e40260245e0aa4883e839ebd0631cd8e8f709c1c9c033e66b944d7103",
+      "acceptedBytes": 2748,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_destruction_helmet.png",
+        "sha256": "dfbb97bc19d658d21aa79bf6de7c17c51aa3139dc9dace94e6957ee8a6c0c6fa",
+        "bytes": 2508497,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_destruction_helmet.png",
+        "sha256": "1d9f03dbb58c22a630e84baf63ac26f9813cf617aef6c48f214b4dd826ab98a1",
+        "bytes": 501826,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Slagcrown Hood: empty ash-grey cloth hood with three short dark bronze crown-like points at the brow and crimson lining. Coordinated destruction Warlock CLOTH set: ash-grey and black woven cloth with deep muted crimson lining and narrow dark bronze trim. A few rough charcoal-black slag fragments as small fittings, restrained dull red cabochons; angular crown-like cloth folds, no actual lava, flames or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_destruction_shoulder",
+      "family": "destruction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_destruction_shoulder.webp",
+      "canonicalDisplayName": "Slagcrown Mantle",
+      "acceptedSha256": "8af99f9c80be58469cd7fde2bc9e11a8e0a0a39ae09546c2a7953b48078bc237",
+      "acceptedBytes": 3254,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_destruction_shoulder.png",
+        "sha256": "34f93168f4b0bcb282a1383266cf20425c8c331ef003157fff5089e1b92074fc",
+        "bytes": 2663098,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_destruction_shoulder.png",
+        "sha256": "aa9f28baf8920a78b8d44469024083e350b3674710706efc07d3f4c43053795d",
+        "bytes": 532276,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Slagcrown Mantle: broad short ash-grey cloth mantle with angular crown-like folded panels and small slag clasps, no torso. Coordinated destruction Warlock CLOTH set: ash-grey and black woven cloth with deep muted crimson lining and narrow dark bronze trim. A few rough charcoal-black slag fragments as small fittings, restrained dull red cabochons; angular crown-like cloth folds, no actual lava, flames or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_destruction_chest",
+      "family": "destruction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_destruction_chest.webp",
+      "canonicalDisplayName": "Slagcrown Robes",
+      "acceptedSha256": "35c963ab7dfc252c5bf1850a99f3fb180f436e2188767daf2f8e0b073d44096c",
+      "acceptedBytes": 3240,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_destruction_chest.png",
+        "sha256": "0613ee1299925c360a2c29a0a30ed4654dc35a34adcc4d1bfe78fe294692aade",
+        "bytes": 2431834,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_destruction_chest.png",
+        "sha256": "41fbc9607ac223e594cba92816c9ba934c3dd607730575933b71dfed1aab5c13",
+        "bytes": 536770,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Slagcrown Robes: complete empty floor-length ash-grey robe with black layered sleeves, crimson inner panels and dark bronze belt clasp. Coordinated destruction Warlock CLOTH set: ash-grey and black woven cloth with deep muted crimson lining and narrow dark bronze trim. A few rough charcoal-black slag fragments as small fittings, restrained dull red cabochons; angular crown-like cloth folds, no actual lava, flames or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_destruction_legs",
+      "family": "destruction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_destruction_legs.webp",
+      "canonicalDisplayName": "Slagcrown Leggings",
+      "acceptedSha256": "29aadc8e37cda424cc2d406b0ca3ed149758d8ee6852b5ba819c8e0a3744916a",
+      "acceptedBytes": 2862,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_destruction_legs.png",
+        "sha256": "0b64c9d0bceb7a93c021a4983438797c2db8949a04d51d46e55c9de96ff2a299",
+        "bytes": 2363027,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_destruction_legs.png",
+        "sha256": "e0693a004ce9ace6d1adfb0468687f13efb3313823a614f1562cb0678b7e6d03",
+        "bytes": 527894,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Slagcrown Leggings: pair of ash-grey cloth leggings with black angular hip drapes and crimson cuff lining, separated legs, no boots. Coordinated destruction Warlock CLOTH set: ash-grey and black woven cloth with deep muted crimson lining and narrow dark bronze trim. A few rough charcoal-black slag fragments as small fittings, restrained dull red cabochons; angular crown-like cloth folds, no actual lava, flames or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vanguard_warlock_destruction_gloves",
+      "family": "destruction",
+      "batch": "warfare-season2-warlock-icons-2026-10-22",
+      "runtimeUrl": "/ui/items/vanguard_warlock_destruction_gloves.webp",
+      "canonicalDisplayName": "Slagcrown Gloves",
+      "acceptedSha256": "6d0e308ec73727f674af1e70199eeadff61736f5cff18eb3a5c1f642ede62689",
+      "acceptedBytes": 3286,
+      "original": {
+        "path": "tmp/imagegen/v045-warlock/originals/vanguard_warlock_destruction_gloves.png",
+        "sha256": "36fd60d4ceb1a0a023b87d02b21c898e608b0f85609d4381405ef968d840bc83",
+        "bytes": 2732848,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-warlock/masters/vanguard_warlock_destruction_gloves.png",
+        "sha256": "5abe20354c1861e6856876816c852c8fa61f2c139a84606a824e20e22be5017a",
+        "bytes": 543340,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. One opaque square fantasy MMORPG inventory item icon, 1024x1024. Paint Slagcrown Gloves: pair of empty ash-grey woven gloves with black pointed cuffs, crimson lining and small slag wrist clasps, five covered fingers each. Coordinated destruction Warlock CLOTH set: ash-grey and black woven cloth with deep muted crimson lining and narrow dark bronze trim. A few rough charcoal-black slag fragments as small fittings, restrained dull red cabochons; angular crown-like cloth folds, no actual lava, flames or magical effects. World of ClaudeCraft woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile cloth weave, clear fabric folds and modest hard fittings, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep shadows, opaque charcoal/umber painted vignette and subtle contact shadow. Complete centered subject fills about 72 percent square with safe padding, readable at 22px and circular crop. No wearer, mannequin, skin, face, hands holding objects, text, letters, numbers, pseudo-writing, border, frame, watermark, transparency, collage, split sheet, photograph, plastic 3D render or unrelated objects. One finished square icon.",
+        "references": [
+          {
+            "path": "public/ui/items/heroic_crownforged_dreadhelm.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "c89a59601fd686c6782caa64d8749d966d60ba45eb18867f47f460ea409db46b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize the original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert the accepted master with scripts/convert_item_icons_webp.mjs at its default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, set consistency, materials, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/warfare-season2-warlock-icons/small-size-review.png",
+        "gameCaptureStatus": "Verified static painted icon in desktop and mobile landscape inventory captures; other UI surfaces not separately captured.",
+        "gameCaptures": [
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-desktop.png",
+          "docs/screenshots/warfare-season2-warlock-icons/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

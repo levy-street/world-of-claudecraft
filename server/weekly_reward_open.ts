@@ -2,6 +2,7 @@
 // character save may publish the rolled item. Reuse the character save FIFO.
 
 import type { SimContext } from '../src/sim/sim_context';
+import { sanitizeWeeklyLootSpec } from '../src/sim/weekly_loot_spec';
 import { parseWeeklyTableSelection } from '../src/sim/weekly_reward_options';
 import {
   finishWeeklyRewardOpen,
@@ -23,6 +24,7 @@ export interface WeeklyRewardOpenHost<S extends WeeklyRewardSession> {
   sim: {
     ctx: SimContext;
     claimWeeklyReward(choice: string, pid: number, token: string): void;
+    setWeeklyLootSpec(spec: string | null, pid: number): void;
   };
   clients: ReadonlyMap<number, S>;
   saveCharacter(
@@ -46,8 +48,22 @@ export async function dispatchWeeklyRewardCommand<S extends WeeklyRewardSession>
   host: WeeklyRewardOpenHost<S>,
   session: S,
   command: string,
-  msg: { choice?: unknown; token?: unknown; table?: unknown; tables?: unknown },
+  msg: { choice?: unknown; token?: unknown; table?: unknown; tables?: unknown; spec?: unknown },
 ): Promise<void> {
+  const live = () =>
+    host.clients.get(session.pid) === session &&
+    !session.left &&
+    !session.escrowQuarantined &&
+    host.sim.ctx.players.has(session.pid) &&
+    host.sim.ctx.entities.has(session.pid);
+  if (!live()) return;
+  // A preference is memory-only and never joins the durability queue. The Sim
+  // validates class ownership and proximity, independent of the active talent spec.
+  if (command === 'weekly_loot_spec') {
+    if (msg.spec === null || sanitizeWeeklyLootSpec(msg.spec))
+      host.sim.setWeeklyLootSpec(msg.spec as string | null, session.pid);
+    return;
+  }
   if (
     typeof msg.choice !== 'string' ||
     msg.choice.length > 64 ||
@@ -57,13 +73,6 @@ export async function dispatchWeeklyRewardCommand<S extends WeeklyRewardSession>
     ((msg.tables ?? msg.table) !== undefined && !parseWeeklyTableSelection(msg.tables ?? msg.table))
   )
     return;
-  const live = () =>
-    host.clients.get(session.pid) === session &&
-    !session.left &&
-    !session.escrowQuarantined &&
-    host.sim.ctx.players.has(session.pid) &&
-    host.sim.ctx.entities.has(session.pid);
-  if (!live()) return;
   let admission = admissions.get(host);
   if (!admission) {
     admission = { active: new Set(), retryAt: new WeakMap() };

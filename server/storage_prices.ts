@@ -2,7 +2,7 @@
 // hands a validated StoragePricesOverride to the realm Sim at construction
 // (server/sim_boot_config.ts passes it into new Sim). The shape is one JSON
 // object of copper price lists, each at EXACTLY its compiled default's length:
-//   {"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[5 ints]}
+//   {"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[10 ints]}
 // Boot-time only: the Sim ctor resolves the override once, so changing the env
 // takes a process restart. Validation is strict and fail-safe PER DIMENSION: a
 // dimension applies only as an array of the exact compiled length whose every

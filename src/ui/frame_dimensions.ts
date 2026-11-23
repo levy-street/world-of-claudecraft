@@ -26,9 +26,11 @@ const UNIT_KEYS = {
   focusTarget1: ['focusTarget1Width', 'focusTarget1Height'],
   focusTarget2: ['focusTarget2Width', 'focusTarget2Height'],
   focusTarget3: ['focusTarget3Width', 'focusTarget3Height'],
+  playerResource: ['playerFrameResourceWidth', 'playerFrameResourceHeight'],
 } as const;
 
-/** Pet and focus frames resize their bars without stretching text or portraits. */
+/** Pet and focus frames resize their bars without stretching text or portraits;
+ *  the detached resource bar is one unzoomed bar, so its height drag is 1:1. */
 export function additionalUnitDimensions(
   id: string,
   options: () => FramesMenuSettingsHooks | null,
@@ -37,9 +39,10 @@ export function additionalUnitDimensions(
   if (!keys) return undefined;
   const zoom = () =>
     id === 'petFrame' ? 0.8 * Number(options()?.settings.get('playerFrameScale') ?? 1) : 1;
+  const bars = id === 'playerResource' ? 1 : 2;
   return {
     width: frameDimension(options, keys[0], zoom),
-    height: frameDimension(options, keys[1], () => 2 * zoom()),
+    height: frameDimension(options, keys[1], () => bars * zoom()),
   };
 }
 
@@ -68,4 +71,34 @@ export function migratePetFrameSize(
     /* Leave the durable legacy value available for a later attempt. */
     return false;
   }
+}
+
+/** Gap below the player frame where a first-time detached resource bar sits. */
+export const RESOURCE_BAR_DETACH_GAP = 6;
+
+/**
+ * Where and how big the resource bar lands the first time it is detached:
+ * just below the player frame, left-aligned with the bar's docked spot, at the
+ * size it had there (rects are visual px; the sizes are setting px, so the UI
+ * Scale zoom is divided back out), clamped to the settings' own ranges.
+ */
+export function resourceBarFirstSeat(
+  bar: { left: number; top: number; width: number; height: number },
+  frame: { bottom: number; height: number } | null,
+  uiScale: number,
+): { seat: { left: number; top: number }; width: number; height: number } {
+  const scale = uiScale > 0 ? uiScale : 1;
+  const w = SETTING_RANGES.playerFrameResourceWidth;
+  const h = SETTING_RANGES.playerFrameResourceHeight;
+  const clamp = (v: number, r: { min: number; max: number; def: number }) =>
+    v > 0 ? Math.min(r.max, Math.max(r.min, Math.round(v / scale))) : r.def;
+  const below = frame && frame.height > 0 ? frame.bottom + RESOURCE_BAR_DETACH_GAP : null;
+  return {
+    seat: {
+      left: bar.width > 0 ? bar.left : 320,
+      top: below ?? (bar.height > 0 ? bar.top : 200),
+    },
+    width: clamp(bar.width, w),
+    height: clamp(bar.height, h),
+  };
 }

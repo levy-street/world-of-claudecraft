@@ -11,7 +11,11 @@
 // body, and account state for the weapon-skin loadout. Each card model says
 // which, so the badge is never inferred in markup.
 
-import { MOUNT_SKIN_IDS, MOUNT_SKINS, type MountSkinId } from '../../../sim/content/mount_skins';
+import {
+  ALL_MOUNT_SKIN_IDS,
+  type MountSkinId,
+  mountSkinDef,
+} from '../../../sim/content/mount_skins';
 import type { MountRarity } from '../../../sim/content/mounts';
 import { MECH_CHROMAS } from '../../../sim/content/skins';
 import {
@@ -22,21 +26,37 @@ import {
 } from '../../../sim/content/weapon_skins';
 import type { SkinCatalog, SkinRank, WeaponSkinType } from '../../../sim/types';
 import { type TabStripModel, tabStripModel } from '../../tab_strip_view';
+import type { BuddyCosmeticsSnapshot } from './buddy_cosmetics_view';
 
-/** Closed on purpose: a future tab (buddies) is a deliberate addition here. */
-export type CosmeticsTab = 'mounts' | 'skins' | 'mech';
+/** Closed set shared by the tab strip and panel painter. */
+export type CosmeticsTab = 'mounts' | 'skins' | 'mech' | 'buddies';
 
-export const COSMETICS_TABS: readonly CosmeticsTab[] = ['mounts', 'skins', 'mech'];
+export const COSMETICS_TABS: readonly CosmeticsTab[] = ['mounts', 'skins', 'mech', 'buddies'];
 
 export function isCosmeticsTab(value: string): value is CosmeticsTab {
   return (COSMETICS_TABS as readonly string[]).includes(value);
 }
+
+/** Whether an owned Combat Mech chroma can be put on from the interface.
+ *
+ *  Switched off while the mech is reworked for the new character bodies. An
+ *  owned chroma still lists, but the two controls that put the suit on render
+ *  disabled: the swatch under the model on the character sheet
+ *  (`char_skin_window.ts`) and Wear on this window's mech card. Taking the suit
+ *  off stays available in both places, so a player already wearing it is never
+ *  stranded in it.
+ *
+ *  Interface only: the sim still accepts the mech catalog, so ownership, saved
+ *  characters and the wire are untouched. Set this to true to bring both
+ *  controls back; nothing else needs to change. */
+export const COMBAT_MECH_WEARABLE = false;
 
 export type CosmeticsScope = 'account' | 'character';
 
 /** One plain read of everything the window paints from. */
 export interface CosmeticsSnapshot {
   tab: CosmeticsTab;
+  buddies: BuddyCosmeticsSnapshot;
   ownedMountSkins: readonly string[];
   wornMountSkin: string | null;
   /** The character owns at least one rideable mount (a skin needs a ride). */
@@ -83,7 +103,9 @@ export interface MechChromaCard {
   index: number;
   rank: SkinRank;
   worn: boolean;
-  action: 'wear' | 'takeOff';
+  /** `unavailable` is an owned chroma that cannot be put on right now
+   *  (COMBAT_MECH_WEARABLE); the worn one always keeps `takeOff`. */
+  action: 'wear' | 'takeOff' | 'unavailable';
   ownershipScope: CosmeticsScope;
   wornScope: CosmeticsScope;
 }
@@ -91,12 +113,16 @@ export interface MechChromaCard {
 /** Every catalog mount skin in store order, owned or not, so the tab doubles
  *  as the catalog a player has not bought into yet. */
 export function mountSkinCards(s: CosmeticsSnapshot): MountSkinCard[] {
-  return MOUNT_SKIN_IDS.map((id) => {
+  return ALL_MOUNT_SKIN_IDS.filter(
+    (id) =>
+      s.ownedMountSkins.includes(id) ||
+      !['terrorspark_groundshaker', 'drakemaw_raptor'].includes(id),
+  ).map((id) => {
     const owned = s.ownedMountSkins.includes(id);
     const worn = owned && s.wornMountSkin === id;
     return {
       id,
-      rarity: MOUNT_SKINS[id].rarity,
+      rarity: mountSkinDef(id)!.rarity,
       owned,
       worn,
       action: !owned ? null : worn ? 'takeOff' : 'wear',
@@ -136,8 +162,12 @@ export function weaponSkinGroups(s: CosmeticsSnapshot): WeaponSkinGroup[] {
   return groups;
 }
 
-/** The OWNED Combat Mech chromas in catalog order. */
-export function mechChromaCards(s: CosmeticsSnapshot): MechChromaCard[] {
+/** The OWNED Combat Mech chromas in catalog order. `wearable` is a parameter
+ *  only so both states stay tested; callers leave it at the switch. */
+export function mechChromaCards(
+  s: CosmeticsSnapshot,
+  wearable: boolean = COMBAT_MECH_WEARABLE,
+): MechChromaCard[] {
   const cards: MechChromaCard[] = [];
   MECH_CHROMAS.forEach((chroma, index) => {
     if (!s.mechChromaIds.includes(chroma.id)) return;
@@ -147,7 +177,7 @@ export function mechChromaCards(s: CosmeticsSnapshot): MechChromaCard[] {
       index,
       rank: chroma.rank,
       worn,
-      action: worn ? 'takeOff' : 'wear',
+      action: worn ? 'takeOff' : wearable ? 'wear' : 'unavailable',
       ownershipScope: 'account',
       wornScope: 'character',
     });
@@ -177,6 +207,7 @@ export function cosmeticsTabStrip(
 export function cosmeticsSig(s: CosmeticsSnapshot): string {
   return JSON.stringify([
     s.tab,
+    s.buddies,
     s.ownedMountSkins,
     s.wornMountSkin,
     s.ownsAnyMount,

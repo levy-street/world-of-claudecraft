@@ -19,6 +19,7 @@ describe('interface body classes', () => {
       compactChat: 'compact-chat',
       hideUnusedActionSlots: 'hide-unused-action-slots',
       colorblindMode: 'colorblind-mode',
+      classicCombatText: 'classic-combat-text',
     });
   });
 

@@ -2,14 +2,15 @@ import type { corpseLootAvailability } from '../../../game/corpse_loot_availabil
 import { HARVEST_BODY_RANGE, pickHarvestBody } from '../../../game/harvest_body_pick';
 import { ITEMS } from '../../../sim/data';
 import { lootQualityTier } from '../../../sim/loot_quality';
+import type { MaterialComposition } from '../../../sim/material_sources';
 import type { ItemInstancePayload } from '../../../sim/types';
 import { dist2d, type Entity, type ItemDef } from '../../../sim/types';
 import type { CorpseHarvestInfo, IWorld, WorldInteractionOutcome } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
-import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
+import { itemCopyDisplayName } from '../../item_copy_name_core';
 import { knownItemDef } from '../../known_item';
 import { lootQualityBadgeHtml } from '../../loot_quality_view';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -50,6 +51,8 @@ export interface LootWindowItemStack {
   itemId: string;
   count: number;
   instance?: ItemInstancePayload;
+  /** Per-unit provenance (a World PvP skull's victim, a material's gatherer). */
+  materialSources?: MaterialComposition;
 }
 
 type CorpseAvailability = ReturnType<typeof corpseLootAvailability>;
@@ -69,7 +72,11 @@ export interface LootWindowControllerDeps {
    *  rather than re-typed; the quality parameter is shape uniformity only
    *  here, since no copy payload reaches this surface, and is never passed. */
   itemIcon: PainterHostPresentation['itemIcon'];
-  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
+  itemTooltip(
+    item: ItemDef,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   /** The shared HUD confirm dialog (Hud.confirmDialog: focus-trapped,
    *  aria-named), for the bind-on-pickup warning before Take Loot. */
@@ -777,7 +784,7 @@ export class LootWindowController {
         ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
         : '';
     const qualityClass = item?.kind === 'quest' ? 'q-quest' : `q-${item?.quality ?? 'common'}`;
-    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}${lootQualityBadgeHtml(stack.instance, { labelled: true })}<span class="loot-item-name ${qualityClass}">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
+    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}${lootQualityBadgeHtml(stack.instance, { labelled: true })}<span class="loot-item-name ${qualityClass}">${esc(item ? itemCopyDisplayName(item, stack.instance, stack.materialSources) : stack.itemId)}${count}</span></div>`;
   }
 
   private attachItemTooltips(items: readonly LootWindowItemStack[]): void {
@@ -789,7 +796,7 @@ export class LootWindowController {
       // def-derived body.
       this.deps.attachTooltip(row, () =>
         item
-          ? this.deps.itemTooltip(item, items[index]?.instance)
+          ? this.deps.itemTooltip(item, items[index]?.instance, items[index]?.materialSources)
           : `<div class="tt-title">${esc(itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
       );
     });

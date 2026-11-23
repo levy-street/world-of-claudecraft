@@ -5,7 +5,7 @@
 // The list mirrors the game's own routers: the sim dispatch in
 // src/sim/social/chat.ts (talking, channels, party, readouts, presence, recovery)
 // plus the server-side chat commands (guild and officer chat, /who, ignore and
-// block). The ALLOW_DEV_COMMANDS-gated /dev surface is deliberately absent: it is
+// block, /flair). The ALLOW_DEV_COMMANDS-gated /dev surface is deliberately absent: it is
 // a development cheat set, never available in normal play.
 
 import { esc } from '../../ui/esc';
@@ -102,6 +102,11 @@ const GROUPS: Group[] = [
       { cmds: ['/session', '/sess', '/sessionstats'], desc: 'guide.commandsPage.session' },
       { cmds: ['/arena', '/rating'], desc: 'guide.commandsPage.arena' },
       { cmds: ['/pvp', '/pvp on', '/pvp off'], desc: 'guide.commandsPage.pvpZones' },
+      { cmds: ['/flair', '/flair on', '/flair off'], desc: 'guide.commandsPage.flair' },
+      {
+        cmds: ['/presence', '/presence everyone', '/presence friends', '/presence none'],
+        desc: 'guide.commandsPage.presence',
+      },
       { cmds: ['/listings', '/mylistings', '/auctions'], desc: 'guide.commandsPage.listings' },
       { cmds: ['/buyback', '/bb', '/repurchase'], desc: 'guide.commandsPage.buyback' },
     ],

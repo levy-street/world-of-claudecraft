@@ -3,9 +3,13 @@
 // fire, never while an eruption is telegraphing or has just landed, never in
 // the run-up to Deathless Rage; eruptions wait out a spike wave and never
 // reach an impaled raider; Rage frees the impaled; and an impaled raider next
-// to a wardstone may still channel it.
+// to a wardstone may still channel it. Eruptions also wait out live Soul Rend
+// marks plus a short gap after they clear, never open right beside a hall
+// pillar, and Bone Storm is retired from play (owner, 2026-10-02).
 
 import { describe, expect, it } from 'vitest';
+import { dungeonInstanceAt } from '../src/sim/dungeon_floor';
+import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
 import * as nythraxis from '../src/sim/encounters/nythraxis';
 import {
   isNythraxisImpaled,
@@ -17,13 +21,17 @@ import {
   NYTHRAXIS_IMPALED_AURA_ID,
   nythraxisImpaledAuraFor,
 } from '../src/sim/nythraxis_bone_spike';
+import { NYTHRAXIS_BONE_STORM_ENABLED } from '../src/sim/nythraxis_bone_storm';
 import {
   NYTHRAXIS_GRAVE_ERUPTION_IMPALED_CLEARANCE,
+  NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE,
   NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
   NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS,
   nythraxisGraveEruptionCount,
+  nythraxisGraveEruptionPattern,
   pointInNythraxisCircle,
 } from '../src/sim/nythraxis_grave_eruption';
+import { NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS } from '../src/sim/nythraxis_soul_rend';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { DT, type Entity, NYTHRAXIS_BOSS_ID, type SimEvent } from '../src/sim/types';
@@ -54,7 +62,7 @@ function setup(opts: { difficulty?: 'normal' | 'heroic' } = {}) {
     world: EMPTY_TEST_WORLD,
   }) as AnySim;
   const tankPid = sim.addPlayer('warrior', 'Tank') as number;
-  sim.players.get(tankPid)!.questsDone.add('q_nythraxis_bound_guardian');
+  sim.players.get(tankPid)?.questsDone.add('q_nythraxis_bound_guardian');
   const raiderPids: number[] = [];
   for (let i = 0; i < 9; i++) {
     const pid = sim.addPlayer(i < 2 ? 'priest' : 'mage', `Raider${i}`) as number;
@@ -276,6 +284,168 @@ describe('Grave Eruption keeps clear of spikes', () => {
         ).toBe(false);
       }
     }
+  });
+});
+
+describe('Grave Eruption keeps clear of Soul Rend', () => {
+  it('pins the gap at 1.5 s', () => {
+    expect(NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS).toBe(1.5);
+  });
+
+  for (const difficulty of ['normal', 'heroic'] as const) {
+    it(`${difficulty}: holds through live marks, then opens no sooner than 1.5 s after they detonate`, () => {
+      const { ctx, boss, st } = setup({ difficulty });
+      const ms = nythraxis.nythraxisMechanicState(st);
+      nythraxis.castNythraxisSoulRend(ctx, boss, st);
+      expect(st.soulRendMarks.length).toBeGreaterThan(0);
+      st.soulRendTimer = 999;
+      // The eruption comes due while the marks are still live.
+      ms.eruptionTimer = DT;
+      let guard = 0;
+      while (st.soulRendMarks.length > 0) {
+        tickDriver(ctx, boss, DT);
+        expect(ms.eruptionPoints, 'no eruption while marks are live').toHaveLength(0);
+        if (++guard > 400) throw new Error('Soul Rend never detonated');
+      }
+      // Detonated this tick: the gap is armed at full length.
+      expect(ms.soulRendFireGapTimer).toBeCloseTo(NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS, 5);
+      let ticksAfter = 0;
+      while (ms.eruptionPoints.length === 0) {
+        tickDriver(ctx, boss, DT);
+        ticksAfter++;
+        if (ticksAfter > 200) throw new Error('eruption never started after the gap');
+      }
+      const elapsed = ticksAfter * DT;
+      expect(elapsed).toBeGreaterThanOrEqual(NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS - 1e-9);
+      expect(elapsed).toBeLessThanOrEqual(NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS + 2 * DT);
+    });
+  }
+
+  it('holds a due Soul Rend while an eruption telegraphs, including one that began the same tick', () => {
+    const { ctx, boss, st } = setup();
+    const ms = nythraxis.nythraxisMechanicState(st);
+    st.phase = 2;
+    // Both come due on the same tick: the eruption wins, the marks wait.
+    ms.eruptionTimer = DT;
+    st.soulRendTimer = DT;
+    tickDriver(ctx, boss, DT);
+    expect(ms.eruptionPoints.length).toBeGreaterThan(0);
+    expect(st.soulRendMarks).toHaveLength(0);
+    // Through the telegraph the marks keep waiting; once it lands they go out.
+    tickDriver(ctx, boss, NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS - 2 * DT);
+    expect(ms.eruptionPoints.length).toBeGreaterThan(0);
+    expect(st.soulRendMarks).toHaveLength(0);
+    tickDriver(ctx, boss, 1.5);
+    expect(ms.eruptionPoints).toHaveLength(0);
+    expect(st.soulRendMarks.length).toBeGreaterThan(0);
+  });
+
+  it('does not hold an eruption when no marks were cast', () => {
+    const { ctx, boss, st } = setup();
+    const ms = nythraxis.nythraxisMechanicState(st);
+    ms.eruptionTimer = DT;
+    tickDriver(ctx, boss, DT);
+    expect(ms.soulRendFireGapTimer).toBe(0);
+    expect(ms.eruptionPoints.length).toBeGreaterThan(0);
+  });
+
+  it('arms the same gap when Bone Storm releases live marks, and only then', () => {
+    const { ctx, boss, st } = setup();
+    const ms = nythraxis.nythraxisMechanicState(st);
+    nythraxis.startNythraxisBoneStorm(ctx, boss, st);
+    expect(ms.soulRendFireGapTimer, 'no marks, no gap').toBe(0);
+    ms.boneStorm = null;
+    nythraxis.castNythraxisSoulRend(ctx, boss, st);
+    expect(st.soulRendMarks.length).toBeGreaterThan(0);
+    nythraxis.startNythraxisBoneStorm(ctx, boss, st);
+    expect(st.soulRendMarks).toHaveLength(0);
+    expect(ms.soulRendFireGapTimer).toBe(NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS);
+  });
+});
+
+describe('Grave Eruption keeps clear of the hall pillars', () => {
+  const dist = (a: { x: number; z: number }, b: { x: number; z: number }) =>
+    Math.hypot(a.x - b.x, a.z - b.z);
+
+  it('pins the keep-out: the 3 yd ring edge stays 4 yd from a pillar centre', () => {
+    expect(NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE).toBe(7);
+    expect(NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE - NYTHRAXIS_GRAVE_ERUPTION_RADIUS).toBe(4);
+  });
+
+  it('moves a circle aimed at a raider hugging a pillar off the pillar, every cast key', () => {
+    const origin = { x: 0, z: 0 };
+    const pillars = [
+      { x: -32, z: -12 },
+      { x: 32, z: -12 },
+      { x: -32, z: 10 },
+    ];
+    const targets = pillars.map((p, i) => ({ id: i + 1, x: p.x + 1.5, z: p.z }));
+    for (let castKey = 1; castKey <= 64; castKey++) {
+      // Decisive: with no pillar list the first circle lands right on its target.
+      const unguarded = nythraxisGraveEruptionPattern(castKey, origin, 4, targets);
+      expect(dist(unguarded[0], pillars[0])).toBeLessThan(
+        NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE,
+      );
+      const points = nythraxisGraveEruptionPattern(castKey, origin, 4, targets, [], pillars);
+      expect(points.length, `cast ${castKey} still fields its circles`).toBe(4);
+      for (const point of points) {
+        for (const pillar of pillars) {
+          expect(dist(point, pillar)).toBeGreaterThanOrEqual(
+            NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE,
+          );
+        }
+      }
+    }
+  });
+
+  for (const difficulty of ['normal', 'heroic'] as const) {
+    it(`${difficulty}: the live driver keeps every circle off the real hall pillars`, () => {
+      const { sim, ctx, boss, st, raiders, room } = setup({ difficulty });
+      const frame = dungeonInstanceAt(boss.spawnPos.x, boss.spawnPos.z);
+      if (!frame) throw new Error('the boss must stand in a dungeon instance');
+      expect(frame.layout).toBe(NYTHRAXIS_LAYOUT);
+      const pillars = NYTHRAXIS_LAYOUT.pillars.map((p) => ({
+        x: frame.ox + p.x,
+        z: frame.oz + p.z,
+      }));
+      expect(pillars).toHaveLength(6);
+      // Every free raider hugs a pillar, 1.5 yd off its centre on the aisle side.
+      raiders.forEach((e, i) => {
+        const pillar = pillars[i % pillars.length];
+        const local = NYTHRAXIS_LAYOUT.pillars[i % pillars.length];
+        teleport(sim, e, pillar.x + (local.x < 0 ? 1.5 : -1.5), pillar.z, boss.pos.y);
+      });
+      const ms = nythraxis.nythraxisMechanicState(st);
+      for (let cast = 0; cast < 8; cast++) {
+        sim.tickCount += 1;
+        nythraxis.startNythraxisGraveEruption(ctx, boss, st, room());
+        expect(ms.eruptionPoints.length).toBe(nythraxisGraveEruptionCount(difficulty));
+        for (const point of ms.eruptionPoints) {
+          for (const pillar of pillars) {
+            expect(dist(point, pillar)).toBeGreaterThanOrEqual(
+              NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE,
+            );
+          }
+        }
+        ms.eruptionPoints = [];
+        ms.eruptionImpactRemaining = 0;
+      }
+    });
+  }
+});
+
+describe('Bone Storm is retired from play', () => {
+  it('the switch is off', () => {
+    expect(NYTHRAXIS_BONE_STORM_ENABLED).toBe(false);
+  });
+
+  it('a due storm in phase 3 never begins', () => {
+    const { ctx, boss, st } = setup();
+    const ms = nythraxis.nythraxisMechanicState(st);
+    st.phase = 3;
+    ms.boneStormTimer = DT;
+    tickDriver(ctx, boss, 10);
+    expect(ms.boneStorm).toBeNull();
   });
 });
 

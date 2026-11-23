@@ -15,6 +15,7 @@ import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import { isMergeableInstancePayload, itemInstancePayloadsEqual } from '../sim/item_instance_merge';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import { isMaterialItemId } from '../sim/material_ids';
 import type { MaterialComposition } from '../sim/material_sources';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -155,7 +156,11 @@ export class MailboxWindow {
       itemId,
       instance,
     );
-    if (instance && materialCount === null && isMergeableInstancePayload(instance)) {
+    if (
+      instance &&
+      isMergeableInstancePayload(instance) &&
+      (materialCount === null || !isMaterialItemId(itemId))
+    ) {
       // Already staged: the first click already grabbed every owned unlocked
       // copy, so a re-click is a no-op, exactly like the fungible dedupe
       // below rather than a second, redundant slot.
@@ -166,7 +171,7 @@ export class MailboxWindow {
         )
       )
         return;
-      const owned = this.ownedInstancedCountFor(itemId, instance);
+      const owned = materialCount ?? this.ownedInstancedCountFor(itemId, instance);
       if (owned < 1) return;
       if (this.attachments.length >= max) {
         this.deps.showError(

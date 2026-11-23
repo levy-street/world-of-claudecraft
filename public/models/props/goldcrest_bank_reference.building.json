@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "kind": "interior-building",
+  "name": "goldcrest_bank_reference",
+  "model": "/models/props/goldcrest_bank_reference.glb",
+  "dimensions": {
+    "width": 14,
+    "depth": 11,
+    "height": 7.2
+  },
+  "interior": {
+    "floors": 2,
+    "style": "warm timber banking hall, teller counters, manager office, records room, fortified stone vault annex",
+    "entrance": {
+      "side": "front",
+      "localAxis": "+z",
+      "width": 3.2
+    },
+    "roof": "review-separable"
+  },
+  "collision": {
+    "mode": "wall-shell",
+    "wallThickness": 0.35,
+    "fullFootprintObbForbidden": true,
+    "requiresManualIntegration": true
+  },
+  "review": [
+    "doorway is visibly open and wide enough for the player",
+    "floors are continuous and stairs have usable clearance",
+    "rooms are not filled by hidden or fused geometry",
+    "roof can be hidden or separated for the gameplay camera",
+    "shell colliders match visible walls and leave the doorway open"
+  ]
+}

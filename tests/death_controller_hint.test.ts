@@ -24,7 +24,7 @@ describe('death controller hint', () => {
     expect(deathControllerConfirmLabel([{ button: GP.A, action: 'jump' }], 'xbox')).toBeNull();
   });
 
-  it('paints the live cap onto exactly the two remaining death buttons', () => {
+  it('paints the live cap onto exactly the three death buttons', () => {
     const attrs = new Map<string, string>();
     const requested: string[] = [];
     const button = {
@@ -44,7 +44,7 @@ describe('death controller hint', () => {
     });
     expect(attrs.get('data-gamepad-confirm-label')).toBe('A');
     // The Pale Keeper's raise has no button any more (the ghost talks to the
-    // Keeper), so the cap paints onto Release and the corpse button only.
-    expect(requested).toEqual(['release-btn', 'resurrect-corpse-btn']);
+    // Keeper), so the cap paints onto Release, PvP Resurrect and the corpse button.
+    expect(requested).toEqual(['release-btn', 'pvp-resurrect-btn', 'resurrect-corpse-btn']);
   });
 });

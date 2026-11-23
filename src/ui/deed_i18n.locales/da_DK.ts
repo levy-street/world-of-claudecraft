@@ -362,6 +362,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Dalens Krønike, Kapitel II',
+    desc: 'Afslut andet kapitel af Sauls krønike: nedlæg banditter, murlokker og minens skadedyr, og trods Relikvariet.',
   },
   chr_vale_chapter_iii: {
     name: 'Krøniken om Dalen',
@@ -1161,5 +1162,217 @@ export const table: DeedLocaleTable = {
   cmb_coinsack_caught: {
     name: 'Pågrebet på Fersk Gerning',
     desc: 'Fang en Møntposekryber i en Begravet Hoard, før den stikker af med guldet.',
+  },
+  exp_wisp_maze_hard: {
+    name: 'Klarere end skyggerne',
+    desc: 'Find de stjalne pengepunge og undslip Evergarden-labyrinten pa Hard.',
+  },
+  prog_titan: {
+    name: 'Kæmpe',
+    desc: 'Optjen i alt 10.000.000 erfaringspoint i din levetid.',
+    title: 'Kæmpe',
+  },
+  pvp_flag_1h: {
+    name: 'Dristig',
+    desc: 'Hold Verdens-PvP slået til i 1 time spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Dristig',
+  },
+  pvp_flag_3h: {
+    name: 'Trodsig',
+    desc: 'Hold Verdens-PvP slået til i 3 timer spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Trodsig',
+  },
+  pvp_flag_6h: {
+    name: 'Frygtløs',
+    desc: 'Hold Verdens-PvP slået til i 6 timer spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Frygtløs',
+  },
+  pvp_flag_24h: {
+    name: 'Ubøjelig',
+    desc: 'Hold Verdens-PvP slået til i 24 timer spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Ubøjelig',
+  },
+  pvp_flag_168h: {
+    name: 'Uovervindelig',
+    desc: 'Hold Verdens-PvP slået til i 7 dage spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Uovervindelig',
+  },
+  dgn_morthen_candlelight: {
+    name: 'Alle lys tændt',
+    desc: 'Besejr Morthen Gravkalderen efter at have gentændt alle fire mindelys inden for 20 sekunder, efter at hans hvileløse værn opstod.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Stille nu',
+    desc: 'Besejr kantor Ilvane, uden at hendes Hulrummets klagesang nogensinde rammer nogen.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Ingen efterladt hængende',
+    desc: 'Besejr Knoglekuldens frue, uden at hun nogensinde taber nogen fra sit Frosne favntag.',
+  },
+  dgn_marrow_tidy: {
+    name: 'En ryddelig kirkegård',
+    desc: 'Besejr graver Marrow med hver åben grav lagt ved klokkegårdens kant.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Det sidste vers',
+    desc: 'Besejr Ysolei, den druknede månes avatar, med Det blege kors sidste kantor ved din side.',
+    title: 'Korets vidne',
+  },
+  dgn_sledge_tusker: {
+    name: 'Kold last',
+    desc: 'Besejr slædestødtanden, uden at nogen rammes af dens nedtrampning.',
+  },
+  dgn_korzul_thin_ice: {
+    name: 'Tynd is',
+    desc: 'Besejr Korzul Gravlindormen med mindst tolv af søens nitten plader ubrudte.',
+  },
+  dgn_velkhar_cold: {
+    name: 'Kold trøst',
+    desc: 'Besejr stornekromantikeren Velkhar, uden at en eneste genoprejst knoglevandrer rejser sig en anden gang.',
+  },
+  dgn_korgath_still_bound: {
+    name: 'Låsen holder',
+    desc: 'Besejr Korgath den bundne på heroisk sværhedsgrad med mindst to kæder, der aldrig er brudt.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'En mildere afslutning',
+    desc: 'Besejr Korgath den bundne med alle fire kæder brudt.',
+  },
+  dgn_great_saurian: {
+    name: 'Væltet titan',
+    desc: 'Besejr storøglen og dens bærestolsforbandelsesmaner inden for 20 sekunder af hinanden.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Aldrig fanget',
+    desc: 'Besejr Zulgar, bassinets stemme, uden at nogen bliver sønderrevet.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Ukrudtsbekæmpelse',
+    desc: 'Besejr Frådseblomsten, uden at en eneste tornespire vokser frem.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Holdt på afstand',
+    desc: 'Besejr Hugtandsherren bæstmesteren og hans store jaguar med Flokbånd aktivt i under 10 sekunder i alt.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Intet bur holder os',
+    desc: 'Besejr fængselsvogteren, uden at nogen knuses i et jernbur.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Ikke et svedent hår',
+    desc: 'Besejr dødsklangslindormen, uden at nogen brændes af dens Bålsvejp.',
+  },
+  dgn_mere_hydra: {
+    name: 'Alle hoveder ned',
+    desc: 'Dræb alle søhydraens tre hoveder inden for 10 sekunder af hinanden.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Højt og tørt',
+    desc: 'Besejr Ysolei, den druknede månes avatar, uden at nogen rammes af hendes Tidevandsnedslag.',
+  },
+  dgn_colossus_mirror: {
+    name: 'Knus glasset',
+    desc: 'Besejr tidevandsglaskolossen med hvert spejlbillede knust inden for 15 sekunder, efter det opstår.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Hver stemme i tone',
+    desc: 'Besejr kormoder Selthe med hvert Kor delt af to eller flere, og uden at nogen Solo berører andre.',
+  },
+  dgn_turretback: {
+    name: 'Udsættelsesvarsel',
+    desc: 'Besejr skibsvragskaptajnen, uden at nogen bliver ramt af Spøgelsesbredside.',
+  },
+  dgn_vael_beacon: {
+    name: 'I fyrets skær',
+    desc: 'Besejr Vael Tågebinderen uden at sprænge en eneste tågeskygge.',
+  },
+  dgn_ossick_moored: {
+    name: 'Sikker havn',
+    desc: 'Besejr fangevogter Ossick, uden at nogen bliver trukket ned i Drukningsgraven.',
+  },
+  dgn_olen_buttress: {
+    name: 'Hold muren',
+    desc: 'Besejr ridderkommandør Olen, uden at hans Tilbagespringende bolværk nogensinde rammer en anden spiller.',
+  },
+  cmb_point_taken: {
+    name: 'Pointen forstået',
+    desc: 'Sluk halmformandens lygte på opbuddets eksercerplads, og lad plankerne mærke slagene.',
+  },
+  cmb_balgath_ten: { name: 'Højen beholder intet', desc: 'Nedlæg den begravede formand ti gange.' },
+  cmb_balgath: {
+    name: 'Ikke længere formand',
+    desc: 'Læg den begravede formand tilbage i hans gravhøj.',
+  },
+  dgn_guild_first_contract: {
+    name: 'Ordren underskrevet',
+    desc: 'Fuldfør en af Lygtehallens ugentlige dungeonkontrakter.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Stamgæst ved tavlen',
+    desc: 'Fuldfør 10 af Lygtehallens ugentlige dungeonkontrakter.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Kontraktveteran',
+    desc: 'Fuldfør 50 af Lygtehallens ugentlige dungeonkontrakter.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Ordrebud',
+    desc: 'Købes hos Garrick Holt, Lygtehallens kvartermester, for 6 lygtesegl.',
+    title: 'Ordrebud',
+  },
+  feat_guild_hallsworn: {
+    name: 'Hallens edsvorne',
+    desc: 'Købes hos Garrick Holt, Lygtehallens kvartermester, for 14 lygtesegl.',
+    title: 'Hallens edsvorne',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Fra Lygtehallen',
+    desc: 'Købes hos Garrick Holt, Lygtehallens kvartermester, for 24 lygtesegl.',
+    title: 'fra Lygtehallen',
+  },
+  feat_gourdlight_guise: {
+    name: 'Græskarlygternes forklædning',
+    desc: 'Ej et Udskåret græskarhoved taget fra Gamle Halmgrin på hans mark forbi Vildsvineengen under Græskarlygternes aften.',
+  },
+  feat_old_thatchgrin: {
+    name: 'Stubbe og aske',
+    desc: 'Hjælp med at besejre Gamle Halmgrin på hans græskarmark forbi Vildsvineengen under Græskarlygternes aften.',
+  },
+  feat_title_gourdlit: {
+    name: 'Den græskarlyste',
+    desc: 'Læs Græskarlystes brev, byttet hos Hester Græskarvæge for Græskarlygteslik under Græskarlygternes aften.',
+    title: 'den græskarlyste',
+  },
+  feat_title_trickster: {
+    name: 'Spøgefugl',
+    desc: 'Læs Spøgefuglens brev, byttet hos Hester Græskarvæge for Græskarlygteslik under Græskarlygternes aften.',
+    title: 'Spøgefugl',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Den hult grinende',
+    desc: 'Læs Det Hule Grins brev, byttet hos Hester Græskarvæge for Græskarlygteslik under Græskarlygternes aften.',
+    title: 'den hult grinende',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Græskarjæger',
+    desc: 'Find alle Hjemsøgte græskar, som er skjult rundt om i verden under Græskarlygternes aften.',
+    title: 'den hule',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Hver eneste dørtærskel',
+    desc: 'Sig slik eller ballade til hver byboer, som åbner døren i Østbæk, Sumpbroen og Højvagten under Græskarlygternes aften.',
+  },
+  feat_gourdlight_errands: {
+    name: 'Til Hesters tjeneste',
+    desc: 'Gennemfør hvert af Hester Græskarvæges skiftende ærinder under Græskarlygternes aften mindst én gang.',
+  },
+  feat_gourdlight_frights: {
+    name: 'Tre forskrækkede byer',
+    desc: 'Under Hesters ærinde Bøh! skal du forskrække en byboer i hver af byerne Østbæk, Sumpbroen og Højvagten.',
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Græskarlygter fra start til slut',
+    desc: 'Gennemfør hele Græskarlygternes aften: besejr Gamle Halmgrin, find alle Hjemsøgte græskar, afslut alle Hesters ærinder, bank på alle døre, og forskræk en byboer i hver af de tre byer.',
+    title: 'den græskarsvorne',
   },
 };

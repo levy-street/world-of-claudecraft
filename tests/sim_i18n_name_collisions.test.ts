@@ -29,11 +29,29 @@ const EXPECTED: readonly {
   ids: readonly string[];
   resolved: string;
 }[] = [
+  // The Hollow Crypt rework (df3bb72577e, PR 4352): Sexton Marrow's grave adds
+  // are "the zone's Restless Bones at the crypt's level" (content/hollow_crypt.ts),
+  // named as the zone1 mob on purpose. Neither is a boss, so the sorted id picks.
+  {
+    kind: 'mob',
+    name: 'Restless Bones',
+    ids: ['marrow_restless_bones', 'restless_bones'],
+    resolved: 'marrow_restless_bones',
+  },
   {
     kind: 'mob',
     name: 'Training Dummy',
     ids: ['hub_training_dummy', 'training_dummy'],
     resolved: 'hub_training_dummy',
+  },
+  // The Sunken Bastion rework: Vael's Fog Veil shades wear the boss's name on
+  // purpose. The boss preference picks Vael (the sorted id alone would pick the
+  // shade, and Vael's own lines would read the shade's rendering).
+  {
+    kind: 'mob',
+    name: 'Vael the Fogbinder',
+    ids: ['vael_fog_shade', 'vael_the_mistcaller'],
+    resolved: 'vael_the_mistcaller',
   },
   {
     kind: 'mob',
@@ -46,6 +64,32 @@ const EXPECTED: readonly {
     name: 'Rime Elemental',
     ids: ['rift_rime_elemental', 'rime_elemental'],
     resolved: 'rift_rime_elemental',
+  },
+  // The Drowned Temple rework: the Mere Hydra's three heads are one creature
+  // and its per-class Tideglass Reflections one kind of copy; each set renders
+  // one string everywhere, so which id the name resolves to cannot show.
+  {
+    kind: 'mob',
+    name: 'Mere Hydra',
+    ids: ['mere_hydra_head_center', 'mere_hydra_head_left', 'mere_hydra_head_right'],
+    resolved: 'mere_hydra_head_center',
+  },
+  {
+    kind: 'mob',
+    name: 'Tideglass Reflection',
+    ids: [
+      'tideglass_reflection',
+      'tideglass_reflection_druid',
+      'tideglass_reflection_hunter',
+      'tideglass_reflection_mage',
+      'tideglass_reflection_paladin',
+      'tideglass_reflection_priest',
+      'tideglass_reflection_rogue',
+      'tideglass_reflection_shaman',
+      'tideglass_reflection_warlock',
+      'tideglass_reflection_warrior',
+    ],
+    resolved: 'tideglass_reflection',
   },
   {
     kind: 'ability',
@@ -76,6 +120,14 @@ const UNRESOLVABLE: readonly { name: string; why: string }[] = [
   {
     name: 'Rime Elemental',
     why: 'rime_elemental is the Frostveil mob, rift_rime_elemental the rift elite; both live, and 5 locales translate them apart.',
+  },
+  {
+    name: 'Restless Bones',
+    why: "marrow_restless_bones is Sexton Marrow's Hollow Crypt add, a copy of the zone1 restless_bones named alike on purpose; the non-Latin locales already copy the zone mob's rendering onto it, but its Latin-locale names are still pending, so those locales show it in English. The release fill must copy the zone mob's rendering onto it, and this row then leaves.",
+  },
+  {
+    name: 'Vael the Fogbinder',
+    why: "vael_fog_shade is the Fog Veil's copy of vael_the_mistcaller, named as the boss on purpose; the map resolves to the boss, but the shade's Latin-locale names are still pending, so 15 locales show it in English. The release fill must copy the boss's rendering onto the shade, and this row then leaves.",
   },
 ];
 
@@ -110,6 +162,19 @@ describe('reverse-map name collisions are resolved on purpose', () => {
       const live = c.ids.filter(reachable);
       expect(live, `${c.name} must have exactly one reachable id`).toHaveLength(1);
       expect(c.resolved, `${c.name} must resolve to its reachable id`).toBe(live[0]);
+    }
+  });
+
+  it('a mob name shared with a boss resolves to the boss', () => {
+    // The mob map's preference, asserted on its own terms like the ability arm:
+    // where exactly one colliding id is a boss, the name is the boss's, since
+    // every sim line that splices it (a yell, a death, a deed) is the boss's.
+    const bossShared = NAME_COLLISIONS.filter(
+      (c) => c.kind === 'mob' && c.ids.filter((id) => MOBS[id]?.boss).length === 1,
+    );
+    expect(bossShared.length, 'no boss-shared mob name: the arm is vacuous').toBeGreaterThan(0);
+    for (const c of bossShared) {
+      expect(MOBS[c.resolved]?.boss, `${c.name} must resolve to its boss`).toBe(true);
     }
   });
 

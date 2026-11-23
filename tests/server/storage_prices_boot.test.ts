@@ -11,7 +11,7 @@
 // quietly fall back in-sim, and a boot-REJECTED one can never apply.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const SOCKET_DEFAULTS = [1000000, 2000000, 3500000, 5000000];
+const SOCKET_DEFAULTS = [750000, 1000000, 1250000, 1500000];
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -25,14 +25,27 @@ const muted = () => ({
 });
 
 describe('the STORAGE_PRICES boot chain, executed end to end', () => {
+  it('rejects an old five-rung vault override and falls back to the ten-rung defaults', async () => {
+    vi.resetModules();
+    vi.stubEnv('STORAGE_PRICES', '{"vaultUpgrades":[20000,50000,100000,200000,400000]}');
+    const { err } = muted();
+    const { STORAGE_PRICES } = await import('../../server/storage_prices');
+    const { resolveStoragePrices } = await import('../../src/sim/storage_prices');
+    expect(STORAGE_PRICES).toBeUndefined();
+    expect(err.mock.calls.map((call) => call[0]).join(' ')).toContain('vaultUpgrades');
+    expect(resolveStoragePrices(STORAGE_PRICES).vaultUpgrades).toEqual([
+      20000, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000,
+    ]);
+  });
+
   it('a set env var reaches the exported constant, with the applied and rejection lines', async () => {
     vi.resetModules();
-    vi.stubEnv('STORAGE_PRICES', '{"bankSockets":[111111,2000000,3500000,5000000],"junkKey":1}');
+    vi.stubEnv('STORAGE_PRICES', '{"bankSockets":[111111,1000000,1250000,1500000],"junkKey":1}');
     const { err, log } = muted();
     const { STORAGE_PRICES } = await import('../../server/storage_prices');
     // 111111 is in no price table: a wiring drop (constant no longer fed by
     // the parse) cannot reproduce it by coincidence.
-    expect(STORAGE_PRICES).toStrictEqual({ bankSockets: [111111, 2000000, 3500000, 5000000] });
+    expect(STORAGE_PRICES).toStrictEqual({ bankSockets: [111111, 1000000, 1250000, 1500000] });
     expect(err.mock.calls.map((c) => c[0])).toStrictEqual([
       'STORAGE_PRICES: unknown key "junkKey"; the compiled default prices apply for it.',
     ]);
@@ -80,7 +93,10 @@ describe('the STORAGE_PRICES boot chain, executed end to end', () => {
 
   it('buildRealmSimConfig binds the SAME parsed override object into SimConfig', async () => {
     vi.resetModules();
-    vi.stubEnv('STORAGE_PRICES', '{"vaultUpgrades":[333,50000,100000,200000,400000]}');
+    vi.stubEnv(
+      'STORAGE_PRICES',
+      '{"vaultUpgrades":[333,40000,70000,120000,200000,320000,500000,750000,1100000,1600000]}',
+    );
     muted();
     const { buildRealmSimConfig } = await import('../../server/sim_boot_config');
     const mod = await import('../../server/storage_prices');
@@ -88,9 +104,18 @@ describe('the STORAGE_PRICES boot chain, executed end to end', () => {
     // dropped the journal wiring must not compile); this test has no journal,
     // so it says so with the exported inert constant.
     const { inertVaultConsumptionAdmission } = await import('../../src/sim/sim_context');
-    const cfg = buildRealmSimConfig(undefined, inertVaultConsumptionAdmission);
+    const cfg = buildRealmSimConfig(
+      undefined,
+      inertVaultConsumptionAdmission,
+      (_pid, deposit, withdraw) => {
+        deposit();
+        withdraw();
+        return true;
+      },
+      () => 'settled',
+    );
     expect(cfg.storagePrices).toStrictEqual({
-      vaultUpgrades: [333, 50000, 100000, 200000, 400000],
+      vaultUpgrades: [333, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000],
     });
     // Reference identity closes the chain: the builder hands the Sim the very
     // object the boot parse minted (the behavioral half of the tunables
@@ -112,8 +137,8 @@ describe('parser/resolver dual-validation agreement (QA 09)', () => {
     const candidates: unknown[] = [
       [0, 0, 0, 0],
       [1, 2, 3, 4],
-      [111111, 2000000, 3500000, 5000000],
-      [1000000, 2000000, 3500000, 5000000], // the compiled default restated
+      [111111, 1000000, 1250000, 1500000],
+      [750000, 1000000, 1250000, 1500000], // the compiled default restated
       [9007199254740991, 2, 3, 4],
       [9007199254740992, 2, 3, 4], // past MAX_SAFE_INTEGER: both reject
       [-1, 2, 3, 4],

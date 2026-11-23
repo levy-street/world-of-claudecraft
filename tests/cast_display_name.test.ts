@@ -10,6 +10,15 @@ import { castDisplayName, targetCastDisplayName } from '../src/ui/cast_display_n
 import { setLanguage, t } from '../src/ui/i18n';
 
 describe('castDisplayName', () => {
+  it.each([
+    ['ghost_captain_broadside', 'Spectral Broadside'],
+    ['ghost_captain_anchor', 'Cursed Anchor'],
+    ['ghost_captain_boarding', 'Phantom Boarding'],
+  ])('names the captain cast %s on both bars', (id, name) => {
+    setLanguage('en');
+    expect(castDisplayName(id)).toBe(name);
+    expect(targetCastDisplayName(id)).toBe(name);
+  });
   it('maps the named system casts to their abilityUi keys', () => {
     expect(castDisplayName(FISHING_CAST_ID)).toBe(t('abilityUi.cast.fishing'));
     expect(castDisplayName(CRAFT_CAST_ID)).toBe(t('abilityUi.cast.crafting'));

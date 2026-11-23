@@ -1,0 +1,687 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-worldquests-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 8,
+    "removedCategoryFallbacks": [
+      "exp_arcane_calligraphy",
+      "exp_arcane_calligraphy_gold",
+      "exp_forge_helper",
+      "exp_last_barricade",
+      "exp_borrowed_face",
+      "exp_windrider_slalom",
+      "exp_duskweave_dispatches",
+      "exp_wisp_maze"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "exp_arcane_calligraphy",
+      "family": "deed-worldquests",
+      "batchId": "deed-worldquests-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_arcane_calligraphy.webp",
+      "canonicalDisplayName": "A Steady Hand",
+      "acceptedSha256": "3f9380921480bd0b0fb1f4c45b9a019b4a3d4ed0e20ca7c52854c4e86d3c1ff7",
+      "acceptedBytes": 8150,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/originals/exp_arcane_calligraphy.png",
+        "sha256": "e658ad08959afc833b2623635493a4b0bace1dec5e4d58660592d02e527cf8c2",
+        "bytes": 2041720,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/masters/exp_arcane_calligraphy.png",
+        "sha256": "282d04a6976da9282bb1de561872dba5c9a1b59a2f686e1bb9844db387810c94",
+        "bytes": 440605,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for A Steady Hand (exp_arcane_calligraphy). Subject: A luminous ivory quill completing one clean geometric triangular rune above an old Eastbrook paving stone. Quill dominant, glowing blue tip touches the last corner of the triangle, restrained arcane blue on weathered golden stone. The triangle is a simple magical shape, no writing or alphabetic glyphs. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_arcane_calligraphy",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [145, 68, 1154, 1174],
+          "framedSubject": [409, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-worldquests-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-worldquests-icons-v045/exp_arcane_calligraphy-desktop.png",
+          "docs/screenshots/deed-worldquests-icons-v045/exp_arcane_calligraphy-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_arcane_calligraphy_gold",
+      "family": "deed-worldquests",
+      "batchId": "deed-worldquests-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_arcane_calligraphy_gold.webp",
+      "canonicalDisplayName": "Written in Starlight",
+      "acceptedSha256": "d4b8ec7762c2152e4f7337346139bcf261a94eb160d3cd8553b0e917d9b1c390",
+      "acceptedBytes": 10318,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/originals/exp_arcane_calligraphy_gold.png",
+        "sha256": "3eea3b99fa6b00654b523b703e8cdae834209fd219823d1a2f9e34eaf5150998",
+        "bytes": 2150888,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/masters/exp_arcane_calligraphy_gold.png",
+        "sha256": "37eaaaabde6de33ac302ed387baf0a1db1eb5a2bd768b31730ffcb9b70950f22",
+        "bytes": 426235,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Written in Starlight (exp_arcane_calligraphy_gold). Subject: A brilliant luminous ivory quill written in starlight with exactly five small completed geometric arcane shapes orbiting it: triangle, diamond, circle, pentagon and hexagon. A narrow bright gold laurel cradles the quill below, indicating Gold rating without text or numerals. Five distinct floating blue shapes, dominant feather quill, celestial blue and gold. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_arcane_calligraphy_gold",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [128, 44, 1130, 1192],
+          "framedSubject": [391, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-worldquests-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-worldquests-icons-v045/exp_arcane_calligraphy_gold-desktop.png",
+          "docs/screenshots/deed-worldquests-icons-v045/exp_arcane_calligraphy_gold-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_forge_helper",
+      "family": "deed-worldquests",
+      "batchId": "deed-worldquests-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_forge_helper.webp",
+      "canonicalDisplayName": "A Helping Hammer",
+      "acceptedSha256": "b0eda468920cf6a2849b5f9bbeda9f81d026bed7fcadb884d6620edc4948ee3d",
+      "acceptedBytes": 6624,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/originals/exp_forge_helper.png",
+        "sha256": "47a8a456dd8989cbadd28a836f61c54d1d52d462205d33252b0e2c6cc7b7226a",
+        "bytes": 1659396,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/masters/exp_forge_helper.png",
+        "sha256": "b022fbfde212dd66dec0f86a7b384aae026b99319b76ec93b4e089d8c6e6d403",
+        "bytes": 366291,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for A Helping Hammer (exp_forge_helper). Subject: A smith's stout hammer crossing a newly finished kite shield above a small dark iron anvil. The shield has a clean warm brass rim and polished slate steel face, the hammer has a simple dark head and wrapped handle. Shield and crossed hammer are the dominant silhouette, warm forge brass highlights on dark iron. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_forge_helper",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [146, 64, 1109, 1178],
+          "framedSubject": [387, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-worldquests-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-worldquests-icons-v045/exp_forge_helper-desktop.png",
+          "docs/screenshots/deed-worldquests-icons-v045/exp_forge_helper-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_last_barricade",
+      "family": "deed-worldquests",
+      "batchId": "deed-worldquests-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_last_barricade.webp",
+      "canonicalDisplayName": "The Last Barricade",
+      "acceptedSha256": "2bffc76746a25bffff391153452c01449f9d9bd064f1dd0011bb98c3f84da429",
+      "acceptedBytes": 9452,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/originals/exp_last_barricade.png",
+        "sha256": "963058d11ab38fbe95144bda19ad92fb48a17f67752d945f9ab04925bd1b1e60",
+        "bytes": 2120725,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/masters/exp_last_barricade.png",
+        "sha256": "e373247ff6fae9a2e6dfa11855300a30470d125c97c8617905f93b2912b3b0ce",
+        "bytes": 423532,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for The Last Barricade (exp_last_barricade). Subject: A compact sturdy timber barricade of sharpened wooden stakes holding against three grasping skeletal hands from behind it. One bright golden crossbow bolt slants above the stakes, small forest-green leaves below, ember gold highlights on old timber. Barricade dominant, defiant protective mood, no gore. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_last_barricade",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [91, 94, 1169, 1177],
+          "framedSubject": [430, 432],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-worldquests-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-worldquests-icons-v045/exp_last_barricade-desktop.png",
+          "docs/screenshots/deed-worldquests-icons-v045/exp_last_barricade-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_borrowed_face",
+      "family": "deed-worldquests",
+      "batchId": "deed-worldquests-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_borrowed_face.webp",
+      "canonicalDisplayName": "A Borrowed Face",
+      "acceptedSha256": "6b65ac593174b01ff6b307e5915dda39e3202dc877e26967c0df58864d4b6068",
+      "acceptedBytes": 7462,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/originals/exp_borrowed_face.png",
+        "sha256": "5174496bb4db79fe648879e0f3270bc952af1f59d1483ae3de52f10f8e7f174a",
+        "bytes": 2264988,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/masters/exp_borrowed_face.png",
+        "sha256": "5f718b8bf5a9b1ce3b0d7b94c6299fbe126b046d678ce1a27c6eaae9bb8fb8f7",
+        "bytes": 426556,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for A Borrowed Face (exp_borrowed_face). Subject: A cracked silver-blue watchman's face mask revealing one sinister shadowed eye beneath its broken edge. A small brass-rimmed magnifying lens and torn red wax seal sit beside it. Mask dominant, muted blue and silver, clear split between disguise and hidden eye, no paper writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_borrowed_face",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [83, 67, 1191, 1180],
+          "framedSubject": [425, 427],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-worldquests-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-worldquests-icons-v045/exp_borrowed_face-desktop.png",
+          "docs/screenshots/deed-worldquests-icons-v045/exp_borrowed_face-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_windrider_slalom",
+      "family": "deed-worldquests",
+      "batchId": "deed-worldquests-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_windrider_slalom.webp",
+      "canonicalDisplayName": "Windrider Slalom",
+      "acceptedSha256": "57a525d56afacdce3d23593f84a64706df9a05019976bf1cf0c62d9de9e5cf6d",
+      "acceptedBytes": 7952,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/originals/exp_windrider_slalom.png",
+        "sha256": "5d1e6655fa4b360b8c1956532337dfb8c9c9ca080418162f9056c2d91221f2f4",
+        "bytes": 2059365,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/masters/exp_windrider_slalom.png",
+        "sha256": "2284b2b4e2107307719daeaa172839d3b8e1dfee8cf72e7e377385450ff65f75",
+        "bytes": 441908,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Windrider Slalom (exp_windrider_slalom). Subject: A small mechanical glider banking through a single thick gold course ring above a miniature steep red-rock canyon. Glider has broad pale blue canvas wings on a weathered bronze frame and a small mechanical tail, no person. The glider and course ring dominate. Sky blue, sandstone and weathered bronze; canyon scenery contained inside compact emblem. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_windrider_slalom",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [70, 76, 1186, 1158],
+          "framedSubject": [438, 425],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-worldquests-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-worldquests-icons-v045/exp_windrider_slalom-desktop.png",
+          "docs/screenshots/deed-worldquests-icons-v045/exp_windrider_slalom-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_duskweave_dispatches",
+      "family": "deed-worldquests",
+      "batchId": "deed-worldquests-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_duskweave_dispatches.webp",
+      "canonicalDisplayName": "Duskweave Dispatches",
+      "acceptedSha256": "785502e39ab986283b0c129294dbb9b3c6733ca97a03188558a6f43139235d3c",
+      "acceptedBytes": 6592,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/originals/exp_duskweave_dispatches.png",
+        "sha256": "fcc0acc7758d1c70a16d4f3597cb09a1059866053667466265f107267b383b02",
+        "bytes": 1887682,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/masters/exp_duskweave_dispatches.png",
+        "sha256": "3d86e3702b6bb24b92cc197153261ec0adda97db0299db219fe7d3b579648c81",
+        "bytes": 405351,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Duskweave Dispatches (exp_duskweave_dispatches). Subject: One sealed cream parchment dispatch slipping beneath the sweeping edge of a rich violet enchanted cloak beside a small hooded bronze lantern. A prominent red wax seal on the blank folded paper, no visible writing. Cloak forms compact hooded silhouette with no face or person, dusk purple, wax red and warm lantern glow. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_duskweave_dispatches",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [67, 50, 1178, 1172],
+          "framedSubject": [443, 447],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-worldquests-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-worldquests-icons-v045/exp_duskweave_dispatches-desktop.png",
+          "docs/screenshots/deed-worldquests-icons-v045/exp_duskweave_dispatches-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "exp_wisp_maze",
+      "family": "deed-worldquests",
+      "batchId": "deed-worldquests-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/exp_wisp_maze.webp",
+      "canonicalDisplayName": "A Light in the Maze",
+      "acceptedSha256": "f10be569dcbe6d9e2d79eec74164a504831a1d986e70b828c344b6b7c19ea7d9",
+      "acceptedBytes": 8020,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/originals/exp_wisp_maze.png",
+        "sha256": "c4c467c09482663f93da5534035d1af314a352177353e8f2336809ee77d55ee8",
+        "bytes": 2017349,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-worldquests/masters/exp_wisp_maze.png",
+        "sha256": "d7d970d2a8d3fab04bbabaead564d7474ba385d7d0a3fe68bd800356660d7699",
+        "bytes": 432476,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for A Light in the Maze (exp_wisp_maze). Subject: A bright small cyan-green wisp guides the way through a compact miniature maze of deep green hedges toward two recovered brown leather coin purses with a few gold coins at an open exit. Wisp, purses and a simple clear winding hedge corridor form one compact emblem. Fresh Evergarden green, cyan wisp light and warm gold, no lettering or numbers. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "exp_wisp_maze",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [51, 91, 1203, 1156],
+          "framedSubject": [427, 395],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-worldquests-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-worldquests-icons-v045/exp_wisp_maze-desktop.png",
+          "docs/screenshots/deed-worldquests-icons-v045/exp_wisp_maze-mobile.png"
+        ]
+      }
+    }
+  ]
+}

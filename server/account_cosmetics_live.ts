@@ -29,6 +29,15 @@ export function mergeAccountCosmetics(a: AccountCosmetics, b: AccountCosmetics):
     weaponSkinIds: [...new Set([...(a.weaponSkinIds ?? []), ...(b.weaponSkinIds ?? [])])],
     weaponSkinLoadout: { ...(b.weaponSkinLoadout ?? {}) },
     mountSkinIds: [...new Set([...(a.mountSkinIds ?? []), ...(b.mountSkinIds ?? [])])],
+    // Item ownership is replaceable and revocable. Persistence snapshots from
+    // paid grant writes omit it, so they cannot undo the live item projection.
+    ...(b.collectibleMountSkinIds !== undefined || a.collectibleMountSkinIds !== undefined
+      ? {
+          collectibleMountSkinIds: [
+            ...(b.collectibleMountSkinIds ?? a.collectibleMountSkinIds ?? []),
+          ],
+        }
+      : {}),
   };
 }
 

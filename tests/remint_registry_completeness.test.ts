@@ -114,8 +114,11 @@ describe('remint registry completeness', () => {
     // Non-vacuity: the registry really does wire families in, so an empty parse
     // (a refactor to a different import spelling) cannot pass the arm above by
     // emptying the family side instead of the registry side. Held at the
-    // shipped count, so a family dropped from BOTH sides still reds.
-    expect(registered.size, 'families wired into the registry').toBe(9);
+    // shipped count, so a family dropped from BOTH sides still reds. 17: the
+    // nine before plus the Mirefen muster and Balgath families (balgath_boulder,
+    // balgath_starwake, craterglass_stave, guttered_eye, muster_camp,
+    // muster_effigy, muster_grapnel, muster_standard) at the v0.45.0 integration.
+    expect(registered.size, 'families wired into the registry').toBe(17);
   });
 
   it('every family the registry imports still exists on disk', () => {

@@ -1,51 +1,30 @@
 // The pure core of the shapeshift form adornments (Moonwing Form's antlers,
-// crescent and wings; Gloamveil's veil). Pins WHAT a rig wears for each form
-// flag and body kind, and the pose math the THREE painters apply every frame.
+// crescent and wings). Pins WHAT a rig wears for the form flag and body kind,
+// and the pose math the THREE painter applies every frame. Gloamveil wears no
+// adornment: its look is tests/gloam_climb_core.test.ts and its neighbours.
 import { describe, expect, it } from 'vitest';
 import {
   createMoonwingPose,
   formAdornmentPlan,
-  gloamveilEyeGlow,
   MOONWING_UNFURL_SECONDS,
   moonwingPoseInto,
 } from '../src/render/characters/form_adornment_core';
 
 describe('formAdornmentPlan', () => {
   it('grows the antlers back only on a composed Moonwing body', () => {
-    expect(formAdornmentPlan(true, false, 'composed')).toEqual({
-      moonwing: true,
-      antlers: true,
-      gloamveil: false,
-    });
+    expect(formAdornmentPlan(true, 'composed')).toEqual({ moonwing: true, antlers: true });
     // The legacy druid.glb rig wears its own antlered hood, and a mech body is
     // a whole replacement: crescent and wings, never a second pair of antlers.
     for (const body of ['classRig', 'replacement'] as const) {
-      expect(formAdornmentPlan(true, false, body)).toEqual({
-        moonwing: true,
-        antlers: false,
-        gloamveil: false,
-      });
+      expect(formAdornmentPlan(true, body)).toEqual({ moonwing: true, antlers: false });
     }
   });
 
-  it('veils a KayKit face in Gloamveil, never a replacement body', () => {
-    for (const body of ['composed', 'classRig'] as const) {
-      expect(formAdornmentPlan(false, true, body)).toEqual({
-        moonwing: false,
-        antlers: false,
-        gloamveil: true,
-      });
-    }
-    expect(formAdornmentPlan(false, true, 'replacement').gloamveil).toBe(false);
-  });
-
-  it('wears nothing outside the two forms', () => {
+  it('wears nothing outside Moonwing, and plans no piece for any other form', () => {
     for (const body of ['composed', 'classRig', 'replacement'] as const) {
-      expect(formAdornmentPlan(false, false, body)).toEqual({
-        moonwing: false,
-        antlers: false,
-        gloamveil: false,
-      });
+      // The whole plan, key for key: a piece planned for Gloamveil (the face
+      // veil this core used to carry) would show up here as a third key.
+      expect(formAdornmentPlan(false, body)).toEqual({ moonwing: false, antlers: false });
     }
   });
 });
@@ -104,22 +83,5 @@ describe('moonwingPoseInto', () => {
   it('writes into and returns the caller-owned pose (no per-frame allocation)', () => {
     const pose = createMoonwingPose();
     expect(moonwingPoseInto(1, false, false, false, pose)).toBe(pose);
-  });
-});
-
-describe('gloamveilEyeGlow', () => {
-  it('smoulders within a narrow band and holds steady under reduced motion', () => {
-    let low = Infinity;
-    let high = -Infinity;
-    for (let t = 0; t < 10; t += 0.05) {
-      const glow = gloamveilEyeGlow(t, false);
-      low = Math.min(low, glow);
-      high = Math.max(high, glow);
-    }
-    expect(low).toBeGreaterThanOrEqual(0.84);
-    expect(high).toBeLessThanOrEqual(1);
-    expect(high - low).toBeGreaterThan(0.1);
-    expect(gloamveilEyeGlow(0.7, true)).toBe(1);
-    expect(gloamveilEyeGlow(3.1, true)).toBe(1);
   });
 });

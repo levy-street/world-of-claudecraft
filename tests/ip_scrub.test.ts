@@ -282,6 +282,14 @@ const KEEP_EXEMPTIONS: { entry: string; value: string; fieldIncludes: string }[]
   // Scoped to exactly these two fields: any other 'Infernal' still fails the gate.
   { entry: 'Infernal', value: 'The Infernal Citadel', fieldIncludes: 'rift.place.infernalCitadel' },
   { entry: 'Infernal', value: 'Infernal Citadel', fieldIncludes: 'rift.place.theme.infernal' },
+  // PROVISIONAL, pending the maintainer's sign-off on the PR: the Crucible hunter
+  // quiver (src/sim/content/ignivar_loot.ts) is named Infernal Quiver at the
+  // operator's request. The denylist arms 'Infernal' for the warlock demon pet; here
+  // it is the adjective on a quiver, and the only exact-phrase hit is a Path of
+  // Exile cosmetic skin, not a gear item. Scoped to the item def and its catalog
+  // name (both fields end in items.infernal_quiver.name); any other 'Infernal'
+  // still fails the gate.
+  { entry: 'Infernal', value: 'Infernal Quiver', fieldIncludes: 'items.infernal_quiver.name' },
 ];
 function isKeptException(field: string, value: string, entry: string): boolean {
   return KEEP_EXEMPTIONS.some(
@@ -680,6 +688,29 @@ describe('ip_scrub - verbatim-WoW denylist scanner (G0)', () => {
     for (const entry of PHASE03_ENTRIES) {
       expect(fired.has(entry), `hardcoded arm "${entry}" never fired on the fixture`).toBe(true);
     }
+  });
+
+  it('teeth: the Infernal Quiver exemption is scoped to that one item name', () => {
+    const hits = (field: string, value: string): Violation[] => {
+      const out: Violation[] = [];
+      scanNameValue(field, 'fixture', value, false, out);
+      return out;
+    };
+    // Positive control: the exempted value on its own item is clean, in the sim
+    // def layer and the resolved English catalog layer alike.
+    expect(hits('items.infernal_quiver.name', 'Infernal Quiver')).toEqual([]);
+    expect(hits('i18n.en.entities.items.infernal_quiver.name', 'Infernal Quiver')).toEqual([]);
+    // The 'Infernal' arm still fires on the same value on any other item.
+    for (const field of ['items.other_item.name', 'items.heroic_infernal_quiver.name']) {
+      expect(
+        hits(field, 'Infernal Quiver').map((v) => v.denylistEntry),
+        field,
+      ).toEqual(['Infernal']);
+    }
+    // And on any other 'Infernal' value on the exempted item itself.
+    expect(
+      hits('items.infernal_quiver.name', 'Infernal Blade').map((v) => v.denylistEntry),
+    ).toEqual(['Infernal']);
   });
 
   it("teeth: reports ZERO hits on the game's own original names", () => {

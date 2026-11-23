@@ -62,10 +62,16 @@ concurrency:
 # ref" step gain the same floor with no retry wrapper and no auto-rerun
 # coverage (not a checkout step), so a trickle-abort there fails the
 # minutes-long lint job fast and takes a manual rerun; that beats a
-# 15-minute bound ride. Values pinned by tests/ci_workflow.test.ts.
+# 15-minute bound ride. Raised the low-speed time window from 120 to 240 on
+# 2026-10-27: on five merge_group runs on 2026-10-25 (40149100934, 40148716850,
+# 40148093188, 40145607176, 40150638622), git checkout under filter: blob:none
+# requested ~26,000 missing blob OIDs from the promisor remote across 10
+# concurrent test jobs, and server-side pack-header assembly exceeded 120s
+# before the first byte streamed, aborting git checkout with curl 28 (which
+# actions/checkout does not retry). Values pinned by tests/ci_workflow.test.ts.
 env:
   GIT_HTTP_LOW_SPEED_LIMIT: '1000'
-  GIT_HTTP_LOW_SPEED_TIME: '120'
+  GIT_HTTP_LOW_SPEED_TIME: '240'
 
 # Two-tier i18n gate, split by git ref in this one file. Each tier is a parallel
 # pair (tests job + checks job, no needs edge either way) so wall clock is
@@ -272,6 +278,122 @@ jobs:
         # commit object, which the next step fetches with --depth=1 when missing.
         # Full-history checkout was pure waste: it dominated the job wall time.
         uses: actions/checkout@v6
+        with:
+          # Same blobless sparse cone as pr-gate's checkout (rationale and
+          # the reader coupling live there); pinned identical by
+          # tests/ci_workflow.test.ts. biome.json excludes !docs/screenshots.
+          sparse-checkout: |
+            /*
+            !/docs/screenshots/*/
+            /docs/screenshots/admin-cheater-mark/
+            /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/aura-tracks/
+            /docs/screenshots/balgath-shardpike/
+            /docs/screenshots/bank-storage-charters/
+            /docs/screenshots/bank-vault-tab/
+            /docs/screenshots/bastion-ghost-crew/
+            /docs/screenshots/buried-hoard-entrance/
+            /docs/screenshots/buried-hoard-valley/
+            /docs/screenshots/clue-character-panel/
+            /docs/screenshots/clue-icons-v045/
+            /docs/screenshots/confection-cascade/
+            /docs/screenshots/confection-cascade-v3/
+            /docs/screenshots/confection-cascade-v4/
+            /docs/screenshots/confection-cascade-v5/
+            /docs/screenshots/confection-cascade-v6/
+            /docs/screenshots/confection-cascade-v7/
+            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/deed-adventures-icons-v045/
+            /docs/screenshots/deed-bastion-icons-v045/
+            /docs/screenshots/deed-border-cartouche/
+            /docs/screenshots/deed-crucible-icons-v045/
+            /docs/screenshots/deed-crypt-icons-v045/
+            /docs/screenshots/deed-factions-icons-v045/
+            /docs/screenshots/deed-foundations-icons-v045/
+            /docs/screenshots/deed-gravewyrm-icons-v045/
+            /docs/screenshots/deed-temple-icons-v045/
+            /docs/screenshots/deed-wildheart-icons-v045/
+            /docs/screenshots/deed-worldquests-icons-v045/
+            /docs/screenshots/dungeon-bastion-blues-icons-v045/
+            /docs/screenshots/dungeon-bastion-icons-v045/
+            /docs/screenshots/dungeon-crypt-blues-icons-v045/
+            /docs/screenshots/dungeon-crypt-icons-v045/
+            /docs/screenshots/dungeon-gravewyrm-icons-v045/
+            /docs/screenshots/dungeon-temple-blues-icons-v045/
+            /docs/screenshots/dungeon-temple-icons-v045/
+            /docs/screenshots/dungeon-wildheart-icons-v045/
+            /docs/screenshots/eastbrook-ferry/
+            /docs/screenshots/dungeon-groups/
+            /docs/screenshots/eastbrook-grand-armoury/
+            /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/faction-automaton-icons-v045/
+            /docs/screenshots/faction-church-icons-v045/
+            /docs/screenshots/faction-rift-icons-v045/
+            /docs/screenshots/far-foliage-impostors/
+            /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/first-person-view/
+            /docs/screenshots/guild-bank-history/
+            /docs/screenshots/guild-bank-tab/
+            /docs/screenshots/guild-pledge-board/
+            /docs/screenshots/guild-social-v1/
+            /docs/screenshots/highwatch-guild/
+            /docs/screenshots/harvest-button-refresh/
+            /docs/screenshots/haunted-pumpkins/
+            /docs/screenshots/hoard-arcane-icons-v045/
+            /docs/screenshots/hoard-brute-icons-v045/
+            /docs/screenshots/hoard-ember-icons-v045/
+            /docs/screenshots/hoard-frost-icons-v045/
+            /docs/screenshots/hoard-necro-icons-v045/
+            /docs/screenshots/hoard-storm-icons-v045/
+            /docs/screenshots/hoard-tide-icons-v045/
+            /docs/screenshots/hoard-venom-icons-v045/
+            /docs/screenshots/horse-whistle-v045/
+            /docs/screenshots/icon-backlog-v045-surfaces/
+            /docs/screenshots/ignivar-raid/
+            /docs/screenshots/ignivar-raid-expansion/
+            /docs/screenshots/intentional-gathering-pr1/
+            /docs/screenshots/intentional-gathering-pr2/
+            /docs/screenshots/interface-redesign/
+            /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/ley-beam-v1/
+            /docs/screenshots/market-house-redesign/
+            /docs/screenshots/masterwrought-art-completion-2026-09-02/
+            /docs/screenshots/membership/
+            /docs/screenshots/membership-courier/
+            /docs/screenshots/missing-skills-v045/
+            /docs/screenshots/placeholder-art-completion-2026-08-09/
+            /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/ravenrift-battleground/
+            /docs/screenshots/referral-armour/
+            /docs/screenshots/referral-cards/
+            /docs/screenshots/referral-portrait-render-2026-10-09/
+            /docs/screenshots/referral-rewards-v045/
+            /docs/screenshots/release-v036-skill-normalization-2026-08-10/
+            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/rewards-icons-v045/
+            /docs/screenshots/scenery-windows-4070-2026-10-15/
+            /docs/screenshots/target-dots/
+            /docs/screenshots/touch-ui-rework/
+            /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warfare-season2-druid-icons/
+            /docs/screenshots/warfare-season2-hunter-icons/
+            /docs/screenshots/warfare-season2-mage-icons/
+            /docs/screenshots/warfare-season2-paladin-icons/
+            /docs/screenshots/warfare-season2-priest-icons/
+            /docs/screenshots/warfare-season2-rogue-icons/
+            /docs/screenshots/warfare-season2-shaman-icons/
+            /docs/screenshots/warfare-season2-warlock-icons/
+            /docs/screenshots/warfare-season2-warrior-icons/
+            /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
+            /docs/screenshots/world-quest-cannon/
+            /docs/screenshots/world-quest-horde/
+            /docs/screenshots/world-quest-investigation/
+            /docs/screenshots/world-quest-puzzle-polish/
+          sparse-checkout-cone-mode: false
+          # Explicit for the reader; the sparse-checkout input
+          # already implies it (matching the changes job's step).
+          filter: blob:none
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -366,13 +488,137 @@ jobs:
     # contains the slowest observed cold Playwright Chromium install (2.33
     # minutes), so 10 keeps a 2.7x margin over a cold-cache day. Its one
     # stalled run sat 17.5 minutes in checkout inside an 18.4 minute wall
-    # (run 31107474546).
-    timeout-minutes: 10
+    # (run 31107474546). Raised to 12 on the v0.45.0 integration: the suite
+    # grew to a 6.2 minute healthy wall (run 39354039920) and now runs in two
+    # sessions (about a minute more), so 12 keeps room for a cold Chromium
+    # install while still killing a checkout stall well short of 18 minutes.
+    # Raised to 18 on 2026-10-27: merge_group runs 40156081869 and 40150638622
+    # passed both browser sessions at 12m00s after an 8 to 9 minute full-tree
+    # checkout and were bound-killed during Post Set up Node.js; applying the
+    # 1.60 x 1.37 slow-runner formula to the 7.2 minute two-session healthy
+    # wall plus cold Chromium headroom gives 18 minutes.
+    timeout-minutes: 18
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          # Same blobless sparse cone as pr-gate's checkout (rationale and
+          # the reader coupling live there); pinned identical by
+          # tests/ci_workflow.test.ts.
+          sparse-checkout: |
+            /*
+            !/docs/screenshots/*/
+            /docs/screenshots/admin-cheater-mark/
+            /docs/screenshots/admin-guild-bank-panel/
+            /docs/screenshots/aura-tracks/
+            /docs/screenshots/balgath-shardpike/
+            /docs/screenshots/bank-storage-charters/
+            /docs/screenshots/bank-vault-tab/
+            /docs/screenshots/bastion-ghost-crew/
+            /docs/screenshots/buried-hoard-entrance/
+            /docs/screenshots/buried-hoard-valley/
+            /docs/screenshots/clue-character-panel/
+            /docs/screenshots/clue-icons-v045/
+            /docs/screenshots/confection-cascade/
+            /docs/screenshots/confection-cascade-v3/
+            /docs/screenshots/confection-cascade-v4/
+            /docs/screenshots/confection-cascade-v5/
+            /docs/screenshots/confection-cascade-v6/
+            /docs/screenshots/confection-cascade-v7/
+            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/deed-adventures-icons-v045/
+            /docs/screenshots/deed-bastion-icons-v045/
+            /docs/screenshots/deed-border-cartouche/
+            /docs/screenshots/deed-crucible-icons-v045/
+            /docs/screenshots/deed-crypt-icons-v045/
+            /docs/screenshots/deed-factions-icons-v045/
+            /docs/screenshots/deed-foundations-icons-v045/
+            /docs/screenshots/deed-gravewyrm-icons-v045/
+            /docs/screenshots/deed-temple-icons-v045/
+            /docs/screenshots/deed-wildheart-icons-v045/
+            /docs/screenshots/deed-worldquests-icons-v045/
+            /docs/screenshots/dungeon-bastion-blues-icons-v045/
+            /docs/screenshots/dungeon-bastion-icons-v045/
+            /docs/screenshots/dungeon-crypt-blues-icons-v045/
+            /docs/screenshots/dungeon-crypt-icons-v045/
+            /docs/screenshots/dungeon-gravewyrm-icons-v045/
+            /docs/screenshots/dungeon-temple-blues-icons-v045/
+            /docs/screenshots/dungeon-temple-icons-v045/
+            /docs/screenshots/dungeon-wildheart-icons-v045/
+            /docs/screenshots/eastbrook-ferry/
+            /docs/screenshots/dungeon-groups/
+            /docs/screenshots/eastbrook-grand-armoury/
+            /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/faction-automaton-icons-v045/
+            /docs/screenshots/faction-church-icons-v045/
+            /docs/screenshots/faction-rift-icons-v045/
+            /docs/screenshots/far-foliage-impostors/
+            /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/first-person-view/
+            /docs/screenshots/guild-bank-history/
+            /docs/screenshots/guild-bank-tab/
+            /docs/screenshots/guild-pledge-board/
+            /docs/screenshots/guild-social-v1/
+            /docs/screenshots/highwatch-guild/
+            /docs/screenshots/harvest-button-refresh/
+            /docs/screenshots/haunted-pumpkins/
+            /docs/screenshots/hoard-arcane-icons-v045/
+            /docs/screenshots/hoard-brute-icons-v045/
+            /docs/screenshots/hoard-ember-icons-v045/
+            /docs/screenshots/hoard-frost-icons-v045/
+            /docs/screenshots/hoard-necro-icons-v045/
+            /docs/screenshots/hoard-storm-icons-v045/
+            /docs/screenshots/hoard-tide-icons-v045/
+            /docs/screenshots/hoard-venom-icons-v045/
+            /docs/screenshots/horse-whistle-v045/
+            /docs/screenshots/icon-backlog-v045-surfaces/
+            /docs/screenshots/ignivar-raid/
+            /docs/screenshots/ignivar-raid-expansion/
+            /docs/screenshots/intentional-gathering-pr1/
+            /docs/screenshots/intentional-gathering-pr2/
+            /docs/screenshots/interface-redesign/
+            /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/ley-beam-v1/
+            /docs/screenshots/market-house-redesign/
+            /docs/screenshots/masterwrought-art-completion-2026-09-02/
+            /docs/screenshots/membership/
+            /docs/screenshots/membership-courier/
+            /docs/screenshots/missing-skills-v045/
+            /docs/screenshots/placeholder-art-completion-2026-08-09/
+            /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/ravenrift-battleground/
+            /docs/screenshots/referral-armour/
+            /docs/screenshots/referral-cards/
+            /docs/screenshots/referral-portrait-render-2026-10-09/
+            /docs/screenshots/referral-rewards-v045/
+            /docs/screenshots/release-v036-skill-normalization-2026-08-10/
+            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/rewards-icons-v045/
+            /docs/screenshots/scenery-windows-4070-2026-10-15/
+            /docs/screenshots/target-dots/
+            /docs/screenshots/touch-ui-rework/
+            /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warfare-season2-druid-icons/
+            /docs/screenshots/warfare-season2-hunter-icons/
+            /docs/screenshots/warfare-season2-mage-icons/
+            /docs/screenshots/warfare-season2-paladin-icons/
+            /docs/screenshots/warfare-season2-priest-icons/
+            /docs/screenshots/warfare-season2-rogue-icons/
+            /docs/screenshots/warfare-season2-shaman-icons/
+            /docs/screenshots/warfare-season2-warlock-icons/
+            /docs/screenshots/warfare-season2-warrior-icons/
+            /docs/screenshots/wildheart/
+            /docs/screenshots/woc-market/
+            /docs/screenshots/world-quest-cannon/
+            /docs/screenshots/world-quest-horde/
+            /docs/screenshots/world-quest-investigation/
+            /docs/screenshots/world-quest-puzzle-polish/
+          sparse-checkout-cone-mode: false
+          # Explicit for the reader; the sparse-checkout input
+          # already implies it (matching the changes job's step).
+          filter: blob:none
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -427,20 +673,39 @@ jobs:
         # only when no route produced the fonts the suite demonstrably
         # needs. Worst-case degraded wall is about 3.7 minutes on top of
         # the 3.73-minute healthy wall, inside this job's 10-minute bound.
+        # Swap mirror-list sources too: current runners resolve apt through
+        # /etc/apt/apt-mirrors.txt. Run each timeout as root so it can terminate
+        # privileged installer descendants before the next attempt takes the lock.
+        # The absolute Node path keeps the setup-node version under sudo.
         run: |
           npx playwright install chromium
-          if ! timeout -k 15 100 npx playwright install-deps chromium; then
+          sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' /etc/apt/apt-mirrors.txt /etc/apt/apt-security-mirrors.txt /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list 2>/dev/null || true
+          if sudo timeout -k 15 100 "$(command -v node)" node_modules/playwright/cli.js install-deps chromium; then
+            echo "Chromium OS dependencies installed"
+          else
             echo "install-deps unavailable (exit $?); verifying CJK font coverage directly"
             if ! fc-list :lang=ja | grep -q .; then
-              sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list 2>/dev/null || true
-              timeout -k 15 60 sudo apt-get update || true
-              timeout -k 15 90 sudo apt-get install -y --no-install-recommends fonts-noto-cjk || true
+              sudo timeout -k 15 60 apt-get update || true
+              sudo timeout -k 15 90 apt-get install -y --no-install-recommends fonts-noto-cjk || true
             fi
             fc-list :lang=ja | grep -q . || { echo "no CJK font coverage by any route; the browser suite cannot pass without it"; exit 1; }
           fi
 
       - name: Run browser regressions
-        run: npm run test:browser
+        # Two halves in two fresh browser and dev-server sessions, one after the
+        # other. On the v0.45.0 integration one long session intermittently lost
+        # its server connection at the 48th file (varkhul_assembly_links_visual;
+        # Chromium itself stayed healthy and exited cleanly), which skipped the
+        # remaining 29 files. Both halves always run and either failing fails the
+        # step, so no file is ever skipped. DEBUG=pw:browser echoes Chromium's
+        # stderr in case the drop moves; remove it once the cause is understood.
+        env:
+          DEBUG: pw:browser
+        run: |
+          status=0
+          npm run test:browser -- --shard=1/2 || status=1
+          npm run test:browser -- --shard=2/2 || status=1
+          exit "$status"
 
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
@@ -549,7 +814,17 @@ jobs:
     # packing, never from the simulation (the review round showed a
     # simulated 9.79m flat pack against a real 11.21m when one modeling
     # assumption was wrong).
-    timeout-minutes: 37
+    # 2026-10-25 v0.45 re-derivation: run 40134416344 at 8a9bd02c
+    # was SELECTIVE; its completed healthy shard 6 took 35m52s. Shard 5
+    # (attempt 1) and shard 7 (attempt 2) reached the 37-minute limit with
+    # passing tests still running. Use the completed wall, not an estimate
+    # from either cancelled leg: (35 + 52/60) x 1.60 x 1.37 = 78.62,
+    # rounded up to 79. Selection, worker counts, and test coverage stay
+    # unchanged. This workflow edit widens its own PR run to FULL, so that
+    # run cannot be used to remeasure selective performance. The queue's
+    # 90-minute response ceiling leaves only 3 minutes beyond the maximum
+    # 8 + 79 required path; actual FULL walls must be monitored separately.
+    timeout-minutes: 79
     runs-on: ubuntu-latest
 
     # The real-SQL merge bar (ruling R16, recorded in the woc-marketplace
@@ -621,7 +896,7 @@ jobs:
           # directories join the corpus automatically) and requires SET
           # EQUALITY with this list, so a reference this cone omits, or a
           # cone entry nothing references anymore, fails the pin in the same
-          # change. pr-checks, browser-gate, release-checks, and
+          # change. pr-checks, release-checks, and
           # release-version-gate deliberately keep the full tree.
           sparse-checkout: |
             /*
@@ -629,28 +904,67 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/aura-tracks/
+            /docs/screenshots/balgath-shardpike/
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
+            /docs/screenshots/bastion-ghost-crew/
             /docs/screenshots/buried-hoard-entrance/
             /docs/screenshots/buried-hoard-valley/
             /docs/screenshots/clue-character-panel/
-            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/clue-icons-v045/
             /docs/screenshots/confection-cascade/
             /docs/screenshots/confection-cascade-v3/
             /docs/screenshots/confection-cascade-v4/
             /docs/screenshots/confection-cascade-v5/
             /docs/screenshots/confection-cascade-v6/
             /docs/screenshots/confection-cascade-v7/
+            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/deed-adventures-icons-v045/
+            /docs/screenshots/deed-bastion-icons-v045/
             /docs/screenshots/deed-border-cartouche/
+            /docs/screenshots/deed-crucible-icons-v045/
+            /docs/screenshots/deed-crypt-icons-v045/
+            /docs/screenshots/deed-factions-icons-v045/
+            /docs/screenshots/deed-foundations-icons-v045/
+            /docs/screenshots/deed-gravewyrm-icons-v045/
+            /docs/screenshots/deed-temple-icons-v045/
+            /docs/screenshots/deed-wildheart-icons-v045/
+            /docs/screenshots/deed-worldquests-icons-v045/
+            /docs/screenshots/dungeon-bastion-blues-icons-v045/
+            /docs/screenshots/dungeon-bastion-icons-v045/
+            /docs/screenshots/dungeon-crypt-blues-icons-v045/
+            /docs/screenshots/dungeon-crypt-icons-v045/
+            /docs/screenshots/dungeon-gravewyrm-icons-v045/
+            /docs/screenshots/dungeon-temple-blues-icons-v045/
+            /docs/screenshots/dungeon-temple-icons-v045/
+            /docs/screenshots/dungeon-wildheart-icons-v045/
+            /docs/screenshots/eastbrook-ferry/
+            /docs/screenshots/dungeon-groups/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/faction-automaton-icons-v045/
+            /docs/screenshots/faction-church-icons-v045/
+            /docs/screenshots/faction-rift-icons-v045/
             /docs/screenshots/far-foliage-impostors/
             /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/first-person-view/
             /docs/screenshots/guild-bank-history/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-pledge-board/
             /docs/screenshots/guild-social-v1/
+            /docs/screenshots/highwatch-guild/
             /docs/screenshots/harvest-button-refresh/
+            /docs/screenshots/haunted-pumpkins/
+            /docs/screenshots/hoard-arcane-icons-v045/
+            /docs/screenshots/hoard-brute-icons-v045/
+            /docs/screenshots/hoard-ember-icons-v045/
+            /docs/screenshots/hoard-frost-icons-v045/
+            /docs/screenshots/hoard-necro-icons-v045/
+            /docs/screenshots/hoard-storm-icons-v045/
+            /docs/screenshots/hoard-tide-icons-v045/
+            /docs/screenshots/hoard-venom-icons-v045/
+            /docs/screenshots/horse-whistle-v045/
+            /docs/screenshots/icon-backlog-v045-surfaces/
             /docs/screenshots/ignivar-raid/
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/intentional-gathering-pr1/
@@ -660,13 +974,32 @@ jobs:
             /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
+            /docs/screenshots/membership/
+            /docs/screenshots/membership-courier/
+            /docs/screenshots/missing-skills-v045/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/ravenrift-battleground/
+            /docs/screenshots/referral-armour/
+            /docs/screenshots/referral-cards/
+            /docs/screenshots/referral-portrait-render-2026-10-09/
+            /docs/screenshots/referral-rewards-v045/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/rewards-icons-v045/
+            /docs/screenshots/scenery-windows-4070-2026-10-15/
             /docs/screenshots/target-dots/
             /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warfare-season2-druid-icons/
+            /docs/screenshots/warfare-season2-hunter-icons/
+            /docs/screenshots/warfare-season2-mage-icons/
+            /docs/screenshots/warfare-season2-paladin-icons/
+            /docs/screenshots/warfare-season2-priest-icons/
+            /docs/screenshots/warfare-season2-rogue-icons/
+            /docs/screenshots/warfare-season2-shaman-icons/
+            /docs/screenshots/warfare-season2-warlock-icons/
+            /docs/screenshots/warfare-season2-warrior-icons/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
             /docs/screenshots/world-quest-cannon/
@@ -714,8 +1047,9 @@ jobs:
       # the SAME PR; that scope cannot reach other PRs, merge_group runs,
       # release-gate, or the nightly, and the PR tier holds no secrets and a
       # read-only token. The key pins every node_modules-layout input
-      # (lockfile, vite config, .npmrc for node-linker, package.json for the
-      # packageManager pin) so a re-layout starts clean instead of restoring
+      # (lockfile, vite config, .npmrc for node-linker; package.json is omitted
+      # so release version bumps do not invalidate the store while pnpm-lock.yaml
+      # is unchanged) so a re-layout starts clean instead of restoring
       # a store vitest would discard or mis-resolve; no restore-keys for the
       # same reason. actions/cache saves only when the primary key missed, so
       # entries stay bounded: one 57-73 MB compressed entry per shard per
@@ -755,7 +1089,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc') }}
 
       # The shard entry regenerates the artifacts itself, once per job, BY
       # DESIGN (the S3 guard, guide freshness, and the git-subprocess suites
@@ -872,28 +1206,67 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/aura-tracks/
+            /docs/screenshots/balgath-shardpike/
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
+            /docs/screenshots/bastion-ghost-crew/
             /docs/screenshots/buried-hoard-entrance/
             /docs/screenshots/buried-hoard-valley/
             /docs/screenshots/clue-character-panel/
-            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/clue-icons-v045/
             /docs/screenshots/confection-cascade/
             /docs/screenshots/confection-cascade-v3/
             /docs/screenshots/confection-cascade-v4/
             /docs/screenshots/confection-cascade-v5/
             /docs/screenshots/confection-cascade-v6/
             /docs/screenshots/confection-cascade-v7/
+            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/deed-adventures-icons-v045/
+            /docs/screenshots/deed-bastion-icons-v045/
             /docs/screenshots/deed-border-cartouche/
+            /docs/screenshots/deed-crucible-icons-v045/
+            /docs/screenshots/deed-crypt-icons-v045/
+            /docs/screenshots/deed-factions-icons-v045/
+            /docs/screenshots/deed-foundations-icons-v045/
+            /docs/screenshots/deed-gravewyrm-icons-v045/
+            /docs/screenshots/deed-temple-icons-v045/
+            /docs/screenshots/deed-wildheart-icons-v045/
+            /docs/screenshots/deed-worldquests-icons-v045/
+            /docs/screenshots/dungeon-bastion-blues-icons-v045/
+            /docs/screenshots/dungeon-bastion-icons-v045/
+            /docs/screenshots/dungeon-crypt-blues-icons-v045/
+            /docs/screenshots/dungeon-crypt-icons-v045/
+            /docs/screenshots/dungeon-gravewyrm-icons-v045/
+            /docs/screenshots/dungeon-temple-blues-icons-v045/
+            /docs/screenshots/dungeon-temple-icons-v045/
+            /docs/screenshots/dungeon-wildheart-icons-v045/
+            /docs/screenshots/eastbrook-ferry/
+            /docs/screenshots/dungeon-groups/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/faction-automaton-icons-v045/
+            /docs/screenshots/faction-church-icons-v045/
+            /docs/screenshots/faction-rift-icons-v045/
             /docs/screenshots/far-foliage-impostors/
             /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/first-person-view/
             /docs/screenshots/guild-bank-history/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-pledge-board/
             /docs/screenshots/guild-social-v1/
+            /docs/screenshots/highwatch-guild/
             /docs/screenshots/harvest-button-refresh/
+            /docs/screenshots/haunted-pumpkins/
+            /docs/screenshots/hoard-arcane-icons-v045/
+            /docs/screenshots/hoard-brute-icons-v045/
+            /docs/screenshots/hoard-ember-icons-v045/
+            /docs/screenshots/hoard-frost-icons-v045/
+            /docs/screenshots/hoard-necro-icons-v045/
+            /docs/screenshots/hoard-storm-icons-v045/
+            /docs/screenshots/hoard-tide-icons-v045/
+            /docs/screenshots/hoard-venom-icons-v045/
+            /docs/screenshots/horse-whistle-v045/
+            /docs/screenshots/icon-backlog-v045-surfaces/
             /docs/screenshots/ignivar-raid/
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/intentional-gathering-pr1/
@@ -903,13 +1276,32 @@ jobs:
             /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
+            /docs/screenshots/membership/
+            /docs/screenshots/membership-courier/
+            /docs/screenshots/missing-skills-v045/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/ravenrift-battleground/
+            /docs/screenshots/referral-armour/
+            /docs/screenshots/referral-cards/
+            /docs/screenshots/referral-portrait-render-2026-10-09/
+            /docs/screenshots/referral-rewards-v045/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/rewards-icons-v045/
+            /docs/screenshots/scenery-windows-4070-2026-10-15/
             /docs/screenshots/target-dots/
             /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warfare-season2-druid-icons/
+            /docs/screenshots/warfare-season2-hunter-icons/
+            /docs/screenshots/warfare-season2-mage-icons/
+            /docs/screenshots/warfare-season2-paladin-icons/
+            /docs/screenshots/warfare-season2-priest-icons/
+            /docs/screenshots/warfare-season2-rogue-icons/
+            /docs/screenshots/warfare-season2-shaman-icons/
+            /docs/screenshots/warfare-season2-warlock-icons/
+            /docs/screenshots/warfare-season2-warrior-icons/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
             /docs/screenshots/world-quest-cannon/
@@ -959,7 +1351,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-a-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-a-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc') }}
 
       # Same selection relay as the shard step (env, never run-line
       # interpolation); the lane entry regenerates the i18n artifacts once
@@ -997,28 +1389,67 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/aura-tracks/
+            /docs/screenshots/balgath-shardpike/
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
+            /docs/screenshots/bastion-ghost-crew/
             /docs/screenshots/buried-hoard-entrance/
             /docs/screenshots/buried-hoard-valley/
             /docs/screenshots/clue-character-panel/
-            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/clue-icons-v045/
             /docs/screenshots/confection-cascade/
             /docs/screenshots/confection-cascade-v3/
             /docs/screenshots/confection-cascade-v4/
             /docs/screenshots/confection-cascade-v5/
             /docs/screenshots/confection-cascade-v6/
             /docs/screenshots/confection-cascade-v7/
+            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/deed-adventures-icons-v045/
+            /docs/screenshots/deed-bastion-icons-v045/
             /docs/screenshots/deed-border-cartouche/
+            /docs/screenshots/deed-crucible-icons-v045/
+            /docs/screenshots/deed-crypt-icons-v045/
+            /docs/screenshots/deed-factions-icons-v045/
+            /docs/screenshots/deed-foundations-icons-v045/
+            /docs/screenshots/deed-gravewyrm-icons-v045/
+            /docs/screenshots/deed-temple-icons-v045/
+            /docs/screenshots/deed-wildheart-icons-v045/
+            /docs/screenshots/deed-worldquests-icons-v045/
+            /docs/screenshots/dungeon-bastion-blues-icons-v045/
+            /docs/screenshots/dungeon-bastion-icons-v045/
+            /docs/screenshots/dungeon-crypt-blues-icons-v045/
+            /docs/screenshots/dungeon-crypt-icons-v045/
+            /docs/screenshots/dungeon-gravewyrm-icons-v045/
+            /docs/screenshots/dungeon-temple-blues-icons-v045/
+            /docs/screenshots/dungeon-temple-icons-v045/
+            /docs/screenshots/dungeon-wildheart-icons-v045/
+            /docs/screenshots/eastbrook-ferry/
+            /docs/screenshots/dungeon-groups/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/faction-automaton-icons-v045/
+            /docs/screenshots/faction-church-icons-v045/
+            /docs/screenshots/faction-rift-icons-v045/
             /docs/screenshots/far-foliage-impostors/
             /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/first-person-view/
             /docs/screenshots/guild-bank-history/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-pledge-board/
             /docs/screenshots/guild-social-v1/
+            /docs/screenshots/highwatch-guild/
             /docs/screenshots/harvest-button-refresh/
+            /docs/screenshots/haunted-pumpkins/
+            /docs/screenshots/hoard-arcane-icons-v045/
+            /docs/screenshots/hoard-brute-icons-v045/
+            /docs/screenshots/hoard-ember-icons-v045/
+            /docs/screenshots/hoard-frost-icons-v045/
+            /docs/screenshots/hoard-necro-icons-v045/
+            /docs/screenshots/hoard-storm-icons-v045/
+            /docs/screenshots/hoard-tide-icons-v045/
+            /docs/screenshots/hoard-venom-icons-v045/
+            /docs/screenshots/horse-whistle-v045/
+            /docs/screenshots/icon-backlog-v045-surfaces/
             /docs/screenshots/ignivar-raid/
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/intentional-gathering-pr1/
@@ -1028,13 +1459,32 @@ jobs:
             /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
+            /docs/screenshots/membership/
+            /docs/screenshots/membership-courier/
+            /docs/screenshots/missing-skills-v045/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/ravenrift-battleground/
+            /docs/screenshots/referral-armour/
+            /docs/screenshots/referral-cards/
+            /docs/screenshots/referral-portrait-render-2026-10-09/
+            /docs/screenshots/referral-rewards-v045/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/rewards-icons-v045/
+            /docs/screenshots/scenery-windows-4070-2026-10-15/
             /docs/screenshots/target-dots/
             /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warfare-season2-druid-icons/
+            /docs/screenshots/warfare-season2-hunter-icons/
+            /docs/screenshots/warfare-season2-mage-icons/
+            /docs/screenshots/warfare-season2-paladin-icons/
+            /docs/screenshots/warfare-season2-priest-icons/
+            /docs/screenshots/warfare-season2-rogue-icons/
+            /docs/screenshots/warfare-season2-shaman-icons/
+            /docs/screenshots/warfare-season2-warlock-icons/
+            /docs/screenshots/warfare-season2-warrior-icons/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
             /docs/screenshots/world-quest-cannon/
@@ -1066,7 +1516,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-b-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-b-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc') }}
 
       # Same selection relay as the shard step (env, never run-line
       # interpolation); the lane entry regenerates the i18n artifacts once
@@ -1256,7 +1706,16 @@ jobs:
     # excluded from the base exactly like the lane stalls). 16.43 x 1.60 x
     # 1.37 = 36.0, so 36: the same arithmetic that first produced 35, one
     # minute looser now that the base is measured rather than projected.
-    timeout-minutes: 36
+    # 2026-10-24 re-derivation for v0.45.0: run 40113294880 shard 5
+    # completed successfully in 35m29s (job 120929304710), including a
+    # healthy 2m35s checkout. Seven of sixteen release shard jobs across
+    # that PR run and push run 40113280475 hit the old 36-minute wall;
+    # shard 8 had already reported all 766 files passed when it was killed.
+    # Use the COMPLETED job wall, not extrapolation from killed progress:
+    # (35 + 29/60) x 1.60 x 1.37 = 77.78, rounded up to 78 minutes.
+    # The cost is a longer ceiling for a hung release job. Per-test limits,
+    # coverage and the merge-queue PR-tier bound remain independent.
+    timeout-minutes: 78
     runs-on: ubuntu-latest
 
     # Same real-SQL wiring as pr-gate (ruling R16): a per-leg Postgres and
@@ -1312,28 +1771,67 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/aura-tracks/
+            /docs/screenshots/balgath-shardpike/
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
+            /docs/screenshots/bastion-ghost-crew/
             /docs/screenshots/buried-hoard-entrance/
             /docs/screenshots/buried-hoard-valley/
             /docs/screenshots/clue-character-panel/
-            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/clue-icons-v045/
             /docs/screenshots/confection-cascade/
             /docs/screenshots/confection-cascade-v3/
             /docs/screenshots/confection-cascade-v4/
             /docs/screenshots/confection-cascade-v5/
             /docs/screenshots/confection-cascade-v6/
             /docs/screenshots/confection-cascade-v7/
+            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/deed-adventures-icons-v045/
+            /docs/screenshots/deed-bastion-icons-v045/
             /docs/screenshots/deed-border-cartouche/
+            /docs/screenshots/deed-crucible-icons-v045/
+            /docs/screenshots/deed-crypt-icons-v045/
+            /docs/screenshots/deed-factions-icons-v045/
+            /docs/screenshots/deed-foundations-icons-v045/
+            /docs/screenshots/deed-gravewyrm-icons-v045/
+            /docs/screenshots/deed-temple-icons-v045/
+            /docs/screenshots/deed-wildheart-icons-v045/
+            /docs/screenshots/deed-worldquests-icons-v045/
+            /docs/screenshots/dungeon-bastion-blues-icons-v045/
+            /docs/screenshots/dungeon-bastion-icons-v045/
+            /docs/screenshots/dungeon-crypt-blues-icons-v045/
+            /docs/screenshots/dungeon-crypt-icons-v045/
+            /docs/screenshots/dungeon-gravewyrm-icons-v045/
+            /docs/screenshots/dungeon-temple-blues-icons-v045/
+            /docs/screenshots/dungeon-temple-icons-v045/
+            /docs/screenshots/dungeon-wildheart-icons-v045/
+            /docs/screenshots/eastbrook-ferry/
+            /docs/screenshots/dungeon-groups/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/faction-automaton-icons-v045/
+            /docs/screenshots/faction-church-icons-v045/
+            /docs/screenshots/faction-rift-icons-v045/
             /docs/screenshots/far-foliage-impostors/
             /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/first-person-view/
             /docs/screenshots/guild-bank-history/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-pledge-board/
             /docs/screenshots/guild-social-v1/
+            /docs/screenshots/highwatch-guild/
             /docs/screenshots/harvest-button-refresh/
+            /docs/screenshots/haunted-pumpkins/
+            /docs/screenshots/hoard-arcane-icons-v045/
+            /docs/screenshots/hoard-brute-icons-v045/
+            /docs/screenshots/hoard-ember-icons-v045/
+            /docs/screenshots/hoard-frost-icons-v045/
+            /docs/screenshots/hoard-necro-icons-v045/
+            /docs/screenshots/hoard-storm-icons-v045/
+            /docs/screenshots/hoard-tide-icons-v045/
+            /docs/screenshots/hoard-venom-icons-v045/
+            /docs/screenshots/horse-whistle-v045/
+            /docs/screenshots/icon-backlog-v045-surfaces/
             /docs/screenshots/ignivar-raid/
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/intentional-gathering-pr1/
@@ -1343,13 +1841,32 @@ jobs:
             /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
+            /docs/screenshots/membership/
+            /docs/screenshots/membership-courier/
+            /docs/screenshots/missing-skills-v045/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/ravenrift-battleground/
+            /docs/screenshots/referral-armour/
+            /docs/screenshots/referral-cards/
+            /docs/screenshots/referral-portrait-render-2026-10-09/
+            /docs/screenshots/referral-rewards-v045/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/rewards-icons-v045/
+            /docs/screenshots/scenery-windows-4070-2026-10-15/
             /docs/screenshots/target-dots/
             /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warfare-season2-druid-icons/
+            /docs/screenshots/warfare-season2-hunter-icons/
+            /docs/screenshots/warfare-season2-mage-icons/
+            /docs/screenshots/warfare-season2-paladin-icons/
+            /docs/screenshots/warfare-season2-priest-icons/
+            /docs/screenshots/warfare-season2-rogue-icons/
+            /docs/screenshots/warfare-season2-shaman-icons/
+            /docs/screenshots/warfare-season2-warlock-icons/
+            /docs/screenshots/warfare-season2-warrior-icons/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
             /docs/screenshots/world-quest-cannon/
@@ -1388,7 +1905,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc') }}
 
       # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
       # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
@@ -1435,28 +1952,67 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/aura-tracks/
+            /docs/screenshots/balgath-shardpike/
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
+            /docs/screenshots/bastion-ghost-crew/
             /docs/screenshots/buried-hoard-entrance/
             /docs/screenshots/buried-hoard-valley/
             /docs/screenshots/clue-character-panel/
-            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/clue-icons-v045/
             /docs/screenshots/confection-cascade/
             /docs/screenshots/confection-cascade-v3/
             /docs/screenshots/confection-cascade-v4/
             /docs/screenshots/confection-cascade-v5/
             /docs/screenshots/confection-cascade-v6/
             /docs/screenshots/confection-cascade-v7/
+            /docs/screenshots/cosmetics-window/
+            /docs/screenshots/deed-adventures-icons-v045/
+            /docs/screenshots/deed-bastion-icons-v045/
             /docs/screenshots/deed-border-cartouche/
+            /docs/screenshots/deed-crucible-icons-v045/
+            /docs/screenshots/deed-crypt-icons-v045/
+            /docs/screenshots/deed-factions-icons-v045/
+            /docs/screenshots/deed-foundations-icons-v045/
+            /docs/screenshots/deed-gravewyrm-icons-v045/
+            /docs/screenshots/deed-temple-icons-v045/
+            /docs/screenshots/deed-wildheart-icons-v045/
+            /docs/screenshots/deed-worldquests-icons-v045/
+            /docs/screenshots/dungeon-bastion-blues-icons-v045/
+            /docs/screenshots/dungeon-bastion-icons-v045/
+            /docs/screenshots/dungeon-crypt-blues-icons-v045/
+            /docs/screenshots/dungeon-crypt-icons-v045/
+            /docs/screenshots/dungeon-gravewyrm-icons-v045/
+            /docs/screenshots/dungeon-temple-blues-icons-v045/
+            /docs/screenshots/dungeon-temple-icons-v045/
+            /docs/screenshots/dungeon-wildheart-icons-v045/
+            /docs/screenshots/eastbrook-ferry/
+            /docs/screenshots/dungeon-groups/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
+            /docs/screenshots/faction-automaton-icons-v045/
+            /docs/screenshots/faction-church-icons-v045/
+            /docs/screenshots/faction-rift-icons-v045/
             /docs/screenshots/far-foliage-impostors/
             /docs/screenshots/fenbridge-rebuild/
+            /docs/screenshots/first-person-view/
             /docs/screenshots/guild-bank-history/
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-pledge-board/
             /docs/screenshots/guild-social-v1/
+            /docs/screenshots/highwatch-guild/
             /docs/screenshots/harvest-button-refresh/
+            /docs/screenshots/haunted-pumpkins/
+            /docs/screenshots/hoard-arcane-icons-v045/
+            /docs/screenshots/hoard-brute-icons-v045/
+            /docs/screenshots/hoard-ember-icons-v045/
+            /docs/screenshots/hoard-frost-icons-v045/
+            /docs/screenshots/hoard-necro-icons-v045/
+            /docs/screenshots/hoard-storm-icons-v045/
+            /docs/screenshots/hoard-tide-icons-v045/
+            /docs/screenshots/hoard-venom-icons-v045/
+            /docs/screenshots/horse-whistle-v045/
+            /docs/screenshots/icon-backlog-v045-surfaces/
             /docs/screenshots/ignivar-raid/
             /docs/screenshots/ignivar-raid-expansion/
             /docs/screenshots/intentional-gathering-pr1/
@@ -1466,13 +2022,32 @@ jobs:
             /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
+            /docs/screenshots/membership/
+            /docs/screenshots/membership-courier/
+            /docs/screenshots/missing-skills-v045/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
+            /docs/screenshots/ravenrift-battleground/
+            /docs/screenshots/referral-armour/
+            /docs/screenshots/referral-cards/
+            /docs/screenshots/referral-portrait-render-2026-10-09/
+            /docs/screenshots/referral-rewards-v045/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/rewards-icons-v045/
+            /docs/screenshots/scenery-windows-4070-2026-10-15/
             /docs/screenshots/target-dots/
             /docs/screenshots/touch-ui-rework/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warfare-season2-druid-icons/
+            /docs/screenshots/warfare-season2-hunter-icons/
+            /docs/screenshots/warfare-season2-mage-icons/
+            /docs/screenshots/warfare-season2-paladin-icons/
+            /docs/screenshots/warfare-season2-priest-icons/
+            /docs/screenshots/warfare-season2-rogue-icons/
+            /docs/screenshots/warfare-season2-shaman-icons/
+            /docs/screenshots/warfare-season2-warlock-icons/
+            /docs/screenshots/warfare-season2-warrior-icons/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
             /docs/screenshots/world-quest-cannon/

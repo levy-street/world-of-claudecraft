@@ -94,6 +94,7 @@ function emptyWireWorld(): GroundTelegraphWireWorld {
     activeIgnivarMeteors: [],
     activeTemporalHourglasses: [],
     activeConsecrations: [],
+    activeSporeBursts: [],
     varkhulEncounter: {
       activeVarkhulForgestormWarnings: [],
       activeVarkhulCinderFires: [],
@@ -243,6 +244,7 @@ describe('Nythraxis snapshot wire fragment (server)', () => {
       activeIgnivarMeteors: [],
       activeTemporalHourglasses: [],
       activeConsecrations: [],
+      activeSporeBursts: [],
       activeVarkhulForgestormWarnings: [],
       activeVarkhulCinderFires: [],
       activeVarkhulCinderOrbProjectiles: [],
@@ -518,6 +520,7 @@ describe('applyGroundTelegraphSnapshot', () => {
       activeVarkhulAssemblies: [],
       activeTemporalHourglasses: [],
       activeConsecrations: [],
+      activeSporeBursts: [],
     };
   }
 

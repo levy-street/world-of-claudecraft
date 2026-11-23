@@ -30,7 +30,7 @@ import { ko_KR } from '../src/ui/i18n.locales/ko_KR';
 import { ru_RU } from '../src/ui/i18n.locales/ru_RU';
 import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
 import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
-import { DEED_ART_PENDING, ITEM_IMAGE_IDS } from '../src/ui/icons';
+import { DEED_ART_PENDING, deedImageUrl, ITEM_IMAGE_IDS } from '../src/ui/icons';
 
 const repoRoot = path.resolve(__dirname, '..');
 
@@ -398,8 +398,10 @@ describe('clue scroll items and deeds (the content records this feature carries)
       reward: { kind: 'title', text: 'Treasure Hunter' },
     });
     expect(RELIQUARY_HORIZON_TITLES).toContain('exp_clue_ten_caskets');
-    expect(DEED_ART_PENDING.has('exp_clue_first_casket')).toBe(true);
-    expect(DEED_ART_PENDING.has('exp_clue_ten_caskets')).toBe(true);
+    for (const id of ['exp_clue_first_casket', 'exp_clue_ten_caskets']) {
+      expect(DEED_ART_PENDING.has(id), id).toBe(false);
+      expect(deedImageUrl(`deed_${id}`), id).toBe(`/ui/deeds/${id}.webp`);
+    }
   });
 });
 

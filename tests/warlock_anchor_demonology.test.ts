@@ -51,8 +51,13 @@ describe('demonology 200 DPS anchors at 120 seconds', () => {
     // parity goldens. No warlock number changed: with that one line reverted on
     // this tip the old band passes. Measured 213.84 over the four seeds; the
     // band keeps its plus or minus 5% width.
-    expect(mean('dps')).toBeGreaterThanOrEqual(203);
-    expect(mean('dps')).toBeLessThanOrEqual(225);
+    // Re-anchored for the Mirefen hut wall wander fix (an idle pick inside a
+    // mudfin hut wall is skipped for one more pause, mob/locomotion.ts): the
+    // camp murlocs' wander draws fork the shared stream again. No warlock
+    // number changed: without the fix (6754e8490e0) the old band passes.
+    // Measured 227.3 over the four seeds; the band keeps its plus or minus 5%.
+    expect(mean('dps')).toBeGreaterThanOrEqual(216);
+    expect(mean('dps')).toBeLessThanOrEqual(239);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 

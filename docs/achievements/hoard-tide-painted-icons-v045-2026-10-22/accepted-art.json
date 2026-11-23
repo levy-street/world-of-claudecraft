@@ -1,0 +1,919 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "hoard-tide-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rare_chalice_of_living_tides",
+      "family": "hoard-tide",
+      "tier": "Tarnished",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_chalice_of_living_tides.webp",
+      "canonicalDisplayName": "Tarnished Chalice of the Living Tides",
+      "acceptedSha256": "d1101429e8af41e477eb96e66c49e36383a295b307dd5358aec080b4baf6e1da",
+      "acceptedBytes": 3720,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/rare_chalice_of_living_tides.png",
+        "sha256": "14e5c7b0beacf8bca5cb91118a691a306a8f17cd90089ad71397d755ecd023c4",
+        "bytes": 2455535,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/rare_chalice_of_living_tides.png",
+        "sha256": "3b7af5796b5f7bf17162f3fe05a47dae931c4f7a489399618088efa34f9193c8",
+        "bytes": 551216,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "35d06f988ffc7e1e7730e5e8dbaa9cd31390186125c9c62d87541779f4977601",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Chalice of the Living Tides (rare_chalice_of_living_tides) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal ceremonial chalice in three-quarter view, broad cup brimming with softly luminous aqua water, slender sturdy stem and round foot, two simple curling wave marks on the front of the cup, subtle coral-shaped supports. Clearly a drinking chalice, not an orb or potion bottle. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with sea-green patina, faded teal leather or metal, salt-worn edges, restrained aqua highlights. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/rare_chalice_of_living_tides.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "35d06f988ffc7e1e7730e5e8dbaa9cd31390186125c9c62d87541779f4977601"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_pendant_continuous_flow",
+      "family": "hoard-tide",
+      "tier": "Tarnished",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_pendant_continuous_flow.webp",
+      "canonicalDisplayName": "Tarnished Pendant of Continuous Flow",
+      "acceptedSha256": "ade64a9a31bf105e39ad6c0a167a7c088aabc032c3e49985d2533e2c550d66df",
+      "acceptedBytes": 2820,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/rare_pendant_continuous_flow.png",
+        "sha256": "86ddc164e88b557a401e85d15cfab8d2d1053487a958321cefeee8fbfd194518",
+        "bytes": 2304268,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/rare_pendant_continuous_flow.png",
+        "sha256": "09b9f2cbe24b33da5367c03c9e069bdccbc44dc65062d1d09f990ddce8c717d9",
+        "bytes": 506405,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "ba7a18c0af14a425c6babf02416ce5072513a88fc9cae8b2afa92267a5908622",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Pendant of Continuous Flow (rare_pendant_continuous_flow) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal droplet pendant on a short fully visible loop of metal chain, large translucent aqua teardrop stone in a broad metal setting with a simple curling wave engraving, tiny coral details at the bail. Pendant and complete chain together form one centered necklace silhouette, no wearer. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with sea-green patina, faded teal leather or metal, salt-worn edges, restrained aqua highlights. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/rare_pendant_continuous_flow.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "ba7a18c0af14a425c6babf02416ce5072513a88fc9cae8b2afa92267a5908622"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_coral_encrusted_girdle",
+      "family": "hoard-tide",
+      "tier": "Tarnished",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_coral_encrusted_girdle.webp",
+      "canonicalDisplayName": "Tarnished Coral-Encrusted Girdle",
+      "acceptedSha256": "1a8354fe73334dd57cc3d9660eabb77ce0362d51c921f0f921fa2ac234ba51f4",
+      "acceptedBytes": 4308,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/rare_coral_encrusted_girdle.png",
+        "sha256": "d32f9e0c14088561944f62d02c4013998ba60f9716b06d6bb2adff72bd0cd0f6",
+        "bytes": 2482444,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/rare_coral_encrusted_girdle.png",
+        "sha256": "0df6cd31bd1564245907307591d4afb4a3d9ba2bb025e823500b4febd2f01f42",
+        "bytes": 530973,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "f92358c0e3ef4f7930cb2971b94908ef98f408ab5aceb78111f1c0966f4955eb",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Coral-Encrusted Girdle (rare_coral_encrusted_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal MAIL girdle in a broad curved belt silhouette, overlapping teal metal scales and linked mail on dark backing, central square clasp engraved with two simple curling wave marks, small ivory and pink coral encrustations along the edges. Clear flexible scale-and-ring mail, not a cloth cord or solid plate belt. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with sea-green patina, faded teal leather or metal, salt-worn edges, restrained aqua highlights. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/rare_coral_encrusted_girdle.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "f92358c0e3ef4f7930cb2971b94908ef98f408ab5aceb78111f1c0966f4955eb"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_riptide_handwraps",
+      "family": "hoard-tide",
+      "tier": "Tarnished",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_riptide_handwraps.webp",
+      "canonicalDisplayName": "Tarnished Riptide Handwraps",
+      "acceptedSha256": "1dfff44b264e674396eaa561bd3890e45f7f9395fba29f6b16ba4479c9313e20",
+      "acceptedBytes": 3962,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/rare_riptide_handwraps.png",
+        "sha256": "f9708695850a1c2a0491a5eafb97d3b8dd21d687871a5657923f0a23444308a6",
+        "bytes": 2498119,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/rare_riptide_handwraps.png",
+        "sha256": "1bc67701a8509da83b95c078875e117c5b4faefc084c54701f3a95ec35c6f3f5",
+        "bytes": 544328,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "04842132052896d97d251dd1ac941ee8ea0df6c4d2f2b059e4db6c96baade089",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Riptide Handwraps (rare_riptide_handwraps) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of sea-teal LEATHER handwrap gloves, supple stitched hide palms and finger coverings with overlapping teal leather strips wrapped around wrists and knuckles, small metal wrist clasps, two simple curling wave marks embossed on the back of the foremost glove. One glove forward and matching partner behind, empty with no living hands. Clearly leather, not metal gauntlets or cloth bandages. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with sea-green patina, faded teal leather or metal, salt-worn edges, restrained aqua highlights. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/rare_riptide_handwraps.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "04842132052896d97d251dd1ac941ee8ea0df6c4d2f2b059e4db6c96baade089"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "chalice_of_living_tides",
+      "family": "hoard-tide",
+      "tier": "Epic",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/chalice_of_living_tides.webp",
+      "canonicalDisplayName": "Chalice of the Living Tides",
+      "acceptedSha256": "b08db661763c17f01ac148de99c4ca719f44745b7d174b92bcb81b3e777a5d09",
+      "acceptedBytes": 3932,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/chalice_of_living_tides.png",
+        "sha256": "fbc48592fa363ddd21f6e7aeca62501e163f1bdba8f681fdf5cd586aa56237a5",
+        "bytes": 2256173,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/chalice_of_living_tides.png",
+        "sha256": "356d8c8d4a609850f7e438f0b3d23966256c7f234b9e16ca334e23a7fdeb0343",
+        "bytes": 548173,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "8b82811070ab5ab3753a2cb2be16b085baf24f532afc513265357a65c01f2d5b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Chalice of the Living Tides (chalice_of_living_tides) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal ceremonial chalice in three-quarter view, broad cup brimming with softly luminous aqua water, slender sturdy stem and round foot, two simple curling wave marks on the front of the cup, subtle coral-shaped supports. Clearly a drinking chalice, not an orb or potion bottle. Tier finish: Well-kept masterwork: polished silver fittings, saturated sea-teal materials, crisp wave marks, clean coral details and luminous aqua accents. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/chalice_of_living_tides.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "8b82811070ab5ab3753a2cb2be16b085baf24f532afc513265357a65c01f2d5b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "pendant_continuous_flow",
+      "family": "hoard-tide",
+      "tier": "Epic",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/pendant_continuous_flow.webp",
+      "canonicalDisplayName": "Pendant of Continuous Flow",
+      "acceptedSha256": "0a00e658ca4df383fb1a77dde4010527912c67d427423ba9bb15cf31240276cb",
+      "acceptedBytes": 3044,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/pendant_continuous_flow.png",
+        "sha256": "bdf870c6f86244c75f37a0fd8a7a846f84f77c96dceec976cfd8de30397e1744",
+        "bytes": 2135985,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/pendant_continuous_flow.png",
+        "sha256": "91a6014e8efa031b27e104a7afee469d13470156043b6c2344cada76f87ce929",
+        "bytes": 498342,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "8e6c3f5e834a1ac8def95521ac867f569288963c11916ffd80cd492208049776",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Pendant of Continuous Flow (pendant_continuous_flow) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal droplet pendant on a short fully visible loop of metal chain, large translucent aqua teardrop stone in a broad metal setting with a simple curling wave engraving, tiny coral details at the bail. Pendant and complete chain together form one centered necklace silhouette, no wearer. Tier finish: Well-kept masterwork: polished silver fittings, saturated sea-teal materials, crisp wave marks, clean coral details and luminous aqua accents. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/pendant_continuous_flow.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "8e6c3f5e834a1ac8def95521ac867f569288963c11916ffd80cd492208049776"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "coral_encrusted_girdle",
+      "family": "hoard-tide",
+      "tier": "Epic",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/coral_encrusted_girdle.webp",
+      "canonicalDisplayName": "Coral-Encrusted Girdle",
+      "acceptedSha256": "0904d653d047cd9bf6422bd9d74a8da26ac26addbd2b8f28658471b9e9b2ee63",
+      "acceptedBytes": 5128,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/coral_encrusted_girdle.png",
+        "sha256": "62f263c73a059a56b38628d374dfc5303dea54c9e176a6e0f82f15e9d261f1ef",
+        "bytes": 2434116,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/coral_encrusted_girdle.png",
+        "sha256": "5ca65910fd2a8aa669a939ceaabafbaccbaf0972dcf3623fb4632bed6f4377e7",
+        "bytes": 555622,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "b0673ca8aa892db5c5be79f9cf5574bdae1f27fee8e0d923c381a97486ec321e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Coral-Encrusted Girdle (coral_encrusted_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal MAIL girdle in a broad curved belt silhouette, overlapping teal metal scales and linked mail on dark backing, central square clasp engraved with two simple curling wave marks, small ivory and pink coral encrustations along the edges. Clear flexible scale-and-ring mail, not a cloth cord or solid plate belt. Tier finish: Well-kept masterwork: polished silver fittings, saturated sea-teal materials, crisp wave marks, clean coral details and luminous aqua accents. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/coral_encrusted_girdle.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "b0673ca8aa892db5c5be79f9cf5574bdae1f27fee8e0d923c381a97486ec321e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "riptide_handwraps",
+      "family": "hoard-tide",
+      "tier": "Epic",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/riptide_handwraps.webp",
+      "canonicalDisplayName": "Riptide Handwraps",
+      "acceptedSha256": "574a999fe6225c522a0d45e247067d2c8ae58daadd07a21d943efb7a6a0c6d19",
+      "acceptedBytes": 4274,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/riptide_handwraps.png",
+        "sha256": "e3a7b51c0960a3b077e56f28a7848777451c7954bc6b1474e24e455ea1a0d441",
+        "bytes": 2437270,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/riptide_handwraps.png",
+        "sha256": "de7d30f9780429b4e3ed056f2493ae3ce8e5a33e857ab69d2a9e57271e7c6e6f",
+        "bytes": 565007,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "13e70e626a0cf24719901797b7bc8c048f22901054fe735829c1628b6500e0ee",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Riptide Handwraps (riptide_handwraps) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of sea-teal LEATHER handwrap gloves, supple stitched hide palms and finger coverings with overlapping teal leather strips wrapped around wrists and knuckles, small metal wrist clasps, two simple curling wave marks embossed on the back of the foremost glove. One glove forward and matching partner behind, empty with no living hands. Clearly leather, not metal gauntlets or cloth bandages. Tier finish: Well-kept masterwork: polished silver fittings, saturated sea-teal materials, crisp wave marks, clean coral details and luminous aqua accents. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/riptide_handwraps.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "13e70e626a0cf24719901797b7bc8c048f22901054fe735829c1628b6500e0ee"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_chalice_of_living_tides",
+      "family": "hoard-tide",
+      "tier": "Sovereign",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_chalice_of_living_tides.webp",
+      "canonicalDisplayName": "Sovereign Chalice of the Living Tides",
+      "acceptedSha256": "add82243c9ca488121f034c6367c33f6d16f645c812e9e6a8eabe61a4a66c619",
+      "acceptedBytes": 4300,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/legendary_chalice_of_living_tides.png",
+        "sha256": "93536d9d54f3da2e74c4d96dc6ff58f591d5ccee2ab7dd06a4fbda982cdfcaf5",
+        "bytes": 2192098,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/legendary_chalice_of_living_tides.png",
+        "sha256": "e4996bcad2b62a22269317e7582677008a66931dacead6469aca55c53aee44de",
+        "bytes": 525039,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "b1f51c461592f8add468780d01e15a2855e725c49366e2c270de3a8c6523b453",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Chalice of the Living Tides (legendary_chalice_of_living_tides) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal ceremonial chalice in three-quarter view, broad cup brimming with softly luminous aqua water, slender sturdy stem and round foot, two simple curling wave marks on the front of the cup, subtle coral-shaped supports. Clearly a drinking chalice, not an orb or potion bottle. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep turquoise and navy materials, additional flowing gold wave ornament, bright aqua accents and polished coral details. Gold belongs to the object, never a surrounding frame. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/legendary_chalice_of_living_tides.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "b1f51c461592f8add468780d01e15a2855e725c49366e2c270de3a8c6523b453"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_pendant_continuous_flow",
+      "family": "hoard-tide",
+      "tier": "Sovereign",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_pendant_continuous_flow.webp",
+      "canonicalDisplayName": "Sovereign Pendant of Continuous Flow",
+      "acceptedSha256": "e94cf1422dd1845e04deed2d1c0d73844b8dc6cb7b2be9137284d0d7ed7ef11a",
+      "acceptedBytes": 3564,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/legendary_pendant_continuous_flow.png",
+        "sha256": "9d5b28485f700fb752b06c2ef7fa369ae85d08dfb89ad9066905a1f6a534f279",
+        "bytes": 2025924,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/legendary_pendant_continuous_flow.png",
+        "sha256": "8109f7a44c8bd34d10c108475528df7a243302f6799d565692b2df4bc9425319",
+        "bytes": 484450,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "51e5333f034d08bc3e3684de606601151349b9322538015e31f668ad42abdda6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Pendant of Continuous Flow (legendary_pendant_continuous_flow) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal droplet pendant on a short fully visible loop of metal chain, large translucent aqua teardrop stone in a broad metal setting with a simple curling wave engraving, tiny coral details at the bail. Pendant and complete chain together form one centered necklace silhouette, no wearer. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep turquoise and navy materials, additional flowing gold wave ornament, bright aqua accents and polished coral details. Gold belongs to the object, never a surrounding frame. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/legendary_pendant_continuous_flow.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "51e5333f034d08bc3e3684de606601151349b9322538015e31f668ad42abdda6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_coral_encrusted_girdle",
+      "family": "hoard-tide",
+      "tier": "Sovereign",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_coral_encrusted_girdle.webp",
+      "canonicalDisplayName": "Sovereign Coral-Encrusted Girdle",
+      "acceptedSha256": "6c9a36ad718161e6e4b44a219571113d546a89e28906e5be2a4792c5f9d52021",
+      "acceptedBytes": 5628,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/legendary_coral_encrusted_girdle.png",
+        "sha256": "1f395d01f4a54a9173100ef858a1d07df7eb27c2f53b0bd6e032498783251942",
+        "bytes": 2581332,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/legendary_coral_encrusted_girdle.png",
+        "sha256": "e586391b70395af57cb0db9546bccc77021b1c82c5f5278171c68fb0971c5ec0",
+        "bytes": 546717,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "9891ff3f3635b731cce34f5120f6761b967c9f6b7cc39b6e0e05c83eaf93949b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Coral-Encrusted Girdle (legendary_coral_encrusted_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete sea-teal MAIL girdle in a broad curved belt silhouette, overlapping teal metal scales and linked mail on dark backing, central square clasp engraved with two simple curling wave marks, small ivory and pink coral encrustations along the edges. Clear flexible scale-and-ring mail, not a cloth cord or solid plate belt. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep turquoise and navy materials, additional flowing gold wave ornament, bright aqua accents and polished coral details. Gold belongs to the object, never a surrounding frame. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/legendary_coral_encrusted_girdle.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "9891ff3f3635b731cce34f5120f6761b967c9f6b7cc39b6e0e05c83eaf93949b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_riptide_handwraps",
+      "family": "hoard-tide",
+      "tier": "Sovereign",
+      "batch": "hoard-tide-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_riptide_handwraps.webp",
+      "canonicalDisplayName": "Sovereign Riptide Handwraps",
+      "acceptedSha256": "2a19fdd1169e63fe07181b522c7e5961ec2c136b217e8d600b2ba446c933cc95",
+      "acceptedBytes": 4668,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-tide/originals/legendary_riptide_handwraps.png",
+        "sha256": "f10ce186da4d7da073c0740fa0f55c87d439f515fbd7f2ecafe4600757d8ce35",
+        "bytes": 2535195,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-tide/masters/legendary_riptide_handwraps.png",
+        "sha256": "e2682141b0ec44d6902bcb2527d0870ed388781a434c3dafca8e1fe24e9cd561",
+        "bytes": 552893,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "921ecd643e3922545e1302eb4e094ce2ff79e0795f837c89c3892108f8690ae1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Riptide Handwraps (legendary_riptide_handwraps) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of sea-teal LEATHER handwrap gloves, supple stitched hide palms and finger coverings with overlapping teal leather strips wrapped around wrists and knuckles, small metal wrist clasps, two simple curling wave marks embossed on the back of the foremost glove. One glove forward and matching partner behind, empty with no living hands. Clearly leather, not metal gauntlets or cloth bandages. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep turquoise and navy materials, additional flowing gold wave ornament, bright aqua accents and polished coral details. Gold belongs to the object, never a surrounding frame. Tide family: sea teal, navy, subtle coral and luminous aqua, paired curling wave motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-teal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-tide/superseded/legendary_riptide_handwraps.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "921ecd643e3922545e1302eb4e094ce2ff79e0795f837c89c3892108f8690ae1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-tide-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-tide-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ],
+  "perceptualReview": {
+    "candidateCount": 6,
+    "disposition": "Reviewed all three chalice-tier pairs and all three pendant-tier pairs at source and small sizes. Shared cup/stem and droplet/chain silhouettes intentionally preserve identity. Tarnished patina, clean silver fitting shapes and broad gold wave ornaments distinguish tiers; all are separately generated paintings, not recolors or crops."
+  }
+}

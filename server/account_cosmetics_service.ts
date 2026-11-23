@@ -6,9 +6,16 @@
 // consumer; the pure rules live in server/account_cosmetics_live.ts and the
 // persistence in server/account_cosmetics_db.ts (re-exported by ./db, which is
 // what keeps every test double on one import).
-import { isMountSkinId } from '../src/sim/content/mount_skins';
+import { MEMBERSHIP_ANNUAL_MOUNT } from '../src/membership_annual_contract';
+import { isStoreMountSkinId } from '../src/sim/content/mount_skins';
+import { mountDef } from '../src/sim/content/mounts';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
-import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import {
+  isGrantableWeaponSkin,
+  isWeaponSkinType,
+  WEAPON_SKINS,
+} from '../src/sim/content/weapon_skins';
+import type { GuildAccountPort } from '../src/sim/guild_quartermaster';
 import type { Entity, SkinCatalog, WeaponSkinLoadout, WeaponSkinType } from '../src/sim/types';
 import type { AccountCosmetics } from '../src/world_api';
 import {
@@ -24,6 +31,7 @@ import {
   markAccountQuestComplete,
   setAccountWeaponSkinLoadout,
 } from './db';
+import { wornMountSkinAllowed } from './mount_skin_reconcile';
 import { createKeyedSerialWriter } from './serial_writer';
 
 /** The slice of a live session this service reads and writes. */
@@ -31,11 +39,21 @@ export interface CosmeticsSession {
   accountId: number;
   pid: number;
   accountCosmetics: AccountCosmetics;
+  selfHeavyDirty?: boolean;
 }
 
 /** The slice of the Sim the service drives. */
 export interface CosmeticsSim {
-  meta(pid: number): { questsDone: Set<string>; questLog: Map<string, unknown> } | null | undefined;
+  meta(pid: number):
+    | {
+        questsDone: Set<string>;
+        questLog: Map<string, unknown>;
+        accountMountSkinIds?: readonly string[];
+        accountMountItemsHydrated?: boolean;
+        mountSkinId?: string | null;
+      }
+    | null
+    | undefined;
   ctx: { markDeedsDirty(pid: number): void };
   entities: Map<number, Entity>;
   setWeaponSkinLoadout(pid: number, loadout: WeaponSkinLoadout): void;
@@ -88,9 +106,46 @@ export class AccountCosmeticsService {
     for (const live of this.host.sessions()) {
       if (live.accountId !== accountId) continue;
       live.accountCosmetics = merged;
+      const meta = sim.meta(live.pid);
+      if (meta) {
+        meta.accountMountSkinIds = [
+          ...new Set([...(merged.mountSkinIds ?? []), ...(merged.collectibleMountSkinIds ?? [])]),
+        ];
+      }
       this.applyQuestLockouts(live.pid, merged);
       sim.setWeaponSkinLoadout(live.pid, ownedWeaponSkinLoadout(merged));
       this.host.resyncQuests(live);
+    }
+  }
+
+  /** Replace an item's revocable projection, never persist an additive grant.
+   * The caller supplies its indexed account sessions, avoiding a realm scan. */
+  setCollectibleMountSkins(
+    accountId: number,
+    ids: string[],
+    sessions: Iterable<CosmeticsSession>,
+    authoritative = true,
+  ): void {
+    const merged = this.remember(accountId, {
+      ...(this.byAccount.get(accountId) ?? EMPTY_LIVE_ACCOUNT_COSMETICS),
+      collectibleMountSkinIds: ids,
+    });
+    const sim = this.host.sim();
+    const owned = [...new Set([...(merged.mountSkinIds ?? []), ...ids])];
+    for (const session of sessions) {
+      if (session.accountId !== accountId) continue;
+      session.accountCosmetics = merged;
+      session.selfHeavyDirty = true;
+      const meta = sim.meta(session.pid);
+      if (!meta) continue;
+      meta.accountMountSkinIds = owned;
+      meta.accountMountItemsHydrated = authoritative;
+      if (
+        (authoritative || !mountDef(meta.mountSkinId ?? '')) &&
+        !wornMountSkinAllowed(merged, meta.mountSkinId)
+      ) {
+        sim.setMountSkin(session.pid, null);
+      }
     }
   }
 
@@ -116,6 +171,19 @@ export class AccountCosmeticsService {
       .catch((err) => console.error('failed to save account mech chroma:', err));
   }
 
+  /** Ownership is session-scoped. Online purchases must commit the character charge
+   * and account grant together; this synchronous port can never grant a skin. */
+  ledger(
+    session: CosmeticsSession,
+    purchaseWeaponSkin?: (offerId: string) => void,
+  ): GuildAccountPort {
+    return {
+      ownsWeaponSkin: (skinId) => session.accountCosmetics.weaponSkinIds.includes(skinId),
+      grantWeaponSkin: () => false,
+      purchaseWeaponSkin,
+    };
+  }
+
   /**
    * Grant a mech-chroma cosmetic to an account by id (a Discord swag claim, whose
    * points/claim are already resolved durably server-side). Best-effort live update:
@@ -139,7 +207,8 @@ export class AccountCosmeticsService {
   grantWeaponSkins(accountId: number, skinIds: string[]): void {
     this.grantSkins(
       accountId,
-      skinIds.filter((id) => WEAPON_SKINS[id]),
+      // never a skin reserved for a future raid, whatever the economy ledger carries
+      skinIds.filter(isGrantableWeaponSkin),
       'weaponSkinIds',
       grantAccountWeaponSkins,
     );
@@ -151,10 +220,17 @@ export class AccountCosmeticsService {
   grantMountSkins(accountId: number, skinIds: string[]): void {
     this.grantSkins(
       accountId,
-      skinIds.filter(isMountSkinId),
+      skinIds.filter(isStoreMountSkinId),
       'mountSkinIds',
       grantAccountMountSkins,
     );
+  }
+
+  /** The annual membership mount (src/membership_annual_contract.ts): already persisted by
+   *  the reward delivery transaction, so this union is a no-op write that refreshes live
+   *  sessions. Ownership survives membership expiry and never depends on the reins. */
+  grantMembershipMount(accountId: number): void {
+    this.grantSkins(accountId, [MEMBERSHIP_ANNUAL_MOUNT], 'mountSkinIds', grantAccountMountSkins);
   }
 
   /** Coalesce concurrent reconciliations. Publish ownership only after the
@@ -229,7 +305,7 @@ export class AccountCosmeticsService {
   changeMountSkin(session: CosmeticsSession, raw: unknown): void {
     const skinId = raw === null ? null : typeof raw === 'string' ? raw : undefined;
     if (skinId === undefined) return;
-    if (skinId !== null && !(session.accountCosmetics.mountSkinIds ?? []).includes(skinId)) return;
+    if (skinId !== null && !wornMountSkinAllowed(session.accountCosmetics, skinId)) return;
     this.host.sim().setMountSkin(session.pid, skinId);
   }
 }

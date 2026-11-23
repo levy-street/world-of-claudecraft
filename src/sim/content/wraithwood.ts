@@ -10,6 +10,7 @@
 // render/haunt_features.ts (the greatTrees records below give the sim its
 // solid trunk colliders).
 
+import { GIBBETMERE_LAYOUT, paintedTownBuildingDefs } from '../painted_towns';
 import type {
   CampDef,
   EscortDef,
@@ -596,13 +597,10 @@ export const WRAITHWOOD_ESCORTS: Record<string, EscortDef> = {
 
 export const WRAITHWOOD_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Gibbetmere: a shuttered hamlet under the eaves
-  buildings: [
-    { kind: 'inn', x: 352, z: 1434, w: 6, d: 7, rot: 0.5 },
-    { kind: 'house', x: 368, z: 1426, w: 6, d: 6, rot: -1.2 },
-    { kind: 'house', x: 354, z: 1420, w: 5, d: 5, rot: 2.3 },
-    { kind: 'chapel', x: 365, z: 1440, w: 5, d: 7, rot: -2.2 },
-  ],
+  // Gibbetmere: a shuttered hamlet under the eaves, its painted inn and chapel
+  // facing each other across the fenced square and the sexton's house south
+  // of the graves (sim/painted_towns/gibbetmere.ts)
+  buildings: [...paintedTownBuildingDefs(GIBBETMERE_LAYOUT)],
   wells: [{ x: 360, z: 1432, r: 1.5 }],
   stalls: [{ x: 356, z: 1426, rot: 0.6, r: 1.6 }],
   crates: [
@@ -626,7 +624,9 @@ export const WRAITHWOOD_PROPS: ZonePropsDef = {
   // grave fields: the wood buries its own
   graveyards: [
     { x: 294, z: 1612 },
-    { x: 386, z: 1420 },
+    // the Wraithwood Graves' headstones, beside the spirit healer's graveyard
+    // and clear of the painted chapel's south end
+    { x: 392, z: 1408 },
     { x: 434, z: 1538 },
   ],
   // The giant overgrown trees the realm is named for: solid trunk colliders

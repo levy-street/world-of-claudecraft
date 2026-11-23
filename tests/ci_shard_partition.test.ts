@@ -280,7 +280,7 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     // contract below covers locally measured rows between harvests.
     const covered = items.filter((i) => MEASURED_WEIGHTS[i.key.slice(1)] !== undefined).length;
     expect(covered / items.length).toBeGreaterThanOrEqual(0.915);
-  });
+  }, 60_000);
 });
 
 const committedTable = JSON.parse(

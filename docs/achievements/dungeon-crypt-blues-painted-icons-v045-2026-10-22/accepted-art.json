@@ -1,0 +1,2127 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 25,
+    "replacedSvgIcons": 25,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "spadeworn_gauntlets",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/spadeworn_gauntlets.webp",
+      "canonicalDisplayName": "Spadeworn Gauntlets",
+      "acceptedSha256": "7be3c6e987f30da72cc01cf991d91d630b8fe086b96ec64ec990a785a9c66850",
+      "acceptedBytes": 4262,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/spadeworn_gauntlets.png",
+        "sha256": "1b860b9d1e8959c28410021b1d39969687a5521ed4507a1b31318dd5a1247794",
+        "bytes": 2524718,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/spadeworn_gauntlets.png",
+        "sha256": "386e81ec72a35d73da63c4c954f50b87b0aa7b4260ec349ff0014dfd933b0195",
+        "bytes": 537608,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "c49a4a816bcd4e21f5afe9fc4776e0f4d81bb2c0c889b698734628bbec05a3db",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Spadeworn Gauntlets (spadeworn_gauntlets) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete pair of MAIL gauntlets arranged over a short dirt-crusted wooden spade haft segment, articulated iron knuckle plates, visible interlinked chain cuffs, one turned worn-bright palm. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/spadeworn_gauntlets.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "c49a4a816bcd4e21f5afe9fc4776e0f4d81bb2c0c889b698734628bbec05a3db"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_spadeworn_gauntlets",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_spadeworn_gauntlets.webp",
+      "canonicalDisplayName": "Heroic Spadeworn Gauntlets",
+      "acceptedSha256": "55edb31c19c725d5d72867d6ba9175ddfcbd218248f4a4a1693dfd6f0002815e",
+      "acceptedBytes": 4770,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_spadeworn_gauntlets.png",
+        "sha256": "edc0c345adb530d98493155d053b3226640d0eee05e5f0e91bfd6a5676fc1de0",
+        "bytes": 2554240,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_spadeworn_gauntlets.png",
+        "sha256": "b01da5f511a69b6caa5bb0a8755cddb345ebc3996ec0ce09444601aff50d11a8",
+        "bytes": 577796,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "3b38a63f148020de0407016d1fd272bbb7abbea74b1e87db34574b8b6d6778fe",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Spadeworn Gauntlets (heroic_spadeworn_gauntlets) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete pair of MAIL gauntlets arranged over a short dirt-crusted wooden spade haft segment, articulated iron knuckle plates, visible interlinked chain cuffs, one turned worn-bright palm. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong golden candlelight halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_spadeworn_gauntlets.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "3b38a63f148020de0407016d1fd272bbb7abbea74b1e87db34574b8b6d6778fe"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gravedirt_grips",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gravedirt_grips.webp",
+      "canonicalDisplayName": "Gravedirt Grips",
+      "acceptedSha256": "7b14a9991b70fb6f5191124c4a555c9980a1c6ecb20c3cbc1f446f6301cfac5a",
+      "acceptedBytes": 3692,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/gravedirt_grips.png",
+        "sha256": "f33030fe07ad822577a78eabb7f875055afd154213ec3161f44f7f0922fb02fb",
+        "bytes": 2390927,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/gravedirt_grips.png",
+        "sha256": "dc01d409528f32fae1ca559e7acae6e10df76c0cfe11f160f7fe3844526f323b",
+        "bytes": 521868,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "bc3692f21200f5ee95ee71b4b54775476a5abafe62193cec883aee833820d249",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gravedirt Grips (gravedirt_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of dark LEATHER fingerless gloves, empty fingertips cut away, knuckles caked in grave earth, small bone wrist toggles. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/gravedirt_grips.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "bc3692f21200f5ee95ee71b4b54775476a5abafe62193cec883aee833820d249"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_gravedirt_grips",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_gravedirt_grips.webp",
+      "canonicalDisplayName": "Heroic Gravedirt Grips",
+      "acceptedSha256": "7e3e1110972c190bc675c96e267a867cc38e4d223e0c9db48c2c4f857916a98a",
+      "acceptedBytes": 4778,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_gravedirt_grips.png",
+        "sha256": "f89a1d23e5f68380268d6b4aebf80c3644d4b2c4b923ff047762bc7beef19663",
+        "bytes": 2552876,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_gravedirt_grips.png",
+        "sha256": "36c3e56a1172a0a3232e529665b1c31ef4ebdb9369ebf382a976b3a23a69eef6",
+        "bytes": 594183,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "83f340eb800519b9d47c252c974ff0ffad5bb23f2fcfcc21b1dddc82785f08ca",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Gravedirt Grips (heroic_gravedirt_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of dark LEATHER fingerless gloves, empty fingertips cut away, knuckles caked in grave earth, small bone wrist toggles. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong golden candlelight halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_gravedirt_grips.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "83f340eb800519b9d47c252c974ff0ffad5bb23f2fcfcc21b1dddc82785f08ca"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "bellrope_mitts",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/bellrope_mitts.webp",
+      "canonicalDisplayName": "Bellrope Mitts",
+      "acceptedSha256": "806e055366347e3c2c62c5d21ca43b9ef312b225da2bbca0dcd6ccab7ff93a99",
+      "acceptedBytes": 4120,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/bellrope_mitts.png",
+        "sha256": "44e56d8dffa35e7ee2b976118a892e7e97943f9ba3eb8ebd90cce7867bbe1ece",
+        "bytes": 2384819,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/bellrope_mitts.png",
+        "sha256": "1f48a358e4784a437f15f413aa323385b6874727dabda20ad8f8d3e3d128e7a8",
+        "bytes": 538505,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "a9b62669dcf4ae6e12f2ca0d1a75fffce5f869ddecdb0120d15d19542c1c6bc1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Bellrope Mitts (bellrope_mitts) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of faded violet CLOTH fingerless mitts wound with thick bell rope, a little bronze bell attached to one rope tail. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/bellrope_mitts.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "a9b62669dcf4ae6e12f2ca0d1a75fffce5f869ddecdb0120d15d19542c1c6bc1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_bellrope_mitts",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_bellrope_mitts.webp",
+      "canonicalDisplayName": "Heroic Bellrope Mitts",
+      "acceptedSha256": "32fabca3d4a659fa6be2759d225772a01308c95679754339cc90c8cb31529a98",
+      "acceptedBytes": 4660,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_bellrope_mitts.png",
+        "sha256": "d54083fde0fcdb59af82038730d7f0818ab4f67a6d2f6c146218954009ecbddb",
+        "bytes": 2555887,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_bellrope_mitts.png",
+        "sha256": "ebb6563095eefcc8d2e17f2cc1cdf26d07556993183074b1c67e7942be82029d",
+        "bytes": 598213,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "1c2c8620525eef64bd24980bac55a8444dbe437ad2e923a0918add2e527245f2",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Bellrope Mitts (heroic_bellrope_mitts) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete staggered pair of faded violet CLOTH fingerless mitts wound with thick bell rope, a little bronze bell attached to one rope tail. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong golden candlelight halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_bellrope_mitts.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "1c2c8620525eef64bd24980bac55a8444dbe437ad2e923a0918add2e527245f2"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rimewreath_coif",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rimewreath_coif.webp",
+      "canonicalDisplayName": "Rimewreath Coif",
+      "acceptedSha256": "df7dd45b2fc560afadd3dbf3571f8ce2edcb110e3a099e9e5616fe7ac2de9b68",
+      "acceptedBytes": 4926,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/rimewreath_coif.png",
+        "sha256": "cf2c31efb255945ab7c294b50ed0d3c4a52f0f7d571f160a710f240fd832e637",
+        "bytes": 2794393,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/rimewreath_coif.png",
+        "sha256": "5b41826070a66167067da802eef4ec4cd7554b87be0baccb4d8d852fe7df6220",
+        "bytes": 588994,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "43ee8fbc73d99acd192df455f33496acbd1d9485bb05ae558f95c20d79936ff7",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rimewreath Coif (rimewreath_coif) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty MAIL coif of delicate silver chain crowned with a bridal wreath of icy crystalline flowers; blue frost on the chain, dark empty face opening. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/rimewreath_coif.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "43ee8fbc73d99acd192df455f33496acbd1d9485bb05ae558f95c20d79936ff7"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_rimewreath_coif",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_rimewreath_coif.webp",
+      "canonicalDisplayName": "Heroic Rimewreath Coif",
+      "acceptedSha256": "a2458d6ce2855dbf67eb44b95c0bc9d530b1f1319a8f714be26c33f53eff4d7b",
+      "acceptedBytes": 5138,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_rimewreath_coif.png",
+        "sha256": "1e622dc175f0db1c640a63de2ec3880b60ad5ccfd5e48062ee00e081c17c0b36",
+        "bytes": 2854409,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_rimewreath_coif.png",
+        "sha256": "8e601e4c63bcb6e870b621f53aa6eaac7ea6792eb9a973683bad980f8bd92647",
+        "bytes": 611317,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "803c432689265ae02b1879b9b8c1975c9348bcd84835c63d990fff3b175a24ce",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Rimewreath Coif (heroic_rimewreath_coif) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty MAIL coif of delicate silver chain crowned with a bridal wreath of icy crystalline flowers; blue frost on the chain, dark empty face opening. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong icy blue bridal frost halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_rimewreath_coif.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "803c432689265ae02b1879b9b8c1975c9348bcd84835c63d990fff3b175a24ce"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rime_laced_hood",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rime_laced_hood.webp",
+      "canonicalDisplayName": "Rime-Laced Hood",
+      "acceptedSha256": "647a72d7ab47e708d149599a15b5a1862022c9aa379235a19c044f0ce3897b21",
+      "acceptedBytes": 3674,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/rime_laced_hood.png",
+        "sha256": "a822676b6186ce4d0106f871421ca04f9ad8d9a27199a8a3bef2af7a1bc110ea",
+        "bytes": 2646749,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/rime_laced_hood.png",
+        "sha256": "e5e770332756fd3c3bbdc31118dcf9d3d5c344d05f37ca78817c1d48fb5083bb",
+        "bytes": 555975,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "7fb18ddcbdec3ba3b8d8ff43ec75c0a3dfd5c3ff5c24e45556a8e1558b23381b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rime-Laced Hood (rime_laced_hood) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete peaked LEATHER hood, cold grey supple hide laced with prominent frost-white cord, dark empty face opening, visible stitched seams. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/rime_laced_hood.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "7fb18ddcbdec3ba3b8d8ff43ec75c0a3dfd5c3ff5c24e45556a8e1558b23381b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_rime_laced_hood",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_rime_laced_hood.webp",
+      "canonicalDisplayName": "Heroic Rime-Laced Hood",
+      "acceptedSha256": "c341c231168185f94556b6a32fba11bdccd99ddd340ccb288d41ec50594c432c",
+      "acceptedBytes": 4512,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_rime_laced_hood.png",
+        "sha256": "5dcda7b1ba87eb89d2cea547b75ab3e7b0accb66652881f9c1124cce94b8aaa7",
+        "bytes": 2511016,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_rime_laced_hood.png",
+        "sha256": "515046c20deecbbe13f05967dcb93f13f1922efdd1b704d01e6e899ab614e5ad",
+        "bytes": 570328,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "6e1a5d32697f5fd9940f8a63813591c3f40f8dd630bd67f235a5a4865fa87c0d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Rime-Laced Hood (heroic_rime_laced_hood) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete peaked LEATHER hood, cold grey supple hide laced with prominent frost-white cord, dark empty face opening, visible stitched seams. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong icy blue bridal frost halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_rime_laced_hood.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6e1a5d32697f5fd9940f8a63813591c3f40f8dd630bd67f235a5a4865fa87c0d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "lamenting_veil",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/lamenting_veil.webp",
+      "canonicalDisplayName": "Lamenting Veil",
+      "acceptedSha256": "497809a397b227ed19f9915f1d104c57f690c5aa591dd979d5a680551063c0af",
+      "acceptedBytes": 4328,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/lamenting_veil.png",
+        "sha256": "32c2d6dfa1f717fc4e7d08d57431038dc3d44a8fa53ae49f0bb19fa22171399a",
+        "bytes": 2499352,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/lamenting_veil.png",
+        "sha256": "7de8457e583665b7a5df0fa29648e25a4b3836fa0d502b3cf9628d87ad19bcb1",
+        "bytes": 628970,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "ec4cbdeb6eac2721a3ff3d68699937ed485f13d17ad5ec7467c0397a2dd55312",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Lamenting Veil (lamenting_veil) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete silver bridal circlet with a cascading rime-silk CLOTH veil beaded with luminous frozen tears. Empty draped garment, no face, no head or mannequin; silver filigree and delicate frost lace. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/lamenting_veil.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ec4cbdeb6eac2721a3ff3d68699937ed485f13d17ad5ec7467c0397a2dd55312"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_lamenting_veil",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_lamenting_veil.webp",
+      "canonicalDisplayName": "Heroic Lamenting Veil",
+      "acceptedSha256": "67607d3385df5b52835922e78ad80a74efd44d079c875a3175b42aa03666fcad",
+      "acceptedBytes": 4588,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_lamenting_veil.png",
+        "sha256": "c1707bd9143018de9ff3ebe8ea280b856ad6eae80e4fec2c7d3197739262d0db",
+        "bytes": 2700787,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_lamenting_veil.png",
+        "sha256": "e86291e4625a5740408607dd1f718bf38be56193cbea440f72a97f6ab2c71419",
+        "bytes": 638133,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "09b065b97299a173db51fd1ed97fa91cb09df69309f09352eb901aa0f4a5d150",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Lamenting Veil (heroic_lamenting_veil) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete silver bridal circlet with a cascading rime-silk CLOTH veil beaded with luminous frozen tears. Empty draped garment, no face, no head or mannequin; silver filigree and delicate frost lace. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong icy blue bridal frost halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_lamenting_veil.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "09b065b97299a173db51fd1ed97fa91cb09df69309f09352eb901aa0f4a5d150"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "choirward_pauldrons",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/choirward_pauldrons.webp",
+      "canonicalDisplayName": "Choirward Pauldrons",
+      "acceptedSha256": "e0810aab264602b04bbb7a3f0bfee94a6ff354494fd116020a8a7f3b7af57aed",
+      "acceptedBytes": 4544,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/choirward_pauldrons.png",
+        "sha256": "3cafb6224518e254a142165e17cf030a7a70fd54b74943637bedc459fcb06025",
+        "bytes": 2354178,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/choirward_pauldrons.png",
+        "sha256": "39058df331da11f2590c12809bc104b2dead780dcc5087b0bfa3a926071a2ca6",
+        "bytes": 556689,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "370d34446c9a7f69fe921aa46aa504881cb6bd318e6005bd73bdfe922a4cc925",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Choirward Pauldrons (choirward_pauldrons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete pair of MAIL shoulder pauldrons, silver-edged layered metal lames over interlinked chain, violet tabard strips and a central silver bell ornament. No torso or wearer. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/choirward_pauldrons.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "370d34446c9a7f69fe921aa46aa504881cb6bd318e6005bd73bdfe922a4cc925"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_choirward_pauldrons",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_choirward_pauldrons.webp",
+      "canonicalDisplayName": "Heroic Choirward Pauldrons",
+      "acceptedSha256": "28b94668201c65c4945575e4acc9f54845eeefa654242ae7e0f552098f4a66a3",
+      "acceptedBytes": 4584,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_choirward_pauldrons.png",
+        "sha256": "19a1e681a39fefb7725366731b1eefab913714964b5612d712b852af209c01ad",
+        "bytes": 2422564,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_choirward_pauldrons.png",
+        "sha256": "960861678977d06f6874c9d63cd3e807b6c43aeae138c9bbf5f0bda4da5de2b3",
+        "bytes": 621995,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "2b7ceb168df1527b12e03f7949cc2637b489181bd6ea11dab88ce46bdd2965c0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Choirward Pauldrons (heroic_choirward_pauldrons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete pair of MAIL shoulder pauldrons, silver-edged layered metal lames over interlinked chain, violet tabard strips and a central silver bell ornament. No torso or wearer. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong spectral violet choir light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_choirward_pauldrons.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "2b7ceb168df1527b12e03f7949cc2637b489181bd6ea11dab88ce46bdd2965c0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "choristers_spaulders",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/choristers_spaulders.webp",
+      "canonicalDisplayName": "Chorister's Spaulders",
+      "acceptedSha256": "1c4e7e79f998c35ff2126644e1747ac258dbc6e161ebf11831c38335ba70c80b",
+      "acceptedBytes": 3134,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/choristers_spaulders.png",
+        "sha256": "dbc782488e74639270f9cb1fec99b01485f7a298283da36e46668a7ccd1378ec",
+        "bytes": 2171655,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/choristers_spaulders.png",
+        "sha256": "0cea87164cdfa960110e0a4fc542a9a9e4f30f6478576589893234029bbc2e05",
+        "bytes": 470834,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "b544d8d3ae94891e229f59e92c701c0a00a353bde557951c80d1eaec3e650b3b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Chorister's Spaulders (choristers_spaulders) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete pair of rounded LEATHER shoulder spaulders, dark purple-brown stitched hide, decorative musical-note embroidery, one short silver chime hanging below. No torso or wearer. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/choristers_spaulders.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "b544d8d3ae94891e229f59e92c701c0a00a353bde557951c80d1eaec3e650b3b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_choristers_spaulders",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_choristers_spaulders.webp",
+      "canonicalDisplayName": "Heroic Chorister's Spaulders",
+      "acceptedSha256": "65467467307b5aea57a1e76dbcb61600c2356e8962a8c840ce689cadf56054c1",
+      "acceptedBytes": 4120,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_choristers_spaulders.png",
+        "sha256": "947148677e8f64fd434e9f1af88ad303d9ef14345126e5ede3b8609b82d1665d",
+        "bytes": 2452199,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_choristers_spaulders.png",
+        "sha256": "439bc95632ba19bcdd8e6f8cff215090650c2de542b67f2ec9d3c9fc5faa373a",
+        "bytes": 579869,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "738b13943d9aee65b46fa829437eb45491260a73edf7fa5dd6a3ef02753b85b7",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Chorister's Spaulders (heroic_choristers_spaulders) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete pair of rounded LEATHER shoulder spaulders, dark purple-brown stitched hide, decorative musical-note embroidery, one short silver chime hanging below. No torso or wearer. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong spectral violet choir light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_choristers_spaulders.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "738b13943d9aee65b46fa829437eb45491260a73edf7fa5dd6a3ef02753b85b7"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "cantors_stole",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/cantors_stole.webp",
+      "canonicalDisplayName": "Cantor's Stole",
+      "acceptedSha256": "2c3b367684d3aa52f9d88771a1413d328eb78b3e54da07a21f86ffe8841d7474",
+      "acceptedBytes": 4088,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/cantors_stole.png",
+        "sha256": "9401ab1b8115395e3ad557cdf2d2741d78b5daa94b046d32f034874107d94a92",
+        "bytes": 2522365,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/cantors_stole.png",
+        "sha256": "bcd71452ff8db19f102aadebaa3e5e172c1f46cdce54ba2d20ca923f7542aab3",
+        "bytes": 558922,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "29704afda4cc39ec572311991c714971f69d4966d75f965b9e881d3c8505b504",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Cantor's Stole (cantors_stole) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete violet choir CLOTH stole, folded inverted U shape with two long hanging tails, gold embroidered bell motifs and fringed ends. Whole stole visible, no wearer. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/cantors_stole.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "29704afda4cc39ec572311991c714971f69d4966d75f965b9e881d3c8505b504"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_cantors_stole",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_cantors_stole.webp",
+      "canonicalDisplayName": "Heroic Cantor's Stole",
+      "acceptedSha256": "be1c4ae72ebbfc6204f779de006478df289bb73a0513fe809663d23473454195",
+      "acceptedBytes": 4746,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_cantors_stole.png",
+        "sha256": "b6bc2ae81788e5be010ff6f72de5fc00ef2e7228a391d4059e6832c5a99a22bb",
+        "bytes": 2587513,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_cantors_stole.png",
+        "sha256": "092857ed8bda36406d6764aa449c34a19bac5d61e726b6c9676b5b2f36eed9ee",
+        "bytes": 601337,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "d5fd5dae0c637d5e0e11d97e6fdf011dd77cf89095cbaafd83428404a092e22e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Cantor's Stole (heroic_cantors_stole) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete violet choir CLOTH stole, folded inverted U shape with two long hanging tails, gold embroidered bell motifs and fringed ends. Whole stole visible, no wearer. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong spectral violet choir light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_cantors_stole.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d5fd5dae0c637d5e0e11d97e6fdf011dd77cf89095cbaafd83428404a092e22e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "knellbound_hauberk",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/knellbound_hauberk.webp",
+      "canonicalDisplayName": "Knellbound Hauberk",
+      "acceptedSha256": "706f36f58d869c6ef8178746307a49f42e287e87956491528acf2c43871dd97b",
+      "acceptedBytes": 4182,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/knellbound_hauberk.png",
+        "sha256": "0fd1450b65a8c3fbe279c8deb339f8390ad67e60d1045c9d2cb43780b0d05421",
+        "bytes": 2691840,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/knellbound_hauberk.png",
+        "sha256": "8c55526764c5df1f687253d9f23953da7b2678f6b46c6579d71d32136bd55b04",
+        "bytes": 544852,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "050bed076d43f7669458e9f888280359b5e1a13afc7ef94ac19bb9b987fdc697",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Knellbound Hauberk (knellbound_hauberk) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty grave-dark MAIL hauberk, clearly interlinked blackened iron chain, a heavy bronze knell bell chained across breast, aged metal, no wearer. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/knellbound_hauberk.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "050bed076d43f7669458e9f888280359b5e1a13afc7ef94ac19bb9b987fdc697"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_knellbound_hauberk",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_knellbound_hauberk.webp",
+      "canonicalDisplayName": "Heroic Knellbound Hauberk",
+      "acceptedSha256": "a42780cd1d10450d5351d78cceb80da66c67c6d9d9e62f8ab755927ecd11ebdc",
+      "acceptedBytes": 5640,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_knellbound_hauberk.png",
+        "sha256": "db1b58c6a93dad42b7d0d16b85579f1c035fe6fc06250b6796b693d0c6d2372b",
+        "bytes": 2820866,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_knellbound_hauberk.png",
+        "sha256": "a499161ee6cd499fbcdb72394f3c6ab99221f2527c1487006a166bd2e77440f4",
+        "bytes": 594445,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "8c47f45086c1267c060725a42842cd7935b460c219f82d5736fb7529966823af",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Knellbound Hauberk (heroic_knellbound_hauberk) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty grave-dark MAIL hauberk, clearly interlinked blackened iron chain, a heavy bronze knell bell chained across breast, aged metal, no wearer. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong green soul-light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_knellbound_hauberk.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "8c47f45086c1267c060725a42842cd7935b460c219f82d5736fb7529966823af"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "candlewatch_jerkin",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/candlewatch_jerkin.webp",
+      "canonicalDisplayName": "Candlewatch Jerkin",
+      "acceptedSha256": "9b5bdb1e2d7689e415a9db25def23b35d5a8afb4e17b7f1a2dfe9f99a8d727c0",
+      "acceptedBytes": 3484,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/candlewatch_jerkin.png",
+        "sha256": "04d3b0ef14278421ecb307868bed33dee40eed254433b759c02040778edd1f79",
+        "bytes": 2375920,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/candlewatch_jerkin.png",
+        "sha256": "afa290a2d63b6bcc3ddd5e445f578333081003e9f7df53541ba7daa02c37fb34",
+        "bytes": 539344,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "916829171fd5c01c8a46f8f1111283531da639ac908973a23be684c55bfbf1d4",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Candlewatch Jerkin (candlewatch_jerkin) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty dark LEATHER jerkin with a diagonal bandolier holding exactly three lit tallow candles in short metal cups, warm wax drips and soft flame glow, supple stitched hide. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/candlewatch_jerkin.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "916829171fd5c01c8a46f8f1111283531da639ac908973a23be684c55bfbf1d4"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_candlewatch_jerkin",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_candlewatch_jerkin.webp",
+      "canonicalDisplayName": "Heroic Candlewatch Jerkin",
+      "acceptedSha256": "1ea7d30e55784f6a44529c881cf47e3b56b3685cbf2b5cc4f4474d04ff7f02a5",
+      "acceptedBytes": 4348,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_candlewatch_jerkin.png",
+        "sha256": "d5e363ef35fc60703a6d8a2f457e23d0725bb0ba934d2a34919102d58c8d94b8",
+        "bytes": 2364528,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_candlewatch_jerkin.png",
+        "sha256": "e6a3b1803a34f3b62a74a810b862503c7d87729efd12f3a3cd8a6ef9af472845",
+        "bytes": 561801,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "cb3948858f395232274d9836bb32c589b318378d93ab8c572e3e09f4b5787cfb",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Candlewatch Jerkin (heroic_candlewatch_jerkin) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty dark LEATHER jerkin with a diagonal bandolier holding exactly three lit tallow candles in short metal cups, warm wax drips and soft flame glow, supple stitched hide. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong green soul-light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_candlewatch_jerkin.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "cb3948858f395232274d9836bb32c589b318378d93ab8c572e3e09f4b5787cfb"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "robe_of_the_unquiet_rite",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/robe_of_the_unquiet_rite.webp",
+      "canonicalDisplayName": "Robe of the Unquiet Rite",
+      "acceptedSha256": "89b6a9022b9d5a4d392bc4756dbdd6886b42e84be6493a8cd87d4665ca2f09f4",
+      "acceptedBytes": 3548,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/robe_of_the_unquiet_rite.png",
+        "sha256": "2bb18511bcd38e81f8badf9357ea9e56a7f1d28736e075057731a4a3d46474e3",
+        "bytes": 2258885,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/robe_of_the_unquiet_rite.png",
+        "sha256": "ea31c108a09623c45853b31fdd17d6c1acb2e64a31b13b2de07ef2ede4be2484",
+        "bytes": 525027,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "cb34d30de1b149eea389610060754df330a8a4c84a84ed3cc3003d8ee84034eb",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Robe of the Unquiet Rite (robe_of_the_unquiet_rite) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty violet-black CLOTH ritual robe, flowing folds, a circular Rite Ring emblem containing exactly four small candle-flame motifs prominently embroidered on the breast, ghostly green accents. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/robe_of_the_unquiet_rite.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "cb34d30de1b149eea389610060754df330a8a4c84a84ed3cc3003d8ee84034eb"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_robe_of_the_unquiet_rite",
+      "family": "crypt-blues",
+      "tier": "heroic",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_robe_of_the_unquiet_rite.webp",
+      "canonicalDisplayName": "Heroic Robe of the Unquiet Rite",
+      "acceptedSha256": "75faa3032e6420d8cb52bb40b075c6d6ef4cd414f34c846770984a4e05c87482",
+      "acceptedBytes": 5094,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/heroic_robe_of_the_unquiet_rite.png",
+        "sha256": "c755227528107171e35211f04b5abd7569fe9203509d016dacca6328db5fde08",
+        "bytes": 2472450,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/heroic_robe_of_the_unquiet_rite.png",
+        "sha256": "9f00a730f979b607681cc9f5986d99a278570b44eb065d4304852c4e045a95db",
+        "bytes": 601117,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "e42e92c322b49cd7b76823505a861f2377eb4be5777c89c8d933cf8f723b4c36",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Robe of the Unquiet Rite (heroic_robe_of_the_unquiet_rite) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty violet-black CLOTH ritual robe, flowing folds, a circular Rite Ring emblem containing exactly four small candle-flame motifs prominently embroidered on the breast, ghostly green accents. No wearer or mannequin. Heroic version: visibly different three-quarter presentation, deeper midnight ground and strong green soul-light halo with luminous edge glints. Preserve the core construction and material; a new individual painting. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/heroic_robe_of_the_unquiet_rite.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "e42e92c322b49cd7b76823505a861f2377eb4be5777c89c8d933cf8f723b4c36"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gravecallers_rod",
+      "family": "crypt-blues",
+      "tier": "normal",
+      "batch": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gravecallers_rod.webp",
+      "canonicalDisplayName": "Gravecaller's Rod",
+      "acceptedSha256": "cd9714dbfbd7c918f949bfab5c3faf882fd9783ba469efefa862ff3c770d49b0",
+      "acceptedBytes": 2462,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/originals/gravecallers_rod.png",
+        "sha256": "96f43598f1f6d193082924bfb06a57780188d47b0d430332f0f2e5face4275cb",
+        "bytes": 2001733,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-crypt-blues/masters/gravecallers_rod.png",
+        "sha256": "584f42fe6a2c4432bd4f503a0b286c14f2be488a06d12813df916309df59e5f2",
+        "bytes": 451202,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "lower-dungeon-blues-icons-2026-10-08",
+        "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+        "sha256": "0091d84dded325aeeb83d0d751bf21d6c8a2835c99a65f70952bc3d7f80f830a",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gravecaller's Rod (gravecallers_rod) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete short black iron magic rod diagonally posed, pale carved bone grip and a cage of curled finger bones at its tip holding a compact soul-green flame. Whole cage and butt visible. No wearer or mannequin. Preserve canonical Hollow Crypt rare loot identity and material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow; Heroic versions use the specified deeper boss-light ground. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-crypt-blues/superseded/gravecallers_rod.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "0091d84dded325aeeb83d0d751bf21d6c8a2835c99a65f70952bc3d7f80f830a"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-crypt-blues-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-crypt-blues-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

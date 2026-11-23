@@ -228,7 +228,7 @@ function hit(
   ctx.dealDamage(
     caster,
     target,
-    hoardMechanicDamage(inst, fraction),
+    hoardMechanicDamage(inst, fraction, 'add'),
     false,
     def.school,
     def.name,

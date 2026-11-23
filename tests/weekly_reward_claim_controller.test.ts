@@ -321,11 +321,14 @@ describe('completed-week claim flow', () => {
     expect(s.host.querySelectorAll('.vault-is-revealed')).toHaveLength(1);
     expect(s.open).not.toHaveBeenCalled();
     const stale = s.host.querySelector<HTMLButtonElement>('[data-focus-key="weekly-open:1"]')!;
+    s.state.lootSpec = 'fire';
     s.state.claimSequence++;
     stale.click();
     expect(s.open).not.toHaveBeenCalled();
     s.render();
-    expect(s.host.querySelector('.weekly-start-claim')).not.toBeNull();
+    expect(s.host.querySelector('.weekly-start-claim')).toBeNull();
+    expect(s.host.querySelectorAll('.vault-is-revealed')).toHaveLength(1);
+    expect(s.host.querySelector('[data-focus-key="weekly-open:1"]')).not.toBeNull();
   });
 
   it('offers ready rewards on opening, survives repaint, and enters the earned vaults without claiming', () => {

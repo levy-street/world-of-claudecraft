@@ -1589,6 +1589,15 @@ body[data-guide-route="home"] .guide-main {
 .guide-footer-links a:not(.guide-cta):hover {
   color: var(--g-gold);
 }
+/* Player-guide links: 40px touch targets, so the wrapped rows need no extra row gap. */
+.guide-footer-guides {
+  row-gap: 0;
+}
+.guide-footer-guides a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+}
 .guide-footer-rights {
   color: var(--g-text-muted);
   font-size: var(--g-text-sm);

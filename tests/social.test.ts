@@ -4,6 +4,7 @@
 // tests/social_shared.ts. Tests here run on the entity-stripped
 // SOCIAL_TEST_WORLD via makeWorld() except the three that fight or loot a
 // live camp wolf, which keep the full built-in world via makeFullWorld().
+
 import { describe, expect, it } from 'vitest';
 import {
   CRYPT_SPAWNS,
@@ -14,7 +15,9 @@ import {
   MOBS,
 } from '../src/sim/data';
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../src/sim/eastbrook_layout';
+import { cryptDevTrigger } from '../src/sim/encounters/hollow_crypt';
 import { createMob } from '../src/sim/entity';
+import { claimedInstanceAt } from '../src/sim/instances/dungeons';
 import { type Party, Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -1080,6 +1083,10 @@ describe('the Hollow Crypt', () => {
     expect(cryptMobs.length).toBe(CRYPT_SPAWNS.length);
     // walk the player onto the boss: pulse should hit within ~12s
     const boss = nearestMob(sim, 'morthen', origin);
+    // Skip his entrance at the Rite Ring (encounters/hollow_crypt): this pins
+    // the pulse in combat, not the cinematic.
+    const claim = claimedInstanceAt(sim.ctx, mustEntity(sim, a).pos);
+    if (claim) cryptDevTrigger(sim.ctx, claim, 'skip');
     const ea = sim.entities.get(a)!;
     sim.setPlayerLevel(10, a);
     ea.hp = ea.maxHp;
@@ -1161,7 +1168,11 @@ describe('the new dungeons', () => {
           Math.abs(e.pos.x - origin.x) < 120,
       ).length;
     expect(addsNear()).toBe(0);
+    // The waves are his encounter's (encounters/gravewyrm_sanctum/velkhar.ts):
+    // they come while he is in his fight, on a target.
     velkhar.inCombat = true;
+    velkhar.aggroTargetId = a;
+    velkhar.aiState = 'attack';
     velkhar.hp = Math.floor(velkhar.maxHp * 0.6);
     sim.tick();
     expect(addsNear()).toBe(3);
@@ -1186,7 +1197,11 @@ describe('dungeon difficulty slash command', () => {
     const p = sim.addPlayer('warrior', 'Solo');
     sim.enterDungeon('hollow_crypt', p);
     sim.leaveDungeon(p);
-    sim.setDungeonDifficulty('heroic', p);
+    // Seed a divergent preference so this tests explicit slash-command routing,
+    // independently of the automatic switch covered in difficulty_selection.test.ts.
+    sim.players.get(p)!.dungeonDifficulty = 'heroic';
+    const claim = sim.instances.find((inst) => inst.dungeonId === 'hollow_crypt' && inst.partyKey);
+    expect(claim?.difficulty).toBe('normal');
 
     sim.drainEvents();
     sim.chat('/dungeon reset', p);
@@ -1201,6 +1216,7 @@ describe('dungeon difficulty slash command', () => {
             event.text === 'All instances have been reset.',
         ),
     ).toBe(true);
+    expect(claim?.difficulty).toBe('heroic');
   });
 
   it('routes the /dungeons and /instances reset aliases', () => {

@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/basin_jaguar_woc.glb",
+      "out": "models/creatures/woc_basin_jaguar.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Stalk",
+        "Hit",
+        "Bite",
+        "Claw",
+        "Roar",
+        "Stunned",
+        "Pounce",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

@@ -207,6 +207,7 @@ describe('the schedule and the cold-open gate share one linked signature', () =>
       // The subject is the per-skin units alone: no poses, no portraits.
       includeCardPoses: false,
       portraitFramings: [],
+      iosMemoryProfile: false,
       renderCharShell: () => {},
       prewarmCharSkin: () => {
         if (!gate.isLinked(sig)) {
@@ -254,6 +255,7 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       warmCharSkins: true,
       includeCardPoses: true,
       portraitFramings: ['headshot', 'body'],
+      iosMemoryProfile: false,
       renderCharShell: () => {
         calls.push('shell');
       },
@@ -318,6 +320,7 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       warmCharSkins: false,
       includeCardPoses: false,
       portraitFramings: ['headshot'],
+      iosMemoryProfile: false,
       renderCharShell: () => {},
       prewarmCharSkin: () => {},
       prewarmCardPose: () => {},
@@ -359,6 +362,7 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       warmCharSkins: true,
       includeCardPoses: true,
       portraitFramings: ['headshot', 'body'],
+      iosMemoryProfile: false,
       renderCharShell: () => {
         calls.push('shell');
       },
@@ -407,6 +411,7 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       warmCharSkins: true,
       includeCardPoses: true,
       portraitFramings: ['headshot', 'body'],
+      iosMemoryProfile: false,
       renderCharShell: () => {},
       prewarmCharSkin: () => {},
       prewarmCardPose: () => {},
@@ -458,5 +463,90 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'preview:portrait:hunter:0:headshot',
       'preview:portrait:hunter:1:headshot',
     ]);
+  });
+
+  // The iOS memory profile: every alternate class skin is a standalone atlas
+  // that a warm fetches, transcodes, keeps for the page and uploads into the
+  // portrait context, so that profile warms the default skin only and leaves
+  // the alternates to the live capture on first ask.
+  const catalogDeps = (iosMemoryProfile: boolean, calls: string[] = []) =>
+    buildPostEntryPreviewPrewarmUnits<string>({
+      playerClass: 'hunter',
+      allClasses: ['hunter', 'mage', 'warrior'],
+      skinCount: (unitId) => ({ player_hunter: 3, player_mage: 2 })[unitId] ?? 1,
+      cardPoses: ['heroic'],
+      includeCharFamily: true,
+      warmCharSkins: true,
+      includeCardPoses: true,
+      portraitFramings: ['headshot', 'body'],
+      iosMemoryProfile,
+      renderCharShell: () => {},
+      prewarmCharSkin: (skin) => {
+        calls.push(`skin:${skin}`);
+      },
+      prewarmCardPose: () => {},
+      renderPortrait: (cls, skin, framing) => {
+        calls.push(`portrait:${cls}:${skin}:${framing}`);
+      },
+    });
+
+  it('iOS memory profile: portraits warm skin 0 only, one unit per class and framing', () => {
+    const calls: string[] = [];
+    const units = catalogDeps(true, calls);
+    expect(units.map((u) => u.label)).toEqual([
+      'preview:char-window',
+      'preview:char-skin:0',
+      'preview:char-skin:1',
+      'preview:char-skin:2',
+      'preview:card-pose:0',
+      'preview:portrait:hunter:0:headshot',
+      'preview:portrait:hunter:0:body',
+      'preview:portrait:mage:0:headshot',
+      'preview:portrait:mage:0:body',
+      'preview:portrait:warrior:0:headshot',
+      'preview:portrait:warrior:0:body',
+    ]);
+    for (const u of units) u.run();
+    // Only the portrait catalog is trimmed: the local legacy player's own
+    // paperdoll swatches still warm every skin.
+    expect(calls).toEqual([
+      'skin:0',
+      'skin:1',
+      'skin:2',
+      'portrait:hunter:0:headshot',
+      'portrait:hunter:0:body',
+      'portrait:mage:0:headshot',
+      'portrait:mage:0:body',
+      'portrait:warrior:0:headshot',
+      'portrait:warrior:0:body',
+    ]);
+  });
+
+  it('off the iOS memory profile the plan keeps every (class, skin), and iOS only drops alternate-skin portraits', () => {
+    const desktop = catalogDeps(false).map((u) => u.label);
+    expect(desktop).toEqual([
+      'preview:char-window',
+      'preview:char-skin:0',
+      'preview:char-skin:1',
+      'preview:char-skin:2',
+      'preview:card-pose:0',
+      'preview:portrait:hunter:0:headshot',
+      'preview:portrait:hunter:0:body',
+      'preview:portrait:hunter:1:headshot',
+      'preview:portrait:hunter:1:body',
+      'preview:portrait:hunter:2:headshot',
+      'preview:portrait:hunter:2:body',
+      'preview:portrait:mage:0:headshot',
+      'preview:portrait:mage:0:body',
+      'preview:portrait:mage:1:headshot',
+      'preview:portrait:mage:1:body',
+      'preview:portrait:warrior:0:headshot',
+      'preview:portrait:warrior:0:body',
+    ]);
+    const alternateSkinPortrait = (label: string): boolean =>
+      /^preview:portrait:[^:]+:[1-9]\d*:/.test(label);
+    expect(catalogDeps(true).map((u) => u.label)).toEqual(
+      desktop.filter((label) => !alternateSkinPortrait(label)),
+    );
   });
 });

@@ -23,6 +23,7 @@ import { Pool } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CHARACTER_SAVE_LEASED_LINE } from '../server/character_save_statement';
 import { materialSourceConnection } from '../server/material_source_connection';
+import { MATERIAL_SOURCE_WRITER_FUNCTION_SQL } from '../server/material_source_writer';
 import {
   applyOfflineCharacterSaveBounds,
   type BoundedTransactionRunner,
@@ -184,6 +185,34 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
     await admin?.query(`DROP DATABASE IF EXISTS ${VERIFY_DB}`).catch(() => {});
     await admin?.end().catch(() => {});
   }, 30_000);
+
+  it('upgrades a v1 database before a pending market backfill writes world state', async () => {
+    await pool.query("DELETE FROM world_state WHERE key = 'market_backfill_done'");
+    await pool.query(
+      "INSERT INTO world_state (key, data) VALUES ('market', $1::jsonb) ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data",
+      [JSON.stringify({ listings: [], collections: [], nextId: 1 })],
+    );
+    const oldFunction = MATERIAL_SOURCE_WRITER_FUNCTION_SQL.replace(
+      "IS DISTINCT FROM '2'",
+      "IS DISTINCT FROM '1'",
+    );
+    await pool.query(oldFunction);
+    try {
+      await expect(
+        pool.query("UPDATE world_state SET data = data WHERE key = 'market'"),
+      ).rejects.toMatchObject({ code: '55000' });
+      await db.ensureSchema();
+      expect(
+        (await pool.query("SELECT key FROM world_state WHERE key = 'market_backfill_done'"))
+          .rowCount,
+      ).toBe(1);
+      const id = await makeCharacter();
+      expect(await db.saveOfflineCharacterState(id, 7, STATE('upgraded'))).toBe(true);
+      expect(await markerOf(id)).toBe('upgraded');
+    } finally {
+      await pool.query(MATERIAL_SOURCE_WRITER_FUNCTION_SQL);
+    }
+  }, 120_000);
 
   describe('the unleased fence (saveOfflineCharacterState, the D13-5 strip write)', () => {
     it('lands on a character with NO lease row at all', async () => {

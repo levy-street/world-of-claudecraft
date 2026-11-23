@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { GRAVEWYRM_SANCTUM_FIELD } from '../src/sim/content/gravewyrm_sanctum_layout';
+import { HOLLOW_CRYPT_FIELD } from '../src/sim/content/hollow_crypt_layout';
+import { SUNKEN_BASTION_FIELD } from '../src/sim/content/sunken_bastion_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { CRYPT_LAYOUT } from '../src/sim/dungeon_layout';
 import {
@@ -83,12 +86,42 @@ describe('generic dungeon map view', () => {
   );
 
   it('projects the authoritative generic layout instead of an Ignivar-only copy', () => {
-    const model = buildDungeonWorldMapModel(worldIn('hollow_crypt'), 560, 34);
+    // The Abandoned Crypt keeps a room plan (the Gravewyrm Sanctum, the old
+    // example here, is an open-air field since its Ice Tomb rework).
+    const model = buildDungeonWorldMapModel(worldIn('nythraxis_crypt'), 560, 34);
     expect(model).not.toBeNull();
-    expect(model?.sourceLayout).toBe(CRYPT_LAYOUT);
+    expect(model?.field).toBeNull();
     expect(model?.floors.length).toBeGreaterThan(0);
     expect(model?.walls.length).toBeGreaterThan(0);
     expect(model?.markers.at(-1)).toMatchObject({ kind: 'player' });
+  });
+
+  it.each([
+    ['hollow_crypt', HOLLOW_CRYPT_FIELD],
+    ['sunken_bastion', SUNKEN_BASTION_FIELD],
+    ['gravewyrm_sanctum', GRAVEWYRM_SANCTUM_FIELD],
+  ] as const)('draws the %s as its painted open-air field plate, not a fallback box', (id, def) => {
+    const model = buildDungeonWorldMapModel(worldIn(id), 560, 34);
+    expect(model).not.toBeNull();
+    expect(model?.sourceLayout).toBe(CRYPT_LAYOUT);
+    expect(model?.field?.key).toBe(def.key);
+    // The plate frames the whole field (every surface) inside the canvas.
+    const rect = model?.fieldRect;
+    expect(rect).not.toBeNull();
+    if (!rect) return;
+    expect(rect.x).toBeGreaterThanOrEqual(0);
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.x + rect.w).toBeLessThanOrEqual(560.001);
+    expect(rect.y + rect.h).toBeLessThanOrEqual(560.001);
+    expect(Math.max(rect.w, rect.h)).toBeGreaterThan(400);
+    // The player stands on the plate, not off it.
+    const me = model?.markers.at(-1);
+    expect(me).toMatchObject({ kind: 'player' });
+    if (!me) return;
+    expect(me.cx).toBeGreaterThan(rect.x);
+    expect(me.cx).toBeLessThan(rect.x + rect.w);
+    expect(me.cy).toBeGreaterThan(rect.y);
+    expect(me.cy).toBeLessThan(rect.y + rect.h);
   });
 
   it("draws a party member's dungeon from OUTSIDE via the anchor: party marker, no player arrow", () => {

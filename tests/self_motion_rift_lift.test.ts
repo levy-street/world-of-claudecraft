@@ -7,7 +7,12 @@
 // suite has no reason to ever hit.
 
 import { describe, expect, it } from 'vitest';
-import { resolvedRiftFloorPlan, riftLiftFor } from '../src/render/self_motion_rift_lift';
+import {
+  resolvedRiftFloorPlan,
+  riftLiftFor,
+  withRiftLift,
+} from '../src/render/self_motion_rift_lift';
+import type { MotionState, PredictionFrame } from '../src/render/self_prediction_core';
 import {
   isRiftPos,
   RIFT_BAND_X_MIN,
@@ -18,6 +23,7 @@ import {
 } from '../src/sim/data';
 import { generateRiftFloor, riftLiftAt } from '../src/sim/rift/rift_gen';
 import type { RiftUpgradeManifest } from '../src/sim/rift/types';
+import { emptyMoveInput } from '../src/sim/types';
 import type { RiftFloorView } from '../src/world_api/dungeons';
 
 // Same procedural fixture tests/self_motion.test.ts's ramp-walking test uses:
@@ -148,5 +154,49 @@ describe('riftLiftFor (issue #3479)', () => {
 
     const farX = view.origin.x + RIFT_REGION_HALF_X + 5;
     expect(riftLiftFor(plan, view.origin, farX, view.origin.z)).toBe(0);
+  });
+});
+
+// The reconciling predictor (self_prediction.ts) steps through withRiftLift;
+// tests/hoard_room_floor.test.ts drives it against the live Sim. These pin the
+// wrapper's own contract: the kernel sees the flat floor, the result carries
+// the lift of where the step ended, and a deck-frame body is left alone.
+describe('withRiftLift', () => {
+  const frame: PredictionFrame = { ct: 1, mi: emptyMoveInput(), facing: null };
+  function stateAt(x: number, y: number, z: number, deck: number | null = null): MotionState {
+    return { deck, pos: { x, y, z }, prevPos: { x, y, z } } as MotionState;
+  }
+
+  it('hands the kernel the flat floor and reapplies the lift where the step ends', () => {
+    const view = riftFloorView();
+    const plan = resolvedRiftFloorPlan(view);
+    const top = riftLiftFor(plan, view.origin, view.origin.x, view.origin.z + 100);
+    expect(top).toBeGreaterThan(0);
+    let seenY = Number.NaN;
+    // A kernel stand-in: records the feet it was handed, then walks down the
+    // ramp to z 89 (halfway down 84..94) at the same flat height.
+    const step = withRiftLift(
+      (state) => {
+        seenY = state.pos.y;
+        state.pos.z = view.origin.z + 89;
+      },
+      () => view,
+    );
+    const state = stateAt(view.origin.x, top, view.origin.z + 100);
+    step(state, frame);
+    expect(seenY).toBeCloseTo(0, 9);
+    expect(state.pos.y).toBeCloseTo(riftLiftFor(plan, view.origin, state.pos.x, state.pos.z), 9);
+    expect(state.pos.y).toBeLessThan(top);
+  });
+
+  it('steps untouched outside a rift and in a sailing ship frame', () => {
+    const calls: number[] = [];
+    const inner = (state: MotionState) => {
+      calls.push(state.pos.y);
+    };
+    const view = riftFloorView();
+    withRiftLift(inner, () => null)(stateAt(view.origin.x, 7, view.origin.z + 100), frame);
+    withRiftLift(inner, () => view)(stateAt(view.origin.x, 7, view.origin.z + 100, 0), frame);
+    expect(calls).toEqual([7, 7]);
   });
 });

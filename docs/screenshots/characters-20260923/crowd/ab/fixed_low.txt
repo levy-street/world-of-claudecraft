@@ -1,0 +1,55 @@
+WOC crowd A/B rig, one arm: fixed
+STATUS: performance evidence (headed, real GPU, quiet host).
+
+arm      http://127.0.0.1:5303  sha 61bc4f62e22e (worktree dirty outside the served files)  branch feature/woc-characters  dev build  page build id 61bc4f62e22e
+served   ~/woc-size-tiers (working directory of the process listening on the port)
+browser  Chrome/154.0.8037.95  headed  fresh profile  vsync flags untouched
+webgl    ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)  (timer query extension: yes)
+flags    ?gfx=low&governor=0&gputimer=1&fpscap=60  viewport 1920x953 @1  drawing buffer 1920x953
+pacing   headed: frames paced by the display vsync; cadence unknown at 0.0 Hz, ceiling 60, raw rAF median 8.3 ms
+host     Apple M4 Pro, 14 cores, load 4.8 at start and 4.9 at end
+         14 MB swapped in and out during the run
+throttle no throttle
+daylight frozen at phase 0.5 (0.5 is noon)
+date     2026-10-05T10:05:47.893Z
+
+crowd    40 bots through the sim: 9 classes, 20 male and 20 female, default faces, six worn slots on 40/40
+         worn set cryptbone_helm, cryptbone_pauldrons, mistveil_grips, recruit_tunic, mistveil_cord, oiled_boots
+         this arm draws fixed class rigs (the WOC bodies): each shows its own class piece for every worn slot
+
+scene      gpu ms/frame   draws   triangles   frame mean / p95 ms   over 50 ms   time over 33.4 ms   long tasks (n, max)   programs   bodies
+SOLO               1.03     212       0.93M          16.67 / 19.0            0              0.00 s               0, 0 ms   290 (+0)   
+ARRIVAL            1.39     453       1.45M          16.69 / 20.6            0              0.00 s               0, 0 ms   297 (+7)   drawn 40/40, articulated 40, far mesh 0
+CLOSE              1.40     455       1.45M          16.75 / 21.0            1              0.06 s               0, 0 ms   297 (+0)   drawn 40/40, articulated 40, far mesh 0
+FAR                1.10     385       1.16M          16.67 / 19.4            0              0.00 s               0, 0 ms   300 (+0)   drawn 40/40, articulated 0, far mesh 40
+
+ARRIVAL: all 40 bodies had a view (nameplate, click target) after 0.36 s and were drawn after 0.54 s (first 0.12 s, half 0.32 s); the drawn set last changed at 0.65 s; worst raw frame gap 26 ms; spawn task 8.9 ms; 1 model and texture files (0.34 MB) first requested in the window, 0 of them character files (0.00 MB)
+CLOSE over SOLO: +243 draws (6.1 a body), +0.52M triangles (12,990 a body), +0.369 ms GPU (0.0090 ms a body)
+FAR over SOLO: +173 draws (4.3 a body), +0.24M triangles (5,943 a body), +0.067 ms GPU (0.0020 ms a body)
+
+gpu-prep events per window (lifetime counter deltas):
+  SOLO     live-program 0, gate-timeout 0
+  ARRIVAL  live-program 0, gate-timeout 0
+  CLOSE    live-program 0, gate-timeout 0
+  FAR      live-program 0, gate-timeout 0
+
+build ledger, view rows per window (count, total ms, mean ms; max is the lifetime worst):
+  SOLO     no view build
+  ARRIVAL  view:rig          40 builds      36.7 ms  mean 0.92 ms  max 2.2 ms
+  ARRIVAL  view:woc-armor-merge  40 builds      13.1 ms  mean 0.33 ms  max 1.5 ms
+  ARRIVAL  view:composed-far-bake   1 builds       5.8 ms  mean 5.80 ms  max 6.8 ms
+  ARRIVAL  view:woc-head-fold  35 builds       4.5 ms  mean 0.13 ms  max 0.8 ms
+  ARRIVAL  view:woc-head-merge  40 builds       2.2 ms  mean 0.06 ms  max 0.7 ms
+  CLOSE    no view build
+  FAR      no view build
+  ARRIVAL  slowest single builds: view:composed-far-bake 5.8 ms at 0.05 s; view:rig 2.2 ms at 0.01 s; view:rig 2.1 ms at 0.20 s
+
+background queue units per window (kind x units, the six busiest):
+  SOLO     none
+  ARRIVAL  live-gate x961, touch x770, upload-mid x42, woc-head-mount x40, woc-head-merge x39, woc-armor-mount x22
+  CLOSE    none
+  FAR      none
+
+settles  entry 49 s, close 15 s, far 15 s
+rig      its own work inside the windows: SOLO 11.0 ms, ARRIVAL 101.2 ms, CLOSE 9.1 ms, FAR 10.5 ms
+health   page errors 0, console errors 2, WebGL messages 0, failed asset requests 0

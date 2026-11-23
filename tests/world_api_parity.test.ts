@@ -36,6 +36,22 @@ import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
+
+describe('riding purchase quote default parity', () => {
+  it('a rankless online request remains basic-only and advanced requests carry an explicit quote', () => {
+    const commands: unknown[] = [];
+    const client = Object.create(ClientWorld.prototype) as ClientWorld;
+    Object.defineProperty(client, 'cmd', { value: (command: unknown) => commands.push(command) });
+    Object.defineProperty(client, 'ridingTrainingTier', { value: () => 1 });
+    client.learnRiding(42);
+    client.learnRiding(42, 1);
+    expect(commands).toEqual([
+      { cmd: 'learn_riding', npc: 42, ridingTier: 0 },
+      { cmd: 'learn_riding', npc: 42, ridingTier: 1 },
+    ]);
+  });
+});
+
 import { OVERHEAD_EMOTE_IDS, type PlayerClass } from '../src/sim/types';
 // The 27 facet interfaces the W1 split produced (src/world_api/<facet>.ts), plus the
 // bank facet added in the bank-system feature and the Book of Deeds facet. Imported
@@ -43,6 +59,7 @@ import { OVERHEAD_EMOTE_IDS, type PlayerClass } from '../src/sim/types';
 import type { IWorldActionBar } from '../src/world_api/action_bar';
 import type { IWorldBank } from '../src/world_api/bank';
 import type { IWorldBattleground } from '../src/world_api/battleground';
+import type { IWorldBuddies } from '../src/world_api/buddies';
 import type { IWorldCardMinigame } from '../src/world_api/card_minigame';
 import type { IWorldChat } from '../src/world_api/chat';
 // The overhead-emote runtime surface the chat facet derives locally (see the
@@ -63,6 +80,7 @@ import type { IWorldFarming } from '../src/world_api/farming';
 import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
+import type { IWorldLanceTrial } from '../src/world_api/lance_trial';
 import type { IWorldLoot } from '../src/world_api/loot';
 import type { IWorldMail } from '../src/world_api/mail';
 import type { IWorldMarket } from '../src/world_api/market';
@@ -73,6 +91,8 @@ import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
 import type { IWorldReliquary } from '../src/world_api/reliquary';
+import type { IWorldSeasonal } from '../src/world_api/seasonal';
+import type { IWorldSeating } from '../src/world_api/seating';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
@@ -132,6 +152,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeVarkhulAnvilMeteors', kind: 'data' },
   { name: 'activeVarkhulAssemblies', kind: 'data' },
   { name: 'activeTemporalHourglasses', kind: 'data' },
+  { name: 'activeSporeBursts', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   { name: 'worldQuestCycle', kind: 'data' },
@@ -140,6 +161,8 @@ export const IWORLD_MEMBERS = [
   { name: 'weeklyQuestResetAtMs', kind: 'data' },
   { name: 'chooseWeeklyQuest', kind: 'method' },
   { name: 'commendWeeklyQuest', kind: 'method' },
+  { name: 'guildContracts', kind: 'data' },
+  { name: 'buyGuildCosmetic', kind: 'method' },
   { name: 'worldQuestLeaderboard', kind: 'method' }, // async
   { name: 'worldQuestLog', kind: 'data' },
   { name: 'worldQuestTime', kind: 'data' },
@@ -150,10 +173,12 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestRerollCycle', kind: 'data' },
   { name: 'clueHunt', kind: 'data' },
   { name: 'treasureMap', kind: 'data' },
+  { name: 'alliedHearthstoneAttunement', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'canRerollWorldQuest', kind: 'method' },
   { name: 'rerollWorldQuest', kind: 'method' },
   { name: 'abandonClueHunt', kind: 'method' },
+  { name: 'attuneAlliedHearthstone', kind: 'method' },
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'groundAimPlacementPreview', kind: 'method' },
@@ -228,6 +253,7 @@ export const IWORLD_MEMBERS = [
   { name: 'releaseSpirit', kind: 'method' },
   { name: 'resurrectAtCorpse', kind: 'method' },
   { name: 'resurrectAtSpiritHealer', kind: 'method' },
+  { name: 'pvpResurrect', kind: 'method' },
   { name: 'respondToResurrection', kind: 'method' },
   { name: 'chat', kind: 'method' },
   { name: 'playEmote', kind: 'method' },
@@ -293,6 +319,10 @@ export const IWORLD_MEMBERS = [
   { name: 'whoInfo', kind: 'data' },
   { name: 'whoRequest', kind: 'method' },
   // --- social graph commands + async search ---
+  { name: 'socialFriendsPage', kind: 'method' },
+  { name: 'socialBlocksPage', kind: 'method' },
+  { name: 'referralCardsSnapshot', kind: 'method' },
+  { name: 'referralCardsAction', kind: 'method' },
   { name: 'friendAdd', kind: 'method' },
   { name: 'friendRemove', kind: 'method' },
   { name: 'blockAdd', kind: 'method' },
@@ -354,6 +384,13 @@ export const IWORLD_MEMBERS = [
   { name: 'mailMarkRead', kind: 'method' },
   // --- personal bank: proximity-gated contents read + deposit/withdraw/buy commands ---
   { name: 'bankInfo', kind: 'data' },
+  { name: 'courierInfo', kind: 'data' },
+  { name: 'courierDispatch', kind: 'method' },
+  { name: 'accountBankInfo', kind: 'data' },
+  { name: 'requestAccountBanks', kind: 'method' },
+  { name: 'selectAccountBank', kind: 'method' },
+  { name: 'accountBankTransfer', kind: 'method' },
+  { name: 'claimMembershipArmour', kind: 'method' },
   { name: 'bankDeposit', kind: 'method' },
   { name: 'bankWithdraw', kind: 'method' },
   { name: 'bankBuySlots', kind: 'method' },
@@ -374,6 +411,7 @@ export const IWORLD_MEMBERS = [
   { name: 'weeklyRewardInfo', kind: 'data' },
   { name: 'claimWeeklyReward', kind: 'method' },
   { name: 'openWeeklyReward', kind: 'method' },
+  { name: 'setWeeklyLootSpec', kind: 'method' },
   { name: 'vaultInfo', kind: 'data' },
   { name: 'vaultDeposit', kind: 'method' },
   { name: 'vaultWithdraw', kind: 'method' },
@@ -406,6 +444,13 @@ export const IWORLD_MEMBERS = [
   { name: 'lockpickEngage', kind: 'method' },
   { name: 'lockpickAction', kind: 'method' },
   { name: 'lockpickAbort', kind: 'method' },
+  // The Shardpike trial (world_api/lance_trial.ts).
+  { name: 'lanceTrial', kind: 'data' },
+  { name: 'lanceRestRemaining', kind: 'data' },
+  { name: 'lanceGuidance', kind: 'data' },
+  { name: 'lanceBrace', kind: 'method' },
+  { name: 'lanceThrust', kind: 'method' },
+  { name: 'lanceRelease', kind: 'method' },
   { name: 'collectDelveChestLoot', kind: 'method' },
   { name: 'delveRiteChoose', kind: 'method' },
   { name: 'delveRun', kind: 'data' },
@@ -473,13 +518,18 @@ export const IWORLD_MEMBERS = [
   { name: 'perfectingSwapInfo', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'worldBossActive', kind: 'method' }, // realm liveness, separate from loot lockout
+  { name: 'answerDungeonGuide', kind: 'method' }, // a dungeon guide's offer answer (send-only)
+  { name: 'dungeonRun', kind: 'data' }, // the group dungeon run stood in, with boss progress (null outside)
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'hoardBossCues', kind: 'method' }, // live Buried Hoard boss telegraphs
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
+  { name: 'activeDungeonDifficulty', kind: 'method' }, // active claim read, null outside
+  { name: 'unappliedDungeonDifficulty', kind: 'method' }, // live claim tier the selection missed
   { name: 'setDungeonDifficulty', kind: 'method' },
+  { name: 'heroicMarks', kind: 'data' }, // Heroic Marks currency balance
   { name: 'buyHeroicVendorItem', kind: 'method' },
   { name: 'buyCrucibleVendorItem', kind: 'method' },
   { name: 'leaderboard', kind: 'method' }, // async
@@ -508,6 +558,7 @@ export const IWORLD_MEMBERS = [
   { name: 'deleteLoadout', kind: 'method' },
   // --- rideable ground mounts (IWorldMounts) ---
   { name: 'ownedMounts', kind: 'method' }, // read-returning
+  { name: 'ridingTrainingTier', kind: 'method' },
   { name: 'ridingTrained', kind: 'method' }, // read-returning
   { name: 'toggleMounted', kind: 'method' },
   // --- riding skill purchase (IWorldMounts) ---
@@ -523,6 +574,13 @@ export const IWORLD_MEMBERS = [
   { name: 'enterVehicle', kind: 'method' },
   { name: 'useVehicleAction', kind: 'method' },
   { name: 'leaveVehicle', kind: 'method' },
+  // --- cosmetic buddies (IWorldBuddies) ---
+  { name: 'ownedBuddies', kind: 'method' }, // read-returning
+  { name: 'pendingBuddies', kind: 'method' }, // read-returning
+  { name: 'renameBuddy', kind: 'method' },
+  { name: 'summonBuddy', kind: 'method' },
+  { name: 'toggleBuddy', kind: 'method' },
+  { name: 'setBuddyAutoloot', kind: 'method' },
   // --- Dungeon Finder facet (IWorldDungeonFinder) ---
   { name: 'dungeonFinderInfo', kind: 'data' },
   { name: 'dungeonFinderBoard', kind: 'data' },
@@ -535,6 +593,10 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonFinderApply', kind: 'method' },
   { name: 'dungeonFinderApplyCancel', kind: 'method' },
   { name: 'dungeonFinderApplicationRespond', kind: 'method' },
+  { name: 'dungeonFinderExpeditionOpen', kind: 'method' },
+  { name: 'dungeonFinderExpeditionTravel', kind: 'method' },
+  { name: 'dungeonFinderExpeditionApply', kind: 'method' },
+  { name: 'dungeonFinderExpeditionConfigure', kind: 'method' },
   // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title/border
   // reads + the two cosmetic selection commands ---
   { name: 'deedsEarned', kind: 'data' },
@@ -587,10 +649,21 @@ export const IWORLD_MEMBERS = [
   // --- the scheduled ferry (IWorldTransport): one read-returning method, the
   // live timetable view both worlds derive from their schedule clock ---
   { name: 'ferryView', kind: 'method' },
-  // IWorldWorldPvp (world_pvp.ts): the /pvp flag readout + raise/lower.
+  // IWorldWorldPvp (world_pvp.ts): the /pvp flag readout + raise/lower, and
+  // the Skull Bag's store/take command.
   { name: 'worldPvpInfo', kind: 'data' },
   { name: 'setWorldPvpFlag', kind: 'method' },
+  { name: 'skullBagAction', kind: 'method' },
   { name: 'hillInfo', kind: 'data' },
+  // The classic inn "Resting" state (IWorldProgressionXp): derived in both worlds.
+  { name: 'resting', kind: 'data' },
+  // IWorldSeating (seating.ts): sit on a piece of furniture by its seat id.
+  { name: 'sitOnSeat', kind: 'method' },
+  // IWorldSeasonal (seasonal.ts): the running seasonal event and trick-or-treat.
+  { name: 'activeSeasonalEvent', kind: 'data' },
+  { name: 'trickOrTreatedToday', kind: 'data' },
+  { name: 'hauntedPumpkinsFound', kind: 'data' },
+  { name: 'trickOrTreat', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -824,6 +897,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // presentation-layer transform folded in, so the HUD/cross-hotbar/spellbook
     // can show the same resolve Sim.resolvedAbility would produce instead of a
     // raw known-array lookup.
+    // The Mirefen world boss lands on top of that with the Shardpike balance
+    // trial (world_api/lance_trial.ts, the 34th facet file): lanceTrial,
+    // lanceRestRemaining and lanceGuidance (data) plus lanceBrace,
+    // lanceThrust and lanceRelease (methods), six members in all.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -937,9 +1014,26 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(424);
-    expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(298);
+    // Plus the release's faction currencies and treasure map reads (+2 data) and
+    // hoardBossCues (+1 method): 424/126/298.
+    // Plus the Mirefen world-boss branch's lance_trial facet (lanceTrial,
+    // lanceRestRemaining, lanceGuidance data; lanceBrace, lanceThrust, lanceRelease
+    // methods): 430/129/301 on its own, 437/131/306 on the v0.45.0 integration
+    // (the membership integration's 431/128/303 plus those six members).
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 438, 131, 307.
+    // Buddy collection contributes six methods and no data members.
+    // The Studio merge adds no member: 448/131/317. The dungeon objectives
+    // tracker's dungeonRun adds one data member: 449/132/317.
+    // Plus the tavern's inn state (resting, data) and the seating facet's
+    // sitOnSeat (method) on feature/mirefen-tavern: 426/127/299 on its own,
+    // 451/133/318 merged into the v0.45.0 integration.
+    // Lantern Hall's guildContracts (data) and buyGuildCosmetic (method): 453/134/319.
+    // Riding ranks (PR 4390) add one method over the release: 466/140/329.
+    // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
+    // more: 471/140/331.
+    expect(IWORLD_MEMBERS.length).toBe(471);
+    expect(DATA_MEMBERS.length).toBe(140);
+    expect(METHOD_MEMBERS.length).toBe(331);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -957,6 +1051,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptLinkedQuest',
       'acceptQuest',
       'accountAdmin',
+      'accountBankInfo',
+      'accountBankTransfer',
       'accountCosmetics',
       'accountDeeds',
       'accountFlair',
@@ -964,6 +1060,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'actionBarReadOnly',
       'activeBorder',
       'activeConsecrations',
+      'activeDungeonDifficulty',
       'activeFrostRings',
       'activeIgnivarMeteors',
       'activeLoadout',
@@ -974,6 +1071,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeNythraxisGraveEruptions',
       'activeNythraxisGraveFlames',
       'activeNythraxisGravefires',
+      'activeSeasonalEvent',
+      'activeSporeBursts',
       'activeTemporalHourglasses',
       'activeTitle',
       'activeVarkhulAnvilMeteors',
@@ -981,6 +1080,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeVarkhulCinderFires',
       'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
+      'alliedHearthstoneAttunement',
+      'answerDungeonGuide',
       'applyEnchant',
       'applyTalents',
       'archetypeTitle',
@@ -989,6 +1090,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
+      'attuneAlliedHearthstone',
       'autoLoot',
       'bagCapacity',
       'bags',
@@ -1010,6 +1112,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'boostWorldQuestGlider',
       'buyBackItem',
       'buyCrucibleVendorItem',
+      'buyGuildCosmetic',
       'buyHeroicVendorItem',
       'buyItem',
       'canRerollWorldQuest',
@@ -1029,6 +1132,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'chooseWeeklyQuest',
       'civicServicePlacements',
       'claimEventSkin',
+      'claimMembershipArmour',
       'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
@@ -1046,6 +1150,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'convertRaidToParty',
       'copper',
       'corpseHarvestInfo',
+      'courierDispatch',
+      'courierInfo',
       'craftItem',
       'craftSkills',
       'craftVaultStock',
@@ -1079,6 +1185,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderApply',
       'dungeonFinderApplyCancel',
       'dungeonFinderBoard',
+      'dungeonFinderExpeditionApply',
+      'dungeonFinderExpeditionConfigure',
+      'dungeonFinderExpeditionOpen',
+      'dungeonFinderExpeditionTravel',
       'dungeonFinderInfo',
       'dungeonFinderListingClose',
       'dungeonFinderListingCreate',
@@ -1086,6 +1196,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderQueueLeave',
       'dungeonFinderRespond',
       'dungeonFinderSetRoles',
+      'dungeonRun',
       'enterDelve',
       'enterDungeon',
       'enterVehicle',
@@ -1120,6 +1231,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildBankWithdraw',
       'guildBankWithdrawGold',
       'guildBuyRosterPage',
+      'guildContracts',
       'guildCreate',
       'guildDecline',
       'guildDemote',
@@ -1142,7 +1254,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestCrop',
       'harvestNode',
       'harvestPreference',
+      'hauntedPumpkinsFound',
       'healPet',
+      'heroicMarks',
       'hillInfo',
       'hoardBossCues',
       'hobbyCraft',
@@ -1153,6 +1267,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'inventory',
       'joinCardDuelQueue',
       'known',
+      'lanceBrace',
+      'lanceGuidance',
+      'lanceRelease',
+      'lanceRestRemaining',
+      'lanceThrust',
+      'lanceTrial',
       'lastCraftResult',
       'lastDisenchantResult',
       'lastEnchantResult',
@@ -1208,6 +1328,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeRespawnSeconds',
       'openCommissionOrder',
       'openWeeklyReward',
+      'ownedBuddies',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1217,6 +1338,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'partyTradeMsRemaining',
+      'pendingBuddies',
       'perfectItem',
       'perfectingInfo',
       'perfectingSwapInfo',
@@ -1237,6 +1359,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestige',
       'prestigeRank',
       'professionsState',
+      'pvpResurrect',
       'questLog',
       'questState',
       'questsDone',
@@ -1246,6 +1369,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'realm',
       'rechargeToolEffect',
       'recipeList',
+      'referralCardsAction',
+      'referralCardsSnapshot',
       'releaseEmpoweredAbility',
       'releaseSpirit',
       'reliquaryAccountFinds',
@@ -1258,9 +1383,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryPageCompletion',
       'reliquaryRarity',
       'reliquaryRecent',
+      'renameBuddy',
       'renamePet',
       'renown',
       'reportTelemetry',
+      'requestAccountBanks',
       'rerollWorldQuest',
       'resetWorldQuestMatch3',
       'resetWorldQuestPuzzle',
@@ -1268,10 +1395,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'respec',
       'respondToResurrection',
       'restedXp',
+      'resting',
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
       'ridingTrained',
+      'ridingTrainingTier',
       'riftBossDeathZones',
       'riftCollisionToken',
       'riftEventMsRemaining',
@@ -1281,12 +1410,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'saveActionBarLayout',
       'saveLoadout',
       'searchCharacters',
+      'selectAccountBank',
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
+      'setBuddyAutoloot',
       'setDungeonDifficulty',
       'setGuildPledgeSettings',
       'setHarvestPreference',
@@ -1301,9 +1432,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sitOnSeat',
+      'skullBagAction',
       'slotToolEffect',
+      'socialBlocksPage',
+      'socialFriendsPage',
       'socialInfo',
       'socketRiftGem',
       'sortInventory',
@@ -1314,6 +1450,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
+      'summonBuddy',
       'swapPerfectingRanks',
       'swapWorldQuestMatch3Tiles',
       'switchLoadout',
@@ -1326,6 +1463,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talents',
       'targetEntity',
       'targetNearestFriendly',
+      'toggleBuddy',
       'toggleMounted',
       'toggleWeaponStow',
       'toolEffectSlots',
@@ -1342,7 +1480,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeSetOffer',
       'trainRecipe',
       'treasureMap',
+      'trickOrTreat',
+      'trickOrTreatedToday',
       'turnInQuest',
+      'unappliedDungeonDifficulty',
       'unbindItem',
       'unequipBag',
       'unequipItem',
@@ -1380,6 +1521,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
   it('the sorted data-kind set is exactly the pinned contract', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountAdmin',
+      'accountBankInfo',
       'accountCosmetics',
       'accountDeeds',
       'actionBarReadOnly',
@@ -1393,6 +1535,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeNythraxisGraveEruptions',
       'activeNythraxisGraveFlames',
       'activeNythraxisGravefires',
+      'activeSeasonalEvent',
+      'activeSporeBursts',
       'activeTemporalHourglasses',
       'activeTitle',
       'activeVarkhulAnvilMeteors',
@@ -1400,6 +1544,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeVarkhulCinderFires',
       'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
+      'alliedHearthstoneAttunement',
       'archetypeTitle',
       'arenaInfo',
       'bagCapacity',
@@ -1415,6 +1560,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'companionState',
       'companionUpgrades',
       'copper',
+      'courierInfo',
       'craftSkills',
       'craftVaultStock',
       'craftingIdentity',
@@ -1426,6 +1572,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'duelInfo',
       'dungeonFinderBoard',
       'dungeonFinderInfo',
+      'dungeonRun',
       'entities',
       'entityRosterVersion',
       'equipment',
@@ -1436,12 +1583,18 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'gatheringGoal',
       'gatheringProficiency',
       'guildBankInfo',
+      'guildContracts',
       'harvestPreference',
+      'hauntedPumpkinsFound',
+      'heroicMarks',
       'hillInfo',
       'hobbyCraft',
       'honor',
       'inventory',
       'known',
+      'lanceGuidance',
+      'lanceRestRemaining',
+      'lanceTrial',
       'lastCraftResult',
       'lastDisenchantResult',
       'lastEnchantResult',
@@ -1476,6 +1629,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryRecent',
       'renown',
       'restedXp',
+      'resting',
       'riftCollisionToken',
       'riftFloor',
       'socialInfo',
@@ -1489,6 +1643,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'townFocusPending',
       'tradeInfo',
       'treasureMap',
+      'trickOrTreatedToday',
       'unlockedMilestones',
       'vaultInfo',
       'vehicleSession',
@@ -1516,16 +1671,20 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
+      'accountBankTransfer',
       'accountFlair',
       'accuseWorldQuestSuspect',
+      'activeDungeonDifficulty',
       'activeLootRolls',
       'activeMasterLootRolls',
+      'answerDungeonGuide',
       'applyEnchant',
       'applyTalents',
       'arenaAugmentPick',
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
+      'attuneAlliedHearthstone',
       'autoLoot',
       'bankBuySlots',
       'bankDeposit',
@@ -1542,6 +1701,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'boostWorldQuestGlider',
       'buyBackItem',
       'buyCrucibleVendorItem',
+      'buyGuildCosmetic',
       'buyHeroicVendorItem',
       'buyItem',
       'canRerollWorldQuest',
@@ -1558,6 +1718,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'chat',
       'chooseWeeklyQuest',
       'claimEventSkin',
+      'claimMembershipArmour',
       'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
@@ -1570,6 +1731,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'convertPartyToRaid',
       'convertRaidToParty',
       'corpseHarvestInfo',
+      'courierDispatch',
       'craftItem',
       'dailyRewardHistory',
       'dailyRewardLeaderboard',
@@ -1593,6 +1755,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderApplicationRespond',
       'dungeonFinderApply',
       'dungeonFinderApplyCancel',
+      'dungeonFinderExpeditionApply',
+      'dungeonFinderExpeditionConfigure',
+      'dungeonFinderExpeditionOpen',
+      'dungeonFinderExpeditionTravel',
       'dungeonFinderListingClose',
       'dungeonFinderListingCreate',
       'dungeonFinderQueueJoin',
@@ -1650,6 +1816,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ignoreRemove',
       'interact',
       'joinCardDuelQueue',
+      'lanceBrace',
+      'lanceRelease',
+      'lanceThrust',
       'leaderboard',
       'learnRiding',
       'leaveCardDuelQueue',
@@ -1689,6 +1858,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeRespawnSeconds',
       'openCommissionOrder',
       'openWeeklyReward',
+      'ownedBuddies',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1697,6 +1867,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'partyTradeMsRemaining',
+      'pendingBuddies',
       'perfectItem',
       'perfectingInfo',
       'perfectingSwapInfo',
@@ -1711,11 +1882,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playCardInDuel',
       'playEmote',
       'prestige',
+      'pvpResurrect',
       'questState',
       'raidLockouts',
       'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'rechargeToolEffect',
+      'referralCardsAction',
+      'referralCardsSnapshot',
       'releaseEmpoweredAbility',
       'releaseSpirit',
       'reliquaryCatalogCompletion',
@@ -1723,8 +1897,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryPageClearCount',
       'reliquaryPageCompletion',
       'reliquaryRarity',
+      'renameBuddy',
       'renamePet',
       'reportTelemetry',
+      'requestAccountBanks',
       'rerollWorldQuest',
       'resetWorldQuestMatch3',
       'resetWorldQuestPuzzle',
@@ -1735,6 +1911,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'resurrectAtSpiritHealer',
       'revivePet',
       'ridingTrained',
+      'ridingTrainingTier',
       'riftBossDeathZones',
       'riftEventMsRemaining',
       'rotateWorldQuestPuzzleTile',
@@ -1742,12 +1919,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'saveActionBarLayout',
       'saveLoadout',
       'searchCharacters',
+      'selectAccountBank',
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
       'separateMaterialStack',
       'setActiveBorder',
       'setActiveTitle',
+      'setBuddyAutoloot',
       'setDungeonDifficulty',
       'setGuildPledgeSettings',
       'setHarvestPreference',
@@ -1762,9 +1941,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
+      'sitOnSeat',
+      'skullBagAction',
       'slotToolEffect',
+      'socialBlocksPage',
+      'socialFriendsPage',
       'socketRiftGem',
       'sortInventory',
       'spinDailyReward',
@@ -1772,6 +1956,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'startWorldQuestActivity',
       'stopAutoAttack',
       'submitLootRoll',
+      'summonBuddy',
       'swapPerfectingRanks',
       'swapWorldQuestMatch3Tiles',
       'switchLoadout',
@@ -1781,6 +1966,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentPoints',
       'targetEntity',
       'targetNearestFriendly',
+      'toggleBuddy',
       'toggleMounted',
       'toggleWeaponStow',
       'trackGatheringCommission',
@@ -1792,7 +1978,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeRequest',
       'tradeSetOffer',
       'trainRecipe',
+      'trickOrTreat',
       'turnInQuest',
+      'unappliedDungeonDifficulty',
       'unbindItem',
       'unequipBag',
       'unequipItem',
@@ -1915,6 +2103,7 @@ const FACET_COMBAT = [
   'activeNythraxisGravefires',
   'activeNythraxisBindingSigils',
   'activeTemporalHourglasses',
+  'activeSporeBursts',
   'activeVarkhulForgestormWarnings',
   'activeVarkhulCinderFires',
   'activeVarkhulCinderOrbProjectiles',
@@ -1934,6 +2123,7 @@ const FACET_COMBAT = [
   'releaseSpirit',
   'resurrectAtCorpse',
   'resurrectAtSpiritHealer',
+  'pvpResurrect',
   'respondToResurrection',
 ] as const satisfies readonly (keyof IWorldCombat)[];
 type _ExhaustCombat = AssertNever<Exclude<keyof IWorldCombat, (typeof FACET_COMBAT)[number]>>;
@@ -1948,6 +2138,20 @@ const FACET_TARGETING = [
 ] as const satisfies readonly (keyof IWorldTargeting)[];
 type _ExhaustTargeting = AssertNever<
   Exclude<keyof IWorldTargeting, (typeof FACET_TARGETING)[number]>
+>;
+
+// The Shardpike trial (world_api/lance_trial.ts): the wielder's own beam and rest clock, the
+// guidance the loud prompt paints, and the three verbs.
+const FACET_LANCE_TRIAL = [
+  'lanceTrial',
+  'lanceRestRemaining',
+  'lanceGuidance',
+  'lanceBrace',
+  'lanceThrust',
+  'lanceRelease',
+] as const satisfies readonly (keyof IWorldLanceTrial)[];
+type _ExhaustLanceTrial = AssertNever<
+  Exclude<keyof IWorldLanceTrial, (typeof FACET_LANCE_TRIAL)[number]>
 >;
 
 const FACET_INTERACTION = [
@@ -1975,6 +2179,7 @@ const FACET_LOOT = [
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
 const FACET_INVENTORY = [
+  'claimMembershipArmour',
   'inventory',
   'bags',
   'bagCapacity',
@@ -2025,6 +2230,8 @@ const FACET_QUESTS = [
   'questsDone',
   'chooseWeeklyQuest',
   'commendWeeklyQuest',
+  'guildContracts',
+  'buyGuildCosmetic',
   'weeklyQuest',
   'weeklyQuestResetAtMs',
   'worldQuestCycle',
@@ -2055,6 +2262,8 @@ const FACET_QUESTS = [
   'treasureMap',
   'clueHunt',
   'abandonClueHunt',
+  'alliedHearthstoneAttunement',
+  'attuneAlliedHearthstone',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -2064,6 +2273,7 @@ const FACET_PROGRESSION_XP = [
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
+  'resting',
   'playtimeSeconds',
   'craftSkills',
   'gatheringProficiency',
@@ -2185,9 +2395,13 @@ type _ExhaustCardMinigame = AssertNever<
 >;
 
 const FACET_SOCIAL_GRAPH = [
+  'referralCardsSnapshot',
+  'referralCardsAction',
   'socialInfo',
   'whoInfo',
   'whoRequest',
+  'socialFriendsPage',
+  'socialBlocksPage',
   'friendAdd',
   'friendRemove',
   'blockAdd',
@@ -2250,9 +2464,16 @@ const FACET_MAIL = [
 type _ExhaustMail = AssertNever<Exclude<keyof IWorldMail, (typeof FACET_MAIL)[number]>>;
 
 const FACET_BANK = [
+  'courierInfo',
+  'courierDispatch',
+  'accountBankInfo',
+  'requestAccountBanks',
+  'selectAccountBank',
+  'accountBankTransfer',
   'weeklyRewardInfo',
   'claimWeeklyReward',
   'openWeeklyReward',
+  'setWeeklyLootSpec',
   'bankInfo',
   'bankPurchasedSlots',
   'bankDeposit',
@@ -2287,15 +2508,20 @@ type _ExhaustGuildBank = AssertNever<
 const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
+  'dungeonRun',
   'raidLockouts',
   'worldBossActive',
+  'answerDungeonGuide',
   'riftFloor',
   'riftCollisionToken',
   'riftBossDeathZones',
   'hoardBossCues',
   'riftEventMsRemaining',
   'dungeonDifficulty',
+  'activeDungeonDifficulty',
+  'unappliedDungeonDifficulty',
   'setDungeonDifficulty',
+  'heroicMarks',
   'buyHeroicVendorItem',
   'buyCrucibleVendorItem',
 ] as const satisfies readonly (keyof IWorldDungeons)[];
@@ -2339,6 +2565,7 @@ type _ExhaustTelemetry = AssertNever<
 
 const FACET_MOUNTS = [
   'ownedMounts',
+  'ridingTrainingTier',
   'ridingTrained',
   'toggleMounted',
   'learnRiding',
@@ -2356,6 +2583,16 @@ const FACET_VEHICLES = [
   'leaveVehicle',
 ] as const satisfies readonly (keyof IWorldVehicles)[];
 type _ExhaustVehicles = AssertNever<Exclude<keyof IWorldVehicles, (typeof FACET_VEHICLES)[number]>>;
+
+const FACET_BUDDIES = [
+  'ownedBuddies',
+  'pendingBuddies',
+  'renameBuddy',
+  'summonBuddy',
+  'toggleBuddy',
+  'setBuddyAutoloot',
+] as const satisfies readonly (keyof IWorldBuddies)[];
+type _ExhaustBuddies = AssertNever<Exclude<keyof IWorldBuddies, (typeof FACET_BUDDIES)[number]>>;
 const FACET_DUNGEON_FINDER = [
   'dungeonFinderInfo',
   'dungeonFinderBoard',
@@ -2368,6 +2605,10 @@ const FACET_DUNGEON_FINDER = [
   'dungeonFinderApply',
   'dungeonFinderApplyCancel',
   'dungeonFinderApplicationRespond',
+  'dungeonFinderExpeditionOpen',
+  'dungeonFinderExpeditionTravel',
+  'dungeonFinderExpeditionApply',
+  'dungeonFinderExpeditionConfigure',
 ] as const satisfies readonly (keyof IWorldDungeonFinder)[];
 type _ExhaustDungeonFinder = AssertNever<
   Exclude<keyof IWorldDungeonFinder, (typeof FACET_DUNGEON_FINDER)[number]>
@@ -2480,11 +2721,22 @@ type _ExhaustTransport = AssertNever<
 const FACET_WORLD_PVP = [
   'worldPvpInfo',
   'setWorldPvpFlag',
+  'skullBagAction',
   'hillInfo',
 ] as const satisfies readonly (keyof IWorldWorldPvp)[];
 type _ExhaustWorldPvp = AssertNever<
   Exclude<keyof IWorldWorldPvp, (typeof FACET_WORLD_PVP)[number]>
 >;
+
+const FACET_SEATING = ['sitOnSeat'] as const satisfies readonly (keyof IWorldSeating)[];
+const FACET_SEASONAL = [
+  'activeSeasonalEvent',
+  'trickOrTreatedToday',
+  'hauntedPumpkinsFound',
+  'trickOrTreat',
+] as const satisfies readonly (keyof IWorldSeasonal)[];
+type _ExhaustSeasonal = AssertNever<Exclude<keyof IWorldSeasonal, (typeof FACET_SEASONAL)[number]>>;
+type _ExhaustSeating = AssertNever<Exclude<keyof IWorldSeating, (typeof FACET_SEATING)[number]>>;
 
 // The facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
@@ -2517,13 +2769,17 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   professions: FACET_PROFESSIONS,
   mounts: FACET_MOUNTS,
   vehicles: FACET_VEHICLES,
+  buddies: FACET_BUDDIES,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
   reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
   farming: FACET_FARMING,
+  lanceTrial: FACET_LANCE_TRIAL,
   transport: FACET_TRANSPORT,
   worldPvp: FACET_WORLD_PVP,
+  seating: FACET_SEATING,
+  seasonal: FACET_SEASONAL,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
@@ -2540,7 +2796,12 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // vehicles facet.
     // 35 at the second release/v0.44.0 base merge: plus the release's world_pvp.ts.
     // 36 at the fourth release/v0.44.0 base merge: plus the release's transport.ts.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(36);
+    // 37 with the Mirefen world-boss branch's lance_trial.ts.
+    // Buddy collection contributes IWorldBuddies.
+    // 37 on feature/walkable-tavern-aaa: plus seating.ts (sit on furniture); 39 merged
+    // into the v0.45.0 integration (its 38 plus seating.ts).
+    // 40 with feature/halloween-event's seasonal.ts.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(40);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2619,10 +2880,15 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(424);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(424);
+    // The integration includes the five-dungeon rework, six buddy methods and
+    // the dungeon objectives tracker's dungeonRun (one data member); the tavern
+    // adds resting (data) and sitOnSeat (the seating facet's method).
+    // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
+    // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(471);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(471);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -1328,6 +1328,10 @@ export interface AccountDetail {
   isAdmin: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;
+  // When the player locked the account through POST /api/account/deactivate
+  // (accounts.deactivated_at); null for a live account. Independent of a ban or
+  // suspension, so the dashboard offers the audited reactivate action on it alone.
+  deactivatedAt: string | null;
   moderationReason: string;
   chatMutedUntil: string | null;
   chatMuteReason: string;
@@ -1347,6 +1351,9 @@ export interface AccountDetail {
   // the account is not marked, so the dashboard can branch apply-vs-lift the way
   // it does for dailyRewardsBan.
   cheaterMark: { secondsRemaining: number; reason: string; setAt: string | null } | null;
+  // The operator world quest block (accounts.world_quests_*): the audited reason and
+  // when it was applied. Null when the account is not blocked.
+  worldQuestBlock: { reason: string; blockedAt: string } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -1649,6 +1656,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
       query(
         `SELECT id, username, created_at, last_login, is_admin, banned_at, suspended_until,
+                deactivated_at,
                 COALESCE(moderation_reason, '') AS moderation_reason,
                 chat_muted_until,
                 COALESCE(chat_mute_reason, '') AS chat_mute_reason,
@@ -1662,6 +1670,8 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
                 cheater_mark_seconds,
                 COALESCE(cheater_mark_reason, '') AS cheater_mark_reason,
                 cheater_mark_set_at,
+                world_quests_blocked_at,
+                COALESCE(world_quests_block_reason, '') AS world_quests_block_reason,
                 last_login_ip,
                 (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                            FROM play_sessions s WHERE s.account_id = accounts.id), 0)
@@ -1748,6 +1758,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     isAdmin: a.is_admin,
     bannedAt: a.banned_at,
     suspendedUntil: a.suspended_until,
+    deactivatedAt: a.deactivated_at ?? null,
     moderationReason: a.moderation_reason,
     chatMutedUntil: a.chat_muted_until,
     chatMuteReason: a.chat_mute_reason,
@@ -1783,6 +1794,13 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
             setAt: a.cheater_mark_set_at ?? null,
           }
         : null,
+    worldQuestBlock:
+      a.world_quests_blocked_at == null
+        ? null
+        : {
+            reason: String(a.world_quests_block_reason),
+            blockedAt: a.world_quests_blocked_at,
+          },
     lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({

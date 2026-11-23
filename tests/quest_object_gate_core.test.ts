@@ -50,6 +50,26 @@ describe('makeQuestObjectGate', () => {
     expect(gate(crate(), onQuest())).toBe(false);
   });
 
+  it('withholds an encounter-entombed mob from every viewer, the editor included', () => {
+    // Morthen under the Rite Ring, the Knellwyrm before it flies in
+    // (src/sim/encounters/hollow_crypt): no body, plate or click until revealed.
+    const mob = (entombed: boolean): Entity =>
+      ({
+        kind: 'mob',
+        templateId: 'morthen',
+        pos: { x: 0, y: 0, z: 0 },
+        auras: entombed ? [{ id: 'crypt_entombed' }] : [],
+      }) as unknown as Entity;
+    for (const gate of [
+      makeQuestObjectGate({}),
+      makeQuestObjectGate({ showAllQuestObjects: true }),
+      makeQuestObjectGate({}, { worldQuestCycle: '', worldQuestLog: new Map() }),
+    ]) {
+      expect(gate(mob(true), new Map())).toBe(true);
+      expect(gate(mob(false), new Map())).toBe(false);
+    }
+  });
+
   it('treats an absent flag as the game default, never as opt-out', () => {
     const gate = makeQuestObjectGate({ showAllQuestObjects: undefined });
     expect(gate(crate(), new Map())).toBe(true);
@@ -83,8 +103,35 @@ describe('makeQuestObjectGate', () => {
     });
     expect(gate(piece, new Map())).toBe(true);
     expect(gate(lastPiece, new Map())).toBe(false);
-    worldQuestLog.get('wq_farshore_salvage')!.state = 'completed';
+    const salvageProgress = worldQuestLog.get('wq_farshore_salvage');
+    if (!salvageProgress) throw new Error('missing salvage progress');
+    salvageProgress.state = 'completed';
     expect(gate(lastPiece, new Map())).toBe(true);
+  });
+
+  it('admits a reconnected owner vault portal through the character resolver', () => {
+    const portal = {
+      ...crate(),
+      id: 42,
+      templateId: 'hoard_entrance',
+      objectItemId: null,
+      lootable: true,
+      vaultOwnerPid: 10,
+      vaultOwnerCharacterId: 701,
+    };
+    const worldQuestLog = new Map<string, WorldQuestProgress>();
+    const world = {
+      playerId: 20,
+      partyInfo: null,
+      characterId: 701,
+      worldQuestCycle: worldQuestCycleForResetDay('2026-09-04'),
+      worldQuestLog,
+    };
+
+    expect(makeQuestObjectGate({}, { ...world, characterId: undefined })(portal, new Map())).toBe(
+      true,
+    );
+    expect(makeQuestObjectGate({}, world)(portal, new Map())).toBe(false);
   });
 });
 

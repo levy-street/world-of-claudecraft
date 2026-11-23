@@ -249,6 +249,7 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.snapshot().families).toEqual([
       expect.objectContaining({ id: 'engine', ready: true, pending: 0, refused: 0 }),
       expect.objectContaining({ id: 'kit', ready: false, pending: 1, refused: 1 }),
+      expect.objectContaining({ id: 'relic', ready: true, pending: 0, refused: 0 }),
     ]);
     await units[1].run();
     expect(readiness.admit(GATED)).toBe(true);

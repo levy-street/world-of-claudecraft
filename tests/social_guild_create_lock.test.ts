@@ -42,7 +42,7 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-function openWindow(): SocialWindow {
+function openWindow(openReferralCards?: () => void): SocialWindow {
   root = document.createElement('div');
   root.id = 'social-window';
   document.body.appendChild(root);
@@ -65,6 +65,11 @@ function openWindow(): SocialWindow {
     restoreFocus: noop,
     showPrompt: noop,
     startWhisper: noop,
+    openReferralCards,
+    openSelfMenu: noop,
+    openUnitMenu: noop,
+    openNameMenu: noop,
+    isMobileLayout: () => false,
   };
   const win = new SocialWindow(deps);
   win.toggle();
@@ -85,6 +90,16 @@ function typeName(name: string): void {
 }
 
 describe('social window: the Found button holds for one name_screen lane beat', () => {
+  it('opens Refer a Friend from Social without issuing a guild or friend action', () => {
+    const open = vi.fn();
+    const win = openWindow(open);
+    const button = root.querySelector<HTMLButtonElement>('[data-open-referral-cards]')!;
+    expect(button.textContent).toContain('Refer a Friend');
+    button.click();
+    expect(open).toHaveBeenCalledOnce();
+    expect(world.guildCreate).not.toHaveBeenCalled();
+    win.toggle();
+  });
   it('sends once, holds the button, and re-arms on the one-shot timer', () => {
     const win = openWindow();
     expect(win.isOpen).toBe(true);

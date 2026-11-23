@@ -76,10 +76,11 @@ describe('draggedWindowPosition', () => {
 describe('installWindowDrag', () => {
   const setup = (options?: {
     elId?: string;
+    windowClasses?: string[];
     isDragHandle?: () => boolean;
     onCommit?(el: HTMLElement, left: number, top: number, rect: DOMRect): void;
   }) => {
-    const windowClasses = new Set(['window', 'panel']);
+    const windowClasses = new Set(['window', 'panel', ...(options?.windowClasses ?? [])]);
     const bodyClasses = new Set<string>();
     let rectReads = 0;
     let currentRect = { left: 100, top: 80, width: 400, height: 300 } as DOMRect;
@@ -107,6 +108,11 @@ describe('installWindowDrag', () => {
         remove: (name: string) => windowClasses.delete(name),
         contains: (name: string) => windowClasses.has(name),
       },
+      clientLeft: 0,
+      clientTop: 0,
+      clientWidth: 400,
+      clientHeight: 300,
+      closest: () => null,
       getBoundingClientRect: () => {
         rectReads++;
         return currentRect;
@@ -426,6 +432,40 @@ describe('installWindowDrag', () => {
       expect(confirm.rectReads()).toBe(0);
     } finally {
       confirm.restore();
+    }
+  });
+
+  // The bag window's NW resize grip sits on its title bar, which is also the
+  // drag handle: a press in that corner must leave the move to the resizer.
+  it('leaves a press on the NW resize grip to the resizer, but drags from the rest of the title', () => {
+    const nwClasses = ['window-resizable', 'window-resizable-nw'];
+    // Window at (100,80): the NW band covers (100..118, 80..98) at scale 1.
+    const onGrip = setup({ elId: 'bags', windowClasses: nwClasses });
+    try {
+      onGrip.fire('pointerdown', { clientX: 105, clientY: 85 });
+      expect(onGrip.raised()).toBe(1);
+      expect(onGrip.el.classList.contains('window-dragging')).toBe(false);
+      expect(onGrip.bodyClasses.has('window-drag-active')).toBe(false);
+      expect(onGrip.captures).toEqual([]);
+    } finally {
+      onGrip.restore();
+    }
+
+    const offGrip = setup({ elId: 'bags', windowClasses: nwClasses });
+    try {
+      offGrip.fire('pointerdown', { clientX: 160, clientY: 95 });
+      expect(offGrip.el.classList.contains('window-dragging')).toBe(true);
+    } finally {
+      offGrip.restore();
+    }
+
+    // A window without the NW grip still drags from its top-left title corner.
+    const plain = setup({ windowClasses: ['window-resizable'] });
+    try {
+      plain.fire('pointerdown', { clientX: 105, clientY: 85 });
+      expect(plain.el.classList.contains('window-dragging')).toBe(true);
+    } finally {
+      plain.restore();
     }
   });
 });

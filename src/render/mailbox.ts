@@ -4,8 +4,7 @@
 // both bind the shared Eastbrook surface atlas over authored vertex colors.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
   eastbrookSurfaceAtlasMetadata,
@@ -20,7 +19,7 @@ import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 const MAILBOX_ASSET_URL = '/models/props/mailbox_pillar.glb';
 const MAILBOX_TARGET_HEIGHT = 2.9;
 const MAILBOX_UNREAD_SOCKET = 'Socket_UnreadGlow';
-let loadedMailboxGltf: GLTF | null = null;
+let loadedMailboxGltf: LoadedGltf | null = null;
 let preparedMailboxTemplate: THREE.Group | null = null;
 let fallbackMailboxTemplate: THREE.Group | null = null;
 let sharedGlowGeometry: THREE.SphereGeometry | null = null;

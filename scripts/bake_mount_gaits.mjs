@@ -13,8 +13,9 @@
 // The clipless prop-lane mounts (snail, hover cycle) keep their procedural
 // bob (src/render/mount_visuals.ts) and are not touched here. The valorsteed
 // and thunderstrut_gobbler GLBs ship AUTHORED clips from their source models
-// (renamed to Idle/Walk/Run/Death at import) and MUST NOT be baked over: they
-// have no RIGS entry.
+// (renamed to Idle/Walk/Run/Death at import), and the Drakemaw Raptor is rigged
+// and animated in Blender from scratch (scripts/assets/drakemaw_raptor/): none
+// of them may be baked over, so none has a RIGS entry.
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
@@ -116,52 +117,6 @@ const RIGS = {
       ['rig_leg_rl', null, 0.5, 1],
     ],
     rock: { bone: 'rig_root', walk: 1.5, run: 2.5 },
-  },
-  drakemaw_raptor: {
-    root: 'Root',
-    fwd: -1,
-    // The one BIPED here: a saddle-broken theropod, so the stride is two legs
-    // half a cycle apart rather than diagonal quadruped pairs. Its Tripo rig
-    // came back humanoid (clavicles and hands, no tail bone), which is why the
-    // forelimbs ride in `legs` at a quarter amplitude: same trick grag_bear
-    // uses to swing spine bones as front limbs. Each arm counter-phases the
-    // leg on its own side, so it pumps rather than paddling in sync.
-    //
-    // This entry exists because the imported source clips drove Hip
-    // TRANSLATION half a model unit off the bind pose (baked-in root motion).
-    // Scaled to the ridden height that threw the body ~2.5 yd off the saddle
-    // and cycled it every stride, so the raptor launched back and forth and
-    // the rider appeared to float beside it. Every key here is rest * delta
-    // rotation plus a root Y bob, which cannot leave bind space by
-    // construction: see this file's header contract.
-    legs: [
-      ['L_Thigh', 'L_Calf', 0, 1],
-      ['R_Thigh', 'R_Calf', 0.5, 1],
-      ['L_Upperarm', 'L_Forearm', 0.5, 0.25],
-      ['R_Upperarm', 'R_Forearm', 0, 0.25],
-    ],
-    // Its legs are short for its ridden height (hip 0.43, foot 0.10 on a
-    // 0.94-unit model, so ~34% of height) and it is a top-tier +80% mount at
-    // 12.6 yd/s, which sets up a conflict worth spelling out. Under a perfect
-    // foot match, stride CADENCE is bodySpeed / (2 * stride * normScale): it
-    // depends only on stride LENGTH, never on the clip duration, since
-    // locomotionTimeScale rescales duration away. So on short legs a perfect
-    // foot match forces a frantic cadence (the shared table gave ~3.0
-    // strides/sec, which read as badly sped up), and the only way to calm it is
-    // a longer stride plus a deliberate, bounded amount of slide.
-    // The reach here is pushed to the long end of what a sprinting biped can
-    // sell (58 deg), and the manifest then declares runRef at the ridden speed
-    // so timeScale lands on exactly 1.0 and the clip plays at its authored
-    // cadence: 2 strides/sec. See the manifest entry for the slide that buys.
-    gaits: {
-      Walk: { dur: 0.95, upper: 30, lower: 18 },
-      Run: { dur: 0.5, upper: 58, lower: 34 },
-    },
-    // a running theropod carries its spine level and counter-rotates its
-    // shoulders, so keep the pitch small and let the roll do the work
-    rock: { bone: 'Spine01', walk: 1.2, run: 2.2 },
-    sway: { bone: 'Waist', walk: 1.5, run: 2.8 },
-    head: { bone: 'Head', amp: 3 },
   },
 };
 

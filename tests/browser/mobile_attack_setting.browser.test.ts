@@ -32,6 +32,7 @@ function slot(kind: ActionBarSlotState['kind']): ActionBarSlotState {
     kind,
     abilityId: null,
     itemId: null,
+    petCommand: null,
     iconKey: kind === 'attack' ? '__attack' : '',
     cooldownRemaining: 0,
     cooldownTotal: 0,

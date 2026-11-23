@@ -484,6 +484,8 @@ describe('bare containment reads of the active element stay out of repaint ladde
     'claudium_window.ts': 'dataset-keyed read on a sub-root; a parked root resolves nothing',
     'desktop_update_toast.ts': 'do-not-steal-focus check, never focuses anything',
     'dialog_key_activation.ts': 'keyboard activation guard, requires a button',
+    'hud/referral_cards/referral_cards_controller.ts':
+      'captures the invoking control before opening a modal prompt; no repaint restore ladder',
     'focus_manager.ts': 'the Tab trap itself (armed while focus is inside the root)',
     'focus_restore.ts': 'the helper',
     'hud/vendor/buy_quantity_prompt_window.ts': 'do-not-steal-focus check, never focuses anything',

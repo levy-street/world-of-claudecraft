@@ -382,7 +382,11 @@ describe('the material-saving bonus and the output-variance roll apply at craft 
 // capped 0.15 chance it would have procced on, the better arm's still between
 // the 0.03 base and the 0.08 boosted chance). Spares on record: 94, 271, 330,
 // and 338 for the worse arm; 61, 707, 850, and 854 for the better arm. The
-// seed-1 'normal' case still lands unchanged and is left alone.
+// seed-1 'normal' case still lands unchanged and is left alone. The
+// vestments are eligible equipment, so each craft now takes a third draw
+// after the proc (the permanent loot-quality roll at grant, unenhanced at
+// both pinned seeds); it follows the two rolls these cases pin, so no seed
+// moved.
 describe('the variance roll actually changes the masterwork outcome (#1296, hunted seeds)', () => {
   function vestmentsScenario(sim: Sim, pid: number, meta: PlayerMeta, maxChance: boolean) {
     attuneJackOfAllTrades(ctxOf(sim), pid);
@@ -407,7 +411,7 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     rng.setObserver((v) => draws.push(v));
     runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     rng.setObserver(null);
-    expect(draws.length).toBe(2);
+    expect(draws.length).toBe(3); // variance, proc, then the output's one loot-quality draw
     const [varianceRoll, procRoll] = draws;
     // Confirms the scenario is actually exercising the suppression: without
     // the Jack override this procRoll would have masterworked (MASTERWORK_CHANCE_CAP is 0.15).
@@ -427,7 +431,7 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     rng.setObserver((v) => draws.push(v));
     runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     rng.setObserver(null);
-    expect(draws.length).toBe(2);
+    expect(draws.length).toBe(3); // variance, proc, then the output's one loot-quality draw
     const [varianceRoll, procRoll] = draws;
     expect(varianceRoll).toBeGreaterThanOrEqual(JACK_VARIANCE_WORSE_CHANCE);
     expect(varianceRoll).toBeLessThan(JACK_VARIANCE_WORSE_CHANCE + JACK_VARIANCE_BETTER_CHANCE);
@@ -440,7 +444,7 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     expect(sim.lastCraftResult?.masterwork).toBe(true);
   });
 
-  it('a normal roll changes nothing: draws twice, still masterwork-eligible on the ordinary chance (seed 1)', () => {
+  it('a normal roll changes nothing: draws variance then proc, still masterwork-eligible on the ordinary chance (seed 1)', () => {
     const sim = makeSim(1);
     const pid = sim.playerId;
     const meta = metaOf(sim, pid);

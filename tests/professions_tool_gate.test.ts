@@ -952,7 +952,7 @@ describe('the HUD actually feeds the viewer proficiency into the view', () => {
       .replace(/(^|\s)\/\/.*$/gm, '$1');
     const call = source.slice(source.indexOf('buildVendorView('));
     expect(call.startsWith('buildVendorView(')).toBe(true);
-    const args = call.slice(0, call.indexOf('),\n'));
+    const args = call.slice(0, call.indexOf('this.vendorQtyMultiple'));
     expect(args).toContain('gatheringProficiency:');
     // and it comes from the world, not from a literal.
     expect(args).toMatch(/gatheringProficiency:\s*this\.sim\.gatheringProficiency/);

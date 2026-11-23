@@ -26,10 +26,15 @@ function smooth(value: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** Visual intensities authored against the exact 0.80 second verdict clip. */
+/** Visual intensities authored against the 0.80 second KayKit verdict clip.
+ *  Other rigs retain their authored animation and sample the same effect by
+ *  clip phase, so WOC's longer chop reaches impact halfway through its swing. */
 export function paladinTemplarsVerdictFxPlan(
   timeSeconds: number | null,
+  clipDuration = PALADIN_TEMPLARS_VERDICT_DURATION,
 ): PaladinTemplarsVerdictFxPlan {
+  if (timeSeconds !== null)
+    timeSeconds *= PALADIN_TEMPLARS_VERDICT_DURATION / Math.max(1e-6, clipDuration);
   if (timeSeconds === null || timeSeconds < 0 || timeSeconds >= PALADIN_TEMPLARS_VERDICT_DURATION) {
     return OFF;
   }
@@ -169,8 +174,12 @@ export class PaladinTemplarsVerdictFx {
     this.update(null, 0);
   }
 
-  update(timeSeconds: number | null, dt: number): void {
-    const plan = paladinTemplarsVerdictFxPlan(timeSeconds);
+  update(
+    timeSeconds: number | null,
+    dt: number,
+    clipDuration = PALADIN_TEMPLARS_VERDICT_DURATION,
+  ): void {
+    const plan = paladinTemplarsVerdictFxPlan(timeSeconds, clipDuration);
     this.elapsed += Math.max(0, dt);
     for (const anchor of this.anchors) {
       anchor.edge.visible = plan.edge > 0.001;

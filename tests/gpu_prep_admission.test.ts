@@ -5,11 +5,16 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { resetArrivalCoverForTest, setArrivalCover } from '../src/render/arrival_cover';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import {
+  resetContextRestoreHoldForTest,
+  setContextRestorePacing,
+} from '../src/render/context_restore_hold';
 import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
 import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
 
 afterEach(() => {
   resetArrivalCoverForTest();
+  resetContextRestoreHoldForTest();
 });
 
 describe('createGpuPrepAdmission', () => {
@@ -259,5 +264,32 @@ describe('createGpuPrepAdmission', () => {
     ).toBe(true);
     expect(budget.snapshot().decisions.legacy).toBe(1);
     expect(budget.snapshot().decisions['cover-not-arrival']).toBe(0);
+  });
+});
+
+describe('createGpuPrepAdmission under a context restore hold', () => {
+  it('paces what the cover admits: a spent frame refuses the next restore unit, a curtain would not', () => {
+    const run = (hold: boolean): boolean[] => {
+      const budget = createGpuPrepBudget({ targetFrameMs: 16.7, minSliceMs: 1.5 });
+      const admission = createGpuPrepAdmission(budget);
+      budget.noteFrame(16.7);
+      setArrivalCover(true);
+      if (hold) setContextRestorePacing(true);
+      const candidate = {
+        label: 'restore-link:context-restore-visible:0',
+        priority: GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        deferredFrames: 0,
+      };
+      const first = admission.admit(candidate);
+      admission.spend(40, candidate.label);
+      const second = admission.admit(candidate);
+      // Debt waits for the end of the hold either way.
+      const debt = admission.admit({ ...candidate, priority: GPU_WORK_PRIORITY.BOOT_DEBT });
+      setArrivalCover(false);
+      resetContextRestoreHoldForTest();
+      return [first, second, debt];
+    };
+    expect(run(true)).toEqual([true, false, false]);
+    expect(run(false)).toEqual([true, true, false]);
   });
 });

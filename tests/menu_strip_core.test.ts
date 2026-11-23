@@ -234,4 +234,16 @@ describe('menuCaptionCenterX', () => {
   it('reports nothing for a live index the placement never filled', () => {
     expect(menuCaptionCenterX({ centers: [], live: 0, viewportWidth: 844, margin: 6 })).toBeNull();
   });
+
+  // The gesture layer clamps the row in the safe-area box but hands back
+  // viewport coordinates, so the box starts at the left inset. Both bounds and
+  // the narrow fallback move with it.
+  it('clamps inside a safe-area box that starts at clampLeft', () => {
+    const input = { centers: [24, 84], live: 0, viewportWidth: 780, margin: 6, clampLeft: 32 };
+    expect(menuCaptionCenterX(input)).toBe(32 + 6 + MENU_CAPTION_HALF_PX);
+    expect(menuCaptionCenterX({ ...input, centers: [900], live: 0 })).toBe(
+      32 + 780 - 6 - MENU_CAPTION_HALF_PX,
+    );
+    expect(menuCaptionCenterX({ ...input, viewportWidth: 80 })).toBe(32 + 40);
+  });
 });

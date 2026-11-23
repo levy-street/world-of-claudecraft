@@ -143,6 +143,7 @@ export const TOGGLE_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'form_bear',
   'form_cat',
   'form_moonkin',
+  'form_sporemender',
   'form_shadow',
   'form_travel',
   'form_fireball',
@@ -213,6 +214,8 @@ const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set([
 const PARTY_FRAME_EXCLUDED_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'sated',
   'cheater_mark',
+  // a worn pumpkin or a trick: cosmetic, never worth a healer's frame slot
+  'seasonal_cosmetic',
 ]);
 
 /** Effects worth surfacing on a compact party/raid frame. Generic maintenance

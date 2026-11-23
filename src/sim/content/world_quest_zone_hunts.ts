@@ -33,11 +33,15 @@ const kill = (
   area: { x: number; z: number; radius: number },
   targetMobId: string,
   count: number,
+  // Only where the ring centre plus the default offset is unfit (the Great
+  // Maze, a collider); see WorldQuestDef.championAt.
+  championAt?: { x: number; z: number },
 ): WorldQuestDef => ({
   id,
   zoneId,
   minLevel,
   area,
+  ...(championAt ? { championAt } : {}),
   objective: { type: 'kill', targetMobId },
   count,
 });
@@ -170,7 +174,10 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
   ),
   kill('wq_frostveil_sprites', 'frostveil', 17, { x: -84, z: 1738, radius: 22 }, 'fen_sprite', 3),
   // Willowfen (levels 19 to 20)
-  kill('wq_willowfen_toads', 'willowfen', 19, { x: -363, z: 328, radius: 132 }, 'bogtoad', 6),
+  kill('wq_willowfen_toads', 'willowfen', 19, { x: -363, z: 328, radius: 132 }, 'bogtoad', 6, {
+    x: -354,
+    z: 338,
+  }),
   kill(
     'wq_willowfen_sprites',
     'willowfen',
@@ -255,8 +262,19 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     { x: 360, z: 1011, radius: 147 },
     'topiary_wolf',
     4,
+    // The Evergarden rings centre on the Great Maze, so each champion rises
+    // on the open lawn beside one of its own camps instead.
+    { x: 302, z: 912 },
   ),
-  kill('wq_evergarden_gnomes', 'evergarden', 20, { x: 362, z: 972, radius: 119 }, 'hedge_gnome', 4),
+  kill(
+    'wq_evergarden_gnomes',
+    'evergarden',
+    20,
+    { x: 362, z: 972, radius: 119 },
+    'hedge_gnome',
+    4,
+    { x: 268, z: 984 },
+  ),
   kill(
     'wq_evergarden_stags',
     'evergarden',
@@ -264,6 +282,7 @@ export const WORLD_QUEST_ZONE_HUNTS: readonly WorldQuestDef[] = Object.freeze([
     { x: 345, z: 1022, radius: 145 },
     'topiary_stag',
     4,
+    { x: 364, z: 916 },
   ),
   // Farshore Isle (levels 3 to 7; world quests open at 5)
   kill(

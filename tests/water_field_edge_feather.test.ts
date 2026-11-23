@@ -60,30 +60,29 @@ describe('interactive water field edge', () => {
     const frag = mat?.fragmentShader ?? '';
     const vert = mat?.vertexShader ?? '';
 
-    // A weight, not a predicate: `bool waveSampleAt` is the regression.
-    expect(frag).toContain('float waveSampleAt');
-    expect(frag).not.toContain('bool waveSampleAt');
-    // The ramp has to be INSIDE waveSampleAt, not just somewhere in the shader
+    // A weight, not a predicate: `bool wakeSampleAt` is the regression.
+    expect(frag).toContain('float wakeSampleAt');
+    expect(frag).not.toContain('bool wakeSampleAt');
+    // The ramp has to be INSIDE wakeSampleAt, not just somewhere in the shader
     // (the fragment stage uses smoothstep for foam, distance and sheen too).
-    const body = frag.slice(frag.indexOf('float waveSampleAt'));
-    const fn = body.slice(0, body.indexOf('\n  }'));
+    const body = frag.slice(frag.indexOf('float wakeSampleAt'));
+    const fn = body.slice(0, body.indexOf('\n}'));
     expect(fn).toMatch(/smoothstep\(0\.0, [0-9.]+, min\(toEdge\.x, toEdge\.y\)\)/);
     expect(fn).toContain('return 0.0;');
 
     // Both stages must ride the weight. Displacing geometry or perturbing the
     // normal at full strength up to the border reinstates the seam.
-    // waveSampleAt writes `wave` as an out param, so it must be called in its
+    // wakeSampleAt writes `wave` as an out param, so it must be called in its
     // own statement: reading wave.r in the same expression is undefined in GLSL.
-    expect(vert).toMatch(/float waveW = uWaveEnabled \* waveSampleAt\(pos\.xz, wave\);/);
-    // The lift also rides the baked shore gate (depthFade, see aSwellGate): the
-    // field clamps to +/- 0.65 yards and this was once the only displacement
-    // term with no depth gate at all, so a wake beside a beach raised the sheet
-    // over the sand. The weight and the gate are both required here; only the
-    // fragment stage's use of the field is left ungated, deliberately, so a
-    // wake still SHADES right up to the waterline.
-    expect(vert).toMatch(/pos\.y \+= wave\.r \* waveW \* depthFade;/);
-    expect(frag).toMatch(/waveSlope = wave\.ba \* waveW/);
-    expect(frag).toMatch(/waveEnergy = .*\* waveW/);
+    expect(vert).toMatch(/float waveW = uWaveEnabled \* wakeSampleAt\(xz, wave\);/);
+    // The lift also rides the baked shore gate (aSwellGate): the field clamps
+    // to +/- 0.65 yards and this was once the only displacement term with no
+    // depth gate at all, so a wake beside a beach raised the sheet over the
+    // sand. Only the fragment stage's use of the field is left ungated,
+    // deliberately, so a wake still SHADES right up to the waterline.
+    expect(vert).toMatch(/wp\.y \+= wave\.r \* waveW \* aSwellGate;/);
+    expect(frag).toMatch(/wakeSlope = wave\.ba \* waveW/);
+    expect(frag).toMatch(/wakeEnergy = .*\* waveW/);
     view.dispose();
   });
 });

@@ -137,10 +137,15 @@ export function abilityVfxGateMaterials(root: THREE.Object3D): THREE.Material[] 
  *  object drawing that program. The gated families come first, in family
  *  order, so the resume lane closes the gate's window before it links any
  *  other pool, and a gated drawable represents a program it shares with any
- *  other pool, so the unit and the gate entry name the same object. */
-export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVfxCompileTarget[] {
+ *  other pool, so the unit and the gate entry name the same object. A
+ *  `declined` family's drawables never draw on this device, so they get no
+ *  unit. */
+export function collectAbilityVfxCompileTargets(
+  root: THREE.Object3D,
+  declined: readonly CastVfxFamilyId[] = [],
+): AbilityVfxCompileTarget[] {
   const seen = new Set<string>();
-  const gated = CAST_VFX_FAMILIES.flatMap(({ id }) =>
+  const gated = CAST_VFX_FAMILIES.filter(({ id }) => !declined.includes(id)).flatMap(({ id }) =>
     pooledPrograms(root, (object) => inCastVfxFamily(object, id), seen),
   );
   const rest = pooledPrograms(root, (object) => castVfxFamilyBitOf(object) === 0, seen);

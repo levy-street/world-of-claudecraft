@@ -52,6 +52,11 @@ export class HoardBossCueMirror {
     });
   }
 
+  /** Drop every cue: the mirrored rift floor was reset (rift_floor_mirror.ts). */
+  clear(): void {
+    this.cues = [];
+  }
+
   views(): HoardBossCueView[] {
     const now = this.nowMs();
     return this.cues.flatMap((cue) => {

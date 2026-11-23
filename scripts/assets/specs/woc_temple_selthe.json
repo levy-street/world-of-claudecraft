@@ -1,0 +1,26 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/temple_selthe_woc.glb",
+      "out": "models/creatures/woc_temple_selthe.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Hit",
+        "Attack",
+        "Attack2",
+        "SeaSong",
+        "Bolt",
+        "Beam",
+        "Surge",
+        "Chorus",
+        "Solo",
+        "Cast",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

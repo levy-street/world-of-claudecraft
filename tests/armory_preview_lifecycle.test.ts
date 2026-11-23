@@ -88,20 +88,23 @@ describe('Armory preview lifecycle', () => {
       expect(at, `${name} not found`).toBeGreaterThan(-1);
       return store.slice(at, store.indexOf('\n  }', at));
     };
-    const openStore = bodyOf('openStore(): void {');
-    expect(openStore).toContain("this.tab = 'store'");
+    const openStore = bodyOf("openStore(tab: 'store' | 'memberships' = 'store'): void {");
+    expect(openStore).toContain('this.tab = tab');
     for (const hop of [
       openStore,
       bodyOf('toggle(): void {'),
       bodyOf('private async renderCurrent('),
       bodyOf('private async renderStore('),
+      bodyOf('private async renderMemberships('),
     ]) {
       expect(hop.toLowerCase()).not.toContain('ensurearmory');
       expect(hop.toLowerCase()).not.toContain('warm');
     }
 
     // And the hud's store entry point adds nothing of its own.
-    const hudOpenStart = hud.indexOf('openWocStore(): void {');
+    const hudOpenStart = hud.indexOf(
+      "openWocStore(tab: 'store' | 'memberships' = 'store'): void {",
+    );
     expect(hudOpenStart).toBeGreaterThan(-1);
     const hudOpen = hud.slice(hudOpenStart, hud.indexOf('\n  }', hudOpenStart));
     expect(hudOpen.toLowerCase()).not.toContain('armory');

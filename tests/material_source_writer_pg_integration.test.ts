@@ -26,9 +26,11 @@
 import { randomBytes } from 'node:crypto';
 import { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { prepareMaterialSourceWriterUpgrade } from '../server/material_source_host';
 import {
   MATERIAL_SOURCE_GUARDED_TABLES,
   MATERIAL_SOURCE_WRITER_CAPABILITY,
+  MATERIAL_SOURCE_WRITER_FUNCTION_SQL,
   MATERIAL_SOURCE_WRITER_GUARD_SQL,
   MATERIAL_SOURCE_WRITER_SQLSTATE,
   MATERIAL_SOURCE_WRITER_STARTUP_OPTION,
@@ -241,7 +243,7 @@ describeDb('material source writer guard (REAL Postgres)', () => {
     // A RAW space in an option value would be split off as a second server
     // argument and the connection would never open, so the value with a space
     // is escaped the way PostgreSQL's options syntax requires.
-    const values = ['0', '2', 'true', String.raw`yes\ please`];
+    const values = ['0', '1', 'true', String.raw`yes\ please`];
     for (const value of values) {
       const wrong = new Client({
         connectionString: TEST_URL,
@@ -263,7 +265,7 @@ describeDb('material source writer guard (REAL Postgres)', () => {
   it('announces the capability while preserving composed option values', async () => {
     // The composed string is what a wired caller would hand pg. Each case
     // proves BOTH halves survive pg_split_opts: the capability really arrives
-    // as 1, and the caller's own value is unchanged.
+    // as 2, and the caller's own value is unchanged.
     const cases = [
       { option: 'woc_msw_plain', expected: 'woc_msw_plain' },
       // An escaped space stays one value rather than splitting.
@@ -293,7 +295,7 @@ describeDb('material source writer guard (REAL Postgres)', () => {
     expect(await refusalFor(updated, writeSql('characters', 'INSERT', 9202))).toBeNull();
     const read = `SELECT current_setting('${MATERIAL_SOURCE_WRITER_CAPABILITY}', true) AS value`;
     const setting = await updated.query(read);
-    expect(setting.rows[0].value).toBe('1');
+    expect(setting.rows[0].value).toBe('2');
     await updated.query(`SET search_path = ${SCHEMA}`);
   });
 
@@ -319,5 +321,43 @@ describeDb('material source writer guard (REAL Postgres)', () => {
       MATERIAL_SOURCE_WRITER_SQLSTATE,
     );
     expect(await refusalFor(updated, writeSql('guild_banks', 'INSERT', 9302))).toBeNull();
+  });
+
+  it('upgrades existing v1 triggers transactionally and fences an already connected v1 writer', async () => {
+    const oldFunction = MATERIAL_SOURCE_WRITER_FUNCTION_SQL.replace(
+      "IS DISTINCT FROM '2'",
+      "IS DISTINCT FROM '1'",
+    );
+    const old = new Client({
+      connectionString: TEST_URL,
+      options: '-c woc.material_source_writer=1',
+    });
+    await old.connect();
+    await updated.query(`SET search_path = ${SCHEMA}`);
+    try {
+      await admin.query(oldFunction);
+      expect(await refusalFor(old, writeSql('characters', 'INSERT', 9401))).toBeNull();
+      expect((await refusalFor(updated, writeSql('characters', 'INSERT', 9402)))?.code).toBe(
+        '55000',
+      );
+      await updated.query('BEGIN');
+      await prepareMaterialSourceWriterUpgrade(updated, updated);
+      await updated.query(writeSql('characters', 'INSERT', 9403));
+      await updated.query('ROLLBACK');
+      expect(
+        (await admin.query(`SELECT id FROM ${qualified('characters')} WHERE id = 9403`)).rowCount,
+      ).toBe(0);
+      expect(await refusalFor(old, writeSql('characters', 'INSERT', 9404))).toBeNull();
+      await updated.query('BEGIN');
+      await prepareMaterialSourceWriterUpgrade(updated, updated);
+      await updated.query(writeSql('characters', 'INSERT', 9405));
+      await updated.query('COMMIT');
+      expect((await refusalFor(old, writeSql('characters', 'INSERT', 9406)))?.code).toBe('55000');
+      expect(await refusalFor(updated, writeSql('characters', 'INSERT', 9407))).toBeNull();
+    } finally {
+      await updated.query('ROLLBACK');
+      await admin.query(MATERIAL_SOURCE_WRITER_FUNCTION_SQL);
+      await old.end();
+    }
   });
 });

@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "clue-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 2,
+    "replacedSvgIcons": 2,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "clue_scroll",
+      "family": "clue",
+      "batch": "clue-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/clue_scroll.webp",
+      "canonicalDisplayName": "Clue Scroll",
+      "acceptedSha256": "78e4bac549f610a42788fe8d4c729ccb968706389bc348f1741a3cd9c5b05f3d",
+      "acceptedBytes": 3294,
+      "original": {
+        "path": "tmp/imagegen/v045-items-clue/originals/clue_scroll.png",
+        "sha256": "e13cd22211f12a4c6a9d66a08d97a8a2c4d300a436890066189fbd7527078e1d",
+        "bytes": 2265090,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-clue/masters/clue_scroll.png",
+        "sha256": "79ef0a2900368ba679041cf2aaf46c872c65132ae69d3278258e187956ad7e43",
+        "bytes": 549973,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "clue-scroll-icons-2026-09-17",
+        "provenanceRecord": "docs/achievements/clue-scroll-icons-2026-09-17/",
+        "sha256": "529772bc60e21e63bc5631aa8da440bd252c1a13ebe09235036b2cedcf201768",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Clue Scroll (clue_scroll) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete weathered parchment scroll half unrolled vertically, curled top and lightly torn lower edge. A single hand-painted dark red treasure-cross symbol near the lower right, red ribbon with a round wax seal at lower left. Blank parchment elsewhere, no writing or pseudo-script. The red cross is an intentional treasure marker, not typography. Preserve the established Clue Hunt item identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-clue/superseded/clue_scroll.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "529772bc60e21e63bc5631aa8da440bd252c1a13ebe09235036b2cedcf201768"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/clue-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/clue-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/clue-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "treasure_casket",
+      "family": "clue",
+      "batch": "clue-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/treasure_casket.webp",
+      "canonicalDisplayName": "Treasure Casket",
+      "acceptedSha256": "925e92587eda9829485e6d3803a75303b42ef424747c4ab628eab8fac42fea03",
+      "acceptedBytes": 3870,
+      "original": {
+        "path": "tmp/imagegen/v045-items-clue/originals/treasure_casket.png",
+        "sha256": "e1af3f40aa9a70edd98455533c296ead7b05e6828499cf1d7166183b423d22ce",
+        "bytes": 2392567,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-items-clue/masters/treasure_casket.png",
+        "sha256": "86ef45cc694d4c49cda29e1d861d9641a56c5c88366d233940fd8808fe7023df",
+        "bytes": 549524,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "clue-scroll-icons-2026-09-17",
+        "provenanceRecord": "docs/achievements/clue-scroll-icons-2026-09-17/",
+        "sha256": "84a4ad79d82f96a2eac4018632e6039d94c07a0736f43144126beba115dbb2c1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Treasure Casket (treasure_casket) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete squat oak treasure casket in three-quarter view, dark iron reinforcing bands and rivets, brass lock plate. Its rounded domed lid is cracked open enough to reveal gold coins and one small cyan gem at the rim, soft contained golden light spilling through the opening. Tactile oak grain, cool iron, warm brass. No coins or other objects scattered outside the chest. Preserve the established Clue Hunt item identity. Dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-items-clue/superseded/treasure_casket.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "84a4ad79d82f96a2eac4018632e6039d94c07a0736f43144126beba115dbb2c1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/clue-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/clue-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/clue-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

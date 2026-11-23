@@ -1,12 +1,14 @@
 export const NYTHRAXIS_DUNGEON_ID = 'nythraxis_boss_arena';
 export const NYTHRAXIS_BOSS_TEMPLATE_ID = 'nythraxis_scourge_of_thornpeak';
 export const NYTHRAXIS_ALDRIC_TEMPLATE_ID = 'brother_aldric_raid';
-// Every brother_aldric* template shares this visual key, and the Eastbrook
+// Every brother_aldric* template shares this visual key (his authored look on the
+// priest's WOC body, src/render/characters/npc_looks.ts), and the Eastbrook
 // brother_aldric is a static zone NPC: a character that entered the world there
-// already compiled it, so the catalog's Aldric arm is skipped and the aldric
+// already built it, so the catalog's Aldric arm is skipped and the aldric
 // A/B row reads +0 on BOTH legs. The bench records the warm state so that row
-// is never read as proof the prewarm did the work.
-export const NYTHRAXIS_ALDRIC_VISUAL_KEY = 'npc_aldric';
+// is never read as proof the prewarm did the work. Any other priest-bodied NPC
+// of the entry zone warms the same key, which the park zone check covers too.
+export const NYTHRAXIS_ALDRIC_VISUAL_KEY = 'player_priest';
 export const NYTHRAXIS_ALDRIC_SPAWN_DIST = 50;
 export const NYTHRAXIS_PHASE_TWO_HP_PERCENT = 50;
 export const DUNGEON_INSTANCE_X_MIN = 100_000;
@@ -19,7 +21,7 @@ export const NYTHRAXIS_BOSS_SPAWN_LOCAL = Object.freeze({ x: 0, z: 96 });
 export const MOB_INTEREST_RADIUS = 90;
 // Where the observer is parked between legs. World entry prewarms every static
 // NPC MODEL of the spawn zone, and Eastbrook, Mirefen and Thornpeak each place
-// a brother_aldric on the shared npc_aldric key, so a character that enters in
+// a brother_aldric on the shared priest-body key, so a character that enters in
 // any of them has Aldric linked before the leg starts and the aldric row
 // measures nothing. Farshore Isle places none (pinned against the live NPC
 // table), and it is a level 3 to 7 hub, so a geared observer parks there safely.

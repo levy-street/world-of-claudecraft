@@ -72,12 +72,11 @@ export interface MarketInfo {
   pageCount: number; // total browse pages of other sellers' listings (>= 1)
   collectionCopper: number; // proceeds waiting to be collected
   collectionItems: InvSlot[]; // returned/expired items waiting to be collected
-  /** The itemized ledger behind `collectionCopper`: one row per sale still awaiting
-   *  pickup, oldest first. Empty when nothing has sold since the last collect. */
+  /** The seller's sale history (the History tab): one row per sale, oldest first,
+   *  kept after the gold is collected and bounded by the ledger cap. */
   collectionSales: MarketSaleRecord[];
-  /** Older sales the ledger cap dropped. Their gold IS in `collectionCopper`, so the
-   *  tab says how many rows it is not listing rather than showing a short list that
-   *  does not add up. */
+  /** Older sales the ledger cap dropped, so the tab says how many rows it is not
+   *  listing rather than silently showing a short list. */
   collectionSalesOmitted: number;
   cutPct: number; // the Merchant's cut on a sale, as a percentage
   maxListings: number; // per-seller active-listing cap

@@ -186,7 +186,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
       ).toEqual([]);
       if (inScope.length === 0) continue;
       const spans = functionSpans(src);
-      const rel = file.slice(SERVER_DIR.length + 1);
+      const rel = file.slice(SERVER_DIR.length + 1).replaceAll('\\', '/');
       for (const site of inScope) {
         totalInScope += 1;
         const span = spans.find((s) => site.index >= s.start && site.index < s.end);
@@ -286,7 +286,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
     // never-used account (the provision race loser): it cannot hold a live
     // token or a cached moderation row, so no bust is owed. Any SECOND hard
     // delete of accounts rows must land here and make its own case.
-    expect(deletes.map((d) => d.file.slice(SERVER_DIR.length + 1))).toEqual([
+    expect(deletes.map((d) => d.file.slice(SERVER_DIR.length + 1).replaceAll('\\', '/'))).toEqual([
       'federated_auth_db.ts',
     ]);
   });
@@ -367,7 +367,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
     // must never appear here.
     const importers = files
       .filter((f) => /from '\.{1,2}\/woc_auth_guard_cache'/.test(sources.get(f) ?? ''))
-      .map((f) => f.slice(SERVER_DIR.length + 1))
+      .map((f) => f.slice(SERVER_DIR.length + 1).replaceAll('\\', '/'))
       .sort();
     expect(importers).toEqual([
       'chat_filter_db.ts',
@@ -383,7 +383,7 @@ describe('auth-guard bust coverage (discovered, never hand-enumerated)', () => {
       const src = sources.get(file) ?? '';
       if (
         src.includes('woc_auth_guard_cache') &&
-        !importers.includes(file.slice(SERVER_DIR.length + 1))
+        !importers.includes(file.slice(SERVER_DIR.length + 1).replaceAll('\\', '/'))
       ) {
         expect.fail(`${file} references woc_auth_guard_cache outside the pinned import set`);
       }

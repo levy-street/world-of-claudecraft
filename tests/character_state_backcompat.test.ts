@@ -44,10 +44,13 @@ describe('character state JSONB back-compat', () => {
     };
 
     const state = sim.serializeCharacter(pid)!;
-    expect(state.vendorBuyback).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    // Legacy unsigned rows save with explicit unknown-source units.
+    expect(state.vendorBuyback).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(state.delveClears).toEqual({ d_reservoir: 3 });
     expect(state.bank).toEqual({
-      inventory: [{ itemId: 'wolf_fang', count: 3 }],
+      inventory: [{ itemId: 'wolf_fang', count: 3, materialSources: [{ source: {}, count: 3 }] }],
       purchasedSlots: 6,
       bonusSlots: 0,
     });
@@ -99,5 +102,16 @@ describe('character state JSONB back-compat', () => {
     expect(reserialized.delveClears).toEqual({});
     expect(reserialized.companionUpgrades).toEqual({});
     expect(reserialized.bank).toEqual({ inventory: [], purchasedSlots: 0, bonusSlots: 0 });
+    expect(reserialized).toEqual({
+      ...state,
+      vendorBuyback: [],
+      delveClears: {},
+      companionUpgrades: {},
+      bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
+    });
+
+    const sim3 = makeSim();
+    const canonicalPid = sim3.addPlayer('warrior', 'Reloaded', { state: reserialized });
+    expect(sim3.serializeCharacter(canonicalPid)).toEqual(reserialized);
   });
 });

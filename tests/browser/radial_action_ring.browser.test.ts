@@ -28,6 +28,7 @@ import {
   type StripDirection,
   stripCaptionCenterX,
 } from '../../src/ui/hud/action_bar/radial_action_core';
+import { RadialGesture } from '../../src/ui/hud/action_bar/radial_gesture_controller';
 import {
   RADIAL_PETAL_DIRECTIONS,
   RadialPetalPainter,
@@ -96,6 +97,7 @@ function emptySlotState(kind: ActionBarSlotState['kind']): ActionBarSlotState {
     kind,
     abilityId: null,
     itemId: null,
+    petCommand: null,
     iconKey: '',
     cooldownRemaining: 0,
     cooldownTotal: 0,
@@ -794,6 +796,87 @@ describe.each(VIEWPORTS)('radial action ring at $label', ({ width, height, tier 
     // UNCLAMPED radial would push a petal off screen, so the pins above are
     // proving the clamp rather than passing on roomy geometry.
     expect(overrunSeen, 'no seat exercised the edge clamp').toBe(true);
+  });
+
+  // The overlay carries the safe area as PADDING, which does not move an
+  // absolutely positioned petal, so the REAL gesture layer must hand the painter
+  // viewport coordinates. It used to read the padding as an offset, which drew
+  // every petal a whole inset up and left of its button on a notched or
+  // edge-to-edge phone. env() is 0 headless, so the insets are set inline, and
+  // one-sided like a real landscape notch.
+  it('seats the revealed petals on their button with a one-sided inset', async () => {
+    const rig = await setup();
+    const insetLeft = 40;
+    const insetTop = 24;
+    rig.overlay.style.paddingLeft = `${insetLeft}px`;
+    rig.overlay.style.paddingTop = `${insetTop}px`;
+    const petalPainter = new RadialPetalPainter(
+      writers(),
+      {
+        overlay: rig.overlay,
+        cancel: rig.cancel,
+        bar: { container: rig.overlay, slots: rig.petalBtns.map(slotElements) },
+      },
+      () => '',
+    );
+    const petalState: ActionBarState = {
+      slots: RADIAL_PETAL_DIRECTIONS.map(() => emptySlotState('empty')),
+      manySpells: false,
+    };
+    const gesture = new RadialGesture({
+      buttons: rig.slotBtns,
+      writers: writers(),
+      tapMenus: () => false,
+      metricsHost: rig.overlay,
+      hasSlot: () => true,
+      cast: () => {},
+      pressClaimed: () => false,
+      takeSuppressedPress: () => false,
+      onCancel: () => {},
+    });
+    gesture.attach();
+    const overlayStyle = getComputedStyle(rig.overlay);
+    const ratio = Number.parseFloat(overlayStyle.getPropertyValue('--radial-radius-ratio'));
+    const margin = Number.parseFloat(overlayStyle.getPropertyValue('--radial-margin'));
+    const touch = (type: string, el: HTMLElement, x: number, y: number) =>
+      el.dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          pointerId: 1,
+          pointerType: 'touch',
+          clientX: x,
+          clientY: y,
+        }),
+      );
+
+    for (const btn of rig.slotBtns) {
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.x + rect.width / 2;
+      const cy = rect.y + rect.height / 2;
+      touch('pointerdown', btn, cx, cy);
+      // A flick past the deadzone reveals the petals without waiting the timer.
+      touch('pointermove', btn, cx + 40, cy);
+      const placement = gesture.placement();
+      expect(placement, 'the flick did not reveal the petals').not.toBeNull();
+      if (!placement) continue;
+      petalPainter.paint(petalState, placement, 'right', true);
+
+      // Where the radial's origin must render, worked out independently in
+      // viewport coordinates: the button's centre, clamped one reach inside the
+      // safe-area box [inset, viewport edge]. The cancel X is seated ON the
+      // origin and each petal one radius off it.
+      const radius = rect.width * ratio;
+      const reach = radius + rect.width / 2 + margin;
+      const expectX = Math.min(Math.max(cx, insetLeft + reach), width - reach);
+      const expectY = Math.min(Math.max(cy, insetTop + reach), height - reach);
+      const cancelBox = rig.cancel.getBoundingClientRect();
+      expect(cancelBox.x + cancelBox.width / 2).toBeCloseTo(expectX, 0);
+      expect(cancelBox.y + cancelBox.height / 2).toBeCloseTo(expectY, 0);
+      const right = rig.petalBtns[RADIAL_PETAL_DIRECTIONS.indexOf('right')].getBoundingClientRect();
+      expect(right.x + right.width / 2).toBeCloseTo(expectX + radius, 0);
+      touch('pointerup', btn, cx + 40, cy);
+    }
   });
 
   it('closes the radial by default and dims only its own area when open', async () => {

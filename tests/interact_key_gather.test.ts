@@ -25,7 +25,7 @@ import {
   createGatherEffectConfirm,
   interactKeyGatherOptions,
 } from '../src/game/interact_key_gather';
-import { GATHER_NODES } from '../src/sim/data';
+import { activeGatherNodes } from '../src/sim/data';
 import { gatherNodeToolGateFor } from '../src/ui/gather_node_tooltip_controller';
 import { gatherEffectPrompt } from '../src/ui/hud/professions/gathering_view';
 import type { IWorld } from '../src/world_api';
@@ -54,7 +54,7 @@ describe('interactKeyGatherOptions', () => {
     const opts = interactKeyGatherOptions(world, effectConfirm);
 
     // The SAME array the node click and the tool press read, not a copy.
-    expect(opts.nodes).toBe(GATHER_NODES);
+    expect(opts.nodes).toBe(activeGatherNodes());
     expect(opts.tooFarText).toBe('t:questUi.errors.tooFar');
     expect(opts.notReadyText).toBe('t:hudChrome.gathering.notReady');
     expect(opts.effectConfirm).toBe(effectConfirm);

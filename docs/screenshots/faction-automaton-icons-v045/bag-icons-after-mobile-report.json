@@ -1,0 +1,20 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/automaton_cog_ring.webp",
+    "http://localhost:5194/ui/items/clockwork_tinkers_pack.webp",
+    "http://localhost:5194/ui/items/artificers_welding_cowl.webp",
+    "http://localhost:5194/ui/items/forgemaster_crag_cleaver.webp",
+    "http://localhost:5194/ui/items/champion_forged_loop.webp",
+    "http://localhost:5194/ui/items/cogwork_choker.webp",
+    "http://localhost:5194/ui/items/forgemasters_girdle.webp",
+    "http://localhost:5194/ui/items/forgemasters_sabatons.webp",
+    "http://localhost:5194/ui/items/formula_piston_drive.webp",
+    "http://localhost:5194/ui/items/forgewall_gorget.webp"
+  ],
+  "allDecoded": true
+}

@@ -27,11 +27,13 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isMergeableInstancePayload } from './item_instance_merge';
+import { isItemLocked } from './item_lock_flag';
 import { moveMaterialBetweenContainers } from './material_container_move';
 import { isMaterialItemId } from './material_ids';
 import {
   normalizeLoadedMaterialSlot,
   preservesMaterialCountOnLoad,
+  savedMaterialSlot,
   validateMaterialSlotSourcesOnLoad,
 } from './material_slot_load';
 import {
@@ -41,6 +43,7 @@ import {
 import type { MaterialComposition } from './material_sources';
 import { sanitizeRiftGearInstance } from './rift/progression';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
 /** Slots every character's bank starts with, before any expansion. */
@@ -62,12 +65,13 @@ export const BANK_EXPANSION_PRICES: readonly number[] = [
 export const BANK_PURCHASED_SLOTS_MAX = BANK_EXPANSION_PRICES.length * BANK_EXPANSION_SLOTS;
 
 /** The most bonus slots the server's entitlement registry can grant: +2 email,
- *  +2 Discord, +2 wallet, +2 per qualified referral capped at 5 (+10), so 16.
+ *  +2 Discord, +2 wallet, +2 per qualified referral capped at 5 (+10), and
+ *  +20 for the permanent second completed-card reward, so 36.
  *  This is the load-path clamp for `bonusSlots` (a tampered save must not mint
  *  capacity the registry cannot grant). The server-side registry ceiling is pinned
  *  equal to this constant (tests/bank_entitlements.test.ts), so a future source
  *  (X, Twitch) bumps BOTH in the same change or that tripwire goes red. */
-export const BANK_MAX_BONUS_SLOTS = 16;
+export const BANK_MAX_BONUS_SLOTS = 36;
 
 /** Bank bag sockets: a second, independent way to grow the bank, sitting as a
  *  tier ABOVE the twelve-rung slot ladder (which is grandfathered untouched).
@@ -78,12 +82,12 @@ export const BANK_MAX_BONUS_SLOTS = 16;
  *  diverge in a future tuning and must never alias. */
 export const BANK_BAG_SOCKETS = 4;
 /** Copper cost of each successive socket unlock, cheapest first, charged the
- *  exact-copper way BANK_EXPANSION_PRICES is (100g / 200g / 350g / 500g; 1g is
+ *  exact-copper way BANK_EXPANSION_PRICES is (75g / 100g / 125g / 150g; 1g is
  *  10000 copper). Data-as-code like the ladder: the price is always this table
  *  lookup, never a client-supplied value. These are the locked launch
  *  defaults; the server-side override seam is storage_prices.ts, and
  *  tests/bank_sockets.test.ts pins them as literals. */
-export const BANK_SOCKET_PRICES: readonly number[] = [1000000, 2000000, 3500000, 5000000];
+export const BANK_SOCKET_PRICES: readonly number[] = [750000, 1000000, 1250000, 1500000];
 
 /** Coerce a persisted/stamped bonus-slot value into [0, BANK_MAX_BONUS_SLOTS]. */
 export function clampBonusSlots(raw: unknown): number {
@@ -332,7 +336,7 @@ export function moveBetweenContainers(
     return { moved: 0, refusal: 'invalid' };
   }
   const slot = source[sourceIndex];
-  if (isMaterialItemId(slot.itemId)) {
+  if (isStackProvenanceItemId(slot.itemId)) {
     return moveMaterialBetweenContainers(
       source,
       sourceIndex,
@@ -461,6 +465,18 @@ export function bankDeposit(
   const slot = meta.inventory[slotIndex];
   if (ITEMS[slot.itemId]?.kind === 'quest') {
     ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
+    return;
+  }
+  // Lent gear (the muster pike, src/sim/muster_pike.ts) is not the player's to store: the
+  // lender takes it back, and a banked copy would outlive the loan.
+  if (ITEMS[slot.itemId]?.lentGear) {
+    ctx.error(meta.entityId, 'You cannot store borrowed gear in the bank.');
+    return;
+  }
+  // A player-locked copy stays in the bag cell it is pinned to
+  // (inventory_order.ts): the lock is the owner's "keep this right here".
+  if (isItemLocked(slot.instance)) {
+    ctx.error(meta.entityId, 'That item is locked and cannot be stored in the bank.');
     return;
   }
   let selectedSources: MaterialComposition | undefined;
@@ -705,9 +721,15 @@ export function bankGrantStorageSlots(
  *  the NEXT expansion, null once every expansion has been purchased. */
 export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
   const r = ctx.resolve(pid);
+  if (!r || !nearBanker(ctx, r.e)) return null;
+  return personalBankInfoFor(ctx, pid);
+}
+
+/** Owned-bank projection for admitted courier custody and the ordinary banker gate. */
+export function personalBankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
+  const r = ctx.resolve(pid);
   if (!r) return null;
-  const { meta, e: p } = r;
-  if (!nearBanker(ctx, p)) return null;
+  const { meta } = r;
   const bank = meta.bank;
   const purchases = Math.floor(bank.purchasedSlots / BANK_EXPANSION_SLOTS);
   const nextExpansionCost =
@@ -967,7 +989,7 @@ export function sanitizeBankState(
  *  pre-phase-11 save and every never-purchased save stays byte-equal. */
 export function savedBankState(bank: BankState): SavedBankState {
   return {
-    inventory: bank.inventory.map(cloneInvSlot),
+    inventory: bank.inventory.map(savedMaterialSlot),
     purchasedSlots: bank.purchasedSlots,
     bonusSlots: bank.bonusSlots,
     ...(bank.unlockedSockets > 0 || bank.socketBags.some((b) => b !== null)

@@ -269,10 +269,10 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
   });
 
   it('the cosmetic side is the one that varies: LOW_FOG exists and the bobber does not read it', () => {
-    // The low preset's fog trade is real (the constant exists in the
-    // renderer)...
-    const renderer = read('src/render/renderer.ts');
-    expect(renderer.includes('LOW_FOG')).toBe(true);
+    // The low preset's fog trade is real (the constant exists, and the
+    // renderer's fog pass reads it)...
+    expect(read('src/render/outdoor_biome_presets.ts')).toMatch(/export const LOW_FOG = \{/);
+    expect(read('src/render/renderer.ts')).toContain('if (this.lowGfx) return LOW_FOG;');
     // ...and it is scenery-only for professions because the actionable
     // surfaces above never import the renderer's fog state either.
     expect(read('src/render/fishing_bobber.ts').includes('LOW_FOG')).toBe(false);

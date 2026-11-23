@@ -18,19 +18,18 @@ describe('discord special roles - guild role name matching', () => {
     expect(specialRoleByName('Artists')?.key).toBe('artists');
   });
 
-  it('resolves the Admin guild role to a dedicated admin key', () => {
-    // The guild's staff role is named Admin; it must surface in game like
-    // Levy St and Devs do (bug: previously there was no matching entry).
-    expect(specialRoleByName('Admin')?.key).toBe('admin');
-    expect(specialRoleByName('admin')?.key).toBe('admin');
-    expect(specialRoleByName('Admins')?.key).toBe('admin');
-    expect(specialRoleByName('Administrator')?.key).toBe('admin');
-  });
-
-  it('keeps the Admin nameplate color on the staff green the role has in Discord', () => {
-    // The Admin role is the renamed Mods role, and renaming a Discord role
-    // keeps its color, so admin inherits the staff green.
-    expect(specialRoleColor('admin')).toBe('#57d98a');
+  it('surfaces the Admin guild role as the Sentinel flair, with no admin tag of its own', () => {
+    // An [Admin] tag is deliberately not shown in game: Admin holders read as
+    // Sentinels, so every Admin variant resolves to the seniormods key.
+    expect(specialRoleByName('Admin')?.key).toBe('seniormods');
+    expect(specialRoleByName('admin')?.key).toBe('seniormods');
+    expect(specialRoleByName('Admins')?.key).toBe('seniormods');
+    expect(specialRoleByName('Administrator')?.key).toBe('seniormods');
+    expect(specialRoleByName('Administrators')?.key).toBe('seniormods');
+    // A stale stored 'admin' key surfaces nothing until the bot re-pushes it.
+    expect(specialRoleByKey('admin')).toBeUndefined();
+    expect(specialRoleColor('admin')).toBeNull();
+    expect(specialRoleChatTag('admin')).toBe(false);
   });
 
   it('resolves the singular Artist guild role name (bug: only Artists matched)', () => {
@@ -61,7 +60,18 @@ describe('discord special roles - guild role name matching', () => {
     }
   });
 
-  it('resolves the Senior Mods and Junior Mods guild roles to their own keys', () => {
+  it('resolves the renamed Sentinel and Observer guild roles to the mod-tier keys', () => {
+    // The guild renamed Senior Mods to Sentinel and Junior Mods to Observer; the
+    // name match dropped every holder's flair until these names were added.
+    expect(specialRoleByName('Sentinel')?.key).toBe('seniormods');
+    expect(specialRoleByName('sentinel')?.key).toBe('seniormods');
+    expect(specialRoleByName('Sentinels')?.key).toBe('seniormods');
+    expect(specialRoleByName('Observer')?.key).toBe('juniormods');
+    expect(specialRoleByName('observer')?.key).toBe('juniormods');
+    expect(specialRoleByName('Observers')?.key).toBe('juniormods');
+  });
+
+  it('still resolves the old Senior Mods and Junior Mods names to their own keys', () => {
     expect(specialRoleByName('Senior Mods')?.key).toBe('seniormods');
     expect(specialRoleByName('senior mods')?.key).toBe('seniormods');
     expect(specialRoleByName('Senior Mod')?.key).toBe('seniormods');
@@ -101,37 +111,30 @@ describe('discord special roles - guild role name matching', () => {
 });
 
 describe('discord special roles - priority', () => {
-  it('ranks admin above devs and below levyst', () => {
+  it('ranks core dev above devs and below levyst', () => {
     const levyst = specialRoleByKey('levyst');
-    const admin = specialRoleByKey('admin');
-    const devs = specialRoleByKey('devs');
-    expect(admin).toBeDefined();
-    expect(levyst!.priority).toBeGreaterThan(admin!.priority);
-    expect(admin!.priority).toBeGreaterThan(devs!.priority);
-  });
-
-  it('ranks core dev above devs and below admin', () => {
-    const admin = specialRoleByKey('admin');
     const coredevs = specialRoleByKey('coredevs');
     const devs = specialRoleByKey('devs');
     expect(coredevs).toBeDefined();
-    expect(admin!.priority).toBeGreaterThan(coredevs!.priority);
+    expect(levyst!.priority).toBeGreaterThan(coredevs!.priority);
     expect(coredevs!.priority).toBeGreaterThan(devs!.priority);
   });
 
   it('picks the top role across mixed guild role names, aliases included', () => {
-    expect(topSpecialRole(['Artist', 'Admin'])?.key).toBe('admin');
+    expect(topSpecialRole(['Artist', 'Admin'])?.key).toBe('seniormods');
     expect(topSpecialRole(['Admin', 'Levy St'])?.key).toBe('levyst');
     expect(topSpecialRole(['Member', 'Artist'])?.key).toBe('artists');
     expect(topSpecialRole(['Member', 'WoC Champion'])).toBeUndefined();
   });
 
-  it('surfaces Core Dev over Devs, but Admin still outranks Core Dev', () => {
+  it('surfaces Core Dev over Devs, and Devs over the Admin (Sentinel) flair', () => {
     // A member who holds both Devs and Core Dev (like the founder) surfaces the
-    // higher Core Dev tag.
+    // higher Core Dev tag. Admin now reads as Sentinel, which sits below Devs.
     expect(topSpecialRole(['Devs', 'Core Dev'])?.key).toBe('coredevs');
     expect(topSpecialRole(['Mods', 'Core Dev'])?.key).toBe('coredevs');
-    expect(topSpecialRole(['Core Dev', 'Admin'])?.key).toBe('admin');
+    expect(topSpecialRole(['Core Dev', 'Admin'])?.key).toBe('coredevs');
+    expect(topSpecialRole(['Devs', 'Admin'])?.key).toBe('devs');
+    expect(topSpecialRole(['Admin', 'Mods'])?.key).toBe('seniormods');
   });
 
   it('slots Senior Mods above Mods and Junior Mods below Mods, all below staff', () => {
@@ -191,8 +194,8 @@ describe('discord special roles - catalog integrity', () => {
 
   it('ships the exact English tag labels for the new mod-tier and community roles', () => {
     const tags = hudChromeStrings.discord.roleTag as Record<string, string>;
-    expect(tags.seniormods).toBe('Senior Mod');
-    expect(tags.juniormods).toBe('Junior Mod');
+    expect(tags.seniormods).toBe('Sentinel');
+    expect(tags.juniormods).toBe('Observer');
     expect(tags.contentcreator).toBe('Content Creator');
     expect(tags.legend).toBe('LEGEND');
     expect(tags.shill).toBe('SHILL');
@@ -232,15 +235,7 @@ describe('discord special roles - the chat-tag staff set', () => {
     // The chat tag is a pure authority signal: adding a community role here
     // (or dropping a staff one) must be a deliberate, reviewable change.
     const tagged = DISCORD_SPECIAL_ROLES.filter((r) => r.chatTag).map((r) => r.key);
-    expect(tagged).toEqual([
-      'levyst',
-      'admin',
-      'coredevs',
-      'devs',
-      'seniormods',
-      'mods',
-      'juniormods',
-    ]);
+    expect(tagged).toEqual(['levyst', 'coredevs', 'devs', 'seniormods', 'mods', 'juniormods']);
     expect(specialRoleChatTag('mods')).toBe(true);
     expect(specialRoleChatTag('legend')).toBe(false);
     expect(specialRoleChatTag('shill')).toBe(false);

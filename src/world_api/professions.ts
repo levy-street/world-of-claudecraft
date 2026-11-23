@@ -11,7 +11,7 @@ import type {
   PerfectingSwapRequest,
 } from '../sim/professions/perfecting_swap';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
-import type { EquipSlot, StationDef } from '../sim/types';
+import type { EquipSlot, ItemInstancePayload, StationDef } from '../sim/types';
 import type { WorldInteractionOutcome } from './interaction';
 
 export type {
@@ -120,6 +120,8 @@ export interface CraftResultView {
   // this craft's output. `quality` now reports the output def's static
   // quality (outputs are deterministic; the quality roll is retired).
   masterwork?: boolean;
+  // The crafted copy's whole payload, only when it rolled loot quality.
+  instance?: ItemInstancePayload;
 }
 
 // Masterwork proc surface (Professions 2.0): the local viewer's most

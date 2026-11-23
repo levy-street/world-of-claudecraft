@@ -206,9 +206,6 @@ describe('routeEvents frame bytes and session mutations', () => {
     watcher.spectating = {
       characterId: subject.characterId,
       name: 'Subject',
-      savedPos: { ...entityPos(server, watcher.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     fWatcher.sent.length = 0;
     fSubject.sent.length = 0;
@@ -251,9 +248,6 @@ describe('routeEvents frame bytes and session mutations', () => {
     spec.spectating = {
       characterId: owner.characterId,
       name: 'Owner',
-      savedPos: { ...entityPos(server, spec.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     owner.selfHeavyDirty = false;
     spec.selfHeavyDirty = false;
@@ -508,9 +502,6 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
     watcher.spectating = {
       characterId: subject.characterId,
       name: 'Subject',
-      savedPos: { ...entityPos(server, watcher.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     const spy = vi.spyOn(botDetectorOf(server), 'observeEvent');
 
@@ -697,6 +688,33 @@ describe('event_frame pure assembly', () => {
     expect(filterRoutableEvents(events)).toEqual([loot]);
   });
 
+  it('filterRoutableEvents drops the server-only worldPvpKill (its consumer is the Discord kill feed)', () => {
+    const kill: SimEvent = {
+      type: 'worldPvpKill',
+      killerName: 'Kargath',
+      victimName: 'Annthar',
+      killerLevel: 60,
+      victimLevel: 58,
+      zoneId: 'drakelands',
+      assists: 0,
+      copper: 0,
+    };
+    const log = { type: 'log', text: 'You have slain Annthar.', pid: 7 } as unknown as SimEvent;
+    expect(filterRoutableEvents([kill, log])).toEqual([log]);
+  });
+
+  it('filterRoutableEvents drops the server-only hillAnnounced (clients already get the realm log line)', () => {
+    const call: SimEvent = {
+      type: 'hillAnnounced',
+      phase: 'warning',
+      zoneId: 'drakelands',
+      secondsUntilRise: 900,
+      secondsUntilFall: 3600,
+    };
+    const log = { type: 'log', text: 'A hill will rise in Drakelands in 15 minutes.' } as SimEvent;
+    expect(filterRoutableEvents([call, log])).toEqual([log]);
+  });
+
   it('serializeEventFragments stringifies each event once, index-aligned', () => {
     const events = [
       { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },
@@ -775,9 +793,6 @@ describe('routeEvents selection guards', () => {
     watcher.spectating = {
       characterId: target.characterId,
       name: 'Target',
-      savedPos: { ...entityPos(server, watcher.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     fWatcher.sent.length = 0;
     fTarget.sent.length = 0;
@@ -830,9 +845,6 @@ describe('routeEvents selection guards', () => {
     watcher.spectating = {
       characterId: target.characterId,
       name: 'Target',
-      savedPos: { ...entityPos(server, watcher.pid) },
-      priorGm: false,
-      stowedPet: null,
     };
     fWatcher.sent.length = 0;
 

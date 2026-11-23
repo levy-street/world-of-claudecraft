@@ -144,6 +144,8 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['priest_doctrine', 'power_word_shield'],
   ['priest_effigy', 'mind_blast'],
   ['priest_gloomtithe', 'summon_tithefiend'],
+  ['priest_stilled_mind_crit', 'inner_focus'],
+  ['spirit_bomb_progress', 'spirit_bomb'],
   ['priest_lingering_dread', 'psychic_scream'],
   ['priest_living_covenant', 'power_word_shield'],
   ['priest_processional_grace', 'choir_of_deliverance'],

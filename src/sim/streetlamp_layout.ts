@@ -387,3 +387,33 @@ export const LAMP_LIGHT_STRIDE = 3;
 export function lampCarriesLight(indexInZone: number): boolean {
   return indexInZone % LAMP_LIGHT_STRIDE === 0;
 }
+
+/** An authored zone rect as lampAreaAt reads it (x bounds default to the world strip). */
+export interface WorldZoneRect {
+  id: string;
+  zMin: number;
+  zMax: number;
+  xMin?: number;
+  xMax?: number;
+}
+
+/** Strict authored-area identity at a point, or null outside every zone. This
+ *  decides which fixture style a stretch of road is lit with, so it must not
+ *  fall back to a nearest zone: a lamp just outside every rect is genuinely
+ *  wilderness and takes the default. `stripMinX`/`stripMaxX` are the world
+ *  strip a rect without its own x bounds spans (data.ts STRIP_MIN_X/MAX_X).
+ *  Moved here from colliders.ts, whose monolith ceiling it was holding. */
+export function lampAreaAt(
+  x: number,
+  z: number,
+  zones: readonly WorldZoneRect[],
+  stripMinX: number,
+  stripMaxX: number,
+): string | null {
+  for (const zone of zones) {
+    const xMin = zone.xMin ?? stripMinX;
+    const xMax = zone.xMax ?? stripMaxX;
+    if (x >= xMin && x < xMax && z >= zone.zMin && z < zone.zMax) return zone.id;
+  }
+  return null;
+}

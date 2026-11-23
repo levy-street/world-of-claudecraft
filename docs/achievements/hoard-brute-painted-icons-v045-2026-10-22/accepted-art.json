@@ -1,0 +1,915 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "hoard-brute-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rare_breastplate_tectonic_might",
+      "family": "hoard-brute",
+      "tier": "Tarnished",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_breastplate_tectonic_might.webp",
+      "canonicalDisplayName": "Tarnished Breastplate of Tectonic Might",
+      "acceptedSha256": "d8260261d0ea621e454583c47e84a053fc3bd111d9c47571cdc30aeaf435c724",
+      "acceptedBytes": 4998,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/rare_breastplate_tectonic_might.png",
+        "sha256": "409ed70f2409c298db983f5c7c9820a0c8045d3fb7581877e884445d367fa064",
+        "bytes": 2844073,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/rare_breastplate_tectonic_might.png",
+        "sha256": "f08f914b4dc0a1a696bfc6fb9997b911c50c3fec61c98e1eccaa5b0378149ece",
+        "bytes": 593223,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "c92dc83e032d761c42586e21534db59c5ab823827ed1edeb34ebb39e4d6f7f65",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Breastplate of Tectonic Might (rare_breastplate_tectonic_might) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty earth-brown MAIL chest armor, broad torso with thick overlapping stone-grey metal scales and linked mail rings over dark brown padded backing, reinforced collar, massive rectangular chest clasp bearing two stacked mountain chevrons, sturdy waist belt. Flexible scale-mail construction despite the breastplate name; no single smooth plate torso, no wearer. Tier finish: Weathered lower-tier craftsmanship: pitted dull pewter fittings with slight green patina, worn brown leather or scuffed metal, plain broad edges and rough unpolished stone. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/rare_breastplate_tectonic_might.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "c92dc83e032d761c42586e21534db59c5ab823827ed1edeb34ebb39e4d6f7f65"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_band_mountains_weight",
+      "family": "hoard-brute",
+      "tier": "Tarnished",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_band_mountains_weight.webp",
+      "canonicalDisplayName": "Tarnished Band of the Mountain's Weight",
+      "acceptedSha256": "41b0de9c733fad62c0dc605b851ddf52efa463d6666ec1a6d5bcfb7c435a6841",
+      "acceptedBytes": 3256,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/rare_band_mountains_weight.png",
+        "sha256": "decfc0f2f11e70b10323436df6cb4de569cbd32b3024af86a9f8100b47d91602",
+        "bytes": 2444190,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/rare_band_mountains_weight.png",
+        "sha256": "e92a86c8f665119a9fee07ee865a573d41576667dc799af01d31d583b3606bdd",
+        "bytes": 526232,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "40c6d5b3657bcf485b2e808e1770f513a4ac543cbb00b073d8cbf6684d6758d0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Band of the Mountain's Weight (rare_band_mountains_weight) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete heavy signet ring in three-quarter view, very thick metal band with a clearly visible finger hole, large square earth-brown stone set diagonally like a diamond, natural sediment layers in the stone and a pair of simple raised mountain chevrons on the lower band. Broad chunky weight-bearing form, no magical glow. Tier finish: Weathered lower-tier craftsmanship: pitted dull pewter fittings with slight green patina, worn brown leather or scuffed metal, plain broad edges and rough unpolished stone. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/rare_band_mountains_weight.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "40c6d5b3657bcf485b2e808e1770f513a4ac543cbb00b073d8cbf6684d6758d0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_monolithic_shoulderguards",
+      "family": "hoard-brute",
+      "tier": "Tarnished",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_monolithic_shoulderguards.webp",
+      "canonicalDisplayName": "Tarnished Monolithic Shoulderguards",
+      "acceptedSha256": "2101dfa23fbe05b48e5b363e2f7008c997e0fb2287746db7093d428152421125",
+      "acceptedBytes": 3766,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/rare_monolithic_shoulderguards.png",
+        "sha256": "1c1b7c87f7af645ad9a7408a08b9b214666fa22beb1592bac414df6352e03c83",
+        "bytes": 2421175,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/rare_monolithic_shoulderguards.png",
+        "sha256": "396a95acf923544ae864686d069bd997966ff66683a7df4872aaf2f45bc52eb8",
+        "bytes": 517287,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "50bc350b0fbef12d0257219c9d6110e1563aae727c117ee0c4b7f00feae49a71",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Monolithic Shoulderguards (rare_monolithic_shoulderguards) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of earth-brown LEATHER shoulder guards, broad slab-shaped panels of thick cured hide with layered leather edges, visible stitching and heavy straps, a few stone-grey studs and a simple pair of stacked mountain chevrons embossed on the foremost panel. One shoulderguard forward and matching partner behind. Clearly leather, not solid stone boulders or metal plate pauldrons. Tier finish: Weathered lower-tier craftsmanship: pitted dull pewter fittings with slight green patina, worn brown leather or scuffed metal, plain broad edges and rough unpolished stone. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/rare_monolithic_shoulderguards.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "50bc350b0fbef12d0257219c9d6110e1563aae727c117ee0c4b7f00feae49a71"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_earthshaker_warboots",
+      "family": "hoard-brute",
+      "tier": "Tarnished",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_earthshaker_warboots.webp",
+      "canonicalDisplayName": "Tarnished Earthshaker Warboots",
+      "acceptedSha256": "4537daeef26f1ce358f4d497e0f8957c6e13d1d35981d11a08cc0a8317f01b06",
+      "acceptedBytes": 3744,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/rare_earthshaker_warboots.png",
+        "sha256": "7a55a47b29f6acf10f6b3b84f8625d2f8355aa2dd61673c27cbef90d7369de41",
+        "bytes": 2448832,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/rare_earthshaker_warboots.png",
+        "sha256": "17104a33112d453b1b120edb91e0c8b63377c3fd46a0da9fa91f440e3bfcc018",
+        "bytes": 545962,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "9d26e7fab1d14b3c76d482de9fbccda559a040a44173093ad1e10160f570274b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Earthshaker Warboots (rare_earthshaker_warboots) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of heavy earth-brown MAIL warboots, overlapping stone-grey metal scales and linked mail on dark brown backing, reinforced rounded toes, thick low soles and broad ankle straps, a pair of stacked mountain chevrons on each shin. One boot in front and its matching partner behind. Mail armor with rugged weight, no wearer. Tier finish: Weathered lower-tier craftsmanship: pitted dull pewter fittings with slight green patina, worn brown leather or scuffed metal, plain broad edges and rough unpolished stone. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/rare_earthshaker_warboots.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "9d26e7fab1d14b3c76d482de9fbccda559a040a44173093ad1e10160f570274b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "breastplate_tectonic_might",
+      "family": "hoard-brute",
+      "tier": "Epic",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/breastplate_tectonic_might.webp",
+      "canonicalDisplayName": "Breastplate of Tectonic Might",
+      "acceptedSha256": "f99180d9394dfd4abc14b3c087ab6b7d58999918a6a505807578dbd38fd257cc",
+      "acceptedBytes": 5294,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/breastplate_tectonic_might.png",
+        "sha256": "a212dd7f19368b14c9a28be998ece2eaf5904c08f4082926e94f0d7ae0b77bd0",
+        "bytes": 2752032,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/breastplate_tectonic_might.png",
+        "sha256": "44221538309264c6878d263c6c8b4560d6e7727ddd557a7fd0910c59ffa4ac2a",
+        "bytes": 592662,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "092a2c6a979e0a6dacb1de85ea29ba768220d55c1675d7a59ff711ef973470a6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Breastplate of Tectonic Might (breastplate_tectonic_might) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty earth-brown MAIL chest armor, broad torso with thick overlapping stone-grey metal scales and linked mail rings over dark brown padded backing, reinforced collar, massive rectangular chest clasp bearing two stacked mountain chevrons, sturdy waist belt. Flexible scale-mail construction despite the breastplate name; no single smooth plate torso, no wearer. Tier finish: Well-kept masterwork: bright silver fittings, rich dark earth-brown and stone-grey materials, crisp broad chevrons, polished edges on the heavy stone focal detail. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/breastplate_tectonic_might.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "092a2c6a979e0a6dacb1de85ea29ba768220d55c1675d7a59ff711ef973470a6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "band_mountains_weight",
+      "family": "hoard-brute",
+      "tier": "Epic",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/band_mountains_weight.webp",
+      "canonicalDisplayName": "Band of the Mountain's Weight",
+      "acceptedSha256": "c78a3a18424bab634856bfd279cd290d3f63b0f9498f7461e19bc86a15e424f9",
+      "acceptedBytes": 3642,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/band_mountains_weight.png",
+        "sha256": "bd179c8f72a32602f7803f8d0f1c2b62e47c2839abe56d8e8477ffd5d25087b5",
+        "bytes": 2396485,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/band_mountains_weight.png",
+        "sha256": "99c047019384edfb493557d356e3b939cbc2fb5c508fff06c742e3742d659ac0",
+        "bytes": 534673,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "0afb05852d27cdfc27b18cb587adf7dc585e78f04cecbed203b19ea8c01a2174",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Band of the Mountain's Weight (band_mountains_weight) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete heavy signet ring in three-quarter view, very thick metal band with a clearly visible finger hole, large square earth-brown stone set diagonally like a diamond, natural sediment layers in the stone and a pair of simple raised mountain chevrons on the lower band. Broad chunky weight-bearing form, no magical glow. Tier finish: Well-kept masterwork: bright silver fittings, rich dark earth-brown and stone-grey materials, crisp broad chevrons, polished edges on the heavy stone focal detail. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/band_mountains_weight.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "0afb05852d27cdfc27b18cb587adf7dc585e78f04cecbed203b19ea8c01a2174"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "monolithic_shoulderguards",
+      "family": "hoard-brute",
+      "tier": "Epic",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/monolithic_shoulderguards.webp",
+      "canonicalDisplayName": "Monolithic Shoulderguards",
+      "acceptedSha256": "f706a372da1485c85e5312450a5bbad1aa8eb190db41a787129236bbec46b18f",
+      "acceptedBytes": 4092,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/monolithic_shoulderguards.png",
+        "sha256": "eed4614da895c03fe8b6fdf6c19d52acff788ae5bb213e3dd330d22afd8c2425",
+        "bytes": 2415643,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/monolithic_shoulderguards.png",
+        "sha256": "df84a8c67b5c54da1281faa2b3785ed036f6807de77c689f4e27dfb2f0085b16",
+        "bytes": 536370,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "72eaf7380440fc7b9fa4059662a7ed39b39cc13926f96c45853e285b9e21f7c0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Monolithic Shoulderguards (monolithic_shoulderguards) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of earth-brown LEATHER shoulder guards, broad slab-shaped panels of thick cured hide with layered leather edges, visible stitching and heavy straps, a few stone-grey studs and a simple pair of stacked mountain chevrons embossed on the foremost panel. One shoulderguard forward and matching partner behind. Clearly leather, not solid stone boulders or metal plate pauldrons. Tier finish: Well-kept masterwork: bright silver fittings, rich dark earth-brown and stone-grey materials, crisp broad chevrons, polished edges on the heavy stone focal detail. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/monolithic_shoulderguards.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "72eaf7380440fc7b9fa4059662a7ed39b39cc13926f96c45853e285b9e21f7c0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "earthshaker_warboots",
+      "family": "hoard-brute",
+      "tier": "Epic",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/earthshaker_warboots.webp",
+      "canonicalDisplayName": "Earthshaker Warboots",
+      "acceptedSha256": "2d175baed9ed9736f2f19669eff07cfa0ed18292e90e977860772ccf04d1cbea",
+      "acceptedBytes": 4432,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/earthshaker_warboots.png",
+        "sha256": "3755c398d991b8108359ee42c15f9e3b8d44c0011eb11b8d75d51db7bb6d240b",
+        "bytes": 2529930,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/earthshaker_warboots.png",
+        "sha256": "66a877ed1123ca2a117ee148db2e16dd6289752369f933c1027be5bffc1c92ca",
+        "bytes": 568724,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "9b313709d87875e5df37a9c9eaf1d833210f85efb0119d15bd6dc499cb70c984",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Earthshaker Warboots (earthshaker_warboots) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of heavy earth-brown MAIL warboots, overlapping stone-grey metal scales and linked mail on dark brown backing, reinforced rounded toes, thick low soles and broad ankle straps, a pair of stacked mountain chevrons on each shin. One boot in front and its matching partner behind. Mail armor with rugged weight, no wearer. Tier finish: Well-kept masterwork: bright silver fittings, rich dark earth-brown and stone-grey materials, crisp broad chevrons, polished edges on the heavy stone focal detail. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/earthshaker_warboots.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "9b313709d87875e5df37a9c9eaf1d833210f85efb0119d15bd6dc499cb70c984"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_breastplate_tectonic_might",
+      "family": "hoard-brute",
+      "tier": "Sovereign",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_breastplate_tectonic_might.webp",
+      "canonicalDisplayName": "Sovereign Breastplate of Tectonic Might",
+      "acceptedSha256": "7c837cd7d207271bc962311acce556c10b2191d82408201723e8173afccd2f2b",
+      "acceptedBytes": 5044,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/legendary_breastplate_tectonic_might.png",
+        "sha256": "d44b43551e424aa542a5e4130031274abffd43bfae55eff1bfb3d4bb48a90e9f",
+        "bytes": 2494954,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/legendary_breastplate_tectonic_might.png",
+        "sha256": "32b702814c2b759e5e1637b183e62bc76b040bea5de9c5d9cc751b827cdb1b38",
+        "bytes": 568775,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "662f4a25615bde829d4c5e55cffbbe636ca95a08b47c3ea85c05bca94f9954fb",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Breastplate of Tectonic Might (legendary_breastplate_tectonic_might) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty earth-brown MAIL chest armor, broad torso with thick overlapping stone-grey metal scales and linked mail rings over dark brown padded backing, reinforced collar, massive rectangular chest clasp bearing two stacked mountain chevrons, sturdy waist belt. Flexible scale-mail construction despite the breastplate name; no single smooth plate torso, no wearer. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep earth-brown and charcoal materials, additional angular gold mountain-chevron ornament and a warm amber-brown polished stone focal accent. Gold ornament belongs to the object, never a surrounding frame. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/legendary_breastplate_tectonic_might.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "662f4a25615bde829d4c5e55cffbbe636ca95a08b47c3ea85c05bca94f9954fb"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_band_mountains_weight",
+      "family": "hoard-brute",
+      "tier": "Sovereign",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_band_mountains_weight.webp",
+      "canonicalDisplayName": "Sovereign Band of the Mountain's Weight",
+      "acceptedSha256": "4acfe9538800affb4fcbf858851f4c2edcd138c7dff01a91ef94c75e2cbd5e12",
+      "acceptedBytes": 3736,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/legendary_band_mountains_weight.png",
+        "sha256": "d62a857c304cc27b2810e42aac543c547bdcf7dbde7b5c9f0e87a31ed1096aac",
+        "bytes": 2358300,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/legendary_band_mountains_weight.png",
+        "sha256": "17a158eeb58d7b93617715d4e69ffcca3638a9c991bbd634674bbbcd162fab5c",
+        "bytes": 546698,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "f113639096cca0ea0e33185b66e22dc770916ea2fefbc6fc7ebe934ba563b11a",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Band of the Mountain's Weight (legendary_band_mountains_weight) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete heavy signet ring in three-quarter view, very thick metal band with a clearly visible finger hole, large square earth-brown stone set diagonally like a diamond, natural sediment layers in the stone and a pair of simple raised mountain chevrons on the lower band. Broad chunky weight-bearing form, no magical glow. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep earth-brown and charcoal materials, additional angular gold mountain-chevron ornament and a warm amber-brown polished stone focal accent. Gold ornament belongs to the object, never a surrounding frame. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/legendary_band_mountains_weight.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "f113639096cca0ea0e33185b66e22dc770916ea2fefbc6fc7ebe934ba563b11a"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_monolithic_shoulderguards",
+      "family": "hoard-brute",
+      "tier": "Sovereign",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_monolithic_shoulderguards.webp",
+      "canonicalDisplayName": "Sovereign Monolithic Shoulderguards",
+      "acceptedSha256": "2dacfeba4888b20f94f679dd3b27fffe03dd9c38e90cf779d0054a9ab0383a68",
+      "acceptedBytes": 4378,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/legendary_monolithic_shoulderguards.png",
+        "sha256": "f11a253389e7b22739bbfb62d7efde7a236e6008cdbbf20c7b2b45290a241a60",
+        "bytes": 2319873,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/legendary_monolithic_shoulderguards.png",
+        "sha256": "a97c28da4fd4c0d2eb5d6db7c67dfda0c6a23e2dc6c1cab8891a443173438092",
+        "bytes": 537980,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "d6739282e7c91172ff48cbe5dd78dfe38a66f81074ec617f197978287d699422",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Monolithic Shoulderguards (legendary_monolithic_shoulderguards) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of earth-brown LEATHER shoulder guards, broad slab-shaped panels of thick cured hide with layered leather edges, visible stitching and heavy straps, a few stone-grey studs and a simple pair of stacked mountain chevrons embossed on the foremost panel. One shoulderguard forward and matching partner behind. Clearly leather, not solid stone boulders or metal plate pauldrons. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep earth-brown and charcoal materials, additional angular gold mountain-chevron ornament and a warm amber-brown polished stone focal accent. Gold ornament belongs to the object, never a surrounding frame. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/legendary_monolithic_shoulderguards.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "d6739282e7c91172ff48cbe5dd78dfe38a66f81074ec617f197978287d699422"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_earthshaker_warboots",
+      "family": "hoard-brute",
+      "tier": "Sovereign",
+      "batch": "hoard-brute-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_earthshaker_warboots.webp",
+      "canonicalDisplayName": "Sovereign Earthshaker Warboots",
+      "acceptedSha256": "ae8b1eb8b7d0195201431ddef40649ed3b4aba1e76578d53eeccef308d23c02c",
+      "acceptedBytes": 4534,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-brute/originals/legendary_earthshaker_warboots.png",
+        "sha256": "cf0e7865d906ab48ea38c790deec70cdfb228c23897e5066b0e860162898df55",
+        "bytes": 2444073,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-brute/masters/legendary_earthshaker_warboots.png",
+        "sha256": "29afd5424579c87b93e5c199e5e8a7dd7e6b6a28531255abe4cb099f06da51da",
+        "bytes": 562010,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "a02187caca40d7a43aa913ef538902b51cf82c23889835279e36639d91c743fc",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Earthshaker Warboots (legendary_earthshaker_warboots) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of heavy earth-brown MAIL warboots, overlapping stone-grey metal scales and linked mail on dark brown backing, reinforced rounded toes, thick low soles and broad ankle straps, a pair of stacked mountain chevrons on each shin. One boot in front and its matching partner behind. Mail armor with rugged weight, no wearer. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, deep earth-brown and charcoal materials, additional angular gold mountain-chevron ornament and a warm amber-brown polished stone focal accent. Gold ornament belongs to the object, never a surrounding frame. Warlord Grask family: earth brown, stone beige and charcoal, double mountain-chevron motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-brute/superseded/legendary_earthshaker_warboots.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "a02187caca40d7a43aa913ef538902b51cf82c23889835279e36639d91c743fc"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-brute-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-brute-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

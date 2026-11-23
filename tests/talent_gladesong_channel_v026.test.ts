@@ -6,6 +6,7 @@ import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & {
   nextId: number;
@@ -93,5 +94,34 @@ describe('Gladesong channel healing', () => {
     expect(healedTargets).not.toContain(blocked.id);
     expect(healedTargets).not.toContain(far.id);
     expect(healedTargets).not.toContain(hostile.id);
+  });
+
+  it('bills 240 mana and arms a 60 sec cooldown (Groveheart rework)', () => {
+    const sim = new Sim({
+      seed: 260_1757,
+      playerClass: 'druid',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_frenzied_regeneration' } })).toBe(
+      true,
+    );
+    const caster = sim.player;
+    const resolved = sim.resolvedAbility('tranquility');
+    expect(resolved?.cost).toBe(240);
+    expect(resolved?.cooldown).toBe(60);
+
+    caster.resource = caster.maxResource;
+    const before = caster.resource;
+    sim.castAbility('tranquility');
+    expect(caster.resource).toBe(before - 240);
+    expect(caster.cooldowns.get('tranquility')).toBe(60);
+
+    // Still on cooldown just short of a minute, ready again after it.
+    for (let tick = 0; tick < 20 * 59; tick++) sim.tick();
+    expect(caster.cooldowns.has('tranquility')).toBe(true);
+    for (let tick = 0; tick < 20 * 2; tick++) sim.tick();
+    expect(caster.cooldowns.has('tranquility')).toBe(false);
   });
 });

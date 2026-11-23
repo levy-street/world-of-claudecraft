@@ -53,6 +53,44 @@ interface Candidate {
   order: number;
 }
 
+/** Where the visible-zone lane last rechecked its queue (NaN until the first). */
+export interface ZoneStreamRecheck {
+  x: number;
+  z: number;
+  far: number;
+}
+
+export function createZoneStreamRecheck(): ZoneStreamRecheck {
+  return { x: Number.NaN, z: Number.NaN, far: Number.NaN };
+}
+
+/**
+ * The visible-zone lane's frame-loop cadence: a recheck is due once the camera
+ * has travelled ZONE_STREAM_RECHECK_DISTANCE from the last claimed position or
+ * the horizon moved by a yard (always on the first call, and after a caller
+ * resets `x` to NaN to force one). A due recheck is claimed: its position is
+ * recorded and true is returned.
+ */
+export function claimZoneStreamRecheck(
+  check: ZoneStreamRecheck,
+  cameraX: number,
+  cameraZ: number,
+  horizon: number,
+): boolean {
+  const moved = Math.hypot(cameraX - check.x, cameraZ - check.z);
+  if (
+    Number.isFinite(check.x) &&
+    moved < ZONE_STREAM_RECHECK_DISTANCE &&
+    Math.abs(horizon - check.far) < 1
+  ) {
+    return false;
+  }
+  check.x = cameraX;
+  check.z = cameraZ;
+  check.far = horizon;
+  return true;
+}
+
 /** Squared XZ distance from a point to a zone's exact rectangle. */
 export function distanceSqToZone(zone: ZoneDef, x: number, z: number): number {
   const minX = zone.xMin ?? STRIP_MIN_X;

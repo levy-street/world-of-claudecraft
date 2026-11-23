@@ -16,7 +16,12 @@
 // DOM-free (registered in tests/architecture.test.ts UI_PURE_CORES): the
 // painters hand in the page origin, this module never reads the host.
 
-import { CANONICAL_TERMS_URL, NATIVE_APP } from '../client_origin';
+import {
+  CANONICAL_PRIVACY_URL,
+  CANONICAL_TERMS_URL,
+  CANONICAL_WHITEPAPER_URL,
+  NATIVE_APP,
+} from '../client_origin';
 
 export interface TermsUrlEnv {
   /** True in the Capacitor native app (its WebView origin is not the site). */
@@ -40,4 +45,33 @@ export function resolveTermsUrl(env: TermsUrlEnv): string {
  *  page origin the painter reads (location.origin, or '' when unavailable). */
 export function termsUrlFor(origin: string): string {
   return resolveTermsUrl({ nativeApp: NATIVE_APP, origin });
+}
+
+/** The same-origin path the site serves for privacy (server/main.ts STATIC_PAGE_ALIASES
+ *  and vite.config.ts alias '/privacy' to privacy.html). */
+export const PRIVACY_PATH = '/privacy';
+
+/** Same-origin '/privacy' whenever the client is served by the site itself;
+ *  the canonical URL otherwise. */
+export function resolvePrivacyUrl(env: TermsUrlEnv): string {
+  if (!env.nativeApp && /^https?:\/\//.test(env.origin)) return PRIVACY_PATH;
+  return CANONICAL_PRIVACY_URL;
+}
+
+export function privacyUrlFor(origin: string): string {
+  return resolvePrivacyUrl({ nativeApp: NATIVE_APP, origin });
+}
+
+/** The same-origin path to the whitepaper pdf asset on the public site. */
+export const WHITEPAPER_PATH = '/World-of-ClaudeCraft-Whitepaper-v1.0.pdf';
+
+/** Same-origin whitepaper pdf path whenever served by the site;
+ *  the canonical URL otherwise. */
+export function resolveWhitepaperUrl(env: TermsUrlEnv): string {
+  if (!env.nativeApp && /^https?:\/\//.test(env.origin)) return WHITEPAPER_PATH;
+  return CANONICAL_WHITEPAPER_URL;
+}
+
+export function whitepaperUrlFor(origin: string): string {
+  return resolveWhitepaperUrl({ nativeApp: NATIVE_APP, origin });
 }

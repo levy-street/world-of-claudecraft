@@ -81,6 +81,7 @@ const EXPECTED_CMDS = [
   'selectTalentRow',
   'sell',
   'setSpec',
+  'skull_bag',
   'swap_perfecting_ranks',
   'switchLoadout',
   'turnin',

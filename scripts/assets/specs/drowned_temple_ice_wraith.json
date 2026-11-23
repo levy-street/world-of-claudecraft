@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/ice_wraith.glb",
+      "out": "models/creatures/temple_ice_wraith.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Attack", "HitReact", "Death"]
+    }
+  ]
+}

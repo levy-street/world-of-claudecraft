@@ -2,7 +2,7 @@
 // one the character holds (or has finished), the reward line, the reset
 // countdown, and the confirm-dialog model. DOM-free; the painter
 // (weekly_quests_window.ts) renders exactly what this shapes.
-import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../sim/content/dungeon_difficulty';
 import {
   WEEKLY_EMISSARY_NPC_DEF,
   WEEKLY_QUEST_REWARD,
@@ -121,7 +121,9 @@ export function buildWeeklyCommendation(world: WeeklyWorld): WeeklyCommendationV
   );
   return {
     heading: t('hudChrome.weekly.commendHeading'),
-    note: t('hudChrome.weekly.commendNote', {
+    // A pick carried past the reset says so in this same line, so the strip
+    // keeps its height (the cards above it have no room to give).
+    note: t(held.carried ? 'hudChrome.weekly.commendCarriedNote' : 'hudChrome.weekly.commendNote', {
       amount: whole(WEEKLY_QUEST_REWARD.commendationStanding),
     }),
     options,
@@ -142,7 +144,12 @@ function cardState(quest: WeeklyQuestDef, held: WeeklyQuestProgress | null): Wee
   return held.state === 'completed' ? 'completed' : 'active';
 }
 
-function buttonLabel(state: WeeklyQuestCardState, count: number, required: number): string {
+function buttonLabel(
+  state: WeeklyQuestCardState,
+  count: number,
+  required: number,
+  carried: boolean,
+): string {
   const tally = {
     count: formatNumber(count, { maximumFractionDigits: 0 }),
     required: formatNumber(required, { maximumFractionDigits: 0 }),
@@ -151,9 +158,10 @@ function buttonLabel(state: WeeklyQuestCardState, count: number, required: numbe
     case 'active':
       return t('hudChrome.weekly.inProgress', tally);
     case 'completed':
-      return t('hudChrome.weekly.completed');
+      return t(carried ? 'hudChrome.weekly.completedLastWeek' : 'hudChrome.weekly.completed');
     case 'locked':
-      return t('hudChrome.weekly.lockedThisWeek');
+      // A carried pick holds the cards only until its commendation is claimed.
+      return t(carried ? 'hudChrome.weekly.claimFirst' : 'hudChrome.weekly.lockedThisWeek');
     default:
       return t('hudChrome.weekly.choose');
   }
@@ -182,7 +190,7 @@ export function buildWeeklyQuestsView(world: WeeklyWorld, nowMs: number): Weekly
       art: `${WEEKLY_ART_DIR}/${quest.kind}.webp`,
       medal: `${WEEKLY_ART_DIR}/medal_${quest.kind}.webp`,
       state,
-      buttonLabel: buttonLabel(state, count, quest.count),
+      buttonLabel: buttonLabel(state, count, quest.count, held?.carried === true),
       count,
       required: quest.count,
     };
@@ -206,7 +214,7 @@ export function buildWeeklyQuestDialog(
   level: number,
   resetText: string,
 ): WeeklyQuestDialogView {
-  const mark = ITEMS[HEROIC_MARK_ITEM_ID];
+  const mark = ITEMS[HEROIC_MARK_CURRENCY_ID];
   const cache = ITEMS[WEEKLY_QUEST_REWARD.cacheItemId];
   const marks = formatNumber(EMISSARY_CACHE_MARKS, { maximumFractionDigits: 0 });
   return {
@@ -226,7 +234,7 @@ export function buildWeeklyQuestDialog(
     rewardItemIcon: `ui/items/${WEEKLY_QUEST_REWARD.cacheItemId}.webp`,
     rewardItemDesc: t('hudChrome.weekly.cacheDesc', {
       count: marks,
-      item: mark ? itemDisplayName(mark) : HEROIC_MARK_ITEM_ID,
+      item: mark ? itemDisplayName(mark) : HEROIC_MARK_CURRENCY_ID,
     }),
     note: t('hudChrome.weekly.dialogNote', { reset: resetText }),
     art: `${WEEKLY_ART_DIR}/${quest.kind}.webp`,

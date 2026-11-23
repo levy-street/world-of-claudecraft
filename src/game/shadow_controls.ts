@@ -2,7 +2,7 @@ import { shadowPickpocketTarget } from '../sim/world_quest_shadow_target';
 
 export { shadowPickpocketTarget } from '../sim/world_quest_shadow_target';
 
-import { SHADOW_QUEST_ID } from '../sim/content/world_quest_shadow';
+import { SHADOW_QUEST_ID, SHADOW_STEAL_SUSPICION_LIMIT } from '../sim/content/world_quest_shadow';
 import type { IWorld } from '../world_api';
 
 export type ShadowControlWorld = Pick<
@@ -20,7 +20,13 @@ export function shadowChooseSlot(world: ShadowControlWorld, slot: number): void 
     return;
   }
   const shadow = world.worldQuestLog.get(SHADOW_QUEST_ID)?.shadow;
-  if (slot !== 0 || !shadow || shadow.cooldown > 0 || shadow.suspicion > 0 || shadow.stealing)
+  if (
+    slot !== 0 ||
+    !shadow ||
+    shadow.cooldown > 0 ||
+    shadow.suspicion >= SHADOW_STEAL_SUSPICION_LIMIT ||
+    shadow.stealing
+  )
     return;
   const targetId = shadowPickpocketTarget(world);
   if (targetId !== undefined) world.shadowWorldQuestAction('pickpocket', targetId);

@@ -367,7 +367,7 @@ export class SignatureCrests {
       kind === 'leap_rupture' ||
       kind.startsWith('iron_') ||
       kind.endsWith('_pressure');
-    if (authoredSurface && !this.preparation.ready(kind)) return false;
+    if (!this.preparation.ready(kind)) return false;
     let s = this.slots.find((s) => !s.active);
     // A decorative voice wake can yield to the target's physical blade contact.
     // Never displace another material family or another contact backing.
@@ -488,7 +488,9 @@ export class SignatureCrests {
     return true;
   }
   /** One caster-owned storm borrows the existing eight-slot sculpture pool.
-   * Live frame stamps, not a guessed duration, own release and interruption. */
+   * Live frame stamps, not a guessed duration, own release and interruption.
+   * Readiness is asked on every held frame, not only when a slot is taken:
+   * a refused frame lets the update sweep hide the slot. */
   holdStorm(
     entityId: number,
     x: number,
@@ -499,6 +501,8 @@ export class SignatureCrests {
   ): boolean {
     if (
       this.disposed ||
+      !this.spawnGate.allows(CAST_VFX_KIT) ||
+      !this.preparation.ready('steel_storm') ||
       !Number.isFinite(x) ||
       !Number.isFinite(y) ||
       !Number.isFinite(z) ||

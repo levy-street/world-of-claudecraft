@@ -82,7 +82,9 @@ describe('the launch wharf', () => {
       6,
     );
     // The walk-lift sum no longer knows a tower: it adds nothing at the launch.
-    expect(overworldWalkSurface(GLIDER_NPC_DEF.pos.x, GLIDER_NPC_DEF.pos.z, 10)).toBe(10);
+    expect(overworldWalkSurface(GLIDER_NPC_DEF.pos.x, GLIDER_NPC_DEF.pos.z, 10, WORLD_SEED)).toBe(
+      10,
+    );
   });
 
   it('spawns Flightmaster Zephyr at the wharf deck height', () => {

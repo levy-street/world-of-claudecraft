@@ -40,6 +40,7 @@ import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   hoardIntensity,
   hoardMechanicDamage,
+  hoardPlayerBudget,
 } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
@@ -134,7 +135,7 @@ function collapse(
   living: readonly Entity[],
   emit: CaveEmit,
 ): void {
-  const count = moleRockCount(living.length);
+  const count = moleRockCount(hoardPlayerBudget(inst.vault, living.length));
   const start = living.length > 0 ? held.casts % living.length : 0;
   const under = living
     .map((_, i) => living[(start + i) % living.length].pos)

@@ -414,7 +414,7 @@ export class MarketWindow {
       info?.collectionItems,
       // The ledger is its own axis, not a shadow of the copper: a sale whose
       // proceeds floor to 0 moves neither the purse nor the goods, and without
-      // this the open Collect tab would never repaint to show its row.
+      // this the open History tab would never repaint to show its row.
       info?.collectionSales,
       info?.collectionSalesOmitted,
       // The Wanted tab's own axes: the board, the viewer's cap use, and the

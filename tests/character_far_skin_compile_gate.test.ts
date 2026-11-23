@@ -12,6 +12,7 @@
 // GLTF/texture loader (the harness of tests/character_far_mesh_skin.test.ts).
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { failWocHeads, landWocBodies } from './helpers/woc_streamed';
 
 const VISUAL_KEY = 'player_paladin';
 
@@ -41,7 +42,9 @@ function stubSourceClip(name: string): THREE.AnimationClip {
 function stubGltf() {
   const scene = new THREE.Group();
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
-  mesh.name = 'body';
+  // (named as the paladin's body node; on the fixed rig this test builds, every
+  // mesh of the body takes the skin atlas)
+  mesh.name = 'Character_Body';
   scene.add(mesh);
   return {
     scene,
@@ -74,12 +77,26 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
       ),
       releaseGltf: vi.fn(),
     }));
+    // A FIXED rig is what this rule is about: a body whose far mesh is its key's own bake,
+    // built with the body (a mob, an NPC, the Combat Mech). The paladin def is lent to it
+    // without its WOC manifest: a WOC body bakes its far mesh per look, on its far crossing
+    // (tests/woc_far_equipment.test.ts), and builds none at construction.
+    const manifest = await import('../src/render/characters/manifest');
+    manifest.VISUALS[VISUAL_KEY] = { ...manifest.VISUALS[VISUAL_KEY], wocCharacter: undefined };
     const assets = await import('../src/render/characters/assets');
     const { charactersReady } = assets;
     await charactersReady();
+    await landWocBodies(assets, [VISUAL_KEY]);
+    // the stub ships no head library: the body's wait for its head has already ended
+    failWocHeads(await import('../src/render/characters/woc_head_packs'));
     const released = vi.spyOn(assets, 'releaseTintedMaterials');
     const { CharacterVisual } = await import('../src/render/characters/visual');
     const { SKINS } = await import('../src/render/characters/manifest');
+    // The WOC bodies ship no chromas (every class SKINS row is null since the
+    // 2026-09-18 sets), and this rule is about the far mesh following an
+    // alternate atlas, so lend the row the KayKit paladin's old alt atlas: the
+    // mocked loader tags textures by url and never reads the file.
+    SKINS[VISUAL_KEY] = [null, 'textures/skins/paladin/alt_a.png'];
     const altSkinUrl = SKINS[VISUAL_KEY]?.[1];
     expect(altSkinUrl).toBeTruthy();
 

@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "batchId": "quest-shield-icons-2026-10-23",
+  "generatedAt": "2026-10-23",
+  "source": "OpenAI built-in image generation",
+  "owner": "World of ClaudeCraft",
+  "license": "Project asset, with the project only",
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "prompt": [
+    {
+      "id": "lychgate_buckler",
+      "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory item icon. Paint in World of ClaudeCraft woc-item-icon-v1 style. Single shield shown complete from the front with slight three-quarter depth, centered occupying 72 percent of square, generous safe padding all around. Premium hand-painted classic dark fantasy MMO artwork, tactile metal and wood, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep bottom-right shadows. Fully opaque deep charcoal painted vignette with restrained zone tint and subtle contact shadow. Readable silhouette at 22px and circular crop. No text, letters, numbers, pseudo-writing, logo, watermark, border, UI, rarity frame, hands, person, environment scene, collage, or transparent background. Output one square image at least 1024x1024. The previously viewed Eastbrook Buckler, Kingsbane Last Oath and Linen Pouch are house-style references only, not subject identities. Primary request: Lychgate Buckler, a modest uncommon early adventurer shield rewarded by a chapel priest for laying restless dead to rest in Eastbrook Vale. Round stout dark weathered oak buckler with aged silver iron rim, eight broad rivets, dull iron central boss, two broad iron reinforcing bands, restrained aged ivory paint worn from the oak. Simple sturdy chapel-yard equipment, no skulls or magic, no emblems. Warm umber charcoal ground. Distinct round silhouette."
+    },
+    {
+      "id": "bastion_kite_shield",
+      "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory item icon. Paint in World of ClaudeCraft woc-item-icon-v1 style. Single shield shown complete from the front with slight three-quarter depth, centered occupying 72 percent of square, generous safe padding all around. Premium hand-painted classic dark fantasy MMO artwork, tactile metal and wood, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep bottom-right shadows. Fully opaque deep charcoal painted vignette with restrained zone tint and subtle contact shadow. Readable silhouette at 22px and circular crop. No text, letters, numbers, pseudo-writing, logo, watermark, border, UI, rarity frame, hands, person, environment scene, collage, or transparent background. Output one square image at least 1024x1024. The previously viewed Eastbrook Buckler, Kingsbane Last Oath and Linen Pouch are house-style references only, not subject identities. Primary request: Bastion Kite Shield, uncommon knightly shield from a century-drowned hold in Mirefen Marsh. Elongated kite shield, rounded broad shoulders tapering to a single bottom point, aged steel rim and central vertical ridge, weathered deep desaturated teal painted wood face, subdued bronze fittings, a little green patina in joints and scuffed steel highlights. Restrained marsh teal charcoal ground. Practical recovered knightly equipment, no runes or emblem or glow. Clear kite silhouette."
+    },
+    {
+      "id": "barrowfield_tower_shield",
+      "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory item icon. Paint in World of ClaudeCraft woc-item-icon-v1 style. Single shield shown complete from the front with slight three-quarter depth, centered occupying 72 percent of square, generous safe padding all around. Premium hand-painted classic dark fantasy MMO artwork, tactile metal and wood, crisp focal edges and softer peripheral brushwork. Warm top-left key light, cool deep bottom-right shadows. Fully opaque deep charcoal painted vignette with restrained zone tint and subtle contact shadow. Readable silhouette at 22px and circular crop. No text, letters, numbers, pseudo-writing, logo, watermark, border, UI, rarity frame, hands, person, environment scene, collage, or transparent background. Output one square image at least 1024x1024. The previously viewed Eastbrook Buckler, Kingsbane Last Oath and Linen Pouch are house-style references only, not subject identities. Primary request: Barrowfield Tower Shield, a rare sturdy shield rewarded by a mountain garrison captain for returning ancient revenant soldiers to rest. Tall broad rectangular tower shield with softly clipped upper corners and nearly flat lower edge, thick forged dark steel face over ancient dark oak, bold central raised steel rib, substantial brass-bronze reinforcement along rim and horizontal bands, iron rivets, old battle scars and a few deep sword nicks. Excellent imposing craftsmanship with worn history, restrained cold slate-blue face reflections and warm bronze edges, blue-charcoal painted ground. No skulls, emblems, runes or magic. Distinct substantial rectangular tower silhouette."
+    }
+  ],
+  "framingEditPrompt": "Edit only composition and framing. Preserve this exact shield design, materials, colors, light and painterly style, but zoom out so the complete shield is centered and its height spans exactly 72 percent of the square image, leaving 14 percent empty painted background above its top and 14 percent below its bottom. Generous background margin on every side. Continue the same subtle dark painted background seamlessly, no frame or border. Do not redesign or add objects or writing. Opaque square output.",
+  "references": [
+    {
+      "path": "public/ui/items/eastbrook_buckler.webp",
+      "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156",
+      "role": "Inspected house-style reference; generation was text-only, without attached image inputs."
+    },
+    {
+      "path": "public/ui/items/kingsbane_last_oath.webp",
+      "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30",
+      "role": "Inspected house-style reference; generation was text-only, without attached image inputs."
+    },
+    {
+      "path": "public/ui/items/linen_pouch.webp",
+      "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937",
+      "role": "Inspected house-style reference; generation was text-only, without attached image inputs."
+    }
+  ],
+  "processing": [
+    "Retain initial and reframed generated PNGs byte for byte in ignored tmp/imagegen/quest-shields/<id>/ staging.",
+    "Normalize accepted square source to a 512x512 sRGB PNG with Sharp Lanczos3.",
+    "Run npm run assets:items: canonical 128x128 WebP, quality 82, smartSubsample, effort 6."
+  ],
+  "review": {
+    "reviewer": "Codex",
+    "sizesInspected": [512, 128, 40, 28, 22],
+    "additionalModes": ["28-grayscale", "64-circle"],
+    "sheetPath": "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/size-review.png",
+    "verdict": "Accepted: distinct round, kite and tower silhouettes, complete centered subjects, tactile materials, warm top-left light, opaque painted grounds, no writing or baked frame. One framing edit per painting added safe padding.",
+    "inGameReview": "Passed: all three quest reward icons on desktop and Lychgate Buckler on mobile, captured through the offline quest dialog as a paladin.",
+    "inGameEvidence": [
+      "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/01-quest-shield-rewards-eastbrook-desktop.png",
+      "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/02-quest-shield-rewards-mirefen-desktop.png",
+      "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/03-quest-shield-rewards-thornpeak-desktop.png",
+      "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/04-quest-shield-rewards-eastbrook-mobile.png"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "lychgate_buckler",
+      "batchId": "quest-shield-icons-2026-10-23",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/lychgate_buckler.webp",
+      "sourcePath": "tmp/imagegen/quest-shields/lychgate_buckler/original.png",
+      "sourceSha256": "535aa2ed642ec61fc6a00ac3ae735da49e3003c8fe1a6b08d8c904e3088c7e41",
+      "framedSourcePath": "tmp/imagegen/quest-shields/lychgate_buckler/accepted.png",
+      "framedSourceSha256": "7fb46313a6e633cc003e8abfa58b36a424db8b3e98ae992c6f263236d5cc09f2",
+      "masterPath": "tmp/imagegen/quest-shields/lychgate_buckler/master.png",
+      "masterSha256": "9ce89e091e681a05fc8ec9eec89307e9f8250c62f44e425b7e84ec8bf2ae406a",
+      "acceptedSha256": "21ffc6cd63feba1e6cfbd67a0a122831f4dbe169d1f3f7864e99dc95948abc98",
+      "acceptedBytes": 2574,
+      "retryCount": 1
+    },
+    {
+      "kind": "item",
+      "id": "bastion_kite_shield",
+      "batchId": "quest-shield-icons-2026-10-23",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/bastion_kite_shield.webp",
+      "sourcePath": "tmp/imagegen/quest-shields/bastion_kite_shield/original.png",
+      "sourceSha256": "12a8110f20789bbcd02aa1ceb18739b9a2cdc39127a43959ecaac0258e1a42c6",
+      "framedSourcePath": "tmp/imagegen/quest-shields/bastion_kite_shield/accepted.png",
+      "framedSourceSha256": "4cc7fb6efaadd98442346c1f81e237793c6b9fe1c581f5471d1549611d1a9de4",
+      "masterPath": "tmp/imagegen/quest-shields/bastion_kite_shield/master.png",
+      "masterSha256": "d6cdced45dde4814f9916019326ccbd1f524273ff32bdcc48da21f6d07d1a4d9",
+      "acceptedSha256": "22e4d64f34494f1cbe3d5e5533dd358f2c1bea04aa17482058c6142a1d9e7613",
+      "acceptedBytes": 1740,
+      "retryCount": 1
+    },
+    {
+      "kind": "item",
+      "id": "barrowfield_tower_shield",
+      "batchId": "quest-shield-icons-2026-10-23",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/barrowfield_tower_shield.webp",
+      "sourcePath": "tmp/imagegen/quest-shields/barrowfield_tower_shield/original.png",
+      "sourceSha256": "b8b32f813a91f33eec3de9444867fbf1195fbe5bef06f0ec23526d490a4ad0ca",
+      "framedSourcePath": "tmp/imagegen/quest-shields/barrowfield_tower_shield/accepted.png",
+      "framedSourceSha256": "5db450ecd19283ae201975e70f92d8d452d63e44af1b627b4efa54c557ab7b67",
+      "masterPath": "tmp/imagegen/quest-shields/barrowfield_tower_shield/master.png",
+      "masterSha256": "d86953b49c841cd21c120c8b9e4254a8315f235f700f416390ebea21002c7153",
+      "acceptedSha256": "258e5f65830cbf136f3a012dcb6289facb5d11127961c2b17557752b91c6c3aa",
+      "acceptedBytes": 2362,
+      "retryCount": 1
+    }
+  ]
+}

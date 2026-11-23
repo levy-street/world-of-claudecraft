@@ -103,6 +103,19 @@ describe('bossCorpseHoldSeconds (pure leaf)', () => {
     expect(isHeldBossTemplate(undefined)).toBe(false);
   });
 
+  it('covers a mid-boss that opts in, under the same limits as a boss', () => {
+    expect(isHeldBossTemplate({ bossCorpseHold: true })).toBe(true);
+    expect(isHeldBossTemplate({ bossCorpseHold: true, worldBoss: true })).toBe(false);
+    expect(bossCorpseHoldSeconds({ bossCorpseHold: true }, corpse(instance))).toBe(
+      BOSS_CORPSE_HOLD_SECONDS,
+    );
+    // Never in the open world, never a per-player summon.
+    expect(bossCorpseHoldSeconds({ bossCorpseHold: true }, corpse(world))).toBe(0);
+    expect(
+      bossCorpseHoldSeconds({ bossCorpseHold: true }, { ...corpse(instance), summonedAdd: true }),
+    ).toBe(0);
+  });
+
   it('grants nothing to a non-boss, wherever it died', () => {
     expect(bossCorpseHoldSeconds({}, corpse(instance))).toBe(0);
     expect(bossCorpseHoldSeconds({ elite: true } as never, corpse(instance))).toBe(0);

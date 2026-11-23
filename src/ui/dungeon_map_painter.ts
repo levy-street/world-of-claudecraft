@@ -13,6 +13,8 @@ import {
   type MapAnchor,
 } from './dungeon_map_view';
 import { dungeonDisplayName } from './entity_i18n';
+import { FieldMapPlateArt } from './field_map_painter';
+import { t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
 
 const FULL_CIRCLE = Math.PI * 2;
@@ -118,6 +120,7 @@ export class DungeonMapPainter {
   private colors: DungeonMapColors | null = null;
   private readonly staticPlates = new WeakMap<DungeonMapStaticGeometry, HTMLCanvasElement>();
   private readonly view = new DungeonMapViewCore();
+  private readonly fieldArt = new FieldMapPlateArt();
   private paintedWorldMap: PaintedDungeonWorldMap | null = null;
 
   constructor(
@@ -205,7 +208,14 @@ export class DungeonMapPainter {
     plate.width = model.canvasWidth;
     plate.height = model.canvasHeight;
     const plateCtx = plate.getContext('2d');
-    if (plateCtx) {
+    if (plateCtx && model.field && model.fieldRect) {
+      // An open-air field: its painted plate, scaled into its projected bounds.
+      plateCtx.fillStyle = this.fieldArt.backdrop(model.field);
+      plateCtx.fillRect(0, 0, plate.width, plate.height);
+      const r = model.fieldRect;
+      plateCtx.imageSmoothingEnabled = true;
+      plateCtx.drawImage(this.fieldArt.plate(model.field), r.x, r.y, r.w, r.h);
+    } else if (plateCtx) {
       plateCtx.fillStyle = colors.backdrop;
       plateCtx.fillRect(0, 0, plate.width, plate.height);
       this.drawStaticPlan(plateCtx, model, colors, metrics);
@@ -291,7 +301,7 @@ export class DungeonMapPainter {
   ): void {
     const model = this.view.minimap(world, size, MINIMAP_BASE_SCALE * zoom);
     if (!model) return;
-    this.writers.setText(zoneLabelEl, dungeonDisplayName(model.dungeonId));
+    this.writers.setText(zoneLabelEl, dungeonTitleWithDifficulty(model.dungeonId, world));
     const colors = this.resolveColors();
 
     ctx.clearRect(0, 0, size, size);
@@ -299,7 +309,9 @@ export class DungeonMapPainter {
     ctx.beginPath();
     ctx.arc(size / 2, size / 2, size / 2 - MINIMAP_CLIP_INSET, 0, FULL_CIRCLE);
     ctx.clip();
-    ctx.fillStyle = colors.backdrop;
+    ctx.fillStyle = model.staticGeometry.field
+      ? this.fieldArt.backdrop(model.staticGeometry.field)
+      : colors.backdrop;
     ctx.fillRect(0, 0, size, size);
     ctx.drawImage(
       this.staticPlate(model.staticGeometry, colors, MINIMAP_MARKER_METRICS),
@@ -320,7 +332,7 @@ export class DungeonMapPainter {
     const model = this.view.worldMap(world, size, pad, anchor);
     if (!model) return null;
     const colors = this.resolveColors();
-    const title = dungeonDisplayName(model.dungeonId);
+    const title = dungeonTitleWithDifficulty(model.dungeonId, world);
 
     ctx.clearRect(0, 0, size, size);
     ctx.drawImage(this.staticPlate(model.staticGeometry, colors, WORLD_MAP_MARKER_METRICS), 0, 0);
@@ -342,4 +354,12 @@ export class DungeonMapPainter {
     }
     return this.paintedWorldMap;
   }
+}
+
+export function dungeonTitleWithDifficulty(dungeonId: string, world: IWorld): string {
+  const name = dungeonDisplayName(dungeonId);
+  const difficulty = world.activeDungeonDifficulty?.() ?? world.dungeonDifficulty?.() ?? 'normal';
+  const diffLabel =
+    difficulty === 'heroic' ? t('hudChrome.finder.heroic') : t('hudChrome.finder.normal');
+  return `${name} (${diffLabel})`;
 }

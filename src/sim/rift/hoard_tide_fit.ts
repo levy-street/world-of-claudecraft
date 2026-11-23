@@ -29,6 +29,11 @@ export function tideFloorBlocked(colliders: readonly Collider[], x: number, z: n
       if (Math.hypot(dx, dz) < collider.r + TIDE_FIT_PLAYER_MARGIN) return true;
       continue;
     }
+    // Rift layouts never emit prisms (placement-only); bound one conservatively.
+    if (collider.type === 'prism') {
+      if (Math.hypot(dx, dz) < collider.br + TIDE_FIT_PLAYER_MARGIN) return true;
+      continue;
+    }
     const cos = Math.cos(collider.rot);
     const sin = Math.sin(collider.rot);
     if (
@@ -73,7 +78,12 @@ export function tideLaneColliders(
   const near: Collider[] = [];
   for (let i = 0; i < all.length; i++) {
     const collider = all[i];
-    const size = collider.type === 'circle' ? collider.r : Math.hypot(collider.hw, collider.hd);
+    const size =
+      collider.type === 'circle'
+        ? collider.r
+        : collider.type === 'prism'
+          ? collider.br
+          : Math.hypot(collider.hw, collider.hd);
     if (Math.hypot(collider.x - x, collider.z - z) <= reach + size) near.push(collider);
   }
   return near;

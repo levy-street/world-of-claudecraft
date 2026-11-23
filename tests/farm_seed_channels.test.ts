@@ -89,7 +89,7 @@ describe('THE IDENTITY GUARD: farming never becomes conditional on raiding', () 
     expect(sim.countItem(seedId, pid), `${seedId} purchase`).toBe(before + 1);
     // The whole claim, stated: this character holds zero Heroic Marks and has
     // entered no instance, and still walked away with an upper-tier seed.
-    expect(sim.countItem('heroic_mark', pid)).toBe(0);
+    expect(sim.meta(pid)!.heroicMarks).toBe(0);
     // CLAIMED instances, not the pre-created slot roster: a slot exists from
     // world build, a CLAIM is what "entered a dungeon" actually means, and it
     // is the same predicate rollLoot's heroic arm resolves.

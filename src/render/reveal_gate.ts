@@ -41,6 +41,7 @@
 // reveals early.
 
 import { arrivalEstablishingShotActive, registerRevealGateForArrival } from './arrival_cover';
+import { registerContextRestoreReset } from './context_restore_registry';
 import {
   gpuPrepNow,
   noteRevealImminentHold,
@@ -92,6 +93,9 @@ export interface RevealGate extends RevealGateCore {
    *  apart from the piecewise count: these are the fairness reveals, the ones
    *  that may still draw cold. */
   noteRootRevealedAtReach(key: string): void;
+  /** A WebGL context restore: every key is forgotten and every request made
+   *  before it stops counting (see reveal_gate_core.ts reset). */
+  forgetContext(): number;
 }
 
 const defaultSchedule = (onTimeout: () => void, ms: number): (() => void) => {
@@ -124,8 +128,12 @@ export function createRevealGate(
   rootsFor: (key: string) => readonly object[],
 ): RevealGate {
   const schedule = host.schedule ?? defaultSchedule;
+  // Bumped by a context restore: a request made on the lost context never
+  // settles a key of the restored one.
+  let context = 0;
   const gate: RevealGateCore = createRevealGateCore(
     (key, imminent) => {
+      const requestContext = context;
       let roots: readonly object[] = [];
       try {
         roots = rootsFor(key);
@@ -138,7 +146,9 @@ export function createRevealGate(
       const startCompiles = (): void => {
         const requestedAtMs = gpuPrepNow();
         const compiles = roots.map((root) => {
-          const settleRoot = (): void => gate.settleRoot(key, root);
+          const settleRoot = (): void => {
+            if (context === requestContext) gate.settleRoot(key, root);
+          };
           try {
             return Promise.resolve(host.compile(root, imminent)).then(settleRoot, settleRoot);
           } catch (error) {
@@ -152,7 +162,7 @@ export function createRevealGate(
         const cancelWatchdog = schedule(() => {
           // A key another owner settled meanwhile (the occluder-fade gate's
           // escalation) is warm: nothing to reveal, nothing to report.
-          if (settled || gate.state(key) === 'warm') return;
+          if (settled || context !== requestContext || gate.state(key) === 'warm') return;
           settled = true;
           cancelSoftDeadline();
           console.warn(`Reveal gate watchdog revealed ${key} before its compiles settled`);
@@ -177,7 +187,7 @@ export function createRevealGate(
         }
         if (Number.isFinite(softMs) && softMs > 0 && softMs < REVEAL_GATE_WATCHDOG_MS) {
           cancelSoftDeadline = schedule(() => {
-            if (settled || gate.state(key) === 'warm') return;
+            if (settled || context !== requestContext || gate.state(key) === 'warm') return;
             const { ready, total } = gate.readiness(key, readiness);
             recordGpuPrepEvent({
               kind: 'reveal-soft-deadline',
@@ -191,7 +201,7 @@ export function createRevealGate(
         void Promise.all(compiles).then(() => {
           cancelWatchdog();
           cancelSoftDeadline();
-          if (settled) return;
+          if (settled || context !== requestContext) return;
           settled = true;
           gate.settle(key);
         });
@@ -221,7 +231,12 @@ export function createRevealGate(
     noteRootRevealedAtReach(_key: string): void {
       noteRevealRootReach();
     },
+    forgetContext(): number {
+      context++;
+      return gate.reset();
+    },
   });
   registerRevealGateForArrival(revealGate);
+  registerContextRestoreReset('reveal-gate', revealGate, (owner) => owner.forgetContext());
   return revealGate;
 }

@@ -1,0 +1,27 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_ossuary_drake_woc.glb",
+      "out": "models/creatures/woc_crypt_ossuary_drake.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Fly",
+        "Glide",
+        "Land",
+        "SkyRoar",
+        "Roar",
+        "Bite",
+        "Bite2",
+        "Breath",
+        "TailSweep",
+        "WingBuffet",
+        "Hit",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

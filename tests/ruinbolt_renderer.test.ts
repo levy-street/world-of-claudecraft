@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Renderer } from '../src/render/renderer';
 import type { SimEvent } from '../src/sim/types';
+import { withMeleeContact } from './helpers/renderer_contact';
 
 interface RuinboltRendererHarness {
   handleEvent(event: SimEvent): void;
@@ -31,6 +32,7 @@ function makeHarness(sourceClass = 'warlock', claim = true) {
   };
   renderer.views = new Map<number, never>();
   renderer.triggerAttack = vi.fn();
+  withMeleeContact(renderer);
   return { renderer, handleSpellfx, onDamage, projectile };
 }
 

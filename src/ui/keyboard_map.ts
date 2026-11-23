@@ -36,6 +36,7 @@ import {
 } from './focus_restore';
 import { type TranslationKey, t } from './i18n';
 import { keybindConflictPrompt } from './keybind_conflict_prompt_core';
+import { detectKeyboardLayout, type KeyboardLayoutId } from './keyboard_layout_convert_core';
 import {
   loadKeyboardFormFactor,
   loadKeyboardLegendSource,
@@ -165,6 +166,12 @@ function keyLegend(code: string): string {
  *  QWERTY on the letter and digit keys (so a legend choice is worth offering). */
 function layoutIsNonQwerty(): boolean {
   return layoutMap !== null && legendsDifferFromQwerty(layoutCharacter, keyLabel);
+}
+
+/** The listed layout (keyboard_layout_convert_core.ts) the OS layout matches,
+ *  or null where the browser cannot report it; the layout converter's default. */
+export function detectOsKeyboardLayout(): Promise<KeyboardLayoutId | null> {
+  return loadLayoutMap().then(() => detectKeyboardLayout(layoutCharacter));
 }
 
 /** Paint the overview into `root` (appended) and return its handle. */

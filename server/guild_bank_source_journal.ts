@@ -36,6 +36,7 @@
 
 import { materialItemIds } from '../src/sim/material_ids';
 import type { MaterialStackSlot } from '../src/sim/material_stack';
+import { stackProvenanceItemIds } from '../src/sim/stack_provenance_ids';
 import type { InvSlot } from '../src/sim/types';
 import {
   type MaterialSourceContainerChange,
@@ -67,6 +68,8 @@ export interface GuildBookSourceChange {
 /**
  * The exact per-payload movement between two book states, or `null` when the
  * shared model cannot read one of them.
+ * Includes consumable makers for custody replay. The journal writer below
+ * still records only actual materials, with no new audit rows for consumables.
  *
  * Null is deliberately not an empty answer: an empty array means "this book's
  * material stock did not move", while null means "this book's material stock
@@ -82,7 +85,7 @@ export function guildBookMaterialMovements(
   const rows = diffMaterialContainers(
     before as readonly MaterialStackSlot[],
     after as readonly MaterialStackSlot[],
-    materialItemIds(),
+    stackProvenanceItemIds(),
   );
   return rows.ok ? rows.value : null;
 }

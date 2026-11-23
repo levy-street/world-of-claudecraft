@@ -104,7 +104,10 @@ the live Vite page and reloads with it. Env vars that matter on that command lin
   local `npm run server`.
 - `WOC_DISTRIBUTION=website|steam|epic`: try a channel unpacked (see above).
 - `WOC_DISABLE_GPU_FORCE=1`: skip every GPU lever for this launch (the discrete-GPU
-  force on all platforms, the Linux PRIME relaunch, and the Linux GPU backend switches).
+  force on all platforms, the Linux PRIME relaunch, the Linux GPU backend switches, and
+  the shader disk cache switches).
+- `WOC_DISABLE_SHADER_DISK_CACHE=1`: launch without the shader disk cache switches (see
+  "Shader disk cache" below), every other lever unchanged.
 - `WOC_GPU_BACKEND=vulkan|opengl`: force the Linux GL backend for this launch, never
   judged into the memory (see "GPU backend on Linux" below); `vulkan` is also how to try
   Vulkan on a GPU the policy keeps Auto off (AMD, at the time of writing).
@@ -348,6 +351,69 @@ hybrid detection (`isLinuxHybridGpu`) reads `boot_vga` and skips the offload; sh
 GPU lever still misfire in the dev loop, run it with `WOC_DISABLE_GPU_FORCE=1` (it skips
 the PRIME config in `scripts/electron-dev.mjs` and every GPU lever in the shell) and pick
 the backend with `WOC_GPU_BACKEND=vulkan`, which wins over the rescue env.
+
+## Shader disk cache
+
+Chromium keeps linked WebGL programs in a GPU disk cache (`GPUCache` under the profile
+directory) and reuses them in later sessions; on Windows a hit skips the FXC compile, the
+bulk of a program's link cost on D3D11. By default Chromium never writes a program linked
+through `KHR_parallel_shader_compile`, which is how the game prewarms nearly all of them:
+the GPU process resolves the link inside `MakeCurrent()`, before the scope that installs
+the disk-write callback, so the program stays in memory only. Returning players therefore
+recompiled every prewarmed program every session.
+
+The shell turns on two Chromium switches (`electron/shader_disk_cache.cjs`, applied from
+`electron/main.cjs` before app `ready`), on Windows and Linux only (macOS was never
+measured):
+- the feature `ANGLEPerContextBlobCache` (`SHADER_DISK_CACHE_FEATURE`), disabled by
+  default in Chromium, which gives ANGLE per-context cache callbacks that write to disk
+  on every link path. It is MERGED into `--enable-features` with whatever else is
+  enabled (the Linux Vulkan rungs' own feature set, a player's own switch) by
+  `appendEnabledFeatures` in `electron/chromium_features.cjs`: Chromium keeps one value
+  per switch, so a second `enable-features` append would replace the first;
+- `--gpu-disk-cache-size-kb` (`GPU_DISK_CACHE_SIZE_KB`, 64 MB instead of the 6 MB
+  default), which leaves room for several full tours. The GPU process also holds up to
+  that much in memory and reads the whole cache at startup, which is why it is not
+  larger. On Windows the cache lives in the roaming profile (`%APPDATA%`), like the rest
+  of the shell's data. A size the player passes on the command line wins.
+
+Both stay off when the embedded Chromium is older than the one that first carries the
+callback fixes below (`MIN_CHROMIUM_WITH_BLOB_CACHE_FIXES`, checked against
+`process.versions.chrome`), or when that version cannot be read.
+
+`main.log` records `[gpu] shader disk cache: on (default)` or `off (<reason>)` at startup.
+
+**Turning it off** (from the next launch, both switches together):
+- `WOC_DISABLE_SHADER_DISK_CACHE=1` in the environment (strict `1`), or the no-GPU-lever
+  rescue `WOC_DISABLE_GPU_FORCE=1`;
+- `"shaderDiskCacheOptOut": true` in `desktop-prefs.json` (a hand edit made while the game
+  is closed, since the shell rewrites the file from memory; there is no in-game toggle, and
+  the shell's own saves keep the field).
+
+Turning it off does not remove what is already in `GPUCache`, which stock Chromium still
+reads at startup: when a machine crashes with the cache and keeps crashing with it off,
+also delete the `GPUCache` folder in the profile directory.
+
+There is no server-side kill switch: the switches are read before any page exists, so one
+would need the game to fetch a flag and write the prefs field through a new IPC setter,
+effective one launch later. Until then, a desktop release is the remote off switch.
+
+**At every Electron upgrade**, re-check before shipping (the tests in
+`tests/electron_shader_disk_cache.test.ts` pin the names, not Chromium's behavior):
+- the feature still exists under that name in the embedded Chromium
+  (`kANGLEPerContextBlobCache` in `gpu/config/gpu_finch_features.cc`); Chromium ignores
+  an unknown feature name silently, so a rename turns the fix off without an error;
+- the embedded Chromium carries the use-after-free fixes for these callbacks
+  (crbug.com/500187083 and crbug.com/517018374: `MarkContextLost` in
+  `gpu/command_buffer/service/gles2_cmd_decoder_passthrough.cc` clears the blob cache
+  callbacks under a `SECURITY:` comment). Chromium 150.0.7871.212 (Electron 43.3.0) has
+  both, and the shell keeps the feature off below it; a newer Chromium passes that floor
+  by construction, so a regression there is only caught by this check;
+- if Chromium enables the feature by default or fixes the ordering upstream, the feature
+  switch can go (the size switch still earns its place).
+
+Every Electron upgrade and every GPU driver update empties the cache once (its keys hold
+the Chromium version and the driver).
 
 ## What the maintainer must provision (one-time)
 
@@ -1204,3 +1270,4 @@ Electron is `^43.0.0` (current stable, EOL 2027-01-05; the lockfile pins the exa
 patch). Before bumping to 44 (stable ~2026-08-25): audit renderer `clipboard` usage
 (removed from renderers in 44) and drop any 32-bit expectations. electron-builder
 stays on 26.x (27 is an ESM-only alpha); electron-updater 6.x (7 is an ESM alpha).
+Every bump re-checks the shader disk cache feature (see "Shader disk cache").

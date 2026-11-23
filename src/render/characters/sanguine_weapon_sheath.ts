@@ -84,10 +84,9 @@ export class SanguineWeaponSheath {
         geometry.dispose();
         return;
       }
-      // The only FarBakeGate consumer that reads the readiness proof: calling
-      // the thunk here (not before) is what keeps every other settle (the
-      // crowd's far bakes and effect swaps) from paying the full target
-      // traverse compileTargetPrepared does.
+      // Calling the readiness thunk here (not before) is what keeps the
+      // settles that ignore it (the crowd's far bakes) from paying the full
+      // target traverse compileTargetPrepared does.
       if (isPrepared?.() !== true || !aura.parent) {
         material.dispose();
         geometry.dispose();

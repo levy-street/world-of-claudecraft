@@ -257,7 +257,9 @@ export const QUALITY_TIE_RANK: Record<NonNullable<ItemDef['quality']>, number> =
 };
 export const QUALITY_TIE_SCALE = Object.keys(QUALITY_TIE_RANK).length;
 
-function bestBy(
+/** Exported for tests: tests/dev_kit.test.ts pins the in-band tiebreak on it
+ *  directly, so the property stays live whatever the fresh-20 pool holds. */
+export function bestBy(
   items: readonly ItemDef[],
   score: (item: ItemDef) => number,
   tieScore?: (item: ItemDef) => number,
@@ -302,6 +304,13 @@ function roleIdentitySum(role: DevKitRole, item: ItemDef): number {
   return identity;
 }
 
+/** buildDevKit's in-band tiebreak: identity first, then quality (then id, in bestBy). */
+export function devKitTieScore(role: DevKitRole, item: ItemDef): number {
+  return (
+    roleIdentitySum(role, item) * QUALITY_TIE_SCALE + QUALITY_TIE_RANK[item.quality ?? 'common']
+  );
+}
+
 /** The largest-capacity bag in the fresh-20 pool, or null if there is none.
  *  Materials-only bags are excluded on purpose: the kit fills EVERY socket with
  *  this one bag, and a materials-only bag feeds the materials pool instead of
@@ -310,9 +319,9 @@ function roleIdentitySum(role: DevKitRole, item: ItemDef): number {
  *  wants general capacity; specialty satchels are equipped deliberately. */
 export function bestKitBag(): ItemDef | null {
   // Deliberately the same kind-based filter server/pbe_boost.ts bestBoostBag
-  // uses, so a mis-authored bag def cannot make the two pickers disagree.
+  // uses. Protected rewards need their owning grant's custody receipt.
   const bags = Object.values(ITEMS).filter(
-    (item) => item.kind === 'bag' && !isMaterialsOnlyBag(item) && !item.unique,
+    (item) => item.kind === 'bag' && !isMaterialsOnlyBag(item) && !item.unique && !item.noDiscard,
   );
   return bestBy(bags, (item) => item.bagSlots ?? 0);
 }
@@ -337,8 +346,7 @@ export function buildDevKit(cls: PlayerClass, spec: string): DevKit | null {
 
   const pool = Object.values(ITEMS).filter((item) => isFreshTwentyItem(cls, item));
   const score = (item: ItemDef): number => roleItemScore(role, item);
-  const tie = (item: ItemDef): number =>
-    roleIdentitySum(role, item) * QUALITY_TIE_SCALE + QUALITY_TIE_RANK[item.quality ?? 'common'];
+  const tie = (item: ItemDef): number => devKitTieScore(role, item);
   const equip: Partial<Record<EquipSlot, string>> = {};
 
   for (const slot of KIT_SLOTS) {

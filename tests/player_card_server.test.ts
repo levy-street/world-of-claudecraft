@@ -10,13 +10,15 @@ const dbMock = vi.hoisted(() => {
   delete process.env.PUBLIC_ORIGIN;
   delete process.env.REALMS;
   delete process.env.REALM_NAME;
-  return { query: vi.fn() };
+  return { query: vi.fn(), membership: vi.fn() };
 });
 vi.mock('pg', () => ({
   Pool: vi.fn(function Pool() {
     return { query: dbMock.query };
   }),
 }));
+
+vi.mock('../server/membership_service', () => ({ getMembership: dbMock.membership }));
 
 import { lifetimeXpStanding } from '../server/db';
 import {
@@ -159,6 +161,9 @@ beforeEach(() => {
   slugRows = [];
   cardRows = [];
   accountForSlugRows = [];
+  dbMock.membership
+    .mockReset()
+    .mockResolvedValue({ active: false, expiresAt: null, authorizedUntil: 0 });
   upsertThrows = null;
   standingCountRows = [];
   dbMock.query.mockReset();
@@ -180,7 +185,7 @@ beforeEach(() => {
     if (s.includes('SELECT character_id, account_id, png, title, description'))
       return Promise.resolve({ rows: cardRows });
     if (s.includes('SELECT title, description, locale')) return Promise.resolve({ rows: cardRows }); // metadata-only OG page read
-    if (s.includes('SELECT account_id FROM player_cards WHERE slug'))
+    if (s.includes('SELECT p.account_id, c.name FROM player_cards p'))
       return Promise.resolve({ rows: accountForSlugRows });
     if (s.includes('INSERT INTO referrals')) return Promise.resolve({ rows: [] });
     return Promise.resolve({ rows: [] });
@@ -1023,15 +1028,56 @@ describe('lifetimeXpStanding', () => {
 });
 
 describe('captureReferral', () => {
+  it('freezes active membership and the card character name without reading PNG bytes', async () => {
+    accountForSlugRows = [{ account_id: 10, name: 'Aldric' }];
+    dbMock.membership.mockResolvedValue({
+      active: true,
+      expiresAt: Date.now() + 60000,
+      authorizedUntil: Date.now() + 30000,
+    });
+    await captureReferral(42, ' SIR-TEST ');
+    expect(dbMock.membership).toHaveBeenCalledExactlyOnceWith(10);
+    expect(dbMock.query.mock.calls).toHaveLength(2);
+    const [lookup, insert] = dbMock.query.mock.calls;
+    expect(lookup[0]).toContain('c.account_id = p.account_id');
+    expect(lookup[0]).not.toContain('png');
+    expect(insert[1]).toEqual([42, 10, 'sir-test', true, 'Aldric']);
+  });
+
+  it('does not award armour from future deadlines when membership is inactive', async () => {
+    accountForSlugRows = [{ account_id: 10, name: 'Aldric' }];
+    dbMock.membership.mockResolvedValue({
+      active: false,
+      expiresAt: Date.now() + 60000,
+      authorizedUntil: Date.now() + 30000,
+    });
+    await captureReferral(42, 'sir-test');
+    expect(dbMock.query.mock.calls.at(-1)?.[1]).toEqual([42, 10, 'sir-test', false, 'Aldric']);
+  });
+
+  it.each(['authorizedUntil', 'expiresAt'])(
+    'refuses stale membership authority (%s)',
+    async (field) => {
+      accountForSlugRows = [{ account_id: 10, name: 'Aldric' }];
+      dbMock.membership.mockResolvedValue({
+        active: true,
+        expiresAt: Date.now() + 60000,
+        authorizedUntil: Date.now() + 30000,
+        [field]: 1,
+      });
+      await captureReferral(42, 'sir-test');
+      expect(dbMock.query.mock.calls.at(-1)?.[1]).toEqual([42, 10, 'sir-test', false, 'Aldric']);
+    },
+  );
   it('records a referral for a known slug owned by another account', async () => {
-    accountForSlugRows = [{ account_id: 10 }];
+    accountForSlugRows = [{ account_id: 10, name: 'Aldric' }];
     await captureReferral(42, 'sir-test');
     const ins = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO referrals'));
-    expect(ins?.[1]).toEqual([42, 10, 'sir-test']);
+    expect(ins?.[1]).toEqual([42, 10, 'sir-test', false, 'Aldric']);
   });
 
   it('ignores a self-referral', async () => {
-    accountForSlugRows = [{ account_id: 42 }];
+    accountForSlugRows = [{ account_id: 42, name: 'Self' }];
     await captureReferral(42, 'sir-test');
     expect(
       dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO referrals')),

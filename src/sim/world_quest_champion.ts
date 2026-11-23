@@ -9,13 +9,14 @@
 // mid-fight is never locked out. An unclaimed champion fades after a few
 // minutes so a site never keeps a permanent elite.
 //
-// Placement is rng-free (a fixed offset from the area centre) and the champion
+// Placement is rng-free (a fixed offset from the area centre, or the quest's
+// authored championAt point) and the champion
 // is a summoned, run-scoped mob (never respawns in place). State is keyed by
 // SimContext in a module WeakMap, transient by design, like the rift ambush.
 
 import { MOBS } from './data';
-import { createMob } from './entity';
 import { applyDungeonSpawnMinibossTuning } from './instances/dungeon_spawn_miniboss';
+import { spawnOpenWorldMob } from './mob/open_world_tuning';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity, MobTemplate, WorldQuestBannerId, WorldQuestDef } from './types';
@@ -28,7 +29,7 @@ export const WORLD_QUEST_CHAMPION_TYPES: ReadonlySet<WorldQuestDef['objective'][
   'delivery',
 ]);
 export const WORLD_QUEST_CHAMPION_TUNING = Object.freeze({
-  healthMultiplier: 5,
+  healthMultiplier: 2,
   scale: 1.4,
   levelAboveQuest: 2,
   lifetimeSeconds: 300,
@@ -71,13 +72,17 @@ export function worldQuestOffersChampion(quest: WorldQuestDef): boolean {
   return WORLD_QUEST_CHAMPION_TYPES.has(quest.objective.type);
 }
 
-/** The champion's kind: the kill target itself, else the nearest hostile of the site. */
+/** The champion's kind: the kill target itself, else the nearest hostile of the site.
+ *  A training dummy is never a candidate: it is hostile (attackable) but inert,
+ *  so a site whose nearest hostile is a practice dummy (the Eastbrook bandit
+ *  camp sits by the hub's) picks the next real mob, or raises no champion. */
 function championTemplate(ctx: SimContext, quest: WorldQuestDef): MobTemplate | null {
   if (quest.objective.type === 'kill') return MOBS[quest.objective.targetMobId] ?? null;
   let best: Entity | null = null;
   let bestDistance = 150;
   for (const e of ctx.entities.values()) {
     if (e.kind !== 'mob' || !e.hostile || e.summonedAdd || !e.templateId) continue;
+    if (MOBS[e.templateId]?.dummy) continue;
     const d = Math.hypot(e.pos.x - quest.area.x, e.pos.z - quest.area.z);
     if (d < bestDistance) {
       best = e;
@@ -87,13 +92,31 @@ function championTemplate(ctx: SimContext, quest: WorldQuestDef): MobTemplate | 
   return best?.templateId ? (MOBS[best.templateId] ?? null) : null;
 }
 
-function tellNear(ctx: SimContext, quest: WorldQuestDef, banner: WorldQuestBannerId): void {
+/** The rng-free point the champion rises at. */
+export function worldQuestChampionSite(quest: WorldQuestDef): { x: number; z: number } {
+  return (
+    quest.championAt ?? {
+      x: quest.area.x + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
+      z: quest.area.z + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
+    }
+  );
+}
+
+/** Banner the completer (who may finish a wide ring far from the site) and
+ *  every live player within alert range of where the champion rises. */
+function tellNear(
+  ctx: SimContext,
+  quest: WorldQuestDef,
+  banner: WorldQuestBannerId,
+  completerId: number,
+): void {
+  const site = worldQuestChampionSite(quest);
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead) continue;
     if (
-      Math.hypot(e.pos.x - quest.area.x, e.pos.z - quest.area.z) <=
-      WORLD_QUEST_CHAMPION_TUNING.alertYards
+      meta.entityId === completerId ||
+      Math.hypot(e.pos.x - site.x, e.pos.z - site.z) <= WORLD_QUEST_CHAMPION_TUNING.alertYards
     )
       ctx.emit({ type: 'worldQuestBanner', banner, pid: meta.entityId });
   }
@@ -118,11 +141,9 @@ export function summonWorldQuestChampion(
     template.minLevel,
     quest.minLevel + WORLD_QUEST_CHAMPION_TUNING.levelAboveQuest,
   );
-  const pos = ctx.groundPos(
-    quest.area.x + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
-    quest.area.z + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
-  );
-  const mob = createMob(ctx.nextId++, template, level, pos);
+  const site = worldQuestChampionSite(quest);
+  const pos = ctx.groundPos(site.x, site.z);
+  const mob = spawnOpenWorldMob(ctx.nextId++, template, level, pos);
   mob.summonedAdd = true;
   mob.runScoped = true;
   applyDungeonSpawnMinibossTuning(mob, {
@@ -139,8 +160,7 @@ export function summonWorldQuestChampion(
     lastTick: -1,
     participants: [],
   });
-  tellNear(ctx, quest, 'championRises');
-  void meta;
+  tellNear(ctx, quest, 'championRises', meta.entityId);
   return true;
 }
 

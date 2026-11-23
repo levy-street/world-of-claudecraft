@@ -1197,4 +1197,215 @@ export const table: DeedLocaleTable = {
     name: 'Suçüstü Yakalandı',
     desc: 'Bir Para Kesesi Fasulyesini Gömülü Hazineden kaçmadan önce yakala.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Golgelerden Daha Parlak',
+    desc: 'Calinan para keselerini geri al ve Evergarden labirentinden Hard zorlugunda kac.',
+  },
+  prog_titan: { name: 'Dev', desc: 'Ömür boyu toplam 10.000.000 deneyim kazan.', title: 'Dev' },
+  pvp_flag_1h: {
+    name: 'Cesur',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 1 saat oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Cesur',
+  },
+  pvp_flag_3h: {
+    name: 'Meydan Okuyan',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 3 saat oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Meydan Okuyan',
+  },
+  pvp_flag_6h: {
+    name: 'Korkusuz',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 6 saat oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Korkusuz',
+  },
+  pvp_flag_24h: {
+    name: 'Boyun Eğmez',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 24 saat oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Boyun Eğmez',
+  },
+  pvp_flag_168h: {
+    name: 'Yılmaz',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 7 gün oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Yılmaz',
+  },
+  cmb_balgath: {
+    name: 'Artık Ustabaşı Değil',
+    desc: 'Gömülü Ustabaşını mezarına geri gönder.',
+  },
+  cmb_balgath_ten: {
+    name: 'Höyük Hiçbir Şeyi Tutamaz',
+    desc: 'Gömülü Ustabaşını on kez alt et.',
+  },
+  cmb_point_taken: {
+    name: 'Mesaj Alındı',
+    desc: 'Toplanma talim alanında Saman Ustabaşının fenerini söndür ve tahtalarına darbelerini hissettir.',
+  },
+  dgn_olen_buttress: {
+    name: 'Duvarı Tut',
+    desc: "Şövalye Komutanı Olen'i, Seken Siperinin ikinci bir oyuncuya vurmasına hiç izin vermeden yen.",
+  },
+  dgn_ossick_moored: {
+    name: 'Güvenli Liman',
+    desc: "Zindancı Ossick'i, kimse Boğulma Çukuruna sürüklenmeden yen.",
+  },
+  dgn_vael_beacon: {
+    name: 'İşaret Işığında',
+    desc: "Fogbinder Vael'i, tek bir Sis Gölgesini bile patlatmadan yen.",
+  },
+  dgn_turretback: {
+    name: 'Tahliye Bildirimi',
+    desc: 'Batık Gemi Kaptanını, kimse Hayalet Borda Ateşinden isabet almadan yen.',
+  },
+  dgn_selthe_pitch: {
+    name: 'Her Ses Uyum İçinde',
+    desc: "Koroana Selthe'yi, her Koro iki veya daha fazla kişi arasında paylaşılırken ve hiçbir Tekli Ezgi başkasına değmeden yen.",
+  },
+  dgn_colossus_mirror: {
+    name: 'Camı Kır',
+    desc: 'Gelgit Camı Devini, her Yansıma ortaya çıktıktan sonraki 15 saniye içinde kırılmış olarak yen.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: 'Kupkuru',
+    desc: "Boğulmuş Ay'ın Avatarı Ysolei'yi, kimse onun Gelgit Çarpışından isabet almadan yen.",
+  },
+  dgn_mere_hydra: {
+    name: 'Tüm Başlar Yerde',
+    desc: 'Göl Hidrasının üç başını da birbirinden en fazla 10 saniye arayla öldür.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: 'Tek Tüy Bile Yanmadı',
+    desc: 'Ölüm Çanı Ejderini, kimse Rov Alevi Geçişiyle yanmadan yen.',
+  },
+  dgn_turnkey_cage: {
+    name: 'Hiçbir Kafes Bizi Tutamaz',
+    desc: 'Zindan Anahtarcısını, kimse Demir Kafeste ezilmeden yen.',
+  },
+  dgn_beastmaster_apart: {
+    name: 'Uzak Tutuldu',
+    desc: 'Diş Lordu Canavar Efendisini ve Büyük Jaguarını, Sürü Bağı toplamda 10 saniyeden az etkin kalacak şekilde yen.',
+  },
+  dgn_gorgebloom_clean: {
+    name: 'Yabani Ot Temizliği',
+    desc: 'Obur Çiçeği, tek bir Diken Filizi bile büyümeden yen.',
+  },
+  dgn_zulgar_uncaught: {
+    name: 'Hiç Yakalanmadı',
+    desc: "Çukurun Sesi Zulgar'ı, kimse Parçalanmış etkisine uğramadan yen.",
+  },
+  dgn_great_saurian: {
+    name: 'Devrilen Titan',
+    desc: 'Büyük Sürüngeni ve Platform Lanet Çağırıcısını birbirinden en fazla 20 saniye arayla yen.',
+  },
+  dgn_korgath_all_chains: {
+    name: 'Daha Merhametli Bir Son',
+    desc: "Bağlı Korgath'ı dört zincirinin tümü kırılmış olarak yen.",
+  },
+  dgn_korgath_still_bound: {
+    name: 'Kilit Dayanıyor',
+    desc: "Bağlı Korgath'ı Kahramanca zorlukta, en az iki zinciri hiç kırılmamış olarak yen.",
+  },
+  dgn_velkhar_cold: {
+    name: 'Soğuk Teselli',
+    desc: "Büyük Nekromansır Velkhar'ı, tek bir Diriltilmiş Kemik Gezer bile ikinci kez dirilmeden yen.",
+  },
+  dgn_korzul_thin_ice: {
+    name: 'İnce Buz',
+    desc: "Mezar Ejderi Korzul'u, göldeki on dokuz levhanın en az on ikisi kırılmamış olarak yen.",
+  },
+  dgn_sledge_tusker: {
+    name: 'Soğuk Yük',
+    desc: 'Kızak Fildişlisini, kimse onun Çiğnemesinden isabet almadan yen.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: 'Son Kıta',
+    desc: "Boğulmuş Ay'ın Avatarı Ysolei'yi, Solgun Koronun Son Kantoru yanındayken yen.",
+    title: 'Koronun Tanığı',
+  },
+  dgn_marrow_tidy: {
+    name: 'Düzenli Bir Mezarlık',
+    desc: "Zangoç Marrow'u, her Açık Mezar Çan Avlusunun kenarına yerleştirilmiş olarak yen.",
+  },
+  dgn_lady_nobody_hanging: {
+    name: 'Kimse Asılı Kalmadı',
+    desc: 'Kemik Donduran Leydiyi, Donmuş Kucaklamasından hiç kimseyi düşürmeden yen.',
+  },
+  dgn_ilvane_hush: {
+    name: 'Artık Sus',
+    desc: "Kantor Ilvane'yi, Boşluğun Ağıdı kimseye hiç isabet etmeden yen.",
+  },
+  dgn_morthen_candlelight: {
+    name: 'Her Mum Yanıyor',
+    desc: "Mezarçağıran Morthen'i, Huzursuz Koruması yükseldikten sonraki 20 saniye içinde dört Anma Mumunun tümünü yeniden yaktıktan sonra yen.",
+  },
+  dgn_guild_first_contract: {
+    name: 'Belge İmzalandı',
+    desc: 'Fener Salonunun haftalık zindan sözleşmelerinden birini tamamla.',
+  },
+  dgn_guild_ten_contracts: {
+    name: 'Panonun Müdavimi',
+    desc: 'Fener Salonunun haftalık zindan sözleşmelerinden 10 tanesini tamamla.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: 'Sözleşme Gazisi',
+    desc: 'Fener Salonunun haftalık zindan sözleşmelerinden 50 tanesini tamamla.',
+  },
+  feat_guild_writ_runner: {
+    name: 'Belge Ulağı',
+    desc: "Fener Salonu levazım subayı Garrick Holt'tan 6 Fener Mührü karşılığında satın alındı.",
+    title: 'Belge Ulağı',
+  },
+  feat_guild_hallsworn: {
+    name: 'Salon Yeminlisi',
+    desc: "Fener Salonu levazım subayı Garrick Holt'tan 14 Fener Mührü karşılığında satın alındı.",
+    title: 'Salon Yeminlisi',
+  },
+  feat_guild_of_lantern_hall: {
+    name: 'Fener Salonundan',
+    desc: "Fener Salonu levazım subayı Garrick Holt'tan 24 Fener Mührü karşılığında satın alındı.",
+    title: 'Fener Salonundan',
+  },
+  feat_gourdlight_guise: {
+    name: 'Kabak Işığı Görünümü',
+    desc: "Kabak Işığı Gecesi sürerken, Yaban Domuzu Çayırı'nın ötesindeki tarlasında Yaşlı Sırıtan Saman'dan alınan bir Oyulmuş Kabak Başlığı'na sahip ol.",
+  },
+  feat_old_thatchgrin: {
+    name: 'Anız ve Kül',
+    desc: "Kabak Işığı Gecesi sürerken, Yaban Domuzu Çayırı'nın ötesindeki kabak tarlasında Yaşlı Sırıtan Saman'ı devirmeye yardım et.",
+  },
+  feat_title_gourdlit: {
+    name: 'Kabak Işıklı',
+    desc: "Kabak Işığı Gecesi sürerken Hester Kabakfitil'den Kabak Işığı Şekerleri karşılığında alınan Kabak Işıklı'nın Fermanı'nı oku.",
+    title: 'Kabak Işıklı',
+  },
+  feat_title_trickster: {
+    name: 'Şakacı',
+    desc: "Kabak Işığı Gecesi sürerken Hester Kabakfitil'den Kabak Işığı Şekerleri karşılığında alınan Şakacı Fermanı'nı oku.",
+    title: 'Şakacı',
+  },
+  feat_title_hollow_grinned: {
+    name: 'Boş Sırıtan',
+    desc: "Kabak Işığı Gecesi sürerken Hester Kabakfitil'den Kabak Işığı Şekerleri karşılığında alınan Boş Sırıtış Fermanı'nı oku.",
+    title: 'Boş Sırıtan',
+  },
+  feat_pumpkin_hunter: {
+    name: 'Kabak Avcısı',
+    desc: 'Kabak Işığı Gecesi boyunca dünyaya gizlenmiş tüm Perili Kabakları bul.',
+    title: 'İçi Boş',
+  },
+  feat_gourdlight_doorsteps: {
+    name: 'Her Kapının Eşiği',
+    desc: "Kabak Işığı Gecesi boyunca Doğudere, Bataklık Köprüsü ve Yüksek Gözcü'de kapısını açan tüm kasabalılardan şeker ya da şaka iste.",
+  },
+  feat_gourdlight_errands: {
+    name: "Hester'ın Her Emrine Hazır",
+    desc: "Hester Kabakfitil'in dönüşümlü Kabak Işığı Gecesi işlerinin her birini en az bir kez tamamla.",
+  },
+  feat_gourdlight_frights: {
+    name: 'Üç Kasaba Ürktü',
+    desc: "Hester'ın Böö! işinde Doğudere, Bataklık Köprüsü ve Yüksek Gözcü'nün her birinde bir kasabalıyı korkut.",
+  },
+  feat_gourdlight_eve_complete: {
+    name: 'Baştan Sona Kabak Işığı',
+    desc: "Kabak Işığı Gecesi'nin tamamını yap: Yaşlı Sırıtan Saman'ı devir, tüm Perili Kabakları bul, Hester'ın tüm işlerini bitir, her kapıyı çal ve üç kasabanın her birinde bir kasabalıyı korkut.",
+    title: 'Kabağa Yeminli',
+  },
 };

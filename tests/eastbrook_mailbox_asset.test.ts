@@ -22,8 +22,8 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/mailbox_pillar.glb');
 const ASSET_BYTES = 32_884;
-const ASSET_SHA256 = 'f67c793f60389069a6c856d871cbc95d11fe7fdc9b438f1866d869c532065ccb';
-const SOURCE_FINGERPRINT = 'fc1dee7d7afef7c4682b1f6015d811f7c97b1c62af920dd5680ef747cfd18291';
+const ASSET_SHA256 = '5b96b24882f5d1c1f66d7da1c420ee1caa6422802ffb1bee4db78d788ceddcc3';
+const SOURCE_FINGERPRINT = 'dfd5aa1e92619b97b4979851abfd51efbc70790cd70594b560f2752e79369809';
 let restoreGfx: (() => void) | null = null;
 
 function setStandardMaterials(value: boolean): void {
@@ -264,7 +264,7 @@ describe('Eastbrook Ravenpost mailbox pipeline', () => {
 describe('Ravenpost mailbox renderer adapter', () => {
   it('drops the immutable loader source after preparing shared resources', () => {
     const source = readFileSync(path.join(REPO_ROOT, 'src/render/mailbox.ts'), 'utf8');
-    expect(source).toContain("import { loadGltf, releaseGltf } from './assets/loader';");
+    expect(source).toMatch(/import \{[^}]*\breleaseGltf\b[^}]*\} from '\.\/assets\/loader';/);
     expect(source).toContain(
       'preparedMailboxTemplate = buildMailboxFromSource(loadedMailboxGltf.scene, atlas);',
     );

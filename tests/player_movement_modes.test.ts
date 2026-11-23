@@ -12,6 +12,7 @@ const calls = vi.hoisted(() => ({
   climb: vi.fn(() => false),
   grab: vi.fn(() => false),
   ferry: vi.fn(() => false),
+  lance: vi.fn(() => false),
 }));
 vi.mock('../src/sim/rift/runs', () => ({ riftPlayerLift: calls.rift }));
 vi.mock('../src/sim/social/away', () => ({ clearAfkOnMove: calls.afk }));
@@ -21,6 +22,9 @@ vi.mock('../src/sim/combat/paladin_valkyrs_calling', () => ({
 vi.mock('../src/sim/combat/heroic_leap', () => ({ advanceHeroicLeap: calls.leap }));
 vi.mock('../src/sim/climb', () => ({ advanceClimb: calls.climb, tryStartClimb: calls.grab }));
 vi.mock('../src/sim/transport_ferry', () => ({ stepPassenger: calls.ferry }));
+// The braced Shardpike (lance_trial.ts, added with the Mirefen world boss, PR
+// 4259) owns the step after the leap and before the climb.
+vi.mock('../src/sim/lance_trial', () => ({ advanceLanceBrace: calls.lance }));
 
 import { advanceExclusiveMovement } from '../src/sim/player_movement_modes';
 
@@ -41,9 +45,15 @@ describe('exclusive player movement ordering', () => {
     expect(advanceExclusiveMovement(ctx, player, meta, deps)).toBe(false);
     expect(player.pos.y).toBe(8);
     expect(meta.lastActiveTick).toBe(30);
-    const order = [calls.rift, calls.afk, calls.valkyr, calls.leap, calls.climb, calls.grab].map(
-      (fn) => fn.mock.invocationCallOrder[0],
-    );
+    const order = [
+      calls.rift,
+      calls.afk,
+      calls.valkyr,
+      calls.leap,
+      calls.lance,
+      calls.climb,
+      calls.grab,
+    ].map((fn) => fn.mock.invocationCallOrder[0]);
     expect(order).toEqual([...order].sort((a, b) => a - b));
     calls.leap.mockClear();
     meta.mountRace = { phase: 'countdown' } as PlayerMeta['mountRace'];

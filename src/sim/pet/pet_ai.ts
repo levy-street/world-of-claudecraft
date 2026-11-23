@@ -47,7 +47,7 @@ import { lineOfSightClear } from '../colliders';
 import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
 import { hunterPetDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
-import { MOBS } from '../data';
+import { isDelvePos, MOBS } from '../data';
 import { isEvadingWildMob } from '../mob/evade_immunity';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { isTrivialTo } from '../mob/targeting';
@@ -66,7 +66,9 @@ import {
   PET_TELEPORT_DISTANCE,
   RUN_SPEED,
   steadyAngleTo,
+  type Vec3,
 } from '../types';
+import { petAssistKeepsTarget, petAssistTargetId } from './pet_assist';
 import { isTameableFamily, petHeelSpeed, petOwnerScaling } from './pet_scaling';
 import { petCanForceTaunt } from './pet_taunt_gate';
 import { tryUseWarlockPetSkill } from './warlock_pet_skills';
@@ -165,6 +167,8 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   // Both arms are the same rule: stop fighting something the owner has left behind.
   // Out of leash range they walked away from it; mounted they rode away from it.
   if (target && (travelling || dist2d(owner.pos, pet.pos) > PET_LEASH)) target = null;
+  // Assist fights only the owner's active target: switching target stands it down.
+  if (target && pet.petMode === 'assist' && !petAssistKeepsTarget(owner, target)) target = null;
   if (!target && !owner.dead) target = petPickTarget(ctx, pet, owner);
   pet.aggroTargetId = target?.id ?? null;
   pet.inCombat = target !== null;
@@ -323,9 +327,20 @@ function pullNearbyMobs(ctx: SimContext, pet: Entity): void {
 // at most every PET_PATH_RECALC and otherwise the cached waypoints are followed.
 // The teleport is kept as a recovery path when no route exists or the pet-owner
 // separation is implausibly large (for example, after an instance transition).
-export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
+export function petFollow(
+  ctx: SimContext,
+  pet: Entity,
+  owner: Entity,
+  targetOverride?: Vec3,
+): void {
+  // A real combat pet heels onto the owner's own tile (targetOverride unset).
+  // buddy_ai.ts's cosmetic-follower dispatcher passes its usual left-and-back
+  // offset point instead, so a buddy keeps standing where it always has while
+  // reusing this exact A*-pathed heel locomotion (owner speed/mount/slow
+  // still read off the real `owner` below; only the aimed-at point changes).
+  const target = targetOverride ?? owner.pos;
   pet.petPathCooldown = Math.max(0, pet.petPathCooldown - DT);
-  const d = dist2d(pet.pos, owner.pos);
+  const d = dist2d(pet.pos, target);
   if (d <= PET_FOLLOW_DISTANCE) {
     pet.petPath = [];
     return;
@@ -333,11 +348,24 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   if (ctx.isRooted(pet)) return;
 
   const swim = ctx.mobCanSwim(MOBS[pet.templateId]);
+  // Inside a delve the A* only knows the delve's DEFAULT room order, not this run's
+  // seeded rooms or its doors, while the pet's movement collides with the real ones
+  // (delves/runs.ts delveRunForEntity). A route planned there can be walled off, so
+  // the pet heels in a straight line instead (as the delve companion and delve mobs
+  // do), sliding along the real walls, and sight is tested against the run's rooms.
+  const delveModules = isDelvePos(owner.pos.x)
+    ? ctx.delveRunForPlayer(owner.id)?.modules
+    : undefined;
   const recompute = (): void => {
+    if (delveModules) {
+      pet.petPath = [];
+      pet.petPathCooldown = PET_PATH_RECALC;
+      return;
+    }
     pet.petPath = findPlayerPath(
       ctx.cfg.seed,
       pet.pos,
-      owner.pos,
+      target,
       PET_PATH_SPAN,
       false,
       swim,
@@ -349,7 +377,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   // its end no longer lands near the (now-moved) owner. findPlayerPath returns a
   // single-waypoint straight line (length 1) when the goal is unreachable.
   const end = pet.petPath[pet.petPath.length - 1];
-  const stale = !end || dist2d(end, owner.pos) > PET_PATH_STALE_DISTANCE;
+  const stale = !end || dist2d(end, target) > PET_PATH_STALE_DISTANCE;
   if (pet.petPathCooldown <= 0 && stale) recompute();
   // drop waypoints we've reached; the last leg homes on the live owner position.
   while (pet.petPath.length > 1 && dist2d(pet.pos, pet.petPath[0]) < PET_WAYPOINT_REACHED)
@@ -371,15 +399,15 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
       !lineOfSightClear(
         ctx.cfg.seed,
         pet.pos,
-        owner.pos,
+        target,
         BODY_RADIUS,
-        undefined,
+        delveModules,
         ctx.riftCollisionToken,
       ))
   ) {
     recompute();
     if (pet.petPath.length <= 1) {
-      pet.pos = { ...owner.pos };
+      pet.pos = { ...target };
       pet.prevPos = { ...pet.pos };
       pet.petPath = [];
       // a warp is a teleport: keep the spatial grid exact this tick instead of
@@ -391,9 +419,9 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   }
 
   const routed = pet.petPath.length > 1;
-  const aim = routed ? pet.petPath[0] : owner.pos;
+  const aim = routed ? pet.petPath[0] : target;
   // Heel against the owner's ACTUAL speed, not a fixed RUN_SPEED floor: mounts add
-  // 60 to 80 percent, so the old 7.7 yd/s floor lost ground to every mounted owner
+  // trained speed, so the old 7.7 yd/s floor lost ground to every mounted owner
   // until the 60 yd teleport rescued the pet. moveSpeedMult(owner) already folds in
   // the mount, speed buffs, and slows; the pet's own multiplier still applies on top
   // so a snared pet is still snared.
@@ -646,6 +674,9 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   // acquisition here as well as clearing the target there means a pet cannot pick a
   // new one up mid-ride, in aggressive stance or by assisting.
   if (ownerIsMounted(owner)) return null;
+  // Assist never defends or roams: its one candidate is the owner's active target,
+  // and only once the owner has cast on it (pet/pet_assist.ts).
+  if (pet.petMode === 'assist') return petAssistPick(ctx, pet, owner);
   // Anti-AFK: an aggressive pet only proactively pulls fresh targets while its
   // owner is actually playing. An idle owner's pet still defends (engagingUs /
   // ownerOffense below) but cannot farm the area alone (hunter/warlock).
@@ -691,6 +722,18 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
     }
   });
   return best;
+}
+
+// The same filters the stance scan above applies to every candidate, on the one
+// unit Assist may take, plus the scan's own reach (PET_ASSIST_RANGE).
+function petAssistPick(ctx: SimContext, pet: Entity, owner: Entity): Entity | null {
+  const id = petAssistTargetId(owner, ctx.players.get(owner.id));
+  const m = id !== null ? ctx.entities.get(id) : undefined;
+  if (!m || m.id === pet.id || m.dead || isEvadingWildMob(m) || !ctx.isHostileTo(pet, m)) {
+    return null;
+  }
+  if (petQuestGateBlocksTarget(ctx, pet, m) || !petCanSeeTarget(m)) return null;
+  return dist2d(pet.pos, m.pos) <= PET_ASSIST_RANGE ? m : null;
 }
 
 function petQuestGateBlocksTarget(ctx: SimContext, pet: Entity, target: Entity): boolean {

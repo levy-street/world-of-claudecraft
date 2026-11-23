@@ -8,7 +8,7 @@ import {
   resolveGatherNodePick,
 } from '../src/render/gather_nodes';
 import { NODE_Y_OFFSET, nodeTierScale } from '../src/render/gather_nodes_lookup';
-import { GATHER_NODES } from '../src/sim/data';
+import { activeGatherNodes } from '../src/sim/data';
 import type { GatherNodeDef, GatherNodeType } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
@@ -43,16 +43,18 @@ function instancedMeshes(group: THREE.Group): THREE.InstancedMesh[] {
 describe('gather node rendering', () => {
   it('batches repeated opaque nodes by zone and type under the coarse key', () => {
     const { group } = buildGatherNodes(1, 'coarse');
-    const expectedBatches = new Set(GATHER_NODES.map((node) => `${node.zoneId}:${node.type}`));
+    const expectedBatches = new Set(
+      activeGatherNodes().map((node) => `${node.zoneId}:${node.type}`),
+    );
     const meshes = instancedMeshes(group);
 
     // 156 nodes since the phase 20 density pass; the coarse key makes one
     // InstancedMesh per (zone, type), 42 today, derived from the content
     // rather than hand-typed so a new zone or node type moves both sides.
-    expect(GATHER_NODES).toHaveLength(156);
+    expect(activeGatherNodes()).toHaveLength(156);
     expect(expectedBatches.size).toBe(42);
     expect(meshes).toHaveLength(expectedBatches.size);
-    expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
+    expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(activeGatherNodes().length);
     expect(new Set(meshes.map((mesh) => mesh.geometry)).size).toBe(3);
     expect(new Set(meshes.map((mesh) => mesh.material)).size).toBe(3);
     for (const mesh of meshes) {
@@ -64,12 +66,12 @@ describe('gather node rendering', () => {
       const nodeIds = mesh.userData.gatherNodeIds as string[];
       expect(nodeIds).toHaveLength(mesh.count);
       for (const nodeId of nodeIds) {
-        const node = GATHER_NODES.find((candidate) => candidate.id === nodeId);
+        const node = activeGatherNodes().find((candidate) => candidate.id === nodeId);
         expect(node?.zoneId).toBe(mesh.userData.gatherNodeZoneId);
         expect(node?.type).toBe(mesh.userData.gatherNodeType);
       }
       // The band is the batch's first node's band, kept for the mesh name.
-      const first = GATHER_NODES.find((candidate) => candidate.id === nodeIds[0]);
+      const first = activeGatherNodes().find((candidate) => candidate.id === nodeIds[0]);
       expect(Math.floor((first?.pos.z ?? 0) / 180)).toBe(mesh.userData.gatherNodeBand);
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       expect(materials.every((material) => !material.transparent && material.alphaTest === 0)).toBe(
@@ -81,7 +83,9 @@ describe('gather node rendering', () => {
   it('keeps the (zone, type, regional z-band) key under the band arm', () => {
     const { group } = buildGatherNodes(1, 'band');
     const expectedBatches = new Set(
-      GATHER_NODES.map((node) => `${node.zoneId}:${node.type}:${Math.floor(node.pos.z / 180)}`),
+      activeGatherNodes().map(
+        (node) => `${node.zoneId}:${node.type}:${Math.floor(node.pos.z / 180)}`,
+      ),
     );
     const meshes = instancedMeshes(group);
 
@@ -90,12 +94,12 @@ describe('gather node rendering', () => {
     // batches. This is the ?gathercoarse=off A/B arm.
     expect(expectedBatches.size).toBe(69);
     expect(meshes).toHaveLength(69);
-    expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
+    expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(activeGatherNodes().length);
     for (const mesh of meshes) {
       const nodeIds = mesh.userData.gatherNodeIds as string[];
       expect(nodeIds).toHaveLength(mesh.count);
       for (const nodeId of nodeIds) {
-        const node = GATHER_NODES.find((candidate) => candidate.id === nodeId);
+        const node = activeGatherNodes().find((candidate) => candidate.id === nodeId);
         expect(node?.zoneId).toBe(mesh.userData.gatherNodeZoneId);
         expect(node?.type).toBe(mesh.userData.gatherNodeType);
         expect(Math.floor((node?.pos.z ?? 0) / 180)).toBe(mesh.userData.gatherNodeBand);
@@ -124,10 +128,11 @@ describe('gather node rendering', () => {
       for (const [instanceId, nodeId] of nodeIds.entries()) {
         mesh.getMatrixAt(instanceId, matrix);
         position.setFromMatrixPosition(matrix);
-        const node = GATHER_NODES.find((candidate) => candidate.id === nodeId);
+        const node = activeGatherNodes().find((candidate) => candidate.id === nodeId);
         expect(node).toBeDefined();
         if (!node) continue;
-        expect(position.x).toBe(node.pos.x);
+        // Instance translations store float32, including fractional authored moves.
+        expect(position.x).toBe(Math.fround(node.pos.x));
         // 5 decimal places, not 6: the instance matrix stores float32, whose
         // quantum at double-digit heights (~2e-6) already exceeds a 5e-7
         // tolerance; which side of it a node lands on depends on the exact
@@ -138,7 +143,7 @@ describe('gather node rendering', () => {
             (nodeTierScale(node.tier) - 1) * templateMinY,
           5,
         );
-        expect(position.z).toBe(node.pos.z);
+        expect(position.z).toBe(Math.fround(node.pos.z));
         expect(
           gatherNodeIdFromIntersection({
             distance: 0,
@@ -151,7 +156,7 @@ describe('gather node rendering', () => {
       }
     }
 
-    expect(seenIds).toEqual(new Set(GATHER_NODES.map((node) => node.id)));
+    expect(seenIds).toEqual(new Set(activeGatherNodes().map((node) => node.id)));
   });
 
   it('preserves a complete authored child transform and bounds every instance', () => {

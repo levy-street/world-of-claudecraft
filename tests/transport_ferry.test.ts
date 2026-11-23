@@ -52,6 +52,7 @@ const ARRIVE_FAR = T.docked + VOYAGE_EAST;
 const DEPART_FAR = ARRIVE_FAR + T.docked;
 const CYCLE = transportCycleSeconds(ROUTE);
 const DECK = WATER_LEVEL + HULL.mainDeckY;
+const GANGWAY_Z = 0.8;
 
 function berthPose(i: 0 | 1) {
   const b = ROUTE.berths[i];
@@ -89,6 +90,13 @@ function place(e: Entity, x: number, y: number, z: number): void {
 
 function placeOnDeck(e: Entity, berth: 0 | 1, lx: number, lz: number): void {
   const at = shipToWorld(berthPose(berth), lx, lz);
+  place(e, at.x, DECK, at.z);
+}
+
+function placeOnSailingDeck(sim: Sim, e: Entity, lx: number, lz: number): void {
+  const pose: TransportPose = { x: 0, z: 0, rot: 0 };
+  transportShipPoseAt(ROUTE, transportClock(sim.ctx), pose);
+  const at = deckToWorld(pose, lx, lz, { x: 0, z: 0 });
   place(e, at.x, DECK, at.z);
 }
 
@@ -204,6 +212,32 @@ describe('the timetable (pure)', () => {
     transportShipPoseAt(ROUTE, CYCLE - 1e-6, p);
     expect(p.x).toBeCloseTo(EAST.x, 3);
     expect(Math.cos(p.rot - EAST.rot)).toBeCloseTo(1, 6);
+  });
+
+  it('knocks passengers across the sailing deck using the deck as footing', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'shaman' });
+    const targetPid = sim.addPlayer('mage', 'Deckhand', { tutorialGreetingSent: true });
+    setClock(sim, DEPART_EAST + 10);
+    sim.tick();
+    const source = sim.entities.get(sim.playerId);
+    const target = sim.entities.get(targetPid);
+    if (!source || !target) throw new Error('missing ferry knockback players');
+    placeOnSailingDeck(sim, source, -2, GANGWAY_Z);
+    placeOnSailingDeck(sim, target, 1, GANGWAY_Z);
+    const before = deckSpot(sim, target);
+
+    const moved = (
+      sim as unknown as {
+        applyKnockback(source: Entity, target: Entity, distance: number): number;
+      }
+    ).applyKnockback(source, target, 2);
+    const after = deckSpot(sim, target);
+
+    expect(moved).toBeGreaterThan(0);
+    expect(after.x).toBeGreaterThan(before.x + 1);
+    expect(after.z).toBeCloseTo(before.z, 3);
+    expect(target.pos.y).toBeCloseTo(DECK, 6);
+    expect(target.onGround).toBe(true);
   });
 });
 

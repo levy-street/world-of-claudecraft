@@ -256,7 +256,7 @@ describe('the cast, authoritative', () => {
     const carrier = views.find((cue) => cue.variant === 'frost-iceage');
     const pillars = views.filter((cue) => cue.variant === 'frost-pillar');
     expect(carrier).toBeDefined();
-    expect(pillars).toHaveLength(icePillarCount(1, HOARD_RARITY_PRESSURE.rare.extra));
+    expect(pillars).toHaveLength(icePillarCount(5, HOARD_RARITY_PRESSURE.rare.extra));
     for (const pillar of pillars) {
       expect(pillar.total).toBe(carrier?.total);
       expect(pillar.radius).toBe(ICE_AGE.pillarRadius);
@@ -274,10 +274,10 @@ describe('the cast, authoritative', () => {
     ).toHaveLength(1);
   });
 
-  it('a legendary hoard gives a lone player a single pillar and a shorter cast', () => {
+  it('a legendary hoard keeps two pillars and its shorter cast even for one entrant', () => {
     const entry = encounter('legendary');
     const { carrier, pillars } = cast(entry);
-    expect(pillars).toHaveLength(1);
+    expect(pillars).toHaveLength(2);
     expect(carrier.total).toBeCloseTo(iceAgeTotalSec(HOARD_RARITY_PRESSURE.legendary.speed), 9);
     expect(carrier.total).toBeLessThan(iceAgeTotalSec(1));
   });

@@ -12,6 +12,7 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { DUNGEON_LIST } from '../src/sim/data';
 import { dungeonText } from '../src/ui/entity_display_core';
 import { ensureLocaleLoaded, formatNumber, setLanguage, t } from '../src/ui/i18n';
+import { localizeRiftPlaceName } from '../src/ui/rift_text_i18n';
 import { localizeSystemText } from '../src/ui/system_text_i18n';
 
 // Non-en tables are lazy: the dense zh_CN table has to be resident before the
@@ -23,6 +24,18 @@ beforeAll(async () => {
 afterEach(() => setLanguage('en'));
 
 describe('localizeSystemText', () => {
+  it('localizes the hoard name in the standard five-player warning', () => {
+    setLanguage('zh_CN');
+    const name = 'Spore Hollow Buried Hoard';
+    const line = `${name} is meant for a full party of 5. Tread carefully.`;
+    expect(localizeSystemText(line)).toBe(
+      t('worldContent.dungeonPartyWarning', {
+        name: localizeRiftPlaceName(name)!,
+        count: formatNumber(5),
+      }),
+    );
+    expect(localizeSystemText(line)).not.toContain(name);
+  });
   it('turns an exact system line into its key', () => {
     setLanguage('zh_CN');
     const out = localizeSystemText('You stand up.');

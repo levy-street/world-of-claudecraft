@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'A Bacia de Wildheart',
-    desc: 'Armas marcantes de Zulgar e do Mestre de Feras Senhor das Presas.',
+    desc: 'Armas características do Mestre das Feras Senhor das Presas, da Flor Devoradora e de Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroico: A Bacia de Wildheart',
-    desc: 'Épicos exclusivos do modo heroico de Zulgar, Voz da Bacia.',
+    desc: 'Épicos e berloques exclusivos do heroico do Mestre das Feras Senhor das Presas, da Flor Devoradora e de Zulgar, Voz da Bacia.',
   },
   conquerors_nythraxis: {
     name: 'Raide de Nythraxis',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, o Pico Desperto',
     desc: 'Espólios épicos pessoais do chefe mundial do Pico Desperto.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, o Capataz Enterrado',
+    desc: 'Espólios arrastados de volta dos túmulos de Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'O Relicário Desmoronado',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galeria de Guerra',
-    desc: 'Os cinco kits de batalha de Guerra, conquistados peça por peça com honra.',
+    desc: 'Os cinco kits de batalha de Guerra da primeira temporada, agora vendidos peça por peça por ouro.',
   },
   conquerors_warfare_armory: {
     name: 'Arsenal de Guerra',
-    desc: 'Joias e armas de Guerra compradas com honra suada.',
+    desc: 'Joias, armas e mercadorias de Guerra compradas com honra suada.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galeria da Vanguarda',

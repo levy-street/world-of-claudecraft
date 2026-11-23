@@ -1,12 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActionBarLayoutUploader } from '../src/net/action_bar_upload';
-import { ITEMS } from '../src/sim/data';
-import type { PlayerClass } from '../src/sim/types';
+import {
+  classSpecs,
+  rowTreeFor,
+  type TalentAllocation,
+  talentsFor,
+} from '../src/sim/content/talents';
+import { abilitiesKnownAt, ITEMS } from '../src/sim/data';
+import { MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 import {
   ACTION_BAR_ABILITY_SLOTS,
   ActionBarController,
 } from '../src/ui/hud/action_bar/action_bar_controller';
-import type { HotbarAction } from '../src/ui/hud/action_bar/hotbar';
+import {
+  type HotbarAction,
+  isAbilityActionBarEligible,
+  loadoutGrantedAbilityIds,
+  loadoutKnownAbilityIds,
+} from '../src/ui/hud/action_bar/hotbar';
 import type { ActionBarLayoutSave } from '../src/world_api/action_bar';
 
 class MemoryStorage {
@@ -29,6 +40,7 @@ interface MutableState {
   known: string[];
   level: number;
   spec: string | null;
+  alloc: TalentAllocation | null;
   auras: string[];
   showAttackButton: boolean;
 }
@@ -56,6 +68,7 @@ function makeHarness(
     known: [...known],
     level: 20,
     spec: null,
+    alloc: null,
     auras: [],
     showAttackButton: true,
   };
@@ -65,6 +78,7 @@ function makeHarness(
     playerName: 'ActionbarTester',
     playerLevel: () => state.level,
     talentSpec: () => state.spec,
+    talentAllocation: () => state.alloc ?? { spec: state.spec, rows: {} },
     knownAbilityIds: () => state.known,
     hasAura: (kind) => state.auras.includes(kind),
     showAttackButton: () => state.showAttackButton,
@@ -726,6 +740,7 @@ function persistHarness(profile?: 'desktop' | 'touch'): {
     playerName: 'ActionbarTester',
     playerLevel: () => 20,
     talentSpec: () => null,
+    talentAllocation: () => ({ spec: null, rows: {} }),
     knownAbilityIds: () => ['heroic_strike', 'sunder_armor'],
     hasAura: () => false,
     showAttackButton: () => true,
@@ -775,6 +790,7 @@ describe('ActionBarController persistence seam', () => {
       playerName: 'ActionbarTester',
       playerLevel: () => 20,
       talentSpec: () => null,
+      talentAllocation: () => ({ spec: null, rows: {} }),
       knownAbilityIds: () => ['heroic_strike'],
       hasAura: () => false,
       showAttackButton: () => true,
@@ -940,6 +956,7 @@ describe('ActionBarController mid-session surface flip (Interface Mode)', () => 
       playerName: 'ActionbarTester',
       playerLevel: () => 20,
       talentSpec: () => null,
+      talentAllocation: () => ({ spec: null, rows: {} }),
       knownAbilityIds: () => ['heroic_strike', 'sunder_armor'],
       hasAura: () => false,
       showAttackButton: () => true,
@@ -1154,15 +1171,17 @@ describe('ActionBarController + ActionBarLayoutUploader across a surface flip', 
     let touch = false;
     const storage = new MemoryStorage();
     const sent: { profile: string; slot0: unknown }[] = [];
-    const uploader = new ActionBarLayoutUploader((command) =>
-      sent.push({ profile: command.profile, slot0: command.layout.forms.normal?.bar[0] }),
-    );
+    const uploader = new ActionBarLayoutUploader((command) => {
+      sent.push({ profile: command.profile, slot0: command.layout.forms.normal?.bar[0] });
+      return true;
+    });
     const controller = new ActionBarController({
       storage,
       playerClass: 'warrior',
       playerName: 'ActionbarTester',
       playerLevel: () => 20,
       talentSpec: () => null,
+      talentAllocation: () => ({ spec: null, rows: {} }),
       knownAbilityIds: () => ['heroic_strike', 'sunder_armor'],
       hasAura: () => false,
       showAttackButton: () => true,
@@ -1239,13 +1258,10 @@ describe('isHotbarItemId: Field Kit (Intentional Gathering, use.type harvestPref
     expect(controller.isHotbarItemId('field_kit')).toBe(true);
   });
 
-  it('preserves the recipe/consumable-pattern exclusion: a one-shot recipe pattern stays unplaceable', () => {
+  it('admits consumable recipe patterns alongside the field kit', () => {
     const { controller } = makeHarness('warrior', [], []);
-    // Guard the guard: the exclusion below must fail on a widened
-    // isHotbarItemId, never pass because the content id quietly stopped
-    // existing or stopped being kind:'recipe'.
     expect(ITEMS.pattern_spiritweld_girdle?.kind).toBe('recipe');
-    expect(controller.isHotbarItemId('pattern_spiritweld_girdle')).toBe(false);
+    expect(controller.isHotbarItemId('pattern_spiritweld_girdle')).toBe(true);
   });
 
   it('routes a field kit drag through the assignable-action path like a gathering tool', () => {
@@ -1296,6 +1312,29 @@ describe('isHotbarItemId: elixirs are placeable like potions', () => {
     expect(controller.isAssignableAction({ type: 'item', id: 'elixir_of_the_bear' })).toBe(true);
     expect(controller.keepsStoredItemId('elixir_of_the_bear')).toBe(true);
     expect(controller.isAssignableAction({ type: 'item', id: 'copper_ore' })).toBe(false);
+  });
+});
+
+describe('isHotbarItemId: allied faction rewards, toys, and usable tools (#4244)', () => {
+  it('admits faction rewards, banner, and glider to the hotbar', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    const factionToolIds = [
+      'dawn_battle_standard',
+      'rift_feather_glider',
+      'clockwork_target_dummy',
+      'clockwork_shock_bomb',
+      'allied_hearthstone',
+      'dense_sharpening_stone',
+      'reinforced_armor_kit',
+    ];
+    for (const id of factionToolIds) {
+      expect(controller.isHotbarItemId(id), `${id} should be hotbar placeable`).toBe(true);
+      expect(
+        controller.isAssignableAction({ type: 'item', id }),
+        `${id} should be assignable action`,
+      ).toBe(true);
+      expect(controller.keepsStoredItemId(id), `${id} should keep stored item id`).toBe(true);
+    }
   });
 });
 
@@ -1471,6 +1510,7 @@ describe('ActionBarController while spectating (/spectate, /unspectate)', () => 
       playerName: 'ActionbarTester',
       playerLevel: () => 20,
       talentSpec: () => state.spec,
+      talentAllocation: () => ({ spec: state.spec, rows: {} }),
       knownAbilityIds: () => state.known,
       hasAura: () => false,
       showAttackButton: () => true,
@@ -1549,6 +1589,7 @@ describe('ActionBarController mutators while spectating', () => {
       playerName: 'ActionbarTester',
       playerLevel: () => 20,
       talentSpec: () => null,
+      talentAllocation: () => ({ spec: null, rows: {} }),
       knownAbilityIds: () => state.known,
       hasAura: () => false,
       showAttackButton: () => true,
@@ -1589,5 +1630,249 @@ describe('ActionBarController mutators while spectating', () => {
     expect(controller.removeAbility('charge')).toBe(true);
     expect(controller.actions.some((action) => action?.id === 'charge')).toBe(false);
     expect(persisted.length).toBeGreaterThan(0);
+  });
+});
+
+// Spec-granted spells and the per-spec bars. When a spec's bar is first loaded
+// it is seeded from the unsuffixed (pre-spec) key, and that copy reads as a
+// "stored" bar, so the first sync never auto-placed the spec's own signature or
+// choice-row spells onto it: the reported "spec spells missing after a spec
+// switch", and any build saved from that bar recorded none of them either.
+// The load path now places exactly the spec's granted spells once, and
+// applyLoadout heals a saved build that lacks them.
+describe('spec-granted spells: legacy-seeded spec bars and saved builds', () => {
+  const level = MAX_LEVEL;
+  const specs = classSpecs('warlock');
+  const allocA: TalentAllocation = { spec: specs[0], rows: {} };
+  const targetKnown = loadoutKnownAbilityIds('warlock', allocA, level);
+  const grantedA = [...loadoutGrantedAbilityIds('warlock', allocA, level)];
+  const baseKnown = abilitiesKnownAt('warlock', level)
+    .filter((known) => isAbilityActionBarEligible(known.def))
+    .map((known) => known.def.id);
+  const abilityIds = (actions: readonly HotbarAction[]): (string | null)[] =>
+    actions.map((action) => (action?.type === 'ability' ? action.id : null));
+  const legacyKey = 'woc_hotbar_warlock_ActionbarTester';
+  const specKey = `${legacyKey}_${specs[0]}`;
+
+  it('fixture: a warlock spec grants at least one bar-eligible spell of its own', () => {
+    expect(specs.length).toBeGreaterThanOrEqual(2);
+    expect(grantedA.length).toBeGreaterThan(0);
+    for (const id of grantedA) expect(baseKnown).not.toContain(id);
+  });
+
+  function legacyBarWithout(removedBase: string): HotbarAction[] {
+    return bar(...baseKnown.filter((id) => id !== removedBase && targetKnown.has(id)));
+  }
+
+  it("places the spec's granted spells once when its bar is seeded from the legacy key", () => {
+    const removedBase = baseKnown.find((id) => targetKnown.has(id) && !grantedA.includes(id));
+    if (!removedBase) throw new Error('fixture needs a base spell the spec keeps');
+    const storage = new MemoryStorage();
+    storage.setItem(legacyKey, JSON.stringify(legacyBarWithout(removedBase)));
+    const { controller, state } = makeHarness('warlock', [...targetKnown], bar(), storage);
+    state.level = level;
+    state.spec = specs[0];
+    controller.init();
+    expect(storage.getItem(specKey), 'seeded from the legacy key').not.toBeNull();
+    controller.syncKnownAbilities();
+    const after = abilityIds(controller.actions);
+    for (const id of grantedA) expect(after, `${id} placed on the seeded spec bar`).toContain(id);
+    // Not the "fresh bar" path: a base spell the legacy copy lacked stays off.
+    expect(after).not.toContain(removedBase);
+  });
+
+  it('trusts an existing per-spec bar: a signature the player took off stays off', () => {
+    const storage = new MemoryStorage();
+    storage.setItem(specKey, JSON.stringify(bar(...baseKnown.filter((id) => targetKnown.has(id)))));
+    const { controller, state } = makeHarness('warlock', [...targetKnown], bar(), storage);
+    state.level = level;
+    state.spec = specs[0];
+    controller.init();
+    controller.syncKnownAbilities();
+    const after = abilityIds(controller.actions);
+    for (const id of grantedA) expect(after).not.toContain(id);
+  });
+
+  it('applyLoadout heals a saved build missing a granted spell and leaves a removed base spell alone', () => {
+    const { controller, state } = makeHarness('warlock', [...targetKnown], bar());
+    state.level = level;
+    state.spec = specs[0];
+    const removedBase = baseKnown.find((id) => targetKnown.has(id) && !grantedA.includes(id));
+    if (!removedBase) throw new Error('fixture needs a base spell the build keeps');
+    // A build saved while the spec bar was still a legacy copy: every base
+    // spell except one the player took off on purpose, no granted spell.
+    const stale = [...targetKnown].filter((id) => id !== removedBase && !grantedA.includes(id));
+    controller.applyLoadout(
+      Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, (_, i) => stale[i] ?? null),
+      allocA,
+    );
+    controller.saveActions();
+    controller.syncKnownAbilities();
+    const after = abilityIds(controller.actions);
+    for (const id of grantedA) expect(after, `${id} healed onto the bar`).toContain(id);
+    expect(after).not.toContain(removedBase);
+  });
+
+  it('applyLoadout returns a granted spell the player took off the build (the stated tradeoff)', () => {
+    const { controller, state } = makeHarness('warlock', [...targetKnown], bar());
+    state.level = level;
+    state.spec = specs[0];
+    const withoutGranted = [...targetKnown].filter((id) => !grantedA.includes(id));
+    controller.applyLoadout(
+      Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, (_, i) => withoutGranted[i] ?? null),
+      allocA,
+    );
+    controller.saveActions();
+    controller.syncKnownAbilities();
+    expect(abilityIds(controller.actions)).toContain(grantedA[0]);
+  });
+
+  it('applyLoadout keeps an item shortcut in a slot the build leaves blank', () => {
+    const { controller, state } = makeHarness('warlock', [...targetKnown], bar());
+    state.level = level;
+    state.spec = specs[0];
+    const withItem = bar();
+    withItem[ACTION_BAR_ABILITY_SLOTS - 1] = { type: 'item', id: 'lesser_healing_potion' };
+    controller.replaceActions(withItem);
+    controller.saveActions();
+    controller.applyLoadout(
+      bar(grantedA[0]).map((action) => action?.id ?? null),
+      allocA,
+    );
+    expect(controller.actions[0]).toEqual({ type: 'ability', id: grantedA[0] });
+    expect(controller.actions[ACTION_BAR_ABILITY_SLOTS - 1]).toEqual({
+      type: 'item',
+      id: 'lesser_healing_potion',
+    });
+  });
+});
+
+// The same heal for a CHOICE-ROW grant (the second source of granted spells),
+// with the expected set derived independently of loadoutGrantedAbilityIds, plus
+// the two lifecycle facts the "once" in the heal's contract rests on: the
+// healed bar is persisted, and the seed flag never leaks onto the next load.
+describe('spec-granted spells: choice-row grants, durability, and the seed flag', () => {
+  const level = MAX_LEVEL;
+  const specs = classSpecs('mage');
+  const spec = specs[0];
+  const signature = talentsFor('mage')?.specs.find((entry) => entry.id === spec)?.signature;
+  // A row with two granting options: the picked one must land, its sibling must not.
+  const grantRow = (rowTreeFor('mage') ?? []).find(
+    (row) => row.options.filter((option) => option.effect.grant?.ability).length >= 2,
+  );
+  const [picked, sibling] = (grantRow?.options ?? []).filter((option) => option.effect.grant);
+  const alloc: TalentAllocation = grantRow
+    ? { spec, rows: { [grantRow.level]: picked.id } }
+    : { spec, rows: {} };
+  const targetKnown = loadoutKnownAbilityIds('mage', alloc, level);
+  const baseKnown = abilitiesKnownAt('mage', level)
+    .filter((known) => isAbilityActionBarEligible(known.def))
+    .map((known) => known.def.id);
+  const abilityIds = (actions: readonly HotbarAction[]): (string | null)[] =>
+    actions.map((action) => (action?.type === 'ability' ? action.id : null));
+  const legacyKey = 'woc_hotbar_mage_ActionbarTester';
+  const specKey = `${legacyKey}_${spec}`;
+  const legacyBar = (): HotbarAction[] =>
+    bar(...baseKnown.filter((id) => targetKnown.has(id) && id !== signature));
+
+  it('fixture: a mage spec has a signature and a row with two granting options', () => {
+    expect(typeof signature).toBe('string');
+    expect(grantRow, 'a mage choice row with two grant options').toBeDefined();
+    expect(picked?.effect.grant?.ability).toBeTruthy();
+    expect(sibling?.effect.grant?.ability).toBeTruthy();
+  });
+
+  it('loadoutGrantedAbilityIds is exactly the signature plus the picked row grant', () => {
+    const rowGrant = picked?.effect.grant?.ability;
+    if (!signature || !rowGrant) throw new Error('fixture');
+    expect([...loadoutGrantedAbilityIds('mage', alloc, level)].sort()).toEqual(
+      [signature, rowGrant].sort(),
+    );
+  });
+
+  it('places the signature and the picked row grant on a legacy-seeded spec bar, not the sibling', () => {
+    const rowGrant = picked?.effect.grant?.ability;
+    const siblingGrant = sibling?.effect.grant?.ability;
+    if (!signature || !rowGrant || !siblingGrant) throw new Error('fixture');
+    const storage = new MemoryStorage();
+    storage.setItem(legacyKey, JSON.stringify(legacyBar()));
+    const { controller, state } = makeHarness('mage', [...targetKnown], bar(), storage);
+    state.level = level;
+    state.spec = spec;
+    state.alloc = alloc;
+    controller.init();
+    controller.syncKnownAbilities();
+    const after = abilityIds(controller.actions);
+    expect(after).toContain(signature);
+    expect(after).toContain(rowGrant);
+    expect(after).not.toContain(siblingGrant);
+    // applyLoadout heals the row grant the same way.
+    const stale = [...targetKnown].filter((id) => id !== rowGrant);
+    controller.applyLoadout(
+      Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, (_, i) => stale[i] ?? null),
+      alloc,
+    );
+    controller.saveActions();
+    controller.syncKnownAbilities();
+    expect(abilityIds(controller.actions)).toContain(rowGrant);
+  });
+
+  it('persists the healed spec bar, and a later removal of the signature sticks', () => {
+    if (!signature) throw new Error('fixture');
+    const storage = new MemoryStorage();
+    storage.setItem(legacyKey, JSON.stringify(legacyBar()));
+    const first = makeHarness('mage', [...targetKnown], bar(), storage);
+    first.state.level = level;
+    first.state.spec = spec;
+    first.state.alloc = alloc;
+    first.controller.init();
+    first.controller.syncKnownAbilities();
+    expect(JSON.stringify(storage.getItem(specKey))).toContain(signature);
+    // A reload trusts the stored spec bar and keeps the healed spell.
+    const second = makeHarness('mage', [...targetKnown], bar(), storage);
+    second.state.level = level;
+    second.state.spec = spec;
+    second.state.alloc = alloc;
+    second.controller.init();
+    second.controller.syncKnownAbilities();
+    expect(abilityIds(second.controller.actions)).toContain(signature);
+    // The player takes it off: the next load must not heal it back.
+    second.controller.replaceActions(
+      second.controller.actions.map((action) => (action?.id === signature ? null : action)),
+    );
+    second.controller.saveActions();
+    const third = makeHarness('mage', [...targetKnown], bar(), storage);
+    third.state.level = level;
+    third.state.spec = spec;
+    third.state.alloc = alloc;
+    third.controller.init();
+    third.controller.syncKnownAbilities();
+    expect(abilityIds(third.controller.actions)).not.toContain(signature);
+  });
+
+  it('a legacy seed for one spec never heals the next spec loaded before a sync', () => {
+    const other = specs[1];
+    const otherSignature = talentsFor('mage')?.specs.find((entry) => entry.id === other)?.signature;
+    if (!signature || !otherSignature) throw new Error('fixture');
+    const otherAlloc: TalentAllocation = { spec: other, rows: {} };
+    const otherKnown = loadoutKnownAbilityIds('mage', otherAlloc, level);
+    const storage = new MemoryStorage();
+    storage.setItem(legacyKey, JSON.stringify(legacyBar()));
+    // The other spec already has a bar of its own, with its signature taken off.
+    storage.setItem(
+      `${legacyKey}_${other}`,
+      JSON.stringify(bar(...baseKnown.filter((id) => otherKnown.has(id) && id !== otherSignature))),
+    );
+    const { controller, state } = makeHarness('mage', [...targetKnown], bar(), storage);
+    state.level = level;
+    state.spec = spec;
+    state.alloc = alloc;
+    controller.init(); // seeds `spec` from the legacy key (flag armed)
+    state.spec = other;
+    state.alloc = otherAlloc;
+    state.known = [...otherKnown];
+    expect(controller.syncSpec()).toBe(true); // loads the other spec's own bar
+    controller.syncKnownAbilities();
+    expect(abilityIds(controller.actions)).not.toContain(otherSignature);
   });
 });

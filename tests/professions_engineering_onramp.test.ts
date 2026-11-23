@@ -300,12 +300,13 @@ describe('engineering on-ramp: the gadget honors masterwrought R14 and R23', () 
     expect(HEROIC_VENDOR_STOCK.filter((o) => offhandIds.has(o.itemId))).toEqual([]);
     expect(FURY_STOCK.filter((id) => offhandIds.has(id))).toEqual([]);
     // Positive controls keep every field and table live: some shipped item
-    // really carries buyValue, the honor stock really carries priceHonor
+    // really carries buyValue, the Warfare counter really carries priced
     // rows, and ALL THREE counters are populated (the NPC control matters:
     // without it the not-contains arms above would pass over a world whose
     // vendors quietly stopped stocking anything).
     expect(Object.values(ITEMS).some((d) => (d.buyValue ?? 0) > 0)).toBe(true);
-    expect(FURY_STOCK.some((id) => (ITEMS[id]?.priceHonor ?? 0) > 0)).toBe(true);
+    // Season 1 (FURY_STOCK) sells for gold since 2026-10-02; the counter stays priced.
+    expect(FURY_STOCK.some((id) => (ITEMS[id]?.buyValue ?? 0) > 0)).toBe(true);
     expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
     expect(Object.values(NPCS).flatMap((npc) => npc.vendorItems ?? []).length).toBeGreaterThan(0);
   });

@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Vildhjertebassinet',
-    desc: 'Kendetegnende våben fra Zulgar og Hugtandherre Bæstmester.',
+    desc: 'Signaturvåben fra Hugtandsherren bæstmesteren, Frådseblomsten og Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisk: Vildhjertebassinet',
-    desc: 'Episke genstande kun fra heroisk tilstand, fra Zulgar, Bassinets Stemme.',
+    desc: 'Episke genstande og smykker kun fra heroisk, fra Hugtandsherren bæstmesteren, Frådseblomsten og Zulgar, bassinets stemme.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, den Vågnende Tinde',
     desc: 'Personligt episk bytte fra den Vågnende Tindes verdensboss.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, den Begravede Formand',
+    desc: 'Bytte slæbt op af gravhøjene i Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Det Sammenstyrtede Relikvarium',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Krigsførelsesgalleri',
-    desc: 'De fem kampsæt til Krigsførelse, optjent stykke for stykke med ære.',
+    desc: 'De fem Krigsførelses kampsæt fra den første sæson, nu solgt stykke for stykke for guldmønter.',
   },
   conquerors_warfare_armory: {
     name: 'Krigsførelsens våbenkammer',
-    desc: 'Smykker og våben til Krigsførelse, købt for hårdt vundet ære.',
+    desc: 'Smykker, våben og varer til Krigsførelse, købt for hårdt vundet ære.',
   },
   conquerors_vanguard_gallery: {
     name: 'Fortropsgalleri',

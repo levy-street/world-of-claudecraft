@@ -5,7 +5,9 @@
 // rider's own mount away instead, the way the delivery cargo pickup already does
 // through forceDismount, so the instructor answers on the first click. Only a
 // vehicle seat or a live mount race still refuses: neither is the player's own
-// mount to dismiss, and both own the player's controls until they end.
+// mount to dismiss, and both own the player's controls until they end. The
+// Fenbridge accusation (world_quest_investigation.ts) is an instructor start too:
+// it summons the infiltrator, so it puts the mount away through this same gate.
 //
 // Pure over the SimContext seam: no rng, no clock, host-agnostic.
 

@@ -1,3 +1,4 @@
+import type { CourierDispatchRequest, CourierInfo } from '../sim/courier';
 import type { MaterialSourceTransferSelection } from '../sim/material_source_transfer_selection';
 import type { InvSlot } from '../sim/types';
 import type { WeeklyRewardInfo } from '../sim/weekly_rewards';
@@ -103,9 +104,23 @@ export interface VaultSpecialRef {
 }
 
 export interface IWorldBank {
+  readonly courierInfo: CourierInfo | null;
+  courierDispatch(request: CourierDispatchRequest): void;
+  readonly accountBankInfo: AccountBankInfo | null;
+  /** openFirst: open the remembered (or first) character's bank once the roster lands. */
+  requestAccountBanks(openFirst?: boolean): void;
+  selectAccountBank(characterId: number): void;
+  accountBankTransfer(
+    characterId: number,
+    direction: 'deposit' | 'withdraw',
+    slotIndex: number,
+    count?: number,
+    expectedSlot?: InvSlot,
+  ): void;
   readonly weeklyRewardInfo: WeeklyRewardInfo | null;
   claimWeeklyReward(choice: string): void;
   openWeeklyReward(choice: string, table?: string | readonly string[]): void;
+  setWeeklyLootSpec(spec: string | null): void;
   // Non-null only while standing at a banker NPC.
   bankInfo: BankInfo | null;
   // Copper- and Claudium-bought ladder slots on the CALLER'S OWN character,
@@ -188,4 +203,12 @@ export interface IWorldBank {
   // client-side send gate agrees with the sim's admission gate in BOTH hosts;
   // owner-only on the wire, never part of the entity broadcast.
   craftVaultStock: Record<string, number> | null;
+}
+
+/** Deliberately requested account view; only the selected character's bank is loaded. */
+export interface AccountBankInfo {
+  characters: { characterId: number; name: string }[];
+  selectedCharacterId: number | null;
+  bank: BankInfo | null;
+  error?: string;
 }

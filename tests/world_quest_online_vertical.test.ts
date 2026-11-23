@@ -42,6 +42,8 @@ import { solveDailyMatch3Level } from '../src/sim/world_quest_daily_generation';
 import { resolveWorldQuestMatch3Level } from '../src/sim/world_quest_daily_levels';
 import { hasWorldQuestDeliveryCargo } from '../src/sim/world_quest_delivery';
 import { applyWorldQuestMatch3Move } from '../src/sim/world_quest_match3';
+import { buildWorldQuestRailView } from '../src/ui/hud/map/world_quest_rail_view';
+import { broadcast } from './helpers/bare_client';
 import { joinGroundTruthCharacter, teleportEntity } from './helpers/movement_ground_truth';
 
 class CapturingWebSocket {
@@ -71,6 +73,112 @@ describe('online world-quest command path', () => {
   afterEach(() => {
     CapturingWebSocket.instances = [];
     vi.unstubAllGlobals();
+  });
+
+  it('synchronizes a confection win and keeps the earned daily complete during practice', async () => {
+    vi.stubGlobal('WebSocket', CapturingWebSocket);
+    const joined = joinGroundTruthCharacter(84);
+    const quest = WORLD_QUESTS_BY_ID.wq_palmreach_confections;
+    if (quest.objective.type !== 'match3') throw new Error('Expected confection fixture');
+    expect(quest.count).toBe(72);
+    const activationObjectItemId = quest.objective.activationObjectItemId;
+    const player = joined.server.sim.entities.get(joined.pid);
+    if (!player) throw new Error('Missing joined player');
+    joined.server.sim.setPlayerLevel(20, joined.pid);
+    joined.server.sim.resetDay = '2026-08-31';
+    teleportEntity(player, quest.area.x, quest.area.z, joined.server.sim.cfg.seed);
+    joined.server.sim.ctx.rebucket(player);
+    joined.server.sim.tick();
+    const activator = [...joined.server.sim.entities.values()].find(
+      (entity) => entity.objectItemId === activationObjectItemId,
+    );
+    if (!activator) throw new Error('Missing confection game box');
+    teleportEntity(player, activator.pos.x, activator.pos.z, joined.server.sim.cfg.seed);
+    joined.server.sim.ctx.rebucket(player);
+
+    const client = new ClientWorld('token', 84, 'warrior', 'http://localhost');
+    const socket = CapturingWebSocket.instances[0];
+    const wire = client as unknown as { onMessage(raw: string): void };
+    wire.onMessage(JSON.stringify({ t: 'hello', pid: joined.pid, seed: 42 }));
+    socket.sent.length = 0;
+    let delivered = 0;
+    const sync = () => {
+      broadcast(joined.server);
+      for (const raw of joined.client.sent.slice(delivered)) {
+        if ((JSON.parse(raw) as { t?: string }).t === 'snap') wire.onMessage(raw);
+      }
+      delivered = joined.client.sent.length;
+    };
+    const open = client.pickUpObject(activator.id);
+    const openFrame = socket.sent.pop();
+    if (!openFrame) throw new Error('Client did not send activation command');
+    joined.server.handleMessage(joined.session, openFrame);
+    const outcome = joined.client.sent
+      .map((raw) => JSON.parse(raw) as { t?: string })
+      .reverse()
+      .find((frame) => frame.t === 'commandOutcome');
+    if (!outcome) throw new Error('Missing activation outcome');
+    wire.onMessage(JSON.stringify(outcome));
+    expect(await open).toBe(true);
+    sync();
+
+    const progress = joined.server.sim.meta(joined.pid)?.worldQuestLog.get(quest.id);
+    if (!progress) throw new Error('Missing confection progress');
+    const level = resolveWorldQuestMatch3Level(quest, progress);
+    if (!level) throw new Error('Missing confection level');
+    const moves = solveDailyMatch3Level(level);
+    if (!moves) throw new Error('Confection level has no solution');
+    for (const [from, to] of moves) {
+      client.swapWorldQuestMatch3Tiles(quest.id, from, to);
+      const frame = socket.sent.pop();
+      if (!frame) throw new Error('Client did not send match-three swap');
+      joined.server.handleMessage(joined.session, frame);
+      sync();
+    }
+    expect(joined.server.sim.meta(joined.pid)?.worldQuestLog.get(quest.id)?.state).toBe(
+      'completed',
+    );
+    expect(joined.server.sim.meta(joined.pid)?.worldQuestLog.get(quest.id)?.count).toBe(72);
+    expect(client.worldQuestLog.get(quest.id)?.state).toBe('completed');
+    expect(client.worldQuestLog.get(quest.id)?.count).toBe(72);
+
+    // Reopening the box begins a non-paying practice game on the authority.
+    const reopen = client.pickUpObject(activator.id);
+    const reopenFrame = socket.sent.pop();
+    if (!reopenFrame) throw new Error('Client did not send practice activation command');
+    joined.server.handleMessage(joined.session, reopenFrame);
+    const reopenOutcome = joined.client.sent
+      .map((raw) => JSON.parse(raw) as { t?: string })
+      .reverse()
+      .find((frame) => frame.t === 'commandOutcome');
+    if (!reopenOutcome) throw new Error('Missing practice activation outcome');
+    wire.onMessage(JSON.stringify(reopenOutcome));
+    expect(await reopen).toBe(true);
+    expect(joined.server.sim.meta(joined.pid)?.worldQuestLog.get(quest.id)?.practiceOnly).toBe(
+      true,
+    );
+    // The live loop routes sim events before broadcasting, marking the owner's heavy snapshot dirty.
+    (
+      joined.server as unknown as {
+        routeEvents(events: ReturnType<typeof joined.server.sim.drainEvents>): void;
+      }
+    ).routeEvents(joined.server.sim.drainEvents());
+    sync();
+    expect(client.worldQuestLog.get(quest.id)).toMatchObject({
+      state: 'active',
+      count: 0,
+      practiceOnly: true,
+    });
+    const board = buildWorldQuestRailView({
+      worldQuestCycle: client.worldQuestCycle,
+      worldQuestLog: client.worldQuestLog,
+      worldQuestExpiresAtMs: client.worldQuestExpiresAtMs,
+      playerLevel: 20,
+      selectedWorldQuestId: quest.id,
+      canReroll: (id) => client.canRerollWorldQuest(id),
+    });
+    expect(board.rows.find((row) => row.questId === quest.id)?.state).toBe('completed');
+    expect(board.reroll.reason).toBe('completed');
   });
 
   it('carries pickup, delivery, match-three swap/reset, and beam rotation through the online stack', async () => {

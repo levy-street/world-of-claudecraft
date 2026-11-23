@@ -83,6 +83,8 @@ function makeWindow(state: WorldState, opts: { peek?: boolean } = {}): Harness {
         setActiveBorder,
         deedsRarity: async () => null,
         deedsRecent: async () => null,
+        entities: new Map(),
+        playerId: 1,
         cfg: { playerClass: 'warrior' },
         player: { name: 'Hero' },
       }) as never,
@@ -231,6 +233,7 @@ describe('Book of Deeds border picker', () => {
     // h3 the group points at), not a second aria-label string.
     expect(el.querySelector('.deeds-titles')?.getAttribute('role')).toBe('group');
     expect(el.querySelector('.deeds-borders')?.getAttribute('role')).toBe('group');
+    // The two ordinary cosmetic groups remain in the Book.
     expect(el.querySelectorAll('.deeds-picker-head').length).toBe(2);
     for (const cls of ['.deeds-titles', '.deeds-borders']) {
       const group = el.querySelector(cls) as HTMLElement;

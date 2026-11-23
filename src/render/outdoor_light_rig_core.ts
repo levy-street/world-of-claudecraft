@@ -3,7 +3,8 @@
 // rig. Pure: no Three, no DOM, no GFX read (the caller passes the profile).
 //
 // Two rigs light the overworld:
-// - The Lambert (low) rig: hemisphere 0.9, sun 2.65, no image-based fill, and
+// - The Lambert (low) rig: hemisphere 1.8, sun 2.25 with readability lighting
+//   (legacy 0.9/2.65 otherwise), no image-based fill, and
 //   the day/night grade is never applied to its lights (the renderer's outdoor
 //   branch returns before grading on the Lambert tier), so its terrain sits at
 //   a permanent full-day fill.
@@ -34,9 +35,47 @@ export const HEMI_INTENSITY_COMPOSER = 0.27;
 export const HEMI_INTENSITY_GRADE = 0.32;
 export const HEMI_INTENSITY_FLAT = 0.4;
 
-/** The Lambert rig's fixed daylight fill and key (never graded). */
+/** Legacy Lambert daylight values, retained for higher-tier terrain compensation. */
 export const LAMBERT_RIG_HEMI_INTENSITY = 0.9;
 export const LAMBERT_RIG_SUN_INTENSITY = 2.65;
+
+export interface LowNightGrade {
+  readonly fog?: string | readonly [number, number, number];
+  readonly nightAmt?: number;
+}
+
+/** The Low preset's clearer fill uses the same light pair and shader programs.
+ * Keep the legacy constants above for higher-tier Lambert terrain compensation.
+ * By day (`nightAmt === 0`) the hemisphere and sun sit at 1.2 / 1.85 so peak
+ * noon does not wash out unshadowed Lambert surfaces; after dark (`nightAmt > 0`),
+ * realms whose night read relies on IBL fill on higher tiers (especially
+ * Drakelands' `ember` sky, which receives a 12.38x night IBL lift on Standard)
+ * get a compensating hemisphere and key lift on the IBL-free Low rig. */
+export function lowHemiIntensity(
+  profile: { readonly lowReadabilityLighting: boolean },
+  grade?: LowNightGrade,
+  biomeOverride?: string,
+): number {
+  if (!profile.lowReadabilityLighting) return LAMBERT_RIG_HEMI_INTENSITY;
+  const n = Math.max(0, Math.min(1, grade?.nightAmt ?? 0));
+  const biome = biomeOverride ?? (typeof grade?.fog === 'string' ? grade.fog : undefined);
+  const darkRealm =
+    biome === 'ember' || biome === 'volcano' || biome === 'hollow' || biome === 'marsh';
+  return 1.2 * (1 + n * (darkRealm ? 0.95 : 0.45));
+}
+
+export function lowSunIntensity(
+  profile: { readonly lowReadabilityLighting: boolean },
+  grade?: LowNightGrade,
+  biomeOverride?: string,
+): number {
+  if (!profile.lowReadabilityLighting) return LAMBERT_RIG_SUN_INTENSITY;
+  const n = Math.max(0, Math.min(1, grade?.nightAmt ?? 0));
+  const biome = biomeOverride ?? (typeof grade?.fog === 'string' ? grade.fog : undefined);
+  const darkRealm =
+    biome === 'ember' || biome === 'volcano' || biome === 'hollow' || biome === 'marsh';
+  return 1.85 * (1 + n * (darkRealm ? 0.65 : 0.25));
+}
 
 /** Hemisphere intensity the standard-materials rig runs at for `profile`. */
 export function hemiOutdoorIntensity(

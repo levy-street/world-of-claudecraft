@@ -155,11 +155,25 @@ describe('unwalkable slope movement gates', () => {
     meta.moveInput.forward = true;
     meta.moveInput.jump = true;
     sim.player.facing = WEST;
+    // The crest was surveyed along THIS z line only, so the gate is asserted
+    // while the body is still on it. The swept solver slides along a face far
+    // better than the old resolver did, and over a minute of jump-spam the
+    // player works ~25yd down the rim to a low z where the border is open
+    // water rather than wall - leaving the corridor, not climbing it. The
+    // invariant that matters (the wall is never scaled) is pinned separately
+    // by the crest-height check below.
+    let peakY = -Infinity;
     for (let i = 0; i < 20 * 60; i++) {
       sim.tick();
+      if (Math.abs(sim.player.pos.z - z) < 3) {
+        expect(sim.player.pos.x, `tick ${i}: crossed the rim crest`).toBeGreaterThan(xCrest);
+        peakY = Math.max(peakY, sim.player.pos.y);
+      }
       expect(sim.player.pos.y, `tick ${i}: climbed to the rim crest height`).toBeLessThan(hCrest);
       expect(sim.player.climb, `tick ${i}: laddered the rim with a ledge climb`).toBeFalsy();
     }
+    // Never got on top of the rim: jump-spam gains no altitude on the face.
+    expect(peakY).toBeLessThan(terrainHeight(xCrest, z, SEED));
   });
 
   it('slides downhill off unwalkably steep ground', () => {

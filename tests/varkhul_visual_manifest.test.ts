@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { npcLookFor } from '../src/render/characters/npc_looks';
 import { IGNIVAR_RAID_ENVIRONMENT } from '../src/render/ignivar_raid_environment';
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../src/sim/mob/dungeon_miniboss_stomp';
 
@@ -161,13 +162,16 @@ describe('expanded Ignivar raid visual manifest', () => {
     }
   });
 
-  it('reuses the established archivist body for Maelin Emberward', () => {
-    const maelin = visualKeyFor({
-      kind: 'npc',
-      templateId: 'archivist_maelin_emberward',
-    } as never);
-    const tullo = visualKeyFor({ kind: 'npc', templateId: 'archivist_tullo' } as never);
-    expect(maelin).toBe(tullo);
-    expect(maelin).toBe('npc_villager_robed');
+  it('dresses Maelin Emberward as the archivist she is: the mage kit, like Tullo', () => {
+    const maelin = npcLookFor('archivist_maelin_emberward');
+    const tullo = npcLookFor('archivist_tullo');
+    expect(maelin?.cls).toBe('mage');
+    expect(maelin?.cls).toBe(tullo?.cls);
+    expect(visualKeyFor({ kind: 'npc', templateId: 'archivist_maelin_emberward' } as never)).toBe(
+      'player_mage_female',
+    );
+    expect(visualKeyFor({ kind: 'npc', templateId: 'archivist_tullo' } as never)).toBe(
+      'player_mage',
+    );
   });
 });

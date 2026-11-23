@@ -9,7 +9,10 @@ export interface IgnivarForgeWavePoint {
   z: number;
 }
 
-export const IGNIVAR_FIRST_FORGE_WAVE_SECONDS = 50;
+// The opening wave resolves before the second Searing Torrent so it never
+// lands inside that Water Conduit's cleanse window (major-ability spacing
+// after Rain of Cinders starts it a little later than this).
+export const IGNIVAR_FIRST_FORGE_WAVE_SECONDS = 24;
 export const IGNIVAR_FORGE_WAVE_EVERY = 60;
 export const IGNIVAR_FORGE_WAVE_WINDUP_SECONDS = 2.5;
 export const IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS = 3;

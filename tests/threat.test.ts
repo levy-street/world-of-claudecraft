@@ -869,6 +869,18 @@ describe('rogue stealth', () => {
     expect(sim.player.auras.some((a) => a.id === 'sprint' && a.kind === 'buff_speed')).toBe(true);
   });
 
+  it('dash can be used during prowl without breaking stealth', () => {
+    const sim = makeSim('druid');
+    sim.setPlayerLevel(12);
+
+    sim.castAbility('prowl');
+    expect(sim.player.auras.some((a) => a.id === 'prowl' && a.kind === 'stealth')).toBe(true);
+
+    sim.castAbility('dash');
+    expect(sim.player.auras.some((a) => a.id === 'prowl' && a.kind === 'stealth')).toBe(true);
+    expect(sim.player.auras.some((a) => a.id === 'dash' && a.kind === 'buff_speed')).toBe(true);
+  });
+
   it('Vanish drops hostile focus and leaves combat immediately', () => {
     const sim = makeSim('rogue');
     sim.setPlayerLevel(20);

@@ -2,13 +2,14 @@
 // Full names need not ride back in the command, even for a 200-source vault row.
 // The server resolves every descriptor from its own unchanged stack; the pin is
 // only a stale-view witness, never authority to create or relabel a source.
-import { materialItemIds } from './material_ids';
+
 import type { MaterialComposition, MaterialSourceCount } from './material_sources';
 import { normalizeMaterialStack } from './material_stack';
 import {
   type MaterialStackSelection,
   materialStackSelectionMatches,
 } from './material_stack_selection';
+import { stackProvenanceItemIds } from './stack_provenance_ids';
 import type { InvSlot } from './types';
 
 export interface MaterialSourceTransferSelection {
@@ -107,7 +108,10 @@ export function resolveMaterialSourceTransferSelection(
   if (request === null) return { ok: false, error: 'invalid-selection' };
   if (!materialStackSelectionMatches(inventory, request.itemId, request.target))
     return { ok: false, error: 'stale-selection' };
-  const normalized = normalizeMaterialStack(inventory[request.target.slotIndex], materialItemIds());
+  const normalized = normalizeMaterialStack(
+    inventory[request.target.slotIndex],
+    stackProvenanceItemIds(),
+  );
   if (!normalized.ok) return { ok: false, error: 'invalid-sources' };
   const sources: MaterialSourceCount[] = [];
   let count = 0;

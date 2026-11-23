@@ -61,10 +61,12 @@ export const OUT_OF_GRAPH_PATTERNS = Object.freeze([
   // (tests/mob_rally.test.ts) and that would be a large false-positive class.
   ['execFileSync', /\bexecFileSync\s*\(/],
   ['spawnSync', /\bspawnSync\s*\(/],
-  // Any call-form import(), not just the awaited adjacency: a dynamic import
-  // wrapped in Promise.all(...) or returned bare is just as invisible to the
-  // static graph, and the awaited-only regex missed those forms.
-  ['dynamic-import', /\bimport\s*\(/],
+  // Any call-form import() with a computed or non-literal specifier, not just
+  // the awaited adjacency: a dynamic import wrapped in Promise.all(...) or
+  // returned bare is just as invisible to the static graph, while a plain
+  // string-literal import('...') is collected by Vite into transformed.dynamicDeps
+  // and walked by vitest's getTestDependencies alongside transformed.deps.
+  ['dynamic-import', /\bimport\s*\(\s*(?!['"][^'"\n]+['"]\s*\))/],
   // Third-party fs readers. A test that asserts on the CONTENT of a shipped
   // binary asset through a library (NodeIO GLB reads, sharp image metadata)
   // makes no fs call of its own, so the function patterns above never fire,
@@ -156,8 +158,8 @@ export function buildHelperImportPattern(helperPaths) {
   return new RegExp(`from\\s*['"][^'"]*\\/(?:${alt})(?:\\.[cm]?[jt]s)?['"]`);
 }
 
-/** Static imports from the product source trees the graph DOES model. */
-const SRC_IMPORT_RE = /from\s*['"](?:\.\.\/)+(?:src|server|headless|bot)\//;
+/** Static or string-literal dynamic imports from the product source trees the graph DOES model. */
+const SRC_IMPORT_RE = /(?:from\s*|\bimport\s*\(\s*)['"](?:\.\.\/)+(?:src|server|headless|bot)\//;
 
 /**
  * @typedef {'blind' | 'partial' | 'graph'} VisibilityClass

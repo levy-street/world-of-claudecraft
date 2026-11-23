@@ -1,5 +1,5 @@
-// The renderer-side camera VIEW settings (field of view and the Action Cam),
-// applied from the settings store. Render modules never read the store, so
+// The renderer-side camera VIEW settings (field of view, the Action Cam and
+// first person), applied from the settings store. Render modules never read the store, so
 // main.ts pushes these through here: once per changed key from its settings
 // router, and all at once onto a freshly rebuilt renderer.
 
@@ -9,11 +9,17 @@ import { type GameSettings, SETTING_RANGES } from './settings';
 export interface CameraViewRenderer {
   setCameraFov(deg: number): void;
   readonly actionCam: { set(enabled: boolean, side: ActionCamSide): void };
+  readonly firstPerson: { setMode(mode: number): void };
 }
 
 export interface CameraViewSettingsStore {
-  get<K extends 'cameraFov' | 'actionCam' | 'actionCamShoulder'>(key: K): GameSettings[K];
-  set(key: 'cameraFov' | 'actionCamShoulder' | 'cameraZoom', value: number): number;
+  get<K extends 'cameraFov' | 'actionCam' | 'actionCamShoulder' | 'firstPersonMode'>(
+    key: K,
+  ): GameSettings[K];
+  set(
+    key: 'cameraFov' | 'actionCamShoulder' | 'cameraZoom' | 'firstPersonMode',
+    value: number,
+  ): number;
   set(key: 'actionCam', value: boolean): boolean;
 }
 
@@ -57,6 +63,7 @@ export function applyCameraViewSettings(
 ): void {
   renderer.setCameraFov(store.get('cameraFov'));
   pushActionCam(renderer, store);
+  renderer.firstPerson.setMode(store.get('firstPersonMode'));
 }
 
 /**
@@ -72,6 +79,10 @@ export function applyCameraViewSetting(
 ): boolean {
   if (key === 'cameraFov') {
     renderer.setCameraFov(store.set('cameraFov', Number(value)));
+    return true;
+  }
+  if (key === 'firstPersonMode') {
+    renderer.firstPerson.setMode(store.set('firstPersonMode', Number(value)));
     return true;
   }
   if (key === 'actionCam' || key === 'actionCamShoulder') {

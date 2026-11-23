@@ -9,8 +9,10 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d } from '../types';
 import { hasUnbreakableMovementLock } from './cc';
+import { glacialFrontContains } from './glacial_front';
 import { grantHunterFocus, onHunterTrailbreak } from './hunter_shared';
 import { trailbreakArcFor } from './hunter_trailbreak_arc';
+import { HUNTING_MOMENTUM_MAX_STACKS } from './hunting_momentum_speed';
 import { wearsSetBonus } from './set_bonus_wearer';
 
 export const BLOODHOOK_BLEED_ID = 'bloodhook_bleed';
@@ -19,6 +21,20 @@ export const FIELDCRAFT_REENTRY_ID = 'fieldcraft_reentry';
 /** Slagsnare 4pc: the once-per-8-sec Woundrend momentum-preserve lockout. */
 export const SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID = 'slagsnare_momentum_icd';
 const BLOODHOOK_PENDING_ID = 'bloodhook_pending';
+export const BLOODHOOK_SLOW_ID = 'bloodhook_slow';
+/** Hunting Momentum is a persistent bank (the Old Blood shape): the finite backing
+ *  duration keeps saves and snapshots JSON-safe, persistent_aura.ts stops it
+ *  aging, and leaving combat clears it (fieldcraftCombatState). */
+const MOMENTUM_BACKING_DURATION = 3600;
+/** Woundrend's extra strike damage when it consumes a full Momentum bank. */
+export const WOUNDREND_FULL_MOMENTUM_BONUS = 0.6;
+/** Bloodtrail Assault with no living pet: Focus regenerates this much faster. */
+export const BLOODTRAIL_LONE_FOCUS_REGEN_BONUS = 1;
+/** Bloodtrail Assault adds this much reach to the Shrapnel Charge cone. */
+const BLOODTRAIL_SHRAPNEL_REACH = 2;
+/** Marker held while a Trailbreak leap is airborne; the landing sprint reads it. */
+export const TRAILBREAK_AIRBORNE_ID = 'trailbreak_airborne';
+const TRAILBREAK_AIRBORNE_MAX_SEC = 4;
 /** Base Focus a landed Gutting Strike grants (the Slagsnare 2pc bends it). */
 const GUTTING_STRIKE_BASE_FOCUS = 15;
 
@@ -118,6 +134,25 @@ export function startBloodhook(
   ctx.enterCombat(hunter, target);
 }
 
+/** The arrival slow reads the resolved ability, so a talent or set edit to
+ *  Bloodhook's effect carries through without a copy on the pending aura. */
+function applyBloodhookSlow(ctx: SimContext, hunter: Entity, target: Entity): void {
+  const effect = ctx
+    .resolvedAbility('bloodhook', hunter.id)
+    ?.effects.find((eff) => eff.type === 'hunterBloodhook');
+  if (effect?.type !== 'hunterBloodhook' || !effect.slowMult || !effect.slowDuration) return;
+  ctx.applyAura(target, {
+    id: BLOODHOOK_SLOW_ID,
+    name: 'Bloodhook',
+    kind: 'slow',
+    remaining: effect.slowDuration,
+    duration: effect.slowDuration,
+    value: effect.slowMult,
+    sourceId: hunter.id,
+    school: 'physical',
+  });
+}
+
 export function finishBloodhook(
   ctx: SimContext,
   hunter: Entity,
@@ -132,6 +167,7 @@ export function finishBloodhook(
     return;
   }
   const woundTotal = pending.value2 ?? 36;
+  applyBloodhookSlow(ctx, hunter, target);
   applyPrimaryWound(
     ctx,
     hunter,
@@ -170,15 +206,14 @@ export function finishBloodhook(
       'Bloodhook Re-entry',
     );
     removeAura(ctx, hunter, FIELDCRAFT_REENTRY_ID);
-    if (stacks >= 3) removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
+    if (stacks >= HUNTING_MOMENTUM_MAX_STACKS) removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
   }
   // Snaretooth Mail 4pc (Warfare Season 2): a Bloodhook that arrives grants
-  // Hunting Momentum through the same setter Gutting Strike uses (8 sec
-  // window, 3 stack cap). After the Re-entry payoff above, so the grant never
-  // feeds the strike that consumes it. Draws no rng.
+  // Hunting Momentum through the same setter Gutting Strike uses (3 stack
+  // cap). After the Re-entry payoff above, so the grant never feeds the strike
+  // that consumes it. Draws no rng.
   if (wearsSetBonus(ctx, hunter, 'vanguard_hunter_survival', 4)) {
-    const current = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID)?.stacks ?? 0;
-    setMomentum(ctx, hunter, Math.min(3, current + VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS));
+    addMomentum(ctx, hunter, VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS);
   }
 }
 
@@ -209,13 +244,36 @@ function setMomentum(ctx: SimContext, hunter: Entity, stacks: number): void {
     id: HUNTING_MOMENTUM_ID,
     name: 'Hunting Momentum',
     kind: 'hunter_momentum',
-    remaining: 8,
-    duration: 8,
+    remaining: MOMENTUM_BACKING_DURATION,
+    duration: MOMENTUM_BACKING_DURATION,
     value: stacks,
     stacks,
     sourceId: hunter.id,
     school: 'physical',
   });
+}
+
+/** Adds stacks up to the cap and returns the new count. */
+function addMomentum(ctx: SimContext, hunter: Entity, amount: number): number {
+  const current = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID)?.stacks ?? 0;
+  const next = Math.min(HUNTING_MOMENTUM_MAX_STACKS, current + amount);
+  setMomentum(ctx, hunter, next);
+  return next;
+}
+
+/** Momentum is an in-combat bank like Old Blood: leaving combat empties it. */
+export function fieldcraftCombatState(ctx: SimContext, hunter: Entity): void {
+  if (hunter.inCombat) return;
+  if (hunter.auras.some((aura) => aura.id === HUNTING_MOMENTUM_ID)) {
+    removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
+  }
+}
+
+/** Focus regen multiplier: Bloodtrail Assault doubles it while no pet lives. */
+export function hunterFocusRegenMult(ctx: SimContext, hunter: Entity): number {
+  if (!hunter.auras.some((aura) => aura.kind === 'hunter_bloodtrail')) return 1;
+  const pet = ctx.petOf(hunter.id);
+  return pet && !pet.dead ? 1 : 1 + BLOODTRAIL_LONE_FOCUS_REGEN_BONUS;
 }
 
 function petFollowup(ctx: SimContext, hunter: Entity, target: Entity, amount = 18): void {
@@ -242,14 +300,12 @@ export function onFieldcraftWeaponStrike(
         ? SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS
         : GUTTING_STRIKE_BASE_FOCUS;
     grantHunterFocus(ctx, hunter, guttingFocus, 'raptor_strike');
-    const current = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID)?.stacks ?? 0;
-    setMomentum(ctx, hunter, Math.min(3, current + 1));
+    const stacks = addMomentum(ctx, hunter, 1);
     if (hunter.auras.some((aura) => aura.id === FIELDCRAFT_REENTRY_ID)) {
-      const stacks = Math.min(3, current + 1);
       const bonus = Math.max(1, Math.round(dealt * 0.15 * stacks));
       ctx.dealDamage(hunter, target, bonus, false, 'physical', 'Hunting Momentum', 'hit', true);
       removeAura(ctx, hunter, FIELDCRAFT_REENTRY_ID);
-      if (stacks >= 3) removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
+      if (stacks >= HUNTING_MOMENTUM_MAX_STACKS) removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
     }
     return;
   }
@@ -273,16 +329,30 @@ export function onFieldcraftWeaponStrike(
   }
   const momentum = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID);
   if (momentum) {
-    momentum.remaining = momentum.duration;
     const stacks = momentum.stacks ?? 1;
-    if (stacks >= 3) {
-      const bonus = Math.max(1, Math.round(dealt * 0.15 * stacks));
-      ctx.dealDamage(hunter, target, bonus, false, 'physical', 'Hunting Momentum', 'hit', true);
+    if (stacks >= HUNTING_MOMENTUM_MAX_STACKS) {
+      // +60% of the strike as it landed. alreadyFinal: dealt already carries
+      // every source-side multiplier (Lonely Soul, damage buffs), so the payoff
+      // must not take them a second time.
+      const bonus = Math.max(1, Math.round(dealt * WOUNDREND_FULL_MOMENTUM_BONUS));
+      ctx.dealDamage(
+        hunter,
+        target,
+        bonus,
+        false,
+        'physical',
+        'Hunting Momentum',
+        'hit',
+        true,
+        undefined,
+        undefined,
+        undefined,
+        true,
+      );
       // Slagsnare 4pc: the Woundrend consume (this site ONLY; the Re-entry
       // consumers keep spending the stacks) preserves the 3 stacks, once per
-      // 8 sec. The lockout's 8 sec deliberately MATCHES the Momentum window,
-      // and the refresh above already restarted that window, so preserved
-      // stacks carry a full 8 sec. The payoff damage above stays at 3-stack
+      // 8 sec. Momentum no longer ages, so preserved stacks stay until the
+      // next consume or combat ends. The payoff damage above stays at 3-stack
       // value either way. Deterministic, no rng.
       if (slagsnarePreservesMomentum(ctx, hunter, meta)) {
         armSlagsnarePreserveLockout(ctx, hunter);
@@ -295,43 +365,77 @@ export function onFieldcraftWeaponStrike(
     petFollowup(ctx, hunter, target);
 }
 
+/** Everyone a Shrapnel Charge cone hits, nearest first (ties by id), plus the
+ *  main target: the hunter's own target when the cone catches it, else the
+ *  nearest enemy hit. Uncapped. Pure over ctx reads, draws no rng. */
+export function shrapnelConeTargets(
+  ctx: SimContext,
+  hunter: Entity,
+  range: number,
+  angleDeg: number,
+): { primary: Entity | null; others: Entity[] } {
+  const hit = ctx
+    .hostilesInRadius(hunter, hunter.pos, range)
+    .filter(
+      (enemy) =>
+        !enemy.dead &&
+        glacialFrontContains(hunter.pos, hunter.facing, enemy.pos, range, angleDeg) &&
+        ctx.hasLineOfSight(hunter, enemy),
+    )
+    .sort((a, b) => dist2d(a.pos, hunter.pos) - dist2d(b.pos, hunter.pos) || a.id - b.id);
+  const primary = hit.find((enemy) => enemy.id === hunter.targetId) ?? hit[0] ?? null;
+  return { primary, others: hit.filter((enemy) => enemy !== primary) };
+}
+
 export function runShrapnelCharge(
   ctx: SimContext,
   hunter: Entity,
-  target: Entity | null,
   effect: {
     primaryMin: number;
     primaryMax: number;
     splashMin: number;
     splashMax: number;
-    radius: number;
-    maxTargets: number;
+    coneRange: number;
+    coneAngleDeg: number;
     spreadTotal: number;
     spreadDuration: number;
     spreadInterval: number;
     damageMult?: number;
   },
   abilityName: string,
+  abilityId: string,
 ): void {
-  if (!target || target.dead) return;
   const empowered = hunter.auras.some((aura) => aura.kind === 'hunter_bloodtrail');
-  const radius = effect.radius + (empowered ? 2 : 0);
+  const range = effect.coneRange + (empowered ? BLOODTRAIL_SHRAPNEL_REACH : 0);
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: hunter.id,
+    targetId: hunter.id,
+    school: 'physical',
+    fx: 'fireCone',
+    ability: abilityId,
+    range,
+    angle: effect.coneAngleDeg,
+    level: 1,
+  });
+  const { primary, others } = shrapnelConeTargets(ctx, hunter, range, effect.coneAngleDeg);
+  if (!primary) return;
   fieldcraftPhysicalDamage(
     ctx,
     hunter,
-    target,
+    primary,
     effect.primaryMin * (empowered ? 1.25 : 1),
     effect.primaryMax * (empowered ? 1.25 : 1),
     abilityName,
     effect.damageMult,
   );
-  const primaryWound = target.auras.find(
+  const primaryWound = primary.auras.find(
     (aura) => aura.id === BLOODHOOK_BLEED_ID && aura.sourceId === hunter.id,
   );
   if (primaryWound) {
     ctx.dealDamage(
       hunter,
-      target,
+      primary,
       Math.round(primaryWound.value * (empowered ? 1.5 : 1)),
       false,
       'physical',
@@ -340,12 +444,10 @@ export function runShrapnelCharge(
       true,
     );
   }
-  const nearby = ctx
-    .hostilesInRadius(hunter, target.pos, radius)
-    .filter((enemy) => enemy.id !== target.id && !enemy.dead && ctx.hasLineOfSight(target, enemy))
-    .sort((a, b) => dist2d(a.pos, target.pos) - dist2d(b.pos, target.pos) || a.id - b.id)
-    .slice(0, Math.max(0, effect.maxTargets - 1));
-  for (const enemy of nearby) {
+  // One stack per cast that hits anyone, however many enemies the cone catches.
+  addMomentum(ctx, hunter, 1);
+  for (const enemy of others) {
+    if (enemy.dead) continue;
     fieldcraftPhysicalDamage(
       ctx,
       hunter,
@@ -383,9 +485,20 @@ export function trailbreak(ctx: SimContext, hunter: Entity, distance: number): v
   hunter.vy = arc.vy;
   hunter.jumping = true;
   hunter.fallStartY = hunter.pos.y;
+  // Touching down grants the landing sprint (combat/hunter_tick.ts). The marker
+  // self-expires so a leap that never registers a landing cannot bank it.
+  ctx.applyAura(hunter, {
+    id: TRAILBREAK_AIRBORNE_ID,
+    name: 'Trailbreak',
+    kind: 'internal_cd',
+    remaining: TRAILBREAK_AIRBORNE_MAX_SEC,
+    duration: TRAILBREAK_AIRBORNE_MAX_SEC,
+    value: 1,
+    sourceId: hunter.id,
+    school: 'physical',
+  });
   const momentum = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID);
   if (!momentum) return;
-  momentum.remaining = momentum.duration;
   ctx.applyAura(hunter, {
     id: FIELDCRAFT_REENTRY_ID,
     name: 'Armed Re-entry',

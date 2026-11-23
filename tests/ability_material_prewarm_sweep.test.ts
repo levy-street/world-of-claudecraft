@@ -63,6 +63,11 @@ const EXCLUDED: Record<string, string> = {
     'and colour and are reachable only inside the battleground scene, which builds on entry. ' +
     'src/render/CLAUDE.md: a program only ONE encounter can reach warms at that interior attach, ' +
     'never in the boot manifest.',
+  'city_clutter.ts':
+    'World scenery, not a cast: bakeModels() fills the cache when buildCityClutter first builds ' +
+    'the painted-clutter InstancedMeshes into the group the Renderer constructor adds straight to ' +
+    'the scene (renderer.ts), and it builds nothing at all when GFX.cityClutter is off or on the ' +
+    'built-in world (no stamps). Same ruling as cliff_scree: the boot scene compile unit reaches it.',
   'cliff_scree.ts':
     'World scenery, not a cast: bakeRocks() fills the cache while buildCliffScree assembles the ' +
     'scatter the Renderer constructor adds straight to the scene (renderer.ts), so the boot scene ' +
@@ -74,6 +79,16 @@ const EXCLUDED: Record<string, string> = {
     'the mount gate links it at the first sighting while the rig is still hidden, for owners and ' +
     'observers alike. A boot twin, or a plume on the owned-mount prewarm rig ' +
     '(mount_prewarm.ts), was declined: the gate only delays a cosmetic.',
+  'maw_glow.ts':
+    'Wildheart Basin interior scenery, not a cast: buildMawGlow() fills the card cache while ' +
+    'basin_interior.ts assembles the interior group, so the interior compile gate links every ' +
+    'halo and pool before the dungeon shows; afterwards only their opacity moves. ' +
+    'src/render/CLAUDE.md: a program only ONE encounter can reach warms at that interior attach.',
+  'sanctum_face.ts':
+    'Gravewyrm Sanctum interior scenery, not a cast: the frozen Korzul parts are fetched by ' +
+    'ensureFrozenWyrm(), which sanctum_interior.ts awaits before buildSanctumFace() builds every ' +
+    'face material with the interior, linked by its compile gate. Same ruling as the battleground ' +
+    'caches: reachable only inside that one interior, so never in the boot manifest.',
   'frost_ice_fields.ts':
     'Zone scenery, not a cast: prepareFrostIceParts() fills the cache while buildFrostIceFields ' +
     'assembles the Frostveil spire group, which frost_sky.ts adds to the zone scene, so the zone ' +
@@ -99,7 +114,9 @@ const REGISTERED_MODULES = [
   'warlock_meteor_fx.ts',
   'coach_trail_materials.ts',
   'moonwing_adornment.ts',
-  'gloamveil_veil.ts',
+  'balgath_ranged_fx.ts',
+  'balgath_starwake_fx.ts',
+  'effigy_rig.ts',
 ];
 
 /** A module-scope lazy cache, however the formatter wrapped it. The type
@@ -253,9 +270,16 @@ describe('the lazy-material sweep', () => {
     // the warlock meteor rocks, plus the two rig-adornment stand-ins), the
     // two excluded scenery bakes, and the rocket-sled plume pair. The
     // battleground caches are the remaining non-bundle hit. Plus the World
-    // Quests branch's calligraphy guidance bundle: 18 / 17.
-    expect(hits.length).toBeGreaterThanOrEqual(18);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(17);
+    // Quests branch's calligraphy guidance bundle: 18 / 17. Plus the Mirefen
+    // world-boss branch's three (Balgath's ranged kit, his Wake of the Fallen Star and
+    // the muster effigy's rig): 21 / 20.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 23, 22.
+    // + the ClaudeCraft Studio import's painted city-clutter bake (PR 4479): 24, 23.
+    // Minus Gloamveil's face-veil kit, retired with the veil (the form's look
+    // now mints no lazy module cache: gloam_field.ts builds its three
+    // materials in its constructor): 23, 22.
+    expect(hits.length).toBeGreaterThanOrEqual(23);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(22);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

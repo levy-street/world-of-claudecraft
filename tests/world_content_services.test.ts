@@ -254,7 +254,7 @@ describe('WorldContent static gameplay services', () => {
     setActiveWorldContent(null);
     const sim = new Sim({ seed: 71, playerClass: 'warrior' });
 
-    expect(sim.stationPlacements).toBe(STATIONS);
+    expect(sim.stationPlacements).toBe(BUILTIN_WORLD.services?.stations);
     expect(entitiesWithTemplate(sim, 'mailbox')).toHaveLength(
       BUILTIN_WORLD.services?.mailboxes?.length ?? 0,
     );
@@ -304,7 +304,7 @@ describe('WorldContent static gameplay services', () => {
     // The editor/render registry is mutable, but it cannot retarget gameplay
     // authorization, later joins, or release destinations in an existing Sim.
     setActiveWorldContent(custom);
-    expect(builtin.stationPlacements).toBe(STATIONS);
+    expect(builtin.stationPlacements).toBe(BUILTIN_WORLD.services?.stations);
     expect(builtin.civicServicePlacements).toBe(builtinCivic);
     expect(explicit.civicServicePlacements).toBe(explicitCivic);
     const builtinPid = builtin.addPlayer('warrior', 'Builtin');

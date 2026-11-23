@@ -16,7 +16,7 @@ import { ABILITIES, CLASSES } from '../../../sim/content/classes';
 import { specBaselineFor } from '../../../sim/content/spec_baselines';
 import { rowTreeFor } from '../../../sim/content/talent_rows';
 import type { TalentEffect } from '../../../sim/content/talents';
-import { talentsFor } from '../../../sim/content/talents';
+import { specSignatureIds, talentsFor } from '../../../sim/content/talents';
 import type { PlayerClass } from '../../../sim/types';
 
 /** Whether an ability is a spell a player can press: known to the content, not
@@ -31,7 +31,7 @@ const cache = new Map<PlayerClass, readonly string[]>();
 
 /**
  * Every ability id a class can ever hold, passives included: the authored kit,
- * each spec's signature, and every grant a talent row option or spec effect
+ * each spec's signatures, and every grant a talent row option or spec effect
  * carries. The aura catalog reads this (a passive such as Hot Streak is what
  * arms its proc); the spell picker reads the trackable subset below.
  */
@@ -45,7 +45,7 @@ export function cooldownClassAbilityIds(cls: PlayerClass): readonly string[] {
   const addEffect = (effect: TalentEffect | undefined): void => add(effect?.grant?.ability);
   for (const id of CLASSES[cls]?.abilities ?? []) add(id);
   for (const spec of talentsFor(cls)?.specs ?? []) {
-    add(spec.signature);
+    for (const id of specSignatureIds(spec)) add(id);
     addEffect(spec.mastery.effect);
     addEffect(specBaselineFor(cls, spec.id));
   }

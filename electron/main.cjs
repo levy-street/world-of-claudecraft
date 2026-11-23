@@ -32,6 +32,8 @@ const {
   extractInlineScriptHashes,
   withCspHeader,
   ALLOWED_PERMISSIONS,
+  isExternalDocumentUrl,
+  toCanonicalExternalUrl,
 } = require('./shell_guards.cjs');
 const { rangeContentType, rangedFileResponse } = require('./media_range.cjs');
 const { resolveDesktopConfig, walletConnectionSupported } = require('./desktop_config.cjs');
@@ -96,6 +98,7 @@ const {
   shouldRescueMissingGpu,
 } = require('./gpu_backend.cjs');
 const { gpuBackendPolicy } = require('./gpu_backend_policy.cjs');
+const { applyShaderDiskCacheSwitches, decideShaderDiskCache } = require('./shader_disk_cache.cjs');
 const { launchSettingsSnapshot, restartApp } = require('./launch_settings.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const { presentationStatePayload } = require('./presentation_events.cjs');
@@ -316,6 +319,21 @@ if (gpuPolicy.why !== '') {
 // one), whether or not this launch climbed, so the cadence measures launches since the
 // last ATTEMPT rather than since anything at all.
 mergeDesktopPrefs(launchCounterAfterAutoLaunch({ prefs: desktopPrefs, launch: gpuBackendLaunch }));
+
+// Keep compiled shader programs between sessions (electron/shader_disk_cache.cjs): a Chromium
+// feature that lets programs linked in parallel reach the GPU disk cache, and a larger cache.
+// Before app 'ready' like every switch; its feature is merged into `enable-features` with the
+// Vulkan rungs' own, never a second value that would replace them.
+const shaderDiskCache = decideShaderDiskCache({
+  platform: process.platform,
+  chromeVersion: process.versions.chrome,
+  env: process.env,
+  prefs: desktopPrefs,
+});
+applyShaderDiskCacheSwitches(app, shaderDiskCache);
+log.info(
+  `[gpu] shader disk cache: ${shaderDiskCache.enabled ? 'on' : 'off'} (${shaderDiskCache.reason})`,
+);
 
 // Steam preloads its overlay into every native Linux game, and with that library mapped
 // Chromium's GPU process cannot start: the browser process gives up with a CHECK and the app
@@ -833,6 +851,11 @@ function createMainWindow() {
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('http://') || url.startsWith('https://')) {
       shell.openExternal(url);
+    } else {
+      const canonical = toCanonicalExternalUrl(url, APP_ORIGIN, apiOrigin);
+      if (canonical.startsWith('http://') || canonical.startsWith('https://')) {
+        shell.openExternal(canonical);
+      }
     }
     return { action: 'deny' };
   });
@@ -847,6 +870,20 @@ function createMainWindow() {
     const isMainFrame = details.isMainFrame !== false;
     if (!navigationAllowed(details.url, isMainFrame, appOrigins)) {
       details.preventDefault();
+      if (
+        isMainFrame &&
+        (details.url.startsWith('http://') || details.url.startsWith('https://'))
+      ) {
+        shell.openExternal(details.url);
+      }
+      return;
+    }
+    if (isMainFrame && isExternalDocumentUrl(details.url)) {
+      details.preventDefault();
+      const canonical = toCanonicalExternalUrl(details.url, APP_ORIGIN, apiOrigin);
+      if (canonical.startsWith('http://') || canonical.startsWith('https://')) {
+        shell.openExternal(canonical);
+      }
     }
   };
   mainWindow.webContents.on('will-navigate', guardNavigation);
@@ -1954,6 +1991,10 @@ app.whenReady().then(() => {
   // try/catch guards the (practically impossible) double-registration race.
   const registerDisabledUpdateInstall = () => {
     try {
+      ipcMain.handle('desktop-update-check', (event) => {
+        if (!trustedSender(event)) return null;
+        return 'unavailable';
+      });
       ipcMain.handle('desktop-update-install', (event) => {
         if (!trustedSender(event)) return null;
         log.warn('[updater] install requested but auto-update is unavailable on this build');

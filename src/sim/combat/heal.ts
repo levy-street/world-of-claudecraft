@@ -25,12 +25,14 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { recordQueueHealing } from '../instances/queue_participation';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { worldPvpOnPlayerAided } from '../pvp';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
+import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { runWeaponProcs } from './equip_procs';
 import {
   BEACON_OF_LIGHT_NAME,
@@ -135,6 +137,7 @@ export function applyHeal(
           (1 + healDone) *
           (crit ? 1.5 + source.critDmgHealBonus : 1) *
           paladinHealingDoneMultiplier(source) *
+          sporemenderHealingDoneMult(source) *
           hexOutputMult(ctx, source) *
           healingTakenMult(ctx, target),
       );
@@ -167,6 +170,7 @@ export function applyHeal(
     ...(overheal > 0 ? { overheal } : {}),
   });
   healingThreat(ctx, source, target, healed);
+  recordQueueHealing(ctx, source, target, healed);
   // Thornhollow Fields: real healing on an ally is support, and a kill that
   // ally helps land pays the healer an assist. Only healing that actually
   // landed counts (a fully overhealed or absorbed cast is not support), and the

@@ -1,0 +1,113 @@
+[
+  {
+    "profile": "desktop",
+    "held": [
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 7,
+        "instance": {
+          "signer": "Ana"
+        },
+        "slot": 0
+      },
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 5,
+        "instance": {
+          "signer": "Bru"
+        },
+        "slot": 1
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 4,
+        "instance": {
+          "signer": "Ana"
+        },
+        "slot": 3
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 6,
+        "instance": {
+          "signer": "Bru"
+        },
+        "slot": 2
+      }
+    ]
+  },
+  {
+    "profile": "landscape",
+    "held": [
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 7,
+        "instance": {
+          "signer": "Ana"
+        },
+        "slot": 0
+      },
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 5,
+        "instance": {
+          "signer": "Bru"
+        },
+        "slot": 1
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 4,
+        "instance": {
+          "signer": "Ana"
+        },
+        "slot": 3
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 6,
+        "instance": {
+          "signer": "Bru"
+        },
+        "slot": 2
+      }
+    ]
+  },
+  {
+    "profile": "portrait",
+    "held": [
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 7,
+        "instance": {
+          "signer": "Ana"
+        },
+        "slot": 0
+      },
+      {
+        "itemId": "sunpetal_healing_draught",
+        "count": 5,
+        "instance": {
+          "signer": "Bru"
+        },
+        "slot": 1
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 4,
+        "instance": {
+          "signer": "Ana"
+        },
+        "slot": 3
+      },
+      {
+        "itemId": "baked_bread",
+        "count": 6,
+        "instance": {
+          "signer": "Bru"
+        },
+        "slot": 2
+      }
+    ]
+  }
+]

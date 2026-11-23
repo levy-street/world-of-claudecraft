@@ -171,9 +171,6 @@ script-driven, off-peak only.
   would silently retune `soc_by_ravens_wing`.
 - The leaderboard header subtitle reads Lifetime XP on every tab
   (pre-existing shared chrome, not deeds-owned).
-- The nameplate declutter stack offset (fixed 20 px) does not model the
-  deed-title subtitle line on a titled plate; cosmetic clustering only, the
-  same class as the guild-tag line.
 - Daily-rewards moderation writes (setDailyRewardsBan and the IP form)
   commit without firing the onAccountModerated cache-bust hook; benign today
   because that hook busts only the lifetime-XP and guild board caches;

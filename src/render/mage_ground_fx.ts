@@ -48,6 +48,7 @@ import {
   nythraxisGraveEruptionPalette,
 } from './nythraxis_hazard_palette_core';
 import { isNythraxisBindingSigil, NYTHRAXIS_SIGIL_PALETTE } from './nythraxis_sigil_core';
+import { thatchgrinRuneColor } from './scarecrow_fx_core';
 import { SCHOOL_COLORS } from './vfx';
 
 /** HSL lightness ceiling applied before a rune ring's additive brightening
@@ -82,6 +83,10 @@ const RUNE_FADE = 0.8; // seconds of fade at the rune's end of life
 const RUNE_SPIN = 0.5; // rad/s, lazy mote rotation
 const RUNE_GROUND_LIFT = 0.08; // avoids z-fighting after terrain sampling
 const RUNE_SEGMENTS = 48;
+/** The flat wash over a mob windup's whole blast disc: enough to read the band
+ *  between the inscription's rings as danger, faint enough to keep the rings the
+ *  first thing the eye finds. */
+const RUNE_DANGER_FILL_OPACITY = 0.2;
 /** Half the height of the shared flame/shard quad geometry (its points span
  *  y = -0.44 .. 0.46), so a scaled shard's base can be planted on the ground. */
 export const METEOR_FLAME_GEOMETRY_HALF_HEIGHT = 0.45;
@@ -1317,12 +1322,18 @@ export class MageGroundFx {
     // player's own cast the player band. Steps are the legacy order minus
     // one, the encounter band's rule, so the rung reads the same in both.
     const layer = runeCircleLayer(opts.ability);
-    const paletteKey = bindingSigil ? 'binding-sigil' : school;
+    // an encounter that wears its own rim (Old Thatchgrin's violet Gourdfall rings)
+    const encounterRim = thatchgrinRuneColor(opts.ability);
+    const paletteKey = bindingSigil
+      ? 'binding-sigil'
+      : encounterRim !== null
+        ? `rim-${encounterRim}`
+        : school;
     const schoolColor = capRingLightness(
       new THREE.Color(
         bindingSigil
           ? NYTHRAXIS_SIGIL_PALETTE.rim
-          : (SCHOOL_COLORS[school] ?? SCHOOL_COLORS.arcane),
+          : (encounterRim ?? SCHOOL_COLORS[school] ?? SCHOOL_COLORS.arcane),
       ),
     );
     const group = new THREE.Group();
@@ -1423,6 +1434,38 @@ export class MageGroundFx {
     matKinds.push(glowKind);
     ownedGeometries.push(glowGeo);
     baseOpacities.push(0.18);
+    // A rift mob windup (a stomp or pulse, no ability id) hits EVERY player
+    // inside its radius: the blast is a full disc (mob/locomotion.ts
+    // fireWarStomp / fireAoePulse). The inscription alone leaves an unlit band
+    // between its inner and outer rings, and players read that band as a safe
+    // gap to stand in (Warlord Grask player report). Wash the whole disc so the
+    // drawn danger is exactly the damage area. The player's own Rune of Power
+    // and the Nythraxis sigil keep the bare inscription.
+    if (layer === 'encounter' && !bindingSigil) {
+      const fillGeo = this.createTerrainDisc(opts.x, opts.z, opts.radius, RUNE_SEGMENTS);
+      const fillKind = `mage-rune-power-danger-fill:${paletteKey}`;
+      const fillMat = this.acquireMaterial(
+        fillKind,
+        RUNE_DANGER_FILL_OPACITY,
+        () =>
+          new THREE.MeshBasicMaterial({
+            color: schoolColor.clone(),
+            transparent: true,
+            opacity: RUNE_DANGER_FILL_OPACITY,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          }),
+      );
+      const fill = new THREE.Mesh(fillGeo, fillMat);
+      fill.name = 'mage-rune-power-danger-fill';
+      fill.renderOrder = floorVfxRenderOrder(layer, 4);
+      group.add(fill);
+      mats.push(fillMat);
+      matKinds.push(fillKind);
+      ownedGeometries.push(fillGeo);
+      baseOpacities.push(RUNE_DANGER_FILL_OPACITY);
+    }
 
     const orbit = new THREE.Group();
     orbit.name = 'mage-rune-power-motes';

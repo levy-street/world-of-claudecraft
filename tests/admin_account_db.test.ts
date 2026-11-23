@@ -192,6 +192,47 @@ describe('admin account detail query', () => {
     expect(mocks.query).toHaveBeenCalledTimes(5);
   });
 
+  it('carries the player self-deactivation timestamp so the dashboard can offer reactivate', async () => {
+    const accountRow = (deactivatedAt: string | null) => ({
+      rows: [
+        {
+          id: 21773,
+          username: 'nekontain',
+          created_at: '2026-06-22T06:09:14Z',
+          last_login: null,
+          is_admin: false,
+          banned_at: null,
+          suspended_until: null,
+          deactivated_at: deactivatedAt,
+          moderation_reason: '',
+          chat_muted_until: null,
+          chat_mute_reason: '',
+          chat_strikes: 0,
+          last_login_ip: null,
+          playtime_seconds: 0,
+        },
+      ],
+    });
+    mocks.query
+      .mockResolvedValueOnce(accountRow('2026-10-04T09:37:13Z'))
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce(accountRow(null))
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] });
+
+    const deactivated = await accountDetail(21773);
+    const live = await accountDetail(21773);
+
+    expect(deactivated?.deactivatedAt).toBe('2026-10-04T09:37:13Z');
+    expect(live?.deactivatedAt).toBeNull();
+    expect(mocks.query.mock.calls[0][0]).toMatch(/\bdeactivated_at,/);
+  });
+
   it('lists accounts through the plain pool read with the lifetime playtime rollup term', async () => {
     mocks.query
       .mockResolvedValueOnce({

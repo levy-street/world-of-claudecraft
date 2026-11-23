@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_bone_brute_woc.glb",
+      "out": "models/creatures/woc_crypt_bone_brute.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "Attack2", "React", "Slam", "Death"],
+      "maxTex": 1024
+    }
+  ]
+}

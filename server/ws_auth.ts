@@ -15,8 +15,9 @@ import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
+import { MEMBERSHIP_OFF, membershipCharacterLocked } from '../src/membership_contract';
 import { type AccountLedger, freshAccountLedger } from '../src/sim/account_ledger';
-import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
+import { setReferralArmour } from '../src/sim/referral_armour';
 import {
   type BankBonusSource,
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
@@ -26,6 +27,7 @@ import {
   STABLE_TIMER_WIRE_VERSION,
 } from '../src/world_api';
 import { sanitizeAppearance } from '../src/world_api/appearance';
+import type { AccountMountItemsRow } from './account_mount_items_core';
 import type {
   AccountChatMuteStatus,
   AccountCosmetics,
@@ -35,7 +37,9 @@ import type {
 } from './db';
 import type { GameServer } from './game';
 import { noteClientFrame } from './keepalive_sweep';
+import type { MembershipAuthorization } from './membership_service';
 import { negotiateMovementWireVersion } from './movement_wire_version';
+import type { ReferralArmourEntitlement } from './referral_armour_db';
 import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
 
@@ -65,6 +69,7 @@ const WS_AUTH_ERROR = {
   // commit.
   tooManyConnections: 'too many connections from your network',
   forceRename: 'This character must be renamed before entering the world.',
+  membershipRequired: 'membership required for this character',
   authTimedOut: 'authentication timed out',
   incompatibleWorldLayout: ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
 } as const;
@@ -86,14 +91,19 @@ const WS_UPGRADE_PATH = '/ws';
 
 // Every failed handshake check sends exactly one {t:'error'} frame (the shape the
 // client parses in online.ts onMessage), then closes the socket. Centralizes both
-// the frame shape and the send-then-close ordering in one place.
+// the frame shape and the send-then-close ordering in one place. The frame goes
+// out uncompressed: a compressed send makes ws allocate the socket's ~256 KiB
+// deflate stream (server/ws_compression.ts), which a client that never answers
+// the close would hold for ws's close timeout, so rejected sockets never get one.
 function rejectHandshake(ws: WebSocket, error: string): void {
-  ws.send(JSON.stringify({ t: 'error', error }));
+  ws.send(JSON.stringify({ t: 'error', error }), { compress: false });
   ws.close();
 }
 
 export interface WsAuthDeps {
   game: GameServer;
+  getMembership?: (accountId: number) => Promise<MembershipAuthorization>;
+  referralArmourForAccount?: (accountId: number) => Promise<ReferralArmourEntitlement | null>;
   accountAndScopeForToken: (
     token: string,
   ) => Promise<{ accountId: number; scope: TokenScope } | null>;
@@ -116,6 +126,8 @@ export interface WsAuthDeps {
   ) => { fbp?: string | null; fbc?: string | null };
   metaEventSourceUrl: (req: http.IncomingMessage) => string | undefined;
   loadAccountCosmetics: (accountId: number) => Promise<AccountCosmetics>;
+  loadAccountMountItems?: (accountId: number) => Promise<AccountMountItemsRow[]>;
+  loadAccountBuddies?: (accountId: number) => Promise<readonly string[]>;
   /** The account ledger load (server/account_ledger_db.ts): which characters
    *  on the account earned each deed and found each relic. */
   loadAccountLedger: (accountId: number) => Promise<AccountLedger>;
@@ -156,7 +168,6 @@ export interface WsAuthDeps {
   bankBonusForAccount: (
     accountId: number,
   ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
-  guestPayoutsForCycle: (characterId: number, cycle: string) => Promise<number>;
 }
 
 export interface WsAuthHandlers {
@@ -186,7 +197,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount,
-    guestPayoutsForCycle,
   } = deps;
 
   // Character ids whose lease-acquire-through-join section is in flight in THIS
@@ -329,6 +339,19 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         rejectHandshake(ws, WS_AUTH_ERROR.forceRename);
         return;
       }
+      const membership = deps.getMembership
+        ? await deps.getMembership(accountId)
+        : { ...MEMBERSHIP_OFF, authorizedUntil: 0, recurringExpiresAt: null };
+      const membershipLocked = (row: CharacterRow) =>
+        membershipCharacterLocked(
+          row.membership_slot,
+          { ...membership, active: membership.active && membership.authorizedUntil > Date.now() },
+          Date.now(),
+        );
+      if (membershipLocked(character)) {
+        rejectHandshake(ws, WS_AUTH_ERROR.membershipRequired);
+        return;
+      }
       const chatMute = await chatMuteStatusForAccount(accountId);
       // Resolved at each game.join call below, not here: like
       // generalChatRateLimitHydration, resolving early would leave every
@@ -362,18 +385,23 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
       // The account ledger rides beside the cosmetics: both are account-wide
       // state the join hands the sim, so one round trip covers the pair.
-      const [accountCosmetics, accountLedger] = await Promise.all([
-        loadAccountCosmetics(accountId),
-        // A cosmetic table must never gate login: a failed read joins with a
-        // fresh ledger (the sim's own default) and the next join retries.
-        loadAccountLedger(accountId).catch(() => freshAccountLedger()),
-      ]);
+      const [accountCosmetics, accountLedger, accountMountItems, accountBuddyOwned] =
+        await Promise.all([
+          loadAccountCosmetics(accountId),
+          // A cosmetic table must never gate login: a failed read joins with a
+          // fresh ledger (the sim's own default) and the next join retries.
+          loadAccountLedger(accountId).catch(() => freshAccountLedger()),
+          deps.loadAccountMountItems?.(accountId).catch(() => undefined),
+          deps.loadAccountBuddies ? deps.loadAccountBuddies(accountId) : Promise.resolve([]),
+        ]);
       const joinMeta = {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
         accountCosmetics,
+        accountMountItems,
         accountLedger,
+        accountBuddyOwned,
         isAdmin,
         adminPermissions,
         clientSeed,
@@ -384,6 +412,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // The character's stored action-bar layout, sent once to the owning client
         // so it restores at login on any device (game.join re-validates it).
         hotbarLayout: character.hotbar_layout ?? null,
+        // Presence privacy, known before the session joins anyone's roster
+        // (game.join validates it; server/presence_privacy.ts).
+        presenceMode: character.presence_mode ?? null,
         // The authored modular look (own column). Rides the join so the world
         // entity carries it and every client in view composes this character's
         // real body (identity wire key `app`).
@@ -406,6 +437,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       pendingLeaseJoins.add(character.id);
       try {
         let admittedCharacter = character;
+        let referralArmour: ReferralArmourEntitlement | null | undefined;
         let leaseNonce: string | undefined;
         let result: ReturnType<GameServer['join']>;
         if (game.hasSessionForCharacter(character.id)) {
@@ -417,6 +449,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // resumes and keeps its nonce; a live duplicate is rejected) and never
           // re-stamp the row with a fresh acquire that a doomed handshake could
           // leave mismatched.
+          if (membershipLocked(character)) {
+            rejectHandshake(ws, WS_AUTH_ERROR.membershipRequired);
+            return;
+          }
           const moderation = chatModerationHydration.resolve(freshModeration);
           result = game.join(
             ws,
@@ -478,6 +514,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
             // await means a DB error fails the handshake exactly like a getCharacter failure.
             const bankBonus = await bankBonusForAccount(accountId);
+            // Fixed account-PK read, before the lease; resumes retain live authority.
+            if (deps.referralArmourForAccount)
+              referralArmour = await deps.referralArmourForAccount(accountId);
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {
@@ -529,20 +568,13 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               throw err;
             }
             const moderation = chatModerationHydration.resolve(freshModeration);
-            const vaultGuestCycle = worldQuestCycleForResetDay(game.sim.resetDay);
-            let vaultGuestPayouts = 0;
-            try {
-              if (vaultGuestCycle)
-                vaultGuestPayouts = await guestPayoutsForCycle(
-                  admittedCharacter.id,
-                  vaultGuestCycle,
-                );
-            } catch (error) {
-              await releaseCharacterLease(character.id, leaseNonce).catch((releaseError) =>
-                console.error('lease release failed:', releaseError),
+            if (membershipLocked(admittedCharacter)) {
+              await releaseCharacterLease(character.id, leaseNonce).catch((error) =>
+                console.error('lease release failed:', error),
               );
               leaseNonce = undefined;
-              throw error;
+              rejectHandshake(ws, WS_AUTH_ERROR.membershipRequired);
+              return;
             }
             result = game.join(
               ws,
@@ -557,10 +589,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 // The fresh arm re-read the row after the lease: that copy, or
                 // the still-queued document captured before it, supersedes the
                 // ownership-read copy joinMeta carries (game.join re-validates).
+                presenceMode: admittedCharacter.presence_mode ?? null,
                 hotbarLayout: queuedHotbarLayout ?? admittedCharacter.hotbar_layout ?? null,
                 leaseNonce,
                 bankBonus,
-                vaultGuestUsage: { cycle: vaultGuestCycle, payouts: vaultGuestPayouts },
                 mutedUntil: moderation.mutedUntil,
                 reason: moderation.reason,
                 chatStrikes: moderation.strikes,
@@ -569,6 +601,11 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 ),
               },
             );
+            // Buddy grants queued while the character was offline (the admin
+            // grant endpoint's offline arm) land now, fresh-join arm only: a
+            // resume never re-reads the queue. Fire-and-forget; the drain owns
+            // its own logging and never fails the handshake.
+            if (!('error' in result)) void game.drainBuddyGrants(result);
           } finally {
             // Decrement on every fresh-arm exit path (join completed, lease refused,
             // or a thrown DB error): a successful join is now counted by
@@ -592,6 +629,21 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           return;
         }
         const session = result;
+        session.membershipSlot = admittedCharacter.membership_slot === true;
+        if (deps.getMembership) {
+          game.sim.setMembership(
+            session.pid,
+            membership.active
+              ? Math.max(
+                  0,
+                  (Math.min(membership.expiresAt ?? 0, membership.authorizedUntil) - Date.now()) /
+                    1000,
+                )
+              : 0,
+          );
+        }
+        if (referralArmour !== undefined)
+          setReferralArmour(game.sim.ctx, session.pid, referralArmour);
         console.log(
           `+ ${admittedCharacter.name} (${admittedCharacter.class}) joined, ${game.clients.size} online`,
         );
@@ -608,6 +660,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // against a clock it has not started.
         noteClientFrame(ws);
         ws.on('message', (data) => {
+          if (session.ws !== ws) return;
           noteClientFrame(ws);
           game.handleMessage(session, String(data));
         });

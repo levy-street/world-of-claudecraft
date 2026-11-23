@@ -583,8 +583,13 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     expect(drainedIds).toContain('prog_veteran');
     expect(drainedIds).toContain('prog_first_steps');
     // Exactly the marquee subset of this tick's unlocks broadcast (with the
-    // session actor), and the opt-out flag was consulted by account id.
-    expect(broadcastSpy).toHaveBeenCalledWith({ characterId: 42, name: 'Hilda' }, 'prog_veteran');
+    // session actor, which carries the account id since the referral cards
+    // change 642100fe8aa made blocks account-aware), and the opt-out flag was
+    // consulted by account id.
+    expect(broadcastSpy).toHaveBeenCalledWith(
+      { characterId: 42, accountId: 7, name: 'Hilda' },
+      'prog_veteran',
+    );
     const broadcastIds = broadcastSpy.mock.calls.map((c) => c[1]);
     const expectedMarquee = drainedIds.filter((id) => isMarqueeDeed(DEEDS[id]));
     expect(broadcastIds.sort()).toEqual(expectedMarquee.sort());
@@ -682,7 +687,7 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     const batched = insertDeedsMock.mock.calls.flatMap((c) => [...c[1]]);
     expect([...rows, ...batched]).toContain('prog_guildsworn');
     expect(broadcastSpy).toHaveBeenCalledWith(
-      { characterId: 42, name: 'Hilda' },
+      { characterId: 42, accountId: 7, name: 'Hilda' },
       'prog_guildsworn',
     );
     expect(broadcastsFlagMock).toHaveBeenCalledWith(7);
@@ -1012,7 +1017,10 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     ]);
     // The async opt-out read resolves on the microtask queue; the save has not.
     await new Promise((resolve) => setImmediate(resolve));
-    expect(broadcastSpy).toHaveBeenCalledWith({ characterId: 42, name: 'Hilda' }, 'prog_veteran');
+    expect(broadcastSpy).toHaveBeenCalledWith(
+      { characterId: 42, accountId: 7, name: 'Hilda' },
+      'prog_veteran',
+    );
     expect(insertMock).not.toHaveBeenCalled();
     releaseSave();
     await settle();
@@ -1138,7 +1146,10 @@ describe('reliquaryUnlock illumination fan-out through GameServer.detectActivity
     detect([illumEvent(session.pid)]);
     await settle();
     expect(illumSpy).toHaveBeenCalledTimes(1);
-    expect(illumSpy).toHaveBeenCalledWith({ characterId: 84, name: 'Lumina' }, PAGE_ID);
+    expect(illumSpy).toHaveBeenCalledWith(
+      { characterId: 84, accountId: 21, name: 'Lumina' },
+      PAGE_ID,
+    );
     expect(broadcastsFlagMock).toHaveBeenCalledTimes(1);
     expect(broadcastsFlagMock).toHaveBeenCalledWith(21);
     // Marquee only: no Discord feed card and no character_deeds write ride
@@ -1291,7 +1302,10 @@ describe('reliquaryUnlock illumination fan-out through GameServer.detectActivity
     detect(server.sim.tick());
     await settle();
     expect(illumSpy).toHaveBeenCalledTimes(1);
-    expect(illumSpy).toHaveBeenCalledWith({ characterId: 94, name: 'Retrograde' }, LIVE_PAGE_ID);
+    expect(illumSpy).toHaveBeenCalledWith(
+      { characterId: 94, accountId: 32, name: 'Retrograde' },
+      LIVE_PAGE_ID,
+    );
   });
 
   it('the completion ladder lands end to end off the last real fill: record, feed cards, marquees, wearable titles', async () => {
@@ -1397,15 +1411,15 @@ describe('reliquaryUnlock illumination fan-out through GameServer.detectActivity
     // Both marquee'd with the session actor, and the completing fill's
     // first-ever Illumination rode the REAL path into the marquee too.
     expect(broadcastSpy).toHaveBeenCalledWith(
-      { characterId: 93, name: 'Curator' },
+      { characterId: 93, accountId: 31, name: 'Curator' },
       'col_reliquary_conquerors',
     );
     expect(broadcastSpy).toHaveBeenCalledWith(
-      { characterId: 93, name: 'Curator' },
+      { characterId: 93, accountId: 31, name: 'Curator' },
       'col_reliquary_complete',
     );
     expect(illumSpy).toHaveBeenCalledWith(
-      { characterId: 93, name: 'Curator' },
+      { characterId: 93, accountId: 31, name: 'Curator' },
       'conquerors_hollow_crypt',
     );
 

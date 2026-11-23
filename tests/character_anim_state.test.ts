@@ -3,8 +3,13 @@ import {
   ANIM_REPAIR_FRAMES,
   type AnimActionWeight,
   type AnimState,
+  advanceBankRoll,
   advanceSwimPitch,
   advanceTreadBlend,
+  applyLocoDirection,
+  BANK_FULL_SPEED,
+  BANK_FULL_YAW_RATE,
+  BANK_ROLL_MAX,
   castHoldStep,
   desiredBaseState,
   drivesPose,
@@ -20,7 +25,9 @@ import {
   shouldInterruptLanding,
   shouldPlayLanding,
   shouldPlayOutCastExit,
+  TURN_LEAN_MAX,
   weaponStowedOverlay,
+  yawRateBetween,
 } from '../src/render/characters/anim_state';
 
 // A three.js SkinnedMesh renders BIND POSE (arms out, the T-pose) whenever the
@@ -257,7 +264,80 @@ describe('desiredBaseState', () => {
     expect(desiredBaseState(anim({ ...moving, sitting: true }), true)).toBe('sit');
     expect(desiredBaseState(anim(), true)).toBe('idle');
   });
+});
 
+describe('advanceBankRoll', () => {
+  // The sim's facing grows counter-clockwise (forward is `(sin f, cos f)`), so a
+  // POSITIVE yaw rate is a left-hand turn; the pose wrap's +Z raises the body's
+  // left side. Leaning INTO a left turn drops that side, hence a negative roll.
+  it('leans into the turn, not away from it', () => {
+    let roll = 0;
+    for (let i = 0; i < 200; i++) roll = advanceBankRoll(roll, BANK_FULL_YAW_RATE, 99, 1 / 60);
+    expect(roll).toBeLessThan(0);
+    expect(roll).toBeCloseTo(-BANK_ROLL_MAX, 2);
+
+    let right = 0;
+    for (let i = 0; i < 200; i++) right = advanceBankRoll(right, -BANK_FULL_YAW_RATE, 99, 1 / 60);
+    expect(right).toBeCloseTo(BANK_ROLL_MAX, 2);
+  });
+
+  it('clamps a mouse flick instead of throwing the body on its side', () => {
+    let roll = 0;
+    for (let i = 0; i < 200; i++) roll = advanceBankRoll(roll, 40, 99, 1 / 60);
+    expect(roll).toBeCloseTo(-BANK_ROLL_MAX, 2);
+  });
+
+  it('does not bank a body that is turning on the spot', () => {
+    let roll = 0;
+    for (let i = 0; i < 200; i++) roll = advanceBankRoll(roll, BANK_FULL_YAW_RATE, 0, 1 / 60);
+    expect(roll).toBeCloseTo(0, 5);
+  });
+
+  it('scales with travel up to the full-authority speed', () => {
+    let half = 0;
+    for (let i = 0; i < 200; i++) {
+      half = advanceBankRoll(half, BANK_FULL_YAW_RATE, BANK_FULL_SPEED / 2, 1 / 60);
+    }
+    expect(half).toBeCloseTo(-BANK_ROLL_MAX / 2, 2);
+  });
+
+  it('unwinds to level when the turn stops', () => {
+    let roll = -BANK_ROLL_MAX;
+    for (let i = 0; i < 200; i++) roll = advanceBankRoll(roll, 0, 99, 1 / 60);
+    expect(Math.abs(roll)).toBeLessThan(1e-3);
+  });
+
+  it('takes a land lean far smaller than a swimmer bank', () => {
+    let lean = 0;
+    for (let i = 0; i < 200; i++) {
+      lean = advanceBankRoll(lean, BANK_FULL_YAW_RATE, 99, 1 / 60, TURN_LEAN_MAX);
+    }
+    expect(lean).toBeCloseTo(-TURN_LEAN_MAX, 3);
+    expect(Math.abs(lean)).toBeLessThan(BANK_ROLL_MAX / 3);
+  });
+
+  it('survives a non-finite rate or speed', () => {
+    expect(advanceBankRoll(0, Number.NaN, 9, 1 / 60)).toBeCloseTo(0, 6);
+    expect(advanceBankRoll(0, 1, Number.NaN, 1 / 60)).toBeCloseTo(0, 6);
+  });
+});
+
+describe('yawRateBetween', () => {
+  it('takes the short way around the wrap', () => {
+    // Without wrapping, a heading crossing +/-PI reads as a 360deg/frame flick
+    // and slams the body onto its side for one frame.
+    const rate = yawRateBetween(Math.PI - 0.05, -Math.PI + 0.05, 0.1);
+    expect(rate).toBeCloseTo(1, 5);
+  });
+
+  it('is zero on a stalled frame', () => {
+    expect(yawRateBetween(0, 1, 0)).toBe(0);
+  });
+});
+
+// Upstream's battle stance (v0.42): an IDLE variant every other pose outranks.
+// Fourth argument is the stance clip.
+describe('desiredBaseState (battle stance)', () => {
   it('holds the battle stance instead of the idle while engaged and standing', () => {
     expect(desiredBaseState(anim({ combat: true }), true, true, true)).toBe('combatIdle');
     // Not engaged: the relaxed idle, exactly as before the stance existed.
@@ -288,6 +368,71 @@ describe('desiredBaseState', () => {
     expect(desiredBaseState(anim({ ...fighting, spinning: true }), true, true, true)).toBe('spin');
     expect(desiredBaseState(anim({ ...fighting, casting: true }), true, true, true)).toBe('cast');
     expect(desiredBaseState(anim({ ...fighting, sitting: true }), true, true, true)).toBe('sit');
+  });
+});
+
+// A Q/E strafe slides the body sideways at the full run speed. A rig that ships
+// both side runs plays them; every other rig keeps the run it always played.
+describe('desiredBaseState strafe', () => {
+  const strafing = (over: Partial<AnimState> = {}) =>
+    anim({ moving: true, running: true, speed: 7, strafe: 'left', ...over });
+  /** A rig with walkBack and both side runs (the WOC player bodies). The positions
+   *  are walkBack, wade, glide, combatIdle, prowlIdle, prowlWalk, braced, strafe. */
+  const withSideRuns = (s: AnimState, hasWalkBack = true) =>
+    desiredBaseState(s, hasWalkBack, true, true, false, false, false, true);
+
+  it('plays the side run for the side the body travels toward', () => {
+    expect(withSideRuns(strafing())).toBe('strafeLeft');
+    expect(withSideRuns(strafing({ strafe: 'right' }))).toBe('strafeRight');
+  });
+
+  it('keeps the run for a rig without both side runs (the default)', () => {
+    expect(desiredBaseState(strafing(), true)).toBe('run');
+    expect(desiredBaseState(strafing(), true, true, true, false, false, false, false)).toBe('run');
+  });
+
+  it('keeps a slow sideways walk on the walk cycle', () => {
+    expect(withSideRuns(strafing({ running: false, speed: 2.2 }))).toBe('walk');
+  });
+
+  it('only strafes while moving: a stale side on a standing body is an idle', () => {
+    expect(withSideRuns(strafing({ moving: false, running: false, speed: 0 }))).toBe('idle');
+    expect(withSideRuns(strafing({ moving: false, running: false, combat: true }))).toBe(
+      'combatIdle',
+    );
+    expect(withSideRuns(anim({ moving: true, running: true, speed: 7, strafe: null }))).toBe('run');
+  });
+
+  it('never strafes a backpedal, whatever the rig covers it with', () => {
+    const back = strafing({ backwards: true });
+    expect(withSideRuns(back)).toBe('walkBack');
+    // no walkBack clip, or a rig that reverses its forward cycle: still the run
+    expect(withSideRuns(back, false)).toBe('run');
+    expect(withSideRuns(strafing({ backwards: true, reverseBackpedal: true }))).toBe('run');
+  });
+
+  it('yields to every higher-priority pose (one arm per competing branch)', () => {
+    expect(withSideRuns(strafing({ wading: true }))).toBe('wade');
+    expect(
+      desiredBaseState(strafing({ stealthed: true }), true, true, true, true, true, false, true),
+    ).toBe('prowlWalk');
+    expect(withSideRuns(strafing({ swimming: true }))).toBe('swimSurface');
+    expect(withSideRuns(strafing({ airborne: true }))).toBe('jump');
+    expect(withSideRuns(strafing({ spinning: true }))).toBe('spin');
+    expect(withSideRuns(strafing({ casting: true }))).toBe('cast');
+    expect(withSideRuns(strafing({ sitting: true }))).toBe('sit');
+    // stealth WITHOUT a prowl clip (every humanoid) strafes as usual
+    expect(withSideRuns(strafing({ stealthed: true }))).toBe('strafeLeft');
+  });
+});
+
+describe('applyLocoDirection', () => {
+  it('feeds every direction fact, overwriting the last entity the scratch held', () => {
+    const s = anim({ backwards: true, reverseBackpedal: true, strafe: 'right' });
+    applyLocoDirection(s, { backwards: false, strafe: 'left' }, false);
+    expect([s.backwards, s.reverseBackpedal, s.strafe]).toEqual([false, false, 'left']);
+    applyLocoDirection(s, { backwards: true, strafe: null }, true);
+    expect([s.backwards, s.reverseBackpedal, s.strafe]).toEqual([true, true, null]);
   });
 });
 
@@ -409,6 +554,36 @@ describe('locomotionTimeScale', () => {
     // an authored walkBack clip plays FORWARD; only the reversed fallback negates
     expect(locomotionTimeScale('walkBack', back)).toBeCloseTo(1);
     expect(locomotionTimeScale('walk', { ...back, backwards: false })).toBeCloseTo(1);
+  });
+
+  it('matches both side runs against strafeRef, clamped like the run', () => {
+    for (const state of ['strafeLeft', 'strafeRight'] as const) {
+      const at = (speed: number) => ({ speed, backwards: false });
+      // strafeRef is the LAST parameter, defaulting to the run's reference
+      expect(locomotionTimeScale(state, at(7)), state).toBeCloseTo(1);
+      expect(locomotionTimeScale(state, at(3.5), 2.2, 3.5), state).toBeCloseTo(1);
+      // strafeRef rides after the cadence ceilings (walkMax, runMax)
+      expect(
+        locomotionTimeScale(state, at(5), 2.2, 7, 2.2, 2.2, 0.6, undefined, undefined, 5),
+        state,
+      ).toBeCloseTo(1);
+      expect(
+        locomotionTimeScale(state, at(4), 2.2, 7, 2.2, 2.2, 0.6, undefined, undefined, 5),
+        state,
+      ).toBeCloseTo(0.8);
+      // the run's clamp: 1.6 on top, runTimeScaleMin (default 0.6) underneath
+      expect(locomotionTimeScale(state, at(99)), state).toBeCloseTo(1.6);
+      expect(locomotionTimeScale(state, at(0.5)), state).toBeCloseTo(0.6);
+      expect(locomotionTimeScale(state, at(0.5), 2.2, 7, 2.2, 2.2, 0.35), state).toBeCloseTo(0.35);
+    }
+  });
+
+  it('never reverses a side run, even for a rig that reverses its backpedal', () => {
+    const odd = { speed: 7, backwards: true, reverseBackpedal: true };
+    expect(locomotionTimeScale('strafeLeft', odd)).toBeCloseTo(1);
+    expect(locomotionTimeScale('strafeRight', odd)).toBeCloseTo(1);
+    // (the run under the same flags DOES reverse: the branch is what differs)
+    expect(locomotionTimeScale('run', odd)).toBeCloseTo(-1);
   });
 });
 
@@ -591,6 +766,12 @@ describe('weaponStowedOverlay', () => {
   it('forces the sheathed pose while mounted, regardless of the sim bit', () => {
     expect(weaponStowedOverlay(false, false, true)).toBe(true);
     expect(weaponStowedOverlay(true, false, true)).toBe(true);
+  });
+
+  it('forces the sheathed pose while sitting, regardless of the sim bit', () => {
+    expect(weaponStowedOverlay(false, false, false, true)).toBe(true);
+    expect(weaponStowedOverlay(true, false, false, true)).toBe(true);
+    expect(weaponStowedOverlay(false, false, false, false)).toBe(false);
   });
 
   it('is only ever an overlay: it never reports drawn when any input says stowed', () => {

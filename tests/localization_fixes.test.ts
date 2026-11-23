@@ -22,6 +22,12 @@ import {
   worldPvpDefeatLine,
   worldPvpKillLine,
 } from '../src/sim/pvp/world_pvp';
+import {
+  WORLD_PVP_BOUNTY_EARNED_LINE,
+  WORLD_PVP_BOUNTY_LAPSED_LINE,
+  worldPvpBountyCollectedLine,
+  worldPvpBountyPlacedLine,
+} from '../src/sim/pvp/world_pvp_bounty';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
@@ -660,6 +666,12 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       HILL_TAKEN_LINE,
       HILL_LOST_LINE,
       HILL_READOUT_NONE_LINE,
+      // World PvP bounties (src/sim/pvp/world_pvp_bounty.ts): the holder's
+      // notices and the two realm announcements, same constant-and-builder shape.
+      WORLD_PVP_BOUNTY_EARNED_LINE,
+      WORLD_PVP_BOUNTY_LAPSED_LINE,
+      worldPvpBountyPlacedLine('Aki'),
+      worldPvpBountyCollectedLine('Bet', 'Aki'),
     ];
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -1079,6 +1091,14 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   // dungeon_finder.ts's assembled line both sat outside the guard that way).
   const nr = new RegExp(`(?:this|ctx)\\.(?:notice|stopFollow)\\([^,()]+,\\s*${lit}`, 'g');
   for (const m of simSrc.matchAll(nr)) cands.push({ type: 'log', tmpl: unq(m[1]) });
+  // Module-local broadcast helpers named `announce` fan ONE line out as a 'log'
+  // emit with the text in a variable, which every emit form above misses: the
+  // rift portals' announce(ctx, '<lit>', color) and the authored-map flag
+  // rehearsal's announce(ctx, run, '<lit>', color). The optional middle arg is
+  // a bare identifier only (never a literal), so the two-arg form cannot read
+  // its COLOR as the text; the call may wrap (biome puts each arg on its line).
+  const an = new RegExp(`\\bannounce\\(\\s*ctx,\\s*(?:[A-Za-z_$][\\w$.]*,\\s*)?${lit}`, 'g');
+  for (const m of simSrc.matchAll(an)) cands.push({ type: 'log', tmpl: unq(m[1]) });
   // Ternary args to error/notice/stopFollow (both branches). The first-arg
   // class spans newlines (a biome-wrapped call puts each arg on its own line)
   // but still excludes parens, so a single-arg call cannot bleed into the NEXT
@@ -1266,6 +1286,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/fatigue.ts'), 'utf8'),
+    // The Shardpike trial (brace/thrust refusals + the set/fumble/blind notices).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/lance_trial.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
     // DL1: Drowned Litany boss/rite/rooms emit surfaces.
@@ -1330,6 +1352,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // at zone expiry (type:'log', telegraph:true). These are the only player-facing
     // emits in this file; re-localized via the sim.rift.detonate* rules.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
+    // The landing halves of those bars (the bigCast and breathCone unleashes
+    // lines, the death-zone detonateText) moved to mob_cast_bars.ts: the same
+    // literals, re-localized by the same rules.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_cast_bars.ts'), 'utf8'),
     // Professions 2.0: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
     // biting.", "Something golden flashes beneath the surface!", "You need to
@@ -1476,6 +1502,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // above, resolved by the sim_i18n log.bossUnleashes RULE). Scanned so any FUTURE literal
     // emit added to this module lands under the drift guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/dragonkin_brood.ts'), 'utf8'),
+    // The warpath's dev trace: its lines are dev-channel ("[dev] ..." to testers, only with
+    // dev commands on), English by rule and variable-routed like dev_commands.ts emitDevLog.
+    // Scanned so a literal PLAYER emit ever added here lands under the drift guard.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/warpath_dev_trace.ts'), 'utf8'),
     socialSrc,
     // Whole-directory sweep (the phase 18 whole-branch review): EVERY
     // src/sim/professions module is scanned, the same directory-glob treatment
@@ -1511,6 +1541,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // refusals sit under the drift guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_scrolls.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_casket.ts'), 'utf8'),
+    // The trash engine's G3 use (a Soul Brazier toppled with the interact
+    // press): its refusals ("Too far away.", "Line of sight.", "You are
+    // busy.", the dead line) are RETURNED by kitUseRefusal and emitted
+    // through a variable, so only the return-literal scan sees them here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/trash_kit/encounter_use.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized
@@ -1556,6 +1591,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     'server/character_blob_size.ts',
     'server/character_save_statement.ts',
     'server/admin_market_metrics.ts',
+    'server/realm_motd.ts',
   ]
     .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
     .join('\n');
@@ -1606,6 +1642,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // class below would otherwise read `rank` as 5); the bracketed arm has its
     // own matcher cases in tests/server_i18n.test.ts.
     if (/RANK_LABEL|rankLabel\(/.test(expr)) return 'Officer';
+    // A rift tier is one letter of the C/B/A/S ladder (RiftTier), and the rift
+    // portal announcements' rules match exactly that class, so a NAME probe
+    // would fail them for the wrong reason.
+    if (/\btier\b/.test(expr)) return 'S';
     if (
       // The three ready-check tallies are counts whose names say so in words
       // rather than in any of the stems below, so they read as a NAME and the
@@ -1758,11 +1798,23 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'chat.ts',
       'chat_readouts.ts',
       'duel.ts',
+      'duel_zone.ts',
       'dungeon_finder.ts',
+      'dungeon_finder_dev.ts',
+      'expedition_social.ts',
       'fiesta.ts',
       'fiesta_bots.ts',
+      'finder_advert.ts',
+      'finder_applications.ts',
+      'finder_guild.ts',
+      'finder_listing_edit.ts',
+      'finder_recruitment.ts',
+      'map_objective_bots.ts',
+      'map_objectives_hooks.ts',
+      'map_objectives_run.ts',
       'party.ts',
       'pull_timer.ts',
+      'queue_rewards.ts',
       'ready_check.ts',
       'trade.ts',
       'trade_offer_sources.ts',
@@ -1877,6 +1929,11 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // e3 anti-bleed: the newline-tolerant condm must still stop at ';' and ')', so
     // an emit followed by an unrelated wrapped ternary cannot harvest its branches.
     "ctx.emit({ type: 'log', text: 'SYNTH_EMIT_STOP' });\ny =\n  b\n    ? 'EMIT_TERN_BLEED_A'\n    : 'EMIT_TERN_BLEED_B';",
+    // an: the module-local announce helpers. The two-arg form (rift portals) must
+    // read the text, never the trailing color literal; the run-carrying form
+    // (map objectives) arrives biome-wrapped, one arg per line.
+    "announce(ctx, `SYNTH_ANNOUNCE ${tier}`, '#ANNOUNCE_COLOR_BLEED');",
+    "announce(\n  ctx,\n  run,\n  `SYNTH_ANNOUNCE_RUN ${name}`,\n  '#ANNOUNCE_RUN_COLOR_BLEED',\n);",
   ].join('\n');
   const synthServer = [
     "this.send({ type: 'error', text: 'SYNTH_SERVER_INLINE' });", // s1
@@ -1930,6 +1987,8 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
       'log',
       'SYNTH_EMIT_STOP',
     ],
+    ['sim announce helper, two-arg form (an)', 'log', 'SYNTH_ANNOUNCE ${tier}'],
+    ['sim announce helper, run form, wrapped (an)', 'log', 'SYNTH_ANNOUNCE_RUN ${name}'],
     ['server inline text (s1)', 'error', 'SYNTH_SERVER_INLINE'],
     ['server ternary text, branch A (s1t)', 'log', 'SYNTH_SRV_TERN_A'],
     ['server ternary text, branch B (s1t)', 'log', 'SYNTH_SRV_TERN_B'],
@@ -1960,6 +2019,10 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // Negative: the single-arg stopFollow's scan must NOT bleed past ')' into the
     // following track(...) call's literal (would regress if the nr first-arg class
     // ever stopped excluding ')').
+    // Negative: the announce form's optional middle arg is an identifier, so
+    // neither form can harvest its color literal as the line.
+    const colorBled = cands.filter((c) => c.tmpl.includes('COLOR_BLEED'));
+    expect(colorBled, 'announce form must never read the color arg as text').toEqual([]);
     const bled = cands.some((c) => c.tmpl === 'BLEED_SENTINEL_should_not_capture');
     expect(bled, "nr first-arg class must stop at ')' (no cross-call bleed)").toBe(false);
     const socialBled = cands.some((c) => c.tmpl === 'SOCIAL_BLEED_SENTINEL_should_not_capture');
@@ -2183,7 +2246,11 @@ describe('deploy-window aliases for wire-carried renames', () => {
     // bundle-only read proves the catalog really carries the key (fresh read
     // of the round-1 fix).
     expect(
-      tEntityOptional({ kind: 'dungeon', id: 'drowned_temple', field: 'enterText' }),
+      tEntityOptional({
+        kind: 'dungeon',
+        id: 'drowned_temple',
+        field: 'enterText',
+      }),
       'the English catalog carries the enterText row',
     ).toBe(live);
     try {
@@ -2267,6 +2334,18 @@ describe('vendor sell log line localizes the item name for both a single item an
         const out = harness().localizeLootText('Sold Copper Ore for 4c.');
         expect(out, lang).toBe(expected);
       }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('localizes both current and legacy royal-door denial punctuation', () => {
+    try {
+      setLanguage('es');
+      const current = 'Nythraxis is engaged - the royal door has sealed shut.';
+      const legacy = 'Nythraxis is engaged \u2014 the royal door has sealed shut.';
+      expect(localizeSimText(current)).not.toBe(current);
+      expect(localizeSimText(current)).toBe(localizeSimText(legacy));
     } finally {
       setLanguage('en');
     }

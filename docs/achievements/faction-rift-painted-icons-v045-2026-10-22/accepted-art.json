@@ -1,0 +1,857 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "faction-rift-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 10,
+    "replacedSvgIcons": 10,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rift_watchers_band",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rift_watchers_band.webp",
+      "canonicalDisplayName": "Rift Watcher's Band",
+      "acceptedSha256": "b665cf1ea66d8109b2eaa5c3033eeda30f230871b944e6ef5b812de4616a5d67",
+      "acceptedBytes": 3290,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/rift_watchers_band.png",
+        "sha256": "3e8f0fcd3aa05a8db5dfcbb6cb85dfdee2db17eabc840d7cf036cfd7d98eb838",
+        "bytes": 2190919,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/rift_watchers_band.png",
+        "sha256": "4923cf75e13cd1bda94c34e83837e787f3192753319a980323cf3af40e880ccd",
+        "bytes": 526369,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "44cb956a53cee6a56a374e5ec0c49cae01a3aa3c061ce1a90746060ceb49508d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rift Watcher's Band (rift_watchers_band) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete dark silver ring in three-quarter view, a narrow glowing cyan riftglass channel inset around its circular band, small diamond-shaped cyan rift gem in a modest silver setting. Darkened silver and clear bright cyan, restrained decoration. Distinct simple lower-rank ring, no giant violet gemstone. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/rift_watchers_band.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "44cb956a53cee6a56a374e5ec0c49cae01a3aa3c061ce1a90746060ceb49508d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rift_surveyors_satchel",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rift_surveyors_satchel.webp",
+      "canonicalDisplayName": "Rift Surveyor's Satchel",
+      "acceptedSha256": "703184776697ac098019bf6e75b91cfd248f7940209471f68e6cddce8e21b032",
+      "acceptedBytes": 3978,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/rift_surveyors_satchel.png",
+        "sha256": "0a08afcec5a5ee57a5550a783ee7d07168813747018c2ceaeb60a5e95a4359b8",
+        "bytes": 2571009,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/rift_surveyors_satchel.png",
+        "sha256": "68ab9abd0a650015cdac81794412400e396c4941819b41230e4d6f4c2ad4fea7",
+        "bytes": 529607,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "386f33b30f3a223b321b1822f444f663c17f0308103707f4b1d384d0e8dba57e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rift Surveyor's Satchel (rift_surveyors_satchel) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete midnight-navy leather surveyor satchel, compact rectangular three-quarter volume, wide curved flap and two leather buckle straps with worn brass hardware. A small hanging cyan rift crystal at the front and a simple brass flap clasp. Soft grain, stitched seams and practical worn edges, dark blue-black leather with cyan accents, no unrelated loose contents. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/rift_surveyors_satchel.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "386f33b30f3a223b321b1822f444f663c17f0308103707f4b1d384d0e8dba57e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "riftwalkers_tunic",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/riftwalkers_tunic.webp",
+      "canonicalDisplayName": "Riftwalker's Tunic",
+      "acceptedSha256": "1a503b12ae9bfdd5c25d952261af960b264a0c44962324f4e4c5d6b45c915708",
+      "acceptedBytes": 3590,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/riftwalkers_tunic.png",
+        "sha256": "7660f6fa28663bc89a97860da4c299b1ebec4854860dd8a0426c2563e077dd2b",
+        "bytes": 2411002,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/riftwalkers_tunic.png",
+        "sha256": "3637e8564a4f6795ca86a90b9ac144e0cabef235e63150a172bb58b00d2395ad",
+        "bytes": 505857,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "0808200413a49b08f2bd3db1968a0909e53e5fb069e2356e5f2225c9470ad418",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Riftwalker's Tunic (riftwalkers_tunic) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty midnight-blue LEATHER tunic, front-facing with short reinforced shoulder caps, layered leather lapels and supple stitched torso. Thin cyan geometric rift stitching follows curved seams; dark waist belt and small cyan clasp. Clear flexible grain and stitching, not cloth robes or metal armor. No body, head or mannequin. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/riftwalkers_tunic.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "0808200413a49b08f2bd3db1968a0909e53e5fb069e2356e5f2225c9470ad418"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "riftwarden_voidblade",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/riftwarden_voidblade.webp",
+      "canonicalDisplayName": "Riftwarden's Voidblade",
+      "acceptedSha256": "4cbe2dc9f8bb432b689eaff16e72a155b2d70f737784c7e9a9befd6ca5e4672c",
+      "acceptedBytes": 2322,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/riftwarden_voidblade.png",
+        "sha256": "5a29b08fa06825cbf1945a678e0889646d38e27812e65602c94c9af648813d83",
+        "bytes": 2057828,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/riftwarden_voidblade.png",
+        "sha256": "9a9a43fc38c5b991643438d64e03aa0d034ddeb7b382219386fa7dd0b9790655",
+        "bytes": 459369,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "b023249a35545fc3ff1f4420f2dcdcb2ec93d82435cc1d990385a7e59f1a30c3",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Riftwarden's Voidblade (riftwarden_voidblade) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete elegant curved one-handed sword on a bottom-left to top-right diagonal. Dark violet void-forged blade with a restrained luminous cyan-violet cutting edge, small aged-gold swept guard, dark brown wrapped grip and round bronze pommel. Slim fast sword with a subtle crescent curve, not a dagger or oversized greatsword. Tip, full blade, guard and pommel all visible with padding. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/riftwarden_voidblade.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "b023249a35545fc3ff1f4420f2dcdcb2ec93d82435cc1d990385a7e59f1a30c3"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "champion_rift_band",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/champion_rift_band.webp",
+      "canonicalDisplayName": "Champion's Rift Band",
+      "acceptedSha256": "8186b2f98f83794637b27eeab5ae96712d9fdf6350dc63aba399a64e5140ea0f",
+      "acceptedBytes": 3884,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/champion_rift_band.png",
+        "sha256": "d7f543abfb02879e1cb150afd9062b4410c5374fd2adfc01b9cc804ba887cd80",
+        "bytes": 2193938,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/champion_rift_band.png",
+        "sha256": "3d3b4ea2c9195d029ee82ce51ede64974f64c870acc6665576e666a8d07dbdf9",
+        "bytes": 523819,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "66c5a9f0efba6bff51969222754de47dec2d52bc97a9580e30d0ed755c514fb2",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Champion's Rift Band (champion_rift_band) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete ornate platinum ring in three-quarter view, broad sculpted band and four firm silver claws holding a large faceted deep-violet astral void stone. A tiny bright star-like point floats inside the dark gemstone; angular shoulders and subtle cosmic channels. Regal large gemstone distinguishes this champion ring from the narrow cyan-inlaid Rift Watcher band. No surrounding stars or frame. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/champion_rift_band.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "66c5a9f0efba6bff51969222754de47dec2d52bc97a9580e30d0ed755c514fb2"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "tidewatchers_locket",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/tidewatchers_locket.webp",
+      "canonicalDisplayName": "Tidewatcher's Locket",
+      "acceptedSha256": "be9a2fc79f062f994b802879ed1f3860994d03d5db96b840c637e38f36577033",
+      "acceptedBytes": 2994,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/tidewatchers_locket.png",
+        "sha256": "c1e7158f99b5efae35b21cc4ba8312ec327846c1b6993df267989c0fdd0c1eae",
+        "bytes": 2081673,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/tidewatchers_locket.png",
+        "sha256": "b14cc143cf3b9f9e6ef705c19a9346eff1a8499541de23631666af31d9fb42a0",
+        "bytes": 469545,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "fe93ce161251d6dc3ffe48320b733f8a18b197f538b37ab7e50aeebdc5f98104",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tidewatcher's Locket (tidewatchers_locket) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete silver necklace loop with a large teal tide-glass teardrop locket at bottom center. Smooth translucent aqua droplet with a restrained swirling tide inside, polished silver cap and bail, simple silver chain entirely in frame. Practical modest ornament, clear teardrop silhouette, no violet jagged shard. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/tidewatchers_locket.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "fe93ce161251d6dc3ffe48320b733f8a18b197f538b37ab7e50aeebdc5f98104"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "riftwalkers_cord",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/riftwalkers_cord.webp",
+      "canonicalDisplayName": "Riftwalker's Cord",
+      "acceptedSha256": "83007b17743ea9ee7d0f440ce41567147ad98507ff849328a5d9ae34462bd087",
+      "acceptedBytes": 3316,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/riftwalkers_cord.png",
+        "sha256": "0466fc25f85cb028a1c80260186d4807262a0a6f06b327d4aca237ba70ecc257",
+        "bytes": 2293986,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/riftwalkers_cord.png",
+        "sha256": "a94aef32f0f128e06a1848ec8418f5f565e9c9e97a7f98480a286c6b6e4a661c",
+        "bytes": 485775,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "67e099f755439196cfaf26dc18240da864883b7b1265ebc5fc500af4ee552765",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Riftwalker's Cord (riftwalkers_cord) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete broad curved waist belt made of dark midnight-blue LEATHER with stitched edges, a substantial silver buckle holding one angular glowing teal rift crystal. Flexible thick hide with a few overlapping reinforcement strips and cool cyan seam accents, matching Riftwalker leather armor. Both ends visible, no cloth cord, no solid plate belt. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/riftwalkers_cord.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "67e099f755439196cfaf26dc18240da864883b7b1265ebc5fc500af4ee552765"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "riftwalkers_treads",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/riftwalkers_treads.webp",
+      "canonicalDisplayName": "Riftwalker's Treads",
+      "acceptedSha256": "b271a7228487440c61744356b74703f2865a03c9d0237561ca9515dc91cb0bce",
+      "acceptedBytes": 3964,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/riftwalkers_treads.png",
+        "sha256": "a1d0ef49f0c1b505185c5d2b80ec759b4015800e91ca50fb55eae598ce4d3d39",
+        "bytes": 2292413,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/riftwalkers_treads.png",
+        "sha256": "0fafcf158ce1cf2b9ecaf7e4b312a5a0f07adbc5a22aefab0fb8abc9251dc861",
+        "bytes": 541911,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "5d430c12dd76d0dc7fbe363ff010a5b619bd925ef55d71f05116fce9f66f440f",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Riftwalker's Treads (riftwalkers_treads) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One compact matching pair of supple midnight-blue LEATHER adventurer boots, one forward and partner behind. Teal cuff trim, dark leather crossing buckle straps, small silver clasps, sturdy worn soles and clean stitched panels. Cyan rift accents restrained along cuffs, natural curved toes, no metal sabatons or living feet. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/riftwalkers_treads.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "5d430c12dd76d0dc7fbe363ff010a5b619bd925ef55d71f05116fce9f66f440f"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "formula_riftwalkers_grace",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/formula_riftwalkers_grace.webp",
+      "canonicalDisplayName": "Formula: Riftwalker's Grace",
+      "acceptedSha256": "7ffe060a75826832c538f0f3f17a94329395c85f2e7cbc68bf90cf75bf3acf0b",
+      "acceptedBytes": 3352,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/formula_riftwalkers_grace.png",
+        "sha256": "31a74c0149b543a8174029bb4df285f4650d985e5c30582cf19a1e00308b2d31",
+        "bytes": 2208103,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/formula_riftwalkers_grace.png",
+        "sha256": "2edc9a0761d04fd46fa41627f913bbb0530829204c28056bf746e69f99d841b3",
+        "bytes": 542858,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "ca07d71b4e14236ef3d422a6b4ec504951126613dbe953202a5abfc443d7e537",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Formula: Riftwalker's Grace (formula_riftwalkers_grace) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One rolled warm ivory parchment enchantment scroll with visibly curled ends, bound by a dark teal ribbon and one teal wax seal bearing a single deliberate simple split-diamond rift emblem. Parchment has no writing, no pseudo-script, no letters. Closed compact diagonal roll, a faint cyan gleam at the seal, tactile paper edges and ribbon weave. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/formula_riftwalkers_grace.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ca07d71b4e14236ef3d422a6b4ec504951126613dbe953202a5abfc443d7e537"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "riftwardens_pendant",
+      "family": "faction-rift",
+      "batch": "faction-rift-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/riftwardens_pendant.webp",
+      "canonicalDisplayName": "Riftwarden's Pendant",
+      "acceptedSha256": "1a739f266338e8a2d54b533b14921ef1e5e0e7f63916fcf715010fa2995c27fa",
+      "acceptedBytes": 3148,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-rift/originals/riftwardens_pendant.png",
+        "sha256": "fca811731db61e974c3834f4eb00b39f1edeae6cde1537693424f1ecdb4bc588",
+        "bytes": 2030484,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-rift/masters/riftwardens_pendant.png",
+        "sha256": "a829813f89c39da5f1ef65067efaf297239c4e096d6d4f02c7f5ca80cceb887f",
+        "bytes": 457978,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "d72638adff8180dc7ff48391ae76d3482ad78aabd1cf62a9408c37dc47061cea",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Riftwarden's Pendant (riftwardens_pendant) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete ornate silver necklace with a large jagged deep-violet void shard held in a strong angular silver prong setting. Fully visible dark silver chain loops around above it; a small cyan fissure glows inside the purple shard. Severe spiky gemstone silhouette and elaborate silver setting distinguish it from the smooth teal Tidewatcher teardrop. Rift Watch faction: deep navy, dark silver, cyan riftglass and restrained cosmic violet. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-navy painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-rift/superseded/riftwardens_pendant.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d72638adff8180dc7ff48391ae76d3482ad78aabd1cf62a9408c37dc47061cea"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-rift-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-rift-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

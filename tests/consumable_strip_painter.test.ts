@@ -136,6 +136,7 @@ function slotState(iconKey: string): ActionBarSlotState {
     kind: 'item',
     abilityId: null,
     itemId: iconKey,
+    petCommand: null,
     iconKey,
     cooldownRemaining: 0,
     cooldownTotal: 0,

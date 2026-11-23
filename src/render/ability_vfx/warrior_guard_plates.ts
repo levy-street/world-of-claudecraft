@@ -12,6 +12,11 @@ import { GuardPrewarm } from './guard_prewarm';
 import { warriorSteelTexture } from './production_assets';
 import type { AbilityVfxRibbons, RibbonAnchor } from './ribbons';
 import { warriorGuardGeometry } from './warrior_guard_geometry';
+import {
+  type WarriorKitSurface,
+  warriorKitSlotMap,
+  warriorKitSurface,
+} from './warrior_kit_surface';
 
 export type WarriorGuardKind = 0 | 1 | 2 | 3;
 export interface WarriorGuardAura {
@@ -55,7 +60,7 @@ const UP = new THREE.Vector3(0, 1, 0);
 export class WarriorGuardPlates {
   /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
   spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
-  readonly mesh: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
+  readonly mesh: THREE.InstancedMesh<THREE.BufferGeometry, WarriorKitSurface>;
   readonly preparation: GuardPrewarm;
   private readonly wearers = new Map<number, Wearer>();
   private readonly frameMatrix = new THREE.Matrix4();
@@ -76,9 +81,10 @@ export class WarriorGuardPlates {
     this.mesh = new THREE.InstancedMesh(
       warriorGuardGeometry(),
       modulateEmissiveByVertexColor(
-        new THREE.MeshStandardMaterial({
+        warriorKitSurface('warrior-held-guard-plates', {
           color: 0xffffff,
           vertexColors: true,
+          map: warriorSteelTexture() ?? warriorKitSlotMap(),
           roughness: 0.4,
           metalness: 0.2,
           emissive: 0xffffff,
@@ -113,10 +119,7 @@ export class WarriorGuardPlates {
           // Both enclosing recipes upload this shared texture before geometry.
           const texture = warriorSteelTexture();
           if (!texture) throw new Error('Warrior guard steel has not been prepared');
-          if (this.mesh.material.map !== texture) {
-            this.mesh.material.map = texture;
-            this.mesh.material.needsUpdate = true;
-          }
+          this.mesh.material.map = texture;
         },
       },
       ...this.preparation.units(host),

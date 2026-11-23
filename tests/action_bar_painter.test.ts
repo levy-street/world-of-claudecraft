@@ -71,6 +71,7 @@ function slotState(over: Partial<ActionBarSlotState> = {}): ActionBarSlotState {
     kind: 'ability',
     abilityId: 'x',
     itemId: null,
+    petCommand: null,
     iconKey: 'ability:x',
     cooldownRemaining: 0,
     cooldownTotal: 0,

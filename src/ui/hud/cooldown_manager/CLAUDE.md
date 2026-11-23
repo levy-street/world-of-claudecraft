@@ -3,9 +3,10 @@
 Options > Cooldown Manager: floating GROUPS of non-clickable buttons for the spells
 the player picks. Three kinds: a single button, a button group (a grid with a
 settable run length and run count), and a line of spells. Each group has its own
-orientation, icon direction, icon size, padding, opacity, visibility (always, in
-combat, hidden) and timer switch, and is dragged into place while the Options
-sub-view is open. Each button shows the spell's cooldown sweep, dims while it cannot
+orientation, icon direction, icon size, padding, opacity, two rows of combinable
+checkmarks for when it shows (out of combat, in combat) and where (open world,
+instances), and timer switch, and is dragged into place while the Options sub-view
+is open. Each button shows the spell's cooldown sweep, dims while it cannot
 be cast, lights up when it is ready, follows the spell when its button transforms
 (Gorebite into Redharvest), and can play one of the Auras panel's alert cues and
 light the spell's action-bar button when it becomes ready. The Auras panel
@@ -14,11 +15,11 @@ core, thin painter, one controller, one settings panel.
 
 | File | What it is |
 |---|---|
-| `cooldown_manager_config.ts` | Stored shape (groups, per-spell config, shared layout), sanitizers, the group layout rules (`cooldownCell`, `cooldownGroupShown`), spell assignment, and the search matcher. Pure rules; imports the cue catalog, so it is not a registered pure core. |
+| `cooldown_manager_config.ts` | Stored shape (groups, per-spell config, shared layout), sanitizers (including the pre-checkmark `visibility` / `onlyWhenReady` migrations), the group layout rules (`cooldownCell`, `cooldownGroupShown`, `cooldownGroupActive`), spell assignment, and the search matcher. Pure rules; imports the cue catalog, so it is not a registered pure core. |
 | `cooldown_manager_catalog.ts` | Every ability a class can hold across all specs, talents and levels (derived), and its trackable-spell subset the picker offers. Pinned by a sweep over every class, spec and talent option. |
 | `cooldown_manager_auras.ts` | The trackable AURAS (engines, procs, buffs): `ENGINE_AURAS` (the one hand table, each row pinned against the sim source), the Auras panel's procs, every talent-row proc, and class self-buffs; plus the `aura:<id>` / `kind:<kind>` token rules. |
 | `cooldown_manager_store.ts` | The per-character localStorage record (`woc_cooldown_manager:<class>:<name>`), carried by the full settings export. |
-| `cooldown_manager_view.ts` | The per-frame pure core: readiness, transform, glow flags, cue edges. Registered in `UI_PURE_CORES`. |
+| `cooldown_manager_view.ts` | The per-frame pure core: readiness, transform, glow flags, cue edges, the buff reminder (`cooldownAuraReminder`) and per-entry muting. Registered in `UI_PURE_CORES`. |
 | `cooldown_manager_painter.ts` | Thin painter over `PainterHostWriters` (a `HOT_PAINTERS` member). |
 | `cooldown_manager_controller.ts` | The DOM adapter: mints the groups, drives view + painter, plays cues, feeds the hotbar glow, projects the settings hooks. |
 | `cooldown_manager_settings.ts` | The Options sub-panel (cold DOM): general switches, group cards, and the Tracked Spells sorter. |
@@ -33,6 +34,20 @@ core, thin painter, one controller, one settings panel.
   pulses it. It shows stacks and time left, never a hotbar glow. Auras the static
   catalog misses are still offered: the controller remembers every helpful aura
   seen on the player (`recordSeen`, one Set lookup per aura per frame, capped).
+
+- **When a button and a group show are checkmarks that combine, never a select.**
+  Each entry ticks Ready and/or Not Ready (an aura: Active and/or Missing); each
+  group ticks its combat row (out of combat, in combat) and its place row (open
+  world, instances: past `DUNGEON_X_THRESHOLD`, the same instance-plane test the
+  HUD's zone label uses, so battlegrounds and every instanced band count).
+  Unticking a whole combat row only hides the group (it still sounds: the
+  sound-only route), but a group outside its ticked PLACES is fully off (`cooldownGroupActive`): hidden, muted and no hotbar glow, with its
+  edges still recorded so walking in never replays a stale cue.
+- **Missing alone is a buff reminder** (`cooldownAuraReminder`): the aura button
+  inverts, lit, pulsing (with the light-up switch on) and chiming while the aura is
+  missing or short of its stack goal, and hidden once it is up. A dead player is
+  never reminded, but resurrecting without the aura chimes once (the reminder keeps
+  an unlit edge through death instead of forgetting it); login stays silent.
 
 - **Readiness is the action bar's, never a second rule.** The view composes
   `createActionBarView` over a descriptor whose slots are the tracked spells, and
@@ -59,6 +74,8 @@ core, thin painter, one controller, one settings panel.
   `watchedGlowAbilityIds` channel; it can never suppress an authored class proc.
   It is offered only where the desktop action bar is live.
 - **The buttons are decoration, not controls:** the layer is `aria-hidden` and
-  `pointer-events: none` except in placement (the Options sub-view is open), where
-  every group shows and can be dragged. The keyboard path to the same placement is
+  `pointer-events: none` on the layer and group gaps. Icons receive pointer events
+  for the shared spell or aura hover tooltip, without casting. Touch readouts
+  pass camera gestures through outside placement. In placement (the Options
+  sub-view is open), every group shows and can be dragged. The keyboard path to the same placement is
   the position sliders on each group card.

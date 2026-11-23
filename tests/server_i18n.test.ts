@@ -441,3 +441,53 @@ describe('guild custom rank lines (docs/prd/guild-custom-ranks.md)', () => {
     }
   });
 });
+
+// The GM tool notices (server/moderation_service.ts) are English on the wire and
+// re-rendered client-side. Every one must be recognized, and staff-authored free
+// text (announcements, watch notes) must pass through untouched even when it
+// happens to look like another server message.
+describe('GM tool strings round-trip through localizeServerText', () => {
+  const lines = [
+    'Usage: /visible on|off',
+    'You are already visible.',
+    'You are already invisible.',
+    'You are now visible.',
+    'You are now invisible. Players and creatures can no longer see or target you.',
+    'Usage: /watch ["<name>" [note]]',
+    'Usage: /unwatch "<name>"',
+    "No character named 'Bob'.",
+    'Added Bob to the watchlist.',
+    'Removed Bob from the watchlist.',
+    'Bob is not on the watchlist.',
+    'The watchlist is empty.',
+    'Watchlist (3):',
+    'Watched: Bob',
+    'Watched: Bob (gold seller)',
+    '...and 4 more.',
+    'Watchlist: Bob just logged in.',
+    'Watchlist: Alt just logged in (watched as Bob).',
+    'Watch note: Bob is not jailed.',
+    'Usage: /announce <message>',
+    '[Announcement] Fury: Bob is not jailed. Restart at 10:00.',
+  ];
+
+  it('recognizes every line and renders the English source exactly', () => {
+    setLanguage('en');
+    for (const line of lines) expect(localizeServerText(line), line).toBe(line);
+  });
+
+  it('keeps names and staff-authored text verbatim in every locale', () => {
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      expect(
+        localizeServerText('[Announcement] Fury: Bob is not jailed. Restart at 10:00.'),
+      ).toContain('Bob is not jailed. Restart at 10:00.');
+      expect(localizeServerText('Watch note: Bob is not jailed.')).toContain('Bob is not jailed.');
+      expect(localizeServerText('Watchlist: Alt just logged in (watched as Bob).')).toContain(
+        'Alt',
+      );
+      expect(localizeServerText('Watched: Bob (gold seller)')).toContain('gold seller');
+    }
+    setLanguage('en');
+  });
+});

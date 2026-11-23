@@ -72,6 +72,10 @@ describe('lockoutKind', () => {
     expect(isRaidRoom('nythraxis_boss_arena')).toBe(true);
     expect(isRaidRoom('ignivar_inner_crucible')).toBe(true);
     expect(isRaidRoom('hollow_crypt')).toBe(false);
-    expect(LOCKOUT_KIND_ORDER).toEqual(['raid', 'dungeon', 'worldBoss']);
+    expect(LOCKOUT_KIND_ORDER).toEqual(['raid', 'dungeon', 'worldBoss', 'weeklyQuest']);
+  });
+
+  it('classifies a weekly quest lock by its prefix (quests/weekly_quest_lock.ts)', () => {
+    expect(lockoutKind('weeklyquest:q_muster_trophy')).toBe('weeklyQuest');
   });
 });

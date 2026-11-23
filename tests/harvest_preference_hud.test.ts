@@ -16,6 +16,14 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import type { HarvestPreference } from '../src/sim/professions/harvest_preference';
 import type { SimEvent } from '../src/sim/types';
 import { FocusManager } from '../src/ui/focus_manager';
@@ -29,6 +37,7 @@ import {
 import { makeWindowFocus } from '../src/ui/window_focus';
 import { syncWindowOpenBodyClasses } from '../src/ui/window_open_state';
 import type { IWorld } from '../src/world_api';
+import { contactAtOnce } from './helpers/renderer_contact';
 import { stripComments } from './helpers/strip_comments';
 
 // happy-dom rewrites import.meta.url to an http scheme (the localization_fixes idiom).
@@ -232,7 +241,7 @@ describe('the spectator bug: the generic pid gate is not enough for harvestPrefe
     // that method's body reaches are stamped on directly.
     const hud = Object.create(Hud.prototype) as HudTestHarness;
     hud.sim = sim;
-    hud.renderer = { handleEvent: vi.fn() };
+    hud.renderer = { handleEvent: vi.fn(), atContact: contactAtOnce };
     hud.meters = { onEvent: vi.fn() };
     hud.harvestPreferenceController = { open };
     hud.isNythraxisEvent = () => false;

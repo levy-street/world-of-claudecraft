@@ -69,7 +69,10 @@ describeDb('woc market directed rail against real Postgres', () => {
     await db.ensureSchema();
     await db.runConcurrentIndexMigrations();
 
-    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 12 });
+    pool = new Pool({
+      ...materialSourceConnection(verifyUrl(ADMIN_URL as string)),
+      max: 12,
+    });
     marketDb = new marketDbMod.PgWocMarketDb(pool);
   }, 120_000);
 
@@ -84,7 +87,11 @@ describeDb('woc market directed rail against real Postgres', () => {
   // the one-open-settlement index stays the authority)
   // -------------------------------------------------------------------------
 
-  const SAVE_STATE = { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState;
+  const SAVE_STATE = {
+    questLog: [],
+    questsDone: [],
+    inventory: [],
+  } as unknown as CharacterState;
 
   async function seedAccount(): Promise<number> {
     seq++;
@@ -235,7 +242,12 @@ describeDb('woc market directed rail against real Postgres', () => {
           pid: 100_000 + characterId,
           extracted: copy,
           characterName: `DirectedChar${characterId}`,
-          save: { characterId, level: 10, state: SAVE_STATE, leaseNonce: undefined },
+          save: {
+            characterId,
+            level: 10,
+            state: SAVE_STATE,
+            leaseNonce: undefined,
+          },
         };
       },
       grantCopy: () => {
@@ -287,8 +299,16 @@ describeDb('woc market directed rail against real Postgres', () => {
     buyerCharacter: number;
     sellerName: string;
     sellerCharacter: number;
-    agreed: { itemId: string; instance?: InvSlot['instance']; craftedRecipeId?: string };
-    acceptRef: { index: number; itemId: string; expectInstance?: InvSlot['instance'] | null };
+    agreed: {
+      itemId: string;
+      instance?: InvSlot['instance'];
+      craftedRecipeId?: string;
+    };
+    acceptRef: {
+      index: number;
+      itemId: string;
+      expectInstance?: InvSlot['instance'] | null;
+    };
     seller: number;
   }): Promise<
     | { ok: true; listing: { id: number; endsAtMs: number } | null }
@@ -326,7 +346,10 @@ describeDb('woc market directed rail against real Postgres', () => {
           : { expectInstance: args.acceptRef.expectInstance }),
       },
       args.sellerCharacter,
-      { nonce: minted.challenge.nonce, signature: `devsig:${minted.challenge.nonce}` },
+      {
+        nonce: minted.challenge.nonce,
+        signature: `devsig:${minted.challenge.nonce}`,
+      },
     );
     if (!sellerSide.ok) return sellerSide as { ok: false; reason: string };
     const buyerSide = await args.service.acceptDirectedOffer(
@@ -352,7 +375,9 @@ describeDb('woc market directed rail against real Postgres', () => {
       // The listing recorded the seller wallet at creation; the seller then
       // unlinked it and the twin account linked the SAME pubkey (pubkey is
       // UNIQUE, so the twin is sequential, never concurrent).
-      const listingId = await seedListing(realm, seller, { sellerWallet: 'wallet-twin-shared' });
+      const listingId = await seedListing(realm, seller, {
+        sellerWallet: 'wallet-twin-shared',
+      });
       await linkWallet(twin, 'wallet-twin-shared');
       const claimed = await marketDb.claimBuyNowLock(
         realm,
@@ -381,7 +406,9 @@ describeDb('woc market directed rail against real Postgres', () => {
       const realm = 'directed-wallet-null';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const listingId = await seedListing(realm, seller, { sellerWallet: 'wallet-null-seller' });
+      const listingId = await seedListing(realm, seller, {
+        sellerWallet: 'wallet-null-seller',
+      });
       // Degenerate arm: the LISTING wallet is never null by DDL, but the
       // claimer-side read can be. A buyer with NO wallet row must not trip
       // the twin guard (the route refuses wallet_required upstream; the SQL
@@ -520,7 +547,9 @@ describeDb('woc market directed rail against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const buyerCharacter = await seedCharacter(realm, buyer);
-      const listingId = await seedListing(realm, seller, { directedBuyerAccount: buyer });
+      const listingId = await seedListing(realm, seller, {
+        directedBuyerAccount: buyer,
+      });
       const inserted = await marketDb.insertSettlement({
         listingId,
         bidId: null,
@@ -702,9 +731,11 @@ describeDb('woc market directed rail against real Postgres', () => {
     };
   }
 
-  async function offerAcceptState(
-    id: number,
-  ): Promise<{ buyerAccepted: boolean; sellerAccepted: boolean; itemRefNull: boolean }> {
+  async function offerAcceptState(id: number): Promise<{
+    buyerAccepted: boolean;
+    sellerAccepted: boolean;
+    itemRefNull: boolean;
+  }> {
     const res = await pool.query(
       `SELECT buyer_accepted, seller_accepted, item_ref FROM woc_market_directed_offers WHERE id = $1`,
       [id],
@@ -721,7 +752,9 @@ describeDb('woc market directed rail against real Postgres', () => {
       const realm = 'directed-converge';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const listingId = await seedListing(realm, seller, { directedBuyerAccount: buyer });
+      const listingId = await seedListing(realm, seller, {
+        directedBuyerAccount: buyer,
+      });
       const reopenable = await seedOffer(realm, seller, buyer, {
         status: 'accepted',
         buyerAccepted: true,
@@ -748,9 +781,18 @@ describeDb('woc market directed rail against real Postgres', () => {
       const service = makeService(realm, { wallets: new Map() });
       const stats = await service.sweepPass();
       expect(stats?.convergedOffers).toBe(2);
-      expect(await offerRow(reopenable)).toEqual({ status: 'pending', listingId: null });
-      expect(await offerRow(lapsed)).toEqual({ status: 'expired', listingId: null });
-      expect(await offerRow(stamped)).toEqual({ status: 'accepted', listingId });
+      expect(await offerRow(reopenable)).toEqual({
+        status: 'pending',
+        listingId: null,
+      });
+      expect(await offerRow(lapsed)).toEqual({
+        status: 'expired',
+        listingId: null,
+      });
+      expect(await offerRow(stamped)).toEqual({
+        status: 'accepted',
+        listingId,
+      });
       // The REAL reopen UPDATE resets the seller accept and clears the named
       // item so a spent step-up proof cannot re-drive custody, while keeping
       // the buyer's standing consent (B6/R1). This is the production SQL the
@@ -886,7 +928,9 @@ describeDb('woc market directed rail against real Postgres', () => {
         buyerAccepted: true,
         sellerAccepted: true,
       });
-      const fresh = await seedOffer(realm, seller, buyer, { status: 'pending' });
+      const fresh = await seedOffer(realm, seller, buyer, {
+        status: 'pending',
+      });
       expect(await marketDb.reopenDirectedOffer(realm, stuck), 'the occupied pair blocks').toBe(
         false,
       );
@@ -966,7 +1010,9 @@ describeDb('woc market directed rail against real Postgres', () => {
           'the reopen was observed blocked on the racer',
         ).toBeGreaterThanOrEqual(0);
         await racer.query('COMMIT');
-        expect(await reopen, 'swallowed as the pair-occupied no-op').toEqual({ flipped: false });
+        expect(await reopen, 'swallowed as the pair-occupied no-op').toEqual({
+          flipped: false,
+        });
       } finally {
         racer.release();
       }
@@ -1137,7 +1183,9 @@ describeDb('woc market directed rail against real Postgres', () => {
       const realm = 'reopen-guards';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const declined = await seedOffer(realm, seller, buyer, { status: 'declined' });
+      const declined = await seedOffer(realm, seller, buyer, {
+        status: 'declined',
+      });
       expect(await marketDb.reopenDirectedOffer(realm, declined)).toBe(false);
       expect((await offerRow(declined)).status, 'a dead deal never resurrects').toBe('declined');
 
@@ -1170,7 +1218,9 @@ describeDb('woc market directed rail against real Postgres', () => {
       const realm = 'offer-cas-status';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const declined = await seedOffer(realm, seller, buyer, { status: 'declined' });
+      const declined = await seedOffer(realm, seller, buyer, {
+        status: 'declined',
+      });
       expect(await marketDb.resolveDirectedOffer(realm, declined, 'withdrawn')).toBeNull();
       expect((await offerRow(declined)).status, 'a verdict never relabels').toBe('declined');
       expect(await marketDb.acceptDirectedOfferSide(realm, declined, 'buyer', null)).toBeNull();
@@ -1280,7 +1330,12 @@ describeDb('woc market directed rail against real Postgres', () => {
         const sibling = await seedOffer(realm, seller, await seedAccount(), {});
         const results = await Promise.allSettled([
           marketDb.escrowInsertListing(
-            { characterId, level: 10, state: SAVE_STATE, leaseNonce: undefined },
+            {
+              characterId,
+              level: 10,
+              state: SAVE_STATE,
+              leaseNonce: undefined,
+            },
             {
               realm,
               sellerAccount: seller,
@@ -1346,7 +1401,9 @@ describeDb('woc market directed rail against real Postgres', () => {
         status: 'declined',
         updatedAtMs: old,
       });
-      const pendingOld = await seedOffer(realm, seller, buyer, { updatedAtMs: old });
+      const pendingOld = await seedOffer(realm, seller, buyer, {
+        updatedAtMs: old,
+      });
       const resolvedFresh = await seedOffer(realm, seller, buyer, {
         status: 'expired',
         updatedAtMs: realNowMs - MINUTE_MS,
@@ -1424,7 +1481,11 @@ describeDb('woc market directed rail against real Postgres', () => {
       expect(out).toMatchObject({ ok: false, reason: 'item_mismatch' });
       // The pin the guard compares against is the canonical copy pin.
       expect(
-        itemCopyPin({ itemId: 'amber_crimson_armor_plate', count: 1, instance: heldCopy.instance }),
+        itemCopyPin({
+          itemId: 'amber_crimson_armor_plate',
+          count: 1,
+          instance: heldCopy.instance,
+        }),
       ).not.toBe(
         itemCopyPin({
           itemId: 'amber_crimson_armor_plate',
@@ -1485,7 +1546,10 @@ describeDb('woc market directed rail against real Postgres', () => {
         seller,
         // The buyer's trade window previewed the copy in cell 2; the seller
         // accepts naming the one in cell 7.
-        agreed: { itemId: 'amber_crimson_armor_plate', instance: staged.instance },
+        agreed: {
+          itemId: 'amber_crimson_armor_plate',
+          instance: staged.instance,
+        },
         acceptRef: {
           index: 1,
           itemId: 'amber_crimson_armor_plate',
@@ -1702,7 +1766,11 @@ describeDb('woc market directed rail against real Postgres', () => {
     it('strikes escalate by one and a suspension never shortens', async () => {
       const acc = await seedAccount();
       const first = await marketDb.addStrike(acc, null);
-      expect(first).toMatchObject({ accountId: acc, strikes: 1, suspendedUntilMs: null });
+      expect(first).toMatchObject({
+        accountId: acc,
+        strikes: 1,
+        suspendedUntilMs: null,
+      });
       const long = BASE_MS + 120 * MINUTE_MS;
       const second = await marketDb.addStrike(acc, long);
       expect(second.strikes).toBe(2);

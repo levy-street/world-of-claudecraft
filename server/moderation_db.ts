@@ -67,6 +67,9 @@ export const MODERATION_ACTIONS = [
   // folded into the stored reason text.
   'restore_item',
   'restore_slot',
+  // Buddy grants (server/buddy_wire.ts): the seasonal award channel. Same
+  // shape as the restores: value minted onto a character, reason required.
+  'grant_buddy',
   // Stamped-legendary-name removal (Masterwrought phase 13,
   // server/clear_item_name.ts): moderation of PLAYER-AUTHORED content on an
   // item copy, so the reason is REQUIRED and the stripped target is folded
@@ -79,14 +82,45 @@ export const MODERATION_ACTIONS = [
   // tick, not a decision, and would otherwise write an audit row per save.
   'cheater_mark',
   'cheater_mark_lift',
+  // In-game GM tools (server/moderation_service.ts). None sanctions anyone, but
+  // each is a staff decision worth recovering: who watched an account and why,
+  // who went invisible and when, and what was broadcast to the whole realm
+  // (the announcement text is the stored reason; invisibility and announce
+  // rows are recorded against the GM's own account).
+  'watch',
+  'unwatch',
+  'gm_invisible',
+  'gm_visible',
+  'announce',
+  // The world quest block (src/sim/world_quest_block.ts): the lighter sanction
+  // for world quest botting, short of a ban. Reason REQUIRED on both arms, for
+  // the same recoverability reason as the Cheater mark.
+  'world_quests_block',
+  'world_quests_unblock',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
+
+// The audit kinds the in-game chat commands write through recordInGameAction.
+export type InGameModerationAction =
+  | 'kick'
+  | 'kill'
+  | 'jail'
+  | 'unjail'
+  | 'spectate'
+  | 'unspectate'
+  | 'watch'
+  | 'unwatch'
+  | 'gm_invisible'
+  | 'gm_visible'
+  | 'announce';
 
 // A pg pool or a pinned pool client (both expose query); lets the audit-log INSERT
 // run inside a caller's transaction or standalone.
 type Queryable = Pick<typeof pool, 'query'>;
 
-function recordModerationAction(
+// Exported for sibling sanction modules (server/world_quest_block_db.ts) whose
+// own transaction must commit the audit row atomically with the account write.
+export function recordModerationAction(
   db: Queryable,
   action: ModerationActionKind,
   params: {
@@ -1227,7 +1261,7 @@ export async function setDailyRewardsIpBan(input: {
 // Audit-only record for an in-game action whose live effect is owned by the
 // GameServer. Unlike account sanctions, this changes no persistent account state.
 export async function recordInGameAction(input: {
-  action: 'kick' | 'kill' | 'jail' | 'unjail' | 'spectate' | 'unspectate';
+  action: InGameModerationAction;
   accountId: number;
   adminAccountId: number;
   reason: unknown;
@@ -1320,7 +1354,7 @@ export async function forceCharacterRename(input: {
 export async function recordProfessionsRestore(input: {
   characterId: number;
   adminAccountId: number;
-  action: 'restore_item' | 'restore_slot';
+  action: 'restore_item' | 'restore_slot' | 'grant_buddy';
   detail: string;
   reason: unknown;
 }): Promise<{ accountId: number }> {

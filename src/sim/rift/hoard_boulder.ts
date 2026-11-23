@@ -30,6 +30,7 @@ import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   hoardIntensity,
   hoardMechanicDamage,
+  hoardPlayerBudget,
   hoardPressure,
 } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
@@ -117,7 +118,7 @@ function begin(
   const held = boulderState(state);
   const pressure = hoardPressure(inst.vault);
   const double = hoardIntensity(inst.vault, living.length) >= HOARD_DOUBLE_MECHANIC_INTENSITY;
-  const plan = boulderPlan(living.length, double);
+  const plan = boulderPlan(hoardPlayerBudget(inst.vault, living.length), double);
   held.casts++;
   held.boulders = [];
   // The carrier outlives every beat; it is withdrawn the moment the last boulder

@@ -27,6 +27,8 @@ export interface AccountCosmetics {
   // its own rollback-safe row, like the weapon skins. The worn skin is per
   // character (characters.state) and never lives here.
   mountSkinIds: string[];
+  // Runtime projection only. Never written to the additive paid ownership row.
+  collectibleMountSkinIds?: string[];
 }
 
 function uniqueStrings(value: unknown): string[] {

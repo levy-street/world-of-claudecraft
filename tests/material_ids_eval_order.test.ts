@@ -15,6 +15,30 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
     vi.resetModules();
   });
 
+  it.each(['registry', 'data'])(
+    'derives complete immutable stack provenance with %s first',
+    async (entry) => {
+      if (entry === 'data') await import('../src/sim/data');
+      const registry = await import('../src/sim/stack_provenance_ids');
+      const { ITEMS } = await import('../src/sim/data');
+      const { materialItemIds } = await import('../src/sim/material_ids');
+      const kinds = new Set(['food', 'drink', 'potion', 'elixir', 'flask', 'scroll']);
+      const expected = new Set([
+        ...materialItemIds(),
+        ...Object.values(ITEMS)
+          .filter((item) => kinds.has(item.kind) && (item.stackSize ?? 20) > 1)
+          .map((item) => item.id),
+      ]);
+      const ids = registry.stackProvenanceItemIds();
+      expect([...ids].sort()).toEqual([...expected].sort());
+      expect(ids.has('sunpetal_healing_draught')).toBe(true);
+      expect(ids.has('baked_bread')).toBe(true);
+      expect(ids.has('tangled_weed')).toBe(false);
+      expect('add' in ids).toBe(false);
+      expect('delete' in ids).toBe(false);
+    },
+  );
+
   it('evaluates cleanly with bags.ts as the entry module', async () => {
     const mod = await import('../src/sim/bags');
     expect(mod.BACKPACK_SLOTS).toBe(16);
@@ -53,6 +77,7 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
     const gathering = await import('../src/sim/professions/gathering_materials');
     const grades = await import('../src/sim/professions/material_grades');
     const salvage = await import('../src/sim/professions/salvage_materials');
+    const trophy = await import('../src/sim/pvp/world_pvp_trophy');
     const rederived = derivation.deriveMaterialItemIds({
       nodeMaterialTable: gathering.NODE_MATERIAL_TABLE,
       materialGrades: grades.MATERIAL_GRADES,
@@ -63,6 +88,7 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
       recipes: data.ALL_RECIPES,
       enchants: enchants.ENCHANTS,
       recipePendingMaterialItemIds: crucible.CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
+      trophyMaterialItemIds: trophy.WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS,
       items: data.ITEMS,
     });
     expect([...set].sort()).toEqual([...rederived].sort());

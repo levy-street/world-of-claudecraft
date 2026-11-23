@@ -6,6 +6,12 @@
 // Steps (southPassX). Terrain: the FEN_* tables in world.ts; the willows,
 // lilypads, and bridge dressing live in render/fen_features.ts.
 
+import {
+  BRIDGEMERE_CAUSEWAY_ROAD,
+  BRIDGEMERE_LAYOUT,
+  BRIDGEMERE_NPC_PLACEMENTS_BY_ID,
+  paintedTownBuildingDefs,
+} from '../painted_towns';
 import type {
   CampDef,
   GroundObjectDef,
@@ -78,11 +84,9 @@ export const WILLOWFEN_ZONE: ZoneDef = {
 };
 
 export const WILLOWFEN_ROADS: { x: number; z: number }[][] = [
-  [
-    { x: -372, z: 260 },
-    { x: -360, z: 322 },
-    { x: -360, z: 362 },
-  ], // the Amberfen Steps -> the Fenway causeway -> Bridgemere
+  // the Amberfen Steps -> the Fenway causeway -> Bridgemere, ending in the
+  // painted inn's forecourt (sim/painted_towns/bridgemere.ts)
+  BRIDGEMERE_CAUSEWAY_ROAD.map((point) => ({ ...point })),
   // every spoke leaves over the causeway: the moat has ONE crossing
   [
     { x: -360, z: 324 },
@@ -232,8 +236,10 @@ export const WILLOWFEN_NPCS: Record<string, NpcDef> = {
     id: 'bridgewright_alden',
     name: 'Bridgewright Alden',
     title: 'Master of the Fenway',
-    pos: { x: -359, z: 354 },
-    facing: 2.9,
+    // at the causeway's head in the painted inn's forecourt
+    // (sim/painted_towns/bridgemere.ts)
+    pos: { ...BRIDGEMERE_NPC_PLACEMENTS_BY_ID.bridgewright_alden.position },
+    facing: BRIDGEMERE_NPC_PLACEMENTS_BY_ID.bridgewright_alden.facing,
     color: 0x8a6f4d,
     questIds: [
       'q_wf_across_the_fenway',
@@ -247,8 +253,10 @@ export const WILLOWFEN_NPCS: Record<string, NpcDef> = {
     id: 'netter_maris',
     name: 'Netter Maris',
     title: 'Eel-Netter of Bridgemere',
-    pos: { x: -354, z: 364 },
-    facing: -0.8,
+    // by the moat's west edge in the painted inn's forecourt
+    // (sim/painted_towns/bridgemere.ts)
+    pos: { ...BRIDGEMERE_NPC_PLACEMENTS_BY_ID.netter_maris.position },
+    facing: BRIDGEMERE_NPC_PLACEMENTS_BY_ID.netter_maris.facing,
     color: 0x6f9aa0,
     questIds: ['q_wf_eels_for_the_smokehouse', 'q_wf_toll_and_tangle'],
     greeting: 'Smell that? Smoked eel. Half this town stands on stilts I bought with it.',
@@ -539,27 +547,23 @@ export const WILLOWFEN_QUEST_CAMPS: CampDef[] = [
 
 export const WILLOWFEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Bridgemere: the island town, its buildings spread wide across the
-  // doubled moat island so every lane between them stays open
-  buildings: [
-    { kind: 'inn', x: -370, z: 369, w: 6, d: 7, rot: 0.7 },
-    { kind: 'house', x: -350, z: 354, w: 6, d: 6, rot: -0.9 },
-    { kind: 'house', x: -371, z: 349, w: 5, d: 5, rot: 2.4 },
-    { kind: 'chapel', x: -351, z: 370, w: 5, d: 7, rot: -2.1 },
-    { kind: 'house', x: -360, z: 375, w: 5, d: 5, rot: 0.1 },
-  ],
-  wells: [{ x: -356, z: 361, r: 1.5 }],
+  // Bridgemere: the painted island inn and the barrow chapel across the
+  // bridge (sim/painted_towns/bridgemere.ts)
+  buildings: [...paintedTownBuildingDefs(BRIDGEMERE_LAYOUT)],
+  // the inn's forecourt at the causeway's head keeps the square's well, fire,
+  // stall and crates
+  wells: [{ x: -352.5, z: 348.5, r: 1.5 }],
   stalls: [
-    { x: -365, z: 359, rot: 0.5, r: 1.6 },
+    { x: -370, z: 349.5, rot: 0.5, r: 1.6 },
     // the gate market: one stall trading at the causeway's south approach
     { x: -352, z: 314, rot: -1.3, r: 1.6 },
   ],
   crates: [
-    [-368, 365],
-    [-352, 358],
+    [-372.5, 351.5],
+    [-351, 350.5],
   ],
   campfires: [
-    [-358, 366],
+    [-355.5, 351.5],
     [-379, 212], // the Steps' waycamp (Waykeeper Pell's fire)
     [-416, 449], // Mother Sedge's fire at Willowweep
   ],
@@ -567,7 +571,7 @@ export const WILLOWFEN_PROPS: ZonePropsDef = {
     { x: -411, z: 449, rot: 2.0, scale: 1 }, // Mother Sedge's camp at Willowweep
   ],
   // homesteads and watchtowers spread across the fen's dry rises, each on
-  // probed level ground (KayKit blue set, matching Bridgemere's roofs)
+  // probed level ground (KayKit blue set)
   decorProps: [
     { key: 'hexbHomeA', x: -448, z: 452, rot: 0.6, scale: 7.5, r: 4.5, h: 8 },
     { key: 'hexbHomeB', x: -392, z: 232, rot: 2.4, scale: 7.5, r: 5, h: 10 },

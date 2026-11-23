@@ -6,6 +6,18 @@ import { describe, expect, it } from 'vitest';
 import { normalizeAccountCosmetics } from '../src/net/account_cosmetics_wire';
 
 describe('normalizeAccountCosmetics', () => {
+  it('replaces revocable collectible skins and filters malformed entries', () => {
+    expect(
+      normalizeAccountCosmetics({ collectibleMountSkinIds: ['valorsteed', null, 2] })
+        .collectibleMountSkinIds,
+    ).toEqual(['valorsteed']);
+    expect(
+      normalizeAccountCosmetics({ collectibleMountSkinIds: [] }).collectibleMountSkinIds,
+    ).toEqual([]);
+    expect(
+      normalizeAccountCosmetics({ collectibleMountSkinIds: 'valorsteed' }).collectibleMountSkinIds,
+    ).toEqual([]);
+  });
   it('returns all-empty defaults for undefined', () => {
     expect(normalizeAccountCosmetics(undefined)).toEqual({
       completedQuestIds: [],

@@ -81,10 +81,10 @@ const SOURCE_BY_COMMAND: ReadonlyMap<string, CopperFlowSource> = new Map(
     mail_take: 'mail',
     bank_buy_slots: 'bank',
     // The Materials Vault upgrade ladder is the same bursar surface as the
-    // bank slot ladder (770000 copper per character across five rungs).
+    // bank slot ladder (4720000 copper per character across ten rungs).
     vault_buy_upgrade: 'bank',
     // The bank bag-socket ladder (Bank Storage phase 07): the same bursar
-    // surface again, and the largest one-character bank sink (11500000 copper
+    // surface again, and a large one-character bank sink (4500000 copper
     // across four sockets), so booking it under 'other' would hide exactly
     // the sink this module exists to price.
     bank_unlock_socket: 'bank',

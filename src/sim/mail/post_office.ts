@@ -1,3 +1,4 @@
+import { assertHeroicMarksGrantsFit } from '../heroic_marks';
 // The Ravenpost: the in-game mail system. A new system module behind SimContext
 // (the market.ts shape): this class OWNS the shared mail book, the mail-id
 // counter, and the mailbox entity ids; the inventory hub (addItem/removeItem/
@@ -27,6 +28,7 @@ import {
   WELCOME_LETTER,
   WYRMFALL_CORE_LETTER,
 } from '../content/letters';
+import { MEMBERSHIP_TOKEN_ID } from '../content/membership';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
 import { isMergeableInstancePayload, itemInstancePayloadsEqual } from '../item_instance_merge';
@@ -39,13 +41,12 @@ import {
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
 import { removeSellUnitsFromInventory, removeVendorSellUnits } from '../items';
-import { isMaterialItemId } from '../material_ids';
 import { rekeyMaterialSignature } from '../material_signatures';
 import { validateMaterialSlotSourcesOnLoad } from '../material_slot_load';
-
 import { WYRMFALL_CORE_ITEM_ID } from '../professions/masterwrought_materials';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { isStackProvenanceItemId } from '../stack_provenance_ids';
 import {
   cloneInvSlot,
   dist2d,
@@ -614,10 +615,10 @@ export class PostOffice {
           this.result(meta.entityId, 'noMailBound');
           return;
         }
-        if (!isMaterialItemId(s.itemId)) {
+        if (!isStackProvenanceItemId(s.itemId)) {
           instancedWanted.push({ itemId: s.itemId, instance: s.instance, count });
         }
-      } else if (!isMaterialItemId(s.itemId)) {
+      } else if (!isStackProvenanceItemId(s.itemId)) {
         wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
       }
     }
@@ -801,6 +802,7 @@ export class PostOffice {
       this.result(meta.entityId, 'letterGone');
       return;
     }
+    assertHeroicMarksGrantsFit(meta, m.items);
     // Escrow in the expiry sense (sub-silver coin alone does not count): the
     // clock write at the tail keys on this, the coin grant below on any coin.
     const hadAttachments = mailHoldsEscrow(m);
@@ -820,7 +822,8 @@ export class PostOffice {
     }
     // Parcels respect bag capacity (#1354, the market-collect rule): a stack that
     // does not fit stays ATTACHED to the letter for a later take, never destroyed
-    // and never force-added past the bag budget. Capacity is checked per stack
+    // and never force-added past the bag budget, except membership tokens,
+    // which use the existing visible inventory overflow. Capacity is checked per stack
     // against the live inventory, so cumulative capacity is honoured. An
     // instanced parcel (a marketplace custody delivery or return) grants
     // through addItemInstance so the exact payload survives. Every grant
@@ -837,6 +840,7 @@ export class PostOffice {
       // threads its craftedRecipeId marker through so a mailed crafted item
       // keeps its provenance on arrival, the same as the market fix.
       if (
+        s.itemId === MEMBERSHIP_TOKEN_ID ||
         canGrantCopies(
           meta.inventory,
           bagPools(meta.bags),

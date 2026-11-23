@@ -187,6 +187,8 @@ describe('shutdown wiring (source pin)', () => {
     expect(endSessions).toBeGreaterThan(saveAll);
     expect(ledgerDrain).toBeGreaterThan(endSessions);
     expect(deedsDrain).toBeGreaterThan(endSessions);
+    expect(sweep).toBeGreaterThan(saveAll);
+    expect(unstuckDrain).toBeGreaterThan(endSessions);
     expect(unstuckDrain).toBeGreaterThan(endSessions);
     expect(sweep).toBeGreaterThan(saveAll);
     expect(sweep).toBeGreaterThan(ledgerDrain);
@@ -277,7 +279,10 @@ function storageEffectClient(updateRowCount: number) {
       return { rows: [PREIMAGE_ROW], rowCount: 1 };
     }
     if (/UPDATE characters/i.test(sql)) {
-      return { rows: updateRowCount > 0 ? [PREIMAGE_ROW] : [], rowCount: updateRowCount };
+      return {
+        rows: updateRowCount > 0 ? [PREIMAGE_ROW] : [],
+        rowCount: updateRowCount,
+      };
     }
     if (/FROM storage_purchase_applied_receipts/i.test(sql)) return { rows: [], rowCount: 0 };
     if (/FROM storage_purchases[\s\S]*FOR UPDATE/i.test(sql)) {

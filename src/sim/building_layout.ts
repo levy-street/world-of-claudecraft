@@ -1,3 +1,4 @@
+import { AUTHORED_TOWN_INN_IDS } from './authored_town_registry';
 import type { BuildingDef } from './types';
 
 export type BuildingGroundAt = (x: number, z: number) => number;
@@ -146,9 +147,10 @@ export function buildingContainsPoint(
 }
 
 /**
- * Rebuilt inns opt into the collider-correct transform. Keep the historical
- * transform for every unrelated inn so a town-layout change cannot move
- * established rest areas elsewhere in the world.
+ * Rebuilt inns (every inn of the towns in sim/authored_town_registry.ts) opt
+ * into the collider-correct transform. Keep the historical transform for
+ * every unrelated inn so a town-layout change cannot move established rest
+ * areas elsewhere in the world.
  */
 export function buildingContainsRestPoint(
   building: BuildingDef,
@@ -156,7 +158,7 @@ export function buildingContainsRestPoint(
   z: number,
   padding = 0,
 ): boolean {
-  if (building.id === 'eastbrook_inn' || building.id === 'fenbridge_crooked_reed_inn') {
+  if (building.id !== undefined && AUTHORED_TOWN_INN_IDS.has(building.id)) {
     return buildingContainsPoint(building, x, z, padding);
   }
 

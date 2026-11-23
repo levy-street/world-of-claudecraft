@@ -9,10 +9,18 @@
 // used (see that helper's header), and a lower bound like `>= 3000` would also
 // pass for a loop that waited ten minutes.
 import { describe, expect, it } from 'vitest';
-import type { ActivityItem, DailyRewardWinnersDay, RelayItem } from '../bot/logic';
+import {
+  type ActivityItem,
+  type DailyRewardWinnersDay,
+  type HillAnnouncementItem,
+  PVP_FEED_LINES_PER_POST,
+  type PvpKillItem,
+  type RelayItem,
+} from '../bot/logic';
 import {
   ANNOUNCED_DAYS_MAX,
   freshOutboxPollState,
+  type OutboxChannels,
   OutboxChannelUnsetError,
   type OutboxIo,
   outboxIoFor,
@@ -77,6 +85,27 @@ function winnersDay(day: string): DailyRewardWinnersDay {
   };
 }
 
+function pvpKill(killerName: string, victimName = 'Borin'): PvpKillItem {
+  return {
+    killerName,
+    victimName,
+    killerLevel: 60,
+    victimLevel: 58,
+    zoneName: 'Drakelands',
+    assists: 0,
+    copper: 0,
+    realm: 'Eastbrook',
+  };
+}
+
+function hillCall(
+  phase: HillAnnouncementItem['phase'],
+  risesAtMs = NOW + 15 * 60_000,
+  fallsAtMs = risesAtMs + 45 * 60_000,
+): HillAnnouncementItem {
+  return { phase, zoneName: 'Drakelands', risesAtMs, fallsAtMs, realm: 'Eastbrook' };
+}
+
 function linkChange(discordUserId: string): OutboxLinkChangeItem {
   return {
     accountId: 7,
@@ -95,6 +124,8 @@ function envelope(streams: Partial<OutboxEnvelope> = {}): OutboxEnvelope {
     winners: { days: [] },
     linkChanges: { items: [] },
     queuePops: { items: [], watching: false },
+    pvpKills: { items: [] },
+    hillAnnouncements: { items: [] },
     ...streams,
   };
 }
@@ -125,6 +156,9 @@ interface Recorder {
   marks: string[];
   links: OutboxLinkChangeItem[][];
   pops: OutboxQueuePopItem[];
+  /** One entry per digest post, each the batch it carried. */
+  pvpBatches: PvpKillItem[][];
+  hills: HillAnnouncementItem[];
   errors: { where: string; message: string }[];
 }
 
@@ -142,6 +176,8 @@ function recorder(
     failActivity?: (item: ActivityItem) => boolean;
     failWinners?: (day: DailyRewardWinnersDay) => boolean;
     failQueuePop?: (item: OutboxQueuePopItem) => boolean;
+    failPvpBatch?: (batch: readonly PvpKillItem[]) => boolean;
+    failHill?: (item: HillAnnouncementItem) => boolean;
     markResult?: (day: string) => unknown;
     now?: () => number;
   } = {},
@@ -155,6 +191,8 @@ function recorder(
     marks: [],
     links: [],
     pops: [],
+    pvpBatches: [],
+    hills: [],
     errors: [],
     io: {
       now: options.now ?? (() => NOW),
@@ -178,6 +216,16 @@ function recorder(
         calls.push(`activity:${item.kind}`);
         rec.activity.push(item);
         if (options.failActivity?.(item)) throw new Error(`activity ${item.kind} refused`);
+      },
+      postPvpKills: async (batch) => {
+        calls.push(`pvp:${batch.length}`);
+        rec.pvpBatches.push([...batch]);
+        if (options.failPvpBatch?.(batch)) throw new Error(`pvp batch of ${batch.length} refused`);
+      },
+      postHillAnnouncement: async (item) => {
+        calls.push(`hill:${item.phase}`);
+        rec.hills.push(item);
+        if (options.failHill?.(item)) throw new Error(`hill ${item.phase} refused`);
       },
       postWinnersDay: async (day) => {
         calls.push(`winners:${day.day}`);
@@ -571,6 +619,11 @@ describe('outbox poll didWork signal', () => {
       { name: 'winners', streams: { winners: { days: [winnersDay('2026-07-31')] } } },
       { name: 'linkChanges', streams: { linkChanges: { items: [linkChange('u9')] } } },
       { name: 'queuePops', streams: { queuePops: { items: [queuePop('u9')], watching: false } } },
+      { name: 'pvpKills', streams: { pvpKills: { items: [pvpKill('Annthar')] } } },
+      {
+        name: 'hillAnnouncements',
+        streams: { hillAnnouncements: { items: [hillCall('warning')] } },
+      },
       // The watch signal alone, with NOTHING drained: an opted-in player is
       // waiting in a queue, and the pop that ends the wait has a 30 s window,
       // so the loop must hold the fast cadence rather than decay to idle.
@@ -676,7 +729,7 @@ describe('outbox channel routing', () => {
   }
 
   function factoryIo(
-    channels: { relay: string; activity: string; dailyRewards: string },
+    channels: OutboxChannels,
     drained: OutboxEnvelope,
   ): {
     io: OutboxIo;
@@ -714,7 +767,12 @@ describe('outbox channel routing', () => {
     return { io, sent, dms, marks, missing, errors };
   }
 
-  const CHANNELS = { relay: 'relay-1', activity: 'activity-1', dailyRewards: 'daily-1' };
+  const CHANNELS = {
+    relay: 'relay-1',
+    activity: 'activity-1',
+    dailyRewards: 'daily-1',
+    pvpFeed: 'pvp-1',
+  };
 
   it('sends each stream to its OWN channel, shaped by its OWN builder', async () => {
     // The one mutation this exists for is a swapped channel id, which type-checks
@@ -728,13 +786,33 @@ describe('outbox channel routing', () => {
       envelope({
         relay: { items: [relayItem('c1', 'Annthar')] },
         activity: { items: [activityItem('Annthar')] },
+        hillAnnouncements: { items: [hillCall('warning')] },
+        pvpKills: { items: [pvpKill('Kargath', 'Annthar')] },
         winners: { days: [winnersDay('2026-07-31')] },
       }),
     );
 
     await runOutboxPoll(wired.io);
 
-    expect(wired.sent.map((s) => s.channelId)).toEqual(['relay-1', 'activity-1', 'daily-1']);
+    expect(wired.sent.map((s) => s.channelId)).toEqual([
+      'relay-1',
+      'activity-1',
+      'pvp-1',
+      'pvp-1',
+      'daily-1',
+    ]);
+    // The hill call shares the kill feed's channel and is shaped by its own builder.
+    const hillEmbed = (wired.sent[2].payload.embeds as { title: string }[])[0];
+    expect(hillEmbed.title).toBe('A hill will rise in Drakelands');
+    expect(wired.sent[2].payload.allowed_mentions).toEqual({ parse: [] });
+    wired.sent.splice(2, 1);
+    const pvpPayload = wired.sent[2].payload;
+    // Only the kill-feed builder writes this line, and it never pings.
+    expect((pvpPayload.embeds as { description: string }[])[0].description).toBe(
+      ':crossed_swords: **Kargath** (60) slew **Annthar** (58) in Drakelands',
+    );
+    expect(pvpPayload.allowed_mentions).toEqual({ parse: [] });
+    wired.sent.splice(2, 1);
 
     const relayPayload = wired.sent[0].payload;
     expect(relayPayload.content).toBe('<@u1>');
@@ -792,7 +870,7 @@ describe('outbox channel routing', () => {
     // only buildQueuePopMessage produces (the game-URL button, the live
     // deadline stamp).
     const wired = factoryIo(
-      { relay: '', activity: '', dailyRewards: '' },
+      { relay: '', activity: '', dailyRewards: '', pvpFeed: '' },
       envelope({ queuePops: { items: [queuePop('u1')], watching: false } }),
     );
 
@@ -821,10 +899,12 @@ describe('outbox channel routing', () => {
     // once per channel rather than once per poll, or a deployment that never set
     // one would log a line every 3 seconds for the life of the process.
     const wired = factoryIo(
-      { relay: '', activity: '', dailyRewards: '' },
+      { relay: '', activity: '', dailyRewards: '', pvpFeed: '' },
       envelope({
         relay: { items: [relayItem('c1'), relayItem('c2')] },
         activity: { items: [activityItem()] },
+        pvpKills: { items: [pvpKill('Kargath')] },
+        hillAnnouncements: { items: [hillCall('warning')] },
         winners: { days: [winnersDay('2026-07-31')] },
       }),
     );
@@ -833,7 +913,8 @@ describe('outbox channel routing', () => {
     await runOutboxPoll(wired.io);
 
     expect(wired.sent).toEqual([]);
-    expect(wired.missing).toEqual(['relay', 'activity', 'dailyRewards']);
+    // The kill feed has NO fallback channel: unset means off, reported once.
+    expect(wired.missing).toEqual(['relay', 'activity', 'pvpFeed', 'dailyRewards']);
     // The day is NOT marked: there was nowhere to announce it, so it stays
     // unannounced and the server re-serves it once a channel is configured.
     expect(wired.marks).toEqual([]);
@@ -865,10 +946,123 @@ describe('outbox channel routing', () => {
     // Stated directly on the seam, because the whole no-mark behavior above
     // depends on it: a post that resolved quietly would be indistinguishable
     // from a successful announcement and the day would be marked.
-    const wired = factoryIo({ relay: '', activity: '', dailyRewards: '' }, envelope());
+    const wired = factoryIo({ relay: '', activity: '', dailyRewards: '', pvpFeed: '' }, envelope());
     await expect(wired.io.postRelay(relayItem('c1'))).rejects.toBeInstanceOf(
       OutboxChannelUnsetError,
     );
+  });
+});
+
+describe('outbox PvP kill feed digests', () => {
+  it('posts one digest per PVP_FEED_LINES_PER_POST kills, FIFO, after activity and before winners', async () => {
+    // The whole point of the stream: a brawl drains as a handful of posts, never
+    // one createMessage per kill. One more kill than two full batches proves
+    // both the batch size and that the remainder is not dropped.
+    const kills = Array.from({ length: PVP_FEED_LINES_PER_POST * 2 + 1 }, (_, i) =>
+      pvpKill(`K${i}`),
+    );
+    const rec = recorder({
+      envelope: envelope({
+        activity: { items: [activityItem()] },
+        pvpKills: { items: kills },
+        winners: { days: [winnersDay('2026-07-31')] },
+      }),
+    });
+
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+
+    expect(rec.calls).toEqual([
+      'drain',
+      'links:0',
+      'activity:levelup',
+      `pvp:${PVP_FEED_LINES_PER_POST}`,
+      `pvp:${PVP_FEED_LINES_PER_POST}`,
+      'pvp:1',
+      'winners:2026-07-31',
+      'mark:2026-07-31',
+    ]);
+    expect(rec.pvpBatches.flat().map((k) => k.killerName)).toEqual(kills.map((_, i) => `K${i}`));
+  });
+
+  it('isolates a refused digest: the next batch still posts and the refusal is reported', async () => {
+    const kills = Array.from({ length: PVP_FEED_LINES_PER_POST + 1 }, (_, i) => pvpKill(`K${i}`));
+    const rec = recorder({
+      envelope: envelope({ pvpKills: { items: kills } }),
+      failPvpBatch: (batch) => batch.length === PVP_FEED_LINES_PER_POST,
+    });
+
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.pvpBatches.map((b) => b.length)).toEqual([PVP_FEED_LINES_PER_POST, 1]);
+    expect(rec.errors).toEqual([
+      { where: 'pvp-kills', message: `pvp batch of ${PVP_FEED_LINES_PER_POST} refused` },
+    ]);
+  });
+
+  it('tolerates an older server that sends no pvpKills stream at all', async () => {
+    const { pvpKills: _omitted, ...older } = envelope({ relay: { items: [relayItem('c1')] } });
+    const rec = recorder({ envelope: older as OutboxEnvelope });
+
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.pvpBatches).toEqual([]);
+    expect(rec.errors).toEqual([]);
+  });
+});
+
+describe('outbox King of the Hill spawn calls', () => {
+  it('posts each call after the activity cards and AHEAD of the kill digests', async () => {
+    const rec = recorder({
+      envelope: envelope({
+        activity: { items: [activityItem()] },
+        pvpKills: { items: [pvpKill('K0')] },
+        hillAnnouncements: { items: [hillCall('warning'), hillCall('risen', NOW - 1000)] },
+      }),
+    });
+
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.calls).toEqual([
+      'drain',
+      'links:0',
+      'activity:levelup',
+      'hill:warning',
+      'hill:risen',
+      'pvp:1',
+    ]);
+  });
+
+  it('skips a call whose moment already passed while it was queued, silently', async () => {
+    // A warning once the hill has risen, a rise once it has fallen: posting
+    // either would call players to a hill that is not there.
+    const rec = recorder({
+      envelope: envelope({
+        hillAnnouncements: {
+          items: [
+            hillCall('warning', NOW - 1),
+            hillCall('risen', NOW - 60_000, NOW - 1),
+            hillCall('risen', NOW - 60_000, NOW + 60_000),
+          ],
+        },
+      }),
+    });
+
+    // Still work: the drain carried items even though two were skipped.
+    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(rec.hills.map((h) => [h.phase, h.fallsAtMs])).toEqual([['risen', NOW + 60_000]]);
+    expect(rec.errors).toEqual([]);
+  });
+
+  it('isolates a refused call: the rest still post and the refusal is reported', async () => {
+    const rec = recorder({
+      envelope: envelope({
+        hillAnnouncements: { items: [hillCall('warning'), hillCall('risen', NOW - 1000)] },
+        pvpKills: { items: [pvpKill('K0')] },
+      }),
+      failHill: (item) => item.phase === 'warning',
+    });
+
+    await runOutboxPoll(rec.io);
+    expect(rec.hills.map((h) => h.phase)).toEqual(['warning', 'risen']);
+    expect(rec.pvpBatches).toHaveLength(1);
+    expect(rec.errors).toEqual([{ where: 'hill', message: 'hill warning refused' }]);
   });
 });
 
@@ -885,7 +1079,7 @@ describe('outbox factory pass-through seams', () => {
       createMessage: async () => {},
       sendDirectMessage: async () => {},
       markDailyRewardWinners: async () => ({ ok: true }),
-      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd', pvpFeed: 'p' },
       gameUrl: 'https://game.test',
       breakerState: () => 'open',
       drain: async () => {
@@ -907,7 +1101,7 @@ describe('outbox factory pass-through seams', () => {
       createMessage: async () => {},
       sendDirectMessage: async () => {},
       markDailyRewardWinners: async () => ({ ok: true }),
-      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd', pvpFeed: 'p' },
       gameUrl: 'https://game.test',
       breakerState: () => 'closed',
       drain: async () => envelope({ linkChanges: { items: [linkChange('u9')] } }),
@@ -926,7 +1120,7 @@ describe('outbox factory pass-through seams', () => {
       },
       sendDirectMessage: async () => {},
       markDailyRewardWinners: async () => ({ ok: true }),
-      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd', pvpFeed: 'p' },
       gameUrl: 'https://game.test',
       breakerState: () => 'closed',
       drain: async () => envelope({ relay: { items: [relayItem('c1')] } }),

@@ -282,8 +282,8 @@ describe('bank self snapshot wire decoders', () => {
       stock: { copper_ore: 3 },
       special: [],
       upgrades: 1,
-      perMaterialCap: 40,
-      nextUpgradeCost: 50000,
+      perMaterialCap: 100,
+      nextUpgradeCost: 40000,
     };
 
     apply(client, { cvault: stock, bpsl: 12, bank, vault });

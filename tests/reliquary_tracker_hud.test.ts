@@ -25,7 +25,15 @@
 // completion() null, and the method must produce the hidden strip, not a
 // throw.
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { Hud } from '../src/ui/hud';
 import { reliquaryPageName } from '../src/ui/reliquary_i18n';

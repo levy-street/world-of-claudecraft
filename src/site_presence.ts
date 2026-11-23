@@ -33,7 +33,16 @@ function pageName(fallback: string): string {
   return path || fallback;
 }
 
+let presenceStarted = false;
+
+/**
+ * Start the page's presence heartbeat. Once per page: the landing-first boot
+ * (src/ui/landing_first.ts) starts it before the client loads, and main.ts calls it
+ * again at boot.
+ */
 export function startSitePresence(fallbackPage = 'home'): void {
+  if (presenceStarted) return;
+  presenceStarted = true;
   const id = visitorId();
   const send = () => {
     if (document.visibilityState === 'hidden') return;

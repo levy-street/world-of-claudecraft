@@ -1,0 +1,1023 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "faction-church-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "order_prayer_beads",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/order_prayer_beads.webp",
+      "canonicalDisplayName": "Order Prayer Beads",
+      "acceptedSha256": "eef9a34cd0e5736011660105f9a3727c6614169e8bbe7bf3a6271e1f166c80c6",
+      "acceptedBytes": 2670,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/order_prayer_beads.png",
+        "sha256": "3dd897ea78ff5d9ec88ce42515e3fef2a8b0fc4cd6846fcee127b1e96452096b",
+        "bytes": 2056026,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/order_prayer_beads.png",
+        "sha256": "f63d8ae88387d82fe915bcb51d8b765fd712e1a3510739a4f9d563f69d7eb586",
+        "bytes": 450893,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "121d079fc32c02d2e0ab8d106967b73c174d6572c82f5e7ae637caf71506fb63",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Order Prayer Beads (order_prayer_beads) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete loop of sacred olivewood prayer beads, round honey-brown polished wooden beads with grain and small brass separators, a modest brass sunburst pendant hanging at the bottom. Soft worn cord, tactile warm wood and aged brass, fully visible bead loop and pendant, no cross-shaped writing or letters. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/order_prayer_beads.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "121d079fc32c02d2e0ab8d106967b73c174d6572c82f5e7ae637caf71506fb63"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "vestments_of_the_acolyte",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/vestments_of_the_acolyte.webp",
+      "canonicalDisplayName": "Vestments of the Acolyte",
+      "acceptedSha256": "5255502673e796e29f39f9db5b396e8526a38aa636c20e5f0e36d0b5f58fa1f8",
+      "acceptedBytes": 3824,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/vestments_of_the_acolyte.png",
+        "sha256": "74c8a09e312eb4428879f2d0a2f753ced2d9736eb2bed33f38b5e91744fc664d",
+        "bytes": 2400179,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/vestments_of_the_acolyte.png",
+        "sha256": "6f6f84e5d8e07a4130a52421b2a7e8f8625b983b712abfe5fe707d655373bc3a",
+        "bytes": 593637,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "6bc8c701219852c7988a90e4a879d902ba1500c2cf4c573c084945c6220882e2",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Vestments of the Acolyte (vestments_of_the_acolyte) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty cream CLOTH clerical robe, front-facing with soft flowing folds and short broad sleeves. A long golden dawn stole drapes down both sides of the front, each end embroidered with one intentional simple sun emblem. Ivory linen, soft gold woven borders and a modest cloth waist tie, clearly cloth not leather or metal, no body or mannequin. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/vestments_of_the_acolyte.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6bc8c701219852c7988a90e4a879d902ba1500c2cf4c573c084945c6220882e2"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "templar_dawn_shield",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/templar_dawn_shield.webp",
+      "canonicalDisplayName": "Templar's Dawn Shield",
+      "acceptedSha256": "70c2cae97f83cf3e87ffbb92f293b9c91787b27598fdc71c30be9f222c6bd96f",
+      "acceptedBytes": 3624,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/templar_dawn_shield.png",
+        "sha256": "a8422a6504ce384267099d56a41d85d37b154659bda8a2fc83c3839efd2e2773",
+        "bytes": 2461679,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/templar_dawn_shield.png",
+        "sha256": "a13fa6c779392052c48f0872e2a262fc82cf5565dfab068d12ef46a6d6145bbc",
+        "bytes": 595544,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "cbb243470da0eb4a1ffabf5acc4e4c789f4de322623f54c739dae160f69fbdda",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Templar's Dawn Shield (templar_dawn_shield) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete heavy heater-shaped shield in slight three-quarter front view, white enamel face, broad warm gold rim, large embossed golden sunburst at center with a small amber core. Thick metal construction, restrained sacred highlights, visible pointed lower tip and curved top shoulders, no writing or separate UI frame. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/templar_dawn_shield.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "cbb243470da0eb4a1ffabf5acc4e4c789f4de322623f54c739dae160f69fbdda"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "dawnkeeper_consecrated_mace",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/dawnkeeper_consecrated_mace.webp",
+      "canonicalDisplayName": "Dawnkeeper's Consecrated Mace",
+      "acceptedSha256": "02ebb2e58a138084f871615139eaf23d535790c8727adfe7b5de3a69dbd535d8",
+      "acceptedBytes": 2752,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/dawnkeeper_consecrated_mace.png",
+        "sha256": "a77faa7ab9a6f768acb76817f846f6e27e2dfad5a74c8e622c56e916a8f845a3",
+        "bytes": 2213488,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/dawnkeeper_consecrated_mace.png",
+        "sha256": "e27c8f60392d16de6703856fc19a718cc6cb226d44769b23deefc464b12c8b8d",
+        "bytes": 517998,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "69aaee2bd5e0c8a314a4d00918aa2cc8cb9e796969e12d0b723acd2d2cb17590",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Dawnkeeper's Consecrated Mace (dawnkeeper_consecrated_mace) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete one-handed consecrated mace on a lower-left to upper-right diagonal. Heavy flanged golden head built like a small sacred brazier, warm white-gold holy light contained between broad metal flanges; stout metal shaft with ivory wrapped grip and rounded gold pommel. Clearly a mace with a compact heavy striking head, not a staff, wand or torch. Full head, shaft and pommel visible. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/dawnkeeper_consecrated_mace.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "69aaee2bd5e0c8a314a4d00918aa2cc8cb9e796969e12d0b723acd2d2cb17590"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "champion_dawn_medallion",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/champion_dawn_medallion.webp",
+      "canonicalDisplayName": "Champion's Dawn Medallion",
+      "acceptedSha256": "e5121b386b5f764da7e8d4962f083652aec720eca5a551a261c6567a1b5a8247",
+      "acceptedBytes": 4132,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/champion_dawn_medallion.png",
+        "sha256": "9a8b10aee558f64483b0c9585126d3c981dd48e71ab32fbc3cd3a95faaf45f96",
+        "bytes": 2231921,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/champion_dawn_medallion.png",
+        "sha256": "9d52062436a9c3769cb5d6382fcb584acf8222602ba9edbc770a7782f0466350",
+        "bytes": 536977,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "d93a1f4bb225178d3f4a7f3757c13288dc017c62a64518f0a72b01b42a1ac43d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Champion's Dawn Medallion (champion_dawn_medallion) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete heavy gold necklace with a broad radiant sun medallion, thick gold rays around one large round amber dawnstone. The gemstone has a warm honey glow and bright inner sun-point. Fully visible short gold chain loop, regal gold craftsmanship, round sun silhouette, no text or surrounding UI ornament. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/champion_dawn_medallion.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d93a1f4bb225178d3f4a7f3757c13288dc017c62a64518f0a72b01b42a1ac43d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "acolytes_signet",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/acolytes_signet.webp",
+      "canonicalDisplayName": "Acolyte's Signet",
+      "acceptedSha256": "07debe63e7e66fd387db198b773c614782f030c61c86cc08849d77faa91475ab",
+      "acceptedBytes": 3622,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/acolytes_signet.png",
+        "sha256": "fb190afa10b46c81069b48d7dc34e7d5f9c36df0f492aa82905ffa86370b404a",
+        "bytes": 2243224,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/acolytes_signet.png",
+        "sha256": "a67b298506de33709c869ff88bf6a0013bcb50520e804bcfacbab7ad6aa02951",
+        "bytes": 550528,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "2caf0a014d9dd1cca687ce903735f0bbcd1b156376fb2e05c967341736a11a64",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Acolyte's Signet (acolytes_signet) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One simple thick gold signet ring in three-quarter view, flat round bezel engraved with one deliberate small sun-sigil. Plain warm polished gold band with modest worn edges, no large gemstone. The broad flat stamped seal face is the focal point, no text or letters. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/acolytes_signet.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "2caf0a014d9dd1cca687ce903735f0bbcd1b156376fb2e05c967341736a11a64"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "cord_of_the_dawn",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/cord_of_the_dawn.webp",
+      "canonicalDisplayName": "Cord of the Dawn",
+      "acceptedSha256": "950b9bd935eb9efd7637388018cca0470a22809736c3edb039ebdc29d8ce63a1",
+      "acceptedBytes": 3606,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/cord_of_the_dawn.png",
+        "sha256": "d336abf8e988a5e25b3493e5bab83869dd07334ef0a41df31ef27d694bafd1fc",
+        "bytes": 2584162,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/cord_of_the_dawn.png",
+        "sha256": "7a3be06e9cac5bd0a4cdf0ae34a64c22efb94f130a4b9cfc410dc6ef1ee69d9a",
+        "bytes": 568384,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "27669148758076083d9acd35cc6df5af9cf5a79a5e3410a177e512bd9e06b252",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Cord of the Dawn (cord_of_the_dawn) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete ivory CLOTH waist sash arranged as a broad curved belt, soft folded fabric wrapped through a small golden dawn-sun clasp. One short fringed end hangs visibly below the buckle, subtle gold thread edging and warm cream linen weave. Clearly supple fabric, not leather or metal armor, no wearer. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/cord_of_the_dawn.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "27669148758076083d9acd35cc6df5af9cf5a79a5e3410a177e512bd9e06b252"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "dawnlit_slippers",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/dawnlit_slippers.webp",
+      "canonicalDisplayName": "Dawnlit Slippers",
+      "acceptedSha256": "3f0e7b2576a5538eeca2fbeebb59fe07b54d21c41bde2e969dade34e98c0bfa2",
+      "acceptedBytes": 3326,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/dawnlit_slippers.png",
+        "sha256": "79cfab982bffff4907f15ad28a125695383764c85d74e9caa1300bb386633a7b",
+        "bytes": 2403027,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/dawnlit_slippers.png",
+        "sha256": "78cefa122a9192418b4a6b68be115f632ac25b613acc31c88d7acadf5504d045",
+        "bytes": 552984,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "a31d891f3f533bd5e4d0950d7c87c493359832c1ed571e51ac5356e2e5005c21",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Dawnlit Slippers (dawnlit_slippers) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One compact matching pair of soft ivory CLOTH slippers, one forward and partner behind. Golden dawn embroidery on each vamp, low rounded toes, delicate gold trim at the opening and soft thin soles. Cream woven cloth and gold thread, no metal toe caps, no boots or living feet. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/dawnlit_slippers.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "a31d891f3f533bd5e4d0950d7c87c493359832c1ed571e51ac5356e2e5005c21"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "formula_dawnfire_etching",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/formula_dawnfire_etching.webp",
+      "canonicalDisplayName": "Formula: Dawnfire Etching",
+      "acceptedSha256": "a1f2ce10f2304eda9eef2dbfcb63a0c7eb3cdb516ed1b761d687004e69df3e88",
+      "acceptedBytes": 3372,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/formula_dawnfire_etching.png",
+        "sha256": "1d048a860d72fea126f98bd364e1318cbc664f02ed092faf4b5a66bcc43f9594",
+        "bytes": 2213450,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/formula_dawnfire_etching.png",
+        "sha256": "f874950dd6c4dab91f53e358d3b6192936e116d9fe874881f5a224696b0a7b62",
+        "bytes": 525315,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "9b11be8c29aca53897fa4e044302492d71eb728f9705d470beb807f5a4bc6764",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Formula: Dawnfire Etching (formula_dawnfire_etching) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One compact horizontal rolled parchment enchantment scroll with curled ends, tied with a deep crimson ribbon and a gold-red wax seal bearing a single intentional flame emblem. Warm ivory paper with softly toasted edges, small contained ember glow in the seal. No writing, letters, numbers or pseudo-script. Distinguish from white-gold blessing scroll by red ribbon and flame seal. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/formula_dawnfire_etching.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "9b11be8c29aca53897fa4e044302492d71eb728f9705d470beb807f5a4bc6764"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "formula_dawns_benediction",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/formula_dawns_benediction.webp",
+      "canonicalDisplayName": "Formula: Dawn's Benediction",
+      "acceptedSha256": "022151909bb25e7cf3be4866ad40c7123261d25c14d376bea30c3f63dda23eae",
+      "acceptedBytes": 3480,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/formula_dawns_benediction.png",
+        "sha256": "c37e390423442f511271211bead4883a5122084b9a4ddee35464674fbd6c879b",
+        "bytes": 2272526,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/formula_dawns_benediction.png",
+        "sha256": "c4b9da081a4b771ac55740b0d6a532ae4f1fa578b28fbaac7a252f683ce3ea05",
+        "bytes": 576913,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "8672cbdc6b79e3589851a9a1ff65b6c46e158576dc66c857d18586966c783ac8",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Formula: Dawn's Benediction (formula_dawns_benediction) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One compact diagonally rolled pale ivory parchment enchantment scroll, tied with a broad white silk ribbon edged in gold. A pearly white-gold wax seal bears one simple radiant sun emblem, gentle warm white blessing light. Smooth pale paper and graceful ribbon tails, no writing, letters or pseudo-script. Distinguish from red flame scroll by white ribbon, pale seal and diagonal pose. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/formula_dawns_benediction.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "8672cbdc6b79e3589851a9a1ff65b6c46e158576dc66c857d18586966c783ac8"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "champions_dawn_loop",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/champions_dawn_loop.webp",
+      "canonicalDisplayName": "Champion's Dawn Loop",
+      "acceptedSha256": "1e464dda28efce6bdc9d042e4a0e04c1d922d434705658c02490f4f747f69a91",
+      "acceptedBytes": 4308,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/champions_dawn_loop.png",
+        "sha256": "16c90f6139ff8e2605a43342a10dc9b74e98035916bbf23d16f9a3bc9f1b723e",
+        "bytes": 2396488,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/champions_dawn_loop.png",
+        "sha256": "bd0ca3b44ec67e605c2305cc4076e35eeeca85fffd9e7d5fe50716f9eca7d3b5",
+        "bytes": 582347,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "3a6cf1c7cc8e26ed94cfb81079d0f0159cd9ef7ae6dcc96cf70f1d6c7c29bb42",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Champion's Dawn Loop (champions_dawn_loop) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One heavy ornate gold champion ring in three-quarter view, broad warm gold shoulders with subtle sun-ray relief and firm prongs holding a large radiant round amber sunstone. Rich honey-orange jewel and heavy gold construction, no flat signet face or white opal. Whole band clearly visible with central dark opening. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/champions_dawn_loop.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "3a6cf1c7cc8e26ed94cfb81079d0f0159cd9ef7ae6dcc96cf70f1d6c7c29bb42"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "dawnkeepers_circle",
+      "family": "faction-church",
+      "batch": "faction-church-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/dawnkeepers_circle.webp",
+      "canonicalDisplayName": "Dawnkeeper's Circle",
+      "acceptedSha256": "ba55c838bbfe98f1162b64e50cabd67698b712bd2b2839bd026e0a78f3ee828b",
+      "acceptedBytes": 2582,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-church/originals/dawnkeepers_circle.png",
+        "sha256": "5c7ac2ff691be692564ecc2b76eeb99dfcf1cbddbf68c4e9a5572d66d4feb360",
+        "bytes": 2009928,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-church/masters/dawnkeepers_circle.png",
+        "sha256": "42c296f9e877b298e3e3763d5a6d0d0a80d682492b6ca5bfc498c90f07836f01",
+        "bytes": 499553,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "f6fdc2287b98a3d4b2d4c1f1275e645d0020334fa16ebeb7b0795a0998d42699",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Dawnkeeper's Circle (dawnkeepers_circle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One slender white-gold ring in three-quarter view, delicate curved band and small prong basket holding a luminous smooth ivory dawn-opal cabochon. Opal glows softly with pearl white, pale pink and a hint of gold, understated graceful sacred craftsmanship. No amber gemstone or heavy yellow-gold champion band. Church of the Order faction: ivory, pale gold, warm sun amber and restrained dawn light. Preserve authored item identity and canonical material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-church/superseded/dawnkeepers_circle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "f6fdc2287b98a3d4b2d4c1f1275e645d0020334fa16ebeb7b0795a0998d42699"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-church-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-church-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

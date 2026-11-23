@@ -21,6 +21,40 @@ interface Batch {
   ends: Float64Array;
   preparation: GuardPrewarm;
 }
+/** One material per kind, every one from the same source, so every kind and
+ *  the boot stand-in share one program. */
+function fragmentMaterial(scene: THREE.Scene, crystal: number): THREE.ShaderMaterial {
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      uSun: sceneKeyLightUniform(scene),
+      uTime: { value: 0 },
+      uMotion: { value: 1 },
+      uCrystal: { value: crystal },
+    },
+    vertexShader: `attribute vec3 aOrigin,aVelocity,aTint;attribute vec4 aLife,aShape;uniform float uTime,uMotion;uniform vec3 uSun;varying vec3 vNormal,vView,vTint,vLight;varying float vFade;
+        void main(){float age=uTime-aLife.x;float life=aLife.y;float p=clamp(age/max(life,0.001),0.,1.);float live=step(0.,age)*(1.-step(life,age))*step(0.001,life);float t=age*uMotion;
+          float gravity=12.;float floorY=aShape.w;float fall=aOrigin.y-floorY;float hit=(aVelocity.y+sqrt(max(0.,aVelocity.y*aVelocity.y+2.*gravity*fall)))/gravity;
+          float after=max(0.,t-hit);float bounceV=0.24*max(0.,gravity*hit-aVelocity.y);
+          vec3 travel=aVelocity*t;travel.y-=0.5*gravity*t*t;
+          if(t>hit){travel.xz=aVelocity.xz*(hit+after*0.3);travel.y=floorY-aOrigin.y+max(0.,bounceV*after-0.5*gravity*after*after);}
+          float spin=aLife.w<0.?(3.+mod(abs(aLife.w)*1.73,8.))*sign(sin(aLife.w)):5.;
+          float angle=abs(aLife.w)+t*spin;float c=cos(angle),s=sin(angle);mat3 rot=mat3(c,0.,s,s*0.6,0.8,-c*0.6,-s*0.8,0.6,c*0.8);
+          float shrink=1.-smoothstep(0.66,1.,p);vec3 local=rot*(position*aShape.xyz)*aLife.z*shrink*live;
+          vec4 view=modelViewMatrix*vec4(aOrigin+travel+local,1.);vNormal=normalize(normalMatrix*rot*(normal/max(aShape.xyz,vec3(0.001))));vView=-view.xyz;vTint=aTint;vLight=mat3(viewMatrix)*uSun;vFade=live;gl_Position=projectionMatrix*view;
+          if(live<0.5)gl_Position=vec4(2.,2.,2.,1.);
+        }`,
+    fragmentShader: `uniform float uCrystal;varying vec3 vNormal,vView,vTint,vLight;varying float vFade;void main(){if(vFade<0.5)discard;vec3 n=normalize(vNormal);vec3 light=normalize(vLight);float diffuse=0.24+0.76*max(0.,dot(n,light));float fresnel=pow(max(0.,1.-abs(dot(n,normalize(vView)))),3.);float spec=pow(max(0.,dot(reflect(-light,n),normalize(vView))),38.);vec3 colour=vTint*diffuse+vec3(0.75,0.9,1.)*(spec*(0.22+uCrystal*0.7)+fresnel*uCrystal*0.26);gl_FragColor=vec4(colour,1.);
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+        }`,
+    depthWrite: true,
+    depthTest: true,
+    side: THREE.FrontSide,
+  });
+  material.name = 'solid-impact-fragments';
+  return material;
+}
+
 /** Three capped solid draws. Faceted models are prepared offline; trajectories,
  * tumbling, a single damped bounce and shrink-out run entirely on the GPU.
  * The pool is built at boot, before the Warrior kit's demand load lands the
@@ -36,7 +70,21 @@ export class SolidImpactFragments {
   private readonly fracturedShape = { x: 1, y: 1, z: 1, tint: 1, lift: 1 };
   private readonly metalShape = { x: 1, y: 1, z: 1, speed: 1, lift: 1, tint: 1 };
   private disposed = false;
-  constructor(private readonly scene: THREE.Scene) {}
+  private readonly standIn: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+  constructor(private readonly scene: THREE.Scene) {
+    // The batches wait for the kit's geometry, so the boot warm-up would see no
+    // fragment program. This hidden stand-in carries it: the key reads no
+    // geometry, so the boot link is the one every batch draws.
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(9), 3));
+    geometry.setAttribute('normal', new THREE.Float32BufferAttribute(new Float32Array(9), 3));
+    this.standIn = new THREE.Mesh(geometry, fragmentMaterial(scene, 0));
+    this.standIn.name = 'solidImpact:boot-stand-in';
+    tagCastVfxKit(this.standIn);
+    this.standIn.visible = false;
+    this.standIn.frustumCulled = false;
+    scene.add(this.standIn);
+  }
   units(host: CrestPrewarmHost): PrewarmResumeUnit[] {
     if (this.disposed) return [];
     const units: PrewarmResumeUnit[] = [];
@@ -90,33 +138,10 @@ export class SolidImpactFragments {
         ),
       );
     geometry.instanceCount = PER_KIND;
-    const material = new THREE.ShaderMaterial({
-      uniforms: {
-        uSun: sceneKeyLightUniform(this.scene),
-        uTime: { value: 0 },
-        uMotion: { value: 1 },
-        uCrystal: { value: kind === 'ice_shard' ? 1 : kind === 'metal_splinter' ? 0.5 : 0 },
-      },
-      vertexShader: `attribute vec3 aOrigin,aVelocity,aTint;attribute vec4 aLife,aShape;uniform float uTime,uMotion;uniform vec3 uSun;varying vec3 vNormal,vView,vTint,vLight;varying float vFade;
-        void main(){float age=uTime-aLife.x;float life=aLife.y;float p=clamp(age/max(life,0.001),0.,1.);float live=step(0.,age)*(1.-step(life,age))*step(0.001,life);float t=age*uMotion;
-          float gravity=12.;float floorY=aShape.w;float fall=aOrigin.y-floorY;float hit=(aVelocity.y+sqrt(max(0.,aVelocity.y*aVelocity.y+2.*gravity*fall)))/gravity;
-          float after=max(0.,t-hit);float bounceV=0.24*max(0.,gravity*hit-aVelocity.y);
-          vec3 travel=aVelocity*t;travel.y-=0.5*gravity*t*t;
-          if(t>hit){travel.xz=aVelocity.xz*(hit+after*0.3);travel.y=floorY-aOrigin.y+max(0.,bounceV*after-0.5*gravity*after*after);}
-          float spin=aLife.w<0.?(3.+mod(abs(aLife.w)*1.73,8.))*sign(sin(aLife.w)):5.;
-          float angle=abs(aLife.w)+t*spin;float c=cos(angle),s=sin(angle);mat3 rot=mat3(c,0.,s,s*0.6,0.8,-c*0.6,-s*0.8,0.6,c*0.8);
-          float shrink=1.-smoothstep(0.66,1.,p);vec3 local=rot*(position*aShape.xyz)*aLife.z*shrink*live;
-          vec4 view=modelViewMatrix*vec4(aOrigin+travel+local,1.);vNormal=normalize(normalMatrix*rot*(normal/max(aShape.xyz,vec3(0.001))));vView=-view.xyz;vTint=aTint;vLight=mat3(viewMatrix)*uSun;vFade=live;gl_Position=projectionMatrix*view;
-          if(live<0.5)gl_Position=vec4(2.,2.,2.,1.);
-        }`,
-      fragmentShader: `uniform float uCrystal;varying vec3 vNormal,vView,vTint,vLight;varying float vFade;void main(){if(vFade<0.5)discard;vec3 n=normalize(vNormal);vec3 light=normalize(vLight);float diffuse=0.24+0.76*max(0.,dot(n,light));float fresnel=pow(max(0.,1.-abs(dot(n,normalize(vView)))),3.);float spec=pow(max(0.,dot(reflect(-light,n),normalize(vView))),38.);vec3 colour=vTint*diffuse+vec3(0.75,0.9,1.)*(spec*(0.22+uCrystal*0.7)+fresnel*uCrystal*0.26);gl_FragColor=vec4(colour,1.);
-          #include <tonemapping_fragment>
-          #include <colorspace_fragment>
-        }`,
-      depthWrite: true,
-      depthTest: true,
-      side: THREE.FrontSide,
-    });
+    const material = fragmentMaterial(
+      this.scene,
+      kind === 'ice_shard' ? 1 : kind === 'metal_splinter' ? 0.5 : 0,
+    );
     const mesh = new THREE.Mesh(geometry, material);
     mesh.name = `solidImpact:${kind}`;
     tagCastVfxKit(mesh);
@@ -258,6 +283,9 @@ export class SolidImpactFragments {
       release(() => b.mesh.material.dispose());
     }
     this.batches.clear();
+    release(() => this.standIn.removeFromParent());
+    release(() => this.standIn.geometry.dispose());
+    release(() => this.standIn.material.dispose());
     if (errors.length) throw new AggregateError(errors, 'Solid fragment cleanup failed');
   }
 }

@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/basin_gorgebloom_woc.glb",
+      "out": "models/creatures/woc_basin_gorgebloom.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Turn",
+        "Attack",
+        "Hit",
+        "Death",
+        "Roar",
+        "SeedRain",
+        "VineLash",
+        "Gorge",
+        "Pollinate",
+        "BloomSpit"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

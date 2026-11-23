@@ -7,6 +7,7 @@ import { type CannonEnemyKind, TICK_RATE, type VehicleSession } from '../src/sim
 
 interface MockActor {
   key: string;
+  opts: unknown;
   root: THREE.Group;
   update: ReturnType<typeof vi.fn>;
   dispose: ReturnType<typeof vi.fn>;
@@ -20,7 +21,12 @@ vi.mock('../src/render/characters', () => ({
     dispose = vi.fn();
     setShadow = vi.fn();
     setProxyShadow = vi.fn();
-    constructor(readonly key: string) {
+    readonly opts: unknown;
+    constructor(
+      readonly key: string,
+      ...rest: unknown[]
+    ) {
+      this.opts = rest[6];
       if (actors.made.length === actors.failAt) throw new Error('model assembly failed');
       actors.made.push(this);
     }
@@ -40,6 +46,36 @@ function session(): VehicleSession {
 }
 
 describe('existing animated cannon enemy models', () => {
+  it('does not walk parked rigs and refreshes a reused slot before its next draw', () => {
+    const pool = new CannonEnemyVisuals();
+    const s = session();
+    const commander = pool.root.getObjectByName('cannon-commander');
+    if (!commander) throw new Error('Commander slot was not built');
+    const walk = vi.spyOn(commander, 'updateMatrixWorld');
+    try {
+      pool.update(null, 0.05, () => 2);
+      pool.root.updateMatrixWorld(true);
+      expect(walk).not.toHaveBeenCalled();
+      s.encounter.enemies = [
+        { id: 1, kind: 'commander', hp: 800, x: 440, z: 1000, slowUntilTick: 0 },
+      ];
+      pool.update(s, 0.05, () => 2);
+      pool.root.updateMatrixWorld();
+      expect(commander.matrixWorld.elements.slice(12, 15)).toEqual([440, 2, 1000]);
+      pool.update(null, 0.05, () => 2);
+      walk.mockClear();
+      pool.root.updateMatrixWorld();
+      expect(walk).not.toHaveBeenCalled();
+      s.encounter.enemies[0].x = 470;
+      pool.update(s, 0.05, () => 4);
+      pool.root.updateMatrixWorld();
+      expect(walk).toHaveBeenCalledOnce();
+      expect(commander.matrixWorld.elements.slice(12, 15)).toEqual([470, 4, 1000]);
+    } finally {
+      pool.dispose();
+    }
+  });
+
   it('tips killed actors briefly but always gives the only commander slot to a living actor', () => {
     const pool = new CannonEnemyVisuals();
     const s = session();
@@ -83,11 +119,14 @@ describe('existing animated cannon enemy models', () => {
     const pool = new CannonEnemyVisuals();
     expect(actors.made).toHaveLength(51);
     expect([...new Set(actors.made.map((a) => a.key))]).toEqual([
-      'mob_bandit',
+      'player_rogue',
+      'player_hunter',
       'player_warrior',
-      'npc_knight',
-      'mob_bruiser',
+      'player_paladin',
+      'player_shaman',
     ]);
+    // a crowd in the world: the armored actors' class body draws the crowd's armor detail
+    for (const actor of actors.made) expect(actor.opts).toEqual({ wocArmorDetail: 'crowd' });
     const s = session();
     s.encounter.enemies = [1, 2].map((id) => ({
       id,

@@ -54,6 +54,7 @@ function outline(): { deck: [number, number][]; keel: [number, number][] } {
 
 function inside(c: Collider, x: number, z: number): boolean {
   if (c.type === 'circle') return Math.hypot(x - c.x, z - c.z) < c.r;
+  if (c.type === 'prism') throw new Error('unexpected prism collider');
   const cos = Math.cos(-c.rot);
   const sin = Math.sin(-c.rot);
   const lx = (x - c.x) * cos + (z - c.z) * sin;

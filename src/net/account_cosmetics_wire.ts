@@ -34,5 +34,8 @@ export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
     weaponSkinIds: stringList(src.weaponSkinIds),
     weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
     mountSkinIds: stringList(src.mountSkinIds),
+    ...(src.collectibleMountSkinIds !== undefined
+      ? { collectibleMountSkinIds: stringList(src.collectibleMountSkinIds) }
+      : {}),
   };
 }

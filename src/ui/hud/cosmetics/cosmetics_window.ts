@@ -10,6 +10,7 @@
 // signature-gated refresh for the slow HUD band.
 
 import { audio } from '../../../game/audio';
+import { buddyDef } from '../../../sim/content/buddies';
 import { skinnableWeaponTypesFor } from '../../../sim/content/weapon_skin_rules';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
@@ -130,9 +131,14 @@ export class CosmeticsWindow {
     const c = w.accountCosmetics;
     return {
       tab: this.tab,
-      ownedMountSkins: c.mountSkinIds,
+      buddies: { owned: w.ownedBuddies(), pending: w.pendingBuddies(), active: p?.buddyKey ?? '' },
+      ownedMountSkins: [
+        ...c.mountSkinIds,
+        ...(c.collectibleMountSkinIds ?? []),
+        ...w.ownedMounts(),
+      ],
       wornMountSkin: p?.mountSkinId ?? null,
-      ownsAnyMount: w.ownedMounts().length > 0,
+      ownsAnyMount: true,
       weaponSkinIds: c.weaponSkinIds,
       weaponSkinLoadout: c.weaponSkinLoadout,
       applicableWeaponTypes: p
@@ -158,6 +164,7 @@ export class CosmeticsWindow {
     const strip = cosmeticsTabStrip(
       this.tab,
       {
+        buddies: t('hudChrome.collections.tabs.buddies'),
         mounts: t('hudChrome.cosmetics.tabMounts'),
         skins: t('hudChrome.cosmetics.tabSkins'),
         mech: t('hudChrome.cosmetics.tabMech'),
@@ -215,6 +222,12 @@ export class CosmeticsWindow {
   private apply(action: CosmeticsAction): void {
     const w = this.deps.world();
     switch (action.kind) {
+      case 'summon-buddy': {
+        const def = buddyDef(action.id);
+        if (!def || !w.ownedBuddies().includes(def.key)) return;
+        w.summonBuddy(def.key);
+        break;
+      }
       // Preview mutates nothing here, so NO repaint: a repaint would destroy
       // the very button the overlay captured as its focus opener.
       case 'preview-mount':

@@ -1,15 +1,17 @@
+import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { ChatBubbleLayer } from '../src/render/chat_bubble_layer';
 import { Renderer } from '../src/render/renderer';
+import type { IWorld } from '../src/world_api';
 
-interface BubbleHarness {
-  updateChatBubbles(): void;
-}
-
+// The bubble layer moved out of renderer.ts (src/render/chat_bubble_layer.ts);
+// the renderer's per-frame updateChatBubbles is now forge speech plus this
+// layer's update(), pinned at the bottom.
 function bubbleHarness(
   now: number,
   bubbleUntil: number,
 ): {
-  harness: BubbleHarness;
+  layer: ChatBubbleLayer;
   el: { isConnected: boolean; style: { display: string }; remove(): void };
 } {
   vi.spyOn(performance, 'now').mockReturnValue(now);
@@ -20,36 +22,43 @@ function bubbleHarness(
       this.isConnected = false;
     },
   };
-  const renderer = Object.create(Renderer.prototype) as BubbleHarness & {
-    chatBubbles: Map<number, { el: HTMLDivElement; until: number }>;
-    sim: { entities: Map<number, unknown>; worldQuestLog: Map<string, unknown> };
-    views: Map<number, unknown>;
-    viewport: { width: number; height: number };
-  };
-  renderer.chatBubbles = new Map([
-    [7, { el: el as unknown as HTMLDivElement, until: bubbleUntil }],
-  ]);
-  renderer.sim = { entities: new Map(), worldQuestLog: new Map() };
-  renderer.views = new Map();
-  renderer.viewport = { width: 800, height: 600 };
-  return { harness: renderer, el };
+  const sim = { entities: new Map(), worldQuestLog: new Map() } as unknown as IWorld;
+  const layer = new ChatBubbleLayer({
+    sim: () => sim,
+    layer: () => {
+      throw new Error('no new bubble expected');
+    },
+    camera: () => new THREE.PerspectiveCamera(),
+    viewport: () => ({ width: 800, height: 600 }),
+    views: () => new Map(),
+  });
+  layer.bubbles.set(7, { el: el as unknown as HTMLDivElement, until: bubbleUntil });
+  return { layer, el };
 }
 
 describe('chat bubble lifecycle', () => {
   it('keeps a live bubble while its entity or view is not drawable yet', () => {
-    const { harness, el } = bubbleHarness(1000, 2000);
+    const { layer, el } = bubbleHarness(1000, 2000);
 
-    harness.updateChatBubbles();
+    layer.update();
 
     expect(el.isConnected).toBe(true);
     expect(el.style.display).toBe('none');
   });
 
   it('expires a live bubble that never gets a drawable anchor', () => {
-    const { harness, el } = bubbleHarness(2500, 2000);
+    const { layer, el } = bubbleHarness(2500, 2000);
 
-    harness.updateChatBubbles();
+    layer.update();
 
     expect(el.isConnected).toBe(false);
+    expect(layer.bubbles.size).toBe(0);
+  });
+
+  it('is the layer the renderer ticks every frame', () => {
+    const source = String(
+      (Renderer.prototype as unknown as { updateChatBubbles(): void }).updateChatBubbles,
+    );
+    expect(source).toContain('this.chatBubbles.update()');
   });
 });

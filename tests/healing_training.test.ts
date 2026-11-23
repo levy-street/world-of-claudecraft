@@ -122,7 +122,7 @@ describe('Healing Training Ground: priest healing mechanics', () => {
     const initialHp = scout.hp;
 
     // Position player in front of the dummies
-    sim.player.pos = sim.groundPos(-82, -42);
+    sim.player.pos = sim.groundPos(-82, -36);
     sim.player.facing = 0;
 
     // Target the scout
@@ -147,7 +147,7 @@ describe('Healing Training Ground: priest healing mechanics', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'priest', devCommands: true });
     sim.setPlayerLevel(20);
     sim.setSpec('holy');
-    sim.player.pos = sim.groundPos(-82, -42);
+    sim.player.pos = sim.groundPos(-82, -36);
     sim.player.facing = 0;
 
     const dummies = HEALING_TRAINING_GROUND_SPAWNS.map((s) =>
@@ -175,7 +175,7 @@ describe('Healing Training Ground: priest healing mechanics', () => {
   it('a priest can apply renew (Lingering Grace) to heal over time', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'priest', devCommands: true });
     sim.setPlayerLevel(20);
-    sim.player.pos = sim.groundPos(-82, -42);
+    sim.player.pos = sim.groundPos(-82, -36);
     sim.player.facing = 0;
 
     const tank = [...sim.entities.values()].find(
@@ -221,8 +221,9 @@ describe('Healing Training Ground: priest healing mechanics', () => {
 
     expect(sim.player.level).toBe(20);
     expect(Math.round(sim.player.pos.x)).toBe(-82);
-    expect(Math.round(sim.player.pos.z)).toBe(-42);
-    expect(sim.player.facing).toBe(0); // facing east towards the dummies
+    expect(Math.round(sim.player.pos.z)).toBe(-36);
+    // facing the middle of the row (the scout dummy at -76, -39)
+    expect(sim.player.facing).toBeCloseTo(Math.atan2(-39 - -36, -76 - -82), 9);
   });
 });
 

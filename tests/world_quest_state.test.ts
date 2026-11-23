@@ -7,8 +7,39 @@ import { gliderScoreboardId } from '../src/sim/glider_scoreboards';
 import { Sim } from '../src/sim/sim';
 import { takeWorldQuestDeliveryCargo } from '../src/sim/world_quest_delivery';
 import { freshWorldQuestRotationCache, rotationBindings } from '../src/sim/world_quest_state';
+import { activeWorldQuestsForCycle, canRerollWorldQuest } from '../src/sim/world_quests';
 
 describe('world quest coordinator adapters', () => {
+  it('checks reroll eligibility for the requested player with their level and cycle override', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    sim.resetDay = '2026-10-18';
+    const cycle = sim.ctx.currentWorldQuestRotation().cycle;
+    const quest = activeWorldQuestsForCycle(cycle).find((q) => q.zoneId === 'eastbrook_vale');
+    if (!quest) throw new Error('missing Eastbrook assignment');
+    const primary = sim.meta(sim.playerId)!;
+    primary.devWorldQuestCycle = '';
+    expect(sim.canRerollWorldQuest(quest.id)).toEqual({
+      canReroll: false,
+      reason: 'No active world quest cycle.',
+    });
+    const pid = sim.addPlayer('mage', 'Reroller');
+    const meta = sim.meta(pid)!;
+    const player = sim.entities.get(pid)!;
+    player.level = 1;
+    meta.devWorldQuestCycle = cycle;
+    expect(sim.canRerollWorldQuest(quest.id, pid)).toEqual(
+      canRerollWorldQuest(meta, quest.id, cycle, 1),
+    );
+    expect(sim.canRerollWorldQuest(quest.id, 987654)).toEqual({
+      canReroll: false,
+      reason: 'Player not found.',
+    });
+    sim.entities.delete(pid);
+    expect(sim.canRerollWorldQuest(quest.id, pid)).toEqual(
+      canRerollWorldQuest(meta, quest.id, cycle, 20),
+    );
+    expect(sim.canRerollWorldQuest(quest.id, pid).canReroll).toBe(true);
+  });
   it('bounds personal records and preserves daily and lifetime best times independently', () => {
     const course = 'galecrest_windrider_slalom';
     const daily = gliderScoreboardId(course, 'daily')!;

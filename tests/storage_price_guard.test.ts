@@ -103,7 +103,7 @@ const allFiles = [...uiFiles, ...renderFiles, ...netFiles, ...gameFiles];
 const familyFiles = allFiles.filter((f) => /(bank|vault|bags|guild_bank)/.test(basename(f)));
 
 // The live ban set: every value of the four price tables, CONCATENATED (the
-// exact-size pin below counts table entries, not distinct values; four values
+// exact-size pin below counts table entries, not distinct values; five values
 // repeat across tables).
 const banList: readonly number[] = [
   ...BANK_EXPANSION_PRICES,
@@ -203,8 +203,8 @@ const TREE_ALLOWANCES: ReadonlyArray<[file: string, value: number, anchor: strin
   ['src/render/scene_census_core.ts', 1000000, 'const M = 1000000'],
   // A render megapixel unit, not money.
   ['src/render/post_pixel_budget_core.ts', 1000000, 'MEGAPIXEL'],
-  // A memo-size cap, not money.
-  ['src/render/shore_water_gate_core.ts', 400000, 'PROBE_MEMO_LIMIT'],
+  // The Studio Rock tool's seed modulus (rock_gen.ts, twice): a hash range, not money.
+  ['src/render/rock_gen.ts', 100000, 'params.rockSeed ?? 0) % 100000'],
   // The WIRE-BOUNDARY cap on a client-declared cost, not a price and not from
   // any price table: it mirrors STORAGE_MAX_EXPECTED_COST_CLAUDIUM
   // (server/storage_purchases.ts), which is deliberately far ABOVE every real
@@ -218,6 +218,14 @@ const TREE_ALLOWANCES: ReadonlyArray<[file: string, value: number, anchor: strin
   ['src/ui/hud/vehicle/cannon_tactics_view.ts', 1000000, 'result.shotsFired > 1000000'],
   // The vehicle session wire decoder's finite-number bound, not money.
   ['src/net/vehicle_session_wire.ts', 1000000, 'Math.abs(value) <='],
+  // Two minutes in milliseconds, three times: timeouts and a countdown band.
+  ['src/ui/woc_market_view.ts', 120000, 'remainingMs < 120000'],
+  ['src/net/mobile_wallet_deeplink.ts', 120000, 'RESPONSE_TIMEOUT_MS'],
+  ['src/net/wallet_connect.ts', 120000, '}, 120000);'],
+  // The bounded preparation retry delay, in milliseconds.
+  ['src/render/ability_vfx/active_kit_prewarm.ts', 120000, 'ACTIVE_KIT_RETRY_DELAYS_MS'],
+  // A render triangle budget, not money.
+  ['src/render/render_budget.ts', 1600000, 'targetTriangles: 1600000'],
 ];
 const usedTreeAnchors = new Set<string>();
 const treeAllowed: AllowFn = anchoredAllow(TREE_ALLOWANCES, usedTreeAnchors);
@@ -337,6 +345,23 @@ describe('the literal scanner (positive controls through the real operator)', ()
     expect(
       scanCode(prepare('const a = 0x2_49F0;'), banValues, 'fixture.ts', null, none),
     ).toHaveLength(1);
+  });
+
+  it('the prewarm retry allowance still catches a price elsewhere in that file', () => {
+    const allow = anchoredAllow(TREE_ALLOWANCES, new Set<string>());
+    const fixture = [
+      'const ACTIVE_KIT_RETRY_DELAYS_MS = [5000, 30000, 120_000];',
+      'const storagePrice = 120_000;',
+    ].join('\n');
+    const hits = scanCode(
+      prepare(fixture),
+      banValues.filter((value) => value >= 100000),
+      'src/render/ability_vfx/active_kit_prewarm.ts',
+      allow,
+      none,
+    );
+    expect(hits).toHaveLength(1);
+    expect(hits[0]).toContain(':2 [120000]');
   });
 
   it('a line-anchored allowance spares ONLY its anchored line (QA 09)', () => {
@@ -497,8 +522,8 @@ describe('arm (e): the scan can never pass vacuously', () => {
   });
 
   it('the derived ban set has exactly the four live tables in it', () => {
-    // 12 bank expansions + 4 sockets + 5 vault rungs + 7 guild rungs. A table
+    // 12 bank expansions + 4 sockets + 10 vault rungs + 7 guild rungs. A table
     // that grows or shrinks moves this pin: acknowledge the retune here.
-    expect(banList.length).toBe(28);
+    expect(banList.length).toBe(33);
   });
 });

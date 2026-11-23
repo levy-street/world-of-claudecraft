@@ -35,7 +35,7 @@ import {
 } from './hoard_bone_reaper_core';
 import { hoardBossKit } from './hoard_boss_kits';
 import { measureHoardRoom } from './hoard_room';
-import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
+import { hoardMechanicDamage, hoardPlayerBudget, hoardPressure } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export { HOARD_HARVESTED_SOUL_AURA_ID };
@@ -129,7 +129,7 @@ function startScythe(
   // Enough players in a rare enough hoard, and a SECOND scythe comes with it: its
   // route mirrored left for right, its blade begun on the far side of the turn,
   // and (its cue id being the next one) a different route pattern. Two readable
-  // hazards to thread between, never a lone player's problem. The two share the
+  // hazards to thread between. Group maps retain both when players leave. They share the
   // per-player hit cooldown on purpose: caught between them is one hit, never two.
   // Only where the room is wide enough for the mirrored routes to stay apart: cornered
   // against a wall the two would ride the same line, so he calls just the one.
@@ -172,7 +172,7 @@ function startHarvest(
   const pressure = hoardPressure(inst.vault);
   const seed = state.nextCueId;
   const offsets = soulSpawnOffsets(
-    soulCountFor(players.length, pressure.extra),
+    soulCountFor(hoardPlayerBudget(inst.vault, players.length), pressure.extra),
     seed,
     frame,
     frame.halfWidth,
@@ -265,7 +265,8 @@ export function tickHoardBoneReaper(
   // Never two of the same at once, and never a harvest with no room to run it.
   const busy = (variant: string) => state.cues.some((cue) => cue.variant === variant);
   if (reaper.step === 0 ? busy('bone-scythe') : busy('bone-harvest')) return;
-  if (reaper.step === 0) startScythe(ctx, inst, boss, state, living.length, emit);
+  if (reaper.step === 0)
+    startScythe(ctx, inst, boss, state, hoardPlayerBudget(inst.vault, living.length), emit);
   else startHarvest(ctx, inst, boss, state, living, emit);
   reaper.step = reaper.step === 0 ? 1 : 0;
   const pressed = boss.hp / Math.max(1, boss.maxHp) <= BONE_REAPER_PRESSED_HP;
@@ -395,7 +396,12 @@ function tickSoul(
         radius: 1.8,
         sourceId: catcher.id,
       });
-      burden(ctx, boss, catcher, players.filter((p) => !p.dead).length <= 1);
+      burden(
+        ctx,
+        boss,
+        catcher,
+        hoardPlayerBudget(inst.vault, players.filter((p) => !p.dead).length) <= 1,
+      );
       if (SOUL_HARVEST.playerRewardEnabled) {
         catcher.hp = Math.min(
           catcher.maxHp,

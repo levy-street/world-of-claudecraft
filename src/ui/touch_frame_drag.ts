@@ -1,6 +1,6 @@
 // Always-on one-finger drag for the class engine indicators on the TOUCH
 // layout (the proc overlay, the paladin devotion medallion, the warlock doom
-// meter): the touch counterpart of the desktop "Unlock interface" editor,
+// meter and priest charge medallion): the touch counterpart of the desktop "Unlock interface" editor,
 // which every touch layout refuses (MovableFrame no-ops its gestures there and
 // the options row is never offered). Event-driven only (pointer events, one
 // resize listener), no per-frame cost, so this is a plain sibling module the

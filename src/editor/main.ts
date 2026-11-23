@@ -3,10 +3,39 @@
 // the document language/direction and title, then mounts the editor over the
 // built-in world content as a starting point.
 
+import { audio } from '../game/audio';
+import { music } from '../game/music';
+import {
+  installWebGLContextRelease,
+  markPageDisposable,
+  registerPageTeardown,
+} from '../render/context_release';
+import { ensureTerrainSplatAssetFetch } from '../render/terrain';
 import { CAMPS, GROUND_OBJECTS, NPCS, ROADS, ZONES } from '../sim/data';
 import './styles.css';
-import { ensureLocaleLoaded, getLanguage, languageTag, t } from '../ui/i18n';
+import { ensureLocaleLoaded, getLanguage, languageTag } from '../ui/i18n';
 import { EditorApp } from './app';
+import { drainLocalAssetUrls } from './local_assets';
+import { STUDIO_DOCUMENT_TITLE } from './studio_brand';
+
+// The editor's 3D viewport holds a full game WebGLRenderer (its GL context is
+// tracked via trackWebGLContext). The page is deliberately excluded from the
+// bfcache so reload/close always returns renderer, audio, worker and asset-cache
+// resources promptly. Playtest saves first and runs in its own disposable tab,
+// so no unsaved editor document needs to survive a navigation freeze.
+markPageDisposable();
+installWebGLContextRelease();
+registerPageTeardown(() => {
+  music.close();
+  audio.close();
+  for (const url of drainLocalAssetUrls()) URL.revokeObjectURL(url);
+  delete (window as unknown as { __editor?: EditorApp }).__editor;
+});
+
+// Painting always renders through the paint-capable splat material, so the
+// editor needs the terrain layer textures on EVERY graphics tier (the game
+// skips the ~15MB fetch on the low tier; a maker cannot).
+ensureTerrainSplatAssetFetch();
 
 // Deep clone so editing never mutates the imported module globals (BUILTIN_WORLD
 // shares those arrays); the editor works on its own document.
@@ -29,7 +58,7 @@ async function boot(): Promise<void> {
   const tag = languageTag(getLanguage());
   document.documentElement.lang = tag;
   document.documentElement.dir = isRtl(tag) ? 'rtl' : 'ltr';
-  document.title = t('editor.docTitle');
+  document.title = STUDIO_DOCUMENT_TITLE;
   const app = new EditorApp(mount, {
     zones: clone(ZONES),
     camps: clone(CAMPS),

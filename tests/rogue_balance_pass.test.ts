@@ -40,7 +40,47 @@ describe('rogue balance pass', () => {
     expect(stealthed(p)).toBe(true);
   });
 
-  it('Redhanded resolves as +30% Craven Thrust crit and False Face removes the Duskveil slow', () => {
+  it("Killer's Calm guarantees five critical attacks and is exhausted before the sixth", () => {
+    const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('assassination');
+    const p = sim.player;
+    const mob = createMob(22_000, MOBS.forest_wolf, 5, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 2,
+    });
+    mob.hostile = true;
+    mob.maxHp = mob.hp = 500_000;
+    (sim as unknown as { addEntity(entity: Entity): void }).addEntity(mob);
+    sim.targetEntity(mob.id);
+    p.facing = 0;
+    sim.castAbility('cold_blood');
+    expect(p.auras.find((a) => a.kind === 'next_attack_crit')?.charges).toBe(5);
+    const criticals: boolean[] = [];
+    for (let attack = 0; attack < 6; attack++) {
+      // Aura changes recalculate gear stats; remove natural crit after each recalc.
+      p.critChance = 0;
+      p.gcdRemaining = 0;
+      p.resource = p.maxResource;
+      sim.events.length = 0;
+      sim.castAbility('sinister_strike');
+      p.autoAttack = false;
+      const hits = sim.events.filter((e) => e.type === 'damage' && e.sourceId === p.id);
+      expect(hits).toHaveLength(1);
+      const hit = hits[0];
+      if (hit.type !== 'damage') throw new Error('missing Wicked Slash damage');
+      criticals.push(hit.crit);
+      if (attack < 4) {
+        expect(p.auras.find((a) => a.kind === 'next_attack_crit')?.charges).toBe(4 - attack);
+      } else {
+        expect(p.auras.some((a) => a.kind === 'next_attack_crit')).toBe(false);
+      }
+    }
+    expect(criticals).toEqual([true, true, true, true, true, false]);
+  });
+
+  it('Redhanded resolves as +30% Craven Thrust crit and False Face speeds up Duskveil by 15%', () => {
     const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('assassination');
@@ -55,31 +95,32 @@ describe('rogue balance pass', () => {
     expect(mods.abilities.backstab?.critPct).toBeCloseTo(0.3);
 
     sim.setSpec('subtlety');
-    // Duskveil aura value 0.5 * (1 + 1 mastery buffPct at level 20) = 1.0, and
-    // Smokestep's stealth rides the same mastery row.
+    // Duskveil aura value 1.0 * (1 + 0.15 mastery buffPct at level 20) = 1.15, and
+    // Smokefade's stealth rides the same mastery row.
     expect(sim.resolvedAbility('stealth')?.effects[0]).toMatchObject({
       kind: 'stealth',
-      value: 1,
+      value: 1.15,
     });
     expect(sim.resolvedAbility('vanish')?.effects[0]).toMatchObject({
       kind: 'stealth',
-      value: 1,
+      value: 1.15,
     });
 
     // The value is a MOVEMENT multiplier (player_motion.moveSpeedMult folds a
-    // stealth aura in as a slow), so the mastered rogue really walks at full
-    // speed while hidden. Without the mastery the same cast leaves 0.5.
+    // stealth aura below 1 in as a slow and one above 1 as a speed buff), so the
+    // mastered rogue really runs 15% faster while hidden. Without the mastery the
+    // same cast leaves full speed.
     const p = sim.player;
     sim.castAbility('stealth');
     sim.tick();
     expect(stealthed(p)).toBe(true);
-    expect(moveSpeedMult(p)).toBeCloseTo(1);
+    expect(moveSpeedMult(p)).toBeCloseTo(1.15);
 
     const bare = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
     bare.setPlayerLevel(20);
     bare.castAbility('stealth');
     bare.tick();
-    expect(moveSpeedMult(bare.player)).toBeCloseTo(0.5);
+    expect(moveSpeedMult(bare.player)).toBeCloseTo(1);
   });
 
   it('Redhanded scales the poison coats and Thuggery rolls extra attacks', () => {

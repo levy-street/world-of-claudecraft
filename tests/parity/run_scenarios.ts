@@ -44,24 +44,15 @@ function plain(trace: Trace): unknown {
 }
 
 // Contiguous shard boundaries over SCENARIOS, timing-balanced by MEASURED
-// per-file cost (not by scenario count). Two subtleties found while balancing:
-// recording warms subsystem code paths for later same-subsystem scenarios, so
-// `fiesta` stays in the same shard as the heavy `fiesta_powerups` (cold, that
-// scenario alone records ~4x slower); and one irreducibly heavy scenario rides
-// alone in the single-entry slice [36, 37). NOTE, found by the Phase 11d QA
-// architecture audit: that slice was authored for `nythraxis_full_pull`, but
-// scenarios inserted since have shifted the indices, and index 36 is
-// `mob_locomotion` today while `nythraxis_full_pull` sits at 40 inside the final
-// shard. Nothing is dropped or double-run by that (the tiling is re-validated at
-// import and the bounds still cover 0..SCENARIOS.length), so this is a wall-time
-// balance that no longer does what its comment says, not a correctness bug. Any
-// re-balance should re-derive the isolated index from the measured costs rather
-// than trusting the name here. The last bound is
-// SCENARIOS.length, so a newly appended scenario automatically lands in the
-// final shard. Every shard file re-validates the tiling at import time, so a
-// bad edit here fails the whole suite instead of silently dropping scenarios
-// from the gate.
-const SHARD_BOUNDS: readonly number[] = [0, 7, 11, 13, 17, 36, 37, SCENARIOS.length];
+// per-file cost (not by scenario count; rebalanced 2026-10-27 across all 84
+// scenarios so parity_g no longer accumulates 47 trailing scenarios at 275s).
+// Recording warms subsystem code paths for later same-subsystem scenarios, so
+// `fiesta` stays in the same shard as `fiesta_powerups` ([12, 21)). The last
+// bound is SCENARIOS.length, so a newly appended scenario automatically lands
+// in the final shard. Every shard file re-validates the tiling at import time,
+// so a bad edit here fails the whole suite instead of silently dropping
+// scenarios from the gate.
+const SHARD_BOUNDS: readonly number[] = [0, 12, 21, 41, 52, 58, 71, SCENARIOS.length];
 
 export const PARITY_SHARD_COUNT = SHARD_BOUNDS.length - 1;
 
@@ -87,6 +78,7 @@ export function runParityShard(shard: number): void {
   describe('parity gate', () => {
     for (const scenario of scenarios) {
       describe(scenario.name, () => {
+        let cachedTrace: unknown;
         // Explicit timeouts: the heaviest scenario (nythraxis_full_pull) records a
         // full raid pull TWICE in the determinism test and brushes vitest's 5000ms
         // default on slow shared CI runners (observed timing out twice in a row on
@@ -97,12 +89,14 @@ export function runParityShard(shard: number): void {
           const a = plain(recordTrace(scenario));
           const b = plain(recordTrace(scenario));
           expect(a).toEqual(b);
+          cachedTrace = a;
           // two full recordings of the heaviest scenarios (the raid pull,
           // the fiesta) on the 13-zone world: headroom under suite load
         }, 90_000);
 
         it(UPDATE ? 'mints the golden' : 'matches the committed golden', () => {
-          const trace = plain(recordTrace(scenario));
+          const trace = cachedTrace ?? plain(recordTrace(scenario));
+          cachedTrace = undefined;
           const path = goldenPath(scenario.name);
           if (UPDATE) {
             mkdirSync(GOLDEN_DIR, { recursive: true });

@@ -53,6 +53,8 @@ export class WorldQuestLeyFxController {
       } catch {
         continue;
       }
+      // A new circuit or closing the window can cancel an unfinished rotation.
+      void animation.finished.catch(() => {});
       this.rotations.add(animation);
       animation.onfinish = animation.oncancel = () => {
         this.rotations.delete(animation);
@@ -188,6 +190,8 @@ export class WorldQuestLeyFxController {
       element.remove();
       return;
     }
+    // Cosmetic cancellation is expected; oncancel does not handle this promise.
+    void animation.finished.catch(() => {});
     this.effects.set(element, animation);
     const clean = () => {
       animation.onfinish = animation.oncancel = null;

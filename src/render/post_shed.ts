@@ -1,5 +1,6 @@
 import { Color, type WebGLRenderer, type WebGLRenderTarget } from 'three';
 import type { Pass } from 'three/examples/jsm/postprocessing/Pass.js';
+import { registerContextRestoreReset } from './context_restore_registry';
 import type { PreparedBloomPass } from './post_bloom';
 import type { StaticOpaqueN8AOPass } from './post_n8ao';
 import type { OutputGradePass } from './post_output_grade';
@@ -64,6 +65,24 @@ export class PostShed {
     readonly chain: PostShedChain,
   ) {
     this.plan = postShedPlan(chain, 1);
+    registerContextRestoreReset('post-shed', this, (owner) => owner.forgetContext());
+  }
+
+  /** A WebGL context restore: the twin's program is gone (the SMAA tail runs
+   *  again until the presentation prewarm links it once more) and every
+   *  shed target came back empty. Re-planning from the full chain replays
+   *  each shed transition, so its clears run again on the restored targets
+   *  (an AO target left at zero would darken the whole frame). */
+  forgetContext(): void {
+    if (this.disposed) return;
+    const level = this.level;
+    // Back to the full chain first, while the twin still counts as linked, so
+    // a standing FXAA rung hands its passes back to SMAA; then re-plan the
+    // level on the chain this painter may shed without the twin.
+    this.apply(1);
+    this.twinReady = false;
+    this.level = Number.NaN;
+    this.apply(level);
   }
 
   /** The deepest rung applied that changes this chain, `full` at level 1. */

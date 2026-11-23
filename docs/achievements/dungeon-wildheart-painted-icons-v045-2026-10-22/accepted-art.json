@@ -1,0 +1,940 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 11,
+    "replacedSvgIcons": 11,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "beastpit_warbelt",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/beastpit_warbelt.webp",
+      "canonicalDisplayName": "Beastpit Warbelt",
+      "acceptedSha256": "a9a9587f7120282b80f8952b0545f4d71deefa5da73f42cc1f5288d88aa003c8",
+      "acceptedBytes": 4370,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/beastpit_warbelt.png",
+        "sha256": "381b10990b573b8d627f56b9753b392ba80de37a427a3e4c17c26e6ee05e8349",
+        "bytes": 2245304,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/beastpit_warbelt.png",
+        "sha256": "048dac329595467aae4cc69914f4d534ea96d4b84c00bdb1d63c3ed1030f7483",
+        "bytes": 521871,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "e65e0aefb2428cdfd8371aba3ddc992df46aa05ba4c74027966900274d67d18e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Beastpit Warbelt (beastpit_warbelt) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete broad MAIL warbelt curved around empty space, visibly interlinked dark iron chain band with ivory fang pendants and a red-lacquered carved jaguar-skull buckle at center. Dark metal, ochre bone and strong war red; no wearer. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/beastpit_warbelt.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "e65e0aefb2428cdfd8371aba3ddc992df46aa05ba4c74027966900274d67d18e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "jaguar_hide_jerkin",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/jaguar_hide_jerkin.webp",
+      "canonicalDisplayName": "Jaguar-Hide Jerkin",
+      "acceptedSha256": "693bff69e77d40f82aebb33ae98a8c3dfd305aba75d1860f99be60df1317f78b",
+      "acceptedBytes": 5410,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/jaguar_hide_jerkin.png",
+        "sha256": "de97063177579aad88c9a2e387fcb18def0a1c3d2ea09b6087911c9773131792",
+        "bytes": 2550172,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/jaguar_hide_jerkin.png",
+        "sha256": "c7030abd91e53c042dbb4002444c28632dc3ca87f520778b3106ef2e7b29c3f3",
+        "bytes": 576761,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "98691641ac6e8197c41df8adaa0de6f7aa6e1f69a13eaeb62742ca87c06f26c7",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Jaguar-Hide Jerkin (jaguar_hide_jerkin) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty sleeveless LEATHER jerkin made of ochre jaguar hide with dark rosette spots, laced up the front with thick jade-green cord. Supple stitched hide with slight fur at edge, strong vest silhouette, no wearer. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/jaguar_hide_jerkin.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "98691641ac6e8197c41df8adaa0de6f7aa6e1f69a13eaeb62742ca87c06f26c7"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "hexbone_handwraps",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/hexbone_handwraps.webp",
+      "canonicalDisplayName": "Hexbone Handwraps",
+      "acceptedSha256": "27a5bdcf491dc168f968572b60d120768f68c26c8578dff7058c562c5e22423a",
+      "acceptedBytes": 4320,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/hexbone_handwraps.png",
+        "sha256": "ac29e043099529bdfe02e8d26b6d40e746c2e01c52b4d97eee0a32b7c895567e",
+        "bytes": 2287612,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/hexbone_handwraps.png",
+        "sha256": "10774e5a58222473a4e1081d9b31c1bd871907c2c740c52850c448c9a4536df1",
+        "bytes": 537962,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "1314f2a037db1ae4964083ca80cd86557115d9518bc316c7509d32ae85a70177",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Hexbone Handwraps (hexbone_handwraps) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A compact matching pair of empty CLOTH handwrap gloves, worn ochre cloth strips bound with small carved ivory bone charms, one faceted jade hexagonal charm between each set of knuckles. Clear glove silhouette and five finger shapes each, no living hands or readable runes. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/hexbone_handwraps.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "1314f2a037db1ae4964083ca80cd86557115d9518bc316c7509d32ae85a70177"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rootbound_sabatons",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rootbound_sabatons.webp",
+      "canonicalDisplayName": "Rootbound Sabatons",
+      "acceptedSha256": "d864d285021936e924e9856518bf28664100bd5a2bb269fb7b1a0bfda953a2ff",
+      "acceptedBytes": 4016,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/rootbound_sabatons.png",
+        "sha256": "9f842dfb0ec8527ea78c8ff1ba91fd3e0690c11eb0adea3b4d20eafd6d5bc2ba",
+        "bytes": 2287801,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/rootbound_sabatons.png",
+        "sha256": "e15dd0d9e2583143be85a62a383dbbcdc28b1fb3eae6e0c56851307850adaf40",
+        "bytes": 508905,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "502548a16f258ed9871327fa589cd9469614e0c91aed05b681eb90e0eb93f10e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rootbound Sabatons (rootbound_sabatons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A compact matching pair of heavy MAIL sabatons, dark interlinked chain over boots with iron toe reinforcement, living woody roots gripping each ankle and toe, few moss-green leaves. Whole pair visible, no feet or wearer. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/rootbound_sabatons.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "502548a16f258ed9871327fa589cd9469614e0c91aed05b681eb90e0eb93f10e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "pollen_dusted_leggings",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/pollen_dusted_leggings.webp",
+      "canonicalDisplayName": "Pollen-Dusted Leggings",
+      "acceptedSha256": "033c0c8f24f8b851432c2fde31d1cdd5db6fcb1b469566b5ea300ccf04f5c770",
+      "acceptedBytes": 2770,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/pollen_dusted_leggings.png",
+        "sha256": "8c549068b66aaf23149ec5816a658b4ac4016e4473f597304d4c75dba0582dc8",
+        "bytes": 2103486,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/pollen_dusted_leggings.png",
+        "sha256": "2f2e71bd5d21b2288934e3d5574ce073bff80f5669c6d2394809cf9c1d8acdd1",
+        "bytes": 486458,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "ae2e3bdacfb0b4391a411717242d60cbc326d7cb3c68c713bd5b3268340c0d87",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Pollen-Dusted Leggings (pollen_dusted_leggings) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of moss-brown LEATHER leggings, supple stitched panels with vine-shaped embossed seams, pollen-gold dust settled along thighs and knees and a few drifting golden motes nearby. Distinct trouser silhouette with separated legs, no wearer. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/pollen_dusted_leggings.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ae2e3bdacfb0b4391a411717242d60cbc326d7cb3c68c713bd5b3268340c0d87"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "bloomsilk_cowl",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/bloomsilk_cowl.webp",
+      "canonicalDisplayName": "Bloomsilk Cowl",
+      "acceptedSha256": "318e2c8c1c6dcdd7e39f3d2ffafab3156ca37893497a97fee5e233c30d80b8e5",
+      "acceptedBytes": 3474,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/bloomsilk_cowl.png",
+        "sha256": "ee6629b4bb14844b0aaa6a6902178ea73df7d3a14ef16eeecf881e22f1d18100",
+        "bytes": 2312952,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/bloomsilk_cowl.png",
+        "sha256": "6aeccd33d8d14c948d83dcb3b883983a9baba448275ad4c589436e8e16568f30",
+        "bytes": 535505,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "c0779e30237eb58b571d64f0d5e1aac6bfb363d19c0cd5916becd6b98dce3dbd",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Bloomsilk Cowl (bloomsilk_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty moss-green CLOTH hood made of soft bloomsilk, petal-shaped layered hem in pale pink and dusty rose, one pollen-gold flower clasp near the neck. Shadowed face opening and visible silk folds, no face or mannequin. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/bloomsilk_cowl.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "c0779e30237eb58b571d64f0d5e1aac6bfb363d19c0cd5916becd6b98dce3dbd"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "falls_blessed_staff",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/falls_blessed_staff.webp",
+      "canonicalDisplayName": "Falls-Blessed Staff",
+      "acceptedSha256": "e4cb23ba12f521155cf32814a4432086e66efee71604fc2b9c8fe76577395a4c",
+      "acceptedBytes": 2070,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/falls_blessed_staff.png",
+        "sha256": "68e4669d475c263dc1ff2f1ffa6253aa010818871eb899a382338c32cca884b4",
+        "bytes": 1937458,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/falls_blessed_staff.png",
+        "sha256": "167a2f46e984a130da0ae2ede156f65aed0d8193013b5bbabc5a47bd13820ebb",
+        "bytes": 439990,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "e4ec355c65cdd0c0706976308db0c823e9de428053a7041dede73222bc359699",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Falls-Blessed Staff (falls_blessed_staff) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete long river-wood staff diagonally posed with generous padding. Gnarled dark wooden shaft crowned by a smooth falls-worn wet black basalt stone, small white-cyan ribbon of magical water spilling from the stone and curling down the upper shaft. Natural jade bindings, whole crown and butt visible, no wielder. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/falls_blessed_staff.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "e4ec355c65cdd0c0706976308db0c823e9de428053a7041dede73222bc359699"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "fanglords_hide_mantle",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/fanglords_hide_mantle.webp",
+      "canonicalDisplayName": "Fanglord's Hide Mantle",
+      "acceptedSha256": "b215edabd7171d473b6b6da03e53ea08df6ea37bef0caa6ff89f3ca2510647f8",
+      "acceptedBytes": 4744,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/fanglords_hide_mantle.png",
+        "sha256": "42fdc4f1e4203b7547f85c62870df9998aab5b8531ee57485bedf3c5ef021753",
+        "bytes": 2321143,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/fanglords_hide_mantle.png",
+        "sha256": "93ed93069d45a8b2cc1e75ecd9312ba379239ade3a8e9e6ec339ba1a6c3e7d4f",
+        "bytes": 551896,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "197fc48d336bd3c18692675fd9d29cbb40fddfbb73f2e30bcad7dc25ff49d0fe",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Fanglord's Hide Mantle (fanglords_hide_mantle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete LEATHER shoulder mantle made of golden rosetted jaguar hide, sculpted snarling jaguar head forming one shoulder cap with ivory fangs, long war-red feathers hanging from the side, jade ties. Empty armor object, no living animal, no wearer, no blood. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/fanglords_hide_mantle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "197fc48d336bd3c18692675fd9d29cbb40fddfbb73f2e30bcad7dc25ff49d0fe"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "thornroot_greathelm",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/thornroot_greathelm.webp",
+      "canonicalDisplayName": "Thorncrowned Greathelm",
+      "acceptedSha256": "119ce14e162c9e03908a1e0714700cefae702c3cac99e8a2b60e78bf35ff3c06",
+      "acceptedBytes": 4354,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/thornroot_greathelm.png",
+        "sha256": "ebe7a5e1c1d8b0f13516f6e9d03590ef1c108c9424416c37d7c553f6bf9bf04e",
+        "bytes": 2635448,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/thornroot_greathelm.png",
+        "sha256": "ea4359200a60cb88f3b0405e163d60588b9c3bf282196c00c9f60911d72556f1",
+        "bytes": 552092,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "14c80f8b8da41c0519a0be3d22550e948fde575e228f817e76b0ec085cf2551b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Thorncrowned Greathelm (thornroot_greathelm) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete closed MAIL helmet with dark iron faceplate and visibly interlinked chain aventail, crown ringed with thick thorned woody roots and one small pollen-yellow bloom. Angular eye slit, aged basalt steel and moss, no face or wearer. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/thornroot_greathelm.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "14c80f8b8da41c0519a0be3d22550e948fde575e228f817e76b0ec085cf2551b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "fanglords_whistle",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/fanglords_whistle.webp",
+      "canonicalDisplayName": "Fanglord's Whistle",
+      "acceptedSha256": "7bf83e1660b1935c9998ff56b22370b62ba314e08e7bc842955523535490f6c0",
+      "acceptedBytes": 4070,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/fanglords_whistle.png",
+        "sha256": "59b7b5280f2eb87b0de4d752ff91801a16f8d7ffe4399fc335f684090c50d33a",
+        "bytes": 2288102,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/fanglords_whistle.png",
+        "sha256": "8c3189b9f8cbfb8e47bc244ecee50e7adb5b556e7f421e0d1941f855cc2f2da2",
+        "bytes": 581513,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "ebfc7af42ecf7cd7a7b452ec7a82927477ee547c25c065d7f61e902286d8e2e2",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Fanglord's Whistle (fanglords_whistle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete carved ivory fang-shaped whistle with clear small air hole and mouthpiece, hanging from a looping war-red cord. A compact translucent jade-green spirit jaguar head curls from a thin wisp above the whistle, secondary to the solid fang. Bone and red cord remain the clear focal silhouette. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/fanglords_whistle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ebfc7af42ecf7cd7a7b452ec7a82927477ee547c25c065d7f61e902286d8e2e2"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "gorgebloom_seedpod",
+      "family": "wildheart",
+      "batch": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/gorgebloom_seedpod.webp",
+      "canonicalDisplayName": "Gorgebloom Seedpod",
+      "acceptedSha256": "7f7081238eb7644c96b53ebf79cb85cb5ffd03956ac36eb5a4f5017ab3fa9729",
+      "acceptedBytes": 4082,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/originals/gorgebloom_seedpod.png",
+        "sha256": "7391e46ebdbeb0eca760eb91f1780532521bdbf0b5af955270021a33d1680665",
+        "bytes": 2278875,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-wildheart/masters/gorgebloom_seedpod.png",
+        "sha256": "50dc8185d57868105f95291ef4cd4409dfefa69a995d92d9e96b6a46a86ff3d4",
+        "bytes": 543960,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "wildheart-basin-icons-2026-10-02",
+        "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+        "sha256": "485917c5aaee4d0c896d6152bc9c3d77fc701c93a4c1466662c3c9660c4d62ba",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Gorgebloom Seedpod (gorgebloom_seedpod) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete thick blood-red botanical seedpod split open along its center, with textured crimson petal-like husk and curled green stem, glowing pollen-gold seed nestled inside. Rich organic plant textures, a few tiny golden pollen motes, no gore. Preserve established Wildheart Basin loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-wildheart/superseded/gorgebloom_seedpod.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "485917c5aaee4d0c896d6152bc9c3d77fc701c93a4c1466662c3c9660c4d62ba"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-wildheart-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-wildheart-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

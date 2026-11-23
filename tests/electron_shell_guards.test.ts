@@ -9,10 +9,12 @@ import {
   EMBEDDED_SUBFRAME_ORIGINS,
   extractInlineScriptHashes,
   isDevToolsToggleShortcut,
+  isExternalDocumentUrl,
   isSoftwareRenderer,
   isTrustedSender,
   navigationAllowed,
   originAllowed,
+  toCanonicalExternalUrl,
   withCspHeader,
 } from '../electron/shell_guards.cjs';
 
@@ -398,5 +400,71 @@ describe('isTrustedSender', () => {
       false,
     );
     expect(isTrustedSender({}, allowed)).toBe(false);
+  });
+});
+
+describe('isExternalDocumentUrl', () => {
+  it('classifies whitepaper pdf and any pdf as external documents', () => {
+    expect(
+      isExternalDocumentUrl('app://worldofclaudecraft/World-of-ClaudeCraft-Whitepaper-v1.0.pdf'),
+    ).toBe(true);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/docs/manual.PDF')).toBe(true);
+  });
+
+  it('classifies legal and support documentation routes as external documents', () => {
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/terms')).toBe(true);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/terms.html')).toBe(true);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/privacy')).toBe(true);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/privacy.html')).toBe(true);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/support')).toBe(true);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/data-deletion')).toBe(true);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/wiki')).toBe(true);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/wiki/')).toBe(true);
+  });
+
+  it('does not classify game client entry points or in-game assets as external documents', () => {
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/')).toBe(false);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/index.html')).toBe(false);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/play')).toBe(false);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/play.html')).toBe(false);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/assets/main.js')).toBe(false);
+    expect(isExternalDocumentUrl('app://worldofclaudecraft/ui/cursors/gauntlet.png')).toBe(false);
+  });
+
+  it('handles invalid urls gracefully without throwing', () => {
+    expect(isExternalDocumentUrl('')).toBe(false);
+    expect(isExternalDocumentUrl('not a url')).toBe(false);
+  });
+});
+
+describe('toCanonicalExternalUrl', () => {
+  const prod = 'https://worldofclaudecraft.com';
+
+  it('rebases app:// document URLs to the canonical production web origin', () => {
+    expect(
+      toCanonicalExternalUrl(
+        'app://worldofclaudecraft/World-of-ClaudeCraft-Whitepaper-v1.0.pdf',
+        APP,
+        prod,
+      ),
+    ).toBe('https://worldofclaudecraft.com/World-of-ClaudeCraft-Whitepaper-v1.0.pdf');
+    expect(toCanonicalExternalUrl('app://worldofclaudecraft/terms', APP, prod)).toBe(
+      'https://worldofclaudecraft.com/terms',
+    );
+    expect(toCanonicalExternalUrl('app://worldofclaudecraft/privacy', APP, prod)).toBe(
+      'https://worldofclaudecraft.com/privacy',
+    );
+  });
+
+  it('preserves query parameters and hash fragments', () => {
+    expect(toCanonicalExternalUrl('app://worldofclaudecraft/terms?lang=es#s1', APP, prod)).toBe(
+      'https://worldofclaudecraft.com/terms?lang=es#s1',
+    );
+  });
+
+  it('leaves http and https URLs untouched', () => {
+    expect(toCanonicalExternalUrl('https://discord.com/invite/woc', APP, prod)).toBe(
+      'https://discord.com/invite/woc',
+    );
   });
 });

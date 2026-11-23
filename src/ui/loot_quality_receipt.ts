@@ -1,5 +1,6 @@
 // Only authoritative loot receipt metadata supplies an exact-copy chat link.
 // User-typed item tokens retain their static definition-only meaning.
+import { isValidLootQuality } from '../sim/loot_quality';
 import type { ItemInstancePayload, SimEvent } from '../sim/types';
 import { itemStackDisplayName } from './entity_display_core';
 import { parseChatSegments, tryEncodeItemLink } from './hud/quest/quest_link';
@@ -58,4 +59,19 @@ export function lootQualityReceiptNodes(
     }
   }
   return [body];
+}
+
+/** The crafted line's body: the plain text for an Ordinary craft, or, when the
+ *  craft rolled permanent quality, the nodes whose item link opens that exact
+ *  copy (the link then reads "[Name, Superior]" through lootQualityAriaName). */
+export function craftedLineBody(
+  doc: Document,
+  text: string,
+  itemId: string,
+  instance: ItemInstancePayload | undefined,
+  appendLink: (parent: HTMLElement, id: string, copy?: ItemInstancePayload) => void,
+): string | Node[] {
+  return isValidLootQuality(instance?.lootQuality)
+    ? lootQualityReceiptNodes(doc, text, itemId, instance!, appendLink)
+    : text;
 }

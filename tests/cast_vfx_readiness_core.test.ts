@@ -384,3 +384,31 @@ describe('the linked answer is a handle, never a boolean', () => {
     expect(typeof build).toBe('function');
   });
 });
+
+describe('createCastVfxReadiness after a WebGL context restore', () => {
+  it('reset closes every ready family again, restarts its deadline, and keeps a device decline', () => {
+    const decal: Mat = { id: 'decal', program: PROGRAM_A };
+    const { readiness, state } = harness([decal], [{ id: 'crest', program: null }], {
+      declined: () => true,
+    });
+    expect(readiness.admit(WARRIOR)).toBe(true);
+    state.nowMs = 10;
+    // The restored context has no program for the decal yet.
+    decal.program = null;
+    readiness.reset();
+    expect(readiness.admit(ENGINE)).toBe(false);
+    expect(readiness.snapshot().families[0]).toMatchObject({ ready: false, forced: false });
+    // The kit stays declined: a device decision, never re-asked.
+    expect(readiness.snapshot().families[1]).toMatchObject({ declined: true });
+    // The deadline counts from the first consult AFTER the reset.
+    state.nowMs = 10 + DEADLINE_MS - 1;
+    expect(readiness.admit(ENGINE)).toBe(false);
+    state.nowMs = 10 + DEADLINE_MS;
+    expect(readiness.admit(ENGINE)).toBe(true);
+    // Re-proved on the restored context: open on its programs again.
+    const fresh = harness([decal]);
+    decal.program = PROGRAM_B;
+    fresh.readiness.reset();
+    expect(fresh.readiness.admit(ENGINE)).toBe(true);
+  });
+});

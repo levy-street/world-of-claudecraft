@@ -24,7 +24,8 @@
 // Behavior is the training dummy's, unchanged: every one of these carries
 // `dummy: true`, which is the single flag the sim reads to hold a practice target
 // inert (mob/locomotion.ts never lets it aggro, move, or swing; combat/
-// pull_eligibility.ts keeps it from being dragged off its marker; deeds.ts routes
+// pull_eligibility.ts keeps it from being dragged or knocked off its marker,
+// the knockback half enforced inside knockback.ts applyKnockback; deeds.ts routes
 // its damage to the practice counter instead of the real combat ledger). They
 // carry zero damage, zero move speed and zero aggro radius on top of that, so the
 // inertness holds even for a code path that reads the template numbers directly.

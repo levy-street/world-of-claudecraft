@@ -58,7 +58,7 @@ export const GATHER_NODE_TYPES: readonly GatherNodeType[] = ['ore', 'wood', 'her
 // `level` (issue: profession XP) is a one-time snapshot of each node's zone
 // levelRange midpoint (eastbrook_vale [1,7] -> 4; mirefen_marsh, zone2's
 // levelRange [6,13] -> 10), not a live lookup: see types.ts GatherNodeDef.
-export const GATHER_NODES: GatherNodeDef[] = [
+const GATHER_NODE_ROWS: GatherNodeDef[] = [
   // Eastbrook Vale (eastbrook_vale), ore around the Copper Dig outcrops (the
   // zone's mine-themed POI, zone1.ts pois); moved here from Boar Meadow (a
   // wolf/boar mob area with no mining flavor and no discoverable landmark)
@@ -458,11 +458,14 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 
+  // Moved off the ground the grand Highwatch inn's south end took (its reach in
+  // sim/highwatch_layout.ts), past its turret into the lane between the inn and
+  // the watch house; tests/highwatch_layout_suite.test.ts keeps it clear.
   {
     id: 'herb_thornpeak_1',
     zoneId: 'thornpeak_heights',
     type: 'herb',
-    pos: { x: 18, z: 648 },
+    pos: { x: 30, z: 645.5 },
     level: 17,
     tier: 1,
   },
@@ -632,11 +635,14 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 17,
     tier: 3,
   },
+  // Moved off the ground the Highwatch inn's back wall took (its reach in
+  // sim/highwatch_layout.ts), into the open ground between the inn, the Cairns
+  // and the watch house; tests/highwatch_layout_suite.test.ts keeps it clear.
   {
     id: 'herb_thornpeak_t2',
     zoneId: 'thornpeak_heights',
     type: 'herb',
-    pos: { x: 28, z: 658 },
+    pos: { x: 24, z: 645 },
     level: 17,
     tier: 2,
   },
@@ -1198,8 +1204,10 @@ export const GATHER_NODES: GatherNodeDef[] = [
     // swim depth where harvestNode's swim deny always refuses. The headland
     // west of the cove keeps the whole harvest disc standable and a full
     // yard above the sea plane (its sea-plane exemption retired with the
-    // move).
-    pos: { x: 430, z: 379 },
+    // move). It stood at (430, 379) until the painted market hall took that
+    // ground (sim/painted_towns/wickharbor.ts); it lies up the headland
+    // behind the hall now.
+    pos: { x: 431, z: 388 },
     level: 20,
     tier: 1,
   },
@@ -1666,3 +1674,12 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 ];
+
+// Deep-frozen at module load, not just shared: a Studio map resolves its moved
+// veins against this table through an identity-keyed memo
+// (sim/moved_objects.ts gatherNodesFor), which is only sound while the rows
+// behind the key cannot change (the src/sim/CLAUDE.md content-memo rule). A
+// moved node is a fresh row, never a write into one of these.
+export const GATHER_NODES: GatherNodeDef[] = Object.freeze(
+  GATHER_NODE_ROWS.map((node) => Object.freeze({ ...node, pos: Object.freeze({ ...node.pos }) })),
+) as GatherNodeDef[];

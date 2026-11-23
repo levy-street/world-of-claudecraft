@@ -1,3 +1,5 @@
+import { COURIER_ABILITY } from '../../sim/content/courier';
+
 // i18n source catalog - Abilities + class ability names (English values).
 // Part of src/ui/i18n.catalog/; assembled into `en` by ./index.ts.
 // Translations live in src/ui/i18n.locales/<lang>.ts, never here.
@@ -12,6 +14,9 @@ const abilityStringsEn = {
       // Shown under the Attack tooltip: right-click removes the button from the bar,
       // freeing the slot (and its key) for a normal action. Restored in Options.
       attackRemoveHint: 'Right-click to remove it from the bar and free the slot.',
+      // Shown under an occupied slot's tooltip: a slot drag only starts with Shift
+      // held, so a plain press-and-drag stays a cast (hold-to-charge abilities).
+      moveHint: 'Shift-drag to move',
       emptySlot: 'Empty slot',
       slotAria: 'Action slot {slot}: {ability}',
       emptySlotAria: 'Action slot {slot}: empty',
@@ -132,6 +137,7 @@ function abilityTranslations(
 const classAbilityNamesEn = {
   entities: {
     abilities: abilityTranslations([
+      [COURIER_ABILITY.id, COURIER_ABILITY.name, COURIER_ABILITY.description],
       // The Vale Cup sport kit (docs/prd/vale-cup.md).
       ['sport_kick', 'Kick', 'Knock the ball along the ground toward the aim point.'],
       [
@@ -173,6 +179,11 @@ const classAbilityNamesEn = {
         'Rain arrows over an 8-yard area for 3 sec. Enemies in the area take {damage} Physical damage every 0.5 sec. Damage increases with Ranged Attack Power.',
       ],
       [
+        'phosphor_flask',
+        'Phosphor Flask',
+        'A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power.',
+      ],
+      [
         'pack_command',
         'Pack Command',
         "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit.",
@@ -203,22 +214,22 @@ const classAbilityNamesEn = {
       [
         'bloodhook',
         'Bloodhook',
-        'Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
+        'Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. On arrival, slow the target by 30% for 3 sec. (Fieldcraft signature)',
       ],
       [
         'shrapnel_charge',
         'Shrapnel Charge',
-        'Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power.',
+        'Blast a 10-yard cone in front of you. Your target, or the nearest enemy hit if your target is outside the cone, takes 24 to 30 Physical damage. Every other enemy in the cone takes 7 to 9 and bleeds for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Hitting an enemy grants 1 Hunting Momentum. Direct damage increases with Ranged Attack Power.',
       ],
       [
         'bloodtrail_assault',
         'Bloodtrail Assault',
-        'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage.',
+        'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge reaches 2 yards farther, deals 25% more base damage to its main target, and triggers 50% more wound damage. While you have no living pet, your Focus also regenerates 100% faster.',
       ],
       [
         'trailbreak',
         'Trailbreak',
-        'Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+        'Leap 25 yards backward and break free of roots and movement slows. Landing grants 50% movement speed for 3 sec. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
       ],
       ['wildheart', 'Wildheart', 'Immediately restore 30% of your maximum health.'],
       [
@@ -227,9 +238,29 @@ const classAbilityNamesEn = {
         'Reduce damage taken by 60% for 8 sec, but prevent attacks while active.',
       ],
       [
+        'play_dead',
+        'Play Dead',
+        'Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up.',
+      ],
+      [
+        'tactical_camo',
+        'Tactical Camo',
+        'Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)',
+      ],
+      [
         'frostjaw_trap',
         'Frostjaw Trap',
-        'Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+        'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+      ],
+      [
+        'bear_trap',
+        'Bear Trap',
+        'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it bleeds for {damage} Physical damage over 15 sec and is slowed by 50% for 4 sec. Damage increases with Ranged Attack Power. Only one Bear Trap can be active at a time. Placing another replaces it. It can coexist with your Frostjaw Trap.',
+      ],
+      [
+        'scatterbolt',
+        'Scatterbolt',
+        'Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Knockback-immune enemies are unaffected. Deals no damage.',
       ],
       [
         'pack_rally',
@@ -366,7 +397,7 @@ const classAbilityNamesEn = {
       [
         'mass_barrier',
         'Mass Barrier',
-        'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+        'Shields you and up to 4 nearby allies within 30 yd, each absorbing {damage} damage for 15 sec. (Mage talent)',
       ],
       [
         'overload',
@@ -526,7 +557,7 @@ const classAbilityNamesEn = {
       [
         'kidney_shot',
         'Low Blow',
-        'Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec).',
+        'Finishing move that stuns the target for 2 sec plus 1 sec per combo point (5 combo points: 7 sec).',
       ],
       [
         'ambush',
@@ -540,7 +571,7 @@ const classAbilityNamesEn = {
       [
         'stealth',
         'Duskveil',
-        'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.',
+        'Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.',
         { subtlety: 'Each opener you use from Duskveil adds 1 Gloam (max 3).' },
       ],
       ['adrenaline_rush', 'Quickened Blood', 'Your blood runs hot, instantly restoring 60 energy.'],
@@ -599,7 +630,7 @@ const classAbilityNamesEn = {
       [
         'vanish',
         'Smokefade',
-        'Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
+        'Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec.',
       ],
       [
         'instant_poison',
@@ -881,12 +912,12 @@ const classAbilityNamesEn = {
       [
         'hunting_momentum',
         'Hunting Momentum',
-        'Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)',
+        'Passive: Gutting Strike and a Shrapnel Charge that hits an enemy each grant 1 Hunting Momentum, up to 3. Momentum lasts until spent or until you leave combat, and each stack increases your movement speed by 15%. At 3 stacks, Woundrend deals 60% more strike damage and consumes the stacks. (Fieldcraft)',
       ],
       [
         'fieldcraft_reentry',
         'Armed Re-entry',
-        'Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)',
+        'Passive: With Hunting Momentum, Trailbreak arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)',
       ],
       [
         'wing_clip',
@@ -901,7 +932,7 @@ const classAbilityNamesEn = {
       [
         'aspect_of_the_cheetah',
         "Courser's Guise",
-        "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
+        "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze).",
       ],
       [
         'aimed_shot',
@@ -931,7 +962,7 @@ const classAbilityNamesEn = {
       [
         'shadow_word_pain',
         'Dirge of Decay',
-        'Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers already includes 10% more damage and grants 1 Gloomtithe per tick on your Effigy. Reapplying your active Dirge to an enemy mob refreshes your existing Dirges on all living hostile mobs within 30 yards of you and in line of sight. This does not spread Dirge to new targets.',
+        'Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers ticks can critically strike, using your spell critical chance and critical damage bonus. Vespers already includes 10% more damage and grants 1 Gloomtithe per tick on your Effigy. Reapplying your active Dirge to an enemy mob refreshes your existing Dirges on all living hostile mobs within 30 yards of you and in line of sight. This does not spread Dirge to new targets.',
       ],
       [
         'power_word_shield',
@@ -956,7 +987,22 @@ const classAbilityNamesEn = {
       [
         'mind_flay',
         'Litany of Woe',
-        'Channel for 3 sec, dealing {damage} Shadow damage each second. Damage increases with Spell Power.',
+        'Channel for 3 sec, dealing {damage} Shadow damage each second. Damage increases with Spell Power. Vespers ticks can critically strike, using your spell critical chance and critical damage bonus.',
+      ],
+      [
+        'vampiric_touch',
+        'Vampiric Touch',
+        'Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%.',
+      ],
+      [
+        'void_rupture',
+        'Void Rupture',
+        'Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted.',
+      ],
+      [
+        'spirit_bomb',
+        'Tithe Bomb',
+        'Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell.',
       ],
       [
         'flash_heal',
@@ -971,7 +1017,7 @@ const classAbilityNamesEn = {
       [
         'thunder_reservoir',
         'Thunder Reservoir',
-        'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
+        'Passive: Arc Bolt, Skybranch, and Magma Burst grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
       ],
       [
         'lightning_overload',
@@ -981,7 +1027,7 @@ const classAbilityNamesEn = {
       [
         'lava_burst',
         'Magma Burst',
-        'Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+        'Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. A critical strike deals an extra 24% of the normal hit. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
       ],
       [
         'thunderstorm',
@@ -1011,7 +1057,7 @@ const classAbilityNamesEn = {
       [
         'flame_shock',
         'Cinder Jolt',
-        'Deal {damage} Fire damage, then {overTime} Fire damage over 12 sec. The initial hit increases with Spell Power.',
+        'Deal {damage} Fire damage, then {overTime} Fire damage over {duration} sec. The initial hit increases with Spell Power.',
       ],
       [
         'flametongue_weapon',
@@ -1173,7 +1219,15 @@ const classAbilityNamesEn = {
             'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
         },
       ],
-      ['healing_touch', 'Wildmend', 'Heals a friendly target for {damage}.'],
+      [
+        'healing_touch',
+        'Wildmend',
+        'Heals a friendly target for {damage}.',
+        {
+          restoration:
+            'Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3.',
+        },
+      ],
       [
         'mark_of_the_wild',
         'Wildward',
@@ -1192,11 +1246,11 @@ const classAbilityNamesEn = {
       ],
       [
         'rejuvenation',
-        'Wildbloom',
+        'Sporemending',
         'Heals the target for {damage} over 12 sec.',
         {
           restoration:
-            'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom.',
+            'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom.',
         },
       ],
       [
@@ -1208,7 +1262,7 @@ const classAbilityNamesEn = {
       [
         'bear_form',
         'Bruin Form',
-        'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+        'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
       ],
       [
         'maul',
@@ -1216,7 +1270,7 @@ const classAbilityNamesEn = {
         'A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
         },
       ],
       [
@@ -1241,6 +1295,12 @@ const classAbilityNamesEn = {
         { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
       ],
       [
+        'scratch',
+        'Scratch',
+        'Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
+        { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
+      ],
+      [
         'ferocious_bite',
         'Gorebite',
         'Finishing move that causes {damage}. Cat Form only.',
@@ -1258,8 +1318,11 @@ const classAbilityNamesEn = {
       [
         'regrowth',
         'Second Bloom',
-        'Heals a friendly target for {damage} and an additional amount over 21 sec.',
-        { restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).' },
+        'Heals a friendly target for {damage} and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.',
+        {
+          restoration:
+            'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
+        },
       ],
       ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
@@ -1293,12 +1356,12 @@ const classAbilityNamesEn = {
       [
         'hibernate',
         'Slumber',
-        'Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it.',
+        'Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails.',
       ],
       [
         'dash',
         'Dash',
-        'Sprint forward, increasing movement speed by 50% for 15 sec. Cat Form only.',
+        'Shift into Cat Form if you are not already, then sprint, increasing movement speed by 50% for 15 sec. Usable in any form. Instant, and does not trigger the global cooldown.',
       ],
       [
         'pounce',
@@ -1328,7 +1391,7 @@ const classAbilityNamesEn = {
       [
         'rip',
         'Bloodrift',
-        'Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Cat Form only.',
+        'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: {damage} total). Cat Form only.',
         { feral: 'The landed hit adds 1 Old Blood (max 3).' },
       ],
       [
@@ -1529,12 +1592,12 @@ const classAbilityNamesEn = {
       [
         'cold_blood',
         "Killer's Calm",
-        'Focuses your killing intent so your next attack is a critical strike. (Knifework signature)',
+        'Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)',
       ],
       [
         'blade_flurry',
         'Mirrored Blades',
-        'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)',
+        'Unleashes a flurry of blades, increasing attack speed by 20% for 30 sec. (Thuggery signature)',
       ],
       [
         'hemorrhage',
@@ -1584,7 +1647,11 @@ const classAbilityNamesEn = {
       [
         'swiftmend',
         'Fleetmend',
-        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        {
+          restoration:
+            'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        },
       ],
       [
         'moonlash',
@@ -1604,7 +1671,7 @@ const classAbilityNamesEn = {
       [
         'marrowbreak',
         'Marrowbreak',
-        'Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
+        'Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
       ],
       [
         'wildwake',
@@ -1617,9 +1684,41 @@ const classAbilityNamesEn = {
         'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)',
       ],
       [
+        'sporemender_form',
+        'Sporemender Form',
+        'Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)',
+      ],
+      [
+        'spore_burst',
+        'Spore Burst',
+        'Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.',
+        {
+          balance: 'At 3 Moontide it is 25% stronger and spends your Moontide.',
+          restoration:
+            'Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance.',
+        },
+      ],
+      [
+        'natures_boon',
+        "Nature's Boon",
+        "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
+        {
+          feral:
+            'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+          balance:
+            'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+          restoration:
+            'Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
+        },
+      ],
+      [
         'overbloom',
         'Overbloom',
-        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+        'Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.',
+        {
+          restoration:
+            'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending.',
+        },
       ],
       [
         'summon_imp',
@@ -1709,7 +1808,7 @@ const classAbilityNamesEn = {
       [
         'iron_resolve',
         'Iron Resolve',
-        'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb {absorbPerRage} damage per rage spent, lasting up to 10 sec. (Protection)',
+        'Grit your teeth and ignore the pain: a shield absorbs damage equal to {damage}% of your maximum health when cast, lasting up to {duration} sec. (Protection)',
       ],
       [
         'faultline',
@@ -1942,7 +2041,11 @@ const classAbilityNamesEn = {
       [
         'inner_focus',
         'Stilled Mind',
-        'Makes your next Priest spell free and uninterruptible. Lasts 60 sec.',
+        'Your next Priest spell costs no Mana and cannot be interrupted. Lasts 60 sec.',
+        {
+          shadow:
+            'Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus.',
+        },
       ],
       [
         'innervate',
@@ -2034,7 +2137,7 @@ const classAbilityNamesEn = {
       [
         'multi_shot',
         'Splitshot',
-        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)',
+        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)',
       ],
       [
         'prayer_of_healing',
@@ -2069,7 +2172,7 @@ const classAbilityNamesEn = {
       [
         'shadowstep',
         'Shadeslip',
-        'Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)',
+        'Steps through the shadows to your target, friend or foe, without breaking Duskveil. Stores up to 2 charges. (Rogue talent)',
       ],
       ['silence', 'Hushword', 'Silences the target for 4 sec. (Priest talent)'],
       [
@@ -2144,7 +2247,7 @@ const classAbilityNamesEn = {
       [
         'typhoon',
         'Typhoon',
-        'A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec.',
+        'A blast of wind hurls all enemies within 8 yd 15 yd away from you and dazes them, slowing their movement by 50% for 4 sec. Enemy players are thrown into the air in a straight line: knocked off a ledge, they keep going and take falling damage, and a fatal fall counts as your kill.',
       ],
       [
         'voidfeast',
@@ -2165,7 +2268,7 @@ const classAbilityNamesEn = {
       [
         'summon_tithefiend',
         'Call Tithefiend',
-        'Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
+        'Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It attacks only enemies within 35 yards that have your Dirge of Decay, preferring your Effigy. Without a target, it waits until one becomes available or its duration ends. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
       ],
       ['martyrs_aegis', "Martyr's Aegis", "Reduce one ally's incoming damage by 40% for 8 sec."],
       [
@@ -2177,6 +2280,10 @@ const classAbilityNamesEn = {
         'choir_of_deliverance',
         'Choir of Deliverance',
         'Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power.',
+        {
+          shadow:
+            'For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing.',
+        },
       ],
     ]),
   },

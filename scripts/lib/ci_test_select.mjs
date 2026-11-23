@@ -57,7 +57,10 @@ import {
  *
  * tests/ci_selection_pipeline.test.ts recomputes the static import closure of
  * the two entries and fails when a module in the closure is missing here, so
- * the list cannot rot as imports are added.
+ * the list cannot rot as imports are added. The closure has a second root set:
+ * the Vitest plugins vite.config.ts registers that replace part of vitest's own
+ * related selection (scripts/lib/vitest_bounded_related.mjs), since the merged
+ * selective leg's test set is computed by them.
  */
 export const SELECTION_PIPELINE_FILES = Object.freeze([
   'scripts/detect_code_changes.mjs',
@@ -72,6 +75,7 @@ export const SELECTION_PIPELINE_FILES = Object.freeze([
   'scripts/lib/gate_fast_plan.mjs',
   'scripts/lib/teardown_rpc_flake.mjs',
   'scripts/lib/test_visibility.mjs',
+  'scripts/lib/vitest_bounded_related.mjs',
 ]);
 
 /** Statuses the pull request files endpoint documents. Anything else widens. */

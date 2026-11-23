@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { runContextRestoreResets } from '../src/render/context_restore_registry';
 import { PostShed } from '../src/render/post_shed';
 import { POST_SHED_BLOOM_MIPS_FULL } from '../src/render/post_shed_core';
 
@@ -226,6 +227,24 @@ describe('post shed painter over the live chain', () => {
       { target: ao.occlusionTarget, hex: 0xffffff, alpha: 1 },
     ]);
     expect(post.shedRung()).toBe('ao-off');
+  });
+
+  it('a WebGL context restore clears the shed AO target to white again (the restored one is zeroed)', async () => {
+    const clears: RecordedClear[] = [];
+    const { post, ao, bloom } = await insaneChain(clears);
+    post.setShedLevel(0);
+    clears.length = 0;
+    runContextRestoreResets();
+    // The level stands (AO still shed), and its target is white again: a zeroed
+    // occlusion target would multiply the whole frame to black.
+    expect(ao.occlusionPassthrough).toBe(true);
+    expect(post.shedRung()).toBe('ao-off');
+    expect(clears).toContainEqual({ target: ao.occlusionTarget, hex: 0xffffff, alpha: 1 });
+    expect(clears).toContainEqual({
+      target: bloom.renderTargetsHorizontal[0],
+      hex: 0x000000,
+      alpha: 0,
+    });
   });
 
   it('restoring from the floor re-enables every pass and the full mip chain with no clear', async () => {

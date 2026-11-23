@@ -47,6 +47,38 @@ export function installCastVfxCanvasStub(): void {
   vi.stubGlobal('document', { createElement: canvas, createElementNS: canvas });
 }
 
+/** Every Object3D a pool instance reaches through its own fields (slots,
+ *  arrays, nested records), stopping at the scene and the camera it was
+ *  handed. The attribution a drawable gets is the pool that holds it. */
+export function objectsHeldBy(pool: unknown): Set<THREE.Object3D> {
+  const held = new Set<THREE.Object3D>();
+  const visited = new Set<unknown>();
+  const visit = (value: unknown, depth: number): void => {
+    if (value === null || typeof value !== 'object' || visited.has(value)) return;
+    visited.add(value);
+    const object = value as THREE.Object3D & { isScene?: boolean; isCamera?: boolean };
+    if (object.isObject3D) {
+      if (object.isScene || object.isCamera) return;
+      object.traverse((child) => held.add(child));
+      return;
+    }
+    if (depth === 0 || ArrayBuffer.isView(value)) return;
+    const record = value as {
+      isMaterial?: boolean;
+      isTexture?: boolean;
+      isBufferGeometry?: boolean;
+    };
+    if (record.isMaterial || record.isTexture || record.isBufferGeometry) return;
+    const entries =
+      value instanceof Map || value instanceof Set
+        ? [...value.values()]
+        : Object.values(value as Record<string, unknown>);
+    for (const entry of entries) visit(entry, depth - 1);
+  };
+  visit(pool, 5);
+  return held;
+}
+
 /** Whether three would submit primitives for this object on the next frame:
  *  visible through its ancestors, and a non-empty instance or draw range. */
 export function wouldDraw(object: THREE.Object3D): boolean {
@@ -81,10 +113,14 @@ export function drawingFamilies(drawables: readonly THREE.Object3D[]): number {
 }
 
 /** Stubs ready every kit preparation a pool checks before its solid pieces
- *  draw (headless, none of them ever reports ready on its own). */
-export function prepareCastVfxKit(fx: AbilityVfxFx): void {
+ *  draw (headless, none of them ever reports ready on its own); `answer`
+ *  lets a case take that readiness back. */
+export function prepareCastVfxKit(
+  fx: AbilityVfxFx,
+  answer: (kind?: unknown) => boolean = () => true,
+): void {
   const pools = fx as unknown as Record<string, { preparation: unknown }>;
-  const ready = { ready: () => true, units: () => [], dispose: () => {} };
+  const ready = { ready: answer, units: () => [], dispose: () => {} };
   pools.crests.preparation = ready;
   pools.guards.preparation = ready;
   pools.spiritHammers.preparation = ready;

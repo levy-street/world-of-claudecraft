@@ -17,8 +17,8 @@ import type { Entity, WorldContent } from '../src/sim/types';
 const EXPANSIONS = [
   500, 1000, 2500, 5000, 10000, 20000, 40000, 80000, 150000, 300000, 600000, 1200000,
 ];
-const SOCKETS = [1000000, 2000000, 3500000, 5000000];
-const VAULT = [20000, 50000, 100000, 200000, 400000];
+const SOCKETS = [750000, 1000000, 1250000, 1500000];
+const VAULT = [20000, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000];
 
 const DEFAULTS = { bankExpansions: EXPANSIONS, bankSockets: SOCKETS, vaultUpgrades: VAULT };
 
@@ -98,7 +98,7 @@ describe('resolveStoragePrices validation', () => {
   });
 
   it('a non-number entry drops the whole dimension', () => {
-    const raw = [...SOCKETS.slice(0, 3), '5000000'];
+    const raw = [...SOCKETS.slice(0, 3), '1500000'];
     expect(resolveStoragePrices({ bankSockets: raw }).bankSockets).toEqual(SOCKETS);
   });
 
@@ -115,10 +115,10 @@ describe('resolveStoragePrices validation', () => {
     expect(resolveStoragePrices({ bankSockets: raw }).bankSockets).toEqual(SOCKETS);
     const edge = withEntry(SOCKETS, 1, Number.MAX_SAFE_INTEGER);
     expect(resolveStoragePrices({ bankSockets: edge }).bankSockets).toEqual([
-      1000000,
+      750000,
       Number.MAX_SAFE_INTEGER,
-      3500000,
-      5000000,
+      1250000,
+      1500000,
     ]);
   });
 
@@ -147,12 +147,12 @@ describe('resolveStoragePrices validation', () => {
   it('resolved tables are frozen copies, never aliases of the caller arrays', () => {
     const mine = withEntry(SOCKETS, 0, 123);
     const resolved = resolveStoragePrices({ bankSockets: mine });
-    expect(resolved.bankSockets).toEqual([123, 2000000, 3500000, 5000000]);
+    expect(resolved.bankSockets).toEqual([123, 1000000, 1250000, 1500000]);
     expect(resolved.bankSockets).not.toBe(mine);
     // Mutating the caller's array after resolve must not reach the table.
     mine[1] = 42;
     mine.push(9);
-    expect(resolved.bankSockets).toEqual([123, 2000000, 3500000, 5000000]);
+    expect(resolved.bankSockets).toEqual([123, 1000000, 1250000, 1500000]);
     expect(Object.isFrozen(resolved)).toBe(true);
     expect(Object.isFrozen(resolved.bankSockets)).toBe(true);
     // The default path is frozen too.
@@ -304,8 +304,8 @@ describe('SimConfig.storagePrices through the live Sim', () => {
     expect(m.copper).toBe(200000 - 111111 - 222);
     expect(m.vault.upgrades).toBe(1);
     // The next quotes walk the (unoverridden) later rungs of the same tables.
-    expect(sim.bankInfoFor(sim.playerId)!.nextSocketCost).toBe(2000000);
-    expect(sim.vaultInfoFor(sim.playerId)!.nextUpgradeCost).toBe(50000);
+    expect(sim.bankInfoFor(sim.playerId)!.nextSocketCost).toBe(1000000);
+    expect(sim.vaultInfoFor(sim.playerId)!.nextUpgradeCost).toBe(40000);
   });
 
   it('the SimContext exposes the SAME resolved table the Sim owns (reference identity)', () => {

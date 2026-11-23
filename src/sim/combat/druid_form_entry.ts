@@ -1,11 +1,12 @@
-// Druid form-entry buttons (v0.43): three abilities that PUT YOU IN a form as
-// part of pressing them, rather than refusing unless you are already wearing it.
+// Druid form-entry buttons (v0.43): abilities that PUT YOU IN a form as part
+// of pressing them, rather than refusing unless you are already wearing it.
 //
 //   Stalk (prowl)        -> Cat Form, then stealth
 //   Lunge (lunge)        -> Cat Form, then the gap closer
+//   Dash (dash)          -> Cat Form, then the sprint (instant, off the GCD)
 //   Bruin Rush (bear_charge) -> Bruin Form, then the rush
 //
-// All three are usable in and out of every form. The shift is the same form
+// All of them are usable in and out of every form. The shift is the same form
 // every other route produces, deliberately: it reads the authored form
 // ability's own selfBuff for duration and value, and it stamps the aura with
 // that FORM ABILITY's id (cat_form / bear_form), not the pressed button's.
@@ -15,8 +16,9 @@
 // Every other reader keys on the aura KIND and cannot tell the routes apart.
 //
 // What this deliberately does NOT do:
-//   - charge the form button's own cost. These three bill their own cost (0 for
-//     Stalk and Bruin Rush, 40 energy for Lunge) and nothing more.
+//   - charge the form button's own cost. These bill their own cost (0 for
+//     Stalk, Dash and Bruin Rush, 40 energy for Lunge) and nothing more, and
+//     they keep their own GCD rule (Dash stays off the global cooldown).
 //   - grant Loping Stride. The shift sprint belongs to the form BUTTONS
 //     (FORM_ABILITY_IDS in druid_engines.ts); a stealth opener or a gap closer
 //     that also sprinted would break its own pacing.
@@ -42,6 +44,7 @@ import type { DruidCombatForm } from './form_requirement';
 export const DRUID_FORM_ENTRY: Readonly<Record<string, DruidCombatForm>> = {
   prowl: 'cat',
   lunge: 'cat',
+  dash: 'cat',
   bear_charge: 'bear',
 };
 

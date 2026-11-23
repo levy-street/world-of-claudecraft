@@ -583,11 +583,14 @@ type HealEvent = Extract<SimEvent, { type: 'heal' }>;
  *   eat/drink tick that is not a sound tick.
  * - A HoT tick fires every couple of seconds for its whole duration; the one-shot
  *   application cue (Sim.applyAura) covers the "heal landed" moment instead, so
- *   ticks stay silent. Frenzied Regeneration is fully exempt (a Bear Form
+ *   ticks stay silent. Frenzied Regeneration is exempt (a Bear Form
  *   self-heal, never aimed at anyone else, so the repeat does not read as spammy
  *   the way a party HoT does): it keeps its old tick-only sound, so the one-shot
  *   application emit is skipped for it too. Confirmed in-game on Priest (Renew)
- *   and Druid (Rejuvenation, Regrowth, Frenzied Regeneration).
+ *   and Druid (Rejuvenation, Regrowth, Frenzied Regeneration). A tick that
+ *   healed nothing (pure overheal at full health, amount 0) is silent even for
+ *   Frenzied Regeneration, and a DoT leech tick that landed as pure overheal
+ *   arrives flagged hot, so it is silent too.
  * - Only after those gates does an actual Warrior Bloodletting recovery take its
  *   own quieter cue (warriorRecoveryAudio), or stay silent when nothing was
  *   restored; it never bypasses the tick rules above. */
@@ -599,6 +602,9 @@ export function healAudioPlan(
   const hot = ev.type === 'heal2' && ev.hot === true;
   const regeneration = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
   if (hot ? !regeneration : regeneration) return null;
+  // A tick that healed nothing (pure overheal on a full-health target) is silent
+  // even for Frenzied Regeneration; a tick a heal-absorb shield ate still plays.
+  if (hot && ev.amount <= 0 && (ev.absorbed ?? 0) === 0) return null;
   const recovery = ev.type === 'heal2' ? warriorRecoveryAudio(ev) : undefined;
   if (recovery !== undefined) return recovery ? { cue: recovery, gain: 0.75 } : null;
   return { cue: cue ?? 'heal_impact', gain: 1 };

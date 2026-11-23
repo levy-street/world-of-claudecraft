@@ -5,10 +5,25 @@
 // the mage staff. questRewardItemId is now the single source of truth.
 import { describe, expect, it } from 'vitest';
 import { QUESTS, questRewardItemId, REWARD_ARCHETYPE } from '../src/sim/data';
+import {
+  defaultRewardChoice,
+  questFixedReward,
+  questRewardChoices,
+} from '../src/sim/quests/quest_reward_choice';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
-const ALL_CLASSES: PlayerClass[] = ['warrior', 'paladin', 'shaman', 'rogue', 'hunter', 'mage', 'priest', 'warlock', 'druid'];
+const ALL_CLASSES: PlayerClass[] = [
+  'warrior',
+  'paladin',
+  'shaman',
+  'rogue',
+  'hunter',
+  'mage',
+  'priest',
+  'warlock',
+  'druid',
+];
 
 describe('quest reward preview matches turn-in (#98)', () => {
   it('resolves the archetype fallback for classes without an explicit reward', () => {
@@ -20,24 +35,35 @@ describe('quest reward preview matches turn-in (#98)', () => {
   });
 
   it('the resolver agrees with what turnInQuest actually grants, for every class', () => {
+    // q_greyjaw also carries a choose-one list, so the authored cloak is one of
+    // its cards rather than a fixed grant: the dialog previews the preselected
+    // card, and a turn-in that names no pick grants exactly that card. Naming
+    // the cloak grants the cloak.
+    const quest = QUESTS['q_greyjaw'];
     for (const cls of ALL_CLASSES) {
-      // autoEquip off so the granted reward stays in the bag where we can count it
-      const sim = new Sim({ seed: 1, playerClass: cls, playerName: 'Q', autoEquip: false });
-      const preview = questRewardItemId(QUESTS['q_greyjaw'], cls);
+      expect(questFixedReward(quest, cls)).toBeUndefined();
+      expect(questRewardChoices(quest, cls)).toContain('greyjaw_pelt_cloak');
+      for (const pick of [undefined, 'greyjaw_pelt_cloak']) {
+        // autoEquip off so the granted reward stays in the bag where we can count it
+        const sim = new Sim({ seed: 1, playerClass: cls, playerName: 'Q', autoEquip: false });
+        const meta = (sim as any).primary;
+        const preview = pick ?? defaultRewardChoice(quest, cls, meta.talents.spec);
 
-      // drive the quest to turn-in
-      const meta = (sim as any).primary;
-      meta.questLog.set('q_greyjaw', { questId: 'q_greyjaw', state: 'ready', counts: [1] });
-      sim.addItem('greyjaw_fang', 1);
-      const npc = [...sim.entities.values()].find((e) => e.kind === 'npc' && e.templateId === QUESTS['q_greyjaw'].turnInNpcId)!;
-      sim.player.pos = { ...npc.pos };
-      const before = sim.countItem(preview ?? '__none__');
-      sim.turnInQuest('q_greyjaw');
-      const granted = sim.countItem(preview ?? '__none__');
+        // drive the quest to turn-in
+        meta.questLog.set('q_greyjaw', { questId: 'q_greyjaw', state: 'ready', counts: [1] });
+        sim.addItem('greyjaw_fang', 1);
+        const npc = [...sim.entities.values()].find(
+          (e) => e.kind === 'npc' && e.templateId === quest.turnInNpcId,
+        )!;
+        sim.player.pos = { ...npc.pos };
+        const before = sim.countItem(preview ?? '__none__');
+        sim.turnInQuest('q_greyjaw', pick);
+        const granted = sim.countItem(preview ?? '__none__');
 
-      // whatever the preview promised, the player now holds one more of it
-      expect(preview).toBe('greyjaw_pelt_cloak');
-      expect(granted).toBe(before + 1);
+        // whatever the preview promised, the player now holds one more of it
+        expect(preview, `${cls} ${pick}`).toBeDefined();
+        expect(granted, `${cls} ${pick}`).toBe(before + 1);
+      }
     }
   });
 });

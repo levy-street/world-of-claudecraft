@@ -23,6 +23,7 @@ import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   hoardIntensity,
   hoardMechanicDamage,
+  hoardPlayerBudget,
   hoardPressure,
 } from './hoard_scaling';
 import {
@@ -541,7 +542,7 @@ export function tickHoardTentacles(
     if (held.timer > 0 || living.length === 0 || !mayRise) return;
     // Only into a clean room, and never into the middle of a set of his waves.
     if (state.cues.length > 0 || state.sequenceStep !== 0) return;
-    rise(ctx, inst, boss, state, living.length, emit);
+    rise(ctx, inst, boss, state, hoardPlayerBudget(inst.vault, living.length), emit);
     return;
   }
   held.stagger = Math.max(0, held.stagger - DT);

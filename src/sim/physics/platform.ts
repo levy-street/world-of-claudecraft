@@ -14,7 +14,7 @@
 // so a deck plank and a stone quay seat a body identically. Pure leaf: no
 // SimContext, no rng, no allocation.
 
-import { type Collider, colliderTopAt, SUPPORT_OVERLAP } from '../colliders';
+import { type Collider, colliderTopAt, insidePrism, SUPPORT_OVERLAP } from '../colliders';
 
 /** Height comparisons against a platform top (the grid's MOVE_TOP_EPS). */
 const TOP_EPS = 1e-3;
@@ -26,6 +26,14 @@ function withinFootprint(c: Collider, x: number, z: number, reachR: number): boo
     const dz = z - c.z;
     const reach = c.r + reachR;
     return dx * dx + dz * dz < reach * reach;
+  }
+  if (c.type === 'prism') {
+    // An authored Collision Master volume: its real outline, the same
+    // containment rule the solver's support query applies to prisms.
+    const dx = x - c.x;
+    const dz = z - c.z;
+    const reach = c.br + reachR;
+    return dx * dx + dz * dz < reach * reach && insidePrism(c, x, z);
   }
   const cos = Math.cos(-c.rot);
   const sin = Math.sin(-c.rot);

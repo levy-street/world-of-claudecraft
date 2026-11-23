@@ -9,6 +9,7 @@ import type { InstancedGhostHide, InstancedOccluderGhosts } from './instanced_oc
 import {
   OCCLUDER_FADE_PREFETCH_YD,
   occluderFadeSettled,
+  occluderFadesDisabled,
   occluderKeepsInstances,
   withinOccluderFadePrefetch,
 } from './occluder_fade_core';
@@ -75,6 +76,8 @@ export function cameraSegmentHitsTree(
   camY: number,
   camZ: number,
 ): boolean {
+  // The editor's viewport turns every camera fade off (occluder_fade_core).
+  if (occluderFadesDisabled()) return false;
   if (
     (eyeY < t.topY && pointInsideTree(t, eyeX, eyeZ)) ||
     (camY < t.topY && pointInsideTree(t, camX, camZ))

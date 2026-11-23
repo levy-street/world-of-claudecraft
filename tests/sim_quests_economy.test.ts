@@ -363,11 +363,8 @@ describe('food, drink, vendor', () => {
     expect(sim.countItem('boar_hide')).toBe(1);
     // proceeds = 2*9 + 1 = 19 copper
     expect(sim.copper).toBe(19);
-    // each sold gray stack is recorded for buyback
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'soggy_moccasin' && s.count === 2)).toBe(
-      true,
-    );
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'tangled_weed' && s.count === 1)).toBe(true);
+    // plain gray junk never fills the buyback list (items.ts skipsVendorBuyback)
+    expect(sim.vendorBuyback).toEqual([]);
     // exactly one summary loot line (not one per stack)
     const sold = sim.events.filter((e) => e.type === 'loot' && /^Sold /.test(e.text));
     expect(sold).toHaveLength(1);

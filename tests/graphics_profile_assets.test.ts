@@ -16,7 +16,11 @@ const mocks = vi.hoisted(() => {
     characters: prepare(),
     sky: prepare(),
     cliff: prepare(),
+    cityClutter: prepare(),
     town: prepare(),
+    fenbridgeTown: prepare(),
+    highwatchTown: prepare(),
+    paintedTowns: prepare(),
     armoury: prepare(),
     mailbox: prepare(),
     noticeboard: prepare(),
@@ -25,6 +29,7 @@ const mocks = vi.hoisted(() => {
     wyrmwatchHarbor: prepare(),
     wickharborWharf: prepare(),
     wickharborHarbor: prepare(),
+    mirefenTavern: prepare(),
     reset: vi.fn(),
     sledReset: vi.fn(),
   };
@@ -61,6 +66,9 @@ vi.mock('../src/render/characters/assets', () => ({
   prepareCharacterProfileAssets: mocks.characters,
   resetCharacterProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/characters/ghost_veil', () => ({
+  resetSpiritVeilLedger: mocks.reset,
+}));
 vi.mock('../src/render/sky', () => ({
   ensureSkyAssetsAt: mocks.sky,
 }));
@@ -68,9 +76,25 @@ vi.mock('../src/render/cliff_scree', () => ({
   prepareCliffScreeProfileAssets: mocks.cliff,
   resetCliffScreeProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/city_clutter', () => ({
+  prepareCityClutterProfileAssets: mocks.cityClutter,
+  resetCityClutterProfileCaches: mocks.reset,
+}));
 vi.mock('../src/render/eastbrook_town', () => ({
   prepareEastbrookTownProfileAssets: mocks.town,
   resetEastbrookTownProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/fenbridge_town', () => ({
+  prepareFenbridgeTownProfileAssets: mocks.fenbridgeTown,
+  resetFenbridgeTownProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/highwatch_town', () => ({
+  prepareHighwatchTownProfileAssets: mocks.highwatchTown,
+  resetHighwatchTownProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/painted_towns', () => ({
+  preparePaintedTownProfileAssets: mocks.paintedTowns,
+  resetPaintedTownProfileCaches: mocks.reset,
 }));
 vi.mock('../src/render/transport_ship', () => ({
   prepareTransportShipAssets: mocks.ship,
@@ -92,6 +116,10 @@ vi.mock('../src/render/wickharbor_harbor', () => ({
   prepareWickharborHarborAssets: mocks.wickharborHarbor,
   resetWickharborHarborCaches: mocks.reset,
 }));
+vi.mock('../src/render/mirefen_tavern', () => ({
+  prepareMirefenTavernAssets: mocks.mirefenTavern,
+  resetMirefenTavernCaches: mocks.reset,
+}));
 vi.mock('../src/render/eastbrook_grand_armoury', () => ({
   prepareEastbrookGrandArmouryProfileAssets: mocks.armoury,
   resetEastbrookGrandArmouryProfileCaches: mocks.reset,
@@ -109,6 +137,9 @@ vi.mock('../src/render/banker_chest', () => ({
 }));
 vi.mock('../src/render/door_portal', () => ({
   resetDoorPortalProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/sanctum_exit_portal', () => ({
+  resetSanctumExitPortalProfileCaches: mocks.reset,
 }));
 vi.mock('../src/render/eastbrook_surface_atlas', () => ({
   resetEastbrookSurfaceProfileCaches: mocks.reset,
@@ -136,9 +167,6 @@ vi.mock('../src/render/temporal_hourglass_visual', () => ({
 }));
 vi.mock('../src/render/paladin_ascension_visual', () => ({
   resetPaladinAscensionProfileCaches: mocks.reset,
-}));
-vi.mock('../src/render/wildheart_terrain', () => ({
-  resetWildheartTerrainProfileCaches: mocks.reset,
 }));
 vi.mock('../src/render/goblin_rocket_sled_fx', () => ({
   resetGoblinRocketSledProfileCaches: mocks.sledReset,
@@ -169,7 +197,9 @@ const prepareSpies = [
   mocks.characters,
   mocks.sky,
   mocks.cliff,
+  mocks.cityClutter,
   mocks.town,
+  mocks.fenbridgeTown,
   mocks.armoury,
   mocks.mailbox,
   mocks.noticeboard,
@@ -178,6 +208,7 @@ const prepareSpies = [
   mocks.wyrmwatchHarbor,
   mocks.wickharborWharf,
   mocks.wickharborHarbor,
+  mocks.mirefenTavern,
 ];
 
 beforeEach(() => {
@@ -200,8 +231,16 @@ describe('graphics profile asset preparation', () => {
     for (const prepare of prepareSpies.slice(0, 9)) expect(prepare).toHaveBeenCalledWith(target);
     expect(mocks.sky).toHaveBeenCalledWith(position.x, position.z, target);
     expect(mocks.cliff).toHaveBeenCalledWith(target);
+    expect(mocks.cityClutter).toHaveBeenCalledWith(target);
+    // Every town loads its placed buildings at the TARGET profile's
+    // texture tier (a rebuild prepares before the live settings switch).
+    expect(mocks.town).toHaveBeenCalledWith(target);
+    expect(mocks.fenbridgeTown).toHaveBeenCalledWith(target);
+    expect(mocks.highwatchTown).toHaveBeenCalledWith(target);
+    expect(mocks.paintedTowns).toHaveBeenCalledWith(target);
+    // ...and so does the painted Mirefen tavern (its .half / .quarter texture-tier files)
+    expect(mocks.mirefenTavern).toHaveBeenCalledWith(target);
     for (const prepare of [
-      mocks.town,
       mocks.armoury,
       mocks.mailbox,
       mocks.noticeboard,
@@ -243,9 +282,13 @@ describe('graphics profile derived-cache reset', () => {
       'foliage',
       'props',
       'characters',
+      'spirit_veil',
       'stations',
       'eastbrook_surface_atlas',
       'eastbrook_town',
+      'fenbridge_town',
+      'highwatch_town',
+      'painted_towns',
       'banker_chest',
       'mailbox',
       'noticeboard',
@@ -253,8 +296,9 @@ describe('graphics profile derived-cache reset', () => {
       'quest_objects',
       'jail_scene',
       'cliff_scree',
+      'city_clutter',
       'door_portal',
-      'wildheart_terrain',
+      'sanctum_exit_portal',
       'fireball_travel_visual',
       'frost_nova_root_visual',
       'ice_block_visual',
@@ -264,6 +308,7 @@ describe('graphics profile derived-cache reset', () => {
       'wyrmwatch_harbor',
       'wickharbor_wharf',
       'wickharbor_harbor',
+      'mirefen_tavern',
       'paladin_ascension_visual',
       'goblin_rocket_sled_fx',
       'ground_decor_prewarm',

@@ -1,7 +1,26 @@
 // Dev-build chat command that scrubs the world day/night cycle and lunar
 // phase (extracted from the main.ts chat send path; main.ts is a firewall,
 // not a home). See the usage lines below for the accepted forms.
-import { setDayNightPhaseOverride, setLunarPhaseOverride } from '../render/day_night_clock';
+import {
+  dayNightPhaseOverride,
+  setDayNightPhaseOverride,
+  setLunarPhaseOverride,
+} from '../render/day_night_clock';
+import { phaseToCycleMs } from '../sim/day_night';
+import { parseServerTimeCommand } from '../sim/dev/day_night_override';
+
+/**
+ * The UTC-anchored millisecond clock the OFFLINE sim's day/night cycle reads, honoring
+ * the dev override: with no override it is the same Date.now the renderer's sky uses,
+ * and under `/daynight <phase>` it is a synthesized instant inside the first cycle with
+ * exactly that phase, so the sim's night is the sky's night either way. It lives beside
+ * the override it reads, which is what keeps the scrub honest: scrubbing to night puts
+ * the world boss to bed on screen rather than only repainting the sky above him.
+ */
+export function offlineDayNightNowMs(): number {
+  const override = dayNightPhaseOverride();
+  return override === null ? Date.now() : phaseToCycleMs(override);
+}
 
 export interface DayNightDevHud {
   log(text: string, color?: string): void;
@@ -14,7 +33,7 @@ export interface DayNightDevHud {
 // Render-only: it just overrides the shared clock phase (day_night_clock), so
 // the sky lighting and the minimap dial both jump to the chosen time of day.
 // Returns true when it handled the input (so it is not also sent to chat).
-const MOON_PRESETS: Record<string, number> = {
+export const MOON_PRESETS: Readonly<Record<string, number>> = {
   new: 0,
   crescent: 0.125,
   half: 0.25,
@@ -22,7 +41,7 @@ const MOON_PRESETS: Record<string, number> = {
   gibbous: 0.375,
   full: 0.5,
 };
-const DAY_NIGHT_PRESETS: Record<string, number> = {
+export const DAY_NIGHT_PRESETS: Readonly<Record<string, number>> = {
   midnight: 0,
   night: 0,
   dawn: 0.25,
@@ -36,13 +55,59 @@ const DAY_NIGHT_PRESETS: Record<string, number> = {
   sunset: 0.75,
   evening: 0.8,
 };
-export function tryDayNightDevCommand(raw: string, hud: DayNightDevHud): boolean {
+/** A preset name or a number in [0,1), wrapped; null when neither. */
+export function parsePhaseArg(
+  word: string,
+  presets: Readonly<Record<string, number>>,
+): number | null {
+  if (word in presets) return presets[word];
+  const n = Number.parseFloat(word);
+  return Number.isFinite(n) ? ((n % 1) + 1) % 1 : null;
+}
+
+/**
+ * OFFLINE `/dev servertime <arg>`: the offline sim's clock IS the sky's override
+ * (offlineDayNightNowMs above), so there is one clock and this sets it, exactly as
+ * /daynight does. Left to the sim, the command would wrap the offline clock in a fixed
+ * offset that any later /daynight then shifted (the offset was anchored to the old
+ * reading), landing a /daynight night on DAY and leaving Old Thatchgrin on his pole under
+ * a midnight sky. Online the line is not touched here: it goes to the server, whose clock
+ * the sky does not share. Returns true when it consumed the line.
+ */
+function tryOfflineServerTime(raw: string, hud: DayNightDevHud): boolean {
+  const cmd = parseServerTimeCommand(raw.trim());
+  if (cmd === null) return false;
+  if (cmd === 'usage') {
+    hud.log('[dev] usage: /dev servertime day|night|dawn|dusk|<0..1>|auto', '#ffcf6a');
+    return true;
+  }
+  if (cmd.kind === 'auto') {
+    setDayNightPhaseOverride(null);
+    hud.log('[dev] offline world clock and sky back on real time', '#8fd0ff');
+  } else {
+    setDayNightPhaseOverride(cmd.phase);
+    hud.log(
+      `[dev] offline world clock and sky set to ${cmd.label} (phase ${cmd.phase.toFixed(2)}); /daynight moves the same clock`,
+      '#8fd0ff',
+    );
+  }
+  hud.refreshDayNightDial();
+  return true;
+}
+
+export function tryDayNightDevCommand(
+  raw: string,
+  hud: DayNightDevHud,
+  devCommandsAvailable = import.meta.env.DEV,
+  offline = false,
+): boolean {
+  // Dev builds or realms advertising ALLOW_DEV_COMMANDS=1 (dev/PBE) only: a
+  // per-client phase override is brighter-night-for-me, which is banned on
+  // production realms where devCommandsAvailable is false.
+  if (!import.meta.env.DEV && !devCommandsAvailable) return false;
+  if (offline && tryOfflineServerTime(raw, hud)) return true;
   const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
   if (!m) return false;
-  // Dev builds only: a per-client phase override is brighter-night-for-me,
-  // exactly the actionable-visibility class the graphics-fairness rule bans.
-  // Harmless while DAY_ONLY pins day, but gate it before that ever flips.
-  if (!import.meta.env.DEV) return false;
   const arg = m[1].trim().toLowerCase();
   if (!arg) {
     hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
@@ -57,11 +122,7 @@ export function tryDayNightDevCommand(raw: string, hud: DayNightDevHud): boolean
       hud.log('[dev] moon resumed (real lunar clock)', '#8fd0ff');
       return true;
     }
-    let moonPhase: number | null = moonWord in MOON_PRESETS ? MOON_PRESETS[moonWord] : null;
-    if (moonPhase === null) {
-      const n = Number.parseFloat(moonWord);
-      if (Number.isFinite(n)) moonPhase = ((n % 1) + 1) % 1;
-    }
+    const moonPhase = parsePhaseArg(moonWord, MOON_PRESETS);
     if (moonPhase === null) {
       hud.log(
         `[dev] unknown moon "${moonWord}" - try new|crescent|half|full|<0..1>|auto`,
@@ -79,11 +140,7 @@ export function tryDayNightDevCommand(raw: string, hud: DayNightDevHud): boolean
     hud.refreshDayNightDial();
     return true;
   }
-  let phase: number | null = arg in DAY_NIGHT_PRESETS ? DAY_NIGHT_PRESETS[arg] : null;
-  if (phase === null) {
-    const n = Number.parseFloat(arg);
-    if (Number.isFinite(n)) phase = ((n % 1) + 1) % 1;
-  }
+  const phase = parsePhaseArg(arg, DAY_NIGHT_PRESETS);
   if (phase === null) {
     hud.log(`[dev] unknown time "${arg}" - try night|dawn|day|dusk|<0..1>|auto`, '#ffcf6a');
     return true;

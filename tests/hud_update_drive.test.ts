@@ -298,6 +298,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the minimap raid-lockout badge class, value-diffed',
   },
   {
+    call: 'this.updateInstanceDifficultyBadge',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the minimap instance difficulty badge and tooltip, value-diffed',
+  },
+  {
     call: 'this.dailyRewardsLauncher.refresh',
     band: 'slow',
     gate: '',
@@ -317,6 +324,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'write-elided paladin Devotion/Ascension resource widget driven by the paladinDevotionView core',
+  },
+  {
+    call: 'this.doomMeter.paintShadow',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'write-elided Shadow Gloomtithe and Tithe Bomb meters read replicated aura banks',
   },
   {
     call: 'this.syncActiveHotbarForm',
@@ -527,6 +541,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the SELF debuff row: never tier-gated (your own debuffs are the ACTIONABLE read, docs/design/graphics-settings-fairness.md), so it paints every frame on every graphics preset, same as the target debuffs strip',
   },
   {
+    call: 'this.dungeonPrompts.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the dungeon encounter prompts (the Iron Cage escape, Gaoler Ossick chain alert, the Wildheart Basin and Gravewyrm Sanctum alerts): ungated per frame because the escape press feedback, the chain reach and the hazard readouts are what the player reacts to; each painter hides itself when its view is not visible and every value rides the elided writers, so an idle frame writes nothing',
+  },
+  {
     call: 'this.targetDotsPainter.update',
     band: 'frame',
     gate: '',
@@ -546,6 +567,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "target && target.kind !== 'object' && target.id !== this.lastAnnouncedTargetId",
     surface: 'chrome',
     why: 'marks the target-name announcement so a same-named re-target still re-reads; its result is written straight to the target live region, deliberately NOT through the elided writer, and the id gate makes that an event write rather than a per-frame one',
+  },
+  {
+    call: 'fillTargetHealthText',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))",
+    surface: 'none',
+    why: 'fills the target descriptor health text under the Health Text option (dead or playing dead reads Dead); a pure descriptor write the painter call below paints, no DOM touch of its own',
   },
   {
     call: 'this.targetFramePainter.paint',
@@ -737,6 +765,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the pet bar; rebuilds its buttons behind a signature latch',
   },
   {
+    call: 'this.shardpikeBar.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: "the world-boss trial's whole input surface: the three pike verbs, the balance beam, and the loud centre-screen instruction. Ungated and per-frame on purpose, because the beam moves every sim tick and the thrust window drains in real time; BOTH halves build once on the first visible paint and then only re-state, and the prompt additionally holds a signature latch so its text and classes are written only when the line actually changes rather than sixty times a second for a once-a-second countdown'",
+  },
+  {
     call: 'this.renderStanceBar',
     band: 'frame',
     gate: '',
@@ -844,26 +879,26 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the spirit-mode body class that drains the world to greyscale',
   },
   {
+    call: 'noteReleaseOverlayShown',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'records the Release overlay opening so its button ignores presses for a short hold; state only, no DOM write',
+  },
+  {
     call: 'this.setDisplay',
     band: 'frame',
     gate: '',
-    sites: 2,
+    sites: 3,
     surface: 'chrome',
-    why: 'the full-screen death overlay and the standing ghost hint line, through the elided writer',
+    why: 'the death screens through the elided writer: the full-screen death overlay, the standing ghost hint line and the ghost prompt (its one corpse button), each shown or hidden by the pure death view core (src/ui/hud/death; a battleground spirit gets neither ghost surface because the respawn wave is its only way back)',
   },
   {
-    call: 'this.setDisplay',
+    call: 'this.pvpRez.paint',
     band: 'frame',
-    gate: 'ghost && !ghostInBgMatch',
+    gate: '',
     surface: 'chrome',
-    why: 'the ghost prompt (its one corpse button) while the spirit is in reach of its body; a battleground spirit is exempt because the respawn wave is its only way back',
-  },
-  {
-    call: 'this.setDisplay',
-    band: 'frame',
-    gate: '!(ghost && !ghostInBgMatch)',
-    surface: 'chrome',
-    why: 'hides the ghost prompt while not a corpse-running ghost',
+    why: 'the PvP Resurrect button and its note line (src/ui/hud/death/pvp_resurrect_painter.ts): shown with the offer, disabled and counting down while the PVP_RESURRECT_WAIT_SECONDS wait runs, all through the elided writers',
   },
   {
     call: 'syncDeathControllerHints',
@@ -875,28 +910,28 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.showBanner',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone banner on a real zone crossing, committed the moment zoneAt flips (the old z-only dead band never fired on an east-west realm crossing)',
   },
   {
     call: 'this.log',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone-entry chat line',
   },
   {
     call: 'this.logZoneWelcome',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone welcome blurb in chat',
   },
   {
     call: 'this.renderer.vistaPan',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== '' && !p.dead && !p.inCombat && !recentlyInCombat",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p) && !p.dead && !p.inCombat && !recentlyInCombat',
     surface: 'none',
     why: 'the zone-entry camera sweep; a renderer call, not a HUD write',
   },
@@ -940,11 +975,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'vehicle integrity, aiming and cooldowns use the shared eliding writer facet',
   },
   {
+    call: 'this.zoneAnnouncements.subzoneHit',
+    band: 'medium',
+    gate: '',
+    surface: 'none',
+    why: 'resolves landmark announcements with ferry and dungeon suppression',
+  },
+  {
     call: 'this.showSubzone',
     band: 'medium',
-    gate: 'subzone !== this.lastSubzone && subzone',
+    gate: 'subzone !== this.lastSubzone && hit',
     surface: 'chrome',
-    why: 'the subzone banner on a landmark crossing',
+    why: 'the subzone banner on a landmark crossing (a zone POI point or an authored `locations` rect)',
   },
   {
     call: 'syncMinigameMusic',
@@ -970,9 +1012,16 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'paintRestIndicator',
     band: 'medium',
-    gate: 'rest.resting !== this.lastResting',
+    gate: 'rest.labelKey !== this.lastResting',
     surface: 'chrome',
     why: 'the resting zZz on the player portrait, behind an edge latch. Was an inline restEl.classList.toggle until masterwrought D129s review round moved the badges whole DOM half (the on/off class plus BOTH text sinks) into rest_indicator_painter.ts: the title was being corrected on a locale switch while the aria-label was left saying Resting through a whole meal, and one function writing both from one resolved string is what stops them drifting again',
+  },
+  {
+    call: 'this.dungeonTracker.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the dungeon objectives tracker (the plate and boss rows at the top of the right stack). A facet-routed painter over a skeleton built once: every write is elided, so an unchanged run, or no run at all, costs a model rebuild in place and zero DOM writes (tests/dungeon_tracker_painter.test.ts drives the identical-frame loop)',
   },
   {
     call: 'this.updateQuestTracker',
@@ -1094,6 +1143,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       proof: 'if (sig === this.lastSig) {',
     },
     why: 'the dungeon finder window; an unchanged sig still ticks its 1 Hz clock text',
+  },
+  {
+    call: 'this.finderSurfaces.expeditions.render',
+    band: 'medium',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/expeditions/expedition_controller.ts',
+      proof: 'if (sig === this.lastSig) {',
+    },
+    why: 'signature-gated bell, entry choice and open expedition cards; no work on identical polls',
   },
   {
     call: 'this.dungeonFinderProposalPopup.render',
@@ -1287,6 +1348,21 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the social window; a struct change rebuilds, a content change refreshes the list only',
   },
   {
+    call: 'this.referralCards.update',
+    band: 'slow',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/referral_cards/referral_cards_controller.ts',
+      proof:
+        'if (this.lastRevision === revision && this.lastFriendshipInviter === inviter) return;',
+    },
+    // The friendship armour claim (0c118462629) widened the guard to the
+    // inviter name as well; the early return still skips identical passes.
+    why: 'launcher and open card rebuild only after the authoritative revision or the friendship inviter changes',
+  },
+  {
     call: 'this.updateGuildBillboardEcho',
     band: 'slow',
     gate: '',
@@ -1326,6 +1402,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the weekly emissary window (charge progress and the reset clock, minute-granular)',
   },
   {
+    call: 'this.guildHallWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.guildHallWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'hud/guild_hall/guild_hall_window.ts', proof: SIG_RETURN },
+    why: "Lantern Hall's guild window (the week's contracts, the seals, the titles owned and the reset clock, minute-granular)",
+  },
+  {
     call: 'this.wocMarketWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.wocMarketWindow.isOpen',
@@ -1352,6 +1436,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: { kind: 'module', module: 'bank_window.ts', proof: SIG_RETURN },
     why: 'the bank window; it also closes itself when the bank mirror goes null',
+  },
+  {
+    call: 'this.courierWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.courierWindow.isOpen()',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/courier/courier_window.ts',
+      proof: 'if (!force && signature === this.lastSignature) return;',
+    },
+    why: 'the owner courier window; custody, phase, membership and draft changes rebuild it, while pose-only movement never does',
   },
   {
     call: 'this.dailyRewardsWindow.refreshIfChanged',
@@ -1470,9 +1566,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       kind: 'module',
       module: 'hud/quest/quest_dialog_controller.ts',
       proof:
-        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig) { this.refresh(); }',
+        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || seasonalTownsfolkRowsSig(this.seasonalRows(npc)) !== this.lastTrickOrTreatSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
     },
-    why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order) plus the Clue Scroll step row (world quests round 2: the hunt step advances on a sim log line), three edges no quest event fires for",
+    why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order) plus the Clue Scroll step row (world quests round 2: the hunt step advances on a sim log line) plus a dungeon guide's offer state (another member's answer flips it while the dialog is open), and the Allied Hearthstone attune row, five edges no quest event fires for",
   },
   {
     call: 'this.updateDeedTracker',
@@ -1872,7 +1968,13 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // surface (51 / 96 measured on the merged tree). The release's Eastbrook
       // ferry countdown panel (hud ferryHud) is one more chrome surface at the
       // fourth release/v0.44.0 base merge (97 measured on the merged tree).
-    ).toEqual({ window: 51, chrome: 97, none: 18 });
+      // The courier window adds one slow-band, open-only window surface.
+      // The Mirefen world-boss branch's Shardpike bar paint: chrome 98.
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 52, 99.
+      // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
+      // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
+      // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
+    ).toEqual({ window: 55, chrome: 101, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1895,7 +1997,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // loot window's corpse arm moved OUT of the `none` bucket below into
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
-      module: 28,
+      // The courier window owns both revision and content signature guards.
+      // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
+      module: 32,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1939,6 +2043,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     ).toEqual(
       [
         'arena_window.ts: if (ravenriftSig === this.lastSig) return;',
+        'hud/referral_cards/referral_cards_controller.ts: if (this.lastRevision === revision && this.lastFriendshipInviter === inviter) return;',
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',
@@ -1949,6 +2054,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
         'hud/battleground/battleground_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'hud/cosmetics/cosmetics_window.ts: const sig = cosmeticsSig(this.snapshot()); if (sig === this.lastSig) return;',
+        'hud/courier/courier_window.ts: if (!force && signature === this.lastSignature) return;',
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
@@ -1958,12 +2064,13 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud/woc_trade/woc_trade_controller.ts: if (sig === this.lastTradeSig) return;',
         'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
+        'hud/expeditions/expedition_controller.ts: if (sig === this.lastSig) {',
         // The corpse popup's own latch. `force` is the relocalize arm, which
         // rebuilds through the same guard past a signature a locale switch
         // cannot move, so the flag is part of the line the pin looks for.
         'hud/loot/loot_window_controller.ts: const unchanged = sig === this.corpseSig && harvestSig === this.harvestStatusSig; if (!force && unchanged) return availability;',
         'hud/professions/farming_plant_sheet_window.ts: if (view.status !== this.paintedStatus) this.paint();',
-        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig) { this.refresh(); }',
+        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || seasonalTownsfolkRowsSig(this.seasonalRows(npc)) !== this.lastTrickOrTreatSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
         'mailbox_window.ts: if (sig === this.lastSig) return;',
         'market_window.ts: if (sig === this.lastSig) return;',
         'meters.ts: if (!this.isOpen || now - this.lastRender < 250) return;',
@@ -1981,6 +2088,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
         'weekly_quests_window.ts: if (sig === this.lastSig) return;',
+        'hud/guild_hall/guild_hall_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),
     );

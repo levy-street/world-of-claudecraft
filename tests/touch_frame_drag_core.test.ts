@@ -1,6 +1,6 @@
 // The touch-layout drag of the class engine indicators, pure half
 // (src/ui/touch_frame_drag_core.ts): the frames table resolves exactly the
-// three engine indicators against the unlock registry under the pre-registry
+// class engine indicators against the unlock registry under the persisted
 // storage keys, the viewport-fraction clamp keeps a frame's VISUAL body inside
 // every side of the safe area (each inset exercised on its own), the storage
 // round-trip survives malformed input, the drag arithmetic keeps the grab
@@ -24,11 +24,12 @@ import {
 } from '../src/ui/touch_frame_drag_core';
 
 describe('TOUCH_DRAG_FRAMES', () => {
-  it('names exactly the three class engine indicators, resolved against the unlock registry', () => {
+  it('names each class engine indicator, resolved against the unlock registry', () => {
     expect(TOUCH_DRAG_FRAMES.map((row) => row.frameId)).toEqual([
       'procOverlay',
       'paladinDevotion',
       'doomMeter',
+      'priestCharge',
     ]);
     for (const row of TOUCH_DRAG_FRAMES) {
       const spec = HUD_FRAME_SPECS.find((s) => s.id === row.frameId);
@@ -40,6 +41,7 @@ describe('TOUCH_DRAG_FRAMES', () => {
       'proc-overlay',
       'paladin-devotion-frame',
       'warlock-doom-frame',
+      'priest-charge-frame',
     ]);
   });
 
@@ -49,6 +51,7 @@ describe('TOUCH_DRAG_FRAMES', () => {
       procOverlay: 'procOverlayAnchor',
       paladinDevotion: 'paladinDevotionAnchor',
       doomMeter: 'warlockDoomAnchor',
+      priestCharge: 'priestChargeAnchor',
     });
     expect(new Set(TOUCH_DRAG_FRAMES.map((row) => row.storageKey)).size).toBe(
       TOUCH_DRAG_FRAMES.length,

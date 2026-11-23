@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, expect, it, vi } from 'vitest';
+import { WEEKLY_BOSS_TABLES } from '../src/sim/weekly_reward_tables';
 import { emptyWeeklyRewards, weeklyLootPool } from '../src/sim/weekly_rewards';
 import type { PainterHostPresentation } from '../src/ui/painter_host';
 import { WeeklyRewardsTab } from '../src/ui/weekly_rewards_window';
@@ -155,6 +156,7 @@ describe('weekly reward pane', () => {
     state.pvp = 10;
     state.world = 100;
     state.raids = [2, 1, 2];
+    state.raidClears = [2, 2, 1];
     const root = document.createElement('div');
     const pane = new WeeklyRewardsTab({
       world: () =>
@@ -177,11 +179,15 @@ describe('weekly reward pane', () => {
     });
     pane.renderInto(root);
     expect(root.querySelectorAll('.weekly-track-pvp .weekly-earned').length).toBeGreaterThan(0);
+    const pvpLabels = [...root.querySelectorAll('.weekly-track-pvp .weekly-milestone-label')].map(
+      (label) => label.textContent,
+    );
+    expect(pvpLabels).toEqual(['1 PvP Win', '3 PvP Wins', '5 PvP Wins']);
     expect(root.querySelectorAll('.weekly-track-world .weekly-earned')).toHaveLength(0);
     expect(root.querySelector('.weekly-confirm')).toBeNull();
     expect(root.querySelector('.weekly-choice')).toBeNull();
     const raidSlots = root.querySelectorAll('.weekly-track-raid .weekly-milestone');
-    expect(raidSlots[0]?.textContent).toContain('1 Raid Encounter Cleared');
+    expect(raidSlots[0]?.textContent).toContain('1 Raid Clear');
     expect(raidSlots[0]?.querySelector('img')?.getAttribute('src')).toBe(
       '/ui/weekly-vault/heroic.webp',
     );
@@ -225,5 +231,88 @@ describe('weekly reward pane', () => {
     root.replaceChildren();
     pane.renderInto(root);
     expect(root.querySelector('.weekly-heroic-upgrade')).toBeNull();
+  });
+  // The Dungeon Finder's preview is where players plan runs, so its possible-loot
+  // catalog lists every table before any boss dies; the keeper keeps cleared-only.
+  const noKillsPane = (readOnly: boolean, playerLevel = 60) => {
+    const state = emptyWeeklyRewards(604800000);
+    state.bossUnlocks = {};
+    const root = document.createElement('div');
+    const pane = new WeeklyRewardsTab(
+      {
+        world: () =>
+          ({
+            cfg: { playerClass: 'warrior' },
+            weeklyRewardInfo: {
+              state,
+              nowMs: 1000,
+              playerLevel,
+              canClaim: !readOnly,
+              worldQuestsAvailable: true,
+              readyWeeks: 0,
+            },
+          }) as IWorld,
+        presentation: {
+          itemIcon: () => '',
+          attachTooltip: vi.fn(),
+        } as unknown as PainterHostPresentation,
+        onInventoryChanged: vi.fn(),
+      },
+      { readOnly },
+    );
+    pane.renderInto(root);
+    pane.close();
+    return root;
+  };
+  const tableNames = (root: Element, pool: string) =>
+    [...root.querySelectorAll(`#weekly-pool-${pool} summary > span:first-of-type`)].map(
+      (el) => el.textContent,
+    );
+
+  it('previews every raid and dungeon table in read-only mode before any boss kill', () => {
+    const root = noKillsPane(true);
+    for (const pool of ['dungeon', 'dungeon_heroic'])
+      expect(tableNames(root, pool)).toEqual(
+        expect.arrayContaining([
+          'The Hollow Crypt',
+          'The Sunken Bastion',
+          'The Drowned Temple',
+          'Gravewyrm Sanctum',
+          'The Wildheart Basin',
+        ]),
+      );
+    for (const pool of ['raid', 'raid_heroic'])
+      expect(tableNames(root, pool)).toHaveLength(
+        WEEKLY_BOSS_TABLES.filter((table) => table.category === 'raid').length,
+      );
+    const dungeon = root.querySelector('#weekly-pool-dungeon')!;
+    expect(dungeon.textContent).toContain('All tables these vaults can roll from.');
+    expect(dungeon.textContent).not.toContain('No eligible');
+    expect(dungeon.querySelectorAll('.weekly-loot').length).toBeGreaterThan(0);
+    // PvP has no boss tables, so it keeps its own rule.
+    const pvp = root.querySelector('#weekly-pool-pvp')!;
+    expect(pvp.textContent).not.toContain('All tables these vaults can roll from.');
+    expect(pvp.textContent).toContain('For raids and dungeons, select one or more tables');
+  });
+
+  it('keeps the level filter in the read-only preview', () => {
+    const root = noKillsPane(true, 1);
+    expect(tableNames(root, 'raid_heroic')).toEqual([]);
+    expect(root.querySelector('#weekly-pool-raid_heroic')!.textContent).toContain(
+      'No eligible loot at your current level.',
+    );
+  });
+
+  it('explains an empty keeper catalog by missing boss clears, not by level', () => {
+    const root = noKillsPane(false);
+    for (const pool of ['raid', 'raid_heroic', 'dungeon', 'dungeon_heroic']) {
+      const group = root.querySelector(`#weekly-pool-${pool}`)!;
+      expect(group.querySelectorAll('details')).toHaveLength(0);
+      expect(group.textContent).toContain(
+        'No eligible equipment from your recorded boss clears at this difficulty.',
+      );
+      expect(group.textContent).not.toContain('No eligible loot at your current level.');
+      expect(group.textContent).not.toContain('All tables these vaults can roll from.');
+    }
   });
 });

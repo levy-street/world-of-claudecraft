@@ -300,10 +300,11 @@ function screenshotSparseBlocks(source: string): string[] {
 }
 
 describe('CI workflow parity', () => {
+  // Reads the whole tracked text corpus; disk contention is not a CI policy failure.
   it('sparse-checkout on the test jobs covers every referenced screenshot subtree', () => {
-    // The five sparse test-job checkouts (pr-gate, both long-sims lanes,
-    // release-gate, release-i18n) exclude docs/screenshots DIRECTORIES
-    // (794 MB of committed PR evidence; the measured 11m21s checkout
+    // The seven sparse test-job checkouts (lint, browser-gate, pr-gate, both
+    // long-sims lanes, release-gate, release-i18n) exclude docs/screenshots
+    // DIRECTORIES (794 MB of committed PR evidence; the measured 11m21s checkout
     // pathology scales with the blob payload) except every subtree the repo
     // actually references. The coupling corpus is EVERY tracked
     // reference-carrying file outside docs/screenshots, enumerated from the
@@ -311,7 +312,8 @@ describe('CI workflow parity', () => {
     // coupling shipped and missed two acceptance manifests on its first CI
     // run, and a curated four-root walk is the same failure shape one level
     // up (a reference from a root nobody curated in stays invisible).
-    // Existence comes from the GIT INDEX, not the working tree: under the
+    // Include non-ignored new task files locally; tracked existence still comes
+    // from Git, so sparse checkouts do not silently drop evidence. Under the
     // very cone this verifies, an excluded directory does not exist on disk.
     const SPARSE_CONE = [
       '          sparse-checkout: |',
@@ -320,28 +322,67 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/admin-cheater-mark/',
       '            /docs/screenshots/admin-guild-bank-panel/',
       '            /docs/screenshots/aura-tracks/',
+      '            /docs/screenshots/balgath-shardpike/',
       '            /docs/screenshots/bank-storage-charters/',
       '            /docs/screenshots/bank-vault-tab/',
+      '            /docs/screenshots/bastion-ghost-crew/',
       '            /docs/screenshots/buried-hoard-entrance/',
       '            /docs/screenshots/buried-hoard-valley/',
       '            /docs/screenshots/clue-character-panel/',
-      '            /docs/screenshots/cosmetics-window/',
+      '            /docs/screenshots/clue-icons-v045/',
       '            /docs/screenshots/confection-cascade/',
       '            /docs/screenshots/confection-cascade-v3/',
       '            /docs/screenshots/confection-cascade-v4/',
       '            /docs/screenshots/confection-cascade-v5/',
       '            /docs/screenshots/confection-cascade-v6/',
       '            /docs/screenshots/confection-cascade-v7/',
+      '            /docs/screenshots/cosmetics-window/',
+      '            /docs/screenshots/deed-adventures-icons-v045/',
+      '            /docs/screenshots/deed-bastion-icons-v045/',
       '            /docs/screenshots/deed-border-cartouche/',
+      '            /docs/screenshots/deed-crucible-icons-v045/',
+      '            /docs/screenshots/deed-crypt-icons-v045/',
+      '            /docs/screenshots/deed-factions-icons-v045/',
+      '            /docs/screenshots/deed-foundations-icons-v045/',
+      '            /docs/screenshots/deed-gravewyrm-icons-v045/',
+      '            /docs/screenshots/deed-temple-icons-v045/',
+      '            /docs/screenshots/deed-wildheart-icons-v045/',
+      '            /docs/screenshots/deed-worldquests-icons-v045/',
+      '            /docs/screenshots/dungeon-bastion-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-bastion-icons-v045/',
+      '            /docs/screenshots/dungeon-crypt-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-crypt-icons-v045/',
+      '            /docs/screenshots/dungeon-gravewyrm-icons-v045/',
+      '            /docs/screenshots/dungeon-temple-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-temple-icons-v045/',
+      '            /docs/screenshots/dungeon-wildheart-icons-v045/',
+      '            /docs/screenshots/eastbrook-ferry/',
+      '            /docs/screenshots/dungeon-groups/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
+      '            /docs/screenshots/faction-automaton-icons-v045/',
+      '            /docs/screenshots/faction-church-icons-v045/',
+      '            /docs/screenshots/faction-rift-icons-v045/',
       '            /docs/screenshots/far-foliage-impostors/',
       '            /docs/screenshots/fenbridge-rebuild/',
+      '            /docs/screenshots/first-person-view/',
       '            /docs/screenshots/guild-bank-history/',
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-pledge-board/',
       '            /docs/screenshots/guild-social-v1/',
+      '            /docs/screenshots/highwatch-guild/',
       '            /docs/screenshots/harvest-button-refresh/',
+      '            /docs/screenshots/haunted-pumpkins/',
+      '            /docs/screenshots/hoard-arcane-icons-v045/',
+      '            /docs/screenshots/hoard-brute-icons-v045/',
+      '            /docs/screenshots/hoard-ember-icons-v045/',
+      '            /docs/screenshots/hoard-frost-icons-v045/',
+      '            /docs/screenshots/hoard-necro-icons-v045/',
+      '            /docs/screenshots/hoard-storm-icons-v045/',
+      '            /docs/screenshots/hoard-tide-icons-v045/',
+      '            /docs/screenshots/hoard-venom-icons-v045/',
+      '            /docs/screenshots/horse-whistle-v045/',
+      '            /docs/screenshots/icon-backlog-v045-surfaces/',
       '            /docs/screenshots/ignivar-raid/',
       '            /docs/screenshots/ignivar-raid-expansion/',
       '            /docs/screenshots/intentional-gathering-pr1/',
@@ -351,13 +392,32 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/ley-beam-v1/',
       '            /docs/screenshots/market-house-redesign/',
       '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',
+      '            /docs/screenshots/membership/',
+      '            /docs/screenshots/membership-courier/',
+      '            /docs/screenshots/missing-skills-v045/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
+      '            /docs/screenshots/ravenrift-battleground/',
+      '            /docs/screenshots/referral-armour/',
+      '            /docs/screenshots/referral-cards/',
+      '            /docs/screenshots/referral-portrait-render-2026-10-09/',
+      '            /docs/screenshots/referral-rewards-v045/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
+      '            /docs/screenshots/rewards-icons-v045/',
+      '            /docs/screenshots/scenery-windows-4070-2026-10-15/',
       '            /docs/screenshots/target-dots/',
       '            /docs/screenshots/touch-ui-rework/',
       '            /docs/screenshots/vault-fine-mark/',
+      '            /docs/screenshots/warfare-season2-druid-icons/',
+      '            /docs/screenshots/warfare-season2-hunter-icons/',
+      '            /docs/screenshots/warfare-season2-mage-icons/',
+      '            /docs/screenshots/warfare-season2-paladin-icons/',
+      '            /docs/screenshots/warfare-season2-priest-icons/',
+      '            /docs/screenshots/warfare-season2-rogue-icons/',
+      '            /docs/screenshots/warfare-season2-shaman-icons/',
+      '            /docs/screenshots/warfare-season2-warlock-icons/',
+      '            /docs/screenshots/warfare-season2-warrior-icons/',
       '            /docs/screenshots/wildheart/',
       '            /docs/screenshots/woc-market/',
       '            /docs/screenshots/world-quest-cannon/',
@@ -368,9 +428,11 @@ describe('CI workflow parity', () => {
     ].join('\n');
     // Job-anchored, not a bare workflow-wide count: each sparse job carries
     // the block exactly once, the full-tree jobs carry it never (their
-    // freshness diffs, builds, and the browser suite read wider), and the
-    // workflow-wide total closes the no-sixth-copy direction.
+    // freshness diffs and builds read wider), and the workflow-wide total
+    // closes the no-eighth-copy direction.
     for (const job of [
+      'lint',
+      'browser-gate',
       'pr-gate',
       'pr-long-sims-a',
       'pr-long-sims-b',
@@ -379,28 +441,28 @@ describe('CI workflow parity', () => {
     ]) {
       expect(jobSource(job).split(SPARSE_CONE), job).toHaveLength(2);
     }
-    for (const job of ['pr-checks', 'browser-gate', 'release-checks', 'release-version-gate']) {
+    for (const job of ['pr-checks', 'release-checks', 'release-version-gate']) {
       expect(jobSource(job).includes(SPARSE_CONE), job).toBe(false);
     }
-    expect(workflow.split(SPARSE_CONE)).toHaveLength(6);
+    expect(workflow.split(SPARSE_CONE)).toHaveLength(8);
     // The counts above are both blind in one direction: they say how many
-    // copies of THIS literal exist, and nothing at all about a sixth block that
+    // copies of THIS literal exist, and nothing at all about an extra block that
     // was copy-pasted and then edited, which reads as zero copies of the
     // literal in a job the first loop does not name. So extract every
     // screenshot-excluding sparse block the workflow actually contains, whole,
     // and require each to BE the literal. That subsumes both counts against a
     // divergent copy: a drifted block is still extracted here and still fails.
     const blocks = screenshotSparseBlocks(workflow);
-    expect(blocks, 'every sparse-checkout block carrying the screenshot exclusion').toHaveLength(5);
+    expect(blocks, 'every sparse-checkout block carrying the screenshot exclusion').toHaveLength(7);
     for (const [i, block] of blocks.entries()) {
       expect(block, `sparse-checkout block ${i + 1} diverged from the one cone`).toBe(SPARSE_CONE);
     }
     // The extractor's own control, and it proves the thing that actually
-    // matters: SIXTH-BLOCK DISCOVERY. Append a synthetic sixth job whose cone
-    // diverged (one subtree dropped) and the extractor must find SIX blocks
+    // matters: EXTRA-BLOCK DISCOVERY. Append a synthetic extra job whose cone
+    // diverged (one subtree dropped) and the extractor must find EIGHT blocks
     // with exactly one of them unequal, which is precisely the state a
     // copy-pasted-then-edited block would leave the workflow in. Mutating one
-    // of the existing five would only prove the extractor reads them.
+    // of the existing seven would only prove the extractor reads them.
     //
     // The dropped subtree is DERIVED from the parsed cone, never a hard-coded
     // path: a hard-coded one silently stops mutating anything the day that
@@ -416,25 +478,25 @@ describe('CI workflow parity', () => {
     expect(divergentCone).not.toBe(SPARSE_CONE);
     const withSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${divergentCone}\n`;
     const sixBlocks = screenshotSparseBlocks(withSixth);
-    expect(sixBlocks, 'a sixth block must be DISCOVERED, not silently skipped').toHaveLength(6);
+    expect(sixBlocks, 'an extra block must be DISCOVERED, not silently skipped').toHaveLength(8);
     expect(sixBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
 
-    // ...and the same sixth block hiding behind a different block-scalar style
+    // ...and the same extra block hiding behind a different block-scalar style
     // is still discovered, which is what SPARSE_HEADER_RE buys.
     for (const style of ['|-', '|+', '>', '>-']) {
       const restyled = divergentCone.replace(/^(\s*sparse-checkout:\s*)\|$/m, `$1${style}`);
       expect(restyled, `the ${style} rewrite really changed the header`).not.toBe(divergentCone);
       const styled = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${restyled}\n`;
-      expect(screenshotSparseBlocks(styled), `a ${style} block must be found`).toHaveLength(6);
+      expect(screenshotSparseBlocks(styled), `a ${style} block must be found`).toHaveLength(8);
     }
 
-    // ...and the same sixth block split by an INTERNAL BLANK LINE above its
+    // ...and the same extra block split by an INTERNAL BLANK LINE above its
     // exclusion line is still discovered whole. Blank lines are legal inside
     // a YAML block scalar, and the pre-fix extractor broke its body walk at
     // the first one: this block's truncated fragment lacked the exclusion, so
-    // the divergent sixth cone left discovery entirely and the five-block
+    // the divergent extra cone left discovery entirely and the seven-block
     // count above stayed green over it. The control reds on that extractor
-    // (five blocks found) and holds the fixed walk to the honest direction:
+    // (seven blocks found) and holds the fixed walk to the honest direction:
     // a formatting trick may only ever surface as MORE blocks discovered
     // (then unequal to the one cone), never fewer.
     const splitLines = divergentCone.split('\n');
@@ -444,13 +506,13 @@ describe('CI workflow parity', () => {
     const blankSplitCone = splitLines.join('\n');
     const withBlankSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${blankSplitCone}\n`;
     const blankBlocks = screenshotSparseBlocks(withBlankSixth);
-    expect(blankBlocks, 'a blank-line-split sixth block must be DISCOVERED whole').toHaveLength(6);
+    expect(blankBlocks, 'a blank-line-split extra block must be DISCOVERED whole').toHaveLength(8);
     expect(blankBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
     // The closer half of the same immunity (the Phase 18 fresh-read control):
     // a blank line parked between the last subtree row and the cone-mode
-    // closer must not drop the closer from the extracted block. The sixth
+    // closer must not drop the closer from the extracted block. The extra
     // copy here is the UNMODIFIED cone with that one blank inserted, so the
-    // post-fix extractor reads it EQUAL to SPARSE_CONE (six equal blocks);
+    // post-fix extractor reads it EQUAL to SPARSE_CONE (eight equal blocks);
     // the pre-fix lines[end + 1] lookup lost the closer and read it unequal.
     // The divergent cone cannot carry this control (it is unequal either
     // way), which is why the body-split control above cannot see the closer.
@@ -463,7 +525,7 @@ describe('CI workflow parity', () => {
     const blankBeforeCloser = coneLines.join('\n');
     const withBlankCloserSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${blankBeforeCloser}\n`;
     const closerBlocks = screenshotSparseBlocks(withBlankCloserSixth);
-    expect(closerBlocks, 'a blank before the closer must not lose the block').toHaveLength(6);
+    expect(closerBlocks, 'a blank before the closer must not lose the block').toHaveLength(8);
     expect(
       closerBlocks.filter((block) => block !== SPARSE_CONE),
       'a blank before the closer must not drop the closer from the block',
@@ -474,10 +536,14 @@ describe('CI workflow parity', () => {
     const repoRootUrl = new URL('..', import.meta.url);
     const indexDirs = new Set<string>();
     {
-      const ls = spawnSync('git', ['ls-files', 'docs/screenshots'], {
-        cwd: fileURLToPath(repoRootUrl),
-        encoding: 'utf8',
-      });
+      const ls = spawnSync(
+        'git',
+        ['ls-files', '--cached', '--others', '--exclude-standard', 'docs/screenshots'],
+        {
+          cwd: fileURLToPath(repoRootUrl),
+          encoding: 'utf8',
+        },
+      );
       expect(ls.status).toBe(0);
       for (const line of ls.stdout.split('\n')) {
         const match = line.match(/^docs\/screenshots\/([A-Za-z0-9._-]+)\//);
@@ -511,11 +577,15 @@ describe('CI workflow parity', () => {
     ];
     const referenced = new Set<string>();
     {
-      const ls = spawnSync('git', ['ls-files', '-z'], {
-        cwd: fileURLToPath(repoRootUrl),
-        encoding: 'utf8',
-        maxBuffer: 64 * 1024 * 1024,
-      });
+      const ls = spawnSync(
+        'git',
+        ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+        {
+          cwd: fileURLToPath(repoRootUrl),
+          encoding: 'utf8',
+          maxBuffer: 64 * 1024 * 1024,
+        },
+      );
       expect(ls.status).toBe(0);
       const repoRoot = fileURLToPath(repoRootUrl);
       const tracked = ls.stdout.split('\0').filter((file) => file.length > 0);
@@ -568,6 +638,7 @@ describe('CI workflow parity', () => {
       'charselect-zone',
       'dash-speed-stack',
       'nythraxis-dread-curse-swap',
+      'realm-motd',
     ]);
     for (const dir of workflowScopedFollowup) {
       expect(referenced.has(dir), `${dir} remains a real referenced screenshot subtree`).toBe(true);
@@ -576,7 +647,7 @@ describe('CI workflow parity', () => {
     expect([...referenced].filter((dir) => !workflowScopedFollowup.has(dir)).sort()).toEqual(
       [...coneDirs].sort(),
     );
-  });
+  }, 60_000);
 
   it('performs no hand-rolled directory reads (the corpus is the git index)', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
@@ -674,7 +745,19 @@ describe('CI workflow parity', () => {
     // auto-rerunnable setup class.
     expect(browserGate).toContain(PLAYWRIGHT_INSTALL_BLOCK);
     expect(browserGate).not.toContain('--with-deps');
-    expect(browserGate).toContain('run: npm run test:browser');
+    // Two halves in two fresh sessions (a long single session lost its server
+    // connection at the 48th file on the v0.45.0 integration). Pinned whole:
+    // both halves always run and either failing fails the step, so a half can
+    // never drop out or mask the other.
+    expect(browserGate).toContain(
+      [
+        '        run: |',
+        '          status=0',
+        '          npm run test:browser -- --shard=1/2 || status=1',
+        '          npm run test:browser -- --shard=2/2 || status=1',
+        '          exit "$status"',
+      ].join('\n'),
+    );
     const browser = gateSteps.find((s) => s.name === 'browser regressions');
     expect(browser?.cmd).toBe('npm');
     expect(browser?.args).toEqual(['run', 'test:browser']);
@@ -1348,24 +1431,22 @@ describe('CI workflow parity', () => {
     // in shape rather than lifted from the checkout-stall replay directly, so
     // every job in this file carries a conscious timeout-minutes value.
     const bounds = [
-      // pr-gate: 37 is the 2026-08-14 re-derivation from the worst healthy
-      // SELECTIVE shard wall (16.55 minutes, run 31765273776; selective and
-      // full mode share this one bound and selective is the expensive one,
-      // x 1.60 slow-runner ratio x 1.37 margin = 36.3). The 20-then-40
-      // history, the full-mode measurement trap (a ci.yml-touching PR
-      // always widens to full, so a bounds PR cannot observe selective
-      // walls), and the derivation live on the ci.yml bound.
-      ['pr-gate', 37],
+      // pr-gate: v0.45 SELECTIVE run 40134416344 shard 6 completed in
+      // 35m52s. The established 1.60 slow-runner ratio and 1.37 margin
+      // give 78.62 minutes, rounded up to 79. Cancelled legs are not the
+      // sizing base; a workflow-editing PR widens to FULL and cannot
+      // remeasure selective walls. Full evidence lives on the ci.yml bound.
+      ['pr-gate', 79],
       // release-gate is the one shard matrix that keeps its CI_LONG_SUITES
       // files in-shard (pr-gate hands them to the lanes), so a single shard
       // can draw four of them at once and the bound has to cover a slow
       // runner rather than the healthy median. 20 was sized from a 14.63
       // minute healthy worst case and was bound-killing shard 1 by 2026-08-11
-      // at b160a1ba18; 36 is the 2026-08-14 re-derivation from the measured
-      // post-split release-push worst (16.43 minutes, checkout-stall walls
-      // excluded) at the same 1.60 ratio and 1.37 margin; evidence on the
-      // ci.yml bound.
-      ['release-gate', 36],
+      // at b160a1ba18. The August 36-minute budget was overtaken by the
+      // v0.45 workload: run 40113294880 shard 5 completed in 35m29s with
+      // a healthy checkout. The same 1.60 ratio and 1.37 margin give
+      // 77.78 minutes, rounded up to 78; evidence on the ci.yml bound.
+      ['release-gate', 78],
       // The lanes: 28 is the 2026-08-14 re-derivation from post-rebalance
       // healthy walls (worst lane 12.5 minutes, same formula as pr-gate).
       // The 60-to-20-to-30 history, including the falsified under-10
@@ -1374,7 +1455,10 @@ describe('CI workflow parity', () => {
       // rebalance without re-sizing.
       ['pr-long-sims-a', 28],
       ['pr-long-sims-b', 28],
-      ['browser-gate', 10],
+      // 18 since 2026-10-27: merge_group runs 40156081869 and 40150638622
+      // passed both browser sessions at 12m00s after an 8 to 9 minute checkout
+      // and were bound-killed during Post Set up Node.js (rationale on ci.yml).
+      ['browser-gate', 18],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
       // single-digit shape check the classifier test keeps.
@@ -1516,7 +1600,7 @@ describe('CI workflow parity', () => {
     // checkout left nothing running after it) is ci-stall-rerun.yml, pinned
     // by tests/ci_stall_rerun.test.ts.
     expect(workflow).toMatch(
-      /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '120'\n/,
+      /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '240'\n/,
     );
     expect(workflow.match(/GIT_HTTP_LOW_SPEED_LIMIT/g)).toHaveLength(1);
     expect(workflow.match(/GIT_HTTP_LOW_SPEED_TIME/g)).toHaveLength(1);
@@ -1765,7 +1849,7 @@ describe('CI workflow parity', () => {
     // here.
     const cacheStepName = String.raw`- name: Cache vitest transform cache\n`;
     const cacheStepBody = String.raw`(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-`;
-    const cacheKeyTail = String.raw`-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n`;
+    const cacheKeyTail = String.raw`-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc'\) \}\}\n\n`;
     const shardKeySegment = String.raw`shard\$\{\{ matrix\.shard \}\}`;
     const prGateCacheStepRe = new RegExp(
       `${cacheStepName}${PR_GATE_STEP_GATE_RE_SEGMENT}${cacheStepBody}${shardKeySegment}${cacheKeyTail}`,

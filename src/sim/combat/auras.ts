@@ -28,8 +28,8 @@
 // stay verbatim and in place: reordering either guard, the loop, or any draw forks the
 // shared rng stream for every later draw.
 //
-// This slice draws NO rng of its own. Its only rng-bearing callee is ctx.dealDamage
-// (the DoT tick), reached through the seam. updateGroundAoEs / pulseGroundAoE are NOT
+// Shadow priest Dirge and Vampiric Touch roll spell crit before ctx.dealDamage; other DoTs
+// retain their existing RNG order. updateGroundAoEs / pulseGroundAoE are NOT
 // here: pulseGroundAoE STAYS on Sim (a shared entry point), and its per-tick driver was
 // already extracted to entity_roster (tickGroundAoEs) by E1.
 //
@@ -38,15 +38,17 @@
 
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
 import { updateDawnBattleStandards } from '../content/faction_rewards';
+import { TRINKET_AURA } from '../content/trinkets';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
 import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
-import type { SimContext } from '../sim_context';
+import type { DamageResolution, SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
+import { releaseStoneStatue, tickGutteredGlare } from './balgath_trinkets';
 import { regenParkedCatEnergy } from './cat_form_energy';
 import { isStunned } from './cc';
 import {
@@ -55,9 +57,13 @@ import {
 } from './crafted_collection_effects';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
+import { naturesBoonOnHotTick } from './druid_natures_boon';
+import { secondBloomOnHotExpired } from './druid_second_bloom';
+import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
+import { hunterFocusRegenMult } from './hunter_fieldcraft';
 import {
   detonateOssuaryMark,
   OSSUARY_MARK_ABILITY_ID,
@@ -65,7 +71,10 @@ import {
 } from './necromancy';
 import { tickPaladinOathChainPull } from './paladin_control';
 import { periodicHarmStands } from './periodic_harm';
+import { shadowPeriodicHit } from './priest/periodic_crit';
+import { prepareShadowSecondVerse, shadowSecondVerseTick } from './priest/shadow_talents';
 import { priestOnAuraEnded } from './priest/talents';
+import { healVampiricTouch } from './priest/vampiric_touch';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
@@ -141,8 +150,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
     for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
     p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
   } else if (p.resourceType === 'focus') {
-    // Hunter Focus returns at 5 per second on the classic two-second tick.
-    p.resource = Math.min(p.maxResource, p.resource + 10);
+    // Hunter Focus returns at 5 per second on the classic two-second tick
+    // (doubled by a petless Bloodtrail Assault, combat/hunter_fieldcraft.ts).
+    p.resource = Math.min(p.maxResource, p.resource + 10 * hunterFocusRegenMult(ctx, p));
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
@@ -217,6 +227,9 @@ export function updateTimers(p: Entity): void {
   p.gcdRemaining = Math.max(0, p.gcdRemaining - DT);
   p.potionCdRemaining = Math.max(0, p.potionCdRemaining - DT);
   p.firebottleCdRemaining = Math.max(0, p.firebottleCdRemaining - DT);
+  // The PvP Resurrect wait (pvp/pvp_resurrect.ts) runs on a corpse, and this lap
+  // visits the dead too.
+  if (p.pvpResurrectWait) p.pvpResurrectWait = Math.max(0, p.pvpResurrectWait - DT);
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
@@ -320,6 +333,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   // an entry a side effect already removed; it never revisits one. rng draw order
   // is unaffected: this removes a spurious extra dealDamage, it adds none.
   const snapshot = e.auras.slice();
+  prepareShadowSecondVerse(ctx, snapshot);
   for (let i = snapshot.length - 1; i >= 0; i--) {
     const a = snapshot[i];
     if (!e.auras.includes(a)) continue; // removed by an earlier entry's side effect this tick
@@ -347,6 +361,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
           tickSacrilegiousMarch(ctx, e, a);
+        } else if (a.id === TRINKET_AURA.gutteredGlare) {
+          tickGutteredGlare(ctx, e, a);
+        } else if (a.id === TRINKET_AURA.stoneStatue) {
+          releaseStoneStatue(ctx, e, a);
         } else if (
           (a.kind === 'dot' || a.kind === 'affliction_eye' || a.kind === 'affliction_violence') &&
           !periodicHarmStands(ctx, ctx.entities.get(a.sourceId) ?? null, e)
@@ -377,11 +395,17 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             school: a.school,
             fx: 'tick',
           });
+          const periodicHit =
+            a.school === 'shadow' && !a.finalDamage
+              ? shadowPeriodicHit(ctx, dotSource, a.id, tickDamage)
+              : { amount: tickDamage, crit: false };
+          const resolution: DamageResolution | undefined =
+            a.id === 'vampiric_touch' ? { landedHpLoss: 0 } : undefined;
           const tickLanded = ctx.dealDamage(
             dotSource,
             e,
-            tickDamage,
-            false,
+            periodicHit.amount,
+            periodicHit.crit,
             a.school,
             a.name,
             'hit',
@@ -408,7 +432,12 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // Banks copied from resolved damage (Ignite) skip the source-output
             // multipliers so the payout equals what was banked, once.
             a.finalDamage === true,
+            null,
+            false,
+            resolution,
           );
+          if (resolution) healVampiricTouch(ctx, dotSource, a, resolution.landedHpLoss);
+          shadowSecondVerseTick(ctx, e, a);
           vespersOnDotTick(ctx, e, a);
           thundercallOnDotTick(ctx, dotSource, a, tickLanded);
           druidEngineOnBleedTick(ctx, dotSource, a);
@@ -421,11 +450,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               const intended = Math.round(tickDamage * a.leechPct * ctx.healingTakenMult(src));
               const landing = consumeHealAbsorb(ctx, src, intended);
               const absorbed = intended - landing;
-              const healed = Math.min(landing, src.maxHp - src.hp);
+              const healed = Math.min(landing, Math.max(0, src.maxHp - src.hp));
               onCraftedCollectionHeal(ctx, src, src, landing - healed);
-              if (healed > 0 || absorbed > 0) {
+              const overheal = landing - healed;
+              if (healed > 0 || absorbed > 0 || overheal > 0) {
                 if (healed > 0) src.hp += healed;
-                const overheal = landing - healed;
+                // A tick that landed as pure overheal still reports it for the
+                // meters and the parse, flagged hot so the client treats it as a
+                // silent passive tick; every other leech tick keeps its shape.
+                const passive = healed === 0 && absorbed === 0;
                 ctx.emit({
                   type: 'heal2',
                   sourceId: src.id,
@@ -433,6 +466,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
                   amount: healed,
                   crit: false,
                   ability: a.name,
+                  ...(passive ? { hot: true } : {}),
                   ...(absorbed > 0 ? { absorbed } : {}),
                   ...(overheal > 0 ? { overheal } : {}),
                 });
@@ -451,15 +485,21 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
           }
         } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
-          const intended = Math.round(a.value * ctx.healingTakenMult(e));
+          const healer = ctx.entities.get(a.sourceId);
+          // Sporemender Form scales its wearer's HoT ticks live (exactly 1 for
+          // every other healer, so their tick arithmetic is unchanged).
+          const intended = Math.round(
+            a.value * sporemenderHealingDoneMult(healer) * ctx.healingTakenMult(e),
+          );
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
-          const healed = Math.min(landing, e.maxHp - e.hp);
-          const healer = ctx.entities.get(a.sourceId);
+          const healed = Math.min(landing, Math.max(0, e.maxHp - e.hp));
           if (healer) onCraftedCollectionHeal(ctx, healer, e, landing - healed);
-          if (healed > 0 || absorbed > 0) {
+          const overheal = landing - healed;
+          // A tick on a full-health target emits too (amount 0, the whole tick as
+          // overheal) so overheal totals cover the at-full-health case.
+          if (healed > 0 || absorbed > 0 || overheal > 0) {
             if (healed > 0) e.hp += healed;
-            const overheal = landing - healed;
             ctx.emit({
               type: 'heal2',
               sourceId: a.sourceId,
@@ -475,6 +515,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             const src = ctx.entities.get(a.sourceId);
             if (src && healed > 0) ctx.healingThreat(src, e, healed);
           }
+          // Groveheart Nature's Boon (combat/druid_natures_boon.ts): an owned
+          // HoT tick can arm the free Wildmend and Spore Burst window.
+          // Restoration-gated and cooldown-gated inside, before any rng draw.
+          naturesBoonOnHotTick(ctx, healer ?? null, a);
         } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
           e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));
         } else if (a.kind === 'polymorph') {
@@ -521,6 +565,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         const source = ctx.entities.get(a.sourceId);
         if (source && !source.dead && source.kind === 'player') {
           onHotExpired(ctx, source, a.id, e);
+          // Second Bloom's closing heal (combat/druid_second_bloom.ts): only
+          // this natural full-duration expiry pays it, never a consume,
+          // harvest, dispel, or overwrite.
+          secondBloomOnHotExpired(ctx, source, e, a);
         }
       }
       // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must

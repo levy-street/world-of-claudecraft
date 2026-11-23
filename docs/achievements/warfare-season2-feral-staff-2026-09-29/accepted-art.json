@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "warfare-season2-feral-staff-2026-09-29",
+    "owner": "World of ClaudeCraft"
+  },
+  "styleContract": "woc-item-icon-v1",
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "generation": {
+    "source": "OpenAI built-in image generation",
+    "prompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon for World of ClaudeCraft, contract woc-item-icon-v1. Paint Vanguard's Feral Staff (vanguard_feral_staff), a two-handed physical combat staff for a feral druid. Thick dark hardwood haft, worn crimson leather grip, blackened steel reinforced ends with burnished gold trim, upper end sculpted as a compact bestial claw clutching a solid crimson enamel oval, no caster crystal or magic beam. Complete long staff diagonal bottom-left to top-right, centered with safe padding, 70 percent square fill. Premium hand-painted classic dark fantasy MMO inventory art, tactile wood grain, leather and metal, warm top-left key light, cool deep shadow, crisp focal edge, softer peripheral brushwork, charcoal-umber opaque painted vignette. Three provided images are STYLE REFERENCES ONLY: long weapon diagonal and safe padding, buckler material/light, pouch tactile treatment. Do not copy their subjects. No text, letters, numbers, pseudo-writing, border, rarity frame, watermark, transparency, cropped tip/base, hands or mannequin. Generate one square image, 1024x1024.\n",
+    "retryCount": 0,
+    "references": [
+      {
+        "path": "public/ui/items/kingsbane_last_oath.webp",
+        "role": "style only",
+        "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+      },
+      {
+        "path": "public/ui/items/eastbrook_buckler.webp",
+        "role": "style only",
+        "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+      },
+      {
+        "path": "public/ui/items/linen_pouch.webp",
+        "role": "style only",
+        "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+      }
+    ],
+    "original": {
+      "path": "tmp/feral-staff-art/original.png",
+      "sha256": "925fe06b74ea8bf419d2299189c470f28f7a450e9b3748286251033621085233"
+    },
+    "master": {
+      "path": "tmp/feral-staff-art/master.png",
+      "sha256": "fd1fcfcfc69270f20c28f23dddb4fe302ad8f57f8e58be34b1a14a6020e44034"
+    },
+    "processing": "Sharp resize to 512x512 sRGB opaque PNG master; npm run assets:items emits the 128x128 WebP."
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "vanguard_feral_staff",
+      "family": "two-handed staff",
+      "runtimeUrl": "/ui/items/vanguard_feral_staff.webp",
+      "acceptedSha256": "1beaf775b29b014201cf2429c8084213f89327aef825d0ac1fb3893c35d50d7c",
+      "acceptedBytes": 2178,
+      "source": {
+        "path": "public/ui/items/vanguard_feral_staff.webp"
+      }
+    }
+  ],
+  "review": {
+    "reviewer": "Codex",
+    "status": "pass",
+    "image": "tmp/feral-staff-art/review.png",
+    "inGameScreenshots": "Not captured in sparse worktree; UI layout unchanged.",
+    "sizesInspected": [512, 128, 40, 28, 22, "28-grayscale", "64-circle"],
+    "findings": "Complete staff silhouette, opaque ground, readable claw head and grip, distinct materials, no writing or baked frame. Reviewed generated original and normalized master plus shipping small-size sheet."
+  }
+}

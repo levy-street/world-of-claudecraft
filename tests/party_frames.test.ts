@@ -44,10 +44,38 @@ describe('party frame style resolution', () => {
 });
 
 describe('party frame header state', () => {
-  it('shows the member count and derives the disclosure state without DOM state', () => {
-    expect(partyFrameHeaderState(4, false)).toEqual({ visible: true, count: 4, collapsed: false });
-    expect(partyFrameHeaderState(4, true)).toEqual({ visible: true, count: 4, collapsed: true });
+  it('counts the local player and derives the disclosure state without DOM state', () => {
+    // Four other members' rows plus the hidden local player is a party of five.
+    expect(partyFrameHeaderState(4, false)).toEqual({ visible: true, count: 5, collapsed: false });
+    expect(partyFrameHeaderState(4, true)).toEqual({ visible: true, count: 5, collapsed: true });
     expect(partyFrameHeaderState(0, true)).toEqual({ visible: false, count: 0, collapsed: true });
+  });
+
+  it('matches the full roster size for the rows the selector hands the painter', () => {
+    const info: PartyInfo = {
+      leader: 1,
+      raid: false,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
+      members: [member(1, 1), member(2, 1), member(3, 1), member(4, 1)],
+    };
+    for (const showSelf of [false, true]) {
+      const config = { ...DEFAULT_PARTY_FRAME_DISPLAY, showSelf };
+      const rows = selectPartyFrameMembers(info, 1, { x: 0, z: 0 }, undefined, config);
+      expect(partyFrameHeaderState(rows.length, false, showSelf).count).toBe(4);
+    }
+  });
+
+  it('does not count the local player twice when their own row is shown', () => {
+    expect(partyFrameHeaderState(5, false, true)).toEqual({
+      visible: true,
+      count: 5,
+      collapsed: false,
+    });
+    expect(partyFrameHeaderState(0, false, true)).toEqual({
+      visible: false,
+      count: 0,
+      collapsed: false,
+    });
   });
 });
 

@@ -1,0 +1,857 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "faction-automaton-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 10,
+    "replacedSvgIcons": 10,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "automaton_cog_ring",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/automaton_cog_ring.webp",
+      "canonicalDisplayName": "Automaton Cog Ring",
+      "acceptedSha256": "013071b92b13911cfb089025702b373df1bda788d3adea00c5d6dd1f5001cd52",
+      "acceptedBytes": 4128,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/automaton_cog_ring.png",
+        "sha256": "da3c5495d6557f69d0165fde730bff36bd6024083c1e9f077151a219c11acb04",
+        "bytes": 2243895,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/automaton_cog_ring.png",
+        "sha256": "0ea55b43d1c01435f43e64a0c0e93d3d202ce70695ebb8981d65cef4aade0c6e",
+        "bytes": 545192,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "b9877edbcfbe5fc2d753deaea16f40262b9cbf9d4e28cf94144944e5dd07c4f0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Automaton Cog Ring (automaton_cog_ring) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete mechanical ring in three-quarter view: interlocking brass and gunmetal gear teeth around the band, raised round central cog face with a small glowing amber axle. Visible ring opening, tactile machined teeth and worn brass. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/automaton_cog_ring.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "b9877edbcfbe5fc2d753deaea16f40262b9cbf9d4e28cf94144944e5dd07c4f0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "clockwork_tinkers_pack",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/clockwork_tinkers_pack.webp",
+      "canonicalDisplayName": "Clockwork Tinker's Pack",
+      "acceptedSha256": "79863c70341e96204ceaf06ae99b5125824c5b53053b862cdf67d6cb89c7e054",
+      "acceptedBytes": 4646,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/clockwork_tinkers_pack.png",
+        "sha256": "5fc9b5571fdff471b12594fac8e37374dd8054f6dccc5e320acc232efaf5f956",
+        "bytes": 2489794,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/clockwork_tinkers_pack.png",
+        "sha256": "63310643f0a1b6ebbeff2cec35799ffc58c21ae5dddd01a626bcd3ccac01889f",
+        "bytes": 576970,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "0416142d08a24fd06ecd0ec1637402d59739a36a696de2c5c21d83d3f4f256db",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Clockwork Tinker's Pack (clockwork_tinkers_pack) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete stout brown leather backpack reinforced with riveted brass bands, twin buckled straps, a round glass pressure dial with tick marks only and a short curved copper boiler tube on its side. Compact practical tinker pack, no writing or numbers. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/clockwork_tinkers_pack.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "0416142d08a24fd06ecd0ec1637402d59739a36a696de2c5c21d83d3f4f256db"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "artificers_welding_cowl",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/artificers_welding_cowl.webp",
+      "canonicalDisplayName": "Artificer's Welding Cowl",
+      "acceptedSha256": "44c371aa42a660c9c446423e27790126b948fa5d42385017561b3777f1719327",
+      "acceptedBytes": 4268,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/artificers_welding_cowl.png",
+        "sha256": "89a129be7df530193044bab49df376b37600ddb9d13eae926d61081475c1f43a",
+        "bytes": 2441291,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/artificers_welding_cowl.png",
+        "sha256": "8687a5e8fdbbdaddd7af273d9354fe4709c25addbfe5198171aa12703232fffe",
+        "bytes": 554420,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "71263e1969cf2f4095c764a1050d785ec62a832be1f3e28bbf53ddbe033d422e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Artificer's Welding Cowl (artificers_welding_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One empty smith's welding helmet, a protective dark chainMAIL coif beneath a heavy riveted brass faceplate and leather crown. Two round glowing amber glass eye lenses, narrow breathing grille. Clearly visible interlinked mail around neck, canonical MAIL armor, no wearer, face or mannequin. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/artificers_welding_cowl.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "71263e1969cf2f4095c764a1050d785ec62a832be1f3e28bbf53ddbe033d422e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "forgemaster_crag_cleaver",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/forgemaster_crag_cleaver.webp",
+      "canonicalDisplayName": "Forgemaster's Crag Cleaver",
+      "acceptedSha256": "d7a8adf1de38efdf18252be0c95cb006504c0d3da7a6e391d5213309a6783d97",
+      "acceptedBytes": 2730,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/forgemaster_crag_cleaver.png",
+        "sha256": "7bdfc840202f18a9b9c287d60825a6b3aa8f6093730fe2761a56addaf6248110",
+        "bytes": 2166485,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/forgemaster_crag_cleaver.png",
+        "sha256": "190aaf103de5a1531ec5a757fc30174f7ef8f44ccf74c11e2f8760f0a14a721c",
+        "bytes": 505089,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "ede9b9322e85d53b15bcf26adfada295c9c9412dea065ce1e6c50957ae429ef6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Forgemaster's Crag Cleaver (forgemaster_crag_cleaver) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete massive TWO-HANDED industrial axe diagonal from lower left to upper right. Long dark wrapped shaft with brass piston fittings, one large notched asymmetric gunmetal cleaver head, broad bright cutting bevel, three narrow molten orange heat vents in the solid head. Entire head and full long two-hand grip and pommel inside frame, no floating pieces or second blade. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/forgemaster_crag_cleaver.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "ede9b9322e85d53b15bcf26adfada295c9c9412dea065ce1e6c50957ae429ef6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "champion_forged_loop",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/champion_forged_loop.webp",
+      "canonicalDisplayName": "Champion's Forged Loop",
+      "acceptedSha256": "643b049b8e1d3da5967a7b5b09e97bbc1158cbac72007f7f429ebf27d568f1fa",
+      "acceptedBytes": 3570,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/champion_forged_loop.png",
+        "sha256": "4761813ee475cd0bc5917b5574c4714ffb3ad4a4b69ded5a9002435897845e4f",
+        "bytes": 2433175,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/champion_forged_loop.png",
+        "sha256": "15c6e5a12114f4b7122c2969a781f204e90b4533b661d6cff972c45840da8b01",
+        "bytes": 522068,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-vendor-icons-2026-09-16",
+        "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+        "sha256": "b1fa66c2db4604e4d0aa404e4c4afd5c02bd44b6d1f0974a56282a29bffea28d",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Champion's Forged Loop (champion_forged_loop) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One heavy folded Damascus steel finger ring in three-quarter view. Broad dark layered metal band with visible rippling fold ridges, thin molten orange channels and one small square hot forge rivet at the crown. Visible ring opening. Clearly distinct from toothed brass cog ring: smooth heavy steel and small square rivet, no cog face. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/champion_forged_loop.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "b1fa66c2db4604e4d0aa404e4c4afd5c02bd44b6d1f0974a56282a29bffea28d"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "cogwork_choker",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/cogwork_choker.webp",
+      "canonicalDisplayName": "Cogwork Choker",
+      "acceptedSha256": "353f3ce8140c6462bbb2a24e6106092c24bcc20e7919c3bbcf67a496448b6725",
+      "acceptedBytes": 3472,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/cogwork_choker.png",
+        "sha256": "320e93b617f7305e25d69bcb5a29f206f83ebc32050a1b1f250561b9c0ac0274",
+        "bytes": 2244473,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/cogwork_choker.png",
+        "sha256": "10bbacd40394ce2d4efb3463cc734d778f4439afd0ab8a6f3afa2fffc6e2d2e0",
+        "bytes": 495331,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "d51536c91a8208f6ef33456581bb5b4445cf6da2f3b024ce903a27d84014a1ea",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Cogwork Choker (cogwork_choker) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete brass choker necklace formed from interlocking small cogs, arranged as an open oval with a suspended large cog pendant at the lower center. Amber glowing axle in the pendant, dark gunmetal joining links, compact tactile mechanical jewelry. Clearly a necklace with linked chain, not a finger ring. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/cogwork_choker.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d51536c91a8208f6ef33456581bb5b4445cf6da2f3b024ce903a27d84014a1ea"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "forgemasters_girdle",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/forgemasters_girdle.webp",
+      "canonicalDisplayName": "Forgemaster's Girdle",
+      "acceptedSha256": "640b50c7240adc5a354a67a043fe32681fc573b200dc7a73b6996a09c5751bae",
+      "acceptedBytes": 4284,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/forgemasters_girdle.png",
+        "sha256": "0acf33f8a6af7e8aa78c276ba16a5f84f542455cc5dc83af4da515f9e1b2e9b7",
+        "bytes": 2299279,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/forgemasters_girdle.png",
+        "sha256": "f7c7d2f52d579e12cbfb8d6803928f2373c753fb7b4a6026511fbd9a17d7f24b",
+        "bytes": 523785,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "69ac86c9776dbb4c6a7cd02ad136e8652c96945f4c2b53f034dd77401e6db9d1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Forgemaster's Girdle (forgemasters_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete heavy MAIL armor waist belt, dark interlinked steel mail over leather backing, riveted steel upper and lower reinforcing bands and a large circular brass gear buckle. Broad curved horizontal belt silhouette with readable chain links and worn brass. No wearer. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/forgemasters_girdle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "69ac86c9776dbb4c6a7cd02ad136e8652c96945f4c2b53f034dd77401e6db9d1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "forgemasters_sabatons",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/forgemasters_sabatons.webp",
+      "canonicalDisplayName": "Forgemaster's Sabatons",
+      "acceptedSha256": "35bce6893d8318366ace3d7b06c5cbdadbe6139be535bc2b58c00cf35442fac2",
+      "acceptedBytes": 4286,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/forgemasters_sabatons.png",
+        "sha256": "357539cfbcf80555cba34b8288bfd031a48032335d12e3b97bd7bd200ae2ddd3",
+        "bytes": 2310975,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/forgemasters_sabatons.png",
+        "sha256": "066ce18d21ec4b53b774abea5cff06ab5690619a9a432d7c89c6a37953dee835",
+        "bytes": 555334,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "8050e6dcb7a55c0f2ab8f5029425e4ceea18de0e2d9404b6bf31bf266409a8c0",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Forgemaster's Sabatons (forgemasters_sabatons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One compact matching pair of heavy MAIL armor boots, one forward and one behind. Dark interlinked steel chain mail at ankles, articulated steel toe and heel plates, brass rivet trim, small restrained ember heat vents at the toes. Whole pair including soles, no wearer, clearly armored boots. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/forgemasters_sabatons.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "8050e6dcb7a55c0f2ab8f5029425e4ceea18de0e2d9404b6bf31bf266409a8c0"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "formula_piston_drive",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/formula_piston_drive.webp",
+      "canonicalDisplayName": "Formula: Piston Drive",
+      "acceptedSha256": "afe766b0b403191bcfce5b3cda8def8dd6bcb908dea8c2831134df3b0145ebae",
+      "acceptedBytes": 3400,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/formula_piston_drive.png",
+        "sha256": "87a53676686ec79dcb2e699646972aa30a9450692b6ebef4f1cc626b6c7e4463",
+        "bytes": 2177045,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/formula_piston_drive.png",
+        "sha256": "244e3f1632dbb65de22be06297cb844e5d6890347c20ac77f835ffef58871b59",
+        "bytes": 541061,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "82492965f4be0e96e606fb4aab4cde981834471cd479f27b9770ade10ffa3668",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Formula: Piston Drive (formula_piston_drive) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete rolled ivory parchment enchantment scroll bound with a dark brown ribbon and a copper wax seal bearing a simple embossed mechanical piston emblem. Rolled ends and short ribbon tails, worn paper, copper and dark industrial brass. No writing, letters, numbers, pseudo-script or technical diagram. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/formula_piston_drive.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "82492965f4be0e96e606fb4aab4cde981834471cd479f27b9770ade10ffa3668"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "forgewall_gorget",
+      "family": "faction-automaton",
+      "batch": "faction-automaton-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/forgewall_gorget.webp",
+      "canonicalDisplayName": "Forgewall Gorget",
+      "acceptedSha256": "98d90ce2265458f1f4d7d795f52cb9ce4546663d3277427673af5c509c42b2e7",
+      "acceptedBytes": 3846,
+      "original": {
+        "path": "tmp/imagegen/v045-faction-automaton/originals/forgewall_gorget.png",
+        "sha256": "51265db2da3a7f3f7b955b75c059c668313ca6493e000c64d3827782a0938940",
+        "bytes": 2331316,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-faction-automaton/masters/forgewall_gorget.png",
+        "sha256": "3b2a0c7669ee7e0e8e714f3f100ec6f0d62c676eab041584fff1d4a3cc492240",
+        "bytes": 540665,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "faction-ladder-icons-2026-09-23",
+        "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+        "sha256": "6ae12fe33ab2730a43dad8eac955df825c1504b05df90fa545da9493481c3ee2",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Forgewall Gorget (forgewall_gorget) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete solid dark steel armored neck collar in three-quarter view, broad horseshoe gorget plate with rivets along its rim, three short hanging protective tassets. Small central square brass plate bearing a simple glowing orange geometric forge emblem. Empty neck opening, no wearer or shoulders. Clearly rigid armor collar, not linked cog necklace. Automaton faction identity: worn brass, gunmetal steel, copper and restrained forge-ember orange. Preserve canonical item identity and material in tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-faction-automaton/superseded/forgewall_gorget.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "6ae12fe33ab2730a43dad8eac955df825c1504b05df90fa545da9493481c3ee2"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/faction-automaton-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/faction-automaton-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

@@ -60,8 +60,13 @@ function clearDiscordConfigEnv(): void {
 
 async function loadDispatch(): Promise<Dispatch> {
   const main = await import('../../../server/main');
-  return (req, res) => {
+  return async (req, res) => {
     main.routeHttpRequest(req, res);
+    let ticks = 0;
+    while (!(res as unknown as { writableEnded: boolean }).writableEnded) {
+      if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
+      await new Promise((r) => setImmediate(r));
+    }
   };
 }
 

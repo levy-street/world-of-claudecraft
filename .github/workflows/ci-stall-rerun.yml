@@ -81,7 +81,7 @@ concurrency:
 # carries; it would be silly for the stall net to hang on the stall class.
 env:
   GIT_HTTP_LOW_SPEED_LIMIT: '1000'
-  GIT_HTTP_LOW_SPEED_TIME: '120'
+  GIT_HTTP_LOW_SPEED_TIME: '240'
 
 jobs:
   rerun:

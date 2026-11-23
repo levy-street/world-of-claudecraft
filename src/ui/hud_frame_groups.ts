@@ -11,6 +11,7 @@ export const HUD_FRAME_GROUPS = [
     setting: 'combineTrackerFrames',
     labelKey: 'hudChrome.interfaceUnlock.frameNames.trackerGroup' as TranslationKey,
     members: [
+      'dungeonTracker',
       'questTracker',
       'deedTracker',
       'riftTracker',

@@ -404,4 +404,4 @@ export function impostorSpriteNormal(
  * silhouette at night while its real twin stays readable. One constant so
  * the two sides of the swap line can never drift apart.
  */
-export const CANOPY_EMISSIVE_FLOOR: readonly [number, number, number] = [0.155, 0.175, 0.135];
+export const CANOPY_EMISSIVE_FLOOR: readonly [number, number, number] = [0.175, 0.225, 0.165];

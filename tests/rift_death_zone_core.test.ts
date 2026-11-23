@@ -9,10 +9,12 @@ import {
   PULSE_SPEED_URGENT,
   RING_MAX_OPACITY,
   RING_MIN_OPACITY,
+  resolveEncounterFxScope,
   SWEEP_BASE_OPACITY,
   SWEEP_URGENT_OPACITY,
   URGENT_REMAINING_SEC,
 } from '../src/render/rift_death_zone_core';
+import { DUNGEONS, instanceOrigin, RIFT_X_MIN } from '../src/sim/data';
 
 // The readability contract behind the v0.36.0 player feedback ("very hard to
 // see the red circles"): the telegraph may pulse but never near-invisible, the
@@ -96,5 +98,31 @@ describe('rift death zone core: visual plan', () => {
       expect(sx, `scale tracks the fraction at ${f}`).toBeCloseTo(Math.max(f, 0.001), 10);
     }
     expect(deathZoneSweepScale(0)[0], 'zero fraction stays non-degenerate').toBeGreaterThan(0);
+  });
+
+  it('scopes encounter FX to the active dungeon or rift and returns null in the overworld', () => {
+    expect(resolveEncounterFxScope(undefined)).toBeNull();
+    expect(resolveEncounterFxScope(0)).toBeNull();
+    expect(resolveEncounterFxScope(500)).toBeNull();
+    expect(resolveEncounterFxScope(0, true)).toBe('rift');
+    expect(resolveEncounterFxScope(RIFT_X_MIN)).toBe('rift');
+    expect(resolveEncounterFxScope(instanceOrigin(DUNGEONS.hollow_crypt.index, 0).x)).toBe(
+      'hollow_crypt',
+    );
+    expect(resolveEncounterFxScope(instanceOrigin(DUNGEONS.sunken_bastion.index, 0).x)).toBe(
+      'sunken_bastion',
+    );
+    expect(resolveEncounterFxScope(instanceOrigin(DUNGEONS.drowned_temple.index, 0).x)).toBe(
+      'drowned_temple',
+    );
+    expect(resolveEncounterFxScope(instanceOrigin(DUNGEONS.wildheart_basin.index, 0).x)).toBe(
+      'wildheart_basin',
+    );
+    expect(resolveEncounterFxScope(instanceOrigin(DUNGEONS.gravewyrm_sanctum.index, 0).x)).toBe(
+      'gravewyrm_sanctum',
+    );
+    expect(resolveEncounterFxScope(instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0).x)).toBe(
+      'dungeon_generic',
+    );
   });
 });

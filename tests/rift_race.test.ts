@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { BUILTIN_WORLD, isRiftPos } from '../src/sim/data';
 import { spawnNaturalRiftPortal } from '../src/sim/rift/portals';
@@ -118,7 +118,7 @@ describe('shared Rift race with group-isolated dungeon instances', () => {
     );
     // Rifts pay NO Heroic Marks (maintainer decision): the win pays the gear
     // ladder and first-clear extras instead, and the corpse stays lootable.
-    expect((boss.loot?.items ?? []).some((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toBe(
+    expect((boss.loot?.items ?? []).some((item) => item.itemId === HEROIC_MARK_CURRENCY_ID)).toBe(
       false,
     );
     expect((boss.loot?.items ?? []).length).toBeGreaterThan(0);
@@ -155,7 +155,7 @@ describe('shared Rift race with group-isolated dungeon instances', () => {
     // appear on this path.
     const loserItems = loserBoss.loot?.items ?? [];
     expect(loserItems).toHaveLength(0);
-    expect(loserItems.some((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toBe(false);
+    expect(loserItems.some((item) => item.itemId === HEROIC_MARK_CURRENCY_ID)).toBe(false);
     expect(loserItems.some((item) => item.instance?.rift !== undefined)).toBe(false);
     expect(loserItems.some((item) => item.itemId === RIFT_ESSENCE_ITEM_ID)).toBe(false);
     expect(

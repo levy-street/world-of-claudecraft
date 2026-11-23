@@ -7,7 +7,11 @@ import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
-import { compareStatLabelKey, itemAffixTooltipLines } from '../src/ui/item_affix_tooltip';
+import {
+  compareStatLabelKey,
+  itemAffixTooltipLines,
+  itemRatingTooltipLines,
+} from '../src/ui/item_affix_tooltip';
 
 function item(over: Partial<ItemDef>): ItemDef {
   return {
@@ -93,6 +97,31 @@ describe('itemAffixTooltipLines: the esc() wrap over the composed line', () => {
       vi.doUnmock('../src/ui/i18n');
       vi.resetModules();
     }
+  });
+});
+
+describe('itemRatingTooltipLines: the Warfare main-hand rule', () => {
+  // countsWarfareRating (src/sim/pvp/power.ts) drops an offhand weapon's
+  // Warfare rating, so every weapon that carries it says so under the line.
+  const MAIN_HAND_ONLY = '<div class="tt-sub">Warfare counts only in the main hand.</div>';
+
+  it('follows a weapon Warfare line with the main-hand rule', () => {
+    const weapon = item({
+      kind: 'weapon',
+      slot: 'mainhand',
+      pvpOffenseRating: 45,
+      pvpDefenseRating: 73,
+    });
+    expect(itemRatingTooltipLines(weapon)).toBe(
+      `<div class="tt-green">+45 Warfare</div>${MAIN_HAND_ONLY}`,
+    );
+  });
+
+  it('leaves armor and Warfare-free weapons without it', () => {
+    const armor = item({ pvpOffenseRating: 45, pvpDefenseRating: 73 });
+    expect(itemRatingTooltipLines(armor)).toBe('<div class="tt-green">+45 Warfare</div>');
+    const plain = item({ kind: 'weapon', slot: 'mainhand' });
+    expect(itemRatingTooltipLines(plain)).toBe('');
   });
 });
 

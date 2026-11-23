@@ -1,5 +1,7 @@
-// Pure world-quest reroll leaf: deterministic selection, validation, and
-// assignment replacement. Zero RNG, no wall clock, no DOM/Three.js imports.
+// World-quest reroll: deterministic selection, validation, and assignment
+// replacement. Zero RNG, no wall clock, no DOM/Three.js imports. A quest may be
+// replaced while in progress: its progress is discarded and any live session
+// it started is torn down (world_quest_teardown.ts).
 
 import { WORLD_QUESTS_BY_ID } from './content/world_quests';
 import type { PlayerMeta } from './sim';
@@ -11,6 +13,7 @@ import {
   WORLD_QUESTS_BY_ZONE,
   worldQuestCycleNumber,
 } from './world_quest_rotation';
+import { endWorldQuestSession } from './world_quest_teardown';
 
 export interface CanRerollResult {
   readonly canReroll: boolean;
@@ -57,9 +60,6 @@ export function canRerollWorldQuest(
   const progress = meta.worldQuestLog.get(questId);
   if (progress?.state === 'completed' || progress?.practiceOnly || progress?.glider?.practiceOnly) {
     return { canReroll: false, reason: 'Completed world quests cannot be rerolled.' };
-  }
-  if (progress && progress.count > 0) {
-    return { canReroll: false, reason: 'In-progress world quests cannot be rerolled.' };
   }
 
   const activeQuests = playerActiveWorldQuests(meta, cycle);
@@ -156,6 +156,8 @@ export function rerollWorldQuest(ctx: SimContext, meta: PlayerMeta, questId: str
     return false;
   }
 
+  const current = playerActiveWorldQuests(meta, cycle).find((q) => q.id === questId);
+  if (current) endWorldQuestSession(ctx, meta, current);
   applyWorldQuestReroll(meta, questId, replacement, cycle);
   return true;
 }

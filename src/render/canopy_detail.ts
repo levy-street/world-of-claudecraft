@@ -52,7 +52,7 @@ const CANOPY_TEXTURE_PREFIX = 'Moss002';
 const MOSS002_AO_MEAN = 0.474;
 /** Full-depth diffuse span across the AO range (a spec's aoDepth scales it):
  *  at 1.0 the seams between clumps sit ~15% under the clump tops. */
-const CANOPY_AO_SPAN = 0.62;
+const CANOPY_AO_SPAN = 0.38;
 /** Down-facing crevice ramp: shading starts once the raw geometric normal
  *  points below the horizon by START and saturates at FULL. */
 const CANOPY_CREVICE_DOWN_START = 0.15;
@@ -105,23 +105,23 @@ export interface CanopyDetailSpec {
  * ferns tile finer because they are small and viewed close.
  */
 export const CANOPY_DETAIL_SPECS: Record<string, CanopyDetailSpec> = {
-  Leaves_Pine: { strength: 0.6, tileScale: 1 / 10, aoDepth: 1.2, creviceShade: 0.4, desat: 0.06 },
+  Leaves_Pine: { strength: 0.22, tileScale: 1 / 10, aoDepth: 0.48, creviceShade: 0.08, desat: 0 },
   Leaves_NormalTree: {
-    strength: 0.5,
-    tileScale: 1 / 10,
-    aoDepth: 1,
-    creviceShade: 0.26,
-    desat: 0.08,
+    strength: 0.24,
+    tileScale: 1 / 9,
+    aoDepth: 0.62,
+    creviceShade: 0.22,
+    desat: 0.04,
   },
   Leaves_TwistedTree: {
-    strength: 0.5,
+    strength: 0.2,
     tileScale: 1 / 10,
-    aoDepth: 1,
-    creviceShade: 0.26,
-    desat: 0.08,
+    aoDepth: 0.44,
+    creviceShade: 0.06,
+    desat: 0,
   },
-  // dressing bushes read closest and greenest: the strongest desat lives here
-  Leaves: { strength: 0.4, tileScale: 1 / 5, aoDepth: 0.7, creviceShade: 0.15, desat: 0.18 },
+  // dressing bushes: pull raw (0, 0.139, 0.025) neon green toward natural meadow chroma
+  Leaves: { strength: 0.18, tileScale: 1 / 5, aoDepth: 0.36, creviceShade: 0.08, desat: 0.3 },
 };
 
 interface CanopyTextures {

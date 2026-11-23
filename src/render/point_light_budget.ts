@@ -15,6 +15,31 @@ export interface FireLightSink {
   push(...lights: THREE.PointLight[]): number;
 }
 
+/**
+ * The register/release face of the renderer's point-light budget
+ * (`Renderer.budgetLights`), for a producer whose lights come and go with its
+ * own lifecycle rather than with an entity view's reconcile.
+ */
+export interface BudgetPointLightRegistry {
+  register(light: THREE.PointLight): void;
+  release(light: THREE.PointLight): void;
+}
+
+/**
+ * Join a self-driven light (its owner writes the intensity every frame) to the
+ * budget as a dynamic carrier source. It is marked first, so even a producer
+ * handed no registry never leaves a light three would gather beside the
+ * carriers; such a light simply draws nothing.
+ */
+export function adoptDynamicBudgetLight(
+  light: THREE.PointLight,
+  registry?: BudgetPointLightRegistry | null,
+): void {
+  light.userData.budgetDynamic = true;
+  markPointLightSource(light);
+  registry?.register(light);
+}
+
 export interface RankedPointLight {
   light: THREE.PointLight;
   d2: number;
@@ -89,6 +114,59 @@ function isDrawnEligible(light: THREE.PointLight, sceneRoot: THREE.Object3D): bo
   return false;
 }
 
+/**
+ * Swap one owner's whole set of budgeted lights for its next one, in place, and
+ * return the set to hold. For a producer that rebuilds its lights WHOLESALE
+ * rather than streaming them one at a time: the editor's authored map lights
+ * (Renderer.setEditorMapLights) are rebuilt as a group on every document edit,
+ * so without the release half, every edit would stack another 24 dead lights
+ * into the rank.
+ *
+ * Why the Studio needs this at all: it used to add every authored light to the
+ * scene live and leave it shining, which is not merely "a few extra lights".
+ * numPointLights is compiled into every lit material, so a 24-lamp city made
+ * EVERY material in the scene loop 24 lights per fragment and re-upload 24
+ * light structs on each material switch. Measured on one of SPACEY's maps
+ * (harbour, Retina, 2026-09-17): 63 -> 172 fps with the DRAW COUNT UNCHANGED -
+ * the cost was never geometry - and the lighting it bought was a look no
+ * player can see, since the shipped game budgets these same lights anyway.
+ *
+ * Authored intensities are captured as the budget's base, NOT as
+ * `budgetDynamic`: a lamp's brightness is a static document value, so the
+ * budget owns it and hands it back whenever the lamp wins a slot again.
+ */
+export function swapBudgetedLights(
+  viewLights: THREE.PointLight[],
+  previous: readonly THREE.PointLight[],
+  next: readonly THREE.PointLight[],
+): THREE.PointLight[] {
+  for (const light of previous) {
+    const index = viewLights.indexOf(light);
+    if (index >= 0) viewLights.splice(index, 1);
+  }
+  const held = [...next];
+  for (const light of held) {
+    // A carrier source at once, like a reconciled view light: three must
+    // never gather an authored lamp beside the fixed carriers.
+    markPointLightSource(light);
+    light.userData.budgetBase = light.intensity;
+    viewLights.push(light);
+  }
+  return held;
+}
+
+/** Steady authored lights (map lamps, non-lava pool glows: `userData.steady`)
+ *  outrank ambient flicker sources when the budget is contended, so a maker's
+ *  placed lamp does not go dark because a few campfires sit slightly closer.
+ *  A steady entry ranks as if twice as near (its squared distance quartered);
+ *  pure distance still orders entries within each class. Ranking only: the
+ *  shine range test below still reads the true d2. */
+const STEADY_RANK_D2_SCALE = 0.25;
+
+function rankDistance(entry: RankedPointLight): number {
+  return entry.light.userData.steady === true ? entry.d2 * STEADY_RANK_D2_SCALE : entry.d2;
+}
+
 /** Apply a fixed-count nearest-light budget without reallocating rank entries.
  *  Returns the number of counted, drawn-eligible lights. */
 export function applyPointLightBudget(
@@ -123,7 +201,9 @@ export function applyPointLightBudget(
   // are skipped by the running counter instead, so a hidden ancestor never
   // forces a per-frame sort of its own (the hot path stays allocation-free).
   if (ranked.length > liveBudget) {
-    ranked.sort((a, b) => Number(!a.eligible) - Number(!b.eligible) || a.d2 - b.d2);
+    ranked.sort(
+      (a, b) => Number(!a.eligible) - Number(!b.eligible) || rankDistance(a) - rankDistance(b),
+    );
   }
   let drawn = 0;
   for (let index = 0; index < ranked.length; index++) {
@@ -157,6 +237,10 @@ export function flickerContributingFireLights(
     const fireIndex = entry.fireIndex;
     if (fireIndex === undefined || entry.d2 >= rangeSq || entry.eligible === false) continue;
     const base = (entry.light.userData.baseIntensity as number | undefined) ?? 11;
-    entry.light.intensity = base + Math.sin(time * 11 + fireIndex * 1.7) * 2.5 * (base / 11);
+    // Steady lights (authored lamps, still pools) hold their base; fires flicker.
+    entry.light.intensity =
+      entry.light.userData.steady === true
+        ? base
+        : base + Math.sin(time * 11 + fireIndex * 1.7) * 2.5 * (base / 11);
   }
 }

@@ -82,27 +82,48 @@ const STEP_FRAG = /* glsl */ `
     float west = texture2D(uInput, vUv - vec2(uTexel.x, 0.0)).r;
     float north = texture2D(uInput, vUv + vec2(0.0, uTexel.y)).r;
     float south = texture2D(uInput, vUv - vec2(0.0, uTexel.y)).r;
-    float laplacian = east + west + north + south - 4.0 * height;
+    float ne = texture2D(uInput, vUv + vec2(uTexel.x, uTexel.y)).r;
+    float nw = texture2D(uInput, vUv + vec2(-uTexel.x, uTexel.y)).r;
+    float se = texture2D(uInput, vUv + vec2(uTexel.x, -uTexel.y)).r;
+    float sw = texture2D(uInput, vUv - vec2(uTexel.x, uTexel.y)).r;
+    // Isotropic 9-point Laplacian so expanding ripples and Kelvin wakes stay
+    // round rather than squaring off along the texture axes.
+    float laplacian = (east + west + north + south) * 0.8
+      + (ne + nw + se + sw) * 0.2
+      - 4.0 * height;
 
     velocity = (velocity + laplacian * uWaveCoefficient) * uDamping;
     height += velocity;
 
     vec2 worldPoint = uOrigin + vUv * uFieldSize;
     float impact = 0.0;
+    float velImpact = 0.0;
     for (int i = 0; i < ${IMPULSE_CAPACITY}; i++) {
       if (i >= uImpulseCount) break;
       vec4 endpoints = uImpulseEndpoints[i];
       vec4 shape = uImpulseShapes[i];
       vec2 motion = endpoints.zw - endpoints.xy;
-      float newVolume = capsuleProfile(worldPoint, endpoints.zw, shape.xy, shape.z);
-      if (dot(motion, motion) > 0.000001) {
-        float oldVolume = capsuleProfile(worldPoint, endpoints.xy, shape.xy, shape.z);
-        impact += (oldVolume - newVolume) * shape.w;
+      float motionLen = length(motion);
+      if (motionLen > 0.001) {
+        vec2 dir = motion / motionLen;
+        vec2 bowPos = endpoints.zw + dir * max(shape.z * 0.52, motionLen * 0.7);
+        vec2 sternPos = endpoints.xy - dir * (shape.z * 0.24);
+        float bowCrest = capsuleProfile(worldPoint, bowPos, shape.xy, shape.z * 0.92);
+        float sternTrough = capsuleProfile(worldPoint, sternPos, shape.xy, shape.z * 1.08);
+        // shape.w > 0 on moveContact: stern is depressed (-), bow is pushed up (+)
+        float dipole = (bowCrest * 0.85 - sternTrough * 1.0) * shape.w;
+        impact += dipole;
+        velImpact += dipole * 0.42;
       } else {
-        impact += newVolume * shape.w;
+        float newVolume = capsuleProfile(worldPoint, endpoints.zw, shape.xy, shape.z);
+        float outerRing = max(0.0, capsuleProfile(worldPoint, endpoints.zw, shape.xy, shape.z * 1.55) - newVolume);
+        float pulse = (newVolume - outerRing * 0.35) * shape.w;
+        impact += pulse;
+        velImpact += pulse * 0.48;
       }
     }
     height += impact;
+    velocity += velImpact;
 
     // The field is a WINDOW on a continuous surface, not a closed lake: absorb
     // at the rim so an outgoing wake leaves instead of reflecting back inward
@@ -113,11 +134,14 @@ const STEP_FRAG = /* glsl */ `
     height *= mix(0.72, 1.0, interior);
 
     float invSpan = 0.5 / max(uCellSize, 0.001);
-    vec2 slope = vec2(east - west, north - south) * invSpan;
+    vec2 slope = vec2(
+      (east - west) * 0.7 + (ne + se - nw - sw) * 0.15,
+      (north - south) * 0.7 + (ne + nw - se - sw) * 0.15
+    ) * invSpan;
     gl_FragColor = vec4(
       clamp(height, -0.65, 0.65),
-      clamp(velocity, -0.24, 0.24),
-      clamp(slope, vec2(-0.5), vec2(0.5))
+      clamp(velocity, -0.32, 0.32),
+      clamp(slope, vec2(-0.65), vec2(0.65))
     );
   }
 `;
@@ -192,10 +216,10 @@ export class WaterSimulation {
     this.enabled = supportsSimulation(renderer);
     this.plan = waterFieldPlan(GFX.waterTier);
     this.stepSeconds = 1 / this.plan.stepHz;
-    const propagationDistance = 10.5 * this.stepSeconds;
-    this.damping = 0.74 ** this.stepSeconds;
+    const propagationDistance = 11.8 * this.stepSeconds;
+    this.damping = 0.85 ** this.stepSeconds;
     this.waveCoefficient = Math.min(
-      0.38,
+      0.42,
       (propagationDistance * propagationDistance) / (this.plan.cellSize * this.plan.cellSize),
     );
 
@@ -283,7 +307,7 @@ export class WaterSimulation {
   }
 
   addSplash(x: number, z: number, radius: number, strength = 1): void {
-    this.enqueue(x, z, x, z, 0, 0, radius, -0.16 * clamp(strength, 0.15, 1.8));
+    this.enqueue(x, z, x, z, 0, 0, radius, -0.16 * clamp(strength, 0.15, 2.0));
   }
 
   enterContact(
@@ -305,7 +329,7 @@ export class WaterSimulation {
       axisX * axisScale,
       axisZ * axisScale,
       radius,
-      -0.13 * clamp(strength, 0.15, 1.8),
+      -0.15 * clamp(strength, 0.15, 2.0),
     );
   }
 
@@ -320,7 +344,7 @@ export class WaterSimulation {
     axisZ: number,
     strength = 1,
   ): void {
-    const amplitude = 0.075 * clamp(strength, 0.2, 1.8);
+    const amplitude = 0.11 * clamp(strength, 0.2, 1.8);
     const safeHalfLength = clamp(halfLength, 0, 1.6);
     const axisScale = safeHalfLength / Math.max(Math.hypot(axisX, axisZ), 0.0001);
     const shapeX = axisX * axisScale;
@@ -356,7 +380,7 @@ export class WaterSimulation {
       axisX * axisScale,
       axisZ * axisScale,
       radius,
-      0.09 * clamp(strength, 0.15, 1.8),
+      0.16 * clamp(strength, 0.15, 2.2),
     );
   }
 

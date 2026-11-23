@@ -1057,7 +1057,7 @@ export function mountAppearanceCustomizer(
     pBody,
     'auth.body',
     ['male', 'female'],
-    (g) => (g === 'male' ? 'auth.genderMale' : 'auth.genderFemale'),
+    (g) => (g === 'male' ? 'auth.bodyTypeA' : 'auth.bodyTypeB'),
     () => value.gender,
     (g) => {
       // Lashes follow the body. They are the female standard and off on the

@@ -1,5 +1,6 @@
 // The renderer's farm event route (Masterwrought phase 18, item
-// renderer-farm-event-route-pin): handleEvent's switch routes EXACTLY the three
+// renderer-farm-event-route-pin): the event switch (dispatchEvent, which
+// handleEvent wraps in the Spell Effects event scope) routes EXACTLY the three
 // farm flourish events (farmPlanted, farmHarvested, farmWithered) to
 // farmPatchVisuals.onFarmEvent, and nothing else. The adapter suite pins what
 // onFarmEvent does with each; this file pins that the renderer still sends
@@ -19,11 +20,11 @@ const ROUTED = ['farmPlanted', 'farmHarvested', 'farmWithered'];
 const read = (rel: string): string =>
   stripComments(readFileSync(new URL(`../${rel}`, import.meta.url), 'utf8'));
 
-/** The body of `handleEvent(ev: SimEvent): void {`, brace-walked from its
+/** The body of `dispatchEvent(ev: SimEvent): void {`, brace-walked from its
  *  declaration (never a `.handleEvent(` call reference). */
 function handleEventBody(renderer: string): string {
-  const decl = renderer.indexOf('  handleEvent(ev: SimEvent): void {');
-  expect(decl, 'handleEvent declaration not found').toBeGreaterThan(-1);
+  const decl = renderer.indexOf('  private dispatchEvent(ev: SimEvent): void {');
+  expect(decl, 'dispatchEvent declaration not found').toBeGreaterThan(-1);
   const open = renderer.indexOf('{', decl);
   let depth = 0;
   for (let i = open; i < renderer.length; i++) {
@@ -42,10 +43,10 @@ describe('the renderer farm event route', () => {
   const call = 'this.farmPatchVisuals?.onFarmEvent(ev, this.sim.playerId);';
 
   it('routes exactly the three flourish events to farmPatchVisuals.onFarmEvent, and no other case', () => {
-    // Exactly one dispatch, inside handleEvent.
+    // Exactly one dispatch, inside dispatchEvent.
     expect(renderer.split(call)).toHaveLength(2);
     const callAt = body.indexOf(call);
-    expect(callAt, 'the dispatch must sit inside handleEvent').toBeGreaterThan(-1);
+    expect(callAt, 'the dispatch must sit inside dispatchEvent').toBeGreaterThan(-1);
     // The case labels immediately preceding the dispatch, walked back from
     // it: every `case 'x':` up to the previous statement (a `break;`, a `}`
     // or another dispatch), in source order.

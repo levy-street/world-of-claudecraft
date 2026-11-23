@@ -1,5 +1,5 @@
-// Mirrors the self-wire record's static combat-rating scalars and weapon
-// fields onto the ClientWorld's local Entity mirror. Kept as its own module
+// Mirrors the self-wire record's static combat-rating scalars, weapon fields and
+// death state onto the ClientWorld's local Entity mirror. Kept as its own module
 // (the account_cosmetics_wire.ts / guild_bank_log_wire.ts convention) so
 // online.ts stays a consumer rather than growing another decode block; a new
 // self-wire scalar lands here, not as another inline `e.x = s.y ?? e.x` line
@@ -44,6 +44,14 @@ export function applySelfCombatScalars(e: Entity, s: any): void {
   // swords rode a recent-personal-event heuristic (hud.ts), so a raider a boss
   // held who had not yet traded a blow saw no combat state at all.
   if (s.cbt !== undefined) e.inCombat = s.cbt === 1;
+  // The death state (server/self_scalar_wire.ts `corpse` / `pvr`). The corpse
+  // position while a ghost (null once resurrected) drives the corpse marker and
+  // the resurrect button; the PvP Resurrect bit, 0/1, drives the death screen's
+  // PvP Resurrect button. Both delta-guarded: an omitted key is unchanged.
+  if (s.corpse !== undefined) e.corpsePos = s.corpse ?? null;
+  if (s.pvr !== undefined) e.pvpResurrect = s.pvr === 1;
+  // The wait before that offer may be taken, whole seconds (`pvrw`).
+  if (s.pvrw !== undefined) e.pvpResurrectWait = s.pvrw;
   e.weapon = s.weapon ?? e.weapon;
   // offhandWeapon can legitimately BE null (unequipped), so it needs the
   // explicit presence check the other fields above don't: `?? e.X` would keep

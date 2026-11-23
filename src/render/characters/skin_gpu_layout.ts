@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { carryGeometryLod } from '../assets/geometry_lod';
 
 export interface SkinGpuLayoutStats {
   skeletons: number;
@@ -45,6 +46,12 @@ function referencedBones(
   return { ordered, remap };
 }
 
+/** Every bone, unmoved: the palette a keepPalette rig keeps. */
+function identityReferences(boneCount: number): { ordered: number[]; remap: Int32Array } {
+  const ordered = Array.from({ length: boneCount }, (_, i) => i);
+  return { ordered, remap: Int32Array.from(ordered) };
+}
+
 function remappedSkinIndex(
   source: SkinIndexAttribute,
   remap: Int32Array,
@@ -61,6 +68,13 @@ function remappedSkinIndex(
   return new THREE.BufferAttribute(array, source.itemSize);
 }
 
+export interface SkinGpuLayoutOptions {
+  /** Keep every palette matrix (narrow the joint attribute only): a rig whose skeleton more
+   *  parts bind to later, such as a WOC base that streamed armor attaches to by bone name
+   *  (woc_armor_bind.ts), must keep bones its own meshes never fetch. */
+  keepPalette?: boolean;
+}
+
 /**
  * Remove palette matrices that no skinIndex slot fetches and narrow the joint
  * attribute to its smallest exact integer representation.
@@ -69,7 +83,10 @@ function remappedSkinIndex(
  * matrices before multiplying by the weights, so preserving those references
  * keeps the shader's inputs and arithmetic exactly unchanged.
  */
-export function optimizeSkinGpuLayout(root: THREE.Object3D): SkinGpuLayoutStats {
+export function optimizeSkinGpuLayout(
+  root: THREE.Object3D,
+  opts?: SkinGpuLayoutOptions,
+): SkinGpuLayoutStats {
   const stats: SkinGpuLayoutStats = {
     skeletons: 0,
     paletteMatricesBefore: 0,
@@ -98,11 +115,12 @@ export function optimizeSkinGpuLayout(root: THREE.Object3D): SkinGpuLayoutStats 
       continue;
     }
 
-    const references = referencedBones(meshes, skeleton.bones.length);
-    if (!references || references.ordered.length > 0x10000) {
+    const found = referencedBones(meshes, skeleton.bones.length);
+    if (!found || found.ordered.length > 0x10000) {
       stats.paletteMatricesAfter += skeleton.bones.length;
       continue;
     }
+    const references = opts?.keepPalette ? identityReferences(skeleton.bones.length) : found;
 
     const compactPalette = references.ordered.length < skeleton.bones.length;
     const optimizedGeometry = new Map<THREE.BufferGeometry, THREE.BufferGeometry>();
@@ -128,6 +146,8 @@ export function optimizeSkinGpuLayout(root: THREE.Object3D): SkinGpuLayoutStats 
       let geometry = optimizedGeometry.get(sourceGeometry);
       if (!geometry) {
         geometry = sourceGeometry.clone();
+        // the same vertices in the same order: its coarser levels hold (assets/geometry_lod.ts)
+        carryGeometryLod(sourceGeometry, geometry);
         geometry.setAttribute(
           'skinIndex',
           remappedSkinIndex(sourceIndex, references.remap, references.ordered.length),

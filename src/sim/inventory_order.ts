@@ -14,7 +14,13 @@
 //
 // Pure leaf: no SimContext, no rng, no clock. The sim's move command and the HUD's grid
 // both call this, so what the player drags onto is what the server rearranges.
+//
+// A player-locked stack (item_lock.ts) is also locked to its CELL: no drag moves it and
+// no drag displaces it, so a second gear set parked in the bags stays exactly where the
+// player put it. The equip swap (items.ts equipItem) is the one sanctioned way a locked
+// cell changes hands: the piece it replaces lands in the cell the locked copy left.
 
+import { isItemLocked } from './item_lock_flag';
 import type { InvSlot } from './types';
 
 /** A laid-out bag: one entry per cell, null where the cell is empty. */
@@ -73,13 +79,55 @@ export function cellOfIndex(inventory: readonly InvSlot[], capacity: number): nu
   return at;
 }
 
+/** Stamp every stack's CURRENT cell as its hint, so the visible grid survives an array
+ *  mutation (a splice, a push) untouched: a hint-less stack placed by the first-free
+ *  fallback would otherwise slide into whatever hole the mutation opens. Returns the
+ *  cell per inventory index (-1 past the grid), the cellOfIndex shape. */
+export function freezeBagCells(inventory: readonly InvSlot[], capacity: number): number[] {
+  const cells = layoutBagCells(inventory, capacity);
+  const at = new Array<number>(inventory.length).fill(-1);
+  for (let cell = 0; cell < cells.length; cell++) {
+    const stack = cells[cell];
+    if (!stack) continue;
+    const index = inventory.indexOf(stack);
+    if (index < 0) continue;
+    // Past-the-grid overflow stays hint-less: it is not a real cell to pin.
+    if (cell < capacity) stack.slot = cell;
+    at[index] = cell < capacity ? cell : -1;
+  }
+  return at;
+}
+
+/** Stamp the cell `stack` currently lays out in as its hint, so a hint-less stack placed
+ *  by the first-free fallback stays there instead of sliding when an earlier hint-less
+ *  stack leaves. The layout is unchanged by the stamp (the fallback already put it in
+ *  that cell). A stack past the grid, or not in `inventory`, is left alone. */
+export function pinStackToCurrentCell(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  stack: InvSlot,
+): void {
+  const index = inventory.indexOf(stack);
+  if (index < 0) return;
+  const cell = cellOfIndex(inventory, capacity)[index];
+  if (cell !== undefined && cell >= 0 && cell < Math.floor(capacity)) stack.slot = cell;
+}
+
+/** True when a drag may not move this stack, or may not displace it: the owner locked
+ *  it, which pins it to its cell. */
+export function isCellPinned(stack: InvSlot | null | undefined): boolean {
+  return !!stack && isItemLocked(stack.instance);
+}
+
 /** Move the stack at inventory index `from` into bag cell `to`.
  *
  *  Empty cell: the stack simply parks there, leaving a hole behind it.
  *  Occupied cell: the two stacks TRADE cells, so nothing is ever displaced into limbo.
  *
  *  Returns false (mutating nothing) when the move is illegal, so a hand-crafted wire
- *  command cannot park a stack outside the bag or move a stack that is not there. */
+ *  command cannot park a stack outside the bag or move a stack that is not there. A
+ *  locked stack is pinned on both ends: it cannot be moved, and nothing can be dropped
+ *  onto its cell. */
 export function moveStackToCell(
   inventory: InvSlot[],
   from: number,
@@ -91,10 +139,12 @@ export function moveStackToCell(
   if (to < 0 || to >= Math.floor(capacity)) return false;
   const moved = inventory[from];
   if (!moved) return false;
+  if (isCellPinned(moved)) return false;
   const cells = layoutBagCells(inventory, capacity);
   const fromCell = cells.indexOf(moved);
   if (fromCell === to) return false;
   const displaced = cells[to] ?? null;
+  if (isCellPinned(displaced)) return false;
   // Write BOTH stacks' cells explicitly: the displaced one keeps its position by taking
   // the cell the moved stack vacated, and every other stack keeps whatever cell the
   // layout already gave it, so a single drag can never reshuffle the whole bag.

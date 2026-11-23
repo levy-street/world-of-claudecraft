@@ -339,3 +339,34 @@ export function farmCompostBinPosition(patch: FarmPatchDef): { x: number; z: num
   // Beds fill row by row from the north-west, so beds[0] IS the first row.
   return { x: minX - FARM_COMPOST_BIN_OFFSET, z: patch.beds[0].z };
 }
+
+/** One pose of a bed in the map editor (editor_api/moved_object_preview.ts). */
+export interface FarmBedPose {
+  readonly x: number;
+  readonly z: number;
+  readonly rotY?: number;
+}
+
+/**
+ * Where a crop seat lands when the map editor drags its bed from one pose to
+ * another: carried by the same move as the bed (turned about the bed's base
+ * point by the yaw change, then shifted), with the ground re-sampled under
+ * the new spot, so the crop keeps its place in the bed. `turn` is the yaw the
+ * seat's own orientation takes on.
+ */
+export function farmSeatAfterBedMove(
+  seat: { readonly x: number; readonly z: number },
+  from: FarmBedPose,
+  to: FarmBedPose,
+  ground: (x: number, z: number) => number,
+): { x: number; y: number; z: number; turn: number } {
+  const turn = (to.rotY ?? 0) - (from.rotY ?? 0);
+  const dx = seat.x - from.x;
+  const dz = seat.z - from.z;
+  // A yaw of `turn` about +y, the same rotation the bed instance takes.
+  const cos = Math.cos(turn);
+  const sin = Math.sin(turn);
+  const x = to.x + dx * cos + dz * sin;
+  const z = to.z - dx * sin + dz * cos;
+  return { x, y: ground(x, z), z, turn };
+}

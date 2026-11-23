@@ -154,7 +154,7 @@ interface MapHudHarness {
     paintWorldMap(): { title: string; model: null } | null;
   };
   continentPainter: {
-    paintContinent(): { regions: ContinentZoneRegion[] };
+    paintContinent(): { regions: ContinentZoneRegion[]; ports: [] };
   };
 }
 
@@ -473,6 +473,7 @@ function lifecycleHarness(): {
     interiorMaps: { paintWorldMap: vi.fn(() => null) },
     continentPainter: {
       paintContinent: () => ({
+        ports: [],
         regions: [
           {
             zoneId: zone.id,

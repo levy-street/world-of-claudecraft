@@ -49,7 +49,11 @@ function detailAt(
 // numeric literal OR the MAX_OUTDOOR_FOG_FAR constant (the open-sky realms), and
 // the row-count pin below makes a silently unparseable row a failure, not a
 // silently shrunken sweep.
-const rendererSrc = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+// The fog presets moved out of renderer.ts into their own data module.
+const presetsSrc = readFileSync(
+  new URL('../src/render/outdoor_biome_presets.ts', import.meta.url),
+  'utf8',
+);
 
 function maxOutdoorFogFar(): number {
   const src = readFileSync(new URL('../src/render/zone_streaming.ts', import.meta.url), 'utf8');
@@ -67,8 +71,8 @@ function shippedBiomeFog(): { biome: string; near: number; far: number }[] {
   // field) silently moved it in front of the table, leaving this sweep parsing a
   // 230 KB body with no fog row in it. `[^=]*` crosses the Record<...> type, whose
   // own brace is what kept the anchor off the declaration in the first place.
-  const block = /static BIOME_FOG[^=]*=\s*\{([\s\S]*?)\n {2}\};/.exec(rendererSrc);
-  expect(block, 'BIOME_FOG table not found in renderer.ts').not.toBe(null);
+  const block = /export const BIOME_FOG[^=]*=\s*\{([\s\S]*?)\n\};/.exec(presetsSrc);
+  expect(block, 'BIOME_FOG table not found in outdoor_biome_presets.ts').not.toBe(null);
   const body = (block as RegExpExecArray)[1];
   const rows = [...body.matchAll(/(\w+):\s*\{[^}]*near:\s*([\d.]+),\s*far:\s*([\w.]+)/g)].map(
     (m) => ({
@@ -89,8 +93,8 @@ function shippedBiomeFog(): { biome: string; near: number; far: number }[] {
 // The one preset the lean tier ever sees: outdoorFogPreset() returns LOW_FOG on
 // the low tier, so the lean sweep runs against it rather than the biome table.
 function shippedLowFog(): { biome: string; near: number; far: number } {
-  const m = /LOW_FOG = \{ color: \w+, near: ([\d.]+), far: ([\d.]+) \}/.exec(rendererSrc);
-  expect(m, 'LOW_FOG preset not found in renderer.ts').not.toBe(null);
+  const m = /LOW_FOG = \{ color: \w+, near: ([\d.]+), far: ([\d.]+) \}/.exec(presetsSrc);
+  expect(m, 'LOW_FOG preset not found in outdoor_biome_presets.ts').not.toBe(null);
   const [, near, far] = m as RegExpExecArray;
   return { biome: 'low-tier', near: Number(near), far: Number(far) };
 }
@@ -401,7 +405,10 @@ describe('foliage LOD: the lean rock/dressing caps measure from the near edge', 
   // out as the camera orbited, while its collider still blocked movement.
   const cap = LOD_LOW.rockFar; // 190
   const leanScale = foliageDistanceScale(1, true); // 1 at a rested budget
-  const radius = 290; // a shipped lean rock slab (see the world-data sweep below)
+  // A halves-era lean rock slab (the out-radius case: its near edge can sit under
+  // the player). The lean tier now buckets on a BUCKET_DEPTH grid, whose widest
+  // shipped rock slab is about 187 yd (see the world-data sweep below).
+  const radius = 290;
   const leanRocks = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
     windowFor({ centerDist, radius, maxDist: cap, distanceScale: leanScale, ...over });
 
@@ -446,26 +453,40 @@ describe('foliage LOD: the lean rock/dressing caps measure from the near edge', 
     expect(bucketVisible({ ...w, centerDist: 300 + radius })).toBe(false); // whole slab past swap
   });
 
-  it('the shipped world really has lean rock slabs wider than the rock cap', () => {
-    // Re-bucket the live decorations the way buildTrees() does (two columns
-    // split on x < 0, one band per BUCKET_DEPTH from WORLD_MIN_Z, radius from
-    // the bucket's bounds plus the canopy margin) and show the gap is real:
-    // a boulder on a slab's near edge can be under the player while the
-    // slab's center is past the cap. Parsed from the renderer so a re-bucketing
-    // that closes the gap by itself retires this pin honestly.
+  it('the shipped world really has lean rock slabs deep enough for the centre rule to hide', () => {
+    // Re-bucket the live decorations the way buildTrees() does on the LEAN tier
+    // (the tier this cap belongs to) and show the gap is real: a boulder on a
+    // slab's near edge sits inside the cap while the slab's centre is past it,
+    // for every camera-to-centre distance in the (cap, cap + radius) band.
+    // Parsed from the renderer so a re-bucketing that closes the gap by itself
+    // retires this pin honestly. Since 28539d3de5c the lean tier buckets on a
+    // BUCKET_DEPTH grid (no longer two half-world columns), so no lean rock slab
+    // out-radiuses the cap any more (widest about 187 yd against 190), but most
+    // still hide a band more than half the cap deep; the bucket bounds moved
+    // into foliageSpotsBounds (foliage_tree_sculpt.ts) with the genshin merge
+    // (e10ecc2aef8).
     const foliageSrc = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
+    const sculptSrc = readFileSync(
+      new URL('../src/render/foliage_tree_sculpt.ts', import.meta.url),
+      'utf8',
+    );
     const depth = Number(/const BUCKET_DEPTH = (\d+)/.exec(foliageSrc)?.[1]);
     const margin = Number(
-      /Math\.hypot\(maxX - minX, maxZ - minZ\) \/ 2 \+ (\d+); \/\/ canopy/.exec(foliageSrc)?.[1],
+      /foliageSpotsBounds\(items, (\d+)\); \/\/ canopy margin/.exec(foliageSrc)?.[1],
     );
     expect(depth).toBeGreaterThan(0);
     expect(margin).toBeGreaterThan(0);
+    // The two rules this sweep re-derives, pinned where they live.
+    expect(foliageSrc).toContain(
+      'const col = GFX.leanFoliage ? Math.floor(d.x / BUCKET_DEPTH) : d.x < 0 ? 0 : 1;',
+    );
+    expect(sculptSrc).toContain('radius: Math.hypot(maxX - minX, maxZ - minZ) / 2 + margin,');
     const bounds = new Map<
       string,
       { minX: number; maxX: number; minZ: number; maxZ: number; rocks: number }
     >();
     for (const d of generateDecorations(WORLD_SEED)) {
-      const key = `${Math.floor((d.z - WORLD_MIN_Z) / depth)}:${d.x < 0 ? 0 : 1}`;
+      const key = `${Math.floor((d.z - WORLD_MIN_Z) / depth)}:${Math.floor(d.x / depth)}`;
       let b = bounds.get(key);
       if (!b) {
         b = { minX: d.x, maxX: d.x, minZ: d.z, maxZ: d.z, rocks: 0 };
@@ -482,12 +503,10 @@ describe('foliage LOD: the lean rock/dressing caps measure from the near edge', 
       .map((b) => Math.hypot(b.maxX - b.minX, b.maxZ - b.minZ) / 2 + margin);
     expect(radii.length).toBeGreaterThan(0);
     const widest = Math.max(...radii);
-    // Most rock slabs out-radius the rested lean cap; the center rule
-    // therefore hides a near-edge boulder from a camera anywhere in the
-    // (cap, radius) annulus of slab-center distances.
-    const wider = radii.filter((r) => r > cap * leanScale).length;
-    expect(wider / radii.length).toBeGreaterThan(0.5);
-    expect(widest).toBeGreaterThan(cap * leanScale);
+    // Most lean rock slabs hide a band more than half the rested cap deep: the
+    // centre rule drops a near-edge boulder from a camera anywhere in it.
+    const deep = radii.filter((r) => r > (cap * leanScale) / 2).length;
+    expect(deep / radii.length).toBeGreaterThan(0.5);
     const camToCenter = cap * leanScale + 1;
     expect(bucketVisible(leanRocks(camToCenter, { radius: widest }))).toBe(false);
     expect(bucketVisible(leanRocks(camToCenter, { radius: widest, maxNearEdge: true }))).toBe(true);

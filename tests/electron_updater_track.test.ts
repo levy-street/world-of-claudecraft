@@ -106,13 +106,13 @@ describe('initUpdater track wiring', () => {
     expect(sent).toEqual([{ type: 'available', version: '0.23.0' }]);
   });
 
-  it('REFUSES a cross-origin update: no download, no toast, loud log', () => {
+  it('REFUSES a cross-origin update and reports failure without downloading', () => {
     const fake = makeFakeAutoUpdater();
     const { deps, sent, log } = makeDeps(fake, PROD);
     initUpdater(deps);
     fake.emit('update-available', { version: '0.23.1', wocApiOrigin: DEV });
     expect(fake.downloadUpdate).not.toHaveBeenCalled();
-    expect(sent).toEqual([]);
+    expect(sent).toEqual([{ type: 'error' }]);
     expect(log.error).toHaveBeenCalledTimes(1);
     const [message, detail] = log.error.mock.calls[0] as [string, Record<string, unknown>];
     expect(message).toContain('REFUSED');
@@ -154,6 +154,55 @@ describe('initUpdater track wiring', () => {
     fake.emit('error', new Error('feed host down'));
     // The error payload must stay bare: no message ever reaches the page.
     expect(sent).toEqual([{ type: 'checking' }, { type: 'not-available' }, { type: 'error' }]);
+  });
+
+  it('allows only trusted manual checks and shares an in-flight check', async () => {
+    const fake = makeFakeAutoUpdater();
+    const { deps } = makeDeps(fake, PROD);
+    let trusted = false;
+    initUpdater({ ...deps, isTrusted: () => trusted });
+    const check = (
+      deps.ipcMain.handle.mock.calls as unknown as [string, (event: unknown) => Promise<string>][]
+    ).find(([channel]) => channel === 'desktop-update-check')![1];
+    expect(await check({})).toBe('unavailable');
+    expect(fake.checkForUpdates).not.toHaveBeenCalled();
+    trusted = true;
+    const first = check({});
+    const second = check({});
+    expect(first).toBe(second);
+    expect(await first).toBe('checking');
+    expect(fake.checkForUpdates).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a running download single and offers an already downloaded update immediately', async () => {
+    const fake = makeFakeAutoUpdater();
+    const { deps } = makeDeps(fake, PROD);
+    initUpdater(deps);
+    const check = (
+      deps.ipcMain.handle.mock.calls as unknown as [string, (event: unknown) => Promise<string>][]
+    ).find(([channel]) => channel === 'desktop-update-check')![1];
+    const offer = { version: '0.46.0', wocApiOrigin: PROD };
+    fake.emit('update-available', offer);
+    fake.emit('update-available', offer);
+    expect(fake.downloadUpdate).toHaveBeenCalledTimes(1);
+    expect(await check({})).toBe('checking');
+    expect(fake.checkForUpdates).not.toHaveBeenCalled();
+    fake.emit('update-downloaded', offer);
+    expect(await check({})).toBe('ready');
+  });
+
+  it('answers a failed manual check and lets the next click retry', async () => {
+    const fake = makeFakeAutoUpdater();
+    fake.checkForUpdates = vi.fn(() => Promise.reject(new Error('offline')));
+    const { deps, sent } = makeDeps(fake, PROD);
+    initUpdater(deps);
+    const check = (
+      deps.ipcMain.handle.mock.calls as unknown as [string, (event: unknown) => Promise<string>][]
+    ).find(([channel]) => channel === 'desktop-update-check')![1];
+    expect(await check({})).toBe('unavailable');
+    expect(sent).toEqual([{ type: 'error' }]);
+    expect(await check({})).toBe('unavailable');
+    expect(fake.checkForUpdates).toHaveBeenCalledTimes(2);
   });
 });
 

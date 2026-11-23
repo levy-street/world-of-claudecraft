@@ -2,7 +2,7 @@
 //
 // A vault command reserves its worst-case bank_ledger row count BEFORE the Sim
 // mutates (server/vault_wire.ts reserveLedgerRows), and the exact rows are
-// derived afterwards by diffing vaultInfoFor. A commit whose rows exceed the
+// derived afterwards from exact successful movement facts. A commit whose rows exceed the
 // reservation is a post-mutation projection failure, which the live host
 // treats as terminal: the session is quarantined and disconnected (game.ts
 // quarantineBankLedgerProjection). So the reservation MUST be a true upper
@@ -97,7 +97,7 @@ export function vaultDepositAllLedgerRowBound(inventory: readonly InvSlot[]): nu
  *  bounds to that row's distinct identities; a selector the Sim will not
  *  resolve is a no-op that writes nothing, so it bounds to one. */
 export function vaultWithdrawLedgerRowBound(
-  before: VaultInfo | null,
+  before: { readonly special: readonly InvSlot[] } | null,
   itemId: string,
   special: VaultSpecialRef | undefined,
 ): number {

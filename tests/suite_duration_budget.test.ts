@@ -69,20 +69,43 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   // the D136 nonce-expiry and D145 displacement-race arms this wave added, each
   // parking on a contended row against the real lock_timeout. The exact row
   // records that parallelizable shape without promoting it into the measured lane:
-  // 120_000 + 30_000 + 15 * 30_000 = 600_000.
-  ['tests/character_save_statement_pg_integration.test.ts', 600_000],
+  // The pending v1-market-backfill upgrade proof already declares a separate
+  // 120s case. This ledger records existing declarations, not new timeouts:
+  // 120_000 + 30_000 + 15 * 30_000 + 120_000 = 720_000.
+  ['tests/character_save_statement_pg_integration.test.ts', 720_000],
   ['tests/chronomancy_balance_targets.test.ts', 420_000],
   // The real-suite shard collection case walks the complete test corpus and
   // needs a 60s allowance on low-worker hosts; the other timeout pins in this
-  // file keep the exact aggregate just above the default.
-  ['tests/ci_shard_plan.test.ts', 310_000],
+  // file keep the exact aggregate just above the default. The fail-closed relay
+  // case adds 65_000 so runEntry's own 60s child deadline governs a full-tree scan.
+  ['tests/ci_shard_plan.test.ts', 375_000],
   ['tests/discord_db_integration.test.ts', 420_000],
+  // The Mirefen tavern's whole-world build (the collider grid, the floor fold and the keeper
+  // spawn over a full Sim) carries three raised cases: 180_000 + 120_000 + 120_000 plus
+  // default-bounded rest, measured at 480_000 in all.
+  ['tests/mirefen_tavern.test.ts', 480_000],
   ['tests/dragonkin_whelp_litter.test.ts', 420_000],
-  ['tests/druid_balance_probe.test.ts', 540_000],
+  // The claim roster pulls, resets and kills every dungeon boss in three raised
+  // cases, each a full instance run: 3 * 120_000.
+  ['tests/dungeon_run_roster.test.ts', 360_000],
+  // Korzul's wake and pull: one whole-crypt build at 180_000 plus six encounter
+  // cases at 60_000 each, every one over the 20 s default under a loaded run:
+  // 180_000 + 6 * 60_000.
+  ['tests/gravewyrm_korzul.test.ts', 540_000],
+  // The Moon Stair entrance suite builds a whole shipped world (makeSim) in each of its
+  // eight walk and spawn cases, each raised to 180_000 for a cold CI build: 8 * 180_000.
+  // The rest stay default-bounded; the file measured 4.6 s of test time locally.
+  ['tests/drowned_temple_entrance.test.ts', 1_440_000],
+  ['tests/druid_balance_probe.test.ts', 600_000],
   ['tests/emerald_deck_escape.test.ts', 540_000],
   ['tests/guild_bank_pg_integration.test.ts', 840_000],
   ['tests/nythraxis_matrix.test.ts', 1_200_000],
   ['tests/owned_class_balance_dps_probes.test.ts', 360_000],
+  // The Groveheart harness: its 60 s healing probe measured about 13 s alone
+  // and 17 s under vitest, too close to the 20 s default under a loaded full
+  // run, so it takes the long-sims 120 s budget beside the 300 s contract case:
+  // 120_000 + 300_000 = 420_000 (the same shape as the chronomancy targets).
+  ['tests/owned_class_balance_groveheart.test.ts', 420_000],
   // The shared PostgreSQL escrow fixture carries a 30s setup hook plus ten
   // independently bounded 30s cases. The exact row records that existing
   // parallelizable shape without promoting the suite into the measured lane.

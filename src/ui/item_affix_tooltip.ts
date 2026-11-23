@@ -3,6 +3,7 @@
 // the combat ratings, matching the catalog doc's Stats | Affix | Ratings
 // column order. Healing Power has no character-sheet cell yet, so its label
 // key is addressed directly rather than through statNameKey's StatId union.
+import { countsWarfareRating } from '../sim/pvp/power';
 import type { ItemDef } from '../sim/types';
 import { esc } from './esc';
 import { type TranslationKey, t } from './i18n';
@@ -45,7 +46,13 @@ export function itemRatingTooltipLines(item: ItemDef): string {
       }),
     )}</div>`;
   const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
-  if (warfareRating > 0) html += line(warfareRating, 'warfare');
+  if (warfareRating > 0) {
+    html += line(warfareRating, 'warfare');
+    // The one rule (src/sim/pvp/power.ts): an item that adds none in the offhand
+    // only counts in the main hand.
+    if (!countsWarfareRating('offhand', item))
+      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.warfareMainHandOnly'))}</div>`;
+  }
   for (const ratingStat of ['hitRating', 'critRating', 'hasteRating'] as const) {
     const value = item[ratingStat] ?? 0;
     if (value > 0) html += line(value, ratingStat);

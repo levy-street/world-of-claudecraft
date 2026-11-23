@@ -29,11 +29,14 @@ mobile portrait *and* landscape before calling UI work done.
   margins/padding are added). Flex/grid + fluid type; no ad-hoc inline styles.
 - **Mobile touch** (gate on touch capability / runtime state, not only `max-width`: landscape
   phones need it too):
-  - Every visible `input`/`select`/`textarea` is **>=16px** font, or iOS Safari auto-zooms the
+  - Every visible `input`/`select`/`textarea` is **>=16px rendered** font, or iOS Safari auto-zooms the
     page on focus (it ignores the viewport `user-scalable=no`/`maximum-scale`; font-size is the
     only reliable fix). Enforced centrally by the `@media (pointer: coarse)` 16px `!important`
-    floor in `src/styles/base.css` (the admin bundle mirrors it in `src/admin/styles/`); never
-    set a per-control mobile font below 16px. Regression check:
+    floor and `body.mobile-touch` fallback in `src/styles/base.css`. Inside `#ui`, the
+    inherited `--touch-input-font-size` compensates for UI Scale below 1; a computed
+    16px font alone can render smaller after CSS zoom. The admin bundle has its own
+    unscaled floor in `src/admin/styles/`. Never set a per-control mobile font below
+    the rendered floor. Regression check:
     `node scripts/mobile_input_zoom_check.mjs` (needs `npm run dev`).
   - Every tappable target stays **>=40x40px** on mobile touch (the preferred floor); 24x24px
     (WCAG 2.2 SC 2.5.8) is the absolute minimum, used only where 40x40 is genuinely infeasible.
@@ -602,6 +605,13 @@ same file), and each module's header carries its own contract.
   members (a captured pet id would go stale). The sliver is deliberately NOT class `bar`
   (two shipped rules select every non-hp `.bar` child of a row) and not role=button (the row
   is the button; a nested control is the axe nested-interactive violation).
+- **hud/target_frame_menu.ts**: the pure half of the target frame's right-click menu.
+  `targetFrameMenuKind` is the ONE place that decides which menu a target opens (another
+  player, your own pet, your own cosmetic buddy, or a markable wild hostile), and
+  `buddyMenuHtml` builds the buddy menu's rows; `hud.ts` keeps only the openers, which
+  place the popup and bind its rows. A buddy is deliberately NOT a pet here: it takes no
+  pet command, so `isControllableOwnedPet` excludes it and `isOwnBuddy` (`pet_entity.ts`)
+  routes it to its own one-row menu (autoloot).
 - **hud/vendor/vendor_view.ts** / **vendor_window.ts**: the first window migrated out of
   `hud.ts` by the recipe above (pure view decides the rows; thin consumer paints from
   injected `deps`).
@@ -615,7 +625,9 @@ same file), and each module's header carries its own contract.
   `window_resize_core.ts`) + **movable_frame.ts** (pure
   `target_frame_pos.ts`; `frame_pos_reset.ts`): the shared SE-corner resize grip on every
   `.window.panel` and the movable/lockable unit-frame controller, both instance-parameterized.
-  Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; titlebar drag is frame-batched
+  Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; a bottom-anchored window (the
+  bags) also gets a NW grip via `TOP_LEFT_GRIP_WINDOW_IDS`, which titlebar drag yields to
+  (`isTopLeftResizeGrip`), so it can grow upward; titlebar drag is frame-batched
   and compositor-only until it commits through Hud's shared position clamp. Bump
   `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position reset.
 - **interface_unlock.ts** (pure `interface_unlock_core.ts`): the "Unlock interface" Interface

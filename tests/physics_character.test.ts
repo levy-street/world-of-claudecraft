@@ -27,6 +27,7 @@ import {
 import { LEDGE_GRAB_MIN } from '../src/sim/physics/ledge';
 import { GRAVITY, JUMP_VELOCITY } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
+import { traversalBand } from '../src/sim/traversal_band';
 import type { WorldContent } from '../src/sim/types';
 import { RUN_SPEED } from '../src/sim/types';
 import {
@@ -124,7 +125,8 @@ function findStrideableStone(): { x: number; z: number; scale: number } | undefi
       const cz = c.z ?? 0;
       if (Math.hypot(cx - d.x, cz - d.z) <= 0.25) return false; // the stone itself
       if (cz < d.z - 3 || cz > d.z + 2) return false; // outside the walk
-      const reach = (c.type === 'circle' ? c.r : Math.hypot(c.hw, c.hd)) + 0.6;
+      const reach =
+        (c.type === 'circle' ? c.r : c.type === 'prism' ? c.br : Math.hypot(c.hw, c.hd)) + 0.6;
       return Math.abs(cx - d.x) < reach;
     });
     if (blocksCorridor) continue;
@@ -353,8 +355,11 @@ describe('step up: walking over low obstacles', () => {
     setActiveWorldContent(world({ crates: [[SPOT.x, cz]] }));
     const g = groundHeight(SPOT.x, cz, SEED);
     const top = g + campCrateShape(SPOT.x, cz, 0).top;
+    // The allowance of the ACTIVE content (traversal_band.ts): this fixture is
+    // an authored world, which mantles on the Studio band.
+    const band = traversalBand();
     // Feet just INSIDE the allowance: crosses, and lands on the crate top.
-    const inBand = top - MANTLE_REACH + 0.02;
+    const inBand = top - band + 0.02;
     let px = SPOT.x;
     let pz = SPOT.z;
     for (let i = 0; i < 20 && pz < cz; i++) {
@@ -364,15 +369,15 @@ describe('step up: walking over low obstacles', () => {
       pz = out.z;
     }
     expect(pz).toBeGreaterThanOrEqual(cz);
-    expect(floorHeightAt(SEED, px, pz, R, inBand + MANTLE_REACH)).toBeCloseTo(top, 6);
+    expect(floorHeightAt(SEED, px, pz, R, inBand + band)).toBeCloseTo(top, 6);
     // Feet just OUTSIDE it: still a wall, and the landing pass agrees by
     // refusing the same top. This is the negative arm the allowance needs:
     // raising the horizontal gate alone would turn this into a tunnel.
-    const below = top - MANTLE_REACH - 0.05;
+    const below = top - band - 0.05;
     moveCharacter(params({ grounded: false }), SPOT.x, below, SPOT.z, 0, 4, out);
     expect(out.blocked).toBe(true);
     expect(out.z).toBeLessThan(cz);
-    expect(floorHeightAt(SEED, SPOT.x, cz, R, below + MANTLE_REACH)).toBeLessThan(top);
+    expect(floorHeightAt(SEED, SPOT.x, cz, R, below + band)).toBeLessThan(top);
   });
 
   it('never steps onto something taller than the step height', () => {

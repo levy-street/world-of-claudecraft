@@ -48,14 +48,11 @@ import { bareClient } from './helpers/bare_client';
 /** Catalogued Hollow Crypt unique used across Reliquary pin tests. */
 const CATALOGUE_RELIC = 'cryptbone_helm';
 const PAGE_ID = 'conquerors_hollow_crypt';
-/** Hollow Crypt has five item relics; used for Illumination + absolute totals. */
-const HOLLOW_CRYPT_RELICS = [
-  'cryptbone_greaves',
-  'cryptbone_helm',
-  'cryptbone_pauldrons',
-  'greyjaw_hide_boots',
-  'gravewoven_bag',
-] as const;
+/** The Hollow Crypt page's item relics, read off the live page; used for
+ *  Illumination + absolute totals. */
+const HOLLOW_CRYPT_RELICS = (RELIQUARY_PAGES_BY_ID[PAGE_ID]?.relics ?? []).flatMap((relic) =>
+  relic.kind === 'item' ? [relic.itemId] : [],
+);
 /** Authored profession mark id (Phase 7 field note) for sparse marks[] wire pins. */
 const SEEDED_MARK_ID = 'gather_event:pristine_vein';
 
@@ -472,7 +469,7 @@ describe('Reliquary online / offline parity for scripted state', () => {
     expect(onlinePage).toEqual(offlinePage);
     expect(onlinePage).not.toBeNull();
     expect(onlinePage!.owned).toBe(2);
-    expect(onlinePage!.total).toBe(5);
+    expect(onlinePage!.total).toBe(HOLLOW_CRYPT_RELICS.length);
     expect(onlinePage!.total).toBe(RELIQUARY_PAGES_BY_ID[PAGE_ID]!.relics.length);
     expect(onlinePage!.complete).toBe(false);
 

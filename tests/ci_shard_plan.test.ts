@@ -377,10 +377,15 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/owned_class_balance_role_bands.test.ts',
       'tests/owned_class_raid_armor_avoidance.test.ts',
       'tests/owned_class_raid_sustain_bands.test.ts',
+      'tests/warlock_anchor_affliction.test.ts',
+      'tests/warlock_anchor_demonology.test.ts',
+      'tests/warlock_anchor_destruction.test.ts',
+      'tests/warlock_five_minute_windows.test.ts',
     ]);
     // The two lane jobs' halves, also literal (the a/b balance is a measured
     // decision, re-balanced 2026-08-13 with the run 31732244215 per-file
-    // duration ledger recorded in the lane-split PRs).
+    // duration ledger recorded in the lane-split PRs and updated 2026-10-27
+    // with full-mode run 40304367651 when the four warlock suites joined).
     expect([...CI_LONG_SUITE_HALVES.a]).toEqual([
       'tests/nythraxis_matrix.test.ts',
       'tests/owned_class_balance_dps_metrics.test.ts',
@@ -389,6 +394,8 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/owned_class_balance_healer_probes.test.ts',
       'tests/owned_class_balance_role_bands.test.ts',
       'tests/owned_class_raid_armor_avoidance.test.ts',
+      'tests/warlock_anchor_affliction.test.ts',
+      'tests/warlock_five_minute_windows.test.ts',
     ]);
     expect([...CI_LONG_SUITE_HALVES.b]).toEqual([
       'tests/chronomancy_balance_targets.test.ts',
@@ -398,6 +405,8 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/owned_class_balance_groveheart.test.ts',
       'tests/owned_class_balance_healer_contract.test.ts',
       'tests/owned_class_raid_sustain_bands.test.ts',
+      'tests/warlock_anchor_demonology.test.ts',
+      'tests/warlock_anchor_destruction.test.ts',
     ]);
     // Exact partition of the union the shard legs exclude. Half b is DERIVED
     // (union minus half a), so "in neither half" and "in both halves" are
@@ -721,6 +730,7 @@ describe('the long-sims lane (Phase 4)', () => {
 // cannot hide behind unit tests of the parts.
 describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+  const vitestCli = path.join(repoRoot, 'node_modules/vitest/vitest.mjs');
 
   it('vitest related runs a TEST-file seed and goes RED on an empty collection', async () => {
     // The merged selective leg feeds the floor files to `vitest related` as
@@ -753,10 +763,9 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
       writeFileSync(path.join(fixtureRoot, 'notes.md'), 'inert non-test seed\n');
       const runChild = (seeds: string[]) => {
         const child = spawn(
-          'npx',
+          process.execPath,
           [
-            '--no-install',
-            'vitest',
+            vitestCli,
             'related',
             ...seeds,
             '--run',
@@ -771,11 +780,11 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
             // A SCRUBBED env, like runEntry below: this test itself runs
             // inside vitest, and an inherited VITEST_* worker environment
             // makes the child vitest misbehave (observed: it prints the RUN
-            // header, runs nothing, and exits 0). HOME rides along for the
-            // npx cache.
+            // header, runs nothing, and exits 0).
             env: {
               PATH: process.env.PATH ?? '',
               ...(process.env.HOME ? { HOME: process.env.HOME } : {}),
+              ...(process.env.SystemRoot ? { SystemRoot: process.env.SystemRoot } : {}),
             },
           },
         );
@@ -981,10 +990,10 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     const runA = await runEntry(['--lane=long-sims-a', '--plan-only'], env);
     expect(runA.exitCode).toBe(0);
     // The exact reason line closes BOTH directions and the cardinality at
-    // once: "1 of 7" fails if a second half-a lane file lands on the floor
+    // once: "1 of 9" fails if a second half-a lane file lands on the floor
     // (whatever its sort position) and if the half's list total drifts.
     expect(runA.log).toContain(
-      'plan: mode=selective (selective: 1 of 7 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 1 of 9 lane file(s) on the floor or changed)',
     );
     expect(runA.log).toContain('lane runs: tests/nythraxis_matrix.test.ts');
     expect(runA.log).not.toContain('tests/owned_class_balance_role_bands.test.ts');
@@ -995,7 +1004,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     // ZERO legs here: the documented empty-lane path, exercised on the real
     // tree (the fixture-based cases above cover the non-empty shapes).
     expect(runB.log).toContain(
-      'plan: mode=selective (selective: 0 of 7 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 0 of 9 lane file(s) on the floor or changed)',
     );
     expect(runB.log).toContain('lane runs: nothing');
     // Binding negative: zero legs means no npm test invocation is printed at
@@ -1016,10 +1025,9 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     excludePath: string,
   ): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
     const child = spawn(
-      'npx',
+      process.execPath,
       [
-        '--no-install',
-        'vitest',
+        vitestCli,
         'list',
         '--filesOnly',
         `--exclude=${excludePath}`,
@@ -1053,7 +1061,10 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
         );
       }, 60_000);
       killer.unref();
-      child.on('error', reject);
+      child.on('error', (error) => {
+        clearTimeout(killer);
+        reject(error);
+      });
       child.on('close', (code) => {
         clearTimeout(killer);
         resolve(code);
@@ -1070,7 +1081,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     // silently; this spawn makes that loud. `vitest list --filesOnly` prints
     // the collected set without running anything.
     //
-    // This test spawns a real `npx vitest` subprocess from INSIDE a vitest run, sharing the
+    // This test spawns the installed Vitest CLI from INSIDE a vitest run, sharing the
     // same module/transform cache the outer run is concurrently writing to under full-suite
     // parallel load, which occasionally races the spawned list into a stale read. One retry
     // of the WHOLE attempt (spawn plus every assertion below) distinguishes that from a real
@@ -1083,7 +1094,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
         'tests/battleground.test.ts',
       );
       expect(exitCode, `stdout:\n${stdout}\nstderr:\n${stderr}`).toBe(0);
-      const files = stdout.split('\n').map((l) => l.trim());
+      const files = stdout.split('\n').map((l) => l.trim().replaceAll('\\', '/'));
       // Exact, not glob-broadened: the excluded file is gone, its many
       // same-prefix siblings survive.
       expect(files.some((f) => f.endsWith('tests/battleground.test.ts'))).toBe(false);
@@ -1158,6 +1169,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(run.log).toContain('nightly');
   });
 
+  // Let runEntry's own 60-second child deadline govern a full-tree plan scan.
   it('falls back to the full plan on an unparseable relay (fail closed)', async () => {
     const run = await runEntry(['--shard=1/8', '--plan-only'], {
       TEST_MODE: 'selective',
@@ -1166,7 +1178,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(run.exitCode).toBe(0);
     expect(run.log).toContain('plan: mode=full');
     expect(run.log).toContain('npm test -- --shard=1/8');
-  });
+  }, 65_000);
 
   it('strips control characters from the relayed reason before echoing it', async () => {
     // The reason is log-only, but the consumer must not trust the producer's

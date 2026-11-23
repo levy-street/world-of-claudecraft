@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { tagCastVfxEngine } from '../cast_vfx_family';
+import { registerContextRestoreReset } from '../context_restore_registry';
 import { type AbilityVfxTextures, OVERLAY_ATLAS_GRID, OVERLAY_CELL } from './fx_textures';
 
 // One pooled point cloud for every persistent overlay sprite (windup orbs,
@@ -117,6 +118,15 @@ export class OverlaySprites {
       if (this.geo.drawRange.count === 0) this.points.visible = false;
     };
     scene.add(this.points);
+    registerContextRestoreReset('overlay-sprites', this, (owner) => owner.forgetContext());
+  }
+
+  /** A WebGL context restore: the cloud draws again until its program is
+   *  relinked on the restored context, the same idiom as ../vfx.ts. */
+  forgetContext(): void {
+    if (this.disposed) return;
+    this.warmed = false;
+    this.points.visible = true;
   }
 
   /** The one drawable, which the boot links ahead of the rest of the pools. */

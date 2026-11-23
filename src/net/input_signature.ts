@@ -1,5 +1,13 @@
 import type { MoveInput } from '../sim/types';
 
+/** The one-frame inputs (a jump, a turn edge) held until the next send (moved from
+ *  online.ts). */
+export interface PendingTransientInput {
+  jump: boolean;
+  turnLeft: boolean;
+  turnRight: boolean;
+}
+
 export function inputSignature(mi: MoveInput, mouselookFacing: number | null): string {
   const facing = mouselookFacing === null ? '' : Math.round(mouselookFacing * 10000).toString();
   return [
@@ -17,3 +25,8 @@ export function inputSignature(mi: MoveInput, mouselookFacing: number | null): s
     facing,
   ].join(',');
 }
+
+/** Two facings are the same heading (wrap-aware, to float noise): the input sender's
+ *  "did the facing change" test (moved out of online.ts under the monolith ratchet). */
+export const inputFacingsMatch = (a: number, b: number): boolean =>
+  Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;

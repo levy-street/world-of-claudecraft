@@ -19,6 +19,7 @@ import { cannonResultText } from './hud/vehicle/cannon_tactics_view';
 import { formatList, formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
 import { questProgressEventText } from './quest_progress_text';
+import { seasonalEventPresentation } from './seasonal_event_view';
 import { targetPortraitUrl } from './target_portrait_view';
 import type { WorldQuestLeyRotation } from './world_quest_ley_view';
 import { worldQuestTraceScoreText } from './world_quest_trace_view';
@@ -188,6 +189,10 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
         }),
         sound: 'quest_ready',
       };
+    // Seasonal events (src/sim/seasonal/): the knock's treat or trick and the
+    // toggles, composed in seasonal_event_view.ts.
+    case 'seasonal':
+      return seasonalEventPresentation(event);
     case 'clueHuntDone': {
       const text = t('questUi.logs.clueHuntDone', { title: clueHuntTitle(event.huntId) });
       return { bannerText: text, logText: text, sound: 'quest_complete' };
@@ -217,6 +222,21 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
       };
     case 'treasureMapLost':
       return { logText: t('questUi.logs.treasureMapLost') };
+    case 'worldQuestRewardMailed': {
+      // A full-bags payout went to the Ravenpost: the banner is the pop-up
+      // the player cannot miss, the log line the durable copy. Queued as a
+      // celebration so the completion banner landing on the same tick waits
+      // its turn instead of replacing it.
+      const text = t('questUi.logs.worldQuestRewardMailed', {
+        items: formatList(
+          event.itemIds.map((itemId) => {
+            const def = ownEntry(ITEMS, itemId);
+            return def ? itemDisplayName(def) : itemId;
+          }),
+        ),
+      });
+      return { bannerText: text, bannerClass: 'deed', logText: text, sound: 'quest_ready' };
+    }
     case 'treasureMapRead':
       // A re-read only re-opens the window; the line is for the first read.
       return event.fresh

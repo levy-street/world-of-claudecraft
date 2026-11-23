@@ -6,9 +6,12 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SEED = WORLD_SEED;
 
-// Tidebound Acolyte is the seeded carrier of the desperateHeal mechanic.
+// Sloomtooth the Drowned (content/zone2.ts, Drowning Resurgence) is the seeded
+// carrier of the desperateHeal mechanic. The Tidebound Acolyte carried it until
+// the Sunken Bastion rework traded its silent heal for the interruptible Brine
+// Mend trash kit.
 function makeAcolyte(sim: Sim, hpFrac: number) {
-  const mob = createMob(990101, MOBS.tidebound_acolyte, 13, { x: 0, y: 0, z: 0 });
+  const mob = createMob(990101, MOBS.sloomtooth_the_drowned, 11, { x: 0, y: 0, z: 0 });
   mob.hp = Math.round(mob.maxHp * hpFrac);
   mob.inCombat = true;
   return mob;
@@ -19,8 +22,14 @@ function fire(sim: Sim, mob: ReturnType<typeof makeAcolyte>) {
 }
 
 describe('mob desperation self-heal', () => {
-  it('seeds the mechanic on the Tidebound Acolyte', () => {
-    expect(MOBS.tidebound_acolyte.desperateHeal).toEqual({ belowHpPct: 0.3, healPct: 0.25 });
+  it('seeds the mechanic on Sloomtooth the Drowned', () => {
+    expect(MOBS.sloomtooth_the_drowned.desperateHeal).toEqual({
+      belowHpPct: 0.3,
+      healPct: 0.25,
+    });
+    // The Bastion rework's Acolyte heals through its kickable Brine Mend now.
+    expect(MOBS.tidebound_acolyte.desperateHeal).toBeUndefined();
+    expect(MOBS.tidebound_acolyte.trashKit?.mend).toBeDefined();
   });
 
   it('heals once when hp first drops below the threshold', () => {

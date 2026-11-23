@@ -1,7 +1,7 @@
 // The trigger set a released spirit can walk into during its corpse run. A
 // ghost does not fight, cast, or regen, but it CAN cross every world seam a
 // living player can: a dungeon or raid door (to re-enter its instance and
-// resurrect at the entrance), a rift portal, and a paired overworld passage
+// resurrect where it arrives), a rift portal, and a paired overworld passage
 // (portals.ts). The passage matters because release picks the nearest
 // graveyard by distance: a death on the Thornpeak side of the Hollow's zone
 // line rises at Eldershine Rest across a sealed border, and the Duskfall

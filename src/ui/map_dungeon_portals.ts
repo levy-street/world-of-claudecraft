@@ -7,6 +7,8 @@
 // doorPos with their parent (the Nythraxis raid arena reuses the Abandoned Crypt
 // door, since it is reached through a sealed door inside the crypt) stamp a second
 // label at the identical map point, so the dungeon and raid names overlap.
+import { activeDungeonDoorPos, getActiveWorldContent } from '../sim/data';
+import { objectRemoved } from '../sim/moved_objects';
 import type { DungeonDef } from '../sim/types';
 
 export interface MapDungeonPortal {
@@ -23,10 +25,15 @@ export function overworldDungeonPortals(
   zMax: number,
 ): MapDungeonPortal[] {
   const portals: MapDungeonPortal[] = [];
+  const moves = getActiveWorldContent().objectMoves;
   for (const d of dungeons) {
     if (d.overworldDoor === false) continue;
-    if (d.doorPos.z < zMin || d.doorPos.z >= zMax) continue;
-    portals.push({ id: d.id, x: d.doorPos.x, z: d.doorPos.z });
+    // A Studio map may move a door (moved_objects.ts): the pin follows it,
+    // and a deleted door has no overworld entrance to pin.
+    if (objectRemoved(moves, 'dungeonDoor', d.id)) continue;
+    const door = activeDungeonDoorPos(d);
+    if (door.z < zMin || door.z >= zMax) continue;
+    portals.push({ id: d.id, x: door.x, z: door.z });
   }
   return portals;
 }

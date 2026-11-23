@@ -1423,6 +1423,28 @@ describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)',
     expect(open.usable).toBe(true);
     expect(open.procGlow).toBe(true);
   });
+
+  it('Void Rupture requires three owned charges before enabling and highlighting its slot', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('void_rupture', ABILITIES.void_rupture) })),
+      fakeDeps(),
+    );
+    for (const [sourceId, stacks, ready] of [
+      [2, 5, false],
+      [1, 2, false],
+      [1, 3, true],
+      [1, 5, true],
+    ] as const) {
+      const state = view.tick(
+        world({
+          auras: [{ kind: 'gloomtithe', sourceId, stacks }],
+          targetPos: { x: 0, y: 0, z: 10 },
+        }),
+      ).slots[0];
+      expect(state.usable, `source ${sourceId}, charges ${stacks}`).toBe(ready);
+      expect(state.procGlow, `source ${sourceId}, charges ${stacks}`).toBe(ready);
+    }
+  });
 });
 
 describe('actionBarView: next-cast empowerment highlight (empowered)', () => {
@@ -1950,7 +1972,7 @@ describe("actionBarView: Nature's Boon is form-scoped in every highlight", () =>
     // Oakhide: dark on BOTH flags, because the window will not pay for it here.
     expect(slots[0].naturesBoonGlow).toBe(false);
     expect(slots[0].empowered).toBe(false);
-    // Wildbloom is not bear-scoped, so the same window still lights it in Cat
+    // Sporemending is not bear-scoped, so the same window still lights it in Cat
     // Form. Without this arm the test would pass on a gate that darkens the
     // whole window rather than just its bear-only member.
     expect(slots[1].naturesBoonGlow).toBe(true);

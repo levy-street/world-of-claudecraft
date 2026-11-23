@@ -114,12 +114,12 @@ describe('pet heel pathfinding', () => {
   });
 
   it('warps to the owner only as a last resort when no route exists', () => {
-    // 87yd apart with the harbor-town bank breaking line of sight and the gap
-    // beyond the A* search window: no route can be found, so the pet snaps to
-    // heel. Re-staged 2026-08-18 for the Eastbrook harbor move (d19aa33f76):
-    // the old (0,-5)/(0,82) pair spanned the vacated town ground, which is now
-    // open, so a clear straight line there let the pet path instead of warp.
-    const { sim, pet, owner } = setup({ x: 12, y: 0, z: -135 }, { x: 12, y: 0, z: -48 });
+    // 88yd apart with the north-west rim terrain breaking line of sight and no
+    // way round inside the A* search window: no route can be found, so the pet
+    // snaps to heel. Re-staged 2026-10-14 for the Tidehold rebuild of Eastbrook
+    // (#4494): the old (12,-135)/(12,-48) pair's bank no longer breaks the line,
+    // so the pet ran home instead. Staged on terrain, away from the town.
+    const { sim, pet, owner } = setup({ x: -150, y: 0, z: 178 }, { x: -150, y: 0, z: 90 });
     expect(dist(pet.pos, owner.pos)).toBeGreaterThan(60);
     sim.tick();
     expect(dist(pet.pos, owner.pos)).toBeLessThan(1);

@@ -45,15 +45,20 @@ layers behind the `index.ts` barrel:
   gate keeps one ready bit per family (`../cast_vfx_family.ts`), one entry per
   program: the ENGINE (the pooled primitive families above except the spirits,
   plus the `../vfx.ts` particle cloud) and the KIT (the Warrior kit's pools
-  `fx.ts` builds with the engine, because several of their pieces draw with no
-  readiness check of their own). The painter admits each cast on its own mask
+  `fx.ts` builds with the engine, so a Warrior cast waits for the whole kit
+  rather than showing part of it). The painter admits each cast on its own mask
   (`cast_requirements.ts`) at its first entry point and latches a refusal for
   the rest of that cast (`cast_admission_core.ts`); spirits keep their own
   gate and sit in neither family. A new pool tags every drawable it builds with
   `tagCastVfxEngine` or `tagCastVfxKit`, carries the `spawnGate` `fx.ts` hands
   it and checks its family before every spawn, the units link engine, then
   kit, then every other pool, and `tests/cast_vfx_engine_family.test.ts` fails
-  a pool `fx.ts` builds that sits in none of its tables.
+  a pool `fx.ts` builds that sits in none of its tables. A kit pool also checks
+  its own preparation (its sheet upload, geometry or program proof) on every
+  spawn and on every frame of a held piece, never only when a slot is taken;
+  `tests/cast_vfx_spawn_gate.test.ts` fails a kit pool with no door there,
+  one that draws while its pieces are unprepared, and a held piece that keeps
+  drawing after its readiness is taken back.
   `AbilityVfxFx.prewarmSpawn` stays boot-window only,
   because it spawns VISIBLE primitives; these units are what the renderer's
   `vfx.ability-primitives` manifest entry retains when the entry deadline drops
@@ -159,18 +164,26 @@ selected by ability id only:
   `warrior_attention*.ts`, `warrior_control*.ts`), and prewarm
   (`active_kit_prewarm.ts`, `crest_prewarm.ts`, `guard_prewarm.ts`,
   `baked_pool_prewarm.ts`) registered through the renderer's manifest entry.
-  The kit's textures (`production_assets.ts`, `contact_assets.ts`: nine baked
+  The kit's textures (`production_assets.ts`, `contact_assets.ts`: eight baked
   sheets, three contact sheets, the material maps, the fragment GLB) never ride
   the deferred preload lane: `ensureWarriorKitAssets` loads them once, on
   demand, when a local Warrior enters or the painter first sees a remote one
-  (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
-  on constrained-memory devices, where the kit stays cold and the generic
-  presentation runs (`tests/warrior_kit_assets.test.ts`,
-  `tests/active_kit_prewarm.test.ts`). Every sheet a live cast draws is
+  (`requestClassKit`; a failed preparation asks again on the bounded
+  `ACTIVE_KIT_RETRY_DELAYS_MS` backoff, paying only its unpaid units), decodes
+  its image sheets off the main thread on Chromium (`loadBitmapTexture`, texel
+  for texel what the image path uploads:
+  `tests/browser/bitmap_texture_pixels.browser.test.ts`; each bitmap is closed
+  once uploaded, and a rebuilt renderer's request decodes the set again before
+  its recipe uploads it: `../assets/bitmap_sheet_release.ts`),
+  keeps a mip chain on the WebP sheets, and DECLINES them
+  on constrained-memory devices, where the kit stays cold, the generic
+  presentation runs, and the boot warm-up links none of the kit's programs
+  (`warriorKitDeclinedByDevice` in `../cast_vfx_prewarm.ts`;
+  `tests/warrior_kit_assets.test.ts`, `tests/active_kit_prewarm.test.ts`). Every sheet a live cast draws is
   uploaded by its own unit of the kit recipe (`KIT_SHEETS` in
   `active_kit_prewarm.ts`), the contact sheets and the generic smoke and dust
-  layers included, since the kit is their only consumer (the loaded shockwave
-  sheet has no live consumer, only the boot-window `prewarmSpawn`); the boot
+  layers included, since the kit is their only consumer, and the kit loads no
+  sheet the recipe does not upload; the boot
   warm-up (`abilityVfxTexturePrewarmSteps`) reads none of them, so the recipe is
   their one upload home on every renderer, a recycled one included. A sheet is
   stored as soon as it decodes, so every drawer also waits for this renderer's
@@ -183,15 +196,21 @@ selected by ability id only:
   the load lands after it: it binds them in
   a unit of its own preparation recipe, ahead of its compile (the crests'
   `crest-bind-kit`, the guards' `guard-bind-steel`; `tests/crest_prewarm.test.ts`).
+  The boot warm-up links the kit's programs for every class, so a mapped
+  surface holds `warriorKitSlotMap()` (`warrior_kit_surface.ts`) from
+  construction and its bind swaps the texture only, never with `needsUpdate`:
+  the program linked at boot is the one the kit draws
+  (`tests/warrior_kit_boot_programs.test.ts`).
   A pool whose GEOMETRY comes from the kit builds its meshes in that recipe
   too, and spawns nothing until their upload unit ran (the solid fragments'
-  `fragment-build`; `tests/solid_impact_fragments_prewarm.test.ts`).
+  `fragment-build`; `tests/solid_impact_fragments_prewarm.test.ts`), while a
+  hidden stand-in with the same shader carries its program from construction.
   Its preparation rides
   `ACTIVE_KIT_PRIORITY` (the boot-debt lane) under the per-frame budget, never
   the actionable floor, and it waits out a loading cover: the kit is cosmetic
   and gated by its own readiness, and the floor once admitted all ten sheets
   into one frame (about 0.6 s on an Intel HD 530). Generic sheets (smoke, dust,
-  shockwave, the harvest splash) ship at 1024px; only signature sheets earn
+  the harvest splash) ship at 1024px; only signature sheets earn
   2048px, and a new sheet needs the same justification.
 - **Cost rules still apply.** The shared families it extends (`ribbons.ts`
   vertex budget, `flipbooks.ts` blending, `fx_textures.ts` overlay atlas) are

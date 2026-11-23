@@ -141,6 +141,7 @@ export const FRAME_SIZE_RESET_KEYS: Partial<Record<string, readonly string[]>> =
   playerFrame: ['playerFrameScale', 'playerFrameWidth', 'playerFrameHeight'],
   targetFrame: ['targetFrameScale', 'targetFrameWidth', 'targetFrameHeight'],
   partyFrames: ['partyFrameScale', 'partyFrameWidth', 'partyFrameHeight'],
+  playerResource: ['playerFrameResourceWidth', 'playerFrameResourceHeight'],
   petFrame: ['petFrameWidth', 'petFrameHeight'],
   focusTarget1: ['focusTarget1Width', 'focusTarget1Height'],
   focusTarget2: ['focusTarget2Width', 'focusTarget2Height'],

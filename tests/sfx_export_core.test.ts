@@ -2,7 +2,6 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   copyFileSync,
-  existsSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -15,6 +14,7 @@ import { dirname, join } from 'node:path';
 import ffmpegPath from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import { describe, expect, it } from 'vitest';
+import { resolveSfxTool } from '../scripts/sfx/ffmpeg_paths.mjs';
 // @ts-expect-error untyped zero-dependency authoring tool (scripts/*.mjs convention)
 import * as exportBundleModule from '../scripts/sfx_studio/export_bundle.mjs';
 // @ts-expect-error untyped zero-dependency authoring tool (scripts/*.mjs convention)
@@ -176,11 +176,13 @@ describe('SFX production bundle', () => {
     // the Studio spawns for playback. A newer PATH ffmpeg measures MP3 duration a
     // few tens of milliseconds shorter, which flips these clips across the
     // one-second peak/LUFS branch boundary and rejects a clip the gate accepts.
-    // ffprobe-static@3.1.0 has no Linux arm64 binary, so the shared conformance
-    // resolver falls back to PATH ffprobe only when the static binary is absent.
+    // ffprobe-static@3.1.0 has no Linux arm64 binary (and its darwin/arm64
+    // binary is x86_64 and requires Rosetta 2), so the shared conformance
+    // resolver falls back to PATH ffprobe only when the static binary is absent
+    // or unrunnable without Rosetta.
     expect(exportBundleModule.CONFORMANCE_FFMPEG_PATH).toBe(ffmpegPath);
     expect(exportBundleModule.CONFORMANCE_FFPROBE_PATH).toBe(
-      existsSync(ffprobeStatic.path) ? ffprobeStatic.path : 'ffprobe',
+      resolveSfxTool({ staticPath: ffprobeStatic.path, fallback: 'ffprobe' }),
     );
     // The constants alone do not prove the validator USES them: pin the call-site
     // wiring so a revert to the PATH binaries (which only misbehaves on machines

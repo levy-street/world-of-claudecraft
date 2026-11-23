@@ -27,7 +27,7 @@ import {
   TOOL_EFFECTS,
   type ToolEffectId,
 } from '../../../sim/content/professions';
-import { GATHER_NODES, ITEMS } from '../../../sim/data';
+import { activeGatherNodes, GATHER_NODES, ITEMS } from '../../../sim/data';
 import {
   effectiveGradeToolTier,
   type GradeReadMeta,
@@ -123,7 +123,9 @@ export interface NearbyGatherNode {
 export function buildNearbyGatherNodes(world: IWorld, radiusYd: number): NearbyGatherNode[] {
   const p = world.player;
   const out: NearbyGatherNode[] = [];
-  for (const node of GATHER_NODES) {
+  // activeGatherNodes(), not the raw table: an authored map has none, and a
+  // panel listing veins nobody can see or reach is worse than an empty one.
+  for (const node of activeGatherNodes()) {
     const dx = node.pos.x - p.pos.x;
     const dz = node.pos.z - p.pos.z;
     if (Math.sqrt(dx * dx + dz * dz) > radiusYd) continue;

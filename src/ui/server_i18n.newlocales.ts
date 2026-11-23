@@ -51,6 +51,12 @@ export const SERVER_NEW = {
     'ignores.empty': 'Tvůj seznam ignorovaných je prázdný.',
     'ignores.list': 'Ignorovaní ({count}): {names}',
     'ignores.usage': 'Použití: /ignore <jméno>, /unignore <jméno>, /ignorelist.',
+    'flair.shown':
+      'Tvoje role na Discordu je viditelná pro ostatní hráče. Napiš /flair off a skryješ ji.',
+    'flair.hidden':
+      'Tvoje role na Discordu je před ostatními hráči skrytá. Napiš /flair on a zobrazíš ji.',
+    'flair.notLinked': 'Pro použití /flair propoj svůj účet Discord.',
+    'flair.usage': 'Použití: /flair, /flair on nebo /flair off.',
     'friends.notIgnored': '{name} není na tvém seznamu ignorovaných.',
     'friends.notOnFriends': "V seznamu přátel nemáš postavu jménem '{name}'.",
     'friends.notOnIgnore': "V seznamu ignorovaných nemáš postavu jménem '{name}'.",
@@ -118,6 +124,14 @@ export const SERVER_NEW = {
       'Příliš mnoho neúspěšných pokusů. Počkej pár minut a zkus to znovu.',
     'pet.nameNotAllowed': 'Jméno mazlíčka není povoleno.',
     'legendary.nameNotAllowed': 'Toto jméno není povoleno.',
+    'presence.everyone':
+      'Přátelé a členové cechu tě vidí online. Napiš /presence friends nebo /presence none a skryješ se.',
+    'presence.friends':
+      'Online tě vidí jen tví přátelé. Napiš /presence everyone nebo /presence none a změníš to.',
+    'presence.none':
+      'Pro přátele a členy cechu jsi offline. Napiš /presence everyone nebo /presence friends a změníš to.',
+    'presence.usage':
+      'Použití: /presence, /presence everyone, /presence friends nebo /presence none.',
     'time.day': '{count} den',
     'time.days': '{count} dní',
     'time.hour': '{count} hodina',
@@ -197,6 +211,12 @@ export const SERVER_NEW = {
     'ignores.empty': 'Din ignoreringsliste er tom.',
     'ignores.list': 'Ignoreret ({count}): {names}',
     'ignores.usage': 'Brug: /ignore <navn>, /unignore <navn>, /ignorelist.',
+    'flair.shown':
+      'Din Discord-rolle vises for andre spillere. Skriv /flair off for at skjule den.',
+    'flair.hidden':
+      'Din Discord-rolle er skjult for andre spillere. Skriv /flair on for at vise den.',
+    'flair.notLinked': 'Tilknyt din Discord-konto for at bruge /flair.',
+    'flair.usage': 'Brug: /flair, /flair on eller /flair off.',
     'friends.notIgnored': '{name} er ikke på din ignoreringsliste.',
     'friends.notOnFriends': "Ingen figur ved navn '{name}' på din venneliste.",
     'friends.notOnIgnore': "Ingen figur ved navn '{name}' på din ignoreringsliste.",
@@ -264,6 +284,14 @@ export const SERVER_NEW = {
     'moderation.tooManyFailed': 'For mange mislykkede forsøg. Vent et par minutter og prøv igen.',
     'pet.nameNotAllowed': 'Kæledyrsnavnet er ikke tilladt.',
     'legendary.nameNotAllowed': 'Det navn er ikke tilladt.',
+    'presence.everyone':
+      'Venner og medlemmer af din lavsforening kan se, at du er online. Skriv /presence friends eller /presence none for at skjule dig.',
+    'presence.friends':
+      'Kun dine venner kan se, at du er online. Skriv /presence everyone eller /presence none for at ændre det.',
+    'presence.none':
+      'Du vises som offline for venner og medlemmer af din lavsforening. Skriv /presence everyone eller /presence friends for at ændre det.',
+    'presence.usage':
+      'Brug: /presence, /presence everyone, /presence friends eller /presence none.',
     'time.day': '{count} dag',
     'time.days': '{count} dage',
     'time.hour': '{count} time',
@@ -345,6 +373,12 @@ export const SERVER_NEW = {
     'ignores.empty': 'Daftar abaikan kamu kosong.',
     'ignores.list': 'Diabaikan ({count}): {names}',
     'ignores.usage': 'Penggunaan: /ignore <nama>, /unignore <nama>, /ignorelist.',
+    'flair.shown':
+      'Peran Discord kamu terlihat oleh pemain lain. Ketik /flair off untuk menyembunyikannya.',
+    'flair.hidden':
+      'Peran Discord kamu disembunyikan dari pemain lain. Ketik /flair on untuk menampilkannya.',
+    'flair.notLinked': 'Tautkan akun Discord kamu untuk menggunakan /flair.',
+    'flair.usage': 'Penggunaan: /flair, /flair on, atau /flair off.',
     'friends.notIgnored': '{name} tidak ada dalam daftar abaikanmu.',
     'friends.notOnFriends': "Tidak ada karakter bernama '{name}' dalam daftar temanmu.",
     'friends.notOnIgnore': "Tidak ada karakter bernama '{name}' dalam daftar abaikanmu.",
@@ -414,6 +448,14 @@ export const SERVER_NEW = {
       'Terlalu banyak percobaan gagal. Tunggu beberapa menit lalu coba lagi.',
     'pet.nameNotAllowed': 'Nama peliharaan tidak diperbolehkan.',
     'legendary.nameNotAllowed': 'Nama itu tidak diperbolehkan.',
+    'presence.everyone':
+      'Teman dan anggota guild dapat melihatmu online. Ketik /presence friends atau /presence none untuk bersembunyi.',
+    'presence.friends':
+      'Hanya temanmu yang dapat melihatmu online. Ketik /presence everyone atau /presence none untuk mengubahnya.',
+    'presence.none':
+      'Kamu tampak offline bagi teman dan anggota guild. Ketik /presence everyone atau /presence friends untuk mengubahnya.',
+    'presence.usage':
+      'Penggunaan: /presence, /presence everyone, /presence friends, atau /presence none.',
     'time.day': '{count} hari',
     'time.days': '{count} hari',
     'time.hour': '{count} jam',
@@ -493,6 +535,12 @@ export const SERVER_NEW = {
     'ignores.empty': 'Je negeerlijst is leeg.',
     'ignores.list': 'Genegeerd ({count}): {names}',
     'ignores.usage': 'Gebruik: /ignore <naam>, /unignore <naam>, /ignorelist.',
+    'flair.shown':
+      'Je Discord-rol is zichtbaar voor andere spelers. Typ /flair off om hem te verbergen.',
+    'flair.hidden':
+      'Je Discord-rol is verborgen voor andere spelers. Typ /flair on om hem te tonen.',
+    'flair.notLinked': 'Koppel je Discord-account om /flair te gebruiken.',
+    'flair.usage': 'Gebruik: /flair, /flair on of /flair off.',
     'friends.notIgnored': '{name} staat niet op je negeerlijst.',
     'friends.notOnFriends': "Geen personage met de naam '{name}' op je vriendenlijst.",
     'friends.notOnIgnore': "Geen personage met de naam '{name}' op je negeerlijst.",
@@ -563,6 +611,14 @@ export const SERVER_NEW = {
       'Te veel mislukte pogingen. Wacht een paar minuten en probeer het opnieuw.',
     'pet.nameNotAllowed': 'Huisdiernaam is niet toegestaan.',
     'legendary.nameNotAllowed': 'Die naam is niet toegestaan.',
+    'presence.everyone':
+      'Vrienden en gildeleden kunnen zien dat je online bent. Typ /presence friends of /presence none om je te verbergen.',
+    'presence.friends':
+      'Alleen je vrienden kunnen zien dat je online bent. Typ /presence everyone of /presence none om dit te wijzigen.',
+    'presence.none':
+      'Je lijkt offline voor vrienden en gildeleden. Typ /presence everyone of /presence friends om dit te wijzigen.',
+    'presence.usage':
+      'Gebruik: /presence, /presence everyone, /presence friends of /presence none.',
     'time.day': '{count} dag',
     'time.days': '{count} dagen',
     'time.hour': '{count} uur',
@@ -645,6 +701,12 @@ export const SERVER_NEW = {
     'ignores.empty': 'Twoja lista ignorowanych jest pusta.',
     'ignores.list': 'Ignorowani ({count}): {names}',
     'ignores.usage': 'Użycie: /ignore <imię>, /unignore <imię>, /ignorelist.',
+    'flair.shown':
+      'Twoja rola na Discordzie jest widoczna dla innych graczy. Wpisz /flair off, aby ją ukryć.',
+    'flair.hidden':
+      'Twoja rola na Discordzie jest ukryta przed innymi graczami. Wpisz /flair on, aby ją pokazać.',
+    'flair.notLinked': 'Połącz konto Discord, aby używać /flair.',
+    'flair.usage': 'Użycie: /flair, /flair on lub /flair off.',
     'friends.notIgnored': '{name} nie znajduje się na twojej liście ignorowanych.',
     'friends.notOnFriends': "Brak postaci o imieniu '{name}' na twojej liście znajomych.",
     'friends.notOnIgnore': "Brak postaci o imieniu '{name}' na twojej liście ignorowanych.",
@@ -714,6 +776,14 @@ export const SERVER_NEW = {
       'Zbyt wiele nieudanych prób. Odczekaj kilka minut i spróbuj ponownie.',
     'pet.nameNotAllowed': 'Imię zwierzęcia jest niedozwolone.',
     'legendary.nameNotAllowed': 'To imię jest niedozwolone.',
+    'presence.everyone':
+      'Znajomi i członkowie gildii widzą, że jesteś online. Wpisz /presence friends lub /presence none, aby się ukryć.',
+    'presence.friends':
+      'Tylko twoi znajomi widzą, że jesteś online. Wpisz /presence everyone lub /presence none, aby to zmienić.',
+    'presence.none':
+      'Dla znajomych i członków gildii jesteś offline. Wpisz /presence everyone lub /presence friends, aby to zmienić.',
+    'presence.usage':
+      'Użycie: /presence, /presence everyone, /presence friends lub /presence none.',
     'time.day': '{count} dzień',
     'time.days': '{count} dni',
     'time.hour': '{count} godzina',
@@ -795,6 +865,10 @@ export const SERVER_NEW = {
     'ignores.empty': 'Din ignoreringslista är tom.',
     'ignores.list': 'Ignorerade ({count}): {names}',
     'ignores.usage': 'Användning: /ignore <namn>, /unignore <namn>, /ignorelist.',
+    'flair.shown': 'Din Discord-roll visas för andra spelare. Skriv /flair off för att dölja den.',
+    'flair.hidden': 'Din Discord-roll är dold för andra spelare. Skriv /flair on för att visa den.',
+    'flair.notLinked': 'Koppla ditt Discord-konto för att använda /flair.',
+    'flair.usage': 'Användning: /flair, /flair on eller /flair off.',
     'friends.notIgnored': '{name} finns inte på din ignoreringslista.',
     'friends.notOnFriends': "Ingen karaktär vid namn '{name}' på din vänlista.",
     'friends.notOnIgnore': "Ingen karaktär vid namn '{name}' på din ignoreringslista.",
@@ -863,6 +937,14 @@ export const SERVER_NEW = {
       'För många misslyckade försök. Vänta några minuter och försök igen.',
     'pet.nameNotAllowed': 'Djurnamnet är inte tillåtet.',
     'legendary.nameNotAllowed': 'Det namnet är inte tillåtet.',
+    'presence.everyone':
+      'Vänner och gillesmedlemmar kan se att du är online. Skriv /presence friends eller /presence none för att dölja dig.',
+    'presence.friends':
+      'Bara dina vänner kan se att du är online. Skriv /presence everyone eller /presence none för att ändra det.',
+    'presence.none':
+      'Du visas som offline för vänner och gillesmedlemmar. Skriv /presence everyone eller /presence friends för att ändra det.',
+    'presence.usage':
+      'Användning: /presence, /presence everyone, /presence friends eller /presence none.',
     'time.day': '{count} dag',
     'time.days': '{count} dagar',
     'time.hour': '{count} timme',
@@ -942,6 +1024,10 @@ export const SERVER_NEW = {
     'ignores.empty': 'Yok sayma listen boş.',
     'ignores.list': 'Yok sayılanlar ({count}): {names}',
     'ignores.usage': 'Kullanım: /ignore <ad>, /unignore <ad>, /ignorelist.',
+    'flair.shown': 'Discord rolün diğer oyunculara gösteriliyor. Gizlemek için /flair off yaz.',
+    'flair.hidden': 'Discord rolün diğer oyunculardan gizleniyor. Göstermek için /flair on yaz.',
+    'flair.notLinked': '/flair kullanmak için Discord hesabını bağla.',
+    'flair.usage': 'Kullanım: /flair, /flair on veya /flair off.',
     'friends.notIgnored': '{name} engel listende değil.',
     'friends.notOnFriends': "Arkadaş listende '{name}' adlı bir karakter yok.",
     'friends.notOnIgnore': "Engel listende '{name}' adlı bir karakter yok.",
@@ -1010,6 +1096,14 @@ export const SERVER_NEW = {
     'moderation.tooManyFailed': 'Çok fazla başarısız deneme. Birkaç dakika bekleyip tekrar dene.',
     'pet.nameNotAllowed': 'Evcil adına izin verilmiyor.',
     'legendary.nameNotAllowed': 'Bu ada izin verilmiyor.',
+    'presence.everyone':
+      'Arkadaşların ve lonca üyeleri çevrimiçi olduğunu görebilir. Gizlenmek için /presence friends veya /presence none yaz.',
+    'presence.friends':
+      'Çevrimiçi olduğunu yalnızca arkadaşların görebilir. Değiştirmek için /presence everyone veya /presence none yaz.',
+    'presence.none':
+      'Arkadaşlarına ve lonca üyelerine çevrimdışı görünüyorsun. Değiştirmek için /presence everyone veya /presence friends yaz.',
+    'presence.usage':
+      'Kullanım: /presence, /presence everyone, /presence friends veya /presence none.',
     'time.day': '{count} gün',
     'time.days': '{count} gün',
     'time.hour': '{count} saat',
@@ -1091,6 +1185,12 @@ export const SERVER_NEW = {
     'ignores.empty': 'Danh sách bỏ qua của bạn trống.',
     'ignores.list': 'Đã bỏ qua ({count}): {names}',
     'ignores.usage': 'Cách dùng: /ignore <tên>, /unignore <tên>, /ignorelist.',
+    'flair.shown':
+      'Vai trò Discord của bạn đang hiển thị với người chơi khác. Gõ /flair off để ẩn.',
+    'flair.hidden':
+      'Vai trò Discord của bạn đang bị ẩn với người chơi khác. Gõ /flair on để hiển thị.',
+    'flair.notLinked': 'Hãy liên kết tài khoản Discord của bạn để dùng /flair.',
+    'flair.usage': 'Cách dùng: /flair, /flair on hoặc /flair off.',
     'friends.notIgnored': '{name} không có trong danh sách phớt lờ của bạn.',
     'friends.notOnFriends': "Không có nhân vật nào tên '{name}' trong danh sách bạn bè của bạn.",
     'friends.notOnIgnore': "Không có nhân vật nào tên '{name}' trong danh sách phớt lờ của bạn.",
@@ -1159,6 +1259,14 @@ export const SERVER_NEW = {
     'moderation.tooManyFailed': 'Quá nhiều lần thử thất bại. Hãy chờ vài phút rồi thử lại.',
     'pet.nameNotAllowed': 'Tên thú nuôi không được phép.',
     'legendary.nameNotAllowed': 'Tên đó không được phép.',
+    'presence.everyone':
+      'Bạn bè và thành viên bang hội có thể thấy bạn trực tuyến. Gõ /presence friends hoặc /presence none để ẩn.',
+    'presence.friends':
+      'Chỉ bạn bè của bạn mới thấy bạn trực tuyến. Gõ /presence everyone hoặc /presence none để thay đổi.',
+    'presence.none':
+      'Bạn hiển thị ngoại tuyến với bạn bè và thành viên bang hội. Gõ /presence everyone hoặc /presence friends để thay đổi.',
+    'presence.usage':
+      'Cách dùng: /presence, /presence everyone, /presence friends hoặc /presence none.',
     'time.day': '{count} ngày',
     'time.days': '{count} ngày',
     'time.hour': '{count} giờ',

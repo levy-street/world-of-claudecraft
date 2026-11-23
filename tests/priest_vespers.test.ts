@@ -43,6 +43,11 @@ function vespersPriest(): { sim: Sim; priest: Entity } {
   const sim = new Sim({ seed: 2803, playerClass: 'priest', autoEquip: true });
   sim.setPlayerLevel(20);
   expect(sim.setSpec('shadow')).toBe(true);
+  // These single-priest combat cases do not need ambient world AI ticking.
+  const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+  for (const entity of [...sim.entities.values()]) {
+    if (entity.id !== sim.playerId) ctx.dropEntity(entity.id);
+  }
   sim.tick();
   sim.player.resource = sim.player.maxResource;
   // Never-resist harness (the makeAffliction idiom): the arrangement casts
@@ -474,7 +479,7 @@ describe('Vespers baseline loop', () => {
     );
   });
 
-  it('dismisses Tithefiend when no Effigy or own-Dirge fallback remains', () => {
+  it('keeps Tithefiend idle without own Dirge and resumes the same summon when Dirge returns', () => {
     const { sim, priest } = vespersPriest();
     const primary = addDummy(sim, 9923, priest.pos.x, priest.pos.z + 8);
     prepareEffigy(sim, priest, primary);
@@ -483,22 +488,95 @@ describe('Vespers baseline loop', () => {
     priest.cooldowns.delete('summon_tithefiend');
     sim.castAbility('summon_tithefiend', priest.id);
     sim.tick();
-    expect(
-      [...sim.entities.values()].some(
-        (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
-      ),
-    ).toBe(true);
+    const guardian = [...sim.entities.values()].find(
+      (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
+    );
+    if (!guardian?.guardianState) throw new Error('Tithefiend missing');
+    const remaining = guardian.guardianState.remaining;
+    const dirge = primary.auras.find((aura) => aura.id === 'shadow_word_pain');
+    if (!dirge) throw new Error('Dirge missing');
 
     primary.auras = primary.auras.filter(
       (aura) => aura.id !== 'priest_effigy' && aura.id !== 'shadow_word_pain',
     );
-    for (let tick = 0; tick < 12; tick++) sim.tick();
-
+    // Another priest's Dirge must not make this guardian attack.
+    primary.auras.push({ ...dirge, sourceId: priest.id + 1000 });
+    const idleEvents = Array.from({ length: 40 }, () => sim.tick()).flat();
+    expect(sim.entities.get(guardian.id)).toBe(guardian);
+    expect(guardian.guardianState.remaining).toBeCloseTo(remaining - 2, 6);
     expect(
-      [...sim.entities.values()].some(
-        (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
+      idleEvents.filter(
+        (event) => event.type === 'damage' && event.ability === 'Tithefiend Strike',
       ),
-    ).toBe(false);
+    ).toHaveLength(0);
+
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    sim.castAbility('shadow_word_pain', priest.id);
+    // Allow the reapplication projectile to arrive before the guardian's next poll.
+    const resumedEvents = Array.from({ length: 40 }, () => sim.tick()).flat();
+    expect(sim.entities.get(guardian.id)).toBe(guardian);
+    expect(
+      resumedEvents.some(
+        (event) => event.type === 'damage' && event.ability === 'Tithefiend Strike',
+      ),
+    ).toBe(true);
+    expect(guardian.guardianState.remaining).toBeLessThan(remaining - 2);
+  });
+
+  it.each(['duration', 'owner death'] as const)(
+    'still dismisses an idle Tithefiend on %s',
+    (reason) => {
+      const { sim, priest } = vespersPriest();
+      const primary = addDummy(sim, 9924, priest.pos.x, priest.pos.z + 8);
+      prepareEffigy(sim, priest, primary);
+      addGloomtithe((sim as unknown as { ctx: SimContext }).ctx, priest, 5);
+      priest.gcdRemaining = 0;
+      priest.resource = priest.maxResource;
+      sim.castAbility('summon_tithefiend', priest.id);
+      const guardian = [...sim.entities.values()].find(
+        (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
+      );
+      if (!guardian?.guardianState) throw new Error('Tithefiend missing');
+      primary.auras = [];
+      for (let tick = 0; tick < 12; tick++) sim.tick();
+      expect(sim.entities.has(guardian.id)).toBe(true);
+      if (reason === 'owner death') {
+        priest.dead = true;
+        sim.tick();
+      } else {
+        for (let tick = 0; tick < 300; tick++) sim.tick();
+      }
+      expect(sim.entities.has(guardian.id)).toBe(false);
+    },
+  );
+
+  it.each([29, 30])('channels Litany of Woe at %s yards', (distance) => {
+    const { sim, priest } = vespersPriest();
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    ctx.lineOfSightBlocked = () => false;
+    const primary = addDummy(sim, 9925, priest.pos.x, priest.pos.z + distance);
+    sim.targetEntity(primary.id, priest.id);
+    sim.castAbility('mind_flay', priest.id);
+    expect(priest.castingAbility).toBe('mind_flay');
+    // At 30 yards the final channel projectile lands after the channel ends.
+    const events = Array.from({ length: 100 }, () => sim.tick()).flat();
+    expect(
+      events.filter((event) => event.type === 'damage' && event.ability === 'Litany of Woe'),
+    ).toHaveLength(3);
+  });
+
+  it('rejects Litany outside 30 yards without spending Mana or starting its channel', () => {
+    const { sim, priest } = vespersPriest();
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    ctx.lineOfSightBlocked = () => false;
+    const primary = addDummy(sim, 9926, priest.pos.x, priest.pos.z + 31);
+    sim.targetEntity(primary.id, priest.id);
+    const mana = priest.resource;
+    sim.castAbility('mind_flay', priest.id);
+    expect(priest.castingAbility).toBeNull();
+    expect(priest.resource).toBe(mana);
+    expect(priest.gcdRemaining).toBe(0);
   });
 
   it('produces the same Effigy, bank, echo, and guardian outcome for the same seed', () => {
@@ -512,9 +590,31 @@ describe('Vespers baseline loop', () => {
       priest.cooldowns.delete('summon_tithefiend');
       sim.castAbility('summon_tithefiend', priest.id);
       const events: Array<Record<string, unknown>> = [];
+      let survivedIdle = false;
+      let resumed = false;
       for (let tick = 0; tick < 50; tick++) {
+        if (tick === 10) {
+          for (const target of [primary, secondary]) {
+            target.auras = target.auras.filter((aura) => aura.id !== 'shadow_word_pain');
+          }
+        }
+        if (tick === 25) {
+          survivedIdle = [...sim.entities.values()].some(
+            (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
+          );
+        }
+        if (tick === 30) {
+          priest.gcdRemaining = 0;
+          priest.resource = priest.maxResource;
+          sim.castAbility('shadow_word_pain', priest.id);
+        }
+        const tickEvents = sim.tick();
+        if (tick >= 30)
+          resumed ||= tickEvents.some(
+            (event) => event.type === 'damage' && event.ability === 'Tithefiend Strike',
+          );
         events.push(
-          ...sim.tick().map((event) => ({
+          ...tickEvents.map((event) => ({
             type: event.type,
             ...('ability' in event ? { ability: event.ability } : {}),
             ...('amount' in event ? { amount: event.amount } : {}),
@@ -525,6 +625,9 @@ describe('Vespers baseline loop', () => {
         (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
       );
       return {
+        survivedIdle,
+        resumed,
+        rngTail: Array.from({ length: 4 }, () => sim.rng.range(0, 1)),
         primaryHp: primary.hp,
         secondaryHp: secondary.hp,
         resource: priest.resource,
@@ -539,6 +642,9 @@ describe('Vespers baseline loop', () => {
       };
     };
 
-    expect(run()).toEqual(run());
+    const first = run();
+    expect(first.survivedIdle).toBe(true);
+    expect(first.resumed).toBe(true);
+    expect(first).toEqual(run());
   });
 });

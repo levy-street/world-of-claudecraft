@@ -16,7 +16,8 @@
 // questLog/questsDone shape is identical for the offline Sim and the online
 // ClientWorld mirror, so the two produce identical models.
 
-import { NPCS, QUESTS, questRewardItem, zoneAt } from '../../../sim/data';
+import { NPCS, QUESTS, zoneAt } from '../../../sim/data';
+import { questFixedReward } from '../../../sim/quests/quest_reward_choice';
 import type { PlayerClass, QuestProgress } from '../../../sim/types';
 import { questObjectiveRequired } from '../../../sim/types';
 
@@ -168,7 +169,7 @@ export function buildQuestLogView(input: QuestLogInput): QuestLogView {
         }),
         xpReward: quest.xpReward,
         copperReward: quest.copperReward,
-        rewardItemId: questRewardItem(quest, playerClass) ?? null,
+        rewardItemId: questFixedReward(quest, playerClass) ?? null,
         turnInNpcId: quest.turnInNpcId,
       };
     }

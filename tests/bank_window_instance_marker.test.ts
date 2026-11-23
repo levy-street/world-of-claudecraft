@@ -84,6 +84,22 @@ function slot(itemId: string, instance?: ItemInstancePayload, count = 1): InvSlo
 }
 
 describe('bank grid instanced-slot marker', () => {
+  it('keeps maker glyph and accessible label on a normalized mixed potion', () => {
+    const root = windowFor([
+      {
+        itemId: 'minor_healing_potion',
+        count: 3,
+        materialSources: [
+          { source: { signer: 'Ana' }, count: 1 },
+          { source: { signer: 'Bru' }, count: 2 },
+        ],
+      },
+    ]);
+    const cell = root.querySelector('.bank-item:not(.empty)');
+    expect(cell?.querySelector('.bi-glyph-signed')).not.toBeNull();
+    expect(cell?.getAttribute('aria-label')).toContain('maker-marked copy');
+  });
+
   it('a promoted copy keeps its chosen name in the aria and asks the icon for its legendary rim', () => {
     // The all-surfaces rule on the personal bank, both halves: the cell
     // authority (worn_item_cell_view.ts) hands the grid the chosen name for
@@ -300,7 +316,7 @@ describe('bank-item instance mark stylesheet contract', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/[^\n]*/g, '');
     expect(painter).toContain('cornerMarkHtml(cornerMark)');
-    expect(painter).toContain('bagInstanceGlyphKind(slot.instance)');
+    expect(painter).toContain('bagInstanceGlyphKind(slot.instance, slot.materialSources)');
     // The KNOWN key family must be used on its own: the lookbehind skips the
     // UNKNOWN_ sibling, whose name contains this one as a substring (a bare
     // contain could never fail while the import line exists).

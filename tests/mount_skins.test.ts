@@ -17,7 +17,7 @@ import {
   normalizeMountSkinId,
   RETIRED_MOUNT_SKIN_IDS,
 } from '../src/sim/content/mount_skins';
-import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
+import { MOUNT_KEYS, MOUNTS, mountDef } from '../src/sim/content/mounts';
 
 // Mount skins are account cosmetics worn OVER a ridden mount: a look, never a
 // catalog row. These pins keep the family disjoint from the mount catalog and
@@ -70,12 +70,12 @@ describe('mount skin catalog', () => {
     for (const id of MOUNT_SKIN_IDS) expect(MOUNT_SKINS[id].rarity, id).toBe('epic');
   });
 
-  it('is disjoint from the mount catalog: a skin id is never a MountKey', () => {
+  it('keeps paid SKUs separate while registering collectible mounts as skins', () => {
     for (const id of MOUNT_SKIN_IDS) {
       expect(id in MOUNTS).toBe(false);
       expect((MOUNT_KEYS as readonly string[]).includes(id)).toBe(false);
     }
-    for (const key of MOUNT_KEYS) expect(isMountSkinId(key)).toBe(false);
+    for (const key of MOUNT_KEYS) expect(isMountSkinId(key)).toBe(true);
   });
 
   it('carries no speed tier: a skin never changes what the ridden mount does', () => {
@@ -86,12 +86,23 @@ describe('mount skin catalog', () => {
     }
   });
 
+  it.each(['__proto__', 'constructor', 'toString', 'hasOwnProperty'])(
+    'refuses inherited catalog identity %s',
+    (id) => {
+      expect(mountDef(id)).toBeNull();
+      expect(isMountSkinId(id)).toBe(false);
+      expect(mountSkinDef(id)).toBeNull();
+      expect(normalizeMountSkinId(id)).toBeNull();
+      expect(mountPresentationKey('valorsteed', id)).toBe('valorsteed');
+    },
+  );
+
   it('resolves and normalizes ids strictly', () => {
     expect(mountSkinDef('mech_bird')?.name).toBe('Cluckwork Mech Bird');
-    expect(mountSkinDef('valorsteed')).toBeNull();
+    expect(mountSkinDef('valorsteed')?.rarity).toBe('common');
     expect(mountSkinDef('')).toBeNull();
     expect(normalizeMountSkinId('chimeglass_tortoise')).toBe('chimeglass_tortoise');
-    expect(normalizeMountSkinId('valorsteed')).toBeNull();
+    expect(normalizeMountSkinId('valorsteed')).toBe('valorsteed');
     expect(normalizeMountSkinId('')).toBeNull();
     expect(normalizeMountSkinId(null)).toBeNull();
     expect(normalizeMountSkinId(undefined)).toBeNull();

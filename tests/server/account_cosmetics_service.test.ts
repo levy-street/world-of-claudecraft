@@ -1,9 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const { persist } = vi.hoisted(() => ({ persist: vi.fn() }));
+const { persist, persistWeapon } = vi.hoisted(() => ({
+  persist: vi.fn(),
+  persistWeapon: vi.fn(),
+}));
 vi.mock('../../server/db', () => ({
   grantAccountMountSkins: persist,
-  grantAccountWeaponSkins: vi.fn(),
+  grantAccountWeaponSkins: persistWeapon,
   grantAccountMechChroma: vi.fn(),
   markAccountQuestComplete: vi.fn(),
   setAccountWeaponSkinLoadout: vi.fn(),
@@ -12,6 +15,7 @@ vi.mock('../../server/db', () => ({
 import { EMPTY_LIVE_ACCOUNT_COSMETICS } from '../../server/account_cosmetics_live';
 import { AccountCosmeticsService } from '../../server/account_cosmetics_service';
 import { RETIRED_MOUNT_SKIN_IDS } from '../../src/sim/content/mount_skins';
+import { RESERVED_WEAPON_SKIN_IDS } from '../../src/sim/content/weapon_skins';
 
 const base = () => ({ ...EMPTY_LIVE_ACCOUNT_COSMETICS, mountSkinIds: [] as string[] });
 const flush = async () => {
@@ -20,6 +24,7 @@ const flush = async () => {
 afterEach(() => {
   vi.restoreAllMocks();
   persist.mockReset();
+  persistWeapon.mockReset();
 });
 
 function setup() {
@@ -39,7 +44,45 @@ function setup() {
   return { service, sessions, sim };
 }
 
+describe('weapon skins reserved for a future raid', () => {
+  it('never mirrors one the economy ledger grants, nor grants one through the guild ledger', () => {
+    const { service, sessions } = setup();
+    expect(RESERVED_WEAPON_SKIN_IDS.length).toBe(4);
+    service.grantWeaponSkins(7, [...RESERVED_WEAPON_SKIN_IDS, 'not_a_skin']);
+    expect(persistWeapon).not.toHaveBeenCalled();
+    expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([[], []]);
+    const ledger = service.ledger(sessions[0] as never);
+    for (const id of RESERVED_WEAPON_SKIN_IDS) expect(ledger.grantWeaponSkin(id), id).toBe(false);
+    expect(sessions[0].accountCosmetics.weaponSkinIds).toEqual([]);
+    // Even an allowed earned skin must go through the atomic character/account
+    // purchase coordinator; a synchronous grant cannot safely charge seals.
+    expect(ledger.grantWeaponSkin('lantern_hall_sword')).toBe(false);
+    expect(persistWeapon).not.toHaveBeenCalled();
+    const purchase = vi.fn();
+    const onlineLedger = service.ledger(sessions[0], purchase);
+    onlineLedger.purchaseWeaponSkin?.('weapon_skin_lantern_hall_sword');
+    expect(purchase).toHaveBeenCalledExactlyOnceWith('weapon_skin_lantern_hall_sword');
+    expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([[], []]);
+    expect(persistWeapon).not.toHaveBeenCalled();
+  });
+});
+
 describe('durable mount skin grants', () => {
+  it('keeps an alt-backed selection while item ownership is provisional, then revokes on authoritative absence', () => {
+    const { service, sessions, sim } = setup();
+    sim.meta = () => ({ mountSkinId: 'grag_bear', accountMountSkinIds: [] }) as never;
+    service.setCollectibleMountSkins(7, [], sessions, false);
+    expect(sim.setMountSkin).not.toHaveBeenCalled();
+    service.setCollectibleMountSkins(7, [], sessions, true);
+    expect(sim.setMountSkin).toHaveBeenCalledWith(1, null);
+    expect(sim.setMountSkin).toHaveBeenCalledWith(2, null);
+  });
+
+  it('never turns a collectible reins projection into a permanent paid grant', () => {
+    const { service } = setup();
+    service.grantMountSkins(7, ['valorsteed', 'grag_bear']);
+    expect(persist).not.toHaveBeenCalled();
+  });
   it('never mirrors a retired skin the economy ledger still grants', () => {
     // The service's grant ledger keeps the Rallycart RXT rows as dormant data
     // after the skin left the catalog; the mirror filters them like any id the
@@ -115,5 +158,50 @@ describe('durable mount skin grants', () => {
       [1, 'mech_bird'],
       [1, null],
     ]);
+  });
+});
+
+describe('replaceable collectible mount cosmetics', () => {
+  it('fans revocation to indexed characters, updates simulation ownership, clears worn looks, and dirties snapshots', () => {
+    const metas = new Map(
+      [1, 2].map((pid) => [
+        pid,
+        {
+          questsDone: new Set<string>(),
+          questLog: new Map(),
+          accountMountSkinIds: [] as readonly string[],
+          mountSkinId: pid === 1 ? 'valorsteed' : 'mech_bird',
+        },
+      ]),
+    );
+    const sessions = [1, 2].map((pid) => ({
+      pid,
+      accountId: 7,
+      accountCosmetics: { ...base(), mountSkinIds: ['mech_bird'] },
+      selfHeavyDirty: false,
+    }));
+    const setMountSkin = vi.fn();
+    const realmSessions = vi.fn(() => {
+      throw new Error('indexed fanout must not scan realm');
+    });
+    const service = new AccountCosmeticsService({
+      sim: () => ({ meta: (pid: number) => metas.get(pid), setMountSkin }) as never,
+      sessions: realmSessions,
+      resyncQuests: vi.fn(),
+    });
+    service.remember(7, sessions[0].accountCosmetics);
+    service.setCollectibleMountSkins(7, ['valorsteed'], sessions);
+    expect(metas.get(2)?.accountMountSkinIds).toEqual(['mech_bird', 'valorsteed']);
+    expect(setMountSkin).not.toHaveBeenCalled();
+    service.setCollectibleMountSkins(7, [], sessions);
+    expect(setMountSkin).toHaveBeenCalledExactlyOnceWith(1, null);
+    expect(sessions.map((session) => session.accountCosmetics.collectibleMountSkinIds)).toEqual([
+      [],
+      [],
+    ]);
+    expect(sessions.every((session) => session.selfHeavyDirty)).toBe(true);
+    expect(metas.get(1)?.accountMountSkinIds).toEqual(['mech_bird']);
+    expect(realmSessions).not.toHaveBeenCalled();
+    expect(persist).not.toHaveBeenCalled();
   });
 });

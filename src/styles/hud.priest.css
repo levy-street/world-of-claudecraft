@@ -1,0 +1,451 @@
+/* A class medallion: faceted silver, a liquid void core, and five tithe gems.
+   Decoration is token-colored; counts and readiness survive every quality tier. */
+@layer components {
+  .priest-charge-frame {
+    --priest-metal: color-mix(in srgb, var(--color-text-on-ink) 52%, var(--color-debuff-shadow));
+    --priest-metal-dark: color-mix(in srgb, var(--color-debuff-shadow) 25%, var(--color-ink-deep));
+    position: fixed;
+    left: 50%;
+    top: 70%;
+    translate: -50% -50%;
+    z-index: 24;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    height: 144px;
+    isolation: isolate;
+    color: var(--color-text-on-ink);
+    pointer-events: none;
+  }
+  .priest-charge-frame.hud-frame-detached {
+    translate: none;
+  }
+  #ui > .priest-charge-frame:not(.tf-unlocked) {
+    pointer-events: none;
+  }
+  .priest-charge-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .priest-bomb-meter {
+    position: relative;
+    flex: 0 0 104px;
+    width: 104px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
+    pointer-events: auto;
+  }
+  .priest-bomb-crown,
+  .priest-bomb-bezel,
+  .priest-bomb-orbit,
+  .priest-bomb-bar,
+  .priest-bomb-fill {
+    position: absolute;
+    pointer-events: none;
+  }
+  .priest-bomb-crown {
+    inset: -1px -26px;
+    z-index: -1;
+    clip-path: polygon(
+      50% 0,
+      57% 15%,
+      64% 11%,
+      68% 26%,
+      89% 25%,
+      81% 39%,
+      100% 48%,
+      81% 55%,
+      88% 73%,
+      66% 71%,
+      59% 90%,
+      50% 100%,
+      41% 90%,
+      34% 71%,
+      12% 73%,
+      19% 55%,
+      0 48%,
+      19% 39%,
+      11% 25%,
+      32% 26%,
+      36% 11%,
+      43% 15%
+    );
+    background: conic-gradient(
+      from 15deg,
+      var(--priest-metal-dark),
+      var(--priest-metal) 9%,
+      var(--color-portrait-lo) 16%,
+      var(--priest-metal) 24%,
+      var(--priest-metal-dark) 32%,
+      var(--color-portrait-hi) 42%,
+      var(--priest-metal) 49%,
+      var(--priest-metal-dark) 58%,
+      var(--priest-metal) 65%,
+      var(--color-portrait-lo) 73%,
+      var(--priest-metal) 85%,
+      var(--priest-metal-dark)
+    );
+    filter: drop-shadow(0 2px 2px var(--color-ink-deep));
+  }
+  .priest-bomb-crown::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    clip-path: inherit;
+    background:
+      radial-gradient(ellipse, transparent 42%, var(--color-ink-deep) 45% 49%, transparent 51%),
+      linear-gradient(
+        120deg,
+        transparent 28%,
+        color-mix(in srgb, var(--color-text-on-ink) 22%, transparent) 29%,
+        transparent 31% 70%,
+        var(--color-portrait-hi) 71%
+      );
+  }
+  .priest-bomb-bezel {
+    inset: 10px;
+    z-index: 3;
+    border: 4px ridge var(--priest-metal);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 0 0 2px var(--color-ink-deep),
+      0 0 0 2px var(--priest-metal-dark),
+      0 3px 5px var(--color-ink-deep);
+  }
+  .priest-bomb-orb {
+    --disc-size: 74px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    pointer-events: none;
+  }
+  .priest-bomb-orb-fill {
+    position: absolute;
+    inset: 0;
+    transform-origin: center bottom;
+    background:
+      radial-gradient(
+        ellipse at 24% 28%,
+        color-mix(in srgb, var(--color-text-on-ink) 85%, transparent),
+        transparent 23%
+      ),
+      radial-gradient(ellipse at 78% 70%, var(--color-aura-rpg-violet), transparent 42%),
+      linear-gradient(
+        0deg,
+        var(--priest-metal-dark),
+        var(--color-debuff-shadow) 42%,
+        var(--color-aura-rpg-violet) 82%,
+        var(--color-text-on-ink)
+      );
+    box-shadow:
+      inset 0 5px 7px -4px var(--color-text-on-ink),
+      inset 0 -7px 15px var(--priest-metal-dark);
+    transition: transform calc(280ms * var(--motion-scale)) ease-out;
+  }
+  .priest-bomb-orb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(
+        ellipse at 30% 18%,
+        color-mix(in srgb, var(--color-text-on-ink) 48%, transparent),
+        transparent 26%
+      ),
+      radial-gradient(
+        circle,
+        transparent 35%,
+        color-mix(in srgb, var(--color-ink-deep) 80%, transparent) 95%
+      );
+    pointer-events: none;
+  }
+  .priest-bomb-sigil {
+    position: absolute;
+    left: 50%;
+    top: 34%;
+    width: 27px;
+    height: 15px;
+    translate: -50% -50%;
+    rotate: -45deg;
+    border: 1px solid color-mix(in srgb, var(--color-text-on-ink) 65%, transparent);
+    border-radius: 80% 0 80% 0;
+    background: radial-gradient(
+      circle,
+      var(--color-text-on-ink) 0 7%,
+      var(--color-ink-deep) 10% 24%,
+      transparent 28%
+    );
+    box-shadow: 0 0 9px color-mix(in srgb, var(--color-aura-rpg-violet) 55%, transparent);
+  }
+  .priest-bomb-bar {
+    inset: 7px;
+    z-index: 4;
+    border-radius: 50%;
+    overflow: hidden;
+    mask: radial-gradient(circle, transparent 66%, var(--color-white) 68% 71%, transparent 73%);
+  }
+  .priest-bomb-fill {
+    --priest-progress: 0;
+    inset: 0;
+    background: conic-gradient(
+      from 180deg,
+      var(--color-aura-rpg-violet),
+      var(--color-text-on-ink) calc(var(--priest-progress) * 1turn),
+      transparent 0
+    );
+  }
+  .priest-bomb-body {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .priest-bomb-header {
+    position: absolute;
+    left: 50%;
+    top: 61px;
+    translate: -50% 0;
+  }
+  .priest-charge-count {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-on-ink);
+    text-shadow:
+      0 1px 2px var(--color-ink-deep),
+      0 -1px 2px var(--color-ink-deep);
+  }
+  .priest-bomb-header .priest-charge-count {
+    display: block;
+    padding: 2px 6px;
+    border: 1px solid var(--priest-metal);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(var(--color-portrait-hi), var(--color-ink-deep));
+    box-shadow: 0 2px 4px var(--color-ink-deep);
+    font-size: 14px;
+    line-height: 18px;
+  }
+  .priest-bomb-ready {
+    position: absolute;
+    top: 91px;
+    left: -22px;
+    right: -22px;
+    text-align: center;
+    font-size: 10px;
+    line-height: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px var(--color-ink-deep);
+  }
+  .priest-bomb-orbit {
+    inset: -15px;
+    z-index: -2;
+    border-radius: 50%;
+    opacity: 0;
+    background: radial-gradient(
+      circle,
+      transparent 35%,
+      color-mix(in srgb, var(--color-aura-rpg-violet) 40%, transparent) 48%,
+      transparent 69%
+    );
+  }
+  .priest-bomb-meter.ready .priest-bomb-orbit {
+    opacity: var(--fx-shadow, 1);
+    animation: priest-ready-breathe 2.4s ease-in-out infinite;
+  }
+  .priest-bomb-meter.ready .priest-bomb-bezel {
+    border-color: var(--color-text-on-ink);
+    box-shadow:
+      inset 0 0 0 2px var(--priest-metal-dark),
+      0 0 calc(12px * var(--fx-shadow, 1)) var(--color-debuff-shadow);
+  }
+  .priest-bomb-meter.ready .priest-bomb-orb-fill::after {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background: conic-gradient(
+      transparent 0 22%,
+      color-mix(in srgb, var(--color-text-on-ink) 52%, transparent) 28%,
+      transparent 36% 58%,
+      color-mix(in srgb, var(--color-aura-rpg-violet) 70%, transparent) 65%,
+      transparent 74%
+    );
+    animation: priest-void-turn 9s linear infinite;
+  }
+  .priest-gloom-meter {
+    position: relative;
+    width: 148px;
+    min-height: 40px;
+    flex: 0 0 40px;
+    display: flex;
+    justify-content: center;
+    pointer-events: auto;
+  }
+  .priest-gloom-pips {
+    position: absolute;
+    inset: 4px 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
+  .priest-gloom-pips::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: -12px;
+    height: 23px;
+    border-bottom: 2px ridge var(--priest-metal);
+    border-radius: 50%;
+    box-shadow: 0 2px 3px var(--color-ink-deep);
+  }
+  .priest-gloom-pip {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    rotate: 45deg;
+    border: 2px ridge var(--priest-metal);
+    border-radius: 2px 5px 2px 5px;
+    background: linear-gradient(135deg, var(--color-portrait-hi), var(--color-ink-deep));
+    box-shadow: 0 2px 3px var(--color-ink-deep);
+    transition:
+      background calc(180ms * var(--motion-scale)),
+      box-shadow calc(180ms * var(--motion-scale));
+  }
+  .priest-gloom-pip:nth-child(2),
+  .priest-gloom-pip:nth-child(4) {
+    top: 4px;
+  }
+  .priest-gloom-pip:nth-child(3) {
+    top: 6px;
+  }
+  .priest-gloom-pip.on {
+    background: radial-gradient(
+      circle at 25% 22%,
+      var(--color-text-on-ink),
+      var(--color-aura-rpg-violet) 38%,
+      var(--priest-metal-dark) 83%
+    );
+    border-color: var(--color-aura-rpg-violet);
+    box-shadow:
+      0 0 calc(8px * var(--fx-shadow, 1)) var(--color-debuff-shadow),
+      inset 1px 1px 1px var(--color-text-on-ink);
+  }
+  .priest-gloom-meter .priest-charge-count {
+    position: absolute;
+    top: 28px;
+    font-size: 11px;
+    line-height: 12px;
+  }
+  .priest-gloom-meter:focus-visible,
+  .priest-bomb-meter:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+  }
+  @keyframes priest-ready-breathe {
+    50% {
+      opacity: 0.45;
+      transform: scale(1.08);
+    }
+  }
+  @keyframes priest-void-turn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (max-height: 820px) {
+    .priest-charge-frame {
+      top: 65%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .priest-charge-frame *,
+    .priest-charge-frame *::after {
+      animation: none !important;
+      transition: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .priest-bomb-crown,
+    .priest-bomb-orbit {
+      visibility: hidden;
+    }
+    .priest-bomb-bezel,
+    .priest-gloom-pip {
+      border-color: CanvasText;
+    }
+    .priest-bomb-orb-fill,
+    .priest-gloom-pip.on {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
+    .priest-bomb-header .priest-charge-count {
+      background: Canvas;
+      color: CanvasText;
+    }
+    .priest-bomb-meter.ready .priest-bomb-bezel {
+      border-color: Highlight;
+    }
+  }
+}
+@layer hud-mobile {
+  body.mobile-touch .priest-charge-frame {
+    --priest-touch-scale: var(--ui-scale, 1);
+    top: 58%;
+    width: 156px;
+    height: auto;
+    min-height: 132px;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
+    touch-action: none;
+    cursor: var(--cursor-move, move);
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  body.mobile-touch .priest-gloom-meter,
+  body.mobile-touch .priest-bomb-meter {
+    min-width: calc(40px / var(--priest-touch-scale));
+    min-height: calc(40px / var(--priest-touch-scale));
+  }
+  body.mobile-touch .priest-gloom-meter {
+    flex-basis: calc(40px / var(--priest-touch-scale));
+  }
+  body.mobile-touch .priest-bomb-meter {
+    flex-basis: 96px;
+    width: 96px;
+  }
+  body.mobile-touch .priest-bomb-orb {
+    --disc-size: 66px;
+  }
+  body.mobile-touch .priest-bomb-header {
+    top: 56px;
+  }
+  body.mobile-touch .priest-bomb-ready {
+    top: 85px;
+  }
+  body.mobile-touch .priest-gloom-meter .priest-charge-count {
+    top: 28px;
+    font-size: calc(11px / var(--priest-touch-scale));
+  }
+  body.mobile-touch .priest-charge-frame.tf-touch-placed {
+    left: var(--touch-fx);
+    top: var(--touch-fy);
+    translate: -50% -50%;
+    bottom: auto;
+  }
+}

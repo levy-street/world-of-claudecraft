@@ -1,0 +1,25 @@
+{
+  "bagBar": [
+    "http://localhost:5173/ui/items/backpack.webp",
+    "http://localhost:5173/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5173/ui/items/baked_bread.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_discipline_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_discipline_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_discipline_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_discipline_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_discipline_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_holy_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_holy_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_holy_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_holy_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_holy_gloves.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_shadow_helmet.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_shadow_shoulder.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_shadow_chest.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_shadow_legs.webp",
+    "http://localhost:5173/ui/items/vanguard_priest_shadow_gloves.webp"
+  ],
+  "allDecoded": true
+}

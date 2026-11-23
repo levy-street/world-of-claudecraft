@@ -10,11 +10,18 @@ import type { FactionId } from './factions';
 import {
   freshFactionCurrencies,
   freshFactionReputation,
+  sanitizeAlliedHearthstoneAttunement,
   sanitizeFactionCurrencies,
   sanitizeFactionReputation,
 } from './factions';
 import { type PersonalGliderRecords, sanitizeGliderRecords } from './glider_personal_records';
+import {
+  type GuildContractProgress,
+  sanitizeGuildContractProgress,
+  savedGuildContractProgress,
+} from './guild_contracts';
 import type { PlayerMeta } from './sim';
+import type { SimContext } from './sim_context';
 import {
   sanitizeTreasureMap,
   sanitizeVaultAttempt,
@@ -27,6 +34,7 @@ import { WORLD_BOSSES } from './world_boss';
 import { sanitizeWorldQuestReplacements } from './world_quest_reroll';
 import {
   activeWorldQuestsForCycle,
+  canRerollWorldQuest,
   restoreWorldQuestClaims,
   sanitizeWorldQuestCycle,
   sanitizeWorldQuestProgress,
@@ -41,6 +49,10 @@ export interface WorldQuestPlayerState {
   worldQuestLog: Map<string, WorldQuestProgress>;
   /** Session-only cycle override used by focused dev commands; never persisted. */
   devWorldQuestCycle?: string | null;
+  /** The operator world quest block (src/sim/world_quest_block.ts). Server-set
+   *  from the account row at join and on an admin change; never persisted in
+   *  the character blob, never true offline, never user-settable. */
+  worldQuestsBlocked?: boolean;
   /** Puzzle-area entry edges for this session. Never persisted or wired. */
   worldQuestAreas: Set<string>;
   /** Minigame unlocked by the area's physical activator for this session. */
@@ -55,6 +67,8 @@ export interface WorldQuestPlayerState {
   worldQuestReplacements: Record<string, string>;
   /** The weekly emissary's pick (src/sim/weekly_quests.ts); null while none is taken. */
   weeklyQuest: WeeklyQuestProgress | null;
+  /** Lantern Hall's weekly contracts (src/sim/guild_contracts.ts); null until the first. */
+  guildContracts: GuildContractProgress | null;
   /**
    * Clue Scrolls (src/sim/clue_scrolls.ts). The active hunt cursor (null when
    * none); the world-quest cycle that already paid a scroll ('' when none);
@@ -68,8 +82,8 @@ export interface WorldQuestPlayerState {
   clueCasketsOpened: number;
   /**
    * Treasure maps (src/sim/treasure_vault.ts): the map read and not yet dug up
-   * (null when none), and the guest vault payouts taken in `vaultGuestCycle`
-   * (the owner's own vaults never count). Cycle-independent like the hunt.
+   * (null when none). Legacy guest payout counters remain in saves for
+   * compatibility with older versions; they no longer restrict rewards.
    */
   treasureMap: TreasureMapProgress | null;
   vaultAttempt: VaultAttempt | null;
@@ -98,6 +112,7 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     worldQuestRerollCycle: '',
     worldQuestReplacements: {},
     weeklyQuest: null,
+    guildContracts: null,
     clueHunt: null,
     clueScrollCycle: '',
     clueCasketsOpened: 0,
@@ -156,6 +171,9 @@ export function restoreWorldQuestState(
   // by design; sanitizeClueHunt says the same); the step is clamped to the
   // hunt's length. The paid-cycle mark is kept whatever cycle it names: a
   // stale one simply never matches the current cycle again.
+  // Lantern Hall's contracts ride the same blob, restored whatever the board holds (a past
+  // week's done list rolls over on first read; the lifetime count is what persists).
+  meta.guildContracts = sanitizeGuildContractProgress(saved?.guildContracts);
   meta.clueHunt = sanitizeClueHunt(saved?.clueHunt);
   meta.clueScrollCycle = sanitizeWorldQuestCycle(saved?.clueScrollCycle);
   meta.clueCasketsOpened = sanitizeClueCasketsOpened(saved?.clueCasketsOpened);
@@ -170,6 +188,9 @@ export function restoreWorldQuestState(
   meta.vaultAttemptDurable = true;
   meta.vaultGuestCycle = sanitizeWorldQuestCycle(saved?.vaultGuestCycle);
   meta.vaultGuestPayouts = sanitizeVaultGuestPayouts(saved?.vaultGuestPayouts);
+  // The faction-reward Allied Hearthstone keeps its bind across sessions (an
+  // unknown hub id restores unbound, so the next use in a hub binds afresh).
+  meta.alliedHearthstoneAttunement = sanitizeAlliedHearthstoneAttunement(saved?.alliedHearthstone);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
@@ -215,6 +236,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasVaultAttempt = meta.vaultAttempt !== null && meta.vaultAttempt !== undefined;
   const hasVaultAttemptSeq = meta.vaultAttemptSeq > 0;
   const hasVaultGuest = (meta.vaultGuestPayouts ?? 0) > 0 && !!meta.vaultGuestCycle;
+  const guildContracts = savedGuildContractProgress(meta);
+  const hearth = sanitizeAlliedHearthstoneAttunement(meta.alliedHearthstoneAttunement);
   if (
     !meta.worldQuestCycle &&
     meta.worldQuestLog.size === 0 &&
@@ -228,7 +251,9 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasTreasureMap &&
     !hasVaultAttempt &&
     !hasVaultAttemptSeq &&
-    !hasVaultGuest
+    !hasVaultGuest &&
+    !guildContracts &&
+    !hearth
   ) {
     return weeklyPart;
   }
@@ -288,12 +313,14 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(hasClueHunt && meta.clueHunt ? { clueHunt: { ...meta.clueHunt } } : {}),
       ...(hasClueCycle ? { clueScrollCycle: meta.clueScrollCycle } : {}),
       ...(hasCaskets ? { clueCasketsOpened: meta.clueCasketsOpened } : {}),
+      ...(guildContracts ? { guildContracts } : {}),
       ...(hasTreasureMap && meta.treasureMap ? { treasureMap: { ...meta.treasureMap } } : {}),
       ...(hasVaultAttempt && meta.vaultAttempt ? { vaultAttempt: { ...meta.vaultAttempt } } : {}),
       ...(hasVaultAttemptSeq ? { vaultAttemptSeq: meta.vaultAttemptSeq } : {}),
       ...(hasVaultGuest
         ? { vaultGuestCycle: meta.vaultGuestCycle, vaultGuestPayouts: meta.vaultGuestPayouts }
         : {}),
+      ...(hearth ? { alliedHearthstone: hearth } : {}),
     },
     ...(factionsObj ? { factions: factionsObj } : {}),
     ...(currenciesObj ? { factionCurrencies: currenciesObj } : {}),
@@ -311,4 +338,17 @@ export function worldBossActive(
   if (entityId === null) return false;
   const entity = entities.get(entityId);
   return entity !== undefined && !entity.dead;
+}
+
+/** Resolve the coordinator's reroll read without owning player or rotation state. */
+export function canRerollWorldQuestForPlayer(
+  ctx: Pick<SimContext, 'entities' | 'currentWorldQuestRotation'>,
+  meta: PlayerMeta | undefined,
+  questId: string,
+): { canReroll: boolean; reason?: string } {
+  if (!meta) return { canReroll: false, reason: 'Player not found.' };
+  const player = ctx.entities.get(meta.entityId);
+  const level = player?.level ?? 20;
+  const cycle = meta.devWorldQuestCycle ?? ctx.currentWorldQuestRotation().cycle;
+  return canRerollWorldQuest(meta, questId, cycle, level);
 }

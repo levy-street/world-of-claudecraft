@@ -1413,7 +1413,7 @@ describe('STORAGE_PRICES env parsing (server/storage_prices.ts)', () => {
   it('a negative entry drops its whole dimension', async () => {
     const { parseStoragePrices } = await import('../../server/storage_prices');
     const { override, rejections } = parseStoragePrices(
-      '{"vaultUpgrades":[20000,50000,-1,200000,400000]}',
+      '{"vaultUpgrades":[20000,40000,-1,120000,200000,320000,500000,750000,1100000,1600000]}',
     );
     expect(override).toBeUndefined();
     expect(rejections).toHaveLength(1);
@@ -1467,13 +1467,13 @@ describe('STORAGE_PRICES env parsing (server/storage_prices.ts)', () => {
   it('a full valid override round-trips (fresh literal expectations)', async () => {
     const { parseStoragePrices } = await import('../../server/storage_prices');
     const { override, rejections } = parseStoragePrices(
-      '{"bankExpansions":[1,2,3,4,5,6,7,8,9,10,11,12],"bankSockets":[13,14,15,16],"vaultUpgrades":[17,18,19,20,21]}',
+      '{"bankExpansions":[1,2,3,4,5,6,7,8,9,10,11,12],"bankSockets":[13,14,15,16],"vaultUpgrades":[17,18,19,20,21,22,23,24,25,26]}',
     );
     expect(rejections).toStrictEqual([]);
     expect(override).toStrictEqual({
       bankExpansions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       bankSockets: [13, 14, 15, 16],
-      vaultUpgrades: [17, 18, 19, 20, 21],
+      vaultUpgrades: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
     });
   });
 
@@ -1605,8 +1605,10 @@ describe('STORAGE_PRICES env parsing (server/storage_prices.ts)', () => {
       bankExpansions: [
         500, 1000, 2500, 5000, 10000, 20000, 40000, 80000, 150000, 300000, 600000, 1200000,
       ],
-      bankSockets: [1000000, 2000000, 3500000, 5000000],
-      vaultUpgrades: [20000, 50000, 100000, 200000, 400000],
+      bankSockets: [750000, 1000000, 1250000, 1500000],
+      vaultUpgrades: [
+        20000, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000,
+      ],
     });
   });
 

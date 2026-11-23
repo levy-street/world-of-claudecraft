@@ -1,0 +1,17 @@
+{
+  "note": "The muster training effigy of Balgath and the soldiers' stake mallet. Raw GLBs come from the deterministic Blender factory scripts/assets/muster_effigy/model.py, driven by export_muster_effigy.mjs, which stamps the source fingerprint and runs this spec. Vertex-coloured, texture-free. keepExtras retains the empty LanternFlame node (the flame anchor) and the root extras. Silhouette reference: the project's own Balgath cyclops model, proportions only, nothing traced.",
+  "items": [
+    {
+      "src": "tmp/asset_src/muster_effigy/muster_effigy.glb",
+      "out": "models/creatures/muster_effigy.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_effigy/muster_mallet.glb",
+      "out": "models/weapons/muster_mallet.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

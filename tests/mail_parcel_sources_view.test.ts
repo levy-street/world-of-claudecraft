@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { MaterialComposition } from '../src/sim/material_sources';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type { InvSlot } from '../src/sim/types';
 import {
   appendableMailParcelCount,
@@ -47,6 +49,7 @@ describe('mail parcel material source view', () => {
   it('keeps mixed requests index-aligned and aggregates rows across recipe identities', () => {
     const inventory: InvSlot[] = [
       { itemId: 'baked_bread', count: 1 },
+      { itemId: 'worn_sword', count: 1 },
       {
         itemId: 'copper_ore',
         count: 1,
@@ -60,15 +63,22 @@ describe('mail parcel material source view', () => {
         materialSources: [{ source: { signer: 'Bru' }, count: 2 }],
       },
     ];
+    const before = structuredClone(inventory);
+    expect(isStackProvenanceItemId('baked_bread')).toBe(true);
+    expect(isStackProvenanceItemId('worn_sword')).toBe(false);
     const previews = plannedMailParcelSources(inventory, [
       { itemId: 'baked_bread', count: 1 },
       { itemId: 'copper_ore', count: 3 },
+      { itemId: 'worn_sword', count: 1 },
     ]);
 
     expect(previews).not.toBeNull();
-    expect(previews).toHaveLength(2);
-    expect(previews?.[0]).toBeUndefined();
+    expect(previews).toHaveLength(3);
+    expect(previews?.[0]).toEqual([{ source: {}, count: 1 }]);
     expect(sourceCounts(previews?.[1])).toEqual({ Ana: 1, Bru: 2 });
+    expect(previews?.[1]).toHaveLength(2);
+    expect(previews?.[2]).toBeUndefined();
+    expect(inventory).toEqual(before);
   });
 
   it('refuses previews and exposes no capacity for malformed material state', () => {
@@ -87,11 +97,59 @@ describe('mail parcel material source view', () => {
   });
 
   it('delegates non-material requests to the mailbox existing stock rules', () => {
-    const inventory: InvSlot[] = [{ itemId: 'baked_bread', count: 4 }];
-    const attachments: InvSlot[] = [{ itemId: 'baked_bread', count: 2 }];
+    expect(ITEMS.worn_sword.kind).toBe('weapon');
+    expect(isStackProvenanceItemId('worn_sword')).toBe(false);
+    const inventory: InvSlot[] = [{ itemId: 'worn_sword', count: 1 }];
+    const attachments: InvSlot[] = [{ itemId: 'worn_sword', count: 1 }];
 
-    expect(appendableMailParcelCount(inventory, [], 'baked_bread')).toBeNull();
+    expect(appendableMailParcelCount(inventory, [], 'worn_sword')).toBeNull();
     expect(mailParcelCountCeiling(inventory, attachments, 0)).toBeNull();
     expect(plannedMailParcelSources(inventory, attachments)).toEqual([undefined]);
   });
+
+  it.each(['baked_bread', 'minor_healing_potion'])(
+    'previews exact unknown and signed consumable units for %s',
+    (itemId) => {
+      expect(isStackProvenanceItemId(itemId)).toBe(true);
+      const inventory: InvSlot[] = [
+        { itemId, count: 2, craftedRecipeId: 'recipe_a' },
+        {
+          itemId,
+          count: 2,
+          craftedRecipeId: 'recipe_b',
+          materialSources: [
+            { source: { signer: 'Ana' }, count: 1 },
+            { source: { signer: 'Bru' }, count: 1 },
+          ],
+        },
+      ];
+      const before = structuredClone(inventory);
+      const attachments = [{ itemId, count: 4 }];
+      expect(appendableMailParcelCount(inventory, [], itemId)).toBe(4);
+      expect(appendableMailParcelCount(inventory, [{ itemId, count: 2 }], itemId)).toBe(2);
+      expect(mailParcelCountCeiling(inventory, attachments, 0)).toBe(4);
+      expect(plannedMailParcelSources(inventory, attachments)).toEqual([
+        [
+          { source: {}, count: 2 },
+          { source: { signer: 'Ana' }, count: 1 },
+          { source: { signer: 'Bru' }, count: 1 },
+        ],
+      ]);
+      expect(plannedMailParcelSources(inventory, [{ itemId, count: 5 }])).toBeNull();
+      expect(inventory).toEqual(before);
+    },
+  );
+
+  it.each([{ locked: true }, { boundTo: 7 }, { bindOnTrade: true }])(
+    'excludes locked or bound consumable stock: %j',
+    (instance) => {
+      const inventory: InvSlot[] = [{ itemId: 'baked_bread', count: 2, instance }];
+      const before = structuredClone(inventory);
+      const attachments = [{ itemId: 'baked_bread', count: 1, instance }];
+      expect(appendableMailParcelCount(inventory, [], 'baked_bread', instance)).toBe(0);
+      expect(mailParcelCountCeiling(inventory, attachments, 0)).toBe(0);
+      expect(plannedMailParcelSources(inventory, attachments)).toBeNull();
+      expect(inventory).toEqual(before);
+    },
+  );
 });

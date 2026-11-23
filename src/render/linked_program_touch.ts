@@ -27,6 +27,16 @@ export interface MaterialPropertiesLike {
   get(material: THREE.Material): unknown;
 }
 
+/** `webgl.properties` read at every call, never captured: a WebGL context
+ *  restore replaces three's properties object, and a settle or a host that
+ *  kept the old one polls the dead context's programs for the rest of the
+ *  session (context_restore.ts). */
+export function liveMaterialProperties(webgl: {
+  readonly properties: MaterialPropertiesLike;
+}): MaterialPropertiesLike {
+  return { get: (material) => webgl.properties.get(material) };
+}
+
 interface MaterialProgramsLike {
   programs?: Map<string, LinkedProgramLike>;
 }

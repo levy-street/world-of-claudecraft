@@ -1,0 +1,915 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "hoard-necro-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rare_bone_studded_pauldrons",
+      "family": "hoard-necro",
+      "tier": "Tarnished",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_bone_studded_pauldrons.webp",
+      "canonicalDisplayName": "Tarnished Bone-Studded Pauldrons",
+      "acceptedSha256": "ec963498c477ec56c2a5c3c2c3ef36c81208c97308291797ccdd1d5d46a2f793",
+      "acceptedBytes": 4106,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/rare_bone_studded_pauldrons.png",
+        "sha256": "c2b758dd57e6416e7ac66b63cb951b2711933eac9a079142721bfe06d052c14a",
+        "bytes": 2388263,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/rare_bone_studded_pauldrons.png",
+        "sha256": "e702f98874cab869707980c524e4514b963c98726b3c75322eaa3f14d954d863",
+        "bytes": 511489,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "1db8efdc6bf8dfc095d0890f558bb20eabb91046d7a31a83aacc4b480e9f8c34",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Bone-Studded Pauldrons (rare_bone_studded_pauldrons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of bone-pale MAIL shoulder pauldrons, layered steel scales and linked mail rings over dark backing, rounded pale bone studs on the ridges and a simple crossed-bone insignia on the foremost shoulder. One guard forward and matching partner behind. Clearly flexible mail construction with attached bone ornament, no wearer, no gore. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with faint green patina, aged yellow-grey bone, faded grey leather or cloth, restrained mint-green enchantment. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/rare_bone_studded_pauldrons.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "1db8efdc6bf8dfc095d0890f558bb20eabb91046d7a31a83aacc4b480e9f8c34"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_legguards_of_the_ossuary",
+      "family": "hoard-necro",
+      "tier": "Tarnished",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_legguards_of_the_ossuary.webp",
+      "canonicalDisplayName": "Tarnished Legguards of the Ossuary",
+      "acceptedSha256": "9994a75d29c50e3e4b053cd155d07f5b95bcd994012fe8792ea076ff932dbae6",
+      "acceptedBytes": 3066,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/rare_legguards_of_the_ossuary.png",
+        "sha256": "37945d8f56e9f1d686b9f5706f4009d3a85cdfd84aca960bc3212008ae7dbf65",
+        "bytes": 2170742,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/rare_legguards_of_the_ossuary.png",
+        "sha256": "b23f01903c3901c4f7da92dc05aad5b76daba3c6938fb4eb8d979ff95541a8e9",
+        "bytes": 481296,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "cea008105daa195f62bd9b647b6d98689cc05c54702eda55f9cdc8839a862baa",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Legguards of the Ossuary (rare_legguards_of_the_ossuary) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of ivory-grey LEATHER legguards, sturdy stitched hide trousers with overlapping cured leather thigh and knee panels, pale bone toggles and a simple crossed-bone insignia near the waist. Clearly leather grain and seams, not metal plate or bare skeletal legs. Complete waist to ankle, empty, no wearer. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with faint green patina, aged yellow-grey bone, faded grey leather or cloth, restrained mint-green enchantment. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/rare_legguards_of_the_ossuary.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "cea008105daa195f62bd9b647b6d98689cc05c54702eda55f9cdc8839a862baa"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_seal_of_the_cryptwalker",
+      "family": "hoard-necro",
+      "tier": "Tarnished",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_seal_of_the_cryptwalker.webp",
+      "canonicalDisplayName": "Tarnished Seal of the Cryptwalker",
+      "acceptedSha256": "ea9d0e4604f76140c3c1db87db49a9ddb1164b8609dfc17ec525bfdfea2ffe14",
+      "acceptedBytes": 2912,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/rare_seal_of_the_cryptwalker.png",
+        "sha256": "9974aa26925c3e64bb359f36a441f162a156565de83fbc5310f8bf59663124b0",
+        "bytes": 2216356,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/rare_seal_of_the_cryptwalker.png",
+        "sha256": "bc32ce06efa4fdf3f9d1a28bf5cb255a6f00bc621b1b64189f0b725290672165",
+        "bytes": 488954,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "a20f734909659eaee833f1d57d3f53e80444ff2e635dc2dbd23a53dc0d703d27",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Seal of the Cryptwalker (rare_seal_of_the_cryptwalker) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pale-bone seal ring in three-quarter view, circular metal band with a clear finger hole, diamond-shaped pale bone bezel holding a mint-green translucent seal stone, small crossed-bone motif on the lower band. Simple heavy signet silhouette, restrained spectral green glow, no skull. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with faint green patina, aged yellow-grey bone, faded grey leather or cloth, restrained mint-green enchantment. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/rare_seal_of_the_cryptwalker.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "a20f734909659eaee833f1d57d3f53e80444ff2e635dc2dbd23a53dc0d703d27"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_ossuary_bone_crown",
+      "family": "hoard-necro",
+      "tier": "Tarnished",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_ossuary_bone_crown.webp",
+      "canonicalDisplayName": "Tarnished Ossuary Bone Crown",
+      "acceptedSha256": "8b2ea17736a68b8d2f86addce2fdba7f6e8ff44d3fe56979e6ec6f39916353e2",
+      "acceptedBytes": 4040,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/rare_ossuary_bone_crown.png",
+        "sha256": "88c475af7e66fa4d06fe613ffc01f827011d0670a689dae60dde405bd0080cda",
+        "bytes": 2500842,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/rare_ossuary_bone_crown.png",
+        "sha256": "46165404899fe703a73d4fb8f5e8bfe86889023caf4c0e3728ab6f23705feeaa",
+        "bytes": 513280,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "83e4b01b687b4ccff3c9a45e7a0d47d8b9b9fecc200984909bab04dde843a2c6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Ossuary Bone Crown (rare_ossuary_bone_crown) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete CLOTH ceremonial crown: a broad padded ivory-grey fabric circlet with visible woven texture, dark stitched lining and five slender pale bone points attached around the top edge. Each bone point ends in a small mint-green enchanted bead. A small crossed-bone clasp on the front. Crown opening clearly visible, cloth body with bone ornaments, not a solid metal crown, no head or wearer. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with faint green patina, aged yellow-grey bone, faded grey leather or cloth, restrained mint-green enchantment. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/rare_ossuary_bone_crown.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "83e4b01b687b4ccff3c9a45e7a0d47d8b9b9fecc200984909bab04dde843a2c6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "bone_studded_pauldrons",
+      "family": "hoard-necro",
+      "tier": "Epic",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/bone_studded_pauldrons.webp",
+      "canonicalDisplayName": "Bone-Studded Pauldrons",
+      "acceptedSha256": "3f07110806f1b29535f8548112400f564413af46e3b9c3d035193b4f68c4c448",
+      "acceptedBytes": 4536,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/bone_studded_pauldrons.png",
+        "sha256": "d474fb74fb23997872e1cac00f8a425b7c49d20c7f9162c752f49544ba449ac1",
+        "bytes": 2384950,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/bone_studded_pauldrons.png",
+        "sha256": "2321222eb9941f22207a6b09bc9aa302add7d7b2eaf2d30f10776da00433f18f",
+        "bytes": 517970,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "6f6bcc18de85d020ca0b81443ce775d282c2d5385141cd13a555e25d0d0de341",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Bone-Studded Pauldrons (bone_studded_pauldrons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of bone-pale MAIL shoulder pauldrons, layered steel scales and linked mail rings over dark backing, rounded pale bone studs on the ridges and a simple crossed-bone insignia on the foremost shoulder. One guard forward and matching partner behind. Clearly flexible mail construction with attached bone ornament, no wearer, no gore. Tier finish: Well-kept masterwork: polished silver fittings, clean ivory bone and bone-grey leather or cloth, crisp crossed-bone details, clear mint-green accents. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/bone_studded_pauldrons.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "6f6bcc18de85d020ca0b81443ce775d282c2d5385141cd13a555e25d0d0de341"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legguards_of_the_ossuary",
+      "family": "hoard-necro",
+      "tier": "Epic",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legguards_of_the_ossuary.webp",
+      "canonicalDisplayName": "Legguards of the Ossuary",
+      "acceptedSha256": "b797df1f7c6c53766ddf5229b009cd1e844c5832233340c620c13de7e789c387",
+      "acceptedBytes": 3208,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/legguards_of_the_ossuary.png",
+        "sha256": "27b901ad76ba1a2771d18938e4cba621d8d699729177aa7762842022a31835b1",
+        "bytes": 2057952,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/legguards_of_the_ossuary.png",
+        "sha256": "623d3eaa27338cb98ef8eecbd9f51ed4fadd0efc7cbe77fbf4b6c3e0d7550ea1",
+        "bytes": 443252,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "457dcf199e51fae251b148f6b6e83ee449ca4ea11ef7ec7e8896e1217d8f15ab",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Legguards of the Ossuary (legguards_of_the_ossuary) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of ivory-grey LEATHER legguards, sturdy stitched hide trousers with overlapping cured leather thigh and knee panels, pale bone toggles and a simple crossed-bone insignia near the waist. Clearly leather grain and seams, not metal plate or bare skeletal legs. Complete waist to ankle, empty, no wearer. Tier finish: Well-kept masterwork: polished silver fittings, clean ivory bone and bone-grey leather or cloth, crisp crossed-bone details, clear mint-green accents. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/legguards_of_the_ossuary.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "457dcf199e51fae251b148f6b6e83ee449ca4ea11ef7ec7e8896e1217d8f15ab"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "seal_of_the_cryptwalker",
+      "family": "hoard-necro",
+      "tier": "Epic",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/seal_of_the_cryptwalker.webp",
+      "canonicalDisplayName": "Seal of the Cryptwalker",
+      "acceptedSha256": "dcb5bae961b6fd538ccff2232131875af8a0f872050ecbe1e82b4ae8cf96bb6a",
+      "acceptedBytes": 3294,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/seal_of_the_cryptwalker.png",
+        "sha256": "c22adaeab6f0240d0f5334ac1cbc72bda3e71df8b2e2e7f2533e6d3c89edabe6",
+        "bytes": 2199584,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/seal_of_the_cryptwalker.png",
+        "sha256": "63e72f035dab263b7e037040e52bdcef19e32cf5aa00de335d64b60bb821c2f4",
+        "bytes": 502562,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "41e8688d0746fcba5a6a697e6065c3f196e4b5f81a9127fa14cd3660a8a69672",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Seal of the Cryptwalker (seal_of_the_cryptwalker) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pale-bone seal ring in three-quarter view, circular metal band with a clear finger hole, diamond-shaped pale bone bezel holding a mint-green translucent seal stone, small crossed-bone motif on the lower band. Simple heavy signet silhouette, restrained spectral green glow, no skull. Tier finish: Well-kept masterwork: polished silver fittings, clean ivory bone and bone-grey leather or cloth, crisp crossed-bone details, clear mint-green accents. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/seal_of_the_cryptwalker.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "41e8688d0746fcba5a6a697e6065c3f196e4b5f81a9127fa14cd3660a8a69672"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "ossuary_bone_crown",
+      "family": "hoard-necro",
+      "tier": "Epic",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/ossuary_bone_crown.webp",
+      "canonicalDisplayName": "Ossuary Bone Crown",
+      "acceptedSha256": "d5d897d85ed025eadee2723f2a851e0afdcb243825133a441c66eaed5495a1b3",
+      "acceptedBytes": 3890,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/ossuary_bone_crown.png",
+        "sha256": "9b36469df407f4e0bcc23713ae4f46d9fdacacebbdc183c420802fd5f23ccb42",
+        "bytes": 2407385,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/ossuary_bone_crown.png",
+        "sha256": "a1ccd39dd78bbec68f88690cd07acd0328f47e11f5d078493baee175ef55702a",
+        "bytes": 503915,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "a3c4a19b7b0557d7789ebc9e9a7033c69f92d5a58dbf75b7d49f6b960bd0299f",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Ossuary Bone Crown (ossuary_bone_crown) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete CLOTH ceremonial crown: a broad padded ivory-grey fabric circlet with visible woven texture, dark stitched lining and five slender pale bone points attached around the top edge. Each bone point ends in a small mint-green enchanted bead. A small crossed-bone clasp on the front. Crown opening clearly visible, cloth body with bone ornaments, not a solid metal crown, no head or wearer. Tier finish: Well-kept masterwork: polished silver fittings, clean ivory bone and bone-grey leather or cloth, crisp crossed-bone details, clear mint-green accents. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/ossuary_bone_crown.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "a3c4a19b7b0557d7789ebc9e9a7033c69f92d5a58dbf75b7d49f6b960bd0299f"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_bone_studded_pauldrons",
+      "family": "hoard-necro",
+      "tier": "Sovereign",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_bone_studded_pauldrons.webp",
+      "canonicalDisplayName": "Sovereign Bone-Studded Pauldrons",
+      "acceptedSha256": "c0f0e42a57574e172bcd329300dfa8339337a311f9cc99e9c3ed7679557be38e",
+      "acceptedBytes": 5282,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/legendary_bone_studded_pauldrons.png",
+        "sha256": "20b49ef98cc3d1c9a7cbf11419a65da94bb5e01b6639ffc845e4ce3ca5d7eeb3",
+        "bytes": 2536450,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/legendary_bone_studded_pauldrons.png",
+        "sha256": "96e23261af70e273e3a8bf4d23e3b160f158fa1dbdae0b4a9c3c62fad1bd9f82",
+        "bytes": 566433,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "2820e938f8498c8f79ef94a52784b642a08a0c52d73ba06f2760df2f61c057ce",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Bone-Studded Pauldrons (legendary_bone_studded_pauldrons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of bone-pale MAIL shoulder pauldrons, layered steel scales and linked mail rings over dark backing, rounded pale bone studs on the ridges and a simple crossed-bone insignia on the foremost shoulder. One guard forward and matching partner behind. Clearly flexible mail construction with attached bone ornament, no wearer, no gore. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, pale polished ivory bone and charcoal-grey backing, additional angular gold ornament, brighter mint-green spectral accents. Gold belongs to the object, never a surrounding frame. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/legendary_bone_studded_pauldrons.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "2820e938f8498c8f79ef94a52784b642a08a0c52d73ba06f2760df2f61c057ce"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_legguards_of_the_ossuary",
+      "family": "hoard-necro",
+      "tier": "Sovereign",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_legguards_of_the_ossuary.webp",
+      "canonicalDisplayName": "Sovereign Legguards of the Ossuary",
+      "acceptedSha256": "f16464ebf829df349a641fc6b685e2b769b34d29abbb7021df27b46ac0b4cba1",
+      "acceptedBytes": 3802,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/legendary_legguards_of_the_ossuary.png",
+        "sha256": "4a4aaa931960478f62406b1c6a5c4fe57de214ec578e95636e6858730c6deacf",
+        "bytes": 2223414,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/legendary_legguards_of_the_ossuary.png",
+        "sha256": "3fab139672d14cea5cb248d263cdb81826bf7051ce300aab63987e15a1f2467d",
+        "bytes": 472519,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "22716d7b2f9de984e0af1f27f952b86a45a7f5998d626ab4033112d8850f89ad",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Legguards of the Ossuary (legendary_legguards_of_the_ossuary) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of ivory-grey LEATHER legguards, sturdy stitched hide trousers with overlapping cured leather thigh and knee panels, pale bone toggles and a simple crossed-bone insignia near the waist. Clearly leather grain and seams, not metal plate or bare skeletal legs. Complete waist to ankle, empty, no wearer. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, pale polished ivory bone and charcoal-grey backing, additional angular gold ornament, brighter mint-green spectral accents. Gold belongs to the object, never a surrounding frame. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/legendary_legguards_of_the_ossuary.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "22716d7b2f9de984e0af1f27f952b86a45a7f5998d626ab4033112d8850f89ad"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_seal_of_the_cryptwalker",
+      "family": "hoard-necro",
+      "tier": "Sovereign",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_seal_of_the_cryptwalker.webp",
+      "canonicalDisplayName": "Sovereign Seal of the Cryptwalker",
+      "acceptedSha256": "171b16eb694fadd3f2fdbfe0260efad80718822ad5f3028a85882a86b4732f2e",
+      "acceptedBytes": 3744,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/legendary_seal_of_the_cryptwalker.png",
+        "sha256": "260858d292a0b59159a0d0eb3fce9c124a5c4569d75c28fada57d36573802635",
+        "bytes": 2214060,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/legendary_seal_of_the_cryptwalker.png",
+        "sha256": "5578c96937132d59111ab181d8d18866fc3b3ba8d212c8c564e962f973dfd3fd",
+        "bytes": 518230,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "5791341e9abef4f8fa97aa3c92de7470cb716557f72aa542275945aa2657a0c8",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Seal of the Cryptwalker (legendary_seal_of_the_cryptwalker) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pale-bone seal ring in three-quarter view, circular metal band with a clear finger hole, diamond-shaped pale bone bezel holding a mint-green translucent seal stone, small crossed-bone motif on the lower band. Simple heavy signet silhouette, restrained spectral green glow, no skull. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, pale polished ivory bone and charcoal-grey backing, additional angular gold ornament, brighter mint-green spectral accents. Gold belongs to the object, never a surrounding frame. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/legendary_seal_of_the_cryptwalker.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "5791341e9abef4f8fa97aa3c92de7470cb716557f72aa542275945aa2657a0c8"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_ossuary_bone_crown",
+      "family": "hoard-necro",
+      "tier": "Sovereign",
+      "batch": "hoard-necro-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_ossuary_bone_crown.webp",
+      "canonicalDisplayName": "Sovereign Ossuary Bone Crown",
+      "acceptedSha256": "ab92bf67d387f0924cef06857c9651e77d0cc98a104afc77cfe280e4832cc481",
+      "acceptedBytes": 4592,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-necro/originals/legendary_ossuary_bone_crown.png",
+        "sha256": "8ee7cacb2868cb7ffc52afd7b9a098f923fadcfddfc3757aa9591b6eb816fa97",
+        "bytes": 2446688,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-necro/masters/legendary_ossuary_bone_crown.png",
+        "sha256": "262e1500a20988b23ea17c7031d3a4d4fec268cfe9d4204f38eb4a52a2a76d74",
+        "bytes": 525536,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "55d1a6c859245e8eaea4dba2b879f3f9fbbd155c1c117e56b0f6e4ee714d985e",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Ossuary Bone Crown (legendary_ossuary_bone_crown) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete CLOTH ceremonial crown: a broad padded ivory-grey fabric circlet with visible woven texture, dark stitched lining and five slender pale bone points attached around the top edge. Each bone point ends in a small mint-green enchanted bead. A small crossed-bone clasp on the front. Crown opening clearly visible, cloth body with bone ornaments, not a solid metal crown, no head or wearer. Tier finish: Regal highest-tier craftsmanship: broad warm gold fittings, pale polished ivory bone and charcoal-grey backing, additional angular gold ornament, brighter mint-green spectral accents. Gold belongs to the object, never a surrounding frame. Bone Legion family: pale ivory, bone grey, charcoal and restrained spectral mint green, crossed-bone motif. Preserve authored identity and canonical armor material while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-necro/superseded/legendary_ossuary_bone_crown.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "55d1a6c859245e8eaea4dba2b879f3f9fbbd155c1c117e56b0f6e4ee714d985e"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-necro-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-necro-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

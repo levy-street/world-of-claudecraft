@@ -107,7 +107,7 @@ describe('options window unstuck action', () => {
     const root = new FakeElement();
     const cmd = vi.fn();
     const clientWorld = {
-      unstuck: () => ClientWorld.prototype.unstuck.call({ cmd } as never),
+      unstuck: () => ClientWorld.prototype.unstuck.call({ cmd, movementWireVersion: 1 } as never),
     };
     vi.stubGlobal('document', {
       createElement: () => new FakeElement(),

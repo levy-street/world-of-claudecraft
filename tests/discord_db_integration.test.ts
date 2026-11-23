@@ -20,8 +20,12 @@
 import { Pool } from 'pg';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import {
+  DISCORD_SCHEMA,
+  discordFlairForAccount,
+  discordFlairHiddenForAccount,
   discordFlexRowsForDiscordIds,
   discordLinksForAccounts,
+  setDiscordFlairHidden,
   setDiscordMemberMetaBulk,
 } from '../server/discord_db';
 import {
@@ -34,6 +38,11 @@ const DB_URL = process.env.TEST_DATABASE_URL;
 const SCHEMA = 'discord_db_integration_test';
 const describeDb = DB_URL ? describe : describe.skip;
 const REALM = 'eastbrook';
+// The shipped /flair column DDL, applied verbatim so this file executes the very
+// statement ensureSchema() runs at boot (and proves a re-run is a no-op).
+const FLAIR_HIDDEN_DDL = DISCORD_SCHEMA.split('\n').find((line) =>
+  line.includes('ADD COLUMN IF NOT EXISTS flair_hidden'),
+);
 
 function planNodes(node: Record<string, unknown>): Record<string, unknown>[] {
   const nodes: Record<string, unknown>[] = [node];
@@ -87,6 +96,8 @@ describeDb('discord set-based statements (real Postgres)', () => {
       );
       CREATE INDEX characters_account ON characters(account_id);
     `);
+    if (!FLAIR_HIDDEN_DDL) throw new Error('DISCORD_SCHEMA lost the flair_hidden column');
+    await pool.query(FLAIR_HIDDEN_DDL);
   }, 60_000);
 
   afterAll(async () => {
@@ -703,5 +714,44 @@ describeDb('discord set-based statements (real Postgres)', () => {
       expect(Number(linkScan?.['Actual Loops'])).toBe(1);
       expect(Number(linkScan?.['Actual Rows'])).toBe(1000);
     }, 120_000);
+  });
+
+  // -------------------------------------------------------------------------
+  // /flair: flair_hidden
+  // -------------------------------------------------------------------------
+
+  describe('/flair visibility (flair_hidden)', () => {
+    it('re-applies the shipped column DDL as a no-op and reads existing links as shown', async () => {
+      await seedLink(1, 'du-1', { role: 'seniormods' });
+      await pool.query(FLAIR_HIDDEN_DDL as string);
+      expect(await discordFlairHiddenForAccount(pool, 1)).toBe(false);
+      expect((await discordFlairForAccount(pool, 1))?.role).toBe('seniormods');
+    });
+
+    it('/flair off masks the role in the flair read; /flair on brings it straight back', async () => {
+      await seedLink(1, 'du-1', { username: 'Fizban', role: 'juniormods' });
+
+      expect(await setDiscordFlairHidden(pool, 1, true)).toBe(true);
+      const hidden = await discordFlairForAccount(pool, 1);
+      expect(hidden?.role).toBeNull();
+      expect(hidden?.name).toBe('Fizban'); // only the role is hidden
+      expect(await discordFlairHiddenForAccount(pool, 1)).toBe(true);
+      // The bot-pushed role is untouched, so showing it again needs no re-push.
+      const stored = await pool.query(
+        'SELECT discord_role FROM discord_links WHERE account_id = 1',
+      );
+      expect(stored.rows[0].discord_role).toBe('juniormods');
+
+      expect(await setDiscordFlairHidden(pool, 1, false)).toBe(true);
+      expect((await discordFlairForAccount(pool, 1))?.role).toBe('juniormods');
+      expect(await discordFlairHiddenForAccount(pool, 1)).toBe(false);
+    });
+
+    it('an unlinked account has nothing to toggle or report', async () => {
+      await pool.query('INSERT INTO accounts (id) VALUES (9)');
+      expect(await setDiscordFlairHidden(pool, 9, true)).toBe(false);
+      expect(await discordFlairHiddenForAccount(pool, 9)).toBeNull();
+      expect(await discordFlairForAccount(pool, 9)).toBeNull();
+    });
   });
 });

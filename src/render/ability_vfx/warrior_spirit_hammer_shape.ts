@@ -87,6 +87,11 @@ export function warriorSpiritHammerShape(): THREE.BufferGeometry {
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  // The pool's white slot map reads one texel, so every vertex samples it at 0,0.
+  geometry.setAttribute(
+    'uv',
+    new THREE.Float32BufferAttribute(new Float32Array((positions.length / 3) * 2), 2),
+  );
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
   return geometry;

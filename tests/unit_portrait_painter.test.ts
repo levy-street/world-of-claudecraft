@@ -262,9 +262,51 @@ describe('UnitPortraitPainter', () => {
       expect(modularPortraitDataUrl).toHaveBeenCalledWith('player_warrior_modular', LOOK);
       expect(canvas.dataset.portrait).toBe('/composed.png');
 
-      painter.drawPlayer(canvas, { kind: 'class', cls: 'mage', skin: 1 });
-      expect(playerPortraitDataUrl).toHaveBeenCalledWith('mage', 1);
+      vi.mocked(visualPortraitDataUrl).mockReturnValue('/class.png');
+      painter.drawPlayer(canvas, {
+        kind: 'class',
+        cls: 'mage',
+        skin: 1,
+        visualKey: 'player_mage_female',
+      });
+      // the headshot of the body the player wears, with no head of their own to key on
+      expect(visualPortraitDataUrl).toHaveBeenCalledWith(
+        'player_mage_female',
+        1,
+        'headshot',
+        undefined,
+      );
+      expect(playerPortraitDataUrl).not.toHaveBeenCalled();
       expect(canvas.dataset.portrait).toBe('/class.png');
+    });
+
+    it("draws a class body in the player's OWN head, the default face only as a peeked interim", () => {
+      const { canvas, context } = fakeCanvas();
+      const painter = new UnitPortraitPainter(() => 1);
+      const head = { gender: 'female', headHair: 'curls', headBeard: 'none' };
+      const subject = {
+        kind: 'class' as const,
+        cls: 'mage' as const,
+        skin: 1,
+        visualKey: 'player_mage_female',
+        head,
+      };
+      vi.mocked(visualPortraitDataUrl).mockReturnValue(null);
+      vi.mocked(cachedPortraitDataUrl).mockReturnValue(null);
+      painter.drawPlayer(canvas, subject);
+      expect(visualPortraitDataUrl).toHaveBeenCalledWith('player_mage_female', 1, 'headshot', head);
+      // the interim is a PEEK of the body's default face: no second capture starts
+      expect(cachedPortraitDataUrl).toHaveBeenCalledWith('player_mage_female', 1);
+      expect(playerPortraitDataUrl).not.toHaveBeenCalled();
+      expect(context.drawImage.mock.calls[0][0]).toBe(crestCanvas);
+
+      vi.mocked(cachedPortraitDataUrl).mockReturnValue('/default-face.png');
+      painter.drawPlayer(canvas, subject);
+      expect(canvas.dataset.portrait).toBe('/default-face.png');
+
+      vi.mocked(visualPortraitDataUrl).mockReturnValue('/own-face.png');
+      painter.drawPlayer(canvas, subject);
+      expect(canvas.dataset.portrait).toBe('/own-face.png');
     });
   });
 });

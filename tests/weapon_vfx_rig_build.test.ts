@@ -879,13 +879,20 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     });
 
     // A ratchet, kept literal on purpose: one host surface per GLB material.
-    expect(hosts).toBe(24);
+    expect(hosts).toBe(29);
     for (const key of Object.keys(WEAPON_VFX)) {
       expect(names, `spec ${key} missing from the prewarm group`).toContain(
         `prewarm-skin-host:${key}`,
       );
     }
-    for (const name of ['vfx_coreSprite', 'vfx_motes', 'vfx_drift', 'vfx_twinkles', 'vfx_aurora']) {
+    for (const name of [
+      'vfx_coreSprite',
+      'vfx_motes',
+      'vfx_drift',
+      'vfx_twinkles',
+      'vfx_aurora',
+      'vfx_arcs',
+    ]) {
       expect(names, `${name} missing from the prewarm rigs`).toContain(name);
     }
     // The fresnel rim shell parents itself to the host mesh instead of the rig
@@ -912,7 +919,7 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     // comparing it against Object.keys(WEAPON_VFX) cannot fail and neither can
     // a uniqueness check over Object.keys. Literals are the only thing here
     // that notices the catalog, or the unit plan derived from it, drifting.
-    expect(WEAPON_VFX_PREWARM_KEYS).toHaveLength(23);
+    expect(WEAPON_VFX_PREWARM_KEYS).toHaveLength(28);
     expect(WEAPON_VFX_PREWARM_KEYS[0]).toBe('ice_fang');
     expect(WEAPON_VFX_PREWARM_KEYS[WEAPON_VFX_PREWARM_KEYS.length - 1]).toBe('cinderlatch');
     // And the plan really is the catalog, in its own order.
@@ -953,25 +960,25 @@ describe('buildWeaponVfxPrewarmGroup', () => {
     });
 
     const ids = units.map((unit) => unit.id);
-    expect(ids).toHaveLength(47);
+    expect(ids).toHaveLength(57);
     // Phase order is the contract: every build, then the single shared-texture
     // unit, then every compile. A compile that ran before its build would find
     // no group and link nothing.
-    expect(ids.slice(0, 23)).toEqual(
+    expect(ids.slice(0, 28)).toEqual(
       WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:build:${key}`),
     );
-    expect(ids[23]).toBe('weapon-skins:textures');
-    expect(ids.slice(24)).toEqual(
+    expect(ids[28]).toBe('weapon-skins:textures');
+    expect(ids.slice(29)).toEqual(
       WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:compile:${key}`),
     );
     expect(ids[0]).toBe('weapon-skins:build:ice_fang');
-    expect(ids[46]).toBe('weapon-skins:compile:cinderlatch');
+    expect(ids[56]).toBe('weapon-skins:compile:cinderlatch');
 
     // Running the plan in order stages every skin once and compiles each one.
-    for (const unit of units.slice(0, 24)) unit.run();
+    for (const unit of units.slice(0, 29)) unit.run();
     expect(staged).toEqual([...WEAPON_VFX_PREWARM_KEYS]);
     expect(textures).toBe(1);
-    expect(published).toHaveLength(23);
+    expect(published).toHaveLength(28);
   });
 
   it('skips a compile whose skin was released, without throwing', () => {
@@ -1001,13 +1008,13 @@ describe('buildWeaponVfxPrewarmGroup', () => {
   });
 
   it('plans one build and one compile unit per catalog skin, with literal ids', () => {
-    // 23 skins, 2 per-skin units each plus the one shared texture unit: what
+    // 28 skins, 2 per-skin units each plus the one shared texture unit: what
     // the PR claims the streamed lane replaced the single 534 ms unit with.
     const buildIds = WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:build:${key}`);
     const compileIds = WEAPON_VFX_PREWARM_KEYS.map((key) => `weapon-skins:compile:${key}`);
     expect(buildIds[0]).toBe('weapon-skins:build:ice_fang');
     expect(compileIds[compileIds.length - 1]).toBe('weapon-skins:compile:cinderlatch');
-    expect(new Set([...buildIds, ...compileIds, 'weapon-skins:textures']).size).toBe(47);
+    expect(new Set([...buildIds, ...compileIds, 'weapon-skins:textures']).size).toBe(57);
     // Every planned id round-trips through the failure-boundary key mapping,
     // so no unit can fail into "owns nothing" by an id typo.
     for (const id of [...buildIds, ...compileIds]) {

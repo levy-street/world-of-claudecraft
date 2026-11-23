@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { DEV_KIT_ROLE_COUNT, DEV_KIT_ROLES, devKitRole } from '../src/sim/content/dev_kit_roles';
+import {
+  DEV_KIT_ROLE_COUNT,
+  DEV_KIT_ROLES,
+  type DevKitRole,
+  devKitRole,
+} from '../src/sim/content/dev_kit_roles';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_ITEMS } from '../src/sim/content/heroic_vendor';
 import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
@@ -7,19 +12,22 @@ import { talentsFor } from '../src/sim/content/talents';
 import { ITEMS } from '../src/sim/data';
 import {
   applyDevKit,
+  bestBy,
   bestKitBag,
   buildDevKit,
   DEV_KIT_EXCLUDED_DUNGEON,
   DEV_KIT_LEVEL,
+  devKitTieScore,
   dungeonLootIds,
   isFreshTwentyItem,
   QUALITY_TIE_RANK,
   QUALITY_TIE_SCALE,
+  roleItemScore,
 } from '../src/sim/dev_kit';
 import { canDualWield, isShieldItem } from '../src/sim/equipment_rules';
 import { itemFromRaid } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, type ItemDef, type PlayerClass } from '../src/sim/types';
 
 // These presets exist so a tester can gear up in one click instead of being kitted
 // out through the database, and so a Gravewyrm Sanctum balance run measures the
@@ -233,9 +241,11 @@ describe('kit construction', () => {
       'burnished_thorium_amulet',
       'coiled_copper_torc',
       'etched_iron_loop',
+      'foremans_wage_band',
       'gleaming_thorium_loop',
       'hammered_copper_band',
       'iron_link_choker',
+      'mirelight_locket',
       'mother_of_pearl',
       'polished_copper_loop',
       'riveted_iron_signet',
@@ -255,30 +265,39 @@ describe('kit construction', () => {
       ).toEqual(FRESH_TWENTY_JEWELRY);
     }
     //
-    // Neck is archetype-blind: burnished_thorium_amulet (agi 5, sta 3) outscores
-    // iron_link_choker (agi 3, sta 1) on stamina alone, so even a pure-intellect
-    // caster scoring its agility at zero still takes it. The faction
-    // quartermasters' standing ladder (content/faction_vendors.ts) is out of
-    // the fresh-20 pool by construction (no standing on day one), so standing
-    // stock can never displace the crafted rungs here.
-    const NECK = 'burnished_thorium_amulet';
-    // Strength roles: the rung-50 str ring, then the rung-25 str ring, an
-    // outright win for ring2 (str 3 at full weight clears the int loop's 3
-    // stamina, and the keepsake's 1/1/1 scores 2.1 against the signet's 3.6).
-    const STR_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
-    // Agility roles: the rung-50 str ring, then the tutorial keepsake. Before
-    // Mother of Pearl, ring2 here was a REAL TIE: the rung-25 str ring (str 3
-    // x 0.4 + sta 1 x 0.6) and the rung-50 int ring (sta 3 x 0.6) both score
-    // exactly 1.8 in real arithmetic, and only IEEE754 product rounding ever
-    // separated them (phase 05 QA probe); bestBy judges the tie inside an
-    // epsilon band and resolves it on the role IDENTITY sum first, so the
-    // signet won on the stats the role actually uses. The keepsake now
-    // clears both outright (agi 1 + str 1 x 0.4 + sta 1 x 0.6 = 2.0 against
-    // 1.8), a real score gap, so the tie no longer decides this camp. A pick
-    // that moves here means a weights retune (admit it) or the scorer broke.
-    const AGI_RINGS = ['weighted_thorium_band', 'mother_of_pearl'] as const;
-    // Intellect roles: the rung-50 int ring, then the rung-25 int ring (the
-    // keepsake scores 1.75 caster / 2.1 healer against the loop's 3.4).
+    // REVISITED for the Mirefen world boss, exactly as the roster note above
+    // promises: the Foreman's Wage consolation reward (loot-gated to players
+    // at or below 13, worn to 20 like the Proving Shore keepsake before it)
+    // put two more rare pieces inside the tier, and both score into a preset.
+    // Every number below is MEASURED off roleItemScore, not argued.
+    //
+    // Neck is no longer archetype-blind, and that is the one real move here.
+    // burnished_thorium_amulet (agi 5, sta 3) still wins every physical camp
+    // (arms 4.3, prot 5.0, feral 7.0 against the locket's 2.4 / 4.0 / 4.0),
+    // but mirelight_locket (int 4, sta 4) is the first fresh-20 neck with
+    // intellect on it, so a caster that scored the amulet's agility at zero
+    // (1.2) now has something to wear: 5.6 against 1.2 is not a tie being
+    // broken, it is the caster neck slot finally having a candidate.
+    // The faction quartermasters' standing ladder (content/faction_vendors.ts) is out of
+    // the fresh-20 pool by construction (no standing on day one), so standing stock can
+    // never displace the picks here.
+    const PHYSICAL_NECK = 'burnished_thorium_amulet';
+    const CASTER_NECK = 'mirelight_locket';
+    // Strength roles: the rung-50 str ring, then the Wage band. ring2 moved
+    // off riveted_iron_signet (str 3, sta 1) by 0.2: the band's sta 3 + str 2
+    // scores 3.8 on arms (str 1, agi 0.5, sta 0.6) against the signet's 3.6,
+    // and 4.4 against 3.1 on protection, where stamina leads. A retune of
+    // either weight can flip the arms row back, which is why the margin is
+    // written down rather than left implied.
+    const STR_RINGS = ['weighted_thorium_band', 'foremans_wage_band'] as const;
+    // Agility roles: the rung-50 str ring, then the Wage band. It displaces
+    // the tutorial keepsake outright (2.6 against 2.0 on agi 1, str 0.4,
+    // sta 0.6), so the old epsilon tie between the rung-25 str ring and the
+    // rung-50 int ring stays as dead as Mother of Pearl left it.
+    const AGI_RINGS = ['weighted_thorium_band', 'foremans_wage_band'] as const;
+    // Intellect roles: unmoved. The rung-50 int ring, then the rung-25 int
+    // ring; the Wage band is a physical ring and scores 1.2 here, well under
+    // etched_iron_loop's 3.75 caster / 4.1 healer.
     const CASTER_RINGS = ['gleaming_thorium_loop', 'etched_iron_loop'] as const;
     const STR_SPECS = [
       'warrior/arms',
@@ -286,6 +305,8 @@ describe('kit construction', () => {
       'warrior/prot',
       'paladin/protection',
       'paladin/retribution',
+      'shaman/enhancement',
+      'druid/feral',
     ];
     const AGI_SPECS = [
       'hunter/beast_mastery',
@@ -294,7 +315,6 @@ describe('kit construction', () => {
       'rogue/assassination',
       'rogue/combat',
       'rogue/subtlety',
-      'shaman/enhancement',
     ];
     const CASTER_SPECS = [
       'paladin/holy',
@@ -312,19 +332,19 @@ describe('kit construction', () => {
       'druid/balance',
       'druid/restoration',
     ];
-    // druid/feral takes the str ring and then the rung-50 INT ring, and it is
-    // not a mistake. It is the one TANK_AGI role, and stamina leads outright
-    // there (sta 1.0), so after the str ring it takes the int loop for its 3
-    // stamina rather than the rung-25 str ring or the keepsake: 3.0 against
-    // 1.9 and 2.1, real score gaps, not the epsilon tie above. A tank wearing
-    // an intellect ring looks wrong and is the scorer working as designed.
-    const FERAL_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
+    // druid/feral used to take the str ring and then the rung-50 INT ring,
+    // because it was the one TANK_AGI role (sta 1.0) and the int loop's 3
+    // stamina beat everything else in the pool. The Wage band carries 3
+    // stamina AND 2 strength, so it clears the loop on the same weights
+    // (3.6 against 3.0) and this camp stops being the odd one out: the tank
+    // no longer wears an intellect ring. Feral and Enhancement are Strength
+    // roles now (content/spec_primary_stat.ts), filed with the other STR_SPECS.
 
     const expected = new Map<string, readonly [string, string]>();
     for (const key of STR_SPECS) expected.set(key, STR_RINGS);
     for (const key of AGI_SPECS) expected.set(key, AGI_RINGS);
     for (const key of CASTER_SPECS) expected.set(key, CASTER_RINGS);
-    expected.set('druid/feral', FERAL_RINGS);
+    const casterSpecs = new Set(CASTER_SPECS);
     // Cross-check against the role table, so a spec added there without a row here
     // fails rather than going unpinned.
     expect(expected.size).toBe(DEV_KIT_ROLE_COUNT);
@@ -334,7 +354,9 @@ describe('kit construction', () => {
       const rings = expected.get(key);
       expect(rings, `${key} is not classified above`).toBeDefined();
       const kit = buildDevKit(cls, spec);
-      expect(kit?.equip.neck, `${key} neck`).toBe(NECK);
+      expect(kit?.equip.neck, `${key} neck`).toBe(
+        casterSpecs.has(key) ? CASTER_NECK : PHYSICAL_NECK,
+      );
       expect(kit?.equip.ring1, `${key} ring1`).toBe(rings?.[0]);
       expect(kit?.equip.ring2, `${key} ring2`).toBe(rings?.[1]);
     }
@@ -351,24 +373,43 @@ describe('kit construction', () => {
     // it) or the tome ladder changed. Scope: CASTER_ALL classes only; a
     // hunter's held offhand is its quiver (tomes are class-locked away), and
     // dual-wield specs fill the slot with a second weapon first.
-    const CASTER_TOME = 'sunpetal_grimoire';
+    // Re-pinned sunpetal_grimoire -> chorus_conch by the Drowned Temple
+    // rework: Choirmother Selthe's Chorus Conch is a rare held offhand on the
+    // exact same line as the tome (int 5, spi 3, sta 3), so every caster sees
+    // an identity-and-quality tie that the picker resolves on id.
+    const CASTER_TOME = 'chorus_conch';
     const casterClasses = new Set(['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid']);
     let pinned = 0;
+    let staffCasters = 0;
     for (const { cls, spec } of everySpec()) {
       const kit = buildDevKit(cls, spec);
       const off = kit?.equip.offhand;
-      if (!off) continue;
+      if (!off) {
+        const main = ITEMS[kit?.equip.mainhand ?? ''];
+        if (casterClasses.has(cls) && main?.kind === 'weapon' && main.hand === 'twohand')
+          staffCasters += 1;
+        continue;
+      }
       if (ITEMS[off]?.kind !== 'held_offhand') continue;
       if (!casterClasses.has(cls)) continue;
       expect(off, `${cls}/${spec} held offhand`).toBe(CASTER_TOME);
       pinned += 1;
     }
-    // Liveness at the REAL count (the vacuity-floor rule): thirteen specs
-    // carry the pick today (mage x3, priest x3, warlock x3, druid x3,
-    // shaman/elemental; paladin contributes zero, holy and protection take
-    // shields and retribution takes nothing). A pool or picker change that
-    // moves ANY of them must be admitted here.
-    expect(pinned).toBe(13);
+    // Liveness at the REAL count (the vacuity-floor rule). Thirteen specs
+    // carried the pick until the Wildheart Basin rework (mage x3, priest x3,
+    // warlock x3, druid x3, shaman/elemental). Its Falls-Blessed Staff, a
+    // level-20 boss rare, now outscores a one-hander plus the tome for every
+    // caster spec but feral (which keeps a one-hander and the held offhand),
+    // so twelve specs move to the two-hander and one keeps the pick; paladin
+    // contributes zero tomes (holy and protection take shields, retribution a
+    // two-hander, the thirteenth two-hander counted below). A pool or picker
+    // change that moves ANY of them must be admitted here.
+    // Admitted: Feral's weights turned Strength-led (Feral is a Strength spec,
+    // content/spec_primary_stat.ts), so it now takes the Cragthorn Greatstaff,
+    // the fourteenth two-hander, and no spec holds the tome. The per-spec check
+    // above stays armed for any spec that moves back to a held offhand.
+    expect(pinned).toBe(0);
+    expect(staffCasters).toBe(14);
   });
 
   it('never puts the same ring in both ring slots', () => {
@@ -389,17 +430,43 @@ describe('kit construction', () => {
   });
 
   it('an in-band tie prefers quality over id (the masterwrought Phase 11o tiebreak)', () => {
-    // The regression this pins: feral weights no int or spi, so the rare
-    // sunpetal_grimoire and the uncommon copperlens_ocular tie on identity
-    // (sta 2 each) inside the epsilon band, and before the quality term the
-    // alphabet handed the kit the strictly weaker uncommon the day its lower
-    // id shipped. The tome must win on quality.
-    expect(buildDevKit('druid', 'feral')?.equip.offhand).toBe('sunpetal_grimoire');
-    // The dominance order's other half: quality never outranks identity (a
-    // caster spec whose weights the tome's int/spi DO count keeps it too,
-    // trivially, and a role-stat edge beats any quality edge by construction;
-    // the integer-stat premise that construction rests on is pinned below).
-    expect(buildDevKit('mage', 'frost')?.equip.offhand).toBe('sunpetal_grimoire');
+    // The regression this pins: two held offhands on the same weighted line tie
+    // inside the epsilon band, and before the quality term the alphabet handed
+    // the kit the strictly weaker uncommon the day its lower id shipped. Feral
+    // was the live probe (sunpetal_grimoire against copperlens_ocular, later
+    // chorus_conch) until its Strength weights moved it to a two-hander and no
+    // kit pick rode a quality tie any more, so the picker is pinned directly.
+    const role: DevKitRole = {
+      spec: 'probe',
+      weights: { sta: 1, str: 0.7, agi: 0.4 },
+      melee: true,
+    };
+    const offhand = (id: string, quality: ItemDef['quality'], stats: ItemDef['stats']) =>
+      ({
+        id,
+        name: id,
+        kind: 'held_offhand',
+        slot: 'offhand',
+        quality,
+        sellValue: 0,
+        stats,
+      }) as ItemDef;
+    const pick = (items: ItemDef[]) =>
+      bestBy(
+        items,
+        (item) => roleItemScore(role, item),
+        (item) => devKitTieScore(role, item),
+      )?.id;
+    // Same line, same identity: the rare wins although the uncommon sorts first.
+    expect(
+      pick([offhand('a_uncommon', 'uncommon', { sta: 2 }), offhand('b_rare', 'rare', { sta: 2 })]),
+    ).toBe('b_rare');
+    // The dominance order's other half: quality never outranks identity. Str 4
+    // and agi 7 tie in band (0.7 x 4 = 0.4 x 7 = 2.8), and the larger role-stat
+    // sum wins however low its quality (the integer-stat premise is pinned below).
+    expect(
+      pick([offhand('a_epic', 'epic', { str: 4 }), offhand('b_common', 'common', { agi: 7 })]),
+    ).toBe('b_common');
   });
 
   it('the tiebreak scale strictly exceeds the quality ladder top rank (dominance property)', () => {
@@ -519,6 +586,10 @@ describe('/dev kit against a real Sim', () => {
         .map((item) => item.bagSlots ?? 0),
     );
     expect(best?.bagSlots).toBe(generalMax);
+    // Custody-protected card rewards must come from their receipt-owning grant path.
+    expect(ITEMS.referral_satchel.noDiscard).toBe(true);
+    expect(ITEMS.referral_satchel.bagSlots).toBe(generalMax);
+    expect(best?.noDiscard).not.toBe(true);
     // Non-vacuity: the exclusion only proves something while a materials-only bag that
     // WOULD have won exists. If the catalog ever loses that bag, this arm must be
     // re-derived rather than left quietly passing.

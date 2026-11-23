@@ -1,7 +1,9 @@
 // Persistent social state, mirrored from the server's SocialService. Mirrors
 // server/social.ts shapes; kept here so the HUD has no server-side imports.
+
 import type { PlayerFlair } from '../sim/account_flair';
 import type { GuildRankDef, GuildRankId } from '../sim/guild_ranks';
+import type { ReferralCardsAction, ReferralCardsSnapshot } from '../sim/referral_contract';
 
 export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead' | 'afk';
 // A rank id on the guild's ladder (GuildInfo.ranks): 'leader' and 'member' at
@@ -11,6 +13,7 @@ export type GuildRank = GuildRankId;
 export type { GuildRankDef };
 
 export interface FriendInfo {
+  tier?: 'friend' | 'bound';
   id: number;
   name: string;
   cls: string;
@@ -111,9 +114,21 @@ export interface GuildInfo {
   nextRosterPrice?: number | null;
 }
 
+// Presence privacy (server/presence_privacy.ts): who sees this character online
+// through friends lists and the guild roster. 'friends' means the players on
+// THIS character's own friends list.
+export type PresenceMode = 'everyone' | 'friends' | 'none';
+
+export const PRESENCE_MODES: readonly PresenceMode[] = ['everyone', 'friends', 'none'];
+
 export interface SocialInfo {
   friends: FriendInfo[];
+  friendsCursor?: number;
+  friendsNextCursor?: number | null;
   blocks: { id: number; name: string }[];
+  blocksCursor?: number;
+  blocksNextCursor?: number | null;
+  blocksUnavailable?: boolean;
   // personal chat ignores: hides their public chat from you and nothing else.
   // A block is the heavy tool (invites, whispers, mail, /who all die with it).
   // Neither is the ADMIN "mute", which is a staff silence applied to a player.
@@ -122,6 +137,9 @@ export interface SocialInfo {
   // The viewer's own standing pledge; null when none (and always null while
   // guilded: joining any guild clears the pledge server-side).
   myPledge: MyPledgeInfo | null;
+  // The viewer's own presence setting (the Social window's Friends footer).
+  // Absent from an older server's frame, where the control is not shown.
+  presenceMode?: PresenceMode;
 }
 
 // The realm's online roster as the Social window's Who tab mirrors it (the
@@ -158,7 +176,9 @@ export interface CharacterSearchResult {
 // This is the already-crawlable subset (the same one behind the public /c/:name
 // page), so it deliberately carries NO wallet balance, Discord/GitHub identity,
 // or equipped gear: those stay on the proximity-gated entity wire, visible only
-// when you are actually standing next to the player.
+// when you are actually standing next to the player. (One consented exception:
+// applying to a group listing shares worn gear with that listing's leader, via
+// DungeonFinderApplicantView.gear in the leader's own finder snapshot.)
 export interface CharacterProfile {
   name: string;
   cls: string;
@@ -174,6 +194,10 @@ export interface CharacterProfile {
 export interface IWorldSocialGraph {
   // persistent social: friends, ignore/block, guilds (online play only)
   socialInfo: SocialInfo | null;
+  socialFriendsPage(cursor: number): void;
+  socialBlocksPage(cursor: number): void;
+  referralCardsSnapshot(): ReferralCardsSnapshot | null;
+  referralCardsAction(action: ReferralCardsAction): void;
   friendAdd(name: string): void;
   friendRemove(name: string): void;
   blockAdd(name: string): void;

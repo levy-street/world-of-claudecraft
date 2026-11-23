@@ -1,0 +1,20 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/rift_watchers_band.webp",
+    "http://localhost:5194/ui/items/rift_surveyors_satchel.webp",
+    "http://localhost:5194/ui/items/riftwalkers_tunic.webp",
+    "http://localhost:5194/ui/items/riftwarden_voidblade.webp",
+    "http://localhost:5194/ui/items/champion_rift_band.webp",
+    "http://localhost:5194/ui/items/tidewatchers_locket.webp",
+    "http://localhost:5194/ui/items/riftwalkers_cord.webp",
+    "http://localhost:5194/ui/items/riftwalkers_treads.webp",
+    "http://localhost:5194/ui/items/formula_riftwalkers_grace.webp",
+    "http://localhost:5194/ui/items/riftwardens_pendant.webp"
+  ],
+  "allDecoded": true
+}

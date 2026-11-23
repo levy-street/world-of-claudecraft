@@ -23,6 +23,7 @@ import {
   leaveDungeon,
   nythraxisInstanceSealed,
 } from './instances/dungeons';
+import { NYTHRAXIS_BONE_STORM_ENABLED } from './nythraxis_bone_storm';
 import { nythraxisEnrageSeconds } from './nythraxis_enrage_clock';
 import { NYTHRAXIS_PHASE_THREE_HP } from './nythraxis_kings_wrath';
 import { resetRaidDevBot, reviveRaidDevBotInPlace } from './raid_dev_bot';
@@ -258,7 +259,10 @@ export function pokeNythraxisDevMechanic(
     case 'eruption':
       st.eruptionTimer = DT;
       st.spikeSettleTimer = 0;
-      return { ok: true, message: 'Grave Eruption: next tick.' };
+      return {
+        ok: true,
+        message: 'Grave Eruption: next tick (it waits out live Soul Rend marks plus 1.5 s).',
+      };
     case 'sigil':
       if (st.sigil)
         return { ok: false, message: 'A sigil is already up; bind it or let it lapse.' };
@@ -269,7 +273,10 @@ export function pokeNythraxisDevMechanic(
       if (!wardPhase)
         return { ok: false, message: 'Soul Rend is a phase 2 mechanic (/dev nyx phase2).' };
       st.soulRendTimer = DT;
-      return { ok: true, message: 'Soul Rend: next tick (it waits out a Rage cast).' };
+      return {
+        ok: true,
+        message: 'Soul Rend: next tick (it waits out a Rage cast and a live eruption).',
+      };
     case 'rage':
       if (!wardPhase)
         return { ok: false, message: 'Deathless Rage is a phase 2 mechanic (/dev nyx phase2).' };
@@ -280,6 +287,8 @@ export function pokeNythraxisDevMechanic(
         message: 'Deathless Rage: next tick (it waits out live Soul Rend marks and a live sigil).',
       };
     case 'storm':
+      if (!NYTHRAXIS_BONE_STORM_ENABLED)
+        return { ok: false, message: 'Bone Storm is retired from play.' };
       if (st.phase !== 3)
         return { ok: false, message: 'Bone Storm is a phase 3 mechanic (/dev nyx phase3).' };
       st.boneStormTimer = DT;

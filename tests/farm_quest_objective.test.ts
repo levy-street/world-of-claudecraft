@@ -22,7 +22,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { FARM_CROPS, type FarmCropDef } from '../src/sim/content/farm_crops';
 import { FARM_PATCHES, farmBedById } from '../src/sim/content/farm_patches';
-import { QUESTS } from '../src/sim/data';
+import { BUILTIN_WORLD, QUESTS } from '../src/sim/data';
+import { farmBedFor, farmPatchesFor } from '../src/sim/moved_objects';
 import type { PlotState } from '../src/sim/professions/farm_projection';
 import {
   FARM_WITHERED_HUSK_COUNT,
@@ -135,7 +136,8 @@ function standAt(sim: Sim, x: number, z: number): void {
 }
 
 function standAtBed(sim: Sim, bedId: string): void {
-  const bed = farmBedById(bedId);
+  const authored = farmBedById(bedId);
+  const bed = authored && farmBedFor(BUILTIN_WORLD.objectMoves, authored);
   if (!bed) throw new Error(`no such bed: ${bedId}`);
   standAt(sim, bed.x, bed.z);
 }
@@ -575,7 +577,7 @@ describe('the farm objective marker (questObjectiveAreas)', () => {
     );
     expect(FARM_PATCHES.length).toBe(4);
     expect(areas).toHaveLength(4);
-    for (const patch of FARM_PATCHES) {
+    for (const patch of farmPatchesFor(BUILTIN_WORLD.objectMoves, FARM_PATCHES)) {
       const cx = patch.beds.reduce((sum, b) => sum + b.x, 0) / patch.beds.length;
       const cz = patch.beds.reduce((sum, b) => sum + b.z, 0) / patch.beds.length;
       const area = areas.find((a) => a.center.x === cx && a.center.z === cz);

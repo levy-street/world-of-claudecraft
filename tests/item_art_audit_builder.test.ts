@@ -5,7 +5,17 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+
+// These mutable temporary images must not stay open in libvips' operation cache.
+const cache = sharp.cache();
+beforeAll(() => {
+  sharp.cache(false);
+});
+afterAll(() => {
+  sharp.cache({ memory: cache.memory.max, files: cache.files.max, items: cache.items.max });
+});
+
 import {
   assertItemArtAuditPass,
   buildItemArtAudit,
@@ -579,7 +589,11 @@ describe('item-art audit builder', () => {
       updateItemArtAuditVerdict(
         {
           ...source,
-          evidence: { ...source.evidence, shippingCatalogSha256: '0'.repeat(64) },
+          evidence: {
+            ...source.evidence,
+            shippingCatalogSha256:
+              '1ce5db8bb37fa5ce649ebbe18dfc23033f71c30674578a65291856e750195d0b'.repeat(64),
+          },
         },
         build,
       ),
@@ -829,7 +843,7 @@ describe('item-art audit builder', () => {
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
         encoding: 'utf8',
-        timeout: 30_000,
+        timeout: 55_000,
       }),
     ) as Record<string, unknown>;
     // Restored post-merge (release/v0.42.0 into professions): neither
@@ -852,6 +866,9 @@ describe('item-art audit builder', () => {
     // the sha/bytes straight from `--verify-only` on this tree.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
     // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306 on the release.
+    // 2066 / 2095 at the feature/v045-integration merge into feature/halloween-event:
+    // the integration's catalogue plus the 27 Gourdlight Eve event items, sha and bytes
+    // re-measured with `--verify-only` on the merged tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
@@ -864,29 +881,51 @@ describe('item-art audit builder', () => {
       // painted weapons, re-measured with `--verify-only` on the merged tree.
       // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
       // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
-      catalogSha256: 'e3f58abc4acad903941898542c592ca749451e776bdb34935821a6e79e32e7c6',
-      catalogBytes: 801291,
+      // 1709 / 1727 with the 245 choose-one leveling quest armor paintings
+      // (quest-leveling-gear-icons-2026-10-06), re-measured with `--verify-only`.
+      // 1785 / 1803 with the 76 quest blue reward rares
+      // (quest-blue-rewards-icons-2026-10-07), re-measured the same way.
+      // 1800 / 1818 with PR 4281's 8 membership and 7 referral paintings on the
+      // membership integration, re-measured the same way.
+      // 1860 / 1878 with the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07),
+      // re-measured the same way.
+      // 1875 / 1893 with both on the membership integration, re-measured.
+      // 1890 / 1908 with the Mirefen world-boss branch's fifteen items on the v0.45.0
+      // integration, re-measured.
+      // 2005 / 2034 on 42 sheet pages with the five-dungeon rework (PR 4352) on the v0.45.0
+      // integration, re-measured.
+      // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
+      // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
+      // `--verify-only` on the merged tree.
+      // Integration45: 141 new files plus repainted loot and Nightwing Chimaera, measured by --verify-only.
+      // 2,183 owners / 2,212 live with Wobbles the Slime's reins, re-measured with
+      // `node scripts/item_art_audit.mjs --verify-only` (catalog +523 bytes).
+      // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
+      // Release adds five painted owners; measured with --verify-only on the combined tree.
+      // Restored feral staff and eight jewelry paintings; measured with --verify-only.
+      catalogSha256: '5ef9cee82541194673dc4768027c5f0b6f0667b11c63f251501db76473f75b58',
+      catalogBytes: 1196985,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1464,
-      liveItemCount: 1482,
-      generatedHeroicDefinitions: 78,
-      heroicDefinitionsWithOwnWebp: 59,
-      heroicWeaponArtAliases: 19,
+      catalogCount: 2191,
+      liveItemCount: 2220,
+      generatedHeroicDefinitions: 116,
+      heroicDefinitionsWithOwnWebp: 86,
+      heroicWeaponArtAliases: 30,
       groupCount: 26,
-      sheetPageCount: 36,
-      sheetCount: 288,
+      sheetPageCount: 45,
+      sheetCount: 360,
       sheetModeCounts: {
-        '128-color': 36,
-        '40-color': 36,
-        '28-color': 36,
-        '22-color': 36,
-        '28-grayscale': 36,
-        '64-circle': 36,
-        'small-multiview': 36,
-        identity: 36,
+        '128-color': 45,
+        '40-color': 45,
+        '28-color': 45,
+        '22-color': 45,
+        '28-grayscale': 45,
+        '64-circle': 45,
+        'small-multiview': 45,
+        identity: 45,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '53d42dd05b8370ad9bf62c5b1d779efc05f02f28fe129a7fe8b53c1b863557fc',
+      shippingCatalogSha256: '1ce5db8bb37fa5ce649ebbe18dfc23033f71c30674578a65291856e750195d0b',
       machineChecksPassed: true,
       verdict: null,
     });

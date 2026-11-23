@@ -31,6 +31,7 @@ import {
   recordAuthFailure,
   requestIp,
 } from './ratelimit';
+import { type ReferralSignup, resolveReferralSignup } from './referral_armour_db';
 
 const APPLE_ISSUER = 'https://appleid.apple.com';
 const APPLE_KEYS_URL = `${APPLE_ISSUER}/auth/keys`;
@@ -146,6 +147,7 @@ async function provisionAppleAccount(
   name: string,
   email: string | null,
   req: http.IncomingMessage,
+  referral: ReferralSignup | null,
 ) {
   const base = usernameBase(name, email);
   const meta = { ip: requestIp(req), userAgent: String(req.headers['user-agent'] ?? '') };
@@ -155,6 +157,7 @@ async function provisionAppleAccount(
     try {
       return await createAccount(username, await hashPassword(newToken()), meta, {
         passwordSet: false,
+        referral,
       });
     } catch (error) {
       if (isUniqueViolation(error)) continue;
@@ -165,7 +168,7 @@ async function provisionAppleAccount(
     `apple${randomBytes(8).toString('hex').slice(0, 18)}`,
     await hashPassword(newToken()),
     meta,
-    { passwordSet: false },
+    { passwordSet: false, referral },
   );
 }
 
@@ -241,10 +244,12 @@ export async function handleAppleLoginNew(
   if (!pending) return json(res, 400, { error: 'expired' });
   let accountId = await accountForApple(pool, pending.apple_subject);
   if (accountId === null) {
+    const referral = await resolveReferralSignup(body.ref);
     const account = await provisionAppleAccount(
       pending.display_name ?? '',
       pending.apple_email,
       req,
+      referral,
     );
     if (await linkAppleAccount(pool, account.id, pending.apple_subject, pending.apple_email)) {
       accountId = account.id;

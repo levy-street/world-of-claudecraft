@@ -15,6 +15,7 @@ const KITS = [
       'mongoose_bite',
       'shrapnel_charge',
       'bloodtrail_assault',
+      'tactical_camo',
     ],
   },
   {
@@ -28,6 +29,7 @@ const KITS = [
       'mongoose_bite',
       'shrapnel_charge',
       'bloodtrail_assault',
+      'tactical_camo',
     ],
   },
   {
@@ -38,6 +40,7 @@ const KITS = [
       'mongoose_bite',
       'shrapnel_charge',
       'bloodtrail_assault',
+      'tactical_camo',
       'hunting_momentum',
       'fieldcraft_reentry',
     ],
@@ -95,14 +98,14 @@ describe('Hunter v0.29 spec action ownership', () => {
     expect(knownFor('survival', 5)).toContain('raptor_strike');
   });
 
-  it('shows Fieldcraft mechanics as passives and uses 15 second movement cooldowns', () => {
+  it('shows Fieldcraft mechanics as passives and keeps its movement cooldowns short', () => {
     const sim = new Sim({ seed: 2903, playerClass: 'hunter', autoEquip: false });
     sim.setPlayerLevel(20);
     expect(sim.setSpec('survival')).toBe(true);
 
     expect(sim.resolvedAbility('hunting_momentum')?.def.passive).toBe(true);
     expect(sim.resolvedAbility('fieldcraft_reentry')?.def.passive).toBe(true);
-    expect(sim.resolvedAbility('bloodhook')?.cooldown).toBe(15);
+    expect(sim.resolvedAbility('bloodhook')?.cooldown).toBe(10);
     expect(sim.resolvedAbility('trailbreak')?.cooldown).toBe(15);
   });
 

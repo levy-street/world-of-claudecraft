@@ -1,0 +1,11 @@
+{
+  "note": "Balgath's Starwake VFX kit: ONE GLB with seventeen named mesh nodes (star_crystal_0..5, lava_chunk_0..5, pool_crust_0..3, geyser_column). The raw GLB comes from the deterministic Blender factory scripts/assets/balgath_starwake/model.py, driven by export_balgath_starwake.mjs, which stamps the source fingerprint and runs this spec. Vertex-coloured, texture-free (no KTX2 step), original work with no reference image.",
+  "items": [
+    {
+      "src": "tmp/asset_src/balgath_starwake/balgath_starwake.glb",
+      "out": "models/vfx/balgath_starwake.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

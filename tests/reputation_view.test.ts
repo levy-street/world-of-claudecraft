@@ -1,12 +1,14 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
 import {
   FACTION_IDS,
   LOW_LEVEL_MAX_STANDING,
   MAX_STANDING,
   STANDING_THRESHOLDS,
 } from '../src/sim/factions';
+import { createGliderFlightState } from '../src/sim/minigames/glider_flight';
 import type { WorldQuestProgress } from '../src/sim/types';
 import { buildReputationRow, buildReputationView } from '../src/ui/hud/reputation/reputation_view';
 
@@ -69,6 +71,36 @@ describe('reputation view: one row per allied faction', () => {
 });
 
 describe('reputation view: the day summary', () => {
+  it('counts a rewarded quest during a practice replay', () => {
+    const view = buildReputationView({
+      factions: {},
+      level: 20,
+      worldQuestLog: new Map([
+        [
+          'wq_palmreach_confections',
+          {
+            questId: 'wq_palmreach_confections',
+            count: 0,
+            state: 'active',
+            practiceOnly: true,
+          } satisfies WorldQuestProgress,
+        ],
+        [
+          GLIDER_QUEST_ID,
+          {
+            questId: GLIDER_QUEST_ID,
+            count: 0,
+            state: 'active',
+            glider: { ...createGliderFlightState(), practiceOnly: true },
+          } satisfies WorldQuestProgress,
+        ],
+      ]),
+      worldQuestExpiresAtMs: 0,
+      nowMs: 0,
+    });
+    expect(view.day.completed).toBe(2);
+  });
+
   it('counts completed quests against the board and the time until the reset', () => {
     const view = buildReputationView({
       factions: { rift_watch: 30 },

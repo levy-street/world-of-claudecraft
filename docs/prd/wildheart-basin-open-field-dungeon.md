@@ -17,7 +17,7 @@ The result is:
 - Id: `wildheart_basin`
 - Name: The Wildheart Basin
 - Host map: Palmreach
-- Entrance: near The Sunken Idol at `{-232, 1112}`
+- Entrance: beside The Sunken Idol at `{-237, 1093}` (moved from `{-232, 1112}`, where a knoll and a rock face stood before the door)
 - Dungeon index: 7
 - Interior type: `wildheart`
 - Party size: 5

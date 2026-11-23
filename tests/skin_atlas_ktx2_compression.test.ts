@@ -41,21 +41,31 @@ function* walkPngs(dir: string): Generator<string> {
 }
 
 describe('standalone skin atlas KTX2 compression (shipped assets)', () => {
-  it('ships a valid KTX2 sibling for every atlas SKINS/SKIN_EMISSIVE actually load', () => {
-    const referenced = new Set<string>();
+  it('ships a valid KTX2 for every skin or WOC underarmor atlas, and no WOC source PNG', () => {
+    const legacy = new Set<string>();
     for (const list of Object.values(SKINS)) {
-      for (const u of list) if (u?.startsWith(`${SKINS_DIR}/`)) referenced.add(u);
+      for (const u of list) if (u?.startsWith(`${SKINS_DIR}/`)) legacy.add(u);
     }
     for (const list of Object.values(SKIN_EMISSIVE)) {
-      for (const u of list) if (u?.startsWith(`${SKINS_DIR}/`)) referenced.add(u);
+      for (const u of list) if (u?.startsWith(`${SKINS_DIR}/`)) legacy.add(u);
     }
-    // Tight vacuity floor (tests/CLAUDE.md): the exact count the source
-    // comments cite, so a dropped or renamed entry cannot hide silently.
-    expect(referenced.size).toBe(34);
+    const underArmor = new Set<string>();
+    for (const def of Object.values(VISUALS)) {
+      const url = def.wocCharacter?.underArmorAtlas?.url;
+      if (url) underArmor.add(url);
+    }
+    // Fernando's retained KayKit atlas, and the sixteen WOC underarmor atlases.
+    expect(legacy.size).toBe(1);
+    expect(underArmor.size).toBe(16);
+    for (const url of underArmor) expect(legacy.has(url), url).toBe(false);
 
-    for (const url of referenced) {
+    for (const url of [...legacy, ...underArmor]) {
       const pngPath = path.join(ROOT, 'public', url);
-      expect(fs.existsSync(pngPath), `${url} missing from disk`).toBe(true);
+      // A legacy atlas keeps its PNG source beside the sibling. A WOC underarmor master lives
+      // in the character source export, never in the game folder: the loader swaps the `.png`
+      // url for the sibling (pinned below), so a shipped master is dead weight in every deploy
+      // and app bundle (the media manifest copies every image under public/textures).
+      expect(fs.existsSync(pngPath), `${url} source PNG in the game folder`).toBe(legacy.has(url));
       const ktx2Path = ktx2SiblingPath(pngPath);
       expect(fs.existsSync(ktx2Path), `${url}: missing .ktx2 sibling`).toBe(true);
       const header = fs.readFileSync(ktx2Path).subarray(0, KTX2_MAGIC.length);
@@ -71,6 +81,8 @@ describe('standalone skin atlas KTX2 compression (shipped assets)', () => {
     // skip rule is actually exercised, not vacuously true over an empty set.
     expect(skipped.length).toBeGreaterThan(0);
     expect(skipped.every((f) => path.basename(f) === 'base.png')).toBe(true);
+    // The 34 legacy source atlases. The 16 WOC underarmor masters are not here: only their
+    // KTX2 ships (the first case above).
     expect(convertible.length).toBe(34);
 
     for (const f of convertible) {
@@ -240,11 +252,17 @@ describe('loadSkinTexInto routes textures/skins/ atlases through the KTX2 loader
     };
     collect(SKINS);
     collect(SKIN_EMISSIVE);
+    for (const def of Object.values(VISUALS)) {
+      const url = def.wocCharacter?.underArmorAtlas?.url;
+      if (!url) continue;
+      expectedKtx2.add(url.replace(/\.png$/, '.ktx2'));
+      const task = assets.ensureAtlasByUrl(url);
+      if (task) pending.push(task);
+    }
     await Promise.all(pending);
 
-    // Tight vacuity floor (tests/CLAUDE.md): the exact atlas count the source
-    // comments cite, so a silently emptied manifest cannot pass.
-    expect(expectedKtx2.size).toBe(34);
+    // Pin the WOC underarmor and retained NPC atlas inventory independently.
+    expect(expectedKtx2.size).toBe(17);
     expect(new Set(ktx2Calls)).toEqual(expectedKtx2);
     for (const url of ktx2Calls) {
       expect(url.startsWith(`${SKINS_DIR}/`), url).toBe(true);

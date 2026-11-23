@@ -30,6 +30,7 @@ import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   hoardIntensity,
   hoardMechanicDamage,
+  hoardPlayerBudget,
   hoardPressure,
 } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
@@ -104,7 +105,7 @@ function laySpores(
   emit: Emit,
 ): void {
   const rare = inst.vault?.rarity !== 'common';
-  const count = sporeCloudCount(rare, living.length);
+  const count = sporeCloudCount(rare, hoardPlayerBudget(inst.vault, living.length));
   // Everyone takes a turn under a cloud: rotate the order by the cast count.
   const start = living.length > 0 ? held.casts % living.length : 0;
   const order = living.map((_, i) => living[(start + i) % living.length].pos);
@@ -157,7 +158,7 @@ function growBloat(
     boss.pos.z + Math.cos(angle) * MUSHROOM.bloatDistance,
   );
   const cap = createMob(ctx.nextId++, template, boss.level, pos);
-  cap.maxHp = bloatHealth(boss.maxHp, living.length);
+  cap.maxHp = bloatHealth(boss.maxHp, hoardPlayerBudget(inst.vault, living.length));
   cap.hp = cap.maxHp;
   cap.summonedAdd = true;
   cap.facing = angle + Math.PI;

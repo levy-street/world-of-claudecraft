@@ -112,7 +112,7 @@ const staged = await page.evaluate(() => {
     slotIndex >= 0 &&
     meta.inventory[slotIndex]?.instance?.locked === true &&
     meta.inventory[slotIndex]?.count === 20;
-  sim.vaultBuyUpgrade(); // rung 0: the 2g unlock, ceiling 40
+  sim.vaultBuyUpgrade(); // rung 0: the 2g unlock, ceiling 100
   window.__game?.hud?.openBank?.();
   return { ok: true, lockedOk };
 });

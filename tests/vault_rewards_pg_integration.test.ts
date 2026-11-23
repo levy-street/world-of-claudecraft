@@ -20,8 +20,11 @@ import {
   vaultRewardClaimChannel,
 } from '../server/vault_rewards_db';
 import type { CharacterState } from '../src/sim/character_state';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import { HOARD_BASE_ITEM_IDS, hoardLootVariantId } from '../src/sim/content/hoard_loot';
+import type { LootQualityDescriptor } from '../src/sim/loot_quality';
 import type { Sim } from '../src/sim/sim';
+import type { InvSlot } from '../src/sim/types';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
 const VERIFY_DB = 'wocc_vault_rewards_verify';
@@ -51,8 +54,12 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
     pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 4 });
     await pool.query(VAULT_REWARDS_SCHEMA);
     await pool.query(MAIL_CUSTODY_PARCELS_SCHEMA);
+    // The production shape (server/db.ts): characters.id is a SERIAL, a 32-bit
+    // INTEGER, while the vault ledger stores character ids as BIGINT. A BIGINT
+    // fixture here hid a guest-cap query that Postgres refuses against the real
+    // table, which left every hoard cleared with a guest without a chest.
     await pool.query(
-      `CREATE TABLE characters (id BIGINT PRIMARY KEY, realm TEXT NOT NULL, state JSONB)`,
+      `CREATE TABLE characters (id SERIAL PRIMARY KEY, realm TEXT NOT NULL, state JSONB)`,
     );
     await pool.query(`CREATE TABLE world_state (key TEXT PRIMARY KEY, data JSONB)`);
     await pool.query(
@@ -87,15 +94,14 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
     ],
   };
 
-  it('reads the capped paid-cycle usage before and after a mail-backed claim', async () => {
+  it('keeps paying guests after the third claim despite legacy saved usage', async () => {
     const db = createVaultRewardsDb(pool, 'GuestUsageRealm');
-    expect(await db.guestPayoutsForCycle(801, 'wq1_10')).toBe(0);
     await pool.query(`INSERT INTO characters (id, realm, state) VALUES ($1, $2, $3::jsonb)`, [
       801,
       'GuestUsageRealm',
       JSON.stringify({ worldQuests: { vaultGuestCycle: 'wq1_10', vaultGuestPayouts: 1 } }),
     ]);
-    for (let n = 1; n <= 3; n++) {
+    for (let n = 1; n <= 4; n++) {
       await db.commitVaultOutcome({
         attemptId: `801:usage:${n}`,
         ownerCharacterId: 800,
@@ -111,10 +117,8 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
           },
         ],
       });
-      expect(await db.guestPayoutsForCycle(801, 'wq1_10')).toBe(Math.min(3, n + 1));
+      expect((await db.loadVaultOutcome(`801:usage:${n}`))?.claims[1].copper).toBe(1);
     }
-    expect((await db.loadVaultOutcome('801:usage:3'))?.claims[1].copper).toBe(0);
-    expect(await db.guestPayoutsForCycle(801, 'wq1_11')).toBe(0);
   });
 
   it('atomically records every participant, preserves the first payload, and pages due claims', async () => {
@@ -163,6 +167,108 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
        AND indexname = 'vault_reward_claims_due_mail'`,
     );
     expect(index.rowCount).toBe(1);
+  });
+
+  it('round-trips enhanced and old plain claims, rejects descriptor changes, and saves a direct reward once', async () => {
+    const realm = 'VaultQualityRealm';
+    const db = createVaultRewardsDb(pool, realm);
+    const lootQuality: LootQualityDescriptor = { version: 1, tier: 3, weights: [9, 7, 5, 3, 1] };
+    const input: VaultOutcomeInput = {
+      attemptId: '8701:quality',
+      ownerCharacterId: 8701,
+      claims: [
+        {
+          characterId: 8701,
+          recipientName: 'Enhanced',
+          items: [
+            { itemId: 'slagbreaker_helmet', count: 1, lootQuality },
+            { itemId: HEROIC_MARK_CURRENCY_ID, count: 2 },
+          ],
+          copper: 125,
+          mailDueAt: due,
+        },
+        {
+          characterId: 8702,
+          recipientName: 'Plain',
+          items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
+          copper: 80,
+          mailDueAt: due,
+        },
+      ],
+    };
+    expect(await db.commitVaultOutcome(input)).toBe('created');
+    expect(await db.commitVaultOutcome(structuredClone(input))).toBe('already_committed');
+    const loaded = await db.loadVaultOutcome(input.attemptId);
+    const expected = input.claims.map((claim) => ({ ...claim, mailDueAt: due.toISOString() }));
+    expect(loaded?.claims).toEqual(expected);
+    const dueClaims = await db.dueVaultRewardClaims(10, due);
+    expect(dueClaims).toEqual(expected.map((claim) => ({ ...claim, attemptId: input.attemptId })));
+    expect(dueClaims[1].items[0]).not.toHaveProperty('lootQuality');
+
+    const changed = structuredClone(input);
+    changed.claims[0].items[0].lootQuality = { ...lootQuality, weights: [1, 3, 5, 7, 9] };
+    await expect(db.commitVaultOutcome(changed)).rejects.toThrow(
+      'conflicting vault outcome payload',
+    );
+    expect((await db.loadVaultOutcome(input.attemptId))?.claims).toEqual(expected);
+
+    const claim = loaded?.claims[0];
+    if (!claim) throw new Error('enhanced claim missing');
+    const state = {
+      level: 20,
+      xp: 0,
+      copper: 10,
+      heroicMarks: 7,
+      hp: 100,
+      resource: 0,
+      pos: { x: 0, z: 0 },
+      facing: 0,
+      equipment: {},
+      inventory: [],
+      questLog: [],
+      questsDone: [],
+      worldQuests: { cycle: 'quality', progress: [] },
+    } as unknown as CharacterState;
+    await pool.query('INSERT INTO vault_test_characters VALUES ($1, $2::jsonb)', [
+      claim.characterId,
+      JSON.stringify(state),
+    ]);
+    const deps = {
+      pool,
+      saveCharacter: async (
+        client: import('../server/vault_rewards_db').VaultRewardClient,
+        saved: CharacterState,
+      ) => {
+        const updated = await client.query(
+          'UPDATE vault_test_characters SET state = $2::jsonb WHERE character_id = $1',
+          [claim.characterId, JSON.stringify(saved)],
+        );
+        return updated.rowCount === 1;
+      },
+    };
+    const args = { realm, attemptId: input.attemptId, claim, owner: true, state };
+    expect(await commitVaultDirectClaim(deps, args)).toBe('delivered');
+    const stored = await pool.query<{ state: CharacterState }>(
+      'SELECT state FROM vault_test_characters WHERE character_id = $1',
+      [claim.characterId],
+    );
+    expect(stored.rows[0].state.inventory).toEqual([
+      { itemId: 'slagbreaker_helmet', count: 1, instance: { lootQuality } },
+    ]);
+    expect(stored.rows[0].state.heroicMarks).toBe(9);
+    expect(stored.rows[0].state.copper).toBe(135);
+    expect(
+      await commitVaultDirectClaim(deps, { ...args, state: structuredClone(stored.rows[0].state) }),
+    ).toBe('already_claimed');
+    const replayed = await pool.query<{ state: CharacterState }>(
+      'SELECT state FROM vault_test_characters WHERE character_id = $1',
+      [claim.characterId],
+    );
+    expect(replayed.rows).toEqual(stored.rows);
+    expect(await vaultRewardClaimChannel(pool, realm, input.attemptId, claim.characterId)).toBe(
+      'direct',
+    );
+    expect((await db.dueVaultRewardClaims(10, due)).map((row) => row.characterId)).toEqual([8702]);
   });
 
   it('rolls back the outcome if a later participant claim insert fails', async () => {
@@ -447,9 +553,9 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
     ).toBe(true);
   });
 
-  it('reserves at most three guest payouts per cycle at clear, even before any chest or mail claim', async () => {
+  it('pays every guest claim at clear, including concurrent fourth and fifth clears', async () => {
     const db = createVaultRewardsDb(pool, 'VaultRealm');
-    for (let sequence = 10; sequence < 14; sequence++) {
+    for (let sequence = 10; sequence < 13; sequence++) {
       const attemptId = `72:${sequence}`;
       const input: VaultOutcomeInput = {
         attemptId,
@@ -464,12 +570,27 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
       const guest = (await db.loadVaultOutcome(attemptId))?.claims.find(
         (claim) => claim.characterId === 74,
       );
-      expect(guest?.copper).toBe(sequence === 13 ? 0 : 80);
-      expect(guest?.items).toEqual(sequence === 13 ? [] : [{ itemId: 'treasure_map_b', count: 1 }]);
+      expect(guest?.copper).toBe(80);
+      expect(guest?.items).toEqual([{ itemId: 'treasure_map_b', count: 1 }]);
+    }
+    const later = [13, 14].map((sequence) => ({
+      attemptId: `72:${sequence}`,
+      ownerCharacterId: 72,
+      claims: [outcome.claims[0], { ...outcome.claims[1], characterId: 74, guestCycle: 'cycle-1' }],
+    }));
+    expect(await Promise.all(later.map((input) => db.commitVaultOutcome(input)))).toEqual([
+      'created',
+      'created',
+    ]);
+    for (const input of later) {
+      const guest = (await db.loadVaultOutcome(input.attemptId))?.claims[1];
+      expect(guest?.copper).toBe(80);
+      expect(guest?.items).toEqual([{ itemId: 'treasure_map_b', count: 1 }]);
+      expect(await db.commitVaultOutcome(input)).toBe('already_committed');
     }
   });
 
-  it('honors guest payouts already saved before the new ledger was deployed', async () => {
+  it('ignores guest payouts already saved before the limit was removed', async () => {
     await pool.query(`INSERT INTO characters (id, realm, state) VALUES ($1, $2, $3::jsonb)`, [
       76,
       'VaultRealm',
@@ -489,16 +610,16 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
       const guest = (await db.loadVaultOutcome(attemptId))?.claims.find(
         (claim) => claim.characterId === 76,
       );
-      expect(guest?.copper).toBe(sequence === 30 ? 80 : 0);
+      expect(guest?.copper).toBe(80);
     }
   });
 
-  it('sanitizes malformed and out-of-range legacy guest counters before reserving a clear', async () => {
+  it('ignores malformed and out-of-range legacy guest counters', async () => {
     const db = createVaultRewardsDb(pool, 'VaultRealm');
-    for (const [id, raw, paid] of [
-      [90, 'oops', true],
-      [91, -1, true],
-      [92, 9999999999999, false],
+    for (const [id, raw] of [
+      [90, 'oops'],
+      [91, -1],
+      [92, 9999999999999],
     ] as const) {
       await pool.query('INSERT INTO characters (id, realm, state) VALUES ($1, $2, $3::jsonb)', [
         id,
@@ -516,7 +637,7 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
       const guest = (await db.loadVaultOutcome(attemptId))?.claims.find(
         (claim) => claim.characterId === id,
       );
-      expect(guest?.copper).toBe(paid ? 80 : 0);
+      expect(guest?.copper).toBe(80);
     }
   });
 
@@ -655,6 +776,93 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
     expect(reloaded.rows[0].state.reliquary.firstFind[baseId]).toEqual({ count: 1 });
     expect(reloaded.rows[0].state.copper).toBe(19);
     expect(await vaultRewardClaimChannel(pool, 'VaultRealm', '72:collection', 77)).toBe('direct');
+  });
+
+  it('books enhanced and old plain rewards through the real service into custody JSONB without replay duplicates', async () => {
+    const realm = REALM;
+    const db = createVaultRewardsDb(pool, realm);
+    const lootQuality: LootQualityDescriptor = { version: 1, tier: 2, weights: [2, 4, 6, 8, 10] };
+    const input: VaultOutcomeInput = {
+      attemptId: '8703:quality-mail',
+      ownerCharacterId: 8703,
+      claims: [
+        {
+          characterId: 8703,
+          recipientName: 'EnhancedMail',
+          items: [{ itemId: 'slagbreaker_helmet', count: 1, lootQuality }],
+          copper: 7,
+          mailDueAt: due,
+        },
+        {
+          characterId: 8704,
+          recipientName: 'PlainMail',
+          items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
+          copper: 8,
+          mailDueAt: due,
+        },
+      ],
+    };
+    expect(await db.commitVaultOutcome(input)).toBe('created');
+    const live = new Map<string, InvSlot[]>();
+    const mailSystemParcel = vi.fn<Sim['mailSystemParcel']>((_recipient, _letter, items, ref) => {
+      if (!ref) throw new Error('missing custody ref');
+      live.set(ref, structuredClone(items));
+      return true;
+    });
+    const onClaimFailure = vi.fn();
+    const service = new VaultRewardService(
+      {
+        sim: {
+          mailSystemParcel,
+          hasCustodyParcel: (ref: string) => live.has(ref),
+          canBookVaultRewardMail: () => true,
+        } as unknown as Sim,
+        withPermit: async <T>(run: () => Promise<T>) => run(),
+        saveOwner: async () => true,
+        claimDirect: async () => 'retry' as const,
+        characterPid: () => null,
+        onClaimFailure,
+      },
+      db,
+      pool,
+    );
+    const refs = input.claims.map(
+      (claim) => `vault:${realm}:${input.attemptId}:${claim.characterId}`,
+    );
+    service.tick(due.getTime());
+    await vi.waitFor(() => expect(live.size).toBe(2));
+    await vi.waitFor(() =>
+      expect((service as unknown as { mailing: boolean }).mailing).toBe(false),
+    );
+    const readParcels = () =>
+      pool.query<{ custody_ref: string; items: InvSlot[]; copper: string }>(
+        'SELECT custody_ref, items, copper FROM mail_custody_parcels WHERE custody_ref = ANY($1::text[]) ORDER BY custody_ref',
+        [refs],
+      );
+    const stored = await readParcels();
+    expect(stored.rows).toEqual([
+      {
+        custody_ref: refs[0],
+        items: [{ itemId: 'slagbreaker_helmet', count: 1, instance: { lootQuality } }],
+        copper: '7',
+      },
+      { custody_ref: refs[1], items: [{ itemId: 'slagbreaker_helmet', count: 1 }], copper: '8' },
+    ]);
+    for (const row of stored.rows) expect(live.get(row.custody_ref)).toEqual(row.items);
+    expect(await db.commitVaultOutcome(structuredClone(input))).toBe('already_committed');
+    service.tick(due.getTime() + 30_000);
+    await vi.waitFor(() =>
+      expect((service as unknown as { mailing: boolean }).mailing).toBe(false),
+    );
+    expect((await readParcels()).rows).toEqual(stored.rows);
+    expect(mailSystemParcel).toHaveBeenCalledTimes(2);
+    expect(onClaimFailure).not.toHaveBeenCalled();
+    for (const claim of input.claims) {
+      expect(await vaultRewardClaimChannel(pool, realm, input.attemptId, claim.characterId)).toBe(
+        'mail',
+      );
+    }
+    expect(await db.dueVaultRewardClaims(10, due)).toEqual([]);
   });
 
   it('runs the real service mail sweep at its due boundary, skips direct claims, and isolates bad rows', async () => {

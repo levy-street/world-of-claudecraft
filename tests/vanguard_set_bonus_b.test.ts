@@ -4,6 +4,7 @@
 // effect is present when the tier is met and absent one piece below it. The
 // last block pins every number in the tooltip copy (content/
 // vanguard_item_sets.ts) to the implementation constants.
+
 import { describe, expect, it } from 'vitest';
 import { HOURBINDER_HASTE_ID } from '../src/sim/combat/chronomancy';
 import { gainRuin, ruinAmount } from '../src/sim/combat/destruction';
@@ -14,6 +15,7 @@ import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { setBonusFlag } from '../src/sim/content/ignivar_set_bonuses';
 import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import type { TalentModifiers } from '../src/sim/content/talents';
+import { VANGUARD_PUSHBACK_SET_IDS } from '../src/sim/content/vanguard_set_bonuses';
 import * as B from '../src/sim/content/vanguard_set_bonuses_b';
 import { ITEM_SETS, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -156,8 +158,10 @@ describe('Vanguard B sets: registration', () => {
       const four = computeCharacterModifiers(cls, { spec, rows: {} }, 20, equipment);
       expect(four.selected[setBonusFlag(setId, 2)]).toBe(true);
       expect(four.selected[setBonusFlag(setId, 4)]).toBe(true);
-      // No Season 2 set carries the raid tier's spell pushback rider.
-      expect(four.global.castPushbackReduction).toBe(0);
+      // Every Season 2 set but the warrior and rogue ones carries the pushback rider (2 pieces).
+      expect(four.global.castPushbackReduction).toBe(
+        VANGUARD_PUSHBACK_SET_IDS.includes(setId) ? 1 : 0,
+      );
     }
   });
 
@@ -680,26 +684,54 @@ describe('Starwarden Raiment (balance)', () => {
 describe('Bloodmane Hide (feral)', () => {
   const SET = 'vanguard_druid_feral';
 
-  it('2pc: Bruin Rush cooldown 15 -> 12 sec, not at 1 piece', () => {
-    expect(resolved(live('druid', 'feral', SET, 2), 'bear_charge').cooldown).toBe(12);
-    expect(resolved(live('druid', 'feral', SET, 1), 'bear_charge').cooldown).toBe(15);
+  it('2pc: Lunge cooldown 12 -> 9 sec through Slinkstrike, not at 1 piece', () => {
+    for (const [pieces, cooldown] of [
+      [1, 12],
+      [2, 9],
+    ] as const) {
+      const sim = live('druid', 'feral', SET, pieces);
+      const mob = addHostile(sim, 15);
+      cast(sim, 'cat_form');
+      expect(resolved(sim, 'pounce').def.id).toBe('lunge');
+      expect(resolved(sim, 'pounce').cooldown).toBe(cooldown);
+      cast(sim, 'pounce', mob);
+      expect(sim.player.cooldowns.get('lunge')).toBeCloseTo(cooldown, 0);
+      expect(sim.player.cooldowns.has('pounce')).toBe(false);
+    }
   });
 
-  function rushShield(pieces: number) {
-    const sim = live('druid', 'feral', SET, pieces);
+  it('2pc: Bruin Rush cooldown 15 -> 12 sec, not at 1 piece', () => {
+    for (const [pieces, cooldown] of [
+      [1, 15],
+      [2, 12],
+    ] as const) {
+      const sim = live('druid', 'feral', SET, pieces);
+      const mob = addHostile(sim, 15);
+      expect(resolved(sim, 'bear_charge').cooldown).toBe(cooldown);
+      cast(sim, 'bear_charge', mob);
+      expect(sim.player.cooldowns.get('bear_charge')).toBeCloseTo(cooldown, 0);
+    }
+  });
+
+  it('4pc: Dash cooldown 60 -> 45 sec in Cat Form, not at 3 pieces', () => {
+    for (const [pieces, cooldown] of [
+      [3, 60],
+      [4, 45],
+    ] as const) {
+      const sim = live('druid', 'feral', SET, pieces);
+      cast(sim, 'cat_form');
+      expect(resolved(sim, 'dash').cooldown).toBe(cooldown);
+      cast(sim, 'dash');
+      expect(sim.player.cooldowns.get('dash')).toBeCloseTo(cooldown, 0);
+    }
+  });
+
+  it('4pc: Bruin Rush no longer grants an absorb shield', () => {
+    const sim = live('druid', 'feral', SET, 4);
     const mob = addHostile(sim, 15);
     cast(sim, 'bear_charge', mob);
     expect(sim.player.cooldowns.has('bear_charge')).toBe(true);
-    return { aura: auraOn(sim.player, 'set_vanguard_druid_feral_4pc'), p: sim.player };
-  }
-
-  it('4pc: Bruin Rush shields the druid for 6 percent of max health, not at 3', () => {
-    const { aura, p } = rushShield(4);
-    const shield = expectDefined(aura);
-    expect(shield.kind).toBe('absorb');
-    expect(shield.value).toBe(Math.round(p.maxHp * B.VANGUARD_FERAL_4PC_SHIELD_PCT_MAX));
-    expect(shield.duration).toBe(B.VANGUARD_FERAL_4PC_SHIELD_DURATION_SEC);
-    expect(rushShield(3).aura).toBeUndefined();
+    expect(auraOn(sim.player, 'set_vanguard_druid_feral_4pc')).toBeUndefined();
   });
 });
 
@@ -784,8 +816,8 @@ describe('Vanguard B sets: tooltip numbers match the constants', () => {
       ],
     ],
     vanguard_druid_feral: [
-      [B.VANGUARD_FERAL_2PC_RUSH_COOLDOWN_CUT_SEC],
-      [B.VANGUARD_FERAL_4PC_SHIELD_PCT_MAX * 100, B.VANGUARD_FERAL_4PC_SHIELD_DURATION_SEC],
+      [B.VANGUARD_FERAL_2PC_LUNGE_COOLDOWN_CUT_SEC],
+      [B.VANGUARD_FERAL_4PC_DASH_COOLDOWN_CUT_SEC],
     ],
     vanguard_druid_restoration: [
       [B.VANGUARD_RESTO_DRUID_2PC_FLEETMEND_COOLDOWN_CUT_SEC],

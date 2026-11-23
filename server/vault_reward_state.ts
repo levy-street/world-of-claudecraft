@@ -4,27 +4,43 @@
 
 import { addStacked } from '../src/sim/bags';
 import type { CharacterState } from '../src/sim/character_state';
+import {
+  assertHeroicMarksGrantsFit,
+  creditHeroicMarks,
+  isCurrencyGrantId,
+} from '../src/sim/heroic_marks';
+import { hoardRewardGrantItems } from '../src/sim/rift/hoard_reward_items';
 import { projectHoardRewardCollections } from '../src/sim/rift/hoard_reward_save';
+import { cloneItemInstancePayload, type InvSlot } from '../src/sim/types';
 import type { VaultRewardClaim } from './vault_rewards_db';
 
 export function addVaultRewardToCharacterState(
   state: CharacterState,
   claim: VaultRewardClaim,
-  attemptId: string,
-  owner: boolean,
+  preparedItems?: readonly InvSlot[],
 ): CharacterState {
+  assertHeroicMarksGrantsFit(state, claim.items);
   const capped = claim.items.length === 0 && claim.copper === 0;
   if (!capped) {
-    for (const item of claim.items) addStacked(state.inventory, item.itemId, item.count);
+    // Heroic Marks land on the saved balance, exactly as the live hub credits them.
+    const grants = preparedItems ?? hoardRewardGrantItems(claim.items);
+    for (const item of grants) {
+      if (isCurrencyGrantId(item.itemId)) creditHeroicMarks(state, item.count);
+      else {
+        addStacked(
+          state.inventory,
+          item.itemId,
+          item.count,
+          item.instance ? cloneItemInstancePayload(item.instance) : undefined,
+        );
+      }
+    }
     projectHoardRewardCollections(state, claim.items);
     const copper = state.copper + claim.copper;
     if (!Number.isSafeInteger(copper)) throw new Error('vault reward copper overflow');
     state.copper = copper;
   }
   if (!state.worldQuests) state.worldQuests = { cycle: '', progress: [] };
-  if (owner && state.worldQuests.vaultAttempt?.id === attemptId) {
-    delete state.worldQuests.vaultAttempt;
-  }
   if (!capped) {
     state.worldQuests.clueCasketsOpened = (state.worldQuests.clueCasketsOpened ?? 0) + 1;
   }

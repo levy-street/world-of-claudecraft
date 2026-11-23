@@ -6,6 +6,7 @@ import { HUB_SPARRING_MASTER_ID } from './content/practice_dummies';
 import { MOBS } from './data';
 import { createMob } from './entity';
 import { playerDummyRestHp } from './mob/practice_dummies';
+import { objectRemoved, practiceDummyFacing, practiceDummyPos } from './moved_objects';
 import type { SimContext } from './sim_context';
 import type { WorldContent } from './types';
 
@@ -25,14 +26,13 @@ export function spawnHealingTrainingGround(ctx: SimContext, world: WorldContent)
     if (!template) continue;
     const entityId = HEALING_TRAINING_ENTITY_IDS[spawn.mobId];
     if (ctx.entities.has(entityId)) continue;
-    const dummy = createMob(
-      entityId,
-      template,
-      template.maxLevel,
-      ctx.groundPos(spawn.pos.x, spawn.pos.z),
-    );
-    dummy.facing = -Math.PI / 2;
-    dummy.prevFacing = -Math.PI / 2;
+    // A Studio map may move, turn or delete a dummy (moved_objects.ts); its
+    // reserved id stays, so a deleted one simply never spawns.
+    if (objectRemoved(world.objectMoves, 'practiceDummy', spawn.mobId)) continue;
+    const pos = practiceDummyPos(world.objectMoves, spawn.mobId, spawn.pos);
+    const dummy = createMob(entityId, template, template.maxLevel, ctx.groundPos(pos.x, pos.z));
+    dummy.facing = practiceDummyFacing(world.objectMoves, spawn.mobId, -Math.PI / 2);
+    dummy.prevFacing = dummy.facing;
     dummy.hp = playerDummyRestHp(dummy.maxHp, template.restHpFraction);
     ctx.addEntity(dummy);
   }

@@ -34,6 +34,7 @@ import {
   HOARD_DOUBLE_MECHANIC_INTENSITY,
   hoardIntensity,
   hoardMechanicDamage,
+  hoardPlayerBudget,
   hoardPressure,
 } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
@@ -122,6 +123,7 @@ function begin(
   held.cocoons = [];
   const double = hoardIntensity(inst.vault, living.length) >= HOARD_DOUBLE_MECHANIC_INTENSITY;
   const count = cocoonCount(living.length, double);
+  const budget = hoardPlayerBudget(inst.vault, living.length);
   const spin = (x: number, z: number, target: Entity | null, free: number): void => {
     const total = target ? COCOON_TOTAL_SEC : BROOD_COCOON_TOTAL_SEC;
     const cue: MarkCue = {
@@ -171,7 +173,7 @@ function begin(
     // `living` is id-sorted (instancePlayers sorts); the turn walks round it.
     for (let n = 0; n < count; n++) {
       const target = pool[(held.casts + n) % pool.length];
-      spin(target.pos.x, target.pos.z, target, living.length - count);
+      spin(target.pos.x, target.pos.z, target, budget - cocoonCount(budget, double));
     }
   }
   held.timer = COCOON_EVERY_SEC * hoardPressure(inst.vault).cadence;

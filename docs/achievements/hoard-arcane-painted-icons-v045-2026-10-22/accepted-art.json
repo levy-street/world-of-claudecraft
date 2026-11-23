@@ -1,0 +1,915 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "hoard-arcane-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rare_collapsar_band_of_nyxaris",
+      "family": "hoard-arcane",
+      "tier": "Tarnished",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_collapsar_band_of_nyxaris.webp",
+      "canonicalDisplayName": "Tarnished Collapsar Band of Nyxaris",
+      "acceptedSha256": "1f689c2da52a7c05c58873b5d8d9972ab0100857284b406997dd62f730728b15",
+      "acceptedBytes": 3454,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/rare_collapsar_band_of_nyxaris.png",
+        "sha256": "5a32d92369c283aca9cc7381c4527b3ad5604a5276dc1736517eacec8e12ac18",
+        "bytes": 2378309,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/rare_collapsar_band_of_nyxaris.png",
+        "sha256": "c277120dd94952dbadd888bf16c3f0b1113f2c57af8e6de860f0cd6a2cd4eb07",
+        "bytes": 539414,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "ed8f2f8eeb2652349f9c15fd249cfefc36fa96ddb06a59a3e7d3c68097de3aa4",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Collapsar Band of Nyxaris (rare_collapsar_band_of_nyxaris) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete chunky signet ring in three-quarter view, clearly open circular metal band, one large diamond-shaped violet gemstone in a raised square setting, a small black-violet void cabochon on the lower band. Keep the hole and the gemstone silhouette legible. Tier finish: Restrained lower-tier craftsmanship: dull pitted pewter fittings, faint green patina, worn purple fabric or scuffed metal, plain broad edges and a small subdued violet focal gem. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/rare_collapsar_band_of_nyxaris.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "ed8f2f8eeb2652349f9c15fd249cfefc36fa96ddb06a59a3e7d3c68097de3aa4"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_orb_collapsing_void",
+      "family": "hoard-arcane",
+      "tier": "Tarnished",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_orb_collapsing_void.webp",
+      "canonicalDisplayName": "Tarnished Orb of Collapsing Void",
+      "acceptedSha256": "e4a2529b4f67e7d0e19a62479eedbaa7ffd5fe7d17157c19cd3c3251573a167b",
+      "acceptedBytes": 3478,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/rare_orb_collapsing_void.png",
+        "sha256": "ad5e615317242775ed1f2e26156b278da0955d9448bfb4182b1f0b05ef5da4ef",
+        "bytes": 2347211,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/rare_orb_collapsing_void.png",
+        "sha256": "d59c79013d829aa87f401f911e5eb36f6e3ebd8f6719368a729990564684942d",
+        "bytes": 553048,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "6783c7957a595a5d490d04f6e6f0db320eb7dd38cf282a5ba8c8d126c0d76132",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Orb of Collapsing Void (rare_orb_collapsing_void) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete violet glass caster orb held by two curved metal claws on a short broad pedestal, a tiny black collapsing void core with restrained lavender wisps inside the sphere. The transparent glass is the subject material, the canvas remains opaque. Tier finish: Restrained lower-tier craftsmanship: dull pitted pewter fittings, faint green patina, worn purple fabric or scuffed metal, plain broad edges and a small subdued violet focal gem. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/rare_orb_collapsing_void.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "6783c7957a595a5d490d04f6e6f0db320eb7dd38cf282a5ba8c8d126c0d76132"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_cowl_of_event_horizon",
+      "family": "hoard-arcane",
+      "tier": "Tarnished",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_cowl_of_event_horizon.webp",
+      "canonicalDisplayName": "Tarnished Cowl of the Event Horizon",
+      "acceptedSha256": "c4ac69c95935a0824e8917f0259ce9664bde9da8e5a14e3331c3764359a67100",
+      "acceptedBytes": 3006,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/rare_cowl_of_event_horizon.png",
+        "sha256": "d05c44593e3ab9bd145332a2084f80e6c6e5aae53e2942fa5f638c8d26eb61b4",
+        "bytes": 2432153,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/rare_cowl_of_event_horizon.png",
+        "sha256": "27363e797161e0103fb8c8fdcc325bcb11887dd3ed96ee691f665918cb6b6226",
+        "bytes": 505610,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "7e31bdac92e7a88ee97980b4ef6a5c165e1ce03cf3d182d7f618feb10df8afcb",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Cowl of the Event Horizon (rare_cowl_of_event_horizon) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty deep violet CLOTH cowl, heavy folded hood and short draped neck wrap, arched dark face opening, a small black-violet circular void brooch above the forehead. No head or face inside, no rigid helmet, no shoulder armor. Tier finish: Restrained lower-tier craftsmanship: dull pitted pewter fittings, faint green patina, worn purple fabric or scuffed metal, plain broad edges and a small subdued violet focal gem. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/rare_cowl_of_event_horizon.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "7e31bdac92e7a88ee97980b4ef6a5c165e1ce03cf3d182d7f618feb10df8afcb"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_mantle_of_singularity",
+      "family": "hoard-arcane",
+      "tier": "Tarnished",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_mantle_of_singularity.webp",
+      "canonicalDisplayName": "Tarnished Mantle of Singularity",
+      "acceptedSha256": "be09d033f2ffb618f47b0f9d15f73240414c9bed2850f0e25411f9f38eda3bfe",
+      "acceptedBytes": 3060,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/rare_mantle_of_singularity.png",
+        "sha256": "53fdb610ed5835d9f4a02174a46fc8919a26a84e1d20da5b8b3d254710801ba0",
+        "bytes": 2574181,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/rare_mantle_of_singularity.png",
+        "sha256": "0261a74f46102b104d21d03d1b5cf5bca82908df64386707ba50adf7a45ba079",
+        "bytes": 517365,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "d01ab087b92f37c7d85358807eb5eaf894d591673f531e321dcacfcf1163f4de",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Mantle of Singularity (rare_mantle_of_singularity) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete crescent-shaped deep violet CLOTH shoulder mantle, layered soft padded fabric panels, curved embroidered edging and a round black-violet void clasp. Clearly textile shoulderwear, no metal plate armor, no wearer, no head. Tier finish: Restrained lower-tier craftsmanship: dull pitted pewter fittings, faint green patina, worn purple fabric or scuffed metal, plain broad edges and a small subdued violet focal gem. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/rare_mantle_of_singularity.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "d01ab087b92f37c7d85358807eb5eaf894d591673f531e321dcacfcf1163f4de"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "collapsar_band_of_nyxaris",
+      "family": "hoard-arcane",
+      "tier": "Epic",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/collapsar_band_of_nyxaris.webp",
+      "canonicalDisplayName": "Collapsar Band of Nyxaris",
+      "acceptedSha256": "6770b75621a1ec113939aa2f3cf0c39388898bb238dd18f2e084fec284f814b2",
+      "acceptedBytes": 4124,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/collapsar_band_of_nyxaris.png",
+        "sha256": "e791c60a4622157736bd9a4c71abb46e461a8a10ac315e0a189268d4e57b14e6",
+        "bytes": 2271952,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/collapsar_band_of_nyxaris.png",
+        "sha256": "0feb6aaacd5c4ab22d3a744371d88185ee608c1a78c0abd5e46dbb3721d42a09",
+        "bytes": 597279,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "1887094c914afb984a353c2ce10b5f491604211a19357642a6619f457241bb1f",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Collapsar Band of Nyxaris (collapsar_band_of_nyxaris) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete chunky signet ring in three-quarter view, clearly open circular metal band, one large diamond-shaped violet gemstone in a raised square setting, a small black-violet void cabochon on the lower band. Keep the hole and the gemstone silhouette legible. Tier finish: Well-kept masterwork: bright silver fittings, rich saturated violet materials, crisp folded or beveled edges, medium violet focal gem with a restrained pale highlight. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/collapsar_band_of_nyxaris.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "1887094c914afb984a353c2ce10b5f491604211a19357642a6619f457241bb1f"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "orb_collapsing_void",
+      "family": "hoard-arcane",
+      "tier": "Epic",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/orb_collapsing_void.webp",
+      "canonicalDisplayName": "Orb of Collapsing Void",
+      "acceptedSha256": "1f67fa6b657c950e3a1ab3067c8a5eeed98439cc26838b2cb31a7d413fab2703",
+      "acceptedBytes": 3978,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/orb_collapsing_void.png",
+        "sha256": "e59a00403504c8acd118ce2ae570c2abb6ddeeda2f6863f922452b161d8dd9ba",
+        "bytes": 2452322,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/orb_collapsing_void.png",
+        "sha256": "1307a80596576ab2008ac355f877fdec93c54bb172b4ec61ea396add47e49c8a",
+        "bytes": 586033,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "9550226347dd45aa5c5204b08225c55b70211beb8936baf9a4a5f9edbfc2f112",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Orb of Collapsing Void (orb_collapsing_void) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete violet glass caster orb held by two curved metal claws on a short broad pedestal, a tiny black collapsing void core with restrained lavender wisps inside the sphere. The transparent glass is the subject material, the canvas remains opaque. Tier finish: Well-kept masterwork: bright silver fittings, rich saturated violet materials, crisp folded or beveled edges, medium violet focal gem with a restrained pale highlight. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/orb_collapsing_void.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "9550226347dd45aa5c5204b08225c55b70211beb8936baf9a4a5f9edbfc2f112"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "cowl_of_event_horizon",
+      "family": "hoard-arcane",
+      "tier": "Epic",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/cowl_of_event_horizon.webp",
+      "canonicalDisplayName": "Cowl of the Event Horizon",
+      "acceptedSha256": "93a11140bb01e97fca54e20bed77a5a53a97c619091554f41d83b911190e08a6",
+      "acceptedBytes": 3104,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/cowl_of_event_horizon.png",
+        "sha256": "0bd421a06a67be0c26125d4766acdf020c68201bb1bbf98268f44e86149dbefa",
+        "bytes": 2312362,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/cowl_of_event_horizon.png",
+        "sha256": "0b47cce8332e8e7da799fd96061fa86380a9d8e7aedfe4d921b2e84251a37f02",
+        "bytes": 516530,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "e6b2fa75f45ade6dd0350d7751572f2f4f170c3396991c59ed00f187c5738e12",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Cowl of the Event Horizon (cowl_of_event_horizon) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty deep violet CLOTH cowl, heavy folded hood and short draped neck wrap, arched dark face opening, a small black-violet circular void brooch above the forehead. No head or face inside, no rigid helmet, no shoulder armor. Tier finish: Well-kept masterwork: bright silver fittings, rich saturated violet materials, crisp folded or beveled edges, medium violet focal gem with a restrained pale highlight. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/cowl_of_event_horizon.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "e6b2fa75f45ade6dd0350d7751572f2f4f170c3396991c59ed00f187c5738e12"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "mantle_of_singularity",
+      "family": "hoard-arcane",
+      "tier": "Epic",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/mantle_of_singularity.webp",
+      "canonicalDisplayName": "Mantle of Singularity",
+      "acceptedSha256": "64401209061bc184adac4577b89983df47734e36be6ec7d9fd6905df0a32e823",
+      "acceptedBytes": 3830,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/mantle_of_singularity.png",
+        "sha256": "48c4ef5b2e8195d84a72b20ea35c4c7e1aff79dd79f50f83df072ebe281c3dd9",
+        "bytes": 2503016,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/mantle_of_singularity.png",
+        "sha256": "8c1607fcf746d3c55ba18b5c3c73e8a6d66a26b017bfbd309747e2981ba1faa8",
+        "bytes": 558967,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "4b10f709e17ceb296912e4f66c141cf7e8da23e387136751303dbe34f0f1cf56",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Mantle of Singularity (mantle_of_singularity) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete crescent-shaped deep violet CLOTH shoulder mantle, layered soft padded fabric panels, curved embroidered edging and a round black-violet void clasp. Clearly textile shoulderwear, no metal plate armor, no wearer, no head. Tier finish: Well-kept masterwork: bright silver fittings, rich saturated violet materials, crisp folded or beveled edges, medium violet focal gem with a restrained pale highlight. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/mantle_of_singularity.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "4b10f709e17ceb296912e4f66c141cf7e8da23e387136751303dbe34f0f1cf56"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_collapsar_band_of_nyxaris",
+      "family": "hoard-arcane",
+      "tier": "Sovereign",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_collapsar_band_of_nyxaris.webp",
+      "canonicalDisplayName": "Sovereign Collapsar Band of Nyxaris",
+      "acceptedSha256": "aa3126687e688dc62844a6d8c04536b4c04c1459d2c5b9dc20af1e36f07ab899",
+      "acceptedBytes": 4344,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/legendary_collapsar_band_of_nyxaris.png",
+        "sha256": "f65c937b925bc3b413604345ef540f6a1b24cb4d681d63045dc82c7a9bbedc4f",
+        "bytes": 2205213,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/legendary_collapsar_band_of_nyxaris.png",
+        "sha256": "b96f80ceb78408c209e25cc2499c680fc9feb9fe009c78356d10ca08dc0eb666",
+        "bytes": 565512,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "c043427a19c404bdb355cb32fb168b759fa09775a726413aabe4a84d6b3516e4",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Collapsar Band of Nyxaris (legendary_collapsar_band_of_nyxaris) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete chunky signet ring in three-quarter view, clearly open circular metal band, one large diamond-shaped violet gemstone in a raised square setting, a small black-violet void cabochon on the lower band. Keep the hole and the gemstone silhouette legible. Tier finish: Regal highest-tier craftsmanship: warm gold fittings with broad angular filigree, deeper royal-purple materials, larger luminous violet focal gem and an extra pair of short elegant gold accents. Gold ornament is part of the object, never a surrounding frame. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/legendary_collapsar_band_of_nyxaris.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "c043427a19c404bdb355cb32fb168b759fa09775a726413aabe4a84d6b3516e4"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_orb_collapsing_void",
+      "family": "hoard-arcane",
+      "tier": "Sovereign",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_orb_collapsing_void.webp",
+      "canonicalDisplayName": "Sovereign Orb of Collapsing Void",
+      "acceptedSha256": "36a6926a0fef2f75e9354dd3ceb6b79b9e89bc37c85b5fc0a5571b83b4bfd71b",
+      "acceptedBytes": 4660,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/legendary_orb_collapsing_void.png",
+        "sha256": "825fe44010fc0cf9b6f14424085bb44af623d3df894a19f4e1403b0f0c3d54b4",
+        "bytes": 2358575,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/legendary_orb_collapsing_void.png",
+        "sha256": "ab19fefb5fea8d5354b770f7a597893032fe35101b11d4fe14ca2ae2c6dfe3e7",
+        "bytes": 611154,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "56835929819f5ad010737c5aadb074ea67d2df6817e65fad5aaa74e27d12d746",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Orb of Collapsing Void (legendary_orb_collapsing_void) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete violet glass caster orb held by two curved metal claws on a short broad pedestal, a tiny black collapsing void core with restrained lavender wisps inside the sphere. The transparent glass is the subject material, the canvas remains opaque. Tier finish: Regal highest-tier craftsmanship: warm gold fittings with broad angular filigree, deeper royal-purple materials, larger luminous violet focal gem and an extra pair of short elegant gold accents. Gold ornament is part of the object, never a surrounding frame. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/legendary_orb_collapsing_void.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "56835929819f5ad010737c5aadb074ea67d2df6817e65fad5aaa74e27d12d746"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_cowl_of_event_horizon",
+      "family": "hoard-arcane",
+      "tier": "Sovereign",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_cowl_of_event_horizon.webp",
+      "canonicalDisplayName": "Sovereign Cowl of the Event Horizon",
+      "acceptedSha256": "280b65853a553f79537cf7b0f3705b98e638169774da08a984a5a4686f747c49",
+      "acceptedBytes": 3746,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/legendary_cowl_of_event_horizon.png",
+        "sha256": "585dedbeb1f3a83d4c47464cd7056a6592ac44d09f3940c39161dc3fd36e29ce",
+        "bytes": 2189356,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/legendary_cowl_of_event_horizon.png",
+        "sha256": "8c4f4d843938f0a2641e521b5bd4d91f2c310426ccd7f3409ca5e0696038871e",
+        "bytes": 513470,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "d0667966b8fef3e51ead087b8aa261704567854f15bd1e2f84cc37df35360fe5",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Cowl of the Event Horizon (legendary_cowl_of_event_horizon) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty deep violet CLOTH cowl, heavy folded hood and short draped neck wrap, arched dark face opening, a small black-violet circular void brooch above the forehead. No head or face inside, no rigid helmet, no shoulder armor. Tier finish: Regal highest-tier craftsmanship: warm gold fittings with broad angular filigree, deeper royal-purple materials, larger luminous violet focal gem and an extra pair of short elegant gold accents. Gold ornament is part of the object, never a surrounding frame. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/legendary_cowl_of_event_horizon.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "d0667966b8fef3e51ead087b8aa261704567854f15bd1e2f84cc37df35360fe5"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_mantle_of_singularity",
+      "family": "hoard-arcane",
+      "tier": "Sovereign",
+      "batch": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_mantle_of_singularity.webp",
+      "canonicalDisplayName": "Sovereign Mantle of Singularity",
+      "acceptedSha256": "466cfd5dd69cc36e69d996f43747226be1c53f560f7cf9f6aff6da7ad974be09",
+      "acceptedBytes": 4370,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-arcane/originals/legendary_mantle_of_singularity.png",
+        "sha256": "ffd5387af81905b98c7593068a6af574726abd58e13d8dea3b67c5ac1612b1e2",
+        "bytes": 2579548,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-arcane/masters/legendary_mantle_of_singularity.png",
+        "sha256": "e691e3b685c12474a2787976b84f5c0df3a1a87da79267bc22fac3e132345e3b",
+        "bytes": 563096,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "ab3b479b1d4edd6a3dbab6ddc2cb9329d0079254b7c4c5087d6a785cdfd92211",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Mantle of Singularity (legendary_mantle_of_singularity) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete crescent-shaped deep violet CLOTH shoulder mantle, layered soft padded fabric panels, curved embroidered edging and a round black-violet void clasp. Clearly textile shoulderwear, no metal plate armor, no wearer, no head. Tier finish: Regal highest-tier craftsmanship: warm gold fittings with broad angular filigree, deeper royal-purple materials, larger luminous violet focal gem and an extra pair of short elegant gold accents. Gold ornament is part of the object, never a surrounding frame. Arcane Nyxaris family: deep violet, lavender and void-black, with a small circular void motif. Preserve the old icon's authored object identity while replacing its flat SVG rendering with tactile, dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque charcoal-purple painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-arcane/superseded/legendary_mantle_of_singularity.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "ab3b479b1d4edd6a3dbab6ddc2cb9329d0079254b7c4c5087d6a785cdfd92211"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-arcane-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-arcane-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

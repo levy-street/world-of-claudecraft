@@ -95,7 +95,10 @@ describe('the HUD bubble gate wires the pure style module', () => {
   });
 
   it('applies the channel border tint inline in the renderer', () => {
-    expect(rendererSrc).toContain('s.border');
-    expect(rendererSrc).toContain('borderColor');
+    // the bubbles moved out of renderer.ts into their own layer module
+    const layerSrc = readFileSync(join(repoRoot, 'src/render/chat_bubble_layer.ts'), 'utf8');
+    expect(layerSrc).toContain('s.border');
+    expect(layerSrc).toContain('borderColor');
+    expect(rendererSrc).toContain('this.chatBubbles.show(entityId, text, style, ttlSec);');
   });
 });

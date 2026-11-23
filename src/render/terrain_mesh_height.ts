@@ -17,7 +17,12 @@
 // into terrainHeight and had to be subtracted here and drawn as masonry. A
 // future feature sharper than the lattice subtracts itself here the same way.
 import { terrainHeight } from '../sim/world';
+import { terrainVertexDelta } from './terrain_vertex_edits';
 
 export function meshTerrainHeight(x: number, z: number, seed: number): number {
-  return terrainHeight(x, z, seed);
+  // Mesh Fix vertex moves are the one authored feature that IS sharper than
+  // the lattice, and they subtract themselves here by design: render-only, so
+  // the sim keeps the analytic surface and nobody can author a wall a player
+  // walks into but cannot see.
+  return terrainHeight(x, z, seed) + terrainVertexDelta(x, z);
 }

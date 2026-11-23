@@ -37,6 +37,7 @@ import {
 } from '../sim/transport_schedule';
 import type { Entity } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
+import { applySeatedPose } from './seated_pose';
 import type { ReconciledSelfPrediction, SelfRenderPrediction } from './self_render_position_core';
 import {
   type SelfRenderPositionState,
@@ -240,6 +241,8 @@ export function entityRenderPose(
     out.y = e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha;
     out.z = e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha;
   }
+  // a body on a seat is drawn in it (and walking in and out of it): seated_pose.ts
+  if (last) applySeatedPose(last, e, out, performance.now());
   return out;
 }
 

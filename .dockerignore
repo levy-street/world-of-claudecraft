@@ -15,6 +15,7 @@ scripts/*
 !scripts/build_bundle_pregen.mjs
 !scripts/build_server.mjs
 !scripts/build_bot.mjs
+!scripts/migrate_release_gifts.ts
 !scripts/migrate_old_cragmaw_pelt.ts
 !scripts/old_cragmaw_pelt_migration.ts
 !scripts/migrate_rift_forge_rollback.ts

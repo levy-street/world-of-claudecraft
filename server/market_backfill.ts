@@ -188,9 +188,9 @@ export function mergeMarketSaves(existing: MarketSave, incoming: MarketSave): Ma
   // Collections merge by key: existing rows keep their order (copper summed and
   // items concatenated when the incoming partition shares a key), net-new
   // incoming keys append at the end.
-  // The pending sale ledger rides along with the copper it explains: this merge
-  // SUMS copper, so a clone that dropped `sales` would hand a seller gold with no
-  // rows accounting for it. Conditional + sanitized so a row that never carried a
+  // The sale ledger (the seller's History) rides along with the copper: this
+  // merge SUMS copper, so a clone that dropped `sales` would lose the seller's
+  // sale history. Conditional + sanitized so a row that never carried a
   // ledger (every pre-ledger blob) is still cloned byte-identical.
   const cloneCollection = (c: MarketCollectionSave): MarketCollectionSave => ({
     key: c.key,

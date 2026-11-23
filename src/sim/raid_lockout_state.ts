@@ -13,18 +13,26 @@
 // (src/ui/raid_lockout_format.ts raidLockoutDisplayName) and groups them by
 // lockoutKind below.
 
+import { weeklyQuestIdFromLockout } from './quests/weekly_quest_lock';
 import { isRaidRoom } from './raid_rooms';
 import { worldBossIdFromLockout } from './world_boss';
 
 /** What a lockout id locks: a raid boss room (either reset boundary), an
  *  ordinary dungeon (a heroic daily under `<dungeon>:heroic`), or a looted
  *  world boss (`worldboss:<mobId>`). */
-export type RaidLockoutKind = 'raid' | 'dungeon' | 'worldBoss';
+export type RaidLockoutKind = 'raid' | 'dungeon' | 'worldBoss' | 'weeklyQuest';
 
-export const LOCKOUT_KIND_ORDER: readonly RaidLockoutKind[] = ['raid', 'dungeon', 'worldBoss'];
+export const LOCKOUT_KIND_ORDER: readonly RaidLockoutKind[] = [
+  'raid',
+  'dungeon',
+  'worldBoss',
+  'weeklyQuest',
+];
 
 export function lockoutKind(lockoutId: string): RaidLockoutKind {
   if (worldBossIdFromLockout(lockoutId) !== null) return 'worldBoss';
+  // A weekly quest turned in this week (`weeklyquest:<questId>`).
+  if (weeklyQuestIdFromLockout(lockoutId) !== null) return 'weeklyQuest';
   const dungeonId = lockoutId.endsWith(':heroic')
     ? lockoutId.slice(0, -':heroic'.length)
     : lockoutId;

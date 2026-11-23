@@ -12,14 +12,14 @@ import type { ItemDef } from '../../../sim/types';
 export interface HeroicShopRow {
   itemId: string;
   item: ItemDef;
-  /** Price in Heroic Marks (the heroic_mark inventory item). */
+  /** Price in Heroic Marks (the currency counter, src/sim/heroic_marks.ts). */
   marks: number;
   affordable: boolean;
 }
 
 export interface HeroicShopView {
   rows: HeroicShopRow[];
-  /** The viewer's current Heroic Marks balance (bag count). */
+  /** The viewer's current Heroic Marks balance (IWorld.heroicMarks). */
   balance: number;
 }
 

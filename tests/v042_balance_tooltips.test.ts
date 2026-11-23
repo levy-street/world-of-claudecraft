@@ -274,9 +274,9 @@ describe('abilityDamageBonus applies resolved outputScaling (v0.42.0 fix)', () =
   });
 
   it('multiplies an absorb rider by outputScaling.absorb', () => {
-    // Every shield with an authored Spell Power coefficient is a mage
-    // personal barrier (spell_scaling.ts's absorbBonus header); Psalm of
-    // Warding carries none and scales by rank instead.
+    // Every shield with an authored coefficient (the mage barriers, Psalm of
+    // Warding, Mass Barrier) reads healPower through absorbBonus with the
+    // resolved talent/absorb multiplier.
     const iceBarrier = known('mage', 'ice_barrier', FROST_MAGE_MODS);
     const outputScaling = buildAbilityOutputScaling(iceBarrier.def, 'mage', FROST_MAGE_MODS);
     const eff = requiredEffect(iceBarrier.effects, (e) => e.type === 'absorb');
@@ -285,6 +285,20 @@ describe('abilityDamageBonus applies resolved outputScaling (v0.42.0 fix)', () =
     expect(abilityDamageBonus(res, eff, SC)).toBe(
       absorbBonus(SC.healPower, eff.spellPowerCoeff ?? 0, outputScaling.absorb),
     );
+
+    // Psalm of Warding (Doctrine): the 0.10 coefficient times the Discipline
+    // absorb multiplier, never the old flat-by-rank zero rider.
+    const psalm = known('priest', 'power_word_shield', DOCTRINE_MODS);
+    const psalmScaling = buildAbilityOutputScaling(psalm.def, 'priest', DOCTRINE_MODS);
+    const psalmEff = requiredEffect(psalm.effects, (e) => e.type === 'absorb');
+    if (psalmEff.type !== 'absorb') throw new Error('unreachable');
+    expect(psalmEff.spellPowerCoeff).toBe(0.1);
+    const psalmRes = { ...psalm, outputScaling: psalmScaling };
+    const psalmBonus = abilityDamageBonus(psalmRes, psalmEff, SC);
+    // Discipline: heal mult 1.18 x absorb mastery 1.30.
+    expect(psalmScaling.absorb).toBeCloseTo(1.534, 6);
+    expect(psalmBonus).toBe(Math.round(200 * 0.1 * 1.534));
+    expect(psalmBonus).toBe(absorbBonus(SC.healPower, 0.1, psalmScaling.absorb));
   });
 
   it('falls back to the pre-v0.42 factor-1 behavior when outputScaling is absent', () => {
@@ -464,7 +478,7 @@ describe('actual runtime -> formatted tooltip, real Sim casts (Groveheart druid)
     for (let i = 0; i < 20 * seconds; i++) sim.tick();
   }
 
-  it('Wildbloom (rejuvenation): the pure-HoT $d matches the actually deposited tick total', () => {
+  it('Sporemending (rejuvenation): the pure-HoT $d matches the actually deposited tick total', () => {
     const sim = freshGroveheartDruid(101);
     const p = sim.player;
     castAbility(sim.ctx, 'rejuvenation', p.id);
@@ -543,7 +557,7 @@ describe('actual runtime -> formatted tooltip, real Sim casts (Groveheart druid)
     castAbility(sim.ctx, 'swiftmend', p.id);
     const actualHealed = healedAmount(waitForCast(sim));
     expect(actualHealed).toBeGreaterThan(0);
-    // The consumed Wildbloom is gone; Swiftmend's own heal is the only thing
+    // The consumed Sporemending is gone; Swiftmend's own heal is the only thing
     // that landed.
     expect(p.auras.some((a) => a.id === 'rejuvenation')).toBe(false);
     const res = sim.resolvedAbility('swiftmend');

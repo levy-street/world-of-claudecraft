@@ -6,7 +6,7 @@
 // an interrupted meal forfeits it, the ONE 'well_fed' aura id makes the
 // whole food family mutually exclusive (last eaten wins, dish or role plate
 // alike) while elixir_<kind> coexists because the ids can never collide, the
-// mint draws zero rng, and the aura is transient across save/load.
+// mint draws zero rng, and the aura persists across save/load.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -118,16 +118,21 @@ describe('well fed: the one aura id', () => {
     expect(bad.kind).toBe('drink');
   });
 
-  it('content pin: the well-fed carrier set is exactly the seven buff foods', () => {
+  it('content pin: the well-fed carrier set is exactly the seven buff foods and five candies', () => {
     const carriers = Object.values(ITEMS)
       .filter((def) => def.kind === 'food' && def.wellFed !== undefined)
       .map((def) => def.id)
       .sort();
     expect(carriers).toEqual([
+      'crabapple_chew',
       'eastbrook_glazed_carrots',
       'evergarden_braised_greens',
       'fenbridge_rice_pudding',
+      'gourdseed_brittle',
+      'hearthroot_toffee',
       'highwatch_barley_porridge',
+      'lantern_mint_drop',
+      'owlwatch_fudge',
       'sageleaf_chowder',
       'stonepot_stew',
       'warspice_skewers',
@@ -149,7 +154,14 @@ describe('well fed: the one aura id', () => {
     // union must stay exactly the set the shipped carriers use, so widening it
     // for a kind nothing carries, or a carrier appearing outside it, is a
     // deliberate change here and an audit of the strip.
-    const narrowed: readonly TimedStatBuffAuraKind[] = ['buff_ap', 'buff_int', 'buff_sta'];
+    const narrowed: readonly TimedStatBuffAuraKind[] = [
+      'buff_ap',
+      'buff_int',
+      'buff_sta',
+      'buff_str',
+      'buff_agi',
+      'buff_spi',
+    ];
     const carried = new Set<string>();
     for (const def of Object.values(ITEMS)) {
       if (def.elixir) carried.add(def.elixir.kind);
@@ -185,17 +197,30 @@ describe('well fed: the one aura id', () => {
       buff_sta: true,
       buff_ap: true,
       buff_int: true,
+      buff_str: true,
+      buff_agi: true,
+      buff_spi: true,
     };
     const sharedKinds: Record<TimedStatBuffAuraKind, true> = {
       buff_sta: true,
       buff_ap: true,
       buff_int: true,
+      buff_str: true,
+      buff_agi: true,
+      buff_spi: true,
     };
     expect(sameSet).toBe(true);
     expect(Object.keys(flaskKinds).sort()).toEqual(Object.keys(sharedKinds).sort());
     // ...and against the literal set, so re-spelling BOTH records the same
     // wrong way still reds (the pair compare alone would not see it).
-    expect(Object.keys(flaskKinds).sort()).toEqual(['buff_ap', 'buff_int', 'buff_sta']);
+    expect(Object.keys(flaskKinds).sort()).toEqual([
+      'buff_agi',
+      'buff_ap',
+      'buff_int',
+      'buff_spi',
+      'buff_sta',
+      'buff_str',
+    ]);
   });
 });
 
@@ -496,24 +521,30 @@ describe('well fed: duration ticks down and the aura expires', () => {
   });
 });
 
-describe('well fed: transient across save and load', () => {
-  it('a live aura does not survive the serializeCharacter round trip', () => {
-    // Auras are transient by design: no persistence path serializes entity
-    // auras (serializeCharacter carries no auras key, only the two dedicated
-    // sickness timers), so a relog drops the buff like any temporary aura.
+describe('well fed: persists across save and load', () => {
+  it('a live aura survives the serializeCharacter round trip with its remaining time', () => {
+    // Buffs persist through a logout with their timers frozen while offline
+    // (src/sim/aura_persist.ts): the save carries the aura's remaining seconds
+    // and the reload resumes from exactly that remaining, self-sourced on the
+    // new entity so a fresh meal still replaces it.
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'eastbrook_glazed_carrots');
     expect(wellFedAuras(p).length).toBe(1);
+    const live = wellFedAuras(p)[0];
 
     const state = sim.serializeCharacter(pid)!;
     expect(state).toBeTruthy();
-    expect('auras' in (state as unknown as Record<string, unknown>)).toBe(false);
+    expect(state.auras?.map((a) => a.id)).toEqual([WELL_FED_AURA_ID]);
 
     const sim2 = new Sim({ seed: 43, playerClass: 'warrior', noPlayer: true });
     const pid2 = sim2.addPlayer('warrior', 'Restored', { state });
-    sim2.tick();
     const p2 = sim2.entities.get(pid2)! as Entity;
-    expect(wellFedAuras(p2), 'buff gone after the round trip').toEqual([]);
+    const restored = wellFedAuras(p2);
+    expect(restored.length, 'buff kept after the round trip').toBe(1);
+    expect(restored[0].kind).toBe(live.kind);
+    expect(restored[0].value).toBe(live.value);
+    expect(restored[0].remaining).toBeCloseTo(live.remaining, 2);
+    expect(restored[0].sourceId).toBe(pid2);
   });
 });
 
@@ -689,7 +720,7 @@ describe('well fed: the retired namespace is gone (the unification landed)', () 
       .filter((def) => def.kind === 'food' && def.wellFed !== undefined)
       .map((def) => def.id)
       .sort();
-    expect(carriers, 'the sweep really has carriers to eat').toHaveLength(7);
+    expect(carriers, 'the sweep really has carriers to eat').toHaveLength(12);
     for (const itemId of carriers) {
       const { sim, pid, p } = playerWorld();
       eatToCompletion(sim, pid, p, itemId);

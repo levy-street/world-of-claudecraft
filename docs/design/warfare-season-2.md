@@ -14,9 +14,14 @@ cheaper entry tier:
   shoulder, chest, legs, gloves), the same five slots and the same 2-piece and 4-piece
   thresholds as every raid set (owner decision). 135 armor items. Waist and feet stay
   entry tier.
-- **Four season weapons:** a strength two-hander (the honor shop has none today), a
-  strength one-hander, an agility one-hander and a caster staff.
-- **Jewelry** stays entry tier: at item level 35 it would out-stat the badge jewelry.
+- **Season weapons:** a strength two-handed sword, a strength one-hander, an agility
+  one-hander, a caster staff, and the druid-only Vanguard's Feral Staff.
+  The feral staff carries 10 Strength, 9 Agility, 11 Stamina, 73 Warfare Offense Rating,
+  and 112 Warfare Defense Rating, with the same two-handed damage budget as the caster staff.
+- **Jewelry:** one ring and one neck per role (Strength, Agility, damage caster, healer), added
+  2026-10-02 (see "Revision 2026-10-02" below). It was left on the entry tier at first because
+  item-level-35 jewelry out-stats the item-level-26 badge jewelry; it now follows the armor's
+  rule instead: never better than the raid tier.
 - **Item level 35:** source level 29 plus the epic bump of 6. That is level with the Ignivar
   raid tier.
 - **Bonuses:** each set has a 2-piece and a 4-piece bonus that work everywhere, PvE included
@@ -31,7 +36,12 @@ cheaper entry tier:
 
 Season 2 combines the two. **Every 2-piece bonus is PvP utility, and every 4-piece builds on
 its own 2-piece.** The 2-piece bends a mobility, control or defensive button. The 4-piece
-adds a follow-up that fires off that button.
+adds a follow-up that fires off that button. Every set whose spec has a cast damage can delay
+(`VANGUARD_PUSHBACK_SET_IDS` in `content/vanguard_set_bonuses.ts`) also grants immunity to
+damage cast pushback at two pieces, the rider every Season 1 family carries. That is all 14
+caster sets plus the Protection and Retribution paladin, all three hunter, Enhancement
+shaman and Feral druid sets. Only the six warrior and rogue sets go without: rogues have no
+cast-time ability, and Bladestorm already ignores pushback.
 
 ## The PvE promise: never better than the raid tier in raids
 
@@ -39,8 +49,10 @@ The owner's two rules are that honor gear is never the raid pick, and that bonus
 everywhere. These rules hold them together:
 
 - **Stats:**
-  - Each piece's stat line is 0.9 of its item-level-35 line budget (the honor discount),
-    with no hit, crit or haste rating.
+  - Each piece's stat line is 0.9 of its item-level-35 line budget (the honor discount).
+  - Since 2026-10-02 each piece also carries ONE combat rating at a third of the raid piece's,
+    and caster and healer pieces carry Spell Power or Healing Power, so the full kit lands on
+    the raid lane (see "Revision 2026-10-02" below).
   - Stamina is the full-budget stamina floor (`staminaBaseline` of the undiscounted budget),
     so every piece meets the same floor as any item-level-35 epic, and no more: Vitality,
     not stamina, is where honor gear's PvP health comes from.
@@ -65,21 +77,43 @@ everywhere. These rules hold them together:
   - every **4-piece** is sized below the same spec's raid 4-piece;
   - where a Season 2 bonus touches a number a raid bonus also bends, the two combine as the
     larger value, never added.
-- **No spell-pushback immunity on any honor set.** Every caster raid 2-piece carries it, and
-  it would be the strongest PvP rider of all.
+- **Spell-pushback immunity (reversed 2026-10, owner call):** the original rule kept it off
+  every honor set as the strongest PvP rider of all. It now rides every 2-piece whose spec
+  has a cast damage can delay (see above), so a caster or a Marksmanship hunter can finish a
+  cast under pressure. It is the same knob the caster raid 2-pieces set and max-combines
+  with it, so it never stacks past full immunity.
 - **WARFARE ratings (rebalanced 2026-09-25, owner rule "make Season 2 better than Season
   1"):** a full Season 1 kit reaches every Warfare cap through its 4-piece and 7-piece
   bonuses (+200 rating), and Season 2's ability bonuses carry no rating, so at 1x the slot
   budget a Season 2 kit fell short of Season 1 in PvP (about 13 percent less health, 19 and
   23 percent Offense and Defense). The pieces now carry the rating instead:
-  - Offense is 2.2x and Defense 3.4x the slot budget (`SEASON2_OFFENSE_RATING_MULT`,
-    `SEASON2_DEFENSE_RATING_MULT`). A Season 2 kit (the five pieces plus entry-tier waist,
-    feet, jewelry and weapon) reaches the 30 percent Offense and Defense caps.
+  - Offense is 1.8x and Defense 2.9x the slot budget (`SEASON2_OFFENSE_RATING_MULT`,
+    `SEASON2_DEFENSE_RATING_MULT`). The full kit (the five pieces and a Season 2 weapon,
+    plus entry-tier waist and feet and the Season 2 jewelry, which carries the entry-tier
+    jewelry's Warfare rating so the totals are the same) reaches the 30 percent Offense and
+    Defense caps
+    and the +80 percent Vitality cap: exactly with a one-hander, one ring's worth over with
+    a two-hander.
+  - **Rebalanced 2026-10-02 (owner: "rebalance this"), from 2.2x and 3.4x.** At the old
+    multipliers a part kit already capped: three Season 2 pieces with a Season 2 greatsword
+    in each hand (Fury's two-hand pairing) and PvE gear everywhere else read 29.5 percent
+    Offense, 30 percent Defense and +76 percent Vitality, so the remaining slots went to PvE
+    gear for its crit, hit and haste. The multipliers are now the smallest at which every
+    spec's full kit still reaches the caps, so each Season 2 piece moves the totals until
+    the kit is complete (that build now reads 18.2 percent Offense). Full-kit health is
+    unchanged, since Vitality caps either way.
+  - **Only the main hand's weapon carries Warfare rating** (`countsWarfareRating`,
+    `src/sim/pvp/power.ts`). An offhand weapon adds none, for every dual wielder: two
+    Season 2 daggers or one-handers would otherwise carry 90 Offense against a two-hander's
+    59, and Fury's second greatsword doubled the weapon slot outright. Weapon tooltips say
+    so under the Warfare line.
   - The Vitality cap rose from +50 to +80 percent (`PVP_VITALITY_CAP`). A full Season 1 kit
     still lands at about +50 percent (302 rating); a Season 2 kit reaches +80.
-  - Measured at level 20 on the Sim: Season 2 carries 9 to 10 percent more maximum health in
-    PvP than a full Season 1 kit for physical specs and about 14 percent for casters (whose
-    Season 1 pieces carry only half the stamina premium). None of it applies in dungeons or
+  - Measured at level 20 on the Sim, each side with its own weapon (2026-10-02): Season 2
+    carries 8.0 percent more maximum health in PvP than a full Season 1 kit for arms, 5.9
+    percent for protection and 14.7 percent for fire (whose Season 1 pieces carry only half
+    the stamina premium). Protection sits lowest because the Season 2 one-hander carries 8
+    stamina against the Season 1 one-hander's 12. None of it applies in dungeons or
     raids, where Vitality is off and Warfare never touches PvE, so the tank guard is
     unchanged. `tests/warfare_season2.test.ts` ("the PvP promise") pins the caps and a
     health floor over Season 1.
@@ -98,14 +132,23 @@ everywhere. These rules hold them together:
 
   A full set costs 6,600 Honor.
 - **Weapons:** 1,800 Honor each.
+- **Jewelry:** 600 Honor a neck and 425 a ring (1.5 times the entry tier's old honor prices,
+  the ring rounded to the 25 the armor prices sit on).
 - **Where it is sold:** both honor quartermasters (FURY in Eastbrook Vale, Warmarshal Draven
   Kole in Highwatch). The shop lists a Season 2 group first: the viewer's own three spec
   sets (the sets are class-locked, so the shop shows only what the viewer can wear), then the
   season weapons the viewer can wield. The entry tier follows as its own group, unfiltered.
+- **The Weekly Vault:** the PvP row (1, 3 and 5 ranked arena or rated battleground wins a
+  week) rolls Season 2 and nothing else, class-filtered like every vault row, so a character
+  rolls only its own three spec sets and the season weapons it can wield (`weeklyLootPool` in
+  `src/sim/weekly_rewards.ts`; amended 2026-10-07). The Reliquary's Vanguard Gallery names
+  both quartermasters and the `weekly_vault_pvp` activity on every slot.
 - **Art:** the four weapons ship painted icons (the `warfare-season2-weapons-2026-09-25`
-  batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. The 135 armor
-  pieces sit on `ITEM_ART_PENDING` (pinned in `tests/item_icons.test.ts`) and draw their
-  procedural icon until a follow-up art pass paints them.
+  batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. All 135 armor
+  pieces across the nine classes ship individual paintings from the
+  `warfare-season2-*-icons-2026-10-22` batches in `public/ui/items/mapping.json`.
+  `tests/item_icons.test.ts` verifies complete static coverage;
+  `tests/warfare_season2_icon_art.test.ts` pins every set and its accepted shipping hashes.
 - **Ids:** sets use a new prefix, `vanguard_<spec>`, so the existing `warfare_*` pins keep
   meaning the entry tier.
 
@@ -164,6 +207,80 @@ cast-triggered refunds at their trigger's own cooldown. The highest left: Bruin 
 Faultline (17), Onrush (about 14). Oath Chain's cast slow reads only on player casts, so it
 does nothing to mobs; it is a PvP bonus by design.
 
+## Revision 2026-10-02: combat ratings and Season 2 jewelry
+
+Owner request: "rework the PvP gear so there's hit/haste/crit/spell power/healing power across
+all the gear", with hit on the rings (50 for melee and 40 for casters in all) and stamina still
+the priority. Season 1 is unchanged.
+
+**The WoW reference** (item databases, matched pairs at item level 264, waist slot):
+
+| | Primary | Stamina | Damage stat | Offensive ratings | PvP stat |
+|---|---|---|---|---|---|
+| Raid melee belt (Astrylian's Sutured Cinch) | 104 Agi | 120 | 161 AP | 80 crit + 64 ArP = 144 | none |
+| PvP melee belt (Wrathful Gladiator's Belt of Triumph) | 112 Agi | 137 | 122 AP | 72 crit | 80 resilience |
+| Raid caster belt (Crushing Coldwraith Belt) | 92 Int | 92 | 122 SP | 64 crit + 80 haste = 144 | none |
+| PvP caster belt (Wrathful Gladiator's Cord of Dominance) | 61 Int | 137 | 132 SP | 72 crit | 80 resilience |
+
+- PvP pieces carry half the raid piece's offensive rating (one rating, not two) and more
+  stamina, and the caster belt keeps full spell power.
+- Hit lived on dedicated PvP rings sized near the PvP cap (Cataclysm's Gladiator's Ring of
+  Accuracy: 301 stamina, 201 agility, 134 hit). The healer ring (Band of Meditation) is the
+  same ring with Spirit in place of the hit.
+- Resilience also cut the chance and size of a crit taken, so much of that crit was cancelled.
+  Warfare Defense is flat damage reduction, already capped on a full kit, so it cancels none
+  of it: Season 2 takes a third of the raid rating rather than half.
+
+**The rules** (`src/sim/content/pvp_honor_season2.ts`, pinned in `tests/warfare_season2.test.ts`):
+
+- **Armor:** 28 of the spec's raid-set main rating (a third of the raid piece's 85, rounded
+  down): crit or haste, following the raid set (arms crit like Slagbreaker, fury haste like
+  Emberfury).
+- **Weapons:** 33 crit (a third of the raid weapon's 100).
+- **Necks:** 8 crit, 8 haste on the healer neck (a third of the raid neck's 25).
+- **Rings:** the PvP hit cap. Two melee rings (25 Hit each) cancel the base 5 percent melee
+  miss against a same-level player, two caster rings (20 each) the 4 percent spell resist.
+  Dual-wield auto-attacks keep their extra 10 percent miss, as in classic, so the cap covers
+  special attacks and single-weapon swings. Hit past the cap does nothing in PvP, so the rings
+  stop there; no other Season 2 piece carries Hit.
+  Heals are never resisted, so the healer ring carries 20 haste instead.
+- **Spell Power and Healing Power:** the full kit (five pieces, staff, Season 2 neck and two
+  rings, entry-tier waist and feet) lands on the raid lanes, 86 Spell Power and 172 healing.
+  The neck and rings copy the raid jewelry (4 Spell Power, 8 Healing Power). The entry-tier
+  waist and feet stay as they are, so their raid share rides on the five armor pieces (a
+  caster helm carries 9 Spell Power against the raid helm's 7). The one staff serves both
+  roles: 34 Spell Power and 34 Healing Power.
+- **Art:** the eight jewelry pieces ship painted icons (the `vanguard-jewelry-icons-2026-10-03`
+  batch, SVG compositions by `scripts/generate_vanguard_jewelry_icons.mjs`).
+- **Jewelry stat line and Warfare:** the armor rule (0.9 of the ring or neck budget, stamina
+  at the full-budget floor), and the entry-tier jewelry's Warfare rating, so every cap total
+  is unchanged.
+- **Unchanged:** stamina, the stat lines, Warfare ratings and caps, prices of the existing
+  pieces, and everything in Season 1.
+
+**Measured** on the owned-class DPS probe (`scripts/owned_class_balance_probe.ts`), the full
+Season 2 kit before and after, 60 seconds against a level-20 target (the same miss and resist
+chance as against a player), 10 seeds. Dummy DPS, so Warfare and crowd control are not in it;
+fight length against a player scales with the inverse.
+
+| Spec | Today | After | Change | Fight length |
+|---|---|---|---|---|
+| Marksmanship | 180.8 | 200.3 | +19.5 | -10 percent |
+| Beast Mastery | 182.1 | 204.9 | +22.8 | -11 percent |
+| Survival | 163.9 | 182.1 | +18.2 | -10 percent |
+| Enhancement | 172.8 | 201.2 | +28.4 | -14 percent |
+| Feral | 214.0 | 238.6 | +24.6 | -10 percent |
+| Elemental | 142.1 | 209.8 | +67.7 | -32 percent |
+| Shadow | 138.1 | 205.2 | +67.1 | -33 percent |
+| Balance | 128.4 | 181.9 | +53.5 | -29 percent |
+
+Casters gain the most because they also gain their Spell Power lane: today a Season 2 caster
+carries none of it while a Season 2 melee weapon already deals full raid weapon damage, which
+left casters 25 to 35 percent behind melee in the same kit. After, they land in the physical
+band (182 to 239) rather than ahead of it. Half the Spell Power would put them at 162 to 184
+(elemental 184.0, shadow 176.7, balance 161.9); none at 141 to 157. The Spell Power amounts
+are the one dial if casters prove too strong in play.
+
 ## The 27 sets
 
 Each spec lists its set and item names, the 2-piece and 4-piece text, the implementation
@@ -219,7 +336,7 @@ Implementation routes:
 - **4pc:** "Shieldcrack reduces Faultline's remaining cooldown by 1 sec."
   Route: DATA, castNth refund on `shield_slam` (n 1) to `faultline`, 1 sec. With
   Shieldcrack every 6 sec, effective Faultline about 21 sec.
-- **PvE ceiling:** Forgewall 2pc (Iron Resolve 5 absorb per rage, +25 percent) and 4pc
+- **PvE ceiling:** Forgewall 2pc (Iron Resolve shield 25 percent of max health, up from 20) and 4pc
   (Shieldcrack refunds Iron Resolve 2 sec). Season 2 touches only a stun that bosses
   ignore; Faultline's damage is a minor share. Zero mitigation, so it cannot compete
   with Forgewall's absorb economy; it is trash-pack control only.
@@ -305,7 +422,7 @@ Implementation routes:
 ### Marksmanship (`marksmanship`, signature Cold Focus `cold_focus`)
 - **Set:** Farsight Harness. Farsight Coif, Farsight Spaulders, Farsight Jerkin, Farsight Legguards, Farsight Gauntlets.
 - **2pc:** "Trailbreak's cooldown is reduced by 4 sec."
-  Route: DATA, ability row `{ ability: 'trailbreak', cooldownFlat: -4 }` (15 to 11 sec,
+  Route: DATA, ability row `{ ability: 'trailbreak', cooldownFlat: -4 }` (20 to 16 sec,
   12 yd backward leap).
 - **4pc:** "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more
   than once every 15 sec."
@@ -469,6 +586,8 @@ Implementation routes:
   - Route: DATA ProcDef. `trigger: { on: 'castNth', n: 1, abilities: ['stormstrike'] }`, `responses: [{ kind: 'cooldownRefund', ability: 'elemental_trance', seconds: 4 }]`.
   - Resolved: about 1 Ancestral Strike per 12 sec, so Trance comes back about every
     90 sec instead of 120 (Stormsurge resets add a little more; disclose).
+- **Stats:** the five Galeborn pieces carry Strength and Stamina, with the existing physical
+  stat budget unchanged (shaman attack power never reads Agility).
 - **PvE ceiling:** Warspirit Emberscale (2pc: Ancestral Strike advances cadence 3
   steps; 4pc: Ancestral Strike hits 30 percent harder). Ours adds zero damage: a slow
   (bosses largely ignore it) and more uptime on a defensive. Stonehearth Bastion
@@ -612,16 +731,17 @@ Implementation routes:
 **Set:** Bloodmane Hide
 **Items:** Bloodmane Helm, Bloodmane Shoulderpads, Bloodmane Tunic, Bloodmane Legguards, Bloodmane Grips
 
-- **2pc:** "Bruin Rush's cooldown is reduced by 3 sec." (`bear_charge`, charge plus 1 sec stun, 15 to 12 sec)
-  - Route: DATA. `{ ability: 'bear_charge', cooldownFlat: -3 }`.
-- **4pc:** "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
-  - Route: DATA ProcDef. `trigger: { on: 'castNth', n: 1, abilities: ['bear_charge'] }`, `responses: [{ kind: 'absorb', amountPctMaxHp: 0.06, duration: 6, name: 'Bloodmane Guard', target: 'self' }]` (`target: 'self'` REQUIRED, the Rush is hostile).
-  - PvP read: gap close into Cat Form (Rush makes Cat free for 3 sec) with a cushion.
+- **2pc:** "Reduces the cooldowns of Lunge and Bruin Rush by 3 sec." (`lunge`, the out-of-stealth Slinkstrike button, 12 to 9 sec; `bear_charge`, 15 to 12 sec)
+  - Route: DATA. `{ ability: 'lunge', cooldownFlat: -3 }` and `{ ability: 'bear_charge', cooldownFlat: -3 }`.
+- **4pc:** "Dash's cooldown is reduced by 15 sec." (60 to 45 sec, Cat Form only)
+  - Route: DATA. `{ ability: 'dash', cooldownFlat: -15 }`.
+  - PvP read: gap close in either form more often, with Dash available more often for chasing or escaping.
+- **Stats:** the five Bloodmane pieces carry Strength and Stamina, with the existing physical stat budget unchanged.
 - **PvE ceiling:** both Wildfang raid sets. Wildfang Emberhide (Cat: Redharvest 45
   energy; Redharvest replants Flense) and Cinderbark Ward (Bruin: Sweeping Claws 30
   percent extra Old Blood; Marrowbreak +30 percent and keeps its strike beside the 18
-  percent guard). Ours: zero damage; the absorb is at most 0.5 percent max health per
-  sec and only if Rush is spent on cooldown, which a raid tank rarely does.
+  percent guard). These honor bonuses improve mobility, with no direct damage
+  multiplier or absorb. Lunge still costs 40 energy for its strike and combo point.
 
 ### Restoration (`restoration`, Groveheart, healer)
 **Set:** Thistlebloom Vestment

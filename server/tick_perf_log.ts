@@ -14,7 +14,8 @@
 // windowed ring in server/character_blob_size.ts): the heartbeat is the cheap
 // always-on view of the same signal woc_character_state_bytes_p99 scrapes.
 
-import { ZONES } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, ZONES, zoneAt } from '../src/sim/data';
+import type { Entity } from '../src/sim/types';
 import type { PhaseStats } from './tick_profiler';
 
 // Per-zone attribution buckets for the mob.update phase (moved here from
@@ -33,6 +34,13 @@ export const MOB_ZONE_PHASE_OTHER = `${MOB_ZONE_PHASE_PREFIX}other`;
 export const MOB_ZONE_PHASE_BY_ID = new Map<string, string>(
   ZONES.map((z) => [z.id, `${MOB_ZONE_PHASE_PREFIX}${z.id}`]),
 );
+/** The zone/group bucket a mob's update cost is attributed to (moved here from
+ *  server/game.ts beside the buckets). Pure and allocation-free: a cheap zoneAt band scan
+ *  plus a Map lookup of an interned string. */
+export function mobZonePhase(mob: Pick<Entity, 'pos'>): string {
+  if (mob.pos.x > DUNGEON_X_THRESHOLD) return MOB_ZONE_PHASE_INSTANCE;
+  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.x, mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
+}
 export const SIM_MOB_ZONE_PHASES = [
   ...ZONES.map((z) => `${MOB_ZONE_PHASE_PREFIX}${z.id}`),
   MOB_ZONE_PHASE_INSTANCE,

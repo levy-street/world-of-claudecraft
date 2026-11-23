@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/skeleton_minion_woc.glb",
+      "out": "models/creatures/woc_skeleton_minion.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "React", "Death", "Awaken", "Cast"],
+      "maxTex": 1024
+    }
+  ]
+}

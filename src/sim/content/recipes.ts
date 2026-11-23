@@ -4663,6 +4663,8 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
 // recipe omitted from recipeList was unreachable in normal play; the same
 // applies to the tool recipes de-stubbed here (#1135's crafted base tools).
+// Reserved recipe family; retired companion looks have no craftable source.
+export const BUDDY_CHARM_RECIPES: ProfessionRecipeRecord[] = [];
 
 export const FACTION_REWARD_RECIPES: ProfessionRecipeRecord[] = [
   {
@@ -4742,6 +4744,7 @@ export const FACTION_REWARD_RECIPES: ProfessionRecipeRecord[] = [
 
 export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
+  ...BUDDY_CHARM_RECIPES,
   ...TOOL_RECIPES,
   ...ROD_RECIPES,
   ...TOOL_EFFECT_RECIPES,

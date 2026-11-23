@@ -11,10 +11,11 @@
 
 import { poolCapacityOf, poolOccupancyOf } from '../sim/bag_pools';
 import { BACKPACK_SLOTS } from '../sim/bags';
-import { type BagCells, layoutBagCells } from '../sim/inventory_order';
+import { type BagCells, isCellPinned, layoutBagCells } from '../sim/inventory_order';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { Quality } from '../sim/loot_master';
 import { isMaterialItemId } from '../sim/material_ids';
+import { WORLD_PVP_SKULL_BAG_ITEM_ID } from '../sim/pvp/world_pvp_trophy';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import {
   applyBagFilter,
@@ -29,6 +30,9 @@ export type { BagCells };
 
 /** The item facts the bag click/tooltip logic needs (a subset of ItemDef). */
 export interface BagItemInfo {
+  /** The def id. Read only by the Skull Bag arm (bagItemAction's
+   *  'openSkullBag'); every other rung decides off the def's fields. */
+  id?: string;
   kind: string;
   noMarketList?: boolean;
   /** Refused by the sim's vendor sell path (src/sim/items.ts sellItem). */
@@ -136,6 +140,8 @@ export type BagAction =
   | 'discardQuest'
   | 'equipBag'
   | 'placeFeast'
+  /** The World PvP Skull Bag: toggles its sub-inventory pane in the bags window. */
+  | 'openSkullBag'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -163,6 +169,8 @@ export type BagTooltipHintKey =
   // The placeable feast: the click SETS IT OUT at your feet (placeFeast),
   // it never eats it, so the generic "Click to use" undersold the action.
   | 'itemUi.tooltip.clickSetOut'
+  // The Skull Bag: the click opens its sub-inventory pane, never uses it.
+  | 'hudChrome.skullBag.clickOpen'
   // The station-placing tools: the click SETS THE STATION UP at your feet
   // (placeMobileStation), the feast's twin in the one deployable-hint
   // pattern, and the same verb the sim's placement line speaks.
@@ -267,6 +275,9 @@ export function bagItemAction(
   // not discarded; only inert quest items fall through to the discard prompt.
   if (item.kind === 'quest') return item.use ? 'use' : 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // The Skull Bag (src/sim/pvp/skull_bag.ts) is a sub-inventory, not a socket
+  // bag: a click shows or hides its pane, the bags window owns the rest.
+  if (item.id === WORLD_PVP_SKULL_BAG_ITEM_ID) return 'openSkullBag';
   // A placeable feast (ItemDef.feast, Farming Phase 12) routes to the
   // dedicated place verb instead of plain useItem, the mount-classification
   // pattern: this pure core decides off the def, bags_window dispatches
@@ -551,6 +562,8 @@ export function bagTooltipHintKey(
   if (item.kind === 'quest')
     return item.use ? 'itemUi.tooltip.clickUse' : 'itemUi.tooltip.clickDestroy';
   if (item.kind === 'mount') return 'hudChrome.mounts.clickManage';
+  // Twin of bagItemAction's openSkullBag arm.
+  if (item.id === WORLD_PVP_SKULL_BAG_ITEM_ID) return 'hudChrome.skullBag.clickOpen';
   if (
     item.kind === 'weapon' ||
     item.kind === 'armor' ||
@@ -738,6 +751,20 @@ export function buildBagGrid(
   if (visible.length === 0)
     return { state: 'noMatch', cells: [], visible: [], emptyCells: 0, overflow };
   return { state: 'items', cells, visible, emptyCells, overflow };
+}
+
+/** True when a drag from inventory index `from` onto bag cell `to` would move or
+ *  displace a player-locked stack, which the sim refuses (inventory_order.ts
+ *  moveStackToCell, the same isCellPinned rule). The drop handler toasts on it
+ *  instead of dispatching a reorder that silently does nothing. */
+export function bagReorderBlockedByLock(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  from: number,
+  to: number,
+): boolean {
+  if (isCellPinned(inventory[from])) return true;
+  return isCellPinned(layoutBagCells(inventory, capacity)[to]);
 }
 
 /** Stable key over exactly what the sort command changes: each stack's id,

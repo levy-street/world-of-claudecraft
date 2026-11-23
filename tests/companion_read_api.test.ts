@@ -251,16 +251,22 @@ describe('GET /api/me/characters (read-scoped my-characters list)', () => {
     expect(block).toContain('characterListPayload(');
     expect(block).toContain('await listCharacters(accountId)');
     expect(block).toContain('(await loadAccountCosmetics(accountId)).weaponSkinLoadout');
+    expect(block).toContain('await getMembership(accountId)');
     expect(block).not.toContain('bearerActiveAccount');
   });
 
-  it('returns the same shape as GET /api/characters (both call characterListPayload)', () => {
+  it('both list routes pass their account membership into the same characterListPayload', () => {
     const calls = (
       MAIN.match(
-        /characterListPayload\(\s*await listCharacters\(accountId\),\s*\(await loadAccountCosmetics\(accountId\)\)\.weaponSkinLoadout,\s*\)/g,
+        /characterListPayload\(\s*await listCharacters\(accountId\),\s*\(await loadAccountCosmetics\(accountId\)\)\.weaponSkinLoadout,\s*await getMembership\(accountId\),\s*await referralCapacityEarned\(accountId\),\s*\)/g,
       ) ?? []
     ).length;
     expect(calls).toBe(2); // /api/me/characters and the full-session GET /api/characters
+    const fullRoute = MAIN.slice(MAIN.indexOf("if (url === '/api/characters')"));
+    const fullGet = fullRoute.slice(0, fullRoute.indexOf("if (req.method === 'POST')"));
+    expect(fullGet).toContain('bearerActiveAccount(req, res)');
+    expect(fullGet).toContain('characterListPayload(');
+    expect(fullGet).toContain('await getMembership(accountId)');
   });
 
   it('is matched before the generic /api/characters route', () => {

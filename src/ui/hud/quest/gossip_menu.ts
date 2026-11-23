@@ -40,6 +40,13 @@ export interface GossipMenuContent {
    *  hunt's current step targets this NPC. Its own field so a plain quest
    *  giver with nothing else to offer still keeps the dialog open for it. */
   hasClueStep: boolean;
+  /** A dungeon lore guide (dungeon_guide_dialog_core.ts): his greeting and,
+   *  while his offer stands, the answer rows. Its own field so a guide, who
+   *  has no quest and no stock, keeps the dialog open. */
+  hasDungeonGuide: boolean;
+  /** The seasonal trick-or-treat row (trick_or_treat_row_view.ts): its own field
+   *  so a townsperson with nothing else to offer keeps the dialog open for it. */
+  hasTrickOrTreat?: boolean;
 }
 
 export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
@@ -56,6 +63,8 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasTraining &&
     !content.hasFarmer &&
     !content.hasWorldQuestBoard &&
-    !content.hasClueStep
+    !content.hasClueStep &&
+    !content.hasDungeonGuide &&
+    content.hasTrickOrTreat !== true
   );
 }

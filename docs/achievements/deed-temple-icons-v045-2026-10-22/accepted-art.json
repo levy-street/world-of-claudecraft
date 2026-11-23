@@ -1,0 +1,458 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-temple-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 5,
+    "removedCategoryFallbacks": [
+      "dgn_selthe_pitch",
+      "dgn_colossus_mirror",
+      "dgn_ysolei_high_and_dry",
+      "dgn_mere_hydra",
+      "dgn_drowned_temple_cantor"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "dgn_selthe_pitch",
+      "family": "deed-temple",
+      "batchId": "deed-temple-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_selthe_pitch.webp",
+      "canonicalDisplayName": "Every Voice in Tune",
+      "acceptedSha256": "cefc619df7b9a920bdbd209de98c44293b7b3ca8ef1c68156b9d9a4563f76b16",
+      "acceptedBytes": 9954,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-temple/originals/dgn_selthe_pitch.png",
+        "sha256": "9daa7d3577687454aa3617b865ccfab197df0da935cfd797c09b8bc961c3422e",
+        "bytes": 1705857,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-temple/masters/dgn_selthe_pitch.png",
+        "sha256": "5080400ed82f37fe721e1646d0e89cbc64f3f82b1a9ad1c34306c1b536a8cee1",
+        "bytes": 439873,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Every Voice in Tune (dgn_selthe_pitch). Subject: Three beautiful nacre conch horns arranged as a compact choir, two together joined by one soft golden harmony ribbon and a third slightly apart with its own small silver tone. Pearly shells and gold rims above a small pale moonstone altar, musical waves as simple flowing arcs, no written score or letters. Clear conch silhouettes, sea pearl, pale gold and restrained moonlit violet. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/choirmother_selthe.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "265d4e38a9442cf7b49d870c8aa9a9583bfa44085c6679357d8291671aaca1ac"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_selthe_pitch",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [127, 121, 1169, 1121],
+          "framedSubject": [448, 430],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-temple-icons-v045/dgn_selthe_pitch-desktop.png",
+          "docs/screenshots/deed-temple-icons-v045/dgn_selthe_pitch-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_colossus_mirror",
+      "family": "deed-temple",
+      "batchId": "deed-temple-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_colossus_mirror.webp",
+      "canonicalDisplayName": "Break the Glass",
+      "acceptedSha256": "8f91b16c1b015db232e91c6cfb6b72dea1ba9ab8b8c9d9e8ebcc2db9403ea338",
+      "acceptedBytes": 10240,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-temple/originals/dgn_colossus_mirror.png",
+        "sha256": "2e6e7285136dd631c59e762c9c228fd798d839b9bc2afe73700c30481ad65b3c",
+        "bytes": 2272687,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-temple/masters/dgn_colossus_mirror.png",
+        "sha256": "5fb1cc54d68724482d0aad7e04849d80800f55f144ef381698a7672a3d62a4ca",
+        "bytes": 439983,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Break the Glass (dgn_colossus_mirror). Subject: A large sea-green tideglass mirror shattering cleanly into angular crystal pieces, its fading reflected face only a simple ghostly silhouette inside the largest shard. Thick weathered silver frame with coral-like branches, brilliant cyan fracture lines, a small hourglass below implies a quick victory. Mirror and breaking shards dominate, no numbers, text or person outside the reflection. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/tideglass_colossus.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "4a29298215a081807ba34112a63abffaf41ea2e527116f901abc5ec479b40683"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_colossus_mirror",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [88, 61, 1177, 1188],
+          "framedSubject": [433, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-temple-icons-v045/dgn_colossus_mirror-desktop.png",
+          "docs/screenshots/deed-temple-icons-v045/dgn_colossus_mirror-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_ysolei_high_and_dry",
+      "family": "deed-temple",
+      "batchId": "deed-temple-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_ysolei_high_and_dry.webp",
+      "canonicalDisplayName": "High and Dry",
+      "acceptedSha256": "30ecf553b5aaac2d2e67c4feb2376c62c2850cb611c5ca4f54aa0fed69d6e238",
+      "acceptedBytes": 9476,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-temple/originals/dgn_ysolei_high_and_dry.png",
+        "sha256": "4d0d3fab3eb50378d53d5ca6f1d145148147fb7a4e25036124b1eab4a894d57c",
+        "bytes": 2285933,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-temple/masters/dgn_ysolei_high_and_dry.png",
+        "sha256": "0b086b9ec2b83e68aa67128cdbc03c4d3b1ec008b3f3f695bbd41d56283017d1",
+        "bytes": 454418,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for High and Dry (dgn_ysolei_high_and_dry). Subject: A pair of sturdy adventurer boots planted safely on a high dry moonstone platform while a mighty turquoise tidal wave crashes below and curls around its base. A small silver crescent moon hangs above the platform. Boots and dry ledge remain visibly above the waterline, pearl stone, dark brown leather and moonlit sea teal, no person, writing or UI symbols. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/ysolei.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "a094cdf7839c6a03f21c9b4a97a8bc1a1e59f37a0e1523477eb2d0eef495c908"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_ysolei_high_and_dry",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [96, 97, 1190, 1177],
+          "framedSubject": [437, 431],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-temple-icons-v045/dgn_ysolei_high_and_dry-desktop.png",
+          "docs/screenshots/deed-temple-icons-v045/dgn_ysolei_high_and_dry-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_mere_hydra",
+      "family": "deed-temple",
+      "batchId": "deed-temple-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_mere_hydra.webp",
+      "canonicalDisplayName": "All Heads Down",
+      "acceptedSha256": "44e5545bd357b9dcf01406b81f148edfc2ba18628236c996f4e140766f3be638",
+      "acceptedBytes": 7552,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-temple/originals/dgn_mere_hydra.png",
+        "sha256": "0dffa17751c5bcbfc2327bf8276d7eef09e28a646858debbd6e6da53991af75f",
+        "bytes": 2051734,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-temple/masters/dgn_mere_hydra.png",
+        "sha256": "0ac2fdc4bd03b00424013e345f9295ce1c8eef9ae5de0d57b23cc1629646b15a",
+        "bytes": 421596,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for All Heads Down (dgn_mere_hydra). Subject: Exactly three long-necked silver-grey sea hydra heads slumped together in defeat over the edge of one shallow dark teal pool. Three distinct reptilian heads with narrow snouts, small ivory crown spines and closed eyes; each neck curves down, no severing or wounds. Pearly scales with mossy green base, three heads equal and countable, compact triangular crest, no blood or lettering. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/mere_hydra_head_center.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "bee63b2afbf1b16ccb52c94acd2cbbede19125e7a61f9eb6a4b34f4f35b92efe"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_mere_hydra",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [66, 130, 1186, 1127],
+          "framedSubject": [448, 399],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-temple-icons-v045/dgn_mere_hydra-desktop.png",
+          "docs/screenshots/deed-temple-icons-v045/dgn_mere_hydra-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_drowned_temple_cantor",
+      "family": "deed-temple",
+      "batchId": "deed-temple-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_drowned_temple_cantor.webp",
+      "canonicalDisplayName": "The Last Verse",
+      "acceptedSha256": "3f73f890e27985189dbec902adeb05ad1233aca9a2ecf46e820d047c5f58c152",
+      "acceptedBytes": 7940,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-temple/originals/dgn_drowned_temple_cantor.png",
+        "sha256": "c65bccb9699911b0f6016eb93e8238599ece2d90cb983a0b8e7147278dfaa281",
+        "bytes": 1865492,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-temple/masters/dgn_drowned_temple_cantor.png",
+        "sha256": "a3457c59f657a8bce5161cc0016935b976bf0ad0a6717cbf514c0606db53e955",
+        "bytes": 426972,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for The Last Verse (dgn_drowned_temple_cantor). Subject: An open pale ivory choir hymnal resting on a moonstone altar beside one small silver handbell. A single soft golden musical ribbon rises from the blank pages and fades peacefully into a silver crescent moon, marking the Last Cantor singing the final verse for his choir. Hymnal and bell dominate, ivory, pearl, pale gold and tranquil moonlit blue. No written notes, text, letters or visible person. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_drowned_temple_cantor",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [96, 69, 1176, 1203],
+          "framedSubject": [427, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-temple-icons-v045/dgn_drowned_temple_cantor-desktop.png",
+          "docs/screenshots/deed-temple-icons-v045/dgn_drowned_temple_cantor-mobile.png"
+        ]
+      }
+    }
+  ]
+}

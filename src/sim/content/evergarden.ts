@@ -14,6 +14,7 @@
 // give the sim its solid trunk colliders).
 
 import { DAWNHOLD_BUILDINGS, DAWNHOLD_COURT_STATUE } from '../dawnhold_layout';
+import { HEDGEWICK_LAYOUT, paintedTownBuildingDefs } from '../painted_towns';
 import type {
   CampDef,
   GroundObjectDef,
@@ -652,15 +653,11 @@ export const EVERGARDEN_OBJECTS: GroundObjectDef[] = [
 
 export const EVERGARDEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Hedgewick: the groundskeepers' hamlet by the gate lawns
-  // mid-size buildings (bigger than the old doll scale, smaller than the
-  // full-scale pass), spread so every road corridor out of the square walks
-  buildings: [
-    // the inn stands clear northeast of the churchyard rails
-    { kind: 'inn', x: 318, z: 808, w: 9, d: 10, rot: 0.7 },
-    { kind: 'house', x: 344, z: 826, w: 8, d: 8, rot: -1.0 },
-    { kind: 'house', x: 318, z: 828, w: 8, d: 8, rot: 2.1 },
-  ],
+  // Hedgewick: the groundskeepers' hamlet by the gate lawns. Five painted
+  // buildings stand round the green between its five roads (the painted
+  // rebuild, sim/painted_towns/hedgewick.ts): the inn, the chapel in its
+  // churchyard, the smithy, and two houses.
+  buildings: [...paintedTownBuildingDefs(HEDGEWICK_LAYOUT)],
   wells: [{ x: 324, z: 814, r: 1.5 }],
   stalls: [{ x: 326, z: 802, rot: 0.5, r: 1.6 }],
   crates: [
@@ -734,15 +731,9 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
       h: 4.9,
     },
     { key: 'hexBarracks', x: 306, z: 860, rot: -0.9, scale: 8, r: 6, h: 13 },
-    // Hedgewick's medieval quarter, spread for easy walking: chapel by the
-    // churchyard, tavern on the pond road, smithy west, homes and the
-    // market ringing the square with every road corridor kept clear
-    { key: 'hexChurch', x: 302, z: 788, rot: Math.PI / 2, scale: 8, r: 5.6, h: 15 },
-    { key: 'hexTavern', x: 352, z: 806, rot: -1.45, scale: 8, r: 6, h: 13 },
-    { key: 'hexBlacksmith', x: 290, z: 824, rot: 2.03, scale: 7.5, r: 5.6, h: 10 },
-    { key: 'hexHomeA', x: 328, z: 838, rot: Math.PI, scale: 7.5, r: 5.2, h: 11 },
-    { key: 'hexHomeB', x: 334, z: 790, rot: 0.6, scale: 7.5, r: 5.2, h: 11 },
-    { key: 'hexMarket', x: 310, z: 844, rot: Math.PI, scale: 6, r: 4.5, h: 7 },
+    // (Hedgewick's hexagon quarter, the church, tavern, blacksmith, both
+    // homes and the market, gave way to the painted town: its rows live on
+    // as HEDGEWICK_LAYOUT.replacedDecorProps, sim/painted_towns/hedgewick.ts)
     // the Garden Gate: a grand doubled arch over the entry road, flanked by
     // flush stone walls (colliders on), with the parterre core's hedge line
     // and flower border along their garden face (the arch stays walk-through:
@@ -819,30 +810,25 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'hexWheelbarrow', x: 272, z: 1005, rot: -1.1, scale: 4 },
     { key: 'hexLumber', x: 452, z: 938, rot: 2.1, scale: 5 },
     { key: 'hexWheelbarrow', x: 460, z: 940, rot: 0.9, scale: 4 },
-    // the churchyard's wrought-iron enclosure (walk-through dressing) pulled
-    // in close around the chapel and the gardener's plot. Rails run at a
-    // 3.5yd pitch (each piece is 4 long) so every run butts INTO its corner
-    // pillars with no gaps; the east side leaves an open, gateless entrance
-    // facing the town square.
+    // the churchyard's wrought-iron enclosure (walk-through dressing) round
+    // the chapel's south side and the gardener's plot before its door: the
+    // painted chapel itself closes the yard's back (its south rail meets
+    // the chapel's south wall, its north rail the bell tower). Rails run at
+    // a 3.5yd pitch (each piece is 4 long) so every run butts INTO its
+    // corner pillars with no gaps; the east side leaves an open, gateless
+    // entrance facing the town square.
     { key: 'gardenIronPillar', x: 296, z: 782 },
     { key: 'gardenIronPillar', x: 314, z: 782 },
-    { key: 'gardenIronPillar', x: 296, z: 800 },
     { key: 'gardenIronPillar', x: 314, z: 800 },
     { key: 'gardenIronFence', x: 298, z: 782 },
     { key: 'gardenIronFence', x: 301.5, z: 782 },
     { key: 'gardenIronFence', x: 305, z: 782 },
     { key: 'gardenIronFence', x: 308.5, z: 782 },
     { key: 'gardenIronFence', x: 312, z: 782 },
-    { key: 'gardenIronFence', x: 298, z: 800 },
-    { key: 'gardenIronFence', x: 301.5, z: 800 },
     { key: 'gardenIronFence', x: 305, z: 800 },
     { key: 'gardenIronFence', x: 308.5, z: 800 },
     { key: 'gardenIronFence', x: 312, z: 800 },
     { key: 'gardenIronFence', x: 296, z: 784, rot: Math.PI / 2 },
-    { key: 'gardenIronFence', x: 296, z: 787.5, rot: Math.PI / 2 },
-    { key: 'gardenIronFence', x: 296, z: 791, rot: Math.PI / 2 },
-    { key: 'gardenIronFence', x: 296, z: 794.5, rot: Math.PI / 2 },
-    { key: 'gardenIronFence', x: 296, z: 798, rot: Math.PI / 2 },
     { key: 'gardenIronFence', x: 314, z: 784, rot: Math.PI / 2 },
     { key: 'gardenIronFence', x: 314, z: 786.25, rot: Math.PI / 2 },
     { key: 'gardenIronFence', x: 314, z: 795.75, rot: Math.PI / 2 },

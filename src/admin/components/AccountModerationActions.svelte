@@ -6,6 +6,7 @@
   import {
     type Built,
     banAccount,
+    reactivateAccount,
     resetPassword,
     suspendCustom,
     suspendHours,
@@ -18,7 +19,7 @@
 
   type Target = Pick<
     AccountDetail,
-    'id' | 'isAdmin' | 'bannedAt' | 'suspendedUntil' | 'moderationReason'
+    'id' | 'isAdmin' | 'bannedAt' | 'suspendedUntil' | 'deactivatedAt' | 'moderationReason'
   >;
   type SelectedAction =
     | { kind: 'suspend'; hours: number; label: string }
@@ -26,6 +27,7 @@
     | { kind: 'unsuspend'; label: string }
     | { kind: 'ban'; label: string }
     | { kind: 'unban'; label: string }
+    | { kind: 'reactivate'; label: string }
     | { kind: 'reset-password'; label: string };
 
   let {
@@ -63,6 +65,7 @@
     if (action.kind === 'ban') return t('dialog.confirmBan');
     if (action.kind === 'unban') return t('dialog.confirmUnban');
     if (action.kind === 'unsuspend') return t('dialog.confirmUnsuspension');
+    if (action.kind === 'reactivate') return t('dialog.confirmReactivation');
     if (action.kind === 'suspend-custom') return t('dialog.confirmCustomSuspension');
     if (action.kind === 'reset-password') return t('dialog.confirmResetPassword');
     return t('dialog.confirmSuspension');
@@ -78,6 +81,7 @@
     let built: Built;
     if (action.kind === 'ban') built = banAccount(target.id, values.reason);
     else if (action.kind === 'unban') built = unbanAccount(target.id, values.reason);
+    else if (action.kind === 'reactivate') built = reactivateAccount(target.id, values.reason);
     else if (action.kind === 'unsuspend') {
       built = unsuspendAccount(target.id, values.reason);
     }
@@ -99,6 +103,11 @@
 
 {#if !target.isAdmin}
   <section class="account-admin-controls mod-account-actions" aria-label={t('detail.accountActions')}>
+    {#if target.deactivatedAt}
+      <div class="moderation-reason">
+        {t('detail.deactivatedNotice', { value: fmtDate(target.deactivatedAt) })}
+      </div>
+    {/if}
     {#if status === 'banned' && target.moderationReason}
       <div class="moderation-reason">
         {t('detail.banReason', { value: target.moderationReason })}
@@ -109,6 +118,11 @@
       </div>
     {/if}
 
+    {#if target.deactivatedAt}
+      <button onclick={() => (selected = { kind: 'reactivate', label: t('detail.reactivate') })}>
+        {t('detail.reactivate')}
+      </button>
+    {/if}
     {#if status === 'banned'}
       <button onclick={() => (selected = { kind: 'unban', label: t('detail.unban') })}>
         {t('detail.unban')}

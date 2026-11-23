@@ -106,10 +106,11 @@ const mobileCss = readSource('../src/styles/hud.mobile.css');
 const hudChromeCatalog = readSource('../src/ui/i18n.catalog/hud_chrome.ts');
 
 describe('WOC Store window contract', () => {
-  it('opens on the Store tab and keeps Daily Rewards as a sub-tab', () => {
-    expect(storeWindow).toContain("private tab: 'store' | 'rewards' = 'store'");
+  it('opens on the Cosmetic Store tab beside Memberships, with no Daily Rewards tab', () => {
+    expect(storeWindow).toContain("private tab: 'store' | 'memberships' | 'rewards' = 'store'");
     expect(dailyRewardsChrome).toContain('data-woc-store-tab="store"');
-    expect(dailyRewardsChrome).toContain('data-woc-store-tab="rewards"');
+    expect(dailyRewardsChrome).toContain('data-woc-store-tab="memberships"');
+    expect(dailyRewardsChrome).not.toContain('data-woc-store-tab="rewards"');
   });
 
   it('offers a Claudium top-up when the selected skin is unaffordable', () => {
@@ -394,8 +395,10 @@ describe('WOC Store window contract', () => {
       'this.claudiumHooks?.storeSnapshot()',
     );
 
-    const hook = main.slice(main.indexOf('storeSnapshot: async () =>'));
-    const storeSnapshot = hook.slice(0, hook.indexOf('snapshot: async () =>'));
+    expect(main).toContain('storeSnapshot: () => storeSnapshotForHud(economy)');
+    const storeSnapshot = stripComments(
+      readFileSync(new URL('../src/net/subscription_sdk.ts', import.meta.url), 'utf8'),
+    );
     expect(storeSnapshot).toContain('economy.storeSnapshot()');
     expect(storeSnapshot).not.toContain('economy.skus()');
     expect(storeSnapshot).not.toContain("economy.price('woc')");
@@ -680,8 +683,9 @@ describe('WOC Store window contract', () => {
     // focusKeyAttr joined the import when the top-up button gained a key (phase 17
     // QA): a pin on the whole import LINE is a same-change obligation for any
     // widening, which is the point of pinning the line rather than the symbols.
+    // findFocusKey joined with the Memberships tab, whose repaint restores focus by key.
     expect(storeWindow).toContain(
-      "import { captureFocusKey, focusedWithin, focusKeyAttr } from './focus_restore'",
+      "import { captureFocusKey, findFocusKey, focusedWithin, focusKeyAttr } from './focus_restore'",
     );
     // restoreFirstEnabled moved BEHIND store_focus_policy in Phase 15 QA, so the
     // reach this pin used to have over the shared helper is kept by following it

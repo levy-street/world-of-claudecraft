@@ -20,9 +20,15 @@ import {
   type ActivityItem,
   buildActivityMessage,
   buildDailyRewardWinnersMessage,
+  buildHillAnnouncementMessage,
+  buildPvpKillFeedMessage,
   buildQueuePopMessage,
   buildRelayMessage,
+  chunkPvpKills,
   type DailyRewardWinnersDay,
+  type HillAnnouncementItem,
+  hillAnnouncementIsStale,
+  type PvpKillItem,
   type RelayItem,
 } from './logic';
 import type { BreakerState } from './rate_governor';
@@ -56,6 +62,10 @@ export interface OutboxIo {
   /** Rejects on a failed post, the way the Discord shell already behaves. */
   postRelay: (item: RelayItem) => Promise<unknown>;
   postActivity: (item: ActivityItem) => Promise<unknown>;
+  /** One digest post for a batch from chunkPvpKills (never more than a post's lines). */
+  postPvpKills: (batch: readonly PvpKillItem[]) => Promise<unknown>;
+  /** One King of the Hill spawn card, to the same channel as the kill feed. */
+  postHillAnnouncement: (item: HillAnnouncementItem) => Promise<unknown>;
   postWinnersDay: (day: DailyRewardWinnersDay) => Promise<unknown>;
   /**
    * Mark a day announced. Answers nullish for a failed call rather than
@@ -76,6 +86,9 @@ export interface OutboxChannels {
   relay: string;
   activity: string;
   dailyRewards: string;
+  /** The World PvP kill feed and the King of the Hill spawn calls. No
+   *  fallback: unset means both are off. */
+  pvpFeed: string;
 }
 
 export interface OutboxIoOptions {
@@ -132,6 +145,8 @@ export function outboxIoFor(options: OutboxIoOptions): OutboxIo {
       const payload = buildActivityMessage(item);
       if (payload) await post('activity', payload);
     },
+    postPvpKills: (batch) => post('pvpFeed', buildPvpKillFeedMessage(batch)),
+    postHillAnnouncement: (item) => post('pvpFeed', buildHillAnnouncementMessage(item)),
     postWinnersDay: (day) => post('dailyRewards', buildDailyRewardWinnersMessage(day)),
     markWinnersDay: (day) => options.markDailyRewardWinners(day),
     applyLinkChanges: options.applyLinkChanges,
@@ -204,7 +219,8 @@ function rememberAnnounced(state: OutboxPollState, day: string): void {
  * true holds the fast active interval while a backlog exists, false lets each
  * empty run decay the delay toward idle. The signal is split by stream class:
  *
- * - The three DRAINED streams (relay, activity, link changes) count by
+ * - The DRAINED streams (relay, activity, link changes, queue pops, PvP kills,
+ *   hill announcements) count by
  *   CARRIAGE, not post outcome: the drain consumed them, so fifty relay items
  *   with every post refused still means a backlog existed, and backing off
  *   then would be exactly backwards.
@@ -256,6 +272,8 @@ export async function runOutboxPoll(
   const winnerDays = listOf(streams.winners?.days);
   const linkChanges = listOf(streams.linkChanges?.items);
   const queuePops = listOf(streams.queuePops?.items);
+  const pvpKills = listOf(streams.pvpKills?.items);
+  const hillAnnouncements = listOf(streams.hillAnnouncements?.items);
   // The watch signal counts as work WITHOUT anything being drained: an
   // opted-in, linked player is waiting in a queue, and the pop that ends the
   // wait has a 30 s answer window, so the loop holds its fast cadence rather
@@ -266,7 +284,9 @@ export async function runOutboxPoll(
     relayItems.length > 0 ||
     activityItems.length > 0 ||
     linkChanges.length > 0 ||
-    queuePops.length > 0;
+    queuePops.length > 0 ||
+    pvpKills.length > 0 ||
+    hillAnnouncements.length > 0;
 
   const report = (error: unknown, where: string): void => {
     // The unset-channel case has already been reported once by the factory;
@@ -318,6 +338,29 @@ export async function runOutboxPoll(
       await io.postActivity(item);
     } catch (error) {
       report(error, 'activity');
+    }
+  }
+  // King of the Hill spawn calls go ahead of the kill digests in the shared
+  // PvP channel: they have a deadline (the rise, then the fall), and an item
+  // whose moment already passed while it sat in a backlog is skipped
+  // silently rather than calling players to a hill that is not there.
+  for (const item of hillAnnouncements) {
+    if (hillAnnouncementIsStale(item, io.now())) continue;
+    try {
+      await io.postHillAnnouncement(item);
+    } catch (error) {
+      report(error, 'hill');
+    }
+  }
+  // The kill feed posts DIGESTS: one createMessage per batch of
+  // PVP_FEED_LINES_PER_POST lines, never one per kill, so a brawl cannot hit
+  // the channel's rate limit on its own. Each batch in its own catch, the
+  // per-item rule above: a refused digest costs its lines, not the rest.
+  for (const batch of chunkPvpKills(pvpKills)) {
+    try {
+      await io.postPvpKills(batch);
+    } catch (error) {
+      report(error, 'pvp-kills');
     }
   }
   // ANNOUNCE THEN MARK, in that order and never the other way. The day stays

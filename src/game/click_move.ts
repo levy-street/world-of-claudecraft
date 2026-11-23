@@ -40,6 +40,49 @@ export function stepAngleToward(current: number, target: number, maxStep: number
   return current + Math.sign(d) * step;
 }
 
+export const CLICK_MOVE_TURN_RATE = 4.2; // rad per second
+
+export function clickMoveTurn(current: number, bearing: number, elapsedSeconds: number): number {
+  return stepAngleToward(current, bearing, CLICK_MOVE_TURN_RATE * elapsedSeconds);
+}
+
+const CLICK_MOVE_PROGRESS_EPSILON = 1.5; // yards of travel that counts as progress (a walking player clears this fast; a player hopping in place at a fence never does)
+const CLICK_MOVE_STUCK_MS = 1100; // ms of walking without progress before we reroute around (then give up)
+
+export interface ClickMoveProgressWatch {
+  anchor: Point2;
+  walkedMs: number;
+  lastAtMs: number;
+}
+
+export function newClickMoveWatch(): ClickMoveProgressWatch {
+  return { anchor: { x: 0, z: 0 }, walkedMs: 0, lastAtMs: 0 };
+}
+
+export function restartClickMoveWatch(watch: ClickMoveProgressWatch, pos: Point2, nowMs: number) {
+  watch.anchor = { x: pos.x, z: pos.z };
+  watch.walkedMs = 0;
+  watch.lastAtMs = nowMs;
+}
+
+// Only time spent trying to walk counts: a turn in place toward the next leg is not
+// a lack of progress, and counting it can trip a false stall at a sharp corner.
+export function clickMoveStalled(
+  watch: ClickMoveProgressWatch,
+  pos: Point2,
+  nowMs: number,
+  walking: boolean,
+): boolean {
+  const elapsed = nowMs - watch.lastAtMs;
+  watch.lastAtMs = nowMs;
+  if (distance2d(pos, watch.anchor) > CLICK_MOVE_PROGRESS_EPSILON) {
+    restartClickMoveWatch(watch, pos, nowMs);
+    return false;
+  }
+  if (walking) watch.walkedMs += elapsed;
+  return watch.walkedMs > CLICK_MOVE_STUCK_MS;
+}
+
 /**
  * Compute one frame of click-to-move toward `target`.
  * @param stopDistance how close counts as "arrived" (e.g. melee range for an

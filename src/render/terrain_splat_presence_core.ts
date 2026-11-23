@@ -1,6 +1,10 @@
 export interface TerrainSplatPresence {
   readonly splat: readonly [boolean, boolean, boolean, boolean];
   readonly extra: readonly [boolean, boolean];
+  /** FORK: the chunk lies on or within the feather of a painted TEXTURE cell
+   *  (terrain_paint_layers.ts), so its fragments must run the paint taps.
+   *  Absent or false = the whole paint block is skipped for the draw. */
+  readonly paint?: boolean;
 }
 
 export function terrainSplatPresenceMask(presence: TerrainSplatPresence): number {
@@ -10,7 +14,8 @@ export function terrainSplatPresenceMask(presence: TerrainSplatPresence): number
     (Number(presence.splat[2]) << 2) |
     (Number(presence.splat[3]) << 3) |
     (Number(presence.extra[0]) << 4) |
-    (Number(presence.extra[1]) << 5)
+    (Number(presence.extra[1]) << 5) |
+    (Number(presence.paint === true) << 6)
   );
 }
 

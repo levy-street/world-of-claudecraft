@@ -25,6 +25,7 @@ function rig() {
         {
           id: g.entityId,
           kind: 'npc',
+          templateId: g.npc.id,
           facing: Math.PI / 2,
           dead: false,
           pos: { x: 1 + i * 0.1, y: 0, z: 0 },
@@ -61,7 +62,7 @@ describe('shadow action controls', () => {
   });
   it('rejects stolen orders, vertical separation and suspicious or distant steals', () => {
     const { world, raw, progress } = rig();
-    progress.shadow.suspicion = 0.2;
+    progress.shadow.suspicion = 0.5;
     shadowChooseSlot(world, 0);
     progress.shadow.suspicion = 0;
     raw.player.pos.y = 4;
@@ -98,6 +99,59 @@ describe('shadow action controls', () => {
     expect(view.tick(world, () => '').slots).toBe(state.slots);
     expect(state.slots[0].usable).toBe(false);
     expect(state.slots[1].usable).toBe(true);
+  });
+  it.each([
+    [0, true],
+    [0.2, true],
+    [0.499, true],
+    [0.5, false],
+    [0.9, false],
+  ] as const)('matches the server steal limit at suspicion %s', (suspicion, allowed) => {
+    const { world, raw, progress } = rig();
+    progress.shadow.suspicion = suspicion;
+    const view = createShadowActionBarView();
+    expect(view.tick(world, () => '').slots[0].usable).toBe(allowed);
+    expect(view.tick(world, () => '').slots[1].usable).toBe(true);
+    expect(shadowActionHint(world)).toBe(
+      t(allowed ? 'questUi.worldQuest.shadow.stealTip' : 'questUi.worldQuest.shadow.danger'),
+    );
+    shadowChooseSlot(world, 0);
+    expect(raw.shadowWorldQuestAction).toHaveBeenCalledTimes(allowed ? 1 : 0);
+    if (allowed)
+      expect(raw.shadowWorldQuestAction).toHaveBeenCalledWith(
+        'pickpocket',
+        SHADOW_GUARDS[0].entityId,
+      );
+  });
+  it('keeps the danger hint while suspicion lingers with no steal open', () => {
+    const { world, raw, progress } = rig();
+    progress.shadow.suspicion = 0.2;
+    raw.player.pos.x = -10;
+    expect(shadowPickpocketTarget(world)).toBeUndefined();
+    expect(shadowActionHint(world)).toBe(t('questUi.worldQuest.shadow.danger'));
+    progress.shadow.suspicion = 0;
+    expect(shadowActionHint(world)).toBe(t('questUi.worldQuest.shadow.noTarget'));
+  });
+  it.each([0, 0.2, 0.499])('blocks a lantern beam even at suspicion %s', (suspicion) => {
+    const { world, raw, progress } = rig();
+    progress.shadow.suspicion = suspicion;
+    const lantern = raw.entities.get(SHADOW_GUARDS[4].entityId)!;
+    lantern.pos.x = -4;
+    const view = createShadowActionBarView();
+    expect(shadowPickpocketTarget(world)).toBeUndefined();
+    expect(view.tick(world, () => '').slots[0].usable).toBe(false);
+    expect(view.tick(world, () => '').slots[1].usable).toBe(true);
+    expect(shadowActionHint(world)).toBe(t('questUi.worldQuest.shadow.danger'));
+    shadowChooseSlot(world, 0);
+    expect(raw.shadowWorldQuestAction).not.toHaveBeenCalled();
+
+    lantern.facing = -Math.PI / 2;
+    expect(view.tick(world, () => '').slots[0].usable).toBe(true);
+    shadowChooseSlot(world, 0);
+    expect(raw.shadowWorldQuestAction).toHaveBeenCalledWith(
+      'pickpocket',
+      SHADOW_GUARDS[0].entityId,
+    );
   });
 });
 

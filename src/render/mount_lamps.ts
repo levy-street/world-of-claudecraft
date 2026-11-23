@@ -30,6 +30,7 @@ import {
   MOUNT_LAMP_INTENSITY,
   type MountVisualSpec,
   mountLampFlicker,
+  mountLampSummonFlare,
 } from './mount_visuals';
 
 export interface MountLamps {
@@ -84,11 +85,14 @@ export function attachMountLamps(root: THREE.Object3D, spec: MountVisualSpec): M
 }
 
 /** Re-drive each lamp's flame level for this frame. Must run BEFORE the point
- *  light budget pass; the budget zeroes what it will not shine. */
-export function updateMountLamps(lamps: MountLamps, timeSec: number): void {
+ *  light budget pass; the budget zeroes what it will not shine. `flareAgeSec`
+ *  is the time since this mount was summoned when its summon burst is light
+ *  (mountLampSummonFlare); Infinity, the default, keeps the plain flame. */
+export function updateMountLamps(lamps: MountLamps, timeSec: number, flareAgeSec = Infinity): void {
+  const flare = mountLampSummonFlare(flareAgeSec);
   for (let i = 0; i < lamps.lights.length; i++) {
     const level = lamps.flickers[i] ? mountLampFlicker(timeSec, i) : 1;
-    lamps.lights[i].intensity = lamps.peaks[i] * level;
+    lamps.lights[i].intensity = lamps.peaks[i] * level * flare;
   }
 }
 

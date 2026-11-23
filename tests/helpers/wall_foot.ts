@@ -15,12 +15,8 @@
 // tiny tests consume the entire 20-second budget under suite load. Coordinates
 // are test data; the assertions below are the contract that makes them safe.
 
-import {
-  groundHeight,
-  terrainSteepnessAt,
-  terrainWallStandoff,
-  WATER_LEVEL,
-} from '../../src/sim/world';
+import { terrainWallStandoff } from '../../src/sim/wall_standoff';
+import { groundHeight, terrainSteepnessAt, WATER_LEVEL } from '../../src/sim/world';
 
 export interface WallFoot {
   /** A standable cell within a body radius of a wall. */

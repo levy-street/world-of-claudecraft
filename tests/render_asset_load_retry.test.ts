@@ -30,11 +30,14 @@ describe('loadGltf retries a transient failure before rejecting', () => {
 
   it('succeeds if a later attempt loads fine', async () => {
     let calls = 0;
-    const fakeGltf = { scene: {} };
+    // the scene post-passes (town weathering, foliage edge fade) walk it: an empty one
+    const fakeGltf = { scene: { traverse() {} } };
     vi.doMock('three/addons/loaders/GLTFLoader.js', () => ({
       GLTFLoader: class {
         setMeshoptDecoder(): void {}
         setKTX2Loader(): void {}
+        // the WOC_lod plugin rides every loader (loader.ts)
+        register(): void {}
         load(
           _url: string,
           onLoad: (g: unknown) => void,
@@ -61,6 +64,8 @@ describe('loadGltf retries a transient failure before rejecting', () => {
       GLTFLoader: class {
         setMeshoptDecoder(): void {}
         setKTX2Loader(): void {}
+        // the WOC_lod plugin rides every loader (loader.ts)
+        register(): void {}
         load(_url: string, _onLoad: unknown, _onProgress: unknown, onError: () => void): void {
           calls++;
           onError();

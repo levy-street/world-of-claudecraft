@@ -33,6 +33,9 @@ export const SHADOW_LANTERN_CONE: ShadowCone = { radius: 10, halfAngle: 0.85 };
  *  dispatch (a one-second steal) and step back out, not long enough to loiter. */
 export const SHADOW_WIDE_CIRCLE_FILL_SECONDS = 4.5;
 
+/** Suspicion this high refuses a new steal. Shared by input, HUD and authority. */
+export const SHADOW_STEAL_SUSPICION_LIMIT = 0.5;
+
 // Two guard families: dispatch carriers (circle-only, the steal targets; you slip
 // in behind them) and lantern guards (a small contact circle plus a forward cone
 // that pierces the cloak). Two lantern sentries patrol, two lantern watchmen hold

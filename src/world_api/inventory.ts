@@ -3,7 +3,7 @@ import type { NamedSlotTarget } from '../sim/item_copy_ref';
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import type { RiftForgeResult } from '../sim/rift/progression';
-import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemInstancePayload, ItemUseTarget } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 
 /** The forge pair's host-dependent answer: the offline Sim's synchronous
@@ -11,6 +11,7 @@ import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 export type RiftForgeOutcome = RiftForgeResult | Promise<boolean>;
 
 export interface IWorldInventory {
+  claimMembershipArmour(): void;
   inventory: InvSlot[];
   // The 4 equippable bag sockets (kind:'bag' item ids, null = empty socket).
   bags: (string | null)[];
@@ -54,7 +55,9 @@ export interface IWorldInventory {
   equipBag(itemId: string, socket?: number, target?: { slotIndex: number }): void;
   /** Return the bag in `socket` to the inventory (refused when items would not fit). */
   unequipBag(socket: number): void;
-  useItem(itemId: string, target?: { slotIndex?: number; aim?: { x: number; z: number } }): void;
+  /** `target.inkMap` names the treasure map a Cartographer's Ink redraws (the
+   *  picker's choice); without it the ink redraws the read map, as before. */
+  useItem(itemId: string, target?: ItemUseTarget): void;
   /** `target.anchor` is the OPTIONAL ordinal-plus-count description of the copy
    *  the player clicked (src/sim/item_copy_anchor.ts). The slot index alone
    *  proves only that the cell still holds this ITEM; the anchor proves it

@@ -7,7 +7,7 @@ import {
   characterAppearanceOptions,
 } from './character_appearance';
 import { esc } from './esc';
-import { mechChromaName } from './hud/cosmetics';
+import { COMBAT_MECH_WEARABLE, mechChromaName } from './hud/cosmetics';
 import { formatNumber, t } from './i18n';
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
@@ -46,8 +46,15 @@ export interface CharSkinPainterHost {
  *  Combat Mech catalog swatches and an unequip control. Wired via the
  *  `CharSkinPainterHost` deps object `hud.ts`'s `skinHost()` builds.
  *  Distinct from the cosmetic skin-roll reveal overlay, which lives in
- *  `hud/cosmetics/skin_event_controller.ts`. */
-export function paintCharSkinPicker(host: CharSkinPainterHost): void {
+ *  `hud/cosmetics/skin_event_controller.ts`.
+ *
+ *  While the mech is switched off (COMBAT_MECH_WEARABLE) the swatches stay in
+ *  the row, disabled, and only the unequip control takes a click. `wearable` is
+ *  a parameter only so both states stay tested; the Hud leaves it at the switch. */
+export function paintCharSkinPicker(
+  host: CharSkinPainterHost,
+  wearable: boolean = COMBAT_MECH_WEARABLE,
+): void {
   const row = $('#char-skin-row') as HTMLElement | null;
   if (!row) return;
   const cls = host.sim.cfg.playerClass;
@@ -64,7 +71,8 @@ export function paintCharSkinPicker(host: CharSkinPainterHost): void {
   row.innerHTML = '';
   row.style.setProperty('--class-color', classCss(cls));
   if (options.length === 0) return;
-  void host.preloadMechAssets();
+  // A swatch that takes no click has nothing to preview, so the mech files stay unfetched.
+  if (wearable) void host.preloadMechAssets();
   const current = Math.max(0, host.sim.player.skin ?? 0);
   const currentCatalog = host.sim.player.skinCatalog ?? 'class';
   for (const option of options) {
@@ -75,7 +83,12 @@ export function paintCharSkinPicker(host: CharSkinPainterHost): void {
     b.textContent = labelNumber;
     b.setAttribute('role', 'listitem');
     b.setAttribute('aria-label', mechChromaName(option.chromaId));
+    if (!wearable) {
+      b.disabled = true;
+      b.setAttribute('aria-disabled', 'true');
+    }
     b.addEventListener('click', () => {
+      if (!wearable) return;
       row.querySelectorAll('.skin-swatch').forEach((x) => {
         x.classList.remove('sel');
       });
@@ -107,7 +120,7 @@ export function paintCharSkinPicker(host: CharSkinPainterHost): void {
     host.attachTooltip(
       b,
       () =>
-        `<div class="tt-name">${esc(mechChromaName(option.chromaId))}</div><div class="tt-sub">${esc(t('skinEvent.unlocked'))}</div>`,
+        `<div class="tt-name">${esc(mechChromaName(option.chromaId))}</div><div class="tt-sub">${esc(t(wearable ? 'skinEvent.unlocked' : 'hudChrome.wocStore.unavailable'))}</div>`,
     );
     row.appendChild(b);
   }

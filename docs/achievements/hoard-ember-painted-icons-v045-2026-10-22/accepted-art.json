@@ -1,0 +1,915 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "hoard-ember-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rare_ember_wrought_crown",
+      "family": "hoard-ember",
+      "tier": "Tarnished",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_ember_wrought_crown.webp",
+      "canonicalDisplayName": "Tarnished Ember-Wrought Crown",
+      "acceptedSha256": "255df250edad4fb414795ba8817dd2db289ef40e081291e82dc1ac2565973a1c",
+      "acceptedBytes": 4210,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/rare_ember_wrought_crown.png",
+        "sha256": "ba972696271fd76db8be2f89e4c0c5315244a9c8631fa45cbf4f4612a54a0fa3",
+        "bytes": 2378409,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/rare_ember_wrought_crown.png",
+        "sha256": "d351b17d3b0b0972ada600cdc1ca1475ff427b0132eda08fa48de7c9790c1479",
+        "bytes": 517896,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "5a99b496851a438ca92deec4a91e2d8389ffe5e34737228b7065f5c07e1c45ca",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Ember-Wrought Crown (rare_ember_wrought_crown) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete open-topped crown of blackened forged metal with five broad upward points tipped in glowing ember gemstones, an orange flame-shaped central gem and a band of small linked mail rings below the rim. Thick practical metal construction, visibly hollow crown interior, no head, no cloth hood. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings with ash and slight patina, faded rust-red fabric or soot-black metal, plain broad edges, small subdued ember stones. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/rare_ember_wrought_crown.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "5a99b496851a438ca92deec4a91e2d8389ffe5e34737228b7065f5c07e1c45ca"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_cinder_stitched_robes",
+      "family": "hoard-ember",
+      "tier": "Tarnished",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_cinder_stitched_robes.webp",
+      "canonicalDisplayName": "Tarnished Cinder-Stitched Robes",
+      "acceptedSha256": "815539b05ac8e7af332ffa099a0b53943ede454f5c41e38cf2d42b5328c1d112",
+      "acceptedBytes": 3286,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/rare_cinder_stitched_robes.png",
+        "sha256": "961860281fa56e9b3065788a6eddc064ac7d9c4eb3bdddc930f6037b11a85b0c",
+        "bytes": 2423917,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/rare_cinder_stitched_robes.png",
+        "sha256": "d60be7c169de75e6f9d380fc1ff3bf0b4bbc1f2529429dc6ddbbb2960b9e1297",
+        "bytes": 515485,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "9ffa8662e7f03bac3b4898e9f3b44354cfddd3a554fa224e6ccc95eb9f55f8c1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Cinder-Stitched Robes (rare_cinder_stitched_robes) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty cinder-red CLOTH robe, long hem and loose sleeves, heavy woven fabric stitched with ember-orange seams, dark charcoal lining, a narrow metal waist clasp and small flame-shaped ember pendant at the chest. Soft folds and textile weave, no plate armor, no wearer. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings with ash and slight patina, faded rust-red fabric or soot-black metal, plain broad edges, small subdued ember stones. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/rare_cinder_stitched_robes.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "9ffa8662e7f03bac3b4898e9f3b44354cfddd3a554fa224e6ccc95eb9f55f8c1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_chained_ember_choker",
+      "family": "hoard-ember",
+      "tier": "Tarnished",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_chained_ember_choker.webp",
+      "canonicalDisplayName": "Tarnished Chained Ember Choker",
+      "acceptedSha256": "336a40d903d91eb0b6b7bf8054cdd51f5542e43064223a2a0c081ba81f90ece6",
+      "acceptedBytes": 3076,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/rare_chained_ember_choker.png",
+        "sha256": "c02b9293e428702710e4e97179d1df2fab12d86697d1b6fd227b57c24c030e68",
+        "bytes": 2186383,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/rare_chained_ember_choker.png",
+        "sha256": "04043216a2a587478383a6f35e00c241c2350256809e87a97f2b87f63c5ae574",
+        "bytes": 495002,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "4d75d152fcfe558e484f871066b8b7aa2a4bfd58427fb152c1695649a2a409ec",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Chained Ember Choker (rare_chained_ember_choker) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete short heavy metal chain choker arranged as an open oval, with a large teardrop-shaped pendant cage holding a single orange-red live ember. Thick visibly linked chain, flame-shaped glowing core with controlled warm light confined near the pendant. No long dangling chain, no wearer. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings with ash and slight patina, faded rust-red fabric or soot-black metal, plain broad edges, small subdued ember stones. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/rare_chained_ember_choker.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "4d75d152fcfe558e484f871066b8b7aa2a4bfd58427fb152c1695649a2a409ec"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_molten_clinker_girdle",
+      "family": "hoard-ember",
+      "tier": "Tarnished",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_molten_clinker_girdle.webp",
+      "canonicalDisplayName": "Tarnished Molten Clinker Girdle",
+      "acceptedSha256": "4c5f51c8bcf45a677791b8da188c2d73de1191390adb91434a34b2c03c4c761f",
+      "acceptedBytes": 3864,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/rare_molten_clinker_girdle.png",
+        "sha256": "eba07daf664227944145d35811a4a7e1b1f3898cfa299e28c247a85e67b10f1a",
+        "bytes": 2302264,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/rare_molten_clinker_girdle.png",
+        "sha256": "74800c12f2739972aa86d2bd82744226d85c6cf09a8fd1f0ee14412da98686bb",
+        "bytes": 519364,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "c8ca7c30043c2ecf457d0f61051475d4e1049e99bff3ab4cadec9d3582d92c71",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Molten Clinker Girdle (rare_molten_clinker_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete clinker-dark MAIL girdle, a broad curved belt of small linked iron plates and chain rings on soot-brown backing, heavy square buckle containing a flame-shaped molten orange inset, riveted ends. Three-quarter view with visible belt curvature and thickness, restrained lava glow, no loose flames. Tier finish: Weathered lower-tier craftsmanship: dull pitted pewter fittings with ash and slight patina, faded rust-red fabric or soot-black metal, plain broad edges, small subdued ember stones. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/rare_molten_clinker_girdle.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "c8ca7c30043c2ecf457d0f61051475d4e1049e99bff3ab4cadec9d3582d92c71"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "ember_wrought_crown",
+      "family": "hoard-ember",
+      "tier": "Epic",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/ember_wrought_crown.webp",
+      "canonicalDisplayName": "Ember-Wrought Crown",
+      "acceptedSha256": "2014a709978e2dbd7d32c97b13fc97d2b3d7d62cfed435bca9e953fc1ef646ff",
+      "acceptedBytes": 5034,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/ember_wrought_crown.png",
+        "sha256": "5626c4b720156d4e0ec83a6b2e4b331819eab15f297b19bab254b3aa7e533174",
+        "bytes": 2384251,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/ember_wrought_crown.png",
+        "sha256": "41e141dd94c3e381651704168e890f72145a55c1e13d57f92f3b428014db482e",
+        "bytes": 574000,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "90d2fb0712568927a8b05479075fc44f1e4243995991db6efa06e32c90d9c1a3",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Ember-Wrought Crown (ember_wrought_crown) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete open-topped crown of blackened forged metal with five broad upward points tipped in glowing ember gemstones, an orange flame-shaped central gem and a band of small linked mail rings below the rim. Thick practical metal construction, visibly hollow crown interior, no head, no cloth hood. Tier finish: Well-kept masterwork: bright silver fittings against forge-dark metal and rich cinder-red fabric, clean angular details, bright controlled orange ember gemstones. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/ember_wrought_crown.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "90d2fb0712568927a8b05479075fc44f1e4243995991db6efa06e32c90d9c1a3"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "cinder_stitched_robes",
+      "family": "hoard-ember",
+      "tier": "Epic",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/cinder_stitched_robes.webp",
+      "canonicalDisplayName": "Cinder-Stitched Robes",
+      "acceptedSha256": "a7d60964abfd596993cdac629a293a4811a5322d6ebd1bc47e06008d07f25ccd",
+      "acceptedBytes": 4072,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/cinder_stitched_robes.png",
+        "sha256": "530e3f9c5e134a831363c958dc6808ce741305dd0c91efbdc14bf684d42c7097",
+        "bytes": 2480278,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/cinder_stitched_robes.png",
+        "sha256": "e9ebfcbede8a6e058def5174df08a67ffd048809e94826dc5eafb13a1e120bd5",
+        "bytes": 567130,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "003bc8ae10f2d7a9000b26ecc5b8c664e3f2d0dd1dcf9f9ed4b04e438a984155",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Cinder-Stitched Robes (cinder_stitched_robes) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty cinder-red CLOTH robe, long hem and loose sleeves, heavy woven fabric stitched with ember-orange seams, dark charcoal lining, a narrow metal waist clasp and small flame-shaped ember pendant at the chest. Soft folds and textile weave, no plate armor, no wearer. Tier finish: Well-kept masterwork: bright silver fittings against forge-dark metal and rich cinder-red fabric, clean angular details, bright controlled orange ember gemstones. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/cinder_stitched_robes.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "003bc8ae10f2d7a9000b26ecc5b8c664e3f2d0dd1dcf9f9ed4b04e438a984155"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "chained_ember_choker",
+      "family": "hoard-ember",
+      "tier": "Epic",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/chained_ember_choker.webp",
+      "canonicalDisplayName": "Chained Ember Choker",
+      "acceptedSha256": "288521acc5ad072b4c888cc6e661c69257b5ef9788188801bd4da1596602cdfb",
+      "acceptedBytes": 3990,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/chained_ember_choker.png",
+        "sha256": "3408d7dc142ce159656adfa40161c0d4e164d482fd5bad965b4cb53b0f52563b",
+        "bytes": 2359492,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/chained_ember_choker.png",
+        "sha256": "1098e7f63214c8c87bde8149bd70ab5dd468b3267ec7af1978bd0a782b98a1dd",
+        "bytes": 553379,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "f4436b249b56f49d8cdb799d8276fe3762e5074b2a08ea1250c75481c04178a8",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Chained Ember Choker (chained_ember_choker) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete short heavy metal chain choker arranged as an open oval, with a large teardrop-shaped pendant cage holding a single orange-red live ember. Thick visibly linked chain, flame-shaped glowing core with controlled warm light confined near the pendant. No long dangling chain, no wearer. Tier finish: Well-kept masterwork: bright silver fittings against forge-dark metal and rich cinder-red fabric, clean angular details, bright controlled orange ember gemstones. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/chained_ember_choker.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "f4436b249b56f49d8cdb799d8276fe3762e5074b2a08ea1250c75481c04178a8"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "molten_clinker_girdle",
+      "family": "hoard-ember",
+      "tier": "Epic",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/molten_clinker_girdle.webp",
+      "canonicalDisplayName": "Molten Clinker Girdle",
+      "acceptedSha256": "417a318eafbc9b32e7c773055cccc1c1cce88d25f8b46c183f1f9159872c3509",
+      "acceptedBytes": 4250,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/molten_clinker_girdle.png",
+        "sha256": "a3b43b1715d39059880e50e881c109244d945d58c5f7d012b9c88c223a2cfff9",
+        "bytes": 2391652,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/molten_clinker_girdle.png",
+        "sha256": "7fc6fe8cf3c092bf5a4c698c82006cf1a1cf79fd2e89ed1da97496d0ab410059",
+        "bytes": 530351,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "8b245b24eec716ae669201b33aa5cbca515ba2f12bc4b7bc7020002ce9ac8368",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Molten Clinker Girdle (molten_clinker_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete clinker-dark MAIL girdle, a broad curved belt of small linked iron plates and chain rings on soot-brown backing, heavy square buckle containing a flame-shaped molten orange inset, riveted ends. Three-quarter view with visible belt curvature and thickness, restrained lava glow, no loose flames. Tier finish: Well-kept masterwork: bright silver fittings against forge-dark metal and rich cinder-red fabric, clean angular details, bright controlled orange ember gemstones. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/molten_clinker_girdle.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "8b245b24eec716ae669201b33aa5cbca515ba2f12bc4b7bc7020002ce9ac8368"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_ember_wrought_crown",
+      "family": "hoard-ember",
+      "tier": "Sovereign",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_ember_wrought_crown.webp",
+      "canonicalDisplayName": "Sovereign Ember-Wrought Crown",
+      "acceptedSha256": "7d6a77fb2ae4f364549125e1b7ce2e3666efde56a080edbb1212426c07278c07",
+      "acceptedBytes": 4786,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/legendary_ember_wrought_crown.png",
+        "sha256": "cbb2d661540ecf0d371490d9071a34b0263c61788f1f9db301fd729e5f55e46b",
+        "bytes": 2462761,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/legendary_ember_wrought_crown.png",
+        "sha256": "e31f384c060837da60f4a327a988c06ed2b420bfc2b180e112cd316244ca80f6",
+        "bytes": 557511,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "7aee64511e368e8867631b60636fafed7d68b44a8ec7d3f8e53427654e5e770f",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Ember-Wrought Crown (legendary_ember_wrought_crown) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete open-topped crown of blackened forged metal with five broad upward points tipped in glowing ember gemstones, an orange flame-shaped central gem and a band of small linked mail rings below the rim. Thick practical metal construction, visibly hollow crown interior, no head, no cloth hood. Tier finish: Regal highest-tier craftsmanship: warm gold fittings or gold textile edging, deep cinder-red and black materials, broad flame-shaped ornamental accents and larger luminous orange ember stones. Gold ornament is part of the object, never a surrounding frame. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/legendary_ember_wrought_crown.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "7aee64511e368e8867631b60636fafed7d68b44a8ec7d3f8e53427654e5e770f"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_cinder_stitched_robes",
+      "family": "hoard-ember",
+      "tier": "Sovereign",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_cinder_stitched_robes.webp",
+      "canonicalDisplayName": "Sovereign Cinder-Stitched Robes",
+      "acceptedSha256": "48e92bf8b912234dbaa43b642b7ea3425c605babfe41e2ceb74b7d4c20563574",
+      "acceptedBytes": 4328,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/legendary_cinder_stitched_robes.png",
+        "sha256": "bf980bfcf255eb3191badb219d5157b1a4b16201c8b5b166c0b429ad8a9df986",
+        "bytes": 2432266,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/legendary_cinder_stitched_robes.png",
+        "sha256": "86c3fe0349fa8c4e73dd781e0dc291e9e89427fceddb8ee45553aeb97aa077ec",
+        "bytes": 534696,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "30b1a9151a5a0a5e34a38571b123ce149cc981cc4b610e861a77adf3a3d74e12",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Cinder-Stitched Robes (legendary_cinder_stitched_robes) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty cinder-red CLOTH robe, long hem and loose sleeves, heavy woven fabric stitched with ember-orange seams, dark charcoal lining, a narrow metal waist clasp and small flame-shaped ember pendant at the chest. Soft folds and textile weave, no plate armor, no wearer. Tier finish: Regal highest-tier craftsmanship: warm gold fittings or gold textile edging, deep cinder-red and black materials, broad flame-shaped ornamental accents and larger luminous orange ember stones. Gold ornament is part of the object, never a surrounding frame. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/legendary_cinder_stitched_robes.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "30b1a9151a5a0a5e34a38571b123ce149cc981cc4b610e861a77adf3a3d74e12"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_chained_ember_choker",
+      "family": "hoard-ember",
+      "tier": "Sovereign",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_chained_ember_choker.webp",
+      "canonicalDisplayName": "Sovereign Chained Ember Choker",
+      "acceptedSha256": "73253de0eafdfe261e0f8735e7c46cc6c41f82edcebc97de808baccb9b9f080d",
+      "acceptedBytes": 4152,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/legendary_chained_ember_choker.png",
+        "sha256": "247910813df9c6bb6f7d4812055c9caf890e83c7f404888bfe22a2df0de6c7c3",
+        "bytes": 2135460,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/legendary_chained_ember_choker.png",
+        "sha256": "9212b6be7c5d2e036575d229b944ff1884c7ed9c56b9e72877e6217901301f6f",
+        "bytes": 512076,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "ddfc0dc17fd43c90e6633877b8d7cfc276542af2f361eb657d7fb70f0333bada",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Chained Ember Choker (legendary_chained_ember_choker) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete short heavy metal chain choker arranged as an open oval, with a large teardrop-shaped pendant cage holding a single orange-red live ember. Thick visibly linked chain, flame-shaped glowing core with controlled warm light confined near the pendant. No long dangling chain, no wearer. Tier finish: Regal highest-tier craftsmanship: warm gold fittings or gold textile edging, deep cinder-red and black materials, broad flame-shaped ornamental accents and larger luminous orange ember stones. Gold ornament is part of the object, never a surrounding frame. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/legendary_chained_ember_choker.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "ddfc0dc17fd43c90e6633877b8d7cfc276542af2f361eb657d7fb70f0333bada"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_molten_clinker_girdle",
+      "family": "hoard-ember",
+      "tier": "Sovereign",
+      "batch": "hoard-ember-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_molten_clinker_girdle.webp",
+      "canonicalDisplayName": "Sovereign Molten Clinker Girdle",
+      "acceptedSha256": "6e315da8c7e954d9a4136024bc3793d4264a6e0f9406976bca65d082a3332634",
+      "acceptedBytes": 5052,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-ember/originals/legendary_molten_clinker_girdle.png",
+        "sha256": "d8b02c8b2878e88998221bf0b6f1c0ed9aba9956e9f465244a5bd57267183299",
+        "bytes": 2478723,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-ember/masters/legendary_molten_clinker_girdle.png",
+        "sha256": "878c9fbf1d5a791ec867fadcebd272bf6ed956d49ab7baa2dd61a09fe2380c70",
+        "bytes": 569565,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "be4aebad6bef0e6a36584339dd82dd9ed62dfb69d3d509895bb1ee10b483b559",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Molten Clinker Girdle (legendary_molten_clinker_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete clinker-dark MAIL girdle, a broad curved belt of small linked iron plates and chain rings on soot-brown backing, heavy square buckle containing a flame-shaped molten orange inset, riveted ends. Three-quarter view with visible belt curvature and thickness, restrained lava glow, no loose flames. Tier finish: Regal highest-tier craftsmanship: warm gold fittings or gold textile edging, deep cinder-red and black materials, broad flame-shaped ornamental accents and larger luminous orange ember stones. Gold ornament is part of the object, never a surrounding frame. Emberforge Tyrant family: rust-red, forge-black, bronze and orange ember light, flame motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark charcoal-umber painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-ember/superseded/legendary_molten_clinker_girdle.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "be4aebad6bef0e6a36584339dd82dd9ed62dfb69d3d509895bb1ee10b483b559"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-ember-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-ember-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

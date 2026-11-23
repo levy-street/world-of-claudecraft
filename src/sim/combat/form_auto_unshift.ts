@@ -44,6 +44,7 @@ export const DAMAGING_EFFECT_TYPES: ReadonlySet<EffectType> = new Set<EffectType
   'dot',
   'finisherDamage',
   'groundAoE',
+  'sporeBurst',
   'weaponDamage',
   'weaponStrike',
 ]);
@@ -57,6 +58,7 @@ export const HEALING_EFFECT_TYPES: ReadonlySet<EffectType> = new Set<EffectType>
   'hot',
   'selfHealPctMax',
   'selfHotPctMax',
+  'sporeBurst',
 ]);
 
 /** Does this ability deal damage or restore health? `consumeAura` is the one

@@ -18,6 +18,7 @@ import {
   MENU_STRIP_ITEMS,
   MENU_STRIP_PITCH_PX,
 } from '../../src/ui/hud/menu/menu_strip_core';
+import { MenuStripGesture } from '../../src/ui/hud/menu/menu_strip_gesture_controller';
 import { MenuStripPainter } from '../../src/ui/hud/menu/menu_strip_painter';
 import { resolveMobileHudLayout } from '../../src/ui/mobile_hud_layout';
 import { makeWriterFacet } from '../../src/ui/painter_host';
@@ -205,7 +206,7 @@ const PLAYER_FRAME_MARKUP = `
                model a stance-bearing warrior. -->
           <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-hidden="true" style="display: none"></div>
           <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
-          <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
+          <div id="pf-resource-frame"><div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div></div>
         </div>
       </div>`;
 
@@ -322,6 +323,81 @@ describe.each(VIEWPORTS)('touch menu control at $label', ({ width, height }) => 
     document.documentElement.style.setProperty('--app-vh', `${height}px`);
     return mountControl();
   }
+
+  // Android 15+ draws every app edge-to-edge, so a landscape phone has a real
+  // safe-area inset that the overlay carries as PADDING. Padding does not move
+  // an absolutely positioned child, so the REAL gesture layer must hand the
+  // painter viewport coordinates. When it read the padding as an offset, the
+  // row slid a whole inset left: the cancel X left the anchor and Mount sat
+  // under the finger, so the click the browser hit-tests after a tap landed on
+  // Mount and the tap that should open the row mounted instead (Discord report,
+  // Pixel 7a native app). env() is 0 headless, so the inset is set inline.
+  it.each([32, 48])(
+    'a tap with a %ipx left inset opens the row with the cancel X on the anchor',
+    async (insetPx) => {
+      const rig = await setup();
+      rig.strip.style.paddingLeft = `${insetPx}px`;
+      const painter = new MenuStripPainter(writers(), {
+        strip: rig.strip,
+        items: rig.items,
+        cancel: rig.cancel,
+        caption: rig.caption,
+        captionText: rig.captionText,
+      });
+      const picks: number[] = [];
+      const gesture: MenuStripGesture = new MenuStripGesture({
+        anchor: rig.anchor,
+        metricsHost: rig.strip,
+        items: rig.items,
+        cancel: rig.cancel,
+        writers: writers(),
+        tapMenus: () => false,
+        leftHanded: () => false,
+        pick: (index) => picks.push(index),
+        onCancel: () => {},
+        repaint: () => {
+          const open = gesture.openState();
+          painter.paint(open === null ? null : { ...open, caption: '' });
+        },
+      });
+      gesture.attach();
+
+      const anchorBox = rig.anchor.getBoundingClientRect();
+      const x = anchorBox.x + anchorBox.width / 2;
+      const y = anchorBox.y + anchorBox.height / 2;
+      const touch = (type: string) =>
+        rig.anchor.dispatchEvent(
+          new PointerEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            pointerId: 1,
+            pointerType: 'touch',
+            clientX: x,
+            clientY: y,
+          }),
+        );
+      touch('pointerdown');
+      touch('pointerup');
+      expect(gesture.isOpen()).toBe(true);
+
+      const cancelBox = rig.cancel.getBoundingClientRect();
+      expect(cancelBox.x + cancelBox.width / 2).toBeCloseTo(x, 0);
+      expect(cancelBox.y + cancelBox.height / 2).toBeCloseTo(y, 0);
+      const mountBox = rig.items[0].getBoundingClientRect();
+      expect(MENU_STRIP_ITEMS[0].id).toBe('mount');
+      expect(overlaps(mountBox, anchorBox), 'Mount is seated over the anchor').toBe(false);
+      expect(mountBox.left).toBeGreaterThan(anchorBox.right);
+
+      // The click a real tap produces is hit-tested where the finger was, AFTER
+      // the release opened the row. It must find the cancel X, which swallows
+      // it, and never the Mount button.
+      const hit = document.elementFromPoint(x, y);
+      expect(hit !== null && rig.cancel.contains(hit), 'the tap point misses the X').toBe(true);
+      hit?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+      expect(picks).toEqual([]);
+      expect(gesture.isOpen()).toBe(true);
+    },
+  );
 
   it('wears the overflow glyph, not the chat one the strip now carries', async () => {
     const rig = await setup();

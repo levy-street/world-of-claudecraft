@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import {
+  GOURDLIGHT_EVE_ID,
+  GOURDLIGHT_KEEPER_ENTITY_ID,
+  GOURDLIGHT_KEEPER_FENBRIDGE_ENTITY_ID,
+  GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID,
+  GOURDLIGHT_KEEPER_NPC_ID,
+  GOURDLIGHT_KEEPER_POSTS,
+} from '../src/sim/content/gourdlight_eve';
 import { LAST_KEEP_SPIRIT_HEALER_ENTITY_ID } from '../src/sim/content/graveyards';
 import { HEALING_TRAINING_ENTITY_IDS } from '../src/sim/content/healing_training';
+import { HIGHWATCH_GUILD_ENTITY_IDS } from '../src/sim/content/highwatch_guild';
 import { CRUCIBLE_VENDOR_ENTITY_ID } from '../src/sim/content/ignivar_loot';
+import { TAVERN_KEEPER_ENTITY_ID, TAVERN_KEEPER_NPC_ID } from '../src/sim/content/mirefen_tavern';
 import { FURY_ENTITY_ID } from '../src/sim/content/pvp_honor';
 import { HARBOR_HOUSE_KEEPER_ENTITY_ID } from '../src/sim/content/wyrmwatch_harbor_house';
 import { WARFARE_QUARTERMASTER_ENTITY_ID } from '../src/sim/pvp/warfare_quartermaster';
@@ -26,8 +36,15 @@ const RESERVED: Record<string, number> = {
   LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
   HARBOR_HOUSE_KEEPER_ENTITY_ID,
   WEEKLY_KEEPER_ENTITY_ID,
+  TAVERN_KEEPER_ENTITY_ID,
+  GOURDLIGHT_KEEPER_ENTITY_ID,
+  GOURDLIGHT_KEEPER_FENBRIDGE_ENTITY_ID,
+  GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID,
   ...Object.fromEntries(
     Object.entries(HEALING_TRAINING_ENTITY_IDS).map(([id, n]) => [`HEALING_TRAINING:${id}`, n]),
+  ),
+  ...Object.fromEntries(
+    Object.entries(HIGHWATCH_GUILD_ENTITY_IDS).map(([id, n]) => [`HIGHWATCH_GUILD:${id}`, n]),
   ),
 };
 
@@ -49,17 +66,34 @@ describe('reserved singleton entity ids', () => {
     expect(collisions, 'ids reserved more than once').toEqual([]);
   });
 
-  it('the vault keeper and the harbormaster both spawn, each under her own id', () => {
+  it('the vault keeper, the harbormaster and the innkeeper all spawn, each under her own id', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     expect(sim.entities.get(WEEKLY_KEEPER_ENTITY_ID)?.templateId).toBe(WEEKLY_KEEPER_ID);
     expect(sim.entities.get(HARBOR_HOUSE_KEEPER_ENTITY_ID)?.templateId).toBe(
       HARBOR_HOUSE_KEEPER_NPC_ID,
     );
-    for (const templateId of [WEEKLY_KEEPER_ID, HARBOR_HOUSE_KEEPER_NPC_ID]) {
+    expect(sim.entities.get(TAVERN_KEEPER_ENTITY_ID)?.templateId).toBe(TAVERN_KEEPER_NPC_ID);
+    for (const templateId of [WEEKLY_KEEPER_ID, HARBOR_HOUSE_KEEPER_NPC_ID, TAVERN_KEEPER_NPC_ID]) {
       const copies = [...sim.entities.values()].filter(
         (e) => e.kind === 'npc' && e.templateId === templateId,
       );
       expect(copies, templateId).toHaveLength(1);
     }
+  });
+  it('the Gourdlight keeper spawns once per city stall, each under its own id, while the event runs, and only then', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    for (const post of GOURDLIGHT_KEEPER_POSTS)
+      expect(sim.entities.get(post.entityId)).toBeUndefined();
+    sim.seasonal.hostEventId = GOURDLIGHT_EVE_ID;
+    sim.tick();
+    for (const post of GOURDLIGHT_KEEPER_POSTS) {
+      expect(sim.entities.get(post.entityId)?.templateId, post.id).toBe(GOURDLIGHT_KEEPER_NPC_ID);
+    }
+    const copies = [...sim.entities.values()].filter(
+      (e) => e.kind === 'npc' && e.templateId === GOURDLIGHT_KEEPER_NPC_ID,
+    );
+    expect(copies.map((e) => e.id).sort()).toEqual(
+      GOURDLIGHT_KEEPER_POSTS.map((p) => p.entityId).sort(),
+    );
   });
 });

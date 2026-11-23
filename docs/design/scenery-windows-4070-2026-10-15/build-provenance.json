@@ -1,0 +1,9 @@
+{
+  "started": "2026-10-14T19:59:18.176Z",
+  "commit": "c33418ac34895a94ebf0ff7c25f895c2628634a4",
+  "status": "",
+  "purpose": "Local offline scenery review, production minification, native tier materials and lighting. Media is hardlinked to this checkout; do not edit assets during review. Not a deployable build.",
+  "media": 2146,
+  "manifestSha256": "00a75a30ca204ce7008e49a5d2db76dbf9b0286c7438e564e8889de7d77b2966",
+  "completed": "2026-10-14T19:59:57.537Z"
+}

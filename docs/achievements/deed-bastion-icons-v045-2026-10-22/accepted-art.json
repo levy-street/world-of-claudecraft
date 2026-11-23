@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-bastion-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 5,
+    "removedCategoryFallbacks": [
+      "dgn_olen_buttress",
+      "dgn_ossick_moored",
+      "dgn_vael_beacon",
+      "dgn_turretback",
+      "dgn_turnkey_cage"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "dgn_olen_buttress",
+      "family": "deed-bastion",
+      "batchId": "deed-bastion-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_olen_buttress.webp",
+      "canonicalDisplayName": "Hold the Wall",
+      "acceptedSha256": "06cd81723369238890ce895bfd49bf4a37a2f3a68e82c40c6ab7ac236f039f4f",
+      "acceptedBytes": 8250,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-bastion/originals/dgn_olen_buttress.png",
+        "sha256": "9ec09ea934981b18a09e8106533a769490a89d90a1c5c77da14a536ab11a6ad2",
+        "bytes": 2249036,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-bastion/masters/dgn_olen_buttress.png",
+        "sha256": "36518a4dd6a9b4b55cb8f2df30a11e41dd9862f42d347c9d638d52bc39ab3aa2",
+        "bytes": 446393,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Hold the Wall (dgn_olen_buttress). Subject: A broad battered sea-green knight shield braced firmly against a short grey stone bastion wall, with a faint curved gold rebound trail ending at the shield instead of passing onward. Shield and solid wall dominant, dark iron rim, pale salt weathering and warm gilt fittings, compact coastal fortress emblem. No figures or writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_olen_buttress",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [119, 203, 1160, 1159],
+          "framedSubject": [428, 393],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-bastion-icons-v045/dgn_olen_buttress-desktop.png",
+          "docs/screenshots/deed-bastion-icons-v045/dgn_olen_buttress-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_ossick_moored",
+      "family": "deed-bastion",
+      "batchId": "deed-bastion-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_ossick_moored.webp",
+      "canonicalDisplayName": "Safe Harbor",
+      "acceptedSha256": "c0fac02377b3e4dbc77811b223d0225572dafe9a35922795ac39078911320dd5",
+      "acceptedBytes": 7648,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-bastion/originals/dgn_ossick_moored.png",
+        "sha256": "72637af6722a0bf28bb023fdf6dfcc0ee54aa1233a575fe4de2c3e7bbbcad542",
+        "bytes": 2101374,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-bastion/masters/dgn_ossick_moored.png",
+        "sha256": "34937b82fdbb333390f2440720584ab7809c05b8631b3be88cba982ec51e337c",
+        "bytes": 420053,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Safe Harbor (dgn_ossick_moored). Subject: A heavy iron anchor firmly moored by a thick unbroken rope to a stone harbor bollard above a dark swirling blue drowning pit. A small warm brass harbor lantern shines from the dry ledge beside the anchor. Anchor, secure rope and dry ledge dominate, sea green and storm blue with warm brass; no person in the water. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_ossick_moored",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [76, 108, 1179, 1184],
+          "framedSubject": [440, 429],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-bastion-icons-v045/dgn_ossick_moored-desktop.png",
+          "docs/screenshots/deed-bastion-icons-v045/dgn_ossick_moored-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_vael_beacon",
+      "family": "deed-bastion",
+      "batchId": "deed-bastion-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_vael_beacon.webp",
+      "canonicalDisplayName": "By the Beacon's Light",
+      "acceptedSha256": "9baf56bbfdabddd040c6add59b4c6cbd00c2b81d1b5f1f3aeba27495f1662f8f",
+      "acceptedBytes": 7542,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-bastion/originals/dgn_vael_beacon.png",
+        "sha256": "7ad8800471c2271e71cf7d4384f4108e305292b392aae9feb9bff392024a51e6",
+        "bytes": 1817249,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-bastion/masters/dgn_vael_beacon.png",
+        "sha256": "bfec9d538852db2cea3fd19d5867f3f20fd3cc6912485b5d0e7a8d7d3915f801",
+        "bytes": 432021,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for By the Beacon's Light (dgn_vael_beacon). Subject: A strong brass beacon lantern on a weathered stone pedestal casting a warm golden cone through sea-green fog. Three small intact spectral blue wisps stay peacefully outside the bright beam, none exploding. Lantern dominant, slate stone, brass gold and misty sea teal, safe calm channel through fog, no figures or text. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_vael_beacon",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [75, 72, 1192, 1184],
+          "framedSubject": [447, 445],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-bastion-icons-v045/dgn_vael_beacon-desktop.png",
+          "docs/screenshots/deed-bastion-icons-v045/dgn_vael_beacon-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_turretback",
+      "family": "deed-bastion",
+      "batchId": "deed-bastion-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_turretback.webp",
+      "canonicalDisplayName": "Eviction Notice",
+      "acceptedSha256": "275059593ea41c7cc55c938a72c2a5107b40bb094435d45d1dc3d36ecabca40d",
+      "acceptedBytes": 10968,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-bastion/originals/dgn_turretback.png",
+        "sha256": "e039fb9678e2a23f0070f3336eb5d2ca6639e54ed428d33fb737c47e191eff0a",
+        "bytes": 2369341,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-bastion/masters/dgn_turretback.png",
+        "sha256": "0e722dda8312175be07befa9a51ff341a9df3185df55054151135380dce56ff6",
+        "bytes": 417353,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Eviction Notice (dgn_turretback). Subject: A miniature wrecked wooden pirate ship listing away from a dry stone quay as three pale turquoise spectral cannonballs arc harmlessly over empty water beside it. Broken mast and ragged cream sail, a compact suggestion of sea spray, ship dominant and visibly defeated. Sea-green ghost light, weathered dark oak and warm bronze; no people or lettering. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_turretback",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [32, 74, 1222, 1203],
+          "framedSubject": [448, 425],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-bastion-icons-v045/dgn_turretback-desktop.png",
+          "docs/screenshots/deed-bastion-icons-v045/dgn_turretback-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_turnkey_cage",
+      "family": "deed-bastion",
+      "batchId": "deed-bastion-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_turnkey_cage.webp",
+      "canonicalDisplayName": "No Cage Can Hold Us",
+      "acceptedSha256": "8916c5c436c7f0942b57fdb57e9357908906c04f9f070cf7581dffc085508b98",
+      "acceptedBytes": 7980,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-bastion/originals/dgn_turnkey_cage.png",
+        "sha256": "7c8cc3ad12bddfd5126a9506df9c77cd4d56476f6c0abda9fbec329f29434159",
+        "bytes": 2167502,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-bastion/masters/dgn_turnkey_cage.png",
+        "sha256": "ff29531f30c4384a63ebe9966c7f7f75aaf19901804bdc99a3f5a272d5134b62",
+        "bytes": 431451,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for No Cage Can Hold Us (dgn_turnkey_cage). Subject: A heavy dark iron prison cage with its barred door thrown fully open and its crushing overhead grate stopped by a snapped chain. A large brass cell key rests on the safe stone threshold, bright warm light spills through the open doorway. Cage and open escape dominant, aged iron, sea-green patina and gold highlights, no captive figure or writing. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; current authored encounter definitions",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_turnkey_cage",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [138, 51, 1196, 1188],
+          "framedSubject": [407, 438],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-bastion-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-bastion-icons-v045/dgn_turnkey_cage-desktop.png",
+          "docs/screenshots/deed-bastion-icons-v045/dgn_turnkey_cage-mobile.png"
+        ]
+      }
+    }
+  ]
+}

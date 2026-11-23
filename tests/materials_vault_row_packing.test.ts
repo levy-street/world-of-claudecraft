@@ -58,7 +58,7 @@ function metaOf(sim: Sim) {
 }
 
 /** A warrior standing at the banker with empty bags and a rung-2 vault (an
- *  80-unit per-material ceiling, so four bag stacks of one material fit). */
+ *  200-unit per-material ceiling, so four bag stacks of one material fit). */
 function atBanker(): Sim {
   const sim = new Sim({ seed: 73, playerClass: 'warrior', autoEquip: false, world: STORAGE_WORLD });
   const banker = [...sim.entities.values()].find(
@@ -253,12 +253,12 @@ describe('which payloads split (vaultRowMovesWhole)', () => {
     sim.vaultDeposit(0, 1);
     expect(meta.inventory).toEqual([locked()]);
     expect(meta.vault.special).toEqual([]);
-    // Headroom 2 of the 80 cap: a locked stack of 3 moves whole or not at all.
-    meta.vault.stock = { [ORE]: 78 };
+    // Headroom 2 of the 200 cap: a locked stack of 3 moves whole or not at all.
+    meta.vault.stock = { [ORE]: 198 };
     sim.vaultDeposit(0);
     expect(meta.inventory).toEqual([locked()]);
     expect(meta.vault.special).toEqual([]);
-    expect(meta.vault.stock).toEqual({ [ORE]: 78 });
+    expect(meta.vault.stock).toEqual({ [ORE]: 198 });
   });
 
   it('still refuses to split a locked row', () => {

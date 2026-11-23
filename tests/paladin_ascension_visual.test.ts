@@ -66,20 +66,86 @@ describe('PaladinAscensionVisual', () => {
     const worldRoot = new THREE.Group();
     const characterRoot = new THREE.Group();
     worldRoot.position.set(12, 4, -3);
-    characterRoot.position.y = 0.25;
     worldRoot.add(characterRoot, visual.group, visual.crown);
 
+    // The renderer's rider placement rewrites the rig root every frame before
+    // the visual runs (placeRider or the mount attitude pass).
+    characterRoot.position.y = 0.25;
     visual.update(ACTIVE_PLAN, 1, false, characterRoot);
     const crown = requiredObject(visual, 'paladin-ascension-solar-crown');
     expect(characterRoot.position.y).toBeCloseTo(0.33);
     expect(crown.position.y).toBeCloseTo(2.08);
     expect(worldRoot.position.toArray()).toEqual([12, 4, -3]);
 
+    characterRoot.position.y = 0.25;
     visual.update({ active: false, charges: 0, lastCharge: false }, 0.1, false, characterRoot);
     expect(visual.group.visible).toBe(false);
     expect(visual.crown.visible).toBe(false);
     expect(characterRoot.position.y).toBeCloseTo(0.25);
     visual.dispose();
+  });
+
+  // The rider-root regression behind "the riding pose is broken, mostly on
+  // paladins": the visual used to latch the rig root's height the first frame
+  // it saw it and write that height back every frame for the life of the view
+  // (it is built on the first Ascension and never torn down until the view
+  // goes). A paladin who ascended on foot then sat at ground level under every
+  // later mount; one who ascended in the saddle floated at seat height after
+  // dismounting. Each frame below runs the renderer's order: place the rider,
+  // then sync the visual.
+  const SEAT = 1.15;
+  const INACTIVE_PLAN = { active: false, charges: 0, lastCharge: false };
+  function frame(
+    visual: PaladinAscensionVisual,
+    root: THREE.Object3D,
+    placedY: number,
+    plan: typeof ACTIVE_PLAN,
+  ): number {
+    root.position.y = placedY;
+    visual.update(plan, 1 / 60, false, root);
+    return root.position.y;
+  }
+
+  it('lets a paladin who ascended on foot sit the saddle of a later mount', () => {
+    const visual = new PaladinAscensionVisual(1.8);
+    const root = new THREE.Group();
+    expect(frame(visual, root, 0, ACTIVE_PLAN)).toBeCloseTo(0.08);
+    expect(frame(visual, root, 0, INACTIVE_PLAN)).toBe(0);
+    // Mounts up after the Ascension ended: the seat must survive the visual.
+    expect(frame(visual, root, SEAT, INACTIVE_PLAN)).toBe(SEAT);
+    expect(frame(visual, root, SEAT, INACTIVE_PLAN)).toBe(SEAT);
+    // Ascends again in the saddle: the hover rides on top of the seat.
+    expect(frame(visual, root, SEAT, ACTIVE_PLAN)).toBeCloseTo(SEAT + 0.08);
+    expect(frame(visual, root, SEAT, ACTIVE_PLAN)).toBeCloseTo(SEAT + 0.08);
+    visual.dispose();
+  });
+
+  it('drops a paladin who ascended in the saddle back to the ground on dismount', () => {
+    const visual = new PaladinAscensionVisual(1.8);
+    const root = new THREE.Group();
+    expect(frame(visual, root, SEAT, ACTIVE_PLAN)).toBeCloseTo(SEAT + 0.08);
+    expect(frame(visual, root, 0, ACTIVE_PLAN)).toBeCloseTo(0.08);
+    expect(frame(visual, root, 0, INACTIVE_PLAN)).toBe(0);
+    visual.dispose();
+  });
+
+  it('follows a seat that moves every frame (the bob, a seat bone)', () => {
+    const visual = new PaladinAscensionVisual(1.8);
+    const root = new THREE.Group();
+    for (const y of [SEAT, SEAT + 0.03, SEAT - 0.02, SEAT + 0.01]) {
+      expect(frame(visual, root, y, INACTIVE_PLAN)).toBe(y);
+      expect(frame(visual, root, y, ACTIVE_PLAN)).toBeCloseTo(y + 0.08);
+    }
+    visual.dispose();
+  });
+
+  it('never moves the rig root on dispose', () => {
+    const visual = new PaladinAscensionVisual(1.8);
+    const root = new THREE.Group();
+    frame(visual, root, 0, ACTIVE_PLAN);
+    root.position.y = SEAT;
+    visual.dispose();
+    expect(root.position.y).toBe(SEAT);
   });
 
   it('seats the crown on the rider anchor and the seal on the view group', () => {
@@ -111,5 +177,22 @@ describe('PaladinAscensionVisual', () => {
     expect(rendererSource).toMatch(
       /syncPaladinAscensionVisual\(\s*v\.paladinAscensionVisual,\s*v\.group,\s*v\.riderAnchor,[\s\S]*?this\.reducedMotion\(\),\s*v\.visual\.root,\s*\)/,
     );
+  });
+
+  it('syncs after both rider placements, since the hover adds to the placed height', () => {
+    // The hover is additive on top of this frame's seat, so the visual must run
+    // AFTER both writers of the rider height (placeRider, and the mount
+    // attitude pass inside updateMountPresentation). Run before them, the lift
+    // is overwritten; with no placement in between, it would climb every frame.
+    const rendererSource = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    );
+    const sync = rendererSource.search(/syncPaladinAscensionVisual\(\s*v\.paladinAscensionVisual/);
+    const place = rendererSource.indexOf('placeRider(v, v.visual.root,');
+    const mount = rendererSource.indexOf('updateMountPresentation(v, {');
+    expect(place).toBeGreaterThan(0);
+    expect(mount).toBeGreaterThan(0);
+    expect(sync).toBeGreaterThan(Math.max(place, mount));
   });
 });

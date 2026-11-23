@@ -43,16 +43,16 @@ describe('createVariantPrewarmSlot', () => {
   it('exposes two resume units, stage then compile, sharing the builder', async () => {
     const h = host();
     const twin = new THREE.Group();
-    const slot = createVariantPrewarmSlot(h.api, 'character-effect-variants', () => twin);
+    const slot = createVariantPrewarmSlot(h.api, 'ghost-fade-variants', () => twin);
     const units = slot.resumeUnits();
     expect(units.map((u) => u.id)).toEqual([
-      'character-effect-variants:group',
-      'character-effect-variants:compile',
+      'ghost-fade-variants:group',
+      'ghost-fade-variants:compile',
     ]);
     // The link unit REPORTS a missing artifact rather than passing quietly:
     // the resume ledger records a failed unit, and a silent success there is
     // how a slot whose re-stage threw was booked as warmed.
-    await expect(units[1].run()).rejects.toThrow('character-effect-variants');
+    await expect(units[1].run()).rejects.toThrow('ghost-fade-variants');
     expect(h.compiled).toEqual([]);
     await units[0].run();
     await units[1].run();

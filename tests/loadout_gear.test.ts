@@ -14,7 +14,12 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { slotAcceptsItem } from '../src/sim/equipment_rules';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
-import { buildGearSet, planGearSwap, type SavedGearSet } from '../src/sim/loadout_gear';
+import {
+  buildGearSet,
+  cloneGearSet,
+  planGearSwap,
+  type SavedGearSet,
+} from '../src/sim/loadout_gear';
 import { repairTalentLoadouts } from '../src/sim/talent_loadouts';
 import {
   ALL_EQUIP_SLOTS,
@@ -79,6 +84,32 @@ describe('buildGearSet: capturing what is worn', () => {
     const power = enchant('power');
     const set = buildGearSet({ waist: GIRDLE }, { waist: power });
     expect(set.waist?.pin).toBe(pinOf(withPayload(GIRDLE, power)));
+  });
+});
+
+describe('cloneGearSet: deep copy and shape preservation', () => {
+  it('deep clones a gear set preserving slots, ids, and pins while decoupling objects', () => {
+    const original: SavedGearSet = {
+      waist: { itemId: GIRDLE, pin: 'pin_waist' },
+      feet: { itemId: BOOTS, pin: 'pin_feet' },
+    };
+    const cloned = cloneGearSet(original);
+    expect(cloned).toEqual(original);
+    expect(cloned).not.toBe(original);
+    expect(cloned.waist).not.toBe(original.waist);
+    expect(cloned.feet).not.toBe(original.feet);
+  });
+
+  it('skips empty or malformed entries gracefully', () => {
+    const mixed = {
+      waist: { itemId: GIRDLE, pin: 'pin_waist' },
+      feet: undefined,
+      head: { itemId: '', pin: 'invalid' },
+    } as unknown as SavedGearSet;
+    const cloned = cloneGearSet(mixed);
+    expect(cloned).toEqual({
+      waist: { itemId: GIRDLE, pin: 'pin_waist' },
+    });
   });
 });
 

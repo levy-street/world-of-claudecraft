@@ -197,7 +197,15 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 434 with the trinket slot's seventeen character-scoped relics (PR 4173).
     // 466 at the release/v0.44.0 merge into feature/buried-hoards (2026-09-28): the 32 Buried Hoard pieces
     // (character-scoped items), the same +32 as reliquary_content.test.ts's pair.
-    expect(catalogTotal).toBe(466);
+    // 479 with the Mirefen world boss page's seven character-scoped item relics, his
+    // Craterglass Stave and five trinkets (+13).
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
+    // 531 with the referral stamp cards (642100fe8aa): the referral_raptor and
+    // referral_tank reward mounts take two slots on the Horizons mounts page;
+    // 532 with nightwing_chimera on Horizons mounts; 533 with wobbles_slime.
+    // Halloween adds the broom and five title deeds
+    // across the existing collection pages (six additional completion slots).
+    expect(catalogTotal).toBe(551);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });

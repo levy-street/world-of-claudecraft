@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/sanctum_velkhar_woc.glb",
+      "out": "models/creatures/woc_sanctum_velkhar.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Hit",
+        "Attack",
+        "Cast",
+        "Thaw",
+        "SoulfireTrench",
+        "ShadowVolley",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

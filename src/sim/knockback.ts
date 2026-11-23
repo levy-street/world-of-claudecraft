@@ -9,17 +9,46 @@
 
 import { seatGroundedAt } from './colliders';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
-import { isMoored } from './combat/trinkets';
+import { isPlantedPracticeDummy } from './combat/pull_eligibility';
+import { trinketRefusesKnockback } from './combat/trinkets';
+import { forcedMoveGroundHeight } from './forced_move_ground';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { SKIN_WIDTH } from './physics';
+import { platformSupportAt } from './physics/platform';
 import { rideSteepnessAt, stepWaterLevel } from './ride_height';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
-import { groundHeight, waterLevelAt } from './world';
+import { onUnderSheet, sheetWallBlocksStep, waterLevelAt } from './world';
 
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH;
+
+/** The yards a shove of `distance` actually gets after every knockback
+ *  immunity (Ice Block, Veilbound March, the Mooring Stone, a dev anchor) and
+ *  the target's knockback resistance; 0 means the target does not move. The
+ *  one gate both the grounded shove below and the airborne launch
+ *  (combat/knockback_launch.ts) pass through, so neither can bypass it. */
+export function knockbackDistanceAfterGuards(
+  ctx: SimContext,
+  source: Entity,
+  target: Entity,
+  distance: number,
+): number {
+  // A practice dummy stays planted on its marker (Typhoon used to blow one
+  // yards off its spot); guarded here so every knockback caller inherits it.
+  if (isPlantedPracticeDummy(target)) return 0;
+  if (source.id !== target.id && ctx.isIceBlocked(target)) return 0;
+  if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
+  // The Mooring Stone and the Shape of the Foreman hold their wearer where they stand
+  // (combat/trinkets.ts trinketRefusesKnockback).
+  if (source.id !== target.id && trinketRefusesKnockback(target)) return 0;
+  if (ctx.cfg.devCommands && ctx.players.get(target.id)?.devAnchored) return 0;
+  // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
+  // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
+  // and never displaces the victim, so a caster keeps casting through it.
+  return Math.max(0, distance * (1 - (target.knockbackResistance ?? 0)));
+}
 
 export function applyKnockback(
   ctx: SimContext,
@@ -27,15 +56,7 @@ export function applyKnockback(
   target: Entity,
   distance: number,
 ): number {
-  if (source.id !== target.id && ctx.isIceBlocked(target)) return 0;
-  if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
-  // The Mooring Stone holds its wearer where they stand (combat/trinkets.ts).
-  if (source.id !== target.id && isMoored(target)) return 0;
-  if (ctx.cfg.devCommands && ctx.players.get(target.id)?.devAnchored) return 0;
-  // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
-  // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
-  // and never displaces the victim, so a caster keeps casting through it.
-  distance *= 1 - (target.knockbackResistance ?? 0);
+  distance = knockbackDistanceAfterGuards(ctx, source, target, distance);
   if (distance <= 0) return 0;
   let dx = target.pos.x - source.pos.x;
   let dz = target.pos.z - source.pos.z;
@@ -46,30 +67,58 @@ export function applyKnockback(
     dz = Math.cos(source.facing);
     len = 1;
   }
-  const ux = dx / len,
-    uz = dz / len;
+  return displaceAlong(ctx, target, dx / len, dz / len, distance);
+}
+
+/**
+ * Move `target` up to `distance` yards along the unit direction (ux, uz), with
+ * the knockback's terrain clamp and collider sweep (the shared walker of every
+ * forced displacement: a shove away, or a drag toward a point such as an
+ * undertow). The caller has already applied its own immunity rules. Returns
+ * the yards actually moved.
+ */
+export function displaceAlong(
+  ctx: SimContext,
+  target: Entity,
+  ux: number,
+  uz: number,
+  distance: number,
+): number {
+  if (distance <= 0) return 0;
   const STEP = 0.5;
   let moved = 0;
   let cx = target.pos.x,
     cz = target.pos.z;
+  const platform = ctx.platformFor?.(target) ?? null;
+  const platformMaxY = target.pos.y + 3;
+  const footingAt = (x: number, z: number) => {
+    const terrain = forcedMoveGroundHeight(x, z, ctx.cfg.seed, target.pos.y);
+    const platformTop = platformSupportAt(platform, x, z, BODY_RADIUS, platformMaxY);
+    return { terrain, platformTop, floor: Math.max(terrain, platformTop) };
+  };
   while (moved < distance) {
     const adv = Math.min(STEP, distance - moved);
     const nx = cx + ux * adv,
       nz = cz + uz * adv;
-    const h1 = groundHeight(nx, nz, ctx.cfg.seed);
-    if (h1 < waterLevelAt(nx, nz, ctx.cfg.seed) - SWIM_DEPTH) break; // would land in deep water
+    const next = footingAt(nx, nz);
+    if (next.floor < waterLevelAt(nx, nz, ctx.cfg.seed) - SWIM_DEPTH) break; // would land in deep water
     // ridden-surface slopes (ride_height.ts): a submerged bed bump does not
     // stop a shove crossing shallow water. No shore step-out here: a forced
     // displacement conservatively stops at a bank face.
     const wls = stepWaterLevel(cx, cz, nx, nz, ctx.cfg.seed);
-    const r0 = Math.max(groundHeight(cx, cz, ctx.cfg.seed), wls);
-    const r1 = Math.max(h1, wls);
+    const current = footingAt(cx, cz);
+    const r0 = Math.max(current.floor, wls);
+    const r1 = Math.max(next.floor, wls);
     if (
-      r1 > r0 &&
-      ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
-        (h1 >= wls && rideSteepnessAt(nx, nz, ctx.cfg.seed) > MAX_CLIMB_SLOPE))
+      (r1 > r0 &&
+        ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
+          (next.platformTop === -Infinity &&
+            next.terrain >= wls &&
+            !onUnderSheet(nx, nz, ctx.cfg.seed, target.pos.y) &&
+            rideSteepnessAt(nx, nz, ctx.cfg.seed) > MAX_CLIMB_SLOPE))) ||
+      sheetWallBlocksStep(ctx.cfg.seed, cx, cz, target.pos.y, nx, nz)
     ) {
-      break; // would slam into a cliff
+      break; // would slam into a cliff (or the tunnel's rock wall)
     }
     // resolveMove sweeps cx,cz -> nx,nz against static colliders (walls,
     // pillars, delve module bounds/doors) in small sub-steps, so a thin wall
@@ -95,10 +144,19 @@ export function applyKnockback(
   // Support-aware seat: a victim shoved along crate tops stays on them, and
   // one shoved through a passed-over prop footprint is nudged clear instead
   // of being embedded at terrain height inside it.
-  const seat = seatGroundedAt(ctx.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
+  const platformTop = platformSupportAt(platform, cx, cz, BODY_RADIUS, platformMaxY);
+  const seat =
+    platformTop > forcedMoveGroundHeight(cx, cz, ctx.cfg.seed, target.pos.y)
+      ? { x: cx, y: platformTop, z: cz }
+      : seatGroundedAt(ctx.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
   target.pos.x = seat.x;
   target.pos.z = seat.z;
-  target.pos.y = seat.y;
+  // A victim shoved along a tube or carve floor stays on THAT sheet: the
+  // seat helper reads the surface heightfield, which sits a hill above an
+  // underground body. (Never true on the built-in world, which has no sheets.)
+  target.pos.y = onUnderSheet(seat.x, seat.z, ctx.cfg.seed, target.pos.y)
+    ? forcedMoveGroundHeight(seat.x, seat.z, ctx.cfg.seed, target.pos.y)
+    : seat.y;
   target.vy = 0;
   target.onGround = true;
   target.fallStartY = target.pos.y;

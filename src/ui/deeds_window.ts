@@ -331,6 +331,7 @@ export class DeedsWindow {
       watchRev: this.watchRev,
       statsDigest: deedStatsDigest(world.deedStats),
       devTier: world.player.devTier ?? 0,
+      referralTitleOwned: world.referralCardsSnapshot?.()?.titleOwned,
     });
   }
 
@@ -458,6 +459,7 @@ export class DeedsWindow {
       activeTitle: world.activeTitle,
       activeBorder: world.activeBorder,
       devTier: world.player.devTier ?? 0,
+      referralTitleOwned: world.referralCardsSnapshot?.()?.titleOwned,
       deeds: DEEDS,
       order: DEED_ORDER,
       category: this.category,

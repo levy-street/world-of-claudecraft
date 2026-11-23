@@ -81,6 +81,11 @@ export function stealthDetectionRadius(
   return baseRadius * stealthDetectionMultiplier(observer.level, stealthed.level);
 }
 
+/** Hunter Play Dead (feign death): no mob or pet perceives or pulls the 'corpse'. */
+export function isFeigningDeath(target: Entity): boolean {
+  return target.auras.some((a) => a.kind === 'feign_death');
+}
+
 export function hasEscapeStealth(target: Entity): boolean {
   return target.auras.some((a) => a.id === 'vanish' && a.kind === 'stealth');
 }
@@ -90,6 +95,8 @@ export function canDetectStealthedTarget(
   target: Entity,
   baseRadius: number,
 ): boolean {
+  // Play Dead (hunter feign death): a mob never notices a 'corpse'.
+  if (isFeigningDeath(target)) return false;
   if (!target.auras.some((a) => a.kind === 'stealth')) return true;
   if (hasEscapeStealth(target)) return false;
   return dist2d(observer.pos, target.pos) <= stealthDetectionRadius(observer, target, baseRadius);
@@ -102,7 +109,7 @@ export function canDetectStealthedTarget(
 // stealth detection, so a rogue's opener and Vanish work against the pair the
 // same way they work against the player. Pure: no clock, no rng.
 export function petCanSeeStealthedTarget(target: Entity): boolean {
-  return !target.auras.some((a) => a.kind === 'stealth');
+  return !target.auras.some((a) => a.kind === 'stealth' || a.kind === 'feign_death');
 }
 
 export function addThreat(mob: Entity, sourceId: number, amount: number): void {

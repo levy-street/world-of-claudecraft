@@ -46,14 +46,14 @@ export const WEEKLY_QUEST_WEEK_PREFIX = 'wk_';
 export const WEEKLY_EMISSARY_TALK_RANGE = 7;
 
 export const WEEKLY_EMISSARY_NPC_ID = 2_146_900_060;
-// On the green south of the Eastbrook notice board, a stride from Marshal
-// Redbrook, facing the civic square (the same lawn the marshal watches from).
+// Beside the Weekly Vault's door, on the far side of it from the vault
+// keeper, facing up the main street to the square.
 export const WEEKLY_EMISSARY_NPC_DEF: NpcDef = {
   id: 'weekly_emissary',
   name: 'Cham Pete',
   title: 'Emissary',
-  pos: { x: -52, z: -108 },
-  facing: 1.41,
+  pos: { x: -72.28, z: -95.59 },
+  facing: 1.68,
   color: 0x6b4fa8,
   questIds: [],
   dynamic: true,

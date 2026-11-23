@@ -5,7 +5,11 @@
 // per-second value through the elided writers, the tone classes chosen from
 // the union, the mount attributes, the language switch), plus the ring's pure
 // core and the sim matcher rows for the hill's lines.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { applyFrameGeometrySetting } from '../src/game/frame_geometry_settings';
+import { SETTING_RANGES } from '../src/game/settings';
 import {
   HILL_COLOR_OTHERS,
   HILL_COLOR_UNHELD,
@@ -28,8 +32,11 @@ import {
   hillRiseLine,
   hillWarningLine,
 } from '../src/sim/pvp/hill';
+import { frameSettingRelated } from '../src/ui/frame_menu_core';
 import { buildHillBarView, HillBar, hillEdgeDistance, hillRivalCount } from '../src/ui/hud/hill';
+import { shouldAnnounceHillPvp } from '../src/ui/hud/hill/hill_bar_view';
 import { setLanguage } from '../src/ui/i18n';
+import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { localizeSimText } from '../src/ui/sim_i18n';
 import type { HillInfo } from '../src/world_api';
@@ -49,34 +56,46 @@ const info = (over: Partial<HillInfo> = {}): HillInfo => ({
   yourCount: 0,
   challenger: 'none',
   challengerCount: 0,
+  rivalCount: 0,
   contest: 0,
+  contestPaused: false,
   ...over,
 });
 
 afterEach(() => setLanguage('en'));
 
 describe('buildHillBarView', () => {
+  it('does not announce PvP for under-level viewers, but does when they become eligible', () => {
+    const underLevel = buildHillBarView(info({ inside: true, standing: 'level' }), null);
+    const counted = buildHillBarView(info({ inside: true }), null);
+    expect(shouldAnnounceHillPvp(null, underLevel)).toBe(false);
+    expect(shouldAnnounceHillPvp(counted, underLevel)).toBe(false);
+    expect(shouldAnnounceHillPvp(underLevel, counted)).toBe(true);
+    expect(shouldAnnounceHillPvp(counted, counted)).toBe(false);
+    expect(shouldAnnounceHillPvp(null, buildHillBarView(null, null))).toBe(false);
+    expect(
+      shouldAnnounceHillPvp(null, buildHillBarView(info({ inside: true, phase: 'warning' }), null)),
+    ).toBe(false);
+    expect(
+      shouldAnnounceHillPvp(null, buildHillBarView(info({ inside: true, standing: 'raid' }), null)),
+    ).toBe(true);
+  });
   it("hides without a hill or outside the hill's zone", () => {
     expect(buildHillBarView(null, { x: 0, z: 0 }).visible).toBe(false);
     expect(buildHillBarView(info({ inZone: false }), { x: 360, z: 1540 }).visible).toBe(false);
   });
 
-  it('measures you against the holder, or the largest rival while unheld', () => {
-    expect(
-      hillRivalCount(
-        info({ holder: 'other', holderCount: 3, challenger: 'you', challengerCount: 4 }),
-      ),
-    ).toBe(3);
-    expect(hillRivalCount(info({ holder: 'none', challenger: 'other', challengerCount: 2 }))).toBe(
-      2,
-    );
-    expect(
-      hillRivalCount(
-        info({ holder: 'you', holderCount: 2, challenger: 'other', challengerCount: 3 }),
-      ),
-    ).toBe(3);
+  it('measures you against the holder, else the largest other group inside', () => {
+    expect(hillRivalCount(info({ holder: 'other', holderCount: 3, rivalCount: 4 }))).toBe(3);
+    expect(hillRivalCount(info({ holder: 'none', rivalCount: 2 }))).toBe(2);
+    expect(hillRivalCount(info({ holder: 'you', holderCount: 2, rivalCount: 3 }))).toBe(3);
     expect(hillRivalCount(info({ holder: 'you', holderCount: 2 }))).toBe(0);
-    expect(hillRivalCount(info({ holder: 'none', challenger: 'you', challengerCount: 2 }))).toBe(0);
+    // A lone challenger paused by a rival of equal size sees that rival, not 0.
+    expect(
+      hillRivalCount(
+        info({ holder: 'none', challenger: 'you', contestPaused: true, rivalCount: 1 }),
+      ),
+    ).toBe(1);
   });
 
   it('reports the whole-yard distance to the edge, zero inside', () => {
@@ -105,7 +124,7 @@ describe('buildHillBarView', () => {
       theirs: 2,
       contest: 15,
       capture: HILL_CAPTURE_SECONDS,
-      contestFraction: 0.25,
+      contestFraction: 0.5,
       distanceYards: 0,
       minutesLeft: 42,
       phase: 'active',
@@ -128,7 +147,7 @@ describe('buildHillBarView', () => {
 });
 
 describe('HillBar (the painter)', () => {
-  function harness() {
+  function harness(banner?: (text: string) => void) {
     const layer = document.createElement('div');
     document.body.appendChild(layer);
     const calls: string[] = [];
@@ -168,17 +187,42 @@ describe('HillBar (the painter)', () => {
         else el.setAttribute(name, value);
       },
     };
-    const bar = new HillBar({ layer: () => layer, writers });
+    const bar = new HillBar({ layer: () => layer, writers, banner });
     return { layer, bar, calls };
   }
+
+  it('announces active entry and activation inside once, and rearms after leaving', () => {
+    let entries = 0;
+    const { bar } = harness(() => entries++);
+    const update = (over: Partial<HillInfo>) =>
+      bar.update(buildHillBarView(info(over), { x: 360, z: 1540 }));
+    update({ inside: false });
+    update({ inside: true, standing: 'level' });
+    expect(entries).toBe(0);
+    update({ inside: true, phase: 'warning' });
+    expect(entries).toBe(0);
+    update({ inside: true });
+    update({ inside: true, holder: 'you' });
+    bar.relocalize();
+    expect(entries).toBe(1);
+    update({ inside: false });
+    update({ inside: true, standing: 'raid' });
+    expect(entries).toBe(2);
+    bar.update(buildHillBarView(null, null));
+    update({ inside: true });
+    expect(entries).toBe(3);
+  });
 
   it('mounts once with the status attributes and paints the unheld state', () => {
     const { layer, bar, calls } = harness();
     bar.update(
-      buildHillBarView(info({ challenger: 'other', challengerCount: 2, contest: 12 }), {
-        x: 460,
-        z: 1540,
-      }),
+      buildHillBarView(
+        info({ challenger: 'other', challengerCount: 2, rivalCount: 2, contest: 12 }),
+        {
+          x: 460,
+          z: 1540,
+        },
+      ),
     );
     const root = layer.querySelector('#hill-bar') as HTMLElement;
     expect(root).not.toBeNull();
@@ -189,11 +233,13 @@ describe('HillBar (the painter)', () => {
     expect(root.textContent).toContain('The Drakelands');
     expect(root.textContent).toContain('Nobody holds the hill');
     expect(root.textContent).toContain('Inside: you 0, largest rival 2');
-    expect(root.textContent).toContain('Losing the hill: 12 seconds of 1 minute');
+    expect(root.textContent).toContain('Losing the hill: 12 seconds of 30 seconds');
     expect(root.textContent).toContain('50 yd to the circle');
     expect(root.textContent).toContain('Falls in 42 minutes');
-    expect(root.querySelector('.hill-note')).toBeNull();
-    expect((root.querySelector('.hill-fill') as HTMLElement).style.width).toBe('20%');
+    expect(root.querySelector('.hill-note')?.textContent).toBe(
+      'Entering the active circle enables World PvP.',
+    );
+    expect((root.querySelector('.hill-fill') as HTMLElement).style.width).toBe('40%');
     expect(root.classList.contains('is-contested')).toBe(true);
     expect(root.classList.contains('is-you-contesting')).toBe(false);
     bar.update(
@@ -206,6 +252,42 @@ describe('HillBar (the painter)', () => {
     expect(root.classList.contains('is-you')).toBe(false);
     expect(root.classList.contains('is-other')).toBe(false);
     expect(calls.length).toBeGreaterThan(0);
+  });
+
+  it('says so when the clock is paused by a rival, and resumes the running text after', () => {
+    const { layer, bar } = harness();
+    const paused = info({
+      challenger: 'you',
+      challengerCount: 1,
+      yourCount: 1,
+      rivalCount: 1,
+      contest: 20,
+      contestPaused: true,
+      inside: true,
+    });
+    bar.update(buildHillBarView(paused, { x: 360, z: 1540 }));
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    expect(root.textContent).toContain('Paused: 20 seconds of 30 seconds');
+    expect(root.textContent).toContain('Inside: you 1, largest rival 1');
+    expect(root.classList.contains('is-paused')).toBe(true);
+    bar.update(
+      buildHillBarView(
+        info({ challenger: 'other', challengerCount: 1, contest: 20, contestPaused: true }),
+        { x: 360, z: 1540 },
+      ),
+    );
+    expect(root.textContent).toContain('Rival paused: 20 seconds of 30 seconds');
+    bar.update(
+      buildHillBarView(
+        { ...paused, rivalCount: 0, contest: 21, contestPaused: false },
+        {
+          x: 360,
+          z: 1540,
+        },
+      ),
+    );
+    expect(root.textContent).toContain('Taking the hill: 21 seconds of 30 seconds');
+    expect(root.classList.contains('is-paused')).toBe(false);
   });
 
   it('a repeated frame writes nothing; a live change writes only its slot', () => {
@@ -239,7 +321,7 @@ describe('HillBar (the painter)', () => {
     expect(root.classList.contains('is-you')).toBe(true);
     expect(root.textContent).toContain('Your group holds the hill');
     expect(root.textContent).toContain('You are inside the circle');
-    expect(root.textContent).toContain('Hold a majority inside for 1 minute to take it');
+    expect(root.textContent).toContain('Hold a majority inside for 30 seconds to take it');
     bar.update(
       buildHillBarView(
         info({ holder: 'other', holderCount: 2, yourCount: 1, challenger: 'none' }),
@@ -275,7 +357,15 @@ describe('HillBar (the painter)', () => {
       'Raid members do not count: only parties can hold the hill',
     );
     bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
-    expect(root.querySelector('.hill-note')).toBeNull();
+    expect(root.querySelector('.hill-note')?.textContent).toBe(
+      'Entering the active circle enables World PvP.',
+    );
+  });
+
+  it('shows the ordinary PvP level requirement to an ineligible player', () => {
+    const { layer, bar } = harness();
+    bar.update(buildHillBarView(info({ standing: 'level' }), { x: 360, z: 1540 }));
+    expect(layer.querySelector('.hill-note')?.textContent).toBe('Requires level 10.');
   });
 
   it('hides when the hill closes or the player leaves the zone, and relocalizes in place', () => {
@@ -297,6 +387,78 @@ describe('HillBar (the painter)', () => {
     expect(root.style.display).toBe('block');
     bar.dispose();
     expect(layer.querySelector('#hill-bar')).toBeNull();
+  });
+
+  it('adopts the static #hill-bar frame and paints its body, so mover chrome survives', () => {
+    const { layer, bar } = harness();
+    // The shipped markup: a governed frame (the hillBar HUD_FRAME_SPECS row)
+    // whose root carries the mover chrome beside the painted body.
+    layer.innerHTML =
+      '<div id="hill-bar" role="status" aria-live="polite"><div id="hill-body"></div></div>';
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    // The registry mover's real chrome on a governed frame is its resize grip.
+    const chrome = document.createElement('button');
+    chrome.className = 'mf-resize-grip';
+    root.appendChild(chrome);
+    bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
+    expect(layer.querySelectorAll('#hill-bar')).toHaveLength(1);
+    const body = root.querySelector('#hill-body') as HTMLElement;
+    expect(body.querySelector('.hill-held')?.textContent).toBe('Nobody holds the hill');
+    // A sig change rebuilds the skeleton inside the body only.
+    bar.update(buildHillBarView(info({ phase: 'warning' }), { x: 360, z: 1540 }));
+    expect(body.textContent).toContain('The hill has not risen yet');
+    expect(chrome.isConnected).toBe(true);
+    // Disposing leaves the document's frame in place, emptied and hidden.
+    bar.dispose();
+    expect(layer.querySelector('#hill-bar')).toBe(root);
+    expect(body.childElementCount).toBe(0);
+    expect(root.style.display).toBe('none');
+  });
+});
+
+describe('the King of the Hill frame row', () => {
+  it('is governed by the editor and opens its backdrop option from the frame menu', () => {
+    expect(HUD_FRAME_SPECS.find((row) => row.id === 'hillBar')).toMatchObject({
+      elementId: 'hill-bar',
+      detachToUiRoot: false,
+      labelKey: 'hudChrome.hill.title',
+    });
+    expect(frameSettingRelated('hillBar', 'hillBarOpacity')).toBe(true);
+    expect(frameSettingRelated('hillBar', 'chatOpacity')).toBe(false);
+    // Stock is the solid panel, so nothing changes until a player asks.
+    expect(SETTING_RANGES.hillBarOpacity).toEqual({ min: 0, max: 1, def: 1 });
+    const vars: Record<string, string> = {};
+    const style = {
+      setProperty: (name: string, value: string) => {
+        vars[name] = value;
+      },
+    };
+    expect(applyFrameGeometrySetting(style, 'hillBarOpacity', 0.4)).toBe(true);
+    expect(vars).toEqual({ '--hill-bar-opacity': '0.4' });
+  });
+
+  it('fades only the backdrop layer, and steps below the editor toolbar while arranging', () => {
+    const read = (f: string) =>
+      readFileSync(join(import.meta.dirname, '..', 'src', 'styles', f), 'utf8');
+    const block = (css: string, selector: string) => {
+      const at = css.indexOf(`${selector} {`);
+      expect(at, `${selector} rule`).toBeGreaterThan(-1);
+      return css.slice(at, css.indexOf('}', at));
+    };
+    const components = read('components.css');
+    // The stock panel moved onto ::before unchanged; the root keeps no fill of
+    // its own (the text must never fade with the opacity).
+    const backdrop = block(components, '#hill-bar::before');
+    expect(backdrop).toContain('background: var(--panel-bg-strong)');
+    expect(backdrop).toContain('border: 1px solid var(--color-bg-field-edge)');
+    expect(backdrop).toContain('opacity: var(--hill-bar-opacity, 1)');
+    expect(block(components, '#hill-bar')).not.toContain('background:');
+    expect(
+      block(
+        read('hud.css'),
+        'body.interface-unlocked #hill-bar.tf-unlocked:not(.hud-frame-detached)',
+      ),
+    ).toContain('top: 64px');
   });
 });
 

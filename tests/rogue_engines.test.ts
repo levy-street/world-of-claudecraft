@@ -368,8 +368,11 @@ describe('Skulduggery: the Gloam bank and its detonation', () => {
     // release/v0.37.0 castle base): one tick parks the shared stream where
     // the single detonation swing resolves as a plain non-crit hit (the
     // formula dodge slot and the authored opener crit arm both stay live,
-    // see the pin comment above).
-    sim.tick();
+    // see the pin comment above). Re-hunted for the Mirefen hut wall wander
+    // fix (an idle pick inside a mudfin hut wall is skipped for one more
+    // pause, mob/locomotion.ts), which forks the shared stream: now three
+    // ticks (one and two no longer land a plain hit).
+    for (let i = 0; i < 3; i++) sim.tick();
 
     // The detonation: one press, in the open, face to face. The veil rises
     // BEFORE the strike resolves, so this very hit is the empowered (+50%,

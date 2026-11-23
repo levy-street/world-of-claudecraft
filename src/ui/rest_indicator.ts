@@ -8,6 +8,17 @@ export interface RestStateInput {
   sitting: boolean;
   eating: boolean;
   drinking: boolean;
+  /** Standing in an inn's rest area out of combat (IWorld.resting): classic "Resting",
+   *  filling the rested pool. Optional so older fixtures keep their meaning. */
+  inRestArea?: boolean;
+}
+
+/** The input from the player's own booleans and the world's rest-area read. */
+export function restStateOf(
+  p: { sitting: boolean; eating: unknown; drinking: unknown },
+  inRestArea: boolean,
+): RestStateInput {
+  return { sitting: !!p.sitting, eating: !!p.eating, drinking: !!p.drinking, inRestArea };
 }
 
 // The tooltip text is surfaced as a translation key (resolved by the HUD via
@@ -19,7 +30,8 @@ export type RestLabelKey =
   | 'hud.core.eatingDrinking'
   | 'hud.core.eating'
   | 'hud.core.drinking'
-  | 'hudChrome.rest.resting';
+  | 'hudChrome.rest.resting'
+  | 'hudChrome.rest.restArea';
 
 export interface RestView {
   resting: boolean; // any seated state → show the indicator
@@ -28,7 +40,8 @@ export interface RestView {
 }
 
 // Label precedence: recovering (eating/drinking) is the more informative state,
-// so it wins over a plain seat. Eating and drinking can run at once (separate
+// so it wins over a plain seat; standing (or sitting) in an inn's rest area says
+// so, because that is what fills the rested pool. Eating and drinking can run at once (separate
 // slots); we surface the combined "Recovering" rather than picking one. A bare
 // sit (no consumable) reads as classic "Resting".
 export function restView(input: RestStateInput): RestView {
@@ -36,6 +49,7 @@ export function restView(input: RestStateInput): RestView {
   if (eating && drinking) return { resting: true, labelKey: 'hud.core.eatingDrinking', glyph: 'z' };
   if (eating) return { resting: true, labelKey: 'hud.core.eating', glyph: 'z' };
   if (drinking) return { resting: true, labelKey: 'hud.core.drinking', glyph: 'z' };
+  if (input.inRestArea) return { resting: true, labelKey: 'hudChrome.rest.restArea', glyph: 'z' };
   if (sitting) return { resting: true, labelKey: 'hudChrome.rest.resting', glyph: 'z' };
   return { resting: false, labelKey: '', glyph: 'z' };
 }

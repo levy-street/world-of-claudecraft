@@ -18,9 +18,23 @@ import type { ArenaWallFootprint } from './arena_wall_occlusion_core';
 import type { DungeonInteriorVariant } from './dungeon';
 import { type WallCullPlane, wallSegmentOutward } from './wall_backface_cull_core';
 
+/** One placed dungeon-kit piece, as the editor's shipped-map adapter reads it:
+ *  the same call the instanced build makes, recorded in world terms instead of
+ *  composed into a matrix (DungeonInteriors.captureDungeonPlacementRecords). */
+export interface DungeonPlacementRecord {
+  kind: string;
+  x: number;
+  y: number;
+  z: number;
+  rotY: number;
+  scale: number | [number, number, number];
+}
+
 /** Accumulates instance transforms per module kind, then emits InstancedMeshes. */
 export class Placements {
   readonly byKind = new Map<string, THREE.Matrix4[]>();
+  /** Plain-data tape of every add(), for captureDungeonPlacementRecords. */
+  readonly records: DungeonPlacementRecord[] = [];
   private readonly pos = new THREE.Vector3();
   private readonly quat = new THREE.Quaternion();
   private readonly scl = new THREE.Vector3();
@@ -34,6 +48,14 @@ export class Placements {
     rotY = 0,
     scale: number | [number, number, number] = 1,
   ): void {
+    this.records.push({
+      kind,
+      x,
+      y,
+      z,
+      rotY,
+      scale: Array.isArray(scale) ? [scale[0], scale[1], scale[2]] : scale,
+    });
     const m = new THREE.Matrix4();
     this.pos.set(x, y, z);
     this.quat.setFromEuler(this.euler.set(0, rotY, 0));

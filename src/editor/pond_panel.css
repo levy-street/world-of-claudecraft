@@ -1,0 +1,11 @@
+.ed-pond-add {
+  white-space: normal;
+}
+
+@media (pointer: coarse) {
+  .ed-pond-add,
+  .ed-pond-panel input {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

@@ -5,6 +5,7 @@ import {
   SHADOW_QUEST_ID,
   SHADOW_SAFE_SPOT,
   SHADOW_SITE,
+  SHADOW_STEAL_SUSPICION_LIMIT,
 } from './content/world_quest_shadow';
 import { createNpc } from './entity';
 import { hasShadowCloak, SHADOW_CLOAK_AURA_ID } from './shadow_action_lock';
@@ -17,6 +18,7 @@ import {
   shadowGuardDetects,
   shadowPatrolPosition,
 } from './world_quest_shadow_patrol';
+import { shadowBeamExposure } from './world_quest_shadow_target';
 
 /** Seconds inside a lantern beam before you are caught. */
 export const SHADOW_BEAM_FILL_SECONDS = 0.6;
@@ -146,21 +148,6 @@ function guardTarget(
     return;
   return entity;
 }
-/** Suspicion this high (or any lantern beam) refuses a new steal: the thief is
- *  already half-noticed, so the wide circles reward darting in, not loitering. */
-export const SHADOW_STEAL_SUSPICION_LIMIT = 0.5;
-
-/** True while any lantern guard's beam holds the player. */
-function shadowBeamExposure(ctx: SimContext, player: Entity): boolean {
-  for (const row of SHADOW_GUARDS) {
-    if (!row.cone) continue;
-    const guard = ctx.entities.get(row.entityId);
-    if (!guard || guard.templateId !== row.npc.id || guard.dead) continue;
-    if (shadowGuardDetects({ detectionRadius: 0, cone: row.cone }, guard, player.pos)) return true;
-  }
-  return false;
-}
-
 export function performShadowAction(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -183,7 +170,7 @@ export function performShadowAction(
     state.cooldown > 0 ||
     state.stealing ||
     state.suspicion >= SHADOW_STEAL_SUSPICION_LIMIT ||
-    shadowBeamExposure(ctx, player)
+    shadowBeamExposure(ctx.entities, player)
   )
     return;
   const guard = guardTarget(ctx, player, targetId ?? player.targetId ?? undefined);

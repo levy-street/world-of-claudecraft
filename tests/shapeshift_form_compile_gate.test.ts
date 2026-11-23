@@ -24,7 +24,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
     expect(source).toContain('formCompilePending: null,');
   });
 
-  it('gates all four lazy form-visual builds (sheep, bear, cat, travel) on compile', () => {
+  it('gates all five lazy form-visual builds (sheep, bear, cat, travel, sporemender) on compile', () => {
     const source = renderer();
     const blockStart = source.indexOf('// lazy form visuals, swapped by visibility');
     const blockEnd = source.indexOf('// rideable mount under the player', blockStart);
@@ -32,21 +32,31 @@ describe('shapeshift-form compile gate (#2571)', () => {
     expect(blockEnd).toBeGreaterThan(blockStart);
     const block = source.slice(blockStart, blockEnd);
 
-    // Every form is built by the one shared builder, and the four that must not
+    // Every form is built by the one shared builder, and the five that must not
     // pop in half-linked ask it for the gate. Metamorphosis is the deliberate
     // exception: it grows out of the body it replaces.
+    // The entity loop hands the requested form to the form-rig sync
+    // (characters/form_rig_sync.ts, where the polymorph slot also swaps the
+    // sheep for the Toad Hex's toad), which calls back into the one builder.
+    expect(block).toContain('syncFormRig(e, v, requestedForm, this.buildFormRig)');
+    expect(source).toContain('this.buildFormVisual(e, v, key, slot, gate)');
+    const rigs = readFileSync(
+      new URL('../src/render/characters/form_rig_sync.ts', import.meta.url),
+      'utf8',
+    );
     for (const [form, slot] of [
       ['sheep', 'sheepVisual'],
       ['bear', 'bearVisual'],
       ['cat', 'catVisual'],
       ['travel', 'travelVisual'],
+      ['sporemender', 'sporemenderVisual'],
     ]) {
-      expect(block, `${slot} gated build`).toContain(
-        `this.buildFormVisual(e, v, 'form_${form}', '${slot}', true)`,
+      expect(rigs, `${slot} gated build`).toContain(
+        `${form}: { key: 'form_${form}', slot: '${slot}', gate: true }`,
       );
     }
-    expect(block).toContain(
-      "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
+    expect(rigs).toContain(
+      "metamorph: { key: 'form_metamorph', slot: 'metamorphVisual', gate: false }",
     );
 
     // ...and the builder still attaches, marks pending, gates, and settles, in

@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_rime_egg_sac_woc.glb",
+      "out": "models/creatures/woc_crypt_rime_egg_sac.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Hit", "Death"],
+      "maxTex": 1024
+    }
+  ]
+}

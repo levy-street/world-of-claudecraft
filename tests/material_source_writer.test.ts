@@ -63,13 +63,13 @@ function occurrences(haystack: string, needle: string): number {
 }
 
 describe('material source writer capability constants', () => {
-  it('names one fixed capability at version 1', () => {
+  it('names one fixed capability at version 2', () => {
     expect(MATERIAL_SOURCE_WRITER_CAPABILITY).toBe('woc.material_source_writer');
-    expect(MATERIAL_SOURCE_WRITER_VERSION).toBe('1');
+    expect(MATERIAL_SOURCE_WRITER_VERSION).toBe('2');
   });
 
   it('builds the startup option from the capability and version', () => {
-    expect(MATERIAL_SOURCE_WRITER_STARTUP_OPTION).toBe('-c woc.material_source_writer=1');
+    expect(MATERIAL_SOURCE_WRITER_STARTUP_OPTION).toBe('-c woc.material_source_writer=2');
     expect(MATERIAL_SOURCE_WRITER_STARTUP_OPTION).toBe(
       `-c ${MATERIAL_SOURCE_WRITER_CAPABILITY}=${MATERIAL_SOURCE_WRITER_VERSION}`,
     );
@@ -189,7 +189,7 @@ describe('material source writer startup option combining', () => {
 
   it('appends the capability after the caller options', () => {
     expect(withMaterialSourceWriterOption('-c statement_timeout=15000')).toBe(
-      '-c statement_timeout=15000 -c woc.material_source_writer=1',
+      '-c statement_timeout=15000 -c woc.material_source_writer=2',
     );
   });
 
@@ -269,7 +269,7 @@ describe('material source writer startup option combining', () => {
   it('appends again when already present, rather than deduplicating', () => {
     // The string is built once at connection creation, so there is no caller
     // that needs idempotence, and the repeated value is the same one anyway.
-    const already = '-c woc.material_source_writer=1';
+    const already = '-c woc.material_source_writer=2';
     expect(withMaterialSourceWriterOption(already)).toBe(
       `${already} ${MATERIAL_SOURCE_WRITER_STARTUP_OPTION}`,
     );

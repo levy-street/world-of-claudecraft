@@ -411,12 +411,14 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.cooldowns.has('greater_invisibility')).toBe(false);
   });
 
-  it('Mass Barrier shields the caster (and any nearby allies) for 130', () => {
+  it('Mass Barrier shields the caster (and any nearby allies) for 250 + 25% of healPower', () => {
     const { sim, p } = rig({ 17: 'mag_r17_mass_barrier' });
+    p.healPower = 120;
     sim.castAbility('mass_barrier');
     const shield = p.auras.find((a) => a.id === 'mass_barrier');
     expect(shield?.kind).toBe('absorb');
-    expect(shield?.value).toBe(130);
+    expect(shield?.value).toBe(280); // 250 + 120 x 0.25
+    expect(shield?.duration).toBe(15);
   });
 
   it('Overflowing Power shaves defensive cooldowns as mana is spent, capped by the window', () => {

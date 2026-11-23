@@ -22,6 +22,7 @@ import type { FocusManager, FocusTrapHandle } from './focus_manager';
 export interface WindowFocusBridge {
   captureFocus: () => HTMLElement | null;
   restoreFocus: (target: HTMLElement | null) => void;
+  focusFirst?: () => void;
 }
 
 /**
@@ -42,6 +43,7 @@ export function makeWindowFocus(fm: FocusManager, root: () => HTMLElement): Wind
       handle = fm.open({ root, returnFocusTo: opener });
       return opener;
     },
+    focusFirst: () => handle?.focusFirst(),
     restoreFocus: (target) => {
       // An in-window refocus (target still inside the open window) must NOT tear
       // down the trap; only a return-to-opener on close (target outside the

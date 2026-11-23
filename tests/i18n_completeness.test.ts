@@ -158,6 +158,7 @@ describe('i18n whole-catalog completeness', () => {
     const BRAND_ALLOW = new Set([
       'footer.copyright', // "{year} World of ClaudeCraft" - brand
       'footer.githubLink', // repository URL
+      'footer.levyStreet', // "Levy Street" - studio brand (footer backlink)
       'fiesta.bracket', // "Fiesta" event brand
       'serverUnavailable.logoAlt', // "World of ClaudeCraft" logo alt text - brand
       'guide.brand', // "World of ClaudeCraft" - brand (Guide)
@@ -231,6 +232,7 @@ describe('i18n whole-catalog completeness', () => {
         'hudChrome.bank.vaultSearch',
         'hudChrome.mapAtlas.collapseHint',
         'hudChrome.mapAtlas.expandHint',
+        'hudChrome.graphicsRestore.note',
         'guide.nav.worldPvp',
         'guide.settingsPage.ifColorblindMode',
         'guide.settingsPage.ifTargetAurasBelowFrame',
@@ -257,6 +259,18 @@ describe('i18n whole-catalog completeness', () => {
         'entities.items.vanguard_',
         'entities.itemSets.vanguard_',
       ].some((prefix) => key.startsWith(prefix));
+    // v0.45 ClaudeCraft Studio merge debt: the Studio editor and its authored-map
+    // content landed with English source copy before the non-Latin fill pass. The
+    // fixture names each pending key exactly (never a namespace, so the strings the
+    // public editor already translated stay guarded); the release fill pass deletes
+    // entries as it fills them, and a key that left the catalog fails below.
+    const studioPending = new Set<string>(
+      JSON.parse(
+        readFileSync(new URL('./fixtures/studio_pending_non_latin.json', import.meta.url), 'utf8'),
+      ) as string[],
+    );
+    const staleStudioPending = [...studioPending].filter((key) => !(key in enFlat));
+    expect(staleStudioPending, 'studio pending keys missing from the catalog').toEqual([]);
     const nonLatin: SupportedLanguage[] = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'];
     const leaks: string[] = [];
     for (const lang of nonLatin) {
@@ -267,7 +281,8 @@ describe('i18n whole-catalog completeness', () => {
           flat[key] === enValue &&
           !BRAND_ALLOW.has(key) &&
           !isDevelopmentOnly(key) &&
-          !isReleaseLinePendingNonLatin(key)
+          !isReleaseLinePendingNonLatin(key) &&
+          !studioPending.has(key)
         ) {
           leaks.push(`${lang} ${key}: "${enValue}"`);
         }

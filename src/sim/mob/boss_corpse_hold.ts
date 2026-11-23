@@ -17,7 +17,10 @@
 //
 // The hold applies to a camp-placed `boss` template inside an instance (rift
 // floors, dungeons, raids, delves: spawnPos beyond DUNGEON_X_THRESHOLD, the
-// same predicate the respawn gate uses). An authored fixed schedule
+// same predicate the respawn gate uses), and to a named mid-boss that opts in
+// with MobTemplate.bossCorpseHold: the Hollow Crypt's wing bosses carry boss
+// loot without the `boss` flag, and Sexton Marrow's corpse went unlootable a
+// minute after a kill that leaves his Restless Bones standing. An authored fixed schedule
 // (`respawnSeconds`) caps it exactly as it caps the default decay in
 // handleDeath, so such a mob returns on schedule whether or not it was looted.
 // Everything else keeps the classic 60s decay, deliberately:
@@ -56,13 +59,15 @@ import type { Entity, MobTemplate } from '../types';
 /** How long a slain instance boss's lootable corpse stands (seconds). */
 export const BOSS_CORPSE_HOLD_SECONDS = 30 * 60;
 
-type HoldTemplate = Pick<MobTemplate, 'boss' | 'worldBoss' | 'respawnSeconds'>;
+type HoldTemplate = Pick<MobTemplate, 'boss' | 'bossCorpseHold' | 'worldBoss' | 'respawnSeconds'>;
 type HoldMob = Pick<Entity, 'spawnPos' | 'summonedAdd' | 'runScoped'>;
 
-/** A `boss` template the hold can apply to: world bosses keep their
- * scheduler-owned window (see the header). */
+/** A `boss` template (or a mid-boss opted in with `bossCorpseHold`) the hold
+ * can apply to: world bosses keep their scheduler-owned window (see the
+ * header). */
 export function isHeldBossTemplate(template: HoldTemplate | undefined): boolean {
-  return template?.boss === true && template.worldBoss !== true;
+  if (!template || template.worldBoss === true) return false;
+  return template.boss === true || template.bossCorpseHold === true;
 }
 
 /**

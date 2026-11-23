@@ -12,6 +12,7 @@ import {
 } from '../building_layout';
 import { getActiveWorldContent, isBuiltinWorldActive } from '../data';
 import { KIT_BUILDINGS } from '../kit_buildings';
+import { tavernRestsAt } from '../mirefen_tavern';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type BuildingDef, canPrestige, DT, type Entity, MAX_LEVEL, xpForLevel } from '../types';
@@ -22,6 +23,8 @@ const RESTED_SECONDS_PER_GAME_HOUR = 60; // 1 in-game hour = 60 sim seconds
 const RESTED_FILL_FRACTION = 0.05; // a full "bubble" = 5% of the level's XP-to-level
 const RESTED_FILL_HOURS = 8; // accrued per this many in-game hours of resting
 const RESTED_CAP_LEVELS = 1.5; // pool clamps to 1.5 levels of XP, the classic-era cap
+const RESTED_INN_PADDING = 2; // yards of slack around an editor-placed inn that still counts as resting
+
 // True while the player is standing in (or just beside) an inn footprint and
 // out of combat — the classic "resting" state that accrues rested XP.
 // Two inn sources: the authored BuildingDef inns of the active world, and the
@@ -30,18 +33,36 @@ const RESTED_CAP_LEVELS = 1.5; // pool clamps to 1.5 levels of XP, the classic-e
 // pipeline and never appears in props.buildings). The kit footprint is the
 // kit collider's own OBB, so it takes the collider-correct point test. The
 // Harbormaster's House at the Wyrmwatch cliff harbor rests a body on its floor
-// the same way (wyrmwatch_harbor_house.ts), on the built-in world only.
+// the same way (wyrmwatch_harbor_house.ts), and so does the whole inside of the
+// Mirefen tavern (mirefen_tavern.ts), on the built-in world only.
 export function isResting(
   p: Entity,
   buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
   kitBuildings: readonly BuildingDef[] = KIT_BUILDINGS,
-  harborHouse: boolean = isBuiltinWorldActive(),
+  builtInRests: boolean = isBuiltinWorldActive(),
 ): boolean {
   if (p.inCombat) return false;
-  if (harborHouse && harborHouseRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
+  if (builtInRests && harborHouseRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
+  if (builtInRests && tavernRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
   for (const b of buildings) {
     if (b.kind !== 'inn') continue;
     if (buildingContainsRestPoint(b, p.pos.x, p.pos.z, buildingRestPadding(b))) return true;
+  }
+  // Editor-authored inns: an inn dropped as a world prop through the editor lives
+  // in `placements`, not `props.buildings`, so it needs its own footprint test.
+  for (const placed of getActiveWorldContent().placements ?? []) {
+    if (placed.worldPropKind !== 'inn' || !placed.worldPropWidth) continue;
+    const w = (placed.worldPropWidth ?? 0) * placed.scale * (placed.scaleX ?? 1);
+    const d = (placed.worldPropDepth ?? 0) * placed.scale * (placed.scaleZ ?? 1);
+    // Point-in-rotated-rect: bring the player into the inn's local frame.
+    const dx = p.pos.x - placed.x;
+    const dz = p.pos.z - placed.z;
+    const cos = Math.cos(-placed.rotY);
+    const sin = Math.sin(-placed.rotY);
+    const lx = dx * cos - dz * sin;
+    const lz = dx * sin + dz * cos;
+    if (Math.abs(lx) <= w / 2 + RESTED_INN_PADDING && Math.abs(lz) <= d / 2 + RESTED_INN_PADDING)
+      return true;
   }
   for (const b of kitBuildings) {
     if (b.kind !== 'inn') continue;

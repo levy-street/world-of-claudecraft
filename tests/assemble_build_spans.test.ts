@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
+import { landWocBodies } from './helpers/woc_streamed';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 type BuildSpansModule = typeof import('../src/render/build_spans');
@@ -32,6 +33,9 @@ async function loadFresh(): Promise<{ assets: AssetsModule; spans: BuildSpansMod
   const spans = (await import('../src/render/build_spans')) as BuildSpansModule;
   const assets = (await import('../src/render/characters/assets')) as AssetsModule;
   await assets.charactersReady();
+  // The part library left the boot preload when the world's NPCs stopped composing
+  // from it (its def is lazyPreload): ask for it the way a host does and let it land.
+  await landWocBodies(assets, [MODULAR_WARRIOR_KEY]);
   return { assets, spans };
 }
 
@@ -52,21 +56,28 @@ describe('assembleModular emits the view-part sub-spans of one composed build', 
     spans.setBuildSpanSink((kind, ms, atMs) => recorded.push({ kind, ms, atMs }));
     const root = assets.assembleModular(VISUALS[MODULAR_WARRIOR_KEY], DEFAULT_LOOK);
     expect(root).toBeInstanceOf(THREE.Object3D);
-    expect(recorded.map((s) => s.kind)).toEqual([
+    const steps = [
       'view-part:assemble:variant',
       'view-part:assemble:parts',
       'view-part:assemble:decals',
       'view-part:assemble:recolor',
       'view-part:assemble:morphs',
       'view-part:assemble:props',
-    ]);
+    ];
+    // The first compose of a part set is a cache MISS: the variant compose
+    // records its own kind, nested inside (and so ending before) the variant step.
+    expect(recorded.map((s) => s.kind)).toEqual(['view-part:variant-compose', ...steps]);
     for (const span of recorded) {
       expect(span.ms).toBeGreaterThanOrEqual(0);
       expect(Number.isFinite(span.atMs)).toBe(true);
     }
-    // the sink is the only outlet: cleared, a second compose is silent
+    // A second compose of the same part set is a HIT: the steps again, and no
+    // compose span, so the kind's count is the number of composes paid.
+    assets.assembleModular(VISUALS[MODULAR_WARRIOR_KEY], DEFAULT_LOOK);
+    expect(recorded.slice(7).map((s) => s.kind)).toEqual(steps);
+    // the sink is the only outlet: cleared, a third compose is silent
     spans.setBuildSpanSink(null);
     assets.assembleModular(VISUALS[MODULAR_WARRIOR_KEY], DEFAULT_LOOK);
-    expect(recorded).toHaveLength(6);
+    expect(recorded).toHaveLength(13);
   });
 });

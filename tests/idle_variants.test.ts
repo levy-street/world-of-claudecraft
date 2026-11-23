@@ -13,6 +13,20 @@ const characterVisualSource = readFileSync(
   new URL('../src/render/characters/visual.ts', import.meta.url),
   'utf8',
 );
+const clipNamesSource = readFileSync(
+  new URL('../src/render/characters/clip_names.ts', import.meta.url),
+  'utf8',
+);
+
+/** Every clip a def plays: its body GLB's plus its animation libraries' (a WOC body ships
+ *  its clips in a separate anims file, animUrls). */
+function defClipDurations(def: { url: string; animUrls?: readonly string[] }): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const url of [def.url, ...(def.animUrls ?? [])]) {
+    for (const [name, d] of clipDurations(url.replace(/^\//, ''))) out.set(name, d);
+  }
+  return out;
+}
 
 /** Clip name -> duration (seconds), read straight out of a GLB's accessors. */
 function clipDurations(glbRelative: string): Map<string, number> {
@@ -99,7 +113,7 @@ describe('idle-breaker clips', () => {
 
   it('names only clips the shipped GLB really carries', () => {
     for (const [key, def] of rigsWithVariants) {
-      const durations = clipDurations(def.url.replace(/^\//, ''));
+      const durations = defClipDurations(def);
       for (const name of def.clips.idleVariants ?? []) {
         expect(durations.has(name), `${key} declares a missing idle variant: ${name}`).toBe(true);
       }
@@ -119,11 +133,10 @@ describe('idle-breaker clips', () => {
   });
 
   it('registers every scheduled idle clip in the CharacterVisual action map', () => {
-    const start = characterVisualSource.indexOf('function clipNamesOf(def: VisualDef): string[] {');
-    const end = characterVisualSource.indexOf('\nfunction firstLoadedEmoteClip(', start);
+    // The clip-name listing lives in clip_names.ts; visual.ts registers what it returns.
+    const start = clipNamesSource.indexOf('function clipNamesOf(def: VisualDef): string[] {');
     expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const actionMap = characterVisualSource.slice(start, end);
+    const actionMap = clipNamesSource.slice(start);
 
     const registration = characterVisualSource.match(
       /for \(const name of \[([\s\S]*?)\]\) \{([\s\S]*?)\n {6}\}/,
@@ -172,11 +185,17 @@ describe('idle-breaker clips', () => {
     expect(jitter).toBe(0);
     expect(min).toBe(5);
     for (const [key, def] of rigsWithVariants) {
-      const durations = clipDurations(def.url.replace(/^\//, ''));
+      const durations = defClipDurations(def);
       const longest = Math.max(
         ...(def.clips.idleVariants ?? []).map((name) => durations.get(name) ?? 0),
       );
       expect(longest, `${key} has a zero-length idle variant`).toBeGreaterThan(0);
+      // A rig that holds every draw for its idle loop seam cannot re-fire over
+      // a live fidget whatever its cadence: a due draw also waits out the
+      // one-shot playing (the clock parks at zero), and the seam only comes
+      // round once the base idle is back. Its short cadence is how its fidgets
+      // chain (tests/idle_variant_shuffle.test.ts).
+      if (def.clips.idleVariantsOnLoopSeam) continue;
       expect(min, `${key}: fidget beat ${min}s vs longest clip ${longest}s`).toBeGreaterThan(
         longest,
       );
@@ -240,5 +259,85 @@ describe('idle-breaker clips', () => {
     } finally {
       random.mockRestore();
     }
+  });
+});
+
+describe('held draws and the loop seam', () => {
+  it('parks a fidget held behind a one-shot at zero, so it fires when the one-shot ends', () => {
+    // The clock below zero read as unarmed on the next frame and re-armed a full
+    // cadence, silently dropping the held fidget. Real frames (dt > 0) show it.
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0);
+    try {
+      const { visual, playOneShot } = idleVariantHarness();
+      visual.idleVariantIn = 0.01;
+      visual.currentIsOneShot = true;
+      visual.tickIdleVariant(0.016, 'idle');
+      expect(visual.idleVariantIn).toBe(0);
+      visual.tickIdleVariant(0.016, 'idle');
+      expect(visual.idleVariantIn).toBe(0);
+      expect(playOneShot).not.toHaveBeenCalled();
+      visual.currentIsOneShot = false;
+      visual.tickIdleVariant(0.016, 'idle');
+      expect(playOneShot).toHaveBeenCalledExactlyOnceWith('Idle_Look', 1);
+    } finally {
+      random.mockRestore();
+    }
+  });
+
+  it('parks the idle beat the same way', () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0);
+    try {
+      const { visual, playOneShot } = idleVariantHarness();
+      visual.idleBeatIn = 0.01;
+      visual.currentIsOneShot = true;
+      visual.tickIdleBeat(0.016, 'idle');
+      expect(visual.idleBeatIn).toBe(0);
+      visual.currentIsOneShot = false;
+      visual.tickIdleBeat(0.016, 'idle');
+      expect(playOneShot).toHaveBeenCalledExactlyOnceWith('Idle_Shake', 1);
+    } finally {
+      random.mockRestore();
+    }
+  });
+
+  it('holds a seam rig for the idle wrap, then draws fidgets and the idle itself in even turns', () => {
+    const idle = { time: 3, getClip: () => ({ duration: 6 }) };
+    const { visual, playOneShot } = idleVariantHarness();
+    Object.assign(visual, {
+      idleVariantBag: [],
+      lastIdleVariant: null,
+      def: {
+        clips: {
+          idle: 'Idle',
+          idleVariants: ['A', 'B'],
+          idleVariantCadence: { everySec: 1, jitterSec: 0 },
+          idleVariantsOnLoopSeam: true,
+          idleVariantsShuffled: true,
+          idleVariantsIncludeIdle: true,
+        },
+      },
+      action: (name: string) => (name === 'Idle' ? idle : {}),
+    });
+    visual.tickIdleVariant(0, 'idle'); // arm: 1 s
+    visual.tickIdleVariant(1.01, 'idle'); // due mid-loop: held
+    expect(playOneShot).not.toHaveBeenCalled();
+    expect(visual.idleVariantIn).toBe(0);
+
+    const picks: string[] = [];
+    for (let draw = 0; draw < 9; draw++) {
+      idle.time = 6; // on the seam
+      const before = playOneShot.mock.calls.length;
+      visual.tickIdleVariant(0.016, 'idle');
+      const played = playOneShot.mock.calls.length > before;
+      picks.push(played ? (playOneShot.mock.calls.at(-1)?.[0] as string) : 'Idle');
+      if (!played) expect(visual.idleVariantIn).toBeCloseTo(1, 5); // one more idle loop
+      idle.time = 3;
+      visual.tickIdleVariant(1.01, 'idle'); // due again, held off the seam
+    }
+    expect(playOneShot.mock.calls.every(([name]) => name !== 'Idle')).toBe(true);
+    for (let round = 0; round < 3; round++) {
+      expect(picks.slice(round * 3, round * 3 + 3).sort()).toEqual(['A', 'B', 'Idle']);
+    }
+    for (let i = 1; i < picks.length; i++) expect(picks[i]).not.toBe(picks[i - 1]);
   });
 });

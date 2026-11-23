@@ -11,7 +11,7 @@ import {
 import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity } from '../src/sim/types';
+import { DT, type Entity, type PlayerClass } from '../src/sim/types';
 import { VARKHUL_SHARED_PYRE_AURA_ID } from '../src/sim/varkhul_shared_pyre';
 
 function encounter(heroic = false): { sim: Sim; boss: Entity } {
@@ -27,6 +27,7 @@ function encounter(heroic = false): { sim: Sim; boss: Entity } {
   const tankMeta = sim.players.get(sim.player.id);
   if (!tankMeta) throw new Error('Tank metadata missing');
   tankMeta.talentMods.role = 'tank';
+  tankMeta.talentMods.spec = 'prot';
   boss.inCombat = true;
   boss.aiState = 'attack';
   boss.aggroTargetId = sim.player.id;
@@ -36,8 +37,8 @@ function encounter(heroic = false): { sim: Sim; boss: Entity } {
   return { sim, boss };
 }
 
-function addDps(sim: Sim, boss: Entity, name: string): Entity {
-  const pid = sim.addPlayer('mage', name);
+function addDps(sim: Sim, boss: Entity, name: string, cls: PlayerClass = 'mage'): Entity {
+  const pid = sim.addPlayer(cls, name);
   const meta = sim.players.get(pid);
   const player = meta ? sim.entities.get(meta.entityId) : undefined;
   if (!meta || !player) throw new Error(`${name} missing`);
@@ -210,6 +211,7 @@ describe('Varkhul Tempering Ray encounter integration', () => {
     const aggroMeta = sim.players.get(sim.player.id);
     if (!aggroMeta) throw new Error('Aggro player metadata missing');
     aggroMeta.talentMods.role = 'dps';
+    aggroMeta.talentMods.spec = 'arms';
     const eligible = addDps(sim, boss, 'Eligible Smith');
     const state = armOnlyInterceptBeam(sim, boss);
     state.interceptBeamCastKey = 1;
@@ -222,10 +224,11 @@ describe('Varkhul Tempering Ray encounter integration', () => {
 
   it('excludes an authored off-tank even when that player does not hold aggro', () => {
     const { sim, boss } = encounter();
-    const offTank = addDps(sim, boss, 'Off Tank');
+    const offTank = addDps(sim, boss, 'Off Tank', 'paladin');
     const offTankMeta = sim.players.get(offTank.id);
     if (!offTankMeta) throw new Error('Off-tank metadata missing');
     offTankMeta.talentMods.role = 'tank';
+    offTankMeta.talentMods.spec = 'protection';
     const eligible = addDps(sim, boss, 'Eligible Smith');
     const state = armOnlyInterceptBeam(sim, boss);
     state.interceptBeamCastKey = 1;

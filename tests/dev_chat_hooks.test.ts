@@ -16,6 +16,7 @@ function deps() {
           logs.push(text);
         },
         refreshDayNightDial: () => {},
+        devCommandsAvailable: undefined as boolean | undefined,
       },
       renderer: {
         scene: { add() {}, remove() {}, traverse() {} } as never,
@@ -45,5 +46,12 @@ describe('dev chat hooks', () => {
     expect(tryDevChatHooks('/daynight', d.bag)).toBe(true);
     expect(d.logs.length).toBeGreaterThan(0);
     expect(d.logs[0]).toContain('/daynight');
+  });
+
+  it('accepts /dev time day when hud.devCommandsAvailable is true on hosted dev realms', () => {
+    const d = deps();
+    d.bag.hud.devCommandsAvailable = true;
+    expect(tryDevChatHooks('/dev time day', d.bag)).toBe(true);
+    expect(d.logs[0]).toContain('time of day set to day');
   });
 });

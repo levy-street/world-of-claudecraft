@@ -1,10 +1,11 @@
-// Shared inventory mutation for the instance-grant hub. Materials use exact
+// Shared inventory mutation for the instance-grant hub. Source-aware items use exact
 // source-aware packing; other items retain their existing per-copy semantics.
 import { addStacked, stackSizeOf } from './bags';
 import { ITEMS } from './data';
+import { creditHeroicMarks, isCurrencyGrantId } from './heroic_marks';
 import { canStackInstancePayloads } from './item_instance_merge';
-import { isMaterialItemId } from './material_ids';
 import type { MaterialComposition } from './material_sources';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { cloneItemInstancePayload, type InvSlot, type ItemInstancePayload } from './types';
 
 /** Acquisition metadata shared by both inventory grant callbacks. */
@@ -28,6 +29,30 @@ export interface InventoryGrantOptions {
   readonly derivedFrom?: string;
 }
 
+/** The plain (payload-free) grant mutation behind Sim.addItem: stack the copies
+ *  into the bags, or, for a currency id (Heroic Marks), credit its counter and
+ *  touch no slot. The hub's receipt, discovery and Reliquary bookkeeping run
+ *  the same either way, so a marks grant reads exactly as it did as an item. */
+export function grantPlainStack(
+  meta: { inventory: InvSlot[]; heroicMarks: number },
+  itemId: string,
+  count: number,
+  opts?: InventoryGrantOptions,
+): void {
+  if (isCurrencyGrantId(itemId)) {
+    creditHeroicMarks(meta, count);
+    return;
+  }
+  addStacked(
+    meta.inventory,
+    itemId,
+    count,
+    undefined,
+    opts?.craftedRecipeId,
+    opts?.materialSources,
+  );
+}
+
 export function grantInventoryInstances(
   inventory: InvSlot[],
   itemId: string,
@@ -36,7 +61,7 @@ export function grantInventoryInstances(
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
 ): void {
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     addStacked(inventory, itemId, count, instance, craftedRecipeId, materialSources);
     return;
   }

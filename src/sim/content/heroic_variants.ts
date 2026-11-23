@@ -34,6 +34,7 @@ import {
   NYTHRAXIS_RAID_BOSS_ID,
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
 } from './heroic_loot';
+import { NYTHRAXIS_RELOCATED_ITEM_IDS } from './nythraxis_loot';
 import { TEMPLE_DUNGEON_DEFS } from './temple';
 import { WILDHEART_DUNGEON_DEFS } from './wildheart';
 
@@ -229,9 +230,11 @@ export function buildHeroicVariants(
   // (source 22). Anchored on the raid boss's normal loot so the loot-roll
   // auto-swap in a heroic claim yields the same raid-tier variant, and it stays
   // the single source of truth shared with the item-level source index.
-  const raidBases = new Set(
-    (mobs[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
-  );
+  const raidBases = new Set<string>([
+    ...(mobs[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
+    // The pieces relocated to the dungeons keep their raid-tier Heroic copies.
+    ...NYTHRAXIS_RELOCATED_ITEM_IDS,
+  ]);
   // A variant a five-man HEROIC BOSS table references directly (heroic_duskwhisper
   // on the Fanglord Beastmaster) registers at HEROIC_LOOT_SOURCE_LEVEL in the
   // item-level source index (item_level.ts applies the same non-raid bossId rule),

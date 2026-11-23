@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/basin_beastmaster_woc.glb",
+      "out": "models/creatures/woc_basin_beastmaster.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Hit",
+        "Attack",
+        "Attack2",
+        "WarCry",
+        "Ward",
+        "Quake",
+        "Cast",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

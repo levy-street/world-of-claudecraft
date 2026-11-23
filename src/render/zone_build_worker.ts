@@ -16,13 +16,50 @@
 // two ways depending on which thread built them. The tier arrives on the
 // request as `lowShade` instead.
 
+import { setActiveWorldContent } from '../sim/data';
+import { attachVoxelData, decodeVoxelRle } from '../sim/terrain_cuts';
+import type { TerrainCut, WorldContent } from '../sim/types';
+import type { CavityMeshArrays } from './cut_cavity_core';
+import { type CavityTileJob, cavityTransferList, marchCavityTile } from './cut_cavity_tile_core';
+import { type GroundPaletteTable, setGroundPaletteOverrides } from './ground_palette_override_core';
+
+/** FORK: dug volumes this worker holds, by identity (see VoxelVolumeMessage). */
+const voxStore = new Map<string, { vrev: number; data: Int8Array }>();
+
 import {
   beginChunkGeometry,
+  buildChunkCutFine,
   type ChunkGeometryArrays,
   fillChunkIndexRow,
   fillChunkVertexRow,
 } from './terrain_chunk_build';
-import { shoreDepthAt, shoreSlopeAt } from './water_core';
+import { shoreDepthAt, shoreDepthAttribute, shoreSlopeAt } from './water_core';
+
+/**
+ * The active world content, shipped to the worker so its copy of src/sim reads
+ * the SAME world the main thread does.
+ *
+ * A worker gets its own module instances, so `getActiveWorldContent()` there
+ * answers with the built-in world no matter what the editor loaded. Every
+ * content-dependent term the mesher reaches through world.ts then silently
+ * reverts: the height stamps an author sculpted (applyEditLayer), the zone
+ * biome, the roads, the water level, the biome paint. On a custom map that
+ * renders the UNEDITED world under correctly-placed props, a flat sea floor
+ * with a town floating over it (the Goldcrest report). The pool sends this
+ * before the first job and again whenever the content generation moves.
+ */
+export interface TerrainWorldContentMessage {
+  kind: 'content';
+  generation: number;
+  /**
+   * null = the built-in world, and it must stay null rather than a copy of it.
+   * Several readers (data.ts activeZoneList, and the zone x-bounds it feeds)
+   * tell the shipped world from an authored one by OBJECT IDENTITY, so a
+   * structured clone of BUILTIN_WORLD would read as a custom map and re-bound
+   * its zones. Passing null lets the worker restore its own instance.
+   */
+  content: WorldContent | null;
+}
 
 export interface TerrainChunkRequest {
   kind: 'chunk';
@@ -36,6 +73,15 @@ export interface TerrainChunkRequest {
   skirtSpan: number;
   /** Resolved by the main thread: see the note above about gfx.ts. */
   lowShade: boolean;
+  /** Boolean terrain cuts and the patches that undo them, resolved by the main
+   *  thread off the ACTIVE content (the worker has no world content of its
+   *  own). Plain data, so postMessage structured-clones them; a map with no
+   *  cuts sends nothing and the mesher keeps its old fast path. */
+  cuts?: readonly TerrainCut[];
+  cutPatches?: readonly TerrainCut[];
+  /** Palette-lab ground overrides (ground_palette_override_core.ts), present
+   *  once the main thread ever set one; null clears them back to stock. */
+  groundPalette?: GroundPaletteTable | null;
 }
 
 /** The sheet's vertex positions travel EXPLICITLY rather than being re-derived
@@ -47,9 +93,37 @@ export interface WaterFillRequest {
   x: Float32Array;
   z: Float32Array;
   seed: number;
+  /** Floor the dry shore depth (water_core.ts clampsDryShoreDepth), resolved
+   *  on the main thread. Absent = the raw depth (the built-in world). */
+  clampDry?: boolean;
 }
 
-export type ZoneBuildRequest = TerrainChunkRequest | WaterFillRequest;
+// FORK: the pool also ships the active world's content ahead of a job (see
+// TerrainWorldContentMessage above), so the worker meshes the SAME world.
+// FORK: a carve interior tile (render/cut_cavity_tile_core.ts): the camera
+// LOD passes and the bake march off the frame. The cuts ride the job already
+// narrowed to the tile; a dug volume's field travels as its RLE text.
+export interface CavityTileRequest extends CavityTileJob {
+  kind: 'cavity';
+  id: number;
+}
+/** FORK: a dug volume's field, shipped to a worker ONCE per revision (its
+ *  RLE text is megabytes for a big dig; cloning it per tile job cost more
+ *  than the march). No reply: it precedes, on the same ordered channel, the
+ *  cavity jobs whose cuts reference it by `vid`. */
+export interface VoxelVolumeMessage {
+  kind: 'voxel';
+  vid: string;
+  vrev: number;
+  text: string;
+  cells: number;
+}
+export type ZoneBuildRequest =
+  | TerrainChunkRequest
+  | WaterFillRequest
+  | TerrainWorldContentMessage
+  | CavityTileRequest
+  | VoxelVolumeMessage;
 
 export interface WaterFillArrays {
   shoreDepth: Float32Array;
@@ -59,6 +133,7 @@ export interface WaterFillArrays {
 export type ZoneBuildResponse =
   | ({ id: number; ok: true; kind: 'chunk' } & ChunkGeometryArrays)
   | ({ id: number; ok: true; kind: 'water-fill' } & WaterFillArrays)
+  | { id: number; ok: true; kind: 'cavity'; arrays: CavityMeshArrays | null }
   | { id: number; ok: false; error: string };
 
 /** Every buffer the response carries, so postMessage moves them instead of
@@ -73,10 +148,30 @@ function transferListFor(arrays: ChunkGeometryArrays): Transferable[] {
   ];
   if (arrays.splats) buffers.push(arrays.splats.buffer);
   if (arrays.extras) buffers.push(arrays.extras.buffer);
+  if (arrays.rim) {
+    buffers.push(
+      arrays.rim.positions.buffer,
+      arrays.rim.normals.buffer,
+      arrays.rim.uvs.buffer,
+      arrays.rim.indices.buffer,
+    );
+  }
+  if (arrays.clip) {
+    buffers.push(
+      arrays.clip.positions.buffer,
+      arrays.clip.normals.buffer,
+      arrays.clip.colors.buffer,
+      arrays.clip.uvs.buffer,
+      arrays.clip.indices.buffer,
+    );
+    if (arrays.clip.splats) buffers.push(arrays.clip.splats.buffer);
+    if (arrays.clip.extras) buffers.push(arrays.clip.extras.buffer);
+  }
   return buffers;
 }
 
 export function buildChunkArrays(job: TerrainChunkRequest): ChunkGeometryArrays {
+  if (job.groundPalette !== undefined) setGroundPaletteOverrides(job.groundPalette);
   const state = beginChunkGeometry(
     job.x0,
     job.z0,
@@ -86,6 +181,7 @@ export function buildChunkArrays(job: TerrainChunkRequest): ChunkGeometryArrays 
     job.withSplat,
     job.skirtSpan,
     job.lowShade,
+    job.cuts && job.cuts.length > 0 ? { cuts: job.cuts, patches: job.cutPatches } : null,
   );
   for (let row = 0; row < state.gh; row++) fillChunkVertexRow(state, row);
   for (let row = 0; row < state.gh - 1; row++) fillChunkIndexRow(state, row);
@@ -97,6 +193,7 @@ export function buildChunkArrays(job: TerrainChunkRequest): ChunkGeometryArrays 
     splats: state.splats,
     extras: state.extras,
     indices: state.indices,
+    ...buildChunkCutFine(state),
   };
 }
 
@@ -105,7 +202,10 @@ export function buildWaterFillArrays(job: WaterFillRequest): WaterFillArrays {
   const shoreDepth = new Float32Array(count);
   const shoreSlope = new Float32Array(count);
   for (let i = 0; i < count; i++) {
-    shoreDepth[i] = shoreDepthAt(job.x[i], job.z[i], job.seed);
+    shoreDepth[i] = shoreDepthAttribute(
+      shoreDepthAt(job.x[i], job.z[i], job.seed),
+      job.clampDry === true,
+    );
     shoreSlope[i] = shoreSlopeAt(job.x[i], job.z[i], job.seed);
   }
   return { shoreDepth, shoreSlope };
@@ -131,6 +231,18 @@ const workerScope: ZoneBuildWorkerScope | null =
 
 if (workerScope) {
   workerScope.onmessage = (event: MessageEvent<ZoneBuildRequest>) => {
+    if (event.data.kind === 'content') {
+      // No reply: the pool sends this immediately before the job that needs it,
+      // on the same ordered channel, so the job cannot overtake it.
+      setActiveWorldContent(event.data.content);
+      return;
+    }
+    if (event.data.kind === 'voxel') {
+      const v = event.data;
+      const data = decodeVoxelRle(v.text, v.cells);
+      if (data) voxStore.set(v.vid, { vrev: v.vrev, data });
+      return;
+    }
     const job = event.data;
     try {
       if (job.kind === 'water-fill') {
@@ -139,6 +251,21 @@ if (workerScope) {
           filled.shoreDepth.buffer,
           filled.shoreSlope.buffer,
         ]);
+        return;
+      }
+      if (job.kind === 'cavity') {
+        // Attach the shipped volumes to this job's cloned records (their
+        // text was stripped on the way in).
+        for (const cut of job.cuts) {
+          if (cut.shape !== 'voxel' || !cut.vid) continue;
+          const held = voxStore.get(cut.vid);
+          if (held && held.vrev === (cut.vrev ?? 0)) attachVoxelData(cut, held.data);
+        }
+        const arrays = marchCavityTile(job);
+        workerScope.postMessage(
+          { id: job.id, ok: true, kind: 'cavity', arrays },
+          arrays ? cavityTransferList(arrays) : [],
+        );
         return;
       }
       const arrays = buildChunkArrays(job);

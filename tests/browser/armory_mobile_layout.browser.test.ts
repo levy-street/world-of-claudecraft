@@ -43,7 +43,7 @@ describe('mobile Armory landscape layout', () => {
     store.innerHTML =
       '<div class="panel-title"><span>WOC Store</span>' +
       `<button type="button" class="x-btn" data-close aria-label="Close WOC Store">${svgIcon('close')}</button></div>` +
-      '<div class="woc-store-tabs"><button>Store</button><button>Daily Rewards</button></div>' +
+      '<div class="woc-store-tabs"><button>Cosmetic Store</button><button>Memberships</button></div>' +
       '<div class="dr-body woc-store-body">' +
       '<section class="armory-section rarity-rare"><header><div><span>Rare</span>' +
       '<h3>Test Collection</h3></div><span class="armory-section-price">500</span></header>' +

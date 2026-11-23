@@ -68,7 +68,13 @@ function probeToolByExecution(toolPath, shell) {
       settled = true;
       resolve(ok);
     };
-    const child = spawn(toolPath, ['-version'], { stdio: 'ignore', shell });
+    let child;
+    try {
+      child = spawn(toolPath, ['-version'], { stdio: 'ignore', shell });
+    } catch {
+      finish(false);
+      return;
+    }
     child.on('error', () => finish(false));
     child.on('exit', (code) => finish(code === 0));
   });

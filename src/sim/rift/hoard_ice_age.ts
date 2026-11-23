@@ -14,6 +14,7 @@
 // and only then do the pillars break. They are cues with a fixed life that ends
 // after the blast, so cover cannot vanish before it is judged.
 
+import { hoardDamageReduction } from '../content/treasure_maps';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
 import { hoardBossKit } from './hoard_boss_kits';
@@ -28,7 +29,7 @@ import {
   isIceAgeVariant,
 } from './hoard_ice_age_core';
 import { measureHoardRoom } from './hoard_room';
-import { hoardMechanicDamage, hoardPressure } from './hoard_scaling';
+import { hoardMechanicDamage, hoardPlayerBudget, hoardPressure } from './hoard_scaling';
 import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_ICE_AGE_ABILITY = 'Ice Age';
@@ -159,7 +160,7 @@ export function tickHoardIceAge(
   // keeps running while it waits (and through the cast itself), so it fires on
   // the first clean tick; the rarity cadence is applied once, at the reset below.
   if (state.cues.length > 0) return;
-  startIceAge(ctx, inst, boss, state, living, emit);
+  startIceAge(ctx, inst, boss, state, hoardPlayerBudget(inst.vault, living), emit);
   ice.timer = ICE_AGE_EVERY_SEC * hoardPressure(inst.vault).cadence;
 }
 
@@ -208,6 +209,7 @@ function landIcicles(
 
 function blast(
   ctx: SimContext,
+  inst: RiftInstance,
   boss: Entity,
   carrier: SweepCue,
   state: HoardBossState,
@@ -233,7 +235,11 @@ function blast(
     ctx.dealDamage(
       boss,
       player,
-      Math.round(player.maxHp * ICE_AGE.lethalHealthMultiplier),
+      Math.round(
+        player.maxHp *
+          ICE_AGE.lethalHealthMultiplier *
+          (inst.vault ? hoardDamageReduction(inst.vault.rarity, 'boss') : 1),
+      ),
       false,
       'frost',
       HOARD_ICE_AGE_ABILITY,
@@ -282,7 +288,7 @@ export function tickHoardIceAgeCue(
     ice.blasted = true;
     ice.casting = false;
     clearCast(boss);
-    blast(ctx, boss, cue, state, players);
+    blast(ctx, inst, boss, cue, state, players);
   }
   return cue.remaining > 1e-8;
 }

@@ -1,0 +1,129 @@
+.ed-pick-panel {
+  position: absolute;
+  left: 12px;
+  bottom: 14px;
+  z-index: 8;
+  max-width: min(330px, calc(100% - 24px));
+  padding: 10px 12px;
+  border: 1px solid var(--ed-line-strong);
+  border-radius: var(--ed-radius);
+  background: var(--ed-panel);
+  color: var(--ed-text);
+  box-shadow: var(--ed-shadow);
+  font-size: 12px;
+  max-height: calc(100% - 28px);
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.ed-pick-panel[hidden],
+.ed-pick-outline[hidden],
+.ed-pick-panel [hidden] {
+  display: none;
+}
+.ed-pick-panel p {
+  margin: 0 0 6px;
+}
+.ed-pick-panel .ed-pick-hint {
+  color: var(--ed-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.ed-pick-panel button {
+  min-height: 34px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--ed-line-strong);
+  border-radius: 4px;
+  color: inherit;
+  background: var(--ed-panel-2);
+  text-align: left;
+  cursor: pointer;
+}
+.ed-pick-panel button:hover,
+.ed-pick-panel button:focus-visible {
+  outline: 2px solid var(--ed-focus);
+  outline-offset: 1px;
+  background: var(--ed-panel-3);
+}
+.ed-pick-list {
+  display: grid;
+  gap: 4px;
+  max-height: min(240px, 36dvh);
+  overflow: auto;
+  margin: 8px 0;
+}
+.ed-pick-list button {
+  display: grid;
+  gap: 3px;
+}
+.ed-pick-list small {
+  font-size: 10px;
+  color: var(--ed-muted);
+}
+.ed-pick-outline {
+  position: absolute;
+  z-index: 7;
+  pointer-events: none;
+  border: 2px solid var(--ed-focus);
+  box-shadow: 0 0 0 1px var(--ed-bg);
+  border-radius: 3px;
+}
+.ed-pick-outline[data-behind="true"] {
+  border-style: dashed;
+}
+
+@media (pointer: coarse) {
+  .ed-pick-panel button {
+    min-height: 44px;
+  }
+}
+@media (forced-colors: active) {
+  .ed-pick-panel,
+  .ed-pick-panel button {
+    background: Canvas;
+    color: CanvasText;
+    border-color: ButtonText;
+  }
+  .ed-pick-panel :is(.ed-pick-hint, small) {
+    color: CanvasText;
+  }
+  .ed-pick-panel button:focus-visible {
+    outline-color: Highlight;
+  }
+  .ed-pick-outline {
+    border-color: Highlight;
+    box-shadow: none;
+  }
+}
+.ed-pick-navigation {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.ed-pick-navigation button {
+  text-align: center;
+}
+.ed-pick-list button[aria-pressed="true"] {
+  border-color: var(--ed-focus);
+  background: var(--ed-panel-3);
+}
+.ed-pick-floor-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  margin-top: 8px;
+}
+.ed-pick-floor-control input {
+  accent-color: var(--ed-focus);
+}
+.ed-pick-panel button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.ed-stage:has(> .ed-selection-quick-actions:not([hidden])) .ed-pick-panel {
+  max-height: calc(50% - 24px);
+}

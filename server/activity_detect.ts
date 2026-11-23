@@ -1,7 +1,8 @@
 // The tick's significant-activity chain: the per-event else-if body of
 // GameServer.detectActivity (the max-level ding, rare drops, masterwork and
 // legendary professions cards, the golden harvest, duel and arena results,
-// and the daily-reward delve observers), extracted from server/game.ts as a
+// the World PvP kill feed, the King of the Hill spawn announcements, and the
+// daily-reward delve observers), extracted from server/game.ts as a
 // move-not-rewrite (server/CLAUDE.md module-first; the monolith ratchet): arm
 // bodies and comments are verbatim, `this.X` became `deps.X`, and the loop's
 // `continue` became `return` (the chain was the last statement of the loop
@@ -14,6 +15,8 @@ import { emitCraftActivityCard } from './craft_activity';
 import { dailyRewardService } from './daily_rewards';
 import { enqueueActivity } from './discord_activity';
 import { duelActivityCard } from './discord_activity_pvp';
+import { enqueueHillAnnouncement, hillAnnouncementItem } from './discord_hill_feed';
+import { enqueuePvpKill, pvpKillFeedItem } from './discord_pvp_feed';
 import { REALM } from './realm';
 
 // The session slice the chain reads. GameServer's ClientSession satisfies it
@@ -139,6 +142,16 @@ export function detectActivityEvent<S extends ActivityDetectSession>(
       deps.profileUrlFor(ev.winnerName),
     );
     enqueueActivity(card.item, card.key, now);
+  } else if (ev.type === 'worldPvpKill') {
+    // The PvP kill feed (server/discord_pvp_feed.ts), its own outbox stream
+    // rather than an activity card: names only, no session lookups, and the
+    // sim already guarantees one event per death, so no dedupe key.
+    enqueuePvpKill(pvpKillFeedItem(ev, REALM));
+  } else if (ev.type === 'hillAnnounced') {
+    // King of the Hill spawn announcements for the same Discord PvP channel
+    // (server/discord_hill_feed.ts); the fall is dropped there.
+    const item = hillAnnouncementItem(ev, REALM, now);
+    if (item) enqueueHillAnnouncement(item);
   } else if (ev.type === 'arenaEnd' && !ev.draw && ev.pid !== undefined) {
     const s = deps.clients.get(ev.pid);
     if (!s) return;

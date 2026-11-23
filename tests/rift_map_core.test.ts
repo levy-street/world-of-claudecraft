@@ -429,6 +429,12 @@ describe('rift map live model', () => {
       ['wraithwood', 'dark-forest'],
       ['palmreach', 'sand'],
       ['galecrest', 'coast'],
+      ['eastbrook_vale', 'coast'],
+      ['mirefen_marsh', 'marsh'],
+      ['thornpeak_heights', 'coast'],
+      ['veiled_hollow', 'dark-forest'],
+      ['evergarden', 'moonlit-meadow'],
+      ['farshore_isle', 'coast'],
     ]);
   });
 

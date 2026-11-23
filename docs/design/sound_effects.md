@@ -99,8 +99,13 @@ apart; verify by ear or against the source before treating a hit as a defect.
 
 ### `src/game/sfx.ts` — `Sfx` (singleton `sfx`)
 A decoupled 3D engine with **its own `AudioContext` + `AudioListener`** (siblings:
-`audio`/`music`/`voice`). Driven by the `sfxVolume` setting (wired alongside
-`audio.setVolume` in `main.ts`). API:
+`audio`/`music`/`voice`). Two output buses, one per Audio panel slider: the
+effects master driven by the `sfxVolume` setting (wired alongside
+`audio.setVolume` in `main.ts`) and the ambience bus driven by `ambientVolume`.
+`sfxMixBus` (`src/game/sfx_mix_bus.ts`) picks the bus per clip key: the
+manifest's `ambience` category plus the procedural crowd bed go to ambience;
+everything else, including the point emitters of gameplay objects (rift portal,
+buried hoard, rift hazards), stays on effects. API:
 - `init()` — gated on the same user gesture as `audio.init()` (`enterWorld`);
   preloads the startup working set and lazily deduplicates fetch/decode work for
   contextual cues.
@@ -347,6 +352,7 @@ as footstep variant choice, not gameplay-affecting).
 | `amb_dungeon` | ✓ | global | a dark stone dungeon interior, dripping water echoes and a low ominous drone |
 | `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
 | `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
+| `amb_tavern` | yes | global, gated | a tavern room: overlapping talk and laughter, mugs, the hearth and a little lute music (project-synthesized, `scripts/gen_tavern_ambience_sfx.mjs`) |
 
 Point ambience (`amb_campfire`/`amb_forge`) shares the same falloff every
 other positional sound uses by default, but `amb_forge` gets its own,
@@ -357,6 +363,20 @@ This sets the stage for future station ambiences (Professions 2.0's other
 station types: kitchens, apothecary, tannery, loom, toolworks, see issue
 #2208) to get their own audible radius the same way: a new `AmbientPointSource`
 `kind` plus a named constant, no changes to the override mechanism itself.
+
+The Mirefen tavern's room bed (`amb_tavern`, point kind `tavern`) is the one point
+source that does not pan: `src/render/world_audio.ts` anchors it at the hall's middle
+(built-in world only), and `src/game/sfx.ts` plays it as a stereo bed through a
+lowpass (`setLoopLowpass`) whose level and cutoff come from the pure
+`src/game/tavern_ambience_core.ts` for where the player stands (the avatar's eye the
+renderer passes to `ambience()`, never the camera, which trails the player and sits in
+the doorway while they stand in the hall): full and clear inside
+the hall and the nook, muffled and quieter outside (loudest before the open door,
+fading over `TAVERN_AMBIENCE_RADIUS` yards from it, a low murmur through the walls
+close round the rest), blended over a couple of yards across the doorway so walking
+in and out never steps (`tests/tavern_ambience_core.test.ts`). The clip is a custom
+master baked as a seamless 16-bar loop; regenerate it with
+`node scripts/gen_tavern_ambience_sfx.mjs`, then `npm run sfx:manifest`.
 
 ### Interface and personal event cues
 

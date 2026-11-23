@@ -3,13 +3,13 @@
 //
 // Two objects, two draw calls, no per-frame CPU work beyond four uniform writes:
 //
-//  * TINT — a camera-facing quad pinned just past the near plane, drawn last with
+//  * TINT: a camera-facing quad pinned just past the near plane, drawn last with
 //    depth testing off. The scene fog already darkens distance toward the same
 //    blue (frame() applies an underwater fog override), but fog cannot reach
 //    the sky dome, which renders unfogged; the quad is what stops a clear sky
 //    showing through the surface from below and sells "you are inside water".
 //
-//  * BUBBLES — ONE THREE.Points whose whole animation lives in the vertex
+//  * BUBBLES: ONE THREE.Points whose whole animation lives in the vertex
 //    shader. Each point owns a fixed offset inside a box, a phase and a rise
 //    rate; the shader wraps it up the box with `mod`, so nothing is simulated,
 //    respawned or uploaded. The box rides the camera, so bubbles are always
@@ -20,8 +20,10 @@
 // the scene's materials, so surfacing simply fades the group back out.
 
 import * as THREE from 'three';
+import { isBuiltinWorldActive } from '../sim/data';
 import { waterLevelAt } from '../sim/world';
 import { createWaterApproachProbe } from './water_approach_core';
+import { drawnWaterLevelAt } from './water_core';
 
 /** The colour the world drowns toward. */
 export const UNDERWATER_TINT = 0x1d5f87;
@@ -33,6 +35,7 @@ export const UNDERWATER_FOG_FAR = 46;
 const UNDERWATER_FADE_DEPTH = 0.45;
 /** Peak opacity of the tint quad, at full submersion. */
 const TINT_OPACITY = 0.46;
+
 /** Vertical extent of the bubble column (yards). Points wrap within it. */
 const BUBBLE_BOX_HEIGHT = 9;
 /** Bubbles seat in an ANNULUS around the camera: anything spawned at the lens
@@ -81,17 +84,30 @@ export interface UnderwaterWaterSide {
 const BUBBLE_VERT = /* glsl */ `
   attribute vec3 aOffset;   // x/z seat in the box, y = starting height
   attribute vec2 aMotion;   // x = rise rate, y = wobble phase
+  attribute float aSize;    // relative radius, 0.35..1.6
   uniform float uTime;
   uniform float uHeight;
   uniform float uSize;
   varying float vFade;
+  varying float vSize;
   void main() {
-    float rise = aOffset.y + uTime * aMotion.x;
+    vSize = aSize;
+    // Bigger bubbles climb faster (buoyancy beats drag as radius grows), which
+    // is most of what makes a real bubble stream read as physical rather than
+    // as drifting dots.
+    float rise = aOffset.y + uTime * aMotion.x * (0.55 + aSize * 0.7);
     // mod() is the whole "respawn": a bubble leaving the top re-enters at the
     // bottom, so the stream is endless without any CPU-side particle bookkeeping.
     float y = mod(rise, uHeight) - uHeight * 0.5;
-    float wob = uTime * 1.7 + aMotion.y;
-    vec3 p = vec3(aOffset.x + sin(wob) * 0.14, y, aOffset.z + cos(wob * 0.83) * 0.14);
+    // Small bubbles jitter tightly and quickly, big ones sway wide and slow.
+    float wobRate = 2.6 / (0.5 + aSize);
+    float wobAmp = 0.06 + aSize * 0.16;
+    float wob = uTime * wobRate + aMotion.y;
+    vec3 p = vec3(
+      aOffset.x + sin(wob) * wobAmp,
+      y,
+      aOffset.z + cos(wob * 0.83 + aMotion.y) * wobAmp
+    );
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     // fade in off the bottom and out at the top so wrapping never pops
     float h = (y + uHeight * 0.5) / uHeight;
@@ -99,7 +115,7 @@ const BUBBLE_VERT = /* glsl */ `
     // Perspective size with a hard ceiling: a bubble that drifts close must not
     // grow into a full-screen sprite (point sprites have no far/near clipping
     // of their own, so this clamp IS the near plane for them).
-    gl_PointSize = clamp(uSize * 40.0 / max(0.6, -mv.z), 1.5, 18.0);
+    gl_PointSize = clamp(uSize * aSize * 40.0 / max(0.6, -mv.z), 1.5, 26.0);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -109,11 +125,55 @@ const BUBBLE_FRAG = /* glsl */ `
   uniform vec3 uColor;
   uniform float uOpacity;
   varying float vFade;
+  varying float vSize;
   void main() {
     vec2 d = gl_PointCoord - 0.5;
     float r = length(d) * 2.0;
     if (r > 1.0) discard;
     // a bright rim over a faint fill: reads as a gas bubble rather than a dot
+    float rim = smoothstep(0.5, 0.95, r);
+    // Specular pip up and to the left, the giveaway that a bubble is a lit
+    // sphere of gas. Only worth drawing on bubbles big enough to show it.
+    float pip = smoothstep(0.30, 0.0, length(d - vec2(-0.16, 0.16)))
+              * smoothstep(0.55, 1.1, vSize);
+    float a = uOpacity * vFade * (0.10 + rim * 0.8 + pip * 0.9)
+            * (1.0 - smoothstep(0.9, 1.0, r));
+    if (a <= 0.002) discard;
+    gl_FragColor = vec4(uColor + pip * 0.35, a);
+  }
+`;
+
+// The bubble pair the built-in world shipped with (one size, a fixed wobble, no
+// specular pip). The sized bubbles above are the Studio's, for authored maps.
+const BUBBLE_VERT_CLASSIC = /* glsl */ `
+  attribute vec3 aOffset;   // x/z seat in the box, y = starting height
+  attribute vec2 aMotion;   // x = rise rate, y = wobble phase
+  uniform float uTime;
+  uniform float uHeight;
+  uniform float uSize;
+  varying float vFade;
+  void main() {
+    float rise = aOffset.y + uTime * aMotion.x;
+    float y = mod(rise, uHeight) - uHeight * 0.5;
+    float wob = uTime * 1.7 + aMotion.y;
+    vec3 p = vec3(aOffset.x + sin(wob) * 0.14, y, aOffset.z + cos(wob * 0.83) * 0.14);
+    vec4 mv = modelViewMatrix * vec4(p, 1.0);
+    float h = (y + uHeight * 0.5) / uHeight;
+    vFade = smoothstep(0.0, 0.12, h) * (1.0 - smoothstep(0.82, 1.0, h));
+    gl_PointSize = clamp(uSize * 40.0 / max(0.6, -mv.z), 1.5, 18.0);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const BUBBLE_FRAG_CLASSIC = /* glsl */ `
+  precision mediump float;
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  varying float vFade;
+  void main() {
+    vec2 d = gl_PointCoord - 0.5;
+    float r = length(d) * 2.0;
+    if (r > 1.0) discard;
     float rim = smoothstep(0.5, 0.95, r);
     float a = uOpacity * vFade * (0.14 + rim * 0.8) * (1.0 - smoothstep(0.9, 1.0, r));
     if (a <= 0.002) discard;
@@ -164,8 +224,10 @@ export class UnderwaterView {
     this.group.add(this.tint);
 
     const count = lowGfx ? 40 : 140;
+    const classicBubbles = isBuiltinWorldActive();
     const offsets = new Float32Array(count * 3);
     const motion = new Float32Array(count * 2);
+    const sizes = new Float32Array(count);
     for (let i = 0; i < count; i++) {
       // seeded by nothing in particular: the pattern is ambient, not authored
       const a = Math.random() * Math.PI * 2;
@@ -176,11 +238,14 @@ export class UnderwaterView {
       offsets[i * 3 + 2] = Math.sin(a) * r;
       motion[i * 2] = 0.55 + Math.random() * 1.15; // yd/s of rise
       motion[i * 2 + 1] = Math.random() * Math.PI * 2;
+      // Skewed small: a real stream is mostly fine bubbles with a few fat ones.
+      if (!classicBubbles) sizes[i] = 0.35 + Math.random() ** 2.2 * 1.25;
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
     geo.setAttribute('aOffset', new THREE.BufferAttribute(offsets, 3));
     geo.setAttribute('aMotion', new THREE.BufferAttribute(motion, 2));
+    if (!classicBubbles) geo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), BUBBLE_BOX_HEIGHT);
 
     this.bubbleMat = new THREE.ShaderMaterial({
@@ -191,8 +256,8 @@ export class UnderwaterView {
         uColor: { value: new THREE.Color(0xdff2ff) },
         uOpacity: { value: 0 },
       },
-      vertexShader: BUBBLE_VERT,
-      fragmentShader: BUBBLE_FRAG,
+      vertexShader: classicBubbles ? BUBBLE_VERT_CLASSIC : BUBBLE_VERT,
+      fragmentShader: classicBubbles ? BUBBLE_FRAG_CLASSIC : BUBBLE_FRAG,
       transparent: true,
       depthTest: false,
       depthWrite: false,
@@ -216,7 +281,7 @@ export class UnderwaterView {
     dt: number,
   ): void {
     const cam = camera.position;
-    const level = waterLevelAt(cam.x, cam.z, seed);
+    const level = drawnWaterLevelAt(cam.x, cam.y, cam.z, seed);
     const water = this.water?.() ?? null;
     // The editor rebuilds the water view, disposing the underside material
     // the gate linked: the new one is gated afresh.

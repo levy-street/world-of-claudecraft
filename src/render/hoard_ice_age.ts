@@ -27,7 +27,6 @@ import {
 } from '../sim/rift/hoard_ice_age_core';
 import type { HoardBossCueView } from '../world_api/dungeons';
 import { loadGltf } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX, type GfxTier, surfaceMat } from './gfx';
@@ -57,7 +56,6 @@ function loadSource(): Promise<THREE.Group | undefined> {
     .catch(() => undefined);
   return loading;
 }
-if (typeof window !== 'undefined') registerDeferredPreload(loadSource);
 
 const BURSTS = 240;
 const SNOW = 520;

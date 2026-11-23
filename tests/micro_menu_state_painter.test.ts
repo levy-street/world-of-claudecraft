@@ -40,6 +40,7 @@ function mountRail(): void {
     btn.id = selector.slice(1);
     btn.className = 'micro-btn ui-icon-btn ui-icon-btn--micro';
     document.body.appendChild(btn);
+    if (document.getElementById(windowId)) continue;
     const win = document.createElement('div');
     win.id = windowId;
     win.className = 'window panel';
@@ -88,7 +89,7 @@ describe('microMenuWindowOpen: reads the shared open-window marker', () => {
       lookups.mock.calls.filter(([id]) => windowIds.has(String(id))).length;
 
     painter.paint(v.tick(microMenuWindowOpen, { talentPoints: 0 }));
-    expect(windowLookups()).toBe(MICRO_MENU_LAUNCHERS.length);
+    expect(windowLookups()).toBe(windowIds.size);
     lookups.mockClear();
 
     painter.paint(v.tick(microMenuWindowOpen, { talentPoints: 0 }));
@@ -125,6 +126,20 @@ describe('microMenuWindowOpen: reads the shared open-window marker', () => {
 });
 
 describe('MicroMenuStatePainter: the open-window ring', () => {
+  it('rings both Groups launchers from their shared window', () => {
+    const painter = new MicroMenuStatePainter(facet().writers);
+    const v = view();
+    for (const open of [true, false]) {
+      openWindow('dungeon-finder-window', open);
+      painter.paint(v.tick(microMenuWindowOpen, { talentPoints: 0 }));
+      for (const id of ['mm-dfinder', 'expedition-bell']) {
+        const button = document.getElementById(id)!;
+        expect(button.classList.contains('is-on')).toBe(open);
+        expect(button.getAttribute('aria-pressed')).toBe(String(open));
+      }
+    }
+  });
+
   it('rings the open launcher and clears the rest', () => {
     const { writers } = facet();
     const painter = new MicroMenuStatePainter(writers);

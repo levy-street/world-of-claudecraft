@@ -13,6 +13,10 @@
 // encounter arms a settle (NYTHRAXIS_SOUL_REND_SETTLE_SECONDS, read only by
 // the storm cast) so the storm never opens on a freshly stacked raid.
 //
+// Bone Storm is retired from play (NYTHRAXIS_BONE_STORM_ENABLED), so the
+// release and the settle above only matter if the switch is flipped back.
+// The fire gap below is live: it keeps Grave Eruption clear of the marks.
+//
 // `src/sim`-pure: no rng, no wall clock, no DOM. The driver in
 // encounters/nythraxis.ts calls releaseNythraxisSoulRendMarks from
 // startNythraxisBoneStorm.
@@ -26,6 +30,13 @@ export const NYTHRAXIS_SOUL_REND_AURA_ID = 'nythraxis_soul_rend';
  * time it already gets after any other major to spread out.
  */
 export const NYTHRAXIS_SOUL_REND_SETTLE_SECONDS = 6;
+/**
+ * Seconds after the Soul Rend marks are gone (detonated or released) before a
+ * Grave Eruption may begin telegraphing: the marked raiders read their circle,
+ * the circle clears, and only then do the floor circles start (owner call,
+ * 2026-10-02). A due eruption also waits out the live marks themselves.
+ */
+export const NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS = 1.5;
 
 /**
  * Strip every live Soul Rend mark without resolving it: the aura comes off

@@ -193,6 +193,8 @@ function buildMountPreview(
 
   function createRider(): CharacterVisual {
     const pv = previewAppearanceVisual(currentAppearance);
+    // the rider's real hands: a weapon slot with nothing equipped is an empty hand, as in
+    // the world
     const visual = new CharacterVisual(
       pv.visualKey,
       0xffffff,
@@ -200,6 +202,8 @@ function buildMountPreview(
       pv.weaponItemId,
       pv.weaponOverride,
       pv.offhandItemId,
+      null,
+      { bareWhenUnarmed: true },
     );
     const skin = currentAppearance.weaponSkinId;
     if (skin) visual.setWeaponSkin(skin);

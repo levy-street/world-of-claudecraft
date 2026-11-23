@@ -142,6 +142,19 @@
       "output": "shrapnel_charge.webp"
     },
     {
+      "abilityId": "scatterbolt",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated Scatterbolt art for PR #4488",
+      "output": "scatterbolt.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A wooden and steel crossbow firing three scattered bolts through an orange-gold explosion.",
+      "generationPrompt": "Use case: stylized-concept. Asset type: square painted fantasy MMO action-bar ability icon, Scatterbolt. Primary request: a crossbow with an explosion. A single unmistakable chunky medieval crossbow in a dramatic three-quarter view, dark wood stock and steel bow limbs, firing a powerful orange-gold explosive burst with three short bolts scattering outward. Large clear crossbow silhouette occupies most of the square, diagonal lower-left to upper-right composition, blast just beyond the front of the weapon. Dark smoky brown background with vivid amber sparks. Hand-painted classic fantasy RPG spell icon, bold brushwork, strong warm highlights and dark outlines, simple readable shapes at 32 pixels. Full-bleed square artwork, opaque background. No border, no frame, no lettering, no text, no watermark, no hands or people, no modern gun.",
+      "acceptedSha256": "90e5e8fbe4c382226f47a29c57ada5f74acea4fcfe36d0b45ef39f4b918dc169",
+      "acceptedBytes": 6650
+    },
+    {
       "abilityId": "bloodtrail_assault",
       "sourcePack": "OpenAI image generation through Codex",
       "sourceFile": "project-generated for PR #2218",
@@ -469,6 +482,54 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for hunter\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Drakesting (wyvern_sting)\nCanonical mechanic: Drakesting incapacitates a target 8 to 30 yd away for up to 4 sec; damage breaks it; 60 sec cooldown.\nSubject: A winged serpent stinger piercing a closing eye with sleep vapor.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "play_dead",
+      "output": "play_dead.webp",
+      "sourcePack": "OpenAI built-in image generation for PR #4488",
+      "sourceFile": "play_dead.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A black-and-white skunk playing dead with paws up and tongue out.",
+      "acceptedSha256": "df557fc7975af2e1552132e10c9b2127ae3475db4401ca3a91e437a6ed9d1ec4",
+      "acceptedBytes": 5766
+    },
+    {
+      "abilityId": "tactical_camo",
+      "output": "tactical_camo.webp",
+      "sourcePack": "OpenAI built-in image generation for PR #4488",
+      "sourceFile": "tactical_camo.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A leafy bush covered with woodland military camouflage cloth and netting.",
+      "acceptedSha256": "56efcbf3ec38cbb11f796e52b686c4151e53981cd6ab0687292915f854abb68e",
+      "acceptedBytes": 7058
+    },
+    {
+      "abilityId": "bear_trap",
+      "output": "bear_trap.webp",
+      "sourcePack": "OpenAI built-in image generation for PR #4488",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "sourceFile": "bear_trap.png",
+      "intendedVisualSubject": "An open steel bear trap.",
+      "acceptedSha256": "c8723bff8ff951b8bf4629c930092a28d10af89ce4f8ddbf66b237f42a865899",
+      "acceptedBytes": 5092
+    },
+    {
+      "abilityId": "phosphor_flask",
+      "output": "phosphor_flask.webp",
+      "sourcePack": "OpenAI built-in image generation for PR #4488",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "sourceFile": "molotov_cocktail.png",
+      "intendedVisualSubject": "A flaming green glass bottle (approved as the Molotov Cocktail painting, shipped as Phosphor Flask).",
+      "acceptedSha256": "63a91e2b64690cef7b6182797772572ff0308bbb713352982b9941e6b3c080eb",
+      "acceptedBytes": 5446
     }
   ],
   "note": "The v0.29 Hunter class rework icons are original project-generated art. Earlier abilities retain their recorded CraftPix provenance. Existing procedural recipes remain available as runtime resilience if a static asset cannot load.",

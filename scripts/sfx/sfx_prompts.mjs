@@ -134,6 +134,8 @@ export const SFX = [
   // (foot_<surface>) through Sfx.mountRun's fallback branch. A mount is opted
   // into that fallback purely by the ABSENCE of its key here, so adding one
   // back is all it takes to give either of them a bespoke stride again.
+  // Wobbles the Slime (developer mount) borrows the footfall the same way
+  // until a bespoke squelch is generated for it.
   {
     key: 'mount_run_goblin_rocket_sled_start',
     custom: true,
@@ -239,6 +241,17 @@ export const SFX = [
   },
   {
     key: 'mount_run_terrorspark_groundshaker_stop',
+    custom: true,
+  },
+  {
+    // The Lantern Hall Destrier's whinny as it rears on its hind legs (a standing jump while
+    // mounted, src/render/mount_rear_core.ts): two takes generated with the ElevenLabs Sound
+    // Effects API (eleven_text_to_sound_v2, 2026-10-16) and picked by the maintainer, prompt
+    // "A powerful heavy war horse rearing up and letting out a loud, proud whinny neigh, with a
+    // short snort at the end, realistic recording, close, no music, no voices, about 2 seconds".
+    // Stored as custom masters so a paid regeneration never replaces the picked takes; the
+    // variant pool rotates them with a no-repeat bias.
+    key: 'mount_neigh_lantern_hall_destrier',
     custom: true,
   },
   {
@@ -987,6 +1000,22 @@ export const SFX = [
     stereo: true,
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
+  {
+    // Project-generated (not ElevenLabs): scripts/gen_tavern_ambience_sfx.mjs synthesizes
+    // the Mirefen tavern's room of talk, mugs and hearth crackle from fixed seeds and mixes
+    // in the Fenbridge town theme rendered from the procedural score, baking a crossfaded
+    // wrap so the runtime's plain loop=true playback has no seam. custom is load-bearing: the
+    // generator masters the bed itself (about -17 LUFS, peaks near -8 dBFS), so conform only
+    // enforces the true-peak ceiling and never retargets it. stereo: a non-positional bed
+    // (src/game/sfx.ts plays it through the tavern ambience's lowpass, never a panner).
+    key: 'amb_tavern',
+    duration: 44,
+    loop: true,
+    stereo: true,
+    custom: true,
+    prompt:
+      'A lively medieval tavern room: overlapping talk and laughter, mugs clinking, a hearth crackling and a little lute music from the corner. Seamless loop.',
+  },
 
   // --- Custom recordings (not ElevenLabs) ----------------------------------
   { key: 'quest_accept', custom: true },
@@ -1205,6 +1234,26 @@ export const SFX = [
   { key: 'rift_ice_glide', custom: true, loop: true }, // point-source loop for a player currently gliding
   { key: 'rift_ice_stop', custom: true }, // skidding to a halt off the ice
   { key: 'rift_lava_tick', custom: true }, // the 1 Hz lava/blackwater hazard burn tick
+  // Gourdlight Eve: synthesized from scratch by scripts/sfx/gourdlight_sfx.mjs (original,
+  // no samples; CREDITS.md). Old Thatchgrin's Gourdfall and Swelling Gourd ride the
+  // spellfxAt sfxKey (the impacts) and the renderer's scarecrow layer (the whistle, the
+  // ripening pulse); the Emberbristle Broom's own stride and hover hum.
+  { key: 'proj_gourdfall_whistle', custom: true },
+  { key: 'impact_gourdfall', custom: true },
+  { key: 'spell_swelling_gourd_pulse', custom: true },
+  { key: 'impact_swelling_gourd_burst', custom: true },
+  { key: 'mount_run_emberbristle_broom', custom: true },
+  { key: 'mount_idle_emberbristle_broom', custom: true, loop: true },
+  // Hester's toys (src/sim/seasonal/seasonal_toys.ts, toy_cauldron.ts): the spellfxAt
+  // sfxKey (the lantern, the bats, the candle, the cauldron set down and drunk from) and the
+  // render toy layer (the prank's splat on landing, the cauldron's bubbling at its spot).
+  { key: 'impact_prank_pumpkin_splat', custom: true },
+  { key: 'spell_wanderwisp_lantern', custom: true },
+  { key: 'spell_startled_bats', custom: true },
+  { key: 'spell_murmurwick_candle', custom: true },
+  { key: 'spell_gurglegreen_cauldron', custom: true },
+  { key: 'gurglegreen_bubble_loop', custom: true, loop: true },
+  { key: 'spell_gurglegreen_quaff', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

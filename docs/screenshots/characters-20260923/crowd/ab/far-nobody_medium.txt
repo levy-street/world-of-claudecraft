@@ -1,0 +1,40 @@
+WOC crowd A/B rig, one arm: far-nobody
+STATUS: performance evidence (headed, real GPU, quiet host).
+
+arm      http://127.0.0.1:5303  sha 61bc4f62e22e (worktree dirty outside the served files)  branch feature/woc-characters  dev build  page build id 61bc4f62e22e
+served   ~/woc-size-tiers (working directory of the process listening on the port)
+browser  Chrome/154.0.8037.95  headed  fresh profile  vsync flags untouched
+webgl    ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)  (timer query extension: yes)
+flags    ?gfx=medium&governor=0&gputimer=1&fpscap=60&wocfarbodytint=off  viewport 1920x953 @1  drawing buffer 1920x953
+pacing   headed: frames paced by the display vsync; cadence unknown at 0.0 Hz, ceiling 60, raw rAF median 8.3 ms
+host     Apple M4 Pro, 14 cores, load 5.1 at start and 4.1 at end
+         5 MB swapped in and out during the run
+throttle no throttle
+daylight frozen at phase 0.5 (0.5 is noon)
+date     2026-10-05T09:55:36.758Z
+
+crowd    40 bots through the sim: 9 classes, 20 male and 20 female, default faces, six worn slots on 40/40
+         worn set cryptbone_helm, cryptbone_pauldrons, mistveil_grips, recruit_tunic, mistveil_cord, oiled_boots
+         this arm draws fixed class rigs (the WOC bodies): each shows its own class piece for every worn slot
+
+scene      gpu ms/frame   draws   triangles   frame mean / p95 ms   over 50 ms   time over 33.4 ms   long tasks (n, max)   programs   bodies
+SOLO               3.99     378       1.34M          16.67 / 20.2            0              0.00 s               0, 0 ms   349 (+0)   
+FAR                4.26     550       1.59M          16.67 / 20.8            0              0.00 s               0, 0 ms   374 (+0)   drawn 40/40, articulated 0, far mesh 40
+
+FAR over SOLO: +172 draws (4.3 a body), +0.25M triangles (6,200 a body), +0.274 ms GPU (0.0070 ms a body)
+
+gpu-prep events per window (lifetime counter deltas):
+  SOLO     live-program 0, gate-timeout 0
+  FAR      live-program 0, gate-timeout 0
+
+build ledger, view rows per window (count, total ms, mean ms; max is the lifetime worst):
+  SOLO     no view build
+  FAR      no view build
+
+background queue units per window (kind x units, the six busiest):
+  SOLO     none
+  FAR      none
+
+settles  entry 50 s, far 15 s
+rig      its own work inside the windows: SOLO 10.4 ms, FAR 9.7 ms
+health   page errors 0, console errors 2, WebGL messages 0, failed asset requests 0

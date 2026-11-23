@@ -9,7 +9,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random or
 // Date.now (enforced by tests/architecture.test.ts).
 
-import { DEV_KIT_ROLES, devKitRole } from '../content/dev_kit_roles';
+import { DEV_KIT_ROLES, type DevKitRole, devKitRole } from '../content/dev_kit_roles';
 import { SEASON2_STOCK } from '../content/pvp_honor_season2';
 import { RIFT_GEAR_ITEM_ID_SET } from '../content/rift/items';
 import { ITEMS } from '../data';
@@ -38,17 +38,18 @@ const SEASON2_STOCK_IDS: ReadonlySet<string> = new Set(SEASON2_STOCK);
 // spec-less caller takes the line of the class's FIRST-LISTED spec in
 // DEV_KIT_ROLES (talent-tree order: holy for paladins, elemental for shamans,
 // balance for druids), which is the same pick the raw sum happened to land on
-// for those classes; a deliberate rule, not an accident of the table.
+// for those classes; a deliberate rule, not an accident of the table. The same
+// resolved role decides whether Healing Power pieces are candidates at all.
 const CASTER_LINE = ['int', 'spi', 'sta'] as const;
 const PHYSICAL_LINE = ['str', 'agi', 'sta'] as const;
-function lineStatsFor(
-  cls: string,
-  spec: string | null,
-): readonly ('str' | 'agi' | 'sta' | 'int' | 'spi')[] {
-  const role =
+function roleFor(cls: string, spec: string | null): DevKitRole | null {
+  return (
     (spec ? devKitRole(cls as PlayerClass, spec) : null) ??
     DEV_KIT_ROLES[cls as PlayerClass]?.[0] ??
-    null;
+    null
+  );
+}
+function lineStatsFor(role: DevKitRole | null): readonly ('str' | 'agi' | 'sta' | 'int' | 'spi')[] {
   return role?.weights.int ? CASTER_LINE : PHYSICAL_LINE;
 }
 
@@ -77,10 +78,16 @@ export function bestEpicGearFor(
   spec: string | null,
 ): Partial<Record<EquipSlot, string>> {
   const collectionRole = collectionRoleForSpec(cls as PlayerClass, spec);
-  const line = lineStatsFor(cls, spec);
+  const role = roleFor(cls, spec);
+  const line = lineStatsFor(role);
   const epics = Object.values(ITEMS).filter(
     (item) =>
       item.quality === 'epic' &&
+      // Healing Power never damages (the directionality contract), so a
+      // non-healer role never takes a healer piece over its own affix; the
+      // line-only score below cannot see that difference. (dev_kit.ts scores
+      // Healing Power at zero for the same roles; this picker excludes it.)
+      (role?.healer === true || (item.healPower ?? 0) === 0) &&
       (item.kind === 'armor' || item.kind === 'weapon') &&
       // Raid best-in-slot: Warfare Season 2 honor gear is never a pick, so the
       // tank and weapon guards that compare it against this stay honest.

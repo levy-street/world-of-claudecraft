@@ -352,7 +352,7 @@ describe('Smolderstrike 4pc: the Lights Out refund proc', () => {
 });
 
 describe("Ashveil 2pc: the Lurker's Strike damage row", () => {
-  it('resolves ambush to bonus 36 and weaponMult 3.225 for wearers (29 and 2.6 base)', () => {
+  it('resolves ambush to bonus 39 and weaponMult 3.475 for wearers (32 and 2.85 base)', () => {
     // Delivered arithmetic (the additive accumulator): v0.42.0 Skulduggery
     // (docs/design/class-balance-v042.md) dropped subtlety's baseline global
     // meleeDmgPct 0.08 -> 0.04 AND retired ambush's own baseline dmgPct row
@@ -365,14 +365,18 @@ describe("Ashveil 2pc: the Lurker's Strike damage row", () => {
     // round(28 x 1.29) = 36 (control round(28 x 1.04) = 29) and weaponMult
     // 2.5 x 1.29 (control 2.5 x 1.04); the in-veil Veiled Edge multiplier
     // lands on the scaled weapon component afterward.
+    // The rogue tweak pass then gives Skulduggery a 0.10 offensive physical
+    // bonus (spec_output_tuning.ts) on the same additive accumulator: control
+    // 1.14, wearer 1.39 (~+22 percent delivered). bonus round(28 x 1.39) = 39
+    // (control round(28 x 1.14) = 32), weaponMult 2.5 x 1.39 (control 2.5 x 1.14).
     const base = abilitiesKnownAt('rogue', 25, rogueMods('subtlety', {}));
     const setw = abilitiesKnownAt('rogue', 25, rogueMods('subtlety', worn('ashveil', 2)));
     const baseStrike = weaponStrikeOf(expectDefined(base.find((k) => k.def.id === 'ambush')));
     const wornStrike = weaponStrikeOf(expectDefined(setw.find((k) => k.def.id === 'ambush')));
-    expect(baseStrike.bonus).toBe(29);
-    expect(baseStrike.weaponMult).toBeCloseTo(2.5 * 1.04, 6);
-    expect(wornStrike.bonus).toBe(36);
-    expect(wornStrike.weaponMult).toBeCloseTo(2.5 * 1.29, 6);
+    expect(baseStrike.bonus).toBe(32);
+    expect(baseStrike.weaponMult).toBeCloseTo(2.5 * 1.14, 6);
+    expect(wornStrike.bonus).toBe(39);
+    expect(wornStrike.weaponMult).toBeCloseTo(2.5 * 1.39, 6);
   });
 });
 

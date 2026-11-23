@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CommitCoalescer,
+  groupMemberPoint,
   NORTH_UP_YAW,
   NUDGE_STEP_BIG_YD,
   NUDGE_STEP_YD,
@@ -95,7 +96,7 @@ describe('scaleStep', () => {
 
   it('clamps to the inspector slider bounds', () => {
     expect(scaleStep(PLACEMENT_SCALE_MAX, -100)).toBe(PLACEMENT_SCALE_MAX);
-    expect(scaleStep(4.9, -100)).toBe(PLACEMENT_SCALE_MAX);
+    expect(scaleStep(49.9, -100)).toBe(PLACEMENT_SCALE_MAX);
     expect(scaleStep(PLACEMENT_SCALE_MIN, 100)).toBe(PLACEMENT_SCALE_MIN);
     expect(scaleStep(0.21, 100)).toBe(PLACEMENT_SCALE_MIN);
   });
@@ -147,5 +148,44 @@ describe('CommitCoalescer (one undo commit per burst)', () => {
     c.tick(600);
     expect(c.due(999)).toBe(false);
     expect(c.due(1_000)).toBe(true);
+  });
+});
+
+describe('groupMemberPoint (multi-selection group transforms)', () => {
+  it('translates rigidly when only moving (dRot 0, ratio 1)', () => {
+    const pt = groupMemberPoint(5, 8, 0, 0, 3, -2, 0, 1);
+    expect(pt.x).toBeCloseTo(8);
+    expect(pt.z).toBeCloseTo(6);
+  });
+
+  it('orbits members about the pivot on rotation (+Y convention: +X toward -Z)', () => {
+    // Member one yard along +X from the pivot; +90 degrees sends it to -Z.
+    const pt = groupMemberPoint(11, 20, 10, 20, 0, 0, Math.PI / 2, 1);
+    expect(pt.x).toBeCloseTo(10);
+    expect(pt.z).toBeCloseTo(19);
+    // A full turn brings it home.
+    const home = groupMemberPoint(11, 20, 10, 20, 0, 0, Math.PI * 2, 1);
+    expect(home.x).toBeCloseTo(11);
+    expect(home.z).toBeCloseTo(20);
+  });
+
+  it('spreads members from the pivot on scale', () => {
+    const pt = groupMemberPoint(12, 21, 10, 20, 0, 0, 0, 2);
+    expect(pt.x).toBeCloseTo(14);
+    expect(pt.z).toBeCloseTo(22);
+  });
+
+  it('composes scale, rotation, and translation', () => {
+    // Offset (1, 0) scales to (3, 0), rotates -90deg to (0, +3)... in three.js
+    // +Y terms: -angle turns +X toward +Z. Then the group shifts by (5, 5).
+    const pt = groupMemberPoint(1, 0, 0, 0, 5, 5, -Math.PI / 2, 3);
+    expect(pt.x).toBeCloseTo(5);
+    expect(pt.z).toBeCloseTo(8);
+  });
+
+  it('keeps a member sitting on the pivot pinned through any rotate/scale', () => {
+    const pt = groupMemberPoint(10, 20, 10, 20, 0, 0, 1.234, 7);
+    expect(pt.x).toBeCloseTo(10);
+    expect(pt.z).toBeCloseTo(20);
   });
 });

@@ -1,16 +1,17 @@
 // Exact material rows for anonymous transfers; quantities stay compressed.
-import { isMaterialItemId, materialItemIds } from './material_ids';
+
 import { type MaterialTakePlan, planMaterialInventoryTake } from './material_inventory_take';
 import { materialSourceUnitPayload } from './material_inventory_units';
 import { materialPayloadKey } from './material_payload_identity';
 import { mergeMaterialCompositions } from './material_sources';
 import { normalizeMaterialStack } from './material_stack';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from './stack_provenance_ids';
 import type { InvSlot } from './types';
 
 export function coalesceMaterialTransferSlots(slots: readonly InvSlot[]): InvSlot[] {
   const rows = new Map<string, InvSlot>();
   for (const slot of slots) {
-    const read = normalizeMaterialStack(slot, materialItemIds());
+    const read = normalizeMaterialStack(slot, stackProvenanceItemIds());
     if (!read.ok) throw new Error('invalid material transfer composition');
     const key = materialPayloadKey(read.value);
     const held = rows.get(key);
@@ -34,12 +35,12 @@ export function planPlainMaterialTransfer(
   itemId: string,
   count: number,
 ): { plan: MaterialTakePlan; rows: InvSlot[] } | null {
-  if (!isMaterialItemId(itemId)) return null;
+  if (!isStackProvenanceItemId(itemId)) return null;
   const plan = planMaterialInventoryTake({
     inventory,
     itemId,
     count,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     eligibleSource: (source, slot) => materialSourceUnitPayload(slot, source) === undefined,
   });
   if (!plan.ok) throw new Error('material transfer does not match available stock');

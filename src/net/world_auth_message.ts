@@ -1,9 +1,18 @@
+import { DESKTOP_API_ORIGIN } from '../client_origin';
+import { runtimeWebSocketUrl } from '../runtime';
 import {
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE,
   PET_SPECIAL_WIRE_VERSION,
 } from '../world_api';
 import { STABLE_TIMER_WIRE_VERSION } from './snapshot_timer_wire';
+
+/** The world socket's URL for this page (moved from online.ts, which
+ *  re-exports it): the desktop shell dials its API origin, every other host
+ *  the page's own. */
+export function buildWebSocketUrl(protocol: string, host: string): string {
+  return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
+}
 
 export function buildWebSocketAuthMessage(
   token: string,

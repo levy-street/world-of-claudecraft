@@ -1,7 +1,7 @@
 // Lightning Strike (src/sim/rift/hoard_lightning_strike.ts): the Storm Caller
 // locks a player's position, warns for about a second, then hits whoever stands
 // in the circle. One test per acceptance criterion of the owner's brief.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { hoardCueAppearance } from '../src/render/hoard_boss_fx_core';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -132,7 +132,19 @@ describe('Storm Caller Lightning Strike', () => {
     sim.player.pos = { ...sim.player.pos, x: cue.x + HOARD_LIGHTNING_STRIKE.radius - 0.2 };
     expect(pointInLightningStrike(cue, sim.player.pos)).toBe(true);
     const hpBefore = sim.player.hp;
+    const damage = vi.spyOn(sim.ctx, 'dealDamage');
     tick(sim, caller, HOARD_LIGHTNING_STRIKE.telegraphSec * 0.6);
+    expect(damage).toHaveBeenCalledWith(
+      caller,
+      sim.player,
+      148,
+      false,
+      'nature',
+      'Lightning Strike',
+      'hit',
+      true,
+    );
+    damage.mockRestore();
     // Through the ordinary combat path, so armour-free nature damage near the
     // authored share of the reference health.
     const lost = hpBefore - sim.player.hp;
@@ -144,7 +156,8 @@ describe('Storm Caller Lightning Strike', () => {
       Math.round(
         HOARD_REFERENCE_HEALTH *
           HOARD_LIGHTNING_STRIKE.damageFraction *
-          HOARD_RARITY_PRESSURE.epic.damage,
+          HOARD_RARITY_PRESSURE.epic.damage *
+          0.5,
       ),
     );
     expect(

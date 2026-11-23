@@ -3,16 +3,14 @@
 // close() releases it immediately. The committed portrait remains the loading,
 // reduced-motion, no-WebGL, and failure fallback.
 
+import type { GuideModelSpec } from '../guide/content.generated';
 import type { LinkedProgramTouchQueue } from '../render/linked_program_touch_lane';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import type { RaidBossGuideBoss } from './raid_boss_guide_view';
 
-export interface RaidBossGuideModelSpec {
-  url: string;
-  idle: string | null;
-  height: number;
-  yaw?: number;
-}
+/** The standalone guide viewer's model spec (the raid pins its three; a
+ *  dungeon page resolves its boss's in-game model, boss_journal/journal_model_spec.ts). */
+export type RaidBossGuideModelSpec = GuideModelSpec;
 
 export const RAID_BOSS_GUIDE_MODEL_SPECS: Readonly<
   Record<RaidBossGuideBoss, RaidBossGuideModelSpec>
@@ -55,7 +53,12 @@ export type RaidBossGuideModelViewerFactory = (
 ) => Promise<RaidBossGuideModelViewer>;
 
 export interface RaidBossGuideModelMountOptions {
-  boss: RaidBossGuideBoss;
+  /** The model's identity across re-renders: a raid boss slug or a dungeon mob id. */
+  boss: string;
+  /** The model to load. Absent: the raid's pinned spec for `boss`. Null: no 3D
+   *  model for this boss, so the committed portrait stays (no WebGL context). */
+  spec?: RaidBossGuideModelSpec | null;
+  tint?: number | null;
   name: string;
   posterUrl: string;
   canvasLabel: string;
@@ -68,12 +71,29 @@ export interface RaidBossGuideModelMountOptions {
 
 type ModelState = 'idle' | 'loading' | 'ready' | 'error' | 'nowebgl';
 
+/** The shared GLB cache the real viewer loads through: the journal releases,
+ *  on close, the boss files it was first to bring in (a Dungeon Finder visit
+ *  can browse two dozen bosses the world never needed). Injected for tests. */
+export interface RaidBossGuideGltfCache {
+  isCached(url: string): boolean;
+  release(url: string): void;
+}
+
+let sharedLoader: typeof import('../render/assets/loader') | null = null;
+
+const DEFAULT_GLTF_CACHE: RaidBossGuideGltfCache = {
+  // Unknown until the real viewer has loaded the module: never release then.
+  isCached: (url) => sharedLoader?.isGltfCached(url) ?? true,
+  release: (url) => sharedLoader?.releaseGltf(url),
+};
+
 async function createDefaultViewer(
   stage: HTMLElement,
   canvasLabel: string,
   touchQueue: () => LinkedProgramTouchQueue | null = () => null,
 ): Promise<RaidBossGuideModelViewer> {
   const { ModelViewer } = await import('../guide/viewer/scene');
+  sharedLoader ??= await import('../render/assets/loader');
   return new ModelViewer(stage, canvasLabel, touchQueue);
 }
 
@@ -107,10 +127,12 @@ export class RaidBossGuideModelController {
   private viewer: RaidBossGuideModelViewer | null = null;
   private visibilityObserver: IntersectionObserver | null = null;
   private loadQueue: Promise<void> = Promise.resolve();
-  private requestedBoss: RaidBossGuideBoss | null = null;
-  private loadedBoss: RaidBossGuideBoss | null = null;
+  private requestedBoss: string | null = null;
+  private loadedBoss: string | null = null;
   private options: RaidBossGuideModelMountOptions | null = null;
   private webglSupported: boolean | null = null;
+  /** GLB files this journal was first to load (released on destroy). */
+  private readonly ownedUrls = new Set<string>();
   private restoreFocusAfterLoad = false;
   private generation = 0;
   private onscreen = true;
@@ -121,6 +143,7 @@ export class RaidBossGuideModelController {
     private readonly supportsWebGL: () => boolean = () => browserSupportsWebGL(doc),
     private readonly prefersReducedMotion: () => boolean = () => browserPrefersReducedMotion(doc),
     private readonly touchQueue: () => LinkedProgramTouchQueue | null = () => null,
+    private readonly gltfCache: RaidBossGuideGltfCache = DEFAULT_GLTF_CACHE,
   ) {
     this.host = doc.createElement('div');
     this.host.className = 'rbg-model-viewer';
@@ -164,7 +187,10 @@ export class RaidBossGuideModelController {
     slot.replaceChildren(this.host);
     this.setState((this.host.dataset.state as ModelState | undefined) ?? 'idle');
 
-    if (!this.canUseWebGL()) {
+    if (options.spec === null || !this.canUseWebGL()) {
+      // A portrait-only page holds no WebGL context, and an in-flight load for
+      // the previous boss must never land on it.
+      if (options.spec === null) this.releaseViewer();
       this.requestedBoss = options.boss;
       this.loadedBoss = null;
       this.setState('nowebgl');
@@ -191,17 +217,23 @@ export class RaidBossGuideModelController {
     if (!this.prefersReducedMotion()) this.activate();
   }
 
-  destroy(): void {
+  private releaseViewer(): void {
     this.generation++;
-    this.requestedBoss = null;
-    this.loadedBoss = null;
-    this.options = null;
     this.restoreFocusAfterLoad = false;
     this.visibilityObserver?.disconnect();
     this.visibilityObserver = null;
     const viewer = this.viewer;
     this.viewer = null;
     viewer?.destroy();
+  }
+
+  destroy(): void {
+    this.releaseViewer();
+    this.requestedBoss = null;
+    this.loadedBoss = null;
+    this.options = null;
+    for (const url of this.ownedUrls) this.gltfCache.release(url);
+    this.ownedUrls.clear();
     this.host.remove();
     this.setState('idle');
     this.loadQueue = Promise.resolve();
@@ -209,7 +241,14 @@ export class RaidBossGuideModelController {
 
   private activate(): void {
     const options = this.options;
-    if (!options || !this.canUseWebGL() || this.host.dataset.state === 'loading') return;
+    if (
+      !options ||
+      options.spec === null ||
+      !this.canUseWebGL() ||
+      this.host.dataset.state === 'loading'
+    ) {
+      return;
+    }
     const shouldRestoreFocus = this.loadButton.ownerDocument.activeElement === this.loadButton;
     this.restoreFocusAfterLoad ||= shouldRestoreFocus;
     const generation = ++this.generation;
@@ -219,7 +258,7 @@ export class RaidBossGuideModelController {
     if (shouldRestoreFocus) this.status.focus();
     this.loadQueue = this.loadQueue
       .catch(() => undefined)
-      .then(() => this.load(generation, boss, options.canvasLabel))
+      .then(() => this.load(generation, boss, options))
       .catch((error: unknown) => {
         if (generation !== this.generation) return;
         console.error('Raid boss guide model failed to load', error);
@@ -239,9 +278,12 @@ export class RaidBossGuideModelController {
 
   private async load(
     generation: number,
-    boss: RaidBossGuideBoss,
-    canvasLabel: string,
+    boss: string,
+    options: RaidBossGuideModelMountOptions,
   ): Promise<void> {
+    const canvasLabel = options.canvasLabel;
+    const spec = options.spec ?? RAID_BOSS_GUIDE_MODEL_SPECS[boss as RaidBossGuideBoss];
+    if (!spec) throw new Error(`No boss guide model for ${boss}`);
     if (generation !== this.generation) return;
     let viewer = this.viewer;
     if (!viewer) {
@@ -258,7 +300,17 @@ export class RaidBossGuideModelController {
     }
     if (generation !== this.generation) return;
     viewer.setLabel(canvasLabel);
-    await viewer.load(RAID_BOSS_GUIDE_MODEL_SPECS[boss], null);
+    // Every file the viewer loads for this spec: the body, its weapons, and
+    // any clip or armor files a split body carries.
+    for (const url of [
+      spec.url,
+      ...(spec.attach ?? []).map((a) => a.url),
+      ...(spec.animUrls ?? []),
+      ...(spec.armor ?? []),
+    ]) {
+      if (!this.gltfCache.isCached(url)) this.ownedUrls.add(url);
+    }
+    await viewer.load(spec, options.tint ?? null);
     if (generation !== this.generation) return;
     this.loadedBoss = boss;
     this.setState('ready');

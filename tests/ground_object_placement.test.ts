@@ -15,18 +15,27 @@
 // These are the guards for that class of bug, not just the one instance.
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { GROUND_OBJECTS } from '../src/sim/data';
+import { CAMPS, GROUND_OBJECTS, QUESTS } from '../src/sim/data';
 import { DAWNHOLD } from '../src/sim/dawnhold_layout';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
+import { questObjectiveAreas } from '../src/sim/quest_targets';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-// A pickup deliberately authored onto a walkable structure would go here, as
-// `'<itemId>@<x>,<z>'`, with the reason. Empty on purpose: every shipped
-// pickup stands on natural ground.
-const ON_STRUCTURE_ALLOWLIST: ReadonlySet<string> = new Set<string>();
+// A pickup deliberately authored onto a walkable structure goes here, as
+// `'<itemId>@<x>,<z>'`, with the reason. Every other shipped pickup stands on
+// natural ground.
+const ON_STRUCTURE_ALLOWLIST: ReadonlySet<string> = new Set<string>([
+  // One of the four Warded Shore-Rocks lies on a tread of the Moon Stair, the
+  // built flight to the Drowned Temple's moongate (src/sim/drowned_temple_stair.ts).
+  // Its spot is unchanged (a pickup is a terrain calm anchor: moving it would
+  // reshape the gully the flight is fitted to); the flight is an open ramp from
+  // the mirror to the dais, and tests/drowned_temple_entrance.test.ts walks a
+  // player to the rock and pins it on the tread's own surface.
+  'moongate_rubbing@-68,783',
+]);
 
 // groundHeight adds the walkable lift fields (castle walls and bastions, the
 // beacon spiral, the Vale Cup tiers) over terrainHeight, so any gap between
@@ -179,6 +188,43 @@ describe('authored ground pickups stand on reachable natural ground', () => {
   });
 });
 
+// The Gravewyrm Sanctum's Seal Gate (src/sim/sanctum_seal_gate.ts) was built
+// over the old spots of four key shards and three sigils (under its east
+// pylon, in its gate tunnel and in its rock wall), so they moved into the gate plaza in front of it, which
+// the quest text already named ("scattered in the gate plaza"). Each one must
+// lie in that plaza on open ground a body can stand on beside it.
+describe('the Sanctum key shards and sigils lie in the gate plaza', () => {
+  const door = { x: 0, z: 858 };
+  const items = ['sanctum_key_shard', 'gravewyrm_sigil'];
+
+  it('none is left in the gate tunnel or its walls, every one is in the plaza', () => {
+    for (const def of GROUND_OBJECTS.filter((g) => items.includes(g.itemId))) {
+      expect(def.positions.length).toBe(4);
+      for (const p of def.positions) {
+        // the plaza runs z 842 to 856, in front of the gate line at z 858
+        expect(p.z, `${def.itemId} at ${p.x},${p.z}`).toBeGreaterThanOrEqual(door.z - 16);
+        expect(p.z, `${def.itemId} at ${p.x},${p.z}`).toBeLessThanOrEqual(door.z - 2);
+        expect(Math.abs(p.x - door.x), `${def.itemId} at ${p.x},${p.z}`).toBeLessThanOrEqual(10);
+      }
+    }
+  });
+
+  it('every one stands clear of the Seal Gate and its props, on natural ground', () => {
+    const sim = makeSim();
+    const seed = sim.cfg.seed;
+    for (const def of GROUND_OBJECTS.filter((g) => items.includes(g.itemId))) {
+      for (const p of def.positions) {
+        const at = `${def.itemId} at ${p.x},${p.z}`;
+        expect(isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS), at).toBe(false);
+        expect(
+          groundHeight(p.x, p.z, seed) - terrainHeight(p.x, p.z, seed),
+          at,
+        ).toBeLessThanOrEqual(LIFT_EPSILON);
+      }
+    }
+  });
+});
+
 // The other way verbatim placement strands a pickup: DOWN, under a declared
 // water body. The Bridgemere moat is authored as a ring of lake pools, and the
 // first Sunken Toll-Chest of Toll and Tangle sat at the exact centre of one
@@ -280,5 +326,49 @@ describe('authored ground pickups lie within wading depth of any declared water'
     }
     expect(qp.counts[1], 'all three chests credited').toBe(3);
     expect(qp.counts[0], 'the sprite cull is still owed').toBe(0);
+  });
+});
+
+describe('the Stolen Supply Crates lie in the relocated bandit camps', () => {
+  it('places every supply_crate inside a vale_bandit camp on unobstructed natural ground', () => {
+    const sim = makeSim();
+    const seed = sim.cfg.seed;
+    const def = GROUND_OBJECTS.find((g) => g.itemId === 'supply_crate');
+    expect(def).toBeDefined();
+    expect(def?.positions).toHaveLength(6);
+    const banditCamps = CAMPS.filter((c) => c.mobId === 'vale_bandit');
+    expect(banditCamps).toHaveLength(2);
+    for (const p of def?.positions ?? []) {
+      const inBanditCamp = banditCamps.some(
+        (camp) => Math.hypot(p.x - camp.center.x, p.z - camp.center.z) <= camp.radius,
+      );
+      expect(inBanditCamp, `supply_crate at ${p.x},${p.z} should sit in a vale_bandit camp`).toBe(
+        true,
+      );
+      expect(
+        isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS),
+        `supply_crate at ${p.x},${p.z} is inside a collider`,
+      ).toBe(false);
+      expect(groundHeight(p.x, p.z, seed) - terrainHeight(p.x, p.z, seed)).toBeLessThanOrEqual(
+        LIFT_EPSILON,
+      );
+    }
+  });
+
+  it('centers the Stolen Supplies map objective area on the bandit camps', () => {
+    const quest = QUESTS.q_supplies;
+    expect(quest).toBeDefined();
+    const areas = questObjectiveAreas(
+      new Map([['q_supplies', { questId: 'q_supplies', counts: [0], state: 'active' }]]),
+    );
+    expect(areas).toHaveLength(1);
+    const [area] = areas;
+    expect(area.center.x).toBeGreaterThan(60);
+    expect(area.center.z).toBeGreaterThan(0);
+    const def = GROUND_OBJECTS.find((g) => g.itemId === 'supply_crate');
+    expect(def).toBeDefined();
+    for (const p of def?.positions ?? []) {
+      expect(Math.hypot(p.x - area.center.x, p.z - area.center.z)).toBeLessThanOrEqual(area.radius);
+    }
   });
 });

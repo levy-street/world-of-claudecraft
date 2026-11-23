@@ -1,7 +1,7 @@
 // WARFARE rating conversion and hostile player-vs-player damage scaling.
 // Pure and host-agnostic: no state, rng, or clock reads.
 
-import type { Entity } from '../types';
+import type { Entity, EquipSlot, ItemDef } from '../types';
 
 export const PVP_RATING_PER_PCT = 10;
 // A complete 11-slot WARFARE kit carries 182 of each rating and its seven-piece
@@ -59,6 +59,14 @@ export function pvpVitalityFromRating(defenseRating: number): number {
     PVP_VITALITY_CAP,
     Math.max(0, defenseRating) / (PVP_VITALITY_RATING_PER_PCT * 100),
   );
+}
+
+// Only the main hand's weapon carries Warfare rating (owner rule, 2026-10-02): a
+// dual wielder's offhand weapon (two daggers, or Fury's second greatsword) adds
+// none, so a second weapon cannot double the slot that every kit has once.
+// Non-weapon offhands keep theirs.
+export function countsWarfareRating(slot: EquipSlot, item: ItemDef): boolean {
+  return !(slot === 'offhand' && item.kind === 'weapon');
 }
 
 export function pvpDamageMultiplier(source: Entity, target: Entity): number {

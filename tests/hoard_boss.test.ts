@@ -344,7 +344,8 @@ describe('Buried Hoard boss encounter', () => {
     const impactEvents = tickMechanic(sim, HOARD_SWEEP_WINDUP_SEC);
     // A legendary hoard: a flat share of the reference health, pressed by rarity.
     expect(sim.player.hp).toBe(
-      hpBefore - Math.round(HOARD_REFERENCE_HEALTH * 0.24 * HOARD_RARITY_PRESSURE.legendary.damage),
+      hpBefore -
+        Math.round(HOARD_REFERENCE_HEALTH * 0.24 * HOARD_RARITY_PRESSURE.legendary.damage * 0.7),
     );
     expect(
       impactEvents.filter((event) => event.type === 'spellfxAt' && event.fx === 'meteorImpact'),
@@ -396,17 +397,15 @@ describe('Buried Hoard boss encounter', () => {
     const hpBefore = sim.player.hp;
     tickMechanic(sim, HOARD_MARK_WINDUP_SEC);
     expect(sim.player.hp).toBe(
-      hpBefore - Math.round(HOARD_REFERENCE_HEALTH * 0.18 * HOARD_RARITY_PRESSURE.legendary.damage),
+      hpBefore -
+        Math.round(HOARD_REFERENCE_HEALTH * 0.18 * HOARD_RARITY_PRESSURE.legendary.damage * 0.7),
     );
     sim.player.pos.x += 10;
     tickMechanic(sim, HOARD_MARK_HAZARD_TICK_SEC * 0.5);
     sim.player.pos = marked;
     const beforePulse = sim.player.hp;
     tickMechanic(sim, HOARD_MARK_HAZARD_TICK_SEC);
-    expect(sim.player.hp).toBe(
-      beforePulse -
-        Math.round(HOARD_REFERENCE_HEALTH * 0.03 * HOARD_RARITY_PRESSURE.legendary.damage),
-    );
+    expect(sim.player.hp).toBe(beforePulse - 32);
     sim.player.pos.x += 10;
     const afterLeaving = sim.player.hp;
     tickMechanic(sim, HOARD_MARK_HAZARD_SEC);

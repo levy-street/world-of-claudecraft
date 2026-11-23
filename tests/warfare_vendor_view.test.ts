@@ -1,3 +1,4 @@
+import { SEASON2_JEWELRY_IDS } from '../src/sim/content/pvp_honor_season2';
 // The WARFARE quartermaster's shop view core: how the honor stock divides into
 // its six sections, which offers read as owned, which set-bonus tiers are live,
 // and how many pieces the NEXT unmet tier still wants. Node-only, driving the
@@ -9,14 +10,21 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
-import { FURY_STOCK, HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
+import {
+  FURY_STOCK,
+  HONOR_QUARTERMASTER_STOCK,
+  HONOR_VENDOR_STOCK,
+} from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef, ItemSet } from '../src/sim/types';
 import {
   buildWarfareVendorView,
   isWarfareVendorNpc,
+  WARFARE_SHOP_COMPANIONS_KEY,
+  WARFARE_SHOP_GOODS_KEY,
   WARFARE_SHOP_JEWELRY_KEY,
+  WARFARE_SHOP_SEASON2_JEWELRY_KEY,
   WARFARE_SHOP_SEASON2_WEAPONS_KEY,
   WARFARE_SHOP_SET_ORDER,
   WARFARE_SHOP_WEAPONS_KEY,
@@ -114,8 +122,10 @@ function fixture(): {
 function viewer(over: Partial<WarfareShopViewer> = {}): WarfareShopViewer {
   return {
     honor: 100_000,
+    copper: 10_000_000,
     ownedItemIds: new Set<string>(),
     equippedItemIds: new Set<string>(),
+    acquiredBuddyKeys: new Set<string>(),
     ...over,
   };
 }
@@ -371,6 +381,7 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
         number,
         {
           honor: number;
+          copper: number;
           inventory: InvSlot[];
           equipment: Record<string, string | undefined>;
         }
@@ -379,6 +390,7 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
     const primary = internals.players.get(internals.primaryId);
     if (!primary) throw new Error('primary player meta missing');
     primary.honor = 4321;
+    primary.copper = 98_765;
     primary.equipment = { chest: CHEST };
     primary.inventory = [
       { itemId: HELM, count: 1 },
@@ -390,6 +402,7 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
   function clientWorld(): WarfareShopWorld {
     const client = bareClient(1);
     client.honor = 4321;
+    client.copper = 98_765;
     client.equipment = { chest: CHEST };
     client.inventory = [
       { itemId: HELM, count: 1 },
@@ -405,6 +418,7 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
     ] as const) {
       const viewerModel = warfareShopViewer(world);
       expect(viewerModel.honor, label).toBe(4321);
+      expect(viewerModel.copper, label).toBe(98_765);
       expect([...viewerModel.equippedItemIds].sort(), label).toEqual([CHEST]);
       expect([...viewerModel.ownedItemIds].sort(), label).toEqual([CHEST, HELM, POTION].sort());
     }
@@ -414,8 +428,57 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
     const fromSim = warfareShopViewer(simWorld());
     const fromClient = warfareShopViewer(clientWorld());
     expect(fromClient.honor).toBe(fromSim.honor);
+    expect(fromClient.copper).toBe(fromSim.copper);
     expect([...fromClient.equippedItemIds].sort()).toEqual([...fromSim.equippedItemIds].sort());
     expect([...fromClient.ownedItemIds].sort()).toEqual([...fromSim.ownedItemIds].sort());
+  });
+
+  it.each(['collected', 'pending'] as const)(
+    'marks a %s buddy as acquired even without a whistle in the bags',
+    (state) => {
+      const world: WarfareShopWorld = {
+        cfg: { seed: 7, playerClass: 'warrior' },
+        honor: 100_000,
+        equipment: {},
+        inventory: [],
+        copper: 0,
+        ownedBuddies: () => (state === 'collected' ? ['horse'] : []),
+        pendingBuddies: () => (state === 'pending' ? ['horse'] : []),
+      };
+      const model = warfareShopViewer(world);
+      const view = buildWarfareVendorView([], ITEMS, ITEM_SETS, { ...model, warfareVendor: true });
+      expect(model.acquiredBuddyKeys.has('horse')).toBe(true);
+      expect(view.sections[0].offers[0]).toMatchObject({ owned: true, affordable: true });
+    },
+  );
+
+  it('lists the honor counter companions last, in their own group after the entry tier', () => {
+    const view = buildWarfareVendorView(
+      HONOR_VENDOR_STOCK,
+      ITEMS,
+      ITEM_SETS,
+      viewer({ warfareVendor: true }),
+    );
+    const last = view.sections[view.sections.length - 1];
+    expect(last).toMatchObject({
+      kind: 'companions',
+      group: 'companions',
+      key: WARFARE_SHOP_COMPANIONS_KEY,
+    });
+    expect(last.offers.length).toBeGreaterThan(0);
+    for (const o of last.offers) expect(o.item.kind, o.itemId).toBe('companion');
+    // The only companions-group section, and no companion leaks into a gear group.
+    expect(view.sections.filter((s) => s.group === 'companions')).toEqual([last]);
+    for (const s of view.sections.slice(0, -1)) {
+      expect(s.group, s.key).not.toBe('companions');
+      for (const o of s.offers) expect(o.item.kind, o.itemId).not.toBe('companion');
+    }
+  });
+
+  it('does not mistake a legacy whistle in a bag for a permanent buddy unlock', () => {
+    const model = viewer({ ownedItemIds: new Set(['whistle_horse']) });
+    const view = buildWarfareVendorView([], ITEMS, ITEM_SETS, { ...model, warfareVendor: true });
+    expect(view.sections[0].offers[0].owned).toBe(false);
   });
 
   it('drops the empty equipment slots rather than counting them as worn ids', () => {
@@ -528,6 +591,7 @@ describe('buildWarfareVendorView over the full honor stock (Warfare Season 2 fir
       'vanguard_mage_fire',
       'vanguard_mage_frost',
       WARFARE_SHOP_SEASON2_WEAPONS_KEY,
+      WARFARE_SHOP_SEASON2_JEWELRY_KEY,
     ]);
     for (const setId of ['vanguard_mage_arcane', 'vanguard_mage_fire', 'vanguard_mage_frost']) {
       const section = setSection(view, setId);
@@ -550,7 +614,15 @@ describe('buildWarfareVendorView over the full honor stock (Warfare Season 2 fir
       ...WARFARE_SHOP_SET_ORDER,
       WARFARE_SHOP_JEWELRY_KEY,
       WARFARE_SHOP_WEAPONS_KEY,
+      // The World PvP Skull Bag: nothing to wear, so its own Goods section.
+      WARFARE_SHOP_GOODS_KEY,
     ]);
+    const goods = view.sections.find((s) => s.key === WARFARE_SHOP_GOODS_KEY);
+    expect(goods?.kind).toBe('goods');
+    expect(goods?.offers.map((o) => [o.itemId, o.honor])).toEqual([['pvp_skull_bag', 500]]);
+    // Never filed as jewelry.
+    const jewelry = view.sections.find((s) => s.key === WARFARE_SHOP_JEWELRY_KEY);
+    expect(jewelry?.offers.some((o) => o.itemId === 'pvp_skull_bag')).toBe(false);
   });
 
   it('shows every class exactly its own three Season 2 sets', () => {
@@ -575,6 +647,37 @@ describe('buildWarfareVendorView over the full honor stock (Warfare Season 2 fir
       const sets = view.sections.filter((s) => s.group === 'season2' && s.kind === 'set');
       expect(sets, cls).toHaveLength(3);
       for (const s of sets) expect(s.key.startsWith(`vanguard_${cls}_`), s.key).toBe(true);
+    }
+  });
+
+  it('lists all eight Season 2 jewelry pieces in their own Season 2 section, never with the entry jewelry', () => {
+    for (const cls of ['warrior', 'mage', 'priest']) {
+      const view = buildWarfareVendorView(
+        HONOR_QUARTERMASTER_STOCK,
+        ITEMS,
+        ITEM_SETS,
+        viewer({ viewerClass: cls }),
+      );
+      const season = view.sections.find((s) => s.key === WARFARE_SHOP_SEASON2_JEWELRY_KEY);
+      expect(season?.kind, cls).toBe('jewelry');
+      expect(season?.group, cls).toBe('season2');
+      // Unlocked jewelry: every class sees all eight, in stock order.
+      expect(
+        season?.offers.map((o) => o.itemId),
+        cls,
+      ).toEqual([...SEASON2_JEWELRY_IDS]);
+      expect(
+        season?.offers.every((o) => o.honor > 0 && o.copper === 0),
+        cls,
+      ).toBe(true);
+      const entry = view.sections.find((s) => s.key === WARFARE_SHOP_JEWELRY_KEY);
+      expect(entry?.group, cls).toBe('entry');
+      for (const id of SEASON2_JEWELRY_IDS) {
+        expect(
+          entry?.offers.some((o) => o.itemId === id),
+          `${cls}: ${id} not in the entry jewelry`,
+        ).toBe(false);
+      }
     }
   });
 
@@ -603,5 +706,55 @@ describe('buildWarfareVendorView names the spec of each Season 2 set', () => {
     for (const s of view.sections) {
       if (s.kind === 'set' && s.group === 'entry') expect(s.spec, s.key).toBeUndefined();
     }
+  });
+});
+
+describe('buildWarfareVendorView prices Season 1 in gold', () => {
+  it('prices every entry-tier row in copper and every other row in Honor', () => {
+    const view = buildWarfareVendorView(
+      HONOR_QUARTERMASTER_STOCK,
+      ITEMS,
+      ITEM_SETS,
+      viewer({ viewerClass: 'warrior' }),
+    );
+    const offers = view.sections.flatMap((section) => section.offers);
+    const entry = new Set(FURY_STOCK);
+    expect(offers.filter((offer) => entry.has(offer.itemId))).toHaveLength(FURY_STOCK.length);
+    for (const offer of offers) {
+      if (entry.has(offer.itemId)) {
+        expect(offer.copper, offer.itemId).toBe(ITEMS[offer.itemId].buyValue);
+        expect(offer.honor, offer.itemId).toBe(0);
+      } else {
+        expect(offer.honor, offer.itemId).toBeGreaterThan(0);
+        expect(offer.copper, offer.itemId).toBe(0);
+      }
+    }
+  });
+
+  it('carries the coin purse only when the stock sells something for gold', () => {
+    const withGold = buildWarfareVendorView(
+      FURY_STOCK,
+      ITEMS,
+      ITEM_SETS,
+      viewer({ copper: 98_765 }),
+    );
+    expect(withGold.goldBalance).toBe(98_765);
+    const honorOnly = buildWarfareVendorView(
+      HONOR_QUARTERMASTER_STOCK.filter((id) => !FURY_STOCK.includes(id)),
+      ITEMS,
+      ITEM_SETS,
+      viewer({ copper: 98_765, viewerClass: 'warrior' }),
+    );
+    expect(honorOnly.goldBalance).toBeNull();
+  });
+
+  it('reads gold, not Honor, for the affordability of a Season 1 row', () => {
+    const helm = 'furyforged_warhelm';
+    const price = ITEMS[helm].buyValue as number;
+    const affordable = (over: Partial<WarfareShopViewer>) =>
+      buildWarfareVendorView([helm], ITEMS, ITEM_SETS, viewer(over)).sections[0].offers[0]
+        .affordable;
+    expect(affordable({ honor: 0, copper: price })).toBe(true);
+    expect(affordable({ honor: 1_000_000, copper: price - 1 })).toBe(false);
   });
 });

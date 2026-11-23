@@ -1,0 +1,42 @@
+{
+  "state": {
+    "heightDelta": 3,
+    "cfgWorldAbsent": true,
+    "builtin": true,
+    "studio": false,
+    "placements": [
+      {
+        "path": "/models/biome/hex_crate_big.glb",
+        "x": 110,
+        "z": 280,
+        "rotY": 0,
+        "scale": 2,
+        "collideRadius": 2,
+        "collideCustom": true
+      }
+    ],
+    "blocked": true,
+    "height": 1.2637904193710274,
+    "viewExists": true,
+    "groupVisible": true,
+    "meshes": 3,
+    "rendered": [
+      {
+        "name": "placed-batch:/models/biome/hex_crate_big.glb#0",
+        "visible": true,
+        "parentVisible": true
+      },
+      {
+        "name": "placed-imposters",
+        "visible": false,
+        "parentVisible": true
+      },
+      {
+        "name": "placed-building-imposters",
+        "visible": false,
+        "parentVisible": true
+      }
+    ]
+  },
+  "errors": []
+}

@@ -12,6 +12,8 @@ import { esc } from './esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, findFocusKey } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
+import { svgIcon } from './ui_icons';
+import { weeklyLootSpecLabel } from './weekly_reward_loot_focus_controller';
 import { appendWeeklyRewardTablePicker } from './weekly_reward_table_picker_controller';
 import { showWeeklyRewardsReadyPrompt } from './weekly_rewards_ready_prompt';
 import {
@@ -26,6 +28,7 @@ const OPEN_ACK_WAIT_MS = 2000;
 export class WeeklyRewardClaimController {
   private owner: IWorld | null = null;
   private batchKey = '';
+  private commandKey = '';
   private started = false;
   private revealed = new Set<number>();
   private tableSelections = new Map<number, string[]>();
@@ -48,6 +51,9 @@ export class WeeklyRewardClaimController {
       presentation: PainterHostPresentation;
       onInventoryChanged(): void;
       hideTooltip?(): void;
+    },
+    private readonly options?: {
+      readOnly?: boolean;
     },
   ) {}
 
@@ -87,6 +93,7 @@ export class WeeklyRewardClaimController {
 
   private current(key: string): boolean {
     return (
+      !this.options?.readOnly &&
       this.owner === this.deps.world() &&
       this.deps.world().weeklyRewardInfo?.canClaim === true &&
       this.identity() === key
@@ -108,20 +115,30 @@ export class WeeklyRewardClaimController {
     const available =
       availability ??
       batch.choices.map((choice) =>
-        weeklyRewardAvailability(batch, choice, world.cfg.playerClass, info.playerLevel),
+        weeklyRewardAvailability(
+          batch,
+          choice,
+          world.cfg.playerClass,
+          info.playerLevel,
+          info.state.lootSpec,
+        ),
       );
     return (
       !!batch &&
       batch.choices.some((choice) => choice.opened && choice.itemId) &&
       batch.choices.every(
         (choice, index) =>
-          available[index].exhausted ||
+          this.resolvedForClaim(available[index]) ||
           (choice.opened === true &&
             !!choice.itemId &&
             !!ITEMS[choice.itemId] &&
             this.revealed.has(index)),
       )
     );
+  }
+
+  private resolvedForClaim(availability: WeeklyRewardAvailability): boolean {
+    return availability.exhausted && availability.reason !== 'focus';
   }
 
   renderInto(host: HTMLElement, progress: HTMLElement): void {
@@ -133,16 +150,27 @@ export class WeeklyRewardClaimController {
     const availability =
       batch && info
         ? batch.choices.map((choice) =>
-            weeklyRewardAvailability(batch, choice, world.cfg.playerClass, info.playerLevel),
+            weeklyRewardAvailability(
+              batch,
+              choice,
+              world.cfg.playerClass,
+              info.playerLevel,
+              info.state.lootSpec,
+            ),
           )
         : [];
     const key = this.identity();
-    if (world !== this.owner || key !== this.batchKey) {
+    // Preference revisions invalidate callbacks, but keep this week's reveal flow.
+    const batchKey = batch ? String(batch.resetAtMs) : '';
+    if (world !== this.owner || batchKey !== this.batchKey) {
       this.resetFlow();
       this.revealed.clear();
       this.owner = world;
-      this.batchKey = key;
+      this.batchKey = batchKey;
     }
+    // An acknowledged focus change rejects submissions carrying the old token.
+    if (key !== this.commandKey) this.submitted = false;
+    this.commandKey = key;
     if (!world.weeklyRewardInfo?.canClaim) this.resetFlow();
     if (batch) {
       for (const [index, choice] of batch.choices.entries()) {
@@ -160,8 +188,21 @@ export class WeeklyRewardClaimController {
     host.replaceChildren();
     host.className = 'weekly-claim-flow';
     host.hidden = !batch;
-    progress.hidden = !!batch && this.started;
+    progress.hidden = !this.options?.readOnly && !!batch && this.started;
     if (!batch) return;
+
+    if (this.options?.readOnly) {
+      const notice = document.createElement('div');
+      notice.className = 'weekly-preview-notice ui-card';
+      notice.innerHTML = `<span class="weekly-preview-notice-icon" aria-hidden="true">${svgIcon('chest')}</span><span class="weekly-preview-notice-text">${esc(t('hudChrome.weeklyRewards.previewClaimNotice'))}</span>`;
+      const date = document.createElement('p');
+      date.className = 'weekly-claim-date';
+      date.textContent = t('hudChrome.weeklyRewards.completedWeek', {
+        date: formatDateTime(batch.resetAtMs, { dateStyle: 'medium' }),
+      });
+      host.append(notice, date);
+      return;
+    }
 
     const refresh = (focus?: string) => {
       this.renderInto(host, progress);
@@ -254,7 +295,9 @@ export class WeeklyRewardClaimController {
           ? t('hudChrome.weeklyRewards.chooseOne')
           : t('hudChrome.weeklyRewards.openedCount', {
               count: formatNumber(this.revealed.size),
-              total: formatNumber(availability.filter((entry) => !entry.exhausted).length),
+              total: formatNumber(
+                availability.filter((entry) => !this.resolvedForClaim(entry)).length,
+              ),
             });
       };
       updateCount();
@@ -286,11 +329,13 @@ export class WeeklyRewardClaimController {
           if (availability[index].exhausted) {
             const message = document.createElement('span');
             message.textContent = t(
-              availability[index].reason === 'level'
-                ? 'hudChrome.weeklyRewards.noLevelLoot'
-                : availability[index].reason === 'exhausted'
-                  ? 'hudChrome.weeklyRewards.tablesExhausted'
-                  : 'hudChrome.weeklyRewards.noTables',
+              availability[index].reason === 'focus'
+                ? 'hudChrome.weeklyRewards.noFocusedLoot'
+                : availability[index].reason === 'level'
+                  ? 'hudChrome.weeklyRewards.noLevelLoot'
+                  : availability[index].reason === 'exhausted'
+                    ? 'hudChrome.weeklyRewards.tablesExhausted'
+                    : 'hudChrome.weeklyRewards.noTables',
             );
             footer.replaceChildren(message);
             tile.classList.add('weekly-table-exhausted');
@@ -309,6 +354,14 @@ export class WeeklyRewardClaimController {
           });
           this.disposers.push(picker.dispose);
           const item = choice.opened && choice.itemId ? ITEMS[choice.itemId] : undefined;
+          if (item) {
+            const focus = document.createElement('span');
+            focus.className = 'weekly-rolled-focus';
+            focus.textContent = t('hudChrome.weeklyRewards.rolledFocus', {
+              focus: weeklyLootSpecLabel(world.cfg.playerClass, choice.lootSpec),
+            });
+            footer.append(focus);
+          }
           let revealProgress = this.revealProgress.get(index);
           if (!revealProgress) {
             revealProgress = {};
@@ -351,7 +404,14 @@ export class WeeklyRewardClaimController {
                 index,
                 setTimeout(() => {
                   this.awaitingOpen.delete(index);
-                  if (this.current(key)) this.repaint?.();
+                  // A focus acknowledgement can advance the command token while
+                  // this rejected open is still waiting. Re-enable its current tile.
+                  if (
+                    this.owner === world &&
+                    this.deps.world() === world &&
+                    this.batch()?.resetAtMs === batch.resetAtMs
+                  )
+                    this.repaint?.();
                 }, OPEN_ACK_WAIT_MS),
               );
               const table = picker.selected();
@@ -409,7 +469,7 @@ export class WeeklyRewardClaimController {
           if (this.submitted || !host.contains(confirm)) return;
           if (!this.current(key) || !this.allOpened()) return refresh();
           this.submitted = true;
-          this.deps.world().claimWeeklyReward(batch.resetAtMs + ':' + index);
+          this.deps.world().claimWeeklyReward(`${batch.resetAtMs}:${index}`);
           // Only the host can consume the completed week's rewards.
           refresh('weekly-cancel-claim');
           this.deps.onInventoryChanged();
@@ -423,7 +483,7 @@ export class WeeklyRewardClaimController {
         () => {
           this.selected = null;
           this.submitted = false;
-          refresh('weekly-inspect:' + index);
+          refresh(`weekly-inspect:${index}`);
         },
       );
       const actions = document.createElement('div');

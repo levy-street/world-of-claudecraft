@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { npcLookFor } from '../src/render/characters';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { npcEntityLookFor } from '../src/render/characters/npc_look_provider';
 import { Renderer } from '../src/render/renderer';
 import { MOBS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
@@ -63,16 +64,26 @@ describe("Varkhul's rig twin entity", () => {
   });
 
   it('is never claimed by the modular look provider, which composes no mob', () => {
+    // a look is for an NPC and for the escort characters npc_looks.ts names: any other
+    // mob, one that shares a templateId with an NPC included, keeps its mob visual
     expect(npcLookFor(VARKHUL_BOSS_ID, 'mob')).toBeNull();
-    // The provider main.ts installs routes every non-player through npcLookFor
-    // with the entity's own kind, the arm above.
+    // The provider main.ts installs claims a player and routes every other
+    // entity through npcEntityLookFor (the seam shared with the Studio
+    // viewport), which composes only the Studio's runtime-composed civilians
+    // and answers null for every mob.
+    expect(
+      npcEntityLookFor({ kind: 'mob', templateId: VARKHUL_BOSS_ID } as unknown as Entity),
+    ).toBeNull();
     const main = codeWithoutLineComments(
       readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'),
     );
     const at = main.indexOf('setModularLookProvider((e) =>');
     expect(at).toBeGreaterThan(-1);
-    const provider = main.slice(at, main.indexOf(');', at));
+    // every non-player arm of the provider is that one call, a few lines in
+    const end = main.indexOf('npcEntityLookFor(e)', at);
+    expect(end).toBeGreaterThan(at);
+    expect(end - at).toBeLessThan(400);
+    const provider = main.slice(at, end);
     expect(provider).toContain("e.kind === 'player'");
-    expect(provider).toContain(': npcLookFor(e.templateId, e.kind)');
   });
 });

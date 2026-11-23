@@ -136,6 +136,7 @@ function defaultDesktopPrefs() {
     gpuBackend: 'auto',
     consecutiveGpuLaunchCrashes: 0,
     launchesSinceBackendReprobe: 0,
+    shaderDiskCacheOptOut: false,
   };
 }
 
@@ -185,6 +186,10 @@ function sanitizeDesktopPrefs(input) {
   if (proof) prefs.gpuBackendProof = proof;
   prefs.consecutiveGpuLaunchCrashes = readCount(input.consecutiveGpuLaunchCrashes);
   prefs.launchesSinceBackendReprobe = readCount(input.launchesSinceBackendReprobe);
+  // Additive as well: the shader disk cache off switch (electron/shader_disk_cache.cjs).
+  // There is no in-game toggle, so a hand edit is the only writer; whitelisting it here is
+  // what keeps that edit alive through the shell's own saves.
+  prefs.shaderDiskCacheOptOut = readBoolean(input.shaderDiskCacheOptOut, false);
   return prefs;
 }
 

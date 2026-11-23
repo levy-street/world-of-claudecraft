@@ -2,6 +2,7 @@ import type { PartyInfo } from '../world_api';
 import { isPartyFrameRelevantAura } from './aura_classify';
 import { echoVisibleTo, partyAuraPriority } from './combat/chronomancy';
 import { damageTakenWithin } from './combat/damage_history';
+import { isPlayingDead } from './combat/hunter_play_dead';
 import { rewindHealAmount } from './combat/rewind';
 import { MENDING_CURRENT_ID } from './combat/shaman_spiritmend';
 import type { Role } from './content/talents';
@@ -96,6 +97,14 @@ export function partyFrameAuras(
   return relevant.slice(0, cap).map((aura) => partyFrameAuraSummary(aura, maxHp));
 }
 
+/** A member's health, resource and dead flag as party frames show them. A
+ *  hunter playing dead (feign death) reads as a corpse with empty bars, the same
+ *  on both hosts (collectPartyInfo here, the server party projection). */
+export function partyFrameVitals(e: Entity): { hp: number; res: number; dead: 0 | 1 } {
+  if (isPlayingDead(e)) return { hp: 0, res: 0, dead: 1 };
+  return { hp: e.hp, res: Math.round(e.resource), dead: e.dead ? 1 : 0 };
+}
+
 /** Remaining damage absorption, matching the player and target frame total. */
 export function partyFrameAbsorb(auras: readonly Aura[]): number {
   let total = 0;
@@ -186,14 +195,12 @@ export function collectPartyInfo(ctx: SimContext): PartyInfo | null {
               name: meta.name,
               cls: meta.cls,
               level: e.level,
-              hp: e.hp,
+              ...partyFrameVitals(e),
               mhp: e.maxHp,
-              res: Math.round(e.resource),
               mres: e.maxResource,
               rtype: e.resourceType,
               x: e.pos.x,
               z: e.pos.z,
-              dead: e.dead ? 1 : 0,
               inCombat: e.inCombat ? 1 : 0,
               group: party.raidGroups.get(mPid) ?? 1,
               absorb: partyFrameAbsorb(e.auras),

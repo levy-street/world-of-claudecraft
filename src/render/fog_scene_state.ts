@@ -11,8 +11,22 @@
 // settled); this module owns the resolution and the settled preset values.
 import { dungeonAt, isArenaPos, isBgPos, isDelvePos, isYumiMazePos } from '../sim/data';
 import { waterLevelAt } from '../sim/world';
+import { SANCTUM_FOG_COLOR } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import type { FogSceneState } from './interior_light_rig';
+import { BASIN_FOG_COLOR } from './wildheart_basin/basin_plan_core';
+
+/** The Hollow Crypt's night fog colour (its sky dome fades to it at the horizon). */
+export const HOLLOW_CRYPT_FOG_COLOR = 0x1c2238;
+/** The Sunken Bastion's storm-tide sea fog (its sky dome fades to it at the horizon). */
+export const SUNKEN_BASTION_FOG_COLOR = 0x4d5a57;
+/** The Drowned Temple's violet night haze (its sky dome fades to it at the horizon). */
+export const DROWNED_TEMPLE_FOG_COLOR = 0x252a4c;
+/** The Wildheart Basin's humid gold haze (its sky dome fades to it at the horizon). */
+export const WILDHEART_BASIN_FOG_COLOR = BASIN_FOG_COLOR;
+/** The Gravewyrm Sanctum's thin blue dusk (its sky's horizon too): clear air
+ *  that only turns blue with distance, never a murk and never a sea mist. */
+export const GRAVEWYRM_SANCTUM_FOG_COLOR = SANCTUM_FOG_COLOR;
 
 export interface FogSceneResolution {
   /** The named dungeon interior the player stands in (null/undefined in the
@@ -46,9 +60,18 @@ export function resolveFogScene(
   const inTemple = interior === 'temple';
   const inNythraxis = interior === 'nythraxis';
   const ignivarRaidFogState = ignivarRaidFogStateForInterior(interior ?? null);
-  // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
-  // sky dome and the daylight rig and only swaps in its own field haze.
-  const inWildheartField = interior === 'wildheart';
+  // The Wildheart Basin: an open-air jungle caldera on a humid gold
+  // afternoon, under its OWN sky (the world dome hides inside it).
+  const inWildheartBasin = interior === 'wildheart';
+  // The Hollow Crypt is open-air too, but at night under its OWN sky: the
+  // world dome hides and the interior group carries the moonlit sky.
+  const inHollowCrypt = interior === 'hollow_crypt';
+  // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
+  const inSunkenBastion = interior === 'sunken_bastion';
+  // The Drowned Temple: open-air at night over its lagoon, under its own sky.
+  const inDrownedTemple = interior === 'drowned_temple';
+  // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.
+  const inGravewyrmSanctum = interior === 'gravewyrm_sanctum';
   const inLastKeep = interior === 'lastkeep';
   const inDawnhold = interior === 'dawnhold';
   const desired: FogSceneState = inDelve
@@ -63,17 +86,25 @@ export function resolveFogScene(
             ? 'nythraxis'
             : ignivarRaidFogState
               ? ignivarRaidFogState
-              : inWildheartField
-                ? 'wildheartField'
-                : inLastKeep
-                  ? 'lastkeep'
-                  : inDawnhold
-                    ? 'dawnhold'
-                    : inside
-                      ? 'dungeon'
-                      : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                        ? 'underwater'
-                        : 'outdoor';
+              : inWildheartBasin
+                ? 'wildheartBasin'
+                : inHollowCrypt
+                  ? 'hollowCrypt'
+                  : inSunkenBastion
+                    ? 'sunkenBastion'
+                    : inDrownedTemple
+                      ? 'drownedTemple'
+                      : inGravewyrmSanctum
+                        ? 'gravewyrmSanctum'
+                        : inLastKeep
+                          ? 'lastkeep'
+                          : inDawnhold
+                            ? 'dawnhold'
+                            : inside
+                              ? 'dungeon'
+                              : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                ? 'underwater'
+                                : 'outdoor';
   return { interior, desired };
 }
 
@@ -109,12 +140,44 @@ export function applyFogScenePreset(
     // matching the three state names here is the same condition the renderer
     // held as (ignivarRaidFogState && desired === ignivarRaidFogState)
     applyIgnivarRaidFog(desired, fog);
-  } else if (desired === 'wildheartField') {
-    // Sunlit humid depth keeps the full caldera readable while the rear
-    // shrine and limestone shell settle into a warm green atmospheric veil.
-    fog.color.setHex(0x8ca786);
-    fog.near = 105;
-    fog.far = 430;
+  } else if (desired === 'wildheartBasin') {
+    // Humid gold haze over the jungle caldera: pushed far back so the falls,
+    // the river and the stone jaguar read from the Idol Maw (480 yd), while
+    // the caldera walls soften into the gold; the gorge's own thicker haze is
+    // the interior's (render/wildheart_basin/basin_air.ts).
+    fog.color.setHex(WILDHEART_BASIN_FOG_COLOR);
+    fog.near = 150;
+    fog.far = 1050;
+  } else if (desired === 'hollowCrypt') {
+    // Night air over the grave-mist: a deep blue-violet veil pushed far back
+    // so the whole necropolis and the ritual column read from the landing,
+    // while the far crag settles into silhouette against the sky.
+    fog.color.setHex(HOLLOW_CRYPT_FOG_COLOR);
+    fog.near = 70;
+    fog.far = 460;
+  } else if (desired === 'sunkenBastion') {
+    // Storm-tide sea fog: grey-green and heavy low over the water, pushed back
+    // far enough that the whole headland climbs out of it from the landing and
+    // the Fogbeacon reads at the top, while the far coast drowns in it.
+    fog.color.setHex(SUNKEN_BASTION_FOG_COLOR);
+    fog.near = 70;
+    fog.far = 640;
+  } else if (desired === 'drownedTemple') {
+    // A thin violet night haze over the lagoon, pushed far back so the Moon
+    // Altar's column and the far rim's falls read from the Moongate Landing
+    // (440 yd), while the crater wall fades into the night.
+    fog.color.setHex(DROWNED_TEMPLE_FOG_COLOR);
+    fog.near = 140;
+    fog.far = 1050;
+  } else if (desired === 'gravewyrmSanctum') {
+    // Thin, clear polar dusk: the air only turns blue with distance, pushed
+    // far back so the whole cirque, the lake far below and the dragon in the
+    // Calving Face read from the Gate Landing (about 480 yd), while the ring
+    // of Thornpeak's summits settles into the blue hour. The steam over the
+    // Thaw Works and the vault is the interior's own (render/gravewyrm_sanctum).
+    fog.color.setHex(GRAVEWYRM_SANCTUM_FOG_COLOR);
+    fog.near = 90;
+    fog.far = 980;
   } else if (desired === 'lastkeep') {
     // The Last Keep: a warm hearth-lit haze pushed well back, so its
     // grand three-story halls read golden and inhabited instead of

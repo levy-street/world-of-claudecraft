@@ -2,12 +2,13 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { GUILD_RANK_PERMISSIONS } from '../src/sim/guild_ranks';
 import { guildRanksPanelView } from '../src/ui/guild_ranks_view';
-import type { GuildRow } from '../src/ui/social_view';
+import { type GuildRow, socialPageControls } from '../src/ui/social_view';
 import {
   guildMemberRowHtml,
   guildRanksPanelHtml,
   rankLabelText,
   rosterExpandConfirmHtml,
+  socialPagerHtml,
   splicePriceHtml,
 } from '../src/ui/social_window';
 import type { SocialInfo } from '../src/world_api';
@@ -27,6 +28,29 @@ const hudChromeCatalog = readFileSync(
   'utf8',
 );
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
+
+describe('social block list paging', () => {
+  it('provides both return and continuation controls for inherited overflow pages', () => {
+    const html = socialPagerHtml('block', { first: true, next: 12 });
+    expect(html).toContain('data-act="block-page" data-cursor="0"');
+    expect(html).toContain('data-act="block-page" data-cursor="12"');
+    expect(painter).toContain('w.socialBlocksPage(Number(node.dataset.cursor ?? 0))');
+  });
+  it('selects block metadata independently and rejects unsafe continuation values', () => {
+    const social = {
+      blocksCursor: 1,
+      blocksNextCursor: 8,
+      friendsCursor: 0,
+      friendsNextCursor: 4,
+    } as SocialInfo;
+    expect(socialPageControls(social, 'block')).toEqual({ first: true, next: 8 });
+    expect(socialPageControls(social, 'friend')).toEqual({ first: false, next: 4 });
+    expect(
+      socialPageControls({ ...social, blocksNextCursor: Number.NaN }, 'block').next,
+    ).toBeNull();
+    expect(socialPagerHtml('block', socialPageControls(null, 'block'))).toBe('');
+  });
+});
 
 describe('social_window: .soc-body layout never uses CSS multicol', () => {
   // Regression for a review finding on the wide-landscape relayout: `.soc-body` is a
@@ -143,6 +167,37 @@ describe('social_window: delegated row listeners (no per-tick churn)', () => {
     const body = painter.slice(start, next);
     expect(body).toContain('body.innerHTML');
     expect(body).not.toContain('addEventListener');
+  });
+});
+
+describe('social_window: row right-click opens the player menu', () => {
+  it('wires ONE delegated contextmenu listener on the body, dispatched by onBodyContextMenu', () => {
+    expect(painter).toMatch(/body\.addEventListener\('contextmenu'/);
+    expect(painter).toContain('private onBodyContextMenu(');
+  });
+
+  it('claims only a row that names a player: the early return precedes preventDefault', () => {
+    const start = painter.indexOf('private onBodyContextMenu(');
+    const handler = painter.slice(start, painter.indexOf('\n  }\n', start));
+    expect(handler).toContain(".closest<HTMLElement>('[data-player]')");
+    expect(handler.indexOf('return;')).toBeGreaterThan(-1);
+    expect(handler.indexOf('return;')).toBeLessThan(handler.indexOf('e.preventDefault()'));
+  });
+
+  it('tags a player row on every roster tab (friends, guild, ignore/block, pledges, raid, who)', () => {
+    // Six row builders, each must carry the attribute the handler resolves.
+    expect(painter.match(/<div class="soc-row[^`]*data-player="\$\{esc\(/g)?.length).toBe(6);
+  });
+
+  it('hud wires each menu dep to the matching unit-frame / chat-name menu', () => {
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud).toContain('openSelfMenu: (x, y) => this.openSelfContextMenu(x, y),');
+    expect(hud).toContain(
+      'openUnitMenu: (pid, name, x, y) => this.openContextMenu(pid, name, x, y),',
+    );
+    expect(hud).toContain(
+      'openNameMenu: (name, x, y) => this.openChatPlayerContextMenu(name, x, y),',
+    );
   });
 });
 
@@ -324,6 +379,13 @@ describe('social_window: guild displayed-role chip (rendered rows)', () => {
     const html = guildMemberRowHtml(row({ rank: 'leader', joinedAt: NOW - 3 * DAY }), NOW);
     expect(chips(html)).toEqual(['<span class="rank">Guild Master</span>']);
     expect(html).not.toContain('soc-tenure');
+  });
+
+  it('tags the row with the member name for the right-click player menu (escaped)', () => {
+    expect(guildMemberRowHtml(row(), NOW)).toMatch(
+      /^<div class="soc-row is-offline" data-player="Gorak">/,
+    );
+    expect(guildMemberRowHtml(row({ name: 'A"b<' }), NOW)).toContain('data-player="A&quot;b&lt;"');
   });
 
   it('escapes the member name around the chip', () => {

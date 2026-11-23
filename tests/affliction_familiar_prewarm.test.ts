@@ -49,6 +49,7 @@ vi.mock('../src/render/assets/loader', () => ({
 // build answers "assets unavailable" (the builder's own skip arm).
 vi.mock('../src/render/characters', () => ({
   createCharacterVisual: () => null,
+  visualAssetsResident: () => true,
 }));
 
 // The module registers its deferred preload only in a browser (a `window`

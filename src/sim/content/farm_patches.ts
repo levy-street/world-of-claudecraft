@@ -56,6 +56,10 @@ export interface FarmBedDef {
   readonly id: string;
   readonly x: number;
   readonly z: number;
+  /** A Studio map's turn and size for this bed (sim/moved_objects.ts); the
+   *  built-in rows never carry them. */
+  readonly rotY?: number;
+  readonly scale?: number;
 }
 
 export interface FarmPatchDef {

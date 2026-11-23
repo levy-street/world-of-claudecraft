@@ -8,6 +8,12 @@ import type { Entity } from '../types';
 // CC (root/incapacitate/polymorph) on MOBS.training_dummy as a generic,
 // undying practice target, so ccImmune would silence those tests too.
 export function isPullEligible(target: Entity): boolean {
-  const template = MOBS[target.templateId];
-  return template?.boss !== true && template?.dummy !== true;
+  return MOBS[target.templateId]?.boss !== true && !isPlantedPracticeDummy(target);
+}
+
+// Practice dummies are planted on their markers outright: no displacement of
+// any kind (pull, chain, grip, or knockback) may move one. Narrower than
+// isPullEligible on purpose: bosses still take knockbacks.
+export function isPlantedPracticeDummy(target: Entity): boolean {
+  return MOBS[target.templateId]?.dummy === true;
 }

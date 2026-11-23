@@ -1,4 +1,5 @@
 import { VESPERASH_4PC_MANA_RETURN_MULT } from '../../content/ignivar_set_bonuses';
+import { LIVING_COVENANT_MAX_EXTENSION } from '../../content/priest_shadow_tuning';
 import { VANGUARD_SHADOW_2PC_SLOW_MULT } from '../../content/vanguard_set_bonuses_a';
 import type { PlayerMeta, ResolvedAbility } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -6,8 +7,11 @@ import { type Aura, dist2d, type Entity } from '../../types';
 import { dismissOwnedGuardians, guardianOf, summonGuardian } from '../guardians';
 import { wearsSetBonus } from '../set_bonus_wearer';
 import { EFFIGY_AURA_ID, GLOOMTITHE_AURA_ID, GLOOMTITHE_MAX_STACKS } from './presentation';
+import { extendShadowPrimaryDots, hasShadowTalent, resolveShadowChoir } from './shadow_talents';
+import { recordGloomtitheGeneration } from './spirit_bomb';
 import { hasPriestTalent, PRIEST_TALENT_IDS } from './talents';
 
+export { LIVING_COVENANT_MAX_EXTENSION } from '../../content/priest_shadow_tuning';
 export { EFFIGY_AURA_ID, GLOOMTITHE_AURA_ID, GLOOMTITHE_MAX_STACKS } from './presentation';
 export const GLOOMTITHE_GRACE = 15;
 export const EFFIGY_ECHO_RATE = 0.3;
@@ -21,10 +25,6 @@ export const MINDFRACTURE_SPELL_POWER_COEFF = 0.5;
 export const TITHEFIEND_BASE_SPELL_POWER_COEFF = 0.15;
 export const TITHEFIEND_MAX_STACK_DAMAGE_MULT = 1.25;
 export const TITHEFIEND_MAX_STACK_SCALE = 1.1;
-// Living Covenant's per-application extension budget (vespersEchoDamage below,
-// and the Dirge range-refresh in dirge_refresh.ts): at most this many extra
-// seconds of Dirge duration may be banked past its base 18, seconds 18-24.
-export const LIVING_COVENANT_MAX_EXTENSION = 6;
 
 /** v0.42.0: VESPERS_DOT_DAMAGE_MULT reaches Dirge's authored base total via
  * resolveVespersAbility above, but effect_dispatch.ts's runtime SP rider
@@ -41,6 +41,7 @@ export function resolveVespersAbility(
   meta: Pick<PlayerMeta, 'cls' | 'talents'>,
 ): ResolvedAbility {
   if (meta.cls !== 'priest' || meta.talents.spec !== 'shadow') return resolved;
+  if (resolved.def.id === 'choir_of_deliverance') return resolveShadowChoir(resolved, meta);
   if (resolved.def.id === 'shadow_word_pain') {
     return {
       ...resolved,
@@ -161,6 +162,7 @@ export function bindEffigy(ctx: SimContext, priest: Entity, target: Entity): boo
 
 export function addGloomtithe(ctx: SimContext, priest: Entity, amount = 1): void {
   if (amount <= 0 || priest.dead) return;
+  recordGloomtitheGeneration(ctx, priest, amount);
   const existing = priest.auras.find((aura) => aura.kind === 'gloomtithe');
   if (existing) {
     existing.stacks = Math.min(GLOOMTITHE_MAX_STACKS, (existing.stacks ?? 1) + amount);
@@ -192,16 +194,14 @@ function tithefiendDuration(stacks: number): number {
 
 function summonTithefiend(ctx: SimContext, priest: Entity, stacks: number): void {
   if (stacks <= 0) return;
-  const incarnate = stacks === 5 && hasPriestTalent(ctx, priest, PRIEST_TALENT_IDS.incarnateSpirit);
-  const incarnateMult = incarnate ? 1.5 : 1;
   const maxStackMult = stacks === GLOOMTITHE_MAX_STACKS ? TITHEFIEND_MAX_STACK_DAMAGE_MULT : 1;
-  const damageMult = incarnateMult * maxStackMult;
+  const damageMult = maxStackMult;
   summonGuardian(ctx, priest, {
     key: TITHEFIEND_KEY,
     name: 'Tithefiend',
     color: 0x6c258a,
     scale: stacks === GLOOMTITHE_MAX_STACKS ? TITHEFIEND_MAX_STACK_SCALE : 0.82,
-    remaining: tithefiendDuration(stacks) * incarnateMult,
+    remaining: tithefiendDuration(stacks),
     attackInterval: 2,
     minDamage: Math.round((12 + stacks * 8) * damageMult),
     maxDamage: Math.round((16 + stacks * 8) * damageMult),
@@ -212,7 +212,7 @@ function summonTithefiend(ctx: SimContext, priest: Entity, stacks: number): void
     preferredTargetId: effigyTarget(ctx, priest.id)?.id ?? null,
     maxRange: TITHEFIEND_MAX_RANGE,
     requiredTargetAuraId: 'shadow_word_pain',
-    dismissWhenUntargeted: true,
+    dismissWhenUntargeted: false,
   });
 }
 
@@ -276,6 +276,7 @@ export function vespersEchoDamage(
   // cancellations from creating relationship state or Gloomtithe.
   if (abilityId === 'mind_blast') {
     if (!bindEffigy(ctx, priest, target)) return;
+    extendShadowPrimaryDots(ctx, priest, target);
     addGloomtithe(ctx, priest);
   }
 
@@ -305,23 +306,25 @@ export function vespersEchoDamage(
   candidates.sort((a, b) => a.distance - b.distance || a.entity.id - b.entity.id);
   const echoRate = abilityId === TITHEFIEND_STRIKE_ID ? TITHEFIEND_ECHO_RATE : EFFIGY_ECHO_RATE;
   const echoDamage = Math.max(1, Math.round(dealt * echoRate));
+  const livingCovenant = hasShadowTalent(ctx, priest, PRIEST_TALENT_IDS.livingCovenant);
   for (const { entity } of candidates.slice(0, 3)) {
     const dirge = ownDirge(entity, priest.id);
-    if (
-      dirge &&
-      hasPriestTalent(ctx, priest, PRIEST_TALENT_IDS.livingCovenant) &&
-      dirge.extendedBy !== undefined
-    ) {
+    if (dirge && livingCovenant && dirge.extendedBy !== undefined) {
       const extension = Math.min(1, LIVING_COVENANT_MAX_EXTENSION - dirge.extendedBy);
       if (extension > 0) {
         dirge.extendedBy += extension;
         dirge.remaining += extension;
         dirge.duration += extension;
       }
-    } else if (dirge && hasPriestTalent(ctx, priest, PRIEST_TALENT_IDS.livingCovenant)) {
+    } else if (dirge && livingCovenant) {
       dirge.extendedBy = 1;
       dirge.remaining += 1;
       dirge.duration += 1;
+    }
+    const secondaryEffigy = ownEffigy(entity, priest.id);
+    if (dirge && secondaryEffigy && livingCovenant) {
+      secondaryEffigy.remaining = dirge.remaining;
+      secondaryEffigy.duration = dirge.duration;
     }
     ctx.dealDamage(
       priest,
@@ -339,20 +342,6 @@ export function vespersEchoDamage(
       'priest_effigy_echo',
       true,
     );
-    if (hasPriestTalent(ctx, priest, PRIEST_TALENT_IDS.secondVerse)) {
-      ctx.applyAura(entity, {
-        id: `priest_second_verse_effigy_${ctx.tickCount}_${entity.id}`,
-        name: 'Effigy Echo',
-        kind: 'dot',
-        remaining: 2,
-        duration: 2,
-        value: Math.max(1, Math.round(echoDamage * 0.4)),
-        tickInterval: 2,
-        tickTimer: 2,
-        sourceId: priest.id,
-        school: 'shadow',
-      });
-    }
   }
 }
 

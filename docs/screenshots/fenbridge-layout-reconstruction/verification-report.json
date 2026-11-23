@@ -1,0 +1,241 @@
+{
+  "generatedAt": "2026-10-23T03:12:03.713Z",
+  "headCommit": "7fbd7532ab0aeb1793b663bfa59699554ab68837",
+  "oldFootprintChecks": [
+    {
+      "id": "old_warden_gatehouse_center",
+      "x": 11.6,
+      "z": 274.6,
+      "groundY": 1.2,
+      "blocked": false,
+      "pass": true
+    },
+    {
+      "id": "old_crooked_reed_inn_west_edge",
+      "x": 8,
+      "z": 298,
+      "groundY": 1.2,
+      "blocked": false,
+      "pass": true
+    },
+    {
+      "id": "old_lantern_chapel_east_edge",
+      "x": -10,
+      "z": 299.6,
+      "groundY": 1.2,
+      "blocked": false,
+      "pass": true
+    },
+    {
+      "id": "old_gilded_strongbox_center",
+      "x": -12.3,
+      "z": 325.3,
+      "groundY": 1.1169,
+      "blocked": false,
+      "pass": true
+    }
+  ],
+  "walkInChecks": [
+    {
+      "id": "fenbridge_crooked_reed_inn",
+      "inside": {
+        "x": 15.6035,
+        "z": 297.9038,
+        "floorY": 1.6894,
+        "terrainY": 1.2,
+        "deckRise": 0.4894
+      },
+      "threshold": {
+        "x": 13.6035,
+        "z": 297.9038,
+        "floorY": 1.6894
+      },
+      "outsideApproach": {
+        "x": 11.6035,
+        "z": 297.9038,
+        "floorY": 1.2
+      },
+      "outsideBlocked": false,
+      "thresholdBlocked": false,
+      "insideBlocked": false,
+      "pass": true
+    },
+    {
+      "id": "fenbridge_lantern_chapel",
+      "inside": {
+        "x": -14.9518,
+        "z": 300.5931,
+        "floorY": 2.0493,
+        "terrainY": 1.2,
+        "deckRise": 0.8493
+      },
+      "threshold": {
+        "x": -12.9531,
+        "z": 300.6629,
+        "floorY": 2.0493
+      },
+      "outsideApproach": {
+        "x": -10.9543,
+        "z": 300.7327,
+        "floorY": 1.2
+      },
+      "outsideBlocked": false,
+      "thresholdBlocked": false,
+      "insideBlocked": false,
+      "pass": true
+    },
+    {
+      "id": "fenbridge_moonwort_apothecary",
+      "inside": {
+        "x": 11.9203,
+        "z": 325.9461,
+        "floorY": 1.8251,
+        "terrainY": 1.2,
+        "deckRise": 0.6251
+      },
+      "threshold": {
+        "x": 10.5309,
+        "z": 324.5074,
+        "floorY": 1.8251
+      },
+      "outsideApproach": {
+        "x": 9.1416,
+        "z": 323.0688,
+        "floorY": 1.2
+      },
+      "outsideBlocked": false,
+      "thresholdBlocked": false,
+      "insideBlocked": false,
+      "pass": true
+    },
+    {
+      "id": "fenbridge_gilded_strongbox",
+      "inside": {
+        "x": -42.9492,
+        "z": 331.099,
+        "floorY": 1.8245,
+        "terrainY": 1.2,
+        "deckRise": 0.6245
+      },
+      "threshold": {
+        "x": -40.9492,
+        "z": 331.099,
+        "floorY": 1.8245
+      },
+      "outsideApproach": {
+        "x": -38.9492,
+        "z": 331.099,
+        "floorY": 1.2
+      },
+      "outsideBlocked": false,
+      "thresholdBlocked": false,
+      "insideBlocked": false,
+      "pass": true
+    }
+  ],
+  "npcChecks": [
+    {
+      "id": "warden_fenwick",
+      "foundInSim": true,
+      "x": 6.7105,
+      "z": 276.2715,
+      "simX": 6.7105,
+      "simZ": 276.2715,
+      "groundY": 1.2,
+      "blockedAtStandingY": false,
+      "pass": true
+    },
+    {
+      "id": "brother_aldric_fen",
+      "foundInSim": true,
+      "x": -11.0614,
+      "z": 304.6422,
+      "simX": -11.0614,
+      "simZ": 304.6422,
+      "groundY": 1.2,
+      "blockedAtStandingY": false,
+      "pass": true
+    },
+    {
+      "id": "provisioner_hale",
+      "foundInSim": true,
+      "x": -4.9635,
+      "z": 286.4371,
+      "simX": -4.9635,
+      "simZ": 286.4371,
+      "groundY": 1.2,
+      "blockedAtStandingY": false,
+      "pass": true
+    },
+    {
+      "id": "herbalist_yara",
+      "foundInSim": true,
+      "x": -8.9867,
+      "z": 290.0728,
+      "simX": -8.9867,
+      "simZ": 290.0728,
+      "groundY": 1.2,
+      "blockedAtStandingY": false,
+      "pass": true
+    },
+    {
+      "id": "scout_maren",
+      "foundInSim": true,
+      "x": 6.9109,
+      "z": 288.0741,
+      "simX": 6.9109,
+      "simZ": 288.0741,
+      "groundY": 1.2,
+      "blockedAtStandingY": false,
+      "pass": true
+    },
+    {
+      "id": "bursar_petra_vell",
+      "foundInSim": true,
+      "x": 11.2708,
+      "z": 308.0314,
+      "simX": 11.2708,
+      "simZ": 308.0314,
+      "groundY": 1.2,
+      "blockedAtStandingY": false,
+      "pass": true
+    },
+    {
+      "id": "chronicler_osric_fenn",
+      "foundInSim": true,
+      "x": 12.3069,
+      "z": 293.9751,
+      "simX": 12.3069,
+      "simZ": 293.9751,
+      "groundY": 1.2,
+      "blockedAtStandingY": false,
+      "pass": true
+    },
+    {
+      "id": "tanner_hesk",
+      "foundInSim": true,
+      "x": 6.0605,
+      "z": 325.7003,
+      "simX": 6.0605,
+      "simZ": 325.7003,
+      "groundY": 1.2,
+      "blockedAtStandingY": false,
+      "pass": true
+    },
+    {
+      "id": "farmer_teasel",
+      "foundInSim": true,
+      "x": -28.2431,
+      "z": 319.5521,
+      "simX": -28.2431,
+      "simZ": 319.5521,
+      "groundY": 0.8326,
+      "blockedAtStandingY": false,
+      "pass": true
+    }
+  ],
+  "servicesCheck": {
+    "innRestingActive": true,
+    "petraBankerChestPresent": true
+  }
+}

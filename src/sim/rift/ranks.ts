@@ -330,6 +330,16 @@ export function riftRankTemplate(
     dmgBase: template.dmgBase * dmg,
     dmgPerLevel: template.dmgPerLevel * dmg,
     armorPerLevel: template.armorPerLevel * tuning.armorMultiplier,
+    // This floor would also set an authored-immobile template (moveSpeed 0)
+    // walking, the bug the dungeon transform had (instances/difficulty.ts
+    // heroicMoveSpeed). It is NOT live here: this function has two callers, the
+    // floor spawn list (rift/runs.ts) and a rift boss's summonAdds
+    // (mob/boss_mechanics.ts), and neither names an immobile template. The
+    // immobile hoard scenery (the brood egg, the tide totem, the pulsars, the
+    // tentacles, the cocoons, the bloat caps) is created by its own hoard
+    // module from the RAW template (createMob in rift/hoard_*.ts), so it keeps
+    // moveSpeed 0. A new immobile template placed on a rift floor or summoned
+    // through summonAdds would need the same guard as the dungeons.
     moveSpeed: Math.max(template.moveSpeed, tuning.minMoveSpeed),
   };
 }

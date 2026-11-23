@@ -19,12 +19,15 @@ import type { AccountCosmetics } from '../src/world_api';
  *  whatever the ownership row says: the row keeps the grant as dormant data,
  *  the character just stops wearing something the game no longer has. */
 export function wornMountSkinAllowed(
-  cosmetics: Pick<AccountCosmetics, 'mountSkinIds'>,
+  cosmetics: Pick<AccountCosmetics, 'mountSkinIds' | 'collectibleMountSkinIds'>,
   mountSkinId: string | null | undefined,
 ): boolean {
   if (!mountSkinId) return true;
   if (!isMountSkinId(mountSkinId)) return false;
   // Nullish-tolerant like account_cosmetics_live.ts: an older narrower shape
   // handed over at runtime reads as owning nothing, never as a throw at join.
-  return (cosmetics.mountSkinIds ?? []).includes(mountSkinId);
+  return (
+    (cosmetics.mountSkinIds ?? []).includes(mountSkinId) ||
+    (cosmetics.collectibleMountSkinIds ?? []).includes(mountSkinId)
+  );
 }

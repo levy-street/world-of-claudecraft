@@ -88,6 +88,38 @@ describe('drakelands rebuild kit grade', () => {
     expect(material.emissiveMap).toBe(glow);
   });
 
+  it('adds a diffuse-scaled ember floor to fortress props with lava-crack glow maps without clobbering their glow map', () => {
+    const material = kitMaterial();
+    const glow = new THREE.Texture();
+    glow.name = 'dungeon_entrance_glow';
+    material.emissiveMap = glow;
+    ignivarEnvPropsInternalsForTest.applyIgnivarFortressWarmth(material);
+    // Idempotent when called a second time: does not compound color or cache key.
+    ignivarEnvPropsInternalsForTest.applyIgnivarFortressWarmth(material);
+    expect(material.emissiveMap).toBe(glow);
+    expect(material.color.r).toBeCloseTo(1.4, 5);
+    expect(material.color.g).toBeCloseTo(1.24, 5);
+    expect(material.color.b).toBeCloseTo(1.1, 5);
+    expect(material.customProgramCacheKey()).toMatch(/^fortress-warmth\|/);
+    expect(material.customProgramCacheKey()).not.toMatch(/^fortress-warmth\|fortress-warmth\|/);
+    const shader = {
+      uniforms: {},
+      vertexShader: THREE.ShaderLib.standard.vertexShader,
+      fragmentShader: THREE.ShaderLib.standard.fragmentShader,
+    };
+    material.onBeforeCompile(
+      shader as unknown as THREE.WebGLProgramParametersWithUniforms,
+      null as unknown as THREE.WebGLRenderer,
+    );
+    expect(shader.fragmentShader).toContain('wocFortressEmberFloor');
+
+    // Without an authored emissiveMap, routes the base map into emissiveMap directly.
+    const unlit = kitMaterial();
+    ignivarEnvPropsInternalsForTest.applyIgnivarFortressWarmth(unlit);
+    expect(unlit.emissiveMap).toBe(unlit.map);
+    expect(unlit.emissive.getHex()).toBe(0x462314);
+  });
+
   it('every shipped kit piece carries a base-colour atlas and no authored emissive', async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()

@@ -19,7 +19,10 @@ describe('soulbound: heroic_mark is bound', () => {
   it('cannot be destroyed via right-click discard, but ordinary items can', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', autoEquip: true });
     const pid = sim.player.id;
-    sim.addItem('heroic_mark', 3, pid);
+    // Marks are a currency now, so a grant never bags a stack; a legacy slot can
+    // still exist until the next load folds it, and the def's noDiscard guard
+    // must keep protecting it, so inject one directly.
+    sim.meta(pid)!.inventory.push({ itemId: 'heroic_mark', count: 3 });
     sim.addItem('minor_healing_potion', 3, pid);
 
     sim.discardItem('heroic_mark', 2, pid);
@@ -84,7 +87,8 @@ describe('soulbound: heroic_mark is bound', () => {
       throw new Error('missing mail test fixture');
     }
     senderMeta.copper = 1_000;
-    sim.addItem('heroic_mark', 1, sender);
+    // A legacy bag slot (a grant now credits the currency instead).
+    senderMeta.inventory.push({ itemId: 'heroic_mark', count: 1 });
     senderEntity.pos = { ...box.pos };
     senderEntity.prevPos = { ...box.pos };
     sim.rebucket(senderEntity);

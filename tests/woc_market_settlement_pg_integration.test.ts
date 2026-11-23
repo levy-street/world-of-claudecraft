@@ -67,7 +67,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
     await db.ensureSchema();
     await db.runConcurrentIndexMigrations();
 
-    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 12 });
+    pool = new Pool({
+      ...materialSourceConnection(verifyUrl(ADMIN_URL as string)),
+      max: 12,
+    });
     marketDb = new marketDbMod.PgWocMarketDb(pool);
   }, 120_000);
 
@@ -204,9 +207,11 @@ describeDb('woc market settlement guards against real Postgres', () => {
     );
   }
 
-  async function listingRow(
-    id: number,
-  ): Promise<{ status: string; resolution: string | null; lockAccount: number | null }> {
+  async function listingRow(id: number): Promise<{
+    status: string;
+    resolution: string | null;
+    lockAccount: number | null;
+  }> {
     const res = await pool.query(
       `SELECT status, resolution, buy_now_lock_account FROM woc_market_listings WHERE id = $1`,
       [id],
@@ -321,7 +326,11 @@ describeDb('woc market settlement guards against real Postgres', () => {
         seller,
         BASE_MS + 3 * MINUTE_MS,
       );
-      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'cancelled' });
+      expect(out).toMatchObject({
+        id: listingId,
+        status: 'closed',
+        resolution: 'cancelled',
+      });
     });
 
     it('a successful cancel expires a failed settlement so a retry cannot revive it', async () => {
@@ -329,9 +338,15 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const listingId = await seedListing(realm, seller);
-      const settlement = await seedSettlement(realm, listingId, buyer, { state: 'failed' });
+      const settlement = await seedSettlement(realm, listingId, buyer, {
+        state: 'failed',
+      });
       const out = await marketDb.cancelListingIfUnbid(realm, listingId, seller, BASE_MS);
-      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'cancelled' });
+      expect(out).toMatchObject({
+        id: listingId,
+        status: 'closed',
+        resolution: 'cancelled',
+      });
       const after = await settlementRow(settlement.id);
       expect(after.state).toBe('expired');
       expect(after.failReason).toBe('listing_cancelled');
@@ -347,7 +362,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const listingId = await seedListing(realm, seller);
-      const failed = await seedSettlement(realm, listingId, buyer, { state: 'failed' });
+      const failed = await seedSettlement(realm, listingId, buyer, {
+        state: 'failed',
+      });
       const open = await seedSettlement(realm, listingId, buyer);
       const out = await marketDb.cancelListingIfUnbid(realm, listingId, seller, BASE_MS);
       expect(out).toBe('settlement_live');
@@ -421,16 +438,26 @@ describeDb('woc market settlement guards against real Postgres', () => {
       });
       const settlement = await seedSettlement(realm, listingId, buyer);
       const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
-      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+      expect(out).toMatchObject({
+        id: listingId,
+        status: 'closed',
+        resolution: 'suspended',
+      });
       const row = await listingRow(listingId);
       expect(row.status).toBe('closed');
       expect(row.resolution).toBe('suspended');
       const after = await settlementRow(settlement.id);
       expect(after.state).toBe('expired');
       expect(after.failReason).toBe('listing_suspended');
-      expect(await bidRow(heldBid)).toEqual({ status: 'cancelled', bondState: 'refund_due' });
+      expect(await bidRow(heldBid)).toEqual({
+        status: 'cancelled',
+        bondState: 'refund_due',
+      });
       // An unfunded bond has nothing to refund; only the bid is cancelled.
-      expect(await bidRow(pendingBid)).toEqual({ status: 'cancelled', bondState: 'pending' });
+      expect(await bidRow(pendingBid)).toEqual({
+        status: 'cancelled',
+        bondState: 'pending',
+      });
     });
 
     it('refuses the suspend at every state where the payment may already be moving', async () => {
@@ -465,7 +492,11 @@ describeDb('woc market settlement guards against real Postgres', () => {
       );
       expect((await listingRow(listingId)).status).toBe('active');
       const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS + 3 * MINUTE_MS);
-      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+      expect(out).toMatchObject({
+        id: listingId,
+        status: 'closed',
+        resolution: 'suspended',
+      });
       expect((await listingRow(listingId)).resolution).toBe('suspended');
     });
 
@@ -476,14 +507,23 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const bidder = await seedAccount();
       const listingId = await seedListing(realm, seller);
       const heldBid = await seedBid(realm, listingId, bidder);
-      const settlement = await seedSettlement(realm, listingId, buyer, { state: 'failed' });
+      const settlement = await seedSettlement(realm, listingId, buyer, {
+        state: 'failed',
+      });
       const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
-      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+      expect(out).toMatchObject({
+        id: listingId,
+        status: 'closed',
+        resolution: 'suspended',
+      });
       const after = await settlementRow(settlement.id);
       expect(after.state).toBe('expired');
       expect(after.failReason).toBe('listing_suspended');
       // The atomic teardown holds on this arm too, not only over 'offered'.
-      expect(await bidRow(heldBid)).toEqual({ status: 'cancelled', bondState: 'refund_due' });
+      expect(await bidRow(heldBid)).toEqual({
+        status: 'cancelled',
+        bondState: 'refund_due',
+      });
     });
 
     it('refuses a missing or already-closed listing', async () => {
@@ -523,7 +563,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
           status: 'closed',
           resolution: 'suspended',
         });
-        expect(await bidRow(bidId)).toEqual({ status: 'cancelled', bondState: 'refund_due' });
+        expect(await bidRow(bidId)).toEqual({
+          status: 'cancelled',
+          bondState: 'refund_due',
+        });
       } finally {
         client.release();
       }
@@ -540,7 +583,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const listingId = await seedListing(realm, seller);
-      const settlement = await seedSettlement(realm, listingId, buyer, { state: 'delivered' });
+      const settlement = await seedSettlement(realm, listingId, buyer, {
+        state: 'delivered',
+      });
       const live = await marketDb.liveSettlementForListing(listingId);
       expect(live?.id).toBe(settlement.id);
       expect(live?.state).toBe('delivered');
@@ -571,10 +616,18 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const realm = 'guard-delivered-reclaim';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const deliveredListing = await seedListing(realm, seller, { status: 'settling' });
-      await seedSettlement(realm, deliveredListing, buyer, { state: 'delivered' });
-      const deadListing = await seedListing(realm, seller, { status: 'settling' });
-      const dead = await seedSettlement(realm, deadListing, buyer, { state: 'failed' });
+      const deliveredListing = await seedListing(realm, seller, {
+        status: 'settling',
+      });
+      await seedSettlement(realm, deliveredListing, buyer, {
+        state: 'delivered',
+      });
+      const deadListing = await seedListing(realm, seller, {
+        status: 'settling',
+      });
+      const dead = await seedSettlement(realm, deadListing, buyer, {
+        state: 'failed',
+      });
       // The failed settlement is past its retry window, so its listing really
       // is stranded; the delivered one is mid-close and must never REOPEN
       // (re-auctioning a delivered item was the dupe): it converges to the
@@ -722,7 +775,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // without the invariant under test.
       await pool.query('DROP INDEX woc_market_settlements_open2');
       try {
-        const delivered = await seedSettlement(realm, listingId, buyer, { state: 'delivered' });
+        const delivered = await seedSettlement(realm, listingId, buyer, {
+          state: 'delivered',
+        });
         const revived = await seedSettlement(realm, listingId, buyer);
         // The ranking arm: the ADVANCED row is inserted SECOND (higher id),
         // so a survivor chosen by state rank differs from keep-earliest; a
@@ -764,7 +819,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const listingId = await seedListing(realm, seller);
       await pool.query('DROP INDEX woc_market_settlements_open2');
       try {
-        const keep = await seedSettlement(realm, listingId, buyer, { state: 'confirming' });
+        const keep = await seedSettlement(realm, listingId, buyer, {
+          state: 'confirming',
+        });
         const dupe = await seedSettlement(realm, listingId, buyer);
         // A failed CONCURRENTLY build (the incident-response hand build the
         // DDL comment names) leaves an INVALID carcass that satisfies both
@@ -829,14 +886,21 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const bidder = await seedAccount();
       const buyer = await seedAccount();
-      const listingId = await seedListing(realm, seller, { endsAtMs: BASE_MS - MINUTE_MS });
-      const bidId = await seedBid(realm, listingId, bidder, { bondReference: 'bond-ref-h9-race' });
+      const listingId = await seedListing(realm, seller, {
+        endsAtMs: BASE_MS - MINUTE_MS,
+      });
+      const bidId = await seedBid(realm, listingId, bidder, {
+        bondReference: 'bond-ref-h9-race',
+      });
       const buyNow = await seedSettlement(realm, listingId, buyer);
       await makeService(realm).sweepPass();
       // Exactly one winner: the buy-now settlement stands alone and the
       // standing bid holds no claim; its bond rode the refund pipeline to its
       // terminal state inside the same pass (the dev economy always settles).
-      expect(await bidRow(bidId)).toEqual({ status: 'outbid', bondState: 'refunded' });
+      expect(await bidRow(bidId)).toEqual({
+        status: 'outbid',
+        bondState: 'refunded',
+      });
       const settlements = await pool.query(
         `SELECT id, state FROM woc_market_settlements WHERE listing_id = $1`,
         [listingId],
@@ -849,7 +913,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const realm = 'guard-h9-clean';
       const seller = await seedAccount();
       const bidder = await seedAccount();
-      const listingId = await seedListing(realm, seller, { endsAtMs: BASE_MS - MINUTE_MS });
+      const listingId = await seedListing(realm, seller, {
+        endsAtMs: BASE_MS - MINUTE_MS,
+      });
       const bidId = await seedBid(realm, listingId, bidder);
       await makeService(realm).sweepPass();
       expect((await bidRow(bidId)).status).toBe('won');
@@ -915,7 +981,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // The converse guard: naming a cancelled bid as winner aborts the whole
       // insert, so no settlement can exist whose winner holds no claim.
       const otherListing = await seedListing(realm, seller);
-      const cancelledBid = await seedBid(realm, otherListing, bidder, { status: 'cancelled' });
+      const cancelledBid = await seedBid(realm, otherListing, bidder, {
+        status: 'cancelled',
+      });
       const out = await marketDb.insertSettlement({
         listingId: otherListing,
         bidId: cancelledBid,
@@ -993,7 +1061,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const winner = await seedAccount();
       const runnerUp = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling', offerNext: true });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+        offerNext: true,
+      });
       const winnerBid = await seedBid(realm, listingId, winner, {
         amountCents: 900,
         bondReference: 'bond-ref-cascade-winner',
@@ -1011,8 +1082,14 @@ describeDb('woc market settlement guards against real Postgres', () => {
       });
       await makeService(realm).sweepPass();
       // The defaulted winner's forfeit also resolves inside the same pass.
-      expect(await bidRow(winnerBid)).toEqual({ status: 'defaulted', bondState: 'forfeited' });
-      expect(await bidRow(runnerUpBid)).toEqual({ status: 'won', bondState: 'held' });
+      expect(await bidRow(winnerBid)).toEqual({
+        status: 'defaulted',
+        bondState: 'forfeited',
+      });
+      expect(await bidRow(runnerUpBid)).toEqual({
+        status: 'won',
+        bondState: 'held',
+      });
       const settlements = await pool.query(
         `SELECT bid_id, state, attempt FROM woc_market_settlements WHERE listing_id = $1 ORDER BY id`,
         [listingId],
@@ -1029,7 +1106,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const winner = await seedAccount();
       const runnerUp = await seedAccount();
       const buyer = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling', offerNext: true });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+        offerNext: true,
+      });
       const winnerBid = await seedBid(realm, listingId, winner, {
         amountCents: 900,
         bondReference: 'bond-ref-cc-winner',
@@ -1056,7 +1136,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // racer, the won stamp rolled back, and the re-held bond went straight
       // back through the refund pipeline (terminal in the same pass).
       expect((await settlementRow(failed.id)).state).toBe('expired');
-      expect(await bidRow(runnerUpBid)).toEqual({ status: 'outbid', bondState: 'refunded' });
+      expect(await bidRow(runnerUpBid)).toEqual({
+        status: 'outbid',
+        bondState: 'refunded',
+      });
       const offered = await pool.query(
         `SELECT id FROM woc_market_settlements WHERE listing_id = $1 AND state = 'offered'`,
         [listingId],
@@ -1168,7 +1251,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const realm = 'guard-close-nobids-live';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const listingId = await seedListing(realm, seller, { endsAtMs: BASE_MS - MINUTE_MS });
+      const listingId = await seedListing(realm, seller, {
+        endsAtMs: BASE_MS - MINUTE_MS,
+      });
       await seedSettlement(realm, listingId, buyer);
       await makeService(realm).sweepPass();
       // The unguarded close was the dupe hole: 'no_bids' would mail the
@@ -1184,7 +1269,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const realm = 'guard-insert-vs-close';
       const seller = await seedAccount();
       const bidder = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+      });
       const bidId = await seedBid(realm, listingId, bidder, {
         status: 'outbid',
         bondState: 'held',
@@ -1250,7 +1337,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // current bid: the exact fixture where the old activateBid (own bid,
       // then listing, then the PREVIOUS bid) crossed the suspend guard's
       // ordered scan and one side died 40P01.
-      const standingBid = await seedBid(realm, listingId, standingBidder, { amountCents: 700 });
+      const standingBid = await seedBid(realm, listingId, standingBidder, {
+        amountCents: 700,
+      });
       const pendingBid = await seedBid(realm, listingId, pendingBidder, {
         status: 'pending_bond',
         bondState: 'pending',
@@ -1299,8 +1388,12 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyerA = await seedAccount();
       const buyerB = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling' });
-      const failed = await seedSettlement(realm, listingId, buyerA, { state: 'failed' });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+      });
+      const failed = await seedSettlement(realm, listingId, buyerA, {
+        state: 'failed',
+      });
       // Legal coexistence: 'failed' sits outside the open-set index, so a
       // second open settlement can stand beside it (the cascade builds
       // exactly this pair).
@@ -1316,8 +1409,12 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const realm = 'guard-quote-revive-ok';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling' });
-      const failed = await seedSettlement(realm, listingId, buyer, { state: 'failed' });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+      });
+      const failed = await seedSettlement(realm, listingId, buyer, {
+        state: 'failed',
+      });
       const service = makeService(realm);
       const out = await service.settlementQuote(buyer, failed.id);
       expect(out).toMatchObject({ ok: true });
@@ -1358,7 +1455,11 @@ describeDb('woc market settlement guards against real Postgres', () => {
         [settlement.id, BASE_MS - MINUTE_MS],
       );
       const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
-      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+      expect(out).toMatchObject({
+        id: listingId,
+        status: 'closed',
+        resolution: 'suspended',
+      });
       const after = await settlementRow(settlement.id);
       expect(after.state).toBe('expired');
       expect(after.failReason).toBe('listing_suspended');
@@ -1371,7 +1472,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const bidder = await seedAccount();
       const listingId = await seedListing(realm, seller);
-      const bidId = await seedBid(realm, listingId, bidder, { status: 'cancelled' });
+      const bidId = await seedBid(realm, listingId, bidder, {
+        status: 'cancelled',
+      });
       await marketDb.markBidStatus(bidId, 'outbid', ['active']);
       expect((await bidRow(bidId)).status).toBe('cancelled');
       await marketDb.markBidStatus(bidId, 'outbid');
@@ -1390,10 +1493,16 @@ describeDb('woc market settlement guards against real Postgres', () => {
         bondState: 'held',
       });
       await marketDb.markBidOutbidQueueRefund(activeBid);
-      expect(await bidRow(activeBid)).toEqual({ status: 'outbid', bondState: 'refund_due' });
+      expect(await bidRow(activeBid)).toEqual({
+        status: 'outbid',
+        bondState: 'refund_due',
+      });
       // The CAS from 'active': a cancelled bid (and its bond) is left alone.
       await marketDb.markBidOutbidQueueRefund(cancelledBid);
-      expect(await bidRow(cancelledBid)).toEqual({ status: 'cancelled', bondState: 'held' });
+      expect(await bidRow(cancelledBid)).toEqual({
+        status: 'cancelled',
+        bondState: 'held',
+      });
     });
   });
 
@@ -1406,7 +1515,11 @@ describeDb('woc market settlement guards against real Postgres', () => {
       await seedSettlement(realm, listingId, buyer, { state: 'expired' });
       expect(await marketDb.liveSettlementForListing(listingId)).toBeNull();
       const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
-      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+      expect(out).toMatchObject({
+        id: listingId,
+        status: 'closed',
+        resolution: 'suspended',
+      });
     });
   });
 
@@ -1416,7 +1529,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const bidder = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+      });
       // The close-time shape: a won bid with a held bond behind the failed
       // settlement. Reclaiming (and expiring) here would silently skip the
       // deadline pass that defaults the winner, forfeits the bond, records
@@ -1433,14 +1548,19 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const after = await settlementRow(failed.id);
       expect(after.state).toBe('failed');
       expect((await listingRow(listingId)).status).toBe('settling');
-      expect(await bidRow(wonBid)).toEqual({ status: 'won', bondState: 'held' });
+      expect(await bidRow(wonBid)).toEqual({
+        status: 'won',
+        bondState: 'held',
+      });
     }, 20_000);
 
     it('the reopen statement itself refuses while an open or failed settlement rides the listing', async () => {
       const realm = 'guard-reclaim-reopen-belt';
       const seller = await seedAccount();
       const buyer = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+      });
       const settlement = await seedSettlement(realm, listingId, buyer);
       // The belt under the read-then-act arm: a direct reopen with an open
       // settlement present must not move the row; a retry-eligible 'failed'
@@ -1469,7 +1589,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const bidder = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+      });
       const releasedBid = await seedBid(realm, listingId, bidder, {
         status: 'cancelled',
         bondState: 'refund_due',
@@ -1497,7 +1619,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const bidder = await seedAccount();
-      const listingId = await seedListing(realm, seller, { status: 'settling' });
+      const listingId = await seedListing(realm, seller, {
+        status: 'settling',
+      });
       const wonBid = await seedBid(realm, listingId, bidder, {
         status: 'won',
         bondState: 'held',
@@ -1507,13 +1631,20 @@ describeDb('woc market settlement guards against real Postgres', () => {
         bidId: wonBid,
       });
       const out = await marketDb.suspendListingIfSafe(realm, listingId, BASE_MS);
-      expect(out).toMatchObject({ id: listingId, status: 'closed', resolution: 'suspended' });
+      expect(out).toMatchObject({
+        id: listingId,
+        status: 'closed',
+        resolution: 'suspended',
+      });
       const after = await settlementRow(failed.id);
       expect(after.state).toBe('expired');
       expect(after.failReason).toBe('listing_suspended');
       // The CTE released the winner in the same statement: without it the
       // bid sits 'won' with a held bond no sweep arm can ever reach.
-      expect(await bidRow(wonBid)).toEqual({ status: 'cancelled', bondState: 'refund_due' });
+      expect(await bidRow(wonBid)).toEqual({
+        status: 'cancelled',
+        bondState: 'refund_due',
+      });
     });
   });
   describe('activity reads are item-named (the real SQL, not just the fake twin)', () => {
@@ -1525,7 +1656,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // pin reaches the CORRELATION itself (a single-listing seed passes an
       // uncorrelated lookup that names every row after the first listing).
       const crown = await seedListing(realm, seller);
-      const plate = await seedListing(realm, seller, { itemId: 'deathlord_warplate' });
+      const plate = await seedListing(realm, seller, {
+        itemId: 'deathlord_warplate',
+      });
       await seedSettlement(realm, crown, buyer);
       await seedSettlement(realm, plate, buyer);
       const rows = await marketDb.settlementsByAccount(realm, buyer, 10);
@@ -1549,7 +1682,9 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const seller = await seedAccount();
       const buyer = await seedAccount();
       const listingId = await seedListing(realm, seller);
-      const settlement = await seedSettlement(realm, listingId, buyer, { state: 'confirming' });
+      const settlement = await seedSettlement(realm, listingId, buyer, {
+        state: 'confirming',
+      });
       // The chain-polls segment runs UNLOCKED now, so the deploy-overlap case
       // is two processes reaching the same verdict write together. The
       // from-state CAS is the exclusion: exactly one wins, and the loser's
@@ -1590,7 +1725,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
       // Promise.all this replaces held up to six clients per request, so the
       // decisive assertion is the PEAK, not the outcome (the pool-hold bound
       // must be COUNTED, never just passed functionally).
-      const gaugePool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 2 });
+      const gaugePool = new Pool({
+        connectionString: verifyUrl(ADMIN_URL as string),
+        max: 2,
+      });
       let inFlight = 0;
       let peak = 0;
       const counting = {
@@ -1765,7 +1903,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
         `SELECT state, tx_signature FROM woc_market_settlements WHERE id = $1`,
         [offered.id],
       );
-      expect(recorded.rows[0]).toEqual({ state: 'confirming', tx_signature: 'sig-shared' });
+      expect(recorded.rows[0]).toEqual({
+        state: 'confirming',
+        tx_signature: 'sig-shared',
+      });
 
       // A non-offered row refuses and takes nothing: the signature-first
       // recording belongs to the offered window only.
@@ -1774,7 +1915,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
         `SELECT state, tx_signature FROM woc_market_settlements WHERE id = $1`,
         [failed.id],
       );
-      expect(failedRow.rows[0]).toEqual({ state: 'failed', tx_signature: null });
+      expect(failedRow.rows[0]).toEqual({
+        state: 'failed',
+        tx_signature: null,
+      });
 
       // The ledger holds ONE settlement per signature: a rival submitting the
       // same signature answers the typed word, never a raw 500, and stays
@@ -1786,7 +1930,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
         `SELECT state, tx_signature FROM woc_market_settlements WHERE id = $1`,
         [rival.id],
       );
-      expect(rivalRow.rows[0]).toEqual({ state: 'offered', tx_signature: null });
+      expect(rivalRow.rows[0]).toEqual({
+        state: 'offered',
+        tx_signature: null,
+      });
     });
   });
 
@@ -1794,8 +1941,12 @@ describeDb('woc market settlement guards against real Postgres', () => {
     it('claimDueListings takes only ACTIVE listings whose close has passed', async () => {
       const realm = `sweep-due-${++seq}`;
       const seller = await seedAccount();
-      const due = await seedListing(realm, seller, { endsAtMs: BASE_MS - MINUTE_MS });
-      const future = await seedListing(realm, seller, { endsAtMs: BASE_MS + 60 * MINUTE_MS });
+      const due = await seedListing(realm, seller, {
+        endsAtMs: BASE_MS - MINUTE_MS,
+      });
+      const future = await seedListing(realm, seller, {
+        endsAtMs: BASE_MS + 60 * MINUTE_MS,
+      });
       const settling = await seedListing(realm, seller, {
         status: 'settling',
         endsAtMs: BASE_MS - MINUTE_MS,
@@ -1940,7 +2091,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
         status: 'defaulted',
         bondState: 'forfeit_due',
       });
-      await seedSettlement(realm, listing, buyer, { state: 'failed', bidId: defaulted });
+      await seedSettlement(realm, listing, buyer, {
+        state: 'failed',
+        bidId: defaulted,
+      });
       const out = await marketDb.suspendListingIfSafe(realm, listing, BASE_MS);
       expect(typeof out === 'object' ? out.id : out).toBe(listing);
       expect(await bidRow(defaulted), 'a defaulted verdict is history, not releasable').toEqual({
@@ -1973,14 +2127,26 @@ describeDb('woc market settlement guards against real Postgres', () => {
       const low = await seedAccount();
       const prior = await seedAccount();
       const listing = await seedListing(realm, seller);
-      await seedBid(realm, listing, active, { status: 'active', amountCents: 950 });
+      await seedBid(realm, listing, active, {
+        status: 'active',
+        amountCents: 950,
+      });
       const out900 = await seedBid(realm, listing, eligible, {
         status: 'outbid',
         amountCents: 900,
       });
-      await seedBid(realm, listing, low, { status: 'outbid', amountCents: 800 });
-      await seedBid(realm, listing, prior, { status: 'outbid', amountCents: 920 });
-      await seedBid(realm, listing, prior, { status: 'defaulted', amountCents: 990 });
+      await seedBid(realm, listing, low, {
+        status: 'outbid',
+        amountCents: 800,
+      });
+      await seedBid(realm, listing, prior, {
+        status: 'outbid',
+        amountCents: 920,
+      });
+      await seedBid(realm, listing, prior, {
+        status: 'defaulted',
+        amountCents: 990,
+      });
       expect((await marketDb.nextCascadeBidder(listing, 850))?.id).toBe(out900);
       expect((await marketDb.nextCascadeBidder(listing, 900))?.id, 'the floor is inclusive').toBe(
         out900,
@@ -2006,8 +2172,14 @@ describeDb('woc market settlement guards against real Postgres', () => {
         bondState: 'forfeit_due',
         placedAtMs: BASE_MS - 20 * MINUTE_MS,
       });
-      await seedBid(realm, listing, bidder, { status: 'won', bondState: 'held' });
-      await seedBid(realm, listing, bidder, { status: 'lapsed', bondState: 'void' });
+      await seedBid(realm, listing, bidder, {
+        status: 'won',
+        bondState: 'held',
+      });
+      await seedBid(realm, listing, bidder, {
+        status: 'lapsed',
+        bondState: 'void',
+      });
       await seedBid(realm, listing, bidder, { bondState: 'pending' });
       const due = await marketDb.bondsDue(realm, 10);
       expect(
@@ -2044,7 +2216,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
           [realm, seller],
         ),
         'a non-object custody copy never lands',
-      ).rejects.toMatchObject({ code: '23514', constraint: 'woc_market_listings_item_check' });
+      ).rejects.toMatchObject({
+        code: '23514',
+        constraint: 'woc_market_listings_item_check',
+      });
       await expect(
         pool.query(
           `INSERT INTO woc_market_listings (
@@ -2054,7 +2229,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
                      500, now(), now())`,
           [realm, seller],
         ),
-      ).rejects.toMatchObject({ code: '23514', constraint: 'woc_market_listings_format_check' });
+      ).rejects.toMatchObject({
+        code: '23514',
+        constraint: 'woc_market_listings_format_check',
+      });
       const listing = await seedListing(realm, seller);
       await expect(seedBid(realm, listing, buyer, { status: 'bogus' })).rejects.toMatchObject({
         code: '23514',
@@ -2094,7 +2272,10 @@ describeDb('woc market settlement guards against real Postgres', () => {
            ) VALUES ($1, $2, 'x', '"str"'::jsonb, 100, NULL, $3, $4, 'S', 'B')`,
           [realm, listing, seller, buyer],
         ),
-      ).rejects.toMatchObject({ code: '23514', constraint: 'woc_market_sales_item_check' });
+      ).rejects.toMatchObject({
+        code: '23514',
+        constraint: 'woc_market_sales_item_check',
+      });
       await expect(
         pool.query(
           `INSERT INTO woc_market_directed_offers (

@@ -1,0 +1,940 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "dungeon-temple-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 11,
+    "replacedSvgIcons": 11,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "conchplate_girdle",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/conchplate_girdle.webp",
+      "canonicalDisplayName": "Conchplate Girdle",
+      "acceptedSha256": "fcc3e88cc43e2b5cdbcd86a79ff73609c807dac5519d7ea304c19082c593ead3",
+      "acceptedBytes": 4322,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/conchplate_girdle.png",
+        "sha256": "ee98c1abf4db75af663c9e79c63f569ef0a36793464e66a039fd1ffdca48b302",
+        "bytes": 2264074,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/conchplate_girdle.png",
+        "sha256": "c512e7f671319bf02f4a579bf064309a5ab371a3e0db316ad9fb973ec42a4b48",
+        "bytes": 555523,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "431cae51e54c8876f94e6e35faacc8c9e6dfc55be600ec783d7921f3193d26d9",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Conchplate Girdle (conchplate_girdle) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete MAIL waist girdle with visible chain links between overlapping ivory conch-shell metal plates and a large golden spiral shell buckle. Curved belt silhouette, pale pearly steel, aged gold, no wearer. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/conchplate_girdle.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "431cae51e54c8876f94e6e35faacc8c9e6dfc55be600ec783d7921f3193d26d9"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "pale_chorus_leggings",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/pale_chorus_leggings.webp",
+      "canonicalDisplayName": "Pale Chorus Leggings",
+      "acceptedSha256": "64ff57d8baaefe7f7821dc5b7c0665d571a1cde86d9071f4e71a3c7d5759d130",
+      "acceptedBytes": 3036,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/pale_chorus_leggings.png",
+        "sha256": "f3ca701d42904490d8570964408ec2ab7848a95aeeeeaa9f337097caeb9d5308",
+        "bytes": 2210834,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/pale_chorus_leggings.png",
+        "sha256": "8498ca8f550736c9087140417ce8815892d11ca1dd84f8261cac7b5b85f49e60",
+        "bytes": 516471,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "862ef18754ecbb3095a370961484130971c006436cd23585c310c7da793ed2c6",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Pale Chorus Leggings (pale_chorus_leggings) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of pale ivory LEATHER leggings, supple leather stitched seams, silver-blue flowing decorative seam patterns resembling waves, no readable music or writing. Fitted trousers with separate legs, no wearer. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/pale_chorus_leggings.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "862ef18754ecbb3095a370961484130971c006436cd23585c310c7da793ed2c6"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "refrain_silk_gloves",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/refrain_silk_gloves.webp",
+      "canonicalDisplayName": "Refrain Silk Gloves",
+      "acceptedSha256": "20e1d5e58e3f6db1c3f40e0817f899c0bb2d506fcd5f1ddf78adbaf094ee669b",
+      "acceptedBytes": 3742,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/refrain_silk_gloves.png",
+        "sha256": "3310d843d3904dd3a331bf49997552512db5bdfcceeb84f6cfa4662c4a7c828b",
+        "bytes": 2169663,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/refrain_silk_gloves.png",
+        "sha256": "afe33bac8c9915f5c55a759464869a7b942cb3172c7d4b1d53607ea0a2dce23d",
+        "bytes": 562668,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "d636fe80a2305fb67a313fc9ff85b78beeec9bb0beeb9f965fe084c16ac2976c",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Refrain Silk Gloves (refrain_silk_gloves) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A compact matching pair of pale ivory SILK CLOTH gloves, graceful fabric folds, small gold musical-note shaped metal ornament on each cuff. Five fingers per glove, empty gloves, no hands. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/refrain_silk_gloves.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d636fe80a2305fb67a313fc9ff85b78beeec9bb0beeb9f965fe084c16ac2976c"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "chorus_conch",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/chorus_conch.webp",
+      "canonicalDisplayName": "Chorus Conch",
+      "acceptedSha256": "c883ceacebc8102571cb6e70518ab18deb8b621f06b5914c60e900d5d4599719",
+      "acceptedBytes": 3800,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/chorus_conch.png",
+        "sha256": "dbb2af4205fe1b7c877bc0bed55457a7fa1598065cbbb02165beabd547adadcf",
+        "bytes": 2228165,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/chorus_conch.png",
+        "sha256": "52b540f9141f7ba0f6733f446305dbbb7475e7d87736e725bdb68ae17db710a4",
+        "bytes": 615720,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "42e7651de27f9d7bc2ff1655e8bd7fc577dda99c53edfdf84c5c1f1c7ab2ecd8",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Chorus Conch (chorus_conch) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete curled nacre conch shell, pearlescent ivory with pink and violet shimmer. Large open shell mouth faces forward left with contained warm golden magical light. Clear ridged spiral and pointed tip, no stand. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/chorus_conch.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "42e7651de27f9d7bc2ff1655e8bd7fc577dda99c53edfdf84c5c1f1c7ab2ecd8"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "heroic_chorus_conch",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/heroic_chorus_conch.webp",
+      "canonicalDisplayName": "Heroic Chorus Conch",
+      "acceptedSha256": "628565723aaf7c9a0e12c3ba82fe5747f9fe3aca0e9dd985d570d7aa67b9e7c1",
+      "acceptedBytes": 4528,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/heroic_chorus_conch.png",
+        "sha256": "8dc53a556fc9dec4a2587fb448fd0a66caa6e927b452a719b561c91bb9fd5cdc",
+        "bytes": 2200580,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/heroic_chorus_conch.png",
+        "sha256": "b9c5c3a59b26f371c72edf109b914fd19a7f8f644354511321fdb08db225fbf7",
+        "bytes": 623076,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "acc9784fc4ddd192e4f6ce41b040a5b0630402df643156b93c7c3143044f39c8",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Heroic Chorus Conch (heroic_chorus_conch) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete magnificent nacre conch shell in a different three-quarter pose with its broad open mouth facing forward right, ivory pink violet pearlescent spiral. Strong cool moonlight rim on shell ridges and pale gold magical light spilling from the opening. Deeper navy moonlit background and richer luminous shell than its normal version; distinct individual painting. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/heroic_chorus_conch.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "acc9784fc4ddd192e4f6ce41b040a5b0630402df643156b93c7c3143044f39c8"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "tideglass_pauldrons",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/tideglass_pauldrons.webp",
+      "canonicalDisplayName": "Tideglass Pauldrons",
+      "acceptedSha256": "170262fc632bd3b81acfd9b782fc89980de542a5ce29db6d9828fe666aacf12d",
+      "acceptedBytes": 4182,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/tideglass_pauldrons.png",
+        "sha256": "9e337e40b6a538cdda1988ec76287283e6755fbff54336dd28f83400aa31ad49",
+        "bytes": 2300964,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/tideglass_pauldrons.png",
+        "sha256": "de62c216e12f045d7faa856e3e40f3023051c57cdf6f2db25726f0e2db170a37",
+        "bytes": 534966,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "8a0f8bf1f19773763e1d11a9e685db9e17552537329616ffac98dca7ee79b2c4",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tideglass Pauldrons (tideglass_pauldrons) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A compact matching pair of MAIL shoulder guards with visibly interlinked steel chain hanging below pearly metal caps, crowns of translucent blue tideglass prism shards. Ocean blue glass and steel, no torso or wearer. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/tideglass_pauldrons.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "8a0f8bf1f19773763e1d11a9e685db9e17552537329616ffac98dca7ee79b2c4"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "moonburn_treads",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/moonburn_treads.webp",
+      "canonicalDisplayName": "Moonburn Treads",
+      "acceptedSha256": "725f6b2b6ed1d4fa9613c3fa38ce62e9d260496044f564b936ebd5e59c0ad21a",
+      "acceptedBytes": 3596,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/moonburn_treads.png",
+        "sha256": "d486497e38dbd5004a05e835e7b6db338cd2cfd7c87cf77b986bc17b7f3394a0",
+        "bytes": 2322318,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/moonburn_treads.png",
+        "sha256": "172170055e574666cc72de47aef96d2a24cc581d38d803ce49873e2bee185e36",
+        "bytes": 524874,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "4843a8035228845ea10a86a8fc4cc9d69a0eab20e3945460fa023e078ae56776",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Moonburn Treads (moonburn_treads) in World of ClaudeCraft woc-item-icon-v1 style. Subject: A complete compact pair of dark sea-brown LEATHER boots, one forward and one behind, cold silver crescent branded on each upper cuff, supple stitched leather, subtle bluish silver edge light, no feet or wearer. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/moonburn_treads.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "4843a8035228845ea10a86a8fc4cc9d69a0eab20e3945460fa023e078ae56776"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "prism_etched_cowl",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/prism_etched_cowl.webp",
+      "canonicalDisplayName": "Prism-Etched Cowl",
+      "acceptedSha256": "8c27b0bbef63ef00cd1522d4ae196ef32d8d10ea38354531e1b6b69856319623",
+      "acceptedBytes": 3554,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/prism_etched_cowl.png",
+        "sha256": "8c14ce23cf8d240dcb644a911cbec83785f324eea68b982be143c0c5c72cd99a",
+        "bytes": 2455323,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/prism_etched_cowl.png",
+        "sha256": "1ea6f7cb8c1af9b69e9cf5c1b6a53b86b03af5c20b92a9ec6fd6af2fcfc7b8d5",
+        "bytes": 554518,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "53302f40dc518690c477410728fbc12e4dd6950d30736f5d03f364e9a601f64a",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Prism-Etched Cowl (prism_etched_cowl) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty pale blue-gray CLOTH cowl, dark face opening, delicate silver geometric stitched trim, one faceted violet prism jewel attached prominently at brow. Soft silk folds, no face or mannequin. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/prism_etched_cowl.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "53302f40dc518690c477410728fbc12e4dd6950d30736f5d03f364e9a601f64a"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "tideglass_shiv",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/tideglass_shiv.webp",
+      "canonicalDisplayName": "Tideglass Shiv",
+      "acceptedSha256": "39040df2189aa95f76d9bc8be640409b1287c5de24c955854a7744cf43339752",
+      "acceptedBytes": 2642,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/tideglass_shiv.png",
+        "sha256": "bfabf116a77d608443a4f420cf557498a3a62c8485637a69d55927a849a74752",
+        "bytes": 2174571,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/tideglass_shiv.png",
+        "sha256": "c6ab6eab1b7b6c991507f2753f8220fbbc0d148ee2f863f6d14f9c6e75b3a444",
+        "bytes": 507792,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "d5c32a29a9e2b5fa4af2c0b8e0c4c1436182a5423319be20a46097c38c7efcbc",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tideglass Shiv (tideglass_shiv) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete slim translucent sea-blue tideglass dagger diagonally posed, narrow sharply faceted crystalline blade, small aged-gold guard, dark wrapped grip and round white pearl pommel. Whole tip and pommel visible. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/tideglass_shiv.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "d5c32a29a9e2b5fa4af2c0b8e0c4c1436182a5423319be20a46097c38c7efcbc"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "pale_chorus_vestment",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/pale_chorus_vestment.webp",
+      "canonicalDisplayName": "Pale Chorus Vestment",
+      "acceptedSha256": "4439e3b496f30b4476266e05a1bb96d0ddfef42cb3b7d8df916e38366d26cfb4",
+      "acceptedBytes": 3986,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/pale_chorus_vestment.png",
+        "sha256": "e8798f3a68b0a6e9921c4fe3fd0ae3045e7e2a2c1b579e8733eb1b1121dd72dc",
+        "bytes": 2169164,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/pale_chorus_vestment.png",
+        "sha256": "2378048bc4b5785fa8803a29f75693f06df2c1326b93f7638f5ddf6e6209ecd6",
+        "bytes": 554401,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "e5d677d560ea6c4408414ff40d09ac36ee94d3dc948294ffbe857546a591b629",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Pale Chorus Vestment (pale_chorus_vestment) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete empty pale ivory and silver-blue moonsilk CLOTH robe, flowing long skirt, broad rich gold embroidered stole down both sides of chest, pearl clasp. Soft luminous woven fabric, no head, hands or mannequin. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/pale_chorus_vestment.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "e5d677d560ea6c4408414ff40d09ac36ee94d3dc948294ffbe857546a591b629"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "tideglass_warmaul",
+      "family": "temple",
+      "batch": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/tideglass_warmaul.webp",
+      "canonicalDisplayName": "Tideglass Warmaul",
+      "acceptedSha256": "32e64e2891c7ad9384a84ee81963404b737d2dbee3bd9f39eea28b92752611b0",
+      "acceptedBytes": 3126,
+      "original": {
+        "path": "tmp/imagegen/v045-dungeon-temple/originals/tideglass_warmaul.png",
+        "sha256": "e2164838d72cfa44eab43ca14b9f29187a895667ce4d1db763e780d93286b13e",
+        "bytes": 2088168,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-dungeon-temple/masters/tideglass_warmaul.png",
+        "sha256": "9e9ff59026e6acbb0bcfa2a045cfa4d6ca24b970675472bc94913d635e518bc4",
+        "bytes": 510646,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "drowned-temple-icons-2026-09-30",
+        "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+        "sha256": "c2ef2f312d31537aee1a7ebee649ed999a7560cb52152cce5a7703eb0a57f2ed",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving canonical item identity and material.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tideglass Warmaul (tideglass_warmaul) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete one-handed pearl-stone warmaul diagonally posed. Heavy rectangular ivory pearl-stone hammer head crowned with a large faceted blue tideglass prism, aged gold mounts, compact dark blue wrapped handle and pearl butt cap. Whole head and handle visible, no wielder. Preserve established Drowned Temple loot identity and canonical armor material. Tactile dimensional hand-painted classic fantasy MMO art, warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete centered subject at about 72 percent canvas fill with generous padding on an opaque dark charcoal-umber painted vignette and subtle contact shadow, except the Heroic conch uses a deeper moonlit navy vignette. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No writing, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparency, collage, split sheet, living hands or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-dungeon-temple/superseded/tideglass_warmaul.webp",
+            "role": "old authored object identity; not an image-edit input",
+            "sha256": "c2ef2f312d31537aee1a7ebee649ed999a7560cb52152cce5a7703eb0a57f2ed"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          },
+          {
+            "path": "public/ui/items/kingsbane_last_oath.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30"
+          },
+          {
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical material, distinct item silhouettes, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/dungeon-temple-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/dungeon-temple-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ]
+}

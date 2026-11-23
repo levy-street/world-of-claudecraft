@@ -16,6 +16,7 @@ import {
   standingProgress,
 } from '../../../sim/factions';
 import type { WorldQuestProgress } from '../../../sim/types';
+import { worldQuestCompletedForBoard } from '../../../sim/world_quest_practice';
 import { factionEmblemImageUrl } from '../../currency_art';
 
 export interface ReputationRowView {
@@ -95,7 +96,7 @@ export function buildReputationView(input: ReputationViewInput): ReputationView 
   );
   let completed = 0;
   for (const progress of input.worldQuestLog.values()) {
-    if (progress.state === 'completed') completed++;
+    if (worldQuestCompletedForBoard(progress)) completed++;
   }
   const expires = input.worldQuestExpiresAtMs;
   const resetsInMs =

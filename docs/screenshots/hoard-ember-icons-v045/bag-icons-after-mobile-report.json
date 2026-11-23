@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/rare_ember_wrought_crown.webp",
+    "http://localhost:5194/ui/items/rare_cinder_stitched_robes.webp",
+    "http://localhost:5194/ui/items/rare_chained_ember_choker.webp",
+    "http://localhost:5194/ui/items/rare_molten_clinker_girdle.webp",
+    "http://localhost:5194/ui/items/ember_wrought_crown.webp",
+    "http://localhost:5194/ui/items/cinder_stitched_robes.webp",
+    "http://localhost:5194/ui/items/chained_ember_choker.webp",
+    "http://localhost:5194/ui/items/molten_clinker_girdle.webp",
+    "http://localhost:5194/ui/items/legendary_ember_wrought_crown.webp",
+    "http://localhost:5194/ui/items/legendary_cinder_stitched_robes.webp",
+    "http://localhost:5194/ui/items/legendary_chained_ember_choker.webp",
+    "http://localhost:5194/ui/items/legendary_molten_clinker_girdle.webp"
+  ],
+  "allDecoded": true
+}

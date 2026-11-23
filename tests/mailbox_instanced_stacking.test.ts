@@ -149,7 +149,7 @@ describe("mailbox compose: mergeable instanced attachments stack (issue: potions
     expect(root.querySelector('.mail-parcel-qty-input')).toBeNull();
   });
 
-  it('a locked instanced copy also stays one-per-slot with no stepper', () => {
+  it('refuses a locked consumable instead of staging an unsendable parcel', () => {
     const locked: ItemInstancePayload = { signer: 'Mira', locked: true };
     const { win, root } = openSendTab([
       { itemId: 'sunpetal_healing_draught', count: 1, instance: locked },
@@ -157,7 +157,7 @@ describe("mailbox compose: mergeable instanced attachments stack (issue: potions
 
     win.stageParcel('sunpetal_healing_draught', locked);
 
-    expect(chips(root)).toHaveLength(1);
+    expect(chips(root)).toHaveLength(0);
     expect(root.querySelector('.mail-parcel-qty-input')).toBeNull();
   });
 });

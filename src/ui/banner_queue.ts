@@ -143,3 +143,54 @@ export class BannerQueue<T> {
     if (this.pendingAmbient !== null && !keep(this.pendingAmbient)) this.pendingAmbient = null;
   }
 }
+
+/** The visual language the shared #banner slot paints in. 'default' is the
+ *  bare gold celebration text every milestone has always used (level up, zone
+ *  crossing, craft masterwork, duel result). 'deed' is the Book of Deeds
+ *  plate: a framed, quieter parchment treatment, because a deed accomplishment
+ *  firing an identical gold banner to a real level-up is a known cause of
+ *  players reading routine gathering progress as leveling. 'skill' is the
+ *  gathering skill milestone plate: copper craft framing with the profession
+ *  crest, so a Mining 50 plate can never steal the character level-up reading. */
+export type BannerVariant = 'default' | 'deed' | 'skill' | 'worldQuest' | 'pvp';
+
+/** Everything one banner paint needs, held whole so a queued banner (R38)
+ *  renders later exactly as it would have rendered immediately. */
+export interface BannerPayload {
+  text: string;
+  motion: boolean;
+  decorativeIconUrl?: string;
+  variant: BannerVariant;
+  /** The secondary lines stacked under the title, ALREADY normalized by
+   *  `bannerSubtextLines` (never an empty array, never an empty string). Several
+   *  exist for the battleground verdict, whose facts (score plus rating swing,
+   *  why the match ended, the first-win bonus) are INDEPENDENT sentences: each
+   *  stays its own `t()` key on its own line instead of being concatenated. */
+  subtext?: string[];
+  durationMs: number;
+  source: 'unstuck' | null;
+  /** The R38 class, kept on the payload so the advance chain can tell a
+   *  deferred AMBIENT (droppable when stale) from a celebration. */
+  bannerClass: BannerClass;
+  /** performance.now() at enqueue, for the ambient max-defer below. */
+  enqueuedAt: number;
+}
+
+/** The fade gap between a finished banner and the next queued one. */
+export const BANNER_ADVANCE_GAP_MS = 250;
+
+/** How long a parked AMBIENT banner stays worth replaying. An ambient is
+ *  current-state, not history: behind ONE celebration (2600ms + gap) a zone
+ *  name or prompt is still fresh enough to show, but behind a celebration
+ *  CHAIN a "starting now" or countdown digit replayed many seconds late
+ *  misleads (the phase 14 QA finding), so the advance chain drops anything
+ *  parked longer than this. Celebrations never age out: "you leveled" stays
+ *  true however late it shows. */
+export const AMBIENT_MAX_DEFER_MS = 4000;
+/** Ambient text describes current state; celebrations remain meaningful later. */
+export function isBannerStale(
+  payload: Pick<BannerPayload, 'bannerClass' | 'enqueuedAt'>,
+  now: number,
+): boolean {
+  return payload.bannerClass === 'ambient' && now - payload.enqueuedAt > AMBIENT_MAX_DEFER_MS;
+}

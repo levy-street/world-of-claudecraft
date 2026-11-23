@@ -637,7 +637,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     );
     ctx.error(
       r.meta.entityId,
-      'Use /dungeon reset to abandon your empty instances after changing difficulty.',
+      'Use /dungeon reset to abandon your empty instances and start them fresh.',
     );
     return null;
   }

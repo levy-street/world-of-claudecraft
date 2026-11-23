@@ -8,6 +8,8 @@ import {
 } from '../src/render/characters/assets';
 import {
   type ClipMap,
+  KAYKIT_BASELINES,
+  KAYKIT_KNIGHT_WARRIOR,
   modularVisualKey,
   VISUALS,
   visualKeyFor,
@@ -743,8 +745,10 @@ describe('outfit colorways', () => {
     }
   });
 
-  // Harbormaster Tamsin's sea coat (npc_looks.ts): an NPC-only material colorway. Navy
-  // broadcloth, brass where the coat's pale steel buttons and cuffs were, dark leather.
+  // The composed library's NPC-only material colorway, authored as Harbormaster Tamsin's
+  // sea coat: navy broadcloth, brass where the coat's pale steel buttons and cuffs were,
+  // dark leather. Nobody wears it since every NPC moved to a WOC class body
+  // (characters/npc_looks.ts); it stays with the library it belongs to.
   it('compiles the NPC-only admiralty colorway to navy cloth, brass steel and dark leather', () => {
     expect(NPC_MATERIAL_COLORWAY_IDS).toEqual(['admiralty']);
     expect(OUTFIT_COLORWAY_IDS as readonly string[]).not.toContain('admiralty');
@@ -1324,7 +1328,16 @@ describe('per-class modular defs', () => {
   it.each(PLAYER_CLASSES)('player_%s_modular mirrors its class def', (cls) => {
     const key = modularVisualKey(cls);
     const def = VISUALS[key];
-    const base = VISUALS[`player_${cls}`];
+    // A class on a WOC modular body (the warrior) never composes the KayKit
+    // library, so its `_modular` def mirrors the retired KayKit warrior rig the
+    // library was cut from (KAYKIT_KNIGHT_WARRIOR), never the WOC class def:
+    // the library rides Rig_Medium and the WOC clips would bind onto it against
+    // the wrong bind pose. Everything below still holds against that base.
+    const classDef = VISUALS[`player_${cls}`];
+    const base = classDef.wocCharacter
+      ? (KAYKIT_BASELINES[cls] ?? KAYKIT_KNIGHT_WARRIOR)
+      : classDef;
+    if (classDef.wocCharacter) expect(def.wocCharacter).toBeUndefined();
     expect(def, key).toBeTruthy();
     expect(def.modular).toBe(true);
     // one shared part library for every class

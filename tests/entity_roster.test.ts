@@ -18,9 +18,11 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
+import { freshMusterArmy } from '../src/sim/mirefen_muster';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import type { PendingProjectile } from '../src/sim/projectile_travel';
 import { Rng } from '../src/sim/rng';
+import { freshSeasonalWorldState } from '../src/sim/seasonal';
 import { Sim } from '../src/sim/sim';
 import {
   createSimContext,
@@ -123,6 +125,7 @@ function makeCtx() {
     instances: [],
     riftInstances: [],
     riftPortalIds: null,
+    pendingDifficultyChanges: new Map(),
     dungeonResetLocks: new Map(),
     get arenaMatches() {
       return arenaMatches;
@@ -132,6 +135,8 @@ function makeCtx() {
     },
     masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
+    graveyards: [],
+    playerStart: { x: 0, z: 0 },
     get cfg() {
       return cfg;
     },
@@ -155,16 +160,21 @@ function makeCtx() {
     bgMatches: new Map(),
     worldPvpDisabled: false,
     hillState: { active: null, window: 0, plan: null, attempts: 0, retryAt: 0, passTick: 0 },
+    seasonal: freshSeasonalWorldState(),
     hillProbe: { wet: () => false, steep: () => false, blocked: () => false, zoneIdAt: () => null },
     worldPvpBooks: {
       recentDamage: new Map(),
       recentSupport: new Map(),
+      lastFightAt: new Map(),
       paidDeaths: new Set(),
+      spoils: new Map(),
       killsByPair: new Map(),
       zoneOf: new Map(),
       nextDisarmAt: Number.POSITIVE_INFINITY,
       zonePassTick: Number.NEGATIVE_INFINITY,
       sweptAtTick: 0,
+      nextPayoutAt: Number.POSITIVE_INFINITY,
+      forfeitVictim: null,
     },
     bgBusySlots: new Set(),
     bgOutcomes: [],
@@ -245,6 +255,8 @@ function makeCtx() {
     removeFungibleItem: vi.fn(),
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
+    hillPartyDisband: vi.fn(),
+    hillPartyJoin: vi.fn(),
     dropPartyMarkers: vi.fn(),
     formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
@@ -268,6 +280,7 @@ function makeCtx() {
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
     weeklyRaidResetMs: vi.fn((nowMs: number) => nowMs),
+    dayNightPhase: vi.fn(() => null),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     instanceClaimIdAt: vi.fn(() => null),
@@ -275,9 +288,11 @@ function makeCtx() {
     leaveDungeon: vi.fn(),
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
+    emitRiftDeparture: vi.fn(),
     riftOpenTreasure: vi.fn(),
     resetDungeonInstances: vi.fn(),
     inheritDungeonResetLocks: vi.fn(),
+    onDungeonFinderPartyJoined: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
@@ -306,6 +321,7 @@ function makeCtx() {
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],
+    musterArmy: freshMusterArmy(),
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),

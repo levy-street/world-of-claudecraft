@@ -4,8 +4,22 @@
 // everywhere the origin is not the site (the packaged desktop shell's app://,
 // the Capacitor shells' capacitor://localhost and http://localhost).
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_TERMS_URL } from '../src/client_origin';
-import { resolveTermsUrl, TERMS_PATH, termsUrlFor } from '../src/ui/terms_link';
+import {
+  CANONICAL_PRIVACY_URL,
+  CANONICAL_TERMS_URL,
+  CANONICAL_WHITEPAPER_URL,
+} from '../src/client_origin';
+import {
+  PRIVACY_PATH,
+  privacyUrlFor,
+  resolvePrivacyUrl,
+  resolveTermsUrl,
+  resolveWhitepaperUrl,
+  TERMS_PATH,
+  termsUrlFor,
+  WHITEPAPER_PATH,
+  whitepaperUrlFor,
+} from '../src/ui/terms_link';
 
 describe('resolveTermsUrl', () => {
   it('links the same-origin page when the site serves the client', () => {
@@ -41,5 +55,69 @@ describe('resolveTermsUrl', () => {
     // resolves same-origin through the painter-facing helper too.
     expect(termsUrlFor('http://localhost:3000')).toBe(TERMS_PATH);
     expect(termsUrlFor('app://worldofclaudecraft')).toBe(CANONICAL_TERMS_URL);
+  });
+});
+
+describe('resolvePrivacyUrl', () => {
+  it('links the same-origin page when the site serves the client', () => {
+    expect(resolvePrivacyUrl({ nativeApp: false, origin: 'https://worldofclaudecraft.com' })).toBe(
+      PRIVACY_PATH,
+    );
+    expect(resolvePrivacyUrl({ nativeApp: false, origin: 'http://localhost:5173' })).toBe(
+      PRIVACY_PATH,
+    );
+  });
+
+  it('takes the canonical URL on non-site origins', () => {
+    expect(resolvePrivacyUrl({ nativeApp: false, origin: 'app://worldofclaudecraft' })).toBe(
+      CANONICAL_PRIVACY_URL,
+    );
+    expect(resolvePrivacyUrl({ nativeApp: true, origin: 'capacitor://localhost' })).toBe(
+      CANONICAL_PRIVACY_URL,
+    );
+    expect(resolvePrivacyUrl({ nativeApp: true, origin: 'http://localhost' })).toBe(
+      CANONICAL_PRIVACY_URL,
+    );
+    expect(resolvePrivacyUrl({ nativeApp: false, origin: '' })).toBe(CANONICAL_PRIVACY_URL);
+  });
+
+  it('canonical privacy URL matches the public policy route', () => {
+    expect(CANONICAL_PRIVACY_URL).toBe('https://worldofclaudecraft.com/privacy');
+    expect(PRIVACY_PATH).toBe('/privacy');
+    expect(privacyUrlFor('http://localhost:3000')).toBe(PRIVACY_PATH);
+    expect(privacyUrlFor('app://worldofclaudecraft')).toBe(CANONICAL_PRIVACY_URL);
+  });
+});
+
+describe('resolveWhitepaperUrl', () => {
+  it('links the same-origin pdf when the site serves the client', () => {
+    expect(
+      resolveWhitepaperUrl({ nativeApp: false, origin: 'https://worldofclaudecraft.com' }),
+    ).toBe(WHITEPAPER_PATH);
+    expect(resolveWhitepaperUrl({ nativeApp: false, origin: 'http://localhost:5173' })).toBe(
+      WHITEPAPER_PATH,
+    );
+  });
+
+  it('takes the canonical URL on non-site origins', () => {
+    expect(resolveWhitepaperUrl({ nativeApp: false, origin: 'app://worldofclaudecraft' })).toBe(
+      CANONICAL_WHITEPAPER_URL,
+    );
+    expect(resolveWhitepaperUrl({ nativeApp: true, origin: 'capacitor://localhost' })).toBe(
+      CANONICAL_WHITEPAPER_URL,
+    );
+    expect(resolveWhitepaperUrl({ nativeApp: true, origin: 'http://localhost' })).toBe(
+      CANONICAL_WHITEPAPER_URL,
+    );
+    expect(resolveWhitepaperUrl({ nativeApp: false, origin: '' })).toBe(CANONICAL_WHITEPAPER_URL);
+  });
+
+  it('canonical whitepaper URL matches the public hosted pdf asset', () => {
+    expect(CANONICAL_WHITEPAPER_URL).toBe(
+      'https://worldofclaudecraft.com/World-of-ClaudeCraft-Whitepaper-v1.0.pdf',
+    );
+    expect(WHITEPAPER_PATH).toBe('/World-of-ClaudeCraft-Whitepaper-v1.0.pdf');
+    expect(whitepaperUrlFor('http://localhost:3000')).toBe(WHITEPAPER_PATH);
+    expect(whitepaperUrlFor('app://worldofclaudecraft')).toBe(CANONICAL_WHITEPAPER_URL);
   });
 });

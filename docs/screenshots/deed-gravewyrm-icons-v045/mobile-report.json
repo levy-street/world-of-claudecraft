@@ -1,0 +1,42 @@
+[
+  {
+    "id": "dgn_korgath_all_chains",
+    "src": "http://localhost:5194/ui/deeds/dgn_korgath_all_chains.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_korgath_still_bound",
+    "src": "http://localhost:5194/ui/deeds/dgn_korgath_still_bound.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_velkhar_cold",
+    "src": "http://localhost:5194/ui/deeds/dgn_velkhar_cold.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_korzul_thin_ice",
+    "src": "http://localhost:5194/ui/deeds/dgn_korzul_thin_ice.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_sledge_tusker",
+    "src": "http://localhost:5194/ui/deeds/dgn_sledge_tusker.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

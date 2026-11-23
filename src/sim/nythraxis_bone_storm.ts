@@ -25,6 +25,16 @@
 import { hash2 } from './rng';
 import type { DungeonDifficulty } from './types';
 
+/**
+ * Owner call 2026-10-02: Bone Storm is RETIRED FROM PLAY. The phase 3 driver
+ * never starts a storm while this is false, and the Raid Boss Guide page and
+ * the Dungeon Finder blurb read it too, so the fight and the text that
+ * describes it always agree (the NYTHRAXIS_ADDS_ENABLED idiom). The tuning,
+ * the wire rows, the renderer, and the direct-call unit tests stay intact;
+ * flipping this back restores the storm.
+ */
+export const NYTHRAXIS_BONE_STORM_ENABLED = false;
+
 export interface NythraxisBoneStormPoint {
   x: number;
   z: number;

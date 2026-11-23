@@ -36,7 +36,7 @@
 export const MATERIAL_SOURCE_WRITER_CAPABILITY = 'woc.material_source_writer';
 
 /** The announced writer version, and the only value the guard accepts. */
-export const MATERIAL_SOURCE_WRITER_VERSION = '1';
+export const MATERIAL_SOURCE_WRITER_VERSION = '2';
 
 const CAPABILITY_SETTING = `${MATERIAL_SOURCE_WRITER_CAPABILITY}=${MATERIAL_SOURCE_WRITER_VERSION}`;
 
@@ -95,7 +95,7 @@ export function materialSourceGuardTriggerName(table: string): string {
 
 // current_setting(..., true) returns NULL when the GUC was never set, so the
 // null-safe comparison covers "unset" and "wrong version" with one test.
-const GUARD_FUNCTION_SQL = `CREATE OR REPLACE FUNCTION ${MATERIAL_SOURCE_WRITER_GUARD_FUNCTION}()
+export const MATERIAL_SOURCE_WRITER_FUNCTION_SQL = `CREATE OR REPLACE FUNCTION ${MATERIAL_SOURCE_WRITER_GUARD_FUNCTION}()
   RETURNS trigger
   LANGUAGE plpgsql
 AS $woc_msw$
@@ -124,7 +124,7 @@ function guardTriggerSql(row: MaterialSourceGuardedTable): string {
  * through the applying connection's search_path.
  */
 export const MATERIAL_SOURCE_WRITER_GUARD_SQL = [
-  GUARD_FUNCTION_SQL,
+  MATERIAL_SOURCE_WRITER_FUNCTION_SQL,
   ...MATERIAL_SOURCE_GUARDED_TABLES.map(guardTriggerSql),
 ].join('\n\n');
 

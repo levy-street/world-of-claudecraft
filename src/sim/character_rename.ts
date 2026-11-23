@@ -16,6 +16,7 @@
 // src/sim-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Pure bookkeeping, zero draws.
 
+import { COURIER_CAPACITY } from './courier/types';
 import { rekeyMaterialSignature } from './material_signatures';
 import type { CharacterState } from './sim';
 import type { ItemInstancePayload } from './types';
@@ -33,7 +34,7 @@ export function rekeySigner(
 
 /**
  * Rewrite `instance.signer === oldName` to `newName` across the character's
- * five signer-bearing blob regions (carried inventory, bank inventory, the
+ * signer-bearing blob regions (carried inventory, bank inventory, courier cargo, the
  * vendor buyback ring, and the equipped-instance map under BOTH its
  * spellings), PLUS the signer-derived `craftedBy` on every slotted tool
  * effect. Touches
@@ -65,6 +66,12 @@ export function rekeyInstanceSigner(
     if (rekeySigner(slot.instance, oldName, newName)) changed = true;
   }
   for (const slot of state.bank?.inventory ?? []) {
+    if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
+    if (rekeySigner(slot.instance, oldName, newName)) changed = true;
+  }
+  // Courier cargo is still owned custody. Rewrite current signatures only,
+  // using the same bounded walk as offline legendary-name moderation.
+  for (const slot of (state.courier?.cargo ?? []).slice(0, COURIER_CAPACITY)) {
     if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
     if (rekeySigner(slot.instance, oldName, newName)) changed = true;
   }

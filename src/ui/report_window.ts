@@ -155,10 +155,12 @@ export function openReportWindow(
     const details = ($('#report-details') as HTMLTextAreaElement).value;
     submit.disabled = true;
     const hooks = deps.reportHooks();
-    const request =
-      pid !== undefined
+    // The captured character name still resolves after logout; the world pid does not.
+    const request = hooks?.submitByName
+      ? hooks.submitByName(name, reason, details)
+      : pid !== undefined
         ? hooks?.submit(pid, reason, details)
-        : hooks?.submitByName?.(name, reason, details);
+        : undefined;
     if (!request) {
       submit.disabled = false;
       $('#report-error').textContent = t('hud.report.failed');

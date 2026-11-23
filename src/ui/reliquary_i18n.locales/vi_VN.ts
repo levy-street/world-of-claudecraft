@@ -44,11 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Lòng Chảo Trái Tim Hoang Dã',
-    desc: 'Vũ khí tiêu biểu từ Zulgar và Thuần Thú Sư Lãnh Chúa Nanh.',
+    desc: 'Vũ khí đặc trưng từ Thuần Thú Sư Lãnh Chúa Nanh, Hoa Hẻm Núi và Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Anh Hùng: Lòng Chảo Trái Tim Hoang Dã',
-    desc: 'Đồ sử thi chỉ rơi ở chế độ anh hùng từ Zulgar, Tiếng Nói Của Vùng Trũng.',
+    desc: 'Trang bị sử thi và trang sức chỉ có ở độ khó Anh Hùng từ Thuần Thú Sư Lãnh Chúa Nanh, Hoa Hẻm Núi và Zulgar, Tiếng Nói Của Vùng Trũng.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',
@@ -61,6 +61,10 @@ export const table: ReliquaryLocaleTable = {
   conquerors_thunzharr: {
     name: 'Thunzharr, Đỉnh Núi Thức Giấc',
     desc: 'Chiến lợi phẩm sử thi riêng từ trùm thế giới của Đỉnh Núi Thức Giấc.',
+  },
+  conquerors_balgath: {
+    name: 'Balgath, Đốc Công Bị Chôn Vùi',
+    desc: 'Chiến lợi phẩm lôi ra từ những gò mộ Mirefen.',
   },
   conquerors_collapsed_reliquary: {
     name: 'Thánh Tích Sụp Đổ',
@@ -140,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Phòng Trưng Bày Chiến Tranh',
-    desc: 'Năm bộ chiến trang Chiến Tranh, kiếm được từng món một bằng danh dự.',
+    desc: 'Năm bộ chiến trang Chiến Tranh mùa thứ nhất, giờ được bán từng món một bằng vàng.',
   },
   conquerors_warfare_armory: {
     name: 'Kho Vũ Khí Chiến Tranh',
-    desc: 'Trang sức và vũ khí Chiến Tranh mua bằng danh dự khó nhọc mới có.',
+    desc: 'Trang sức, vũ khí và vật phẩm Chiến Tranh mua bằng danh dự khó nhọc mới có.',
   },
   conquerors_vanguard_gallery: {
     name: 'Phòng Trưng Bày Tiên Phong',

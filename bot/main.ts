@@ -715,6 +715,7 @@ async function main(): Promise<void> {
       relay: cfg.relayChannelId,
       activity: cfg.activityChannelId,
       dailyRewards: cfg.dailyRewardsChannelId,
+      pvpFeed: cfg.pvpFeedChannelId,
     },
     gameUrl: cfg.gameUrl,
     // Read fresh per run, never captured: the gate exists to notice the breaker

@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_ossuary_warrior_woc.glb",
+      "out": "models/creatures/woc_crypt_ossuary_warrior.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Attack2",
+        "React",
+        "Cleave",
+        "Death",
+        "Awaken"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

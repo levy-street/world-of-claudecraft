@@ -251,6 +251,14 @@ describe('Claudium spend entitlement mirroring', () => {
           costClaudium: 10,
           owned: false,
         },
+        // a catalog skin reserved for a future raid is no storefront row, even if listed
+        {
+          itemId: 'squallcrest_sword',
+          name: 'Squallcrest',
+          kind: 'skin',
+          costClaudium: 10,
+          owned: true,
+        },
       ],
     });
     const res = new FakeRes();
@@ -279,6 +287,10 @@ describe('Claudium spend entitlement mirroring', () => {
     { itemId: 'guildmark_arming_sword', kind: 'item' },
     { itemId: 'retired_placeholder_hat', kind: 'skin' },
     { itemId: '__proto__', kind: 'skin' },
+    { itemId: 'constructor', kind: 'skin' },
+    { itemId: 'valorsteed', kind: 'skin' },
+    { itemId: 'grag_bear', kind: 'skin' },
+    { itemId: 'rimelight_staff', kind: 'skin' },
   ])('rejects unsupported store spend $itemId/$kind before debiting Claudium', async (body) => {
     const res = new FakeRes();
 
@@ -299,6 +311,7 @@ describe('Claudium spend entitlement mirroring', () => {
       reason: 'unknown_item',
     });
     expect(spendMock).not.toHaveBeenCalled();
+    expect(grantMountSkins).not.toHaveBeenCalled();
   });
 
   it('rejects a string expected cost before calling the monetary service', async () => {
@@ -426,6 +439,40 @@ describe('Claudium spend entitlement mirroring', () => {
     });
     expect(storeMock).toHaveBeenCalledWith(7);
     expect(grantWeaponSkins).toHaveBeenCalledWith(7, ['guildmark_arming_sword']);
+  });
+
+  it('filters collectible appearances out of paid store rows and permanent grant reconciliation', async () => {
+    storeMock.mockResolvedValue({
+      available: true,
+      items: ['valorsteed', 'grag_bear', '__proto__', 'constructor', 'mech_bird'].map((itemId) => ({
+        itemId,
+        name: itemId,
+        kind: 'skin',
+        costClaudium: 1200,
+        owned: true,
+      })),
+    });
+    const res = new FakeRes();
+    await handleClaudiumApi(
+      makeReq({ method: 'GET', url: '/api/claudium/store' }),
+      res as never,
+      7,
+    );
+    expect(responseJson(res)).toEqual({
+      available: true,
+      items: [
+        {
+          itemId: 'mech_bird',
+          name: 'mech_bird',
+          kind: 'skin',
+          costClaudium: 1200,
+          owned: true,
+        },
+      ],
+    });
+    expect(grantMountSkins).toHaveBeenCalledWith(7, ['mech_bird']);
+    expect(grantMountSkins).toHaveBeenCalledTimes(1);
+    expect(grantWeaponSkins).not.toHaveBeenCalled();
   });
 
   it('accepts a mount skin SKU (kind skin) and mirrors it through the mount skin hook only', () => {
@@ -783,10 +830,56 @@ describe('Claudium economy-service transport contract', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledOnce();
+    expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+      'https://economy.example/v1/claudium/stripe/webhook',
+    );
     const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
     expect(request.headers).toMatchObject({ 'stripe-signature': 't=123,v1=signature' });
     expect(Buffer.from(request.body as Uint8Array).equals(rawBody)).toBe(true);
   });
+
+  // Membership billing has its own Stripe endpoint and signing secret on the service, so its
+  // events must reach that endpoint, not the Claudium one, and with no session (Stripe has none).
+  it.each([
+    { received: true, status: 200 },
+    { received: false, status: 400 },
+  ])(
+    'relays the membership webhook to the service membership endpoint: answers $status',
+    async ({ received, status }) => {
+      vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+      vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
+      const fetchMock = vi.fn(async (_input: string | URL | Request, _init?: RequestInit) =>
+        Promise.resolve(new Response(JSON.stringify({ received }), { status })),
+      );
+      vi.stubGlobal('fetch', fetchMock);
+      const path = '/api/claudium/membership/stripe/webhook';
+      const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
+      if (!route) throw new Error(`missing ${path}`);
+      expect(route.middleware ?? []).toHaveLength(0);
+      const rawBody = Buffer.from('{\n  "type": "invoice.paid"\n}\n');
+      const res = new FakeRes();
+
+      await route.handler(
+        fakeCtx({
+          method: 'POST',
+          url: path,
+          headers: { 'stripe-signature': 't=123,v1=membership' },
+          body: rawBody,
+          res: res as never,
+        }),
+      );
+
+      expect(res.statusCode).toBe(status);
+      expect(responseJson(res)).toEqual({ received });
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
+        'https://economy.example/v1/claudium/membership/stripe/webhook',
+      );
+      const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
+      expect(request.headers).toMatchObject({ 'stripe-signature': 't=123,v1=membership' });
+      expect(Buffer.from(request.body as Uint8Array).equals(rawBody)).toBe(true);
+    },
+  );
 
   it('keeps accountId numeric in purchase JSON bodies', async () => {
     vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');

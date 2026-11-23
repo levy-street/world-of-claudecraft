@@ -79,10 +79,17 @@ export interface PartyFrameHeaderState {
   collapsed: boolean;
 }
 
-/** Derive the desktop party disclosure from the roster count and user toggle. */
-export function partyFrameHeaderState(count: number, collapsed: boolean): PartyFrameHeaderState {
-  const safeCount = Math.max(0, Math.floor(count));
-  return { visible: safeCount > 0, count: safeCount, collapsed };
+/** Derive the desktop party disclosure from the rendered row count and user toggle.
+ *  The count is the party size, so it includes the local player: their row is hidden
+ *  unless `selfShown` (the showSelf option), in which case it is already a row. */
+export function partyFrameHeaderState(
+  rowCount: number,
+  collapsed: boolean,
+  selfShown = false,
+): PartyFrameHeaderState {
+  const rows = Math.max(0, Math.floor(rowCount));
+  const count = rows > 0 && !selfShown ? rows + 1 : rows;
+  return { visible: rows > 0, count, collapsed };
 }
 
 const ROLE_ORDER = { tank: 0, healer: 1, dps: 2 } as const;

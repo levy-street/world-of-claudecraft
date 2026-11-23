@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { zoomCeilingFor } from '../src/game/camera_zoom_ceiling';
 import {
   createShadowVolumeBasis,
   SHADOW_CASTER_MARGIN,
@@ -88,11 +89,16 @@ describe('zone-feature shadow casting range', () => {
   it('stays inside the geometric reach of the shipped shadow volume', () => {
     // The derivation in the core's header, recomputed here from the SHIPPED
     // constants: the sun anchor and shadow camera in renderer.ts / gfx.ts, the
-    // camera zoom cap in input.ts, and foliage_shadow_core's own caster margin
-    // and volume test. Restating a number here would let the header rot.
+    // camera zoom cap input.ts clamps to (its open-world value lives in
+    // camera_zoom_ceiling.ts), and foliage_shadow_core's own caster margin and
+    // volume test. Restating a number here would let the header rot.
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const gfx = readFileSync(new URL('../src/render/gfx.ts', import.meta.url), 'utf8');
     const input = readFileSync(new URL('../src/game/input.ts', import.meta.url), 'utf8');
+    const ceiling = readFileSync(
+      new URL('../src/game/camera_zoom_ceiling.ts', import.meta.url),
+      'utf8',
+    );
     const half = Number(
       /this\.shadowBaseExtent = LOW_GFX \? [\d.]+ : ([\d.]+);/.exec(renderer)?.[1],
     );
@@ -101,13 +107,18 @@ describe('zone-feature shadow casting range', () => {
     const anchor = /SUN_ANCHOR = new THREE\.Vector3\((-?[\d.]+), (-?[\d.]+), (-?[\d.]+)\)/.exec(
       gfx,
     );
-    const zoomCap = Number(
-      /Math\.min\((\d+), Math\.max\(3, this\.camDist \+ delta\)\)/.exec(input)?.[1],
-    );
+    // input.ts clamps the wheel to its live zoomMax, which starts at (and
+    // outside a dungeon stays at) BASE_ZOOM_MAX: the boss ceiling only ever
+    // lifts inside a dungeon instance, never over the open world these zone
+    // features stand in.
+    expect(input).toMatch(/Math\.min\(this\.zoomMax, Math\.max\(3, this\.camDist \+ delta\)\)/);
+    expect(input).toMatch(/zoomMax = BASE_ZOOM_MAX;/);
+    const zoomCap = Number(/export const BASE_ZOOM_MAX = (\d+);/.exec(ceiling)?.[1]);
+    expect(zoomCeilingFor({ inDungeon: false, bossHeights: [24] })).toBe(zoomCap);
     expect(half, 'shadow base half-extent not found in renderer.ts').toBeGreaterThan(0);
     expect(far, 'shadow camera far not found in renderer.ts').toBeGreaterThan(near);
     expect(anchor, 'SUN_ANCHOR not found in gfx.ts').not.toBe(null);
-    expect(zoomCap, 'camera zoom cap not found in input.ts').toBeGreaterThan(0);
+    expect(zoomCap, 'camera zoom cap not found in camera_zoom_ceiling.ts').toBeGreaterThan(0);
 
     const [ax, ay, az] = [Number(anchor?.[1]), Number(anchor?.[2]), Number(anchor?.[3])];
     const lightDistance = Math.hypot(ax, ay, az);

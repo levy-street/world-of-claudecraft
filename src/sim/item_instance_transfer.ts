@@ -19,7 +19,6 @@
 import { sanitizeItemInstancePayloadOnLoad } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
 import { cloneLootQuality } from './loot_quality/types';
-import { isMaterialItemId, materialItemIds } from './material_ids';
 import { countMaterialInventoryForHub } from './material_inventory_hub';
 import { applyMaterialInventoryTake, planMaterialInventoryTake } from './material_inventory_take';
 import { materialInventoryUnits, materialSourceUnitPayload } from './material_inventory_units';
@@ -33,6 +32,7 @@ import type { MaterialComposition } from './material_sources';
 import { normalizeMaterialStack } from './material_stack';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from './stack_provenance_ids';
 import { isTransferLockedInstance } from './transfer_lock';
 import {
   cloneItemInstancePayload,
@@ -99,7 +99,7 @@ export function countMatchingUnlocked(
   itemId: string,
   instance: ItemInstancePayload,
 ): number {
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     return countMaterialInventoryForHub(
       meta.inventory ?? [],
       itemId,
@@ -124,10 +124,10 @@ export function holdsMatchingLocked(
   itemId: string,
   instance: ItemInstancePayload,
 ): boolean {
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     return (meta.inventory ?? []).some((slot) => {
       if (slot.itemId !== itemId) return false;
-      const read = normalizeMaterialStack(slot, materialItemIds());
+      const read = normalizeMaterialStack(slot, stackProvenanceItemIds());
       if (!read.ok) throw new Error('invalid material source state in escrow selection');
       return (read.value.materialSources ?? []).some(({ source }) => {
         const payload = materialSourceUnitPayload(read.value, source);
@@ -166,12 +166,12 @@ export function removeMatchingInstance(
   const { meta } = r;
   // `?? []`: same decoupled-test-ctx contract as the two counters above.
   const inventory = meta.inventory ?? [];
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     const plan = planMaterialInventoryTake({
       inventory,
       itemId,
       count: 1,
-      materialIds: materialItemIds(),
+      materialIds: stackProvenanceItemIds(),
       eligibleSource: (source, slot) => {
         const payload = materialSourceUnitPayload(slot, source);
         return !isTransferLockedInstance(payload) && itemInstancePayloadsEqual(payload, instance);
@@ -233,11 +233,19 @@ export function grantCopies(
   // Market, trade, and ordinary mail move held copies. A vault reward letter
   // carries fresh world loot, so its Reliquary obtain tally must advance.
   if (instance)
-    ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count, {
-      craftedRecipeId,
-      movement: !worldSourced,
-      ...(materialSources === undefined ? {} : { materialSources }),
-    });
+    ctx.addItemInstance(
+      itemId,
+      isStackProvenanceItemId(itemId)
+        ? cloneMaterialPayload(instance)
+        : cloneItemInstancePayload(instance),
+      pid,
+      count,
+      {
+        craftedRecipeId,
+        movement: !worldSourced,
+        ...(materialSources === undefined ? {} : { materialSources }),
+      },
+    );
   else
     ctx.addItem(itemId, count, pid, {
       craftedRecipeId,

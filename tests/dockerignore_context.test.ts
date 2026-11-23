@@ -53,6 +53,16 @@ describe('vite.config.ts survives the image build context', () => {
   });
 });
 
+describe('server bundle entries survive the image build context', () => {
+  it('includes every declared server and migration entry', () => {
+    const build = readRepoFile('scripts/build_server.mjs') ?? '';
+    const entries = [...build.matchAll(/entryPoints:\s*\[\s*'([^']+)'/g)].map((m) => m[1]);
+    expect(entries).toContain('server/main.ts');
+    expect(entries).toContain('scripts/migrate_release_gifts.ts');
+    expect(entries.filter((path) => isIgnoredByDockerignore(dockerignore, path))).toEqual([]);
+  });
+});
+
 describe('isIgnoredByDockerignore', () => {
   const rules = [
     'scripts/*',

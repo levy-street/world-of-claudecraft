@@ -18,8 +18,12 @@
 
 import bpy, bmesh, math, traceback
 from mathutils import Vector
+import os
+# Repo root: a prepended REPO_ROOT, else WOC_REPO, else from __file__ (absent under a text-block or bridge exec).
+REPO_ROOT = globals().get('REPO_ROOT') or os.environ.get('WOC_REPO') or os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(globals()['__file__'])), '..', '..'))
 
-OUT = "/Users/troy/Documents/woc/plaque/tmp/asset_src/realm_builder/realm_builder_monument.glb"
+OUT = os.path.join(REPO_ROOT, "tmp/asset_src/realm_builder/realm_builder_monument.glb")
 
 
 def srgb_to_linear(c):

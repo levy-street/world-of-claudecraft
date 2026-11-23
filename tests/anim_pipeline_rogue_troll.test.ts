@@ -69,7 +69,10 @@ describe('rogue ability-specific attacks (issue #2889 rogue-troll batch)', () =>
   });
 
   it('wires the donor GLB and every new clip on player_rogue, leaving the prior 3 entries untouched', () => {
-    const block = manifestBlock('player_rogue: swims({', 'player_priest: swims({');
+    const block = manifestBlock(
+      'export const KAYKIT_ROGUE: VisualDef = swims({',
+      'export const KAYKIT_PRIEST',
+    );
     expect(block).toContain('rogue_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     for (const clip of ROGUE_NEW_CLIPS) expect(block).toContain(`'${clip}'`);
@@ -80,10 +83,13 @@ describe('rogue ability-specific attacks (issue #2889 rogue-troll batch)', () =>
   });
 
   it('every mapped ability id is a real rogue ability, and every referenced clip is shipped', () => {
-    const rogueBlock = manifestBlock('player_rogue: swims({', 'player_priest: swims({');
+    const rogueBlock = manifestBlock(
+      'export const KAYKIT_ROGUE: VisualDef = swims({',
+      'export const KAYKIT_PRIEST',
+    );
     const abilityStart = rogueBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
-    const abilityEnd = rogueBlock.indexOf('\n      },', abilityStart);
+    const abilityEnd = rogueBlock.indexOf('\n    },', abilityStart);
     expect(abilityEnd).toBeGreaterThan(abilityStart);
     const block = rogueBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_]+)',$/gm)];

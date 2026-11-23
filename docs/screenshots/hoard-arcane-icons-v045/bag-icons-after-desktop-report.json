@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/rare_collapsar_band_of_nyxaris.webp",
+    "http://localhost:5194/ui/items/rare_orb_collapsing_void.webp",
+    "http://localhost:5194/ui/items/rare_cowl_of_event_horizon.webp",
+    "http://localhost:5194/ui/items/rare_mantle_of_singularity.webp",
+    "http://localhost:5194/ui/items/collapsar_band_of_nyxaris.webp",
+    "http://localhost:5194/ui/items/orb_collapsing_void.webp",
+    "http://localhost:5194/ui/items/cowl_of_event_horizon.webp",
+    "http://localhost:5194/ui/items/mantle_of_singularity.webp",
+    "http://localhost:5194/ui/items/legendary_collapsar_band_of_nyxaris.webp",
+    "http://localhost:5194/ui/items/legendary_orb_collapsing_void.webp",
+    "http://localhost:5194/ui/items/legendary_cowl_of_event_horizon.webp",
+    "http://localhost:5194/ui/items/legendary_mantle_of_singularity.webp"
+  ],
+  "allDecoded": true
+}

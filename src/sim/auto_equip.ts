@@ -46,6 +46,8 @@ export function maybeAutoEquip(
   meta: PlayerMeta,
   granted?: ItemInstancePayload,
 ): void {
+  // A commissioned copy belongs to its requester and must never be worn here.
+  if (granted?.bindOnTrade) return;
   const def = ITEMS[itemId];
   if (!def?.slot || !canEquipItem(meta.cls, def)) return;
   // Skip silently (no error toast) if the piece is gated above the player's

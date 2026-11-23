@@ -19,6 +19,7 @@ import {
   talentPointsAtLevel,
   talentsFor,
 } from '../content/talents';
+import { MEDALLION_USE_COOLDOWN_KEY } from '../content/trinkets';
 import {
   ABILITIES,
   abilitiesKnownAt,
@@ -32,6 +33,7 @@ import {
 import { formatMoney } from '../format_money';
 import { COMBAT_SPIRIT_REGEN_FRACTION, FIVE_SECOND_RULE_SECONDS } from '../mana_regen';
 import { MARKET_MAX_LISTINGS } from '../market';
+import { dungeonDoorPos } from '../moved_objects';
 import * as petCommands from '../pet/pet_commands';
 import { FALL_SAFE_DISTANCE, type PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -190,9 +192,11 @@ export function combatReadout(e: Entity, heldByEnemies: boolean): string {
 // only the static DUNGEON_LIST (already entrance-sorted by index) and the
 // door zone via zoneAt — no new fields.
 export function dungeonsReadout(): string {
-  const parts = DUNGEON_LIST.map(
-    (d) => `${d.name} (${zoneAt(d.doorPos.x, d.doorPos.z).name}, ${d.suggestedPlayers} players)`,
-  );
+  const moves = getActiveWorldContent().objectMoves;
+  const parts = DUNGEON_LIST.map((d) => {
+    const door = dungeonDoorPos(moves, d);
+    return `${d.name} (${zoneAt(door.x, door.z).name}, ${d.suggestedPlayers} players)`;
+  });
   return `Dungeons (${parts.length}): ${parts.join(', ')}.`;
 }
 // Readout for "/consider": sizes up the current target's level versus yours.
@@ -435,7 +439,7 @@ function auraLabel(a: Aura): string {
 //
 export function cooldownsReadout(e: Entity): string {
   const parts = [...e.cooldowns]
-    .filter(([id]) => !isUnstuckSystemCooldown(id))
+    .filter(([id]) => !isUnstuckSystemCooldown(id) && id !== MEDALLION_USE_COOLDOWN_KEY)
     .sort((a, b) => a[1] - b[1])
     .map(([id, remaining]) => `${ABILITIES[id]?.name ?? id} (${Math.ceil(remaining)}s)`);
   if (parts.length === 0) return 'No abilities are on cooldown.';

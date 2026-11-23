@@ -47,6 +47,14 @@ import {
   SOUL_LANCE_VFX_FULL_SPEC,
   SOUL_LANCE_VFX_SPEC,
 } from './necromancy_vfx_specs';
+import {
+  SPIRIT_BOMB_VFX_FULL_SPEC,
+  SPIRIT_BOMB_VFX_SPEC,
+  VAMPIRIC_TOUCH_VFX_FULL_SPEC,
+  VAMPIRIC_TOUCH_VFX_SPEC,
+  VOID_RUPTURE_VFX_FULL_SPEC,
+  VOID_RUPTURE_VFX_SPEC,
+} from './priest_vfx_specs';
 import { TRINKET_VFX_FULL_SPECS, TRINKET_VFX_SPECS } from './trinket_vfx_specs';
 import {
   EMBERKIN_FELBOLT_VFX_FULL_SPEC,
@@ -60,6 +68,9 @@ import { WARRIOR_VFX_FULL_SPECS, WARRIOR_VFX_SPECS } from './warrior_vfx_specs';
 // Generated gallery projections remain untouched. Class-owned bespoke
 // identities resolve through this narrow runtime seam instead.
 export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
+  if (abilityId === 'void_rupture') return VOID_RUPTURE_VFX_SPEC;
+  if (abilityId === 'spirit_bomb') return SPIRIT_BOMB_VFX_SPEC;
+  if (abilityId === 'vampiric_touch') return VAMPIRIC_TOUCH_VFX_SPEC;
   if (Object.hasOwn(WARRIOR_VFX_SPECS, abilityId)) return WARRIOR_VFX_SPECS[abilityId];
   if (Object.hasOwn(TRINKET_VFX_SPECS, abilityId)) return TRINKET_VFX_SPECS[abilityId];
   if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_SPEC;
@@ -89,6 +100,9 @@ export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
 }
 
 export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | undefined {
+  if (abilityId === 'void_rupture') return VOID_RUPTURE_VFX_FULL_SPEC;
+  if (abilityId === 'spirit_bomb') return SPIRIT_BOMB_VFX_FULL_SPEC;
+  if (abilityId === 'vampiric_touch') return VAMPIRIC_TOUCH_VFX_FULL_SPEC;
   if (Object.hasOwn(WARRIOR_VFX_FULL_SPECS, abilityId)) return WARRIOR_VFX_FULL_SPECS[abilityId];
   if (Object.hasOwn(TRINKET_VFX_FULL_SPECS, abilityId)) return TRINKET_VFX_FULL_SPECS[abilityId];
   if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_FULL_SPEC;

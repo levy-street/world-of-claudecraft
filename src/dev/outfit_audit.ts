@@ -5,6 +5,7 @@
 // inspected at pixel level outside the tiny creation viewport.
 import * as THREE from 'three';
 import { assetsReady } from '../render/assets/preload';
+import { visualAssetsResident } from '../render/characters/assets';
 import {
   type ArmorSetId,
   CLASS_ARMOR_SETS,
@@ -83,6 +84,16 @@ function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   );
 }
 
+/** A class's composed def is fetched on demand (manifest.ts: nothing a player can reach
+ *  builds one, so it is out of the boot gate): land its files before building it. */
+async function landVisual(key: string): Promise<void> {
+  const deadline = performance.now() + 30_000;
+  while (!visualAssetsResident(key)) {
+    if (performance.now() > deadline) throw new Error(`outfit audit: ${key} never loaded`);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+}
+
 export interface ShotOpts {
   set: ArmorSetId;
   gender?: 'male' | 'female';
@@ -119,7 +130,9 @@ export async function shoot(opts: ShotOpts): Promise<string> {
   });
   const worn = fullSet(opts.set);
   const cls = SET_CLASS[opts.set] ?? 'warrior';
-  const visual = new CharacterVisual(`player_${cls}_modular`, 0xffffff, 0, null, null, null, {
+  const key = `player_${cls}_modular`;
+  await landVisual(key);
+  const visual = new CharacterVisual(key, 0xffffff, 0, null, null, null, {
     app,
     worn,
   });

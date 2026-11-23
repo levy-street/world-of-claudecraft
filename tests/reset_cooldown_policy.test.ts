@@ -13,18 +13,18 @@ import {
 
 describe('reset cooldown policy: which claims pay the five-minute Reset All cooldown', () => {
   it('every standard dungeon pays it', () => {
-    expect(resetCooldownApplies('hollow_crypt')).toBe(true);
-    expect(resetCooldownApplies('nythraxis_crypt')).toBe(true);
+    expect(resetCooldownApplies('hollow_crypt', false)).toBe(true);
+    expect(resetCooldownApplies('nythraxis_crypt', false)).toBe(true);
     const standard = DUNGEON_LIST.map((d) => d.id).filter(
       (id) => !RAID_REQUIRED_DUNGEON_IDS.has(id),
     );
     expect(standard.length).toBeGreaterThan(0);
-    for (const id of standard) expect(resetCooldownApplies(id)).toBe(true);
+    for (const id of standard) expect(resetCooldownApplies(id, false)).toBe(true);
   });
 
-  it('the raid-required rooms skip it: the Nythraxis boss arena and every Ignivar room', () => {
-    expect(resetCooldownApplies('nythraxis_boss_arena')).toBe(false);
-    for (const id of IGNIVAR_RAID_ROOM_IDS) expect(resetCooldownApplies(id)).toBe(false);
+  it('the raid-required rooms skip it on a tier switch: the Nythraxis boss arena and every Ignivar room', () => {
+    expect(resetCooldownApplies('nythraxis_boss_arena', false)).toBe(false);
+    for (const id of IGNIVAR_RAID_ROOM_IDS) expect(resetCooldownApplies(id, false)).toBe(false);
     expect([...RAID_REQUIRED_DUNGEON_IDS].sort()).toEqual(
       ['nythraxis_boss_arena', ...IGNIVAR_RAID_ROOM_IDS].sort(),
     );
@@ -39,6 +39,12 @@ describe('reset cooldown policy: which claims pay the five-minute Reset All cool
     }
     expect(DAILY_LOCKOUT_RAID_ROOMS.has('nythraxis_boss_arena')).toBe(true);
     expect(IGNIVAR_RAID_ROOM_IDS.some((id) => WEEKLY_LOCKOUT_RAID_ROOMS.has(id))).toBe(true);
+  });
+
+  it('every claim rebuilt at its old difficulty pays it, raid rooms included', () => {
+    for (const d of DUNGEON_LIST) expect(resetCooldownApplies(d.id, true), d.id).toBe(true);
+    expect(resetCooldownApplies('nythraxis_boss_arena', true)).toBe(true);
+    for (const id of IGNIVAR_RAID_ROOM_IDS) expect(resetCooldownApplies(id, true)).toBe(true);
   });
 
   it('dungeons.ts re-exports the same set object (one source of truth)', () => {

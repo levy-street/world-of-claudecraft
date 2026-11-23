@@ -553,8 +553,8 @@ Direfang Grips, Nightfang Treads, Sutil's Gambit, The Architect's Cornerstone.
 **Rotation** (an in-and-out melee loop, not a ranged one)
 1. `aspect_of_the_hawk`, tame before the pull, stand at ~12 yards
 2. `bloodtrail_assault` on cooldown
-3. With no Bloodhook Wound up: `bloodhook` if 8+ yards away (it charges you back
-   into melee), otherwise `trailbreak` (leap 12 yards back to arm Re-entry)
+3. With no Bloodhook Wound up: `bloodhook` if 4+ yards away (it charges you back
+   into melee), otherwise `trailbreak` (leap 25 yards back to arm Re-entry)
 4. `shrapnel_charge` while the wound rides
 5. `mongoose_bite` (Woundrend) at 3 Hunting Momentum or when the wound is expiring
 6. `raptor_strike` (Gutting Strike) filler, free and restores 15 focus

@@ -37,7 +37,7 @@ describe('nameplate projection', () => {
     );
   });
 
-  it('rejects anchors outside the viewport before decluttering and painting them', () => {
+  it('rejects anchors outside the viewport before painting them', () => {
     expect(isNameplateScreenAnchorVisible(640, 360, 1280, 720)).toBe(true);
     // Keep a bounded gutter so a wide plate or an emote can remain partially visible.
     expect(isNameplateScreenAnchorVisible(-119, 360, 1280, 720)).toBe(true);

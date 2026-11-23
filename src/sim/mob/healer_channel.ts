@@ -1,3 +1,6 @@
+import { THATCHGRIN_KIT } from '../content/gourdlight_eve_scarecrow';
+import { TEMPLE_BOSS_CAST_SCHOOLS } from '../encounters/drowned_temple/ids';
+import { ILVANE_CAST_SCHOOLS } from '../encounters/hollow_crypt/ilvane_ids';
 import {
   HOARD_ADD_CAST_SCHOOLS,
   HOARD_CONTROL_CAST_SCHOOLS,
@@ -6,6 +9,12 @@ import {
 import type { Aura } from '../types';
 import { VARKHUL_CINDER_REPAIR_CAST_ID } from '../varkhul_cinder_artificer';
 import { IGNIVAR_CINDER_LANCE_CAST_ID } from './ignivar_trash_automata';
+import { BASTION_KIT_CAST_SCHOOLS } from './trash_kit/bastion_cast_ids';
+import { TRASH_KIT_CAST_SCHOOLS } from './trash_kit/cast_ids';
+import { TRASH_DEMO_CAST_SCHOOLS } from './trash_kit/engine_demo';
+import { SANCTUM_KIT_CAST_SCHOOLS } from './trash_kit/sanctum_cast_ids';
+import { TEMPLE_KIT_CAST_SCHOOLS } from './trash_kit/temple_cast_ids';
+import { WILDHEART_KIT_CAST_SCHOOLS } from './trash_kit/wildheart_cast_ids';
 
 // The scripted cast id updateHealerHold puts on a channelHeal mob (Malric, the
 // Nythraxis spirit healer) so its heal renders a real, interruptible cast bar.
@@ -22,9 +31,30 @@ export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['sch
   [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: { school: 'fire' },
   [VARKHUL_CINDER_REPAIR_CAST_ID]: { school: 'fire' },
   [IGNIVAR_CINDER_LANCE_CAST_ID]: { school: 'fire' },
+  // Old Thatchgrin's Thatchbound bar (seasonal/scarecrow_puppet.ts): a kick fizzles it.
+  [THATCHGRIN_KIT.puppet.name]: { school: THATCHGRIN_KIT.puppet.school },
   // Buried Hoard control casts: a fear, stun, silence or hex a hoard mob casts
   // instead of landing instantly (src/sim/rift/hoard_control_casts.ts).
   ...HOARD_CONTROL_CAST_SCHOOLS,
   ...HOARD_LIGHTNING_STRIKE_CAST_SCHOOL,
   ...HOARD_ADD_CAST_SCHOOLS,
+  // The dungeon trash kit's bolts, raises, calls and shrieks (mob/trash_kit).
+  ...TRASH_KIT_CAST_SCHOOLS,
+  // The Sunken Bastion's heals and shields (mob/trash_kit/bastion_cast_ids.ts).
+  ...BASTION_KIT_CAST_SCHOOLS,
+  // The Drowned Temple's lullaby, tide call and coil (mob/trash_kit/temple_cast_ids.ts).
+  ...TEMPLE_KIT_CAST_SCHOOLS,
+  // Choirmother Selthe's Drowning Aria
+  // (encounters/drowned_temple/ids.ts TEMPLE_BOSS_CAST_SCHOOLS).
+  ...TEMPLE_BOSS_CAST_SCHOOLS,
+  // Cantor Ilvane's Dirge of the Hollow (encounters/hollow_crypt/ilvane_ids.ts);
+  // her heroic Unbroken Verse runs under an id registered nowhere.
+  ...ILVANE_CAST_SCHOOLS,
+  // The Wildheart Basin's Ancestral Sap (mob/trash_kit/wildheart_cast_ids.ts).
+  ...WILDHEART_KIT_CAST_SCHOOLS,
+  // The Gravewyrm Sanctum's Warming Rite and Goad (mob/trash_kit/sanctum_cast_ids.ts).
+  ...SANCTUM_KIT_CAST_SCHOOLS,
+  // The trash engine's demonstration kit (mob/trash_kit/engine_demo.ts): the
+  // dev-only kickable nova.
+  ...TRASH_DEMO_CAST_SCHOOLS,
 };

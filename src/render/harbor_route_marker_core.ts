@@ -1,7 +1,9 @@
 // The harbor route marker's pure decisions (the painter is
 // harbor_route_markers.ts): which named parts of the one shared model a
-// graphics tier keeps, and the shape of the destination plate the painter
-// draws the name on. Three-, DOM- and i18n-free.
+// graphics tier keeps, the shape of the destination plate the painter draws
+// the name on, and the plate canvas the name is painted into (its size per
+// memory profile and every paint metric in canvas pixels). Three-, DOM- and
+// i18n-free.
 //
 // Fairness (docs/design/graphics-settings-fairness.md): the sign's whole
 // message is "a ship stops here, it goes THERE, board THAT way", so the parts
@@ -111,4 +113,113 @@ export function harborRouteMarkerTextFaces(
     { z: plate.faceOffset, yaw: 0 },
     { z: -plate.faceOffset, yaw: Math.PI },
   ];
+}
+
+// ---------------------------------------------------------------------------
+// The plate canvas per memory profile
+// ---------------------------------------------------------------------------
+//
+// Every world entry paints one canvas per destination and uploads it with a
+// full mip chain; on iOS WebKit that backing store and texture count against
+// the WebContent process ceiling that kills the page. On a phone, at the iOS
+// profile's capped pixel ratio, a plate spans fewer render pixels than the
+// half-size canvas has at every ordinary reading distance (it passes 512 only
+// with the camera about 2 yd from the board), so the full-size top level buys
+// nothing there; a large iPad passes it inside about 5 yd, where the name is
+// magnified and softer, never smaller. So the iOS memory profile (every iOS
+// WebKit host, the tight rung included) paints at half each side, a quarter
+// of the texels. The profile is static for a page (it follows the platform),
+// so a plate never changes size once painted.
+//
+// Fairness: the destination name is what a player reads to pick a ferry, so
+// it is painted on every profile and every tier; the half-size canvas keeps
+// the aspect and scales every metric below with it, so the lettering fills the
+// same share of the plate and a long localized name shrinks exactly as far.
+
+/** The plate canvas: wide like the painted panel (about 3 to 1). */
+export interface HarborRouteMarkerPlateCanvasSize {
+  readonly width: number;
+  readonly height: number;
+}
+
+/** Full size, every profile outside the iOS memory profile. */
+export const HARBOR_ROUTE_MARKER_PLATE_CANVAS: HarborRouteMarkerPlateCanvasSize = Object.freeze({
+  width: 1024,
+  height: 340,
+});
+
+/** The iOS memory profile: half each side, same aspect. */
+export const HARBOR_ROUTE_MARKER_PLATE_CANVAS_IOS: HarborRouteMarkerPlateCanvasSize = Object.freeze(
+  { width: 512, height: 170 },
+);
+
+/** The profile flag the canvas size reads (a slice of GfxSettings). */
+export interface HarborRouteMarkerPlateMemoryProfile {
+  readonly iosMemoryProfile: boolean;
+}
+
+export function harborRouteMarkerPlateCanvasSize(
+  profile: HarborRouteMarkerPlateMemoryProfile,
+): HarborRouteMarkerPlateCanvasSize {
+  return profile.iosMemoryProfile
+    ? HARBOR_ROUTE_MARKER_PLATE_CANVAS_IOS
+    : HARBOR_ROUTE_MARKER_PLATE_CANVAS;
+}
+
+/** The painter's absolute metrics, canvas pixels. */
+export interface HarborRouteMarkerPlatePaint {
+  /** The sign-writer's keyline inside the edge: stroke width and inset. */
+  readonly keylineWidth: number;
+  readonly keylineInset: number;
+  /** The pale lift under the ink, offset right and down. */
+  readonly liftX: number;
+  readonly liftY: number;
+  /** The fit loop stops above this font size, stepping down by the step. */
+  readonly minFontPx: number;
+  readonly fontStepPx: number;
+}
+
+/** The metrics as authored on the full-size canvas. */
+const FULL_SIZE_PAINT: HarborRouteMarkerPlatePaint = Object.freeze({
+  keylineWidth: 6,
+  keylineInset: 22,
+  liftX: 2,
+  liftY: 3,
+  minFontPx: 28,
+  fontStepPx: 4,
+});
+
+/** The paint metrics for a canvas this tall: the full-size metrics scaled by
+ *  its height against the full-size canvas (exactly the authored numbers on
+ *  the full-size canvas). */
+export function harborRouteMarkerPlatePaint(canvasHeight: number): HarborRouteMarkerPlatePaint {
+  const k = canvasHeight / HARBOR_ROUTE_MARKER_PLATE_CANVAS.height;
+  return {
+    keylineWidth: FULL_SIZE_PAINT.keylineWidth * k,
+    keylineInset: FULL_SIZE_PAINT.keylineInset * k,
+    liftX: FULL_SIZE_PAINT.liftX * k,
+    liftY: FULL_SIZE_PAINT.liftY * k,
+    minFontPx: FULL_SIZE_PAINT.minFontPx * k,
+    fontStepPx: FULL_SIZE_PAINT.fontStepPx * k,
+  };
+}
+
+/**
+ * The lettering size: from `startPx`, step down until `fits` accepts a size,
+ * never stepping to a size at or below the floor. When nothing fits, the last
+ * size tried is kept and the painter's fillText maxWidth squeezes the name,
+ * so it is never clipped. `fits` is called once per size tried, largest first.
+ */
+export function harborRouteMarkerPlateFontPx(
+  startPx: number,
+  paint: HarborRouteMarkerPlatePaint,
+  fits: (px: number) => boolean,
+): number {
+  let size = startPx;
+  for (;;) {
+    if (fits(size)) return size;
+    const next = size - paint.fontStepPx;
+    if (next <= paint.minFontPx) return size;
+    size = next;
+  }
 }

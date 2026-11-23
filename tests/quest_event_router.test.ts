@@ -15,7 +15,8 @@ function fakeHud() {
     log: vi.fn(),
     questBanner: { show: vi.fn() },
     showBanner: vi.fn(),
-    questDialog: { refresh: vi.fn() },
+    questDialog: { refresh: vi.fn(), open: vi.fn() },
+    weeklyQuestsWindow: { open: vi.fn() },
     worldQuestPuzzleWindow: { applyEventPresentation: vi.fn() },
     treasureMapWindow: { open: vi.fn(), refresh: vi.fn() },
   };
@@ -92,6 +93,17 @@ describe('quest event router', () => {
     );
   });
 
+  it('opens the investigation dialogue and the weekly board, presenting nothing else', () => {
+    const hud = fakeHud();
+    const talk = { type: 'worldQuestInvestigationDialogue', targetId: 42 } as SimEvent;
+    expect(applyQuestEventPresentation(hud, talk)).toBe(false);
+    expect(hud.questDialog.open).toHaveBeenCalledWith(42);
+    const weekly = { type: 'worldQuestWeeklyOpen' } as SimEvent;
+    expect(applyQuestEventPresentation(hud, weekly)).toBe(false);
+    expect(hud.weeklyQuestsWindow.open).toHaveBeenCalledOnce();
+    expect(hud.log).not.toHaveBeenCalled();
+  });
+
   it('logs progress on the progress tone', () => {
     expect(HUD_LOG.PROGRESS).toBeTruthy();
   });
@@ -109,6 +121,7 @@ describe('quest event router', () => {
       '    text: string | readonly Node[],\n    color = ',
       '  showBanner(\n    text: string,',
       'if (applyQuestEventPresentation(this, ev)) continue;',
+      'private readonly weeklyQuestsWindow = new WeeklyQuestsWindow({',
     ]) {
       expect(hudSource, anchor).toContain(anchor);
     }

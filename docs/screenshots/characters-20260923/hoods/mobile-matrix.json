@@ -1,0 +1,923 @@
+{
+  "matrix": [
+    {
+      "cls": "hunter",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_hunter",
+            "head": "Armor_Hunter_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_hunter",
+            "head": "Armor_Hunter_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_hunter",
+            "head": "Armor_Hunter_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_hunter",
+            "head": "Armor_Hunter_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_hunter",
+            "head": "Armor_Hunter_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_hunter",
+            "head": "Armor_Hunter_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "hunter",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_hunter_female",
+            "head": "Armor_Female_Hunter_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_hunter_female",
+            "head": "Armor_Female_Hunter_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_hunter_female",
+            "head": "Armor_Female_Hunter_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_hunter_female",
+            "head": "Armor_Female_Hunter_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_hunter_female",
+            "head": "Armor_Female_Hunter_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_hunter_female",
+            "head": "Armor_Female_Hunter_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "rogue",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_rogue",
+            "head": "Armor_Rogue_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_rogue",
+            "head": "Armor_Rogue_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_rogue",
+            "head": "Armor_Rogue_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_rogue",
+            "head": "Armor_Rogue_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_rogue",
+            "head": "Armor_Rogue_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_rogue",
+            "head": "Armor_Rogue_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "rogue",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_rogue_female",
+            "head": "Armor_Female_Rogue_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_rogue_female",
+            "head": "Armor_Female_Rogue_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_rogue_female",
+            "head": "Armor_Female_Rogue_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_rogue_female",
+            "head": "Armor_Female_Rogue_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_rogue_female",
+            "head": "Armor_Female_Rogue_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_rogue_female",
+            "head": "Armor_Female_Rogue_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "warlock",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_warlock",
+            "head": "Armor_Warlock_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_warlock",
+            "head": "Armor_Warlock_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_warlock",
+            "head": "Armor_Warlock_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_warlock",
+            "head": "Armor_Warlock_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_warlock",
+            "head": "Armor_Warlock_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_warlock",
+            "head": "Armor_Warlock_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "warlock",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_warlock_female",
+            "head": "Armor_Female_Warlock_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_warlock_female",
+            "head": "Armor_Female_Warlock_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_warlock_female",
+            "head": "Armor_Female_Warlock_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_warlock_female",
+            "head": "Armor_Female_Warlock_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_warlock_female",
+            "head": "Armor_Female_Warlock_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_warlock_female",
+            "head": "Armor_Female_Warlock_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "mage",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_mage",
+            "head": "Armor_Mage_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_mage",
+            "head": "Armor_Mage_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_mage",
+            "head": "Armor_Mage_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_mage",
+            "head": "Armor_Mage_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_mage",
+            "head": "Armor_Mage_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_mage",
+            "head": "Armor_Mage_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "mage",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_mage_female",
+            "head": "Armor_Female_Mage_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_mage_female",
+            "head": "Armor_Female_Mage_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_mage_female",
+            "head": "Armor_Female_Mage_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_mage_female",
+            "head": "Armor_Female_Mage_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_mage_female",
+            "head": "Armor_Female_Mage_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_mage_female",
+            "head": "Armor_Female_Mage_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "priest",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_priest",
+            "head": "Armor_Priest_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_priest",
+            "head": "Armor_Priest_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_priest",
+            "head": "Armor_Priest_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_priest",
+            "head": "Armor_Priest_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_priest",
+            "head": "Armor_Priest_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_priest",
+            "head": "Armor_Priest_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "priest",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_priest_female",
+            "head": "Armor_Female_Priest_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_priest_female",
+            "head": "Armor_Female_Priest_Hood",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_priest_female",
+            "head": "Armor_Female_Priest_Hood",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_priest_female",
+            "head": "Armor_Female_Priest_Hood",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_priest_female",
+            "head": "Armor_Female_Priest_Hood",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_priest_female",
+            "head": "Armor_Female_Priest_Hood",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "warrior",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_warrior",
+            "head": "Armor_Original_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_warrior",
+            "head": "Armor_Original_Helm",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_warrior",
+            "head": "Armor_Original_Helm",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_warrior",
+            "head": "Armor_Original_Helm",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_warrior",
+            "head": "Armor_Original_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_warrior",
+            "head": "Armor_Original_Helm",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "warrior",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_warrior_female",
+            "head": "Armor_Female_Warrior_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_warrior_female",
+            "head": "Armor_Female_Warrior_Helm",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_warrior_female",
+            "head": "Armor_Female_Warrior_Helm",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_warrior_female",
+            "head": "Armor_Female_Warrior_Helm",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_warrior_female",
+            "head": "Armor_Female_Warrior_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_warrior_female",
+            "head": "Armor_Female_Warrior_Helm",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "paladin",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_paladin",
+            "head": "Armor_Paladin_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_paladin",
+            "head": "Armor_Paladin_Helm",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_paladin",
+            "head": "Armor_Paladin_Helm",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_paladin",
+            "head": "Armor_Paladin_Helm",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_paladin",
+            "head": "Armor_Paladin_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_paladin",
+            "head": "Armor_Paladin_Helm",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "paladin",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_paladin_female",
+            "head": "Armor_Female_Paladin_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_paladin_female",
+            "head": "Armor_Female_Paladin_Helm",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_paladin_female",
+            "head": "Armor_Female_Paladin_Helm",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_paladin_female",
+            "head": "Armor_Female_Paladin_Helm",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_paladin_female",
+            "head": "Armor_Female_Paladin_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_paladin_female",
+            "head": "Armor_Female_Paladin_Helm",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "druid",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_druid",
+            "head": "Armor_Druid_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_druid",
+            "head": "Armor_Druid_Helm",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_druid",
+            "head": "Armor_Druid_Helm",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_druid",
+            "head": "Armor_Druid_Helm",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_druid",
+            "head": "Armor_Druid_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_druid",
+            "head": "Armor_Druid_Helm",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "druid",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_druid_female",
+            "head": "Armor_Female_Druid_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_druid_female",
+            "head": "Armor_Female_Druid_Helm",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_druid_female",
+            "head": "Armor_Female_Druid_Helm",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_druid_female",
+            "head": "Armor_Female_Druid_Helm",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_druid_female",
+            "head": "Armor_Female_Druid_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_druid_female",
+            "head": "Armor_Female_Druid_Helm",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "shaman",
+      "gender": "male",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_shaman",
+            "head": "Armor_Shaman_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_shaman",
+            "head": "Armor_Shaman_Helm",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_shaman",
+            "head": "Armor_Shaman_Helm",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_shaman",
+            "head": "Armor_Shaman_Helm",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_shaman",
+            "head": "Armor_Shaman_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_shaman",
+            "head": "Armor_Shaman_Helm",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    },
+    {
+      "cls": "shaman",
+      "gender": "female",
+      "states": [
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_shaman_female",
+            "head": "Armor_Female_Shaman_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_shaman_female",
+            "head": "Armor_Female_Shaman_Helm",
+            "shown": true,
+            "hair": false
+          }
+        },
+        {
+          "hidden": true,
+          "world": {
+            "key": "player_shaman_female",
+            "head": "Armor_Female_Shaman_Helm",
+            "shown": false,
+            "hair": true
+          },
+          "preview": {
+            "key": "player_shaman_female",
+            "head": "Armor_Female_Shaman_Helm",
+            "shown": false,
+            "hair": true
+          }
+        },
+        {
+          "hidden": false,
+          "world": {
+            "key": "player_shaman_female",
+            "head": "Armor_Female_Shaman_Helm",
+            "shown": true,
+            "hair": false
+          },
+          "preview": {
+            "key": "player_shaman_female",
+            "head": "Armor_Female_Shaman_Helm",
+            "shown": true,
+            "hair": false
+          }
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

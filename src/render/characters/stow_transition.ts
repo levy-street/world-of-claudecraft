@@ -13,19 +13,29 @@ export interface StowTransition {
   target: boolean;
   /** Seconds until the pending swap lands; 0 = nothing pending. */
   timer: number;
+  /** True while the rig is seated (ground sit, chair sit, or stand-up): forces
+   *  `attached = true` without overwriting `target`, so standing up restores `target`. */
+  sitting?: boolean;
 }
 
 export function createStowTransition(): StowTransition {
-  return { attached: false, target: false, timer: 0 };
+  return { attached: false, target: false, timer: 0, sitting: false };
 }
 
 /** Request a new pose with a deferred swap. Returns true when the caller should
  *  (re)play the arm gesture: any actual target change replays it, including a
  *  mid-flight reversal (the arm reaches again, the swap lands on the final
- *  state once). A same-target request is a no-op. */
+ *  state once). A same-target request is a no-op. While seated (`t.sitting`),
+ *  `target` is recorded for when the character stands up, while `attached` stays
+ *  sheathed (`true`) with no standing arm gesture. */
 export function requestStow(t: StowTransition, stowed: boolean, swapDelay: number): boolean {
   if (stowed === t.target) return false;
   t.target = stowed;
+  if (t.sitting) {
+    t.timer = 0;
+    t.attached = true;
+    return false;
+  }
   t.timer = Math.max(1e-6, swapDelay);
   return true;
 }
@@ -35,8 +45,23 @@ export function requestStow(t: StowTransition, stowed: boolean, swapDelay: numbe
 export function forceStow(t: StowTransition, stowed: boolean): boolean {
   t.target = stowed;
   t.timer = 0;
-  if (t.attached === stowed) return false;
-  t.attached = stowed;
+  const want = t.sitting ? true : stowed;
+  if (t.attached === want) return false;
+  t.attached = want;
+  return true;
+}
+
+/** Sync the seated stow overlay (`sitting` true while sitting or rising from a
+ *  seat). Sitting always sheathes weapons and shields immediately without
+ *  playing the standing sheathe clip, and standing up restores `t.target`.
+ *  Returns true when `t.attached` changed and the caller must re-attach now. */
+export function syncSittingStow(t: StowTransition, sitting: boolean): boolean {
+  if (Boolean(t.sitting) === sitting) return false;
+  t.sitting = sitting;
+  t.timer = 0;
+  const want = sitting ? true : t.target;
+  if (t.attached === want) return false;
+  t.attached = want;
   return true;
 }
 

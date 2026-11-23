@@ -1,0 +1,487 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-gravewyrm-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 5,
+    "removedCategoryFallbacks": [
+      "dgn_korgath_all_chains",
+      "dgn_korgath_still_bound",
+      "dgn_velkhar_cold",
+      "dgn_korzul_thin_ice",
+      "dgn_sledge_tusker"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "dgn_korgath_all_chains",
+      "family": "deed-gravewyrm",
+      "batchId": "deed-gravewyrm-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_korgath_all_chains.webp",
+      "canonicalDisplayName": "A Kinder End",
+      "acceptedSha256": "2e5e32e27c588aedb7383565d27de4e32d0607e81245abc70bf85626858cb0a6",
+      "acceptedBytes": 7580,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/originals/dgn_korgath_all_chains.png",
+        "sha256": "b80fed795838666554d8de49dd4107e5ed8cd0477014ac303559f95b78e8f9be",
+        "bytes": 2113170,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/masters/dgn_korgath_all_chains.png",
+        "sha256": "37e04d7a0e0f9a548093d5417a283f7807ac236bf29c3db011fa0331987701a8",
+        "bytes": 380590,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for A Kinder End (dgn_korgath_all_chains). Subject: An empty heavy dark-iron foreman shackle opened at the center, surrounded by exactly FOUR short broken iron chain lengths pointing outward in a cross: top, bottom, left, right. Each chain has an obvious snapped outer link, all four clearly separated and countable. A weathered smith hammer lies diagonally behind the open cuff. A soft warm gold light shines from the freed center, cold pale frost on the broken links, compassionate and solemn, no person or written symbols. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/korgath_the_bound.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "2b83b4304d7f69576cbab9ca5b1c7cc8e9475243a38477343a65bb49baecdfb1"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/encounters/gravewyrm_sanctum/",
+        "retryCount": 1,
+        "correction": {
+          "reason": "Initial source framed at 448px had 0.2929 visible coverage, below converter minimum 0.34. Revised composition preserves four broken chains and adds a compact stone base.",
+          "prompt": "Edit the provided World of ClaudeCraft achievement crest dgn_korgath_all_chains (A Kinder End). Keep the open dark iron foreman cuff, warm gold freed-center light, diagonal smith hammer, and EXACTLY FOUR visibly broken chain lengths in top/bottom/left/right directions. Make the overall composition more compact and filled: shorten each chain to two thick links, pull their broken ends closer to the center, and add one roughly round weathered charcoal stone anvil-base behind the central cuff and inner chain links, occupying the gaps behind the hammer. The stone should be a tactile material part of the emblem, not a UI border or background plate. All four chain breaks must remain clearly visible and countable against the stone or transparency. Keep icy silver edges and warm upper-left painted light. Preserve genuine transparent exterior and generous transparent padding on all sides. No text, letters, numbers or new objects. One crest, square canvas. Aim for a broad compact silhouette that reads clearly at 32px, with fewer empty holes inside it.",
+          "reference": {
+            "path": "tmp/imagegen/v045-deeds-gravewyrm/originals/dgn_korgath_all_chains-rejected-sparse.png",
+            "sha256": "2eee7f0e8c984dffda63add69cf7749c295df3fbb2cb2e394cb229f5543f4a9b"
+          }
+        }
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_korgath_all_chains",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [35, 76, 1221, 1191],
+          "framedSubject": [448, 421],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korgath_all_chains-desktop.png",
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korgath_all_chains-mobile.png"
+        ],
+        "additionalStates": {
+          "desktopUnearned": "Verified correct WebP in grayscale with unearned card state.",
+          "portrait": "Correct URL decodes, but the existing Rotate to Landscape overlay deliberately obscures portrait gameplay. Not counted as unobstructed portrait visual verification.",
+          "reports": [
+            "docs/screenshots/deed-gravewyrm-icons-v045/desktop-extra-states.json",
+            "docs/screenshots/deed-gravewyrm-icons-v045/mobile-extra-states.json"
+          ]
+        }
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_korgath_still_bound",
+      "family": "deed-gravewyrm",
+      "batchId": "deed-gravewyrm-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_korgath_still_bound.webp",
+      "canonicalDisplayName": "The Lock Holds",
+      "acceptedSha256": "a07d1fef1b878d4affb7ccb979bed0c4c5a8b733452326023f0d9d6c9a5aaeb7",
+      "acceptedBytes": 9650,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/originals/dgn_korgath_still_bound.png",
+        "sha256": "15f9ce541d38c18f57454b59c1eab7b95595255c0c9942699e970020fe7ad645",
+        "bytes": 2493956,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/masters/dgn_korgath_still_bound.png",
+        "sha256": "efbbc8c7e5cc61630541ded34dc023a6faaf7f167a7ec97531921fd5ab8ae244",
+        "bytes": 440486,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for The Lock Holds (dgn_korgath_still_bound). Subject: A massive closed dark iron padlock with a broad gold reinforced face, held firmly by TWO intact heavy iron chains crossing behind it in an X. Both chains are unbroken from end to end with clear interlocking links. The lock rests against a compact frost-crusted black stone seal. Restrained crimson magical seams and icy silver edges, strong central locked silhouette, no open shackle, no snapped chains, no text. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/korgath_the_bound.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "2b83b4304d7f69576cbab9ca5b1c7cc8e9475243a38477343a65bb49baecdfb1"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/encounters/gravewyrm_sanctum/",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_korgath_still_bound",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [73, 68, 1183, 1186],
+          "framedSubject": [427, 431],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korgath_still_bound-desktop.png",
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korgath_still_bound-mobile.png"
+        ],
+        "additionalStates": {
+          "desktopUnearned": "Verified correct WebP in grayscale with unearned card state.",
+          "portrait": "Correct URL decodes, but the existing Rotate to Landscape overlay deliberately obscures portrait gameplay. Not counted as unobstructed portrait visual verification.",
+          "reports": [
+            "docs/screenshots/deed-gravewyrm-icons-v045/desktop-extra-states.json",
+            "docs/screenshots/deed-gravewyrm-icons-v045/mobile-extra-states.json"
+          ]
+        }
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_velkhar_cold",
+      "family": "deed-gravewyrm",
+      "batchId": "deed-gravewyrm-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_velkhar_cold.webp",
+      "canonicalDisplayName": "Cold Comfort",
+      "acceptedSha256": "5fa7788104b6d19eed60a6c7517da0cda818fb7cb3d88b23e3ba27923ba011e9",
+      "acceptedBytes": 8120,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/originals/dgn_velkhar_cold.png",
+        "sha256": "db0e01cac8da260143a4df4ec761eced80d7a59bfe78dea2589c4d419f02fb0f",
+        "bytes": 2323988,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/masters/dgn_velkhar_cold.png",
+        "sha256": "92618660490eda0a36f8076eb498acef5c74a81b7ef05f2b90a981ebdc42e24d",
+        "bytes": 447403,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Cold Comfort (dgn_velkhar_cold). Subject: A single weathered ivory skeleton skull and crossed bones resting motionless inside a clear blue ice crystal, with the faint violet necromantic flame above it snuffed to a thin wisp. Broad faceted ice, strong skull silhouette, a small broken dark necromancer staff tip lies at the crystal base. Cold blue and ivory with restrained violet, no animated skeleton, no second skull, no blood or letters. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/grand_necromancer_velkhar.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "cff44b950c5b8d1e495ed5035a0ab2cbd027f91f4daf173fdc21952204b6a852"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/encounters/gravewyrm_sanctum/",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_velkhar_cold",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [122, 62, 1139, 1195],
+          "framedSubject": [402, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_velkhar_cold-desktop.png",
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_velkhar_cold-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_korzul_thin_ice",
+      "family": "deed-gravewyrm",
+      "batchId": "deed-gravewyrm-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_korzul_thin_ice.webp",
+      "canonicalDisplayName": "Thin Ice",
+      "acceptedSha256": "41f3fd3e5a84687234345339f2a25ce1c8a87a6da8dcea8af77a1fe417ac36ac",
+      "acceptedBytes": 8648,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/originals/dgn_korzul_thin_ice.png",
+        "sha256": "f46147881ba191e7c385205e37dc3121ca466137531fc35d4d579d64abbf30ae",
+        "bytes": 2261095,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/masters/dgn_korzul_thin_ice.png",
+        "sha256": "4f7354d30fbfcca73f8c9bbcf1bd2256f0b8ecd3c6264526cb09e76907a6d52c",
+        "bytes": 423365,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Thin Ice (dgn_korzul_thin_ice). Subject: A small silver-grey spectral dragon skull hovering above a broad intact frozen lake surface made of large pale blue hexagonal ice plates. A few dark hairline cracks stop at the plate edges while most of the compact lake remains solid and bright. The thick intact hexagonal ice mosaic dominates the lower half, dragon skull at top, frosted stone rim, clear icy cyan and silver-white, no numbers, writing, boot or person. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/korzul_the_gravewyrm.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "986b78f4effbba5cff875817db179ebd22e3746d61c4f0165f1cea6d56d14a8d"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/encounters/gravewyrm_sanctum/",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_korzul_thin_ice",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [74, 55, 1180, 1196],
+          "framedSubject": [434, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korzul_thin_ice-desktop.png",
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_korzul_thin_ice-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_sledge_tusker",
+      "family": "deed-gravewyrm",
+      "batchId": "deed-gravewyrm-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_sledge_tusker.webp",
+      "canonicalDisplayName": "Cold Cargo",
+      "acceptedSha256": "86674e82887ea72dba786eba1dafa1664607f6454e020a0817ae0bf062f93b0f",
+      "acceptedBytes": 8746,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/originals/dgn_sledge_tusker.png",
+        "sha256": "8449a8874f56256e76f1396384fe1b3c0731bb682389e714f84c2718594e19fe",
+        "bytes": 2287635,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-gravewyrm/masters/dgn_sledge_tusker.png",
+        "sha256": "526354564406ce0d5e29c844ff0c494a81b4a2fadd942d6cf99755df9847f665",
+        "bytes": 446030,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Cold Cargo (dgn_sledge_tusker). Subject: A compact three-quarter front view of a grey woolly mammoth with long curved ivory tusks pulling a low wooden cargo sledge over snow. Dark iron harness and two strapped iron soul braziers with small spectral violet flames, one clear pair of mammoth footprints leads safely past a small standing shield at the side, no contact. Mammoth head and tusks dominate; body and sledge recede compactly behind, icy blue snow, weathered warm timber, no rider, injury or lettering. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/mobs/sledge_tusker.webp",
+            "role": "Project-owned encounter portrait reviewed visually for subject context; not an image-edit input",
+            "sha256": "e9454acaa6019ff7f5a645b4807ca4ae50ad1693cc6f487b8d79328fc8d32191"
+          }
+        ],
+        "identityBrief": "src/sim/content/deeds.ts; src/sim/encounters/gravewyrm_sanctum/",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_sledge_tusker",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [69, 88, 1193, 1177],
+          "framedSubject": [441, 427],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-gravewyrm-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_sledge_tusker-desktop.png",
+          "docs/screenshots/deed-gravewyrm-icons-v045/dgn_sledge_tusker-mobile.png"
+        ]
+      }
+    }
+  ]
+}

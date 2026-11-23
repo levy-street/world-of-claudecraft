@@ -161,7 +161,7 @@ describe('the Mother of Mushrooms, in her cave', () => {
     const { sim, inst, boss } = encounter('rare');
     run(sim, boss, MUSHROOM.sporeFirstSec + DT);
     const warned = cues(inst, 'mushroom-spore');
-    expect(warned).toHaveLength(sporeCloudCount(true, 1));
+    expect(warned).toHaveLength(sporeCloudCount(true, 5));
     expect(warned.every((cue) => cue.kind === 'mark' && cue.phase === 'warning')).toBe(true);
     // One lands on the player.
     const mine = warned.find(

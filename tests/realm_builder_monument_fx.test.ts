@@ -11,6 +11,7 @@ import path from 'node:path';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { gfxInternalsForTest, sharedUniforms } from '../src/render/gfx';
+import { buildPickOnlyObjectBody } from '../src/render/pick_only_objects';
 import {
   buildRealmBuilderMonumentBody,
   buildRealmBuilderMonumentFx,
@@ -26,6 +27,7 @@ import {
 } from '../src/render/realm_builder_monument_fx_core';
 import { currentRealmBuilder } from '../src/sim/content/realm_builders';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import { REALM_BUILDER_MONUMENT_TEMPLATE_ID } from '../src/sim/types';
 
 const restores: Array<() => void> = [];
 
@@ -298,12 +300,10 @@ describe('Realm Builder monument pick volume', () => {
 
   it('is what renderer.ts routes the monument to, ahead of the generic loot arm', () => {
     const source = readFileSync(path.join(__dirname, '..', 'src/render/renderer.ts'), 'utf8');
-    // The LITERAL, like the noticeboard arm beside it: importing the constant
-    // pushed this condition past 80 columns, and the wrap broke both this scan
-    // and the file's monolith ceiling. realm_builder_monument.test.ts pins the
-    // literal to REALM_BUILDER_MONUMENT_TEMPLATE_ID so they cannot drift.
+    // One pick-only arm serves every scenery-drawn interactable
+    // (src/render/pick_only_objects.ts); the monument is a row of its table.
     const monumentArm = source.indexOf(
-      "e.kind === 'object' && e.templateId === 'realm_builder_monument'",
+      "e.kind === 'object' && isPickOnlyObjectTemplate(e.templateId)",
     );
     const genericArm = source.indexOf("} else if (e.kind === 'object') {");
     expect(monumentArm).toBeGreaterThan(-1);
@@ -312,7 +312,10 @@ describe('Realm Builder monument pick volume', () => {
     // monument arm placed after it never runs and the statue goes back to
     // standing a quest-pickup prop and a loot sparkle inside its own plinth.
     expect(monumentArm).toBeLessThan(genericArm);
-    expect(source).toContain('buildRealmBuilderMonumentPickBody()');
+    expect(source).toContain('buildPickOnlyObjectBody(e.templateId');
+    const routed = buildPickOnlyObjectBody(REALM_BUILDER_MONUMENT_TEMPLATE_ID);
+    expect(routed.group.name).toBe(buildRealmBuilderMonumentPickBody().group.name);
+    expect(routed.height).toBe(EASTBROOK_LAYOUT.civic.monument.height);
   });
 });
 

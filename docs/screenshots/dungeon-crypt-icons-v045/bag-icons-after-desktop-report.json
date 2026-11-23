@@ -1,0 +1,26 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/gravedirt_treads.webp",
+    "http://localhost:5194/ui/items/bellrope_girdle.webp",
+    "http://localhost:5194/ui/items/sextons_spadehaft.webp",
+    "http://localhost:5194/ui/items/rimesilk_mantle.webp",
+    "http://localhost:5194/ui/items/bonechill_carapace_vest.webp",
+    "http://localhost:5194/ui/items/rimeweb_hunters_leggings.webp",
+    "http://localhost:5194/ui/items/rimeweb_fang.webp",
+    "http://localhost:5194/ui/items/cantors_cassock.webp",
+    "http://localhost:5194/ui/items/choirward_leggings.webp",
+    "http://localhost:5194/ui/items/choristers_gloves.webp",
+    "http://localhost:5194/ui/items/cantors_hymnal.webp",
+    "http://localhost:5194/ui/items/heroic_cantors_hymnal.webp",
+    "http://localhost:5194/ui/items/gravecallers_vestments.webp",
+    "http://localhost:5194/ui/items/unquiet_stalkers_hood.webp",
+    "http://localhost:5194/ui/items/sextons_burial_spade.webp",
+    "http://localhost:5194/ui/items/rimesilk_hood.webp"
+  ],
+  "allDecoded": true
+}

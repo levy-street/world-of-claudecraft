@@ -76,6 +76,23 @@ describe('zone resolution stays total on an empty zone list', () => {
 });
 
 describe('terrain features follow the active content verbatim', () => {
+  it('preserves frozen fractional and integer bounds across content swaps', () => {
+    for (const [min, max] of [
+      [-180, 180],
+      [-180.25, 180.75],
+      [-240, 240],
+    ]) {
+      const world = customPeaks();
+      world.zones[0] = { ...world.zones[0], xMin: min, xMax: max };
+      setActiveWorldContent(world);
+      const bounds = worldXBoundsAt(50);
+      expect(bounds).toEqual({ min, max });
+      expect(Object.isFrozen(bounds)).toBe(true);
+      expect(worldXBoundsAt(60)).toBe(bounds);
+      expect(worldXBoundsAt(Number.NaN)).toEqual({ min, max });
+    }
+  });
+
   it('a zero-zone content flattens no builtin hub (and stays finite)', () => {
     const hub = ZONES[0].hub;
     const builtinAtHub = terrainHeight(hub.x, hub.z, SEED);

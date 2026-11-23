@@ -1,7 +1,13 @@
 import { GLIDER_QUEST_ID } from '../sim/content/world_quest_glider';
+import { isBuiltinWorldActive } from '../sim/data';
 import { wispMazeActionsLocked } from '../sim/wisp_maze_action_lock';
 import type { IWorld } from '../world_api';
-import { diagonalMovementVisualFacing, type MovementVisualInput } from './movement_visual';
+import {
+  diagonalMovementVisualFacing,
+  diagonalMovementVisualOffset,
+  easeMovementVisualOffset,
+  type MovementVisualInput,
+} from './movement_visual';
 
 /** Countdown and flight both belong to the authoritative flight kernel. */
 export function gliderControlsActive(world: Pick<IWorld, 'worldQuestLog'>): boolean {
@@ -59,6 +65,40 @@ export function gliderAwareVisualFacing(
   baseFacing: number,
 ): number | null {
   return gliderControlsActive(world) ? null : diagonalMovementVisualFacing(mi, baseFacing);
+}
+
+/**
+ * The local diagonal visual yaw, EASED between frames (movement_visual.ts), so
+ * a strafe joining or leaving the run turns the body instead of snapping it
+ * between fixed headings. Returns the per-frame resolver; the easing state
+ * lives in its closure. Withheld (and reset) while the flight kernel owns
+ * facing; null once settled back on the base heading with nothing asking for
+ * an offset, so the classic presentation owns the facing outright.
+ *
+ * The easing is an authored-map (Studio) presentation: on the built-in world
+ * (`easing` false, read per frame) the resolver is exactly the classic
+ * {@link gliderAwareVisualFacing} step, withheld while movement is frozen.
+ */
+export function easedGliderAwareVisualFacing(
+  world: Pick<IWorld, 'worldQuestLog'>,
+  frozen: () => boolean,
+  easing: () => boolean = () => !isBuiltinWorldActive(),
+): (mi: MovementVisualInput, baseFacing: number, dt: number) => number | null {
+  let offset = 0;
+  return (mi, baseFacing, dt) => {
+    if (gliderControlsActive(world)) {
+      offset = 0;
+      return null;
+    }
+    if (!easing()) {
+      offset = 0;
+      return frozen() ? null : diagonalMovementVisualFacing(mi, baseFacing);
+    }
+    const target = frozen() ? null : diagonalMovementVisualOffset(mi);
+    offset = easeMovementVisualOffset(offset, target ?? 0, dt);
+    if (target === null && Math.abs(offset) < 0.002) return null;
+    return baseFacing + offset;
+  };
 }
 
 /** Local movement freezes through a mount race countdown and while a cannon is manned;

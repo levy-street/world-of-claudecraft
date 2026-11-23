@@ -214,14 +214,14 @@ describe('mountInspectDeps', () => {
     expect(neither?.owned).toBe(false);
   });
 
-  it('reads worn from the player and ownsAnyMount from the owned mounts', () => {
+  it('reads worn from the player without requiring a local reins item', () => {
     const worn = seams(fakeWorld({ mountSkinIds: [REINS], mountSkinId: REINS })).deps.row(REINS);
     expect(worn?.worn).toBe(true);
     const bare = seams(
       fakeWorld({ mountSkinIds: [REINS], mountSkinId: OTHER, ownedMounts: [] }),
     ).deps.row(REINS);
     expect(bare?.worn).toBe(false);
-    expect(bare?.ownsAnyMount).toBe(false);
+    expect(bare?.ownsAnyMount).toBe(true);
   });
 
   it('returns null for a skin the catalog does not declare', () => {

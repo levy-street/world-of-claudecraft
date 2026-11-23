@@ -65,7 +65,7 @@ export function withGraphicsDraft<K extends string>(
 /** How a slider's readout is formatted; the painter maps this to a formatter. */
 // 'shoulder' reads a -1..1 offset as "Left 60%" / "Center" / "Right 100%"
 // (actionCamShoulderReadout below resolves which key and percent).
-export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'shoulder';
+export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'shoulder' | 'pixels';
 
 /** The Action Cam shoulder slider's readout: which label key, and the
  *  magnitude as a 0..1 fraction for the percent formatter. */
@@ -131,6 +131,10 @@ export interface BoolToggleControl {
   disabled?: boolean;
   /** Rebuild the panel after dispatch so dependent controls refresh immediately. */
   rerender?: boolean;
+  /** Paint as a checkbox row (label after the box) instead of the On/Off plate:
+   *  for a set of independent options under one subhead, any mix of which may
+   *  be on (the Combat tab's enemy-highlight styles). Same store, same dispatch. */
+  check?: boolean;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -179,6 +183,9 @@ export interface NoteControl {
    *  keeps the whole sentence including where the value sits (never a
    *  concatenation). */
   valueKeys?: Record<string, TranslationKey>;
+  /** Paint as a gold group heading (`.set-subhead`) that titles the rows under
+   *  it, instead of a muted explanatory line. */
+  subhead?: boolean;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -322,7 +329,7 @@ const boolToggle = (
   s: OptionsSettingsSource,
   key: string,
   labelKey: TranslationKey,
-  opts: Pick<BoolToggleControl, 'disabled' | 'rerender'> = {},
+  opts: Pick<BoolToggleControl, 'disabled' | 'rerender' | 'check'> = {},
 ): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, on: s.bool(key), ...opts });
 
 /** The option value nearest the stored setting (the level ladders persist
@@ -728,6 +735,11 @@ export function buildGraphicsSections(
       ? choice(s, 'displayMode', 'hud.options.displayMode', displayModeOptions)
       : toggle(s, 'fullscreen', 'hud.options.fullscreen'),
     toggle(s, 'weather', 'game.settings.weather'),
+    // Spell effects cast by players and their pets (default on). Off keeps
+    // every enemy effect and every read a player acts on (area rings,
+    // crowd-control bands, cast bars); it sits beside Weather as the other
+    // "calm the screen" switch.
+    boolToggle(s, 'spellEffects', 'hudChrome.options.spellEffects'),
     // Opt-in wake/ripple simulation on water (default off): the one water effect
     // that runs extra GPU passes; bubbles and splashes are unaffected. It sits
     // beside Weather in GRAPHICS rather than in Interface (Troy, 2026-08-07):
@@ -899,12 +911,13 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
 // Audio panel (cluster 4)
 // ---------------------------------------------------------------------------
 
-/** Body control rows for the Audio sub-panel: three volume sliders, the bespoke
+/** Body control rows for the Audio sub-panel: four volume sliders, the bespoke
  *  music on/off toggle (reads the live MusicDirector), then the three audio bool
  *  toggles. The painter appends the footer. */
 export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
     slider(s, 'sfxVolume', 'hud.options.soundEffects'),
+    slider(s, 'ambientVolume', 'hudChrome.options.ambienceVolume'),
     slider(s, 'musicVolume', 'hud.options.musicVolume'),
     slider(s, 'voiceVolume', 'hud.options.voiceVolume'),
     { control: 'musicToggle', labelKey: 'hud.options.music' },
@@ -963,10 +976,48 @@ export const INTERFACE_TAB_LABEL_KEY: Record<InterfaceTab, TranslationKey> = {
   combat: 'hudChrome.interfaceTabs.combat',
 };
 
+/** The Combat tab's Style of Enemy Highlight checkboxes, in the order the group
+ *  lists them. Each is its own bool setting (all off by default). */
+const TARGET_HIGHLIGHT_ROWS: readonly (readonly [string, TranslationKey])[] = [
+  ['targetHighlightEdgeArrow', 'hudChrome.options.enemyHighlightEdgeArrow'],
+  ['targetHighlightNameplate', 'hudChrome.options.enemyHighlightNameplate'],
+  ['targetHighlightOverhead', 'hudChrome.options.enemyHighlightOverhead'],
+  ['targetHighlightReticle', 'hudChrome.options.enemyHighlightReticle'],
+];
+
 // Stamp a category onto each control in a per-tab sub-list. Kept pure (a plain
 // map) so the tagged list round-trips through the same determinism guard.
 const tag = (category: InterfaceTab, controls: OptionsControl[]): OptionsControl[] =>
   controls.map((c): OptionsControl => ({ ...c, category }));
+
+/** The Detach Resource Bar toggle plus, while it is on, its two size sliders;
+ *  nothing on the touch HUD, where the mover never applies a seat. */
+function resourceBarRows(s: OptionsSettingsSource, env?: OptionsEnv): OptionsControl[] {
+  if (env?.touch) return [];
+  const rows: OptionsControl[] = [
+    boolToggle(s, 'playerFrameResourceDetached', 'hudChrome.options.playerFrameResourceDetached', {
+      rerender: true,
+    }),
+  ];
+  if (s.bool('playerFrameResourceDetached'))
+    rows.push(
+      slider(
+        s,
+        'playerFrameResourceWidth',
+        'hudChrome.options.playerFrameResourceWidth',
+        'pixels',
+        1,
+      ),
+      slider(
+        s,
+        'playerFrameResourceHeight',
+        'hudChrome.options.playerFrameResourceHeight',
+        'pixels',
+        1,
+      ),
+    );
+  return rows;
+}
 
 export function buildInterfaceControls(
   s: OptionsSettingsSource,
@@ -978,6 +1029,7 @@ export function buildInterfaceControls(
     { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
+    boolToggle(s, 'spellTooltipOnHover', 'hudChrome.options.spellTooltipOnHover'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
     boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
     boolToggle(s, 'colorblindMode', 'hud.options.colorblindMode'),
@@ -985,6 +1037,13 @@ export function buildInterfaceControls(
     // Camera comfort (mouse-look direction), so it sits with the comfort
     // toggles rather than the Combat tab's attack/action-bar cluster.
     boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
+    // First person at the closest zoom: off, with the body below the head, or
+    // with no body at all (render/first_person_core.ts).
+    choice(s, 'firstPersonMode', 'hudChrome.options.firstPersonMode', [
+      { value: 0, labelKey: 'hudChrome.options.firstPersonOff' },
+      { value: 1, labelKey: 'hudChrome.options.firstPersonBody' },
+      { value: 2, labelKey: 'hudChrome.options.firstPersonNoBody' },
+    ]),
     boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
     boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
     boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
@@ -995,6 +1054,7 @@ export function buildInterfaceControls(
     boolToggle(s, 'showReliquaryTracker', 'hudChrome.options.showReliquaryTracker'),
     boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
     boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
+    boolToggle(s, 'showPetNames', 'hudChrome.options.showPetNames'),
     boolToggle(s, 'confirmVendorSell', 'hudChrome.options.confirmVendorSell'),
     note('hudChrome.options.confirmVendorSellNote'),
     choice(
@@ -1003,7 +1063,7 @@ export function buildInterfaceControls(
       'hudChrome.options.confirmVendorSellMinQuality',
       SELL_CONFIRM_QUALITY_CHOICES,
     ),
-    note('hudChrome.options.confirmVendorSellMinQualityNote'),
+    note('hudChrome.options.confirmVendorSellMinQualityNoteGray'),
   ];
   // The desktop shell's GPU preference, last in the tab so the web arm's row
   // order is untouched. Gated on the bridge CAPABILITY, so it renders only in a
@@ -1047,6 +1107,14 @@ export function buildInterfaceControls(
         { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
       ]),
       boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
+      // Detach Resource Bar lifts mana / energy / rage into a frame of its own;
+      // its size rows exist only while it is detached (docked, the bar takes
+      // the player frame's geometry), so the toggle re-renders the panel. The
+      // touch HUD owns its own layout (frame editing is desktop-only), so it
+      // offers none of the three rows.
+      ...resourceBarRows(s, env),
+      // The King of the Hill bar's backdrop; its text stays solid.
+      slider(s, 'hillBarOpacity', 'hudChrome.options.hillBarOpacity'),
       choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
@@ -1079,6 +1147,10 @@ export function buildInterfaceControls(
     ]),
     ...tag('combat', [
       boolToggle(s, 'eastbrookGuidance', 'hudChrome.tutorialGreeting.guidanceSetting'),
+      // The advisory dungeon alerts (the tip panel over the action bar). The
+      // note names what stays on screen whatever this is set to.
+      boolToggle(s, 'showDungeonHints', 'hudChrome.options.showDungeonHints'),
+      note('hudChrome.options.showDungeonHintsNote'),
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
       boolToggle(
         s,
@@ -1089,6 +1161,12 @@ export function buildInterfaceControls(
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
       boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
+      // Style of Enemy Highlight: a heading over four independent checkboxes,
+      // each one extra cue for a hostile current target; any mix works together.
+      { control: 'note', textKey: 'hudChrome.options.enemyHighlightStyle', subhead: true },
+      ...TARGET_HIGHLIGHT_ROWS.map(([key, labelKey]) =>
+        boolToggle(s, key, labelKey, { check: true }),
+      ),
       // The two dot-tracking surfaces, both showing only the LOCAL player's own
       // debuffs: the icon row on an enemy's nameplate, and the standalone Target
       // dots frame that tracks them across every enemy at once.
@@ -1097,6 +1175,11 @@ export function buildInterfaceControls(
       // the plate-native size and the slider only grows it, to 300%. Percent is
       // the default slider format, so the readout says "150%".
       slider(s, 'nameplateDotScale', 'hudChrome.options.nameplateDotScale'),
+      // PvP: the offensive/defensive tracker, a hostile player's tracked cooldowns
+      // above their name, beside the dot tracker it mirrors, with its own size
+      // slider directly under the toggle (same 100% to 300% range).
+      boolToggle(s, 'showNameplateCooldowns', 'hudChrome.options.showNameplateCooldowns'),
+      slider(s, 'nameplateCooldownScale', 'hudChrome.options.nameplateCooldownScale'),
       boolToggle(s, 'showTargetDots', 'hudChrome.options.showTargetDots'),
       // The six aura tracks: bars of the auras YOU have out, each its own
       // movable frame and each opted into individually (all default off).
@@ -1108,6 +1191,9 @@ export function buildInterfaceControls(
       boolToggle(s, 'showFriendlyTrack', 'hudChrome.options.showFriendlyTrack'),
       boolToggle(s, 'showShieldTrack', 'hudChrome.options.showShieldTrack'),
       slider(s, 'fctScale', 'hud.options.fctScale'),
+      // Opt back into the shipped white / gold combat text (the vivid school-coloured
+      // look is the default); directly under the size slider for the same numbers.
+      boolToggle(s, 'classicCombatText', 'hudChrome.options.classicCombatText'),
       // The secondary/third bar toggles deliberately have NO menu rows: the
       // plus/minus buttons on the primary action bar are the one control for
       // adding and removing the optional rows (the settings and the central

@@ -26,6 +26,7 @@ const priestManaSpellAbilityIds = [
   'lesser_heal',
   'power_word_fortitude',
   'shadow_word_pain',
+  'vampiric_touch',
   'power_word_shield',
   'renew',
   'mind_blast',
@@ -473,7 +474,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r5_tactical_retreat',
           name: 'Tactical Retreat',
-          description: 'Trailbreak stores 2 uses and removes roots and movement slows when used.',
+          description: 'Trailbreak stores 2 uses.',
           icon: 'trailbreak',
           effect: { ability: [{ ability: 'trailbreak', bonusCharges: 1 }] },
         },
@@ -529,17 +530,17 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
+          // Renamed from Beastguard in the Fieldcraft rework; the id is frozen.
           id: 'hun_r8_beastguard',
-          name: 'Beastguard',
+          name: 'Lonely Soul',
           description:
-            'Redirect 15% of damage to a living pet without reducing it below 20% health. Without one, take 8% less damage below 50% health.',
+            'Redirect 30% of damage taken to a living pet without reducing it below 20% health. Without a living pet, deal 10% more damage.',
           icon: 'concussive_shot',
           effect: {
-            global: { petDmgSharePct: 0.15 },
+            global: { petDmgSharePct: 0.3 },
             runtime: {
               petHealthFloorPct: 0.2,
-              fallbackDamageReductionPct: 0.08,
-              healthThresholdPct: 0.5,
+              noPetDamagePct: 0.1,
             },
           },
         },
@@ -553,7 +554,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r11_double_hush',
           name: 'Double Hush',
-          description: 'Hushing Shot stores 2 uses, each with a 24 sec recharge.',
+          description: 'Hushing Shot stores 2 uses, each recharging 4 sec slower (19 sec).',
           icon: 'counter_shot',
           effect: {
             ability: [{ ability: 'counter_shot', bonusCharges: 1, cooldownFlat: 4 }],
@@ -563,10 +564,10 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r11_binding_payload',
           name: 'Binding Payload',
           description:
-            'Frostjaw Trap roots every enemy in its trigger area for 3 sec, then slows them by 40% for 4 sec.',
+            'Your traps root every enemy in their trigger area for 3 sec, then slow them by 40% for 4 sec.',
           icon: 'frostjaw_trap',
           effect: {
-            ability: [{ ability: 'frostjaw_trap' }],
+            ability: [{ ability: 'frostjaw_trap' }, { ability: 'bear_trap' }],
             runtime: { rootDuration: 3, slowPct: 0.4, slowDuration: 4 },
           },
         },
@@ -603,9 +604,14 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r14_trapcraft',
           name: 'Trapcraft',
           description:
-            "Frostjaw Trap's cooldown is reduced by 20%. Triggering it restores 20 Focus and reduces Trailbreak's cooldown by 5 sec.",
+            "Each trap's cooldown is reduced by 20%. Triggering a trap restores 20 Focus and reduces Trailbreak's cooldown by 5 sec.",
           icon: 'frostjaw_trap',
-          effect: { ability: [{ ability: 'frostjaw_trap', cooldownPct: -0.2 }] },
+          effect: {
+            ability: [
+              { ability: 'frostjaw_trap', cooldownPct: -0.2 },
+              { ability: 'bear_trap', cooldownPct: -0.2 },
+            ],
+          },
         },
         {
           id: 'hun_r14_guise_mastery',
@@ -698,10 +704,10 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r20_chain_reaction',
           name: 'Chain Reaction',
           description:
-            'Frostjaw Trap marks enemies within 4 yards for 8 sec. Your next 3 Focus spenders echo 40% damage between marked enemies.',
+            'Your traps mark enemies within 4 yards for 8 sec when triggered. Your next 3 Focus spenders echo 40% damage between marked enemies.',
           icon: 'frostjaw_trap',
           effect: {
-            ability: [{ ability: 'frostjaw_trap' }],
+            ability: [{ ability: 'frostjaw_trap' }, { ability: 'bear_trap' }],
             runtime: { radius: 4, markDuration: 8, charges: 3, echoPct: 0.4 },
           },
         },
@@ -1181,7 +1187,8 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r11_inner_focus',
           name: 'Stilled Mind',
-          description: 'Grants Stilled Mind. Your next Priest spell is free and uninterruptible.',
+          description:
+            'Grants Stilled Mind. Your next Priest spell within 60 sec costs no Mana and cannot be interrupted. Shadow: separately reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus.',
           icon: 'inner_focus',
           effect: { grant: { ability: 'inner_focus' } },
         },
@@ -1212,7 +1219,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r14_pain_and_suffering',
           name: 'Living Covenant',
           description:
-            'Doctrine damage-healing restores Psalm of Warding by 20% of the healing done, up to its original absorb. Benison turns Choirmend overhealing into a 10 sec absorb capped at 10% maximum health. Each Vespers Effigy echo extends Dirge of Decay by 1 sec, up to 6 sec per target.',
+            'Doctrine damage-healing restores Psalm of Warding by 20% of the healing done, up to its original absorb. Benison turns Choirmend overhealing into a 10 sec absorb capped at 10% maximum health. Shadow: landed Mindfracture hits on your Effigy extend your Dirge of Decay and Vampiric Touch by 1 sec, up to 3 sec per application. Echoes extend Dirge on other enemies by 1 sec, up to 6 sec per application. Extensions preserve the next tick and do not generate Gloomtithe.',
           icon: 'power_word_shield',
           effect: {
             intrinsic: {
@@ -1223,6 +1230,8 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
                 benisonAbsorbCapPct: 0.1,
                 vespersExtension: 1,
                 vespersExtensionCap: 6,
+                shadowPrimaryExtension: 1,
+                shadowPrimaryExtensionCap: 3,
               },
             },
           },
@@ -1254,7 +1263,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r17_choir_of_deliverance',
           name: 'Choir of Deliverance',
           description:
-            'Learn Choir of Deliverance. Channel for 6 sec, healing party members within 30 yards every 2 sec. 180 sec cooldown.',
+            'Learn Choir of Deliverance. Shadow: instantly gain a 15 sec effect that shares 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards. In raids, only your subgroup is healed. You can keep attacking in Shadowform. Holy and Discipline: channel for 6 sec, healing party members within 30 yards every 2 sec. 180 sec cooldown.',
           icon: 'choir_of_deliverance',
           effect: { grant: { ability: 'choir_of_deliverance' } },
         },
@@ -1269,7 +1278,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r20_twin_covenant',
           name: 'Twin Covenant',
           description:
-            'Doctrine can link 2 allies and converts 70% of Holy damage into healing for each. Benison stores 2 Seraphic Vigil uses and can protect 2 allies. Vespers can bind 2 Effigies; both build the same Gloomtithe bank.',
+            'Doctrine can link 2 allies and converts 70% of Holy damage into healing for each. Benison stores 2 Seraphic Vigil uses and can protect 2 allies. Shadow can bind 2 enemies as Effigies with Dirge of Decay and Mindfracture. Dirge ticks on both generate Gloomtithe for the same bank and Tithe Bomb.',
           icon: 'seraphic_vigil',
           effect: {
             ability: [{ ability: 'seraphic_vigil', bonusCharges: 1 }],
@@ -1289,17 +1298,20 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r20_second_verse',
           name: 'Second Verse',
           description:
-            'After 2 sec, repeat 40% of Scouring Mercy healing from Doctrine, group healing from Benison, or Effigy echo damage from Vespers. The repeat cannot trigger itself.',
+            'Doctrine repeats 40% of Scouring Mercy healing after 2 sec. Benison repeats 40% of group healing after 2 sec. Shadow: every 5th regular Vampiric Touch tick on your Effigy adds one extra damage tick, with its normal healing from enemy health lost. Refreshing your Vampiric Touch before it expires preserves the count on that enemy. If it expires, the count resets. Extra ticks cannot trigger themselves.',
           icon: 'smite',
           effect: {
-            intrinsic: { mechanic: 'priest_second_verse', metrics: { pct: 0.4, delay: 2 } },
+            intrinsic: {
+              mechanic: 'priest_second_verse',
+              metrics: { pct: 0.4, delay: 2, shadowTicks: 5 },
+            },
           },
         },
         {
           id: 'pri_r20_incarnate_spirit',
           name: 'Incarnate Spirit',
           description:
-            'A fully consumed Psalm of Warding heals its target for 40% of the original absorb. Benison Vigil healing also heals up to 3 party members within 15 yards for 40%. A 5-stack Vespers Tithefiend deals 50% more damage and lasts 50% longer.',
+            'Doctrine: a fully consumed Psalm of Warding heals its target for 40% of the original absorb. Benison: Vigil healing also heals up to 3 party members within 15 yards for 40%. Shadow: Tithe Bomb leaves an 8-yard zone for 6 sec, dealing an additional 20% of its noncritical damage over 3 pulses, one every 2 sec. Damage is reduced beyond 5 targets. Enemies must remain in the zone.',
           icon: 'summon_tithefiend',
           effect: {
             intrinsic: {
@@ -1308,9 +1320,9 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
                 shieldHealPct: 0.4,
                 splashTargetCap: 3,
                 splashHealPct: 0.4,
-                tithefiendStacks: 5,
-                tithefiendDamagePct: 0.5,
-                tithefiendDurationPct: 0.5,
+                bombResidualPct: 0.2,
+                bombResidualDuration: 6,
+                bombResidualInterval: 2,
               },
             },
           },
@@ -1802,7 +1814,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r5_improved_wrath',
           name: 'Wildshift',
           description:
-            'Shapeshifting into Cat, Bruin, or Moonwing Form removes breakable roots and slows.',
+            'Shapeshifting into Cat, Bruin, Moonwing, or Sporemender Form removes breakable roots and slows.',
           icon: 'travel_form',
           effect: { intrinsic: { mechanic: 'druid_wildshift', metrics: {} } },
         },
@@ -1970,7 +1982,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r14_empowered_touch',
           name: 'Seedspread',
           description:
-            'Overbloom replants a fresh Wildbloom on every ally whose healing it harvested.',
+            'Overbloom replants a fresh Sporemending on every ally whose healing it harvested.',
           icon: 'rejuvenation',
           effect: {
             intrinsic: { mechanic: 'druid_seedspread', metrics: {} },

@@ -13,6 +13,11 @@ export interface ResolvedAbility {
   rank: number;
   cost: number;
   castTime: number;
+  /** The cast time the Spell Power coefficient reads when a speed-up should not
+   *  shrink the heal (Verdance's faster Wildmend, combat/druid_engines.ts). Absent
+   *  on every other resolve: read it through spell_scaling's
+   *  coefficientCastTime, which falls back to castTime. */
+  scalingCastTime?: number;
   cooldown: number; // base def.cooldown, after talent cooldown modifiers
   /** Cooldown map key when a cooldown-carrying transform shares the base
    *  button's clock (one slot, one clock); absent for every other resolve. */

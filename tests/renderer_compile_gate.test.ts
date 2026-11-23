@@ -1,8 +1,10 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import * as characters from '../src/render/characters';
+import { SerialGateLane } from '../src/render/compile_gate';
+import { compileProof } from '../src/render/compile_target_readiness';
 import {
   buildFarmPatchProps,
   FarmPatchVisuals,
@@ -14,6 +16,7 @@ import {
 } from '../src/render/prewarm_depth_material';
 import { pieceMaterialsOf } from '../src/render/program_variant_settle';
 import { type EntityView, Renderer } from '../src/render/renderer';
+import { TextureResidencyLedger } from '../src/render/texture_residency_ledger';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { Entity } from '../src/sim/types';
 
@@ -28,7 +31,11 @@ interface CompileGateHarness {
   gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void;
   compileGate(target: THREE.Object3D, requiredForEntry?: boolean): Promise<unknown>;
   attachZoneFeature(
-    view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
+    view: {
+      group: THREE.Group;
+      glowLights?: THREE.PointLight[];
+      cullGroups?: THREE.Group[];
+    },
     freeze?: boolean,
   ): void;
 }
@@ -54,6 +61,12 @@ function harness(): CompileGateHarness & Record<string, unknown> {
   renderer.shutdownStarted = false;
   // the shadow arm's depth-twin cache, read by every gate piece's variant settle
   renderer.prewarmDepthMaterials = new Map();
+  // the texture prep lane joins the ledger's chunked uploads in flight
+  renderer.textureResidency = new TextureResidencyLedger({
+    webgl: () => renderer.webgl as THREE.WebGLRenderer,
+    queue: { run: (...args) => (renderer.backgroundGpuWork as BackgroundGpuQueue).run(...args) },
+    idleSlot: () => Promise.resolve(),
+  });
   return renderer;
 }
 
@@ -105,7 +118,10 @@ describe('Renderer live shader compile rejection recovery', () => {
     const rig = new THREE.Group();
     const telegraph = new THREE.Group();
     group.add(rig, telegraph);
-    const view = { compilePending: false, visualCompilePending: false } as EntityView;
+    const view = {
+      compilePending: false,
+      visualCompilePending: false,
+    } as EntityView;
 
     const ready = renderer.gateViewOnCompile(view, group, rig);
 
@@ -445,13 +461,18 @@ describe('Renderer live shader compile rejection recovery', () => {
     const start = dungeonSource.indexOf('  async buildInterior(');
     expect(start).toBeGreaterThan(-1);
     const body = dungeonSource.slice(start, dungeonSource.indexOf('\n  }', start));
-    const returns = body.split('return group;').length - 1;
+    // The editor's keyed-build tracker (dungeon_keyed_builds.ts) wraps each
+    // returned group as `return track(group);`, so both forms count.
+    const returns =
+      body.split('return group;').length - 1 + body.split('return track(group);').length - 1;
     const gated = body.split('await attachSceneGroupGated(').length - 1;
     const bareAdds = body.split('this.scene.add(group);').length - 1;
     expect(returns).toBeGreaterThanOrEqual(3);
     expect(bareAdds).toBe(0);
     expect(gated).toBe(returns);
-    const wildheart = body.indexOf("if (interior === 'wildheart')");
+    // The open-air fields (Wildheart, the Hollow Crypt, the Sunken Bastion, the
+    // Drowned Temple) share one arm, keyed by OPEN_AIR_FIELDS.
+    const wildheart = body.indexOf('if (field) {');
     expect(wildheart).toBeGreaterThan(-1);
     const wildheartArm = body.slice(wildheart, body.indexOf('return group;', wildheart));
     expect(wildheartArm).toContain(
@@ -481,10 +502,11 @@ describe('Renderer live shader compile rejection recovery', () => {
 // program, which is what the per-frame admission can pace; the gate still
 // settles only after the last piece, so a gated reveal is no earlier.
 describe('the compile gate touch tail, per program', () => {
-  function touchHarness(
-    programs: number,
-  ): CompileGateHarness &
-    Record<string, unknown> & { queued: { label?: string; priority?: number }[]; order: string[] } {
+  function touchHarness(programs: number): CompileGateHarness &
+    Record<string, unknown> & {
+      queued: { label?: string; priority?: number }[];
+      order: string[];
+    } {
     const renderer = harness();
     const order: string[] = [];
     const queued: { label?: string; priority?: number }[] = [];
@@ -546,7 +568,9 @@ describe('the compile gate touch tail, per program', () => {
       });
       target.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
     }
-    renderer.webgl = { properties: { get: (queried: unknown) => linked.get(queried) } };
+    renderer.webgl = {
+      properties: { get: (queried: unknown) => linked.get(queried) },
+    };
     renderer.touchTarget = target;
     renderer.queued = queued;
     renderer.order = order;
@@ -757,7 +781,11 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
   it('restores every swap when the walk throws part-way', async () => {
     const renderer = shadowHarness();
     const compileAsync = vi.fn();
-    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync,
+    };
     const first = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
     first.castShadow = false;
     const second = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
@@ -787,7 +815,11 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
   it('compiles the depth twin of a root whose only mesh is a non-caster (the rig beyond the band)', async () => {
     const renderer = shadowHarness();
     const compileAsync = vi.fn(() => Promise.resolve());
-    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync,
+    };
     const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
     mesh.castShadow = false;
     const material = mesh.material;
@@ -804,7 +836,11 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
   it('compiles nothing for a root without meshes, or whose meshes carry no material', async () => {
     const renderer = shadowHarness();
     const compileAsync = vi.fn(() => Promise.resolve());
-    renderer.webgl = { getRenderTarget: () => null, setRenderTarget: () => {}, compileAsync };
+    renderer.webgl = {
+      getRenderTarget: () => null,
+      setRenderTarget: () => {},
+      compileAsync,
+    };
     const bare = new THREE.Mesh(new THREE.BufferGeometry());
     bare.material = null as unknown as THREE.Material;
     const root = new THREE.Group();
@@ -837,7 +873,10 @@ describe('the shadow arm compiles a depth twin for every mesh, caster or not', (
     const { seats } = buildFarmPatchProps(1234, FARM_PATCHES);
     // No gate handed in: the attach is bare and synchronous, which is what
     // lets these cases hold the groups without awaiting a settle.
-    const visuals = new FarmPatchVisuals(scene, seats, { burst() {}, groundPuff() {} });
+    const visuals = new FarmPatchVisuals(scene, seats, {
+      burst() {},
+      groundPuff() {},
+    });
     visuals.sync({ myFarmPlots: [], farmNowMs: () => 0, entities, cfg: { seed: 1234 } }, 0.5);
     const tables = scene.children.filter((c) => c.name.startsWith('farmFeast:')) as THREE.Group[];
     expect(tables).toHaveLength(FEAST_SHADOW_CAP + 1);
@@ -940,13 +979,18 @@ describe('the far-bake compile gate handed to character visuals', () => {
     const renderer = harness();
     const sentinel = () => {};
     renderer.farBakeGate = sentinel;
+    // the work queue rides in with the gate: a visual puts off main-thread pieces on it
+    const queue = { run: vi.fn() };
+    (renderer as unknown as { backgroundGpuWork: unknown }).backgroundGpuWork = queue;
     renderer.viewCreateRetry = {
       canAttempt: () => true,
       markSucceeded: vi.fn(),
       markFailed: vi.fn(),
     };
+    // the local player is entity 7: its own armor draws full detail (woc_armor_core.ts)
+    (renderer as unknown as { sim: { playerId: number } }).sim = { playerId: 7 };
     const setFarBakeGate = vi.fn();
-    vi.spyOn(characters, 'createCharacterVisual').mockReturnValue({
+    const create = vi.spyOn(characters, 'createCharacterVisual').mockReturnValue({
       setFarBakeGate,
     } as unknown as ReturnType<typeof characters.createCharacterVisual>);
     const entity = { id: 7 } as Parameters<typeof characters.createCharacterVisual>[0];
@@ -958,7 +1002,16 @@ describe('the far-bake compile gate handed to character visuals', () => {
     ).createCharacterVisualWithRetry(entity, 'view');
 
     expect(built).not.toBeNull();
-    expect(setFarBakeGate).toHaveBeenCalledWith(sentinel);
+    expect(setFarBakeGate).toHaveBeenCalledWith(sentinel, queue);
+    expect(create).toHaveBeenLastCalledWith(entity, undefined, undefined, true);
+    // any other character is built at the crowd's detail
+    const peer = { id: 8 } as Parameters<typeof characters.createCharacterVisual>[0];
+    (
+      renderer as unknown as {
+        createCharacterVisualWithRetry(e: unknown, slot: string): unknown;
+      }
+    ).createCharacterVisualWithRetry(peer, 'view');
+    expect(create).toHaveBeenLastCalledWith(peer, undefined, undefined, false);
     // and a failed build installs nothing (there is no visual to install on)
     vi.spyOn(characters, 'createCharacterVisual').mockReturnValue(null);
     setFarBakeGate.mockClear();
@@ -981,19 +1034,66 @@ describe('the far-bake compile gate handed to character visuals', () => {
     // ...and one crowd bake links at a time: the gate is enqueued on the
     // renderer's SerialGateLane. The settle hands the caller a LAZY proof
     // thunk instead of an eagerly computed boolean, so a crowd bake whose
-    // settle callback ignores it (every consumer but the sanguine weapon
-    // sheath) never pays compileTargetPrepared's target traverse.
+    // settle callback ignores it never pays compileTargetPrepared's target
+    // traverse; a host without parallel compile hands no proof at all
+    // (compileProof, pinned in tests/sanguine_weapon_sheath.test.ts).
     expect(rendererSource).toContain(
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
         '    this.farBakeLane.enqueue(\n' +
         '      (settled) => this.gateSwapFlagOnCompile(target, settled),\n' +
-        '      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),\n' +
+        '      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl, target)),\n' +
         '    );',
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');
     // Both live build paths install it: fresh builds and pool re-acquires.
-    expect(rendererSource).toContain('visual.setFarBakeGate(this.farBakeGate);');
+    expect(rendererSource).toContain(
+      'visual.setFarBakeGate(this.farBakeGate, this.backgroundGpuWork);',
+    );
     expect(rendererSource).toContain('farBakeGate: () => this.farBakeGate,');
+  });
+
+  it('on a host without parallel shader compile it settles with no compile behind it, and hands no proof', async () => {
+    // The field cannot be built on this harness (above), so its body is composed here
+    // from the very parts the source pin names: the lane, gateSwapFlagOnCompile and
+    // compileProof. What a WOC stand-in rests on (tests/woc_merge_visual.test.ts): that
+    // host's settle comes with nothing linked, and so with NO proof, never with one that
+    // could only read false.
+    const renderer = harness();
+    const compileGate = vi.fn(() => Promise.resolve());
+    renderer.compileGate = compileGate;
+    const lane = new SerialGateLane();
+    const properties = { get: (): unknown => undefined };
+    const farBakeGate = (
+      target: THREE.Object3D,
+      onSettled: (ready?: () => boolean) => void,
+    ): void =>
+      lane.enqueue(
+        (settled) => renderer.gateSwapFlagOnCompile(target, settled),
+        () =>
+          onSettled(
+            compileProof(renderer.asyncCompileSupported as boolean, { properties }, target),
+          ),
+      );
+    const settles: ((() => boolean) | undefined)[] = [];
+    const material = new THREE.MeshBasicMaterial();
+    const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    renderer.asyncCompileSupported = false;
+    farBakeGate(target, (ready) => settles.push(ready));
+    await flushGate();
+    expect(settles).toEqual([undefined]);
+    expect(compileGate).not.toHaveBeenCalled();
+    expect(lane.pending).toBe(0);
+    // with the extension the same gate compiles first, and its settle carries a proof to
+    // read (false here: nothing recorded a linked program for the target)
+    renderer.asyncCompileSupported = true;
+    farBakeGate(target, (ready) => settles.push(ready));
+    await flushGate();
+    await flushGate();
+    expect(compileGate).toHaveBeenCalledTimes(1);
+    expect(settles).toHaveLength(2);
+    expect(settles[1]?.()).toBe(false);
+    target.geometry.dispose();
+    material.dispose();
   });
 });
 

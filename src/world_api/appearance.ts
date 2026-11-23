@@ -60,6 +60,24 @@ export const APPEARANCE_WIRE_KEYS: readonly string[] = [
   'blush',
   'eyeshadow',
   'outfit',
+  // the WOC head builder (src/render/characters/woc_head_catalog.ts)
+  'headHair',
+  'headNose',
+  'headMouth',
+  'headBrows',
+  'headEars',
+  'headEyes',
+  'headPiercing',
+  'browHue',
+  'browSat',
+  'browLight',
+  'headShape',
+  // appended, never inserted: sanitizeAppearance emits keys in THIS order and
+  // sameAppearance compares the serialized documents, so an insertion would
+  // reorder every stored look and bust each one's wire memo once
+  'headBeard',
+  // the WOC body size (WOC_BODY_SCALE_RANGE in src/render/characters/modular.ts)
+  'bodyScale',
 ];
 
 /** The slider names each nested map may carry: ALLOWLISTED, exactly like the
@@ -96,6 +114,15 @@ export const APPEARANCE_BODY_SLIDER_KEYS: readonly string[] = [
   'knees',
   'feet',
 ];
+/** The WOC head builder's face controls (WOC_HEAD_MORPH_KEYS in
+ *  src/render/characters/woc_head_catalog.ts), under `headShape`. */
+export const APPEARANCE_HEAD_SHAPE_KEYS: readonly string[] = [
+  'eyeSpacing',
+  'eyeSize',
+  'eyeTilt',
+  'browHeight',
+  'chinWidth',
+];
 
 /** Which slider allowlist a nested map validates against, keyed by its own
  *  top-level key. A lookup, not a two-way ternary: a ternary over two known
@@ -103,10 +130,13 @@ export const APPEARANCE_BODY_SLIDER_KEYS: readonly string[] = [
  *  third nested key would validate its sliders against the wrong allowlist
  *  instead of failing loudly. Here a key with no entry is simply not a nested
  *  map this module knows how to sanitize, and sanitizeAppearance drops it,
- *  same as any other value it does not recognize. */
-const NESTED_SLIDER_KEYS: Record<string, readonly string[]> = {
+ *  same as any other value it does not recognize. Exported so the wire-ceiling
+ *  test builds its maximal document from THIS table: a nested key it did not
+ *  know about would be filled as a scalar, dropped, and under-count the bound. */
+export const APPEARANCE_NESTED_SLIDER_KEYS: Readonly<Record<string, readonly string[]>> = {
   face: APPEARANCE_FACE_SLIDER_KEYS,
   body: APPEARANCE_BODY_SLIDER_KEYS,
+  headShape: APPEARANCE_HEAD_SHAPE_KEYS,
 };
 
 /** Every string VALUE a look may carry is a style id: a short bare identifier
@@ -123,9 +153,10 @@ const NESTED_SLIDER_KEYS: Record<string, readonly string[]> = {
  *  alphanumerics and underscore, which cannot spell an insult, cannot carry
  *  markup or a control code, and never escapes in JSON.
  *
- *  All 148 ids the renderer defines today are plain lowercase words, the
- *  longest 14 ('longcenterpart'), so this is comfortable headroom rather than a
- *  tight fit, and if a future id ever needs a character outside the class the
+ *  Every id the renderer defines today (the WOC head catalog's included) is a
+ *  plain lowercase word, the longest 14 ('longcenterpart'), so this is
+ *  comfortable headroom rather than a tight fit, and if a future id ever needs
+ *  a character outside the class the
  *  drift guard in tests/appearance_wire_bounds.test.ts fails on it at CI time
  *  rather than a player's look silently not saving. */
 const STYLE_ID_RE = /^[a-z0-9_]{1,24}$/;
@@ -135,21 +166,25 @@ const STYLE_ID_RE = /^[a-z0-9_]{1,24}$/;
  *
  * A real ceiling, not an estimate, and tests/appearance_wire_bounds.test.ts
  * builds the maximal document and measures it rather than trusting this
- * constant. It is reachable by construction: every one of the 26 scalar keys
- * carrying a 24-character id (a string of 24 costs 26 with its quotes), and
- * both slider maps full of worst-case doubles, each 25 characters long. 25 is
+ * constant. It is reachable by construction: every scalar key carrying a
+ * 24-character id (a string of 24 costs 26 with its quotes, one more than the
+ * longest number, so even a numeric key like bodyScale is worst as an id), and
+ * all three slider maps (face, body, headShape) full of worst-case doubles,
+ * each 25 characters long. 25 is
  * the true longest JSON.stringify of any finite double, not 24: JSON uses
  * fixed notation down to 1e-6 exclusive, so a value just above that boundary
  * still prints in fixed form yet needs the full 17 significant digits, for
  * example -0.0000032101548324340437 (sign, "0.", five leading zeros, 17
  * digits).
  *
- * For scale, a default look is 586 bytes on the wire and a fully randomised one
- * about 911, which is where the "~0.6 KB" the identity-wire reasoning quotes
- * comes from. The gap between that and this is all numeric precision, and the
- * charset bound is what stops the gap being unbounded text.
+ * For scale, a default look is just under 0.9 KB on the wire and a fully
+ * randomised one about 1.5 K, which is where the "~0.9 KB" the identity-wire
+ * reasoning quotes comes from. The gap between that and this is all numeric
+ * precision, and the charset bound is what stops the gap being unbounded text.
+ * (The WOC head builder took the ceiling from 1489; its beard, the chin
+ * control and the body size from 2038.)
  */
-export const APPEARANCE_MAX_WIRE_BYTES = 1489;
+export const APPEARANCE_MAX_WIRE_BYTES = 2154;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -205,7 +240,7 @@ export function sanitizeAppearance(value: unknown): Record<string, unknown> | nu
   for (const key of APPEARANCE_WIRE_KEYS) {
     if (!(key in value)) continue;
     const raw = value[key];
-    const sliderKeys = NESTED_SLIDER_KEYS[key];
+    const sliderKeys = APPEARANCE_NESTED_SLIDER_KEYS[key];
     if (sliderKeys) {
       const map = sanitizeSliderMap(raw, sliderKeys);
       if (map !== null) {

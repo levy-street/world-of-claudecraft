@@ -1,0 +1,953 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "hoard-frost-painted-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "scope": {
+    "paintings": 12,
+    "replacedSvgIcons": 12,
+    "otherBacklogUnchanged": true
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "rare_glacier_hewn_bulwark",
+      "family": "hoard-frost",
+      "tier": "Tarnished",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_glacier_hewn_bulwark.webp",
+      "canonicalDisplayName": "Tarnished Glacier-Hewn Bulwark",
+      "acceptedSha256": "95e9805c3e232c3df14490359feb169c5650bda7ba0447209f1fa6c40e960268",
+      "acceptedBytes": 3806,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/rare_glacier_hewn_bulwark.png",
+        "sha256": "9e9138827873260b6bee6d6e0136fea0fb10ddd89a71dd6cbc29e48b0f4f72ee",
+        "bytes": 2750385,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/rare_glacier_hewn_bulwark.png",
+        "sha256": "d61e13b76013d71eab0428b3b9766bf32f62c6cc7016854aa3acfb130a806c0a",
+        "bytes": 576599,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "e292eda8715e6e733b3e21a8e87aeedbf0dc11228cff152aeec46a61a925e94f",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Glacier-Hewn Bulwark (rare_glacier_hewn_bulwark) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete blue glacier-ice kite shield with a thick reinforced metal rim, broad angular top and pointed bottom, a round central metal boss inset with a simple six-ray snowflake. Translucent blue ice slabs show depth and trapped frost cracks, recognizable practical shield silhouette. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with slight green patina, scuffed pale blue materials, plain broad edges, modest frost accumulation. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/rare_glacier_hewn_bulwark.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "e292eda8715e6e733b3e21a8e87aeedbf0dc11228cff152aeec46a61a925e94f"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_permafrost_legguards",
+      "family": "hoard-frost",
+      "tier": "Tarnished",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_permafrost_legguards.webp",
+      "canonicalDisplayName": "Tarnished Permafrost Legguards",
+      "acceptedSha256": "776a4ee4fc69ffbb034d41bfd6e2537ba405c7443facc136c1be17a46e176d63",
+      "acceptedBytes": 3502,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/rare_permafrost_legguards.png",
+        "sha256": "f25fd9f3996f47411977d0ccdf5bd27aaf370cd0d4b7587e5de5eb71dae088e8",
+        "bytes": 2372702,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/rare_permafrost_legguards.png",
+        "sha256": "a254ce928edf1900cb25cc4490f3bc023ee4fdfd41ad428f5d1a93dfd3a07c23",
+        "bytes": 509270,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "509f1155538bd6c5090d1cfd86fc154e4e694070996421db35d89d8e5ff658a5",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Permafrost Legguards (rare_permafrost_legguards) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of frost-blue MAIL legguards from waist to ankles, articulated overlapping small mail scales over dark blue padding, thick belt, reinforced knee patches and frost dust along the cuffs. Clearly flexible scale-mail, not plate trousers. A small six-ray snowflake clasp at the waist. No boots, no wearer. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with slight green patina, scuffed pale blue materials, plain broad edges, modest frost accumulation. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/rare_permafrost_legguards.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "509f1155538bd6c5090d1cfd86fc154e4e694070996421db35d89d8e5ff658a5"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_frostbitten_rime_slippers",
+      "family": "hoard-frost",
+      "tier": "Tarnished",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_frostbitten_rime_slippers.webp",
+      "canonicalDisplayName": "Tarnished Frostbitten Rime Slippers",
+      "acceptedSha256": "8887bd9de5be0658b34d9e8cfdddb1fab0808462fa1b751db2a79ce687edbead",
+      "acceptedBytes": 3976,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/rare_frostbitten_rime_slippers.png",
+        "sha256": "fc1159787a8ed5f114f4b685038dfa3f0f7876df73a01e67553b08c72cbbfcb7",
+        "bytes": 2669812,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/rare_frostbitten_rime_slippers.png",
+        "sha256": "bc58ed9f8fd555c2d14313a2bc9ad7a8b2b392cbe3f3e8fb0c6f0ad3dabe4611",
+        "bytes": 576418,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "1f62e3799a502b3a1594839ea9785cc6549526e936683bc2bb64d3ff95e2b38b",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Frostbitten Rime Slippers (rare_frostbitten_rime_slippers) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of pale ice-blue CLOTH slippers, soft quilted uppers and folded cuffs, low flexible soles and rounded toes, rime crystals clinging to the seams and a small six-ray snowflake embroidered on each instep. One slipper in front and its matching partner behind. Clearly textile footwear, not metal boots. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with slight green patina, scuffed pale blue materials, plain broad edges, modest frost accumulation. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/rare_frostbitten_rime_slippers.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "1f62e3799a502b3a1594839ea9785cc6549526e936683bc2bb64d3ff95e2b38b"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rare_rime_crusted_grips",
+      "family": "hoard-frost",
+      "tier": "Tarnished",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rare_rime_crusted_grips.webp",
+      "canonicalDisplayName": "Tarnished Rime-Crusted Grips",
+      "acceptedSha256": "fd82cc00c5ecb361b533c98aea51be62a8cbe0c0f28e0fe6cd6a436f81833087",
+      "acceptedBytes": 4154,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/rare_rime_crusted_grips.png",
+        "sha256": "818474654a3ea3a9c97f464a6e032ef89b9fd286546dc69362429b3537d052db",
+        "bytes": 2616047,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/rare_rime_crusted_grips.png",
+        "sha256": "3e10e027536cd22051c4508c97f7698bed4978c6f5b4967702e66b8f2242d39e",
+        "bytes": 549117,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "f065a440537eafebeedcc96195a026b0ace9b9b4ce102ca22e1af0f0fda08d50",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Tarnished Rime-Crusted Grips (rare_rime_crusted_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of frost-blue LEATHER gloves, supple stitched fingers with exactly five digits per glove, broad fitted wrist cuffs, pale rime crust on the knuckles and seams, small six-ray snowflake stitched onto the back of the foremost glove. One glove slightly behind its partner. Clearly leather, no rigid metal gauntlets. Tier finish: Weathered lower-tier craftsmanship: dull pewter fittings with slight green patina, scuffed pale blue materials, plain broad edges, modest frost accumulation. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/rare_rime_crusted_grips.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "f065a440537eafebeedcc96195a026b0ace9b9b4ce102ca22e1af0f0fda08d50"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "glacier_hewn_bulwark",
+      "family": "hoard-frost",
+      "tier": "Epic",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/glacier_hewn_bulwark.webp",
+      "canonicalDisplayName": "Glacier-Hewn Bulwark",
+      "acceptedSha256": "8e7001c335ca1098be697be1ae579c18e6b9ac2ca4896ca370a1f116f0a410b0",
+      "acceptedBytes": 4204,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/glacier_hewn_bulwark.png",
+        "sha256": "273cf231b81c1acdb85bbd698ebf0472dce8f30f2bf846ac981ef3e63a099268",
+        "bytes": 2533886,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/glacier_hewn_bulwark.png",
+        "sha256": "581096842ff88b942402e93c8f8b0fe27dcd2a71d941ca123846bcd0f99b7aab",
+        "bytes": 584466,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "54cad73ed2c29c24e2f19f2a292a5b1a0d64a0c2e2f8c0b23494b303054202c1",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Glacier-Hewn Bulwark (glacier_hewn_bulwark) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete blue glacier-ice kite shield with a thick reinforced metal rim, broad angular top and pointed bottom, a round central metal boss inset with a simple six-ray snowflake. Translucent blue ice slabs show depth and trapped frost cracks, recognizable practical shield silhouette. Tier finish: Well-kept masterwork: bright silver fittings, rich glacier-blue materials, crisp crafted seams and edges, clear icy highlights. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/glacier_hewn_bulwark.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "54cad73ed2c29c24e2f19f2a292a5b1a0d64a0c2e2f8c0b23494b303054202c1"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "permafrost_legguards",
+      "family": "hoard-frost",
+      "tier": "Epic",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/permafrost_legguards.webp",
+      "canonicalDisplayName": "Permafrost Legguards",
+      "acceptedSha256": "2d3869841f32e0443eddb378cbc6130624b662af35984cad4e44aa2632c6b5ff",
+      "acceptedBytes": 4196,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/permafrost_legguards.png",
+        "sha256": "19b87e3000d5a67c8a26e8a2b705c3ea75ce3646658d618b36c73f7bfae854a7",
+        "bytes": 2463863,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/permafrost_legguards.png",
+        "sha256": "14e158c5fdb51464fcb3e3a419890b2c7703f4a88687a8f3e1d78548b9854e45",
+        "bytes": 554128,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "645e63c4798e23a3fe24462219175570501fe60c6f13261085348e5f9d8d3951",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Permafrost Legguards (permafrost_legguards) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of frost-blue MAIL legguards from waist to ankles, articulated overlapping small mail scales over dark blue padding, thick belt, reinforced knee patches and frost dust along the cuffs. Clearly flexible scale-mail, not plate trousers. A small six-ray snowflake clasp at the waist. No boots, no wearer. Tier finish: Well-kept masterwork: bright silver fittings, rich glacier-blue materials, crisp crafted seams and edges, clear icy highlights. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/permafrost_legguards.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "645e63c4798e23a3fe24462219175570501fe60c6f13261085348e5f9d8d3951"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "frostbitten_rime_slippers",
+      "family": "hoard-frost",
+      "tier": "Epic",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/frostbitten_rime_slippers.webp",
+      "canonicalDisplayName": "Frostbitten Rime Slippers",
+      "acceptedSha256": "925bdee6bb85b52a94637842424267973f7dbb5eb334537eeb5c65583c5e4dd2",
+      "acceptedBytes": 4266,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/frostbitten_rime_slippers.png",
+        "sha256": "5efbd63c15c9d6b33c84b68d28834cde719c9476d8e2aaf456c95ae6bbb50558",
+        "bytes": 2741802,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/frostbitten_rime_slippers.png",
+        "sha256": "0d78c5c913e191ce4c8a64b97c4827f12d09771d3ac7b4340577fb57d10282c3",
+        "bytes": 593804,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "8723ff608601dd798dc5d4d52ea032fc95e2948990b7b280e0334971ec3d49fb",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Frostbitten Rime Slippers (frostbitten_rime_slippers) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of pale ice-blue CLOTH slippers, soft quilted uppers and folded cuffs, low flexible soles and rounded toes, rime crystals clinging to the seams and a small six-ray snowflake embroidered on each instep. One slipper in front and its matching partner behind. Clearly textile footwear, not metal boots. Tier finish: Well-kept masterwork: bright silver fittings, rich glacier-blue materials, crisp crafted seams and edges, clear icy highlights. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/frostbitten_rime_slippers.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "8723ff608601dd798dc5d4d52ea032fc95e2948990b7b280e0334971ec3d49fb"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "rime_crusted_grips",
+      "family": "hoard-frost",
+      "tier": "Epic",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/rime_crusted_grips.webp",
+      "canonicalDisplayName": "Rime-Crusted Grips",
+      "acceptedSha256": "9944d6240ae9331adb2f58ed190f27367ddb38a990a1901abac8979a0f9b1df4",
+      "acceptedBytes": 4296,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/rime_crusted_grips.png",
+        "sha256": "17f93a13a27b70833cd79ff06e683dafa8bc7f04f9961878d8f07be73ffb7c50",
+        "bytes": 2662470,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/rime_crusted_grips.png",
+        "sha256": "25a0f166e4efde8b4d2067255bbcd0e7b2a96758f2ae26bbb39880ee9fe41e33",
+        "bytes": 596566,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "a5671dafe13b41109cac54baf92f39d0e6ee37658648d7efd058cfab773b7327",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Rime-Crusted Grips (rime_crusted_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of frost-blue LEATHER gloves, supple stitched fingers with exactly five digits per glove, broad fitted wrist cuffs, pale rime crust on the knuckles and seams, small six-ray snowflake stitched onto the back of the foremost glove. One glove slightly behind its partner. Clearly leather, no rigid metal gauntlets. Tier finish: Well-kept masterwork: bright silver fittings, rich glacier-blue materials, crisp crafted seams and edges, clear icy highlights. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/rime_crusted_grips.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "a5671dafe13b41109cac54baf92f39d0e6ee37658648d7efd058cfab773b7327"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_glacier_hewn_bulwark",
+      "family": "hoard-frost",
+      "tier": "Sovereign",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_glacier_hewn_bulwark.webp",
+      "canonicalDisplayName": "Sovereign Glacier-Hewn Bulwark",
+      "acceptedSha256": "bb8c3986cb0f54c5b029f0bba7534ae00c3f202a1762b7778807b4174b50afcf",
+      "acceptedBytes": 4634,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/legendary_glacier_hewn_bulwark.png",
+        "sha256": "8a1096b6c8e5bbc459a149f7c6f298a7acdd386fb246366b6791b688c7b55b51",
+        "bytes": 2628338,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/legendary_glacier_hewn_bulwark.png",
+        "sha256": "e9fee28b9be16cf462f9fb17a9135e847b695036475b97b14b9ab61f2d7c2a9b",
+        "bytes": 581031,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "81783eda0478ef56a2f99717ec42a1d711a2c03ac2ee8cb485ee5ddf0c06a7ae",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Glacier-Hewn Bulwark (legendary_glacier_hewn_bulwark) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete blue glacier-ice kite shield with a thick reinforced metal rim, broad angular top and pointed bottom, a round central metal boss inset with a simple six-ray snowflake. Translucent blue ice slabs show depth and trapped frost cracks, recognizable practical shield silhouette. Tier finish: Regal highest-tier craftsmanship: warm gold fittings or golden textile edging, deep glacier-blue materials, broad elegant angular ornament around the snowflake motif, pristine crisp rime crystals. Gold belongs on the object, never a surrounding frame. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/legendary_glacier_hewn_bulwark.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "81783eda0478ef56a2f99717ec42a1d711a2c03ac2ee8cb485ee5ddf0c06a7ae"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_permafrost_legguards",
+      "family": "hoard-frost",
+      "tier": "Sovereign",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_permafrost_legguards.webp",
+      "canonicalDisplayName": "Sovereign Permafrost Legguards",
+      "acceptedSha256": "994d179f1c1a6699930205400589af81ebe0981143f44a06a4008570c0921860",
+      "acceptedBytes": 4368,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/legendary_permafrost_legguards.png",
+        "sha256": "6f17094d312154b5845337efb0d5d495ddef71ec15667209b00c9ab9a1de25f4",
+        "bytes": 2501179,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/legendary_permafrost_legguards.png",
+        "sha256": "76c59d79383723e8a20501a21598b55b6850b6a1bbb015fddf91734e846dfbc2",
+        "bytes": 553956,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "ad88e3af6531abdc96fa1454947504c7ae64b9313024bd038882f0f7d9a39580",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Permafrost Legguards (legendary_permafrost_legguards) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of frost-blue MAIL legguards from waist to ankles, articulated overlapping small mail scales over dark blue padding, thick belt, reinforced knee patches and frost dust along the cuffs. Clearly flexible scale-mail, not plate trousers. A small six-ray snowflake clasp at the waist. No boots, no wearer. Tier finish: Regal highest-tier craftsmanship: warm gold fittings or golden textile edging, deep glacier-blue materials, broad elegant angular ornament around the snowflake motif, pristine crisp rime crystals. Gold belongs on the object, never a surrounding frame. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/legendary_permafrost_legguards.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "ad88e3af6531abdc96fa1454947504c7ae64b9313024bd038882f0f7d9a39580"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_frostbitten_rime_slippers",
+      "family": "hoard-frost",
+      "tier": "Sovereign",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_frostbitten_rime_slippers.webp",
+      "canonicalDisplayName": "Sovereign Frostbitten Rime Slippers",
+      "acceptedSha256": "98d6e930e1daf0c55eaf12dd4733d8b354ad5938450f0e36a565b21bbed238c9",
+      "acceptedBytes": 5256,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/legendary_frostbitten_rime_slippers.png",
+        "sha256": "7e380381d267a48b1f3392be13925efbff6bbbdaf59d05fd0286ca7827a49834",
+        "bytes": 2998769,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/legendary_frostbitten_rime_slippers.png",
+        "sha256": "3bf85d51fdfebbe78b487ed814faca2ecb0f94d197bbf4f1bccb84de5c620d80",
+        "bytes": 635905,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "255a717d08c90b74a92473e534f335a40bc41649e2a69e7236a5304097d4bd1a",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Frostbitten Rime Slippers (legendary_frostbitten_rime_slippers) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of pale ice-blue CLOTH slippers, soft quilted uppers and folded cuffs, low flexible soles and rounded toes, rime crystals clinging to the seams and a small six-ray snowflake embroidered on each instep. One slipper in front and its matching partner behind. Clearly textile footwear, not metal boots. Tier finish: Regal highest-tier craftsmanship: warm gold fittings or golden textile edging, deep glacier-blue materials, broad elegant angular ornament around the snowflake motif, pristine crisp rime crystals. Gold belongs on the object, never a surrounding frame. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/legendary_frostbitten_rime_slippers.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "255a717d08c90b74a92473e534f335a40bc41649e2a69e7236a5304097d4bd1a"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "item",
+      "id": "legendary_rime_crusted_grips",
+      "family": "hoard-frost",
+      "tier": "Sovereign",
+      "batch": "hoard-frost-painted-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/items/legendary_rime_crusted_grips.webp",
+      "canonicalDisplayName": "Sovereign Rime-Crusted Grips",
+      "acceptedSha256": "5640e134b28df25f48acb24addb0abbdaad427c4619b843b98e28c4a19eb45b1",
+      "acceptedBytes": 4840,
+      "original": {
+        "path": "tmp/imagegen/v045-hoard-frost/originals/legendary_rime_crusted_grips.png",
+        "sha256": "64335c79fbacaccb49b17c967ff49ded22d6d614a8bbe1ff5248b93ea1e52360",
+        "bytes": 2717355,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-hoard-frost/masters/legendary_rime_crusted_grips.png",
+        "sha256": "d1af6e242fc102cc1ac35ae28a4cefbb5ba710eb220a3a7cc5e20c9461fff035",
+        "bytes": 571082,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "superseded": {
+        "batchId": "hoard-boss-loot-icons-2026-09-20",
+        "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+        "sha256": "ea4553bf723b88bb3a5cac9e945614cff7ea7fc31cb484db1603412ccb9e1456",
+        "reason": "Replace flat SVG composition with an individually authored painting preserving item identity and tier.",
+        "disposition": "Removed from the former current owner; historical generator retained unchanged."
+      },
+      "generation": {
+        "source": "OpenAI built-in image_gen",
+        "prompt": "Use case: stylized-concept. Asset type: opaque square fantasy MMORPG inventory icon. Paint Sovereign Rime-Crusted Grips (legendary_rime_crusted_grips) in World of ClaudeCraft woc-item-icon-v1 style. Subject: One complete pair of frost-blue LEATHER gloves, supple stitched fingers with exactly five digits per glove, broad fitted wrist cuffs, pale rime crust on the knuckles and seams, small six-ray snowflake stitched onto the back of the foremost glove. One glove slightly behind its partner. Clearly leather, no rigid metal gauntlets. Tier finish: Regal highest-tier craftsmanship: warm gold fittings or golden textile edging, deep glacier-blue materials, broad elegant angular ornament around the snowflake motif, pristine crisp rime crystals. Gold belongs on the object, never a surrounding frame. Hoarfrost Warden family: cold blue-grey, ice blue and snow white, simple snowflake motif. Preserve authored item identity while replacing flat SVG rendering with tactile dimensional hand-painted classic fantasy MMO art. Warm top-left key light, cool deep shadows, crisp focal edges and softer peripheral brushwork. Complete object centered at about 72 percent canvas fill with generous safe padding on an opaque dark blue-charcoal painted vignette, subtle contact shadow. Readable at 22, 28 and 40 pixels and in a 64px circular crop. One unique icon, square 1024x1024. No text, letters, numbers, labels, rarity frame, UI border, watermark, checkerboard, transparent background, collage, split sheet, living hands, mannequin or cropped edges.",
+        "references": [
+          {
+            "path": "tmp/imagegen/v045-hoard-frost/superseded/legendary_rime_crusted_grips.webp",
+            "role": "old authored object identity and tier finish; not an image-edit input",
+            "sha256": "ea4553bf723b88bb3a5cac9e945614cff7ea7fc31cb484db1603412ccb9e1456"
+          },
+          {
+            "path": "public/ui/items/eastbrook_buckler.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156"
+          },
+          {
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "visual house-style review anchor; not an image-edit input",
+            "sha256": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4"
+          }
+        ],
+        "retryCount": 0
+      },
+      "processing": [
+        "Normalize original square image to a 512x512 opaque sRGB PNG master with Sharp",
+        "Convert accepted master with scripts/convert_item_icons_webp.mjs at default quality 82, smartSubsample enabled, 128x128 WebP"
+      ],
+      "review": {
+        "sourceAndMaster": "Reviewed complete subject identity, canonical armor material, tier distinction, lighting, text-free background and square framing.",
+        "sizes": [512, 128, 40, 28, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/hoard-frost-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified in desktop and mobile landscape inventories; all twelve authored URLs decoded successfully.",
+        "gameCaptureEvidence": [
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-desktop.png",
+          "docs/screenshots/hoard-frost-icons-v045/bag-icons-after-mobile.png"
+        ]
+      }
+    }
+  ],
+  "perceptualReview": {
+    "candidatePairs": [
+      {
+        "left": "item:glacier_hewn_bulwark",
+        "right": "item:legendary_glacier_hewn_bulwark",
+        "hammingDistance": 4,
+        "meanAbsoluteDifference": 0.044138,
+        "structuralSimilarity": 0.888165,
+        "luminanceSimilarity": 0.91855,
+        "edgeSimilarity": 0.851028,
+        "cropFraction": 0,
+        "cropDirection": "none"
+      },
+      {
+        "left": "item:glacier_hewn_bulwark",
+        "right": "item:rare_glacier_hewn_bulwark",
+        "hammingDistance": 2,
+        "meanAbsoluteDifference": 0.043096,
+        "structuralSimilarity": 0.897301,
+        "luminanceSimilarity": 0.927604,
+        "edgeSimilarity": 0.860263,
+        "cropFraction": 0,
+        "cropDirection": "none"
+      },
+      {
+        "left": "item:legendary_glacier_hewn_bulwark",
+        "right": "item:rare_glacier_hewn_bulwark",
+        "hammingDistance": 2,
+        "meanAbsoluteDifference": 0.040993,
+        "structuralSimilarity": 0.875002,
+        "luminanceSimilarity": 0.905497,
+        "edgeSimilarity": 0.83773,
+        "cropFraction": 0,
+        "cropDirection": "none"
+      }
+    ],
+    "disposition": "All three pairs are the intentionally related Glacier-Hewn Bulwark tiers. Individually generated paintings retain a kite shield silhouette and central snowflake; Tarnished uses pitted pewter and irregular ice, Epic clean silver angular reinforcements, Sovereign gold filigree and brighter ice. Reviewed originals and small-size sheet; retain all three distinct authored tier paintings. No exact duplicates."
+  }
+}

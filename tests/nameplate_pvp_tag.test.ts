@@ -130,6 +130,7 @@ function harness(targets: Entity[], isHostilePlayer: (e: Entity) => boolean = ()
     world,
     layer,
     getViewport: () => VIEWPORT,
+    showPetNames: () => false,
     getDevicePixelRatio: () => 1,
     showNameplates: () => true,
     showDevBadges: () => true,
@@ -193,5 +194,30 @@ describe('the nameplate <PvP> tag', () => {
     expect(state.name).toBe('<PvP> Aleph');
     painter.update(true);
     expect(state.name).toBe('<PvP> Bet');
+  });
+});
+
+describe('the nameplate King of the Hill <Bounty> tag', () => {
+  it('a bountied player carries the tag after <PvP> and before the name', () => {
+    const hunted = entity({ id: 2, name: 'Aleph', pvpFlag: true, hillBounty: 23 });
+    const { painter } = harness([hunted]);
+    painter.update(true);
+    expect(stateOf(painter, 2).name).toBe('<PvP> <Bounty 23> Aleph');
+  });
+
+  it('follows the bounty on the next pass even when it is not a full pass, both ways', () => {
+    const target = entity({ id: 2, name: 'Aleph', pos: FAR });
+    const { painter } = harness([target]);
+    painter.update(true);
+    expect(stateOf(painter, 2).name).toBe('Aleph');
+    target.hillBounty = 15;
+    painter.update(false);
+    expect(stateOf(painter, 2).name).toBe('<Bounty 15> Aleph');
+    target.hillBounty = 20;
+    painter.update(false);
+    expect(stateOf(painter, 2).name).toBe('<Bounty 20> Aleph');
+    delete target.hillBounty;
+    painter.update(false);
+    expect(stateOf(painter, 2).name).toBe('Aleph');
   });
 });

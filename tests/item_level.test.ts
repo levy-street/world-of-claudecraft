@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import {
+  NYTHRAXIS_RELOCATED_ITEM_IDS,
+  NYTHRAXIS_RELOCATED_TRINKET_IDS,
+} from '../src/sim/content/nythraxis_loot';
 import { TROPHY_RECIPES } from '../src/sim/content/recipes';
 import {
   RIFT_EPIC_ITEM_IDS,
@@ -277,15 +281,19 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
         e.itemId && isGearEntry(e.itemId) ? [e.itemId] : [],
       ),
     );
-    // The three heroic-only raid weapons plus the four raid trinkets
-    // (content/trinkets.ts), all in the one heroic-exclusive group.
-    expect(raidIds.size).toBe(7);
-    expect([...raidIds].filter((id) => ITEMS[id].slot === 'trinket').sort()).toEqual([
-      'echoing_lens',
-      'hunters_tally',
-      'mooring_stone',
-      'wellspring_seed',
+    // The three heroic-only raid weapons, the one heroic-exclusive group. The four
+    // raid trinkets (content/trinkets.ts) moved to heroic five-man bosses on
+    // 2026-10-08 and, with the Heroic copies of the nineteen relocated raid
+    // pieces, keep the raid tier there (content/nythraxis_loot.ts).
+    expect(raidIds.size).toBe(3);
+    expect([...raidIds].filter((id) => ITEMS[id].slot === 'trinket')).toEqual([]);
+    const relocatedRaidTier = new Set<string>([
+      ...NYTHRAXIS_RELOCATED_TRINKET_IDS,
+      ...NYTHRAXIS_RELOCATED_ITEM_IDS.map((id) => `heroic_${id}`),
     ]);
+    for (const id of NYTHRAXIS_RELOCATED_TRINKET_IDS) {
+      expect(ITEMS[id].slot, id).toBe('trinket');
+    }
     // The Ignivar raid bosses' heroic-only appends live in this table too but
     // read the Crucible tier (source 26, ilvl 35, sigil tokens with no item
     // level at all); their pins live in tests/ignivar_loot.test.ts, so this
@@ -303,7 +311,7 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
     expect(ids.length).toBeGreaterThanOrEqual(12); // the full five-man heroic set + raid weapons
     for (const id of ids) {
       const item = ITEMS[id];
-      const raid = raidIds.has(id);
+      const raid = raidIds.has(id) || relocatedRaidTier.has(id);
       expect(item, `${id} is a real item`).toBeTruthy();
       expect(itemSourceLevel(id), `${id} source`).toBe(raid ? 27 : 25);
       expect(item.quality, id).toBe('epic');

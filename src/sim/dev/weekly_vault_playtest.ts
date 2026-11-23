@@ -18,6 +18,7 @@ export function prepareWeeklyVaultPlaytest(ctx: SimContext, pid: number, rollove
     rollover ? Math.max(1, ctx.lockoutNowMs() - 1000) : ctx.weeklyRaidResetMs(ctx.lockoutNowMs()),
   );
   state.raids = [2, 1, 2];
+  state.raidClears = [2, 2, 1];
   state.dungeons = [2, 2, 2, 2, 1];
   state.pvp = 3;
   state.world = 4;

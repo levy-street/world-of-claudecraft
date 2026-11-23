@@ -1,0 +1,61 @@
+{
+  "context": "Production icon resolver and fallback glyphs; actual 128,48,32 CSS pixels.",
+  "evidence": [
+    {
+      "id": "spirit_bomb",
+      "before": true,
+      "size": 48,
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "spirit_bomb",
+      "before": false,
+      "size": 128,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "id": "spirit_bomb",
+      "before": false,
+      "size": 48,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "id": "spirit_bomb",
+      "before": false,
+      "size": 32,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "id": "void_rupture",
+      "before": true,
+      "size": 48,
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "void_rupture",
+      "before": false,
+      "size": 128,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "id": "void_rupture",
+      "before": false,
+      "size": 48,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "id": "void_rupture",
+      "before": false,
+      "size": 32,
+      "width": 128,
+      "height": 128
+    }
+  ]
+}

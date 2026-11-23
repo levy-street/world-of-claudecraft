@@ -1,0 +1,33 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_morthen_woc.glb",
+      "out": "models/creatures/woc_crypt_morthen.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Rise",
+        "SummonSouls",
+        "ShieldRitual",
+        "BellToll",
+        "StaffStrike",
+        "StaffStrike2",
+        "Hit",
+        "Death",
+        "Transform",
+        "ScytheIdle",
+        "ScytheWalk",
+        "ScytheRun",
+        "ScytheSweep",
+        "ScytheSweep2",
+        "ScytheToll",
+        "ScytheSummon",
+        "ScytheHit",
+        "ScytheDeath"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

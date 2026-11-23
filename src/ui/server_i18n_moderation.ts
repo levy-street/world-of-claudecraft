@@ -1,3 +1,5 @@
+import { GM_TOOLS_MESSAGES } from './server_i18n_gm_tools';
+
 type Messages = Record<string, string>;
 
 const en: Messages = {
@@ -526,26 +528,26 @@ const jailGeneric: Messages = {
 };
 
 export const IN_GAME_MODERATION_MESSAGES: Record<string, Messages> = {
-  en: { ...en, ...jailEn },
-  en_CA: { ...en, ...jailEn },
-  es: { ...es, ...jailEs },
-  es_ES: { ...es, ...jailEs },
-  fr_FR: { ...fr, ...jailFr },
-  fr_CA: { ...fr, ...jailFr },
-  it_IT: { ...it, ...jailIt },
-  de_DE: { ...de, ...jailDe },
-  zh_CN: { ...zhCN, ...jailGeneric },
-  zh_TW: { ...zhTW, ...jailGeneric },
-  ko_KR: { ...ko, ...jailGeneric },
-  ja_JP: { ...ja, ...jailGeneric },
-  pt_BR: { ...pt, ...jailGeneric },
-  ru_RU: { ...ru, ...jailGeneric },
-  cs_CZ: { ...cs, ...jailGeneric },
-  da_DK: { ...da, ...jailGeneric },
-  id_ID: { ...id, ...jailGeneric },
-  nl_NL: { ...nl, ...jailGeneric },
-  pl_PL: { ...pl, ...jailGeneric },
-  sv_SE: { ...sv, ...jailGeneric },
-  tr_TR: { ...tr, ...jailGeneric },
-  vi_VN: { ...vi, ...jailGeneric },
+  en: { ...en, ...jailEn, ...GM_TOOLS_MESSAGES.en },
+  en_CA: { ...en, ...jailEn, ...GM_TOOLS_MESSAGES.en_CA },
+  es: { ...es, ...jailEs, ...GM_TOOLS_MESSAGES.es },
+  es_ES: { ...es, ...jailEs, ...GM_TOOLS_MESSAGES.es_ES },
+  fr_FR: { ...fr, ...jailFr, ...GM_TOOLS_MESSAGES.fr_FR },
+  fr_CA: { ...fr, ...jailFr, ...GM_TOOLS_MESSAGES.fr_CA },
+  it_IT: { ...it, ...jailIt, ...GM_TOOLS_MESSAGES.it_IT },
+  de_DE: { ...de, ...jailDe, ...GM_TOOLS_MESSAGES.de_DE },
+  zh_CN: { ...zhCN, ...jailGeneric, ...GM_TOOLS_MESSAGES.zh_CN },
+  zh_TW: { ...zhTW, ...jailGeneric, ...GM_TOOLS_MESSAGES.zh_TW },
+  ko_KR: { ...ko, ...jailGeneric, ...GM_TOOLS_MESSAGES.ko_KR },
+  ja_JP: { ...ja, ...jailGeneric, ...GM_TOOLS_MESSAGES.ja_JP },
+  pt_BR: { ...pt, ...jailGeneric, ...GM_TOOLS_MESSAGES.pt_BR },
+  ru_RU: { ...ru, ...jailGeneric, ...GM_TOOLS_MESSAGES.ru_RU },
+  cs_CZ: { ...cs, ...jailGeneric, ...GM_TOOLS_MESSAGES.cs_CZ },
+  da_DK: { ...da, ...jailGeneric, ...GM_TOOLS_MESSAGES.da_DK },
+  id_ID: { ...id, ...jailGeneric, ...GM_TOOLS_MESSAGES.id_ID },
+  nl_NL: { ...nl, ...jailGeneric, ...GM_TOOLS_MESSAGES.nl_NL },
+  pl_PL: { ...pl, ...jailGeneric, ...GM_TOOLS_MESSAGES.pl_PL },
+  sv_SE: { ...sv, ...jailGeneric, ...GM_TOOLS_MESSAGES.sv_SE },
+  tr_TR: { ...tr, ...jailGeneric, ...GM_TOOLS_MESSAGES.tr_TR },
+  vi_VN: { ...vi, ...jailGeneric, ...GM_TOOLS_MESSAGES.vi_VN },
 };

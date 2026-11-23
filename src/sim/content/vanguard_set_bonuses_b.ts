@@ -93,12 +93,12 @@ export const VANGUARD_BALANCE_4PC_ICD_SEC = 20;
 /** Starwarden 4pc aura ids (never Gripping Roots' own). */
 export const VANGUARD_BALANCE_4PC_MOBILE_AURA_ID = 'set_vanguard_druid_balance_4pc_mobile';
 export const VANGUARD_BALANCE_4PC_SPEED_AURA_ID = 'set_vanguard_druid_balance_4pc_speed';
+/** Bloodmane 2pc: seconds cut from Lunge's cooldown (12 to 9). */
+export const VANGUARD_FERAL_2PC_LUNGE_COOLDOWN_CUT_SEC = 3;
 /** Bloodmane 2pc: seconds cut from Bruin Rush's cooldown (15 to 12). */
 export const VANGUARD_FERAL_2PC_RUSH_COOLDOWN_CUT_SEC = 3;
-/** Bloodmane 4pc: Bruin Rush's self-shield as a fraction of max health. */
-export const VANGUARD_FERAL_4PC_SHIELD_PCT_MAX = 0.06;
-/** Bloodmane 4pc: shield duration in seconds. */
-export const VANGUARD_FERAL_4PC_SHIELD_DURATION_SEC = 6;
+/** Bloodmane 4pc: seconds cut from Dash's cooldown (60 to 45). */
+export const VANGUARD_FERAL_4PC_DASH_COOLDOWN_CUT_SEC = 15;
 /** Thistlebloom 2pc: seconds cut from Fleetmend's cooldown (8 to 7). */
 export const VANGUARD_RESTO_DRUID_2PC_FLEETMEND_COOLDOWN_CUT_SEC = 1;
 /** Thistlebloom 4pc: movement speed multiplier after Fleetmend. */
@@ -474,33 +474,19 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_druid_feral: [
     {
       pieces: 2,
-      // Bruin Rush 15 -> 12 sec: a resolved cooldownFlat row.
+      // Lunge 12 -> 9 sec (the out-of-stealth Slinkstrike button), Rush 15 -> 12.
       effect: {
         ability: [
+          { ability: 'lunge', cooldownFlat: -VANGUARD_FERAL_2PC_LUNGE_COOLDOWN_CUT_SEC },
           { ability: 'bear_charge', cooldownFlat: -VANGUARD_FERAL_2PC_RUSH_COOLDOWN_CUT_SEC },
         ],
       },
     },
     {
       pieces: 4,
-      // Bruin Rush shields the druid for 6 percent of max health for 6 sec.
-      // target 'self' is REQUIRED (the Rush is hostile).
+      // Cat Form mobility: Dash 60 -> 45 sec.
       effect: {
-        proc: {
-          id: 'set_vanguard_druid_feral_4pc',
-          name: 'Bruin Rush',
-          school: 'physical',
-          trigger: { on: 'castNth', n: 1, abilities: ['bear_charge'] },
-          responses: [
-            {
-              kind: 'absorb',
-              amountPctMaxHp: VANGUARD_FERAL_4PC_SHIELD_PCT_MAX,
-              duration: VANGUARD_FERAL_4PC_SHIELD_DURATION_SEC,
-              name: 'Bruin Rush',
-              target: 'self',
-            },
-          ],
-        },
+        ability: [{ ability: 'dash', cooldownFlat: -VANGUARD_FERAL_4PC_DASH_COOLDOWN_CUT_SEC }],
       },
     },
   ],

@@ -11,5 +11,23 @@ export function stopDisconnectedPlayerInput(sim: Sim, pid: number): void {
   if (!meta) return;
   Object.assign(meta.moveInput, emptyMoveInput());
   const player = sim.entities.get(pid);
-  if (player) leaveWispMaze(sim.ctx, meta, player);
+  if (player) {
+    player.pvpRewardsPaused = true;
+    leaveWispMaze(sim.ctx, meta, player);
+  }
+}
+
+/** Resume played-time rewards and reconcile pet commands with the new client. */
+export function resumeConnectedPlayerInput(
+  sim: Sim,
+  pid: number,
+  petCommandsSupported: boolean,
+): void {
+  const player = sim.entities.get(pid);
+  if (player) player.pvpRewardsPaused = false;
+  if (!petCommandsSupported) {
+    for (const entity of sim.entities.values()) {
+      if (entity.ownerId === pid) entity.petAutoSkill = false;
+    }
+  }
 }

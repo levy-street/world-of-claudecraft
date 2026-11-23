@@ -83,9 +83,10 @@ describe('skinned character GPU layout', () => {
 
     // The palette pass reads the rig AFTER the merge and after the shared-
     // skeleton rebind (rig_shared_skeleton.ts), which is what leaves it one
-    // skeleton to compact instead of one per surviving part.
+    // skeleton to compact instead of one per surviving part. A WOC base keeps
+    // its whole palette (streamed armor binds to bones the body never skins).
     expect(assets).toMatch(
-      /mergeSkinnedParts\(root, animatedNodeNames\(clips\)\);[\s\S]*?shareRigSkeleton\(root\);[\s\S]*?optimizeSkinGpuLayout\(root\);/,
+      /mergeSkinnedParts\(\s*root,\s*animatedNodeNames\(clips\),[\s\S]*?\);[\s\S]*?shareRigSkeleton\(root\);[\s\S]*?optimizeSkinGpuLayout\(root, \{ keepPalette: woc !== undefined \}\);/,
     );
     // Five sites: the assembly sweep, the lean offhand swap, the skin tail
     // (finishWeaponAttach), the excluded hand on a full re-attach, and the

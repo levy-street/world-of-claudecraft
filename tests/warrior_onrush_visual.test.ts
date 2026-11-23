@@ -4,9 +4,20 @@ import type { AnimState } from '../src/render/characters/anim_state';
 import type { CharacterVisual as Visual } from '../src/render/characters/visual';
 
 const ARRIVAL = 'Warrior_Onrush_Arrival';
+const KAYKIT_FIXTURE_KEY = 'player_warrior';
 let CharacterVisual: typeof Visual;
+let restoreFixture: () => void;
 beforeAll(async () => {
   vi.resetModules();
+  const { KAYKIT_KNIGHT_WARRIOR, VISUALS } = await import('../src/render/characters/manifest');
+  const original = VISUALS[KAYKIT_FIXTURE_KEY];
+  // These clips exercise the retained KayKit warrior's native arrival policy.
+  // Install its definition before preload so the fixture uses that rig's
+  // vocabulary instead of the live WOC player's authored actions.
+  VISUALS[KAYKIT_FIXTURE_KEY] = KAYKIT_KNIGHT_WARRIOR;
+  restoreFixture = () => {
+    VISUALS[KAYKIT_FIXTURE_KEY] = original;
+  };
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => {
       const scene = new THREE.Group();
@@ -43,6 +54,7 @@ beforeAll(async () => {
   ({ CharacterVisual } = await import('../src/render/characters/visual'));
 });
 afterAll(() => {
+  restoreFixture?.();
   vi.restoreAllMocks();
   vi.doUnmock('../src/render/assets/loader');
   vi.resetModules();
@@ -65,7 +77,7 @@ function state(overrides: Partial<AnimState> = {}): AnimState {
   };
 }
 function setup() {
-  const visual = new CharacterVisual('player_warrior', 0xffffff, 0);
+  const visual = new CharacterVisual(KAYKIT_FIXTURE_KEY, 0xffffff, 0);
   const peek = visual as unknown as { current: THREE.AnimationAction | null };
   visual.update(0.01, state(), true);
   visual.playAttack('charge');

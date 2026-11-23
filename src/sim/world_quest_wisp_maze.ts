@@ -155,6 +155,11 @@ export function leaveWispMaze(ctx: SimContext, meta: PlayerMeta, player: Entity)
   )
     return;
   pauseWispMaze(meta);
+  returnToWispMazeKeeper(ctx, player);
+}
+
+/** Puts the player back beside the maze keeper, outside the maze. */
+export function returnToWispMazeKeeper(ctx: SimContext, player: Entity): void {
   player.pos = ctx.groundPos(WISP_MAZE_NPC_DEF.pos.x, WISP_MAZE_NPC_DEF.pos.z + 1);
   player.prevPos = { ...player.pos };
   player.vx = player.vy = player.vz = 0;

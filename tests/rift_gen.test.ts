@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Collider } from '../src/sim/colliders';
+import type { LayoutCollider } from '../src/sim/colliders';
 import { RIFT_THEMES } from '../src/sim/content/rift/themes';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { polygonContainsPoint } from '../src/sim/geometry2d';
@@ -13,7 +13,7 @@ import {
 
 const BODY_R = 0.6;
 
-function clears(colliders: readonly Collider[], x: number, z: number, r = BODY_R): boolean {
+function clears(colliders: readonly LayoutCollider[], x: number, z: number, r = BODY_R): boolean {
   for (const c of colliders) {
     if (c.type === 'circle') {
       const dx = x - c.x;

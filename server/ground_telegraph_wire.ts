@@ -1,6 +1,6 @@
 // Per-viewer ground-telegraph snapshot fragments: the anonymous ground-AoE
 // warnings (frost rings, Ignivar meteor warnings, temporal hourglasses,
-// consecrations) plus the Varkhul and Nythraxis encounter blocks, concatenated
+// consecrations, spore bursters) plus the Varkhul and Nythraxis encounter blocks, concatenated
 // in the exact order the snapshot frame carries them. The broadcast loop builds
 // one realm projection per pass (each sim readout is read exactly once); this
 // module then filters and serializes it once per viewer without growing the
@@ -23,6 +23,7 @@ import type { ActiveVarkhulForgestormWarning } from '../src/sim/varkhul_forgesto
 import type {
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveSporeBurst,
   ActiveTemporalHourglass,
 } from '../src/world_api';
 import { type NythraxisEncounterWireWorld, nythraxisEncounterWireJson } from './nythraxis_wire';
@@ -37,6 +38,7 @@ export interface GroundTelegraphWireWorld {
   activeIgnivarMeteors: readonly ActiveIgnivarMeteorWarning[];
   activeTemporalHourglasses: readonly ActiveTemporalHourglass[];
   activeConsecrations: readonly ActiveConsecration[];
+  activeSporeBursts: readonly ActiveSporeBurst[];
   varkhulEncounter: VarkhulEncounterWireWorld;
   nythraxisEncounter: NythraxisEncounterWireWorld;
   // The open-world ground-AoE horizon; consecrations always scope to it, even
@@ -56,6 +58,7 @@ export interface GroundTelegraphWorldSource {
   activeIgnivarMeteors: readonly ActiveIgnivarMeteorWarning[];
   activeTemporalHourglasses: readonly ActiveTemporalHourglass[];
   activeConsecrations: readonly ActiveConsecration[];
+  activeSporeBursts: readonly ActiveSporeBurst[];
   activeVarkhulForgestormWarnings: readonly ActiveVarkhulForgestormWarning[];
   activeVarkhulCinderFires: readonly ActiveVarkhulCinderFire[];
   activeVarkhulCinderOrbProjectiles: readonly ActiveVarkhulCinderOrbProjectile[];
@@ -79,6 +82,7 @@ export function groundTelegraphWorld(
     activeIgnivarMeteors: sim.activeIgnivarMeteors,
     activeTemporalHourglasses: sim.activeTemporalHourglasses,
     activeConsecrations: sim.activeConsecrations,
+    activeSporeBursts: sim.activeSporeBursts,
     varkhulEncounter: {
       activeVarkhulForgestormWarnings: sim.activeVarkhulForgestormWarnings,
       activeVarkhulCinderFires: sim.activeVarkhulCinderFires,
@@ -173,12 +177,28 @@ export function groundTelegraphWireJson(
     anchorPos,
     world.eventRadius,
   );
+  // Spore Burst mushrooms carry their caster (`src`) so each viewer colours
+  // the timer by its own hostility; they ride the consecration horizon.
+  // Appended last, so every earlier family keeps its key order.
+  const sporeBursts = world.activeSporeBursts
+    .filter((burst) => {
+      const dx = burst.x - anchorPos.x;
+      const dz = burst.z - anchorPos.z;
+      const limit = world.interestQueryRadius + burst.radius;
+      return dx * dx + dz * dz <= limit * limit;
+    })
+    .map(
+      (burst) =>
+        `{"id":${JSON.stringify(burst.id)},"x":${round2(burst.x)},"z":${round2(burst.z)},"r":${round2(burst.radius)},"dur":${round2(burst.duration)},"rem":${round2(burst.remaining)},"src":${burst.sourceId}}`,
+    );
+  const sporeBurstsJson = sporeBursts.length > 0 ? `,"sporeBursts":[${sporeBursts.join(',')}]` : '';
   return (
     frostRingsJson +
     ignivarMeteorsJson +
     varkhulEncounterJson +
     temporalHourglassesJson +
     consecrationsJson +
-    nythraxisEncounterJson
+    nythraxisEncounterJson +
+    sporeBurstsJson
   );
 }

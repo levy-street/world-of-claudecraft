@@ -9,7 +9,15 @@ const calls = vi.hoisted(() => ({
   traceGate: vi.fn(),
   ready: Promise.resolve(),
   wispReady: Promise.resolve(),
+  cannonLowGfx: [] as unknown[],
+  gfx: null as { standardMaterials: boolean } | null,
 }));
+vi.mock('../src/render/gfx', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/render/gfx')>();
+  const GFX = { ...actual.GFX };
+  calls.gfx = GFX;
+  return { ...actual, GFX };
+});
 vi.mock('../src/render/race_line', () => ({
   RaceLine: class {
     update() {
@@ -54,6 +62,9 @@ import { WorldGuidance } from '../src/render/world_guidance';
 vi.mock('../src/render/cannon_encounter_visual', () => ({
   CannonEncounterVisual: class {
     readyForEntry = calls.ready;
+    constructor(_scene: unknown, _ground: unknown, _gate: unknown, lowGfx?: boolean) {
+      calls.cannonLowGfx.push(lowGfx);
+    }
     update() {
       calls.events.push('cannon');
     }
@@ -124,6 +135,23 @@ describe('personal world guidance coordinator', () => {
         'cannon',
         'wisp-maze',
       ]);
+    },
+  );
+  it.each([true, false])('hands the cannon encounter the Low look when lowGfx=%s', (lowGfx) => {
+    calls.cannonLowGfx.length = 0;
+    new WorldGuidance(new THREE.Scene(), () => 0, undefined, undefined, undefined, lowGfx);
+    expect(calls.cannonLowGfx).toEqual([lowGfx]);
+  });
+  it.each([true, false])(
+    'reads Low from the graphics profile by default (standardMaterials=%s)',
+    (standardMaterials) => {
+      const gfx = calls.gfx as { standardMaterials: boolean };
+      const was = gfx.standardMaterials;
+      gfx.standardMaterials = standardMaterials;
+      calls.cannonLowGfx.length = 0;
+      new WorldGuidance(new THREE.Scene(), () => 0);
+      gfx.standardMaterials = was;
+      expect(calls.cannonLowGfx).toEqual([!standardMaterials]);
     },
   );
   it('forwards NPC fizz arguments unchanged and releases the new visual', () => {

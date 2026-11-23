@@ -742,6 +742,31 @@ describe('SerialGateLane', () => {
   // robust "everything queued has run" boundary.
   const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
+  it('runs a gate enqueued from a settle reaction once, after the settling gate, behind the queue', async () => {
+    // The effect swap re-arms its scratch set from inside its own settle.
+    const lane = new SerialGateLane();
+    const started: string[] = [];
+    const settles: Record<string, () => void> = {};
+    const start = (name: string) => (settled: () => void) => {
+      started.push(name);
+      settles[name] = settled;
+    };
+    lane.enqueue(start('a'), () => lane.enqueue(start('a-again')));
+    lane.enqueue(start('b'));
+    await tick();
+    settles.a();
+    expect(lane.pending).toBe(2);
+    await tick();
+    expect(started).toEqual(['a', 'b']);
+    settles.b();
+    await tick();
+    expect(started).toEqual(['a', 'b', 'a-again']);
+    settles['a-again']();
+    await tick();
+    expect(started).toEqual(['a', 'b', 'a-again']);
+    expect(lane.pending).toBe(0);
+  });
+
   it('starts one gate at a time, in arrival order, and runs each caller reaction on its settle', async () => {
     const lane = new SerialGateLane();
     const started: string[] = [];

@@ -378,6 +378,20 @@ describe('action bar: equipment and target-aura requirements', () => {
     expect(at(HIGH_DAGGER.id, requiredLevelFor(HIGH_DAGGER))).toBe(true);
   });
 
+  it('allows adaptive dagger abilities only for the active dagger specialization', () => {
+    const w = world({ level: 20, equippedItems: { mainhand: 'membership_staff' } });
+    w.playerClass = 'rogue';
+    w.paladinSpec = 'assassination';
+    w.player.membershipActive = true;
+    expect(secondaryRequirementsMet(w, known(ABILITIES.backstab))).toBe(true);
+    expect(usableOnBar(ABILITIES.backstab, w)).toBe(true);
+    w.paladinSpec = 'combat';
+    expect(secondaryRequirementsMet(w, known(ABILITIES.backstab))).toBe(false);
+    w.paladinSpec = 'assassination';
+    w.player.membershipActive = false;
+    expect(secondaryRequirementsMet(w, known(ABILITIES.backstab))).toBe(false);
+  });
+
   it('reads the rank-resolved effects over the def when the resolve supplies them', () => {
     const backstab = ABILITIES.backstab;
     const w = world({ level: 60, equippedItems: { mainhand: SWORD } });

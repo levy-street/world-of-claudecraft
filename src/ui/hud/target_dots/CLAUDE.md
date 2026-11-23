@@ -5,7 +5,12 @@
 # Target dots (`#target-dots`)
 
 The multi-target debuff tracker: one bar row per debuff the LOCAL player currently
-has out, across every enemy in interest range, with a live countdown. Governed by
+has out, across every enemy in interest range, with a live countdown. An enemy is a
+living mob or a living player the shared PvP verdict names hostile right now
+(`deps.isHostilePlayer`, wired to `src/ui/pvp_hostile_core.ts`: a duel, a
+battleground, a ranked arena, or open-world PvP under the `/pvp` flag). Friendly
+players never qualify, so a lockout the player causes on an ally (Bloodlust's
+exhaustion on the party) never becomes a row. Governed by
 the `showTargetDots` setting (Interface > Combat) and movable like any other HUD
 frame (`HUD_FRAME_SPECS` row `targetDots`).
 

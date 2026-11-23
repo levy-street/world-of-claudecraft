@@ -18,7 +18,7 @@ import type { Rng } from '../rng';
 import type { CoreStats, ItemDef, ItemInstancePayload, WeaponInfo } from '../types';
 import { isValidLootQuality, type LootQualityDescriptor } from './types';
 
-export function createLootQuality(rng: Rng): LootQualityDescriptor | undefined {
+export function createLootQuality(rng: Pick<Rng, 'int'>): LootQualityDescriptor | undefined {
   const draw = rng.int(0, 9999);
   if (draw < 9000) return undefined;
   const tier = draw < 9900 ? 1 : draw < 9990 ? 2 : draw < 9999 ? 3 : 4;

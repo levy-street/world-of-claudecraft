@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/rare_silkstalker_woven_vest.webp",
+    "http://localhost:5194/ui/items/rare_spun_venom_spaulders.webp",
+    "http://localhost:5194/ui/items/rare_broodmother_chitin_cowl.webp",
+    "http://localhost:5194/ui/items/rare_venom_etched_waistcord.webp",
+    "http://localhost:5194/ui/items/silkstalker_woven_vest.webp",
+    "http://localhost:5194/ui/items/spun_venom_spaulders.webp",
+    "http://localhost:5194/ui/items/broodmother_chitin_cowl.webp",
+    "http://localhost:5194/ui/items/venom_etched_waistcord.webp",
+    "http://localhost:5194/ui/items/legendary_silkstalker_woven_vest.webp",
+    "http://localhost:5194/ui/items/legendary_spun_venom_spaulders.webp",
+    "http://localhost:5194/ui/items/legendary_broodmother_chitin_cowl.webp",
+    "http://localhost:5194/ui/items/legendary_venom_etched_waistcord.webp"
+  ],
+  "allDecoded": true
+}

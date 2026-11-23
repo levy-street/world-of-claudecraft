@@ -109,6 +109,55 @@ function navigationAllowed(
   return subframeHostSuffixAllowed(url, subframeHostSuffixes);
 }
 
+// External document paths that belong in the system browser rather than navigating
+// the desktop game shell.
+const EXTERNAL_DOCUMENT_PATHS = new Set([
+  '/terms',
+  '/terms.html',
+  '/privacy',
+  '/privacy.html',
+  '/support',
+  '/support.html',
+  '/data-deletion',
+  '/data-deletion.html',
+  '/wiki',
+  '/wiki/',
+]);
+
+// Determine whether a URL represents an external document (PDF or standalone legal/help page)
+// that should be opened in the system browser rather than navigating the desktop game shell.
+function isExternalDocumentUrl(urlString) {
+  let parsed;
+  try {
+    parsed = new URL(urlString);
+  } catch {
+    return false;
+  }
+  if (parsed.pathname.toLowerCase().endsWith('.pdf')) return true;
+  const path = parsed.pathname.replace(/\/+$/, '') || '/';
+  return EXTERNAL_DOCUMENT_PATHS.has(path) || EXTERNAL_DOCUMENT_PATHS.has(parsed.pathname);
+}
+
+// Convert an app:// or relative document URL into a canonical public web URL
+// suitable for passing to the OS shell (shell.openExternal).
+function toCanonicalExternalUrl(
+  urlString,
+  _appOrigin = 'app://worldofclaudecraft',
+  apiOrigin = 'https://worldofclaudecraft.com',
+) {
+  let parsed;
+  try {
+    parsed = new URL(urlString);
+  } catch {
+    return urlString;
+  }
+  const base = apiOrigin || 'https://worldofclaudecraft.com';
+  if (parsed.protocol === 'app:' || parsed.protocol === 'file:') {
+    return new URL(`${parsed.pathname}${parsed.search}${parsed.hash}`, base).toString();
+  }
+  return urlString;
+}
+
 // Third-party origins the shipped index.html actually uses. The desktop shell keeps
 // the same behavior as the web build (chosen posture), so the CSP allow-lists exactly
 // these and nothing more. Grouped by the directive each feeds.
@@ -187,10 +236,11 @@ const CSP_ORIGINS = {
 // Extract a CSP source-hash (`sha256-<base64>`) for every INLINE <script> in html
 // (one with no `src` attribute and a non-empty body), matching what a browser hashes:
 // the exact text between the tags. External <script src> tags need no hash. index.html
-// ships three executable inline scripts (the i18n stored-locale bootstrap, whose body
-// varies per build, plus the analytics snippets), so the hashes are read from the built
-// file at runtime rather than hard-coded. Inline scripts never contain a literal
-// </script> (the i18n injector escapes '<'), so the non-greedy match is safe here.
+// ships several executable inline scripts (the i18n stored-locale bootstrap, whose body
+// varies per build, the analytics snippets and the boot splash fail-safe), so the
+// hashes are read from the built file at runtime rather than hard-coded. Inline
+// scripts never contain a literal </script> (the i18n injector escapes '<'), so the
+// non-greedy match is safe here.
 function extractInlineScriptHashes(html) {
   const hashes = [];
   const re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
@@ -357,4 +407,7 @@ module.exports = {
   extractInlineScriptHashes,
   buildContentSecurityPolicy,
   withCspHeader,
+  EXTERNAL_DOCUMENT_PATHS,
+  isExternalDocumentUrl,
+  toCanonicalExternalUrl,
 };

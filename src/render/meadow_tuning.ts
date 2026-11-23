@@ -13,6 +13,49 @@
 // Node-tested core and reads the paint constants from here.
 
 // ---------------------------------------------------------------------------
+// Cluster coverage and size (shared by the carpet, the band and the bake)
+// ---------------------------------------------------------------------------
+//
+// The near carpet (blade_grass.ts), the mid band (blade_grass_band.ts) and the
+// ground bake (grass_ground_bake.ts) must lay down the SAME clusters at the
+// same sizes, or the painted ground stops matching the blades standing on it.
+// These are the one copy of those rules.
+
+/** Coverage share of cells that carry a cluster on the leanest soil; lush
+ *  soil fills toward every cell. The painted meadow look wants a near-full
+ *  carpet with only a gentle patch structure, so the floor sits high. */
+export const MEADOW_COVER_FLOOR = 0.9;
+/** Extra coverage the lushness term adds (times lush squared). */
+export const MEADOW_COVER_GAIN = 1.2;
+
+/** Threshold a cell's placement hash must fall under to carry a cluster. */
+export function meadowCoverage(lush: number): number {
+  return MEADOW_COVER_FLOOR + MEADOW_COVER_GAIN * lush * lush;
+}
+
+/** Horizontal instance scale of one cluster: a knee-high blade carpet on
+ *  lush soil that thins to ankle height on lean soil, with a rare taller
+ *  tuft class (hTuft under 0.08) to break the crop line. hSize and hTuft are
+ *  the cell's own hashes in [0, 1). */
+export function meadowClusterScale(lush: number, hSize: number, hTuft: number): number {
+  const lushHere = 0.78 + lush * 0.4;
+  const s = (0.4 + hSize * 0.24) * lushHere;
+  return hTuft < 0.08 ? s * (1.2 + hTuft * 2) : s;
+}
+
+/** Vertical instance scale for a cluster of horizontal scale `s`; hJit is the
+ *  cell's height-jitter hash in [0, 1). */
+export function meadowClusterHeight(s: number, lush: number, hJit: number): number {
+  return s * (1.2 + lush * 0.4) * (0.85 + hJit * 0.3);
+}
+
+/** Camera-near collapse window (yards from the eye to a cluster's root):
+ *  full collapse inside NEAR, full size past FAR. Shared by the carpet and the
+ *  band so a low camera sees the same clearing whichever layer is nearest. */
+export const MEADOW_CAMERA_CLEAR_NEAR = 1.5;
+export const MEADOW_CAMERA_CLEAR_FAR = 4.0;
+
+// ---------------------------------------------------------------------------
 // Mid-band blade clusters (blade_grass_band.ts)
 // ---------------------------------------------------------------------------
 
@@ -63,11 +106,11 @@ export const GRASS_BAKE_TEXTURE_SIZE = 1024;
 /** Shade of the soil showing between blade strokes in the bake (linear grey).
  *  This is the ground texture's CONTRAST floor: lower reads as deeper
  *  shadowed turf, higher flattens the strokes toward one tone. */
-export const GRASS_BAKE_SOIL_SHADE = 0.3;
+export const GRASS_BAKE_SOIL_SHADE = 0.88;
 
 /** Per-cluster grey jitter span in the bake (plus or minus around 1.0), so
  *  the tiling period is broken by value variety, never by rescaling. */
-export const GRASS_BAKE_CLUSTER_JITTER = 0.12;
+export const GRASS_BAKE_CLUSTER_JITTER = 0.03;
 
 // ---------------------------------------------------------------------------
 // Ground paint (terrain.ts splat grass layer + far_terrain.ts tiles)
@@ -89,6 +132,15 @@ export const GRASS_PAINT_TRIM = 0.8;
 /** Full-strength gain the paint applies over the per-vertex grass tint
  *  (vColor). Derived, not hand-set: lift times trim. */
 export const GRASS_PAINT_GAIN = GRASS_PAINT_BLADE_LIFT * GRASS_PAINT_TRIM;
+
+/** Gain the painted sand layer applies over the per-vertex sand tone
+ *  (terrain.ts): sand takes the palette at full strength, so this sets how
+ *  bright a palette sand reads on screen under the vale's noon sun. */
+export const SAND_PAINT_GAIN = 0.46;
+
+/** How much of the sand photo's normalised luma grain survives on the
+ *  painted sand (0 = flat paint, 1 = the photo's full speckle). */
+export const SAND_PAINT_GRAIN = 0.18;
 
 /** How far the band blades' BASE colour sinks toward the painted ground
  *  under them (1 = exactly the ground's mip-average, 0 = no sink). Tips

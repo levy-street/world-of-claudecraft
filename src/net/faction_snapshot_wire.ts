@@ -8,7 +8,11 @@
 import { sanitizeClueHunt } from '../sim/clue_scrolls';
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
-import { sanitizeFactionCurrencies, sanitizeFactionReputation } from '../sim/factions';
+import {
+  sanitizeAlliedHearthstoneAttunement,
+  sanitizeFactionCurrencies,
+  sanitizeFactionReputation,
+} from '../sim/factions';
 import { sanitizeTreasureMap } from '../sim/treasure_vault';
 import { sanitizeWorldQuestReplacements } from '../sim/world_quest_reroll';
 import { sanitizeWorldQuestCycle } from '../sim/world_quests';
@@ -20,9 +24,10 @@ export interface FactionSelfMirrors {
   worldQuestReplacements: Readonly<Record<string, string>>;
   clueHunt: Readonly<{ huntId: string; step: number }> | null;
   treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null;
+  alliedHearthstoneAttunement: FactionId | null;
 }
 
-/** Apply the `fac`, `facCur`, `wqrr`, `wqrep`, `cluh` and `tmap` self keys; each is independent. */
+/** Apply the `fac`, `facCur`, `wqrr`, `wqrep`, `cluh`, `tmap` and `ahs` self keys; each is independent. */
 export function applyFactionSelfWire(
   target: Partial<FactionSelfMirrors> & { worldQuestCycle?: string },
   self: {
@@ -32,6 +37,7 @@ export function applyFactionSelfWire(
     wqrep?: unknown;
     cluh?: unknown;
     tmap?: unknown;
+    ahs?: unknown;
   },
 ): void {
   if (self.fac !== undefined) {
@@ -62,5 +68,9 @@ export function applyFactionSelfWire(
     // unknown site decodes to null); the seed never leaves the server.
     const map = sanitizeTreasureMap(self.tmap);
     target.treasureMap = map ? Object.freeze({ rarity: map.rarity, siteId: map.siteId }) : null;
+  }
+  if (self.ahs !== undefined) {
+    // The Allied Hearthstone's bound hub: an unknown id or null decodes unbound.
+    target.alliedHearthstoneAttunement = sanitizeAlliedHearthstoneAttunement(self.ahs) ?? null;
   }
 }

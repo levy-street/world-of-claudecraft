@@ -31,7 +31,7 @@ Spikes remain, as the impale mechanic rather than adds.
 2. `/dev nythraxisraid normal` (or `heroic`). You zone into the arena with nine
    anchored, invulnerable bots spread across the hall. They are targets for
    every mechanic that skips the aggro holder (Bone Spike, Soul Rend,
-   Gravefire) and for Bone Storm's charges. They never die and never move.
+   Gravefire). They never die and never move.
 3. `/dev god` so you survive a landed Deathless Rage and an Unbound sigil.
 4. Walk up and hit him. Everything runs on its real cadence from here.
 
@@ -39,23 +39,26 @@ Spikes remain, as the impale mechanic rather than adds.
 
 `/dev nyx <mechanic>` sets that mechanic's timer to the next tick. The
 encounter's own rules still apply: a sigil waits out the 6 s major gap, a Rage
-waits out a live sigil and live Soul Rend marks, a storm waits out any other
-major. A storm does NOT wait for live Soul Rend marks: the instant it begins,
-any live marks are released unresolved (the aura leaves, no damage), because
-"stack" and "spread and run" cannot both be answered at once. It does wait out
-the 6 s settle after a Soul Rend detonation, so it never opens on the huddle.
+waits out a live sigil and live Soul Rend marks, and a Grave Eruption waits
+out live Soul Rend marks plus 1.5 s after they detonate
+(`NYTHRAXIS_SOUL_REND_FIRE_GAP_SECONDS`), so the circles of fire never open on
+top of, or right behind, the marks.
+
+Bone Storm is retired from play (`NYTHRAXIS_BONE_STORM_ENABLED`, owner call
+2026-10-02): phase 3 never starts a storm, and the Raid Boss Guide page and
+the Dungeon Finder blurb no longer list it.
 
 | Command | What you should see |
 |---|---|
 | `/dev nyx curse` | Dread Curse hits you (you must be in melee reach); at 2 stacks the swap callout |
 | `/dev nyx spike` | Two bots (three on heroic) impaled with a spike through them; hit the spikes. A spike is a ward (v0.42.2): 4 hits on normal, 6 on heroic, from anyone, each hit counting one whatever it deals, and its health bar reads as hits remaining. Cast it again inside 55 s: the same bots are never re-picked (the per-raider cooldown) |
-| `/dev nyx eruption` | Purple warning rings under bots, the burst, then purple Grave Flame (12 s normal, 8 s heroic) |
+| `/dev nyx eruption` | Purple warning rings under bots, the burst, then purple Grave Flame (12 s normal, 8 s heroic). No ring ever opens right beside a hall pillar |
 | `/dev nyx sigil` | The sigil flares on one of the two platforms flanking the throne, 30 yd to the raid's left or right of where the boss spawned (alternating each cast, v0.42.2); drag him up onto it |
 | `/dev nyx phase2` | Health to 69%: the stomp, Brother Aldric's entrance, the wardstones light |
 | `/dev nyx rend` | Three bots (six) marked; the split hit lands when the marks expire and leaves NO fire (Soulfire retired in v0.42.2) |
 | `/dev nyx rage` | Deathless Rage cast; then `/dev nyx wards` makes three bots complete the wardstones (interrupt + stun), or wait and eat the 82% (115%) |
 | `/dev nyx phase3` | Health to 29%: The King's Wrath once no major is in flight |
-| `/dev nyx storm` | Bone Storm: he ignores threat, whirls, charges four bots, slams, then comes back to you |
+| `/dev nyx storm` | Refused: "Bone Storm is retired from play." |
 | `/dev nyx enrage 10` | The Crown Endures in 10 s: the yells, then the enrage buff and its ramp |
 
 `/dev hp <1-100>` with him targeted sets his health directly. `/dev raid reset`
@@ -70,8 +73,11 @@ raid re-forms it at the other difficulty.
   identical on every graphics preset (actionable geometry never sheds).
 - The sigil never lands within 6 yd of a wardstone, and on normal never in
   live fire.
-- Bone Storm's charges around the pillars: this is the piece most likely to
-  need tuning.
+- Grave Eruption keeps clear of the pillars: no ring's centre comes within
+  7 yd of a pillar's centre (`NYTHRAXIS_GRAVE_ERUPTION_PILLAR_CLEARANCE`), so a
+  raider hugging a pillar sees their ring open a few yards out in the aisle.
+- After Soul Rend detonates, count at least 1.5 s before the next eruption's
+  warning rings appear.
 - The heroic floor: Grave Flame burns out on its own (8 s, second playtest
   pass) instead of lasting until the transition; watch whether the floor
   still feels crowded by phase 3, and whether the cap (24 flame patches)
@@ -94,8 +100,8 @@ raid re-forms it at the other difficulty.
   fire a spike should be findable at a glance from across the room, on the
   low graphics tier too (the tint applies on every tier; only the glow is
   standard-tier polish).
-- Every offensive effect (warning rings, Grave Flame, Gravefire,
-  Bone Storm/Bone Slam) should now read purple on both difficulties; the
+- Every offensive effect (warning rings, Grave Flame, Gravefire) should now
+  read purple on both difficulties; the
   Binding Sigil stays blue and the Soul Rend floor ring/overhead mark stay
   red-alone, green-once-stacked.
 - Raw white damage: Normal Nythraxis is tuned to hit for about 90% of Normal

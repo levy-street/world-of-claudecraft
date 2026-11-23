@@ -66,6 +66,7 @@ import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
   bindRefusalReason,
+  type ConvertedLayout,
   type Keybinds,
   keyLabel,
 } from '../game/keybinds';
@@ -104,7 +105,9 @@ import type { TranslationKey } from './i18n.catalog';
 import { BIND_CATEGORY_LABEL_KEYS, bindActionDisplayName } from './keybind_action_names_core';
 import { keybindConflictPrompt } from './keybind_conflict_prompt_core';
 import { keybindDeviceNoteKeys, keybindRefusalNote } from './keybind_device_notes_core';
-import { buildKeybindCode, parseKeybindCode } from './keybind_transfer_core';
+import { buildKeybindLayoutConvertRow } from './keybind_layout_convert_rows';
+import { KEYBIND_PANEL_SETTING_KEYS } from './keybind_panel_settings';
+import { buildKeybindCode, type KeybindSetup, parseKeybindCode } from './keybind_transfer_core';
 import {
   type KeyboardMapHandle,
   type KeyboardMapPaintDeps,
@@ -112,6 +115,7 @@ import {
 } from './keyboard_map';
 import type { KeyboardLayer } from './keyboard_map_core';
 import { KeyboardMapWindow } from './keyboard_map_window';
+import { optionsCheckRow, optionsNoteRow, optionsSubheadRow } from './options_check_rows';
 import {
   buildChatTimestampRows,
   buildChatWindowResetRow,
@@ -184,21 +188,6 @@ interface NumericChoiceBinding {
   set(key: NumericSettingKey, value: number): void;
 }
 
-// The six GameSettings the Key Bindings panel renders alongside the
-// rebindable keys (the settingToggleKeybind + clickMoveMouseButtonRow calls in
-// renderKeybinds below). Its Reset to Defaults must restore these too, not just
-// the key-code map: without this list, a player's custom mouse-camera,
-// click-to-move (and its mouse button), attack-move, or left-handed-touch
-// choice silently survived a "reset everything" click. (The profanity filter
-// is a chat setting: it renders in Interface > Chat, whose own footer resets it.)
-const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
-  'mouseCamera',
-  'lockCursorOnRotate',
-  'clickToMove',
-  'clickToMoveButton',
-  'attackMove',
-  'leftHandedTouch',
-];
 // Every action id the registry knows: a pasted hotkey code naming none of them
 // would import as a full reset, so parseKeybindCode refuses it as hollow.
 const KNOWN_ACTION_IDS: ReadonlySet<string> = new Set(BIND_ACTIONS.map((a) => a.id));
@@ -773,13 +762,21 @@ export class OptionsWindow {
           this.settingToggle(parent, c, hooks);
           break;
         case 'boolToggle':
-          this.settingBoolToggle(parent, c, hooks, c.rerender ? (key) => rerender(key) : undefined);
+          if (c.check) optionsCheckRow(parent, c, hooks);
+          else
+            this.settingBoolToggle(
+              parent,
+              c,
+              hooks,
+              c.rerender ? (key) => rerender(key) : undefined,
+            );
           break;
         case 'choice':
           this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined, choiceBinding);
           break;
         case 'note':
-          this.noteRow(parent, c.textKey, c.valueKeys);
+          if (c.subhead) optionsSubheadRow(parent, t(c.textKey));
+          else optionsNoteRow(parent, c.textKey, c.valueKeys);
           break;
         case 'musicToggle':
           this.musicToggle(parent, c.labelKey);
@@ -1020,19 +1017,6 @@ export class OptionsWindow {
     }
     parent.appendChild(row);
     sync();
-  }
-
-  private noteRow(
-    parent: HTMLElement,
-    textKey: TranslationKey,
-    valueKeys?: Record<string, TranslationKey>,
-  ): void {
-    const note = document.createElement('div');
-    note.className = 'set-note';
-    // The view names its placeholders as keys and this resolves them, so the
-    // whole sentence including the value stays one translatable string.
-    note.textContent = optionsText(textKey, valueKeys);
-    parent.appendChild(note);
   }
 
   // The bespoke music on/off toggle (reads the live MusicDirector, not a setting).
@@ -1805,12 +1789,11 @@ export class OptionsWindow {
     });
   }
 
-  // The hotkey-setup row on the Key Bindings panel: the same Export/Import
-  // expando, carrying this character's key-code map (Keybinds.snapshot) in the
-  // keybind_transfer_core.ts envelope. Import applies live through
-  // Keybinds.importBindings (load()'s validation: unknown actions ignored,
-  // reserved codes skipped, one code per action) and repaints the panel; no
-  // reload, since every reader of the map goes through the live instance.
+  // The hotkey-setup rows on the Key Bindings panel: the Export/Import expando
+  // (Keybinds.snapshot in the keybind_transfer_core.ts envelope) and the layout
+  // converter (keybind_layout_convert_rows.ts). Both apply live (no reload)
+  // through applyKeybindSetup: Keybinds.importBindings with load()'s
+  // validation (unknown actions, reserved codes, one code per action), then a repaint.
   private keybindTransferRows(body: HTMLElement): void {
     const wrap = document.createElement('div');
     wrap.className = 'kb-transfer';
@@ -1826,16 +1809,21 @@ export class OptionsWindow {
               : 'hudChrome.transfer.invalid',
           );
         }
-        this.deps.keybinds().importBindings(parsed.binds);
-        this.dropKeyCapture();
-        this.keybindNote = t('hudChrome.keybindTransfer.imported');
-        this.deps.refreshKeybindLabels();
-        this.keyboardWindow.repaint();
-        this.renderKeybinds();
+        this.applyKeybindSetup(parsed.binds, t('hudChrome.keybindTransfer.imported'));
         return null;
       },
     });
     body.appendChild(wrap);
+    buildKeybindLayoutConvertRow(body, this.deps, (...a) => this.applyKeybindSetup(...a));
+  }
+
+  private applyKeybindSetup(binds: KeybindSetup, note: string, layout?: ConvertedLayout): void {
+    this.deps.keybinds().importBindings(binds, layout ?? null);
+    this.dropKeyCapture();
+    this.keybindNote = note;
+    this.deps.refreshKeybindLabels();
+    this.keyboardWindow.repaint();
+    this.renderKeybinds();
   }
 
   // The shared Export/Import row + expando. `exportCode` yields the code shown
@@ -2584,6 +2572,12 @@ export class OptionsWindow {
       'lockCursorOnRotate',
       t('hudChrome.options.keybindHelpLockCursorOnRotate'),
     );
+    this.settingToggleKeybind(
+      rail,
+      t('hudChrome.options.rawMouseInput'),
+      'rawMouseInput',
+      t('hudChrome.options.keybindHelpRawMouseInput'),
+    );
     this.settingToggleKeybind(rail, t('hud.options.clickToMove'), 'clickToMove');
     this.clickMoveMouseButtonRow(rail);
     this.settingToggleKeybind(rail, t('hud.keybinds.actions.attackMove'), 'attackMove');
@@ -2715,10 +2709,7 @@ export class OptionsWindow {
       audio.click();
       this.deps.keybinds().reset();
       this.keyboardWindow.repaint();
-      // The panel also renders seven GameSettings toggles alongside the
-      // rebindable keys (mouse camera, click-to-move and its mouse button,
-      // attack move, left-handed touch, profanity filter); Reset to Defaults
-      // must restore those too, not just the key-code map.
+      // Reset every setting owned by this panel alongside its key-code map.
       const hooks = this.deps.options();
       hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
       for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));

@@ -15,13 +15,18 @@
 //
 // GPU preparation: every mesh this module will ever draw is built at
 // construction into fixed pools (orbs, lanterns, hammers, bolts) that sit
-// hidden in the scene, tagged renderCategory 'vfx'. That tag is the prewarm
-// home: the vfx.ability-primitives boot entry and its resume units link every
-// 'vfx' program in the scene (collectAbilityVfxCompileTargets), and the cast
-// readiness gate waits on those same materials. So nothing here links a
-// program in a live frame, and nothing is added to the scene after boot.
-// Cosmetic draws wait on that gate (`ready`); the lantern light draws on every
-// tier regardless, because it is information a healer acts on.
+// hidden in the scene, tagged renderCategory 'vfx' and cast-VFX family
+// 'relic'. That tag is the prewarm home: the vfx.ability-primitives boot entry
+// and its resume units link every 'vfx' program in the scene
+// (collectAbilityVfxCompileTargets), the relic family's right after the
+// engine's and the kit's, and the relic family's ready bit waits on those same
+// materials. So nothing here links a program in a live frame, and nothing is
+// added to the scene after boot. Cosmetic draws wait on that bit (`ready`); the
+// lantern light draws on every tier regardless, because it is information a
+// healer acts on, so its program is linked earlier, by vfx.cast-first-reads
+// (`lanternLightDrawable`): before the curtain, except on the minimal manifest,
+// where that entry resumes as program debt just after the reveal and a lantern
+// already standing in view then can still link its light live.
 //
 // Particles ride the renderer's pooled Vfx cloud (burst), so embers add no
 // material, mesh or draw call.
@@ -31,6 +36,7 @@ import type { IWorld } from '../world_api';
 import type { AbilityVfxSpellfxEvent } from './ability_vfx/painter';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { tagCastVfxFamily } from './cast_vfx_family';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { surfaceMat } from './gfx';
 import {
@@ -112,7 +118,7 @@ export interface TrinketRelicsHost {
   ground(x: number, z: number): number;
   vfx: RelicParticles;
   time(): number;
-  /** The cast readiness gate: true once every 'vfx' program is linked. */
+  /** True once the relic family's programs are linked (cast_vfx_family.ts). */
   ready(): boolean;
 }
 
@@ -164,7 +170,7 @@ interface WispState {
 
 function tagVfx(root: THREE.Object3D): void {
   root.traverse((child) => {
-    child.userData.renderCategory = 'vfx';
+    tagCastVfxFamily(child, 'relic');
     child.frustumCulled = false;
   });
 }
@@ -227,6 +233,7 @@ export class TrinketRelics {
   private readonly root = new THREE.Group();
   private readonly bodyMat: THREE.Material;
   private readonly glowMat: THREE.MeshBasicMaterial;
+  private readonly boltMat: THREE.MeshBasicMaterial;
   private readonly orbs: OrbSlot[] = [];
   private readonly lanterns: LanternSlot[] = [];
   private readonly hammers: HammerSlot[] = [];
@@ -247,6 +254,10 @@ export class TrinketRelics {
     this.bodyMat = surfaceMat({ vertexColors: true, flatShading: true, roughness: 0.8 });
     this.glowMat = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xffffff });
     this.glowMat.color.multiplyScalar(1.35);
+    // Its own instance: the GLB glow carries vec4 colours and the bolt vec3, two
+    // programs, and the family's ready bit reads one program per material.
+    this.boltMat = this.glowMat.clone();
+    this.boltMat.name = 'trinket-relics:kindling-bolt';
     const orbTemplate = this.template('KindlingOrb');
     const lanternTemplate = this.template('LastFlameLantern');
     const hammerTemplate = this.template('TemperHammer');
@@ -317,7 +328,7 @@ export class TrinketRelics {
       this.hammers.push({ ...this.pooledPivot(pivot), ownerId: -1, age: 0, struck: false });
     }
     for (let i = 0; i < BOLT_SLOTS; i++) {
-      const mesh = new THREE.Mesh(boltGeometry, this.glowMat);
+      const mesh = new THREE.Mesh(boltGeometry, this.boltMat);
       mesh.name = 'kindling-bolt';
       this.root.add(mesh);
       tagVfx(mesh);
@@ -384,6 +395,13 @@ export class TrinketRelics {
     return { pivot };
   }
 
+  /** The lantern light, drawn with no readiness check: the root the
+   *  vfx.cast-first-reads entry links before the curtain. Every slot shares
+   *  its program. */
+  lanternLightDrawable(): THREE.Object3D {
+    return this.lanterns[0].light;
+  }
+
   setQuality(q: number): void {
     this.quality = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
   }
@@ -429,7 +447,6 @@ export class TrinketRelics {
 
   update(dt: number, reducedMotion = false): void {
     const step = Number.isFinite(dt) ? Math.max(0, Math.min(dt, 0.25)) : 0;
-    const ready = this.host.ready();
     this.scanClock += step;
     if (this.scanClock >= SCAN_INTERVAL_SEC) {
       this.scanClock = 0;
@@ -439,12 +456,23 @@ export class TrinketRelics {
       for (const orb of this.orbs) if (orb.ownerId !== -1) orb.remaining -= step;
       for (const lantern of this.lanterns) if (lantern.ownerId !== -1) lantern.remaining -= step;
     }
+    // Asked only while a relic is tracked: the family's deadline clock starts at
+    // its first consult, so a session with no wearer in view never runs it down.
+    const ready = this.tracking() && this.host.ready();
     const t = this.host.time();
     this.updateOrbs(step, t, ready, reducedMotion);
     this.updateLanterns(t, ready, reducedMotion);
     this.updateHammers(step, ready, reducedMotion);
     this.updateBolts(step);
     this.updateWisps(step, ready);
+  }
+
+  private tracking(): boolean {
+    if (this.wisps.size > 0) return true;
+    for (const orb of this.orbs) if (orb.ownerId !== -1) return true;
+    for (const lantern of this.lanterns) if (lantern.ownerId !== -1) return true;
+    for (const hammer of this.hammers) if (hammer.ownerId !== -1) return true;
+    return false;
   }
 
   /** One pass over the viewed entities: which relic states each one shows.

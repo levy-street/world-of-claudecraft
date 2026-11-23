@@ -190,3 +190,58 @@ describe('Frostjaw Trap', () => {
     expect(traps[0].pos.x).toBeCloseTo(sim.player.pos.x, 1);
   });
 });
+
+describe('trap talents on Bear Trap', () => {
+  it('lets Binding Payload root and slow every enemy in the trigger area', () => {
+    const sim = setup({ 11: 'hun_r11_binding_payload' });
+    sim.castAbility('bear_trap');
+    sim.tick();
+    const trap = trapEntries(sim)[0];
+    const first = addMobAt(sim, trap.pos.x, trap.pos.z);
+    const second = addMobAt(sim, trap.pos.x + 0.5, trap.pos.z);
+
+    advance(sim, 20);
+
+    const bearRooted = (mob: Entity) => mob.auras.some((aura) => aura.id === 'bear_trap_freeze');
+    expect([first, second].filter(bearRooted)).toHaveLength(2);
+    for (const mob of [first, second]) {
+      expect(mob.auras.find((aura) => aura.id === 'bear_trap_slow')?.value).toBe(0.6);
+    }
+    // Only the enemy that sprang the jaws bleeds.
+    const bleeding = [first, second].filter((mob) =>
+      mob.auras.some((aura) => aura.id === 'bear_trap_bleed'),
+    );
+    expect(bleeding).toHaveLength(1);
+  });
+
+  it('roots nobody without Binding Payload', () => {
+    const sim = setup();
+    sim.castAbility('bear_trap');
+    sim.tick();
+    const trap = trapEntries(sim)[0];
+    const first = addMobAt(sim, trap.pos.x, trap.pos.z);
+    advance(sim, 20);
+    expect(first.auras.some((aura) => aura.kind === 'root')).toBe(false);
+    expect(first.auras.find((aura) => aura.id === 'bear_trap_slow')?.value).toBe(0.5);
+  });
+
+  it('links Trapcraft and Chain Reaction to a Bear Trap trigger', () => {
+    const sim = setup({
+      14: 'hun_r14_trapcraft',
+      20: 'hun_r20_chain_reaction',
+    });
+    expect(sim.resolvedAbility('bear_trap')?.cooldown).toBeCloseTo(24, 5);
+    sim.player.resource = 0;
+    sim.player.cooldowns.set('trailbreak', 20);
+    sim.castAbility('bear_trap');
+    sim.tick();
+    const trap = trapEntries(sim)[0];
+    const first = addMobAt(sim, trap.pos.x, trap.pos.z);
+
+    advance(sim, 20);
+
+    expect(sim.player.resource).toBeGreaterThanOrEqual(20);
+    expect(sim.player.cooldowns.get('trailbreak')).toBeLessThanOrEqual(15);
+    expect(first.auras.some((aura) => aura.id.startsWith('hunter_chain_mark'))).toBe(true);
+  });
+});

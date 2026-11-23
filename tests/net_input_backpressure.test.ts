@@ -193,6 +193,31 @@ describe('ClientWorld input send backpressure gate', () => {
     expect(JSON.parse(sent[0])).toEqual({ t: 'cmd', cmd: 'chat' });
   });
 
+  it('flushes queued v2 movement before the Unstuck command despite backpressure', () => {
+    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+    client.movementWireVersion = 2;
+    withWebSocketStub(() => {
+      expect(
+        client.sendMovementFrame(
+          { ct: 0, mi: { ...client.moveInput, forward: true }, facing: Math.PI / 2 },
+          1_000,
+        ),
+      ).toBe(true);
+      expect(sent).toHaveLength(0);
+      ClientWorld.prototype.unstuck.call(client);
+    });
+
+    expect(ws.bufferedAmount).toBe(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+    expect(sent).toHaveLength(2);
+    expect(sentInput(sent, 0)).toMatchObject({
+      t: 'input',
+      seq: 1,
+      ct: 0,
+      mi: expect.objectContaining({ f: 1 }),
+    });
+    expect(JSON.parse(sent[1])).toEqual({ t: 'cmd', cmd: 'unstuck' });
+  });
+
   it('queues a v2 jump edge and flushes it in client tick order on recovery', () => {
     const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
     client.movementWireVersion = 2;

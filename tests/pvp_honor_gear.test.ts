@@ -4,6 +4,7 @@ import {
   FURY_NPC,
   FURY_STOCK,
   HONOR_QUARTERMASTER_STOCK,
+  HONOR_VENDOR_STOCK,
   WARFARE_ITEMS,
   WARFARE_JEWELRY_STAT_FRACTION,
   WARFARE_RATING_FRACTION,
@@ -23,25 +24,30 @@ import {
   itemStaminaModel,
   primaryStatSum,
 } from '../src/sim/item_level';
+import * as items from '../src/sim/items';
 import { LAUNCH_PAPERDOLL_SLOTS } from '../src/sim/launch_paperdoll_slots';
 import { pvpFractionsFromRatings } from '../src/sim/pvp';
-import type { EquipSlot, PlayerClass } from '../src/sim/types';
+import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
+import type { Entity, EquipSlot, PlayerClass } from '../src/sim/types';
 import { expectedWarfareStamina } from './helpers/warfare_stamina';
 
 /** The item level the whole WARFARE catalog sits at after the retune. */
 const WARFARE_ILVL = 31;
 
+// Season 1 sells for gold (copper), owner rule 2026-10-02: the seven armor
+// pieces of a family come to 100 gold; jewelry and weapons at the same rate.
 const SLOT_PRICES: Record<string, number> = {
-  mainhand: 1_200,
-  helmet: 900,
-  neck: 400,
-  shoulder: 700,
-  chest: 1_200,
-  waist: 450,
-  legs: 1_050,
-  gloves: 550,
-  feet: 550,
-  ring: 275,
+  mainhand: 220_000,
+  helmet: 170_000,
+  neck: 70_000,
+  shoulder: 130_000,
+  chest: 220_000,
+  waist: 90_000,
+  legs: 190_000,
+  gloves: 100_000,
+  feet: 100_000,
+  ring: 50_000,
 };
 
 const SUPPORTED_ITEM_SLOTS = [
@@ -203,12 +209,17 @@ describe('FURY WARFARE stock', () => {
     // chapel step (7 yd from Brother Aldric) for the town's eastern edge. The
     // placement still derives from EASTBROOK_NPC_PLACEMENTS_BY_ID.fury, so his
     // facing moved with him.
-    expect(NPCS.fury.pos).toEqual({ x: 16, z: -78 });
-    expect(NPCS.fury.facing).toBe(-2.2455372690184494);
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // smithy's forge shelter took the north road's old line, so the road swings
+    // west round it over his stand and he keeps the town's edge a few strides
+    // on, between that road and the coast track.
+    expect(NPCS.fury.pos).toEqual({ x: 21, z: -83.5 });
+    expect(NPCS.fury.facing).toBe(-2.0570389598824015);
     expect(NPCS.fury.dynamic).toBe(true);
     // The entry tier first, then the two honor trinkets, then Warfare Season 2
-    // (pinned as the tail in warfare_season2.test.ts).
-    expect(NPCS.fury.vendorItems).toEqual(HONOR_QUARTERMASTER_STOCK);
+    // (pinned as the gear tail in warfare_season2.test.ts), then the buddy.
+    expect(NPCS.fury.vendorItems).toEqual(HONOR_VENDOR_STOCK);
+    expect(HONOR_VENDOR_STOCK).toEqual([...HONOR_QUARTERMASTER_STOCK]);
     expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual(FURY_STOCK);
     expect(
       HONOR_QUARTERMASTER_STOCK.slice(
@@ -287,7 +298,7 @@ const WARFARE_LINES: Record<string, [number, number]> = {
 };
 
 describe('FURY WARFARE item budgets', () => {
-  it('makes every offer a soulbound, honor-priced item-level-31 epic with full WARFARE', () => {
+  it('makes every offer a soulbound, gold-priced item-level-31 epic with full WARFARE', () => {
     for (const id of FURY_STOCK) {
       const item = ITEMS[id];
       // Ratings and the fraction discount below both key off the FULL,
@@ -305,7 +316,8 @@ describe('FURY WARFARE item budgets', () => {
       expect(item.requiredLevel, id).toBe(20);
       expect(item.soulbound, id).toBe(true);
       expect(item.sellValue, id).toBe(0);
-      expect(item.buyValue, id).toBeUndefined();
+      // The gold price itself is pinned per slot below (SLOT_PRICES).
+      expect(item.buyValue, id).toBeGreaterThan(0);
       expect(itemSourceLevel(id), id).toBe(WARFARE_SOURCE_LEVEL);
       expect(itemLevel(item), id).toBe(31);
       // WARFARE gear carries a deliberate primary-stat DISCOUNT against a same-slot
@@ -339,7 +351,8 @@ describe('FURY WARFARE item budgets', () => {
       // rating fraction is 1.0 and unchanged, so a diff here means it drifted.
       expect(item.pvpOffenseRating, id).toBe(budget);
       expect(item.pvpDefenseRating, id).toBe(budget);
-      expect(item.priceHonor, id).toBe(SLOT_PRICES[item.slot ?? '']);
+      expect(item.buyValue, id).toBe(SLOT_PRICES[item.slot ?? '']);
+      expect(item.priceHonor, `${id} is no longer an honor purchase`).toBeUndefined();
     }
   });
 
@@ -501,6 +514,52 @@ describe('honor trinkets sold beside the WARFARE kit', () => {
       expect(item.pvpDefenseRating, id).toBe(Math.round(line * WARFARE_RATING_FRACTION));
       expect(item.pvpOffenseRating, id).toBe(13);
       expect(item.set, id).toBeUndefined();
+    }
+  });
+});
+
+describe('Season 1 sells for gold at the quartermaster', () => {
+  it('costs exactly 100 gold for each seven-piece family', () => {
+    const families = new Set(FURY_STOCK.map((id) => ITEMS[id].set).filter((set) => set));
+    expect(families.size).toBe(5);
+    for (const set of families) {
+      const ids = FURY_STOCK.filter((id) => ITEMS[id].set === set);
+      expect(ids, `${set}`).toHaveLength(7);
+      const total = ids.reduce((sum, id) => sum + (ITEMS[id].buyValue ?? 0), 0);
+      expect(total, `${set}`).toBe(1_000_000);
+    }
+  });
+
+  it('debits gold, never Honor, and needs no Honor at all', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    const pid = sim.addPlayer('warrior', 'Buyer');
+    sim.setPlayerLevel(20, pid);
+    const vendor = sim.entities.get(FURY_ENTITY_ID) as Entity;
+    const player = sim.entities.get(pid) as Entity;
+    player.pos.x = vendor.pos.x;
+    player.pos.z = vendor.pos.z;
+    const meta = ctx.players.get(pid) as { honor: number; copper: number; inventory: unknown[] };
+    meta.inventory.length = 0;
+    meta.honor = 0;
+    meta.copper = 200_000;
+    items.buyItem(ctx, vendor.id, 'furyforged_warhelm', pid);
+    expect(sim.countItem('furyforged_warhelm', pid)).toBe(1);
+    expect(meta.copper).toBe(200_000 - SLOT_PRICES.helmet);
+    expect(meta.honor).toBe(0);
+    // Short of the gold, the purchase is refused whatever Honor is banked.
+    meta.honor = 100_000;
+    meta.copper = SLOT_PRICES.chest - 1;
+    items.buyItem(ctx, vendor.id, 'furyforged_warplate', pid);
+    expect(sim.countItem('furyforged_warplate', pid)).toBe(0);
+    expect(meta.honor).toBe(100_000);
+  });
+
+  it('keeps the two Warfare trinkets on Honor', () => {
+    for (const id of WARFARE_TRINKET_STOCK) {
+      expect(HONOR_QUARTERMASTER_STOCK, id).toContain(id);
+      expect(ITEMS[id].priceHonor, id).toBe(800);
+      expect(ITEMS[id].buyValue, id).toBeUndefined();
     }
   });
 });

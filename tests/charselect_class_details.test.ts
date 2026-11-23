@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, CLASSES } from '../src/sim/content/classes';
+import { SPEC_PRIMARY_STAT } from '../src/sim/content/spec_primary_stat';
 import { TALENTS } from '../src/sim/content/talents';
 import type { PlayerClass } from '../src/sim/types';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES, SPEC_CARD_INFO } from '../src/ui/class_details_data';
@@ -63,8 +64,8 @@ describe('specialization card metadata', () => {
       for (const spec of classTalents.specs) {
         const card = SPEC_CARD_INFO[cls][spec.id];
         expect(card, `missing spec card for ${cls}:${spec.id}`).toBeTruthy();
-        expect(['str', 'agi', 'int', 'spi', 'sta'], `${cls}:${spec.id}`).toContain(
-          card.primaryStat,
+        expect(['str', 'agi', 'int'], `${cls}:${spec.id}`).toContain(
+          SPEC_PRIMARY_STAT[cls][spec.id],
         );
         expect(['low', 'medium', 'high'], `${cls}:${spec.id}`).toContain(card.complexity);
         expect(card.examples.length, `${cls}:${spec.id}`).toBeGreaterThanOrEqual(3);
@@ -101,7 +102,7 @@ describe('specialization card metadata', () => {
 
   it('keeps the mage cards int-scaled', () => {
     for (const id of ['fire', 'frost', 'arcane']) {
-      expect(SPEC_CARD_INFO.mage[id].primaryStat, id).toBe('int');
+      expect(SPEC_PRIMARY_STAT.mage[id], id).toBe('int');
     }
   });
 

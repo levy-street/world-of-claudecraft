@@ -85,11 +85,34 @@ export function indexClip(root, name) {
       node,
       path,
       times: sampler.getInput().getArray(),
-      values: sampler.getOutput().getArray(),
+      values: floatValues(sampler.getOutput()),
       size: path === 'rotation' ? 4 : 3,
     });
   }
   return map;
+}
+
+/**
+ * An output accessor's values as real numbers. A meshopt-built rig stores rotations as
+ * normalized integers (KHR_mesh_quantization: SHORT or BYTE, normalized), which read raw
+ * would be quaternions of length ~32767; a float accessor passes through untouched.
+ */
+function floatValues(accessor) {
+  const raw = accessor.getArray();
+  if (!accessor.getNormalized() || raw instanceof Float32Array) return raw;
+  const scale =
+    raw instanceof Int16Array
+      ? 32767
+      : raw instanceof Int8Array
+        ? 127
+        : raw instanceof Uint16Array
+          ? 65535
+          : raw instanceof Uint8Array
+            ? 255
+            : 1;
+  const out = new Float32Array(raw.length);
+  for (let i = 0; i < raw.length; i++) out[i] = Math.max(-1, raw[i] / scale);
+  return out;
 }
 
 /** Sample one donor channel at absolute time t (clamped, linear/slerp). */

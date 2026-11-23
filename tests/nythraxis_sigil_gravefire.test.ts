@@ -563,6 +563,12 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     expect(st.gravefires).toHaveLength(1);
     expect(st.soulRendMarks.length).toBeGreaterThan(0);
     tickSim(sim, NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS);
+    // The live Soul Rend marks hold the eruption too; clear them so the arm
+    // resumes here (the gap after a detonation is pinned in
+    // nythraxis_spike_fire_rules.test.ts).
+    expect(st.eruptionPoints).toEqual([]);
+    st.soulRendMarks = [];
+    tickSim(sim, DT);
     expect(st.eruptionPoints!.length).toBeGreaterThan(0);
     tickSim(sim, 2);
     expect(st.sigil).not.toBeNull();

@@ -29,9 +29,11 @@ export interface DiscordSpecialRole {
 
 // Matching is by role NAME, so a guild-side rename silently breaks the link
 // (that is how Admin and Artist dropped out of the game); every entry now
-// carries the rename history and common variants as aliases. The admin color
-// stays on the staff green because the guild's Admin role is the renamed Mods
-// role and a Discord rename keeps the role's color.
+// carries the rename history and common variants as aliases. The guild renamed
+// Senior Mods to Sentinel and Junior Mods to Observer, and the guild's Admin
+// role deliberately has no tag of its own: an Admin surfaces in game as a
+// Sentinel, so the role names stay aliases of that entry. The keys never change
+// with a rename because they are stored per linked account.
 export const DISCORD_SPECIAL_ROLES: readonly DiscordSpecialRole[] = [
   {
     key: 'levyst',
@@ -39,14 +41,6 @@ export const DISCORD_SPECIAL_ROLES: readonly DiscordSpecialRole[] = [
     aliases: ['Levy Street'],
     color: '#ff6b6b',
     priority: 11,
-    chatTag: true,
-  },
-  {
-    key: 'admin',
-    name: 'Admin',
-    aliases: ['Admins', 'Administrator', 'Administrators'],
-    color: '#57d98a',
-    priority: 10,
     chatTag: true,
   },
   {
@@ -67,8 +61,20 @@ export const DISCORD_SPECIAL_ROLES: readonly DiscordSpecialRole[] = [
   },
   {
     key: 'seniormods',
-    name: 'Senior Mods',
-    aliases: ['Senior Mod', 'Senior Moderator', 'Senior Moderators', 'Sr Mod', 'Sr Mods'],
+    name: 'Sentinel',
+    aliases: [
+      'Sentinels',
+      'Senior Mods',
+      'Senior Mod',
+      'Senior Moderator',
+      'Senior Moderators',
+      'Sr Mod',
+      'Sr Mods',
+      'Admin',
+      'Admins',
+      'Administrator',
+      'Administrators',
+    ],
     color: '#2eb872',
     priority: 7,
     chatTag: true,
@@ -83,8 +89,16 @@ export const DISCORD_SPECIAL_ROLES: readonly DiscordSpecialRole[] = [
   },
   {
     key: 'juniormods',
-    name: 'Junior Mods',
-    aliases: ['Junior Mod', 'Junior Moderator', 'Junior Moderators', 'Jr Mod', 'Jr Mods'],
+    name: 'Observer',
+    aliases: [
+      'Observers',
+      'Junior Mods',
+      'Junior Mod',
+      'Junior Moderator',
+      'Junior Moderators',
+      'Jr Mod',
+      'Jr Mods',
+    ],
     color: '#9ce8b6',
     priority: 5,
     chatTag: true,

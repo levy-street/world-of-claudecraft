@@ -24,6 +24,12 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.landmarks',
   'views.persistent-portals',
   'views.nearby',
+  // Every translucent character look draws the veil: a character saved dead
+  // (it enters as a released spirit), every death, the Pale Keeper and the
+  // quest visions, Ghost Wolf, the Veilbound March, stealth, Moonkin and Soul
+  // Rend. Skipped, each would wait behind the effect gate, and Soul Rend,
+  // never deferred, would link live in the raid frame.
+  'entities.spirit-veil-family',
   'world.settle-state',
   'post.initial-frame',
   'textures.scene',
@@ -405,6 +411,8 @@ export interface ProgramContentMeshShape {
   /** An instanceColor buffer flips USE_INSTANCING_COLOR into the key. */
   hasInstanceColor?: boolean;
   isBatchedMesh?: boolean;
+  hasInstanceMorph?: boolean;
+  hasBatchColor?: boolean;
   /** morphAttributes.position PRESENT: three defines USE_MORPHTARGETS on
    *  presence, even for an empty array, so present-with-zero and absent are
    *  distinct variants. */
@@ -450,7 +458,7 @@ export function prewarmProgramContentKeys(
 ): string[] {
   const token =
     `${shape.isSkinnedMesh ? 's' : 'm'}${shape.isInstancedMesh ? 'i' : ''}` +
-    `${shape.hasInstanceColor ? 'ic' : ''}${shape.isBatchedMesh ? 'b' : ''}` +
+    `${shape.hasInstanceColor ? 'ic' : ''}${shape.hasInstanceMorph ? 'im' : ''}${shape.isBatchedMesh ? 'b' : ''}${shape.hasBatchColor ? 'bc' : ''}` +
     `${shape.hasMorphPositions ? 'P' : ''}p${shape.morphTargetCount ?? 0}` +
     `n${shape.morphNormalCount ?? 0}k${shape.morphColorCount ?? 0}` +
     `${shape.hasTangents ? 't' : ''}${shape.hasNormals ? 'N' : ''}` +

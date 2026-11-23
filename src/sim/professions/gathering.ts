@@ -22,6 +22,7 @@ import {
 import { ITEMS } from '../data';
 import { gatheredMaterialSources } from '../material_gatherer';
 import { forceDismount } from '../mounts';
+import { gatherNodesFor, type ObjectMoves } from '../moved_objects';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -216,8 +217,10 @@ export function effectiveGradeToolTier(
   ).outcome.gradeToolTier;
 }
 
-export function gatherNodeById(nodeId: string): GatherNodeDef | undefined {
-  return GATHER_NODES.find((n) => n.id === nodeId);
+export function gatherNodeById(nodeId: string, moves?: ObjectMoves): GatherNodeDef | undefined {
+  // A Studio map may move a node (moved_objects.ts): the same row, at its
+  // new spot, so the harvest reach is measured from where the vein stands.
+  return gatherNodesFor(moves, GATHER_NODES).find((n) => n.id === nodeId);
 }
 
 // Material rarity roll (#1122): the standard item rarity ladder (ItemDef['quality'],
@@ -551,7 +554,7 @@ export function harvestNode(
     ctx.error(meta.entityId, "You can't do that while shapeshifted.");
     return false;
   }
-  const node = gatherNodeById(nodeId);
+  const node = gatherNodeById(nodeId, ctx.objectMoves);
   if (!node) {
     ctx.error(meta.entityId, 'That resource node does not exist.');
     return false;
@@ -727,7 +730,7 @@ export function useGatherToolItem(
   let best: GatherNodeDef | null = null;
   let bestDist = Infinity;
   let bestReady = false;
-  for (const node of GATHER_NODES) {
+  for (const node of gatherNodesFor(ctx.objectMoves, GATHER_NODES)) {
     if (node.type !== nodeType) continue;
     const d = distToNode(p.pos, node.pos);
     if (d > INTERACT_RANGE) continue;
@@ -778,7 +781,7 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // grant actually mints, confirmed or not.
   const effectUseConfirmed = p.gatherCastEffectConfirmed;
   p.gatherCastEffectConfirmed = false;
-  const node = gatherNodeById(nodeId);
+  const node = gatherNodeById(nodeId, ctx.objectMoves);
   // Defensive: the id was validated at cast start and content is static.
   if (!node) return;
   if (distToNode(p.pos, node.pos) > INTERACT_RANGE) {

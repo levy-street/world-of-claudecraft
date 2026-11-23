@@ -15,6 +15,93 @@ export interface WebGLContextHolder {
 
 const holders = new Set<WebGLContextHolder>();
 const normalizedInfoLogContexts = new WeakSet<object>();
+const teardowns = new Set<() => void>();
+const disposablePages = new WeakSet<object>();
+const disposablePagesInstalled = new WeakSet<object>();
+
+/**
+ * Mark a renderer-heavy document as disposable. Editor/playtest pages must not
+ * survive in the back-forward cache: even after JS objects become unreachable,
+ * Chromium's renderer allocator can retain their decoded model/texture pages
+ * (often swapped out) in the same process across repeated round trips.
+ *
+ * The unload listener keeps these pages out of the bfcache on browsers that use
+ * it as an eligibility signal. The persisted-pagehide branch in
+ * installWebGLContextRelease is the safety net for browsers that still cache
+ * the page; a persisted restore is reloaded because its WebGL resources were
+ * deliberately retired while it was frozen.
+ */
+export function markPageDisposable(
+  target: Pick<EventTarget, 'addEventListener'> = window,
+  locationTarget: Pick<Location, 'reload'> = window.location,
+): void {
+  const key = target as object;
+  disposablePages.add(key);
+  if (disposablePagesInstalled.has(key)) return;
+  disposablePagesInstalled.add(key);
+  target.addEventListener('unload', () => {
+    // Presence of the handler is intentional: it disqualifies renderer-heavy
+    // editor/playtest documents from the back-forward cache where supported.
+  });
+  target.addEventListener('pageshow', (e) => {
+    if ((e as PageTransitionEvent).persisted) locationTarget.reload();
+  });
+}
+
+/**
+ * Register an arbitrary teardown to run alongside the WebGL context release on
+ * real page teardown (see installWebGLContextRelease). The editor<->playtest
+ * navigation ping-pong is a full document teardown each hop; browsers reclaim
+ * AudioContexts (like GL contexts) lazily and cap them, so the audio engines
+ * register their close() here to hand the audio threads/buffers back at once
+ * instead of piling up across hops. Returns an unregister function.
+ */
+export function registerPageTeardown(fn: () => void): () => void {
+  teardowns.add(fn);
+  return () => {
+    teardowns.delete(fn);
+  };
+}
+
+/** Run every registered teardown once; per-callback failures are swallowed. */
+export function runPageTeardowns(): void {
+  // LIFO mirrors construction order: renderers and views register after the
+  // shared asset modules they consume, so they retire before those caches are
+  // emptied. This also matches ordinary nested resource ownership.
+  const pending = [...teardowns].reverse();
+  teardowns.clear();
+  for (const fn of pending) {
+    try {
+      fn();
+    } catch {
+      /* best-effort teardown */
+    }
+  }
+}
+
+/**
+ * Fully retire the current document and replace its history entry. Editor and
+ * playtest pages are extremely large; assigning location leaves each previous
+ * document eligible for the back-forward cache, retaining its map, decoded
+ * models, canvases, workers, and JS heap. Replacement prevents the round-trip
+ * workflow from stacking retired documents while preserving its explicit Back
+ * to Editor button.
+ */
+export function retirePageAndReplace(
+  url: string,
+  target: Pick<Location, 'replace'> = window.location,
+): void {
+  releaseTrackedWebGLContexts();
+  runPageTeardowns();
+  target.replace(url);
+}
+
+/** Retire a short-lived renderer-heavy tab before closing it. */
+export function retirePageAndClose(target: Pick<Window, 'close'> = window): void {
+  releaseTrackedWebGLContexts();
+  runPageTeardowns();
+  target.close();
+}
 
 /**
  * Three r165 calls `.trim()` directly on WebGL info logs, although the WebGL
@@ -90,18 +177,20 @@ export function releaseTrackedWebGLContexts(): void {
 
 /**
  * Wire context release to the page-teardown event. `pagehide` fires on reload,
- * navigation, and tab close, and unlike `unload` it does not disqualify the page
- * from the bfcache. Call once at startup.
+ * navigation, and tab close. Call once at startup.
  *
- * Release only on a real teardown (`persisted === false`). When the page is
- * frozen into the bfcache (`persisted === true`) the contexts must survive:
- * `dispose()` is terminal and nothing rebuilds them, so a bfcache restore
- * (`pageshow` with `persisted`) has to come back to live canvases, not dead ones.
+ * Ordinary pages retain their contexts when frozen into the bfcache. Pages
+ * marked by markPageDisposable release even on a persisted pagehide and reload
+ * if the browser nevertheless restores them.
  */
 export function installWebGLContextRelease(
   target: Pick<EventTarget, 'addEventListener'> = window,
 ): void {
   target.addEventListener('pagehide', (e) => {
-    if (!(e as PageTransitionEvent).persisted) releaseTrackedWebGLContexts();
+    const persisted = (e as PageTransitionEvent).persisted;
+    if (!persisted || disposablePages.has(target as object)) {
+      releaseTrackedWebGLContexts();
+      runPageTeardowns();
+    }
   });
 }

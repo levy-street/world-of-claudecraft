@@ -12,6 +12,7 @@
 // after a skin swap.
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { landWocBodies } from './helpers/woc_streamed';
 
 // player_paladin has no `show` allowlist (so a plain, non-skinned stub mesh
 // stays visible through assembleModel's accessory filter) and a real
@@ -46,7 +47,9 @@ function stubSourceClip(name: string): THREE.AnimationClip {
 function stubGltf() {
   const scene = new THREE.Group();
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
-  mesh.name = 'body';
+  // (named as the paladin's body node; on the fixed rig this test builds, every
+  // mesh of the body takes the skin atlas)
+  mesh.name = 'Character_Body';
   scene.add(mesh);
   const emissive = new THREE.Mesh(
     new THREE.BoxGeometry(0.2, 0.2, 0.2),
@@ -89,10 +92,23 @@ describe('far-LOD mesh follows the selected body skin', () => {
       ),
       releaseGltf: vi.fn(),
     }));
-    const { charactersReady, prepareVisual } = await import('../src/render/characters/assets');
+    // A FIXED rig is what this rule is about: a body whose far mesh is its key's own bake,
+    // built with the body (a mob, an NPC, the Combat Mech). The paladin def is lent to it
+    // without its WOC manifest: a WOC body bakes its far mesh per look, on its far crossing
+    // (tests/woc_far_equipment.test.ts), and builds none at construction.
+    const manifest = await import('../src/render/characters/manifest');
+    manifest.VISUALS[VISUAL_KEY] = { ...manifest.VISUALS[VISUAL_KEY], wocCharacter: undefined };
+    const assets = await import('../src/render/characters/assets');
+    const { charactersReady, prepareVisual } = assets;
     await charactersReady();
+    await landWocBodies(assets, [VISUAL_KEY]);
     const { CharacterVisual } = await import('../src/render/characters/visual');
     const { SKINS } = await import('../src/render/characters/manifest');
+    // The WOC bodies ship no chromas (every class SKINS row is null since the
+    // 2026-09-18 sets), and this rule is about the far mesh following an
+    // alternate atlas, so lend the row the KayKit paladin's old alt atlas: the
+    // mocked loader tags textures by url and never reads the file.
+    SKINS[VISUAL_KEY] = [null, 'textures/skins/paladin/alt_a.png'];
 
     const altSkinUrl = SKINS[VISUAL_KEY]?.[1];
     expect(altSkinUrl).toBeTruthy();
@@ -108,7 +124,9 @@ describe('far-LOD mesh follows the selected body skin', () => {
       let map: THREE.Texture | null = null;
       visual.root.traverse((o) => {
         const mesh = o as THREE.Mesh;
-        if (mesh.isMesh && mesh.userData.bodyMesh) {
+        // every body mesh takes the atlas unless it opts out (a rig that marks its
+        // atlas targets says so with skinAtlasTarget: false on the rest)
+        if (mesh.isMesh && mesh.userData.bodyMesh && mesh.userData.skinAtlasTarget !== false) {
           map = (mesh.material as THREE.MeshStandardMaterial).map;
         }
       });

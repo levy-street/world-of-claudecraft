@@ -345,12 +345,12 @@ describe('tooltip_paint.ts consumes the core (source pins)', () => {
   });
 
   it('the mousemove reposition path reuses the cached box through the same core', () => {
-    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const hud = readFileSync(new URL('../src/ui/tooltip_binding.ts', import.meta.url), 'utf8');
     const start = hud.indexOf("el.addEventListener('mousemove', (e) => {");
     expect(start).toBeGreaterThan(-1);
     const body = hud.slice(start, hud.indexOf("el.addEventListener('mouseleave'", start));
     expect(body).toMatch(
-      /tooltipPlacementAt\(\s*e\.clientX,\s*e\.clientY,\s*\{ w: ttW, h: ttH \},\s*this\.tooltipViewport\(\),?\s*\)/,
+      /tooltipPlacementAt\(\s*e\.clientX,\s*e\.clientY,\s*\{ w: ttW, h: ttH \},\s*deps\.tooltipViewport\(\),?\s*\)/,
     );
     expect(body).not.toContain('Math.min(window.innerWidth');
     // No layout read on the hot path: the cached size, never a re-measure.

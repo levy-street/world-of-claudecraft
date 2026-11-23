@@ -1,0 +1,9 @@
+{
+  "urls": [
+    "http://localhost:5194/ui/items/rift_watchers_band.webp",
+    "http://localhost:5194/ui/items/rift_surveyors_satchel.webp",
+    "http://localhost:5194/ui/items/riftwalkers_tunic.webp",
+    "http://localhost:5194/ui/items/riftwarden_voidblade.webp"
+  ],
+  "allDecoded": true
+}

@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { bashExecutable, bashFixtureEnv, bashPath } from './helpers/bash_fixture';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative: string) => fs.readFileSync(path.join(root, relative), 'utf8');
@@ -56,21 +57,22 @@ describe('Codex project configuration', () => {
       fs.mkdirSync(path.join(fixture, '.codex/hooks'), { recursive: true });
       fs.mkdirSync(path.join(fixture, '.codex/agents'), { recursive: true });
       fs.mkdirSync(path.join(fixture, 'src'), { recursive: true });
-      fs.copyFileSync(
-        path.join(root, '.claude/hooks/qa-stop.sh'),
+      fs.writeFileSync(
         path.join(fixture, '.claude/hooks/qa-stop.sh'),
+        read('.claude/hooks/qa-stop.sh').replace(/\r\n/g, '\n'),
       );
-      fs.copyFileSync(
-        path.join(root, '.codex/hooks/qa-stop.sh'),
+      fs.writeFileSync(
         path.join(fixture, '.codex/hooks/qa-stop.sh'),
+        read('.codex/hooks/qa-stop.sh').replace(/\r\n/g, '\n'),
       );
       spawnSync('git', ['init', '--quiet', fixture], { encoding: 'utf8' });
       const agent = path.join(fixture, '.codex/agents/new.toml');
       fs.writeFileSync(agent, 'name = "clean"\n');
 
       const run = (active: boolean) =>
-        spawnSync('bash', [path.join(fixture, '.codex/hooks/qa-stop.sh')], {
+        spawnSync(bashExecutable(), [bashPath(path.join(fixture, '.codex/hooks/qa-stop.sh'))], {
           cwd: fixture,
+          env: bashFixtureEnv(),
           input: JSON.stringify({ stop_hook_active: active }),
           encoding: 'utf8',
         });
@@ -106,7 +108,8 @@ describe('Codex project configuration', () => {
       expect(JSON.parse(trackedBlocked.stdout).reason).toContain('leftover debugger');
       expect(run(true).stdout).toBe('');
     } finally {
-      fs.rmSync(fixture, { recursive: true, force: true });
+      // Git antivirus/indexer handles can linger briefly on Windows after exit.
+      fs.rmSync(fixture, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     }
   });
 

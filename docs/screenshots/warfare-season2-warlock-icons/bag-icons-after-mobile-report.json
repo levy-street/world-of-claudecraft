@@ -1,0 +1,25 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_affliction_helmet.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_affliction_shoulder.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_affliction_chest.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_affliction_legs.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_affliction_gloves.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_demonology_helmet.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_demonology_shoulder.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_demonology_chest.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_demonology_legs.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_demonology_gloves.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_destruction_helmet.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_destruction_shoulder.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_destruction_chest.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_destruction_legs.webp",
+    "http://localhost:5194/ui/items/vanguard_warlock_destruction_gloves.webp"
+  ],
+  "allDecoded": true
+}

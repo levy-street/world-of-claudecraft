@@ -47,6 +47,12 @@ export class MapIO {
     this.store = new MapStore(storage);
   }
 
+  /** Hydrate the map store (IndexedDB + one-time localStorage migration).
+   *  Await once at boot before the first list/load; see MapStore.ready(). */
+  ready(): Promise<void> {
+    return this.store.ready();
+  }
+
   // ---- local <-> server linkage --------------------------------------------
 
   private readStoredLinks(): Record<string, ServerLink> {
@@ -165,6 +171,9 @@ export class MapIO {
   }
 
   draftSave(map: CustomMap): boolean {
+    if (this.store.idbActive) {
+      return this.store.draftPut(map.meta.id, serializeMapCompact(map), map.meta.updatedAt);
+    }
     if (!this.storage) return false;
     this.migrateLegacyDraft();
     try {
@@ -180,6 +189,10 @@ export class MapIO {
 
   /** The most recently autosaved draft across every map, or null. */
   draftLoad(): CustomMap | null {
+    if (this.store.idbActive) {
+      const raw = this.store.draftNewest();
+      return raw ? parseMap(raw) : null;
+    }
     if (!this.storage) return null;
     this.migrateLegacyDraft();
     try {
@@ -198,8 +211,33 @@ export class MapIO {
     }
   }
 
+  /** A specific map's autosave draft, used when returning from playtest. */
+  draftLoadById(mapId: string): CustomMap | null {
+    if (this.store.idbActive) {
+      const raw = this.store.draftGet(mapId);
+      return raw ? parseMap(raw) : null;
+    }
+    if (!this.storage) return null;
+    this.migrateLegacyDraft();
+    try {
+      const raw = this.storage.getItem(DRAFT_KEY_PREFIX + mapId);
+      if (raw) return parseMap(raw);
+      // Legacy slot fallback (migration blocked by quota).
+      const legacy = this.storage.getItem(LEGACY_DRAFT_KEY);
+      if (!legacy) return null;
+      const map = parseMap(legacy);
+      return map?.meta.id === mapId ? map : null;
+    } catch {
+      return null;
+    }
+  }
+
   /** Clear ONLY this map's draft slot; other maps keep their autosaves. */
   draftClear(mapId: string): void {
+    if (this.store.idbActive) {
+      this.store.draftDelete(mapId);
+      return;
+    }
     if (!this.storage) return;
     this.migrateLegacyDraft();
     try {

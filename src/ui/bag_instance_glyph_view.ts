@@ -22,6 +22,7 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { isPlainCopy } from '../sim/item_plain_copy';
+import type { MaterialComposition } from '../sim/material_sources';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
 import type { ItemInstancePayload } from '../sim/types';
 
@@ -35,15 +36,18 @@ export type BagInstanceGlyphKind =
 
 /** The single glyph kind for one bag stack's payload, or null for a plain
  *  fungible stack (no payload, no corner glyph). */
-export function bagInstanceGlyphKind(instance?: ItemInstancePayload): BagInstanceGlyphKind {
-  // A tracked epic or legendary copy carries a guid and provenance from the
-  // moment it is minted (src/sim/item_tracking.ts); that identity says nothing
-  // about what the copy IS, so it earns no corner glyph on its own.
-  if (isPlainCopy(instance)) return null;
+export function bagInstanceGlyphKind(
+  instance?: ItemInstancePayload,
+  sources?: MaterialComposition,
+): BagInstanceGlyphKind {
+  if (instance?.rolled?.masterwork === true) return 'masterwork';
+  if (instance && isEnchantedInstance(instance)) return 'enchanted';
+  if (
+    instance?.signer !== undefined ||
+    sources?.some(({ source, count }) => count > 0 && source.signer !== undefined)
+  )
+    return 'signed';
   if (!instance) return null;
-  if (instance.rolled?.masterwork === true) return 'masterwork';
-  if (isEnchantedInstance(instance)) return 'enchanted';
-  if (instance.signer !== undefined) return 'signed';
   if (instance.bindOnTrade === true || instance.boundTo !== undefined) return 'bound';
   return 'generic';
 }

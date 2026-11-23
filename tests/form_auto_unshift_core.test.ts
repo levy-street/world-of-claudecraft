@@ -33,6 +33,7 @@ const AUTO_UNSHIFTING_DRUID_ABILITIES = [
   'overbloom',
   'regrowth',
   'rejuvenation',
+  'spore_burst',
   'starfire',
   'sunlance',
   'swiftmend',

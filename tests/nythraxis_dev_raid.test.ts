@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
+import { NYTHRAXIS_BONE_STORM_ENABLED } from '../src/sim/nythraxis_bone_storm';
 import {
   isNythraxisDevMechanic,
   NYTHRAXIS_ARENA_ID,
@@ -181,13 +182,18 @@ describe('/dev nythraxisraid', () => {
     expect(st.deathlessCastRemaining).toBe(0);
     expect(st.deathlessStunRemaining).toBeGreaterThan(0);
     for (let i = 0; i < 20 * 10; i++) sim.tick();
-    // Phase 3 and its storm, then the clock.
+    // Phase 3, then the clock. Bone Storm is retired from play
+    // (NYTHRAXIS_BONE_STORM_ENABLED), so the storm poke refuses and no
+    // storm begins.
     say('/dev nyx phase3');
     for (let i = 0; i < 20 * 8 && st.phase !== 3; i++) sim.tick();
     expect(st.phase).toBe(3);
     say('/dev nyx storm');
+    expect(errors().some((e) => /Bone Storm is retired from play/.test(e.text ?? ''))).toBe(
+      !NYTHRAXIS_BONE_STORM_ENABLED,
+    );
     for (let i = 0; i < 20 * 8 && !st.boneStorm; i++) sim.tick();
-    expect(st.boneStorm).not.toBeNull();
+    expect(Boolean(st.boneStorm)).toBe(NYTHRAXIS_BONE_STORM_ENABLED);
     say('/dev nyx enrage 1');
     for (let i = 0; i < 20 * 2; i++) sim.tick();
     expect(boss.auras.some((a: { name: string }) => a.name === 'The Crown Endures')).toBe(true);

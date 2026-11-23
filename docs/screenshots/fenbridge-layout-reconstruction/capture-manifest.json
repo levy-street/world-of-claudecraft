@@ -1,0 +1,2320 @@
+{
+  "generatedAt": "2026-10-22T23:41:50.125Z",
+  "axisConvention": {
+    "screenRight": "+X (World West)",
+    "screenLeft": "-X (World East)",
+    "screenDown": "+Z (World North)",
+    "screenUp": "-Z (World South)",
+    "cameraUpVector": [
+      0,
+      0,
+      -1
+    ],
+    "formula": {
+      "px": "((x - xMin) / (xMax - xMin)) * width",
+      "py": "((z - zMin) / (zMax - zMin)) * height"
+    }
+  },
+  "sourceHashes": {
+    "duallam": "167b46b95c8797bca65df100955d5b6a209263fae56c0bc264c794bafa242d51",
+    "mirefen": "c32c25a76325ddcbce3c04ff41721536cb38e79e1f0c07ea84223853fad4c9d6",
+    "mirefenStandalone": "498fb76dd290c8ba7647f4f54573a2daaa91227159bf3d89885d0e1a593c25d7",
+    "combined": "0b753e684eee666c1bab9239970446521d0f10429409d7a1dda9052502bd382b"
+  },
+  "datasets": {
+    "target-before": {
+      "overview": {
+        "id": "overview",
+        "label": "Overview (130x130 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -10,
+        "centerZ": 315,
+        "spanYards": 130,
+        "xMin": -75,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -10,
+            180,
+            315
+          ],
+          "target": [
+            -10,
+            0,
+            315
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 1181.5385,
+              "projPy": 834.9538,
+              "formPx": 1181.5385,
+              "formPy": 834.9538,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 1364.2831,
+              "projPy": 387.5446,
+              "formPx": 1364.2831,
+              "formPy": 387.5446,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 926.3262,
+              "projPy": 781.3908,
+              "formPx": 926.3262,
+              "formPy": 781.3908,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 1382.4,
+              "projPy": 1203.5938,
+              "formPx": 1382.4,
+              "formPy": 1203.5938,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 437.185,
+              "projPy": 1315.4304,
+              "formPx": 437.185,
+              "formPy": 1315.4304,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-sw": {
+        "id": "tile-sw",
+        "label": "Tile Top-Left (-X/-Z, World SE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            285
+          ],
+          "target": [
+            -40,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 2194.2857,
+              "projPy": 1550.6286,
+              "formPx": 2194.2857,
+              "formPy": 1550.6286,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 2533.6686,
+              "projPy": 719.7257,
+              "formPx": 2533.6686,
+              "formPy": 719.7257,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 1720.32,
+              "projPy": 1451.1543,
+              "formPx": 1720.32,
+              "formPy": 1451.1543,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 2567.3143,
+              "projPy": 2235.2457,
+              "formPx": 2567.3143,
+              "formPy": 2235.2457,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.915,
+              "projPy": 2442.9422,
+              "formPx": 811.915,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-se": {
+        "id": "tile-se",
+        "label": "Tile Top-Right (+X/-Z, World SW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            285
+          ],
+          "target": [
+            20,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 438.8571,
+              "projPy": 1550.6286,
+              "formPx": 438.8571,
+              "formPy": 1550.6286,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 778.24,
+              "projPy": 719.7257,
+              "formPx": 778.24,
+              "formPy": 719.7257,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": -35.1086,
+              "projPy": 1451.1543,
+              "formPx": -35.1086,
+              "formPy": 1451.1543,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 811.8857,
+              "projPy": 2235.2457,
+              "formPx": 811.8857,
+              "formPy": 2235.2457,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5136,
+              "projPy": 2442.9422,
+              "formPx": -943.5136,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-nw": {
+        "id": "tile-nw",
+        "label": "Tile Bottom-Left (-X/+Z, World NE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            345
+          ],
+          "target": [
+            -40,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 2194.2857,
+              "projPy": -204.8,
+              "formPx": 2194.2857,
+              "formPy": -204.8,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 2533.6686,
+              "projPy": -1035.7029,
+              "formPx": 2533.6686,
+              "formPy": -1035.7029,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 1720.32,
+              "projPy": -304.2743,
+              "formPx": 1720.32,
+              "formPy": -304.2743,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 2567.3143,
+              "projPy": 479.8171,
+              "formPx": 2567.3143,
+              "formPy": 479.8171,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.915,
+              "projPy": 687.5136,
+              "formPx": 811.915,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-ne": {
+        "id": "tile-ne",
+        "label": "Tile Bottom-Right (+X/+Z, World NW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            345
+          ],
+          "target": [
+            20,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 438.8571,
+              "projPy": -204.8,
+              "formPx": 438.8571,
+              "formPy": -204.8,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 778.24,
+              "projPy": -1035.7029,
+              "formPx": 778.24,
+              "formPy": -1035.7029,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": -35.1086,
+              "projPy": -304.2743,
+              "formPx": -35.1086,
+              "formPy": -304.2743,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 811.8857,
+              "projPy": 479.8171,
+              "formPx": 811.8857,
+              "formPy": 479.8171,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5136,
+              "projPy": 687.5136,
+              "formPx": -943.5136,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      }
+    },
+    "source-duallam-c5427ab37cc": {
+      "overview": {
+        "id": "overview",
+        "label": "Overview (130x130 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -10,
+        "centerZ": 315,
+        "spanYards": 130,
+        "xMin": -75,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -10,
+            180,
+            315
+          ],
+          "target": [
+            -10,
+            0,
+            315
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 1181.5385,
+              "projPy": 834.9538,
+              "formPx": 1181.5385,
+              "formPy": 834.9538,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 1364.2831,
+              "projPy": 387.5446,
+              "formPx": 1364.2831,
+              "formPy": 387.5446,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 926.3262,
+              "projPy": 781.3908,
+              "formPx": 926.3262,
+              "formPy": 781.3908,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 1382.4,
+              "projPy": 1203.5938,
+              "formPx": 1382.4,
+              "formPy": 1203.5938,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 437.185,
+              "projPy": 1315.4304,
+              "formPx": 437.185,
+              "formPy": 1315.4304,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-sw": {
+        "id": "tile-sw",
+        "label": "Tile Top-Left (-X/-Z, World SE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            285
+          ],
+          "target": [
+            -40,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 2194.2857,
+              "projPy": 1550.6286,
+              "formPx": 2194.2857,
+              "formPy": 1550.6286,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 2533.6686,
+              "projPy": 719.7257,
+              "formPx": 2533.6686,
+              "formPy": 719.7257,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 1720.32,
+              "projPy": 1451.1543,
+              "formPx": 1720.32,
+              "formPy": 1451.1543,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 2567.3143,
+              "projPy": 2235.2457,
+              "formPx": 2567.3143,
+              "formPy": 2235.2457,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.915,
+              "projPy": 2442.9422,
+              "formPx": 811.915,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-se": {
+        "id": "tile-se",
+        "label": "Tile Top-Right (+X/-Z, World SW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            285
+          ],
+          "target": [
+            20,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 438.8571,
+              "projPy": 1550.6286,
+              "formPx": 438.8571,
+              "formPy": 1550.6286,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 778.24,
+              "projPy": 719.7257,
+              "formPx": 778.24,
+              "formPy": 719.7257,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": -35.1086,
+              "projPy": 1451.1543,
+              "formPx": -35.1086,
+              "formPy": 1451.1543,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 811.8857,
+              "projPy": 2235.2457,
+              "formPx": 811.8857,
+              "formPy": 2235.2457,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5136,
+              "projPy": 2442.9422,
+              "formPx": -943.5136,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-nw": {
+        "id": "tile-nw",
+        "label": "Tile Bottom-Left (-X/+Z, World NE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            345
+          ],
+          "target": [
+            -40,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 2194.2857,
+              "projPy": -204.8,
+              "formPx": 2194.2857,
+              "formPy": -204.8,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 2533.6686,
+              "projPy": -1035.7029,
+              "formPx": 2533.6686,
+              "formPy": -1035.7029,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 1720.32,
+              "projPy": -304.2743,
+              "formPx": 1720.32,
+              "formPy": -304.2743,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 2567.3143,
+              "projPy": 479.8171,
+              "formPx": 2567.3143,
+              "formPy": 479.8171,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.915,
+              "projPy": 687.5136,
+              "formPx": 811.915,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-ne": {
+        "id": "tile-ne",
+        "label": "Tile Bottom-Right (+X/+Z, World NW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            345
+          ],
+          "target": [
+            20,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 438.8571,
+              "projPy": -204.8,
+              "formPx": 438.8571,
+              "formPy": -204.8,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 778.24,
+              "projPy": -1035.7029,
+              "formPx": 778.24,
+              "formPy": -1035.7029,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": -35.1086,
+              "projPy": -304.2743,
+              "formPx": -35.1086,
+              "formPy": -304.2743,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 811.8857,
+              "projPy": 479.8171,
+              "formPx": 811.8857,
+              "formPy": 479.8171,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5136,
+              "projPy": 687.5136,
+              "formPx": -943.5136,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      }
+    },
+    "source-mirefen-3aa88a5a077": {
+      "overview": {
+        "id": "overview",
+        "label": "Overview (130x130 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -10,
+        "centerZ": 315,
+        "spanYards": 130,
+        "xMin": -75,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -10,
+            180,
+            315
+          ],
+          "target": [
+            -10,
+            0,
+            315
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 1181.5385,
+              "projPy": 834.9538,
+              "formPx": 1181.5385,
+              "formPy": 834.9538,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 1364.2831,
+              "projPy": 387.5446,
+              "formPx": 1364.2831,
+              "formPy": 387.5446,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 926.3262,
+              "projPy": 781.3908,
+              "formPx": 926.3262,
+              "formPy": 781.3908,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 1382.4,
+              "projPy": 1203.5938,
+              "formPx": 1382.4,
+              "formPy": 1203.5938,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 437.185,
+              "projPy": 1315.4304,
+              "formPx": 437.185,
+              "formPy": 1315.4304,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-sw": {
+        "id": "tile-sw",
+        "label": "Tile Top-Left (-X/-Z, World SE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            285
+          ],
+          "target": [
+            -40,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 2194.2857,
+              "projPy": 1550.6286,
+              "formPx": 2194.2857,
+              "formPy": 1550.6286,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 2533.6686,
+              "projPy": 719.7257,
+              "formPx": 2533.6686,
+              "formPy": 719.7257,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 1720.32,
+              "projPy": 1451.1543,
+              "formPx": 1720.32,
+              "formPy": 1451.1543,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 2567.3143,
+              "projPy": 2235.2457,
+              "formPx": 2567.3143,
+              "formPy": 2235.2457,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.915,
+              "projPy": 2442.9422,
+              "formPx": 811.915,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-se": {
+        "id": "tile-se",
+        "label": "Tile Top-Right (+X/-Z, World SW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            285
+          ],
+          "target": [
+            20,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 438.8571,
+              "projPy": 1550.6286,
+              "formPx": 438.8571,
+              "formPy": 1550.6286,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 778.24,
+              "projPy": 719.7257,
+              "formPx": 778.24,
+              "formPy": 719.7257,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": -35.1086,
+              "projPy": 1451.1543,
+              "formPx": -35.1086,
+              "formPy": 1451.1543,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 811.8857,
+              "projPy": 2235.2457,
+              "formPx": 811.8857,
+              "formPy": 2235.2457,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5136,
+              "projPy": 2442.9422,
+              "formPx": -943.5136,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-nw": {
+        "id": "tile-nw",
+        "label": "Tile Bottom-Left (-X/+Z, World NE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            345
+          ],
+          "target": [
+            -40,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 2194.2857,
+              "projPy": -204.8,
+              "formPx": 2194.2857,
+              "formPy": -204.8,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 2533.6686,
+              "projPy": -1035.7029,
+              "formPx": 2533.6686,
+              "formPy": -1035.7029,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 1720.32,
+              "projPy": -304.2743,
+              "formPx": 1720.32,
+              "formPy": -304.2743,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 2567.3143,
+              "projPy": 479.8171,
+              "formPx": 2567.3143,
+              "formPy": 479.8171,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.915,
+              "projPy": 687.5136,
+              "formPx": 811.915,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-ne": {
+        "id": "tile-ne",
+        "label": "Tile Bottom-Right (+X/+Z, World NW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            345
+          ],
+          "target": [
+            20,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 438.8571,
+              "projPy": -204.8,
+              "formPx": 438.8571,
+              "formPy": -204.8,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 778.24,
+              "projPy": -1035.7029,
+              "formPx": 778.24,
+              "formPy": -1035.7029,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": -35.1086,
+              "projPy": -304.2743,
+              "formPx": -35.1086,
+              "formPy": -304.2743,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 811.8857,
+              "projPy": 479.8171,
+              "formPx": 811.8857,
+              "formPy": 479.8171,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5136,
+              "projPy": 687.5136,
+              "formPx": -943.5136,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      }
+    },
+    "source-combined-20261020T0115Z": {
+      "overview": {
+        "id": "overview",
+        "label": "Overview (130x130 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -10,
+        "centerZ": 315,
+        "spanYards": 130,
+        "xMin": -75,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -10,
+            180,
+            315
+          ],
+          "target": [
+            -10,
+            0,
+            315
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 1181.5385,
+              "projPy": 834.9538,
+              "formPx": 1181.5385,
+              "formPy": 834.9538,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 1364.2831,
+              "projPy": 387.5446,
+              "formPx": 1364.2831,
+              "formPy": 387.5446,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 926.3262,
+              "projPy": 781.3908,
+              "formPx": 926.3262,
+              "formPy": 781.3908,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 1382.4,
+              "projPy": 1203.5938,
+              "formPx": 1382.4,
+              "formPy": 1203.5938,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 437.185,
+              "projPy": 1315.4304,
+              "formPx": 437.185,
+              "formPy": 1315.4304,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-sw": {
+        "id": "tile-sw",
+        "label": "Tile Top-Left (-X/-Z, World SE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            285
+          ],
+          "target": [
+            -40,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 2194.2857,
+              "projPy": 1550.6286,
+              "formPx": 2194.2857,
+              "formPy": 1550.6286,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 2533.6686,
+              "projPy": 719.7257,
+              "formPx": 2533.6686,
+              "formPy": 719.7257,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 1720.32,
+              "projPy": 1451.1543,
+              "formPx": 1720.32,
+              "formPy": 1451.1543,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 2567.3143,
+              "projPy": 2235.2457,
+              "formPx": 2567.3143,
+              "formPy": 2235.2457,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.915,
+              "projPy": 2442.9422,
+              "formPx": 811.915,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-se": {
+        "id": "tile-se",
+        "label": "Tile Top-Right (+X/-Z, World SW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            285
+          ],
+          "target": [
+            20,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 438.8571,
+              "projPy": 1550.6286,
+              "formPx": 438.8571,
+              "formPy": 1550.6286,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 778.24,
+              "projPy": 719.7257,
+              "formPx": 778.24,
+              "formPy": 719.7257,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": -35.1086,
+              "projPy": 1451.1543,
+              "formPx": -35.1086,
+              "formPy": 1451.1543,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 811.8857,
+              "projPy": 2235.2457,
+              "formPx": 811.8857,
+              "formPy": 2235.2457,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5136,
+              "projPy": 2442.9422,
+              "formPx": -943.5136,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-nw": {
+        "id": "tile-nw",
+        "label": "Tile Bottom-Left (-X/+Z, World NE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            345
+          ],
+          "target": [
+            -40,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 2194.2857,
+              "projPy": -204.8,
+              "formPx": 2194.2857,
+              "formPy": -204.8,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 2533.6686,
+              "projPy": -1035.7029,
+              "formPx": 2533.6686,
+              "formPy": -1035.7029,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": 1720.32,
+              "projPy": -304.2743,
+              "formPx": 1720.32,
+              "formPy": -304.2743,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 2567.3143,
+              "projPy": 479.8171,
+              "formPx": 2567.3143,
+              "formPy": 479.8171,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.915,
+              "projPy": 687.5136,
+              "formPx": 811.915,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-ne": {
+        "id": "tile-ne",
+        "label": "Tile Bottom-Right (+X/+Z, World NW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            345
+          ],
+          "target": [
+            20,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_native",
+              "x": 0,
+              "y": 1.2,
+              "z": 303,
+              "projPx": 438.8571,
+              "projPy": -204.8,
+              "formPx": 438.8571,
+              "formPy": -204.8,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_native",
+              "x": 11.6,
+              "y": 1.2,
+              "z": 274.6,
+              "projPx": 778.24,
+              "projPy": -1035.7029,
+              "formPx": 778.24,
+              "formPy": -1035.7029,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_native",
+              "x": -16.2,
+              "y": 4.5,
+              "z": 299.6,
+              "projPx": -35.1086,
+              "projPy": -304.2743,
+              "formPx": -35.1086,
+              "formPy": -304.2743,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_native",
+              "x": 12.75,
+              "y": 8,
+              "z": 326.4,
+              "projPx": 811.8857,
+              "projPy": 479.8171,
+              "formPx": 811.8857,
+              "formPy": 479.8171,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.249,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5136,
+              "projPy": 687.5136,
+              "formPx": -943.5136,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      }
+    },
+    "target-after": {
+      "overview": {
+        "id": "overview",
+        "label": "Overview (130x130 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -10,
+        "centerZ": 315,
+        "spanYards": 130,
+        "xMin": -75,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -10,
+            180,
+            315
+          ],
+          "target": [
+            -10,
+            0,
+            315
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_moved",
+              "x": 0.1235,
+              "y": 1.2,
+              "z": 300.5201,
+              "projPx": 1183.4841,
+              "projPy": 795.8859,
+              "formPx": 1183.4841,
+              "formPy": 795.8859,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_moved",
+              "x": 10.2731,
+              "y": 1.2,
+              "z": 265.9471,
+              "projPx": 1343.3793,
+              "projPy": 251.2282,
+              "formPx": 1343.3793,
+              "formPy": 251.2282,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_moved",
+              "x": -23.9464,
+              "y": 4.5,
+              "z": 300.279,
+              "projPx": 804.2906,
+              "projPy": 792.0876,
+              "formPx": 804.2906,
+              "formPy": 792.0876,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_moved",
+              "x": 15.9752,
+              "y": 8,
+              "z": 328.6336,
+              "projPx": 1433.2093,
+              "projPy": 1238.7816,
+              "formPx": 1433.2093,
+              "formPy": 1238.7816,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.2492,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 437.1818,
+              "projPy": 1315.4304,
+              "formPx": 437.1818,
+              "formPy": 1315.4304,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-sw": {
+        "id": "tile-sw",
+        "label": "Tile Top-Left (-X/-Z, World SE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            285
+          ],
+          "target": [
+            -40,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_moved",
+              "x": 0.1235,
+              "y": 1.2,
+              "z": 300.5201,
+              "projPx": 2197.899,
+              "projPy": 1478.0738,
+              "formPx": 2197.899,
+              "formPy": 1478.0738,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_moved",
+              "x": 10.2731,
+              "y": 1.2,
+              "z": 265.9471,
+              "projPx": 2494.8473,
+              "projPy": 466.5666,
+              "formPx": 2494.8473,
+              "formPy": 466.5666,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_moved",
+              "x": -23.9464,
+              "y": 4.5,
+              "z": 300.279,
+              "projPx": 1493.6825,
+              "projPy": 1471.0199,
+              "formPx": 1493.6825,
+              "formPy": 1471.0199,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_moved",
+              "x": 15.9752,
+              "y": 8,
+              "z": 328.6336,
+              "projPx": 2661.6744,
+              "projPy": 2300.5945,
+              "formPx": 2661.6744,
+              "formPy": 2300.5945,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.2492,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.9091,
+              "projPy": 2442.9422,
+              "formPx": 811.9091,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-se": {
+        "id": "tile-se",
+        "label": "Tile Top-Right (+X/-Z, World SW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 285,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 250,
+        "zMax": 320,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            285
+          ],
+          "target": [
+            20,
+            0,
+            285
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_moved",
+              "x": 0.1235,
+              "y": 1.2,
+              "z": 300.5201,
+              "projPx": 442.4704,
+              "projPy": 1478.0738,
+              "formPx": 442.4704,
+              "formPy": 1478.0738,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_moved",
+              "x": 10.2731,
+              "y": 1.2,
+              "z": 265.9471,
+              "projPx": 739.4187,
+              "projPy": 466.5666,
+              "formPx": 739.4187,
+              "formPy": 466.5666,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_moved",
+              "x": -23.9464,
+              "y": 4.5,
+              "z": 300.279,
+              "projPx": -261.7461,
+              "projPy": 1471.0199,
+              "formPx": -261.7461,
+              "formPy": 1471.0199,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_moved",
+              "x": 15.9752,
+              "y": 8,
+              "z": 328.6336,
+              "projPx": 906.2459,
+              "projPy": 2300.5945,
+              "formPx": 906.2459,
+              "formPy": 2300.5945,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.2492,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5195,
+              "projPy": 2442.9422,
+              "formPx": -943.5195,
+              "formPy": 2442.9422,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-nw": {
+        "id": "tile-nw",
+        "label": "Tile Bottom-Left (-X/+Z, World NE, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": -40,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -75,
+        "xMax": -5,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            -40,
+            180,
+            345
+          ],
+          "target": [
+            -40,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_moved",
+              "x": 0.1235,
+              "y": 1.2,
+              "z": 300.5201,
+              "projPx": 2197.899,
+              "projPy": -277.3548,
+              "formPx": 2197.899,
+              "formPy": -277.3548,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_moved",
+              "x": 10.2731,
+              "y": 1.2,
+              "z": 265.9471,
+              "projPx": 2494.8473,
+              "projPy": -1288.862,
+              "formPx": 2494.8473,
+              "formPy": -1288.862,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_moved",
+              "x": -23.9464,
+              "y": 4.5,
+              "z": 300.279,
+              "projPx": 1493.6825,
+              "projPy": -284.4087,
+              "formPx": 1493.6825,
+              "formPy": -284.4087,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_moved",
+              "x": 15.9752,
+              "y": 8,
+              "z": 328.6336,
+              "projPx": 2661.6744,
+              "projPy": 545.1659,
+              "formPx": 2661.6744,
+              "formPy": 545.1659,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.2492,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": 811.9091,
+              "projPy": 687.5136,
+              "formPx": 811.9091,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      },
+      "tile-ne": {
+        "id": "tile-ne",
+        "label": "Tile Bottom-Right (+X/+Z, World NW, 70x70 yd)",
+        "width": 2048,
+        "height": 2048,
+        "centerX": 20,
+        "centerZ": 345,
+        "spanYards": 70,
+        "xMin": -15,
+        "xMax": 55,
+        "zMin": 310,
+        "zMax": 380,
+        "cameraPose": {
+          "position": [
+            20,
+            180,
+            345
+          ],
+          "target": [
+            20,
+            0,
+            345
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "projection": "orthographic-vertical-90deg"
+        },
+        "calibration": {
+          "maxErrorPx": 0,
+          "anchors": [
+            {
+              "id": "cistern_moved",
+              "x": 0.1235,
+              "y": 1.2,
+              "z": 300.5201,
+              "projPx": 442.4704,
+              "projPy": -277.3548,
+              "formPx": 442.4704,
+              "formPy": -277.3548,
+              "errorPx": 0
+            },
+            {
+              "id": "warden_moved",
+              "x": 10.2731,
+              "y": 1.2,
+              "z": 265.9471,
+              "projPx": 739.4187,
+              "projPy": -1288.862,
+              "formPx": 739.4187,
+              "formPy": -1288.862,
+              "errorPx": 0
+            },
+            {
+              "id": "chapel_moved",
+              "x": -23.9464,
+              "y": 4.5,
+              "z": 300.279,
+              "projPx": -261.7461,
+              "projPy": -284.4087,
+              "formPx": -261.7461,
+              "formPy": -284.4087,
+              "errorPx": 0
+            },
+            {
+              "id": "apothecary_moved",
+              "x": 15.9752,
+              "y": 8,
+              "z": 328.6336,
+              "projPx": 906.2459,
+              "projPy": 545.1659,
+              "formPx": 906.2459,
+              "formPy": 545.1659,
+              "errorPx": 0
+            },
+            {
+              "id": "strongbox_moved",
+              "x": -47.2492,
+              "y": 1.2,
+              "z": 333.499,
+              "projPx": -943.5195,
+              "projPy": 687.5136,
+              "formPx": -943.5195,
+              "formPy": 687.5136,
+              "errorPx": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  "targetHeadCommit": "7fbd7532ab0aeb1793b663bfa59699554ab68837",
+  "groundCaptures": [
+    "gatehouse-approach.png",
+    "inn-entrance.png",
+    "chapel-entrance.png",
+    "apothecary-entrance.png",
+    "strongbox-entrance.png",
+    "added-houses-north.png"
+  ]
+}

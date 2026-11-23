@@ -47,9 +47,13 @@ function castPatchUp(sim: TestSim): SimEvent[] {
 }
 
 describe('Hunter Patch Up', () => {
-  it('heals only the living owned pet for exactly 240 over 12 sec', () => {
+  it('heals only the living owned pet for 10% of its pool every sec for 8 sec', () => {
     const sim = makeHunter();
     const ownPet = addPet(sim, sim.playerId);
+    // Settle the inherited owner share (see the revive test), then pin the pool.
+    sim.tick();
+    ownPet.maxHp = 1_000;
+    ownPet.hp = 1;
     const otherPid = sim.addPlayer('hunter', 'Other Hunter');
     const foreignPet = addPet(sim, otherPid);
     sim.player.targetId = foreignPet.id;
@@ -58,35 +62,38 @@ describe('Hunter Patch Up', () => {
     expect(resolved?.def).toMatchObject({
       name: 'Patch Up',
       requiresTarget: false,
-    });
-    expect(resolved?.effects).toContainEqual({
-      type: 'hot',
-      total: 240,
-      duration: 12,
-      interval: 3,
+      cost: 0,
     });
 
+    const focusBefore = sim.player.maxResource;
     castPatchUp(sim);
+    // Free: the cast spends no Focus (regen may only have topped it back up).
+    expect(sim.player.resource).toBe(focusBefore);
 
     expect(ownPet.auras).toContainEqual(
       expect.objectContaining({
         id: 'revive_pet',
         kind: 'hot',
-        value: 60,
-        tickInterval: 3,
+        value: 100,
+        tickInterval: 1,
+        duration: 8,
         sourceId: sim.playerId,
       }),
     );
     expect(foreignPet.auras.some((aura) => aura.id === 'revive_pet')).toBe(false);
     expect(sim.player.auras.some((aura) => aura.id === 'revive_pet')).toBe(false);
 
-    const periodicEvents = advance(sim, 20 * 12);
+    const periodicEvents = advance(sim, 20 * 8);
     const healEvents = periodicEvents.filter(
       (event): event is Extract<SimEvent, { type: 'heal2' }> =>
         event.type === 'heal2' && event.targetId === ownPet.id,
     );
-    expect(healEvents.map((event) => event.amount)).toEqual([60, 60, 60, 60]);
-    expect(healEvents.reduce((total, event) => total + event.amount, 0)).toBe(240);
+    // 100-point ticks (10% of 1,000) every second; the pet's own out-of-combat
+    // regen tops it off too, so the final tick can be clipped or land on a full
+    // pool (no heal event). No tick ever heals more than 100.
+    expect(healEvents.length).toBeGreaterThanOrEqual(7);
+    expect(healEvents.slice(0, 7).map((event) => event.amount)).toEqual(Array(7).fill(100));
+    expect(healEvents.every((event) => event.amount <= 100)).toBe(true);
     expect(
       periodicEvents.some((event) => event.type === 'heal2' && event.targetId === foreignPet.id),
     ).toBe(false);
@@ -109,12 +116,12 @@ describe('Hunter Patch Up', () => {
     expect(foreignPet.auras.some((aura) => aura.id === 'revive_pet')).toBe(false);
   });
 
-  it('revives the dead owned pet at 35% health', () => {
+  it('revives the dead owned pet at 50% health', () => {
     const sim = makeHunter();
     const pet = addPet(sim, sim.playerId, 0);
     // addPet builds the pet by hand rather than through completeTame, so it starts
     // without the owner's inherited share (pet/pet_scaling.ts). Let that settle while
-    // the pet is still alive, then re-pin the pool: revive takes 35% of the LIVE
+    // the pet is still alive, then re-pin the pool: revive takes 50% of the LIVE
     // maxHp, so a share landing between the fixture and the cast would move the
     // expected value. Re-deriving is a no-op once settled, so 1000 holds.
     sim.tick();
@@ -126,7 +133,7 @@ describe('Hunter Patch Up', () => {
 
     expect(pet.dead).toBe(false);
     expect(pet.maxHp).toBe(1_000); // the pool really did stay pinned
-    expect(pet.hp).toBe(350);
+    expect(pet.hp).toBe(500);
     expect(pet.ownerId).toBe(sim.playerId);
     expect(pet.auras.some((aura) => aura.id === 'revive_pet')).toBe(false);
   });

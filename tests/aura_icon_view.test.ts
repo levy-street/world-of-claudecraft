@@ -191,6 +191,8 @@ const POST_OVERHAUL_RUNTIME_AURA_SOURCES = [
   ['priest_doctrine', 'power_word_shield'],
   ['priest_effigy', 'mind_blast'],
   ['priest_gloomtithe', 'summon_tithefiend'],
+  ['priest_stilled_mind_crit', 'inner_focus'],
+  ['spirit_bomb_progress', 'spirit_bomb'],
   ['priest_lingering_dread', 'psychic_scream'],
   ['priest_living_covenant', 'power_word_shield'],
   ['priest_processional_grace', 'choir_of_deliverance'],
@@ -317,7 +319,7 @@ describe('resolveAuraIconId', () => {
     // ProcDef producers plus the closed semantic inventory above.
     expect(choiceSources).toHaveLength(7);
     expect(new Set(choiceSources.map(([id]) => id)).size).toBe(choiceSources.length);
-    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(107);
+    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(109);
     const expected = new Map<string, string>([
       ...choiceSources,
       ...NON_CHOICE_RUNTIME_AURA_SOURCES,
@@ -334,7 +336,7 @@ describe('resolveAuraIconId', () => {
       POWERUPS.reduce((count, definition) => count + definition.buffs.length, 0),
     );
     expect(REUSED_PAINTED_RUNTIME_AURA_SOURCES).toHaveLength(12);
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(147);
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(149);
     for (const [id, source] of expected) {
       const paintedIdentity = hasAuraImageIdentity(id) ? id : source;
       const imageUrl = auraImageUrl(paintedIdentity);

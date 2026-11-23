@@ -248,6 +248,35 @@ For off-box safety, sync the directory to S3 occasionally:
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in
   `docs/design/professions-tuning-packet.md`.
+- **Heroic Marks currency rollback (mixed fleet)**: from the release that made Heroic
+  Marks a currency, the balance rides `characters.state.heroicMarks` and a character's
+  first load folds its old `heroic_mark` bag and bank stacks into it
+  (`src/sim/heroic_marks.ts`). `characters.state` is written whole, so a binary that
+  predates the currency autosaves the blob WITHOUT `heroicMarks` and erases that
+  character's whole balance; its quartermaster also counts only bag stacks, so the
+  player sees zero first. Roll the release out to EVERY realm process in one deploy pass.
+  Before rolling back past it, stop and flush EVERY game, admin, offline and
+  background writer and take a consistent database backup. Inventory every persisted
+  character-state carrier, including any offline snapshots that can later replace
+  `characters.state`, and pending reward/mail carriers. Snapshot validated balances
+  using `bigint`, not `int` (valid balances exceed 2^31):
+  `CREATE TABLE heroic_marks_rollback AS SELECT id, (state->>'heroicMarks')::bigint AS
+  marks FROM characters WHERE state ? 'heroicMarks';`. Validate each value as an
+  integer from 0 through 9007199254740991 BEFORE casting; malformed or out-of-range
+  data must abort the conversion for investigation, never coerce or omit a balance.
+  Test the exact conversion on a disposable restored backup at that full range first.
+  A safe older-format conversion must account for existing legacy bag/bank stacks,
+  every scalar carrier and already-pending parcels without double counting. Write
+  converted carriers AND strip `heroicMarks` in the SAME atomic transaction, with
+  all writers still stopped. Verify aggregate currency conservation and per-character
+  equality before commit; any overflow, inventory/payload/slot bound, missing carrier
+  or mismatch must roll back the entire conversion. A MAX_SAFE_INTEGER balance cannot
+  be expanded into a practical number of 20-unit stacks: never run a per-mark or
+  unbounded stack-expansion loop. If a tested bounded conversion cannot represent
+  every balance losslessly, restore the consistent pre-upgrade backup instead.
+  Keep the fleet stopped until validation succeeds, then start only the chosen
+  version everywhere. Never leave both the scalar and re-injected units: the next
+  roll forward would fold them twice. Merely restarting the old binary is unsupported.
 - **Farming plot deploy order and rollback (mixed fleet)**: `farmPlots` rides
   `characters.state`, which is written whole, so a server binary that predates the
   farming growth-engine release autosaves the blob WITHOUT `farmPlots` and erases
@@ -418,6 +447,16 @@ For off-box safety, sync the directory to S3 occasionally:
   expansion or vault upgrade table joins the professions cap-raise class: the old
   binary clamps the raised value on load and persists the loss, so that release
   owes its own caveat here.
+- **Ten-rung Materials Vault (v0.45.0)**: the vault upgrade table grew from five
+  rungs (40 to 200 per material) to ten (100 to 1000), so this release is in the
+  professions cap-raise class above. Rolling back across it is DESTRUCTIVE for any
+  character who bought rung 6 or higher: the old binary clamps `vault.upgrades` to 5
+  on load and persists that, so the paid rungs (up to 427g each character) are gone,
+  while the stock itself survives because capacity never truncates. The same loss
+  happens on a mixed fleet where an old-binary realm loads such a character. Cut over
+  every realm in one pass, and treat a rollback as a restore-from-backup decision. A
+  `STORAGE_PRICES` override that still lists five `vaultUpgrades` entries is now
+  rejected at boot and that dimension falls back to the compiled ladder (logged).
 - **Vault identity rows over the bag stack size (v0.43.0)**: the Materials Vault now
   packs one row per material identity at the vault's own row size, so a row can hold
   more than the 20-unit bag stack (four legacy rows of twenty fold into one row of
@@ -796,6 +835,12 @@ For off-box safety, sync the directory to S3 occasionally:
   works when the server actually sees the variable: `docker-compose.yml`
   forwards it through the per-key `environment` block, so a deploy template
   that renders its own compose must carry the same line.
+- `WS_PERMESSAGE_DEFLATE` is a kill switch, not an opt-in: outbound game
+  WebSocket frames are compressed (permessage-deflate) by default. Set it to
+  `0` (or `false`) to send them uncompressed on a realm
+  (`server/ws_compression.ts`); any other set value fails fast at boot. Like
+  `RIFT_FORGE_ENABLED`, it reaches the server only through the compose
+  `environment` block.
 - **Community test profile**: on a disposable public test realm, set
   `PROVISION_TEST_ACCOUNTS=1` in the host `.env`, then restart the game
   container. The flag gives newly created accounts nine level-20 characters,
@@ -1283,7 +1328,7 @@ For off-box safety, sync the directory to S3 occasionally:
   reconciliation rather than silently undercounting an unaudited write window.
 - **`STORAGE_PRICES`: the storage price override (server/storage_prices.ts).** One
   JSON object of copper price lists on ONE line, any subset of
-  `{"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[5 ints]}`
+  `{"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[10 ints]}`
   (vault rung 0 is the vault unlock). Boot-time only: the sim resolves it once at
   world construction, so a change needs a process restart. Each list is accepted
   only at its exact compiled length with entries that are safe integers of at
@@ -1449,6 +1494,7 @@ empty or non-positive value, so an unset key is always safe and a blank line in
 | `DISCORD_TEST_CHANNEL_ID` | unset | One-time "bot online" startup announcement, and the last-resort fallback channel for relay and activity posts. |
 | `DISCORD_RELAY_CHANNEL_ID` | falls back to the test channel | Where in-game "!" community posts land. With neither this nor the test channel set, drained relay items are DROPPED after a once-per-channel notice, so set one before opening the feature to players. |
 | `DISCORD_ACTIVITY_CHANNEL_ID` | falls back to relay, then test | Where the significant-activity feed lands. Same drop rule as relay. |
+| `DISCORD_PVP_FEED_CHANNEL_ID` | unset (no fallback) | The World PvP kill feed, plus the King of the Hill spawn calls (a card when a hill is announced, with a live countdown, and another when it rises). Kills: every resolved `/pvp` kill as one line, batched into digest posts (`PVP_FEED_LINES_PER_POST` lines each, `bot/logic.ts`), names only (nobody is pinged). Deliberately has no fallback so kill volume never spills into the relay or activity channel. With it unset, drained kills are DROPPED after a once-per-channel notice, which is the off switch. |
 | `DISCORD_DAILY_REWARDS_CHANNEL_ID` | unset | Daily-rewards top-10 winner posts. Unlike relay and activity, an unset channel drops nothing: a winner day is marked on the server only after its post lands, so it is re-served until it can be announced. |
 
 **Behavior:**

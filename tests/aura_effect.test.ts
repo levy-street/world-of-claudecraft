@@ -472,9 +472,9 @@ describe('auraEffectDescriptor', () => {
       key: 'hudChrome.auraEffect.oldBlood',
       nums: { stacks: 3, max: 3 },
     });
-    expect(desc({ id: 'verdance', kind: 'verdance', value: 0, stacks: 5 })).toEqual({
+    expect(desc({ id: 'verdance', kind: 'verdance', value: 0, stacks: 3 })).toEqual({
       key: 'hudChrome.auraEffect.verdance',
-      nums: { stacks: 5, max: 5 },
+      nums: { stacks: 3, max: 3 },
     });
   });
 
@@ -503,6 +503,13 @@ describe('auraEffectDescriptor', () => {
     expect(desc({ kind: 'form_moonkin', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.formMoonkin',
       nums: { pct: 20, armorPct: 50 },
+    });
+  });
+
+  it('describes both Sporemender Form bonuses and its slower pace from the sim constants', () => {
+    expect(desc({ kind: 'form_sporemender', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.formSporemender',
+      nums: { pct: 20, armorPct: 40, slowPct: 20 },
     });
   });
 
@@ -715,6 +722,7 @@ describe('auraEffectDescriptor', () => {
       { kind: 'cauterize_fatigue', value: 0 },
       { kind: 'cast_shield', value: 1 },
       { kind: 'form_moonkin', value: 0 },
+      { kind: 'form_sporemender', value: 0 },
       { kind: 'form_shadow', value: 15 },
       { kind: 'affliction_eye', value: 1, tickInterval: 2.5 },
       { kind: 'affliction_eye_secondary', value: 0.5 },

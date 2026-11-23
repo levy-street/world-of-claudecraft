@@ -1,8 +1,11 @@
 // Thundercall v0.44.0 rework (docs/prd/shaman-thundercall-elemental-v028.md,
 // "v0.44.0 rework"): partial Thunder vents, Arc Overload, Magma Burst with
-// Magma Surge, Stormbreak, and classic 5/5 Lightning Mastery.
-import { afterEach, describe, expect, it, vi } from 'vitest';
+// Magma Surge, Stormbreak, and classic 5/5 Lightning Mastery. Plus the v0.45.0
+// rotation fix: Magma Burst banks Thunder, costs less, and carries Lava Flows,
+// and Cinder Jolt runs 27 sec, so the full kit beats Arc Bolt plus Earthen Jolt.
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
+  armPrimalMastery,
   clearThundercallState,
   MAGMA_SURGE_ID,
   PRIMAL_MASTERY_VENT_ID,
@@ -10,10 +13,15 @@ import {
 } from '../src/sim/combat/shaman_thundercall';
 import {
   ARC_OVERLOAD_CHANCE,
+  MAGMA_BURST_CRIT_BONUS,
+  MAGMA_BURST_THUNDER,
   MAGMA_SURGE_CHANCE,
+  magmaBurstCritBonus,
   rollArcOverload,
   STORMBREAK_MANA_FRACTION,
+  THUNDERCALL_CINDER_JOLT_DURATION,
   thundercallOnDotTick,
+  thundercallOnMagmaBurstImpact,
 } from '../src/sim/combat/shaman_thundercall_kit';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
@@ -21,10 +29,13 @@ import {
   emptyAllocation,
   type TalentRowLevel,
 } from '../src/sim/content/talents';
-import { MOBS } from '../src/sim/data';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { abilityDisplayDescription } from '../src/ui/ability_description';
+import { tEntity } from '../src/ui/entity_i18n';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 
 const THUNDER_CHARGES_ID = 'shaman_thunder_charges';
 const ECHOING_ELEMENTS = 'sha_r20_elemental_fury';
@@ -294,6 +305,8 @@ describe('Thundercall v0.44 Magma Burst and Magma Surge', () => {
     expect(shaman.auras.some((aura) => aura.id === MAGMA_SURGE_ID)).toBe(false);
     expect(shaman.cooldowns.get('lava_burst')).toBeGreaterThan(7);
     expect(hits(run(sim, 40), 'Magma Burst')).toHaveLength(1);
+    // v0.45: the surged instant cast banks its Thunder like a hard cast.
+    expect(thunder(shaman)).toBe(MAGMA_BURST_THUNDER);
   });
 
   it('only a Thundercall’s own Cinder Jolt draws a surge roll', () => {
@@ -382,5 +395,159 @@ describe('Thundercall v0.44 Stormbreak and Lightning Mastery', () => {
         id,
       ).toBe(false);
     }
+  });
+});
+
+describe('Thundercall v0.45 rotation fix', () => {
+  type Rig = ReturnType<typeof setup>;
+  const cinderDotEffect = ({ sim, shaman }: Rig) =>
+    sim.resolvedAbility('flame_shock', shaman.id)?.effects.find((effect) => effect.type === 'dot');
+  const ownCinder = ({ shaman, target }: Rig) =>
+    target.auras.find((aura) => aura.id === 'flame_shock' && aura.sourceId === shaman.id);
+  // The elemental Cinder Jolt dot as the talent bake hands it to the resolver:
+  // the spec's spell damage bonus already scales the authored 48, and it still
+  // runs the authored 12 sec. Returns its rounded tick, the amount that lands.
+  const bakedElementalCinderTick = (): number => {
+    const mods = computeTalentModifiers('shaman', { ...emptyAllocation(), spec: 'elemental' }, 20);
+    const dot = abilitiesKnownAt('shaman', 20, mods)
+      .find((known) => known.def.id === 'flame_shock')
+      ?.effects.find((effect) => effect.type === 'dot');
+    if (dot?.type !== 'dot') throw new Error('elemental Cinder Jolt has no dot');
+    expect(dot.duration).toBe(12);
+    return Math.round(dot.total / (dot.duration / dot.interval));
+  };
+
+  it('Magma Burst banks its Thunder on a hit, up to the cap', () => {
+    const empty = setup();
+    landNoCrit(empty.sim);
+    expect(hits(cast(empty.sim, empty.shaman, 'lava_burst'), 'Magma Burst')).toHaveLength(1);
+    expect(thunder(empty.shaman)).toBe(MAGMA_BURST_THUNDER);
+
+    // One short of the cap: the grant clamps at 5 rather than overflowing.
+    const nearCap = setup();
+    seedThunder(nearCap.shaman, 4);
+    landNoCrit(nearCap.sim);
+    expect(hits(cast(nearCap.sim, nearCap.shaman, 'lava_burst'), 'Magma Burst')).toHaveLength(1);
+    expect(thunder(nearCap.shaman)).toBe(5);
+
+    const full = setup();
+    seedThunder(full.shaman, 5);
+    landNoCrit(full.sim);
+    expect(hits(cast(full.sim, full.shaman, 'lava_burst'), 'Magma Burst')).toHaveLength(1);
+    expect(thunder(full.shaman)).toBe(5);
+
+    // Flat like Skybranch: Primal Mastery's double Thunder is Arc Bolt's alone.
+    const primal = setup();
+    armPrimalMastery(primal.sim.ctx, primal.shaman);
+    landNoCrit(primal.sim);
+    expect(hits(cast(primal.sim, primal.shaman, 'lava_burst'), 'Magma Burst')).toHaveLength(1);
+    expect(thunder(primal.shaman)).toBe(MAGMA_BURST_THUNDER);
+
+    // Thunder is Thundercall's alone: the hook banks nothing for another spec.
+    const warspirit = setup({ spec: 'enhancement' });
+    thundercallOnMagmaBurstImpact(warspirit.sim.ctx, warspirit.shaman);
+    expect(thunder(warspirit.shaman)).toBe(0);
+  });
+
+  it('Thundercall Cinder Jolt burns 27 sec at the same damage per tick as other specs', () => {
+    const elemental = setup();
+    const warspirit = setup({ spec: 'enhancement' });
+    // Same tick, 9 ticks instead of 4. Warspirit keeps the authored rank 2:
+    // 48 over 12 sec, 12 a tick.
+    expect(THUNDERCALL_CINDER_JOLT_DURATION).toBe(27);
+    const ticks = THUNDERCALL_CINDER_JOLT_DURATION / 3;
+    const tick = bakedElementalCinderTick();
+    expect(cinderDotEffect(elemental)).toMatchObject({
+      duration: THUNDERCALL_CINDER_JOLT_DURATION,
+      total: tick * ticks,
+      interval: 3,
+    });
+    expect(cinderDotEffect(warspirit)).toMatchObject({ duration: 12, total: 48, interval: 3 });
+
+    landNoCrit(elemental.sim);
+    landNoCrit(warspirit.sim);
+    // The real cast path: the bolt lands within 1 sec, then one tick every 3 sec
+    // to expiry.
+    const elementalHits = hits(
+      cast(elemental.sim, elemental.shaman, 'flame_shock', 20),
+      'Cinder Jolt',
+    );
+    const warspiritHits = hits(
+      cast(warspirit.sim, warspirit.shaman, 'flame_shock', 20),
+      'Cinder Jolt',
+    );
+    expect(ownCinder(elemental)?.duration).toBe(THUNDERCALL_CINDER_JOLT_DURATION);
+    expect(ownCinder(warspirit)?.duration).toBe(12);
+    expect(ownCinder(elemental)?.value).toBe(tick);
+    expect(ownCinder(warspirit)?.value).toBe(12);
+    elementalHits.push(...hits(run(elemental.sim, 20 * 30), 'Cinder Jolt'));
+    warspiritHits.push(...hits(run(warspirit.sim, 20 * 30), 'Cinder Jolt'));
+    expect(elementalHits).toHaveLength(1 + ticks);
+    expect(warspiritHits).toHaveLength(1 + 4);
+    expect(ownCinder(elemental)).toBeUndefined();
+  });
+
+  it('Lava Flows adds 24% of the normal hit to a Magma Burst critical strike', () => {
+    // Same seed, same damage roll: only the Cinder Jolt on the target differs.
+    const plain = setup();
+    landNoCrit(plain.sim);
+    const normal = hits(cast(plain.sim, plain.shaman, 'lava_burst'), 'Magma Burst')[0];
+    const burning = setup();
+    burning.target.auras.push(cinderDot(burning.shaman));
+    landNoCrit(burning.sim);
+    const crit = hits(cast(burning.sim, burning.shaman, 'lava_burst'), 'Magma Burst')[0];
+    expect(normal?.crit).toBe(false);
+    expect(crit?.crit).toBe(true);
+    expect(crit.amount / normal.amount).toBeCloseTo(
+      1.5 + burning.shaman.critDmgSpellBonus + MAGMA_BURST_CRIT_BONUS,
+      1,
+    );
+
+    // Magma Burst for a Thundercall only.
+    expect(magmaBurstCritBonus(plain.sim.ctx, plain.shaman, 'lava_burst')).toBe(
+      MAGMA_BURST_CRIT_BONUS,
+    );
+    expect(magmaBurstCritBonus(plain.sim.ctx, plain.shaman, 'lightning_bolt')).toBe(0);
+    const warspirit = setup({ spec: 'enhancement' });
+    expect(magmaBurstCritBonus(warspirit.sim.ctx, warspirit.shaman, 'lava_burst')).toBe(0);
+  });
+
+  it('Thundercall Magma Burst takes Arc Bolt’s 35% Mana discount', () => {
+    const { sim, shaman } = setup();
+    const authored = ABILITIES.lava_burst.ranks?.find((rank) => rank.level === 20)?.cost;
+    expect(authored).toBe(70);
+    expect(sim.resolvedAbility('lava_burst', shaman.id)?.cost).toBe(Math.round(70 * 0.65));
+    expect(sim.resolvedAbility('lightning_bolt', shaman.id)?.cost).toBe(Math.round(60 * 0.65));
+  });
+
+  describe('tooltips', () => {
+    beforeAll(async () => {
+      await ensureLocaleLoaded('en');
+      setLanguage('en');
+    });
+
+    it('Cinder Jolt prints its resolved total and duration for each spec', () => {
+      const text = ({ sim, shaman }: Rig) => {
+        const resolved = sim.resolvedAbility('flame_shock', shaman.id);
+        if (!resolved) throw new Error('flame_shock did not resolve');
+        return abilityDisplayDescription(resolved, '42');
+      };
+      expect(text(setup())).toContain(
+        `then ${bakedElementalCinderTick() * 9} Fire damage over 27 sec`,
+      );
+      expect(text(setup({ spec: 'enhancement' }))).toContain('then 48 Fire damage over 12 sec');
+    });
+
+    it('Magma Burst and Thunder Reservoir name the Thunder grant', () => {
+      expect(tEntity({ kind: 'ability', id: 'lava_burst', field: 'description' })).toContain(
+        `A hit grants ${MAGMA_BURST_THUNDER} Thunder.`,
+      );
+      expect(tEntity({ kind: 'ability', id: 'lava_burst', field: 'description' })).toContain(
+        `A critical strike deals an extra ${Math.round(MAGMA_BURST_CRIT_BONUS * 100)}% of the normal hit.`,
+      );
+      expect(tEntity({ kind: 'ability', id: 'thunder_reservoir', field: 'description' })).toContain(
+        'Arc Bolt, Skybranch, and Magma Burst grant Thunder',
+      );
+    });
   });
 });

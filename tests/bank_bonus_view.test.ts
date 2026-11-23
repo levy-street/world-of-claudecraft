@@ -217,6 +217,10 @@ describe('bankBonusRowHtml: the three-way status choice', () => {
         label: 'hudChrome.bank.bonusSourceReferral',
         advert: 'hudChrome.bank.bonusReferralExplainer',
       },
+      referral_cards: {
+        label: 'referralCards.bankBonus',
+        advert: 'referralCards.bankBonusHelp',
+      },
     });
     // The section's own five keys, which no row carries.
     for (const key of [

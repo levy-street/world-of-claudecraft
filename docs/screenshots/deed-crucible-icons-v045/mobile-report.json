@@ -1,0 +1,50 @@
+[
+  {
+    "id": "dgn_ignivar",
+    "src": "http://localhost:5194/ui/deeds/dgn_ignivar.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_ignivar_heroic",
+    "src": "http://localhost:5194/ui/deeds/dgn_ignivar_heroic.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_varkhul",
+    "src": "http://localhost:5194/ui/deeds/dgn_varkhul.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_varkhul_heroic",
+    "src": "http://localhost:5194/ui/deeds/dgn_varkhul_heroic.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "dgn_varkhul_flawless",
+    "src": "http://localhost:5194/ui/deeds/dgn_varkhul_flawless.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  },
+  {
+    "id": "hid_forgebreaker",
+    "src": "http://localhost:5194/ui/deeds/hid_forgebreaker.webp",
+    "decoded": true,
+    "naturalWidth": 128,
+    "earned": true,
+    "visible": true
+  }
+]

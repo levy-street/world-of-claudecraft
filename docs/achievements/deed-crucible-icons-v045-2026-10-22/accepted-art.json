@@ -1,0 +1,532 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "deed-crucible-icons-v045-2026-10-22",
+    "base": "5167aabadeea7b21f0921e6d3973350072428b19",
+    "targetBranch": "feature/v045-integration"
+  },
+  "contracts": {
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject"
+    }
+  },
+  "scope": {
+    "paintings": 6,
+    "removedCategoryFallbacks": [
+      "dgn_ignivar",
+      "dgn_ignivar_heroic",
+      "dgn_varkhul",
+      "dgn_varkhul_heroic",
+      "dgn_varkhul_flawless",
+      "hid_forgebreaker"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "deed",
+      "id": "dgn_ignivar",
+      "family": "deed-crucible",
+      "batchId": "deed-crucible-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_ignivar.webp",
+      "canonicalDisplayName": "The Herald Falls",
+      "acceptedSha256": "ea5b398c1da19300327d95c315164d4552e7769353167f15a35f185ce7660df0",
+      "acceptedBytes": 8094,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crucible/originals/dgn_ignivar.png",
+        "sha256": "0d527690e8a3836f233b290a36af55f71aa6c6e61ceb3fcb6da8d99261ed563c",
+        "bytes": 2156442,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crucible/masters/dgn_ignivar.png",
+        "sha256": "4b0f387d8135165ccac48b99e925380c1088f198fdcfdd6e6c7551d76b7e3f66",
+        "bytes": 416772,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for The Herald Falls (dgn_ignivar). Subject: A cracked dark iron molten herald mask, its central flame dying to a few orange sparks, above a small sealed spring of deep turquoise water. Mask dominant, broad stern angular features, forge orange and iron black. Compact bronze medallion-like scene with no enclosing plate. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_ignivar",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [101, 62, 1152, 1193],
+          "framedSubject": [414, 446],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crucible-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crucible-icons-v045/dgn_ignivar-desktop.png",
+          "docs/screenshots/deed-crucible-icons-v045/dgn_ignivar-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_ignivar_heroic",
+      "family": "deed-crucible",
+      "batchId": "deed-crucible-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_ignivar_heroic.webp",
+      "canonicalDisplayName": "Heroic: The Herald Falls",
+      "acceptedSha256": "2126fe91ff5a88c7e9bf5664e8318f53837adc49de6c2cefc10bfd1b052e79ec",
+      "acceptedBytes": 8682,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crucible/originals/dgn_ignivar_heroic.png",
+        "sha256": "e4d25275fdd9d5b48717568ec9455c35ca45cb468d9d04f4a942bfd1d3030a30",
+        "bytes": 2272136,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crucible/masters/dgn_ignivar_heroic.png",
+        "sha256": "3bf7a86f504ee997ed3e01d7557bbdaf1f729b8b020469076b48cc545dab4883",
+        "bytes": 432967,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Heroic: The Herald Falls (dgn_ignivar_heroic). Subject: A cracked dark iron molten herald mask, one last bright ember inside its split forehead, above a small sealed turquoise spring. A substantial pair of gold laurel branches frame the mask as a Heroic distinction. Mask dominant, broad angular features, gold and ember orange against iron black. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_ignivar_heroic",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [67, 65, 1185, 1189],
+          "framedSubject": [420, 423],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crucible-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crucible-icons-v045/dgn_ignivar_heroic-desktop.png",
+          "docs/screenshots/deed-crucible-icons-v045/dgn_ignivar_heroic-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_varkhul",
+      "family": "deed-crucible",
+      "batchId": "deed-crucible-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_varkhul.webp",
+      "canonicalDisplayName": "The Forge Goes Cold",
+      "acceptedSha256": "597c2b05ddfe48a542de87a040bb730ce62909cb75c328cf4ce8ccf7e0eab30d",
+      "acceptedBytes": 7622,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crucible/originals/dgn_varkhul.png",
+        "sha256": "8922b5a7b9cde9b03f02f578cfd91ad9f1bfe8c989db5a5ed7becf9ac55b218d",
+        "bytes": 2341053,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crucible/masters/dgn_varkhul.png",
+        "sha256": "3eec494b8c3bc5678d98213e96b7a5175e1699c46c7cec4abb21d8f4fe751adc",
+        "bytes": 378998,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for The Forge Goes Cold (dgn_varkhul). Subject: A great cold dark iron anvil with a massive silent smithing hammer raised diagonally above it. Forge glow has faded to blue-grey ash; a thin clear turquoise springwater stream crosses the dark coals below. Strong readable anvil silhouette, hammer and anvil dominate, subdued iron and blue grey. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_varkhul",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [99, 34, 1189, 1219],
+          "framedSubject": [412, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crucible-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crucible-icons-v045/dgn_varkhul-desktop.png",
+          "docs/screenshots/deed-crucible-icons-v045/dgn_varkhul-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_varkhul_heroic",
+      "family": "deed-crucible",
+      "batchId": "deed-crucible-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_varkhul_heroic.webp",
+      "canonicalDisplayName": "Heroic: The Forge Goes Cold",
+      "acceptedSha256": "94781f92e00e8bfe886223cebac12949b4b5db8191c535bf7c6e17726cfadcc6",
+      "acceptedBytes": 10450,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crucible/originals/dgn_varkhul_heroic.png",
+        "sha256": "6726e15f832e07803e8559666cc915b14899167cb4f51672b50db489e0823a3c",
+        "bytes": 2546353,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crucible/masters/dgn_varkhul_heroic.png",
+        "sha256": "b10bc36871f9536feed8780c41c785a18fb544201de3fd77f82a059cd9e613e6",
+        "bytes": 443154,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Heroic: The Forge Goes Cold (dgn_varkhul_heroic). Subject: A great dark iron anvil with a frosted pale blue striking face, a massive silent smithing hammer raised diagonally above it. Rich gold laurel branches frame the anvil as a Heroic distinction. Blue-grey ash and a small clear turquoise springwater stream below. Clear anvil and hammer silhouette, gold rim accents and cold iron. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_varkhul_heroic",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [52, 36, 1203, 1214],
+          "framedSubject": [438, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crucible-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crucible-icons-v045/dgn_varkhul_heroic-desktop.png",
+          "docs/screenshots/deed-crucible-icons-v045/dgn_varkhul_heroic-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "dgn_varkhul_flawless",
+      "family": "deed-crucible",
+      "batchId": "deed-crucible-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/dgn_varkhul_flawless.webp",
+      "canonicalDisplayName": "Not One Ember Lost",
+      "acceptedSha256": "3e07ab93e95f99499cd24d0332874857e11234a8a4176111b13bb54d2b7005f7",
+      "acceptedBytes": 7576,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crucible/originals/dgn_varkhul_flawless.png",
+        "sha256": "876a1afd95aae7567a8b06accbf5947a88df78d9c8d9662f3ea91c867adb4703",
+        "bytes": 1888046,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crucible/masters/dgn_varkhul_flawless.png",
+        "sha256": "a27205b906a079b7bd64ae1326b1496b8bd36239fe150e8cd58ad47368f66504",
+        "bytes": 392782,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for Not One Ember Lost (dgn_varkhul_flawless). Subject: Exactly ten small upright bronze candles arranged in an evenly spaced complete ring seen from an elevated three-quarter view, each with one bright unbroken golden flame. Ten separate visible flames, none hidden or extinguished. The ring stands on a compact dark bronze forge floor, warm gold light, dark iron centre. Each candle has a short stout shaft and an obvious flame, uncluttered central space; countable ten flames symbolize all ten raiders surviving. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 1,
+        "correction": {
+          "prompt": "Correct this World of ClaudeCraft achievement crest. The current image incorrectly has NINE lit candles. It must have exactly TEN distinct candles and TEN flames. Add the missing tenth candle at the very back, top centre of the ring, between the two existing back candles, raised enough for its full flame and short bronze candle body to be visible. Retain all nine existing candles and flames. Count carefully: 3 back candles (left, centre, right), 2 upper side candles, 2 middle side candles, 3 front candles = TEN in total. Retain the bronze forge floor, golden fire, existing painterly materials and transparent exterior. No text, numbers, UI labels, checkerboard or background. Keep native transparent background. One crest only.",
+          "referencedImage": "tmp/imagegen/v045-deeds-crucible/originals/dgn_varkhul_flawless-rejected-nine-candles.png",
+          "referencedSha256": "2ac633abe1b2c20eb1513151d38b4b31ba4c1e1ea1114eb92ffec2b62ac9d49b",
+          "reason": "First source had nine candles; corrected source has ten distinct lit candles, visually counted."
+        }
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "dgn_varkhul_flawless",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [41, 30, 1213, 1149],
+          "framedSubject": [448, 428],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crucible-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crucible-icons-v045/dgn_varkhul_flawless-desktop.png",
+          "docs/screenshots/deed-crucible-icons-v045/dgn_varkhul_flawless-mobile.png"
+        ]
+      }
+    },
+    {
+      "kind": "deed",
+      "id": "hid_forgebreaker",
+      "family": "deed-crucible",
+      "batchId": "deed-crucible-icons-v045-2026-10-22",
+      "runtimeUrl": "/ui/deeds/hid_forgebreaker.webp",
+      "canonicalDisplayName": "A Spring Unchained",
+      "acceptedSha256": "c4aa8e1753e8d57f8ca747ac6b282dc0e593d1c48b145be729c237e2530eecae",
+      "acceptedBytes": 10092,
+      "original": {
+        "path": "tmp/imagegen/v045-deeds-crucible/originals/hid_forgebreaker.png",
+        "sha256": "492045083b1a672b3a1ccf76c18ebcc095709a0b612254d12baba21ab4f29c9d",
+        "bytes": 2403207,
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "master": {
+        "path": "tmp/imagegen/v045-deeds-crucible/masters/hid_forgebreaker.png",
+        "sha256": "5ef15bf1e7a92b58512ae95c4f3cdddfb42ad589cda876ef38df06bec93ef17b",
+        "bytes": 430272,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "hasAlpha": true
+      },
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "transparentBackground": true,
+        "prompt": "Use case: stylized-concept. Asset type: World of ClaudeCraft Book of Deeds achievement crest. Paint a unique transparent-background fantasy MMO achievement emblem for A Spring Unchained (hid_forgebreaker). Subject: A completed massive dark iron two-handed Forgebreaker hammer laid diagonally over a broken heavy forge chain. Hammer has a black iron rectangular segmented block head, a bronze-orange circular core set into its broad side, and a long leather-strapped dark shaft. A clear cool-blue springwater ribbon flows through the snapped chain links below. Hammer clearly dominant, ember orange against cool blue, compact medallion-like silhouette without a plate. Follow the existing project deed art: tactile dimensional hand-painted miniature object or compact scene emblem, warm upper-left light, cool deep recesses, crisp broad forms, restrained highlights, rich materials. A compact roughly round silhouette, all pictured scenery contained within the emblem and fading cleanly to genuine alpha at its outer edge. Center the whole emblem, occupying about 76 percent of a square 1024x1024 canvas, with ample transparent space on every side. Keep the focal object readable at 32px, 40px and 48px, with clear light/dark separation. Genuine transparent background and transparent outer corners, no background plate or rectangular scene, no drop shadow outside the emblem, no text, letters, numbers, captions, watermark, UI border or painted checkerboard. One crest only, no sheet or collage.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_evergarden_first_harvest.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "48c569b88bba6742c077e0b8e4abb7a0496799787dc1003ab18c2271a1541e2f"
+          },
+          {
+            "path": "public/ui/deeds/prog_legendmaker.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "d2a3d51f70d581d3ab68f3f83e1826e1d6dcea164a79aaa84d541fca78641e75"
+          },
+          {
+            "path": "public/ui/deeds/col_reliquary_complete.webp",
+            "role": "Project-owned deed style reviewed visually; not an image-edit input",
+            "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4"
+          },
+          {
+            "path": "public/ui/items/varkhul_forgebreaker.webp",
+            "role": "Project-owned hammer identity reviewed visually; not an image-edit input",
+            "sha256": "65667cc86da52dd0ee97b9e8785867a13c263196b363f9b5e6f9310f2f9f5bec"
+          }
+        ],
+        "identityBrief": "docs/achievements/icon-brief.md",
+        "retryCount": 0
+      },
+      "processing": {
+        "steps": [
+          "Retain original native RGBA source; no chroma key",
+          "Frame alpha>=8 subject bounds to a centered 512x512 sRGB RGBA master, aiming at 48% coverage with a 448px side cap and transparent padding",
+          "Run scripts/convert_deed_icons_webp.mjs on masters: validate alpha geometry, then downscale to 128px WebP at quality 82"
+        ],
+        "framing": {
+          "id": "hid_forgebreaker",
+          "nativeAlpha": true,
+          "alphaThreshold": 8,
+          "sourceBounds": [55, 26, 1194, 1205],
+          "framedSubject": [433, 448],
+          "targetCoverage": 0.48,
+          "maxSubjectSide": 448
+        }
+      },
+      "review": {
+        "sourceAndMaster": "Reviewed subject identity, text-free art, complete silhouette and transparent exterior.",
+        "sizes": [512, 128, 48, 40, 32, 22],
+        "grayscaleSize": 28,
+        "circularCropSize": 64,
+        "evidence": "docs/screenshots/deed-crucible-icons-v045/small-size-review.png",
+        "gameCaptureStatus": "Verified desktop and mobile landscape earned deed cards; expected 128px URL decoded and visible.",
+        "gameCaptures": [
+          "docs/screenshots/deed-crucible-icons-v045/hid_forgebreaker-desktop.png",
+          "docs/screenshots/deed-crucible-icons-v045/hid_forgebreaker-mobile.png"
+        ]
+      }
+    }
+  ]
+}

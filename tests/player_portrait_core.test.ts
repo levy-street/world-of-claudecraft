@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { playerVisualKey } from '../src/render/characters/manifest';
 import type { ModularLook } from '../src/render/characters/modular';
 import type { Entity } from '../src/sim/types';
 import {
@@ -32,6 +33,7 @@ function lookups(look: ModularLook | null): PlayerPortraitLookups<ModularLook> {
   return {
     lookFor: () => look,
     visualKeyFor: (e) => `player_${e.templateId}_modular`,
+    classVisualKeyFor: (e) => playerVisualKey(e.templateId, e.modularAppearance),
   };
 }
 
@@ -41,6 +43,22 @@ const composedKeyOf = (visualKey: string, look: ModularLook): string =>
   `${visualKey}:mod:${look.app.gender}:headshot`;
 
 describe('playerPortraitSubject', () => {
+  it('keeps the female body key when a player uses a WOC class rig', () => {
+    const subject = playerPortraitSubject(
+      player({ modularAppearance: { gender: 'female' } }),
+      lookups(null),
+    );
+    expect(subject).toMatchObject({ kind: 'class', visualKey: 'player_warrior_female' });
+    // the stored appearance rides the class subject: the portrait keys and
+    // dresses the WOC body's modular head from it
+    expect(subject).toMatchObject({ head: { gender: 'female' } });
+    expect(
+      portraitUpdateFrames(subject, { visualKey: 'player_warrior_female', skin: 2 }, composedKeyOf),
+    ).toBe(true);
+    expect(
+      portraitUpdateFrames(subject, { visualKey: 'player_warrior', skin: 2 }, composedKeyOf),
+    ).toBe(false);
+  });
   it('composes a player with an authored look, peer or self alike', () => {
     expect(playerPortraitSubject(player(), lookups(LOOK))).toEqual({
       kind: 'composed',
@@ -56,6 +74,7 @@ describe('playerPortraitSubject', () => {
       kind: 'class',
       cls: 'warrior',
       skin: 2,
+      visualKey: 'player_warrior',
     });
   });
 
@@ -73,6 +92,7 @@ describe('playerPortraitSubject', () => {
       kind: 'class',
       cls: 'warrior',
       skin: 0,
+      visualKey: 'player_warrior',
     });
   });
 });

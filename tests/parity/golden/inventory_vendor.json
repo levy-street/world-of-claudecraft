@@ -11,7 +11,7 @@
     "useItem food/drink (sit + eating/drinking slot), potion (heal + cooldown), elixir (applyAura)",
     "discardItem: removeItem the discarded count",
     "sellItem: vendorInRange gate + recordVendorBuyback + meta.copper payout",
-    "sellAllJunk: bulk gray sweep, per-stack buyback record, one summary line",
+    "sellAllJunk: bulk gray sweep, plain grays skip buyback, one summary line",
     "buyBackItem: meta.copper spend + addItemSilent + onInventoryChangedForQuests"
   ],
   "draws": 0,
@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1010,
+      "nextId": 1011,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "659fb871",
+      "nextId": 1012,
+      "state": "79c0034c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -63,6 +63,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 1000,
@@ -81,7 +84,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -133,7 +136,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -147,7 +150,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -191,9 +194,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "7b2a7846",
-      "events": "6ba600cb",
+      "nextId": 1012,
+      "state": "e1a20831",
+      "events": "7b079d2f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -220,6 +223,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -240,7 +246,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -258,15 +264,33 @@
           "inventory": [
             {
               "count": 10,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 5,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -300,7 +324,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -314,7 +338,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -358,9 +382,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "7bebb80a",
-      "events": "7c6130e2",
+      "nextId": 1012,
+      "state": "5b4624b7",
+      "events": "9b90e82d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -387,6 +411,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -409,7 +436,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -428,15 +455,33 @@
           "inventory": [
             {
               "count": 10,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 5,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -481,7 +526,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -495,7 +540,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 130,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -539,9 +584,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "03d3ff07",
-      "events": "2cad1b67",
+      "nextId": 1012,
+      "state": "07f17e02",
+      "events": "7bb2d484",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -568,6 +613,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -590,7 +638,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -609,15 +657,33 @@
           "inventory": [
             {
               "count": 10,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 5,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -662,7 +728,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -676,7 +742,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 120,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -720,9 +786,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "2df72c83",
-      "events": "53de473e",
+      "nextId": 1012,
+      "state": "0e86f6f2",
+      "events": "bf50d54d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -749,6 +815,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -771,7 +840,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -789,15 +858,33 @@
           "inventory": [
             {
               "count": 10,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 5,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -846,7 +933,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -860,7 +947,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -904,9 +991,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "e6b0d089",
-      "events": "9a911caf",
+      "nextId": 1012,
+      "state": "e258c033",
+      "events": "2d30819f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -933,6 +1020,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -955,7 +1045,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -973,15 +1063,33 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1030,7 +1138,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -1056,7 +1164,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1101,9 +1209,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "4f3170ac",
-      "events": "caaa9e90",
+      "nextId": 1012,
+      "state": "aa05a73a",
+      "events": "ec778e24",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1130,6 +1238,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -1152,7 +1263,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1170,11 +1281,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1223,7 +1346,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             }
           ],
           "blockChance": 0.05,
@@ -1249,7 +1372,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1294,9 +1417,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "a5d6b479",
-      "events": "0c54b94b",
+      "nextId": 1012,
+      "state": "99564366",
+      "events": "1a16079d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1323,6 +1446,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -1346,7 +1472,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1364,11 +1490,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1417,7 +1555,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             },
             {
               "duration": 900,
@@ -1426,7 +1564,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1010,
+              "sourceId": 1011,
               "value": 12
             }
           ],
@@ -1453,7 +1591,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1498,9 +1636,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "732efd44",
-      "events": "b6703dad",
+      "nextId": 1012,
+      "state": "84a81cd5",
+      "events": "f769fd0b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1527,6 +1665,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -1554,7 +1695,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1572,11 +1713,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1625,7 +1778,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             },
             {
               "duration": 900,
@@ -1634,7 +1787,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1010,
+              "sourceId": 1011,
               "value": 12
             }
           ],
@@ -1661,7 +1814,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1706,9 +1859,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "8f15e374",
-      "events": "8661df26",
+      "nextId": 1012,
+      "state": "8f3b83c3",
+      "events": "b5f7ad8a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1735,6 +1888,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -1763,7 +1919,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1781,11 +1937,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1844,7 +2012,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             },
             {
               "duration": 900,
@@ -1853,7 +2021,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1010,
+              "sourceId": 1011,
               "value": 12
             }
           ],
@@ -1880,7 +2048,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1925,9 +2093,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "9cf7d8a8",
-      "events": "409ddd42",
+      "nextId": 1012,
+      "state": "9df7ddc9",
+      "events": "86f491d4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1954,6 +2122,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 714,
@@ -1982,7 +2153,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2000,11 +2171,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -2075,7 +2258,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             },
             {
               "duration": 900,
@@ -2084,7 +2267,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1010,
+              "sourceId": 1011,
               "value": 12
             }
           ],
@@ -2111,7 +2294,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2156,9 +2339,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "a8eff8b0",
-      "events": "adc6b855",
+      "nextId": 1012,
+      "state": "a41039b8",
+      "events": "b5a00f90",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2185,6 +2368,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 723,
@@ -2214,7 +2400,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2232,11 +2418,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -2282,10 +2480,6 @@
           "vendorBuyback": [
             {
               "count": 1,
-              "itemId": "soggy_moccasin"
-            },
-            {
-              "count": 1,
               "itemId": "wolf_fang",
               "materialSources": [
                 {
@@ -2311,7 +2505,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             },
             {
               "duration": 900,
@@ -2320,7 +2514,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1010,
+              "sourceId": 1011,
               "value": 12
             }
           ],
@@ -2347,7 +2541,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2392,9 +2586,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "fcb42414",
-      "events": "c18fbbfb",
+      "nextId": 1012,
+      "state": "b38fa9cf",
+      "events": "d30c5a4d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2421,6 +2615,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 719,
@@ -2450,7 +2647,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2468,11 +2665,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -2515,12 +2724,6 @@
             "stock": {}
           },
           "vaultAttemptDurable": true,
-          "vendorBuyback": [
-            {
-              "count": 1,
-              "itemId": "soggy_moccasin"
-            }
-          ],
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2537,7 +2740,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             },
             {
               "duration": 900,
@@ -2546,7 +2749,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1010,
+              "sourceId": 1011,
               "value": 12
             }
           ],
@@ -2573,7 +2776,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2618,8 +2821,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "fcb42414",
+      "nextId": 1012,
+      "state": "b38fa9cf",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2647,6 +2850,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 719,
@@ -2676,7 +2882,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1011,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2694,11 +2900,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -2741,12 +2959,6 @@
             "stock": {}
           },
           "vaultAttemptDurable": true,
-          "vendorBuyback": [
-            {
-              "count": 1,
-              "itemId": "soggy_moccasin"
-            }
-          ],
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2763,7 +2975,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1011
             },
             {
               "duration": 900,
@@ -2772,7 +2984,7 @@
               "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1010,
+              "sourceId": 1011,
               "value": 12
             }
           ],
@@ -2799,7 +3011,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 220,
-          "id": 1010,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

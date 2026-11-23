@@ -457,13 +457,26 @@
      body.mobile-touch class (gated to <=940px) would miss. !important guarantees the
      floor wins over the small classic-font rules regardless of selector specificity
      (e.g. .prompt .prompt-number, which out-specifies a plain catch-all); pointer:coarse
-     leaves desktop (fine pointer) untouched. New inputs are covered automatically. */
+     leaves desktop (fine pointer) untouched. The native app also enables touch UI
+     explicitly, so its runtime class gets the same floor. Inside #ui the floor
+     compensates for a sub-1 UI Scale: WebKit sees the rendered font, not just
+     getComputedStyle().fontSize. New inputs are covered automatically. */
   @media (pointer: coarse) {
     input,
     textarea,
     select {
-      font-size: 16px !important;
+      font-size: var(--touch-input-font-size, 16px) !important;
     }
+    /* #ui carries zoom: var(--ui-scale), and the iOS threshold is RENDERED
+       size, so an author 16px under a UI Scale below 1 renders small enough to
+       trigger the zoom (the Book of Deeds search trap, mobile_zoom_guard.ts).
+       Divide the floor back out so the rendered size never drops under 16px. */
+    #ui :is(input, textarea, select) {
+      font-size: max(16px, calc(16px / var(--ui-scale, 1))) !important;
+    }
+  }
+  body.mobile-touch :is(input, textarea, select) {
+    font-size: var(--touch-input-font-size, 16px) !important;
   }
 
   #nameplates {
@@ -486,6 +499,7 @@
     overflow: hidden;
     pointer-events: none;
     z-index: 10;
+    --touch-input-font-size: max(16px, calc(16px / var(--ui-scale, 1)));
   }
   #ui > * {
     pointer-events: auto;
@@ -587,7 +601,7 @@
   /* UI chrome icons: shared glyph-sizing primitives (siblings of the .x-btn /
      .panel chrome above). Relocated from index.html's inline <style>: these are
      base-tier glyph styling, and keeping them in
-     @layer base lets component overrides (e.g. #mm-music .ui-icon) win as intended.
+     @layer base lets component overrides (e.g. #expedition-bell .ui-icon) win as intended.
      They had been left inline-unlayered, which would have inverted those overrides. */
   /* ---------- UI chrome icons (inline SVG from ui_icons.ts, tinted via currentColor) ---------- */
   .ui-icon {

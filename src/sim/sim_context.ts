@@ -1,3 +1,5 @@
+import type { BuddyKey } from './content/buddies';
+import type { PendingDifficultyChange } from './instances/difficulty_selection';
 // SimContext: the shared seam every extracted game-system module talks to instead
 // of reaching into the 17.5k-line `Sim` monolith.
 //
@@ -13,16 +15,21 @@
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { AccountCosmetics } from '../world_api';
+import type { Collider } from './colliders';
 import type { FrozenOrbState } from './combat/frozen_orb';
 import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
+import type { CourierAccountExchange, CourierBankExchange } from './courier';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { GuildBankState } from './guild_bank';
 import type { InventoryGrantOptions } from './inventory_grant';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
+import { materialItemIds } from './material_ids';
+import type { MusterArmyState } from './mirefen_muster';
 import type { MobScanCounters } from './mob/scan_counters';
+import type { ObjectMoves } from './moved_objects';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
@@ -32,6 +39,7 @@ import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
+import type { SeasonalWorldState } from './seasonal/seasonal_state';
 import type {
   ArenaMatch,
   ArenaQueueUnit,
@@ -85,6 +93,7 @@ import type {
   Vec3,
   WorldQuestDef,
 } from './types';
+import { splitVaultTakesBySigner } from './vault_material_sources';
 
 /** Shared inert success handle for hosts with no durable audit sink. Reused by
  *  reference so offline/headless vault actions allocate no reservation object. */
@@ -105,11 +114,16 @@ export type RuntimeSimConfig = Required<
     | 'respawnSeconds'
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
+    | 'courierBankExchange'
+    | 'courierAccountExchange'
     | 'gathererIdentity'
     | 'mintItemGuid'
+    // Deliberately NOT defaulted: undefined is the "no day/night clock" world
+    // (dayNightPhase() answers null), which tests and the RL env rely on.
+    | 'dayNightNowMs'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'mintItemGuid'> & {
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'mintItemGuid' | 'dayNightNowMs'> & {
     vaultOpenNeedsSave?: boolean;
     vaultRewardNeedsSave?: boolean;
   };
@@ -143,6 +157,18 @@ export interface SimContextPrimitives {
   accountCosmetics: AccountCosmetics;
   /** Static crafting stations owned by this Sim's authored world bundle. */
   readonly stationPlacements: readonly StationDef[];
+  /** Gameplay objects this Sim's authored world moved (sim/moved_objects.ts):
+   *  farm beds, practice dummies, gather nodes, dungeon doors. Undefined for
+   *  the built-in world, so every resolver returns the shipped row. */
+  readonly objectMoves?: ObjectMoves;
+  /** This Sim's authored world graveyards: spirit release AND /unstuck pick the
+   *  nearest of these (spirit.ts ghostGraveyard), so a custom map never sends a
+   *  player to a built-in yard. Empty when the world authors none. The built-in
+   *  world's rows are OVERWORLD_GRAVEYARDS. */
+  readonly graveyards: readonly { x: number; z: number }[];
+  /** This Sim's authored world player start: the respawn anchor when the world
+   *  has no graveyards (PLAYER_START for the built-in world). */
+  readonly playerStart: { x: number; z: number };
   // The local / RL player id (single-player + renderer contexts). Reassigned on the
   // first join and on the primary's departure, so it is a LIVE getter, not a snapshot.
   // Stays a Sim field; the moved raid-marker `markerFor` (T1) reads it through the seam.
@@ -197,6 +223,8 @@ export interface SimContextPrimitives {
   // reads/finds/iterates it and mutates slot fields in place; the array identity
   // stays Sim-owned (like delayedEvents/groundAoEs), so this is a live read-only view.
   readonly instances: InstanceSlot[];
+  // Session-only leader requests, one per initiating player, cleared on departure.
+  readonly pendingDifficultyChanges: Map<number, PendingDifficultyChange>;
   // Session-only manual-reset cooldowns keyed by durable character identity and
   // dungeon id. Unlike party instance keys, these survive relogs and party reforming.
   readonly dungeonResetLocks: Map<string, { availableAt: number; claimId: number }>;
@@ -282,6 +310,9 @@ export interface SimContextPrimitives {
   // King of the Hill (pvp/hill.ts): the standing hill, the schedule and the
   // hour's accruals, one live view like the books above (session-only).
   readonly hillState: HillState;
+  // The seasonal-event core (seasonal/): the host-fed active event, the /dev
+  // override and the open/close edge. One live view, mutated in place.
+  readonly seasonal: SeasonalWorldState;
   // The hill's spot probe, bound by the Sim (pvp/hill_probe.ts); tests bind fakes.
   readonly hillProbe: HillSpotProbe;
   // Resolved-match records the authoritative host drains post-tick
@@ -395,6 +426,9 @@ export interface SimContextPrimitives {
   // VALUES in place; the deeds proximity sweep resolves the witness target
   // through this instead of scanning the whole entity map every second.
   readonly worldBossEntityIds: readonly (number | null)[];
+  // The Mirefen muster around Balgath's crater (src/sim/mirefen_muster.ts): its soldiers,
+  // weapon rack and live pike loans. Sim-owned holder mutated in place; nothing persists.
+  readonly musterArmy: MusterArmyState;
   // Book of Deeds session runtime (per-attempt encounter windows, per-match
   // Vale Cup memory, the Saul talk counter). Sim-owned holder mutated in
   // place; nothing in it persists.
@@ -433,6 +467,7 @@ export interface SimContextPrimitives {
 // a faithful move-not-rewrite. Grouped by the slice that will eventually own them.
 export interface SimContextCallbacks {
   // Event sink (core). Routes to `Sim.emit`.
+  onBuddyGranted?: (pid: number, key: BuddyKey) => void;
   emit(ev: SimEvent): void;
   // Personal error toast/event to a player (core). Routes to `Sim.error`, which
   // emits `{ type: 'error', text, pid, reason? }`.
@@ -451,9 +486,9 @@ export interface SimContextCallbacks {
   // (N1, the delve slice, quest spawns, the interaction dispatchers) reaches them
   // through the seam; implemented in instances/dungeons, Sim keeps thin delegates so
   // existing `this.enterDungeon` etc. call sites resolve unchanged.
-  // dungeonDifficulty/setDungeonDifficulty are the heroic-selection commands: the
-  // body-stays-on-Sim kind (party/meta state lives on Sim), exposed so the chat
-  // slash command and instances/dungeons reach them through the seam.
+  // dungeonDifficulty reads the live preference; setDungeonDifficulty is owned by
+  // instances/difficulty_selection. The chat command and instance modules reach
+  // both through the seam.
   // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it
   // once per death to settle a heroic final boss's direct participant rewards
   // and whole-claim realm-reset lockout together (no rng draws).
@@ -466,6 +501,11 @@ export interface SimContextCallbacks {
   // raid rooms' normal and heroic lockouts expire on (host-owned like raidResetMs;
   // offline/headless fall back to a flat 7-day week).
   weeklyRaidResetMs(nowMs: number): number;
+  // The world day/night phase in [0,1) (0 midnight, 0.5 noon; src/sim/day_night.ts) off
+  // the host clock SimConfig.dayNightNowMs, or null when the host supplies no such
+  // clock (tests, the RL env): null means "there is no night", and every nocturnal
+  // rule must treat it as permanent day so those worlds stay the pre-cycle world.
+  dayNightPhase(): number | null;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
@@ -473,6 +513,8 @@ export interface SimContextCallbacks {
   leaveDungeon(pid?: number): boolean;
   resetDungeonInstances(pid?: number): void;
   inheritDungeonResetLocks(pid: number): void;
+  // Party joins eagerly withdraw all pending manual finder applications.
+  onDungeonFinderPartyJoined(pid: number): void;
   // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
   // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
   // these two are on the seam so foreign callers reach them through ctx.
@@ -484,6 +526,9 @@ export interface SimContextCallbacks {
     portal?: Entity,
   ): void;
   leaveRift(pid?: number): void;
+  /** Tell the client a member is being moved off the rift floor at `from` by a
+   *  non-exit teleport (spirit release, /unstuck); spirit.ts cannot import rift/runs. */
+  emitRiftDeparture(pid: number, from: Vec3): void;
   /** Open an off-path hidden rift treasure chest (interact -> loot, no lockpick). */
   riftOpenTreasure(objectId: number, pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
@@ -687,6 +732,8 @@ export interface SimContextCallbacks {
   pullTimerStart(rawCommand: string, pid?: number): void;
   pullTimerCancel(pid?: number): void;
   removeFromParty(pid: number, verb: string): void;
+  hillPartyDisband(partyId: number, survivorPid: number): void;
+  hillPartyJoin(pid: number): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
   // Dungeon Finder formation seam (owned by social/party.ts): merge solo
@@ -694,7 +741,10 @@ export interface SimContextCallbacks {
   // invite prompts or accept events. Returns the formed party, or null (and
   // mutates nothing) when a source roster no longer matches live party state.
   // Consumed by social/dungeon_finder.ts.
-  formDungeonFinderGroup(units: FinderFormationUnit[], opts: { raid: boolean }): Party | null;
+  formDungeonFinderGroup(
+    units: FinderFormationUnit[],
+    opts: { raid: boolean; expeditionClaim?: InstanceSlot },
+  ): Party | null;
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onRecipeCraftedForQuests(recipeId: string, meta: PlayerMeta): void;
   onNodeGatheredForQuests(node: GatherNodeDef, itemId: string, meta: PlayerMeta): void;
@@ -849,6 +899,7 @@ export interface SimContextCallbacks {
     e: Entity,
     ignoreFences?: boolean,
   ): { x: number; z: number };
+  platformFor?(entity: Entity): readonly Collider[] | null;
   // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1 / M5) ---
   updatePet(pet: Entity): void;
   isDelveCompanionMob(mob: Entity): boolean;
@@ -906,13 +957,16 @@ export interface SimContextCallbacks {
   equipItem(itemId: string, pid?: number): void;
   unequipItem(slot: EquipSlot, pid?: number): boolean;
   // Payload grants preserve material source buckets and gear instance identity.
+  // Returns the payload the first copy actually landed with (a tracked copy
+  // carries its minted guid and provenance, item_tracking.ts), or nothing when
+  // the grant did not resolve.
   addItemInstance(
     itemId: string,
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
     opts?: InventoryGrantOptions,
-  ): void;
+  ): ItemInstancePayload | void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
   // Owned by mob/boss_mechanics.ts (M5); the delve boss scripts consume it.
@@ -1115,7 +1169,8 @@ export interface SimContextCallbacks {
   // B1 bags (src/sim/bags.ts): the capacity pre-check every blocking command
   // path calls before granting (buy/loot/pickup/fish/conjure/collect/trade/
   // turn-in). Stays on Sim next to the addItem/removeItem/countItem hub.
-  canAddItem(itemId: string, count: number, pid?: number): boolean;
+  // Pass the granted copy's payload to include only compatible stack room.
+  canAddItem(itemId: string, count: number, pid?: number, copy?: ItemInstancePayload): boolean;
 
   // Ravenpost mail (mail/post_office.ts): the quest turn-in core
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter
@@ -1216,6 +1271,10 @@ export interface SimContextCallbacks {
 
 // The seam consumed by extracted modules.
 export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
+  readonly courierBankExchange?: CourierBankExchange;
+  // Installed by the host after boot (the membership services own it); absent in
+  // offline worlds, where a courier has no other characters to visit.
+  readonly courierAccountExchange?: CourierAccountExchange;
   // The resolved storage price table (storage_prices.ts): bank expansions,
   // bank bag sockets, vault rungs. Frozen at Sim construction from the
   // cfg.storagePrices override; the ONE price truth every bank/vault charge
@@ -1240,6 +1299,8 @@ export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
 // journal wiring fails to compile there, and a deliberately inert server
 // caller must pass the exported inert constant by name.
 export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {
+  readonly courierBankExchange?: CourierBankExchange;
+  readonly courierAccountExchange?: CourierAccountExchange;
   readonly storagePrices: StoragePrices;
 }
 
@@ -1251,6 +1312,12 @@ export interface SimContextHost extends SimContextPrimitives, SimContextCallback
 // determinism.
 export function createSimContext(host: SimContextHost): SimContext {
   return {
+    get courierBankExchange() {
+      return host.courierBankExchange;
+    },
+    get courierAccountExchange() {
+      return host.courierAccountExchange;
+    },
     get rng() {
       return host.rng;
     },
@@ -1283,6 +1350,15 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get stationPlacements() {
       return host.stationPlacements;
+    },
+    get objectMoves() {
+      return host.objectMoves;
+    },
+    get graveyards() {
+      return host.graveyards;
+    },
+    get playerStart() {
+      return host.playerStart;
     },
     get primaryId() {
       return host.primaryId;
@@ -1331,6 +1407,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set dungeonDoorIds(v) {
       host.dungeonDoorIds = v;
+    },
+    get pendingDifficultyChanges() {
+      return host.pendingDifficultyChanges;
     },
     get instances() {
       return host.instances;
@@ -1455,6 +1534,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get hillState() {
       return host.hillState;
     },
+    get seasonal() {
+      return host.seasonal;
+    },
     get hillProbe() {
       return host.hillProbe;
     },
@@ -1566,6 +1648,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get worldBossEntityIds() {
       return host.worldBossEntityIds;
     },
+    get musterArmy() {
+      return host.musterArmy;
+    },
     get deedRuntime() {
       return host.deedRuntime;
     },
@@ -1587,12 +1672,14 @@ export function createSimContext(host: SimContextHost): SimContext {
     set nextCommissionOrderId(v) {
       host.nextCommissionOrderId = v;
     },
+    onBuddyGranted: host.onBuddyGranted,
     emit: host.emit,
     error: host.error,
     reserveVaultConsumption: host.reserveVaultConsumption,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
     weeklyRaidResetMs: host.weeklyRaidResetMs,
+    dayNightPhase: host.dayNightPhase,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     instanceClaimIdAt: host.instanceClaimIdAt,
@@ -1600,9 +1687,11 @@ export function createSimContext(host: SimContextHost): SimContext {
     leaveDungeon: host.leaveDungeon,
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
+    emitRiftDeparture: host.emitRiftDeparture,
     riftOpenTreasure: host.riftOpenTreasure,
     resetDungeonInstances: host.resetDungeonInstances,
     inheritDungeonResetLocks: host.inheritDungeonResetLocks,
+    onDungeonFinderPartyJoined: host.onDungeonFinderPartyJoined,
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,
@@ -1670,6 +1759,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     pullTimerStart: host.pullTimerStart,
     pullTimerCancel: host.pullTimerCancel,
     removeFromParty: host.removeFromParty,
+    hillPartyDisband: host.hillPartyDisband,
+    hillPartyJoin: host.hillPartyJoin,
     dropPartyMarkers: host.dropPartyMarkers,
     formDungeonFinderGroup: host.formDungeonFinderGroup,
     onMobKilledForQuests: host.onMobKilledForQuests,
@@ -1725,6 +1816,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     resolveMovePoint: host.resolveMovePoint,
     resolvePlayerMove: host.resolvePlayerMove,
     resolveMove: host.resolveMove,
+    ...(host.platformFor ? { platformFor: host.platformFor } : {}),
     updatePet: host.updatePet,
     isDelveCompanionMob: host.isDelveCompanionMob,
     updateDelveCompanion: host.updateDelveCompanion,
@@ -1855,7 +1947,10 @@ export function createSimContext(host: SimContextHost): SimContext {
  * Undefined means the action has no vault draw and the host was deliberately
  * not called. Null is a host refusal. A handle is an accepted reservation.
  * The cloned rows and array are frozen before crossing the host boundary, and
- * sorting uses code-unit order so it is deterministic across runtimes. */
+ * sorting uses code-unit order so it is deterministic across runtimes. Units
+ * the draw will take from the crafter's OWN signed buckets are split into
+ * their own signer-carrying takes (splitVaultTakesBySigner), so the host's
+ * ledger rows name the identity that really leaves the vault. */
 export function reservePlannedVaultConsumption(
   ctx: SimContext,
   pid: number,
@@ -1864,13 +1959,25 @@ export function reservePlannedVaultConsumption(
 ): VaultConsumptionReservation | null | undefined {
   const takes: VaultConsumptionTake[] = [];
   for (const plan of plans) {
-    for (const take of plan.vault) {
-      takes.push(Object.freeze({ itemId: take.itemId, count: take.count }));
-    }
+    for (const take of plan.vault) takes.push({ itemId: take.itemId, count: take.count });
   }
   if (takes.length === 0) return undefined;
   takes.sort((a, b) => (a.itemId < b.itemId ? -1 : a.itemId > b.itemId ? 1 : a.count - b.count));
-  return ctx.reserveVaultConsumption(pid, Object.freeze(takes), vaultUpgrades);
+  const meta = ctx.players.get(pid);
+  const offered = meta
+    ? splitVaultTakesBySigner(
+        takes,
+        meta.vault.stock,
+        meta.vault.special,
+        materialItemIds(),
+        meta.name,
+      )
+    : takes;
+  return ctx.reserveVaultConsumption(
+    pid,
+    Object.freeze(offered.map((take) => Object.freeze({ ...take }))),
+    vaultUpgrades,
+  );
 }
 
 /** Settle a planned vault reservation against what the apply loop really moved.

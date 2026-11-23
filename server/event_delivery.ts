@@ -1,3 +1,4 @@
+import { duelEndVisibleToViewer } from '../src/sim/social/duel_zone';
 import type { SimEvent, Vec3 } from '../src/sim/types';
 
 type CombatEventParty = {
@@ -43,7 +44,25 @@ export function shouldDeliverCombatEventToViewer(
   // An absorb credit is healing-shaped (shielder -> shielded): same scope.
   if (ev.type === 'absorb')
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
+  // A hidden hunter trap's placement and armed shimmer: only its owner and the
+  // owner's group may learn where it lies, so enemy players walk into it blind.
+  if (ev.type === 'spellfxAt' && ev.concealedFromHostiles) {
+    if (ev.sourceId === undefined) return false;
+    const owner = principalOf(ev.sourceId, ownerOf);
+    return owner === viewerPid || viewerParty?.members.includes(owner) === true;
+  }
   return true;
+}
+
+export function shouldDeliverEventToViewer(
+  ev: SimEvent,
+  viewerPid: number,
+  viewerParty: CombatEventParty | null,
+  ownerOf: CombatEventOwnerLookup,
+  viewerPos: Vec3,
+): boolean {
+  if (ev.type === 'duelEnd') return duelEndVisibleToViewer(ev, viewerPid, viewerPos);
+  return shouldDeliverCombatEventToViewer(ev, viewerPid, viewerParty, ownerOf);
 }
 
 // The live-entity lookup eventAnchor scopes entity-anchored events with; the

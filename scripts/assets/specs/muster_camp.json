@@ -1,0 +1,83 @@
+{
+  "note": "The Mirefen muster camp kit (Balgath world boss). Raw GLBs come from the deterministic Blender factory scripts/assets/muster_camp/model.py, driven by export_muster_camp.mjs, which stamps the source fingerprint and runs this spec. Vertex-coloured, texture-free, one GLB per kit piece; placed by src/render/muster_camps_core.ts through the props decor pass. Style references: owner-supplied AI concept images (stake palisades, barricade, gate, watchtower), style only, not committed and not traced.",
+  "items": [
+    {
+      "src": "tmp/asset_src/muster_camp/muster_palisade.glb",
+      "out": "models/props/muster_palisade.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_barricade.glb",
+      "out": "models/props/muster_barricade.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_gate.glb",
+      "out": "models/props/muster_gate.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_watchtower.glb",
+      "out": "models/props/muster_watchtower.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_tent_large.glb",
+      "out": "models/props/muster_tent_large.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_tent_small.glb",
+      "out": "models/props/muster_tent_small.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_weapon_rack.glb",
+      "out": "models/props/muster_weapon_rack.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_lantern_post.glb",
+      "out": "models/props/muster_lantern_post.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_crate.glb",
+      "out": "models/props/muster_crate.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_barrel.glb",
+      "out": "models/props/muster_barrel.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_sacks.glb",
+      "out": "models/props/muster_sacks.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_cart_wheel.glb",
+      "out": "models/props/muster_cart_wheel.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/muster_camp/muster_torch.glb",
+      "out": "models/props/muster_torch.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

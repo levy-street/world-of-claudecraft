@@ -42,6 +42,10 @@ ALTER TABLE discord_links ADD COLUMN IF NOT EXISTS discord_role TEXT;
 -- it separately, and may differ if the owner later sets their own). Additive +
 -- idempotent so existing deployments upgrade on boot.
 ALTER TABLE discord_links ADD COLUMN IF NOT EXISTS discord_email TEXT;
+-- The player's own /flair on|off choice for their Discord role flair. Defaults
+-- to shown so every existing link keeps today's behavior; a constant default
+-- makes this a metadata-only change on Postgres 11+. Additive + idempotent.
+ALTER TABLE discord_links ADD COLUMN IF NOT EXISTS flair_hidden BOOLEAN NOT NULL DEFAULT FALSE;
 -- Single-use, short-lived OAuth state rows. The PKCE verifier is stored
 -- server-side (never round-tripped through the browser); consuming a state row
 -- deletes it (replay + CSRF protection). account_id is set only for 'link' mode.
@@ -662,14 +666,16 @@ export interface DiscordFlair {
   name: string | null;
   /** Epoch ms the member joined the Discord server, or null (for "member since"). */
   joinedAtMs: number | null;
-  /** Top special-role key (levyst/admin/coredevs/devs/mods/artists), or null. */
+  /** Top special-role key (src/sim/discord_roles.ts), or null. */
   role: string | null;
 }
 
 /**
  * Full nameplate/inspect flair for an account: status tier + Discord PFP + handle.
  * Null when the account has no linked Discord (so unlinked players broadcast
- * nothing). One round-trip joining the link to the reward balance.
+ * nothing). One round-trip joining the link to the reward balance. A player who
+ * ran /flair off gets no role here, and this read is the one every role surface
+ * (nameplate, inspect card, chat tag) derives from, so hiding needs no other check.
  */
 export async function discordFlairForAccount(
   pool: Pool,
@@ -677,7 +683,8 @@ export async function discordFlairForAccount(
 ): Promise<DiscordFlair | null> {
   const res = await pool.query(
     `SELECT dl.discord_user_id, dl.discord_username, dl.discord_avatar,
-            dl.discord_joined_at, dl.discord_role,
+            dl.discord_joined_at,
+            CASE WHEN dl.flair_hidden THEN NULL ELSE dl.discord_role END AS discord_role,
             COALESCE(rp.lifetime_points, 0) AS lifetime_points
        FROM discord_links dl
        LEFT JOIN reward_points rp ON rp.account_id = dl.account_id
@@ -694,6 +701,37 @@ export async function discordFlairForAccount(
     joinedAtMs: joined !== null && Number.isFinite(joined) ? joined : null,
     role: typeof row.discord_role === 'string' ? row.discord_role : null,
   };
+}
+
+/**
+ * Whether the account hid its Discord role flair with /flair off, or null when
+ * the account has no linked Discord.
+ */
+export async function discordFlairHiddenForAccount(
+  pool: Pool,
+  accountId: number,
+): Promise<boolean | null> {
+  const res = await pool.query('SELECT flair_hidden FROM discord_links WHERE account_id = $1', [
+    accountId,
+  ]);
+  const row = res.rows[0];
+  return row ? row.flair_hidden === true : null;
+}
+
+/**
+ * Persist /flair on (hidden = false) or /flair off (hidden = true). False when
+ * the account has no linked Discord, so there was nothing to change.
+ */
+export async function setDiscordFlairHidden(
+  pool: Pool,
+  accountId: number,
+  hidden: boolean,
+): Promise<boolean> {
+  const res = await pool.query('UPDATE discord_links SET flair_hidden = $2 WHERE account_id = $1', [
+    accountId,
+    hidden,
+  ]);
+  return (res.rowCount ?? 0) > 0;
 }
 
 /**

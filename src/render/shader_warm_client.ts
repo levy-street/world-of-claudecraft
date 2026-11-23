@@ -895,6 +895,23 @@ export function noteShaderWarmSettingChanged(): void {
   if (state.platform === 'ios' && setting !== 'off') state.refusal = 'ios-webkit';
 }
 
+/** The game context was restored in place: its extension set was enabled
+ *  again (renderer_extensions.ts, re-run by context_restore.ts) and every
+ *  program the worker warmed was keyed for the lost context's request book.
+ *  Retire the worker and forget its book, so the next policy call starts a
+ *  fresh one initialised from the restored context. A retirement for cause
+ *  (the breaker, an extension drift) stands, exactly as across a setting
+ *  round trip. */
+export function restartShaderWarmForContextRestore(): void {
+  if (!state.spawn || state.workerState === 'idle') return;
+  const cause = state.retiredCause;
+  retireAndForgetWorker();
+  if (!cause) return;
+  state.workerState = cause.worker;
+  state.refusal = cause.reason;
+  state.retiredCause = cause;
+}
+
 /** The renderer is going: the worker's context contract was that renderer's,
  *  and so were the programs it warmed (their context goes with the worker),
  *  so the request book starts over with the next renderer. */

@@ -75,6 +75,7 @@ import {
 } from '../sim/delves/geometry';
 import { isFerryPassenger } from '../sim/ferry_passenger';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
+import { slipperyGrip } from '../sim/slippery_ground';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 import type { DelveRunInfo } from '../world_api/delves';
 import type { RiftFloorView } from '../world_api/dungeons';
@@ -401,10 +402,14 @@ export class SelfMotionPredictor {
     // does not carry: stand down and let the deck-framed authoritative pose
     // (render/deck_frame.ts) draw them (the reconciling pipeline predicts
     // aboard; this legacy one does not).
+    // Slippery ground (src/sim/slippery_ground.ts) carries a ground velocity
+    // the server never mirrors: the reconciling pipeline stands down on it
+    // (a movement override), and so does this one.
     if (
       !frame.enabled ||
       hasValkyrsCallingFlightAura(self) ||
       self.riftSliding ||
+      slipperyGrip(self) > 0 ||
       isFerryPassenger(self)
     ) {
       this.reset();
@@ -491,6 +496,7 @@ export class SelfMotionPredictor {
     // Mount speed reads the entity mirror (player_motion.moveSpeedMult), so a
     // mid-session mount/dismount must reach the scratch actor the same frame.
     actor.mountKey = self.mountKey;
+    actor.ridingTier = self.ridingTier;
     // The kernel roots movement while a mount summon channel is in flight
     // (mountCastRemaining > 0 with a non-empty mountCastKey); borrow both so the
     // online display roots in lockstep with the server. A dismount channel

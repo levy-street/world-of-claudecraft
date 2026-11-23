@@ -37,6 +37,7 @@ import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { draggedCopySlotIndex, dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { focusedWithin, restoreFirstEnabled } from './focus_restore';
+import { gearScore } from './gear_score_view';
 import { writeHotbarDragData } from './hud/action_bar/hotbar';
 import { isUsableTrinketId } from './hud/action_bar/trinket_slot_core';
 import { currenciesTabHtml } from './hud/currencies';
@@ -309,7 +310,7 @@ export class CharWindow {
             archetype: archetypeTitle,
             hobby: hobbyCraft,
           });
-    let html = `<div class="panel-title char-title-portrait ui-win-head">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'sm', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text ui-win-title" id="char-title">${esc(p.name)}<span class="ui-win-sub char-title-sub">${archetypeCrest}${esc(subtitle)}</span></span><span class="char-honor-balance">${currencyIconHtml('honor')}${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait ui-win-head">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'sm', catalog: p.skinCatalog, appearance: p.modularAppearance, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text ui-win-title" id="char-title">${esc(p.name)}<span class="ui-win-sub char-title-sub">${archetypeCrest}${esc(subtitle)}</span></span><span class="char-honor-balance">${currencyIconHtml('honor')}${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     const panelLabel = `aria-labelledby="${esc(charSidebarTabId(sidebar.selected))}"`;
     const paperdoll = `<section class="char-equipment-pane"><div class="paperdoll">
         <div class="equip-col" id="equip-col-left"></div>
@@ -415,7 +416,11 @@ export class CharWindow {
       else this.markDropTargets(drag.itemId, named);
     }
 
-    for (const cell of el.querySelectorAll<HTMLElement>('.stat-panels [data-stat]')) {
+    // Every stat row on the sheet: the Offense/Defense rail and the attribute
+    // row under the paperdoll. Keyed on the cell itself, never on a wrapper: the
+    // bottom tab strip restructure renamed the old `.stat-panels` wrapper and
+    // silently left every stat without its tooltip (live report).
+    for (const cell of el.querySelectorAll<HTMLElement>('.stat-cell[data-stat]')) {
       const stat = cell.dataset.stat as StatId;
       // Resolve the tooltip lazily, on show, so the breakdown reflects the
       // player's current stats at the moment they hover, not at render time.
@@ -464,7 +469,9 @@ export class CharWindow {
   /** The titled stat boards (Offense, Defense, then Specialization): the
    *  Character tab's rail. */
   private statsRailHtml(world: IWorld): string {
-    return `<div class="char-rail-panels">${STAT_PANELS.filter((panel) => panel.kind !== 'tiles')
+    return `<div class="char-rail-panels">${this.gearScoreHtml(world)}${STAT_PANELS.filter(
+      (panel) => panel.kind !== 'tiles',
+    )
       .map((panel) => {
         const cells = panel.stats
           .map((stat) =>
@@ -479,6 +486,18 @@ export class CharWindow {
         return `<div class="stat-panel ui-card">${title}${cells}</div>`;
       })
       .join('')}${specializationPanelHtml(world)}</div>`;
+  }
+
+  /** The Gearscore card at the top of the rail (the average worn item level),
+   *  omitted while nothing worn has an item level. */
+  private gearScoreHtml(world: IWorld): string {
+    const score = gearScore(buildPaperdollView(world.equipment, ITEMS, world.equipmentInstances));
+    if (score === null) return '';
+    return (
+      `<div class="stat-panel ui-card char-gearscore">` +
+      `<span class="stat-cell ui-stat-row">${esc(t('hudChrome.charSheet.gearScore'))} ` +
+      `<b>${esc(formatNumber(score, { minimumFractionDigits: 1, maximumFractionDigits: 1 }))}</b></span></div>`
+    );
   }
 
   /** The five primary attributes as tiles: the row under the paperdoll. */

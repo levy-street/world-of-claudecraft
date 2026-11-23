@@ -13,3 +13,14 @@ export function materialStorageTransferPayload(
     ...(selection === undefined ? {} : { selection }),
   };
 }
+
+/** Exact-copy bag selector shared by carried and bank socket commands. */
+export function bagSocketPayload(
+  itemId: string,
+  socket?: number,
+  target?: { slotIndex: number },
+): { item: string; socket: number | undefined; slot?: number } {
+  return target === undefined
+    ? { item: itemId, socket }
+    : { item: itemId, socket, slot: target.slotIndex };
+}

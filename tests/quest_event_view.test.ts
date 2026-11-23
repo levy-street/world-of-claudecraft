@@ -5,6 +5,18 @@ import { questEventPresentation } from '../src/ui/quest_event_view';
 import { worldQuestDisplayName } from '../src/ui/world_quest_view';
 
 describe('quest event presentation', () => {
+  it('reports osmium rather than copper for Willowfen mining progress', () => {
+    const progress = questEventPresentation({
+      type: 'worldQuestProgress',
+      questId: 'wq_willowfen_ore',
+      count: 1,
+      required: 3,
+      pid: 1,
+    });
+    expect(progress?.logText).toBe('Mine Osmium Ore: 1/3');
+    expect(progress?.flashText).toBe('Mine Osmium Ore: 1/3');
+  });
+
   it.each(['bronze', 'silver', 'gold'] as const)(
     'keeps %s score in the durable log without changing normal completion feedback',
     (rating) => {
@@ -207,5 +219,23 @@ describe('clue scroll and treasure hunt events', () => {
     expect(casket?.logText).toMatch(
       /^The casket holds 6g 0s and Cracked Wolf Fang and Cracked Wolf Fang\.$/,
     );
+  });
+
+  it('pops a queued banner and a log line naming every mailed world quest reward', () => {
+    const mailed = questEventPresentation({
+      type: 'worldQuestRewardMailed',
+      itemIds: ['wolf_fang', 'rift_essence'],
+      pid: 1,
+    });
+    const text =
+      'Your bags are full. Your reward was sent to your mailbox: Cracked Wolf Fang and Rift Essence.';
+    // The banner is the pop-up; queued as a celebration so the completion
+    // banner on the same tick cannot replace it. The log line is the record.
+    expect(mailed).toEqual({
+      bannerText: text,
+      bannerClass: 'deed',
+      logText: text,
+      sound: 'quest_ready',
+    });
   });
 });

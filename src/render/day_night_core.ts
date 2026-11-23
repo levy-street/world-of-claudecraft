@@ -11,20 +11,27 @@
 //
 // The cycle is anchored to the Unix epoch, so it is timezone-independent by
 // construction: every client on Earth computes the identical phase from the same
-// absolute instant, giving one shared world clock with no netcode. Day/night is
-// render-only (it never touches the sim), so this determinism is about visual
-// consistency across clients, not about parity.
+// absolute instant, giving one shared world clock with no netcode. The period and
+// the phase function themselves live in src/sim/day_night.ts (the sim reads the
+// same clock to put its world boss to bed at dusk); everything that turns a phase
+// into LIGHT stays here, render-only, and this determinism is about visual
+// consistency across clients.
 
+import { DAY_NIGHT_CYCLE_MS } from '../sim/day_night';
 import type { BiomeId } from '../sim/types';
 import { clamp01 } from './num_clamp';
 
 /** Full day-to-night-to-day period. Forty-five real minutes: long enough that a
  *  zone crossing is not outpaced by the sky (the old twenty felt frantic), still
  *  short enough that a play session sees several dawns and dusks. Epoch-anchored
- *  below, so the phase is identical for every player on Earth at the same
+ *  (cyclePhase), so the phase is identical for every player on Earth at the same
  *  instant, decoupled from local clocks. The lunar month (LUNAR_CYCLE_MS) is
- *  defined in cycles, so it stretches with this automatically. */
-export const DAY_NIGHT_CYCLE_MS = 45 * 60 * 1000;
+ *  defined in cycles, so it stretches with this automatically.
+ *
+ *  Defined in src/sim/day_night.ts and re-exported: the sim needs the same period
+ *  and phase function now that a world boss sleeps through the night, and one
+ *  definition is what keeps his dawn and the sky's dawn the same instant. */
+export { cyclePhase, DAY_NIGHT_CYCLE_MS } from '../sim/day_night';
 
 /** The grade a frame reads: intensity scale for the lights + IBL, per-channel
  *  color multipliers for the sky dome and fog, a fog-distance pull-in, and the
@@ -451,15 +458,6 @@ function lerp3(
 function smoothstep(t: number): number {
   const c = clamp01(t);
   return c * c * (3 - 2 * c);
-}
-
-/** Cycle position in [0, 1) for a Unix millisecond timestamp. Epoch-anchored, so
- *  the same instant yields the same phase in every timezone. The double modulo
- *  keeps it in range even for a negative input (defensive; now is never < 0). */
-export function cyclePhase(nowMs: number): number {
-  return (
-    (((nowMs % DAY_NIGHT_CYCLE_MS) + DAY_NIGHT_CYCLE_MS) % DAY_NIGHT_CYCLE_MS) / DAY_NIGHT_CYCLE_MS
-  );
 }
 
 /** Global daylight amount in [0, 1] for a cycle phase: 0 at phase 0 (midnight),

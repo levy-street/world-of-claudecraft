@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import {
   RIFT_ESSENCE_ITEM_ID,
   RIFT_GEAR_ITEM_IDS,
   RIFT_GEM_IDS,
 } from '../src/sim/content/rift/items';
+import { GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
+import { SHADOW_QUEST_ID } from '../src/sim/content/world_quest_shadow';
+import { WISP_MAZE_QUEST_ID, WISP_MAZE_SITE } from '../src/sim/content/world_quest_wisp_maze';
 import { isRiftPos, ZONES } from '../src/sim/data';
+import { createGliderFlightState } from '../src/sim/minigames/glider_flight';
+import { createWispMaze } from '../src/sim/minigames/wisp_maze';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import {
   closeNaturalRiftPortal,
@@ -25,10 +30,12 @@ import {
   spawnNaturalRiftPortal,
   updateRiftPortals,
 } from '../src/sim/rift/portals';
-import { updateRiftInstances } from '../src/sim/rift/runs';
+import { updateRiftInstances, updateRiftTriggers } from '../src/sim/rift/runs';
 import type { RiftEvent, RiftInstance } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import { DT, type Entity, type SimEvent, type WorldQuestProgress } from '../src/sim/types';
+import { inWispMazeFootprint } from '../src/sim/wisp_maze_ground';
+import { inGardenMaze } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const SEED = 777;
@@ -121,6 +128,13 @@ describe('rift ranks: zone mapping and tuning', () => {
         ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'].includes(zone.id),
       ).every((zone) => !zone.riftPortalEligible),
     ).toBe(true);
+    // The northern row of the map never hosts a natural rift (maintainer
+    // decision): pinned by id against the scheduler's own eligibility list.
+    const eligibleIds = eligibleRiftZones().map((zone) => zone.id);
+    for (const id of ['amberfall', 'frostveil', 'drakelands']) {
+      expect(ZONES.some((zone) => zone.id === id)).toBe(true);
+      expect(eligibleIds).not.toContain(id);
+    }
     const farshore = eligible.find((zone) => zone.id === 'farshore_isle')!;
     const nightbloom = eligible.find((zone) => zone.id === 'nightbloom')!;
     expect(riftTierForZone(farshore, 0)).toBe('C');
@@ -152,7 +166,7 @@ describe('rift portals: one-per-zone rotation scheduler', () => {
     const events = spawnDuePortal(sim);
     // One portal per eligible zone, all distinct zones, in a single pass.
     const zones = eligibleRiftZones();
-    expect(zones.length).toBe(11);
+    expect(zones.length).toBe(8);
     expect(sim.naturalRiftPortals.length).toBe(zones.length);
     expect(new Set(sim.naturalRiftPortals.map((q) => q.zoneId)).size).toBe(zones.length);
     for (const p of sim.naturalRiftPortals) {
@@ -661,7 +675,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     ).toBe(true);
     // NO Heroic Marks on the corpse at any rank: marks stay a heroic
     // dungeon/raid currency (maintainer decision).
-    const marks = (boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID);
+    const marks = (boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_CURRENCY_ID);
     expect(marks).toEqual([]);
   });
 
@@ -675,7 +689,9 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     tickSeconds(sim, 1.2);
     // The heroic daily gate is dungeon/raid state: a rift clear never stamps it.
     expect([...meta.heroicDaily.marked].some((k) => k.startsWith('rift_'))).toBe(false);
-    expect((boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID)).toEqual([]);
+    expect((boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_CURRENCY_ID)).toEqual(
+      [],
+    );
     // A dev-portal run has no rank: never pays, never seals.
     sim.enterRift(4242, 15, sim.player.id);
     const inst2 = sim.riftInstances.find((i) => i.partyKey !== null && i.seed === 4242)!;
@@ -705,7 +721,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     tickSeconds(sim, 1.2);
     expect(inst.rewarded).toBe(true);
     const rewardItems = boss.loot?.items ?? [];
-    expect(rewardItems.filter((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toEqual([]);
+    expect(rewardItems.filter((item) => item.itemId === HEROIC_MARK_CURRENCY_ID)).toEqual([]);
     expect(rewardItems.some((item) => item.itemId === RIFT_ESSENCE_ITEM_ID)).toBe(false);
     expect(
       rewardItems.some((item) => (RIFT_GEM_IDS as readonly string[]).includes(item.itemId)),
@@ -1044,4 +1060,110 @@ describe('rift entry: won-run loot recovery grace (the portal outlives the clear
       'no false promise of a standing entrance',
     ).toBe(false);
   });
+});
+
+describe('rift portals: maze exclusions and world quest trials', () => {
+  it('never spawns a rift portal inside the wisp maze footprint or the garden maze', () => {
+    const sim = makeSim();
+    let spawnedCount = 0;
+    for (let ordinal = 0; ordinal < 60; ordinal++) {
+      if (spawnNaturalRiftPortal(sim.ctx, ordinal, { zoneId: 'evergarden' })) {
+        spawnedCount++;
+        const portal = sim.ctx.naturalRiftPortals.at(-1)!;
+        expect(
+          inWispMazeFootprint(portal.position.x, portal.position.z, 8),
+          `ordinal ${ordinal} rift portal at (${portal.position.x}, ${portal.position.z}) should not be in wisp maze footprint`,
+        ).toBe(false);
+        expect(
+          inGardenMaze(portal.position.x, portal.position.z),
+          `ordinal ${ordinal} rift portal at (${portal.position.x}, ${portal.position.z}) should not be in garden maze`,
+        ).toBe(false);
+      }
+    }
+    expect(spawnedCount).toBeGreaterThan(10);
+  });
+
+  it('refuses automatic or direct portal entry while wisp maze actions are locked', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    spawnDuePortal(sim);
+    const portalInfo = sim.naturalRiftPortals[0];
+    const portalEntity = sim.entities.get(portalInfo.id)!;
+
+    // Activate wisp maze trial.
+    const state = createWispMaze(42, 'normal');
+    const meta = sim.ctx.players.get(sim.player.id)!;
+    meta.worldQuestLog.set(WISP_MAZE_QUEST_ID, {
+      questId: WISP_MAZE_QUEST_ID,
+      count: 0,
+      state: 'active',
+      wispMaze: state,
+    });
+
+    // Place player at their valid maze location, and portal right next to them.
+    sim.player.pos = {
+      x: WISP_MAZE_SITE.x + state.playerX,
+      y: sim.player.pos.y,
+      z: WISP_MAZE_SITE.z + state.playerZ,
+    };
+    sim.player.prevPos = { ...sim.player.pos };
+    portalEntity.pos = { ...sim.player.pos };
+
+    // Proximity check during sim tick must NOT enter the rift.
+    sim.tick();
+    expect(sim.riftInstances.some((i) => i.memberIds.has(sim.player.id))).toBe(false);
+
+    // Direct portal interaction must also be refused.
+    sim.enterRift(portalInfo.seed, portalInfo.baseLevel, sim.player.id, undefined, portalEntity);
+    expect(sim.riftInstances.some((i) => i.memberIds.has(sim.player.id))).toBe(false);
+  });
+
+  // Every trial that owns the player's movement, not only the maze: the
+  // glider flies over Galecrest and the 2D trigger ignores altitude.
+  const TRIALS: {
+    trial: string;
+    questId: string;
+    live: () => Partial<WorldQuestProgress>;
+    ended: () => Partial<WorldQuestProgress>;
+  }[] = [
+    {
+      trial: 'wisp maze',
+      questId: WISP_MAZE_QUEST_ID,
+      live: () => ({ wispMaze: createWispMaze(42, 'normal') }),
+      ended: () => ({ wispMaze: { ...createWispMaze(42, 'normal'), paused: true } }),
+    },
+    {
+      trial: 'shadow',
+      questId: SHADOW_QUEST_ID,
+      live: () => ({ shadow: { phase: 'cloaked', suspicion: 0, cooldown: 0 } }),
+      ended: () => ({ shadow: { phase: 'caught', suspicion: 0, cooldown: 0 } }),
+    },
+    {
+      trial: 'glider',
+      questId: GLIDER_QUEST_ID,
+      live: () => ({ glider: createGliderFlightState(false) }),
+      ended: () => ({ glider: { ...createGliderFlightState(false), phase: 'won' } }),
+    },
+  ];
+
+  it.each(TRIALS)(
+    'refuses portal walk-in during a live $trial run and allows it once the run ends',
+    ({ questId, live, ended }) => {
+      const sim = makeSim();
+      sim.setPlayerLevel(RIFT_MIN_LEVEL);
+      spawnDuePortal(sim);
+      const portal = sim.entities.get(sim.naturalRiftPortals[0].id)!;
+      sim.player.pos = { ...portal.pos };
+      const log = sim.ctx.players.get(sim.player.id)!.worldQuestLog;
+      const inRift = () => sim.riftInstances.some((i) => i.memberIds.has(sim.player.id));
+
+      log.set(questId, { questId, count: 0, state: 'active', ...live() });
+      updateRiftTriggers(sim.ctx, sim.player);
+      expect(inRift(), 'walk-in during the run').toBe(false);
+
+      log.set(questId, { questId, count: 0, state: 'active', ...ended() });
+      updateRiftTriggers(sim.ctx, sim.player);
+      expect(inRift(), 'walk-in after the run').toBe(true);
+    },
+  );
 });

@@ -153,8 +153,16 @@ describe('dynamic resolution renderer wiring', () => {
         /projectionScalePixels\(\n\s+this\.camera\.projectionMatrix\.elements\[5\],\n\s+this\.renderPixelHeight,/g,
       ),
     ).toHaveLength(2);
-    expect(renderer).toContain('(clientX / this.viewport.width) * 2 - 1');
-    expect(renderer).toContain('-(clientY / this.viewport.height) * 2 + 1');
+    // Click picking moved to world_picking.ts; it maps through the renderer's
+    // CSS viewport (the host hands it this.viewport), never the pixel height.
+    const picking = readFileSync(
+      new URL('../src/render/world_picking.ts', import.meta.url),
+      'utf8',
+    );
+    expect(renderer).toContain('viewport: () => this.viewport,');
+    expect(picking).toContain('const { width, height } = this.host.viewport();');
+    expect(picking).toContain('(clientX / width) * 2 - 1, -(clientY / height) * 2 + 1');
+    expect(picking).not.toContain('renderPixelHeight');
     expect(renderer).toContain('(this.tmpV.x * 0.5 + 0.5) * this.viewport.width');
     expect(renderer).toContain('(-this.tmpV.y * 0.5 + 0.5) * this.viewport.height');
   });

@@ -1,0 +1,24 @@
+{
+  "bagBar": [
+    "http://localhost:5173/ui/items/backpack.webp",
+    "http://localhost:5173/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5173/ui/items/baked_bread.webp",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url",
+    "procedural-data-url"
+  ]
+}

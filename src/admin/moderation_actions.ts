@@ -232,6 +232,26 @@ export function unbanAccount(accountId: number, note: string): Built {
   };
 }
 
+// Reverse a player's own self-deactivation (POST .../accounts/:id/reactivate). Audited
+// server-side under the 'reactivate' action, so it requires a reason like the other
+// account actions. It only clears the deactivation lock; a ban or suspension on the
+// same account stays in force.
+export function reactivateAccount(accountId: number, note: string): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  return {
+    pending: {
+      title: t('dialog.confirmReactivation'),
+      rows: [
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionReactivate') },
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/reactivate`,
+      body: { reason: note },
+    },
+  };
+}
+
 export function banDailyRewards(accountId: number, note: string, durationHours?: number): Built {
   if (!note) return { errorKey: 'alert.noteRequired' };
   if (

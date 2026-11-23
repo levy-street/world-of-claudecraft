@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
@@ -50,7 +50,38 @@ function damageEvents(events: SimEvent[], ability: string) {
   );
 }
 
+describe('shipped Splitshot', () => {
+  it('has no minimum range since the v0.45 hunter pass (8 yards before)', () => {
+    expect(ABILITIES.multi_shot.minRange).toBeUndefined();
+    expect(ABILITIES.multi_shot.description).not.toContain('Cannot be aimed within');
+  });
+
+  it('fires point blank', () => {
+    const sim = makeHunter();
+    const target = addTargetAt(sim, 1);
+    sim.drainEvents();
+
+    sim.castAbility('multi_shot', sim.playerId, { x: target.pos.x, z: target.pos.z });
+    const events = sim.tick();
+
+    expect(events).not.toContainEqual({ type: 'error', pid: sim.playerId, text: 'Too close!' });
+    expect(damageEvents(events, 'Splitshot')).toHaveLength(1);
+  });
+});
+
+// No shipped position ability authors a minimum range any more, so the engine
+// path is pinned on Splitshot with a fixture minimum (removed after the suite)
+// to keep it guarded for the next ability that ships one.
+const SPLITSHOT_MIN_RANGE = 4;
+
 describe('position ability minimum range', () => {
+  beforeAll(() => {
+    ABILITIES.multi_shot.minRange = SPLITSHOT_MIN_RANGE;
+  });
+  afterAll(() => {
+    delete ABILITIES.multi_shot.minRange;
+  });
+
   it('refuses Splitshot inside its minimum range without dealing area damage', () => {
     const sim = makeHunter();
     const target = addTargetAt(sim, 3);
@@ -85,7 +116,7 @@ describe('position ability minimum range', () => {
 
   it('allows Splitshot exactly at its minimum range', () => {
     const sim = makeHunter();
-    const target = addTargetAt(sim, 8);
+    const target = addTargetAt(sim, SPLITSHOT_MIN_RANGE);
     sim.drainEvents();
 
     sim.castAbility('multi_shot', sim.playerId, { x: target.pos.x, z: target.pos.z });
@@ -97,7 +128,7 @@ describe('position ability minimum range', () => {
   it('pushes the no-aim fallback out to the minimum range along facing', () => {
     const sim = makeHunter();
     sim.player.facing = 0;
-    addTargetAt(sim, 8);
+    addTargetAt(sim, SPLITSHOT_MIN_RANGE);
     sim.drainEvents();
 
     sim.castAbility('multi_shot', sim.playerId);

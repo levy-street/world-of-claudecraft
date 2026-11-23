@@ -422,9 +422,10 @@ partition, the rings in Varkhul's varkhul_offset), so hit is farmable,
 never a lucky bonus drop. The one-item-per-five-raiders re-cut halved the
 flow of every elective but kept each in a guaranteed group, with one
 consequence stated plainly: those groups are NORMAL-only. The Heroic
-exclusive partitions carry hit only on the six marquee weapons (30 each),
-so a roster that raided Heroic alone would top out at 60 against the 130
-melee and 110 spell caps. That is the intended shape, not a gap: Heroic
+exclusive partitions carry hit only on the six marquee weapons (30 each)
+and the hunter's Infernal Quiver (50, added 2026-10-21), so a roster that
+raided Heroic alone would top out at 60 (80 for a hunter: one weapon plus
+the quiver) against the 130 melee and 110 spell caps. That is the intended shape, not a gap: Heroic
 pays the exclusives, Normal pays the electives, the two difficulties hold
 separate weekly locks, and a Heroic roster farms its cap from its Normal
 lock the same week. Pinned per difficulty by the elective-lanes case in
@@ -506,14 +507,23 @@ The 10 armor variants map to the 27 specs (and 29 sets) like this:
 
 Notes that are not the genre default and must not be "corrected": mage arcane
 (Chronomancy) is a healer; druid feral (Wildfang) is the declared tank spec;
-hunters are a leather class; enhancement, hunter, and feral itemize
-Agility-led, not Strength-led (dev_kit_roles.ts weights).
+hunters are a leather class; enhancement and feral are Strength specs, not the
+genre's Agility specs (shaman and druid attack power is 2 per Strength and
+never reads Agility). The one source for every spec's primary stat is
+`src/sim/content/spec_primary_stat.ts`, pinned against the live stat path by
+`tests/spec_primary_stat.test.ts`.
+
+AMENDED (2026-10-21): this note once said enhancement and feral itemize
+Agility-led, copied from the dev kit weights. That was wrong: the shipped
+Warspirit and Wildfang sets were re-statted to Strength on 2026-08-30
+(aa2601951ae), Stonehearth matches the shield-tank twins, and Cinderbark Ward
+keeps Agility beside Strength only because bears cannot block.
 
 Two specs carry two sets each, by maintainer decision: feral gets a cat
 damage set (Wildfang Emberhide) and a bear tank set (Cinderbark Ward), and
 enhancement gets its damage set (Warspirit Emberscale) and an off-tank set
 (Stonehearth Bastion). That makes 29 sets across 27 specs, with tank
-coverage in both leather and Agility mail.
+coverage in both leather and Strength mail.
 
 ## The 29 tier sets
 
@@ -540,16 +550,16 @@ Primary budgets split by identity, then normalize to the exact slot budget:
 
 - Cloth spell damage: int 2 : spi 1, Spell Damage, crit and haste ratings.
 - Cloth healing: int 1 : spi 1, Healing Power, haste or crit rating.
-- Leather tanking: sta 1.2 : agi 1, crit rating, extra armor line.
-- Leather dps: agi 2 : sta 1, crit and haste ratings.
+- Leather tanking (Cinderbark): sta 1.2 : str and agi 1 (split about evenly;
+  bears cannot block, so Agility's dodge is their avoidance), crit rating,
+  extra armor line.
+- Leather dps: agi 2 : sta 1 (rogue, hunter) or str 2 : sta 1 (Wildfang, the
+  feral cat set), crit and haste ratings.
 - Leather spell damage: int 2 : spi 1, Spell Damage, crit rating.
 - Leather healing: int 1 : spi 1, Healing Power, haste rating.
-- Mail tanking (Strength): sta 1.2 : str 1, crit rating, extra armor line,
-  shields.
-- Mail tanking (Agility, Stonehearth): sta 1.2 : agi 1, crit rating, extra
-  armor line, shields.
-- Mail dps (Strength): str 2 : sta 1, crit and haste ratings.
-- Mail dps (Agility, Warspirit): agi 2 : sta 1, crit and haste ratings.
+- Mail tanking (Strength, incl. Stonehearth): sta 1.2 : str 1, crit rating,
+  extra armor line, shields.
+- Mail dps (Strength, incl. Warspirit): str 2 : sta 1, crit and haste ratings.
 - Mail spell damage: int 2 : spi 1, Spell Damage, crit and haste ratings.
 - Mail healing: int 1 : spi 1, Healing Power, crit or haste rating.
 
@@ -570,6 +580,32 @@ budget-neutral swap of the piece's minor rating). The guaranteed floor
 (any waist + two rings + any weapon = 140) covers both caps for every
 class; pinned by the cap-coverage describe in tests/ignivar_loot.test.ts.
 The scarcity POLICY holds: set pieces still carry no Hit.
+
+AMENDED (2026-10-12, healer Crit): the full-coverage widening above had
+also seeded Hit on the healer electives (the three Healing Power waists,
+Loop of Quiet Springs, Staff of the Last Spring, Springtouched Crozier),
+contradicting the ratings-ladder rule that healer-facing pieces never
+carry Hit. Direct heals are not resisted, so for most healers that Hit was
+dead weight. The two damage-converting healers (arcane mage via Temporal
+Echo, discipline priest via Doctrine) do lose live Hit, since their
+healing rides resistible damage; they trade it for Crit by maintainer
+direction, and Crit still applies before the conversion. The ring and
+weapons carry the same amount as Crit instead (25 ring, 30 weapon). The
+three waists carry Crit 30, and the other 30 rating moved into the primary
+line as +6 Int / +4 Spi (Int 15, Spi 12), converted at the dev-kit healer
+weights (rating 0.3, Int 1, Spi 0.7). Measured against what a direct
+healer actually used (the Hit was worth nothing to them), this is a
+deliberate healer buff, not a budget-neutral swap: each waist sits 10 over
+its ilvl-35 line by design, exempted in tests/item_stamina_baseline.test.ts.
+The cap floor is computed over the non-healer lanes only (healers have no
+window). Two kit builders followed: the line-only /dev bis picker
+(src/sim/dev/bis_gear.ts) now excludes Healing Power pieces for non-healer
+specs (dev_kit.ts already scored them at zero there), and the PBE boost
+(server/pbe_boost.ts, kit v7) has casters weigh a two-hander against a
+one-hander plus its offhand, so the healer staff's newly scored Crit cannot
+strip the holy kits' orb and shield. Pinned by the healer-Crit cases in
+tests/ignivar_loot.test.ts, which also hold that no shipped item with
+Healing Power carries Hit.
 
 ### The sets
 
@@ -596,7 +632,7 @@ at least matching the retired flat-stat package it replaces.
 |---|---|---|---|
 | Slagbreaker Battlegear (slagbreaker) | arms, Battlecraft | Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20. | Casting Redhand reduces Breachmaker's remaining cooldown by 3 sec. |
 | Emberfury Harness (emberfury) | fury, Bloodrush | Your Enrage lasts 6 sec instead of 4. | Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health. |
-| Forgewall Aegis (forgewall) | prot, Ironguard | Iron Resolve converts rage at 5 absorb per point instead of 4. | Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec. |
+| Forgewall Aegis (forgewall) | prot, Ironguard | Iron Resolve's shield absorbs 25% of your maximum health instead of 20%. | Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec. |
 
 **Paladin (mail)**
 
@@ -773,7 +809,7 @@ Physical jewelry splits str/agi evenly so every melee, ranged, and tank spec
 can use it; spell damage jewelry carries Spell Damage; healing jewelry
 carries Healing Power.
 
-### Shields and held offhands (4 items)
+### Shields, held offhands, and the hunter quiver (5 items)
 
 | Item | Slot | For |
 |---|---|---|
@@ -781,10 +817,17 @@ carries Healing Power.
 | Ember Warden's Barrier | offhand shield | mail healers (paladin holy, shaman resto) |
 | Orb of the Last Spring | held offhand | healers (Healing Power) |
 | Cinder of the First Design | held offhand | damage casters (Spell Damage) |
+| Infernal Quiver | worn offhand (quiver) | hunters |
 
 Shields are ArmorItemDef with shield: true and blockValue; requiredClass
 covers the shield-capable classes per role. Held offhands take the 0.75 held
-slot budget (18 points).
+slot budget (18 points). The quiver is worn, not held (occupiesHand false,
+the direfang_quiver precedent): it costs no two-hander, so it takes the
+WORN_OFFHAND_STAT_MULT line (11 points: Agi 7, Sta 4), crit 25 like the
+other offhands, and Hit 50: the one Hit-carrying offhand of the tier (the
+operator's call, 2026-10-21, keeping the hunter quiver ladder's Hit identity).
+A Heroic-only hunter (one weapon plus the quiver) reaches 80 Hit, still short
+of the 130 melee cap, so the Normal lock stays load-bearing for hit.
 
 ### Weapons (9 items)
 
@@ -860,7 +903,8 @@ Heroic pays in ACCESS, never in numbers. Each kill's slots are:
   A heroic claim skips the Normal-only off-set group, draws nothing for it,
   and this group pays instead: the marquee weapons, the Wand of Quenched
   Sparks, and on Varkhul the shields (Emberward at its unchanged ABSOLUTE 3
-  percent per heroic kill) plus both held offhands. This slot is GEAR ONLY,
+  percent per heroic kill) plus both held offhands and the hunter's Infernal
+  Quiver. This slot is GEAR ONLY,
   never a sigil, and the boss's raid trinkets sit in it too (they also sit in
   the Normal off-set slot, see below). So every Heroic kill pays one item
   Normal can never drop (the raid trinkets excepted), and Normal remains the
@@ -975,7 +1019,7 @@ tests/reliquary_content.test.ts.
 | copper | both | 200000 copper (heroic base on a heroic claim) | 1.0 |
 | varkhul_sigils | both | Legging Sigil of the Anvil / Ember / Tempest, Helm Sigil of the Anvil / Ember / Tempest | 0.17 / 0.17 / 0.16, 0.17 / 0.16 / 0.17 |
 | varkhul_offset | Normal only | the 10 feet pieces at 0.0390625 each, the 4 rings at 0.08984375 each, Forgefather's Temper / Heart of the Crucible (raid trinkets) at 0.125 each | sums to 1.0 |
-| varkhul_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Bulwark of the Inner Crucible 0.177, Ember Warden's Barrier 0.177, Varkhul's Emberward 0.03, Heart of the End Greatblade / Forgefire Spire / Staff of the Last Spring at 0.1045 / 0.098 / 0.0985, Orb of the Last Spring / Cinder of the First Design at 0.0375 each, Forgefather's Temper / Heart of the Crucible at 0.12 each | sums to 1.0 |
+| varkhul_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Bulwark of the Inner Crucible 0.177, Ember Warden's Barrier 0.177, Varkhul's Emberward 0.03, Heart of the End Greatblade / Forgefire Spire / Staff of the Last Spring at 0.1045 / 0.098 / 0.0985, Orb of the Last Spring / Cinder of the First Design at 0.025 each, Forgefather's Temper / Heart of the Crucible at 0.12 each, Infernal Quiver 0.025 (appended; the three offhands split the unchanged 0.075 held share in thirds) | sums to 1.0 |
 | varkhul_h_robe | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.34 / 0.33 / 0.33 | sums to 1.0 |
 
 ## Future redistribution
@@ -1004,9 +1048,9 @@ CLAUDE.md, content-obligations-reviewer):
 
 - **Item art**: one committed public/ui/items/<id>.webp per non-weapon item.
   The table adds 202 new item ids total (145 set pieces, 15 sigils, 20
-  waist/feet, 8 jewelry, 4 held/shield, 10 weapons); the 192 non-weapon ids
-  each need an icon, while the 10 weapons register through the weapon
-  variant tables instead. Generated through the assets:items pipeline with
+  waist/feet, 8 jewelry, 5 held/shield/quiver, 9 weapons); the 193 non-weapon
+  ids each need an icon (the later Infernal Quiver's is still pending), while
+  the 9 weapons register through the weapon variant tables instead. Generated through the assets:items pipeline with
   provenance rows in mapping.json; ITEM_IMAGE_IDS auto-picks up non-weapon
   ids and the icon gate fails on any gap.
 - **i18n**: every item id in ITEM_ENTITY_IDS with its English name at the

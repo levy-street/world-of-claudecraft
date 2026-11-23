@@ -72,7 +72,8 @@ function openWindow(root: HTMLElement, overrides: Record<string, unknown> = {}):
   const window = new OptionsWindow({
     root: () => root,
     world: () => ({}) as never,
-    keybinds: () => ({ labelAt: () => '', snapshot: () => ({}) }) as never,
+    keybinds: () =>
+      ({ labelAt: () => '', snapshot: () => ({}), convertedLayout: () => null }) as never,
     refreshKeybindLabels: vi.fn(),
     beginActionBarKeybindMode: vi.fn(),
     slotActionName: () => null,

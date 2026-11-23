@@ -17,6 +17,7 @@ import {
   noteShaderWarmHold,
   noteShaderWarmSettingChanged,
   resetShaderWarmForTest,
+  restartShaderWarmForContextRestore,
   SHADER_WARM_READY_DEADLINE_MS,
   setShaderWarmStoredSettingSource,
   shaderWarmAvailable,
@@ -2036,6 +2037,52 @@ describe('auto leaves the worker off on every backend', () => {
       refusal: 'extension-drift:EXT_disjoint_timer_query_webgl2',
     });
     expect(shaderWarmAvailable()).toBe(false);
+  });
+});
+
+describe('a WebGL context restore of the game context', () => {
+  const D3D11 =
+    'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002504) Direct3D11 vs_5_0 ps_5_0, D3D11)';
+  const context = () => ({
+    getContextAttributes: () => ({ antialias: false }),
+    getExtension: (name: string) =>
+      name === 'WEBGL_debug_renderer_info' ? { UNMASKED_RENDERER_WEBGL: 0x9246 } : null,
+    getParameter: (name: number) => (name === 0x9246 ? D3D11 : ''),
+  });
+  it('retires the running worker and lets the next policy call start a fresh one on the restored context', () => {
+    const workers: FakeWorker[] = [];
+    resetShaderWarmForTest({
+      spawn: () => {
+        const worker = fakeWorker();
+        workers.push(worker);
+        return worker;
+      },
+      search: '',
+      stored: 'all',
+    });
+    shaderWarmDecide(context(), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(workers).toHaveLength(1);
+    restartShaderWarmForContextRestore();
+    expect(workers[0].terminations).toBe(1);
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'idle', refusal: null });
+    shaderWarmDecide(context(), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(workers).toHaveLength(2);
+    expect(workers[1].ofKind('init')).toHaveLength(1);
+  });
+
+  it('keeps a retirement for cause, and does nothing where no worker ever ran', () => {
+    const worker = fakeWorker();
+    resetShaderWarmForTest({ spawn: () => worker, search: '', stored: 'all' });
+    shaderWarmDecide(context(), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    noteShaderWarmExtensionDrift('EXT_disjoint_timer_query_webgl2');
+    restartShaderWarmForContextRestore();
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'dead',
+      refusal: 'extension-drift:EXT_disjoint_timer_query_webgl2',
+    });
+    resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '', stored: 'auto' });
+    restartShaderWarmForContextRestore();
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'idle', refusal: null });
   });
 });
 

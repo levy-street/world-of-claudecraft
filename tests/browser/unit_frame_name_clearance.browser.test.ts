@@ -39,7 +39,7 @@ const PLAYER_FRAME_MARKUP = `
         <div class="uf-name" id="pf-name">Snipercup</div>
       </div>
       <div class="bar hp ui-bevel"><div class="bar-fill ui-bevel-fill" id="pf-hp"></div><div class="bar-text ui-bevel-text" id="pf-hp-text"></div></div>
-      <div class="bar mana ui-bevel ui-bevel--res" id="pf-resource"><div class="bar-fill ui-bevel-fill" id="pf-res"></div><div class="bar-text ui-bevel-text" id="pf-res-text"></div></div>
+      <div id="pf-resource-frame"><div class="bar mana ui-bevel ui-bevel--res" id="pf-resource"><div class="bar-fill ui-bevel-fill" id="pf-res"></div><div class="bar-text ui-bevel-text" id="pf-res-text"></div></div></div>
     </div>
   </div>`;
 

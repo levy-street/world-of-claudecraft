@@ -1,11 +1,13 @@
 import {
   ACESFilmicToneMapping,
   AgXToneMapping,
+  type Camera,
   CineonToneMapping,
   ColorManagement,
   GLSL3,
   LinearToneMapping,
   NeutralToneMapping,
+  type PerspectiveCamera,
   RawShaderMaterial,
   ReinhardToneMapping,
   SRGBTransfer,
@@ -17,6 +19,8 @@ import {
   type WebGLRenderTarget,
 } from 'three';
 import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass.js';
+import { PALETTE_GRADE_GLSL, paletteGradeUniforms } from './palette_lab';
+import { CEL_INK_GLSL } from './post_cel_ink_glsl';
 import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
 
 interface TimeUniform {
@@ -35,6 +39,14 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   // spirit_grade_core.ts, the same 0.6s CSS ease the base.css filter it
   // replaces used to run.
   uniform float uSpirit;
+
+  #ifdef CEL_INK
+  ${CEL_INK_GLSL}
+  #endif
+
+  #ifdef PALETTE_GRADE
+  ${PALETTE_GRADE_GLSL}
+  #endif
 
   #include <tonemapping_pars_fragment>
   #include <colorspace_pars_fragment>
@@ -278,13 +290,27 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
     // one, so on that path this is the grade's own entry quantize and nothing
     // more; the taps it blended are deliberately not quantized individually.
     vec3 c = quantizeHalf(outputColor.rgb);
+    #ifdef PALETTE_GRADE
+    // Palette lab: the look owns the white balance (the stock GAIN at mix 0).
+    c = pow(max(vec3(0.0), c * mix(GAIN, uPalWB.rgb, uPalWB.a) + LIFT), GAMMA);
+    #else
     c = pow(max(vec3(0.0), c * GAIN + LIFT), GAMMA);
+    #endif
     c = mix(c, c * c * (3.0 - 2.0 * c), 0.23);
     float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
     c = mix(vec3(l), c, 1.07);
+    #ifdef PALETTE_GRADE
+      // Palette lab (?palette=on): the live zone look, on the display image.
+      c = paletteGrade(c);
+    #endif
     vec2 d = vUv - 0.5;
-    c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);
+    c *= 1.0 - 0.08 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);
     c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;
+    #ifdef CEL_INK
+      // Cel-shading R&D ink + saturation (post_cel_ink_glsl.ts): after the
+      // display grade, before the spirit drain, so a ghost still drains fully.
+      c = celInkApply(c, inputUv, uInputUvRect.zw);
+    #endif
     if (uSpirit > 0.0) {
       float grey = dot(c, vec3(0.2126, 0.7152, 0.0722));
       c = mix(c, vec3(grey), uSpirit) * (1.0 - (1.0 - SPIRIT_BRIGHTNESS) * uSpirit);
@@ -317,6 +343,30 @@ export interface OutputGradeOptions {
    * combined with the SMAA tail, which already anti-aliases the same image.
    */
   readonly fxaa?: boolean;
+  /**
+   * Compile in the cel-shading R&D ink arm (`?cel=on`, post_cel_ink_glsl.ts).
+   * Like the FXAA arm it is a define on this pass, not a pass or a target of
+   * its own, and its taps ride the same uInputUvRect remap and clamp.
+   */
+  readonly celInk?: GradeCelInk;
+  /**
+   * Compile in the palette lab's live grade (`?palette=on`,
+   * palette_lab/palette_grade.ts) over the lab's SHARED uniform block, so every
+   * grade pass of the chain draws the same look.
+   */
+  readonly paletteGrade?: boolean;
+}
+
+/** Where the grade's cel ink reads scene depth, and the look's knobs. */
+export interface GradeCelInk {
+  /** The target holding this frame's scene depth. Read every frame: N8AO
+   *  replaces its beauty target on a stencil change. */
+  readonly depthTarget: () => WebGLRenderTarget;
+  readonly camera: Camera;
+  readonly ink: number;
+  readonly saturation: number;
+  /** Tap offset in CSS pixels; scaled by the renderer's pixel ratio. */
+  readonly inkWidth: number;
 }
 
 export class OutputGradePass extends Pass {
@@ -328,10 +378,15 @@ export class OutputGradePass extends Pass {
     uInputUvRect: { value: Vector4 };
     uInputTexelSize: { value: Vector2 };
     uSpirit: { value: number };
+    tCelDepth: { value: Texture | null };
+    uCelInk: { value: Vector4 };
+    uCelTap: { value: Vector2 };
   };
   readonly material: RawShaderMaterial;
   readonly fsQuad: FullScreenQuad;
   readonly fxaa: boolean;
+  private readonly celInk: GradeCelInk | null;
+  private readonly paletteGrade: boolean;
   private outputColorSpace: string | null = null;
   private toneMapping: ToneMapping | null = null;
   private readonly hasPreparedBloom: boolean;
@@ -344,6 +399,8 @@ export class OutputGradePass extends Pass {
     super();
     this.hasPreparedBloom = bloomTexture !== null;
     this.fxaa = options.fxaa === true;
+    this.celInk = options.celInk ?? null;
+    this.paletteGrade = options.paletteGrade === true;
     this.uniforms = {
       tDiffuse: { value: null },
       tBloom: { value: bloomTexture },
@@ -352,11 +409,15 @@ export class OutputGradePass extends Pass {
       uInputUvRect: { value: new Vector4(1, 1, 1, 1) },
       uInputTexelSize: { value: new Vector2(0, 0) },
       uSpirit: { value: 0 },
+      tCelDepth: { value: null },
+      // x ink, y saturation, z camera near, w camera far
+      uCelInk: { value: new Vector4(0, 1, 0.1, 1000) },
+      uCelTap: { value: new Vector2(0, 0) },
     };
     this.material = new RawShaderMaterial({
       name: 'OutputGradeShader',
       glslVersion: GLSL3,
-      uniforms: this.uniforms,
+      uniforms: this.paletteGrade ? { ...this.uniforms, ...paletteGradeUniforms() } : this.uniforms,
       vertexShader: OUTPUT_GRADE_VERTEX_SHADER,
       fragmentShader: OUTPUT_GRADE_FRAGMENT_SHADER,
       depthTest: false,
@@ -386,6 +447,7 @@ export class OutputGradePass extends Pass {
         1 / Math.max(1, readBuffer.height),
       );
     }
+    if (this.celInk) this.updateCelInk(this.celInk, renderer);
 
     if (
       this.outputColorSpace !== renderer.outputColorSpace ||
@@ -397,6 +459,12 @@ export class OutputGradePass extends Pass {
 
       if (this.fxaa) {
         this.material.defines.FXAA_GRADE = '';
+      }
+      if (this.celInk) {
+        this.material.defines.CEL_INK = '';
+      }
+      if (this.paletteGrade) {
+        this.material.defines.PALETTE_GRADE = '';
       }
       if (ColorManagement.getTransfer(renderer.outputColorSpace) === SRGBTransfer) {
         this.material.defines.SRGB_TRANSFER = '';
@@ -432,6 +500,23 @@ export class OutputGradePass extends Pass {
     } finally {
       renderer.autoClear = oldAutoClear;
     }
+  }
+
+  private updateCelInk(celInk: GradeCelInk, renderer: WebGLRenderer): void {
+    const depth = celInk.depthTarget();
+    this.uniforms.tCelDepth.value = depth.depthTexture;
+    const tap = celInk.inkWidth * Math.max(1, renderer.getPixelRatio());
+    this.uniforms.uCelTap.value.set(
+      tap / Math.max(1, depth.width),
+      tap / Math.max(1, depth.height),
+    );
+    const camera = celInk.camera as PerspectiveCamera;
+    // The edge test linearizes a perspective depth buffer; any other camera
+    // keeps the saturation and draws no ink.
+    const ink = camera.isPerspectiveCamera ? celInk.ink : 0;
+    const near = camera.isPerspectiveCamera ? camera.near : 0.1;
+    const far = camera.isPerspectiveCamera ? camera.far : 1000;
+    this.uniforms.uCelInk.value.set(ink, celInk.saturation, near, far);
   }
 
   override dispose(): void {

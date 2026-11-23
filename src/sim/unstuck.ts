@@ -131,6 +131,12 @@ function battlegroundGeometryHalfExtents(): { x: number; z: number } {
       z = Math.max(z, Math.abs(collider.z) + collider.r);
       continue;
     }
+    if (collider.type === 'prism') {
+      // the fork's Collision Master prisms: their bounding radius bounds them
+      x = Math.max(x, Math.abs(collider.x) + collider.br);
+      z = Math.max(z, Math.abs(collider.z) + collider.br);
+      continue;
+    }
     const cos = Math.cos(collider.rot);
     const sin = Math.sin(collider.rot);
     x = Math.max(
@@ -322,6 +328,16 @@ function overlapsBattlegroundWall(match: BgMatch, pos: Vec3): boolean {
       if (distance < collider.r + PLAYER_BODY_RADIUS - POSITION_EPS) {
         return true;
       }
+      continue;
+    }
+    // The battleground layout never emits prisms (placement-only); bound one
+    // conservatively by its outline radius.
+    if (collider.type === 'prism') {
+      const distance = Math.hypot(
+        location.point.localX - collider.x,
+        location.point.localZ - collider.z,
+      );
+      if (distance < collider.br + PLAYER_BODY_RADIUS - POSITION_EPS) return true;
       continue;
     }
     const dx = location.point.localX - collider.x;

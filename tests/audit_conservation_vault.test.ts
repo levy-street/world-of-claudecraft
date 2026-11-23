@@ -188,14 +188,16 @@ const MATERIALS: readonly string[] = [
   'smithing_flux',
   INERT_MATERIAL,
 ];
-/** The five-rung ladder and the per-material ceiling each rung grants. */
-const PRICES: readonly number[] = [20000, 50000, 100000, 200000, 400000];
-const CAPS: readonly number[] = [40, 80, 120, 160, 200];
-/** Comfortably above the whole ladder (770000) plus every fee a run can pay,
+/** The ten-rung ladder and the per-material ceiling each rung grants. */
+const PRICES: readonly number[] = [
+  20000, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000,
+];
+const CAPS: readonly number[] = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+/** Comfortably above the whole ladder (4720000) plus every fee a run can pay,
  *  so the gold sink's Math.max(0, ...) floor never clamps and the closed-form
  *  fee term stays exact. The craft step asserts the headroom rather than
  *  trusting this number. */
-const START_COPPER = 2_000_000;
+const START_COPPER = 6_000_000;
 /** Carried units per material are held under this, so the pack can never fill:
  *  a full pack would deny a craft for space, which the materials oracle does
  *  not model. The craft step counts any space denial and the floor requires it
@@ -251,36 +253,46 @@ type Step =
   | { k: 'buy' }
   | { k: 'craft' };
 
-/** The op alphabet, WEIGHTED and split in two PHASES, for coverage alone. Every
- *  op stays reachable at every point and the oracle is identical throughout;
- *  only how often each is drawn changes.
+/** The op alphabet, WEIGHTED and split in two PHASES, for coverage alone. The
+ *  oracle is identical throughout; only how often each op is drawn changes.
  *
- *  The two phases exist because a rung purchase widens every ceiling by 40, so
+ *  The two phases exist because a rung purchase widens every ceiling by 100, so
  *  the two ends of the ladder cannot both be exercised at one buy rate. The
- *  FRONT half buys rarely, so the vault spends its time pressed against a tight
- *  ceiling, which is where the partial fill and the no-headroom refusal live.
- *  The BACK half buys often, so the ladder tops out and the at-cap refusal is
- *  reached. A uniform draw reaches one or the other, never both. */
+ *  FRONT half never draws a buy, so the vault spends it pressed against one
+ *  ceiling: an ODD seed opens with the unlock as its first step and spends the
+ *  front half against the 100 ceiling, which is where the partial fill and the
+ *  no-headroom refusal live; an EVEN seed stays locked through the front half,
+ *  which is where the locked refusals live. The BACK half buys often, so the
+ *  ten-rung ladder tops out and the at-cap refusal is reached. A uniform draw
+ *  reaches one end or the other, never both.
+ *
+ *  A carried bag stack holds at most 20, so a deposit can only TRUNCATE when
+ *  the stored count already sits within 20 of its ceiling. The front half
+ *  therefore aims most of its grants at INERT_MATERIAL, the one material no
+ *  craft ever draws down, so a run can actually climb to within a stack of the
+ *  100 ceiling before the back half starts buying it wider. */
 const EARLY_WEIGHTS: readonly [Step['k'], number][] = [
-  ['grant', 4],
-  ['deposit', 5],
-  ['withdraw', 3],
+  ['grant', 8],
+  ['deposit', 6],
+  ['withdraw', 1],
   ['deposit_all', 2],
-  ['buy', 1],
-  ['craft', 3],
+  ['craft', 2],
 ];
 const LATE_WEIGHTS: readonly [Step['k'], number][] = [
   ['grant', 3],
   ['deposit', 3],
   ['withdraw', 3],
   ['deposit_all', 2],
-  ['buy', 4],
+  ['buy', 6],
   ['craft', 3],
 ];
 const expand = (weights: readonly [Step['k'], number][]): Step['k'][] =>
   weights.flatMap(([k, weight]) => Array.from({ length: weight }, () => k));
 const EARLY_KINDS = expand(EARLY_WEIGHTS);
 const LATE_KINDS = expand(LATE_WEIGHTS);
+/** How often a front-half grant is aimed at INERT_MATERIAL rather than drawn
+ *  uniformly over MATERIALS (see the phase note above). */
+const EARLY_INERT_GRANT_BIAS = 0.75;
 
 function genSteps(seed: number): Step[] {
   const rnd = rngFor(seed);
@@ -289,13 +301,19 @@ function genSteps(seed: number): Step[] {
   const depth = 30 + (seed % 31);
   const steps: Step[] = [];
   for (let i = 0; i < depth; i++) {
-    const alphabet = i < depth / 2 ? EARLY_KINDS : LATE_KINDS;
-    const k = alphabet[Math.floor(rnd() * alphabet.length)];
+    const front = i < depth / 2;
+    const alphabet = front ? EARLY_KINDS : LATE_KINDS;
+    const drawn = alphabet[Math.floor(rnd() * alphabet.length)];
+    // An odd seed unlocks first; an even one stays locked until the back half.
+    const k = i === 0 && seed % 2 === 1 ? 'buy' : drawn;
     switch (k) {
       case 'grant':
         steps.push({
           k,
-          which: Math.floor(rnd() * MATERIALS.length),
+          which:
+            front && rnd() < EARLY_INERT_GRANT_BIAS
+              ? MATERIALS.indexOf(INERT_MATERIAL)
+              : Math.floor(rnd() * MATERIALS.length),
           amt: 8 + Math.floor(rnd() * 24),
         });
         break;
@@ -1344,11 +1362,11 @@ describe('the conservation oracle (mutation check: it can actually fail)', () =>
     w.sim.addItem('copper_ore', 1, w.pid, { silent: true });
     expect(conservationViolations(w)).toEqual([]);
 
-    // Two rungs granted with no copper paid: the purse keeps 70000 the ladder
+    // Two rungs granted with no copper paid: the purse keeps 60000 the ladder
     // position proves was spent, so the closed-form burn term reports it as
     // minted copper and names the exact ladder amount that went unpaid.
     meta.vault.upgrades = 2;
-    expect(conservationViolations(w).join()).toContain('ladder 70000');
+    expect(conservationViolations(w).join()).toContain('ladder 60000');
     meta.vault.upgrades = 0;
 
     meta.copper += 1;
@@ -1392,7 +1410,7 @@ describe('the audit arm (mutation check: a dropped or bent row is caught)', () =
       store.insertBankLedgerRows.mockClear();
       w = makeWorld(1);
       const scenario: Step[] = [
-        { k: 'buy' }, // rung 1: the vault unlocks at a 40 ceiling
+        { k: 'buy' }, // rung 1: the vault unlocks at a 100 ceiling
         { k: 'deposit_all' }, // one command, four materials, four rows
         { k: 'craft' }, // the bags hold no reagents, so the vault pays all three
         { k: 'buy' }, // rung 2, so the final row's rung is not the first one
@@ -1459,6 +1477,71 @@ describe('the audit arm (mutation check: a dropped or bent row is caught)', () =
     );
     expect(audit(bentRung).map((f) => f.kind)).toContain('purchased_mismatch');
   }, 60_000);
+
+  it("reconciles a craft that spends the crafter's OWN signed vault units", async () => {
+    // Crafts may draw units signed with the crafter's own name. The custody
+    // ledger keys those by signer, so the craft_consume row must name that
+    // identity or the audit reads a pooled shortfall beside a signed surplus.
+    coverage.enabled = false;
+    let w: World;
+    let rows: Record<string, unknown>[];
+    try {
+      store.insertBankLedgerRow.mockClear();
+      store.insertBankLedgerRows.mockClear();
+      w = makeWorld(2);
+      const meta = metaOf(w.sim, w.pid);
+      // Replace the run's starting grant with exactly one craft's reagents: one
+      // plain wolf fang plus three the crafter signed (a rare gather), so the
+      // draw takes the plain unit first, then one signed unit.
+      meta.inventory.length = 0;
+      w.granted.clear();
+      w.sim.addItem('wolf_fang', 1, w.pid);
+      w.sim.addItemInstance('wolf_fang', { signer: meta.name }, w.pid, 3);
+      w.sim.addItem('bone_fragments', 4, w.pid);
+      w.sim.addItem('smithing_flux', 6, w.pid);
+      w.granted.set('wolf_fang', 4);
+      w.granted.set('bone_fragments', 4);
+      w.granted.set('smithing_flux', 6);
+      const scenario: Step[] = [{ k: 'buy' }, { k: 'deposit_all' }, { k: 'craft' }];
+      for (const step of scenario) expect(await applyStep(w, step)).toEqual([]);
+      expect(conservationViolations(w)).toEqual([]);
+      await bankLedgerIdle();
+      rows = [...store.rows];
+    } finally {
+      coverage.enabled = true;
+    }
+
+    const signed = {
+      vaultSpecial: 1,
+      instance: { signer: metaOf(w.sim, w.pid).name },
+      craftedRecipeId: null,
+    };
+    expect(
+      rows
+        .filter((r) => r.op === 'craft_consume' && r.item_id === 'wolf_fang')
+        .map((r) => ({ count: r.count, instance: r.instance })),
+    ).toEqual([
+      { count: 1, instance: null },
+      { count: 1, instance: signed },
+    ]);
+    // The one signed fang the craft left behind is still in the vault.
+    expect(vaultStoredCount(metaOf(w.sim, w.pid).vault, 'wolf_fang')).toBe(2);
+
+    const persisted = w.sim.serializeCharacter(w.pid);
+    const character = { id: CHARACTER_ID, realm: REALM, state: { vault: persisted?.vault } };
+    const audit = (ledgerRows: Record<string, unknown>[]) =>
+      auditBank({
+        ledgerRows: ledgerRows as unknown as BankLedgerAuditRow[],
+        characters: [character],
+        guildBanks: [],
+      });
+    expect(audit(rows)).toEqual([]);
+
+    // The pre-fix row shape (every take written as pooled stock) is exactly the
+    // mismatch this guards against.
+    const pooledOnly = rows.map((r) => (r.op === 'craft_consume' ? { ...r, instance: null } : r));
+    expect(audit(pooledOnly).map((f) => f.kind)).toContain('ledger_state_mismatch');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -1505,7 +1588,7 @@ describe('coverage of the property sweep', () => {
       'withdraw:clamped',
       'withdraw:refused-absent',
       // The batched sweep: moved, locked, and the armed-but-empty click
-      // (reliably reached: 226 of 11,223 steps in the reference 250-seed
+      // (reliably reached: 198 of 11,223 steps in the reference 250-seed
       // sweep, so its absence from this floor was an oversight, not a
       // reachability limit).
       'deposit_all:moved',

@@ -11,7 +11,6 @@ import { type TranslationKey, t } from './i18n';
 // the catalog, and the test above verifies the set matches the role catalog.
 const DISCORD_ROLE_TAG_KEYS: Record<string, TranslationKey> = {
   levyst: 'hudChrome.discord.roleTag.levyst',
-  admin: 'hudChrome.discord.roleTag.admin',
   coredevs: 'hudChrome.discord.roleTag.coredevs',
   devs: 'hudChrome.discord.roleTag.devs',
   seniormods: 'hudChrome.discord.roleTag.seniormods',

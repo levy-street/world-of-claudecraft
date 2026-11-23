@@ -157,7 +157,7 @@ describe('crafted item tooltip coverage', () => {
       'materialProfessionHintText(item.id)',
       'elixirTooltipLines(item)',
       'wellFedTooltipLines(item)',
-      'recipePatternTooltipLines(item, this.sim.craftingIdentity)',
+      'recipePatternTooltipLines(item, this.sim.craftingIdentity, card)',
       'feastTooltipLines(item)',
       'stackSizeTooltipLine(item, instance)',
     ]) {

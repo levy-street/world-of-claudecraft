@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 import AccountModerationActions from '../../src/admin/components/AccountModerationActions.svelte';
 import ChatModerationControls from '../../src/admin/components/ChatModerationControls.svelte';
+import { fmtDate } from '../../src/admin/format';
 import { t } from '../../src/admin/i18n';
 import type { PendingAction } from '../../src/admin/moderation_actions';
 
@@ -68,6 +69,7 @@ describe('AccountModerationActions', () => {
           isAdmin: false,
           bannedAt: null,
           suspendedUntil: null,
+          deactivatedAt: null,
           moderationReason: 'previous unban review',
         },
         onSubmit: vi.fn(async () => true),
@@ -77,6 +79,62 @@ describe('AccountModerationActions', () => {
     expect(screen.queryByText(/previous unban review/)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: t('detail.suspend24h') })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: t('detail.unsuspend') })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: t('detail.reactivate') })).not.toBeInTheDocument();
+  });
+
+  it('shows when the player deactivated the account and posts an audited reactivate', async () => {
+    const onSubmit = vi.fn(async (_pending: PendingAction) => true);
+    const deactivatedAt = '2026-10-04T09:37:13Z';
+    render(AccountModerationActions, {
+      props: {
+        target: {
+          id: 21773,
+          isAdmin: false,
+          bannedAt: null,
+          suspendedUntil: null,
+          deactivatedAt,
+          moderationReason: '',
+        },
+        onSubmit,
+      },
+    });
+
+    expect(
+      screen.getByText(t('detail.deactivatedNotice', { value: fmtDate(deactivatedAt) })),
+    ).toBeInTheDocument();
+    // Deactivation is not a sanction, so the normal suspend/ban actions stay offered.
+    expect(screen.getByRole('button', { name: t('detail.suspend24h') })).toBeInTheDocument();
+
+    await fireEvent.click(screen.getByRole('button', { name: t('detail.reactivate') }));
+    expect(screen.getByText(t('dialog.confirmReactivation'))).toBeInTheDocument();
+    const reason = screen.getByPlaceholderText(t('detail.notePlaceholder'));
+    await fireEvent.input(reason, { target: { value: 'deactivated by accident' } });
+    await fireEvent.click(screen.getByRole('button', { name: t('dialog.confirm') }));
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      endpoint: '/admin/api/moderation/accounts/21773/reactivate',
+      body: { reason: 'deactivated by accident' },
+    });
+  });
+
+  it('offers reactivate alongside unban when a deactivated account is also banned', () => {
+    render(AccountModerationActions, {
+      props: {
+        target: {
+          id: 42,
+          isAdmin: false,
+          bannedAt: '2026-06-01T00:00:00Z',
+          suspendedUntil: null,
+          deactivatedAt: '2026-06-02T00:00:00Z',
+          moderationReason: 'cheating',
+        },
+        onSubmit: vi.fn(async () => true),
+      },
+    });
+
+    expect(screen.getByRole('button', { name: t('detail.reactivate') })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: t('detail.unban') })).toBeInTheDocument();
   });
 
   it('does not offer account sanctions for an admin account', () => {

@@ -57,7 +57,10 @@ describe('paladin ability-specific clips (issue #2889 follow-up batch)', () => {
   });
 
   it('wires the donor GLB and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_paladin: swims({', 'player_hunter: swims({');
+    const block = manifestBlock(
+      'export const KAYKIT_PALADIN: VisualDef = swims({',
+      'const KAYKIT_BASELINES',
+    );
     expect(block).toContain('paladin_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     // Cast_Verdict still ships in the donor but is unmapped on the composed
@@ -69,10 +72,14 @@ describe('paladin ability-specific clips (issue #2889 follow-up batch)', () => {
   });
 
   it('every mapped ability id is a real paladin ability, and every referenced clip is shipped', () => {
-    const paladinBlock = manifestBlock('player_paladin: swims({', 'player_hunter: swims({');
+    const paladinBlock = manifestBlock(
+      'export const KAYKIT_PALADIN: VisualDef = swims({',
+      'const KAYKIT_BASELINES',
+    );
     const abilityStart = paladinBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
-    const abilityEnd = paladinBlock.indexOf('\n      },', abilityStart);
+    // KAYKIT_PALADIN is a top-level export, one indent shallower than a VISUALS row.
+    const abilityEnd = paladinBlock.indexOf('\n    },', abilityStart);
     expect(abilityEnd).toBeGreaterThan(abilityStart);
     const block = paladinBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z0-9_]+)',$/gm)];
@@ -137,14 +144,26 @@ describe('skeleton golem bespoke attack (issue #2889 follow-up batch)', () => {
     );
     expect(golemBlock).toContain("attack: ['Golem_Slam']");
 
-    // skel_golem is the ONLY VisualDef calling skeletonLargeClips; the other
-    // skeleton VisualDefs share the smaller 41-joint rig via skeletonClips()
-    // instead and are untouched by this change.
+    // skel_golem was the ONLY VisualDef calling skeletonLargeClips; the
+    // five-dungeon rework added the Hollow Crypt's crypt_skel_brute on the same
+    // skeleton_golem.glb rig (the Sunken Bastion's Gaoler Ossick wore it too
+    // until he got his own sculpted body), and each keeps the bespoke
+    // Golem_Slam override rather than the generic swing. The other skeleton
+    // VisualDefs share the smaller 41-joint rig via skeletonClips() instead
+    // and are untouched by this change. The Bone Brute has since moved to its
+    // own art-guide body (woc_crypt_bone_brute.glb), so skel_golem is alone again.
     const largeClipsCallers = [...MANIFEST_SRC.matchAll(/clips: \{\s*\.\.\.skeletonLargeClips\(/g)]
       .length;
     expect(largeClipsCallers).toBe(1);
+    const slamOverrides = [
+      ...MANIFEST_SRC.matchAll(
+        /clips: \{\s*\.\.\.skeletonLargeClips\([^)]*\),\s*attack: \['Golem_Slam'\]/g,
+      ),
+    ].length;
+    expect(slamOverrides).toBe(largeClipsCallers);
     const skeletonClipsCallers = [...MANIFEST_SRC.matchAll(/clips: skeletonClips\(/g)].length;
-    expect(skeletonClipsCallers).toBeGreaterThanOrEqual(10);
+    // 8 since the Hollow Crypt's cutthroat and chorister left for their own art-guide bodies
+    expect(skeletonClipsCallers).toBeGreaterThanOrEqual(8);
   });
 
   it('is wired to a real boss/rare mob (a dungeon final boss among them)', () => {

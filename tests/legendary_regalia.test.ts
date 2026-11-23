@@ -411,8 +411,8 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     expect([...pubBlock.matchAll(/pub\.(\w+) = inst\.(\w+);/g)]).toHaveLength(7);
     expect(pubBlock.match(/\bpub\.\w+\s*=/g) ?? []).toHaveLength(7);
     expect(pubBlock).not.toContain('...');
-    // game.ts still owns the one call site and the wire write.
-    const game = read('server/game.ts');
+    // The identity writer owns the one call site and the wire write.
+    const game = read('server/entity_identity_wire.ts');
     expect(game).toContain('const eqi = equippedInstanceWire(e);');
     expect(game).toContain('if (eqi) out.eqi = eqi;');
     expect(game).not.toMatch(/pub\.\w+ = inst\.\w+;/);

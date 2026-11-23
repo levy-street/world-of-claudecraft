@@ -11,6 +11,10 @@
 export const ENTRY_DETAIL_HORIZON_STEPS = [240, 360, 520, 700] as const;
 export const ENTRY_DETAIL_HORIZON_STABLE_FRAMES = 8;
 export const ENTRY_DETAIL_HORIZON_HEADROOM_MS = 20;
+export const ENTRY_DETAIL_HORIZON_FAR_HEADROOM_MS = 12.5;
+export const ENTRY_DETAIL_HORIZON_SHED_MS = 18.5;
+export const ENTRY_DETAIL_HORIZON_SHED_FRAMES = 12;
+export const ENTRY_DETAIL_HORIZON_MIN_SHED_STEP = 1;
 
 export interface EntryDetailHorizonState {
   cap: number;
@@ -34,6 +38,12 @@ const targetAt = (step: number, targetFar: number): number =>
     ENTRY_DETAIL_HORIZON_STEPS[Math.min(step, ENTRY_DETAIL_HORIZON_STEPS.length - 1)],
   );
 
+export function entryDetailHorizonHeadroomMs(step: number): number {
+  return step >= ENTRY_DETAIL_HORIZON_MIN_SHED_STEP
+    ? ENTRY_DETAIL_HORIZON_FAR_HEADROOM_MS
+    : ENTRY_DETAIL_HORIZON_HEADROOM_MS;
+}
+
 export function createEntryDetailHorizonState(targetFar: number): EntryDetailHorizonState {
   const cap = Math.max(0, targetAt(0, targetFar));
   return { cap, step: 0, stableFrames: 0, complete: cap >= targetFar };
@@ -43,17 +53,49 @@ export function advanceEntryDetailHorizon(
   state: EntryDetailHorizonState,
   input: EntryDetailHorizonInput,
 ): EntryDetailHorizonState {
+  const canShed =
+    state.step > ENTRY_DETAIL_HORIZON_MIN_SHED_STEP &&
+    targetAt(ENTRY_DETAIL_HORIZON_MIN_SHED_STEP, input.targetFar) < state.cap;
+  const overloaded =
+    canShed &&
+    !input.externallyPaced &&
+    Number.isFinite(input.frameMs) &&
+    input.frameMs > ENTRY_DETAIL_HORIZON_SHED_MS;
+  if (overloaded) {
+    const overloadFrames = (state.stableFrames < 0 ? -state.stableFrames : 0) + 1;
+    if (overloadFrames >= ENTRY_DETAIL_HORIZON_SHED_FRAMES) {
+      const prevStep = Math.max(ENTRY_DETAIL_HORIZON_MIN_SHED_STEP, state.step - 1);
+      const prevCap = targetAt(prevStep, input.targetFar);
+      return {
+        cap: prevCap,
+        step: prevStep,
+        stableFrames: 0,
+        complete: prevCap >= input.targetFar,
+      };
+    }
+    return {
+      ...state,
+      cap: Math.min(state.cap, input.targetFar),
+      stableFrames: -overloadFrames,
+    };
+  }
   if (state.complete || state.cap >= input.targetFar) {
-    return { ...state, cap: input.targetFar, stableFrames: 0, complete: true };
+    const decayedOverload = state.stableFrames < 0 ? state.stableFrames + 1 : 0;
+    return { ...state, cap: input.targetFar, stableFrames: decayedOverload, complete: true };
   }
   const nextStep = Math.min(state.step + 1, ENTRY_DETAIL_HORIZON_STEPS.length - 1);
   const nextCap = targetAt(nextStep, input.targetFar);
+  const headroomMs = entryDetailHorizonHeadroomMs(state.step);
   const healthy =
     input.compileReady &&
     input.terrainReadyFar >= nextCap &&
     Number.isFinite(input.frameMs) &&
-    (input.externallyPaced || input.frameMs <= ENTRY_DETAIL_HORIZON_HEADROOM_MS);
-  const stableFrames = healthy ? state.stableFrames + 1 : 0;
+    (input.externallyPaced || input.frameMs <= headroomMs);
+  const stableFrames = healthy
+    ? Math.max(0, state.stableFrames) + 1
+    : state.stableFrames < 0
+      ? state.stableFrames + 1
+      : 0;
   if (stableFrames < ENTRY_DETAIL_HORIZON_STABLE_FRAMES) {
     return { ...state, stableFrames };
   }

@@ -2,10 +2,12 @@ import * as THREE from 'three';
 import {
   COLUMN_ZONES,
   columnBlendAt,
+  isBuiltinWorldActive,
   STRIP_MAX_X,
   STRIP_MIN_X,
   STRIP_ZONES,
   ZONES,
+  zoneAt,
 } from '../sim/data';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { loadKtx2Texture, loadTexture, releaseKtx2Texture, releaseTexture } from './assets/loader';
@@ -17,6 +19,12 @@ import {
   stepEnvironmentBlend,
 } from './environment_transition_core';
 import { GFX, type GfxSettings } from './gfx';
+import {
+  PALETTE_SKY_DECLARATIONS,
+  PALETTE_SKY_GLSL,
+  paletteLabEnabled,
+  paletteSkyUniforms,
+} from './palette_lab';
 import type { SkyResidencyRegion } from './sky_residency_core';
 import { skyTexture } from './textures';
 
@@ -62,7 +70,7 @@ const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number
   // clamp reined in from 2.6 with the contrast pass, so the re-expanded cloud
   // tops do not just feed the bloom smear instead
   vale: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
-  marsh: { gain: 0.6, clamp: 2.2 },
+  marsh: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
   peaks: { gain: 0.48, clamp: 1.7, contrast: 1.15 },
   // Paint-only biomes reuse the closest shipped sky (no new HDRI downloads).
   beach: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
@@ -390,10 +398,10 @@ const HDRI_SUN_U: Record<SkyKey, number> = {
 // sunset gold, day blue), so the heavy grades that faked those moods over
 // shared photographs are retired.
 const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
-  vale: [1, 1, 1],
-  marsh: [1, 1, 1],
-  peaks: [1, 1, 1],
-  beach: [1, 1, 1],
+  vale: [0.94, 1.04, 1.14],
+  marsh: [0.94, 1.04, 1.14],
+  peaks: [0.95, 1.03, 1.12],
+  beach: [0.94, 1.05, 1.14],
   desert: [1, 1, 1],
   volcano: [1, 1, 1],
   cave: [1, 1, 1],
@@ -401,13 +409,13 @@ const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
   ember: [1, 1, 1],
   frost: [1, 1, 1],
   amber: [1, 1, 1],
-  fen: [1, 1, 1],
+  fen: [0.95, 1.04, 1.12],
   night: [1, 1, 1],
   haunt: [1, 1, 1],
-  jungle: [1, 1, 1],
-  garden: [1, 1, 1],
-  gale: [1, 1, 1],
-  farshore: [1, 1, 1],
+  jungle: [0.95, 1.04, 1.1],
+  garden: [0.95, 1.04, 1.12],
+  gale: [0.95, 1.03, 1.12],
+  farshore: [0.94, 1.05, 1.14],
 };
 
 const hdriStore: Partial<Record<SkyKey, THREE.Texture>> = {};
@@ -547,6 +555,18 @@ export function ensureSkyBiomeAssets(
 // This is the second line of defense behind the renderer's pinned set, so a
 // release can never blank the sky that is on screen.
 const domeBindings = new Set<() => readonly SkyKey[]>();
+
+// The dome the world renderer draws, for surfaces that reflect the live sky
+// (the ocean's reflection probe renders this exact mesh's geometry and
+// material, so a reflection carries the biome blend, the day/night grade, the
+// dusk glow and the horizon fog band the dome itself shows). The most recently
+// built dome wins; its view's dispose clears it.
+let liveDome: THREE.Mesh | null = null;
+
+/** The live sky dome, or null before the world built one. */
+export function liveSkyDome(): THREE.Mesh | null {
+  return liveDome;
+}
 
 /** Every biome currently bound into a live sky dome's uniforms. */
 export function currentDomeBiomes(): SkyKey[] {
@@ -790,9 +810,9 @@ const SKY_VERT = /* glsl */ `
 // directional horizon-band tint; without a field the string is byte-identical
 // to the legacy shader. Decided once, before the material compiles, exactly
 // like the geometry consumers gate on hasBiomeHazeField().
-const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
+const skyFrag = (zoneHaze: boolean, paletteSky = false): string => /* glsl */ `${
   zoneHaze ? BIOME_HAZE_DECLARATIONS : ''
-}
+}${paletteSky ? PALETTE_SKY_DECLARATIONS : ''}
   uniform sampler2D uSkyA;
   uniform sampler2D uSkyB;
   uniform float uMix;
@@ -891,7 +911,7 @@ const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
       c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     }
     c *= mix(uTintA, uTintB, uMix); // biome grade
-    // Cycle sky grading, between the biome grade and the dark night multiply:
+${paletteSky ? PALETTE_SKY_GLSL : ''}    // Cycle sky grading, between the biome grade and the dark night multiply:
     // (1) desaturate toward night, so the day HDRI greys out to moonlight
     // instead of reading as a dimmed daytime photograph; (2) pour a warm
     // dawn/dusk glow into the horizon band around the live sun azimuth while
@@ -1061,7 +1081,15 @@ export function ensureSkyAssetsAt(
   z: number,
   target: Readonly<GfxSettings> = GFX,
 ): Promise<void> {
-  return ensureSkyBiomeAssets(skyBiomesAt(x, z), target);
+  // On an authored map the IBL follows the map's OWN zone biome (the
+  // renderer's environment choice, see Renderer.updateEnvBiome), which the
+  // shipped world's sky bands know nothing about. Fetch it here too, so the
+  // entry build can prefilter it behind the loading screen: an IBL that lands
+  // after the reveal relinks every lit material mid-play (a visible hitch and
+  // a lighting shift).
+  const biomes = skyBiomesAt(x, z);
+  const own = isBuiltinWorldActive() ? null : zoneAt(x, z).biome;
+  return ensureSkyBiomeAssets(own && !biomes.includes(own) ? [...biomes, own] : biomes, target);
 }
 
 // u offset that moves a given HDRI's sun azimuth onto SUN_ANCHOR's azimuth
@@ -1070,15 +1098,125 @@ function sunOffsetU(biome: SkyKey, sunDir: THREE.Vector3): number {
   return HDRI_SUN_U[biome] - sunU;
 }
 
-function deferBasicSkyFragments(material: THREE.MeshBasicMaterial): void {
+interface BasicSkyUniforms {
+  uSkyA: { value: THREE.Texture };
+  uSkyB: { value: THREE.Texture };
+  uHasHdri: { value: number };
+  uOffA: { value: number };
+  uOffB: { value: number };
+  uTuneA: { value: THREE.Vector3 };
+  uTuneB: { value: THREE.Vector3 };
+  uTintA: { value: THREE.Vector3 };
+  uTintB: { value: THREE.Vector3 };
+  uMix: { value: number };
+  uSunDirLive: { value: THREE.Vector3 };
+  uDuskWarm: { value: number };
+  uNightDesat: { value: number };
+  uStarAmt: { value: number };
+  uTime: { value: number };
+  uFog: { value: THREE.Color };
+}
+
+function deferBasicSkyFragments(
+  material: THREE.MeshBasicMaterial,
+  uniforms: BasicSkyUniforms,
+): void {
   material.onBeforeCompile = (shader) => {
     const anchor = '#include <logdepthbuf_vertex>';
     if (!shader.vertexShader.includes(anchor)) {
       throw new Error('sky shader is missing the pinned log-depth vertex anchor');
     }
-    shader.vertexShader = shader.vertexShader.replace(anchor, `${anchor}\n${SKY_FAR_DEPTH}`);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWocSkyDir;')
+      .replace(anchor, `vWocSkyDir = position;\n${anchor}\n${SKY_FAR_DEPTH}`);
+    if (!shader.fragmentShader || !shader.uniforms) return;
+    Object.assign(shader.uniforms, uniforms);
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+uniform sampler2D uSkyA;
+uniform sampler2D uSkyB;
+uniform float uHasHdri;
+uniform float uOffA;
+uniform float uOffB;
+uniform vec3 uTuneA;
+uniform vec3 uTuneB;
+uniform vec3 uTintA;
+uniform vec3 uTintB;
+uniform float uMix;
+uniform vec3 uSunDirLive;
+uniform float uDuskWarm;
+uniform float uNightDesat;
+uniform float uStarAmt;
+uniform float uTime;
+uniform vec3 uFog;
+varying vec3 vWocSkyDir;
+vec3 wocSampleLowSky(sampler2D skyMap, vec3 dir, float uOff, vec3 tune) {
+  vec2 uv = vec2(
+    atan(dir.z, dir.x) * 0.15915494 + 0.5 + uOff,
+    asin(clamp(dir.y, -1.0, 1.0)) * 0.31830989 + 0.5
+  );
+  vec3 c = texture2D(skyMap, uv).rgb * tune.x;
+  if (tune.z != 1.0) c = 0.8 * exp2(tune.z * log2(max(c, vec3(1e-4)) * 1.25));
+  return min(c, vec3(tune.y));
+}
+float wocSkyHash12(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>
+vec3 wocDir = normalize(vWocSkyDir);
+vec3 wocSkyBase = uHasHdri > 0.5
+  ? mix(
+      wocSampleLowSky(uSkyA, wocDir, uOffA, uTuneA),
+      wocSampleLowSky(uSkyB, wocDir, uOffB, uTuneB),
+      uMix
+    )
+  : sampledDiffuseColor.rgb;
+wocSkyBase *= mix(uTintA, uTintB, uMix);
+float wocCycleLum = dot(wocSkyBase, vec3(0.2126, 0.7152, 0.0722));
+wocSkyBase = mix(wocSkyBase, vec3(wocCycleLum), uNightDesat);
+diffuseColor.rgb = diffuse * wocSkyBase;`,
+      )
+      .replace(
+        '#include <tonemapping_fragment>',
+        `vec3 wocC = gl_FragColor.rgb;
+if (uDuskWarm > 0.001) {
+  vec2 sunAz = normalize(uSunDirLive.xz);
+  vec2 dirAz = normalize(wocDir.xz + vec2(1e-5, 0.0));
+  float align = max(dot(dirAz, sunAz), 0.0);
+  float band = (1.0 - smoothstep(0.04, 0.55, wocDir.y)) * smoothstep(-0.24, -0.02, wocDir.y);
+  float warm = uDuskWarm * band * (0.2 + 0.8 * align * align);
+  vec3 duskCol = vec3(1.0, 0.34, 0.09);
+  float duskTarget = min(0.3 + 0.9 * wocCycleLum, 0.95);
+  wocC = mix(wocC, duskCol * duskTarget, warm * 0.8);
+  wocC += duskCol * warm * align * align * 0.5;
+}
+if (uStarAmt > 0.001) {
+  float upper = smoothstep(-0.02, 0.2, wocDir.y);
+  if (upper > 0.0) {
+    vec2 suv = vec2(atan(wocDir.z, wocDir.x), asin(clamp(wocDir.y, -1.0, 1.0))) * 72.0;
+    vec2 scell = floor(suv);
+    if (wocSkyHash12(scell) >= 0.9) {
+      vec2 sf = fract(suv) - vec2(wocSkyHash12(scell + 7.0), wocSkyHash12(scell + 13.0));
+      float point = smoothstep(0.012, 0.0, dot(sf, sf));
+      if (point > 0.0) {
+        float twinkle = 0.55 + 0.45 * sin(uTime * (1.5 + wocSkyHash12(scell + 3.0) * 3.5) + wocSkyHash12(scell + 19.0) * 6.2832);
+        float star = point * (0.4 + 0.6 * wocSkyHash12(scell + 41.0)) * twinkle;
+        wocC += vec3(0.9, 0.93, 1.0) * star * upper * uStarAmt;
+      }
+    }
+  }
+}
+wocC = mix(uFog, wocC, smoothstep(0.1, 0.36, wocDir.y));
+gl_FragColor.rgb = wocC;
+#include <tonemapping_fragment>`,
+      );
   };
-  material.customProgramCacheKey = () => 'woc-sky-far-depth-v1';
+  material.customProgramCacheKey = () => 'woc-sky-far-depth-v3';
 }
 
 export function buildSky(
@@ -1090,38 +1228,166 @@ export function buildSky(
   const start = biomeBlendAt(initialX, initialZ);
   const startBiomes = start.from === start.to ? [start.from] : [start.from, start.to];
   if (lowGfx || !hasSkyHdriAssets(startBiomes)) {
-    let current = start;
+    const sun = sunDir.clone().normalize();
+    const tuneVec = (b: SkyKey): THREE.Vector3 =>
+      new THREE.Vector3(HDRI_TUNE[b].gain, HDRI_TUNE[b].clamp, HDRI_TUNE[b].contrast ?? 1);
+    const fallbackTex = skyTexture();
+    const current = createEnvironmentBlend(start);
+    let boundFrom = start.from;
+    let boundTo = start.to;
+    let disposed = false;
+    const lowUrlTextures = new Map<string, THREE.Texture>();
+    const lowUrlPending = new Map<string, Promise<void>>();
+    const basicUniforms: BasicSkyUniforms = {
+      uSkyA: { value: fallbackTex },
+      uSkyB: { value: fallbackTex },
+      uHasHdri: { value: 0 },
+      uOffA: { value: sunOffsetU(start.from, sun) },
+      uOffB: { value: sunOffsetU(start.to, sun) },
+      uTuneA: { value: tuneVec(start.from) },
+      uTuneB: { value: tuneVec(start.to) },
+      uTintA: { value: new THREE.Vector3(...BIOME_TINT[start.from]) },
+      uTintB: { value: new THREE.Vector3(...BIOME_TINT[start.to]) },
+      uMix: { value: start.t },
+      uSunDirLive: { value: sun.clone() },
+      uDuskWarm: { value: 0 },
+      uNightDesat: { value: 0 },
+      uStarAmt: { value: 0 },
+      uTime: { value: 0 },
+      uFog: { value: new THREE.Color(0x9ec8ea) },
+    };
+    const ensureLowSkyUrl = (url: string): void => {
+      if (lowUrlTextures.has(url) || lowUrlPending.has(url) || disposed) return;
+      const task = loadKtx2Texture(url, { large: true })
+        .then((tex) => {
+          lowUrlPending.delete(url);
+          const ready = finishSkyTexture(tex, true);
+          const urlA = BIOME_SKY_1K[current.from];
+          const urlB = BIOME_SKY_1K[current.to];
+          if (disposed || (url !== urlA && url !== urlB)) {
+            ready.dispose();
+            releaseKtx2Texture(url);
+            return;
+          }
+          lowUrlTextures.set(url, ready);
+          syncLowSkyHdri();
+        })
+        .catch(() => {
+          lowUrlPending.delete(url);
+        });
+      lowUrlPending.set(url, task);
+    };
+    const syncLowSkyHdri = (): void => {
+      if (!lowGfx || disposed) return;
+      const urlA = BIOME_SKY_1K[current.from];
+      const urlB = BIOME_SKY_1K[current.to];
+      for (const [url, tex] of lowUrlTextures) {
+        if (url !== urlA && url !== urlB) {
+          lowUrlTextures.delete(url);
+          tex.dispose();
+          releaseKtx2Texture(url);
+        }
+      }
+      ensureLowSkyUrl(urlA);
+      ensureLowSkyUrl(urlB);
+      const texA = lowUrlTextures.get(urlA);
+      const texB = lowUrlTextures.get(urlB);
+      if (texA && texB) {
+        basicUniforms.uSkyA.value = texA;
+        basicUniforms.uSkyB.value = texB;
+        basicUniforms.uOffA.value = sunOffsetU(current.from, sun);
+        basicUniforms.uOffB.value = sunOffsetU(current.to, sun);
+        basicUniforms.uTuneA.value.copy(tuneVec(current.from));
+        basicUniforms.uTuneB.value.copy(tuneVec(current.to));
+        basicUniforms.uHasHdri.value = 1;
+      } else if (texA) {
+        basicUniforms.uSkyA.value = texA;
+        basicUniforms.uSkyB.value = texA;
+        basicUniforms.uOffA.value = sunOffsetU(current.from, sun);
+        basicUniforms.uOffB.value = basicUniforms.uOffA.value;
+        basicUniforms.uTuneA.value.copy(tuneVec(current.from));
+        basicUniforms.uTuneB.value.copy(basicUniforms.uTuneA.value);
+        basicUniforms.uHasHdri.value = 1;
+      } else if (texB) {
+        basicUniforms.uSkyA.value = texB;
+        basicUniforms.uSkyB.value = texB;
+        basicUniforms.uOffA.value = sunOffsetU(current.to, sun);
+        basicUniforms.uOffB.value = basicUniforms.uOffA.value;
+        basicUniforms.uTuneA.value.copy(tuneVec(current.to));
+        basicUniforms.uTuneB.value.copy(basicUniforms.uTuneA.value);
+        basicUniforms.uHasHdri.value = 1;
+      } else {
+        basicUniforms.uSkyA.value = fallbackTex;
+        basicUniforms.uSkyB.value = fallbackTex;
+        basicUniforms.uHasHdri.value = 0;
+      }
+    };
+    syncLowSkyHdri();
     const dome = new THREE.Mesh(
       new THREE.SphereGeometry(DOME_RADIUS, 24, 16),
       new THREE.MeshBasicMaterial({
-        map: skyTexture(),
+        map: fallbackTex,
         side: THREE.BackSide,
         fog: false,
         depthWrite: false,
       }),
     );
-    deferBasicSkyFragments(dome.material);
+    deferBasicSkyFragments(dome.material, basicUniforms);
     // Draw after opaque geometry at far depth. Covered fragments fail depth
     // before the texture sample while untouched background pixels stay exact.
     dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
+    liveDome = dome;
     return {
       dome,
-      setCameraPos: (x, z) => {
-        current = biomeBlendAt(x, z);
+      setCameraPos: (x, z, dt = 0) => {
+        const target = biomeBlendAt(x, z);
+        if (dt > 0) {
+          stepEnvironmentBlend(current, target, dt, SKY_ENVIRONMENT_RESPONSE);
+        } else {
+          current.from = target.from;
+          current.to = target.to;
+          current.t = target.t;
+        }
+        if (current.from !== boundFrom || current.to !== boundTo) {
+          basicUniforms.uTintA.value.set(...BIOME_TINT[current.from]);
+          basicUniforms.uTintB.value.set(...BIOME_TINT[current.to]);
+          boundFrom = current.from;
+          boundTo = current.to;
+          syncLowSkyHdri();
+        }
+        basicUniforms.uMix.value = current.t;
       },
-      setDayNight: () => {},
-      setCycle: () => {},
-      setFog: () => {},
-      setStars: () => {},
+      setDayNight: (mul) => {
+        dome.material.color.setRGB(mul[0], mul[1], mul[2]);
+      },
+      setCycle: (liveSunDir, duskWarm, nightDesat) => {
+        basicUniforms.uSunDirLive.value.copy(liveSunDir);
+        basicUniforms.uDuskWarm.value = duskWarm;
+        basicUniforms.uNightDesat.value = nightDesat;
+      },
+      setFog: (c) => {
+        basicUniforms.uFog.value.copy(c);
+      },
+      setStars: (amt, time) => {
+        basicUniforms.uStarAmt.value = amt;
+        basicUniforms.uTime.value = time;
+      },
       envTexture: () => null,
       domeTexture: () => null,
       skyBiomeAssetsResident,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
       currentBiomeBlend: () => current,
-      // The canvas dome samples skyTexture(), never the HDR stores, so it binds
-      // nothing and has nothing to unbind.
-      dispose: () => {},
+      dispose: () => {
+        disposed = true;
+        for (const [url, tex] of lowUrlTextures) {
+          tex.dispose();
+          releaseKtx2Texture(url);
+        }
+        lowUrlTextures.clear();
+        lowUrlPending.clear();
+        if (liveDome === dome) liveDome = null;
+      },
     };
   }
 
@@ -1164,16 +1430,24 @@ export function buildSky(
   // field before buildSky runs), so the dome's tint follows the same camera
   // and day/night grade with zero per-frame writes of its own.
   const zoneHaze = hasBiomeHazeField();
+  // The palette lab's gradient arm (`?palette=on` only): absent, the dome
+  // compiles the shipped string byte for byte.
+  const paletteSky = paletteLabEnabled();
   const material = new THREE.ShaderMaterial({
-    uniforms: { ...uniforms, ...(zoneHaze ? biomeHazeUniforms() : {}) },
+    uniforms: {
+      ...uniforms,
+      ...(zoneHaze ? biomeHazeUniforms() : {}),
+      ...(paletteSky ? paletteSkyUniforms() : {}),
+    },
     vertexShader: SKY_VERT,
-    fragmentShader: skyFrag(zoneHaze),
+    fragmentShader: skyFrag(zoneHaze, paletteSky),
     side: THREE.BackSide,
     fog: false,
     depthWrite: false,
   });
   const dome = new THREE.Mesh(new THREE.SphereGeometry(DOME_RADIUS, 32, 20), material);
   dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
+  liveDome = dome;
 
   const current = createEnvironmentBlend(start);
   let boundFrom = start.from;
@@ -1247,6 +1521,7 @@ export function buildSky(
     currentBiomeBlend: () => current,
     dispose(): void {
       domeBindings.delete(readBinding);
+      if (liveDome === dome) liveDome = null;
     },
   };
 }

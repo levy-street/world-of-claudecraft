@@ -13,7 +13,7 @@ import { lead, p, related, section } from './ui';
 const BLOCKS_AFTER_MARKS = [
   ['guide.economy.vendorsTitle', 'guide.economy.vendorsBody'],
   ['guide.economy.buyingTitle', 'guide.economy.buyingBody'],
-  ['guide.economy.junkTitle', 'guide.economy.junkBody'],
+  ['guide.economy.junkTitle', 'guide.economy.junkBodyFinal'],
   ['guide.economy.tradeTitle', 'guide.economy.tradeBody'],
 ] as const;
 

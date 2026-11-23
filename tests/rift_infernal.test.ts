@@ -8,7 +8,7 @@
 import { createHash } from 'node:crypto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { fitAuthoredWallSegment } from '../src/render/authored_walls_core';
-import type { Collider } from '../src/sim/colliders';
+import type { LayoutCollider } from '../src/sim/colliders';
 import {
   buildInfernalCitadelFloor,
   INFERNAL_DOORS,
@@ -47,7 +47,7 @@ function setPieceSeeds(count: number): number[] {
   return out;
 }
 
-function clears(colliders: readonly Collider[], x: number, z: number, r = BODY_R): boolean {
+function clears(colliders: readonly LayoutCollider[], x: number, z: number, r = BODY_R): boolean {
   for (const c of colliders) {
     if (c.type === 'circle') {
       const dx = x - c.x;

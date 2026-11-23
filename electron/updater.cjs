@@ -99,6 +99,9 @@ function initUpdater({
   };
 
   let lastProgressSent = -1;
+  let downloading = false;
+  let downloaded = false;
+  let checkInFlight = null;
   autoUpdater.on('checking-for-update', () => {
     log.info('[updater] checking for updates');
     send(updateEventPayload('checking'));
@@ -113,15 +116,19 @@ function initUpdater({
         offeredOrigin: verdict.offeredOrigin,
         expectedOrigin: verdict.expectedOrigin,
       });
+      send(updateEventPayload('error'));
       return;
     }
     log.info('[updater] update available', {
       version: info?.version,
       originStamp: verdict.stamped ? 'match' : 'absent (pre-split feed file)',
     });
+    if (downloading || downloaded) return;
+    downloading = true;
     lastProgressSent = -1;
     send(updateEventPayload('available', info));
     autoUpdater.downloadUpdate().catch((err) => {
+      downloading = false;
       log.warn('[updater] download failed', err?.message ?? String(err));
       // Clear the renderer's "downloading" card; the retry happens on the next
       // scheduled check either way.
@@ -139,6 +146,8 @@ function initUpdater({
     send(payload);
   });
   autoUpdater.on('update-downloaded', (info) => {
+    downloading = false;
+    downloaded = true;
     log.info('[updater] update downloaded; will install on quit or restart', {
       version: info?.version,
     });
@@ -149,6 +158,7 @@ function initUpdater({
   // payload only lets the renderer clear a checking/downloading card that
   // would otherwise sit there forever.
   autoUpdater.on('error', (err) => {
+    downloading = false;
     log.warn('[updater] error (will retry on the next check)', err?.message ?? String(err));
     send(updateEventPayload('error'));
   });
@@ -162,10 +172,26 @@ function initUpdater({
   });
 
   const check = () => {
-    autoUpdater
-      .checkForUpdates()
-      .catch((err) => log.warn('[updater] check failed', err?.message ?? String(err)));
+    if (downloaded) return Promise.resolve('ready');
+    if (downloading) return Promise.resolve('checking');
+    if (checkInFlight) return checkInFlight;
+    checkInFlight = Promise.resolve()
+      .then(() => autoUpdater.checkForUpdates())
+      .then(() => 'checking')
+      .catch((err) => {
+        log.warn('[updater] check failed', err?.message ?? String(err));
+        send(updateEventPayload('error'));
+        return 'unavailable';
+      })
+      .finally(() => {
+        checkInFlight = null;
+      });
+    return checkInFlight;
   };
+  ipcMain.handle('desktop-update-check', (event) => {
+    if (!isTrusted(event)) return 'unavailable';
+    return check();
+  });
   // First check after the game has had its boot bandwidth; then periodically.
   // Process-lifetime timers by design (the updater lives as long as the app),
   // so they are deliberately never cleared.

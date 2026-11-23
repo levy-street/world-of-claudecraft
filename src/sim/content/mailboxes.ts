@@ -37,7 +37,7 @@ export const MAILBOXES: MailboxDef[] = [
   hubMailbox(DRAKELANDS_ZONE, { x: -7, z: 5 }), // Wyrmwatch, inside the gate lawn
   hubMailbox(FROSTVEIL_ZONE, { x: 7, z: -5 }), // Icemantle, at the pass-side square
   hubMailbox(AMBERFALL_ZONE, { x: 7, z: -5 }), // Lanternmere, by the ferry market
-  hubMailbox(WILLOWFEN_ZONE, { x: 6, z: -6 }), // Bridgemere, near the island square
+  hubMailbox(WILLOWFEN_ZONE, { x: -6.5, z: -10.5 }), // Bridgemere, in the island inn's forecourt
   hubMailbox(NIGHTBLOOM_ZONE, { x: 6, z: -5 }), // Moonrest, beside the hollow path
   hubMailbox(WRAITHWOOD_ZONE, { x: -6, z: 6 }), // Gibbetmere, under the eaves
   hubMailbox(PALMREACH_ZONE, { x: 6, z: -5 }), // Drifthaven, at the reef road

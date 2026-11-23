@@ -1,0 +1,21 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/conchplate_girdle.webp",
+    "http://localhost:5194/ui/items/pale_chorus_leggings.webp",
+    "http://localhost:5194/ui/items/refrain_silk_gloves.webp",
+    "http://localhost:5194/ui/items/chorus_conch.webp",
+    "http://localhost:5194/ui/items/heroic_chorus_conch.webp",
+    "http://localhost:5194/ui/items/tideglass_pauldrons.webp",
+    "http://localhost:5194/ui/items/moonburn_treads.webp",
+    "http://localhost:5194/ui/items/prism_etched_cowl.webp",
+    "http://localhost:5194/ui/items/tideglass_shiv.webp",
+    "http://localhost:5194/ui/items/pale_chorus_vestment.webp",
+    "http://localhost:5194/ui/items/tideglass_warmaul.webp"
+  ],
+  "allDecoded": true
+}

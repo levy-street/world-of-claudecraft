@@ -27,6 +27,8 @@ import {
   normalizeAppearance,
   slotCovered,
 } from './modular';
+import { effectiveHelmHidden } from './seasonal_head_core';
+import { classBodyComposes } from './woc_parts_core';
 
 /** The roster-row fields a look is composed from. Structural on purpose: the
  *  char-select `CharacterSummary` satisfies it without this render module
@@ -81,7 +83,14 @@ export function inWorldLookFor(
   armorSetFor: (cls: PlayerClass) => ArmorSetId,
 ): ModularLook | null {
   if (e.kind !== 'player' || !e.modularAppearance) return null;
-  return composedLook(e.modularAppearance, armorSetFor(e.templateId as PlayerClass), e.helmHidden);
+  // A class on a WOC modular body (woc_parts_core.ts) never composes the
+  // KayKit library: its fixed def dresses itself from the worn equipment.
+  if (!classBodyComposes(e.templateId as PlayerClass)) return null;
+  return composedLook(
+    e.modularAppearance,
+    armorSetFor(e.templateId as PlayerClass),
+    effectiveHelmHidden(e),
+  );
 }
 
 /**
@@ -112,7 +121,7 @@ export function armorSetSourceFor(
  * player's dev override).
  */
 export function charselectLook(c: RosterLookRow): ModularLook | null {
-  if (c.skinCatalog === 'mech') return null;
+  if (c.skinCatalog === 'mech' || !classBodyComposes(c.class)) return null;
   return composedLook(c.appearance, classArmorSet(c.class), c.helmHidden === true);
 }
 
@@ -174,6 +183,12 @@ export function helmSlotAvailableForEntity(
   lookFor: (e: Entity) => ModularLook | null,
 ): boolean {
   if (!e || isMechWearer(e)) return false;
+  // A WOC body wears its helm from the equipped helmet item, so the eye is
+  // offered exactly while one is worn (woc_parts_core.ts empties the head slot
+  // on helmHidden).
+  if (e.kind === 'player' && !classBodyComposes(e.templateId as PlayerClass)) {
+    return !!e.equippedItems?.helmet;
+  }
   return helmSlotAvailableForLook(
     lookFor(e.helmHidden ? ({ ...e, helmHidden: false } as Entity) : e),
   );

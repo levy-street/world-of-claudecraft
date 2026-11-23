@@ -20,6 +20,7 @@ import {
   localToWorld,
   samplePolyline,
 } from '../src/sim/eastbrook_layout';
+import { FENBRIDGE_LAYOUT, FENBRIDGE_STATIONS_BY_ID } from '../src/sim/fenbridge_layout';
 import {
   findPath,
   PLAYER_BODY_RADIUS,
@@ -80,12 +81,14 @@ function midpoint(a: { x: number; z: number }, b: { x: number; z: number }) {
   return { x: (a.x + b.x) / 2, z: (a.z + b.z) / 2 };
 }
 
+// Returns where the follower actually stopped (within 0.2 yd of `to`), so a
+// walk made of several legs can start each leg from the last one's arrival.
 function expectWalkableRoute(
   label: string,
   from: { x: number; z: number },
   to: { x: number; z: number },
   bodyRadius: number,
-): void {
+): { x: number; z: number } {
   const options = {
     seed: SEED,
     bodyRadius,
@@ -150,6 +153,27 @@ function expectWalkableRoute(
   expect(Math.hypot(to.x - current.x, to.z - current.z), `${label} endpoint`).toBeLessThanOrEqual(
     0.2,
   );
+  return current;
+}
+
+// One unbroken walk through the points in order: every leg goes through
+// expectWalkableRoute (so every stride keeps its fence, collision, deep-water
+// and climb-slope checks and every leg must arrive), and each leg starts
+// where the one before it stopped, never back on the waypoint itself.
+function expectWalkableLegs(
+  label: string,
+  points: readonly { x: number; z: number }[],
+  bodyRadius: number,
+): void {
+  let at = points[0];
+  for (let leg = 1; leg < points.length; leg++) {
+    at = expectWalkableRoute(
+      `${label} leg ${leg} of ${points.length - 1}`,
+      at,
+      points[leg],
+      bodyRadius,
+    );
+  }
 }
 
 function placeEntity(sim: Sim, entity: Entity, point: { x: number; z: number }): void {
@@ -184,6 +208,17 @@ function placeEntity(sim: Sim, entity: Entity, point: { x: number; z: number }):
 // the opened-out market square: this fixture only holds if its plain rows carry
 // the SAME collision as the live authored stalls, so a stale position here
 // forks the wolf projection at the bottom of this file rather than the town.
+// Re-minted 2026-10 for the Tidehold rebuild: six placed buildings replaced
+// the eleven kit shells, so the six building rows are re-probed from the live
+// ZONE1_PROPS records (each one the building's WALL box). The old rows stood
+// on ground the rebuild cleared (the kit bank, chapel and workshops), which
+// made them colliders and calm pads present in this fixture and nowhere else.
+// Each row keeps its record id and nothing else of the authored record: a
+// placed building is solid past its wall box (a bell tower, a strongroom, a
+// forge shelter), and those annex boxes are found by id and standing place
+// (placedBuildingAnnexes), so an id-less row would leave the live town with
+// solids this fixture lacks. The chapel still keeps an assetId, for the same
+// reason as before.
 function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   const townBuildingIds = new Set(
     [...EASTBROOK_LAYOUT.preservedBuildings, ...EASTBROOK_LAYOUT.buildings].map(
@@ -193,20 +228,45 @@ function legacyEastbrookProps(current: ZonePropsDef): ZonePropsDef {
   return {
     ...current,
     buildings: [
-      { kind: 'house', x: 12, z: -94, w: 7, d: 5.5, rot: -2.356194490192345 },
-      { kind: 'house', x: -2, z: -122, w: 7, d: 5.5, rot: -2.0344439357957027 },
-      { kind: 'inn', x: -38, z: -88, w: 7.5, d: 6, rot: -2.5535900500422257 },
       {
-        kind: 'chapel',
-        assetId: '/models/props/eastbrook_chapel.glb',
-        x: 2,
-        z: -78,
-        w: 5.5,
-        d: 6,
-        rot: 0.7853981633974483,
+        id: 'eastbrook_bank',
+        kind: 'house',
+        x: 30.38,
+        z: -115,
+        w: 23.4,
+        d: 16.24,
+        rot: Math.PI / 2,
       },
-      { kind: 'house', x: -28, z: -122, w: 5.5, d: 4.5, rot: 2.5535900500422257 },
-      { kind: 'house', x: -16, z: -128, w: 5.5, d: 4.5, rot: 0.5880026035475675 },
+      {
+        id: 'eastbrook_smithy',
+        kind: 'house',
+        x: -34.06,
+        z: -113.48,
+        w: 14.3,
+        d: 11.7,
+        rot: Math.PI,
+      },
+      {
+        id: 'eastbrook_inn',
+        kind: 'inn',
+        x: -40.51,
+        z: -72.3,
+        w: 26,
+        d: 16.9,
+        rot: Math.PI / 2,
+      },
+      {
+        id: 'eastbrook_chapel',
+        kind: 'chapel',
+        assetId: '/models/tidehold/hall.glb',
+        x: -64,
+        z: -115.57,
+        w: 15.6,
+        d: 28.6,
+        rot: Math.PI,
+      },
+      { id: 'eastbrook_apothecary', kind: 'house', x: -7.02, z: -82.03, w: 14.3, d: 10.92, rot: 0 },
+      { id: 'eastbrook_quay_cottage', kind: 'house', x: -75, z: -49.9, w: 16.58, d: 11.12, rot: 0 },
       ...current.buildings.filter((building) => !building.id || !townBuildingIds.has(building.id)),
     ],
     wells: [
@@ -335,12 +395,15 @@ describe('Eastbrook authored gameplay data integration', () => {
     // Re-pinned again for owner round 6b: Gorrak's camp joined the main bandit
     // band northeast, so his two tents, his two crates and his fire travelled
     // with the boss to the reunited camp around (115, 42).
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // fisherman's camp moved down the strand to the water's edge, and the two
+    // rowboats beside its old spot went with the move.
     expect(ZONE1_PROPS.tents).toEqual([
       { x: 58, z: 25, rot: 0.4, scale: 1 },
       { x: 68, z: 16, rot: 2.1, scale: 1 },
       { x: 113, z: 47, rot: 1.2, scale: 1.3 },
       { x: 119, z: 39, rot: -0.6, scale: 1 },
-      { x: -90.5, z: -78.5, rot: -0.9, scale: 1 },
+      { x: -104.5, z: -81.9, rot: -1.658, scale: 1 },
     ]);
     expect(ZONE1_PROPS.crates).toEqual([
       [56, 22],
@@ -352,7 +415,7 @@ describe('Eastbrook authored gameplay data integration', () => {
     expect(ZONE1_PROPS.campfires).toEqual([
       [59, 17],
       [111, 46],
-      [-93.5, -76.5],
+      [-101.52, -78.71],
       [-30, 146],
       [-61, 56],
     ]);
@@ -361,9 +424,12 @@ describe('Eastbrook authored gameplay data integration', () => {
       [-78, 54],
       [-69, 55],
     ]);
+    // The chapel-rise ruin (-5, -60) is gone: the smithy of the World of
+    // ClaudeCraft Studio map's arrangement stands on its south columns.
     expect(ZONE1_PROPS.ruinRings).toEqual([
-      { x: 80, z: 78, ringR: 7, columns: 7 },
-      { x: -5, z: -60, ringR: 8, columns: 6 },
+      // the Fallen Chapel stands on this ring's site: it is bare
+      // (tests/hollow_crypt_entrance.test.ts)
+      { x: 80, z: 78, ringR: 7, columns: 7, bare: true },
     ]);
     // Re-pinned 2026-08-18 for the harbor move (commit d19aa33f76): the
     // Eastbrook graveyard row moved to the chapel green; the second
@@ -375,10 +441,13 @@ describe('Eastbrook authored gameplay data integration', () => {
     // Re-pinned for owner round 6b: the retired Vale Chapel Yard anchor at
     // (4, -56) is gone with its graveyard record, because its Pale Keeper stood
     // 15 yd from the rebuilt Eastbrook Rest and read as a duplicate.
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // churchyard moved with the chapel, its two plots inside the iron rails
+    // beside the chapel's north wall.
     expect(ZONE1_PROPS.graveyards).toEqual([
-      { x: -2, z: -70 },
+      { x: 37.5, z: -99.3 },
       { x: -22, z: 118 },
-      { x: -9, z: -70 },
+      { x: 28.5, z: -107.8 },
     ]);
     // Re-pinned for owner refinement round 6b: the Collapsed Reliquary mouth
     // left the town chapel rise and moved to the Mirror Lake shore, so the
@@ -677,18 +746,21 @@ describe('Eastbrook authored gameplay data integration', () => {
   // Re-pinned for owner round 6b: FURY is the honor quartermaster, a service
   // NPC, so he left the chapel step (7 yd from Brother Aldric) for the town's
   // eastern edge; his facing is still derived, so it moved with him.
+  // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the north
+  // road swings west round the smithy's forge shelter over his old stand, so
+  // he keeps the town's edge between that road and the coast track.
   it('spawns layout-authored FURY under a reserved id without shifting nextId or RNG', () => {
     expect(EASTBROOK_NPC_PLACEMENTS_BY_ID.fury).toEqual({
       id: 'fury',
-      position: { x: 16, z: -78 },
-      facing: -2.2455372690184494,
+      position: { x: 21, z: -83.5 },
+      facing: -2.0570389598824015,
       anchorId: 'eastbrook_chapel',
       bodyRadius: 0.6,
     });
     expect(BUILTIN_WORLD.npcs[FURY_NPC_ID]).toMatchObject({
       id: 'fury',
-      pos: { x: 16, z: -78 },
-      facing: -2.2455372690184494,
+      pos: { x: 21, z: -83.5 },
+      facing: -2.0570389598824015,
       dynamic: true,
     });
     expect(FURY_ENTITY_ID).toBe(1_000_000_001);
@@ -723,12 +795,12 @@ describe('Eastbrook authored gameplay data integration', () => {
       id: 1_000_000_001,
       kind: 'npc',
       templateId: 'fury',
-      x: 16,
-      z: -78,
-      spawnX: 16,
-      spawnZ: -78,
-      facing: -2.2455372690184494,
-      prevFacing: -2.2455372690184494,
+      x: 21,
+      z: -83.5,
+      spawnX: 21,
+      spawnZ: -83.5,
+      facing: -2.0570389598824015,
+      prevFacing: -2.0570389598824015,
     });
     expect([...withFury.entities.keys()].filter((id) => id !== FURY_ENTITY_ID)).toEqual([
       ...withoutFury.entities.keys(),
@@ -766,7 +838,9 @@ describe('Eastbrook authored gameplay data integration', () => {
         id: 'station_fenbridge_tannery',
         type: 'tannery',
         zoneId: 'mirefen_marsh',
-        pos: { x: 1.0670827486441765, z: 315.3263500973041 },
+        // Fenbridge's own layout owns its station (the painted rebuild moved it
+        // to the tanning yard behind the bank)
+        pos: { ...FENBRIDGE_STATIONS_BY_ID.station_fenbridge_tannery.position },
         masterNpcId: 'tanner_hesk',
       },
       {
@@ -786,13 +860,17 @@ describe('Eastbrook authored gameplay data integration', () => {
         x: EASTBROOK_LAYOUT.services.mailbox.position.x,
         z: EASTBROOK_LAYOUT.services.mailbox.position.z,
       },
-      { x: 6, z: 294 },
+      // Fenbridge's own layout owns its mailbox (the painted rebuild moved it to
+      // the crossroads)
+      { ...FENBRIDGE_LAYOUT.services.mailbox.position },
       { x: 6, z: 654 },
       { x: -33, z: 1025 },
       { x: 397, z: 1905 },
       { x: -23, z: 1555 },
       { x: -353, z: 2067 },
-      { x: -354, z: 356 },
+      // Bridgemere's moved to the island inn's forecourt (the painted inn
+      // stands over the old square, sim/painted_towns/bridgemere.ts)
+      { x: -366.5, z: 351.5 },
       { x: -364, z: 1415 },
       { x: 354, z: 1436 },
       { x: -294, z: 815 },
@@ -809,9 +887,11 @@ describe('Eastbrook authored gameplay data integration', () => {
     // harbor quay and the graveyard contract to the chapel green. Every
     // behavioral test in this file consumes PLAYER_START symbolically, so
     // the moved spawn is re-pinned here as exported data.
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // graveyard moved with the chapel into the churchyard beside it.
     expect(PLAYER_START).toEqual({ x: -94, z: -58 });
-    expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: -2, z: -70 });
-    expect(EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint).toEqual({ x: 0, z: -70 });
+    expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: 37.5, z: -99.3 });
+    expect(EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint).toEqual({ x: 39.5, z: -99.3 });
   });
 });
 
@@ -983,6 +1063,51 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     }
   });
 
+  it('walks the graveyard route in through the churchyard gap, never through a rail', () => {
+    // The churchyard's iron rails are walk-through dressing, so the clear-path
+    // check above cannot see them; the route to the Pale Keeper still keeps to
+    // the way in (the gap the rails leave at the yard's north-east corner). A
+    // drawn rail runs about 3.85 yd along its own local x; 1.95 is a hair
+    // over its half length.
+    const RAIL_HALF_LENGTH = 1.95;
+    const graveyard = EASTBROOK_LAYOUT.services.graveyard.position;
+    const rails = (ZONE1_PROPS.decorProps ?? [])
+      .filter(
+        (prop) =>
+          prop.key === 'gardenIronFence' &&
+          Math.hypot(prop.x - graveyard.x, prop.z - graveyard.z) < 30,
+      )
+      .map((prop) => ({
+        a: localToWorld(prop, prop.rot ?? 0, -RAIL_HALF_LENGTH, 0),
+        b: localToWorld(prop, prop.rot ?? 0, RAIL_HALF_LENGTH, 0),
+      }));
+    // the yard's fifteen rails, so the sweep below is not vacuous
+    expect(rails).toHaveLength(15);
+    const route = EASTBROOK_LAYOUT.services.routes.find(
+      (candidate) => candidate.id === 'eastbrook_graveyard_route',
+    );
+    if (!route) throw new Error('missing graveyard route');
+    const toRail = (point: { x: number; z: number }, a: typeof point, b: typeof point) => {
+      const abx = b.x - a.x;
+      const abz = b.z - a.z;
+      const t = Math.max(
+        0,
+        Math.min(1, ((point.x - a.x) * abx + (point.z - a.z) * abz) / (abx * abx + abz * abz)),
+      );
+      return Math.hypot(point.x - a.x - abx * t, point.z - a.z - abz * t);
+    };
+    for (const point of samplePolyline(route.points, 0.1)) {
+      for (const rail of rails) {
+        expect(toRail(point, rail.a, rail.b), `route at ${point.x}, ${point.z}`).toBeGreaterThan(
+          route.bodyRadius + 0.5,
+        );
+      }
+    }
+    // and it ends within talking reach of the Pale Keeper over the first stone
+    const end = route.points[route.points.length - 1];
+    expect(Math.hypot(end.x - graveyard.x, end.z - graveyard.z)).toBeLessThan(INTERACT_RANGE);
+  });
+
   // Re-anchored 2026-08-18 for the harbor move (commit d19aa33f76,
   // docs/design/eastbrook-revamp/site-plan.md): the square anchor moved to
   // the new market square and the six retired gate destinations left the
@@ -993,6 +1118,9 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   // dropping its entrance too (31), then appended the harbour quarter's three
   // coastal buildings along the dock road, each bringing its own entrance
   // back into the proof (34).
+  // Re-pinned 2026-10 for the Tidehold rebuild: six placed buildings replaced
+  // the eleven kit shells, so eleven entrances became six (29). Every one of
+  // the six is still walked to and from the square below.
   it('pathfinds bidirectionally from the square to every service, NPC, station, and entrance', () => {
     // A standing spot in the square, DERIVED from the centrepiece rather than
     // hardcoded. It used to be (-12.5, -100.5), which was clear of the well
@@ -1030,7 +1158,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         (building) => ({ id: `${building.id}:entrance`, point: building.frontStandingPoint }),
       ),
     ];
-    expect(destinations).toHaveLength(34);
+    expect(destinations).toHaveLength(29);
     const moverProfiles = [
       { id: 'player', bodyRadius: PLAYER_BODY_RADIUS },
       // Pet locomotion deliberately shares PLAYER_BODY_RADIUS; keep this
@@ -1260,6 +1388,8 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     setActiveWorldContent(BUILTIN_WORLD);
     const rebuilt = new Sim({ seed: stabilitySeed, playerClass: 'warrior', noPlayer: true });
 
+    // The freight yard moved clear of the Weekly Vault's terrain pad.
+    // Both worlds now compare every spawn height as well as its x/z position.
     const stableProjection = (sim: Sim) =>
       [...sim.entities.values()]
         .filter((entity) => entity.kind === 'mob' || entity.kind === 'object')
@@ -1350,6 +1480,22 @@ describe('the first sixty seconds: starter pull lanes from spawn', () => {
       .sort((a, b) => a.d - b.d)
       .slice(0, 2);
     expect(nearest.length).toBe(2);
+    // The walk out goes the way a player goes, by the main street. The
+    // Tidehold rebuild (2026-10) put a wide building across each old beeline:
+    // the quay cottage across the wolf camp's (its detour climbed the quay
+    // pad's north-east rim, a 0.36 yd kerb in one stride) and the 26 yd tavern
+    // front across the boar camp's. So the wolf walk leaves the quay by the
+    // street south of the cottage, to where it has rounded the cottage at
+    // (-70, -68), and the boar walk carries on along the street to the square
+    // at (-26, -101) before heading east. One waypoint each, both on the
+    // street itself (pinned below); the pull spot and its checks are unchanged.
+    const viaMainStreet: Record<string, readonly { x: number; z: number }[]> = {
+      forest_wolf: [{ x: -70, z: -68 }],
+      wild_boar: [{ x: -26, z: -101 }],
+    };
+    for (const via of Object.values(viaMainStreet)) {
+      for (const waypoint of via) expect(ZONE1_ROADS[1]).toContainEqual(waypoint);
+    }
     for (const { camp } of nearest) {
       // The pull spot as a player finds it: walk the pathfinder's own route
       // out of town and stop at the first waypoint inside ranged pull
@@ -1367,7 +1513,11 @@ describe('the first sixty seconds: starter pull lanes from spawn', () => {
         route.find((p) => Math.hypot(p.x - camp.center.x, p.z - camp.center.z) <= 25) ??
         route[route.length - 1];
       expect(isBlocked(SEED, pull.x, pull.z, 0.5), `${camp.mobId} pull spot`).toBe(false);
-      expectWalkableRoute(`${camp.mobId} camp approach`, PLAYER_START, pull, 0.5);
+      expectWalkableLegs(
+        `${camp.mobId} camp approach`,
+        [PLAYER_START, ...(viaMainStreet[camp.mobId] ?? []), pull],
+        0.5,
+      );
       expect(lineOfSightClear(SEED, pull, camp.center), `${camp.mobId} pull sight lane`).toBe(true);
       expect(
         Math.hypot(pull.x - camp.center.x, pull.z - camp.center.z),

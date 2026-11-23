@@ -16,6 +16,12 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 
 const ENTRIES = ['scripts/detect_code_changes.mjs', 'scripts/ci_shard_test.mjs'];
 
+// The second root set: Vitest plugins vite.config.ts registers that replace
+// part of vitest's own `related` selection. The merged selective leg's test
+// set is computed by them, so they decide selection exactly like the entries'
+// modules do, yet nothing in the entries' import graph reaches them.
+const SELECTION_PLUGINS = ['scripts/lib/vitest_bounded_related.mjs'];
+
 function importClosure(entries: string[]): string[] {
   const seen = new Set<string>();
   const queue = [...entries];
@@ -50,7 +56,26 @@ describe('the selection pipeline trigger list matches the real import closure', 
     // fail-open hole (that module could change selection behavior without
     // widening); a listed file outside the closure is a stale trigger that
     // widens runs for a module no longer involved.
-    expect(importClosure(ENTRIES)).toEqual([...SELECTION_PIPELINE_FILES].sort());
+    expect(importClosure([...ENTRIES, ...SELECTION_PLUGINS])).toEqual(
+      [...SELECTION_PIPELINE_FILES].sort(),
+    );
+  });
+
+  it('roots every selection plugin vite.config.ts actually imports', () => {
+    // vite.config.ts is TypeScript with many non-selection imports, so the
+    // plugin roots are listed by hand; this pins the list against the config:
+    // every scripts/lib vitest_* plugin it imports whose module replaces a
+    // vitest specifications method must be a root.
+    const config = readFileSync(path.join(REPO_ROOT, 'vite.config.ts'), 'utf8');
+    for (const m of config.matchAll(/from\s*['"]\.\/(scripts\/lib\/vitest_[^'"]+\.mjs)['"]/g)) {
+      const source = readFileSync(path.join(REPO_ROOT, m[1]), 'utf8');
+      if (/specifications\.\w+\s*=/.test(source)) {
+        expect(SELECTION_PLUGINS, `${m[1]} replaces a vitest selection method`).toContain(m[1]);
+      }
+    }
+    for (const plugin of SELECTION_PLUGINS) {
+      expect(config, `vite.config.ts no longer imports ${plugin}`).toContain(`./${plugin}`);
+    }
   });
 
   it('keeps both CI entries in the trigger list themselves', () => {

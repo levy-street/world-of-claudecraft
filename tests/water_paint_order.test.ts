@@ -60,16 +60,33 @@ describe('water paint order is pinned, not camera-derived', () => {
     vi.restoreAllMocks();
   });
 
-  it('draws the horizon apron under every zone surface plane', () => {
-    // Both are transparent with depth writes off, so paint order alone decides.
-    const material = zonePlaneA.material as THREE.Material;
-    expect(material.transparent).toBe(true);
-    expect(material.depthWrite).toBe(false);
-    expect(apron.material).toBe(material); // one shared material, one program
-
-    // The apron carries a constant deep shore depth and no foam; the zone plane
-    // carries the real shoreline. The zone plane must win, at every camera angle.
+  it('draws the horizon apron under every zone sheet, and never inside one', () => {
+    // Neither writes depth: a floor mark a player reacts to (a boss telegraph,
+    // a draped ring) draws after the water and must show through shallow water
+    // on every tier exactly as on the Phong plane.
+    const sheet = zonePlaneA.material as THREE.ShaderMaterial;
+    const apronMaterial = apron.material as THREE.ShaderMaterial;
+    expect(sheet.transparent).toBe(true);
+    expect(sheet.depthWrite).toBe(false);
+    expect(apronMaterial.depthWrite).toBe(false);
+    // The apron's variant discards inside every built sheet, so the sheet with
+    // the real shoreline owns its rect whatever the two displacements do; the
+    // rest of its uniforms are the very same objects.
+    expect(apronMaterial.defines.OCEAN_APRON).toBe('');
+    expect(sheet.defines.OCEAN_APRON).toBeUndefined();
+    expect(apronMaterial.uniforms.uOceanCascade).toBe(sheet.uniforms.uOceanCascade);
+    expect(apronMaterial.uniforms.uSheetRects).toBeDefined();
     expect(apron.renderOrder).toBeLessThan(zonePlaneA.renderOrder);
+  });
+
+  it('lists a sheet for the apron to discard in only once the sheet is visible', () => {
+    const rects = (apron.material as THREE.ShaderMaterial).uniforms.uSheetRectCount;
+    zonePlaneA.visible = false;
+    water.update(1, 0, 0, 100);
+    const hidden = rects.value as number;
+    zonePlaneA.visible = true;
+    water.update(2, 0, 0, 100);
+    expect(rects.value).toBe(hidden + 1);
   });
 
   it('gives every zone surface plane the same order, so zones cannot reorder', async () => {

@@ -22,6 +22,7 @@
 
 import type { PainterHostWriters } from '../../painter_host';
 import type { ActionBarState } from './action_bar_view';
+import { petSlotMode } from './pet_slot_core';
 
 // Attribute / property / class names the painter drives. Named, not inlined, so the
 // painter references no bare DOM string literal.
@@ -128,12 +129,16 @@ export class ActionBarPainter {
       this.writers.setAttr(el.btn, ARIA_DESCRIPTION_ATTR, s.ariaDescription);
       this.writers.setAttr(el.btn, ARIA_DISABLED_ATTR, s.usable ? 'false' : 'true');
       // aria-pressed only where a toggle semantic is real: the Attack toggle
-      // always, any other slot only while it owns the armed ground aim
-      // (removed afterwards, so ordinary cast buttons stay plain buttons).
+      // and a pet-stance slot always, any other slot only while it owns the
+      // armed ground aim (removed afterwards, so ordinary cast buttons stay
+      // plain buttons).
+      const toggle =
+        s.kind === 'attack' ||
+        (s.kind === 'pet' && s.petCommand !== null && petSlotMode(s.petCommand) !== null);
       this.writers.setAttr(
         el.btn,
         ARIA_PRESSED_ATTR,
-        s.kind === 'attack' ? (s.queued ? 'true' : 'false') : s.aiming ? 'true' : null,
+        toggle ? (s.queued ? 'true' : 'false') : s.aiming ? 'true' : null,
       );
       this.writers.setText(el.keybindEl, s.keybindLabel);
     }

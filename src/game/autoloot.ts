@@ -1,3 +1,4 @@
+import { bodyPoolSharedWithParty, isLootableBody } from '../sim/corpse_loot_state';
 import { isRaidInstancePos } from '../sim/instances/dungeons';
 import { dist2d, INTERACT_RANGE } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -32,8 +33,11 @@ export class AutoLoot {
     for (const m of world.partyInfo?.members ?? []) mine.add(m.pid);
     const px = world.player.pos;
     for (const e of world.entities.values()) {
-      if (e.kind !== 'mob' || !e.dead || !e.lootable || !e.loot) continue;
-      const tappedMine = e.tappedById == null || mine.has(e.tappedById);
+      if (!isLootableBody(e) || !e.loot) continue;
+      // A World PvP body's pool is the killer's alone (bodyPoolSharedWithParty).
+      const tappedMine = bodyPoolSharedWithParty(e)
+        ? e.tappedById == null || mine.has(e.tappedById)
+        : e.tappedById === world.playerId;
       const personalMine = e.loot.items.some((slot) => slot.personalFor?.includes(world.playerId));
       const openToAll = e.loot.items.some((slot) => slot.openToAll && slot.count > 0);
       if (!tappedMine && !personalMine && !openToAll) continue;

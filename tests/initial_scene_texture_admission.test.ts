@@ -46,6 +46,52 @@ it('collects visible scene textures plus only explicitly prioritized hidden root
   expect(collectInitialSceneTextures(scene, [priorityRoot])).not.toContain(deferredTexture);
 });
 
+it('excludes visible staged prewarm groups from initial scene texture admission', () => {
+  const scene = new THREE.Scene();
+  const worldTexture = new THREE.Texture();
+  const prewarmCategoryTexture = new THREE.Texture();
+  const prewarmNamedTexture = new THREE.Texture();
+  const priorityTexture = new THREE.Texture();
+
+  scene.add(
+    new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ map: worldTexture })),
+  );
+
+  const categoryPrewarm = new THREE.Group();
+  categoryPrewarm.userData.renderCategory = 'prewarm';
+  categoryPrewarm.add(
+    new THREE.Mesh(
+      new THREE.BufferGeometry(),
+      new THREE.MeshBasicMaterial({ map: prewarmCategoryTexture }),
+    ),
+  );
+  scene.add(categoryPrewarm);
+
+  const namedPrewarm = new THREE.Group();
+  namedPrewarm.name = 'door-material-prewarm';
+  namedPrewarm.add(
+    new THREE.Mesh(
+      new THREE.BufferGeometry(),
+      new THREE.MeshBasicMaterial({ map: prewarmNamedTexture }),
+    ),
+  );
+  scene.add(namedPrewarm);
+
+  const priorityRoot = new THREE.Group();
+  priorityRoot.visible = false;
+  priorityRoot.add(
+    new THREE.Mesh(
+      new THREE.BufferGeometry(),
+      new THREE.MeshBasicMaterial({ map: priorityTexture }),
+    ),
+  );
+
+  expect(collectInitialSceneTextures(scene, [priorityRoot])).toEqual([
+    worldTexture,
+    priorityTexture,
+  ]);
+});
+
 it('keeps only self and current target in the initial entity presentation cohort', () => {
   const self = { group: new THREE.Group() };
   const target = { group: new THREE.Group() };

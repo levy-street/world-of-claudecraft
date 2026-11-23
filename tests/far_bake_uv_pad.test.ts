@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { padMissingUv } from '../src/render/characters/far_bake_uv_pad';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
+import { landWocBodies } from './helpers/woc_streamed';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 
@@ -84,6 +85,9 @@ async function loadAssets(): Promise<AssetsModule> {
   }));
   const assets = (await import('../src/render/characters/assets')) as AssetsModule;
   await assets.charactersReady();
+  // The part library left the boot preload when the world's NPCs stopped composing
+  // from it (its def is lazyPreload): ask for it the way a host does and let it land.
+  await landWocBodies(assets, [MODULAR_WARRIOR_KEY]);
   return assets;
 }
 
@@ -124,5 +128,24 @@ describe('far-LOD bake uv survival', () => {
     const uv = bake?.geo.getAttribute('uv');
     expect(uv).toBeDefined();
     expect(uv?.count).toBe(6);
+  });
+
+  it('carries position, normal and uv and nothing else, on a fixed rig and on a composed body', async () => {
+    const assets = await loadAssets();
+    // The merged head's per-vertex slot is the WOC far bake's own addition
+    // (woc_far_bake.ts, after the shared bake): neither of these two paths gains
+    // an attribute for it.
+    const attributes = (geo: THREE.BufferGeometry | null | undefined): string[] =>
+      Object.keys(geo?.attributes ?? {}).sort();
+    expect(attributes(assets.prepareVisual('mob_mushroom_pixie').idleGeo)).toEqual([
+      'normal',
+      'position',
+      'uv',
+    ]);
+    expect(attributes(assets.modularFarBake(MODULAR_WARRIOR_KEY, DEFAULT_LOOK)?.geo)).toEqual([
+      'normal',
+      'position',
+      'uv',
+    ]);
   });
 });

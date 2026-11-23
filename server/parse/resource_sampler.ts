@@ -7,11 +7,9 @@
 // a warrior sat rage-starved between spenders, whether a rogue capped energy
 // and wasted regen, whether a healer went out of mana or coasted at full, or
 // how close a raid actually ran to the floor. None of it is derivable after the
-// fact either: the event stream carries amounts, never the resulting pools, and
-// a periodic tick that FULLY overheals emits no heal event at all (see the
-// known capture limits in this directory's CLAUDE.md), so integrating damage
-// minus healing drifts silently. Sampling the real pools is the only honest
-// answer.
+// fact either: the event stream carries amounts, never the resulting pools,
+// so integrating damage minus healing drifts silently. Sampling the real pools
+// is the only honest answer.
 //
 // Read-only like the rest of the recorder: it reads the structural entity view
 // and never touches sim state.

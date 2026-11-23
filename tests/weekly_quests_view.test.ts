@@ -131,4 +131,50 @@ describe('the commendation view', () => {
       "This week's commendation went to the Church Order.",
     );
   });
+
+  it('words a pick carried past the reset as last week, in the same one-line note', () => {
+    const carried = buildWeeklyQuestsView(
+      {
+        weeklyQuest: {
+          questId: 'wk_raid',
+          week: 'wk_1',
+          count: 1,
+          state: 'completed',
+          carried: true,
+        },
+        weeklyQuestResetAtMs: 0,
+        factions: {},
+        player: { level: 20 },
+      },
+      0,
+    );
+    expect(carried.cards.map((card) => [card.id, card.buttonLabel])).toEqual([
+      ['wk_dungeons', 'Claim first'],
+      ['wk_raid', 'Completed last week'],
+      ['wk_battlegrounds', 'Claim first'],
+      ['wk_worldboss', 'Claim first'],
+    ]);
+    expect(carried.commendation?.note).toBe(
+      '1,000 standing from last week, still unclaimed. Claim it to choose a new charge.',
+    );
+    // An online mirror with no carried mark reads as this week's pick.
+    const thisWeek = buildWeeklyQuestsView(
+      {
+        weeklyQuest: { questId: 'wk_raid', week: 'wk_2', count: 1, state: 'completed' },
+        weeklyQuestResetAtMs: 0,
+        factions: {},
+        player: { level: 20 },
+      },
+      0,
+    );
+    expect(thisWeek.cards.map((card) => card.buttonLabel)).toEqual([
+      'Locked this week',
+      'Completed this week',
+      'Locked this week',
+      'Locked this week',
+    ]);
+    expect(thisWeek.commendation?.note).toBe(
+      '1,000 standing to one faction of your choice, once a week.',
+    );
+  });
 });

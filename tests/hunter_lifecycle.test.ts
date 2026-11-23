@@ -105,7 +105,6 @@ function seedTransientState(sim: TestSim, hunter: Entity, target: Entity): void 
     },
     'Frostjaw Trap',
     'frostjaw_trap',
-    25,
   );
 }
 

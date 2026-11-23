@@ -171,6 +171,26 @@ describe('opaque capture attachment residency', () => {
     }
   });
 
+  it('copies nothing while the post shed suppresses it, and resumes when released', () => {
+    const f = setup();
+    const unbind = bindSceneSamples(f.scene, f.mesh);
+    try {
+      // The deepest post-shed rung (post.ts) stops the copy: every consumer
+      // takes its unsampled arm through the same uniform, never a relink.
+      f.capture.setSuppressed(true);
+      f.draw();
+      expect(f.renderer.copyTextureToTexture).not.toHaveBeenCalled();
+      expect(f.mesh.material.uniforms.uSceneReady.value).toBe(0);
+      f.capture.setSuppressed(false);
+      f.draw();
+      expect(f.renderer.copyTextureToTexture).toHaveBeenCalledTimes(2);
+      expect(f.mesh.material.uniforms.uSceneReady.value).toBe(1);
+    } finally {
+      unbind();
+      f.dispose();
+    }
+  });
+
   it('reallocates from the resize path, outside a draw, and guards the new extent', () => {
     const f = setup();
     const unbind = bindSceneSamples(f.scene, f.mesh);

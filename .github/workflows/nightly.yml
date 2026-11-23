@@ -277,12 +277,14 @@ jobs:
         # launch below.
         run: |
           npx playwright install chromium
-          if ! timeout -k 15 100 npx playwright install-deps chromium; then
+          sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' /etc/apt/apt-mirrors.txt /etc/apt/apt-security-mirrors.txt /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list 2>/dev/null || true
+          if sudo timeout -k 15 100 "$(command -v node)" node_modules/playwright/cli.js install-deps chromium; then
+            echo "Chromium OS dependencies installed"
+          else
             echo "install-deps unavailable (exit $?); verifying CJK font coverage directly"
             if ! fc-list :lang=ja | grep -q .; then
-              sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list 2>/dev/null || true
-              timeout -k 15 60 sudo apt-get update || true
-              timeout -k 15 90 sudo apt-get install -y --no-install-recommends fonts-noto-cjk || true
+              sudo timeout -k 15 60 apt-get update || true
+              sudo timeout -k 15 90 apt-get install -y --no-install-recommends fonts-noto-cjk || true
             fi
             fc-list :lang=ja | grep -q . || { echo "no CJK font coverage by any route; the browser suite cannot pass without it"; exit 1; }
           fi

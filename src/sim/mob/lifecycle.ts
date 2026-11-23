@@ -40,11 +40,17 @@ import { cancelCorpseHarvestForCorpse } from '../professions/corpse_harvest_sess
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { dist2d, type Entity, IGNIVAR_BOSS_ID, NYTHRAXIS_BOSS_ID } from '../types';
-import { groundHeight } from '../world';
+import { mobGroundHeight } from '../world';
+import { clearCorpseSink } from './boss_corpse_sink';
+import { resetBossRangedMechanics } from './boss_ranged_mechanics';
+import { resetBossSlams } from './boss_slams';
+import { resetBossStarwake } from './boss_starwake';
 import { resetMobCharge } from './charge';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
 import { resetRiftMechanicWindups } from './rift_escape_window';
+import { boneShrapnel } from './trash_kit/crypt_hooks';
+import { resetWarpath } from './warpath';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
@@ -59,6 +65,13 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   // when nobody was harvesting; draws no rng.
   cancelCorpseHarvestForCorpse(ctx, mob);
   mob.corpseHarvestState = undefined;
+  // A fresh life pays again (an encounter's regrown part: Entity.regrown).
+  mob.regrown = undefined;
+  // A death burst belongs to one life (mob/trash_kit/death_burst.ts).
+  mob.deathBurst = undefined;
+  // The trash kit's long-lived state (Reassemble, Carrion Glut, Snapped
+  // Fetters) belongs to the life that ended.
+  mob.trashLife = undefined;
   mob.dead = false;
   mob.lootable = false;
   mob.loot = null;
@@ -68,8 +81,23 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.harvestClaimedBy = null;
   mob.ownerId = null;
   mob.hostile = true;
+  clearCorpseSink(mob);
+  // A patroller (editor Mob tool) walks its spawnPos along the route, so it
+  // would otherwise respawn wherever it happened to die. Send it back to the
+  // head of its path and restart the walk. Inert for every routeless mob.
+  if (mob.route && mob.route.points.length >= 2) {
+    mob.spawnPos.x = mob.route.points[0].x;
+    mob.spawnPos.z = mob.route.points[0].z;
+    // Re-seat the home point too: a later evade walks straight at spawnPos, so
+    // it must not keep the height of wherever the patrol died.
+    mob.spawnPos.y = ctx.groundPos(mob.spawnPos.x, mob.spawnPos.z).y;
+    mob.routeIdx = 0;
+    mob.routeDir = 1;
+    mob.routeWaitLeft = 0;
+  }
   mob.pos = { ...mob.spawnPos };
-  mob.pos.y = groundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed);
+  // a camp on a mine floor respawns on that floor, not on the summit above it
+  mob.pos.y = mobGroundHeight(mob.pos.x, mob.pos.z, ctx.cfg.seed, mob.spawnPos.y);
   mob.prevPos = { ...mob.pos };
   ctx.rebucket(mob);
   mob.hp = mob.maxHp;
@@ -84,11 +112,27 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.leashAnchor = null;
   mob.evadeStall = 0;
   mob.chaseStall = 0;
+  mob.chaseRoute = undefined;
   mob.chainPullInbound = false;
   releasePin(mob);
   mob.fleeTimer = 0;
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;
+  // A warpath circuit does not survive a death: the next spawn opens on his focus
+  // phase at the barrow, not mid-run to whichever landmark he was heading for.
+  resetWarpath(mob);
+  resetBossSlams(mob);
+  resetBossRangedMechanics(ctx, mob);
+  resetBossStarwake(mob);
+  // A slumbering template that ever respawned in place (none does today: the world boss is
+  // scheduler-owned) must come back awake, or a daytime respawn would run the dawn wake
+  // and broadcast the realm-wide call on every single respawn.
+  if (MOBS[mob.templateId]?.slumber) {
+    mob.asleep = false;
+    // ...and unheld: a respawn that inherited a stale rise would come back hostile but
+    // AI-frozen for the rest of it (mob/slumber.ts rise()).
+    mob.slumberRise = 0;
+  }
   clearThreat(mob);
   // A respawn is a brand-new pull: the world-boss damager roster clears with
   // the hate table so loot rights never carry across lives.
@@ -280,4 +324,6 @@ export function detonateCorpse(ctx: SimContext, dead: Entity): void {
   }
   // A clean bloat kill means the blast caught nobody it credits.
   deedsMod.onBloatDetonatedForDeeds(ctx, dead, damagedPids);
+  // The Bone Minion's shrapnel also cuts the skeletons round it.
+  boneShrapnel(ctx, dead);
 }

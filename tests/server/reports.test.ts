@@ -395,6 +395,37 @@ describe('POST /api/reports validation ladder', () => {
     expect(r.status).toBe(200);
     expect(r.body).toEqual({ ok: true, reportId: 42 });
   });
+
+  it('submits a name report for an offline character using server-resolved identity', async () => {
+    vi.mocked(getCharacter).mockResolvedValue(charRow(5, 'Rep'));
+    const reportTargetForPid = vi.fn(() => null);
+    installRuntime({ reportTargetForPid });
+    const target = { accountId: 9, characterId: 3, characterName: 'Foe' };
+    vi.mocked(findCharacterReportTargetByName).mockResolvedValue(target);
+    vi.mocked(createPlayerReport).mockResolvedValue({ id: 43 });
+
+    const r = await authedPost({
+      reason: 'cheating',
+      reporterCharacterId: 5,
+      targetCharacterName: 'Foe',
+      targetAccountId: 999,
+      targetCharacterId: 888,
+      details: 'speed hacking',
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ ok: true, reportId: 43 });
+    expect(reportTargetForPid).not.toHaveBeenCalled();
+    expect(findCharacterReportTargetByName).toHaveBeenCalledExactlyOnceWith('Foe');
+    expect(createPlayerReport).toHaveBeenCalledExactlyOnceWith({
+      reporterAccountId: 7,
+      reporterCharacterId: 5,
+      reporterCharacterName: 'Rep',
+      target,
+      reason: 'cheating',
+      details: 'speed hacking',
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------

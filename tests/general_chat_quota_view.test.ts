@@ -168,6 +168,7 @@ function makeChatWindow(activeTab: 'world' | 'general', chatLog: HTMLElement) {
     hasQuest: () => false,
     showError: () => {},
     openWhoTab: () => false,
+    openGroupFinder: () => {},
   });
   Object.assign(chatWindow as unknown as Record<string, unknown>, { activeChatTab: activeTab });
   return chatWindow;

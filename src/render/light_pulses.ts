@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { GFX } from './gfx';
 import { markPointLightSource } from './point_light_carriers_core';
+import { spellEffectsMuted } from './spell_effects_switch';
 
 interface Pulse {
   light: THREE.PointLight;
@@ -56,6 +57,10 @@ export class LightPulses {
 
   /** Flash a short-lived point light at a world position. */
   pulse(at: THREE.Vector3, school: string, intensity = 6, duration = 0.45, range = 7): void {
+    // Every caller is a spell or ability moment: a pulse inside a muted
+    // caster's event is skipped (spell_effects_switch.ts). The lights stay
+    // allocated either way, so no program or light count changes.
+    if (spellEffectsMuted()) return;
     const cap = Math.min(this.capacity(), this.pool.length);
     if (cap === 0) return;
     let slot: Pulse | undefined;
@@ -72,6 +77,36 @@ export class LightPulses {
         if (this.pool[i].remaining < slot.remaining) slot = this.pool[i];
       }
     }
+    this.light(slot, at, school, intensity, duration, range);
+  }
+
+  /** Flash a pulse only into a free slot, never stealing a live one: for a steady
+   *  ambient flicker (a burning hut) that must not cut a talent moment short.
+   *  Returns whether it lit. */
+  pulseIfFree(
+    at: THREE.Vector3,
+    school: string,
+    intensity = 6,
+    duration = 0.45,
+    range = 7,
+  ): boolean {
+    const cap = Math.min(this.capacity(), this.pool.length);
+    for (let i = 0; i < cap; i++) {
+      if (this.pool[i].remaining > 0) continue;
+      this.light(this.pool[i], at, school, intensity, duration, range);
+      return true;
+    }
+    return false;
+  }
+
+  private light(
+    slot: Pulse,
+    at: THREE.Vector3,
+    school: string,
+    intensity: number,
+    duration: number,
+    range: number,
+  ): void {
     slot.light.color.setHex(SCHOOL_LIGHT[school] ?? 0xffe28a);
     slot.light.position.copy(at);
     slot.light.position.y += 1.1;

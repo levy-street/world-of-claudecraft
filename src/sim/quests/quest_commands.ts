@@ -23,16 +23,21 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
-import { bagPools, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
+import { bagPools, bagsFullError, consumeOneScratch, countStacked, fitsAll } from '../bags';
 import { WISP_MAZE_QUEST_ID } from '../content/world_quest_wisp_maze';
-import { ITEMS, QUESTS, questRewardItemId } from '../data';
+import { DUNGEONS, ITEMS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { recordTrackedConsumed } from '../item_tracking';
 import { removePreferFungible } from '../items';
+import { grantFreshLoot } from '../loot/fresh_quality_grant';
 import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
+import { emitReferralQuestEvidence } from '../referral_evidence';
+import { markGourdlightErrand } from '../seasonal/gourdlight_deed_marks';
+import { seasonalBlockedQuestIds } from '../seasonal/seasonal_quests';
+import { activeSeasonalEventOf } from '../seasonal/seasonal_state';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { hubHealingAbilityId } from '../tutorial/hub_healing_lesson';
@@ -57,6 +62,8 @@ import {
 } from './profession_quest_effects';
 import { playerHoldsQuestItem } from './quest_item_presence';
 import { grantQuestRecipeReward, validateQuestRecipeReward } from './quest_recipe_rewards';
+import { defaultRewardChoice, questFixedReward, resolveRewardChoice } from './quest_reward_choice';
+import { weeklyLockedQuestIds, weeklyQuestLockoutId } from './weekly_quest_lock';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -81,7 +88,11 @@ export function computeQuestState(
   if (questsDone.has(questId) && !quest.repeatable) return 'done';
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
+  if (quest.maxLevel && playerLevel > quest.maxLevel) return 'unavailable';
   if (quest.retired) return 'unavailable';
+  // A quest pointing into a development-only room waits until that room ships.
+  if (quest.gatedWithDungeon && DUNGEONS[quest.gatedWithDungeon]?.guideVisible === false)
+    return 'unavailable';
   // Class-locked quest (the paladin-only Divine Tome chain): invisible to any
   // other class. A missing class fails closed so a class-less caller never opens it.
   if (quest.requiredClass && (!playerClass || !quest.requiredClass.includes(playerClass)))
@@ -132,10 +143,7 @@ export function computeQuestState(
 export function questState(ctx: SimContext, questId: string, pid?: number): QuestState {
   const r = ctx.resolve(pid);
   if (!r) return 'unavailable';
-  const withinCadence =
-    r.meta.questCadence.size > 0
-      ? new Set(cadenceBlockedKeys(r.meta.questCadence, ctx.tickCount))
-      : undefined;
+  const withinCadence = repeatBlockedQuestIds(ctx, r.meta);
   return computeQuestState(
     questId,
     r.meta.questLog,
@@ -145,6 +153,31 @@ export function questState(ctx: SimContext, questId: string, pid?: number): Ques
     withinCadence,
     r.meta.cls,
   );
+}
+
+/**
+ * The repeatable quests this player cannot take again yet: work orders inside their tick
+ * cadence, plus weekly quests locked until the weekly reset (weekly_quest_lock.ts). One
+ * set, fed to computeQuestState here and mirrored to the online client through the cprof
+ * `cadenceBlockedQuests` (professions/crafting_identity.ts), so both worlds agree.
+ * Undefined when nothing is blocked, which keeps the common case allocation-free.
+ */
+export function repeatBlockedQuestIds(
+  ctx: SimContext,
+  meta: PlayerMeta,
+): ReadonlySet<string> | undefined {
+  const cadence =
+    meta.questCadence.size > 0 ? cadenceBlockedKeys(meta.questCadence, ctx.tickCount) : [];
+  const weekly =
+    meta.raidLockouts.size > 0 ? weeklyLockedQuestIds(meta.raidLockouts, ctx.lockoutNowMs()) : [];
+  // Seasonal quests close with their event (seasonal/seasonal_quests.ts).
+  const seasonal = seasonalBlockedQuestIds(
+    activeSeasonalEventOf(ctx.seasonal),
+    ctx.resetDay,
+    ctx.seasonal.devDaily,
+  );
+  if (cadence.length === 0 && weekly.length === 0 && seasonal.length === 0) return undefined;
+  return new Set([...cadence, ...weekly, ...seasonal]);
 }
 
 function questNpcFor(
@@ -360,8 +393,16 @@ export function abandonQuest(ctx: SimContext, questId: string, pid?: number): vo
   });
 }
 
-export function turnInQuest(ctx: SimContext, questId: string, pid?: number): void {
-  const r = ctx.resolve(pid);
+// `choiceOrPid` mirrors acceptQuest's selection slot: a string is the picked
+// choose-one reward (QuestDef.choiceRewards), a number is the player id.
+export function turnInQuest(
+  ctx: SimContext,
+  questId: string,
+  choiceOrPid?: string | number,
+  pid?: number,
+): void {
+  const picked = typeof choiceOrPid === 'string' ? choiceOrPid : undefined;
+  const r = ctx.resolve(typeof choiceOrPid === 'number' ? choiceOrPid : pid);
   if (!r) return;
   const { meta, e: p } = r;
   // Dead players (released ghosts included) cannot turn in quests.
@@ -392,10 +433,19 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
     ctx.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest turn-in is not nearby.');
     return;
   }
-  // Capacity gate (classic): the reward must fit AFTER the collect items are
+  const choice = resolveRewardChoice(quest, meta.cls, picked, meta.talents.spec);
+  if (!choice.ok) {
+    ctx.error(meta.entityId, 'That reward is not offered.');
+    return;
+  }
+  // Capacity gate (classic): the rewards must fit AFTER the collect items are
   // handed in, so simulate the hand-in on a scratch copy before committing.
-  const rewardItem = questRewardItemId(quest, meta.cls);
-  if (rewardItem) {
+  // The fixed reward and the chosen one are checked together (fitsAll), so two
+  // one-slot items against one free slot correctly refuse.
+  const rewardItems = [questFixedReward(quest, meta.cls), choice.itemId].filter(
+    (id): id is string => id !== undefined,
+  );
+  if (rewardItems.length > 0) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
     for (const obj of quest.objectives) {
       // An ownership turn-in consumes nothing, so it frees no room either:
@@ -421,13 +471,14 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
         }
       }
     }
-    if (countFit(scratch, bagPools(meta.bags), rewardItem, 1) < 1) {
-      bagsFullError(ctx, meta.entityId, rewardItem);
+    const adds = rewardItems.map((itemId) => ({ itemId, count: 1 }));
+    if (!fitsAll(scratch, bagPools(meta.bags), adds)) {
+      bagsFullError(ctx, meta.entityId, rewardItems[rewardItems.length - 1]);
       return;
     }
   }
 
-  turnInQuestCore(ctx, questId, quest, meta);
+  turnInQuestCore(ctx, questId, quest, meta, choice.itemId);
 }
 
 // Shared turn-in reward core: consumes the collect items, marks the quest done, and
@@ -436,11 +487,15 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
 // the state + NPC-proximity checks; the /dev completer forces the objectives ready).
 // Both the NPC turn-in and quests/dev_quest_commands.ts go through here so the reward
 // math cannot drift.
+// `rewardChoice` is the validated choose-one pick; a caller with no dialog (the
+// /dev completer, scripted completions) leaves it out and the spec default is
+// granted, so no path can finish a choice quest empty.
 export function turnInQuestCore(
   ctx: SimContext,
   questId: string,
   quest: QuestDef,
   meta: PlayerMeta,
+  rewardChoice?: string,
 ): boolean {
   const qp = meta.questLog.get(questId);
   if (!qp) return false;
@@ -482,6 +537,8 @@ export function turnInQuestCore(
   if (firstCompletion) meta.counters.questsCompleted++;
   // Quest and chapter deed predicates read questsDone, so re-check this player.
   ctx.markDeedsDirty(meta.entityId);
+  // Gourdlight Eve's whole-event checklist counts each rotating errand once.
+  markGourdlightErrand(ctx, meta, questId);
   if (quest.copperReward > 0) {
     meta.copper += quest.copperReward;
     ctx.emit({
@@ -490,8 +547,12 @@ export function turnInQuestCore(
       pid: meta.entityId,
     });
   }
-  const rewardItem = questRewardItemId(quest, meta.cls);
-  if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId, { source: `quest:${quest.id}` });
+  const rewardItem = questFixedReward(quest, meta.cls);
+  // The quest labels a tracked reward copy's provenance (item_tracking.ts).
+  const rewardOpts = { source: `quest:${quest.id}` };
+  if (rewardItem) grantFreshLoot(ctx, rewardItem, 1, meta.entityId, rewardOpts);
+  const chosen = rewardChoice ?? defaultRewardChoice(quest, meta.cls, meta.talents.spec);
+  if (chosen) grantFreshLoot(ctx, chosen, 1, meta.entityId, rewardOpts);
   grantQuestRecipeReward(ctx, quest, meta);
   ctx.grantXp(quest.xpReward, meta);
   // Arm the repeat-cadence window (work orders): the quest stays
@@ -500,12 +561,20 @@ export function turnInQuestCore(
   if (quest.repeatCadenceTicks && quest.repeatCadenceTicks > 0) {
     armCadence(meta.questCadence, questId, ctx.tickCount, quest.repeatCadenceTicks);
   }
+  // A weekly quest locks until the realm's weekly reset (weekly_quest_lock.ts); a
+  // daily one rides the same lock to the next daily reset.
+  if (quest.weeklyReset || quest.dailyReset) {
+    const now = ctx.lockoutNowMs();
+    const until = quest.dailyReset ? ctx.raidResetMs(now) : ctx.weeklyRaidResetMs(now);
+    meta.raidLockouts.set(weeklyQuestLockoutId(questId), until);
+  }
   // A quest that unlocks a quest-gated ability (recall_the_fallen <-
   // q_rite_of_redemption) must surface it now: rebuild the known list (which reads
   // the just-updated questsDone) and announce the newly learned ability. The diff
   // in refreshKnownAbilities means an ordinary turn-in announces nothing.
   ctx.refreshKnownAbilities(meta, true);
   ctx.emit({ type: 'questDone', questId, pid: meta.entityId });
+  emitReferralQuestEvidence(ctx, meta, questId);
   ctx.emit({
     type: 'log',
     text: `Quest completed: ${quest.name}`,

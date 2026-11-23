@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { shadowChooseSlot } from '../src/game/shadow_controls';
 import {
   SHADOW_QUEST_ID as ID,
   SHADOW_GUARDS,
@@ -11,6 +12,8 @@ import { BUILTIN_WORLD } from '../src/sim/data';
 import { hasShadowCloak, shadowActionsLocked } from '../src/sim/shadow_action_lock';
 import { Sim } from '../src/sim/sim';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { t } from '../src/ui/i18n';
+import { createShadowActionBarView, shadowActionHint } from '../src/ui/world_quest_shadow_view';
 
 function setup() {
   const sim = new Sim({
@@ -125,6 +128,97 @@ describe('Duskweave dispatches world quest', () => {
     // Loitering fills the slow circle all the way.
     tick(sim, Math.ceil(SHADOW_WIDE_CIRCLE_FILL_SECONDS * 20));
     expect(sim.worldQuestLog.get(ID)?.shadow?.phase).toBe('caught');
+  });
+  it('walks into both wide circles and completes from 2/4 through the real action controls', () => {
+    function run() {
+      const sim = setup();
+      // Isolate carrier suspicion from lantern timing; keep real movement,
+      // authoritative suspicion, client controls and the full steal channel.
+      safeGuards(sim);
+      const progress = sim.worldQuestLog.get(ID)!;
+      progress.count = 2;
+      progress.creditedObjects = ['2146900041', '2146900042'];
+      const view = createShadowActionBarView();
+      const trace: number[] = [];
+      for (const id of [2146900043, 2146900044]) {
+        const guard = sim.entities.get(id)!;
+        near(sim, id, 5.8);
+        sim.player.facing = guard.facing;
+        sim.player.targetId = id;
+        sim.moveInput.forward = true;
+        for (let i = 0; i < 40; i++) {
+          if (Math.hypot(sim.player.pos.x - guard.pos.x, sim.player.pos.z - guard.pos.z) <= 2.3)
+            break;
+          sim.tick();
+        }
+        sim.moveInput.forward = false;
+        expect(
+          Math.hypot(sim.player.pos.x - guard.pos.x, sim.player.pos.z - guard.pos.z),
+        ).toBeLessThanOrEqual(2.5);
+        expect(progress.shadow?.suspicion).toBeGreaterThan(0);
+        expect(progress.shadow?.suspicion).toBeLessThan(0.5);
+        trace.push(progress.shadow!.suspicion);
+        expect(view.tick(sim, () => '').slots[0].usable).toBe(true);
+        expect(shadowActionHint(sim)).toBe(t('questUi.worldQuest.shadow.stealTip'));
+        shadowChooseSlot(sim, 0);
+        expect(progress.shadow?.stealing?.targetId).toBe(id);
+        tick(sim);
+        trace.push(progress.count);
+        if (progress.state === 'active') {
+          expect(progress.count).toBe(3);
+          expect(progress.creditedObjects).toEqual(['2146900041', '2146900042', '2146900043']);
+          sim.player.pos = sim.groundPos(SHADOW_SAFE_SPOT.x, SHADOW_SAFE_SPOT.z);
+          sim.player.prevPos = { ...sim.player.pos };
+          tick(sim, 20);
+        }
+      }
+      expect(progress.state).toBe('completed');
+      expect(progress.count).toBe(4);
+      expect(progress.creditedObjects).toBeUndefined();
+      expect(hasShadowCloak(sim.player)).toBe(false);
+      return trace;
+    }
+    expect(run()).toEqual(run());
+  });
+  it.each([
+    [0, true],
+    [0.2, true],
+    [0.499, true],
+    [0.5, false],
+    [0.9, false],
+  ] as const)('keeps authoritative steal admission at suspicion %s', (suspicion, allowed) => {
+    const sim = setup();
+    safeGuards(sim);
+    near(sim, 2146900043);
+    tick(sim, 1);
+    sim.worldQuestLog.get(ID)!.shadow!.suspicion = suspicion;
+    sim.shadowWorldQuestAction('pickpocket', 2146900043);
+    expect(sim.worldQuestLog.get(ID)?.shadow?.stealing !== undefined).toBe(allowed);
+  });
+  it('keeps HUD, controls and authority blocked in a lantern beam below the suspicion limit', () => {
+    const sim = setup();
+    safeGuards(sim);
+    near(sim, 2146900043);
+    tick(sim, 1);
+    const shadow = sim.worldQuestLog.get(ID)!.shadow!;
+    shadow.suspicion = 0.2;
+    const lantern = sim.entities.get(2146900045)!;
+    lantern.dead = false;
+    lantern.pos = { ...sim.player.pos, x: sim.player.pos.x - 4 };
+    lantern.facing = Math.PI / 2;
+    sim.player.targetId = 2146900043;
+    const view = createShadowActionBarView();
+    expect(view.tick(sim, () => '').slots[0].usable).toBe(false);
+    expect(view.tick(sim, () => '').slots[1].usable).toBe(true);
+    shadowChooseSlot(sim, 0);
+    expect(shadow.stealing).toBeUndefined();
+    sim.shadowWorldQuestAction('pickpocket', 2146900043);
+    expect(shadow.stealing).toBeUndefined();
+
+    lantern.facing = -Math.PI / 2;
+    expect(view.tick(sim, () => '').slots[0].usable).toBe(true);
+    shadowChooseSlot(sim, 0);
+    expect(shadow.stealing?.targetId).toBe(2146900043);
   });
   it('rejects remote and sentry targets, cancels a moving steal, and ignores command spam', () => {
     const sim = setup();

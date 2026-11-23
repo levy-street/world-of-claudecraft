@@ -1,23 +1,10 @@
-// How hard a Buried Hoard presses, as ONE table every boss mechanic reads.
-//
-// A hoard already scales its mobs' health and damage two ways: by the party's
-// head count (content/treasure_maps.ts vaultHealthFactor / vaultDamageFactor, so
-// a lone reader fights roughly open-world strength) and by the map's rarity,
-// which picks the Rift rank and with it the heroic stat transform. What neither
-// reached was the boss MECHANICS: a frontal, a meteor, a scythe, a soul hit for
-// the same share of a player's health on a common map as on a legendary one,
-// alone or five strong.
-//
-// This table closes that, and it is per RARITY on purpose. Head count keeps a
-// solo run fair; rarity is what makes a legendary hoard cost more than a common
-// one for whoever walks in, alone included. Mechanic damage is a flat amount per
-// player hit, so it needs no head count term: it is already the same threat to
-// one player as to each of five.
-//
-// Pure data plus one lookup. Rare is the baseline (every mechanic was tuned on
-// it), so a rare hoard plays exactly as before.
+// Fixed rarity budgets for Buried Hoard stats, mechanics, and encounter pressure.
 
-import type { TreasureMapRarity } from '../content/treasure_maps';
+import {
+  HOARD_SUGGESTED_PLAYERS,
+  hoardDamageReduction,
+  type TreasureMapRarity,
+} from '../content/treasure_maps';
 import type { RiftInstance } from './types';
 
 export interface HoardPressure {
@@ -31,10 +18,7 @@ export interface HoardPressure {
   speed: number;
 }
 
-/** How hard the hoard leans on the room as a whole: the living head count plus
- *  the rarity's step. It is what decides whether a mechanic comes in MULTIPLES
- *  (a second Wandering Scythe): a full party in a legendary hoard, or five in an
- *  epic one, never a lone player. */
+/** Fixed encounter size plus rarity determines simultaneous mechanics. */
 export const HOARD_RARITY_STEP: Readonly<Record<TreasureMapRarity, number>> = Object.freeze({
   common: -1,
   rare: 0,
@@ -47,7 +31,7 @@ export function hoardIntensity(
   vault: RiftInstance['vault'] | undefined,
   livingPlayers: number,
 ): number {
-  return Math.max(1, livingPlayers) + (vault ? HOARD_RARITY_STEP[vault.rarity] : 0);
+  return hoardPlayerBudget(vault, livingPlayers) + (vault ? HOARD_RARITY_STEP[vault.rarity] : 0);
 }
 
 export const HOARD_RARITY_PRESSURE: Readonly<Record<TreasureMapRarity, HoardPressure>> =
@@ -75,7 +59,17 @@ export const HOARD_REFERENCE_HEALTH = 1200;
  *  tank and a mage; more stamina means more room to take it. No cap: a mechanic
  *  stood in on low health can kill. Every hoard mechanic goes through here, so
  *  the rarity ladder holds for all eight bosses and their casters. */
-export function hoardMechanicDamage(inst: RiftInstance, fraction: number): number {
-  const scale = hoardPressure(inst.vault).damage;
+export function hoardMechanicDamage(
+  inst: RiftInstance,
+  fraction: number,
+  role: 'boss' | 'add' = 'boss',
+): number {
+  const reduction = inst.vault ? hoardDamageReduction(inst.vault.rarity, role) : 1;
+  const scale = hoardPressure(inst.vault).damage * reduction;
   return Math.max(1, Math.round(HOARD_REFERENCE_HEALTH * fraction * scale));
+}
+
+/** Difficulty uses the authored party size; target selection still uses living players. */
+export function hoardPlayerBudget(vault: RiftInstance['vault'] | undefined, fallback = 1): number {
+  return vault ? HOARD_SUGGESTED_PLAYERS[vault.rarity] : Math.max(1, fallback);
 }

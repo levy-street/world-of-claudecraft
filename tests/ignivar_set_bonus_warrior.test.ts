@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
-import { setBonusFlag } from '../src/sim/content/ignivar_set_bonuses';
+import { FORGEWALL_2PC_SHIELD_PCT_MAX, setBonusFlag } from '../src/sim/content/ignivar_set_bonuses';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { computeCharacterModifiers } from '../src/sim/set_bonus_mods';
@@ -63,17 +63,18 @@ describe('warrior Crucible sets: the resolved 2-piece rewrites', () => {
     }
   });
 
-  it('Forgewall 2pc: Iron Resolve converts rage at 5 absorb per point, up from 4', () => {
+  it("Forgewall 2pc: Iron Resolve's shield absorbs 25 percent of max health, up from 20", () => {
     const base = knownWith('prot', {});
     const setw = knownWith('prot', worn('forgewall', 2));
-    const baseEff = effectOf(base.known, 'iron_resolve', 'absorbSpentResource') as {
-      mult: number;
+    const baseEff = effectOf(base.known, 'iron_resolve', 'absorb') as {
+      casterMaxHpPct: number;
     };
-    const wornEff = effectOf(setw.known, 'iron_resolve', 'absorbSpentResource') as {
-      mult: number;
+    const wornEff = effectOf(setw.known, 'iron_resolve', 'absorb') as {
+      casterMaxHpPct: number;
     };
-    expect(baseEff.mult).toBe(4);
-    expect(wornEff.mult).toBe(5);
+    expect(baseEff.casterMaxHpPct).toBe(0.2);
+    expect(wornEff.casterMaxHpPct).toBe(FORGEWALL_2PC_SHIELD_PCT_MAX);
+    expect(FORGEWALL_2PC_SHIELD_PCT_MAX).toBe(0.25);
   });
 
   it('one piece below the threshold changes nothing', () => {

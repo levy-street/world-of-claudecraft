@@ -22,9 +22,9 @@
 
 import * as THREE from 'three';
 import { assetUrl } from './assets/media';
+import { CAMERA_RELATIVE_GLSL } from './camera_relative_glsl';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { sharedUniforms } from './gfx';
-
 // NOTE: three.js's GLTFLoader sanitizes node names (dots are reserved chars
 // and get STRIPPED: 'vfx_vent.l' -> 'vfx_ventl'), so the lookup below matches
 // both the raw glTF spelling and the sanitized one.
@@ -74,7 +74,7 @@ export interface IgnivarVfxHandle {
 
 // ---------------------------------------------------------------- shaders
 
-const PLUME_VERT = `
+const PLUME_VERT = `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 uniform float uIntensity;
 uniform float uReach;
@@ -120,7 +120,7 @@ void main() {
   world.y += (pow(max(life, 0.0), 1.3) * uReach * 2.0
            + sin(uTime * 7.0 + aSeed * 53.0) * 0.02 * life) * mscale;
 
-  vec4 mv = viewMatrix * world;
+  vec4 mv = wocCamRelView(world.xyz);
   // grow out of the vent, then burn away
   float grow = smoothstep(0.0, 0.15, life) * (1.0 - smoothstep(0.55, 1.0, life));
   gl_PointSize = aSize * mscale * grow * (1.0 + uIntensity * 0.5) * (260.0 / -mv.z);
@@ -162,7 +162,7 @@ void main() {
 // whose centreline spirals up the (buoyancy-bent) plume path and waves over
 // time, with the alpha scrolling upward along the ribbon so the wisp reads
 // as rising. aT runs 0..1 along the strip, aSide is the +-1 width offset.
-const SMOKE_VERT = `
+const SMOKE_VERT = `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 uniform float uIntensity;
 uniform float uReach;
@@ -190,7 +190,7 @@ void main() {
   vec3 camRight = normalize(vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]));
   float width = (0.018 + t * 0.085) * mscale;
   world.xyz += camRight * aSide * width;
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * wocCamRelView(world.xyz);
 }
 `;
 
@@ -221,7 +221,7 @@ void main() {
 // The ChannelEnd release: an expanding fresnel SHELL that erupts from the
 // core and washes over the whole character, riding the same uBurst envelope
 // as the extra particles -- exp decay makes it expand fast then linger.
-const PULSE_VERT = `
+const PULSE_VERT = `${CAMERA_RELATIVE_GLSL}
 uniform float uBurst;
 varying float vRim;
 varying float vP;
@@ -229,7 +229,7 @@ void main() {
   float p = 1.0 - uBurst;            // 0 at the moment of release -> 1 expanded
   vP = p;
   float r = mix(0.18, 1.25, p);      // core-sized -> past the whole silhouette
-  vec4 mv = viewMatrix * modelMatrix * vec4(position * r, 1.0);
+  vec4 mv = wocCamRelView((modelMatrix * vec4(position * r, 1.0)).xyz);
   vec3 nv = normalize(mat3(viewMatrix) * mat3(modelMatrix) * normal);
   vRim = 1.0 - abs(nv.z);            // bright edge-on rim, clear face-on
   gl_Position = projectionMatrix * mv;
@@ -252,7 +252,7 @@ void main() {
 // under his feet. Own envelope (uShock) so the meteor slam and the channel
 // pulse never fight; the ring lives on the model ROOT so it stays flat on
 // the floor no matter what the skeleton is doing.
-const SHOCK_VERT = `
+const SHOCK_VERT = `${CAMERA_RELATIVE_GLSL}
 uniform float uShock;
 varying float vRad;
 void main() {
@@ -261,7 +261,7 @@ void main() {
   float p = 1.0 - uShock;             // 0 at impact -> 1 fully expanded
   float s = mix(0.15, 2.3, p);
   vec3 pos = vec3(position.x * s, position.y + 0.02, position.z * s);
-  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView((modelMatrix * vec4(pos, 1.0)).xyz);
 }
 `;
 const SHOCK_FRAG = `
@@ -276,7 +276,7 @@ void main() {
   gl_FragColor = vec4(col * (1.2 + uIntensity * 0.3), a);
 }
 `;
-const SHIMMER_VERT = `
+const SHIMMER_VERT = `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 uniform float uIntensity;
 varying vec2 vUv;
@@ -289,7 +289,7 @@ void main() {
   float mscale = length(modelMatrix[1].xyz);
   float s = 0.55 * (0.8 + 0.4 * uIntensity) * mscale;
   vec3 world = c + right * position.x * s + up * (position.y * s + s * 0.55);
-  gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(world);
 }
 `;
 
@@ -360,7 +360,7 @@ varying float vFade;
 ${FLAME_ATLAS_GLSL}
 `;
 
-const FLAME_VERT = `
+const FLAME_VERT = `${CAMERA_RELATIVE_GLSL}
 ${FLAME_COMMON}
 void main() {
   vSeed = iSeed;
@@ -392,7 +392,7 @@ void main() {
   vec3 camRight = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 camUp    = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
   world.xyz += (camRight * rc.x + camUp * rc.y) * size;
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * wocCamRelView(world.xyz);
 
   float ff = min(life * ${FLAME_FRAMES.toFixed(1)}, ${(FLAME_FRAMES - 1).toFixed(3)});
   float fA = floor(ff);
@@ -448,7 +448,7 @@ void main() {
 `;
 
 // the muzzle: a hot billboard flare parked just off the vent mouth
-const FMUZZLE_VERT = `
+const FMUZZLE_VERT = `${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 uniform float uFlame;
 varying vec2 vUv;
@@ -460,7 +460,7 @@ void main() {
   vec3 camUp    = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
   float s = (0.22 + 0.04 * sin(uTime * 21.0) + 0.02 * sin(uTime * 33.0)) * uFlame * mscale;
   vec3 world = c.xyz + (camRight * position.x + camUp * position.y) * s;
-  gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView(world);
 }
 `;
 const FMUZZLE_FRAG = `
@@ -487,11 +487,11 @@ void main() {
 // bounds, and update() writes three floats. dispose() releases only the
 // per-instance materials -- the shared geos/texture stay cached for the next
 // spawn on purpose (a raid respawns these constantly).
-const AOE_DISC_VERT = `
+const AOE_DISC_VERT = `${CAMERA_RELATIVE_GLSL}
 varying vec2 vP;
 void main() {
   vP = position.xz; // circle baked flat; local radius 1
-  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView((modelMatrix * vec4(position, 1.0)).xyz);
 }
 `;
 const AOE_DISC_FRAG = `
@@ -595,7 +595,7 @@ void main() {
 // Ground flames reuse FLAME_COMMON + FLAME_FRAG wholesale (uFlame here is the
 // burn envelope; uReach is declared-unused). Each sprite loops rising from a
 // fixed area-uniform spot inside the circle.
-const AOE_FLAME_VERT = `
+const AOE_FLAME_VERT = `${CAMERA_RELATIVE_GLSL}
 ${FLAME_COMMON}
 uniform float uErupt;
 uniform float uInnerRadiusRatio;
@@ -624,7 +624,7 @@ void main() {
   vec3 camRight = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 camUp    = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
   world.xyz += (camRight * rc.x + camUp * rc.y) * size;
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * wocCamRelView(world.xyz);
   float ff = min(life * 36.0, 35.000);
   float fA = floor(ff);
   vBlend = ff - fA;

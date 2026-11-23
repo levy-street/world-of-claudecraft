@@ -141,16 +141,21 @@ const MOON_CRATER_BANDS = [
  * crater inside a mare is darker than the mare, which is what gives the face
  * depth instead of decals.
  */
-function paintMoonMaria(ctx: CanvasRenderingContext2D): void {
+function paintMoonMaria(ctx: CanvasRenderingContext2D, lowGfx = false): void {
   ctx.globalCompositeOperation = 'multiply';
+  const contrast = lowGfx ? 0.42 : 1;
   for (const mare of MOON_MARIA) {
     ctx.save();
     ctx.translate(mare.x, mare.y);
     ctx.rotate(mare.rot);
     ctx.scale(1, mare.ry / mare.rx);
     const g = ctx.createRadialGradient(0, 0, 0, 0, 0, mare.rx);
-    g.addColorStop(0, `rgba(150, 160, 191, ${mare.dark})`);
-    g.addColorStop(0.58, `rgba(172, 181, 206, ${mare.dark * 0.7})`);
+    const dark = mare.dark * contrast;
+    g.addColorStop(0, lowGfx ? `rgba(196, 212, 238, ${dark})` : `rgba(150, 160, 191, ${dark})`);
+    g.addColorStop(
+      0.58,
+      lowGfx ? `rgba(212, 224, 244, ${dark * 0.7})` : `rgba(172, 181, 206, ${dark * 0.7})`,
+    );
     // a transparent stop leaves the backdrop untouched under 'multiply'
     // whatever colour it names, so white keeps the falloff honest
     g.addColorStop(1, 'rgba(255, 255, 255, 0)');
@@ -163,7 +168,7 @@ function paintMoonMaria(ctx: CanvasRenderingContext2D): void {
 /** Craters: a multiplied floor, a bright arc on the lit (upper-left) rim and a
  *  hard shadow arc opposite. The RIM PAIR is the relief cue; a floor on its own
  *  is a stain. */
-function paintMoonCraters(ctx: CanvasRenderingContext2D, rnd: () => number): void {
+function paintMoonCraters(ctx: CanvasRenderingContext2D, rnd: () => number, lowGfx = false): void {
   for (const band of MOON_CRATER_BANDS) {
     for (let i = 0; i < band.count; i++) {
       const ang = rnd() * Math.PI * 2;
@@ -173,18 +178,18 @@ function paintMoonCraters(ctx: CanvasRenderingContext2D, rnd: () => number): voi
       const cr = band.min + rnd() * (band.max - band.min);
       ctx.globalCompositeOperation = 'multiply';
       const floor = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
-      floor.addColorStop(0, 'rgba(126, 136, 170, 0.9)');
-      floor.addColorStop(0.72, 'rgba(152, 161, 191, 0.62)');
+      floor.addColorStop(0, lowGfx ? 'rgba(186, 204, 234, 0.45)' : 'rgba(126, 136, 170, 0.9)');
+      floor.addColorStop(0.72, lowGfx ? 'rgba(204, 218, 240, 0.3)' : 'rgba(152, 161, 191, 0.62)');
       floor.addColorStop(1, 'rgba(255, 255, 255, 0)');
       ctx.fillStyle = floor;
       ctx.fillRect(0, 0, MOON_TEX, MOON_TEX);
       ctx.globalCompositeOperation = 'source-over';
       ctx.lineWidth = Math.max(1.2, cr * 0.2);
-      ctx.strokeStyle = 'rgba(252, 253, 255, 0.72)';
+      ctx.strokeStyle = lowGfx ? 'rgba(252, 254, 255, 0.55)' : 'rgba(252, 253, 255, 0.72)';
       ctx.beginPath();
       ctx.arc(cx, cy, cr * 0.84, Math.PI * 0.8, Math.PI * 1.6);
       ctx.stroke();
-      ctx.strokeStyle = 'rgba(92, 101, 133, 0.6)';
+      ctx.strokeStyle = lowGfx ? 'rgba(164, 186, 224, 0.32)' : 'rgba(92, 101, 133, 0.6)';
       ctx.beginPath();
       ctx.arc(cx, cy, cr * 0.84, Math.PI * -0.2, Math.PI * 0.6);
       ctx.stroke();
@@ -243,7 +248,11 @@ function paintMoonPhaseShadow(ctx: CanvasRenderingContext2D, term: MoonTerminato
 // The cratered lunar face, repainted whenever the lunar phase crosses a repaint
 // bucket: the maria are authored and the craters come from a fresh fixed-seed
 // LCG every paint (identical face each time), so only the phase shadow changes.
-function paintMoonFace(ctx: CanvasRenderingContext2D, term: MoonTerminator | null): void {
+function paintMoonFace(
+  ctx: CanvasRenderingContext2D,
+  term: MoonTerminator | null,
+  lowGfx = false,
+): void {
   const rnd = makeRng(97);
   ctx.clearRect(0, 0, MOON_TEX, MOON_TEX);
   // Limb darkening: CONCENTRIC, and a long fall. The old gradient bottomed out
@@ -256,11 +265,11 @@ function paintMoonFace(ctx: CanvasRenderingContext2D, term: MoonTerminator | nul
   // disc proper.
   const base = ctx.createRadialGradient(128, 128, 0, 128, 128, MOON_R + 4);
   base.addColorStop(0, 'rgba(247, 249, 255, 1)');
-  base.addColorStop(0.55, 'rgba(236, 241, 252, 1)');
-  base.addColorStop(0.8, 'rgba(213, 220, 242, 1)');
-  base.addColorStop(0.93, 'rgba(179, 188, 219, 1)');
-  base.addColorStop(0.985, 'rgba(139, 148, 184, 1)');
-  base.addColorStop(1, 'rgba(133, 142, 178, 0)');
+  base.addColorStop(0.55, lowGfx ? 'rgba(242, 246, 255, 1)' : 'rgba(236, 241, 252, 1)');
+  base.addColorStop(0.8, lowGfx ? 'rgba(229, 236, 252, 1)' : 'rgba(213, 220, 242, 1)');
+  base.addColorStop(0.93, lowGfx ? 'rgba(210, 222, 246, 0.94)' : 'rgba(179, 188, 219, 1)');
+  base.addColorStop(0.985, lowGfx ? 'rgba(192, 210, 242, 0.72)' : 'rgba(139, 148, 184, 1)');
+  base.addColorStop(1, lowGfx ? 'rgba(186, 206, 240, 0)' : 'rgba(133, 142, 178, 0)');
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, MOON_TEX, MOON_TEX);
   // everything else stays inside the disc
@@ -276,13 +285,13 @@ function paintMoonFace(ctx: CanvasRenderingContext2D, term: MoonTerminator | nul
   const shade = ctx.createLinearGradient(44.6, 44.6, 211.4, 211.4);
   shade.addColorStop(0, 'rgba(255, 255, 255, 0)');
   shade.addColorStop(0.42, 'rgba(255, 255, 255, 0)');
-  shade.addColorStop(1, 'rgba(146, 155, 189, 0.85)');
+  shade.addColorStop(1, lowGfx ? 'rgba(202, 218, 244, 0.45)' : 'rgba(146, 155, 189, 0.85)');
   ctx.globalCompositeOperation = 'multiply';
   ctx.fillStyle = shade;
   ctx.fillRect(0, 0, MOON_TEX, MOON_TEX);
-  paintMoonMaria(ctx);
-  paintMoonCraters(ctx, rnd);
-  ctx.restore(); // drops the clip AND the multiply blend mode together
+  paintMoonMaria(ctx, lowGfx);
+  paintMoonCraters(ctx, rnd, lowGfx);
+  ctx.restore(); // drops the clip AND the composite mode together
   if (term && term.litFrac < 0.985) paintMoonPhaseShadow(ctx, term);
 }
 
@@ -437,31 +446,30 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
   let lastWarmth = -1;
   // the moon face paints into a canvas the phase repaints reuse
   const faceCtx = makeCanvas(MOON_TEX, MOON_TEX);
-  paintMoonFace(faceCtx, null); // full face until the first setMoonPhase
+  paintMoonFace(faceCtx, null, lowGfx); // full face until the first setMoonPhase
   const faceTex = new THREE.CanvasTexture(faceCtx.canvas);
   const moonSprites = [
     makeSprite(
       moonGlowTexture(),
       MOON_HALO_SCALE,
       MOON_HALO_SCALE,
-      0.3,
+      lowGfx ? 0.22 : 0.3,
       THREE.AdditiveBlending,
       -9,
     ),
     // normal-blended so maria/craters read dark; a light HDR lift lets the
     // bright HIGHLANDS bloom gently against the night sky while the maria and
     // crater floors, now painted several times darker, stay well under the
-    // threshold. That spread is the point: the face has to span a real range
-    // for the tonemap to give any of it back. Deliberately smaller than the
-    // sun disc.
+    // threshold. On lowGfx there is no bloom pass and the sky stays bright day
+    // blue, so the face keeps an unclippedpearly-white [1, 1, 1] multiplier.
     makeSprite(
       faceTex,
       MOON_FACE_SCALE,
       MOON_FACE_SCALE,
-      1,
+      lowGfx ? 0.92 : 1,
       THREE.NormalBlending,
       -8,
-      [1.2, 1.24, 1.34],
+      lowGfx ? [1, 1, 1] : [1.2, 1.24, 1.34],
     ),
   ];
   let lastBucket = -1;
@@ -473,7 +481,7 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
       if (bucket === lastBucket) return;
       lastBucket = bucket;
       const term = moonTerminator((bucket + 0.5) / MOON_PHASE_BUCKETS);
-      paintMoonFace(faceCtx, term);
+      paintMoonFace(faceCtx, term, lowGfx);
       faceTex.needsUpdate = true;
       // the halo follows the lit fraction: a full moon glows, a new one barely.
       // Kept modest on purpose: an additive halo that is too strong bleeds over
@@ -491,4 +499,39 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
       }
     },
   };
+}
+
+/**
+ * Aim and fade the camera-riding sun and moon sprites for this frame, moved
+ * out of renderer.ts. The basin keeps directional daylight and the sky dome,
+ * but these sprites can clip against its high rim as oversized wedges, so they
+ * are reserved for the overworld (`outdoor`). Keeps the moon's shape on the
+ * lunar clock (no-op between phase buckets) and runs the sun's disc to sunset
+ * orange (`sunWarmth`) on the same horizon curve the sky glow uses.
+ */
+export function aimCelestialSprites(
+  celestial: CelestialSprites | null,
+  sunSprites: readonly THREE.Sprite[],
+  moonSprites: readonly THREE.Sprite[],
+  camera: THREE.Camera,
+  sunDir: THREE.Vector3,
+  moonDir: THREE.Vector3,
+  sunUp: number,
+  moonUp: number,
+  outdoor: boolean,
+  lunarPhase: number,
+  sunWarmth: number,
+): void {
+  celestial?.setMoonPhase(lunarPhase);
+  celestial?.setSunWarmth(sunWarmth);
+  for (const sp of sunSprites) {
+    sp.position.copy(camera.position).addScaledVector(sunDir, 760);
+    sp.visible = outdoor && sunUp > 0.02;
+    sp.material.opacity = (sp.userData.baseOpacity as number) * sunUp;
+  }
+  for (const sp of moonSprites) {
+    sp.position.copy(camera.position).addScaledVector(moonDir, 760);
+    sp.visible = outdoor && moonUp > 0.02;
+    sp.material.opacity = (sp.userData.baseOpacity as number) * moonUp;
+  }
 }

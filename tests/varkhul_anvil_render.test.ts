@@ -17,8 +17,11 @@ function anvilImpactHarness() {
   renderer.warlockMeteorFx = {};
   renderer.views = new Map();
   renderer.abilityVfx = { handleSpellfxAt: vi.fn().mockReturnValue(false) };
+  renderer.scarecrowFx = { handleSpellfxAt: vi.fn().mockReturnValue(false) };
   renderer.sim = { cfg: { seed: 42 } };
-  renderer.vfx = { burst, burstLater };
+  // spellBurst is the gated twin the renderer draws a spell fallback through;
+  // a boss cast is never muted, so it lands on the same burst.
+  renderer.vfx = { burst, burstLater, spellBurst: burst };
   renderer.spawnAoeRing = spawnAoeRing;
   renderer.addShake = addShake;
   return { renderer: renderer as EventHarness, burst, burstLater, spawnAoeRing, addShake };

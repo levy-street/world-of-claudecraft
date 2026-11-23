@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/temple_ysolei_woc.glb",
+      "out": "models/creatures/woc_temple_ysolei.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Hit",
+        "Bite",
+        "Tail_Sweep",
+        "Lunar_Tide",
+        "Undertow",
+        "Summon",
+        "Enrage",
+        "Rise",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

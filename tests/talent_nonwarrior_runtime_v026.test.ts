@@ -100,13 +100,16 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.resource).toBe(50);
   });
 
-  it('Borrowed Tempo makes Cutthroat Tempo free without spending banked combo points (issue #2426)', () => {
+  it('a next_cast_free finisher banks its combo points (issue #2426, Borrowed Tempo)', () => {
     // The v0.29 rogue rework retired rog_r11_improved_slice_and_dice (Borrowed
     // Tempo's arming talent), so the empowerment is applied directly: the pin
     // is the DISPATCH contract (a next_cast_free cast banks its combo points),
-    // not the arming vehicle.
+    // not the arming vehicle. Cutthroat Tempo itself costs no energy since the
+    // rogue tweak pass, and a free-cast window never spends itself on an
+    // already-free cast, so the contract rides Low Blow, the finisher that
+    // still bills energy.
     const sim = simWithRows('rogue', {});
-    addTarget(sim);
+    const target = addTarget(sim);
     sim.player.resource = sim.player.maxResource;
     sim.player.comboPoints = 5;
 
@@ -119,32 +122,40 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
       value: 0,
       sourceId: sim.player.id,
       school: 'physical',
-      empowerAbilities: ['slice_and_dice'],
+      empowerAbilities: ['kidney_shot'],
     });
     expect(sim.player.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
 
     const resourceBefore = sim.player.resource;
     const comboBefore = sim.player.comboPoints;
-    sim.castAbility('slice_and_dice');
+    sim.castAbility('kidney_shot');
 
+    expect(target.auras.find((a) => a.id === 'kidney_shot_stun')).toMatchObject({
+      kind: 'stun',
+      duration: 7,
+    });
     expect(sim.player.resource).toBe(resourceBefore); // the whole cast was free: no energy spent
     expect(sim.player.comboPoints).toBe(comboBefore); // combo points banked, not consumed
-    // the finisher still applied its buff, scaled off the banked combo points
-    // (v0.29 rogue rework tuning: 12 sec base plus 4 sec per combo point)
-    const haste = sim.player.auras.find((a) => a.kind === 'buff_haste');
-    expect(haste?.duration).toBeCloseTo(12 + 4 * comboBefore, 5);
+    expect(sim.player.auras.some((a) => a.kind === 'next_cast_free')).toBe(false);
   });
 
-  it('a normal (non-empowered) Cutthroat Tempo still spends its combo points', () => {
+  it('Cutthroat Tempo works during the GCD, spending combo points but no energy', () => {
     const sim = simWithRows('rogue', {});
     addTarget(sim);
     sim.player.resource = sim.player.maxResource;
     sim.player.comboPoints = 5;
 
+    sim.player.gcdRemaining = 1;
     sim.castAbility('slice_and_dice');
 
+    expect(sim.player.gcdRemaining).toBe(1);
+    expect(sim.player.auras.find((a) => a.id === 'slice_and_dice')).toMatchObject({
+      kind: 'buff_haste',
+      value: 1.3,
+      duration: 32,
+    });
     expect(sim.player.comboPoints).toBe(0);
-    expect(sim.player.resource).toBeLessThan(sim.player.maxResource);
+    expect(sim.player.resource).toBe(sim.player.maxResource);
   });
 
   it('adds one talent charge for Twin Icebind', () => {

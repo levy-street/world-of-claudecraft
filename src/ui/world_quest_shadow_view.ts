@@ -1,7 +1,8 @@
-import { SHADOW_QUEST_ID } from '../sim/content/world_quest_shadow';
+import { SHADOW_QUEST_ID, SHADOW_STEAL_SUSPICION_LIMIT } from '../sim/content/world_quest_shadow';
 import type { WorldQuestProgress } from '../sim/types';
 import {
   type ShadowTargetWorld,
+  shadowBeamExposure,
   shadowNearbyCarrier,
   shadowPickpocketTarget,
 } from '../sim/world_quest_shadow_target';
@@ -44,7 +45,7 @@ export function createShadowActionBarView() {
           shadow?.phase === 'cloaked' &&
           (i === 1 ||
             (!shadow.stealing &&
-              shadow.suspicion <= 0 &&
+              shadow.suspicion < SHADOW_STEAL_SUSPICION_LIMIT &&
               shadow.cooldown <= 0 &&
               shadowPickpocketTarget(world) !== undefined));
       }
@@ -59,8 +60,16 @@ export function shadowActionHint(world: ShadowTargetWorld): string {
     return t('questUi.worldQuest.shadow.channel', {
       seconds: formatNumber(shadow.stealing.remaining, { maximumFractionDigits: 1 }),
     });
-  if (shadow && shadow.suspicion > 0) return t('questUi.worldQuest.shadow.danger');
+  if (
+    shadow &&
+    (shadow.suspicion >= SHADOW_STEAL_SUSPICION_LIMIT ||
+      shadowBeamExposure(world.entities, world.player))
+  )
+    return t('questUi.worldQuest.shadow.danger');
+  // A steal still open under the limit gets the steal tip, so the hint never
+  // says "get out of sight" while the Pick Pocket button is lit.
   if (shadowPickpocketTarget(world) !== undefined) return t('questUi.worldQuest.shadow.stealTip');
+  if (shadow && shadow.suspicion > 0) return t('questUi.worldQuest.shadow.danger');
   if (shadowNearbyCarrier(world) !== undefined) return t('questUi.worldQuest.shadow.behind');
   return t('questUi.worldQuest.shadow.noTarget');
 }

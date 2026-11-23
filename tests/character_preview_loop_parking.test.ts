@@ -63,6 +63,9 @@ function harness(): Harness {
   state.timer = { reset: vi.fn(), update: vi.fn(), getDelta: () => 0.016 };
   state.openGate = createPreviewOpenGate();
   state.standIn = null;
+  // the constructor's default: a mouse turntable, not a phone's touch stage
+  state.touchStage = () => false;
+  state.touchWasActive = false;
   state.currentVisual = { update: vi.fn() };
   state.scene = {};
   state.camera = { aspect: 1, updateProjectionMatrix: () => {} };

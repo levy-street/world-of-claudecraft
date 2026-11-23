@@ -88,6 +88,20 @@ export function ensureBiomeHazeField(presets: Readonly<Record<BiomeId, BiomeHaze
   );
 }
 
+/**
+ * Palette lab: re-bake the field's texels in place from new presets (a look
+ * changed a zone's fog). Same layout, same texture object and the same shared
+ * uniforms, so it is an upload, never a relink. No-op without a field.
+ */
+export function refreshBiomeHazeField(presets: Readonly<Record<BiomeId, BiomeHazePreset>>): void {
+  if (!fieldTexture) return;
+  const data = buildBiomeHazeFieldData(presets);
+  const dest = fieldTexture.image.data as Uint8Array;
+  if (dest.length !== data.rgba.length) return;
+  dest.set(data.rgba);
+  fieldTexture.needsUpdate = true;
+}
+
 /** True once the field exists: the compile-time gate every consumer reads, so
  *  a tier without one (low, or `?zonehaze=off`) compiles byte-identically. */
 export function hasBiomeHazeField(): boolean {

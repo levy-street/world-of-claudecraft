@@ -194,7 +194,62 @@ describe('the keep ledger (one decisive pin per row)', () => {
     ).toBe(1);
   });
   it('bank KEPT', () => {
-    expect(meta.bank.inventory).toEqual([{ itemId: 'roasted_boar', count: 1 }]);
+    expect(meta.bank).toEqual({
+      inventory: [
+        { itemId: 'roasted_boar', count: 1, materialSources: [{ source: {}, count: 1 }] },
+      ],
+      purchasedSlots: 0,
+      bonusSlots: 0,
+      unlockedSockets: 0,
+      socketBags: [null, null, null, null],
+      appliedStorageKeys: [],
+    });
+  });
+  it('keeps the whole populated bank, its source identities and storage metadata through reset and reload', () => {
+    const state = resetSave();
+    state.bank = {
+      inventory: [
+        { itemId: 'roasted_boar', count: 1 },
+        {
+          itemId: 'minor_healing_potion',
+          count: 4,
+          instance: { locked: true },
+          materialSources: [{ source: { signer: 'Maker' }, count: 4 }],
+          craftedRecipeId: 'recipe_minor_healing_potion',
+          materialSeparated: true,
+        },
+        { itemId: 'worn_sword', count: 1, instance: { signer: 'Smith', boundTo: 77 } },
+      ],
+      purchasedSlots: 6,
+      bonusSlots: 2,
+      unlockedSockets: 1,
+      socketBags: ['silkspun_satchel', null, null, null],
+      appliedStorageKeys: ['kept-storage-receipt'],
+    };
+    const original = structuredClone(state.bank);
+    const expected = {
+      ...original,
+      inventory: [
+        { itemId: 'roasted_boar', count: 1, materialSources: [{ source: {}, count: 1 }] },
+        ...original.inventory.slice(1),
+      ],
+    };
+    const reset = makeSim();
+    const resetPid = reset.addPlayer('warrior', 'BankKeeper', { state });
+    expect(metaOf(reset, resetPid).bank).toEqual(expected);
+    expect(state.bank).toEqual(original);
+    const control = makeSim();
+    const controlPid = control.addPlayer('warrior', 'BankKeeper', {
+      state: { ...structuredClone(state), masteryResetApplied: true },
+    });
+    expect(metaOf(reset, resetPid).bank).toEqual(metaOf(control, controlPid).bank);
+    const saved = reset.serializeCharacter(resetPid);
+    if (!saved) throw new Error('serializeCharacter returned null');
+    expect(saved.bank).toEqual(expected);
+    const reloaded = makeSim();
+    const reloadedPid = reloaded.addPlayer('warrior', 'BankKeeper', { state: saved });
+    expect(metaOf(reloaded, reloadedPid).bank).toEqual(expected);
+    expect(reloaded.serializeCharacter(reloadedPid)?.bank).toEqual(expected);
   });
   it('copper KEPT', () => {
     expect(meta.copper).toBe(98765);

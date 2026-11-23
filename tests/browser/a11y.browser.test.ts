@@ -267,6 +267,7 @@ describe('axe: quest log window', () => {
         world: () =>
           ({
             cfg: { playerClass: 'warrior' },
+            talents: { spec: null },
             player: { name: 'Aurelia' },
             questLog: new Map([[questId, progress]]),
             questsDone: new Set<string>(),

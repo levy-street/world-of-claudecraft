@@ -1,0 +1,13 @@
+{
+  "urls": [
+    "http://localhost:5194/ui/items/knellbound_hauberk.webp",
+    "http://localhost:5194/ui/items/heroic_mere_crested_helm.webp",
+    "http://localhost:5194/ui/items/breastplate_tectonic_might.webp",
+    "http://localhost:5194/ui/items/whistle_horse.webp",
+    "http://localhost:5194/ui/items/reins_referral_raptor.webp",
+    "http://localhost:5194/ui/items/treasure_casket.webp",
+    "http://localhost:5194/ui/items/cantors_hymnal.webp",
+    "http://localhost:5194/ui/items/gravecallers_rod.webp"
+  ],
+  "allDecoded": true
+}

@@ -27,7 +27,9 @@
 // here is the one the live cast will draw with.
 
 import * as THREE from 'three';
-import { buildGloamveilStandIn, gloamveilMaterials } from './characters/gloamveil_veil';
+import { balgathRangedMaterials, buildBalgathRangedStandIn } from './balgath_ranged_fx';
+import { balgathStarwakeMaterials, buildBalgathStarwakeStandIn } from './balgath_starwake_fx';
+import { buildEffigyRigStandIn, effigyRigMaterials } from './characters/effigy_rig';
 import { buildMoonwingStandIn, moonwingMaterials } from './characters/moonwing_adornment';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
@@ -135,6 +137,35 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     build: () => buildRingOfFrostStandIn().root,
   },
   {
+    // Balgath's ranged kit and cleave fan (Boulder Toss, Foreman's Glare, Barrow Burden):
+    // every live piece draws a clone of one of four bundle materials, and the burden's soak
+    // rings are the Shared Pyre marker's programs. The first boulder of a world-boss fight
+    // must not link its programs inside the combat frame it lands in.
+    id: 'balgath-ranged',
+    module: 'balgath_ranged_fx.ts',
+    materials: () => Object.values(balgathRangedMaterials()),
+    build: () => buildBalgathRangedStandIn(),
+  },
+  {
+    // Balgath's Wake of the Fallen Star: the star's crystals and light, the fissure and
+    // geyser marks, the lava columns, the flung chunks and the molten pools all draw a
+    // clone of one of five bundle materials. The first eruption of a fight must not link
+    // its programs inside the frame the fen goes up in.
+    id: 'balgath-starwake',
+    module: 'balgath_starwake_fx.ts',
+    materials: () => Object.values(balgathStarwakeMaterials()),
+    build: () => buildBalgathStarwakeStandIn(),
+  },
+  {
+    // The muster's training effigy (characters/effigy_rig.ts): the lantern's flame, the
+    // smoke a snuffed lantern gives off and the dust its falling planks raise. The first
+    // lantern put out in a session must not link its programs in the frame it goes out.
+    id: 'muster-effigy',
+    module: 'effigy_rig.ts',
+    materials: () => Object.values(effigyRigMaterials()),
+    build: () => buildEffigyRigStandIn(),
+  },
+  {
     // Divine Ascension's seal and solar crown, built per character view when
     // the aura first shows: the first cast linked the crown (a Mesh and an
     // InstancedMesh draw) inside a live frame, for the caster and every
@@ -188,13 +219,6 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'moonwing_adornment.ts',
     materials: () => moonwingMaterials(),
     build: () => buildMoonwingStandIn(),
-  },
-  {
-    // Gloamveil's veil and burning eyes, the same rig-mounted idiom as Moonwing.
-    id: 'gloamveil-veil',
-    module: 'gloamveil_veil.ts',
-    materials: () => gloamveilMaterials(),
-    build: () => buildGloamveilStandIn(),
   },
 ];
 

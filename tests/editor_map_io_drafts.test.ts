@@ -48,6 +48,15 @@ describe('MapIO drafts (one slot per map id)', () => {
     expect(io.draftLoad()?.meta.id).toBe('new');
   });
 
+  it('draftLoadById returns the requested playtest draft, not the newest draft', () => {
+    const s = memStorage();
+    const io = new MapIO(s);
+    io.draftSave(newCustomMap('Playtest', 'playtest-map', 100));
+    io.draftSave(newCustomMap('Newer Other Map', 'other', 200));
+    expect(io.draftLoadById('playtest-map')?.meta.name).toBe('Playtest');
+    expect(io.draftLoadById('missing')).toBeNull();
+  });
+
   it('drafts are stored compact', () => {
     const s = memStorage();
     const io = new MapIO(s);
@@ -78,6 +87,7 @@ describe('MapIO drafts (one slot per map id)', () => {
     const io = new MapIO(null);
     expect(io.draftSave(newCustomMap('A', 'a', 1))).toBe(false);
     expect(io.draftLoad()).toBeNull();
+    expect(io.draftLoadById('a')).toBeNull();
     io.draftClear('a'); // must not throw
   });
 });

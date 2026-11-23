@@ -1,0 +1,22 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/rare_storm_tuned_buckler.webp",
+    "http://localhost:5194/ui/items/rare_hauberk_tempest_gale.webp",
+    "http://localhost:5194/ui/items/rare_gale_strider_boots.webp",
+    "http://localhost:5194/ui/items/rare_tempest_strike_grips.webp",
+    "http://localhost:5194/ui/items/storm_tuned_buckler.webp",
+    "http://localhost:5194/ui/items/hauberk_tempest_gale.webp",
+    "http://localhost:5194/ui/items/gale_strider_boots.webp",
+    "http://localhost:5194/ui/items/tempest_strike_grips.webp",
+    "http://localhost:5194/ui/items/legendary_storm_tuned_buckler.webp",
+    "http://localhost:5194/ui/items/legendary_hauberk_tempest_gale.webp",
+    "http://localhost:5194/ui/items/legendary_gale_strider_boots.webp",
+    "http://localhost:5194/ui/items/legendary_tempest_strike_grips.webp"
+  ],
+  "allDecoded": true
+}

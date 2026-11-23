@@ -1,10 +1,10 @@
-// Atomic material movement shared by personal and guild bank commands.
+// Atomic source-aware stack movement shared by personal and guild bank commands.
 import type { PoolCapacity } from './bag_pools';
 import { addStacked, countFit } from './bags';
 import type { MoveResult } from './bank';
-import { materialItemIds } from './material_ids';
 import type { MaterialComposition } from './material_sources';
 import { takeMaterialStack } from './material_stack';
+import { stackProvenanceItemIds } from './stack_provenance_ids';
 import type { InvSlot } from './types';
 
 export function moveMaterialBetweenContainers(
@@ -18,7 +18,12 @@ export function moveMaterialBetweenContainers(
   if (source === dest) return { moved: 0, refusal: 'invalid' };
   const slot = source[sourceIndex];
   if (!slot) return { moved: 0, refusal: 'invalid' };
-  const taken = takeMaterialStack(slot, count ?? slot.count, materialItemIds(), selectedSources);
+  const taken = takeMaterialStack(
+    slot,
+    count ?? slot.count,
+    stackProvenanceItemIds(),
+    selectedSources,
+  );
   if (!taken.ok) return { moved: 0, refusal: 'invalid' };
   const { taken: incoming, remaining } = taken.value;
   const { itemId, instance, craftedRecipeId, materialSources } = incoming;

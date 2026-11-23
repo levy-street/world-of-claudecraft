@@ -1,0 +1,28 @@
+{
+  "bagBar": [
+    "http://localhost:5194/ui/items/backpack.webp",
+    "http://localhost:5194/ui/items/resonant_weave_bag.webp"
+  ],
+  "grid": [
+    "http://localhost:5194/ui/items/baked_bread.webp",
+    "http://localhost:5194/ui/items/conchplate_sabatons.webp",
+    "http://localhost:5194/ui/items/heroic_conchplate_sabatons.webp",
+    "http://localhost:5194/ui/items/pale_chorus_slippers.webp",
+    "http://localhost:5194/ui/items/heroic_pale_chorus_slippers.webp",
+    "http://localhost:5194/ui/items/tideglass_gauntlets.webp",
+    "http://localhost:5194/ui/items/heroic_tideglass_gauntlets.webp",
+    "http://localhost:5194/ui/items/moonburn_grips.webp",
+    "http://localhost:5194/ui/items/heroic_moonburn_grips.webp",
+    "http://localhost:5194/ui/items/prism_etched_handwraps.webp",
+    "http://localhost:5194/ui/items/heroic_prism_etched_handwraps.webp",
+    "http://localhost:5194/ui/items/mere_crested_helm.webp",
+    "http://localhost:5194/ui/items/heroic_mere_crested_helm.webp",
+    "http://localhost:5194/ui/items/mereskin_hood.webp",
+    "http://localhost:5194/ui/items/heroic_mereskin_hood.webp",
+    "http://localhost:5194/ui/items/merewater_cowl.webp",
+    "http://localhost:5194/ui/items/heroic_merewater_cowl.webp",
+    "http://localhost:5194/ui/items/merecleaver.webp",
+    "http://localhost:5194/ui/items/moonwrack_stave.webp"
+  ],
+  "allDecoded": true
+}

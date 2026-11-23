@@ -362,14 +362,16 @@ function petsHtml(c: GuideClassInfo): string {
   return '';
 }
 
-// Druid shapeshifting. The three modelled forms come from the generated roster (the same
-// figures the model gallery spins); Moonwing Form has no model entry, so it is prose.
+// Druid shapeshifting. The modelled forms come from the generated roster (the same
+// figures the model gallery spins), Groveheart's Sporemender Form among them;
+// Moonwing Form has no model entry, so it is prose.
 // The names are this page's own keys (the sim's Bruin / Cat / Fleet Form), so a reword on
 // the model gallery's labels can never silently rename the forms here.
 const FORM_NAME_KEY: Record<string, TranslationKey> = {
   form_bear: 'guide.classPage.formName.form_bear',
   form_cat: 'guide.classPage.formName.form_cat',
   form_travel: 'guide.classPage.formName.form_travel',
+  form_sporemender: 'guide.classPage.formName.form_sporemender',
 };
 
 function druidFormsHtml(): string {

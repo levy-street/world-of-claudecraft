@@ -41,7 +41,7 @@ import { DT, type Entity, RUN_SPEED, type SimEvent } from '../src/sim/types';
 
 type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
 
-function encounter(rarity: Rarity = 'rare') {
+function encounter(rarity: Rarity = 'common') {
   const sim = new Sim({ seed: 5150, playerClass: 'warrior', autoEquip: false, devCommands: true });
   sim.chat('/dev level 20', sim.player.id);
   sim.enterRift(makeVaultSeed(3, 183), 23, sim.player.id, undefined, {
@@ -367,7 +367,7 @@ describe('the tentacles in the fight', () => {
     expect(cuesOf(entry.inst, 'tide-tentacle')).toHaveLength(1);
   });
 
-  it('raises more for a bigger party and a rarer hoard', () => {
+  it('uses the fixed five-player count for legendary hoards', () => {
     const solo = encounter('common');
     rise(solo);
     expect(cuesOf(solo.inst, 'tide-tentacle')).toHaveLength(1);
@@ -375,9 +375,9 @@ describe('the tentacles in the fight', () => {
     addAllies(party, 3);
     rise(party);
     const risen = cuesOf(party.inst, 'tide-tentacle');
-    expect(risen).toHaveLength(tentacleCount(4, HOARD_RARITY_PRESSURE.legendary.extra));
+    expect(risen).toHaveLength(tentacleCount(5, HOARD_RARITY_PRESSURE.legendary.extra));
     // Each says which of the set it is.
-    expect(risen.map((cue) => cue.halfAngle).sort()).toEqual([0, 1, 2]);
+    expect(risen.map((cue) => cue.halfAngle).sort()).toEqual([0, 1, 2, 3]);
   });
 
   it('lashes a line at its nearest player after a telegraph, and a sidestep dodges it', () => {

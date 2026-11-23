@@ -108,6 +108,7 @@ function makeHarness(
     hasQuest: (questId) => questId === 'q_wolves' || questId === ODD_QUEST_ID,
     showError: (text) => errors.push(text),
     openWhoTab: () => false,
+    openGroupFinder: () => {},
     afterTabShown: (pane) => shownPanes.push(pane),
   });
   return {
@@ -282,6 +283,22 @@ describe('ChatWindowController', () => {
     expect(online.controller.maybeHandleLocalChatCommand('/whoa')).toBe(false);
     expect(opened).toEqual(['Thornpeak', '']);
     expect(online.sent).toEqual([]);
+  });
+
+  it('opens the Groups window on a bare /lfg (any case) but leaves /lfg <message> to the channel', () => {
+    const harness = makeHarness();
+    let opened = 0;
+    (harness.controller as unknown as { deps: { openGroupFinder(): void } }).deps.openGroupFinder =
+      () => {
+        opened++;
+      };
+    harness.controller.init();
+    expect(harness.controller.maybeHandleLocalChatCommand('/LFG')).toBe(true);
+    expect(harness.controller.maybeHandleLocalChatCommand(' /lfg  ')).toBe(true);
+    expect(harness.controller.maybeHandleLocalChatCommand('/lfg need a healer')).toBe(false);
+    expect(harness.controller.maybeHandleLocalChatCommand('/lfgx')).toBe(false);
+    expect(opened).toBe(2);
+    expect(harness.sent).toEqual([]);
   });
 
   it('handles quest sharing through the injected authoritative quest state', () => {

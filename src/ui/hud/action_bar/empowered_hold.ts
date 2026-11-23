@@ -1,6 +1,10 @@
 // Press-to-charge, release-to-fire pointer binding for empowered abilities,
 // shared by the desktop action bar and the mobile ring. Extracted from hud.ts;
-// the Hud passes narrow closures, never itself.
+// the Hud passes narrow closures, never itself. A Shift press is the slot MOVE
+// gesture (action_bar_lock.isSlotMoveDragAllowed), so the hold stands down and
+// lets the native drag pick the ability up instead of charging it.
+
+import { isSlotMoveModifierHeld } from './action_bar_lock';
 
 export interface EmpoweredHoldDeps {
   /** Bind mode owns clicks and holds on the bar; the hold must stand down. */
@@ -25,6 +29,7 @@ export function bindEmpoweredActionHold(
   btn.addEventListener('pointerdown', (event) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     if (deps.bindModeActive()) return;
+    if (isSlotMoveModifierHeld(event)) return;
     const slot = resolveSlot();
     if (!deps.empoweredAbilityIdForSlot(slot)) return;
     if (deps.chargeActive()) return;
