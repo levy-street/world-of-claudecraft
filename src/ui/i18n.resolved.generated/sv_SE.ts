@@ -5330,6 +5330,7 @@ export const sv_SE: EnTranslations = {
       "riftUpgrade": "Revuppgradering {level}/{max}",
       "riftSockets": "Revstenar {used}/{total}",
       "riftGemSocket": "Socketbonus för ett Riftbound-band",
+      "sigilRedeem": "Can be traded to {vendor}, outside the {raid} entrance in {zone}, for a {slot} set piece.",
       "statEnchanted": "+{value} {stat} (Förtrollad)",
       "enchantedFallback": "Förtrollad",
       "partyTradeWindow": "Du kan överlåta det här föremålet till spelare som delade bytet i {time} till. Att ta på det avslutar handelsfönstret.",

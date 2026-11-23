@@ -5330,6 +5330,7 @@ export const en_CA: EnTranslations = {
       "riftUpgrade": "Rift upgrade {level}/{max}",
       "riftSockets": "Rift gems {used}/{total}",
       "riftGemSocket": "Socket bonus for a Riftbound band",
+      "sigilRedeem": "Can be traded to {vendor}, outside the {raid} entrance in {zone}, for a {slot} set piece.",
       "statEnchanted": "+{value} {stat} (Enchanted)",
       "enchantedFallback": "Enchanted",
       "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window.",

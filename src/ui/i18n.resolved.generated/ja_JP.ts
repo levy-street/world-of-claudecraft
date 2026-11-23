@@ -5330,6 +5330,7 @@ export const ja_JP: EnTranslations = {
       "riftUpgrade": "リフト強化 {level}/{max}",
       "riftSockets": "リフト宝石 {used}/{total}",
       "riftGemSocket": "リフトバウンドリングのソケット効果",
+      "sigilRedeem": "{zone}の{raid}入口の外にいる{vendor}と取引すると、{slot}のセット装備1つと交換できる。",
       "statEnchanted": "+{value} {stat}（エンチャント）",
       "enchantedFallback": "エンチャント済み",
       "partyTradeWindow": "このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。",

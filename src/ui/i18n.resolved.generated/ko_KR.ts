@@ -5330,6 +5330,7 @@ export const ko_KR: EnTranslations = {
       "riftUpgrade": "균열 강화 {level}/{max}",
       "riftSockets": "균열 보석 {used}/{total}",
       "riftGemSocket": "균열결속 반지 소켓 보너스",
+      "sigilRedeem": "{zone}의 {raid} 입구 밖에 있는 {vendor}에게 {slot} 세트 장비 하나로 교환할 수 있습니다.",
       "statEnchanted": "+{value} {stat} (마법부여)",
       "enchantedFallback": "마법부여됨",
       "partyTradeWindow": "앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다.",

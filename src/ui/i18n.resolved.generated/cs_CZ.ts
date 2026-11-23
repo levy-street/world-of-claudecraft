@@ -5330,6 +5330,7 @@ export const cs_CZ: EnTranslations = {
       "riftUpgrade": "Vylepšení trhliny {level}/{max}",
       "riftSockets": "Trhlinové drahokamy {used}/{total}",
       "riftGemSocket": "Bonus do zásuvky pro kapelu Riftbound",
+      "sigilRedeem": "Can be traded to {vendor}, outside the {raid} entrance in {zone}, for a {slot} set piece.",
       "statEnchanted": "+{value} {stat} (okouzleno)",
       "enchantedFallback": "Okouzlený",
       "partyTradeWindow": "Tento předmět můžeš dalších {time} směňovat s hráči, kteří sdíleli jeho kořist. Nasazení předmětu okno pro směnu ukončí.",

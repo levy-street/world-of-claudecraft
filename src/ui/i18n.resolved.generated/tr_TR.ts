@@ -5330,6 +5330,7 @@ export const tr_TR: EnTranslations = {
       "riftUpgrade": "Yarık yükseltmesi {level}/{max}",
       "riftSockets": "Yarık mücevherleri {used}/{total}",
       "riftGemSocket": "Riftbound grubu için soket bonusu",
+      "sigilRedeem": "Can be traded to {vendor}, outside the {raid} entrance in {zone}, for a {slot} set piece.",
       "statEnchanted": "+{value} {stat} (Büyülü)",
       "enchantedFallback": "Büyülü",
       "partyTradeWindow": "Bu eşyayı, düşüşünü paylaşan oyunculara önümüzdeki {time} boyunca takas edebilirsin. Kuşanmak takas penceresini sona erdirir.",

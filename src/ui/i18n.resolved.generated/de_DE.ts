@@ -5330,6 +5330,7 @@ export const de_DE: EnTranslations = {
       "riftUpgrade": "Riss-Aufwertung {level}/{max}",
       "riftSockets": "Riss-Edelsteine {used}/{total}",
       "riftGemSocket": "Sockelbonus für ein Riftbound-Band",
+      "sigilRedeem": "Can be traded to {vendor}, outside the {raid} entrance in {zone}, for a {slot} set piece.",
       "statEnchanted": "+{value} {stat} (Verzaubert)",
       "enchantedFallback": "Verzaubert",
       "partyTradeWindow": "Du kannst diesen Gegenstand noch {time} lang an Spieler weitergeben, die denselben Beutefund erhalten haben. Das Anlegen beendet dieses Handelsfenster.",

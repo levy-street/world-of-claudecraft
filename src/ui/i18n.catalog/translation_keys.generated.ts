@@ -15653,6 +15653,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.itemTooltip.riftSockets'
   | 'hudChrome.itemTooltip.riftTier'
   | 'hudChrome.itemTooltip.riftUpgrade'
+  | 'hudChrome.itemTooltip.sigilRedeem'
   | 'hudChrome.itemTooltip.statEnchanted'
   | 'hudChrome.itemTooltip.trophySkullSource'
   | 'hudChrome.itemUniqueEquipped'

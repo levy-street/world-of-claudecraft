@@ -5330,6 +5330,7 @@ export const zh_TW: EnTranslations = {
       "riftUpgrade": "裂隙強化 {level}/{max}",
       "riftSockets": "裂隙寶石 {used}/{total}",
       "riftGemSocket": "裂隙之戒的鑲嵌加成",
+      "sigilRedeem": "可在{zone}的{raid}入口外與{vendor}交易，換取一件{slot}套裝部件。",
       "statEnchanted": "+{value} {stat}（附魔）",
       "enchantedFallback": "已附魔",
       "partyTradeWindow": "在接下來的{time}內，你可以將此物品交易給共同獲得該掉落的玩家。裝備後交易期限即告結束。",

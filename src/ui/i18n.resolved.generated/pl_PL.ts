@@ -5330,6 +5330,7 @@ export const pl_PL: EnTranslations = {
       "riftUpgrade": "Ulepszenie Szczeliny {level}/{max}",
       "riftSockets": "Klejnoty Szczeliny {used}/{total}",
       "riftGemSocket": "Bonus za gniazdo dla zespołu Riftbound",
+      "sigilRedeem": "Can be traded to {vendor}, outside the {raid} entrance in {zone}, for a {slot} set piece.",
       "statEnchanted": "+{value} {stat} (Zaklęty)",
       "enchantedFallback": "Zaklęty",
       "partyTradeWindow": "Możesz wymienić ten przedmiot z graczami, z którymi wypadł, jeszcze przez {time}. Założenie go kończy okno wymiany.",

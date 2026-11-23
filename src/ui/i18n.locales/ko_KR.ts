@@ -14027,6 +14027,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftForge.done.socketReplaced':
     '{name}에 보석을 박았습니다. {gem}은(는) 파괴되었습니다.',
   'hudChrome.itemTooltip.riftGemSocket': '균열결속 반지 소켓 보너스',
+  'hudChrome.itemTooltip.sigilRedeem':
+    '{zone}의 {raid} 입구 밖에 있는 {vendor}에게 {slot} 세트 장비 하나로 교환할 수 있습니다.',
   'sim.rift.alreadyCleared': '이 균열은 이미 {names} 님이 정복했습니다.',
   'sim.rift.raceLost': '이 균열은 이미 {names} 님이 정복했습니다. 도전이 종료됩니다.',
   'sim.rift.raceWorldWin': '{names} 님이 {seconds}초 만에 {tier} 등급 균열 경주에서 승리했습니다!',
