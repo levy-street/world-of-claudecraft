@@ -18416,7 +18416,7 @@ export const id_ID: EnTranslations = {
       "claw": {
         "name": "Cakar Perobek",
         "description": "Cakar musuh sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo. Hanya dalam Wujud Kucing.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah satu tumpukan Cabikan, pendarahan sebesar 12 kerusakan selama 8 detik per tumpukan (maks 5 tumpukan). Tumpukan baru menyegarkan durasinya."
+        "specNote_feral": "Setiap pukulan yang mengenai menambah satu tumpukan Cabikan, pendarahan sebesar 8 kerusakan selama 8 detik per tumpukan (maks 5 tumpukan). Tumpukan baru menyegarkan durasinya."
       },
       "scratch": {
         "name": "Cakaran",
@@ -18426,7 +18426,7 @@ export const id_ID: EnTranslations = {
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
         "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Kucing.",
-        "specNote_feral": "Memberikan 15% kerusakan lebih besar untuk setiap pendarahanmu pada target dan menyegarkan Celah Darah milikmu ke durasi penuh. Pada 3 Darah Tua tombol ini berubah menjadi Panen Merah, yang menghabiskan Darah Tua untuk serangan yang memperpanjang Kupasan dan Celah Darah milikmu, membuat pendarahanmu pada target berdetak 50% lebih cepat selama 8 detik, dan memulihkan energi."
+        "specNote_feral": "Memberikan 15% kerusakan lebih besar untuk setiap pendarahanmu pada target dan menyegarkan Celah Darah milikmu ke durasi penuh. Pada 3 Darah Tua tombol ini berubah menjadi Panen Merah, yang menghabiskan Darah Tua untuk serangan yang memperpanjang Kupasan dan Celah Darah milikmu, membuat pendarahanmu pada target berdetak 30% lebih cepat selama 8 detik, dan memulihkan energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -18481,11 +18481,11 @@ export const id_ID: EnTranslations = {
       },
       "pounce": {
         "name": "Terkaman Senyap",
-        "description": "Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo dan, sebagai Buas, membuka Robek Leher, pendarahan sebesar 72 kerusakan selama 12 detik. Hanya dalam Wujud Kucing. Di luar siluman, tombol ini adalah Terkaman."
+        "description": "Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo dan, sebagai Buas, menambah 1 Darah Tua (maks 3) serta membuka Robek Leher, pendarahan sebesar 72 kerusakan selama 12 detik. Hanya dalam Wujud Kucing. Di luar siluman, tombol ini adalah Terkaman."
       },
       "lunge": {
         "name": "Terkaman",
-        "description": "Beralih ke Wujud Kucing jika belum, lalu terkam musuh hingga 25 yard jauhnya. Saat tiba, memberikan 60% kerusakan senjata dan menghasilkan 1 poin kombo; terkaman yang terputus mengembalikan jedanya. Dapat digunakan dalam wujud apa pun."
+        "description": "Beralih ke Wujud Kucing jika belum, lalu terkam musuh hingga 25 yard jauhnya. Saat tiba, memberikan 60% kerusakan senjata, menghasilkan 1 poin kombo, dan sebagai Buas menambah 1 Darah Tua (maks 3); terkaman yang terputus mengembalikan jedanya. Dapat digunakan dalam wujud apa pun."
       },
       "hamstring_bite": {
         "name": "Penjatuhan",
@@ -18720,7 +18720,7 @@ export const id_ID: EnTranslations = {
       },
       "redharvest": {
         "name": "Panen Merah",
-        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, memperpanjang Kupasan dan Celah Darah milikmu pada target selama 4 detik (hingga 8 detik masing-masing), membuat pendarahanmu pada target berdetak 50% lebih cepat selama 8 detik (Arus Merah), dan memulihkan {rage} energi. Berfungsi tanpa poin kombo."
+        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, memperpanjang Kupasan dan Celah Darah milikmu pada target selama 8 detik (hingga 16 detik masing-masing), membuat pendarahanmu pada target berdetak 30% lebih cepat selama 8 detik (Arus Merah), dan memulihkan {rage} energi. Berfungsi tanpa poin kombo."
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",

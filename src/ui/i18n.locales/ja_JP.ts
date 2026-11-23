@@ -6388,13 +6388,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'まだキャットフォームでなければ変身してから、15秒間移動速度が50%上昇する疾走を行います。どの形態でも使用可能。即時で、グローバルクールダウンは発生しません。',
   'entities.abilities.pounce.name': '忍び強襲',
   'entities.abilities.lunge.description':
-    'キャットフォームでなければ変身してから、最大25メートル先の敵に飛びかかる。到達時に武器ダメージの60%を与え、コンボポイントを1獲得する。途中で中断された場合は再使用時間が戻る。どの形態でも使用可能。',
+    'キャットフォームでなければ変身してから、最大25メートル先の敵に飛びかかる。到達時に武器ダメージの60%を与え、コンボポイントを1獲得し、フェラルでは古き血を1蓄える（最大3）。途中で中断された場合は再使用時間が戻る。どの形態でも使用可能。',
   'entities.abilities.lunge.name': 'ランジ',
   'entities.abilities.hamstring_bite.description':
     '対象を1秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：6秒）。キャットフォーム時のみ使用可能。',
   'entities.abilities.hamstring_bite.name': 'テイクダウン',
   'entities.abilities.pounce.description':
-    '隠密状態から放つ先制攻撃で、対象を2秒間スタンさせます。コンボポイントを1獲得し、フェラルでは喉裂きを与えます。喉裂きは12秒かけて72ダメージを与える出血です。キャットフォーム専用。ステルス状態でない場合、このボタンはランジになる。',
+    '隠密状態から放つ先制攻撃で、対象を2秒間スタンさせます。コンボポイントを1獲得し、フェラルでは古き血を1蓄え（最大3）、喉裂きを与えます。喉裂きは12秒かけて72ダメージを与える出血です。キャットフォーム専用。ステルス状態でない場合、このボタンはランジになる。',
   'entities.abilities.insect_swarm.name': '刺す虫の群れ',
   'entities.abilities.insect_swarm.description':
     '敵が虫の群れに襲われ、12秒かけて{damage}の自然ダメージを受けます。',
@@ -17356,7 +17356,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
   'entities.abilities.cinderhide.name': '燼皮',
   'entities.abilities.claw.specNote_feral':
-    '命中した攻撃ごとにずた裂きを1スタック付与する。1スタックにつき8秒かけて12ダメージを与える出血（最大5スタック）。新たなスタックで効果時間が更新される。',
+    '命中した攻撃ごとにずた裂きを1スタック付与する。1スタックにつき8秒かけて8ダメージを与える出血（最大5スタック）。新たなスタックで効果時間が更新される。',
   'entities.abilities.scratch.specNote_feral':
     '命中した敵それぞれにスクラッチ傷の出血も与える：6秒かけて12ダメージ。',
   'entities.abilities.cold_focus.description':
@@ -17406,7 +17406,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。',
   'entities.abilities.faithforged_guard.name': '聖光の負債',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '対象にかかっている自分の出血1つにつきダメージが15%増加し、血裂の効果時間を最大まで更新する。古き血が3のとき、このボタンは血の収穫に変化する：古き血を消費する一撃で、皮剥ぎと血裂を延長し、対象にかかっている自分の出血のダメージ間隔を8秒間50%速め、エネルギーを回復する。',
+    '対象にかかっている自分の出血1つにつきダメージが15%増加し、血裂の効果時間を最大まで更新する。古き血が3のとき、このボタンは血の収穫に変化する：古き血を消費する一撃で、皮剥ぎと血裂を延長し、対象にかかっている自分の出血のダメージ間隔を8秒間30%速め、エネルギーを回復する。',
   'entities.abilities.fieldcraft_reentry.description':
     'パッシブ：狩猟の勢いがあると、離脱跳躍は次の腹裂きの一撃または血鉤を12秒間強化します。腹裂きの一撃は1段階ごとに15%ダメージ増加。血鉤は18から24の追加物理ダメージを与え、1段階ごとに15%、さらに遠隔攻撃力で増加します。3段階でいずれかの攻撃が狩猟の勢いを消費します。（生存）',
   'entities.abilities.fieldcraft_reentry.name': '再突入準備',
@@ -17536,7 +17536,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '死亡したグループメンバーを、体力とマナが35%の状態であなたのそばに蘇生する。レベル16以上のサンメンダーは代わりに、グループの30ヤード以内で視線の通る倒れたメンバー全員を呼び戻す。',
   'entities.abilities.recall_the_fallen.name': '倒れし者の呼び戻し',
   'entities.abilities.redharvest.description':
-    '古き血を3消費する：{damage}のダメージを与え、対象の皮剥ぎと血裂をそれぞれ4秒延長し（それぞれ最大8秒）、対象にかかっている自分の出血のダメージ間隔を8秒間50%速め（赤き奔流）、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
+    '古き血を3消費する：{damage}のダメージを与え、対象の皮剥ぎと血裂をそれぞれ8秒延長し（それぞれ最大16秒）、対象にかかっている自分の出血のダメージ間隔を8秒間30%速め（赤き奔流）、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
   'entities.abilities.redharvest.name': '血の収穫',
   'entities.abilities.regrowth.specNote_restoration':
     '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。',

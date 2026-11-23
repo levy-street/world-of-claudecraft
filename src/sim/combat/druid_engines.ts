@@ -163,12 +163,16 @@ const FORM_ABILITY_IDS = new Set([
 ]);
 const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
 // Every landed feral strike that banks one Old Blood. Since the feral bleed
-// rework only the Bruin strikes bank on a hit: Cat Form banks from its own
-// bleed ticks instead (druidEngineOnBleedTick, at most one Old Blood every
-// OLD_BLOOD_BLEED_ICD seconds, combat/druid_bleeds.ts), so the Cat payoff
-// tracks how many bleeds are running rather than how many buttons were
-// pressed. The OLD_BLOOD_STAGES cap of 3 holds through addStage.
-const OLD_BLOOD_STRIKE_IDS = new Set(['maul', 'swipe']);
+// rework Cat Form banks mostly from its own bleed ticks (druidEngineOnBleedTick,
+// at most one Old Blood every OLD_BLOOD_BLEED_ICD seconds, combat/
+// druid_bleeds.ts), so the Cat payoff tracks how many bleeds are running
+// rather than how many buttons were pressed. The Bruin strikes still bank on
+// a hit, and so do the two engage tools: Slinkstrike on the tick its stun
+// lands (the stun arm of effect_dispatch.ts reports here), and Lunge on
+// ARRIVAL when its parked strike rolls through ctx.meleeSwing (combat/
+// druid_lunge.ts): a Lunge cut short banks nothing.
+// The OLD_BLOOD_STAGES cap of 3 holds through addStage.
+const OLD_BLOOD_STRIKE_IDS = new Set(['maul', 'swipe', 'pounce', 'lunge']);
 const VERDANCE_SOWING_IDS = new Set(['rejuvenation', 'regrowth']);
 
 // Banked Verdance on this actor. Reads the aura list by kind only (the same

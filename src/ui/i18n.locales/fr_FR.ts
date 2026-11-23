@@ -10291,13 +10291,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Prenez la Forme de chat si nécessaire, puis sprintez avec 50% de vitesse supplémentaire pendant 15 s. Utilisable sous toute forme. Instantané et ne déclenche pas le temps de recharge global.',
   'entities.abilities.pounce.name': 'Frappe furtive',
   'entities.abilities.lunge.description':
-    "Prend la Forme de chat si ce n'est pas déjà le cas, puis bondit sur un ennemi jusqu'à 25 m. À l'arrivée, inflige 60% des dégâts de l'arme et confère 1 point de combo ; un bond interrompu rembourse son temps de recharge. Utilisable sous n'importe quelle forme.",
+    "Prend la Forme de chat si ce n'est pas déjà le cas, puis bondit sur un ennemi jusqu'à 25 m. À l'arrivée, inflige 60% des dégâts de l'arme, confère 1 point de combo et, en Farouche, ajoute 1 Sang ancien (maximum 3) ; un bond interrompu rembourse son temps de recharge. Utilisable sous n'importe quelle forme.",
   'entities.abilities.lunge.name': 'Bond',
   'entities.abilities.hamstring_bite.description':
     'Technique de finition qui étourdit la cible pendant 1 s plus 1 s par point de combo (5 points de combo : 6 s). Forme de chat uniquement.',
   'entities.abilities.hamstring_bite.name': 'Mise à terre',
   'entities.abilities.pounce.description':
-    'Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo et, en Farouche, inflige Lacère-gorge, un saignement de 72 points de dégâts en 12 s. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond.',
+    'Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo et, en Farouche, ajoute 1 Sang ancien (maximum 3) et inflige Lacère-gorge, un saignement de 72 points de dégâts en 12 s. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond.',
   'entities.abilities.insect_swarm.name': 'Nuée cinglante',
   'entities.abilities.insect_swarm.description':
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
@@ -16938,7 +16938,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Soin de spores fraîche sur la cible.',
   'entities.abilities.redharvest.name': 'Moisson rouge',
   'entities.abilities.redharvest.description':
-    "Consomme vos 3 Sang ancien : frappe pour {damage}, prolonge vos Écorcher et Faille sanglante sur la cible de 4 s (jusqu'à 8 s chacun), accélère de 50% les tics de vos saignements sur la cible pendant 8 s (Torrent rouge) et rend {rage} points d'énergie. Fonctionne sans aucun point de combo.",
+    "Consomme vos 3 Sang ancien : frappe pour {damage}, prolonge vos Écorcher et Faille sanglante sur la cible de 8 s (jusqu'à 16 s chacun), accélère de 30% les tics de vos saignements sur la cible pendant 8 s (Torrent rouge) et rend {rage} points d'énergie. Fonctionne sans aucun point de combo.",
   'entities.abilities.sunlance.name': 'Sillage solaire',
   'entities.abilities.sunlance.description':
     'Consomme vos 3 Marée lunaire pour une frappe de {damage} points de dégâts de Nature plus une brûlure de {overTime} sur 9 s, et rend 35 points de mana : le choix du mana. Déferlante lunaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un.',
@@ -17060,7 +17060,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de chat uniquement.",
   'entities.abilities.claw.specNote_feral':
-    'Chaque coup porté ajoute une charge de Lambeaux, un saignement de 12 points de dégâts en 8 s par charge (5 charges au maximum). Une nouvelle charge réinitialise la durée.',
+    'Chaque coup porté ajoute une charge de Lambeaux, un saignement de 8 points de dégâts en 8 s par charge (5 charges au maximum). Une nouvelle charge réinitialise la durée.',
   'entities.abilities.cold_blood.description':
     'Concentre votre instinct meurtrier pour que vos 5 prochaines attaques soient des coups critiques. (signature Art des lames)',
   'entities.abilities.corpse_explosion.description':
@@ -17096,7 +17096,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Technique de finition qui inflige {damage}. Forme de chat uniquement.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    "Inflige 15% de dégâts supplémentaires pour chacun de vos saignements sur la cible et ramène votre Faille sanglante à sa durée maximale. À 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe qui prolonge vos Écorcher et Faille sanglante, accélère de 50% les tics de vos saignements sur la cible pendant 8 s, et restaure de l'énergie.",
+    "Inflige 15% de dégâts supplémentaires pour chacun de vos saignements sur la cible et ramène votre Faille sanglante à sa durée maximale. À 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe qui prolonge vos Écorcher et Faille sanglante, accélère de 30% les tics de vos saignements sur la cible pendant 8 s, et restaure de l'énergie.",
   'entities.abilities.funeral_harvest.description':
     "Quand un ennemi récemment endommagé par vous ou vos morts-vivants meurt, vous gagnez 1 Fragment d'âme. Cela peut se produire une fois toutes les 3 s.",
   'entities.abilities.funeral_harvest.name': 'Moisson funéraire',

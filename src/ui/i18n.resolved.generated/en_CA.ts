@@ -18416,7 +18416,7 @@ export const en_CA: EnTranslations = {
       "claw": {
         "name": "Rendclaw",
         "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds a stack of Tatter, a bleed of 12 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration."
+        "specNote_feral": "Each hit that lands adds a stack of Tatter, a bleed of 8 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration."
       },
       "scratch": {
         "name": "Scratch",
@@ -18426,7 +18426,7 @@ export const en_CA: EnTranslations = {
       "ferocious_bite": {
         "name": "Gorebite",
         "description": "Finishing move that causes {damage}. Cat Form only.",
-        "specNote_feral": "Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 50% faster for 8 sec, and restores energy."
+        "specNote_feral": "Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 30% faster for 8 sec, and restores energy."
       },
       "swipe": {
         "name": "Sweeping Claws",
@@ -18481,11 +18481,11 @@ export const en_CA: EnTranslations = {
       },
       "pounce": {
         "name": "Slinkstrike",
-        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, opens Throatrake, a bleed of 72 damage over 12 sec. Cat Form only. Out of stealth this button is Lunge."
+        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3) and opens Throatrake, a bleed of 72 damage over 12 sec. Cat Form only. Out of stealth this button is Lunge."
       },
       "lunge": {
         "name": "Lunge",
-        "description": "Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Usable in any form."
+        "description": "Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form."
       },
       "hamstring_bite": {
         "name": "Takedown",
@@ -18720,7 +18720,7 @@ export const en_CA: EnTranslations = {
       },
       "redharvest": {
         "name": "Redharvest",
-        "description": "Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 4 sec (up to 8 sec each), make your bleeds on the target tick 50% faster for 8 sec (Red Torrent), and restore {rage} energy. Works with zero combo points."
+        "description": "Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 30% faster for 8 sec (Red Torrent), and restore {rage} energy. Works with zero combo points."
       },
       "marrowbreak": {
         "name": "Marrowbreak",

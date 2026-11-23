@@ -1294,7 +1294,7 @@ const classAbilityNamesEn = {
         'Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Cat Form only.',
         {
           feral:
-            'Each hit that lands adds a stack of Tatter, a bleed of 12 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
+            'Each hit that lands adds a stack of Tatter, a bleed of 8 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
         },
       ],
       [
@@ -1309,7 +1309,7 @@ const classAbilityNamesEn = {
         'Finishing move that causes {damage}. Cat Form only.',
         {
           feral:
-            'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 50% faster for 8 sec, and restores energy.',
+            'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 30% faster for 8 sec, and restores energy.',
         },
       ],
       [
@@ -1369,12 +1369,12 @@ const classAbilityNamesEn = {
       [
         'pounce',
         'Slinkstrike',
-        'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, opens Throatrake, a bleed of 72 damage over 12 sec. Cat Form only. Out of stealth this button is Lunge.',
+        'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3) and opens Throatrake, a bleed of 72 damage over 12 sec. Cat Form only. Out of stealth this button is Lunge.',
       ],
       [
         'lunge',
         'Lunge',
-        'Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Usable in any form.',
+        'Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form.',
       ],
       [
         'hamstring_bite',
@@ -1673,7 +1673,7 @@ const classAbilityNamesEn = {
       [
         'redharvest',
         'Redharvest',
-        'Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 4 sec (up to 8 sec each), make your bleeds on the target tick 50% faster for 8 sec (Red Torrent), and restore {rage} energy. Works with zero combo points.',
+        'Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 30% faster for 8 sec (Red Torrent), and restore {rage} energy. Works with zero combo points.',
       ],
       [
         'marrowbreak',

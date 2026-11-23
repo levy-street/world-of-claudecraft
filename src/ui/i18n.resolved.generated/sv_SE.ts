@@ -18416,7 +18416,7 @@ export const sv_SE: EnTranslations = {
       "claw": {
         "name": "Rivklo",
         "description": "Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.",
-        "specNote_feral": "Varje träffande slag lägger till en stapel Slamsor, en blödning på 12 skada över 8 sek per stapel (max 5 staplar). En ny stapel förnyar varaktigheten."
+        "specNote_feral": "Varje träffande slag lägger till en stapel Slamsor, en blödning på 8 skada över 8 sek per stapel (max 5 staplar). En ny stapel förnyar varaktigheten."
       },
       "scratch": {
         "name": "Klös",
@@ -18426,7 +18426,7 @@ export const sv_SE: EnTranslations = {
       "ferocious_bite": {
         "name": "Blodsbett",
         "description": "Avslutande drag som orsakar {damage}. Endast i Kattform.",
-        "specNote_feral": "Gör 15% mer skada för varje blödning du har på målet och förnyar din Blodsspricka till full varaktighet. Vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett slag som förlänger dina Flå och Blodsspricka, får dina blödningar på målet att ticka 50% snabbare i 8 sek och återställer energi."
+        "specNote_feral": "Gör 15% mer skada för varje blödning du har på målet och förnyar din Blodsspricka till full varaktighet. Vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett slag som förlänger dina Flå och Blodsspricka, får dina blödningar på målet att ticka 30% snabbare i 8 sek och återställer energi."
       },
       "swipe": {
         "name": "Svepande klor",
@@ -18481,11 +18481,11 @@ export const sv_SE: EnTranslations = {
       },
       "pounce": {
         "name": "Smyghugg",
-        "description": "En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng och öppnar som Vild Strupriv, en blödning på 72 skada över 12 sek. Endast i kattform. Utanför smyg är den här knappen Utfall."
+        "description": "En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng och lägger som Vild till 1 Gammalt Blod (max 3) och öppnar Strupriv, en blödning på 72 skada över 12 sek. Endast i kattform. Utanför smyg är den här knappen Utfall."
       },
       "lunge": {
         "name": "Utfall",
-        "description": "Byt till kattform om du inte redan är i den och kasta dig sedan mot en fiende upp till 25 m bort. Vid ankomsten tillfogas 60% vapenskada och 1 kombopoäng ges; ett avbrutet utfall återbetalar sin nedkylning. Kan användas i alla former."
+        "description": "Byt till kattform om du inte redan är i den och kasta dig sedan mot en fiende upp till 25 m bort. Vid ankomsten tillfogas 60% vapenskada, 1 kombopoäng ges och som Vild läggs 1 Gammalt Blod till (max 3); ett avbrutet utfall återbetalar sin nedkylning. Kan användas i alla former."
       },
       "hamstring_bite": {
         "name": "Nedtagning",
@@ -18720,7 +18720,7 @@ export const sv_SE: EnTranslations = {
       },
       "redharvest": {
         "name": "Röd Skörd",
-        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage}, förlänger dina Flå och Blodsspricka på målet med 4 sek (upp till 8 sek vardera), får dina blödningar på målet att ticka 50% snabbare i 8 sek (Röd Ström) och återställer {rage} energi. Fungerar utan kombopoäng."
+        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage}, förlänger dina Flå och Blodsspricka på målet med 8 sek (upp till 16 sek vardera), får dina blödningar på målet att ticka 30% snabbare i 8 sek (Röd Ström) och återställer {rage} energi. Fungerar utan kombopoäng."
       },
       "marrowbreak": {
         "name": "Märgbräckare",

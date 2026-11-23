@@ -18416,7 +18416,7 @@ export const pl_PL: EnTranslations = {
       "claw": {
         "name": "Szarpiący pazur",
         "description": "Rozerwij wroga pazurami za obrażenia broni plus {damage}. Przyznaje 1 punkt combo. Tylko w Postaci kota.",
-        "specNote_feral": "Każdy trafiony cios dodaje ładunek Strzępów, krwawienia zadającego 12 obrażeń w ciągu 8 sek. na ładunek (maks. 5 ładunków). Nowy ładunek odnawia czas trwania."
+        "specNote_feral": "Każdy trafiony cios dodaje ładunek Strzępów, krwawienia zadającego 8 obrażeń w ciągu 8 sek. na ładunek (maks. 5 ładunków). Nowy ładunek odnawia czas trwania."
       },
       "scratch": {
         "name": "Drapnięcie",
@@ -18426,7 +18426,7 @@ export const pl_PL: EnTranslations = {
       "ferocious_bite": {
         "name": "Krwawe ukąszenie",
         "description": "Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci kota.",
-        "specNote_feral": "Zadaje o 15% więcej obrażeń za każde twoje krwawienie na celu i odnawia twoją Krwawą szczelinę do pełnego czasu trwania. Przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na cios wydłużający twoje Zdzieranie i Krwawą szczelinę, przyspieszający o 50% tiknięcia twoich krwawień na celu na 8 sek. i przywracający energię."
+        "specNote_feral": "Zadaje o 15% więcej obrażeń za każde twoje krwawienie na celu i odnawia twoją Krwawą szczelinę do pełnego czasu trwania. Przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na cios wydłużający twoje Zdzieranie i Krwawą szczelinę, przyspieszający o 30% tiknięcia twoich krwawień na celu na 8 sek. i przywracający energię."
       },
       "swipe": {
         "name": "Zamaszyste pazury",
@@ -18481,11 +18481,11 @@ export const pl_PL: EnTranslations = {
       },
       "pounce": {
         "name": "Skradający cios",
-        "description": "Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji, a w specjalizacji Dzika natura zadaje Rozszarpane gardło, krwawienie zadające 72 obrażenia w ciągu 12 sek. Tylko w postaci kota. Poza skradaniem ten przycisk to Wypad."
+        "description": "Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji, a w specjalizacji Dzika natura dodaje 1 Starą Krew (maks. 3) i zadaje Rozszarpane gardło, krwawienie zadające 72 obrażenia w ciągu 12 sek. Tylko w postaci kota. Poza skradaniem ten przycisk to Wypad."
       },
       "lunge": {
         "name": "Wypad",
-        "description": "Przyjmujesz postać kota, jeśli jeszcze w niej nie jesteś, a potem rzucasz się na wroga oddalonego o maksymalnie 25 jardów. Po dotarciu zadajesz 60% obrażeń broni i otrzymujesz 1 punkt kombinacji; przerwany wypad zwraca czas odnowienia. Można używać w dowolnej postaci."
+        "description": "Przyjmujesz postać kota, jeśli jeszcze w niej nie jesteś, a potem rzucasz się na wroga oddalonego o maksymalnie 25 jardów. Po dotarciu zadajesz 60% obrażeń broni, otrzymujesz 1 punkt kombinacji, a w specjalizacji Dzika natura dodajesz 1 Starą Krew (maks. 3); przerwany wypad zwraca czas odnowienia. Można używać w dowolnej postaci."
       },
       "hamstring_bite": {
         "name": "Obalenie",
@@ -18720,7 +18720,7 @@ export const pl_PL: EnTranslations = {
       },
       "redharvest": {
         "name": "Czerwone Żniwa",
-        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, wydłuża twoje Zdzieranie i Krwawą szczelinę na celu o 4 sek. (do 8 sek. każde), przyspiesza o 50% tiknięcia twoich krwawień na celu na 8 sek. (Czerwony Potok) i przywraca {rage} energii. Działa bez punktów combo."
+        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, wydłuża twoje Zdzieranie i Krwawą szczelinę na celu o 8 sek. (do 16 sek. każde), przyspiesza o 30% tiknięcia twoich krwawień na celu na 8 sek. (Czerwony Potok) i przywraca {rage} energii. Działa bez punktów combo."
       },
       "marrowbreak": {
         "name": "Łamacz szpiku",

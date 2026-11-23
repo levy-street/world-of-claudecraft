@@ -399,7 +399,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Zarpea al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.',
   'entities.abilities.claw.specNote_feral':
-    'Cada golpe que conecta añade una acumulación de Jirones, un sangrado de 12 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración.',
+    'Cada golpe que conecta añade una acumulación de Jirones, un sangrado de 8 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración.',
   'entities.abilities.cold_blood.description':
     'Concentra tu instinto asesino para que tus próximos 5 ataques sean golpes críticos. (motor de Knifework)',
   'entities.abilities.dark_pact.description':

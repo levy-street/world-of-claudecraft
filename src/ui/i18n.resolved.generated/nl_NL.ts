@@ -18416,7 +18416,7 @@ export const nl_NL: EnTranslations = {
       "claw": {
         "name": "Rijtklauw",
         "description": "Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Katgedaante.",
-        "specNote_feral": "Elke slag die raakt voegt een stapel Flarden toe, een bloeding van 12 schade over 8 sec per stapel (max 5 stapels). Een nieuwe stapel ververst de duur."
+        "specNote_feral": "Elke slag die raakt voegt een stapel Flarden toe, een bloeding van 8 schade over 8 sec per stapel (max 5 stapels). Een nieuwe stapel ververst de duur."
       },
       "scratch": {
         "name": "Krab",
@@ -18426,7 +18426,7 @@ export const nl_NL: EnTranslations = {
       "ferocious_bite": {
         "name": "Bloedbeet",
         "description": "Afmaakactie die {damage} veroorzaakt. Alleen in Katgedaante.",
-        "specNote_feral": "Doet 15% meer schade voor elke bloeding van jou op het doelwit en ververst je Bloedscheur tot de volledige duur. Bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een slag die je Villen en Bloedscheur verlengt, je bloedingen op het doelwit 8 sec lang 50% sneller laat tikken en energie herstelt."
+        "specNote_feral": "Doet 15% meer schade voor elke bloeding van jou op het doelwit en ververst je Bloedscheur tot de volledige duur. Bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een slag die je Villen en Bloedscheur verlengt, je bloedingen op het doelwit 8 sec lang 30% sneller laat tikken en energie herstelt."
       },
       "swipe": {
         "name": "Vegende Klauwen",
@@ -18481,11 +18481,11 @@ export const nl_NL: EnTranslations = {
       },
       "pounce": {
         "name": "Sluipslag",
-        "description": "Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op en opent met de specialisatie Wild Keelrijt, een bloeding van 72 schade over 12 sec. Alleen in Katgedaante. Buiten sluiptocht is deze knop Uitval."
+        "description": "Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op en voegt met de specialisatie Wild 1 Oud Bloed toe (max 3) en opent Keelrijt, een bloeding van 72 schade over 12 sec. Alleen in Katgedaante. Buiten sluiptocht is deze knop Uitval."
       },
       "lunge": {
         "name": "Uitval",
-        "description": "Verander in Katgedaante als je dat nog niet bent en stort je dan op een vijand op maximaal 25 yard afstand. Bij aankomst doe je 60% wapenschade en krijg je 1 combopunt; een voortijdig afgebroken Uitval herstelt de herlaadtijd. Bruikbaar in elke gedaante."
+        "description": "Verander in Katgedaante als je dat nog niet bent en stort je dan op een vijand op maximaal 25 yard afstand. Bij aankomst doe je 60% wapenschade, krijg je 1 combopunt en voeg je met de specialisatie Wild 1 Oud Bloed toe (max 3); een voortijdig afgebroken Uitval herstelt de herlaadtijd. Bruikbaar in elke gedaante."
       },
       "hamstring_bite": {
         "name": "Neerhalen",
@@ -18720,7 +18720,7 @@ export const nl_NL: EnTranslations = {
       },
       "redharvest": {
         "name": "Rode Oogst",
-        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage}, verlengt je Villen en Bloedscheur op het doelwit met 4 sec (tot 8 sec elk), laat je bloedingen op het doelwit 8 sec lang 50% sneller tikken (Rode Stroom) en herstelt {rage} energie. Werkt ook zonder combopunten."
+        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage}, verlengt je Villen en Bloedscheur op het doelwit met 8 sec (tot 16 sec elk), laat je bloedingen op het doelwit 8 sec lang 30% sneller tikken (Rode Stroom) en herstelt {rage} energie. Werkt ook zonder combopunten."
       },
       "marrowbreak": {
         "name": "Mergbreker",

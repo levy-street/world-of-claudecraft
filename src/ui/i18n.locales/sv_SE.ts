@@ -8014,10 +8014,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förvandlar fienden till en padda i upp till {duration} sek. Paddan vandrar omkring och läks snabbt. All skada bryter effekten. Endast bestar och humanoider.',
   'entities.abilities.polymorph.name': 'Förhäxa',
   'entities.abilities.pounce.description':
-    'En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng och öppnar som Vild Strupriv, en blödning på 72 skada över 12 sek. Endast i kattform. Utanför smyg är den här knappen Utfall.',
+    'En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng och lägger som Vild till 1 Gammalt Blod (max 3) och öppnar Strupriv, en blödning på 72 skada över 12 sek. Endast i kattform. Utanför smyg är den här knappen Utfall.',
   'entities.abilities.pounce.name': 'Smyghugg',
   'entities.abilities.lunge.description':
-    'Byt till kattform om du inte redan är i den och kasta dig sedan mot en fiende upp till 25 m bort. Vid ankomsten tillfogas 60% vapenskada och 1 kombopoäng ges; ett avbrutet utfall återbetalar sin nedkylning. Kan användas i alla former.',
+    'Byt till kattform om du inte redan är i den och kasta dig sedan mot en fiende upp till 25 m bort. Vid ankomsten tillfogas 60% vapenskada, 1 kombopoäng ges och som Vild läggs 1 Gammalt Blod till (max 3); ett avbrutet utfall återbetalar sin nedkylning. Kan användas i alla former.',
   'entities.abilities.lunge.name': 'Utfall',
   'entities.abilities.hamstring_bite.description':
     'Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek). Endast i kattform.',
@@ -16249,7 +16249,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar 3 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Sporemending på målet.',
   'entities.abilities.redharvest.name': 'Röd Skörd',
   'entities.abilities.redharvest.description':
-    'Förbrukar dina 3 Gammalt Blod: ett slag för {damage}, förlänger dina Flå och Blodsspricka på målet med 4 sek (upp till 8 sek vardera), får dina blödningar på målet att ticka 50% snabbare i 8 sek (Röd Ström) och återställer {rage} energi. Fungerar utan kombopoäng.',
+    'Förbrukar dina 3 Gammalt Blod: ett slag för {damage}, förlänger dina Flå och Blodsspricka på målet med 8 sek (upp till 16 sek vardera), får dina blödningar på målet att ticka 30% snabbare i 8 sek (Röd Ström) och återställer {rage} energi. Fungerar utan kombopoäng.',
   'entities.abilities.sunlance.name': 'Solspår',
   'entities.abilities.sunlance.description':
     'Förbrukar dina 3 Månflod för ett slag som ger {damage} naturskada plus en brännskada på {overTime} under 9 sek och återställer 35 mana: manavalet. Månsvall förbrukar samma 3 Månflod, så välj ett.',
@@ -16461,7 +16461,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.',
   'entities.abilities.claw.specNote_feral':
-    'Varje träffande slag lägger till en stapel Slamsor, en blödning på 12 skada över 8 sek per stapel (max 5 staplar). En ny stapel förnyar varaktigheten.',
+    'Varje träffande slag lägger till en stapel Slamsor, en blödning på 8 skada över 8 sek per stapel (max 5 staplar). En ny stapel förnyar varaktigheten.',
   'entities.abilities.cold_blood.description':
     'Fokuserar ditt dödliga uppsåt så att dina nästa 5 attacker blir kritiska träffar. (Knifework-motorn)',
   'entities.abilities.corpse_explosion.description':
@@ -16496,7 +16496,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Avslutande drag som orsakar {damage}. Endast i Kattform.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Gör 15% mer skada för varje blödning du har på målet och förnyar din Blodsspricka till full varaktighet. Vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett slag som förlänger dina Flå och Blodsspricka, får dina blödningar på målet att ticka 50% snabbare i 8 sek och återställer energi.',
+    'Gör 15% mer skada för varje blödning du har på målet och förnyar din Blodsspricka till full varaktighet. Vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett slag som förlänger dina Flå och Blodsspricka, får dina blödningar på målet att ticka 30% snabbare i 8 sek och återställer energi.',
   'entities.abilities.funeral_harvest.description':
     'När en fiende som nyligen skadats av dig eller dina odöda dör får du 1 Själfragment. Detta kan inträffa högst en gång var 3:e sek.',
   'entities.abilities.funeral_harvest.name': 'Begravningsskörd',

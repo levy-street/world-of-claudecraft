@@ -20,6 +20,8 @@ import {
   onFeralBleedApplied,
   openRedTorrent,
   RED_TORRENT_TICK_RATE,
+  REDHARVEST_EXTEND_CAP,
+  REDHARVEST_EXTEND_SECONDS,
   SCRATCH_WOUND_ID,
   TATTER_ID,
   TATTER_MAX_STACKS,
@@ -193,7 +195,7 @@ describe('Weeping Wounds and Open Veins', () => {
 });
 
 describe('Redharvest and Red Torrent', () => {
-  it('extends Flense and Bloodrift instead of consuming them', () => {
+  it('extends Flense and Bloodrift by 8 sec (cap 16) instead of consuming them', () => {
     for (const effects of [
       ABILITIES.redharvest.effects,
       ...(ABILITIES.redharvest.ranks ?? []).map((rank) => rank.effects),
@@ -203,6 +205,11 @@ describe('Redharvest and Red Torrent', () => {
         .filter((effect) => effect.type === 'extendDot')
         .map((effect) => (effect.type === 'extendDot' ? effect.dot : ''));
       expect(extended.sort()).toEqual(['rake', 'rip']);
+      for (const effect of effects) {
+        if (effect.type !== 'extendDot') continue;
+        expect(effect.seconds).toBe(REDHARVEST_EXTEND_SECONDS);
+        expect(effect.maxBonus).toBe(REDHARVEST_EXTEND_CAP);
+      }
     }
   });
 

@@ -18416,7 +18416,7 @@ export const es: EnTranslations = {
       "claw": {
         "name": "Garra Desgarradora",
         "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma felina.",
-        "specNote_feral": "Cada golpe conectado añade una acumulación de Jirones, un sangrado de 12 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración."
+        "specNote_feral": "Cada golpe conectado añade una acumulación de Jirones, un sangrado de 8 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración."
       },
       "scratch": {
         "name": "Arañazo",
@@ -18426,7 +18426,7 @@ export const es: EnTranslations = {
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
         "description": "Movimiento final que causa {damage}. Solo en Forma felina.",
-        "specNote_feral": "Inflige un 15% más de daño por cada uno de tus sangrados en el objetivo y renueva tu Grieta Sangrienta a su duración completa. Con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe que prolonga tus Desollar y Grieta Sangrienta, hace que tus sangrados en el objetivo hagan tic un 50% más rápido durante 8 s y restaura energía."
+        "specNote_feral": "Inflige un 15% más de daño por cada uno de tus sangrados en el objetivo y renueva tu Grieta Sangrienta a su duración completa. Con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe que prolonga tus Desollar y Grieta Sangrienta, hace que tus sangrados en el objetivo hagan tic un 30% más rápido durante 8 s y restaura energía."
       },
       "swipe": {
         "name": "Zarpas Barredoras",
@@ -18481,11 +18481,11 @@ export const es: EnTranslations = {
       },
       "pounce": {
         "name": "Golpe Sigiloso",
-        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo y, como Feral, abre Desgarro de Garganta, un sangrado de 72 de daño durante 12 s. Solo en Forma felina. Fuera del sigilo, este botón es Embestida felina."
+        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo y, como Feral, añade 1 de Sangre Antigua (máx. 3) y abre Desgarro de Garganta, un sangrado de 72 de daño durante 12 s. Solo en Forma felina. Fuera del sigilo, este botón es Embestida felina."
       },
       "lunge": {
         "name": "Embestida felina",
-        "description": "Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma y otorga 1 punto de combo; si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma."
+        "description": "Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Feral, añade 1 de Sangre Antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma."
       },
       "hamstring_bite": {
         "name": "Derribo",
@@ -18720,7 +18720,7 @@ export const es: EnTranslations = {
       },
       "redharvest": {
         "name": "Cosecha Roja",
-        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, prolonga tus Desollar y Grieta Sangrienta en el objetivo 4 s (hasta 8 s cada uno), hace que tus sangrados en el objetivo hagan tic un 50% más rápido durante 8 s (Torrente Rojo) y restaura {rage} de energía. Funciona sin puntos de combo."
+        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, prolonga tus Desollar y Grieta Sangrienta en el objetivo 8 s (hasta 16 s cada uno), hace que tus sangrados en el objetivo hagan tic un 30% más rápido durante 8 s (Torrente Rojo) y restaura {rage} de energía. Funciona sin puntos de combo."
       },
       "marrowbreak": {
         "name": "Quiebramédula",

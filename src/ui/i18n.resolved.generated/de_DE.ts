@@ -18416,7 +18416,7 @@ export const de_DE: EnTranslations = {
       "claw": {
         "name": "Reißklaue",
         "description": "Krallt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Katzengestalt.",
-        "specNote_feral": "Jeder Treffer, der landet, fügt einen Stapel Fetzen hinzu, eine Blutung, die pro Stapel 12 Schaden über 8 Sek. verursacht (max. 5 Stapel). Ein neuer Stapel erneuert die Dauer."
+        "specNote_feral": "Jeder Treffer, der landet, fügt einen Stapel Fetzen hinzu, eine Blutung, die pro Stapel 8 Schaden über 8 Sek. verursacht (max. 5 Stapel). Ein neuer Stapel erneuert die Dauer."
       },
       "scratch": {
         "name": "Kratzen",
@@ -18426,7 +18426,7 @@ export const de_DE: EnTranslations = {
       "ferocious_bite": {
         "name": "Blutbiss",
         "description": "Finishing-Move, der {damage} verursacht. Nur in Katzengestalt.",
-        "specNote_feral": "Verursacht 15% mehr Schaden für jede Eurer Blutungen auf dem Ziel und setzt Euren Blutriss auf seine volle Dauer zurück. Bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen Schlag verbraucht, der Euer Schinden und Euren Blutriss verlängert, Eure Blutungen auf dem Ziel 8 Sek. lang 50% schneller ticken lässt und Energie wiederherstellt."
+        "specNote_feral": "Verursacht 15% mehr Schaden für jede Eurer Blutungen auf dem Ziel und setzt Euren Blutriss auf seine volle Dauer zurück. Bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen Schlag verbraucht, der Euer Schinden und Euren Blutriss verlängert, Eure Blutungen auf dem Ziel 8 Sek. lang 30% schneller ticken lässt und Energie wiederherstellt."
       },
       "swipe": {
         "name": "Fegende Klauen",
@@ -18481,11 +18481,11 @@ export const de_DE: EnTranslations = {
       },
       "pounce": {
         "name": "Schleichschlag",
-        "description": "Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt und öffnet als Wilder Kampf Kehlriss, eine Blutung, die 72 Schaden über 12 Sek. verursacht. Nur in Katzengestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung."
+        "description": "Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt und fügt als Wilder Kampf 1 Altes Blut hinzu (max. 3) und öffnet Kehlriss, eine Blutung, die 72 Schaden über 12 Sek. verursacht. Nur in Katzengestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung."
       },
       "lunge": {
         "name": "Ansprung",
-        "description": "Nehmt Katzengestalt an, falls Ihr nicht bereits darin seid, und springt dann einen bis zu 25 m entfernten Gegner an. Bei der Ankunft verursacht Ihr 60% Waffenschaden und erhaltet 1 Combopunkt; ein vorzeitig abgebrochener Ansprung erstattet seine Abklingzeit zurück. In jeder Gestalt nutzbar."
+        "description": "Nehmt Katzengestalt an, falls Ihr nicht bereits darin seid, und springt dann einen bis zu 25 m entfernten Gegner an. Bei der Ankunft verursacht Ihr 60% Waffenschaden, erhaltet 1 Combopunkt und fügt als Wilder Kampf 1 Altes Blut hinzu (max. 3); ein vorzeitig abgebrochener Ansprung erstattet seine Abklingzeit zurück. In jeder Gestalt nutzbar."
       },
       "hamstring_bite": {
         "name": "Niederreißen",
@@ -18720,7 +18720,7 @@ export const de_DE: EnTranslations = {
       },
       "redharvest": {
         "name": "Rote Ernte",
-        "description": "Verbraucht 3 Altes Blut: ein Schlag für {damage}, verlängert Euer Schinden und Euren Blutriss auf dem Ziel um 4 Sek. (bis zu 8 Sek. je Blutung), lässt Eure Blutungen auf dem Ziel 8 Sek. lang 50% schneller ticken (Roter Strom) und stellt {rage} Energie wieder her. Funktioniert auch ohne Combopunkte."
+        "description": "Verbraucht 3 Altes Blut: ein Schlag für {damage}, verlängert Euer Schinden und Euren Blutriss auf dem Ziel um 8 Sek. (bis zu 16 Sek. je Blutung), lässt Eure Blutungen auf dem Ziel 8 Sek. lang 30% schneller ticken (Roter Strom) und stellt {rage} Energie wieder her. Funktioniert auch ohne Combopunkte."
       },
       "marrowbreak": {
         "name": "Markbrecher",

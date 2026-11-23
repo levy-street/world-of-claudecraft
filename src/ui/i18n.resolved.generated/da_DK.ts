@@ -18416,7 +18416,7 @@ export const da_DK: EnTranslations = {
       "claw": {
         "name": "Flængeklo",
         "description": "Klo fjenden for våbenskade plus {damage}. Giver 1 combopoint. Kun i Katteform.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer en stak Pjalter, en blødning på 12 skade over 8 sek. pr. stak (maks. 5 stakke). En ny stak fornyer varigheden."
+        "specNote_feral": "Hvert slag, der rammer, tilføjer en stak Pjalter, en blødning på 8 skade over 8 sek. pr. stak (maks. 5 stakke). En ny stak fornyer varigheden."
       },
       "scratch": {
         "name": "Krads",
@@ -18426,7 +18426,7 @@ export const da_DK: EnTranslations = {
       "ferocious_bite": {
         "name": "Blodbid",
         "description": "Afsluttende manøvre, der giver {damage}. Kun i Katteform.",
-        "specNote_feral": "Giver 15% mere skade for hver af dine blødninger på målet og fornyer din Blodrevne til fuld varighed. Ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et slag, der forlænger dine Flæns og Blodrevne, får dine blødninger på målet til at tikke 50% hurtigere i 8 sek. og gendanner energi."
+        "specNote_feral": "Giver 15% mere skade for hver af dine blødninger på målet og fornyer din Blodrevne til fuld varighed. Ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et slag, der forlænger dine Flæns og Blodrevne, får dine blødninger på målet til at tikke 30% hurtigere i 8 sek. og gendanner energi."
       },
       "swipe": {
         "name": "Fejende Kløer",
@@ -18481,11 +18481,11 @@ export const da_DK: EnTranslations = {
       },
       "pounce": {
         "name": "Luskeslag",
-        "description": "En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint og åbner som Forvildet Struberive, en blødning på 72 skade over 12 sek. Kun i Katteform. Uden sneg-tilstand er denne knap Spring."
+        "description": "En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint og tilføjer som Forvildet 1 Gammelt Blod (maks. 3) og åbner Struberive, en blødning på 72 skade over 12 sek. Kun i Katteform. Uden sneg-tilstand er denne knap Spring."
       },
       "lunge": {
         "name": "Spring",
-        "description": "Skift til Katteform, hvis du ikke allerede er i den, og spring så mod en fjende op til 25 m væk. Ved ankomst påføres 60% våbenskade og gives 1 kombopoint; et afbrudt spring refunderer sin nedkøling. Kan bruges i enhver form."
+        "description": "Skift til Katteform, hvis du ikke allerede er i den, og spring så mod en fjende op til 25 m væk. Ved ankomst påføres 60% våbenskade, der gives 1 kombopoint, og som Forvildet tilføjes 1 Gammelt Blod (maks. 3); et afbrudt spring refunderer sin nedkøling. Kan bruges i enhver form."
       },
       "hamstring_bite": {
         "name": "Nedlæggelse",
@@ -18720,7 +18720,7 @@ export const da_DK: EnTranslations = {
       },
       "redharvest": {
         "name": "Rød Høst",
-        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, forlænger dine Flæns og Blodrevne på målet med 4 sek. (op til 8 sek. hver), får dine blødninger på målet til at tikke 50% hurtigere i 8 sek. (Rød Strøm) og gendanner {rage} energi. Virker uden kombopoint."
+        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, forlænger dine Flæns og Blodrevne på målet med 8 sek. (op til 16 sek. hver), får dine blødninger på målet til at tikke 30% hurtigere i 8 sek. (Rød Strøm) og gendanner {rage} energi. Virker uden kombopoint."
       },
       "marrowbreak": {
         "name": "Marvbrækker",

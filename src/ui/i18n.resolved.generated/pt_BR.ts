@@ -18416,7 +18416,7 @@ export const pt_BR: EnTranslations = {
       "claw": {
         "name": "Garra Dilacerante",
         "description": "Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Gato.",
-        "specNote_feral": "Cada acerto adiciona um acúmulo de Farrapos, um sangramento de 12 de dano ao longo de 8 s por acúmulo (máx. 5 acúmulos). Um novo acúmulo renova a duração."
+        "specNote_feral": "Cada acerto adiciona um acúmulo de Farrapos, um sangramento de 8 de dano ao longo de 8 s por acúmulo (máx. 5 acúmulos). Um novo acúmulo renova a duração."
       },
       "scratch": {
         "name": "Arranhão",
@@ -18426,7 +18426,7 @@ export const pt_BR: EnTranslations = {
       "ferocious_bite": {
         "name": "Mordida Sanguinária",
         "description": "Movimento finalizador que causa {damage}. Apenas Forma de Gato.",
-        "specNote_feral": "Causa 15% a mais de dano para cada um dos seus sangramentos no alvo e renova sua Fenda Sangrenta para a duração total. Com 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em um golpe que prolonga seus Esfolar e Fenda Sangrenta, faz seus sangramentos no alvo darem tiques 50% mais rápido por 8 s e restaura energia."
+        "specNote_feral": "Causa 15% a mais de dano para cada um dos seus sangramentos no alvo e renova sua Fenda Sangrenta para a duração total. Com 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em um golpe que prolonga seus Esfolar e Fenda Sangrenta, faz seus sangramentos no alvo darem tiques 30% mais rápido por 8 s e restaura energia."
       },
       "swipe": {
         "name": "Garras Varredoras",
@@ -18481,11 +18481,11 @@ export const pt_BR: EnTranslations = {
       },
       "pounce": {
         "name": "Bote Furtivo",
-        "description": "Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo e, como Feral, abre Rasga-garganta, um sangramento de 72 de dano ao longo de 12 s. Apenas Forma de Gato. Fora da furtividade, este botão é Bote."
+        "description": "Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo e, como Feral, adiciona 1 de Sangue Antigo (máx. 3) e abre Rasga-garganta, um sangramento de 72 de dano ao longo de 12 s. Apenas Forma de Gato. Fora da furtividade, este botão é Bote."
       },
       "lunge": {
         "name": "Bote",
-        "description": "Assume a Forma de Gato se ainda não estiver nela e dá um bote em um inimigo a até 25 m. Ao chegar, causa 60% do dano da arma e concede 1 ponto de combo; um bote interrompido devolve sua recarga. Utilizável em qualquer forma."
+        "description": "Assume a Forma de Gato se ainda não estiver nela e dá um bote em um inimigo a até 25 m. Ao chegar, causa 60% do dano da arma, concede 1 ponto de combo e, como Feral, adiciona 1 de Sangue Antigo (máx. 3); um bote interrompido devolve sua recarga. Utilizável em qualquer forma."
       },
       "hamstring_bite": {
         "name": "Derrubada",
@@ -18720,7 +18720,7 @@ export const pt_BR: EnTranslations = {
       },
       "redharvest": {
         "name": "Colheita Vermelha",
-        "description": "Consome seus 3 de Sangue Antigo: golpeia por {damage}, prolonga seus Esfolar e Fenda Sangrenta no alvo em 4 s (até 8 s cada), faz seus sangramentos no alvo darem tiques 50% mais rápido por 8 s (Torrente Vermelha) e restaura {rage} de energia. Funciona sem pontos de combo."
+        "description": "Consome seus 3 de Sangue Antigo: golpeia por {damage}, prolonga seus Esfolar e Fenda Sangrenta no alvo em 8 s (até 16 s cada), faz seus sangramentos no alvo darem tiques 30% mais rápido por 8 s (Torrente Vermelha) e restaura {rage} de energia. Funciona sem pontos de combo."
       },
       "marrowbreak": {
         "name": "Quebra-Medula",

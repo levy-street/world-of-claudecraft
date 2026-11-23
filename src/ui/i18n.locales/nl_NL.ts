@@ -8297,10 +8297,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verandert de vijand in een pad gedurende maximaal {duration} sec. De pad dwaalt rond en geneest snel. Elke schade verbreekt het effect. Alleen beesten en humanoïden.',
   'entities.abilities.polymorph.name': 'Beheksen',
   'entities.abilities.pounce.description':
-    'Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op en opent met de specialisatie Wild Keelrijt, een bloeding van 72 schade over 12 sec. Alleen in Katgedaante. Buiten sluiptocht is deze knop Uitval.',
+    'Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op en voegt met de specialisatie Wild 1 Oud Bloed toe (max 3) en opent Keelrijt, een bloeding van 72 schade over 12 sec. Alleen in Katgedaante. Buiten sluiptocht is deze knop Uitval.',
   'entities.abilities.pounce.name': 'Sluipslag',
   'entities.abilities.lunge.description':
-    'Verander in Katgedaante als je dat nog niet bent en stort je dan op een vijand op maximaal 25 yard afstand. Bij aankomst doe je 60% wapenschade en krijg je 1 combopunt; een voortijdig afgebroken Uitval herstelt de herlaadtijd. Bruikbaar in elke gedaante.',
+    'Verander in Katgedaante als je dat nog niet bent en stort je dan op een vijand op maximaal 25 yard afstand. Bij aankomst doe je 60% wapenschade, krijg je 1 combopunt en voeg je met de specialisatie Wild 1 Oud Bloed toe (max 3); een voortijdig afgebroken Uitval herstelt de herlaadtijd. Bruikbaar in elke gedaante.',
   'entities.abilities.lunge.name': 'Uitval',
   'entities.abilities.hamstring_bite.description':
     'Afmaakactie die het doelwit verdooft voor 1 sec plus 1 sec per combopunt (5 combopunten: 6 sec). Alleen in Katsgedaante.',
@@ -16134,7 +16134,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verbruikt 3 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Sporenheling op het doelwit.',
   'entities.abilities.redharvest.name': 'Rode Oogst',
   'entities.abilities.redharvest.description':
-    'Verbruikt je 3 Oud Bloed: een slag voor {damage}, verlengt je Villen en Bloedscheur op het doelwit met 4 sec (tot 8 sec elk), laat je bloedingen op het doelwit 8 sec lang 50% sneller tikken (Rode Stroom) en herstelt {rage} energie. Werkt ook zonder combopunten.',
+    'Verbruikt je 3 Oud Bloed: een slag voor {damage}, verlengt je Villen en Bloedscheur op het doelwit met 8 sec (tot 16 sec elk), laat je bloedingen op het doelwit 8 sec lang 30% sneller tikken (Rode Stroom) en herstelt {rage} energie. Werkt ook zonder combopunten.',
   'entities.abilities.sunlance.name': 'Zonnespoor',
   'entities.abilities.sunlance.description':
     'Verbruikt je 3 Maanvloed voor een slag van {damage} Natuur-schade plus een brandwond van {overTime} over 9 sec, en herstelt 35 mana: de manakeuze. Maangolf verbruikt dezelfde 3 Maanvloed, dus kies er een.',
@@ -16632,7 +16632,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Katgedaante.',
   'entities.abilities.claw.specNote_feral':
-    'Elke slag die raakt voegt een stapel Flarden toe, een bloeding van 12 schade over 8 sec per stapel (max 5 stapels). Een nieuwe stapel ververst de duur.',
+    'Elke slag die raakt voegt een stapel Flarden toe, een bloeding van 8 schade over 8 sec per stapel (max 5 stapels). Een nieuwe stapel ververst de duur.',
   'entities.abilities.cold_blood.description':
     'Focust je moordlust zodat je volgende 5 aanvallen kritieke treffers zijn. (Knifework-motor)',
   'entities.abilities.corpse_explosion.description':
@@ -16668,7 +16668,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Afmaakactie die {damage} veroorzaakt. Alleen in Katgedaante.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Doet 15% meer schade voor elke bloeding van jou op het doelwit en ververst je Bloedscheur tot de volledige duur. Bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een slag die je Villen en Bloedscheur verlengt, je bloedingen op het doelwit 8 sec lang 50% sneller laat tikken en energie herstelt.',
+    'Doet 15% meer schade voor elke bloeding van jou op het doelwit en ververst je Bloedscheur tot de volledige duur. Bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een slag die je Villen en Bloedscheur verlengt, je bloedingen op het doelwit 8 sec lang 30% sneller laat tikken en energie herstelt.',
   'entities.abilities.funeral_harvest.description':
     'Wanneer een vijand die onlangs door jou of je ondoden is beschadigd sterft, krijg je 1 Zielfragment. Dit kan hoogstens eenmaal per 3 sec gebeuren.',
   'entities.abilities.funeral_harvest.name': 'Begrafenisoogst',

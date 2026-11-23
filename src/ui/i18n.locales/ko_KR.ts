@@ -6341,13 +6341,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '표범 변신 상태가 아니면 먼저 변신한 뒤 15초 동안 이동 속도가 50% 증가하는 질주를 합니다. 어떤 변신 상태에서도 사용 가능합니다. 즉시 시전하며 전역 재사용 대기시간을 유발하지 않습니다.',
   'entities.abilities.pounce.name': '살금 기습',
   'entities.abilities.lunge.description':
-    '표범 변신 상태가 아니라면 먼저 변신한 뒤, 최대 25yd 떨어진 적에게 달려듭니다. 도착하면 무기 공격력의 60%만큼 피해를 입히고 연계 점수 1점을 얻습니다. 도중에 끊기면 재사용 대기시간이 반환됩니다. 모든 형태에서 사용 가능.',
+    '표범 변신 상태가 아니라면 먼저 변신한 뒤, 최대 25yd 떨어진 적에게 달려듭니다. 도착하면 무기 공격력의 60%만큼 피해를 입히고 연계 점수 1점을 얻으며, 야성 전문화에서는 오랜 피가 1단계 쌓입니다(최대 3단계). 도중에 끊기면 재사용 대기시간이 반환됩니다. 모든 형태에서 사용 가능.',
   'entities.abilities.lunge.name': '도약 습격',
   'entities.abilities.hamstring_bite.description':
     '대상을 1초에 더해 연계 점수 하나당 1초 기절시키는 마무리 기술입니다 (연계 점수 5: 6초). 표범 변신 상태에서만 사용 가능.',
   'entities.abilities.hamstring_bite.name': '쓰러뜨리기',
   'entities.abilities.pounce.description':
-    '은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻으며, 야성 전문화에서는 12초에 걸쳐 72의 피해를 입히는 출혈 효과인 목 찢기를 겁니다. 표범 변신 전용. 은신 상태가 아니면 이 버튼은 도약 습격이 됩니다.',
+    '은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻으며, 야성 전문화에서는 오랜 피가 1단계 쌓이고(최대 3단계) 12초에 걸쳐 72의 피해를 입히는 출혈 효과인 목 찢기를 겁니다. 표범 변신 전용. 은신 상태가 아니면 이 버튼은 도약 습격이 됩니다.',
   'entities.abilities.insect_swarm.name': '쏘는 벌레 떼',
   'entities.abilities.insect_swarm.description':
     '적이 곤충 떼에 휩싸여 12초에 걸쳐 {damage}의 자연 피해를 입습니다.',
@@ -17300,7 +17300,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '피부를 식은 용암 찌꺼기처럼 10초 동안 굳혀 받는 모든 피해를 25% 감소시킵니다.',
   'entities.abilities.cinderhide.name': '잿가죽',
   'entities.abilities.claw.specNote_feral':
-    '적중한 공격마다 갈가리 찢기를 1중첩 쌓습니다. 중첩당 8초에 걸쳐 12의 피해를 입히는 출혈 효과입니다(최대 5중첩). 새 중첩이 쌓이면 지속시간이 초기화됩니다.',
+    '적중한 공격마다 갈가리 찢기를 1중첩 쌓습니다. 중첩당 8초에 걸쳐 8의 피해를 입히는 출혈 효과입니다(최대 5중첩). 새 중첩이 쌓이면 지속시간이 초기화됩니다.',
   'entities.abilities.scratch.specNote_feral':
     '적중한 각 적에게 할퀸 상처 출혈도 일으킵니다: 6초에 걸쳐 12의 피해.',
   'entities.abilities.cold_focus.description':
@@ -17350,7 +17350,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '8초 동안 다음에 받는 적의 공격에 응답합니다. 최대 {buff}의 피해를 막고 같은 양을 신성 피해로 공격자에게 되돌려주며, 헌신을 1 얻습니다. 한 번의 공격에만 응답합니다. 승천은 응답할 수 있는 양을 50% 증가시킵니다.',
   'entities.abilities.faithforged_guard.name': '빛의 빚',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '대상에 걸린 자신의 출혈 효과 하나당 피해가 15% 증가하며, 피의 균열의 지속시간을 최대로 초기화합니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 오랜 피를 소모하는 일격으로, 자신의 저미기와 피의 균열을 연장하고 대상에 걸린 자신의 출혈 효과가 8초 동안 50% 더 빠르게 피해를 주게 하며 기력을 회복합니다.',
+    '대상에 걸린 자신의 출혈 효과 하나당 피해가 15% 증가하며, 피의 균열의 지속시간을 최대로 초기화합니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 오랜 피를 소모하는 일격으로, 자신의 저미기와 피의 균열을 연장하고 대상에 걸린 자신의 출혈 효과가 8초 동안 30% 더 빠르게 피해를 주게 하며 기력을 회복합니다.',
   'entities.abilities.fieldcraft_reentry.description':
     '지속 효과: 사냥의 기세가 있을 때 흔적 끊기가 다음 내장 가르기나 피갈고리를 12초 동안 강화합니다. 내장 가르기는 중첩당 피해가 15% 증가합니다. 피갈고리는 추가 물리 피해 18~24를 주며 이 피해는 중첩당 15% 및 원거리 전투력에 따라 증가합니다. 3중첩이면 두 공격 중 어느 것이든 사냥의 기세를 소모합니다. (생존)',
   'entities.abilities.fieldcraft_reentry.name': '재진입 준비',
@@ -17482,7 +17482,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '죽은 파티원을 당신 곁에서 생명력과 마나가 35%인 상태로 되살립니다. 레벨 16 이상의 태양 치유사는 대신 파티에서 30야드 내 시야가 닿는 쓰러진 모든 구성원을 불러 되살립니다.',
   'entities.abilities.recall_the_fallen.name': '쓰러진 자 소환',
   'entities.abilities.redharvest.description':
-    '오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 대상에 걸린 자신의 저미기와 피의 균열을 4초 연장하며(각각 최대 8초), 대상에 걸린 자신의 출혈 효과가 8초 동안 50% 더 빠르게 피해를 주게 하고(붉은 격류), 기력을 {rage}만큼 회복합니다. 연계 점수가 없어도 사용할 수 있습니다.',
+    '오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 대상에 걸린 자신의 저미기와 피의 균열을 8초 연장하며(각각 최대 16초), 대상에 걸린 자신의 출혈 효과가 8초 동안 30% 더 빠르게 피해를 주게 하고(붉은 격류), 기력을 {rage}만큼 회복합니다. 연계 점수가 없어도 사용할 수 있습니다.',
   'entities.abilities.redharvest.name': '피의 수확',
   'entities.abilities.regrowth.specNote_restoration':
     '시전할 때마다 푸른 생장이 1단계 쌓입니다(최대 3단계). 이미 효과가 지속 중인 개화를 갱신해도 쌓입니다.',

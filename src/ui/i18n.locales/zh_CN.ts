@@ -7749,13 +7749,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '若当前不是豹形态，先切换为豹形态，再冲刺，使移动速度提高50%，持续15秒。任何形态下均可使用。瞬发，不触发公共冷却。',
   'entities.abilities.pounce.name': '匿袭',
   'entities.abilities.lunge.description':
-    '如果尚未处于豹形态则先变为豹形态，然后扑向最远25码外的敌人。抵达时造成60%武器伤害并获得1个连击点；扑击中途被打断会返还其冷却时间。任何形态下均可使用。',
+    '如果尚未处于豹形态则先变为豹形态，然后扑向最远25码外的敌人。抵达时造成60%武器伤害并获得1个连击点，野性专精下还会累积1层古血（最多3层）；扑击中途被打断会返还其冷却时间。任何形态下均可使用。',
   'entities.abilities.lunge.name': '扑击',
   'entities.abilities.hamstring_bite.description':
     '终结技，昏迷目标 1 秒外加每点连击点 1 秒（5 点连击点：6 秒）。仅限豹形态使用。',
   'entities.abilities.hamstring_bite.name': '扑倒',
   'entities.abilities.pounce.description':
-    '一个潜行开场技，昏迷目标 2 秒。奖励 1 个连击点，野性专精下还会施加裂喉，一个在 12 秒内造成 72 点伤害的流血效果。仅限豹形态。未潜行时，此按钮为扑击。',
+    '一个潜行开场技，昏迷目标 2 秒。奖励 1 个连击点，野性专精下还会累积1层古血（最多3层）并施加裂喉，一个在 12 秒内造成 72 点伤害的流血效果。仅限豹形态。未潜行时，此按钮为扑击。',
   'entities.abilities.insect_swarm.name': '蜇刺虫群',
   'entities.abilities.insect_swarm.description':
     '敌人被虫群侵袭，在 12 秒内受到 {damage} 点自然伤害。',
@@ -18178,7 +18178,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。',
   'entities.abilities.cinderhide.name': '熔渣皮肤',
   'entities.abilities.claw.specNote_feral':
-    '每次命中叠加1层撕碎，每层为一个在8秒内造成12点伤害的流血效果（最多5层）。叠加新的一层会刷新持续时间。',
+    '每次命中叠加1层撕碎，每层为一个在8秒内造成8点伤害的流血效果（最多5层）。叠加新的一层会刷新持续时间。',
   'entities.abilities.scratch.specNote_feral':
     '每个被击中的敌人还会受到抓伤流血效果：在6秒内造成12点伤害。',
   'entities.abilities.cold_focus.description':
@@ -18228,7 +18228,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。',
   'entities.abilities.faithforged_guard.name': '圣光之债',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '目标身上每有一个你的流血效果，造成的伤害提高15%，并将你的血隙刷新为完整持续时间。古血达到3层时，此按钮变为血收：消耗古血发动一次打击，延长你的剐削与血隙，使你在目标身上的流血效果跳动速度提高50%，持续8秒，并恢复能量。',
+    '目标身上每有一个你的流血效果，造成的伤害提高15%，并将你的血隙刷新为完整持续时间。古血达到3层时，此按钮变为血收：消耗古血发动一次打击，延长你的剐削与血隙，使你在目标身上的流血效果跳动速度提高30%，持续8秒，并恢复能量。',
   'entities.abilities.fieldcraft_reentry.description':
     '被动：拥有狩猎势能时，断迹使你的下一次剖膛一击或血钩获得强化，持续12秒。剖膛一击每层增伤15%。血钩额外造成18至24点物理伤害，该伤害每层提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（生存）',
   'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
@@ -18357,7 +18357,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使一名死亡的小队成员回到你身边复活，并恢复 35% 的生命值和法力值。16 级或以上的黎明愈者则会改为呼唤小队中 30 码内且在你视线内的所有阵亡成员回到你身边复活。',
   'entities.abilities.recall_the_fallen.name': '唤回逝者',
   'entities.abilities.redharvest.description':
-    '消耗你的3层古血：造成{damage}点伤害，将你在目标身上的剐削与血隙各延长4秒（每个最多延长8秒），使你在目标身上的流血效果跳动速度提高50%，持续8秒（赤红奔流），并恢复{rage}点能量。无需连击点也可使用。',
+    '消耗你的3层古血：造成{damage}点伤害，将你在目标身上的剐削与血隙各延长8秒（每个最多延长16秒），使你在目标身上的流血效果跳动速度提高30%，持续8秒（赤红奔流），并恢复{rage}点能量。无需连击点也可使用。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.regrowth.specNote_restoration':
     '每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。',

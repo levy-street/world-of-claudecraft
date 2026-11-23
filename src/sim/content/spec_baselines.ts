@@ -270,14 +270,18 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'maul', dmgPct: 0.35 },
-        // Feral bleed rework: Rendclaw and Scratch gave up their +15% (they now
-        // plant Tatter and Scratch Wound, combat/druid_bleeds.ts) and Gorebite
-        // starts 30% lower because it gains 15% per bleed on the target. These
-        // rows are the Monte Carlo tuning knobs for the direct-to-bleed shift.
-        { ability: 'claw', dmgPct: 0 },
+        // Feral bleed rework: Rendclaw and Scratch went from +15% to -15% (they
+        // now plant Tatter and Scratch Wound, combat/druid_bleeds.ts), Gorebite
+        // starts 30% lower because it gains 15% per bleed on the target, and
+        // Redharvest is 20% lower because it now extends and speeds the bleeds
+        // instead of cashing them out. Sized by the Monte Carlo pass A1 (L20
+        // Nythraxis-armor dummy, 120 sec, 10 seeds): about 187 to 189 DPS
+        // against 170 for the pre-rework kit and a 145 to 190 peer band.
+        { ability: 'claw', dmgPct: -0.15 },
         // Scratch copies Rendclaw's damage profile, baseline row included.
-        { ability: 'scratch', dmgPct: 0 },
+        { ability: 'scratch', dmgPct: -0.15 },
         { ability: 'ferocious_bite', dmgPct: -0.3 },
+        { ability: 'redharvest', dmgPct: -0.2 },
         { ability: 'swipe', dmgPct: 0.2 },
       ],
     },

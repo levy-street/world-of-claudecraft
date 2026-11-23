@@ -18416,7 +18416,7 @@ export const vi_VN: EnTranslations = {
       "claw": {
         "name": "Vuốt Xé",
         "description": "Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm một tầng Xé Tơi, một hiệu ứng chảy máu gây 12 sát thương trong 8 giây mỗi tầng (tối đa 5 tầng). Tầng mới làm mới thời gian hiệu lực."
+        "specNote_feral": "Mỗi đòn đánh trúng thêm một tầng Xé Tơi, một hiệu ứng chảy máu gây 8 sát thương trong 8 giây mỗi tầng (tối đa 5 tầng). Tầng mới làm mới thời gian hiệu lực."
       },
       "scratch": {
         "name": "Cào",
@@ -18426,7 +18426,7 @@ export const vi_VN: EnTranslations = {
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
         "description": "Đòn kết liễu gây {damage}. Chỉ trong Hình Mèo.",
-        "specNote_feral": "Gây thêm 15% sát thương cho mỗi hiệu ứng chảy máu của bạn trên mục tiêu và làm mới Vết Nứt Máu của bạn về toàn bộ thời gian hiệu lực. Ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một đòn đánh kéo dài Lóc Xé và Vết Nứt Máu của bạn, khiến các hiệu ứng chảy máu của bạn trên mục tiêu gây sát thương nhanh hơn 50% trong 8 giây, và hồi năng lượng."
+        "specNote_feral": "Gây thêm 15% sát thương cho mỗi hiệu ứng chảy máu của bạn trên mục tiêu và làm mới Vết Nứt Máu của bạn về toàn bộ thời gian hiệu lực. Ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một đòn đánh kéo dài Lóc Xé và Vết Nứt Máu của bạn, khiến các hiệu ứng chảy máu của bạn trên mục tiêu gây sát thương nhanh hơn 30% trong 8 giây, và hồi năng lượng."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
@@ -18481,11 +18481,11 @@ export const vi_VN: EnTranslations = {
       },
       "pounce": {
         "name": "Đòn Lẻn Vồ",
-        "description": "Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn và, khi là Hoang Dã, mở Xé Họng, một hiệu ứng chảy máu gây 72 sát thương trong 12 giây. Chỉ dùng được ở Hình Mèo. Khi không ẩn thân, nút này là Lao Vồ."
+        "description": "Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn và, khi là Hoang Dã, thêm 1 Huyết Cổ (tối đa 3) và mở Xé Họng, một hiệu ứng chảy máu gây 72 sát thương trong 12 giây. Chỉ dùng được ở Hình Mèo. Khi không ẩn thân, nút này là Lao Vồ."
       },
       "lunge": {
         "name": "Lao Vồ",
-        "description": "Chuyển sang Hình Mèo nếu bạn chưa ở dạng đó, rồi lao vào kẻ địch cách xa tới 25 thước. Khi tới nơi, gây 60% sát thương vũ khí và nhận 1 điểm liên hoàn; cú lao bị cắt ngang sẽ hoàn lại thời gian hồi chiêu. Dùng được ở mọi hình dạng."
+        "description": "Chuyển sang Hình Mèo nếu bạn chưa ở dạng đó, rồi lao vào kẻ địch cách xa tới 25 thước. Khi tới nơi, gây 60% sát thương vũ khí, nhận 1 điểm liên hoàn và, khi là Hoang Dã, thêm 1 Huyết Cổ (tối đa 3); cú lao bị cắt ngang sẽ hoàn lại thời gian hồi chiêu. Dùng được ở mọi hình dạng."
       },
       "hamstring_bite": {
         "name": "Quật Ngã",
@@ -18720,7 +18720,7 @@ export const vi_VN: EnTranslations = {
       },
       "redharvest": {
         "name": "Thu Hoạch Đỏ",
-        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, kéo dài Lóc Xé và Vết Nứt Máu của bạn trên mục tiêu thêm 4 giây (tối đa 8 giây mỗi hiệu ứng), khiến các hiệu ứng chảy máu của bạn trên mục tiêu gây sát thương nhanh hơn 50% trong 8 giây (Dòng Thác Đỏ) và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn."
+        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, kéo dài Lóc Xé và Vết Nứt Máu của bạn trên mục tiêu thêm 8 giây (tối đa 16 giây mỗi hiệu ứng), khiến các hiệu ứng chảy máu của bạn trên mục tiêu gây sát thương nhanh hơn 30% trong 8 giây (Dòng Thác Đỏ) và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn."
       },
       "marrowbreak": {
         "name": "Đoạn Tủy",

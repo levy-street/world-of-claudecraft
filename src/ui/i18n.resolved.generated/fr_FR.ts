@@ -18416,7 +18416,7 @@ export const fr_FR: EnTranslations = {
       "claw": {
         "name": "Griffe lacérante",
         "description": "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de chat uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute une charge de Lambeaux, un saignement de 12 points de dégâts en 8 s par charge (5 charges au maximum). Une nouvelle charge réinitialise la durée."
+        "specNote_feral": "Chaque coup porté ajoute une charge de Lambeaux, un saignement de 8 points de dégâts en 8 s par charge (5 charges au maximum). Une nouvelle charge réinitialise la durée."
       },
       "scratch": {
         "name": "Griffure",
@@ -18426,7 +18426,7 @@ export const fr_FR: EnTranslations = {
       "ferocious_bite": {
         "name": "Morsure sanglante",
         "description": "Technique de finition qui inflige {damage}. Forme de chat uniquement.",
-        "specNote_feral": "Inflige 15% de dégâts supplémentaires pour chacun de vos saignements sur la cible et ramène votre Faille sanglante à sa durée maximale. À 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe qui prolonge vos Écorcher et Faille sanglante, accélère de 50% les tics de vos saignements sur la cible pendant 8 s, et restaure de l'énergie."
+        "specNote_feral": "Inflige 15% de dégâts supplémentaires pour chacun de vos saignements sur la cible et ramène votre Faille sanglante à sa durée maximale. À 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe qui prolonge vos Écorcher et Faille sanglante, accélère de 30% les tics de vos saignements sur la cible pendant 8 s, et restaure de l'énergie."
       },
       "swipe": {
         "name": "Griffes balayantes",
@@ -18481,11 +18481,11 @@ export const fr_FR: EnTranslations = {
       },
       "pounce": {
         "name": "Frappe furtive",
-        "description": "Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo et, en Farouche, inflige Lacère-gorge, un saignement de 72 points de dégâts en 12 s. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond."
+        "description": "Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo et, en Farouche, ajoute 1 Sang ancien (maximum 3) et inflige Lacère-gorge, un saignement de 72 points de dégâts en 12 s. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond."
       },
       "lunge": {
         "name": "Bond",
-        "description": "Prend la Forme de chat si ce n'est pas déjà le cas, puis bondit sur un ennemi jusqu'à 25 m. À l'arrivée, inflige 60% des dégâts de l'arme et confère 1 point de combo ; un bond interrompu rembourse son temps de recharge. Utilisable sous n'importe quelle forme."
+        "description": "Prend la Forme de chat si ce n'est pas déjà le cas, puis bondit sur un ennemi jusqu'à 25 m. À l'arrivée, inflige 60% des dégâts de l'arme, confère 1 point de combo et, en Farouche, ajoute 1 Sang ancien (maximum 3) ; un bond interrompu rembourse son temps de recharge. Utilisable sous n'importe quelle forme."
       },
       "hamstring_bite": {
         "name": "Mise à terre",
@@ -18720,7 +18720,7 @@ export const fr_FR: EnTranslations = {
       },
       "redharvest": {
         "name": "Moisson rouge",
-        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, prolonge vos Écorcher et Faille sanglante sur la cible de 4 s (jusqu'à 8 s chacun), accélère de 50% les tics de vos saignements sur la cible pendant 8 s (Torrent rouge) et rend {rage} points d'énergie. Fonctionne sans aucun point de combo."
+        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, prolonge vos Écorcher et Faille sanglante sur la cible de 8 s (jusqu'à 16 s chacun), accélère de 30% les tics de vos saignements sur la cible pendant 8 s (Torrent rouge) et rend {rage} points d'énergie. Fonctionne sans aucun point de combo."
       },
       "marrowbreak": {
         "name": "Brise-moelle",

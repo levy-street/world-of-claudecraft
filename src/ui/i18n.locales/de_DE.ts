@@ -9749,13 +9749,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Wechsle in Katzengestalt, falls du sie noch nicht hast, und sprinte mit 50% mehr Bewegungstempo für 15 Sek. In jeder Gestalt nutzbar. Sofort und ohne globale Abklingzeit.',
   'entities.abilities.pounce.name': 'Schleichschlag',
   'entities.abilities.lunge.description':
-    'Nehmt Katzengestalt an, falls Ihr nicht bereits darin seid, und springt dann einen bis zu 25 m entfernten Gegner an. Bei der Ankunft verursacht Ihr 60% Waffenschaden und erhaltet 1 Combopunkt; ein vorzeitig abgebrochener Ansprung erstattet seine Abklingzeit zurück. In jeder Gestalt nutzbar.',
+    'Nehmt Katzengestalt an, falls Ihr nicht bereits darin seid, und springt dann einen bis zu 25 m entfernten Gegner an. Bei der Ankunft verursacht Ihr 60% Waffenschaden, erhaltet 1 Combopunkt und fügt als Wilder Kampf 1 Altes Blut hinzu (max. 3); ein vorzeitig abgebrochener Ansprung erstattet seine Abklingzeit zurück. In jeder Gestalt nutzbar.',
   'entities.abilities.lunge.name': 'Ansprung',
   'entities.abilities.hamstring_bite.description':
     'Finishing-Move, der das Ziel 1 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 6 Sek.). Nur in Katzengestalt.',
   'entities.abilities.hamstring_bite.name': 'Niederreißen',
   'entities.abilities.pounce.description':
-    'Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt und öffnet als Wilder Kampf Kehlriss, eine Blutung, die 72 Schaden über 12 Sek. verursacht. Nur in Katzengestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung.',
+    'Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt und fügt als Wilder Kampf 1 Altes Blut hinzu (max. 3) und öffnet Kehlriss, eine Blutung, die 72 Schaden über 12 Sek. verursacht. Nur in Katzengestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung.',
   'entities.abilities.insect_swarm.name': 'Stechender Schwarm',
   'entities.abilities.insect_swarm.description':
     'Der Gegner wird von Insekten umschwärmt und erleidet {damage} Naturschaden über 12 Sek.',
@@ -15303,7 +15303,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Sporenheilung auf das Ziel.',
   'entities.abilities.redharvest.name': 'Rote Ernte',
   'entities.abilities.redharvest.description':
-    'Verbraucht 3 Altes Blut: ein Schlag für {damage}, verlängert Euer Schinden und Euren Blutriss auf dem Ziel um 4 Sek. (bis zu 8 Sek. je Blutung), lässt Eure Blutungen auf dem Ziel 8 Sek. lang 50% schneller ticken (Roter Strom) und stellt {rage} Energie wieder her. Funktioniert auch ohne Combopunkte.',
+    'Verbraucht 3 Altes Blut: ein Schlag für {damage}, verlängert Euer Schinden und Euren Blutriss auf dem Ziel um 8 Sek. (bis zu 16 Sek. je Blutung), lässt Eure Blutungen auf dem Ziel 8 Sek. lang 30% schneller ticken (Roter Strom) und stellt {rage} Energie wieder her. Funktioniert auch ohne Combopunkte.',
   'entities.abilities.sunlance.name': 'Sonnenspur',
   'entities.abilities.sunlance.description':
     'Verbraucht 3 Mondflut für einen Schlag mit {damage} Naturschaden plus einem Brand von {overTime} über 9 Sek. und stellt 35 Mana wieder her: die Manawahl. Mondwoge verbraucht dieselben 3 Mondflut, also wählt eine.',
@@ -16933,7 +16933,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Krallt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Katzengestalt.',
   'entities.abilities.claw.specNote_feral':
-    'Jeder Treffer, der landet, fügt einen Stapel Fetzen hinzu, eine Blutung, die pro Stapel 12 Schaden über 8 Sek. verursacht (max. 5 Stapel). Ein neuer Stapel erneuert die Dauer.',
+    'Jeder Treffer, der landet, fügt einen Stapel Fetzen hinzu, eine Blutung, die pro Stapel 8 Schaden über 8 Sek. verursacht (max. 5 Stapel). Ein neuer Stapel erneuert die Dauer.',
   'entities.abilities.cold_blood.description':
     'Bündelt Euren Tötungswillen, sodass Eure nächsten 5 Angriffe kritisch treffen. (Knifework-Engine)',
   'entities.abilities.corpse_explosion.description':
@@ -16969,7 +16969,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Finishing-Move, der {damage} verursacht. Nur in Katzengestalt.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Verursacht 15% mehr Schaden für jede Eurer Blutungen auf dem Ziel und setzt Euren Blutriss auf seine volle Dauer zurück. Bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen Schlag verbraucht, der Euer Schinden und Euren Blutriss verlängert, Eure Blutungen auf dem Ziel 8 Sek. lang 50% schneller ticken lässt und Energie wiederherstellt.',
+    'Verursacht 15% mehr Schaden für jede Eurer Blutungen auf dem Ziel und setzt Euren Blutriss auf seine volle Dauer zurück. Bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen Schlag verbraucht, der Euer Schinden und Euren Blutriss verlängert, Eure Blutungen auf dem Ziel 8 Sek. lang 30% schneller ticken lässt und Energie wiederherstellt.',
   'entities.abilities.funeral_harvest.description':
     'Stirbt ein Gegner, der kürzlich von Euch oder Euren Untoten Schaden erlitten hat, erhaltet Ihr 1 Seelenfragment. Dies kann höchstens alle 3 Sek. eintreten.',
   'entities.abilities.funeral_harvest.name': 'Grabesernte',

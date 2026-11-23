@@ -1,7 +1,7 @@
 // The v0.43 Wildfang pass, one suite per change:
 //   1. every melee attack a feral druid makes reaches 1 yd further
-//   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3); the feral bleed
-//      rework retired that (Cat bleeds bank instead, Slinkstrike opens Throatrake)
+//   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3); kept by the feral
+//      bleed rework, which also has Slinkstrike open Throatrake
 //   3. Nature's Boon: a landed autoattack has a 1-in-15 chance to arm one free
 //      Wildbloom (any form, 50% stronger) OR Oakhide (Bruin only, 25%
 //      stronger) for 10 sec
@@ -232,16 +232,17 @@ describe('1. Wildfang reach: +1 yd on melee attacks', () => {
   });
 });
 
-// Since the feral bleed rework Cat Form strikes bank no Old Blood (its bleed
-// ticks do, tests/feral_bleed_rework.test.ts); the opener plants Throatrake.
+// The feral bleed rework kept Old Blood on both engage tools (Cat builders and
+// finishers bank from bleed ticks instead, tests/feral_bleed_rework.test.ts).
 describe('2. Slinkstrike and Lunge (feral bleed rework)', () => {
-  it('bank no Old Blood on a landed hit', () => {
+  it('Slinkstrike and Lunge still bank one Old Blood each', () => {
     const { sim, player } = rig('feral');
     const ctx = rawCtx(sim);
 
     druidEngineOnLandedStrike(ctx, player, 'pounce');
+    expect(player.auras.find((entry) => entry.id === OLD_BLOOD_ID)?.stacks).toBe(1);
     druidEngineOnLandedStrike(ctx, player, 'lunge');
-    expect(player.auras.some((entry) => entry.id === OLD_BLOOD_ID)).toBe(false);
+    expect(player.auras.find((entry) => entry.id === OLD_BLOOD_ID)?.stacks).toBe(2);
     // The cap is unchanged for the Bruin strikes that still bank.
     expect(OLD_BLOOD_STAGES).toBe(3);
   });
@@ -262,6 +263,7 @@ describe('2. Slinkstrike and Lunge (feral bleed rework)', () => {
           entry.id === 'throatrake' && entry.kind === 'dot' && entry.sourceId === player.id,
       ),
     ).toBe(true);
+    expect(player.auras.find((entry) => entry.id === OLD_BLOOD_ID)?.stacks).toBe(1);
     expect(player.comboPoints).toBe(1);
   });
 });

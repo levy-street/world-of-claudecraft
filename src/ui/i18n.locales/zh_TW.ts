@@ -7750,13 +7750,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '若目前不是貓形態，先切換為貓形態，再衝刺，使移動速度提高50%，持續15秒。任何形態下均可使用。瞬發，不觸發公共冷卻。',
   'entities.abilities.pounce.name': '匿蹤突襲',
   'entities.abilities.lunge.description':
-    '若尚未處於貓形態則先變為貓形態，然後撲向最遠 25 碼外的敵人。抵達時造成 60% 武器傷害並獲得 1 個連擊點；撲擊中途被打斷會返還其冷卻時間。任何形態下皆可使用。',
+    '若尚未處於貓形態則先變為貓形態，然後撲向最遠 25 碼外的敵人。抵達時造成 60% 武器傷害並獲得 1 個連擊點，野性專精下還會累積 1 層古血（最多 3 層）；撲擊中途被打斷會返還其冷卻時間。任何形態下皆可使用。',
   'entities.abilities.lunge.name': '撲擊',
   'entities.abilities.hamstring_bite.description':
     '終結技，昏迷目標 1 秒外加每點連擊點 1 秒（5 點連擊點：6 秒）。僅限貓形態。',
   'entities.abilities.hamstring_bite.name': '撲倒',
   'entities.abilities.pounce.description':
-    '一個潛行開場技，昏迷目標 2 秒。獎勵 1 個連擊點，野性專精下還會施加裂喉，一個在 12 秒內造成 72 點傷害的流血效果。僅限貓形態。未隱匿時，此按鈕為撲擊。',
+    '一個潛行開場技，昏迷目標 2 秒。獎勵 1 個連擊點，野性專精下還會累積 1 層古血（最多 3 層）並施加裂喉，一個在 12 秒內造成 72 點傷害的流血效果。僅限貓形態。未隱匿時，此按鈕為撲擊。',
   'entities.abilities.insect_swarm.name': '螫刺蟲群',
   'entities.abilities.insect_swarm.description':
     '敵人被蟲群侵襲，在 12 秒內受到 {damage} 點自然傷害。',
@@ -18181,7 +18181,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使皮膚硬化為冷卻的熔渣，持續10秒，受到的所有傷害降低25%。',
   'entities.abilities.cinderhide.name': '熔渣皮膚',
   'entities.abilities.claw.specNote_feral':
-    '每次命中的攻擊疊加 1 層撕碎，每層為一個在 8 秒內造成 12 點傷害的流血效果（最多 5 層）。疊加新的一層會重置持續時間。',
+    '每次命中的攻擊疊加 1 層撕碎，每層為一個在 8 秒內造成 8 點傷害的流血效果（最多 5 層）。疊加新的一層會重置持續時間。',
   'entities.abilities.scratch.specNote_feral':
     '每個被擊中的敵人還會受到抓傷流血效果：在 6 秒內造成 12 點傷害。',
   'entities.abilities.cold_focus.description':
@@ -18231,7 +18231,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在 8 秒內，你受到的下一次敵人攻擊將被回敬：至多抵消 {buff} 點傷害，並以等量神聖傷害返還給攻擊者，同時你獲得 1 點虔誠。只回敬一次攻擊。昇華使可回敬的數值提高 50%。',
   'entities.abilities.faithforged_guard.name': '聖光之債',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '目標身上每有一個你的流血效果，造成的傷害提高 15%，並將你的血隙重置為完整持續時間。古血達 3 層時，此按鈕變為血收：消耗古血發動一次打擊，延長你的剮擊與血隙，使你在目標身上的流血效果跳動速度提高 50%，持續 8 秒，並恢復能量。',
+    '目標身上每有一個你的流血效果，造成的傷害提高 15%，並將你的血隙重置為完整持續時間。古血達 3 層時，此按鈕變為血收：消耗古血發動一次打擊，延長你的剮擊與血隙，使你在目標身上的流血效果跳動速度提高 30%，持續 8 秒，並恢復能量。',
   'entities.abilities.fieldcraft_reentry.description':
     '被動：擁有狩獵動能時，斷跡使你的下一次剖膛打擊或血鉤獲得強化，持續12秒。剖膛打擊每層增傷15%。血鉤額外造成18至24點物理傷害，該傷害每層提高15%，並隨遠程攻擊強度提高。達到3層時，任一攻擊都會消耗狩獵動能。（生存）',
   'entities.abilities.fieldcraft_reentry.name': '蓄勢再入',
@@ -18360,7 +18360,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使一名死亡的隊伍成員回到你身邊復活，並恢復 35% 的生命值和法力值。16 級或以上的黎明癒者則會改為呼喚隊伍中 30 碼內且在你視線內的所有陣亡成員回到你身邊復活。',
   'entities.abilities.recall_the_fallen.name': '喚回逝者',
   'entities.abilities.redharvest.description':
-    '消耗3層古血：造成{damage}點傷害，將你在目標身上的剮擊與血隙各延長 4 秒（每個最多延長 8 秒），使你在目標身上的流血效果跳動速度提高 50%，持續 8 秒（赤紅奔流），並恢復{rage}點能量。沒有連擊點也能使用。',
+    '消耗3層古血：造成{damage}點傷害，將你在目標身上的剮擊與血隙各延長 8 秒（每個最多延長 16 秒），使你在目標身上的流血效果跳動速度提高 30%，持續 8 秒（赤紅奔流），並恢復{rage}點能量。沒有連擊點也能使用。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.regrowth.specNote_restoration':
     '每次施放累積 1 層繁茂（最多 3 層），刷新仍在生效的綻放也算。',
