@@ -7815,14 +7815,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.shoal_scuttler.name': 'ショールスカトラー',
   'entities.mobs.the_wreck_warden.name': 'レックウォーデン',
   'entities.mobs.remnant_first_colossus.name': '最初の巨像の残骸',
-  'entities.mobs.quench_shardling.name': 'クエンチ・シャードリング',
+  'entities.mobs.quench_shardling.name': 'クエンチ・スプリンター',
   'entities.mobs.rimeglass_bear.name': '霧氷鏡の熊',
   'entities.mobs.warden_of_the_quench.name': 'クエンチの番人',
   'entities.mobs.heatsworn_ember.name': '熱誓の残り火',
   'entities.mobs.cinderscar_caller.name': '燼の傷跡の呼び手',
   'entities.mobs.ember_hound.name': '残り火の猟犬',
   'entities.mobs.the_glassfield_brute.name': '玻璃の原の暴れ者',
-  'entities.mobs.heaved_shardling.name': '隆起のシャードリング',
+  'entities.mobs.heaved_shardling.name': '隆起のスプリンター',
   'entities.mobs.veinback_burrower.name': '鉱脈背の穴掘り',
   'entities.mobs.downs_bandit.name': '丘陵の盗賊',
   'entities.mobs.wreck_thief.name': '難破船の盗人',
@@ -8453,13 +8453,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_qi_words_in_stone.objectives.0.label': '評議会の碑文を読んだ',
   'entities.quests.q_qi_servants_at_their_posts.title': '持ち場を守る僕たち',
   'entities.quests.q_qi_servants_at_their_posts.text':
-    '碑文には評議会の僕たちのことが記されている。主が戻るまで各地を守ると誓った者たちだ。主は二度と戻らず、僕たちは守ることをやめなかった。数を減らしてくれ、{playerName}。霜の岩棚のクエンチ・シャードリングを六体、焦熱の水路の熱誓の残り火を六体、隆起した岩盤の隆起のシャードリングを六体だ。',
+    '碑文には評議会の僕たちのことが記されている。主が戻るまで各地を守ると誓った者たちだ。主は二度と戻らず、僕たちは守ることをやめなかった。数を減らしてくれ、{playerName}。霜の岩棚のクエンチ・スプリンターを六体、焦熱の水路の熱誓の残り火を六体、隆起した岩盤の隆起のスプリンターを六体だ。',
   'entities.quests.q_qi_servants_at_their_posts.completion':
     'それぞれ六体、おかげで各地が少し静かになった。奴らの核には碑文と同じ印が刻まれていた。僕たちを造った者が、石も造ったのだ。',
   'entities.quests.q_qi_servants_at_their_posts.objectives.0.label':
-    'クエンチ・シャードリングを倒した',
+    'クエンチ・スプリンターを倒した',
   'entities.quests.q_qi_servants_at_their_posts.objectives.1.label': '熱誓の残り火を倒した',
-  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': '隆起のシャードリングを倒した',
+  'entities.quests.q_qi_servants_at_their_posts.objectives.2.label': '隆起のスプリンターを倒した',
   'entities.quests.q_qi_wardens_of_the_arts.title': '術の番人',
   'entities.quests.q_qi_wardens_of_the_arts.text':
     '評議会の番人のうち二体がまだ立っている。一体は霜の岩棚のクレバス群に、もう一体は燼の傷跡の玻璃の原に沈んでいる。碑文はそれらを各々の術の秘密の守り手と呼んでいて、素直に明かしはしないだろう、{playerName}。クエンチの番人と玻璃の原の暴れ者を倒してくれ。',

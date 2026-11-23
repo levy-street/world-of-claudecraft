@@ -26655,7 +26655,7 @@ export const es_ES: EnTranslations = {
         "name": "Fantasma"
       },
       "quench_shardling": {
-        "name": "Quench Shardling"
+        "name": "Quench Splinter"
       },
       "rimeglass_bear": {
         "name": "Rimeglass Bear"
@@ -26676,7 +26676,7 @@ export const es_ES: EnTranslations = {
         "name": "The Glassfield Brute"
       },
       "heaved_shardling": {
-        "name": "Heaved Shardling"
+        "name": "Heaved Splinter"
       },
       "veinback_burrower": {
         "name": "Veinback Burrower"
@@ -29977,17 +29977,17 @@ export const es_ES: EnTranslations = {
       },
       "q_qi_servants_at_their_posts": {
         "title": "Servants at Their Posts",
-        "text": "The inscriptions name the council's servants, sworn to hold each quarter until their masters returned. The masters never came back, and the servants never stopped holding. Thin them, {playerName}: six Quench Shardlings on the Hoarshelf, six Heatsworn Embers in the Burnways and six Heaved Shardlings on the Heaved Slabs.",
+        "text": "The inscriptions name the council's servants, sworn to hold each quarter until their masters returned. The masters never came back, and the servants never stopped holding. Thin them, {playerName}: six Quench Splinters on the Hoarshelf, six Heatsworn Embers in the Burnways and six Heaved Splinters on the Heaved Slabs.",
         "completion": "Six of each, and the quarters a little quieter for it. Their cores were cut with the same mark as the inscriptions. Whoever made the servants made the stones too.",
         "objectives": {
           "0": {
-            "label": "Quench Shardling slain"
+            "label": "Quench Splinter slain"
           },
           "1": {
             "label": "Heatsworn Ember slain"
           },
           "2": {
-            "label": "Heaved Shardling slain"
+            "label": "Heaved Splinter slain"
           }
         }
       },

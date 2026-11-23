@@ -7,7 +7,7 @@ mode: warden | brute | shardling | burrower. Keeps the Tripo palette and bakes a
 base colour with surface grain (ice frost, basalt pitting, sandstone strata, fur strands
 or stone grain), ambient occlusion and edge highlights, plus an emissive (glow) map from
 the creature's lit colours: the Warden's cyan core, the Brute's lava seams and amber
-glass, the Shardling's amber cracks, the Burrower's ore veins.
+glass, the Splinter's amber cracks, the Burrower's ore veins.
 """
 import sys
 

@@ -62,7 +62,7 @@ export const QUARTERED_ISLE_MOBS: Record<string, MobTemplate> = {
   quench_shardling: {
     ...REGULAR,
     id: 'quench_shardling',
-    name: 'Quench Shardling',
+    name: 'Quench Splinter',
     family: 'elemental',
     aggroRadius: 11, // the Quench's servants still keep the ice
     loot: REGULAR_LOOT,
@@ -164,7 +164,7 @@ export const QUARTERED_ISLE_MOBS: Record<string, MobTemplate> = {
   heaved_shardling: {
     ...REGULAR,
     id: 'heaved_shardling',
-    name: 'Heaved Shardling',
+    name: 'Heaved Splinter',
     family: 'elemental',
     armorPerLevel: 14, // heaved sandstone
     aggroRadius: 11,
@@ -217,7 +217,7 @@ const camp = (mobId: string, x: number, z: number, radius: number, count: number
 export const QUARTERED_ISLE_CAMPS: CampDef[] = [
   // The Remnant's camp shipped first: it stays first, so its spawn keeps its id.
   camp('remnant_first_colossus', REMNANT_CAMP_CENTER.x, REMNANT_CAMP_CENTER.z, 5, 1),
-  // the Hoarshelf: Shardlings on the Rimeglass and west of the bridge road, bears on the
+  // the Hoarshelf: Splinters on the Rimeglass and west of the bridge road, bears on the
   // floes east of it, the Warden alone in the Crevasses
   camp('quench_shardling', -78, 2034, 7, 3),
   camp('quench_shardling', -112, 2000, 7, 3),
@@ -235,7 +235,7 @@ export const QUARTERED_ISLE_CAMPS: CampDef[] = [
   camp('ember_hound', 128, 2164, 8, 3),
   camp('ember_hound', 146, 2136, 8, 3),
   camp('the_glassfield_brute', 128, 2284, 5, 1),
-  // the Heavestone Wilds: Shardlings on the Heaved Slabs, Burrowers in and below the
+  // the Heavestone Wilds: Splinters on the Heaved Slabs, Burrowers in and below the
   // Hammer's Cut (the Remnant's camp is above)
   camp('heaved_shardling', -212, 2210, 7, 3),
   camp('heaved_shardling', -174, 2208, 7, 3),

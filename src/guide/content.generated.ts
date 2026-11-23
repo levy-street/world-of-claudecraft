@@ -3523,7 +3523,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_heatsworn_ember.webp"
       },
       {
-        "name": "Heaved Shardling",
+        "name": "Heaved Splinter",
         "min": 20,
         "max": 20,
         "rare": false,
@@ -3532,7 +3532,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_heaved_shardling.webp"
       },
       {
-        "name": "Quench Shardling",
+        "name": "Quench Splinter",
         "min": 20,
         "max": 20,
         "rare": false,

@@ -145,13 +145,13 @@ export const QUARTERED_ISLE_STORY_QUESTS: Record<string, QuestDef> = {
     name: 'Servants at Their Posts',
     giverNpcId: RIVALMOOT_KEEPER_NPC_ID,
     turnInNpcId: RIVALMOOT_KEEPER_NPC_ID,
-    text: "The inscriptions name the council's servants, sworn to hold each quarter until their masters returned. The masters never came back, and the servants never stopped holding. Thin them, $N: six Quench Shardlings on the Hoarshelf, six Heatsworn Embers in the Burnways and six Heaved Shardlings on the Heaved Slabs.",
+    text: "The inscriptions name the council's servants, sworn to hold each quarter until their masters returned. The masters never came back, and the servants never stopped holding. Thin them, $N: six Quench Splinters on the Hoarshelf, six Heatsworn Embers in the Burnways and six Heaved Splinters on the Heaved Slabs.",
     completionText:
       'Six of each, and the quarters a little quieter for it. Their cores were cut with the same mark as the inscriptions. Whoever made the servants made the stones too.',
     objectives: [
-      { type: 'kill', targetMobId: 'quench_shardling', count: 6, label: 'Quench Shardling slain' },
+      { type: 'kill', targetMobId: 'quench_shardling', count: 6, label: 'Quench Splinter slain' },
       { type: 'kill', targetMobId: 'heatsworn_ember', count: 6, label: 'Heatsworn Ember slain' },
-      { type: 'kill', targetMobId: 'heaved_shardling', count: 6, label: 'Heaved Shardling slain' },
+      { type: 'kill', targetMobId: 'heaved_shardling', count: 6, label: 'Heaved Splinter slain' },
     ],
     xpReward: 4600,
     copperReward: 2400,

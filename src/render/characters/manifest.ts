@@ -4550,7 +4550,7 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     authoredAtlas: true,
   },
-  // Heaved Shardling: a small sandstone elemental with slate spikes.
+  // Heaved Splinter: a small sandstone elemental with slate spikes.
   mob_heaved_shardling: {
     url: `${CREATURES}/heaved_shardling.glb`,
     height: 1.4,
