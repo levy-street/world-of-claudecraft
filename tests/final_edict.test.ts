@@ -275,9 +275,14 @@ describe('Final Edict confirmed contact', () => {
     const atlas = new THREE.Texture();
     activeKitPrewarmEntry(f.scene, 'paladin', {
       queue: queue as never,
+      // The borrowed Warrior pieces are declined here, so the recipe is the
+      // stand-ins, this pool and the atlas.
+      assets: async (pieces?: readonly string[]) => pieces === undefined,
+      // The Paladin recipe also asks for its stand-ins and borrowed Warrior
+      // pieces; this effect's buffers ride the 'paladin' part.
       geometry: (_kinds, kit) => {
-        expect(kit).toBe('paladin');
-        return f.effect.preparation.units(f.host);
+        expect(kit).toMatch(/^paladin/);
+        return kit === 'paladin' ? f.effect.preparation.units(f.host) : [];
       },
       // The kit's one texture is its spec-icon atlas.
       texture: (texture) => expect(texture).toBe(atlas),
