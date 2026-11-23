@@ -111,7 +111,9 @@ The guid belongs to the physical copy for its whole life:
   buyback returns the same copy to the same holder), learning a pattern, being
   spent as a craft reagent, being handed in at a quest turn-in or stripped as
   the quest's own required item (at turn-in or abandon), opening a Treasure
-  Casket, being used up by any `useItem` consumable arm, a skin-select token
+  Casket, being used up by a `useItem` consumable arm that spends through the
+  shared `consumeOneUnit` (an arm that removes its item itself must write its
+  own row; none of those holds a tracked id today), a skin-select token
   or a mech chroma plate spent on its cosmetic, a tool-effect charm slotted
   into a gathering tool, and the deletion of the holding character (with the
   World Market listings, the Merchant collection and the homeless Ravenpost

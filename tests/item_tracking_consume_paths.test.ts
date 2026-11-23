@@ -139,6 +139,40 @@ describe('quest turn-in and required-item removal', () => {
     });
   });
 
+  it('the ORDINARY copy is handed in before a newer enchanted one, with its own row', () => {
+    // The plain-copy walk (item_plain_copy.ts takeIdentityOnlyUnits) inside
+    // removePreferFungible: the newest copy is the enchanted one, so a walk
+    // that ranked a guid-only copy as special would hand it in instead.
+    const sim = makeSim();
+    const { meta, pid } = playerOf(sim);
+    meta.inventory = [];
+    registerQuest({
+      objectives: [{ type: 'collect', itemId: RAID_EPIC, count: 1, label: 'Helm' }],
+    });
+    sim.addItem(RAID_EPIC, 1, pid);
+    const ordinaryGuid = guidOf(meta, RAID_EPIC);
+    sim.addItem(RAID_EPIC, 1, pid);
+    const newest = meta.inventory[meta.inventory.length - 1];
+    if (!newest.instance) throw new Error('the second copy carries no payload');
+    newest.instance.enchant = 'enchant_ring_strength';
+    const enchantedGuid = newest.instance.guid;
+    expect(enchantedGuid).not.toBe(ordinaryGuid);
+    meta.questLog.set(TEST_QUEST, { questId: TEST_QUEST, counts: [1], state: 'ready' });
+    sim.drainEvents();
+    expect(turnInQuestCore(sim.ctx, TEST_QUEST, QUESTS[TEST_QUEST], meta)).toBe(true);
+    const left = meta.inventory.filter((s) => s.itemId === RAID_EPIC);
+    expect(left).toHaveLength(1);
+    expect(left[0].instance?.guid).toBe(enchantedGuid);
+    expect(left[0].instance?.enchant).toBe('enchant_ring_strength');
+    const rows = rowsOfKind(sim, 'consume');
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      guid: ordinaryGuid,
+      source: 'questTurnIn',
+      detail: TEST_QUEST,
+    });
+  });
+
   it('an ownership turn-in keeps the copy and writes nothing', () => {
     const sim = makeSim();
     const { meta, pid } = playerOf(sim);
