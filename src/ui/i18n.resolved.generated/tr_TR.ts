@@ -4456,6 +4456,8 @@ export const tr_TR: EnTranslations = {
     "raidBossGuide": {
       "title": "Patron Rehberi",
       "button": "Patron Rehberi: {boss}",
+      "sourcesLabel": "Guides",
+      "sourceRaids": "Raids",
       "subtitle": "{boss} | {difficulty}",
       "close": "Patron rehberini kapat",
       "bossesLabel": "Akın patronları",
@@ -5154,6 +5156,7 @@ export const tr_TR: EnTranslations = {
         "actionBar2": "Eylem Çubuğu 2",
         "actionBar3": "Eylem Çubuğu 3",
         "steamWishlist": "İstek Listesi Hatırlatması",
+        "bossGuide": "Boss Guide",
         "menu": "Menü",
         "minimap": "Mini Harita",
         "stanceBar": "Duruş Çubuğu",

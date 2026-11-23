@@ -4456,6 +4456,8 @@ export const da_DK: EnTranslations = {
     "raidBossGuide": {
       "title": "Bossguide",
       "button": "Bossguide: {boss}",
+      "sourcesLabel": "Guides",
+      "sourceRaids": "Raids",
       "subtitle": "{boss} | {difficulty}",
       "close": "Luk bossguiden",
       "bossesLabel": "Raidbosser",
@@ -5154,6 +5156,7 @@ export const da_DK: EnTranslations = {
         "actionBar2": "Handlingsbjælke 2",
         "actionBar3": "Handlingsbjælke 3",
         "steamWishlist": "Ønskeliste-påmindelse",
+        "bossGuide": "Boss Guide",
         "menu": "Menu",
         "minimap": "Minikort",
         "stanceBar": "Stillingsbjælke",

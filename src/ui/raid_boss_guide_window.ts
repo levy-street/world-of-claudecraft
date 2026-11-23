@@ -1,5 +1,6 @@
-// Cold DOM adapter for the encounter journal opened from party frames (and
-// from the Dungeon Finder's boss list). A journal SOURCE owns the boss, phase,
+// Cold DOM adapter for the encounter journal, opened from the room's guide
+// button (its own movable frame, #boss-guide-launcher), the side menu's
+// #mm-bossguide, and the Dungeon Finder's boss list. A journal SOURCE owns the boss, phase,
 // difficulty, and mechanic data: the raid guide (raid_boss_guide_view.ts) or a
 // five-player dungeon page (boss_journal/). This class owns browsing state,
 // localization, tooltips, and focus return.
@@ -28,7 +29,7 @@ import {
   journalBossDefeated,
   journalContextFor,
 } from './boss_journal/journal_view';
-import { dungeonJournalSourceFor } from './boss_journal/registry';
+import { dungeonJournalSourceFor, JOURNAL_SOURCES } from './boss_journal/registry';
 import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -57,9 +58,15 @@ export interface RaidBossGuideWindowDeps {
   /** The dungeon run the player stands in (IWorld.dungeonRun): suggests the
    *  next boss, the run's difficulty, and marks the defeated bosses. */
   dungeonRun?(): JournalRunInput | null;
+  /** The standalone, movable seat the room's guide button lives in
+   *  (#boss-guide-launcher). Shown only while the room offers a guide. */
+  launcherHost?(): HTMLElement | null;
 }
 
 const DIFFICULTIES: readonly JournalDifficulty[] = ['normal', 'heroic'];
+
+/** Stamped on #boss-guide-launcher while the room offers no guide. */
+export const LAUNCHER_EMPTY_CLASS = 'is-empty';
 
 const ROLE_PRESENTATION: Readonly<Record<RaidBossGuideRole, [RaidBossGuideTextKey, UiIconName]>> = {
   tank: ['hudChrome.raidBossGuide.roleTank', 'tank'],
@@ -136,7 +143,7 @@ export function raidBossGuideContextFallback(doc: Document, mobile: boolean): HT
 export class RaidBossGuideWindow {
   readonly button: HTMLButtonElement;
   private readonly buttonLabel: HTMLSpanElement;
-  /** What the room offers (drives the party-frames button). */
+  /** What the room offers (drives the standalone guide button). */
   private context: JournalContext | null = null;
   /** The journal the window shows (the room's, or one opened from the finder). */
   private source: JournalSource | null = null;
@@ -149,6 +156,13 @@ export class RaidBossGuideWindow {
   /** The room and run the last sync read: an unchanged tick does nothing. */
   private seenDungeonId: string | null | undefined = undefined;
   private seenRun: JournalRunInput | null = null;
+  /** The guide and boss last read from the side menu, reopened there next time. */
+  private lastBrowsed: { source: JournalSource; boss: string | null } | null = null;
+  /** Opened from the side menu: a browsing window that never auto-closes or
+   *  follows the room, even when it shows the room's own guide. */
+  private openedFromMenu = false;
+  /** The launcher state last written, so an unchanged frame does no DOM work. */
+  private launcherShown: boolean | null = null;
 
   constructor(
     private readonly deps: RaidBossGuideWindowDeps,
@@ -181,7 +195,28 @@ export class RaidBossGuideWindow {
     return this.deps.dungeonRun?.() ?? null;
   }
 
+  /** Read the room (and run) and show or hide the standalone guide button.
+   *  Returns the button while the room offers a guide, else null. */
   syncAvailability(dungeonId: string | null): HTMLButtonElement | null {
+    const button = this.resolveAvailability(dungeonId);
+    this.seatLauncher(button !== null);
+    return button;
+  }
+
+  private seatLauncher(visible: boolean): void {
+    if (visible === this.launcherShown) return;
+    const host = this.deps.launcherHost?.();
+    if (!host) return;
+    this.launcherShown = visible;
+    if (this.button.parentElement !== host) host.append(this.button);
+    // A class, not [hidden]: base.css makes [hidden] !important, which would
+    // also hide the dimmed placeholder the Unlock interface mode shows.
+    if (host.classList.contains(LAUNCHER_EMPTY_CLASS) === visible) {
+      host.classList.toggle(LAUNCHER_EMPTY_CLASS, !visible);
+    }
+  }
+
+  private resolveAvailability(dungeonId: string | null): HTMLButtonElement | null {
     // IWorld.dungeonRun is reference-stable until the run changes, so a tick in
     // the same room with the same run has nothing to repaint.
     const run = dungeonId ? this.run() : null;
@@ -265,19 +300,57 @@ export class RaidBossGuideWindow {
     return true;
   }
 
+  /** The side menu's launcher: the room's own guide when it has one, otherwise
+   *  the last guide browsed (the raid guide first), readable anywhere. */
+  openBrowser(): void {
+    if (this.isOpen) {
+      this.close();
+      return;
+    }
+    this.openedFromContext = false;
+    this.openedFromMenu = true;
+    if (this.context) {
+      // Inside a guided room the menu opens that room's page, as a browsing
+      // window: walking out of the room leaves it open.
+      this.source = this.context.source;
+      this.selectedBoss = this.context.bossKey;
+      if (this.context.runDifficulty) this.difficulty = this.context.runDifficulty;
+    } else {
+      const source = this.lastBrowsed?.source ?? JOURNAL_SOURCES[0];
+      if (!source) return;
+      this.source = source;
+      const boss = this.lastBrowsed?.boss;
+      this.selectedBoss =
+        boss && source.bossKeys.includes(boss) ? boss : (source.bossKeys[0] ?? null);
+    }
+    this.expandedMechanicId = null;
+    this.show(true);
+  }
+
+  /** Switch the open window to another guide (the source picker). */
+  private selectSource(sourceId: string): void {
+    const source = JOURNAL_SOURCES.find((candidate) => candidate.id === sourceId);
+    if (!source || source.id === this.source?.id) return;
+    this.deps.hideTooltip();
+    const roomSource = this.context?.source.id === source.id;
+    this.openedFromContext = roomSource && !this.openedFromMenu;
+    this.source = source;
+    this.selectedBoss = roomSource && this.context ? this.context.bossKey : source.bossKeys[0];
+    this.expandedMechanicId = null;
+    this.render(`source:${source.id}`);
+  }
+
   /** Whether a dungeon ships a guide page for this mob (the finder's button). */
   static hasJournal(dungeonId: string, mobId: string): boolean {
     return dungeonJournalSourceFor(dungeonId)?.bossKeys.includes(mobId) ?? false;
   }
 
-  private show(): void {
+  private show(returnToOpener = this.openedFromContext): void {
     this.deps.closeOthers();
     // A page opened from the Dungeon Finder has no opener left to return to
     // (closing the other windows hid the finder): it returns to the stable
-    // launcher instead.
-    this.openerFocus = this.openedFromContext
-      ? this.deps.captureFocus()
-      : this.deps.contextFallback();
+    // launcher instead. The side menu's button stays, so focus returns there.
+    this.openerFocus = returnToOpener ? this.deps.captureFocus() : this.deps.contextFallback();
     const root = this.deps.root();
     markDialogRoot(root, { labelledBy: 'raid-boss-guide-title' });
     root.style.display = 'block';
@@ -293,7 +366,9 @@ export class RaidBossGuideWindow {
     root.style.display = 'none';
     this.deps.restoreFocus(focusFallback ?? this.openerFocus);
     this.openerFocus = null;
+    this.openedFromMenu = false;
     if (!this.openedFromContext) {
+      if (this.source) this.lastBrowsed = { source: this.source, boss: this.selectedBoss };
       // The finder's page closes back to the room's own journal, if any.
       this.openedFromContext = true;
       this.source = this.context?.source ?? null;
@@ -342,7 +417,7 @@ export class RaidBossGuideWindow {
       `<button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(
         t('hudChrome.raidBossGuide.close'),
       )}">${svgIcon('close')}</button></div>` +
-      `<div class="rbg-shell">${this.bossNavigation(source)}<section class="rbg-journal" tabindex="0" data-focus-key="journal" aria-label="${esc(
+      `${this.sourcePicker(source)}<div class="rbg-shell">${this.bossNavigation(source)}<section class="rbg-journal" tabindex="0" data-focus-key="journal" aria-label="${esc(
         t('hudChrome.raidBossGuide.title'),
       )}">` +
       `${this.heroHtml(selectedBossName, view, dungeon)}` +
@@ -374,6 +449,12 @@ export class RaidBossGuideWindow {
     const journal = root.querySelector<HTMLElement>('.rbg-journal');
     if (journal) bindRaidBossGuideScroll(journal);
     root.querySelector<HTMLElement>('[data-close]')?.addEventListener('click', () => this.close());
+    for (const sourceButton of root.querySelectorAll<HTMLButtonElement>('[data-source]')) {
+      sourceButton.addEventListener('click', () => {
+        const id = sourceButton.dataset.source;
+        if (id) this.selectSource(id);
+      });
+    }
     for (const bossButton of root.querySelectorAll<HTMLButtonElement>('[data-boss]')) {
       bossButton.addEventListener('click', () => {
         const boss = bossButton.dataset.boss;
@@ -413,6 +494,24 @@ export class RaidBossGuideWindow {
         root.querySelector<HTMLElement>('[data-close]'),
       ]);
     }
+  }
+
+  /** Every guide the game ships (the raids, then each dungeon), so a page can
+   *  be read anywhere, not only inside its instance. */
+  private sourcePicker(current: JournalSource): string {
+    const label = tx('hudChrome.raidBossGuide.sourcesLabel');
+    return `<nav class="rbg-source-nav" aria-label="${esc(label)}">${JOURNAL_SOURCES.map(
+      (source) => {
+        const selected = source.id === current.id;
+        const name =
+          source.kind === 'raid'
+            ? tx('hudChrome.raidBossGuide.sourceRaids')
+            : dungeonName(source.id);
+        return `<button type="button" class="rbg-source-tab${selected ? ' active' : ''}" data-source="${esc(
+          source.id,
+        )}" data-focus-key="source:${esc(source.id)}" aria-pressed="${selected}">${esc(name)}</button>`;
+      },
+    ).join('')}</nav>`;
   }
 
   private bossNavigation(source: JournalSource): string {

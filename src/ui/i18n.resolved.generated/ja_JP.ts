@@ -4456,6 +4456,8 @@ export const ja_JP: EnTranslations = {
     "raidBossGuide": {
       "title": "ボス攻略",
       "button": "攻略: {boss}",
+      "sourcesLabel": "攻略ガイド",
+      "sourceRaids": "レイド",
       "subtitle": "{boss} | {difficulty}",
       "close": "ボス攻略を閉じる",
       "bossesLabel": "レイドボス",
@@ -5154,6 +5156,7 @@ export const ja_JP: EnTranslations = {
         "actionBar2": "アクションバー 2",
         "actionBar3": "アクションバー 3",
         "steamWishlist": "ウィッシュリストの通知",
+        "bossGuide": "ボス攻略",
         "menu": "メニュー",
         "minimap": "ミニマップ",
         "stanceBar": "スタンスバー",

@@ -4456,6 +4456,8 @@ export const ko_KR: EnTranslations = {
     "raidBossGuide": {
       "title": "우두머리 공략",
       "button": "공략: {boss}",
+      "sourcesLabel": "공략 목록",
+      "sourceRaids": "공격대",
       "subtitle": "{boss} | {difficulty}",
       "close": "우두머리 공략 닫기",
       "bossesLabel": "공격대 우두머리",
@@ -5154,6 +5156,7 @@ export const ko_KR: EnTranslations = {
         "actionBar2": "행동 단축바 2",
         "actionBar3": "행동 단축바 3",
         "steamWishlist": "찜 목록 알림",
+        "bossGuide": "우두머리 공략",
         "menu": "메뉴",
         "minimap": "미니맵",
         "stanceBar": "태세 바",

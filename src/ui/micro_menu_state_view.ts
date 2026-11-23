@@ -41,6 +41,7 @@ export const MICRO_MENU_LAUNCHERS: readonly MicroMenuLauncherSpec[] = [
   { selector: '#mm-crafting', windowId: 'crafting-window' },
   { selector: '#mm-arena', windowId: 'arena-window' },
   { selector: '#mm-dfinder', windowId: 'dungeon-finder-window' },
+  { selector: '#mm-bossguide', windowId: 'raid-boss-guide-window' },
   { selector: '#expedition-bell', windowId: 'dungeon-finder-window' },
   { selector: '#mm-cardduel', windowId: 'card-duel-window' },
   { selector: '#mm-leaderboard', windowId: 'leaderboard-window' },

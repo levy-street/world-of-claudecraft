@@ -4456,6 +4456,8 @@ export const ru_RU: EnTranslations = {
     "raidBossGuide": {
       "title": "Тактика на босса",
       "button": "Тактика: {boss}",
+      "sourcesLabel": "Тактики",
+      "sourceRaids": "Рейды",
       "subtitle": "{boss} | {difficulty}",
       "close": "Закрыть тактику",
       "bossesLabel": "Рейдовые боссы",
@@ -5154,6 +5156,7 @@ export const ru_RU: EnTranslations = {
         "actionBar2": "Панель команд 2",
         "actionBar3": "Панель команд 3",
         "steamWishlist": "Напоминание о списке желаемого",
+        "bossGuide": "Тактика на босса",
         "menu": "Меню",
         "minimap": "Мини-карта",
         "stanceBar": "Панель стоек",

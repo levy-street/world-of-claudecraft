@@ -3703,11 +3703,13 @@
   body.mobile-touch #party-frames:not(.party-expanded) .party-frame {
     display: none;
   }
-  body.mobile-touch #party-frames:not(.party-expanded) .party-boss-guide-button {
-    display: none;
+  body.mobile-touch #boss-guide-launcher {
+    right: auto;
+    left: calc(50% - 90px);
+    top: max(8px, env(safe-area-inset-top));
   }
   body.mobile-touch .party-boss-guide-button {
-    width: min(344px, calc(100dvw - 30px));
+    width: 180px;
     min-height: 40px;
     border-radius: 8px;
     font-size: 12px;
@@ -3802,6 +3804,9 @@
   body.mobile-touch #raid-boss-guide-window .rbg-difficulty {
     justify-content: space-between;
     margin: 9px 0 11px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-source-tab {
+    min-height: 40px;
   }
   body.mobile-touch #raid-boss-guide-window .rbg-segmented button {
     min-width: 66px;

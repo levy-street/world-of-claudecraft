@@ -189,6 +189,17 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     detachToUiRoot: false,
     maxScale: Number.POSITIVE_INFINITY,
   },
+  // The room's boss guide button, detached from the party frames so it sits
+  // wherever the player likes. Shown in play only inside an instance that ships
+  // a guide; editing shows it as a dimmed placeholder so it can be placed first.
+  {
+    id: 'bossGuideButton',
+    elementId: 'boss-guide-launcher',
+    storageKey: 'woc_hud_frame_boss_guide_button',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.bossGuide',
+    fallbackSize: { w: 170, h: 30 },
+    detachToUiRoot: false,
+  },
   {
     id: 'menu',
     elementId: 'side-buttons',

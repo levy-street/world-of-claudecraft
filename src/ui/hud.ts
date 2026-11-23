@@ -3202,6 +3202,7 @@ export class Hud {
     $('#mm-wiki')?.addEventListener('click', () => this.openWiki());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
+    $('#mm-bossguide')?.addEventListener('click', () => this.raidBossGuideWindow.openBrowser());
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-wocmarket')?.addEventListener('click', () => this.toggleWocMarket());
@@ -5627,6 +5628,7 @@ export class Hud {
 
   private readonly raidBossGuideWindow = new RaidBossGuideWindow({
     root: () => $('#raid-boss-guide-window'),
+    launcherHost: () => document.getElementById('boss-guide-launcher'),
     closeOthers: () => this.closeOtherWindows('#raid-boss-guide-window'),
     contextFallback: () => raidBossGuideContextFallback(document, this.isMobileLayout()),
     attachTooltip: (element, html) => this.attachTooltip(element, html),
@@ -16693,8 +16695,8 @@ export class Hud {
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
     const info = this.sim.partyInfo;
-    const dungeonId = info ? (dungeonAt(this.sim.player.pos.x)?.id ?? null) : null;
-    this.partyFramesPainter.setGuideControl(this.raidBossGuideWindow.syncAvailability(dungeonId));
+    // The guide button is its own frame now, so it shows solo too, not only in a party.
+    this.raidBossGuideWindow.syncAvailability(dungeonAt(this.sim.player.pos.x)?.id ?? null);
     // Re-seat below the target only when its measured stack overlaps this column.
     const targetShown = !!target && target.kind !== 'object';
     const belowTarget = this.partyBelowTargetPainter.update(

@@ -4456,6 +4456,8 @@ export const vi_VN: EnTranslations = {
     "raidBossGuide": {
       "title": "Hướng Dẫn Trùm",
       "button": "Hướng Dẫn Trùm: {boss}",
+      "sourcesLabel": "Guides",
+      "sourceRaids": "Raids",
       "subtitle": "{boss} | {difficulty}",
       "close": "Đóng hướng dẫn trùm",
       "bossesLabel": "Trùm Raid",
@@ -5154,6 +5156,7 @@ export const vi_VN: EnTranslations = {
         "actionBar2": "Thanh Hành Động 2",
         "actionBar3": "Thanh Hành Động 3",
         "steamWishlist": "Nhắc Nhở Danh Sách Ước",
+        "bossGuide": "Boss Guide",
         "menu": "Menu",
         "minimap": "Bản Đồ Nhỏ",
         "stanceBar": "Thanh Thế Đứng",

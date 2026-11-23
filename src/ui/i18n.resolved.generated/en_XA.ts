@@ -4456,6 +4456,8 @@ export const en_XA: EnTranslations = {
     "raidBossGuide": {
       "title": "[Ɓóšš Ĝúíðé]",
       "button": "[Ɓóšš Ĝúíðé: {boss}]",
+      "sourcesLabel": "[Ĝúíðéš]",
+      "sourceRaids": "[Ŕáíðš]",
       "subtitle": "[{boss} | {difficulty}]",
       "close": "[Çļóšé ƀóšš ĝúíðé]",
       "bossesLabel": "[Ŕáíð ƀóššéš]",
@@ -5154,6 +5156,7 @@ export const en_XA: EnTranslations = {
         "actionBar2": "[Áçţíóñ Ɓáŕ 2]",
         "actionBar3": "[Áçţíóñ Ɓáŕ 3]",
         "steamWishlist": "[Ŵíšĥļíšţ Ŕéɱíñðéŕ]",
+        "bossGuide": "[Ɓóšš Ĝúíðé]",
         "menu": "[Ɱéñú]",
         "minimap": "[Ɱíñíɱáþ]",
         "stanceBar": "[Šţáñçé Ɓáŕ]",

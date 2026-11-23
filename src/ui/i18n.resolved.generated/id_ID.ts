@@ -4456,6 +4456,8 @@ export const id_ID: EnTranslations = {
     "raidBossGuide": {
       "title": "Panduan Bos",
       "button": "Panduan Bos: {boss}",
+      "sourcesLabel": "Guides",
+      "sourceRaids": "Raids",
       "subtitle": "{boss} | {difficulty}",
       "close": "Tutup panduan bos",
       "bossesLabel": "Bos raid",
@@ -5154,6 +5156,7 @@ export const id_ID: EnTranslations = {
         "actionBar2": "Bilah Aksi 2",
         "actionBar3": "Bilah Aksi 3",
         "steamWishlist": "Pengingat Wishlist",
+        "bossGuide": "Boss Guide",
         "menu": "Menu",
         "minimap": "Peta Mini",
         "stanceBar": "Bilah Kuda-kuda",

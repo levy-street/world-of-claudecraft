@@ -4456,6 +4456,8 @@ export const cs_CZ: EnTranslations = {
     "raidBossGuide": {
       "title": "Průvodce bossem",
       "button": "Průvodce bossem: {boss}",
+      "sourcesLabel": "Guides",
+      "sourceRaids": "Raids",
       "subtitle": "{boss} | {difficulty}",
       "close": "Zavřít průvodce bossem",
       "bossesLabel": "Raidoví bossové",
@@ -5154,6 +5156,7 @@ export const cs_CZ: EnTranslations = {
         "actionBar2": "Akční lišta 2",
         "actionBar3": "Akční lišta 3",
         "steamWishlist": "Připomínka seznamu přání",
+        "bossGuide": "Boss Guide",
         "menu": "Menu",
         "minimap": "Minimapa",
         "stanceBar": "Lišta postojů",

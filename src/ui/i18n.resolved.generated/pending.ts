@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "es_ES": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "fr_FR": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "fr_CA": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "de_DE": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "nl_NL": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "pl_PL": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "id_ID": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "tr_TR": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "sv_SE": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "vi_VN": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ],
+  "da_DK": [
+    "hudChrome.interfaceUnlock.frameNames.bossGuide",
+    "hudChrome.raidBossGuide.sourceRaids",
+    "hudChrome.raidBossGuide.sourcesLabel"
+  ]
 };

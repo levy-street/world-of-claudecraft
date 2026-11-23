@@ -4456,6 +4456,8 @@ export const zh_TW: EnTranslations = {
     "raidBossGuide": {
       "title": "首領指南",
       "button": "指南: {boss}",
+      "sourcesLabel": "指南",
+      "sourceRaids": "團隊副本",
       "subtitle": "{boss} | {difficulty}",
       "close": "關閉首領指南",
       "bossesLabel": "團隊副本首領",
@@ -5154,6 +5156,7 @@ export const zh_TW: EnTranslations = {
         "actionBar2": "動作條 2",
         "actionBar3": "動作條 3",
         "steamWishlist": "願望清單提醒",
+        "bossGuide": "首領指南",
         "menu": "選單",
         "minimap": "小地圖",
         "stanceBar": "姿態欄",

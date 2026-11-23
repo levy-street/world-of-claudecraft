@@ -729,22 +729,18 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(rows()).toHaveLength(2);
   });
 
-  it('keeps one stable boss-guide control between member rows and leader controls', () => {
-    const guide = fakeEl('button');
+  it('keeps the leader control after the member rows without DOM churn', () => {
     const master = fakeEl('div');
     painter.setMasterControl(master as unknown as HTMLElement);
-    painter.setGuideControl(guide as unknown as HTMLElement);
     painter.sync([member({ pid: 2 })], 1, false);
 
-    expect(container.childNodes).toEqual([headerOf(), wrapperOf(), guide, master]);
+    expect(container.childNodes).toEqual([headerOf(), wrapperOf(), master]);
     const movesBefore = container._mutations;
-    painter.setGuideControl(guide as unknown as HTMLElement);
     painter.sync([member({ pid: 2, hp: 40 })], 1, false);
     expect(container._mutations).toBe(movesBefore);
 
     painter.clear();
     expect(container.childNodes).toEqual([]);
-    expect(guide.parentNode).toBeNull();
   });
 
   it('repaints the crest with the recycled member class via the live slot (the portrait gate)', () => {
@@ -937,15 +933,13 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(kids[kids.length - 1]).toBe(wrapperOf());
   });
 
-  it('keeps the complete mobile footer order with chip, rows, guide, and loot controls', () => {
-    const guide = fakeEl('button');
+  it('keeps the complete mobile footer order with chip, rows, and loot controls', () => {
     const master = fakeEl('div');
     painter.setCollapse(true, true, false, false);
-    painter.setGuideControl(guide as unknown as HTMLElement);
     painter.setMasterControl(master as unknown as HTMLElement);
     painter.sync([member({ pid: 2 })], 1, false);
 
-    expect(container.childNodes).toEqual([findChip(), wrapperOf(), guide, master]);
+    expect(container.childNodes).toEqual([findChip(), wrapperOf(), master]);
   });
 
   it('F1: an expanded party seats the chip alone on its line, no member frame beside it', () => {

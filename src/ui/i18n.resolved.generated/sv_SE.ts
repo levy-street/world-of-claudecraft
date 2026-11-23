@@ -4456,6 +4456,8 @@ export const sv_SE: EnTranslations = {
     "raidBossGuide": {
       "title": "Bossguide",
       "button": "Bossguide: {boss}",
+      "sourcesLabel": "Guides",
+      "sourceRaids": "Raids",
       "subtitle": "{boss} | {difficulty}",
       "close": "Stäng bossguiden",
       "bossesLabel": "Raidbossar",
@@ -5154,6 +5156,7 @@ export const sv_SE: EnTranslations = {
         "actionBar2": "Handlingsfält 2",
         "actionBar3": "Handlingsfält 3",
         "steamWishlist": "Önskelistepåminnelse",
+        "bossGuide": "Boss Guide",
         "menu": "Meny",
         "minimap": "Minikarta",
         "stanceBar": "Ställningsfält",

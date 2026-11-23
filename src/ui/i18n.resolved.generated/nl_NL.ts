@@ -4456,6 +4456,8 @@ export const nl_NL: EnTranslations = {
     "raidBossGuide": {
       "title": "Baasgids",
       "button": "Baasgids: {boss}",
+      "sourcesLabel": "Guides",
+      "sourceRaids": "Raids",
       "subtitle": "{boss} | {difficulty}",
       "close": "Baasgids sluiten",
       "bossesLabel": "Raidbazen",
@@ -5154,6 +5156,7 @@ export const nl_NL: EnTranslations = {
         "actionBar2": "Actiebalk 2",
         "actionBar3": "Actiebalk 3",
         "steamWishlist": "Verlanglijstherinnering",
+        "bossGuide": "Boss Guide",
         "menu": "Menu",
         "minimap": "Minimap",
         "stanceBar": "Houdingsbalk",

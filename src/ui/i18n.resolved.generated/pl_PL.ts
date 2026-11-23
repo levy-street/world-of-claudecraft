@@ -4456,6 +4456,8 @@ export const pl_PL: EnTranslations = {
     "raidBossGuide": {
       "title": "Przewodnik po bossie",
       "button": "Przewodnik po bossie: {boss}",
+      "sourcesLabel": "Guides",
+      "sourceRaids": "Raids",
       "subtitle": "{boss} | {difficulty}",
       "close": "Zamknij przewodnik po bossie",
       "bossesLabel": "Bossowie rajdu",
@@ -5154,6 +5156,7 @@ export const pl_PL: EnTranslations = {
         "actionBar2": "Pasek akcji 2",
         "actionBar3": "Pasek akcji 3",
         "steamWishlist": "Przypomnienie o liście życzeń",
+        "bossGuide": "Boss Guide",
         "menu": "Menu",
         "minimap": "Minimapa",
         "stanceBar": "Pasek postaw",
