@@ -2506,6 +2506,8 @@ export const TARGETS = [
       { key: 'field', scene: 'field' },
       { key: 'bar', scene: 'bar' },
       { key: 'bar-mobile', scene: 'bar', mobile: true },
+      // The whole landscape phone screen, so the bar's share of it is visible.
+      { key: 'field-mobile', scene: 'field', mobile: true },
     ],
     async capture(page, variant) {
       const scene = variant?.scene ?? 'bar';
