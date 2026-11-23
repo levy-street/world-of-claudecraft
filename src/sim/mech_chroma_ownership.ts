@@ -1,6 +1,6 @@
 import type { AccountCosmetics } from '../world_api';
 import { mechChromaForSkin, mechChromaSkinIndex } from './content/skins';
-import type { ItemUseResult, SkinCatalog } from './types';
+import type { ItemInstancePayload, ItemUseResult, SkinCatalog } from './types';
 
 export function wornMechChromaId(catalog: SkinCatalog | undefined, skin: number): string | null {
   if (catalog !== 'mech') return null;
@@ -23,20 +23,28 @@ export function accountCosmeticsWithWornMechChroma(
 export interface MechChromaOwnershipHost {
   accountCosmetics: AccountCosmetics;
   countItem(itemId: string, pid?: number): number;
-  removeItem(itemId: string, count: number, pid?: number): unknown;
+  removeItem(
+    itemId: string,
+    count: number,
+    pid?: number,
+  ): readonly (ItemInstancePayload | undefined)[];
   setPlayerSkin(pid: number, skin: number, catalog?: SkinCatalog): boolean;
 }
 
+/** `onSpent` receives the removed plate's payloads, so the caller can write
+ *  the spent copy's ledger row (cosmetic_token_spend.ts useMechChromaPlate). */
 export function unlockMechChromaFromItem(
   host: MechChromaOwnershipHost,
   owner: { entityId: number },
   itemId: string,
   chromaId: string,
+  onSpent?: (spent: readonly (ItemInstancePayload | undefined)[]) => void,
 ): ItemUseResult | undefined {
   const skin = mechChromaSkinIndex(chromaId);
   if (skin < 0) return undefined;
   if (host.countItem(itemId, owner.entityId) <= 0) return undefined;
-  host.removeItem(itemId, 1, owner.entityId);
+  const spent = host.removeItem(itemId, 1, owner.entityId);
+  onSpent?.(spent);
   const mechChromaIds = host.accountCosmetics.mechChromaIds.includes(chromaId)
     ? host.accountCosmetics.mechChromaIds
     : [...host.accountCosmetics.mechChromaIds, chromaId];

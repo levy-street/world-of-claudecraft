@@ -49,13 +49,15 @@ export const MAX_ITEM_LEDGER_DETAIL_LENGTH = 64;
 /** The closed lifecycle vocabulary of a tracked copy (the `itemTracked`
  *  event kind, mirrored by the server ledger's ITEM_LEDGER_KINDS):
  *  - mint: the copy first reaches a player (its guid is born here);
- *  - transfer: the copy changes hands;
+ *  - transfer: the copy changes hands (into the $WOC Exchange escrow too,
+ *    where `by` names the seller it left: the copy lives on there);
  *  - modify: the copy changes IN PLACE and keeps its guid (Perfecting, a
  *    legendary promotion, an enchant, a Rift Forge upgrade or socket, an
  *    unbind, a Perfecting swap);
  *  - consume: the copy ends (sundered, salvaged, disenchanted, destroyed,
- *    sold off the buyback list, learned as a pattern, spent as a reagent,
- *    deleted with its character); its guid must never be seen again;
+ *    sold off the buyback list, learned as a pattern, spent as a reagent or a
+ *    consumable, handed in for a quest, slotted as a charm, deleted with its
+ *    character); its guid must never be seen again;
  *  - derive: a NEW copy minted from an old one (an upgrade recipe, an admin
  *    restore, a duplicate-guid split), naming its parent. */
 export const ITEM_TRACKED_KINDS = ['mint', 'transfer', 'modify', 'consume', 'derive'] as const;

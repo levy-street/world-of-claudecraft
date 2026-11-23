@@ -5,16 +5,18 @@
 // clueCasketsOpened deed meter (deeds.ts), which is why the open site marks a
 // full deeds pass. Every roll draws from ctx.rng, so the three hosts agree.
 
+import { TREASURE_CASKET_ITEM_ID } from './content/clue_hunts';
 import { delveChestItemsForTier } from './content/delves/lockpick_tiers';
 import { HEROIC_MARK_CURRENCY_ID } from './content/dungeon_difficulty';
 import type { MountKey } from './content/mounts';
 import { assertHeroicMarksGrantsFit } from './heroic_marks';
+import { recordTrackedChange } from './item_tracking';
 import type { LootTier } from './lockpick';
 import { grantFreshLoot } from './loot/fresh_quality_grant';
 import { mountOwned } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { Entity } from './types';
+import type { Entity, ItemInstancePayload } from './types';
 
 /** Copper a casket pays: CASKET_COPPER_BASE + CASKET_COPPER_PER_LEVEL * level.
  *  A WORKING RULE, not a classic-era formula: 4g flat plus 10s per level (a
@@ -64,19 +66,24 @@ function rollCasketPiece(ctx: SimContext, meta: PlayerMeta): { itemId: string; c
  * requests a full deeds pass and emits clueCasketOpened with the granted item
  * ids (one entry per grant) and the copper. The HUD paints the lines from the
  * ids; no loot prose is emitted here beyond addItem's own receipt.
+ *
+ * The casket is a tracked epic, so the spent copy writes its final ledger row
+ * (source `casketOpen`, detail the granted ids) once the payout is known:
+ * `takeOneUnit` is the arm's bare removal, which writes no row of its own.
+ * The row is an emit only, so the rng sequence above is unchanged.
  */
 export function openTreasureCasket(
   ctx: SimContext,
   meta: PlayerMeta,
   player: Entity,
-  consumeOneUnit: () => void,
+  takeOneUnit: () => ItemInstancePayload | undefined,
 ): void {
   const pid = meta.entityId;
   // Reserve the possible marks before consuming the casket or drawing rewards.
   assertHeroicMarksGrantsFit(meta, [
     { itemId: HEROIC_MARK_CURRENCY_ID, count: CASKET_HEROIC_MARKS },
   ]);
-  consumeOneUnit();
+  const spent = takeOneUnit();
   const copper = treasureCasketCopper(player.level);
   const itemIds: string[] = [];
   const material = CASKET_MATERIAL_POOL[ctx.rng.int(0, CASKET_MATERIAL_POOL.length - 1)];
@@ -103,5 +110,14 @@ export function openTreasureCasket(
   // narrow dirty key (deeds.ts METER_DIRTY_KEYS), so the open site itself
   // requests the full pass.
   ctx.markDeedsDirty(pid);
+  recordTrackedChange(
+    ctx,
+    meta,
+    TREASURE_CASKET_ITEM_ID,
+    spent,
+    'consume',
+    'casketOpen',
+    itemIds.join(','),
+  );
   ctx.emit({ type: 'clueCasketOpened', itemIds, copper, pid });
 }

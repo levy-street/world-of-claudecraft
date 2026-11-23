@@ -229,6 +229,7 @@ import {
 } from './content/weapon_skin_rules';
 import { WEAPON_SKINS } from './content/weapon_skins';
 import { type AbilityChargeState, applyCooldowns, serializeCooldowns } from './cooldown_persist';
+import { spendSkinToken, useMechChromaPlate } from './cosmetic_token_spend';
 import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
@@ -382,11 +383,7 @@ import type { MaterialComposition } from './material_sources';
 import { changeMaterialStackGrouping } from './material_stack_commands';
 import type { MaterialStackSelection } from './material_stack_selection';
 import * as vaultMod from './materials_vault';
-import {
-  accountCosmeticsWithWornMechChroma,
-  unequipWornMechChroma,
-  unlockMechChromaFromItem,
-} from './mech_chroma_ownership';
+import { accountCosmeticsWithWornMechChroma, unequipWornMechChroma } from './mech_chroma_ownership';
 import { freshMusterArmy, tickMusterArmy } from './mirefen_muster';
 import { canStartMobAggro } from './mob/aggro_gate';
 import * as bossMechanics from './mob/boss_mechanics';
@@ -4465,7 +4462,7 @@ export class Sim {
       if (!rankAllowsMechChroma(granted, skin)) return null; // chroma tier above rolled rank
       const chroma = MECH_CHROMAS[skin];
       if (!chroma) return null;
-      this.removeItem(tokenItemId, 1, meta.entityId);
+      spendSkinToken(this.ctx, meta, tokenItemId, `mech:${chroma.id}`);
       meta.pendingSkinRank = null;
       meta.pendingSkinCatalog = null;
       meta.pendingSkinItemId = null;
@@ -4478,7 +4475,7 @@ export class Sim {
     }
     if (!rankAllowsSkin(granted, skin)) return null; // tier above the rolled rank
     if (!classHasSkin(meta.cls, skin)) return null; // skin doesn't exist for this class
-    this.removeItem(tokenItemId, 1, meta.entityId);
+    spendSkinToken(this.ctx, meta, tokenItemId, `class:${skin}`);
     this.setPlayerSkin(meta.entityId, skin);
     meta.pendingSkinRank = null;
     meta.pendingSkinCatalog = null;
@@ -5692,7 +5689,7 @@ export class Sim {
       // openSkinSelect is private on Sim; isSwimming is public. The owning facets stay TBD.
       startFishing: (p, meta) => fishing.startFishing(sim.ctx, p, meta),
       unlockMechChromaFromItem: (meta, itemId, chromaId) =>
-        unlockMechChromaFromItem(sim, meta, itemId, chromaId),
+        useMechChromaPlate(sim, meta, itemId, chromaId),
       openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
       isSwimming: (e) => sim.isSwimming(e),
       revalidateOffhandForSpec: (pid) => items.revalidateOffhandForSpec(sim.ctx, pid),
@@ -10053,8 +10050,8 @@ export class Sim {
   }
 
   /** Character deletion: drop the deleted seller's listings + collection (R43). */
-  purgeMarketSeller(characterId: number, name: string): boolean {
-    return this.market.purgeMarketSeller(characterId, name);
+  purgeMarketSeller(characterId: number, name: string, destroyed?: InvSlot[]): boolean {
+    return this.market.purgeMarketSeller(characterId, name, destroyed);
   }
 
   marketSearch(query: MarketQuery, pid?: number): void {
@@ -10228,8 +10225,8 @@ export class Sim {
   }
 
   /** Character deletion: clear the deleted character's mailbox (R43). */
-  purgeMailOwner(characterId: number, name: string): boolean {
-    return this.postOffice.purgeMailOwner(characterId, name);
+  purgeMailOwner(characterId: number, name: string, destroyed?: InvSlot[]): boolean {
+    return this.postOffice.purgeMailOwner(characterId, name, destroyed);
   }
 
   serializeMail(): MailSave {

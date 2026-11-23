@@ -109,7 +109,25 @@ The guid belongs to the physical copy for its whole life:
   salvage (Rift bands included), disenchant, destroying from the bags, falling
   off the end of the vendor buyback list (the sale itself is not the end: a
   buyback returns the same copy to the same holder), learning a pattern, being
-  spent as a craft reagent, and the deletion of the holding character.
+  spent as a craft reagent, being handed in at a quest turn-in or stripped as
+  the quest's own required item (at turn-in or abandon), opening a Treasure
+  Casket, being used up by a `useItem` consumable arm that spends through the
+  shared `consumeOneUnit` (an arm that removes its item itself must write its
+  own row; none of those holds a tracked id today), a skin-select token
+  or a mech chroma plate spent on its cosmetic, a tool-effect charm slotted
+  into a gathering tool, and the deletion of the holding character (with the
+  World Market listings, the Merchant collection and the homeless Ravenpost
+  letters the delete purges).
+- **Escrowed** for the `$WOC` Exchange writes a `transfer` row, never a
+  `consume`: `extractTradableCopyImpl` (`src/sim/broker_custody.ts`) records
+  the copy leaving its seller (`by` the seller, source `wocEscrow`, detail
+  `escrow`), because the copy lives on in escrow with its guid and
+  provenance intact. It leaves escrow through a delivery to the buyer (a
+  movement grant, which writes the ordinary `transfer` row naming the buyer)
+  or a return to the seller (the same holder, which writes nothing), so a
+  `wocEscrow` row followed by no later row means the copy is still in escrow
+  or back with the seller. A `consume` there would make the buyer's row read
+  as a duplicate.
 - **Became a different item** mints a NEW guid as a `derive` row whose
   `related_guid` and `provenance.derivedFrom` name the parent, while the
   parent's `consume` row names the child (an upgrade recipe such as
@@ -125,18 +143,50 @@ The guid belongs to the physical copy for its whole life:
 The `source` on these rows names the action: `perfecting`, `promotion`,
 `perfectingSwap`, `enchant`, `riftForge`, `riftSocket` and `unbind` for a
 `modify`; `sunder`, `salvage`, `disenchant`, `discard`, `vendor` (detail
-`buybackExpired`), `pattern`, `craft:<recipeId>` and `characterDelete` for a
-`consume`. Every crafted tracked copy is minted with `craft:<recipeId>`. The
-`characterDelete` rows are written inside the delete's own transaction
-(`server/character_delete_item_ledger.ts`), one per tracked copy the stored
-character held, so they land exactly when the delete does.
+`buybackExpired`), `pattern`, `craft:<recipeId>`, `questTurnIn` and
+`questAbandon` (detail the quest id), `casketOpen` (detail the granted item
+ids), `use` (detail the use type or item kind), `skinToken` (detail
+`class:<skin>` or `mech:<chromaId>`), `mechChroma` (detail the chroma id),
+`charmSlot` (detail `<professionId>:<effectId>`) and `characterDelete` for a
+`consume`; `wocEscrow` for the escrow `transfer`. Every crafted tracked copy
+is minted with `craft:<recipeId>`. The casket writes its own row once the
+payout is known, so its `useItem` arm takes the bare removal and never also
+writes a `use` row. None of these rows draws rng (they are emits beside the
+removal), so the shared draw order (`tests/parity`) is unchanged.
+
+The `characterDelete` rows for the stored character are written inside the
+delete's own transaction (`server/character_delete_item_ledger.ts`), one per
+tracked copy the stored character held (detail the container: `bags`,
+`bank`, `vault`, `buyback`, `equipped:<slot>`), so they land exactly when
+the delete does. The World Market and Ravenpost books are not in that row:
+they are the live sim's state, purged only after the delete commits
+(`purgeDeletedCharacterWorldState`, `server/characters.ts`). Each purge
+(`purgeMarketSeller`, `purgeMailOwner`) reports the copies it destroyed
+through a sink, and `server/character_purge_item_ledger.ts` writes their
+rows beside the transaction, through the same INSERT (detail `market` or
+`mail`, `character_id` NULL, the account kept), once both books have saved.
+A copy on a letter that flies home to a live sender is not destroyed and
+writes nothing. Writing after the saves narrows, but cannot close, the
+crash window below: the save wrappers swallow their errors, so a failed
+save plus a crash can reload a purged copy whose consume row exists.
 
 The copy-choice walks that destroy "the least special copy first" (an
 untargeted disenchant or sunder) read a copy whose payload is only its
 tracked identity as plain (`isPlainCopy`, `src/sim/item_plain_copy.ts`), so
 a Perfected copy is never spent while an ordinary one sits in the bags. The
-same rule keeps the bag corner glyph off an ordinary epic and lets the
-market's "lowest price of each" view collapse ordinary epic listings.
+other prefer-plain removers (trade staging, vendor sale, id-only salvage and
+apply-enchant, bulk discard, quest hand-in) and their capacity scratch twin
+(`consumeOneScratch`, `src/sim/bags.ts`) run the same order: payload-free
+copies, then identity-only copies with their payload carried out
+(`takeIdentityOnlyUnits`), then the special ones, so a traded copy keeps its
+guid and a salvaged or discarded one writes its own `consume` row. The
+disenchant and sunder walk folds the two plain classes into one pass; either
+way no special copy goes while a plain one is held. The bag destroy warning
+reads the same `isPlainCopy`, judged on the selected copy when a cell is
+named. The same rule keeps the bag corner
+glyph off an ordinary epic and lets the market's "lowest price of each" view
+collapse ordinary epic listings. Mail and market escrow stay payload-free
+only: their `() => true` skip sees an identity-only copy as instanced.
 
 So a guid seen in any row after its `consume` row is a duplicated copy. The
 change history lives in the ledger only; the copy's own payload stays small
@@ -211,7 +261,10 @@ doors and the record: a copy the viewer does not hold reaches the dialog as
 (the hub, the boundaries, the transfers, bags, auto-equip, derive and the
 duplicate guard), `tests/item_lineage_modify.test.ts` (the in-place rows),
 `tests/item_tracking_consume.test.ts` (the end-of-life and derive rows),
-`tests/server/character_delete_item_ledger.test.ts` (the delete rows),
+`tests/item_tracking_consume_paths.test.ts` (the quest, use, cosmetic, charm
+and escrow rows), `tests/server/character_delete_item_ledger.test.ts` (the
+delete rows), `tests/server/character_purge_item_ledger.test.ts` (the purge
+rows),
 `tests/item_history_view.test.ts` and `tests/item_history_dialog_dom.test.ts`
 (the right-click history), `tests/item_history_access_view.test.ts`,
 `tests/trade_item_history_dom.test.ts` and

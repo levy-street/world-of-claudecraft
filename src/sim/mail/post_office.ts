@@ -1320,8 +1320,11 @@ export class PostOffice {
   // walk is here anyway, the deleted character's own pre-senderKey OUTGOING
   // letters get their stable id stamped, so an eventual return flight lands
   // on the dead id and self-destructs instead of reaching whoever reclaims
-  // the freed display name. Returns whether anything changed.
-  purgeMailOwner(characterId: number, name: string): boolean {
+  // the freed display name. Returns whether anything changed. The attachments
+  // of every deleted letter (never a returned one: those copies fly home and
+  // live on) are appended to `destroyed` when given, so the server can write
+  // the tracked copies' final ledger rows (server/character_purge_item_ledger.ts).
+  purgeMailOwner(characterId: number, name: string, destroyed?: InvSlot[]): boolean {
     if (!Number.isFinite(characterId)) return false;
     const key = String(characterId);
     const now = this.ctx.time;
@@ -1375,6 +1378,7 @@ export class PostOffice {
       }
       this.index.untrack(m, now);
       this.mail.splice(i, 1);
+      destroyed?.push(...m.items);
     }
     if (changed) this.bumpRev();
     return changed;

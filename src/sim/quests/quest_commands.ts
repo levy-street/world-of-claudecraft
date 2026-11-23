@@ -27,6 +27,7 @@ import { bagPools, bagsFullError, consumeOneScratch, countStacked, fitsAll } fro
 import { WISP_MAZE_QUEST_ID } from '../content/world_quest_wisp_maze';
 import { DUNGEONS, ITEMS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
+import { recordTrackedConsumed } from '../item_tracking';
 import { removePreferFungible } from '../items';
 import { grantFreshLoot } from '../loot/fresh_quality_grant';
 import type { ArchetypeState } from '../professions/archetype';
@@ -325,12 +326,21 @@ export function acceptLinkedQuest(
 // are durable prerequisites the player keeps, the profession tools (the mining pick,
 // the gathering sickle) and cross-quest keys (the Crypt Keystone). Stripping those
 // would delete a tool the always-require-tool harvest gate still needs.
-function stripRequiredItems(ctx: SimContext, quest: QuestDef, meta: PlayerMeta): void {
+// A stripped tracked copy ends here: its final ledger row names the action
+// (`questTurnIn` or `questAbandon`) and the quest.
+function stripRequiredItems(
+  ctx: SimContext,
+  quest: QuestDef,
+  meta: PlayerMeta,
+  source: 'questTurnIn' | 'questAbandon',
+): void {
   for (const itemId of quest.requiredItems ?? []) {
     const def = ITEMS[itemId];
     if (!def || def.kind !== 'quest' || def.questId !== quest.id) continue;
     const have = ctx.countItem(itemId, meta.entityId);
-    if (have > 0) ctx.removeItem(itemId, have, meta.entityId);
+    if (have <= 0) continue;
+    const stripped = ctx.removeItem(itemId, have, meta.entityId);
+    recordTrackedConsumed(ctx, meta, itemId, stripped, source, quest.id);
   }
 }
 
@@ -373,7 +383,7 @@ export function abandonQuest(ctx: SimContext, questId: string, pid?: number): vo
     return;
   }
   if (!meta.questLog.has(questId)) return;
-  stripRequiredItems(ctx, QUESTS[questId], meta);
+  stripRequiredItems(ctx, QUESTS[questId], meta, 'questAbandon');
   meta.questLog.delete(questId);
   ctx.emit({
     type: 'log',
@@ -505,19 +515,21 @@ export function turnInQuestCore(
       // deprioritize the owner's self-signed CHARM copies; that charm-scoped
       // rule is deliberately absent here because no shipped quest collects a
       // charm (the grade-pool guard in tests/material_grades.test.ts keeps
-      // the collect vocabulary honest).
+      // the collect vocabulary honest). A handed-in tracked copy ends here:
+      // its final ledger row, source `questTurnIn`, detail the quest.
       for (const take of planGradeRemoval(
         obj.itemId,
         questObjectiveRequired(quest, qp, index),
         (id) => ctx.countItem(id, meta.entityId),
       )) {
-        removePreferFungible(ctx, take.itemId, take.count, meta.entityId);
+        const handedIn = removePreferFungible(ctx, take.itemId, take.count, meta.entityId);
+        recordTrackedConsumed(ctx, meta, take.itemId, handedIn, 'questTurnIn', quest.id);
       }
     }
   }
   // Required items (tools, not rewards) leave with the finished quest, so a spent
   // firebottle does not linger in the bag after "Back to the Shallows".
-  stripRequiredItems(ctx, quest, meta);
+  stripRequiredItems(ctx, quest, meta, 'questTurnIn');
   qp.state = 'done';
   meta.questLog.delete(questId);
   const firstCompletion = !meta.questsDone.has(questId);

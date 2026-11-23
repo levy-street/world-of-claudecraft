@@ -1318,7 +1318,10 @@ const MONOLITHS: MonolithRow[] = [
     // riding progression lives in riding_training.ts. wc -l on the merged tree.
     // 11485 after the courier full-bank sync (PR 4598). wc -l.
     // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 11410,
+    // Lowered 11410 -> 11406 when the tracked-copy spend rows for the skin
+    // token and the mech chroma plate went to src/sim/cosmetic_token_spend.ts
+    // (the claim and the item-use binding call it); wc -l on the merged tree.
+    ceiling: 11406,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

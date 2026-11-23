@@ -41,6 +41,7 @@ import {
 } from '../content/professions';
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
+import { recordTrackedChange } from '../item_tracking';
 import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -132,7 +133,21 @@ export function slotToolEffectAction(
   // copy would record provenance the player still holds.
   const entry = r.meta.inventory[resolved.consumeIndex];
   if (entry.count > 1) entry.count -= 1;
-  else r.meta.inventory.splice(resolved.consumeIndex, 1);
+  else {
+    r.meta.inventory.splice(resolved.consumeIndex, 1);
+    // A slotted tracked charm (the epic Maker's Charm) ends here: its final
+    // ledger row names the slot it became. A tracked copy is one per slot, so
+    // only this arm can carry a guid.
+    recordTrackedChange(
+      ctx,
+      r.meta,
+      entry.itemId,
+      entry.instance,
+      'consume',
+      'charmSlot',
+      `${resolved.professionId}:${effectId}`,
+    );
+  }
   // The hub's own post-removal duty, which a targeted splice would otherwise
   // skip: bump wireRev and re-derive collect-quest counts from live bags
   // (sim.ts removeItem and the enchanting targeted removals all do this). No

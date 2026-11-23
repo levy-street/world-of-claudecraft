@@ -421,6 +421,33 @@ describe('BagItemActionMenu disenchant dispatch', () => {
     expect(gone.sundered).toEqual([{ itemId, target: { slotIndex: -1 } }]);
   });
 
+  it('the salvage warning judges the SELECTED copy, even beside an ordinary tracked one', () => {
+    // Salvage destroys the named cell, so a selected Perfected epic must get
+    // the strong warning although an ordinary (identity-only) copy is held.
+    const itemId = 'warhewn_signet';
+    const identity = {
+      guid: '3f2504e0-4f89-41d3-9a0c-0305e82c3301',
+      provenance: { at: 1, by: 'Ada', source: 'world' },
+    };
+    const held: InvSlot[] = [
+      { itemId, count: 1, instance: identity },
+      { itemId, count: 1, instance: { ...identity, perfected: true } },
+    ];
+    const name = itemDisplayName(ITEMS[itemId]);
+    const special = harness(768, held);
+    special.openFor(itemId, 1);
+    special.click('salvage');
+    expect(special.confirms[0].body).toBe(
+      t('hudChrome.enchanting.salvageConfirmBodySpecial', { item: name }),
+    );
+    const ordinary = harness(768, held);
+    ordinary.openFor(itemId, 0);
+    ordinary.click('salvage');
+    expect(ordinary.confirms[0].body).toBe(
+      t('hudChrome.enchanting.salvageConfirmBody', { item: name }),
+    );
+  });
+
   it('the salvage OK names the clicked copy by target, and a vanished copy sends -1', () => {
     const itemId = defFor('uncommon').id;
     const h = harness(768, [
