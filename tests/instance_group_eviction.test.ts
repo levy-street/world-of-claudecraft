@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, DUNGEONS, dungeonAt } from '../src/sim/data';
-import { dungeonExitStandingPos, soloInstanceKeyFor } from '../src/sim/instances/dungeons';
+import {
+  dungeonExitStandingPos,
+  instanceClaimContains,
+  instanceOriginOf,
+  soloInstanceKeyFor,
+} from '../src/sim/instances/dungeons';
 import {
   belongsInClaim,
   INSTANCE_EVICTED_TEXT,
@@ -204,16 +209,63 @@ describe('classic group-instance eviction', () => {
       expect(inside(inst, entity(sim, member), sim)).toBe(true);
     });
 
-    it('keeps the party key where the player already owns a solo run of that dungeon', () => {
+    it('keeps the run when the player still has an empty solo run of that dungeon', () => {
+      const sim = newSim();
+      const leader = sim.addPlayer('warrior', 'Lead');
+      const member = sim.addPlayer('priest', 'Member');
+      // The member runs it alone first and walks out; that claim lingers.
+      expect(sim.enterDungeon('hollow_crypt', member)).toBe(true);
+      const old = sim.instances.find(
+        (i) => i.partyKey === soloInstanceKeyFor(sim.ctx, member),
+      ) as InstanceSlot;
+      expect(sim.leaveDungeon(member)).toBe(true);
+      sim.partyInvite(member, leader);
+      sim.partyAccept(member);
+      expect(sim.enterDungeon('hollow_crypt', leader)).toBe(true);
+      expect(sim.enterDungeon('hollow_crypt', member)).toBe(true);
+      const inst = sim.instances.find((i) => i.partyKey === `party:${sim.ctx.partyOf(member)?.id}`);
+      expect(inst).toBeDefined();
+      expect(inst).not.toBe(old);
+      const partyKey = inst?.partyKey;
+      sim.drainEvents();
+      sim.partyLeave(leader);
+      const events = advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 5);
+      expect(events.get(member)).toBeUndefined();
+      expect(inside(inst as InstanceSlot, entity(sim, member), sim)).toBe(true);
+      expect(inst?.partyKey).toBe(soloInstanceKeyFor(sim.ctx, member));
+      // The old solo run takes the dead party key, so nobody owns it.
+      expect(old.partyKey === null || old.partyKey === partyKey).toBe(true);
+    });
+
+    it('keeps the old solo run instead when the player is standing in it', () => {
       const { sim, leader, member, inst } = duo();
       const own = sim.instances.find(
         (i) => i !== inst && i.dungeonId === 'hollow_crypt' && i.partyKey === null,
       ) as InstanceSlot;
       own.partyKey = soloInstanceKeyFor(sim.ctx, member); // the member's own solo run
+      const p = entity(sim, member);
+      // The same spot, carried from the group run into the old solo run.
+      const from = instanceOriginOf(inst);
+      const to = instanceOriginOf(own);
+      p.pos = { ...p.pos, x: p.pos.x - from.x + to.x, z: p.pos.z - from.z + to.z };
+      expect(instanceClaimContains(own, p.pos)).toBe(true);
       const partyKey = inst.partyKey;
       sim.partyLeave(leader);
-      expect(own.partyKey).not.toBe(partyKey);
+      expect(own.partyKey).toBe(soloInstanceKeyFor(sim.ctx, member));
       expect(inst.partyKey).toBe(partyKey);
+    });
+
+    it('hands the run to the partner who stays when the last member is logging out', () => {
+      const { sim, leader, member, inst } = duo();
+      // The leader disconnects; while their leave save is in flight, the member
+      // leaves the party, leaving the logging-out leader as its last member.
+      sim.preparePlayerLeave(leader);
+      sim.partyLeave(member);
+      expect(inst.partyKey).toBe(soloInstanceKeyFor(sim.ctx, member));
+      sim.removePlayer(leader);
+      const events = advance(sim, INSTANCE_EVICTION_GRACE_SECONDS + 5);
+      expect(events.get(member)).toBeUndefined();
+      expect(inside(inst, entity(sim, member), sim)).toBe(true);
     });
 
     it('does not pass a raid on to its last raider', () => {

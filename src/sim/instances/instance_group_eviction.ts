@@ -20,8 +20,11 @@
 // kicked, or logged out, which removes them from the party), that player keeps
 // the run: handRunToLastMember, called from the party disband, re-keys the
 // party's claims to their solo key, so the door, Reset All and difficulty
-// changes treat it as their own. Everyone else who was in the group is still
-// evicted, unless the owner groups with them again.
+// changes treat it as their own (an old solo run of the same dungeon gives way
+// to it). Everyone else who was in the group is still evicted, unless the
+// owner groups with them again. If the last member is already logging out, the
+// run goes to the player who just left instead, as it would have had the
+// logout landed first.
 //
 // The warning repeats at INSTANCE_EVICTION_REMINDER_SECONDS left. A player who
 // leaves the world (logout or disconnect) while they do not belong is set down
@@ -187,18 +190,47 @@ function groupedWithSoloOwner(ctx: SimContext, pid: number, soloKey: string): bo
 }
 
 /** A non-raid party disbanded down to one player: hand them every claim the
- *  party held, re-keyed to their solo key. A dungeon they already hold a solo
- *  claim for keeps the party key instead (one claim per key and dungeon, the
- *  same guard the expedition re-key keeps). Call after their party is gone. */
-export function handRunToLastMember(ctx: SimContext, partyKey: string, pid: number): void {
+ *  party held, re-keyed to their solo key. Where they already hold a solo claim
+ *  of that dungeon (one claim per key and dungeon, the guard the expedition
+ *  re-key keeps), the two claims swap keys: the group run becomes theirs and
+ *  the old solo run takes the dead party key (party ids are never reused), so
+ *  nobody owns it and the empty-claim reaper frees it. A player standing in the
+ *  old solo run keeps that one instead, and the group run keeps the dead key.
+ *  A last member already leaving the world (their leave save is in flight, and
+ *  their own removal would have disbanded the party a moment later) passes the
+ *  run to `departedPid`, the player whose departure disbanded it, as that later
+ *  disband would have; it goes to nobody if both are leaving. Call after their
+ *  party is gone. */
+export function handRunToLastMember(
+  ctx: SimContext,
+  partyKey: string,
+  lastPid: number,
+  departedPid: number,
+): void {
+  const pid = [lastPid, departedPid].find((id) => {
+    const meta = ctx.players.get(id);
+    return meta !== undefined && !meta.leaving;
+  });
+  if (pid === undefined) return;
   const soloKey = soloInstanceKeyFor(ctx, pid);
   for (const inst of ctx.instances) {
     if (inst.partyKey !== partyKey) continue;
-    const clash = ctx.instances.some(
+    const old = ctx.instances.find(
       (other) => other.partyKey === soloKey && other.dungeonId === inst.dungeonId,
     );
-    if (!clash) inst.partyKey = soloKey;
+    if (old && playerInside(ctx, old)) continue;
+    if (old) old.partyKey = partyKey;
+    inst.partyKey = soloKey;
   }
+}
+
+/** Is any player standing inside this claim? The empty-claim reaper's test. */
+function playerInside(ctx: SimContext, inst: InstanceSlot): boolean {
+  for (const meta of ctx.players.values()) {
+    const e = ctx.entities.get(meta.entityId);
+    if (e && instanceClaimContains(inst, e.pos)) return true;
+  }
+  return false;
 }
 
 /** A player leaving the world (Sim.preparePlayerLeave, before the leave save)

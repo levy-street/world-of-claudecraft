@@ -669,7 +669,7 @@ export class PartyMachine {
       // The one player left keeps the group's dungeon runs (a raid's do not
       // pass on: a player outside any raid group is evicted from it).
       if (party.members.length === 1 && !party.raid) {
-        handRunToLastMember(this.ctx, `party:${party.id}`, party.members[0]);
+        handRunToLastMember(this.ctx, `party:${party.id}`, party.members[0], pid);
       }
       this.parties.delete(party.id);
       this.ctx.dropPartyMarkers(party.id);
