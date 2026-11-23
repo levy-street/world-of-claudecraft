@@ -187,3 +187,12 @@ string leaf new-to-old, re-digests, and requires the result to equal the baselin
 goldens frame by frame, so any behavioral drift cannot survive the reverse map.
 It is the ONLY sanctioned path for accepting state-hash-only golden deltas
 (`ip-refactor/golden_token_inspector.mjs --allow-state-hashes`).
+
+New world content that spawns entities at construction (camps, keepers, ground
+objects) shifts every later entity id, and a few scenarios see ids through staggered
+schedules (`mob/cast_sight.ts`, `mob/trash_kit/kit_cast_sight.ts`), so their rng
+fingerprint can move with no rule change. Before accepting such a re-record, prove it:
+re-run the changed scenario at the head with `sim.nextId` raised until the id shift is
+a whole stagger period, and require the old golden's ticks, draw count and digest back
+exactly (`tests/parity_id_phase.test.ts` pins the two known cases). A scenario that does
+not come back is a real behaviour change: trace it.
