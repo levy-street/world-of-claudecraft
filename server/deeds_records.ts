@@ -223,8 +223,13 @@ export function recordDeedUnlocks(
  *  every join. */
 export function reconcileCharacterDeeds(
   who: { characterId: number; accountId: number },
-  deedIds: readonly string[],
+  earnedIds: readonly string[],
 ): void {
+  // Replay live catalog ids only. An outright-removed deed (soc_civic_duty,
+  // docs/design/deeds.md rule 5) stays in the earned blob verbatim, and
+  // replaying it would re-create the character_deeds row a maintainer purged
+  // on every join. The Renown board's roll-up skips such rows anyway.
+  const deedIds = earnedIds.filter((id) => Object.hasOwn(DEEDS, id));
   if (deedIds.length === 0) return;
   try {
     tail = tail

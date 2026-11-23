@@ -120,9 +120,11 @@ server store always canonical.
    few earners, allowed under the same reading as the Fiesta ruling above),
    the Book window and every meter walk `DEED_ORDER` so no ghost row paints,
    the account ledger's decode is catalog-bounded (see "The account ledger"),
-   and the Renown board's SQL roll-up skips unknown ids, logging them once
+   the Renown board's SQL roll-up skips unknown ids, logging them once
    per refresh so a maintainer can purge the dead `character_deeds` rows by
-   hand if the log is unwelcome. Pinned by the Town Focus case in
+   hand if the log is unwelcome, and the login reconcile
+   (`server/deeds_records.ts` `reconcileCharacterDeeds`) replays live catalog
+   ids only, so a purged row stays purged. Pinned by the Town Focus case in
    `tests/character_state_backcompat.test.ts`. Any future outright removal
    follows this precedent, records it here, and ships in the same change as
    the mechanic it belongs to.
