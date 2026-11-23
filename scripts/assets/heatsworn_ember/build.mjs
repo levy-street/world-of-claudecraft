@@ -4,7 +4,11 @@
 // node build.mjs <emberkin.glb> <color_red.png> <emissive_red.png> <out.glb>
 import fs from 'node:fs';
 import { NodeIO } from '@gltf-transform/core';
-import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extensions';
+import {
+  ALL_EXTENSIONS,
+  EXTMeshoptCompression,
+  KHRMeshQuantization,
+} from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 
 const [, , src, colorPng, emissivePng, out] = process.argv;
@@ -26,6 +30,9 @@ mat.setEmissiveTexture(glow).setEmissiveFactor([1, 1, 1]);
 mat.getEmissiveTextureInfo().setTexCoord(mat.getBaseColorTextureInfo().getTexCoord());
 // The source's accessors are quantized as read (KHR_mesh_quantization stays), so the
 // FILTER method only re-compresses them.
+// The filter method stores normals as normalized bytes, which glTF only allows when the
+// file declares KHR_mesh_quantization.
+doc.createExtension(KHRMeshQuantization).setRequired(true);
 doc
   .createExtension(EXTMeshoptCompression)
   .setRequired(true)

@@ -122,6 +122,12 @@ const PITCH = { heatsworn_ember: 0.5, veinback_burrower: 0.45 };
 
 for (const templateId of MOBS) {
   await chat('/dev noaggro');
+  // SHOT_SPAWN=1 spawns each mob beside the player first (for mobs that live elsewhere,
+  // such as a dungeon's).
+  if (process.env.SHOT_SPAWN) {
+    await chat(`/dev spawn ${templateId}`);
+    await sleep(1500);
+  }
   const found = await page.evaluate(
     ([id, camDist, camPitch]) => {
       const world = window.__game.world;

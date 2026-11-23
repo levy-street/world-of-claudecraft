@@ -278,15 +278,19 @@ describe('the Quartered Isle lane (iOS)', () => {
     // rest of the overworld starts drawing, fails here until updated on purpose.
     const expected = [
       'mob_hoard_rime_elemental',
-      'mob_hoard_hoarfrost_warden',
       'mob_hoard_ember_fiend',
-      'mob_hoard_magma_brute',
       'mob_remnant_first_colossus',
       'mob_rimeglass_bear',
+      // the isle's own bodies
+      'mob_warden_of_the_quench',
+      'mob_the_glassfield_brute',
+      'mob_heaved_shardling',
+      'mob_veinback_burrower',
+      'mob_heatsworn_ember',
     ].map((key) => VISUALS[key].url);
     expect([...ios.isle].sort()).toEqual([...new Set(expected)].sort());
-    // shared with the wider overworld, so they stay in the entry stream
-    for (const id of ['heatsworn_ember', 'heaved_shardling', 'veinback_burrower', 'ember_hound']) {
+    // shared with the wider overworld, so it stays in the entry stream
+    for (const id of ['ember_hound']) {
       expect(ios.postEntry, id).toContain(VISUALS[mobKey(id)].url);
     }
   });

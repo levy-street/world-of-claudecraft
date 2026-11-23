@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "4803ac8282455d48a5423fb2278d2e3f0a90054a1850a3efe8c5aad216f1f792",
+  "rendererFingerprint": "65c01af0ab86eb2dfb8952667a61c1288c0aebb148d0d126ecaa11349ef073c2",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "linux",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 6978664,
-      "sha256": "dcb4e0221df85ee75adc73c68ddc145f06ed7d494e1ac77d74d16fdbb45147ff",
+      "sha256": "420919c37acd082fa38ef1d93289b286f3db8fadb87c8a462bda0c58b3c8033b",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -5167,8 +5167,8 @@
         "model": {
           "url": "models/creatures/heatsworn_ember.glb",
           "path": "public/models/creatures/heatsworn_ember.glb",
-          "bytes": 889588,
-          "sha256": "561c9ce9cc1d9d258bc4af0f3746ff50429faf571e6b639da67e05115a5b092c"
+          "bytes": 523056,
+          "sha256": "2096f29cee581d05ab1979bb98ff71c0f77bf144cf0b909cc5dd3104ebf2c934"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -5185,11 +5185,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "01ca3444d571df9f7e38d1905fdee54a1a252a55ce54f193d7802e81dde6e42d",
+      "sourceFingerprint": "58804d63cd7ccb582ad7a19832107986a300dd6342a6a5c9503af3a64c863ada",
       "output": {
         "path": "public/ui/mobs/heatsworn_ember.webp",
-        "bytes": 2066,
-        "sha256": "59c43848aad9be20a676372445de277cba3e815aebd4a704a33d80ff2f0cb5c6"
+        "bytes": 2058,
+        "sha256": "ff108055f6137f105589c3426b9ee4e188ccb8ff932505f3dbe12ff823178613"
       }
     },
     {
@@ -9349,8 +9349,8 @@
         "model": {
           "url": "models/creatures/hoard_hoarfrost_warden.glb",
           "path": "public/models/creatures/hoard_hoarfrost_warden.glb",
-          "bytes": 1380796,
-          "sha256": "80f8cf59e6e82a5485834d50f7087561cd7c1a38f5cab635e015bb0a229557e3"
+          "bytes": 1153300,
+          "sha256": "e28b2badbb37857cad2e2c2fe2bb622f2c11b2bd9e31a7bc4de2d9017a972fb1"
         },
         "idle": "Idle",
         "height": 2.6,
@@ -9367,7 +9367,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "5532699dc6adfa43987a2888afcefd78c8f99333c0cf9005e3b003f502995ff7",
+      "sourceFingerprint": "f5c5d7e89c667b9647cf9b3bb6370fd2e4c3f47495c35c24cb48938c8a7386eb",
       "output": {
         "path": "public/ui/mobs/rift_boss_frost.webp",
         "bytes": 3508,

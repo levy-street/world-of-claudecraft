@@ -29,6 +29,12 @@ node scripts/assets/hoard_bosses/assemble.mjs maw <dir> public/models/creatures/
 blender --background --python scripts/assets/hoard_bosses/frost_fix.py -- <preset.glb> <fixed/preset.glb> <relax>
 blender --background --python scripts/assets/hoard_bosses/frost_fix.py -- <slash.glb> <fixed/slash.glb> 0 --attack <fixed/idle.glb>
 node scripts/assets/hoard_bosses/assemble.mjs frost <fixed dir> public/models/creatures/hoard_hoarfrost_warden.glb
+# then his Death topples (defeat_02 ends standing): strip a copy Blender can open,
+# topple it, graft only the Death clip back (textures and every other clip untouched)
+c=scripts/assets/quartered_isle_creatures; w=public/models/creatures/hoard_hoarfrost_warden.glb
+node $c/graft_death.mjs strip $w tmp/hw_plain.glb
+blender -b --factory-startup --python $c/topple_death.py -- tmp/hw_plain.glb tmp/hw_topple.glb
+node $c/graft_death.mjs graft $w tmp/hw_topple.glb $w
 
 # Ember, Vharok, Nyxaris: reshape or fix the raw, rig it locally (free), then
 # harden what must not bend (rig-manual weights by distance, which drags a chibi
