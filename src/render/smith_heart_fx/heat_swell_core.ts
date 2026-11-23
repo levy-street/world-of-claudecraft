@@ -25,6 +25,11 @@ export const HEAT_SWELL_LOOK = {
   /** How far behind the wall the trail still glows (yards). */
   coolRun: T.waveSpeed * 2.2,
   originShake: 0.55,
+  /** The fire burning along the crest (line_fire_wall.ts): its height over
+   *  the crest and its tongues' reach (the polish pass of 2026-11-23: the
+   *  bare molten curl read as a plastic roll, not a wave of fire). */
+  flameHeight: 4.2,
+  flameTongue: 5.2,
 } as const;
 
 /** The wave's cross-section, front foot to back foot, as (z, y): z in

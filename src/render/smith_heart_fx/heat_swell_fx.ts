@@ -40,6 +40,7 @@ import {
   swellFootprint,
   swellTrailFade,
 } from './heat_swell_core';
+import { LineFireWall } from './line_fire_wall';
 
 /** What HeatFx lends the swells. */
 export interface HeatSwellHost {
@@ -61,6 +62,8 @@ const SPAN_UNIT = 2.5;
 const _foot = { near: 0, far: 0 };
 const _spray = { x: 0, y: 0, z: 0, sin: 0, cos: 1, half: 1, k: 0 };
 const FWD: [number, number, number] = [0, 0, 0];
+/** The crest's flames draw over the floor and after the wall's opaque body. */
+const SWELL_FLAME_ORDER = 5000;
 
 /** Drops torn off the crest and flung ahead of the wave. */
 const DROP: Puff = {
@@ -277,16 +280,16 @@ void main() {
   // Deep red low in the hollow, heating to orange toward the lip; skins of
   // cooling crust ride up the face and tear (a wall of rock, not a glow).
   float rise = smoothstep(0.05, lipV, v);
-  float mFace = 0.24 + 0.16 * flow + 0.26 * streak * rise + 0.22 * rise;
-  float skin = smoothstep(0.56, 0.72, fbm(vec2(across * 0.8, v * 3.2 - uTime * 1.5) + 4.0));
-  mFace = mix(mFace, 0.08 + 0.06 * flow, skin * 0.8 * (1.0 - smoothstep(lipV - 0.12, lipV, v)));
+  float mFace = 0.17 + 0.14 * flow + 0.26 * streak * rise + 0.17 * rise;
+  float skin = smoothstep(0.5, 0.66, fbm(vec2(across * 0.8, v * 3.2 - uTime * 1.5) + 4.0));
+  mFace = mix(mFace, 0.06 + 0.06 * flow, skin * 0.9 * (1.0 - smoothstep(lipV - 0.12, lipV, v)));
   // Plates of dark crust riding the back, their seams alight (wider and
   // hotter near the crest, where the crust tears).
   vec2 cp = vec2(across * 0.75, v * 6.0 + uTime * 0.4);
   // Warped, uneven plates (not a net).
   float seam = cellEdge(cp + (vec2(vn(cp * 1.3), vn(cp * 1.3 + 5.7)) - 0.5) * 0.9);
   float nearCrest = 1.0 - smoothstep(0.66, 0.98, v);
-  float plate = smoothstep(0.03 + 0.05 * nearCrest, 0.12 + 0.08 * nearCrest, seam);
+  float plate = smoothstep(0.02 + 0.04 * nearCrest, 0.08 + 0.06 * nearCrest, seam);
   float grain = vn(cp * 6.0) * 0.08;
   float mBack = mix(0.6 + 0.1 * flow, 0.04 + grain + 0.1 * nearCrest, plate);
   float m = mix(mFace, mBack, back);
@@ -399,6 +402,11 @@ void main() {
 
 interface SwellSlot {
   wall: THREE.Mesh;
+  /** The fire burning along its crest (line_fire_wall.ts). */
+  flames: LineFireWall;
+  /** The crest's height across this frame (built once: no closure a frame). */
+  crest: (xs: number) => number;
+  crestH: number;
   wallMat: THREE.ShaderMaterial;
   wake: THREE.Mesh;
   wakeMat: THREE.ShaderMaterial;
@@ -471,8 +479,33 @@ export class HeatSwells {
         host.materials,
       );
       host.root.add(wake);
-      this.slots.push({
+      // The crest burning: real flames licking up off it and trailing back,
+      // smoke rolling off them, embers (the Firestorm's own fire, so the
+      // fight's moving fires read as one family). Every tier; the low tier
+      // keeps one sheet and sheds the smoke, the haze and most embers.
+      const detail = host.density >= 1;
+      const flames = new LineFireWall(
+        host,
+        {
+          name: 'smithHeartHeatSwellFlames',
+          height: L.flameHeight,
+          tongue: L.flameTongue,
+          sheetBack: detail ? [1.0, 1.9, 2.8] : [1.6],
+          bodyBack: 2.2,
+          tongues: detail ? 26 : 10,
+          embers: detail ? 220 : 60,
+          smoke: detail,
+          haze: detail,
+          gain: detail ? 0.55 : 0.85,
+          order: SWELL_FLAME_ORDER,
+        },
+        i + 40,
+      );
+      const slot: SwellSlot = {
         wall,
+        flames,
+        crest: () => 0,
+        crestH: 0,
         wallMat,
         wake,
         wakeMat,
@@ -485,7 +518,11 @@ export class HeatSwells {
         live: false,
         goneAt: -99,
         rolled: false,
-      });
+      };
+      // The flames stand on the crest (its droop toward the lane's edges),
+      // a little under its top so they grow out of the rock.
+      slot.crest = (xs) => slot.crestH * 0.9 * swellDroop(xs);
+      this.slots.push(slot);
     }
   }
 
@@ -515,6 +552,7 @@ export class HeatSwells {
     s.rolled = false;
     s.goneAt = -99;
     s.wall.visible = false;
+    s.flames.hide();
     s.wake.visible = false;
     s.wake.position.set(x, y + 0.05, z);
     s.wake.rotation.y = facing;
@@ -548,6 +586,18 @@ export class HeatSwells {
     u.uFar.value = foot.far;
     u.uFade.value = 1;
     s.wake.visible = true;
+    s.crestH = h;
+    s.flames.set(
+      wx,
+      gy,
+      wz,
+      sin,
+      cos,
+      s.half,
+      s.wall.visible ? Math.min(1, h / L.height) : 0,
+      1,
+      s.crest,
+    );
     if (!s.wall.visible) return;
     this.spray(s, wx, gy, wz, h, dt);
   }
@@ -611,6 +661,7 @@ export class HeatSwells {
     if (!s.live) return;
     s.live = false;
     s.wall.visible = false;
+    s.flames.hide();
     if (s.rolled) {
       s.goneAt = this.clock;
       // The box cools into the trail with the rest.
@@ -670,6 +721,7 @@ export class HeatSwells {
       s.live = false;
       s.goneAt = -99;
       s.wall.visible = false;
+      s.flames.hide();
       s.wake.visible = false;
     }
   }

@@ -1,12 +1,12 @@
 // Firestorm's wall of flame (Elemental Fusion of the Heat and the Breath), a
 // part of FinalElementsFx (final_elements_fx.ts keeps the lane's floor
 // telegraph through the warning and lends its host). The plan and the reasons
-// are final_firestorm_core.ts; the programs final_firestorm_glsl.ts, the
-// fragments shared with the Heat guardian's wall of fire
-// (heat_lava_wall_glsl.ts). Per lane slot:
-//   - the wall: stacked fire curtains (one draw), its dark body, the air lit
-//     round it, smoke off its tips and a heat haze (detail tier), tongues
-//     leaping off it (one instanced draw), embers and sparks (one point draw);
+// are final_firestorm_core.ts; the programs final_firestorm_glsl.ts. Per lane
+// slot:
+//   - the wall: a LineFireWall (line_fire_wall.ts, the Heat guardian's fire on
+//     a straight front): stacked fire curtains, its dark body, the air lit
+//     round it, smoke and haze (detail tier), tongues, embers and sparks,
+//     standing on the floor's own heights across the front;
 //   - the trail: low curtains of fire down the burnt lane (one draw, baked on
 //     the floor once per lane), out the moment the sim's lane ends;
 //   - the floor: the burnt lane (one draw, baked once per lane) with the
@@ -26,23 +26,10 @@ import {
   firestormWall,
   FIRESTORM_LOOK as L,
 } from './final_firestorm_core';
-import {
-  FS_EMBER_VERT,
-  FS_FLOOR_FRAG,
-  FS_FLOOR_VERT,
-  FS_SHEET_VERT,
-  FS_TONGUE_VERT,
-  FS_TRAIL_VERT,
-} from './final_firestorm_glsl';
+import { FS_FLOOR_FRAG, FS_FLOOR_VERT, FS_TRAIL_VERT } from './final_firestorm_glsl';
 import { fireRampGlsl } from './heat_flame_core';
-import {
-  WALL_EMBER_FRAG,
-  WALL_GLOW_FRAG,
-  WALL_HAZE_FRAG,
-  WALL_SMOKE_FRAG,
-  wallFireFrag,
-  wallTongueFrag,
-} from './heat_lava_wall_glsl';
+import { wallFireFrag } from './heat_lava_wall_glsl';
+import { LineFireWall, lineFireHash } from './line_fire_wall';
 
 /** What FinalElementsFx lends the wall. */
 export interface FinalFirestormHost {
@@ -63,7 +50,7 @@ interface Uni {
 /** The longest lane a slot bakes (the sim's rim-to-rim lane is 108 yd). */
 const MAX_LENGTH = 120;
 /** The draw order of the wall's layers over the bodies' order. */
-const AIR = { smoke: 0, dark: 1, trail: 2, glow: 3, fire: 4, tongues: 5, embers: 6, haze: 7 };
+const AIR = { trail: 2 };
 /** The danger edge's colour (the fight's fire threat). */
 const EDGE_RGB = [1, 0.36, 0.08] as const;
 
@@ -83,8 +70,12 @@ interface Slot {
   cx: number;
   cz: number;
   r: number;
-  shared: Uni;
-  air: THREE.Object3D[];
+  wall: LineFireWall;
+  /** The floor across the front this frame (relative to its centre). */
+  base: (xs: number) => number;
+  fx: number;
+  fy: number;
+  fz: number;
   trail: THREE.Mesh;
   trailU: Uni;
   floor: THREE.Mesh;
@@ -93,45 +84,6 @@ interface Slot {
   trailBase: THREE.BufferAttribute;
   floorPos: THREE.BufferAttribute;
   floorLane: THREE.BufferAttribute;
-}
-
-function hash01(i: number, salt: number): number {
-  let h = Math.imul(i + 1, 0x9e3779b1) ^ Math.imul(salt + 7, 0x85ebca6b);
-  h = Math.imul(h ^ (h >>> 15), 0x85ebca6b) >>> 0;
-  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
-
-/** Curtains across the lane: x 0..1 across, y 0..1 up, aSheet (back, seed). */
-function sheetGeometry(sheets: readonly (readonly [number, number])[]): THREE.BufferGeometry {
-  const seg = 40;
-  const hs = 10;
-  const per = (seg + 1) * (hs + 1);
-  const pos = new Float32Array(per * sheets.length * 3);
-  const sh = new Float32Array(per * sheets.length * 2);
-  const idx: number[] = [];
-  sheets.forEach(([back, seed], s) => {
-    const base = s * per;
-    for (let i = 0; i <= seg; i++)
-      for (let j = 0; j <= hs; j++) {
-        const k = base + i * (hs + 1) + j;
-        pos[k * 3] = i / seg;
-        pos[k * 3 + 1] = j / hs;
-        sh[k * 2] = back;
-        sh[k * 2 + 1] = seed;
-      }
-    for (let i = 0; i < seg; i++)
-      for (let j = 0; j < hs; j++) {
-        const a = base + i * (hs + 1) + j;
-        const b = a + hs + 1;
-        idx.push(a, b, a + 1, b, b + 1, a + 1);
-      }
-  });
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  g.setAttribute('aSheet', new THREE.BufferAttribute(sh, 2));
-  g.setIndex(idx);
-  return g;
 }
 
 export class FinalFirestormFx {
@@ -147,60 +99,49 @@ export class FinalFirestormFx {
     pools: number,
   ) {
     const budget = firestormBudget(h.density >= 1);
-    const sheetSeeds: (readonly [number, number])[] = L.sheetBack
-      .slice(0, budget.sheets)
-      .map((back, i) => [back, 0.13 + i * 0.37] as const);
-    const curtain = sheetGeometry(sheetSeeds);
-    const single = sheetGeometry([[0.6, 0.29]]);
-    const tongueQuad = new THREE.PlaneGeometry(1, 1, 1, 10);
-    h.geometries.push(curtain, single, tongueQuad);
     // The trail's curtains run along the lane at these shares of its width.
     this.trailLanes = [-0.6, 0.0, 0.62].slice(0, budget.trailSheets);
-    const ramp = fireRampGlsl('fireRamp');
-    const fireFrag = wallFireFrag(ramp);
-    const tongueFrag = wallTongueFrag(ramp);
+    const fireFrag = wallFireFrag(fireRampGlsl('fireRamp'));
 
     for (let s = 0; s < pools; s++) {
-      const ground: number[] = new Array(L.groundSamples).fill(0);
-      const shared: Uni = {
-        uFront: { value: new THREE.Vector3() },
-        uDir: { value: new THREE.Vector2(0, 1) },
-        uHalf: { value: 5 },
-        uRise: { value: 0 },
-        uTime: h.uTime,
-        uRoom: { value: new THREE.Vector3(0, 0, 60) },
-        uGround: { value: ground },
-        uHeat: { value: 1 },
-        uFrontAlong: { value: 0 },
-        uTrail: { value: 0 },
-      };
-      const air: THREE.Object3D[] = [];
+      const wall = new LineFireWall(
+        h,
+        {
+          name: 'smithHeartFirestorm',
+          height: L.height,
+          tongue: L.tongue,
+          sheetBack: L.sheetBack.slice(0, budget.sheets),
+          bodyBack: 0.6,
+          tongues: budget.tongues,
+          embers: budget.embers,
+          smoke: budget.smoke,
+          haze: budget.haze,
+          gain: budget.sheets > 1 ? 0.52 : 0.8,
+          order: h.bodyOrder,
+        },
+        s,
+      );
+      const shared = wall.shared;
       const add = (
         name: string,
         geometry: THREE.BufferGeometry,
         uniforms: Uni,
-        vertexShader: string,
-        fragmentShader: string,
-        blending: THREE.Blending,
         order: number,
-        points = false,
-        defines: Record<string, string> = {},
-      ): THREE.Object3D => {
+      ): THREE.Mesh => {
         const mat = new THREE.ShaderMaterial({
           name,
           uniforms,
-          defines,
-          vertexShader,
-          fragmentShader,
+          vertexShader: FS_TRAIL_VERT,
+          fragmentShader: fireFrag,
           transparent: true,
           depthWrite: false,
           side: THREE.DoubleSide,
-          blending,
+          blending: THREE.AdditiveBlending,
           toneMapped: false,
           fog: false,
         });
         h.materials.push(mat);
-        const obj = points ? new THREE.Points(geometry, mat) : new THREE.Mesh(geometry, mat);
+        const obj = new THREE.Mesh(geometry, mat);
         obj.name = name;
         obj.frustumCulled = false;
         obj.visible = false;
@@ -208,121 +149,6 @@ export class FinalFirestormFx {
         h.root.add(obj);
         return obj;
       };
-      // The fire's curtains (every tier).
-      air.push(
-        add(
-          'smithHeartFirestormFire',
-          curtain,
-          {
-            ...shared,
-            uH: { value: L.height },
-            uLift: { value: 0 },
-            uGain: { value: budget.sheets > 1 ? 0.52 : 0.8 },
-          },
-          FS_SHEET_VERT,
-          fireFrag,
-          THREE.AdditiveBlending,
-          AIR.fire,
-        ),
-      );
-      // Its dark body (every tier: the wall's shape against the bright floor).
-      air.push(
-        add(
-          'smithHeartFirestormBody',
-          single,
-          { ...shared, uH: { value: L.height * 1.08 }, uLift: { value: 0 }, uGain: { value: 1 } },
-          FS_SHEET_VERT,
-          fireFrag,
-          THREE.NormalBlending,
-          AIR.dark,
-          false,
-          { WALL_DARK: '' },
-        ),
-      );
-      // The air lit round it (every tier).
-      air.push(
-        add(
-          'smithHeartFirestormGlow',
-          single,
-          { ...shared, uH: { value: L.height * 1.5 }, uLift: { value: 0 } },
-          FS_SHEET_VERT,
-          WALL_GLOW_FRAG,
-          THREE.AdditiveBlending,
-          AIR.glow,
-        ),
-      );
-      if (budget.smoke)
-        air.push(
-          add(
-            'smithHeartFirestormSmoke',
-            single,
-            { ...shared, uH: { value: L.height * 2.2 }, uLift: { value: 0 } },
-            FS_SHEET_VERT,
-            WALL_SMOKE_FRAG,
-            THREE.NormalBlending,
-            AIR.smoke,
-          ),
-        );
-      if (budget.haze)
-        air.push(
-          add(
-            'smithHeartFirestormHaze',
-            single,
-            { ...shared, uH: { value: L.height * 1.3 }, uLift: { value: 0.5 } },
-            FS_SHEET_VERT,
-            WALL_HAZE_FRAG,
-            THREE.AdditiveBlending,
-            AIR.haze,
-          ),
-        );
-      // The tongues: one instanced draw.
-      const tg = new THREE.InstancedBufferGeometry();
-      tg.index = tongueQuad.index;
-      tg.setAttribute('position', tongueQuad.getAttribute('position'));
-      const ta = new Float32Array(budget.tongues * 2);
-      for (let i = 0; i < budget.tongues; i++) {
-        ta[i * 2] = -1 + (2 * (i + 0.8 * hash01(i, 11 + s))) / budget.tongues;
-        ta[i * 2 + 1] = hash01(i, 29 + s);
-      }
-      tg.setAttribute('aTongue', new THREE.InstancedBufferAttribute(ta, 2));
-      tg.instanceCount = budget.tongues;
-      h.geometries.push(tg);
-      air.push(
-        add(
-          'smithHeartFirestormTongues',
-          tg,
-          { ...shared, uTongue: { value: L.tongue } },
-          FS_TONGUE_VERT,
-          tongueFrag,
-          THREE.AdditiveBlending,
-          AIR.tongues,
-        ),
-      );
-      // The embers and sparks: one point draw.
-      const eg = new THREE.BufferGeometry();
-      const n = budget.embers;
-      eg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-      const ea = new Float32Array(n * 4);
-      for (let i = 0; i < n; i++) {
-        ea[i * 4] = hash01(i, 101 + s) * 2 - 1;
-        ea[i * 4 + 1] = hash01(i, 131 + s);
-        ea[i * 4 + 2] = 0.35 + 0.55 * hash01(i, 151 + s);
-        ea[i * 4 + 3] = 0.16 + 0.26 * hash01(i, 171 + s);
-      }
-      eg.setAttribute('aEmber', new THREE.BufferAttribute(ea, 4));
-      h.geometries.push(eg);
-      air.push(
-        add(
-          'smithHeartFirestormEmbers',
-          eg,
-          { ...shared, uPx: { value: 900 } },
-          FS_EMBER_VERT,
-          WALL_EMBER_FRAG,
-          THREE.AdditiveBlending,
-          AIR.embers,
-          true,
-        ),
-      );
 
       // The trail's low fire: strips along the lane, baked per lane.
       const steps = this.trailSteps;
@@ -340,7 +166,7 @@ export class FinalFirestormFx {
             const q = base + i * (hs + 1) + j;
             tPos[q * 3 + 1] = j / hs;
             tTrail[q * 2] = i * L.trailStep;
-            tTrail[q * 2 + 1] = hash01(k, 401 + s);
+            tTrail[q * 2 + 1] = lineFireHash(k, 401 + s);
           }
         for (let i = 0; i < steps; i++)
           for (let j = 0; j < hs; j++) {
@@ -366,15 +192,7 @@ export class FinalFirestormFx {
         uHeelRun: { value: L.heelRun },
         uGain: { value: 0.62 },
       };
-      const trail = add(
-        'smithHeartFirestormTrail',
-        trailGeo,
-        trailU,
-        FS_TRAIL_VERT,
-        fireFrag,
-        THREE.AdditiveBlending,
-        AIR.trail,
-      ) as THREE.Mesh;
+      const trail = add('smithHeartFirestormTrail', trailGeo, trailU, AIR.trail);
 
       // The burnt lane on the floor: a grid baked per lane.
       const across = L.floorAcross;
@@ -431,7 +249,7 @@ export class FinalFirestormFx {
       floor.renderOrder = h.bodyOrder - 1;
       h.root.add(floor);
 
-      this.slots.push({
+      const slot: Slot = {
         id: -1,
         seen: false,
         burnAt: 0,
@@ -446,8 +264,11 @@ export class FinalFirestormFx {
         cx: 0,
         cz: 0,
         r: 60,
-        shared,
-        air,
+        wall,
+        base: () => 0,
+        fx: 0,
+        fy: 0,
+        fz: 0,
         trail,
         trailU,
         floor,
@@ -455,7 +276,12 @@ export class FinalFirestormFx {
         trailBase,
         floorPos,
         floorLane,
-      });
+      };
+      // The floor across the front, read once per sample (built once: no
+      // closure a frame).
+      slot.base = (xs) =>
+        h.groundY(slot.fx + slot.dz * xs * slot.half, slot.fz - slot.dx * xs * slot.half) - slot.fy;
+      this.slots.push(slot);
     }
   }
 
@@ -572,27 +398,14 @@ export class FinalFirestormFx {
     const look = firestormWall(since, s.length, s.run, this.look);
     const rise = gone ? 0 : look.rise;
     const trail = gone ? 0 : look.trail;
-    const u = s.shared;
-    const fx = s.sx + s.dx * look.front;
-    const fz = s.sz + s.dz * look.front;
-    const fy = this.h.groundY(fx, fz);
-    (u.uFront.value as THREE.Vector3).set(fx, fy, fz);
-    (u.uDir.value as THREE.Vector2).set(s.dx, s.dz);
-    u.uHalf.value = s.half;
-    u.uRise.value = rise;
-    u.uHeat.value = look.heat;
+    const u = s.wall.shared;
+    s.fx = s.sx + s.dx * look.front;
+    s.fz = s.sz + s.dz * look.front;
+    s.fy = this.h.groundY(s.fx, s.fz);
+    s.wall.clip(s.cx, s.cz, s.r);
+    s.wall.set(s.fx, s.fy, s.fz, s.dx, s.dz, s.half, rise, look.heat, s.base);
     u.uFrontAlong.value = look.front;
     u.uTrail.value = trail;
-    (u.uRoom.value as THREE.Vector3).set(s.cx, s.cz, s.r);
-    // The floor across the front (relative to its centre).
-    const ground = u.uGround.value as number[];
-    const n = L.groundSamples;
-    for (let i = 0; i < n; i++) {
-      const lat = (-1 + (2 * i) / (n - 1)) * s.half;
-      ground[i] = this.h.groundY(fx + s.dz * lat, fz - s.dx * lat) - fy;
-    }
-    const wall = rise > 0.002;
-    for (const o of s.air) o.visible = wall;
     s.trail.visible = trail > 0.002;
     s.floorU.uLive.value = gone ? 0 : 1;
     s.floorU.uBurn.value = rise;
@@ -604,7 +417,7 @@ export class FinalFirestormFx {
   private free(s: Slot): void {
     s.id = -1;
     s.goneAt = -1;
-    for (const o of s.air) o.visible = false;
+    s.wall.hide();
     s.trail.visible = false;
     s.floor.visible = false;
   }

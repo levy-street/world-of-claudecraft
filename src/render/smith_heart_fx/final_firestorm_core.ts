@@ -49,8 +49,6 @@ export const FIRESTORM_LOOK = {
   fallOut: 0.3,
   /** The char left once the lane goes (seconds to fade). */
   charFade: 2.2,
-  /** The ground samples across the lane the sheets stand on. */
-  groundSamples: 9,
   /** The burnt lane's floor grid: rows across, yards per step along. */
   floorAcross: 10,
   floorStep: 1.5,

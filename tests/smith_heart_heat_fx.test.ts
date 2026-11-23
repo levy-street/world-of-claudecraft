@@ -204,10 +204,16 @@ describe('HeatFx over a fake world', () => {
     expect(shown(root, 'smithHeartHeatCrater')).toHaveLength(1);
     expect(shown(root, 'smithHeartHeatFist')).toHaveLength(0);
     expect(telegraphsShown(root)).toBe(3);
-    // Every wall stands on its lane, never past the Hearth's floor.
+    // Every wall stands on its lane, never past the Hearth's floor; each
+    // rolling wall's crest burns (the polish pass of 2026-11-23).
+    let burning = 0;
     for (let i = 0; i < 30 * 3; i++) {
       fx.update(1 / 30);
-      for (const w of shown(root, 'smithHeartHeatSwellWall')) {
+      const walls = shown(root, 'smithHeartHeatSwellWall');
+      const fires = shown(root, 'smithHeartHeatSwellFlamesFire');
+      expect(fires.length).toBe(walls.length);
+      burning = Math.max(burning, fires.length);
+      for (const w of walls) {
         const lx = w.position.x - O.x - SPOT.x;
         const lz = w.position.z - O.z - SPOT.z;
         const d = Math.hypot(lx, lz);
@@ -221,7 +227,9 @@ describe('HeatFx over a fake world', () => {
     world.entityRosterVersion++;
     for (let i = 0; i < 30 * 8; i++) fx.update(1 / 30);
     expect(telegraphsShown(root)).toBe(0);
+    expect(burning).toBe(3);
     expect(shown(root, 'smithHeartHeatSwellWall')).toHaveLength(0);
+    expect(shown(root, 'smithHeartHeatSwellFlamesFire')).toHaveLength(0);
     expect(shown(root, 'smithHeartHeatCrater')).toHaveLength(0);
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-heat-fx')).toBeUndefined();
