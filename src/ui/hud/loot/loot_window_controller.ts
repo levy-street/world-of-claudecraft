@@ -161,6 +161,14 @@ export class LootWindowController {
    *  independently of `harvestStatus`, so a second press cannot queue a
    *  duplicate cast. */
   private harvestCommandPending = false;
+  /** A Harvest press that landed while a background status read was in flight
+   *  over an admitted answer (the button's busy overlay). Dropping it made the
+   *  button look dead: the popup re-asks every poll interval and an online read
+   *  is a network round trip, so a real share of presses fell inside that
+   *  window. It is resolved by the settle of THAT read, against the fresh
+   *  answer (sent once if still admitted, dropped otherwise). Cleared on every
+   *  settle, open and close, so it can never outlive the press it records. */
+  private harvestPressQueued = false;
   /** Wall-clock time of the last issued harvest-status query for the open
    *  visit; the poll floor below throttles against it. Reset to a value that
    *  never blocks the NEXT open's first query. */
@@ -240,6 +248,7 @@ export class LootWindowController {
     this.harvestStatus = { kind: 'checking' };
     this.harvestStatusSig = null;
     this.harvestCommandPending = false;
+    this.harvestPressQueued = false;
     this.pendingHarvestRequest = null;
     // A brand-new visit's first query may ask immediately: -Infinity always
     // clears the poll-floor check below, without a special-cased bypass.
@@ -296,6 +305,7 @@ export class LootWindowController {
     this.harvestStatus = { kind: 'checking' };
     this.harvestStatusSig = null;
     this.harvestCommandPending = false;
+    this.harvestPressQueued = false;
     this.pendingHarvestRequest = null;
     this.lastHarvestQueryAtMs = Number.NEGATIVE_INFINITY;
     this.openedWorld = null;
@@ -456,6 +466,13 @@ export class LootWindowController {
       // own settle.
       this.applyHarvestButtonState(view.harvestDisabled || this.harvestCommandPending, false);
     }
+    // Resolve a press made while this read was in flight. Cleared first so it
+    // is consumed exactly once whatever the answer; `harvest` then re-validates
+    // liveness and admission against the fresh status, so a denial or a null
+    // answer drops the press instead of sending it.
+    const queued = this.harvestPressQueued;
+    this.harvestPressQueued = false;
+    if (queued) this.harvest(mobId, generation);
   }
 
   /** Update only changed attributes. A pending background read uses aria-disabled
@@ -674,7 +691,14 @@ export class LootWindowController {
    *  fresh status so the panel does not sit on a stale accepting answer. */
   private harvest(mobId: number, generation: number): void {
     if (this.harvestCommandPending) return;
-    if (this.isHarvestQueryPendingFor(mobId, generation)) return;
+    if (this.isHarvestQueryPendingFor(mobId, generation)) {
+      // Never send on the superseded answer, but do not swallow the press: when
+      // the last answer admitted (the busy-overlay case) remember it, and the
+      // pending read's settle resolves it (`applyHarvestInfo`). Any other
+      // state (checking, denied) is already shown disabled and stays refused.
+      if (this.isCurrentlyAdmitted()) this.harvestPressQueued = true;
+      return;
+    }
     const live = this.liveAvailabilityFor(mobId, generation);
     if (!live?.harvestable) return;
     const status = this.harvestStatus;

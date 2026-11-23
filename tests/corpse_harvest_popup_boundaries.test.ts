@@ -146,12 +146,26 @@ describe('corpse popup asynchronous boundaries', () => {
     expect(r.root.querySelector('.corpse-harvest-hint')).toBe(hint);
     expect(hint?.textContent).toBe(status);
     expect(take?.disabled).toBe(false);
-    harvest?.click();
-    expect(r.harvest).not.toHaveBeenCalled();
     reply.resolve(info());
     await Promise.resolve();
     expect(r.harvestButton()).toBe(harvest);
     expect(harvest?.disabled).toBe(false);
+    r.controller.close();
+  });
+  it('a Harvest press during a slow refresh sends nothing until it settles, then sends once', async () => {
+    const reply = pending<CorpseHarvestInfo | null>();
+    let reads = 0;
+    const r = rig(() => (++reads === 1 ? info() : reply.promise));
+    r.controller.openCorpse(10, 100, 100);
+    const harvest = r.harvestButton();
+    r.advance(500);
+    r.controller.updateProximity();
+    harvest?.click();
+    expect(r.harvest).not.toHaveBeenCalled();
+    reply.resolve(info());
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(r.harvest).toHaveBeenCalledTimes(1);
     r.controller.close();
   });
   it('keeps Harvest disabled if loot changes during a pending status refresh', () => {
