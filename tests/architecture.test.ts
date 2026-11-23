@@ -1231,6 +1231,9 @@ const RENDER_PURE_CORES = [
   // Avalanche's eruption: the spikes, their burst and crumble, the chunks,
   // the torn floor (Jose's playtest of 2026-11-20).
   'src/render/smith_heart_fx/final_avalanche_core.ts',
+  // Firestorm's wall of flame, its trail and burnt floor (Jose's playtest of
+  // 2026-11-23).
+  'src/render/smith_heart_fx/final_firestorm_core.ts',
   'src/render/smith_heart_fx/final_overload_core.ts',
   'src/render/smith_heart_fx/final_overload_ring_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',

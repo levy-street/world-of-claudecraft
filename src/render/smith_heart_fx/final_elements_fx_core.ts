@@ -302,12 +302,6 @@ export function linkFill(age: number): number {
   return clamp01((age - E.spireShowAt) / Math.max(0.1, E.spireCharge - E.spireShowAt));
 }
 
-/** The flame wall's height and its flicker at `t` seconds of its run. */
-export function flameWall(t: number): { height: number; alpha: number } {
-  // About three times a player's height, licking higher and lower.
-  return { height: 8.5 + 1.2 * Math.sin(t * 9), alpha: smooth(t / 0.15) };
-}
-
 /** The stack count's pips round a tank (one gem per stack, up to the cap):
  *  the k-th of n's angle and height at `clock`, so the count reads at a
  *  glance whatever the element (a shape, not only a colour). */

@@ -41,7 +41,8 @@
 // rungs (the lanes on `lane`; the fans the kit's own).
 
 import * as THREE from 'three';
-import type { SmithHeartVein } from '../../sim/content/smith_heart_layout';
+import { HEART_ROOM, type SmithHeartVein } from '../../sim/content/smith_heart_layout';
+import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import {
   ELEMENT_TUNING as E,
   ELEMENT_AURAS,
@@ -75,11 +76,9 @@ import {
   ELEMENT_FX_COLORS as C,
   type ElementObjectKind,
   elementObjectKind,
-  flameWall,
   fusionOrbLook,
   HAIL_DROP,
   hailFall,
-  laneFront,
   linkFill,
   orbitPiece,
   ELEMENT_FX_POOLS as P,
@@ -96,7 +95,6 @@ import {
 import {
   AURA_FRAG,
   BILL_VERT,
-  FLOOR_GLOW_FRAG,
   GLOW_FRAG,
   HAIL_FRAG,
   LAVA_FRAG,
@@ -108,6 +106,7 @@ import {
   WALL_FRAG,
   WALL_VERT,
 } from './final_elements_glsl';
+import { FinalFirestormFx } from './final_firestorm_fx';
 import { KIT_UV_VERT } from './final_kit_glsl';
 import type { FinalElement, FinalTelegraphKind } from './final_telegraph_core';
 import type { FinalTelegraphLane, FinalTelegraphs } from './final_telegraphs';
@@ -191,6 +190,8 @@ const _b = { x: 0, y: 0, z: 0 };
 const _mid = { x: 0, y: 0, z: 0 };
 const _pa = { x: 0, y: 0, z: 0 };
 const _pb = { x: 0, y: 0, z: 0 };
+/** The Anvil's floor under a Firestorm lane (its instance's room). */
+const _room = { x: 0, z: 0, r: HEART_ROOM.r };
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
 /** The draw order of the standing bodies: past the encounter floor band's
  *  rungs (floorVfxRenderOrder), under the sigils drawn over the world. */
@@ -203,13 +204,6 @@ interface Uni {
 interface LaneSlot {
   d: FinalTelegraphLane;
   lane: TelegraphLane;
-  id: number;
-  seen: boolean;
-}
-
-interface Wall {
-  planes: THREE.Mesh[];
-  u: Uni;
   id: number;
   seen: boolean;
 }
@@ -266,7 +260,8 @@ export class FinalElementsFx {
   };
   // ---- the combos ----
   private readonly clouds: Cloud[] = [];
-  private readonly walls: Wall[] = [];
+  /** Firestorm's walls of flame (their own part). */
+  private readonly firestorm: FinalFirestormFx;
   private readonly lanes: LaneSlot[] = [];
   private readonly spires: Spire[] = [];
   private readonly hailBalls: THREE.InstancedMesh;
@@ -277,8 +272,6 @@ export class FinalElementsFx {
    *  frost splats stones leave as they shatter. */
   private readonly hailDiscs: { mesh: THREE.Mesh; u: Uni; id: number; seen: boolean }[] = [];
   private readonly splats: { mesh: THREE.Mesh; u: Uni; born: number; alive: boolean }[] = [];
-  /** The flame walls' light on the floor (by wall). */
-  private readonly wallGlows: { mesh: THREE.Mesh; u: Uni }[] = [];
   /** Avalanche's eruption (its spikes, chunks and scars). */
   private readonly avalanche: FinalAvalancheFx;
   /** The lava pools' crust discs (Magma Rift). */
@@ -527,38 +520,19 @@ export class FinalElementsFx {
       this.clouds.push({ billows, floor, u, id: -1, seen: false, seed: i * 0.37 });
     }
 
-    // ---- the flame walls ----
-    const wallGeo = new THREE.PlaneGeometry(1, 1, 1, 1).translate(0, 0.5, 0);
-    const flatWall = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
-    h.geometries.push(wallGeo, flatWall);
-    for (let i = 0; i < P.walls; i++) {
-      const u: Uni = {
+    // ---- the flame walls (final_firestorm_fx.ts) ----
+    this.firestorm = new FinalFirestormFx(
+      {
+        root: h.root,
         uTime: h.uTime,
-        uAlpha: { value: 0 },
-        uSeed: { value: i * 5.3 },
-        uWrap: { value: 0 },
-        uBoost: { value: 1.25 },
-      };
-      const mat = shader('smithHeartFinalFlameWall', u, WALL_VERT, WALL_FRAG, {
-        blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide,
-      });
-      const planes: THREE.Mesh[] = [];
-      // Three across the lane (its face, read from along it) and three along
-      // it (its flanks, read from the side): a wall of flame from any camera.
-      for (let k = 0; k < 8; k++) planes.push(mesh(wallGeo, mat, 'smithHeartFinalFlameWall'));
-      this.walls.push({ planes, u, id: -1, seen: false });
-      const gu: Uni = { uAlpha: { value: 0 }, uColor: { value: new THREE.Color(0xff8a2a) } };
-      const glow = mesh(
-        flatWall,
-        shader('smithHeartFinalFlameWallLight', gu, KIT_UV_VERT, FLOOR_GLOW_FRAG, {
-          blending: THREE.AdditiveBlending,
-        }),
-        'smithHeartFinalFlameWallLight',
-      );
-      glow.renderOrder = floorVfxRenderOrder('encounter', h.crustRung);
-      this.wallGlows.push({ mesh: glow, u: gu });
-    }
+        groundY: h.groundY,
+        density: h.density,
+        geometries: h.geometries,
+        materials: h.materials,
+        bodyOrder: BODY_ORDER,
+      },
+      P.walls,
+    );
 
     // ---- the lanes: Firestorm's, Avalanche's, the spires' links ----
     // Each in its element's paint (never the plain threat orange): the
@@ -628,7 +602,7 @@ export class FinalElementsFx {
     this.fusionSeen = false;
     this.groups.clear();
     for (const c of this.clouds) c.seen = false;
-    for (const w of this.walls) w.seen = false;
+    this.firestorm.begin(clock);
     for (const l of this.lanes) l.seen = false;
     for (const s of this.spires) s.seen = false;
     for (const c of this.crusts) c.seen = false;
@@ -898,14 +872,7 @@ export class FinalElementsFx {
         sp.mesh.visible = false;
       } else sp.u.uAlpha.value = 0.9 * (1 - t) * (1 - t);
     }
-    for (let i = 0; i < this.walls.length; i++) {
-      const w = this.walls[i];
-      if (!w.seen) {
-        w.id = -1;
-        for (const p of w.planes) p.visible = false;
-        this.wallGlows[i].mesh.visible = false;
-      }
-    }
+    this.firestorm.end();
     this.paintLinks();
     for (const l of this.lanes)
       if (!l.seen) {
@@ -1296,7 +1263,6 @@ export class FinalElementsFx {
     const sz = at.z - dz * info.length * 0.5;
     const lane = this.laneFor(e.id, 'fireLane');
     const run = info.length / E.fireSpeed;
-    const front = burn ? laneFront(since, info.length, run) : 0;
     if (lane) {
       H.kit.drapeLane(
         lane.lane,
@@ -1317,87 +1283,14 @@ export class FinalElementsFx {
       lane.lane.group.visible = true;
     }
     if (!burn) return;
-    let w = this.walls.find((k) => k.id === e.id);
-    if (!w) {
-      w = this.walls.find((k) => k.id === -1 && !k.seen);
-      if (!w) return;
-      w.id = e.id;
-    }
-    w.seen = true;
-    const fw = flameWall(since);
-    w.u.uAlpha.value = front >= info.length - 0.01 ? Math.max(0, 1 - (since - run) * 4) : fw.alpha;
-    // Five sheets across the lane over 6 yd of depth (its face, the front
-    // one the tallest), three along it (its flanks and heart, read from the
-    // side): a thick wall of layered flame that reads from any camera.
-    const depth = 6;
-    for (let k = 0; k < w.planes.length; k++) {
-      const pl = w.planes[k];
-      const across = k < 5;
-      const off = across ? front - k * 1.5 : front - depth / 2;
-      const lateral = across ? 0 : (k - 6) * info.half * 0.8;
-      const px = sx + dx * Math.max(0, off) + dz * lateral;
-      const pz = sz + dz * Math.max(0, off) - dx * lateral;
-      pl.position.set(px, H.groundY(px, pz) - 0.2, pz);
-      pl.rotation.set(0, across ? e.facing : e.facing + Math.PI / 2, 0);
-      const hgt = fw.height * (across ? 1 - k * 0.1 : k === 6 ? 1.05 : 0.85);
-      pl.scale.set(across ? info.half * 2.3 : Math.min(depth, Math.max(0.5, front)), hgt, 1);
-      pl.visible = off > 0 || (!across && front > 0.5);
-    }
-    // Its light on the floor: a warm pool under and ahead of it.
-    const wi = this.walls.indexOf(w);
-    const glow = this.wallGlows[wi];
-    if (glow) {
-      const gx = sx + dx * Math.max(0, front - depth / 2);
-      const gz = sz + dz * Math.max(0, front - depth / 2);
-      glow.mesh.position.set(gx, H.groundY(gx, gz) + 0.08, gz);
-      glow.mesh.rotation.set(0, e.facing, 0);
-      glow.mesh.scale.set(info.half * 3.2, 1, depth + 8);
-      glow.u.uAlpha.value = w.u.uAlpha.value * 0.9;
-      glow.mesh.visible = front > 0.2 && front < info.length;
-    }
-    // Flame tongues and embers torn off its crest, heat smoke over it.
-    // The curtain itself: a dense sheet of the engine's flame sprites rising
-    // across the whole lane over the wall's depth (the silhouette of a real
-    // wall of fire, read from far and high), embers torn off the crest.
-    const n = Math.round(300 * this.dt * Math.max(0.5, H.density) + H.rand());
-    const px = sx + dx * front;
-    const pz = sz + dz * front;
-    const py = H.groundY(px, pz);
-    for (let i = 0; i < n; i++) {
-      const side = (H.rand() * 2 - 1) * info.half;
-      const back = H.rand() * depth;
-      const big = H.rand() < 0.8;
-      H.particles.puff(
-        px + dz * side - dx * back * 0.7,
-        py + 0.4,
-        pz - dx * side - dz * back * 0.7,
-        1,
-        {
-          speed: 0.8,
-          up: big ? 8 + H.rand() * 6 : 13 + H.rand() * 6,
-          life: big ? 0.85 : 1.3,
-          size: big ? [4.6, 1.4] : [0.55, 0.12],
-          color: H.rand() < 0.35 ? C.fireCoreRgb : C.fireRgb,
-          alpha: 1,
-          pool: big ? 'pyre' : 'glow',
-          dir: [dx, 0.6, dz],
-          spread: 0.5,
-        },
-      );
-    }
-    const smoke = Math.round(24 * this.dt * H.density + H.rand() * 0.6);
-    for (let i = 0; i < smoke; i++) {
-      const side = (H.rand() * 2 - 1) * info.half;
-      H.particles.puff(px + dz * side - dx * 2, py + fw.height * 0.9, pz - dx * side - dz * 2, 1, {
-        speed: 1,
-        up: 3.5,
-        life: 2.4,
-        size: [3, 7],
-        color: [0.1, 0.08, 0.07],
-        alpha: 0.5,
-        pool: 'smoke',
-      });
-    }
+    // The wall itself, its trail and the burnt floor (final_firestorm_fx.ts),
+    // on the Anvil's floor only.
+    const def = DUNGEONS.smith_heart;
+    if (!def) return;
+    const o = instanceOrigin(def.index, instanceSlotForZ(e.pos.z));
+    _room.x = o.x + HEART_ROOM.x;
+    _room.z = o.z + HEART_ROOM.z;
+    this.firestorm.see(e.id, sx, sz, e.facing, info.length, info.half, run, since, _room);
   }
 
   private paintAvalanche(e: Entity, run: boolean, age: number, since: number): void {
@@ -1930,6 +1823,7 @@ export class FinalElementsFx {
     this.begin(this.clock, 0);
     this.end();
     this.avalanche.hide();
+    this.firestorm.hide();
     this.born.clear();
     this.stateAt.clear();
     this.lastPulse.clear();

@@ -7,7 +7,7 @@
 //                colour's halo so it reads over any floor;
 //   STEAM_FRAG   a billow of thick white steam, churning (normal blending:
 //                it hides what is behind it, as steam does);
-//   WALL_FRAG    Firestorm's wall of flame: tongues licking up off a
+//   WALL_FRAG    Searing Burn's column of flame round a tank: tongues licking up off a
 //                white-hot base, orange, then dark red at the tips;
 //   AURA_FRAG    an element's shell round a body (the tank's Elemental Strike,
 //                the boss's fusion orbs): fire licking up, frost cells, storm
@@ -189,18 +189,6 @@ void main() {
   vec3 col = mix(deep, ice, clamp(spokes + twig + rim + edge, 0.0, 1.0));
   float alpha = uAlpha * clamp(rim + edge + filled * (0.45 + 0.4 * (spokes + twig)), 0.0, 1.0);
   gl_FragColor = vec4(col, alpha);
-}
-`;
-
-/** The flame wall's light on the floor under it: a warm additive glow. */
-export const FLOOR_GLOW_FRAG = /* glsl */ `
-uniform float uAlpha;
-uniform vec3 uColor;
-varying vec2 vUv;
-void main() {
-  vec2 p = vUv * 2.0 - 1.0;
-  float a = pow(max(1.0 - length(p * vec2(1.0, 1.2)), 0.0), 1.6) * uAlpha;
-  gl_FragColor = vec4(uColor * a, a);
 }
 `;
 

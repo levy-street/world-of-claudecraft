@@ -359,7 +359,15 @@ describe('FinalKitFx draws its own elements', () => {
     expect(visibleNamed(root, 'smithHeartFinalFusionOrb')).toBe(2);
     expect(visibleNamed(root, 'smithHeartFinalFusionGlow')).toBe(2);
     expect(visibleNamed(root, 'smithHeartFinalSteamBillow')).toBe(ELEMENT_FX_POOLS.billows);
-    expect(visibleNamed(root, 'smithHeartFinalFlameWall')).toBeGreaterThan(0);
+    // Firestorm's wall of flame (final_firestorm_fx.ts): its fire, dark body,
+    // trail and the burnt floor with its danger edge.
+    for (const name of [
+      'smithHeartFirestormFire',
+      'smithHeartFirestormBody',
+      'smithHeartFirestormTrail',
+      'smithHeartFirestormFloor',
+    ])
+      expect(visibleNamed(root, name), name).toBe(1);
     // Avalanche's eruption: ice and stone spikes, the torn floor.
     expect(
       instancesShown(root, 'smithHeartAvalancheIce') +
@@ -410,16 +418,20 @@ describe('FinalKitFx draws its own elements', () => {
       'smithHeartFinalSigil',
       'smithHeartFinalFusionOrb',
       'smithHeartFinalSteamBillow',
-      'smithHeartFinalFlameWall',
+      'smithHeartFirestormFire',
+      'smithHeartFirestormTrail',
       'smithHeartFinalSpire',
     ])
       expect(visibleNamed(root, name), name).toBe(0);
+    // The burnt lane's char outlives the wall a moment (never a pop).
+    expect(visibleNamed(root, 'smithHeartFirestormFloor')).toBe(1);
     // The Avalanche's spikes crumble on after its lane object goes (never
     // popping out), then they and the scar are gone.
     for (let i = 0; i < 30 * 5; i++) fx.update(1 / 30);
     expect(instancesShown(root, 'smithHeartAvalancheIce')).toBe(0);
     expect(instancesShown(root, 'smithHeartAvalancheStone')).toBe(0);
     expect(visibleNamed(root, 'smithHeartAvalancheScar')).toBe(0);
+    expect(visibleNamed(root, 'smithHeartFirestormFloor')).toBe(0);
     fx.dispose();
   });
 });
