@@ -236,7 +236,9 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
       }
       expect(appearance()).toEqual(readyAppearance);
       expect(document.activeElement).toBe(harvest);
-      harvest.click();
+      // No press here: a press during the refresh is queued and sent on the
+      // settle (pinned in tests/loot_window_controller.test.ts), which would
+      // legitimately repaint the button and defeat this steadiness check.
       expect(h.world.harvestCorpse).not.toHaveBeenCalled();
       reply(SETTLED_ALL);
       await Promise.resolve();

@@ -1172,6 +1172,71 @@ describe('LootWindowController', () => {
         expect(test.harvestCorpse).not.toHaveBeenCalled();
       });
 
+      // The player-reported bug: the popup re-asks the server every poll
+      // interval, and an online read is a real round trip, so a press that
+      // lands inside that window used to be dropped silently ("Harvest needs
+      // several clicks"). The press is now remembered and resolved when the
+      // read settles, against the FRESH answer.
+      describe('a press that lands while the refresh is in flight', () => {
+        it('is not lost: it fires once when the refresh settles admitted', async () => {
+          const { test, harvest, refresh } = openAdmittedThenSlowRefresh();
+
+          harvest?.click();
+          expect(test.harvestCorpse).not.toHaveBeenCalled();
+
+          refresh.resolve(harvestInfo({ corpseId: 50, preference: { kind: 'all' } }));
+          await flush();
+
+          expect(test.harvestCorpse).toHaveBeenCalledTimes(1);
+          expect(test.harvestCorpse).toHaveBeenCalledWith(50);
+        });
+
+        it('repeated presses during one refresh still send exactly one harvest', async () => {
+          const { test, harvest, refresh } = openAdmittedThenSlowRefresh();
+
+          harvest?.click();
+          harvest?.click();
+          harvest?.click();
+          refresh.resolve(harvestInfo({ corpseId: 50, preference: { kind: 'all' } }));
+          await flush();
+
+          expect(test.harvestCorpse).toHaveBeenCalledTimes(1);
+        });
+
+        it('is dropped, not sent, when the fresh answer denies the harvest', async () => {
+          const { test, harvest, refresh } = openAdmittedThenSlowRefresh();
+
+          harvest?.click();
+          refresh.resolve(harvestInfo({ corpseId: 50, denial: 'bags_full' }));
+          await flush();
+
+          expect(test.harvestCorpse).not.toHaveBeenCalled();
+          expect(harvestBtn(test.element)?.disabled).toBe(true);
+        });
+
+        it('is dropped when the refresh settles with no usable answer', async () => {
+          const { test, harvest, refresh } = openAdmittedThenSlowRefresh();
+
+          harvest?.click();
+          refresh.resolve(null);
+          await flush();
+
+          expect(test.harvestCorpse).not.toHaveBeenCalled();
+        });
+
+        it('does not survive the popup being closed and reopened', async () => {
+          const { test, harvest, refresh } = openAdmittedThenSlowRefresh();
+          harvest?.click();
+
+          test.controller.close();
+          test.controller.openCorpse(50, 0, 0);
+          refresh.resolve(harvestInfo({ corpseId: 50, preference: { kind: 'all' } }));
+          await flush();
+
+          expect(test.harvestCorpse).not.toHaveBeenCalled();
+        });
+      });
+
       it('restores the EXISTING button in place on a same-answer settle: no rebuild, no duplicate tooltip listener', async () => {
         const { test, harvest, hint, refresh } = openAdmittedThenSlowRefresh();
         const attachCallsBefore = test.attachTooltip.mock.calls.length;

@@ -33,8 +33,9 @@ export interface CorpseHarvestPanelDeps {
   /** Opens the shared harvest-preference picker scoped to this body; never
    *  writes the preference itself. */
   onChange(): void;
-  /** Fires once per click; the controller re-validates liveness and admission
-   *  before sending anything. */
+  /** Fires once per click (including a click during a busy refresh, which the
+   *  controller queues); it re-validates liveness and admission before
+   *  sending anything. */
   onHarvest(): void;
   /** The Hud's shared tooltip idiom: hover, mobile long-press, keyboard focus. */
   attachTooltip(element: HTMLElement, html: () => string): void;
@@ -45,9 +46,10 @@ export interface CorpseHarvestPanelDeps {
    *  ever passes both). Painted with `aria-disabled` rather than native
    *  `disabled`, so the control stays in the tab order and keyboard focus
    *  already on it is never blurred to `<body>` by a native disabled flip
-   *  mid-poll (Intentional Gathering PR3 keyboard-focus review); the
-   *  click/keydown handlers below refuse the press the same as a real
-   *  disabled one. Defaults to false, so every existing caller is unaffected. */
+   *  mid-poll (Intentional Gathering PR3 keyboard-focus review). A press while
+   *  busy is forwarded to `onHarvest`, whose controller queues it for the
+   *  in-flight read's settle rather than sending or dropping it. Defaults to
+   *  false, so every existing caller is unaffected. */
   busyRefresh?: boolean;
 }
 
@@ -213,14 +215,15 @@ export function renderCorpseHarvestPanel(
       }),
     ),
   );
-  // aria-disabled retains focus, so explicitly suppress activation while busy.
+  // A native `disabled` button never fires click, so only the aria-disabled
+  // busy overlay reaches here while a refresh is in flight. That press is
+  // FORWARDED, not swallowed: the controller never sends on the superseded
+  // answer, but it remembers the press and resolves it when the read settles.
+  // Dropping it here made Harvest look dead for a share of presses. The same
+  // holds for Enter and Space, which activate through this click handler.
   harvestBtn.addEventListener('click', () => {
-    if (harvestBtn.disabled || harvestBtn.getAttribute('aria-disabled') === 'true') return;
+    if (harvestBtn.disabled) return;
     deps.onHarvest();
-  });
-  harvestBtn.addEventListener('keydown', (event) => {
-    if (harvestBtn.getAttribute('aria-disabled') !== 'true') return;
-    if (event.key === 'Enter' || event.key === ' ') event.preventDefault();
   });
   section.appendChild(harvestBtn);
 
