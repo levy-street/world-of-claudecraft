@@ -104,6 +104,7 @@ import {
   WHIRL_VERT,
 } from './final_kit_glsl';
 import { iceCrust, shellStone } from './final_kit_shapes';
+import { FinalPoolFlames } from './final_pool_flames';
 import { FinalStarsFx } from './final_stars_fx';
 import {
   FINAL_TELEGRAPH_POOLS,
@@ -124,6 +125,8 @@ const _v = new THREE.Vector3();
 const _v2 = new THREE.Vector3();
 const _s = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
+/** The pools' fire stands with the bodies (past every floor rung). */
+const POOL_FLAME_ORDER = 5000;
 
 interface FootSlot {
   d: FinalTelegraphFan;
@@ -222,6 +225,8 @@ export class FinalKitFx {
   /** Its own elements (final_elements_fx.ts): the strike, the fusion, the
    *  combos, the polarity marks; and their objects this roster. */
   private readonly elements: FinalElementsFx;
+  /** The burning pools' fire (final_pool_flames.ts). */
+  private readonly poolFlames: FinalPoolFlames;
   private readonly elementIds: number[] = [];
   /** The bodies a charged pillar's pulse leaps to (pooled). */
   private readonly near: { x: number; y: number; z: number; d: number }[] = [];
@@ -544,6 +549,15 @@ export class FinalKitFx {
       bladeFly: T.bladeFly,
       bladeHalf: T.bladeHalf,
     });
+    // The burning pools' fire (the polish pass of 2026-11-23), under this root.
+    this.poolFlames = new FinalPoolFlames({
+      root: this.root,
+      uTime: this.uTime,
+      geometries: this.geometries,
+      materials: this.materials,
+      detail,
+      order: POOL_FLAME_ORDER,
+    });
     // Its own elements (Jose's brief of 2026-11-19 (b)), under this root.
     this.elements = new FinalElementsFx({
       root: this.root,
@@ -564,6 +578,7 @@ export class FinalKitFx {
       sound: (kind, x, y, z) => this.audio.footprint(kind, x, y, z),
       laneRung: F.lane,
       crustRung: F.crust,
+      poolFire: (id, x, y, z, r, age) => this.poolFlames.see(id, x, y, z, r, age),
       tele: this.tele,
       charRung: F.telegraphChar,
     });
@@ -830,8 +845,10 @@ export class FinalKitFx {
     this.anvilFx.begin(this.clock, dt);
     this.stars.begin(this.clock);
     this.elements.begin(this.clock, dt);
+    this.poolFlames.begin();
     this.paintObjects(world);
     this.paintElements(world);
+    this.poolFlames.end();
     this.anvilFx.end();
     this.paintMarks(world);
     this.stars.end();
@@ -1105,16 +1122,17 @@ export class FinalKitFx {
         case 'emberPool':
         case 'forgePool': {
           this.foot(id, 'pool', FINAL_FOOTPRINTS.pool, x, z, r, 1, false);
-          if (this.rand() < (kind === 'emberPool' ? 0.9 : 0.7) * this.density)
-            this.particles.puff(x, y + 0.2, z, 2, {
-              speed: 0.6,
-              up: 2.8,
-              life: 1.1,
-              size: [1.0, 0.3],
-              color: C.fire,
-              alpha: 1,
-              pool: 'pyre',
-              radius: r * 0.85,
+          // Its fire (final_pool_flames.ts) and a thin smoke off it.
+          this.poolFlames.see(id, x, y, z, r, age);
+          if (this.rand() < (kind === 'emberPool' ? 0.35 : 0.25) * this.density)
+            this.particles.puff(x, y + 1.6, z, 1, {
+              speed: 0.4,
+              up: 2.2,
+              life: 2.2,
+              size: [1.6, 4.2],
+              color: [0.11, 0.085, 0.07],
+              alpha: 0.32,
+              radius: r * 0.6,
             });
           break;
         }
@@ -1504,6 +1522,7 @@ export class FinalKitFx {
     this.rosterSeen = Number.NaN;
     this.stars.hide();
     this.elements.hide();
+    this.poolFlames.hide();
     for (const el of ELEMENTS)
       for (const s of this.pools[el]) {
         s.key = 0;

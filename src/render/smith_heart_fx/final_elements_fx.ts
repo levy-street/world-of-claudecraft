@@ -153,6 +153,8 @@ export interface FinalElementsHost {
   laneRung: number;
   /** The lava crust's floor rung (under the fans' glows, over the floor). */
   crustRung: number;
+  /** A burning pool's fire this frame (the kit's final_pool_flames.ts). */
+  poolFire: (id: number, x: number, y: number, z: number, r: number, age: number) => void;
   /** The kit's element telegraphs: the lanes and links dressed in their
    *  element's paint (the fans' char rung). */
   tele: FinalTelegraphs;
@@ -657,6 +659,8 @@ export class FinalElementsFx {
           c.mesh.visible = true;
         }
         this.bubble(at.x, at.z, r, C.fireRgb, 1.4);
+        // Fire licking up off the melt (the polish pass of 2026-11-23).
+        H.poolFire(e.id, at.x, H.groundY(at.x, at.z), at.z, r, age);
         if (H.rand() < 3 * this.dt * H.density)
           H.particles.puff(at.x, H.groundY(at.x, at.z) + 0.4, at.z, 1, {
             speed: 0.5,
