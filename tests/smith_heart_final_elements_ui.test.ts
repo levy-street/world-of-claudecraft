@@ -368,6 +368,15 @@ describe('FinalKitFx draws its own elements', () => {
       'smithHeartFirestormFloor',
     ])
       expect(visibleNamed(root, name), name).toBe(1);
+    // The falling hailstone's shadow gathers in its circle (the polish pass of
+    // 2026-11-23: the pale stone over a pale circle read poorly).
+    let shadow = 0;
+    root?.traverse((o) => {
+      if (o.name !== 'smithHeartFinalHailCircle' || !o.visible) return;
+      const m = (o as THREE.Mesh).material as THREE.ShaderMaterial;
+      shadow = Math.max(shadow, m.uniforms.uShadow.value as number);
+    });
+    expect(shadow).toBeGreaterThan(0);
     // Avalanche's eruption: ice and stone spikes, the torn floor.
     expect(
       instancesShown(root, 'smithHeartAvalancheIce') +

@@ -172,23 +172,54 @@ export const HAIL_FRAG = /* glsl */ `
 uniform float uFill;
 uniform float uAlpha;
 uniform float uSeed;
+// 0..1 as its stone comes down (0: not falling): the stone's shadow on the
+// floor, gathering and darkening in the middle (the polish pass of
+// 2026-11-23: the pale circle and pale stone were hard to read).
+uniform float uShadow;
 varying vec2 vUv;
 void main() {
   vec2 p = vUv * 2.0 - 1.0;
   float r = length(p);
   if (r > 1.0) discard;
   float rim = smoothstep(0.84, 0.95, r) * (1.0 - smoothstep(0.97, 1.0, r));
+  // A dark cold outline just inside the edge, so the rim reads on any floor.
+  float outline = smoothstep(0.78, 0.86, r) * (1.0 - smoothstep(0.86, 0.92, r));
   float front = 1.0 - clamp(uFill, 0.0, 1.0);
   float filled = smoothstep(front - 0.05, front + 0.05, r);
   float edge = (1.0 - smoothstep(0.0, 0.05, abs(r - front))) * step(0.02, uFill) * (1.0 - step(0.999, uFill));
   float a = atan(p.y, p.x);
   float spokes = pow(abs(sin(a * 6.0 + uSeed)), 22.0) * smoothstep(0.08, 0.9, r);
   float twig = pow(abs(sin(a * 18.0 + uSeed * 2.0)), 40.0) * smoothstep(0.4, 0.95, r);
-  vec3 deep = vec3(0.42, 0.66, 0.95);
+  vec3 deep = vec3(0.2, 0.42, 0.78);
   vec3 ice = vec3(0.86, 0.96, 1.0);
   vec3 col = mix(deep, ice, clamp(spokes + twig + rim + edge, 0.0, 1.0));
-  float alpha = uAlpha * clamp(rim + edge + filled * (0.45 + 0.4 * (spokes + twig)), 0.0, 1.0);
+  col = mix(col, vec3(0.04, 0.1, 0.24), outline * 0.85);
+  float alpha = uAlpha * clamp(rim + edge + outline * 0.7 + filled * (0.45 + 0.4 * (spokes + twig)), 0.0, 1.0);
+  // The stone's shadow: a soft dark spot growing tighter and darker as it
+  // nears the floor.
+  float sh = clamp(uShadow, 0.0, 1.0);
+  float spot = (1.0 - smoothstep(0.0, mix(0.75, 0.4, sh), r)) * sh;
+  col = mix(col, vec3(0.02, 0.04, 0.1), spot * 0.85);
+  alpha = max(alpha, spot * 0.7 * uAlpha);
   gl_FragColor = vec4(col, alpha);
+}
+`;
+
+/** A falling hailstone's streak (additive, on the solids' vertex: a cone
+ *  standing 0..1 over the stone): frost light brightest at the stone,
+ *  fading up the streak and soft at its sides. */
+export const HAIL_STREAK_FRAG = /* glsl */ `
+varying vec3 vN;
+varying vec3 vView;
+varying vec3 vCol;
+varying vec3 vObj;
+void main() {
+  vec3 n = normalize(vN);
+  vec3 v = normalize(vView);
+  float face = abs(dot(n, v));
+  float up = clamp(vObj.y, 0.0, 1.0);
+  float a = pow(1.0 - up, 1.6) * smoothstep(0.05, 0.6, face) * 0.85;
+  gl_FragColor = vec4(vec3(0.62, 0.84, 1.0) * a, a);
 }
 `;
 

@@ -97,6 +97,7 @@ import {
   BILL_VERT,
   GLOW_FRAG,
   HAIL_FRAG,
+  HAIL_STREAK_FRAG,
   LAVA_FRAG,
   SIGIL_FRAG,
   SOLID_FRAG,
@@ -426,14 +427,23 @@ export class FinalElementsFx {
     h.geometries.push(trailGeo);
     this.hailTrails = instanced(
       trailGeo,
-      solid('smithHeartFinalHailTrail', 1),
+      shader('smithHeartFinalHailTrail', {}, SOLID_VERT, HAIL_STREAK_FRAG, {
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+      }),
       P.hail,
       'smithHeartFinalHailTrail',
     );
+    this.hailTrails.renderOrder = BODY_ORDER + 1;
     const discGeoH = new THREE.CircleGeometry(1, 40).rotateX(-Math.PI / 2);
     h.geometries.push(discGeoH);
     const hailDisc = (name: string, i: number) => {
-      const u: Uni = { uFill: { value: 0 }, uAlpha: { value: 0 }, uSeed: { value: i * 1.3 } };
+      const u: Uni = {
+        uFill: { value: 0 },
+        uAlpha: { value: 0 },
+        uSeed: { value: i * 1.3 },
+        uShadow: { value: 0 },
+      };
       const m = mesh(discGeoH, shader(name, u, KIT_UV_VERT, HAIL_FRAG), name);
       m.renderOrder = floorVfxRenderOrder('encounter', h.crustRung);
       return { mesh: m, u };
@@ -1368,14 +1378,15 @@ export class FinalElementsFx {
       d.mesh.visible = true;
     }
     const f = hailFall(warn - age, warn);
+    if (d) d.u.uShadow.value = f.shown ? 1 - f.height / HAIL_DROP : 0;
     if (!f.shown || this.hailUsed >= P.hail) return;
     const y = H.groundY(x, z) + f.height + 0.7;
     const i = this.hailUsed++;
     const spin = this.clock * 4 + e.id;
-    this.piece(this.hailBalls, i, x, y, z, 1.35, 1.55, 1.35, spin, e.id, 0, 0xe8f8ff);
+    this.piece(this.hailBalls, i, x, y, z, 1.35, 1.55, 1.35, spin, e.id, 0, 0x4a88cc);
     // Its streak: a pale cone trailing up behind it, longer as it speeds.
     const streak = 3 + 7 * (1 - f.height / HAIL_DROP);
-    this.piece(this.hailTrails, i, x, y + 0.7, z, 1.1, streak, 1.1, 0, 0, 0, 0xd8f0ff);
+    this.piece(this.hailTrails, i, x, y + 0.2, z, 1.5, streak, 1.5, 0, 0, 0, 0xd8f0ff);
     if (H.rand() < 1.6 * H.density)
       H.particles.puff(x, y + 0.8, z, 1, {
         speed: 0.4,
