@@ -6245,7 +6245,7 @@
      uses. The group icon and the "LFM:" prefix keep it distinct from an
      uncommon item or guild line without color too. */
   .chat-group-link {
-    color: #5cd6a0;
+    color: var(--color-chat-group-link);
     cursor: var(--cursor-point);
     text-decoration: underline;
     text-decoration-thickness: 1px;

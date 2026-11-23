@@ -87,23 +87,25 @@ try {
       selectorTimeoutMs: 600000,
       gameBootTimeoutMs: 600000,
     });
-    // Stage: a level 20 tank leading a Hollow Crypt listing, posted to General,
-    // then a trade line with real item links for the color comparison.
+    // Stage: a level 8 tank (inside the Hollow Crypt band) leading a listing.
+    // The level-up deed lines are cleared from the log so the shot shows only
+    // the two General lines: real item links, then the advert's group link.
     await page.evaluate(`(() => {
-      const g = window.__game; const sim = g.sim; const pid = sim.playerId;
-      sim.setPlayerLevel?.(20, pid);
+      const sim = window.__game.sim;
+      sim.setPlayerLevel(8, sim.playerId);
       sim.dungeonFinderSetRoles(['tank']);
       sim.dungeonFinderListingCreate('hollow_crypt_normal', ['learning']);
+    })()`);
+    await new Promise((r) => setTimeout(r, 1500));
+    await page.evaluate(`document.querySelector('#chatlog').replaceChildren()`);
+    await page.evaluate(`(() => {
+      const sim = window.__game.sim;
+      sim.chat('/general WTS [[i:conchplate_sabatons]] [[i:hammer_of_the_open_lock]]');
     })()`);
     await new Promise((r) => setTimeout(r, 600));
     await page.evaluate(`(() => {
       const sim = window.__game.sim;
       sim.dungeonFinderExpeditionConfigure({ kind: 'advertise', target: 'general' });
-    })()`);
-    await new Promise((r) => setTimeout(r, 600));
-    await page.evaluate(`(() => {
-      const sim = window.__game.sim;
-      sim.chat('/general WTS [[i:conchplate_sabatons]] [[i:hammer_of_the_open_lock]]');
     })()`);
     await new Promise((r) => setTimeout(r, 1200));
     const chatClip = await clipOf(page, '#chatlog-frame');

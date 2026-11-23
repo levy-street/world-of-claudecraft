@@ -65,29 +65,47 @@ describe('group chat link element', () => {
     link.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
     link.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }));
     link.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
-    expect(groups.openListing.mock.calls).toEqual([[42], [42], [42]]);
+    const call = [42, 'hollow_crypt_normal'];
+    expect(groups.openListing.mock.calls).toEqual([call, call, call]);
   });
 
   it('styles the link in the LFG mint, never an item-quality or quest color', () => {
     const css = readFileSync('src/styles/hud.css', 'utf8');
     const rule = css.match(/\.chat-group-link \{[^}]*\}/)?.[0] ?? '';
-    expect(rule).toContain('color: #5cd6a0;');
+    expect(rule).toContain('color: var(--color-chat-group-link);');
+    expect(readFileSync('src/styles/tokens.css', 'utf8')).toContain(
+      '--color-chat-group-link: #5cd6a0;',
+    );
     for (const taken of ['#1eff00', '#0070dd', '#a335ee', '#ff8000', '#ffc864'])
       expect(rule).not.toContain(taken);
   });
 });
 
 describe('boardJumpTarget', () => {
-  const board = [{ id: 4 }, { id: 9 }];
-  it('lands on a listed row, my own listing, or reports gone', () => {
-    expect(boardJumpTarget(board, null, 9)).toBe('listed');
-    expect(boardJumpTarget(board, { id: 12 }, 12)).toBe('listed');
-    expect(boardJumpTarget(board, { id: 12 }, 5)).toBe('gone');
-    expect(boardJumpTarget([], null, 4)).toBe('gone');
+  const board = [
+    { id: 4, activityId: 'hollow_crypt_normal' },
+    { id: 9, activityId: 'nythraxis_boss_arena_heroic' },
+  ];
+  const mine = { id: 12, activityId: 'sunken_bastion_normal' };
+  it('lands on a listed row or my own listing, and reports a missing id as gone', () => {
+    expect(boardJumpTarget(board, null, 9, 'nythraxis_boss_arena_heroic')).toBe('listed');
+    expect(boardJumpTarget(board, mine, 12, 'sunken_bastion_normal')).toBe('listed');
+    expect(boardJumpTarget(board, mine, 5, 'hollow_crypt_normal')).toBe('gone');
+    expect(boardJumpTarget([], null, 4, 'hollow_crypt_normal')).toBe('gone');
+  });
+  it('never lands on a listing for other content than the link named', () => {
+    // A typed token, or a stale link whose id now belongs to another group.
+    expect(boardJumpTarget(board, null, 4, 'nythraxis_boss_arena_heroic')).toBe('gone');
+    expect(boardJumpTarget(board, mine, 12, 'hollow_crypt_normal')).toBe('gone');
+    expect(boardJumpTarget(board, null, 4, 'no_such_activity')).toBe('gone');
+  });
+  it('still lands after the leader switched the same content to its other difficulty', () => {
+    expect(boardJumpTarget(board, null, 4, 'hollow_crypt_heroic')).toBe('listed');
+    expect(boardJumpTarget(board, null, 9, 'nythraxis_boss_arena_normal')).toBe('listed');
   });
   it('waits for the first board snapshot instead of calling the group gone', () => {
-    expect(boardJumpTarget(null, null, 4)).toBe('unsynced');
-    expect(boardJumpTarget(null, { id: 4 }, 4)).toBe('listed');
+    expect(boardJumpTarget(null, null, 4, 'hollow_crypt_normal')).toBe('unsynced');
+    expect(boardJumpTarget(null, mine, 12, 'sunken_bastion_normal')).toBe('listed');
   });
 });
 
@@ -156,7 +174,7 @@ describe('DungeonFinderWindow.openListing (the chat link landing)', () => {
       row(4, 'hollow_crypt_normal'),
       row(9, 'sunken_bastion_normal'),
     ]);
-    window.openListing(9);
+    window.openListing(9, 'sunken_bastion_normal');
     expect(window.isOpen).toBe(true);
     const card = root.querySelector<HTMLElement>('[data-listing-id="9"]');
     expect(card?.classList.contains('df-listing-flash')).toBe(true);
@@ -179,7 +197,7 @@ describe('DungeonFinderWindow.openListing (the chat link landing)', () => {
       filter.dispatchEvent(new Event('change'));
     }
     expect(root.querySelector('[data-listing-id="4"]')).toBeNull();
-    window.openListing(4);
+    window.openListing(4, 'hollow_crypt_normal');
     expect(
       root.querySelector('[data-listing-id="4"]')?.classList.contains('df-listing-flash'),
     ).toBe(true);
@@ -187,11 +205,38 @@ describe('DungeonFinderWindow.openListing (the chat link landing)', () => {
 
   it('says the group is no longer listed when the listing has closed or filled', () => {
     const { root, window } = setup([row(4, 'hollow_crypt_normal')]);
-    window.openListing(77);
+    window.openListing(77, 'hollow_crypt_normal');
     expect(window.isOpen).toBe(true);
     const note = root.querySelector('.df-jump-gone');
     expect(note?.textContent).toBe(t('hudChrome.finder.listingGone'));
     expect(note?.getAttribute('role')).toBe('status');
     expect(root.querySelector('.df-listing-flash')).toBeNull();
+  });
+
+  it('treats a link that names other content than the listing as gone', () => {
+    const { root, window } = setup([row(4, 'hollow_crypt_normal')]);
+    window.openListing(4, 'nythraxis_boss_arena_heroic');
+    expect(root.querySelector('.df-jump-gone')?.textContent).toBe(
+      t('hudChrome.finder.listingGone'),
+    );
+    expect(root.querySelector('.df-listing-flash')).toBeNull();
+  });
+
+  it('says so when the board hides the listing from me (my own party leader posted it)', () => {
+    const { root, world, window } = setup([row(9, 'hollow_crypt_normal')]);
+    // A party member clicking their own leader's advert: the browse column
+    // skips the group I am already in, so there is no card to land on.
+    (world as { partyInfo: unknown }).partyInfo = {
+      leader: 2,
+      members: [
+        { pid: 1, name: 'Me', cls: 'paladin', level: 20 },
+        { pid: 2, name: 'Leader9', cls: 'warrior', level: 20 },
+      ],
+    };
+    window.openListing(9, 'hollow_crypt_normal');
+    expect(root.querySelector('[data-listing-id="9"]')).toBeNull();
+    expect(root.querySelector('.df-jump-gone')?.textContent).toBe(
+      t('hudChrome.finder.listingHidden'),
+    );
   });
 });

@@ -45,7 +45,7 @@ export function groupChatLinkPlainText(activityId: string): string {
 export function groupChatLinkEl(
   doc: Document,
   seg: { listingId: number; activityId: string },
-  groups: { openListing(listingId: number): void },
+  groups: { openListing(listingId: number, activityId: string): void },
 ): Node {
   const label = groupChatLinkLabel(seg.activityId);
   if (!label) return doc.createTextNode('[?]');
@@ -59,7 +59,7 @@ export function groupChatLinkEl(
   icon.setAttribute('aria-hidden', 'true');
   icon.innerHTML = svgIcon('social');
   link.append('[', icon, `${label}]`);
-  const open = (): void => groups.openListing(seg.listingId);
+  const open = (): void => groups.openListing(seg.listingId, seg.activityId);
   link.addEventListener('click', open);
   link.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Enter' && ev.key !== ' ') return;

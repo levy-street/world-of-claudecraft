@@ -404,21 +404,25 @@ export class DungeonFinderMachine {
     }
   }
 
-  /** The "LFM - ..." line for a leader's listing (`chat`: the General form that
-   *  leads with the clickable group link), or null when it has none. */
-  advertTextFor(leaderPid: number, form: 'plain' | 'chat' = 'plain'): string | null {
+  /** Both advert lines for a leader's listing from ONE listing view build: the
+   *  plain "LFM - ..." line (preview and Discord) and the General form that
+   *  leads with the clickable group link (falling back to the plain line if the
+   *  token guard ever refuses). Null when the player leads no valid listing. */
+  advertLinesFor(leaderPid: number): { text: string; chatLine: string } | null {
     const listing = this.listingBy(leaderPid);
     const activity = listing ? finderActivity(listing.activityId) : undefined;
     if (!listing || !activity || !this.listingValid(listing)) return null;
     const view = this.listingViewFor(listing, activity, this.listingMembers(listing));
     if (!view) return null;
     const advert = { ...view, guildOnly: isGuildParty(view.tags) };
-    return form === 'chat' ? finderAdvertChatLine(listing.id, advert) : finderAdvertText(advert);
+    const text = finderAdvertText(advert);
+    if (!text) return null;
+    return { text, chatLine: finderAdvertChatLine(listing.id, advert) ?? text };
   }
 
   // Offline host only: General reaches the local chat log; Discord needs the server.
   private advertise(pid: number, target: FinderAdvertTarget): void {
-    const text = this.advertTextFor(pid, 'chat');
+    const text = this.advertLinesFor(pid)?.chatLine;
     if (!text) {
       this.ctx.error(pid, 'You do not lead a group listing.');
       return;
@@ -1587,8 +1591,9 @@ export class DungeonFinderMachine {
     const queueUnit = unit ?? heldUnit;
     const until = this.cooldownUntil.get(pid) ?? 0;
     const listing = this.listingBy(pid);
-    const advertText = listing ? this.advertTextFor(pid) : null;
-    const advertChatLine = listing ? this.advertTextFor(pid, 'chat') : null;
+    const adverts = listing ? this.advertLinesFor(pid) : null;
+    const advertText = adverts?.text;
+    const advertChatLine = adverts?.chatLine;
     // Personal projection is bounded by FINDER_PLAYER_APPLICATION_CAP (5).
     const myApplications = this.applications.forPlayer(pid).map((app) => {
       return {

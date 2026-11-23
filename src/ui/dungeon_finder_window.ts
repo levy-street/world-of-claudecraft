@@ -179,9 +179,11 @@ export class DungeonFinderWindow {
 
   /** A chat group link: open the board on one listing (filter cleared so the
    *  row is visible), then spotlight its card with the deed-link gold pulse, or
-   *  say the group is gone. Runs after open() so its focus wins over the
-   *  default close-button focus. */
-  openListing(listingId: number): void {
+   *  say why it cannot: the group is gone (or the link names other content),
+   *  or the board hides it from me (my own party's listing, a lockout). Runs
+   *  after open() so its focus wins over the default close-button focus. Before
+   *  the first board snapshot the window shows its own syncing note. */
+  openListing(listingId: number, activityId: string): void {
     this.creatingGroup = false;
     this.boardFilter = 'all';
     this.pane = 'list';
@@ -192,16 +194,22 @@ export class DungeonFinderWindow {
       world.dungeonFinderBoard,
       world.dungeonFinderInfo?.myListing,
       listingId,
+      activityId,
     );
-    if (target === 'gone') {
+    if (target === 'unsynced') return;
+    const card =
+      target === 'listed'
+        ? el.querySelector<HTMLElement>(`[data-listing-id="${listingId}"]`)
+        : null;
+    if (!card) {
+      const key =
+        target === 'gone' ? 'hudChrome.finder.listingGone' : 'hudChrome.finder.listingHidden';
       el.querySelector('.df-board-listings .df-board-heading')?.insertAdjacentHTML(
         'afterend',
-        `<p class="df-note df-jump-gone" role="status">${esc(t('hudChrome.finder.listingGone'))}</p>`,
+        `<p class="df-note df-jump-gone" role="status">${esc(t(key))}</p>`,
       );
       return;
     }
-    const card = el.querySelector<HTMLElement>(`[data-listing-id="${listingId}"]`);
-    if (target !== 'listed' || !card) return;
     card.tabIndex = -1;
     card.focus({ preventScroll: true });
     // Guarded: jsdom (the focus test env) ships no scrollIntoView.

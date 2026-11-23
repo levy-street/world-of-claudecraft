@@ -245,6 +245,8 @@
        light panel, and keeps --color-text-overlay light with a text-shadow. */
     --color-gold: var(--gold);
     --color-accent: var(--gold);
+    /* The LFG chat tone (chat_channels.ts lfg), worn by the clickable group link. */
+    --color-chat-group-link: #5cd6a0;
     --color-text-overlay: #f4eede;
     --text-outline-color: #000000;
     --panel-edge: #08080d;

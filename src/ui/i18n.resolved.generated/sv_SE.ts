@@ -6979,6 +6979,7 @@ export const sv_SE: EnTranslations = {
       "postDiscordOffline": "Endast onlinespel",
       "chatLink": "LFM: {dungeon} ({difficulty})",
       "listingGone": "That group is no longer listed.",
+      "listingHidden": "You cannot join that group from the board right now.",
       "inspect": "Inspektera",
       "inspectApplicantAria": "Inspektera {name}",
       "partyHeading": "Ta med din grupp",

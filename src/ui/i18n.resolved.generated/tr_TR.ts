@@ -6979,6 +6979,7 @@ export const tr_TR: EnTranslations = {
       "postDiscordOffline": "Yalnızca çevrimiçi oyun",
       "chatLink": "LFM: {dungeon} ({difficulty})",
       "listingGone": "That group is no longer listed.",
+      "listingHidden": "You cannot join that group from the board right now.",
       "inspect": "İncele",
       "inspectApplicantAria": "{name} incele",
       "partyHeading": "Grubunu getir",

@@ -6979,6 +6979,7 @@ export const da_DK: EnTranslations = {
       "postDiscordOffline": "Kun onlinespil",
       "chatLink": "LFM: {dungeon} ({difficulty})",
       "listingGone": "That group is no longer listed.",
+      "listingHidden": "You cannot join that group from the board right now.",
       "inspect": "Undersøg",
       "inspectApplicantAria": "Inspicér {name}",
       "partyHeading": "Tag din gruppe med",

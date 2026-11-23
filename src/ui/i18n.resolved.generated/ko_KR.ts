@@ -6979,6 +6979,7 @@ export const ko_KR: EnTranslations = {
       "postDiscordOffline": "온라인 플레이 전용",
       "chatLink": "LFM: {dungeon} ({difficulty})",
       "listingGone": "이 파티는 더 이상 모집 중이 아닙니다.",
+      "listingHidden": "지금은 목록에서 이 파티에 참가할 수 없습니다.",
       "inspect": "살펴보기",
       "inspectApplicantAria": "{name} 살펴보기",
       "partyHeading": "파티와 함께 참여",

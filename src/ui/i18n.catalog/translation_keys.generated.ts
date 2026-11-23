@@ -14994,6 +14994,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.finder.levelUnavailable'
   | 'hudChrome.finder.levels'
   | 'hudChrome.finder.listingGone'
+  | 'hudChrome.finder.listingHidden'
   | 'hudChrome.finder.lockedFor'
   | 'hudChrome.finder.lockoutDaily'
   | 'hudChrome.finder.lockoutNone'

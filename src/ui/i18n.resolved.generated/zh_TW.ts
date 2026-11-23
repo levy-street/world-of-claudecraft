@@ -6979,6 +6979,7 @@ export const zh_TW: EnTranslations = {
       "postDiscordOffline": "僅限線上遊玩",
       "chatLink": "LFM: {dungeon} ({difficulty})",
       "listingGone": "該隊伍已不在列表中。",
+      "listingHidden": "你目前無法從列表加入該隊伍。",
       "inspect": "查看",
       "inspectApplicantAria": "查看{name}",
       "partyHeading": "帶上你的隊伍",

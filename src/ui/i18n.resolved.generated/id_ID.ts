@@ -6979,6 +6979,7 @@ export const id_ID: EnTranslations = {
       "postDiscordOffline": "Hanya permainan daring",
       "chatLink": "LFM: {dungeon} ({difficulty})",
       "listingGone": "That group is no longer listed.",
+      "listingHidden": "You cannot join that group from the board right now.",
       "inspect": "Periksa",
       "inspectApplicantAria": "Periksa {name}",
       "partyHeading": "Membawa kelompokmu",

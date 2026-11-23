@@ -6979,6 +6979,7 @@ export const es: EnTranslations = {
       "postDiscordOffline": "Solo juego en línea",
       "chatLink": "LFM: {dungeon} ({difficulty})",
       "listingGone": "That group is no longer listed.",
+      "listingHidden": "You cannot join that group from the board right now.",
       "inspect": "Inspeccionar",
       "inspectApplicantAria": "Inspeccionar {name}",
       "partyHeading": "Llevando a tu grupo",

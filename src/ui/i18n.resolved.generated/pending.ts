@@ -11,28 +11,34 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "es_ES": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "fr_FR": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "fr_CA": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "de_DE": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "zh_CN": [
     "hudChrome.finder.chatLink"
@@ -48,41 +54,50 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "ru_RU": [
     "hudChrome.finder.chatLink"
   ],
   "cs_CZ": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "nl_NL": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "pl_PL": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "id_ID": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "tr_TR": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "sv_SE": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "vi_VN": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ],
   "da_DK": [
     "hudChrome.finder.chatLink",
-    "hudChrome.finder.listingGone"
+    "hudChrome.finder.listingGone",
+    "hudChrome.finder.listingHidden"
   ]
 };
