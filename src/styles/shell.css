@@ -2561,6 +2561,11 @@
   .membership-locked {
     color: var(--color-text-muted);
     background: var(--color-bg-input);
+  }
+  /* Grey the content, never the row box: a locked character row stays focusable
+     and selectable, so its focus outline and selected border keep their color. */
+  .char-row.char-empty-slot.membership-locked,
+  .char-row.membership-locked:not(.char-empty-slot) > :not(.char-actions) {
     filter: grayscale(1);
   }
   .char-row.membership-locked .char-name,

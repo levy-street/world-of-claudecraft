@@ -77,6 +77,11 @@ it.each([
     );
     expect(getComputedStyle(premium).filter).toBe(active ? 'none' : 'grayscale(1)');
     expect(getComputedStyle(available).filter).toBe('none');
+    if (scenario === 'expired') {
+      // A locked character stays focusable: grey its content, never its focus ring.
+      expect(getComputedStyle(boundary).filter).toBe('none');
+      expect(getComputedStyle(boundary.querySelector('.char-id')!).filter).toBe('grayscale(1)');
+    }
     for (const row of [available, premium, boundary]) {
       expect(row.scrollWidth).toBeLessThanOrEqual(row.clientWidth + 1);
       expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(40);

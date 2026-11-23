@@ -19,6 +19,8 @@ describe('membership character selection', () => {
       'membershipSlotsHtml(chars, api.characterMembership.active, api.characterLimit)',
     );
     expect(main).toContain("listEl.querySelector('.char-row:not(.char-empty-slot)')");
+    // Placeholder rows are plain list items, so selection resets never stamp aria-selected on them.
+    expect(main).not.toContain("querySelectorAll('#char-list .char-row')");
     // The empty-account path keeps the creation preview instead of the warrior showcase.
     expect(main).toMatch(/\} else if \(chars\.length > 0\) \{\s*previewClassBody\('warrior'\)/);
   });

@@ -1,3 +1,4 @@
+import { MEMBERSHIP_CHARACTER_SLOTS } from '../membership_contract';
 import type { PlayerClass } from '../sim/types';
 import { deleteCharButtonHtml } from './char_delete_button';
 import { type CharselectHintSource, charselectHintsHtml } from './charselect_hints';
@@ -50,9 +51,9 @@ export function membershipSlotsHtml(
   limit: number,
 ): string {
   const premiumOccupied = characters.filter((character) => character.membershipSlot).length;
-  const baseLimit = limit - (active ? 10 : 0);
+  const baseLimit = limit - (active ? MEMBERSHIP_CHARACTER_SLOTS : 0);
   const baseEmpty = Math.max(0, baseLimit - (characters.length - premiumOccupied));
-  const premiumEmpty = Math.max(0, 10 - premiumOccupied);
+  const premiumEmpty = Math.max(0, MEMBERSHIP_CHARACTER_SLOTS - premiumOccupied);
   const row = (premium: boolean) => {
     const locked = premium && !active;
     const label = t(locked ? 'character.membershipSlots' : 'character.emptySlot');

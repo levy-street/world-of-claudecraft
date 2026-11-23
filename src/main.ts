@@ -6469,7 +6469,7 @@ async function refreshCharacters(): Promise<void> {
         // selectRow() call, so redesigning the new row still works.
         redesignEditor.close(false);
         // Deselect other characters
-        document.querySelectorAll('#char-list .char-row').forEach((r) => {
+        document.querySelectorAll('#char-list .char-row:not(.char-empty-slot)').forEach((r) => {
           r.classList.remove('sel');
           r.setAttribute('aria-selected', 'false');
         });
@@ -9730,7 +9730,7 @@ function wireStartScreens(): Promise<void> {
         x.classList.remove('sel');
         x.setAttribute('aria-pressed', 'false');
       });
-      document.querySelectorAll('#char-list .char-row').forEach((r) => {
+      document.querySelectorAll('#char-list .char-row:not(.char-empty-slot)').forEach((r) => {
         r.classList.remove('sel');
         r.setAttribute('aria-selected', 'false');
       });
@@ -9756,7 +9756,7 @@ function wireStartScreens(): Promise<void> {
         window.clearTimeout(hoverTimeouts['charcreate-class-details']);
         hoverTimeouts['charcreate-class-details'] = null;
       }
-      document.querySelectorAll('#char-list .char-row').forEach((r) => {
+      document.querySelectorAll('#char-list .char-row:not(.char-empty-slot)').forEach((r) => {
         r.classList.remove('sel');
         r.setAttribute('aria-selected', 'false');
       });
