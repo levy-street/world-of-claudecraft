@@ -4355,6 +4355,10 @@ export const vi_VN: EnTranslations = {
       "entryMismatchNormal": "Phụ bản này được đặt ở độ khó Thường. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Anh Hùng mới.",
       "entryMismatchHeroic": "Phụ bản này được đặt ở độ khó Anh Hùng. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Thường mới."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Ô Túi Thành Viên",
       "membershipSlotLocked": "Mở khóa ô túi này bằng tư cách thành viên.",

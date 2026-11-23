@@ -4355,6 +4355,10 @@ export const id_ID: EnTranslations = {
       "entryMismatchNormal": "Instans ini diatur ke kesulitan Normal. Gunakan Reset Semua Instans untuk memulai perjalanan Heroik baru.",
       "entryMismatchHeroic": "Instans ini diatur ke kesulitan Heroik. Gunakan Reset Semua Instans untuk memulai perjalanan Normal baru."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Slot tas keanggotaan",
       "membershipSlotLocked": "Buka slot tas ini dengan keanggotaan.",

@@ -4355,6 +4355,10 @@ export const nl_NL: EnTranslations = {
       "entryMismatchNormal": "Deze instantie is ingesteld op de moeilijkheid Normaal. Gebruik Alle instanties resetten om een nieuwe Heroïsche run te starten.",
       "entryMismatchHeroic": "Deze instantie is ingesteld op de moeilijkheid Heroïsch. Gebruik Alle instanties resetten om een nieuwe Normale run te starten."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Lidmaatschapstasplaats",
       "membershipSlotLocked": "Ontgrendel deze tasplaats met een lidmaatschap.",

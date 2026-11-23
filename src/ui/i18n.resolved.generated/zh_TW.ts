@@ -4355,6 +4355,10 @@ export const zh_TW: EnTranslations = {
       "entryMismatchNormal": "此地城副本的難度為普通。使用「重置所有地城副本」以開始全新的英雄難度副本。",
       "entryMismatchHeroic": "此地城副本的難度為英雄。使用「重置所有地城副本」以開始全新的普通難度副本。"
     },
+    "instanceGroup": {
+      "evictWarning": "你不在此副本的隊伍中。你將在 {seconds} 秒後被移出副本。",
+      "evicted": "你已被移出副本，因為你不在其隊伍中。"
+    },
     "bags": {
       "membershipSlot": "會員背包欄位",
       "membershipSlotLocked": "開通會員以解鎖此背包欄位。",

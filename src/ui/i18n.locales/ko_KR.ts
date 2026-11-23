@@ -3571,6 +3571,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아직 인스턴스 안에 플레이어 또는 그 시체가 있어 난이도 변경을 대기열에 등록했습니다. 인스턴스가 비면 변경이 적용됩니다.',
   'hudChrome.dungeonDifficulty.queuedCancelled':
     '파티 또는 파티장이 변경되어 대기 중인 난이도 변경이 취소되었습니다.',
+  'hudChrome.instanceGroup.evictWarning':
+    '이 인스턴스의 파티에 속해 있지 않습니다. {seconds}초 후 인스턴스에서 내보내집니다.',
+  'hudChrome.instanceGroup.evicted':
+    '이 인스턴스의 파티에 속해 있지 않아 인스턴스에서 내보내졌습니다.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     '인스턴스를 초기화하기 전에 던전 난이도를 변경하세요. 비어 있는 인스턴스는 5분 후 자동으로 초기화됩니다.',
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':

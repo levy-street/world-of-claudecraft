@@ -4355,6 +4355,10 @@ export const pl_PL: EnTranslations = {
       "entryMismatchNormal": "Ta instancja ma ustawioną normalną trudność. Użyj opcji Zresetuj wszystkie instancje, aby rozpocząć nowy heroiczny przebieg.",
       "entryMismatchHeroic": "Ta instancja ma ustawioną heroiczną trudność. Użyj opcji Zresetuj wszystkie instancje, aby rozpocząć nowy normalny przebieg."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Miejsce na torbę członkowską",
       "membershipSlotLocked": "Odblokuj to miejsce na torbę dzięki członkostwu.",

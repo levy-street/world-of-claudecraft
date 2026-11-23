@@ -63,6 +63,7 @@ import { resurrectOnInstanceReentry } from '../spirit';
 import { settleTeleportArrival } from '../teleport_arrival';
 import { dropThreat } from '../threat';
 import {
+  type DungeonDef,
   dist2d,
   type Entity,
   IGNIVAR_BOSS_ID,
@@ -91,6 +92,11 @@ import {
 } from './ignivar_entry';
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
+import { updateInstanceGroupEviction } from './instance_group_eviction';
+
+// Re-exported so the Sim coordinator reaches it through its existing dungeons import.
+export { evictLeaverFromGroupInstance } from './instance_group_eviction';
+
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
 import {
   durableMemberKey,
@@ -129,6 +135,11 @@ export const INSTANCE_CLEARED_EMPTY_TIMEOUT = 15 * 60;
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
   if (party) return `party:${party.id}`;
+  return soloInstanceKeyFor(ctx, pid);
+}
+
+/** The key this player's solo claims carry, whether or not they are grouped now. */
+export function soloInstanceKeyFor(ctx: SimContext, pid: number): string {
   // Solo instances key on the DURABLE character id when the server supplies one,
   // so a logout, relog, or character-select "Take Over" (each of which mints a
   // new entity id) rejoins the SAME live instance instead of claiming a fresh one
@@ -927,7 +938,19 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   }
   const door = detachFromDungeon(ctx, p);
   if (!door) return false; // unreachable: dungeonAt already answered above
-  p.pos = ctx.groundPos(door.x, door.z);
+  setDownAtDungeonExit(ctx, p, door);
+  ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
+  return true;
+}
+
+/** The standing position at a dungeon door's outside drop point. Also where
+ *  the group eviction lays a removed player's corpse, so it rests on the same
+ *  surface a living player would stand on. */
+export function dungeonExitStandingPos(
+  ctx: SimContext,
+  door: { x: number; z: number },
+): Entity['pos'] {
+  const pos = ctx.groundPos(door.x, door.z);
   // Seat the exit on the real STANDING surface: a placed deck plate at the
   // drop point (the Last Keep's terrace over its stair band) stands proud of
   // the walk-lift ground, and a body set down under its top is embedded in
@@ -938,8 +961,21 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   // dungeon exit, not a keep special case): a drop point under a deck is a
   // data fact any door can acquire, and on open ground the query finds no
   // support and changes nothing.
-  const exitDeck = supportHeightAt(ctx.cfg.seed, door.x, door.z, PLAYER_BODY_RADIUS, p.pos.y + 2);
-  if (exitDeck > p.pos.y) p.pos.y = exitDeck;
+  const exitDeck = supportHeightAt(ctx.cfg.seed, door.x, door.z, PLAYER_BODY_RADIUS, pos.y + 2);
+  if (exitDeck > pos.y) pos.y = exitDeck;
+  return pos;
+}
+
+/** Stand a player on the outside drop point of a dungeon door (a spot from
+ *  dungeonExitSpot or detachFromDungeon), facing away from it. Shared by the
+ *  exit portal (leaveDungeon) and the group eviction
+ *  (instance_group_eviction.ts). Moves only: the caller detaches first. */
+export function setDownAtDungeonExit(
+  ctx: SimContext,
+  p: Entity,
+  door: { x: number; z: number; facing: number },
+): void {
+  p.pos = dungeonExitStandingPos(ctx, door);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   settleTeleportArrival(p);
@@ -950,8 +986,6 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   p.prevFacing = door.facing;
   p.targetId = null;
   p.autoAttack = false;
-  ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
-  return true;
 }
 
 // How far outside the door an exiting player is set down, so they do not land
@@ -994,6 +1028,14 @@ export function detachFromDungeon(
   if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(p);
   if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
+  return dungeonExitSpot(ctx, dungeon);
+}
+
+/** The outside drop point and facing of one dungeon's door. */
+export function dungeonExitSpot(
+  ctx: SimContext,
+  dungeon: DungeonDef,
+): { x: number; z: number; facing: number } {
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
   // A Studio map may move the door (moved_objects.ts): leaving drops the
   // player in front of where it stands.
@@ -1647,6 +1689,9 @@ export function updateInstances(ctx: SimContext): void {
   // pulled or killed this tick already reads as such. Draws no shared rng.
   tickDungeonGuides(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
+  // Before the queued difficulty retry: a removed player set outside this
+  // second no longer holds the claim that retry is waiting on.
+  updateInstanceGroupEviction(ctx);
   retryPendingDifficultyChanges(ctx);
   updateIgnivarRaidProgression(ctx);
   updateIgnivarForgeLift(ctx);

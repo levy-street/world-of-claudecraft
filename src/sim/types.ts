@@ -8520,6 +8520,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // the 20 Hz exit-portal walk-in trigger must not spam the toast
   // (instances/ignivar_exit.ts).
   ignivarExitDeniedAt?: number;
+  // Seconds left before this player is removed from a group instance claim they
+  // no longer belong to (kicked, left, or the group disbanded), and that claim's
+  // exit id, so a countdown started for one claim never fires on another
+  // (instances/instance_group_eviction.ts). Unset while they belong.
+  instanceEvictIn?: number;
+  instanceEvictClaimId?: number;
   // Sim time of the last lockpickOffer emitted to this player from a
   // rift_locked_chest click, so repeated F-key presses don't spam the UI.
   riftLockpickOfferAt?: number;

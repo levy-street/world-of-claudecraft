@@ -4355,6 +4355,10 @@ export const da_DK: EnTranslations = {
       "entryMismatchNormal": "Denne instans er indstillet til Normal sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Heroisk gennemspilning.",
       "entryMismatchHeroic": "Denne instans er indstillet til Heroisk sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Normal gennemspilning."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Medlemskabsplads til taske",
       "membershipSlotLocked": "Lås denne taskeplads op med et medlemskab.",

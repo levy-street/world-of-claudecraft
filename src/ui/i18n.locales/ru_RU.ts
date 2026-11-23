@@ -5389,6 +5389,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Смена сложности поставлена в очередь: внутри подземелья ещё есть игрок или его тело. Изменение применится, когда подземелья освободятся.',
   'hudChrome.dungeonDifficulty.queuedCancelled':
     'Ожидающая смена сложности отменена, поскольку изменились группа или её лидер.',
+  'hudChrome.instanceGroup.evictWarning':
+    'Вы не состоите в группе этого подземелья. Через {seconds} сек. вы будете удалены из подземелья.',
+  'hudChrome.instanceGroup.evicted':
+    'Вы были удалены из подземелья, так как не состоите в его группе.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.',
   'hudChrome.dungeonDifficulty.resetAlreadyFresh': 'Ваши подземелья уже обновлены. С последнего сброса в них никто не входил.',

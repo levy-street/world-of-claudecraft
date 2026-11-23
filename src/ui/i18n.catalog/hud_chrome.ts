@@ -5287,6 +5287,14 @@ export const hudChromeStrings = {
     entryMismatchHeroic:
       'This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run.',
   },
+  // Group-instance eviction (src/sim/instances/instance_group_eviction.ts): a
+  // player inside a group's instance who is no longer in that group is warned,
+  // then set down outside the door when the grace runs out.
+  instanceGroup: {
+    evictWarning:
+      "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+    evicted: 'You have been removed from the instance because you are not in its group.',
+  },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
   bags: {

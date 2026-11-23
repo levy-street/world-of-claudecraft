@@ -4355,6 +4355,10 @@ export const ja_JP: EnTranslations = {
       "entryMismatchNormal": "このインスタンスはノーマル難易度に設定されています。ヒロイックで新しく始めるには「すべてのインスタンスをリセット」を使用してください。",
       "entryMismatchHeroic": "このインスタンスはヒロイック難易度に設定されています。ノーマルで新しく始めるには「すべてのインスタンスをリセット」を使用してください。"
     },
+    "instanceGroup": {
+      "evictWarning": "あなたはこのインスタンスのグループに所属していません。{seconds}秒後にインスタンスから退出させられます。",
+      "evicted": "このインスタンスのグループに所属していないため、インスタンスから退出させられました。"
+    },
     "bags": {
       "membershipSlot": "メンバーシップバッグ枠",
       "membershipSlotLocked": "メンバーシップでこのバッグ枠を解放。",

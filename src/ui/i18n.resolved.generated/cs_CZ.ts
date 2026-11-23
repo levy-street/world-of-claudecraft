@@ -4355,6 +4355,10 @@ export const cs_CZ: EnTranslations = {
       "entryMismatchNormal": "Tato instance je nastavena na normální obtížnost. Použij Resetovat všechny instance a začni nový hrdinský průchod.",
       "entryMismatchHeroic": "Tato instance je nastavena na hrdinskou obtížnost. Použij Resetovat všechny instance a začni nový normální průchod."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Členská pozice pro brašnu",
       "membershipSlotLocked": "Odemkni tuto pozici pro brašnu pomocí členství.",

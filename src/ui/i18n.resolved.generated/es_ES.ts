@@ -4355,6 +4355,10 @@ export const es_ES: EnTranslations = {
       "entryMismatchNormal": "Esta instancia está configurada en dificultad Normal. Usa Restablecer todas las instancias para iniciar una nueva partida Heroica.",
       "entryMismatchHeroic": "Esta instancia está configurada en dificultad Heroica. Usa Restablecer todas las instancias para iniciar una nueva partida Normal."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Espacio de bolsa de membresía",
       "membershipSlotLocked": "Desbloquea este espacio de bolsa con una membresía.",

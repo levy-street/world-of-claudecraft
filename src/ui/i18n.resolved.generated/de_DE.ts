@@ -4355,6 +4355,10 @@ export const de_DE: EnTranslations = {
       "entryMismatchNormal": "Diese Instanz ist auf die Schwierigkeit Normal eingestellt. Verwende Alle Instanzen zurücksetzen, um einen neuen heroischen Durchlauf zu starten.",
       "entryMismatchHeroic": "Diese Instanz ist auf die Schwierigkeit Heroisch eingestellt. Verwende Alle Instanzen zurücksetzen, um einen neuen normalen Durchlauf zu starten."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Mitgliedschafts-Taschenplatz",
       "membershipSlotLocked": "Schalte diesen Taschenplatz mit einer Mitgliedschaft frei.",

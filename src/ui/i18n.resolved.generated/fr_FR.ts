@@ -4355,6 +4355,10 @@ export const fr_FR: EnTranslations = {
       "entryMismatchNormal": "Cette instance est réglée sur la difficulté Normal. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Héroïque.",
       "entryMismatchHeroic": "Cette instance est réglée sur la difficulté Héroïque. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Normal."
     },
+    "instanceGroup": {
+      "evictWarning": "You are not in this instance's group. You will be removed from the instance in {seconds} seconds.",
+      "evicted": "You have been removed from the instance because you are not in its group."
+    },
     "bags": {
       "membershipSlot": "Emplacement de sac d'abonnement",
       "membershipSlotLocked": "Débloquez cet emplacement de sac avec un abonnement.",
