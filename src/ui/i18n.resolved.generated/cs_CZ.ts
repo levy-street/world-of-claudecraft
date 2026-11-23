@@ -6977,6 +6977,8 @@ export const cs_CZ: EnTranslations = {
       "postDiscord": "Zveřejnit na Discordu",
       "postReadyIn": "Připraveno za {minutes} min",
       "postDiscordOffline": "Pouze při hraní online",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "That group is no longer listed.",
       "inspect": "Prohlédnout",
       "inspectApplicantAria": "Prohlédnout {name}",
       "partyHeading": "Bereš svou družinu",

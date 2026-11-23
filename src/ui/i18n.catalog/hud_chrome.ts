@@ -9769,6 +9769,10 @@ export const hudChromeStrings = {
     postDiscord: 'Post in Discord',
     postReadyIn: 'Ready in {minutes} min',
     postDiscordOffline: 'Online play only',
+    // The clickable group link a General advert carries ("[LFM: The Hollow Crypt (Heroic)]").
+    chatLink: 'LFM: {dungeon} ({difficulty})',
+    // Shown when a chat group link points at a listing that has closed or filled.
+    listingGone: 'That group is no longer listed.',
     inspect: 'Inspect',
     inspectApplicantAria: 'Inspect {name}',
     partyHeading: 'Bringing your party',

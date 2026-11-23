@@ -51,6 +51,20 @@ describe('group listing extras decoding (gear, advert, guild)', () => {
     expect(decoded?.advert).toBeUndefined();
   });
 
+  it('keeps a valid General link line and drops only an oversized or non-string one', () => {
+    const ok = {
+      myListing: { id: 7, advertChatLine: '[[g:7:hollow_crypt_normal]] 1/5 - Healer/DPS needed' },
+    };
+    expect(decodeDungeonFinderInfo(ok)).toBe(ok);
+    for (const bad of ['x'.repeat(161), 42]) {
+      const decoded = decodeDungeonFinderInfo({
+        myListing: { id: 7, advertText: 'LFM - x', advertChatLine: bad },
+      });
+      expect(decoded?.myListing?.advertChatLine).toBeUndefined();
+      expect(decoded?.myListing?.advertText).toBe('LFM - x');
+    }
+  });
+
   it('drops a board row whose guild is not a bounded string', () => {
     const ok = { id: 1, guild: 'Nightwatch' };
     expect(decodeDungeonFinderBoard([ok, { id: 2, guild: 5 }])).toEqual([ok]);

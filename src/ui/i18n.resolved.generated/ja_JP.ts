@@ -6977,6 +6977,8 @@ export const ja_JP: EnTranslations = {
       "postDiscord": "Discordに投稿",
       "postReadyIn": "あと{minutes}分",
       "postDiscordOffline": "オンラインプレイ限定",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "このグループは募集を終了しました。",
       "inspect": "詳細を見る",
       "inspectApplicantAria": "{name}の詳細を見る",
       "partyHeading": "パーティーを連れていく",

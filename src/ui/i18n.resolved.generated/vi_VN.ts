@@ -6977,6 +6977,8 @@ export const vi_VN: EnTranslations = {
       "postDiscord": "Đăng Trong Discord",
       "postReadyIn": "Sẵn sàng sau {minutes} phút",
       "postDiscordOffline": "Chỉ Chơi Trực Tuyến",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "That group is no longer listed.",
       "inspect": "Kiểm Tra",
       "inspectApplicantAria": "Kiểm tra {name}",
       "partyHeading": "Đưa Cả Nhóm Đi",

@@ -6977,6 +6977,8 @@ export const zh_CN: EnTranslations = {
       "postDiscord": "发布到Discord",
       "postReadyIn": "{minutes}分钟后可用",
       "postDiscordOffline": "仅限在线游戏",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "该队伍已不在列表中。",
       "inspect": "查看",
       "inspectApplicantAria": "查看{name}",
       "partyHeading": "带上你的队伍",

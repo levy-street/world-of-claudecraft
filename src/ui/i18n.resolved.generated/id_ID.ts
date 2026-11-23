@@ -6977,6 +6977,8 @@ export const id_ID: EnTranslations = {
       "postDiscord": "Kirim ke Discord",
       "postReadyIn": "Siap dalam {minutes} mnt",
       "postDiscordOffline": "Hanya permainan daring",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "That group is no longer listed.",
       "inspect": "Periksa",
       "inspectApplicantAria": "Periksa {name}",
       "partyHeading": "Membawa kelompokmu",

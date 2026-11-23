@@ -11535,10 +11535,11 @@
     border-color: var(--gold-dim);
     background: color-mix(in srgb, var(--gold) 8%, transparent);
   }
-  /* The jump spotlight (a chat deed-link or recent-strip landing): one gold
-     pulse that fades on its own, no timer in the painter. Reduced motion
-     swaps in a static ring, cleared by the next repaint. */
-  .deed-card-flash {
+  /* The jump spotlight (a chat deed-link, recent-strip or group-link landing):
+     one gold pulse that fades on its own, no timer in the painter. Reduced
+     motion swaps in a static ring, cleared by the next repaint. */
+  .deed-card-flash,
+  .df-listing-flash {
     animation: deed-card-flash 1.6s ease-out 1;
   }
   @keyframes deed-card-flash {
@@ -11554,7 +11555,8 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .deed-card-flash {
+    .deed-card-flash,
+    .df-listing-flash {
       animation: none;
       box-shadow: inset 0 0 0 2px var(--gold-dim);
     }

@@ -6977,6 +6977,8 @@ export const ru_RU: EnTranslations = {
       "postDiscord": "Опубликовать в Discord",
       "postReadyIn": "Доступно через {minutes} мин",
       "postDiscordOffline": "Только в онлайн-игре",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "Эта группа больше не в списке.",
       "inspect": "Осмотреть",
       "inspectApplicantAria": "Осмотреть: {name}",
       "partyHeading": "Ваша группа идёт с вами",

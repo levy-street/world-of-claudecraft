@@ -6977,6 +6977,8 @@ export const nl_NL: EnTranslations = {
       "postDiscord": "In Discord plaatsen",
       "postReadyIn": "Klaar over {minutes} min",
       "postDiscordOffline": "Alleen online spelen",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "That group is no longer listed.",
       "inspect": "Inspecteren",
       "inspectApplicantAria": "Inspecteer {name}",
       "partyHeading": "Je groep meenemen",

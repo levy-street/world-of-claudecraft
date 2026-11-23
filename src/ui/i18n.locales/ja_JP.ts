@@ -14232,6 +14232,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.postDiscord': 'Discordに投稿',
   'hudChrome.finder.postReadyIn': 'あと{minutes}分',
   'hudChrome.finder.postDiscordOffline': 'オンラインプレイ限定',
+  'hudChrome.finder.listingGone': 'このグループは募集を終了しました。',
   'hudChrome.finder.inspect': '詳細を見る',
   'hudChrome.finder.inspectApplicantAria': '{name}の詳細を見る',
   'hudChrome.finder.partyHeading': 'パーティーを連れていく',

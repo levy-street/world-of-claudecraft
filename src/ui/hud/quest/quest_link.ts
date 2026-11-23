@@ -11,14 +11,23 @@
 // which answer "is this id safe to encode" once, here, beside the regex that
 // decides it. The raw encoders stay exported for the parser-agreement test only.
 
+//
+// A third kind, the group link ([[g:<listingId>:<activityId>]]), is minted by the
+// sim's listing advert (src/sim/social/finder_advert.ts finderGroupLinkToken) and
+// opens the Groups window on that listing. Its label comes from the local activity
+// catalogue, so it follows the same no-forged-label rule.
+
 export type ChatSegment =
   | { kind: 'text'; value: string }
   | { kind: 'quest'; questId: string }
-  | { kind: 'item'; itemId: string };
+  | { kind: 'item'; itemId: string }
+  | { kind: 'group'; listingId: number; activityId: string };
 
 // Quest/item ids are [A-Za-z0-9_]+ (e.g. "q_wolves", "sword_iron"). The kind prefix
-// (q | i) selects the segment kind. Global so we can walk every match.
-const CHAT_LINK_RE = /\[\[([qi]):([A-Za-z0-9_]+)\]\]/g;
+// (q | i) selects the segment kind. A group link carries a positive listing number
+// (at most 9 digits) and an activity id in the same charset. Global so we can walk
+// every match.
+const CHAT_LINK_RE = /\[\[(?:([qi]):([A-Za-z0-9_]+)|g:([1-9][0-9]{0,8}):([A-Za-z0-9_]+))\]\]/g;
 
 // The same id charset as CHAT_LINK_RE, anchored, for callers that build a token
 // from an id they did not choose (content data). A token whose id the parser
@@ -67,7 +76,12 @@ export function parseChatSegments(text: string): ChatSegment[] {
   let m = CHAT_LINK_RE.exec(text);
   while (m) {
     if (m.index > last) segments.push({ kind: 'text', value: text.slice(last, m.index) });
-    segments.push(m[1] === 'q' ? { kind: 'quest', questId: m[2] } : { kind: 'item', itemId: m[2] });
+    if (m[3] !== undefined)
+      segments.push({ kind: 'group', listingId: Number(m[3]), activityId: m[4] });
+    else
+      segments.push(
+        m[1] === 'q' ? { kind: 'quest', questId: m[2] } : { kind: 'item', itemId: m[2] },
+      );
     last = m.index + m[0].length;
     m = CHAT_LINK_RE.exec(text);
   }

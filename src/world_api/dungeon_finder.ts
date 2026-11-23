@@ -79,8 +79,11 @@ export interface DungeonFinderMyListingView {
   tags: FinderListingTag[];
   applicants: DungeonFinderApplicantView[];
   details?: ExpeditionDetails;
-  // The "LFM - ..." line the advert buttons post (built by the sim).
+  // The "LFM - ..." line the advert buttons preview and post to Discord (built by the sim).
   advertText?: string;
+  // The General chat form: a clickable group link token
+  // ([[g:<listingId>:<activityId>]]) then the shared size and roles detail.
+  advertChatLine?: string;
   // Roles I assigned to the party members this listing brought along (members
   // without an entry seat by their own role selection). Absent on older snapshots.
   partyRoles?: FinderPartyRole[];

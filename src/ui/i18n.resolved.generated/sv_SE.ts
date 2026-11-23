@@ -6977,6 +6977,8 @@ export const sv_SE: EnTranslations = {
       "postDiscord": "Publicera i Discord",
       "postReadyIn": "Redo om {minutes} min",
       "postDiscordOffline": "Endast onlinespel",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "That group is no longer listed.",
       "inspect": "Inspektera",
       "inspectApplicantAria": "Inspektera {name}",
       "partyHeading": "Ta med din grupp",

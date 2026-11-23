@@ -7,6 +7,8 @@
 //
 // The text is English on purpose: it is posted as the player's own chat line
 // (General) and as a Discord embed, the same sinks a typed "!lfg" line reaches.
+// The General form leads with a group link token in place of the content name,
+// so a reader can click straight through to the listing (finderAdvertChatLine).
 import { finderActivity } from '../content/dungeon_finder';
 import type { Role } from '../content/talents';
 import { DUNGEONS } from '../data';
@@ -36,35 +38,79 @@ export interface FinderAdvertCooldownView {
 
 const ROLE_WORDS: Record<Role, string> = { tank: 'Tank', healer: 'Healer', dps: 'DPS' };
 
-/**
- * "LFM - Nythraxis - Heroic - 4/10 - Healer/DPS needed". `needed` null means
- * the activity does not enforce roles, so any role is welcome. A Guild Party
- * says so, since only guildmates can apply.
- */
-export function finderAdvertText(listing: {
+export interface FinderAdvertListing {
   activityId: string;
   size: number;
   capacity: number;
   needed: Readonly<Record<Role, number>> | null;
   guildOnly: boolean;
-}): string | null {
-  const activity = finderActivity(listing.activityId);
-  const dungeon = activity ? DUNGEONS[activity.dungeonId] : undefined;
-  if (!activity || !dungeon) return null;
+}
+
+// "4/10 - Healer/DPS needed[ - Guild only]", the part both forms share.
+// `needed` null means the activity does not enforce roles, so any role is
+// welcome. A Guild Party says so, since only guildmates can apply.
+function advertDetail(listing: FinderAdvertListing): string[] {
   const roles = listing.needed
     ? (Object.keys(ROLE_WORDS) as Role[]).filter((role) => (listing.needed?.[role] ?? 0) > 0)
     : [];
   const parts = [
-    'LFM',
-    dungeon.name,
-    activity.difficulty === 'heroic' ? 'Heroic' : 'Normal',
     `${listing.size}/${listing.capacity}`,
     roles.length > 0
       ? `${roles.map((role) => ROLE_WORDS[role]).join('/')} needed`
       : 'Any role needed',
   ];
   if (listing.guildOnly) parts.push('Guild only');
-  return parts.join(' - ');
+  return parts;
+}
+
+/**
+ * "LFM - Nythraxis Raid Arena - Heroic - 4/10 - Healer/DPS needed": the plain
+ * line the Groups window previews and the Discord post carries.
+ */
+export function finderAdvertText(listing: FinderAdvertListing): string | null {
+  const activity = finderActivity(listing.activityId);
+  const dungeon = activity ? DUNGEONS[activity.dungeonId] : undefined;
+  if (!activity || !dungeon) return null;
+  return [
+    'LFM',
+    dungeon.name,
+    activity.difficulty === 'heroic' ? 'Heroic' : 'Normal',
+    ...advertDetail(listing),
+  ].join(' - ');
+}
+
+// The id charsets the client chat parser accepts for a group link
+// (src/ui/hud/quest/quest_link.ts); pinned against it by tests/quest_link.test.ts.
+const GROUP_LINK_ACTIVITY_RE = /^[A-Za-z0-9_]+$/;
+const GROUP_LINK_MAX_LISTING_ID = 999_999_999;
+
+/**
+ * The chat token for one group listing, `[[g:<listingId>:<activityId>]]`. The
+ * client renders it as a clickable "[LFM: <dungeon> (<difficulty>)]" link that
+ * opens the Groups window on that listing. The label is built client-side from
+ * the activity catalogue, never from the wire, so a forged token cannot
+ * misrepresent its content. Null when an id falls outside the parser's charset
+ * (the tryEncode guard: never ship a token the parser would show as raw text).
+ */
+export function finderGroupLinkToken(listingId: number, activityId: string): string | null {
+  if (!Number.isInteger(listingId) || listingId < 1 || listingId > GROUP_LINK_MAX_LISTING_ID)
+    return null;
+  if (!GROUP_LINK_ACTIVITY_RE.test(activityId)) return null;
+  return `[[g:${listingId}:${activityId}]]`;
+}
+
+/**
+ * The General chat form of the advert: the clickable group link, then the
+ * shared detail ("[[g:12:hollow_crypt_normal]] 1/5 - Healer/DPS needed"). The
+ * link already names the content and difficulty in each reader's language.
+ */
+export function finderAdvertChatLine(
+  listingId: number,
+  listing: FinderAdvertListing,
+): string | null {
+  if (!finderAdvertText(listing)) return null;
+  const token = finderGroupLinkToken(listingId, listing.activityId);
+  return token ? `${token} ${advertDetail(listing).join(' - ')}` : null;
 }
 
 // Bounded per-key cooldowns on any monotonic seconds clock. Expired entries are

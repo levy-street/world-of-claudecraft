@@ -6977,6 +6977,8 @@ export const en_XA: EnTranslations = {
       "postDiscord": "[Þóšţ íñ Ðíšçóŕð]",
       "postReadyIn": "[Ŕéáðý íñ {minutes} ɱíñ]",
       "postDiscordOffline": "[Óñļíñé þļáý óñļý]",
+      "chatLink": "[ĻƑⱮ: {dungeon} ({difficulty})]",
+      "listingGone": "[Ţĥáţ ĝŕóúþ íš ñó ļóñĝéŕ ļíšţéð.]",
       "inspect": "[Íñšþéçţ]",
       "inspectApplicantAria": "[Íñšþéçţ {name}]",
       "partyHeading": "[Ɓŕíñĝíñĝ ýóúŕ þáŕţý]",

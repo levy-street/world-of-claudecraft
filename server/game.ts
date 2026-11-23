@@ -186,7 +186,7 @@ import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
   persistCheaterMark,
 } from './cheater_mark_runtime';
-import { CommunityRelay } from './community_relay';
+import { advertLineKey, CommunityRelay } from './community_relay';
 import { dispatchPetRename } from './companion_rename';
 import {
   cancelCorpseHarvestCastOnDisconnect,
@@ -7287,7 +7287,7 @@ export class GameServer {
             this.relay.advertise(
               session,
               target,
-              sim.dungeonFinderInfoFor(pid)?.myListing?.advertText,
+              sim.dungeonFinderInfoFor(pid)?.myListing?.[advertLineKey(target)],
               {
                 allowed: (text) =>
                   !this.isChatMuted(session) && !this.enforceChatPolicy(session, text),

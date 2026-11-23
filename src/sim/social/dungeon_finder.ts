@@ -58,6 +58,7 @@ import {
 import {
   FinderAdvertCooldowns,
   type FinderAdvertTarget,
+  finderAdvertChatLine,
   finderAdvertText,
   isFinderAdvertTarget,
 } from './finder_advert';
@@ -403,18 +404,21 @@ export class DungeonFinderMachine {
     }
   }
 
-  /** The "LFM - ..." line for a leader's listing, or null when it has none. */
-  advertTextFor(leaderPid: number): string | null {
+  /** The "LFM - ..." line for a leader's listing (`chat`: the General form that
+   *  leads with the clickable group link), or null when it has none. */
+  advertTextFor(leaderPid: number, form: 'plain' | 'chat' = 'plain'): string | null {
     const listing = this.listingBy(leaderPid);
     const activity = listing ? finderActivity(listing.activityId) : undefined;
     if (!listing || !activity || !this.listingValid(listing)) return null;
     const view = this.listingViewFor(listing, activity, this.listingMembers(listing));
-    return view ? finderAdvertText({ ...view, guildOnly: isGuildParty(view.tags) }) : null;
+    if (!view) return null;
+    const advert = { ...view, guildOnly: isGuildParty(view.tags) };
+    return form === 'chat' ? finderAdvertChatLine(listing.id, advert) : finderAdvertText(advert);
   }
 
   // Offline host only: General reaches the local chat log; Discord needs the server.
   private advertise(pid: number, target: FinderAdvertTarget): void {
-    const text = this.advertTextFor(pid);
+    const text = this.advertTextFor(pid, 'chat');
     if (!text) {
       this.ctx.error(pid, 'You do not lead a group listing.');
       return;
@@ -1584,6 +1588,7 @@ export class DungeonFinderMachine {
     const until = this.cooldownUntil.get(pid) ?? 0;
     const listing = this.listingBy(pid);
     const advertText = listing ? this.advertTextFor(pid) : null;
+    const advertChatLine = listing ? this.advertTextFor(pid, 'chat') : null;
     // Personal projection is bounded by FINDER_PLAYER_APPLICATION_CAP (5).
     const myApplications = this.applications.forPlayer(pid).map((app) => {
       return {
@@ -1615,6 +1620,7 @@ export class DungeonFinderMachine {
             tags: [...listing.tags],
             ...(listing.details ? { details: { ...listing.details } } : {}),
             ...(advertText ? { advertText } : {}),
+            ...(advertChatLine ? { advertChatLine } : {}),
             partyRoles: this.listingMembers(listing).flatMap((memberPid) => {
               const role = listing.memberRoles?.get(memberPid);
               return role ? [{ pid: memberPid, role }] : [];

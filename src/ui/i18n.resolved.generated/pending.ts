@@ -9,25 +9,80 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "es_ES": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "fr_FR": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "fr_CA": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "de_DE": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "zh_CN": [
+    "hudChrome.finder.chatLink"
+  ],
+  "zh_TW": [
+    "hudChrome.finder.chatLink"
+  ],
+  "ko_KR": [
+    "hudChrome.finder.chatLink"
+  ],
+  "ja_JP": [
+    "hudChrome.finder.chatLink"
+  ],
+  "pt_BR": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "ru_RU": [
+    "hudChrome.finder.chatLink"
+  ],
+  "cs_CZ": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "nl_NL": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "pl_PL": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "id_ID": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "tr_TR": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "sv_SE": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "vi_VN": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ],
+  "da_DK": [
+    "hudChrome.finder.chatLink",
+    "hudChrome.finder.listingGone"
+  ]
 };

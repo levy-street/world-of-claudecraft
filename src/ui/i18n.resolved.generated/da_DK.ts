@@ -6977,6 +6977,8 @@ export const da_DK: EnTranslations = {
       "postDiscord": "Slå op i Discord",
       "postReadyIn": "Klar om {minutes} min.",
       "postDiscordOffline": "Kun onlinespil",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "That group is no longer listed.",
       "inspect": "Undersøg",
       "inspectApplicantAria": "Inspicér {name}",
       "partyHeading": "Tag din gruppe med",

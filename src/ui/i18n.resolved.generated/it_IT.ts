@@ -6977,6 +6977,8 @@ export const it_IT: EnTranslations = {
       "postDiscord": "Pubblica su Discord",
       "postReadyIn": "Pronto tra {minutes} min",
       "postDiscordOffline": "Solo gioco online",
+      "chatLink": "LFM: {dungeon} ({difficulty})",
+      "listingGone": "That group is no longer listed.",
       "inspect": "Ispeziona",
       "inspectApplicantAria": "Ispeziona {name}",
       "partyHeading": "Porta il tuo gruppo",
