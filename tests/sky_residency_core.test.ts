@@ -404,7 +404,8 @@ describe('renderer sky-residency driver', () => {
     const body = renderer.slice(start, renderer.indexOf('\n  }', start));
     expect(body).toContain('zoneArrivalReady({');
     expect(body).toContain('prepared: this.preparedZones.has(id)');
-    expect(body).toContain('programsPrewarmed: this.prewarmedZonePrograms.has(id)');
+    // programs: prewarmed, or waiting on lane-held bodies (zone_prewarm_body_wait_core.ts)
+    expect(body).toContain('programsPrewarmed: this.zoneBodyWait.settledOrWaiting(id)');
     expect(body).toContain('standardMaterials: GFX.standardMaterials');
     expect(body).toContain(
       'skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome))',

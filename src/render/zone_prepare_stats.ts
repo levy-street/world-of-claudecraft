@@ -31,6 +31,22 @@ export interface ZonePrewarmStats {
   passMs: number;
 }
 
+/** The prewarmZoneAt readout from its clock marks: build to tBuild, compile to
+ *  tCompile, then the pass to now. */
+export function zonePrewarmStats(
+  zoneId: string,
+  t0: number,
+  tBuild: number,
+  tCompile: number,
+): ZonePrewarmStats {
+  return {
+    zoneId,
+    buildMs: Math.round(tBuild - t0),
+    compileMs: Math.round(tCompile - tBuild),
+    passMs: Math.round(performance.now() - tCompile),
+  };
+}
+
 export interface ZoneStreamingStats {
   prepared: number;
   pending: number;

@@ -905,8 +905,12 @@ export async function prepareDungeonCharacterBodies(interior: string): Promise<v
  *  fits are resident from entry (woc_entry_preload.ts). A fetch that fails does
  *  not end the wait: the file is asked for again after its cooldown, by itself
  *  (armCharacterRetry), and its landing fires the ready signal like any other,
- *  so a host may ask once or every frame. */
-export function visualAssetsResident(key: string, fetch = true): boolean {
+ *  so a host may ask once or every frame. `paced`: a SPECULATIVE asker (the zone
+ *  prewarm) leaves alone every body a paced lane still holds (RiftBodyLanes.holds),
+ *  so it never fetches around the lane's one-at-a-time pump; it waits for the
+ *  lane's fetch to land (onCharacterAssetReady) instead. The file still counts as
+ *  awaited, so a lane fetch that fails is asked for again (armCharacterRetry). */
+export function visualAssetsResident(key: string, fetch = true, paced = false): boolean {
   const def = VISUALS[key];
   if (!def) return false;
   // a WOC body's head core streams beside its base (never gating the build)
@@ -916,7 +920,9 @@ export function visualAssetsResident(key: string, fetch = true): boolean {
     if (characterAssetResident(url)) continue;
     resident = false;
     if (!fetch || !(streamedUrlSet.has(url) || lazyOnDemandUrls.has(url))) continue;
+    // awaited either way: a lane fetch that fails is asked for again after its cooldown
     hostAwaitedUrls.add(url);
+    if (paced && riftLanes.holds(url)) continue;
     if (!characterRetryArmed.has(url)) ensureCharacterUrl(url);
   }
   return resident;

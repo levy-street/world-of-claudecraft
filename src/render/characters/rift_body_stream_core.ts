@@ -6,9 +6,10 @@
 // streams it after first paint (the why lives in assets.ts, beside the stream).
 // The bodies only Rift content draws are a large share of that stream
 // (measured: 110 to 125 MB of ArrayBuffers at world entry) and no overworld
-// entity ever draws them, so on that profile they wait instead. Desktop and
-// Android keep every body in the boot gate, so nothing here changes what they
-// load or when.
+// entity ever draws them, so they wait instead. That wait (the Rift and hoard
+// lanes), like the dungeon-only and buddy bodies' on-demand loads, holds on EVERY
+// host (characterStreamPlan): Desktop and Android keep only the shared overworld
+// bodies and the Quartered Isle's in the boot gate.
 //
 // The class is derived from CONTENT, never from a file name. A visual key is
 // Rift-only when the mob dispatch reaches it from a Rift or Buried Hoard
@@ -371,6 +372,14 @@ export class RiftBodyLanes {
   /** True while a lane holds a body it has not fetched. */
   pending(): boolean {
     return LANE_ORDER.some((lane) => this.cursor[lane] < this.urls[lane].length);
+  }
+
+  /** True while some lane still holds `url` unfetched: the lane owns its timing,
+   *  so a speculative asker (the zone prewarm) must not fetch it around the pacing.
+   *  A body the lane has walked past is in flight, resident, or failed: asking for
+   *  it then joins that fetch or retries it, never adds one beside the lane. */
+  holds(url: string): boolean {
+    return LANE_ORDER.some((lane) => this.urls[lane].indexOf(url, this.cursor[lane]) >= 0);
   }
 
   demand(d: Readonly<RiftBodyDemand>): void {

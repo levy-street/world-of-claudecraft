@@ -971,6 +971,7 @@ import {
   reportZonePrepare,
   type ZonePrewarmStats,
   type ZoneStreamingStats,
+  zonePrewarmStats,
 } from './zone_prepare_stats';
 import { runZoneBackgroundPrewarm, runZonePrewarmTask } from './zone_prewarm';
 import {
@@ -978,6 +979,7 @@ import {
   buildNpcPrewarmGroup,
   buildObjectPrewarmGroup,
   buildPlayerPrewarmGroup,
+  createZoneBodyWait,
   PREWARM_MOB_POOL_COPIES,
   PREWARM_OBJECT_ITEM_IDS,
   PREWARM_OBJECT_POOL_COPIES,
@@ -1983,6 +1985,7 @@ export class Renderer {
   private prewarmedMobTemplates = new Set<string>();
   private prewarmedNpcModels = new Set<string>();
   private prewarmedZonePrograms = new Set<string>();
+  private readonly zoneBodyWait = createZoneBodyWait(this.prewarmedZonePrograms, this);
   private time = 0;
   private frameIdx = 0;
   // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
@@ -3465,6 +3468,7 @@ export class Renderer {
         this.prewarmedZonePrograms,
         this.prewarmedMobTemplates,
         this.prewarmedNpcModels,
+        this.zoneBodyWait,
       ],
       prewarmZone: (x, z) => this.prewarmZoneAt(x, z, { background: true }),
       presentationPrewarm: () => this.renderPresentationPrewarmPass(),
@@ -3624,7 +3628,7 @@ export class Renderer {
     // through prepareZoneAt's sky recovery branch (curtain, or idle pace).
     return zoneArrivalReady({
       prepared: this.preparedZones.has(id),
-      programsPrewarmed: this.prewarmedZonePrograms.has(id),
+      programsPrewarmed: this.zoneBodyWait.settledOrWaiting(id),
       standardMaterials: GFX.standardMaterials,
       skyResident: () =>
         skyBiomesAt(x, z).every((biome) => this.skyView.skyBiomeAssetsResident(biome)),
@@ -3894,7 +3898,7 @@ export class Renderer {
     if (this.shutdownStarted) return;
     const dungeon = dungeonAt(x);
     const zoneId = dungeon ? `dungeon:${dungeon.interior}` : this.zoneIdAt(x, z);
-    if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
+    if (zoneId === null || this.zoneBodyWait.skips(zoneId)) return;
     return runZonePrewarmTask(
       this.pendingZonePrewarms,
       zoneId,
@@ -3959,7 +3963,7 @@ export class Renderer {
               await this.compilePrewarmColorPrograms(this.scene, false);
             }
           }
-          this.prewarmedZonePrograms.add(zoneId);
+          this.zoneBodyWait.settle(zoneId, x, z, mobPrewarm.coldKeys);
         } finally {
           mobGroup.removeFromParent();
           npcGroup.removeFromParent();
@@ -3968,12 +3972,7 @@ export class Renderer {
           // prewarm awaits idle compile slots, leaving its shadow variant cold.
           for (const item of mobPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
           for (const item of npcPrewarm.pooled) this.pooledVisuals.store(item.key, item.visual);
-          this.lastZonePrewarmStats = {
-            zoneId,
-            buildMs: Math.round(tBuild - t0),
-            compileMs: Math.round(tCompile - tBuild),
-            passMs: Math.round(performance.now() - tCompile),
-          };
+          this.lastZonePrewarmStats = zonePrewarmStats(zoneId, t0, tBuild, tCompile);
         }
       },
     );
@@ -5521,6 +5520,7 @@ export class Renderer {
     let entityPrewarmGroup: THREE.Group | null = null;
     let npcPrewarmGroup: THREE.Group | null = null;
     let entityPrewarmPool: { key: string; visual: CharacterVisual }[] = [];
+    let entityPrewarmCold: string[] = [];
     let npcPrewarmPool: { key: string; visual: CharacterVisual }[] = [];
     let deferPoolPublication = false;
     const poolsAwaitPublication = (): boolean =>
@@ -6127,6 +6127,7 @@ export class Renderer {
           const built = buildEntityPrewarmGroup(this.zonePrewarmHost(), activeZone);
           entityPrewarmGroup = built.group;
           entityPrewarmPool = built.pooled;
+          entityPrewarmCold = built.coldKeys;
           this.scene.add(entityPrewarmGroup);
         },
         detail: () =>
@@ -7094,7 +7095,7 @@ export class Renderer {
       prewarmPacing: pacing.receipt(compileBatchRoots, hardMaxMs),
     };
     this.lastPrewarmStats = stats;
-    this.prewarmedZonePrograms.add(activeZone.id);
+    this.zoneBodyWait.settle(activeZone.id, p.pos.x, p.pos.z, entityPrewarmCold);
     // Dev-channel diagnostic (pairs with main.ts's "[entry-guard] scene built"): one
     // line naming where the entry-time main-thread budget went, for isolating
     // world-entry process kills on real devices.
@@ -8462,9 +8463,8 @@ export class Renderer {
 
   private readonly onCharacterAssetReady = (url: string): void => {
     if (this.shutdownStarted) return;
-    // This fires for EVERY character GLB arrival, including the streamed
-    // creature bodies that can never be a weapon skin, and the scan below
-    // mints a skin-url string per skinned view: drop non-skin urls first.
+    this.zoneBodyWait.bodyArrived(); // a body a zone prewarm skipped cold may be this
+    // Every character GLB lands here: drop non-skin urls before the per-view skin scan.
     if (!isWeaponSkinModelUrl(url)) return;
     for (const [id] of this.views) {
       const skinId = this.sim.entities.get(id)?.weaponSkinId ?? null;

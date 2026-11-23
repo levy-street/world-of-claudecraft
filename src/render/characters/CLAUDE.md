@@ -45,7 +45,11 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   opens on a read treasure map, a reachable entrance, or the player inside; a
   third, iOS-only isle lane holds the bodies only the Quartered Isle (and Rift
   content) draws (`isleOnlyBodyLanes`) and opens within `ISLE_STREAM_REACH` of the
-  isle, so they stay out of the post-entry stream;
+  isle, so they stay out of the post-entry stream. A speculative asker never
+  fetches around a lane: the zone prewarm asks `visualAssetsResident` paced (a body
+  a lane still holds, `RiftBodyLanes.holds`, is only asked about) and waits for it
+  to land (`zone_prewarm_body_wait_core.ts`, pinned by
+  `tests/zone_prewarm_isle_lane_wait.test.ts`);
   dungeon-only actors wait for `prepareDungeonCharacterBodies`, awaited by
   `prepareZoneAt` under the arrival cover and before static interior construction.
   Its content-derived inventory includes encounter summons. Cosmetic buddies
