@@ -53,5 +53,5 @@ export function sigilRedeemTooltipLine(item: ItemDef): string {
     zone: tEntity({ kind: 'zone', id: zone.id, field: 'name' }),
     slot: itemSlotLabel(slot),
   });
-  return `<div class="tt-desc">${esc(text)}</div>`;
+  return `<div class="tt-desc tt-sigil-redeem">${esc(text)}</div>`;
 }

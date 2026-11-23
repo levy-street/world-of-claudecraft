@@ -9931,6 +9931,12 @@
   #tooltip .tt-desc.tt-material-use {
     color: var(--color-material-use, #d6ce3b);
   }
+  /* A Crucible sigil's purpose line (src/ui/sigil_redeem_tooltip_view.ts) is
+     one long sentence; capped so it wraps instead of stretching the card to
+     the tooltip's 720px ceiling. */
+  #tooltip .tt-desc.tt-sigil-redeem {
+    max-width: 24em;
+  }
   #tooltip .tt-stat {
     color: #fff;
     font-size: 11.5px;

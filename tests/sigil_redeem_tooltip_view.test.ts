@@ -31,7 +31,7 @@ describe('Crucible sigil purpose line', () => {
     const suffix = id.split('_').at(-1) as string;
     const line = sigilRedeemTooltipLine(ITEMS[id]);
     expect(line).toBe(
-      '<div class="tt-desc">Can be traded to Quartermaster Bronn Emberward, outside the ' +
+      '<div class="tt-desc tt-sigil-redeem">Can be traded to Quartermaster Bronn Emberward, outside the ' +
         'Crucible of the Last Spring entrance in The Drakelands, for a ' +
         `${EXPECTED_SLOT_WORD[suffix]} set piece.</div>`,
     );
