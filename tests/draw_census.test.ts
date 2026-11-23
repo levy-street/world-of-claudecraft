@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DrawCensusSampler, sampleDrawCensus } from '../src/render/draw_census';
 import {
   DRAW_CENSUS_LABEL_MAX,
@@ -81,6 +81,11 @@ describe('draw census core', () => {
     // can carry free text or a JSON escape onto the wire.
     expect(drawCensusLabel('entity:player>helm-01 #2')).toBe('entity:player>helm-01 #2');
     expect(drawCensusLabel('a"b\\c\u0001d\u00e9')).toBe('a_b_c_d_');
+    // A runtime entity id suffix is dropped so one kind of object is one row.
+    expect(drawCensusLabel('farmFeast:4127')).toBe('farmFeast');
+    expect(drawCensusLabel('entity:player')).toBe('entity:player');
+    // The fold-in label is reserved.
+    expect(drawCensusLabel('other')).toBe('other_');
   });
 
   it('keeps the latest sample and the peak of the rolling window only', () => {
@@ -100,6 +105,16 @@ describe('draw census core', () => {
     expect(snap.peak?.draws).toBe(200);
     expect(snap.latest?.draws).toBe(120);
     expect(DRAW_CENSUS_WINDOW_SAMPLES * DRAW_CENSUS_SAMPLE_MS).toBe(5 * 60_000);
+  });
+
+  it('picks the most recent of equal peaks', () => {
+    const window = new DrawCensusWindow(5);
+    const first = sample(300);
+    const second = { ...sample(300), roots: [['second', 300]] as DrawCensusSample['roots'] };
+    window.push(first);
+    window.push(second);
+    window.push(sample(100));
+    expect(window.snapshot().peak).toBe(second);
   });
 });
 
@@ -149,15 +164,34 @@ describe('draw census scene walk', () => {
     expect(sampleDrawCensus(scene, null).draws).toBe(5);
   });
 
-  it('counts nothing for an empty draw range', () => {
+  it('counts spans the way three counts calls: zero-length yes, negative or unbounded no', () => {
     const scene = new THREE.Scene();
-    const empty = mesh('empty');
+    // A zero-length range still reaches drawElements, so three counts a call.
+    const empty = mesh('empty-range');
     empty.geometry = new THREE.BoxGeometry(1, 1, 1);
     empty.geometry.setDrawRange(0, 0);
-    scene.add(empty, mesh('drawn'));
+    // No index and no position: an unbounded span three skips.
+    const bare = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+    bare.name = 'no-attributes';
+    // A group lying past the draw range: a negative span three skips.
+    const mats = [new THREE.MeshBasicMaterial(), new THREE.MeshBasicMaterial()];
+    const clipped = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mats);
+    clipped.name = 'clipped';
+    clipped.geometry.clearGroups();
+    clipped.geometry.addGroup(0, 6, 0);
+    clipped.geometry.addGroup(30, 6, 1);
+    clipped.geometry.setDrawRange(0, 12);
+    // No material: nothing to draw with.
+    const noMaterial = mesh('no-material');
+    (noMaterial as unknown as { material: undefined }).material = undefined;
+    scene.add(empty, bare, clipped, noMaterial, mesh('drawn'));
     const out = sampleDrawCensus(scene, null);
-    expect(out.draws).toBe(1);
-    expect(out.roots).toEqual([['drawn', 1]]);
+    expect(out.roots).toEqual([
+      ['clipped', 1],
+      ['drawn', 1],
+      ['empty-range', 1],
+    ]);
+    expect(out.draws).toBe(3);
   });
 
   it('skips what three would skip: hidden subtrees, empty instancing, hidden materials', () => {
@@ -193,6 +227,65 @@ describe('draw census scene walk', () => {
   });
 });
 
+describe('draw census scene walk: other renderables and labels', () => {
+  it('counts Points, Line, and Sprite, and culls a sprite with the sprite frustum test', () => {
+    const scene = new THREE.Scene();
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0.5, 0, 0], 3));
+    const points = new THREE.Points(geo, new THREE.PointsMaterial());
+    points.name = 'points';
+    const line = new THREE.Line(geo, new THREE.LineBasicMaterial());
+    line.name = 'line';
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial());
+    sprite.name = 'sprite';
+    const farSprite = new THREE.Sprite(new THREE.SpriteMaterial());
+    farSprite.name = 'far-sprite';
+    farSprite.position.set(0, 0, 50);
+    scene.add(points, line, sprite, farSprite);
+    scene.updateMatrixWorld(true);
+    expect(
+      sampleDrawCensus(scene, null)
+        .roots.map(([label]) => label)
+        .sort(),
+    ).toEqual(['far-sprite', 'line', 'points', 'sprite']);
+    const spy = vi.spyOn(THREE.Frustum.prototype, 'intersectsSprite');
+    const culled = sampleDrawCensus(scene, camera());
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
+    const labels = culled.roots.map(([label]) => label);
+    expect(labels).not.toContain('far-sprite');
+    expect(labels).toContain('sprite');
+  });
+
+  it('labels an unnamed root by its category tag, else its type', () => {
+    const scene = new THREE.Scene();
+    scene.add(group('', 'terrain', [mesh()]));
+    scene.add(mesh());
+    expect(sampleDrawCensus(scene, null).roots).toEqual([
+      ['Mesh', 1],
+      ['terrain', 1],
+    ]);
+  });
+
+  it('merges labels that collide after bounding', () => {
+    const scene = new THREE.Scene();
+    scene.add(mesh('a"x'), mesh('a<x'));
+    expect(sampleDrawCensus(scene, null).roots).toEqual([['a_x', 2]]);
+  });
+
+  it('rounds the walk cost to a tenth of a millisecond', () => {
+    const scene = new THREE.Scene();
+    scene.add(mesh('a'));
+    const now = vi.spyOn(performance, 'now');
+    now.mockReturnValueOnce(100).mockReturnValueOnce(103.27);
+    try {
+      expect(sampleDrawCensus(scene, null).walkMs).toBe(3.3);
+    } finally {
+      now.mockRestore();
+    }
+  });
+});
+
 describe('draw census sampler pacing', () => {
   function harness() {
     const queued: Array<() => void> = [];
@@ -200,12 +293,20 @@ describe('draw census sampler pacing', () => {
     scene.add(mesh('a'));
     let generation = 1;
     let skip = false;
+    let down = false;
+    let throwOnce = false;
     const sampler = new DrawCensusSampler({
-      scene: () => scene,
+      scene: () => {
+        if (throwOnce) {
+          throwOnce = false;
+          throw new Error('scene gone');
+        }
+        return scene;
+      },
       camera: () => null,
       skip: () => skip,
       generation: () => generation,
-      shutdown: () => false,
+      shutdown: () => down,
       scheduleIdle: (run) => queued.push(run),
     });
     return {
@@ -215,6 +316,12 @@ describe('draw census sampler pacing', () => {
       bump: () => generation++,
       setSkip: (value: boolean) => {
         skip = value;
+      },
+      shutDown: () => {
+        down = true;
+      },
+      throwNext: () => {
+        throwOnce = true;
       },
     };
   }
@@ -230,6 +337,40 @@ describe('draw census sampler pacing', () => {
     expect(sampler.current().samples).toBe(0);
     queued.shift()?.();
     expect(sampler.current().latest?.draws).toBe(1);
+  });
+
+  it('walks at most once per interval after a walk completes', () => {
+    const { queued, sampler } = harness();
+    sampler.forFrame(0);
+    sampler.forFrame(DRAW_CENSUS_SAMPLE_MS);
+    queued.shift()?.();
+    sampler.forFrame(DRAW_CENSUS_SAMPLE_MS + 1);
+    sampler.forFrame(DRAW_CENSUS_SAMPLE_MS * 2 - 1);
+    expect(queued).toHaveLength(0);
+    sampler.forFrame(DRAW_CENSUS_SAMPLE_MS * 2);
+    expect(queued).toHaveLength(1);
+  });
+
+  it('drops a walk after shutdown', () => {
+    const { queued, sampler, shutDown } = harness();
+    sampler.forFrame(0);
+    sampler.forFrame(DRAW_CENSUS_SAMPLE_MS);
+    shutDown();
+    queued.shift()?.();
+    expect(sampler.current().samples).toBe(0);
+  });
+
+  it('is not stuck pending after a walk throws', () => {
+    const { queued, sampler, throwNext } = harness();
+    sampler.forFrame(0);
+    sampler.forFrame(DRAW_CENSUS_SAMPLE_MS);
+    throwNext();
+    expect(() => queued.shift()?.()).not.toThrow();
+    expect(sampler.current().samples).toBe(0);
+    sampler.forFrame(DRAW_CENSUS_SAMPLE_MS * 2);
+    expect(queued).toHaveLength(1);
+    queued.shift()?.();
+    expect(sampler.current().samples).toBe(1);
   });
 
   it('skips the walk while the drawn scene differs from the graph (underworld mask)', () => {
@@ -274,5 +415,36 @@ describe('draw census sampler pacing', () => {
     expect(snap.enabled).toBe(false);
     queued.shift()?.();
     expect(diagnostics.drawCensus().latest?.categories).toEqual([['dungeon', 2]]);
+  });
+
+  it('passes the camera and the census skip through RenderDiagnostics', () => {
+    const queued: Array<() => void> = [];
+    const scene = new THREE.Scene();
+    const behind = mesh('behind');
+    behind.position.set(0, 0, 50);
+    scene.add(mesh('in'), behind);
+    scene.updateMatrixWorld(true);
+    let skip = true;
+    const cam = camera();
+    const diagnostics = new RenderDiagnostics(
+      {
+        counters: () => ({ programs: 0, textures: 0 }),
+        scene: () => scene,
+        camera: () => cam,
+        censusSkip: () => skip,
+        generation: () => 1,
+        shutdown: () => false,
+        scheduleIdle: (run) => queued.push(run),
+      },
+      false,
+    );
+    diagnostics.forFrame(0);
+    diagnostics.forFrame(DRAW_CENSUS_SAMPLE_MS);
+    queued.shift()?.();
+    expect(diagnostics.drawCensus().samples).toBe(0);
+    skip = false;
+    diagnostics.forFrame(DRAW_CENSUS_SAMPLE_MS * 2);
+    queued.shift()?.();
+    expect(diagnostics.drawCensus().latest?.roots).toEqual([['in', 1]]);
   });
 });

@@ -37,19 +37,48 @@ type CensusObject = THREE.Object3D & {
 
 const UNKNOWN_CATEGORY = 'unknown';
 
-/** Draws one renderable submits, as three's projectObject counts them: an
- *  empty draw range submits nothing, a single material one draw unless it is
+/** Whether three's renderBufferDirect submits (and counts in
+ *  `info.render.calls`) a draw for this geometry and optional group: the draw
+ *  range clipped to the group and to the index or position count. A negative
+ *  span (a group outside the range) or an unbounded one (no index, no
+ *  position) is skipped; a zero-length span still counts as a call. */
+function submits(geometry: THREE.BufferGeometry | undefined, group: THREE.GeometryGroup | null) {
+  if (!geometry) return true;
+  const range = geometry.drawRange;
+  let start = range.start;
+  let end = range.start + range.count;
+  if (group) {
+    start = Math.max(start, group.start);
+    end = Math.min(end, group.start + group.count);
+  }
+  const index = geometry.index;
+  const position = geometry.attributes.position;
+  if (index) {
+    start = Math.max(start, 0);
+    end = Math.min(end, index.count);
+  } else if (position) {
+    start = Math.max(start, 0);
+    end = Math.min(end, position.count);
+  }
+  const count = end - start;
+  return count >= 0 && count !== Number.POSITIVE_INFINITY;
+}
+
+/** Draws one renderable submits, as three's projectObject and
+ *  renderBufferDirect count them: a single material one draw unless it is
  *  hidden, and a multi-material mesh one draw per geometry group whose own
- *  material is visible (no groups, no draws). */
+ *  material is visible (no groups, no draws), each only if its span submits. */
 function drawsFor(obj: CensusObject): number {
   const geometry = obj.geometry;
-  if (geometry && geometry.drawRange.count === 0) return 0;
   const material = obj.material;
-  if (!Array.isArray(material)) return material?.visible === false ? 0 : 1;
+  if (!material) return 0;
+  if (!Array.isArray(material)) {
+    return material.visible === false || !submits(geometry, null) ? 0 : 1;
+  }
   let draws = 0;
   for (const group of geometry?.groups ?? []) {
     const groupMaterial = material[group.materialIndex ?? 0];
-    if (groupMaterial && groupMaterial.visible !== false) draws++;
+    if (groupMaterial && groupMaterial.visible !== false && submits(geometry, group)) draws++;
   }
   return draws;
 }
@@ -127,13 +156,17 @@ export function sampleDrawCensus(
     const root = rootLabel(child);
     visit(child, categoryOf(child, UNKNOWN_CATEGORY), root, root);
   }
+  // The ranking is part of the instrument's price, so it is timed too.
+  const rankedCategories = rankDrawCounts(relabel(categories));
+  const rankedRoots = rankDrawCounts(relabel(roots));
+  const rankedNodes = rankDrawCounts(relabel(nodes));
   return {
     draws,
     objects,
     walkMs: Math.round((performance.now() - startedAt) * 10) / 10,
-    categories: rankDrawCounts(relabel(categories)),
-    roots: rankDrawCounts(relabel(roots)),
-    nodes: rankDrawCounts(relabel(nodes)),
+    categories: rankedCategories,
+    roots: rankedRoots,
+    nodes: rankedNodes,
   };
 }
 
@@ -183,6 +216,9 @@ export class DrawCensusSampler {
         if (this.host.skip?.()) return;
         this.window.push(sampleDrawCensus(this.host.scene(), this.host.camera()));
         this.snapshot = this.window.snapshot();
+      } catch {
+        // An always-on instrument never surfaces as a page error: a walk that
+        // throws (a malformed renderable) is simply not recorded.
       } finally {
         this.pending = false;
       }

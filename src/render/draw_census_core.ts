@@ -7,7 +7,7 @@
 // a fleet regression confined to one zone (the Ignivar raid arena drawing ~45
 // calls per visible character where everywhere else draws ~16) had no
 // attribution at all. The renderer walks the scene on idle time at a slow
-// cadence (draw_census.ts) and this core turns each walk into two short
+// cadence (draw_census.ts) and this core turns each walk into three short
 // rankings (by render category, by top-level scene node, and by category
 // plus nearest named node), plus a rolling
 // peak sized to the beacon's repeat interval so a 5-minute report carries the
@@ -64,9 +64,20 @@ export function emptyDrawCensusSnapshot(): DrawCensusSnapshot {
  *  escapes that inflate the beacon, nothing free-form). */
 const DRAW_CENSUS_LABEL_UNSAFE = /[^A-Za-z0-9 :._/>#-]/g;
 
+/** A trailing `:<digits>` is a runtime entity id (`farmFeast:4127`): it
+ *  would split one kind of object into a row per entity, so it is dropped. */
+const DRAW_CENSUS_ENTITY_ID_SUFFIX = /:\d+$/;
+
 export function drawCensusLabel(raw: string): string {
-  const label = raw.trim().slice(0, DRAW_CENSUS_LABEL_MAX).replace(DRAW_CENSUS_LABEL_UNSAFE, '_');
-  return label.length > 0 ? label : 'unnamed';
+  const label = raw
+    .trim()
+    .replace(DRAW_CENSUS_ENTITY_ID_SUFFIX, '')
+    .slice(0, DRAW_CENSUS_LABEL_MAX)
+    .replace(DRAW_CENSUS_LABEL_UNSAFE, '_');
+  if (label.length === 0) return 'unnamed';
+  // `other` is the fold-in entry; a node really named that must not merge
+  // into (or duplicate) it.
+  return label === DRAW_CENSUS_OTHER_LABEL ? `${label}_` : label;
 }
 
 /** Highest draws first (ties by label, so the order is stable), the top N

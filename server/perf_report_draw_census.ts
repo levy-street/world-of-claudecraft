@@ -3,7 +3,7 @@
 // session drew rather than how many calls it submitted. Same JSONB-not-DDL
 // treatment as the other raw_summary blocks, and the same reason for a bound:
 // the shed ladder keeps it as a core key copied verbatim, so its shape (two
-// samples of two short ranked lists) is enforced here rather than trusted.
+// samples of three short ranked lists) is enforced here rather than trusted.
 //
 // Host-agnostic and pure: no IO, so a Vitest drives it directly.
 
