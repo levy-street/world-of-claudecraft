@@ -3159,7 +3159,8 @@
           "z": 400
         },
         "radius": 9,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "shoal_scuttler",
@@ -3168,7 +3169,8 @@
           "z": 460
         },
         "radius": 8,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "gale_wisp",
@@ -3177,7 +3179,8 @@
           "z": 565
         },
         "radius": 9,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "gale_wisp",
@@ -3186,7 +3189,8 @@
           "z": 585
         },
         "radius": 8,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "hedge_knight",
@@ -3240,7 +3244,8 @@
           "z": 2302
         },
         "radius": 8,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3249,7 +3254,8 @@
           "z": 2266
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3258,7 +3264,8 @@
           "z": 2278
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3267,7 +3274,8 @@
           "z": 2352
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3276,7 +3284,8 @@
           "z": 2302
         },
         "radius": 9,
-        "count": 7
+        "count": 7,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3285,7 +3294,8 @@
           "z": 2348
         },
         "radius": 10,
-        "count": 8
+        "count": 8,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3294,7 +3304,8 @@
           "z": 2318
         },
         "radius": 10,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3303,7 +3314,8 @@
           "z": 2300
         },
         "radius": 12,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3312,7 +3324,8 @@
           "z": 2380
         },
         "radius": 12,
-        "count": 5
+        "count": 5,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3321,7 +3334,8 @@
           "z": 2242
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3330,7 +3344,8 @@
           "z": 2296
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3339,7 +3354,8 @@
           "z": 2282
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3348,7 +3364,8 @@
           "z": 2338
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3357,7 +3374,8 @@
           "z": 2302
         },
         "radius": 9,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3366,7 +3384,8 @@
           "z": 2252
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_broodguard",
@@ -3375,7 +3394,8 @@
           "z": 2384
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3384,7 +3404,8 @@
           "z": 2242
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3393,7 +3414,8 @@
           "z": 2303
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3402,7 +3424,8 @@
           "z": 2286
         },
         "radius": 6,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3411,7 +3434,8 @@
           "z": 2334
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3420,7 +3444,8 @@
           "z": 2308
         },
         "radius": 7,
-        "count": 4
+        "count": 4,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3429,7 +3454,8 @@
           "z": 2258
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "dragonkin_egg",
@@ -3438,7 +3464,8 @@
           "z": 2380
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "friendly_player_dummy",
@@ -3474,7 +3501,8 @@
           "z": -14
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3483,7 +3511,8 @@
           "z": -17
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3492,7 +3521,8 @@
           "z": -11
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3501,7 +3531,8 @@
           "z": -20
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "training_effigy",
@@ -3510,7 +3541,8 @@
           "z": -9
         },
         "radius": 4,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3519,7 +3551,8 @@
           "z": -42
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3528,7 +3561,8 @@
           "z": -48
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "shore_scuttler",
@@ -3537,7 +3571,8 @@
           "z": -40
         },
         "radius": 4,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "remnant_first_colossus",
@@ -3546,7 +3581,8 @@
           "z": 2292
         },
         "radius": 5,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "quench_shardling",
@@ -3555,7 +3591,8 @@
           "z": 2034
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "quench_shardling",
@@ -3564,7 +3601,8 @@
           "z": 2000
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "quench_shardling",
@@ -3573,7 +3611,8 @@
           "z": 2064
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "rimeglass_bear",
@@ -3582,7 +3621,8 @@
           "z": 2016
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "rimeglass_bear",
@@ -3591,7 +3631,8 @@
           "z": 1996
         },
         "radius": 8,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "warden_of_the_quench",
@@ -3600,7 +3641,8 @@
           "z": 2036
         },
         "radius": 5,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "heatsworn_ember",
@@ -3609,7 +3651,8 @@
           "z": 2248
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "heatsworn_ember",
@@ -3618,7 +3661,8 @@
           "z": 2224
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "heatsworn_ember",
@@ -3627,7 +3671,8 @@
           "z": 2270
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "cinderscar_caller",
@@ -3636,7 +3681,8 @@
           "z": 2202
         },
         "radius": 6,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "cinderscar_caller",
@@ -3645,7 +3691,8 @@
           "z": 2188
         },
         "radius": 6,
-        "count": 2
+        "count": 2,
+        "offStream": true
       },
       {
         "mobId": "ember_hound",
@@ -3654,7 +3701,8 @@
           "z": 2164
         },
         "radius": 8,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "ember_hound",
@@ -3663,7 +3711,8 @@
           "z": 2136
         },
         "radius": 8,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "the_glassfield_brute",
@@ -3672,7 +3721,8 @@
           "z": 2284
         },
         "radius": 5,
-        "count": 1
+        "count": 1,
+        "offStream": true
       },
       {
         "mobId": "heaved_shardling",
@@ -3681,7 +3731,8 @@
           "z": 2210
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "heaved_shardling",
@@ -3690,7 +3741,8 @@
           "z": 2208
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "heaved_shardling",
@@ -3699,7 +3751,8 @@
           "z": 2246
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "veinback_burrower",
@@ -3708,7 +3761,8 @@
           "z": 2182
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       },
       {
         "mobId": "veinback_burrower",
@@ -3717,7 +3771,8 @@
           "z": 2136
         },
         "radius": 7,
-        "count": 3
+        "count": 3,
+        "offStream": true
       }
     ],
     "npcs": {
