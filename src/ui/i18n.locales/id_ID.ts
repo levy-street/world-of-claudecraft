@@ -18024,7 +18024,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.name': 'Sisik Bara Roh Perang',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Panen Merah memulihkan 45 energi, naik dari 30.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Panen Merah menanamkan Pengulitan baru pada target.',
+    'Panen Merah juga langsung memberikan 30% sisa kerusakan Kupasan dan Celah Darah milikmu pada target. Keduanya tetap berdetak.',
   'entities.itemSets.wildfang_emberhide.name': 'Kulit Bara Taring Liar',
   'entities.itemSets.wyrmshadow.bonus6':
     'Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda merobek Sobekan Kasar, menyebabkan target berdarah sebesar 4 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.',

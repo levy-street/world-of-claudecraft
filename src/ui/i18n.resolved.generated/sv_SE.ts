@@ -31128,7 +31128,7 @@ export const sv_SE: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Vildtands glödskinn",
         "bonus2": "Rödskörd återställer 45 energi, upp från 30.",
-        "bonus4": "Rödskörd planterar en ny Flåning på målet."
+        "bonus4": "Röd Skörd gör också direkt 30% av den återstående skadan från dina Flå och Blodsspricka på målet. Båda fortsätter att ticka."
       },
       "wyrmshadow": {
         "name": "Nightfang-skrud",

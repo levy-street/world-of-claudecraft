@@ -31128,7 +31128,7 @@ export const vi_VN: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Da Ẩn Nanh Hoang",
         "bonus2": "Redharvest hồi 45 năng lượng, tăng từ 30.",
-        "bonus4": "Redharvest đặt một Flense mới lên mục tiêu."
+        "bonus4": "Thu Hoạch Đỏ còn gây ngay 30% sát thương còn lại của Lóc Xé và Vết Nứt Máu của bạn trên mục tiêu. Cả hai vẫn tiếp tục gây sát thương."
       },
       "wyrmshadow": {
         "name": "Áo Lễ Nightfang",

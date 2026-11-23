@@ -17965,7 +17965,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.name': 'Warspirit-Emberscale',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Redharvest herstelt 45 energie, verhoogd van 30.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Redharvest brengt een nieuwe Flense aan op het doelwit.',
+    'Rode Oogst doet ook direct 30% van de resterende schade van je Villen en Bloedscheur op het doelwit. Beide blijven tikken.',
   'entities.itemSets.wildfang_emberhide.name': 'Wildfang-Emberhuid',
   'entities.itemSets.wyrmshadow.bonus6':
     'Verhoogt aanvals- en spreuksnelheid met 4% en Hit met 3%. Kritieke treffers met je wapen scheuren een Ragged Gash, waardoor het doelwit gedurende 12 sec. elke 2 sec. 4 schade oploopt. Stapelt tot 3 keer.',

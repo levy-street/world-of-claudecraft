@@ -17805,7 +17805,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.name': 'Savaş Ruhu Kor Pulu',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Kızıl Hasat, 30 yerine 45 enerji yeniler.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Kızıl Hasat hedefe yeni bir Deri Yüzme etkisi uygular.',
+    "Kızıl Hasat ayrıca hedefteki Deri Yüzme ve Kanlı Yarığının kalan hasarının %30'unu anında verir. İkisi de işlemeye devam eder.",
   'entities.itemSets.wildfang_emberhide.name': 'Yaban Dişinin Kor Derisi',
   'entities.itemSets.wyrmshadow.bonus6':
     'Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları Pırtık Yara açarak hedefi 12 saniye boyunca her 2 saniyede 4 hasar için kanatır. En fazla 3 kez birikir.',

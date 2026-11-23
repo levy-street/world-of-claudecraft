@@ -31128,7 +31128,7 @@ export const it_IT: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Pelle Cinerea Zanna Selvatica",
         "bonus2": "Raccolto Rosso restituisce 45 energia invece di 30.",
-        "bonus4": "Raccolto Rosso applica una nuova Spellatura al bersaglio."
+        "bonus4": "Mietitura Rossa infligge anche subito il 30% dei danni rimanenti di Scarnificare e Faglia Sanguigna sul bersaglio. Entrambi continuano a fare effetto."
       },
       "wyrmshadow": {
         "name": "Vesti Nightfang",

@@ -18275,7 +18275,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.bonus2':
     'Moisson rouge rend 45 points d’énergie, contre 30 auparavant.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Moisson rouge applique un nouveau Dépeçage à la cible.',
+    'Moisson rouge inflige aussi instantanément 30% des dégâts restants de vos Écorcher et Faille sanglante sur la cible. Les deux continuent de faire effet.',
   'entities.itemSets.wildfang_emberhide.name': 'Peau de braise du Croc sauvage',
   'entities.itemSets.wyrmshadow.bonus6':
     'Augmente la vitesse d’attaque et d’incantation de 4 % et les chances de toucher de 3 %. Vos coups critiques avec une arme infligent une Entaille irrégulière, faisant saigner la cible de 4 points de dégâts toutes les 2 s pendant 12 s. Cumulable jusqu’à 3 fois.',

@@ -18140,7 +18140,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.bonus4': 'Ahnenstoß trifft 30 Prozent härter.',
   'entities.itemSets.warspirit_emberscale.name': 'Kriegsgeist-Glutschuppe',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Roternte stellt 45 statt 30 Energie wieder her.',
-  'entities.itemSets.wildfang_emberhide.bonus4': 'Roternte legt eine frische Häutung auf das Ziel.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    'Rote Ernte verursacht zusätzlich sofort 30% des verbleibenden Schadens Eures Schindens und Eures Blutrisses auf dem Ziel. Beide ticken weiter.',
   'entities.itemSets.wildfang_emberhide.name': 'Wildfang-Gluthaut',
   'entities.itemSets.wyrmshadow.bonus6':
     'Erhöht Angriffs- und Zaubertempo um 4 % und Trefferchance um 3 %. Kritische Waffentreffer reißen eine Zerfetzte Wunde und verursachen 12 Sek. lang alle 2 Sek. 4 Blutungsschaden. Bis zu 3-mal stapelbar.',

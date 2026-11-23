@@ -31128,7 +31128,7 @@ export const ko_KR: EnTranslations = {
       "wildfang_emberhide": {
         "name": "야생송곳니 잉걸가죽",
         "bonus2": "피의 수확이 회복시키는 기력이 30에서 45로 증가합니다.",
-        "bonus4": "피의 수확이 대상에게 새로운 저미기를 남깁니다."
+        "bonus4": "피의 수확이 대상에 걸린 자신의 저미기와 피의 균열의 남은 피해의 30%를 즉시 입힙니다. 두 효과는 계속 유지됩니다."
       },
       "wyrmshadow": {
         "name": "밤송곳니 의복",

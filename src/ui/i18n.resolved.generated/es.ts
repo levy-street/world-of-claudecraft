@@ -31128,7 +31128,7 @@ export const es: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Piel de Brasa del Colmillo Salvaje",
         "bonus2": "Cosecha Roja restaura 45 de energía, en lugar de 30.",
-        "bonus4": "Cosecha Roja aplica un nuevo Desuello al objetivo."
+        "bonus4": "Cosecha Roja también inflige al instante el 30% del daño que les queda a tus Desollar y Grieta Sangrienta en el objetivo. Ambos siguen haciendo efecto."
       },
       "wyrmshadow": {
         "name": "Atuendo de Nightfang",

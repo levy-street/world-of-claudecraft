@@ -31128,7 +31128,7 @@ export const de_DE: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Wildfang-Gluthaut",
         "bonus2": "Roternte stellt 45 statt 30 Energie wieder her.",
-        "bonus4": "Roternte legt eine frische Häutung auf das Ziel."
+        "bonus4": "Rote Ernte verursacht zusätzlich sofort 30% des verbleibenden Schadens Eures Schindens und Eures Blutrisses auf dem Ziel. Beide ticken weiter."
       },
       "wyrmshadow": {
         "name": "Nightfang-Gewänder",

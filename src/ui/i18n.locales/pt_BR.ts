@@ -18609,7 +18609,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.bonus2':
     'Colheita Rubra restaura 45 de energia, em vez de 30.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Colheita Rubra aplica um novo Esfolamento ao alvo.',
+    'Colheita Vermelha também causa na hora 30% do dano restante dos seus Esfolar e Fenda Sangrenta no alvo. Ambos continuam fazendo efeito.',
   'entities.itemSets.wildfang_emberhide.name': 'Pele de Brasa da Presa Selvagem',
   'entities.itemSets.wyrmshadow.bonus6':
     'Aumenta a velocidade de ataque e de lançamento em 4% e o Acerto em 3%. Seus acertos críticos com armas abrem uma Fenda Esfarrapada, causando 4 de sangramento no alvo a cada 2 s por 12 s. Acumula até 3 vezes.',

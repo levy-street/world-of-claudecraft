@@ -17977,7 +17977,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.bonus2':
     'Cosecha Roja restaura 45 de energía, en lugar de 30.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Cosecha Roja aplica un nuevo Desuello al objetivo.',
+    'Cosecha Roja también inflige al instante el 30% del daño que les queda a tus Desollar y Grieta Sangrienta en el objetivo. Ambos siguen haciendo efecto.',
   'entities.itemSets.wildfang_emberhide.name': 'Piel de Brasa del Colmillo Salvaje',
   'entities.itemSets.wyrmshadow.bonus6':
     'Aumenta la velocidad de ataque y lanzamiento un 4% y el Golpe un 3%. Los golpes críticos de tu arma abren una Herida Desgarrada, causando 4 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.',

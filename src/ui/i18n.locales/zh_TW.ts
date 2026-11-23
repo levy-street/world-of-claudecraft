@@ -12627,7 +12627,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.moonscorch.bonus4': '月湧與日醒造成的傷害提高 25%。',
   'entities.itemSets.wildfang_emberhide.name': '野牙燼皮甲',
   'entities.itemSets.wildfang_emberhide.bonus2': '血收恢復的能量由 30 點提高至 45 點。',
-  'entities.itemSets.wildfang_emberhide.bonus4': '血收會在目標身上重新施加剮擊。',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    '血收還會立即造成你在目標身上的剮擊與血隙剩餘傷害的30%，兩者繼續生效。',
   'entities.itemSets.cinderbark.name': '燼皮守禦甲',
   'entities.itemSets.cinderbark.bonus2': '橫掃利爪有 30% 的機率額外累積 1 層古血。',
   'entities.itemSets.cinderbark.bonus4': '碎髓造成的傷害提高 30%，且其緊急護盾不再取代這次打擊。',

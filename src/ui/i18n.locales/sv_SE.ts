@@ -17851,7 +17851,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.warspirit_emberscale_chest.name': 'Glödskalets brynja',
   'entities.items.warspirit_emberscale_gloves.name': 'Glödskalets pansarhandskar',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Rödskörd återställer 45 energi, upp från 30.',
-  'entities.itemSets.wildfang_emberhide.bonus4': 'Rödskörd planterar en ny Flåning på målet.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    'Röd Skörd gör också direkt 30% av den återstående skadan från dina Flå och Blodsspricka på målet. Båda fortsätter att ticka.',
   'entities.itemSets.wildfang_emberhide.name': 'Vildtands glödskinn',
   'entities.itemSets.wyrmshadow.bonus6':
     'Ökar attack- och kastningshastigheten med 4 procent och träffsäkerheten med 3 procent. Dina vapens kritiska träffar river upp ett Trasigt sår som får målet att blöda 4 skada varannan sek i 12 sek. Staplas upp till 3 gånger.',

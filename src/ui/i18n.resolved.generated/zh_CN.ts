@@ -31128,7 +31128,7 @@ export const zh_CN: EnTranslations = {
       "wildfang_emberhide": {
         "name": "野牙烬皮甲",
         "bonus2": "血收恢复的能量由 30 点提高至 45 点。",
-        "bonus4": "血收会在目标身上重新施加剐削。"
+        "bonus4": "血收还会立即造成你在目标身上的剐削与血隙剩余伤害的30%，两者继续生效。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

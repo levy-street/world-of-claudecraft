@@ -17708,7 +17708,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.bonus4': 'Ancestral Strike rammer 30% hårdere.',
   'entities.itemSets.warspirit_emberscale.name': 'Warspirit-emberskæl',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Redharvest gendanner 45 energi i stedet for 30.',
-  'entities.itemSets.wildfang_emberhide.bonus4': 'Redharvest påfører målet en ny Flense.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    'Rød Høst giver også straks 30% af den resterende skade fra dine Flæns og Blodrevne på målet. Begge fortsætter med at tikke.',
   'entities.itemSets.wildfang_emberhide.name': 'Wildfang Emberhide',
   'entities.itemSets.wyrmshadow.bonus6':
     'Øger angrebs- og magihastighed med 4% og træfsikkerhed med 3%. Kritiske træffere med dit våben flår et Ragged Gash op, som får målet til at bløde for 4 skade hvert 2. sek. i 12 sek. Stabler op til 3 gange.',

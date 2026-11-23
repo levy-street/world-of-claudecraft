@@ -31128,7 +31128,7 @@ export const pt_BR: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Pele de Brasa da Presa Selvagem",
         "bonus2": "Colheita Rubra restaura 45 de energia, em vez de 30.",
-        "bonus4": "Colheita Rubra aplica um novo Esfolamento ao alvo."
+        "bonus4": "Colheita Vermelha também causa na hora 30% do dano restante dos seus Esfolar e Fenda Sangrenta no alvo. Ambos continuam fazendo efeito."
       },
       "wyrmshadow": {
         "name": "Traje Nightfang",

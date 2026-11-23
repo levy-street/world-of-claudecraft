@@ -31128,7 +31128,7 @@ export const pl_PL: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Żaroskóra Dzikiego Kła",
         "bonus2": "Krwawy Zbiór przywraca 45 energii zamiast 30.",
-        "bonus4": "Krwawy Zbiór nakłada na cel świeże Rozdarcie."
+        "bonus4": "Czerwone Żniwa dodatkowo natychmiast zadają 30% pozostałych obrażeń twojego Zdzierania i Krwawej szczeliny na celu. Oba krwawienia trwają dalej."
       },
       "wyrmshadow": {
         "name": "Szaty Nightfang",

@@ -31128,7 +31128,7 @@ export const tr_TR: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Yaban Dişinin Kor Derisi",
         "bonus2": "Kızıl Hasat, 30 yerine 45 enerji yeniler.",
-        "bonus4": "Kızıl Hasat hedefe yeni bir Deri Yüzme etkisi uygular."
+        "bonus4": "Kızıl Hasat ayrıca hedefteki Deri Yüzme ve Kanlı Yarığının kalan hasarının %30'unu anında verir. İkisi de işlemeye devam eder."
       },
       "wyrmshadow": {
         "name": "Nightfang Cübbeleri",

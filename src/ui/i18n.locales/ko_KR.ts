@@ -11426,7 +11426,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.name': '야생송곳니 잉걸가죽',
   'entities.itemSets.wildfang_emberhide.bonus2':
     '피의 수확이 회복시키는 기력이 30에서 45로 증가합니다.',
-  'entities.itemSets.wildfang_emberhide.bonus4': '피의 수확이 대상에게 새로운 저미기를 남깁니다.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    '피의 수확이 대상에 걸린 자신의 저미기와 피의 균열의 남은 피해의 30%를 즉시 입힙니다. 두 효과는 계속 유지됩니다.',
   'entities.itemSets.cinderbark.name': '잿불나무껍질 수호구',
   'entities.itemSets.cinderbark.bonus2': '휩쓰는 발톱이 30% 확률로 오랜 피를 1단계 더 쌓습니다.',
   'entities.itemSets.cinderbark.bonus4':

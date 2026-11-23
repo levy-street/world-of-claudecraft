@@ -13431,8 +13431,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.name': 'Тлеющая шкура дикого клыка',
   'entities.itemSets.wildfang_emberhide.bonus2':
     'Кровавая жатва восстанавливает 45 ед. энергии вместо 30.',
-  'entities.itemSets.wildfang_emberhide.bonus4':
-    'Кровавая жатва накладывает на цель новое Свежевание.',
+  'entities.itemSets.wildfang_emberhide.bonus4': 'Кровавая жатва также мгновенно наносит 30% оставшегося урона ваших Свежевания и Кровавого разлома на цели. Оба эффекта продолжают действовать.',
   'entities.itemSets.cinderbark.name': 'Защита пепельной коры',
   'entities.itemSets.cinderbark.bonus2':
     'Разящие когти с вероятностью 30% добавляют дополнительную стадию Старой крови.',

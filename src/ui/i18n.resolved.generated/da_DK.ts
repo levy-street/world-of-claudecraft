@@ -31128,7 +31128,7 @@ export const da_DK: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Wildfang Emberhide",
         "bonus2": "Redharvest gendanner 45 energi i stedet for 30.",
-        "bonus4": "Redharvest påfører målet en ny Flense."
+        "bonus4": "Rød Høst giver også straks 30% af den resterende skade fra dine Flæns og Blodrevne på målet. Begge fortsætter med at tikke."
       },
       "wyrmshadow": {
         "name": "Nightfang klæder",

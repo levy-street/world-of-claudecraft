@@ -17951,7 +17951,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Uderzenie Przodków uderza o 30 procent mocniej.',
   'entities.itemSets.warspirit_emberscale.name': 'Łuska Żaru Ducha Wojny',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Krwawy Zbiór przywraca 45 energii zamiast 30.',
-  'entities.itemSets.wildfang_emberhide.bonus4': 'Krwawy Zbiór nakłada na cel świeże Rozdarcie.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    'Czerwone Żniwa dodatkowo natychmiast zadają 30% pozostałych obrażeń twojego Zdzierania i Krwawej szczeliny na celu. Oba krwawienia trwają dalej.',
   'entities.itemSets.wildfang_emberhide.name': 'Żaroskóra Dzikiego Kła',
   'entities.itemSets.wyrmshadow.bonus6':
     'Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 4 obrażenia od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy.',

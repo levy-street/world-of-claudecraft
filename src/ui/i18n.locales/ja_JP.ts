@@ -11451,7 +11451,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.name': 'ワイルドファングの燼皮鎧',
   'entities.itemSets.wildfang_emberhide.bonus2':
     '血の収穫が回復するエナジーが30から45に増加します。',
-  'entities.itemSets.wildfang_emberhide.bonus4': '血の収穫が対象に新しい皮剥ぎを植え付けます。',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    '血の収穫は対象にかかっている自分の皮剥ぎと血裂の残りダメージの30%を即座に与えます。どちらの効果も継続します。',
   'entities.itemSets.cinderbark.name': 'シンダーバークの守り',
   'entities.itemSets.cinderbark.bonus2': '薙ぎ払う爪が30%の確率で古き血を追加で1蓄えます。',
   'entities.itemSets.cinderbark.bonus4':

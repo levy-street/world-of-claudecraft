@@ -31128,7 +31128,7 @@ export const nl_NL: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Wildfang-Emberhuid",
         "bonus2": "Redharvest herstelt 45 energie, verhoogd van 30.",
-        "bonus4": "Redharvest brengt een nieuwe Flense aan op het doelwit."
+        "bonus4": "Rode Oogst doet ook direct 30% van de resterende schade van je Villen en Bloedscheur op het doelwit. Beide blijven tikken."
       },
       "wyrmshadow": {
         "name": "Nightfang-Gewaden",

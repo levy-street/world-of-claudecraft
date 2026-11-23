@@ -31128,7 +31128,7 @@ export const cs_CZ: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Uhlíková kůže Divokého tesáku",
         "bonus2": "Rudá sklizeň obnoví 45 energie místo 30.",
-        "bonus4": "Rudá sklizeň na cíl umístí nový Odřez."
+        "bonus4": "Rudá sklizeň navíc okamžitě způsobí 30 % zbývajícího poškození tvého Stažení z kůže a Krvavé trhliny na cíli. Obě krvácení dál působí."
       },
       "wyrmshadow": {
         "name": "Roucha nočního tesáku",

@@ -70,6 +70,11 @@ export const RED_TORRENT_TICK_RATE = 1.15;
 export const REDHARVEST_EXTEND_SECONDS = 8;
 /** The cap on Redharvest's extension per bleed application (extendDot maxBonus). */
 export const REDHARVEST_EXTEND_CAP = 16;
+/** Wildfang Emberhide 4pc: Redharvest also deals this share of the damage your
+ *  Flense and Bloodrift on the target have left, instantly, and both keep
+ *  ticking (a partial cash-out; the live kit consumed them outright). */
+export const EMBERHIDE_4PC_CASHOUT_PCT = 0.3;
+export const EMBERHIDE_4PC_CASHOUT_IDS: ReadonlySet<string> = new Set(['rake', 'rip']);
 
 export const GOREBITE_PER_BLEED_PCT = 0.15;
 export const BLOODRIFT_ID = 'rip';

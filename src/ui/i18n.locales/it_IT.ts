@@ -18720,7 +18720,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.bonus2':
     'Raccolto Rosso restituisce 45 energia invece di 30.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Raccolto Rosso applica una nuova Spellatura al bersaglio.',
+    'Mietitura Rossa infligge anche subito il 30% dei danni rimanenti di Scarnificare e Faglia Sanguigna sul bersaglio. Entrambi continuano a fare effetto.',
   'entities.itemSets.wildfang_emberhide.name': 'Pelle Cinerea Zanna Selvatica',
   'entities.itemSets.wyrmshadow.bonus6':
     'Aumenta velocità d’attacco e lancio del 4% e Precisione del 3%. I colpi critici della tua arma aprono una Lacerazione Frastagliata, facendo sanguinare il bersaglio per 4 danni ogni 2 s per 12 s. Si accumula fino a 3 volte.',

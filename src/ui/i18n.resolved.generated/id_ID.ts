@@ -31128,7 +31128,7 @@ export const id_ID: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Kulit Bara Taring Liar",
         "bonus2": "Panen Merah memulihkan 45 energi, naik dari 30.",
-        "bonus4": "Panen Merah menanamkan Pengulitan baru pada target."
+        "bonus4": "Panen Merah juga langsung memberikan 30% sisa kerusakan Kupasan dan Celah Darah milikmu pada target. Keduanya tetap berdetak."
       },
       "wyrmshadow": {
         "name": "Jubah Nightfang",

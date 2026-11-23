@@ -17664,7 +17664,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.bonus4': 'Ancestral Strike zasahuje 30 % silněji.',
   'entities.itemSets.warspirit_emberscale.name': 'Uhlíkové šupiny Válečného ducha',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Rudá sklizeň obnoví 45 energie místo 30.',
-  'entities.itemSets.wildfang_emberhide.bonus4': 'Rudá sklizeň na cíl umístí nový Odřez.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    'Rudá sklizeň navíc okamžitě způsobí 30 % zbývajícího poškození tvého Stažení z kůže a Krvavé trhliny na cíli. Obě krvácení dál působí.',
   'entities.itemSets.wildfang_emberhide.name': 'Uhlíková kůže Divokého tesáku',
   'entities.itemSets.wyrmshadow.bonus6':
     'Zvyšuje rychlost útoků a sesílání o 4 % a zásah o 3 %. Kritické zásahy zbraní způsobí Rozervanou ránu, která cíl krvácí za 4 poškození každé 2 s po dobu 12 s. Sčítá se až 3krát.',

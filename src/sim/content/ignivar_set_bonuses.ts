@@ -1115,13 +1115,13 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // Redharvest plants a fresh Flense on the target: aura-only, applied at
-      // the druidEngineOnCast redharvest branch (which runs AFTER runEffects).
-      // Since the feral bleed rework Redharvest no longer consumes Flense, so
-      // the replant only lands when it is longer than the Flense already
-      // there. It mirrors the real dot application's value arithmetic
-      // (replantFlense in combat/druid_engines.ts) but awards no combo point
-      // and never fires the landed-strike hook. Draws no rng.
+      // Redharvest also deals EMBERHIDE_4PC_CASHOUT_PCT (30%) of the damage
+      // the wearer's Flense and Bloodrift on the target have left, and both
+      // keep ticking: applied at the druidEngineOnCast redharvest branch
+      // (emberhideCashout in combat/druid_engines.ts), which runs AFTER
+      // runEffects, so it reads the bleeds after the extendDot rows. Sized by
+      // Monte Carlo in forge BiS gear to match the live kit's cash-out loop.
+      // Draws no rng.
       effect: {},
     },
   ],

@@ -31128,7 +31128,7 @@ export const fr_FR: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Peau de braise du Croc sauvage",
         "bonus2": "Moisson rouge rend 45 points d’énergie, contre 30 auparavant.",
-        "bonus4": "Moisson rouge applique un nouveau Dépeçage à la cible."
+        "bonus4": "Moisson rouge inflige aussi instantanément 30% des dégâts restants de vos Écorcher et Faille sanglante sur la cible. Les deux continuent de faire effet."
       },
       "wyrmshadow": {
         "name": "Vêtements de Nightfang",

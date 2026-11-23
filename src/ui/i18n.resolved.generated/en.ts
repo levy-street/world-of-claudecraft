@@ -31128,7 +31128,7 @@ export const en: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Wildfang Emberhide",
         "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "bonus4": "Redharvest also deals 30% of the damage your Flense and Bloodrift on the target have left, instantly. Both keep ticking."
       },
       "wyrmshadow": {
         "name": "Nightfang Vestments",

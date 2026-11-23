@@ -17918,7 +17918,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.bonus4': 'Ancestral Strike gây thêm 30% sát thương.',
   'entities.itemSets.warspirit_emberscale.name': 'Vảy Linh Chiến',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Redharvest hồi 45 năng lượng, tăng từ 30.',
-  'entities.itemSets.wildfang_emberhide.bonus4': 'Redharvest đặt một Flense mới lên mục tiêu.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    'Thu Hoạch Đỏ còn gây ngay 30% sát thương còn lại của Lóc Xé và Vết Nứt Máu của bạn trên mục tiêu. Cả hai vẫn tiếp tục gây sát thương.',
   'entities.itemSets.wildfang_emberhide.name': 'Da Ẩn Nanh Hoang',
   'entities.itemSets.wyrmshadow.bonus6':
     'Tăng 4% tốc độ tấn công và thi triển, cùng 3% Hit. Đòn chí mạng bằng vũ khí của bạn xé một Ragged Gash, khiến mục tiêu chảy máu 4 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.',
