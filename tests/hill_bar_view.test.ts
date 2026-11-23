@@ -460,6 +460,41 @@ describe('the King of the Hill frame row', () => {
       ),
     ).toContain('top: 64px');
   });
+
+  it('autoscales to the phone from one viewport unit, desktop size at most', () => {
+    const mobile = readFileSync(
+      join(import.meta.dirname, '..', 'src', 'styles', 'hud.mobile.css'),
+      'utf8',
+    );
+    const block = (selector: string) => {
+      const at = mobile.indexOf(`${selector} {`);
+      expect(at, `${selector} rule`).toBeGreaterThan(-1);
+      return mobile.slice(at, mobile.indexOf('}', at));
+    };
+    const root = block('body.mobile-touch #hill-bar');
+    // One unit: the desktop pixel from a 500px short edge up, shrinking with
+    // the short edge below it, floored so the copy stays legible.
+    expect(root).toContain('--hill-bar-mobile-unit: clamp(0.75px, 0.2vmin, 1px)');
+    // Every desktop size is re-stated against that unit, so at full scale the
+    // bar is the desktop bar and nothing grows past it.
+    expect(root).toContain('font-size: calc(12 * var(--hill-bar-mobile-unit))');
+    expect(root).toContain('min-width: calc(220 * var(--hill-bar-mobile-unit))');
+    expect(root).toContain('calc(100vw - 24px)');
+    // Scaled, never hidden: the bar's own display stays with the painter.
+    expect(root).not.toContain('display');
+    expect(block('body.mobile-touch #hill-bar .hill-head')).toContain(
+      'font-size: calc(13 * var(--hill-bar-mobile-unit))',
+    );
+    // The contest caption sits on the track, so the two heights move together.
+    expect(block('body.mobile-touch #hill-bar .hill-track')).toContain(
+      'height: calc(12 * var(--hill-bar-mobile-unit))',
+    );
+    expect(block('body.mobile-touch #hill-bar .hill-contest')).toContain(
+      'line-height: calc(12 * var(--hill-bar-mobile-unit))',
+    );
+    // One declaration only, so no later rule quietly re-sizes the unit.
+    expect(mobile.match(/--hill-bar-mobile-unit:/g)).toHaveLength(1);
+  });
 });
 
 describe('the ring core', () => {

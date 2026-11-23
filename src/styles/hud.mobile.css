@@ -8513,6 +8513,46 @@
   body.mobile-touch #bg-scoreboard .bg-under {
     font-size: 11px;
   }
+  /* King of the Hill bar: autoscaled to the phone. At the desktop sizes it
+     covered about a third of a 390px-tall landscape screen, right over the
+     players fighting in the circle. Every size is the desktop value times one
+     viewport unit, --hill-bar-mobile-unit, which is a whole pixel (the desktop
+     size) from a 500px short edge up, shrinks with the short edge below that,
+     and never drops under 0.75px so the copy stays legible. The movable-frame
+     controller writes no inline transform on the mobile layout, so this
+     stylesheet owns the size there; nothing here is hidden, only scaled. */
+  body.mobile-touch #hill-bar {
+    --hill-bar-mobile-unit: clamp(0.75px, 0.2vmin, 1px);
+    top: calc(4 * var(--hill-bar-mobile-unit));
+    min-width: calc(220 * var(--hill-bar-mobile-unit));
+    max-width: min(calc(320 * var(--hill-bar-mobile-unit)), calc(100vw - 24px));
+    border-radius: calc(7 * var(--hill-bar-mobile-unit));
+    padding: calc(3 * var(--hill-bar-mobile-unit)) calc(10 * var(--hill-bar-mobile-unit))
+      calc(5 * var(--hill-bar-mobile-unit));
+    font-size: calc(12 * var(--hill-bar-mobile-unit));
+    line-height: 1.2;
+  }
+  body.mobile-touch #hill-bar .hill-head {
+    gap: calc(8 * var(--hill-bar-mobile-unit));
+    font-size: calc(13 * var(--hill-bar-mobile-unit));
+  }
+  body.mobile-touch #hill-bar .hill-held,
+  body.mobile-touch #hill-bar .hill-note {
+    margin-top: calc(1 * var(--hill-bar-mobile-unit));
+  }
+  body.mobile-touch #hill-bar .hill-track {
+    margin-top: calc(3 * var(--hill-bar-mobile-unit));
+    height: calc(12 * var(--hill-bar-mobile-unit));
+    border-radius: calc(6 * var(--hill-bar-mobile-unit));
+  }
+  body.mobile-touch #hill-bar .hill-contest {
+    line-height: calc(12 * var(--hill-bar-mobile-unit));
+    font-size: calc(10 * var(--hill-bar-mobile-unit));
+  }
+  body.mobile-touch #hill-bar .hill-foot {
+    gap: calc(8 * var(--hill-bar-mobile-unit));
+    margin-top: calc(2 * var(--hill-bar-mobile-unit));
+  }
   body.mobile-touch #bg-respawn {
     font-size: 18px;
   }
