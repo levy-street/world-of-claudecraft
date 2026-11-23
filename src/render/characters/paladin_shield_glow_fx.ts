@@ -161,23 +161,27 @@ interface PaladinShieldGlowStandIn {
 }
 let paladinShieldGlowStandIn: PaladinShieldGlowStandIn | null = null;
 
+/** A fresh stand-in, its own instance: the Paladin kit recipe holds one per
+ *  renderer (ability_vfx/paladin_stand_in_prewarm.ts) beside the boot one. */
+export function createPaladinShieldGlowStandIn(): PaladinShieldGlowStandIn {
+  const root = new THREE.Group();
+  root.name = 'paladin-shield-glow-stand-in';
+  root.visible = false;
+  const material = shieldGlowMaterial(
+    1,
+    FAITHWARDEN,
+    0.01,
+    new THREE.Vector3(),
+    new THREE.Vector3(0.5, 0.5, 0.5),
+  );
+  const layer = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+  layer.name = 'paladinShieldGlow';
+  root.add(layer);
+  return { root, materials: [material] };
+}
+
 export function buildPaladinShieldGlowStandIn(): PaladinShieldGlowStandIn {
-  if (!paladinShieldGlowStandIn) {
-    const root = new THREE.Group();
-    root.name = 'paladin-shield-glow-stand-in';
-    root.visible = false;
-    const material = shieldGlowMaterial(
-      1,
-      FAITHWARDEN,
-      0.01,
-      new THREE.Vector3(),
-      new THREE.Vector3(0.5, 0.5, 0.5),
-    );
-    const layer = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
-    layer.name = 'paladinShieldGlow';
-    root.add(layer);
-    paladinShieldGlowStandIn = { root, materials: [material] };
-  }
+  paladinShieldGlowStandIn ??= createPaladinShieldGlowStandIn();
   return paladinShieldGlowStandIn;
 }
 

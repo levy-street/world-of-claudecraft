@@ -50,6 +50,7 @@ import {
 import { PaladinKit, type PaladinKitEntity } from './paladin_kit';
 import { PaladinMending } from './paladin_mending';
 import { paladinSpecEmblemIndex } from './paladin_spec_emblems';
+import { PaladinStandInPrewarm } from './paladin_stand_in_prewarm';
 import { setPaladinVfxQuality } from './paladin_vfx_detail';
 import {
   type PaladinVfxDetail,
@@ -520,6 +521,9 @@ export class AbilityVfxFx implements SequencerHost {
   private tollingHammer: TollingHammer;
   private guardianCovenant: GuardianCovenant;
   private paladinCastSigil: PaladinCastSigil;
+  /** Hidden stand-ins of the renderer-owned Paladin visuals, linked first by
+   *  the Paladin kit recipe and held for the renderer's life. */
+  private readonly paladinStandIns: PaladinStandInPrewarm;
   private worldLightCb:
     | ((
         at: THREE.Vector3,
@@ -849,6 +853,8 @@ export class AbilityVfxFx implements SequencerHost {
       facing: (id) => this.facingOf?.(id) ?? null,
       isLocal: this.isLocalCaster,
     });
+    // The programs the renderer's own Paladin drivers draw (paladin_stand_in_prewarm.ts).
+    this.paladinStandIns = new PaladinStandInPrewarm(scene);
     for (const child of scene.children) if (!beforePaladin.has(child)) markOwnKitPreparation(child);
     this.crests = new SignatureCrests(scene, this.groundY);
     this.guards = new WarriorGuardPlates(scene);
@@ -1549,6 +1555,8 @@ export class AbilityVfxFx implements SequencerHost {
   authoredPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[], kit?: string) {
     if (kit === 'paladin')
       return [
+        // First: the renderer-owned visuals, whose first casts linked live.
+        ...this.paladinStandIns.units(host),
         ...this.finalEdict.preparation.units(host),
         ...this.dawnfall.preparation.units(host),
         ...this.sunVerdictLance.preparation.units(host),
@@ -3277,6 +3285,7 @@ export class AbilityVfxFx implements SequencerHost {
     release(() => this.tollingHammer.dispose());
     release(() => this.guardianCovenant.dispose());
     release(() => this.paladinCastSigil.dispose());
+    release(() => this.paladinStandIns.dispose());
     release(() => this.baked.dispose());
     release(() => this.fragments.dispose());
     release(() => this.crests.dispose());

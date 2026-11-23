@@ -776,25 +776,29 @@ interface PaladinConsecrationStandIn {
 }
 let paladinConsecrationStandIn: PaladinConsecrationStandIn | null = null;
 
+/** A fresh stand-in, its own instance: the Paladin kit recipe holds one per
+ *  renderer (ability_vfx/paladin_stand_in_prewarm.ts) beside the boot one. */
+export function createPaladinConsecrationStandIn(): PaladinConsecrationStandIn {
+  const scratch = new THREE.Scene();
+  new PaladinConsecrationVisuals(scratch, () => 0).sync([
+    { id: 'paladin-consecration-stand-in', x: 0, z: 0, radius: 8, duration: 8, remaining: 8 },
+  ]);
+  const root = scratch.children[0];
+  root.removeFromParent();
+  root.name = 'paladin-consecration-stand-in';
+  root.visible = false;
+  const materials: THREE.Material[] = [];
+  root.traverse((object) => {
+    const material = (object as THREE.Mesh).material;
+    if (material && !Array.isArray(material) && !materials.includes(material)) {
+      materials.push(material);
+    }
+  });
+  return { root, materials };
+}
+
 export function buildPaladinConsecrationStandIn(): PaladinConsecrationStandIn {
-  if (!paladinConsecrationStandIn) {
-    const scratch = new THREE.Scene();
-    new PaladinConsecrationVisuals(scratch, () => 0).sync([
-      { id: 'paladin-consecration-stand-in', x: 0, z: 0, radius: 8, duration: 8, remaining: 8 },
-    ]);
-    const root = scratch.children[0];
-    root.removeFromParent();
-    root.name = 'paladin-consecration-stand-in';
-    root.visible = false;
-    const materials: THREE.Material[] = [];
-    root.traverse((object) => {
-      const material = (object as THREE.Mesh).material;
-      if (material && !Array.isArray(material) && !materials.includes(material)) {
-        materials.push(material);
-      }
-    });
-    paladinConsecrationStandIn = { root, materials };
-  }
+  paladinConsecrationStandIn ??= createPaladinConsecrationStandIn();
   return paladinConsecrationStandIn;
 }
 

@@ -784,33 +784,37 @@ interface PaladinAscensionStandIn {
 }
 let paladinAscensionStandIn: PaladinAscensionStandIn | null = null;
 
+/** A fresh stand-in, its own instance: the Paladin kit recipe holds one per
+ *  renderer (ability_vfx/paladin_stand_in_prewarm.ts) beside the boot one. */
+export function createPaladinAscensionStandIn(): PaladinAscensionStandIn {
+  const root = new THREE.Group();
+  root.name = 'paladin-ascension-stand-in';
+  const visual = new PaladinAscensionVisual(REFERENCE_HEIGHT);
+  root.add(visual.group, visual.crown);
+  // Ascension's wings are Avenging Wrath's: one pair built spread, never furled.
+  syncPaladinAvengingWrathVisual(
+    null,
+    visual.crown,
+    REFERENCE_HEIGHT,
+    true,
+    0,
+    true,
+    undefined,
+    null,
+    'full',
+  );
+  const materials: THREE.Material[] = [];
+  root.traverse((object) => {
+    const material = (object as THREE.Mesh).material;
+    if (material && !Array.isArray(material) && !materials.includes(material)) {
+      materials.push(material);
+    }
+  });
+  return { root, materials };
+}
+
 export function buildPaladinAscensionStandIn(): PaladinAscensionStandIn {
-  if (!paladinAscensionStandIn) {
-    const root = new THREE.Group();
-    root.name = 'paladin-ascension-stand-in';
-    const visual = new PaladinAscensionVisual(REFERENCE_HEIGHT);
-    root.add(visual.group, visual.crown);
-    // Ascension's wings are Avenging Wrath's: one pair built spread, never furled.
-    syncPaladinAvengingWrathVisual(
-      null,
-      visual.crown,
-      REFERENCE_HEIGHT,
-      true,
-      0,
-      true,
-      undefined,
-      null,
-      'full',
-    );
-    const materials: THREE.Material[] = [];
-    root.traverse((object) => {
-      const material = (object as THREE.Mesh).material;
-      if (material && !Array.isArray(material) && !materials.includes(material)) {
-        materials.push(material);
-      }
-    });
-    paladinAscensionStandIn = { root, materials };
-  }
+  paladinAscensionStandIn ??= createPaladinAscensionStandIn();
   return paladinAscensionStandIn;
 }
 

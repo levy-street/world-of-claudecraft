@@ -30,6 +30,7 @@ import { CrestPrewarm } from '../src/render/ability_vfx/crest_prewarm';
 import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import { GuardPrewarm } from '../src/render/ability_vfx/guard_prewarm';
 import { OverlaySprites } from '../src/render/ability_vfx/overlay_sprites';
+import { PaladinStandInPrewarm } from '../src/render/ability_vfx/paladin_stand_in_prewarm';
 import * as assets from '../src/render/ability_vfx/production_assets';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
 import { SpiritApparitions } from '../src/render/ability_vfx/spirits';
@@ -310,6 +311,19 @@ const RESET_FIXTURES: Record<ContextRestoreResetId, Fixture> = {
       'touch:crest:blood_cut:1',
       'crest-upload:blood_cut',
     ]);
+  },
+  'paladin-stand-ins': async () => {
+    installCanvasStub();
+    const prep = new PaladinStandInPrewarm(new THREE.Scene());
+    const host = linkedHost();
+    const ids = prep.units(host).map((unit) => unit.id);
+    expect(ids.length).toBeGreaterThan(0);
+    await runUnits(prep.units(host));
+    expect(prep.ready()).toBe(true);
+    expect(prep.units(host)).toEqual([]);
+    resetFor('paladin-stand-ins');
+    expect(prep.ready()).toBe(false);
+    expect(prep.units(host).map((unit) => unit.id)).toEqual(ids);
   },
   'active-kit': async () => {
     const texture = new THREE.Texture();

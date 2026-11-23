@@ -111,6 +111,7 @@ const REGISTERED_MODULES = [
   'paladin_ascension_visual.ts',
   'paladin_aegis_visual.ts',
   'paladin_consecration_visual.ts',
+  'paladin_avenging_wrath_visual.ts',
   'paladin_shield_glow_fx.ts',
   'frozen_orb_fx.ts',
   'mage_ground_fx.ts',
@@ -282,9 +283,10 @@ describe('the lazy-material sweep', () => {
     // now mints no lazy module cache: gloam_field.ts builds its three
     // materials in its constructor): 23, 22. Plus the Paladin rework's three
     // per-instance stand-ins (the Aegis dome, the Holy Ground zone, the shield
-    // and weapon glow layer): 26, 25.
-    expect(hits.length).toBeGreaterThanOrEqual(26);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(25);
+    // and weapon glow layer): 26, 25. Plus Avenging Wrath's wings and rune
+    // band, which had no stand-in at all: 27, 26.
+    expect(hits.length).toBeGreaterThanOrEqual(27);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(26);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

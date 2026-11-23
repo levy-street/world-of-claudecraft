@@ -358,7 +358,8 @@ function easeOutBack(t: number): number {
 
 /** One wing geometry (unit body height) and one rune-band plane for every
  * wearer, never disposed: a cast attaches meshes over them, it never rebuilds
- * them, and the boot stand-in (buildPaladinAscensionStandIn) holds them too. */
+ * them, and the stand-ins (buildPaladinAvengingWrathStandIn, and Divine
+ * Ascension's, which borrows these wings) hold them too. */
 const WING_GEOMETRY = buildWingGeometry();
 const RUNE_BAND_GEOMETRY = new THREE.PlaneGeometry(1, 1);
 
@@ -456,6 +457,45 @@ function createPaladinAvengingWrathVisual(
       material.dispose();
     },
   };
+}
+
+/** The reference rig height the stand-in is built at; it scales the geometry
+ *  only, never a material, so every live wearer links the same programs. */
+const STAND_IN_HEIGHT = 1.8;
+
+/**
+ * The prewarm stand-in: one hidden pair of wings with its rune band, never
+ * disposed. Every live pair mints its own two materials and disposes them when
+ * its aura goes, so the first Avenging Wrath of a session linked
+ * `paladin_avenging_wrath:wings` and `:rune-band` inside a live frame, and with
+ * nothing else holding the programs, a later cast could link them again.
+ * Registered in ABILITY_MATERIAL_SOURCES; the Paladin kit recipe holds a fresh
+ * one of its own (ability_vfx/paladin_stand_in_prewarm.ts).
+ */
+interface PaladinAvengingWrathStandIn {
+  root: THREE.Group;
+  materials: THREE.Material[];
+}
+let paladinAvengingWrathStandIn: PaladinAvengingWrathStandIn | null = null;
+
+/** A fresh stand-in, its own instance (see buildPaladinAvengingWrathStandIn). */
+export function createPaladinAvengingWrathStandIn(): PaladinAvengingWrathStandIn {
+  const root = new THREE.Group();
+  root.name = 'paladin-avenging-wrath-stand-in';
+  root.visible = false;
+  // The full detail's wing: the lighter ones draw the same attributes through
+  // another index, which three's program key does not read.
+  const visual = createPaladinAvengingWrathVisual(root, STAND_IN_HEIGHT, 'full');
+  return { root, materials: [visual.material, visual.runeBand.material] };
+}
+
+export function buildPaladinAvengingWrathStandIn(): PaladinAvengingWrathStandIn {
+  paladinAvengingWrathStandIn ??= createPaladinAvengingWrathStandIn();
+  return paladinAvengingWrathStandIn;
+}
+
+export function paladinAvengingWrathStandInMaterials(): readonly THREE.Material[] {
+  return buildPaladinAvengingWrathStandIn().materials;
 }
 
 /** The aura is gone: the wings fold back behind the shoulders, dimming as they

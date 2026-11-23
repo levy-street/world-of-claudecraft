@@ -115,6 +115,7 @@ const PALADIN = [
   'tollingHammer',
   'guardianCovenant',
   'paladinCastSigil',
+  'paladinStandIns',
 ] as const;
 
 type Draw = { object: THREE.Object3D; material: THREE.Material };

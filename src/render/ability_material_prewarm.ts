@@ -25,6 +25,14 @@
 // The group is staged into the scene HIDDEN and never disposed: disposing a
 // material releases the program this entry exists to keep, and every material
 // here is the one the live cast will draw with.
+//
+// The Paladin rows are ALSO linked, much earlier, by the Paladin kit recipe,
+// on stand-ins of its own (ability_vfx/paladin_stand_in_prewarm.ts): this
+// group is linked by the last background unit, minutes after the curtain on a
+// slow boot, while the kit runs seconds after entry or a Paladin's first
+// sighting. They stay here because not every draw of them follows a sighting:
+// a Holy Ground in interest range is drawn whether or not its caster has a
+// view, and a renderer that never sights a Paladin still holds them by here.
 
 import * as THREE from 'three';
 import { balgathRangedMaterials, buildBalgathRangedStandIn } from './balgath_ranged_fx';
@@ -47,6 +55,10 @@ import {
   buildPaladinAscensionStandIn,
   paladinAscensionStandInMaterials,
 } from './paladin_ascension_visual';
+import {
+  buildPaladinAvengingWrathStandIn,
+  paladinAvengingWrathStandInMaterials,
+} from './paladin_avenging_wrath_visual';
 import {
   buildPaladinConsecrationStandIn,
   paladinConsecrationStandInMaterials,
@@ -202,6 +214,14 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'paladin_consecration_visual.ts',
     materials: () => [...paladinConsecrationStandInMaterials()],
     build: () => buildPaladinConsecrationStandIn().root,
+  },
+  {
+    // Avenging Wrath's wings and rune band: every live pair mints and disposes
+    // its own two materials, so nothing held their programs between casts.
+    id: 'paladin-avenging-wrath',
+    module: 'paladin_avenging_wrath_visual.ts',
+    materials: () => [...paladinAvengingWrathStandInMaterials()],
+    build: () => buildPaladinAvengingWrathStandIn().root,
   },
   {
     // The shield and weapon glow layered over a Paladin's held gear

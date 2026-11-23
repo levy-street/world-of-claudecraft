@@ -644,21 +644,25 @@ interface PaladinAegisStandIn {
 }
 let paladinAegisStandIn: PaladinAegisStandIn | null = null;
 
+/** A fresh stand-in, its own instance: the Paladin kit recipe holds one per
+ *  renderer (ability_vfx/paladin_stand_in_prewarm.ts) beside the boot one. */
+export function createPaladinAegisStandIn(): PaladinAegisStandIn {
+  const visual = new PaladinAegisVisual();
+  const root = visual.group;
+  root.name = 'paladin-aegis-stand-in';
+  root.visible = false;
+  const materials: THREE.Material[] = [];
+  root.traverse((object) => {
+    const material = (object as THREE.Mesh).material;
+    if (material && !Array.isArray(material) && !materials.includes(material)) {
+      materials.push(material);
+    }
+  });
+  return { root, materials };
+}
+
 export function buildPaladinAegisStandIn(): PaladinAegisStandIn {
-  if (!paladinAegisStandIn) {
-    const visual = new PaladinAegisVisual();
-    const root = visual.group;
-    root.name = 'paladin-aegis-stand-in';
-    root.visible = false;
-    const materials: THREE.Material[] = [];
-    root.traverse((object) => {
-      const material = (object as THREE.Mesh).material;
-      if (material && !Array.isArray(material) && !materials.includes(material)) {
-        materials.push(material);
-      }
-    });
-    paladinAegisStandIn = { root, materials };
-  }
+  paladinAegisStandIn ??= createPaladinAegisStandIn();
   return paladinAegisStandIn;
 }
 
