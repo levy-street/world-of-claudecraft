@@ -2,7 +2,7 @@
 // changed body, an idle frame, two frames into its fight and its death. Needs a running
 // Vite dev client (offline dev commands work there). Seeds the lowest graphics preset.
 //
-//   GAME_URL=http://localhost:5173 SHOT_DIR=docs/screenshots/quartered-isle-mobs \
+//   GAME_URL=http://localhost:5173 SHOT_DIR=tmp/quartered-isle-mobs \
 //     SHOT_PREFIX=after-desktop node scripts/quartered_isle_mobs_shot.mjs
 //
 // SHOT_W / SHOT_H set the viewport (mobile is landscape-only in game, e.g. 932x430);
