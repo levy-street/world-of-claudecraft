@@ -33,6 +33,8 @@ const SECONDS = Number(
   process.env.SHOT_SECONDS ??
     {
       anvil: 9.5,
+      fist: 12,
+      embers: 10,
       wrath: 7,
       rush: 10,
       pillars: 5,
@@ -190,6 +192,48 @@ const PLANS = {
       '/dev heart final root',
     ],
     trigger: ['/dev heart final tornado'],
+  },
+  // The Heat quarter's own fire: Basalt Fist and its three Molten Swells,
+  // and the Ember Mark's pools (Heroic), for the fire polish pass of
+  // 2026-11-23.
+  fist: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 14,
+    raid: 4,
+    raidSpread: 7,
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final quarter heat',
+      '/dev heart final pull',
+      '/dev heart final root',
+    ],
+    quiet: true,
+    trigger: ['/dev heart final fist'],
+    views: { high: [0.3, 0.9, 50], raid: [1.0, 0.22, 34], close: [0.9, 0.28, 20] },
+  },
+  embers: {
+    tp: 'final',
+    fxRoot: 'smith-heart-final-kit-fx',
+    anchor: { x: 128.25, z: 112.25 },
+    toward: { x: 188, z: 172 },
+    bossTemplate: 'heart_masterless_strength',
+    standOff: 18,
+    raid: 4,
+    raidSpread: 8,
+    setup: [
+      '/dev heart final reset',
+      '/dev heart final heroic',
+      '/dev heart final quarter heat',
+      '/dev heart final pull',
+      '/dev heart final root',
+    ],
+    quiet: true,
+    trigger: ['/dev heart final embers'],
+    views: { high: [0.3, 0.8, 40], raid: [1.0, 0.22, 28], close: [0.9, 0.3, 16] },
   },
   overload: {
     tp: 'final',
