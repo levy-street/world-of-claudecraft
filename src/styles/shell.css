@@ -2561,16 +2561,32 @@
   .membership-locked {
     color: var(--color-text-muted);
     background: var(--color-bg-input);
+    filter: grayscale(1);
   }
   .char-row.membership-locked .char-name,
   .char-row.membership-locked .char-sub {
     color: var(--color-text-muted);
   }
-  .membership-slot {
+  .char-empty-slot {
     min-height: 48px;
     cursor: default;
   }
-  .membership-slot .char-sub {
+  #char-list .char-row.char-empty-slot .char-sub {
+    flex: 1 1 0;
+    min-width: 0;
+    white-space: normal;
+  }
+  .char-slot-lock {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+  }
+  .char-name .char-slot-lock {
+    vertical-align: middle;
+    margin-right: var(--spacing-xs);
+  }
+  #charselect-panel.cs-wow #char-list .char-row.membership-locked .char-actions .enter-world-btn {
+    min-width: 0;
     white-space: normal;
   }
   .char-row:hover {
