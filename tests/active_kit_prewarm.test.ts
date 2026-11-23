@@ -868,7 +868,10 @@ function paladinFixture(localClass: string) {
   const material = new THREE.ShaderMaterial({ uniforms: paladinSpecIconUniforms() });
   const entry = activeKitPrewarmEntry(scene, localClass, {
     queue: queue as unknown as Pick<BackgroundGpuQueue, 'run'>,
-    assets: vi.fn(async () => true),
+    // The whole Warrior kit loads; the Warrior pieces the Paladin landings
+    // borrow answer declined, so these cases pin the Paladin pools and atlas
+    // alone (tests/paladin_borrowed_warrior_pieces.test.ts covers the pieces).
+    assets: vi.fn(async (pieces?: readonly string[]) => pieces === undefined),
     paladinAssets,
     geometry: (kinds, kit) => {
       geometryCalls.push(kit ?? 'warrior');

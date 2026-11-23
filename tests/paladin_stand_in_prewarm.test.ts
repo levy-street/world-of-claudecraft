@@ -107,8 +107,15 @@ function engine() {
   return { scene, fx };
 }
 
+/** The engine's parts of the Paladin recipe in the order active_kit_prewarm.ts
+ *  queues them, less the borrowed Warrior pieces (no Warrior asset is loaded
+ *  here; tests/paladin_borrowed_warrior_pieces.test.ts covers them). */
 function paladinUnits(fx: AbilityVfxFx, host: ReturnType<typeof fakeHost>['host']) {
-  return fx.authoredPrewarmUnits(host, [], 'paladin') as PrewarmResumeUnit[];
+  return [
+    ...fx.authoredPrewarmUnits(host, [], 'paladin-stand-ins'),
+    ...fx.authoredPrewarmUnits(host, [], 'paladin-borrowed'),
+    ...fx.authoredPrewarmUnits(host, [], 'paladin'),
+  ] as PrewarmResumeUnit[];
 }
 
 async function runAll(units: readonly PrewarmResumeUnit[]): Promise<void> {
@@ -147,6 +154,8 @@ describe('the Paladin kit recipe links the renderer-owned Paladin programs', () 
     const firstOther = isStandIn.indexOf(false);
     expect(lastStandIn).toBeGreaterThan(0);
     expect(lastStandIn).toBeLessThan(firstOther);
+    // They are their own part of the recipe: the pools' part carries none.
+    expect(standInUnits(fx.authoredPrewarmUnits(fakeHost().host, [], 'paladin'))).toEqual([]);
     // The Warrior recipe never carries them: no other class pays for them.
     expect(standInUnits(fx.authoredPrewarmUnits(fakeHost().host) as PrewarmResumeUnit[])).toEqual(
       [],

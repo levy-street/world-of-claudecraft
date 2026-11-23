@@ -6429,7 +6429,7 @@ export class Renderer {
       },
       activeKitPrewarmEntry(this.scene, this.sim.cfg.playerClass, {
         queue: this.backgroundGpuWork,
-        assets: () => ensureWarriorKitAssets(GFX.constrainedMemory),
+        assets: (pieces) => ensureWarriorKitAssets(GFX.constrainedMemory, pieces),
         geometry: (kinds, kit?: string) =>
           this.abilityVfxFx.authoredPrewarmUnits(
             {

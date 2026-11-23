@@ -147,10 +147,13 @@ export class BakedImpactLayers {
   }
   /** Active Warrior preparation opts into strict, per-slot draw readiness.
    * Other classes keep their existing dependency set and texture-only path.
-   * Nothing is enumerable before the kit's demand load lands the sheet. */
-  units(host: CrestPrewarmHost) {
+   * Nothing is enumerable before the kit's demand load lands the sheet. The
+   * Paladin recipe prepares the same slots (same unit ids, so neither kit pays
+   * them twice) with a borrowed sheet it uploaded, `prepared`, since it loads
+   * no Red Harvest sheet. */
+  units(host: CrestPrewarmHost, prepared: THREE.Texture | null = bakedTexture('harvest_impact')) {
     if (this.disposed) return [];
-    const texture = bakedTexture('harvest_impact');
+    const texture = prepared;
     if (!texture) return [];
     this.preparation ??= new BakedPoolPrewarm(
       this.scene,
@@ -175,10 +178,15 @@ export class BakedImpactLayers {
     reverse = false,
     roll = 0,
     aspect = 1,
+    /** A Paladin landing's borrowed layer: it never asks the Warrior kit's
+     *  cast family gate (no Paladin cast asks for it, and a refusal there
+     *  would count a requirement miss), and draws only on a slot its own
+     *  preparation proved (program settled and touched, buffers uploaded). */
+    borrowed = false,
   ): boolean {
     if (
       this.disposed ||
-      !this.spawnGate.allows(CAST_VFX_KIT) ||
+      (!borrowed && !this.spawnGate.allows(CAST_VFX_KIT)) ||
       !bakedTexture(kind) ||
       // Decoding is not GPU preparation. A layer the Warrior kit uploads stays
       // cold until this renderer's explicit upload has completed successfully.
@@ -196,7 +204,11 @@ export class BakedImpactLayers {
       kind === 'warrior_crush' ||
       kind === 'warrior_fervor';
     const s = this.slots.find(
-      (s, index) => !s.active && (!strict || !prepared || prepared.ready(index)),
+      (s, index) =>
+        !s.active &&
+        (borrowed
+          ? prepared?.ready(index) === true
+          : !strict || !prepared || prepared.ready(index)),
     );
     if (!s) return false;
     s.active = true;

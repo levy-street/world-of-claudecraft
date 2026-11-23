@@ -12,6 +12,8 @@ import {
 } from './paladin_spec_icons';
 import {
   bakedTexture,
+  PALADIN_BORROWED_PIECES,
+  type WarriorKitPiece,
   warriorBloodTexture,
   warriorPressureTexture,
   warriorRockTexture,
@@ -61,14 +63,18 @@ export const ACTIVE_KIT_RETRY_DELAYS_MS: readonly number[] = [5_000, 30_000, 120
 interface ActiveKitHost {
   queue: Pick<BackgroundGpuQueue, 'run'>;
   /** Start (or join) the Warrior kit's demand-loaded assets before any unit
-   *  runs; false means the device declined them, so the kit stays cold and no
-   *  unit runs. Absent in tests that inject textures directly. */
-  assets?(): Promise<boolean>;
+   *  runs: the whole kit, or with `pieces` only those (the Paladin recipe asks
+   *  for PALADIN_BORROWED_PIECES). False means the device declined them, so
+   *  the pieces stay cold and no unit needing them runs. Absent in tests that
+   *  inject textures directly. */
+  assets?(pieces?: readonly WarriorKitPiece[]): Promise<boolean>;
   /** The Paladin kit's demand load (its spec-icon atlas). Defaults to
    *  `ensurePaladinSpecIcons`; tests inject their own. */
   paladinAssets?(): Promise<boolean>;
   /** The authored preparation units: the Warrior crests for `kinds`, or with
-   *  `kit` 'paladin' the Paladin kit's own pools (`kinds` ignored). */
+   *  `kit` one part of the Paladin recipe (`kinds` ignored): 'paladin-stand-ins'
+   *  (the renderer-owned visuals), 'paladin-borrowed' (the Warrior pieces its
+   *  landings borrow) or 'paladin' (the kit's own pools). */
   geometry(kinds: readonly CrestKind[], kit?: string): readonly PrewarmResumeUnit[];
   texture(texture: THREE.Texture): void;
 }
@@ -96,6 +102,9 @@ interface Preparation {
   /** The pending retry per kit: a Warrior kit in backoff never swallows a
    *  Paladin sighting (the painter asks once per class), nor the reverse. */
   retry: Map<string, ReturnType<typeof setTimeout>>;
+  /** The borrowed Warrior pieces' demand load for the Paladin recipe, as of
+   *  its last run: 'cold' before any, 'declined' on a constrained device. */
+  borrowed: 'cold' | 'ready' | 'declined' | 'failed';
 }
 const preparations = new WeakMap<object, Preparation>();
 
@@ -149,10 +158,58 @@ function paladinIconUnit(state: Preparation): PrewarmResumeUnit {
   };
 }
 
+/** The Warrior sheets a Paladin landing borrows, uploaded by the SAME units the
+ *  Warrior recipe runs (one id each, so the shared done record pays neither
+ *  kit twice): the shout dust and smoke layers, and the rock map Valkyr's
+ *  Calling's slabs sample. */
+const PALADIN_BORROWED_SHEETS = new Set([
+  'active-shout-dust',
+  'active-smoke',
+  'active-warrior-rock',
+]);
+
+function sheetUnit(
+  state: Preparation,
+  [id, name, sheet]: (typeof KIT_SHEETS)[number],
+): PrewarmResumeUnit {
+  return {
+    id: `upload-big:${id}`,
+    synchronous: true,
+    run: () => {
+      const texture = sheet();
+      if (!texture) throw new Error(`${name} texture was not loaded`);
+      state.host.texture(texture);
+    },
+  };
+}
+
+/** The Paladin recipe: the stand-ins first, then the borrowed Warrior pieces
+ *  (their sheets, then their slots, fragments and crest) once their demand
+ *  load landed, then the kit's own pools, then the spec-icon atlas. A device
+ *  that declined the pieces, or a load that failed, runs the rest without
+ *  them. */
+function paladinRecipe(state: Preparation): readonly PrewarmResumeUnit[] {
+  const borrowed =
+    state.borrowed === 'ready'
+      ? [
+          ...KIT_SHEETS.filter(([id]) => PALADIN_BORROWED_SHEETS.has(id)).map((entry) =>
+            sheetUnit(state, entry),
+          ),
+          ...state.host.geometry([], 'paladin-borrowed'),
+        ]
+      : [];
+  return [
+    ...state.host.geometry([], 'paladin-stand-ins'),
+    ...borrowed,
+    ...state.host.geometry([], 'paladin'),
+    paladinIconUnit(state),
+  ];
+}
+
 /** Every unit of a kit's recipe, done or not. */
 function fullRecipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
   let units: readonly PrewarmResumeUnit[];
-  if (cls === 'paladin') units = [...state.host.geometry([], 'paladin'), paladinIconUnit(state)];
+  if (cls === 'paladin') units = paladinRecipe(state);
   else if (cls === 'warrior') units = warriorRecipe(state);
   else units = [];
   state.planned.set(
@@ -172,17 +229,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
 
 function warriorRecipe(state: Preparation): readonly PrewarmResumeUnit[] {
   return [
-    ...KIT_SHEETS.map(
-      ([id, name, sheet]): PrewarmResumeUnit => ({
-        id: `upload-big:${id}`,
-        synchronous: true,
-        run: () => {
-          const texture = sheet();
-          if (!texture) throw new Error(`${name} texture was not loaded`);
-          state.host.texture(texture);
-        },
-      }),
-    ),
+    ...KIT_SHEETS.map((entry) => sheetUnit(state, entry)),
     ...state.host.geometry(ACTIVE_WARRIOR_CRESTS),
   ];
 }
@@ -207,6 +254,7 @@ export function activeKitPrewarmEntry(scene: object, cls: string, host: ActiveKi
     context: 0,
     failures: new Map(),
     retry: new Map(),
+    borrowed: 'cold',
   };
   preparations.set(scene, state);
   registerContextRestoreReset('active-kit', state, invalidatePreparation);
@@ -250,8 +298,18 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
     // load leaves the whole kit cold; the Paladin's only leaves its atlas
     // unit unpaid (it fails, and the backoff asks again).
     if (selected === 'warrior' && state.host.assets && !(await state.host.assets())) return;
-    if (selected === 'paladin')
+    if (selected === 'paladin') {
       await (state.host.paladinAssets ?? ensurePaladinSpecIcons)().catch(() => false);
+      // Only the Warrior pieces its landings borrow, never the whole kit. A
+      // decline (constrained memory, the Warrior kit's own device policy)
+      // leaves them cold for good; a failed load runs the rest of the recipe
+      // and fails the run below, so this kit's backoff asks for them again.
+      const load = state.host.assets?.(PALADIN_BORROWED_PIECES) ?? Promise.resolve(true);
+      state.borrowed = await load.then(
+        (resident) => (resident ? 'ready' : 'declined'),
+        () => 'failed' as const,
+      );
+    }
     if (state.cancelled) return;
     const context = state.context;
     for (const unit of recipe(state, selected)) {
@@ -271,6 +329,8 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
       if (state.cancelled || state.context !== context) return;
       state.done.add(unit.id);
     }
+    if (selected === 'paladin' && state.borrowed === 'failed')
+      throw new Error('The Warrior pieces the Paladin landings borrow did not load');
   })();
   state.task = task;
   state.taskKit = selected;

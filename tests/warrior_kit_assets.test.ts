@@ -198,7 +198,9 @@ describe('the eager preload is gone for good', () => {
     expect(source).toContain(
       'resumeActiveAbilityKit(this.scene, options.resumeAfterFirstPaint, this.sim.cfg.playerClass);',
     );
-    expect(source).toContain('assets: () => ensureWarriorKitAssets(GFX.constrainedMemory),');
+    expect(source).toContain(
+      'assets: (pieces) => ensureWarriorKitAssets(GFX.constrainedMemory, pieces),',
+    );
     expect(source).not.toContain('abilityVfxBootTextureDependencies');
   });
 });

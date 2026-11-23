@@ -209,7 +209,14 @@ selected by ability id only:
   `ACTIVE_KIT_PRIORITY` (the boot-debt lane) under the per-frame budget, never
   the actionable floor, and it waits out a loading cover: the kit is cosmetic
   and gated by its own readiness, and the floor once admitted all ten sheets
-  into one frame (about 0.6 s on an Intel HD 530). Generic sheets (smoke, dust,
+  into one frame (about 0.6 s on an Intel HD 530). The Paladin landings borrow
+  a few of the kit's pieces (the shout dust and smoke layers, the stone chips,
+  Valkyr's Calling's leap_rupture slabs): the Paladin recipe loads only those
+  (`PALADIN_BORROWED_PIECES`, the loader is cut by piece and pays none twice),
+  prepares them with the same unit ids the Warrior recipe uses, and its
+  landings draw them through `fx.ts` `paladinBakedAt` / `paladinFragmentsAt` /
+  `paladinCrestAt`, on their own preparation and never the kit's cast family
+  gate (`tests/paladin_borrowed_warrior_pieces.test.ts`). Generic sheets (smoke, dust,
   the harvest splash) ship at 1024px; only signature sheets earn
   2048px, and a new sheet needs the same justification.
 - **Cost rules still apply.** The shared families it extends (`ribbons.ts`

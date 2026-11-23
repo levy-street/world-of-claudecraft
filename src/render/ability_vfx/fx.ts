@@ -59,7 +59,7 @@ import {
 } from './paladin_vfx_detail_core';
 import { LightPillars } from './pillars';
 import { markOwnKitPreparation } from './prewarm';
-import type { BakedKind, FragmentKind } from './production_assets';
+import { type BakedKind, bakedTexture, type FragmentKind } from './production_assets';
 import { RecallTheFallen } from './recall_the_fallen';
 import {
   AbilityVfxRibbons,
@@ -786,10 +786,10 @@ export class AbilityVfxFx implements SequencerHost {
     // The flight's debris rides this engine's own pools through closures, so
     // the flight holds none of them itself (each pool keeps one owner).
     const valkyrGround: ValkyrGroundHost = {
-      bakedAt: (...args) => this.bakedAt(...args),
-      fragmentsAt: (...args) => this.fragmentsAt(...args),
+      bakedAt: (...args) => this.paladinBakedAt(...args),
+      fragmentsAt: (...args) => this.paladinFragmentsAt(...args),
       decalXZ: (...args) => this.decalXZ(...args),
-      crestAt: (...args) => this.crestAt(...args),
+      crestAt: (...args) => this.paladinCrestAt(...args),
       shakeAt: (...args) => this.shakeAt(...args),
     };
     this.valkyrsCalling = new ValkyrsCalling(
@@ -1553,10 +1553,21 @@ export class AbilityVfxFx implements SequencerHost {
   // now, and the flipbook prewarm does the same for the six impact sheets.
   // The prewarm's finally-block clear() hides everything again.
   authoredPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[], kit?: string) {
+    // The Paladin recipe (active_kit_prewarm.ts) asks for three parts, in
+    // order: the renderer-owned visuals, whose first casts linked live; the
+    // Warrior pieces its landings borrow, once their demand load landed and
+    // their sheets were uploaded; then the kit's own pools.
+    if (kit === 'paladin-stand-ins') return this.paladinStandIns.units(host);
+    if (kit === 'paladin-borrowed') {
+      const sheet = bakedTexture('shout_dust');
+      return [
+        ...(sheet ? this.baked.units(host, sheet) : []),
+        ...this.fragments.units(host, ['stone_chip']),
+        ...this.crests.borrowedUnits(host, ['leap_rupture']),
+      ];
+    }
     if (kit === 'paladin')
       return [
-        // First: the renderer-owned visuals, whose first casts linked live.
-        ...this.paladinStandIns.units(host),
         ...this.finalEdict.preparation.units(host),
         ...this.dawnfall.preparation.units(host),
         ...this.sunVerdictLance.preparation.units(host),
@@ -1676,10 +1687,22 @@ export class AbilityVfxFx implements SequencerHost {
       const angle = (k * Math.PI) / 3 + 0.3;
       const px = x + Math.sin(angle) * 1.4 * size,
         pz = z + Math.cos(angle) * 1.4 * size;
-      this.bakedAt('shout_dust', px, floor, pz, 4.2 * size, 0xb09a78, 0xf6e4c2, 0.7, 0, 0, angle);
+      this.paladinBakedAt(
+        'shout_dust',
+        px,
+        floor,
+        pz,
+        4.2 * size,
+        0xb09a78,
+        0xf6e4c2,
+        0.7,
+        0,
+        0,
+        angle,
+      );
     }
     const chips = paladinDetailCount(18, detail);
-    this.fragmentsAt('stone_chip', x, floor + 0.3, z, 0xb8a88c, chips, 3.2, 0, 0, 1.2, true);
+    this.paladinFragmentsAt('stone_chip', x, floor + 0.3, z, 0xb8a88c, chips, 3.2, 0, 0, 1.2, true);
     this.shakeAt(x, floor, z, 0.4, true);
   }
 
@@ -1729,10 +1752,10 @@ export class AbilityVfxFx implements SequencerHost {
       const angle = (k * Math.PI * 2) / 3 + 0.5;
       const px = x + Math.sin(angle) * 0.7,
         pz = z + Math.cos(angle) * 0.7;
-      this.bakedAt('shout_dust', px, floor, pz, 2.4, 0xb09a78, 0xf6e4c2, 0.5, 0, 0, angle);
+      this.paladinBakedAt('shout_dust', px, floor, pz, 2.4, 0xb09a78, 0xf6e4c2, 0.5, 0, 0, angle);
     }
     const chips = paladinDetailCount(8, detail);
-    this.fragmentsAt('stone_chip', x, floor + 0.2, z, 0xb8a88c, chips, 1.8, 0, 0, 0.8, true);
+    this.paladinFragmentsAt('stone_chip', x, floor + 0.2, z, 0xb8a88c, chips, 1.8, 0, 0, 0.8, true);
     this.shakeAt(x, floor, z, 0.16, true);
   }
 
@@ -1960,10 +1983,22 @@ export class AbilityVfxFx implements SequencerHost {
       const angle = (k * Math.PI) / 2 + Math.atan2(dx, dz) + 0.4;
       const px = x + Math.sin(angle) * 0.9,
         pz = z + Math.cos(angle) * 0.9;
-      this.bakedAt('shout_dust', px, floor, pz, 3.2, 0xb09a78, 0xf6e4c2, 0.55, 0, 0, angle);
+      this.paladinBakedAt('shout_dust', px, floor, pz, 3.2, 0xb09a78, 0xf6e4c2, 0.55, 0, 0, angle);
     }
     const chips = paladinDetailCount(10, detail);
-    this.fragmentsAt('stone_chip', x, floor + 0.2, z, 0xb8a88c, chips, 2.2, dx, dz, 0.8, true);
+    this.paladinFragmentsAt(
+      'stone_chip',
+      x,
+      floor + 0.2,
+      z,
+      0xb8a88c,
+      chips,
+      2.2,
+      dx,
+      dz,
+      0.8,
+      true,
+    );
     this.shakeAt(x, floor, z, 0.22, true);
   }
 
@@ -2445,6 +2480,106 @@ export class AbilityVfxFx implements SequencerHost {
       angle,
       duration,
       pitch,
+    );
+  }
+
+  // The Warrior pieces a Paladin landing borrows (the Paladin kit recipe loads
+  // and prepares them: active_kit_prewarm.ts, PALADIN_BORROWED_PIECES). Each
+  // draws once its OWN preparation ran, the slot or batch proved and its sheet
+  // uploaded, and never asks the Warrior kit's cast family gate: no Paladin
+  // cast asks for that family, so a refusal there only counted a requirement
+  // miss while the piece waited on a Warrior that may never come. The Warrior
+  // doors above keep their gate unchanged.
+  private paladinBakedAt(
+    kind: BakedKind,
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    tint: number,
+    hot: number,
+    duration: number,
+    delay: number,
+    heat: number,
+    angle = 0,
+  ): boolean {
+    if (this.disposed) return false;
+    return this.baked.spawn(
+      kind,
+      x,
+      y,
+      z,
+      size,
+      tint,
+      hot,
+      duration,
+      delay,
+      heat,
+      this.groundY(x, z),
+      angle,
+      this.groundY,
+      false,
+      0,
+      1,
+      true,
+    );
+  }
+  private paladinFragmentsAt(
+    kind: FragmentKind,
+    x: number,
+    y: number,
+    z: number,
+    tint: number,
+    count: number,
+    power: number,
+    dx: number,
+    dz: number,
+    duration?: number,
+    fractured = false,
+  ): void {
+    if (this.disposed) return;
+    this.fragments.burst(
+      kind,
+      x,
+      y,
+      z,
+      tint,
+      count,
+      power,
+      dx,
+      dz,
+      this.groundY,
+      duration,
+      fractured,
+      true,
+    );
+  }
+  private paladinCrestAt(
+    x: number,
+    y: number,
+    z: number,
+    radius: number,
+    height: number,
+    tint: number,
+    accent: number,
+    substance: CrestKind,
+    angle = 0,
+    duration = 1.15,
+  ): boolean {
+    if (this.disposed) return false;
+    return this.crests.spawn(
+      x,
+      y,
+      z,
+      radius,
+      height,
+      tint,
+      accent,
+      substance,
+      angle,
+      duration,
+      0,
+      true,
     );
   }
 
