@@ -479,6 +479,7 @@ import {
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/chat_timestamp';
 import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
+import { groupChatLinkEl, groupChatLinkPlainText } from './hud/chat/group_chat_link';
 import { RaidWarningBanner } from './hud/chat/raid_warning_banner';
 import { ReadyCheckLeaderWindow } from './hud/chat/ready_check_leader_window';
 import { createClassResourceMeters } from './hud/class_resources';
@@ -13767,6 +13768,10 @@ export class Hud {
         this.appendChatItemLink(parent, seg.itemId);
         continue;
       }
+      if (seg.kind === 'group') {
+        parent.append(groupChatLinkEl(document, seg, this.dungeonFinderWindow));
+        continue;
+      }
       const quest = QUESTS[seg.questId];
       if (!quest) {
         parent.append(document.createTextNode(this.maskChat('[?]')));
@@ -13821,6 +13826,7 @@ export class Hud {
     return parseChatSegments(text)
       .map((s) => {
         if (s.kind === 'text') return s.value;
+        if (s.kind === 'group') return groupChatLinkPlainText(s.activityId);
         if (s.kind === 'item') {
           const item = knownItemDef(ITEMS, s.itemId);
           return `[${item ? itemDisplayName(item) : '?'}]`;
@@ -14048,7 +14054,7 @@ export class Hud {
           div.append(
             document.createTextNode(`[${QUESTS[seg.questId] ? questTitle(seg.questId) : '?'}]`),
           );
-        else div.append(document.createTextNode(seg.value));
+        else if (seg.kind === 'text') div.append(document.createTextNode(seg.value));
       }
     } else {
       div.append(document.createTextNode(text));

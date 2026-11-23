@@ -15182,6 +15182,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.postDiscord': '发布到Discord',
   'hudChrome.finder.postReadyIn': '{minutes}分钟后可用',
   'hudChrome.finder.postDiscordOffline': '仅限在线游戏',
+  'hudChrome.finder.listingGone': '该队伍已不在列表中。',
+  'hudChrome.finder.listingHidden': '你目前无法从列表加入该队伍。',
   'hudChrome.finder.inspect': '查看',
   'hudChrome.finder.inspectApplicantAria': '查看{name}',
   'hudChrome.finder.partyHeading': '带上你的队伍',

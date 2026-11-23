@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LFM chat link: proof of concept</title>
+<style>
+  :root {
+    --bg: #0d0b08; --panel: #17130e; --panel-2: #1f1a13; --edge: #4a3d29; --edge-hi: #8a6f3e;
+    --text: #e8e0cf; --muted: #a89e8c; --gold: #ffd28a;
+    --general: #ffc864; --guild: #40d264; --party: #7fd4ff; --lfm: #5cd6a0;
+    --q-uncommon: #1eff00; --q-rare: #0070dd; --q-epic: #a335ee; --q-legendary: #ff8000;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; color: var(--gold); }
+  h2 { font-size: 16px; font-weight: 600; margin: 0 0 10px; color: var(--gold); }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 820px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+  .frame { background: var(--panel); border: 1px solid var(--edge); border-radius: 8px; padding: 12px 14px; }
+  .frame-title { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
+  .chat { font-size: 13px; line-height: 1.75; min-height: 220px; }
+  .line { margin: 0; }
+  .ch-general { color: var(--general); } .ch-guild { color: var(--guild); } .ch-sys { color: #f5e66b; }
+  .who { color: var(--party); cursor: pointer; }
+  .lk { cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; background: none; border: 0; padding: 0; font: inherit; }
+  .lk:hover { filter: brightness(1.25); }
+  .lk:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .lk-lfm { color: var(--lfm); white-space: nowrap; }
+  .lk-lfm svg { width: 13px; height: 13px; vertical-align: -2px; margin-right: 3px; }
+  .lk-lfm.dead { color: #7d8a84; }
+  .q-uncommon { color: var(--q-uncommon); } .q-rare { color: var(--q-rare); } .q-epic { color: var(--q-epic); } .q-legendary { color: var(--q-legendary); }
+  .gray .chat { filter: grayscale(1); }
+  .groups { min-height: 220px; }
+  .empty { color: var(--muted); padding: 24px 4px; text-align: center; }
+  .card { background: var(--panel-2); border: 1px solid var(--edge); border-radius: 8px; padding: 12px 14px; }
+  .card.flash { animation: flash 1.2s ease-out; }
+  @keyframes flash { 0% { border-color: var(--gold); box-shadow: 0 0 0 3px #ffd28a55; } 100% { border-color: var(--edge); box-shadow: none; } }
+  .card-head { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+  .card h3 { margin: 0; font-size: 16px; color: var(--gold); font-weight: 600; }
+  .muted { color: var(--muted); }
+  .bar { height: 6px; background: #2a241b; border-radius: 3px; overflow: hidden; margin: 10px 0 8px; }
+  .bar > div { height: 100%; background: #d9902a; transition: width .3s; }
+  .pill { display: inline-block; padding: 1px 9px; border-radius: 10px; font-size: 12px; margin: 0 4px 4px 0; border: 1px solid #4a4030; color: #8a8277; }
+  .pill.need { background: #3a2a12; color: #ffcf80; border-color: #7a5a20; }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 4px; font-size: 12px; margin: 0 4px 4px 0; background: #2a241b; color: var(--muted); }
+  .btn { background: #2a241b; color: var(--text); border: 1px solid #5a4c34; border-radius: 6px; padding: 5px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  .btn:hover { border-color: var(--edge-hi); }
+  .btn.on { border-color: var(--lfm); color: var(--lfm); }
+  .btn.gold { background: #6b4a14; color: #fff3dc; border-color: #c08a30; }
+  .btn.sm { padding: 3px 10px; font-size: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0; }
+  .err { color: #ff8a7a; font-size: 12px; }
+  .ok { color: #f5e66b; }
+  .tip { position: absolute; z-index: 5; background: #0b0a08f2; border: 1px solid var(--edge-hi); border-radius: 6px; padding: 8px 10px; font-size: 13px; min-width: 200px; pointer-events: none; }
+  .tip b { display: block; font-weight: 600; }
+  .controls { margin-top: 16px; }
+  .controls .row { margin: 6px 0; }
+  .label { color: var(--muted); font-size: 12px; min-width: 120px; }
+  .notes { margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .notes p, .notes li { color: #cfc6b4; margin: 0 0 6px; }
+  .notes ul { margin: 0; padding-left: 18px; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: #2a241b; padding: 1px 5px; border-radius: 4px; color: #f0e3c4; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  td { padding: 4px 6px; border-bottom: 1px solid #2a241b; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+  .rel { position: relative; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Clickable LFM chat link</h1>
+  <p class="sub">Proof of concept for World of ClaudeCraft. Click the mint group link in chat to open the listing in the Groups window. Item links open their tooltip, so you can compare the two.</p>
+
+  <div class="stage" id="stage">
+    <div class="frame rel" id="chatFrame">
+      <p class="frame-title">Chat</p>
+      <div class="chat" id="chat"></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <div class="frame groups">
+      <p class="frame-title">Groups window</p>
+      <div id="groups"><div class="empty">Click a group link in chat to open its listing here.</div></div>
+    </div>
+  </div>
+
+  <div class="frame controls">
+    <h2>Demo controls</h2>
+    <div class="row"><span class="label">Group activity</span>
+      <button class="btn sm" id="join">Someone joins</button>
+      <button class="btn sm" id="leave">Someone leaves</button>
+      <button class="btn sm" id="close">Leader closes listing</button>
+      <button class="btn sm" id="repost">Leader reposts</button>
+      <button class="btn sm" id="reset">Reset</button>
+    </div>
+    <div class="row"><span class="label">Link label</span>
+      <button class="btn sm on" data-mode="frozen">Count as posted</button>
+      <button class="btn sm" data-mode="live">Live count</button>
+      <button class="btn sm" data-mode="none">No count</button>
+    </div>
+    <div class="row"><span class="label">Accessibility</span>
+      <button class="btn sm" id="gray">Grayscale chat (colorblind check)</button>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="frame">
+      <h2>How it works</h2>
+      <ul>
+        <li>The advert posts a small token, <code>[[g:&lt;listingId&gt;]]</code>, beside the item <code>[[i:id]]</code> and quest <code>[[q:id]]</code> links that chat already parses.</li>
+        <li>Each client builds the label itself from the listing, so it shows in the reader's language and cannot be faked.</li>
+        <li>Clicking calls a new <code>IWorld</code> action that opens the Groups window on that listing, offline and online.</li>
+        <li>The card always loads the listing's current state: members, open roles, full or closed.</li>
+        <li>Discord keeps the plain text line, since it cannot open the game.</li>
+      </ul>
+    </div>
+    <div class="frame">
+      <h2>Why mint</h2>
+      <table>
+        <tr><td><span class="sw" style="background:var(--lfm)"></span>LFM link</td><td>Same as the LFG channel color</td></tr>
+        <tr><td><span class="sw" style="background:var(--general)"></span>General / quest</td><td>Gold, would blend in</td></tr>
+        <tr><td><span class="sw" style="background:var(--q-legendary)"></span>Legendary</td><td>Orange is taken</td></tr>
+        <tr><td><span class="sw" style="background:var(--q-uncommon)"></span>Uncommon</td><td>Closest hue: the icon and "LFM:" tell them apart</td></tr>
+        <tr><td><span class="sw" style="background:var(--guild)"></span>Guild chat</td><td>Also green, same answer</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>';
+  const ROLE = { tank: 'Tank', healer: 'Healer', dps: 'DPS' };
+  const CAP = { tank: 2, healer: 3, dps: 5 };
+  const START = { tank: 2, healer: 1, dps: 3 };
+  const ITEMS = {
+    pale_chorus_leggings: { name: 'Pale Chorus Leggings', q: 'uncommon', label: 'Uncommon' },
+    conchplate_sabatons: { name: 'Conchplate Sabatons', q: 'rare', label: 'Rare' },
+    hammer_of_the_open_lock: { name: 'Hammer of the Open Lock', q: 'epic', label: 'Epic' },
+    forgebreaker: { name: 'Forgebreaker, Engine of Varkhul', q: 'legendary', label: 'Legendary' },
+  };
+
+  let s;
+  function reset() {
+    s = { roster: { ...START }, closed: false, posts: [], openId: null, pick: null, applied: false, mode: s ? s.mode : 'frozen', seq: 0 };
+    post();
+    render();
+  }
+  const size = () => s.roster.tank + s.roster.healer + s.roster.dps;
+  const full = () => size() >= 10;
+  const needed = () => Object.keys(CAP).filter((k) => s.roster[k] < CAP[k]);
+  function post() { s.posts.push({ id: ++s.seq, count: size() }); }
+
+  function linkLabel(p) {
+    const base = 'LFM: Nythraxis Raid Arena (Heroic)';
+    if (s.closed) return base + ' - closed';
+    if (s.mode === 'live') return full() ? base + ' - full' : base + ' ' + size() + '/10';
+    if (s.mode === 'none') return base;
+    return base + ' ' + p.count + '/10';
+  }
+  const item = (id) => '<button class="lk q-' + ITEMS[id].q + '" data-item="' + id + '">[' + ITEMS[id].name + ']</button>';
+  const who = (n) => '<span class="who">[' + n + ']</span>';
+  function lfm(p) {
+    const dead = s.closed || (s.mode === 'live' && full());
+    return '<button class="lk lk-lfm' + (dead ? ' dead' : '') + '" data-listing="nythraxis_heroic" aria-label="Open group listing: ' + linkLabel(p) + '">[' + ICON + linkLabel(p) + ']</button>';
+  }
+
+  function renderChat() {
+    const lines = [
+      '<p class="line ch-general">[2. General] ' + who('Brannoc') + ': WTS ' + item('pale_chorus_leggings') + ' ' + item('conchplate_sabatons') + '</p>',
+      '<p class="line ch-general">[2. General] ' + who('Thalwyn') + ': ' + lfm(s.posts[0]) + '</p>',
+      '<p class="line ch-general">[2. General] ' + who('Ossira') + ': ' + item('hammer_of_the_open_lock') + ' finally, still dreaming of ' + item('forgebreaker') + '</p>',
+      '<p class="line ch-guild">[Guild] ' + who('Pelle') + ': lol good luck</p>',
+    ];
+    for (let i = 1; i < s.posts.length; i++) lines.push('<p class="line ch-general">[2. General] ' + who('Thalwyn') + ': ' + lfm(s.posts[i]) + '</p>');
+    document.getElementById('chat').innerHTML = lines.join('');
+  }
+
+  function renderGroups(flash) {
+    const g = document.getElementById('groups');
+    if (!s.openId) { g.innerHTML = '<div class="empty">Click a group link in chat to open its listing here.</div>'; return; }
+    const head = '<div class="card-head"><div><h3>Nythraxis Raid Arena (Heroic)</h3><div class="muted">Raid, 10 players. Leader: Thalwyn (Paladin)</div></div><button class="btn sm" id="x">Close</button></div>';
+    if (s.closed) {
+      g.innerHTML = '<div class="card' + (flash ? ' flash' : '') + '">' + head + '<p class="muted" style="margin:12px 0 0">This listing has closed. <button class="lk" style="color:var(--lfm)" id="browse">Browse other groups</button></p></div>';
+      return;
+    }
+    const pills = Object.keys(CAP).map((k) => '<span class="pill' + (s.roster[k] < CAP[k] ? ' need' : '') + '">' + ROLE[k] + ' ' + s.roster[k] + '/' + CAP[k] + '</span>').join('');
+    let act;
+    if (s.applied) act = '<p class="ok" style="margin:8px 0 0">Application sent to Thalwyn as ' + ROLE[s.pick] + '. You will be told when they answer.</p>';
+    else if (full()) act = '<p class="muted" style="margin:8px 0 0">This group is full.</p>';
+    else act = '<div class="row"><span class="muted">Apply as:</span>' + needed().map((k) => '<button class="btn sm' + (s.pick === k ? ' on' : '') + '" data-role="' + k + '">' + ROLE[k] + '</button>').join('') + '</div><div class="row"><button class="btn gold" id="apply">Apply</button><span class="err" id="err"></span></div>';
+    g.innerHTML = '<div class="card' + (flash ? ' flash' : '') + '">' + head +
+      '<div class="bar"><div style="width:' + size() * 10 + '%"></div></div>' +
+      '<div>' + size() + '/10 members</div><div style="margin-top:6px">' + pills + '</div>' +
+      '<div style="margin-top:4px"><span class="tag">Learning run</span><span class="tag">Voice optional</span></div>' + act + '</div>';
+  }
+
+  function render(flash) { renderChat(); renderGroups(flash); }
+
+  const tip = document.getElementById('tip');
+  document.getElementById('chat').addEventListener('click', (e) => {
+    const l = e.target.closest('[data-listing]');
+    if (l) { tip.hidden = true; s.openId = l.dataset.listing; render(true); return; }
+    const it = e.target.closest('[data-item]');
+    if (it) {
+      const d = ITEMS[it.dataset.item];
+      tip.innerHTML = '<b class="q-' + d.q + '">' + d.name + '</b><span class="muted">' + d.label + ' item. (An item link opens its tooltip.)</span>';
+      const fr = document.getElementById('chatFrame').getBoundingClientRect();
+      const r = it.getBoundingClientRect();
+      tip.style.left = Math.max(8, Math.min(r.left - fr.left, fr.width - 230)) + 'px';
+      tip.style.top = (r.bottom - fr.top + 6) + 'px';
+      tip.hidden = false;
+    }
+  });
+  document.addEventListener('click', (e) => { if (!e.target.closest('[data-item]')) tip.hidden = true; });
+
+  document.getElementById('groups').addEventListener('click', (e) => {
+    if (e.target.id === 'x') { s.openId = null; render(); }
+    else if (e.target.id === 'browse') { e.target.textContent = '(this would show the Groups board)'; }
+    else if (e.target.dataset.role) { s.pick = e.target.dataset.role; renderGroups(); }
+    else if (e.target.id === 'apply') {
+      if (!s.pick) { document.getElementById('err').textContent = 'Choose a role first.'; return; }
+      s.applied = true; renderGroups();
+    }
+  });
+
+  let turn = 0;
+  document.getElementById('join').onclick = () => {
+    if (s.closed || full()) return;
+    const n = needed(); const k = n[turn++ % n.length]; s.roster[k]++;
+    if (s.pick && s.roster[s.pick] >= CAP[s.pick] && !s.applied) s.pick = null;
+    render();
+  };
+  document.getElementById('leave').onclick = () => {
+    if (s.closed) return;
+    const k = ['dps', 'healer', 'tank'].find((r) => s.roster[r] > (r === 'tank' ? 1 : 0));
+    if (k && size() > 1) { s.roster[k]--; render(); }
+  };
+  document.getElementById('close').onclick = () => { s.closed = true; render(); };
+  document.getElementById('repost').onclick = () => { if (!s.closed) { post(); render(); } };
+  document.getElementById('reset').onclick = reset;
+  document.querySelectorAll('[data-mode]').forEach((b) => b.onclick = () => {
+    s.mode = b.dataset.mode;
+    document.querySelectorAll('[data-mode]').forEach((o) => o.classList.toggle('on', o === b));
+    render();
+  });
+  const gray = document.getElementById('gray');
+  gray.onclick = () => { const on = document.getElementById('stage').classList.toggle('gray'); gray.classList.toggle('on', on); };
+
+  reset();
+})();
+</script>
+</body>
+</html>

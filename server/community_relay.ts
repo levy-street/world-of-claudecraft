@@ -14,6 +14,13 @@ import { REALM, REALM_PUBLIC_ORIGIN } from './realm';
 
 export const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 
+/** Which of the leader's sim-built advert lines a target posts: General gets the
+ *  chat form led by the clickable group link, Discord (which cannot open the
+ *  game) keeps the plain "LFM - ..." line. */
+export function advertLineKey(target: FinderAdvertTarget): 'advertChatLine' | 'advertText' {
+  return target === 'general' ? 'advertChatLine' : 'advertText';
+}
+
 export interface RelaySender {
   accountId: number;
   pid: number;

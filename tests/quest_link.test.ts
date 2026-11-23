@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { finderGroupLinkToken } from '../src/sim/social/finder_advert';
 import {
   encodeItemLink,
   encodeQuestLink,
@@ -75,6 +76,61 @@ describe('quest_link', () => {
     expect(parseChatSegments('[[x:foo]] [[i:]]')).toEqual([
       { kind: 'text', value: '[[x:foo]] [[i:]]' },
     ]);
+  });
+});
+
+describe('group links ([[g:<listingId>:<activityId>]])', () => {
+  it('parses the listing number and activity id beside text and other links', () => {
+    expect(
+      parseChatSegments('[[g:42:hollow_crypt_normal]] 1/5 - Healer/DPS needed [[i:gem_ruby]]'),
+    ).toEqual([
+      { kind: 'group', listingId: 42, activityId: 'hollow_crypt_normal' },
+      { kind: 'text', value: ' 1/5 - Healer/DPS needed ' },
+      { kind: 'item', itemId: 'gem_ruby' },
+    ]);
+  });
+
+  it('accepts the widest listing number and rejects the out-of-range and malformed shapes', () => {
+    expect(parseChatSegments('[[g:999999999:x]]')).toEqual([
+      { kind: 'group', listingId: 999_999_999, activityId: 'x' },
+    ]);
+    for (const raw of [
+      '[[g:0:hollow_crypt_normal]]',
+      '[[g:042:hollow_crypt_normal]]',
+      '[[g:1000000000:hollow_crypt_normal]]',
+      '[[g:-1:hollow_crypt_normal]]',
+      '[[g:1.5:hollow_crypt_normal]]',
+      '[[g:12]]',
+      '[[g:12:]]',
+      '[[g:12:odd-id]]',
+      '[[g:12:https://example.com]]',
+      '[[g:abc:hollow_crypt_normal]]',
+    ]) {
+      expect(parseChatSegments(raw)).toEqual([{ kind: 'text', value: raw }]);
+    }
+  });
+
+  it('parses exactly what the sim advert mints, and the sim mints nothing the parser rejects', () => {
+    expect(finderGroupLinkToken(7, 'nythraxis_boss_arena_heroic')).toBe(
+      '[[g:7:nythraxis_boss_arena_heroic]]',
+    );
+    const minted = finderGroupLinkToken(7, 'nythraxis_boss_arena_heroic') ?? '';
+    expect(parseChatSegments(minted)).toEqual([
+      { kind: 'group', listingId: 7, activityId: 'nythraxis_boss_arena_heroic' },
+    ]);
+    for (const id of [0, -3, 1.5, 1_000_000_000, Number.NaN]) {
+      expect(finderGroupLinkToken(id, 'hollow_crypt_normal')).toBeNull();
+    }
+    for (const activityId of CHARSET_CASES) {
+      const token = finderGroupLinkToken(3, activityId);
+      // The WHOLE token must parse as one group link: "odd]]id" parses as a link
+      // to "odd" plus trailing text, which is exactly the doomed shape the
+      // encoder refuses.
+      const parsed = parseChatSegments(`[[g:3:${activityId}]]`);
+      const wholeLink =
+        parsed.length === 1 && parsed[0].kind === 'group' && parsed[0].activityId === activityId;
+      expect(token !== null).toBe(wholeLink);
+    }
   });
 });
 

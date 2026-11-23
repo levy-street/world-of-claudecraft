@@ -88,15 +88,14 @@ export function decodeDungeonFinderInfo(value: unknown): DungeonFinderInfo | nul
         }),
       });
   }
-  if (
-    record(decoded.myListing) &&
-    decoded.myListing.advertText !== undefined &&
-    !(
-      typeof decoded.myListing.advertText === 'string' && decoded.myListing.advertText.length <= 160
-    )
-  ) {
-    const { advertText: _advertText, ...listing } = decoded.myListing;
-    drop('myListing', listing);
+  // A malformed advert line only loses that line (and the post preview).
+  for (const key of ['advertText', 'advertChatLine'] as const) {
+    const listing = decoded.myListing;
+    if (!record(listing) || listing[key] === undefined) continue;
+    const value = listing[key];
+    if (typeof value === 'string' && value.length <= 160) continue;
+    const { [key]: _dropped, ...rest } = listing;
+    drop('myListing', rest);
   }
   // A malformed role assignment list only loses the role pickers' state.
   if (

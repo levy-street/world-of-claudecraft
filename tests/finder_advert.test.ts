@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CommunityRelay } from '../server/community_relay';
+import { advertLineKey, CommunityRelay } from '../server/community_relay';
 import { drainRelay } from '../server/discord_relay';
 import { dispatchDungeonFinderCommand } from '../server/dungeon_finder_commands';
 import { FINDER_GUILD_TAG } from '../src/sim/content/dungeon_finder';
@@ -7,9 +7,11 @@ import { Sim } from '../src/sim/sim';
 import {
   FINDER_ADVERT_COOLDOWN_SECONDS,
   FinderAdvertCooldowns,
+  finderAdvertChatLine,
   finderAdvertText,
 } from '../src/sim/social/finder_advert';
 import type { SimEvent } from '../src/sim/types';
+import { parseChatSegments } from '../src/ui/hud/quest/quest_link';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 afterEach(() => {
@@ -64,6 +66,30 @@ describe('finderAdvertText: the LFM line', () => {
   });
 });
 
+describe('finderAdvertChatLine: the General form with the clickable group link', () => {
+  const crypt = {
+    activityId: 'hollow_crypt_normal',
+    size: 1,
+    capacity: 5,
+    needed: { tank: 0, healer: 1, dps: 3 },
+    guildOnly: false,
+  };
+
+  it('leads with the group link token and keeps the shared size and roles detail', () => {
+    expect(finderAdvertChatLine(12, crypt)).toBe(
+      '[[g:12:hollow_crypt_normal]] 1/5 - Healer/DPS needed',
+    );
+    expect(finderAdvertChatLine(12, { ...crypt, needed: null, guildOnly: true })).toBe(
+      '[[g:12:hollow_crypt_normal]] 1/5 - Any role needed - Guild only',
+    );
+  });
+
+  it('is null for an unknown activity or a listing id the chat parser would reject', () => {
+    expect(finderAdvertChatLine(12, { ...crypt, activityId: 'no_such_activity' })).toBeNull();
+    expect(finderAdvertChatLine(0, crypt)).toBeNull();
+  });
+});
+
 describe('FinderAdvertCooldowns', () => {
   it('spends 5 minutes for General and 30 for Discord, per key and per target', () => {
     expect(FINDER_ADVERT_COOLDOWN_SECONDS).toEqual({ general: 300, discord: 1800 });
@@ -84,9 +110,18 @@ describe('offline Sim advert (the Groups window buttons)', () => {
     const { sim, leader } = leaderSim();
     sim.dungeonFinderListingCreate('hollow_crypt_normal', [], leader);
     const info = sim.dungeonFinderInfoFor(leader);
+    const listingId = info?.myListing?.id ?? -1;
     expect(info?.myListing?.advertText).toBe(
       'LFM - The Hollow Crypt - Normal - 1/5 - Healer/DPS needed',
     );
+    const chatLine = `[[g:${listingId}:hollow_crypt_normal]] 1/5 - Healer/DPS needed`;
+    expect(info?.myListing?.advertChatLine).toBe(chatLine);
+    // The posted token names this very listing, so a click lands on it.
+    expect(parseChatSegments(chatLine)[0]).toEqual({
+      kind: 'group',
+      listingId,
+      activityId: 'hollow_crypt_normal',
+    });
     expect(info?.advert).toEqual({ general: 0, discord: 0, discordAvailable: false });
 
     sim.dungeonFinderExpeditionConfigure({ kind: 'advertise', target: 'general' }, leader);
@@ -96,7 +131,7 @@ describe('offline Sim advert (the Groups window buttons)', () => {
         type: 'chat',
         channel: 'general',
         fromPid: leader,
-        text: 'LFM - The Hollow Crypt - Normal - 1/5 - Healer/DPS needed',
+        text: chatLine,
       }),
     );
     expect(sim.dungeonFinderInfoFor(leader)?.advert?.general).toBe(5);
@@ -160,6 +195,20 @@ describe('online advert: server-owned, per account', () => {
     allowed: () => true,
     postGeneral: (_t: string, delivered: () => void) => delivered(),
   };
+
+  it('picks the link line for General and the plain line for Discord', () => {
+    expect(advertLineKey('general')).toBe('advertChatLine');
+    expect(advertLineKey('discord')).toBe('advertText');
+    const { sim, leader } = leaderSim();
+    sim.dungeonFinderListingCreate('hollow_crypt_normal', [], leader);
+    const mine = sim.dungeonFinderInfoFor(leader)?.myListing;
+    expect(mine?.[advertLineKey('general')]).toBe(
+      `[[g:${mine?.id}:hollow_crypt_normal]] 1/5 - Healer/DPS needed`,
+    );
+    expect(mine?.[advertLineKey('discord')]).toBe(
+      'LFM - The Hollow Crypt - Normal - 1/5 - Healer/DPS needed',
+    );
+  });
 
   it('posts to Discord once per 30 minutes per account, across characters', () => {
     let now = 1_000_000;

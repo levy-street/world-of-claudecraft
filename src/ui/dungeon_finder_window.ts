@@ -37,6 +37,7 @@ import {
   filterBoardListings,
   isBoardContentFilter,
 } from './dungeon_board_filter';
+import { boardJumpTarget } from './dungeon_board_jump';
 import {
   adventureName,
   adventureToolbarHtml,
@@ -174,6 +175,46 @@ export class DungeonFinderWindow {
     if (!wasOpen) {
       (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
     }
+  }
+
+  /** A chat group link: open the board on one listing (filter cleared so the
+   *  row is visible), then spotlight its card with the deed-link gold pulse, or
+   *  say why it cannot: the group is gone (or the link names other content),
+   *  or the board hides it from me (my own party's listing, a lockout). Runs
+   *  after open() so its focus wins over the default close-button focus. Before
+   *  the first board snapshot the window shows its own syncing note. */
+  openListing(listingId: number, activityId: string): void {
+    this.creatingGroup = false;
+    this.boardFilter = 'all';
+    this.pane = 'list';
+    this.open('board');
+    const world = this.deps.world();
+    const el = this.deps.root();
+    const target = boardJumpTarget(
+      world.dungeonFinderBoard,
+      world.dungeonFinderInfo?.myListing,
+      listingId,
+      activityId,
+    );
+    if (target === 'unsynced') return;
+    const card =
+      target === 'listed'
+        ? el.querySelector<HTMLElement>(`[data-listing-id="${listingId}"]`)
+        : null;
+    if (!card) {
+      const key =
+        target === 'gone' ? 'hudChrome.finder.listingGone' : 'hudChrome.finder.listingHidden';
+      el.querySelector('.df-board-listings .df-board-heading')?.insertAdjacentHTML(
+        'afterend',
+        `<p class="df-note df-jump-gone" role="status">${esc(t(key))}</p>`,
+      );
+      return;
+    }
+    card.tabIndex = -1;
+    card.focus({ preventScroll: true });
+    // Guarded: jsdom (the focus test env) ships no scrollIntoView.
+    if (typeof card.scrollIntoView === 'function') card.scrollIntoView({ block: 'center' });
+    card.classList.add('df-listing-flash');
   }
 
   close(): void {

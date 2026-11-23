@@ -16194,6 +16194,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.postDiscord': 'Опубликовать в Discord',
   'hudChrome.finder.postReadyIn': 'Доступно через {minutes} мин',
   'hudChrome.finder.postDiscordOffline': 'Только в онлайн-игре',
+  'hudChrome.finder.listingGone': 'Эта группа больше не в списке.',
+  'hudChrome.finder.listingHidden': 'Сейчас нельзя присоединиться к этой группе через список.',
   'hudChrome.finder.inspect': 'Осмотреть',
   'hudChrome.finder.inspectApplicantAria': 'Осмотреть: {name}',
   'hudChrome.finder.partyHeading': 'Ваша группа идёт с вами',

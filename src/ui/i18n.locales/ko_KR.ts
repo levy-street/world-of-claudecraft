@@ -14182,6 +14182,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.postDiscord': 'Discord에 게시',
   'hudChrome.finder.postReadyIn': '{minutes}분 후 가능',
   'hudChrome.finder.postDiscordOffline': '온라인 플레이 전용',
+  'hudChrome.finder.listingGone': '이 파티는 더 이상 모집 중이 아닙니다.',
+  'hudChrome.finder.listingHidden': '지금은 목록에서 이 파티에 참가할 수 없습니다.',
   'hudChrome.finder.inspect': '살펴보기',
   'hudChrome.finder.inspectApplicantAria': '{name} 살펴보기',
   'hudChrome.finder.partyHeading': '파티와 함께 참여',

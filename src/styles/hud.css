@@ -6240,6 +6240,36 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  /* Group chat link (a listing advert in General): the LFG channel's mint
+     (chat_channels.ts lfg), a hue no item quality, quest link or General line
+     uses. The group icon and the "LFM:" prefix keep it distinct from an
+     uncommon item or guild line without color too. */
+  .chat-group-link {
+    color: var(--color-chat-group-link);
+    cursor: var(--cursor-point);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+  }
+  .chat-group-link:hover {
+    filter: brightness(1.25);
+  }
+  .chat-group-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .chat-group-link-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 0.2em;
+    vertical-align: -0.15em;
+  }
+  .chat-group-link-icon svg {
+    width: 100%;
+    height: 100%;
+  }
   .chat-pane::-webkit-scrollbar {
     width: 8px;
   }
