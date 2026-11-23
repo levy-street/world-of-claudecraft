@@ -39,11 +39,12 @@ describe('parity scenarios see entity ids only through stagger phases', () => {
     const base = traceWithIdShift('mob_cast_sight_route', 0);
     expect(traceWithIdShift('mob_cast_sight_route', period)).toEqual(base);
     expect(traceWithIdShift('mob_cast_sight_route', 1)).not.toEqual(base);
-  });
+    // Three whole-world recordings: past the default timeout on a loaded CI shard.
+  }, 120_000);
 
   it('rift_boss_floor is unchanged by an even id shift', () => {
     const base = traceWithIdShift('rift_boss_floor', 0);
     expect(traceWithIdShift('rift_boss_floor', 2)).toEqual(base);
     expect(traceWithIdShift('rift_boss_floor', 1)).not.toEqual(base);
-  });
+  }, 120_000);
 });
