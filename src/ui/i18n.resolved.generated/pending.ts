@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "es_ES": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "fr_FR": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "fr_CA": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "de_DE": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "nl_NL": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "pl_PL": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "id_ID": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "tr_TR": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "sv_SE": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "vi_VN": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ],
+  "da_DK": [
+    "hudChrome.itemTooltip.sigilRedeem"
+  ]
 };

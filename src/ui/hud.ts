@@ -925,6 +925,7 @@ import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { seasonalItemTooltipLines } from './seasonal_item_tooltip';
 import { selfPreviewSubject, selfTryOnBody } from './self_preview_subject';
 import { localizeServerText } from './server_i18n';
+import { sigilRedeemTooltipLine } from './sigil_redeem_tooltip_view';
 import {
   localizeAuthoredYellSpeakerName,
   localizeAuthoredYellText,
@@ -6574,6 +6575,7 @@ export class Hud {
         html += `<div class="tt-sub">${esc(t('hudChrome.mounts.useToRide'))}</div>`;
       }
     }
+    html += sigilRedeemTooltipLine(item); // what a Crucible sigil buys, and where
     const requiredClasses = requiredClassesForTooltip(item);
     if (requiredClasses) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;

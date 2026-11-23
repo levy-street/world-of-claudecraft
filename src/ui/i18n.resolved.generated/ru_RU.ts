@@ -5330,6 +5330,7 @@ export const ru_RU: EnTranslations = {
       "riftUpgrade": "Улучшение разлома {level}/{max}",
       "riftSockets": "Самоцветы разлома {used}/{total}",
       "riftGemSocket": "Бонус гнезда для кольца разлома",
+      "sigilRedeem": "Можно обменять на предмет комплекта (ячейка: {slot}). Торговец: {vendor}, снаружи у входа в рейд «{raid}», {zone}.",
       "statEnchanted": "+{value} {stat} (зачаровано)",
       "enchantedFallback": "Зачаровано",
       "partyTradeWindow": "Вы можете передать этот предмет игрокам, разделившим эту добычу, ещё в течение {time}. Надев предмет, вы завершите период обмена.",

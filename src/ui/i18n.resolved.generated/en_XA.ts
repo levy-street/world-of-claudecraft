@@ -5330,6 +5330,7 @@ export const en_XA: EnTranslations = {
       "riftUpgrade": "[Ŕíƒţ úþĝŕáðé {level}/{max}]",
       "riftSockets": "[Ŕíƒţ ĝéɱš {used}/{total}]",
       "riftGemSocket": "[Šóçķéţ ƀóñúš ƒóŕ á Ŕíƒţƀóúñð ƀáñð]",
+      "sigilRedeem": "[Çáñ ƀé ţŕáðéð ţó {vendor}, óúţšíðé ţĥé {raid} éñţŕáñçé íñ {zone}, ƒóŕ á {slot} šéţ þíéçé.]",
       "statEnchanted": "[+{value} {stat} (Éñçĥáñţéð)]",
       "enchantedFallback": "[Éñçĥáñţéð]",
       "partyTradeWindow": "[Ýóú ɱáý ţŕáðé ţĥíš íţéɱ ţó þļáýéŕš ŵĥó šĥáŕéð íţš ðŕóþ ƒóŕ ţĥé ñéẋţ {time}. Éɋúíþþíñĝ íţ éñðš ţĥé ţŕáðé ŵíñðóŵ.]",

@@ -14076,6 +14076,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftForge.done.socketReplaced':
     '{name}に宝石をはめ込みました。{gem}は破壊されました。',
   'hudChrome.itemTooltip.riftGemSocket': 'リフトバウンドリングのソケット効果',
+  'hudChrome.itemTooltip.sigilRedeem':
+    '{zone}の{raid}入口の外にいる{vendor}と取引すると、{slot}のセット装備1つと交換できる。',
   'sim.rift.alreadyCleared': 'このリフトはすでに {names} が攻略しました。',
   'sim.rift.raceLost': 'このリフトはすでに {names} が攻略しました。挑戦は終了します。',
   'sim.rift.raceWorldWin': '{names} が {seconds}秒で{tier}ランク・リフトレースに勝利！',

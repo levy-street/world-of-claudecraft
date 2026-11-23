@@ -16039,6 +16039,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftForge.done.socket': '{name}: самоцвет вставлен.',
   'hudChrome.riftForge.done.socketReplaced': 'Самоцвет вставлен в {name}; {gem} уничтожен.',
   'hudChrome.itemTooltip.riftGemSocket': 'Бонус гнезда для кольца разлома',
+  'hudChrome.itemTooltip.sigilRedeem': 'Можно обменять на предмет комплекта (ячейка: {slot}). Торговец: {vendor}, снаружи у входа в рейд «{raid}», {zone}.',
   'sim.rift.alreadyCleared': 'Этот разлом уже закрыла группа {names}.',
   'sim.rift.raceLost': 'Этот разлом уже закрыла группа {names}. Ваш поход завершён.',
   'sim.rift.raceWorldWin': '{names} победили в гонке разлома ранга {tier} за {seconds} с!',

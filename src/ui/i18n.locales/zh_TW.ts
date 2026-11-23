@@ -15028,6 +15028,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.riftForge.done.socket': '已為{name}鑲嵌一顆寶石。',
   'hudChrome.riftForge.done.socketReplaced': '已將寶石鑲入{name}；{gem}已被摧毀。',
   'hudChrome.itemTooltip.riftGemSocket': '裂隙之戒的鑲嵌加成',
+  'hudChrome.itemTooltip.sigilRedeem':
+    '可在{zone}的{raid}入口外與{vendor}交易，換取一件{slot}套裝部件。',
   'sim.rift.alreadyCleared': '此裂隙已由 {names} 清除。',
   'sim.rift.raceLost': '此裂隙已由 {names} 清除。你的挑戰結束了。',
   'sim.rift.raceWorldWin': '{names} 以 {seconds} 秒贏得了 {tier} 級裂隙競速！',

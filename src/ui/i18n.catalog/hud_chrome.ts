@@ -6884,6 +6884,11 @@ export const hudChromeStrings = {
     // On a Rift gem's own tooltip, above the rating line its colour grants
     // once socketed (src/ui/rift_band_tooltip.ts).
     riftGemSocket: 'Socket bonus for a Riftbound band',
+    // A Crucible sigil's purpose line (src/ui/sigil_redeem_tooltip_view.ts):
+    // the vendor NPC name, the raid he stands outside, its zone, and the
+    // gear-slot label every set piece the sigil buys shares.
+    sigilRedeem:
+      'Can be traded to {vendor}, outside the {raid} entrance in {zone}, for a {slot} set piece.',
     // The enchant-attributed sibling of itemUi.tooltip.stat, rendered on the
     // share of a per-copy bonus stat that an applied enchant granted
     // (item_instance_tooltip.ts instanceBonusStatLines). It replaced the old

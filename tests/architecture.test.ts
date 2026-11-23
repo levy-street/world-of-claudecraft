@@ -229,6 +229,8 @@ const UI_PURE_CORES = [
   'src/ui/item_copy_name_core.ts',
   'src/ui/item_combat_tooltip_view.ts',
   'src/ui/treasure_map_tooltip_view.ts',
+  // A Crucible sigil's purpose line: vendor, place, and the slot it buys.
+  'src/ui/sigil_redeem_tooltip_view.ts',
   'src/ui/hud/action_bar/slot_edit_hints_core.ts',
   'src/ui/trinket_tooltip_view.ts',
   // The trinket auras' tooltip descriptor and their item-icon art map.
