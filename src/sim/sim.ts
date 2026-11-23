@@ -538,7 +538,6 @@ import {
 } from './professions/farming';
 import { consumeFeastAction, type FeastState, placeFeastAction } from './professions/feast';
 import * as fishing from './professions/fishing';
-import type { RespecPaymentTier } from './professions/focus';
 import {
   completeGatherCast as completeGatherCastImpl,
   drainGatheringGrants,
@@ -565,12 +564,13 @@ import {
   gatheringGoalFor as gatheringGoalForImpl,
 } from './professions/gathering_goal_projection';
 import type { GatheringGoalView } from './professions/gathering_goal_types';
-import {
-  loadGatheringSettings,
-  serializeGatheringSettings,
-} from './professions/gathering_settings_persist';
 import { updateGuildTrendLetters } from './professions/guild_letter';
-import { HARVEST_PREFERENCE_ALL, type HarvestPreference } from './professions/harvest_preference';
+import {
+  applyHarvestPreferenceOnLoad,
+  HARVEST_PREFERENCE_ALL,
+  type HarvestPreference,
+  serializeHarvestPreference,
+} from './professions/harvest_preference';
 import {
   harvestPreferenceFor as harvestPreferenceForImpl,
   setHarvestPreference as setHarvestPreferenceImpl,
@@ -631,8 +631,6 @@ import {
   type ToolEffectConfirmMode,
   type ToolEffectSlot,
 } from './professions/tools';
-import * as townFocusCommands from './professions/town_focus_commands';
-import type { PendingTownFocus, TownFocusPendingView } from './professions/town_focus_pending';
 import {
   grandfatherKnownRecipes,
   resolveTrain,
@@ -1764,15 +1762,6 @@ export interface PlayerMeta
   companionUpgrades: Record<string, number>;
   delveLoreUnlocked: Set<string>;
   delveDaily: { date: string; firstClearXp: Set<string>; markClears: number };
-  // Persistent town focus allocation (#1143): component type -> points spent.
-  // Set only while standing in a town hub; adds a bonus to that component's
-  // #1142 harvest yield, on top of the universal baseline, never below it.
-  townFocus: Record<string, number>;
-  // #1144: a re-spec queued on the 'time' or 'timeAndPartial' payment tier,
-  // pending the tier's duration before it commits onto `townFocus` above.
-  // Persisted (professions/town_focus_pending.ts, remaining seconds), so a
-  // logout or an instance handoff no longer drops it; charged at resolution.
-  pendingTownFocus?: PendingTownFocus;
   // Heroic reset-window circuit progress for the Book of Deeds. Reward eligibility
   // is gated only by raidLockouts; this persisted field records which distinct
   // heroic clears contributed to one authoritative reset window without gating rewards.
@@ -2910,7 +2899,6 @@ export class Sim {
       companionUpgrades: {},
       delveLoreUnlocked: new Set(),
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
-      townFocus: {},
       heroicDaily: { date: '', marked: new Set() },
       heroicMarks: 0,
       wyrmfallDaily: { date: '', sources: new Set() },
@@ -3328,7 +3316,8 @@ export class Sim {
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
-      loadGatheringSettings(meta, s, this.time);
+      // See PlayerMeta.harvestPreference / harvest_preference.ts applyHarvestPreferenceOnLoad.
+      meta.harvestPreference = applyHarvestPreferenceOnLoad(s.harvestPreference);
       // Intentional Gathering PR4: absent/undefined stays absent (no goal); a
       // valid saved goal is restored verbatim; a malformed one loads the
       // 'invalid' sentinel rather than silently becoming no goal. Never
@@ -4024,7 +4013,7 @@ export class Sim {
       // side (professions/farm_persist.ts).
       ...farmPlotsSaveFragment(meta.farmPlots),
       ...(meta.tutorialGreetingSent ? { tutorialGreetingSent: true } : {}),
-      ...serializeGatheringSettings(meta, this.time),
+      ...serializeHarvestPreference(meta.harvestPreference),
       // Intentional Gathering PR4: sparse (absent while no goal is tracked).
       // Never serializes the derived projection/cache or the live order
       // binding (gatheringGoalOrder), only the compact selection.
@@ -6013,10 +6002,6 @@ export class Sim {
           // Proficiency just became visible; the gathering predicates re-check.
           deedsMod.markDeedsDirty(this.ctx, p.id);
         }
-        // #1144: resolves a queued time-tier town-focus re-spec once its
-        // duration elapses. Draws no rng, so the tick-phase draw order is
-        // unchanged.
-        if (meta.pendingTownFocus) townFocusCommands.updateTownFocusRespec(this.ctx, meta);
         // Mount summon/dismount transition: decrement the timer, cancel a summon
         // on combat/swim, complete a mount/dismount, and force-dismount a mounted
         // swimmer. Live players only (a dead player is already force-dismounted by
@@ -8680,29 +8665,6 @@ export class Sim {
     setHarvestPreferenceImpl(this.ctx, raw, pid);
   }
 
-  // Town focus (#1143/#1144): the persistent allocation plus its re-spec/
-  // payment-tier machinery live in professions/town_focus_commands.ts (the
-  // monolith ratchet); these stay thin delegates so every existing call site
-  // (server/HUD/tests) resolves unchanged.
-  townFocusFor(pid: number): Record<string, number> {
-    return townFocusCommands.townFocusFor(this.ctx, pid);
-  }
-
-  get townFocus(): Record<string, number> {
-    return this.townFocusFor(this.primaryId);
-  }
-
-  townFocusPendingFor(pid: number): TownFocusPendingView | null {
-    return townFocusCommands.townFocusPendingFor(this.ctx, pid);
-  }
-
-  get townFocusPending(): TownFocusPendingView | null {
-    return this.townFocusPendingFor(this.primaryId);
-  }
-
-  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier, pid?: number): void {
-    townFocusCommands.setTownFocus(this.ctx, allocation, tier, pid);
-  }
   interact(pid?: number): void {
     interaction.interact(this.ctx, pid, this.noticeboardDefinitions);
   }

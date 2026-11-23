@@ -774,10 +774,6 @@ export const table: DeedLocaleTable = {
     name: 'En lindorms skatt',
     desc: 'Plundra sammanlagt 100 guld i mynt.',
   },
-  soc_civic_duty: {
-    name: 'Medborgerlig plikt',
-    desc: 'Placera din första stadsfokuspoäng.',
-  },
   exp_long_road_north: {
     name: 'Den långa vägen norrut',
     desc: 'Besök alla tre huvudorterna: Östbäck, Kärrbron och Högvakten.',

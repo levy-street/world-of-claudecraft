@@ -1008,10 +1008,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.maxed': 'Högsta anseende uppnått',
   'hudChrome.reputation.faction.rift_watch': 'Riftvakt',
   'hudChrome.reputation.factionTitle.rift_watch.champion': 'Högvakt',
-  'hudChrome.townFocus.pendingLine':
-    'Sparad. Din omspecning till denna allokeringskompletteras i {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'Focus höjer graden och mängden av vad du skördar. För att skörda endast ett material ställer du en Harvest Preference från ditt Field Kit eller Professions-fönstret.',
   'hudChrome.unstuck.revivedAtGraveyardFree':
     'Du har flyttats till närmaste kyrkogård och uppvaknad. Att använda Unstuck igen inom timmen lämnar dig med Unstuck Sjukdom.',
   'hudChrome.unstuck.helpUnstuckWindow':
@@ -4161,8 +4157,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Du behöver inte hitta dessa med ögat. Varje fyndplats i zonen är utritad på zonkartan var kartan än visar den marken, och på minikartan när du passerar den, så en insamlingsrunda kan planeras från kartskärmen innan du ger dig av. En fyndplats dina verktyg ännu inte kan bearbeta är markerad snarare än dold: den behåller sin plats med en genomstruken, nedtonad markering, så du kan se marken du tränar dig mot. På datorn räcker det att föra muspekaren över en ådra, ett bestånd eller en fläck i världen: den namnges, du får veta vilket verktyg den vill ha, och när du väl har bearbetat den räknas din egen återspawning ner till sekunden. På pekskärm finns det inget att föra en pekare över, så minikartans markeringar berättar samma historia.',
   'guide.profPages.specimenBodyFamilies':
     'Håll lite ledigt väskutrymme när du samlar: ett signerat vindfall behöver en egen plats eller en matchande signerad stapel att landa i, och om inget passar anländer utbytet ändå, men signaturen går förlorad. Kroppsskörd har också sin egen premiumarm: omkring {pct}% av varje skördad komponent kommer upp sällsynt eller bättre. En familj med ett perfekt exemplar att ge (hud, silke, gift, klo, kött) håller sitt vanliga utbyte enkelt och präglar det signerade exemplaret bredvid; de andra fem, huggtand, tyg, bete, horn och gälar, signerar själva utbytet.',
-  'guide.professions.focusBodyTiers':
-    'Varje huvudort har en Stadsfokus-panel för besökande skördare: stå i staden, öppna den bredvid minikartan, och sprid en budget på 10 fokuspoäng över de komponenttyper du bryr dig om. Var femte poäng på en komponent höjer dess skördegrad ett steg (högst två steg), och varje poäng lägger till 10 procent till dess utbyte; ofokuserade komponenter blir aldrig sämre.\n\nDin fördelning följer din karaktär vart den än vandrar och kan riktas om vid vilket senare besök i staden som helst, i den takt du väljer. Att ta din tid är gratis: omriktningen tar 1 minut per poäng du flyttar. Att betala lite snabbar på det, 15 sekunder per poäng plus 5 koppar och 1 Klingdamm per poäng, och att betala fullt ut gör det omedelbart för 25 koppar och 5 Klingdamm per poäng. Bara de poäng du faktiskt flyttar räknas, så att knuffa en enda poäng är billigt, och en panel du öppnar och stänger oförändrad kostar ingenting på någon nivå.',
   'guide.professions.harvestBodyFamilies':
     'Insamling stannar inte vid fyndplatser. Många slagna bestar kan skördas en gång var, först till kvarn, för hudar, huggtänder, klor, betar, horn, gälar, silke, gift, tyg och kött, direkt från kroppen vid sidan av det vanliga bytet. Interagera-tangenten tar bara bytet; skörden är ett eget val, som du gör i avsnittet Skörda i bytesfönstret. När en best bär mer än en användbar komponent är valet ditt: ta allt den kan ge, eller koncentrera dig på färre komponenter och ta en mätbart finare kvalitet av det du tar.\n\nEtt sällsynt eller bättre skördeslag på en exemplarbärande familj ger också ett signerat perfekt exemplar (ett Orört skinn, Orörd siden, Orörd giftkörtel, Orörd klo eller Förstklassig styckdetalj) utöver det vanliga utbytet, och registrerar Ett perfekt exemplar i din Bedrifternas bok. Vilken karaktär som helst kan skörda, ingen träning krävs, och vilket insamlingsverktyg du äger räknas mot premiumarmen, oavsett vilket yrke det tillhör.',
   'guide.professions.toolEffectsHeading': 'Verktygseffekter',
@@ -5097,12 +5091,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Gratis',
-  'hudChrome.townFocus.respecCostLine': 'Kostar {coin} och {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Direkt (full kostnad)',
-  'hudChrome.townFocus.respecTierLabel': 'Omfördelningshastighet',
-  'hudChrome.townFocus.respecTierPartialOption': 'Snabbare (liten kostnad)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Gratis (ta din tid)',
   'hudChrome.warfare.floatReasons.assist': 'Assist',
   'hudChrome.warfare.floatReasons.firstWin': 'Första segern',
   'hudChrome.warfare.floatReasons.kill': 'Dråp',
@@ -5911,7 +5899,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ämnen kräver ett löfte. Ett hobby frågar bara vart din nyfikenhet vandrar, {playerName}. Plocka några örter och bestäm vilket hantverk, det som är motsatt dina ämnen, du vill ägna dig åt.',
   'entities.quests.q_prof_hobby_switch.title': 'Ett annorlunda tidsfördriv',
   'entities.quests.q_prof_intro.completion':
-    'Ser du? Malm samlad och valkar på händerna. Håll på med gruvdrift, skogsavverkning och örtskörd när du reser längs vägarna, och när du är tillbaka i staden, håll koll på Stadsanslagstavlan vid marknaden och hantverksbordet i närheten. Det finns en rättvis handel i allt av det, om du vill ha det.',
+    'Ser du? Malm samlad och valkar på händerna. Håll på med gruvdrift, skogsavverkning och örtskörd när du reser längs vägarna, och när du är tillbaka i staden, håll koll på hantverksbordet vid marknaden. Det finns en rättvis handel i allt av det, om du vill ha det.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmåder skördad',
   'entities.quests.q_prof_intro.text':
     'Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, nordöst om staden, förbi Vargstråket. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.',
@@ -6443,14 +6431,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bortom strider och uppdrag belönar världen dig för att bruka jorden och smedjan: samla råmaterial, förvandla dem till utrustning och varor genom tio hantverksyrken, och slå dig till ro i en identitet som en av de tio arketyper yrkena representerar.',
   'hudChrome.mobile.dailyRewards': 'Butik',
   'hudChrome.perf.labels.predLead': 'Prediktionsförsprång',
-  'hudChrome.townFocus.budgetLabel': 'Poäng kvar: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Minska fokus på {component}',
-  'hudChrome.townFocus.hint':
-    'Fokuspoäng ger en bonus ovanpå varje komponents grundavkastning. Ofokuserade komponenter stannar på grundnivån.',
-  'hudChrome.townFocus.increaseAria': 'Öka fokus på {component}',
-  'hudChrome.townFocus.notInTownHint': 'Du måste vara i staden för att ställa in ditt fokus.',
-  'hudChrome.townFocus.saveButton': 'Spara fokus',
-  'hudChrome.townFocus.title': 'Stadsfokus',
   'hudChrome.archetypeTitle.none': 'Ingen',
   'entities.itemSets.crownforged.bonus4':
     'Dina kritiska vapenträffar splittrar målet med Benflisa och får det att blöda för 8 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.',
@@ -14271,9 +14251,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Druidformer',
   'guide.nav.sidebarLabel': 'Guideämnen',
   'guide.professions.craftHowTitle': 'Hantverksfönstret',
-  'guide.professions.focusBody':
-    'Varje huvudort har en Stadsfokus-panel för besökande skördare: stå i staden, öppna den bredvid minikartan, och rikta en liten budget av fokuspoäng mot de komponenttyper du bryr dig om. Ju mer fokus du ger en komponent, desto finare och rikare kommer den av varje senare kropp; din fördelning följer din karaktär vart den än vandrar, och du kan göra om den, gratis, vid vilket senare besök i staden som helst.',
-  'guide.professions.focusTitle': 'Stadsfokus',
   'guide.professions.harvestTitle': 'Att skörda själva jakten',
   'guide.search.typeAbility': 'Förmåga',
   'guide.search.typeDeed': 'Bedrift',
@@ -15790,9 +15767,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'Dölj frånkopplade gillesmedlemmar',
   'hudChrome.social.offlineHeader': 'Frånkopplade ({n})',
   'hudChrome.social.onlineHeader': 'Anslutna ({n})',
-  'hudChrome.townFocus.tierHint':
-    'Varje {points} poäng på en komponent höjer dess skördnivå ett steg, upp till {steps} steg; färre än {points} poäng ökar fortfarande utbytet.',
-  'hudChrome.townFocus.townOnlyHint': 'Fokus kan bara ändras medan du är i staden.',
   'hudChrome.unbind.cannotAfford': 'Du har inte råd med upplösningsavgiften.',
   'hudChrome.unbind.close': 'Stäng upplösning',
   'hudChrome.unbind.confirmBody': 'Lös upp {name} för {fee}?',
@@ -17043,7 +17017,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Varfor gick min insamling plötsligt langsamt?',
   'guide.profPages.faq.q8': 'Kan jag tillverka utanfor staden?',
   'guide.profPages.faq.a3':
-    'Det är två skilda handlingar på samma kropp. Allt ett lik innehåller, mynt och fynd plus insamlingsbara komponenter, öppnas i samma fönster, men interagera-tangenten och Ta byte plockar bara det vanliga bytet, som följer normala bytesregler. Insamling är yrkessidan, som lossar material från kroppen själv, och sker först när du väljer Skörda i det fönstret.\n\nInsamling är först till kvarn, engångsbasis: varje kropp kan skördas exakt en gång, av vem som helst som gör anspråk på det först, inbegripet online-föregångare. Ditt Stadsfokus formar vad du får: när du står i ett stadscentrum kan du fördela 10 fokuspoäng över de komponenttyper du bryr dig om, och varje fokuserad komponent rullar en bättre nivå (var 5:e poäng ökar det ett steg, som mest två steg) och ger mer (10 procent per poäng). Ofokuserade komponenter försämras aldrig.',
+    'Det är två skilda handlingar på samma kropp. Allt ett lik innehåller, mynt och fynd plus insamlingsbara komponenter, öppnas i samma fönster, men interagera-tangenten och Ta byte plockar bara det vanliga bytet, som följer normala bytesregler. Insamling är yrkessidan, som lossar material från kroppen själv, och sker först när du väljer Skörda i det fönstret.\n\nInsamling är först till kvarn, engångsbasis: varje kropp kan skördas exakt en gång, av vem som helst som gör anspråk på det först, inbegripet online-föregångare.',
   'guide.profPages.faq.a4':
     'Du har hittat en ovanligt rik skörd. Ungefär 1 av 90 skördar utlöser en sällsynt insamlingshändelse: uråldrig kärnved i träd, en orörd åder i malm eller en månlyst blomma bland örter. Utbytet femdubblas, varje enhet får ditt namn som signatur och fyndet annonseras i hela zonen. En vanlig skörd som får sällsynt eller bättre kvalitet signerar också utbytet.\n\nSignerade material är värda att behålla eller sälja dyrt: en signerad enhet av ett nödvändigt reagens i väskorna eller Materialvalvet, där tillverkningen kan hämta det, ger 2 procentenheter högre mästerverkschans. De kan dela en kompatibel stapel med osignerat material eller andra samlares och undertecknares enheter utan att tappa märken; varje källa och mängd sparas separat.',
   'guide.profPages.faq.a5':

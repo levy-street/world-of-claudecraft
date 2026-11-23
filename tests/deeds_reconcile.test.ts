@@ -142,6 +142,26 @@ describe('reconcileCharacterDeeds', () => {
     expect(insertDeedsMock).not.toHaveBeenCalled();
   });
 
+  it('drops ids outside the live catalog, so a removed deed never re-inserts its row', async () => {
+    // An outright-removed deed (soc_civic_duty, docs/design/deeds.md rule 5)
+    // stays in the earned blob verbatim; replaying it would re-create the
+    // character_deeds row a maintainer purged, on every join.
+    reconcileCharacterDeeds({ characterId: 42, accountId: 7 }, [
+      'prog_veteran',
+      'soc_civic_duty',
+      'constructor',
+    ]);
+    await settle();
+    expect(insertDeedsMock).toHaveBeenCalledTimes(1);
+    expect([...insertDeedsMock.mock.calls[0][1]]).toEqual(['prog_veteran']);
+  });
+
+  it('an earned set made only of removed ids is a no-op that never touches the db', async () => {
+    reconcileCharacterDeeds({ characterId: 42, accountId: 7 }, ['soc_civic_duty']);
+    await settle();
+    expect(insertDeedsMock).not.toHaveBeenCalled();
+  });
+
   it('does not pre-dedupe: a replayed reconcile issues its own batch (the SQL collapses it)', async () => {
     // Idempotence lives in ON CONFLICT DO NOTHING, pinned as a literal in
     // tests/deeds_db.test.ts. From the caller's side, two reconciles for the
@@ -157,9 +177,11 @@ describe('reconcileCharacterDeeds', () => {
   it('a rejected batch logs, never throws into the caller, and never faults the chain', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     insertDeedsMock.mockRejectedValueOnce(new Error('db down'));
-    expect(() => reconcileCharacterDeeds({ characterId: 1, accountId: 1 }, ['a'])).not.toThrow();
+    expect(() =>
+      reconcileCharacterDeeds({ characterId: 1, accountId: 1 }, ['prog_veteran']),
+    ).not.toThrow();
     // A later reconcile still runs: the rejection did not stall the FIFO tail.
-    reconcileCharacterDeeds({ characterId: 1, accountId: 1 }, ['b']);
+    reconcileCharacterDeeds({ characterId: 1, accountId: 1 }, ['prog_first_steps']);
     await settle();
     expect(errorSpy).toHaveBeenCalledWith('character_deeds reconcile failed:', expect.any(Error));
     expect(insertDeedsMock).toHaveBeenCalledTimes(2);

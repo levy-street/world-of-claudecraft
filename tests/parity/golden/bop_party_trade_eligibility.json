@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "d91d38b2",
+      "state": "cfa6a5b0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -113,7 +113,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -199,7 +198,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -411,7 +409,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "6ba41604",
+      "state": "79b7d35a",
       "events": "396f8a66",
       "rng": {
         "draws": 8,
@@ -515,7 +513,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -602,7 +599,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -814,7 +810,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "6ba41604",
+      "state": "79b7d35a",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -918,7 +914,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1005,7 +1000,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },

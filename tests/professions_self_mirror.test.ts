@@ -72,7 +72,6 @@ function freshTarget(): ProfessionsSelfMirrors {
     gatheringProficiency: {},
     toolEffectSlots: [],
     harvestPreference: null,
-    townFocusPending: null,
     gatheringGoal: null,
     myFarmPlots: [],
     professionsState: { skills: [] },

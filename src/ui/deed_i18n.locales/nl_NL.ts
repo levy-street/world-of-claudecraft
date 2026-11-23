@@ -692,7 +692,6 @@ export const table: DeedLocaleTable = {
     name: 'Een Wurmschat',
     desc: 'Maak een levenstotaal van 100 goud aan munten buit.',
   },
-  soc_civic_duty: { name: 'Burgerplicht', desc: 'Wijs je eerste stadsfocuspunt toe.' },
   exp_long_road_north: {
     name: 'De Lange Weg naar het Noorden',
     desc: 'Bezoek alle drie de hoofdnederzettingen: Oostbeek, Veenbrug en Hoogwacht.',

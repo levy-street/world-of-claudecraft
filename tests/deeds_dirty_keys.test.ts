@@ -111,7 +111,6 @@ describe('bucket completeness (the contract narrow marks rely on)', () => {
         vcupWins: 0,
         vcupGuildWins: 0,
         bank: { purchasedSlots: 0 },
-        townFocus: {},
         delveLoreUnlocked: new Set<string>(),
         companionUpgrades: {},
         deedStats: statsProxy,

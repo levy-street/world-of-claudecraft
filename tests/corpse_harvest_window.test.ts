@@ -9,6 +9,8 @@
 // commandPending override.
 
 import { describe, expect, it, vi } from 'vitest';
+import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
+import { MOBS } from '../src/sim/data';
 import type { CorpseHarvestStatusViewModel } from '../src/ui/hud/loot/corpse_harvest_view';
 import { componentLabel, renderCorpseHarvestPanel } from '../src/ui/hud/loot/corpse_harvest_window';
 
@@ -377,11 +379,11 @@ describe('renderCorpseHarvestPanel: dispatch', () => {
 });
 
 // Preserved unchanged by the Intentional Gathering PR3 harvest-status rework:
-// Town Focus (src/ui/town_focus_window.ts) still reads the sibling
-// `hudChrome.corpseHarvest.components.*` keys directly via componentLabel's
-// own key map, pinned by tests/town_focus_i18n.test.ts against the real set
-// of componentTags used across mob content.
-describe('componentLabel: preserved for Town Focus and its i18n pin', () => {
+// componentLabel reads the `hudChrome.corpseHarvest.components.*` keys via its
+// own key map. Pinned here against the real set of componentTags used across
+// mob content (the former Town Focus panel's i18n pin, kept after that panel
+// left the game because the label map is what the corpse window renders).
+describe('componentLabel: the component-tag label map', () => {
   it('resolves a real label for a known component tag', () => {
     expect(componentLabel('hide')).toBe('Hide');
   });
@@ -389,4 +391,23 @@ describe('componentLabel: preserved for Town Focus and its i18n pin', () => {
   it('falls back to the raw tag for an unmapped one, never throwing', () => {
     expect(componentLabel('not_a_real_tag')).toBe('not_a_real_tag');
   });
+
+  // Re-homed from the deleted tests/town_focus_i18n.test.ts: componentLabel
+  // falls back to the raw tag silently, so a new mob componentTags value or a
+  // new HARVEST_COMPONENT_ITEMS key without a label row would show a lowercase
+  // raw tag. Iterate the real sources so neither gap can reopen.
+  const tags = new Set<string>(Object.keys(HARVEST_COMPONENT_ITEMS));
+  for (const mob of Object.values(MOBS)) {
+    for (const tag of mob.componentTags ?? []) tags.add(tag);
+  }
+
+  it('covers a non-empty tag set from mob content and the harvest item table', () => {
+    expect(tags.size).toBeGreaterThan(0);
+  });
+
+  for (const tag of tags) {
+    it(`resolves a real label for "${tag}", not the raw tag`, () => {
+      expect(componentLabel(tag)).not.toBe(tag);
+    });
+  }
 });

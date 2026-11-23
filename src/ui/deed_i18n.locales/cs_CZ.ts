@@ -664,7 +664,6 @@ export const table: DeedLocaleTable = {
     name: 'Dračí poklad',
     desc: 'Ukořisti za celý život celkem 100 zlatých v mincích.',
   },
-  soc_civic_duty: { name: 'Občanská povinnost', desc: 'Přiděl svůj první bod zaměření města.' },
   exp_long_road_north: {
     name: 'Dlouhá cesta na sever',
     desc: 'Navštiv všechna tři hlavní sídla: Eastbrook, Fenbridge a Highwatch.',

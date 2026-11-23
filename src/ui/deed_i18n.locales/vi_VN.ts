@@ -708,10 +708,6 @@ export const table: DeedLocaleTable = {
     name: 'Kho Báu Của Rồng',
     desc: 'Nhặt được tổng cộng trọn đời 100 vàng tiền xu.',
   },
-  soc_civic_duty: {
-    name: 'Nghĩa Vụ Công Dân',
-    desc: 'Phân bổ điểm trọng tâm thị trấn đầu tiên của bạn.',
-  },
   exp_long_road_north: {
     name: 'Đường Dài Lên Phương Bắc',
     desc: 'Ghé thăm cả ba khu định cư trung tâm: Đông Khê, Cầu Đầm và Vọng Đài Cao.',

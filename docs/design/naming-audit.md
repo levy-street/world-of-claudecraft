@@ -2016,7 +2016,7 @@ frozen).
 | Cinderweave Raiment | GENERIC |  | item:cinderweave_raiment |
 | Cinderweave Regalia | GENERIC |  | itemSet:warfare_cinderweave |
 | Cinderweave Slippers | GENERIC |  | item:cinderweave_slippers |
-| Civic Duty | GENERIC |  | deed:soc_civic_duty |
+| Civic Duty | GENERIC | removed from the game 2026-11-04 with the Town Focus mechanic | deed:soc_civic_duty |
 | Claw | GENERIC |  | ability:claw |
 | Cleansing Tides | GENERIC |  | talentMastery:restoration |
 | Cleansing Verdict | GENERIC |  | ability:cleansing_verdict choiceRow:pal_r8_cleansing_verdict |

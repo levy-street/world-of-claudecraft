@@ -599,7 +599,7 @@ export class LootWindowController {
     // pinned in tests/loot_window_controller.test.ts.
     if (harvestable) {
       const hint = this.deps.document.createElement('div');
-      hint.className = 'town-focus-hint';
+      hint.className = 'loot-footer-hint';
       hint.textContent = t('hudChrome.loot.unifiedPressHint');
       this.deps.element.appendChild(hint);
     }

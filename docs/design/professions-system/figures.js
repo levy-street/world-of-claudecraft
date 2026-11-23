@@ -99,15 +99,6 @@
     group(510, "Split across all three", [2, 2, 2], "everything, but low tier each");
   })();
 
-  // Figure 6: additive focus radar over component types.
-  (function () {
-    const svg = document.getElementById("radar-additive"); if (!svg) return;
-    const base = 38;
-    gridAndAxes(svg, COMP, 112);
-    valuePoly(svg, [base, base, base, base, base + 46, base + 42, base, base], COL.gold, "rgba(217,178,90,0.16)", 112);
-    valuePoly(svg, new Array(COMP.length).fill(base), COL.teal, "rgba(79,208,192,0.30)", 112);
-  })();
-
   // Figure 4: power spectrum.
   (function () {
     const host = document.getElementById("spectrum"); if (!host) return;

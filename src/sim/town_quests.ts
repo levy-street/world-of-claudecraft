@@ -9,7 +9,7 @@
 //
 // The town quests of a zone are the town's OWN ERRANDS: the non-repeatable
 // quests the town hands out or receives (the giver or a turn-in NPC stands
-// inside the zone's hub circle, professions/focus.ts isInTownZone) that are
+// inside the zone's hub circle, town_zone.ts isInTownZone) that are
 // also finished inside the zone (a turn-in NPC stands in it). Turn-ins count
 // because most zones open with a border scout's breadcrumb that reports TO
 // the town warden; a town whose warden is still owed that report is not
@@ -37,7 +37,7 @@
 // between. A zone without welcomeDone never reads town_done.
 import { PROFESSION_TRAINERS } from './content/profession_trainers';
 import { DUNGEONS, NPCS, QUESTS, zoneAt, zoneWelcomeText } from './data';
-import { isInTownZone } from './professions/focus';
+import { isInTownZone } from './town_zone';
 import type { DungeonDef, NpcDef, PlayerClass, QuestDef, QuestState, ZoneDef } from './types';
 
 export type ZoneEntryHint = 'welcome' | 'town_done';

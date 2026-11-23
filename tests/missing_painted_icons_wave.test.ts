@@ -705,7 +705,8 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
     // 352 with Lantern Hall's six after the integration45 backlog supplied all 57 formerly
     // missing crests: only the six, on the pending ledger, have no painting.
-    expect(DEED_ORDER).toHaveLength(369);
+    // 368 after Town Focus and its painted Civic Duty deed (soc_civic_duty) left the game (2026-11-04).
+    expect(DEED_ORDER).toHaveLength(368);
     // Release adds Titan, five PvP streak titles and the Hard wisp maze (7).
     expect(DEED_ART_PENDING.size).toBe(13);
     for (const id of [

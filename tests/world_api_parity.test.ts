@@ -206,10 +206,7 @@ export const IWORLD_MEMBERS = [
   { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
   { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
-  { name: 'townFocus', kind: 'data' },
-  { name: 'townFocusPending', kind: 'data' },
   { name: 'civicServicePlacements', kind: 'data' },
-  { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
   { name: 'reportTelemetry', kind: 'method' },
@@ -1031,9 +1028,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Riding ranks (PR 4390) add one method over the release: 466/140/329.
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
     // more: 471/140/331.
-    expect(IWORLD_MEMBERS.length).toBe(471);
-    expect(DATA_MEMBERS.length).toBe(140);
-    expect(METHOD_MEMBERS.length).toBe(331);
+    // Town Focus removed from the game (townFocus, townFocusPending data;
+    // setTownFocus method): 468/138/330.
+    expect(IWORLD_MEMBERS.length).toBe(468);
+    expect(DATA_MEMBERS.length).toBe(138);
+    expect(METHOD_MEMBERS.length).toBe(330);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1431,7 +1430,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
-      'setTownFocus',
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
@@ -1467,8 +1465,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'toggleMounted',
       'toggleWeaponStow',
       'toolEffectSlots',
-      'townFocus',
-      'townFocusPending',
       'trackGatheringCommission',
       'trackGatheringRecipe',
       'tradeAccept',
@@ -1639,8 +1635,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentSpec',
       'talents',
       'toolEffectSlots',
-      'townFocus',
-      'townFocusPending',
       'tradeInfo',
       'treasureMap',
       'trickOrTreatedToday',
@@ -1940,7 +1934,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
-      'setTownFocus',
       'setWeeklyLootSpec',
       'setWorldPvpFlag',
       'shadowWorldQuestAction',
@@ -2161,9 +2154,6 @@ const FACET_INTERACTION = [
   'harvestCorpse',
   'corpseHarvestInfo',
   'pickUpObject',
-  'townFocus',
-  'townFocusPending',
-  'setTownFocus',
   'autoLoot',
 ] as const satisfies readonly (keyof IWorldInteraction)[];
 type _ExhaustInteraction = AssertNever<
@@ -2887,8 +2877,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(471);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(471);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(468);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(468);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

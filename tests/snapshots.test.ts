@@ -5921,8 +5921,6 @@ const ALL_DELTA_KEYS = [
   'sp',
   'stats',
   'tal',
-  'tfocus',
-  'tfpend',
   'tmap',
   'tot',
   'trade',
@@ -6071,8 +6069,6 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   season: 'activeSeasonalEvent',
   sh: 'spellHaste',
   sp: 'spellPower',
-  tfocus: 'townFocus',
-  tfpend: 'townFocusPending',
   tmap: 'treasureMap',
   tot: 'trickOrTreatedToday',
   tslot: 'toolEffectSlots',
@@ -6286,14 +6282,6 @@ function dirtyEveryDeltaField(): {
   // the "carries every key" presence loop, since All encodes as the
   // non-null explicit token, but would not prove a real choice decodes).
   meta.harvestPreference = { kind: 'material', itemId: 'rough_hide' };
-  // tfpend: a REAL queued re-spec (null is the idle default and would fail
-  // the presence loop). Far enough out that no tick in this fixture resolves it.
-  meta.pendingTownFocus = {
-    allocation: { silk: 2 },
-    readyAtTime: sim.time + FAR_FUTURE_MS,
-    coin: 0,
-    materials: 0,
-  };
   // tslot: a REAL slotted effect, not the empty default. Without this the key
   // rides the first snapshot as `[]`, which is not null, so it passes the
   // "dirtied to a non-default value" loop below vacuously and nothing anywhere
@@ -7575,7 +7563,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 136 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 134 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +2: the courier's courierTravelTicks and courierLegTicks (PR 4281), for 124.
@@ -7644,8 +7632,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 125.
     // Courier vault and other-character stores add one owner delta key.
     // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
-    expect(ALL_DELTA_KEYS).toHaveLength(136);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(136);
+    // -2: tfocus and tfpend left with the Town Focus mechanic (2026-11-04).
+    expect(ALL_DELTA_KEYS).toHaveLength(134);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(134);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7826,7 +7815,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 125.
     // Courier vault and other-character stores add one owner delta key.
     // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
-    expect(scraped.size).toBe(136);
+    // Town Focus removed from the game: tfocus and tfpend leave, for 134.
+    expect(scraped.size).toBe(134);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

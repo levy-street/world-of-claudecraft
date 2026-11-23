@@ -656,7 +656,6 @@ export const table: DeedLocaleTable = {
   soc_pocket_money: { name: '小遣い銭', desc: '硬貨を生涯累計で1ゴールド拾い集める。' },
   soc_heavy_purse: { name: 'ずっしり重い財布', desc: '硬貨を生涯累計で10ゴールド拾い集める。' },
   soc_wyrms_hoard: { name: 'ワームの財宝', desc: '硬貨を生涯累計で100ゴールド拾い集める。' },
-  soc_civic_duty: { name: '市民の務め', desc: '町の重点ポイントを初めて割り振る。' },
   exp_long_road_north: {
     name: '北への長い道',
     desc: '3つの拠点集落、イーストブルック、フェンブリッジ、ハイウォッチをすべて訪れる。',

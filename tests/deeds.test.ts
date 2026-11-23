@@ -1343,18 +1343,6 @@ describe('meter triggers (negative then positive per resolver)', () => {
         },
       },
       {
-        deedId: 'soc_civic_duty',
-        below: () => {
-          meta.townFocus = {};
-        },
-        at: () => {
-          // A real component family: since #2511 no reachable path can put a
-          // key like 'forge' in an allocation, so a fixture using one would
-          // pin a shape the game cannot produce.
-          meta.townFocus = { hide: 1 };
-        },
-      },
-      {
         deedId: 'dlv_lore_journal',
         below: () => {
           meta.delveLoreUnlocked = new Set(['a', 'b', 'c', 'd']);

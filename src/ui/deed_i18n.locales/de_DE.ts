@@ -706,7 +706,6 @@ export const table: DeedLocaleTable = {
   soc_pocket_money: { name: 'Taschengeld', desc: 'Erbeute insgesamt 1 Gold in Münzen.' },
   soc_heavy_purse: { name: 'Ein schwerer Beutel', desc: 'Erbeute insgesamt 10 Gold in Münzen.' },
   soc_wyrms_hoard: { name: 'Der Hort eines Wyrms', desc: 'Erbeute insgesamt 100 Gold in Münzen.' },
-  soc_civic_duty: { name: 'Bürgerpflicht', desc: 'Vergib deinen ersten Stadtfokus-Punkt.' },
   exp_long_road_north: {
     name: 'Die lange Straße gen Norden',
     desc: 'Besuche alle drei Hauptorte: Eastbrook, Fenbridge und Highwatch.',

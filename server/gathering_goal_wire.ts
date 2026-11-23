@@ -1,7 +1,7 @@
 // Intentional Gathering PR4 (docs/prd/intentional-gathering/goal-projection-
 // contract.md): the owner-only `ggoal` self-delta, kept as its own leaf
 // beside (never inside) gathering_self_wire.ts. That module is the
-// tfocus/gprof/tslot/hpref cluster extracted from GameServer.selfWireJson's
+// gprof/tslot/hpref cluster extracted from GameServer.selfWireJson's
 // bcastSelf block; this is a distinct feature's single field with its own
 // contract, a full-view REPLACEMENT rather than a scalar or map mirror: an
 // explicit `null` clears the tracked goal, and `maybe` (the same per-tick

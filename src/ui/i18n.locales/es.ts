@@ -1033,10 +1033,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta el daño infligido a jugadores un {increase}% y reduce el daño recibido de jugadores un {reduction}%. También aumenta tu salud máxima un {health}% en todas partes excepto en mazmorras, bandas, expediciones y brechas.',
   'hudChrome.statInfo.names.spellCrit': 'Crítico con hechizos',
   'hudChrome.targetAuras.close': 'Cerrar la ventana de auras del objetivo',
-  'hudChrome.townFocus.pendingLine':
-    'Guardado. Tu reasignación a esta distribución se completa en {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'El enfoque mejora el grado y la cantidad de lo que recolectas. Para recolectar un solo material, establece una preferencia de recolección desde tu Kit de campo o la ventana de Profesiones.',
   'hudChrome.trade.offerQuantityAll': 'Ofrecer todo',
   'hudChrome.trade.offerQuantityConfirm': 'Ofrecer',
   'hudChrome.trade.offerQuantityHint': 'Se te preguntará cuántos quieres ofrecer',
@@ -4015,8 +4011,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'No hace falta que los encuentres a simple vista. Cada nodo de la zona aparece dibujado en el mapa de zona allí donde el mapa muestra ese terreno, y en el minimapa a medida que pasas junto a él, así que una ruta de farmeo puede planificarse desde la pantalla del mapa antes de salir. Un nodo que tus herramientas todavía no pueden trabajar se marca en vez de ocultarse: conserva su lugar con una marca tachada y atenuada, para que puedas ver el terreno hacia el que te estás entrenando. En escritorio, pasar el cursor sobre una veta, un árbol o una mata en el mundo indica su nombre, te dice qué herramienta pide y, una vez que lo has trabajado, cuenta tu propia reaparición segundo a segundo. En pantalla táctil no hay nada sobre lo que pasar el cursor, así que las marcas del minimapa cuentan la misma historia.',
   'guide.profPages.specimenBodyFamilies':
     'Guarda algo de sitio libre en las bolsas cuando farmees: un golpe de suerte firmado necesita una ranura propia o una pila firmada idéntica donde caer, y si no encaja en ninguna parte el rendimiento llega igualmente, pero la firma se pierde. La cosecha de cadáveres tiene también su propio brazo de premio gordo: alrededor del {pct}% de cada componente cosechado sale raro o mejor. Una familia que tiene un ejemplar perfecto que dar (piel, seda, veneno, garra, carne) mantiene liso su rendimiento ordinario y acuña el ejemplar firmado junto a él; las otras cinco, colmillo, tela, colmillo, cuerno y agallas, firman el rendimiento en sí.',
-  'guide.professions.focusBodyTiers':
-    'Cada pueblo principal mantiene un panel de Enfoque del pueblo para los recolectores que pasan por ahí: quédate en el pueblo, ábrelo junto al minimapa, y reparte un presupuesto de 10 puntos de enfoque entre los tipos de componente que te interesen. Cada 5 puntos en un componente suben su nivel de recolección un paso (dos pasos como máximo), y cada punto añade un 10 por ciento a su rendimiento; los componentes sin enfoque se mantienen en su nivel base.\n\nTu asignación sigue a tu personaje a todas partes y puede reasignarse en cualquier visita posterior al pueblo, al ritmo que elijas. Tomarte tu tiempo es gratis: la reasignación tarda 1 minuto por cada punto que muevas. Pagar un poco la acelera, 15 segundos por punto más 5 de cobre y 1 Polvo de Carillón por punto, y pagar el importe completo la hace instantánea por 25 de cobre y 5 Polvo de Carillón por punto. Solo se cuentan los puntos que realmente mueves, así que ajustar un solo punto sale barato, y un panel que abres y cierras sin cambiar nada no cuesta nada en ningún nivel.',
   'guide.professions.harvestBodyFamilies':
     'La recolección no se limita a los nodos. Muchas bestias abatidas pueden cosecharse una sola vez, el primero en llegar, para obtener pieles, colmillos, garras, colmillos, cuernos, agallas, seda, veneno, tela y carne directamente del cadáver junto a su botín ordinario. La tecla de interacción solo toma el botín; cosechar es una elección aparte, que haces desde la sección Recolectar de la ventana de botín. Cuando una bestia porta más de un componente aprovechable, la elección es tuya: hazte con cuanto pueda dar, o concéntrate en menos componentes y obtén una calidad notablemente superior de lo que sí tomas.\n\nUna tirada de cosecha rara o mejor en una familia portadora de ejemplares también otorga un ejemplar perfecto firmado (una Piel Prístina, Seda Prístina, Glándula de Veneno Prístina, Garra Prístina o Corte Primo) además del rendimiento ordinario, y registra Espécimen Perfecto en tu Libro de Gestas. Cualquier personaje puede cosechar, sin necesidad de entrenamiento, y cualquier herramienta de recolección que poseas cuenta para el tramo de calidad superior, sea del oficio que sea.',
   'guide.professions.toolEffectsHeading': 'Efectos de herramienta',
@@ -4981,12 +4975,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2c2',
   'hudChrome.pvp.launcherTitle': 'JcJ',
   'hudChrome.pvp.mobileLabel': 'JcJ',
-  'hudChrome.townFocus.respecCostFree': 'Gratis',
-  'hudChrome.townFocus.respecCostLine': 'Cuesta {coin} y {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Instantáneo (coste completo)',
-  'hudChrome.townFocus.respecTierLabel': 'Velocidad de reespecialización',
-  'hudChrome.townFocus.respecTierPartialOption': 'Más rápido (coste pequeño)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Gratis (tómate tu tiempo)',
   'hudChrome.warfare.floatReasons.assist': 'Asistencia',
   'hudChrome.warfare.floatReasons.firstWin': 'Primera victoria',
   'hudChrome.warfare.floatReasons.kill': 'Baja',
@@ -5832,7 +5820,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Las especializaciones principales exigen un voto. Una afición solo pregunta hacia dónde vaga tu curiosidad, {playerName}. Recoge algunas hierbas y decide qué oficio, contrario a tus especializaciones principales, quieres desarrollar.',
   'entities.quests.q_prof_hobby_switch.title': 'Un Pasatiempo Diferente',
   'entities.quests.q_prof_intro.completion':
-    '¿Lo ves? Mineral recogido y callos en las manos. Sigue con la minería, la tala y la herboristería mientras recorres los caminos, y cuando estés de vuelta en el pueblo, fíjate en el Tablón de Enfoque junto al mercado y el banco de artesanía cercano. Hay un trato justo en cada parte, si lo quieres.',
+    '¿Lo ves? Mineral recogido y callos en las manos. Sigue con la minería, la tala y la herboristería mientras recorres los caminos, y cuando estés de vuelta en el pueblo, fíjate en el banco de artesanía junto al mercado. Hay un trato justo en cada parte, si lo quieres.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Veta de mineral extraída',
   'entities.quests.q_prof_intro.text':
     'Cada alma en Eastbrook trabaja un oficio además de la espada, {playerName}. Hay vetas de mineral en las rocas alrededor de la Excavación de Cobre, al noreste del pueblo y más allá de la Senda de lobos. Ve a golpear con el pico y trabaja 5 de ellas tú mismo; lo sabré.',
@@ -6465,14 +6453,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Más allá del combate y las misiones, el mundo te recompensa por trabajar la tierra y la fragua: recolectar materias primas, convertirlas en equipo y bienes a lo largo de diez oficios de artesanía, y asentarte en una identidad como uno de los diez arquetipos que esos oficios representan.',
   'hudChrome.mobile.dailyRewards': 'Tienda',
   'hudChrome.perf.labels.predLead': 'Adelanto de predicción',
-  'hudChrome.townFocus.budgetLabel': 'Puntos restantes: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Reducir el enfoque en {component}',
-  'hudChrome.townFocus.hint':
-    'Los puntos de enfoque añaden una bonificación sobre el rendimiento base de cada componente. Los componentes sin enfoque se mantienen en el nivel base.',
-  'hudChrome.townFocus.increaseAria': 'Aumentar el enfoque en {component}',
-  'hudChrome.townFocus.notInTownHint': 'Debes estar en el pueblo para fijar tu enfoque.',
-  'hudChrome.townFocus.saveButton': 'Guardar enfoque',
-  'hudChrome.townFocus.title': 'Enfoque del pueblo',
   'hudChrome.archetypeTitle.none': 'Ninguno',
   'entities.itemSets.crownforged.bonus4':
     'Tus golpes críticos con el arma astillan al objetivo con Astilla de Hueso, haciéndolo sangrar 8 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.',
@@ -14708,9 +14688,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Formas de druida',
   'guide.nav.sidebarLabel': 'Temas de la guía',
   'guide.professions.craftHowTitle': 'La ventana de artesanía',
-  'guide.professions.focusBody':
-    'Cada pueblo principal mantiene un panel de Enfoque del pueblo para los recolectores de paso: párate en el pueblo, ábrelo junto al minimapa y dirige un pequeño presupuesto de puntos de enfoque hacia los tipos de componente que te interesan. Cuanto más enfoque des a un componente, más fino y rico saldrá de cada cadáver posterior; tu asignación acompaña a tu personaje dondequiera que vaya, y puedes reajustarla, gratis, en cualquier visita posterior al pueblo.',
-  'guide.professions.focusTitle': 'Enfoque del pueblo',
   'guide.professions.harvestTitle': 'Cosechar la propia cacería',
   'guide.search.typeAbility': 'Habilidad',
   'guide.search.typeDeed': 'Gesta',
@@ -16248,10 +16225,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'Ocultar miembros desconectados de la hermandad',
   'hudChrome.social.offlineHeader': 'Desconectados ({n})',
   'hudChrome.social.onlineHeader': 'En línea ({n})',
-  'hudChrome.townFocus.tierHint':
-    'Cada {points} puntos en un componente suben su nivel de recolección un paso, hasta {steps} pasos; menos de {points} puntos aún mejoran el rendimiento.',
-  'hudChrome.townFocus.townOnlyHint':
-    'El enfoque solo puede cambiarse mientras estés en el pueblo.',
   'hudChrome.unbind.cannotAfford': 'No puedes permitirte la tarifa de desvinculación.',
   'hudChrome.unbind.close': 'Cerrar desvinculación',
   'hudChrome.unbind.confirmBody': '¿Desvincular {name} por {fee}?',
@@ -17300,7 +17273,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': '¿Por qué mi recolección se volvió más lenta de repente?',
   'guide.profPages.faq.q8': '¿Puedo crear objetos lejos del pueblo?',
   'guide.profPages.faq.a3':
-    'Son dos acciones distintas sobre el mismo cadáver. Todo lo que un cadáver contiene, monedas y botín más cualquier componente recolectable, se abre en la misma ventana, pero la tecla de interacción y Tomar botín solo recogen el botín ordinario, que sigue las reglas normales de botín. La recolección es el lado de los oficios, extrayendo materiales del cadáver mismo, y solo ocurre cuando eliges Recolectar en esa ventana.\n\nLa recolección es de primero en llegar, de uso único: cada cadáver puede recolectarse exactamente una vez, por quien lo reclame primero, incluidos los que están en línea. Tu Enfoque del Pueblo determina lo que obtienes: mientras estés en un pueblo principal puedes distribuir 10 puntos de enfoque entre los tipos de componente que te interesan, y cada componente enfocado saca un nivel mejor (cada 5 puntos lo sube un escalón, como máximo dos escalones) y rinde más (10 por ciento por punto). Los componentes sin enfoque nunca empeoran.',
+    'Son dos acciones distintas sobre el mismo cadáver. Todo lo que un cadáver contiene, monedas y botín más cualquier componente recolectable, se abre en la misma ventana, pero la tecla de interacción y Tomar botín solo recogen el botín ordinario, que sigue las reglas normales de botín. La recolección es el lado de los oficios, extrayendo materiales del cadáver mismo, y solo ocurre cuando eliges Recolectar en esa ventana.\n\nLa recolección es de primero en llegar, de uso único: cada cadáver puede recolectarse exactamente una vez, por quien lo reclame primero, incluidos los que están en línea.',
   'guide.profPages.faq.a4':
     'Has encontrado una veta excepcional. Aproximadamente 1 de cada 90 recolecciones activa un hallazgo raro: duramen ancestral en árboles, una veta prístina en menas o una flor iluminada por la luna en hierbas. Multiplica por cinco la cantidad, firma cada unidad con tu nombre y anuncia el hallazgo en toda la zona. Una recolección normal cuya calidad resulte rara o superior también firma su producción.\n\nConviene guardar los materiales firmados o venderlos caros: tener cualquier unidad firmada de un reactivo necesario en tus bolsas o en la Bóveda de Materiales, donde la fabricación pueda utilizarla, añade 2 puntos porcentuales a la probabilidad de obra maestra. Pueden compartir una pila compatible con material sin firmar o de otros recolectores y firmantes sin perder ninguna marca: cada origen y cantidad se conservan por separado.',
   'guide.profPages.faq.a5':

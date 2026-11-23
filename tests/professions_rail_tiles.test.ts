@@ -193,10 +193,8 @@ describe('both tiles hydrate and stay under the rail height budget', () => {
     }
   });
 
-  it('pins the professions column and fits the height budget with Town Focus visible', () => {
-    // Cosmetics sits beside the shop in col-b. Town Focus is hidden in
-    // markup but the HUD reveals it in town, so budget for that extra tile
-    // alongside the default professions column. The authored pixel ceilings
+  it('pins the professions column and fits the height budget', () => {
+    // Cosmetics sits beside the shop in col-b. The authored pixel ceilings
     // remain those guarded against CSS in crafting_launcher.test.ts.
     const UNCOMPACTED_MICRO_PLUS_GAP_PX = 34;
     const COMPACT_MICRO_PLUS_GAP_PX = 25;
@@ -233,15 +231,17 @@ describe('both tiles hydrate and stay under the rail height budget', () => {
       );
       expect(colB.indexOf('id="mm-cosmetics"'), name).toBeLessThan(colB.indexOf('id="mm-arena"'));
       expect(html.match(/id="mm-cosmetics"/g), name).toHaveLength(1);
-      const townFocus = buttons.filter((b) => /id="mm-town-focus"/.test(b));
-      expect(townFocus, name).toHaveLength(1);
-      const townVisibleCount = visible.length + townFocus.length;
+      // Town Focus was removed from the game: no rail tile may carry its id.
       expect(
-        townVisibleCount * UNCOMPACTED_MICRO_PLUS_GAP_PX + BOTTOM_ANCHOR_PX,
+        buttons.filter((b) => /id="mm-town-focus"/.test(b)),
+        name,
+      ).toHaveLength(0);
+      expect(
+        visible.length * UNCOMPACTED_MICRO_PLUS_GAP_PX + BOTTOM_ANCHOR_PX,
         name,
       ).toBeLessThanOrEqual(UNCOMPACTED_BUDGET_PX);
       expect(
-        townVisibleCount * COMPACT_MICRO_PLUS_GAP_PX + BOTTOM_ANCHOR_PX,
+        visible.length * COMPACT_MICRO_PLUS_GAP_PX + BOTTOM_ANCHOR_PX,
         name,
       ).toBeLessThanOrEqual(COMPACT_BUDGET_PX);
     }

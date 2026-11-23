@@ -153,9 +153,9 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 // q_boars kill loot, webwood_silk via q_spiders, widow_venom_sac via q_widows)
 // keep their quest roles only.
 //
-// ORDER IS A SAVE CONTRACT: TOWN_FOCUS_COMPONENTS (../professions/focus.ts) is
-// Object.keys of this table, in this order, and the Town Focus panel renders
-// its rows in that order, so new families are APPENDED, never inserted.
+// Object.keys of this table, in this order, is the family roster the
+// harvest and preference surfaces walk, so new families are APPENDED, never
+// inserted.
 export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
   hide: 'rough_hide',
   fang: 'wolf_fang',

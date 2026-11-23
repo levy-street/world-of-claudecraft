@@ -692,7 +692,6 @@ export const table: DeedLocaleTable = {
     name: '고룡의 보물더미',
     desc: '통산 100골드의 돈을 전리품으로 획득하십시오.',
   },
-  soc_civic_duty: { name: '시민의 의무', desc: '첫 마을 중점 포인트를 배분하십시오.' },
   exp_long_road_north: {
     name: '북으로 가는 먼 길',
     desc: '세 거점 정착지를 모두 방문하십시오: 이스트브룩, 펜브리지, 하이워치.',

@@ -105,7 +105,8 @@ describe('referral receipt growth follows permanent bag custody', () => {
     const saved = roundTrip(state);
     expect(saved.referralRewards).toEqual(state.referralRewards);
     expect(roundTrip(saved)).toEqual(saved);
-    expect(Buffer.byteLength(JSON.stringify(saved))).toBe(21685);
+    // 15 bytes lighter since Town Focus left the game (2026-11-04): the empty townFocus blob row is gone.
+    expect(Buffer.byteLength(JSON.stringify(saved))).toBe(21670);
     expect(Buffer.byteLength(JSON.stringify(referralRewardState(saved)))).toBe(7973);
     expect(() => grantReferralReward(saved, MAX_LINK_ID - 284, 'tutorial')).toThrow('capacity');
     expect(grantReferralReward(saved, MAX_LINK_ID, 'tutorial')).toBe(saved);
@@ -140,7 +141,7 @@ describe('referral receipt growth follows permanent bag custody', () => {
     expect(saved.buddies?.owned).toEqual(['sprites']);
     expect(grantReferralInviterReward(saved, 5)).toBe(saved);
     expect(roundTrip(saved)).toEqual(saved);
-    expect(Buffer.byteLength(JSON.stringify(saved))).toBe(21780);
+    expect(Buffer.byteLength(JSON.stringify(saved))).toBe(21765);
     expect(Buffer.byteLength(JSON.stringify(referralRewardState(saved)))).toBe(7972);
     process.stdout.write(
       `[referral-inviter-custody-growth] ${JSON.stringify({ receipts: 283, bytes: Buffer.byteLength(JSON.stringify(saved)), ledgerBytes: Buffer.byteLength(JSON.stringify(referralRewardState(saved))) })}\n`,

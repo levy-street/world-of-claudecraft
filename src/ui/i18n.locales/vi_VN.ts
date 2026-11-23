@@ -1061,10 +1061,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tăng sát thương gây cho người chơi khác {increase}% và giảm sát thương nhận từ người chơi khác {reduction}%. Cũng tăng sức khỏe tối đa của bạn {health}% ở mọi nơi ngoại trừ các ngục tối, đột kích, sâu và vết nứt.',
   'hudChrome.statInfo.names.spellCrit': 'Phép Thuật Tấn Công Quan Trọng',
   'hudChrome.targetAuras.close': 'Đóng cửa sổ hào quang mục tiêu',
-  'hudChrome.townFocus.pendingLine':
-    'Đã lưu. Tái chỉ định của bạn cho cấp phát này hoàn thành trong {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    'Tiêu điểm tăng mức độ và lượng những gì bạn thu hoạch. Để chỉ thu hoạch một vật liệu, hãy đặt Tùy Chọn Thu Hoạch từ Bộ Công Cụ Đồng Quê hoặc cửa sổ Nghề Thủ Công.',
   'hudChrome.trade.offerQuantityAll': 'Cung Cấp Tất Cả',
   'hudChrome.trade.offerQuantityConfirm': 'Cung Cấp',
   'hudChrome.trade.offerQuantityHint': 'Bạn sẽ được hỏi bao nhiêu để cung cấp',
@@ -4161,8 +4157,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bạn không cần phải tự mắt tìm những thứ này. Mọi điểm tài nguyên trong vùng đều được vẽ trên bản đồ vùng ở bất cứ nơi nào bản đồ hiển thị mặt đất đó, và trên bản đồ nhỏ khi bạn đi ngang qua nó, nên một vòng cày nông sản có thể được lên kế hoạch ngay từ màn hình bản đồ trước khi bạn xuất phát. Một điểm tài nguyên mà công cụ của bạn chưa thể khai thác được đánh dấu chứ không bị ẩn đi: nó vẫn giữ vị trí của mình với một dấu gạch mờ, để bạn có thể thấy mảnh đất mình đang luyện tới. Trên máy tính, rê chuột qua một mạch, bãi, hoặc bụi ngoài thế giới sẽ gọi tên nó, cho bạn biết công cụ nó cần, và, một khi bạn đã khai thác nó, đếm ngược thời gian hồi sinh của riêng bạn chính xác đến từng giây. Trên cảm ứng thì không có gì để rê chuột qua, nên các dấu trên bản đồ nhỏ kể lại đúng câu chuyện đó.',
   'guide.profPages.specimenBodyFamilies':
     'Hãy chừa sẵn một chút chỗ trống trong túi khi bạn cày cuốc: một mẻ trúng lớn có dấu thợ cần một ô trống riêng hoặc một chồng có dấu thợ trùng khớp để rơi vào, và nếu không có chỗ nào vừa thì sản lượng vẫn về tay bạn nhưng dấu thợ sẽ mất. Thu hoạch xác cũng có nhánh trúng lớn của riêng nó: khoảng {pct}% mỗi thành phần thu hoạch được sẽ ra phẩm chất hiếm trở lên. Một nhóm có mẫu vật hoàn hảo để trao (da, tơ, nọc độc, móng vuốt, thịt) giữ nguyên sản lượng thường của nó và đúc thêm mẫu vật có dấu thợ bên cạnh; năm nhóm còn lại, nanh, vải, ngà, sừng, và mang, đóng dấu ngay lên chính sản lượng đó.',
-  'guide.professions.focusBodyTiers':
-    'Mỗi thị trấn trung tâm đều có một bảng Trọng Tâm Thị Trấn dành cho những người thu hoạch ghé qua: đứng trong thị trấn, mở nó từ cạnh bản đồ nhỏ, và dồn một ngân sách 10 điểm trọng tâm vào các loại thành phần bạn quan tâm. Mỗi 5 điểm dồn vào một thành phần nâng bậc thu hoạch của nó lên một bước (tối đa hai bước), và mỗi điểm cộng thêm 10 phần trăm sản lượng của nó; thành phần không được dồn trọng tâm không bao giờ bị giảm.\n\nPhân bổ của bạn đi theo nhân vật đến bất cứ đâu và có thể được đặt lại trong bất kỳ lần ghé thị trấn nào sau này, theo tốc độ bạn chọn. Cứ từ từ thì hoàn toàn miễn phí: việc đặt lại chạy trong 1 phút cho mỗi điểm bạn di chuyển. Trả một chút để tăng tốc, 15 giây mỗi điểm cộng 5 đồng và 1 Bụi Thanh Âm mỗi điểm, và trả đủ sẽ làm điều đó tức thì với giá 25 đồng và 5 Bụi Thanh Âm mỗi điểm. Chỉ những điểm bạn thực sự di chuyển mới được tính, nên nhích một điểm duy nhất rất rẻ, và mở rồi đóng bảng mà không thay đổi gì thì không tốn gì ở bất kỳ mức nào.',
   'guide.professions.harvestBodyFamilies':
     'Thu hoạch không chỉ dừng lại ở các điểm tài nguyên. Nhiều loài thú bị hạ có thể được thu hoạch một lần cho mỗi con, ai đến trước được trước, để lấy da, nanh, móng vuốt, ngà, sừng, mang, tơ, nọc độc, vải, và thịt, ngay từ xác cùng với chiến lợi phẩm thông thường của nó. Phím tương tác chỉ lấy chiến lợi phẩm; thu hoạch là một lựa chọn riêng, thực hiện từ mục Thu Hoạch trong cửa sổ chiến lợi phẩm. Khi một con thú mang nhiều hơn một thành phần có thể thu hoạch, lựa chọn là của bạn: lấy hết mọi thứ nó có thể cho, hoặc tập trung vào ít thành phần hơn để lấy được một bậc phẩm chất rõ rệt tinh hơn.\n\nMột lượt tung thu hoạch phẩm chất hiếm trở lên trên một nhóm có mẫu vật hoàn hảo cũng trao thêm một mẫu vật hoàn hảo có dấu thợ (Da nguyên vẹn, Tơ lụa nguyên sơ, Tuyến nọc độc nguyên sơ, Móng Vuốt Nguyên Vẹn, hoặc Cắt Prime) bên trên sản lượng thông thường, và ghi lại Mẫu Vật Hoàn Hảo vào Sách Kỳ Công của bạn. Bất kỳ nhân vật nào cũng có thể thu hoạch, không cần huấn luyện, và bất kỳ công cụ thu hoạch nào bạn sở hữu cũng được tính vào nhánh cao cấp này, bất kể thuộc nghề nào.',
   'guide.professions.toolEffectsHeading': 'Hiệu Ứng Công Cụ',
@@ -5108,12 +5102,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Miễn Phí',
-  'hudChrome.townFocus.respecCostLine': 'Tốn {coin} và {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Tức thời (đầy đủ chi phí)',
-  'hudChrome.townFocus.respecTierLabel': 'Tốc Độ Đặt Lại',
-  'hudChrome.townFocus.respecTierPartialOption': 'Nhanh hơn (chi phí nhỏ)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Miễn phí (cứ từ từ)',
   'hudChrome.warfare.floatReasons.assist': 'Hỗ Trợ',
   'hudChrome.warfare.floatReasons.firstWin': 'Chiến Thắng Đầu Tiên',
   'hudChrome.warfare.floatReasons.kill': 'Hạ Gục',
@@ -5871,7 +5859,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chuyên ngành đòi hỏi lời thề. Sở thích chỉ hỏi sự tò mò của bạn đi đâu, {playerName}. Hãy hái một ít thảo dược và quyết định kỹ nghệ nào đối diện với chuyên ngành của bạn mà bạn muốn theo đuổi.',
   'entities.quests.q_prof_hobby_switch.title': 'Một Đam Mê Khác',
   'entities.quests.q_prof_intro.completion':
-    'Thấy chưa? Quặng đã thu thập và tay đã có vết chai. Tiếp tục khai thác mỏ, chặt gỗ và hái thảo dược khi bạn đi trên đường, và khi trở lại thị trấn, chú ý đến bảng Trọng Tâm Thị Trấn gần chợ và bàn thủ công gần đó. Có một giao dịch công bằng chờ đợi trong tất cả, nếu bạn muốn.',
+    'Thấy chưa? Quặng đã thu thập và tay đã có vết chai. Tiếp tục khai thác mỏ, chặt gỗ và hái thảo dược khi bạn đi trên đường, và khi trở lại thị trấn, chú ý đến bàn thủ công gần chợ. Có một giao dịch công bằng chờ đợi trong tất cả, nếu bạn muốn.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Mỏ quặng đã khai thác',
   'entities.quests.q_prof_intro.text':
     'Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía đông bắc thị trấn, qua khỏi khu vực sói chạy. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.',
@@ -6570,18 +6558,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Ngoài chiến đấu và nhiệm vụ, thế giới còn tưởng thưởng cho bạn khi cày cuốc và rèn đúc: thu thập nguyên liệu thô, biến chúng thành trang bị và hàng hóa qua mười nghề chế tác, và an cư trong một danh phận là một trong mười hình mẫu mà các nghề ấy đại diện.',
   'hudChrome.mobile.dailyRewards': 'Cửa hàng',
   'hudChrome.perf.labels.predLead': 'Độ Sớm Dự Đoán',
-  'hudChrome.townFocus.budgetLabel': 'Điểm còn lại: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Giảm trọng tâm cho {component}',
-  'hudChrome.townFocus.hint':
-    'Điểm trọng tâm cộng thêm một khoản trên mức sản lượng cơ bản của từng hạng mục. Hạng mục không được dồn trọng tâm giữ nguyên mức cơ bản.',
-  'hudChrome.townFocus.increaseAria': 'Tăng trọng tâm cho {component}',
-  'hudChrome.townFocus.notInTownHint': 'Bạn phải ở trong thị trấn để đặt trọng tâm.',
-  'hudChrome.townFocus.saveButton': 'Lưu Trọng Tâm',
-  'hudChrome.townFocus.tierHint':
-    'Mỗi {points} điểm vào một hạng mục nâng bậc thu hoạch lên một bước, tối đa {steps} bước; ít hơn {points} điểm vẫn tăng sản lượng.',
-  'hudChrome.townFocus.title': 'Trọng Tâm Thị Trấn',
-  'hudChrome.townFocus.townOnlyHint':
-    'Trọng tâm chỉ có thể thay đổi khi bạn đang ở trong thị trấn.',
   'hudChrome.archetypeTitle.none': 'Không có',
   'entities.itemSets.crownforged.bonus4':
     'Các đòn chí mạng bằng vũ khí của bạn găm Dằm Xương vào mục tiêu, khiến nó chảy máu nhận 8 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.',
@@ -14140,9 +14116,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Hình Dạng Druid',
   'guide.nav.sidebarLabel': 'Chủ đề hướng dẫn',
   'guide.professions.craftHowTitle': 'Cửa sổ chế tác',
-  'guide.professions.focusBody':
-    'Mỗi thị trấn trung tâm đều có một bảng Trọng Tâm Thị Trấn dành cho những người thu hoạch ghé qua: đứng trong thị trấn, mở nó từ cạnh bản đồ nhỏ, và nhắm một khoản nhỏ điểm trọng tâm vào những loại thành phần bạn quan tâm. Bạn dồn càng nhiều trọng tâm vào một thành phần, nó ra càng tinh và càng dồi dào từ mỗi cái xác về sau; phân bổ của bạn đi theo nhân vật dù họ rong ruổi đến đâu, và bạn có thể sắp xếp lại nó, miễn phí, trong bất kỳ lần ghé thị trấn nào sau này.',
-  'guide.professions.focusTitle': 'Trọng Tâm Thị Trấn',
   'guide.professions.harvestTitle': 'Thu hoạch chính cuộc đi săn',
   'guide.search.typeAbility': 'Kỹ Năng',
   'guide.search.typeDeed': 'Kỳ Công',
@@ -17105,7 +17078,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Tại sao việc thu hoạch của tôi đột nhiên chậm lại?',
   'guide.profPages.faq.q8': 'Tôi có thể chế tác khi không ở trong thị trấn không?',
   'guide.profPages.faq.a3':
-    'Đó là hai hành động riêng biệt trên cùng một cái xác. Mọi thứ xác mang theo, tiền vàng và đồ rơi cùng với các thành phần có thể thu hoạch, mở ra trong cùng một cửa sổ, nhưng phím tương tác và Nhặt Chiến Lợi Phẩm chỉ lấy phần chiến lợi phẩm thông thường, vốn theo các quy tắc loot thông thường. Thu hoạch là phía nghề nghiệp, tước nguyên liệu từ chính cái xác, và chỉ xảy ra khi bạn chọn Thu Hoạch trong cửa sổ đó.\n\nThu hoạch là người đến trước, dùng một lần: mỗi xác chỉ có thể được thu hoạch đúng một lần, bởi người đầu tiên đến nhận, có mặt trực tuyến hay không. Trọng Tâm Thị Trấn của bạn quyết định những gì bạn nhận được: khi đứng trong trung tâm thị trấn, bạn có thể phân bổ 10 điểm trọng tâm cho các loại thành phần bạn quan tâm, và mỗi thành phần được trọng tâm nhận được bậc tốt hơn (cứ 5 điểm tăng một bậc, tối đa hai bậc) và nhiều hơn (10 phần trăm mỗi điểm). Các thành phần không được trọng tâm không bao giờ bị làm tệ đi.',
+    'Đó là hai hành động riêng biệt trên cùng một cái xác. Mọi thứ xác mang theo, tiền vàng và đồ rơi cùng với các thành phần có thể thu hoạch, mở ra trong cùng một cửa sổ, nhưng phím tương tác và Nhặt Chiến Lợi Phẩm chỉ lấy phần chiến lợi phẩm thông thường, vốn theo các quy tắc loot thông thường. Thu hoạch là phía nghề nghiệp, tước nguyên liệu từ chính cái xác, và chỉ xảy ra khi bạn chọn Thu Hoạch trong cửa sổ đó.\n\nThu hoạch là người đến trước, dùng một lần: mỗi xác chỉ có thể được thu hoạch đúng một lần, bởi người đầu tiên đến nhận, có mặt trực tuyến hay không.',
   'guide.profPages.faq.a4':
     'Bạn tìm được một mẻ thu hoạch lớn. Khoảng 1 trong 90 lần thu hoạch kích hoạt sự kiện thu thập hiếm: lõi gỗ cổ đại trong cây, mạch quặng nguyên sơ hoặc hoa tắm ánh trăng trong thảo dược. Sản lượng tăng gấp năm, từng đơn vị được ký tên bạn và phát hiện được thông báo khắp khu vực. Lần thu hoạch bình thường đạt chất lượng hiếm trở lên cũng ký tên toàn bộ sản lượng.\n\nNguyên liệu có chữ ký đáng để giữ hoặc bán giá cao: giữ bất kỳ đơn vị có chữ ký của nguyên liệu cần thiết trong túi hoặc Kho Nguyên Liệu, tại nơi chế tác có thể lấy dùng, sẽ cộng 2 điểm phần trăm vào tỉ lệ kiệt tác. Chúng có thể chung chồng tương thích với nguyên liệu không ký hoặc của người thu thập và người ký khác mà không mất dấu; mỗi nguồn và số lượng được lưu riêng.',
   'guide.profPages.faq.a5':

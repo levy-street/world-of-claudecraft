@@ -1133,10 +1133,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Augmente les dégâts infligés aux joueurs de {increase}% et réduit les dégâts subis de la part des joueurs de {reduction}%. Augmente aussi vos points de vie maximum de {health}% partout, sauf dans les donjons, les raids, les plongées et les failles.',
   'hudChrome.statInfo.names.spellCrit': 'Critique des sorts',
   'hudChrome.targetAuras.close': 'Fermer la fenêtre des auras de la cible',
-  'hudChrome.townFocus.pendingLine':
-    'Enregistré. Votre reconfiguration vers cette répartition se termine dans {time}.',
-  'hudChrome.townFocus.preferenceHint':
-    "Le Focus augmente la qualité et la quantité de ce que vous récoltez. Pour ne récolter qu'un seul matériau, définissez une Préférence de récolte depuis votre Kit de terrain ou la fenêtre des métiers.",
   'hudChrome.trade.offerQuantityAll': 'Tout proposer',
   'hudChrome.trade.offerQuantityConfirm': 'Proposer',
   'hudChrome.trade.offerQuantityHint': 'On vous demandera combien en proposer',
@@ -4335,8 +4331,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vous n'avez pas besoin de les repérer à l'œil. Chaque nœud de la zone est dessiné sur la carte de zone partout où elle montre ce terrain, et sur la minicarte à mesure que vous le croisez, si bien qu'une tournée de récolte peut se planifier depuis l'écran de carte avant même de partir. Un nœud que vos outils ne peuvent pas encore travailler est marqué plutôt que caché : il garde sa place avec une marque barrée et estompée, pour que vous voyiez le terrain vers lequel vous progressez. Sur ordinateur, survoler un filon, un bosquet ou une parcelle dans le monde le nomme, indique l'outil qu'il demande et, une fois que vous l'avez travaillé, décompte votre propre réapparition à la seconde près. Sur tactile, il n'y a rien à survoler, donc les repères de la minicarte racontent la même histoire.",
   'guide.profPages.specimenBodyFamilies':
     "Gardez un peu de place dans vos sacs quand vous farmez : une aubaine signée a besoin de son propre emplacement ou d'une pile signée identique où se poser, et si rien ne convient, le rendement arrive quand même mais la signature est perdue. Le dépeçage des cadavres a lui aussi son bras de jackpot : environ {pct}% de chaque composant dépecé sort rare ou mieux. Une famille qui a un spécimen parfait à offrir (peau, soie, venin, griffe, viande) garde son rendement ordinaire tel quel et frappe le spécimen signé à côté ; les cinq autres, croc, tissu, défense, corne et branchies, signent le rendement lui-même.",
-  'guide.professions.focusBodyTiers':
-    "Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte, et répartissez un budget de 10 points de focalisation entre les types de composants qui vous intéressent. Chaque tranche de 5 points sur un composant fait monter son palier de récolte d'un cran (deux crans au maximum), et chaque point ajoute 10 pour cent à son rendement ; les composants non focalisés ne sont jamais pénalisés.\n\nVotre répartition suit votre personnage partout et peut être réajustée lors de toute visite ultérieure en ville, au rythme que vous choisissez. Prendre votre temps est gratuit : le réajustement dure 1 minute par point déplacé. Payer un peu l'accélère, 15 secondes par point plus 5 cuivres et 1 Poussière carillon par point, et payer en totalité le rend instantané pour 25 cuivres et 5 Poussières carillon par point. Seuls les points réellement déplacés sont comptés, si bien qu'ajuster un seul point coûte peu, et un panneau ouvert puis refermé sans modification ne coûte jamais rien, quelle que soit la vitesse choisie.",
   'guide.professions.harvestBodyFamilies':
     "La récolte ne s'arrête pas aux nœuds. De nombreuses bêtes abattues peuvent être dépecées une fois chacune, premier arrivé premier servi, pour des peaux, crocs, griffes, défenses, cornes, branchies, soie, venin, tissu et viande, directement sur le cadavre en plus de son butin ordinaire. La touche d'interaction ne prend que le butin ; le dépeçage est un choix à part, que vous faites depuis la section Dépeçage de la fenêtre de butin. Lorsqu'une bête porte plus d'un composant exploitable, le choix vous appartient : prendre tout ce qu'elle peut donner, ou vous concentrer sur moins de composants et obtenir une qualité sensiblement meilleure de ce que vous prenez.\n\nUn jet de récolte rare ou mieux sur une famille porteuse de spécimens accorde également un spécimen parfait signé (une Peau immaculée, une Soie immaculée, une Glande à venin vierge, une Griffe immaculée, ou une Coupe privilégiée) en plus du rendement ordinaire, et consigne Un spécimen parfait dans votre Livre des hauts faits. N'importe quel personnage peut récolter, sans formation requise, et tout outil de récolte que vous possédez compte pour le bonus de prime, quel que soit le métier auquel il appartient.",
   'guide.professions.toolEffectsHeading': "Effets d'outil",
@@ -5308,12 +5302,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'JcJ',
   'hudChrome.pvp.mobileLabel': 'JcJ',
-  'hudChrome.townFocus.respecCostFree': 'Gratuit',
-  'hudChrome.townFocus.respecCostLine': 'Coûte {coin} et {materials}',
-  'hudChrome.townFocus.respecTierInstantOption': 'Instantanée (coût plein)',
-  'hudChrome.townFocus.respecTierLabel': 'Vitesse de modification',
-  'hudChrome.townFocus.respecTierPartialOption': 'Plus rapide (coût réduit)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Gratuite (prenez votre temps)',
   'hudChrome.warfare.floatReasons.assist': 'Assistance',
   'hudChrome.warfare.floatReasons.firstWin': 'Première victoire',
   'hudChrome.warfare.floatReasons.kill': 'Élimination',
@@ -6088,7 +6076,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les majeures exigent un serment. Un passe-temps ne demande qu'où votre curiosité vous mène, {playerName}. Récoltez quelques plantes et décidez quel métier opposé à vos majeures vous souhaitez poursuivre.",
   'entities.quests.q_prof_hobby_switch.title': 'Un autre passe-temps',
   'entities.quests.q_prof_intro.completion':
-    "Vous voyez ? Du minerai récolté et des callosités sur les mains. Continuez à miner, couper du bois et cueillir des plantes en parcourant les routes, et quand vous serez de retour en ville, consultez le panneau Focus du bourg près du marché et l'établi à proximité. Un bon échange vous y attend, si vous le souhaitez.",
+    "Vous voyez ? Du minerai récolté et des callosités sur les mains. Continuez à miner, couper du bois et cueillir des plantes en parcourant les routes, et quand vous serez de retour en ville, consultez l'établi près du marché. Un bon échange vous y attend, si vous le souhaitez.",
   'entities.quests.q_prof_intro.objectives.0.label': 'Filon de minerai récolté',
   'entities.quests.q_prof_intro.text':
     "Chaque âme à Eastbrook exerce un métier en plus de l'épée, {playerName}. Il y a des filons de minerai dans les rochers autour de la Mine de cuivre, au nord-est de la ville, au-delà de la Piste des loups. Allez manier un pic et travailler 5 d'entre eux de vos propres mains ; je verrai la différence.",
@@ -7171,18 +7159,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Au-delà des combats et des quêtes, le monde vous récompense de travailler la terre et la forge : récolter des matières premières, les transformer en équipement et en biens à travers dix métiers d'artisanat, et vous installer dans une identité, celle de l'un des dix archétypes que ces métiers incarnent.",
   'hudChrome.mobile.dailyRewards': 'Boutique',
   'hudChrome.perf.labels.predLead': 'Avance de prédiction',
-  'hudChrome.townFocus.budgetLabel': 'Points restants : {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': 'Réduire la priorité de {component}',
-  'hudChrome.townFocus.hint':
-    'Les points de priorité ajoutent un bonus au rendement de base de chaque composante. Les composantes sans priorité restent au rendement de base.',
-  'hudChrome.townFocus.increaseAria': 'Augmenter la priorité de {component}',
-  'hudChrome.townFocus.notInTownHint': 'Vous devez être en ville pour définir vos priorités.',
-  'hudChrome.townFocus.saveButton': 'Enregistrer les priorités',
-  'hudChrome.townFocus.tierHint':
-    "Chaque {points} points sur un composant font monter son palier de récolte d'un cran, jusqu'à {steps} crans ; moins de {points} points boostent quand même le rendement.",
-  'hudChrome.townFocus.title': 'Priorités de la ville',
-  'hudChrome.townFocus.townOnlyHint':
-    'Le focus ne peut être modifié que lorsque vous êtes en ville.',
   'hudChrome.archetypeTitle.none': 'Aucun',
   'entities.itemSets.crownforged.bonus4':
     "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
@@ -15729,9 +15705,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Chaque objet possède une qualité, et son nom prend la couleur correspondante afin que sa valeur soit lisible en un coup d’œil. Du plus courant au plus précieux :',
   'guide.gear.qualityCommon': 'Commun',
   'guide.professions.craftHowTitle': 'La fenêtre d’artisanat',
-  'guide.professions.focusTitle': 'Focalisation de la ville',
-  'guide.professions.focusBody':
-    'Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte et attribuez un petit capital de points aux types de composants qui vous intéressent. Plus un composant reçoit de focalisation, plus les dépouilles suivantes en fournissent une version fine et abondante. Cette répartition suit votre personnage et peut être modifiée gratuitement lors de chaque visite en ville.',
   'hudChrome.auraEffect.battleStance': 'Posture de combat : 10% de génération de rage en plus',
   'hudChrome.auraEffect.berserkerStance':
     'Posture berserker : coups critiques 3% plus fréquents et 3% plus puissants',
@@ -17674,7 +17647,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Pourquoi ma récolte a-t-elle soudainement ralenti ?',
   'guide.profPages.faq.q8': 'Puis-je fabriquer loin de la ville ?',
   'guide.profPages.faq.a3':
-    "Ce sont deux actions distinctes sur le même corps. Tout ce qu'un cadavre contient, pièces et butins plus tout composant récoltable, s'ouvre dans la même fenêtre, mais la touche d'interaction et Prendre le butin ne ramassent que le butin ordinaire, qui suit les règles normales du butin. La récolte est le côté métiers, en retirant les matériaux du cadavre lui-même, et elle n'a lieu que lorsque vous choisissez Dépecer dans cette fenêtre.\n\nLa récolte est premier arrivé, usage unique : chaque cadavre ne peut être récolté qu'une seule fois, par celui qui le revendique en premier, en ligne compris. Votre Focus de ville détermine ce que vous obtenez : pendant que vous vous trouvez dans un centre de ville, vous pouvez répartir 10 points de Focus sur les types de composants qui vous intéressent, et chaque composant ciblé obtient un meilleur palier (chaque tranche de 5 points le fait monter d'un cran, au maximum deux crans) et un meilleur rendement (10 pour cent par point). Les composants non ciblés ne sont jamais pénalisés.",
+    "Ce sont deux actions distinctes sur le même corps. Tout ce qu'un cadavre contient, pièces et butins plus tout composant récoltable, s'ouvre dans la même fenêtre, mais la touche d'interaction et Prendre le butin ne ramassent que le butin ordinaire, qui suit les règles normales du butin. La récolte est le côté métiers, en retirant les matériaux du cadavre lui-même, et elle n'a lieu que lorsque vous choisissez Dépecer dans cette fenêtre.\n\nLa récolte est premier arrivé, usage unique : chaque cadavre ne peut être récolté qu'une seule fois, par celui qui le revendique en premier, en ligne compris.",
   'guide.profPages.faq.a4':
     'Vous avez fait une trouvaille exceptionnelle. Environ 1 récolte sur 90 déclenche un événement rare : du bois de cœur ancestral sur un arbre, un filon intact pour le minerai ou une fleur au clair de lune pour les plantes. Le rendement est multiplié par cinq, chaque unité porte votre signature et la découverte est annoncée dans toute la zone. Un jet de qualité rare ou supérieure lors d’une récolte ordinaire signe aussi le rendement.\n\nGardez les matériaux signés ou vendez-les cher : détenir un exemplaire signé d’un réactif requis dans vos sacs ou dans votre Réserve de matériaux, là où la fabrication peut y puiser, ajoute 2 points de pourcentage aux chances de chef-d’œuvre. Ils peuvent partager une pile compatible avec des matériaux non signés ou issus d’autres récolteurs et signataires sans perdre leurs marques ; chaque provenance et quantité reste conservée séparément.',
   'guide.profPages.faq.a5':

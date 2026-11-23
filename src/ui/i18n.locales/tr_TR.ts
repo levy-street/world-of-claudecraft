@@ -1069,10 +1069,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Oyunculara verilen hasarı {increase}% artırır ve oyunculardan alınan hasarı {reduction}% azaltır. Ayrıca maksimum sağlığını {health}% arttırır, ancak zindanlar, bölümler, derinlikler ve yarıklar hariç her yerde.',
   'hudChrome.statInfo.names.spellCrit': 'Büyü Kritik',
   'hudChrome.targetAuras.close': 'Hedef aurası penceresini kapat',
-  'hudChrome.townFocus.pendingLine':
-    'Kaydedildi. Yeniden özelleştirmen bu ayırmaya {time} içinde tamamlanıyor.',
-  'hudChrome.townFocus.preferenceHint':
-    'Focus, topladığın derecesini ve miktarını yükseltiyor. Yalnızca bir malzeme toplamak için, Hasat Tercihinizi Alan Kiti veya Meslekler penceresinden ayarlayın.',
   'hudChrome.trade.offerQuantityAll': 'Tümünü teklif et',
   'hudChrome.trade.offerQuantityConfirm': 'Teklif Et',
   'hudChrome.trade.offerQuantityHint': 'Kaç tane teklif edeceğin sorulacak',
@@ -4128,8 +4124,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bunları gözle bulmak zorunda değilsiniz. Bölgedeki her düğüm, haritanın o zemini gösterdiği her yerde bölge haritasında çizilidir, ve yanından geçtiğinizde minimapta da görünür, bu yüzden bir toplama turu yola çıkmadan önce harita ekranından planlanabilir. Aletlerinizin henüz işleyemediği bir düğüm gizlenmek yerine işaretlenir: üzeri çizili, soluk bir işaretle yerini korur, böylece hangi zemine doğru geliştiğinizi görebilirsiniz. Masaüstünde, dünyadaki bir damarın, ağaç kümesinin ya da ot öbeğinin üzerine gelmek onu adlandırır, istediği aleti söyler, ve onu işledikten sonra kendi yeniden oluşma sürenizi saniyesine kadar sayar. Dokunmatikte üzerine gelinecek bir şey olmadığından, minimap işaretleri aynı hikayeyi anlatır.',
   'guide.profPages.specimenBodyFamilies':
     "Toplayıcılık yaparken çantanızda biraz yer boş bırakın: imzalı bir talih vurgunu, inecek kendi yerini ya da eşleşen imzalı bir yığın ister; hiçbiri sığmazsa verim yine gelir ama imza kaybolur. Ceset hasatının da kendi ikramiye kolu vardır: hasat edilen her bileşenin yaklaşık {pct}%'i nadir veya üzeri çıkar. Verecek mükemmel bir numunesi olan bir aile (post, ipek, zehir, pençe, et) sıradan verimini sade tutar ve imzalı numuneyi onun yanında basar; diğer beşi, diş, kumaş, azı dişi, boynuz ve solungaç, verimin kendisini imzalar.",
-  'guide.professions.focusBodyTiers':
-    'Her merkez kasaba, uğrayan toplayıcılar için bir Kasaba Odağı paneli tutar: kasabada dur, onu mini haritanın yanından aç ve 10 odak puanından oluşan bir bütçeyi önemsediğin bileşen türlerine yay. Bir bileşendeki her 5 puan, hasat derecesini bir adım yükseltir (en fazla iki adım), ve her puan verimine yüzde 10 ekler; odaklanılmayan bileşenler asla kötüleşmez.\n\nDağılımın karakterini her yere takip eder ve kasabaya sonraki her uğrayışında, kendi seçtiğin bir hızda yeniden yönlendirilebilir. Acele etmemek ücretsizdir: yeniden yönlendirme, taşıdığın her puan için 1 dakika sürer. Biraz ödemek onu hızlandırır, puan başına 15 saniye artı 5 bakır ve 1 Çan Tozu, tam ödeme ise puan başına 25 bakır ve 5 Çan Tozu karşılığında anında yapar. Yalnızca gerçekten taşıdığın puanlar sayılır, bu yüzden tek bir puanı kıpırdatmak ucuzdur, ve değiştirmeden açıp kapattığın bir panel hiçbir kademede hiçbir şeye mal olmaz.',
   'guide.professions.harvestBodyFamilies':
     'Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; post, diş, pençe, azı dişi, boynuz, solungaç, ipek, zehir, kumaş ve et, cesedin olağan ganimetiyle birlikte doğrudan cesetten elde edilir. Etkileşim tuşu yalnızca yağmayı alır; toplama ayrı bir tercihtir ve yağma penceresindeki Toplama bölümünden yapılır. Bir canavar birden fazla işlenebilir bileşen taşıyorsa seçim sizindir: verebileceği her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nÖrnek taşıyan bir ailede nadir veya daha iyi bir hasat turu, olağan verimin üstüne imzalı mükemmel bir örnek de kazandırır (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi, Kusursuz Pençe ya da Birinci Kalite Et) ve Yiğitlikler Kitabınıza Mükemmel Örnek kaydeder. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti, hangi zanaata ait olursa olsun premium kolu sayılır.',
   'guide.professions.toolEffectsHeading': 'Alet etkileri',
@@ -5072,12 +5066,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.pvp.bracket2v2': '2v2',
   'hudChrome.pvp.launcherTitle': 'PvP',
   'hudChrome.pvp.mobileLabel': 'PvP',
-  'hudChrome.townFocus.respecCostFree': 'Ücretsiz',
-  'hudChrome.townFocus.respecCostLine': '{coin} ve {materials} tutar',
-  'hudChrome.townFocus.respecTierInstantOption': 'Anında (tam ücret)',
-  'hudChrome.townFocus.respecTierLabel': 'Sıfırlama Hızı',
-  'hudChrome.townFocus.respecTierPartialOption': 'Daha Hızlı (küçük ücret)',
-  'hudChrome.townFocus.respecTierTimeOption': 'Ücretsiz (acele etmeden)',
   'hudChrome.warfare.floatReasons.assist': 'Asist',
   'hudChrome.warfare.floatReasons.firstWin': 'İlk Galibiyet',
   'hudChrome.warfare.floatReasons.kill': 'Öldürme',
@@ -5832,7 +5820,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Ana dallar yemin ister. Bir hobi ise yalnızca merakının nereye gezindiğini sorar, {playerName}. Birkaç ot topla ve ana dallarının karşısındaki hangi zanaatı sürdürmek istediğine karar ver.',
   'entities.quests.q_prof_hobby_switch.title': 'Farklı Bir Uğraş',
   'entities.quests.q_prof_intro.completion':
-    'Gördün mü? Cevher toplandı ve ellerin nasırlandı. Yollarda gezerken madenciliğe, odun kesimine ve ot toplamaya devam et; kasabaya döndüğünde çarşının yanındaki Kasaba Odak Panosuna ve yakınındaki zanaat tezgahına dikkat et. İstersen hepsinde adil bir kazanç var.',
+    'Gördün mü? Cevher toplandı ve ellerin nasırlandı. Yollarda gezerken madenciliğe, odun kesimine ve ot toplamaya devam et; kasabaya döndüğünde çarşının yanındaki zanaat tezgahına dikkat et. İstersen hepsinde adil bir kazanç var.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Maden damarı işlendi',
   'entities.quests.q_prof_intro.text':
     "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın kuzeydoğusundaki, Kurt Koşusu'nun ötesindeki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
@@ -6509,17 +6497,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Dünya seni savaşın ve görevlerin ötesinde, toprağı ve ocağı işlediğin için de ödüllendirir: ham madde toplamak, on ayrı zanaat kolunda onları teçhizata ve mallara dönüştürmek ve bu zanaatların temsil ettiği on arketipten birinin kimliğine yerleşmek.',
   'hudChrome.mobile.dailyRewards': 'Mağaza',
   'hudChrome.perf.labels.predLead': 'Tahmin Avansı',
-  'hudChrome.townFocus.budgetLabel': 'Kalan puan: {remaining} / {budget}',
-  'hudChrome.townFocus.decreaseAria': '{component} odağını azalt',
-  'hudChrome.townFocus.hint':
-    'Odak puanları her bileşenin temel getirisinin üzerine bir bonus ekler. Odaklanılmayan bileşenler temel düzeyde kalır.',
-  'hudChrome.townFocus.increaseAria': '{component} odağını artır',
-  'hudChrome.townFocus.notInTownHint': 'Odağını ayarlamak için kasabada olmalısın.',
-  'hudChrome.townFocus.tierHint':
-    'Bir bileşene her {points} puan, hasat kademesini bir adım yükseltir, {steps} adıma kadar; {points} altı puanlar hâlâ verimi artırır.',
-  'hudChrome.townFocus.townOnlyHint': 'Odak yalnızca kasabadayken değiştirilebilir.',
-  'hudChrome.townFocus.saveButton': 'Odağı Kaydet',
-  'hudChrome.townFocus.title': 'Kasaba Odağı',
   'hudChrome.archetypeTitle.none': 'Yok',
   'entities.itemSets.crownforged.bonus4':
     "Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir.",
@@ -14215,9 +14192,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Fleet Formu',
   'guide.models.groupForms': 'Druid Formları',
   'guide.nav.sidebarLabel': 'Rehber konuları',
-  'guide.professions.focusBody':
-    'Her merkez kasaba, uğrayan toplayıcılar için bir Kasaba Odağı paneli tutar: kasabada dur, onu mini haritanın yanından aç ve küçük bir odak puanı bütçesini önemsediğin bileşen türlerine yönelt. Bir bileşene ne kadar çok odak verirsen, sonraki her cesetten o kadar ince ve zengin çıkar; dağılımın karakterini nereye giderse takip eder ve kasabaya sonraki her uğrayışında onu ücretsiz yeniden düzenleyebilirsin.',
-  'guide.professions.focusTitle': 'Kasaba Odağı',
   'guide.professions.harvestTitle': 'Avın kendisini hasat etmek',
   'guide.search.typeAbility': 'Yetenek',
   'guide.search.typeDeed': 'Yiğitlik',
@@ -17041,7 +17015,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': 'Toplamam neden aniden yavaşladı?',
   'guide.profPages.faq.q8': 'Kasabadan uzakta zanaat yapabilir miyim?',
   'guide.profPages.faq.a3':
-    'Bunlar aynı beden üzerinde iki ayrı eylemdir. Bir cesedin tuttuğu her şey, altın ve düşen eşyaların yanı sıra hasat edilebilir bileşenler, aynı pencerede açılır; ancak etkileşim tuşu ve Yağmayı Al yalnızca olağan yağmayı toplar ve bu yağma normal yağma kurallarını izler. Hasat ise meslek tarafıdır, malzemeleri cesetten soyar ve yalnızca o pencerede Topla seçtiğinizde gerçekleşir.\n\nHasat önce gelen tekil kullanımlıktır: her ceset tam olarak bir kez hasat edilebilir, çevrimiçi olup olmaksızın ilk kimin talep ettiği tarafından. Kasaba Odağınız ne aldığınızı şekillendirir: bir kasaba merkezinde dururken 10 odak puanını önem verdiğiniz bileşen türlerine dağıtabilirsiniz ve her odaklanmış bileşen daha iyi bir kademe atar (her 5 puan bir adım yükseltir, en fazla iki adım) ve daha fazla verir (puan başına yüzde 10). Odaklanmamış bileşenler asla kötüleştirilmez.',
+    'Bunlar aynı beden üzerinde iki ayrı eylemdir. Bir cesedin tuttuğu her şey, altın ve düşen eşyaların yanı sıra hasat edilebilir bileşenler, aynı pencerede açılır; ancak etkileşim tuşu ve Yağmayı Al yalnızca olağan yağmayı toplar ve bu yağma normal yağma kurallarını izler. Hasat ise meslek tarafıdır, malzemeleri cesetten soyar ve yalnızca o pencerede Topla seçtiğinizde gerçekleşir.\n\nHasat önce gelen tekil kullanımlıktır: her ceset tam olarak bir kez hasat edilebilir, çevrimiçi olup olmaksızın ilk kimin talep ettiği tarafından.',
   'guide.profPages.faq.a4':
     'Bolluk buldun. Yaklaşık 90 hasattan 1’i nadir toplama olayını tetikler: ağaçta kadim öz odun, cevherde kusursuz damar veya bitkide ay ışıklı çiçek. Verimi beşe katlar, her birimi adınla imzalar ve buluntuyu tüm bölgeye duyurur. Sıradan bir hasatta nadir veya daha iyi kalite gelmesi de verimi imzalar.\n\nİmzalı malzemeleri saklamak veya pahalı satmak değerlidir: gerekli bir reaktifin imzalı birimini çantalarında ya da üretimin erişebildiği Malzeme Kasanda bulundurmak, şaheser şansına 2 yüzde puanı ekler. İmzasız malzemelerle veya başka toplayıcı ve imzalayanların birimleriyle uyumlu bir yığını paylaşabilir, hiçbir işareti kaybetmezler; her kaynak ve miktarı ayrı tutulur.',
   'guide.profPages.faq.a5':

@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "caf53a89",
+      "state": "b2715f53",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -97,7 +97,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -177,7 +176,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "af980fef",
+      "state": "5abe73e1",
       "events": "a0080528",
       "rng": {
         "draws": 0,
@@ -258,7 +257,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -348,7 +346,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "7f85c589",
+      "state": "edeece73",
       "events": "f0f8e452",
       "rng": {
         "draws": 0,
@@ -429,7 +427,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -529,7 +526,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "3b1636e7",
+      "state": "d0352d39",
       "events": "f634704f",
       "rng": {
         "draws": 0,
@@ -612,7 +609,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -706,7 +702,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "eff3423c",
+      "state": "74c3f2ba",
       "events": "feb7a057",
       "rng": {
         "draws": 0,
@@ -796,7 +792,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "unlockedMilestones": [
             "__wq_claim__:wq1_0:wq_eastbrook_bandits"
           ],
@@ -906,7 +901,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "92c7f3a6",
+      "state": "7a0009a0",
       "events": "d41b4889",
       "rng": {
         "draws": 0,
@@ -1008,7 +1003,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "unlockedMilestones": [
             "__wq_claim__:wq1_0:wq_eastbrook_bandits",
             "__wq_claim__:wq1_0:wq_mirefen_gravecallers",
@@ -1136,7 +1130,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "5fba77a1",
+      "state": "83e3732f",
       "events": "2e968515",
       "rng": {
         "draws": 0,
@@ -1238,7 +1232,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1344,7 +1337,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "5fba77a1",
+      "state": "83e3732f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1446,7 +1439,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },

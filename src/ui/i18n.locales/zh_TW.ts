@@ -2853,9 +2853,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.warfareWithHealth':
     '對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。此外，在地城、團隊副本、秘探與裂隙以外的地方，你的最大生命值還會提高 {health}%。',
   'hudChrome.statInfo.names.spellCrit': '法術暴擊',
-  'hudChrome.townFocus.pendingLine': '已儲存。你重新分配至此配置將於 {time} 後完成。',
-  'hudChrome.townFocus.preferenceHint':
-    '專注會提高你採集到的品級與數量。若只想採集單一材料，請從你的野外工具包或專業視窗設定採集偏好。',
   'hudChrome.trinkets.scaled': '{base} (+{bonus})',
   'hudChrome.vehicle.wave': '波次 {wave}/{total}',
   'hudChrome.warfare.floatReasons.hill': '山丘',
@@ -5163,23 +5160,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '{material}不在這具屍體上。可用：{materials}。',
   'hudChrome.corpseHarvest.denial.bagsFull': '你的背包太滿，無法採集。',
   'hudChrome.corpseHarvest.denial.malformedInput': '出了點問題，請再試一次。',
-  'hudChrome.townFocus.title': '城鎮專注',
-  'hudChrome.townFocus.hint':
-    '專注點會在每種材料的基礎產出上疊加加成。未專注的材料保持基礎產出不變。',
-  'hudChrome.townFocus.tierHint':
-    '每在一種材料上投入{points}點專注，其採集品階就會提升一階，最多提升{steps}階；不足{points}點時仍會提高產出。',
-  'hudChrome.townFocus.townOnlyHint': '專注只能在城鎮中調整。',
-  'hudChrome.townFocus.budgetLabel': '剩餘點數：{remaining} / {budget}',
-  'hudChrome.townFocus.saveButton': '儲存專注',
-  'hudChrome.townFocus.notInTownHint': '你必須在城鎮中才能設定專注。',
-  'hudChrome.townFocus.increaseAria': '增加對{component}的專注',
-  'hudChrome.townFocus.decreaseAria': '減少對{component}的專注',
-  'hudChrome.townFocus.respecTierLabel': '重新分配速度',
-  'hudChrome.townFocus.respecTierTimeOption': '免費（花費時間）',
-  'hudChrome.townFocus.respecTierPartialOption': '更快（少量花費）',
-  'hudChrome.townFocus.respecTierInstantOption': '即時（全額花費）',
-  'hudChrome.townFocus.respecCostFree': '免費',
-  'hudChrome.townFocus.respecCostLine': '花費 {coin} 和 {materials}',
   'hudChrome.theme.preset': '介面主題',
   'hudChrome.theme.customColors': '自訂顏色',
   'hudChrome.theme.reset': '重設',
@@ -8455,7 +8435,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.text':
     '東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子東北方、過了狼徑之後的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。',
   'entities.quests.q_prof_intro.completion':
-    '看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的城鎮專注告示板和附近的製作台。只要你願意，這些手藝都能換來公道的生計。',
+    '看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的製作台。只要你願意，這些手藝都能換來公道的生計。',
   'entities.quests.q_prof_intro.objectives.0.label': '已開採礦脈',
   'entities.quests.q_farm_intro.title': '第一道犁溝',
   'entities.quests.q_farm_intro.text':
@@ -13675,9 +13655,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.professions.harvestTitle': '從狩獵本身採收',
   'guide.professions.harvestBodyChoice':
     '採集並不止於節點。許多被擊倒的野獸都可以各被採收一次，先到先得，取得獸皮、尖牙、絲線與獸肉，直接從屍體上與它的普通戰利品一併取得；按下同一個鍵，兩者一同開啟。當一頭野獸身上帶有不只一種可用部件時，選擇便由你決定：把它能給的一切盡數取走，或專注於較少的部件，換取你確實取得之物明顯更精細的品級。\n\n在會產出標本的野獸族類身上擲出精良或更高的採收品質，除了普通產出之外，還會額外給予一件署名的完美標本（完美的獸皮、完美的蜘蛛絲、完美的毒液腺或上等肉塊），並在你的功績之書中記下「完美標本」。任何角色都能採收，無需訓練，而你持有的任何採集工具都會計入最上等產出的判定，無論它屬於哪一門行業。',
-  'guide.professions.focusTitle': '城鎮專注',
-  'guide.professions.focusBody':
-    '每座主據點城鎮都為到訪的採收者備有一面城鎮專注面板：站在鎮上，從小地圖旁打開它，把一小筆專注點數投向你在意的部件類型。此後每具屍體上的專注部件都會精細一個品級、也略微豐厚一些；你的分配會跟著角色走遍天涯，而且日後任何一次回到鎮上，都能免費重新調整。',
   'guide.professions.craftMasteryTitle': '技能與精通',
   'guide.professions.craftMasteryBody':
     '成功製作會提升你在該行業的技能，而技能從不會把行業的配方鎖起來：只要你會某個配方並持有其材料，就能嘗試製作。每個配方產出的都是它所承諾的那件成品，而熟練的手藝偶爾能打造出一件傑作：同樣的成品，做工更精，並蘊含一絲額外的力量。唯一的例外是組合配方：只有調諧到連接這兩門行業的原型、並在兩門行業都證明過技藝的製作者，才能使用它們。',
@@ -19107,8 +19084,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你不必靠眼睛去找這些節點。只要地圖顯示到那塊地面，該區域中的每一處節點都會畫在區域地圖上，你經過時也會出現在小地圖上，所以出發之前就能在地圖畫面上規劃好一趟採集路線。你的工具還處理不了的節點會被標示出來，而不是被藏起來：它會以一個劃掉、變暗的標記留在原位，讓你看見自己正朝著什麼樣的地面練上去。在桌機上，把游標移到世界裡的礦脈、樹叢或草叢上，會說出它的名字、告訴你它需要哪一種工具，而在你採過它之後，還會為你自己的重生倒數到秒。觸控裝置上沒有東西可以懸停，因此改由小地圖上的標記來講同一件事。',
   'guide.profPages.specimenBodyFamilies':
     '採集時記得多留一點背包空間：一份署名的意外之財需要屬於自己的空位，或一疊相符的署名堆疊來承接，若什麼都放不下，產出仍會送達，但署名就此消失。屍體採收也有自己的頭獎機制：每一種採收部件約有 {pct}% 會擲出精良或更高的品質。有完美標本可給的族類（獸皮、蛛絲、毒液、爪、肉）會讓普通產出保持素面，另外在旁邊鑄出署名的標本；其餘五種，尖牙、布料、獠牙、獸角與魚鰓，則直接把署名打在產出本身上。',
-  'guide.professions.focusBodyTiers':
-    '每座主據點城鎮都為到訪的採收者備有一面城鎮專注面板：站在鎮上，從小地圖旁打開它，把 10 點專注點數分配到你在意的部件類型上。某個部件每投入 5 點，它的採收品級就提升一階（最多兩階），而每 1 點都會為它的產量再添 10 個百分點；未受專注的部件絕不會因此變差。\n\n你的分配會跟著角色走遍天涯，日後任何一次回到鎮上都能重新調整，快慢由你決定。慢慢來是免費的：你每移動 1 點，重新分配就進行 1 分鐘。付一點錢可以加快，每點 15 秒外加 5 銅與 1 個鈴音之塵；全額付款則讓它立即完成，每點 25 銅與 5 個鈴音之塵。只有你實際移動的點數才會計算，所以微調一點很便宜，而打開面板卻什麼都沒改就關掉，在任何檔位下都不花一毛錢。',
   'guide.professions.endgameHeading': '大師鍛造終局',
   'guide.professions.endgameBody':
     '每門手藝的訓練師階梯之上，都坐落著同一座峰頂：大師鍛造家族，也就是裝備與物品頁面所述、帶著金色「裝備唯一：大師鍛造」標籤的製造裝備。無論哪門手藝攀登，這條鏈都是同一個形狀：頂級圖樣靠尋獲而非傳授，按日限定的中間製作為整件事定下節奏，三種共享材料供每架階梯取用。成品像任何其他製造品一樣自由交易（交易規則載於製作經濟頁面），而兩件的穿戴上限讓它們是配裝上的點睛，而非整套行頭，所以從不踏足最深終局的工匠，照樣把貨賣給住在那裡的人。',
@@ -20207,7 +20182,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': '我的採集怎麼突然變慢了？',
   'guide.profPages.faq.q8': '離開城鎮還能製作嗎？',
   'guide.profPages.faq.a3':
-    '這是對同一具屍體的兩個獨立操作。屍體身上的一切，金幣與掉落物，加上任何可採收的部件，都在同一個視窗中開啟，但互動鍵與「拾取戰利品」只會取走普通戰利品，它照一般的拾取規則走。採收則是專業這一側，直接從屍身上剝下材料，只有當你在那個視窗中選擇「採集」時才會發生。\n\n採收先到先得，而且只有一次：每具屍體恰好只能被採收一次，由最先取得它的人採收，線上模式亦然。你的城鎮專注決定你拿到什麼：站在主據點城鎮裡，你可以把10點專注點數分配到你在意的部件類型上，每個受專注的部件都會擲出更好的品級（每5點提升一階，最多兩階），產量也更多（每1點10%）。未受專注的部件絕不會因此變差。',
+    '這是對同一具屍體的兩個獨立操作。屍體身上的一切，金幣與掉落物，加上任何可採收的部件，都在同一個視窗中開啟，但互動鍵與「拾取戰利品」只會取走普通戰利品，它照一般的拾取規則走。採收則是專業這一側，直接從屍身上剝下材料，只有當你在那個視窗中選擇「採集」時才會發生。\n\n採收先到先得，而且只有一次：每具屍體恰好只能被採收一次，由最先取得它的人採收，線上模式亦然。',
   'guide.profPages.faq.a4':
     '你碰上了豐收。大約每90次採集中有1次觸發稀有採集事件：樹木中的古老心材、礦石中的完美礦脈或草藥中的月光花。產量變為五倍，每個單位都署上你的名字，並向整個區域通報發現。一般採集若擲出精良或更高品質，也會為產出署名。\n\n已署名素材值得保留或高價出售：在背包中，或在該製作能取用的材料倉庫中，持有任意一份所需素材的已署名個體，即可使傑作機率提高2個百分點。它們可以與未署名素材、其他採集者或署名者的單位共用相容堆疊，不會遺失任何標記；每個來源及其數量均分別保留。',
   'guide.profPages.faq.a5':

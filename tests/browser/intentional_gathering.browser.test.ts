@@ -128,7 +128,6 @@ function mount(mobile: boolean) {
     entities: new Map([[90, corpse]]),
     partyInfo: null,
     inventory: [{ itemId: 'field_kit', count: 1 }],
-    townFocus: {},
     questLog: new Map(),
     questsDone: new Set<string>(),
     myFarmPlots: [] as FarmPlotView[],

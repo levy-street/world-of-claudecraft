@@ -65,10 +65,7 @@ const COMPONENT_LABEL_KEYS: Record<string, string> = {
 };
 
 /** Exported for tests only, so the label map can be pinned against the real set of
- *  componentTags used across mob content (see tests/town_focus_i18n.test.ts).
- *  Preserved unchanged by the Intentional Gathering PR3 harvest-status rework:
- *  Town Focus (src/ui/town_focus_window.ts) still reads the sibling
- *  `hudChrome.corpseHarvest.components.*` keys directly. */
+ *  componentTags used across mob content (see tests/corpse_harvest_window.test.ts). */
 export function componentLabel(tag: string): string {
   const key = COMPONENT_LABEL_KEYS[tag];
   return key ? t(key as TranslationKey) : tag;

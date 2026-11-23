@@ -1267,9 +1267,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.warfareWithHealth':
     '플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다. 던전, 공격대, 탐굴, 균열을 제외한 모든 곳에서 최대 생명력도 {health}% 증가합니다.',
   'hudChrome.statInfo.names.spellCrit': '주문 치명타',
-  'hudChrome.townFocus.pendingLine': '저장되었습니다. 이 배분으로의 재배분이 {time} 후 완료됩니다.',
-  'hudChrome.townFocus.preferenceHint':
-    '집중은 채집하는 재료의 등급과 양을 높입니다. 한 가지 재료만 채집하려면 야전 키트나 전문 기술 창에서 채집 선호를 설정하세요.',
   'hudChrome.trinkets.scaled': '{base} (+{bonus})',
   'hudChrome.vehicle.wave': '웨이브 {wave}/{total}',
   'hudChrome.warfare.floatReasons.hill': '언덕',
@@ -3649,23 +3646,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{material}은(는) 이 시체에 없습니다. 사용 가능: {materials}.',
   'hudChrome.corpseHarvest.denial.bagsFull': '가방이 가득 차서 채집할 수 없습니다.',
   'hudChrome.corpseHarvest.denial.malformedInput': '문제가 발생했습니다. 다시 시도하세요.',
-  'hudChrome.townFocus.title': '마을 집중',
-  'hudChrome.townFocus.hint':
-    '집중 포인트는 각 재료의 기본 산출량에 보너스를 더합니다. 집중하지 않은 재료는 기본 산출량 그대로 유지됩니다.',
-  'hudChrome.townFocus.tierHint':
-    '재료 하나에 집중 {points}포인트를 투자할 때마다 채집 등급이 한 단계 오릅니다(최대 {steps}단계). {points}포인트 미만이라도 산출량은 늘어납니다.',
-  'hudChrome.townFocus.townOnlyHint': '집중은 마을 안에서만 변경할 수 있습니다.',
-  'hudChrome.townFocus.budgetLabel': '남은 포인트: {remaining} / {budget}',
-  'hudChrome.townFocus.saveButton': '집중 저장',
-  'hudChrome.townFocus.notInTownHint': '집중을 설정하려면 마을에 있어야 합니다.',
-  'hudChrome.townFocus.increaseAria': '{component}에 대한 집중 증가',
-  'hudChrome.townFocus.decreaseAria': '{component}에 대한 집중 감소',
-  'hudChrome.townFocus.respecTierLabel': '재배분 속도',
-  'hudChrome.townFocus.respecTierTimeOption': '무료 (시간이 걸림)',
-  'hudChrome.townFocus.respecTierPartialOption': '빠름 (소량 비용)',
-  'hudChrome.townFocus.respecTierInstantOption': '즉시 (전액 비용)',
-  'hudChrome.townFocus.respecCostFree': '무료',
-  'hudChrome.townFocus.respecCostLine': '{coin} 및 {materials} 소모',
   'hudChrome.theme.preset': 'UI 테마',
   'hudChrome.theme.customColors': '사용자 지정 색상',
   'hudChrome.theme.reset': '초기화',
@@ -7058,7 +7038,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.text':
     '이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 북동쪽, 늑대길을 지난 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.',
   'entities.quests.q_prof_intro.completion':
-    '보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.',
+    '보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.',
   'entities.quests.q_prof_intro.objectives.0.label': '광맥 채굴',
   'entities.quests.q_farm_intro.title': '첫 고랑',
   'entities.quests.q_farm_intro.text':
@@ -12547,9 +12527,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.harvestTitle': '사냥감 그 자체를 채집하기',
   'guide.professions.harvestBodyChoice':
     '채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 상당수는 시체에서 곧바로 한 번씩 채집할 수 있어, 가죽과 송곳니, 비단실, 고기가 평범한 전리품과 나란히 나온다. 시체 하나에 채집자는 선착순 한 명뿐이며, 한 번 누르면 전리품과 채집이 함께 열린다. 짐승이 쓸 만한 부위를 둘 이상 지녔다면 선택은 당신 몫이다. 그 시체가 내줄 수 있는 것을 전부 가져가거나, 더 적은 부위에 집중해 실제로 얻는 것을 눈에 띄게 더 좋은 등급으로 가져가거나.\n\n표본이 나오는 계열에서 희귀 이상 판정이 뜨면 평범한 산출물 위에 서명된 완벽한 표본(Pristine Hide, Pristine Silk, Pristine Venom Gland, Prime Cut)이 하나 더 주어지고, 업적의 서에 A Perfect Specimen이 기록된다. 채집에는 훈련이 필요 없어 어떤 캐릭터든 할 수 있으며, 가지고 있는 채집 도구는 어느 전문직의 것이든 최상급 재료 판정에 반영된다.',
-  'guide.professions.focusTitle': '마을 집중',
-  'guide.professions.focusBody':
-    '모든 거점 마을은 찾아오는 채집자를 위해 마을 집중 게시판을 갖추고 있다. 마을에 선 채 미니맵 옆에서 이를 열고, 관심 있는 부위 종류에 약간의 집중 포인트를 겨누라. 집중한 부위는 이후의 모든 시체에서 한 등급 더 좋게, 조금 더 넉넉하게 나온다. 배분은 캐릭터가 어디를 떠돌든 따라다니며, 이후 마을에 들를 때마다 무료로 다시 짤 수 있다.',
   'guide.professions.craftMasteryTitle': '숙련도와 통달',
   'guide.professions.craftMasteryBody':
     '제작에 성공하면 해당 전문직의 숙련도가 오르며, 숙련도가 제작법을 잠가 두는 일은 결코 없다. 제작법을 알고 그 재료를 지녔다면 언제든 시도할 수 있다. 모든 제작법은 약속한 그대로의 결과물을 내놓지만, 손에 익은 솜씨는 이따금 걸작을 만들어 낸다. 같은 물건이되 마무리가 더 정교하고, 약간의 추가 힘이 깃들어 있다. 유일한 예외는 조합 제작법으로, 두 전문직을 잇는 원형에 조율하고 두 전문직 모두에서 검증된 실력을 갖춘 제작자에게만 열린다.',
@@ -18279,8 +18256,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이것들을 눈으로 찾아다닐 필요는 없다. 지역 안의 모든 노드는 지도가 그 땅을 비추는 한 지역 지도 위에 그려지고, 지나칠 때 미니맵에도 표시되므로, 길을 나서기 전에 지도 화면에서 채집 순회로를 짤 수 있다. 아직 도구가 감당하지 못하는 노드는 숨기는 대신 표시한다. 빗금 그어 흐릿해진 표식으로 자리를 지키니, 지금 어떤 땅을 향해 실력을 올리고 있는지 볼 수 있다. 데스크톱에서는 세계의 광맥이나 나무, 약초밭에 커서를 올리면 이름과 필요한 도구를 알려 주고, 한 번 캐 본 뒤로는 자기 몫의 재생성 시간을 초 단위로 세어 준다. 터치에는 커서를 올릴 것이 없으니 미니맵 표식이 같은 이야기를 대신한다.',
   'guide.profPages.specimenBodyFamilies':
     '채집을 돌 때는 가방을 조금 비워 두라. 서명된 횡재는 제 칸이 하나 있거나 서명이 꼭 맞는 더미가 있어야 내려앉는데, 들어갈 자리가 없으면 산출물은 그대로 들어오되 서명이 사라진다. 시체 채집에도 저만의 대박 갈래가 있다. 채집한 부위마다 약 {pct}%가 희귀 이상으로 나온다. 완벽한 표본을 내주는 계열(가죽, 비단실, 독, 발톱, 고기)은 평범한 산출물은 평범한 채로 두고 그 곁에 서명된 표본을 따로 찍어 내며, 나머지 다섯인 송곳니와 천, 엄니, 뿔, 아가미는 산출물 자체에 서명한다.',
-  'guide.professions.focusBodyTiers':
-    '모든 거점 마을은 찾아오는 채집자를 위해 마을 집중 패널을 갖추고 있다. 마을에 선 채 미니맵 옆에서 이를 열고, 집중 포인트 10점을 관심 있는 부위 종류에 나누어 배분하라. 한 부위에 5점을 넣을 때마다 그 부위의 채집 등급이 한 단계 오르고(최대 두 단계), 1점마다 산출량이 10퍼센트씩 늘어난다. 집중하지 않은 부위가 나빠지는 일은 결코 없다.\n\n배분은 캐릭터를 따라 어디든 함께 다니며, 이후 마을에 들를 때마다 원하는 속도로 다시 겨눌 수 있다. 느긋하게 가면 무료다. 옮기는 1점마다 재조정이 1분씩 걸린다. 조금 치르면 빨라져서 1점당 15초에 1점마다 5동과 Chime Dust 1개가 들고, 전부 치르면 1점당 25동과 Chime Dust 5개로 즉시 끝난다. 실제로 옮긴 점수만 계산하므로 1점만 살짝 옮기는 것은 값이 싸고, 열었다가 그대로 닫은 패널은 어느 단계에서도 한 푼도 들지 않는다.',
   'guide.professions.endgameHeading': '명장 제작 최종 단계',
   'guide.professions.endgameBody':
     '어느 제작 기술이든 훈련사 사다리 위에는 같은 정상이 하나 놓여 있다. 명장 제작 가족, 곧 장비와 물품 페이지가 설명하는 금색 "착용 시 고유: 명장 제작" 태그를 단 제작 장비다. 어느 기술이 오르든 사슬의 모양은 같다. 정점 도안은 가르침이 아니라 발견으로 얻고, 하루 한 번으로 묶인 중간 제작이 작업의 속도를 정하며, 세 가지 공유 재료가 모든 사다리를 먹인다. 완성품은 다른 제작품처럼 자유롭게 거래되고(거래 규칙은 제작 경제 페이지에 있다), 두 개까지라는 착용 상한 덕에 온몸을 두르는 한 벌이 아니라 빌드의 악센트로 남는다. 그래서 가장 깊은 최종 콘텐츠에 발을 들이지 않는 장인도 그곳에 사는 이들에게 물건을 판다.',
@@ -19463,7 +19438,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.q7': '채집이 왜 갑자기 느려졌나요?',
   'guide.profPages.faq.q8': '마을 밖에서도 제작할 수 있나요?',
   'guide.profPages.faq.a3':
-    '같은 시체를 두고 벌이는 서로 다른 두 가지 행동이다. 시체가 지닌 것은 전부, 동전과 떨어진 물건은 물론 채집할 수 있는 부위까지 같은 창에 함께 뜨지만, 상호작용 키와 전리품 가져가기가 챙기는 것은 평범한 전리품뿐이며 그것은 평소의 전리품 규칙을 그대로 따른다. 채집은 전문직 쪽의 일로서 시체 그 자체에서 재료를 벗겨 내며, 그 창에서 채집을 골랐을 때에만 일어난다.\n\n채집은 선착순이고 한 번뿐이다. 시체 하나는 먼저 차지한 사람이 딱 한 번만 채집할 수 있으며, 온라인에서도 마찬가지다. 무엇을 얻을지는 마을 집중이 좌우한다. 거점 마을에 선 채로 관심 있는 부위 종류에 집중 포인트 10점을 나누어 겨눌 수 있고, 집중한 부위는 더 좋은 등급으로 굴려지며(5점마다 한 단계, 최대 두 단계) 산출량도 늘어난다(1점마다 10%). 집중하지 않은 부위가 나빠지는 일은 결코 없다.',
+    '같은 시체를 두고 벌이는 서로 다른 두 가지 행동이다. 시체가 지닌 것은 전부, 동전과 떨어진 물건은 물론 채집할 수 있는 부위까지 같은 창에 함께 뜨지만, 상호작용 키와 전리품 가져가기가 챙기는 것은 평범한 전리품뿐이며 그것은 평소의 전리품 규칙을 그대로 따른다. 채집은 전문직 쪽의 일로서 시체 그 자체에서 재료를 벗겨 내며, 그 창에서 채집을 골랐을 때에만 일어난다.\n\n채집은 선착순이고 한 번뿐이다. 시체 하나는 먼저 차지한 사람이 딱 한 번만 채집할 수 있으며, 온라인에서도 마찬가지다.',
   'guide.profPages.faq.a4':
     '풍성한 수확을 발견했습니다. 약 90번 중 1번, 나무의 고대 심재, 광석의 온전한 광맥, 약초의 달빛 꽃 같은 희귀 채집 사건이 발생합니다. 수확량이 다섯 배가 되고 모든 단위에 자신의 서명이 붙으며 발견이 지역 전체에 알려집니다. 일반 수확도 희귀 이상의 품질이 나오면 수확물에 서명이 붙습니다.\n\n서명된 재료는 보관하거나 비싸게 팔 가치가 있습니다. 필요한 재료의 서명된 개체를 가방이나 해당 제작이 꺼내 쓸 수 있는 재료 보관소에 보유하면 걸작 확률이 2퍼센트포인트 증가합니다. 서명 없는 재료나 다른 채집자·서명자의 단위와 호환되는 묶음을 공유해도 표시가 사라지지 않으며 각 출처와 수량이 따로 보존됩니다.',
   'guide.profPages.faq.a5':

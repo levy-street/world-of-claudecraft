@@ -843,10 +843,6 @@ export const table: DeedLocaleTable = {
     name: 'O Tesouro de um Wyrm',
     desc: 'Saqueie um total vitalício de 100 de ouro em moedas.',
   },
-  soc_civic_duty: {
-    name: 'Dever Cívico',
-    desc: 'Aloque seu primeiro ponto de Foco da Cidade.',
-  },
   exp_long_road_north: {
     name: 'A Longa Estrada para o Norte',
     desc: 'Visite os três povoados principais: Eastbrook, Fenbridge e Highwatch.',

@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1016,
-      "state": "16694241",
+      "state": "56c9f7cf",
       "events": "b148d517",
       "rng": {
         "draws": 5,
@@ -118,7 +118,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -441,7 +440,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1017,
-      "state": "47d28a4f",
+      "state": "bc54ec81",
       "events": "ebc60a51",
       "rng": {
         "draws": 8,
@@ -535,7 +534,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -921,7 +919,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1017,
-      "state": "6689605b",
+      "state": "b85b980d",
       "events": "a2a84e58",
       "rng": {
         "draws": 9,
@@ -1016,7 +1014,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1403,7 +1400,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "f1ee9c49",
+      "state": "46da80b3",
       "events": "37fb09d7",
       "rng": {
         "draws": 15,
@@ -1498,7 +1495,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1928,7 +1924,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1020,
-      "state": "1a5a053d",
+      "state": "273f4991",
       "events": "70d396e1",
       "rng": {
         "draws": 20,
@@ -2027,7 +2023,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -2519,7 +2514,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1020,
-      "state": "1a5a053d",
+      "state": "273f4991",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2618,7 +2613,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },

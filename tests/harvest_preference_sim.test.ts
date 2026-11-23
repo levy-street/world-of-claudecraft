@@ -11,7 +11,7 @@
 //   get sim.harvestPreference: HarvestPreference | null (primaryId)
 //   sim.setHarvestPreference(raw, pid?): void, validated through
 //     parseHarvestPreferenceCommand, touches only the resolved player, and
-//     changes NOTHING else (town focus, copper, bags, tools): it is a setting,
+//     changes NOTHING else (copper, bags, tools): it is a setting,
 //     not a harvest action, so it needs no field kit and works anywhere,
 //     in combat included.
 import { describe, expect, it } from 'vitest';
@@ -191,12 +191,11 @@ describe('the harvest preference through real Sim persistence', () => {
     expect(second).toEqual(material('wolf_fang'));
   });
 
-  it('changes nothing else: no town focus, copper, inventory, bags, or tool state moves', () => {
+  it('changes nothing else: no copper, inventory, bags, or tool state moves', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = sim.serializeCharacter(pid)!;
     const copperBefore = sim.copper;
-    const focusBefore = { ...sim.townFocusFor(pid) };
     const bagCapacityBefore = sim.bagCapacity;
     // A full snapshot of the actual inventory and bags, not a single-item
     // proxy: this is the "a setting touches nothing else" contract, so
@@ -209,7 +208,6 @@ describe('the harvest preference through real Sim persistence', () => {
     sim.setHarvestPreference('rough_hide', pid);
 
     expect(sim.copper).toBe(copperBefore);
-    expect(sim.townFocusFor(pid)).toEqual(focusBefore);
     expect(sim.bagCapacity).toBe(bagCapacityBefore);
     const metaAfter = sim.serializeCharacter(pid)!;
     expect(structuredClone(metaAfter.inventory)).toEqual(inventoryBefore);

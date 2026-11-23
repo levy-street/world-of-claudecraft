@@ -229,9 +229,9 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   and the staged core, would otherwise have widened the feedstock),
   deterministic 1:1 yield, the disenchant-style pinned-slot re-check at
   completion; draws NO rng.
-- `tools.ts` / `stations.ts` / `focus.ts`: pure-leaf gates and bonuses
-  (gather-tool tier, per-type crafting stations (superseding the retired
-  level-20 hub), town focus allocation). Tool effects in `tools.ts` are LIVE
+- `tools.ts` / `stations.ts`: pure-leaf gates and bonuses (gather-tool tier,
+  per-type crafting stations (superseding the retired level-20 hub)). Tool
+  effects in `tools.ts` are LIVE
   end to end and this leaf owns every DECISION: `resolveSlotToolEffect` is
   the one mint authority (it also picks WHICH crafted charm copy the mint
   consumes, whose signer becomes the slot's `craftedBy`) and
@@ -239,14 +239,12 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   tool held now, R39 material identity, R47 price rung floored at the slot's
   own ceiling). The R9 slot policy (`slotToolEffectRefused`) keeps Springback
   and fishing slots refused until their arms have real behavior.
-- `town_focus_pending.ts` + `gathering_settings_persist.ts`: the queued
-  town-focus re-spec as persisted state (remaining seconds, re-anchored on the
-  loading Sim's clock) and as the read view both hosts hand the panel (IWorld
-  `townFocusPending`, self-wire `tfpend`, one strict parse for the save and
-  the wire); the second is the sim.ts addPlayer / serializeCharacter seam for
-  the three gathering settings together (focus allocation, its queue, the
-  harvest preference). `town_focus_commands.ts setTownFocus` keeps a running
-  queue when the same allocation is re-saved (never pushes the clock back).
+- Town Focus (the per-component harvest bonus allocated in town, its timed
+  re-spec queue and the `focus.ts` / `town_focus_*.ts` leaves) was REMOVED
+  from the game on 2026-11-04; the harvest preference is the one remaining
+  per-character gathering setting (`harvest_preference.ts`, loaded and saved
+  directly by sim.ts). Older saves carrying `townFocus` / `pendingTownFocus`
+  load with both fields dropped.
 - `tool_effect_actions.ts`: the slot and recharge COMMAND BODIES behind the
   seam (`Sim` keeps thin delegates). Everything stateful lives here and, for
   those TWO, every decision in the `tools.ts` leaf above: resolve first, then

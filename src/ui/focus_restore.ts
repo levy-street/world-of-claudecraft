@@ -22,8 +22,8 @@
 // What stays with the CALLER is the interesting half: which fresh control is the
 // role-equivalent of the one that had focus, and what to degrade to when that one came
 // back disabled. Those ladders are genuinely per-window (mailbox_window prefers the
-// quantity input, town_focus_window walks the stepper pair outward before it leaves the
-// row) and folding them in here would mean a switch over window identities. So this
+// quantity input, a stepper ladder walks the pair outward before it leaves the row)
+// and folding them in here would mean a switch over window identities. So this
 // module owns only the parts every copy spells the same way, and the parts a copy can
 // get subtly wrong: the activeElement narrowing, the containment check, and the
 // disabled skip.
@@ -50,7 +50,7 @@
 /**
  * Anything a caller can hand back focus to. Structural rather than
  * `HTMLButtonElement`, because the two windows this was extracted from already need
- * more than one element type: town_focus_window's ladder is all buttons, but
+ * more than one element type: a stepper ladder is all buttons, but
  * mailbox_window's runs through the parcel's `<input type=number>` quantity field,
  * which is the candidate it most wants to keep. `disabled` is optional so a focusable
  * non-form node (a `tabIndex = 0` span, which several windows paint) is a legal
@@ -99,8 +99,7 @@ export interface FocusRestoreCandidate {
  * The identity is read off `dataset.focusKey` (`data-focus-key="..."` in markup), ONE
  * flat namespace shared by every window, which is exactly why the containment check
  * lives HERE and not in the caller: mailbox_window keys its parcel steppers
- * `<itemId>:<role>`, town_focus_window keys its allocation steppers
- * `<component>:<role>`, and professions_window keys its action buttons
+ * `<itemId>:<role>`, and professions_window keys its action buttons
  * `recharge:<professionId>` and `slot:<professionId>:<effectId>`, all the same shape
  * under the same attribute name. A window that read the key without checking
  * containment would let its own repaint pull focus out of another open window.
@@ -204,7 +203,7 @@ export function focusedWithin(root: ParentNode): HTMLElement | null {
  *
  * A bare `focus()`, deliberately NOT `focus({ preventScroll: true })`, and this is now
  * the ONE place that decision is spelled: every hand-rolled copy already agreed on the
- * bare call, but only town_focus_window recorded why. The reason is that a caller
+ * bare call, but only one of them recorded why. The reason is that a caller
  * restores its scroll offset before calling here, and `focus()` scrolling its target
  * into view is what lets a DEGRADED target (a rung further down the ladder, which the
  * player may not be looking at) win over that offset. Focus must be visible (WCAG

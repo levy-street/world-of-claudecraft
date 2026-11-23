@@ -776,7 +776,6 @@ export const table: DeedLocaleTable = {
     name: 'Un tesoro de wyrm',
     desc: 'Saquea un total acumulado de 100 de oro en monedas.',
   },
-  soc_civic_duty: { name: 'Deber cívico', desc: 'Asigna tu primer punto de enfoque del pueblo.' },
   exp_long_road_north: {
     name: 'El largo camino al norte',
     desc: 'Visita los tres asentamientos principales: Eastbrook, Fenbridge y Highwatch.',

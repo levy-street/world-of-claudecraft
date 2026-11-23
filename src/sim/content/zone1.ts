@@ -1043,7 +1043,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
 export const ZONE1_QUESTS: Record<string, QuestDef> = {
   // Professions onboarding (issue #1701 follow-up): the very first quest a
   // new adventurer can take, no prerequisite and no minLevel gate (defaults
-  // to available at level 1, same as q_wolves). Gathering/crafting/town focus
+  // to available at level 1, same as q_wolves). Gathering and crafting
   // are otherwise entirely undiscoverable: nothing in the starting flow ever
   // points a new player at them (see the professions.ts GATHERING_PROFESSIONS
   // comment: no level/quest/tool gate exists at the mechanic level either, so
@@ -1061,7 +1061,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'foreman_odell',
     text: "Every soul in Eastbrook works a trade besides the sword, $N. There are ore veins in the rocks around the Copper Dig, northeast of town past the wolf runs. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
     completionText:
-      "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+      "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the crafting bench by the market. There's a fair trade waiting in all of it, if you want it.",
     objectives: [{ type: 'gather', nodeType: 'ore', count: 5, label: 'Ore vein harvested' }],
     xpReward: 150,
     copperReward: 50,

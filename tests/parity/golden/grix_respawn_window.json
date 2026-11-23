@@ -28,7 +28,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "322126f0",
+      "state": "b7c4492c",
       "events": "691518be",
       "rng": {
         "draws": 10,
@@ -131,7 +131,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -297,7 +296,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "e7333b2a",
+      "state": "98facf50",
       "events": "a89b84a6",
       "rng": {
         "draws": 21,
@@ -400,7 +399,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -567,7 +565,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "e7333b2a",
+      "state": "98facf50",
       "events": "741638a5",
       "rng": {
         "draws": 21,
@@ -670,7 +668,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },

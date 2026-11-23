@@ -8,7 +8,6 @@
 import { describe, expect, it } from 'vitest';
 import { PROFESSION_TRAINERS } from '../src/sim/content/profession_trainers';
 import { DUNGEONS, NPCS, QUESTS, ZONES, zoneAt } from '../src/sim/data';
-import { isInTownZone } from '../src/sim/professions/focus';
 import {
   instanceMobIds,
   isGroupOrInstanceQuest,
@@ -18,6 +17,7 @@ import {
   townQuestsComplete,
   zoneEntryHint,
 } from '../src/sim/town_quests';
+import { isInTownZone } from '../src/sim/town_zone';
 import type { QuestState, ZoneDef } from '../src/sim/types';
 import { makeSim, teleportTo } from './fixes_shared';
 import { expectDefined } from './helpers/defined';

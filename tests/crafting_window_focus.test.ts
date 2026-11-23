@@ -129,8 +129,8 @@ describe('crafting window: Tab focus trap and restore-on-close', () => {
     const fm = new FocusManager();
     const bridge = makeWindowFocus(fm, () => el);
 
-    // Mirrors Hud.openCrafting: paint first, THEN capture (the train/unbind/
-    // townFocus ordering), so the trap installs over a populated, displayed root.
+    // Mirrors Hud.openCrafting: paint first, THEN capture (the train/unbind
+    // ordering), so the trap installs over a populated, displayed root.
     renderCraftingWindow(el, craftableView(), craftingDeps());
     const capturedOpener = bridge.captureFocus();
     expect(capturedOpener).toBe(opener);

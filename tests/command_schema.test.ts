@@ -197,9 +197,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Sim.sitOnSeat) on feature/walkable-tavern-aaa: 248/262/14 on its own. Merged with
 // the v0.45.0 integration's 262/276: 263/277/14.
 // Main commands plus Gourdlight Eve trick-or-treat.
-const EXPECTED_SEND_COUNT = 273;
+// Town Focus removed (2026-11-04): set_town_focus keeps its append-only token
+// and moves to the dispatch-only tombstones (no ClientWorld sender): 272/287/15.
+const EXPECTED_SEND_COUNT = 272;
 const EXPECTED_DISPATCH_COUNT = 287;
-const EXPECTED_DISPATCH_ONLY_COUNT = 14;
+const EXPECTED_DISPATCH_ONLY_COUNT = 15;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

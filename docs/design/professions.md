@@ -296,19 +296,14 @@ body opens to the first eligible harvester, whose reservation blocks every
 other attempt until it completes, is cancelled, or the corpse expires, and
 one completion consumes the claim. A chosen material
 absent from the corpse refuses the attempt (`material_unavailable`) without
-disturbing the saved preference. Town Focus allocation remains an independent
-bonus the picker never touches: it raises the tier and quantity of whatever a
-harvest extracts and never narrows the pick, which is why the Town Focus panel
-points at the preference picker in its own hint. A re-spec queued on the
-`time` / `timeAndPartial` tiers is persisted with the character
-(`CharacterState.pendingTownFocus`, remaining seconds, re-anchored on the
-loading Sim's clock by `src/sim/professions/town_focus_pending.ts`), so a
-logout or an instance handoff no longer drops it; re-saving the same
-allocation keeps the running clock (`setTownFocus` in
-`town_focus_commands.ts`), and both hosts expose the queue as IWorld
-`townFocusPending` (self-wire `tfpend`) so the panel shows the saved rows and
-a countdown instead of the old committed allocation. A claimed harvest
-mirrors online via the sparse per-entity `hcb` wire key.
+disturbing the saved preference. The harvest tier and quantity come from the
+roll alone: the Town Focus allocation panel that used to add a per-component
+bonus on top (a 10-point budget set while standing in a town hub, with a
+timed, paid re-spec) was removed from the game on 2026-11-04 (the professions
+consolidation; its launcher only appeared in town and the mechanic was judged
+not useful). Older saves still carrying a `townFocus` blob load with the field
+dropped. A claimed harvest mirrors online via the sparse per-entity `hcb` wire
+key.
 
 ### Farming, the fifth gathering profession
 Farming shares the gathering proficiency shape and the land cap, and it is

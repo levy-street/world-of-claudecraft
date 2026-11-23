@@ -63,10 +63,8 @@ import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
-import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import type { PerfectingSwapRequest } from '../sim/professions/perfecting_swap';
-import type { TownFocusPendingView } from '../sim/professions/town_focus_pending';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import { isResting } from '../sim/progression/xp';
 import {
@@ -1445,10 +1443,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Crafting/secondary professions still contribute nothing until later
   // issues (#1120/#1125/#1126/#1140) land.
   professionsState: PlayerProfessionsView = { skills: [] };
-  // #1143: persistent town focus allocation, mirrored from the self-wire `tfocus`.
-  townFocus: Record<string, number> = {};
-  // #1144: the queued re-spec, mirrored from the self-wire `tfpend` (professions_self_mirror.ts).
-  townFocusPending: TownFocusPendingView | null = null;
   // Per-node respawn readiness (#1121, wired #1866): mirrored from the `ncd`
   // self-wire delta below, same shape/semantics as `cooldowns` (remaining
   // seconds as of the last snapshot that changed it; a node with no entry is
@@ -3220,7 +3214,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.dcomp !== undefined) this.companionUpgrades = s.dcomp ?? {};
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
-      if (s.tfocus !== undefined) this.townFocus = s.tfocus ?? {};
       // mst -> activeMobileStationCrafts: a comma-joined nullable scalar, so
       // the delta's explicit null (every station expired, out of range, or
       // never placed) must overwrite to the empty set. The split array is
@@ -3506,9 +3499,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Promise here, settled by the correlated reply requests().onMessage routes.
   corpseHarvestInfo(id: number): Promise<CorpseHarvestInfo | null> {
     return this.requests().inspectCorpse(id);
-  }
-  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier): void {
-    this.cmd({ cmd: 'set_town_focus', allocation, tier });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {

@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "96ac3d4d",
+      "state": "1e738f63",
       "events": "fc59ad47",
       "rng": {
         "draws": 5,
@@ -113,7 +113,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -197,7 +196,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -375,7 +373,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1015,
-      "state": "3ff302c8",
+      "state": "6928fcc0",
       "events": "a55a00d1",
       "rng": {
         "draws": 10,
@@ -456,7 +454,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -540,7 +537,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -783,7 +779,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1016,
-      "state": "8817c61d",
+      "state": "c47cf531",
       "events": "a9db2371",
       "rng": {
         "draws": 13,
@@ -864,7 +860,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -948,7 +943,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1249,7 +1243,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1017,
-      "state": "2f499e6a",
+      "state": "a931ee82",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1330,7 +1324,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1414,7 +1407,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1763,7 +1755,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1018,
-      "state": "1ea0ccca",
+      "state": "a41670e2",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1844,7 +1836,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1928,7 +1919,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -2320,7 +2310,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "ee05726b",
+      "state": "cbc52ed7",
       "events": "d6509a1f",
       "rng": {
         "draws": 16,
@@ -2401,7 +2391,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -2485,7 +2474,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -2922,7 +2910,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "38d34a08",
+      "state": "1bdc5700",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -3003,7 +2991,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -3087,7 +3074,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -3525,7 +3511,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "38d34a08",
+      "state": "1bdc5700",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -3606,7 +3592,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -3690,7 +3675,6 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },

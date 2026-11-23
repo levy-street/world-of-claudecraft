@@ -36,7 +36,6 @@ const PROFESSIONS_BLOB_FIELDS = [
   'recipesGrandfathered',
   'masteryResetApplied',
   'proficiencyDisplayHealApplied',
-  'townFocus',
   'archetype',
   'questCadence',
   'tierMailSent',
@@ -119,7 +118,6 @@ const populatedSim = (): Sim => {
     enchant: 'enchant_weapon_might',
     craftedRecipeId: 'recipe_eastbrook_arming_sword',
   };
-  meta.townFocus = { hide: 3, fang: 2 };
   meta.archetype = {
     activeArchetype: 'weaponcrafting',
     pairedMajor: 'armorcrafting',

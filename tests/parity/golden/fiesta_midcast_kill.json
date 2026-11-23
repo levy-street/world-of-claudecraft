@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1015,
-      "state": "923570ee",
+      "state": "b00117c0",
       "events": "b90a444b",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1015,
-      "state": "234ef837",
+      "state": "4a9791c5",
       "events": "14dc52c1",
       "rng": {
         "draws": 64,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1015,
-      "state": "f819eae9",
+      "state": "429dcedf",
       "events": "f3c46c01",
       "rng": {
         "draws": 281,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1015,
-      "state": "63c4f11e",
+      "state": "c30f33f0",
       "events": "1b9b3d0d",
       "rng": {
         "draws": 534,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1015,
-      "state": "982aff7f",
+      "state": "76bf3ef9",
       "events": "4518139e",
       "rng": {
         "draws": 549,
@@ -172,7 +172,6 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -268,7 +267,6 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -362,7 +360,6 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -453,7 +450,6 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -694,7 +690,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1015,
-      "state": "93033161",
+      "state": "0e2d4feb",
       "events": "0b2f4dee",
       "rng": {
         "draws": 549,
@@ -791,7 +787,6 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -887,7 +882,6 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -981,7 +975,6 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1072,7 +1065,6 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1311,7 +1303,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 1015,
-      "state": "606722bc",
+      "state": "eb81f5e2",
       "events": "7ae990f1",
       "rng": {
         "draws": 549,
@@ -1411,7 +1403,6 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1507,7 +1498,6 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1602,7 +1592,6 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1693,7 +1682,6 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -1932,7 +1920,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1015,
-      "state": "6bed3a7e",
+      "state": "8815124c",
       "events": "741638a5",
       "rng": {
         "draws": 787,
@@ -1943,7 +1931,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1015,
-      "state": "a00316bd",
+      "state": "a6edfdaf",
       "events": "741638a5",
       "rng": {
         "draws": 962,
@@ -2043,7 +2031,6 @@
             },
             "spec": "arms"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -2139,7 +2126,6 @@
             },
             "spec": "arcane"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -2234,7 +2220,6 @@
             },
             "spec": "assassination"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
@@ -2325,7 +2310,6 @@
             },
             "spec": "beast_mastery"
           },
-          "townFocus": {},
           "vault": {
             "stock": {}
           },
