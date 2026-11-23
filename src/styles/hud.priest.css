@@ -403,12 +403,23 @@
   }
 }
 @layer hud-mobile {
+  /* The medallion is autoscaled to the phone, the King of the Hill bar's
+     recipe: every size is its touch value times one viewport unit,
+     --priest-charge-mobile-unit, which is a whole pixel (the stock touch
+     size) from a 500px short edge up, shrinks with the short edge below
+     that, and never drops under 0.75px so both counts stay legible. The
+     movable-frame controller writes no inline transform on the mobile
+     layout, so this stylesheet owns the size there. Only the art and the
+     copy scale: the 40px tap-target floor below is never multiplied by the
+     unit, and nothing is hidden. Hairline borders and shadows keep their
+     pixel values. */
   body.mobile-touch .priest-charge-frame {
     --priest-touch-scale: var(--ui-scale, 1);
+    --priest-charge-mobile-unit: clamp(0.75px, 0.2vmin, 1px);
     top: 58%;
-    width: 156px;
+    width: calc(156 * var(--priest-charge-mobile-unit));
     height: auto;
-    min-height: 132px;
+    min-height: calc(132 * var(--priest-charge-mobile-unit));
     flex-direction: column;
     align-items: center;
     pointer-events: auto;
@@ -426,21 +437,76 @@
     flex-basis: calc(40px / var(--priest-touch-scale));
   }
   body.mobile-touch .priest-bomb-meter {
-    flex-basis: 96px;
-    width: 96px;
+    flex-basis: calc(96 * var(--priest-charge-mobile-unit));
+    width: calc(96 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-bomb-crown {
+    inset: -1px calc(-26 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-bomb-crown::after {
+    inset: calc(5 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-bomb-bezel {
+    inset: calc(10 * var(--priest-charge-mobile-unit));
+    border-width: calc(4 * var(--priest-charge-mobile-unit));
   }
   body.mobile-touch .priest-bomb-orb {
-    --disc-size: 66px;
+    --disc-size: calc(66 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-bomb-sigil {
+    width: calc(27 * var(--priest-charge-mobile-unit));
+    height: calc(15 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-bomb-bar {
+    inset: calc(7 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-bomb-orbit {
+    inset: calc(-15 * var(--priest-charge-mobile-unit));
   }
   body.mobile-touch .priest-bomb-header {
-    top: 56px;
+    top: calc(56 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-bomb-header .priest-charge-count {
+    padding: calc(2 * var(--priest-charge-mobile-unit)) calc(6 * var(--priest-charge-mobile-unit));
+    font-size: calc(14 * var(--priest-charge-mobile-unit));
+    line-height: calc(18 * var(--priest-charge-mobile-unit));
   }
   body.mobile-touch .priest-bomb-ready {
-    top: 85px;
+    top: calc(85 * var(--priest-charge-mobile-unit));
+    left: calc(-22 * var(--priest-charge-mobile-unit));
+    right: calc(-22 * var(--priest-charge-mobile-unit));
+    font-size: calc(10 * var(--priest-charge-mobile-unit));
+    line-height: calc(12 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-gloom-meter {
+    width: calc(148 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-gloom-pips {
+    inset: calc(4 * var(--priest-charge-mobile-unit)) 0 auto;
+    gap: calc(12 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-gloom-pips::before {
+    left: calc(6 * var(--priest-charge-mobile-unit));
+    right: calc(6 * var(--priest-charge-mobile-unit));
+    top: calc(-12 * var(--priest-charge-mobile-unit));
+    height: calc(23 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-gloom-pip {
+    width: calc(16 * var(--priest-charge-mobile-unit));
+    height: calc(16 * var(--priest-charge-mobile-unit));
+    flex-basis: calc(16 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-gloom-pip:nth-child(2),
+  body.mobile-touch .priest-gloom-pip:nth-child(4) {
+    top: calc(4 * var(--priest-charge-mobile-unit));
+  }
+  body.mobile-touch .priest-gloom-pip:nth-child(3) {
+    top: calc(6 * var(--priest-charge-mobile-unit));
   }
   body.mobile-touch .priest-gloom-meter .priest-charge-count {
-    top: 28px;
-    font-size: calc(11px / var(--priest-touch-scale));
+    top: calc(28 * var(--priest-charge-mobile-unit));
+    font-size: calc(11 * var(--priest-charge-mobile-unit) / var(--priest-touch-scale));
+    line-height: calc(12 * var(--priest-charge-mobile-unit));
   }
   body.mobile-touch .priest-charge-frame.tf-touch-placed {
     left: var(--touch-fx);
