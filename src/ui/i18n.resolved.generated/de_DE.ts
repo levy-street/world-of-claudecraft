@@ -18416,7 +18416,7 @@ export const de_DE: EnTranslations = {
       "claw": {
         "name": "Reißklaue",
         "description": "Krallt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Katzengestalt.",
-        "specNote_feral": "Jeder Treffer, der landet, fügt einen Stapel Fetzen hinzu, eine Blutung, die pro Stapel 8 Schaden über 8 Sek. verursacht (max. 5 Stapel). Ein neuer Stapel erneuert die Dauer."
+        "specNote_feral": "Jeder Treffer, der landet, fügt einen Stapel Fetzen hinzu, eine Blutung, die pro Stapel 6 Schaden über 8 Sek. verursacht (max. 5 Stapel). Ein neuer Stapel erneuert die Dauer."
       },
       "scratch": {
         "name": "Kratzen",
@@ -18426,7 +18426,7 @@ export const de_DE: EnTranslations = {
       "ferocious_bite": {
         "name": "Blutbiss",
         "description": "Finishing-Move, der {damage} verursacht. Nur in Katzengestalt.",
-        "specNote_feral": "Verursacht 15% mehr Schaden für jede Eurer Blutungen auf dem Ziel und setzt Euren Blutriss auf seine volle Dauer zurück. Bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen Schlag verbraucht, der Euer Schinden und Euren Blutriss verlängert, Eure Blutungen auf dem Ziel 8 Sek. lang 30% schneller ticken lässt und Energie wiederherstellt."
+        "specNote_feral": "Verursacht 15% mehr Schaden für jede Eurer Blutungen auf dem Ziel und setzt Euren Blutriss auf seine volle Dauer zurück. Bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen Schlag verbraucht, der Euer Schinden und Euren Blutriss verlängert, Eure Blutungen auf dem Ziel 8 Sek. lang 15% schneller ticken lässt und Energie wiederherstellt."
       },
       "swipe": {
         "name": "Fegende Klauen",
@@ -18720,7 +18720,7 @@ export const de_DE: EnTranslations = {
       },
       "redharvest": {
         "name": "Rote Ernte",
-        "description": "Verbraucht 3 Altes Blut: ein Schlag für {damage}, verlängert Euer Schinden und Euren Blutriss auf dem Ziel um 8 Sek. (bis zu 16 Sek. je Blutung), lässt Eure Blutungen auf dem Ziel 8 Sek. lang 30% schneller ticken (Roter Strom) und stellt {rage} Energie wieder her. Funktioniert auch ohne Combopunkte."
+        "description": "Verbraucht 3 Altes Blut: ein Schlag für {damage}, verlängert Euer Schinden und Euren Blutriss auf dem Ziel um 8 Sek. (bis zu 16 Sek. je Blutung), lässt Eure Blutungen auf dem Ziel 8 Sek. lang 15% schneller ticken (Roter Strom) und stellt {rage} Energie wieder her. Verbraucht keine Combopunkte."
       },
       "marrowbreak": {
         "name": "Markbrecher",

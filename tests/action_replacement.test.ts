@@ -183,18 +183,18 @@ describe('replacement rank resolution', () => {
     const out = resolveActionReplacement(resolved('ferocious_bite'), feralActor(20));
     expect(out.def.id).toBe('redharvest');
     expect(out.rank).toBe(3);
-    expect(finisherOf(out)).toMatchObject({ base: 70, perCombo: 43 });
+    expect(finisherOf(out)).toMatchObject({ base: 70, perCombo: 0 });
     expect(refundOf(out).amount).toBe(30);
   });
 
   it('resolves rank 1 at level 5 and rank 2 at level 10', () => {
     const r1 = resolveActionReplacement(resolved('ferocious_bite'), feralActor(5));
     expect(r1.rank).toBe(1);
-    expect(finisherOf(r1)).toMatchObject({ base: 35, perCombo: 20 });
+    expect(finisherOf(r1)).toMatchObject({ base: 35, perCombo: 0 });
     expect(refundOf(r1).amount).toBe(15);
     const r2 = resolveActionReplacement(resolved('ferocious_bite'), feralActor(10));
     expect(r2.rank).toBe(2);
-    expect(finisherOf(r2)).toMatchObject({ base: 52, perCombo: 32 });
+    expect(finisherOf(r2)).toMatchObject({ base: 52, perCombo: 0 });
     expect(refundOf(r2).amount).toBe(22);
   });
 
@@ -210,7 +210,7 @@ describe('replacement rank resolution', () => {
   it('defaults to rank 1 when no actor level is provided (direct callers)', () => {
     const out = replaceResolvedAbility(resolved('ferocious_bite'), 'redharvest');
     expect(out.rank).toBe(1);
-    expect(finisherOf(out)).toMatchObject({ base: 35, perCombo: 20 });
+    expect(finisherOf(out)).toMatchObject({ base: 35, perCombo: 0 });
   });
 });
 

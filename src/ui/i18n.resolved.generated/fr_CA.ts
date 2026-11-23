@@ -18416,7 +18416,7 @@ export const fr_CA: EnTranslations = {
       "claw": {
         "name": "Griffe lacérante",
         "description": "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de chat uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute une charge de Lambeaux, un saignement de 8 points de dégâts en 8 s par charge (5 charges au maximum). Une nouvelle charge réinitialise la durée."
+        "specNote_feral": "Chaque coup porté ajoute une charge de Lambeaux, un saignement de 6 points de dégâts en 8 s par charge (5 charges au maximum). Une nouvelle charge réinitialise la durée."
       },
       "scratch": {
         "name": "Griffure",
@@ -18426,7 +18426,7 @@ export const fr_CA: EnTranslations = {
       "ferocious_bite": {
         "name": "Morsure sanglante",
         "description": "Technique de finition qui inflige {damage}. Forme de chat uniquement.",
-        "specNote_feral": "Inflige 15% de dégâts supplémentaires pour chacun de vos saignements sur la cible et ramène votre Faille sanglante à sa durée maximale. À 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe qui prolonge vos Écorcher et Faille sanglante, accélère de 30% les tics de vos saignements sur la cible pendant 8 s, et restaure de l'énergie."
+        "specNote_feral": "Inflige 15% de dégâts supplémentaires pour chacun de vos saignements sur la cible et ramène votre Faille sanglante à sa durée maximale. À 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe qui prolonge vos Écorcher et Faille sanglante, accélère de 15% les tics de vos saignements sur la cible pendant 8 s, et restaure de l'énergie."
       },
       "swipe": {
         "name": "Griffes balayantes",
@@ -18720,7 +18720,7 @@ export const fr_CA: EnTranslations = {
       },
       "redharvest": {
         "name": "Moisson rouge",
-        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, prolonge vos Écorcher et Faille sanglante sur la cible de 8 s (jusqu'à 16 s chacun), accélère de 30% les tics de vos saignements sur la cible pendant 8 s (Torrent rouge) et rend {rage} points d'énergie. Fonctionne sans aucun point de combo."
+        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, prolonge vos Écorcher et Faille sanglante sur la cible de 8 s (jusqu'à 16 s chacun), accélère de 15% les tics de vos saignements sur la cible pendant 8 s (Torrent rouge) et rend {rage} points d'énergie. Ne consomme pas de points de combo."
       },
       "marrowbreak": {
         "name": "Brise-moelle",

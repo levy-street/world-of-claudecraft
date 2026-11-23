@@ -18416,7 +18416,7 @@ export const en: EnTranslations = {
       "claw": {
         "name": "Rendclaw",
         "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds a stack of Tatter, a bleed of 8 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration."
+        "specNote_feral": "Each hit that lands adds a stack of Tatter, a bleed of 6 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration."
       },
       "scratch": {
         "name": "Scratch",
@@ -18426,7 +18426,7 @@ export const en: EnTranslations = {
       "ferocious_bite": {
         "name": "Gorebite",
         "description": "Finishing move that causes {damage}. Cat Form only.",
-        "specNote_feral": "Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 30% faster for 8 sec, and restores energy."
+        "specNote_feral": "Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 15% faster for 8 sec, and restores energy."
       },
       "swipe": {
         "name": "Sweeping Claws",
@@ -18720,7 +18720,7 @@ export const en: EnTranslations = {
       },
       "redharvest": {
         "name": "Redharvest",
-        "description": "Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 30% faster for 8 sec (Red Torrent), and restore {rage} energy. Works with zero combo points."
+        "description": "Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 15% faster for 8 sec (Red Torrent), and restore {rage} energy. Does not spend combo points."
       },
       "marrowbreak": {
         "name": "Marrowbreak",

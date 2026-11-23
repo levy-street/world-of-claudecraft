@@ -15910,7 +15910,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forbruger 3 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Sporeheling på målet.',
   'entities.abilities.redharvest.name': 'Rød Høst',
   'entities.abilities.redharvest.description':
-    'Forbruger dine 3 Gammelt Blod: et slag for {damage}, forlænger dine Flæns og Blodrevne på målet med 8 sek. (op til 16 sek. hver), får dine blødninger på målet til at tikke 30% hurtigere i 8 sek. (Rød Strøm) og gendanner {rage} energi. Virker uden kombopoint.',
+    'Forbruger dine 3 Gammelt Blod: et slag for {damage}, forlænger dine Flæns og Blodrevne på målet med 8 sek. (op til 16 sek. hver), får dine blødninger på målet til at tikke 15% hurtigere i 8 sek. (Rød Strøm) og gendanner {rage} energi. Forbruger ikke kombopoint.',
   'entities.abilities.sunlance.name': 'Solspor',
   'entities.abilities.sunlance.description':
     'Forbruger dine 3 Måneflod til et slag med {damage} naturskade plus en forbrænding på {overTime} over 9 sek. og gendanner 35 mana: manavalget. Månebølge forbruger de samme 3 Måneflod, så vælg et.',
@@ -16406,7 +16406,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Klo fjenden for våbenskade plus {damage}. Giver 1 combopoint. Kun i Katteform.',
   'entities.abilities.claw.specNote_feral':
-    'Hvert slag, der rammer, tilføjer en stak Pjalter, en blødning på 8 skade over 8 sek. pr. stak (maks. 5 stakke). En ny stak fornyer varigheden.',
+    'Hvert slag, der rammer, tilføjer en stak Pjalter, en blødning på 6 skade over 8 sek. pr. stak (maks. 5 stakke). En ny stak fornyer varigheden.',
   'entities.abilities.cold_blood.description':
     'Fokuserer din dræberinstinkt, så dine næste 5 angreb rammer kritisk. (Knifework-motoren)',
   'entities.abilities.corpse_explosion.description':
@@ -16441,7 +16441,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Afsluttende manøvre, der giver {damage}. Kun i Katteform.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Giver 15% mere skade for hver af dine blødninger på målet og fornyer din Blodrevne til fuld varighed. Ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et slag, der forlænger dine Flæns og Blodrevne, får dine blødninger på målet til at tikke 30% hurtigere i 8 sek. og gendanner energi.',
+    'Giver 15% mere skade for hver af dine blødninger på målet og fornyer din Blodrevne til fuld varighed. Ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et slag, der forlænger dine Flæns og Blodrevne, får dine blødninger på målet til at tikke 15% hurtigere i 8 sek. og gendanner energi.',
   'entities.abilities.funeral_harvest.description':
     'Når en fjende, du eller dine udøde for nylig har skadet, dør, får du 1 Sjælesplint. Dette kan ske højst én gang hvert 3. sek.',
   'entities.abilities.funeral_harvest.name': 'Begravelseshøst',

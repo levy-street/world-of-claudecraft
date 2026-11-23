@@ -16507,7 +16507,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome 3 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Cura de Esporos novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
-    'Consome seus 3 de Sangue Antigo: golpeia por {damage}, prolonga seus Esfolar e Fenda Sangrenta no alvo em 8 s (até 16 s cada), faz seus sangramentos no alvo darem tiques 30% mais rápido por 8 s (Torrente Vermelha) e restaura {rage} de energia. Funciona sem pontos de combo.',
+    'Consome seus 3 de Sangue Antigo: golpeia por {damage}, prolonga seus Esfolar e Fenda Sangrenta no alvo em 8 s (até 16 s cada), faz seus sangramentos no alvo darem tiques 15% mais rápido por 8 s (Torrente Vermelha) e restaura {rage} de energia. Não consome pontos de combo.',
   'entities.abilities.sunlance.name': 'Esteira Solar',
   'entities.abilities.sunlance.description':
     'Consome seus 3 de Maré Lunar para um golpe de {damage} de dano de Natureza mais uma queimadura de {overTime} ao longo de 9 s, e restaura 35 de mana: a escolha de mana. Onda Lunar consome os mesmos 3 de Maré Lunar, então escolha um.',
@@ -17288,7 +17288,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Gato.',
   'entities.abilities.claw.specNote_feral':
-    'Cada acerto adiciona um acúmulo de Farrapos, um sangramento de 8 de dano ao longo de 8 s por acúmulo (máx. 5 acúmulos). Um novo acúmulo renova a duração.',
+    'Cada acerto adiciona um acúmulo de Farrapos, um sangramento de 6 de dano ao longo de 8 s por acúmulo (máx. 5 acúmulos). Um novo acúmulo renova a duração.',
   'entities.abilities.cold_blood.description':
     'Concentra sua intenção mortal para que seus próximos 5 ataques sejam acertos críticos. (assinatura de Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -17323,7 +17323,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Movimento finalizador que causa {damage}. Apenas Forma de Gato.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Causa 15% a mais de dano para cada um dos seus sangramentos no alvo e renova sua Fenda Sangrenta para a duração total. Com 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em um golpe que prolonga seus Esfolar e Fenda Sangrenta, faz seus sangramentos no alvo darem tiques 30% mais rápido por 8 s e restaura energia.',
+    'Causa 15% a mais de dano para cada um dos seus sangramentos no alvo e renova sua Fenda Sangrenta para a duração total. Com 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em um golpe que prolonga seus Esfolar e Fenda Sangrenta, faz seus sangramentos no alvo darem tiques 15% mais rápido por 8 s e restaura energia.',
   'entities.abilities.funeral_harvest.description':
     'Quando um inimigo recentemente ferido por você ou por seus mortos-vivos morre, você ganha 1 Fragmento de Alma. Isso pode ocorrer uma vez a cada 3 s.',
   'entities.abilities.funeral_harvest.name': 'Colheita Fúnebre',

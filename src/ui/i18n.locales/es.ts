@@ -16710,7 +16710,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume 3 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Remiendo de Esporas nueva en el objetivo.',
   'entities.abilities.redharvest.name': 'Cosecha Roja',
   'entities.abilities.redharvest.description':
-    'Consume tus 3 de Sangre Antigua: golpea por {damage}, prolonga tus Desollar y Grieta Sangrienta en el objetivo 8 s (hasta 16 s cada uno), hace que tus sangrados en el objetivo hagan tic un 30% más rápido durante 8 s (Torrente Rojo) y restaura {rage} de energía. Funciona sin puntos de combo.',
+    'Consume tus 3 de Sangre Antigua: golpea por {damage}, prolonga tus Desollar y Grieta Sangrienta en el objetivo 8 s (hasta 16 s cada uno), hace que tus sangrados en el objetivo hagan tic un 15% más rápido durante 8 s (Torrente Rojo) y restaura {rage} de energía. No consume puntos de combo.',
   'entities.abilities.sunlance.name': 'Estela Solar',
   'entities.abilities.sunlance.description':
     'Consume tus 3 de Marea Lunar para un golpe de {damage} de daño de Naturaleza más una quemadura de {overTime} a lo largo de 9 s, y restaura 35 de maná: la opción de maná. Oleada Lunar consume los mismos 3 de Marea Lunar, así que elige una.',
@@ -16823,7 +16823,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma felina.',
   'entities.abilities.claw.specNote_feral':
-    'Cada golpe conectado añade una acumulación de Jirones, un sangrado de 8 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración.',
+    'Cada golpe conectado añade una acumulación de Jirones, un sangrado de 6 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración.',
   'entities.abilities.cold_blood.description':
     'Concentra tu instinto asesino para que tus siguientes 5 ataques sean golpes críticos. (motor de Knifework)',
   'entities.abilities.dark_pact.description':
@@ -16844,7 +16844,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Movimiento final que causa {damage}. Solo en Forma felina.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Inflige un 15% más de daño por cada uno de tus sangrados en el objetivo y renueva tu Grieta Sangrienta a su duración completa. Con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe que prolonga tus Desollar y Grieta Sangrienta, hace que tus sangrados en el objetivo hagan tic un 30% más rápido durante 8 s y restaura energía.',
+    'Inflige un 15% más de daño por cada uno de tus sangrados en el objetivo y renueva tu Grieta Sangrienta a su duración completa. Con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe que prolonga tus Desollar y Grieta Sangrienta, hace que tus sangrados en el objetivo hagan tic un 15% más rápido durante 8 s y restaura energía.',
   'entities.abilities.garrote.description':
     'Enrolla un alambre en torno a la garganta del enemigo, causando {damage} de daño ahora y haciéndolo sangrar por {overTime} a lo largo de 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
   'entities.abilities.garrote.specNote_subtlety':

@@ -16171,7 +16171,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Spotřebuje 3 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Výtrusové hojení.',
   'entities.abilities.redharvest.name': 'Rudá sklizeň',
   'entities.abilities.redharvest.description':
-    'Spotřebuje 3 Staré krve: úder za {damage}, prodlouží tvé Stažení z kůže a Krvavou trhlinu na cíli o 8 s (každé nejvýše o 16 s), na 8 s zrychlí tiky tvých krvácení na cíli o 30 % (Rudý příval) a obnoví {rage} energie. Funguje i bez combo bodů.',
+    'Spotřebuje 3 Staré krve: úder za {damage}, prodlouží tvé Stažení z kůže a Krvavou trhlinu na cíli o 8 s (každé nejvýše o 16 s), na 8 s zrychlí tiky tvých krvácení na cíli o 15 % (Rudý příval) a obnoví {rage} energie. Nespotřebovává combo body.',
   'entities.abilities.sunlance.name': 'Sluneční brázda',
   'entities.abilities.sunlance.description':
     'Spotřebuje 3 Měsíčního přílivu na úder za {damage} přírodního poškození plus popálení za {overTime} během 9 s a obnoví 35 many: volba many. Měsíční vzedmutí spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu.',
@@ -16383,7 +16383,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze v kočičí podobě.',
   'entities.abilities.claw.specNote_feral':
-    'Každý zásah přidá jednu vrstvu Rozedření, krvácení za 8 poškození během 8 s na vrstvu (max 5 vrstev). Nová vrstva obnoví trvání.',
+    'Každý zásah přidá jednu vrstvu Rozedření, krvácení za 6 poškození během 8 s na vrstvu (max 5 vrstev). Nová vrstva obnoví trvání.',
   'entities.abilities.cold_blood.description':
     'Soustředí tvůj zabijácký záměr, takže tvých příštích 5 útoků bude kritickými zásahy. (klíčová schopnost Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -16417,7 +16417,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Dokončovací útok, který způsobí {damage}. Pouze v kočičí podobě.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Způsobí o 15 % vyšší poškození za každé tvé krvácení na cíli a obnoví tvou Krvavou trhlinu na plné trvání. Při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k úderu, jenž prodlouží tvé Stažení z kůže a Krvavou trhlinu, na 8 s zrychlí tiky tvých krvácení na cíli o 30 % a obnoví energii.',
+    'Způsobí o 15 % vyšší poškození za každé tvé krvácení na cíli a obnoví tvou Krvavou trhlinu na plné trvání. Při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k úderu, jenž prodlouží tvé Stažení z kůže a Krvavou trhlinu, na 8 s zrychlí tiky tvých krvácení na cíli o 15 % a obnoví energii.',
   'entities.abilities.funeral_harvest.description':
     'Když zemře nepřítel nedávno zasažený tebou nebo tvými nemrtvými, získáš 1 Úlomek duše. Může nastat nejvýše jednou za 3 s.',
   'entities.abilities.funeral_harvest.name': 'Pohřební sklizeň',

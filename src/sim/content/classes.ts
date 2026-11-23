@@ -6874,7 +6874,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Cat Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds a stack of Tatter, a bleed of 8 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
+        'Each hit that lands adds a stack of Tatter, a bleed of 6 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
     },
   },
   scratch: {
@@ -6933,7 +6933,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Finishing move that causes $d. Cat Form only.',
     specNotes: {
       feral:
-        'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 30% faster for 8 sec, and restores energy.',
+        'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 15% faster for 8 sec, and restores energy.',
     },
   },
   swipe: {
@@ -8365,10 +8365,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'cat',
     requiresAuraKind: 'old_blood',
     requiresAuraStacks: 3,
-    spendsCombo: true,
+    // Feral bleed rework: Redharvest keeps your combo points (Old Blood is its
+    // whole price), so the points reach 5 for Bloodrift and Gorebite instead of
+    // being eaten every few seconds. comboOptional lets the finisherDamage arm
+    // strike with zero points spent; perCombo is 0 so the tooltip and the hit
+    // agree.
+    spendsCombo: false,
     comboOptional: true,
     effects: [
-      { type: 'finisherDamage', base: 35, perCombo: 20, variance: 6 },
+      { type: 'finisherDamage', base: 35, perCombo: 0, variance: 6 },
       { type: 'extendDot', dot: 'rake', seconds: 8, maxBonus: 16 },
       { type: 'extendDot', dot: 'rip', seconds: 8, maxBonus: 16 },
       { type: 'gainResource', amount: 15 },
@@ -8379,7 +8384,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 10,
         cost: 35,
         effects: [
-          { type: 'finisherDamage', base: 52, perCombo: 32, variance: 8 },
+          { type: 'finisherDamage', base: 52, perCombo: 0, variance: 8 },
           { type: 'extendDot', dot: 'rake', seconds: 8, maxBonus: 16 },
           { type: 'extendDot', dot: 'rip', seconds: 8, maxBonus: 16 },
           { type: 'gainResource', amount: 22 },
@@ -8390,7 +8395,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 16,
         cost: 35,
         effects: [
-          { type: 'finisherDamage', base: 70, perCombo: 43, variance: 10 },
+          { type: 'finisherDamage', base: 70, perCombo: 0, variance: 10 },
           { type: 'extendDot', dot: 'rake', seconds: 8, maxBonus: 16 },
           { type: 'extendDot', dot: 'rip', seconds: 8, maxBonus: 16 },
           { type: 'gainResource', amount: 30 },
@@ -8398,7 +8403,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Spends your 3 Old Blood: strike for $d, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 30% faster for 8 sec (Red Torrent), and restore energy. Works with zero combo points.',
+      'Spends your 3 Old Blood: strike for $d, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 15% faster for 8 sec (Red Torrent), and restore energy. Does not spend combo points.',
   },
   marrowbreak: {
     id: 'marrowbreak',

@@ -11,7 +11,7 @@
 // - Tatter: each landed Rendclaw adds a stack of a short bleed (max 5).
 // - Scratch Wound: each landed Scratch swing bleeds the enemy it struck.
 // - Throatrake: the Slinkstrike opener bleeds its target.
-// - Red Torrent: Redharvest makes the druid's bleeds on its target tick 30%
+// - Red Torrent: Redharvest makes the druid's bleeds on its target tick 15%
 //   faster for 8 sec, and adds 8 sec to Flense and Bloodrift, up to 16 sec
 //   extra each (an inert marker on the druid carrying the target id,
 //   the Bruin Rush window precedent).
@@ -37,7 +37,7 @@ import type { Aura, Entity } from '../types';
 
 export const TATTER_ID = 'tatter';
 export const TATTER_NAME = 'Tatter';
-export const TATTER_TOTAL_PER_STACK = 8;
+export const TATTER_TOTAL_PER_STACK = 6;
 export const TATTER_DURATION = 8;
 export const TATTER_INTERVAL = 2;
 export const TATTER_MAX_STACKS = 5;
@@ -62,10 +62,10 @@ export const THROATRAKE_INTERVAL = 3;
 export const RED_TORRENT_ID = 'red_torrent';
 export const RED_TORRENT_NAME = 'Red Torrent';
 export const RED_TORRENT_DURATION = 8;
-/** Bleed tick clock speed while Red Torrent covers the target (1.3 = 30% faster).
- *  Monte Carlo pass A1: Redharvest comes up about every 9 sec, so the 8 sec
- *  window is near-permanent and this rate acts as a standing bleed bonus. */
-export const RED_TORRENT_TICK_RATE = 1.3;
+/** Bleed tick clock speed while Red Torrent covers the target (1.15 = 15% faster).
+ *  Redharvest comes up about every 9 sec, so the 8 sec window is near-permanent
+ *  and this rate acts as a standing bleed bonus (Monte Carlo pass E1). */
+export const RED_TORRENT_TICK_RATE = 1.15;
 /** Redharvest's extension of Flense and Bloodrift, per cast (content extendDot rows). */
 export const REDHARVEST_EXTEND_SECONDS = 8;
 /** The cap on Redharvest's extension per bleed application (extendDot maxBonus). */

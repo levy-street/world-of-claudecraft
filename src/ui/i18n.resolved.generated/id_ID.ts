@@ -18416,7 +18416,7 @@ export const id_ID: EnTranslations = {
       "claw": {
         "name": "Cakar Perobek",
         "description": "Cakar musuh sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo. Hanya dalam Wujud Kucing.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah satu tumpukan Cabikan, pendarahan sebesar 8 kerusakan selama 8 detik per tumpukan (maks 5 tumpukan). Tumpukan baru menyegarkan durasinya."
+        "specNote_feral": "Setiap pukulan yang mengenai menambah satu tumpukan Cabikan, pendarahan sebesar 6 kerusakan selama 8 detik per tumpukan (maks 5 tumpukan). Tumpukan baru menyegarkan durasinya."
       },
       "scratch": {
         "name": "Cakaran",
@@ -18426,7 +18426,7 @@ export const id_ID: EnTranslations = {
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
         "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Kucing.",
-        "specNote_feral": "Memberikan 15% kerusakan lebih besar untuk setiap pendarahanmu pada target dan menyegarkan Celah Darah milikmu ke durasi penuh. Pada 3 Darah Tua tombol ini berubah menjadi Panen Merah, yang menghabiskan Darah Tua untuk serangan yang memperpanjang Kupasan dan Celah Darah milikmu, membuat pendarahanmu pada target berdetak 30% lebih cepat selama 8 detik, dan memulihkan energi."
+        "specNote_feral": "Memberikan 15% kerusakan lebih besar untuk setiap pendarahanmu pada target dan menyegarkan Celah Darah milikmu ke durasi penuh. Pada 3 Darah Tua tombol ini berubah menjadi Panen Merah, yang menghabiskan Darah Tua untuk serangan yang memperpanjang Kupasan dan Celah Darah milikmu, membuat pendarahanmu pada target berdetak 15% lebih cepat selama 8 detik, dan memulihkan energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -18720,7 +18720,7 @@ export const id_ID: EnTranslations = {
       },
       "redharvest": {
         "name": "Panen Merah",
-        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, memperpanjang Kupasan dan Celah Darah milikmu pada target selama 8 detik (hingga 16 detik masing-masing), membuat pendarahanmu pada target berdetak 30% lebih cepat selama 8 detik (Arus Merah), dan memulihkan {rage} energi. Berfungsi tanpa poin kombo."
+        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, memperpanjang Kupasan dan Celah Darah milikmu pada target selama 8 detik (hingga 16 detik masing-masing), membuat pendarahanmu pada target berdetak 15% lebih cepat selama 8 detik (Arus Merah), dan memulihkan {rage} energi. Tidak menghabiskan poin kombo."
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",

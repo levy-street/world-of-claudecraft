@@ -16253,7 +16253,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 3 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Pemulihan Spora segar pada sasaran.',
   'entities.abilities.redharvest.name': 'Panen Merah',
   'entities.abilities.redharvest.description':
-    'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, memperpanjang Kupasan dan Celah Darah milikmu pada target selama 8 detik (hingga 16 detik masing-masing), membuat pendarahanmu pada target berdetak 30% lebih cepat selama 8 detik (Arus Merah), dan memulihkan {rage} energi. Berfungsi tanpa poin kombo.',
+    'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, memperpanjang Kupasan dan Celah Darah milikmu pada target selama 8 detik (hingga 16 detik masing-masing), membuat pendarahanmu pada target berdetak 15% lebih cepat selama 8 detik (Arus Merah), dan memulihkan {rage} energi. Tidak menghabiskan poin kombo.',
   'entities.abilities.sunlance.name': 'Jejak Surya',
   'entities.abilities.sunlance.description':
     'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan sebesar {damage} kerusakan Alam ditambah bakaran {overTime} selama 9 dtk, dan memulihkan 35 mana: pilihan mana. Gelombang Rembulan menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
@@ -16651,7 +16651,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Cakar musuh sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo. Hanya dalam Wujud Kucing.',
   'entities.abilities.claw.specNote_feral':
-    'Setiap pukulan yang mengenai menambah satu tumpukan Cabikan, pendarahan sebesar 8 kerusakan selama 8 detik per tumpukan (maks 5 tumpukan). Tumpukan baru menyegarkan durasinya.',
+    'Setiap pukulan yang mengenai menambah satu tumpukan Cabikan, pendarahan sebesar 6 kerusakan selama 8 detik per tumpukan (maks 5 tumpukan). Tumpukan baru menyegarkan durasinya.',
   'entities.abilities.cold_blood.description':
     'Memusatkan niat membunuhmu sehingga 5 seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -16687,7 +16687,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Kucing.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Memberikan 15% kerusakan lebih besar untuk setiap pendarahanmu pada target dan menyegarkan Celah Darah milikmu ke durasi penuh. Pada 3 Darah Tua tombol ini berubah menjadi Panen Merah, yang menghabiskan Darah Tua untuk serangan yang memperpanjang Kupasan dan Celah Darah milikmu, membuat pendarahanmu pada target berdetak 30% lebih cepat selama 8 detik, dan memulihkan energi.',
+    'Memberikan 15% kerusakan lebih besar untuk setiap pendarahanmu pada target dan menyegarkan Celah Darah milikmu ke durasi penuh. Pada 3 Darah Tua tombol ini berubah menjadi Panen Merah, yang menghabiskan Darah Tua untuk serangan yang memperpanjang Kupasan dan Celah Darah milikmu, membuat pendarahanmu pada target berdetak 15% lebih cepat selama 8 detik, dan memulihkan energi.',
   'entities.abilities.funeral_harvest.description':
     'Saat musuh yang baru saja kamu atau mayat hidupmu lukai mati, kamu memperoleh 1 Serpihan Jiwa. Ini dapat terjadi sekali setiap 3 detik.',
   'entities.abilities.funeral_harvest.name': 'Panen Pemakaman',

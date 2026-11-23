@@ -18416,7 +18416,7 @@ export const tr_TR: EnTranslations = {
       "claw": {
         "name": "Yırtan Pençe",
         "description": "Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.",
-        "specNote_feral": "İsabet eden her vuruş bir yığın Lime Lime ekler; bu, yığın başına 8 saniyede 8 hasar veren bir kanamadır (en fazla 5 yığın). Yeni bir yığın süreyi yeniler."
+        "specNote_feral": "İsabet eden her vuruş bir yığın Lime Lime ekler; bu, yığın başına 8 saniyede 6 hasar veren bir kanamadır (en fazla 5 yığın). Yeni bir yığın süreyi yeniler."
       },
       "scratch": {
         "name": "Tırmalama",
@@ -18426,7 +18426,7 @@ export const tr_TR: EnTranslations = {
       "ferocious_bite": {
         "name": "Kanlı Isırık",
         "description": "{damage} veren bitirici hamle. Yalnızca Kedi Formu.",
-        "specNote_feral": "Hedefteki her kanaman için %15 daha fazla hasar verir ve Kanlı Yarığını tam süresine yeniler. 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak Deri Yüzme ve Kanlı Yarığını uzatan, hedefteki kanamalarının 8 saniye boyunca %30 daha hızlı işlemesini sağlayan ve enerji geri kazandıran bir vuruş yapar."
+        "specNote_feral": "Hedefteki her kanaman için %15 daha fazla hasar verir ve Kanlı Yarığını tam süresine yeniler. 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak Deri Yüzme ve Kanlı Yarığını uzatan, hedefteki kanamalarının 8 saniye boyunca %15 daha hızlı işlemesini sağlayan ve enerji geri kazandıran bir vuruş yapar."
       },
       "swipe": {
         "name": "Süpüren Pençeler",
@@ -18720,7 +18720,7 @@ export const tr_TR: EnTranslations = {
       },
       "redharvest": {
         "name": "Kızıl Hasat",
-        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, hedefteki Deri Yüzme ve Kanlı Yarığını 8 saniye uzatır (her biri en fazla 16 saniye), hedefteki kanamalarının 8 saniye boyunca %30 daha hızlı işlemesini sağlar (Kızıl Sel) ve {rage} enerji geri kazandırır. Sıfır kombo puanıyla da çalışır."
+        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, hedefteki Deri Yüzme ve Kanlı Yarığını 8 saniye uzatır (her biri en fazla 16 saniye), hedefteki kanamalarının 8 saniye boyunca %15 daha hızlı işlemesini sağlar (Kızıl Sel) ve {rage} enerji geri kazandırır. Kombo puanı harcamaz."
       },
       "marrowbreak": {
         "name": "İlik Kıran",

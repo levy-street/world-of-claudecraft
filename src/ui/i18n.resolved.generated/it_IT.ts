@@ -18416,7 +18416,7 @@ export const it_IT: EnTranslations = {
       "claw": {
         "name": "Artiglio Lacerante",
         "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Gatto.",
-        "specNote_feral": "Ogni colpo a segno aggiunge un accumulo di Brandelli, un sanguinamento da 8 danni in 8 sec per accumulo (massimo 5 accumuli). Un nuovo accumulo rinnova la durata."
+        "specNote_feral": "Ogni colpo a segno aggiunge un accumulo di Brandelli, un sanguinamento da 6 danni in 8 sec per accumulo (massimo 5 accumuli). Un nuovo accumulo rinnova la durata."
       },
       "scratch": {
         "name": "Graffio",
@@ -18426,7 +18426,7 @@ export const it_IT: EnTranslations = {
       "ferocious_bite": {
         "name": "Morso Cruento",
         "description": "Mossa finale che infligge {damage}. Solo Forma del Gatto.",
-        "specNote_feral": "Infligge il 15% di danni in più per ogni tuo sanguinamento sul bersaglio e riporta la tua Faglia Sanguigna alla durata piena. A 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo che prolunga Scarnificare e Faglia Sanguigna, fa ticchettare i tuoi sanguinamenti sul bersaglio il 30% più velocemente per 8 sec e ripristina energia."
+        "specNote_feral": "Infligge il 15% di danni in più per ogni tuo sanguinamento sul bersaglio e riporta la tua Faglia Sanguigna alla durata piena. A 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo che prolunga Scarnificare e Faglia Sanguigna, fa ticchettare i tuoi sanguinamenti sul bersaglio il 15% più velocemente per 8 sec e ripristina energia."
       },
       "swipe": {
         "name": "Artigli Falcianti",
@@ -18720,7 +18720,7 @@ export const it_IT: EnTranslations = {
       },
       "redharvest": {
         "name": "Mietitura Rossa",
-        "description": "Consuma 3 Sangue Antico: colpisce per {damage}, prolunga Scarnificare e Faglia Sanguigna sul bersaglio di 8 sec (fino a 16 sec ciascuno), fa ticchettare i tuoi sanguinamenti sul bersaglio il 30% più velocemente per 8 sec (Torrente Rosso) e ripristina {rage} energia. Funziona anche senza punti combo."
+        "description": "Consuma 3 Sangue Antico: colpisce per {damage}, prolunga Scarnificare e Faglia Sanguigna sul bersaglio di 8 sec (fino a 16 sec ciascuno), fa ticchettare i tuoi sanguinamenti sul bersaglio il 15% più velocemente per 8 sec (Torrente Rosso) e ripristina {rage} energia. Non consuma punti combo."
       },
       "marrowbreak": {
         "name": "Spezzamidollo",

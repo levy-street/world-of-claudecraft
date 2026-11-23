@@ -16594,7 +16594,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Cura delle Spore fresca sul bersaglio.',
   'entities.abilities.redharvest.name': 'Mietitura Rossa',
   'entities.abilities.redharvest.description':
-    'Consuma 3 Sangue Antico: colpisce per {damage}, prolunga Scarnificare e Faglia Sanguigna sul bersaglio di 8 sec (fino a 16 sec ciascuno), fa ticchettare i tuoi sanguinamenti sul bersaglio il 30% più velocemente per 8 sec (Torrente Rosso) e ripristina {rage} energia. Funziona anche senza punti combo.',
+    'Consuma 3 Sangue Antico: colpisce per {damage}, prolunga Scarnificare e Faglia Sanguigna sul bersaglio di 8 sec (fino a 16 sec ciascuno), fa ticchettare i tuoi sanguinamenti sul bersaglio il 15% più velocemente per 8 sec (Torrente Rosso) e ripristina {rage} energia. Non consuma punti combo.',
   'entities.abilities.sunlance.name': 'Scia Solare',
   'entities.abilities.sunlance.description':
     'Consuma 3 Marea Lunare per un colpo da {damage} danni di Natura più una bruciatura di {overTime} in 9 sec, e ripristina 35 mana: la scelta del mana. Ondata Lunare consuma le stesse 3 Marea Lunare, quindi scegline una.',
@@ -17375,7 +17375,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Gatto.",
   'entities.abilities.claw.specNote_feral':
-    'Ogni colpo a segno aggiunge un accumulo di Brandelli, un sanguinamento da 8 danni in 8 sec per accumulo (massimo 5 accumuli). Un nuovo accumulo rinnova la durata.',
+    'Ogni colpo a segno aggiunge un accumulo di Brandelli, un sanguinamento da 6 danni in 8 sec per accumulo (massimo 5 accumuli). Un nuovo accumulo rinnova la durata.',
   'entities.abilities.cold_blood.description':
     'Concentra il tuo istinto omicida così che i tuoi prossimi 5 attacchi siano colpi critici. (firma Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -17411,7 +17411,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Mossa finale che infligge {damage}. Solo Forma del Gatto.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Infligge il 15% di danni in più per ogni tuo sanguinamento sul bersaglio e riporta la tua Faglia Sanguigna alla durata piena. A 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo che prolunga Scarnificare e Faglia Sanguigna, fa ticchettare i tuoi sanguinamenti sul bersaglio il 30% più velocemente per 8 sec e ripristina energia.',
+    'Infligge il 15% di danni in più per ogni tuo sanguinamento sul bersaglio e riporta la tua Faglia Sanguigna alla durata piena. A 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo che prolunga Scarnificare e Faglia Sanguigna, fa ticchettare i tuoi sanguinamenti sul bersaglio il 15% più velocemente per 8 sec e ripristina energia.',
   'entities.abilities.funeral_harvest.description':
     "Quando un nemico danneggiato di recente da te o dai tuoi non morti muore, guadagni 1 Frammento d'Anima. Questo può verificarsi una volta ogni 3 sec.",
   'entities.abilities.funeral_harvest.name': 'Raccolto Funebre',

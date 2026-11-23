@@ -16249,7 +16249,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Spor Şifası eker.',
   'entities.abilities.redharvest.name': 'Kızıl Hasat',
   'entities.abilities.redharvest.description':
-    '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, hedefteki Deri Yüzme ve Kanlı Yarığını 8 saniye uzatır (her biri en fazla 16 saniye), hedefteki kanamalarının 8 saniye boyunca %30 daha hızlı işlemesini sağlar (Kızıl Sel) ve {rage} enerji geri kazandırır. Sıfır kombo puanıyla da çalışır.',
+    '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, hedefteki Deri Yüzme ve Kanlı Yarığını 8 saniye uzatır (her biri en fazla 16 saniye), hedefteki kanamalarının 8 saniye boyunca %15 daha hızlı işlemesini sağlar (Kızıl Sel) ve {rage} enerji geri kazandırır. Kombo puanı harcamaz.',
   'entities.abilities.sunlance.name': 'Güneş İzi',
   'entities.abilities.sunlance.description':
     '3 Ay Gelgitini, {damage} Doğa hasarı ve 9 saniyede {overTime} yanık veren bir vuruş için tüketir ve 35 mana geri kazandırır: mana seçimi. Ay Kabarışı da aynı 3 Ay Gelgitini tüketir, o yüzden birini seç.',
@@ -16463,7 +16463,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
   'entities.abilities.claw.specNote_feral':
-    'İsabet eden her vuruş bir yığın Lime Lime ekler; bu, yığın başına 8 saniyede 8 hasar veren bir kanamadır (en fazla 5 yığın). Yeni bir yığın süreyi yeniler.',
+    'İsabet eden her vuruş bir yığın Lime Lime ekler; bu, yığın başına 8 saniyede 6 hasar veren bir kanamadır (en fazla 5 yığın). Yeni bir yığın süreyi yeniler.',
   'entities.abilities.cold_blood.description':
     'Öldürme niyetini odaklar, böylece sonraki 5 saldırın kritik vuruş olur. (Knifework motoru)',
   'entities.abilities.corpse_explosion.description':
@@ -16498,7 +16498,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     '{damage} veren bitirici hamle. Yalnızca Kedi Formu.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Hedefteki her kanaman için %15 daha fazla hasar verir ve Kanlı Yarığını tam süresine yeniler. 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak Deri Yüzme ve Kanlı Yarığını uzatan, hedefteki kanamalarının 8 saniye boyunca %30 daha hızlı işlemesini sağlayan ve enerji geri kazandıran bir vuruş yapar.',
+    'Hedefteki her kanaman için %15 daha fazla hasar verir ve Kanlı Yarığını tam süresine yeniler. 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak Deri Yüzme ve Kanlı Yarığını uzatan, hedefteki kanamalarının 8 saniye boyunca %15 daha hızlı işlemesini sağlayan ve enerji geri kazandıran bir vuruş yapar.',
   'entities.abilities.funeral_harvest.description':
     "Senin ya da ölülerinin yakın zamanda hasar verdiği bir düşman öldüğünde, 1 Ruh Parçası kazanırsın. Bu en fazla 3 sn'de bir gerçekleşebilir.",
   'entities.abilities.funeral_harvest.name': 'Cenaze Hasadı',

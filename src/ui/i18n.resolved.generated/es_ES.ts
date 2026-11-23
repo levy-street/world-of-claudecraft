@@ -18416,7 +18416,7 @@ export const es_ES: EnTranslations = {
       "claw": {
         "name": "Garra Desgarradora",
         "description": "Zarpea al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.",
-        "specNote_feral": "Cada golpe que conecta añade una acumulación de Jirones, un sangrado de 8 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración."
+        "specNote_feral": "Cada golpe que conecta añade una acumulación de Jirones, un sangrado de 6 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración."
       },
       "scratch": {
         "name": "Arañazo",
@@ -18426,7 +18426,7 @@ export const es_ES: EnTranslations = {
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
         "description": "Movimiento de remate que inflige {damage}. Solo en Forma de lobo.",
-        "specNote_feral": "Inflige un 15% más de daño por cada uno de tus sangrados en el objetivo y renueva tu Grieta Sangrienta a su duración completa. Con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe que prolonga tus Desollar y Grieta Sangrienta, hace que tus sangrados en el objetivo hagan tic un 30% más rápido durante 8 s y restaura energía."
+        "specNote_feral": "Inflige un 15% más de daño por cada uno de tus sangrados en el objetivo y renueva tu Grieta Sangrienta a su duración completa. Con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe que prolonga tus Desollar y Grieta Sangrienta, hace que tus sangrados en el objetivo hagan tic un 15% más rápido durante 8 s y restaura energía."
       },
       "swipe": {
         "name": "Zarpas Barredoras",
@@ -18720,7 +18720,7 @@ export const es_ES: EnTranslations = {
       },
       "redharvest": {
         "name": "Cosecha Roja",
-        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, prolonga tus Desollar y Grieta Sangrienta en el objetivo 8 s (hasta 16 s cada uno), hace que tus sangrados en el objetivo hagan tic un 30% más rápido durante 8 s (Torrente Rojo) y restaura {rage} de energía. Funciona sin puntos de combo."
+        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, prolonga tus Desollar y Grieta Sangrienta en el objetivo 8 s (hasta 16 s cada uno), hace que tus sangrados en el objetivo hagan tic un 15% más rápido durante 8 s (Torrente Rojo) y restaura {rage} de energía. No consume puntos de combo."
       },
       "marrowbreak": {
         "name": "Quiebramédula",

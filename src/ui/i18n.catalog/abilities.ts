@@ -1294,7 +1294,7 @@ const classAbilityNamesEn = {
         'Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Cat Form only.',
         {
           feral:
-            'Each hit that lands adds a stack of Tatter, a bleed of 8 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
+            'Each hit that lands adds a stack of Tatter, a bleed of 6 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
         },
       ],
       [
@@ -1309,7 +1309,7 @@ const classAbilityNamesEn = {
         'Finishing move that causes {damage}. Cat Form only.',
         {
           feral:
-            'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 30% faster for 8 sec, and restores energy.',
+            'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 15% faster for 8 sec, and restores energy.',
         },
       ],
       [
@@ -1673,7 +1673,7 @@ const classAbilityNamesEn = {
       [
         'redharvest',
         'Redharvest',
-        'Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 30% faster for 8 sec (Red Torrent), and restore {rage} energy. Works with zero combo points.',
+        'Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 15% faster for 8 sec (Red Torrent), and restore {rage} energy. Does not spend combo points.',
       ],
       [
         'marrowbreak',

@@ -18416,7 +18416,7 @@ export const pt_BR: EnTranslations = {
       "claw": {
         "name": "Garra Dilacerante",
         "description": "Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Gato.",
-        "specNote_feral": "Cada acerto adiciona um acúmulo de Farrapos, um sangramento de 8 de dano ao longo de 8 s por acúmulo (máx. 5 acúmulos). Um novo acúmulo renova a duração."
+        "specNote_feral": "Cada acerto adiciona um acúmulo de Farrapos, um sangramento de 6 de dano ao longo de 8 s por acúmulo (máx. 5 acúmulos). Um novo acúmulo renova a duração."
       },
       "scratch": {
         "name": "Arranhão",
@@ -18426,7 +18426,7 @@ export const pt_BR: EnTranslations = {
       "ferocious_bite": {
         "name": "Mordida Sanguinária",
         "description": "Movimento finalizador que causa {damage}. Apenas Forma de Gato.",
-        "specNote_feral": "Causa 15% a mais de dano para cada um dos seus sangramentos no alvo e renova sua Fenda Sangrenta para a duração total. Com 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em um golpe que prolonga seus Esfolar e Fenda Sangrenta, faz seus sangramentos no alvo darem tiques 30% mais rápido por 8 s e restaura energia."
+        "specNote_feral": "Causa 15% a mais de dano para cada um dos seus sangramentos no alvo e renova sua Fenda Sangrenta para a duração total. Com 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em um golpe que prolonga seus Esfolar e Fenda Sangrenta, faz seus sangramentos no alvo darem tiques 15% mais rápido por 8 s e restaura energia."
       },
       "swipe": {
         "name": "Garras Varredoras",
@@ -18720,7 +18720,7 @@ export const pt_BR: EnTranslations = {
       },
       "redharvest": {
         "name": "Colheita Vermelha",
-        "description": "Consome seus 3 de Sangue Antigo: golpeia por {damage}, prolonga seus Esfolar e Fenda Sangrenta no alvo em 8 s (até 16 s cada), faz seus sangramentos no alvo darem tiques 30% mais rápido por 8 s (Torrente Vermelha) e restaura {rage} de energia. Funciona sem pontos de combo."
+        "description": "Consome seus 3 de Sangue Antigo: golpeia por {damage}, prolonga seus Esfolar e Fenda Sangrenta no alvo em 8 s (até 16 s cada), faz seus sangramentos no alvo darem tiques 15% mais rápido por 8 s (Torrente Vermelha) e restaura {rage} de energia. Não consome pontos de combo."
       },
       "marrowbreak": {
         "name": "Quebra-Medula",

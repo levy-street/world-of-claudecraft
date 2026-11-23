@@ -16365,7 +16365,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Zarodnikowe gojenie na celu.',
   'entities.abilities.redharvest.name': 'Czerwone Żniwa',
   'entities.abilities.redharvest.description':
-    'Zużywa twoje 3 Starej Krwi: cios za {damage}, wydłuża twoje Zdzieranie i Krwawą szczelinę na celu o 8 sek. (do 16 sek. każde), przyspiesza o 30% tiknięcia twoich krwawień na celu na 8 sek. (Czerwony Potok) i przywraca {rage} energii. Działa bez punktów combo.',
+    'Zużywa twoje 3 Starej Krwi: cios za {damage}, wydłuża twoje Zdzieranie i Krwawą szczelinę na celu o 8 sek. (do 16 sek. każde), przyspiesza o 15% tiknięcia twoich krwawień na celu na 8 sek. (Czerwony Potok) i przywraca {rage} energii. Nie zużywa punktów combo.',
   'entities.abilities.sunlance.name': 'Słoneczny ślad',
   'entities.abilities.sunlance.description':
     'Zużywa twoje 3 Księżycowego przypływu na cios zadający {damage} obrażeń natury oraz podpalenie zadające {overTime} w ciągu 9 s i przywraca 35 many: wybór many. Księżycowy przybór zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
@@ -16578,7 +16578,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Rozerwij wroga pazurami za obrażenia broni plus {damage}. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
   'entities.abilities.claw.specNote_feral':
-    'Każdy trafiony cios dodaje ładunek Strzępów, krwawienia zadającego 8 obrażeń w ciągu 8 sek. na ładunek (maks. 5 ładunków). Nowy ładunek odnawia czas trwania.',
+    'Każdy trafiony cios dodaje ładunek Strzępów, krwawienia zadającego 6 obrażeń w ciągu 8 sek. na ładunek (maks. 5 ładunków). Nowy ładunek odnawia czas trwania.',
   'entities.abilities.cold_blood.description':
     'Skupia twój morderczy zamiar, dzięki czemu twoje następne 5 ataków to trafienia krytyczne. (silnik Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -16613,7 +16613,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci kota.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Zadaje o 15% więcej obrażeń za każde twoje krwawienie na celu i odnawia twoją Krwawą szczelinę do pełnego czasu trwania. Przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na cios wydłużający twoje Zdzieranie i Krwawą szczelinę, przyspieszający o 30% tiknięcia twoich krwawień na celu na 8 sek. i przywracający energię.',
+    'Zadaje o 15% więcej obrażeń za każde twoje krwawienie na celu i odnawia twoją Krwawą szczelinę do pełnego czasu trwania. Przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na cios wydłużający twoje Zdzieranie i Krwawą szczelinę, przyspieszający o 15% tiknięcia twoich krwawień na celu na 8 sek. i przywracający energię.',
   'entities.abilities.funeral_harvest.description':
     'Gdy umiera wróg, któremu niedawno zadałeś obrażenia ty lub twoi nieumarli, zyskujesz 1 Odłamek Duszy. Może się to zdarzyć najwyżej raz na 3 sekundy.',
   'entities.abilities.funeral_harvest.name': 'Pogrzebowe Żniwo',

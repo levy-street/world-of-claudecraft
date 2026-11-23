@@ -18416,7 +18416,7 @@ export const sv_SE: EnTranslations = {
       "claw": {
         "name": "Rivklo",
         "description": "Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.",
-        "specNote_feral": "Varje träffande slag lägger till en stapel Slamsor, en blödning på 8 skada över 8 sek per stapel (max 5 staplar). En ny stapel förnyar varaktigheten."
+        "specNote_feral": "Varje träffande slag lägger till en stapel Slamsor, en blödning på 6 skada över 8 sek per stapel (max 5 staplar). En ny stapel förnyar varaktigheten."
       },
       "scratch": {
         "name": "Klös",
@@ -18426,7 +18426,7 @@ export const sv_SE: EnTranslations = {
       "ferocious_bite": {
         "name": "Blodsbett",
         "description": "Avslutande drag som orsakar {damage}. Endast i Kattform.",
-        "specNote_feral": "Gör 15% mer skada för varje blödning du har på målet och förnyar din Blodsspricka till full varaktighet. Vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett slag som förlänger dina Flå och Blodsspricka, får dina blödningar på målet att ticka 30% snabbare i 8 sek och återställer energi."
+        "specNote_feral": "Gör 15% mer skada för varje blödning du har på målet och förnyar din Blodsspricka till full varaktighet. Vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett slag som förlänger dina Flå och Blodsspricka, får dina blödningar på målet att ticka 15% snabbare i 8 sek och återställer energi."
       },
       "swipe": {
         "name": "Svepande klor",
@@ -18720,7 +18720,7 @@ export const sv_SE: EnTranslations = {
       },
       "redharvest": {
         "name": "Röd Skörd",
-        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage}, förlänger dina Flå och Blodsspricka på målet med 8 sek (upp till 16 sek vardera), får dina blödningar på målet att ticka 30% snabbare i 8 sek (Röd Ström) och återställer {rage} energi. Fungerar utan kombopoäng."
+        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage}, förlänger dina Flå och Blodsspricka på målet med 8 sek (upp till 16 sek vardera), får dina blödningar på målet att ticka 15% snabbare i 8 sek (Röd Ström) och återställer {rage} energi. Förbrukar inte kombopoäng."
       },
       "marrowbreak": {
         "name": "Märgbräckare",

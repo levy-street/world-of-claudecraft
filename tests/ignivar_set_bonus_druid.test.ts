@@ -455,11 +455,13 @@ describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
 
   it('is aura-only: no combo point, no Old Blood bank, and non-wearers get nothing', () => {
     const bent = redharvestReplant(true);
-    expect(bent.combo).toBe(0);
+    // Redharvest keeps the 1 combo point the rig set (feral bleed rework); the
+    // replant adds none on top.
+    expect(bent.combo).toBe(1);
     expect(bent.oldBlood).toBe(0);
     const control = redharvestReplant(false);
     expect(control.replanted).toBeUndefined();
-    expect(control.combo).toBe(0);
+    expect(control.combo).toBe(1);
     expect(control.oldBlood).toBe(0);
   });
 });

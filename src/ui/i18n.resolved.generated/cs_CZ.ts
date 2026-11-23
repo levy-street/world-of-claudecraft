@@ -18416,7 +18416,7 @@ export const cs_CZ: EnTranslations = {
       "claw": {
         "name": "Rvoucí dráp",
         "description": "Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze v kočičí podobě.",
-        "specNote_feral": "Každý zásah přidá jednu vrstvu Rozedření, krvácení za 8 poškození během 8 s na vrstvu (max 5 vrstev). Nová vrstva obnoví trvání."
+        "specNote_feral": "Každý zásah přidá jednu vrstvu Rozedření, krvácení za 6 poškození během 8 s na vrstvu (max 5 vrstev). Nová vrstva obnoví trvání."
       },
       "scratch": {
         "name": "Škrábnutí",
@@ -18426,7 +18426,7 @@ export const cs_CZ: EnTranslations = {
       "ferocious_bite": {
         "name": "Krvavý skus",
         "description": "Dokončovací útok, který způsobí {damage}. Pouze v kočičí podobě.",
-        "specNote_feral": "Způsobí o 15 % vyšší poškození za každé tvé krvácení na cíli a obnoví tvou Krvavou trhlinu na plné trvání. Při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k úderu, jenž prodlouží tvé Stažení z kůže a Krvavou trhlinu, na 8 s zrychlí tiky tvých krvácení na cíli o 30 % a obnoví energii."
+        "specNote_feral": "Způsobí o 15 % vyšší poškození za každé tvé krvácení na cíli a obnoví tvou Krvavou trhlinu na plné trvání. Při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k úderu, jenž prodlouží tvé Stažení z kůže a Krvavou trhlinu, na 8 s zrychlí tiky tvých krvácení na cíli o 15 % a obnoví energii."
       },
       "swipe": {
         "name": "Rozmáchlé drápy",
@@ -18720,7 +18720,7 @@ export const cs_CZ: EnTranslations = {
       },
       "redharvest": {
         "name": "Rudá sklizeň",
-        "description": "Spotřebuje 3 Staré krve: úder za {damage}, prodlouží tvé Stažení z kůže a Krvavou trhlinu na cíli o 8 s (každé nejvýše o 16 s), na 8 s zrychlí tiky tvých krvácení na cíli o 30 % (Rudý příval) a obnoví {rage} energie. Funguje i bez combo bodů."
+        "description": "Spotřebuje 3 Staré krve: úder za {damage}, prodlouží tvé Stažení z kůže a Krvavou trhlinu na cíli o 8 s (každé nejvýše o 16 s), na 8 s zrychlí tiky tvých krvácení na cíli o 15 % (Rudý příval) a obnoví {rage} energie. Nespotřebovává combo body."
       },
       "marrowbreak": {
         "name": "Lámání morku",
