@@ -11,6 +11,7 @@ import {
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { requiredLevelFor } from '../src/sim/item_level_req';
 import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { masterworkBonusStats } from '../src/sim/professions/masterwork';
 import { LEGENDARY_PROMOTION_COST } from '../src/sim/professions/perfecting';
@@ -25,6 +26,7 @@ import {
   isGatheredProvenance,
   isGatheredProvenanceKind,
   itemNumber,
+  itemRequiredLevelLine,
   itemStatName,
   tooltipEffectiveQuality,
   wornTooltipInstance,
@@ -780,5 +782,39 @@ describe('instancePartyTradeLine (the BoP party trade window line)', () => {
     expect(hud.indexOf('instancePartyTradeLine(', partyTrade + 1)).toBe(-1);
     // The remaining span resolves through the IWorld clock, never Date.now().
     expect(hud).toContain('this.sim.partyTradeMsRemaining(ms)');
+  });
+});
+
+describe('itemRequiredLevelLine (the card mirrors the equip level gate)', () => {
+  // The sim equip path (src/sim/items.ts equipItem) level-checks exactly these
+  // kinds. The card line once covered only weapon and armor, so every gated
+  // off-hand (orb, tome, quiver, conch) refused to equip below its level while
+  // its tooltip never said why.
+  const EQUIP_GATED_KINDS = new Set(['weapon', 'armor', 'held_offhand']);
+
+  it('names the level on a gated off-hand, red below the gate', () => {
+    const grimoire = ITEMS.sunpetal_grimoire;
+    expect(grimoire.kind).toBe('held_offhand');
+    const req = requiredLevelFor(grimoire);
+    expect(req).toBeGreaterThan(1);
+    const text = t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) });
+    expect(itemRequiredLevelLine(grimoire, req - 1)).toBe(`<div class="tt-red">${text}</div>`);
+    expect(itemRequiredLevelLine(grimoire, req)).toBe(`<div class="tt-sub">${text}</div>`);
+  });
+
+  it('every item the equip path level-gates shows the line, nothing else does', () => {
+    let gatedOffhands = 0;
+    for (const item of Object.values(ITEMS)) {
+      const req = requiredLevelFor(item);
+      const line = itemRequiredLevelLine(item, 1);
+      if (EQUIP_GATED_KINDS.has(item.kind) && req > 1) {
+        expect(line, item.id).toContain(itemNumber(req));
+        if (item.kind === 'held_offhand') gatedOffhands++;
+      } else {
+        expect(line, item.id).toBe('');
+      }
+    }
+    // Vacuity floor: the live catalog carries a couple dozen gated off-hands.
+    expect(gatedOffhands).toBeGreaterThanOrEqual(20);
   });
 });

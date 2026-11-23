@@ -465,10 +465,14 @@ export function vendorSellTooltipLine(item: ItemDef): string {
   )}</div>`;
 }
 
-/** The classic weapon/armor level gate line for the shared item card. */
+/** The classic level gate line for the shared item card. Covers exactly the
+ *  kinds the sim equip path level-checks (src/sim/items.ts equipItem: weapon,
+ *  armor, held_offhand), so an orb, tome or quiver that refuses to equip below
+ *  its level also says so on its card. */
 export function itemRequiredLevelLine(item: ItemDef, playerLevel: number): string {
   const req = requiredLevelFor(item);
-  if ((item.kind !== 'weapon' && item.kind !== 'armor') || req <= 1) return '';
+  const gated = item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand';
+  if (!gated || req <= 1) return '';
   return `<div class="${playerLevel >= req ? 'tt-sub' : 'tt-red'}">${esc(
     t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }),
   )}</div>`;
