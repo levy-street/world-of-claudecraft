@@ -72,7 +72,8 @@ export const heat = {
   swapStacks: 5,
   // The giant's girth: the sim measures a short taunt (the warrior's) to its
   // body's edge (player_attack_reach.ts), so it reaches from past the lip wall.
-  tauntPad: HEAT_BODY_R - 1,
+  // Only the guardian's: its adds are body-less (the sim measures them from the pivot).
+  tauntPad: (m) => (m?.tid === 'heart_heat_guardian' ? HEAT_BODY_R - 1 : 0),
   resetGrace: 30000,
   setup(diff) {
     const out = [

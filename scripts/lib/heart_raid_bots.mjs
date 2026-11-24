@@ -24,7 +24,7 @@
 //   bad?(world, st, at)    true when a spot is unsafe (extra to the hazards)
 //   roleSpot?(world,st,b,me) a bot's own resting spot instead of the generic one
 //   opener                 the roster key that pulls (default the main tank 'mt')
-//   tauntPad               yards past a warrior's short taunt a large body still counts (its
+//   tauntPad?(m)           yards past a warrior's short taunt mob `m`'s body still counts (its
 //                          girth: the sim measures a short reach to the body's edge)
 //   obstacles?(world)      circles a walking bot goes round
 //   blocksLine?(world,a,b) true when no line of sight (pillars)
@@ -1261,7 +1261,7 @@ function rolePosition(world, st, b, me, hazards, boss) {
       // A ranged taunt (the paladin's) needs no walk while in its reach; a
       // warrior's reaches a big body's girth (`tauntPad`) farther, so it waits
       // outside it (the Heat's lip wall) instead of walking into its middle.
-      const pad = boss.tauntPad ?? 0;
+      const pad = tauntPad(boss, t);
       const tauntReach = b.cls === 'paladin' ? 27 : pad > 0 ? reach + pad + 3 : reach;
       const stand = pad > 0 ? reach + pad + 2 : reach - 1;
       want = hypot(b.self, t) > tauntReach ? add(t, unit(t, b.self), stand) : b.self;
@@ -1416,6 +1416,13 @@ export function tankAssign(world, st, b, me) {
   b.loose = loose[0] ?? null;
 }
 
+/** A boss module's taunt pad for mob `m` (a number for every mob, or a
+ *  function of the mob: a big body's girth, none for its small adds). */
+function tauntPad(boss, m) {
+  const pad = boss.tauntPad;
+  return (typeof pad === 'function' ? pad(m) : pad) ?? 0;
+}
+
 function tankTaunt(world, st, b) {
   const loose = b.loose;
   if (!loose) return false;
@@ -1423,7 +1430,7 @@ function tankTaunt(world, st, b) {
   const tauntId = b.cls === 'warrior' ? 'taunt' : 'sacred_challenge';
   // The pad is the body's girth past a SHORT taunt (the warrior's 8 yd): the
   // paladin's 30 yd one is measured from the pivot.
-  const reach = (b.cls === 'warrior' ? 7.5 + (world.boss.tauntPad ?? 0) : 29) + (m.reach ?? 0);
+  const reach = (b.cls === 'warrior' ? 7.5 + tauntPad(world.boss, m) : 29) + (m.reach ?? 0);
   if (hypot(b.self, m) > reach || !cdReady(b, tauntId)) return false;
   if (world.blocks(b.self, m)) return false;
   if (b.self.target !== m.id) b.cmd({ cmd: 'target', id: m.id });
