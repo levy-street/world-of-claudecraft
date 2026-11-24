@@ -1236,6 +1236,9 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/final_firestorm_core.ts',
   // The burning pools' fire (the polish pass of 2026-11-23).
   'src/render/smith_heart_fx/final_pool_flames_core.ts',
+  // The Hailstorm's ice chunks, their fall and shards (the second polish
+  // pass of 2026-11-24).
+  'src/render/smith_heart_fx/final_hail_core.ts',
   'src/render/smith_heart_fx/final_overload_core.ts',
   'src/render/smith_heart_fx/final_overload_ring_core.ts',
   'src/render/smith_heart/heart_collapse_core.ts',

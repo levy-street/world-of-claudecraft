@@ -97,7 +97,6 @@ import {
   BILL_VERT,
   GLOW_FRAG,
   HAIL_FRAG,
-  HAIL_STREAK_FRAG,
   LAVA_FRAG,
   SIGIL_FRAG,
   SOLID_FRAG,
@@ -108,6 +107,7 @@ import {
   WALL_VERT,
 } from './final_elements_glsl';
 import { FinalFirestormFx } from './final_firestorm_fx';
+import { FinalHailFx } from './final_hail_fx';
 import { KIT_UV_VERT } from './final_kit_glsl';
 import type { FinalElement, FinalTelegraphKind } from './final_telegraph_core';
 import type { FinalTelegraphLane, FinalTelegraphs } from './final_telegraphs';
@@ -267,10 +267,9 @@ export class FinalElementsFx {
   private readonly firestorm: FinalFirestormFx;
   private readonly lanes: LaneSlot[] = [];
   private readonly spires: Spire[] = [];
-  private readonly hailBalls: THREE.InstancedMesh;
-  private hailUsed = 0;
-  /** Each falling stone's streak above it. */
-  private readonly hailTrails: THREE.InstancedMesh;
+  /** The hail's falling ice chunks, their frost trails and the shards they
+   *  break into (their own part). */
+  private readonly hail: FinalHailFx;
   /** A hailstone's frost circle filling as it falls (by stone), and the
    *  frost splats stones leave as they shatter. */
   private readonly hailDiscs: { mesh: THREE.Mesh; u: Uni; id: number; seen: boolean }[] = [];
@@ -373,8 +372,7 @@ export class FinalElementsFx {
     };
     const crystal = new THREE.OctahedronGeometry(1, 0).scale(0.45, 1.1, 0.45);
     const rock = new THREE.DodecahedronGeometry(1, 0);
-    const hailGeo = new THREE.IcosahedronGeometry(1, 1);
-    h.geometries.push(crystal, rock, hailGeo);
+    h.geometries.push(crystal, rock);
     // Searing Burn: a column of flame tongues wrapping the tank (its shape
     // reads where the colour alone would not, in the Heat's own orange).
     const columnGeo = new THREE.CylinderGeometry(1, 0.8, 1, 28, 1, true).translate(0, 0.5, 0);
@@ -417,24 +415,15 @@ export class FinalElementsFx {
       P.marks * P.markPieces,
       'smithHeartFinalPolarityPieces',
     );
-    this.hailBalls = instanced(
-      hailGeo,
-      solid('smithHeartFinalHail', 1),
-      P.hail,
-      'smithHeartFinalHail',
-    );
-    const trailGeo = new THREE.ConeGeometry(0.5, 1, 8, 1, true).translate(0, 0.5, 0);
-    h.geometries.push(trailGeo);
-    this.hailTrails = instanced(
-      trailGeo,
-      shader('smithHeartFinalHailTrail', {}, SOLID_VERT, HAIL_STREAK_FRAG, {
-        blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide,
-      }),
-      P.hail,
-      'smithHeartFinalHailTrail',
-    );
-    this.hailTrails.renderOrder = BODY_ORDER + 1;
+    this.hail = new FinalHailFx({
+      root: h.root,
+      uTime: h.uTime,
+      density: h.density,
+      geometries: h.geometries,
+      materials: h.materials,
+      order: BODY_ORDER,
+      spots: P.hail,
+    });
     const discGeoH = new THREE.CircleGeometry(1, 40).rotateX(-Math.PI / 2);
     h.geometries.push(discGeoH);
     const hailDisc = (name: string, i: number) => {
@@ -609,7 +598,7 @@ export class FinalElementsFx {
     this.pipUsed = 0;
     this.sigilUsed = 0;
     this.markPieceUsed = 0;
-    this.hailUsed = 0;
+    this.hail.begin();
     this.avalanche.begin(clock);
     this.fusionSeen = false;
     this.groups.clear();
@@ -916,8 +905,7 @@ export class FinalElementsFx {
     this.flush(this.tankPieces, this.tankPieceUsed);
     this.flush(this.pips, this.pipUsed);
     this.flush(this.markPieces, this.markPieceUsed);
-    this.flush(this.hailBalls, this.hailUsed);
-    this.flush(this.hailTrails, this.hailUsed);
+    this.hail.end(this.clock);
     this.avalanche.end();
   }
 
@@ -1379,24 +1367,21 @@ export class FinalElementsFx {
     }
     const f = hailFall(warn - age, warn);
     if (d) d.u.uShadow.value = f.shown ? 1 - f.height / HAIL_DROP : 0;
-    if (!f.shown || this.hailUsed >= P.hail) return;
-    const y = H.groundY(x, z) + f.height + 0.7;
-    const i = this.hailUsed++;
-    const spin = this.clock * 4 + e.id;
-    this.piece(this.hailBalls, i, x, y, z, 1.35, 1.55, 1.35, spin, e.id, 0, 0x4a88cc);
-    // Its streak: a pale cone trailing up behind it, longer as it speeds.
-    const streak = 3 + 7 * (1 - f.height / HAIL_DROP);
-    this.piece(this.hailTrails, i, x, y + 0.2, z, 1.5, streak, 1.5, 0, 0, 0, 0xd8f0ff);
-    if (H.rand() < 1.6 * H.density)
+    if (!f.shown) return;
+    const g = H.groundY(x, z);
+    // Its cluster of jagged ice chunks and their frost trails (final_hail_fx.ts).
+    this.hail.stone(e.id, x, g, z, r, f.height, HAIL_DROP, this.clock);
+    const y = g + f.height + 0.6;
+    if (H.rand() < 1.2 * H.density)
       H.particles.puff(x, y + 0.8, z, 1, {
-        speed: 0.4,
-        up: 8,
-        life: 0.35,
-        size: [0.7, 0.15],
+        speed: 0.6,
+        up: 6,
+        life: 0.4,
+        size: [0.5, 0.12],
         color: C.frostRgb,
-        alpha: 0.9,
+        alpha: 0.7,
         pool: 'glow',
-        radius: 0.3,
+        radius: 0.5,
       });
   }
 
@@ -1589,13 +1574,15 @@ export class FinalElementsFx {
           H.shake(x, z, 0.3, 60);
           break;
         case ELEMENT_CUES.hail:
-          // The stone shatters: ice shards thrown out, a frost burst, the splat.
+          // The stone shatters: ice shards thrown out (final_hail_fx.ts), a
+          // frost burst, a cold mist, the splat.
           this.splat(x, z, r);
-          fx.puff(x, y + 0.6, z, Math.round(34 * H.density) + 8, {
+          this.hail.shatter(x, y, z, this.clock);
+          fx.puff(x, y + 0.6, z, Math.round(22 * H.density) + 6, {
             speed: 7,
             up: 6,
-            life: 0.8,
-            size: [0.6, 0.18],
+            life: 0.6,
+            size: [0.45, 0.12],
             color: [0.88, 0.96, 1],
             alpha: 1,
             pool: 'glow',
@@ -1829,8 +1816,8 @@ export class FinalElementsFx {
   }
 
   dispose(): void {
-    for (const m of [this.tankPieces, this.pips, this.markPieces, this.hailBalls, this.hailTrails])
-      m.dispose();
+    for (const m of [this.tankPieces, this.pips, this.markPieces]) m.dispose();
+    this.hail.dispose();
     this.avalanche.dispose();
   }
 
@@ -1839,6 +1826,7 @@ export class FinalElementsFx {
     this.end();
     this.avalanche.hide();
     this.firestorm.hide();
+    this.hail.hide();
     this.born.clear();
     this.stateAt.clear();
     this.lastPulse.clear();

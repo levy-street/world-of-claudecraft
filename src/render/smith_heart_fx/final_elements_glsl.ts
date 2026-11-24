@@ -13,7 +13,7 @@
 //                the boss's fusion orbs): fire licking up, frost cells, storm
 //                forks or cracked stone, by `uKind`, stronger with `uStrength`;
 //   SOLID_VERT / SOLID_FRAG  the instanced solids (Avalanche's spikes, the
-//                orbiting rocks and crystals, the hailstones): a fixed key
+//                orbiting rocks and crystals): a fixed key
 //                light, a cold fresnel for ice, the instance's colour;
 //   SPIRE_FRAG   a Storm Spire: dark stone, violet veins lighting with the
 //                charge, flickering hot at the discharge.
@@ -202,24 +202,6 @@ void main() {
   col = mix(col, vec3(0.02, 0.04, 0.1), spot * 0.85);
   alpha = max(alpha, spot * 0.7 * uAlpha);
   gl_FragColor = vec4(col, alpha);
-}
-`;
-
-/** A falling hailstone's streak (additive, on the solids' vertex: a cone
- *  standing 0..1 over the stone): frost light brightest at the stone,
- *  fading up the streak and soft at its sides. */
-export const HAIL_STREAK_FRAG = /* glsl */ `
-varying vec3 vN;
-varying vec3 vView;
-varying vec3 vCol;
-varying vec3 vObj;
-void main() {
-  vec3 n = normalize(vN);
-  vec3 v = normalize(vView);
-  float face = abs(dot(n, v));
-  float up = clamp(vObj.y, 0.0, 1.0);
-  float a = pow(1.0 - up, 1.6) * smoothstep(0.05, 0.6, face) * 0.85;
-  gl_FragColor = vec4(vec3(0.62, 0.84, 1.0) * a, a);
 }
 `;
 

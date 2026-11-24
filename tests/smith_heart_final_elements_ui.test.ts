@@ -366,8 +366,22 @@ describe('FinalKitFx draws its own elements', () => {
       'smithHeartFirestormBody',
       'smithHeartFirestormTrail',
       'smithHeartFirestormFloor',
+      // The second polish pass (2026-11-24): soft flames across the whole
+      // lane and down the burning trail, each over its dark body.
+      'smithHeartFirestormFlames',
+      'smithHeartFirestormFlameBody',
+      'smithHeartFirestormTrailFlames',
+      'smithHeartFirestormTrailFlameBody',
     ])
       expect(visibleNamed(root, name), name).toBe(1);
+    // The hail falls as a cluster of jagged ice chunks with frost trails
+    // (final_hail_fx.ts), never one smooth ball.
+    const stones = () =>
+      instancesShown(root, 'smithHeartFinalHailStones0') +
+      instancesShown(root, 'smithHeartFinalHailStones1') +
+      instancesShown(root, 'smithHeartFinalHailStones2');
+    expect(stones()).toBeGreaterThan(1);
+    expect(instancesShown(root, 'smithHeartFinalHailTrail')).toBe(stones());
     // The falling hailstone's shadow gathers in its circle (the polish pass of
     // 2026-11-23: the pale stone over a pale circle read poorly).
     let shadow = 0;
@@ -416,6 +430,9 @@ describe('FinalKitFx draws its own elements', () => {
       ELEMENT_CUES.balance,
     ])
       expect(fx.handleEvent(evAt(cue)), cue).toBe(true);
+    // The hailstone's hit throws its ice shards.
+    fx.update(1 / 30);
+    expect(instancesShown(root, 'smithHeartFinalHailShards')).toBeGreaterThan(0);
     // Everything gone with its objects and auras.
     for (const id of [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]) entities.delete(id);
     for (const e of [me, tank, fire, boss]) e.auras = [];
@@ -429,9 +446,12 @@ describe('FinalKitFx draws its own elements', () => {
       'smithHeartFinalSteamBillow',
       'smithHeartFirestormFire',
       'smithHeartFirestormTrail',
+      'smithHeartFirestormFlames',
+      'smithHeartFirestormTrailFlames',
       'smithHeartFinalSpire',
     ])
       expect(visibleNamed(root, name), name).toBe(0);
+    expect(instancesShown(root, 'smithHeartFinalHailStones0')).toBe(0);
     // The burnt lane's char outlives the wall a moment (never a pop).
     expect(visibleNamed(root, 'smithHeartFirestormFloor')).toBe(1);
     // The Avalanche's spikes crumble on after its lane object goes (never
