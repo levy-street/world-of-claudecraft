@@ -188,6 +188,15 @@ describe('inspect stage sizing', () => {
     },
   );
 
+  // The mount panel builds its renderer in place, so it keeps the plain 380px
+  // floor rather than the Armory's parked-size clamp.
+  it('keeps the mount stage on its 380px floor on a tall desktop', async () => {
+    await page.viewport(1280, 900);
+    setViewportVars(1);
+    const { stage } = openStage('mount');
+    expect(stage.clientHeight).toBe(380);
+  });
+
   // The out-of-flow canvas must not cover the scene and mode toggles drawn
   // over it: a press on a toggle reaches the toggle.
   it.each(['armory', 'mount'] as const)(
