@@ -7449,9 +7449,9 @@ export const ru_RU: EnTranslations = {
       "temperedTitle": "Смена танков! x{stacks}"
     },
     "tankSwap": {
-      "swapTitle": "Swap x{stacks}",
-      "tauntTitle": "Taunt",
-      "timeAria": "{seconds} seconds left on the debuff"
+      "swapTitle": "Смена x{stacks}",
+      "tauntTitle": "Провокация",
+      "timeAria": "До конца эффекта {seconds} сек"
     },
     "heatGuardian": {
       "say": {

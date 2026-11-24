@@ -7449,9 +7449,9 @@ export const zh_CN: EnTranslations = {
       "temperedTitle": "换坦！x{stacks}"
     },
     "tankSwap": {
-      "swapTitle": "Swap x{stacks}",
-      "tauntTitle": "Taunt",
-      "timeAria": "{seconds} seconds left on the debuff"
+      "swapTitle": "换坦 x{stacks}",
+      "tauntTitle": "嘲讽",
+      "timeAria": "减益效果剩余{seconds}秒"
     },
     "heatGuardian": {
       "say": {

@@ -3002,37 +3002,25 @@ export const pending: Record<string, readonly string[]> = {
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
     "hudChrome.finalOverload.heat",
-    "hudChrome.quenchAlert.secondsBar",
-    "hudChrome.tankSwap.swapTitle",
-    "hudChrome.tankSwap.tauntTitle",
-    "hudChrome.tankSwap.timeAria"
+    "hudChrome.quenchAlert.secondsBar"
   ],
   "zh_TW": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
     "hudChrome.finalOverload.heat",
-    "hudChrome.quenchAlert.secondsBar",
-    "hudChrome.tankSwap.swapTitle",
-    "hudChrome.tankSwap.tauntTitle",
-    "hudChrome.tankSwap.timeAria"
+    "hudChrome.quenchAlert.secondsBar"
   ],
   "ko_KR": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
     "hudChrome.finalOverload.heat",
-    "hudChrome.quenchAlert.secondsBar",
-    "hudChrome.tankSwap.swapTitle",
-    "hudChrome.tankSwap.tauntTitle",
-    "hudChrome.tankSwap.timeAria"
+    "hudChrome.quenchAlert.secondsBar"
   ],
   "ja_JP": [
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
     "hudChrome.finalOverload.heat",
-    "hudChrome.quenchAlert.secondsBar",
-    "hudChrome.tankSwap.swapTitle",
-    "hudChrome.tankSwap.tauntTitle",
-    "hudChrome.tankSwap.timeAria"
+    "hudChrome.quenchAlert.secondsBar"
   ],
   "pt_BR": [
     "abilityUi.cast.heart_bellows_gust",
@@ -3536,10 +3524,7 @@ export const pending: Record<string, readonly string[]> = {
     "abilityUi.cast.heart_gale_bolt",
     "abilityUi.cast.heart_rime_bolt",
     "hudChrome.finalOverload.heat",
-    "hudChrome.quenchAlert.secondsBar",
-    "hudChrome.tankSwap.swapTitle",
-    "hudChrome.tankSwap.tauntTitle",
-    "hudChrome.tankSwap.timeAria"
+    "hudChrome.quenchAlert.secondsBar"
   ],
   "cs_CZ": [
     "abilityUi.cast.heart_bellows_gust",

@@ -7449,9 +7449,9 @@ export const ja_JP: EnTranslations = {
       "temperedTitle": "タンク交代！x{stacks}"
     },
     "tankSwap": {
-      "swapTitle": "Swap x{stacks}",
-      "tauntTitle": "Taunt",
-      "timeAria": "{seconds} seconds left on the debuff"
+      "swapTitle": "交代 x{stacks}",
+      "tauntTitle": "挑発",
+      "timeAria": "デバフの残り{seconds}秒"
     },
     "heatGuardian": {
       "say": {

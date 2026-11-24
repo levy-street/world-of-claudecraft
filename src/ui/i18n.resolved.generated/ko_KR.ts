@@ -7449,9 +7449,9 @@ export const ko_KR: EnTranslations = {
       "temperedTitle": "탱커 교대! x{stacks}"
     },
     "tankSwap": {
-      "swapTitle": "Swap x{stacks}",
-      "tauntTitle": "Taunt",
-      "timeAria": "{seconds} seconds left on the debuff"
+      "swapTitle": "교대 x{stacks}",
+      "tauntTitle": "도발",
+      "timeAria": "약화 효과 {seconds}초 남음"
     },
     "heatGuardian": {
       "say": {
