@@ -41,6 +41,7 @@ const ISLE_URLS = {
   spire: '/models/props/sky_isle_spire.glb',
   terraced: '/models/props/sky_isle_terraced.glb',
   crag: '/models/props/sky_isle_crag.glb',
+  raid: '/models/props/sky_isle_raid.glb',
 } as const satisfies Record<IsleModel, string>;
 
 // The loaded scenes (loadGltf caches by url). Never mutated: the bake clones
@@ -143,6 +144,8 @@ function instanceIsles(
   for (const part of baked.parts) {
     const mesh = new THREE.InstancedMesh(part.geometry, part.material, isles.length);
     // the cached island GLB's own material: the dressing view never disposes it
+    // (the raid isle's glow is its own GLB's emissive map: only the heart, the
+    // lava and the ice light themselves, so the isle darkens with the night)
     mesh.userData.quarteredBorrowedMaterial = true;
     mesh.name = `quartered-floating-isle-${model}`;
     mesh.userData.quarteredIsle = model;
@@ -222,7 +225,9 @@ function cloudMaterial(): THREE.Material {
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.generateMipmaps = true;
   texture.needsUpdate = true;
-  const material = new THREE.MeshBasicMaterial({
+  // lit (Lambert, its cards' normals face up), so the bank greys with the
+  // night instead of glowing white against the stars
+  const material = new THREE.MeshLambertMaterial({
     map: texture,
     color: 0xdde2e8,
     vertexColors: true,

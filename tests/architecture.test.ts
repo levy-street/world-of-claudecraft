@@ -1511,6 +1511,8 @@ const RENDER_PURE_CORES = [
   'src/render/gyre_rock_skin_core.ts',
   'src/render/gyre_wind_core.ts',
   'src/render/quartered_floating_debris_core.ts',
+  // the storm round the raid isle: its cloud cards, bolts and strike clock (quartered_raid_storm.ts)
+  'src/render/quartered_raid_storm_core.ts',
   'src/render/quartered_fissure_lava_core.ts',
   // the scatter boulders' biome and Cinderscar tint (foliage.ts)
   'src/render/scatter_rock_tint_core.ts',

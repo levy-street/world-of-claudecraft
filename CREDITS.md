@@ -540,12 +540,13 @@ something this file marks as restricted, ask first: tony@levystreet.com.
 | Generated prop model (heave_strata_large) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (heave_strata_small) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (heave_strata_rubble) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (sky_isle_pines) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (sky_isle_twin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (sky_isle_slab) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (sky_isle_spire) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (sky_isle_terraced) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (sky_isle_crag) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (sky_isle_pines) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D), simplified and re-textured locally (one colour map) | Project asset | With the project only |
+| Generated prop model (sky_isle_twin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D), simplified and re-textured locally (one colour map) | Project asset | With the project only |
+| Generated prop model (sky_isle_slab) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D), simplified and re-textured locally (one colour map) | Project asset | With the project only |
+| Generated prop model (sky_isle_spire) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D), simplified and re-textured locally (one colour map) | Project asset | With the project only |
+| Generated prop model (sky_isle_terraced) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D), simplified and re-textured locally (one colour map) | Project asset | With the project only |
+| Generated prop model (sky_isle_crag) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D), simplified and re-textured locally (one colour map) | Project asset | With the project only |
+| Generated prop model (sky_isle_raid) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) from an OpenAI image-generation concept sheet, simplified, given a baked glow map and texture-compressed locally | Project asset | With the project only |
 | Generated prop model (council_seat_gate) | World of ClaudeCraft | Project-generated: OpenAI image-generation three-view concept sheet, Tripo AI 3D multiview-to-model and texture | Project asset | With the project only |
 | Generated prop model (council_beacon) | World of ClaudeCraft | Project-generated: OpenAI image-generation three-view concept sheet, Tripo AI 3D multiview-to-model and texture | Project asset | With the project only |
 | Generated prop model (council_plaza) | World of ClaudeCraft | Project-generated: OpenAI image-generation top-down painting built into a disc by a local script | Project asset | With the project only |

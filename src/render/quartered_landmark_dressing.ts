@@ -27,6 +27,9 @@
 //   still missing).
 // - The isles are static: this view has no per-frame hook, and a bob would
 //   need a custom vertex shader (a new program key) for a barely seen drift.
+//   The one moving piece, the storm round the raid isle, is built here (so it
+//   links behind the gate) and ticked from the props update
+//   (quartered_raid_storm.ts tickRaidStorm).
 // The renderer attaches the view through attachZoneFeature, so its programs
 // link behind the world compile gate and the idle zone prepare, never in a live
 // frame.
@@ -63,6 +66,12 @@ import {
   planQuarteredLandmarkDressing,
   type QuarteredSpireSite,
 } from './quartered_landmark_dressing_core';
+import {
+  attachRaidStorm,
+  createRaidStormView,
+  detachRaidStorm,
+  type RaidStormView,
+} from './quartered_raid_storm';
 import { SCENERY_BACKDROP_FLAG } from './scenery_bands';
 
 const QUARTERED_DRESSING_URLS = {
@@ -373,10 +382,19 @@ export function buildQuarteredLandmarks(seed: number): QuarteredLandmarkDressing
   // The isles are the one piece a lower tier may thin: they are cosmetic sky
   // dressing with nothing a player reacts to (the graphics fairness rule), and
   // they key off the same build-time knob the spires' material shed reads.
-  buildFloatingIsles(
-    shedFloatingIsles(plan.debris, GFX.standardMaterials ? 1 : LOW_TIER_DEBRIS_SHARE),
-    { near: clusters.near, mid: clusters.mid, far: clusters.far },
-  );
+  const debris = shedFloatingIsles(plan.debris, GFX.standardMaterials ? 1 : LOW_TIER_DEBRIS_SHARE);
+  buildFloatingIsles(debris, { near: clusters.near, mid: clusters.mid, far: clusters.far });
+  // the storm round the raid isle (quartered_raid_storm.ts) rides the isle's
+  // own cull cluster, so its programs link behind this view's compile gate,
+  // the sweep culls it with the isle, and this view's teardown frees it; the
+  // props update ticks it (this view has no per-frame hook)
+  const raid = debris.isles.find((isle) => isle.model === 'raid');
+  let storm: RaidStormView | null = null;
+  if (raid) {
+    storm = createRaidStormView(raid);
+    clusters[raid.cluster].add(storm.group);
+    attachRaidStorm(storm);
+  }
 
   const cullGroups = [
     ...lakeGroups,
@@ -392,7 +410,15 @@ export function buildQuarteredLandmarks(seed: number): QuarteredLandmarkDressing
     dispose(): void {
       if (disposed) return;
       disposed = true;
-      disposeDressing(group);
+      try {
+        if (storm) {
+          detachRaidStorm(storm);
+          storm.dispose();
+        }
+      } finally {
+        // the dressing's own teardown runs even if the storm's throws
+        disposeDressing(group);
+      }
     },
   };
 }

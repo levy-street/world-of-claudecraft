@@ -404,6 +404,9 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   // the Gyre's wind: ribbons, wisps and mist drawn over the storm peak's road, static zone
   // dressing at the isle's north, never on a raid floor
   'src/render/gyre_wind.ts',
+  // the storm round the raid isle: cloud cards and lightning hung far up in the sky north
+  // of the Gyre, never on a floor
+  'src/render/quartered_raid_storm.ts',
   // the seasonal candle halos: camera-facing sprites at a candle's height, never on
   // the floor (their ground pools take the floor ladder through floorVfxRenderOrder)
   'src/render/seasonal_decor_lights.ts',

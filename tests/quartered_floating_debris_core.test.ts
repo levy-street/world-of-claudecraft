@@ -3,6 +3,7 @@ import {
   CLOUD_BELOW_MAX,
   CLOUD_BELOW_MIN,
   CLOUD_TEXTURE_SIZE,
+  CROWN_Y,
   chainLinkY,
   cloudPuffTexels,
   type FloatingIsle,
@@ -12,13 +13,12 @@ import {
   ISLE_GROUND_CLEAR,
   ISLE_MODEL_KEYS,
   ISLE_MODELS,
-  ISLE_TARGET,
-  ISLE_TOP_FAR,
-  ISLE_TOP_NEAR,
-  ISLE_TRAIL,
+  ISLE_SLOTS,
   isleWorldPoint,
   LOW_TIER_DEBRIS_SHARE,
   planFloatingIsles,
+  RAID_ISLE_SLOT,
+  RAID_VIEW_CLEAR,
   shedFloatingIsles,
 } from '../src/render/quartered_floating_debris_core';
 import { GYRE_PEAK } from '../src/sim/quartered_landmarks';
@@ -45,26 +45,83 @@ function corners(isle: FloatingIsle): [number, number, number][] {
 describe('the Quartered Isle floating isles', () => {
   const plan = planFloatingIsles(finished);
 
-  it('hangs a trail of island models north of the Gyre, never over the isle itself', () => {
-    expect(plan.isles.length).toBeGreaterThanOrEqual(12);
-    expect(plan.isles.length).toBeLessThanOrEqual(ISLE_TARGET);
+  // Seen from the crown looking north: left is +X, right is -X. An islet's
+  // bearing (degrees, + to the left) and the half-angle its width subtends.
+  const bearing = (i: FloatingIsle) =>
+    (Math.atan2(i.x - GYRE_PEAK.x, i.z - GYRE_PEAK.z) * 180) / Math.PI;
+  const halfAngle = (i: FloatingIsle) =>
+    (Math.atan(i.width / 2 / Math.hypot(i.x - GYRE_PEAK.x, i.z - GYRE_PEAK.z)) * 180) / Math.PI;
+  const raid = plan.isles.find((i) => i.model === 'raid');
+  const flanks = plan.isles.filter((i) => i.model !== 'raid');
+
+  it('hangs the raid isle in the middle of the view and three islets either side', () => {
+    expect(raid).toBeDefined();
+    if (!raid) return;
+    expect(plan.isles.filter((i) => i.model === 'raid')).toHaveLength(1);
+    // due north of the crown, far out over the sea
+    expect(Math.abs(bearing(raid))).toBeLessThan(1);
+    expect(raid.z - GYRE_PEAK.z).toBeGreaterThan(250);
+    const left = flanks.filter((i) => bearing(i) > 0);
+    const right = flanks.filter((i) => bearing(i) < 0);
+    expect(left).toHaveLength(3);
+    expect(right).toHaveLength(3);
+    expect(flanks).toHaveLength(ISLE_SLOTS.length);
+    // every islet hangs north of the isle, never over it, and the six flanking
+    // islets use all six of the sky models
     for (const isle of plan.isles) {
       expect(ISLE_MODEL_KEYS).toContain(isle.model);
       for (const c of corners(isle)) expect(c[2]).toBeGreaterThan(GYRE_PEAK.z + 40);
-      expect(isle.z).toBeLessThanOrEqual(ISLE_TRAIL.endZ + 1);
     }
-    // the trail reaches from near the Gyre out to the far distance, in all
-    // three cull stretches, and mixes the models
-    const zs = plan.isles.map((i) => i.z);
-    expect(Math.min(...zs)).toBeLessThan(ISLE_TRAIL.startZ + 40);
-    expect(Math.max(...zs)).toBeGreaterThan(ISLE_TRAIL.endZ - 60);
+    expect(new Set(flanks.map((i) => i.model)).size).toBe(6);
     for (const cluster of ['near', 'mid', 'far']) {
       expect(
         plan.isles.some((i) => i.cluster === cluster),
         cluster,
       ).toBe(true);
     }
-    expect(new Set(plan.isles.map((i) => i.model)).size).toBeGreaterThanOrEqual(5);
+  });
+
+  it("keeps the middle of the view the raid isle's alone", () => {
+    if (!raid) throw new Error('no raid isle');
+    const raidEdge = halfAngle(raid);
+    for (const isle of flanks) {
+      const inner = Math.abs(bearing(isle)) - halfAngle(isle);
+      expect(inner, `islet ${isle.isle} (${isle.model})`).toBeGreaterThanOrEqual(
+        raidEdge + RAID_VIEW_CLEAR,
+      );
+    }
+  });
+
+  it('hangs the flanking islets at uneven heights', () => {
+    const tops = flanks.map((i) => i.maxY).sort((a, b) => a - b);
+    // a wide spread, every islet over the crown, and no two at a like height
+    expect(tops[tops.length - 1] - tops[0]).toBeGreaterThan(100);
+    expect(tops[0]).toBeGreaterThan(CROWN_Y + 15);
+    for (let k = 1; k < tops.length; k++) expect(tops[k] - tops[k - 1]).toBeGreaterThan(10);
+    // and each side climbs and dips on its own
+    for (const side of [1, -1]) {
+      const own = flanks.filter((i) => Math.sign(bearing(i)) === side).map((i) => i.maxY);
+      expect(Math.max(...own) - Math.min(...own)).toBeGreaterThan(40);
+    }
+  });
+
+  it('makes the raid isle the biggest and highest thing in the view, its heart toward the crown', () => {
+    if (!raid) throw new Error('no raid isle');
+    for (const isle of flanks) expect(raid.width).toBeGreaterThan(isle.width * 1.8);
+    expect(raid.maxY).toBeGreaterThan(CROWN_Y + 80);
+    // the highest point in the sky: well over every flanking islet's top
+    expect(raid.maxY).toBeGreaterThan(Math.max(...flanks.map((i) => i.maxY)) + 15);
+    expect(raid.width).toBe(RAID_ISLE_SLOT.width);
+    // the heart (the model's +X face) turned to face south, and the top
+    // tipped toward the crown (seen from below, its keep still shows)
+    const flat = { ...raid, x: 0, y: 0, z: 0, tilt: 0 };
+    const heart = isleWorldPoint(flat, [1, 0, 0]);
+    expect(heart[2]).toBeLessThan(-0.99 * raid.scale);
+    expect(Math.abs(heart[0])).toBeLessThan(1e-6);
+    const up = isleWorldPoint({ ...raid, x: 0, y: 0, z: 0 }, [0, 1, 0]);
+    expect(up[2]).toBeLessThan(-0.25 * raid.scale);
+    expect(Math.abs(up[0])).toBeLessThan(1e-6);
+    expect(raid.tilt).toBe(RAID_ISLE_SLOT.lean);
   });
 
   it('places one model per islet, scaled so its width is the planned width', () => {
@@ -76,8 +133,8 @@ describe('the Quartered Isle floating isles', () => {
       const ys = corners(isle).map((c) => c[1]);
       expect(Math.min(...ys)).toBeCloseTo(isle.minY, 6);
       expect(Math.max(...ys)).toBeCloseTo(isle.maxY, 6);
-      // a small lean only
-      expect(Math.abs(isle.tilt)).toBeLessThanOrEqual(0.08 + 1e-9);
+      // a small lean only (the raid isle's is its own, tested below)
+      if (isle.model !== 'raid') expect(Math.abs(isle.tilt)).toBeLessThanOrEqual(0.08 + 1e-9);
     }
   });
 
@@ -99,27 +156,6 @@ describe('the Quartered Isle floating isles', () => {
     const tip = isleWorldPoint(flat, [0, 0, 0]);
     const head = isleWorldPoint(flat, n);
     expect(head[1] - tip[1]).toBeGreaterThan(0.97);
-  });
-
-  it('climbs and grows the farther north it hangs, so the far islands read big', () => {
-    const sorted = [...plan.isles].sort((a, b) => a.z - b.z);
-    const third = Math.floor(sorted.length / 3);
-    const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
-    const near = sorted.slice(0, third);
-    const far = sorted.slice(-third);
-    expect(mean(far.map((i) => i.maxY))).toBeGreaterThan(mean(near.map((i) => i.maxY)) + 30);
-    expect(mean(far.map((i) => i.width))).toBeGreaterThan(mean(near.map((i) => i.width)) * 1.3);
-    // the big far islands read 40 to 70yd across
-    const leads = plan.isles.filter((i) => i.cluster === 'far' && !ISLE_MODELS[i.model].filler);
-    expect(leads.length).toBeGreaterThan(0);
-    for (const i of leads) {
-      expect(i.width).toBeGreaterThanOrEqual(40);
-      expect(i.width).toBeLessThanOrEqual(70);
-    }
-    for (const i of plan.isles) {
-      expect(i.maxY).toBeGreaterThan(ISLE_TOP_NEAR - 15);
-      expect(i.maxY).toBeLessThan(ISLE_TOP_FAR + 20);
-    }
   });
 
   it('keeps sky between islets', () => {
@@ -150,9 +186,18 @@ describe('the Quartered Isle floating isles', () => {
 
   it('hangs chains under some islets, straight down, ending loose above the ground', () => {
     expect(plan.chains.length).toBeGreaterThan(0);
+    // the raid isle and the broad islets trail chains, the small fillers none
     const chained = new Set(plan.chains.map((c) => c.isle));
-    expect(chained.size).toBeGreaterThan(plan.isles.length * 0.2);
-    expect(chained.size).toBeLessThan(plan.isles.length * 0.7);
+    for (const isle of plan.isles) {
+      const slot = isle.model === 'raid' ? RAID_ISLE_SLOT : ISLE_SLOTS[isle.isle - 1];
+      expect(slot.model).toBe(isle.model);
+      expect(chained.has(isle.isle), `islet ${isle.isle} (${isle.model})`).toBe(slot.chains > 0);
+    }
+    if (!raid) throw new Error('no raid isle');
+    const raidChains = plan.chains.filter((c) => c.isle === raid.isle);
+    expect(raidChains.length).toBe(RAID_ISLE_SLOT.chains);
+    // the raid isle's chains are its own longer run
+    expect(Math.max(...raidChains.map((c) => c.length))).toBeGreaterThan(ISLE_CHAIN_MAX);
     for (const chain of plan.chains) {
       const isle = plan.isles.find((i) => i.isle === chain.isle);
       expect(isle).toBeDefined();
@@ -163,7 +208,8 @@ describe('the Quartered Isle floating isles', () => {
       expect(Math.hypot(chain.x - isle.x, chain.z - isle.z)).toBeLessThan(isle.width);
       expect(chain.cluster).toBe(isle.cluster);
       expect(chain.keep).toBe(isle.keep);
-      expect(chain.length).toBeLessThanOrEqual(ISLE_CHAIN_MAX);
+      const cap = isle.model === 'raid' ? RAID_ISLE_SLOT.chainLength[1] : ISLE_CHAIN_MAX;
+      expect(chain.length).toBeLessThanOrEqual(cap);
       expect(chain.length).toBeCloseTo(chain.links * chain.pitch, 6);
       expect(chain.links).toBeGreaterThanOrEqual(4);
       const bottom = chainLinkY(chain, chain.links - 1) - chain.pitch;
@@ -173,7 +219,7 @@ describe('the Quartered Isle floating isles', () => {
     expect(plan.chains.some((c) => c.length >= ISLE_CHAIN_MIN)).toBe(true);
   });
 
-  it('floats a cloud bank under the trail, below the islets and above the ground', () => {
+  it('floats a cloud bank under the islets, below them and above the ground', () => {
     expect(plan.clouds.length).toBeGreaterThanOrEqual(plan.isles.length);
     for (const puff of plan.clouds) {
       // under the islet nearest it
@@ -219,7 +265,17 @@ describe('the Quartered Isle floating isles', () => {
     expect(shedFloatingIsles(plan, 1)).toEqual(plan);
     const kept = shedFloatingIsles(plan, LOW_TIER_DEBRIS_SHARE);
     expect(kept.isles.length).toBeLessThan(plan.isles.length);
-    expect(kept.isles.length).toBeGreaterThan(0);
+    // the raid isle stays on every tier, the small fillers go first, and a
+    // broad islet still hangs on each side
+    expect(kept.isles.some((i) => i.model === 'raid')).toBe(true);
+    for (const filler of ['crag', 'spire'] as const) {
+      expect(kept.isles.some((i) => i.model === filler)).toBe(false);
+    }
+    for (const side of [1, -1]) {
+      expect(kept.isles.some((i) => i.model !== 'raid' && Math.sign(bearing(i)) === side)).toBe(
+        true,
+      );
+    }
     const keptIds = new Set(kept.isles.map((i) => i.isle));
     for (const chain of plan.chains) {
       expect(kept.chains.includes(chain)).toBe(keptIds.has(chain.isle));

@@ -94,6 +94,7 @@ import {
   propRevealRoots,
   updatePropCullables,
 } from './prop_cull_core';
+import { tickRaidStorm } from './quartered_raid_storm';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
   isLowSceneryCullActive,
@@ -2910,6 +2911,9 @@ export function buildProps(
       reducedMotion = false,
     ): void {
       gyreWind?.update(dt, reducedMotion, camX, camZ, fogFar);
+      // the storm round the raid isle: built by the isle's landmark dressing,
+      // which has no per-frame hook of its own (render/quartered_raid_storm.ts)
+      tickRaidStorm(dt, reducedMotion, camX, camZ, fogFar);
       const lowCull = isLowSceneryCullActive(fogFar);
       const clutterFar = sceneryClutterFar(fogFar);
       const clutterFarSq = clutterFar * clutterFar;

@@ -23,6 +23,8 @@ import {
   quarteredLandmarkLoadFor,
 } from '../src/render/quartered_landmark_dressing';
 import { planQuarteredLandmarkDressing } from '../src/render/quartered_landmark_dressing_core';
+import { tickRaidStorm } from '../src/render/quartered_raid_storm';
+import { strikeAt } from '../src/render/quartered_raid_storm_core';
 import { ISLE_KIT, QUARTERED_ISLE_SPIRES } from '../src/sim/content/quartered_spires';
 import { QUARTERED_FROZEN_LAKES } from '../src/sim/quartered_landmarks';
 import { terrainHeight } from '../src/sim/world';
@@ -283,7 +285,7 @@ describe('the Quartered Isle landmark dressing module', () => {
     // the islands' cached GLB materials and the shared Ignivar lava are borrowed
     expect(borrowed.size).toBeGreaterThanOrEqual(2);
     expect(own.size).toBeGreaterThanOrEqual(4); // ice sheet, spire ice, chain iron, cloud
-    expect(dataTextures.size).toBe(2); // the lake ice and the cloud puff
+    expect(dataTextures.size).toBe(3); // the lake ice, the cloud puff and the raid storm's cloud
     for (const m of borrowed) expect(own.has(m)).toBe(false);
     const seen = new Set<object>();
     const watch = (target: THREE.EventDispatcher<{ dispose: object }>) =>
@@ -302,6 +304,80 @@ describe('the Quartered Isle landmark dressing module', () => {
     const count = seen.size;
     view.dispose();
     expect(seen.size).toBe(count);
+  });
+
+  it("builds the raid isle's storm in the isle's own cluster, ticked until teardown", () => {
+    installAll();
+    const view = buildQuarteredLandmarks(0);
+    const storm = view.group.getObjectByName('quartered-raid-storm');
+    expect(storm).toBeDefined();
+    // it rides the raid isle's cull cluster, so the sweep culls it with the isle
+    const raidMesh = view.group.getObjectByName('quartered-floating-isle-raid');
+    expect(raidMesh).toBeDefined();
+    expect(storm?.parent).toBe(raidMesh?.parent);
+    const bolts = view.group.getObjectByName('quartered-raid-storm-bolts') as THREE.Mesh;
+    // built drawing every bolt (so a prewarm render links its program) ...
+    expect(bolts.geometry.drawRange.count).toBeGreaterThan(0);
+    // ... and the frame tick reaches it: the first frame settles it idle (no
+    // strike yet), drawing no bolt
+    const at = raidMesh?.getWorldPosition(new THREE.Vector3()) ?? new THREE.Vector3();
+    const near = (raidMesh as THREE.InstancedMesh).boundingSphere?.center ?? at;
+    tickRaidStorm(1 / 60, false, near.x, near.z, 5000);
+    expect(bolts.geometry.drawRange.count).toBe(0);
+    // ... and on into the first strike, which draws its bolt
+    tickRaidStorm(strikeAt(0) + 0.05, false, near.x, near.z, 5000);
+    expect(bolts.geometry.drawRange.count).toBeGreaterThan(0);
+    // torn down, the tick no longer reaches it: the next strike, which would
+    // rewrite the bolt's draw range, never lands
+    view.dispose();
+    bolts.geometry.setDrawRange(0, 99);
+    tickRaidStorm(strikeAt(1) - strikeAt(0), false, near.x, near.z, 5000);
+    expect(bolts.geometry.drawRange.count).toBe(99);
+  });
+
+  it('draws no lightning under reduced motion, even mid-strike', () => {
+    installAll();
+    const view = buildQuarteredLandmarks(0);
+    const bolts = view.group.getObjectByName('quartered-raid-storm-bolts') as THREE.Mesh;
+    const boltMaterial = bolts.material as THREE.Material;
+    const raidMesh = view.group.getObjectByName(
+      'quartered-floating-isle-raid',
+    ) as THREE.InstancedMesh;
+    const near = raidMesh.boundingSphere?.center ?? new THREE.Vector3();
+    const into = strikeAt(0) + 0.05;
+    // built drawing its bolt; under reduced motion the clock stands still and
+    // the first frame puts every bolt out
+    expect(bolts.geometry.drawRange.count).toBeGreaterThan(0);
+    tickRaidStorm(into, true, near.x, near.z, 5000);
+    expect(bolts.geometry.drawRange.count).toBe(0);
+    expect(boltMaterial.opacity).toBe(0);
+    // with motion, the same moment strikes ...
+    tickRaidStorm(into, false, near.x, near.z, 5000);
+    expect(bolts.geometry.drawRange.count).toBeGreaterThan(0);
+    expect(boltMaterial.opacity).toBeGreaterThan(0.5);
+    // ... and reduced motion turned on mid-strike puts it out at once
+    tickRaidStorm(1 / 60, true, near.x, near.z, 5000);
+    expect(bolts.geometry.drawRange.count).toBe(0);
+    expect(boltMaterial.opacity).toBe(0);
+    view.dispose();
+  });
+
+  it("keeps ticking one dressing's storm when another dressing is torn down", () => {
+    installAll();
+    const first = buildQuarteredLandmarks(0);
+    const second = buildQuarteredLandmarks(0);
+    const bolts = first.group.getObjectByName('quartered-raid-storm-bolts') as THREE.Mesh;
+    const raidMesh = first.group.getObjectByName(
+      'quartered-floating-isle-raid',
+    ) as THREE.InstancedMesh;
+    const near = raidMesh.boundingSphere?.center ?? new THREE.Vector3();
+    // the newer dressing goes first (a rebuild tearing down out of order)
+    second.dispose();
+    tickRaidStorm(1 / 60, false, near.x, near.z, 5000);
+    expect(bolts.geometry.drawRange.count).toBe(0);
+    tickRaidStorm(strikeAt(0) + 0.05, false, near.x, near.z, 5000);
+    expect(bolts.geometry.drawRange.count).toBeGreaterThan(0);
+    first.dispose();
   });
 
   it('is disposed by the renderer teardown (source pin)', () => {

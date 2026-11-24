@@ -7,19 +7,24 @@
 //
 // The design's Gyre concept shows chunks of land torn from the isle and left
 // hanging in the storm beyond the council's peak, dark jagged islands in cloud
-// with broken chains trailing below them. So the isles fall in one trail that
-// leaves the Gyre's north face and winds out over the sea toward the council's
-// seat (the Smith's Heart), each islet higher and larger than the last so the
-// far ones still read through the haze. Nothing hangs over the isle itself:
-// the sky over the town, the crater and the quarters stays clear.
+// with broken chains trailing below them. Seen from the Gyre's crown, looking
+// north over the sea, they frame one view: a few islets hang in a flank to
+// the left and a few to the right, each at its own height, and the middle of
+// the view is left open for the raid isle, a mock-up of the raid's outside
+// (not the raid's own map), held far out and high in the storm. Nothing hangs over the isle itself: the sky over the town,
+// the crater and the quarters stays clear.
 //
-// Each islet is one of six generated island models (public/models/props/
-// sky_isle_*.glb, base at y 0: the hanging tip, its top at the model height):
-// the broad terraced, twin and pine islands lead the far trail, the crag, slab
-// and spire are the smaller fillers. A model turns by three rotations, in this
-// order: its own base correction (the slab is drawn steeply tilted and is
-// levelled here), the yaw, then a small lean about a horizontal axis. The
-// consumer composes exactly the same order (premultiplied quaternions).
+// The islets are authored slots (ISLE_SLOTS), not a hashed scatter: the view
+// is composed, so every islet's bearing from the crown, distance and height is
+// chosen, and their heights are deliberately uneven. Each is one of six
+// generated island models (public/models/props/sky_isle_*.glb, base at y 0:
+// the hanging tip, its top at the model height): the broad terraced, twin and
+// pine islands lead, the crag, slab and spire are the smaller fillers. The raid
+// isle is a seventh model (sky_isle_raid.glb). A model turns by three
+// rotations, in this order: its own base correction (the slab is drawn steeply
+// tilted and is levelled here), the yaw, then a small lean about a horizontal
+// axis. The consumer composes exactly the same order (premultiplied
+// quaternions).
 //
 // Cosmetic only: nothing here feeds a collider or the sim. Deterministic: no
 // rng stream, only fixed integer hashes, so every client hangs the same isles.
@@ -30,36 +35,158 @@ import { hash2 } from '../sim/rng';
 type GroundAt = (x: number, z: number) => number;
 type Vec3 = [number, number, number];
 
-/** Where the trail starts (just off the Gyre's north face) and how far north
- *  it winds out over the sea. */
-export const ISLE_TRAIL = { startZ: GYRE_PEAK.z + 70, endZ: GYRE_PEAK.z + 400 } as const;
-/** The trail's widest swing either side of the Gyre's axis, yards. */
-export const ISLE_TRAIL_SWING = 90;
+/** The Gyre's crown height, yards: every islet's height is measured from it. */
+export const CROWN_Y = GYRE_PEAK.baseY + GYRE_PEAK.rise;
 /** The least open sky between two islets' edges, yards: wide enough that
  *  each island reads alone from the Gyre's summit. */
 export const ISLE_GAP = 24;
-/** How many islets the trail aims for before the spacing cuts it. */
-export const ISLE_TARGET = 22;
-/** An islet's width (its model's longest horizontal extent), nearest to
- *  farthest, before the per-islet spread (0.9 to 1.2): the far islands read
- *  40 to 70yd across from the Gyre's summit. */
-export const ISLE_WIDTH_NEAR = 26;
-export const ISLE_WIDTH_FAR = 58;
-/** The fillers (crag, slab, spire) hang at this share of the trail's width. */
-export const ISLE_FILLER_SHARE = 0.55;
-/** The height of an islet's top above the sea, nearest to farthest: the
- *  nearest sit above the Gyre's crown, the far ones well above it. */
-export const ISLE_TOP_NEAR = GYRE_PEAK.baseY + GYRE_PEAK.rise + 25;
-export const ISLE_TOP_FAR = ISLE_TOP_NEAR + 80;
 /** The share of islets a low-tier host keeps (see shedFloatingIsles). */
 export const LOW_TIER_DEBRIS_SHARE = 0.6;
 /** The least air under an islet's lowest point (and a chain's end), yards. */
 export const ISLE_GROUND_CLEAR = 6;
 
-/** The six island models. */
-export type IsleModel = 'pines' | 'twin' | 'slab' | 'spire' | 'terraced' | 'crag';
-/** The cull cluster an islet rides: the trail's near, middle or far stretch. */
+/** The six island models, and the raid isle. */
+export type IsleModel = 'pines' | 'twin' | 'slab' | 'spire' | 'terraced' | 'crag' | 'raid';
+/** The cull cluster an islet rides: near, middle or far from the Gyre. */
 export type DebrisCluster = 'near' | 'mid' | 'far';
+
+/** Which side of the view north from the crown an islet hangs on: left is
+ *  +X (the world's west, map-left), right is -X. The raid isle is the middle. */
+export type IsleSide = 'left' | 'right' | 'middle';
+
+/** One authored islet: where it hangs, seen from the Gyre's crown. */
+export interface IsleSlot {
+  side: IsleSide;
+  model: IsleModel;
+  /** bearing from due north, degrees: positive turns left (+X), negative right */
+  bearing: number;
+  /** horizontal distance from the Gyre's peak, yards */
+  dist: number;
+  /** the islet's width (its model's longest horizontal extent), yards */
+  width: number;
+  /** its top above the crown, yards */
+  rise: number;
+  /** chains trailing from its underside, and how far they hang, yards */
+  chains: number;
+  chainLength: [number, number];
+  /** 0..1: a low-tier host keeps the islets below its share (the raid isle is
+   *  0, kept everywhere; the small fillers shed first) */
+  keep: number;
+  /** a fixed yaw (radians) instead of the hashed one: the raid isle turns its
+   *  heart to face the crown */
+  yaw?: number;
+  /** with a fixed yaw, a fixed lean (radians) about the world x axis instead
+   *  of none: negative tips the top south, toward the Gyre */
+  lean?: number;
+}
+
+/** The raid isle: due north of the crown, far out over the sea and high, the
+ *  middle of the view. The heart (the crystal on its keep, the model's +X face)
+ *  turns south to face the Gyre: a quarter turn takes +X to -Z. */
+export const RAID_ISLE_SLOT: IsleSlot = {
+  side: 'middle',
+  model: 'raid',
+  bearing: 0,
+  dist: 300,
+  width: 210,
+  rise: 172,
+  chains: 4,
+  chainLength: [42, 78],
+  keep: 0,
+  yaw: Math.PI / 2,
+  // the highest thing in the sky is seen from below: tipped toward the crown,
+  // its keep, heart and towers still show over the rim
+  lean: -0.36,
+};
+
+/** The flanking islets, three a side. Their heights are uneven on purpose
+ *  (24 to 150yd over the crown), every one tops out below the raid isle (the
+ *  highest point in the sky), and every one stays outside the raid isle's
+ *  share of the view (RAID_VIEW_CLEAR). */
+export const ISLE_SLOTS: readonly IsleSlot[] = [
+  {
+    side: 'left',
+    model: 'crag',
+    bearing: 47,
+    dist: 120,
+    width: 21,
+    rise: 24,
+    chains: 0,
+    chainLength: [0, 0],
+    keep: 0.9,
+  },
+  {
+    side: 'left',
+    model: 'twin',
+    bearing: 36,
+    dist: 185,
+    width: 50,
+    rise: 62,
+    chains: 2,
+    chainLength: [15, 34],
+    keep: 0.3,
+  },
+  {
+    side: 'left',
+    model: 'pines',
+    bearing: 31,
+    dist: 305,
+    width: 58,
+    rise: 128,
+    chains: 1,
+    chainLength: [20, 40],
+    keep: 0.5,
+  },
+  {
+    side: 'right',
+    model: 'spire',
+    bearing: -45,
+    dist: 140,
+    width: 22,
+    rise: 38,
+    chains: 0,
+    chainLength: [0, 0],
+    keep: 0.8,
+  },
+  {
+    side: 'right',
+    model: 'terraced',
+    bearing: -34,
+    dist: 225,
+    width: 54,
+    rise: 92,
+    chains: 2,
+    chainLength: [18, 38],
+    keep: 0.4,
+  },
+  {
+    side: 'right',
+    model: 'slab',
+    bearing: -28,
+    dist: 330,
+    width: 34,
+    rise: 150,
+    chains: 1,
+    chainLength: [15, 30],
+    keep: 0.7,
+  },
+];
+
+/** The least angle, degrees, between the raid isle's edge and a flanking
+ *  islet's edge, seen from the crown: the middle of the view stays the raid
+ *  isle's alone. */
+export const RAID_VIEW_CLEAR = 4;
+
+/** An islet slot's world centre (xz), yards. */
+export function slotXZ(slot: Pick<IsleSlot, 'bearing' | 'dist'>): [number, number] {
+  const a = (slot.bearing * Math.PI) / 180;
+  return [GYRE_PEAK.x + Math.sin(a) * slot.dist, GYRE_PEAK.z + Math.cos(a) * slot.dist];
+}
+
+/** The half-angle, degrees, an islet of `width` subtends at `dist` from the crown. */
+export function slotHalfAngle(slot: Pick<IsleSlot, 'width' | 'dist'>): number {
+  return (Math.atan(slot.width / 2 / slot.dist) * 180) / Math.PI;
+}
 
 export interface IsleModelSpec {
   /** the model's native box, yards: x and z extents and its height */
@@ -79,14 +206,13 @@ export interface IsleModelSpec {
 export const ISLE_MODELS: Readonly<Record<IsleModel, IsleModelSpec>> = {
   pines: { w: 10.6, d: 8.79, h: 14, filler: false },
   twin: { w: 10.55, d: 12.37, h: 16, filler: false },
-  terraced: { w: 11.48, d: 9.73, h: 14, filler: false },
-  crag: { w: 6.67, d: 6.71, h: 10, filler: true },
-  spire: { w: 6.59, d: 4.54, h: 18, filler: true },
+  terraced: { w: 11.48, d: 9.7, h: 14, filler: false },
+  crag: { w: 6.63, d: 6.71, h: 9.94, filler: true },
+  spire: { w: 6.52, d: 4.4, h: 18, filler: true },
   slab: { w: 10.14, d: 6.37, h: 8, filler: true, base: { ax: -0.761, az: 0.649, angle: 0.61 } },
+  raid: { w: 9.81, d: 9.81, h: 9, filler: false },
 };
 export const ISLE_MODEL_KEYS = Object.keys(ISLE_MODELS) as IsleModel[];
-const LEADS: readonly IsleModel[] = ['terraced', 'twin', 'pines'];
-const FILLERS: readonly IsleModel[] = ['crag', 'slab', 'spire'];
 
 export interface FloatingIsle {
   model: IsleModel;
@@ -214,94 +340,40 @@ function groundUnder(groundAt: GroundAt, x: number, z: number, r: number): numbe
   return hi;
 }
 
-const CANDIDATES = 120;
-
-interface IsleSite {
-  x: number;
-  z: number;
-  /** 0 at the Gyre, 1 at the trail's far end */
-  t: number;
-  model: IsleModel;
-  width: number;
-  top: number;
-  ordinal: number;
+/** The cull cluster for a slot at `dist` from the peak. */
+export function clusterOf(dist: number): DebrisCluster {
+  return dist < 170 ? 'near' : dist < 260 ? 'mid' : 'far';
 }
 
-/** The model an islet at trail fraction `t` draws: a lead island three times
- *  in four at the far end, half the time near the Gyre. */
-function modelFor(i: number, t: number): IsleModel {
-  const leadShare = 0.5 + 0.25 * t;
-  const list = hash2(i, 7, 7161) < leadShare ? LEADS : FILLERS;
-  // step through the list by candidate, nudged by a hash, so the trail mixes
-  // all three of a kind instead of repeating one
-  return list[(i + Math.floor(hash2(i, 6, 7153) * 2)) % list.length];
-}
-
-/** The trail's candidate sites, in a hash order so the target fills evenly
- *  along the whole trail instead of exhausting its near end. */
-function trailSites(): (IsleSite & { order: number })[] {
-  const out: (IsleSite & { order: number })[] = [];
-  const { startZ, endZ } = ISLE_TRAIL;
-  for (let i = 0; i < CANDIDATES; i++) {
-    const t = (i + hash2(i, 1, 7101)) / CANDIDATES;
-    // the trail swings in a slow S, and the islets spread wider from it the
-    // farther out they hang
-    const spine = Math.sin(t * Math.PI * 1.4 + 0.5) * ISLE_TRAIL_SWING * (0.4 + 0.6 * t);
-    const spread = (hash2(i, 2, 7111) - 0.5) * 2 * (55 + 95 * t);
-    const model = modelFor(i, t);
-    const width =
-      (ISLE_WIDTH_NEAR + (ISLE_WIDTH_FAR - ISLE_WIDTH_NEAR) * t) *
-      (0.9 + 0.3 * hash2(i, 3, 7121)) *
-      (ISLE_MODELS[model].filler ? ISLE_FILLER_SHARE : 1);
-    out.push({
-      x: GYRE_PEAK.x + spine + spread,
-      z: startZ + (endZ - startZ) * t,
-      t,
-      model,
-      width,
-      top: ISLE_TOP_NEAR + (ISLE_TOP_FAR - ISLE_TOP_NEAR) * t + (hash2(i, 4, 7131) - 0.5) * 24,
-      ordinal: i,
-      order: hash2(i, 5, 7141),
-    });
-  }
-  return out.sort((a, b) => a.order - b.order);
-}
-
-/** True when two islets would touch: their widths plus some sky between. */
-function crowds(a: IsleSite, b: IsleSite): boolean {
-  const gap = (a.width + b.width) * 0.5 + ISLE_GAP;
-  return Math.hypot(a.x - b.x, a.z - b.z) < gap;
-}
-
-function clusterOf(t: number): DebrisCluster {
-  return t < 0.34 ? 'near' : t < 0.67 ? 'mid' : 'far';
-}
-
-/** One islet at a site, its top at `top` (its turned box's highest point). */
-function isletAt(site: IsleSite, top: number, isle: number): FloatingIsle {
-  const i = site.ordinal;
-  const h = (salt: number) => hash2(i, salt, 7201);
-  const spec = ISLE_MODELS[site.model];
-  const scale = site.width / Math.max(spec.w, spec.d);
+/** One islet at a slot, its top at `top` (its turned box's highest point).
+ *  `ordinal` seeds its hashed yaw and lean (a slot with a fixed yaw keeps it,
+ *  and hangs level). */
+function isletAt(slot: IsleSlot, top: number, isle: number, ordinal: number): FloatingIsle {
+  const h = (salt: number) => hash2(ordinal, salt, 7201);
+  const spec = ISLE_MODELS[slot.model];
+  const scale = slot.width / Math.max(spec.w, spec.d);
+  const [x, z] = slotXZ(slot);
+  const fixed = slot.yaw !== undefined;
   const turn = {
-    model: site.model,
-    x: site.x,
+    model: slot.model,
+    x,
     y: 0,
-    z: site.z,
+    z,
     scale,
-    yaw: h(1) * Math.PI * 2,
-    tilt: (h(4) - 0.5) * 0.16,
-    tiltAxisYaw: h(5) * Math.PI * 2,
+    yaw: slot.yaw ?? h(1) * Math.PI * 2,
+    tilt: fixed ? (slot.lean ?? 0) : (h(4) - 0.5) * 0.16,
+    // the world x axis (sin, 0, cos of a quarter turn) for a fixed lean
+    tiltAxisYaw: fixed ? Math.PI / 2 : h(5) * Math.PI * 2,
   };
   const [lo, hi] = turnedYRange(turn);
   const y = top - hi;
   return {
     ...turn,
     y,
-    width: site.width,
+    width: slot.width,
     isle,
-    cluster: clusterOf(site.t),
-    keep: h(2),
+    cluster: clusterOf(slot.dist),
+    keep: slot.keep,
     minY: y + lo,
     maxY: y + hi,
   };
@@ -313,18 +385,21 @@ function isletAt(site: IsleSite, top: number, isle: number): FloatingIsle {
 const CHAIN_PITCH_SHARE = 0.05;
 const CHAIN_PITCH_MIN = 1.5;
 const CHAIN_PITCH_MAX = 3.2;
-/** The share of islets that trail chains. */
-export const ISLE_CHAIN_SHARE = 0.4;
-/** The span a chain hangs, yards, before the ground clamp. */
+/** The span a flanking islet's chain may hang, yards, before the ground
+ *  clamp (the raid isle's own run longer, RAID_ISLE_SLOT.chainLength). */
 export const ISLE_CHAIN_MIN = 15;
 export const ISLE_CHAIN_MAX = 40;
 
-/** The chains under one islet: one to three, anchored round its underside. */
-function chainsFor(isle: FloatingIsle, ordinal: number, groundAt: GroundAt): IsleChain[] {
+/** The chains under one islet (its slot's count), anchored round its underside. */
+function chainsFor(
+  isle: FloatingIsle,
+  slot: IsleSlot,
+  ordinal: number,
+  groundAt: GroundAt,
+): IsleChain[] {
   const h = (salt: number) => hash2(ordinal, salt, 7301);
-  if (h(1) >= ISLE_CHAIN_SHARE) return [];
   const spec = ISLE_MODELS[isle.model];
-  const count = 1 + Math.min(2, Math.floor(h(2) * 3));
+  const count = slot.chains;
   const pitch = Math.min(
     CHAIN_PITCH_MAX,
     Math.max(CHAIN_PITCH_MIN, isle.width * CHAIN_PITCH_SHARE),
@@ -340,7 +415,8 @@ function chainsFor(isle: FloatingIsle, ordinal: number, groundAt: GroundAt): Isl
       f * spec.h,
       Math.sin(a) * spec.d * r,
     ]);
-    let length = ISLE_CHAIN_MIN + (ISLE_CHAIN_MAX - ISLE_CHAIN_MIN) * h(30 + k);
+    const [lmin, lmax] = slot.chainLength;
+    let length = lmin + (lmax - lmin) * h(30 + k);
     const floor = groundAt(anchor[0], anchor[2]) + ISLE_GROUND_CLEAR;
     length = Math.min(length, anchor[1] - floor);
     const links = Math.floor(length / pitch);
@@ -395,30 +471,35 @@ function cloudsFor(isle: FloatingIsle, ordinal: number, groundAt: GroundAt): Clo
   return out;
 }
 
+/** The raid isle first, then the flanking slots: every islet the view hangs. */
+export const ALL_SLOTS: readonly IsleSlot[] = [RAID_ISLE_SLOT, ...ISLE_SLOTS];
+
 /**
  * Every floating islet north of the Gyre, its chains and the cloud bank under
- * the trail. `groundAt` is the finished terrain sampler: an islet whose turned
- * box would reach within `ISLE_GROUND_CLEAR` of the ground (the Gyre's own
- * north face) is lifted until it clears, and a chain stops short of it.
+ * them: the raid isle in the middle of the view and the flanking slots either
+ * side. `groundAt` is the finished terrain sampler: an islet whose turned box
+ * would reach within `ISLE_GROUND_CLEAR` of the ground (the Gyre's own north
+ * face) is lifted until it clears, and a chain stops short of it.
  */
 export function planFloatingIsles(groundAt: GroundAt): FloatingIslesPlan {
-  const placed: IsleSite[] = [];
   const isles: FloatingIsle[] = [];
   const chains: IsleChain[] = [];
   const clouds: CloudPuff[] = [];
-  for (const site of trailSites()) {
-    if (placed.length >= ISLE_TARGET) break;
-    if (placed.some((p) => crowds(p, site))) continue;
-    const index = placed.length;
-    let isle = isletAt(site, site.top, index);
-    const ground = groundUnder(groundAt, site.x, site.z, site.width * 0.6);
+  ALL_SLOTS.forEach((slot, index) => {
+    // ordinals follow the slot's place in the list, so appending a slot never
+    // moves another slot's hashed yaw (inserting or removing one shifts those
+    // after it)
+    const ordinal = 31 + index * 7;
+    const top = CROWN_Y + slot.rise;
+    let isle = isletAt(slot, top, index, ordinal);
+    const [x, z] = slotXZ(slot);
+    const ground = groundUnder(groundAt, x, z, slot.width * 0.6);
     const lift = ground + ISLE_GROUND_CLEAR - isle.minY;
-    if (lift > 0) isle = isletAt(site, site.top + lift, index);
-    placed.push(site);
+    if (lift > 0) isle = isletAt(slot, top + lift, index, ordinal);
     isles.push(isle);
-    chains.push(...chainsFor(isle, site.ordinal, groundAt));
-    clouds.push(...cloudsFor(isle, site.ordinal, groundAt));
-  }
+    chains.push(...chainsFor(isle, slot, ordinal, groundAt));
+    clouds.push(...cloudsFor(isle, ordinal, groundAt));
+  });
   return { isles, chains, clouds };
 }
 
