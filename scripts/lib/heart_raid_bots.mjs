@@ -26,7 +26,7 @@
 //   opener                 the roster key that pulls (default the main tank 'mt')
 //   tauntPad?(m)           yards past a warrior's short taunt mob `m`'s body still counts (its
 //                          girth: the sim measures a short reach to the body's edge)
-//   obstacles?(world)      circles a walking bot goes round
+//   obstacles?(world, b)   circles a walking bot goes round (b: the walker)
 //   blocksLine?(world,a,b) true when no line of sight (pillars)
 //   stillFor?(world,st,b)  seconds the bot may stand still to cast
 //   tankAssign?(world,st,b,me) sets b.tankTarget (a role or an entity id) and b.loose
@@ -705,7 +705,9 @@ export class RaidWorld {
       return true;
     }
     b.settled = null;
-    const circles = this.boss.obstacles?.(this) ?? [];
+    // The walking bot rides along: a boss module may steer it round bodies (a
+    // Heat Live Coal's bearer).
+    const circles = this.boss.obstacles?.(this, b) ?? [];
     const wp = circles.length ? steer(b.self, goal, circles) : goal;
     b.input({ f: 1 }, b.faceTo(wp));
     b.moving = true;

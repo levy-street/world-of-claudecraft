@@ -7,10 +7,14 @@
 // wellspring once a wall has passed), heals through the Falling Cinders, drops the
 // Hearthseeds together and runs, steps into the Wakefire band that has just
 // burned, crosses to the Wheel of the Hearth's dark slice (every tier), kites a Rolling Cinder while two strikers knock it back, and
-// burns the adds (Wellspawn first). Reads only what the server sends; the
-// geometry is the sim's own pure module (claim-local).
+// burns the adds (Wellspawn first), and keeps a Heroic Live Coal's bearer apart
+// while the healers break it (heart_raid_heat_coal.mjs). The overflow's corridors
+// are planned against the clock with the Wellspawn in reach (heart_raid_heat_waves.mjs).
+// Reads only what the server sends; the geometry is the sim's own pure module
+// (claim-local).
 //
 // IGNORE=wakefire  nobody leaves a Wakefire band (the key mechanic)
+// IGNORE=coal      a Live Coal's bearer stands where it is
 
 import { HEARTH_WELL } from '../../src/sim/content/smith_heart_layout';
 import {
@@ -46,8 +50,25 @@ import {
   IGNORE,
   log,
   segDist,
+  tankAssign,
   unit,
 } from './heart_raid_bots.mjs';
+import {
+  coalDuty,
+  coalHazards,
+  coalObstacles,
+  coalUrgency,
+  initCoalTally,
+  trackCoals,
+} from './heart_raid_heat_coal.mjs';
+import {
+  hitReach,
+  spawnTarget,
+  waveSpot,
+  waveStill,
+  wavesOn,
+  wellspawn,
+} from './heart_raid_heat_waves.mjs';
 
 /** The lip wall's outer face (yards from the well's middle): nobody stands inside it. */
 const LIP = HEAT_LIP_WALL.outer;
@@ -159,7 +180,14 @@ export const heat = {
           gaps: ringOf(t).gaps,
           half: e.sc ?? 3,
         });
-      } else if (gapOf(t) !== null) o.gaps.push({ g: e.f ?? 0, half: e.sc ?? 3 });
+      } else if (gapOf(t) !== null) {
+        // As Wakefire's: the template's seconds are the whole countdown to the
+        // ring's launch, counted down from when the raid first saw it.
+        world.gapSeen ??= new Map();
+        if (!world.gapSeen.has(e.id)) world.gapSeen.set(e.id, Date.now());
+        const left = gapOf(t) - (Date.now() - world.gapSeen.get(e.id)) / 1000;
+        o.gaps.push({ g: e.f ?? 0, half: e.sc ?? 3, left });
+      }
     }
     world.o = o;
   },
@@ -167,8 +195,10 @@ export const heat = {
   // The lip wall's colliders (smith_heart_layout.ts HEARTH_LIP_WALLS): a bot
   // crossing the shore walks round them, never into them (a straight line
   // between two Wheel slices near the wall clips it).
-  obstacles(world) {
-    return world.center ? [{ x: world.center.x, z: world.center.z, r: LIP + 0.2 }] : [];
+  // A Live Coal's bearer, and everyone else round one, steer clear too.
+  obstacles(world, b) {
+    if (!world.center) return [];
+    return [{ x: world.center.x, z: world.center.z, r: LIP + 0.2 }, ...coalObstacles(world, b)];
   },
 
   onFloor(world, at) {
@@ -192,6 +222,8 @@ export const heat = {
     const me = world.players.get(b.pid);
     const cinder = strikeTarget(world, st, b, me);
     if (cinder) return cinder;
+    // The Wellspawn: split over the hitters, each one it can reach from a corridor.
+    if (me && wellspawn(world).length) return spawnTarget(world, b, me);
     // The adds first: the Wellspawn before they reach the lip, then the
     // Seedflames; the Wellkeepers are the off-tank's.
     const adds = world.adds.filter(
@@ -221,6 +253,36 @@ export const heat = {
   tankAdd(a) {
     return a.tid === HEAT_MOBS.keeper;
   },
+  // While the guardian is under, a tank with nothing to hold burns the
+  // Wellspawn with the damage dealers (no taunt: they never swing).
+  tankAssign(world, st, b, me) {
+    tankAssign(world, st, b, me);
+    const g = world.mobs.guardian;
+    // Under: its state aura's stage is not the fight's (the snapshot carries
+    // no `hostile` flag on it).
+    const under = !!g && (auraOf(g, HEAT_AURAS.state)?.value2 ?? 0) !== 0;
+    const held = typeof b.tankTarget === 'number' ? world.obs.ents.get(b.tankTarget) : null;
+    if (!under || (held && held.tid === HEAT_MOBS.keeper && alive(held))) return;
+    const t = wellspawn(world).length ? spawnTarget(world, b, me) : null;
+    if (!t) return;
+    b.tankTarget = t.id;
+    b.loose = null;
+  },
+  // A caster begins a bar only if it can finish it before the next corridor.
+  stillFor(world, st, b) {
+    const me = world.players.get(b.pid);
+    return me ? waveStill(world, me) : undefined;
+  },
+  // A Wellspawn about to feed the guardian blasts the whole raid: the healers
+  // top everyone up first (the bot pass of 2026-11-24: two feeds at once with
+  // the raid half down wiped it).
+  topUp(world) {
+    return wellspawn(world).some((a) => wellGap(world, a) < HEAT_TUNING.spawnReach + 6);
+  },
+  // A Live Coal's bearer is healed first (the kits' heal-absorb rule, lifted).
+  healUrgency(world, p) {
+    return coalUrgency(p);
+  },
 
   bad(world, st, at) {
     return inDanger(world, at, st);
@@ -237,6 +299,7 @@ export const heat = {
         out.push({ x: p.x, z: p.z, r: 6 });
     }
     for (const c of cinders(world)) out.push({ x: c.x, z: c.z, r: 5 });
+    out.push(...coalHazards(world, b));
     return out;
   },
 
@@ -258,10 +321,18 @@ export const heat = {
       `Wellspawn fed the guardian: ${st.feeds}; seeds ${st.seedRounds}; Wakefire runs ${st.zoneRuns}; wheels ${st.wheels}; lava waves ${st.waveRings ?? 0}; cinders ${st.cinders}`,
     );
     note(`Phases: ${st.phases.map((p) => `${fmtSec(p.t)} ${p.what}`).join(', ') || '-'}`);
+    const c = initCoalTally(st);
+    note(
+      `Live Coals: ${c.set} set, ${c.out} healed out, ${c.leaps} leapt, ${c.bursts} burst, ${c.doused ?? 0} doused by an overflow, ${c.died} gone with a death (${c.log.join(', ') || 'none'})`,
+    );
   },
   row(world, st) {
     init(st);
-    return [['Fed', String(st.feeds)]];
+    const c = initCoalTally(st);
+    return [
+      ['Fed', String(st.feeds)],
+      ['Coals (set/out/leap/burst)', `${c.set}/${c.out}/${c.leaps}/${c.bursts}`],
+    ];
   },
 };
 
@@ -354,6 +425,11 @@ function init(st) {
 
 function track(world, st) {
   init(st);
+  {
+    const g = world.mobs.guardian;
+    const stage = g ? (auraOf(g, HEAT_AURAS.state)?.value2 ?? 0) : 0;
+    trackCoals(world, st, stage !== 0);
+  }
   const g = world.mobs.guardian;
   const sa = g ? auraOf(g, HEAT_AURAS.state) : null;
   const key = sa ? `${sa.value}/${sa.value2}` : null;
@@ -404,6 +480,22 @@ function track(world, st) {
     log('ROLLING CINDER');
   }
   st.prevCinders = nc;
+  // Through an overflow with Wellspawn walking: every 2 s where they are and
+  // what each hitter does (the bot pass of 2026-11-24 found them unhit).
+  const spawns = wellspawn(world);
+  if (spawns.length && Date.now() - (st.spawnLogAt ?? 0) > 2000) {
+    st.spawnLogAt = Date.now();
+    const rows = world.bots
+      .filter((b) => b.self && !b.self.dead && b.spec.role !== 'healer')
+      .map((b) => {
+        const t = b.self.target ? world.obs.ents.get(b.self.target) : null;
+        const d = t ? Math.round(hypot(t, b.self)) : '-';
+        return `${b.spec.key} ${b.duty}${b.moving ? '*' : ''} ${d}yd`;
+      });
+    log(
+      `  wellspawn ${spawns.map((a) => `${Math.round((a.hp / Math.max(1, a.mhp)) * 100)}%@${wellGap(world, a).toFixed(0)}`).join(' ')}; ${rows.join(', ')}`,
+    );
+  }
   st.spawnSeen ??= new Map();
   for (const a of world.adds) if (a.tid === HEAT_MOBS.spawn) st.spawnSeen.set(a.id, a);
   for (const [id, a] of st.spawnSeen) {
@@ -481,9 +573,18 @@ function waveGoal(world, me) {
 function duty(world, st, b, me) {
   init(st);
   const o = world.o;
-  // The lava waves first: a wall outside a corridor is a heavy blow.
+  // The lava waves first: a wall outside a corridor is a heavy blow. The
+  // corridor spot is planned against the clock with the hitter's Wellspawn in
+  // reach (heart_raid_heat_waves.mjs); the old nearest-corridor walk is the
+  // fallback when no spot can be reached in time.
+  if (wavesOn(world)) {
+    const hitter = b.spec.role === 'dps' || b.spec.role === 'tank';
+    const t = hitter ? spawnTarget(world, b, me) : null;
+    const spot = waveSpot(world, me, t, t ? hitReach(b) : 0);
+    if (spot) return { goal: spot.goal, tol: spot.tol, duty: 'lava waves', ownThreat: true };
+  }
   const wave = waveGoal(world, me);
-  if (wave) return { goal: wave.goal, tol: wave.tol, duty: 'lava waves' };
+  if (wave) return { goal: wave.goal, tol: wave.tol, duty: 'lava waves', ownThreat: true };
   // A cinder's quarry runs round the shore, away from it.
   if (hasAura(me, HEAT_AURAS.hunted)) {
     const c = cinders(world).sort((x, y) => hypot(x, me) - hypot(y, me))[0];
@@ -506,6 +607,20 @@ function duty(world, st, b, me) {
       me,
     );
     if (spot) return { goal: spot, tol: 1.2, duty: 'trail fire away' };
+  }
+  // A Live Coal: its bearer apart from everyone (out of the seeds' reach too),
+  // everyone else off its bearer.
+  {
+    const seedOk = (at) => o.seeds.every((s) => hypot(s, at) >= 18);
+    const c = coalDuty(
+      world,
+      st,
+      b,
+      me,
+      (from, extra, max) => safeNear(world, st, from, me, (at) => extra(at) && seedOk(at), max),
+      (at) => !inDanger(world, at, st) && seedOk(at),
+    );
+    if (c) return c;
   }
   // Hearthseeds: away from every seed until they burst.
   if (o.seeds.length) {
