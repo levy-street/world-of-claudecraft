@@ -254,6 +254,9 @@ export interface HeatFightState {
   coalCasts: number;
   coalAt: number;
   coals: HeatCoal[];
+  /** Every player seen wearing Cinder Grip this pull (the tanks: never a
+   *  coal's pick). */
+  gripWorn: number[];
   coalOuts: number;
   coalLeaps: number;
   coalBursts: number;

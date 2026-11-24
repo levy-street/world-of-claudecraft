@@ -22530,7 +22530,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.crust':
     '단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다.',
   'hudChrome.auraEffect.heatGuardian.coal':
-    '다음에 받는 치유 {absorb}를 흡수하고 매초 {burnMin}~{burnMax}의 화염 피해를 줍니다. 치유로 흡수량을 모두 깎으면 꺼집니다. {leap}미터 안으로 다가온 플레이어에게 남은 흡수량과 함께 옮겨 가며 {leapMin}~{leapMax}의 화염 피해를 줍니다. {seconds}초 안에 꺼지지 않으면 폭발해 당신을 포함한 {radius}미터 안의 모두에게 {burstMin}~{burstMax}의 화염 피해를 줍니다.',
+    '다음에 받는 치유 {absorb}를 흡수하고 매초 {burnMin}~{burnMax}의 화염 피해를 줍니다. 치유로 흡수량을 모두 깎으면 꺼집니다. {leap}미터 안으로 다가온 플레이어에게 남은 흡수량과 함께 옮겨 가며 {leapMin}~{leapMax}의 화염 피해를 줍니다. 누군가에게 옮겨 간 뒤 {grace}초 동안은 다시 옮겨 가지 않습니다. {seconds}초 안에 꺼지지 않으면 폭발해 당신을 포함한 {radius}미터 안의 모두에게 {burstMin}~{burstMax}의 화염 피해를 줍니다.',
   'hudChrome.heatGuardian.say.fist': '돌이 떨어지는 곳에 서라. 그리고 그 일부가 되어라.',
   'hudChrome.heatGuardian.say.sink': '샘이 너희를 맞으러 솟아오른다!',
   'hudChrome.heatGuardian.say.sinkAgain': '다시 화로가 넘친다. 다시 너희는 타오른다.',

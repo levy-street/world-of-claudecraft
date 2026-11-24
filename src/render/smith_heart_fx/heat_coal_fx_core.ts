@@ -52,6 +52,8 @@ export function coalLook(
   duration: number,
   self: boolean,
   clock: number,
+  /** Reduced motion: no bob, a steady glow (it still reads, it never moves). */
+  still = false,
   out: HeatCoalLook = {
     size: 0,
     height: 0,
@@ -62,10 +64,11 @@ export function coalLook(
 ): HeatCoalLook {
   const spent = coalFuseSpent(remaining, duration);
   out.size = COAL_ARROW_SIZE * (self ? COAL_SELF_SCALE : 1);
-  out.height = COAL_ARROW_HEIGHT + 0.18 * Math.sin(clock * 3);
-  // The throb quickens from about once a second to three times as the fuse runs out.
+  out.height = COAL_ARROW_HEIGHT + (still ? 0 : 0.18 * Math.sin(clock * 3));
+  // The throb quickens from about once a second to three times as the fuse
+  // runs out; held steady (brighter with the fuse) under reduced motion.
   const rate = 6 + 14 * spent;
-  out.glow = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(clock * rate));
+  out.glow = still ? 0.8 + 0.2 * spent : 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(clock * rate));
   const left = Math.max(0, remaining);
   out.burstShown = left <= COAL_BURST_SHOW;
   out.burstFill = out.burstShown ? Math.max(0, Math.min(1, 1 - left / COAL_BURST_SHOW)) : 0;

@@ -44,7 +44,13 @@ const whole = (v: number) => formatNumber(Math.max(0, Math.ceil(v)), { maximumFr
 
 export function buildCoalAlertView(input: CoalAlertInput): CoalAlertView {
   if (input.dead) return HIDDEN;
-  const coal = input.auras.find((a) => a.id === HEAT_AURAS.coal);
+  // A plain loop: this runs every frame for every player (no closure).
+  let coal: CoalAlertAura | null = null;
+  for (const a of input.auras)
+    if (a.id === HEAT_AURAS.coal) {
+      coal = a;
+      break;
+    }
   if (!coal) return HIDDEN;
   const left = Math.max(0, coal.remaining ?? 0);
   const total = Math.max(1e-6, coal.duration ?? left);

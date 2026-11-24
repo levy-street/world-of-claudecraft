@@ -20271,11 +20271,11 @@
       }
     }
   }
-  /* Touch: the unit frames sit at the top, so the chip waits under the
-     player frame's corner, clear of the action ring and the joystick. */
+  /* Touch: the tank swap chip's own seat under the target frame's corner
+     (a coal never lands on a tank, so the two never share it), clear of the
+     raid frames down the left, the action ring and the joystick. */
   body.mobile-touch #heart-live-coal {
-    right: auto;
-    left: 12px;
+    right: max(12px, calc(env(safe-area-inset-right) + 8px));
     top: 34%;
   }
 

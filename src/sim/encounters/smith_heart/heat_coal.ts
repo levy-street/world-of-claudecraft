@@ -16,13 +16,16 @@
 //                lasts. Healing through the absorb puts it out.
 //   The leap     another living player within `coalLeapR` of the bearer takes
 //                it (the nearest; ties by id): the absorb it has LEFT and its
-//                fuse go with it (no reset), and the leap strikes them. After a
-//                leap it rests `coalGrace` s, and never goes straight back to
+//                fuse go with it (no reset), and the leap strikes them. Just set
+//                and after a leap it rests `coalGrace` s (a breath to step out
+//                of a clump), and never goes straight back to
 //                the one it left within `coalBackGrace` s (no ping-pong).
 //   The burst    not out in `coalSeconds`: it bursts on everyone within
 //                `coalBurstR` of the bearer, the bearer too (the tier's
 //                punishing factor: heavy, never a whole cloth wearer's health).
-//   Gone         with its bearer's death or leaving the Hearth's floor, and
+//   Never a tank  it never leaps onto one either.
+//   Off the floor carried off the Hearth's floor alive, it bursts there.
+//   Gone         with its bearer's death, and
 //                every one goes out as the guardian sinks (nothing of it rides
 //                into the lava waves) and at the fight's end.
 //
@@ -52,9 +55,23 @@ import {
 } from './heat_scope';
 import type { HeatCoal } from './heat_state';
 
-/** Is `p` a tank now: the guardian's target, or wearing Cinder Grip? */
-export function coalTank(s: Pick<HeatScope, 'boss'>, p: Entity): boolean {
-  return p.id === s.boss.aggroTargetId || auraOf(p, HEAT_AURAS.grip) !== undefined;
+/** Is `p` one of the fight's tanks: the guardian's target, wearing Cinder
+ *  Grip, or having worn it this pull (an off-tank whose stacks ran out between
+ *  swaps is still a tank: the bot pass of 2026-11-24 saw a coal set on one
+ *  leap straight onto the other in the melee). */
+export function coalTank(s: Pick<HeatScope, 'boss' | 'st'>, p: Entity): boolean {
+  return (
+    p.id === s.boss.aggroTargetId ||
+    auraOf(p, HEAT_AURAS.grip) !== undefined ||
+    s.st.gripWorn.includes(p.id)
+  );
+}
+
+/** Note every player wearing Cinder Grip (the fight's tanks, for the picks). */
+function noteGrip(s: HeatScope): void {
+  for (const p of s.players)
+    if (!s.st.gripWorn.includes(p.id) && auraOf(p, HEAT_AURAS.grip) !== undefined)
+      s.st.gripWorn.push(p.id);
 }
 
 function bearing(s: Pick<HeatScope, 'st'>, pid: number): boolean {
@@ -112,7 +129,8 @@ export function setCoals(s: HeatScope): Entity[] {
       pid: p.id,
       fuse: T.coalSeconds,
       tick: T.coalTick,
-      grace: 0,
+      // A breath to step out of a clump before it can leap at all.
+      grace: T.coalGrace,
       prev: null,
       prevGrace: 0,
     });
@@ -142,7 +160,8 @@ export function coalLeapTarget(s: HeatScope, coal: HeatCoal, bearer: Entity): En
   let best: Entity | null = null;
   let bestD = Number.POSITIVE_INFINITY;
   for (const q of livePlayers(s)) {
-    if (q.id === bearer.id || bearing(s, q.id)) continue;
+    // Never onto a tank (the reviews of 2026-11-24: the melee stands by them).
+    if (q.id === bearer.id || bearing(s, q.id) || coalTank(s, q)) continue;
     if (coal.prev === q.id && coal.prevGrace > 1e-9) continue;
     const there = at(s, q);
     const d = Math.hypot(there.x - here.x, there.z - here.z);
@@ -194,6 +213,7 @@ export function burstCoal(s: HeatScope, bearer: Entity): Entity[] {
  *  in the `fight` stage). */
 export function stepCoals(s: HeatScope): void {
   const st = s.st;
+  noteGrip(s);
   if (s.rules.liveCoal) {
     st.coalTimer = Math.max(0, st.coalTimer - DT);
     if (st.coalTimer <= 1e-9 && !wheelNear(s)) {
@@ -206,9 +226,16 @@ export function stepCoals(s: HeatScope): void {
   for (const coal of [...st.coals]) {
     if (!st.coals.includes(coal)) continue;
     const p = s.ctx.entities.get(coal.pid);
-    if (!p || p.dead || !onFloor.has(p.id)) {
+    if (!p || p.dead || p.ghost) {
       if (p) dropAura(p, HEAT_AURAS.coal);
       st.coals = st.coals.filter((c) => c !== coal);
+      continue;
+    }
+    if (!onFloor.has(p.id)) {
+      // Carried off the Hearth's floor alive: it bursts on its bearer there
+      // (never a way to shed it), and on anyone still near.
+      burstCoal(s, p);
+      fireHit(s, p, roll(s, T.coalBurstMin, T.coalBurstMax, punishMult(s)), HEAT_NAMES.coalBurst);
       continue;
     }
     const aura = auraOf(p, HEAT_AURAS.coal);

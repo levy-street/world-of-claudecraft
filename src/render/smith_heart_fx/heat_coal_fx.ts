@@ -37,8 +37,9 @@ export const COAL_SLOTS = 4;
 const DANGER = { color: TELEGRAPH_THREAT_COLORS.danger, accent: C.accent };
 const PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
 const LOOK: HeatCoalLook = { size: 0, height: 0, glow: 0, burstFill: 0, burstShown: false };
-const _q = new THREE.Quaternion();
-const _v = new THREE.Vector3();
+/** A leap ring or burst reach re-drapes on the floor once its bearer has
+ *  slid this far (between, it slides: telegraph_kit.ts placeFan). */
+const REDRAPE = 0.5;
 
 const EMBER = {
   speed: 0.6,
@@ -72,11 +73,17 @@ const ASH = {
   radius: 0.6,
 };
 
-const UV_VERT = /* glsl */ `
+/** A true billboard: the plane laid in view space round its anchor, so the
+ *  arrow faces the camera however it orbits (a plane turned to the player's
+ *  facing goes edge-on under a camera drag: the reviews of 2026-11-24). */
+const BILLBOARD_VERT = /* glsl */ `
 varying vec2 vUv;
 void main() {
   vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vec4 mv = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+  vec2 scale = vec2(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz));
+  mv.xy += position.xy * scale;
+  gl_Position = projectionMatrix * mv;
 }
 `;
 /** The arrow: a downward arrowhead and its shaft as one signed distance, a
@@ -121,7 +128,7 @@ void main() {
   col = mix(col, vec3(1.0, 0.97, 0.86) * (1.1 + 0.5 * uGlow), coal * uGlow * body);
   vec3 haloCol = vec3(1.0, 0.62, 0.22) * (0.55 + 0.45 * uGlow);
   float a = max(body, halo * 0.55);
-  gl_FragColor = vec4(body > 0.001 ? col : haloCol, a);
+  gl_FragColor = vec4(mix(haloCol, col, smoothstep(0.0, 0.5, body)), a);
   #include <colorspace_fragment>
 }
 `;
@@ -133,6 +140,9 @@ interface CoalSlot {
   glow: THREE.Sprite;
   leap: TelegraphFan;
   burst: TelegraphFan;
+  /** Where each fan was last draped (NaN: not yet). */
+  leapAt: { x: number; z: number };
+  burstAt: { x: number; z: number };
   emberIn: number;
 }
 
@@ -147,7 +157,7 @@ export class HeatCoalFx {
       const mat = new THREE.ShaderMaterial({
         name: 'smithHeartHeatCoalArrow',
         uniforms: { uTime: host.uTime, uGlow: { value: 0 } },
-        vertexShader: UV_VERT,
+        vertexShader: BILLBOARD_VERT,
         fragmentShader: ARROW_FRAG,
         transparent: true,
         depthWrite: false,
@@ -172,7 +182,17 @@ export class HeatCoalFx {
       const burst = host.telegraphs.fan('cinderReach');
       host.kit.layOutFan(burst, 360, DANGER);
       burst.group.visible = false;
-      this.slots.push({ id: -1, arrow, mat, glow, leap, burst, emberIn: 0 });
+      this.slots.push({
+        id: -1,
+        arrow,
+        mat,
+        glow,
+        leap,
+        burst,
+        leapAt: { x: Number.NaN, z: 0 },
+        burstAt: { x: Number.NaN, z: 0 },
+        emberIn: 0,
+      });
     }
   }
 
@@ -202,12 +222,18 @@ export class HeatCoalFx {
     clock: number,
     dt: number,
   ): void {
-    const look = coalLook(coal.remaining, coal.duration, self, clock, LOOK);
+    const look = coalLook(
+      coal.remaining,
+      coal.duration,
+      self,
+      clock,
+      this.host.reducedMotion(),
+      LOOK,
+    );
     const at = fxAnchor(p);
     const y = this.host.groundY(at.x, at.z);
     s.arrow.position.set(at.x, at.y + look.height, at.z);
     s.arrow.scale.set(look.size, look.size * 1.25, 1);
-    s.arrow.quaternion.copy(this.cameraYaw());
     s.mat.uniforms.uGlow.value = look.glow;
     s.arrow.visible = true;
     s.glow.position.set(at.x, at.y + look.height - look.size * 0.2, at.z);
@@ -215,7 +241,7 @@ export class HeatCoalFx {
     s.glow.scale.set(g, g, 1);
     s.glow.visible = true;
     // The leap ring, the whole time.
-    this.host.kit.drapeFan(s.leap, this.host.groundY, at.x, y, at.z, 0, T.coalLeapR);
+    this.drape(s.leap, s.leapAt, at.x, y, at.z, T.coalLeapR);
     PAINT.fill = 1;
     PAINT.clock = clock;
     PAINT.range = T.coalLeapR;
@@ -225,7 +251,7 @@ export class HeatCoalFx {
     s.leap.group.visible = true;
     // The burst's reach over the fuse's last seconds.
     if (look.burstShown) {
-      this.host.kit.drapeFan(s.burst, this.host.groundY, at.x, y, at.z, 0, T.coalBurstR);
+      this.drape(s.burst, s.burstAt, at.x, y, at.z, T.coalBurstR);
       PAINT.fill = look.burstFill;
       PAINT.clock = clock;
       PAINT.range = T.coalBurstR;
@@ -233,7 +259,10 @@ export class HeatCoalFx {
       PAINT.fade = undefined;
       this.host.kit.paintFan(s.burst, PAINT);
       s.burst.group.visible = true;
-    } else s.burst.group.visible = false;
+    } else {
+      s.burst.group.visible = false;
+      s.burstAt.x = Number.NaN;
+    }
     // Embers off the carried coal (cosmetic: thinned on the low tier).
     s.emberIn -= dt;
     if (s.emberIn <= 0) {
@@ -242,9 +271,28 @@ export class HeatCoalFx {
     }
   }
 
+  /** Drape `f` at (x, z) once it has slid REDRAPE from its last drape, else
+   *  slide it there. */
+  private drape(
+    f: TelegraphFan,
+    last: { x: number; z: number },
+    x: number,
+    y: number,
+    z: number,
+    range: number,
+  ): void {
+    if (Number.isNaN(last.x) || Math.hypot(x - last.x, z - last.z) > REDRAPE) {
+      this.host.kit.drapeFan(f, this.host.groundY, x, y, z, 0, range);
+      last.x = x;
+      last.z = z;
+    } else this.host.kit.placeFan(f, x, y, z);
+  }
+
   private release(s: CoalSlot): void {
     if (s.id < 0) return;
     s.id = -1;
+    s.leapAt.x = Number.NaN;
+    s.burstAt.x = Number.NaN;
     s.arrow.visible = false;
     s.glow.visible = false;
     s.leap.group.visible = false;
@@ -277,13 +325,6 @@ export class HeatCoalFx {
     parts.puff(x, y + 1.2, z, 36, { ...SPARK, speed: 12, up: 6, radius: 1.2 });
     parts.puff(x, y + 1.4, z, 10, ASH);
     this.host.shakeNear(x, z, 0.45, 30);
-  }
-
-  /** A billboard's turn toward the player's own view (its yaw only). */
-  private cameraYaw(): THREE.Quaternion {
-    const world = this.host.world;
-    const me = world?.entities.get(world.playerId);
-    return _q.setFromAxisAngle(_v.set(0, 1, 0), me ? me.facing + Math.PI : 0);
   }
 
   hide(): void {

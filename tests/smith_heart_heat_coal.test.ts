@@ -14,6 +14,7 @@ import {
   HEAT_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
 import { coalAbsorb, coalHoldsWheel } from '../src/sim/encounters/smith_heart/heat_coal';
+import { addThreat } from '../src/sim/threat';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import { hitsOf } from './helpers/council_fight';
 import { type HeatFight, heatFight } from './helpers/heat_fight';
@@ -62,6 +63,8 @@ const bearers = (f: HeatFight) => f.players.filter((p) => coalOf(p));
 /** Hold the boss's target on player 0 and Cinder Grip on player 1 (and
  *  every pool big: a stat refresh hands the level-1 raiders theirs back). */
 function tanks(f: HeatFight): void {
+  // Player 0 tops the threat table, so the mob AI keeps the guardian on it.
+  addThreat(f.boss(), f.players[0].id, 1e9);
   for (const p of f.players) {
     p.maxHp = 50000;
     p.hp = Math.max(p.hp, 40000);
@@ -119,6 +122,31 @@ describe('Live Coal: who and when', () => {
       ),
     ).toHaveLength(2);
     expect(st.coalTimer).toBeCloseTo(T.coalEvery, 1);
+  });
+
+  it('never takes a tank whose Cinder Grip ran out between swaps', () => {
+    const f = fight('heroic', 4);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    tanks(f);
+    // Player 0 holds the guardian with its own stacks.
+    f.players[0].auras.push({
+      ...(f.players[1].auras.find((a) => a.id === HEAT_AURAS.grip) as Aura),
+    });
+    run(f);
+    // Player 1's stacks run out; four players, two tanks: only 2 and 3 may take it.
+    f.players[1].auras = f.players[1].auras.filter((a) => a.id !== HEAT_AURAS.grip);
+    f.boss().aggroTargetId = f.players[0].id;
+    st.coalTimer = 0.05;
+    for (let i = 0; i < 3; i++) {
+      f.boss().aggroTargetId = f.players[0].id;
+      f.tick();
+    }
+    expect(st.gripWorn).toContain(f.players[1].id);
+    const on = bearers(f).map((p) => p.id);
+    expect(on.length).toBeGreaterThan(0);
+    expect(on).not.toContain(f.players[0].id);
+    expect(on).not.toContain(f.players[1].id);
   });
 
   it('Normal never sets one', () => {
@@ -257,7 +285,9 @@ describe('Live Coal: the burn, healing through, the leap, the burst', () => {
     run(f, ticks(2));
     const fuse = st.coals[0].fuse;
     // Someone walks into it (1.5 yd).
-    const taker = f.players.find((q) => q !== p && q !== f.players[0] && !coalOf(q)) as Entity;
+    const taker = f.players.find(
+      (q) => q !== p && q !== f.players[0] && q !== f.players[1] && !coalOf(q),
+    ) as Entity;
     // A level-20 pool: the coal's aura refreshes the taker's stats.
     taker.level = 20;
     const here = f.local(p);
@@ -278,6 +308,23 @@ describe('Live Coal: the burn, healing through, the leap, the burst', () => {
     run(f, ticks(T.coalGrace + 0.5));
     expect(st.coals[0].pid).toBe(taker.id);
     expect(st.coalLeaps).toBe(1);
+  });
+
+  it('rests a breath after it is set: a clumped neighbour can step away first', () => {
+    const f = fight('heroic');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const p = setOne(f);
+    const near = f.players.find(
+      (q) => q !== p && q !== f.players[0] && q !== f.players[1] && !coalOf(q),
+    ) as Entity;
+    near.level = 20;
+    const here = f.local(p);
+    f.put(near, here.x + 1, here.z);
+    run(f, ticks(T.coalGrace - 0.3));
+    expect(st.coals[0].pid).toBe(p.id);
+    run(f, ticks(0.6));
+    expect(st.coals[0].pid).toBe(near.id);
   });
 
   it('bursts at the fuse on everyone within its reach, the bearer too, never a whole cloth health', () => {
@@ -313,6 +360,59 @@ describe('Live Coal: the burn, healing through, the leap, the burst', () => {
           e.type === 'spellfxAt' && (e as { ability?: string }).ability === HEAT_CUES.coalBurst,
       ),
     ).toBe(true);
+  });
+
+  it('never goes straight back to the one it left, nor onto a tank', () => {
+    const f = fight('heroic');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const p = setOne(f);
+    const q = f.players.find(
+      (x) => x !== p && x !== f.players[0] && x !== f.players[1] && !coalOf(x),
+    ) as Entity;
+    q.level = 20;
+    p.level = 20;
+    run(f, ticks(T.coalGrace + 0.1));
+    const here = f.local(p);
+    f.put(q, here.x + 1, here.z);
+    run(f);
+    expect(st.coals[0].pid).toBe(q.id);
+    // Both stand together past the leap grace but inside the back grace.
+    run(f, ticks(T.coalGrace + 0.5));
+    expect(st.coals[0].pid).toBe(q.id);
+    expect(st.coals[0].prevGrace).toBeGreaterThan(0);
+    // A tank walks right into the bearer: it stays.
+    const tank = f.players[1];
+    tank.level = 20;
+    const there = f.local(q);
+    f.put(p, there.x - 15, there.z);
+    f.put(tank, there.x, there.z + 1);
+    run(f, ticks(T.coalBackGrace));
+    expect(st.coals[0].pid).toBe(q.id);
+    expect(coalOf(tank)).toBeUndefined();
+  });
+
+  it('goes with its bearer at death; carried off the floor alive it bursts', () => {
+    const f = fight('heroic');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    const p = setOne(f);
+    p.hp = 0;
+    p.dead = true;
+    f.tick();
+    expect(st.coals).toHaveLength(0);
+    expect(st.coalBursts).toBe(0);
+    expect(coalOf(p)).toBeUndefined();
+    const g = fight('heroic', 6, 37);
+    const gs = g.state();
+    if (!gs) throw new Error('no fight');
+    const b = setOne(g);
+    b.level = 20;
+    g.put(b, -150, 0);
+    const ev = run(g, 2);
+    expect(gs.coalBursts).toBe(1);
+    expect(coalOf(b)).toBeUndefined();
+    expect(hitsOf(ev, HEAT_NAMES.coalBurst, b.id).length).toBeGreaterThanOrEqual(1);
   });
 
   it('the aura shows the fuse and never lapses before the module resolves it', () => {

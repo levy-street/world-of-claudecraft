@@ -4,7 +4,10 @@
 // to anyone else, never hidden by the hints setting), its names localized, and
 // the arrow's look over the fuse (heat_coal_fx_core.ts).
 
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { HeatFightFx } from '../src/render/smith_heart_fx';
+import { COAL_SLOTS } from '../src/render/smith_heart_fx/heat_coal_fx';
 import {
   COAL_ARROW_SIZE,
   COAL_BURST_SHOW,
@@ -12,17 +15,23 @@ import {
   coalFuseSpent,
   coalLook,
 } from '../src/render/smith_heart_fx/heat_coal_fx_core';
+import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
+import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   HEAT_AURAS,
   HEAT_DIFFICULTY,
+  HEAT_GUARDIAN,
   HEAT_NAMES,
   HEAT_TUNING as T,
+  wellTemplate,
 } from '../src/sim/encounters/smith_heart/heat_ids';
+import type { Entity } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { buildCoalAlertView } from '../src/ui/hud/dungeon/coal_alert_view';
 import { dungeonPromptEnabled } from '../src/ui/hud/dungeon/dungeon_prompt_policy_core';
 import { t } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
+import type { IWorld } from '../src/world_api';
 
 const H = HEAT_DIFFICULTY.heroic;
 const r = (v: number, m: number) => Math.max(1, Math.round(v * m));
@@ -114,5 +123,94 @@ describe('Live Coal: the arrow over the fuse', () => {
     expect(coalLook(COAL_BURST_SHOW / 2, T.coalSeconds, false, 0).burstFill).toBeCloseTo(0.5, 9);
     expect(coalLook(0, T.coalSeconds, false, 0).burstFill).toBe(1);
     expect(COAL_BURST_SHOW).toBeLessThan(T.coalSeconds);
+  });
+});
+
+describe('Live Coal: the arrow in the fight painter', () => {
+  it('draws over every bearer on the low tier too, hidden until a coal lands, owned by the host', () => {
+    const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
+    const ent = (id: number, kind: string, templateId: string, x: number, z: number) =>
+      ({
+        id,
+        kind,
+        templateId,
+        name: templateId,
+        pos: { x: o.x + x, y: 0, z: o.z + z },
+        prevPos: { x: o.x + x, y: 0, z: o.z + z },
+        facing: 0,
+        scale: 1,
+        hp: 100,
+        maxHp: 100,
+        dead: false,
+        auras: [] as Entity['auras'],
+        castingAbility: null,
+      }) as unknown as Entity;
+    const me = ent(1, 'player', 'warrior', -206, 2);
+    const other = ent(2, 'player', 'mage', -200, 8);
+    const entities = new Map<number, Entity>([
+      [1, me],
+      [2, other],
+      [3, ent(3, 'mob', HEAT_GUARDIAN, HEARTH_WELL.x, HEARTH_WELL.z)],
+      [4, ent(4, 'object', wellTemplate('calm'), HEARTH_WELL.x, HEARTH_WELL.z)],
+    ]);
+    const world = {
+      entities,
+      player: me,
+      playerId: 1,
+      entityRosterVersion: 1,
+    } as unknown as IWorld;
+    const scene = new THREE.Scene();
+    const fx = new HeatFightFx(
+      scene,
+      () => 0,
+      world,
+      undefined,
+      () => false,
+      () => {},
+    );
+    // The low tier: the cosmetic layers off (the arrow never reads `detail`).
+    (fx as unknown as { detail: boolean }).detail = false;
+    const arrows = () => {
+      const out: THREE.Mesh[] = [];
+      scene.traverse((c) => {
+        if (c.name === 'smithHeartHeatCoalArrow') out.push(c as THREE.Mesh);
+      });
+      return out;
+    };
+    for (let i = 0; i < 4; i++) fx.update(1 / 20);
+    expect(arrows()).toHaveLength(COAL_SLOTS);
+    expect(arrows().every((a) => !a.visible)).toBe(true);
+    for (const a of arrows()) expect(fx.materials).toContain(a.material);
+    other.auras.push({
+      id: HEAT_AURAS.coal,
+      name: HEAT_NAMES.coal,
+      kind: 'heal_absorb',
+      remaining: 8,
+      duration: T.coalSeconds,
+      value: 300,
+      sourceId: 3,
+    } as Entity['auras'][number]);
+    for (let i = 0; i < 4; i++) fx.update(1 / 20);
+    expect(arrows().filter((a) => a.visible)).toHaveLength(1);
+    other.auras = [];
+    for (let i = 0; i < 4; i++) fx.update(1 / 20);
+    expect(arrows().filter((a) => a.visible)).toHaveLength(0);
+    fx.dispose();
+  });
+
+  it('holds still under reduced motion, still glowing', () => {
+    const a = coalLook(6, T.coalSeconds, false, 0.3, true);
+    const b = coalLook(6, T.coalSeconds, false, 1.7, true);
+    expect(a.height).toBe(b.height);
+    expect(a.glow).toBe(b.glow);
+    expect(a.glow).toBeGreaterThanOrEqual(0.8);
+  });
+
+  it('reads a mirrored aura (no duration, no absorb left) without a NaN', () => {
+    const v = buildCoalAlertView({ auras: [{ id: HEAT_AURAS.coal, value: 0, remaining: 3 }] });
+    expect(v.visible).toBe(true);
+    if (!v.visible) return;
+    expect(v.progress).toBe(1);
+    expect(v.barLabel).toBe('0 to heal');
   });
 });

@@ -412,7 +412,7 @@ export class HeatFightFx implements HeatFxHost {
     private readonly groundFn: (x: number, z: number) => number,
     readonly world?: IWorld,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
-    private readonly reducedMotion: () => boolean = () => false,
+    readonly reducedMotion: () => boolean = () => false,
     private readonly shakeSink?: (amount: number) => void,
     /** The renderer's point-light budget (the lava wall's light on the raid). */
     pointLights: BudgetPointLightRegistry | null = null,
@@ -664,12 +664,15 @@ export class HeatFightFx implements HeatFxHost {
         if (src) this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, C.ringGold, 30, 1.6);
         break;
       case HEAT_CUES.coal:
-        // Carried out of the wellspring on a bolt of fire onto its bearer.
+        // Carried out of the wellspring on a bolt of fire onto its bearer;
+        // the next frame's scan finds the new bearer (no scan-tick lag).
         this.flareBolt(ev.sourceId, ev.targetId);
         this.coal.cue('set', dst);
+        this.scanTimer = 0;
         break;
       case HEAT_CUES.coalLeap:
         this.coal.cue('leap', dst);
+        this.scanTimer = 0;
         break;
       case HEAT_CUES.coalOut:
         this.coal.cue('out', dst);

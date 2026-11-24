@@ -23072,7 +23072,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。',
   'hudChrome.auraEffect.heatGuardian.crust': '已冷却变硬：此效果结束前，击打无法将它打退。',
   'hudChrome.auraEffect.heatGuardian.coal':
-    '吸收你受到的接下来{absorb}点治疗，并每秒对你造成{burnMin}到{burnMax}点火焰伤害。用治疗打穿吸收即可将其熄灭。任何靠近你{leap}码以内的玩家都会带着剩余的吸收量接过它，并受到{leapMin}到{leapMax}点火焰伤害。若{seconds}秒内未被治疗打穿，它会爆裂，对包括你在内{radius}码内的所有人造成{burstMin}到{burstMax}点火焰伤害。',
+    '吸收你受到的接下来{absorb}点治疗，并每秒对你造成{burnMin}到{burnMax}点火焰伤害。用治疗打穿吸收即可将其熄灭。任何靠近你{leap}码以内的玩家都会带着剩余的吸收量接过它，并受到{leapMin}到{leapMax}点火焰伤害；它落到某人身上后{grace}秒内不会再转移。若{seconds}秒内未被治疗打穿，它会爆裂，对包括你在内{radius}码内的所有人造成{burstMin}到{burstMax}点火焰伤害。',
   'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成为它的一部分。',
   'hudChrome.heatGuardian.say.sink': '涌泉升起来迎接你们了！',
   'hudChrome.heatGuardian.say.sinkAgain': '炉心再次满溢。你们再次燃烧。',

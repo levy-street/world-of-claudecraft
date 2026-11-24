@@ -617,8 +617,8 @@ export const HEAT_TUNING = {
   // through an overflow) two non-tanks each carry one: a heal absorb of
   // coalAbsorb (x the tier's damageMult: about 600 on Heroic) and a burn
   // while it lasts; healed through, it goes out. Within coalLeapR of another
-  // player it leaps to them with the absorb it has left (and a hit); after a
-  // leap it rests coalGrace s, and never goes straight back to the one it
+  // player it leaps to them with the absorb it has left (and a hit); just set
+  // and after a leap it rests coalGrace s, and never goes straight back to the one it
   // left within coalBackGrace s. Not out in coalSeconds: it bursts on
   // everyone within coalBurstR (x the tier's punishMult: 800 to 875 on
   // Heroic, under a level-20 cloth wearer's whole health).

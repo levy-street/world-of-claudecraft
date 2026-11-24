@@ -207,6 +207,7 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     coalCasts: 0,
     coalAt: -999,
     coals: [],
+    gripWorn: [],
     coalOuts: 0,
     coalLeaps: 0,
     coalBursts: 0,
@@ -726,6 +727,7 @@ export function heatDevTrigger(
     startZones(s);
     return 'Wakefire: the bands ignite one after another.';
   }
+  if (verb === 'coal' && s.st.stage !== 'fight') return 'No Live Coal while the guardian is under.';
   if (verb === 'coal')
     return `Live Coal on ${setCoals(s).length} (the guardian's ${s.st.difficulty} rules).`;
   if (verb === 'ember' || verb === 'cinder')

@@ -30,6 +30,8 @@ export interface HeatFxHost {
   groundY(x: number, z: number): number;
   rand(): number;
   shakeNear(x: number, z: number, amount: number, reach?: number): void;
+  /** The player's reduced-motion preference (a part's bob or throb holds still). */
+  readonly reducedMotion: () => boolean;
   /** An additive glow sprite material (registered for disposal). */
   sprite(color: number, name: string): THREE.SpriteMaterial;
 }

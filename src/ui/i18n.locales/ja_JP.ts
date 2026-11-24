@@ -22560,7 +22560,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.crust':
     '固く冷えている：この効果が切れるまで、打っても押し返せない。',
   'hudChrome.auraEffect.heatGuardian.coal':
-    '受ける回復を次の{absorb}吸収し、毎秒{burnMin}～{burnMax}の火炎ダメージを与える。回復で吸収を削り切れば消える。{leap}ヤード以内に近づいたプレイヤーには残りの吸収ごと熾火が移り、{leapMin}～{leapMax}の火炎ダメージを与える。{seconds}秒以内に消せなければ破裂し、あなたを含む{radius}ヤード以内の全員に{burstMin}～{burstMax}の火炎ダメージを与える。',
+    '受ける回復を次の{absorb}吸収し、毎秒{burnMin}～{burnMax}の火炎ダメージを与える。回復で吸収を削り切れば消える。{leap}ヤード以内に近づいたプレイヤーには残りの吸収ごと熾火が移り、{leapMin}～{leapMax}の火炎ダメージを与える。誰かに移った後{grace}秒間は再び移らない。{seconds}秒以内に消せなければ破裂し、あなたを含む{radius}ヤード以内の全員に{burstMin}～{burstMax}の火炎ダメージを与える。',
   'hudChrome.heatGuardian.say.fist': '石の落ちる場所に立て。そしてその一部となれ。',
   'hudChrome.heatGuardian.say.sink': '湧泉がお前たちを迎えに昇る！',
   'hudChrome.heatGuardian.say.sinkAgain': '再び炉床はあふれる。再びお前たちは燃える。',

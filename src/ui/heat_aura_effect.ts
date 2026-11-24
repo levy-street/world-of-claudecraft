@@ -120,6 +120,7 @@ export function heatAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescript
           absorb: Math.max(0, Math.round(a.value ?? tierValue(T.coalAbsorb, H.damageMult))),
           ...tierRange('burn', T.coalBurnMin, T.coalBurnMax, H.damageMult),
           leap: T.coalLeapR,
+          grace: T.coalGrace,
           ...tierRange('leap', T.coalLeapMin, T.coalLeapMax, H.damageMult),
           seconds: T.coalSeconds,
           ...tierRange('burst', T.coalBurstMin, T.coalBurstMax, H.punishMult),
