@@ -18177,7 +18177,7 @@ export const en: EnTranslations = {
       },
       "vampiric_touch": {
         "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 30% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
       },
       "void_rupture": {
         "name": "Void Rupture",
@@ -31020,8 +31020,8 @@ export const en: EnTranslations = {
       },
       "vanguard_priest_shadow": {
         "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+        "bonus2": "Each tick of Litany of Woe slows the target's movement by 30 percent for 5 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Void Rupture has a 15 percent chance to cost no Gloomtithe. Void Rupture also grants Duskhymn Ward, absorbing damage equal to 20 percent of your maximum health for 15 sec. Duskhymn Ward cannot occur more than once every 30 sec."
       },
       "vanguard_rogue_assassination": {
         "name": "Nightcut Leathers",

@@ -103,12 +103,18 @@ export const VANGUARD_HOLY_PRIEST_2PC_VEILSTEP_COOLDOWN_CUT_SEC = 6;
 export const VANGUARD_HOLY_PRIEST_4PC_SHIELD_PCT_MAX = 0.08;
 /** Holy 4pc: the shield's duration in seconds. */
 export const VANGUARD_HOLY_PRIEST_4PC_SHIELD_DURATION_SEC = 6;
-/** Shadow 2pc: Litany of Woe's channel slow, the movement multiplier (30 percent slow). */
+/** Shadow 2pc: each Litany of Woe tick's slow, the movement multiplier (30 percent slow). */
 export const VANGUARD_SHADOW_2PC_SLOW_MULT = 0.7;
-/** Shadow 4pc: the Call Tithefiend self shield, a fraction of max health. */
-export const VANGUARD_SHADOW_4PC_SHIELD_PCT_MAX = 0.1;
-/** Shadow 4pc: the shield's duration in seconds. */
-export const VANGUARD_SHADOW_4PC_SHIELD_DURATION_SEC = 8;
+/** Shadow 2pc: how long each tick's slow lasts, in seconds. */
+export const VANGUARD_SHADOW_2PC_SLOW_DURATION_SEC = 5;
+/** Shadow 4pc: Void Rupture's chance to cost no Gloomtithe. */
+export const VANGUARD_SHADOW_4PC_FREE_CHANCE = 0.15;
+/** Shadow 4pc: the Duskhymn Ward self shield, a fraction of max health. */
+export const VANGUARD_SHADOW_4PC_SHIELD_PCT_MAX = 0.2;
+/** Shadow 4pc: the Duskhymn Ward duration in seconds. */
+export const VANGUARD_SHADOW_4PC_SHIELD_DURATION_SEC = 15;
+/** Shadow 4pc: Duskhymn Ward's internal cooldown in seconds. */
+export const VANGUARD_SHADOW_4PC_ICD_SEC = 30;
 
 export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> = {
   // ---- Warrior ----
@@ -577,35 +583,47 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_priest_shadow: [
     {
       pieces: 2,
-      // Bespoke: the single-target channel path never applies non-tick rows,
-      // so combat/priest/vespers.ts applies the slow at the Litany of Woe
-      // channel start for the channel's length and strips it when the
-      // channel is cancelled early. No rng.
-      effect: { tuning: { slowMult: VANGUARD_SHADOW_2PC_SLOW_MULT } },
+      // Bespoke: the single-target channel path resolves only its tick rows,
+      // so combat/priest/duskhymn.ts applies the slow on every landed Litany
+      // of Woe tick (one aura id, refreshed, never stacked). No rng.
+      effect: {
+        tuning: {
+          slowMult: VANGUARD_SHADOW_2PC_SLOW_MULT,
+          slowDurationSec: VANGUARD_SHADOW_2PC_SLOW_DURATION_SEC,
+        },
+      },
     },
     {
       pieces: 4,
-      // Call Tithefiend shields the priest (target 'self'). The name reuses
-      // the localized ability string.
+      // Void Rupture grants Duskhymn Ward (target 'self'), at most once per
+      // icd. The 15 percent free cast rolls at cast commit in
+      // combat/priest/duskhymn.ts, wearer-gated before the draw.
       effect: {
         proc: {
           id: 'set_vanguard_priest_shadow_4pc',
-          name: 'Call Tithefiend',
+          name: 'Duskhymn Ward',
           school: 'shadow',
-          trigger: { on: 'castNth', n: 1, abilities: ['summon_tithefiend'] },
+          trigger: {
+            on: 'castNth',
+            n: 1,
+            abilities: ['void_rupture'],
+            icd: VANGUARD_SHADOW_4PC_ICD_SEC,
+          },
           responses: [
             {
               kind: 'absorb',
               amountPctMaxHp: VANGUARD_SHADOW_4PC_SHIELD_PCT_MAX,
               duration: VANGUARD_SHADOW_4PC_SHIELD_DURATION_SEC,
-              name: 'Call Tithefiend',
+              name: 'Duskhymn Ward',
               target: 'self',
             },
           ],
         },
         tuning: {
+          freeChance: VANGUARD_SHADOW_4PC_FREE_CHANCE,
           shieldPctMaxHp: VANGUARD_SHADOW_4PC_SHIELD_PCT_MAX,
           shieldDurationSec: VANGUARD_SHADOW_4PC_SHIELD_DURATION_SEC,
+          icdSec: VANGUARD_SHADOW_4PC_ICD_SEC,
         },
       },
     },

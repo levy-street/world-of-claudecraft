@@ -211,12 +211,12 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Litany of Woe also slows the target's movement by 30 percent while you channel it. Damage taken no longer delays your spellcasting.",
+        text: "Each tick of Litany of Woe slows the target's movement by 30 percent for 5 sec. Damage taken no longer delays your spellcasting.",
       },
       {
         pieces: 4,
         effect: {},
-        text: 'Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec.',
+        text: 'Void Rupture has a 15 percent chance to cost no Gloomtithe. Void Rupture also grants Duskhymn Ward, absorbing damage equal to 20 percent of your maximum health for 15 sec. Duskhymn Ward cannot occur more than once every 30 sec.',
       },
     ],
   },

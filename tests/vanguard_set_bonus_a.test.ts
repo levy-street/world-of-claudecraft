@@ -8,6 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import { tonguesMult } from '../src/sim/combat/cc';
 import { SHIELDVOW_CAST_SLOW_AURA_ID } from '../src/sim/combat/paladin_control';
+import { addGloomtithe } from '../src/sim/combat/priest/vespers';
 import { onCastCompleted, onShieldConsumed } from '../src/sim/combat/talent_procs';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { setBonusFlag } from '../src/sim/content/ignivar_set_bonuses';
@@ -795,7 +796,7 @@ describe('Priest Season 2 sets', () => {
     expect(shield.aura.duration).toBe(V.VANGUARD_HOLY_PRIEST_4PC_SHIELD_DURATION_SEC);
   });
 
-  it('Duskhymn 2pc: Litany of Woe slows its target for the channel, only at 2 pieces', () => {
+  it('Duskhymn 2pc: each Litany of Woe tick slows its target for 5 sec, only at 2 pieces', () => {
     const channel = (pieces: number) => {
       const sim = makeSim('priest', 'shadow');
       equipSet(sim, 'vanguard_priest_shadow', pieces);
@@ -807,25 +808,30 @@ describe('Priest Season 2 sets', () => {
       expect(sim.player.castingAbility, 'channeling').toBe('mind_flay');
       return { sim, mob };
     };
-    const slowOf = (mob: Entity) => mob.auras.find((a) => a.id === 'vanguard_duskhymn_slow');
+    const slowsOf = (mob: Entity) => mob.auras.filter((a) => a.id === 'vanguard_duskhymn_slow');
     const short = channel(1);
-    ticks(short.sim, 10);
-    expect(slowOf(short.mob)).toBeUndefined();
+    ticks(short.sim, 80);
+    expect(slowsOf(short.mob)).toHaveLength(0);
 
     const full = channel(2);
-    const slow = expectDefined(slowOf(full.mob));
-    expect(slow.kind).toBe('slow');
-    expect(slow.value).toBe(V.VANGUARD_SHADOW_2PC_SLOW_MULT);
-    ticks(full.sim, 30);
-    expect(full.sim.player.castingAbility, 'still channeling').toBe('mind_flay');
-    expect(slowOf(full.mob)).toBeDefined();
-    // The slow ends with the channel.
+    // No slow before the first tick lands: it is a per-tick rider now.
+    expect(slowsOf(full.mob)).toHaveLength(0);
     for (let i = 0; i < 80 && full.sim.player.castingAbility === 'mind_flay'; i++) full.sim.tick();
-    expect(full.sim.player.castingAbility).toBeNull();
-    expect(slowOf(full.mob)).toBeUndefined();
+    expect(full.sim.player.castingAbility, 'channel finished').toBeNull();
+    // Three ticks refreshed one aura: exactly one 30 percent slow, never stacked.
+    const after = slowsOf(full.mob);
+    expect(after).toHaveLength(1);
+    expect(after[0].kind).toBe('slow');
+    expect(after[0].value).toBe(V.VANGUARD_SHADOW_2PC_SLOW_MULT);
+    expect(after[0].duration).toBe(V.VANGUARD_SHADOW_2PC_SLOW_DURATION_SEC);
+    // It outlives the channel and runs out on its own timer.
+    ticks(full.sim, 20);
+    expect(slowsOf(full.mob)).toHaveLength(1);
+    ticks(full.sim, V.VANGUARD_SHADOW_2PC_SLOW_DURATION_SEC * 20 + 20);
+    expect(slowsOf(full.mob)).toHaveLength(0);
   });
 
-  it('Duskhymn 2pc: cancelling the channel early strips the slow', () => {
+  it('Duskhymn 2pc: cancelling the channel keeps a slow that already landed', () => {
     const sim = makeSim('priest', 'shadow');
     equipSet(sim, 'vanguard_priest_shadow', 2);
     sim.player.resource = sim.player.maxResource;
@@ -833,43 +839,68 @@ describe('Priest Season 2 sets', () => {
     const mob = addMob(sim, 10);
     sim.targetEntity(mob.id);
     sim.castAbility('mind_flay');
-    ticks(sim, 5);
-    expect(mob.auras.some((a) => a.id === 'vanguard_duskhymn_slow')).toBe(true);
+    for (let i = 0; i < 60 && !mob.auras.some((a) => a.id === 'vanguard_duskhymn_slow'); i++) {
+      sim.tick();
+    }
+    expect(
+      mob.auras.some((a) => a.id === 'vanguard_duskhymn_slow'),
+      'first tick slowed',
+    ).toBe(true);
     (sim as unknown as { ctx: SimContext }).ctx.cancelCast(sim.player);
     expect(sim.player.castingAbility).toBeNull();
-    expect(mob.auras.some((a) => a.id === 'vanguard_duskhymn_slow')).toBe(false);
-  });
-
-  it('Duskhymn 2pc: the priest dying mid-channel strips the slow too', () => {
-    // The death hub clears the cast without going through cancelCast.
-    const sim = makeSim('priest', 'shadow');
-    equipSet(sim, 'vanguard_priest_shadow', 2);
-    sim.player.resource = sim.player.maxResource;
-    sim.player.facing = 0;
-    const mob = addMob(sim, 10);
-    sim.targetEntity(mob.id);
-    sim.castAbility('mind_flay');
-    ticks(sim, 5);
     expect(mob.auras.some((a) => a.id === 'vanguard_duskhymn_slow')).toBe(true);
-    const host = sim as unknown as {
-      dealDamage(...args: unknown[]): void;
-    };
-    host.dealDamage(null, sim.player, sim.player.maxHp + 100, false, 'physical', null, 'hit', true);
-    expect(sim.player.dead).toBe(true);
-    expect(mob.auras.some((a) => a.id === 'vanguard_duskhymn_slow')).toBe(false);
   });
 
-  it('Duskhymn 4pc: Call Tithefiend shields the priest for 10 percent of max health', () => {
+  it('Duskhymn 4pc: Void Rupture grants Duskhymn Ward for 20 percent of max health, once per 30 sec', () => {
     const run = (pieces: number) => {
-      const { p, ctx, applied } = procHarness('priest', 'shadow', 'vanguard_priest_shadow', pieces);
-      onCastCompleted(ctx, p, 'summon_tithefiend');
-      return applied.find((a) => a.aura.kind === 'absorb');
+      const harness = procHarness('priest', 'shadow', 'vanguard_priest_shadow', pieces);
+      onCastCompleted(harness.ctx, harness.p, 'void_rupture');
+      return { ...harness, ward: harness.applied.find((a) => a.aura.kind === 'absorb') };
     };
-    expect(run(3)).toBeUndefined();
-    const shield = expectDefined(run(4));
-    expect(shield.target.id).toBe(1);
-    expect(shield.aura.value).toBe(Math.round(1000 * V.VANGUARD_SHADOW_4PC_SHIELD_PCT_MAX));
-    expect(shield.aura.duration).toBe(V.VANGUARD_SHADOW_4PC_SHIELD_DURATION_SEC);
+    expect(run(3).ward).toBeUndefined();
+    const full = run(4);
+    const ward = expectDefined(full.ward);
+    expect(ward.target.id).toBe(1);
+    expect(ward.aura.name).toBe('Duskhymn Ward');
+    expect(ward.aura.value).toBe(Math.round(1000 * V.VANGUARD_SHADOW_4PC_SHIELD_PCT_MAX));
+    expect(ward.aura.duration).toBe(V.VANGUARD_SHADOW_4PC_SHIELD_DURATION_SEC);
+    // The internal cooldown blocks a second Ward from the next Void Rupture.
+    onCastCompleted(full.ctx, full.p, 'void_rupture');
+    expect(full.applied.filter((a) => a.aura.kind === 'absorb')).toHaveLength(1);
+  });
+
+  it('Duskhymn 4pc: Call Tithefiend no longer shields the priest', () => {
+    const { p, ctx, applied } = procHarness('priest', 'shadow', 'vanguard_priest_shadow', 4);
+    onCastCompleted(ctx, p, 'summon_tithefiend');
+    expect(applied.find((a) => a.aura.kind === 'absorb')).toBeUndefined();
+  });
+
+  it('Duskhymn 4pc: Void Rupture sometimes costs no Gloomtithe, only at 4 pieces', () => {
+    const freeCasts = (pieces: number) => {
+      const sim = makeSim('priest', 'shadow');
+      equipSet(sim, 'vanguard_priest_shadow', pieces);
+      sim.player.facing = 0;
+      const mob = addMob(sim, 10);
+      sim.targetEntity(mob.id);
+      const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+      let free = 0;
+      const trials = 200;
+      for (let i = 0; i < trials; i++) {
+        sim.player.auras = sim.player.auras.filter((a) => a.kind !== 'gloomtithe');
+        addGloomtithe(ctx, sim.player, 3);
+        sim.player.gcdRemaining = 0;
+        sim.player.resource = sim.player.maxResource;
+        sim.castAbility('void_rupture');
+        const left = sim.player.auras.find((a) => a.kind === 'gloomtithe')?.stacks ?? 0;
+        if (left === 3) free++;
+        else expect(left, 'a paid cast spends all 3').toBe(0);
+      }
+      return free / trials;
+    };
+    expect(freeCasts(3)).toBe(0);
+    const rate = freeCasts(4);
+    expect(rate).toBeGreaterThan(V.VANGUARD_SHADOW_4PC_FREE_CHANCE - 0.07);
+    expect(rate).toBeLessThan(V.VANGUARD_SHADOW_4PC_FREE_CHANCE + 0.07);
   });
 });
 
@@ -946,8 +977,13 @@ describe('Season 2 group A tooltips match the engine constants', () => {
       ],
     ],
     vanguard_priest_shadow: [
-      [pct(1 - V.VANGUARD_SHADOW_2PC_SLOW_MULT)],
-      [pct(V.VANGUARD_SHADOW_4PC_SHIELD_PCT_MAX), V.VANGUARD_SHADOW_4PC_SHIELD_DURATION_SEC],
+      [pct(1 - V.VANGUARD_SHADOW_2PC_SLOW_MULT), V.VANGUARD_SHADOW_2PC_SLOW_DURATION_SEC],
+      [
+        pct(V.VANGUARD_SHADOW_4PC_FREE_CHANCE),
+        pct(V.VANGUARD_SHADOW_4PC_SHIELD_PCT_MAX),
+        V.VANGUARD_SHADOW_4PC_SHIELD_DURATION_SEC,
+        V.VANGUARD_SHADOW_4PC_ICD_SEC,
+      ],
     ],
   };
 

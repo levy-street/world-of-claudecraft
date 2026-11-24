@@ -169,7 +169,7 @@ import {
   priestOnShieldConsumed,
   priestOnVigilTriggered,
 } from './priest/talents';
-import { duskhymnChannelStopped, vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
+import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
 import { onHarvestDeath, tetherRedirect } from './sanctum_trinkets';
@@ -1535,9 +1535,6 @@ export function handleDeath(
   // called explicitly here too, before the field it reads is cleared.
   // Idempotent: a no-op for every death that was never mid-harvest.
   releaseCorpseHarvest(ctx, e.id);
-  // The Duskhymn 2pc channel slow (Warfare Season 2) likewise leaves the
-  // target with the channel; a no-op unless mid-Litany of Woe.
-  duskhymnChannelStopped(ctx, e);
   e.castingAbility = null;
   e.castTargetId = null;
   // Death is a cast cancel: mirror cancelCast's teardown of the channel and

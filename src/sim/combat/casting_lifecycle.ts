@@ -228,8 +228,8 @@ import {
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
+import { duskhymnLitanyTick, duskhymnRuptureCostsNothing } from './priest/duskhymn';
 import { reserveShadowStilledMind } from './priest/stilled_mind';
-import { duskhymnChannelStart, duskhymnChannelStopped } from './priest/vespers';
 import { swingReadyForQueuedCast } from './queued_cast_swing_yield';
 import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
@@ -659,7 +659,6 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       completeAfflictionDrain(ctx, p, channelTarget, p.castingAbility ?? '');
       clearAfflictionConsumeThreads(ctx, p);
       coldsightFeveredDrawCompleted(ctx, p, p.castingAbility, channelTarget);
-      duskhymnChannelStopped(ctx, p);
       p.castingAbility = null;
       p.channeling = false;
       // completed ground-targeted channels drop their aim like every other
@@ -894,7 +893,6 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   if (p.castingAbility) cleanupPaladinAegis(ctx, p.id);
   if (p.castingAbility === CORPSE_HARVEST_CAST_ID) releaseCorpseHarvest(ctx, p.id);
   if (p.castingAbility) coldsightVoidReservationOnCancel(ctx, p, p.castingAbility);
-  duskhymnChannelStopped(ctx, p);
   stopChannelVisual(ctx, p);
   clearAfflictionConsumeThreads(ctx, p);
   emitRainOfFireStop(ctx, p);
@@ -2030,8 +2028,6 @@ export function castAbility(
     p.channelTickTimer = ability.id === 'drain_life' ? DT : p.channelTickEvery;
     p.channelTicksLeft = channelTicks;
     coldsightFeveredDrawChannelStart(ctx, p, ability.id);
-    // Duskhymn Regalia 2pc: the Litany of Woe channel slow (priest/vespers.ts).
-    duskhymnChannelStart(ctx, p, ability.id, target, channelDuration);
     if (ability.id === 'drain_life') {
       consumeFateThreadsForDrain(ctx, p, target, channelDuration);
     }
@@ -2655,6 +2651,8 @@ function applyChannelTick(
         );
         const dmg = periodicHit.amount;
         ctx.dealDamage(src, tgt, dmg, periodicHit.crit, res.def.school, res.def.name, 'hit');
+        // Duskhymn Regalia 2pc: each Litany of Woe tick refreshes its slow.
+        duskhymnLitanyTick(ctx, src, res.def.id, tgt);
         if (doom > 0) gainDoom(ctx, src, doom);
         if (!src.dead) {
           const intended = Math.round(
@@ -3032,7 +3030,8 @@ function applyAbility(
     ability.consumesRequiredAura !== false &&
     !res.effects.some((effect) => effect.type === 'afflictionSentence')
   ) {
-    if (!consumeRequiredAura(ctx, p, ability)) {
+    // Duskhymn Regalia 4pc: a Void Rupture that rolls free keeps its Gloomtithe.
+    if (!duskhymnRuptureCostsNothing(ctx, p, ability.id) && !consumeRequiredAura(ctx, p, ability)) {
       ctx.error(p.id, 'That ability is not ready yet.');
       return;
     }
