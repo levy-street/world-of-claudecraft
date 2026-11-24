@@ -354,13 +354,16 @@ export class HeatWellFx {
     const sc = stump.getAttribute('color') as THREE.BufferAttribute;
     const bc = HEAT_BODY_COLORS.basalt;
     const bd = HEAT_BODY_COLORS.basaltShade;
+    // Dark and sooted (the stone slot's warm key and the well's fire light
+    // washed the wall's longer faces to a pale cream at the playtest of
+    // 2026-11-24): the shade baked deep, a little warmth on the tops.
     for (let i = 0; i < sc.count; i++) {
-      const v = Math.min(1, sc.getX(i)) * 0.7;
+      const v = Math.min(1, sc.getX(i)) * 0.4;
       sc.setXYZ(
         i,
-        bd[0] + (bc[0] - bd[0]) * v,
-        bd[1] + (bc[1] - bd[1]) * v,
-        bd[2] + (bc[2] - bd[2]) * v,
+        (bd[0] + (bc[0] - bd[0]) * v) * 0.62,
+        (bd[1] + (bc[1] - bd[1]) * v) * 0.6,
+        (bd[2] + (bc[2] - bd[2]) * v) * 0.6,
       );
     }
     g.push(stump);
