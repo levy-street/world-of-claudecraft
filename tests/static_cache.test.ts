@@ -177,3 +177,23 @@ describe('isNotModified', () => {
     expect(isNotModified({ 'if-modified-since': 'not a date' }, etag, st.mtime)).toBe(false);
   });
 });
+
+describe('cacheControlFor encyclopedia data', () => {
+  it('caches the content-hashed search index and hover cards forever', () => {
+    for (const p of [
+      '/encyclopedia-data/search.ae47a96c6f.json',
+      '/encyclopedia-data/cards.66164c2972.json',
+    ])
+      expect(cacheControlFor(p), p).toBe('public, max-age=31536000, immutable');
+  });
+
+  it('revalidates the unhashed redirect table and the article pages', () => {
+    for (const p of [
+      '/encyclopedia-data/redirects.json',
+      '/encyclopedia-data/search.json',
+      '/wiki/item/test-sword/index.html',
+      '/sitemap-wiki.xml',
+    ])
+      expect(cacheControlFor(p), p).toBe('no-cache');
+  });
+});

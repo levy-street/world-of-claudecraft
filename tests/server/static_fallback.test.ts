@@ -72,9 +72,21 @@ describe('spaFallbackStatus', () => {
     for (const p of ALIASES.keys()) expect(spaFallbackStatus(p, false, ALIASES), p).toBe(200);
   });
 
-  it('leaves every /wiki path to the guide router', () => {
-    for (const p of ['/wiki', '/wiki/', '/wiki/classes/warrior', '/wiki/no-such-page']) {
+  it('keeps 200 for the /wiki paths a Guide route owns', () => {
+    for (const p of [
+      '/wiki',
+      '/wiki/',
+      '/wiki/classes',
+      '/wiki/classes/warrior',
+      '/wiki/reference/stats',
+    ]) {
       expect(spaFallbackStatus(p, false, ALIASES), p).toBe(200);
+    }
+  });
+
+  it('answers 404 for /wiki paths no Guide route owns (encyclopedia pages are files)', () => {
+    for (const p of ['/wiki/no-such-page', '/wiki/bogus', '/wiki/item/x', '/wiki/encyclopedia']) {
+      expect(spaFallbackStatus(p, false, ALIASES), p).toBe(404);
     }
   });
 
@@ -181,10 +193,18 @@ describe('serveStatic SPA fallback (routeHttpRequest)', () => {
     expect((await fetchPath('/press')).status).toBe(200);
   });
 
-  it('keeps every /wiki path on the guide shell with 200', async () => {
-    const res = await fetchPath('/wiki/no-such-page');
+  it('serves the guide shell with 200 for a Guide route', async () => {
+    const res = await fetchPath('/wiki/classes/warrior');
     expect(res.status).toBe(200);
     expect(res.body).toBe('SHELL:guide');
+  });
+
+  it('serves the guide shell with 404 for an unknown /wiki path', async () => {
+    for (const p of ['/wiki/no-such-page', '/wiki/item/x']) {
+      const res = await fetchPath(p);
+      expect(res.status, p).toBe(404);
+      expect(res.body, p).toBe('SHELL:guide');
+    }
   });
 
   it('leaves the admin host on the admin shell with 200', async () => {

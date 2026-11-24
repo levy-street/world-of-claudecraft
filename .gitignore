@@ -163,3 +163,6 @@ output/
 # task workspaces (git worktrees + design sources; never committed)
 workspaces/
 docs/screenshots/goblin-rocket-sled/
+
+# Static encyclopedia dev build (scripts/wiki_site/build.mjs)
+.wiki-site/

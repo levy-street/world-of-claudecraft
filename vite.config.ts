@@ -36,6 +36,7 @@ import { studioDevGuardMiddleware } from './scripts/lib/studio_dev_guard.mjs';
 import { readBase, snapshotBase } from './scripts/lib/studio_map_base.mjs';
 import { vitestBoundedRelatedPlugin } from './scripts/lib/vitest_bounded_related.mjs';
 import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
+import { WIKI_DEV_DIR, wikiSiteFile } from './scripts/lib/wiki_site_dev.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 const disableVitestFsModuleCache = shouldDisableVitestFsModuleCache(root);
@@ -140,6 +141,34 @@ function isGuideSpaPath(pathOnly: string): boolean {
   if (pathOnly !== '/wiki' && !pathOnly.startsWith('/wiki/')) return false;
   const last = pathOnly.slice(pathOnly.lastIndexOf('/') + 1);
   return !last.includes('.');
+}
+// The static encyclopedia under /wiki (scripts/wiki_site/build.mjs). Registered ahead of
+// the alias plugin so an article path reaches its own page instead of the guide shell.
+// `vite dev` serves the dev build in .wiki-site/ (Vite HTML-transforms it, so its module
+// script resolves); `vite preview` serves the built pages in dist/. Path logic and
+// traversal guards live in scripts/lib/wiki_site_dev.mjs.
+function wikiSitePlugin() {
+  const attach =
+    (root: string, prefix: string) =>
+    (server: {
+      middlewares: {
+        use: (fn: (req: { url?: string }, res: unknown, next: () => void) => void) => void;
+      };
+    }) => {
+      server.middlewares.use((req, _res, next) => {
+        const url = req.url ?? '';
+        const pathOnly = url.split('?')[0];
+        const rel = wikiSiteFile(pathOnly, (file) => existsSync(path.join(root, file)));
+        if (rel) req.url = `${prefix}/${rel}${url.slice(pathOnly.length)}`;
+        next();
+      });
+    };
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  return {
+    name: 'woc-wiki-site',
+    configureServer: attach(path.join(here, WIKI_DEV_DIR), `/${WIKI_DEV_DIR}`),
+    configurePreviewServer: attach(path.join(here, 'dist'), ''),
+  };
 }
 function staticPageAliasPlugin() {
   const rewrite = (req: { url?: string }) => {
@@ -1311,6 +1340,7 @@ export default defineConfig({
     ...(process.env.VITEST
       ? [svelteTesting({ autoCleanup: false }), vitestBoundedRelatedPlugin()]
       : []),
+    wikiSitePlugin(),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     bootSplashStylesheetsPlugin(),
@@ -1373,11 +1403,6 @@ export default defineConfig({
       '/api': { target: apiProxyTarget, changeOrigin: true },
       '/admin/api': { target: apiProxyTarget, changeOrigin: true },
       '/ws': { target: wsProxyTarget, ws: true },
-      // MediaWiki community wiki runs as its own container on :8080. Proxy /wiki*
-      // to it so the in-app "Browse the Wiki" link resolves in dev too — mirrors
-      // the prod reverse-proxy route (nginx /wiki -> :8080). Needs the container
-      // up: `docker compose up -d mediawiki mediawiki-db`.
-      '/wiki': { target: 'http://127.0.0.1:8080', changeOrigin: true },
       // No '/terms' proxy: STATIC_PAGE_ALIASES above already serves the
       // Marketplace consent links' target from public/terms.html in dev, and a
       // prefix proxy captured the rewritten '/terms.html' and made the page

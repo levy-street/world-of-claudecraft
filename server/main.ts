@@ -483,6 +483,7 @@ import {
   handleWalletUnlink,
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest } from './web_login_guard';
+import { resolveWikiRequest } from './wiki_site';
 import {
   bustWocAuthGuardAccount,
   configureWocAuthGuardCache,
@@ -1420,6 +1421,8 @@ const MIME: Record<string, string> = {
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
   '.mp3': 'audio/mpeg',
+  '.xml': 'application/xml; charset=utf-8',
+  '.txt': 'text/plain; charset=utf-8',
 };
 // Stream a static file into a response with full teardown: bare pipe() never
 // destroys the SOURCE stream when the response side closes first, so every
@@ -1460,6 +1463,19 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   // game's index.html. (It previously 302'd to a standalone MediaWiki; that is retired.)
   const isGuide = urlPath === '/wiki' || urlPath.startsWith('/wiki/');
   const shell = isGuide ? 'guide.html' : isAdminRequest(req) ? 'admin.html' : 'index.html';
+  // A static encyclopedia page (server/wiki_site.ts) is served as its own index.html file.
+  const wiki = isGuide ? resolveWikiRequest(STATIC_DIR, urlPath, requestUrl.search) : null;
+  if (wiki?.kind === 'redirect' || wiki?.kind === 'gone') {
+    res.writeHead(wiki.kind === 'gone' ? 410 : 301, {
+      'Content-Type': 'text/plain',
+      'Cache-Control': 'no-cache',
+      ...(wiki.kind === 'redirect' ? { Location: wiki.location } : {}),
+    });
+    res.end(wiki.kind === 'gone' ? 'gone' : 'moved');
+    return;
+  }
+  if (wiki?.kind === 'file')
+    urlPath = `/${path.relative(STATIC_DIR, wiki.file).split(path.sep).join('/')}`;
   // Pretty-URL aliases for standalone static pages.
   urlPath = STATIC_PAGE_ALIASES.get(urlPath) ?? urlPath;
   if (urlPath === '/' || urlPath === '/admin' || urlPath === '/admin/') urlPath = `/${shell}`;
