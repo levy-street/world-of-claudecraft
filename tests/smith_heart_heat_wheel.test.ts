@@ -11,17 +11,20 @@ import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import {
   FIST_SPAN,
   HEAT_DIFFICULTY,
+  HEAT_LIP_WALL,
   HEAT_NAMES,
   HEAT_OBJECTS,
   HEAT_PHASE_KIT,
   HEAT_TUNING as T,
+  WHEEL_ARCS_DEG,
   WHEEL_SLICES,
   wheelOf,
   wheelSliceAt,
   wheelTemplate,
 } from '../src/sim/encounters/smith_heart';
-import { wheelSafes } from '../src/sim/encounters/smith_heart/heat_wheel';
-import type { SimEvent } from '../src/sim/types';
+import { inHearthFloor } from '../src/sim/encounters/smith_heart/heat_geometry';
+import { wheelCrossing, wheelSafes } from '../src/sim/encounters/smith_heart/heat_wheel';
+import { RUN_SPEED, type SimEvent } from '../src/sim/types';
 import { t } from '../src/ui/i18n';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { hitsOf } from './helpers/council_fight';
@@ -55,6 +58,54 @@ function tier(tierName: 'normal' | 'heroic' | 'mythic', n = 4, phase = 2): HeatF
 function spot(slice: number, r = 22) {
   const deg = (slice * 45 + 22.5) * (Math.PI / 180);
   return { x: HEARTH_WELL.x + Math.sin(deg) * r, z: HEARTH_WELL.z + Math.cos(deg) * r };
+}
+
+/** A run whose safe slices step two over at least once (the hard crossing). */
+function twoStepRun(rounds: number): number {
+  for (let run = 0; run < 200; run++) {
+    const safes = wheelSafes(run, rounds);
+    for (let i = 1; i < safes.length; i++) if (Math.abs(safes[i] - safes[i - 1]) === 2) return run;
+  }
+  throw new Error('no two-step run');
+}
+
+/** A slice's bearing span (radians, sim facing). */
+function arcOf(slice: number): [number, number] {
+  const [a, b] = WHEEL_ARCS_DEG[slice];
+  return [(a * Math.PI) / 180, (b * Math.PI) / 180];
+}
+
+/** The walk from slice `from` to slice `to` at `ring` yards from the
+ *  wellspring: from `inset` inside `from`'s edge toward `to` to `inset` inside
+ *  `to`, the short way (over the shore), straight where that line clears the
+ *  lip wall by a body's half yard, else round it; one point per tick at run
+ *  speed. */
+function crossingPath(from: number, to: number, ring: number, inset: number) {
+  const [f0, f1] = arcOf(from);
+  const [t0, t1] = arcOf(to);
+  const up = to > from;
+  const a0 = up ? f1 - inset : f0 + inset;
+  const a1 = up ? t0 + inset : t1 - inset;
+  const at = (a: number) => ({
+    x: HEARTH_WELL.x + Math.sin(a) * ring,
+    z: HEARTH_WELL.z + Math.cos(a) * ring,
+  });
+  const half = Math.abs(a1 - a0) / 2;
+  const straight = ring * Math.cos(half) > HEAT_LIP_WALL.outer + 0.5;
+  const length = straight ? 2 * ring * Math.sin(half) : 2 * half * ring;
+  const n = Math.max(1, Math.ceil(length / (RUN_SPEED * DT_S)));
+  const p0 = at(a0);
+  const p1 = at(a1);
+  const points: { x: number; z: number }[] = [];
+  for (let i = 0; i <= n; i++) {
+    const k = i / n;
+    points.push(
+      straight
+        ? { x: p0.x + (p1.x - p0.x) * k, z: p0.z + (p1.z - p0.z) * k }
+        : at(a0 + (a1 - a0) * k),
+    );
+  }
+  return { points, length };
 }
 
 describe('Guardian of the Heat: the Wheel of the Hearth', () => {
@@ -235,6 +286,156 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
       }
     }
     expect(wheelAt).toBeGreaterThan(T.seedLife - 0.5);
+  });
+
+  // Jose's playtest of 2026-11-24 (Heroic, after the lip wall): "the next safe
+  // zone takes a while to get coloured, and if you get distracted for a second
+  // there is no time to get in". The last round's fire burned the next safe
+  // slice (and the slice between, two over) for its whole wheelBurn, so the
+  // crossing only opened warn - wheelBurn before the next eruption (Heroic 2 s,
+  // Mythic 1.5 s) while the wall had pushed the shore two yards out.
+  it('the way to the next safe slice is put out at once: stepping in at the eruption is never burned', () => {
+    for (const name of ['normal', 'heroic', 'mythic'] as const) {
+      const w = HEAT_DIFFICULTY[name].wheel;
+      const f = tier(name, 2);
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      st.wheelRuns = twoStepRun(w.rounds);
+      f.dev('/dev heart heat wheel');
+      const safes = [...st.wheelSafes];
+      const [a, b] = f.players;
+      const sp = spot(safes[0], 16);
+      f.put(a, sp.x, sp.z);
+      f.put(b, sp.x, sp.z);
+      f.tick(ticks(w.warn) + 1);
+      expect(st.wheelRounds.length).toBe(2);
+      // The instant the next safe slice shows, step onto it (a) and onto the
+      // slice crossed to reach it (b).
+      const crossing = wheelCrossing(safes[0], safes[1]);
+      expect(crossing[crossing.length - 1]).toBe(safes[1]);
+      const np = spot(safes[1], 16);
+      f.put(a, np.x, np.z);
+      const via = crossing.length > 1 ? spot(crossing[0], 16) : np;
+      f.put(b, via.x, via.z);
+      const ev = f.tick(ticks(T.wheelBurn) + 2);
+      expect(hitsOf(ev, HEAT_NAMES.wheel, a.id)).toEqual([]);
+      expect(hitsOf(ev, HEAT_NAMES.wheel, b.id)).toEqual([]);
+    }
+  });
+
+  it('the next safe slice reads safe within wheelDouse: its fire, and the fire on the way, go out', () => {
+    const w = HEAT_DIFFICULTY.heroic.wheel;
+    const f = tier('heroic', 2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.wheelRuns = twoStepRun(w.rounds);
+    f.dev('/dev heart heat wheel');
+    const safes = [...st.wheelSafes];
+    const slices = () => f.objects(HEAT_OBJECTS.wheelPrefix).map((e) => wheelOf(e.templateId));
+    const burns = () => slices().filter((o) => o?.state === 'burn');
+    // Walk to the two-step crossing.
+    let k = 1;
+    while (Math.abs(safes[k] - safes[k - 1]) !== 2) k++;
+    f.tick((ticks(w.warn) + 1) * k);
+    const crossing = wheelCrossing(safes[k - 1], safes[k]);
+    expect(crossing.length).toBe(2);
+    // At the eruption every red flares (the blow is seen), the way across only
+    // briefly; the next round's safe slice is shown at once, its warning whole.
+    const now = burns();
+    expect(now.length).toBe(WHEEL_SLICES - 1);
+    for (const o of now)
+      expect(o?.seconds).toBeCloseTo(
+        crossing.includes(o?.slice ?? -1) ? T.wheelDouse : T.wheelBurn,
+        6,
+      );
+    expect(T.wheelDouse).toBeLessThan(T.wheelTick);
+    expect(
+      slices()
+        .filter((o) => o?.state === 'safe')
+        .map((o) => o?.slice),
+    ).toEqual([safes[k]]);
+    for (const o of slices().filter((o) => o?.state === 'warn')) expect(o?.seconds).toBe(w.warn);
+    f.tick(ticks(T.wheelDouse) + 1);
+    const left = burns().map((o) => o?.slice);
+    for (const slice of crossing) expect(left).not.toContain(slice);
+    expect(left.length).toBe(WHEEL_SLICES - 1 - crossing.length);
+  });
+
+  it('the last round of a run burns every red slice its whole time (nothing to cross to)', () => {
+    const w = HEAT_DIFFICULTY.heroic.wheel;
+    const f = tier('heroic', 2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    f.dev('/dev heart heat wheel');
+    f.tick((ticks(w.warn) + 1) * w.rounds);
+    const burns = f
+      .objects(HEAT_OBJECTS.wheelPrefix)
+      .map((e) => wheelOf(e.templateId))
+      .filter((o) => o?.state === 'burn' && o.seconds === T.wheelBurn);
+    expect(burns.length).toBe(WHEEL_SLICES - 1);
+  });
+
+  it('every crossing is walkable round the lip wall in time, at the melee and the ranged ring', () => {
+    // From just inside the old safe slice's edge toward the next to just inside
+    // the next, round the wall, at run speed, after the brief flare on the way.
+    const inset = (3 * Math.PI) / 180;
+    for (const name of ['normal', 'heroic', 'mythic'] as const) {
+      const w = HEAT_DIFFICULTY[name].wheel;
+      const window = w.warn - T.wheelDouse;
+      for (const [ring, spare] of [
+        [HEAT_LIP_WALL.outer + 1, 1],
+        [HEAT_LIP_WALL.outer + 7, name === 'mythic' ? 0.3 : 0.75],
+      ] as const) {
+        for (let from = 0; from < WHEEL_SLICES; from++) {
+          for (const to of [from - 2, from - 1, from + 1, from + 2]) {
+            if (to < 0 || to >= WHEEL_SLICES) continue;
+            const path = crossingPath(from, to, ring, inset);
+            for (const p of path.points) {
+              expect(inHearthFloor(p.x, p.z)).toBe(true);
+              expect(Math.hypot(p.x - HEARTH_WELL.x, p.z - HEARTH_WELL.z)).toBeGreaterThan(
+                HEAT_LIP_WALL.outer,
+              );
+            }
+            expect(path.length / RUN_SPEED + spare).toBeLessThanOrEqual(window);
+          }
+        }
+      }
+    }
+  });
+
+  it('a raider walking the wall at run speed, half a second late, crosses every round unburnt', () => {
+    for (const name of ['heroic', 'mythic'] as const) {
+      const w = HEAT_DIFFICULTY[name].wheel;
+      const f = tier(name, 1);
+      const st = f.state();
+      if (!st) throw new Error('no fight');
+      st.wheelRuns = twoStepRun(w.rounds);
+      f.dev('/dev heart heat wheel');
+      const safes = [...st.wheelSafes];
+      const [a] = f.players;
+      const ring = HEAT_LIP_WALL.outer + 1.5;
+      const inset = (3 * Math.PI) / 180;
+      const start = crossingPath(safes[0], safes[1], ring, inset).points[0];
+      f.put(a, start.x, start.z);
+      let hits = hitsOf(f.tick(ticks(w.warn) + 1), HEAT_NAMES.wheel, a.id).length;
+      for (let k = 1; k < safes.length; k++) {
+        const path = crossingPath(safes[k - 1], safes[k], ring, inset);
+        const late = ticks(0.5);
+        hits += hitsOf(f.tick(late), HEAT_NAMES.wheel, a.id).length;
+        for (const p of path.points) {
+          f.put(a, p.x, p.z);
+          hits += hitsOf(f.tick(1), HEAT_NAMES.wheel, a.id).length;
+        }
+        // Rest on the new safe slice (at its edge toward the next) to its eruption.
+        const next =
+          k + 1 < safes.length ? crossingPath(safes[k], safes[k + 1], ring, inset) : null;
+        if (next) f.put(a, next.points[0].x, next.points[0].z);
+        const rest = ticks(w.warn) + 1 - late - path.points.length;
+        expect(rest).toBeGreaterThan(0);
+        hits += hitsOf(f.tick(rest), HEAT_NAMES.wheel, a.id).length;
+      }
+      expect(hits).toBe(0);
+    }
   });
 
   it('names itself; the guardian calls it, no banner does', () => {

@@ -8,7 +8,10 @@
 //
 //   A round  each red slice warns the tier's `wheel.warn` s (Normal 5, Heroic 3.5,
 //            Mythic 3), erupts (a near-lethal blow to whoever stands in it, past the
-//            wellspring's lip), and burns `wheelBurn` s more.
+//            wellspring's lip), and burns `wheelBurn` s more; the way to the next
+//            round's safe slice (wheelCrossing) only flares `wheelDouse` s and goes
+//            out, so the next safe slice reads safe and the raid crosses at once,
+//            with the tier's whole warning to do it.
 //   A run    the tier's `wheel.every` s apart, never over a Wakefire run (each waits
 //            out the other, heat.ts) nor a Basalt Fist (heat_fist.ts floorHoldsFist).
 //
@@ -59,6 +62,17 @@ export function wheelSafes(run: number, rounds: number): number[] {
   return out;
 }
 
+/** The slices the raid crosses from round safe slice `from` to the next, `to`:
+ *  any slice between them (the short way, over the shore: the safe slices never
+ *  wrap round behind the altar-stone), then `to` itself. Pure. */
+export function wheelCrossing(from: number, to: number): number[] {
+  const out: number[] = [];
+  const step = to > from ? 1 : -1;
+  for (let slice = from + step; slice !== to; slice += step) out.push(slice);
+  out.push(to);
+  return out;
+}
+
 function beginRound(s: HeatScope, safe: number): void {
   const warn = s.rules.wheel.warn;
   const reds: number[] = [];
@@ -92,6 +106,8 @@ function beginRound(s: HeatScope, safe: number): void {
     tick: 0,
     reds,
     safeId,
+    doused: [],
+    douse: 0,
   });
 }
 
@@ -106,23 +122,36 @@ export function startWheel(s: HeatScope): void {
   heatSay(s, s.boss, 'wheel');
 }
 
-/** The players in a red slice of `round` now: on the shore, not in its safe slice. */
-function inRed(s: HeatScope, round: HeatWheelRound) {
+/** The players in a red slice of `round` now: on the shore, not in its safe
+ *  slice (nor, with `burning`, in a slice already put out). */
+function inRed(s: HeatScope, round: HeatWheelRound, burning = false) {
   return livePlayers(s).filter((p) => {
     const here = at(s, p);
-    return (
-      wellDistance(here.x, here.z) >= HEARTH_WELL.r && wheelSliceAt(here.x, here.z) !== round.safe
-    );
+    if (wellDistance(here.x, here.z) < HEARTH_WELL.r) return false;
+    const slice = wheelSliceAt(here.x, here.z);
+    return slice !== round.safe && !(burning && round.doused.includes(slice));
   });
+}
+
+/** Red object `i`'s slice: the reds are every slice but the safe one, in order. */
+function redSlice(round: HeatWheelRound, i: number): number {
+  return i < round.safe ? i : i + 1;
 }
 
 function setReds(s: HeatScope, round: HeatWheelRound): void {
   round.reds.forEach((id, i) => {
     const e = s.ctx.entities.get(id);
     if (!e) return;
-    // The reds are every slice but the safe one, in order.
-    const slice = i < round.safe ? i : i + 1;
-    e.templateId = wheelTemplate(slice, 'burn', T.wheelBurn);
+    const slice = redSlice(round, i);
+    const seconds = round.doused.includes(slice) ? T.wheelDouse : T.wheelBurn;
+    e.templateId = wheelTemplate(slice, 'burn', seconds);
+  });
+}
+
+/** Put out the doused slices' fire (their objects go; they burn nobody). */
+function douse(s: HeatScope, round: HeatWheelRound): void {
+  round.reds.forEach((id, i) => {
+    if (round.doused.includes(redSlice(round, i))) dropFightObject(s.ctx, s.inst, id);
   });
 }
 
@@ -145,6 +174,10 @@ export function stepWheel(s: HeatScope): void {
       round.state = 'burn';
       round.remaining = T.wheelBurn;
       round.tick = T.wheelTick;
+      if (st.wheelNext < st.wheelSafes.length) {
+        round.doused = wheelCrossing(round.safe, st.wheelSafes[st.wheelNext]);
+        round.douse = T.wheelDouse;
+      }
       setReds(s, round);
       dropFightObject(s.ctx, s.inst, round.safeId);
       cueAt(s, HEAT_CUES.ignite, HEARTH_WELL.x, HEARTH_WELL.z, T.wheelOuter);
@@ -163,10 +196,17 @@ export function stepWheel(s: HeatScope): void {
       for (const id of round.reds) dropFightObject(s.ctx, s.inst, id);
       continue;
     }
+    if (round.douse > 0) {
+      round.douse -= DT;
+      if (round.douse <= 1e-9) {
+        round.douse = 0;
+        douse(s, round);
+      }
+    }
     round.tick -= DT;
     if (round.tick <= 1e-9) {
       round.tick += T.wheelTick;
-      for (const p of inRed(s, round))
+      for (const p of inRed(s, round, true))
         fireHit(
           s,
           p,

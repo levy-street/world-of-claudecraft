@@ -108,6 +108,11 @@ export interface HeatWheelRound {
   /** The red slices' objects, in slice order. */
   reds: number[];
   safeId: number;
+  /** Once erupted: the red slices on the way to the next round's safe slice
+   *  (heat_wheel.ts wheelCrossing), put out after `douse` more seconds and
+   *  never burning anyone meanwhile. Empty on a run's last round. */
+  doused: number[];
+  douse: number;
 }
 
 export interface HeatZoneRun {

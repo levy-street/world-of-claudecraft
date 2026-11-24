@@ -584,7 +584,16 @@ describe('Guardian of the Heat: Basalt Fist waits out Wakefire and the Wheel', (
     ).toBe(true);
     const band = { objectId: 1, band: 0, state: 'burn' as const, remaining: 1, tick: 0 };
     expect(floorHoldsFist({ ...quiet, zones: [band] }, both)).toBe(true);
-    const round = { safe: 1, state: 'warn' as const, remaining: 2, tick: 0, reds: [], safeId: 0 };
+    const round = {
+      safe: 1,
+      state: 'warn' as const,
+      remaining: 2,
+      tick: 0,
+      reds: [],
+      safeId: 0,
+      doused: [],
+      douse: 0,
+    };
     expect(floorHoldsFist({ ...quiet, wheelRounds: [round] }, both)).toBe(true);
     // The next run or Wheel starting before its swells are done holds it too...
     expect(floorHoldsFist({ ...quiet, zoneTimer: FIST_SPAN - 0.1 }, both)).toBe(true);

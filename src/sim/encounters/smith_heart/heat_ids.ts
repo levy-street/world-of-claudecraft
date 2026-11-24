@@ -543,6 +543,12 @@ export const HEAT_TUNING = {
   // HEAT_DIFFICULTY `wheel`): its burn and bite (the same order as
   // Wakefire's), how far out its slices reach.
   wheelBurn: 1.5,
+  /** At an eruption the way to the next round's safe slice (that slice and
+   *  the one crossed to reach it) only flares this long, under one burn tick,
+   *  then goes out: the raid crosses at once with the tier's whole warning
+   *  (Jose's playtest of 2026-11-24: the next safe slice burned on for the
+   *  whole wheelBurn, leaving Heroic 2 s to cross round the new lip wall). */
+  wheelDouse: 0.2,
   wheelTick: 0.5,
   wheelMin: 900,
   wheelMax: 1000,
