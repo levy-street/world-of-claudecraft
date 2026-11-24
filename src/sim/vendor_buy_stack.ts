@@ -27,12 +27,15 @@
 // excludes honor-priced rows and mounts, so a future soulbound stackable (no
 // such row exists today; the soulbound rows with a buyValue are the mounts and
 // the Warfare Season 1 gear, all unstackable and force-1 on both paths regardless) can never bulk-multiply while the count
-// path pins it to 1.
+// path pins it to 1. Faction-marks rows (FACTION_VENDOR_GATES with a positive
+// currencyCost) are force-1 on both axes the same way: the mark cost is
+// debited once per purchase, so neither axis may multiply the units.
 //
 // DOM-free and deterministic so tests/vendor_buy_stack.test.ts drives it directly.
 
 import type { PoolCapacity } from './bag_pools';
 import { countFit, stackSizeOf } from './bags';
+import { FACTION_VENDOR_GATES } from './content/faction_vendors';
 import type { InvSlot, ItemDef } from './types';
 import { vendorStackSize } from './vendor_stack';
 
@@ -86,17 +89,25 @@ export function sanitizeBuyCount(count: number | undefined): number | null {
 }
 
 /** True for the Q23 force-1 rows: honor-priced (honor is authored per
- *  purchase and never multiplied), soulbound, mount, and the riding-service
- *  entry. A count on such a row applies as exactly 1, today's single
- *  purchase; the UI keeps these rows at 1x semantics for the same reason.
- *  The honor arm mirrors items.ts buyItem's own price read (floored,
- *  non-finite treated as unpriced) so the predicate can never disagree with
- *  what the buy path actually charges. */
+ *  purchase and never multiplied), faction-marks-priced (the gate's mark cost
+ *  is likewise debited once per purchase), soulbound, mount, and the
+ *  riding-service entry. A count on such a row applies as exactly 1, today's
+ *  single purchase; the UI keeps these rows at 1x semantics for the same
+ *  reason. The honor and marks arms mirror items.ts buyItem's own price reads
+ *  (floored honor, non-finite treated as unpriced; a positive gate
+ *  currencyCost) so the predicate can never disagree with what the buy path
+ *  actually charges. */
 export function vendorCountForced(def: ItemDef): boolean {
   const honor = def.priceHonor;
   const honorPriced = honor !== undefined && Number.isFinite(honor) && Math.floor(honor) > 0;
+  const marksPriced =
+    Object.hasOwn(FACTION_VENDOR_GATES, def.id) && FACTION_VENDOR_GATES[def.id].currencyCost > 0;
   return (
-    def.kind === 'mount' || def.teachesRiding === true || def.soulbound === true || honorPriced
+    def.kind === 'mount' ||
+    def.teachesRiding === true ||
+    def.soulbound === true ||
+    honorPriced ||
+    marksPriced
   );
 }
 
