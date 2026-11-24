@@ -66,6 +66,7 @@ export function wheelSafes(run: number, rounds: number): number[] {
  *  any slice between them (the short way, over the shore: the safe slices never
  *  wrap round behind the altar-stone), then `to` itself. Pure. */
 export function wheelCrossing(from: number, to: number): number[] {
+  if (from === to) return [];
   const out: number[] = [];
   const step = to > from ? 1 : -1;
   for (let slice = from + step; slice !== to; slice += step) out.push(slice);

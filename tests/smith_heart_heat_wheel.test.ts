@@ -161,6 +161,14 @@ describe('Guardian of the Heat: the Wheel of the Hearth', () => {
     expect(wheelSafes(5, 4).slice(0, 3)).toEqual(wheelSafes(5, 3));
   });
 
+  it('the crossing: the slices between, then the next safe one, the short way over the shore', () => {
+    expect(wheelCrossing(0, 1)).toEqual([1]);
+    expect(wheelCrossing(0, 2)).toEqual([1, 2]);
+    expect(wheelCrossing(3, 1)).toEqual([2, 1]);
+    expect(wheelCrossing(2, 0)).toEqual([1, 0]);
+    expect(wheelCrossing(2, 2)).toEqual([]);
+  });
+
   it('the templates read back', () => {
     expect(wheelOf(wheelTemplate(2, 'warn', 4))).toEqual({ slice: 2, state: 'warn', seconds: 4 });
     expect(wheelOf(wheelTemplate(0, 'safe', 4))).toEqual({ slice: 0, state: 'safe', seconds: 4 });
