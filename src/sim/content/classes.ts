@@ -6406,7 +6406,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Hurls a bolt of nature energy for $d Nature damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
+        'In Moonwing Form, each completed cast adds 1 Suntide (max 3) and extends your Stinging Swarm by 2 sec, up to 6 sec per application. Deals 25% more damage during Moonrise. At 3 Suntide, Skyfall becomes Sunwake.',
     },
   },
   healing_touch: {
@@ -6512,9 +6512,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Burns the enemy with moonfire for $d Arcane damage plus damage over time.',
+    description:
+      'Burns the enemy with moonfire for $d Arcane damage, then $o Arcane damage over $t sec.',
     specNotes: {
-      balance: 'Keep it burning: Moonseed extends it by 6 sec.',
+      balance:
+        'Keep it burning: Skyfall extends it by 2 sec and Moonseed by 6 sec. In Moonwing Form, its ticks add 1 Moontide, at most once every 8 sec. Moonsurge refreshes it, and it ticks 20% faster during Sunrise.',
     },
   },
   moonseed: {
@@ -6545,7 +6547,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // extendDot maxBonus, see abilityDurationValue): Moonscorch 2pc wearers
     // read 12 there, everyone else the base 6.
     description:
-      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to $t sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to $t sec per application. At 3 Moontide, this button becomes Moonsurge.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -6639,7 +6641,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Roots the target in place for up to 12 sec.',
+    description:
+      'Roots the target in place for up to 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails.',
   },
   bear_form: {
     id: 'bear_form',
@@ -7051,14 +7054,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'directDamage', min: 135, max: 185 }],
     actionReplacement: {
       abilityId: 'sunlance',
-      auraKind: 'moontide',
+      auraKind: 'suntide',
       minStacks: 3,
       actorAuraKind: 'form_moonkin',
     },
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3.',
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 3) and extends your Lunar Tempest by 2 sec, up to 12 sec per application together with Moonseed. Casts 20% faster during Sunrise. At 3 Suntide, this button becomes Sunwake.',
     },
   },
   travel_form: {
@@ -7259,6 +7262,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'dot', total: 48, duration: 12, interval: 3 }],
     description: 'The enemy is swarmed by insects, taking $d Nature damage over 12 sec.',
+    specNotes: {
+      balance:
+        'Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise.',
+    },
   },
   tigers_fury: {
     id: 'tigers_fury',
@@ -8309,7 +8316,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     consumesRequiredAura: false,
     effects: [{ type: 'directDamage', min: 136, max: 162, spellPowerCoeff: 0.32 }],
     description:
-      'Spends your 3 Moontide for a heavy strike of $d Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
+      'Spends your 3 Moontide for a heavy strike of $d Arcane damage, refreshes your Lunar Tempest to full duration, and opens Moonrise for 10 sec: Wildbolt deals 25% more damage and Stinging Swarm ticks 20% faster. Opening Moonrise closes Sunrise.',
   },
   sunlance: {
     id: 'sunlance',
@@ -8333,7 +8340,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'gainResource', amount: 35 },
     ],
     description:
-      'Spends your 3 Moontide for a strike of $d Nature damage plus a $o burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one.',
+      'Spends your 3 Suntide for a strike of $d Nature damage plus $o Nature damage over 9 sec, restores 35 mana, refreshes your Stinging Swarm to full duration, and opens Sunrise for 10 sec: Skyfall casts 20% faster and Lunar Tempest ticks 20% faster. Opening Sunrise closes Moonrise.',
   },
   redharvest: {
     id: 'redharvest',

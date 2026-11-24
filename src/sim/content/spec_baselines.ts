@@ -254,7 +254,12 @@ export const SPEC_BASELINES: SpecBaselineTable = {
         { ability: 'entangling_roots', costPct: -0.18, castPct: -0.24 },
         { ability: 'healing_touch', castPct: -0.16 },
         { ability: 'wrath', dmgPct: 0.15, castPct: -0.2 },
-        { ability: 'starfire', castPct: -0.16 },
+        // Tidewheel (combat/druid_tidewheel.ts): Skyfall and both payoffs pay
+        // for the two-bank loop, so the alternating rotation lands on the
+        // live kit's Skyfall-spam DPS (Monte Carlo, heroic Nythraxis dummy).
+        { ability: 'starfire', dmgPct: -0.1, castPct: -0.16 },
+        { ability: 'moonlash', dmgPct: -0.15 },
+        { ability: 'sunlance', dmgPct: -0.15 },
       ],
     },
     feral: {

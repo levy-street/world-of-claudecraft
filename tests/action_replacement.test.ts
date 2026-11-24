@@ -85,13 +85,19 @@ describe('resolveActionReplacement', () => {
 
   it('gates a rule behind actorAuraKind: Skyfall becomes Sunwake only in Moonwing Form', () => {
     const base = resolved('starfire');
-    const outOfForm = resolveActionReplacement(base, actorWith({ kind: 'moontide', stacks: 3 }));
+    const outOfForm = resolveActionReplacement(base, actorWith({ kind: 'suntide', stacks: 3 }));
     expect(outOfForm).toBe(base);
     const inForm = resolveActionReplacement(
       base,
-      actorWith({ kind: 'form_moonkin' }, { kind: 'moontide', stacks: 3 }),
+      actorWith({ kind: 'form_moonkin' }, { kind: 'suntide', stacks: 3 }),
     );
     expect(inForm.def.id).toBe('sunlance');
+    // Tidewheel: Sunwake reads Suntide, so a full Moontide alone leaves Skyfall.
+    const moontideOnly = resolveActionReplacement(
+      base,
+      actorWith({ kind: 'form_moonkin' }, { kind: 'moontide', stacks: 3 }),
+    );
+    expect(moontideOnly).toBe(base);
   });
   it('resolves an ABSENCE rule: Slinkstrike is Lunge out of stealth, on its own clock', () => {
     const base = resolved('pounce');

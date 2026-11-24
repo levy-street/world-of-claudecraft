@@ -138,6 +138,7 @@ import {
   SPORE_BURST_FULL_BANK_POWER,
   sporeBurstFullBank,
 } from './druid_spore_burst';
+import { tidewheelDirectMult } from './druid_tidewheel';
 import { consumeNextAttackCrit } from './empower_next';
 import { rollFeralStrikeEnchant, runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -979,6 +980,7 @@ export function runEffects(
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
+        dmg *= tidewheelDirectMult(p, ability.id);
         const finalDamage = Math.round(dmg * primaryDamageMult);
         lastDirectDamage = finalDamage;
         const targetHpBefore = target.hp;

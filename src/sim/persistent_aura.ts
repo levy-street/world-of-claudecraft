@@ -17,6 +17,7 @@ const PERSISTENT_ENGINE_AURA_IDS: ReadonlySet<string> = new Set([
   'shaman_thunder_charges',
   'shaman_warspirit_cadence',
   'moontide',
+  'suntide',
   'sunwake',
   'old_blood',
   'verdance',

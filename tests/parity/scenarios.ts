@@ -5470,7 +5470,7 @@ function druidEngines(): Scenario {
     name: 'druid_engines',
     coverage: [
       'class:druid (Moongrove, Wildfang, Groveheart)',
-      'Moontide and Sunwake action replacements with Moonlash and Sunlance phase flips',
+      'Tidewheel Moontide and Suntide banks with Moonlash and Sunlance phase flips',
       'Old Blood landed-strike bank across Wolf and Bruin with both payoffs',
       'Verdance completed-HoT bank and Overbloom harvest',
     ],
@@ -5496,27 +5496,33 @@ function druidEngines(): Scenario {
       moon.resource = moon.maxResource;
       sim.castAbility('moonkin_form', moonId);
       rec.tick(35);
+      // Tidewheel: three Skyfalls fill Moontide (Moonseed becomes Moonsurge)
+      // but not Suntide, so the Skyfall button stays Skyfall.
+      for (let cast = 0; cast < 3; cast++) {
+        moon.resource = moon.maxResource;
+        moon.gcdRemaining = 0;
+        sim.castAbility('starfire', moonId);
+        rec.tick(70);
+      }
+      rec.notes.moonlashArmed = sim.resolvedAbility('moonseed', moonId)?.def.id === 'moonlash';
+      rec.notes.sunlanceArmedBySkyfall =
+        sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
+      // Three Wildbolts fill Suntide: the Skyfall button becomes Sunwake.
       for (let cast = 0; cast < 3; cast++) {
         moon.resource = moon.maxResource;
         moon.gcdRemaining = 0;
         sim.castAbility('wrath', moonId);
         rec.tick(50);
       }
-      rec.notes.moonlashArmed = sim.resolvedAbility('moonseed', moonId)?.def.id === 'moonlash';
-      rec.notes.sunlanceArmedToo = sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
-      // Choose the moon: the Moonseed button fires Moonsurge and spends the bank.
+      rec.notes.sunlanceArmed = sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
+      // The Moonseed button fires Moonsurge and spends Moontide only.
       moon.resource = moon.maxResource;
       moon.gcdRemaining = 0;
       sim.castAbility('moonseed', moonId);
       rec.tick(20);
-      for (let cast = 0; cast < 3; cast++) {
-        moon.resource = moon.maxResource;
-        moon.gcdRemaining = 0;
-        sim.castAbility('wrath', moonId);
-        rec.tick(50);
-      }
-      // Choose the sun: the Skyfall button fires Sunwake this time.
-      rec.notes.sunlanceArmed = sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
+      rec.notes.sunlanceArmedAfterMoonsurge =
+        sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
+      // The Skyfall button fires Sunwake and spends Suntide.
       moon.resource = moon.maxResource;
       moon.gcdRemaining = 0;
       sim.castAbility('starfire', moonId);

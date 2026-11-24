@@ -187,12 +187,21 @@ export function runDruidLiveMobProbe(
         const tempest = mob.auras.find(
           (aura) => aura.id === 'moonfire' && aura.sourceId === player.id,
         );
-        const moontide = player.auras.find((aura) => aura.id === 'moontide');
-        const lowMana = player.resource < player.maxResource * 0.4;
-        if (!tempest || tempest.remaining <= 3) sim.castAbility('moonfire');
-        else if ((moontide?.stacks ?? 0) >= 3) sim.castAbility(lowMana ? 'starfire' : 'moonseed');
-        else if (!player.cooldowns.has('moonseed')) sim.castAbility('moonseed');
-        else sim.castAbility('wrath');
+        // Tidewheel (combat/druid_tidewheel.ts): both effects up, each full
+        // bank spent on its own button, Skyfall in Sunrise, Wildbolt in
+        // Moonrise, else fill the lower bank.
+        const swarm = mob.auras.find(
+          (aura) => aura.id === 'insect_swarm' && aura.sourceId === player.id,
+        );
+        const bank = (id: string) => player.auras.find((aura) => aura.id === id)?.stacks ?? 0;
+        const open = (id: string) => player.auras.some((aura) => aura.id === id);
+        if (!tempest) sim.castAbility('moonfire');
+        else if (!swarm) sim.castAbility('insect_swarm');
+        else if (bank('suntide') >= 3) sim.castAbility('starfire');
+        else if (bank('moontide') >= 3) sim.castAbility('moonseed');
+        else if (open('sunrise')) sim.castAbility('starfire');
+        else if (open('moonrise')) sim.castAbility('wrath');
+        else sim.castAbility(bank('suntide') <= bank('moontide') ? 'wrath' : 'starfire');
       } else if (arm === 'wildfang') {
         const oldBlood = player.auras.find((aura) => aura.id === 'old_blood');
         if ((oldBlood?.stacks ?? 0) >= 3 && player.comboPoints >= 1) {

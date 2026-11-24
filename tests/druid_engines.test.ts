@@ -7,6 +7,7 @@ import {
   druidEngineOnLandedStrike,
   LOPING_STRIDE_SPEED,
   MOONTIDE_ID,
+  MOONTIDE_STAGES,
   OLD_BLOOD_ID,
   VERDANCE_ID,
   VERDANCE_STAGES,
@@ -14,6 +15,7 @@ import {
   verdanceWildmendCastTime,
   WILDMEND_ID,
 } from '../src/sim/combat/druid_engines';
+import { SUNTIDE_ID, SUNTIDE_STAGES } from '../src/sim/combat/druid_tidewheel';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { spellHasteMult } from '../src/sim/combat/spell_combat';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
@@ -111,56 +113,73 @@ describe('Moongrove engine', () => {
     expect(stacks(player, MOONTIDE_ID)).toBe(1);
   });
 
-  it('arms both payoff choices at full Moontide and either press spends the bank', () => {
+  it('fills each Tidewheel bank from its own casts and each payoff spends only its own', () => {
     const { sim, player } = rig('balance');
 
     completed(sim, 'wrath');
+    completed(sim, 'starfire');
+    expect(stacks(player, SUNTIDE_ID)).toBe(0);
     expect(stacks(player, MOONTIDE_ID)).toBe(0);
 
     player.auras.push(formAura(player, 'form_moonkin'));
+    // Wildbolt fills Suntide; Skyfall and Moonseed fill Moontide.
     completed(sim, 'wrath');
-    completed(sim, 'starfire');
+    completed(sim, 'wrath');
+    completed(sim, 'wrath');
+    expect(stacks(player, SUNTIDE_ID)).toBe(SUNTIDE_STAGES);
+    expect(stacks(player, MOONTIDE_ID)).toBe(0);
+    expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
+    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
+
     completed(sim, 'moonseed');
-    expect(stacks(player, MOONTIDE_ID)).toBe(3);
+    completed(sim, 'moonseed');
+    completed(sim, 'moonseed');
+    expect(stacks(player, MOONTIDE_ID)).toBe(MOONTIDE_STAGES);
     expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonlash');
     expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
     expect(sim.resolvedAbility('wrath')?.def.id).toBe('wrath');
 
+    // Moonsurge spends Moontide only: Sunwake stays armed.
     completed(sim, 'moonlash');
     expect(stacks(player, MOONTIDE_ID)).toBe(0);
+    expect(stacks(player, SUNTIDE_ID)).toBe(SUNTIDE_STAGES);
     expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
-    expect(sim.resolvedAbility('starfire')?.def.id).toBe('starfire');
+    expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
 
-    completed(sim, 'wrath');
-    completed(sim, 'wrath');
-    completed(sim, 'wrath');
+    // Sunwake spends Suntide only.
     completed(sim, 'sunlance');
-    expect(stacks(player, MOONTIDE_ID)).toBe(0);
+    expect(stacks(player, SUNTIDE_ID)).toBe(0);
     expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
     expect(sim.resolvedAbility('starfire')?.def.id).toBe('starfire');
   });
 
-  it('freezes the bank outside Moonwing and disarms both payoffs', () => {
+  it('freezes both banks outside Moonwing and disarms both payoffs', () => {
     const { sim, player } = rig('balance');
     const mob = targetMob(sim);
     player.auras.push(formAura(player, 'form_moonkin'));
     completed(sim, 'wrath');
     completed(sim, 'wrath');
     completed(sim, 'wrath');
+    completed(sim, 'moonseed');
+    completed(sim, 'moonseed');
+    completed(sim, 'moonseed');
     expect(sim.resolvedAbility('starfire')?.def.id).toBe('sunlance');
+    expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonlash');
 
     player.auras = player.auras.filter((aura) => aura.kind !== 'form_moonkin');
+    expect(stacks(player, SUNTIDE_ID)).toBe(3);
     expect(stacks(player, MOONTIDE_ID)).toBe(3);
     expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonseed');
     expect(sim.resolvedAbility('starfire')?.def.id).toBe('starfire');
 
     // A base Skyfall hard-cast out of form is a plain nuke: it must not
-    // touch the frozen bank.
+    // touch either frozen bank.
     player.resource = player.maxResource;
     player.gcdRemaining = 0;
     sim.castAbility('starfire');
     for (let tick = 0; tick < 80; tick++) sim.tick();
     expect(mob.hp).toBeLessThan(mob.maxHp);
+    expect(stacks(player, SUNTIDE_ID)).toBe(3);
     expect(stacks(player, MOONTIDE_ID)).toBe(3);
 
     player.auras.push(formAura(player, 'form_moonkin'));
@@ -172,9 +191,9 @@ describe('Moongrove engine', () => {
     const { sim, player } = rig('balance');
     const mob = targetMob(sim);
     player.auras.push(formAura(player, 'form_moonkin'));
-    completed(sim, 'wrath');
-    completed(sim, 'wrath');
-    completed(sim, 'wrath');
+    completed(sim, 'starfire');
+    completed(sim, 'starfire');
+    completed(sim, 'starfire');
     player.cooldowns.set('moonseed', 5);
     expect(sim.resolvedAbility('moonseed')?.def.id).toBe('moonlash');
 
@@ -210,11 +229,14 @@ describe('Moongrove engine', () => {
         ?.effects.find((effect) => effect.type === 'directDamage');
       expect(direct).toMatchObject({ type: 'directDamage' });
       if (direct?.type !== 'directDamage') throw new Error('missing Sunlance damage');
-      // Sunwake resolves to its rebalanced Nature strike (base 80-100, lifted by
-      // the Balance spell-damage passive to ~98-123); the v0.29 pass moved its
-      // ceiling down and onto a spell-power rider so a caster scales with gear.
-      expect(direct.min).toBeGreaterThan(90);
-      expect(direct.max).toBeGreaterThan(110);
+      // Sunwake resolves to its rebalanced Nature strike, lifted above its
+      // authored base by the Balance spell-damage passive net of the
+      // Tidewheel's sunlance baseline row; the v0.29 pass moved its ceiling
+      // down and onto a spell-power rider so a caster scales with gear.
+      const authored = ABILITIES.sunlance.effects.find((effect) => effect.type === 'directDamage');
+      if (authored?.type !== 'directDamage') throw new Error('missing authored Sunlance damage');
+      expect(direct.min).toBeGreaterThan(authored.min);
+      expect(direct.max).toBeGreaterThan(authored.max);
       player.resource = player.maxResource;
       player.gcdRemaining = 0;
       sim.castAbility('starfire');
@@ -390,8 +412,10 @@ describe('Wildfang engine', () => {
     // carries no engine bank (the death clear above must not be what saves us).
     const alive = rig('balance');
     alive.player.auras.push(formAura(alive.player, 'form_moonkin'));
+    completed(alive.sim, 'starfire');
     completed(alive.sim, 'wrath');
     expect(stacks(alive.player, MOONTIDE_ID)).toBe(1);
+    expect(stacks(alive.player, SUNTIDE_ID)).toBe(1);
     const aliveState = alive.sim.serializeCharacter(alive.player.id);
     expect(aliveState).not.toBeNull();
     const relogged = new Sim({ seed: 31, playerClass: 'warrior', noPlayer: true });
@@ -400,6 +424,7 @@ describe('Wildfang engine', () => {
     });
     const reloggedPlayer = relogged.entities.get(reloggedId);
     expect(reloggedPlayer?.auras.some((aura) => aura.id === MOONTIDE_ID)).toBe(false);
+    expect(reloggedPlayer?.auras.some((aura) => aura.id === SUNTIDE_ID)).toBe(false);
     expect(reloggedPlayer?.auras.some((aura) => aura.id === VERDANCE_ID)).toBe(false);
   });
 });

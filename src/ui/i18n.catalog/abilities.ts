@@ -103,6 +103,10 @@ type AbilityEntityTranslation = {
   // requirement (Cheap Trick lifting Gut Punch's stealth gate). UI-layer only,
   // resolved by tEntity when the resolved ability drops the requirement.
   descriptionNoStealth?: string;
+  // Rank-conditional description shown when the known rank adds damage over
+  // time the first rank lacks (Gripping Roots from rank 2), so the tooltip can
+  // name that damage without printing an empty figure at rank 1.
+  descriptionWithDot?: string;
 } & Partial<Record<`specNote_${string}`, string>>;
 
 type AbilityEntityTranslations = Record<string, AbilityEntityTranslation>;
@@ -117,15 +121,24 @@ type AbilityTranslationEntry = readonly [
   description: string,
   specNotes?: Record<string, string>,
   descriptionNoStealth?: string,
+  descriptionWithDot?: string,
 ];
 
 function abilityTranslations(
   entries: readonly AbilityTranslationEntry[],
 ): AbilityEntityTranslations {
   const translations: AbilityEntityTranslations = {};
-  for (const [id, name, description, specNotes, descriptionNoStealth] of entries) {
+  for (const [
+    id,
+    name,
+    description,
+    specNotes,
+    descriptionNoStealth,
+    descriptionWithDot,
+  ] of entries) {
     const row: AbilityEntityTranslation = { name, description };
     if (descriptionNoStealth) row.descriptionNoStealth = descriptionNoStealth;
+    if (descriptionWithDot) row.descriptionWithDot = descriptionWithDot;
     for (const [spec, note] of Object.entries(specNotes ?? {})) {
       row[`specNote_${spec}`] = note;
     }
@@ -1216,7 +1229,7 @@ const classAbilityNamesEn = {
         'Hurls a bolt of nature energy for {damage} Nature damage.',
         {
           balance:
-            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
+            'In Moonwing Form, each completed cast adds 1 Suntide (max 3) and extends your Stinging Swarm by 2 sec, up to 6 sec per application. Deals 25% more damage during Moonrise. At 3 Suntide, Skyfall becomes Sunwake.',
         },
       ],
       [
@@ -1236,13 +1249,16 @@ const classAbilityNamesEn = {
       [
         'moonfire',
         'Lunar Tempest',
-        'Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.',
-        { balance: 'Keep it burning: Moonseed extends it by 6 sec.' },
+        'Burns the enemy with moonfire for {damage} Arcane damage, then {overTime} Arcane damage over {duration} sec.',
+        {
+          balance:
+            'Keep it burning: Skyfall extends it by 2 sec and Moonseed by 6 sec. In Moonwing Form, its ticks add 1 Moontide, at most once every 8 sec. Moonsurge refreshes it, and it ticks 20% faster during Sunrise.',
+        },
       ],
       [
         'moonseed',
         'Moonseed',
-        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge.',
       ],
       [
         'rejuvenation',
@@ -1258,7 +1274,14 @@ const classAbilityNamesEn = {
         'Briarguard',
         'Thorns sprout from the target: melee attackers take {buff} Nature damage.',
       ],
-      ['entangling_roots', 'Gripping Roots', 'Roots the target in place for up to 12 sec.'],
+      [
+        'entangling_roots',
+        'Gripping Roots',
+        'Roots the target in place for up to 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails.',
+        undefined,
+        undefined,
+        'Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails.',
+      ],
       [
         'bear_form',
         'Bruin Form',
@@ -1342,7 +1365,7 @@ const classAbilityNamesEn = {
         'Calls down a bolt of stellar fire, causing {damage} Arcane damage.',
         {
           balance:
-            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3.',
+            'In Moonwing Form, each completed cast adds 1 Moontide (max 3) and extends your Lunar Tempest by 2 sec, up to 12 sec per application together with Moonseed. Casts 20% faster during Sunrise. At 3 Suntide, this button becomes Sunwake.',
         },
       ],
       [
@@ -1382,6 +1405,10 @@ const classAbilityNamesEn = {
         'insect_swarm',
         'Stinging Swarm',
         'The enemy is swarmed by insects, taking {damage} Nature damage over 12 sec.',
+        {
+          balance:
+            'Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise.',
+        },
       ],
       [
         'tigers_fury',
@@ -1656,12 +1683,12 @@ const classAbilityNamesEn = {
       [
         'moonlash',
         'Moonsurge',
-        'Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
+        'Spends your 3 Moontide for a heavy strike of {damage} Arcane damage, refreshes your Lunar Tempest to full duration, and opens Moonrise for 10 sec: Wildbolt deals 25% more damage and Stinging Swarm ticks 20% faster. Opening Moonrise closes Sunrise.',
       ],
       [
         'sunlance',
         'Sunwake',
-        'Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one.',
+        'Spends your 3 Suntide for a strike of {damage} Nature damage plus {overTime} Nature damage over 9 sec, restores 35 mana, refreshes your Stinging Swarm to full duration, and opens Sunrise for 10 sec: Skyfall casts 20% faster and Lunar Tempest ticks 20% faster. Opening Sunrise closes Moonrise.',
       ],
       [
         'redharvest',

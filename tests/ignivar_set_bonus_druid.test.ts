@@ -2,9 +2,9 @@
 // bonus proven at the seam it rides, across the four form engines. Moonscorch
 // 2pc is a RESOLVED rewrite of Moonseed's extendDot cap (6 to 12), the one
 // number the extendOwnedDot dispatch and the {duration} tooltip splice both
-// read; 4pc is a dmgPct pair on Moonsurge and Sunwake sized DELIVERED (0.3075
-// against the 1.23 committed baseline: 0.08 spec floor plus the 0.15 Moonrage
-// mastery). Wildfang 2pc rewrites Redharvest's resolved energy restore
+// read; 4pc is a dmgPct pair on Moonsurge and Sunwake sized DELIVERED (0.27
+// against the 1.08 committed payoff baseline: 0.08 spec floor plus the 0.15
+// Moonrage mastery, less the Tidewheel rework's 0.15 payoff rows). Wildfang 2pc rewrites Redharvest's resolved energy restore
 // (floor(x1.5): 22/33/45 by rank); 4pc replants a fresh Flense after the
 // consumeDot cash-out, aura-only. Cinderbark 2pc is the one wearer-only rng
 // draw of the wave (a 30 percent extra Old Blood roll per landed Sweeping
@@ -57,6 +57,12 @@ function worn(setId: string, pieces: number): Partial<Record<string, string>> {
 
 function druidMods(spec: DruidSpec, equipment: Partial<Record<string, string>>) {
   return computeCharacterModifiers('druid', { spec, rows: {} }, 25, equipment);
+}
+
+/** The Balance spec baseline's dmgPct row for a payoff (Tidewheel rework). */
+function payoffBaselineDmgPct(abilityId: 'moonlash' | 'sunlance'): number {
+  const rows = specBaselineFor('druid', 'balance')?.ability ?? [];
+  return rows.find((row) => row.ability === abilityId)?.dmgPct ?? 0;
 }
 
 function entryOf(spec: DruidSpec, equipment: Partial<Record<string, string>>, abilityId: string) {
@@ -283,15 +289,18 @@ describe('Moonscorch 2pc: Moonseed extends Lunar Tempest twice per application',
 });
 
 describe('Moonscorch 4pc: Moonsurge and Sunwake strike 25 percent harder, delivered', () => {
-  it('the accumulator: 1.5375 for wearers against the 1.23 committed baseline', () => {
+  it('the accumulator: the 4pc row on top of the committed payoff baseline', () => {
     for (const abilityId of ['moonlash', 'sunlance'] as const) {
       const wearerMult = resolveTalentHitMult(
         ABILITIES[abilityId],
         druidMods('balance', worn('moonscorch', 4)),
       ).dmgMult;
       const baseMult = resolveTalentHitMult(ABILITIES[abilityId], druidMods('balance', {})).dmgMult;
-      expect(baseMult, abilityId).toBeCloseTo(1.23, 10);
-      expect(wearerMult, abilityId).toBeCloseTo(1.23 + MOONSCORCH_4PC_PAYOFF_DMG_PCT, 10);
+      // The Tidewheel rework gave both payoffs a Balance baseline dmgPct row
+      // (spec_baselines.ts), so the committed baseline is 1.23 plus that row.
+      const committed = 1.23 + payoffBaselineDmgPct(abilityId);
+      expect(baseMult, abilityId).toBeCloseTo(committed, 10);
+      expect(wearerMult, abilityId).toBeCloseTo(committed + MOONSCORCH_4PC_PAYOFF_DMG_PCT, 10);
       // Delivered: exactly the 25 percent the copy promises.
       expect(wearerMult / baseMult, abilityId).toBeCloseTo(1.25, 10);
     }
@@ -302,23 +311,29 @@ describe('Moonscorch 4pc: Moonsurge and Sunwake strike 25 percent harder, delive
   });
 
   it('the resolved damage scales on both arms, including the Sunwake burn dot', () => {
-    // Moonsurge and Sunwake only exist through the Moontide-3 transform, so
-    // the pins resolve them the way play does: the armed payoff buttons.
+    // Moonsurge only exists through the Moontide-3 transform and Sunwake
+    // through the Suntide-3 one, so the pins resolve them the way play does:
+    // the armed payoff buttons.
     function payoffEffects(wearer: boolean) {
       const sim = liveDruid(624, 'balance');
       if (wearer) equipSet(sim, 'moonscorch', 4);
       sim.player.auras.push(formAura(sim.player, 'form_moonkin'));
-      sim.player.auras.push({
-        id: 'moontide',
-        name: 'Moontide',
-        kind: 'moontide',
-        remaining: 3600,
-        duration: 3600,
-        value: 0,
-        stacks: 3,
-        sourceId: sim.player.id,
-        school: 'nature',
-      });
+      for (const [id, name] of [
+        ['moontide', 'Moontide'],
+        ['suntide', 'Suntide'],
+      ] as const) {
+        sim.player.auras.push({
+          id,
+          name,
+          kind: id,
+          remaining: 3600,
+          duration: 3600,
+          value: 0,
+          stacks: 3,
+          sourceId: sim.player.id,
+          school: 'nature',
+        });
+      }
       const moonlash = expectDefined(sim.resolvedAbility('moonseed'));
       const sunlance = expectDefined(sim.resolvedAbility('starfire'));
       expect(moonlash.def.id).toBe('moonlash');
@@ -328,17 +343,24 @@ describe('Moonscorch 4pc: Moonsurge and Sunwake strike 25 percent harder, delive
       const burn = expectDefined(sunlance.effects.find((eff) => eff.type === 'dot'));
       return { moonlash: direct(moonlash), sunlance: direct(sunlance), burn };
     }
+    // Authored 136-162 / 80-100 / 45 burn, rounded at the 1.08 committed
+    // multiplier (1.23 less the Tidewheel payoff rows' 0.15).
     const base = payoffEffects(false);
-    expect(base.moonlash).toMatchObject({ min: 167, max: 199 });
-    expect(base.sunlance).toMatchObject({ min: 98, max: 123 });
-    expect('total' in base.burn ? base.burn.total : 0).toBe(55);
+    expect(base.moonlash).toMatchObject({ min: 147, max: 175 });
+    expect(base.sunlance).toMatchObject({ min: 86, max: 108 });
+    expect('total' in base.burn ? base.burn.total : 0).toBe(49);
+    // The same authored values at 1.08 + MOONSCORCH_4PC_PAYOFF_DMG_PCT.
     const bent = payoffEffects(true);
-    expect(bent.moonlash).toMatchObject({ min: 209, max: 249 });
-    expect(bent.sunlance).toMatchObject({ min: 123, max: 154 });
-    expect('total' in bent.burn ? bent.burn.total : 0).toBe(69);
-    // The 2pc alone must NOT move the damage (the rows are the 4pc's).
-    expect(druidMods('balance', worn('moonscorch', 2)).abilities.moonlash?.dmgPct ?? 0).toBe(0);
-    expect(druidMods('balance', worn('moonscorch', 2)).abilities.sunlance?.dmgPct ?? 0).toBe(0);
+    expect(bent.moonlash).toMatchObject({ min: 184, max: 219 });
+    expect(bent.sunlance).toMatchObject({ min: 108, max: 135 });
+    expect('total' in bent.burn ? bent.burn.total : 0).toBe(61);
+    // The 2pc alone must NOT move the damage (the rows are the 4pc's): the
+    // payoff rows read only the Balance baseline.
+    for (const abilityId of ['moonlash', 'sunlance'] as const) {
+      expect(
+        druidMods('balance', worn('moonscorch', 2)).abilities[abilityId]?.dmgPct ?? 0,
+      ).toBeCloseTo(payoffBaselineDmgPct(abilityId), 10);
+    }
   });
 });
 
@@ -806,7 +828,7 @@ describe('Grovespring 4pc: Overbloom harvests 75 percent and banks 1 Verdance', 
 describe('the wearer literals against the authored copy', () => {
   it('pins every audited druid constant', () => {
     expect(MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC).toBe(12);
-    expect(MOONSCORCH_4PC_PAYOFF_DMG_PCT).toBeCloseTo(0.3075, 10);
+    expect(MOONSCORCH_4PC_PAYOFF_DMG_PCT).toBeCloseTo(0.27, 10);
     expect(WILDFANG_2PC_REDHARVEST_ENERGY_MULT).toBeCloseTo(1.5, 10);
     expect(CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE).toBeCloseTo(0.3, 10);
     // v0.42.0: re-sized to 0.495 so it still delivers exactly 30% on top of

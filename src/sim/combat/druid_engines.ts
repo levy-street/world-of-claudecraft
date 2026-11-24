@@ -30,6 +30,24 @@ import {
   bruinRushWindowTargetId,
   openBruinRushWindow,
 } from './druid_rush_window';
+import {
+  isTidewheelDruid,
+  LUNAR_TEMPEST_ID,
+  MOONRISE_ID,
+  MOONTIDE_TICK_ICD_KEY,
+  openTidewheelWindow,
+  STINGING_SWARM_ID,
+  SUNRISE_ID,
+  SUNTIDE_ID,
+  SUNTIDE_NAME,
+  SUNTIDE_STAGES,
+  SUNTIDE_TICK_ICD_KEY,
+  TIDE_TICK_ICD,
+  tidewheelExtendOnCast,
+  tidewheelReplantDot,
+  tidewheelTickBank,
+  WILDBOLT_ID,
+} from './druid_tidewheel';
 import { wearsSetBonus } from './set_bonus_wearer';
 
 export const MOONTIDE_ID = 'moontide';
@@ -50,7 +68,7 @@ const ENGINE_BACKING_DURATION = 3600;
 export const WILDMEND_ID = 'healing_touch';
 export const VERDANCE_WILDMEND_CAST_TIMES: readonly number[] = [2.2, 1.9, 1.5];
 
-export const HIGHMOON_TITHE_PCT = 0.15;
+export const HIGHMOON_TITHE_PCT = 0.1;
 export const WILD_APEX_MULT = 1.25;
 export const QUICKENING_ENERGY = 5;
 export const QUICKENING_RAGE = 3;
@@ -151,7 +169,7 @@ const FORM_ABILITY_IDS = new Set([
   'moonkin_form',
   'sporemender_form',
 ]);
-const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
+const MOONTIDE_BUILDER_IDS = new Set(['starfire', 'moonseed']);
 // Every landed feral strike that banks one Old Blood. Slinkstrike ('pounce')
 // and Lunge joined the list in the v0.43 feral pass: the stealth opener banks
 // on the tick its stun lands (the stun arm of effect_dispatch.ts reports here
@@ -432,17 +450,35 @@ export function druidEngineOnCast(
   }
   if (spec === 'balance') {
     if (!inMoonwing(player)) return;
-    // One bank, one loop: every completed Wildbolt, Skyfall, or Moonseed
-    // fills the Moontide. At full tide BOTH payoff buttons arm (Moonseed
-    // becomes Moonsurge, Skyfall becomes Sunwake) and either press spends.
-    if (MOONTIDE_BUILDER_IDS.has(abilityId)) {
-      addStage(ctx, player, MOONTIDE_ID, 'Moontide', 'moontide', MOONTIDE_STAGES);
+    // Tidewheel (combat/druid_tidewheel.ts): two banks. Wildbolt fills
+    // Suntide and extends Stinging Swarm; Skyfall and Moonseed fill Moontide
+    // (Skyfall also extends Lunar Tempest). At 3 Suntide, Skyfall becomes
+    // Sunwake; at 3 Moontide, Moonseed becomes Moonsurge.
+    if (abilityId === WILDBOLT_ID) {
+      addStage(ctx, player, SUNTIDE_ID, SUNTIDE_NAME, 'suntide', SUNTIDE_STAGES);
+      tidewheelExtendOnCast(player, abilityId, target);
       return;
     }
-    if (abilityId === 'moonlash' || abilityId === 'sunlance') {
-      // Either chosen payoff spends the whole bank; both buttons revert.
-      removeOwnedAura(ctx, player, MOONTIDE_ID);
-      seedNextEngineBank(ctx, player, MOONTIDE_ID, 'Moontide', 'moontide');
+    if (MOONTIDE_BUILDER_IDS.has(abilityId)) {
+      addStage(ctx, player, MOONTIDE_ID, 'Moontide', 'moontide', MOONTIDE_STAGES);
+      tidewheelExtendOnCast(player, abilityId, target);
+      return;
+    }
+    if (abilityId === 'sunlance' || abilityId === 'moonlash') {
+      // Each payoff spends its own bank, refreshes its school's effect, and
+      // opens the window that favours the other school.
+      const sun = abilityId === 'sunlance';
+      if (sun) {
+        removeOwnedAura(ctx, player, SUNTIDE_ID);
+        seedNextEngineBank(ctx, player, SUNTIDE_ID, SUNTIDE_NAME, 'suntide');
+        tidewheelReplantDot(ctx, player, target, STINGING_SWARM_ID);
+        openTidewheelWindow(ctx, player, SUNRISE_ID);
+      } else {
+        removeOwnedAura(ctx, player, MOONTIDE_ID);
+        seedNextEngineBank(ctx, player, MOONTIDE_ID, 'Moontide', 'moontide');
+        tidewheelReplantDot(ctx, player, target, LUNAR_TEMPEST_ID);
+        openTidewheelWindow(ctx, player, MOONRISE_ID);
+      }
       if (selectedRow(ctx, player, DRUID_TALENT_IDS.highmoonTithe)) {
         refundMana(player, HIGHMOON_TITHE_PCT);
       }
@@ -519,6 +555,22 @@ export function druidEngineOnLandedStrike(
 }
 
 export function druidEngineOnBleedTick(ctx: SimContext, source: Entity | null, aura: Aura): void {
+  // Tidewheel: a Stinging Swarm tick feeds Suntide and a Lunar Tempest tick
+  // feeds Moontide, each at most once per TIDE_TICK_ICD. Draws no rng.
+  const tideBank = tidewheelTickBank(aura);
+  if (tideBank && source && !source.dead && isTidewheelDruid(ctx, source)) {
+    if (!source.procState) source.procState = { counters: {}, icds: {} };
+    const key = tideBank === 'suntide' ? SUNTIDE_TICK_ICD_KEY : MOONTIDE_TICK_ICD_KEY;
+    if (source.procState.icds[key] === undefined) {
+      source.procState.icds[key] = TIDE_TICK_ICD;
+      if (tideBank === 'suntide') {
+        addStage(ctx, source, SUNTIDE_ID, SUNTIDE_NAME, 'suntide', SUNTIDE_STAGES);
+      } else {
+        addStage(ctx, source, MOONTIDE_ID, 'Moontide', 'moontide', MOONTIDE_STAGES);
+      }
+    }
+    return;
+  }
   if (
     !source ||
     source.dead ||

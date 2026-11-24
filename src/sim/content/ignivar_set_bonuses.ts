@@ -287,10 +287,12 @@ export const MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC = 12;
  *  1 + spellDmgPct + dmgPct) and a committed Moongrove at the raid's level
  *  20+ carries the 0.08 spec-baseline spellDmgPct floor PLUS the fully
  *  scaled Moonrage mastery's 0.15, so the real baseline is 1.23 and the row
- *  is 0.25 x 1.23 = 0.3075 (1.5375 / 1.23 = 1.25 exactly). The set doc's
+ *  was 0.25 x 1.23 = 0.3075. The Tidewheel rework's -0.15 payoff spec rows
+ *  (spec_baselines.ts) drop that baseline to 1.08, so the row is now
+ *  0.25 x 1.08 = 0.27 (1.35 / 1.08 = 1.25 exactly). The set doc's
  *  bracketed dmgPct assumed a bare baseline (the Warspirit 4pc deviation
  *  shape); recorded as a deviation in the wave's PR notes. */
-export const MOONSCORCH_4PC_PAYOFF_DMG_PCT = 0.3075;
+export const MOONSCORCH_4PC_PAYOFF_DMG_PCT = 0.27;
 /** Wildfang 2pc: multiplier on Redharvest's RESOLVED gainResource energy
  *  restore (base rank ladder 15/22/30; Math.floor lands the bent ladder at
  *  22/33/45, the set doc's rank truth, with 45 the raid-tier rank-3 value the
@@ -1089,9 +1091,9 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       pieces: 4,
       // Moonsurge and Sunwake strike 25 percent harder, DELIVERED: the
       // additive accumulator folds each row beside the committed spec's 0.08
-      // spellDmgPct floor plus the Moonrage mastery's 0.15, so the row is
-      // 0.3075 (1.5375 / 1.23 = 1.25 exactly; the constant's doc note records
-      // the sizing). The rows reach BOTH arms: Sunwake's burn is a plain dot
+      // spellDmgPct floor plus the Moonrage mastery's 0.15, less the Tidewheel
+      // payoff rows' 0.15, so the row is 0.27 (1.35 / 1.08 = 1.25 exactly; the
+      // constant's doc note records the sizing). The rows reach BOTH arms: Sunwake's burn is a plain dot
       // (no directPct, no perCombo), so scaleEffect's dot arm carries the
       // same multiplier into the resolved burn total. Wild Apex's 1.25
       // payoff multiplier stays MULTIPLICATIVE on top (dispatch-side),
