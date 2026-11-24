@@ -120,6 +120,8 @@ export const RETIRED_KEYS = [
   // -- Reworded successors. The replacement says something materially different, so the
   // old value is not a stale translation to fix but a claim the game no longer makes.
   'guide.gear.soulboundBody', // -> guide.gear.soulboundBodyBound (bind-on-trade rules)
+  // -> guide.gear.soulboundBodyCache (Heroic Marks became a currency, not a bound item)
+  'guide.gear.soulboundBodyBound',
   'guide.profPages.ench.enchantsNote', // -> guide.profPages.ench.enchantsNoteOffhand
   'guide.profPages.specimenBody', // -> guide.profPages.specimenBodyFamilies
   'guide.professions.focusBody', // -> guide.professions.focusBodyTiers

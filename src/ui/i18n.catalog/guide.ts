@@ -2840,6 +2840,14 @@ export const guideStrings = {
     // catalog at its original English until the release-tier fill retires it.
     soulboundBodyBound:
       'A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. That guards prize tokens such as Heroic Marks, and it covers every piece of Warfare gear bought with Honor, so a player-versus-player kit is worn only by the character who earned it. Most of the gear you win from the world is still yours to trade, sell, or share freely.',
+    // Heroic Marks reword, as a NEW key (the soulboundBodyBound precedent
+    // above): Heroic Marks are now a currency counter (src/sim/heroic_marks.ts),
+    // not a soulbound bag item, so the prize named here is the Emissary's
+    // Cache (soulbound: true in src/sim/content/items.ts). soulboundBodyBound
+    // stays in the catalog at its original English until the release-tier
+    // fill retires it.
+    soulboundBodyCache:
+      "A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. That guards prizes such as the Emissary's Cache, and it covers every piece of Warfare gear bought with Honor, so a player-versus-player kit is worn only by the character who earned it. Most of the gear you win from the world is still yours to trade, sell, or share freely.",
   },
 
   professions: {

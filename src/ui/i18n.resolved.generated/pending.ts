@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "es_ES": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "fr_FR": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "fr_CA": [
+    "guide.gear.soulboundBodyCache"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "de_DE": [
+    "guide.gear.soulboundBodyCache"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.gear.soulboundBodyCache"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "nl_NL": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "pl_PL": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "id_ID": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "tr_TR": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "sv_SE": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "vi_VN": [
+    "guide.gear.soulboundBodyCache"
+  ],
+  "da_DK": [
+    "guide.gear.soulboundBodyCache"
+  ]
 };

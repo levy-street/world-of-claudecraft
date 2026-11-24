@@ -10396,6 +10396,7 @@ export type TranslationKeyFlat =
   | 'guide.gear.slotsTitle'
   | 'guide.gear.soulboundBody'
   | 'guide.gear.soulboundBodyBound'
+  | 'guide.gear.soulboundBodyCache'
   | 'guide.gear.soulboundTitle'
   | 'guide.gear.sourcesBody'
   | 'guide.gear.sourcesHonor'
