@@ -143,9 +143,11 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     spawnSets: [RING_SPAWNS],
     // Puzzle: light 2 corpse-candles (Primitive A). One on each side lane of the
     // loop, outside the sealed central mass and clear of the two hazard pools.
+    // They stand in the bare gap between the two flank stepping-stones (z 37 to 41):
+    // the dry island slabs are 0.2 high and would bury a flat walk-on plate.
     interactableSlots: [
-      { x: 20, z: 42, variants: ['corpse_candle'] },
-      { x: -20, z: 42, variants: ['corpse_candle'] },
+      { x: 20, z: 39, variants: ['corpse_candle'] },
+      { x: -20, z: 39, variants: ['corpse_candle'] },
     ],
     hazards: litanyModuleHazards('litany_ring'),
   },
