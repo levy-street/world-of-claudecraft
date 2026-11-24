@@ -219,6 +219,7 @@ function applyDevGear(
   pid: number,
   picks: Partial<Record<EquipSlot, string>>,
   clearStaleSlots: boolean,
+  spec: string | null,
 ): number {
   const meta = ctx.players.get(pid);
   const player = ctx.entities.get(pid);
@@ -236,11 +237,16 @@ function applyDevGear(
       // A Riftbound band is priced by its copy (rift/band_ladder.ts): the
       // shell alone is an empty ring, so the kit mints the maxed S band the
       // parse loadout implies (every upgrade, both sockets filled with the
-      // two DPS ratings), on the class shell the wearer would have earned.
-      const band = createRiftGearInstance('dev-bis', 'S', meta.cls, pid, RIFT_BAND_MAX_UPGRADE, [
-        'rift_gem_verdant',
-        'rift_gem_crimson',
-      ]);
+      // two DPS ratings), on the spec shell the wearer would have earned.
+      const band = createRiftGearInstance(
+        'dev-bis',
+        'S',
+        meta.cls,
+        pid,
+        RIFT_BAND_MAX_UPGRADE,
+        ['rift_gem_verdant', 'rift_gem_crimson'],
+        spec,
+      );
       meta.equipment[slot] = band.itemId;
       meta.equipmentInstance[slot] = band.instance;
     } else {
@@ -262,7 +268,7 @@ export function equipBestInSlotForDev(ctx: SimContext, pid: number, selectedSpec
   if (!meta) return 0;
   const spec = selectedSpec ?? meta.talents?.spec ?? null;
   const picks = (spec ? parseBisGearFor(meta.cls, spec) : null) ?? bestEpicGearFor(meta.cls, spec);
-  return applyDevGear(ctx, pid, picks, true);
+  return applyDevGear(ctx, pid, picks, true, spec);
 }
 
 // The deterministic reference kit for the balance probes and their pinned DPS
@@ -272,6 +278,7 @@ export function equipBestInSlotForDev(ctx: SimContext, pid: number, selectedSpec
 export function equipReferenceEpicKitForDev(ctx: SimContext, pid: number): number {
   const meta = ctx.players.get(pid);
   if (!meta) return 0;
-  const picks = bestEpicGearFor(meta.cls, meta.talents?.spec ?? null);
-  return applyDevGear(ctx, pid, picks, false);
+  const spec = meta.talents?.spec ?? null;
+  const picks = bestEpicGearFor(meta.cls, spec);
+  return applyDevGear(ctx, pid, picks, false, spec);
 }

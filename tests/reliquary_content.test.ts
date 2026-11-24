@@ -1365,7 +1365,7 @@ describe('Reliquary Rift page pins against live rift content', () => {
     // deed, and feat_book_complete unreachable for most of the roster. The
     // class-exclusive set is DERIVED from the live mint site (drive
     // createRiftGearInstance over every CLASSES key) rather than named, so the
-    // pin cannot go stale against a re-tuned shellForClass.
+    // pin cannot go stale against a re-tuned riftBandShellFor.
     //
     // Today createRiftGearInstance is the only class-exclusive mint site in
     // the catalog's reach. A future one needs its own arm here: this sweep
@@ -1398,7 +1398,7 @@ describe('Reliquary Rift page pins against live rift content', () => {
     // RIFT_GEAR_ITEM_IDS, so between themselves they are a self-comparison: a
     // fourth id appended to the array would page a slot the mint site never
     // awards while both stayed green. This arm binds the array to the
-    // independent shellForClass literals in src/sim/rift/progression.ts:
+    // independent riftBandShellFor table in src/sim/rift/band_shell_choice.ts:
     // minting over EVERY playable class must produce the array as a set, in
     // both directions.
     const minted = new Set(
@@ -1417,7 +1417,7 @@ describe('Reliquary Riftbound page (class-personal, outside completion)', () => 
     // EQUALITY in ORDER against the live array, both directions at once: the
     // page spreads RIFT_GEAR_ITEM_IDS, so a fourth band reds here until it is
     // paged, and a band removed from the content reds here until the page
-    // drops it. The array is bound to the independent shellForClass mint
+    // drops it. The array is bound to the independent riftBandShellFor mint
     // literals by the mint-site arm in the Rift describe above, so this pin
     // plus that arm reach the write site.
     expect(riftbound).toBeDefined();
@@ -2989,7 +2989,7 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // class-matched band per winner of a ranked rift's first-clear race, and
   // horizons_riftbound is the page that catalogs them. The claim that
   // createRiftGearInstance covers exactly this array is NOT free here (the
-  // mint literals live in shellForClass); the mint-site arm in the Rift page
+  // mint literals live in riftBandShellFor); the mint-site arm in the Rift page
   // describe pins it over every class.
   rift_first_clear: RIFT_GEAR_ITEM_IDS,
   // Derived from the live piece list: treasure_vault.ts payOne rolls one piece
