@@ -181,7 +181,7 @@ describe('the lip clip', () => {
 
 describe('no invisible damage', () => {
   const look: WheelLook = { build: 0, throb: 0, burn: 0, erupt: 0, scorch: 0 };
-  const fire = { floor: 0, geysers: 0, low: 0 };
+  const fire = { floor: 0, geysers: 0, low: 0, scorch: 0 };
 
   it('a Wheel slice reads as fire through its last tick, and goes fast once the sim drops it', () => {
     for (const tier of ['normal', 'heroic', 'mythic'] as const) {

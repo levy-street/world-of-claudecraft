@@ -134,7 +134,7 @@ interface Slot {
 }
 
 const _look: WheelLook = { build: 0, throb: 0, erupt: -1, burn: 0, scorch: 0 };
-const _fire: WheelFireLook = { floor: 0, geysers: 0, low: 0 };
+const _fire: WheelFireLook = { floor: 0, geysers: 0, low: 0, scorch: 0 };
 const _at: [number, number] = [0, 0];
 
 export class HeatWheelFx {
@@ -406,7 +406,7 @@ export class HeatWheelFx {
         ? wheelFireLook(look, s.phase === 'burn', clock - s.dropped, s.quench, _fire)
         : null;
     u.uBurn.value = fire ? fire.floor : 0;
-    u.uScorch.value = look ? look.scorch : 0;
+    u.uScorch.value = fire ? fire.scorch : look ? look.scorch : 0;
     s.ventU.uGeysers.value = fire ? fire.geysers : 1;
     s.ventU.uLow.value = fire ? fire.low : 0;
     s.floor.position.set(s.x, s.y + 0.1, s.z);

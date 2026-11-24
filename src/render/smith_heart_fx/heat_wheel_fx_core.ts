@@ -168,11 +168,12 @@ export function wheelVentAt(
 }
 
 /** What a burnt slice shows over its fire: the floor's fire (0..1), the big
- *  geysers' share (0..1) and the low flames' (0..1). */
+ *  geysers' share (0..1), the low flames' (0..1) and its scorch (0..1). */
 export interface WheelFireLook {
   floor: number;
   geysers: number;
   low: number;
+  scorch: number;
 }
 
 /**
@@ -181,7 +182,9 @@ export interface WheelFireLook {
  * its geysers `quench`ed (0..1) once the next round marks it safe. While it
  * burns it always reads as fire: the floor at least `danger`, the low flames
  * up (the geysers may drop to cut the clutter, never the danger); after the
- * drop both go over `out`.
+ * drop both go over `out`, and a slice the next round marks safe has its
+ * scorch put out with its geysers (the cool sheet reads clean at once: Jose's
+ * playtest of 2026-11-24, "the next safe zone takes a while to get coloured").
  */
 export function wheelFireLook(
   look: WheelLook,
@@ -195,11 +198,13 @@ export function wheelFireLook(
     out.floor = Math.max(look.burn, WHEEL_FX.danger);
     out.geysers = 1 - q;
     out.low = 1;
+    out.scorch = look.scorch;
     return out;
   }
   const k = 1 - smooth(since / WHEEL_FX.out);
   out.floor = Math.max(look.burn, WHEEL_FX.danger) * k;
   out.geysers = (1 - q) * k;
   out.low = k;
+  out.scorch = look.scorch * (1 - q);
   return out;
 }

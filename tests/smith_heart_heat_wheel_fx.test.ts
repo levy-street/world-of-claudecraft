@@ -32,10 +32,13 @@ import {
   HEAT_DIFFICULTY,
   HEAT_TUNING as T,
   WHEEL_ARCS_DEG,
+  wheelOf,
   wheelTemplate,
 } from '../src/sim/encounters/smith_heart/heat_ids';
+import { wheelSafes } from '../src/sim/encounters/smith_heart/heat_wheel';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
+import { heatFight } from './helpers/heat_fight';
 
 const look = (): WheelLook => ({ build: 0, throb: 0, erupt: -1, burn: 0, scorch: 0 });
 
@@ -77,7 +80,7 @@ describe('heat_wheel_fx_core: a slice warns, erupts and cools', () => {
 
   it('reads as fire for at least as long as the sim burns, quenched or not', () => {
     const burn = T.wheelBurn;
-    const fire = { floor: 0, geysers: 0, low: 0 };
+    const fire = { floor: 0, geysers: 0, low: 0, scorch: 0 };
     // The visual danger window covers the damage window: every instant the
     // sim still burns the slice, the floor is at least the danger fire and
     // the low flames stand, whether or not the next round marks it safe.
@@ -354,6 +357,119 @@ describe('the Wheel inside HeatFightFx over a fake world', () => {
     const after = looks().get(`${a0}:0`);
     expect(after?.burn ?? 0).toBe(0);
     expect(after?.low ?? 0).toBe(0);
+    fx.dispose();
+  });
+
+  // Jose's playtest of 2026-11-24: "after one safe zone, the next one takes a
+  // little while to get coloured". Driven by the REAL sim's wheel objects, tick
+  // by tick: the next round's safe slice shows its rim the tick the sim shows
+  // it, its full cool sheet once the brief flare on it is out (T.wheelDouse),
+  // and the scorch under it is put out with its geysers (WHEEL_FX.quench).
+  it("paints the next safe slice on the sim's clock: whole within wheelDouse of the eruption", () => {
+    const f = heatFight(2, 31);
+    f.dev('/dev heart heat pull');
+    f.dev('/dev heart heat heroic');
+    f.dev('/dev heart heat phase 2');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.seedTimer = 999;
+    st.zoneTimer = 999;
+    st.cinderTimer = 999;
+    st.fistTimer = 999;
+    st.wheelTimer = 999;
+    let run = 0;
+    while (!wheelSafes(run, 3).some((v, i, a) => i > 0 && Math.abs(v - a[i - 1]) === 2)) run++;
+    st.wheelRuns = run;
+    const entities = new Map<number, Entity>();
+    const me = entity('player', 'warrior', -206, 2);
+    entities.set(me.id, me);
+    const world = {
+      entities,
+      player: me,
+      playerId: me.id,
+      entityRosterVersion: 1,
+    } as unknown as IWorld;
+    const scene = new THREE.Scene();
+    const fx = new HeatFightFx(
+      scene,
+      () => 0,
+      world,
+      undefined,
+      () => false,
+      () => {},
+    );
+    // The client's mirror of the sim's wheel objects (one fake per sim id).
+    const mirror = new Map<number, Entity>();
+    const sync = () => {
+      const live = new Set<number>();
+      for (const e of f.objects('sh_heat_wheel_')) {
+        live.add(e.id);
+        const l = f.local(e);
+        let m = mirror.get(e.id);
+        if (!m) {
+          m = entity('object', e.templateId, l.x, l.z);
+          mirror.set(e.id, m);
+          entities.set(m.id, m);
+        }
+        m.templateId = e.templateId;
+      }
+      for (const [id, m] of mirror)
+        if (!live.has(id)) {
+          mirror.delete(id);
+          entities.delete(m.id);
+        }
+      (world as unknown as { entityRosterVersion: number }).entityRosterVersion++;
+      fx.update(1 / 20);
+    };
+    const sheet = (slice: number) => {
+      const from = wheelArc(slice).from;
+      let safe: THREE.ShaderMaterial | null = null;
+      let scorch = 0;
+      scene.traverse((c) => {
+        const m = (c as THREE.Mesh).material as THREE.ShaderMaterial | undefined;
+        if (c.name !== 'smithHeartHeatWheel' || !c.visible || !m?.uniforms) return;
+        if (Math.abs((m.uniforms.uArc.value as THREE.Vector4).z - from) > 1e-6) return;
+        if (m.uniforms.uSafe.value === 1) safe = m;
+        else scorch = Math.max(scorch, m.uniforms.uScorch.value as number);
+      });
+      return { safe: safe as THREE.ShaderMaterial | null, scorch };
+    };
+    f.dev('/dev heart heat wheel');
+    const safes = [...st.wheelSafes];
+    sync();
+    const warn = HEAT_DIFFICULTY.heroic.wheel.warn;
+    for (let k = 1; k < safes.length; k++) {
+      // Up to the eruption that shows round k.
+      let shownAt = -1;
+      for (let i = 0; i < Math.round(warn * 20) + 4 && shownAt < 0; i++) {
+        f.tick(1);
+        sync();
+        const shown = f
+          .objects('sh_heat_wheel_')
+          .some(
+            (e) =>
+              wheelOf(e.templateId)?.state === 'safe' && wheelOf(e.templateId)?.slice === safes[k],
+          );
+        if (shown) shownAt = i;
+      }
+      expect(shownAt).toBeGreaterThanOrEqual(0);
+      // The tick the sim shows it: its cold rim at least.
+      expect(sheet(safes[k]).safe).not.toBeNull();
+      // Whole within the flare on it (and a tick of slack).
+      const flare = Math.round(T.wheelDouse * 20) + 1;
+      for (let i = 0; i < flare; i++) {
+        f.tick(1);
+        sync();
+      }
+      expect(sheet(safes[k]).safe?.uniforms.uPending.value).toBe(0);
+      // The scorch under it goes with its geysers.
+      for (let i = 0; i < Math.ceil(WHEEL_FX.quench * 20) + 1; i++) {
+        f.tick(1);
+        sync();
+      }
+      expect(sheet(safes[k]).safe?.uniforms.uPending.value).toBe(0);
+      expect(sheet(safes[k]).scorch).toBeLessThan(0.05);
+    }
     fx.dispose();
   });
 
