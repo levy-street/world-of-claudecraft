@@ -87,6 +87,20 @@ export const NATURES_BOON_POWER = 1.25;
 export const NATURES_BOON_WILDBLOOM_POWER = 1.5;
 /** How long the armed window lasts, in seconds. */
 export const NATURES_BOON_DURATION = 10;
+/** In Cat Form, the window's Sporemending heals this fraction of the target's
+ *  maximum health over its duration (the hot's pctOfMax) instead of taking
+ *  the 50% Wildbloom power. */
+export const NATURES_BOON_CAT_SPOREMENDING_PCT = 0.1;
+
+/** Does this cast take the Cat Form Sporemending rule: an armed window
+ *  covering Sporemending while the druid is a cat. */
+export function naturesBoonCatSporemending(auras: readonly BoonAura[], abilityId: string): boolean {
+  return (
+    abilityId === 'rejuvenation' &&
+    naturesBoonArmedFor(auras, abilityId) &&
+    auras.some((aura) => aura.kind === 'form_cat')
+  );
+}
 
 /** The spells the window pays for: Sporemending (`rejuvenation`) in any form, and
  *  Oakhide (`barkskin`) in Bruin Form only. Both are armed together and the

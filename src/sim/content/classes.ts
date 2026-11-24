@@ -7006,18 +7006,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // A tank cooldown, so it must fire mid-fight in Bruin Form (or Cat Form)
     // like Primal Reflexes/Primal Surge below, not just pre-cast in caster form.
     usableInForm: true,
-    // A PERCENTAGE since v0.43, not the old flat 150. buff_armor_pct carries
-    // integer percentage POINTS (25 = +25%) and recalcPlayerStats folds it last
-    // (entity.ts), after the form multiplier and the armor masteries, so a bear
-    // tank's Oakhide scales with the armor it actually has instead of decaying
-    // into noise as gear grows. The flat arm was worth about 4% of a geared
-    // bear pool.
-    effects: [{ type: 'selfBuff', kind: 'buff_armor_pct', value: 20, duration: 15 }],
+    // A flat 25% cut to all damage taken (buff_dr, a fraction), replacing the
+    // v0.43 +20% armor. Instances overlap and add (combat/druid_oakhide.ts):
+    // a Nature's Boon proc resets the cooldown, so a second Oakhide can land
+    // while the first runs, for 50% between them.
+    effects: [{ type: 'selfBuff', kind: 'buff_dr', value: 0.25, duration: 15 }],
     // Literal, not the $b resolved-value placeholder: introducing a token into
     // this row breaks the en-vs-locale interpolation-parity guard
     // (tests/i18n_completeness.test.ts) for all 20 overlays, whose translations
     // carry no token. Same shape the flat 150 shipped with.
-    description: 'Your skin hardens like bark, increasing armor by 20% for 15 sec.',
+    description:
+      'Your skin hardens like bark, reducing all damage taken by 25% for 15 sec. Overlapping Oakhides add together.',
   },
   // Druid tank cooldown: a dodge-based defensive (distinct from Oakhide's armor
   // boost). Usable while shapeshifted so a bear tank pops it mid-fight; buff_dodge
@@ -7086,7 +7085,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 16,
     cost: 0,
     castTime: 0,
-    cooldown: 60,
+    cooldown: 15,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -8258,7 +8257,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
     specNotes: {
       feral:
-        'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+        'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form. In Cat Form, the free Sporemending heals for 10% of maximum health over 12 sec.',
       balance:
         'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
       restoration:

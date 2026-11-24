@@ -1859,7 +1859,8 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r8_typhoon',
           name: 'Oakhide Reflex',
-          description: 'Oakhide gains 50% more armor and its cooldown is reduced by 20 sec.',
+          description:
+            "Oakhide's damage reduction is 50% stronger (37.5% instead of 25%) and its cooldown is reduced by 20 sec.",
           icon: 'barkskin',
           effect: {
             ability: [{ ability: 'barkskin', buffPct: 0.5, cooldownFlat: -20 }],

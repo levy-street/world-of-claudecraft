@@ -138,6 +138,7 @@ import {
   druidMarrowbreakUsesGuard,
   resolveDruidOverbloom,
 } from './druid_engines';
+import { oakhideAuraId } from './druid_oakhide';
 import { resolveWeaponSweep } from './druid_scratch';
 import {
   plantSporeBurst,
@@ -1657,14 +1658,15 @@ export function runEffects(
         const hotTotal =
           eff.pctOfMax !== undefined ? Math.round(hotTarget.maxHp * eff.pctOfMax) : eff.total;
         const hotBase = Math.max(1, Math.round(hotTotal / (eff.duration / eff.interval)));
-        const hotSp = hybridHeal
-          ? 0
-          : hotTickBonus(
-              p.healPower,
-              eff.duration,
-              eff.interval,
-              talentHealMult * (1 + mods.global.hotHealPct),
-            );
+        const hotSp =
+          hybridHeal || res.hotNoHealPowerRider === true
+            ? 0
+            : hotTickBonus(
+                p.healPower,
+                eff.duration,
+                eff.interval,
+                talentHealMult * (1 + mods.global.hotHealPct),
+              );
         // The cast-scoped multiplier reaches the WHOLE tick (base plus the Spell
         // Power rider), the same rule as the direct heal above; === 1 guarded so
         // every unmarked hot's arithmetic is byte-identical.
@@ -3886,7 +3888,9 @@ export function runEffects(
         // auraId wins) lives in ./aura_ids.ts, shared with the HUD's aura-track catalog.
         const lifetime = eff.permanent ? Number.POSITIVE_INFINITY : eff.duration;
         ctx.applyAura(p, {
-          id: selfBuffAuraId(ability, eff),
+          // Oakhide instances overlap (combat/druid_oakhide.ts): a second cast
+          // while one runs takes its own id instead of refreshing the first.
+          id: oakhideAuraId(p, selfBuffAuraId(ability, eff)),
           name: eff.auraName ?? ability.name,
           kind: eff.kind,
           remaining: lifetime,

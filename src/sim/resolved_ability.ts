@@ -39,6 +39,10 @@ export interface ResolvedAbility {
   // cast-scoped heal multiplier so the printed percent reaches the WHOLE heal, Spell
   // Power rider included, not just the authored base. Absent (1) on every other cast.
   naturesBoonPower?: number;
+  // Cat Form's Nature's Boon Sporemending (combat/druid_natures_boon.ts): its hot
+  // totals an exact share of maximum health, so the hot arm adds no heal power
+  // rider on top. Absent on every other cast.
+  hotNoHealPowerRider?: boolean;
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
   /** Individual Temporal Echo conversion after worn-set resolution. */

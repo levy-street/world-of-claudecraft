@@ -68,6 +68,7 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['avenging_wrath_buff_crit', 'avenging_wrath'],
   ['avenging_wrath_buff_haste', 'avenging_wrath'],
   ['avenging_wrath_buff_healing_done', 'avenging_wrath'],
+  ['barkskin_overlap', 'barkskin'],
   ['bastion_rite_buff_block', 'bastion_rite'],
   ['bladed_echo', 'whirlwind'],
   ['bloodhook_bleed', 'bloodhook'],

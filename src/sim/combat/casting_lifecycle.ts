@@ -147,7 +147,12 @@ import {
   druidFormEntryPool,
   druidFormEntryTarget,
 } from './druid_form_entry';
-import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
+import {
+  NATURES_BOON_CAT_SPOREMENDING_PCT,
+  naturesBoonArmedFor,
+  naturesBoonCatSporemending,
+  naturesBoonPowerFor,
+} from './druid_natures_boon';
 import { resolveDualPurposeTarget } from './dual_purpose_target';
 import {
   consumeFreeCostFor,
@@ -2287,6 +2292,15 @@ const OVERLOAD_COST_MULT = 1.5;
  *  never be mutated (the consumeOverload rule, right below). Returns `res`
  *  untouched when no window covers this cast, so nothing else moves. */
 function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility {
+  // Cat Form: the window's Sporemending heals a share of the target's maximum
+  // health over its duration (the hot arm's pctOfMax path) instead of taking
+  // the Wildbloom power, so the multiplier stays 1 on this copy.
+  if (naturesBoonCatSporemending(p.auras, res.def.id)) {
+    const effects = res.effects.map((eff) =>
+      eff.type === 'hot' ? { ...eff, pctOfMax: NATURES_BOON_CAT_SPOREMENDING_PCT } : eff,
+    );
+    return { ...res, effects, naturesBoonPower: 1, hotNoHealPowerRider: true };
+  }
   const amp = naturesBoonPowerFor(p.auras, res.def.id);
   if (amp === 1) return res;
   const effects = res.effects.map((eff) => {
@@ -2301,7 +2315,9 @@ function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility
     const scaled: Record<string, unknown> = { ...eff };
     for (const key of ['min', 'max', 'amount', 'total', 'value'] as const) {
       const v = scaled[key];
-      if (typeof v === 'number' && v > 0) scaled[key] = Math.round(v * amp);
+      // A fractional rate (Oakhide's 0.25 damage reduction) scales unrounded,
+      // or rounding would floor it to zero.
+      if (typeof v === 'number' && v > 0) scaled[key] = v < 1 ? v * amp : Math.round(v * amp);
     }
     return scaled as AbilityEffect;
   });

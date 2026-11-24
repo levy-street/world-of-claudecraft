@@ -368,25 +368,24 @@ describe('Primal Reflexes (druid): dodge cooldown', () => {
   });
 });
 
-describe('Oakhide (druid): armor cooldown usable while shapeshifted', () => {
-  it('applies its armor buff in Bruin Form and Cat Form, not just caster form', () => {
+describe('Oakhide (druid): damage reduction usable while shapeshifted', () => {
+  it('applies its damage reduction in Bruin Form and Cat Form, not just caster form', () => {
     const { sim, p, pid } = make('druid');
     cast(sim, 'barkskin', pid);
-    // v0.43: a percentage of armor (integer percentage POINTS), not a flat 150.
-    // 20 base, chosen so Oakhide Reflex (+50% buff) lands exactly on 30%.
-    expect(p.auras.some((a) => a.kind === 'buff_armor_pct' && a.value === 20)).toBe(true);
+    // A 25% cut to all damage taken (buff_dr, a fraction), not armor.
+    expect(p.auras.some((a) => a.kind === 'buff_dr' && a.value === 0.25)).toBe(true);
 
     const { sim: sim2, p: p2, pid: pid2 } = make('druid');
     cast(sim2, 'bear_form', pid2);
     expect(p2.auras.some((a) => a.kind === 'form_bear')).toBe(true);
     cast(sim2, 'barkskin', pid2);
-    expect(p2.auras.some((a) => a.kind === 'buff_armor_pct' && a.value === 20)).toBe(true);
+    expect(p2.auras.some((a) => a.kind === 'buff_dr' && a.value === 0.25)).toBe(true);
 
     const { sim: sim3, p: p3, pid: pid3 } = make('druid');
     cast(sim3, 'cat_form', pid3);
     expect(p3.auras.some((a) => a.kind === 'form_cat')).toBe(true);
     cast(sim3, 'barkskin', pid3);
-    expect(p3.auras.some((a) => a.kind === 'buff_armor_pct' && a.value === 20)).toBe(true);
+    expect(p3.auras.some((a) => a.kind === 'buff_dr' && a.value === 0.25)).toBe(true);
   });
 });
 

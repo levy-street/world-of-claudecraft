@@ -18440,7 +18440,7 @@ export const en: EnTranslations = {
       },
       "barkskin": {
         "name": "Oakhide",
-        "description": "Your skin hardens like bark, increasing armor by 20% for 15 sec."
+        "description": "Your skin hardens like bark, reducing all damage taken by 25% for 15 sec. Overlapping Oakhides add together."
       },
       "sacred_bulwark": {
         "name": "Sacred Bulwark",
@@ -18747,7 +18747,7 @@ export const en: EnTranslations = {
       "natures_boon": {
         "name": "Nature's Boon",
         "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
+        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form. In Cat Form, the free Sporemending heals for 10% of maximum health over 12 sec.",
         "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
         "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
       },
