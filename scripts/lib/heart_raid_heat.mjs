@@ -70,8 +70,9 @@ export const heat = {
   tp: '/dev heart tp heatboss',
   swapAura: 'stackpoison_heart_heat_guardian',
   swapStacks: 5,
-  // The giant's girth: a taunt reaches it from the lip.
-  tauntPad: 5,
+  // The giant's girth: the sim measures a short taunt (the warrior's) to its
+  // body's edge (player_attack_reach.ts), so it reaches from past the lip wall.
+  tauntPad: HEAT_BODY_R - 1,
   resetGrace: 30000,
   setup(diff) {
     const out = [

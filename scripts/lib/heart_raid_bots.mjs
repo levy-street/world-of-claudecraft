@@ -24,7 +24,8 @@
 //   bad?(world, st, at)    true when a spot is unsafe (extra to the hazards)
 //   roleSpot?(world,st,b,me) a bot's own resting spot instead of the generic one
 //   opener                 the roster key that pulls (default the main tank 'mt')
-//   tauntPad               yards past a taunt's reach a large body still counts (its girth)
+//   tauntPad               yards past a warrior's short taunt a large body still counts (its
+//                          girth: the sim measures a short reach to the body's edge)
 //   obstacles?(world)      circles a walking bot goes round
 //   blocksLine?(world,a,b) true when no line of sight (pillars)
 //   stillFor?(world,st,b)  seconds the bot may stand still to cast
@@ -1257,9 +1258,13 @@ function rolePosition(world, st, b, me, hazards, boss) {
     const reach = (t?.reach ?? 0) + 3.5;
     if (!alive(t)) want = spot;
     else if (!holding) {
-      // A ranged taunt (the paladin's) needs no walk while in its reach.
-      const tauntReach = b.cls === 'paladin' ? 27 : reach;
-      want = hypot(b.self, t) > tauntReach ? add(t, unit(t, b.self), reach - 1) : b.self;
+      // A ranged taunt (the paladin's) needs no walk while in its reach; a
+      // warrior's reaches a big body's girth (`tauntPad`) farther, so it waits
+      // outside it (the Heat's lip wall) instead of walking into its middle.
+      const pad = boss.tauntPad ?? 0;
+      const tauntReach = b.cls === 'paladin' ? 27 : pad > 0 ? reach + pad + 3 : reach;
+      const stand = pad > 0 ? reach + pad + 2 : reach - 1;
+      want = hypot(b.self, t) > tauntReach ? add(t, unit(t, b.self), stand) : b.self;
     } else want = spot;
   } else if (role === 'dps' && b.spec.melee) {
     if (alive(t)) {
@@ -1416,7 +1421,9 @@ function tankTaunt(world, st, b) {
   if (!loose) return false;
   const { r, m } = loose;
   const tauntId = b.cls === 'warrior' ? 'taunt' : 'sacred_challenge';
-  const reach = (b.cls === 'warrior' ? 7.5 : 29) + (m.reach ?? 0) + (world.boss.tauntPad ?? 0);
+  // The pad is the body's girth past a SHORT taunt (the warrior's 8 yd): the
+  // paladin's 30 yd one is measured from the pivot.
+  const reach = (b.cls === 'warrior' ? 7.5 + (world.boss.tauntPad ?? 0) : 29) + (m.reach ?? 0);
   if (hypot(b.self, m) > reach || !cdReady(b, tauntId)) return false;
   if (world.blocks(b.self, m)) return false;
   if (b.self.target !== m.id) b.cmd({ cmd: 'target', id: m.id });
