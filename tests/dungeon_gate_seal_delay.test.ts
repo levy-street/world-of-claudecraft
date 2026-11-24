@@ -13,6 +13,7 @@ import { wireEntity } from '../server/game';
 import { syncClientDungeonGates } from '../src/net/dungeon_gate_wire';
 import { isBlocked, resolvePosition } from '../src/sim/colliders';
 import { HOLLOW_CRYPT_GATES } from '../src/sim/content/hollow_crypt';
+import { SMITH_HEART_GUARDIANS } from '../src/sim/content/smith_heart';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   KORZUL_EMERGE_FROM,
@@ -21,6 +22,7 @@ import {
 import { BELL_YARD, MARROW_ID } from '../src/sim/encounters/hollow_crypt';
 import { MORTHEN_SPOT } from '../src/sim/encounters/hollow_crypt/ids';
 import { gapAt, openLipAt } from '../src/sim/encounters/smith_heart/breath_geometry';
+import { HEAT_LIP_WALL } from '../src/sim/encounters/smith_heart/heat_ids';
 import { VAEL_INTRO_STOPS } from '../src/sim/encounters/sunken_bastion/ids';
 import { clearDungeonGateStateForTest } from '../src/sim/instances/dungeon_gate_state';
 import {
@@ -751,7 +753,11 @@ describe('the boss-room seal delay: every sealing gate of every dungeon', () => 
       const home = { x: spawn.x, z: spawn.z };
       const seen = new Set<number>();
       const key = (x: number, z: number): number => (x + 2048) * 4096 + (z + 2048);
-      const queue: [number, number][] = [[Math.round(spawn.x), Math.round(spawn.z)]];
+      // The Guardian of the Heat stands walled in its wellspring (its lip
+      // wall, 2026-11-24): the flood starts on the shore at the wall's foot.
+      const walled = gate.sealWhileEngaged === SMITH_HEART_GUARDIANS.heat;
+      const sx = walled ? spawn.x + HEAT_LIP_WALL.outer + 2 : spawn.x;
+      const queue: [number, number][] = [[Math.round(sx), Math.round(spawn.z)]];
       seen.add(key(queue[0][0], queue[0][1]));
       let least = Infinity;
       let cells = 0;
