@@ -222,7 +222,7 @@ export const DELVE_ITEMS: Record<string, ItemDef> = {
   // --- epic (purple) prestige drops, bountiful-only 12% from the Drowned Reliquary Rite ---
   blackwater_vanguard_chest: {
     id: 'blackwater_vanguard_chest',
-    name: 'Blackwater Vanguard Chestguard',
+    name: 'Bogtar Vanguard Chestguard',
     kind: 'armor',
     armorType: 'mail',
     slot: 'chest',
@@ -268,7 +268,7 @@ export const DELVE_ITEMS: Record<string, ItemDef> = {
   },
   litany_shoulder: {
     id: 'litany_shoulder',
-    name: 'Blackwater Drift Mantle',
+    name: 'Bogtar Drift Mantle',
     kind: 'armor',
     armorType: 'mail',
     slot: 'shoulder',

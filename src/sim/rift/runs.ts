@@ -356,6 +356,16 @@ export function detachFromRift(
   return { x: inst.returnPos.x, z: inst.returnPos.z, facing: inst.returnFacing ?? 0 };
 }
 
+/** The live boss death zones on the floor a player stands on (moved verbatim
+ *  out of Sim.riftBossDeathZones under the monolith ratchet). */
+export function riftBossDeathZonesForPlayer(ctx: SimContext, pid: number) {
+  const p = ctx.entities.get(pid);
+  if (!p) return [];
+  const inst = riftInstanceAtPos(ctx, p.pos);
+  if (!inst || inst.partyKey === null) return [];
+  return inst.bossDeathZones;
+}
+
 export function hoardBossCueViewsForPlayer(ctx: SimContext, pid: number) {
   const player = ctx.entities.get(pid);
   if (!player) return [];

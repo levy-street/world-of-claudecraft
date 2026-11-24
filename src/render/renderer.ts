@@ -481,6 +481,7 @@ import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHauntedPumpkin, syncHauntedPumpkin } from './haunted_pumpkin';
+import { DynamicHazardPools } from './hazard_pool';
 import { usedJsHeapMb } from './heap_sample';
 import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
@@ -2018,6 +2019,8 @@ export class Renderer {
   private abyssalRiftFx!: AbyssalRiftFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
+  // Boss-dropped tar pools (hazard_pool/, IWorld.activeHazardPools).
+  private hazardPools!: DynamicHazardPools;
   // King of the Hill: the standing hill's circle (hill_ring.ts, IWorld.hillInfo).
   private hillRingVisuals!: HillRingVisuals;
   // The viewer's OWN farm plots. Seats are sampled once with the static beds;
@@ -3060,6 +3063,7 @@ export class Renderer {
         this.sim, (amount) => this.addShake(amount), () => this.reducedMotion(), (id, gesture) => this.triggerAttack(id, gesture),
       );
     });
+    this.hazardPools = new DynamicHazardPools(this.scene, gate, this.groundSample);
     this.hillRingVisuals = new HillRingVisuals(this.scene, gate, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -5073,6 +5077,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones(), this.sim.hoardBossCues());
       this.riftDeathZoneVisuals.update(dt);
     }
+    this.hazardPools.update(this.sim.activeHazardPools(), dt, this.reducedMotion());
     this.hillRingVisuals.sync(this.sim.hillInfo);
     this.hillRingVisuals.update(dt);
     this.farmPatchVisuals?.drive(this.sim, dt, this.sim.entities.has(this.sim.playerId));
@@ -11281,6 +11286,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones(), this.sim.hoardBossCues());
       this.riftDeathZoneVisuals.update(dt);
     }
+    this.hazardPools.update(this.sim.activeHazardPools(), dt, this.reducedMotion());
     this.hillRingVisuals.sync(this.sim.hillInfo);
     this.hillRingVisuals.update(dt);
     this.farmPatchVisuals?.drive(this.sim, dt);

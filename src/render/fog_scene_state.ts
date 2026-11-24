@@ -9,7 +9,7 @@
 // edge, the rift palette override, the lowGfx light-rig guard, and the whole
 // outdoor residency clamp that grades fog.far per frame once 'outdoor' has
 // settled); this module owns the resolution and the settled preset values.
-import { dungeonAt, isArenaPos, isBgPos, isDelvePos, isYumiMazePos } from '../sim/data';
+import { delveAt, dungeonAt, isArenaPos, isBgPos, isDelvePos, isYumiMazePos } from '../sim/data';
 import { waterLevelAt } from '../sim/world';
 import { SANCTUM_FOG_COLOR } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
@@ -74,37 +74,41 @@ export function resolveFogScene(
   const inGravewyrmSanctum = interior === 'gravewyrm_sanctum';
   const inLastKeep = interior === 'lastkeep';
   const inDawnhold = interior === 'dawnhold';
-  const desired: FogSceneState = inDelve
-    ? 'delve'
-    : inYumiMaze
-      ? 'yumiMaze'
-      : inBattleground
-        ? 'battleground'
-        : inTemple
-          ? 'temple'
-          : inNythraxis
-            ? 'nythraxis'
-            : ignivarRaidFogState
-              ? ignivarRaidFogState
-              : inWildheartBasin
-                ? 'wildheartBasin'
-                : inHollowCrypt
-                  ? 'hollowCrypt'
-                  : inSunkenBastion
-                    ? 'sunkenBastion'
-                    : inDrownedTemple
-                      ? 'drownedTemple'
-                      : inGravewyrmSanctum
-                        ? 'gravewyrmSanctum'
-                        : inLastKeep
-                          ? 'lastkeep'
-                          : inDawnhold
-                            ? 'dawnhold'
-                            : inside
-                              ? 'dungeon'
-                              : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                                ? 'underwater'
-                                : 'outdoor';
+  // The Drowned Litany keeps its own lifted marsh grade (interior_light_rig.ts).
+  const inLitany = inDelve && delveAt(px)?.id === 'drowned_litany';
+  const desired: FogSceneState = inLitany
+    ? 'litany'
+    : inDelve
+      ? 'delve'
+      : inYumiMaze
+        ? 'yumiMaze'
+        : inBattleground
+          ? 'battleground'
+          : inTemple
+            ? 'temple'
+            : inNythraxis
+              ? 'nythraxis'
+              : ignivarRaidFogState
+                ? ignivarRaidFogState
+                : inWildheartBasin
+                  ? 'wildheartBasin'
+                  : inHollowCrypt
+                    ? 'hollowCrypt'
+                    : inSunkenBastion
+                      ? 'sunkenBastion'
+                      : inDrownedTemple
+                        ? 'drownedTemple'
+                        : inGravewyrmSanctum
+                          ? 'gravewyrmSanctum'
+                          : inLastKeep
+                            ? 'lastkeep'
+                            : inDawnhold
+                              ? 'dawnhold'
+                              : inside
+                                ? 'dungeon'
+                                : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                  ? 'underwater'
+                                  : 'outdoor';
   return { interior, desired };
 }
 
@@ -199,6 +203,13 @@ export function applyFogScenePreset(
     fog.color.setHex(0x0e0705);
     fog.near = 14;
     fog.far = 74;
+  } else if (desired === 'litany') {
+    // the Drowned Litany: a cool marsh-teal murk instead of the reliquary's
+    // ember brown, pushed back so a flooded room reads end to end while its
+    // corners stay dark and its Blackwater tar keeps the eye
+    fog.color.setHex(0x0b1612);
+    fog.near = 18;
+    fog.far = 96;
   } else if (desired === 'yumiMaze') {
     // the Protect Yumi maze is a COMPETITIVE arena: a lighter night-blue
     // murk pushed well past the ~90yd footprint, so the torches + team

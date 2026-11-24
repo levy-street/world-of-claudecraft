@@ -6,12 +6,14 @@
 // lives on DelveRun.nhaliaBoss; the generic stomp / summonAdds / enrage
 // mob-template hooks are NOT used.
 
+import type { HazardPoolView } from '../../world_api/dungeons';
 import { DELVES, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import {
   type DelveRun,
+  type DrownedLitanyBlackwaterMark,
   type DrownedLitanyBossState,
   DT,
   type Entity,
@@ -19,11 +21,15 @@ import {
   TOLLING_BELL_TEMPLATE_ID,
   type TollingBellEntity,
 } from '../types';
+import {
+  BLACKWATER_MARK_DURATION,
+  BLACKWATER_MARK_RADIUS,
+  BLACKWATER_MARK_TICK,
+  blackwaterMarkPoolViews,
+  NO_HAZARD_POOLS,
+} from './boss_pool_views';
 
 const BLACKWATER_MARK_EVERY = 14;
-const BLACKWATER_MARK_RADIUS = 4;
-const BLACKWATER_MARK_DURATION = 8;
-const BLACKWATER_MARK_TICK = 1;
 const BLACKWATER_MARK_PCT_NORMAL = 0.05;
 const BLACKWATER_MARK_PCT_HEROIC = 0.08;
 const CANTOR_PHASE_HP = [0.7, 0.35];
@@ -113,6 +119,28 @@ export function clearDrownedLitanyBellsAndMarks(ctx: SimContext, run: DelveRun):
   }
   st.bells = [];
   st.marks = [];
+}
+
+/** Display-only: a run's Blackwater Marks that can still hurt someone. Once
+ *  Sister Nhalia is dead her marks freeze in place (no countdown, no damage)
+ *  until the module tears down, so they stop being drawn. Reads only. */
+export function liveBlackwaterMarks(
+  ctx: SimContext,
+  run: DelveRun,
+): readonly DrownedLitanyBlackwaterMark[] {
+  const marks = run.nhaliaBoss?.marks;
+  if (!marks?.length) return [];
+  return findNhaliaBoss(ctx, run) ? marks : [];
+}
+
+/** Display-only: the live Blackwater Marks around a player as hazard pool rows
+ *  (the offline world's activeHazardPools()). */
+export function blackwaterMarkPoolsForPlayer(
+  ctx: SimContext,
+  pid: number,
+): readonly HazardPoolView[] {
+  const run = ctx.delveRunForPlayer(pid);
+  return run ? blackwaterMarkPoolViews(liveBlackwaterMarks(ctx, run)) : NO_HAZARD_POOLS;
 }
 
 function findNhaliaBoss(ctx: SimContext, run: DelveRun): Entity | null {
@@ -231,10 +259,12 @@ function tickBlackwaterMarkCast(
     z: target.pos.z,
     remaining: BLACKWATER_MARK_DURATION,
     tickTimer: BLACKWATER_MARK_TICK,
+    // Display identity only (boss_pool_views.ts): read by no mechanic.
+    bornTick: ctx.tickCount,
   });
   ctx.emit({
     type: 'log',
-    text: `${boss.name} marks ${target.name} with Blackwater!`,
+    text: `${boss.name} marks ${target.name} with Bogtar!`,
     color: '#6af',
     entityId: boss.id,
     telegraph: true,
@@ -272,7 +302,7 @@ function tickBlackwaterMarks(
         const dz = p.pos.z - mark.z;
         if (dx * dx + dz * dz > BLACKWATER_MARK_RADIUS * BLACKWATER_MARK_RADIUS) continue;
         const dmg = Math.max(1, Math.round(p.maxHp * pct));
-        ctx.dealDamage(boss, p, dmg, false, 'nature', 'Blackwater Mark', 'hit', true);
+        ctx.dealDamage(boss, p, dmg, false, 'nature', 'Bogtar Mark', 'hit', true);
       }
     }
     live.push(mark);

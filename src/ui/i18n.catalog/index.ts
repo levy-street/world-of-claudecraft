@@ -1351,7 +1351,7 @@ export const en = {
       bossChest:
         'The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.',
       drownedLitanyReliquaryRise:
-        'Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.',
+        'Sister Nhalia falls silent. The Drowned Reliquary rises from the bogtar. Approach it to begin the rite.',
       riteSequenceReady: 'The shrines fall dark. Repeat the sequence.',
       riteSequencePlaying: 'The shrines replay the rite. Wait.',
       riteCorrect: 'A soft chime answers your touch.',
@@ -1407,7 +1407,7 @@ export const en = {
       wayOutNotOpen: 'The way out is not yet open.',
       moveCloserStairs: 'Move closer to the stairs.',
       nhaliaCantorShield: 'Cantors, hold the note!',
-      nhaliaBlackwaterMark: '{name} marks {player} with Blackwater!',
+      nhaliaBlackwaterMark: '{name} marks {player} with Bogtar!',
     },
     // The faction quartermaster refusal (src/sim/items.ts, the faction-price
     // arm of a vendor purchase). The sim emits English; sim_i18n.ts matches it
@@ -1495,7 +1495,7 @@ export const en = {
     guideRepeat:
       'When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.',
     guideStakes:
-      'A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.',
+      'A wrong shrine splashes you with bogtar and costs a try. Complete the sequence to open the reliquary.',
     showsTimes: 'Sequence shown {count} times',
     showsOnce: 'Sequence shown once',
     symbols: '{count} symbols',
@@ -1659,7 +1659,7 @@ export const en = {
       litanyNormal:
         'Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. "The marsh remembers every name they drowned, {playerName}. Stay in the light."',
       litanyHeroic:
-        'Blackwater laps the causeway stones. Edda\'s flame gutters green. "They are singing again below, {playerName}. Do not answer the choir."',
+        'Bogtar laps the causeway stones. Edda\'s flame gutters green. "They are singing again below, {playerName}. Do not answer the choir."',
     },
     module: {
       reliquary_sunken_ossuary:
@@ -1667,7 +1667,7 @@ export const en = {
       reliquary_bell_niche: 'Dozens of handbells hang in silence, each tied with funeral cloth.',
       reliquary_saintless_hall: 'Statues with faces chiseled away with careful hatred.',
       reliquary_finale: 'The buried bell tolls once beneath your boots.',
-      litany_sluice: 'Moss-choked sluice gates drip blackwater into the old choir crypt.',
+      litany_sluice: 'Moss-choked sluice gates drip bogtar into the old choir crypt.',
       litany_ledger: 'Ledger islands rise from flooded channels, ink bleeding into the marsh.',
       litany_ring: 'A reliquary ring loops around a sealed central font of black water.',
       litany_baptistry: 'A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.',
@@ -1715,7 +1715,7 @@ export const en = {
       edda: {
         run_start: 'Keep to the plank-line, {playerName}. The silt takes the proud-footed.',
         ally_revive: 'Up, now. The marsh does not get you today.',
-        combat_start: 'Mind the blackwater, {playerName}. The marsh listens.',
+        combat_start: 'Mind the bogtar, {playerName}. The marsh listens.',
         low_hp: 'Steady. My lantern is not out yet.',
         trap_spotted: 'Wait. The reeds are wrong here.',
         boss_pull: 'That canticle knows your name, {playerName}. Do not sing back.',
@@ -1994,11 +1994,11 @@ export const en = {
       cantors_drowned_sash: { name: "Cantor's Drowned Sash" },
       corpse_candle_focus: { name: 'Corpse-Candle Focus' },
       nhalias_litany_rod: { name: "Nhalia's Litany Rod" },
-      blackwater_vanguard_chest: { name: 'Blackwater Vanguard Chestguard' },
+      blackwater_vanguard_chest: { name: 'Bogtar Vanguard Chestguard' },
       siltstep_leggings: { name: 'Siltstep Leggings' },
       sunken_reliquary_hood: { name: 'Sunken Reliquary Hood' },
       litany_legs: { name: 'Silt-Walker Greaves' },
-      litany_shoulder: { name: 'Blackwater Drift Mantle' },
+      litany_shoulder: { name: 'Bogtar Drift Mantle' },
       litany_gloves_rog: { name: 'Reed-Bound Handwraps' },
       litany_plate_chest: { name: 'Sump-Warden Cuirass' },
       litany_leather_chest: { name: 'Silt-Deep Vestment' },

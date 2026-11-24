@@ -9,6 +9,7 @@ import { CharacterRequests } from './character_requests';
 import { applyCharacterRoster, type CharacterMembership } from './character_roster';
 import { applyCourierSelfWire } from './courier_wire';
 import { activeRaidLockouts, activeRiftBossDeathZones, riftMs } from './dungeon_mirror_views';
+import { HazardPoolMirror } from './hazard_pool_mirror';
 import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 // Online play: REST auth client + WebSocket world mirror.
 
@@ -4857,6 +4858,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // each zone down locally and drops it when remaining falls to zero.
   riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
     return activeRiftBossDeathZones(this.activeBossDeathZones, performance.now());
+  }
+  // Boss-dropped pools from `drun.bossPools`, aged locally (hazard_pool_mirror.ts).
+  private readonly hazardPoolMirror = new HazardPoolMirror();
+  activeHazardPools(): readonly import('../world_api/dungeons').HazardPoolView[] {
+    return this.hazardPoolMirror.views(this.delveRun?.bossPools, performance.now());
   }
   // Milliseconds remaining before the current rift's backing world event stops
   // admitting new parties (null outside a rift, or for a dev-spawned rift). See the

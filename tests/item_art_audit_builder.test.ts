@@ -903,8 +903,10 @@ describe('item-art audit builder', () => {
       // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
       // Release adds five painted owners; measured with --verify-only on the combined tree.
       // Restored feral staff and eight jewelry paintings; measured with --verify-only.
-      catalogSha256: '5ef9cee82541194673dc4768027c5f0b6f0667b11c63f251501db76473f75b58',
-      catalogBytes: 1196985,
+      // The Blackwater-to-Bogtar display rename of two Litany items (8 bytes shorter,
+      // same owners), re-measured with `node scripts/item_art_audit.mjs --verify-only`.
+      catalogSha256: 'c1108a46b3efc5d4e9aa857ca46f7ad33e3d964afee5b07eda3c0335b74d66c8',
+      catalogBytes: 1196977,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
       catalogCount: 2191,
       liveItemCount: 2220,

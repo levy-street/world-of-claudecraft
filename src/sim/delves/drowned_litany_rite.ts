@@ -177,7 +177,7 @@ export function spawnDrownedLitanyRite(
   emitPartyLog(
     ctx,
     run,
-    'Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.',
+    'Sister Nhalia falls silent. The Drowned Reliquary rises from the bogtar. Approach it to begin the rite.',
     '#8f8',
   );
 }

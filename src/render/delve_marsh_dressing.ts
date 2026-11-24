@@ -14,6 +14,7 @@ import { polygonXAtZ } from '../sim/geometry2d';
 import { hash2 } from '../sim/rng';
 import { loadGltf } from './assets/loader';
 import { GFX, surfaceMat } from './gfx';
+import { litanyHazardStyle, placeHazardPools } from './hazard_pool';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { detailedSurfaceMat } from './worn_stone';
 
@@ -598,13 +599,14 @@ export function placeMarshDryIslands(group: THREE.Group, moduleId: LitanyModuleI
   }
 }
 
-/** Larger, scarier Blackwater pools with distinct shallow vs deep visuals.
- *  shallow (tier:'shallow') = lighter translucent teal, reads as wadeable.
- *  deep    (tier:'deep' or no tier) = dark near-opaque navy/black, reads as drowning.
- */
+/** The Blackwater pools of one Litany room, drawn as hazard pool tar
+ *  (src/render/hazard_pool/): shallow zones as wide marsh-green tar, deep
+ *  zones (and untiered ones, which the sim treats as deep) as a thicker
+ *  banked-ember tar that paints over the shallow ring around it. Every pool
+ *  covers its sim zone exactly; the tar edge only wanders outward. */
 export function placeMarshBlackwaterPools(
   group: THREE.Group,
-  hazards: Array<{
+  hazards: ReadonlyArray<{
     x: number;
     z: number;
     r: number;
@@ -612,132 +614,16 @@ export function placeMarshBlackwaterPools(
     rz?: number;
     tier?: 'shallow' | 'deep';
   }>,
-  addGlow: (x: number, z: number, color: number, y?: number, scale?: number) => void,
 ): void {
-  for (const h of hazards) {
-    const isShallow = h.tier === 'shallow';
-    const r = h.r * 1.08;
-    // An authored ellipse (rx/rz, e.g. the apse moat) squashes every ring/circle
-    // by axis, applied to the local (pre-rotateX) geometry so it lands as a
-    // world-space X/Z squash after rotateX maps local Y onto world Z.
-    const sxr = (h.rx ?? h.r) / h.r;
-    const szr = (h.rz ?? h.r) / h.r;
-    if (isShallow) {
-      // Shallow: teal, but opaque enough to read as a damaging pool, not clear
-      // floor. Shallow Blackwater still hurts, so the fill and the warning rim
-      // carry real contrast (a faint teal wash was read as safe wading water).
-      const pool = new THREE.Mesh(
-        new THREE.CircleGeometry(r, 36)
-          .scale(sxr, szr, 1)
-          .rotateX(-Math.PI / 2)
-          .translate(h.x, 0.1, h.z),
-        new THREE.MeshBasicMaterial({
-          color: 0x123f4c,
-          transparent: true,
-          opacity: 0.72,
-          depthWrite: false,
-        }),
-      );
-      pool.renderOrder = 1;
-      group.add(pool);
-      const rim = new THREE.Mesh(
-        new THREE.RingGeometry(r * 0.8, r * 1.04, 40)
-          .scale(sxr, szr, 1)
-          .rotateX(-Math.PI / 2)
-          .translate(h.x, 0.13, h.z),
-        new THREE.MeshBasicMaterial({
-          color: 0x4adaaa,
-          transparent: true,
-          opacity: 0.6,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-        }),
-      );
-      rim.renderOrder = 2;
-      group.add(rim);
-      // A defined outer boundary ring so the pool edge (where the damage starts)
-      // reads at a glance, the same telegraph the deep pool gets.
-      const edge = new THREE.Mesh(
-        new THREE.RingGeometry(r * 0.98, r * 1.06, 40)
-          .scale(sxr, szr, 1)
-          .rotateX(-Math.PI / 2)
-          .translate(h.x, 0.15, h.z),
-        new THREE.MeshBasicMaterial({
-          color: 0x6fe8c4,
-          transparent: true,
-          opacity: 0.5,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-        }),
-      );
-      edge.renderOrder = 3;
-      group.add(edge);
-      addGlow(h.x, h.z, 0x3abcaa, 0.06, r * 0.8);
-    } else {
-      // Deep (default): dark near-opaque navy/black - reads as drowning danger.
-      const core = new THREE.Mesh(
-        new THREE.CircleGeometry(r * 0.72, 32)
-          .scale(sxr, szr, 1)
-          .rotateX(-Math.PI / 2)
-          .translate(h.x, 0.1, h.z),
-        new THREE.MeshBasicMaterial({
-          color: 0x020a06,
-          transparent: true,
-          opacity: 0.94,
-          depthWrite: false,
-        }),
-      );
-      core.renderOrder = 1;
-      group.add(core);
-      const pool = new THREE.Mesh(
-        new THREE.CircleGeometry(r, 36)
-          .scale(sxr, szr, 1)
-          .rotateX(-Math.PI / 2)
-          .translate(h.x, 0.14, h.z),
-        new THREE.MeshBasicMaterial({
-          color: 0x061812,
-          transparent: true,
-          opacity: 0.88,
-          depthWrite: false,
-        }),
-      );
-      pool.renderOrder = 2;
-      group.add(pool);
-      const rim = new THREE.Mesh(
-        new THREE.RingGeometry(r * 0.78, r * 1.02, 40)
-          .scale(sxr, szr, 1)
-          .rotateX(-Math.PI / 2)
-          .translate(h.x, 0.16, h.z),
-        new THREE.MeshBasicMaterial({
-          color: 0x5fd47a,
-          transparent: true,
-          opacity: 0.62,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-        }),
-      );
-      rim.renderOrder = 3;
-      group.add(rim);
-      const outer = new THREE.Mesh(
-        new THREE.RingGeometry(r * 1.02, r * 1.18, 36)
-          .scale(sxr, szr, 1)
-          .rotateX(-Math.PI / 2)
-          .translate(h.x, 0.13, h.z),
-        new THREE.MeshBasicMaterial({
-          color: 0x1a4a32,
-          transparent: true,
-          opacity: 0.28,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-        }),
-      );
-      outer.renderOrder = 2;
-      group.add(outer);
-      addGlow(h.x, h.z, 0x3fae6a, 0.08, r * 0.85);
-    }
-  }
+  placeHazardPools(
+    group,
+    hazards.map((h) => ({
+      x: h.x,
+      z: h.z,
+      r: h.r,
+      rx: h.rx,
+      rz: h.rz,
+      style: litanyHazardStyle(h.tier),
+    })),
+  );
 }

@@ -93,6 +93,8 @@ describe('renderer resource lifecycle', () => {
         throw new Error('portal');
       }),
     };
+    // The boss-dropped tar pool host (hazard_pool/dynamic_pools.ts).
+    const hazardPools = { dispose: vi.fn() };
     const prewarmDepthMaterials = new Map([['depth', depthMaterial]]);
     const errors: unknown[] = [];
     const bestEffort = (cleanup: () => void): void => {
@@ -114,6 +116,7 @@ describe('renderer resource lifecycle', () => {
         farmPatchVisuals,
         frozenOrbFx,
         necromancyArmyPortalFx,
+        hazardPools,
       },
       bestEffort,
     );
@@ -127,6 +130,7 @@ describe('renderer resource lifecycle', () => {
     expect(farmPatchVisuals.dispose).toHaveBeenCalledOnce();
     expect(frozenOrbFx.dispose).toHaveBeenCalledOnce();
     expect(necromancyArmyPortalFx.dispose).toHaveBeenCalledOnce();
+    expect(hazardPools.dispose).toHaveBeenCalledOnce();
     expect(prewarmDepthMaterials.size).toBe(0);
     expect(errors).toHaveLength(3);
   });
@@ -140,6 +144,7 @@ describe('renderer resource lifecycle', () => {
     expect(renderer).toContain('private frozenOrbFx!: FrozenOrbFx;');
     expect(renderer).toContain('private necromancyArmyPortalFx!: NecromancyArmyPortalFx;');
     expect(renderer).toContain('private farmPatchVisuals: FarmPatchVisuals | null = null;');
+    expect(renderer).toContain('private hazardPools!: DynamicHazardPools;');
     expect(renderer).toContain('disposeRendererPrewarmAndGroundFx(this, bestEffort);');
     // ...and both classes really carry the terminal owner the seam calls.
     expect(

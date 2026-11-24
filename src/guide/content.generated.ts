@@ -7411,7 +7411,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
-        "name": "Blackwater Vanguard Chestguard"
+        "name": "Bogtar Vanguard Chestguard"
       },
       {
         "kind": "item",

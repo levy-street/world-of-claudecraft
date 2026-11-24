@@ -1048,6 +1048,7 @@ const RENDER_PURE_CORES = [
   // looks, the wall box, the nova's sight reach and wave, the use hint, the
   // freeze and encase timelines, the quench pools' placement.
   'src/render/trash_engine_fx/trash_engine_fx_core.ts',
+  'src/render/hazard_pool/hazard_pool_core.ts',
   // The line-of-sight field's dense draped layout (shared by the nova and the Dirge).
   'src/render/trash_engine_fx/sight_field_core.ts',
   'src/render/characters/turn_in_place_core.ts',

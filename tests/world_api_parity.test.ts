@@ -524,6 +524,7 @@ export const IWORLD_MEMBERS = [
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'hoardBossCues', kind: 'method' }, // live Buried Hoard boss telegraphs
+  { name: 'activeHazardPools', kind: 'method' }, // live boss-dropped ground pools
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'activeDungeonDifficulty', kind: 'method' }, // active claim read, null outside
@@ -1030,10 +1031,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Lantern Hall's guildContracts (data) and buyGuildCosmetic (method): 453/134/319.
     // Riding ranks (PR 4390) add one method over the release: 466/140/329.
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
-    // more: 471/140/331.
-    expect(IWORLD_MEMBERS.length).toBe(471);
+    // more: 471/140/331. The hazard pool host's activeHazardPools (method)
+    // adds one more: 472/140/332.
+    expect(IWORLD_MEMBERS.length).toBe(472);
     expect(DATA_MEMBERS.length).toBe(140);
-    expect(METHOD_MEMBERS.length).toBe(331);
+    expect(METHOD_MEMBERS.length).toBe(332);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1062,6 +1064,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeConsecrations',
       'activeDungeonDifficulty',
       'activeFrostRings',
+      'activeHazardPools',
       'activeIgnivarMeteors',
       'activeLoadout',
       'activeLootRolls',
@@ -1675,6 +1678,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountFlair',
       'accuseWorldQuestSuspect',
       'activeDungeonDifficulty',
+      'activeHazardPools',
       'activeLootRolls',
       'activeMasterLootRolls',
       'answerDungeonGuide',
@@ -2516,6 +2520,7 @@ const FACET_DUNGEONS = [
   'riftCollisionToken',
   'riftBossDeathZones',
   'hoardBossCues',
+  'activeHazardPools',
   'riftEventMsRemaining',
   'dungeonDifficulty',
   'activeDungeonDifficulty',
@@ -2887,8 +2892,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(471);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(471);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(472);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(472);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

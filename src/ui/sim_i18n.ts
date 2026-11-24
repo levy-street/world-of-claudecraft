@@ -952,7 +952,7 @@ const baseEnTable = {
   'mechanic.crushingSweep': 'Crushing Sweep',
   'mechanic.rallyingBanner': 'Rallying Banner',
   'mechanic.finalBell': 'Final Bell',
-  'mechanic.blackwaterMark': 'Blackwater Mark',
+  'mechanic.blackwaterMark': 'Bogtar Mark',
   'mechanic.litanyPulse': 'Litany Pulse',
   'mechanic.siltWard': 'Silt Ward',
   'mechanic.siltHide': 'Silt Hide',
@@ -27118,7 +27118,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Crushing Sweep': 'mechanic.crushingSweep',
   'Rallying Banner': 'mechanic.rallyingBanner',
   'Final Bell': 'mechanic.finalBell',
-  'Blackwater Mark': 'mechanic.blackwaterMark',
+  'Bogtar Mark': 'mechanic.blackwaterMark',
   'Tolling Bell': 'mechanic.tollingBell',
   'Litany Pulse': 'mechanic.litanyPulse',
   'Silt Ward': 'mechanic.siltWard',
@@ -30609,7 +30609,7 @@ const RULES: Rule[] = [
     build: () => t('sim.delve.bossChest'),
   },
   {
-    re: /^Sister Nhalia falls silent\. The Drowned Reliquary rises from the blackwater\. Approach it to begin the rite\.$/,
+    re: /^Sister Nhalia falls silent\. The Drowned Reliquary rises from the bogtar\. Approach it to begin the rite\.$/,
     build: () => t('sim.delve.drownedLitanyReliquaryRise'),
   },
   {
@@ -30742,7 +30742,7 @@ const RULES: Rule[] = [
     build: (m) => t('sim.delve.raiseDead', { name: locMob(m[1]) }),
   },
   {
-    re: /^(.+) marks (.+) with Blackwater!$/,
+    re: /^(.+) marks (.+) with Bogtar!$/,
     build: (m) => t('sim.delve.nhaliaBlackwaterMark', { name: locMob(m[1]), player: m[2] }),
   },
   { re: /^Cantors, hold the note!$/, build: () => t('sim.delve.nhaliaCantorShield') },

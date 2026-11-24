@@ -8,6 +8,7 @@ import { IGNIVAR_RAID_ENVIRONMENT } from '../src/render/ignivar_raid_environment
 import type { FogSceneState } from '../src/render/interior_light_rig';
 import {
   battlegroundOrigin,
+  DELVES,
   DUNGEON_LIST,
   delveOrigin,
   instanceOrigin,
@@ -56,6 +57,15 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
     // Every one of these positions is also `inside`, so each case is a real
     // precedence assertion against the 'dungeon' fallback arm.
     expect(resolveFogScene(true, delveOrigin(0, 0).x, 5, cam, SEED).desired).toBe('delve');
+    // The Drowned Litany keeps its own lifted marsh grade; every other delve
+    // (the Collapsed Reliquary above) keeps the shared delve murk.
+    const litany = delveOrigin(DELVES.drowned_litany.index, 0).x;
+    expect(resolveFogScene(true, litany, 5, cam, SEED).desired).toBe('litany');
+    expect(resolveFogScene(true, litany + 250, 5, cam, SEED).desired).toBe('litany');
+    expect(
+      resolveFogScene(true, delveOrigin(DELVES.collapsed_reliquary.index, 3).x, 5, cam, SEED)
+        .desired,
+    ).toBe('delve');
     expect(resolveFogScene(true, yumiMazeOrigin(0).x, 5, cam, SEED).desired).toBe('yumiMaze');
     expect(resolveFogScene(true, battlegroundOrigin(0).x, 5, cam, SEED).desired).toBe(
       'battleground',
@@ -119,6 +129,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],
     ['delve', 0x0e0705, 14, 74],
+    ['litany', 0x0b1612, 18, 96],
     ['yumiMaze', 0x161d31, 30, 170],
     ['battleground', 0xaecbe0, 70, 210],
     ['underwater', 0x17506e, 2, 48],
