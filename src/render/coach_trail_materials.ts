@@ -12,7 +12,10 @@
 // manifest already drains (ability_material_prewarm.ts): the stand-in below
 // wears these very materials on the mesh kinds the trail draws, so the boot
 // compile links the three programs the island's first quest would otherwise
-// pay for, and the trail's rebuilds only ever swap geometry.
+// pay for, and the trail's rebuilds only ever swap geometry. The double-sided
+// ones draw in one pass (forceSinglePass): additive with no depth write sums
+// the same in any order, and three's default two-pass draw of a transparent
+// double-sided material re-derives its program twice a frame.
 import * as THREE from 'three';
 
 export const COACH_GOLD = 0xffc860;
@@ -115,6 +118,7 @@ export function coachTrailMaterials(): CoachTrailMaterials {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
+      forceSinglePass: true,
     }),
     ring: new THREE.MeshBasicMaterial({
       name: 'coach:ring',
@@ -124,6 +128,7 @@ export function coachTrailMaterials(): CoachTrailMaterials {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
+      forceSinglePass: true,
     }),
     aura: new THREE.SpriteMaterial({
       name: 'coach:aura',
@@ -143,6 +148,7 @@ export function coachTrailMaterials(): CoachTrailMaterials {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
+      forceSinglePass: true,
     }),
     areaRing: new THREE.MeshBasicMaterial({
       name: 'coach:areaRing',
@@ -152,6 +158,7 @@ export function coachTrailMaterials(): CoachTrailMaterials {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
+      forceSinglePass: true,
     }),
   };
   return coachMaterials;

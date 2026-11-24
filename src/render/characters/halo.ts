@@ -56,6 +56,11 @@ function haloMaterial(color: number): THREE.MeshBasicMaterial {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
+      // One pass: additive with no depth write sums the same in any order, so
+      // three's default two-pass draw of a transparent double-sided material
+      // (back faces, then front, each pass flagging needsUpdate and re-deriving
+      // the program) costs a draw and two program checks a frame for nothing.
+      forceSinglePass: true,
       fog: false,
     });
     haloMats.set(color, mat);
