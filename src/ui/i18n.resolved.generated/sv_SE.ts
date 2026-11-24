@@ -9211,6 +9211,7 @@ export const sv_SE: EnTranslations = {
     "related": "Relaterat",
     "nav": {
       "overview": "Översikt",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Så spelar du",
       "classes": "Klasser",
       "bestiary": "Bestiarium",

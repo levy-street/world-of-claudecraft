@@ -9211,6 +9211,7 @@ export const nl_NL: EnTranslations = {
     "related": "Gerelateerd",
     "nav": {
       "overview": "Overzicht",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Hoe te spelen",
       "classes": "Klassen",
       "bestiary": "Bestiarium",

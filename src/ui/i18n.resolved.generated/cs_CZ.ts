@@ -9211,6 +9211,7 @@ export const cs_CZ: EnTranslations = {
     "related": "Související",
     "nav": {
       "overview": "Přehled",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Jak hrát",
       "classes": "Třídy",
       "bestiary": "Bestiář",

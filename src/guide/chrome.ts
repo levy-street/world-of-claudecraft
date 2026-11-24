@@ -11,7 +11,14 @@ import {
   supportedLanguages,
   t,
 } from '../ui/i18n';
-import { GUIDE_BASE, type GuideGroup, groupedRoutes, hrefFor, topbarRoutes } from './routes';
+import {
+  ENCYCLOPEDIA_HOME,
+  GUIDE_BASE,
+  type GuideGroup,
+  groupedRoutes,
+  hrefFor,
+  topbarRoutes,
+} from './routes';
 import { mountSearch } from './search';
 
 export interface GuideChrome {
@@ -44,7 +51,10 @@ function topNavHtml(): string {
         `<li><a class="guide-nav-link" data-sub="${esc(r.sub)}" href="${esc(hrefFor(r.sub))}">${esc(t(r.navKey))}</a></li>`,
     )
     .join('');
-  return `<ul class="guide-nav-list">${items}</ul>`;
+  // The encyclopedia is a separate static site under /wiki (scripts/wiki_site/), not a Guide
+  // route, so it is a plain link the Guide router never claims.
+  const encyclopedia = `<li><a class="guide-nav-link" href="${ENCYCLOPEDIA_HOME}">${esc(t('guide.nav.encyclopedia'))}</a></li>`;
+  return `<ul class="guide-nav-list">${items}${encyclopedia}</ul>`;
 }
 
 function sidebarHtml(): string {

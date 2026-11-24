@@ -62,7 +62,10 @@ export function mountCompanion(assetUrl = (path) => path) {
   });
   const refreshNav = () => {
     for (const a of document.querySelectorAll('.app-nav a')) {
-      const active = a.hash === (location.hash || '#Main%20Page');
+      // The offline reader routes by #hash; the static site gives each page a path.
+      const active = a.hash
+        ? a.hash === (location.hash || '#Main%20Page')
+        : a.pathname === location.pathname;
       a.classList.toggle('active', active);
       if (active) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');

@@ -8,6 +8,8 @@
 import type { TranslationKey } from '../ui/i18n';
 
 export const GUIDE_BASE = '/wiki';
+/** The static player encyclopedia's home (scripts/wiki_site/), beside the Guide under /wiki. */
+export const ENCYCLOPEDIA_HOME = '/wiki/encyclopedia';
 
 // Sidebar groupings, in display order. The single 'compendium' bucket held every
 // subject page and reached seventeen entries once Rifts and Mounts landed, which is

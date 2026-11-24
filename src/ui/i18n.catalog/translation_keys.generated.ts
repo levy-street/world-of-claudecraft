@@ -10785,6 +10785,7 @@ export type TranslationKeyFlat =
   | 'guide.nav.dungeons'
   | 'guide.nav.economy'
   | 'guide.nav.editor'
+  | 'guide.nav.encyclopedia'
   | 'guide.nav.factions'
   | 'guide.nav.faq'
   | 'guide.nav.gear'

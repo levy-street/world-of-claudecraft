@@ -24,6 +24,8 @@ export const guideStrings = {
   // Top navigation + sidebar controls.
   nav: {
     overview: 'Overview',
+    // The static player encyclopedia at /wiki/encyclopedia (English only).
+    encyclopedia: 'Encyclopedia',
     howToPlay: 'How to Play',
     classes: 'Classes',
     bestiary: 'Bestiary',

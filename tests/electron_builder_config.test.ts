@@ -507,6 +507,17 @@ describe('package.json build block: per-arch NSIS installer + media dedup (issue
     expect(realBuild.files).toContain('!dist/guide-stills/**');
   });
 
+  it('sheds the web encyclopedia pages, data and pictures', () => {
+    for (const entry of [
+      '!dist/wiki/**',
+      '!dist/encyclopedia-data/**',
+      '!dist/encyclopedia-stills/**',
+      '!dist/encyclopedia-attacks/**',
+      '!dist/sitemap-wiki.xml',
+    ])
+      expect(realBuild.files).toContain(entry);
+  });
+
   it('the media and website-only excludes survive channel derivation for website, steam, and epic', () => {
     // desktopBuilderConfig derives every channel from this SAME base block; steam
     // and epic must inherit the slimming, not lose it when they layer their own
@@ -523,6 +534,7 @@ describe('package.json build block: per-arch NSIS installer + media dedup (issue
       '!dist/links.html',
       '!dist/CLAUDE.md',
       '!dist/guide-stills/**',
+      '!dist/wiki/**',
     ];
     const website = desktopBuilderConfig({ base: realBuild, distribution: 'website' });
     const steam = desktopBuilderConfig({

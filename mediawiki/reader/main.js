@@ -1,8 +1,7 @@
-import cardsUrl from '../seed/pages.tooltips.json?url';
-import seedUrl from '../seed/pages.xml?url';
+// The encyclopedia pages' script (encyclopedia.html is only the bundling entry; the build
+// writes one static page per article from it, see scripts/wiki_site/build.mjs).
 import { mountCompanion } from './companion.js';
-import { openReader } from './reader.js';
+import { enhanceWikiPage } from './wiki_page.js';
 
-const assetUrl = (path) => path;
-mountCompanion(assetUrl);
-openReader({ seedUrl, cardsUrl, assetUrl });
+mountCompanion();
+enhanceWikiPage();

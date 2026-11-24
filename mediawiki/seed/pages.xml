@@ -48523,7 +48523,7 @@ Block is the heavier tool, for a player who will not leave you alone. A block cu
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="7053">&apos;&apos;&apos;Seasonal event.&apos;&apos;&apos; Gourdlight Eve activities only appear while the event is running on your realm. The default event window runs from 18 October 2026 at 00:00 to 1 November 2026 at 12:00 UTC. The people who run a realm can change these dates.
+      <text xml:space="preserve" bytes="7053">&apos;&apos;&apos;Seasonal event.&apos;&apos;&apos; Gourdlight Eve activities only appear while the event is running on your realm. The default event window runs from 18 October 2026 at 00:00 to 8 November 2026 at 12:00 UTC. The people who run a realm can change these dates.
 
 Talk to a townsperson who takes part, from within 7 yards. During the event, you can visit each one once per reset day. A treat (65% chance) gives 2 sweets. A trick gives 1 and changes how you look for a short time.
 
@@ -190939,7 +190939,7 @@ Old Thatchgrin is one of the Elementals.
 | 12
 |-
 ! Health
-| 32292
+| 20369
 |-
 ! Armor
 | 352
@@ -190982,7 +190982,7 @@ Old Thatchgrin is one of the Elementals.
 | [[Gourdlight Eve]]
 |-
 ! Participant scaling
-| 32292 health when one player is fighting it. It gains 4709 more health for each extra player, up to 807300.
+| 20369 health when one player is fighting it. It gains 2970 more health for each extra player, up to 509225.
 |-
 ! Spawn schedule
 | Only appears during [[Gourdlight Eve]]. Sleeps by day and wakes at night. After it is killed, its body stays for up to 300 sec. When the body is gone, it comes back 300 sec later.
@@ -190994,7 +190994,7 @@ For creatures in the outside world, these numbers already include level scaling.
 {| class=&quot;wikitable article-facts&quot;
 |-
 ! Level 12
-| 32292 health, 352 armor, 55 to 86 base weapon damage.
+| 20369 health, 352 armor, 55 to 86 base weapon damage.
 |}
 
 == Locations ==

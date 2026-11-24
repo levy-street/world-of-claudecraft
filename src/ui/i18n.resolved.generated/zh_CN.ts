@@ -9211,6 +9211,7 @@ export const zh_CN: EnTranslations = {
     "related": "相关内容",
     "nav": {
       "overview": "概览",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "游戏入门",
       "classes": "职业",
       "bestiary": "生物图鉴",

@@ -291,7 +291,7 @@ await build({
 });
 
 const { stdout } = await execFileAsync(process.execPath, [bundlePath], {
-  maxBuffer: 50 * 1024 * 1024,
+  maxBuffer: 256 * 1024 * 1024,
 });
 await writeFile(outputPath, stdout);
 await copyFile(

@@ -9211,6 +9211,7 @@ export const ja_JP: EnTranslations = {
     "related": "関連項目",
     "nav": {
       "overview": "概要",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "遊び方",
       "classes": "クラス",
       "bestiary": "モンスター図鑑",

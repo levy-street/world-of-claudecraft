@@ -9211,6 +9211,7 @@ export const id_ID: EnTranslations = {
     "related": "Terkait",
     "nav": {
       "overview": "Ikhtisar",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Cara Bermain",
       "classes": "Kelas",
       "bestiary": "Bestiari",

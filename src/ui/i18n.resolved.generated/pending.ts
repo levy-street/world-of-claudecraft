@@ -10,64 +10,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "es_ES": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "fr_FR": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "fr_CA": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "en_CA": [],
   "it_IT": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "de_DE": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "zh_CN": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "zh_TW": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "ko_KR": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "ja_JP": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "pt_BR": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "ru_RU": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "cs_CZ": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "nl_NL": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "pl_PL": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "id_ID": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "tr_TR": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "sv_SE": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "vi_VN": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ],
   "da_DK": [
-    "guide.home.encyclopedia"
+    "guide.home.encyclopedia",
+    "guide.nav.encyclopedia"
   ]
 };

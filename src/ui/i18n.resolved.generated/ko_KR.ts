@@ -9211,6 +9211,7 @@ export const ko_KR: EnTranslations = {
     "related": "관련 항목",
     "nav": {
       "overview": "개요",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "플레이 방법",
       "classes": "직업",
       "bestiary": "몬스터 도감",

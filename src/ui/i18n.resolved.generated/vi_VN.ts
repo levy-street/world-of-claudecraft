@@ -9211,6 +9211,7 @@ export const vi_VN: EnTranslations = {
     "related": "Liên quan",
     "nav": {
       "overview": "Tổng Quan",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Cách Chơi",
       "classes": "Lớp Nhân Vật",
       "bestiary": "Bách Thú",

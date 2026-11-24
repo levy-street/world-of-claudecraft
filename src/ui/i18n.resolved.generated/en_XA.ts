@@ -9211,6 +9211,7 @@ export const en_XA: EnTranslations = {
     "related": "[Ŕéļáţéð]",
     "nav": {
       "overview": "[Óʋéŕʋíéŵ]",
+      "encyclopedia": "[Éñçýçļóþéðíá]",
       "howToPlay": "[Ĥóŵ ţó Þļáý]",
       "classes": "[Çļáššéš]",
       "bestiary": "[Ɓéšţíáŕý]",

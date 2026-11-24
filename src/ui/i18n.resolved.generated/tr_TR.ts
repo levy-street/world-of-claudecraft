@@ -9211,6 +9211,7 @@ export const tr_TR: EnTranslations = {
     "related": "İlgili",
     "nav": {
       "overview": "Genel Bakış",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Nasıl Oynanır",
       "classes": "Sınıflar",
       "bestiary": "Yaratıklar",

@@ -9211,6 +9211,7 @@ export const es_ES: EnTranslations = {
     "related": "Relacionado",
     "nav": {
       "overview": "Resumen",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Cómo jugar",
       "classes": "Clases",
       "bestiary": "Bestiario",

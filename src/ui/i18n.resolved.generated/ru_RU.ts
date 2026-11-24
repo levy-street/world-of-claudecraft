@@ -9211,6 +9211,7 @@ export const ru_RU: EnTranslations = {
     "related": "Связанное",
     "nav": {
       "overview": "Обзор",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Как играть",
       "classes": "Классы",
       "bestiary": "Бестиарий",

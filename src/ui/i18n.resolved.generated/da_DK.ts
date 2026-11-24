@@ -9211,6 +9211,7 @@ export const da_DK: EnTranslations = {
     "related": "Relateret",
     "nav": {
       "overview": "Oversigt",
+      "encyclopedia": "Encyclopedia",
       "howToPlay": "Sådan spiller du",
       "classes": "Klasser",
       "bestiary": "Bestiarium",
