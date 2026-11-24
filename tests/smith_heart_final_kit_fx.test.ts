@@ -359,9 +359,12 @@ describe('FinalKitFx over a fake world', () => {
     expect(visibleNamed(root, 'smithHeartFinalWhirl')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalWhirlCore')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalWhirlSmoke')).toBe(1);
-    // The ember pool burns (final_pool_flames.ts, the polish pass of
-    // 2026-11-23): its tongues of fire and its embers.
+    // The ember pool burns (final_pool_flames.ts, the polish passes of
+    // 2026-11-23 and 11-24): soft flames over their dark body, the heat glow
+    // on the pool and its embers.
     expect(visibleNamed(root, 'smithHeartFinalPoolFlames')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartFinalPoolFlameBody')).toBe(1);
+    expect(visibleNamed(root, 'smithHeartFinalPoolGlow')).toBe(1);
     expect(visibleNamed(root, 'smithHeartFinalPoolEmbers')).toBe(1);
     // The blade hovers at its rise, its line on the floor.
     expect(visibleNamed(root, 'smithHeartStarBlade')).toBe(1);
@@ -462,6 +465,7 @@ describe('FinalKitFx over a fake world', () => {
     expect(footprintsShown(root)).toBe(0);
     expect(visibleNamed(root, 'smithHeartFinalAnvil')).toBe(0);
     expect(visibleNamed(root, 'smithHeartFinalPoolFlames')).toBe(0);
+    expect(visibleNamed(root, 'smithHeartFinalPoolGlow')).toBe(0);
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-final-kit-fx')).toBeUndefined();
   });

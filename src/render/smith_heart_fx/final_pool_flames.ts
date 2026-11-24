@@ -1,16 +1,24 @@
 // The burning pools' fire (the Ember Mark's smouldering embers, Mythic's
-// Forge Fire, part 2's Cinder Trail), a part of FinalKitFx (the kit keeps each
-// pool's floor telegraph at the sim's radius, its danger edge, on every tier).
-// The polish pass of 2026-11-23: the pools were a flat molten disc pricked
-// with a few stick-like flame sprites; now low tongues of real fire lick up
-// all over each pool (the Heat guardian's tongue fragment, heat_lava_wall_glsl
-// .ts), leaning and breathing on their own clocks, with embers drifting up
-// off them. Two draws for every pool at once (one instanced tongue draw, one
-// point draw).
+// Forge Fire, part 2's Cinder Trail, Magma Rift's lava pools), a part of
+// FinalKitFx (the kit keeps each pool's floor telegraph at the sim's radius,
+// its danger edge, on every tier).
+// The second polish pass of 2026-11-24: the first pass's tongues read as rows
+// of regular little cones standing on the disc. Now each pool burns with:
+//   - soft flames (soft_flame_glsl.ts): noise cards with no outline, wide and
+//     round low, licked into tongues and holes up high, their roots melting
+//     into the floor; each on its own height, clock and wandering foot (a
+//     flame dies and rekindles a little elsewhere), so the pool reads as one
+//     living fire;
+//   - the heat glow on the pool's surface under them, breathing;
+//   - smoke curling up off it (detail tier);
+//   - embers drifting up.
+// Five draws for every pool at once (the glow, the smoke, the fire's dark
+// body and its flames, one instanced draw each, and the embers' points).
 //
-// Binding (readability): every tongue's foot stands inside the sim's radius
-// (`POOL_FLAMES.reach` of it), so the fire never reads wider than the hit
-// area; the floor telegraph stays the edge.
+// Binding (readability): every flame's foot stands inside the sim's radius
+// by its own width and lean (poolTongueReach in final_pool_flames_core.ts),
+// the glow stays inside the radius, so the fire never reads wider than the
+// hit area; the floor telegraph stays the edge.
 //
 // Rules (src/render/CLAUDE.md): built whole in the constructor under the
 // kit's root (its one gated attach); fixed pools; no light; the per-pool
@@ -18,58 +26,115 @@
 
 import * as THREE from 'three';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
-import { POOL_FLAMES, poolFlameHeat, poolFlameHeight } from './final_pool_flames_core';
+import {
+  POOL_FLAME_SHAPE,
+  POOL_FLAMES,
+  poolFlameHeat,
+  poolFlameHeight,
+} from './final_pool_flames_core';
 import { fireRampGlsl } from './heat_flame_core';
-import { WALL_EMBER_FRAG, wallTongueFrag } from './heat_lava_wall_glsl';
+import { WALL_EMBER_FRAG } from './heat_lava_wall_glsl';
 import { lineFireHash } from './line_fire_wall';
+import {
+  SOFT_FIRE_COMMON,
+  SOFT_GLOW_FRAG,
+  SOFT_SMOKE_FRAG,
+  softFlameFrag,
+} from './soft_flame_glsl';
 
-const TONGUE_VERT = /* glsl */ `
+const FLAME_VERT = /* glsl */ `
 uniform float uTime;
 attribute vec4 aPool;   // the pool's centre (x, y, z) and the sim's radius
-attribute vec2 aFlame;  // its heat (0 hides), its tongues' height
+attribute vec2 aFlame;  // its heat (0 hides), its flames' height
 attribute vec3 aTongue; // the bearing (0..1), the share out (0..1), the seed
+varying vec2 vUv;
+varying float vSeed;
+varying float vAlpha;
+varying float vHeat;
+${SOFT_FIRE_COMMON}
+${CAMERA_RELATIVE_GLSL}
+void main() {
+  vUv = vec2(position.x + 0.5, position.y + 0.5);
+  float seed = aTongue.z;
+  vSeed = seed;
+  // Its life: it kindles, burns, gutters; each life a little elsewhere.
+  float period = 1.3 + 1.1 * fract(seed * 7.31);
+  float ph0 = uTime / period + seed * 3.7;
+  float cyc = floor(ph0);
+  float ph = ph0 - cyc;
+  float life = smoothstep(0.0, 0.2, ph) * (1.0 - smoothstep(0.62, 1.0, ph));
+  float bearing = (aTongue.x + 0.22 * (sfHash(cyc + seed * 91.0) - 0.5)) * 6.2831853;
+  float share = clamp(aTongue.y + 0.35 * (sfHash(cyc * 1.7 + seed * 53.0) - 0.5), 0.0, 1.0);
+  // Uneven: a few tall flames over a bed of low ones, lower toward the rim.
+  float tall = fract(seed * 13.7);
+  float hMax = aFlame.y * (0.42 + 0.58 * pow(tall, 1.5)) * (1.0 - 0.3 * share);
+  float hgt = hMax * (0.72 + 0.28 * life) * aFlame.x;
+  vAlpha = aFlame.x * life;
+  vHeat = 0.8 + 0.2 * tall;
+  if (vAlpha <= 0.003 || hgt < 0.05) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  float halfW = hMax * ${POOL_FLAME_SHAPE.halfW.toFixed(3)} * (0.8 + 0.2 * fract(seed * 3.3));
+  // Its foot planted in by its own width and lean (poolTongueReach).
+  float spread = hMax * ${(POOL_FLAME_SHAPE.halfW + POOL_FLAME_SHAPE.lean).toFixed(3)};
+  float reach = max(0.0, min(aPool.w * ${POOL_FLAMES.reach.toFixed(3)}, aPool.w - spread));
+  float out_ = sqrt(share) * reach;
+  vec3 foot = aPool.xyz + vec3(sin(bearing) * out_, 0.02, cos(bearing) * out_);
+  float s = seed * 40.0;
+  vec2 lean = vec2(sin(uTime * 0.7 + s), cos(uTime * 0.6 + s * 1.3)) * hMax * ${POOL_FLAME_SHAPE.lean.toFixed(3)};
+  vec3 w = sfFlameCard(foot, hgt, halfW, lean, vec2(position.x * 2.0, vUv.y));
+  gl_Position = projectionMatrix * wocCamRelView(w);
+}
+`;
+
+const GLOW_VERT = /* glsl */ `
+uniform float uTime;
+attribute vec4 aPool;
+attribute vec2 aFlame;
 varying vec2 vUv;
 varying float vSeed;
 varying float vAlpha;
 ${CAMERA_RELATIVE_GLSL}
 void main() {
   vUv = vec2(position.x + 0.5, position.y + 0.5);
-  vSeed = aTongue.z;
-  float a = aTongue.x * 6.2831853;
-  float period = 0.8 + 0.9 * fract(aTongue.z * 7.31);
-  float ph = fract(uTime / period + aTongue.z * 3.7);
-  float grow = sin(min(ph, 0.75) / 0.75 * 3.14159);
-  float lift = smoothstep(0.62, 1.0, ph) * 0.5;
-  // Lower toward the pool's edge (a mound of fire, not a hedge).
-  float edge = 1.0 - 0.45 * aTongue.y;
-  // Uneven: a few tall licks over a carpet of low ones.
-  float tall = fract(aTongue.z * 13.7);
-  float hgt = aFlame.y * edge * (0.3 + 0.7 * tall * tall) * (0.5 + 0.5 * grow) * aFlame.x;
-  vAlpha = aFlame.x * (1.0 - smoothstep(0.62, 0.92, ph)) * smoothstep(0.0, 0.1, ph);
-  if (vAlpha <= 0.002 || hgt < 0.05) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
-  // Its foot no further out than keeps its whole flame inside the sim's
-  // radius (poolTongueReach in final_pool_flames_core.ts, at its tallest).
-  float hMax = aFlame.y;
-  float spread = (0.35 + hMax * 0.75) * 1.2 * 0.5 * 0.8 + hMax * 0.22;
-  float reach = max(0.0, min(aPool.w * ${POOL_FLAMES.reach.toFixed(3)}, aPool.w - spread));
-  float out_ = sqrt(aTongue.y) * reach;
-  vec3 foot = aPool.xyz + vec3(sin(a) * out_, 0.0, cos(a) * out_);
-  vec3 base = foot + vec3(0.0, -0.1 + lift * hgt * 0.8, 0.0);
-  float v = vUv.y;
-  vec3 up = vec3(0.0, hgt, 0.0);
-  float s = aTongue.z * 40.0;
-  vec3 lean = vec3(sin(uTime * 0.7 + s), 0.0, cos(uTime * 0.6 + s * 1.3)) * hgt * 0.22;
-  vec3 spine = base + up * v + lean * v * v;
-  vec3 tangent = normalize(up + 2.0 * lean * v);
-  vec3 toCam = normalize(cameraPosition - spine);
-  vec3 side = cross(tangent, toCam);
-  float sl = length(side);
-  side = sl > 1e-4 ? side / sl : vec3(1.0, 0.0, 0.0);
-  float sBend = sin(v * 5.2 - uTime * 3.6 + s) * (0.6 + 0.4 * sin(uTime * 1.3 + s * 0.7));
-  float flick = sin(uTime * 9.3 + s * 2.1) * 0.5 + sin(uTime * 13.7 + s * 3.3) * 0.3;
-  spine += side * (sBend * 0.14 * v + flick * 0.1 * v * v * v) * hgt;
-  float width = (0.35 + hgt * 0.75) * (0.8 + 0.4 * fract(aTongue.z * 3.3)) * (1.0 - 0.45 * lift);
-  vec3 w = spine + side * position.x * width;
+  vSeed = fract(aPool.x * 0.37 + aPool.z * 0.11);
+  vAlpha = aFlame.x * 0.1;
+  if (vAlpha <= 0.003) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  // Inside the sim's radius.
+  float r = aPool.w * 0.94;
+  vec3 w = aPool.xyz + vec3(position.x * 2.0 * r, 0.09, -position.y * 2.0 * r);
+  gl_Position = projectionMatrix * wocCamRelView(w);
+}
+`;
+
+const SMOKE_VERT = /* glsl */ `
+uniform float uTime;
+attribute vec4 aPool;
+attribute vec2 aFlame;
+attribute vec3 aTongue; // the bearing, the share out, the seed
+varying vec2 vUv;
+varying float vSeed;
+varying float vAlpha;
+varying float vHeat;
+${SOFT_FIRE_COMMON}
+${CAMERA_RELATIVE_GLSL}
+void main() {
+  vUv = vec2(position.x + 0.5, position.y + 0.5);
+  float seed = aTongue.z;
+  vSeed = seed;
+  float period = 3.2 + 1.6 * fract(seed * 5.9);
+  float ph0 = uTime / period + seed * 2.3;
+  float cyc = floor(ph0);
+  float life = ph0 - cyc;
+  float bearing = (aTongue.x + 0.3 * sfHash(cyc + seed * 17.0)) * 6.2831853;
+  float out_ = sqrt(aTongue.y) * aPool.w * 0.55;
+  float H = aFlame.y;
+  float rise = H * (0.55 + 2.4 * life);
+  float drift = life * life * 1.6;
+  vec3 c = aPool.xyz + vec3(sin(bearing) * out_ + drift * sin(seed * 9.0), rise, cos(bearing) * out_ + drift * cos(seed * 9.0));
+  float halfS = H * (0.3 + 0.45 * life);
+  vAlpha = aFlame.x * smoothstep(0.0, 0.2, life) * (1.0 - smoothstep(0.45, 1.0, life)) * 0.75;
+  vHeat = 1.0 - smoothstep(0.0, 0.5, life);
+  if (vAlpha <= 0.003) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  vec3 w = sfSmokeCard(c, halfS, vec2(position.x * 2.0, position.y * 2.0));
   gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
@@ -90,13 +155,13 @@ void main() {
   vSpark = 0.0;
   float a = aEmber.x * 6.2831853;
   float out_ = sqrt(aEmber.y) * ${POOL_FLAMES.reach.toFixed(3)} * aPool.w * 0.8;
-  float hgt = life * (2.5 + 4.0 * fract(aEmber.z * 2.3));
+  float hgt = life * (2.5 + 4.5 * fract(aEmber.z * 2.3));
   float curl = sin(uTime * 1.3 + aEmber.z * 40.0 + hgt * 0.5) * (0.3 + hgt * 0.12);
   vec3 p = aPool.xyz + vec3(sin(a) * out_ + curl, 0.3 + hgt, cos(a) * out_ - curl * 0.6);
   vAlpha = aFlame.x * smoothstep(0.0, 0.08, life) * (1.0 - smoothstep(0.65, 1.0, life));
   vec4 mv = wocCamRelView(p);
   gl_Position = projectionMatrix * mv;
-  float sz = (0.18 + 0.2 * fract(aEmber.z * 5.1)) * (1.0 - 0.5 * life);
+  float sz = (0.16 + 0.2 * fract(aEmber.z * 5.1)) * (1.0 - 0.5 * life);
   gl_PointSize = vAlpha > 0.002 ? clamp(sz * uPx / max(1.0, -mv.z), 1.0, 24.0) : 0.0;
 }
 `;
@@ -113,74 +178,123 @@ export interface PoolFlamesHost {
   uTime: { value: number };
   geometries: THREE.BufferGeometry[];
   materials: THREE.Material[];
-  /** Detail tier (the low tier keeps fewer tongues and embers). */
+  /** Detail tier (the low tier keeps fewer flames and embers, no smoke). */
   detail: boolean;
   /** The draw order (over the floor rungs). */
   order: number;
 }
 
+/** One instanced layer's per-pool attributes: the pool (centre, radius) and
+ *  its fire (heat, height), `per` instances a pool. */
+interface Layer {
+  per: number;
+  pool: THREE.BufferAttribute;
+  flame: THREE.BufferAttribute;
+  obj: THREE.Object3D;
+}
+
 export class FinalPoolFlames {
   private readonly slots: Slot[] = [];
-  private readonly perTongue: number;
-  private readonly perEmber: number;
-  private readonly tPool: THREE.InstancedBufferAttribute;
-  private readonly tFlame: THREE.InstancedBufferAttribute;
-  private readonly ePool: THREE.BufferAttribute;
-  private readonly eFlame: THREE.BufferAttribute;
-  private readonly tongues: THREE.Mesh;
-  private readonly embers: THREE.Points;
+  private readonly layers: Layer[] = [];
   private dirty = false;
 
   constructor(h: PoolFlamesHost) {
     const L = POOL_FLAMES;
-    this.perTongue = h.detail ? L.tongues : L.tonguesLow;
-    this.perEmber = h.detail ? L.embers : L.embersLow;
     for (let i = 0; i < L.pools; i++) this.slots.push({ id: -1, seen: false, heat: -1 });
-    const quad = new THREE.PlaneGeometry(1, 1, 1, 8);
-    const tg = new THREE.InstancedBufferGeometry();
-    tg.index = quad.index;
-    tg.setAttribute('position', quad.getAttribute('position'));
-    const nT = L.pools * this.perTongue;
-    const ta = new Float32Array(nT * 3);
-    for (let p = 0; p < L.pools; p++)
-      for (let k = 0; k < this.perTongue; k++) {
-        const i = p * this.perTongue + k;
-        // Even bearings round the pool, jittered; feet spread over its disc.
-        ta[i * 3] = (k + 0.7 * lineFireHash(i, 601)) / this.perTongue;
-        ta[i * 3 + 1] = (k % 3) / 3 + 0.33 * lineFireHash(i, 613);
-        ta[i * 3 + 2] = lineFireHash(i, 627);
-      }
-    tg.setAttribute('aTongue', new THREE.InstancedBufferAttribute(ta, 3));
-    this.tPool = new THREE.InstancedBufferAttribute(new Float32Array(nT * 4), 4);
-    this.tPool.setUsage(THREE.DynamicDrawUsage);
-    this.tFlame = new THREE.InstancedBufferAttribute(new Float32Array(nT * 2), 2);
-    this.tFlame.setUsage(THREE.DynamicDrawUsage);
-    tg.setAttribute('aPool', this.tPool);
-    tg.setAttribute('aFlame', this.tFlame);
-    tg.instanceCount = nT;
-    h.geometries.push(quad, tg);
+    const quad = new THREE.PlaneGeometry(1, 1, 1, 1);
+    h.geometries.push(quad);
     const ramp = fireRampGlsl('fireRamp');
-    const tMat = new THREE.ShaderMaterial({
-      name: 'smithHeartFinalPoolFlames',
-      uniforms: { uTime: h.uTime, uHeat: { value: 0.82 } },
-      vertexShader: TONGUE_VERT,
-      fragmentShader: wallTongueFrag(ramp),
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-      toneMapped: false,
-      fog: false,
-    });
-    h.materials.push(tMat);
-    this.tongues = new THREE.Mesh(tg, tMat);
-    this.tongues.name = 'smithHeartFinalPoolFlames';
-    this.tongues.frustumCulled = false;
-    this.tongues.visible = false;
-    this.tongues.renderOrder = h.order;
-    h.root.add(this.tongues);
 
-    const nE = L.pools * this.perEmber;
+    /** An instanced card layer: `per` cards a pool, its own attributes. */
+    const cards = (
+      name: string,
+      per: number,
+      vertexShader: string,
+      fragmentShader: string,
+      blending: THREE.Blending,
+      order: number,
+      salt: number,
+      defines: Record<string, string> = {},
+    ): void => {
+      if (per <= 0) return;
+      const g = new THREE.InstancedBufferGeometry();
+      g.index = quad.index;
+      g.setAttribute('position', quad.getAttribute('position'));
+      const n = L.pools * per;
+      const ta = new Float32Array(n * 3);
+      for (let p = 0; p < L.pools; p++)
+        for (let k = 0; k < per; k++) {
+          const i = p * per + k;
+          // Even bearings round the pool, jittered; feet spread over its disc.
+          ta[i * 3] = (k + 0.7 * lineFireHash(i, salt)) / per;
+          ta[i * 3 + 1] = (k * 0.618034 + 0.25 * lineFireHash(i, salt + 12)) % 1;
+          ta[i * 3 + 2] = lineFireHash(i, salt + 26);
+        }
+      g.setAttribute('aTongue', new THREE.InstancedBufferAttribute(ta, 3));
+      const pool = new THREE.InstancedBufferAttribute(new Float32Array(n * 4), 4);
+      pool.setUsage(THREE.DynamicDrawUsage);
+      const flame = new THREE.InstancedBufferAttribute(new Float32Array(n * 2), 2);
+      flame.setUsage(THREE.DynamicDrawUsage);
+      g.setAttribute('aPool', pool);
+      g.setAttribute('aFlame', flame);
+      g.instanceCount = n;
+      h.geometries.push(g);
+      const mat = new THREE.ShaderMaterial({
+        name,
+        uniforms: { uTime: h.uTime, uHeat: { value: 0.86 } },
+        defines,
+        vertexShader,
+        fragmentShader,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending,
+        toneMapped: false,
+        fog: false,
+      });
+      h.materials.push(mat);
+      const mesh = new THREE.Mesh(g, mat);
+      mesh.name = name;
+      mesh.frustumCulled = false;
+      mesh.visible = false;
+      mesh.renderOrder = h.order + order;
+      h.root.add(mesh);
+      this.layers.push({ per, pool, flame, obj: mesh });
+    };
+    // The glow on the pool first, the smoke behind the fire, the fire, then
+    // the embers over it.
+    cards('smithHeartFinalPoolGlow', 1, GLOW_VERT, SOFT_GLOW_FRAG, THREE.AdditiveBlending, 0, 801);
+    cards(
+      'smithHeartFinalPoolSmoke',
+      h.detail ? L.smokes : L.smokesLow,
+      SMOKE_VERT,
+      SOFT_SMOKE_FRAG,
+      THREE.NormalBlending,
+      1,
+      851,
+    );
+    cards(
+      'smithHeartFinalPoolFlameBody',
+      h.detail ? L.tongues : L.tonguesLow,
+      FLAME_VERT,
+      softFlameFrag(ramp),
+      THREE.NormalBlending,
+      2,
+      601,
+      { SOFT_DARK: '' },
+    );
+    cards(
+      'smithHeartFinalPoolFlames',
+      h.detail ? L.tongues : L.tonguesLow,
+      FLAME_VERT,
+      softFlameFrag(ramp),
+      THREE.AdditiveBlending,
+      3,
+      601,
+    );
+
+    const perEmber = h.detail ? L.embers : L.embersLow;
+    const nE = L.pools * perEmber;
     const eg = new THREE.BufferGeometry();
     eg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nE * 3), 3));
     const ea = new Float32Array(nE * 4);
@@ -191,12 +305,12 @@ export class FinalPoolFlames {
       ea[i * 4 + 3] = 0.3 + 0.4 * lineFireHash(i, 727);
     }
     eg.setAttribute('aEmber', new THREE.BufferAttribute(ea, 4));
-    this.ePool = new THREE.BufferAttribute(new Float32Array(nE * 4), 4);
-    this.ePool.setUsage(THREE.DynamicDrawUsage);
-    this.eFlame = new THREE.BufferAttribute(new Float32Array(nE * 2), 2);
-    this.eFlame.setUsage(THREE.DynamicDrawUsage);
-    eg.setAttribute('aPool', this.ePool);
-    eg.setAttribute('aFlame', this.eFlame);
+    const ePool = new THREE.BufferAttribute(new Float32Array(nE * 4), 4);
+    ePool.setUsage(THREE.DynamicDrawUsage);
+    const eFlame = new THREE.BufferAttribute(new Float32Array(nE * 2), 2);
+    eFlame.setUsage(THREE.DynamicDrawUsage);
+    eg.setAttribute('aPool', ePool);
+    eg.setAttribute('aFlame', eFlame);
     h.geometries.push(eg);
     const eMat = new THREE.ShaderMaterial({
       name: 'smithHeartFinalPoolEmbers',
@@ -210,12 +324,13 @@ export class FinalPoolFlames {
       fog: false,
     });
     h.materials.push(eMat);
-    this.embers = new THREE.Points(eg, eMat);
-    this.embers.name = 'smithHeartFinalPoolEmbers';
-    this.embers.frustumCulled = false;
-    this.embers.visible = false;
-    this.embers.renderOrder = h.order + 1;
-    h.root.add(this.embers);
+    const embers = new THREE.Points(eg, eMat);
+    embers.name = 'smithHeartFinalPoolEmbers';
+    embers.frustumCulled = false;
+    embers.visible = false;
+    embers.renderOrder = h.order + 4;
+    h.root.add(embers);
+    this.layers.push({ per: perEmber, pool: ePool, flame: eFlame, obj: embers });
   }
 
   begin(): void {
@@ -244,27 +359,18 @@ export class FinalPoolFlames {
   }
 
   private write(i: number, x: number, y: number, z: number, r: number, heat: number, h: number) {
-    const tp = this.tPool.array as Float32Array;
-    const tf = this.tFlame.array as Float32Array;
-    for (let k = 0; k < this.perTongue; k++) {
-      const q = i * this.perTongue + k;
-      tp[q * 4] = x;
-      tp[q * 4 + 1] = y;
-      tp[q * 4 + 2] = z;
-      tp[q * 4 + 3] = r;
-      tf[q * 2] = heat;
-      tf[q * 2 + 1] = h;
-    }
-    const ep = this.ePool.array as Float32Array;
-    const ef = this.eFlame.array as Float32Array;
-    for (let k = 0; k < this.perEmber; k++) {
-      const q = i * this.perEmber + k;
-      ep[q * 4] = x;
-      ep[q * 4 + 1] = y;
-      ep[q * 4 + 2] = z;
-      ep[q * 4 + 3] = r;
-      ef[q * 2] = heat;
-      ef[q * 2 + 1] = h;
+    for (const l of this.layers) {
+      const tp = l.pool.array as Float32Array;
+      const tf = l.flame.array as Float32Array;
+      for (let k = 0; k < l.per; k++) {
+        const q = i * l.per + k;
+        tp[q * 4] = x;
+        tp[q * 4 + 1] = y;
+        tp[q * 4 + 2] = z;
+        tp[q * 4 + 3] = r;
+        tf[q * 2] = heat;
+        tf[q * 2 + 1] = h;
+      }
     }
     this.dirty = true;
   }
@@ -285,14 +391,13 @@ export class FinalPoolFlames {
       }
     }
     if (this.dirty) {
-      this.tPool.needsUpdate = true;
-      this.tFlame.needsUpdate = true;
-      this.ePool.needsUpdate = true;
-      this.eFlame.needsUpdate = true;
+      for (const l of this.layers) {
+        l.pool.needsUpdate = true;
+        l.flame.needsUpdate = true;
+      }
       this.dirty = false;
     }
-    this.tongues.visible = any;
-    this.embers.visible = any;
+    for (const l of this.layers) l.obj.visible = any;
   }
 
   hide(): void {
