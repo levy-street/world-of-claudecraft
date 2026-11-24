@@ -41,6 +41,7 @@ import {
   PERFECT_MOMENT_ID,
   TEMPORAL_ECHO_ID,
 } from '../../../sim/combat/chronomancy';
+import { OAKHIDE_ID, OAKHIDE_OVERLAP_ID } from '../../../sim/combat/druid_oakhide';
 import { TEMPORAL_HOURGLASS_ID } from '../../../sim/combat/temporal_hourglass';
 import { ABILITIES } from '../../../sim/data';
 import type { AbilityDef, AuraKind } from '../../../sim/types';
@@ -372,6 +373,10 @@ function buildCatalog(): ReadonlyMap<string, AuraTrackEntry> {
       }
     }
   }
+  // A second, overlapping Oakhide runs under its own id (combat/druid_oakhide.ts);
+  // it tracks exactly like the first.
+  const oakhide = out.get(OAKHIDE_ID);
+  if (oakhide) out.set(OAKHIDE_OVERLAP_ID, { ...oakhide, id: OAKHIDE_OVERLAP_ID });
   return out;
 }
 

@@ -4791,6 +4791,7 @@ export const vi_VN: EnTranslations = {
       "cooldownCap": "{used} trên {cap} giây giảm thời gian hồi chiêu đã dùng trong khung này",
       "bruinRushWindow": "Hình Mèo không tốn mana và ghim mục tiêu Cú Lao Bruin của bạn, làm chậm nó {pct}% trong {sec} giây",
       "funeralHarvestLock": "Thu Hoạch Tang Lễ chưa thể tạo thêm Mảnh Linh Hồn",
+      "redTorrent": "Hiệu ứng chảy máu của bạn trên mục tiêu Thu Hoạch Đỏ gây sát thương nhanh hơn {pct}%",
       "effigyPlankHide": "Gạt đi {pct}% mỗi đòn, cho tới khi mũi đâm Thương Mảnh Vỡ dập tắt đèn trong mắt nó",
       "effigyLanternOut": "Đèn của Đốc Công Rơm đã tắt đối với bạn: đòn của bạn và thú nuôi bỏ qua Da Ván Gỗ và gây đủ sát thương",
       "leadenHexLock": "Bùa Trì Trệ chưa thể trói mục tiêu này lại",
@@ -4842,7 +4843,7 @@ export const vi_VN: EnTranslations = {
       "coldsightRead": "Kéo Cung Dài tiếp theo của bạn gây thêm {longDrawPct}% sát thương, hoặc Đòn Bắn Sa Ngã tiếp theo của bạn gây thêm {fellShotPct}%",
       "duskEconomy": "Kỹ năng tốn ít hơn {pct}% năng lượng",
       "moontide": "Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó",
-      "oldBlood": "Huyết Cổ {stacks}/{max}. Đòn trúng từ Vuốt Xé, Lóc Xé, Vết Nứt Máu, Cắn Xé Máu, Vuốt Quét Ngang và Nghiền Xương mỗi lần cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin",
+      "oldBlood": "Huyết Cổ {stacks}/{max}. Ở Hình Mèo, mỗi nhịp chảy máu của bạn cộng 1, nhiều nhất một lần mỗi 3 giây, và mỗi đòn trúng của Đòn Lẻn Vồ và Lao Vồ cộng 1; ở Hình Bruin, mỗi đòn trúng của Vuốt Quét Ngang và Nghiền Xương cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin",
       "verdance": "Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai",
       "freeExecute": "Kỹ năng kết liễu hợp lệ tiếp theo của bạn không tốn gì",
       "resourceSap": "Hồi {value} tài nguyên hiện tại của bạn mỗi {interval} giây",
@@ -18415,17 +18416,17 @@ export const vi_VN: EnTranslations = {
       "claw": {
         "name": "Vuốt Xé",
         "description": "Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
+        "specNote_feral": "Mỗi đòn đánh trúng thêm một tầng Xé Tơi, một hiệu ứng chảy máu gây 6 sát thương trong 8 giây mỗi tầng (tối đa 5 tầng). Tầng mới làm mới thời gian hiệu lực."
       },
       "scratch": {
         "name": "Cào",
         "description": "Cào qua các mục tiêu gần trong 6 mét, gây sát thương vũ khí cộng {damage}. Nhận 1 điểm liên kích cho mỗi mục tiêu trúng đòn. Làm lộ kẻ địch tàng hình trong vùng quét. Chỉ dùng ở Hình Mèo.",
-        "specNote_feral": "Mỗi đòn trúng thêm 1 Huyết Cổ (tối đa 3)."
+        "specNote_feral": "Mỗi kẻ địch bị đánh trúng cũng chảy máu vì Vết Cào: 12 sát thương trong 6 giây."
       },
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
         "description": "Đòn kết liễu gây {damage}. Chỉ trong Hình Mèo.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng."
+        "specNote_feral": "Gây thêm 15% sát thương cho mỗi hiệu ứng chảy máu của bạn trên mục tiêu và làm mới Vết Nứt Máu của bạn về toàn bộ thời gian hiệu lực. Ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một đòn đánh kéo dài Lóc Xé và Vết Nứt Máu của bạn, khiến các hiệu ứng chảy máu của bạn trên mục tiêu gây sát thương nhanh hơn 15% trong 8 giây, và hồi năng lượng."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
@@ -18480,11 +18481,11 @@ export const vi_VN: EnTranslations = {
       },
       "pounce": {
         "name": "Đòn Lẻn Vồ",
-        "description": "Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Mèo. Khi không ẩn thân, nút này là Lao Vồ."
+        "description": "Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn và, khi là Hoang Dã, thêm 1 Huyết Cổ (tối đa 3) và mở Xé Họng, một hiệu ứng chảy máu gây 72 sát thương trong 12 giây. Chỉ dùng được ở Hình Mèo. Khi không ẩn thân, nút này là Lao Vồ."
       },
       "lunge": {
         "name": "Lao Vồ",
-        "description": "Lao vào kẻ địch cách xa tới 12 thước, gây 60% sát thương vũ khí và nhận 1 điểm combo. Chỉ dùng được ở Hình Mèo."
+        "description": "Chuyển sang Hình Mèo nếu bạn chưa ở dạng đó, rồi lao vào kẻ địch cách xa tới 25 thước. Khi tới nơi, gây 60% sát thương vũ khí, nhận 1 điểm liên hoàn và, khi là Hoang Dã, thêm 1 Huyết Cổ (tối đa 3); cú lao bị cắt ngang sẽ hoàn lại thời gian hồi chiêu. Dùng được ở mọi hình dạng."
       },
       "hamstring_bite": {
         "name": "Quật Ngã",
@@ -18496,12 +18497,13 @@ export const vi_VN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Huyết Linh Miêu",
-        "description": "Tạo ra {rage} năng lượng và tăng sức mạnh tấn công thêm {buff} trong {duration} giây. Chỉ trong Hình Mèo."
+        "description": "Tạo ra {rage} năng lượng và tăng sức mạnh tấn công thêm {buff} trong {duration} giây. Chỉ trong Hình Mèo.",
+        "specNote_feral": "Các hiệu ứng chảy máu bạn gây ra trong thời gian hiệu lực gây thêm 20% sát thương trong suốt thời gian tồn tại của chúng."
       },
       "rip": {
         "name": "Vết Nứt Máu",
         "description": "Đòn kết thúc khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 72 sát thương cộng 48 mỗi điểm liên kích tiêu hao (5 điểm: tổng {damage}). Chỉ ở Hình Mèo.",
-        "specNote_feral": "Đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
+        "specNote_feral": "Khi mục tiêu có từ 3 hiệu ứng chảy máu của bạn trở lên, nó chịu Vết Thương Rỉ Máu: giảm 20% lượng hồi máu nhận được."
       },
       "mortal_strike": {
         "name": "Đòn Tàn Phế",
@@ -18718,7 +18720,7 @@ export const vi_VN: EnTranslations = {
       },
       "redharvest": {
         "name": "Thu Hoạch Đỏ",
-        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn."
+        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, kéo dài Lóc Xé và Vết Nứt Máu của bạn trên mục tiêu thêm 8 giây (tối đa 16 giây mỗi hiệu ứng), khiến các hiệu ứng chảy máu của bạn trên mục tiêu gây sát thương nhanh hơn 15% trong 8 giây (Dòng Thác Đỏ) và hồi {rage} năng lượng. Không tiêu điểm liên hoàn."
       },
       "marrowbreak": {
         "name": "Đoạn Tủy",
@@ -19236,7 +19238,7 @@ export const vi_VN: EnTranslations = {
       "rake": {
         "name": "Lóc Xé",
         "description": "Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây {overTime} sát thương chảy máu trong 18 giây. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
+        "specNote_feral": "Ở Hình Mèo, mỗi nhịp chảy máu của bạn thêm Huyết Cổ (tối đa 3, nhiều nhất 1 mỗi 3 giây), và hiệu ứng chảy máu của bạn có thể chí mạng, mỗi lần chảy máu chí mạng hồi 5 năng lượng."
       },
       "revive_pet": {
         "name": "Băng Bó",
@@ -31126,7 +31128,7 @@ export const vi_VN: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Da Ẩn Nanh Hoang",
         "bonus2": "Redharvest hồi 45 năng lượng, tăng từ 30.",
-        "bonus4": "Redharvest đặt một Flense mới lên mục tiêu."
+        "bonus4": "Thu Hoạch Đỏ còn gây ngay 30% sát thương còn lại của Lóc Xé và Vết Nứt Máu của bạn trên mục tiêu. Cả hai vẫn tiếp tục gây sát thương."
       },
       "wyrmshadow": {
         "name": "Áo Lễ Nightfang",

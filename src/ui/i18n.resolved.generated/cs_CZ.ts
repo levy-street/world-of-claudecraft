@@ -4791,6 +4791,7 @@ export const cs_CZ: EnTranslations = {
       "cooldownCap": "Využito {used} z {cap} s snížení doby obnovy v tomto okně",
       "bruinRushWindow": "Kočičí podoba nestojí manu a přišpendlí cíl tvého Medvědího výpadu, čímž ho zpomalí o {pct} % na {sec} s",
       "funeralHarvestLock": "Pohřební sklizeň zatím nemůže vytvořit další Úlomek duše",
+      "redTorrent": "Tvá krvácení na cíli tvé Rudé sklizně tikají o {pct} % rychleji",
       "effigyPlankHide": "Odvrací {pct}% každého úderu, dokud výpad Střepovou píkou nezhasne lucernu v jeho oku",
       "effigyLanternOut": "Lucerna Slaměného předáka pro tebe zhasla: tvé údery i údery tvého mazlíčka ignorují jeho Prkennou kůži a zasahují plnou silou",
       "leadenHexLock": "Olověná kletba tento cíl zatím nemůže znovu zakořenit",
@@ -4842,7 +4843,7 @@ export const cs_CZ: EnTranslations = {
       "coldsightRead": "Tvůj příští Dlouhý nátah způsobí o {longDrawPct}% vyšší poškození, nebo tvůj příští Padlý výstřel o {fellShotPct}% vyšší",
       "duskEconomy": "Schopnosti stojí o {pct}% méně energie",
       "moontide": "Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá",
-      "oldBlood": "Stará krev: stupeň {stacks} z {max}. Zasažené kočičí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí",
+      "oldBlood": "Stará krev: stupeň {stacks} z {max}. V kočičí podobě přidá každý tik tvého krvácení 1, nejvýše jednou za 3 s, a každý zásah Plíživým úderem a Výpadem přidá 1; v Medvědí podobě přidá každý zásah Rozmáchlými drápy a Drcením kostí 1. Při {max}: Krvavý skus se v kočičí podobě změní na Rudou sklizeň a Drcení kostí se v Medvědí podobě změní na Lámání morku",
       "verdance": "Zeleň {stacks}/{max}. Každé seslání Divokého květu, Druhého květu nebo Divokého zhojení přidá 1 a každá Zeleň zkrátí seslání Divokého zhojení. Při {max} se Rychlé zhojení mění v Překvět",
       "freeExecute": "Tvá příští způsobilá dorážecí schopnost nic nestojí",
       "resourceSap": "Obnoví {value} tvého aktuálního zdroje každých {interval} s",
@@ -18415,17 +18416,17 @@ export const cs_CZ: EnTranslations = {
       "claw": {
         "name": "Rvoucí dráp",
         "description": "Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze v kočičí podobě.",
-        "specNote_feral": "Každý zásah přidá 1 Starou krev (max 3)."
+        "specNote_feral": "Každý zásah přidá jednu vrstvu Rozedření, krvácení za 6 poškození během 8 s na vrstvu (max 5 vrstev). Nová vrstva obnoví trvání."
       },
       "scratch": {
         "name": "Škrábnutí",
         "description": "Proškrábni blízké cíle do 6 yardů a způsob poškození zbraní plus {damage}. Za každý zasažený cíl získáš 1 bod komba. Odhalí skryté nepřátele v oblasti zásahu. Pouze v Kočičí podobě.",
-        "specNote_feral": "Každý úspěšný zásah přidá 1 Starou krev (nejvýše 3)."
+        "specNote_feral": "Každý zasažený nepřítel navíc krvácí ze Škrábné rány: 12 poškození během 6 s."
       },
       "ferocious_bite": {
         "name": "Krvavý skus",
         "description": "Dokončovací útok, který způsobí {damage}. Pouze v kočičí podobě.",
-        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k silnějšímu úderu, okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví energii."
+        "specNote_feral": "Způsobí o 15 % vyšší poškození za každé tvé krvácení na cíli a obnoví tvou Krvavou trhlinu na plné trvání. Při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k úderu, jenž prodlouží tvé Stažení z kůže a Krvavou trhlinu, na 8 s zrychlí tiky tvých krvácení na cíli o 15 % a obnoví energii."
       },
       "swipe": {
         "name": "Rozmáchlé drápy",
@@ -18480,11 +18481,11 @@ export const cs_CZ: EnTranslations = {
       },
       "pounce": {
         "name": "Plíživý úder",
-        "description": "Zahajovací útok z plížení, který omráčí cíl na 2 s. Udělí 1 combo bod. Pouze ve kočičí podobě. Bez plížení je toto tlačítko Výpad."
+        "description": "Zahajovací útok z plížení, který omráčí cíl na 2 s. Udělí 1 combo bod a jako Divoký tesák přidá 1 Starou krev (max 3) a způsobí Rozpárané hrdlo, krvácení za 72 poškození během 12 s. Pouze v kočičí podobě. Bez plížení je toto tlačítko Výpad."
       },
       "lunge": {
         "name": "Výpad",
-        "description": "Vrhni se na nepřítele až 12 yardů daleko, způsob 60 % poškození zbraní a získej 1 combo bod. Pouze ve kočičí podobě."
+        "description": "Pokud ještě nejsi v kočičí podobě, přeměň se do ní a pak se vrhni na nepřítele až 25 yardů daleko. Po dopadu způsobí 60 % poškození zbraní, udělí 1 combo bod a jako Divoký tesák přidá 1 Starou krev (max 3); přerušený výpad vrátí svou dobu obnovy. Použitelné v jakékoli podobě."
       },
       "hamstring_bite": {
         "name": "Sražení",
@@ -18496,12 +18497,13 @@ export const cs_CZ: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Rysí krev",
-        "description": "Prudce obnoví {rage} energie a zvýší sílu útoku o {buff} na {duration} s. Pouze v kočičí podobě."
+        "description": "Prudce obnoví {rage} energie a zvýší sílu útoku o {buff} na {duration} s. Pouze v kočičí podobě.",
+        "specNote_feral": "Krvácení, která během jeho trvání způsobíš, působí po celou dobu svého trvání o 20 % vyšší poškození."
       },
       "rip": {
         "name": "Krvavá trhlina",
         "description": "Zakončení, které nechá cíl krvácet každé 2 s po 24 s: 72 poškození plus 48 za utracený combo bod (5 bodů: celkem {damage}). Pouze v Kočičí podobě.",
-        "specNote_feral": "Zasažený úder přidá 1 Starou krev (max 3)."
+        "specNote_feral": "Dokud jsou na cíli 3 nebo více tvých krvácení, trpí Mokvajícími ranami: přijímá o 20 % méně léčení."
       },
       "mortal_strike": {
         "name": "Mrzačící úder",
@@ -18718,7 +18720,7 @@ export const cs_CZ: EnTranslations = {
       },
       "redharvest": {
         "name": "Rudá sklizeň",
-        "description": "Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví {rage} energie. Funguje i bez combo bodů."
+        "description": "Spotřebuje 3 Staré krve: úder za {damage}, prodlouží tvé Stažení z kůže a Krvavou trhlinu na cíli o 8 s (každé nejvýše o 16 s), na 8 s zrychlí tiky tvých krvácení na cíli o 15 % (Rudý příval) a obnoví {rage} energie. Nespotřebovává combo body."
       },
       "marrowbreak": {
         "name": "Lámání morku",
@@ -19236,7 +19238,7 @@ export const cs_CZ: EnTranslations = {
       "rake": {
         "name": "Stažení z kůže",
         "description": "Rozpárej nepřítele za poškození zbraně plus {damage} a způsob {overTime} poškození krvácením během 18 s. Udělí 1 combo bod. Pouze v kočičí podobě.",
-        "specNote_feral": "Každý zásah přidá 1 Starou krev (max 3)."
+        "specNote_feral": "V kočičí podobě přidávají tiky tvého krvácení Starou krev (max 3, nejvýše 1 za 3 s) a tvá krvácení mohou kriticky zasáhnout, přičemž každý kritický tik krvácení obnoví 5 energie."
       },
       "revive_pet": {
         "name": "Ošetření",
@@ -31126,7 +31128,7 @@ export const cs_CZ: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Uhlíková kůže Divokého tesáku",
         "bonus2": "Rudá sklizeň obnoví 45 energie místo 30.",
-        "bonus4": "Rudá sklizeň na cíl umístí nový Odřez."
+        "bonus4": "Rudá sklizeň navíc okamžitě způsobí 30 % zbývajícího poškození tvého Stažení z kůže a Krvavé trhliny na cíli. Obě krvácení dál působí."
       },
       "wyrmshadow": {
         "name": "Roucha nočního tesáku",

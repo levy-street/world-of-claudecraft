@@ -1292,13 +1292,16 @@ const classAbilityNamesEn = {
         'claw',
         'Rendclaw',
         'Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Cat Form only.',
-        { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
+        {
+          feral:
+            'Each hit that lands adds a stack of Tatter, a bleed of 6 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
+        },
       ],
       [
         'scratch',
         'Scratch',
         'Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
-        { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
+        { feral: 'Each enemy it hits also bleeds with Scratch Wound: 12 damage over 6 sec.' },
       ],
       [
         'ferocious_bite',
@@ -1306,7 +1309,7 @@ const classAbilityNamesEn = {
         'Finishing move that causes {damage}. Cat Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
+            'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 15% faster for 8 sec, and restores energy.',
         },
       ],
       [
@@ -1324,7 +1327,11 @@ const classAbilityNamesEn = {
             'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
         },
       ],
-      ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
+      [
+        'barkskin',
+        'Oakhide',
+        'Your skin hardens like bark, reducing all damage taken by 25% for 15 sec. Overlapping Oakhides add together.',
+      ],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
       [
         'sacred_bulwark',
@@ -1366,7 +1373,7 @@ const classAbilityNamesEn = {
       [
         'pounce',
         'Slinkstrike',
-        'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge.',
+        'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3) and opens Throatrake, a bleed of 72 damage over 12 sec. Cat Form only. Out of stealth this button is Lunge.',
       ],
       [
         'lunge',
@@ -1387,12 +1394,16 @@ const classAbilityNamesEn = {
         'tigers_fury',
         'Lynxblood',
         'Surges {rage} energy and increases attack power by {buff} for {duration} sec. Cat Form only.',
+        { feral: 'Bleeds you apply while it lasts deal 20% more damage for their whole duration.' },
       ],
       [
         'rip',
         'Bloodrift',
         'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: {damage} total). Cat Form only.',
-        { feral: 'The landed hit adds 1 Old Blood (max 3).' },
+        {
+          feral:
+            'While 3 or more of your bleeds are on a target, it suffers Weeping Wounds: 20% less healing taken.',
+        },
       ],
       [
         'mortal_strike',
@@ -1666,7 +1677,7 @@ const classAbilityNamesEn = {
       [
         'redharvest',
         'Redharvest',
-        'Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore {rage} energy. Works with zero combo points.',
+        'Spends your 3 Old Blood: strike for {damage}, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 15% faster for 8 sec (Red Torrent), and restore {rage} energy. Does not spend combo points.',
       ],
       [
         'marrowbreak',
@@ -1704,7 +1715,7 @@ const classAbilityNamesEn = {
         "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
         {
           feral:
-            'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+            'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form. In Cat Form, the free Sporemending heals for 10% of maximum health over 12 sec.',
           balance:
             'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
           restoration:

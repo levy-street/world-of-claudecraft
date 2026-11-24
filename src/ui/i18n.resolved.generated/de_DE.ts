@@ -4791,6 +4791,7 @@ export const de_DE: EnTranslations = {
       "cooldownCap": "{used} von {cap} Sek. Abklingzeit-Verkürzung in diesem Fenster verbraucht",
       "bruinRushWindow": "Die Katzengestalt kostet kein Mana und nagelt das Ziel eures Bruin-Ansturms fest, was es {sec} Sek. lang um {pct}% verlangsamt",
       "funeralHarvestLock": "Grabesernte kann noch kein weiteres Seelenfragment erschaffen",
+      "redTorrent": "Eure Blutungen auf dem Ziel Eurer Roten Ernte ticken {pct}% schneller",
       "effigyPlankHide": "Wehrt {pct}% jedes Schlags ab, bis ein Splitterpikenstoß die Laterne in seinem Auge löscht",
       "effigyLanternOut": "Die Laterne des Strohvorarbeiters ist für dich erloschen: Deine Schläge und die deines Begleiters ignorieren seine Bretterhaut und treffen mit voller Wucht",
       "leadenHexLock": "Bleierner Fluch kann dieses Ziel noch nicht erneut verwurzeln",
@@ -4842,7 +4843,7 @@ export const de_DE: EnTranslations = {
       "coldsightRead": "Euer nächster Langer Zug verursacht {longDrawPct}% mehr Schaden, oder Euer nächster Unheilsschuss verursacht {fellShotPct}% mehr",
       "duskEconomy": "Fähigkeiten kosten {pct}% weniger Energie",
       "moontide": "Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr",
-      "oldBlood": "Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer",
+      "oldBlood": "Altes Blut: Stufe {stacks} von {max}. In Katzengestalt fügt jeder Tick Eurer Blutungen 1 hinzu, höchstens einmal alle 3 Sek., und jeder gelandete Treffer von Schleichschlag und Ansprung fügt 1 hinzu; in Bruin-Gestalt fügt jeder gelandete Treffer von Fegende Klauen und Knochenmalmer 1 hinzu. Bei {max}: Blutbiss wird in Katzengestalt zu Rote Ernte, Knochenmalmer wird in Bruin-Gestalt zu Markbrecher",
       "verdance": "Grünkraft: Stufe {stacks} von {max}. Jede Sporenheilung, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.",
       "freeExecute": "Eure nächste berechtigte Hinrichtungsfähigkeit kostet nichts",
       "resourceSap": "Stellt alle {interval} Sek. {value} Eurer aktuellen Ressource wieder her",
@@ -18415,17 +18416,17 @@ export const de_DE: EnTranslations = {
       "claw": {
         "name": "Reißklaue",
         "description": "Krallt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Katzengestalt.",
-        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3)."
+        "specNote_feral": "Jeder Treffer, der landet, fügt einen Stapel Fetzen hinzu, eine Blutung, die pro Stapel 6 Schaden über 8 Sek. verursacht (max. 5 Stapel). Ein neuer Stapel erneuert die Dauer."
       },
       "scratch": {
         "name": "Kratzen",
         "description": "Kratze durch nahe Ziele innerhalb von 6 Metern und verursache Waffenschaden plus {damage}. Gewährt 1 Combopunkt pro getroffenem Ziel. Deckt schleichende Gegner im Bereich auf. Nur in Katzengestalt.",
-        "specNote_feral": "Jeder gelandete Treffer fügt 1 Altes Blut hinzu (max. 3)."
+        "specNote_feral": "Jeder getroffene Gegner blutet außerdem durch Kratzwunde: 12 Schaden über 6 Sek."
       },
       "ferocious_bite": {
         "name": "Blutbiss",
         "description": "Finishing-Move, der {damage} verursacht. Nur in Katzengestalt.",
-        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen stärkeren Schlag verbraucht, der außerdem sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, und Energie wiederherstellt."
+        "specNote_feral": "Verursacht 15% mehr Schaden für jede Eurer Blutungen auf dem Ziel und setzt Euren Blutriss auf seine volle Dauer zurück. Bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen Schlag verbraucht, der Euer Schinden und Euren Blutriss verlängert, Eure Blutungen auf dem Ziel 8 Sek. lang 15% schneller ticken lässt und Energie wiederherstellt."
       },
       "swipe": {
         "name": "Fegende Klauen",
@@ -18480,11 +18481,11 @@ export const de_DE: EnTranslations = {
       },
       "pounce": {
         "name": "Schleichschlag",
-        "description": "Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt. Nur in Katzengestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung."
+        "description": "Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt und fügt als Wilder Kampf 1 Altes Blut hinzu (max. 3) und öffnet Kehlriss, eine Blutung, die 72 Schaden über 12 Sek. verursacht. Nur in Katzengestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung."
       },
       "lunge": {
         "name": "Ansprung",
-        "description": "Springt einen bis zu 12 m entfernten Gegner an, verursacht 60% Waffenschaden und gewährt 1 Combopunkt. Nur in Katzengestalt."
+        "description": "Nehmt Katzengestalt an, falls Ihr nicht bereits darin seid, und springt dann einen bis zu 25 m entfernten Gegner an. Bei der Ankunft verursacht Ihr 60% Waffenschaden, erhaltet 1 Combopunkt und fügt als Wilder Kampf 1 Altes Blut hinzu (max. 3); ein vorzeitig abgebrochener Ansprung erstattet seine Abklingzeit zurück. In jeder Gestalt nutzbar."
       },
       "hamstring_bite": {
         "name": "Niederreißen",
@@ -18496,12 +18497,13 @@ export const de_DE: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Luchsblut",
-        "description": "Erzeugt sofort {rage} Energie und erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Katzengestalt."
+        "description": "Erzeugt sofort {rage} Energie und erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Katzengestalt.",
+        "specNote_feral": "Blutungen, die Ihr während der Wirkung anbringt, verursachen für ihre gesamte Dauer 20% mehr Schaden."
       },
       "rip": {
         "name": "Blutriss",
         "description": "Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 72 Schaden plus 48 pro verbrauchtem Combopunkt (5 Combopunkte: insgesamt {damage}). Nur in Katzengestalt.",
-        "specNote_feral": "Der gelandete Treffer fügt 1 Altes Blut hinzu (max. 3)."
+        "specNote_feral": "Solange 3 oder mehr Eurer Blutungen auf einem Ziel liegen, erleidet es Nässende Wunden: 20% weniger erhaltene Heilung."
       },
       "mortal_strike": {
         "name": "Verstümmelnder Hieb",
@@ -18718,7 +18720,7 @@ export const de_DE: EnTranslations = {
       },
       "redharvest": {
         "name": "Rote Ernte",
-        "description": "Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und {rage} Energie wiederherstellt. Funktioniert auch ohne Combopunkte."
+        "description": "Verbraucht 3 Altes Blut: ein Schlag für {damage}, verlängert Euer Schinden und Euren Blutriss auf dem Ziel um 8 Sek. (bis zu 16 Sek. je Blutung), lässt Eure Blutungen auf dem Ziel 8 Sek. lang 15% schneller ticken (Roter Strom) und stellt {rage} Energie wieder her. Verbraucht keine Combopunkte."
       },
       "marrowbreak": {
         "name": "Markbrecher",
@@ -19236,7 +19238,7 @@ export const de_DE: EnTranslations = {
       "rake": {
         "name": "Schinden",
         "description": "Schindet den Gegner für Waffenschaden plus {damage} und verursacht {overTime} Blutungsschaden über 18 Sek. Gewährt 1 Combopunkt. Nur in Katzengestalt.",
-        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3)."
+        "specNote_feral": "In Katzengestalt fügen Eure Blutungsticks Altes Blut hinzu (max. 3, höchstens 1 alle 3 Sek.), und Eure Blutungen können kritisch treffen, wobei jeder kritische Blutungstreffer 5 Energie wiederherstellt."
       },
       "revive_pet": {
         "name": "Zusammenflicken",
@@ -31126,7 +31128,7 @@ export const de_DE: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Wildfang-Gluthaut",
         "bonus2": "Roternte stellt 45 statt 30 Energie wieder her.",
-        "bonus4": "Roternte legt eine frische Häutung auf das Ziel."
+        "bonus4": "Rote Ernte verursacht zusätzlich sofort 30% des verbleibenden Schadens Eures Schindens und Eures Blutrisses auf dem Ziel. Beide ticken weiter."
       },
       "wyrmshadow": {
         "name": "Nightfang-Gewänder",

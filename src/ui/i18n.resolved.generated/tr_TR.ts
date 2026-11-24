@@ -4791,6 +4791,7 @@ export const tr_TR: EnTranslations = {
       "cooldownCap": "Bu pencerede {used} / {cap} sn bekleme süresi azaltımı kullanıldı",
       "bruinRushWindow": "Kedi Formu mana harcamaz ve Bruin Hücumu hedefini sabitleyerek {sec} saniye boyunca %{pct} yavaşlatır",
       "funeralHarvestLock": "Cenaze Hasadı henüz başka bir Ruh Parçası oluşturamaz",
+      "redTorrent": "Kızıl Hasat hedefindeki kanamaların %{pct} daha hızlı işler",
       "effigyPlankHide": "Kıymık Kargısı hamlesi gözündeki feneri söndürene kadar her darbenin %{pct} kadarını savuşturur",
       "effigyLanternOut": "Saman Ustabaşının feneri senin için sönük: senin ve evcil hayvanının darbeleri Tahta Postunu yok sayıp tam vurur",
       "leadenHexLock": "Kurşun Büyüsü bu hedefi henüz yeniden kökleyemez",
@@ -4842,7 +4843,7 @@ export const tr_TR: EnTranslations = {
       "coldsightRead": "Sonraki Uzun Çekişin %{longDrawPct} daha fazla hasar verir veya sonraki Düşüş Atışın %{fellShotPct} daha fazla verir",
       "duskEconomy": "Yetenekler {pct}% daha az enerji harcar",
       "moontide": "Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar",
-      "oldBlood": "Kadim Kan: aşama {stacks} / {max}. İsabet eden Kedi ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür",
+      "oldBlood": "Kadim Kan: aşama {stacks} / {max}. Kedi Formunda kanamalarının her tiki 1 ekler, 3 saniyede en fazla bir kez, ve isabet eden her Sinsi Darbe ve Atılış vuruşu 1 ekler; Bruin Formunda isabet eden her Süpüren Pençeler ve Kemik Kıran vuruşu 1 ekler. {max} olduğunda: Kedi Formunda Kanlı Isırık Kızıl Hasata, Bruin Formunda Kemik Kıran İlik Kırana dönüşür",
       "verdance": "Yeşillik: aşama {stacks} / {max}. Kullandığın her Spor Şifası, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
       "freeExecute": "Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz",
       "resourceSap": "Her {interval} sn'de mevcut kaynağının {value} kadarını geri kazandırır",
@@ -18415,17 +18416,17 @@ export const tr_TR: EnTranslations = {
       "claw": {
         "name": "Yırtan Pençe",
         "description": "Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.",
-        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
+        "specNote_feral": "İsabet eden her vuruş bir yığın Lime Lime ekler; bu, yığın başına 8 saniyede 6 hasar veren bir kanamadır (en fazla 5 yığın). Yeni bir yığın süreyi yeniler."
       },
       "scratch": {
         "name": "Tırmalama",
         "description": "6 yarda içindeki yakın hedefleri tırmalayarak silah hasarına ek {damage} hasar ver. Vurulan her hedef için 1 kombo puanı kazandırır. Savurma alanındaki gizlenmiş düşmanları açığa çıkarır. Yalnızca Kedi Formunda.",
-        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
+        "specNote_feral": "Vurduğu her düşman ayrıca Tırmık Yarası ile kanar: 6 saniyede 12 hasar."
       },
       "ferocious_bite": {
         "name": "Kanlı Isırık",
         "description": "{damage} veren bitirici hamle. Yalnızca Kedi Formu.",
-        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak daha güçlü bir ısırık gerçekleştirir, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vurur ve enerji geri kazandırır."
+        "specNote_feral": "Hedefteki her kanaman için %15 daha fazla hasar verir ve Kanlı Yarığını tam süresine yeniler. 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak Deri Yüzme ve Kanlı Yarığını uzatan, hedefteki kanamalarının 8 saniye boyunca %15 daha hızlı işlemesini sağlayan ve enerji geri kazandıran bir vuruş yapar."
       },
       "swipe": {
         "name": "Süpüren Pençeler",
@@ -18480,11 +18481,11 @@ export const tr_TR: EnTranslations = {
       },
       "pounce": {
         "name": "Sinsi Darbe",
-        "description": "Hedefi 2 saniye boyunca sersemleten gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kedi Formu. Gizlilik dışında bu düğme Atılış olur."
+        "description": "Hedefi 2 saniye boyunca sersemleten gizlilik açılışı. 1 kombo puanı kazandırır ve Vahşi uzmanlığında 1 Kadim Kan ekler (en fazla 3) ve Gırtlak Yırtığı açar: 12 saniyede 72 hasar veren bir kanama. Yalnızca Kedi Formu. Gizlilik dışında bu düğme Atılış olur."
       },
       "lunge": {
         "name": "Atılış",
-        "description": "12 yardaya kadar uzaktaki bir düşmana atılır, %60 silah hasarı verir ve 1 kombo puanı kazandırır. Yalnızca Kedi Formu."
+        "description": "Zaten Kedi Formunda değilsen Kedi Formuna geçer, ardından 25 yardaya kadar uzaktaki bir düşmana atılır. Varışta %60 silah hasarı verir, 1 kombo puanı kazandırır ve Vahşi uzmanlığında 1 Kadim Kan ekler (en fazla 3); yarıda kesilen bir atılış bekleme süresini iade eder. Her formda kullanılabilir."
       },
       "hamstring_bite": {
         "name": "Yere Serme",
@@ -18496,12 +18497,13 @@ export const tr_TR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Vaşak Kanı",
-        "description": "Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kedi Formu."
+        "description": "Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kedi Formu.",
+        "specNote_feral": "Etkisi sürerken uyguladığın kanamalar tüm süreleri boyunca %20 daha fazla hasar verir."
       },
       "rip": {
         "name": "Kanlı Yarık",
         "description": "Hedefi 24 sn boyunca her 2 sn'de kanatan bitirici: harcanan kombo puanı başına 48 artı 72 hasar (5 puan: toplam {damage}). Yalnızca Kedi Formunda.",
-        "specNote_feral": "İsabet eden vuruş 1 Kadim Kan ekler (en fazla 3)."
+        "specNote_feral": "Hedefte 3 veya daha fazla kanaman varken hedef Sızan Yaralar etkisine girer: aldığı iyileştirme %20 azalır."
       },
       "mortal_strike": {
         "name": "Sakatlayan Darbe",
@@ -18718,7 +18720,7 @@ export const tr_TR: EnTranslations = {
       },
       "redharvest": {
         "name": "Kızıl Hasat",
-        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
+        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, hedefteki Deri Yüzme ve Kanlı Yarığını 8 saniye uzatır (her biri en fazla 16 saniye), hedefteki kanamalarının 8 saniye boyunca %15 daha hızlı işlemesini sağlar (Kızıl Sel) ve {rage} enerji geri kazandırır. Kombo puanı harcamaz."
       },
       "marrowbreak": {
         "name": "İlik Kıran",
@@ -19236,7 +19238,7 @@ export const tr_TR: EnTranslations = {
       "rake": {
         "name": "Deri Yüzme",
         "description": "Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca {overTime} kanama hasarı verir. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.",
-        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
+        "specNote_feral": "Kedi Formunda kanamalarının her tiki Kadim Kan ekler (en fazla 3, 3 saniyede en fazla 1) ve kanamaların kritik vurabilir; her kanama kritiği 5 enerji geri kazandırır."
       },
       "revive_pet": {
         "name": "Yarasını Sar",
@@ -31126,7 +31128,7 @@ export const tr_TR: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Yaban Dişinin Kor Derisi",
         "bonus2": "Kızıl Hasat, 30 yerine 45 enerji yeniler.",
-        "bonus4": "Kızıl Hasat hedefe yeni bir Deri Yüzme etkisi uygular."
+        "bonus4": "Kızıl Hasat ayrıca hedefteki Deri Yüzme ve Kanlı Yarığının kalan hasarının %30'unu anında verir. İkisi de işlemeye devam eder."
       },
       "wyrmshadow": {
         "name": "Nightfang Cübbeleri",

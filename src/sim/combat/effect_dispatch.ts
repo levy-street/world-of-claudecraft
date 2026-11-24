@@ -126,12 +126,19 @@ import {
 } from './destruction';
 import { extendOwnedDot } from './dot_mutation';
 import {
+  feralBleedApplyMult,
+  feralBleedOnOpener,
+  gorebiteBleedMult,
+  onFeralBleedApplied,
+} from './druid_bleeds';
+import {
   druidApexPayoffMult,
   druidEngineOnHotPlanted,
   druidEngineOnLandedStrike,
   druidMarrowbreakUsesGuard,
   resolveDruidOverbloom,
 } from './druid_engines';
+import { oakhideAuraId } from './druid_oakhide';
 import { resolveWeaponSweep } from './druid_scratch';
 import {
   plantSporeBurst,
@@ -1160,6 +1167,9 @@ export function runEffects(
         // hitting harder per pip; consuming the window here ENDS the run.
         dmg *= knockoutRedlineMult(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
+        // Gorebite: +15% per distinct Cat bleed of yours on the target
+        // (combat/druid_bleeds.ts); 1 for every other finisher.
+        dmg *= gorebiteBleedMult(ctx, p, target, ability.id);
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) ||
           sureCrit ||
@@ -1182,7 +1192,7 @@ export function runEffects(
           false,
           ability.id,
         );
-        druidEngineOnLandedStrike(ctx, p, ability.id);
+        druidEngineOnLandedStrike(ctx, p, ability.id, target);
         // A landed feral finisher is a melee strike: it rolls the mainhand's
         // melee enchant like a weaponStrike would (combat/equip_procs.ts).
         rollFeralStrikeEnchant(ctx, p, ability);
@@ -1648,14 +1658,15 @@ export function runEffects(
         const hotTotal =
           eff.pctOfMax !== undefined ? Math.round(hotTarget.maxHp * eff.pctOfMax) : eff.total;
         const hotBase = Math.max(1, Math.round(hotTotal / (eff.duration / eff.interval)));
-        const hotSp = hybridHeal
-          ? 0
-          : hotTickBonus(
-              p.healPower,
-              eff.duration,
-              eff.interval,
-              talentHealMult * (1 + mods.global.hotHealPct),
-            );
+        const hotSp =
+          hybridHeal || res.hotNoHealPowerRider === true
+            ? 0
+            : hotTickBonus(
+                p.healPower,
+                eff.duration,
+                eff.interval,
+                talentHealMult * (1 + mods.global.hotHealPct),
+              );
         // The cast-scoped multiplier reaches the WHOLE tick (base plus the Spell
         // Power rider), the same rule as the direct heal above; === 1 guarded so
         // every unmarked hot's arithmetic is byte-identical.
@@ -2184,7 +2195,9 @@ export function runEffects(
           kind: 'dot',
           remaining: dotDuration,
           duration: dotDuration,
-          value: dotBase + dotSp,
+          // Lynxblood's bleed snapshot (combat/druid_bleeds.ts): 1 for every
+          // dot that is not a feral druid's Cat bleed.
+          value: Math.max(1, Math.round((dotBase + dotSp) * feralBleedApplyMult(ctx, p, dotId))),
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
@@ -2193,6 +2206,8 @@ export function runEffects(
         };
         if (dotId === 'vampiric_touch') applyVampiricTouch(ctx, p, target, dot);
         else ctx.applyAura(target, dot);
+        // Open Veins and Weeping Wounds ride every feral bleed application.
+        onFeralBleedApplied(ctx, p, target, dotId);
         if (priorDirge)
           refreshDirgeFieldAfterReapplication(ctx, p, meta, target, priorDirge, ability.range);
         if (dotId === 'rupture') {
@@ -2205,7 +2220,6 @@ export function runEffects(
             ability: dotId,
           });
         }
-        if (ability.id === 'rip') druidEngineOnLandedStrike(ctx, p, ability.id);
         ctx.enterCombat(p, target);
         if (ability.id === 'serpent_sting') onHunterVenomBarbLanded(ctx, p, target);
         break;
@@ -2376,12 +2390,12 @@ export function runEffects(
           ctx.awardCombo(p, target, ability.awardsCombo + setComboBonus);
           comboAwarded = true;
         }
-        // Same moment, same rule for the feral Old Blood bank: Slinkstrike's
-        // stun IS its landed hit (no strike arm above ever runs for it), so
-        // this is where it reports. A no-op for every other class and for any
-        // druid ability outside OLD_BLOOD_STRIKE_IDS (combat/druid_engines.ts).
+        // Slinkstrike's stun IS its landed hit (no strike arm above ever runs
+        // for it), so this is where it reports: Throatrake, the opener's bleed
+        // (combat/druid_bleeds.ts). A no-op for every other class and ability.
         // Draws no rng.
-        druidEngineOnLandedStrike(ctx, p, ability.id);
+        druidEngineOnLandedStrike(ctx, p, ability.id, target);
+        feralBleedOnOpener(ctx, p, ability.id, target);
         // Sundering Gavel (hammer_of_justice) and Gut Punch (cheap_shot)
         // sound at the target; every other stun has no dedicated recording
         // and stays silent here.
@@ -3874,7 +3888,9 @@ export function runEffects(
         // auraId wins) lives in ./aura_ids.ts, shared with the HUD's aura-track catalog.
         const lifetime = eff.permanent ? Number.POSITIVE_INFINITY : eff.duration;
         ctx.applyAura(p, {
-          id: selfBuffAuraId(ability, eff),
+          // Oakhide instances overlap (combat/druid_oakhide.ts): a second cast
+          // while one runs takes its own id instead of refreshing the first.
+          id: oakhideAuraId(p, selfBuffAuraId(ability, eff)),
           name: eff.auraName ?? ability.name,
           kind: eff.kind,
           remaining: lifetime,

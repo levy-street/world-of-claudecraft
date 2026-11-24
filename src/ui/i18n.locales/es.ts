@@ -5882,6 +5882,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Has usado {used} de {cap} s de reducción de reutilización en esta ventana',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Cosecha funeraria aún no puede crear otro fragmento de alma',
+  'hudChrome.auraEffect.redTorrent':
+    'Tus sangrados en el objetivo de tu Cosecha Roja hacen tic un {pct}% más rápido',
   'hudChrome.auraEffect.leadenHexLock':
     'Maleficio plomizo aún no puede volver a inmovilizar a este objetivo',
   'hudChrome.auraEffect.forbiddenReflectionReady':
@@ -9454,7 +9456,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Escuda a un objetivo aliado y absorbe {damage} de daño durante 30 s. Disciplina además vincula al objetivo con tu daño Sagrado durante 30 s.',
   'entities.abilities.lunge.name': 'Embestida felina',
   'entities.abilities.lunge.description':
-    'Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Colmillo salvaje, añade 1 Sangre antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma.',
+    'Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Feral, añade 1 de Sangre Antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma.',
   'entities.abilities.renew.name': 'Gracia Persistente',
   'entities.abilities.renew.description':
     'Sana al objetivo en {damage} durante 15 s, una vez cada 3 s. La sanación aumenta con el poder con hechizos.',
@@ -9582,13 +9584,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Adopta Forma felina si aún no estás en ella y corre un 50% más rápido durante 15 s. Se puede usar en cualquier forma. Es instantáneo y no activa la reutilización global.',
   'entities.abilities.pounce.name': 'Golpe Sigiloso',
   'entities.abilities.pounce.description':
-    'Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma felina.',
+    'Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo y, como Feral, añade 1 de Sangre Antigua (máx. 3) y abre Desgarro de Garganta, un sangrado de 72 de daño durante 12 s. Solo en Forma felina. Fuera del sigilo, este botón es Embestida felina.',
   'entities.abilities.insect_swarm.name': 'Enjambre Punzante',
   'entities.abilities.insect_swarm.description':
     'Un enjambre de insectos acosa al enemigo, causando {damage} de daño de Naturaleza durante 12 s.',
   'entities.abilities.tigers_fury.name': 'Sangre de Lobo',
   'entities.abilities.tigers_fury.description':
     'Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma felina.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Los sangrados que apliques mientras dure infligen un 20% más de daño durante toda su duración.',
   'entities.abilities.rip.name': 'Grieta Sangrienta',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
@@ -16706,7 +16710,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume 3 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Remiendo de Esporas nueva en el objetivo.',
   'entities.abilities.redharvest.name': 'Cosecha Roja',
   'entities.abilities.redharvest.description':
-    'Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura {rage} de energía. Funciona sin puntos de combo.',
+    'Consume tus 3 de Sangre Antigua: golpea por {damage}, prolonga tus Desollar y Grieta Sangrienta en el objetivo 8 s (hasta 16 s cada uno), hace que tus sangrados en el objetivo hagan tic un 15% más rápido durante 8 s (Torrente Rojo) y restaura {rage} de energía. No consume puntos de combo.',
   'entities.abilities.sunlance.name': 'Estela Solar',
   'entities.abilities.sunlance.description':
     'Consume tus 3 de Marea Lunar para un golpe de {damage} de daño de Naturaleza más una quemadura de {overTime} a lo largo de 9 s, y restaura 35 de maná: la opción de maná. Oleada Lunar consume los mismos 3 de Marea Lunar, así que elige una.',
@@ -16715,7 +16719,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta',
   'hudChrome.auraEffect.oldBlood':
-    'Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de gato y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma',
+    'Sangre Antigua: fase {stacks} de {max}. En Forma felina, cada tic de tus sangrados añade 1, como mucho una vez cada 3 s, y cada golpe conectado de Golpe Sigiloso y Embestida felina añade 1; en Forma de Bruin, cada golpe conectado de Zarpas Barredoras y Rompehuesos añade 1. Con {max}: Mordisco Sangriento se convierte en Cosecha Roja en Forma felina y Rompehuesos se convierte en Quiebramédula en Forma de Bruin',
   'hudChrome.auraEffect.verdance':
     'Verdor {stacks}/{max}. Cada Remiendo de Esporas, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración',
   'hudChrome.riftTracker.title': 'Brecha',
@@ -16819,7 +16823,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma felina.',
   'entities.abilities.claw.specNote_feral':
-    'Cada golpe conectado añade 1 de Sangre Antigua (máx. 3).',
+    'Cada golpe conectado añade una acumulación de Jirones, un sangrado de 6 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración.',
   'entities.abilities.cold_blood.description':
     'Concentra tu instinto asesino para que tus siguientes 5 ataques sean golpes críticos. (motor de Knifework)',
   'entities.abilities.dark_pact.description':
@@ -16840,7 +16844,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Movimiento final que causa {damage}. Solo en Forma felina.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía.',
+    'Inflige un 15% más de daño por cada uno de tus sangrados en el objetivo y renueva tu Grieta Sangrienta a su duración completa. Con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe que prolonga tus Desollar y Grieta Sangrienta, hace que tus sangrados en el objetivo hagan tic un 15% más rápido durante 8 s y restaura energía.',
   'entities.abilities.garrote.description':
     'Enrolla un alambre en torno a la garganta del enemigo, causando {damage} de daño ahora y haciéndolo sangrar por {overTime} a lo largo de 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
   'entities.abilities.garrote.specNote_subtlety':
@@ -16865,7 +16869,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Desuella al enemigo por daño de arma más {damage} y causa {overTime} de daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma felina.',
   'entities.abilities.rake.specNote_feral':
-    'Cada golpe conectado añade 1 de Sangre Antigua (máx. 3).',
+    'En Forma felina, los tics de tus sangrados añaden Sangre Antigua (máx. 3, como mucho 1 cada 3 s), y tus sangrados pueden ser críticos; cada crítico de sangrado restaura 5 de energía.',
   'entities.abilities.regrowth.description':
     'Sana a un objetivo amistoso por {damage} y una cantidad adicional a lo largo de 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.',
   'entities.abilities.regrowth.specNote_restoration':
@@ -16876,7 +16880,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cada lanzamiento añade 1 de Verdor (máx. 3), incluso si renueva una floración que ya está activa. Con 3 de Verdor, Alivio presto se convierte en Sobrefloración.',
   'entities.abilities.rip.description':
     'Remate que hace sangrar al objetivo cada 2 s durante 24 s: 72 de daño más 48 por punto de combo gastado (5 puntos: {damage} en total). Solo en Forma felina.',
-  'entities.abilities.rip.specNote_feral': 'El golpe conectado añade 1 de Sangre Antigua (máx. 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Mientras el objetivo tenga 3 o más de tus sangrados, sufre Heridas Supurantes: recibe un 20% menos de sanación.',
   'entities.abilities.ruinous_brand.description':
     'Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos resuenan por un 25% de daño contra el enemigo marcado, o copian un 50% del daño hacia él cuando los lanzas contra otro objetivo.',
   'entities.abilities.ruinous_brand.name': 'Marca Ruinosa',
@@ -17972,7 +17977,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.bonus2':
     'Cosecha Roja restaura 45 de energía, en lugar de 30.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Cosecha Roja aplica un nuevo Desuello al objetivo.',
+    'Cosecha Roja también inflige al instante el 30% del daño que les queda a tus Desollar y Grieta Sangrienta en el objetivo. Ambos siguen haciendo efecto.',
   'entities.itemSets.wildfang_emberhide.name': 'Piel de Brasa del Colmillo Salvaje',
   'entities.itemSets.wyrmshadow.bonus6':
     'Aumenta la velocidad de ataque y lanzamiento un 4% y el Golpe un 3%. Los golpes críticos de tu arma abren una Herida Desgarrada, causando 4 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.',
@@ -20504,7 +20509,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Araña a los objetivos cercanos en un radio de 6 m e inflige daño de arma más {damage}. Otorga 1 punto de combo por objetivo alcanzado. Revela a los enemigos en sigilo dentro del barrido. Solo en Forma Felina.',
   'entities.abilities.scratch.name': 'Arañazo',
   'entities.abilities.scratch.specNote_feral':
-    'Cada golpe que acierta añade 1 de Sangre Antigua (máximo 3).',
+    'Cada enemigo que golpea también sangra con Herida de Arañazo: 12 de daño durante 6 s.',
   'entities.abilities.spore_burst.description':
     'Invoca un hongo de esporas en la zona objetivo. Tras {duration} s estalla, sana {healing} a los aliados e inflige {damage} de daño de Naturaleza a los enemigos en un radio de 8 m.',
   'entities.abilities.spore_burst.name': 'Estallido de Esporas',

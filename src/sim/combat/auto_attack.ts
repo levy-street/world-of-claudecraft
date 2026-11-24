@@ -728,7 +728,7 @@ export function meleeSwing(
     applyRequitalAutoAttack(ctx, attacker, target);
     tryGrantDawnsWrath(ctx, attacker);
   }
-  druidEngineOnLandedStrike(ctx, attacker, opts.abilityId ?? undefined);
+  druidEngineOnLandedStrike(ctx, attacker, opts.abilityId ?? undefined, target);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.

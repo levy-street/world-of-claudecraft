@@ -4791,6 +4791,7 @@ export const es: EnTranslations = {
       "cooldownCap": "Has usado {used} de {cap} s de reducción de reutilización en esta ventana",
       "bruinRushWindow": "Forma felina no cuesta maná e Inmoviliza a tu objetivo de Embestida de Bruin, ralentizándolo un {pct}% durante {sec} s",
       "funeralHarvestLock": "Cosecha funeraria aún no puede crear otro fragmento de alma",
+      "redTorrent": "Tus sangrados en el objetivo de tu Cosecha Roja hacen tic un {pct}% más rápido",
       "effigyPlankHide": "Rechaza el {pct}% de cada golpe hasta que una estocada de Pica de Fragmentos apaga el farol de su ojo",
       "effigyLanternOut": "El farol del Capataz de Paja está apagado para ti: tus golpes y los de tu mascota ignoran su Coraza de tablones y causan todo su daño",
       "leadenHexLock": "Maleficio plomizo aún no puede volver a inmovilizar a este objetivo",
@@ -4842,7 +4843,7 @@ export const es: EnTranslations = {
       "coldsightRead": "Tu siguiente Tiro largo inflige un {longDrawPct}% más de daño, o tu siguiente Tiro aciago inflige un {fellShotPct}% más",
       "duskEconomy": "Las habilidades cuestan un {pct}% menos de energía",
       "moontide": "Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta",
-      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de gato y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
+      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. En Forma felina, cada tic de tus sangrados añade 1, como mucho una vez cada 3 s, y cada golpe conectado de Golpe Sigiloso y Embestida felina añade 1; en Forma de Bruin, cada golpe conectado de Zarpas Barredoras y Rompehuesos añade 1. Con {max}: Mordisco Sangriento se convierte en Cosecha Roja en Forma felina y Rompehuesos se convierte en Quiebramédula en Forma de Bruin",
       "verdance": "Verdor {stacks}/{max}. Cada Remiendo de Esporas, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración",
       "freeExecute": "Tu próxima facultad de ejecución válida no cuesta recursos",
       "resourceSap": "Restaura {value} de tu recurso actual cada {interval} s",
@@ -18415,17 +18416,17 @@ export const es: EnTranslations = {
       "claw": {
         "name": "Garra Desgarradora",
         "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma felina.",
-        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
+        "specNote_feral": "Cada golpe conectado añade una acumulación de Jirones, un sangrado de 6 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración."
       },
       "scratch": {
         "name": "Arañazo",
         "description": "Araña a los objetivos cercanos en un radio de 6 m e inflige daño de arma más {damage}. Otorga 1 punto de combo por objetivo alcanzado. Revela a los enemigos en sigilo dentro del barrido. Solo en Forma Felina.",
-        "specNote_feral": "Cada golpe que acierta añade 1 de Sangre Antigua (máximo 3)."
+        "specNote_feral": "Cada enemigo que golpea también sangra con Herida de Arañazo: 12 de daño durante 6 s."
       },
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
         "description": "Movimiento final que causa {damage}. Solo en Forma felina.",
-        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía."
+        "specNote_feral": "Inflige un 15% más de daño por cada uno de tus sangrados en el objetivo y renueva tu Grieta Sangrienta a su duración completa. Con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe que prolonga tus Desollar y Grieta Sangrienta, hace que tus sangrados en el objetivo hagan tic un 15% más rápido durante 8 s y restaura energía."
       },
       "swipe": {
         "name": "Zarpas Barredoras",
@@ -18480,11 +18481,11 @@ export const es: EnTranslations = {
       },
       "pounce": {
         "name": "Golpe Sigiloso",
-        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma felina."
+        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo y, como Feral, añade 1 de Sangre Antigua (máx. 3) y abre Desgarro de Garganta, un sangrado de 72 de daño durante 12 s. Solo en Forma felina. Fuera del sigilo, este botón es Embestida felina."
       },
       "lunge": {
         "name": "Embestida felina",
-        "description": "Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Colmillo salvaje, añade 1 Sangre antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma."
+        "description": "Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Feral, añade 1 de Sangre Antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma."
       },
       "hamstring_bite": {
         "name": "Derribo",
@@ -18496,12 +18497,13 @@ export const es: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangre de Lobo",
-        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma felina."
+        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma felina.",
+        "specNote_feral": "Los sangrados que apliques mientras dure infligen un 20% más de daño durante toda su duración."
       },
       "rip": {
         "name": "Grieta Sangrienta",
         "description": "Remate que hace sangrar al objetivo cada 2 s durante 24 s: 72 de daño más 48 por punto de combo gastado (5 puntos: {damage} en total). Solo en Forma felina.",
-        "specNote_feral": "El golpe conectado añade 1 de Sangre Antigua (máx. 3)."
+        "specNote_feral": "Mientras el objetivo tenga 3 o más de tus sangrados, sufre Heridas Supurantes: recibe un 20% menos de sanación."
       },
       "mortal_strike": {
         "name": "Golpe Mutilador",
@@ -18718,7 +18720,7 @@ export const es: EnTranslations = {
       },
       "redharvest": {
         "name": "Cosecha Roja",
-        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura {rage} de energía. Funciona sin puntos de combo."
+        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, prolonga tus Desollar y Grieta Sangrienta en el objetivo 8 s (hasta 16 s cada uno), hace que tus sangrados en el objetivo hagan tic un 15% más rápido durante 8 s (Torrente Rojo) y restaura {rage} de energía. No consume puntos de combo."
       },
       "marrowbreak": {
         "name": "Quiebramédula",
@@ -19236,7 +19238,7 @@ export const es: EnTranslations = {
       "rake": {
         "name": "Desollar",
         "description": "Desuella al enemigo por daño de arma más {damage} y causa {overTime} de daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma felina.",
-        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
+        "specNote_feral": "En Forma felina, los tics de tus sangrados añaden Sangre Antigua (máx. 3, como mucho 1 cada 3 s), y tus sangrados pueden ser críticos; cada crítico de sangrado restaura 5 de energía."
       },
       "revive_pet": {
         "name": "Remendar",
@@ -31126,7 +31128,7 @@ export const es: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Piel de Brasa del Colmillo Salvaje",
         "bonus2": "Cosecha Roja restaura 45 de energía, en lugar de 30.",
-        "bonus4": "Cosecha Roja aplica un nuevo Desuello al objetivo."
+        "bonus4": "Cosecha Roja también inflige al instante el 30% del daño que les queda a tus Desollar y Grieta Sangrienta en el objetivo. Ambos siguen haciendo efecto."
       },
       "wyrmshadow": {
         "name": "Atuendo de Nightfang",

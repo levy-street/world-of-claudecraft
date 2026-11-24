@@ -8201,10 +8201,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengubah musuh menjadi katak hingga {duration} detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid.',
   'entities.abilities.polymorph.name': 'Guna-guna',
   'entities.abilities.pounce.description':
-    'Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo. Hanya dalam Wujud Kucing. Di luar siluman, tombol ini adalah Terkaman.',
+    'Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo dan, sebagai Buas, menambah 1 Darah Tua (maks 3) serta membuka Robek Leher, pendarahan sebesar 72 kerusakan selama 12 detik. Hanya dalam Wujud Kucing. Di luar siluman, tombol ini adalah Terkaman.',
   'entities.abilities.pounce.name': 'Terkaman Senyap',
   'entities.abilities.lunge.description':
-    'Terkam musuh hingga 12 yard jauhnya, memberikan 60% kerusakan senjata dan menghasilkan 1 poin kombo. Hanya dalam Wujud Kucing.',
+    'Beralih ke Wujud Kucing jika belum, lalu terkam musuh hingga 25 yard jauhnya. Saat tiba, memberikan 60% kerusakan senjata, menghasilkan 1 poin kombo, dan sebagai Buas menambah 1 Darah Tua (maks 3); terkaman yang terputus mengembalikan jedanya. Dapat digunakan dalam wujud apa pun.',
   'entities.abilities.lunge.name': 'Terkaman',
   'entities.abilities.hamstring_bite.description':
     'Jurus penutup yang membuat target terpana selama 1 detik plus 1 detik per poin combo (5 poin combo: 6 detik). Hanya dalam Wujud Kucing.',
@@ -8326,6 +8326,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.name': 'Pukulan Gempa',
   'entities.abilities.tigers_fury.description':
     'Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Kucing.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Pendarahan yang kamu berikan selama efek ini aktif memberikan 20% kerusakan lebih besar sepanjang durasinya.',
   'entities.abilities.tigers_fury.name': 'Darah Lynx',
   'entities.abilities.travel_form.description':
     'Seketika berubah menjadi wujud Fleet yang gesit, meningkatkan kecepatan gerak sebesar 40% dan menghapus efek akar serta perlambatan yang dapat diputus. Kau tidak bisa menggunakan kemampuan lain saat berubah wujud, tetapi bisa berubah masuk atau keluar dari pertempuran, ideal untuk melarikan diri. Berubah menjadi wujud apa pun memberikan Langkah Berderap Lambat, ledakan singkat kecepatan gerak.',
@@ -16251,7 +16253,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 3 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Pemulihan Spora segar pada sasaran.',
   'entities.abilities.redharvest.name': 'Panen Merah',
   'entities.abilities.redharvest.description':
-    'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo.',
+    'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, memperpanjang Kupasan dan Celah Darah milikmu pada target selama 8 detik (hingga 16 detik masing-masing), membuat pendarahanmu pada target berdetak 15% lebih cepat selama 8 detik (Arus Merah), dan memulihkan {rage} energi. Tidak menghabiskan poin kombo.',
   'entities.abilities.sunlance.name': 'Jejak Surya',
   'entities.abilities.sunlance.description':
     'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan sebesar {damage} kerusakan Alam ditambah bakaran {overTime} selama 9 dtk, dan memulihkan 35 mana: pilihan mana. Gelombang Rembulan menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
@@ -16260,7 +16262,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya',
   'hudChrome.auraEffect.oldBlood':
-    'Darah Tua: tahap {stacks} dari {max}. Serangan Kucing dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi',
+    'Darah Tua: tahap {stacks} dari {max}. Dalam Wujud Kucing, setiap detak pendarahanmu menambah 1, paling banyak sekali setiap 3 detik, dan setiap serangan Terkaman Senyap dan Terkaman yang kena menambah 1; dalam Wujud Bruin, setiap serangan Cakar Menyapu dan Remuk Tulang yang kena menambah 1. Pada {max}: Gigitan Berdarah menjadi Panen Merah dalam Wujud Kucing, Remuk Tulang menjadi Pematah Sumsum dalam Wujud Bruin',
   'hudChrome.auraEffect.verdance':
     'Kehijauan: tahap {stacks} dari {max}. Setiap Pemulihan Spora, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya',
   'hudChrome.continentMap.levels': 'Level {min} hingga {max}',
@@ -16649,7 +16651,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Cakar musuh sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo. Hanya dalam Wujud Kucing.',
   'entities.abilities.claw.specNote_feral':
-    'Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
+    'Setiap pukulan yang mengenai menambah satu tumpukan Cabikan, pendarahan sebesar 6 kerusakan selama 8 detik per tumpukan (maks 5 tumpukan). Tumpukan baru menyegarkan durasinya.',
   'entities.abilities.cold_blood.description':
     'Memusatkan niat membunuhmu sehingga 5 seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -16685,7 +16687,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Kucing.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest, yang menghabiskan Darah Tua untuk serangan yang lebih kuat, juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan energi.',
+    'Memberikan 15% kerusakan lebih besar untuk setiap pendarahanmu pada target dan menyegarkan Celah Darah milikmu ke durasi penuh. Pada 3 Darah Tua tombol ini berubah menjadi Panen Merah, yang menghabiskan Darah Tua untuk serangan yang memperpanjang Kupasan dan Celah Darah milikmu, membuat pendarahanmu pada target berdetak 15% lebih cepat selama 8 detik, dan memulihkan energi.',
   'entities.abilities.funeral_harvest.description':
     'Saat musuh yang baru saja kamu atau mayat hidupmu lukai mati, kamu memperoleh 1 Serpihan Jiwa. Ini dapat terjadi sekali setiap 3 detik.',
   'entities.abilities.funeral_harvest.name': 'Panen Pemakaman',
@@ -16743,7 +16745,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan {overTime} kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Kucing.',
   'entities.abilities.rake.specNote_feral':
-    'Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
+    'Dalam Wujud Kucing, setiap detak pendarahanmu menambah Darah Tua (maks 3, paling banyak 1 setiap 3 detik), dan pendarahanmu dapat menjadi kritis, dengan setiap kritis pendarahan memulihkan 5 energi.',
   'entities.abilities.reaping_command.description':
     'Menghabiskan 2 Serpihan Jiwa untuk memerintahkan setiap abdi mayat hidup menyerang secara serentak. Penjaga Kubur memancing perhatian dan bersiaga, Warrior menahan, Penyihir Tulang membuka pertahanan sihir, dan Sayap Kubur merobek semua musuh yang terkena.',
   'entities.abilities.reaping_command.name': 'Perintah Penuaian',
@@ -16757,7 +16759,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Setiap rapalan menambah 1 Kehijauan (maks 3), termasuk saat menyegarkan kuntum yang masih aktif. Pada 3 Kehijauan, Pemulihan Cepat berubah menjadi Mekar Raya.',
   'entities.abilities.rip.description':
     'Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk: 72 kerusakan ditambah 48 per poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.',
-  'entities.abilities.rip.specNote_feral': 'Pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Selama 3 atau lebih pendarahanmu ada pada target, target menderita Luka Merembes: penyembuhan yang diterima berkurang 20%.',
   'entities.abilities.ruinous_brand.description':
     'Menandai musuh selama 15 detik. 3 mantra langsung berikutnya bergema sebesar 25% kerusakan terhadap musuh yang ditandai, atau menyalin 50% kerusakan kepadanya saat dirapalkan terhadap target lain. Gema Baut Reruntuhan juga terhitung sebagai pukulan kritis, tanpa pengganda kerusakan kritis tambahan.',
   'entities.abilities.ruinous_brand.name': 'Cap Kehancuran',
@@ -16899,6 +16902,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kemampuan eksekusi berikutnya yang memenuhi syarat tidak memakan biaya apa pun',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Panen Pemakaman belum bisa menciptakan Serpihan Jiwa lagi',
+  'hudChrome.auraEffect.redTorrent':
+    'Pendarahanmu pada target Panen Merah milikmu berdetak {pct}% lebih cepat',
   'hudChrome.auraEffect.galeheartWeapon':
     'Menyelesaikan Irama Roh Perang {steps} pukulan menggemakan serangan itu {count} kali sebesar {pct}% kerusakannya sebagai kerusakan Alam',
   'hudChrome.auraEffect.healEcho': 'Turun di bawah {threshold}% nyawa memulihkan {value} nyawa',
@@ -18019,7 +18024,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.name': 'Sisik Bara Roh Perang',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Panen Merah memulihkan 45 energi, naik dari 30.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Panen Merah menanamkan Pengulitan baru pada target.',
+    'Panen Merah juga langsung memberikan 30% sisa kerusakan Kupasan dan Celah Darah milikmu pada target. Keduanya tetap berdetak.',
   'entities.itemSets.wildfang_emberhide.name': 'Kulit Bara Taring Liar',
   'entities.itemSets.wyrmshadow.bonus6':
     'Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda merobek Sobekan Kasar, menyebabkan target berdarah sebesar 4 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.',
@@ -20284,7 +20289,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Cakar target di sekitar dalam jarak 6 meter, memberikan kerusakan senjata ditambah {damage}. Memberi 1 poin kombo per target yang terkena. Mengungkap musuh tersembunyi dalam sapuan. Hanya Wujud Kucing.',
   'entities.abilities.scratch.name': 'Cakaran',
   'entities.abilities.scratch.specNote_feral':
-    'Setiap serangan yang mengenai sasaran menambah 1 Darah Tua (maksimal 3).',
+    'Setiap musuh yang terkena juga berdarah karena Luka Cakaran: 12 kerusakan selama 6 detik.',
   'entities.abilities.spore_burst.description':
     'Memanggil peledak spora di area target. Setelah {duration} dtk ia meledak, menyembuhkan sekutu sebesar {healing} dan memberikan {damage} kerusakan Alam kepada musuh dalam jarak 8 meter.',
   'entities.abilities.spore_burst.name': 'Ledakan Spora',

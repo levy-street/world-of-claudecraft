@@ -10580,10 +10580,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Promění nepřítele v ropuchu až na {duration} s. Ropucha bloudí a rychle se léčí. Jakékoli poškození efekt přeruší. Jen bestie a humanoidi.',
   'entities.abilities.polymorph.name': 'Očarování',
   'entities.abilities.pounce.description':
-    'Zahajovací útok z plížení, který omráčí cíl na 2 s. Udělí 1 combo bod. Pouze ve kočičí podobě. Bez plížení je toto tlačítko Výpad.',
+    'Zahajovací útok z plížení, který omráčí cíl na 2 s. Udělí 1 combo bod a jako Divoký tesák přidá 1 Starou krev (max 3) a způsobí Rozpárané hrdlo, krvácení za 72 poškození během 12 s. Pouze v kočičí podobě. Bez plížení je toto tlačítko Výpad.',
   'entities.abilities.pounce.name': 'Plíživý úder',
   'entities.abilities.lunge.description':
-    'Vrhni se na nepřítele až 12 yardů daleko, způsob 60 % poškození zbraní a získej 1 combo bod. Pouze ve kočičí podobě.',
+    'Pokud ještě nejsi v kočičí podobě, přeměň se do ní a pak se vrhni na nepřítele až 25 yardů daleko. Po dopadu způsobí 60 % poškození zbraní, udělí 1 combo bod a jako Divoký tesák přidá 1 Starou krev (max 3); přerušený výpad vrátí svou dobu obnovy. Použitelné v jakékoli podobě.',
   'entities.abilities.lunge.name': 'Výpad',
   'entities.abilities.hamstring_bite.description':
     'Dokončovací útok, který omráčí cíl na 1 s plus 1 s za combo bod (5 combo bodů: 6 s). Pouze ve kočičí podobě.',
@@ -10708,6 +10708,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.name': 'Chvějící úder',
   'entities.abilities.tigers_fury.description':
     'Prudce obnoví {rage} energie a zvýší sílu útoku o {buff} na {duration} s. Pouze v kočičí podobě.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Krvácení, která během jeho trvání způsobíš, působí po celou dobu svého trvání o 20 % vyšší poškození.',
   'entities.abilities.tigers_fury.name': 'Rysí krev',
   'entities.abilities.travel_form.description':
     'Okamžitě se proměníš ve svižnou běhavou podobu, zvýšíš rychlost pohybu o 40 % a odstraníš přerušitelné zakořenění a zpomalení. V proměně nemůžeš používat jiné schopnosti, ale můžeš se proměnit v boji i mimo něj, ideální pro únik. Proměna do jakékoli podoby udělí Pružný krok, krátký nával rychlosti pohybu.',
@@ -16169,7 +16171,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Spotřebuje 3 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Výtrusové hojení.',
   'entities.abilities.redharvest.name': 'Rudá sklizeň',
   'entities.abilities.redharvest.description':
-    'Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví {rage} energie. Funguje i bez combo bodů.',
+    'Spotřebuje 3 Staré krve: úder za {damage}, prodlouží tvé Stažení z kůže a Krvavou trhlinu na cíli o 8 s (každé nejvýše o 16 s), na 8 s zrychlí tiky tvých krvácení na cíli o 15 % (Rudý příval) a obnoví {rage} energie. Nespotřebovává combo body.',
   'entities.abilities.sunlance.name': 'Sluneční brázda',
   'entities.abilities.sunlance.description':
     'Spotřebuje 3 Měsíčního přílivu na úder za {damage} přírodního poškození plus popálení za {overTime} během 9 s a obnoví 35 many: volba many. Měsíční vzedmutí spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu.',
@@ -16178,7 +16180,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá',
   'hudChrome.auraEffect.oldBlood':
-    'Stará krev: stupeň {stacks} z {max}. Zasažené kočičí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí',
+    'Stará krev: stupeň {stacks} z {max}. V kočičí podobě přidá každý tik tvého krvácení 1, nejvýše jednou za 3 s, a každý zásah Plíživým úderem a Výpadem přidá 1; v Medvědí podobě přidá každý zásah Rozmáchlými drápy a Drcením kostí 1. Při {max}: Krvavý skus se v kočičí podobě změní na Rudou sklizeň a Drcení kostí se v Medvědí podobě změní na Lámání morku',
   'hudChrome.auraEffect.verdance':
     'Zeleň {stacks}/{max}. Každé seslání Divokého květu, Druhého květu nebo Divokého zhojení přidá 1 a každá Zeleň zkrátí seslání Divokého zhojení. Při {max} se Rychlé zhojení mění v Překvět',
   'hudChrome.continentMap.levels': 'Úrovně {min} až {max}',
@@ -16380,7 +16382,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.name': 'Strusková kůže',
   'entities.abilities.claw.description':
     'Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze v kočičí podobě.',
-  'entities.abilities.claw.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
+  'entities.abilities.claw.specNote_feral':
+    'Každý zásah přidá jednu vrstvu Rozedření, krvácení za 6 poškození během 8 s na vrstvu (max 5 vrstev). Nová vrstva obnoví trvání.',
   'entities.abilities.cold_blood.description':
     'Soustředí tvůj zabijácký záměr, takže tvých příštích 5 útoků bude kritickými zásahy. (klíčová schopnost Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -16414,7 +16417,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Dokončovací útok, který způsobí {damage}. Pouze v kočičí podobě.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k silnějšímu úderu, okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví energii.',
+    'Způsobí o 15 % vyšší poškození za každé tvé krvácení na cíli a obnoví tvou Krvavou trhlinu na plné trvání. Při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k úderu, jenž prodlouží tvé Stažení z kůže a Krvavou trhlinu, na 8 s zrychlí tiky tvých krvácení na cíli o 15 % a obnoví energii.',
   'entities.abilities.funeral_harvest.description':
     'Když zemře nepřítel nedávno zasažený tebou nebo tvými nemrtvými, získáš 1 Úlomek duše. Může nastat nejvýše jednou za 3 s.',
   'entities.abilities.funeral_harvest.name': 'Pohřební sklizeň',
@@ -16471,7 +16474,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.name': 'Vzkříšení Kostlivého bojovníka',
   'entities.abilities.rake.description':
     'Rozpárej nepřítele za poškození zbraně plus {damage} a způsob {overTime} poškození krvácením během 18 s. Udělí 1 combo bod. Pouze v kočičí podobě.',
-  'entities.abilities.rake.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
+  'entities.abilities.rake.specNote_feral':
+    'V kočičí podobě přidávají tiky tvého krvácení Starou krev (max 3, nejvýše 1 za 3 s) a tvá krvácení mohou kriticky zasáhnout, přičemž každý kritický tik krvácení obnoví 5 energie.',
   'entities.abilities.reaping_command.description':
     'Spotřebuje 2 Úlomky duše a přikáže všem nemrtvým služebníkům udeřit společně. Hrobové stráže provokují a připraví se, Bojovníci připoutají, Kostění mágové odhalí magické obrany a Hrobové křídlo roztrhá všechny zasažené nepřátele.',
   'entities.abilities.reaping_command.name': 'Příkaz sklizně',
@@ -16484,7 +16488,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každé seslání přidá 1 Zeleň (max 3), i když jen obnoví květ, který už působí. Při 3 Zeleni se Rychlé zhojení změní na Překvět.',
   'entities.abilities.rip.description':
     'Zakončení, které nechá cíl krvácet každé 2 s po 24 s: 72 poškození plus 48 za utracený combo bod (5 bodů: celkem {damage}). Pouze v Kočičí podobě.',
-  'entities.abilities.rip.specNote_feral': 'Zasažený úder přidá 1 Starou krev (max 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Dokud jsou na cíli 3 nebo více tvých krvácení, trpí Mokvajícími ranami: přijímá o 20 % méně léčení.',
   'entities.abilities.ruinous_brand.description':
     'Na 15 s cejchuje nepřítele. Tvá další 3 přímá kouzla se proti cejchovanému nepříteli ozvou za 25 % poškození, nebo mu při seslání na jiný cíl zkopírují 50 % poškození. Ozvěny Zkázného šípu se také počítají jako kritické zásahy, bez dalšího násobiče kritického poškození.',
   'entities.abilities.ruinous_brand.name': 'Ničivý cejch',
@@ -16618,6 +16623,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeExecute': 'Tvá příští způsobilá dorážecí schopnost nic nestojí',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Pohřební sklizeň zatím nemůže vytvořit další Úlomek duše',
+  'hudChrome.auraEffect.redTorrent':
+    'Tvá krvácení na cíli tvé Rudé sklizně tikají o {pct} % rychleji',
   'hudChrome.auraEffect.galeheartWeapon':
     'Dokončení {steps}úderové kadence Válečného ducha ozvěnou zopakuje úder {count}krát za {pct} % jeho poškození jako přírodní poškození',
   'hudChrome.auraEffect.healEcho': 'Pokles pod {threshold} % zdraví obnoví {value} zdraví',
@@ -17657,7 +17664,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.bonus4': 'Ancestral Strike zasahuje 30 % silněji.',
   'entities.itemSets.warspirit_emberscale.name': 'Uhlíkové šupiny Válečného ducha',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Rudá sklizeň obnoví 45 energie místo 30.',
-  'entities.itemSets.wildfang_emberhide.bonus4': 'Rudá sklizeň na cíl umístí nový Odřez.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    'Rudá sklizeň navíc okamžitě způsobí 30 % zbývajícího poškození tvého Stažení z kůže a Krvavé trhliny na cíli. Obě krvácení dál působí.',
   'entities.itemSets.wildfang_emberhide.name': 'Uhlíková kůže Divokého tesáku',
   'entities.itemSets.wyrmshadow.bonus6':
     'Zvyšuje rychlost útoků a sesílání o 4 % a zásah o 3 %. Kritické zásahy zbraní způsobí Rozervanou ránu, která cíl krvácí za 4 poškození každé 2 s po dobu 12 s. Sčítá se až 3krát.',
@@ -19971,7 +19979,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Proškrábni blízké cíle do 6 yardů a způsob poškození zbraní plus {damage}. Za každý zasažený cíl získáš 1 bod komba. Odhalí skryté nepřátele v oblasti zásahu. Pouze v Kočičí podobě.',
   'entities.abilities.scratch.name': 'Škrábnutí',
   'entities.abilities.scratch.specNote_feral':
-    'Každý úspěšný zásah přidá 1 Starou krev (nejvýše 3).',
+    'Každý zasažený nepřítel navíc krvácí ze Škrábné rány: 12 poškození během 6 s.',
   'entities.abilities.spore_burst.description':
     'Vyvolá v cílové oblasti výtrusovou hlízu. Po {duration} s praskne, vyléčí spojence o {healing} a nepřátelům do 8 yardů způsobí {damage} přírodního poškození.',
   'entities.abilities.spore_burst.name': 'Výtrusový výbuch',

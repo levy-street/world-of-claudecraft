@@ -246,13 +246,13 @@ describe('Wildfang engine', () => {
     expect(player.attackPower).toBe(Math.round((casterAttackPower + 8 + player.level * 2) * 1.1));
   });
 
-  it('shares three landed stages across forms, spends through the live button, and clears after combat', () => {
+  it('banks Bruin hits, spends through the live Cat button, and clears after combat', () => {
     const { sim, player } = rig('feral');
     const mob = targetMob(sim);
     const engineCtx = ctx(sim);
 
-    druidEngineOnLandedStrike(engineCtx, player, 'claw');
-    druidEngineOnLandedStrike(engineCtx, player, 'rake');
+    druidEngineOnLandedStrike(engineCtx, player, 'maul');
+    druidEngineOnLandedStrike(engineCtx, player, 'swipe');
     player.auras.push(formAura(player, 'form_cat'));
     druidEngineOnLandedStrike(engineCtx, player, 'maul');
     expect(stacks(player, OLD_BLOOD_ID)).toBe(3);
@@ -285,9 +285,9 @@ describe('Wildfang engine', () => {
     const mob = targetMob(sim);
     const engineCtx = ctx(sim);
     player.auras.push(formAura(player, 'form_cat'));
-    druidEngineOnLandedStrike(engineCtx, player, 'claw');
-    druidEngineOnLandedStrike(engineCtx, player, 'rake');
-    druidEngineOnLandedStrike(engineCtx, player, 'claw');
+    druidEngineOnLandedStrike(engineCtx, player, 'maul');
+    druidEngineOnLandedStrike(engineCtx, player, 'swipe');
+    druidEngineOnLandedStrike(engineCtx, player, 'maul');
     expect(stacks(player, OLD_BLOOD_ID)).toBe(3);
     const resolvedRank = sim.resolvedAbility('ferocious_bite');
     expect(resolvedRank?.def.id).toBe('redharvest');
@@ -308,8 +308,8 @@ describe('Wildfang engine', () => {
     player.hp = Math.round(player.maxHp * 0.75);
     player.resourceType = 'rage';
     player.resource = 100;
-    druidEngineOnLandedStrike(ctx(sim), player, 'claw');
-    druidEngineOnLandedStrike(ctx(sim), player, 'rake');
+    druidEngineOnLandedStrike(ctx(sim), player, 'maul');
+    druidEngineOnLandedStrike(ctx(sim), player, 'swipe');
     druidEngineOnLandedStrike(ctx(sim), player, 'swipe');
 
     const replacement = sim.resolvedAbility('maul');
@@ -333,8 +333,8 @@ describe('Wildfang engine', () => {
     player.hp = Math.round(player.maxHp * 0.4);
     player.resourceType = 'rage';
     player.resource = 20;
-    druidEngineOnLandedStrike(ctx(sim), player, 'claw');
-    druidEngineOnLandedStrike(ctx(sim), player, 'rake');
+    druidEngineOnLandedStrike(ctx(sim), player, 'maul');
+    druidEngineOnLandedStrike(ctx(sim), player, 'swipe');
     druidEngineOnLandedStrike(ctx(sim), player, 'swipe');
 
     const hpBefore = player.hp;
@@ -351,21 +351,21 @@ describe('Wildfang engine', () => {
 
   it('clears Old Blood through the authoritative tick and on specialization change', () => {
     const { sim, player } = rig('feral');
-    druidEngineOnLandedStrike(ctx(sim), player, 'claw');
+    druidEngineOnLandedStrike(ctx(sim), player, 'maul');
     expect(stacks(player, OLD_BLOOD_ID)).toBe(1);
     player.inCombat = false;
     player.combatTimer = 99;
     sim.tick();
     expect(player.auras.some((aura) => aura.id === OLD_BLOOD_ID)).toBe(false);
 
-    druidEngineOnLandedStrike(ctx(sim), player, 'claw');
+    druidEngineOnLandedStrike(ctx(sim), player, 'maul');
     expect(sim.applyTalents({ spec: 'balance', rows: {} })).toBe(true);
     expect(player.auras.some((aura) => aura.id === OLD_BLOOD_ID)).toBe(false);
   });
 
   it('clears engine banks on death and does not persist them through logout', () => {
     const { sim, player } = rig('feral');
-    druidEngineOnLandedStrike(ctx(sim), player, 'claw');
+    druidEngineOnLandedStrike(ctx(sim), player, 'maul');
     expect(stacks(player, OLD_BLOOD_ID)).toBe(1);
 
     handleDeath(ctx(sim), player, null);

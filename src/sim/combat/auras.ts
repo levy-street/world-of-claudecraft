@@ -56,6 +56,7 @@ import {
   onCraftedCollectionHeal,
 } from './crafted_collection_effects';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
+import { feralBleedPeriodicHit, feralBleedTickRate } from './druid_bleeds';
 import { druidEngineOnBleedTick } from './druid_engines';
 import { naturesBoonOnHotTick } from './druid_natures_boon';
 import { secondBloomOnHotExpired } from './druid_second_bloom';
@@ -352,7 +353,9 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
     if (a.kind === 'thorns') tickThornsCooldown(a);
     if (a.tickInterval) {
-      a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
+      // Red Torrent (combat/druid_bleeds.ts) runs a feral druid's bleed clocks
+      // faster on the Redharvest target; 1 for every other aura.
+      a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT * feralBleedTickRate(ctx, e, a);
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
         if (a.kind === 'pyre_guardian') {
@@ -398,7 +401,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           const periodicHit =
             a.school === 'shadow' && !a.finalDamage
               ? shadowPeriodicHit(ctx, dotSource, a.id, tickDamage)
-              : { amount: tickDamage, crit: false };
+              : // Bloodscent: a feral druid's Cat bleeds roll its melee crit
+                // (combat/druid_bleeds.ts); every other tick passes through
+                // untouched and draws no rng.
+                feralBleedPeriodicHit(ctx, dotSource, a, tickDamage);
           const resolution: DamageResolution | undefined =
             a.id === 'vampiric_touch' ? { landedHpLoss: 0 } : undefined;
           const tickLanded = ctx.dealDamage(
@@ -440,7 +446,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           shadowSecondVerseTick(ctx, e, a);
           vespersOnDotTick(ctx, e, a);
           thundercallOnDotTick(ctx, dotSource, a, tickLanded);
-          druidEngineOnBleedTick(ctx, dotSource, a);
+          druidEngineOnBleedTick(ctx, dotSource, a, e);
           if (a.leechPct !== undefined) {
             const src = dotSource;
             if (src && !src.dead) {

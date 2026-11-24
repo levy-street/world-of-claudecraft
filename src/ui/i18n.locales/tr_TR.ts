@@ -8109,10 +8109,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmanı {duration} saniyeye kadar bir kurbağaya dönüştürür. Kurbağa başıboş dolaşır ve hızla iyileşir. Herhangi bir hasar etkiyi bozar. Yalnızca canavarlar ve insansılar.',
   'entities.abilities.polymorph.name': 'Büyüleme',
   'entities.abilities.pounce.description':
-    'Hedefi 2 saniye boyunca sersemleten gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kedi Formu. Gizlilik dışında bu düğme Atılış olur.',
+    'Hedefi 2 saniye boyunca sersemleten gizlilik açılışı. 1 kombo puanı kazandırır ve Vahşi uzmanlığında 1 Kadim Kan ekler (en fazla 3) ve Gırtlak Yırtığı açar: 12 saniyede 72 hasar veren bir kanama. Yalnızca Kedi Formu. Gizlilik dışında bu düğme Atılış olur.',
   'entities.abilities.pounce.name': 'Sinsi Darbe',
   'entities.abilities.lunge.description':
-    '12 yardaya kadar uzaktaki bir düşmana atılır, %60 silah hasarı verir ve 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
+    'Zaten Kedi Formunda değilsen Kedi Formuna geçer, ardından 25 yardaya kadar uzaktaki bir düşmana atılır. Varışta %60 silah hasarı verir, 1 kombo puanı kazandırır ve Vahşi uzmanlığında 1 Kadim Kan ekler (en fazla 3); yarıda kesilen bir atılış bekleme süresini iade eder. Her formda kullanılabilir.',
   'entities.abilities.lunge.name': 'Atılış',
   'entities.abilities.hamstring_bite.description':
     'Hedefi 1 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 6 sn). Yalnızca Kedi Formu.',
@@ -8232,6 +8232,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.name': 'Sarsan Darbe',
   'entities.abilities.tigers_fury.description':
     'Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kedi Formu.',
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Etkisi sürerken uyguladığın kanamalar tüm süreleri boyunca %20 daha fazla hasar verir.',
   'entities.abilities.tigers_fury.name': 'Vaşak Kanı',
   'entities.abilities.travel_form.description':
     "Anında hızlı bir Fleet Formu'na bürünerek hareket hızını %40 artırır ve kırılabilir kök tuzaklarını ve yavaşlatmaları kaldırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır.",
@@ -16247,7 +16249,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Spor Şifası eker.',
   'entities.abilities.redharvest.name': 'Kızıl Hasat',
   'entities.abilities.redharvest.description':
-    '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır.',
+    '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, hedefteki Deri Yüzme ve Kanlı Yarığını 8 saniye uzatır (her biri en fazla 16 saniye), hedefteki kanamalarının 8 saniye boyunca %15 daha hızlı işlemesini sağlar (Kızıl Sel) ve {rage} enerji geri kazandırır. Kombo puanı harcamaz.',
   'entities.abilities.sunlance.name': 'Güneş İzi',
   'entities.abilities.sunlance.description':
     '3 Ay Gelgitini, {damage} Doğa hasarı ve 9 saniyede {overTime} yanık veren bir vuruş için tüketir ve 35 mana geri kazandırır: mana seçimi. Ay Kabarışı da aynı 3 Ay Gelgitini tüketir, o yüzden birini seç.',
@@ -16256,7 +16258,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar',
   'hudChrome.auraEffect.oldBlood':
-    'Kadim Kan: aşama {stacks} / {max}. İsabet eden Kedi ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür',
+    'Kadim Kan: aşama {stacks} / {max}. Kedi Formunda kanamalarının her tiki 1 ekler, 3 saniyede en fazla bir kez, ve isabet eden her Sinsi Darbe ve Atılış vuruşu 1 ekler; Bruin Formunda isabet eden her Süpüren Pençeler ve Kemik Kıran vuruşu 1 ekler. {max} olduğunda: Kedi Formunda Kanlı Isırık Kızıl Hasata, Bruin Formunda Kemik Kıran İlik Kırana dönüşür',
   'hudChrome.auraEffect.verdance':
     "Yeşillik: aşama {stacks} / {max}. Kullandığın her Spor Şifası, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
   'hudChrome.continentMap.levels': 'Seviye {min} ile {max} arası',
@@ -16460,7 +16462,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.name': 'Kor Deri',
   'entities.abilities.claw.description':
     'Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
-  'entities.abilities.claw.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
+  'entities.abilities.claw.specNote_feral':
+    'İsabet eden her vuruş bir yığın Lime Lime ekler; bu, yığın başına 8 saniyede 6 hasar veren bir kanamadır (en fazla 5 yığın). Yeni bir yığın süreyi yeniler.',
   'entities.abilities.cold_blood.description':
     'Öldürme niyetini odaklar, böylece sonraki 5 saldırın kritik vuruş olur. (Knifework motoru)',
   'entities.abilities.corpse_explosion.description':
@@ -16495,7 +16498,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     '{damage} veren bitirici hamle. Yalnızca Kedi Formu.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak daha güçlü bir ısırık gerçekleştirir, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vurur ve enerji geri kazandırır.',
+    'Hedefteki her kanaman için %15 daha fazla hasar verir ve Kanlı Yarığını tam süresine yeniler. 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak Deri Yüzme ve Kanlı Yarığını uzatan, hedefteki kanamalarının 8 saniye boyunca %15 daha hızlı işlemesini sağlayan ve enerji geri kazandıran bir vuruş yapar.',
   'entities.abilities.funeral_harvest.description':
     "Senin ya da ölülerinin yakın zamanda hasar verdiği bir düşman öldüğünde, 1 Ruh Parçası kazanırsın. Bu en fazla 3 sn'de bir gerçekleşebilir.",
   'entities.abilities.funeral_harvest.name': 'Cenaze Hasadı',
@@ -16552,7 +16555,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.name': 'İskelet Savaşçı Diriltme',
   'entities.abilities.rake.description':
     'Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca {overTime} kanama hasarı verir. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
-  'entities.abilities.rake.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
+  'entities.abilities.rake.specNote_feral':
+    'Kedi Formunda kanamalarının her tiki Kadim Kan ekler (en fazla 3, 3 saniyede en fazla 1) ve kanamaların kritik vurabilir; her kanama kritiği 5 enerji geri kazandırır.',
   'entities.abilities.reaping_command.description':
     '2 Ruh Parçası harcayarak tüm ölü hizmetkarlara birlikte vurma emri verir. Mezar Muhafızları kışkırtır ve hazırlanır, Savaşçılar sabitler, Kemik Büyücüler büyü savunmalarını açığa çıkarır ve Mezar Kanadı vurduğu tüm düşmanları parçalar.',
   'entities.abilities.reaping_command.name': 'Hasat Emri',
@@ -16565,7 +16569,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Her kullanım 1 Yeşillik ekler (en fazla 3); zaten etkide olan bir çiçeği yenilemek de buna dahildir. 3 Yeşillikte, Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür.',
   'entities.abilities.rip.description':
     "Hedefi 24 sn boyunca her 2 sn'de kanatan bitirici: harcanan kombo puanı başına 48 artı 72 hasar (5 puan: toplam {damage}). Yalnızca Kedi Formunda.",
-  'entities.abilities.rip.specNote_feral': 'İsabet eden vuruş 1 Kadim Kan ekler (en fazla 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Hedefte 3 veya daha fazla kanaman varken hedef Sızan Yaralar etkisine girer: aldığı iyileştirme %20 azalır.',
   'entities.abilities.ruinous_brand.description':
     'Bir düşmanı 15 sn süreyle damgalar. Sonraki 3 doğrudan büyün, damgalı düşmana karşı %25 hasarla yankılanır ya da başka bir hedefe atıldığında ona %50 hasar kopyalar. Yıkım Oku yankıları da başka bir kritik hasar çarpanı olmadan kritik vuruş sayılır.',
   'entities.abilities.ruinous_brand.name': 'Yıkıcı Damga',
@@ -16703,6 +16708,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeExecute': 'Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Cenaze Hasadı henüz başka bir Ruh Parçası oluşturamaz',
+  'hudChrome.auraEffect.redTorrent': 'Kızıl Hasat hedefindeki kanamaların %{pct} daha hızlı işler',
   'hudChrome.auraEffect.galeheartWeapon':
     "{steps} vuruşluk Warspirit ritmini tamamlamak, vuruşu hasarının {pct}%'i kadar Doğa hasarıyla {count} kez yankılar",
   'hudChrome.auraEffect.healEcho':
@@ -17799,7 +17805,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warspirit_emberscale.name': 'Savaş Ruhu Kor Pulu',
   'entities.itemSets.wildfang_emberhide.bonus2': 'Kızıl Hasat, 30 yerine 45 enerji yeniler.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Kızıl Hasat hedefe yeni bir Deri Yüzme etkisi uygular.',
+    "Kızıl Hasat ayrıca hedefteki Deri Yüzme ve Kanlı Yarığının kalan hasarının %30'unu anında verir. İkisi de işlemeye devam eder.",
   'entities.itemSets.wildfang_emberhide.name': 'Yaban Dişinin Kor Derisi',
   'entities.itemSets.wyrmshadow.bonus6':
     'Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları Pırtık Yara açarak hedefi 12 saniye boyunca her 2 saniyede 4 hasar için kanatır. En fazla 3 kez birikir.',
@@ -20056,7 +20062,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '6 yarda içindeki yakın hedefleri tırmalayarak silah hasarına ek {damage} hasar ver. Vurulan her hedef için 1 kombo puanı kazandırır. Savurma alanındaki gizlenmiş düşmanları açığa çıkarır. Yalnızca Kedi Formunda.',
   'entities.abilities.scratch.name': 'Tırmalama',
   'entities.abilities.scratch.specNote_feral':
-    'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
+    'Vurduğu her düşman ayrıca Tırmık Yarası ile kanar: 6 saniyede 12 hasar.',
   'entities.abilities.spore_burst.description':
     'Hedef bölgede sporlarla dolu bir mantar çağırır. {duration} saniye sonra patlayarak 8 yarda içindeki müttefikleri {healing} iyileştirir ve düşmanlara {damage} Doğa hasarı verir.',
   'entities.abilities.spore_burst.name': 'Spor Patlaması',

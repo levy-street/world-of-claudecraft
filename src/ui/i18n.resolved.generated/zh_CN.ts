@@ -4791,6 +4791,7 @@ export const zh_CN: EnTranslations = {
       "cooldownCap": "此时间窗已使用 {used}/{cap} 秒冷却缩减",
       "bruinRushWindow": "豹形态无需法力，并钉制你的巨熊冲锋目标，使其减速 {pct}%，持续 {sec} 秒",
       "funeralHarvestLock": "葬礼收割暂时无法再次生成灵魂碎片",
+      "redTorrent": "你在血收目标身上的流血效果跳动速度提高{pct}%",
       "effigyPlankHide": "挡掉每次攻击的 {pct}%，直到碎晶长矛的突刺熄灭它眼中的灯笼",
       "effigyLanternOut": "对你而言，稻草工头的灯笼已经熄灭：你和你宠物的攻击无视其木板之皮，全额命中",
       "leadenHexLock": "铅沉妖术暂时无法再次定身此目标",
@@ -4842,7 +4843,7 @@ export const zh_CN: EnTranslations = {
       "coldsightRead": "你的下一次引弓长射造成的伤害提高{longDrawPct}%，或你的下一次凶邪射击造成的伤害提高{fellShotPct}%",
       "duskEconomy": "技能的能量消耗降低{pct}%",
       "moontide": "月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层",
-      "oldBlood": "古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓",
+      "oldBlood": "古血：第{stacks}/{max}层。豹形态下，你的流血效果每次跳动累积1层，每3秒最多1次，匿袭与扑击每次命中也累积1层；巨熊形态下，横扫利爪与碎骨击每次命中累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓",
       "verdance": "繁茂：第{stacks}/{max}层。每施放一次孢愈术、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放",
       "freeExecute": "下一个符合条件的斩杀技能不消耗资源",
       "resourceSap": "每 {interval} 秒恢复 {value} 点当前资源",
@@ -18415,17 +18416,17 @@ export const zh_CN: EnTranslations = {
       "claw": {
         "name": "裂爪",
         "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限豹形态。",
-        "specNote_feral": "每次命中累积1层古血（最多3层）。"
+        "specNote_feral": "每次命中叠加1层撕碎，每层为一个在8秒内造成6点伤害的流血效果（最多5层）。叠加新的一层会刷新持续时间。"
       },
       "scratch": {
         "name": "抓挠",
         "description": "抓挠 6 码内的附近目标，造成武器伤害加 {damage}。每命中一个目标奖励 1 个连击点。使范围内潜行的敌人现形。仅限豹形态。",
-        "specNote_feral": "每次命中累积1层古血（最多3层）。"
+        "specNote_feral": "每个被击中的敌人还会受到抓伤流血效果：在6秒内造成12点伤害。"
       },
       "ferocious_bite": {
         "name": "血噬",
         "description": "终结技，造成 {damage}。仅限豹形态。",
-        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为血收：消耗古血发动一次更强的撕咬，立即引爆你的剐削与血裂的全部剩余伤害，同时恢复能量。"
+        "specNote_feral": "目标身上每有一个你的流血效果，造成的伤害提高15%，并将你的血隙刷新为完整持续时间。古血达到3层时，此按钮变为血收：消耗古血发动一次打击，延长你的剐削与血隙，使你在目标身上的流血效果跳动速度提高15%，持续8秒，并恢复能量。"
       },
       "swipe": {
         "name": "横扫利爪",
@@ -18480,11 +18481,11 @@ export const zh_CN: EnTranslations = {
       },
       "pounce": {
         "name": "匿袭",
-        "description": "一个潜行开场技，昏迷目标 2 秒。奖励 1 个连击点。仅限豹形态。 未潜行时，此按钮为扑击。"
+        "description": "一个潜行开场技，昏迷目标 2 秒。奖励 1 个连击点，野性专精下还会累积1层古血（最多3层）并施加裂喉，一个在 12 秒内造成 72 点伤害的流血效果。仅限豹形态。未潜行时，此按钮为扑击。"
       },
       "lunge": {
         "name": "扑击",
-        "description": "扑向最远12码外的敌人，造成60%武器伤害并获得1个连击点。仅限豹形态使用。"
+        "description": "如果尚未处于豹形态则先变为豹形态，然后扑向最远25码外的敌人。抵达时造成60%武器伤害并获得1个连击点，野性专精下还会累积1层古血（最多3层）；扑击中途被打断会返还其冷却时间。任何形态下均可使用。"
       },
       "hamstring_bite": {
         "name": "扑倒",
@@ -18496,12 +18497,13 @@ export const zh_CN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "豹血",
-        "description": "涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限豹形态。"
+        "description": "涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限豹形态。",
+        "specNote_feral": "持续期间施加的流血效果在其整个持续时间内造成的伤害提高20%。"
       },
       "rip": {
         "name": "血隙",
         "description": "终结技，使目标每2秒流血一次，持续24秒：造成72点伤害，每消耗1个连击点额外增加48点（5个连击点共{damage}点）。仅限豹形态。",
-        "specNote_feral": "命中的这一击累积1层古血（最多3层）。"
+        "specNote_feral": "目标身上有3个或更多你的流血效果时，会受到渗血伤口影响：受到的治疗降低20%。"
       },
       "mortal_strike": {
         "name": "致残打击",
@@ -18718,7 +18720,7 @@ export const zh_CN: EnTranslations = {
       },
       "redharvest": {
         "name": "血收",
-        "description": "消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。"
+        "description": "消耗你的3层古血：造成{damage}点伤害，将你在目标身上的剐削与血隙各延长8秒（每个最多延长16秒），使你在目标身上的流血效果跳动速度提高15%，持续8秒（赤红奔流），并恢复{rage}点能量。不消耗连击点。"
       },
       "marrowbreak": {
         "name": "碎髓",
@@ -19236,7 +19238,7 @@ export const zh_CN: EnTranslations = {
       "rake": {
         "name": "剐削",
         "description": "撕裂敌人，造成武器伤害外加 {damage} 点，并在18秒内造成 {overTime} 点流血伤害。给予 1 点连击点。仅限豹形态。",
-        "specNote_feral": "每次命中累积1层古血（最多3层）。"
+        "specNote_feral": "豹形态下，你的流血效果每次跳动都会累积古血（最多3层，每3秒最多1层），并且你的流血效果可以造成暴击，每次流血暴击恢复5点能量。"
       },
       "revive_pet": {
         "name": "修补",
@@ -31126,7 +31128,7 @@ export const zh_CN: EnTranslations = {
       "wildfang_emberhide": {
         "name": "野牙烬皮甲",
         "bonus2": "血收恢复的能量由 30 点提高至 45 点。",
-        "bonus4": "血收会在目标身上重新施加剐削。"
+        "bonus4": "血收还会立即造成你在目标身上的剐削与血隙剩余伤害的30%，两者继续生效。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

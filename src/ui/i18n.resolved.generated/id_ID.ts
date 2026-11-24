@@ -4791,6 +4791,7 @@ export const id_ID: EnTranslations = {
       "cooldownCap": "{used} dari {cap} dtk pengurangan jeda terpakai dalam jendela ini",
       "bruinRushWindow": "Wujud Kucing tidak memakai mana dan menjepit target Terjangan Bruin-mu, memperlambatnya {pct}% selama {sec} dtk",
       "funeralHarvestLock": "Panen Pemakaman belum bisa menciptakan Serpihan Jiwa lagi",
+      "redTorrent": "Pendarahanmu pada target Panen Merah milikmu berdetak {pct}% lebih cepat",
       "effigyPlankHide": "Menangkis {pct}% dari setiap hantaman, sampai tusukan Tombak Serpih memadamkan lentera di matanya",
       "effigyLanternOut": "Lentera Mandor Jerami padam bagimu: seranganmu dan peliharaanmu mengabaikan Kulit Papannya dan mengenai dengan kekuatan penuh",
       "leadenHexLock": "Kutuk Timah belum bisa mengakar target ini lagi",
@@ -4842,7 +4843,7 @@ export const id_ID: EnTranslations = {
       "coldsightRead": "Tarikan Panjangmu berikutnya menghasilkan {longDrawPct}% lebih banyak kerusakan, atau Tembakan Jatuhmu berikutnya menghasilkan {fellShotPct}% lebih banyak",
       "duskEconomy": "Kemampuan menghabiskan {pct}% lebih sedikit energi",
       "moontide": "Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya",
-      "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Serangan Kucing dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi",
+      "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Dalam Wujud Kucing, setiap detak pendarahanmu menambah 1, paling banyak sekali setiap 3 detik, dan setiap serangan Terkaman Senyap dan Terkaman yang kena menambah 1; dalam Wujud Bruin, setiap serangan Cakar Menyapu dan Remuk Tulang yang kena menambah 1. Pada {max}: Gigitan Berdarah menjadi Panen Merah dalam Wujud Kucing, Remuk Tulang menjadi Pematah Sumsum dalam Wujud Bruin",
       "verdance": "Kehijauan: tahap {stacks} dari {max}. Setiap Pemulihan Spora, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya",
       "freeExecute": "Kemampuan eksekusi berikutnya yang memenuhi syarat tidak memakan biaya apa pun",
       "resourceSap": "Memulihkan {value} dari sumber dayamu saat ini setiap {interval} dtk",
@@ -18415,17 +18416,17 @@ export const id_ID: EnTranslations = {
       "claw": {
         "name": "Cakar Perobek",
         "description": "Cakar musuh sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo. Hanya dalam Wujud Kucing.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
+        "specNote_feral": "Setiap pukulan yang mengenai menambah satu tumpukan Cabikan, pendarahan sebesar 6 kerusakan selama 8 detik per tumpukan (maks 5 tumpukan). Tumpukan baru menyegarkan durasinya."
       },
       "scratch": {
         "name": "Cakaran",
         "description": "Cakar target di sekitar dalam jarak 6 meter, memberikan kerusakan senjata ditambah {damage}. Memberi 1 poin kombo per target yang terkena. Mengungkap musuh tersembunyi dalam sapuan. Hanya Wujud Kucing.",
-        "specNote_feral": "Setiap serangan yang mengenai sasaran menambah 1 Darah Tua (maksimal 3)."
+        "specNote_feral": "Setiap musuh yang terkena juga berdarah karena Luka Cakaran: 12 kerusakan selama 6 detik."
       },
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
         "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Kucing.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest, yang menghabiskan Darah Tua untuk serangan yang lebih kuat, juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan energi."
+        "specNote_feral": "Memberikan 15% kerusakan lebih besar untuk setiap pendarahanmu pada target dan menyegarkan Celah Darah milikmu ke durasi penuh. Pada 3 Darah Tua tombol ini berubah menjadi Panen Merah, yang menghabiskan Darah Tua untuk serangan yang memperpanjang Kupasan dan Celah Darah milikmu, membuat pendarahanmu pada target berdetak 15% lebih cepat selama 8 detik, dan memulihkan energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -18480,11 +18481,11 @@ export const id_ID: EnTranslations = {
       },
       "pounce": {
         "name": "Terkaman Senyap",
-        "description": "Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo. Hanya dalam Wujud Kucing. Di luar siluman, tombol ini adalah Terkaman."
+        "description": "Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo dan, sebagai Buas, menambah 1 Darah Tua (maks 3) serta membuka Robek Leher, pendarahan sebesar 72 kerusakan selama 12 detik. Hanya dalam Wujud Kucing. Di luar siluman, tombol ini adalah Terkaman."
       },
       "lunge": {
         "name": "Terkaman",
-        "description": "Terkam musuh hingga 12 yard jauhnya, memberikan 60% kerusakan senjata dan menghasilkan 1 poin kombo. Hanya dalam Wujud Kucing."
+        "description": "Beralih ke Wujud Kucing jika belum, lalu terkam musuh hingga 25 yard jauhnya. Saat tiba, memberikan 60% kerusakan senjata, menghasilkan 1 poin kombo, dan sebagai Buas menambah 1 Darah Tua (maks 3); terkaman yang terputus mengembalikan jedanya. Dapat digunakan dalam wujud apa pun."
       },
       "hamstring_bite": {
         "name": "Penjatuhan",
@@ -18496,12 +18497,13 @@ export const id_ID: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Darah Lynx",
-        "description": "Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Kucing."
+        "description": "Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Kucing.",
+        "specNote_feral": "Pendarahan yang kamu berikan selama efek ini aktif memberikan 20% kerusakan lebih besar sepanjang durasinya."
       },
       "rip": {
         "name": "Celah Darah",
         "description": "Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk: 72 kerusakan ditambah 48 per poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.",
-        "specNote_feral": "Pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
+        "specNote_feral": "Selama 3 atau lebih pendarahanmu ada pada target, target menderita Luka Merembes: penyembuhan yang diterima berkurang 20%."
       },
       "mortal_strike": {
         "name": "Serangan Pelukai",
@@ -18718,7 +18720,7 @@ export const id_ID: EnTranslations = {
       },
       "redharvest": {
         "name": "Panen Merah",
-        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo."
+        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, memperpanjang Kupasan dan Celah Darah milikmu pada target selama 8 detik (hingga 16 detik masing-masing), membuat pendarahanmu pada target berdetak 15% lebih cepat selama 8 detik (Arus Merah), dan memulihkan {rage} energi. Tidak menghabiskan poin kombo."
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",
@@ -19236,7 +19238,7 @@ export const id_ID: EnTranslations = {
       "rake": {
         "name": "Kupasan",
         "description": "Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan {overTime} kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Kucing.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
+        "specNote_feral": "Dalam Wujud Kucing, setiap detak pendarahanmu menambah Darah Tua (maks 3, paling banyak 1 setiap 3 detik), dan pendarahanmu dapat menjadi kritis, dengan setiap kritis pendarahan memulihkan 5 energi."
       },
       "revive_pet": {
         "name": "Obati",
@@ -31126,7 +31128,7 @@ export const id_ID: EnTranslations = {
       "wildfang_emberhide": {
         "name": "Kulit Bara Taring Liar",
         "bonus2": "Panen Merah memulihkan 45 energi, naik dari 30.",
-        "bonus4": "Panen Merah menanamkan Pengulitan baru pada target."
+        "bonus4": "Panen Merah juga langsung memberikan 30% sisa kerusakan Kupasan dan Celah Darah milikmu pada target. Keduanya tetap berdetak."
       },
       "wyrmshadow": {
         "name": "Jubah Nightfang",

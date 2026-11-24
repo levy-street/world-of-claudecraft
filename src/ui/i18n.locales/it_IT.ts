@@ -9720,19 +9720,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Assumi Forma del Gatto se necessario, poi scatta con il 50% di velocità in più per 15 s. Utilizzabile in ogni forma. Istantaneo e non attiva il tempo di recupero globale.',
   'entities.abilities.pounce.name': 'Colpo Strisciante',
   'entities.abilities.lunge.description':
-    "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Gatto.",
+    "Assumi la Forma del Gatto se non ci sei già, poi balza su un nemico fino a 25 metri di distanza. All'arrivo infligge il 60% del danno dell'arma, conferisce 1 punto combo e, da Ferino, aggiunge 1 Sangue Antico (massimo 3); un balzo interrotto rimborsa il suo tempo di recupero. Utilizzabile in qualsiasi forma.",
   'entities.abilities.lunge.name': 'Balzo',
   'entities.abilities.hamstring_bite.description':
     'Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec). Solo in Forma del Gatto.',
   'entities.abilities.hamstring_bite.name': 'Atterramento',
   'entities.abilities.pounce.description':
-    'Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Gatto. Fuori dalla furtività questo pulsante è Balzo.',
+    'Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo e, da Ferino, aggiunge 1 Sangue Antico (massimo 3) e apre Gola Squarciata, un sanguinamento da 72 danni in 12 sec. Solo Forma del Gatto. Fuori dalla furtività questo pulsante è Balzo.',
   'entities.abilities.insect_swarm.name': 'Sciame Pungente',
   'entities.abilities.insect_swarm.description':
     'Il nemico è assalito da uno sciame di insetti, subendo {damage} danni da Natura in 12 sec.',
   'entities.abilities.tigers_fury.name': 'Sangue di Lince',
   'entities.abilities.tigers_fury.description':
     "Sprigiona {rage} energia e aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Gatto.",
+  'entities.abilities.tigers_fury.specNote_feral':
+    'I sanguinamenti che applichi mentre è attivo infliggono il 20% di danni in più per tutta la loro durata.',
   'entities.abilities.rip.name': 'Faglia Sanguigna',
   'entities.abilities.mortal_strike.name': 'Colpo Mutilante',
   'entities.abilities.mortal_strike.description':
@@ -16592,7 +16594,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Cura delle Spore fresca sul bersaglio.',
   'entities.abilities.redharvest.name': 'Mietitura Rossa',
   'entities.abilities.redharvest.description':
-    "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo.",
+    'Consuma 3 Sangue Antico: colpisce per {damage}, prolunga Scarnificare e Faglia Sanguigna sul bersaglio di 8 sec (fino a 16 sec ciascuno), fa ticchettare i tuoi sanguinamenti sul bersaglio il 15% più velocemente per 8 sec (Torrente Rosso) e ripristina {rage} energia. Non consuma punti combo.',
   'entities.abilities.sunlance.name': 'Scia Solare',
   'entities.abilities.sunlance.description':
     'Consuma 3 Marea Lunare per un colpo da {damage} danni di Natura più una bruciatura di {overTime} in 9 sec, e ripristina 35 mana: la scelta del mana. Ondata Lunare consuma le stesse 3 Marea Lunare, quindi scegline una.',
@@ -16601,7 +16603,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono',
   'hudChrome.auraEffect.oldBlood':
-    'Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Gatto e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma',
+    'Sangue Antico: stadio {stacks} di {max}. In Forma del Gatto ogni tick dei tuoi sanguinamenti ne aggiunge 1, al massimo una volta ogni 3 sec, e ogni colpo a segno di Colpo Strisciante e Balzo ne aggiunge 1; in Forma di Bruin ogni colpo a segno di Artigli Falcianti e Frantumaossa ne aggiunge 1. A {max}: Morso Cruento diventa Mietitura Rossa in Forma del Gatto, Frantumaossa diventa Spezzamidollo in Forma di Bruin',
   'abilityUi.cast.sundering': 'Frantumare',
   'hud.core.mapMarkerLabels.farmPatch': 'Aiuole',
   'hud.logs.keptLockedMany': 'Conservate {count} copie bloccate.',
@@ -17373,7 +17375,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Gatto.",
   'entities.abilities.claw.specNote_feral':
-    'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
+    'Ogni colpo a segno aggiunge un accumulo di Brandelli, un sanguinamento da 6 danni in 8 sec per accumulo (massimo 5 accumuli). Un nuovo accumulo rinnova la durata.',
   'entities.abilities.cold_blood.description':
     'Concentra il tuo istinto omicida così che i tuoi prossimi 5 attacchi siano colpi critici. (firma Knifework)',
   'entities.abilities.corpse_explosion.description':
@@ -17409,7 +17411,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Mossa finale che infligge {damage}. Solo Forma del Gatto.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo più forte che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina energia.',
+    'Infligge il 15% di danni in più per ogni tuo sanguinamento sul bersaglio e riporta la tua Faglia Sanguigna alla durata piena. A 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo che prolunga Scarnificare e Faglia Sanguigna, fa ticchettare i tuoi sanguinamenti sul bersaglio il 15% più velocemente per 8 sec e ripristina energia.',
   'entities.abilities.funeral_harvest.description':
     "Quando un nemico danneggiato di recente da te o dai tuoi non morti muore, guadagni 1 Frammento d'Anima. Questo può verificarsi una volta ogni 3 sec.",
   'entities.abilities.funeral_harvest.name': 'Raccolto Funebre',
@@ -17467,7 +17469,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     "Scarnifica il nemico per danni dell'arma più {damage} e causa {overTime} danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
   'entities.abilities.rake.specNote_feral':
-    'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
+    'In Forma del Gatto i tick dei tuoi sanguinamenti aggiungono Sangue Antico (massimo 3, al massimo 1 ogni 3 sec) e i tuoi sanguinamenti possono essere critici: ogni critico da sanguinamento ripristina 5 energia.',
   'entities.abilities.reaping_command.description':
     "Spende 2 Frammenti d'Anima per comandare ogni servitore non morto a colpire all'unisono. I Guardiani Sepolcrali provocano e si preparano, i Guerrieri bloccano, i Maghi d'Ossa espongono le difese magiche, e l'Ala Sepolcrale lacera tutti i nemici colpiti.",
   'entities.abilities.reaping_command.name': 'Comando della Mietitura',
@@ -17480,7 +17482,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva. A 3 Verzura, Rapidità di Guarigione diventa Sovrafioritura.',
   'entities.abilities.rip.description':
     'Mossa finale che fa sanguinare il bersaglio ogni 2 s per 24 s: 72 danni più 48 per punto combo consumato (5 punti: {damage} totali). Solo in Forma del Gatto.',
-  'entities.abilities.rip.specNote_feral': 'Il colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Finché sul bersaglio ci sono 3 o più tuoi sanguinamenti, subisce Ferite Stillanti: riceve il 20% di cure in meno.',
   'entities.abilities.ruinous_brand.description':
     'Marchia un nemico per 15 sec. I tuoi prossimi 3 incantesimi diretti riecheggiano per il 25% dei danni contro il nemico marchiato, oppure copiano il 50% dei danni su di esso quando lanciati contro un altro bersaglio. Gli echi di Dardo della Rovina contano anche come colpi critici, senza un ulteriore moltiplicatore di danno critico.',
   'entities.abilities.ruinous_brand.name': 'Marchio rovinoso',
@@ -17623,6 +17626,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'La tua prossima abilità di esecuzione idonea non costa nulla',
   'hudChrome.auraEffect.funeralHarvestLock':
     "Raccolto Funebre non può ancora creare un altro Frammento d'Anima",
+  'hudChrome.auraEffect.redTorrent':
+    'I tuoi sanguinamenti sul bersaglio della tua Mietitura Rossa ticchettano il {pct}% più velocemente',
   'hudChrome.auraEffect.galeheartWeapon':
     'Completare la Cadenza dello Spirito Guerriero da {steps} colpi fa risuonare il colpo {count} volte per il {pct}% dei suoi danni come danni da Natura',
   'hudChrome.auraEffect.healEcho':
@@ -18715,7 +18720,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.bonus2':
     'Raccolto Rosso restituisce 45 energia invece di 30.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Raccolto Rosso applica una nuova Spellatura al bersaglio.',
+    'Mietitura Rossa infligge anche subito il 30% dei danni rimanenti di Scarnificare e Faglia Sanguigna sul bersaglio. Entrambi continuano a fare effetto.',
   'entities.itemSets.wildfang_emberhide.name': 'Pelle Cinerea Zanna Selvatica',
   'entities.itemSets.wyrmshadow.bonus6':
     'Aumenta velocità d’attacco e lancio del 4% e Precisione del 3%. I colpi critici della tua arma aprono una Lacerazione Frastagliata, facendo sanguinare il bersaglio per 4 danni ogni 2 s per 12 s. Si accumula fino a 3 volte.',
@@ -20472,7 +20477,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Graffia i bersagli vicini entro 6 m, infliggendo danni dell'arma più {damage}. Fornisce 1 punto combo per bersaglio colpito. Rivela i nemici furtivi nell'area spazzata. Solo in Forma Felina.",
   'entities.abilities.scratch.name': 'Graffio',
   'entities.abilities.scratch.specNote_feral':
-    'Ogni colpo riuscito aggiunge 1 Sangue Antico (massimo 3).',
+    'Ogni nemico colpito sanguina anche con Ferita da Graffio: 12 danni in 6 sec.',
   'entities.abilities.spore_burst.description':
     'Evoca un fungo esplosivo nella zona bersaglio. Dopo {duration} s esplode, curando gli alleati di {healing} e infliggendo {damage} danni da Natura ai nemici entro 8 m.',
   'entities.abilities.spore_burst.name': 'Esplosione di Spore',

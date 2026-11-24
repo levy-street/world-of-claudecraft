@@ -13461,6 +13461,8 @@ export const TARGETS = [
       'ui/ability_imbue_text',
       // The Thundercall rework's new kit and reworded vent copy.
       'sim/combat/shaman_thundercall',
+      // The Wildfang Cat bleed rework: new bleeds, Old Blood and Redharvest copy.
+      'sim/combat/druid_bleeds',
     ],
     variants: [
       // Every variant enters as the class that OWNS the ability: the standalone
@@ -13550,6 +13552,40 @@ export const TARGETS = [
         charName: 'Stormcaller',
         abilityId: 'lava_burst',
         spec: 'elemental',
+        talentRow: {},
+        beforeLoad: lowGraphicsSeed,
+        mobile: true,
+      },
+      // Wildfang Cat bleed rework: the Wildfang spec notes carry the new
+      // bleeds (Tatter, Scratch Wound, Throatrake, Weeping Wounds, Bloodscent)
+      // and the Lynxblood snapshot, as a level 20 Wildfang druid.
+      ...[
+        ['flense', 'rake'],
+        ['rendclaw', 'claw'],
+        ['scratch', 'scratch'],
+        ['slinkstrike', 'pounce'],
+        ['bloodrift', 'rip'],
+        ['lynxblood', 'tigers_fury'],
+        // Oakhide's damage cut, Stoke's 15 sec cooldown, and the Cat Form
+        // Nature's Boon Sporemending note.
+        ['oakhide', 'barkskin'],
+        ['stoke', 'enrage'],
+        ['natures-boon', 'natures_boon'],
+      ].map(([key, abilityId]) => ({
+        key: `wildfang-${key}`,
+        charClass: 'druid',
+        charName: 'Leafward',
+        abilityId,
+        spec: 'feral',
+        talentRow: {},
+        beforeLoad: lowGraphicsSeed,
+      })),
+      {
+        key: 'wildfang-rendclaw-mobile',
+        charClass: 'druid',
+        charName: 'Leafward',
+        abilityId: 'claw',
+        spec: 'feral',
         talentRow: {},
         beforeLoad: lowGraphicsSeed,
         mobile: true,

@@ -183,25 +183,26 @@ describe('replacement rank resolution', () => {
     const out = resolveActionReplacement(resolved('ferocious_bite'), feralActor(20));
     expect(out.def.id).toBe('redharvest');
     expect(out.rank).toBe(3);
-    expect(finisherOf(out)).toMatchObject({ base: 70, perCombo: 43 });
+    expect(finisherOf(out)).toMatchObject({ base: 70, perCombo: 0 });
     expect(refundOf(out).amount).toBe(30);
   });
 
   it('resolves rank 1 at level 5 and rank 2 at level 10', () => {
     const r1 = resolveActionReplacement(resolved('ferocious_bite'), feralActor(5));
     expect(r1.rank).toBe(1);
-    expect(finisherOf(r1)).toMatchObject({ base: 35, perCombo: 20 });
+    expect(finisherOf(r1)).toMatchObject({ base: 35, perCombo: 0 });
     expect(refundOf(r1).amount).toBe(15);
     const r2 = resolveActionReplacement(resolved('ferocious_bite'), feralActor(10));
     expect(r2.rank).toBe(2);
-    expect(finisherOf(r2)).toMatchObject({ base: 52, perCombo: 32 });
+    expect(finisherOf(r2)).toMatchObject({ base: 52, perCombo: 0 });
     expect(refundOf(r2).amount).toBe(22);
   });
 
-  it('keeps both consumeDot arms and the bank requirement at every rank', () => {
+  it('keeps both extendDot arms (feral bleed rework) at every rank', () => {
     for (const level of [5, 10, 20]) {
       const out = resolveActionReplacement(resolved('ferocious_bite'), feralActor(level));
-      const dots = out.effects.filter((effect) => effect.type === 'consumeDot');
+      expect(out.effects.some((effect) => effect.type === 'consumeDot')).toBe(false);
+      const dots = out.effects.filter((effect) => effect.type === 'extendDot');
       expect(dots.map((effect) => (effect as { dot: string }).dot).sort()).toEqual(['rake', 'rip']);
     }
   });
@@ -209,7 +210,7 @@ describe('replacement rank resolution', () => {
   it('defaults to rank 1 when no actor level is provided (direct callers)', () => {
     const out = replaceResolvedAbility(resolved('ferocious_bite'), 'redharvest');
     expect(out.rank).toBe(1);
-    expect(finisherOf(out)).toMatchObject({ base: 35, perCombo: 20 });
+    expect(finisherOf(out)).toMatchObject({ base: 35, perCombo: 0 });
   });
 });
 

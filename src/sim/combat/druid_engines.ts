@@ -15,9 +15,18 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import { primaryHealingMultiplier } from '../spec_output_tuning';
-import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scaling';
+import { hotTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
+import {
+  EMBERHIDE_4PC_CASHOUT_IDS,
+  EMBERHIDE_4PC_CASHOUT_PCT,
+  feralBleedOnLandedStrike,
+  feralBleedOnTick,
+  feralBleedTickBanksOldBlood,
+  OPEN_VEINS_TALENT_ID,
+  openRedTorrent,
+} from './druid_bleeds';
 import { LUNGE_ID, startLunge } from './druid_lunge';
 import {
   GROVEHEART_BOON_ICD_KEY,
@@ -69,7 +78,10 @@ export const DRUID_TALENT_IDS = {
   longstride: 'dru_r5_ferocity',
   skylark: 'dru_r5_natures_bounty',
   highmoonTithe: 'dru_r14_moonfury',
-  blooddrunk: 'dru_r14_savage_fury',
+  // The row 14 Wildfang option: Blooddrunk until the feral bleed rework made
+  // bleed-tick Old Blood baseline in Cat Form; the slot is now Open Veins
+  // (combat/druid_bleeds.ts), same option id so saved allocations resolve.
+  openVeins: OPEN_VEINS_TALENT_ID,
   seedspread: 'dru_r14_empowered_touch',
   naturesFury: 'dru_r20_improved_hurricane',
   wildApex: 'dru_r20_berserk',
@@ -152,27 +164,17 @@ const FORM_ABILITY_IDS = new Set([
   'sporemender_form',
 ]);
 const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
-// Every landed feral strike that banks one Old Blood. Slinkstrike ('pounce')
-// and Lunge joined the list in the v0.43 feral pass: the stealth opener banks
-// on the tick its stun lands (the stun arm of effect_dispatch.ts reports here
-// beside the combo point it already pays), and Lunge banks on ARRIVAL, when
-// its parked strike actually rolls through ctx.meleeSwing (combat/
-// druid_lunge.ts). A Lunge that ends short strikes nothing and so banks
-// nothing, exactly as it awards no combo point. The OLD_BLOOD_STAGES cap of 3
-// holds for both through addStage. Scratch (combat/druid_scratch.ts) banks
-// once per LANDED swing through the same meleeSwing hook, so a sweep that
-// lands on three enemies fills the bank in one press.
-const OLD_BLOOD_STRIKE_IDS = new Set([
-  'claw',
-  'rake',
-  'rip',
-  'ferocious_bite',
-  'maul',
-  'swipe',
-  'scratch',
-  'pounce',
-  'lunge',
-]);
+// Every landed feral strike that banks one Old Blood. Since the feral bleed
+// rework Cat Form banks mostly from its own bleed ticks (druidEngineOnBleedTick,
+// at most one Old Blood every OLD_BLOOD_BLEED_ICD seconds, combat/
+// druid_bleeds.ts), so the Cat payoff tracks how many bleeds are running
+// rather than how many buttons were pressed. The Bruin strikes still bank on
+// a hit, and so do the two engage tools: Slinkstrike on the tick its stun
+// lands (the stun arm of effect_dispatch.ts reports here), and Lunge on
+// ARRIVAL when its parked strike rolls through ctx.meleeSwing (combat/
+// druid_lunge.ts): a Lunge cut short banks nothing.
+// The OLD_BLOOD_STAGES cap of 3 holds through addStage.
+const OLD_BLOOD_STRIKE_IDS = new Set(['maul', 'swipe', 'pounce', 'lunge']);
 const VERDANCE_SOWING_IDS = new Set(['rejuvenation', 'regrowth']);
 
 // Banked Verdance on this actor. Reads the aura list by kind only (the same
@@ -455,19 +457,18 @@ export function druidEngineOnCast(
     if (selectedRow(ctx, player, DRUID_TALENT_IDS.naturesFury)) {
       setBank(ctx, player, OLD_BLOOD_ID, 'Old Blood', 'old_blood', 1);
     }
-    // Wildfang 4pc: Redharvest plants a fresh Flense on the target. This
-    // funnel runs AFTER runEffects (onCastCompleted), so the consumeDot
-    // cash-out already paid and removed the old bleed: no double billing.
-    // The replant is aura-only: no combo point, and the landed-strike hook
-    // never fires, so it banks no Old Blood. Draws no rng.
-    if (
-      abilityId === 'redharvest' &&
-      target &&
-      !target.dead &&
-      ctx.isHostileTo(player, target) &&
-      wearsSetBonus(ctx, player, 'wildfang_emberhide', 4)
-    ) {
-      replantFlense(ctx, player, target);
+    if (abilityId === 'redharvest' && target && !target.dead && ctx.isHostileTo(player, target)) {
+      // Red Torrent: Redharvest no longer cashes the bleeds out; it speeds
+      // every bleed of yours on the target for 8 sec (the extendDot rows on
+      // the ability already lengthened Flense and Bloodrift). Draws no rng.
+      openRedTorrent(ctx, player, target);
+      // Wildfang 4pc: Redharvest also deals a share of the damage Flense and
+      // Bloodrift have left, and both keep ticking. This funnel runs AFTER
+      // runEffects (onCastCompleted), so the share reads the bleeds after the
+      // extendDot rows lengthened them. Draws no rng.
+      if (wearsSetBonus(ctx, player, 'wildfang_emberhide', 4)) {
+        emberhideCashout(ctx, player, target);
+      }
     }
     return;
   }
@@ -499,8 +500,13 @@ export function druidEngineOnLandedStrike(
   ctx: SimContext,
   player: Entity,
   abilityId?: string,
+  target?: Entity | null,
 ): void {
-  if (!abilityId || !OLD_BLOOD_STRIKE_IDS.has(abilityId)) return;
+  if (!abilityId) return;
+  // Cat Form bleed riders (Tatter, Scratch Wound, Gorebite's Bloodrift
+  // refresh, combat/druid_bleeds.ts): feral-gated inside, no rng.
+  feralBleedOnLandedStrike(ctx, player, abilityId, target);
+  if (!OLD_BLOOD_STRIKE_IDS.has(abilityId)) return;
   const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
   if (meta?.cls !== 'druid' || specOf(ctx, player) !== 'feral') return;
   addStage(ctx, player, OLD_BLOOD_ID, 'Old Blood', 'old_blood', OLD_BLOOD_STAGES);
@@ -518,18 +524,22 @@ export function druidEngineOnLandedStrike(
   }
 }
 
-export function druidEngineOnBleedTick(ctx: SimContext, source: Entity | null, aura: Aura): void {
-  if (
-    !source ||
-    source.dead ||
-    aura.school !== 'physical' ||
-    (aura.id !== 'rake' && aura.id !== 'rip') ||
-    specOf(ctx, source) !== 'feral' ||
-    !selectedRow(ctx, source, DRUID_TALENT_IDS.blooddrunk)
-  ) {
+// A Cat bleed tick: banks Old Blood (baseline since the feral bleed rework,
+// at most once per OLD_BLOOD_BLEED_ICD across all of the druid's bleeds, Cat
+// Form only) and keeps Weeping Wounds up while three or more bleeds run.
+export function druidEngineOnBleedTick(
+  ctx: SimContext,
+  source: Entity | null,
+  aura: Aura,
+  victim: Entity,
+): void {
+  if (!source || source.dead || aura.school !== 'physical' || specOf(ctx, source) !== 'feral') {
     return;
   }
-  addStage(ctx, source, OLD_BLOOD_ID, 'Old Blood', 'old_blood', OLD_BLOOD_STAGES);
+  feralBleedOnTick(ctx, source, victim);
+  if (feralBleedTickBanksOldBlood(source, aura)) {
+    addStage(ctx, source, OLD_BLOOD_ID, 'Old Blood', 'old_blood', OLD_BLOOD_STAGES);
+  }
 }
 
 export function druidEngineCombatState(ctx: SimContext, player: Entity): void {
@@ -602,47 +612,43 @@ export function replantSporemending(
   });
 }
 
-// Wildfang 4pc: the aura-only Flense replant. Mirrors the dot arm's value
-// arithmetic (effect_dispatch.ts 'dot' case) for the resolved Flense bleed:
-// the authored total is already talent-baked, and the Attack Power rider is
-// the same dotTickBonus the real application pays (Flense's weaponStrike is
-// not a hybrid-suppressing nuke, so its bleed carries the rider). The
-// equivalence is pinned by the wave's test against a REAL Flense cast on the
-// same actor, so the two computations cannot drift silently. No combo award,
-// no landed-strike bank, no rng.
-function replantFlense(ctx: SimContext, player: Entity, target: Entity): void {
-  // Mirror the dot arm's duel-end clamp (effect_dispatch 'dot'): this replant
-  // runs at onCastCompleted, strictly AFTER a same-tick duel end has stripped
-  // everything the caster inflicted, so without the guard it would stamp a
-  // fresh hostile bleed the clear can no longer catch.
+// Wildfang 4pc: the partial cash-out. Sums the remaining ticks of the
+// player's own Flense and Bloodrift on the target (the same tick count the
+// old consumeDot arm paid out), pays EMBERHIDE_4PC_CASHOUT_PCT of it as one
+// Redharvest hit, and leaves both bleeds in place. The Wild Apex payoff
+// multiplier applies, as it did to the old cash-out. No rng.
+function emberhideCashout(ctx: SimContext, player: Entity, target: Entity): void {
+  // Same duel-end guard as every other onCastCompleted damage write: a
+  // same-tick duel end has already cleared what the caster inflicted.
   if (duelJustEndedBetween(ctx, target, player)) return;
-  const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
-  if (!meta) return;
-  const resolved = ctx.resolvedAbility('rake', player.id);
-  const dot = resolved?.effects.find((effect) => effect.type === 'dot');
-  if (!resolved || !dot || dot.type !== 'dot') return;
-  const mods = ctx.playerMods(meta);
-  const dotBase = Math.max(1, Math.round(dot.total / (dot.duration / dot.interval)));
-  const dotSp = dotTickBonus(
-    abilityScalingPower(player, resolved.def),
-    resolved.def,
-    dot.duration,
-    dot.interval,
-    resolveTalentHitMult(resolved.def, mods).dmgMult * (1 + mods.global.dotDmgPct),
+  let remaining = 0;
+  for (const aura of target.auras) {
+    if (aura.kind !== 'dot' || aura.sourceId !== player.id) continue;
+    if (!EMBERHIDE_4PC_CASHOUT_IDS.has(aura.id)) continue;
+    remaining += aura.value * remainingTicks(aura);
+  }
+  const amount = Math.round(
+    remaining * EMBERHIDE_4PC_CASHOUT_PCT * druidApexPayoffMult(ctx, player, 'redharvest'),
   );
-  ctx.applyAura(target, {
-    id: 'rake',
-    name: resolved.def.name,
-    kind: 'dot',
-    remaining: dot.duration,
-    duration: dot.duration,
-    value: dotBase + dotSp,
-    tickInterval: dot.interval,
-    tickTimer: dot.interval,
+  if (amount <= 0) return;
+  const def = ctx.resolvedAbility('redharvest', player.id)?.def;
+  ctx.emit({
+    type: 'spellfx',
     sourceId: player.id,
-    school: dot.school ?? resolved.def.school,
+    targetId: target.id,
+    school: 'physical',
+    fx: 'detonate',
+    ability: 'redharvest',
   });
-  ctx.enterCombat(player, target);
+  ctx.dealDamage(
+    player,
+    target,
+    amount,
+    false,
+    def?.school ?? 'physical',
+    def?.name ?? 'Redharvest',
+    'hit',
+  );
 }
 
 export function resolveDruidOverbloom(

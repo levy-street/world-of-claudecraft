@@ -399,7 +399,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     'Zarpea al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.',
   'entities.abilities.claw.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
+    'Cada golpe que conecta añade una acumulación de Jirones, un sangrado de 6 de daño durante 8 s por acumulación (máx. 5 acumulaciones). Una nueva acumulación renueva la duración.',
   'entities.abilities.cold_blood.description':
     'Concentra tu instinto asesino para que tus próximos 5 ataques sean golpes críticos. (motor de Knifework)',
   'entities.abilities.dark_pact.description':
@@ -417,8 +417,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Movimiento de remate que expone al objetivo durante 30 s: cada punto de combo gastado reduce su armadura un 2% (5 puntos de combo: {damage}%).',
   'entities.abilities.ferocious_bite.description':
     'Movimiento de remate que inflige {damage}. Solo en Forma de lobo.',
-  'entities.abilities.ferocious_bite.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía.',
   'entities.abilities.garrote.description':
     'Enrolla un alambre alrededor de la garganta del enemigo, infligiendo {damage} de daño al instante y {overTime} de sangrado a lo largo de 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
   'entities.abilities.garrote.specNote_subtlety':
@@ -434,8 +432,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ossuary_mark.description':
     'Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 Fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
-  'entities.abilities.rake.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.regrowth.description':
     'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.',
   'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',

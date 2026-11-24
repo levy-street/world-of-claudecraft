@@ -4264,7 +4264,10 @@ const mergeExtraEn = {
       'rake',
       'Flense',
       'Flense the enemy for weapon damage plus {damage} and cause {overTime} bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
-      { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
+      {
+        feral:
+          'In Cat Form your bleed ticks add Old Blood (max 3, at most 1 every 3 sec), and your bleeds can critically strike, each bleed crit restoring 5 energy.',
+      },
     ],
     [
       'revive_pet',

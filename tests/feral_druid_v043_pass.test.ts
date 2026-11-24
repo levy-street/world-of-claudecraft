@@ -1,6 +1,7 @@
 // The v0.43 Wildfang pass, one suite per change:
 //   1. every melee attack a feral druid makes reaches 1 yd further
-//   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3)
+//   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3); kept by the feral
+//      bleed rework, which also has Slinkstrike open Throatrake
 //   3. Nature's Boon: a landed autoattack has a 1-in-15 chance to arm one free
 //      Wildbloom (any form, 50% stronger) OR Oakhide (Bruin only, 25%
 //      stronger) for 10 sec
@@ -20,6 +21,7 @@ import {
 } from '../src/sim/combat/druid_form_entry';
 import {
   NATURES_BOON_ABILITIES,
+  NATURES_BOON_CAT_SPOREMENDING_PCT,
   NATURES_BOON_CHANCE,
   NATURES_BOON_DURATION,
   NATURES_BOON_ID,
@@ -29,6 +31,7 @@ import {
   naturesBoonFormAllows,
   naturesBoonOnAutoAttack,
 } from '../src/sim/combat/druid_natures_boon';
+import { OAKHIDE_ID, OAKHIDE_OVERLAP_ID, oakhideAuraId } from '../src/sim/combat/druid_oakhide';
 import { FERAL_MELEE_REACH_BONUS, feralMeleeReachBonus } from '../src/sim/combat/feral_reach';
 import { willAutoUnshift } from '../src/sim/combat/form_auto_unshift';
 import { formRequirementMet, requiredForms } from '../src/sim/combat/form_requirement';
@@ -133,10 +136,6 @@ function armBoon(sim: Sim): void {
   }
 }
 
-function stacks(player: Entity, id: string): number {
-  return player.auras.find((aura) => aura.id === id)?.stacks ?? 0;
-}
-
 function aura(player: Entity, id: string): Aura | undefined {
   return player.auras.find((entry) => entry.id === id);
 }
@@ -235,33 +234,22 @@ describe('1. Wildfang reach: +1 yd on melee attacks', () => {
   });
 });
 
-describe('2. Slinkstrike and Lunge bank Old Blood', () => {
-  it('banks one stage each, capped at three', () => {
+// The feral bleed rework kept Old Blood on both engage tools (Cat builders and
+// finishers bank from bleed ticks instead, tests/feral_bleed_rework.test.ts).
+describe('2. Slinkstrike and Lunge (feral bleed rework)', () => {
+  it('Slinkstrike and Lunge still bank one Old Blood each', () => {
     const { sim, player } = rig('feral');
     const ctx = rawCtx(sim);
 
     druidEngineOnLandedStrike(ctx, player, 'pounce');
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(1);
+    expect(player.auras.find((entry) => entry.id === OLD_BLOOD_ID)?.stacks).toBe(1);
     druidEngineOnLandedStrike(ctx, player, 'lunge');
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(2);
-    druidEngineOnLandedStrike(ctx, player, 'pounce');
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(3);
-    // The cap is the existing OLD_BLOOD_STAGES, not a second number.
+    expect(player.auras.find((entry) => entry.id === OLD_BLOOD_ID)?.stacks).toBe(2);
+    // The cap is unchanged for the Bruin strikes that still bank.
     expect(OLD_BLOOD_STAGES).toBe(3);
-    druidEngineOnLandedStrike(ctx, player, 'lunge');
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(OLD_BLOOD_STAGES);
   });
 
-  it('stays feral-only: the other druid specs bank nothing', () => {
-    for (const spec of ['balance', 'restoration'] as const) {
-      const { sim, player } = rig(spec);
-      druidEngineOnLandedStrike(rawCtx(sim), player, 'pounce');
-      druidEngineOnLandedStrike(rawCtx(sim), player, 'lunge');
-      expect(player.auras.some((entry) => entry.id === OLD_BLOOD_ID)).toBe(false);
-    }
-  });
-
-  it('banks through the real Slinkstrike cast, on the tick its stun lands', () => {
+  it('opens Throatrake through the real Slinkstrike cast, on the tick its stun lands', () => {
     const { sim, player } = rig('feral');
     player.auras.push(formAura(player, 'form_cat'));
     player.auras.push(formAura(player, 'stealth'));
@@ -271,8 +259,13 @@ describe('2. Slinkstrike and Lunge bank Old Blood', () => {
     for (let tick = 0; tick < 4; tick++) sim.tick();
 
     expect(mob.auras.some((entry) => entry.kind === 'stun')).toBe(true);
-    expect(stacks(player, OLD_BLOOD_ID)).toBe(1);
-    // The combo point the opener already paid is untouched by the new bank.
+    expect(
+      mob.auras.some(
+        (entry) =>
+          entry.id === 'throatrake' && entry.kind === 'dot' && entry.sourceId === player.id,
+      ),
+    ).toBe(true);
+    expect(player.auras.find((entry) => entry.id === OLD_BLOOD_ID)?.stacks).toBe(1);
     expect(player.comboPoints).toBe(1);
   });
 });
@@ -452,17 +445,25 @@ describe("3. Nature's Boon", () => {
     expect(player.auras.some((entry) => entry.kind === 'form_cat')).toBe(true);
     // One window, one cast.
     expect(aura(player, NATURES_BOON_ID)).toBeUndefined();
+    // In Cat Form the free Sporemending heals 10% of maximum health over its
+    // duration (pctOfMax) instead of the 50% Wildbloom power, with no heal
+    // power rider: exactly that total over its four ticks.
+    const tick = player.auras.find((entry) => entry.id === 'rejuvenation')?.value ?? 0;
+    const base = Math.round(
+      Math.round(player.maxHp * NATURES_BOON_CAT_SPOREMENDING_PCT) / (12 / 3),
+    );
+    expect(tick).toBe(base);
 
     // First cast wins: the OTHER member reverts. Oakhide pressed next, from
     // Bruin Form where the window would have paid for it, bills its full cost
-    // and lands at its plain 20%, not the empowered 25%.
+    // and lands at its plain 25%, not the empowered 31.25%.
     shiftInto(sim, 'bear_form');
     player.resource = player.maxResource;
     const rageBefore = player.resource;
     sim.castAbility('barkskin');
     for (let tick = 0; tick < 3; tick++) sim.tick();
     expect(player.resource).toBe(rageBefore - ABILITIES.barkskin.cost);
-    expect(player.auras.find((entry) => entry.kind === 'buff_armor_pct')?.value).toBe(20);
+    expect(player.auras.find((entry) => entry.kind === 'buff_dr')?.value).toBe(0.25);
   });
 
   it('leaves the unarmed behavior exactly as it was: Sporemending drops Cat Form', () => {
@@ -645,67 +646,63 @@ describe("Nature's Boon rolls on auto-attacks only", () => {
   });
 });
 
-describe('6. Oakhide grants a percentage of armor, not a flat amount', () => {
-  it('is authored as percentage points, not a flat buff', () => {
+describe('6. Oakhide cuts all damage taken by 25%, and overlapping copies add', () => {
+  it('is authored as a 25% damage reduction for 15 sec', () => {
     const effects = ABILITIES.barkskin.effects;
     expect(effects).toHaveLength(1);
     const buff = effects[0];
     expect(buff.type).toBe('selfBuff');
     if (buff.type !== 'selfBuff') throw new Error('unreachable');
-    expect(buff.kind).toBe('buff_armor_pct');
-    expect(buff.value).toBe(20);
+    expect(buff.kind).toBe('buff_dr');
+    expect(buff.value).toBe(0.25);
     expect(buff.duration).toBe(15);
-    // The flat arm is gone: nothing here still adds a constant.
-    expect(effects.some((e) => e.type === 'selfBuff' && e.kind === 'buff_armor')).toBe(false);
+    // The armor arm is gone.
+    expect(
+      effects.some(
+        (e) => e.type === 'selfBuff' && (e.kind === 'buff_armor' || e.kind === 'buff_armor_pct'),
+      ),
+    ).toBe(false);
   });
 
-  it('raises armor by 20% of what the druid actually has', () => {
+  it('a second Oakhide while the first runs overlaps instead of refreshing', () => {
     const { sim, player } = rig('feral');
-    const before = player.stats.armor;
-    expect(before).toBeGreaterThan(0);
-
+    player.resource = player.maxResource;
+    sim.castAbility('barkskin');
+    for (let tick = 0; tick < 3; tick++) sim.tick();
+    // What a Nature's Boon proc does to the cooldown.
+    player.cooldowns.delete('barkskin');
+    player.resource = player.maxResource;
     sim.castAbility('barkskin');
     for (let tick = 0; tick < 3; tick++) sim.tick();
 
-    expect(player.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
-    expect(player.stats.armor).toBe(Math.round(before * 1.2));
+    const copies = player.auras.filter((a) => a.kind === 'buff_dr' && a.sourceId === player.id);
+    expect(copies.map((a) => a.id).sort()).toEqual([OAKHIDE_ID, OAKHIDE_OVERLAP_ID]);
+    expect(copies.reduce((sum, a) => sum + a.value, 0)).toBeCloseTo(0.5, 10);
   });
 
-  it('scales with the form multiplier, which a flat buff could not do', () => {
-    // The whole point of the change: the same button is worth more to a bear,
-    // because Bruin Form multiplies the armor the percentage then reads.
-    const caster = rig('feral');
-    const casterBase = caster.player.stats.armor;
-    caster.sim.castAbility('barkskin');
-    for (let tick = 0; tick < 3; tick++) caster.sim.tick();
-    const casterGain = caster.player.stats.armor - casterBase;
-
-    const bear = rig('feral');
-    shiftInto(bear.sim, 'bear_form');
-    const bearBase = bear.player.stats.armor;
-    expect(bearBase).toBeGreaterThan(casterBase);
-    bear.sim.castAbility('barkskin');
-    for (let tick = 0; tick < 3; tick++) bear.sim.tick();
-    const bearGain = bear.player.stats.armor - bearBase;
-
-    expect(bearGain).toBeGreaterThan(casterGain);
-    // Both are the same 25% of their own pool.
-    expect(bearGain).toBe(Math.round(bearBase * 1.2) - bearBase);
-    expect(casterGain).toBe(Math.round(casterBase * 1.2) - casterBase);
+  it('with two copies up, a third cast refreshes the one closer to expiring', () => {
+    const caster = {
+      id: 1,
+      auras: [
+        { id: OAKHIDE_ID, sourceId: 1, remaining: 4 },
+        { id: OAKHIDE_OVERLAP_ID, sourceId: 1, remaining: 12 },
+      ],
+    } as unknown as Parameters<typeof oakhideAuraId>[0];
+    expect(oakhideAuraId(caster, OAKHIDE_ID)).toBe(OAKHIDE_ID);
+    expect(oakhideAuraId({ id: 1, auras: [] }, OAKHIDE_ID)).toBe(OAKHIDE_ID);
+    // Every other ability keeps the id it was handed.
+    expect(oakhideAuraId(caster, 'primal_reflexes')).toBe('primal_reflexes');
   });
 
-  it('falls off cleanly, restoring the original armor', () => {
+  it('falls off cleanly after 15 sec', () => {
     const { sim, player } = rig('feral');
-    const before = player.stats.armor;
+    player.resource = player.maxResource;
     sim.castAbility('barkskin');
     for (let tick = 0; tick < 3; tick++) sim.tick();
-    expect(player.stats.armor).toBeGreaterThan(before);
-
+    expect(player.auras.some((a) => a.kind === 'buff_dr')).toBe(true);
     // 15 sec at 20 Hz, plus slack for the expiry tick.
     for (let tick = 0; tick < 320; tick++) sim.tick();
-
-    expect(player.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(false);
-    expect(player.stats.armor).toBe(before);
+    expect(player.auras.some((a) => a.kind === 'buff_dr')).toBe(false);
   });
 });
 
@@ -912,19 +909,17 @@ describe('11. The rushes are off the GCD', () => {
     expect(mob.hp).toBeLessThan(hpBefore);
   });
 
-  it('Oakhide Reflex lands on exactly 30% armor', () => {
-    // The row 8 talent reads "50% more armor"; 20 base is chosen so that is 30.
+  it('Oakhide Reflex lands on exactly 37.5% damage reduction', () => {
+    // The row 8 talent reads "50% stronger": 25% becomes 37.5%.
     const { sim, player } = rig('feral');
     expect(sim.applyTalents({ spec: 'feral', rows: { 8: 'dru_r8_typhoon' } })).toBe(true);
     player.resource = player.maxResource;
-    const before = player.stats.armor;
 
     sim.castAbility('barkskin');
     for (let tick = 0; tick < 3; tick++) sim.tick();
 
-    const buff = player.auras.find((a) => a.kind === 'buff_armor_pct');
-    expect(buff?.value).toBe(30);
-    expect(player.stats.armor).toBe(Math.round(before * 1.3));
+    const buff = player.auras.find((a) => a.kind === 'buff_dr');
+    expect(buff?.value).toBeCloseTo(0.375, 10);
   });
 });
 
@@ -956,7 +951,7 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     sim.castAbility('barkskin');
     for (let tick = 0; tick < 3; tick++) sim.tick();
 
-    expect(player.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
+    expect(player.auras.some((a) => a.kind === 'buff_dr')).toBe(true);
     expect(player.resource).toBe(rageBefore);
     expect(aura(player, NATURES_BOON_ID)).toBeUndefined();
 
@@ -988,7 +983,7 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
     for (let tick = 0; tick < 3; tick++) sim.tick();
 
     // Oakhide still goes off (it is usableInForm), but it pays its own cost...
-    expect(player.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
+    expect(player.auras.some((a) => a.kind === 'buff_dr')).toBe(true);
     expect(player.resource).toBeLessThan(energyBefore);
     // ...and the window survives for the Sporemending it is meant for.
     expect(aura(player, NATURES_BOON_ID)).toBeDefined();
@@ -1051,15 +1046,16 @@ describe('13. An armed window makes its spell stronger (Wildbloom 50%, Oakhide 2
     shiftInto(plain.sim, 'bear_form');
     plain.sim.castAbility('barkskin');
     for (let tick = 0; tick < 3; tick++) plain.sim.tick();
-    const plainPct = plain.player.auras.find((a) => a.kind === 'buff_armor_pct')?.value;
-    expect(plainPct).toBe(20);
+    const plainPct = plain.player.auras.find((a) => a.kind === 'buff_dr')?.value;
+    expect(plainPct).toBe(0.25);
 
     const boon = rig('feral');
     shiftInto(boon.sim, 'bear_form');
     armBoon(boon.sim);
     boon.sim.castAbility('barkskin');
     for (let tick = 0; tick < 3; tick++) boon.sim.tick();
-    const boonPct = boon.player.auras.find((a) => a.kind === 'buff_armor_pct')?.value;
-    expect(boonPct).toBe(25);
+    const boonPct = boon.player.auras.find((a) => a.kind === 'buff_dr')?.value;
+    // A fractional rate scales unrounded: 0.25 x 1.25.
+    expect(boonPct).toBeCloseTo(0.3125, 10);
   });
 });

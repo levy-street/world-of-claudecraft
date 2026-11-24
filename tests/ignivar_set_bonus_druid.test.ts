@@ -5,8 +5,8 @@
 // read; 4pc is a dmgPct pair on Moonsurge and Sunwake sized DELIVERED (0.3075
 // against the 1.23 committed baseline: 0.08 spec floor plus the 0.15 Moonrage
 // mastery). Wildfang 2pc rewrites Redharvest's resolved energy restore
-// (floor(x1.5): 22/33/45 by rank); 4pc replants a fresh Flense after the
-// consumeDot cash-out, aura-only. Cinderbark 2pc is the one wearer-only rng
+// (floor(x1.5): 22/33/45 by rank); 4pc deals 30 percent of the damage Flense
+// and Bloodrift have left without removing them. Cinderbark 2pc is the one wearer-only rng
 // draw of the wave (a 30 percent extra Old Blood roll per landed Sweeping
 // Claws, flag-gated so non-wearers draw nothing); 4pc is a dmgPct row sized
 // DELIVERED (0.495 against the v0.42.0 Wildfang-raised 1.65 Primal Heart
@@ -17,6 +17,7 @@
 // harvest fraction (0.6 to 0.75) and banks 1 Verdance via setBank after the
 // Nature's Fury seed.
 import { describe, expect, it, vi } from 'vitest';
+import { EMBERHIDE_4PC_CASHOUT_PCT } from '../src/sim/combat/druid_bleeds';
 import {
   druidEngineOnHotPlanted,
   druidEngineOnLandedStrike,
@@ -137,7 +138,7 @@ function settleProjectiles(sim: Sim): void {
 function bankOldBlood(sim: Sim, stacksWanted: number): void {
   const current = sim.player.auras.find((aura) => aura.id === OLD_BLOOD_ID)?.stacks ?? 0;
   for (let i = current; i < stacksWanted; i++) {
-    druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'claw');
+    druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'maul');
   }
 }
 
@@ -401,12 +402,22 @@ describe('Wildfang 2pc: Redharvest restores 45 energy, up from 30', () => {
   });
 });
 
-describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
-  function redharvestReplant(wearer: boolean): {
-    replanted: Aura | undefined;
-    realCastAura: Aura;
+describe('Wildfang 4pc: Redharvest cashes out part of Flense and Bloodrift', () => {
+  // The same remaining-tick count the old consumeDot arm paid out.
+  function ticksLeft(aura: Aura): number {
+    const interval = aura.tickInterval ?? 1;
+    const untilNextTick = aura.tickTimer ?? interval;
+    return untilNextTick <= aura.remaining
+      ? 1 + Math.max(0, Math.floor((aura.remaining - untilNextTick) / interval))
+      : 0;
+  }
+
+  function redharvestCashout(wearer: boolean): {
+    expected: number;
+    cashoutCalls: number;
+    flenseKept: boolean;
+    bloodriftKept: boolean;
     combo: number;
-    oldBlood: number;
   } {
     const sim = liveDruid(615, 'feral');
     if (wearer) equipSet(sim, 'wildfang_emberhide', 4);
@@ -416,46 +427,61 @@ describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
     sim.player.maxResource = 100;
     readyCast(sim, 'rake');
     sim.castAbility('rake');
-    const realCast = expectDefined(ownDot(target, sim.player.id, 'rake'));
-    const realCastAura = { ...realCast };
+    readyCast(sim, 'rip');
+    sim.player.comboPoints = 5;
+    sim.castAbility('rip');
+    expect(ownDot(target, sim.player.id, 'rake')).toBeDefined();
+    expect(ownDot(target, sim.player.id, 'rip')).toBeDefined();
     bankOldBlood(sim, 3);
     readyCast(sim, 'ferocious_bite');
     sim.player.comboPoints = 1;
+    const damage = vi.spyOn(ctxOf(sim), 'dealDamage');
     sim.castAbility('ferocious_bite');
-    expect(sim.resolvedAbility('ferocious_bite')?.def.id).not.toBe('redharvest'); // bank spent
+    // The cash-out reads the bleeds AFTER the extendDot rows and leaves them
+    // in place, so the post-cast auras are exactly what it summed.
+    const flense = ownDot(target, sim.player.id, 'rake');
+    const bloodrift = ownDot(target, sim.player.id, 'rip');
+    const remaining =
+      (flense ? flense.value * ticksLeft(flense) : 0) +
+      (bloodrift ? bloodrift.value * ticksLeft(bloodrift) : 0);
+    const expected = Math.round(remaining * EMBERHIDE_4PC_CASHOUT_PCT);
+    const cashoutCalls = damage.mock.calls.filter(
+      (call) =>
+        call[1] === target &&
+        call[2] === expected &&
+        call[3] === false &&
+        call[6] === 'hit' &&
+        call[12] === undefined,
+    ).length;
+    damage.mockRestore();
     return {
-      replanted: ownDot(target, sim.player.id, 'rake'),
-      realCastAura,
+      expected,
+      cashoutCalls,
+      flenseKept: flense !== undefined,
+      bloodriftKept: bloodrift !== undefined,
       combo: sim.player.comboPoints,
-      oldBlood: stacks(sim.player, OLD_BLOOD_ID),
     };
   }
 
-  it('the replant matches a REAL Flense application tick for tick (no arithmetic drift)', () => {
-    const bent = redharvestReplant(true);
-    const replanted = expectDefined(bent.replanted);
-    // The consumeDot cash-out removed the live bleed; this aura is the fresh
-    // replant. Deep-compare the WHOLE aura (progress fields zeroed) against
-    // the real cast's shape: replantFlense hand-mirrors the effect_dispatch
-    // dot arm, so a field the real arm gains (leechPct, a rider) that the
-    // replant does not copy must fail HERE, not ship silently.
-    expect(replanted.duration).toBe(18);
-    expect(replanted.tickInterval).toBe(3);
-    expect({ ...replanted, remaining: 0, tickTimer: 0 }).toEqual({
-      ...bent.realCastAura,
-      remaining: 0,
-      tickTimer: 0,
-    });
+  it('deals the authored share of the remaining bleed damage as one hit', () => {
+    expect(EMBERHIDE_4PC_CASHOUT_PCT).toBe(0.3);
+    const bent = redharvestCashout(true);
+    expect(bent.expected).toBeGreaterThan(0);
+    expect(bent.cashoutCalls).toBe(1);
   });
 
-  it('is aura-only: no combo point, no Old Blood bank, and non-wearers get nothing', () => {
-    const bent = redharvestReplant(true);
-    expect(bent.combo).toBe(0);
-    expect(bent.oldBlood).toBe(0);
-    const control = redharvestReplant(false);
-    expect(control.replanted).toBeUndefined();
-    expect(control.combo).toBe(0);
-    expect(control.oldBlood).toBe(0);
+  it('leaves Flense and Bloodrift ticking and keeps the combo point', () => {
+    const bent = redharvestCashout(true);
+    expect(bent.flenseKept).toBe(true);
+    expect(bent.bloodriftKept).toBe(true);
+    expect(bent.combo).toBe(1);
+  });
+
+  it('non-wearers get no cash-out', () => {
+    const control = redharvestCashout(false);
+    expect(control.flenseKept).toBe(true);
+    expect(control.bloodriftKept).toBe(true);
+    expect(control.cashoutCalls).toBe(0);
   });
 });
 
@@ -546,7 +572,7 @@ describe('Cinderbark 2pc: Sweeping Claws may bank an additional Old Blood', () =
   it('other Old Blood strikes never roll (the bend is Sweeping Claws only)', () => {
     const sim = bearWithTarget(618, true);
     const spy = vi.spyOn(ctxOf(sim).rng, 'chance').mockReturnValue(false);
-    druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'claw');
+    druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'maul');
     druidEngineOnLandedStrike(ctxOf(sim), sim.player, 'maul');
     const rolls = spy.mock.calls
       .map(([p]) => p)

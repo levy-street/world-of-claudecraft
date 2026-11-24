@@ -943,7 +943,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 4,
         effect: {},
-        text: 'Redharvest plants a fresh Flense on the target.',
+        text: 'Redharvest also deals 30% of the damage your Flense and Bloodrift on the target have left, instantly. Both keep ticking.',
       },
     ],
   },

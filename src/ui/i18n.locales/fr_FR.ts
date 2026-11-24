@@ -10291,19 +10291,21 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Prenez la Forme de chat si nécessaire, puis sprintez avec 50% de vitesse supplémentaire pendant 15 s. Utilisable sous toute forme. Instantané et ne déclenche pas le temps de recharge global.',
   'entities.abilities.pounce.name': 'Frappe furtive',
   'entities.abilities.lunge.description':
-    "Bondit sur un ennemi jusqu'à 12 m, inflige 60% des dégâts de l'arme et octroie 1 point de combo. Forme de chat uniquement.",
+    "Prend la Forme de chat si ce n'est pas déjà le cas, puis bondit sur un ennemi jusqu'à 25 m. À l'arrivée, inflige 60% des dégâts de l'arme, confère 1 point de combo et, en Farouche, ajoute 1 Sang ancien (maximum 3) ; un bond interrompu rembourse son temps de recharge. Utilisable sous n'importe quelle forme.",
   'entities.abilities.lunge.name': 'Bond',
   'entities.abilities.hamstring_bite.description':
     'Technique de finition qui étourdit la cible pendant 1 s plus 1 s par point de combo (5 points de combo : 6 s). Forme de chat uniquement.',
   'entities.abilities.hamstring_bite.name': 'Mise à terre',
   'entities.abilities.pounce.description':
-    'Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond.',
+    'Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo et, en Farouche, ajoute 1 Sang ancien (maximum 3) et inflige Lacère-gorge, un saignement de 72 points de dégâts en 12 s. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond.',
   'entities.abilities.insect_swarm.name': 'Nuée cinglante',
   'entities.abilities.insect_swarm.description':
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
   'entities.abilities.tigers_fury.name': 'Sang de lynx',
   'entities.abilities.tigers_fury.description':
     "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de chat uniquement.",
+  'entities.abilities.tigers_fury.specNote_feral':
+    'Les saignements que vous appliquez pendant sa durée infligent 20% de dégâts supplémentaires pendant toute leur durée.',
   'entities.abilities.rip.name': 'Faille sanglante',
   'entities.abilities.mortal_strike.name': 'Frappe mutilante',
   'entities.abilities.mortal_strike.description':
@@ -16936,7 +16938,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Soin de spores fraîche sur la cible.',
   'entities.abilities.redharvest.name': 'Moisson rouge',
   'entities.abilities.redharvest.description':
-    "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo.",
+    "Consomme vos 3 Sang ancien : frappe pour {damage}, prolonge vos Écorcher et Faille sanglante sur la cible de 8 s (jusqu'à 16 s chacun), accélère de 15% les tics de vos saignements sur la cible pendant 8 s (Torrent rouge) et rend {rage} points d'énergie. Ne consomme pas de points de combo.",
   'entities.abilities.sunlance.name': 'Sillage solaire',
   'entities.abilities.sunlance.description':
     'Consomme vos 3 Marée lunaire pour une frappe de {damage} points de dégâts de Nature plus une brûlure de {overTime} sur 9 s, et rend 35 points de mana : le choix du mana. Déferlante lunaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un.',
@@ -16945,7 +16947,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
   'hudChrome.auraEffect.oldBlood':
-    'Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme',
+    'Sang ancien : cran {stacks} sur {max}. En Forme de chat, chaque tic de vos saignements en ajoute 1, au plus une fois toutes les 3 s, et chaque coup porté de Frappe furtive et de Bond en ajoute 1 ; en Forme de Bruin, chaque coup porté de Griffes balayantes et de Brise-os en ajoute 1. À {max} : Morsure sanglante devient Moisson rouge en Forme de chat, Brise-os devient Brise-moelle en Forme de Bruin',
   'hudChrome.auraEffect.verdance':
     "Verdoyance : cran {stacks} sur {max}. Chaque Soin de spores, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
   'hudChrome.riftTracker.title': 'Faille',
@@ -17057,7 +17059,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.name': 'Peau de braise',
   'entities.abilities.claw.description':
     "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de chat uniquement.",
-  'entities.abilities.claw.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
+  'entities.abilities.claw.specNote_feral':
+    'Chaque coup porté ajoute une charge de Lambeaux, un saignement de 6 points de dégâts en 8 s par charge (5 charges au maximum). Une nouvelle charge réinitialise la durée.',
   'entities.abilities.cold_blood.description':
     'Concentre votre instinct meurtrier pour que vos 5 prochaines attaques soient des coups critiques. (signature Art des lames)',
   'entities.abilities.corpse_explosion.description':
@@ -17093,7 +17096,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Technique de finition qui inflige {damage}. Forme de chat uniquement.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe plus puissante qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure de l’énergie.',
+    "Inflige 15% de dégâts supplémentaires pour chacun de vos saignements sur la cible et ramène votre Faille sanglante à sa durée maximale. À 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe qui prolonge vos Écorcher et Faille sanglante, accélère de 15% les tics de vos saignements sur la cible pendant 8 s, et restaure de l'énergie.",
   'entities.abilities.funeral_harvest.description':
     "Quand un ennemi récemment endommagé par vous ou vos morts-vivants meurt, vous gagnez 1 Fragment d'âme. Cela peut se produire une fois toutes les 3 s.",
   'entities.abilities.funeral_harvest.name': 'Moisson funéraire',
@@ -17150,7 +17153,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raise_skeletal_warrior.name': 'Relever un Guerrier squelette',
   'entities.abilities.rake.description':
     "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et inflige {overTime} points de dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de chat uniquement.",
-  'entities.abilities.rake.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
+  'entities.abilities.rake.specNote_feral':
+    "En Forme de chat, les tics de vos saignements ajoutent du Sang ancien (maximum 3, au plus 1 toutes les 3 s), et vos saignements peuvent infliger des coups critiques, chaque critique de saignement rendant 5 points d'énergie.",
   'entities.abilities.reaping_command.description':
     "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés.",
   'entities.abilities.reaping_command.name': 'Commandement de la moisson',
@@ -17163,7 +17167,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active. À 3 Verdoyance, Prompte guérison devient Surfloraison.",
   'entities.abilities.rip.description':
     'Coup de grâce qui fait saigner la cible toutes les 2 s pendant 24 s : 72 dégâts plus 48 par point de combo dépensé (5 points : {damage} au total). Forme de chat uniquement.',
-  'entities.abilities.rip.specNote_feral': 'Le coup porté ajoute 1 Sang ancien (maximum 3).',
+  'entities.abilities.rip.specNote_feral':
+    'Tant que 3 de vos saignements ou plus sont sur une cible, elle subit Plaies suintantes : 20% de soins reçus en moins.',
   'entities.abilities.ruinous_brand.description':
     "Marque un ennemi pendant 15 s. Vos 3 prochains sorts directs se répercutent pour 25% de dégâts contre l'ennemi marqué, ou lui recopient 50% de dégâts quand ils sont lancés sur une autre cible. Les répercussions de Trait de ruine comptent aussi comme coups critiques, sans multiplicateur de dégâts critiques supplémentaire.",
   'entities.abilities.ruinous_brand.name': 'Marque ruineuse',
@@ -17304,6 +17309,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeExecute': "Votre prochaine capacité d'exécution éligible ne coûte rien",
   'hudChrome.auraEffect.funeralHarvestLock':
     "Moisson funéraire ne peut pas encore créer un autre Fragment d'âme",
+  'hudChrome.auraEffect.redTorrent':
+    'Les tics de vos saignements sur la cible de votre Moisson rouge sont {pct}% plus rapides',
   'hudChrome.auraEffect.galeheartWeapon':
     "Terminer la cadence de l'esprit guerrier en {steps} coups répercute la frappe {count} fois pour {pct}% de ses dégâts en dégâts de Nature",
   'hudChrome.auraEffect.healEcho':
@@ -18268,7 +18275,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wildfang_emberhide.bonus2':
     'Moisson rouge rend 45 points d’énergie, contre 30 auparavant.',
   'entities.itemSets.wildfang_emberhide.bonus4':
-    'Moisson rouge applique un nouveau Dépeçage à la cible.',
+    'Moisson rouge inflige aussi instantanément 30% des dégâts restants de vos Écorcher et Faille sanglante sur la cible. Les deux continuent de faire effet.',
   'entities.itemSets.wildfang_emberhide.name': 'Peau de braise du Croc sauvage',
   'entities.itemSets.wyrmshadow.bonus6':
     'Augmente la vitesse d’attaque et d’incantation de 4 % et les chances de toucher de 3 %. Vos coups critiques avec une arme infligent une Entaille irrégulière, faisant saigner la cible de 4 points de dégâts toutes les 2 s pendant 12 s. Cumulable jusqu’à 3 fois.',
@@ -20565,7 +20572,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Griffe les cibles proches dans un rayon de 6 m pour les dégâts de l'arme plus {damage}. Accorde 1 point de combo par cible touchée. Révèle les ennemis camouflés dans le balayage. Forme féline uniquement.",
   'entities.abilities.scratch.name': 'Griffure',
   'entities.abilities.scratch.specNote_feral':
-    'Chaque coup réussi ajoute 1 Sang ancien (3 au maximum).',
+    "Chaque ennemi touché saigne aussi sous l'effet de Plaie de griffure : 12 points de dégâts en 6 s.",
   'entities.abilities.spore_burst.description':
     'Invoque un champignon explosif dans la zone ciblée. Après {duration} s, il éclate, soigne les alliés de {healing} et inflige {damage} dégâts de Nature aux ennemis dans un rayon de 8 m.',
   'entities.abilities.spore_burst.name': 'Explosion de spores',

@@ -23,6 +23,7 @@ import {
   ECHO_GROUP_CONVERT_AOE,
   ECHO_GROUP_CONVERT_SINGLE,
 } from '../sim/combat/chronomancy';
+import { RED_TORRENT_ID, RED_TORRENT_TICK_RATE } from '../sim/combat/druid_bleeds';
 import {
   BRUIN_RUSH_WINDOW_ID,
   MOONTIDE_STAGES,
@@ -496,6 +497,11 @@ export function auraEffectDescriptor(
     };
   }
   if (a.kind === 'internal_cd') {
+    // Red Torrent (combat/druid_bleeds.ts): Redharvest's window on the druid;
+    // its value is the target's entity id, so the line names no number from it.
+    if (a.id === RED_TORRENT_ID) {
+      return { key: `${KEY}.redTorrent`, nums: { pct: pctFromMult(RED_TORRENT_TICK_RATE) } };
+    }
     if (a.id === BRUIN_RUSH_WINDOW_ID) {
       return {
         key: `${KEY}.bruinRushWindow`,

@@ -6852,7 +6852,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Flense the enemy for weapon damage plus $d and cause $o bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
     specNotes: {
-      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+      feral:
+        'In Cat Form your bleed ticks add Old Blood (max 3, at most 1 every 3 sec), and your bleeds can critically strike, each bleed crit restoring 5 energy.',
     },
   },
   claw: {
@@ -6872,7 +6873,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 55 }] }],
     description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Cat Form only.',
     specNotes: {
-      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+      feral:
+        'Each hit that lands adds a stack of Tatter, a bleed of 6 damage over 8 sec per stack (max 5 stacks). A new stack refreshes the duration.',
     },
   },
   scratch: {
@@ -6908,7 +6910,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Scratch through nearby targets within 6 yards for weapon damage plus $d. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
     specNotes: {
-      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+      feral: 'Each enemy it hits also bleeds with Scratch Wound: 12 damage over 6 sec.',
     },
   },
   ferocious_bite: {
@@ -6931,7 +6933,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Finishing move that causes $d. Cat Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
+        'Deals 15% more damage for each of your bleeds on the target and refreshes your Bloodrift to its full duration. At 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a strike that lengthens your Flense and Bloodrift and makes your bleeds on the target tick 15% faster for 8 sec, and restores energy.',
     },
   },
   swipe: {
@@ -7004,18 +7006,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // A tank cooldown, so it must fire mid-fight in Bruin Form (or Cat Form)
     // like Primal Reflexes/Primal Surge below, not just pre-cast in caster form.
     usableInForm: true,
-    // A PERCENTAGE since v0.43, not the old flat 150. buff_armor_pct carries
-    // integer percentage POINTS (25 = +25%) and recalcPlayerStats folds it last
-    // (entity.ts), after the form multiplier and the armor masteries, so a bear
-    // tank's Oakhide scales with the armor it actually has instead of decaying
-    // into noise as gear grows. The flat arm was worth about 4% of a geared
-    // bear pool.
-    effects: [{ type: 'selfBuff', kind: 'buff_armor_pct', value: 20, duration: 15 }],
+    // A flat 25% cut to all damage taken (buff_dr, a fraction), replacing the
+    // v0.43 +20% armor. Instances overlap and add (combat/druid_oakhide.ts):
+    // a Nature's Boon proc resets the cooldown, so a second Oakhide can land
+    // while the first runs, for 50% between them.
+    effects: [{ type: 'selfBuff', kind: 'buff_dr', value: 0.25, duration: 15 }],
     // Literal, not the $b resolved-value placeholder: introducing a token into
     // this row breaks the en-vs-locale interpolation-parity guard
     // (tests/i18n_completeness.test.ts) for all 20 overlays, whose translations
     // carry no token. Same shape the flat 150 shipped with.
-    description: 'Your skin hardens like bark, increasing armor by 20% for 15 sec.',
+    description:
+      'Your skin hardens like bark, reducing all damage taken by 25% for 15 sec. Overlapping Oakhides add together.',
   },
   // Druid tank cooldown: a dodge-based defensive (distinct from Oakhide's armor
   // boost). Usable while shapeshifted so a bear tank pops it mid-fight; buff_dodge
@@ -7084,7 +7085,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 16,
     cost: 0,
     castTime: 0,
-    cooldown: 60,
+    cooldown: 15,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -7185,7 +7186,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // pounce id; Lunge is never learned as a second action.
     actionReplacement: { abilityId: 'lunge', absentAuraKind: 'stealth' },
     description:
-      'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge.',
+      'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3) and opens Throatrake, a bleed of 72 damage over 12 sec. Cat Form only. Out of stealth this button is Lunge.',
   },
   lunge: {
     id: 'lunge',
@@ -7281,10 +7282,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     requiresForm: 'cat',
     effects: [
-      { type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 },
+      // 10 sec (was 6, the feral bleed rework): long enough to reapply every
+      // bleed inside the window, which Wildfang snapshots at +20%
+      // (combat/druid_bleeds.ts LYNXBLOOD_BLEED_MULT).
+      { type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 10 },
       { type: 'gainResource', amount: 30 },
     ],
     description: 'Surges 30 energy and increases attack power by $b for $t sec. Cat Form only.',
+    specNotes: {
+      feral: 'Bleeds you apply while it lasts deal 20% more damage for their whole duration.',
+    },
   },
   rip: {
     id: 'rip',
@@ -7307,7 +7314,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Finishing move that makes the target bleed every 2 sec for 24 sec: 72 damage plus 48 per combo point spent (5 combo points: $d total). Cat Form only.',
     specNotes: {
-      feral: 'The landed hit adds 1 Old Blood (max 3).',
+      feral:
+        'While 3 or more of your bleeds are on a target, it suffers Weeping Wounds: 20% less healing taken.',
     },
   },
 
@@ -8249,7 +8257,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
     specNotes: {
       feral:
-        'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.',
+        'Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form. In Cat Form, the free Sporemending heals for 10% of maximum health over 12 sec.',
       balance:
         'Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.',
       restoration:
@@ -8356,12 +8364,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'cat',
     requiresAuraKind: 'old_blood',
     requiresAuraStacks: 3,
-    spendsCombo: true,
+    // Feral bleed rework: Redharvest keeps your combo points (Old Blood is its
+    // whole price), so the points reach 5 for Bloodrift and Gorebite instead of
+    // being eaten every few seconds. comboOptional lets the finisherDamage arm
+    // strike with zero points spent; perCombo is 0 so the tooltip and the hit
+    // agree.
+    spendsCombo: false,
     comboOptional: true,
     effects: [
-      { type: 'finisherDamage', base: 35, perCombo: 20, variance: 6 },
-      { type: 'consumeDot', dot: 'rake' },
-      { type: 'consumeDot', dot: 'rip' },
+      { type: 'finisherDamage', base: 35, perCombo: 0, variance: 6 },
+      { type: 'extendDot', dot: 'rake', seconds: 8, maxBonus: 16 },
+      { type: 'extendDot', dot: 'rip', seconds: 8, maxBonus: 16 },
       { type: 'gainResource', amount: 15 },
     ],
     ranks: [
@@ -8370,9 +8383,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 10,
         cost: 35,
         effects: [
-          { type: 'finisherDamage', base: 52, perCombo: 32, variance: 8 },
-          { type: 'consumeDot', dot: 'rake' },
-          { type: 'consumeDot', dot: 'rip' },
+          { type: 'finisherDamage', base: 52, perCombo: 0, variance: 8 },
+          { type: 'extendDot', dot: 'rake', seconds: 8, maxBonus: 16 },
+          { type: 'extendDot', dot: 'rip', seconds: 8, maxBonus: 16 },
           { type: 'gainResource', amount: 22 },
         ],
       },
@@ -8381,15 +8394,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 16,
         cost: 35,
         effects: [
-          { type: 'finisherDamage', base: 70, perCombo: 43, variance: 10 },
-          { type: 'consumeDot', dot: 'rake' },
-          { type: 'consumeDot', dot: 'rip' },
+          { type: 'finisherDamage', base: 70, perCombo: 0, variance: 10 },
+          { type: 'extendDot', dot: 'rake', seconds: 8, maxBonus: 16 },
+          { type: 'extendDot', dot: 'rip', seconds: 8, maxBonus: 16 },
           { type: 'gainResource', amount: 30 },
         ],
       },
     ],
     description:
-      'Spends your 3 Old Blood: strike for $d, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore energy. Works with zero combo points.',
+      'Spends your 3 Old Blood: strike for $d, lengthen your Flense and Bloodrift on the target by 8 sec (up to 16 sec each), make your bleeds on the target tick 15% faster for 8 sec (Red Torrent), and restore energy. Does not spend combo points.',
   },
   marrowbreak: {
     id: 'marrowbreak',
