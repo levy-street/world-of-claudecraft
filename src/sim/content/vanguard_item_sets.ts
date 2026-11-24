@@ -371,12 +371,12 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Gripping Roots' cast time is reduced by 0.5 sec. Damage taken no longer delays your spellcasting.",
+        text: 'Gripping Roots becomes instant. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,
         effect: {},
-        text: 'Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec.',
+        text: 'Your first Skyfall on a target held by your Gripping Roots is instant and deals 20 percent more damage.',
       },
     ],
   },

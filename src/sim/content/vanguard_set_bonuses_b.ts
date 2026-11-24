@@ -79,20 +79,16 @@ export const VANGUARD_DESTRUCTION_4PC_CONFLAGRATES_PER_PROC = 2;
 export const VANGUARD_DESTRUCTION_4PC_WINDOW_SEC = 8;
 
 // ---- Druid ----
-/** Starwarden 2pc: seconds cut from Gripping Roots' cast. */
-export const VANGUARD_BALANCE_2PC_ROOTS_CAST_CUT_SEC = 0.5;
-/** Gripping Roots' authored cast time (castPct scales it additively beside
- *  the Moongrove baseline's -0.24, so the cut is 0.5 sec for everyone). */
-export const GRIPPING_ROOTS_CAST_SEC = 1.5;
-/** Starwarden 4pc: movement speed multiplier after Gripping Roots (+20 percent). */
-export const VANGUARD_BALANCE_4PC_SPEED_MULT = 1.2;
-/** Starwarden 4pc: duration in seconds of both the speed and cast-while-moving auras. */
-export const VANGUARD_BALANCE_4PC_DURATION_SEC = 4;
-/** Starwarden 4pc: internal cooldown in seconds. */
-export const VANGUARD_BALANCE_4PC_ICD_SEC = 20;
-/** Starwarden 4pc aura ids (never Gripping Roots' own). */
-export const VANGUARD_BALANCE_4PC_MOBILE_AURA_ID = 'set_vanguard_druid_balance_4pc_mobile';
-export const VANGUARD_BALANCE_4PC_SPEED_AURA_ID = 'set_vanguard_druid_balance_4pc_speed';
+/** Starwarden 2pc: Gripping Roots' cast-time cut as a castPct. castPct rows
+ *  add (beside the Moongrove baseline's -0.24) and the resolved cast time is
+ *  floored at 0 (applyTalentMods), so -1 makes the cast instant for every
+ *  spec. */
+export const VANGUARD_BALANCE_2PC_ROOTS_CAST_PCT = -1;
+/** The Starwarden Raiment set id (combat/druid_starfall_snare.ts reads it). */
+export const VANGUARD_BALANCE_SET_ID = 'vanguard_druid_balance';
+/** Starwarden 4pc (Starfall Snare): damage multiplier on the first Skyfall
+ *  into a target held by the wearer's Gripping Roots (+20 percent). */
+export const VANGUARD_BALANCE_4PC_SKYFALL_DMG_MULT = 1.2;
 /** Bloodmane 2pc: seconds cut from Lunge's cooldown (12 to 9). */
 export const VANGUARD_FERAL_2PC_LUNGE_COOLDOWN_CUT_SEC = 3;
 /** Bloodmane 2pc: seconds cut from Bruin Rush's cooldown (15 to 12). */
@@ -422,51 +418,28 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_druid_balance: [
     {
       pieces: 2,
-      // Gripping Roots casts 0.5 sec faster (1.14 -> 0.64 sec for Moongrove
-      // with its baseline -0.24; 1.5 -> 1.0 for the other specs).
+      // Gripping Roots becomes instant (1.14 sec for Moongrove with its
+      // baseline -0.24, 1.5 sec for the other specs, both to 0).
       effect: {
         ability: [
           {
             ability: 'entangling_roots',
-            castPct: -VANGUARD_BALANCE_2PC_ROOTS_CAST_CUT_SEC / GRIPPING_ROOTS_CAST_SEC,
+            castPct: VANGUARD_BALANCE_2PC_ROOTS_CAST_PCT,
           },
         ],
       },
     },
     {
       pieces: 4,
-      // Casting Gripping Roots grants cast-while-moving and +20 percent
-      // movement speed for 4 sec, at most once every 20 sec (the Tempestwrit
-      // 4pc shape: castNth icd, two self-auras on their own ids).
+      // Bespoke (Starfall Snare): the first Skyfall into a target held by
+      // the wearer's own Gripping Roots is instant and deals 20 percent more
+      // damage, once per Roots application (combat/druid_starfall_snare.ts:
+      // the cast-time seam in casting_lifecycle.ts, the damage in
+      // effect_dispatch.ts directDamage, the bookkeeping in talent_procs.ts).
+      // Conditional on the target, so it cannot be a resolved row.
       effect: {
-        proc: {
-          id: 'set_vanguard_druid_balance_4pc',
-          name: 'Gripping Roots',
-          school: 'nature',
-          trigger: {
-            on: 'castNth',
-            n: 1,
-            abilities: ['entangling_roots'],
-            icd: VANGUARD_BALANCE_4PC_ICD_SEC,
-          },
-          responses: [
-            {
-              kind: 'aura',
-              auraKind: 'processional_grace',
-              value: 1,
-              duration: VANGUARD_BALANCE_4PC_DURATION_SEC,
-              name: 'Gripping Roots',
-              auraId: VANGUARD_BALANCE_4PC_MOBILE_AURA_ID,
-            },
-            {
-              kind: 'aura',
-              auraKind: 'buff_speed',
-              value: VANGUARD_BALANCE_4PC_SPEED_MULT,
-              duration: VANGUARD_BALANCE_4PC_DURATION_SEC,
-              name: 'Gripping Roots',
-              auraId: VANGUARD_BALANCE_4PC_SPEED_AURA_ID,
-            },
-          ],
+        tuning: {
+          skyfallDmgMult: VANGUARD_BALANCE_4PC_SKYFALL_DMG_MULT,
         },
       },
     },

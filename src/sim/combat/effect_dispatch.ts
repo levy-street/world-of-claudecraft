@@ -138,6 +138,7 @@ import {
   SPORE_BURST_FULL_BANK_POWER,
   sporeBurstFullBank,
 } from './druid_spore_burst';
+import { starfallSnareDamageMult } from './druid_starfall_snare';
 import { tidewheelDirectMult } from './druid_tidewheel';
 import { consumeNextAttackCrit } from './empower_next';
 import { rollFeralStrikeEnchant, runWeaponProcs } from './equip_procs';
@@ -981,6 +982,8 @@ export function runEffects(
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
         dmg *= tidewheelDirectMult(p, ability.id);
+        // Starwarden 4pc: the first Skyfall into the wearer's own Gripping Roots.
+        dmg *= starfallSnareDamageMult(ctx, p, ability.id, target);
         const finalDamage = Math.round(dmg * primaryDamageMult);
         lastDirectDamage = finalDamage;
         const targetHpBefore = target.hp;

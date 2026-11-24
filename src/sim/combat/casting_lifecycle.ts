@@ -148,6 +148,7 @@ import {
   druidFormEntryTarget,
 } from './druid_form_entry';
 import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
+import { starfallSnareCastTime } from './druid_starfall_snare';
 import { resolveDualPurposeTarget } from './dual_purpose_target';
 import {
   consumeFreeCostFor,
@@ -1859,14 +1860,22 @@ export function castAbility(
     consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
   // Brineward 2pc (Warfare Season 2) reads the resolved friendly target's
   // health; a pass-through for every other ability and caster.
-  const castTime = brinewardMendingCastTime(
+  // Starwarden 4pc (combat/druid_starfall_snare.ts) reads the target too:
+  // a Skyfall into the wearer's own Gripping Roots is instant.
+  const castTime = starfallSnareCastTime(
     ctx,
     p,
     ability.id,
     target,
-    afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
-      destructionCastTimeMult(p, ability.id) *
-      ashenFocusCastTimeMult(ctx, p, meta, ability.id),
+    brinewardMendingCastTime(
+      ctx,
+      p,
+      ability.id,
+      target,
+      afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
+        destructionCastTimeMult(p, ability.id) *
+        ashenFocusCastTimeMult(ctx, p, meta, ability.id),
+    ),
   );
   // A press that cannot survive movement (abilityCastSurvivesMovement) is denied
   // OUTRIGHT here, before the GCD arms or any cast-commit body state is changed,
