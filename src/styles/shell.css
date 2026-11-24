@@ -8447,14 +8447,39 @@
     overflow: hidden;
     background: radial-gradient(120% 90% at 50% 20%, #2a2640, #0a0a12 75%);
   }
+  /* Out of flow, so the drawing buffer can never size the host. The shared
+     CharacterPreview canvas arrives carrying the buffer of its last host and
+     re-sizes it FROM this host on every resize; in flow, that buffer's aspect
+     and pixel ratio set the auto grid row's height.
+     tests/browser/skin_event_preview_size.browser.test.ts. */
   .se-preview canvas {
+    position: absolute;
+    inset: 0;
     width: 100% !important;
     height: 100% !important;
     display: block;
     cursor: grab;
   }
+  /* Cold-open stand-in (src/ui/preview_stand_in.ts): the class crest covers the
+     still-linking canvas, as on the character sheet, instead of landing
+     unstyled below it. */
+  .se-preview .preview-stand-in {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .se-preview .preview-stand-in img {
+    width: 44%;
+    max-width: 112px;
+    opacity: 0.5;
+  }
   .se-preview-hint {
     position: absolute;
+    z-index: 2;
     left: 0;
     right: 0;
     bottom: 6px;

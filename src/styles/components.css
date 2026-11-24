@@ -4559,18 +4559,32 @@
     right: 8px;
     z-index: 2;
   }
+  /* The Armory stage height mirrors armoryPreviewParkingSize (armory_inspect.ts),
+     so the parked renderer is already the opened size and the first card click
+     resizes no composer targets. The mount panel builds its renderer in place
+     and keeps the plain floor. */
   .armory-inspect-stage {
     position: relative;
-    min-height: 380px;
+    min-height: clamp(380px, calc(100vh - 42px), 430px);
     background: #070d14;
   }
+  .mount-inspect-overlay .armory-inspect-stage {
+    min-height: 380px;
+  }
+  /* Out of flow, so the drawing buffer can never size the stage: the Armory and
+     mount previews re-size the buffer FROM the stage on every resize, and in
+     flow its aspect and pixel ratio set the auto grid row's height.
+     tests/browser/armory_inspect_stage_size.browser.test.ts. */
   .armory-inspect-stage canvas {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
   }
   .armory-inspect-controls {
     position: absolute;
+    z-index: 1;
     right: 10px;
     bottom: 10px;
     left: 10px;
