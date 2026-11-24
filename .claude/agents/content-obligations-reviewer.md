@@ -57,6 +57,14 @@ Player-facing content feeds the `/wiki` guide: `npm run wiki:content` was run (a
 `pretest`/`build`) and any new `guide.*` prose keys were added. Freshness-gated by
 `tests/guide.test.ts`; a red freshness gate means the regen was skipped.
 
+The same content also feeds the static player encyclopedia under `/wiki`
+(`docs/wiki-encyclopedia.md`). A change that adds, renames or removes an entity page ran
+`npm run wiki:paths` and committed `mediawiki/site_paths.json` with the seed
+(`tests/wiki_site_audit.test.ts` reds otherwise). A removed or renamed page's old address in
+`redirects` points at its replacement title where one exists (`null` only for truly gone).
+A new creature, NPC or boss attack without a captured picture is a follow-up, not a blocker:
+name it from `npm run wiki:art-coverage`.
+
 ### Check 4 - Item art and names (CRITICAL)
 
 Every new item id owes committed WebP art under `public/ui/items/<id>.webp` in the same change,
