@@ -18,10 +18,12 @@ import {
   HEAT_WELL,
   heatFightClaims,
   heatObjectKind,
+  PATCH_DANGER,
   patchLook,
   SEED_CORE_R,
   seedLook,
   wellLook,
+  ZONE_DANGER,
   zoneLook,
   zoneRadii,
 } from '../src/render/smith_heart_fx/heat_fight_fx_core';
@@ -115,17 +117,23 @@ describe('heat_fight_fx_core: the fight in the Hearth', () => {
     expect(SEED_CORE_R).toBeLessThan(T.seedReach);
   });
 
-  it('builds a Wakefire band, then erupts and dies down; its rings are the sim bands', () => {
+  it('builds a Wakefire band, then erupts and settles, never fading while the sim can strike; its rings are the sim bands', () => {
     expect(zoneLook('warn', 0, T.zoneWarn)).toEqual({ build: 0, burn: 0 });
     expect(zoneLook('warn', T.zoneWarn, T.zoneWarn).build).toBe(1);
     expect(zoneLook('burn', 0.2, T.zoneBurn).burn).toBeGreaterThan(0.8);
-    expect(zoneLook('burn', T.zoneBurn, T.zoneBurn).burn).toBeLessThan(0.5);
+    // Its last tick (one interval before the sim drops it) lands on fire,
+    // never on a scorch (Jose's playtest of 2026-11-24).
+    for (let t = 0.15; t <= T.zoneBurn; t += 0.05)
+      expect(zoneLook('burn', t, T.zoneBurn).burn).toBeGreaterThanOrEqual(ZONE_DANGER - 1e-9);
+    expect(zoneLook('burn', T.zoneBurn, T.zoneBurn).burn).toBeLessThan(
+      zoneLook('burn', 0.3, T.zoneBurn).burn,
+    );
     for (let b = 0; b < ZONE_BANDS.length; b++) expect(zoneRadii(b)).toEqual(ZONE_BANDS[b]);
     expect(zoneRadii(-1)).toEqual(ZONE_BANDS[0]);
     expect(zoneRadii(99)).toEqual(ZONE_BANDS[ZONE_BANDS.length - 1]);
   });
 
-  it('plunges a cinder out of the smoke; a patch catches and dies', () => {
+  it('plunges a cinder out of the smoke; a patch catches and burns until the sim drops it', () => {
     expect(fallLook(0, T.cinderFallWarn).height).toBe(40);
     expect(fallLook(T.cinderFallWarn, T.cinderFallWarn)).toEqual({ height: 0, fill: 1 });
     let last = Number.POSITIVE_INFINITY;
@@ -136,7 +144,16 @@ describe('heat_fight_fx_core: the fight in the Hearth', () => {
     }
     expect(patchLook(0, 15)).toBe(0);
     expect(patchLook(5, 15)).toBe(1);
-    expect(patchLook(15, 15)).toBe(0);
+    // Dying down over its last two seconds, still fire at its last tick (a
+    // trail's at life - 1, a scorch's at life - 0.5) and at the drop.
+    for (const [life, tick] of [
+      [T.trailLife, T.trailTick],
+      [T.scorchLife, T.scorchTick],
+    ])
+      for (let t = 0.4; t <= life; t += 0.05)
+        expect(patchLook(t, life)).toBeGreaterThanOrEqual(PATCH_DANGER - 1e-9);
+    expect(patchLook(15, 15)).toBeCloseTo(PATCH_DANGER, 9);
+    expect(patchLook(14, 15)).toBeLessThan(1);
   });
 
   it('pools every footprint the sim can keep at once', () => {

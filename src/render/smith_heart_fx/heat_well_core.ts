@@ -19,6 +19,8 @@
 // Three-free, DOM-free, deterministic (the bubbles draw through the caller's
 // rng, a cosmetic one).
 
+import { HEAT_LIP_WALL } from '../../sim/encounters/smith_heart/heat_ids';
+
 /** The pool's flow: a phase's length (seconds), the outward speed and the
  *  turn (yards a second). */
 export const WELL_FLOW = { period: 6, speed: 0.6, swirl: 0.18 } as const;
@@ -173,4 +175,47 @@ export function stepWellBubbles(
     break;
   }
   return popped;
+}
+
+// ---- the lip wall -----------------------------------------------------------------------
+
+/** One basalt stump of the lip wall: its spot (yards from the well's middle),
+ *  its radius and height (yards), its turn. */
+export interface LipStump {
+  x: number;
+  z: number;
+  r: number;
+  h: number;
+  rot: number;
+}
+
+/** The lip wall's two rows of hexagonal basalt stumps (Jose's playtest of
+ *  2026-11-24: a low wall nobody steps into). The outer row's faces stand on
+ *  the wall's outer face (HEAT_LIP_WALL.outer, where its colliders hold a
+ *  body), the inner row against the lip, staggered between them, so the band
+ *  reads as one solid wall from any side; every top under the wall's height
+ *  (the sight line passes over it). Deterministic (a fixed hash). */
+export function wellLipStumps(): LipStump[] {
+  const W = HEAT_LIP_WALL;
+  const out: LipStump[] = [];
+  const rows = [
+    { r: 0.64, at: W.outer - 0.64, hMin: 0.85, hMax: W.height - 0.05, step: 1.12, phase: 0 },
+    { r: 0.56, at: W.inner + 0.62, hMin: 1.0, hMax: W.height, step: 1.02, phase: 0.5 },
+  ];
+  for (const [k, row] of rows.entries()) {
+    const n = Math.ceil((Math.PI * 2 * row.at) / row.step);
+    for (let i = 0; i < n; i++) {
+      const a = ((i + row.phase) / n) * Math.PI * 2;
+      const hash = (Math.sin(i * 12.9898 + k * 78.233) * 43758.5453) % 1;
+      const u = hash < 0 ? hash + 1 : hash;
+      out.push({
+        x: Math.sin(a) * row.at,
+        z: Math.cos(a) * row.at,
+        r: row.r,
+        h: row.hMin + (row.hMax - row.hMin) * u,
+        rot: a + i * 0.7,
+      });
+    }
+  }
+  return out;
 }

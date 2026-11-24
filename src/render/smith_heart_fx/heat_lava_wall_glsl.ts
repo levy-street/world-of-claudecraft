@@ -20,6 +20,7 @@
 import { HEAT_TUNING as T } from '../../sim/encounters/smith_heart/heat_ids';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { LAVA_WALL } from './heat_lava_wall_core';
+import { HEAT_LIP_CLIP_R } from './heat_lip_clip_core';
 
 /** Hearth floor polygon corners (FORGE_POINTS) as a uniform array. */
 export const WALL_POLY_N = 12;
@@ -34,6 +35,10 @@ uniform vec2 uPoly[${WALL_POLY_N}];
 uniform float uRise;
 uniform float uTime;
 const float WALL_PART = ${LAVA_WALL.part.toFixed(3)};
+// The lip clip (heat_lip_clip_core.ts): nothing of a ring draws over the boss's
+// disc; its fire stands up as its front clears the lip wall's outer face.
+const float WALL_LIP = ${HEAT_LIP_CLIP_R.toFixed(3)};
+float wallOffLip(float r) { return smoothstep(WALL_LIP, WALL_LIP + 0.8, r); }
 // The Hearth's floor polygon: negative inside, the distance to its edge.
 float wallPolySd(vec2 p) {
   float d = dot(p - uPoly[0], p - uPoly[0]);
@@ -95,7 +100,7 @@ void main() {
   float R = max(uR + aSheet.x, 0.5);
   vec2 dir = vec2(sin(a), cos(a));
   vec2 xz = uCenter.xz + dir * R;
-  float m = wallOpen(a) * wallInFloor(uCenter.xz + dir * uR) * uRise;
+  float m = wallOpen(a) * wallInFloor(uCenter.xz + dir * uR) * uRise * wallOffLip(uR);
   vMask = m;
   vSeed = aSheet.y;
   float v = position.y;
@@ -254,7 +259,7 @@ void main() {
   vSeed = aTongue.y;
   float a = aTongue.x * 6.2831853;
   vec2 dir = vec2(sin(a), cos(a));
-  float m = wallOpen(a) * wallInFloor(uCenter.xz + dir * uR) * uRise;
+  float m = wallOpen(a) * wallInFloor(uCenter.xz + dir * uR) * uRise * wallOffLip(uR);
   float period = 0.9 + 0.9 * fract(aTongue.y * 7.31);
   float ph = fract(uTime / period + aTongue.y * 3.7);
   // It swells, reaches its height, then breaks off and rises away.
@@ -327,7 +332,7 @@ ${CAMERA_RELATIVE_GLSL}
 void main() {
   float a = aEmber.x * 6.2831853;
   vec2 dir = vec2(sin(a), cos(a));
-  float m = wallOpen(a) * wallInFloor(uCenter.xz + dir * uR) * uRise;
+  float m = wallOpen(a) * wallInFloor(uCenter.xz + dir * uR) * uRise * wallOffLip(uR);
   float seed = aEmber.y;
   float life = fract(uTime * aEmber.z + seed * 11.0);
   vLife = life;
@@ -386,6 +391,7 @@ uniform float uAhead;
 varying float vOff;
 varying float vA;
 varying vec3 vW;
+varying vec2 vL;
 ${WALL_COMMON_GLSL}
 ${CAMERA_RELATIVE_GLSL}
 void main() {
@@ -393,12 +399,15 @@ void main() {
   // More rows near the front (the molten band), fewer out in the light and scorch.
   float k = position.y * 2.0 - 1.0;
   float off = k < 0.0 ? -uBehind * pow(max(-k, 0.0), 1.6) : uAhead * pow(max(k, 0.0), 1.6);
-  float R = max(${T.ringStart.toFixed(3)}, uR + off);
+  float R = max(max(${T.ringStart.toFixed(3)}, WALL_LIP), uR + off);
   vec2 dir = vec2(sin(a), cos(a));
   vec3 w = vec3(uCenter.x + dir.x * R, uCenter.y + 0.06, uCenter.z + dir.y * R);
   vOff = R - uR;
   vA = a;
   vW = w;
+  // Yards from the well's middle, small and steady (the noise's frame: world
+  // yards a hundred thousand out shimmer, heat_lip_clip_core.ts).
+  vL = dir * R;
   gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;
@@ -412,6 +421,7 @@ uniform float uHeat;
 varying float vOff;
 varying float vA;
 varying vec3 vW;
+varying vec2 vL;
 ${WALL_COMMON_GLSL}
 ${noiseGlsl}
 ${moltenGlsl}
@@ -426,7 +436,7 @@ void main() {
   // The molten band itself (ragged edges), only where the wall stands.
   float rag = (vn(vec2(vA * uR * 0.5, uTime * 0.7)) - 0.5) * 0.9;
   float band = smoothstep(-B - 0.4 + rag, -B + 0.5 + rag, off) * (1.0 - smoothstep(A - 0.2, A + 0.5, off - rag * 0.4));
-  float lvl = lavaLevel(vW.xz, vec2(0.0), uTime, 1.25);
+  float lvl = lavaLevel(vL, vec2(0.0), uTime, 1.25);
   float m = band * open * (0.35 + 0.7 * lvl) * uHeat * 0.85;
   vec3 col = molten(clamp(m, 0.0, 1.0));
   float alpha = band * open * 0.96;
@@ -438,7 +448,7 @@ void main() {
   // Behind: the scorched basalt cooling, its cracks dying red.
   float behind = max(0.0, -B - off);
   float scorch = (1.0 - smoothstep(0.0, ${LAVA_WALL.scorchBehind.toFixed(3)} - B, behind)) * step(off, -B) * open;
-  float crack = (1.0 - smoothstep(0.0, 0.09, cellEdge(vW.xz * 0.55))) * exp(-behind / 2.2);
+  float crack = (1.0 - smoothstep(0.0, 0.09, cellEdge(vL * 0.55))) * exp(-behind / 2.2);
   vec3 sc = mix(vec3(0.05, 0.04, 0.035), vec3(1.0, 0.35, 0.08) * 1.3, crack);
   col = mix(col, sc, scorch * (1.0 - alpha));
   alpha = max(alpha, scorch * (0.55 * (1.0 - smoothstep(0.0, 6.0, behind)) + crack * 0.6));
@@ -504,7 +514,8 @@ float corridorPolySd(vec2 p) {
 }
 void main() {
   float inF = smoothstep(-0.2, 0.8, -corridorPolySd(vW.xz));
-  if (inF < 0.01) discard;
+  // Off the boss's disc (the lip clip, heat_lip_clip_core.ts).
+  if (inF < 0.01 || vC.y < ${HEAT_LIP_CLIP_R.toFixed(3)}) discard;
   float x = abs(vC.x);
   float along = vC.y;
   float yards = x * uHalf;

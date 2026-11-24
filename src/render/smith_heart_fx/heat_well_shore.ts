@@ -7,41 +7,52 @@
 // telegraph drapes over it), opaque like the pool and on the pool's own rung
 // of the Heat's floor ladder (the two never overlap: the terrace starts past
 // the lip), under every mark of the fight; its outer edge dithers out.
-// Its width covers the body's melee reach (the lip plus the player's
-// BODY_EDGE_MELEE_REACH) with a margin. Every tier draws it (cheap: one ring,
+// It starts under the lip wall's stumps and reaches past the melee's whole
+// band (the guardian's body radius plus the player's BODY_EDGE_MELEE_REACH)
+// with a margin: the melee's pedestal, grown with the wall on 2026-11-24. Every tier draws it (cheap: one ring,
 // two passes); its embers breathe slowly, never a warning's pulse.
 //
 // Built once by HeatWellFx under the host's root (one gated attach).
 
 import * as THREE from 'three';
+import { BODY_EDGE_MELEE_REACH } from '../../sim/combat/player_attack_reach';
+import { HEAT_BODY_R, HEAT_LIP_WALL } from '../../sim/encounters/smith_heart/heat_ids';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HEAT_LIP_FRAG_GLSL, HEAT_LIP_VERT_GLSL, heatLipClipUniform } from './heat_lip_clip_core';
 import { floorRingGeometry } from './heat_shapes';
 
-/** The terrace: from just outside the lip's stumps to this far past the lip
- *  (yards): the melee's three yards of reach and room behind them. */
-export const HEAT_SHORE = { inner: 0.4, outer: 7 } as const;
+/** The terrace (yards from the well's middle): from under the lip wall's
+ *  outer stumps out past the melee's reach (the body's edge plus
+ *  BODY_EDGE_MELEE_REACH) and two and a half yards of room behind it. */
+export const HEAT_SHORE = {
+  inner: HEAT_LIP_WALL.outer - 0.3,
+  outer: HEAT_BODY_R + BODY_EDGE_MELEE_REACH + 2.5,
+} as const;
 
 const VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
+${HEAT_LIP_VERT_GLSL}
 varying vec2 vUv;
-varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
-  vW = wp.xyz;
+  // The flagstones in yards off the well's middle (heat_lip_clip_core.ts): world
+  // yards a hundred thousand out made the joints and grain shimmer.
+  heatLipLocal(wp.xyz);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
-/** uv.y 0 at the inner edge, 1 at the outer; the flagstones in world yards. */
+/** uv.y 0 at the inner edge, 1 at the outer; the flagstones in yards off the
+ *  well's middle. */
 const FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uHeat;
 varying vec2 vUv;
-varying vec3 vW;
+${HEAT_LIP_FRAG_GLSL}
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
 // Distance to the nearest hex cell's edge (pointy hexes, cell size 1).
@@ -57,17 +68,17 @@ vec3 hexCell(vec2 p) {
 }
 void main() {
   float y = vUv.y;
-  vec3 hc = hexCell(vW.xz / 1.45);
+  vec3 hc = hexCell(vLipL / 1.45);
   float joint = 1.0 - smoothstep(0.025, 0.07, hc.x);
   float tone = hh2(floor(hc.yz * 3.0 + 0.5));
-  float grain = vn(vW.xz * 2.3) * 0.5 + vn(vW.xz * 7.0) * 0.5;
+  float grain = vn(vLipL * 2.3) * 0.5 + vn(vLipL * 7.0) * 0.5;
   // The flagstones: dark sooted basalt, each its own tone, a lit edge on top.
   vec3 stone = vec3(0.105, 0.085, 0.075) * (0.75 + 0.35 * tone + 0.25 * grain);
   stone *= 1.0 + 0.35 * smoothstep(0.07, 0.16, hc.x) * (1.0 - smoothstep(0.16, 0.3, hc.x));
   // Embers in the joints near the lip, cooling outward, breathing slowly.
   float near = 1.0 - smoothstep(0.05, 0.75, y);
   float breath = 0.75 + 0.25 * sin(uTime * 0.7 + tone * 6.28);
-  float ember = joint * near * breath * (0.55 + 0.45 * vn(vW.xz * 0.8 + uTime * 0.15));
+  float ember = joint * near * breath * (0.55 + 0.45 * vn(vLipL * 0.8 + uTime * 0.15));
   vec3 col = mix(stone, vec3(0.03, 0.025, 0.022), joint * (1.0 - near));
   col += molten(0.42 + 0.25 * ember) * ember * 0.8 * uHeat;
   // The carved groove and the worn warm edge at the terrace's rim.
@@ -89,15 +100,14 @@ export class HeatWellShore {
 
   private readonly outer: number;
 
-  /** `r` the well's lip radius (the sim's, fixed). */
-  constructor(host: HeatFxHost, r: number) {
-    // A unit ring from just outside the lip out to the terrace's rim.
-    this.outer = r + HEAT_SHORE.outer;
-    const geo = floorRingGeometry((r + HEAT_SHORE.inner) / this.outer, 128);
+  constructor(host: HeatFxHost) {
+    // A unit ring from under the lip wall out to the terrace's rim.
+    this.outer = HEAT_SHORE.outer;
+    const geo = floorRingGeometry(HEAT_SHORE.inner / this.outer, 128);
     host.geometries.push(geo);
     const mat = new THREE.ShaderMaterial({
       name: 'smithHeartHeatWellShore',
-      uniforms: { uTime: host.uTime, uHeat: { value: 1 } },
+      uniforms: { uTime: host.uTime, uHeat: { value: 1 }, uLipClip: heatLipClipUniform },
       vertexShader: VERT,
       fragmentShader: FRAG,
       toneMapped: false,

@@ -31,6 +31,7 @@ import type { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import { HEAT_FX_COLORS as C } from './heat_fx_core';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HEAT_LIP_FRAG_GLSL, HEAT_LIP_VERT_GLSL, heatLipClipUniform } from './heat_lip_clip_core';
 import { moltenDecal } from './heat_molten_decal';
 import {
   HEAT_SWELL_LOOK as L,
@@ -320,12 +321,13 @@ void main() {
 
 const WAKE_VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
+${HEAT_LIP_VERT_GLSL}
 varying vec2 vUv;
-varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
-  vW = wp.xyz;
+  // The noise's frame: yards off the well's middle (heat_lip_clip_core.ts).
+  heatLipLocal(wp.xyz);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
@@ -344,10 +346,10 @@ uniform float uFar;
 uniform float uCool;
 uniform float uFade;
 varying vec2 vUv;
-varying vec3 vW;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
 ${HEAT_LAVA_GLSL}
+${HEAT_LIP_FRAG_GLSL}
 vec3 trailRamp(float m) {
   vec3 crust = vec3(0.05, 0.038, 0.034);
   vec3 ember = vec3(0.45, 0.08, 0.02);
@@ -377,7 +379,7 @@ void main() {
   float behind = uNear - along;
   // The molten surface shows only in the box and the heel's seam.
   float lvl = 0.0;
-  if (inBox > 0.5 || behind < 3.4) lvl = lavaLevel(vW.xz, vec2(0.0), uTime * 0.4, 1.0);
+  if (inBox > 0.5 || behind < 3.4) lvl = lavaLevel(vLipL, vec2(0.0), uTime * 0.4, 1.0);
   float box = inBox * (0.7 + 0.18 * lvl);
   float out_ = 1.0 - inBox;
   float rag = vn(vec2(along * 0.7, vUv.x * 6.0)) * 0.22;
@@ -388,8 +390,8 @@ void main() {
   float seam = out_ * (1.0 - smoothstep(0.4, 2.6 + 0.8 * rag, behind));
   float seamM = seam * (0.5 + 0.4 * lvl);
   // The cracks: glowing while the crust is hot, dying to a dull ember line.
-  float crack = crackLines(vW.xz * 0.55);
-  float crackM = crack * (0.22 + 0.5 * heat) * (0.75 + 0.25 * vn(vW.xz * 0.8 + uTime * 0.6));
+  float crack = crackLines(vLipL * 0.55);
+  float crackM = crack * (0.22 + 0.5 * heat) * (0.75 + 0.25 * vn(vLipL * 0.8 + uTime * 0.6));
   float m = max(box, trail * max(seamM, crackM));
   vec3 col = trailRamp(clamp(m, 0.0, 1.0)) * 1.25;
   // The crust itself is dark (a char over the floor, not a glow); the cracks
@@ -472,6 +474,7 @@ export class HeatSwells {
             uFar: { value: 0 },
             uCool: { value: L.coolRun },
             uFade: { value: 1 },
+            uLipClip: heatLipClipUniform,
           },
           charStep: HEAT_FLOOR.wakeChar.step,
           glowStep: HEAT_FLOOR.wakeGlow.step,

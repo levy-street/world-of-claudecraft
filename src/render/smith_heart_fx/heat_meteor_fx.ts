@@ -28,6 +28,7 @@ import { HEAT_FIGHT_COLORS as C } from './heat_fight_fx_core';
 import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HEAT_LIP_FRAG_GLSL, HEAT_LIP_VERT_GLSL, heatLipClipUniform } from './heat_lip_clip_core';
 import {
   HEAT_METEOR as M,
   type MeteorLook,
@@ -113,12 +114,14 @@ void main() {
 `;
 const UV_VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
+${HEAT_LIP_VERT_GLSL}
 varying vec2 vUv;
 varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vW = wp.xyz;
+  heatLipLocal(wp.xyz);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
@@ -132,11 +135,13 @@ varying vec2 vUv;
 varying vec3 vW;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
+${HEAT_LIP_FRAG_GLSL}
 void main() {
   vec2 p = vUv * 2.0 - 1.0;
   float r = length(p);
   float rag = vn(vec2(atan(p.y, p.x) * 3.0 + uSeed, uSeed)) * 0.18;
-  if (r > 1.0 - rag * 0.5) discard;
+  // Off the boss's disc (the lip clip, heat_lip_clip_core.ts).
+  if (r > 1.0 - rag * 0.5 || heatLipClipped()) discard;
   float a = atan(p.y, p.x);
   float k = a / 6.2831853 * 11.0 + uSeed;
   float id = floor(k);
@@ -321,6 +326,7 @@ export class HeatMeteorFx {
             uGlow: { value: 0 },
             uFlash: { value: 0 },
             uSeed: { value: meteorHash(i, 7) * 9 },
+            uLipClip: heatLipClipUniform,
           },
           charStep: HEAT_FLOOR.zoneChar.step,
           glowStep: HEAT_FLOOR.zoneGlow.step,

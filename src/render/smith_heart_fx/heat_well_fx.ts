@@ -22,7 +22,6 @@
 // pools, no per-frame allocation, no light.
 
 import * as THREE from 'three';
-import { HEARTH_WELL } from '../../sim/content/smith_heart_layout';
 import { HEAT_AURAS, type HeatWellState } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity } from '../../sim/types';
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
@@ -41,6 +40,7 @@ import {
 import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { clearHeatLipClip, placeHeatLipClip } from './heat_lip_clip_core';
 import { basaltColumn } from './heat_shapes';
 import {
   stepWellBubbles,
@@ -49,11 +49,13 @@ import {
   type WellBubble,
   wellBubbleLook,
   wellBubbleSlots,
+  wellLipStumps,
 } from './heat_well_core';
 import { HeatWellShore } from './heat_well_shore';
 
-/** The lip's stumps: as many as the first well's 26 per its 8 yd of lip. */
-const LIP_STUMPS = Math.round((26 * HEARTH_WELL.r) / 8);
+/** The lip wall's stumps (heat_well_core.ts wellLipStumps: two staggered rows
+ *  filling HEAT_LIP_WALL's band, where the sim's colliders stand). */
+const LIP_PLAN = wellLipStumps();
 const _well: WellLook = { heat: 0, surge: 0, boil: 0, pulse: 0 };
 const _bubble = { radius: 0, pop: 0 };
 const _m = new THREE.Matrix4();
@@ -362,7 +364,7 @@ export class HeatWellFx {
       );
     }
     g.push(stump);
-    this.lip = new THREE.InstancedMesh(stump, heartKitSlotMaterial('stone'), LIP_STUMPS);
+    this.lip = new THREE.InstancedMesh(stump, heartKitSlotMaterial('stone'), LIP_PLAN.length);
     this.lip.name = 'smithHeartHeatWellLip';
     this.lip.frustumCulled = false;
     this.lip.castShadow = true;
@@ -394,7 +396,7 @@ export class HeatWellFx {
     this.rim.visible = false;
     this.rim.renderOrder = floorVfxRenderOrder('encounter', HEAT_FLOOR.wellRim.step);
     host.root.add(this.rim);
-    this.shore = new HeatWellShore(host, HEAT_WELL.r);
+    this.shore = new HeatWellShore(host);
     this.glowMat = host.sprite(0xffc860, 'smithHeartHeatWellGlow');
     this.glow = new THREE.Sprite(this.glowMat);
     this.glow.name = 'smithHeartHeatWellGlow';
@@ -434,15 +436,14 @@ export class HeatWellFx {
     this.pool.scale.set(this.r + 0.3, 1, this.r + 0.3);
     this.rim.position.set(this.x, this.y + 0.12, this.z);
     this.rim.scale.set(this.r + 0.3, 1, this.r + 0.3);
-    for (let i = 0; i < LIP_STUMPS; i++) {
-      const a = (i / LIP_STUMPS) * Math.PI * 2;
-      const rr = this.r + 0.9 + 0.35 * Math.sin(i * 2.3);
-      const h = 0.5 + 0.9 * ((Math.sin(i * 5.7) + 1) / 2);
-      _v.set(this.x + Math.sin(a) * rr, this.y - 0.2, this.z + Math.cos(a) * rr);
-      _q.setFromAxisAngle(_up, a + i);
-      _s.set(2.1, h, 2.1);
+    // The stumps stand a hand into the floor (no seam at their feet).
+    for (const [i, st] of LIP_PLAN.entries()) {
+      _v.set(this.x + st.x, this.y - 0.15, this.z + st.z);
+      _q.setFromAxisAngle(_up, st.rot);
+      _s.set(st.r / 0.5, st.h + 0.15, st.r / 0.5);
       this.lip.setMatrixAt(i, _m.compose(_v, _q, _s));
     }
+    placeHeatLipClip(this.x, this.z);
     this.lip.instanceMatrix.needsUpdate = true;
     this.shore.place(this.x, this.y, this.z);
     this.shimmer.position.set(this.x, this.y - 0.1, this.z);
@@ -539,6 +540,7 @@ export class HeatWellFx {
 
   hide(): void {
     this.placedFor = -1;
+    clearHeatLipClip();
     this.pool.visible = false;
     this.lip.visible = false;
     this.rim.visible = false;

@@ -35,8 +35,11 @@ export const WHEEL_FX = {
   quench: 0.35,
   /** While the sim still burns a slice its floor never reads cooler than
    *  this fire (0..1) and its low flames stand (graphics fairness: no
-   *  invisible damage); once the sim drops it, both go over `out`. */
-  danger: 0.4,
+   *  invisible damage); once the sim drops it, both go over `out`. 0.4 until
+   *  Jose's playtest of 2026-11-24: the slice's last tick landed on ground
+   *  that already read as a cooling scorch ("it disappears but keeps
+   *  hitting"). */
+  danger: 0.8,
   out: 0.3,
   /** A low flame's height (yards, min to max). */
   low: [2.6, 4] as const,

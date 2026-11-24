@@ -124,6 +124,16 @@ export function swellHeight(front: number, length: number = T.laneLength): numbe
   return SWELL_HEIGHT * rise * sink;
 }
 
+/** Where a wave's wall is drawn for its front `front` yards down the lane:
+ *  where the sim strikes, its box held at the lane's end while it sinks there
+ *  (heat_fist.ts stepSwell clamps its front to T.laneLength and strikes until
+ *  the front is a wall's depth past it). Jose's playtest of 2026-11-24: the
+ *  drawn wall rolled on past the lane's end while the sim's box still struck
+ *  behind it. */
+export function swellDrawnFront(front: number): number {
+  return Math.min(Math.max(0, front), T.laneLength);
+}
+
 /** A wave's front `since` seconds after it began to roll (the sim's speed,
  *  so the wall drawn is where the sim strikes). */
 export function swellFront(since: number): number {

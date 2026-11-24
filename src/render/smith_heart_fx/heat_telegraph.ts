@@ -21,6 +21,7 @@
 import * as THREE from 'three';
 import type { TelegraphFan, TelegraphKit, TelegraphLane } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
+import { heatLipClipUniform } from './heat_lip_clip_core';
 import { applyCharBlend } from './heat_molten_decal';
 import { HEAT_TELEGRAPH_LOOKS, type HeatTelegraphKind } from './heat_telegraph_core';
 import { HEAT_TELEGRAPH_FRAG, HEAT_TELEGRAPH_VERT } from './heat_telegraph_glsl';
@@ -78,6 +79,7 @@ export class HeatTelegraphs {
       uCrack: { value: L.crack },
       uRimK: { value: L.rim },
       uSpent: { value: 0 },
+      uLipClip: heatLipClipUniform,
     };
     const common = {
       uniforms,

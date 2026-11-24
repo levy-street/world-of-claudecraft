@@ -76,10 +76,12 @@ import {
   heatFxHash,
   HEAT_FX_POOLS as P,
   SWELL_HEIGHT,
+  swellDrawnFront,
   swellFront,
   swellHeight,
 } from './heat_fx_core';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HEAT_LIP_FRAG_GLSL, HEAT_LIP_VERT_GLSL, heatLipClipUniform } from './heat_lip_clip_core';
 import { moltenDecal } from './heat_molten_decal';
 import { basaltColumn, basaltRepaint, crystalPrism } from './heat_shapes';
 import { HeatSwells } from './heat_swell_fx';
@@ -167,12 +169,14 @@ const SMOKE_PUFF = {
 
 const UV_VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
+${HEAT_LIP_VERT_GLSL}
 varying vec2 vUv;
 varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vW = wp.xyz;
+  heatLipLocal(wp.xyz);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
@@ -186,10 +190,12 @@ varying vec2 vUv;
 varying vec3 vW;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
+${HEAT_LIP_FRAG_GLSL}
 void main() {
   vec2 p = vUv * 2.0 - 1.0;
   float r = length(p);
-  if (r > 1.0) discard;
+  // Off the boss's disc (the lip clip, heat_lip_clip_core.ts).
+  if (r > 1.0 || heatLipClipped()) discard;
   float a = atan(p.y, p.x);
   float k = a / 6.2831853 * 9.0 + uSeed;
   float id = floor(k);
@@ -400,6 +406,7 @@ export class HeatFx {
             uGlow: { value: 0 },
             uFlash: { value: 0 },
             uSeed: { value: heatFxHash(i, 3) * 9 },
+            uLipClip: heatLipClipUniform,
           },
           charStep: HEAT_FLOOR.craterChar.step,
           glowStep: HEAT_FLOOR.craterGlow.step,
@@ -871,8 +878,9 @@ export class HeatFx {
       // Behind the wall's back the lane is spent (the sim strikes only the
       // wall's box): its warning clears there, leaving the scorched trail.
       setLaneSpent(s.lane, Math.max(0, Math.min(front, s.length) - T.waveDepth));
-      // The wave itself, standing in the sim's hit box (heat_swell_fx.ts).
-      this.swells.paint(i, front, swellHeight(front, s.length), dt);
+      // The wave itself, standing in the sim's hit box (heat_swell_fx.ts),
+      // held at the lane's end while it sinks there, as the sim's box is.
+      this.swells.paint(i, swellDrawnFront(front), swellHeight(front, s.length), dt);
     }
   }
 

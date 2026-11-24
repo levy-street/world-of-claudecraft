@@ -214,10 +214,17 @@ export function zoneLook(
     return out;
   }
   out.build = 1;
-  // It erupts at once, then dies down over its burn.
-  out.burn = smooth(age / 0.12) * (0.45 + 0.55 * clamp01((span - age) / span));
+  // It erupts at once, then settles over its burn, never under ZONE_DANGER
+  // while the sim's band stands (its last tick reads as fire; it goes the
+  // moment the sim drops it).
+  out.burn = smooth(age / 0.12) * (ZONE_DANGER + (1 - ZONE_DANGER) * clamp01((span - age) / span));
   return out;
 }
+
+/** A burning Wakefire band never reads fainter than this (0..1) while the sim
+ *  can strike in it (0.45 until Jose's playtest of 2026-11-24: the sheet
+ *  dimmed to a scorch before its last tick). */
+export const ZONE_DANGER = 0.8;
 
 /** A Wheel slice's bearings (radians, sim facing), for the shader's clip. */
 export function wheelArc(slice: number): { from: number; to: number } {
@@ -247,12 +254,17 @@ export function fallLook(
 }
 
 /** A burning patch `age` seconds into its `life`: its burn (0..1, catching,
- *  then dying in its last two seconds). */
+ *  then dying down in its last two seconds, never under PATCH_DANGER while
+ *  the sim's patch stands: it goes the moment the sim drops it). */
 export function patchLook(age: number, life: number): number {
   const catchUp = smooth(age / 0.4);
   const die = clamp01((life - age) / 2);
-  return catchUp * die;
+  return catchUp * (PATCH_DANGER + (1 - PATCH_DANGER) * die);
 }
+
+/** A trail or a landing scorch never burns fainter than this while it can
+ *  strike (0 until Jose's playtest of 2026-11-24). */
+export const PATCH_DANGER = 0.55;
 
 // ---- the template decoders, memoized for the frame path ----------------------------------
 

@@ -28,6 +28,7 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { HEAT_FIGHT_COLORS as C, SEED_CORE_R } from './heat_fight_fx_core';
 import { HEAT_FLOOR } from './heat_floor_ladder_core';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HEAT_LIP_FRAG_GLSL, HEAT_LIP_VERT_GLSL, heatLipClipUniform } from './heat_lip_clip_core';
 import { applyCharBlend } from './heat_molten_decal';
 import { SEED_FIELD, type SeedMark, seedFieldBounds } from './heat_seed_field_core';
 import { HEAT_TELEGRAPH_LOOKS } from './heat_telegraph_core';
@@ -36,10 +37,13 @@ const LOOK = { base: 0, filled: 0, front: 0, rim: 0, warn: 0, detail: 0 };
 const _bounds = { x: 0, z: 0, half: 0 };
 
 const VERT = /* glsl */ `
+${HEAT_LIP_VERT_GLSL}
 varying vec2 vP;
 void main() {
   // Yards from the grid's own middle (the mesh is unrotated and unscaled).
   vP = position.xz;
+  // The lip clip (heat_lip_clip_core.ts): the field never draws over the boss's disc.
+  heatLipLocal((modelMatrix * vec4(position, 1.0)).xyz);
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
@@ -73,7 +77,9 @@ varying vec2 vP;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
 ${HEAT_LAVA_GLSL}
+${HEAT_LIP_FRAG_GLSL}
 void main() {
+  if (heatLipClipped()) discard;
   // The field (seedFieldAt): the unions' signed edges, the swept fronts and
   // the summed falloff.
   float re = 1e4;
@@ -224,6 +230,7 @@ export class HeatSeedField {
       uRimR: { value: R.rim },
       uRimC: { value: K.rim },
       uBodyC: { value: K.body },
+      uLipClip: heatLipClipUniform,
     };
     const common = {
       uniforms: this.uniforms,

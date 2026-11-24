@@ -20,7 +20,7 @@
 // Three-free, DOM-free, deterministic.
 
 import { HEARTH_WELL } from '../../sim/content/smith_heart_layout';
-import { HEAT_TUNING as T } from '../../sim/encounters/smith_heart/heat_ids';
+import { HEAT_LIP_WALL, HEAT_TUNING as T } from '../../sim/encounters/smith_heart/heat_ids';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const smooth = (v: number) => {
@@ -98,13 +98,23 @@ export interface WallLook {
   heat: number;
 }
 
-/** A ring `age` seconds after it was first seen, its front `front` yards out. */
+/** Where a ring's wall stands fully risen however late it was first seen: half
+ *  a yard past the lip wall's outer face, before its front can reach anyone
+ *  (a body stands at least its radius past the wall). Jose's playtest of
+ *  2026-11-24: the melee by the wall was struck while the wall still rose. */
+export const WALL_RISEN_AT = HEAT_LIP_WALL.outer + 0.5;
+
+/** A ring `age` seconds after it was first seen, its front `front` yards out:
+ *  risen by its age or by its front, whichever comes first. */
 export function wallLook(
   age: number,
   front: number,
   out: WallLook = { rise: 0, heat: 0 },
 ): WallLook {
-  const up = smooth(age / LAVA_WALL.rise);
+  const up = Math.max(
+    smooth(age / LAVA_WALL.rise),
+    smooth((front - T.ringStart) / (WALL_RISEN_AT - T.ringStart)),
+  );
   const down = smooth((T.ringEnd - front) / LAVA_WALL.sinkYards);
   out.rise = up * down;
   out.heat = 0.85 + 0.25 * (1 - smooth(age / 3));

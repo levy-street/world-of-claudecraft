@@ -19,8 +19,10 @@
 // coordinates (an instance far from the world's origin would break the hash).
 
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
+import { HEAT_LIP_FRAG_GLSL, HEAT_LIP_VERT_GLSL } from './heat_lip_clip_core';
 
 export const HEAT_TELEGRAPH_VERT = /* glsl */ `
+${HEAT_LIP_VERT_GLSL}
 uniform float uShape;
 uniform vec2 uDir;
 uniform float uLen;
@@ -36,6 +38,8 @@ void main() {
   }
   // Yards from the mark's own spot (rotated and scaled, untranslated).
   vP = (mat3(modelMatrix) * vec3(position.x, 0.0, position.z)).xz;
+  // The lip clip (heat_lip_clip_core.ts): no mark draws over the boss's disc.
+  heatLipLocal((modelMatrix * vec4(position, 1.0)).xyz);
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
@@ -69,7 +73,9 @@ varying vec2 vP;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
 ${HEAT_LAVA_GLSL}
+${HEAT_LIP_FRAG_GLSL}
 void main() {
+  if (heatLipClipped()) discard;
   // The footprint's measure, exactly the kit's: how far along (0 the caster,
   // 1 the far end or rim) and the yards to the nearest edge.
   float radial;

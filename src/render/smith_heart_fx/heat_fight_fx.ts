@@ -85,6 +85,12 @@ import { HEAT_FLOOR, heatParticleSteps } from './heat_floor_ladder_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
 import { HeatLavaWallFx } from './heat_lava_wall_fx';
+import {
+  HEAT_LIP_CLIP_R,
+  HEAT_LIP_FRAG_GLSL,
+  HEAT_LIP_VERT_GLSL,
+  heatLipClipUniform,
+} from './heat_lip_clip_core';
 import { HeatMeteorFx } from './heat_meteor_fx';
 import { moltenDecal } from './heat_molten_decal';
 import { HeatSeedField } from './heat_seed_field';
@@ -185,14 +191,14 @@ const BOLT = {
 
 const DISC_VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
+${HEAT_LIP_VERT_GLSL}
 varying vec2 vXY;
 varying vec3 vP;
-varying vec3 vW;
 void main() {
   vXY = position.xz;
   vP = instanceColor;
   vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
-  vW = wp.xyz;
+  heatLipLocal(wp.xyz);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
@@ -203,15 +209,17 @@ uniform float uTime;
 uniform vec3 uRim;
 varying vec2 vXY;
 varying vec3 vP;
-varying vec3 vW;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
 ${HEAT_LAVA_GLSL}
+${HEAT_LIP_FRAG_GLSL}
 void main() {
+  // Off the boss's disc; the noise in the precise frame (heat_lip_clip_core.ts).
+  if (heatLipClipped()) discard;
   float r = length(vXY);
   float rag = vP.y * (vn(vec2(atan(vXY.y, vXY.x) * 3.0, uTime * 0.6)) - 0.5) * 0.12;
   if (r > 1.0 + rag) discard;
-  float lvl = lavaLevel(vW.xz, vec2(0.0), uTime * 0.5, 1.0);
+  float lvl = lavaLevel(vLipL, vec2(0.0), uTime * 0.5, 1.0);
   float m = vP.x * (0.45 + 0.6 * lvl) * (1.0 - 0.4 * r);
   vec3 col = mix(vec3(0.05, 0.04, 0.035), molten(clamp(m, 0.0, 1.0)), smoothstep(0.03, 0.25, m));
   float rim = smoothstep(0.86, 0.95, r - rag) * (1.0 - smoothstep(0.97, 1.02, r - rag));
@@ -223,12 +231,14 @@ void main() {
 `;
 const RING_VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
+${HEAT_LIP_VERT_GLSL}
 varying vec2 vUv;
 varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vW = wp.xyz;
+  heatLipLocal(wp.xyz);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
@@ -246,16 +256,19 @@ varying vec3 vW;
 ${HEAT_NOISE_GLSL}
 ${HEAT_MOLTEN_GLSL}
 ${HEAT_LAVA_GLSL}
+${HEAT_LIP_FRAG_GLSL}
 void main() {
-  // Only over the Hearth's floor (the back band reaches past its walls).
+  // Only over the Hearth's floor (the back band reaches past its walls), and
+  // off the boss's disc; the noise in the precise frame (heat_lip_clip_core.ts).
   if (vW.x < uClip.x || vW.x > uClip.y || vW.z < uClip.z || vW.z > uClip.w) discard;
+  if (heatLipClipped()) discard;
   float y = vUv.y;
   float rims = (1.0 - smoothstep(0.0, 0.045, y)) + smoothstep(0.955, 1.0, y);
   // The basalt's joints lighting as the warning builds.
-  float joint = 1.0 - smoothstep(0.0, 0.07, cellEdge(vW.xz * 0.45));
-  float spread = step(vn(vW.xz * 0.12) * 0.8 + 0.1, uBuild);
+  float joint = 1.0 - smoothstep(0.0, 0.07, cellEdge(vLipL * 0.45));
+  float spread = step(vn(vLipL * 0.12) * 0.8 + 0.1, uBuild);
   float crack = joint * spread * (0.5 + 0.5 * uBuild);
-  float lvl = lavaLevel(vW.xz, vec2(0.0, 1.5), uTime, 1.2);
+  float lvl = lavaLevel(vLipL, vec2(0.0, 1.5), uTime, 1.2);
   float m = max(crack * 0.75, uBurn * (0.55 + 0.6 * lvl));
   vec3 col = molten(clamp(m, 0.0, 1.0));
   col = mix(col, uRim * 1.5, clamp(rims, 0.0, 1.0));
@@ -473,7 +486,8 @@ export class HeatFightFx implements HeatFxHost {
     // ---- Wakefire's bands ----
     for (let i = 0; i < P.zones; i++) {
       const [inner, outer] = zoneRadii(i);
-      const geo = floorRingGeometry(inner / outer, 128);
+      // Band 0 starts at the lip clip (its inner rim at the lip wall's foot).
+      const geo = floorRingGeometry(Math.max(inner, HEAT_LIP_CLIP_R) / outer, 128);
       this.geometries.push(geo);
       // Char and glow passes: two bands meet on their shared radius.
       const { mesh, mat } = moltenDecal(
@@ -488,6 +502,7 @@ export class HeatFightFx implements HeatFxHost {
             uBurn: { value: 0 },
             uRim: { value: new THREE.Color(TELEGRAPH_THREAT_COLORS.danger) },
             uClip: { value: new THREE.Vector4(-1e9, 1e9, -1e9, 1e9) },
+            uLipClip: heatLipClipUniform,
           },
           charStep: HEAT_FLOOR.zoneChar.step,
           glowStep: HEAT_FLOOR.zoneGlow.step,
@@ -506,6 +521,7 @@ export class HeatFightFx implements HeatFxHost {
       uniforms: {
         uTime: this.uTime,
         uRim: { value: new THREE.Color(TELEGRAPH_THREAT_COLORS.danger) },
+        uLipClip: heatLipClipUniform,
       },
       vertexShader: DISC_VERT,
       fragmentShader: PATCH_FRAG,

@@ -15,16 +15,19 @@
 
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { WALL_COMMON_GLSL } from './heat_lava_wall_glsl';
+import { HEAT_LIP_FRAG_GLSL, HEAT_LIP_VERT_GLSL } from './heat_lip_clip_core';
 import { WHEEL_FX } from './heat_wheel_fx_core';
 
 export const WHEEL_FLOOR_VERT = /* glsl */ `
 ${CAMERA_RELATIVE_GLSL}
+${HEAT_LIP_VERT_GLSL}
 varying vec2 vUv;
 varying vec3 vW;
 void main() {
   vUv = uv;
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vW = wp.xyz;
+  heatLipLocal(wp.xyz);
   gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
@@ -49,10 +52,15 @@ varying vec3 vW;
 ${noise}
 ${molten}
 ${lava}
+${HEAT_LIP_FRAG_GLSL}
 const float WELL_R = ${WHEEL_FX.ventInner.toFixed(2)} - 2.5;
 void main() {
   if (vW.x < uClip.x || vW.x > uClip.y || vW.z < uClip.z || vW.z > uClip.w) discard;
-  vec2 d = vW.xz - uArc.xy;
+  // Off the boss's disc (the lip clip), and every measure and noise in the
+  // precise frame round the well's middle, never raw world yards a hundred
+  // thousand out (they shimmered). Two nearby uniforms subtract exactly.
+  if (heatLipClipped()) discard;
+  vec2 d = vLipL - (uArc.xy - uLipClip.xy);
   float r = length(d);
   float a = atan(d.x, d.y);
   if (a < -1.5707963) a += 6.2831853;
@@ -61,7 +69,7 @@ void main() {
   float y = vUv.y;
   float hard = max(1.0 - smoothstep(0.0, 0.6, edge), (1.0 - smoothstep(0.0, 0.03, y)) + smoothstep(0.97, 1.0, y));
   float soft = 1.0 - smoothstep(0.0, 2.5, edge);
-  vec2 w = vW.xz;
+  vec2 w = vLipL;
   if (uSafe > 0.5) {
     // Calm: a cool clear sheet, frost brightening toward its edges, slow mist
     // drifting across it, a hard bright rim of cold light all round.

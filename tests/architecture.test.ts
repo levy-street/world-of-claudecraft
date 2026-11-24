@@ -1315,6 +1315,9 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/trash_gestures_core.ts',
   // The wellspring's bounded flow and its bubbles; the Hearthseeds' one field.
   'src/render/smith_heart_fx/heat_well_core.ts',
+  // The Heat's lip clip: every floor mark stops at the lip wall; the floor
+  // shaders' precise frame round the well.
+  'src/render/smith_heart_fx/heat_lip_clip_core.ts',
   'src/render/smith_heart_fx/heat_meteor_core.ts',
   'src/render/smith_heart_fx/heat_swell_core.ts',
   'src/render/smith_heart_fx/heat_seed_field_core.ts',

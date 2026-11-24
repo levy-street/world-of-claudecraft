@@ -31,6 +31,7 @@ import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
 import { WALL_AIR_ORDER } from './heat_lava_wall_fx';
 import { WALL_POLY_N } from './heat_lava_wall_glsl';
+import { HEAT_LIP_CLIP_R, heatLipClipUniform } from './heat_lip_clip_core';
 import { moltenDecal } from './heat_molten_decal';
 import { floorRingGeometry } from './heat_shapes';
 import {
@@ -160,7 +161,8 @@ export class HeatWheelFx {
       z: number,
     ) => void,
   ) {
-    const floorGeo = floorRingGeometry(HEARTH_WELL.r / T.wheelOuter, 96);
+    // From the lip clip out (its inner rim at the lip wall's foot).
+    const floorGeo = floorRingGeometry(HEAT_LIP_CLIP_R / T.wheelOuter, 96);
     const quad = new THREE.PlaneGeometry(1, 1, 1, 8);
     // A geyser is WHEEL_FX.planes instances: its crossed planes and its burst.
     const P = WHEEL_FX.planes;
@@ -201,6 +203,7 @@ export class HeatWheelFx {
         uArc: { value: arc },
         uSafe: { value: 0 },
         uPending: { value: 0 },
+        uLipClip: heatLipClipUniform,
       };
       // Wakefire's two rungs: a char and a glow pool commute, so a crossing of
       // slices (two rounds) and bands composes the same from every angle.
