@@ -19,17 +19,21 @@
 // render rule (src/render/CLAUDE.md, GPU work) forbids adding or removing
 // either after boot, because their counts key every lit program.
 //
-// Gameplay-neutral by construction: the largest hold is a 1/4096 colour step,
-// a 0.011 degree direction and a micrometre of camera travel.
+// Gameplay-neutral by construction: the largest hold is half an 8-bit colour
+// step, the same half step of brightness and of fog, a 0.11 degree direction
+// where no shadow map draws (0.011 where one does) and a micrometre of camera
+// travel.
 
 import type * as THREE from 'three';
 import {
   CAMERA_BAND,
   COLOR_BAND,
   DIRECTION_BAND,
+  DIRECTION_BAND_UNSHADOWED,
   deadbandCommit,
   deadbandScalar,
   emptyCommitted,
+  FOG_RANGE_BAND,
   INTENSITY_BAND,
 } from './scene_globals_stabilizer_core';
 
@@ -81,26 +85,73 @@ export class SceneGlobalsStabilizer {
   private fogColor = emptyCommitted(3);
   private readonly liveFog = new Float64Array(3);
   private fogHeld: THREE.Fog | THREE.FogExp2 | null = null;
+  /** Linear fog's near and far (or exponential fog's density in [0]), held and live. */
+  private readonly fogRange = emptyCommitted(2);
+  private readonly liveFogRange = new Float64Array(2);
   private depth = 0;
   /** Commits since creation, per value family (perf report and tests). */
   readonly commits = { light: 0, fog: 0, camera: 0 };
 
-  /** Before a render of `scene` with `camera`: swap the committed values in. */
-  hold(scene: THREE.Scene, camera: THREE.Camera): void {
+  /** Before a render of `scene` with `camera`: swap the committed values in.
+   *  `renderer` says whether a shadow map draws (the direction band). */
+  hold(
+    scene: THREE.Scene,
+    camera: THREE.Camera,
+    renderer?: { shadowMap?: { enabled?: boolean } },
+  ): void {
     // A render nested inside another render's hooks (a prewarm compile from a
     // callback) sees the outer hold already in place; only the outermost
     // render swaps and restores.
     if (this.depth++ > 0) return;
     this.holdCamera(camera);
     this.lights ??= this.findLights(scene);
-    for (const slot of this.lights) this.holdLight(slot);
+    const shadows = renderer?.shadowMap?.enabled === true;
+    for (const slot of this.lights) this.holdLight(slot, shadows);
     const fog = scene.fog;
     if (fog) {
       colorInto(this.liveFog, fog.color);
-      if (deadbandCommit(this.fogColor, this.liveFog, COLOR_BAND)) this.commits.fog++;
+      let moved = deadbandCommit(this.fogColor, this.liveFog, COLOR_BAND);
       writeColor(fog.color, this.fogColor);
+      if (this.holdFogRange(fog)) moved = true;
+      if (moved) this.commits.fog++;
       this.fogHeld = fog;
     }
+  }
+
+  /** Fog near and far (linear) or density (exponential), each in its relative
+   *  band; returns whether it committed. */
+  private holdFogRange(fog: THREE.Fog | THREE.FogExp2): boolean {
+    const held = this.fogRange;
+    const live = this.liveFogRange;
+    if ((fog as THREE.FogExp2).isFogExp2) {
+      const exp = fog as THREE.FogExp2;
+      live[0] = exp.density;
+      const next = Number.isNaN(held[0])
+        ? exp.density
+        : deadbandScalar(held[0], exp.density, FOG_RANGE_BAND);
+      const moved = next !== held[0];
+      held[0] = next;
+      exp.density = next;
+      return moved;
+    }
+    const linear = fog as THREE.Fog;
+    live[0] = linear.near;
+    live[1] = linear.far;
+    const near = Number.isNaN(held[0])
+      ? linear.near
+      : deadbandScalar(held[0], linear.near, FOG_RANGE_BAND);
+    const far = Number.isNaN(held[1])
+      ? linear.far
+      : deadbandScalar(held[1], linear.far, FOG_RANGE_BAND);
+    // Commit both together, so the held pair is always one the integrator held.
+    const moved = near !== held[0] || far !== held[1];
+    if (moved) {
+      held[0] = linear.near;
+      held[1] = linear.far;
+    }
+    linear.near = held[0];
+    linear.far = held[1];
+    return moved;
   }
 
   /** After the render: put the live (integrator) values back. */
@@ -125,7 +176,15 @@ export class SceneGlobalsStabilizer {
         t[14] = slot.liveTargetTranslation[2];
       }
     }
-    if (this.fogHeld) writeColor(this.fogHeld.color, this.liveFog);
+    if (this.fogHeld) {
+      writeColor(this.fogHeld.color, this.liveFog);
+      if ((this.fogHeld as THREE.FogExp2).isFogExp2)
+        (this.fogHeld as THREE.FogExp2).density = this.liveFogRange[0];
+      else {
+        (this.fogHeld as THREE.Fog).near = this.liveFogRange[0];
+        (this.fogHeld as THREE.Fog).far = this.liveFogRange[1];
+      }
+    }
     this.fogHeld = null;
   }
 
@@ -154,7 +213,7 @@ export class SceneGlobalsStabilizer {
     return slots;
   }
 
-  private holdLight(slot: LightSlot): void {
+  private holdLight(slot: LightSlot, shadows: boolean): void {
     const light = slot.light;
     let moved = deadbandCommit(slot.color, colorInto(slot.liveColor, light.color), COLOR_BAND);
     writeColor(light.color, slot.color);
@@ -196,7 +255,13 @@ export class SceneGlobalsStabilizer {
         scratch3[0] = dx / length;
         scratch3[1] = dy / length;
         scratch3[2] = dz / length;
-        if (deadbandCommit(slot.direction, scratch3, DIRECTION_BAND) || slot.distance === 0) {
+        // A shadow map stretches a direction error across the shadow's length;
+        // without one only the diffuse term reads it.
+        const band =
+          shadows && (light as THREE.DirectionalLight).castShadow
+            ? DIRECTION_BAND
+            : DIRECTION_BAND_UNSHADOWED;
+        if (deadbandCommit(slot.direction, scratch3, band) || slot.distance === 0) {
           slot.distance = length;
           moved = true;
         }
@@ -241,7 +306,11 @@ export function attachSceneGlobalsStabilizer(scene: THREE.Scene): SceneGlobalsSt
   const after = scene.onAfterRender;
   scene.onBeforeRender = ((...args: unknown[]) => {
     (before as (...a: unknown[]) => void).apply(scene, args);
-    stabilizer.hold(scene, args[2] as THREE.Camera);
+    stabilizer.hold(
+      scene,
+      args[2] as THREE.Camera,
+      args[0] as { shadowMap?: { enabled?: boolean } } | undefined,
+    );
   }) as unknown as THREE.Scene['onBeforeRender'];
   scene.onAfterRender = ((...args: unknown[]) => {
     stabilizer.release();

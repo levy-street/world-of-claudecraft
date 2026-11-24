@@ -35,9 +35,11 @@ describe('deadbandCommit', () => {
       worst = Math.max(worst, Math.abs(live - c[0]));
     }
     expect(worst).toBeLessThanOrEqual(COLOR_BAND);
-    // 600 frames of drift (0.012) over a 1/4096 band: about 50 commits, not 600.
-    expect(commits).toBeGreaterThan(40);
-    expect(commits).toBeLessThan(60);
+    // 600 frames of drift (0.012) over the band: one commit per band crossed
+    // (about 6 at half an 8-bit step), not 600.
+    const crossings = (600 * 2e-5) / COLOR_BAND;
+    expect(commits).toBeGreaterThanOrEqual(Math.floor(crossings));
+    expect(commits).toBeLessThanOrEqual(Math.ceil(crossings) + 1);
   });
 
   it('does not flip on a value hovering around a fixed point (unlike grid rounding)', () => {

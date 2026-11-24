@@ -8,7 +8,12 @@
 // calls: the day/night grade eases the light and fog colours by about 2e-5 a
 // frame (an 8-bit step is 0.004), and the follow camera's matrix carries
 // floating-point noise around 1e-12, which moves every camera-space light
-// position and direction.
+// position and direction. The grade follows a real 45-minute day (the
+// UTC-anchored cycle, sim/day_night.ts) through a 0.7 s response, so its
+// per-frame step depends on the hour: online at dusk the colours moved about
+// 1.4e-4 a frame and the sun 1e-4 rad, and fog near and far are damped toward
+// the hour's haze the same way. The bands below are therefore sized to what a
+// screen can show, not to the drift of one hour.
 //
 // A deadband keeps a COMMITTED copy of each value and only replaces it once
 // the live value has moved further than the band, so the error is bounded by
@@ -18,15 +23,24 @@
 // Pure core contract: no three import, no DOM, no clocks, no randomness.
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts).
 
-/** Colour components (linear, 0 to 1 and above): far under an 8-bit step. */
-export const COLOR_BAND = 1 / 4096;
-/** Light intensities, relative to the committed value (absolute near zero). */
-export const INTENSITY_BAND = 1 / 2048;
-/** Direction vectors (unit length): about 0.011 degrees. The day sun turns
- *  about 2e-5 rad a frame, so a band this wide re-sends the key light's
- *  direction about one frame in nine; the shift is 2 mm at the tip of a
- *  10-yard shadow. */
+/** Colour components (linear, 0 to 1 and above): half an 8-bit step (1/255),
+ *  so a held colour is never a step a display can show away from the live one. */
+export const COLOR_BAND = 1 / 512;
+/** Light intensities, relative to the committed value (absolute near zero):
+ *  the same half step of brightness. */
+export const INTENSITY_BAND = 1 / 512;
+/** Direction vectors (unit length) where a shadow map draws: about 0.011
+ *  degrees, 2 mm at the tip of a 10-yard shadow, which stretches the error. */
 export const DIRECTION_BAND = 2e-4;
+/** Direction vectors where no shadow map draws (Low): about 0.11 degrees. The
+ *  only reader is the diffuse term, whose change is at most the angle times
+ *  the light's intensity, so the shading moves by under half an 8-bit step. */
+export const DIRECTION_BAND_UNSHADOWED = 2e-3;
+/** Fog near and far, relative: 1/512 of the distance moves the fog factor at
+ *  any depth by about the shift over (far - near), well under half a step for
+ *  every fog the world sets (far - near is tens of yards or more). Density
+ *  (exponential fog) takes the same relative band. */
+export const FOG_RANGE_BAND = 1 / 512;
 /** Camera world matrix elements: rotation terms are unitless, translation in
  *  yards (1e-6 yd is a micrometre at the camera). */
 export const CAMERA_BAND = 1e-6;
