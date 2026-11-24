@@ -22,6 +22,15 @@ export function makeTabs(groups, { label, idPrefix, tabClass, panelClass, listCl
     tabs.append(tab);
     return panel;
   });
+  wire(tabs, panels)(0);
+  return { tabs, panels };
+}
+
+const wired = new WeakSet();
+
+// Gives a tablist its click and arrow-key handling; returns its select(index).
+function wire(tabs, panels) {
+  wired.add(tabs);
   const select = (active) => {
     [...tabs.children].forEach((tab, index) => {
       tab.setAttribute('aria-selected', String(index === active));
@@ -38,6 +47,17 @@ export function makeTabs(groups, { label, idPrefix, tabClass, panelClass, listCl
       tabs.children[next].focus();
     });
   });
-  select(0);
-  return { tabs, panels };
+  return select;
+}
+
+/** Wires tablists that arrived as markup (a prebuilt page), keeping the tab already shown. */
+export function bindTabs(root) {
+  for (const tabs of root.querySelectorAll('[role="tablist"]')) {
+    if (wired.has(tabs)) continue;
+    const panels = [...tabs.children].map((tab) =>
+      (root.ownerDocument ?? root).getElementById(tab.getAttribute('aria-controls') ?? ''),
+    );
+    if (!panels.length || panels.some((panel) => !panel)) continue;
+    wire(tabs, panels);
+  }
 }

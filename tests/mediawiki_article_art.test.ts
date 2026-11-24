@@ -88,7 +88,7 @@ describe('Encyclopedia game artwork', () => {
 
 describe('Encyclopedia reader model art', () => {
   it('lifts the model line into the info box instead of printing it', () => {
-    const reader = readFileSync('mediawiki/reader/reader.js', 'utf8');
+    const reader = readFileSync('mediawiki/reader/page_render.js', 'utf8');
     expect(reader).toContain("image(page.model, 'article-art model')");
     const seed = readFileSync('mediawiki/seed/pages.xml', 'utf8');
     expect(seed).toMatch(

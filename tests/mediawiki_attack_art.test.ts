@@ -82,7 +82,7 @@ describe('Encyclopedia boss attack snapshots', () => {
 
 describe('Encyclopedia reader attack snapshots', () => {
   it('draws the snapshot beside the line and allows the folder in MediaWiki', () => {
-    expect(readFileSync('mediawiki/reader/reader.js', 'utf8')).toContain(
+    expect(readFileSync('mediawiki/reader/page_render.js', 'utf8')).toContain(
       '<img class="attack-shot" data-game-art="',
     );
     const php = readFileSync('mediawiki/LocalSettings.php', 'utf8');

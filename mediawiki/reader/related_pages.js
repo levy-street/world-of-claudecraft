@@ -106,7 +106,7 @@ function memberList(members, current) {
   return list;
 }
 
-export function mountRelatedPages(view, page, index, pages) {
+export function mountRelatedPages(view, page, index, pages, { seeAllLinks = false } = {}) {
   const groups = relatedGroups(page, index);
   if (!groups.length) return;
   const nav = el('nav', 'wiki-navbox');
@@ -124,7 +124,13 @@ export function mountRelatedPages(view, page, index, pages) {
     const start = Math.max(0, Math.min(position - 5, group.members.length - 12));
     const preview = group.members.slice(start, start + 12);
     body.append(memberList(preview, page.title));
-    if (group.members.length > preview.length) {
+    if (group.members.length > preview.length && seeAllLinks) {
+      // A static page cannot fill the list on demand, and every member page repeating
+      // the whole group would bloat the site, so it links to the group's own page.
+      const more = el('p', 'wiki-navbox-more');
+      more.append(pageLink(group.title, 'See all ' + group.members.length + ' pages'));
+      body.append(more);
+    } else if (group.members.length > preview.length) {
       const more = el('details', 'wiki-navbox-more');
       more.append(el('summary', null, 'Show all ' + group.members.length + ' pages'));
       more.addEventListener('toggle', () => {
