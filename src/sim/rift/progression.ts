@@ -27,13 +27,12 @@ import {
   RIFT_BAND_SHELLS,
   riftBandRolledStats,
 } from './band_ladder';
+import { riftBandShellFor } from './band_shell_choice';
 import { nearRiftForge, RIFT_FORGE_TOO_FAR_TEXT } from './forge_gate';
 import { riftHeroicClearPool, riftNormalClearPool } from './loot_pools';
 import { riftRankForBaseLevel } from './ranks';
 
 const TIER_POWER: Record<RiftTier, number> = { C: 1, B: 2, A: 3, S: 4 };
-const MELEE_CLASSES = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
-const AGILITY_CLASSES = new Set<PlayerClass>(['rogue', 'hunter', 'druid']);
 
 /** Essence an upgrade from `upgradeLevel` costs: 2, 4, 6, 8, 10 across the
  *  five steps. Exported so the forge window quotes the same ladder. */
@@ -73,12 +72,6 @@ export interface RiftForgeResult {
  *  enchant (professions/enchanting.ts) at any rung: the marker rides the
  *  rebuild and its bonus is re-added on top of the ladder line every time. */
 const SHELL_STATS = RIFT_BAND_SHELLS;
-
-function shellItemIdForClass(cls: PlayerClass): string {
-  if (MELEE_CLASSES.has(cls)) return 'riftbound_band_of_might';
-  if (AGILITY_CLASSES.has(cls)) return 'riftbound_band_of_guile';
-  return 'riftbound_band_of_insight';
-}
 
 /** The enchant a band copy may carry: a known enchant whose slot kind is the
  *  shell's own (a ring enchant) and that the apply could have admitted on a
@@ -194,9 +187,11 @@ export function sanitizeRiftGearInstance(
   return clean;
 }
 
-/** Mint a band for `cls`. `upgradeLevel` and `gems` exist for the dev kit
- *  and tests (a first clear always mints +0 with empty sockets); gems beyond
- *  the rank's sockets are dropped, newest kept. */
+/** Mint a band for a `cls` player in `spec`: the shell follows the spec's
+ *  primary stat (band_shell_choice.ts), and no spec falls back to the class
+ *  default. `upgradeLevel` and `gems` exist for the dev kit and tests (a
+ *  first clear always mints +0 with empty sockets); gems beyond the rank's
+ *  sockets are dropped, newest kept. */
 export function createRiftGearInstance(
   eventId: string,
   tier: RiftTier,
@@ -204,8 +199,9 @@ export function createRiftGearInstance(
   boundTo: number,
   upgradeLevel = 0,
   gems: readonly RiftGemId[] = [],
+  spec?: string | null,
 ): { itemId: string; instance: ItemInstancePayload } {
-  const itemId = shellItemIdForClass(cls);
+  const itemId = riftBandShellFor(cls, spec);
   const gemSlots = RIFT_BAND_GEM_SLOTS[tier];
   const instance: ItemInstancePayload = {
     boundTo,
@@ -462,7 +458,7 @@ function rollRiftClearQualities(
   return [...items.slice(0, start), ...rollEnemyLootQuality(ctx.rng, boss, items.slice(start))];
 }
 
-/** First-clear personal loot. Every winner gets a class-appropriate non-fungible
+/** First-clear personal loot. Every winner gets a spec-appropriate non-fungible
  * ring, Rift Essence, and an A/S gem; all remain on the corpse until looted. */
 export function addRiftProgressionLoot(
   ctx: SimContext,
@@ -483,7 +479,7 @@ export function addRiftProgressionLoot(
     const pid = participants[i];
     const meta = ctx.players.get(pid);
     if (!meta) continue;
-    const gear = createRiftGearInstance(eventId, tier, meta.cls, pid);
+    const gear = createRiftGearInstance(eventId, tier, meta.cls, pid, 0, [], meta.talents?.spec);
     // Both gates the sibling rollers apply: the source AND the item. Bands are
     // epic armor today, so the item gate is inert, but a shell def change must
     // never stamp a descriptor that reads as enhanced with zero bonus.

@@ -1875,11 +1875,12 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // (addRiftClearGearLoot rolls each independently on an S clear alone).
     //
     // The three first-clear Riftbound bands are deliberately NOT here: they
-    // live on horizons_riftbound instead. shellForClass maps each class to
-    // exactly ONE band, the mint stamps boundTo + personalFor, and trade, mail,
-    // and market all refuse bound instances, so no character can ever hold more
-    // than one of the three. Three slots on this page would make its completion
-    // unreachable and dead-end the Conquerors shelf deed behind it.
+    // live on horizons_riftbound instead. riftBandShellFor maps each class and
+    // spec to exactly ONE band and no class's specs reach all three, the mint
+    // stamps boundTo + personalFor, and trade, mail, and market all refuse
+    // bound instances, so no character can ever hold all three. Three slots on
+    // this page would make its completion unreachable and dead-end the
+    // Conquerors shelf deed behind it.
     relics: items(
       ...RIFT_RARE_ITEM_IDS.map((id) => [id, RIFT_RARE_SOURCES[id]] as const),
       ...RIFT_EPIC_ITEM_IDS.map((id) => [id, fromRift('B')] as const),
@@ -2070,9 +2071,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
 
   // ---- Riftbound (Phase 21): the class-personal bands, outside completion ----
   // The showcase page for the three first-clear bands. A character is minted
-  // exactly ONE of them (shellForClass in src/sim/rift/progression.ts picks by
-  // class) and the instance is bound and personal, so no one can ever fill all
-  // three slots: the page is excludeFromCompletion 'personal' and its slots
+  // one of them per spec (riftBandShellFor in src/sim/rift/band_shell_choice.ts
+  // picks by class and spec, and no class's specs reach all three) and the
+  // instance is bound and personal, so no one can ever fill all three
+  // slots: the page is excludeFromCompletion 'personal' and its slots
   // sit outside both completion pairs while the page still shows a player the
   // whole family and their own band inside it. Spread from the live array in
   // array order, exactly as the Rift page carried them.

@@ -98,7 +98,8 @@ rule that no untrusted remote URL enters entity wire data.
 
 ## Progression
 
-First-clear loot includes a class-appropriate non-fungible Riftbound band, Rift
+First-clear loot includes a spec-appropriate non-fungible Riftbound band (the shell
+follows the winner's spec primary stat, `src/sim/rift/band_shell_choice.ts`), Rift
 Essence, and (on A and S clears) one Rift gem per winner. The band's static
 ItemDef is a stat-free shell; the copy's `rift` payload records the clear's
 rank, its essence upgrades, and its socketed gems, and `src/sim/rift/band_ladder.ts`
