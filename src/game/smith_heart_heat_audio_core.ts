@@ -11,10 +11,12 @@
 //                rise, a river, a Falling Cinder, a Wellspawn climbing out
 //                and feeding the wellspring, a Kindling Mark, a seed landing
 //                and bursting, a Seedflame hatching, Wakefire igniting, a
-//                Rolling Cinder landing, struck back and bursting, the
-//                wellspring settling at the fall)
+//                Rolling Cinder landing, struck back and bursting, a Live
+//                Coal set, leaping, going out and bursting, the wellspring
+//                settling at the fall)
 //   a bar        Basalt Fist's charge fitted to it
-//   the marks    in the local player's ear: a Kindling Mark landing on them,
+//   the marks    in the local player's ear: a Kindling Mark or a Live Coal
+//                landing on them,
 //                a Rolling Cinder or a Seedflame turning to hunt them, and
 //                each new stack of Cinder Grip on a tank (louder at the swap)
 //   the Wheel    (mythic) its red slices heating (a WARNING) and erupting
@@ -98,6 +100,15 @@ export const HEAT_CUE_SOUNDS: Readonly<Record<string, readonly HeatSound[]>> = {
     S('heart_heat_cinder_burst', 1, 'point', 1, 0.4),
     S('heart_council_wrath_blast', 0.4, 'point', 0.95, 0.4),
   ],
+  // Heroic's Live Coals (heat_coal.ts): set on its bearer, leaping to whoever
+  // came too close, going out under the healing, bursting at the fuse.
+  [HEAT_CUES.coal]: [S('heart_heat_kindling', 0.55, 'target', 0.9, 0.3)],
+  [HEAT_CUES.coalLeap]: [S('heart_heat_bolt', 0.6, 'target', 1.15, 0.2)],
+  [HEAT_CUES.coalOut]: [S('heart_heat_settle', 0.35, 'target', 1.4, 0.3)],
+  [HEAT_CUES.coalBurst]: [
+    S('heart_heat_seed_burst', 1, 'point', 0.9, 0.3),
+    S('heart_council_wrath_blast', 0.35, 'point', 1.05, 0.3),
+  ],
   [HEAT_CUES.settle]: [S('heart_heat_settle', 0.9, 'source', 1, 1)],
 };
 
@@ -165,6 +176,7 @@ export function wallRoarGain(near: number): number {
 export const HEAT_MARK_SOUNDS: Readonly<Record<string, HeartMarkSound>> = {
   [HEAT_AURAS.kindling]: HEART_MARK.fire,
   [HEAT_AURAS.hunted]: markSound(HEART_MARK.fire, 1, 0.8),
+  [HEAT_AURAS.coal]: markSound(HEART_MARK.fire, 0.9, 1.1),
 };
 
 /** Cinder Grip on a tank: each new stack a sizzle, louder and deeper from the

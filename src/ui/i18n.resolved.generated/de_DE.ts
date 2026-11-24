@@ -4822,7 +4822,8 @@ export const de_DE: EnTranslations = {
         "kindling": "In {seconds} sec you trail fire for {trail} sec. Each patch burns allies for {min} to {max} Fire damage a second and heals a Wellspawn standing in it by {heal}% of its health a second: leave the group and the Wellspawn's path. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "trail": "You leave a Cinder Trail: patches of fire {radius} yd wide that burn for {life} sec, dealing {min} to {max} Fire damage a second to allies in them and healing a Wellspawn in them by {heal}% of its health a second. Heroic and Mythic: {heroicMin} to {heroicMax} damage.",
         "hunted": "A Rolling Cinder or a Seedflame is after you. A Rolling Cinder that reaches you kills you and burns everyone within {radius} yd: keep away, and let allies strike it, each strike knocks it {knock} yd back (then not again for {crust} sec).",
-        "crust": "Cooled hard: strikes cannot knock it back until this ends."
+        "crust": "Cooled hard: strikes cannot knock it back until this ends.",
+        "coal": "Absorbs the next {absorb} healing you receive and burns you for {burnMin} to {burnMax} Fire damage every second. Heal through it to put it out. Any player who comes within {leap} yd of you takes it, with the absorb it has left, and {leapMin} to {leapMax} Fire damage. Not healed through in {seconds} sec, it bursts for {burstMin} to {burstMax} Fire damage on everyone within {radius} yd, you included."
       },
       "finalBoss": {
         "stateHeat": "Drinking the Heat: Basalt Fist slams a player's spot and three Molten Swells roll out of it. Its star, Fire Whirl, wakes for the rest of the fight: tall columns of fire run across the floor. On Heroic, Ember Marks drop fire at ranged players' feet; on Mythic, its frontal leaves Forge Fire.",
@@ -7451,6 +7452,11 @@ export const de_DE: EnTranslations = {
     "tankSwap": {
       "swapTitle": "Swap x{stacks}",
       "timeAria": "{seconds} seconds left on the debuff"
+    },
+    "liveCoal": {
+      "title": "Live Coal",
+      "absorb": "{absorb} to heal",
+      "fuseAria": "{seconds} seconds until it bursts"
     },
     "heatGuardian": {
       "say": {

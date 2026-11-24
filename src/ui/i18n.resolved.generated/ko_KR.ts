@@ -4822,7 +4822,8 @@ export const ko_KR: EnTranslations = {
         "kindling": "{seconds}초 뒤 {trail}초 동안 불의 자취를 남깁니다. 자취마다 아군에게 매초 {min}~{max}의 화염 피해를 주고, 그 위에 선 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다: 무리와 샘의 자식이 지나는 길에서 벗어나십시오. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
         "trail": "잉걸불 자취를 남기고 있습니다: 폭 {radius}미터의 불이 {life}초 동안 타며, 그 안의 아군에게 매초 {min}~{max}의 화염 피해를 주고 그 안의 샘의 자식의 생명력을 매초 {heal}% 회복시킵니다. 영웅·신화: {heroicMin}에서 {heroicMax}의 피해.",
         "hunted": "구르는 잉걸불이나 씨불이 당신을 쫓고 있습니다. 구르는 잉걸불에 붙잡히면 죽고 {radius}미터 안의 모두가 불탑니다: 거리를 두고 아군이 때리게 하십시오. 한 번 칠 때마다 {knock}미터 밀려납니다(그 뒤 {crust}초 동안은 밀려나지 않습니다).",
-        "crust": "단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다."
+        "crust": "단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다.",
+        "coal": "다음에 받는 치유 {absorb}를 흡수하고 매초 {burnMin}~{burnMax}의 화염 피해를 줍니다. 치유로 흡수량을 모두 깎으면 꺼집니다. {leap}미터 안으로 다가온 플레이어에게 남은 흡수량과 함께 옮겨 가며 {leapMin}~{leapMax}의 화염 피해를 줍니다. {seconds}초 안에 꺼지지 않으면 폭발해 당신을 포함한 {radius}미터 안의 모두에게 {burstMin}~{burstMax}의 화염 피해를 줍니다."
       },
       "finalBoss": {
         "stateHeat": "열기를 마십니다: 현무암 주먹이 플레이어가 선 자리를 내리치고 거기서 용암 너울 세 줄기가 굴러 나옵니다. 그 별인 불의 회오리가 깨어나 전투가 끝날 때까지 이어집니다: 높이 치솟은 불기둥이 바닥을 가로지릅니다. 영웅에서는 불씨 표식이 원거리 플레이어 발밑에 불을 떨어뜨리고, 신화에서는 정면 공격이 대장간 불을 남깁니다.",
@@ -7451,6 +7452,11 @@ export const ko_KR: EnTranslations = {
     "tankSwap": {
       "swapTitle": "교대 x{stacks}",
       "timeAria": "약화 효과 {seconds}초 남음"
+    },
+    "liveCoal": {
+      "title": "살아있는 숯불",
+      "absorb": "치유 필요 {absorb}",
+      "fuseAria": "폭발까지 {seconds}초"
     },
     "heatGuardian": {
       "say": {

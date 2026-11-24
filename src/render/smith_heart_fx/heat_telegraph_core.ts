@@ -25,7 +25,8 @@ export type HeatTelegraphKind =
   | 'seedReach'
   | 'fall'
   | 'cinderReach'
-  | 'hunted';
+  | 'hunted'
+  | 'coalLeap';
 
 export interface HeatTelegraphLook {
   /** How dark the basalt chars under the whole mark (0..1, multiply). */
@@ -68,6 +69,9 @@ export const HEAT_TELEGRAPH_LOOKS: Readonly<Record<HeatTelegraphKind, HeatTelegr
   fall: look(0.55, 1, 0, 0.9, 1),
   cinderReach: look(0.32, 0.5, 0.5, 1.2, 0.85, 1, false),
   hunted: look(0.4, 0.6, 0, 1.8, 0.9, 1, false),
+  // A Live Coal's leap reach (heat_coal_fx.ts): a quiet line round its bearer
+  // the whole time, a light char and no flow (it warns, it does not burn).
+  coalLeap: look(0.24, 0, 0, 1.8, 0.6, 0.8, false),
 };
 
 /**

@@ -24723,6 +24723,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'За вами гонится Катящийся уголь или Огнесемя. Если Катящийся уголь настигнет вас, вы погибнете, а все в пределах {radius} м сгорят: держитесь подальше и пусть союзники бьют его, каждый удар отбрасывает его на {knock} м (после этого {crust} сек его не отбросить).',
   'hudChrome.auraEffect.heatGuardian.crust':
     'Остыл до твёрдости: пока эффект не закончится, удары не отбрасывают его.',
+  'hudChrome.auraEffect.heatGuardian.coal':
+    'Поглощает следующие {absorb} ед. получаемого исцеления и каждую секунду наносит вам от {burnMin} до {burnMax} ед. урона от огня. Исцелите сквозь поглощение, чтобы потушить его. Любой игрок, подошедший к вам ближе чем на {leap} м, забирает уголь с оставшимся поглощением и получает от {leapMin} до {leapMax} ед. урона от огня. Если его не потушить за {seconds} сек, он взрывается, нанося от {burstMin} до {burstMax} ед. урона от огня всем в пределах {radius} м, включая вас.',
   'hudChrome.heatGuardian.say.fist': 'Встаньте там, куда падает камень, и станьте его частью.',
   'hudChrome.heatGuardian.say.sink': 'Источник поднимается вам навстречу!',
   'hudChrome.heatGuardian.say.sinkAgain': 'Снова Очаг переполняется. Снова вы горите.',
@@ -26628,6 +26630,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "hudChrome.knotAlert.ruinTitle": "Удар мехов сбросит вас с края!",
   'hudChrome.tankSwap.swapTitle': 'Смена x{stacks}',
   'hudChrome.tankSwap.timeAria': 'До конца эффекта {seconds} сек',
+  'hudChrome.liveCoal.title': 'Живой уголь',
+  'hudChrome.liveCoal.absorb': 'Исцелить: {absorb}',
+  'hudChrome.liveCoal.fuseAria': 'До взрыва {seconds} сек',
   "hudChrome.quenchAlert.temperedTitle": "Смена танков! x{stacks}",
   'hudChrome.raidAtlas.canvasAria': 'Карта рейда',
   'hudChrome.raidAtlas.subtitle.one': '{floor}: повержено боссов {defeated} из {total}',

@@ -11,6 +11,8 @@
 //    parting at its corridors, and the corridors glowing on the floor;
 //  - heat_cinder_fx.ts: a Rolling Cinder's fall and the cinder itself, the
 //    hunted's marks, the adds' fire;
+//  - heat_coal_fx.ts: Heroic's Live Coals (the arrow over each bearer, the
+//    leap ring at their feet, the burst's reach, their cues);
 // and paints itself:
 //  - the Hearthseeds: each seed's burning heart throbbing faster to its
 //    burst; every live seed's near-lethal core and whole reach on the floor
@@ -62,6 +64,7 @@ import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import { HeatCinderFx } from './heat_cinder_fx';
+import { HeatCoalFx } from './heat_coal_fx';
 import {
   HEAT_FIGHT_COLORS as C,
   HEARTH_CENTRE,
@@ -369,6 +372,7 @@ export class HeatFightFx implements HeatFxHost {
   private readonly onWallPass = (x: number, y: number, z: number): void =>
     this.audio.wallPass(x, y, z);
   private readonly cinder: HeatCinderFx;
+  private readonly coal: HeatCoalFx;
   /** The thrown Hearthseeds' meteors (the seeds themselves in the air). */
   private readonly meteors: HeatMeteorFx;
   private readonly seeds: SeedSlot[] = [];
@@ -392,6 +396,7 @@ export class HeatFightFx implements HeatFxHost {
   private readonly addIds: number[] = [];
   private readonly huntedIds: number[] = [];
   private readonly kindledIds: number[] = [];
+  private readonly coalIds: number[] = [];
   private guardianId = -1;
   private rosterSeen = Number.NaN;
   private origin: { x: number; z: number } | null = null;
@@ -448,6 +453,7 @@ export class HeatFightFx implements HeatFxHost {
     this.well = new HeatWellFx(this);
     this.wall = new HeatLavaWallFx(this, pointLights);
     this.cinder = new HeatCinderFx(this);
+    this.coal = new HeatCoalFx(this);
     this.meteors = new HeatMeteorFx(this);
     this.wheel = new HeatWheelFx(this, (state, x, y, z) => this.audio.wheel(state, x, y, z));
 
@@ -657,6 +663,17 @@ export class HeatFightFx implements HeatFxHost {
       case HEAT_CUES.settle:
         if (src) this.particles.shockRing(fxAnchor(src).x, fxAnchor(src).z, C.ringGold, 30, 1.6);
         break;
+      case HEAT_CUES.coal:
+        // Carried out of the wellspring on a bolt of fire onto its bearer.
+        this.flareBolt(ev.sourceId, ev.targetId);
+        this.coal.cue('set', dst);
+        break;
+      case HEAT_CUES.coalLeap:
+        this.coal.cue('leap', dst);
+        break;
+      case HEAT_CUES.coalOut:
+        this.coal.cue('out', dst);
+        break;
       default:
         break;
     }
@@ -713,6 +730,9 @@ export class HeatFightFx implements HeatFxHost {
         this.particles.puff(x, y + 1.5, z, 10, SMOKE);
         this.shakeNear(x, z, 0.8, 60);
         break;
+      case HEAT_CUES.coalBurst:
+        this.coal.burstAt(x, z, r);
+        break;
       case HEAT_CUES.cinderBurst:
         this.particles.shockRing(x, z, C.white, r * 4, 0.9);
         this.particles.puff(x, y + 1.5, z, 50, { ...SPARK, speed: 15, up: 6, radius: 1.5 });
@@ -758,6 +778,7 @@ export class HeatFightFx implements HeatFxHost {
     const wellIds = list('well');
     this.well.update(wellIds.length > 0 ? wellIds[0] : -1, guardian, this.clock, dt);
     this.cinder.update(list('fall'), this.cinderIds, this.addIds, this.huntedIds, this.clock, dt);
+    this.coal.update(this.coalIds, this.clock, dt);
     this.paintSeeds(world, dt);
     this.meteors.update(guardian, dt);
     this.paintZones(world);
@@ -837,6 +858,7 @@ export class HeatFightFx implements HeatFxHost {
     this.addIds.length = 0;
     this.huntedIds.length = 0;
     this.kindledIds.length = 0;
+    this.coalIds.length = 0;
     this.guardianId = -1;
     for (const id of this.candidateIds) {
       const e = world.entities.get(id);
@@ -854,12 +876,15 @@ export class HeatFightFx implements HeatFxHost {
         // would take a second slot and could crowd a real quarry out).
         let hunted = false;
         let kindled = false;
+        let coal = false;
         for (const a of e.auras) {
           if (a.id === HEAT_AURAS.hunted) hunted = true;
           else if (a.id === HEAT_AURAS.kindling || a.id === HEAT_AURAS.trail) kindled = true;
+          else if (a.id === HEAT_AURAS.coal) coal = true;
         }
         if (hunted) this.huntedIds.push(id);
         if (kindled) this.kindledIds.push(id);
+        if (coal) this.coalIds.push(id);
       }
     }
     this.assign(world);
@@ -915,6 +940,7 @@ export class HeatFightFx implements HeatFxHost {
     this.wheel.hide();
     this.audio.wall(null);
     this.cinder.hide();
+    this.coal.hide();
     this.meteors.hide();
     for (const s of this.seeds) {
       s.id = -1;

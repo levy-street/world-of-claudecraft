@@ -6060,6 +6060,7 @@ export const hudChromeStrings = {
       hunted:
         'A Rolling Cinder or a Seedflame is after you. A Rolling Cinder that reaches you kills you and burns everyone within {radius} yd: keep away, and let allies strike it, each strike knocks it {knock} yd back (then not again for {crust} sec).',
       crust: 'Cooled hard: strikes cannot knock it back until this ends.',
+      coal: 'Absorbs the next {absorb} healing you receive and burns you for {burnMin} to {burnMax} Fire damage every second. Heal through it to put it out. Any player who comes within {leap} yd of you takes it, with the absorb it has left, and {leapMin} to {leapMax} Fire damage. Not healed through in {seconds} sec, it bursts for {burstMin} to {burstMax} Fire damage on everyone within {radius} yd, you included.',
     },
     // The Masterless Strength (src/ui/final_aura_effect.ts; the numbers are
     // encounters/smith_heart/final_ids.ts FINAL_TUNING's). Wordy (M16).
@@ -10482,6 +10483,14 @@ export const hudChromeStrings = {
   tankSwap: {
     swapTitle: 'Swap x{stacks}',
     timeAria: '{seconds} seconds left on the debuff',
+  },
+  // The Smith's Heart's Live Coal chip (src/ui/hud/dungeon/coal_alert_view.ts):
+  // the bearer's own small readout, a word and a number (Jose's rule of
+  // 2026-11-24). Wordy (M16): non-Latin fills in the overlays.
+  liveCoal: {
+    title: 'Live Coal',
+    absorb: '{absorb} to heal',
+    fuseAria: '{seconds} seconds until it bursts',
   },
   // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):
   // what the guardian SAYS (heat_voice.ts HEAT_LINES, the same English). Its

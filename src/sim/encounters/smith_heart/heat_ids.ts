@@ -65,6 +65,10 @@ export const HEAT_AURAS = {
    *  heat_intro_plan.ts HEAT_INTRO_STAGES (cold, or waking with the scene's
    *  clock in `remaining` and `duration`). */
   intro: 'heart_heat_intro',
+  /** Heroic and Mythic: a Live Coal (heat_coal.ts). One aura carries it all:
+   *  a `heal_absorb` (combat/heal.ts consumeHealAbsorb), the absorb left in
+   *  `value`, its whole in `value2`, the fuse in `remaining` and `duration`. */
+  coal: 'heart_heat_live_coal',
 } as const;
 
 /** The guardian's stages (its state aura's `value2`). */
@@ -159,6 +163,16 @@ export const HEAT_CUES = {
   cinderKnock: 'heart_heat_cinder_knock',
   /** A Rolling Cinder reaches its quarry and bursts (spellfxAt). */
   cinderBurst: 'heart_heat_cinder_burst',
+  /** A Live Coal is set on a player (spellfx 'beam', guardian to them). */
+  coal: 'heart_heat_coal',
+  /** A Live Coal leaps to a player who came too close (spellfx 'beam', the
+   *  old bearer to the new one). */
+  coalLeap: 'heart_heat_coal_leap',
+  /** A Live Coal is healed through and goes out (spellfx 'nova' on them). */
+  coalOut: 'heart_heat_coal_out',
+  /** A Live Coal's fuse runs out and it bursts (spellfxAt, the burst's
+   *  reach as the radius). */
+  coalBurst: 'heart_heat_coal_burst',
   /** The fight is over: the wellspring settles (spellfx 'nova'). */
   settle: 'heart_heat_settle',
 } as const;
@@ -203,6 +217,8 @@ export const HEAT_NAMES = {
   cinderLand: 'Cinder Scorch',
   hunted: 'Hunted',
   crust: 'Cooling Crust',
+  coal: 'Live Coal',
+  coalBurst: 'Coal Burst',
 } as const;
 
 // ---- difficulty -----------------------------------------------------------------------
@@ -233,6 +249,8 @@ export interface HeatDifficultyRules {
   overflowAdds: boolean;
   /** A Hearthseed's burst hatches a Seedflame. */
   seedHatch: boolean;
+  /** Live Coals (heat_coal.ts) through every fighting phase. */
+  liveCoal: boolean;
   /** Players a Falling Cinder volley strikes. */
   bolts: number;
   /** A Rolling Cinder's speed (yards a second; a player runs 7). */
@@ -305,6 +323,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     healthMult: 1,
     overflowAdds: false,
     seedHatch: false,
+    liveCoal: false,
     bolts: 2,
     cinderSpeed: 3.2,
     // Slower, with the longest warning: three rounds of 5 s.
@@ -336,6 +355,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     healthMult: 1.47,
     overflowAdds: true,
     seedHatch: true,
+    liveCoal: true,
     bolts: 3,
     cinderSpeed: 4.4,
     wheel: { first: 10, every: 30, warn: 3.5, rounds: 3, hit: 1 },
@@ -356,6 +376,7 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     healthMult: 2.06,
     overflowAdds: true,
     seedHatch: true,
+    liveCoal: true,
     bolts: 3,
     cinderSpeed: 4.4,
     // Mythic's extra: a fourth round, each one quicker.
@@ -591,6 +612,35 @@ export const HEAT_TUNING = {
   cinderRetarget: 1.5,
   /** Seconds of plain melee after a bar lands before the next begins. */
   barGap: 1.2,
+  // Heroic and Mythic: Live Coals (heat_coal.ts; the owner's design of
+  // 2026-11-24). Every `coalEvery` s of fighting (its clock stands still
+  // through an overflow) two non-tanks each carry one: a heal absorb of
+  // coalAbsorb (x the tier's damageMult: about 600 on Heroic) and a burn
+  // while it lasts; healed through, it goes out. Within coalLeapR of another
+  // player it leaps to them with the absorb it has left (and a hit); after a
+  // leap it rests coalGrace s, and never goes straight back to the one it
+  // left within coalBackGrace s. Not out in coalSeconds: it bursts on
+  // everyone within coalBurstR (x the tier's punishMult: 800 to 875 on
+  // Heroic, under a level-20 cloth wearer's whole health).
+  coalFirst: 20,
+  coalEvery: 50,
+  coalTargets: 2,
+  coalAbsorb: 420,
+  coalSeconds: 12,
+  coalTick: 1,
+  coalBurnMin: 38,
+  coalBurnMax: 44,
+  coalLeapR: 2,
+  coalGrace: 1.5,
+  coalBackGrace: 4,
+  coalLeapMin: 140,
+  coalLeapMax: 160,
+  coalBurstR: 7,
+  coalBurstMin: 640,
+  coalBurstMax: 700,
+  /** A coal is never set this near a Wheel of the Hearth's start (a run on
+   *  the floor, or one due this soon), and a Wheel waits this long after one. */
+  coalWheelGap: 3,
 } as const;
 
 // ---- pure helpers ---------------------------------------------------------------------

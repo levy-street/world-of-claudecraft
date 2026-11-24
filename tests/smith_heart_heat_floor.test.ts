@@ -17,6 +17,7 @@ import {
   floorVfxRenderOrder,
 } from '../src/render/floor_vfx_layer_core';
 import { HeatBody, HeatEntranceFx, HeatFightFx, HeatFx } from '../src/render/smith_heart_fx';
+import { COAL_SLOTS } from '../src/render/smith_heart_fx/heat_coal_fx';
 import {
   HEAT_FLOOR,
   type HeatFloorRung,
@@ -237,9 +238,10 @@ describe('the built Heat roots: no camera-sorted tie on the encounter band', () 
         expect(glow?.geometry).toBe((o as THREE.Mesh).geometry);
       });
     // Two fists and six lanes; six falls, six cinders' reaches, twelve
-    // hunted rings (the seeds draw as one field, below; the lava waves' rings
-    // and corridors are their own wall, heat_lava_wall_fx.ts).
-    expect(dressed).toBe(2 + 6 + 6 + 6 + 12);
+    // hunted rings, each Live Coal slot's leap ring and burst reach (the seeds
+    // draw as one field, below; the lava waves' rings and corridors are their
+    // own wall, heat_lava_wall_fx.ts).
+    expect(dressed).toBe(2 + 6 + 6 + 6 + 12 + 2 * COAL_SLOTS);
   });
 
   it("draws every seed's footprint as ONE field on the fight's warning rungs, char then glow", () => {
@@ -373,7 +375,7 @@ describe('heat_telegraph: the kit footprint in the molten paint, shape and timin
 describe('heat_telegraph_core: the looks per kind', () => {
   it('chars deeper where swept and in the warning, a third of it once landed', () => {
     const kinds = Object.keys(HEAT_TELEGRAPH_LOOKS) as HeatTelegraphKind[];
-    expect(kinds).toHaveLength(7);
+    expect(kinds).toHaveLength(8);
     for (const k of kinds) {
       const ahead = heatTelegraphChar(k, 0, 0, false);
       const swept = heatTelegraphChar(k, 1, 0, false);

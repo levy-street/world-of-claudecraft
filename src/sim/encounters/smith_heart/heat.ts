@@ -59,6 +59,7 @@ import {
   stepCinders,
   syncHunted,
 } from './heat_cinders';
+import { clearCoals, coalHoldsWheel, setCoals, stepCoals } from './heat_coal';
 import { clearFist, FIST_SPAN, floorHoldsFist, landFist, startFist, stepSwells } from './heat_fist';
 import { flare, keepOffLip, stepFlare, stepWellFire } from './heat_flare';
 import {
@@ -202,6 +203,13 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     marks: [],
     trails: [],
     sprouts: [],
+    coalTimer: T.coalFirst,
+    coalCasts: 0,
+    coalAt: -999,
+    coals: [],
+    coalOuts: 0,
+    coalLeaps: 0,
+    coalBursts: 0,
     feeds: 0,
     casts: 0,
     said: {},
@@ -301,6 +309,8 @@ export function beginOverflow(s: HeatScope, n: 1 | 2): void {
   const st = s.st;
   clearFist(s);
   clearZones(s);
+  // Live Coals go out as it sinks: nothing of them rides into the waves.
+  clearCoals(s);
   // Hearthseeds still throbbing go out as it sinks: a burst over the lava
   // waves would hide the corridors (the bot pass of 2026-11-18).
   for (const seed of st.seeds) dropFightObject(s.ctx, s.inst, seed.objectId);
@@ -446,8 +456,15 @@ function startMechanics(s: HeatScope): void {
   }
   if (kit.wheel) {
     st.wheelTimer = Math.max(0, st.wheelTimer - DT);
-    // The Wheel also waits out the Hearthseeds (the raid runs from them).
-    if (st.wheelTimer <= 1e-9 && !zonesBusy(st) && !wheelBusy(st) && st.seeds.length === 0) {
+    // The Wheel also waits out the Hearthseeds (the raid runs from them), and
+    // a Live Coal just set (heat_coal.ts: the two never begin together).
+    if (
+      st.wheelTimer <= 1e-9 &&
+      !zonesBusy(st) &&
+      !wheelBusy(st) &&
+      st.seeds.length === 0 &&
+      !coalHoldsWheel(st)
+    ) {
       startWheel(s);
       if (kit.zones) spaceRuns(s, 'wheel');
     }
@@ -481,6 +498,7 @@ const PLAYER_MARKS = [
   HEAT_AURAS.kindling,
   HEAT_AURAS.trail,
   HEAT_AURAS.hunted,
+  HEAT_AURAS.coal,
 ] as const;
 
 /** Everything the fight put on the floor goes. */
@@ -496,6 +514,7 @@ function clearFight(
     clearZones(s);
     clearSeeds(s);
     clearCinders(s);
+    clearCoals(s);
     clearOverflowAdds(s);
     clearFlood(s, st.overflow);
   }
@@ -590,6 +609,8 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepZones(s);
   stepWheel(s);
   stepCinders(s);
+  // Heroic's Live Coals: only while it fights (never in an overflow).
+  if (st.stage === 'fight') stepCoals(s);
   stepWellspawn(s);
   stepKeepers(s);
   stepMarks(s);
@@ -622,6 +643,7 @@ function jumpToPhase(s: HeatScope, phase: number): string | null {
   const b = s.boss;
   clearFist(s);
   clearZones(s);
+  clearCoals(s);
   clearFlood(s, s.st.overflow);
   if (s.st.overflow) endOverflowAdds(s);
   s.st.bar = null;
@@ -704,6 +726,8 @@ export function heatDevTrigger(
     startZones(s);
     return 'Wakefire: the bands ignite one after another.';
   }
+  if (verb === 'coal')
+    return `Live Coal on ${setCoals(s).length} (the guardian's ${s.st.difficulty} rules).`;
   if (verb === 'ember' || verb === 'cinder')
     return callCinder(s) ? 'A Rolling Cinder falls.' : 'No Rolling Cinder can fall now.';
   return null;
@@ -719,5 +743,5 @@ export function heatReadout(ctx: SimContext, inst: InstanceSlot, pid: number): s
   const me = ctx.entities.get(pid);
   const grip = me ? (auraOf(me, HEAT_AURAS.grip)?.stacks ?? 0) : 0;
   const over = st.overflow ? `, overflow ${st.overflow.n} (${st.overflow.clock.toFixed(0)} s)` : '';
-  return `${head}; phase ${st.phase} (${st.stage}${over}), next fist in ${Math.max(0, st.fistTimer).toFixed(0)} s${st.fistHeld > 0 ? ' (held by Wakefire)' : ''}, seeds ${st.seeds.length}, zones ${st.zones.length}, cinders ${st.cinders.length}, Wellspawn ${st.spawn.length}, keepers ${st.keepers.length}, fed ${st.feeds}, your Cinder Grip ${grip}.`;
+  return `${head}; phase ${st.phase} (${st.stage}${over}), next fist in ${Math.max(0, st.fistTimer).toFixed(0)} s${st.fistHeld > 0 ? ' (held by Wakefire)' : ''}, seeds ${st.seeds.length}, zones ${st.zones.length}, cinders ${st.cinders.length}, Wellspawn ${st.spawn.length}, keepers ${st.keepers.length}, fed ${st.feeds}, coals ${st.coals.length} (out ${st.coalOuts}, leaps ${st.coalLeaps}, bursts ${st.coalBursts}), your Cinder Grip ${grip}.`;
 }

@@ -166,6 +166,22 @@ export interface HeatMark {
   dropIn: number;
 }
 
+/** A Live Coal on its bearer (heat_coal.ts): the absorb left rides the
+ *  bearer's aura; the fuse and the leaps are kept here. */
+export interface HeatCoal {
+  /** Its bearer now. */
+  pid: number;
+  /** Seconds to its burst (a leap carries it on, never resets it). */
+  fuse: number;
+  /** Seconds to its next burn tick. */
+  tick: number;
+  /** Seconds before it may leap again (after a leap). */
+  grace: number;
+  /** The bearer it last left, and how long that one stays out of its reach. */
+  prev: number | null;
+  prevGrace: number;
+}
+
 /** A Seedflame and the player it hunts. */
 export interface HeatSprout {
   id: number;
@@ -231,6 +247,16 @@ export interface HeatFightState {
   marks: HeatMark[];
   trails: HeatPatch[];
   sprouts: HeatSprout[];
+  /** Heroic's Live Coals (heat_coal.ts): the clock (fighting time only),
+   *  how many were set (the pick's salt), the fight clock of the last set
+   *  (the Wheel waits it out), the coals on players, and the tallies. */
+  coalTimer: number;
+  coalCasts: number;
+  coalAt: number;
+  coals: HeatCoal[];
+  coalOuts: number;
+  coalLeaps: number;
+  coalBursts: number;
   /** Wellspawn that reached the wellspring, and the hits they dealt. */
   feeds: number;
   /** Mechanic casts started (the hashed picks' salt). */

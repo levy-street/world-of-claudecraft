@@ -763,6 +763,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/quench_alert_view.ts',
   'src/ui/hud/dungeon/knot_alert_view.ts',
   'src/ui/hud/dungeon/tank_swap_alert_view.ts',
+  'src/ui/hud/dungeon/coal_alert_view.ts',
   'src/ui/hud/dungeon/heart_final_phase_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
@@ -1298,6 +1299,8 @@ const RENDER_PURE_CORES = [
   // beats, stone, strikes and bolts.
   'src/render/smith_heart_fx/breath_entrance_core.ts',
   'src/render/smith_heart_fx/heat_fight_fx_core.ts',
+  // A Live Coal's arrow, its leap ring and its burst's reach at a moment of the fuse.
+  'src/render/smith_heart_fx/heat_coal_fx_core.ts',
   'src/render/smith_heart_fx/heat_lava_wall_core.ts',
   // The Wheel of the Hearth on screen: its slices' warning, eruption and
   // scorch, its vents' layout and the low tier's share.

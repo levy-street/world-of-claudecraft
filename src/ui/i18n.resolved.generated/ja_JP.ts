@@ -4822,7 +4822,8 @@ export const ja_JP: EnTranslations = {
         "kindling": "{seconds}秒後、{trail}秒間あなたは炎の跡を残す。跡の一つひとつが味方に毎秒{min}～{max}の火炎ダメージを与え、その上に立つ湧泉の落とし子の体力を毎秒{heal}%回復させる：集団と湧泉の落とし子の通り道から離れよ。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。",
         "trail": "燃え殻の跡を残している：幅{radius}ヤードの炎が{life}秒間燃え、その中の味方に毎秒{min}～{max}の火炎ダメージを与え、その中の湧泉の落とし子の体力を毎秒{heal}%回復させる。ヒロイック・ミシック：{heroicMin}から{heroicMax}のダメージ。",
         "hunted": "転がる燃え殻か種火の精があなたを追っている。転がる燃え殻に追いつかれると死亡し、{radius}ヤード以内の全員が焼かれる：近づかせず、味方に打たせよ。一撃ごとに{knock}ヤード押し返される（その後{crust}秒間は押し返せない）。",
-        "crust": "固く冷えている：この効果が切れるまで、打っても押し返せない。"
+        "crust": "固く冷えている：この効果が切れるまで、打っても押し返せない。",
+        "coal": "受ける回復を次の{absorb}吸収し、毎秒{burnMin}～{burnMax}の火炎ダメージを与える。回復で吸収を削り切れば消える。{leap}ヤード以内に近づいたプレイヤーには残りの吸収ごと熾火が移り、{leapMin}～{leapMax}の火炎ダメージを与える。{seconds}秒以内に消せなければ破裂し、あなたを含む{radius}ヤード以内の全員に{burstMin}～{burstMax}の火炎ダメージを与える。"
       },
       "finalBoss": {
         "stateHeat": "熱を飲む：玄武岩の拳がプレイヤーの立つ場所を打ち砕き、そこから溶岩のうねりが三方へ広がる。その星、炎の旋風が目覚めて戦闘終了まで続く：そびえ立つ炎の柱が床を駆け抜ける。ヒロイックでは燠火の印が遠隔のプレイヤーの足元に炎を落とし、ミシックでは正面攻撃が炉の火を残す。",
@@ -7451,6 +7452,11 @@ export const ja_JP: EnTranslations = {
     "tankSwap": {
       "swapTitle": "交代 x{stacks}",
       "timeAria": "デバフの残り{seconds}秒"
+    },
+    "liveCoal": {
+      "title": "生きた熾火",
+      "absorb": "要回復 {absorb}",
+      "fuseAria": "破裂まであと{seconds}秒"
     },
     "heatGuardian": {
       "say": {

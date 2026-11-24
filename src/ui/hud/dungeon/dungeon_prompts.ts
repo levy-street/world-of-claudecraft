@@ -28,7 +28,8 @@
 // (tank_swap_alert_view.ts on the same family: Swap for the tank carrying a
 // swap debuff at its count, its stacks; nobody else), small beside the
 // target frame, on every tier and whatever the hints setting; it never holds
-// the slot.
+// the slot. Its mirror on the action bar's other side is the Live Coal chip
+// (coal_alert_view.ts: its bearer's absorb left and fuse), the same rules.
 //
 // Beside the slot it paints the Masterless Strength's raid HUD, its phase
 // readout at the top of the screen (heart_final_phase_view.ts and
@@ -53,6 +54,7 @@
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
+import { buildCoalAlertView, COAL_ALERT_KINDS } from './coal_alert_view';
 import { CryptAlertSceneScan, type CryptSceneEntity } from './crypt_alert_scene_core';
 import {
   buildCryptAlertView,
@@ -166,6 +168,7 @@ export class DungeonPrompts {
   private readonly quench: EncounterAlert;
   private readonly knot: EncounterAlert;
   private readonly tankSwap: EncounterAlert;
+  private readonly liveCoal: EncounterAlert;
   private readonly finalPhase: HeartFinalPhasePanel;
   private readonly finalPhaseView = makeFinalPhaseView();
   private readonly finalScan = new HeartFinalScan();
@@ -237,6 +240,11 @@ export class DungeonPrompts {
       id: 'heart-tank-swap',
       className: 'ui-panel-strong encounter-alert heart-tank-swap',
       kinds: TANK_SWAP_ALERT_KINDS,
+    });
+    this.liveCoal = new EncounterAlert(deps, {
+      id: 'heart-live-coal',
+      className: 'ui-panel-strong encounter-alert heart-live-coal',
+      kinds: COAL_ALERT_KINDS,
     });
     this.finalPhase = new HeartFinalPhasePanel(deps);
     this.temple = new EncounterAlert(deps, {
@@ -349,6 +357,12 @@ export class DungeonPrompts {
         ? buildTankSwapAlertView({ self: p, entity })
         : HINT_HIDDEN,
     );
+    // The Live Coal's bearer's own chip (an action readout, off the slot).
+    this.liveCoal.paint(
+      dungeonPromptEnabled('liveCoal', hints)
+        ? buildCoalAlertView({ auras: p.auras, dead: p.dead })
+        : HINT_HIDDEN,
+    );
     // The Masterless Strength's raid HUD (its phase readout; its Overload
     // bars are the room's ring): no personal alert since Jose's playtest of
     // 2026-11-19 (its marks read in the world).
@@ -403,6 +417,7 @@ export class DungeonPrompts {
     this.quench.dispose();
     this.knot.dispose();
     this.tankSwap.dispose();
+    this.liveCoal.dispose();
     this.finalPhase.dispose();
     this.temple.dispose();
     this.kitUse.dispose();

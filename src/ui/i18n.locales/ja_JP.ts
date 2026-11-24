@@ -22559,6 +22559,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '転がる燃え殻か種火の精があなたを追っている。転がる燃え殻に追いつかれると死亡し、{radius}ヤード以内の全員が焼かれる：近づかせず、味方に打たせよ。一撃ごとに{knock}ヤード押し返される（その後{crust}秒間は押し返せない）。',
   'hudChrome.auraEffect.heatGuardian.crust':
     '固く冷えている：この効果が切れるまで、打っても押し返せない。',
+  'hudChrome.auraEffect.heatGuardian.coal':
+    '受ける回復を次の{absorb}吸収し、毎秒{burnMin}～{burnMax}の火炎ダメージを与える。回復で吸収を削り切れば消える。{leap}ヤード以内に近づいたプレイヤーには残りの吸収ごと熾火が移り、{leapMin}～{leapMax}の火炎ダメージを与える。{seconds}秒以内に消せなければ破裂し、あなたを含む{radius}ヤード以内の全員に{burstMin}～{burstMax}の火炎ダメージを与える。',
   'hudChrome.heatGuardian.say.fist': '石の落ちる場所に立て。そしてその一部となれ。',
   'hudChrome.heatGuardian.say.sink': '湧泉がお前たちを迎えに昇る！',
   'hudChrome.heatGuardian.say.sinkAgain': '再び炉床はあふれる。再びお前たちは燃える。',
@@ -26187,6 +26189,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.ruinTitle': 'ふいごの一撃で縁の外へ飛ばされる！',
   'hudChrome.tankSwap.swapTitle': '交代 x{stacks}',
   'hudChrome.tankSwap.timeAria': 'デバフの残り{seconds}秒',
+  'hudChrome.liveCoal.title': '生きた熾火',
+  'hudChrome.liveCoal.absorb': '要回復 {absorb}',
+  'hudChrome.liveCoal.fuseAria': '破裂まであと{seconds}秒',
   'hudChrome.quenchAlert.temperedTitle': 'タンク交代！x{stacks}',
   'hudChrome.raidAtlas.canvasAria': 'レイドマップ',
   'hudChrome.raidAtlas.subtitle.one': '{floor}：ボス {total} 体中 {defeated} 体撃破',

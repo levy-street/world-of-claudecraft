@@ -20193,6 +20193,92 @@
     top: 34%;
   }
 
+  /* ---------- The Smith's Heart's Live Coal chip ---------- */
+  /* Self-mounted by the shared encounter alert painter from
+     src/ui/hud/dungeon/coal_alert_view.ts: the Guardian of the Heat's Live
+     Coal (Heroic and Mythic), for its bearer only, calm and small (Jose's
+     rule of 2026-11-24: the coal reads in the world for everyone, the arrow
+     over its bearer). The tank swap chip's mirror, just left of the action
+     bar at the player frame's level: the coal's name, a thin bar of its fuse
+     and, under it, the healing it still absorbs, in the fire tone. It fades
+     in with one soft pulse and out; nothing flashes while it stays. Every
+     tier, never hidden by the hints setting; it never takes the pointer. */
+  #heart-live-coal {
+    position: absolute;
+    right: calc(50% + var(--action-rail-w) / 2 + 14px);
+    top: calc(
+      100% -
+      var(--unit-frame-seat-offset) -
+      var(--stance-row-lift, 0px) -
+      var(--pet-row-lift, 0px)
+    );
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    z-index: 7;
+    min-width: 92px;
+    max-width: 180px;
+    padding: 5px 12px 5px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-debuff-fire);
+    opacity: 0.94;
+  }
+  #heart-live-coal .fa-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: var(--color-debuff-fire);
+  }
+  #heart-live-coal .fa-line,
+  #heart-live-coal .fa-hint {
+    display: none;
+  }
+  #heart-live-coal .fa-bar {
+    --bar-h: 4px;
+    --bar-color: var(--color-debuff-fire);
+    width: 100%;
+  }
+  #heart-live-coal .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-live-coal .fa-bar-label {
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    #heart-live-coal {
+      transition:
+        opacity 0.25s ease-out,
+        display 0.25s allow-discrete;
+      animation: heart-tank-swap-in 0.5s ease-out 1;
+    }
+    #heart-live-coal[style*="display: none"] {
+      opacity: 0;
+    }
+    @starting-style {
+      #heart-live-coal {
+        opacity: 0;
+      }
+    }
+  }
+  /* Touch: the unit frames sit at the top, so the chip waits under the
+     player frame's corner, clear of the action ring and the joystick. */
+  body.mobile-touch #heart-live-coal {
+    right: auto;
+    left: 12px;
+    top: 34%;
+  }
+
   /* ---------- The Masterless Strength's phase readout (the raid HUD) ---------- */
   /* Self-mounted by src/ui/hud/dungeon/heart_final_phase_painter.ts from
      heart_final_phase_view.ts: the Heroic switch mark's seconds and part 2's

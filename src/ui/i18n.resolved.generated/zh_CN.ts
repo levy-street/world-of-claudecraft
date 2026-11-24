@@ -4822,7 +4822,8 @@ export const zh_CN: EnTranslations = {
         "kindling": "{seconds}秒后你会在{trail}秒内留下火焰足迹。每一块足迹每秒对友方造成{min}到{max}点火焰伤害，并为站在其中的涌泉之子每秒恢复{heal}%生命值：离开团队和涌泉之子的路线。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "trail": "你正在留下余烬足迹：宽{radius}码的火焰燃烧{life}秒，每秒对其中的友方造成{min}到{max}点火焰伤害，并为其中的涌泉之子每秒恢复{heal}%生命值。英雄和史诗难度：{heroicMin}到{heroicMax}点伤害。",
         "hunted": "一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。",
-        "crust": "已冷却变硬：此效果结束前，击打无法将它打退。"
+        "crust": "已冷却变硬：此效果结束前，击打无法将它打退。",
+        "coal": "吸收你受到的接下来{absorb}点治疗，并每秒对你造成{burnMin}到{burnMax}点火焰伤害。用治疗打穿吸收即可将其熄灭。任何靠近你{leap}码以内的玩家都会带着剩余的吸收量接过它，并受到{leapMin}到{leapMax}点火焰伤害。若{seconds}秒内未被治疗打穿，它会爆裂，对包括你在内{radius}码内的所有人造成{burstMin}到{burstMax}点火焰伤害。"
       },
       "finalBoss": {
         "stateHeat": "饮下炽热：玄武之拳砸向玩家所站之处，三道熔岩涌浪从那里滚出。它的星辰火焰旋风苏醒并持续到战斗结束：高耸的火柱在地面上疾驰。英雄难度下，余烬印记会把火焰落在远程玩家脚下；史诗难度下，它的正面攻击会留下锻炉之火。",
@@ -7451,6 +7452,11 @@ export const zh_CN: EnTranslations = {
     "tankSwap": {
       "swapTitle": "换坦 x{stacks}",
       "timeAria": "减益效果剩余{seconds}秒"
+    },
+    "liveCoal": {
+      "title": "炽炭",
+      "absorb": "需治疗 {absorb}",
+      "fuseAria": "{seconds}秒后爆裂"
     },
     "heatGuardian": {
       "say": {

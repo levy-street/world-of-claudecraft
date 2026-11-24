@@ -22529,6 +22529,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '구르는 잉걸불이나 씨불이 당신을 쫓고 있습니다. 구르는 잉걸불에 붙잡히면 죽고 {radius}미터 안의 모두가 불탑니다: 거리를 두고 아군이 때리게 하십시오. 한 번 칠 때마다 {knock}미터 밀려납니다(그 뒤 {crust}초 동안은 밀려나지 않습니다).',
   'hudChrome.auraEffect.heatGuardian.crust':
     '단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다.',
+  'hudChrome.auraEffect.heatGuardian.coal':
+    '다음에 받는 치유 {absorb}를 흡수하고 매초 {burnMin}~{burnMax}의 화염 피해를 줍니다. 치유로 흡수량을 모두 깎으면 꺼집니다. {leap}미터 안으로 다가온 플레이어에게 남은 흡수량과 함께 옮겨 가며 {leapMin}~{leapMax}의 화염 피해를 줍니다. {seconds}초 안에 꺼지지 않으면 폭발해 당신을 포함한 {radius}미터 안의 모두에게 {burstMin}~{burstMax}의 화염 피해를 줍니다.',
   'hudChrome.heatGuardian.say.fist': '돌이 떨어지는 곳에 서라. 그리고 그 일부가 되어라.',
   'hudChrome.heatGuardian.say.sink': '샘이 너희를 맞으러 솟아오른다!',
   'hudChrome.heatGuardian.say.sinkAgain': '다시 화로가 넘친다. 다시 너희는 타오른다.',
@@ -26197,6 +26199,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.ruinTitle': '풀무 강타가 당신을 가장자리 밖으로 날립니다!',
   'hudChrome.tankSwap.swapTitle': '교대 x{stacks}',
   'hudChrome.tankSwap.timeAria': '약화 효과 {seconds}초 남음',
+  'hudChrome.liveCoal.title': '살아있는 숯불',
+  'hudChrome.liveCoal.absorb': '치유 필요 {absorb}',
+  'hudChrome.liveCoal.fuseAria': '폭발까지 {seconds}초',
   'hudChrome.quenchAlert.temperedTitle': '탱커 교대! x{stacks}',
   'hudChrome.raidAtlas.canvasAria': '공격대 지도',
   'hudChrome.raidAtlas.subtitle.one': '{floor}: 우두머리 {total}명 중 {defeated}명 처치',

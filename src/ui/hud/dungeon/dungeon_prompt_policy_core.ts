@@ -18,7 +18,8 @@
 //    distance), the Smith's Heart's Guardian of the Quench cold bar (the
 //    player's own gauge, steered by the whole fight), the Smith's Heart's
 //    tank swap alert (Swap or Taunt: a press the tank must make, and the one
-//    raid-wide cue Jose kept on 2026-11-24; it sits off the shared slot), and the use prompt (the
+//    raid-wide cue Jose kept on 2026-11-24; it sits off the shared slot), the
+//    Live Coal chip (its bearer's own absorb and fuse, off the slot too), and the use prompt (the
 //    panel is the interact press on a brazier or a candle).
 //    It is a player-chosen interface preference, never a graphics-tier knob:
 //    this module takes the setting's own boolean and reads no preset, effects
@@ -42,6 +43,7 @@ export type DungeonPromptId =
   | 'quench'
   | 'knot'
   | 'tankSwap'
+  | 'liveCoal'
   | 'temple'
   | 'kitUse';
 
@@ -57,6 +59,7 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   quench: false,
   knot: false,
   tankSwap: false,
+  liveCoal: false,
   temple: true,
   kitUse: false,
 };

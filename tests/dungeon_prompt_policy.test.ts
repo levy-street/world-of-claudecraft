@@ -58,6 +58,7 @@ const ALL_IDS: DungeonPromptId[] = [
   'quench',
   'knot',
   'tankSwap',
+  'liveCoal',
   'temple',
   'kitUse',
 ];
@@ -77,6 +78,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       quench: false,
       knot: false,
       tankSwap: false,
+      liveCoal: false,
       temple: true,
       kitUse: false,
     });

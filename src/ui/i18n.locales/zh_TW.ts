@@ -23087,6 +23087,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.hunted':
     '一團滾動餘燼或籽焰正在追你。被滾動餘燼追上你會死亡，{radius}碼內的所有人都會被灼燒：保持距離，讓隊友擊打它，每次擊打都會把它打退{knock}碼（之後{crust}秒內無法再次打退）。',
   'hudChrome.auraEffect.heatGuardian.crust': '已冷卻變硬：此效果結束前，擊打無法將它打退。',
+  'hudChrome.auraEffect.heatGuardian.coal':
+    '吸收你受到的接下來{absorb}點治療，並每秒對你造成{burnMin}到{burnMax}點火焰傷害。用治療打穿吸收即可將其熄滅。任何靠近你{leap}碼以內的玩家都會帶著剩餘的吸收量接過它，並受到{leapMin}到{leapMax}點火焰傷害。若{seconds}秒內未被治療打穿，它會爆裂，對包括你在內{radius}碼內的所有人造成{burstMin}到{burstMax}點火焰傷害。',
   'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成為它的一部分。',
   'hudChrome.heatGuardian.say.sink': '湧泉升起來迎接你們了！',
   'hudChrome.heatGuardian.say.sinkAgain': '爐心再次滿溢。你們再次燃燒。',
@@ -24861,6 +24863,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.knotAlert.ruinTitle': '風箱重擊會把你掀出邊緣！',
   'hudChrome.tankSwap.swapTitle': '換坦 x{stacks}',
   'hudChrome.tankSwap.timeAria': '減益效果剩餘{seconds}秒',
+  'hudChrome.liveCoal.title': '熾炭',
+  'hudChrome.liveCoal.absorb': '需治療 {absorb}',
+  'hudChrome.liveCoal.fuseAria': '{seconds}秒後爆裂',
   'hudChrome.quenchAlert.temperedTitle': '換坦！x{stacks}',
   'hudChrome.raidAtlas.canvasAria': '團隊副本地圖',
   'hudChrome.raidAtlas.subtitle.one': '{floor}：已擊敗首領 {defeated}/{total}',

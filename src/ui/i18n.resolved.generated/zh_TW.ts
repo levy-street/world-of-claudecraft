@@ -4822,7 +4822,8 @@ export const zh_TW: EnTranslations = {
         "kindling": "{seconds}秒後你會在{trail}秒內留下火焰足跡。每一塊足跡每秒對友方造成{min}到{max}點火焰傷害，並為站在其中的湧泉之子每秒恢復{heal}%生命值：離開團隊和湧泉之子的路線。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。",
         "trail": "你正在留下餘燼足跡：寬{radius}碼的火焰燃燒{life}秒，每秒對其中的友方造成{min}到{max}點火焰傷害，並為其中的湧泉之子每秒恢復{heal}%生命值。英雄和傳奇難度：{heroicMin}到{heroicMax}點傷害。",
         "hunted": "一團滾動餘燼或籽焰正在追你。被滾動餘燼追上你會死亡，{radius}碼內的所有人都會被灼燒：保持距離，讓隊友擊打它，每次擊打都會把它打退{knock}碼（之後{crust}秒內無法再次打退）。",
-        "crust": "已冷卻變硬：此效果結束前，擊打無法將它打退。"
+        "crust": "已冷卻變硬：此效果結束前，擊打無法將它打退。",
+        "coal": "吸收你受到的接下來{absorb}點治療，並每秒對你造成{burnMin}到{burnMax}點火焰傷害。用治療打穿吸收即可將其熄滅。任何靠近你{leap}碼以內的玩家都會帶著剩餘的吸收量接過它，並受到{leapMin}到{leapMax}點火焰傷害。若{seconds}秒內未被治療打穿，它會爆裂，對包括你在內{radius}碼內的所有人造成{burstMin}到{burstMax}點火焰傷害。"
       },
       "finalBoss": {
         "stateHeat": "飲下熾熱：玄武之拳砸向玩家所站之處，三道熔岩湧浪從那裡滾出。它的星辰火焰旋風甦醒並持續到戰鬥結束：高聳的火柱在地面上疾馳。英雄難度下，餘燼印記會把火焰落在遠程玩家腳下；史詩難度下，它的正面攻擊會留下鍛爐之火。",
@@ -7451,6 +7452,11 @@ export const zh_TW: EnTranslations = {
     "tankSwap": {
       "swapTitle": "換坦 x{stacks}",
       "timeAria": "減益效果剩餘{seconds}秒"
+    },
+    "liveCoal": {
+      "title": "熾炭",
+      "absorb": "需治療 {absorb}",
+      "fuseAria": "{seconds}秒後爆裂"
     },
     "heatGuardian": {
       "say": {

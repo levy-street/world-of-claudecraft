@@ -110,6 +110,23 @@ export function heatAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescript
       };
     case HEAT_AURAS.crust:
       return { key: `${KEY}.crust`, nums: {} };
+    // Heroic and Mythic only (heat_coal.ts), so their resolved numbers; the
+    // absorb is what is left on the aura now.
+    case HEAT_AURAS.coal: {
+      const H = HEAT_DIFFICULTY.heroic;
+      return {
+        key: `${KEY}.coal`,
+        nums: {
+          absorb: Math.max(0, Math.round(a.value ?? tierValue(T.coalAbsorb, H.damageMult))),
+          ...tierRange('burn', T.coalBurnMin, T.coalBurnMax, H.damageMult),
+          leap: T.coalLeapR,
+          ...tierRange('leap', T.coalLeapMin, T.coalLeapMax, H.damageMult),
+          seconds: T.coalSeconds,
+          ...tierRange('burst', T.coalBurstMin, T.coalBurstMax, H.punishMult),
+          radius: T.coalBurstR,
+        },
+      };
+    }
     default:
       return null;
   }
