@@ -907,6 +907,9 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  // deadband bands for the lights, fog and camera every lit program uploads
+  // (scene_globals_stabilizer.ts)
+  'src/render/scene_globals_stabilizer_core.ts',
   'src/render/courier_visual_core.ts',
   // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
   'src/render/mount_embers_core.ts',

@@ -591,7 +591,10 @@ describe('every point-light producer is a carrier source', () => {
 
   it('wires the world scene: the pinned count, the source lists in order, and one scene hook', () => {
     const renderer = sourceOf('render/renderer.ts');
-    const start = renderer.indexOf('attachPointLightCarriers(this.scene, ');
+    // The renderer attaches the carriers through the scene's hook composer
+    // (scene_render_hooks.ts), which attaches them FIRST and only then the
+    // stabilizer that chains after them.
+    const start = renderer.indexOf('attachSceneRenderHooks(this.scene, ');
     expect(start, 'the carriers attach moved; re-anchor this pin').toBeGreaterThan(-1);
     const call = renderer.slice(start, renderer.indexOf(']);', start));
     expect(call).toContain('GFX.maxPointLights + lightPulsePoolSize()');
@@ -604,7 +607,13 @@ describe('every point-light producer is a carrier source', () => {
     ].map((entry) => call.indexOf(entry));
     expect(order.every((at, k) => at > -1 && (k === 0 || at > order[k - 1]))).toBe(true);
     expect(call.split('() =>')).toHaveLength(4);
-    expect(renderer.split('attachPointLightCarriers(')).toHaveLength(2);
+    expect(renderer.split('attachSceneRenderHooks(')).toHaveLength(2);
+    expect(renderer).not.toContain('attachPointLightCarriers(');
+    const hooks_ = sourceOf('render/scene_render_hooks.ts');
+    const carriersAt = hooks_.indexOf('attachPointLightCarriers(scene, ');
+    const stabilizerAt = hooks_.indexOf('attachSceneGlobalsStabilizer(scene)');
+    expect(carriersAt).toBeGreaterThan(-1);
+    expect(stabilizerAt).toBeGreaterThan(carriersAt);
     expect(renderer).not.toContain('lightPads');
 
     // Any other assignment of a scene's hook replaces the pack without a
@@ -668,6 +677,10 @@ describe('every point-light producer is a carrier source', () => {
       'render/placed_assets.ts: puffs',
       'render/placed_assets.ts: sparks',
       'render/point_light_carriers.ts: scene',
+      // The scene-globals stabilizer CHAINS onto the scene hook (it calls the
+      // carriers' hook first, then holds the lights it just packed), so the
+      // pack never freezes; scene_globals_stabilizer.test.ts pins the chain.
+      'render/scene_globals_stabilizer.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
       // The sprite buddy's flame meshes step and upload their own uniforms.
       'render/sprites_buddy_flame.ts: mesh',

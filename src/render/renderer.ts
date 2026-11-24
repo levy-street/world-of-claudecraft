@@ -649,7 +649,6 @@ import { buildPickOnlyObjectBody, isPickOnlyObjectTemplate } from './pick_only_o
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
 import { type RankedPointLight, reconcileViewPointLights } from './point_light_budget';
-import { attachPointLightCarriers, NO_POINT_LIGHTS } from './point_light_carriers';
 import { markPointLightSource } from './point_light_carriers_core';
 import { buildComposer, type PostPipeline } from './post';
 import { precipBiomeAt } from './precip_shelter';
@@ -796,6 +795,7 @@ import {
   type SceneCensusReport,
   sceneCensusChild,
 } from './scene_census_core';
+import { attachSceneRenderHooks, NO_POINT_LIGHTS } from './scene_render_hooks';
 import { sceneKeyLightUniform } from './scene_sampling';
 import * as sceneryDetail from './scenery_detail';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
@@ -2693,7 +2693,7 @@ export class Renderer {
     // carriers, one per budget slot and pulse, and real fire lights start
     // hidden until the budget ranks them as carrier sources.
     for (const light of this.fireLights) light.visible = false;
-    attachPointLightCarriers(this.scene, GFX.maxPointLights + lightPulsePoolSize(), [
+    attachSceneRenderHooks(this.scene, GFX.maxPointLights + lightPulsePoolSize(), [
       () => this.fireLights,
       () => this.viewLights,
       () => this.lightPulses?.lights ?? NO_POINT_LIGHTS,
