@@ -1707,6 +1707,11 @@ const baseEnTable = {
   'aura.solarReprisal': 'Solar Reprisal',
   'aura.dawnsWrath': "Dawn's Wrath",
   'aura.moontide': 'Moontide',
+  // Moonwing Tidewheel (src/sim/combat/druid_tidewheel.ts): the second bank and
+  // the two windows, authored in English by the sim.
+  'aura.suntide': 'Suntide',
+  'aura.sunrise': 'Sunrise',
+  'aura.moonrise': 'Moonrise',
   // The operator-applied Cheater mark's countdown debuff (src/sim/moderation/).
   // The sim authors the aura name in English; this row is what stops the debuff
   // bar and combat log shipping that English to all 21 locales.
@@ -26645,6 +26650,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Crafted Collection': 'aura.craftedCollection',
   "Last Flame's Zeal": 'aura.lastflameZeal',
   Moontide: 'aura.moontide',
+  Suntide: 'aura.suntide',
+  Sunrise: 'aura.sunrise',
+  Moonrise: 'aura.moonrise',
   // The operator-applied Cheater mark's countdown debuff (cheaterMarkAura in
   // src/sim/moderation/cheater_mark.ts). Without this row localizeSimAuraName
   // returns null and every caller falls back to the RAW ENGLISH aura name, which
