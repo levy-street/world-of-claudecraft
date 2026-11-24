@@ -19,7 +19,9 @@ import { cleanup } from './_harness';
 // row on any pixel ratio above 1. The overlays mount on <body>, outside the
 // #ui zoom, so the UI Scale must not matter either.
 
-// The GL previews are stubbed: this pins the CSS box, not the renderer.
+// The GL previews are stubbed: this pins the CSS box, not the renderer. The
+// try-on body counts as resident, so the Armory mounts its stage on the first
+// open instead of waiting for the streamed character assets.
 const handle = {
   setActive: () => undefined,
   setAppearance: () => undefined,
@@ -31,6 +33,7 @@ const handle = {
 };
 vi.mock('../../src/render/armory_preview', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../src/render/armory_preview')>()),
+  armoryPreviewReady: () => true,
   createArmoryPreview: () => handle,
 }));
 vi.mock('../../src/render/mount_preview', async (importOriginal) => ({
