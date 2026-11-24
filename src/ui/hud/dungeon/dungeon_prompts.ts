@@ -24,6 +24,12 @@
 // scenes off the roster (sanctum_alert_scene_core.ts, crypt_alert_scene_core.ts,
 // wildheart_alert_scene_core.ts, temple_alert_scene_core.ts, KitUseSceneScan).
 //
+// Off the slot it paints the Smith's Heart's tank swap alert
+// (tank_swap_alert_view.ts on the same family: Swap for the tank carrying a
+// swap debuff at its count, Taunt for the other tank), small beside the
+// target frame, on every tier and whatever the hints setting; it never holds
+// the slot.
+//
 // Beside the slot it paints the Masterless Strength's raid HUD, its phase
 // readout at the top of the screen (heart_final_phase_view.ts and
 // heart_final_phase_painter.ts: the switch mark and part 2's clocks; the
@@ -79,6 +85,11 @@ import { buildKnotAlertView, KNOT_ALERT_KINDS } from './knot_alert_view';
 import { buildQuenchAlertView, QUENCH_ALERT_KINDS } from './quench_alert_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
+import {
+  buildTankSwapAlertView,
+  TANK_SWAP_ALERT_KINDS,
+  type TankSwapBody,
+} from './tank_swap_alert_view';
 import { TempleAlertSceneScan, type TempleSceneEntity } from './temple_alert_scene_core';
 import { buildTempleAlertView, TEMPLE_ALERT_KINDS } from './temple_alert_view';
 import { WildheartAlertSceneScan, type WildheartSceneEntity } from './wildheart_alert_scene_core';
@@ -105,6 +116,7 @@ export interface DungeonPromptsFrame {
       duration?: number;
       stacks?: number;
       value?: number;
+      value3?: number;
     }[];
     /** The player's target (an alert may read the boss being targeted). */
     targetId?: number | null;
@@ -126,13 +138,15 @@ export interface DungeonPromptsFrame {
         WildheartSceneEntity &
         TempleSceneEntity &
         KitUseBody &
-        FinalPhaseBoss
+        FinalPhaseBoss &
+        TankSwapBody
     >;
     entityRosterVersion: number;
     /** Select a body (the use prompt's press targets the body, then interacts). */
     targetEntity(id: number | null): void;
   };
-  party: readonly { pid: number }[] | null | undefined;
+  /** The roster (its rows' spec roles: the tank swap alert's Taunt is a tank's). */
+  party: readonly { pid: number; role?: 'tank' | 'healer' | 'dps' }[] | null | undefined;
   /** The interact key's label ('' when unbound). */
   interactKey: string;
   touch: boolean;
@@ -152,6 +166,7 @@ export class DungeonPrompts {
   private readonly crypt: EncounterAlert;
   private readonly quench: EncounterAlert;
   private readonly knot: EncounterAlert;
+  private readonly tankSwap: EncounterAlert;
   private readonly finalPhase: HeartFinalPhasePanel;
   private readonly finalPhaseView = makeFinalPhaseView();
   private readonly finalScan = new HeartFinalScan();
@@ -218,6 +233,11 @@ export class DungeonPrompts {
       id: 'heart-knot-alert',
       className: 'ui-panel-strong encounter-alert heart-knot-alert',
       kinds: KNOT_ALERT_KINDS,
+    });
+    this.tankSwap = new EncounterAlert(deps, {
+      id: 'heart-tank-swap',
+      className: 'ui-panel-strong encounter-alert heart-tank-swap',
+      kinds: TANK_SWAP_ALERT_KINDS,
     });
     this.finalPhase = new HeartFinalPhasePanel(deps);
     this.temple = new EncounterAlert(deps, {
@@ -323,6 +343,13 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     this.knot.paint(knot);
+    // The raid's one tank swap cue (an action prompt: never the hints'; off
+    // the shared slot, so it never makes the use prompt yield).
+    this.tankSwap.paint(
+      dungeonPromptEnabled('tankSwap', hints)
+        ? buildTankSwapAlertView({ self: p, party: f.party, entity })
+        : HINT_HIDDEN,
+    );
     // The Masterless Strength's raid HUD (its phase readout; its Overload
     // bars are the room's ring): no personal alert since Jose's playtest of
     // 2026-11-19 (its marks read in the world).
@@ -376,6 +403,7 @@ export class DungeonPrompts {
     this.crypt.dispose();
     this.quench.dispose();
     this.knot.dispose();
+    this.tankSwap.dispose();
     this.finalPhase.dispose();
     this.temple.dispose();
     this.kitUse.dispose();

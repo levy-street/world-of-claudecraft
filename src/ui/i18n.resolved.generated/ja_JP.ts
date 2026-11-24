@@ -7448,6 +7448,11 @@ export const ja_JP: EnTranslations = {
       "rimeAria": "生ける霧氷：砕くまで残り{left}/{whole}の回復",
       "temperedTitle": "タンク交代！x{stacks}"
     },
+    "tankSwap": {
+      "swapTitle": "Swap x{stacks}",
+      "tauntTitle": "Taunt",
+      "timeAria": "{seconds} seconds left on the debuff"
+    },
     "heatGuardian": {
       "say": {
         "intro": "虫けらどもめ。最初の炎に這い入り、生きて出られると思ったか？お前たちの種族が火を知るより前から、我は燃えていた。ならば共に燃え尽きよ！",

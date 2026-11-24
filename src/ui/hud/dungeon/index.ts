@@ -1,7 +1,7 @@
 // HUD domain: dungeon encounter prompts the local player acts on: the Gaol
 // Turnkey's Iron Cage escape, Gaoler Ossick's chain alert, the Wildheart
-// Basin's, the Gravewyrm Sanctum's, the Hollow Crypt's and the Drowned Temple's alerts (the
-// shared encounter alert painter) and the trash engine's use prompt (a Soul Brazier to topple, a
+// Basin's, the Gravewyrm Sanctum's, the Hollow Crypt's and the Drowned Temple's alerts and
+// the Smith's Heart's (its tank swap chip among them) (the shared encounter alert painter) and the trash engine's use prompt (a Soul Brazier to topple, a
 // Remembrance Candle to relight, on the same painter), composed by the HUD as one DungeonPrompts member; and the
 // floating avoidance word. Also the dungeon objectives tracker: the plate at
 // the top of the right tracker stack that names the dungeon and counts its
@@ -93,6 +93,14 @@ export type {
   SanctumAlertView,
 } from './sanctum_alert_view';
 export { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
+export type {
+  TankSwapAlertInput,
+  TankSwapAlertKind,
+  TankSwapAlertView,
+  TankSwapAura,
+  TankSwapBody,
+} from './tank_swap_alert_view';
+export { buildTankSwapAlertView, TANK_SWAP_ALERT_KINDS } from './tank_swap_alert_view';
 export type { TempleSceneEntity, TempleSceneWorld } from './temple_alert_scene_core';
 export { TempleAlertSceneScan } from './temple_alert_scene_core';
 export type {

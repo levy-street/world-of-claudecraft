@@ -7448,6 +7448,11 @@ export const ko_KR: EnTranslations = {
       "rimeAria": "살아 있는 서리: 깨뜨리기까지 치유 {whole} 중 {left} 남음",
       "temperedTitle": "탱커 교대! x{stacks}"
     },
+    "tankSwap": {
+      "swapTitle": "Swap x{stacks}",
+      "tauntTitle": "Taunt",
+      "timeAria": "{seconds} seconds left on the debuff"
+    },
     "heatGuardian": {
       "say": {
         "intro": "벌레들. 최초의 불꽃 속으로 기어들어 와 놓고 살아 나가길 바라느냐? 너희 족속이 불을 알기 전부터 나는 타오르고 있었다. 그렇다면 함께 타올라라!",

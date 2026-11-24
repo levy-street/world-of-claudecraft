@@ -16,7 +16,9 @@
 //    button), Gaoler Ossick's chain alert (a live gauge the player steers by:
 //    the links left on the anchor and the shackle's reach used, with the
 //    distance), the Smith's Heart's Guardian of the Quench cold bar (the
-//    player's own gauge, steered by the whole fight), and the use prompt (the
+//    player's own gauge, steered by the whole fight), the Smith's Heart's
+//    tank swap alert (Swap or Taunt: a press the tank must make, and the one
+//    raid-wide cue Jose kept on 2026-11-24; it sits off the shared slot), and the use prompt (the
 //    panel is the interact press on a brazier or a candle).
 //    It is a player-chosen interface preference, never a graphics-tier knob:
 //    this module takes the setting's own boolean and reads no preset, effects
@@ -39,6 +41,7 @@ export type DungeonPromptId =
   | 'crypt'
   | 'quench'
   | 'knot'
+  | 'tankSwap'
   | 'temple'
   | 'kitUse';
 
@@ -53,6 +56,7 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   crypt: true,
   quench: false,
   knot: false,
+  tankSwap: false,
   temple: true,
   kitUse: false,
 };

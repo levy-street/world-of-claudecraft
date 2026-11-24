@@ -7448,6 +7448,11 @@ export const ru_RU: EnTranslations = {
       "rimeAria": "Живая изморозь: осталось пробить {left} из {whole} ед. исцеления",
       "temperedTitle": "Смена танков! x{stacks}"
     },
+    "tankSwap": {
+      "swapTitle": "Swap x{stacks}",
+      "tauntTitle": "Taunt",
+      "timeAria": "{seconds} seconds left on the debuff"
+    },
     "heatGuardian": {
       "say": {
         "intro": "Насекомые. Вы вползаете в первое пламя и надеетесь уйти? Я горел ещё до того, как ваш род узнал огонь. Так горите же вместе с ним!",

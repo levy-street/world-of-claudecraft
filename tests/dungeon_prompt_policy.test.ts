@@ -57,6 +57,7 @@ const ALL_IDS: DungeonPromptId[] = [
   'crypt',
   'quench',
   'knot',
+  'tankSwap',
   'temple',
   'kitUse',
 ];
@@ -75,6 +76,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       crypt: true,
       quench: false,
       knot: false,
+      tankSwap: false,
       temple: true,
       kitUse: false,
     });
@@ -524,7 +526,9 @@ describe('DungeonPrompts: the Hammer Council paints nothing on the screen', () =
   // The team's feedback of 2026-11-17 ("too many abilities have on-screen
   // markers"): every council mark reads in the world only (its floor ring, the
   // Rush's lane and red arrow, the rock's boulder, the Wake's ghost pillar).
-  it('no council mark mounts or shows a prompt, with the hints on or off, nor frees the slot', () => {
+  // The one exception (Jose's rule of 2026-11-24): Hammer's Weight is the
+  // raid's tank swap, so it shows the shared tank swap chip and nothing else.
+  it('no council mark mounts or shows a prompt but the tank swap chip, nor frees the slot', () => {
     const marks: Auras = [
       COUNCIL_AURAS.rushMark,
       COUNCIL_AURAS.rockMark,
@@ -544,15 +548,17 @@ describe('DungeonPrompts: the Hammer Council paints nothing on the screen', () =
         expect(
           showing.map((el) => el.id),
           mark.id,
-        ).toEqual([]);
+        ).toEqual(mark.id === COUNCIL_AURAS.weight ? ['heart-tank-swap'] : []);
         r.prompts.dispose();
       }
     }
-    // A mark on the player never takes the use prompt's slot from a brazier.
+    // A mark on the player never takes the use prompt's slot from a brazier
+    // (the tank swap chip sits off the slot).
     const r = rig();
     r.add(brazier());
     r.prompts.paint(r.frame(true, marks));
     expect(r.shown('kit-use-prompt')).toBe(true);
+    expect(r.shown('heart-tank-swap')).toBe(true);
     r.prompts.dispose();
   });
 });

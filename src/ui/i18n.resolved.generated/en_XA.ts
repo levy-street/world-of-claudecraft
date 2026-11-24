@@ -7448,6 +7448,11 @@ export const en_XA: EnTranslations = {
       "rimeAria": "[Ļíʋíñĝ Ŕíɱé: {left} óƒ {whole} ĥéáļíñĝ ļéƒţ ţó ƀŕéáķ íţ]",
       "temperedTitle": "[Šŵáþ ţáñķš! ẋ{stacks}]"
     },
+    "tankSwap": {
+      "swapTitle": "[Šŵáþ ẋ{stacks}]",
+      "tauntTitle": "[Ţáúñţ]",
+      "timeAria": "[{seconds} šéçóñðš ļéƒţ óñ ţĥé ðéƀúƒƒ]"
+    },
     "heatGuardian": {
       "say": {
         "intro": "[Íñšéçţš. Ýóú çŕáŵļ íñţó ţĥé ƒíŕšţ ƒļáɱé áñð éẋþéçţ ţó ļéáʋé? Í ŵáš ƀúŕñíñĝ ƀéƒóŕé ýóúŕ ķíñð ļéáŕñéð ƒíŕé. Ţĥéñ ƀúŕñ ŵíţĥ íţ!]",

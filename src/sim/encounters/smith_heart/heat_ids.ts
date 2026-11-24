@@ -444,6 +444,9 @@ export const HEAT_TUNING = {
   gripPerTick: 9,
   gripSeconds: 15,
   gripMaxStacks: 10,
+  /** The tanks swap at this many Cinder Grip stacks, every tier (the bot
+   *  raid of 2026-11-04; the HUD's tank swap alert reads it, tank_swap_ids.ts). */
+  gripSwap: 5,
   // The overflows' lava waves (heat_waves.ts; their pace per tier,
   // HEAT_DIFFICULTY `waves`): a ring leaves the wellspring's lip and rolls
   // out past the Hearth's farthest wall (the floor reaches about 52 yd from

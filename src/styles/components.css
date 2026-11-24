@@ -19889,18 +19889,6 @@
   #heart-quench-alert.is-rime {
     animation: bce-throb 0.9s ease-in-out infinite alternate;
   }
-  /* Rime-Tempered at its swap count (quench_temper.ts): the tank's call to
-     swap, the title in the hostile tone over the cold bar in the frost tone. */
-  #heart-quench-alert.is-tempered {
-    border-color: var(--color-hostile);
-    animation: bce-throb 0.9s ease-in-out infinite alternate;
-  }
-  #heart-quench-alert.is-tempered .fa-title {
-    color: var(--color-hostile);
-  }
-  #heart-quench-alert.is-tempered .fa-fill {
-    --bar-color: var(--color-debuff-frost);
-  }
   #heart-quench-alert.is-water {
     border-color: var(--color-mana);
   }
@@ -19986,12 +19974,6 @@
   }
   #player-frame > #heart-quench-alert.is-water {
     --qa-tone: var(--color-mana);
-  }
-  /* Rime-Tempered at its swap count: the docked bar in the hostile tone,
-     pulsing like the freeze it warns of. */
-  #player-frame > #heart-quench-alert.is-tempered {
-    --qa-tone: var(--color-hostile);
-    animation: heart-quench-dock-pulse 0.7s ease-in-out infinite alternate;
   }
   #player-frame > #heart-quench-alert.is-freezing {
     animation: none;
@@ -20093,15 +20075,8 @@
   #heart-knot-alert.is-lip .fa-bar {
     --bar-color: var(--color-debuff-fire);
   }
-  /* The tank swap (breath_blow.ts): Wind-Battered in the storm's teal,
-     Thunder-Laden in its violet, a ruinous Bellows Blow in the hostile tone;
-     each title in the hostile tone (the tank's call to swap). */
-  #heart-knot-alert.is-charged {
-    border-color: var(--color-debuff-shadow);
-  }
-  #heart-knot-alert.is-charged .fa-bar {
-    --bar-color: var(--color-debuff-shadow);
-  }
+  /* A ruinous Bellows Blow (breath_blow.ts) in the hostile tone (the swap
+     itself is the raid's tank swap alert, #heart-tank-swap). */
   #heart-knot-alert.is-ruin {
     border-color: var(--color-hostile);
     animation: bce-throb 0.9s ease-in-out infinite alternate;
@@ -20109,8 +20084,6 @@
   #heart-knot-alert.is-ruin .fa-bar {
     --bar-color: var(--color-hostile);
   }
-  #heart-knot-alert.is-battered .fa-title,
-  #heart-knot-alert.is-charged .fa-title,
   #heart-knot-alert.is-ruin .fa-title {
     color: var(--color-hostile);
   }
@@ -20125,6 +20098,105 @@
     font-size: 13px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- The Smith's Heart's tank swap alert ---------- */
+  /* Self-mounted by the shared encounter alert painter from
+     src/ui/hud/dungeon/tank_swap_alert_view.ts: the raid's one tank swap cue
+     (Jose's rule of 2026-11-24: for the tanks only, and calm). A small chip
+     off the screen's middle, level with the target frame's stock seat just
+     right of the action bar, so it never covers the boss or the floor's
+     telegraphs. Swap: the stacks and a thin bar of the debuff's time left, in
+     the hostile tone. Taunt: one word in gold. It fades in with one soft pulse
+     and fades out; nothing flashes while it stays. Every tier, never hidden
+     by the hints setting; it never takes the pointer. */
+  #heart-tank-swap {
+    position: absolute;
+    left: calc(50% + var(--action-rail-w) / 2 + 14px);
+    top: calc(
+      100% -
+      var(--unit-frame-seat-offset) -
+      var(--stance-row-lift, 0px) -
+      var(--pet-row-lift, 0px)
+    );
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    z-index: 7;
+    min-width: 92px;
+    max-width: 180px;
+    padding: 5px 12px 6px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 1px solid var(--color-hostile);
+    opacity: 0.94;
+  }
+  #heart-tank-swap .fa-title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: var(--color-hostile);
+  }
+  #heart-tank-swap .fa-line,
+  #heart-tank-swap .fa-hint,
+  #heart-tank-swap .fa-bar-label {
+    display: none;
+  }
+  #heart-tank-swap .fa-bar {
+    --bar-h: 4px;
+    --bar-color: var(--color-hostile);
+    width: 100%;
+  }
+  #heart-tank-swap .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-tank-swap.is-taunt {
+    border-color: var(--color-gold-300);
+  }
+  #heart-tank-swap.is-taunt .fa-title {
+    color: var(--color-gold-300);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    #heart-tank-swap {
+      transition:
+        opacity 0.25s ease-out,
+        display 0.25s allow-discrete;
+      animation: heart-tank-swap-in 0.5s ease-out 1;
+    }
+    #heart-tank-swap[style*="display: none"] {
+      opacity: 0;
+    }
+    @starting-style {
+      #heart-tank-swap {
+        opacity: 0;
+      }
+    }
+  }
+  @keyframes heart-tank-swap-in {
+    0% {
+      scale: 1.12;
+    }
+    45% {
+      scale: 0.98;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  /* Touch: the unit frames sit at the top, so the chip waits under the
+     target frame's corner, clear of the action ring and the joystick. */
+  body.mobile-touch #heart-tank-swap {
+    left: auto;
+    transform: none;
+    right: 12px;
+    top: 34%;
   }
 
   /* ---------- The Masterless Strength's phase readout (the raid HUD) ---------- */

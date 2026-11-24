@@ -359,30 +359,27 @@ describe('The Breath swap: what the tank reads', () => {
       expect(t(`abilityUi.cast.${id}` as never)).not.toContain('abilityUi');
   });
 
-  it('the alert calls the swap at the tier count and the ruinous blow first', () => {
-    const below = alert([
-      { id: BREATH_AURAS.battered, stacks: 2, value3: 3, remaining: 9, duration: 25 },
-    ]);
-    expect(below.visible).toBe(false);
+  it('the knot alert keeps the ruinous blow only (the swap is the shared tank swap alert)', () => {
+    // Wind-Battered and Thunder-Laden at their count paint nothing here now
+    // (tests/smith_heart_tank_swap_alert.test.ts owns the swap's cue).
     const due = alert([
-      { id: BREATH_AURAS.battered, stacks: 3, value3: 3, remaining: 20, duration: 25 },
+      { id: BREATH_AURAS.battered, remaining: 20, duration: 25 },
+      { id: BREATH_AURAS.thunderLaden, remaining: 5, duration: 25 },
     ]);
-    if (!due.visible) throw new Error('hidden');
-    expect(due.kind).toBe('battered');
-    expect(due.title).toBe('Wind-Battered x3: swap tanks!');
-    expect(due.progress).toBeCloseTo(0.8);
-    const charged = alert([
-      { id: BREATH_AURAS.thunderLaden, stacks: 4, value3: 4, remaining: 5, duration: 25 },
-    ]);
-    expect(charged.visible && charged.title).toBe('Thunder-Laden x4: swap tanks!');
+    expect(due.visible).toBe(false);
     const ruin = alert([
-      { id: BREATH_AURAS.battered, stacks: 4, value3: 3, remaining: 20, duration: 25 },
+      { id: BREATH_AURAS.battered, remaining: 20, duration: 25 },
       { id: BREATH_AURAS.blowMark, value2: 1, remaining: 1, duration: 1.7 },
     ]);
-    expect(ruin.visible && ruin.kind).toBe('ruin');
+    if (!ruin.visible) throw new Error('hidden');
+    expect(ruin.kind).toBe('ruin');
+    expect(ruin.title).toBe('Bellows Blow throws you off the edge!');
+    // A blow that is not ruinous asks nothing.
+    const safe = alert([{ id: BREATH_AURAS.blowMark, value2: 0, remaining: 1, duration: 1.7 }]);
+    expect(safe.visible).toBe(false);
     // The Knotted Gale's marks still come first.
     const carry = alert([
-      { id: BREATH_AURAS.battered, stacks: 4, value3: 3, remaining: 20, duration: 25 },
+      { id: BREATH_AURAS.blowMark, value2: 1, remaining: 1, duration: 1.7 },
       { id: BREATH_AURAS.laden, remaining: 8, duration: 15 },
     ]);
     expect(carry.visible && carry.kind).toBe('carry');

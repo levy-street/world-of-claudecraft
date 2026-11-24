@@ -762,6 +762,7 @@ const UI_PURE_CORES = [
   // final's, the Knotted Gale's (the Hammer Council has none since 2026-11-17).
   'src/ui/hud/dungeon/quench_alert_view.ts',
   'src/ui/hud/dungeon/knot_alert_view.ts',
+  'src/ui/hud/dungeon/tank_swap_alert_view.ts',
   'src/ui/hud/dungeon/heart_final_phase_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',

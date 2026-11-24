@@ -534,6 +534,9 @@ export const COUNCIL_TUNING = {
   weightSeconds: 25,
   /** Physical damage taken while it holds (+100 percent). */
   weightTaken: 1,
+  /** The tank swap is due at this many Hammer's Weights (one: the debuff
+   *  itself; the HUD's tank swap alert reads it, tank_swap_ids.ts). */
+  weightSwap: 1,
   // Mountain's Rush (the Guardian's charge): its first bar, the time between
   // two, the bar (the mark's warning), the lane's half width, the wind-up
   // (the line is fixed when the bar lands; the Guardian plants and braces

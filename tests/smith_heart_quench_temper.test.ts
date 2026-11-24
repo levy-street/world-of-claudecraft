@@ -252,21 +252,16 @@ describe('Rime-Tempered: what the tank reads', () => {
     expect(localizeSimAuraName('Rime-Tempered')).toBe('Rime-Tempered');
   });
 
-  it('the alert calls the swap at the tier count over the cold bar, and not before', () => {
+  it('the cold bar stays the cold at the swap count (the swap is the shared tank swap alert)', () => {
     const cold = { id: QUENCH_AURAS.cold, value: 60, value2: 1 };
-    const two = buildQuenchAlertView({
-      auras: [cold, { id: QUENCH_AURAS.tempered, stacks: 2, value2: 20, value3: 3 }],
-    });
-    expect(two.visible && two.kind).toBe('cold');
     const three = buildQuenchAlertView({
       auras: [cold, { id: QUENCH_AURAS.tempered, stacks: 3, value2: 20, value3: 3 }],
     });
     if (!three.visible) throw new Error('hidden');
-    expect(three.kind).toBe('tempered');
-    expect(three.title).toBe('Swap tanks! x3');
-    // The bar stays the cold.
+    expect(three.kind).toBe('cold');
+    expect(three.title).toBe('Cold');
     expect(three.progress).toBeCloseTo(0.6);
-    // The freeze still outranks it.
+    // The freeze still outranks the bar.
     const frozen = buildQuenchAlertView({
       auras: [
         cold,

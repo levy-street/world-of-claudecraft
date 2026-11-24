@@ -10384,7 +10384,8 @@ export const hudChromeStrings = {
     throwTap: 'Tap here at the edge to throw',
     throwClick: 'Click here at the edge to throw',
     throwAria: 'Throw the Knotted Gale into the void',
-    // The tank swap (breath_blow.ts): the tank's own call.
+    // The tank swap (breath_blow.ts): RETIRED 2026-11-24 for the raid's shared
+    // tank swap alert (tankSwap below); kept for the overlays' reviewed rows.
     batteredTitle: 'Wind-Battered x{stacks}: swap tanks!',
     chargedTitle: 'Thunder-Laden x{stacks}: swap tanks!',
     ruinTitle: 'Bellows Blow throws you off the edge!',
@@ -10469,10 +10470,19 @@ export const hudChromeStrings = {
     rimeTitle: 'Living Rime! Leave the group',
     rimeBar: 'Rime {left} / {whole}',
     rimeAria: 'Living Rime: {left} of {whole} healing left to break it',
-    // Rime-Tempered at its swap count (quench_temper.ts): the tank's own call.
-    // Short: it rides the docked cold bar's small title (the stacks read on
-    // the debuff and its tooltip).
+    // Rime-Tempered at its swap count (quench_temper.ts): RETIRED 2026-11-24
+    // for the raid's shared tank swap alert (tankSwap below); kept for the
+    // overlays' reviewed rows.
     temperedTitle: 'Swap tanks! x{stacks}',
+  },
+  // The Smith's Heart's tank swap alert (src/ui/hud/dungeon/
+  // tank_swap_alert_view.ts): the raid's one tank swap cue, a word each, no
+  // sentence (Jose's rule of 2026-11-24). Swap: the tank carrying the swap
+  // debuff at its count (its stacks); Taunt: the other tank.
+  tankSwap: {
+    swapTitle: 'Swap x{stacks}',
+    tauntTitle: 'Taunt',
+    timeAria: '{seconds} seconds left on the debuff',
   },
   // The Smith's Heart's Guardian of the Heat (encounters/smith_heart/heat*.ts):
   // what the guardian SAYS (heat_voice.ts HEAT_LINES, the same English). Its

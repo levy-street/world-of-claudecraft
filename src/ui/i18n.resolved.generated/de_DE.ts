@@ -7448,6 +7448,11 @@ export const de_DE: EnTranslations = {
       "rimeAria": "Living Rime: {left} of {whole} healing left to break it",
       "temperedTitle": "Swap tanks! x{stacks}"
     },
+    "tankSwap": {
+      "swapTitle": "Swap x{stacks}",
+      "tauntTitle": "Taunt",
+      "timeAria": "{seconds} seconds left on the debuff"
+    },
     "heatGuardian": {
       "say": {
         "intro": "Insects. You crawl into the first flame and expect to leave? I was burning before your kind learned fire. Then burn with it!",

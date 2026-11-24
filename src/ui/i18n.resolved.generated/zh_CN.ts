@@ -7448,6 +7448,11 @@ export const zh_CN: EnTranslations = {
       "rimeAria": "活体霜壳：还需{left}/{whole}点治疗才能击碎",
       "temperedTitle": "换坦！x{stacks}"
     },
+    "tankSwap": {
+      "swapTitle": "Swap x{stacks}",
+      "tauntTitle": "Taunt",
+      "timeAria": "{seconds} seconds left on the debuff"
+    },
     "heatGuardian": {
       "say": {
         "intro": "虫子们。你们爬进最初之焰，还指望能离开？在你们的族类学会用火之前，我就已在燃烧。那就与它一同燃尽吧！",

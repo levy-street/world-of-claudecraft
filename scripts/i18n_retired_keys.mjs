@@ -396,6 +396,13 @@ export const RETIRED_KEYS = [
   'hudChrome.finalOverload.barAria',
   'hudChrome.finalOverload.activeAria',
   'hudChrome.finalOverload.groupAria',
+  // -- The Smith's Heart's tank swaps moved to ONE shared alert (Jose's rule of
+  // 2026-11-24: src/ui/hud/dungeon/tank_swap_alert_view.ts, hudChrome.tankSwap.*).
+  // The Breath's Wind-Battered and Thunder-Laden panels and the Quench cold bar's
+  // Rime-Tempered title no longer render.
+  'hudChrome.knotAlert.batteredTitle',
+  'hudChrome.knotAlert.chargedTitle',
+  'hudChrome.quenchAlert.temperedTitle',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

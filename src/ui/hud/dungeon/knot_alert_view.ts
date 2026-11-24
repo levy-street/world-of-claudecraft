@@ -12,10 +12,12 @@
 //    so its one hint is the key (or the tap) that throws, and its title says
 //    so louder at the lip of a gap (a portal is a shortcut, never needed:
 //    Jose's call of 2026-11-08).
-//  - the tank swap (breath_blow.ts), under the Gale's marks: Wind-Battered or
-//    Thunder-Laden at the tier's swap count (it rides the aura's `value3`),
-//    the bar the stacks' time left; and a Bellows Blow under way that will
-//    throw its tank off the Cornice, the bar the cast's time.
+//  - under the Gale's marks, a Bellows Blow under way that will throw its
+//    tank off the Cornice (Heroic's lethal fifth blow, breath_blow.ts), the
+//    bar the cast's time. The swap itself (Wind-Battered, Thunder-Laden at the
+//    tier's count) is the raid's shared tank swap alert since 2026-11-24
+//    (tank_swap_alert_view.ts): the ruin stays here, a different and lethal
+//    call (the tank is about to die, not to hand over).
 // An ACTION prompt (the hints setting never hides it), on every graphics tier.
 // The painter is the shared encounter alert's (encounter_alert_painter.ts).
 
@@ -27,7 +29,7 @@ import { formatNumber, t } from '../../i18n';
 import type { EncounterAlertHidden, EncounterAlertLive } from './encounter_alert_view';
 
 type PortalKind = 'portalA' | 'portalB' | 'portalC' | 'portalD';
-export type KnotAlertKind = PortalKind | 'carry' | 'lip' | 'battered' | 'charged' | 'ruin';
+export type KnotAlertKind = PortalKind | 'carry' | 'lip' | 'ruin';
 
 /** Every kind class the painter toggles (the CSS keys on them). */
 export const KNOT_ALERT_KINDS: readonly KnotAlertKind[] = [
@@ -37,8 +39,6 @@ export const KNOT_ALERT_KINDS: readonly KnotAlertKind[] = [
   'portalD',
   'carry',
   'lip',
-  'battered',
-  'charged',
   'ruin',
 ];
 
@@ -83,9 +83,7 @@ interface AlertAura {
   id: string;
   remaining?: number;
   duration?: number;
-  stacks?: number;
   value2?: number;
-  value3?: number;
 }
 
 export interface KnotAlertInput {
@@ -122,7 +120,7 @@ export function buildKnotAlertView(input: KnotAlertInput): KnotAlertView {
       portal = m;
     }
   }
-  if (!mark) return swapView(input.auras);
+  if (!mark) return ruinView(input.auras);
   const left = Math.max(0, mark.remaining ?? 0);
   const total = Math.max(1e-6, mark.duration ?? 1);
   const seconds = whole(left);
@@ -163,8 +161,8 @@ export function buildKnotAlertView(input: KnotAlertInput): KnotAlertView {
   };
 }
 
-/** A timed swap panel: its title, the bar its aura's time left. */
-function swapPanel(kind: KnotAlertKind, title: string, a: AlertAura): KnotAlertLive {
+/** A timed panel: its title, the bar its aura's time left. */
+function timedPanel(kind: KnotAlertKind, title: string, a: AlertAura): KnotAlertLive {
   const left = Math.max(0, a.remaining ?? 0);
   const total = Math.max(1e-6, a.duration ?? 1);
   const seconds = whole(left);
@@ -183,31 +181,11 @@ function swapPanel(kind: KnotAlertKind, title: string, a: AlertAura): KnotAlertL
   };
 }
 
-/** The tank swap's panel (breath_blow.ts): a ruinous Bellows Blow coming,
- *  else a swap aura at its tier's count, else nothing. */
-function swapView(auras: readonly AlertAura[]): KnotAlertView {
-  let battered: AlertAura | null = null;
-  let charged: AlertAura | null = null;
+/** The ruinous Bellows Blow's panel (breath_blow.ts), else nothing. */
+function ruinView(auras: readonly AlertAura[]): KnotAlertView {
   for (const a of auras) {
     if (a.id === BREATH_AURAS.blowMark && (a.value2 ?? 0) > 0)
-      return swapPanel('ruin', t('hudChrome.knotAlert.ruinTitle'), a);
-    if (a.id === BREATH_AURAS.battered) battered = a;
-    else if (a.id === BREATH_AURAS.thunderLaden) charged = a;
+      return timedPanel('ruin', t('hudChrome.knotAlert.ruinTitle'), a);
   }
-  const due = (a: AlertAura | null) =>
-    a !== null && Math.round(a.stacks ?? 0) >= Math.max(1, a.value3 ?? Number.POSITIVE_INFINITY);
-  const n = (a: AlertAura) => formatNumber(Math.round(a.stacks ?? 0), { maximumFractionDigits: 0 });
-  if (battered && due(battered))
-    return swapPanel(
-      'battered',
-      t('hudChrome.knotAlert.batteredTitle', { stacks: n(battered) }),
-      battered,
-    );
-  if (charged && due(charged))
-    return swapPanel(
-      'charged',
-      t('hudChrome.knotAlert.chargedTitle', { stacks: n(charged) }),
-      charged,
-    );
   return HIDDEN;
 }
