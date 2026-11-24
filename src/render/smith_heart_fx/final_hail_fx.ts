@@ -70,7 +70,7 @@ void main() {
   vec3 n = normalize(vN);
   vec3 v = normalize(vView);
   float ndv = abs(dot(n, v));
-  float fres = pow(1.0 - ndv, 2.2);
+  float fres = pow(max(1.0 - ndv, 0.0), 2.2);
   vec3 l = normalize(vec3(-0.35, 0.85, 0.4));
   float key = max(dot(n, l), 0.0);
   // Deep blue where you look through it, paler on the lit facets.
@@ -137,7 +137,7 @@ void main() {
   // Wisps peeling off the sides as it thins (never a straight beam).
   float xw = x + (n - 0.5) * 0.9 * y;
   float core = exp(-xw * xw * 4.0);
-  float a = core * pow(1.0 - y, 1.6) * smoothstep(0.2, 0.75, n + 0.25 * (1.0 - y)) * smoothstep(0.0, 0.08, y);
+  float a = core * pow(max(1.0 - y, 0.0), 1.6) * smoothstep(0.2, 0.75, n + 0.25 * (1.0 - y)) * smoothstep(0.0, 0.08, y);
   vec3 col = mix(vec3(0.94, 0.98, 1.0), vec3(0.55, 0.8, 1.0), y);
   gl_FragColor = vec4(col, clamp(a, 0.0, 1.0) * 0.5);
 }

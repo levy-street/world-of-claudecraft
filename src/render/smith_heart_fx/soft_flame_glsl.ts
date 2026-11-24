@@ -90,7 +90,7 @@ void main() {
   float w = 0.78 * sqrt(clamp(y / 0.16, 0.0, 1.0)) * pow(max(1.0 - y, 0.0), 0.85);
   float edge = max(w * (0.55 + 0.85 * n), 1e-3);
   float I = 1.0 - smoothstep(0.0, edge, abs(xx));
-  I = pow(I, 0.7);
+  I = pow(max(I, 0.0), 0.7);
   // The tip breaks into tongues; holes open in the upper flame.
   I *= 1.0 - smoothstep(0.42, 0.95, y + (0.5 - n) * 0.55);
   I -= smoothstep(0.55, 0.95, n2) * smoothstep(0.25, 0.8, y) * 0.55;

@@ -67,7 +67,7 @@ void main() {
   float share = clamp(aTongue.y + 0.35 * (sfHash(cyc * 1.7 + seed * 53.0) - 0.5), 0.0, 1.0);
   // Uneven: a few tall flames over a bed of low ones, lower toward the rim.
   float tall = fract(seed * 13.7);
-  float hMax = aFlame.y * (0.42 + 0.58 * pow(tall, 1.5)) * (1.0 - 0.3 * share);
+  float hMax = aFlame.y * (0.42 + 0.58 * pow(max(tall, 0.0), 1.5)) * (1.0 - 0.3 * share);
   float hgt = hMax * (0.72 + 0.28 * life) * aFlame.x;
   vAlpha = aFlame.x * life;
   vHeat = 0.8 + 0.2 * tall;
