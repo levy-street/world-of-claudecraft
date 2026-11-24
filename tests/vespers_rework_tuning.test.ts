@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { VAMPIRIC_TOUCH_HEAL_RATE } from '../src/sim/combat/priest/vampiric_touch';
 import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
+import { DICT, localizeSimAuraName } from '../src/ui/sim_i18n';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Vespers rework tuning: the kit changes
@@ -32,5 +33,12 @@ describe('Vespers rework tuning', () => {
     sim.castAbility('power_infusion');
     expect(sim.player.cooldowns.has('power_infusion'), 'Anointing was cast').toBe(true);
     expect(sim.player.gcdRemaining).toBe(0);
+  });
+
+  it('Duskhymn Ward localizes through the sim aura matcher', () => {
+    expect(localizeSimAuraName('Duskhymn Ward')).toBe('Duskhymn Ward');
+    for (const lang of ['zh_CN', 'zh_TW', 'ko_KR', 'ja_JP', 'ru_RU'] as const) {
+      expect(DICT[lang]['aura.duskhymnWard'], lang).not.toBe('Duskhymn Ward');
+    }
   });
 });
