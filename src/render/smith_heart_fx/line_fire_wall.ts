@@ -3,7 +3,9 @@
 // heat_lava_wall_glsl.ts): stacked animated fire curtains (one draw), a smoky
 // dark body under them, the air lit round it, smoke off its tips and a heat
 // haze (when the look asks), tongues leaping off it (one instanced draw),
-// embers and sparks (one point draw). Shared by Firestorm's wall
+// embers and sparks (one point draw); when the look asks, soft flames all
+// across the lane (one instanced draw, soft_flame_glsl.ts) and smoke puffs
+// rolling off its tips (one instanced draw). Shared by Firestorm's wall
 // (final_firestorm_fx.ts) and the Molten Swells' burning crests
 // (heat_swell_fx.ts), so every moving fire in the Smith's Heart reads as one
 // family.
@@ -25,9 +27,12 @@ import {
 import {
   LINE_EMBER_VERT,
   LINE_FIRE_SAMPLES,
+  LINE_FLAME_VERT,
+  LINE_PUFF_VERT,
   LINE_SHEET_VERT,
   LINE_TONGUE_VERT,
 } from './line_fire_glsl';
+import { SOFT_SMOKE_FRAG, softFlameFrag } from './soft_flame_glsl';
 
 /** The wall's look (yards), fixed at the build. */
 export interface LineFireLook {
@@ -47,6 +52,23 @@ export interface LineFireLook {
   gain: number;
   /** The draw order the layers stack from. */
   order: number;
+  /** Soft flames standing all across the lane (0 or absent: none), their
+   *  height, and how far each wanders across between lives (share of the
+   *  lane's half width). */
+  flames?: number;
+  flameHeight?: number;
+  flameSpan?: number;
+  /** Smoke puffs rolling up off the tips (0 or absent: none). */
+  puffs?: number;
+  /** The sheets' foot melts into the floor (no straight line where a sheet
+   *  meets it). */
+  softFoot?: boolean;
+  /** Where across (share of the half width) the sheets start to taper to
+   *  their ends (default 0.72). */
+  ends?: number;
+  /** The sheets fade out as the view swings edge-on to them (a sheet seen
+   *  along its face reads as a flat line); the soft flames carry the wall. */
+  edgeFade?: boolean;
 }
 
 interface Uni {
@@ -122,10 +144,13 @@ export class LineFireWall {
       uHeat: { value: 1 },
       uFrontAlong: { value: 0 },
       uTrail: { value: 0 },
+      uEnds: { value: look.ends ?? 0.72 },
+      uEdgeOn: { value: look.edgeFade ? 1 : 0 },
     };
     const shared = this.shared;
     const ramp = fireRampGlsl('fireRamp');
     const fireFrag = wallFireFrag(ramp);
+    const foot: Record<string, string> = look.softFoot ? { SOFT_FOOT: '' } : {};
     const tongueFrag = wallTongueFrag(ramp);
     const curtain = sheetGeometry(
       look.sheetBack.map((back, i) => [back, 0.13 + i * 0.37 + seed * 0.11] as const),
@@ -187,7 +212,7 @@ export class LineFireWall {
       THREE.NormalBlending,
       1,
       false,
-      { WALL_DARK: '' },
+      { WALL_DARK: '', ...foot },
     );
     // The air lit round it.
     add(
@@ -207,6 +232,8 @@ export class LineFireWall {
       fireFrag,
       THREE.AdditiveBlending,
       4,
+      false,
+      foot,
     );
     const tg = new THREE.InstancedBufferGeometry();
     tg.index = tongueQuad.index;
@@ -228,6 +255,54 @@ export class LineFireWall {
       THREE.AdditiveBlending,
       5,
     );
+    // Soft flames all across the lane, and smoke puffs off the tips.
+    const cards = (count: number, salt: number): THREE.InstancedBufferGeometry => {
+      const g = new THREE.InstancedBufferGeometry();
+      g.index = cardQuad.index;
+      g.setAttribute('position', cardQuad.getAttribute('position'));
+      const a = new Float32Array(count * 2);
+      for (let i = 0; i < count; i++) {
+        a[i * 2] = -1 + (2 * (i + 0.5 + 0.6 * (lineFireHash(i, salt + seed) - 0.5))) / count;
+        a[i * 2 + 1] = lineFireHash(i, salt + 19 + seed);
+      }
+      g.setAttribute('aFlame', new THREE.InstancedBufferAttribute(a, 2));
+      g.instanceCount = count;
+      host.geometries.push(g);
+      return g;
+    };
+    const cardQuad = new THREE.PlaneGeometry(1, 1, 1, 1);
+    host.geometries.push(cardQuad);
+    if (look.puffs)
+      add(
+        'Puffs',
+        cards(look.puffs, 211),
+        { uTime: host.uTime, ...shared, uH: { value: look.height } },
+        LINE_PUFF_VERT,
+        SOFT_SMOKE_FRAG,
+        THREE.NormalBlending,
+        2,
+      );
+    if (look.flames) {
+      const flameU = {
+        ...shared,
+        uH: { value: look.flameHeight ?? look.height },
+        uSpan: { value: (2.4 / look.flames) * (look.flameSpan ?? 1) },
+      };
+      const flameGeo = cards(look.flames, 233);
+      const flameFrag = softFlameFrag(ramp);
+      add(
+        'FlameBody',
+        flameGeo,
+        flameU,
+        LINE_FLAME_VERT,
+        flameFrag,
+        THREE.NormalBlending,
+        3,
+        false,
+        { SOFT_DARK: '' },
+      );
+      add('Flames', flameGeo, flameU, LINE_FLAME_VERT, flameFrag, THREE.AdditiveBlending, 5);
+    }
     const eg = new THREE.BufferGeometry();
     const n = look.embers;
     eg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));

@@ -26,10 +26,16 @@ import {
   firestormWall,
   FIRESTORM_LOOK as L,
 } from './final_firestorm_core';
-import { FS_FLOOR_FRAG, FS_FLOOR_VERT, FS_TRAIL_VERT } from './final_firestorm_glsl';
+import {
+  FS_FLOOR_FRAG,
+  FS_FLOOR_VERT,
+  FS_TRAIL_FLAME_VERT,
+  FS_TRAIL_VERT,
+} from './final_firestorm_glsl';
 import { fireRampGlsl } from './heat_flame_core';
 import { wallFireFrag } from './heat_lava_wall_glsl';
 import { LineFireWall, lineFireHash } from './line_fire_wall';
+import { softFlameFrag } from './soft_flame_glsl';
 
 /** What FinalElementsFx lends the wall. */
 export interface FinalFirestormHost {
@@ -50,7 +56,7 @@ interface Uni {
 /** The longest lane a slot bakes (the sim's rim-to-rim lane is 108 yd). */
 const MAX_LENGTH = 120;
 /** The draw order of the wall's layers over the bodies' order. */
-const AIR = { trail: 2 };
+const AIR = { trail: 2, flameBody: 3, flames: 4 };
 /** The danger edge's colour (the fight's fire threat). */
 const EDGE_RGB = [1, 0.36, 0.08] as const;
 
@@ -78,10 +84,14 @@ interface Slot {
   fz: number;
   trail: THREE.Mesh;
   trailU: Uni;
+  trailFlames: THREE.Mesh[];
   floor: THREE.Mesh;
   floorU: Uni;
-  /** The baked buffers (the trail's floor points, the floor grid). */
+  /** The baked buffers (the trail's floor points, the trail flames' feet,
+   *  the floor grid). */
   trailBase: THREE.BufferAttribute;
+  flameFoot: THREE.BufferAttribute;
+  flameT: Float32Array;
   floorPos: THREE.BufferAttribute;
   floorLane: THREE.BufferAttribute;
 }
@@ -101,7 +111,12 @@ export class FinalFirestormFx {
     const budget = firestormBudget(h.density >= 1);
     // The trail's curtains run along the lane at these shares of its width.
     this.trailLanes = [-0.6, 0.0, 0.62].slice(0, budget.trailSheets);
-    const fireFrag = wallFireFrag(fireRampGlsl('fireRamp'));
+    const ramp = fireRampGlsl('fireRamp');
+    const fireFrag = wallFireFrag(ramp);
+    const flameFrag = softFlameFrag(ramp);
+    const cardQuad = new THREE.PlaneGeometry(1, 1, 1, 1);
+    h.geometries.push(cardQuad);
+    const nFlames = budget.trailFlames;
 
     for (let s = 0; s < pools; s++) {
       const wall = new LineFireWall(
@@ -116,8 +131,13 @@ export class FinalFirestormFx {
           embers: budget.embers,
           smoke: budget.smoke,
           haze: budget.haze,
-          gain: budget.sheets > 1 ? 0.52 : 0.8,
+          gain: budget.sheets > 1 ? 0.45 : 0.7,
           order: h.bodyOrder,
+          flames: budget.flames,
+          flameHeight: L.height * 1.05,
+          puffs: budget.puffs,
+          softFoot: true,
+          edgeFade: true,
         },
         s,
       );
@@ -188,11 +208,57 @@ export class FinalFirestormFx {
         uTrailH: { value: L.trailHeight },
         uTrailRun: { value: L.trailRun },
         uTrailFloor: { value: L.trailFloor },
-        uHeelH: { value: L.heelHeight },
+        // The strips keep a low heel; the soft flames carry the tall one.
+        uHeelH: { value: L.heelHeight * 0.3 },
         uHeelRun: { value: L.heelRun },
-        uGain: { value: 0.62 },
+        uGain: { value: 0.55 },
       };
       const trail = add('smithHeartFirestormTrail', trailGeo, trailU, AIR.trail);
+      (trail.material as THREE.ShaderMaterial).defines = { SOFT_FOOT: '' };
+
+      // The soft flames down the burning lane (their feet baked per lane).
+      const fg = new THREE.InstancedBufferGeometry();
+      fg.index = cardQuad.index;
+      fg.setAttribute('position', cardQuad.getAttribute('position'));
+      const flameFoot = new THREE.InstancedBufferAttribute(new Float32Array(nFlames * 3), 3);
+      flameFoot.setUsage(THREE.DynamicDrawUsage);
+      const flameT = new Float32Array(nFlames * 3);
+      for (let i = 0; i < nFlames; i++) {
+        flameT[i * 3 + 1] = lineFireHash(i, 451 + s) * 2 - 1;
+        flameT[i * 3 + 2] = lineFireHash(i, 467 + s);
+      }
+      fg.setAttribute('aFoot', flameFoot);
+      fg.setAttribute('aT', new THREE.InstancedBufferAttribute(flameT, 3));
+      fg.instanceCount = nFlames;
+      h.geometries.push(fg);
+      const flameU: Uni = { ...trailU, uHeelH: { value: L.heelHeight }, uHeat: { value: 0.9 } };
+      const card = (name: string, blending: THREE.Blending, order: number, dark: boolean) => {
+        const mat = new THREE.ShaderMaterial({
+          name,
+          uniforms: flameU,
+          defines: dark ? { SOFT_DARK: '' } : {},
+          vertexShader: FS_TRAIL_FLAME_VERT,
+          fragmentShader: flameFrag,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+          blending,
+          toneMapped: false,
+          fog: false,
+        });
+        h.materials.push(mat);
+        const obj = new THREE.Mesh(fg, mat);
+        obj.name = name;
+        obj.frustumCulled = false;
+        obj.visible = false;
+        obj.renderOrder = h.bodyOrder + order;
+        h.root.add(obj);
+        return obj;
+      };
+      const trailFlames = [
+        card('smithHeartFirestormTrailFlameBody', THREE.NormalBlending, AIR.flameBody, true),
+        card('smithHeartFirestormTrailFlames', THREE.AdditiveBlending, AIR.flames, false),
+      ];
 
       // The burnt lane on the floor: a grid baked per lane.
       const across = L.floorAcross;
@@ -271,9 +337,12 @@ export class FinalFirestormFx {
         fz: 0,
         trail,
         trailU,
+        trailFlames,
         floor,
         floorU,
         trailBase,
+        flameFoot,
+        flameT,
         floorPos,
         floorLane,
       };
@@ -354,6 +423,21 @@ export class FinalFirestormFx {
       }
     });
     s.trailBase.needsUpdate = true;
+    // The trail flames' feet on the centre line, spread down the lane.
+    const ff = s.flameFoot.array as Float32Array;
+    const n = ff.length / 3;
+    for (let i = 0; i < n; i++) {
+      const along = ((i + 0.5 + 0.8 * (lineFireHash(i, 491) - 0.5)) / n) * s.length;
+      s.flameT[i * 3] = along;
+      const x = s.sx + s.dx * along;
+      const z = s.sz + s.dz * along;
+      ff[i * 3] = x;
+      ff[i * 3 + 1] = g(x, z);
+      ff[i * 3 + 2] = z;
+    }
+    s.flameFoot.needsUpdate = true;
+    const tAttr = s.trailFlames[0].geometry.getAttribute('aT') as THREE.BufferAttribute;
+    tAttr.needsUpdate = true;
     // The floor grid (a little past the lane's edges so the edge line is
     // whole; the shader discards everything past the sim's half width).
     const fp = s.floorPos.array as Float32Array;
@@ -408,6 +492,7 @@ export class FinalFirestormFx {
     u.uFrontAlong.value = look.front;
     u.uTrail.value = trail;
     s.trail.visible = trail > 0.002;
+    for (const f of s.trailFlames) f.visible = trail > 0.002;
     s.floorU.uLive.value = gone ? 0 : 1;
     s.floorU.uBurn.value = rise;
     s.floorU.uChar.value = char;
@@ -420,6 +505,7 @@ export class FinalFirestormFx {
     s.goneAt = -1;
     s.wall.hide();
     s.trail.visible = false;
+    for (const f of s.trailFlames) f.visible = false;
     s.floor.visible = false;
   }
 

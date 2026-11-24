@@ -27,20 +27,20 @@
 export const FIRESTORM_LOOK = {
   /** The wall's fire height (about three players), its tongues' reach. */
   height: 7.2,
-  tongue: 9.5,
+  tongue: 8,
   /** The sheets' depth behind the front (yards): the front sheet stands ON
    *  the front, the rest behind it inside the burnt lane. */
   sheetBack: [0, 1.8, 3.9] as readonly number[],
   /** The low fire still burning down the lane behind the wall: its height at
    *  the wall's heel and the run (yards) over which it dies down to a lick. */
-  trailHeight: 2.6,
+  trailHeight: 3.4,
   trailRun: 34,
   /** The wall's heel: the fire still tall for a few yards behind the front
    *  (the wall's body read from the side), dying away over `heelRun`. */
-  heelHeight: 4.6,
-  heelRun: 6,
+  heelHeight: 2.4,
+  heelRun: 12,
   /** Its least height far behind the front (the lane still burns). */
-  trailFloor: 0.45,
+  trailFloor: 1.2,
   /** The floor lit ahead of the wall (yards), the molten seam's depth. */
   lightAhead: 7,
   seamBack: 3.2,
@@ -67,10 +67,35 @@ export function firestormBudget(detail: boolean): {
   trailSheets: number;
   smoke: boolean;
   haze: boolean;
+  /** Soft flames across the wall and down the burning trail, smoke puffs
+   *  off its tips (the second polish pass, 2026-11-24). */
+  flames: number;
+  trailFlames: number;
+  puffs: number;
 } {
   return detail
-    ? { sheets: 3, tongues: 56, embers: 520, trailSheets: 3, smoke: true, haze: true }
-    : { sheets: 2, tongues: 18, embers: 140, trailSheets: 2, smoke: false, haze: false };
+    ? {
+        sheets: 3,
+        tongues: 12,
+        embers: 520,
+        trailSheets: 3,
+        smoke: true,
+        haze: true,
+        flames: 44,
+        trailFlames: 170,
+        puffs: 14,
+      }
+    : {
+        sheets: 2,
+        tongues: 6,
+        embers: 140,
+        trailSheets: 2,
+        smoke: false,
+        haze: false,
+        flames: 22,
+        trailFlames: 64,
+        puffs: 0,
+      };
 }
 
 /** The wall's state `since` seconds into the sim's burn, on a lane `length`

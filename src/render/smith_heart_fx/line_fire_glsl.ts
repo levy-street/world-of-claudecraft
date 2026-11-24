@@ -11,10 +11,15 @@
 //   LINE_TONGUE_VERT  tongues of flame leaping off it (camera-facing ribbons
 //                     round a bent spine), trailing back;
 //   LINE_EMBER_VERT   embers swirling up off it (and the burnt lane behind, when
-//                     `uTrail`), sparks flung a few yards ahead.
+//                     `uTrail`), sparks flung a few yards ahead;
+//   LINE_FLAME_VERT   soft flames (soft_flame_glsl.ts) standing all across the
+//                     lane at and just behind the front, so the wall reads as
+//                     one continuous body of fire from every side;
+//   LINE_PUFF_VERT    smoke puffs rolling up off its tips and trailing back.
 // Strings only.
 
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
+import { SOFT_FIRE_COMMON } from './soft_flame_glsl';
 
 /** Samples across the lane of the floor (or crest) the wall stands on. */
 export const LINE_FIRE_SAMPLES = 9;
@@ -53,6 +58,8 @@ vec2 fsSide() { return vec2(uDir.y, -uDir.x); }
 export const LINE_SHEET_VERT = /* glsl */ `
 uniform float uH;
 uniform float uLift;
+uniform float uEnds;
+uniform float uEdgeOn;
 attribute vec2 aSheet;
 varying vec2 vUv;
 varying float vMask;
@@ -66,7 +73,7 @@ void main() {
   float lateral = xs * uHalf;
   vec2 xz = uFront.xz - uDir * aSheet.x + side * lateral;
   // Its ends taper inside the lane's edges (never a straight card edge).
-  float ends = 1.0 - smoothstep(0.72, 1.0, abs(xs));
+  float ends = 1.0 - smoothstep(uEnds, 1.0, abs(xs));
   float m = ends * fsOnFloor(xz) * uRise;
   vMask = m;
   vSeed = aSheet.y;
@@ -79,6 +86,11 @@ void main() {
   float h = uH * (0.3 + 0.7 * m);
   float g = fsGround(xs);
   vec3 w = vec3(xz.x, uFront.y + g - 0.3 + uLift * uH + v * (h + 0.3), xz.y);
+  // Seen edge-on a sheet is a flat line, never fire: it fades out as the
+  // view swings along it (uEdgeOn 1), the soft flames carry the wall there.
+  vec3 toCam = cameraPosition - w;
+  float facing = abs(dot(normalize(toCam.xz + vec2(1e-5, 0.0)), uDir));
+  vMask *= mix(1.0, smoothstep(0.1, 0.5, facing), uEdgeOn);
   vUv = vec2(lateral + s, v);
   gl_Position = projectionMatrix * wocCamRelView(w);
 }
@@ -176,5 +188,91 @@ void main() {
   gl_Position = projectionMatrix * mv;
   float sz = aEmber.w * (spark > 0.5 ? 0.7 : 1.0) * (1.0 - 0.5 * life);
   gl_PointSize = vAlpha > 0.002 ? clamp(sz * uPx / max(1.0, -mv.z), 1.0, 36.0) : 0.0;
+}
+`;
+
+/** A soft flame standing across the lane (instanced cards; aFlame: its slot
+ *  across -1..1, seed). Each lives a second or two and kindles again a little
+ *  aside, on its own clock and height; its foot stands behind the front by
+ *  its own half width (the card never reaches past the sim's front) and
+ *  inside the lane by it (never past the lane's edge). */
+export const LINE_FLAME_VERT = /* glsl */ `
+uniform float uH;
+uniform float uSpan;
+attribute vec2 aFlame;
+varying vec2 vUv;
+varying float vSeed;
+varying float vAlpha;
+varying float vHeat;
+${LINE_FIRE_COMMON}
+${SOFT_FIRE_COMMON}
+${CAMERA_RELATIVE_GLSL}
+void main() {
+  vUv = vec2(position.x + 0.5, position.y + 0.5);
+  float seed = aFlame.y;
+  vSeed = seed;
+  float period = 0.9 + 0.8 * fract(seed * 7.31);
+  float ph0 = uTime / period + seed * 3.7;
+  float cyc = floor(ph0);
+  float ph = ph0 - cyc;
+  float life = smoothstep(0.0, 0.18, ph) * (1.0 - smoothstep(0.62, 1.0, ph));
+  float tall = fract(seed * 13.7);
+  float xs = clamp(aFlame.x + uSpan * (sfHash(cyc + seed * 91.0) - 0.5), -1.0, 1.0);
+  // Lower toward the lane's edges (so the fire reaches right out to them).
+  float hMax = uH * (0.55 + 0.5 * tall) * (1.0 - 0.5 * smoothstep(0.45, 1.0, abs(xs)));
+  float halfW = hMax * 0.42;
+  // Inside the lane by its flame's own half width (it never reads wider: the
+  // card's outer corners are empty, soft_flame_glsl.ts).
+  float lat = sign(xs) * min(abs(xs) * uHalf, max(0.0, uHalf - halfW * 0.7));
+  float back = halfW * 0.8 + 2.6 * sfHash(cyc * 1.7 + seed * 53.0);
+  vec2 side = fsSide();
+  vec2 foot = uFront.xz - uDir * back + side * lat;
+  float m = fsOnFloor(foot) * uRise;
+  float gx = clamp(lat / max(uHalf, 0.1), -1.0, 1.0);
+  float hgt = hMax * (0.75 + 0.25 * life) * (0.4 + 0.6 * uRise);
+  vAlpha = m * life;
+  vHeat = 0.85 + 0.15 * tall;
+  if (vAlpha <= 0.003) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  vec3 f3 = vec3(foot.x, uFront.y + fsGround(gx) - 0.05, foot.y);
+  // Trailing back from the run, swaying.
+  float s = seed * 40.0;
+  vec2 lean = -uDir * hMax * 0.3 + side * sin(uTime * 1.3 + s) * hMax * 0.08;
+  vec3 w = sfFlameCard(f3, hgt, halfW, lean, vec2(position.x * 2.0, vUv.y));
+  gl_Position = projectionMatrix * wocCamRelView(w);
+}
+`;
+
+/** A smoke puff rolling up off the wall's tips (instanced cards; aFlame: its
+ *  place across -1..1, seed): it rises from the fire's tips, swells and
+ *  trails back behind the wall, thinning away. */
+export const LINE_PUFF_VERT = /* glsl */ `
+uniform float uH;
+attribute vec2 aFlame;
+varying vec2 vUv;
+varying float vSeed;
+varying float vAlpha;
+varying float vHeat;
+${LINE_FIRE_COMMON}
+${SOFT_FIRE_COMMON}
+${CAMERA_RELATIVE_GLSL}
+void main() {
+  vUv = vec2(position.x + 0.5, position.y + 0.5);
+  float seed = aFlame.y;
+  vSeed = seed;
+  float period = 2.4 + 1.4 * fract(seed * 5.9);
+  float ph0 = uTime / period + seed * 2.3;
+  float cyc = floor(ph0);
+  float life = ph0 - cyc;
+  float xs = clamp(aFlame.x + 0.2 * (sfHash(cyc + seed * 17.0) - 0.5), -0.9, 0.9);
+  vec2 side = fsSide();
+  float back = 1.0 + life * 5.5;
+  vec2 xz = uFront.xz - uDir * back + side * xs * uHalf;
+  float y = uFront.y + fsGround(xs) + uH * (0.7 + 1.5 * life);
+  float halfS = uH * (0.28 + 0.4 * life);
+  vAlpha = uRise * fsOnFloor(xz) * smoothstep(0.0, 0.2, life) * (1.0 - smoothstep(0.5, 1.0, life)) * 0.8;
+  vHeat = 1.0 - smoothstep(0.0, 0.45, life);
+  if (vAlpha <= 0.003) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  vec3 w = sfSmokeCard(vec3(xz.x, y, xz.y), halfS, vec2(position.x * 2.0, position.y * 2.0));
+  gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;

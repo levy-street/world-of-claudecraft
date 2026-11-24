@@ -4,6 +4,8 @@
 // own:
 //   FS_TRAIL_VERT   the low fire still burning down the lane behind the wall
 //                   (baked on the floor once per lane), dying with distance;
+//   FS_TRAIL_FLAME_VERT  soft flames (soft_flame_glsl.ts) standing down the
+//                   burning lane, tall at the wall's heel, low far behind;
 //   FS_FLOOR_VERT / FS_FLOOR_FRAG   the burnt lane on the floor: the molten
 //                   seam at the wall's foot, the floor lit ahead, the burning
 //                   char behind with its cracks, the crisp hot line on both
@@ -13,6 +15,7 @@
 import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { FIRESTORM_LOOK as L } from './final_firestorm_core';
 import { LINE_FIRE_COMMON } from './line_fire_glsl';
+import { SOFT_FIRE_COMMON } from './soft_flame_glsl';
 
 /** The trail's low fire: a strip baked along the lane on the floor
  *  (aBase: the floor point, aTrail: yards from the lane's start, seed),
@@ -47,6 +50,58 @@ void main() {
   // A lick of sway, the tips trailing back.
   w.xz -= uDir * 0.35 * v * v * h;
   vUv = vec2(aTrail.x * 1.1 + aTrail.y * 13.0, v);
+  gl_Position = projectionMatrix * wocCamRelView(w);
+}
+`;
+
+/** A soft flame down the burning lane (instanced cards): aFoot its point on
+ *  the lane's centre line (baked once per lane), aT (yards from the lane's
+ *  start, its share across -1..1, seed). Its height is the trail's (tall at
+ *  the wall's heel, low far behind); its foot stays inside the lane by its
+ *  own half width and behind the front. */
+export const FS_TRAIL_FLAME_VERT = /* glsl */ `
+uniform float uFrontAlong;
+uniform float uTrail;
+uniform float uTrailH;
+uniform float uTrailRun;
+uniform float uTrailFloor;
+uniform float uHeelH;
+uniform float uHeelRun;
+attribute vec3 aFoot;
+attribute vec3 aT;
+varying vec2 vUv;
+varying float vSeed;
+varying float vAlpha;
+varying float vHeat;
+${LINE_FIRE_COMMON}
+${SOFT_FIRE_COMMON}
+${CAMERA_RELATIVE_GLSL}
+void main() {
+  vUv = vec2(position.x + 0.5, position.y + 0.5);
+  float seed = aT.z;
+  vSeed = seed;
+  float period = 1.1 + 1.0 * fract(seed * 7.31);
+  float ph0 = uTime / period + seed * 3.7;
+  float cyc = floor(ph0);
+  float ph = ph0 - cyc;
+  float life = smoothstep(0.0, 0.2, ph) * (1.0 - smoothstep(0.6, 1.0, ph));
+  float along = aT.x + 1.2 * (sfHash(cyc + seed * 91.0) - 0.5);
+  float behind = uFrontAlong - along;
+  float lit = smoothstep(0.6, 1.8, behind) * step(0.0, along);
+  float k = clamp(behind / uTrailRun, 0.0, 1.0);
+  // The trail's height (firestormTrailHeight, final_firestorm_core.ts).
+  float h = uTrailFloor + (uTrailH - uTrailFloor) * (1.0 - k) * (1.0 - k) + uHeelH * exp(-max(behind, 0.0) / uHeelRun);
+  float tall = fract(seed * 13.7);
+  float hMax = h * (0.55 + 0.6 * tall);
+  float halfW = hMax * 0.42;
+  vec2 side = fsSide();
+  vec2 foot = aFoot.xz + uDir * (along - aT.x) + side * sign(aT.y) * min(abs(aT.y) * uHalf, max(0.0, uHalf - halfW * 0.7));
+  vAlpha = lit * uTrail * life * fsOnFloor(foot) * (0.65 + 0.35 * (1.0 - k));
+  vHeat = 0.75 + 0.25 * (1.0 - k);
+  if (vAlpha <= 0.003) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  float s = seed * 40.0;
+  vec2 lean = -uDir * hMax * 0.25 + side * sin(uTime * 1.1 + s) * hMax * 0.08;
+  vec3 w = sfFlameCard(vec3(foot.x, aFoot.y - 0.05, foot.y), hMax * (0.75 + 0.25 * life), halfW, lean, vec2(position.x * 2.0, vUv.y));
   gl_Position = projectionMatrix * wocCamRelView(w);
 }
 `;

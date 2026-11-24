@@ -150,6 +150,11 @@ void main() {
   float foot = 1.0 - smoothstep(0.0, 0.1, y);
   I += foot * (0.05 + 0.3 * wn(vec2(x * 1.7 + sd, t * 2.3)));
   I = clamp(I * 1.3, 0.0, 1.0) * smoothstep(0.0, 0.25, vMask);
+#ifdef SOFT_FOOT
+  // The foot melts into the floor (no straight line where the sheet meets
+  // it: the floor's own molten seam carries the fire down to the stone).
+  I *= smoothstep(0.0, 0.16, y);
+#endif
 #ifdef WALL_DARK
   // The wall's dark body under the fire (normal blend): a smoky deep-red mass
   // a little wider than the flames, so the bright fire has a dark edge and the
