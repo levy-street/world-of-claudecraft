@@ -101,6 +101,12 @@ export interface ObbCollider {
   gridIndex?: number;
   /** See {@link CircleCollider.src}. */
   src?: string;
+  /**
+   * A low wall every sight line passes over (an authored field's
+   * `FieldWall.sightClear`, the Guardian of the Heat's lip wall): it walls
+   * bodies at any height, but line-of-sight checks never read it.
+   */
+  sightClear?: boolean;
 }
 
 /**
@@ -158,6 +164,14 @@ export interface PrismCollider {
 }
 
 export type Collider = CircleCollider | ObbCollider | PrismCollider;
+
+/** Does a sight line at `sightY` pass over `c` without testing its
+ *  footprint: a sight-clear wall always, and (`skipLow`, where tops are
+ *  known) any collider whose top is at or under the line. */
+export function sightPassesOver(c: Collider, sightY: number, skipLow: boolean): boolean {
+  if (c.type === 'obb' && c.sightClear) return true;
+  return skipLow && c.cameraTopY !== undefined && c.cameraTopY <= sightY;
+}
 
 /**
  * The collider shape a HAND-AUTHORED layout emits (arena, delves, rifts, the

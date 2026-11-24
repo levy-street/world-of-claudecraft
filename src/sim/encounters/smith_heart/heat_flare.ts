@@ -13,16 +13,32 @@
 //                    hold it from afar and leave it swinging at nothing.
 //   Wellspring Fire  the whole fight: whoever stands inside the wellspring's
 //                    lip burns every half second.
+//   The lip wall     every tick, fight or not: a player found inside the lip
+//                    wall (a leap or a teleport onto the well; walking in, the
+//                    wall's colliders hold them) is set down on the shore past
+//                    it (`keepOffLip`), never trapped in the fire.
 //   Cinder Grip      the tank's stacking burn is the template's own
 //                    (`stackPoison` on every landed swing, mob/mob_swing.ts):
 //                    nothing here, the tanks swap around 5 stacks.
 //
 // Zero rng but the damage rolls, in player order.
 
+import { PLAYER_BODY_RADIUS } from '../../pathfind';
+import type { InstanceSlot } from '../../sim';
+import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
-import { beyondFlare, inWell } from './heat_geometry';
+import { beyondFlare, inWell, outOfLip } from './heat_geometry';
 import { HEAT_AURAS, HEAT_CUES, HEAT_NAMES, HEAT_TUNING as T } from './heat_ids';
-import { at, auraOf, beamCue, fireHit, type HeatScope, livePlayers, roll } from './heat_scope';
+import {
+  at,
+  auraOf,
+  beamCue,
+  fireHit,
+  type HeatScope,
+  hearthPlayers,
+  livePlayers,
+  roll,
+} from './heat_scope';
 
 /** Mark `p` Flare-Scorched (or refresh it). */
 function scorch(s: HeatScope, p: Entity): void {
@@ -86,4 +102,22 @@ export function stepWellFire(s: HeatScope): Entity[] {
     fireHit(s, p, roll(s, T.wellMin, T.wellMax), HEAT_NAMES.wellFire);
   }
   return hit;
+}
+
+/** Set every living player found inside the lip wall down on the shore past
+ *  it (heat_geometry.ts `outOfLip`). Returns who was moved. */
+export function keepOffLip(ctx: SimContext, inst: InstanceSlot): Entity[] {
+  const moved: Entity[] = [];
+  const o = ctx.instanceOriginOf(inst);
+  for (const p of hearthPlayers(ctx, inst)) {
+    const to = outOfLip(p.pos.x - o.x, p.pos.z - o.z, PLAYER_BODY_RADIUS);
+    if (!to) continue;
+    const g = ctx.groundPos(o.x + to.x, o.z + to.z);
+    p.pos.x = g.x;
+    p.pos.y = g.y;
+    p.pos.z = g.z;
+    ctx.rebucket(p);
+    moved.push(p);
+  }
+  return moved;
 }

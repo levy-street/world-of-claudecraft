@@ -60,13 +60,14 @@ import {
   syncHunted,
 } from './heat_cinders';
 import { clearFist, FIST_SPAN, floorHoldsFist, landFist, startFist, stepSwells } from './heat_fist';
-import { flare, stepFlare, stepWellFire } from './heat_flare';
+import { flare, keepOffLip, stepFlare, stepWellFire } from './heat_flare';
 import {
   HEAT_AURAS,
   HEAT_CASTS,
   HEAT_CUES,
   HEAT_DIFFICULTY,
   HEAT_GUARDIAN,
+  HEAT_HOME_FACING,
   HEAT_MOBS,
   HEAT_NAMES,
   HEAT_OBJECTS,
@@ -520,6 +521,11 @@ function resetHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity): void {
   restoreTierHealth(boss, boss.smithHeartHeat?.basePool);
   restoreTierSwing(boss, boss.smithHeartHeat?.baseSwing);
   boss.smithHeartHeat = undefined;
+  // It stands as it stood before the pull, facing the Hearth's door (it
+  // never walks home, so nothing else turns it back: Jose's playtest of
+  // 2026-11-24 found it staring at the side the last tank held).
+  boss.facing = HEAT_HOME_FACING;
+  boss.prevFacing = HEAT_HOME_FACING;
 }
 
 /** The guardian has fallen: the end is resolved once. */
@@ -552,6 +558,8 @@ function beginHeat(ctx: SimContext, inst: InstanceSlot, boss: Entity): HeatFight
 export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
   const boss = heatGuardian(ctx, inst);
   if (!boss) return;
+  // Nobody is ever left inside the lip wall, in a fight or out of one.
+  keepOffLip(ctx, inst);
   const st0 = boss.smithHeartHeat ?? null;
   if (!living(boss)) {
     if (st0 && !st0.finished) finishHeat(ctx, inst, boss, st0);

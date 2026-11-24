@@ -397,6 +397,29 @@ export const HEAT_PHASE_KIT: Readonly<Record<HeatPhase, HeatPhaseKit>> = {
  *  well grows (pass 4 of 2026-11-06: 8 to 10.5 with the guardian's body). */
 export const HEAT_WELL_R = 10.5;
 
+/** The low wall of basalt stumps round the wellspring's lip (Jose's playtest
+ *  of 2026-11-24: players walked into the stumps and the fire behind them).
+ *  It is solid from the lip (`inner`) to its outer face (`outer`, yards from
+ *  the well's middle): the layout's collider ring (smith_heart_layout.ts
+ *  HEARTH_LIP_WALLS) keeps every body out of it and the fire, the renderer
+ *  draws its stumps over the same band and clips every floor mark at its
+ *  outer face (nothing a player can stand on lies inside it). `height` its
+ *  top over the floor: under a player's eye line, and its colliders are
+ *  sight-clear, so it never hides the guardian. */
+export const HEAT_LIP_WALL = { inner: HEAT_WELL_R, outer: HEAT_WELL_R + 2, height: 1.4 } as const;
+
+/** The guardian's body radius (its template's bodyRadius): the lip wall's
+ *  outer face plus a yard, so a player's melee (BODY_EDGE_MELEE_REACH past
+ *  the body) reaches it from the wall out to four yards beyond it (the same
+ *  playtest: "melee must hit it from farther"). Every reach measured from
+ *  the well's middle (Hearth Flare's, Wakefire's bands) keeps its own number. */
+export const HEAT_BODY_R = HEAT_LIP_WALL.outer + 1;
+
+/** The guardian's facing at rest (sim convention, 0 runs +z): toward the
+ *  Hearth's door in the east, where the raid comes in. Its spawn takes it, and
+ *  a wipe's reset turns it back to it. */
+export const HEAT_HOME_FACING = Math.PI / 2;
+
 /** The guardian's template scale (its drawn size; the renderer's fire
  *  reckons in it): grown with the well in pass 4, 3 to 4. Its own swing's
  *  reach follows its body radius (mob_combat.ts), never this alone. */
@@ -478,8 +501,9 @@ export const HEAT_TUNING = {
   spawnMinFactor: 0.15,
   spawnSlowAt: 0.5,
   /** One reaching this far from the wellspring's middle feeds it (a yard and
-   *  a half past its lip). */
-  spawnReach: HEAT_WELL_R + 1.5,
+   *  a half past the lip wall's outer face: the wall stops its walk there,
+   *  2026-11-24; a yard and a half past the bare lip before). */
+  spawnReach: HEAT_LIP_WALL.outer + 1.5,
   feedHealPct: 0.03,
   feedMin: 380,
   feedMax: 420,

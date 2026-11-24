@@ -15,7 +15,7 @@ import { resolveNearbyInteractionCandidate } from '../src/game/nearby_interactio
 import { SMITH_HEART_DUNGEON } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { handleSmithHeartDevChat } from '../src/sim/dev/smith_heart_dev';
-import { HEAT_GUARDIAN, HEAT_WELL_R } from '../src/sim/encounters/smith_heart/heat_ids';
+import { HEAT_BODY_R, HEAT_GUARDIAN } from '../src/sim/encounters/smith_heart/heat_ids';
 import {
   SMITH_HEART_LOOT_SPOTS,
   smithHeartLootSpot,
@@ -75,16 +75,16 @@ describe('corpse loot reach', () => {
     expect(MOBS.wolf?.bodyRadius).toBeUndefined();
     expect(corpseLootReach({ kind: 'mob', templateId: 'wolf' })).toBe(INTERACT_RANGE);
     expect(corpseLootReach({ kind: 'player', templateId: 'player' })).toBe(INTERACT_RANGE);
-    expect(MOBS[HEAT_GUARDIAN]?.bodyRadius).toBe(HEAT_WELL_R);
+    expect(MOBS[HEAT_GUARDIAN]?.bodyRadius).toBe(HEAT_BODY_R);
     expect(corpseLootReach({ kind: 'mob', templateId: HEAT_GUARDIAN })).toBe(
-      HEAT_WELL_R + INTERACT_RANGE,
+      HEAT_BODY_R + INTERACT_RANGE,
     );
   });
 
   it('lets a looter on the wellspring lip loot the Guardian of the Heat (the real sim path)', () => {
     const { sim, boss } = deadHeatGuardianWithLoot();
     // Standing on the shore one yard past the burning lip.
-    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_WELL_R + 1 };
+    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_BODY_R + 1 };
     const before = sim.ctx.players.get(sim.player.id)?.copper ?? 0;
     expect(sim.lootCorpse(boss.id)).toBe(true);
     expect((sim.ctx.players.get(sim.player.id)?.copper ?? 0) - before).toBeGreaterThan(0);
@@ -93,13 +93,13 @@ describe('corpse loot reach', () => {
 
   it('answers the interact press from the lip, targeted or not, and the RL obs agrees', () => {
     const targeted = deadHeatGuardianWithLoot();
-    targeted.sim.player.pos = { ...targeted.boss.pos, x: targeted.boss.pos.x + HEAT_WELL_R + 1 };
+    targeted.sim.player.pos = { ...targeted.boss.pos, x: targeted.boss.pos.x + HEAT_BODY_R + 1 };
     targeted.sim.player.targetId = targeted.boss.id;
     targeted.sim.interact();
     expect(targeted.boss.lootable).toBe(false);
 
     const { sim, boss } = deadHeatGuardianWithLoot();
-    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_WELL_R + 1 };
+    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_BODY_R + 1 };
     sim.player.targetId = null;
     sim.rebucket(sim.player);
     // The RL observation's proximity slot advertises the corpse the press will take.
@@ -109,7 +109,7 @@ describe('corpse loot reach', () => {
     expect(obs[slot + 4]).toBeCloseTo(0.33, 5);
     sim.interact();
     expect(boss.lootable).toBe(false);
-    expect(maxCorpseLootReach()).toBeGreaterThanOrEqual(HEAT_WELL_R + INTERACT_RANGE);
+    expect(maxCorpseLootReach()).toBeGreaterThanOrEqual(HEAT_BODY_R + INTERACT_RANGE);
   });
 
   it('walk-by autoloot reaches a big open-world body from its edge, and not past it', () => {
@@ -142,7 +142,7 @@ describe('corpse loot reach', () => {
     if (!spot) throw new Error('no spot');
     // The coffer stands well past the body-edge reach on open floor.
     expect(Math.hypot(spot.x - boss.pos.x, spot.z - boss.pos.z)).toBeGreaterThan(
-      HEAT_WELL_R + INTERACT_RANGE,
+      HEAT_BODY_R + INTERACT_RANGE,
     );
     // Neither at the body's edge nor at the coffer: refused.
     sim.player.pos = { ...boss.pos, x: spot.x + INTERACT_RANGE + 1, z: spot.z };
@@ -186,7 +186,7 @@ describe('corpse loot reach', () => {
     const spot = smithHeartLootSpot(HEAT_GUARDIAN, boss.pos.x, boss.pos.z);
     if (!spot) throw new Error('no spot');
     // Targeted, one yard past the body-edge reach and far from the coffer: no loot.
-    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_WELL_R + INTERACT_RANGE + 1 };
+    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_BODY_R + INTERACT_RANGE + 1 };
     expect(Math.hypot(sim.player.pos.x - spot.x, sim.player.pos.z - spot.z)).toBeGreaterThan(8);
     sim.player.targetId = boss.id;
     sim.interact();
@@ -210,7 +210,7 @@ describe('corpse loot reach', () => {
     // A guardian template in the open world (a dev spawn): body-only reach.
     const stray = { kind: 'mob' as const, templateId: HEAT_GUARDIAN, pos: { x: 10, y: 0, z: 0 } };
     expect(smithHeartLootSpot(HEAT_GUARDIAN, 10, 0)).toBeNull();
-    expect(corpseLootDistance(stray, { x: 10 + HEAT_WELL_R + 3, z: 0 })).toBeCloseTo(3, 9);
+    expect(corpseLootDistance(stray, { x: 10 + HEAT_BODY_R + 3, z: 0 })).toBeCloseTo(3, 9);
     // A body in claim 1 is never looted from claim 0's coffer.
     const body1 = {
       kind: 'mob' as const,
@@ -225,7 +225,7 @@ describe('corpse loot reach', () => {
 
   it('still refuses past the body edge reach', () => {
     const { sim, boss } = deadHeatGuardianWithLoot();
-    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_WELL_R + INTERACT_RANGE + 0.5 };
+    sim.player.pos = { ...boss.pos, x: boss.pos.x + HEAT_BODY_R + INTERACT_RANGE + 0.5 };
     expect(sim.lootCorpse(boss.id)).toBe(false);
     expect(boss.lootable).toBe(true);
   });
@@ -249,7 +249,7 @@ describe('corpse loot reach', () => {
   });
 
   it('mirrors the same reach on the client: no approach from the lip, and the press offers it', () => {
-    const player = stub({ id: 1, kind: 'player', pos: { x: HEAT_WELL_R + 1, y: 0, z: 0 } });
+    const player = stub({ id: 1, kind: 'player', pos: { x: HEAT_BODY_R + 1, y: 0, z: 0 } });
     const body = stub({
       id: 2,
       kind: 'mob',

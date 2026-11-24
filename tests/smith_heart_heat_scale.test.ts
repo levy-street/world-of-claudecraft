@@ -15,9 +15,11 @@ import { GIANT_ANVIL, HEARTH_WELL } from '../src/sim/content/smith_heart_layout'
 import { HEAT_PULL_SPOT } from '../src/sim/dev/smith_heart_dev';
 import {
   beyondFlare,
+  HEAT_BODY_R,
   HEAT_CUES,
   HEAT_GUARDIAN,
   HEAT_GUARDIAN_SCALE,
+  HEAT_LIP_WALL,
   HEAT_NAMES,
   HEAT_OBJECTS,
   HEAT_WELL_R,
@@ -46,7 +48,10 @@ describe('Guardian of the Heat: the grown wellspring', () => {
     expect(HEAT_GUARDIAN_SCALE).toBe(4);
     const tpl = SMITH_HEART_MOBS[HEAT_GUARDIAN];
     expect(tpl.scale).toBe(HEAT_GUARDIAN_SCALE);
-    expect(tpl.bodyRadius).toBe(HEAT_WELL_R);
+    // Since Jose's playtest of 2026-11-24 the body reaches a yard past the
+    // lip wall (melee strikes it from outside the wall, smith_heart_heat_lip_wall).
+    expect(tpl.bodyRadius).toBe(HEAT_BODY_R);
+    expect(HEAT_BODY_R).toBe(HEAT_LIP_WALL.outer + 1);
   });
 
   it('keeps its back lip and its stumps clear of the altar-stone', () => {
@@ -70,21 +75,22 @@ describe('Guardian of the Heat: the grown wellspring', () => {
     expect(ZONE_BANDS[1][0]).toBe(ZONE_BANDS[0][1]);
     expect(ZONE_BANDS[2][0]).toBe(ZONE_BANDS[1][1]);
     expect(T.flareReach).toBe(HEAT_WELL_R + 12);
-    expect(T.spawnReach).toBe(HEAT_WELL_R + 1.5);
-    // A melee standing on the shore just outside the lip: band 0, no Flare.
-    const x = HEARTH_WELL.x + HEARTH_WELL.r + 1.5;
+    // The Wellspawn feed a yard and a half past the lip wall (it stops them there).
+    expect(T.spawnReach).toBe(HEAT_LIP_WALL.outer + 1.5);
+    // A melee standing on the shore just outside the lip wall: band 0, no Flare.
+    const x = HEARTH_WELL.x + HEAT_LIP_WALL.outer + 1.5;
     expect(inBand(0, x, 0)).toBe(true);
     expect(beyondFlare(x, 0)).toBe(false);
     // The far band still reaches the floor's east end.
     expect(ZONE_BANDS[2][1]).toBeGreaterThan(wellDistance(-174, 0));
   });
 
-  it('never drops the fist, a cinder or an add in the fire', () => {
+  it('never drops the fist, a cinder or an add in the fire or its lip wall', () => {
     const inside = fistSpot({ x: HEARTH_WELL.x + 2, z: 1 });
-    expect(wellDistance(inside.x, inside.z)).toBeCloseTo(HEARTH_WELL.r + 1, 6);
+    expect(wellDistance(inside.x, inside.z)).toBeCloseTo(HEAT_LIP_WALL.outer, 6);
     expect(SHORE_POINTS.length).toBeGreaterThan(20);
     for (const p of SHORE_POINTS)
-      expect(wellDistance(p.x, p.z)).toBeGreaterThanOrEqual(HEARTH_WELL.r + 4);
+      expect(wellDistance(p.x, p.z)).toBeGreaterThanOrEqual(HEAT_LIP_WALL.outer + T.cinderLandR);
     for (const p of [...WELLSPAWN_SPOTS, ...WELLKEEPER_SPOTS]) {
       expect(inHearthFloor(p.x, p.z)).toBe(true);
       expect(wellDistance(p.x, p.z)).toBeGreaterThan(T.spawnReach + 4);
@@ -93,15 +99,16 @@ describe('Guardian of the Heat: the grown wellspring', () => {
 
   it('sets a dev pull down on the shore, out of the fire, inside the reach', () => {
     const d = wellDistance(HEAT_PULL_SPOT.x, HEAT_PULL_SPOT.z);
-    expect(d).toBeGreaterThan(HEARTH_WELL.r);
-    expect(d).toBeLessThan(HEARTH_WELL.r + 3);
+    expect(d).toBeGreaterThan(HEAT_LIP_WALL.outer + 0.5);
+    expect(d).toBeLessThan(HEAT_BODY_R + 3);
   });
 
   it('keeps the heroic adds walk to the lip about as long as the first pass', () => {
-    // First pass: 39.2 yd from the east spots, 39.9 from the corner ones.
+    // First pass: 39.2 yd from the east spots, 39.9 from the corner ones;
+    // the lip wall (2026-11-24) takes two yards off the end of it.
     for (const p of WELLSPAWN_SPOTS) {
       const walk = wellDistance(p.x, p.z) - T.spawnReach;
-      expect(walk).toBeGreaterThan(36);
+      expect(walk).toBeGreaterThan(34);
       expect(walk).toBeLessThan(42);
     }
   });
@@ -111,8 +118,8 @@ describe('Guardian of the Heat: the grown wellspring', () => {
       { kind: 'mob', templateId: HEAT_GUARDIAN },
       MELEE_RANGE,
     );
-    // From the lip and three yards out onto the shore.
-    expect(reach).toBe(HEAT_WELL_R + 3);
+    // From the lip wall and four yards out onto the shore.
+    expect(reach).toBe(HEAT_BODY_R + 3);
     const own = combatProfileForMob(HEAT_GUARDIAN, HEAT_GUARDIAN_SCALE).meleeRange;
     expect(own).toBeGreaterThanOrEqual(reach + 1);
   });

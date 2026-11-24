@@ -46,12 +46,13 @@
 // the renderer (terrain, light rivers, the seal, the portal) read this one
 // record.
 
-import { HEAT_WELL_R } from '../encounters/smith_heart/heat_ids';
+import { HEAT_LIP_WALL, HEAT_WELL_R } from '../encounters/smith_heart/heat_ids';
 import type {
   AuthoredFieldDef,
   FieldPolySurface,
   FieldProp,
   FieldSurface,
+  FieldWall,
 } from '../instances/authored_field/types';
 import { bearingDeg, isleFloorSurfaces } from './smith_heart_isle_floor';
 
@@ -441,6 +442,33 @@ export const GIANT_ANVIL = { x: -236, z: 0, hw: 3.2, hd: 8.5, h: 9 } as const;
  *  from 8 to 10.5 and moved its middle 4 yd east: its lip's basalt stumps
  *  clear the stone). Instance-local. */
 export const HEARTH_WELL = { x: -220, z: 0, r: HEAT_WELL_R } as const;
+
+/** The lip wall's collider ring: segments round the wellspring, each an
+ *  OBB spanning HEAT_LIP_WALL's band (its outer face flat at `outer` at
+ *  each segment's middle), overlapping its neighbours so the ring has no
+ *  gap. Sight-clear (a sight line passes over it to the guardian), solid to
+ *  every body (Jose's playtest of 2026-11-24: nobody walks into the stumps
+ *  and the fire). */
+export const HEARTH_LIP_SEGMENTS = 32;
+export const HEARTH_LIP_WALLS: readonly FieldWall[] = Array.from(
+  { length: HEARTH_LIP_SEGMENTS },
+  (_, i) => {
+    const a = (i / HEARTH_LIP_SEGMENTS) * Math.PI * 2;
+    const mid = (HEAT_LIP_WALL.inner + HEAT_LIP_WALL.outer) / 2;
+    const half = HEAT_LIP_WALL.outer * Math.tan(Math.PI / HEARTH_LIP_SEGMENTS) + 0.15;
+    return {
+      id: `heat_lip_${i}`,
+      x: HEARTH_WELL.x + Math.sin(a) * mid,
+      z: HEARTH_WELL.z + Math.cos(a) * mid,
+      hw: half,
+      hd: (HEAT_LIP_WALL.outer - HEAT_LIP_WALL.inner) / 2,
+      // three.js yaw: local x runs along the ring (tangent), local z out.
+      rot: a,
+      height: HEAT_LIP_WALL.height,
+      sightClear: true,
+    };
+  },
+);
 
 // ---- the Heart: the separate final room ---------------------------------------------
 
@@ -1390,7 +1418,7 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   })),
   mapVoid: 'mist',
   surfaces: SURFACES,
-  walls: [],
+  walls: HEARTH_LIP_WALLS,
   props: PROPS,
   lightZones: [
     { id: 'cleft', x: -150, z: -222, r: 68, key: 0xc8c0b0, accent: 0xc8903c, fog: 0x5a5448 },

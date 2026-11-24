@@ -21,7 +21,7 @@ import {
   GRID_CELL,
   MAX_BODY_RADIUS,
 } from './collider_cells';
-import { type Collider, colliderTopAt, rotY } from './collider_shapes';
+import { type Collider, colliderTopAt, rotY, sightPassesOver } from './collider_shapes';
 import {
   CAMERA_BOOM_STEP,
   cameraBoomClearDistance,
@@ -2095,7 +2095,7 @@ function overlapsAny(
   skipLow: boolean,
 ): boolean {
   for (const c of list) {
-    if (skipLow && c.cameraTopY !== undefined && c.cameraTopY <= sightY) continue;
+    if (sightPassesOver(c, sightY, skipLow)) continue;
     // Above the eye line the obstacle is not in the way either: an authored
     // upper storey does not block line of sight along the floor below it.
     if (c.baseY !== undefined && c.baseY > sightY) continue;

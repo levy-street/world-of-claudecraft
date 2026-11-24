@@ -29,6 +29,7 @@ import { isBlocked } from '../src/sim/colliders';
 import {
   RING_PACK_DEGREES,
   SMITH_HEART_GATES,
+  SMITH_HEART_GUARDIANS,
   SMITH_HEART_SEAL_MARKERS,
   SMITH_HEART_SPAWNS,
 } from '../src/sim/content/smith_heart';
@@ -57,6 +58,7 @@ import {
   WEST_STAIR,
 } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { HEAT_LIP_WALL } from '../src/sim/encounters/smith_heart/heat_ids';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 import { setOpenDungeonGates } from '../src/sim/instances/dungeon_gate_state';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
@@ -200,7 +202,12 @@ const SPOTS = {
   lake: SMITH_HEART_BOSS_SPOTS.quench,
   f1: { x: -104, z: 0 },
   f3: { x: -136, z: -20 },
-  anvil: SMITH_HEART_BOSS_SPOTS.heat,
+  // The Heat guardian stands walled in its wellspring (its lip wall, 2026-11-24):
+  // the raid reaches the shore at the wall's foot.
+  anvil: {
+    x: SMITH_HEART_BOSS_SPOTS.heat.x + HEAT_LIP_WALL.outer + 2,
+    z: SMITH_HEART_BOSS_SPOTS.heat.z,
+  },
 } as const;
 
 const HEART_SPOTS = {
@@ -242,8 +249,10 @@ describe("the Smith's Heart route", () => {
       if (!reaches(seen, ringPoint(d))) ringMissed.push(d);
     }
     expect(ringMissed).toEqual([]);
-    // Every spawn of the main map stands on reached floor.
+    // Every spawn of the main map stands on reached floor (but the Heat
+    // guardian, walled in its wellspring: its shore is SPOTS.anvil).
     const stranded = SMITH_HEART_SPAWNS.filter((s) => !inSmithHeartRoom(s.x, s.z))
+      .filter((s) => s.mobId !== SMITH_HEART_GUARDIANS.heat)
       .filter((s) => !reaches(seen, s))
       .map((s) => `${s.mobId}@${s.x.toFixed(0)},${s.z.toFixed(0)}`);
     expect(stranded).toEqual([]);

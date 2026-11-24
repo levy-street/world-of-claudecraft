@@ -16,9 +16,11 @@ import {
   FIST_SPAN,
   floorHoldsFist,
   HEAT_AURAS,
+  HEAT_BODY_R,
   HEAT_CASTS,
   HEAT_CUES,
   HEAT_DIFFICULTY,
+  HEAT_LIP_WALL,
   HEAT_MOBS,
   HEAT_NAMES,
   HEAT_OBJECTS,
@@ -270,7 +272,7 @@ describe('Guardian of the Heat: the guardian', () => {
   it('stands half sunk in its wellspring and never steps out of it', () => {
     const t = SMITH_HEART_MOBS[SMITH_HEART_GUARDIANS.heat];
     expect(t.trashKit).toBeUndefined();
-    expect(t.bodyRadius).toBe(HEARTH_WELL.r);
+    expect(t.bodyRadius).toBe(HEAT_BODY_R);
     expect(t.stackPoison?.name).toBe(HEAT_NAMES.grip);
     const f = pulled();
     const o = f.world(HEARTH_WELL.x, HEARTH_WELL.z);
@@ -360,12 +362,16 @@ describe('Guardian of the Heat: phase 1', () => {
     expect(hitsOf(ev, HEAT_NAMES.flare, far.id)).toEqual([]);
   });
 
-  it('the wellspring burns whoever steps into it', () => {
+  it('nobody is left in the wellspring: one set down in it stands past the lip wall at once, unburnt', () => {
+    // Since Jose's playtest of 2026-11-24 the lip wall keeps every body out
+    // (smith_heart_heat_lip_wall.test.ts); a leap onto the well is freed.
     const f = pulled(2);
     const p = f.players[1];
     f.put(p, HEARTH_WELL.x + 3, 1);
     const ev = f.tick(ticks(1.1));
-    expect(hitsOf(ev, HEAT_NAMES.wellFire, p.id).length).toBeGreaterThanOrEqual(2);
+    expect(hitsOf(ev, HEAT_NAMES.wellFire, p.id)).toEqual([]);
+    const l = f.local(p);
+    expect(wellDistance(l.x, l.z)).toBeGreaterThan(HEAT_LIP_WALL.outer);
   });
 });
 

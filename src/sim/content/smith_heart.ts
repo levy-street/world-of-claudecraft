@@ -28,7 +28,9 @@ import {
   FINAL_PHASES,
 } from '../encounters/smith_heart/final_phase_ids';
 import {
+  HEAT_BODY_R,
   HEAT_GUARDIAN_SCALE,
+  HEAT_HOME_FACING,
   HEAT_MOBS,
   HEAT_NAMES,
   HEAT_TUNING,
@@ -554,15 +556,15 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // SKETCH (bot-measured, never with players): 92,400 base (about 212,500
   // after the elite factor; 64,000 until 2026-11-12, 77,000 until the
   // parse-calibrated pass of 2026-11-16) for a 4 to 5 minute Normal fight,
-  // like the other guardians; Heroic's own multiplier is its difficulty row's. Its body reaches the wellspring's lip
-  // (bodyRadius: melee strikes it from the shore); Cinder Grip is its own
+  // like the other guardians; Heroic's own multiplier is its difficulty row's. Its body reaches a yard past the
+  // lip wall (bodyRadius HEAT_BODY_R: melee strikes it from the shore); Cinder Grip is its own
   // stacking burn on every landed swing (the stackPoison seam), so the tanks
   // swap; every other mechanic is the encounter's.
   heart_heat_guardian: {
     ...boss('heart_heat_guardian', 'Guardian of the Heat', 124350, 0xffe6a0, HEAT_GUARDIAN_SCALE),
     ccImmune: true,
     slowImmune: true,
-    bodyRadius: HEARTH_WELL.r,
+    bodyRadius: HEAT_BODY_R,
     stackPoison: {
       chance: 1,
       perTick: HEAT_TUNING.gripPerTick,
@@ -809,7 +811,7 @@ export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
   ...pack('f1', -104, 0, HEAT_TRIO, Math.PI / 2),
   ...pack('f2', -136, 20, HEAT_TRIO, Math.PI / 2),
   ...pack('f3', -136, -20, HEAT_TRIO, Math.PI / 2),
-  guardian(SMITH_HEART_GUARDIANS.heat, S.heat, Math.PI / 2),
+  guardian(SMITH_HEART_GUARDIANS.heat, S.heat, HEAT_HOME_FACING),
   // ---- The Heart (the separate final room) ---------------------------------------------
   guardian(
     SMITH_HEART_FINAL_BOSS,

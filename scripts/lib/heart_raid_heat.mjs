@@ -22,7 +22,9 @@ import {
 import {
   gapOf,
   HEAT_AURAS,
+  HEAT_BODY_R,
   HEAT_CASTS,
+  HEAT_LIP_WALL,
   HEAT_MOBS,
   HEAT_OBJECTS,
   HEAT_TUNING,
@@ -46,6 +48,9 @@ import {
   segDist,
   unit,
 } from './heart_raid_bots.mjs';
+
+/** The lip wall's outer face (yards from the well's middle): nobody stands inside it. */
+const LIP = HEAT_LIP_WALL.outer;
 
 const T = HEAT_TUNING;
 /** Wakefire's bands round the wellspring (inner, outer), the last open: the
@@ -88,11 +93,11 @@ export const heat = {
     world.origin = { x: well.x - HEARTH_WELL.x, z: well.z - HEARTH_WELL.z };
     world.center = { x: well.x, z: well.z };
     world.home = unit(world.center, world.obs.self);
-    world.tankSpot = add(world.center, world.home, HEARTH_WELL.r + 1.5);
-    world.anchor = add(world.center, world.home, HEARTH_WELL.r + 2);
-    // Ranged about 7 yd past the lip (the bots' 20 yd ring scaled): out of the
-    // melee's band, inside Hearth Flare's reach (12 past the lip).
-    world.rangeScale = (HEARTH_WELL.r + 7) / 20;
+    world.tankSpot = add(world.center, world.home, LIP + 1.5);
+    world.anchor = add(world.center, world.home, LIP + 2);
+    // Ranged about 7 yd past the lip wall (the bots' 20 yd ring scaled): out
+    // of the melee's band, inside Hearth Flare's reach (12 past the lip).
+    world.rangeScale = (LIP + 7) / 20;
     world.arcSpan = 1.5;
     world.prepull = add(world.center, world.home, 26);
     world.reach = 45;
@@ -157,20 +162,20 @@ export const heat = {
 
   onFloor(world, at) {
     const l = L(world, at);
-    return inHearthFloor(l.x, l.z) && wellDistance(l.x, l.z) > HEARTH_WELL.r + 1;
+    return inHearthFloor(l.x, l.z) && wellDistance(l.x, l.z) > LIP + 0.5;
   },
   tankSpot(world) {
     return world.tankSpot;
   },
-  // Melee reaches the giant's body from the wellspring's lip.
+  // Melee reaches the giant's body from outside its lip wall.
   meleeReach(t) {
-    return t?.tid === heat.tids.guardian ? HEARTH_WELL.r + 2.5 : 5.5;
+    return t?.tid === heat.tids.guardian ? HEAT_BODY_R + 2.5 : 5.5;
   },
-  // The melee stand on the lip beside the tank (never in the burning well).
+  // The melee stand at the lip wall beside the tank (never in the burning well).
   roleSpot(world, st, b) {
     if (b.spec.role !== 'dps' || !b.spec.melee) return null;
     const a = Math.atan2(world.home.x, world.home.z) + (b.spec.key === 'rogue' ? 0.4 : -0.4);
-    return add(world.center, { x: Math.sin(a), z: Math.cos(a) }, HEARTH_WELL.r + 1.8);
+    return add(world.center, { x: Math.sin(a), z: Math.cos(a) }, LIP + 1.8);
   },
   targets(world, st, b) {
     const me = world.players.get(b.pid);
@@ -274,7 +279,7 @@ function inDanger(world, at, st) {
   const l = L(world, at);
   if (!inHearthFloor(l.x, l.z)) return true;
   const d = wellDistance(l.x, l.z);
-  if (d < HEARTH_WELL.r + 1) return true;
+  if (d < LIP + 0.5) return true;
   for (const h of [...o.fist, ...o.waves, ...o.spots]) if (hypot(h, at) < h.r) return true;
   for (const ln of o.lanes) if (segDist(at, ln.from, ln.to) < ln.half) return true;
   if (IGNORE !== 'wakefire')
@@ -388,7 +393,7 @@ function track(world, st) {
   for (const [id, a] of st.spawnSeen) {
     if (world.adds.some((x) => x.id === id)) continue;
     st.spawnSeen.delete(id);
-    if (wellGap(world, a) < HEARTH_WELL.r + 2.5) {
+    if (wellGap(world, a) < HEAT_TUNING.spawnReach + 1) {
       st.feeds++;
       log('WELLSPAWN reached the wellspring');
     }
@@ -436,7 +441,7 @@ function waveGoal(world, me) {
     // Close in toward the wellspring (the next ring's corridors are only a
     // few yards round there), never in through a wall still rolling over the
     // way in.
-    radius = Math.max(HEARTH_WELL.r + 3.5, Math.min(d, 16));
+    radius = Math.max(LIP + 2, Math.min(d, 18));
     const youngest = o.rings.reduce((m, r) => Math.min(m, r.front), Number.POSITIVE_INFINITY);
     if (Number.isFinite(youngest) && youngest < d && youngest > radius - 1) radius = d;
   } else return null;

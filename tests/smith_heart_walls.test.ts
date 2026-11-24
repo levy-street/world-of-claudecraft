@@ -39,6 +39,7 @@ import {
   WEST_STAIR,
 } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { HEAT_LIP_WALL } from '../src/sim/encounters/smith_heart/heat_ids';
 import {
   authoredFieldCliffRuns,
   authoredFieldHeight,
@@ -260,7 +261,11 @@ beforeAll(() => {
 
 describe("the Smith's Heart: the drawn walls and the walked floor agree", () => {
   it('the cleared run reaches all four arenas, the dais and the Heart', () => {
-    const spots = Object.values(SMITH_HEART_BOSS_SPOTS).map((p) => [p.x + 4, p.z + 4]);
+    // The Heat guardian stands walled in its wellspring (its lip wall): its
+    // spot is the shore at the wall's foot.
+    const spots = Object.values(SMITH_HEART_BOSS_SPOTS).map((p) =>
+      p === SMITH_HEART_BOSS_SPOTS.heat ? [p.x + HEAT_LIP_WALL.outer + 2, p.z] : [p.x + 4, p.z + 4],
+    );
     for (const [x, z] of [
       [-198, -212],
       [0, -62],

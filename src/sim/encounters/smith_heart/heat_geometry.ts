@@ -18,6 +18,7 @@
 
 import { FORGE_POINTS, HEART_ROOM, HEARTH_WELL } from '../../content/smith_heart_layout';
 import {
+  HEAT_LIP_WALL,
   type HeatWaveRule,
   heatHash,
   HEAT_TUNING as T,
@@ -54,6 +55,25 @@ export function wellDistance(x: number, z: number): number {
 /** Is (x, z) in the wellspring's fire (inside its lip)? */
 export function inWell(x: number, z: number): boolean {
   return wellDistance(x, z) < HEARTH_WELL.r;
+}
+
+/** Where a body standing at (x, z) inside the lip wall (deeper than half a
+ *  yard past its outer face) is set down: straight out along its bearing onto the shore, `body` yards (its
+ *  radius) past the wall (due east, toward the door, from the exact middle);
+ *  null when it already stands outside. The wall's colliders hold a body
+ *  walking in from the shore; this frees one that got inside some other way
+ *  (a leap or a teleport onto the well), which the ring would otherwise trap
+ *  in the fire. */
+export function outOfLip(x: number, z: number, body: number): HPoint | null {
+  const d = wellDistance(x, z);
+  // A body grazing the wall's outer face is the colliders' to settle (behind
+  // the well the altar-stone's foot squeezes it there); only one inside it is
+  // set down.
+  if (d >= HEAT_LIP_WALL.outer - 0.5) return null;
+  const out = HEAT_LIP_WALL.outer + body + 0.05;
+  if (d < 1e-6) return { x: HEARTH_WELL.x + out, z: HEARTH_WELL.z };
+  const k = out / d;
+  return { x: HEARTH_WELL.x + (x - HEARTH_WELL.x) * k, z: HEARTH_WELL.z + (z - HEARTH_WELL.z) * k };
 }
 
 /** Is (x, z) out of the guardian's reach, where Hearth Flare strikes? */
@@ -274,14 +294,19 @@ export const WELLKEEPER_SPOTS: readonly HPoint[] = [
 ];
 
 /** The shore's points (a 6-yard lattice on the floor east of the
- *  wellspring's middle, clear of its lip by 4 yd and of the walls by 3):
- *  where a Rolling Cinder lands. Built once, in a fixed
- *  order. */
+ *  wellspring's middle, clear of the walls by 3, and far enough out that a
+ *  landing's burning circle, `T.cinderLandR`, stays off the lip wall and the
+ *  boss's disc: Jose's playtest of 2026-11-24): where a Rolling Cinder
+ *  lands. Built once, in a fixed order. */
+/** The nearest a shore point lies to the well's middle: a landing's circle
+ *  edge clear of the lip wall's outer face. */
+export const SHORE_MIN = HEAT_LIP_WALL.outer + T.cinderLandR;
+
 export const SHORE_POINTS: readonly HPoint[] = (() => {
   const out: HPoint[] = [];
   for (let x = -250; x <= -176; x += 6) {
     for (let z = -42; z <= 42; z += 6) {
-      if (!inHearthFloor(x, z) || wellDistance(x, z) < HEARTH_WELL.r + 4) continue;
+      if (!inHearthFloor(x, z) || wellDistance(x, z) < SHORE_MIN) continue;
       if (x < HEARTH_WELL.x - 2) continue;
       const clear =
         inHearthFloor(x + 3, z) &&

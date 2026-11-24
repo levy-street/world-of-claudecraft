@@ -171,6 +171,7 @@ import {
   spendHeatIntro,
   spendQuenchIntro,
 } from '../encounters/smith_heart';
+import { HEAT_LIP_WALL } from '../encounters/smith_heart/heat_ids';
 import { setTierHealthDevScale } from '../encounters/smith_heart/tier_health';
 import { setDungeonGatesDevOpen } from '../instances/dungeon_gates';
 import { enterDungeon, freeInstance, leaveDungeon } from '../instances/dungeons';
@@ -245,9 +246,9 @@ const BREATH_PULL_SPOT = { x: -14, z: 198 } as const;
  *  a few strides south of the guardian. */
 const QUENCH_PULL_SPOT = { x: 198, z: -11 } as const;
 /** Where `/dev heart heat pull` sets the player down: on the Hearth's shore,
- *  in front of the guardian's wellspring, past its lip (its fire) and inside
- *  its reach (the lip follows HEARTH_WELL, grown in pass 4). */
-export const HEAT_PULL_SPOT = { x: HEARTH_WELL.x + HEARTH_WELL.r + 1.7, z: 2 } as const;
+ *  in front of the guardian's wellspring, just past its lip wall (a body
+ *  never stands in it) and inside its reach (HEAT_BODY_R). */
+export const HEAT_PULL_SPOT = { x: HEARTH_WELL.x + HEAT_LIP_WALL.outer + 1.2, z: 2 } as const;
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });

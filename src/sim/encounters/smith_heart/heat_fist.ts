@@ -32,6 +32,7 @@ import { facingTo, type HPoint, inWave, swellBearings, wellDistance } from './he
 import {
   HEAT_CASTS,
   HEAT_CUES,
+  HEAT_LIP_WALL,
   HEAT_NAMES,
   HEAT_OBJECTS,
   heatTimed,
@@ -75,10 +76,11 @@ export function floorHoldsFist(
 }
 
 /** Where the fist comes down for a player standing at `p`: their spot,
- *  pushed out of the wellspring onto the shore. */
+ *  pushed out of the wellspring and its lip wall onto the shore (nobody
+ *  stands inside the wall; a dev spot may). */
 export function fistSpot(p: HPoint): HPoint {
   const d = wellDistance(p.x, p.z);
-  const min = HEARTH_WELL.r + 1;
+  const min = HEAT_LIP_WALL.outer;
   if (d >= min) return { x: p.x, z: p.z };
   const f = d > 1e-6 ? facingTo(HEARTH_WELL, p) : Math.PI / 2;
   return { x: HEARTH_WELL.x + Math.sin(f) * min, z: HEARTH_WELL.z + Math.cos(f) * min };

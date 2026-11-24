@@ -103,6 +103,9 @@ export interface FieldWall {
   rot: number;
   /** Visual height above the ground under its centre (sight top follows it). */
   height: number;
+  /** A low wall a sight line passes over (the Guardian of the Heat's lip
+   *  wall, under every eye): it blocks bodies, never line of sight. */
+  sightClear?: boolean;
 }
 
 /** A dressing piece from the dungeon's kit. `r` or `hw`/`hd` add a collider. */

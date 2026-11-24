@@ -41,6 +41,7 @@ export function authoredFieldColliders(def: AuthoredFieldDef, floorY: number): C
       hd: w.hd,
       rot: w.rot,
       cameraTopY: floorY + authoredFieldHeight(def, w.x, w.z) + w.height,
+      ...(w.sightClear ? { sightClear: true } : {}),
     });
   }
   for (const p of def.props) {
