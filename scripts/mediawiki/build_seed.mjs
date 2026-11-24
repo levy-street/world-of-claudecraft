@@ -223,7 +223,11 @@ for (const page of pages.filter(p=>!p.title.startsWith('MediaWiki:')).sort((a,b)
   if(!letters.has(letter))letters.set(letter,[]);
   letters.get(letter).push(link(page.title));
 }
-add('All Pages',[...letters].map(([letter,titles])=>section(letter,bullets(titles))).join(''),['Wiki']);
+// One index page per first letter: a single page of every title is several thousand links,
+// which crawlers and Lighthouse handle badly, so the A to Z hub links one page per letter.
+const letterPage = (letter) => 'All Pages (' + letter + ')';
+for (const [letter, titles] of letters) add(letterPage(letter), bullets(titles), ['Portals', 'All Pages']);
+add('All Pages', bullets([...letters].map(([letter, titles]) => link(letterPage(letter), letter) + ' (' + titles.length + ')')), ['Portals', 'Wiki']);
 
 const illustrations = articleArt(titleBy);
 const models = modelStills(titleBy);

@@ -469916,7 +469916,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   </page>
 
   <page>
-    <title>All Pages</title>
+    <title>All Pages (A)</title>
     <ns>0</ns>
     <id>5280</id>
     <revision>
@@ -469926,8 +469926,7 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="158164">== A ==
-* [[A Borrowed Face (Deed)]]
+      <text xml:space="preserve" bytes="5483">* [[A Borrowed Face (Deed)]]
 * [[A Borrowed Face (World Quest)]]
 * [[A Cart for the Orchard]]
 * [[A Cast in the Looking-Glass (Deed)]]
@@ -470113,8 +470112,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Azgorath, Lord of the Pit (Mob)]]
 * [[Azure Rift Gem]]
 
-== B ==
-* [[Back on the Stove]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (B)</title>
+    <ns>0</ns>
+    <id>5281</id>
+    <revision>
+      <id>5281</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="11085">* [[Back on the Stove]]
 * [[Back to the Forge]]
 * [[Back to the Shallows]]
 * [[Bags (Items index)]]
@@ -470507,8 +470523,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[By Raven&apos;s Wing (Deed)]]
 * [[By the Beacon&apos;s Light (Deed)]]
 
-== C ==
-* [[Cabinet of Curiosities (Deed)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (C)</title>
+    <ns>0</ns>
+    <id>5282</id>
+    <revision>
+      <id>5282</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="14222">* [[Cabinet of Curiosities (Deed)]]
 * [[Caches and pouches (Items index)]]
 * [[Cairnking Epaulets]]
 * [[Cairnking Mantle]]
@@ -470953,8 +470986,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Cutthroat Tempo (Ability)]]
 * [[Cyan Magenta]]
 
-== D ==
-* [[Daggers (Items index)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (D)</title>
+    <ns>0</ns>
+    <id>5283</id>
+    <revision>
+      <id>5283</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="6157">* [[Daggers (Items index)]]
 * [[Dash (Ability)]]
 * [[Dauntless (Deed)]]
 * [[Dawn Battle Standard]]
@@ -471169,8 +471219,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Dustwarden Jerkin]]
 * [[Dyes and appearances (Items index)]]
 
-== E ==
-* [[Early Grave (Ability)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (E)</title>
+    <ns>0</ns>
+    <id>5284</id>
+    <revision>
+      <id>5284</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="6747">* [[Early Grave (Ability)]]
 * [[Earthen Jolt (Ability)]]
 * [[Earthshaker Warboots]]
 * [[Eastbrook Arming Sword]]
@@ -471374,8 +471441,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Eye Jab (Ability)]]
 * [[Eyes on the Vigil]]
 
-== F ==
-* [[Facet and Filigree (Deed)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (F)</title>
+    <ns>0</ns>
+    <id>5285</id>
+    <revision>
+      <id>5285</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="7522">* [[Facet and Filigree (Deed)]]
 * [[Faction standing]]
 * [[Faithwarden (Specialization)]]
 * [[Fallen Captain Aldren (Mob)]]
@@ -471645,8 +471729,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Furyforged Warplate]]
 * [[Furyforged Warspaulders]]
 
-== G ==
-* [[Gale Wisp (Mob)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (G)</title>
+    <ns>0</ns>
+    <id>5286</id>
+    <revision>
+      <id>5286</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="8444">* [[Gale Wisp (Mob)]]
 * [[Gale-Strider Boots]]
 * [[Galeborn Chainmail]]
 * [[Galeborn Grips]]
@@ -471938,8 +472039,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Gyrelens Array]]
 * [[Gyrelens Array (Recipe)]]
 
-== H ==
-* [[Hallowed Wall (Ability)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (H)</title>
+    <ns>0</ns>
+    <id>5287</id>
+    <revision>
+      <id>5287</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="8981">* [[Hallowed Wall (Ability)]]
 * [[Halls of the First Tempering]]
 * [[Halls of the First Tempering (NPCs index)]]
 * [[Hallsworn (Deed)]]
@@ -472261,8 +472379,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Hushword (Ability)]]
 * [[Hushword (Talent)]]
 
-== I ==
-* [[Ice Fang (Weapon skin)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (I)</title>
+    <ns>0</ns>
+    <id>5288</id>
+    <revision>
+      <id>5288</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="2414">* [[Ice Fang (Weapon skin)]]
 * [[Ice Floes (Ability)]]
 * [[Ice Floes (Talent)]]
 * [[Ice Lance (Ability)]]
@@ -472347,8 +472482,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Items by source (Items index)]]
 * [[Ivory Copper]]
 
-== J ==
-* [[Jadeshrine Epaulets]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (J)</title>
+    <ns>0</ns>
+    <id>5289</id>
+    <revision>
+      <id>5289</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="435">* [[Jadeshrine Epaulets]]
 * [[Jadeshrine Mantle]]
 * [[Jadeshrine Pauldrons]]
 * [[Jadeshrine Shoulderguards]]
@@ -472363,8 +472515,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Jewelcrafting ingredients (Items index)]]
 * [[Juggernaut (Augment)]]
 
-== K ==
-* [[Kama-Kage the Shadow-Jump Toad (Mount)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (K)</title>
+    <ns>0</ns>
+    <id>5290</id>
+    <revision>
+      <id>5290</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="1411">* [[Kama-Kage the Shadow-Jump Toad (Mount)]]
 * [[Kazzix&apos;s Heartshard]]
 * [[Keen Dirk]]
 * [[Keen Eye (Augment)]]
@@ -472409,8 +472578,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Korzul the Gravewyrm (Mob)]]
 * [[Korzul the Gravewyrm, Heroic (Contract)]]
 
-== L ==
-* [[Lacquered Rod (Weapon skin)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (L)</title>
+    <ns>0</ns>
+    <id>5291</id>
+    <revision>
+      <id>5291</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="4174">* [[Lacquered Rod (Weapon skin)]]
 * [[Lady of the Bonechill (Contract)]]
 * [[Lady of the Bonechill (Mob)]]
 * [[Lagoon Snapper (Mob)]]
@@ -472542,8 +472728,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Lychgate Buckler]]
 * [[Lynxblood (Ability)]]
 
-== M ==
-* [[Maben Skerrit (NPC)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (M)</title>
+    <ns>0</ns>
+    <id>5292</id>
+    <revision>
+      <id>5292</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="8576">* [[Maben Skerrit (NPC)]]
 * [[Maces (Items index)]]
 * [[Made By Hand (Deed)]]
 * [[Maelin&apos;s Ember Projection (NPC)]]
@@ -472840,8 +473043,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Mysterious Cosmetic Cache]]
 * [[Mythic (Deed)]]
 
-== N ==
-* [[Named in the Mist (Deed)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (N)</title>
+    <ns>0</ns>
+    <id>5293</id>
+    <revision>
+      <id>5293</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="2268">* [[Named in the Mist (Deed)]]
 * [[Names Cut into the Crag (Deed)]]
 * [[Nature (Abilities index)]]
 * [[Nature&apos;s Boon (Ability)]]
@@ -472913,8 +473133,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Nythraxis Raid Arena]]
 * [[Nythraxis, Scourge of Thornpeak (Mob)]]
 
-== O ==
-* [[Oakhide (Ability)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (O)</title>
+    <ns>0</ns>
+    <id>5294</id>
+    <revision>
+      <id>5294</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="2698">* [[Oakhide (Ability)]]
 * [[Oakhide Reflex (Talent)]]
 * [[Oath Chain (Ability)]]
 * [[Oath of the Round Table]]
@@ -473010,8 +473247,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Overworld passages]]
 * [[Owlwatch Fudge]]
 
-== P ==
-* [[Pack Command (Ability)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (P)</title>
+    <ns>0</ns>
+    <id>5295</id>
+    <revision>
+      <id>5295</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="6311">* [[Pack Command (Ability)]]
 * [[Pack Rally (Ability)]]
 * [[Pack Rally (Talent)]]
 * [[Packbreaker (Deed)]]
@@ -473221,8 +473475,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Pyroclast Robe]]
 * [[Pyromancy (Specialization)]]
 
-== Q ==
-* [[Quaking Blow (Ability)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (Q)</title>
+    <ns>0</ns>
+    <id>5296</id>
+    <revision>
+      <id>5296</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="1201">* [[Quaking Blow (Ability)]]
 * [[Quartermaster Bree (NPC)]]
 * [[Quartermaster Bronn Emberward (NPC)]]
 * [[Quartermaster Edda (NPC)]]
@@ -473258,8 +473529,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Quilted Trousers]]
 * [[Quivers off-hand equipment (Items index)]]
 
-== R ==
-* [[Racing Mind (Ability)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (R)</title>
+    <ns>0</ns>
+    <id>5297</id>
+    <revision>
+      <id>5297</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="10139">* [[Racing Mind (Ability)]]
 * [[Racing Mind (Talent)]]
 * [[Radiant Chorus (Ability)]]
 * [[Radiant Devotion (Ability)]]
@@ -473586,8 +473874,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Rusty Dagger]]
 * [[Rusty Hatchet]]
 
-== S ==
-* [[Sablewax Vellum]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (S)</title>
+    <ns>0</ns>
+    <id>5298</id>
+    <revision>
+      <id>5298</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="16710">* [[Sablewax Vellum]]
 * [[Sablewax Vellum (Recipe)]]
 * [[Sableweb Cord]]
 * [[Sableweb Lurker (Mob)]]
@@ -474166,8 +474471,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Swimming and climbing]]
 * [[Swords (Items index)]]
 
-== T ==
-* [[Tactical Camo (Ability)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (T)</title>
+    <ns>0</ns>
+    <id>5299</id>
+    <revision>
+      <id>5299</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="19356">* [[Tactical Camo (Ability)]]
 * [[Tactical Retreat (Talent)]]
 * [[Tailoring]]
 * [[Tailoring ingredients (Items index)]]
@@ -474778,8 +475100,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Typhoon (Ability)]]
 * [[Typhoon (Talent)]]
 
-== U ==
-* [[Umbral Anchor (Ability)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (U)</title>
+    <ns>0</ns>
+    <id>5300</id>
+    <revision>
+      <id>5300</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="2456">* [[Umbral Anchor (Ability)]]
 * [[Unbroken Ritual (Talent)]]
 * [[Uncommon armor and off-hands (Items index)]]
 * [[Uncommon axes (Items index)]]
@@ -474840,8 +475179,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Unyielding (Deed)]]
 * [[Urgent Prayer (Ability)]]
 
-== V ==
-* [[Vael the Fogbinder (Contract)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (V)</title>
+    <ns>0</ns>
+    <id>5301</id>
+    <revision>
+      <id>5301</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="3985">* [[Vael the Fogbinder (Contract)]]
 * [[Vael the Fogbinder (Mob, Fog shade)]]
 * [[Vael the Fogbinder (Mob, level 13)]]
 * [[Vael the Fogbinder, Heroic (Contract)]]
@@ -474975,8 +475331,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Vowkeeper Strike (Ability)]]
 * [[Vysska&apos;s Hatchling (Mob)]]
 
-== W ==
-* [[Walking Mosley Home]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (W)</title>
+    <ns>0</ns>
+    <id>5302</id>
+    <revision>
+      <id>5302</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="7497">* [[Walking Mosley Home]]
 * [[Wall Drills (Deed)]]
 * [[Wand of Quenched Sparks]]
 * [[Wanderer&apos;s Chestguard]]
@@ -475228,8 +475601,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Wyrmshadow Vest]]
 * [[Wyrmwatch Warning Banner]]
 
-== Y ==
-* [[Ysolei, Avatar of the Drowned Moon (Contract)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (Y)</title>
+    <ns>0</ns>
+    <id>5303</id>
+    <revision>
+      <id>5303</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="327">* [[Ysolei, Avatar of the Drowned Moon (Contract)]]
 * [[Ysolei, Avatar of the Drowned Moon (Mob)]]
 * [[Ysolei, Avatar of the Drowned Moon, Heroic (Contract)]]
 * [[Ysolei&apos;s Pearl Greaves (Heroic)]]
@@ -475237,8 +475627,25 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Yumi (Mob)]]
 * [[Yumi&apos;s Keepsake Locket]]
 
-== Z ==
-* [[Zeal (Talent)]]
+
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages (Z)</title>
+    <ns>0</ns>
+    <id>5304</id>
+    <revision>
+      <id>5304</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="471">* [[Zeal (Talent)]]
 * [[Zealfire Gauntlets]]
 * [[Zealfire Hauberk]]
 * [[Zealfire Helm]]
@@ -475255,6 +475662,51 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
 * [[Zyzz&apos;s Deathless Signet]]
 
 
+[[Category:Portals]]
+[[Category:All Pages]]
+</text>
+    </revision>
+  </page>
+
+  <page>
+    <title>All Pages</title>
+    <ns>0</ns>
+    <id>5305</id>
+    <revision>
+      <id>5305</id>
+      <timestamp>2026-11-05T00:00:01Z</timestamp>
+      <contributor><username>WikiAdmin</username><id>1</id></contributor>
+      <comment>Seed World of Claudecraft wiki content</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="731">* [[All Pages (A)|A]] (185)
+* [[All Pages (B)|B]] (392)
+* [[All Pages (C)|C]] (444)
+* [[All Pages (D)|D]] (214)
+* [[All Pages (E)|E]] (203)
+* [[All Pages (F)|F]] (269)
+* [[All Pages (G)|G]] (291)
+* [[All Pages (H)|H]] (321)
+* [[All Pages (I)|I]] (84)
+* [[All Pages (J)|J]] (14)
+* [[All Pages (K)|K]] (44)
+* [[All Pages (L)|L]] (131)
+* [[All Pages (M)|M]] (296)
+* [[All Pages (N)|N]] (71)
+* [[All Pages (O)|O]] (95)
+* [[All Pages (P)|P]] (209)
+* [[All Pages (Q)|Q]] (35)
+* [[All Pages (R)|R]] (326)
+* [[All Pages (S)|S]] (578)
+* [[All Pages (T)|T]] (610)
+* [[All Pages (U)|U]] (60)
+* [[All Pages (V)|V]] (133)
+* [[All Pages (W)|W]] (251)
+* [[All Pages (Y)|Y]] (7)
+* [[All Pages (Z)|Z]] (15)
+
+
+[[Category:Portals]]
 [[Category:Wiki]]
 </text>
     </revision>
@@ -475263,9 +475715,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Intervene</title>
     <ns>0</ns>
-    <id>5281</id>
+    <id>5306</id>
     <revision>
-      <id>5281</id>
+      <id>5306</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475283,9 +475735,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Die by the Sword</title>
     <ns>0</ns>
-    <id>5282</id>
+    <id>5307</id>
     <revision>
-      <id>5282</id>
+      <id>5307</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475303,9 +475755,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Victor&apos;s Surge</title>
     <ns>0</ns>
-    <id>5283</id>
+    <id>5308</id>
     <revision>
-      <id>5283</id>
+      <id>5308</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475323,9 +475775,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Piercing Howl</title>
     <ns>0</ns>
-    <id>5284</id>
+    <id>5309</id>
     <revision>
-      <id>5284</id>
+      <id>5309</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475343,9 +475795,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Thunderhurl</title>
     <ns>0</ns>
-    <id>5285</id>
+    <id>5310</id>
     <revision>
-      <id>5285</id>
+      <id>5310</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475363,9 +475815,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Lingering Dread</title>
     <ns>0</ns>
-    <id>5286</id>
+    <id>5311</id>
     <revision>
-      <id>5286</id>
+      <id>5311</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475383,9 +475835,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Recklessness</title>
     <ns>0</ns>
-    <id>5287</id>
+    <id>5312</id>
     <revision>
-      <id>5287</id>
+      <id>5312</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475403,9 +475855,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Avatar</title>
     <ns>0</ns>
-    <id>5288</id>
+    <id>5313</id>
     <revision>
-      <id>5288</id>
+      <id>5313</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475423,9 +475875,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bladestorm</title>
     <ns>0</ns>
-    <id>5289</id>
+    <id>5314</id>
     <revision>
-      <id>5289</id>
+      <id>5314</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475443,9 +475895,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Sanguine Aura</title>
     <ns>0</ns>
-    <id>5290</id>
+    <id>5315</id>
     <revision>
-      <id>5290</id>
+      <id>5315</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475463,9 +475915,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Sacred Concord</title>
     <ns>0</ns>
-    <id>5291</id>
+    <id>5316</id>
     <revision>
-      <id>5291</id>
+      <id>5316</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475483,9 +475935,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Pack Rally</title>
     <ns>0</ns>
-    <id>5292</id>
+    <id>5317</id>
     <revision>
-      <id>5292</id>
+      <id>5317</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475503,9 +475955,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Shadeslip</title>
     <ns>0</ns>
-    <id>5293</id>
+    <id>5318</id>
     <revision>
-      <id>5293</id>
+      <id>5318</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475523,9 +475975,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Smoke Screen</title>
     <ns>0</ns>
-    <id>5294</id>
+    <id>5319</id>
     <revision>
-      <id>5294</id>
+      <id>5319</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475543,9 +475995,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Flurry of Knives</title>
     <ns>0</ns>
-    <id>5295</id>
+    <id>5320</id>
     <revision>
-      <id>5295</id>
+      <id>5320</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475563,9 +476015,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Thieves&apos; Chorus</title>
     <ns>0</ns>
-    <id>5296</id>
+    <id>5321</id>
     <revision>
-      <id>5296</id>
+      <id>5321</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475583,9 +476035,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Last Prayer</title>
     <ns>0</ns>
-    <id>5297</id>
+    <id>5322</id>
     <revision>
-      <id>5297</id>
+      <id>5322</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475603,9 +476055,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Hushword</title>
     <ns>0</ns>
-    <id>5298</id>
+    <id>5323</id>
     <revision>
-      <id>5298</id>
+      <id>5323</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475623,9 +476075,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Stilled Mind</title>
     <ns>0</ns>
-    <id>5299</id>
+    <id>5324</id>
     <revision>
-      <id>5299</id>
+      <id>5324</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475643,9 +476095,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Anointing</title>
     <ns>0</ns>
-    <id>5300</id>
+    <id>5325</id>
     <revision>
-      <id>5300</id>
+      <id>5325</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475663,9 +476115,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Martyr&apos;s Aegis</title>
     <ns>0</ns>
-    <id>5301</id>
+    <id>5326</id>
     <revision>
-      <id>5301</id>
+      <id>5326</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475683,9 +476135,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Choir of Deliverance</title>
     <ns>0</ns>
-    <id>5302</id>
+    <id>5327</id>
     <revision>
-      <id>5302</id>
+      <id>5327</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475703,9 +476155,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Stoneward</title>
     <ns>0</ns>
-    <id>5303</id>
+    <id>5328</id>
     <revision>
-      <id>5303</id>
+      <id>5328</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475723,9 +476175,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gripping Earth</title>
     <ns>0</ns>
-    <id>5304</id>
+    <id>5329</id>
     <revision>
-      <id>5304</id>
+      <id>5329</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475743,9 +476195,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Primal Exaltation</title>
     <ns>0</ns>
-    <id>5305</id>
+    <id>5330</id>
     <revision>
-      <id>5305</id>
+      <id>5330</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475763,9 +476215,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Ice Floes</title>
     <ns>0</ns>
-    <id>5306</id>
+    <id>5331</id>
     <revision>
-      <id>5306</id>
+      <id>5331</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475783,9 +476235,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Greater Invisibility</title>
     <ns>0</ns>
-    <id>5307</id>
+    <id>5332</id>
     <revision>
-      <id>5307</id>
+      <id>5332</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475803,9 +476255,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Ring of Frost</title>
     <ns>0</ns>
-    <id>5308</id>
+    <id>5333</id>
     <revision>
-      <id>5308</id>
+      <id>5333</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475823,9 +476275,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Power Echo</title>
     <ns>0</ns>
-    <id>5309</id>
+    <id>5334</id>
     <revision>
-      <id>5309</id>
+      <id>5334</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475843,9 +476295,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Overload</title>
     <ns>0</ns>
-    <id>5310</id>
+    <id>5335</id>
     <revision>
-      <id>5310</id>
+      <id>5335</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475863,9 +476315,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Racing Mind</title>
     <ns>0</ns>
-    <id>5311</id>
+    <id>5336</id>
     <revision>
-      <id>5311</id>
+      <id>5336</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475883,9 +476335,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Winter&apos;s Recall</title>
     <ns>0</ns>
-    <id>5312</id>
+    <id>5337</id>
     <revision>
-      <id>5312</id>
+      <id>5337</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475903,9 +476355,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mass Barrier</title>
     <ns>0</ns>
-    <id>5313</id>
+    <id>5338</id>
     <revision>
-      <id>5313</id>
+      <id>5338</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475923,9 +476375,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Rune of Power</title>
     <ns>0</ns>
-    <id>5314</id>
+    <id>5339</id>
     <revision>
-      <id>5314</id>
+      <id>5339</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475943,9 +476395,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Aetherwell</title>
     <ns>0</ns>
-    <id>5315</id>
+    <id>5340</id>
     <revision>
-      <id>5315</id>
+      <id>5340</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475963,9 +476415,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Sacrilegious March</title>
     <ns>0</ns>
-    <id>5316</id>
+    <id>5341</id>
     <revision>
-      <id>5316</id>
+      <id>5341</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -475983,9 +476435,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Dread Chorus</title>
     <ns>0</ns>
-    <id>5317</id>
+    <id>5342</id>
     <revision>
-      <id>5317</id>
+      <id>5342</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476003,9 +476455,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Leaden Hex</title>
     <ns>0</ns>
-    <id>5318</id>
+    <id>5343</id>
     <revision>
-      <id>5318</id>
+      <id>5343</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476023,9 +476475,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Sanguine Covenant</title>
     <ns>0</ns>
-    <id>5319</id>
+    <id>5344</id>
     <revision>
-      <id>5319</id>
+      <id>5344</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476043,9 +476495,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Abyssal Rift</title>
     <ns>0</ns>
-    <id>5320</id>
+    <id>5345</id>
     <revision>
-      <id>5320</id>
+      <id>5345</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476063,9 +476515,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Typhoon</title>
     <ns>0</ns>
-    <id>5321</id>
+    <id>5346</id>
     <revision>
-      <id>5321</id>
+      <id>5346</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476083,9 +476535,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Red Haze</title>
     <ns>0</ns>
-    <id>5322</id>
+    <id>5347</id>
     <revision>
-      <id>5322</id>
+      <id>5347</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476103,9 +476555,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gladesong</title>
     <ns>0</ns>
-    <id>5323</id>
+    <id>5348</id>
     <revision>
-      <id>5323</id>
+      <id>5348</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476123,9 +476575,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Lifesap</title>
     <ns>0</ns>
-    <id>5324</id>
+    <id>5349</id>
     <revision>
-      <id>5324</id>
+      <id>5349</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476143,9 +476595,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Emberkin</title>
     <ns>0</ns>
-    <id>5325</id>
+    <id>5350</id>
     <revision>
-      <id>5325</id>
+      <id>5350</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476163,9 +476615,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Duskmurk</title>
     <ns>0</ns>
-    <id>5326</id>
+    <id>5351</id>
     <revision>
-      <id>5326</id>
+      <id>5351</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476183,9 +476635,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Pyre Colossus</title>
     <ns>0</ns>
-    <id>5327</id>
+    <id>5352</id>
     <revision>
-      <id>5327</id>
+      <id>5352</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476203,9 +476655,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Graveguard</title>
     <ns>0</ns>
-    <id>5328</id>
+    <id>5353</id>
     <revision>
-      <id>5328</id>
+      <id>5353</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476223,9 +476675,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Skeletal Warrior</title>
     <ns>0</ns>
-    <id>5329</id>
+    <id>5354</id>
     <revision>
-      <id>5329</id>
+      <id>5354</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476243,9 +476695,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bone Mage</title>
     <ns>0</ns>
-    <id>5330</id>
+    <id>5355</id>
     <revision>
-      <id>5330</id>
+      <id>5355</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476263,9 +476715,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravewing</title>
     <ns>0</ns>
-    <id>5331</id>
+    <id>5356</id>
     <revision>
-      <id>5331</id>
+      <id>5356</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476283,9 +476735,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Water Elemental</title>
     <ns>0</ns>
-    <id>5332</id>
+    <id>5357</id>
     <revision>
-      <id>5332</id>
+      <id>5357</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476303,9 +476755,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Hoarfrost Warden</title>
     <ns>0</ns>
-    <id>5333</id>
+    <id>5358</id>
     <revision>
-      <id>5333</id>
+      <id>5358</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476323,9 +476775,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Emberforge Tyrant</title>
     <ns>0</ns>
-    <id>5334</id>
+    <id>5359</id>
     <revision>
-      <id>5334</id>
+      <id>5359</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476343,9 +476795,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Broodmother Vysska</title>
     <ns>0</ns>
-    <id>5335</id>
+    <id>5360</id>
     <revision>
-      <id>5335</id>
+      <id>5360</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476363,9 +476815,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bonelord Xarreth</title>
     <ns>0</ns>
-    <id>5336</id>
+    <id>5361</id>
     <revision>
-      <id>5336</id>
+      <id>5361</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476383,9 +476835,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Warlord Grask</title>
     <ns>0</ns>
-    <id>5337</id>
+    <id>5362</id>
     <revision>
-      <id>5337</id>
+      <id>5362</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476403,9 +476855,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Archon Nyxaris</title>
     <ns>0</ns>
-    <id>5338</id>
+    <id>5363</id>
     <revision>
-      <id>5338</id>
+      <id>5363</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476423,9 +476875,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tempest Vharok</title>
     <ns>0</ns>
-    <id>5339</id>
+    <id>5364</id>
     <revision>
-      <id>5339</id>
+      <id>5364</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476443,9 +476895,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Abyssal Maw</title>
     <ns>0</ns>
-    <id>5340</id>
+    <id>5365</id>
     <revision>
-      <id>5340</id>
+      <id>5365</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476463,9 +476915,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mother of Mushrooms</title>
     <ns>0</ns>
-    <id>5341</id>
+    <id>5366</id>
     <revision>
-      <id>5341</id>
+      <id>5366</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476483,9 +476935,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Deeprake</title>
     <ns>0</ns>
-    <id>5342</id>
+    <id>5367</id>
     <revision>
-      <id>5342</id>
+      <id>5367</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476503,9 +476955,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Colossal Bat</title>
     <ns>0</ns>
-    <id>5343</id>
+    <id>5368</id>
     <revision>
-      <id>5343</id>
+      <id>5368</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476523,9 +476975,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Voracious Chest</title>
     <ns>0</ns>
-    <id>5344</id>
+    <id>5369</id>
     <revision>
-      <id>5344</id>
+      <id>5369</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476543,9 +476995,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Acolyte Tessa</title>
     <ns>0</ns>
-    <id>5345</id>
+    <id>5370</id>
     <revision>
-      <id>5345</id>
+      <id>5370</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476563,9 +477015,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Edda Reedhand</title>
     <ns>0</ns>
-    <id>5346</id>
+    <id>5371</id>
     <revision>
-      <id>5346</id>
+      <id>5371</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476583,9 +477035,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Boundstone Helm</title>
     <ns>0</ns>
-    <id>5347</id>
+    <id>5372</id>
     <revision>
-      <id>5347</id>
+      <id>5372</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476604,9 +477056,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravewyrm Gauntlets</title>
     <ns>0</ns>
-    <id>5348</id>
+    <id>5373</id>
     <revision>
-      <id>5348</id>
+      <id>5373</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476625,9 +477077,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravewyrm Bone Quiver</title>
     <ns>0</ns>
-    <id>5349</id>
+    <id>5374</id>
     <revision>
-      <id>5349</id>
+      <id>5374</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476646,9 +477098,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Clockwork Shock Bomb (disambiguation)</title>
     <ns>0</ns>
-    <id>5350</id>
+    <id>5375</id>
     <revision>
-      <id>5350</id>
+      <id>5375</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476667,9 +477119,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tug, the Warhorse</title>
     <ns>0</ns>
-    <id>5351</id>
+    <id>5376</id>
     <revision>
-      <id>5351</id>
+      <id>5376</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476687,9 +477139,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Crystal Lich</title>
     <ns>0</ns>
-    <id>5352</id>
+    <id>5377</id>
     <revision>
-      <id>5352</id>
+      <id>5377</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476707,9 +477159,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Forgemaw The Molten</title>
     <ns>0</ns>
-    <id>5353</id>
+    <id>5378</id>
     <revision>
-      <id>5353</id>
+      <id>5378</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476727,9 +477179,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Flicker and Glimmer</title>
     <ns>0</ns>
-    <id>5354</id>
+    <id>5379</id>
     <revision>
-      <id>5354</id>
+      <id>5379</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476747,9 +477199,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>No Bones About It</title>
     <ns>0</ns>
-    <id>5355</id>
+    <id>5380</id>
     <revision>
-      <id>5355</id>
+      <id>5380</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476767,9 +477219,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Sidestep the Reaper</title>
     <ns>0</ns>
-    <id>5356</id>
+    <id>5381</id>
     <revision>
-      <id>5356</id>
+      <id>5381</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476787,9 +477239,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>No Thrall of Mine</title>
     <ns>0</ns>
-    <id>5357</id>
+    <id>5382</id>
     <revision>
-      <id>5357</id>
+      <id>5382</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476807,9 +477259,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Every Last Moonspawn</title>
     <ns>0</ns>
-    <id>5358</id>
+    <id>5383</id>
     <revision>
-      <id>5358</id>
+      <id>5383</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476827,9 +477279,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Dry Eyes</title>
     <ns>0</ns>
-    <id>5359</id>
+    <id>5384</id>
     <revision>
-      <id>5359</id>
+      <id>5384</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476847,9 +477299,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Stay Buried</title>
     <ns>0</ns>
-    <id>5360</id>
+    <id>5385</id>
     <revision>
-      <id>5360</id>
+      <id>5385</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476867,9 +477319,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wyrmfeller</title>
     <ns>0</ns>
-    <id>5361</id>
+    <id>5386</id>
     <revision>
-      <id>5361</id>
+      <id>5386</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476887,9 +477339,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Vale Arcanist&apos;s Regalia</title>
     <ns>0</ns>
-    <id>5362</id>
+    <id>5387</id>
     <revision>
-      <id>5362</id>
+      <id>5387</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476907,9 +477359,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Boundstone Vanguard</title>
     <ns>0</ns>
-    <id>5363</id>
+    <id>5388</id>
     <revision>
-      <id>5363</id>
+      <id>5388</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476927,9 +477379,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Greyjaw Stalker&apos;s Kit</title>
     <ns>0</ns>
-    <id>5364</id>
+    <id>5389</id>
     <revision>
-      <id>5364</id>
+      <id>5389</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476947,9 +477399,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Barrowlord Battlegear</title>
     <ns>0</ns>
-    <id>5365</id>
+    <id>5390</id>
     <revision>
-      <id>5365</id>
+      <id>5390</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476968,9 +477420,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Nightfang Vestments</title>
     <ns>0</ns>
-    <id>5366</id>
+    <id>5391</id>
     <revision>
-      <id>5366</id>
+      <id>5391</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -476989,9 +477441,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mournweave Raiment</title>
     <ns>0</ns>
-    <id>5367</id>
+    <id>5392</id>
     <revision>
-      <id>5367</id>
+      <id>5392</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477010,9 +477462,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bonewrought Regalia</title>
     <ns>0</ns>
-    <id>5368</id>
+    <id>5393</id>
     <revision>
-      <id>5368</id>
+      <id>5393</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477031,9 +477483,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Direfang Pelt</title>
     <ns>0</ns>
-    <id>5369</id>
+    <id>5394</id>
     <revision>
-      <id>5369</id>
+      <id>5394</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477052,9 +477504,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wraithfire Regalia</title>
     <ns>0</ns>
-    <id>5370</id>
+    <id>5395</id>
     <revision>
-      <id>5370</id>
+      <id>5395</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477073,9 +477525,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Galecall Vestments</title>
     <ns>0</ns>
-    <id>5371</id>
+    <id>5396</id>
     <revision>
-      <id>5371</id>
+      <id>5396</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477094,9 +477546,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Roots&apos; Bramblehide</title>
     <ns>0</ns>
-    <id>5372</id>
+    <id>5397</id>
     <revision>
-      <id>5372</id>
+      <id>5397</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477115,9 +477567,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>A Helping Hammer</title>
     <ns>0</ns>
-    <id>5373</id>
+    <id>5398</id>
     <revision>
-      <id>5373</id>
+      <id>5398</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477135,9 +477587,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>A Borrowed Face</title>
     <ns>0</ns>
-    <id>5374</id>
+    <id>5399</id>
     <revision>
-      <id>5374</id>
+      <id>5399</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477155,9 +477607,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Windrider Slalom</title>
     <ns>0</ns>
-    <id>5375</id>
+    <id>5400</id>
     <revision>
-      <id>5375</id>
+      <id>5400</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477175,9 +477627,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>The Sunken Bastion (disambiguation)</title>
     <ns>0</ns>
-    <id>5376</id>
+    <id>5401</id>
     <revision>
-      <id>5376</id>
+      <id>5401</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477196,9 +477648,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Thunzharr, the Waking Peak</title>
     <ns>0</ns>
-    <id>5377</id>
+    <id>5402</id>
     <revision>
-      <id>5377</id>
+      <id>5402</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477216,9 +477668,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>The Collapsed Reliquary</title>
     <ns>0</ns>
-    <id>5378</id>
+    <id>5403</id>
     <revision>
-      <id>5378</id>
+      <id>5403</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477236,9 +477688,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>The Drowned Litany</title>
     <ns>0</ns>
-    <id>5379</id>
+    <id>5404</id>
     <revision>
-      <id>5379</id>
+      <id>5404</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477256,9 +477708,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Sexton Marrow</title>
     <ns>0</ns>
-    <id>5380</id>
+    <id>5405</id>
     <revision>
-      <id>5380</id>
+      <id>5405</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477277,9 +477729,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Lady of the Bonechill</title>
     <ns>0</ns>
-    <id>5381</id>
+    <id>5406</id>
     <revision>
-      <id>5381</id>
+      <id>5406</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477297,9 +477749,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Cantor Ilvane</title>
     <ns>0</ns>
-    <id>5382</id>
+    <id>5407</id>
     <revision>
-      <id>5382</id>
+      <id>5407</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477317,9 +477769,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Morthen the Gravecaller</title>
     <ns>0</ns>
-    <id>5383</id>
+    <id>5408</id>
     <revision>
-      <id>5383</id>
+      <id>5408</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477337,9 +477789,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Knight-Commander Olen</title>
     <ns>0</ns>
-    <id>5384</id>
+    <id>5409</id>
     <revision>
-      <id>5384</id>
+      <id>5409</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477357,9 +477809,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gaol Turnkey</title>
     <ns>0</ns>
-    <id>5385</id>
+    <id>5410</id>
     <revision>
-      <id>5385</id>
+      <id>5410</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477377,9 +477829,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gaoler Ossick</title>
     <ns>0</ns>
-    <id>5386</id>
+    <id>5411</id>
     <revision>
-      <id>5386</id>
+      <id>5411</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477397,9 +477849,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Vael the Fogbinder</title>
     <ns>0</ns>
-    <id>5387</id>
+    <id>5412</id>
     <revision>
-      <id>5387</id>
+      <id>5412</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477418,9 +477870,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Choirmother Selthe</title>
     <ns>0</ns>
-    <id>5388</id>
+    <id>5413</id>
     <revision>
-      <id>5388</id>
+      <id>5413</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477438,9 +477890,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tideglass Colossus</title>
     <ns>0</ns>
-    <id>5389</id>
+    <id>5414</id>
     <revision>
-      <id>5389</id>
+      <id>5414</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477458,9 +477910,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Ysolei, Avatar of the Drowned Moon</title>
     <ns>0</ns>
-    <id>5390</id>
+    <id>5415</id>
     <revision>
-      <id>5390</id>
+      <id>5415</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477478,9 +477930,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Korgath the Bound</title>
     <ns>0</ns>
-    <id>5391</id>
+    <id>5416</id>
     <revision>
-      <id>5391</id>
+      <id>5416</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477498,9 +477950,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Grand Necromancer Velkhar</title>
     <ns>0</ns>
-    <id>5392</id>
+    <id>5417</id>
     <revision>
-      <id>5392</id>
+      <id>5417</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477518,9 +477970,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Korzul the Gravewyrm (disambiguation)</title>
     <ns>0</ns>
-    <id>5393</id>
+    <id>5418</id>
     <revision>
-      <id>5393</id>
+      <id>5418</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477539,9 +477991,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Fanglord Beastmaster</title>
     <ns>0</ns>
-    <id>5394</id>
+    <id>5419</id>
     <revision>
-      <id>5394</id>
+      <id>5419</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477559,9 +478011,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>The Gorgebloom</title>
     <ns>0</ns>
-    <id>5395</id>
+    <id>5420</id>
     <revision>
-      <id>5395</id>
+      <id>5420</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477579,9 +478031,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Zulgar, Voice of the Basin</title>
     <ns>0</ns>
-    <id>5396</id>
+    <id>5421</id>
     <revision>
-      <id>5396</id>
+      <id>5421</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477599,9 +478051,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>The Wraithwood: Wood Wraith</title>
     <ns>0</ns>
-    <id>5397</id>
+    <id>5422</id>
     <revision>
-      <id>5397</id>
+      <id>5422</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477619,9 +478071,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Brother Aldric</title>
     <ns>0</ns>
-    <id>5398</id>
+    <id>5423</id>
     <revision>
-      <id>5398</id>
+      <id>5423</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477641,9 +478093,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Scout Maren</title>
     <ns>0</ns>
-    <id>5399</id>
+    <id>5424</id>
     <revision>
-      <id>5399</id>
+      <id>5424</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477661,9 +478113,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Brother Halven</title>
     <ns>0</ns>
-    <id>5400</id>
+    <id>5425</id>
     <revision>
-      <id>5400</id>
+      <id>5425</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477681,9 +478133,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Dispatch Guard</title>
     <ns>0</ns>
-    <id>5401</id>
+    <id>5426</id>
     <revision>
-      <id>5401</id>
+      <id>5426</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477703,9 +478155,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Lantern Sentry</title>
     <ns>0</ns>
-    <id>5402</id>
+    <id>5427</id>
     <revision>
-      <id>5402</id>
+      <id>5427</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477723,9 +478175,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Lantern Watchman</title>
     <ns>0</ns>
-    <id>5403</id>
+    <id>5428</id>
     <revision>
-      <id>5403</id>
+      <id>5428</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477743,9 +478195,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wolves at the Door</title>
     <ns>0</ns>
-    <id>5404</id>
+    <id>5429</id>
     <revision>
-      <id>5404</id>
+      <id>5429</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477763,9 +478215,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>The Codfather</title>
     <ns>0</ns>
-    <id>5405</id>
+    <id>5430</id>
     <revision>
-      <id>5405</id>
+      <id>5430</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477783,9 +478235,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>The Bound Guardian</title>
     <ns>0</ns>
-    <id>5406</id>
+    <id>5431</id>
     <revision>
-      <id>5406</id>
+      <id>5431</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477804,9 +478256,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>The Wreck Line</title>
     <ns>0</ns>
-    <id>5407</id>
+    <id>5432</id>
     <revision>
-      <id>5407</id>
+      <id>5432</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477824,9 +478276,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mother of Pearl</title>
     <ns>0</ns>
-    <id>5408</id>
+    <id>5433</id>
     <revision>
-      <id>5408</id>
+      <id>5433</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477844,9 +478296,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Restless Bones</title>
     <ns>0</ns>
-    <id>5409</id>
+    <id>5434</id>
     <revision>
-      <id>5409</id>
+      <id>5434</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477864,9 +478316,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Training Dummy</title>
     <ns>0</ns>
-    <id>5410</id>
+    <id>5435</id>
     <revision>
-      <id>5410</id>
+      <id>5435</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477884,9 +478336,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Raised Bonewalker</title>
     <ns>0</ns>
-    <id>5411</id>
+    <id>5436</id>
     <revision>
-      <id>5411</id>
+      <id>5436</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477904,9 +478356,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Rime Elemental</title>
     <ns>0</ns>
-    <id>5412</id>
+    <id>5437</id>
     <revision>
-      <id>5412</id>
+      <id>5437</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477924,9 +478376,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mere Hydra</title>
     <ns>0</ns>
-    <id>5413</id>
+    <id>5438</id>
     <revision>
-      <id>5413</id>
+      <id>5438</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477945,9 +478397,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tideglass Reflection</title>
     <ns>0</ns>
-    <id>5414</id>
+    <id>5439</id>
     <revision>
-      <id>5414</id>
+      <id>5439</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477973,9 +478425,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Boundstone Girdle</title>
     <ns>0</ns>
-    <id>5415</id>
+    <id>5440</id>
     <revision>
-      <id>5415</id>
+      <id>5440</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -477993,9 +478445,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravewyrm Mantle</title>
     <ns>0</ns>
-    <id>5416</id>
+    <id>5441</id>
     <revision>
-      <id>5416</id>
+      <id>5441</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478013,9 +478465,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tidescale Vest</title>
     <ns>0</ns>
-    <id>5417</id>
+    <id>5442</id>
     <revision>
-      <id>5417</id>
+      <id>5442</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478033,9 +478485,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tideguard Greaves</title>
     <ns>0</ns>
-    <id>5418</id>
+    <id>5443</id>
     <revision>
-      <id>5418</id>
+      <id>5443</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478053,9 +478505,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tideguard Sabatons</title>
     <ns>0</ns>
-    <id>5419</id>
+    <id>5444</id>
     <revision>
-      <id>5419</id>
+      <id>5444</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478073,9 +478525,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Drowned Prayer Leggings</title>
     <ns>0</ns>
-    <id>5420</id>
+    <id>5445</id>
     <revision>
-      <id>5420</id>
+      <id>5445</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478093,9 +478545,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Drowned Prayer Sandals</title>
     <ns>0</ns>
-    <id>5421</id>
+    <id>5446</id>
     <revision>
-      <id>5421</id>
+      <id>5446</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478113,9 +478565,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Eelscale Leggings</title>
     <ns>0</ns>
-    <id>5422</id>
+    <id>5447</id>
     <revision>
-      <id>5422</id>
+      <id>5447</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478133,9 +478585,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Eelscale Treads</title>
     <ns>0</ns>
-    <id>5423</id>
+    <id>5448</id>
     <revision>
-      <id>5423</id>
+      <id>5448</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478153,9 +478605,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Korgath&apos;s Chainwraps</title>
     <ns>0</ns>
-    <id>5424</id>
+    <id>5449</id>
     <revision>
-      <id>5424</id>
+      <id>5449</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478173,9 +478625,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Boneguard Breastplate</title>
     <ns>0</ns>
-    <id>5425</id>
+    <id>5450</id>
     <revision>
-      <id>5425</id>
+      <id>5450</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478193,9 +478645,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Staff of Velkhar</title>
     <ns>0</ns>
-    <id>5426</id>
+    <id>5451</id>
     <revision>
-      <id>5426</id>
+      <id>5451</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478213,9 +478665,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Nightveil Tunic</title>
     <ns>0</ns>
-    <id>5427</id>
+    <id>5452</id>
     <revision>
-      <id>5427</id>
+      <id>5452</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478233,9 +478685,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Broodsworn Grand Robe</title>
     <ns>0</ns>
-    <id>5428</id>
+    <id>5453</id>
     <revision>
-      <id>5428</id>
+      <id>5453</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478253,9 +478705,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravewyrm Stalker&apos;s Treads</title>
     <ns>0</ns>
-    <id>5429</id>
+    <id>5454</id>
     <revision>
-      <id>5429</id>
+      <id>5454</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478273,9 +478725,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravewyrm Sabatons</title>
     <ns>0</ns>
-    <id>5430</id>
+    <id>5455</id>
     <revision>
-      <id>5430</id>
+      <id>5455</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478293,9 +478745,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Broodsworn Soulsteps</title>
     <ns>0</ns>
-    <id>5431</id>
+    <id>5456</id>
     <revision>
-      <id>5431</id>
+      <id>5456</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478313,9 +478765,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Barrowlord Warplate</title>
     <ns>0</ns>
-    <id>5432</id>
+    <id>5457</id>
     <revision>
-      <id>5432</id>
+      <id>5457</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478333,9 +478785,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mournweave Starshroud</title>
     <ns>0</ns>
-    <id>5433</id>
+    <id>5458</id>
     <revision>
-      <id>5433</id>
+      <id>5458</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478353,9 +478805,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Nightfang Harness</title>
     <ns>0</ns>
-    <id>5434</id>
+    <id>5459</id>
     <revision>
-      <id>5434</id>
+      <id>5459</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478373,9 +478825,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Barrowlord Legguards</title>
     <ns>0</ns>
-    <id>5435</id>
+    <id>5460</id>
     <revision>
-      <id>5435</id>
+      <id>5460</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478393,9 +478845,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mournweave Soulsteps</title>
     <ns>0</ns>
-    <id>5436</id>
+    <id>5461</id>
     <revision>
-      <id>5436</id>
+      <id>5461</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478413,9 +478865,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Nightfang Treads</title>
     <ns>0</ns>
-    <id>5437</id>
+    <id>5462</id>
     <revision>
-      <id>5437</id>
+      <id>5462</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478433,9 +478885,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Nightfang Legguards</title>
     <ns>0</ns>
-    <id>5438</id>
+    <id>5463</id>
     <revision>
-      <id>5438</id>
+      <id>5463</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478453,9 +478905,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wyrmfang Greatblade</title>
     <ns>0</ns>
-    <id>5439</id>
+    <id>5464</id>
     <revision>
-      <id>5439</id>
+      <id>5464</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478473,9 +478925,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Staff of the Gravewyrm</title>
     <ns>0</ns>
-    <id>5440</id>
+    <id>5465</id>
     <revision>
-      <id>5440</id>
+      <id>5465</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478493,9 +478945,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Fang of Korzul</title>
     <ns>0</ns>
-    <id>5441</id>
+    <id>5466</id>
     <revision>
-      <id>5441</id>
+      <id>5466</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478513,9 +478965,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Barrowlord Dread Visage</title>
     <ns>0</ns>
-    <id>5442</id>
+    <id>5467</id>
     <revision>
-      <id>5442</id>
+      <id>5467</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478533,9 +478985,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mournweave Soulspire Mantle</title>
     <ns>0</ns>
-    <id>5443</id>
+    <id>5468</id>
     <revision>
-      <id>5443</id>
+      <id>5468</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478553,9 +479005,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Nightfang Talongrips</title>
     <ns>0</ns>
-    <id>5444</id>
+    <id>5469</id>
     <revision>
-      <id>5444</id>
+      <id>5469</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478573,9 +479025,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Heartwood of the Deathless Crown</title>
     <ns>0</ns>
-    <id>5445</id>
+    <id>5470</id>
     <revision>
-      <id>5445</id>
+      <id>5470</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478593,9 +479045,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Thronebane, Last Oath of Thornpeak</title>
     <ns>0</ns>
-    <id>5446</id>
+    <id>5471</id>
     <revision>
-      <id>5446</id>
+      <id>5471</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478613,9 +479065,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bonewrought Dreadhelm</title>
     <ns>0</ns>
-    <id>5447</id>
+    <id>5472</id>
     <revision>
-      <id>5447</id>
+      <id>5472</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478633,9 +479085,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bonewrought Warspaulders</title>
     <ns>0</ns>
-    <id>5448</id>
+    <id>5473</id>
     <revision>
-      <id>5448</id>
+      <id>5473</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478653,9 +479105,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Direfang Crown</title>
     <ns>0</ns>
-    <id>5449</id>
+    <id>5474</id>
     <revision>
-      <id>5449</id>
+      <id>5474</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478673,9 +479125,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Direfang Shoulderguards</title>
     <ns>0</ns>
-    <id>5450</id>
+    <id>5475</id>
     <revision>
-      <id>5450</id>
+      <id>5475</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478693,9 +479145,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wraithfire Cowl</title>
     <ns>0</ns>
-    <id>5451</id>
+    <id>5476</id>
     <revision>
-      <id>5451</id>
+      <id>5476</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478713,9 +479165,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wraithfire Mantle</title>
     <ns>0</ns>
-    <id>5452</id>
+    <id>5477</id>
     <revision>
-      <id>5452</id>
+      <id>5477</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478733,9 +479185,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Galecall Crown</title>
     <ns>0</ns>
-    <id>5453</id>
+    <id>5478</id>
     <revision>
-      <id>5453</id>
+      <id>5478</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478753,9 +479205,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Galecall Spaulders</title>
     <ns>0</ns>
-    <id>5454</id>
+    <id>5479</id>
     <revision>
-      <id>5454</id>
+      <id>5479</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478773,9 +479225,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bonewrought Greatsword</title>
     <ns>0</ns>
-    <id>5455</id>
+    <id>5480</id>
     <revision>
-      <id>5455</id>
+      <id>5480</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478793,9 +479245,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Direfang Greatblade</title>
     <ns>0</ns>
-    <id>5456</id>
+    <id>5481</id>
     <revision>
-      <id>5456</id>
+      <id>5481</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478813,9 +479265,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bonewrought Bulwark</title>
     <ns>0</ns>
-    <id>5457</id>
+    <id>5482</id>
     <revision>
-      <id>5457</id>
+      <id>5482</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478833,9 +479285,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wraithfire Orb</title>
     <ns>0</ns>
-    <id>5458</id>
+    <id>5483</id>
     <revision>
-      <id>5458</id>
+      <id>5483</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478853,9 +479305,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Direfang Quiver</title>
     <ns>0</ns>
-    <id>5459</id>
+    <id>5484</id>
     <revision>
-      <id>5459</id>
+      <id>5484</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478873,9 +479325,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravewyrm Thornmaul</title>
     <ns>0</ns>
-    <id>5460</id>
+    <id>5485</id>
     <revision>
-      <id>5460</id>
+      <id>5485</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478893,9 +479345,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Nightfang&apos;s Greatstaff</title>
     <ns>0</ns>
-    <id>5461</id>
+    <id>5486</id>
     <revision>
-      <id>5461</id>
+      <id>5486</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478913,9 +479365,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Maul of the Scourged Wilds</title>
     <ns>0</ns>
-    <id>5462</id>
+    <id>5487</id>
     <revision>
-      <id>5462</id>
+      <id>5487</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478933,9 +479385,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Roots&apos; Bramblehide Crown</title>
     <ns>0</ns>
-    <id>5463</id>
+    <id>5488</id>
     <revision>
-      <id>5463</id>
+      <id>5488</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478953,9 +479405,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Roots&apos; Bramblehide Mantle</title>
     <ns>0</ns>
-    <id>5464</id>
+    <id>5489</id>
     <revision>
-      <id>5464</id>
+      <id>5489</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478973,9 +479425,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Roots&apos; Bramblehide Harness</title>
     <ns>0</ns>
-    <id>5465</id>
+    <id>5490</id>
     <revision>
-      <id>5465</id>
+      <id>5490</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -478993,9 +479445,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Roots&apos; Bramblehide Cinch</title>
     <ns>0</ns>
-    <id>5466</id>
+    <id>5491</id>
     <revision>
-      <id>5466</id>
+      <id>5491</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479013,9 +479465,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Roots&apos; Bramblehide Legguards</title>
     <ns>0</ns>
-    <id>5467</id>
+    <id>5492</id>
     <revision>
-      <id>5467</id>
+      <id>5492</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479033,9 +479485,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Roots&apos; Bramblehide Grips</title>
     <ns>0</ns>
-    <id>5468</id>
+    <id>5493</id>
     <revision>
-      <id>5468</id>
+      <id>5493</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479053,9 +479505,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Roots&apos; Bramblehide Treads</title>
     <ns>0</ns>
-    <id>5469</id>
+    <id>5494</id>
     <revision>
-      <id>5469</id>
+      <id>5494</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479073,9 +479525,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Courtier&apos;s Bonefang</title>
     <ns>0</ns>
-    <id>5470</id>
+    <id>5495</id>
     <revision>
-      <id>5470</id>
+      <id>5495</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479093,9 +479545,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Thornpeak Wardblade</title>
     <ns>0</ns>
-    <id>5471</id>
+    <id>5496</id>
     <revision>
-      <id>5471</id>
+      <id>5496</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479113,9 +479565,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravecourt Hewer</title>
     <ns>0</ns>
-    <id>5472</id>
+    <id>5497</id>
     <revision>
-      <id>5472</id>
+      <id>5497</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479133,9 +479585,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Votive Ward of the Deathless Court</title>
     <ns>0</ns>
-    <id>5473</id>
+    <id>5498</id>
     <revision>
-      <id>5473</id>
+      <id>5498</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479153,9 +479605,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Thornpeak Moonhide Cowl</title>
     <ns>0</ns>
-    <id>5474</id>
+    <id>5499</id>
     <revision>
-      <id>5474</id>
+      <id>5499</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479173,9 +479625,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Stormhymn Chain Grips</title>
     <ns>0</ns>
-    <id>5475</id>
+    <id>5500</id>
     <revision>
-      <id>5475</id>
+      <id>5500</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479193,9 +479645,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Stormhymn Chain Treads</title>
     <ns>0</ns>
-    <id>5476</id>
+    <id>5501</id>
     <revision>
-      <id>5476</id>
+      <id>5501</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479213,9 +479665,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wildgrowth Leggings</title>
     <ns>0</ns>
-    <id>5477</id>
+    <id>5502</id>
     <revision>
-      <id>5477</id>
+      <id>5502</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479233,9 +479685,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Grovewarden&apos;s Grips</title>
     <ns>0</ns>
-    <id>5478</id>
+    <id>5503</id>
     <revision>
-      <id>5478</id>
+      <id>5503</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479253,9 +479705,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Verdant Walkers</title>
     <ns>0</ns>
-    <id>5479</id>
+    <id>5504</id>
     <revision>
-      <id>5479</id>
+      <id>5504</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479273,9 +479725,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Moonwrack Breastplate</title>
     <ns>0</ns>
-    <id>5480</id>
+    <id>5505</id>
     <revision>
-      <id>5480</id>
+      <id>5505</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479293,9 +479745,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Moonwrack Robe</title>
     <ns>0</ns>
-    <id>5481</id>
+    <id>5506</id>
     <revision>
-      <id>5481</id>
+      <id>5506</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479313,9 +479765,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Moonwrack Tunic</title>
     <ns>0</ns>
-    <id>5482</id>
+    <id>5507</id>
     <revision>
-      <id>5482</id>
+      <id>5507</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479333,9 +479785,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Ysolei&apos;s Pearl Greaves</title>
     <ns>0</ns>
-    <id>5483</id>
+    <id>5508</id>
     <revision>
-      <id>5483</id>
+      <id>5508</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479353,9 +479805,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Selthe&apos;s Sea-Striders</title>
     <ns>0</ns>
-    <id>5484</id>
+    <id>5509</id>
     <revision>
-      <id>5484</id>
+      <id>5509</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479373,9 +479825,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Duskwhisper</title>
     <ns>0</ns>
-    <id>5485</id>
+    <id>5510</id>
     <revision>
-      <id>5485</id>
+      <id>5510</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479393,9 +479845,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Wildheart Tuskblade</title>
     <ns>0</ns>
-    <id>5486</id>
+    <id>5511</id>
     <revision>
-      <id>5486</id>
+      <id>5511</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479413,9 +479865,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Hexwood Staff of the Basin</title>
     <ns>0</ns>
-    <id>5487</id>
+    <id>5512</id>
     <revision>
-      <id>5487</id>
+      <id>5512</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479433,9 +479885,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Fangknife of Zulgar</title>
     <ns>0</ns>
-    <id>5488</id>
+    <id>5513</id>
     <revision>
-      <id>5488</id>
+      <id>5513</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479453,9 +479905,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Fanglord&apos;s Beastspear</title>
     <ns>0</ns>
-    <id>5489</id>
+    <id>5514</id>
     <revision>
-      <id>5489</id>
+      <id>5514</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479473,9 +479925,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Sexton&apos;s Spadehaft</title>
     <ns>0</ns>
-    <id>5490</id>
+    <id>5515</id>
     <revision>
-      <id>5490</id>
+      <id>5515</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479493,9 +479945,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Spadeworn Gauntlets</title>
     <ns>0</ns>
-    <id>5491</id>
+    <id>5516</id>
     <revision>
-      <id>5491</id>
+      <id>5516</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479513,9 +479965,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravedirt Grips</title>
     <ns>0</ns>
-    <id>5492</id>
+    <id>5517</id>
     <revision>
-      <id>5492</id>
+      <id>5517</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479533,9 +479985,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bellrope Mitts</title>
     <ns>0</ns>
-    <id>5493</id>
+    <id>5518</id>
     <revision>
-      <id>5493</id>
+      <id>5518</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479553,9 +480005,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Bride&apos;s Icicle</title>
     <ns>0</ns>
-    <id>5494</id>
+    <id>5519</id>
     <revision>
-      <id>5494</id>
+      <id>5519</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479573,9 +480025,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Rimewreath Coif</title>
     <ns>0</ns>
-    <id>5495</id>
+    <id>5520</id>
     <revision>
-      <id>5495</id>
+      <id>5520</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479593,9 +480045,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Rime-Laced Hood</title>
     <ns>0</ns>
-    <id>5496</id>
+    <id>5521</id>
     <revision>
-      <id>5496</id>
+      <id>5521</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479613,9 +480065,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Lamenting Veil</title>
     <ns>0</ns>
-    <id>5497</id>
+    <id>5522</id>
     <revision>
-      <id>5497</id>
+      <id>5522</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479633,9 +480085,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Cantor&apos;s Hymnal</title>
     <ns>0</ns>
-    <id>5498</id>
+    <id>5523</id>
     <revision>
-      <id>5498</id>
+      <id>5523</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479653,9 +480105,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Choirward Pauldrons</title>
     <ns>0</ns>
-    <id>5499</id>
+    <id>5524</id>
     <revision>
-      <id>5499</id>
+      <id>5524</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479673,9 +480125,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Chorister&apos;s Spaulders</title>
     <ns>0</ns>
-    <id>5500</id>
+    <id>5525</id>
     <revision>
-      <id>5500</id>
+      <id>5525</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479693,9 +480145,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Cantor&apos;s Stole</title>
     <ns>0</ns>
-    <id>5501</id>
+    <id>5526</id>
     <revision>
-      <id>5501</id>
+      <id>5526</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479713,9 +480165,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Knellbound Hauberk</title>
     <ns>0</ns>
-    <id>5502</id>
+    <id>5527</id>
     <revision>
-      <id>5502</id>
+      <id>5527</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479733,9 +480185,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Candlewatch Jerkin</title>
     <ns>0</ns>
-    <id>5503</id>
+    <id>5528</id>
     <revision>
-      <id>5503</id>
+      <id>5528</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479753,9 +480205,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Robe of the Unquiet Rite</title>
     <ns>0</ns>
-    <id>5504</id>
+    <id>5529</id>
     <revision>
-      <id>5504</id>
+      <id>5529</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479773,9 +480225,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gravecaller&apos;s Rod</title>
     <ns>0</ns>
-    <id>5505</id>
+    <id>5530</id>
     <revision>
-      <id>5505</id>
+      <id>5530</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479793,9 +480245,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Knight-Commander&apos;s Longsword</title>
     <ns>0</ns>
-    <id>5506</id>
+    <id>5531</id>
     <revision>
-      <id>5506</id>
+      <id>5531</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479813,9 +480265,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gaolyard Cudgel</title>
     <ns>0</ns>
-    <id>5507</id>
+    <id>5532</id>
     <revision>
-      <id>5507</id>
+      <id>5532</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479833,9 +480285,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Gaolyard Jerkin</title>
     <ns>0</ns>
-    <id>5508</id>
+    <id>5533</id>
     <revision>
-      <id>5508</id>
+      <id>5533</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479853,9 +480305,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Brinewarden Robe</title>
     <ns>0</ns>
-    <id>5509</id>
+    <id>5534</id>
     <revision>
-      <id>5509</id>
+      <id>5534</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479873,9 +480325,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Fogbinder&apos;s Rod</title>
     <ns>0</ns>
-    <id>5510</id>
+    <id>5535</id>
     <revision>
-      <id>5510</id>
+      <id>5535</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479893,9 +480345,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Portcullis Girdle</title>
     <ns>0</ns>
-    <id>5511</id>
+    <id>5536</id>
     <revision>
-      <id>5511</id>
+      <id>5536</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479913,9 +480365,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Cellwatch Belt</title>
     <ns>0</ns>
-    <id>5512</id>
+    <id>5537</id>
     <revision>
-      <id>5512</id>
+      <id>5537</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479933,9 +480385,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Lanternwick Sash</title>
     <ns>0</ns>
-    <id>5513</id>
+    <id>5538</id>
     <revision>
-      <id>5513</id>
+      <id>5538</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479953,9 +480405,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Turnkey&apos;s Shank</title>
     <ns>0</ns>
-    <id>5514</id>
+    <id>5539</id>
     <revision>
-      <id>5514</id>
+      <id>5539</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479973,9 +480425,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Chorus Conch</title>
     <ns>0</ns>
-    <id>5515</id>
+    <id>5540</id>
     <revision>
-      <id>5515</id>
+      <id>5540</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -479993,9 +480445,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Conchplate Sabatons</title>
     <ns>0</ns>
-    <id>5516</id>
+    <id>5541</id>
     <revision>
-      <id>5516</id>
+      <id>5541</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480013,9 +480465,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Pale Chorus Slippers</title>
     <ns>0</ns>
-    <id>5517</id>
+    <id>5542</id>
     <revision>
-      <id>5517</id>
+      <id>5542</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480033,9 +480485,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tideglass Shiv</title>
     <ns>0</ns>
-    <id>5518</id>
+    <id>5543</id>
     <revision>
-      <id>5518</id>
+      <id>5543</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480053,9 +480505,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Tideglass Gauntlets</title>
     <ns>0</ns>
-    <id>5519</id>
+    <id>5544</id>
     <revision>
-      <id>5519</id>
+      <id>5544</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480073,9 +480525,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Moonburn Grips</title>
     <ns>0</ns>
-    <id>5520</id>
+    <id>5545</id>
     <revision>
-      <id>5520</id>
+      <id>5545</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480093,9 +480545,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Prism-Etched Handwraps</title>
     <ns>0</ns>
-    <id>5521</id>
+    <id>5546</id>
     <revision>
-      <id>5521</id>
+      <id>5546</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480113,9 +480565,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mere-Crested Helm</title>
     <ns>0</ns>
-    <id>5522</id>
+    <id>5547</id>
     <revision>
-      <id>5522</id>
+      <id>5547</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480133,9 +480585,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Mereskin Hood</title>
     <ns>0</ns>
-    <id>5523</id>
+    <id>5548</id>
     <revision>
-      <id>5523</id>
+      <id>5548</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480153,9 +480605,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Merewater Cowl</title>
     <ns>0</ns>
-    <id>5524</id>
+    <id>5549</id>
     <revision>
-      <id>5524</id>
+      <id>5549</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480173,9 +480625,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Merecleaver</title>
     <ns>0</ns>
-    <id>5525</id>
+    <id>5550</id>
     <revision>
-      <id>5525</id>
+      <id>5550</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480193,9 +480645,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Moonwrack Stave</title>
     <ns>0</ns>
-    <id>5526</id>
+    <id>5551</id>
     <revision>
-      <id>5526</id>
+      <id>5551</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480213,9 +480665,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Falls-Blessed Staff</title>
     <ns>0</ns>
-    <id>5527</id>
+    <id>5552</id>
     <revision>
-      <id>5527</id>
+      <id>5552</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480233,9 +480685,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Aether Surge</title>
     <ns>0</ns>
-    <id>5528</id>
+    <id>5553</id>
     <revision>
-      <id>5528</id>
+      <id>5553</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -480253,9 +480705,9 @@ Use [[Clockwork Shock Bomb]] from your bags or action bar. It explodes at the sp
   <page>
     <title>Patch Up</title>
     <ns>0</ns>
-    <id>5529</id>
+    <id>5554</id>
     <revision>
-      <id>5529</id>
+      <id>5554</id>
       <timestamp>2026-11-05T00:00:01Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>

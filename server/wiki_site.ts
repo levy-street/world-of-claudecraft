@@ -76,7 +76,12 @@ export function resolveWikiRequest(
   const redirects = wikiRedirects(staticDir);
   if (Object.hasOwn(redirects, slashless)) {
     const target = redirects[slashless];
-    if (typeof target === 'string' && target.startsWith('/') && !target.startsWith('//'))
+    if (
+      typeof target === 'string' &&
+      target.startsWith('/') &&
+      !target.startsWith('//') &&
+      !target.includes('\\')
+    )
       return { kind: 'redirect', location: target + search };
     return { kind: 'gone' };
   }

@@ -1,5 +1,5 @@
 // The encyclopedia's page renderer, shared by the in-browser reader (reader.js) and the
-// static site build (scripts/wiki/build_wiki_site.mjs). It turns a page's wikitext into
+// static site build (scripts/wiki_site/build.mjs). It turns a page's wikitext into
 // the article view: the body markup plus the layout passes that reshape it. Anything that
 // only binds behavior (filters, tooltips, the image viewer) stays with the caller.
 import { layoutArticle } from './article_layout.js';

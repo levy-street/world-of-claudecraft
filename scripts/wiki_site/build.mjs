@@ -240,6 +240,8 @@ async function main() {
   const registry = readRegistry();
   if (args.includes('--clean')) rmSync(join(outDir, 'wiki'), { recursive: true, force: true });
   const { paths, broken } = await buildSite({ seedFile, outDir, templateFile, registry });
+  // A seed generated for this build lives in its own temporary folder.
+  if (args.includes('--generate')) rmSync(dirname(seedFile), { recursive: true, force: true });
   if (args.includes('--consume-template')) rmSync(templateFile, { force: true });
   for (const [target, from] of broken)
     console.warn(`  no page for [[${target}]], linked from ${[...from].slice(0, 3).join('; ')}`);

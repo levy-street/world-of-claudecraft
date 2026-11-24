@@ -48,8 +48,9 @@ route (`server/static_fallback.ts`). `vite dev` serves `.wiki-site/` the same wa
 ## Addresses never move
 
 `mediawiki/site_paths.json` pins every published page's address. A new page gets
-`/wiki/<section>/<slug>` the first time it is pinned; after that, renaming its title or
-changing how it is classified does not move it.
+`/wiki/<section>/<slug>` the first time it is pinned; after that, changing how it is
+classified does not move it. The registry is keyed by title, so a page whose title
+changes is a new page: give the old address a redirect (below) in the same change.
 
 **Every content change that adds, renames or removes a page runs `npm run wiki:paths`**
 (regenerates the seed and updates the registry) and commits both files.
