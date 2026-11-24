@@ -221,18 +221,30 @@ function wrap(a: number): number {
   return r < 0 ? r + TAU : r;
 }
 
+/** The least and the most a ring's corridors sway off the Wellspawn's side
+ *  (degrees): each ring sways the other way from the last, so the next
+ *  corridors stand 30 to 50 degrees round from the last ones (a real walk,
+ *  more than a corridor's width even at the lip). */
+export const RING_SWAY_MIN_DEG = 15;
+export const RING_SWAY_MAX_DEG = 25;
+
 /** Ring `k`'s corridors in overflow `n` (`gaps` of them, `spreadDeg` apart
- *  round the wellspring; evenly round it when not given): the first hashed,
- *  each next turned a hashed 35 to 75 degrees one way or the other from the
- *  last. Pure. */
+ *  round the wellspring; evenly round it when not given), centred on the
+ *  Wellspawn's side of the floor (`WELLSPAWN_BEARING`) and swayed off it a
+ *  hashed RING_SWAY_MIN_DEG to RING_SWAY_MAX_DEG, the other way from the
+ *  last ring (the first ring's way hashed per overflow). Since the bot runs of
+ *  2026-11-24 the corridors face the Wellspawn's walk on every tier, so a
+ *  hitter standing in one has every walking child in reach (they were hashed
+ *  anywhere round the well, and the first overflow's left two children 30 to
+ *  50 yards from every corridor). Pure. */
 export function ringGaps(n: number, k: number, gaps: number, spreadDeg?: number): number[] {
-  let base = ((heatHash(n * 101 + 7, 13) % 360) * Math.PI) / 180;
-  for (let i = 1; i <= k; i++) {
-    const turn = 35 + (heatHash(n * 31 + i, 17) % 41);
-    const sign = heatHash(n * 53 + i, 19) % 2 === 0 ? 1 : -1;
-    base += (sign * turn * Math.PI) / 180;
-  }
+  const first = heatHash(n * 101 + 7, 13) % 2 === 0 ? 1 : -1;
+  const sign = k % 2 === 0 ? first : -first;
+  const span = RING_SWAY_MAX_DEG - RING_SWAY_MIN_DEG + 1;
+  const sway = RING_SWAY_MIN_DEG + (heatHash(n * 31 + k, 17) % span);
   const step = spreadDeg === undefined ? TAU / Math.max(1, gaps) : (spreadDeg * Math.PI) / 180;
+  const base =
+    WELLSPAWN_BEARING + (sign * sway * Math.PI) / 180 - ((Math.max(1, gaps) - 1) * step) / 2;
   const out: number[] = [];
   for (let g = 0; g < gaps; g++) out.push(wrap(base + g * step));
   return out;
@@ -285,6 +297,21 @@ export const WELLSPAWN_SPOTS: readonly HPoint[] = [
   { x: -194, z: -42.5 },
   { x: -194, z: 42.5 },
 ];
+
+/** The Wellspawn's side of the floor: the mean bearing of their posts from
+ *  the well's middle (sim convention: 0 runs +z; due east, toward the door).
+ *  The lava waves' corridors are laid round it (`ringGaps`), so moving the
+ *  posts moves the corridors with them. */
+export const WELLSPAWN_BEARING: number = (() => {
+  let sx = 0;
+  let sz = 0;
+  for (const p of WELLSPAWN_SPOTS) {
+    const d = Math.hypot(p.x - HEARTH_WELL.x, p.z - HEARTH_WELL.z);
+    sx += (p.x - HEARTH_WELL.x) / d;
+    sz += (p.z - HEARTH_WELL.z) / d;
+  }
+  return wrap(Math.atan2(sx, sz));
+})();
 
 /** Where heroic's second overflow raises its two Wellkeepers (as far past
  *  the grown lip as they stood past the first). */

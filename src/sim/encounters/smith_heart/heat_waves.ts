@@ -6,14 +6,16 @@
 //
 //   A ring        a wall of the first flame rolls out of the wellspring's lip
 //                 across the whole Hearth, `speed` yards a second. It parts
-//                 in `gaps` corridors (two, straight across from each other,
-//                 each `gapHalf` either side of its line): whoever it rolls
-//                 over outside a corridor is struck once.
+//                 in `gaps` corridors (two, `gapSpread` 90 degrees apart, on
+//                 the Wellspawn's side of the floor, each `gapHalf` either
+//                 side of its line): whoever it rolls over outside a
+//                 corridor is struck once.
 //   The warning   the next ring's corridors glow on the floor from the moment
 //                 the last ring leaves the lip (the first ring's from the
 //                 moment the guardian is under), so the raid walks to them
-//                 before the wall comes. Each ring's corridors turn a hashed
-//                 35 to 75 degrees from the last one's, one way or the other.
+//                 before the wall comes. Each ring's corridors sway a hashed
+//                 15 to 25 degrees off the Wellspawn's side, the other way
+//                 from the last ring's (ringGaps).
 //   The overflow  the tier's `count` rings, `every` seconds apart (the
 //                 first `lead` seconds in); it ends when the last one has
 //                 rolled past the Hearth's walls. The second overflow (40

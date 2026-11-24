@@ -13,15 +13,21 @@ import {
   gapTemplate,
   HEAT_CUES,
   HEAT_DIFFICULTY,
+  HEAT_LIP_WALL,
   HEAT_MOBS,
   HEAT_NAMES,
   HEAT_OBJECTS,
+  inHearthFloor,
   inRingCorridor,
   inRingWall,
+  RING_SWAY_MAX_DEG,
+  RING_SWAY_MIN_DEG,
   ringGaps,
   ringOf,
   ringTemplate,
   HEAT_TUNING as T,
+  WELLSPAWN_BEARING,
+  WELLSPAWN_SPOTS,
   wavesSeconds,
   wellDistance,
 } from '../src/sim/encounters/smith_heart';
@@ -73,7 +79,9 @@ const at = (bearing: number, r: number) => ({
 });
 
 describe('Guardian of the Heat: the lava waves (pure)', () => {
-  it("each ring's corridors: two straight across, each turned 35 to 75 degrees from the last", () => {
+  it("each ring's corridors: on the Wellspawn's side, each swayed the other way from the last", () => {
+    // The posts' mean bearing is due east of the well's middle, toward the door.
+    expect(WELLSPAWN_BEARING).toBeCloseTo(Math.PI / 2, 9);
     for (const n of [1, 2]) {
       let prev: number[] | null = null;
       for (let k = 0; k < 8; k++) {
@@ -84,17 +92,72 @@ describe('Guardian of the Heat: the lava waves (pure)', () => {
           expect(b).toBeGreaterThanOrEqual(0);
           expect(b).toBeLessThan(2 * Math.PI);
         }
+        const q = ringGaps(n, k, 2, 90);
+        // The pair's middle sways RING_SWAY_MIN_DEG to RING_SWAY_MAX_DEG off the side.
+        const mid = q[0] + Math.PI / 4;
+        const sway = apart(mid, WELLSPAWN_BEARING);
+        expect(sway).toBeGreaterThanOrEqual(RING_SWAY_MIN_DEG * DEG - 1e-9);
+        expect(sway).toBeLessThanOrEqual(RING_SWAY_MAX_DEG * DEG + 1e-9);
         if (prev) {
-          const turn = apart(g[0], prev[0]);
-          expect(turn).toBeGreaterThanOrEqual(35 * DEG - 1e-9);
-          expect(turn).toBeLessThanOrEqual(75 * DEG + 1e-9);
+          // Still a dodge: 30 to 50 degrees round from the last ring's.
+          const turn = apart(q[0], prev[0]);
+          expect(turn).toBeGreaterThanOrEqual(2 * RING_SWAY_MIN_DEG * DEG - 1e-9);
+          expect(turn).toBeLessThanOrEqual(2 * RING_SWAY_MAX_DEG * DEG + 1e-9);
         }
-        prev = g;
+        prev = q;
       }
       expect(ringGaps(n, 3, 2)).toEqual(ringGaps(n, 3, 2));
     }
     // The two overflows do not repeat each other.
-    expect(ringGaps(1, 0, 2)).not.toEqual(ringGaps(2, 0, 2));
+    expect(ringGaps(1, 0, 2, 90)).not.toEqual(ringGaps(2, 0, 2, 90));
+  });
+
+  it('from inside the corridors every walking Wellspawn is in ranged reach for most of its walk', () => {
+    // Bot runs of 2026-11-24: the first overflow's corridors were hashed
+    // anywhere round the well, so two children walked 30 to 50 yd from every
+    // corridor (a ranged hitter reaches 29). Now every ring, on every tier with
+    // Wellspawn, keeps each child within 29 yd of a corridor standing point for
+    // at least 70 percent of its walk from its post to the lip.
+    const REACH = 29;
+    const tiers = (['normal', 'heroic', 'mythic'] as const).filter(
+      (t) => HEAT_DIFFICULTY[t].overflowAdds,
+    );
+    expect(tiers.length).toBeGreaterThan(0);
+    for (const tier of tiers) {
+      HEAT_DIFFICULTY[tier].waves.forEach((rule, i) => {
+        const n = i + 1;
+        for (let k = 0; k < rule.count; k++) {
+          const gaps = ringGaps(n, k, rule.gaps, rule.gapSpread);
+          // The corridors' standing points: their lines from the lip wall out to the floor's edge.
+          const stands: { x: number; z: number }[] = [];
+          for (const g of gaps) {
+            for (let r = HEAT_LIP_WALL.outer + 0.5; r < 60; r += 0.5) {
+              const p = at(g, r);
+              if (!inHearthFloor(p.x, p.z)) break;
+              stands.push(p);
+            }
+            expect(stands.length, `${tier} ${n}/${k}`).toBeGreaterThan(40);
+          }
+          for (const spot of WELLSPAWN_SPOTS) {
+            const d0 = wellDistance(spot.x, spot.z);
+            const steps = 200;
+            let near = 0;
+            for (let j = 0; j <= steps; j++) {
+              const d = d0 - ((d0 - T.spawnReach) * j) / steps;
+              const w = {
+                x: HEARTH_WELL.x + ((spot.x - HEARTH_WELL.x) * d) / d0,
+                z: HEARTH_WELL.z + ((spot.z - HEARTH_WELL.z) * d) / d0,
+              };
+              if (stands.some((p) => Math.hypot(p.x - w.x, p.z - w.z) <= REACH)) near++;
+            }
+            expect(
+              near / (steps + 1),
+              `${tier} overflow ${n} ring ${k} post ${spot.x},${spot.z}`,
+            ).toBeGreaterThanOrEqual(0.7);
+          }
+        }
+      });
+    }
   });
 
   it('every tier lays its two corridors a quarter turn apart (Jose, 2026-11-24)', () => {
