@@ -72,3 +72,33 @@ export function effectivePlayerAttackRange(
   }
   return baseRange + bonus;
 }
+
+/** A target's authored body radius: a mob's `bodyRadius` (the towering
+ *  bosses), 0 for players and every mob that authors none. */
+export function targetBodyRadius(target: AttackTarget): number {
+  if (target.kind !== 'mob') return 0;
+  const r = MOBS[target.templateId]?.bodyRadius;
+  return r !== undefined && r > 0 ? r : 0;
+}
+
+/**
+ * The pivot-to-pivot band a player ability is cast within against `target`.
+ * A RANGE-BANDED ability (one that authors a `minRange`: Charge, Bruin Rush,
+ * Intervene) measures both ends of its band from a big body's edge, like its
+ * melee and short reach do: before, its 8 yd minimum ran from the pivot, so a
+ * warrior standing in melee of the Guardian of the Heat (13.5 yd body) could
+ * still Charge it, and Charge reached only 11.5 yd past its edge (Jose's
+ * playtest of 2026-11-24). Every other ability keeps
+ * `effectivePlayerAttackRange` and no minimum.
+ */
+export function playerAbilityBand(
+  target: AttackTarget,
+  range: number,
+  minRange: number | undefined,
+  attacker?: MeleeReachActor | null,
+): { min: number; max: number } {
+  const max = effectivePlayerAttackRange(target, range, attacker);
+  if (!minRange) return { min: 0, max };
+  const body = targetBodyRadius(target);
+  return { min: minRange + body, max: Math.max(max, range + body) };
+}

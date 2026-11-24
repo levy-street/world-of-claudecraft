@@ -66,7 +66,10 @@ import {
   solarReprisalMakesAbilityFree,
 } from '../../../sim/combat/paladin_solar_reprisal';
 import { sunVerdictAbilityGlowActive } from '../../../sim/combat/paladin_sun_verdict';
-import { effectivePlayerAttackRange } from '../../../sim/combat/player_attack_reach';
+import {
+  effectivePlayerAttackRange,
+  playerAbilityBand,
+} from '../../../sim/combat/player_attack_reach';
 import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
@@ -984,12 +987,13 @@ export function createActionBarView(
           dominionReady &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
           (!def.requiresStealth || world.stealthed || ability.ignoreStealthRequirement === true);
+        // The sim's own band: a gap closer's runs from a big body's edge.
+        const band =
+          def.requiresTarget && tgtDist !== null && target !== null
+            ? playerAbilityBand(target, def.range, def.minRange, reachActor)
+            : null;
         slot.outOfRange =
-          def.requiresTarget &&
-          tgtDist !== null &&
-          target !== null &&
-          (tgtDist > effectivePlayerAttackRange(target, def.range, reachActor) ||
-            (def.minRange !== undefined && tgtDist < def.minRange));
+          band !== null && tgtDist !== null && (tgtDist > band.max || tgtDist < band.min);
         slot.queued = player.queuedOnSwing === def.id;
         // Spec resources/procs share pure sim predicates so the bar and combat
         // agree: Frost lights Ice Lance on a banked Fingers of Frost and Flurry
