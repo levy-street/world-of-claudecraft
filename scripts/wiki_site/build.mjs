@@ -250,7 +250,7 @@ async function main() {
     const redirects = { ...registry.redirects };
     for (const title of drift.missing) redirects[registry.pages[title]] = null;
     const pages = Object.fromEntries([...paths].sort(([a], [b]) => (a < b ? -1 : 1)));
-    writeFileSync(REGISTRY_FILE, JSON.stringify({ pages, redirects }, null, 1) + '\n');
+    writeFileSync(REGISTRY_FILE, JSON.stringify({ pages, redirects }, null, 2) + '\n');
     console.log(
       `site_paths.json: ${drift.added.length} new, ${drift.missing.length} moved to redirects`,
     );
