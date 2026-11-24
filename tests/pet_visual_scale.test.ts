@@ -42,7 +42,14 @@ function tameChampion(sim: Sim, sameLevel = false) {
   completeTame(sim.ctx, sim.player, champion);
   const pet = petOf(sim.ctx, sim.playerId)!;
   expect(pet).toBeDefined();
-  expect(pet.maxHp).toBeLessThan(championHp);
+  // Taming scales to the owner, so a low-level champion can gain HP. Its
+  // champion bonus must still disappear: compare with an ordinary tamed wolf.
+  const baseline = hunterWorld();
+  const wolf = createMob(baseline.nextId++, MOBS.forest_wolf, champion.level, baseline.player.pos);
+  baseline.addEntity(wolf);
+  completeTame(baseline.ctx, baseline.player, wolf);
+  expect(pet.maxHp).toBe(petOf(baseline.ctx, baseline.playerId)!.maxHp);
+  if (sameLevel) expect(pet.maxHp).toBeLessThan(championHp);
   expect(pet.dungeonSpawnMiniboss).toBeFalsy();
   return pet;
 }

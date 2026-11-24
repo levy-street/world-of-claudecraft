@@ -172,7 +172,7 @@ describe('shutdown wiring (source pin)', () => {
     const src = readFileSync(new URL('../server/main.ts', import.meta.url), 'utf8')
       .replace(/^[ \t]*\/\*[\s\S]*?\*\/[ \t]*$/gm, '')
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
-    const saveAll = src.indexOf("await game.saveAll('shutdown')");
+    const finalSave = src.indexOf('await game.saveForShutdown()');
     const endSessions = src.indexOf('await game.endAllPlaySessions(');
     const sweep = src.indexOf('await releaseAllCharacterLeases(');
     const ledgerDrain = src.indexOf('await bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS)');
@@ -183,14 +183,14 @@ describe('shutdown wiring (source pin)', () => {
     // the saves are lease-fenced (a holder + nonce EXISTS inside the UPDATE), so
     // a reorder below the sweep would fence out EVERY shutdown save (rowCount 0,
     // nothing persisted) and silently drop all in-flight state on each restart.
-    expect(saveAll).toBeGreaterThan(-1);
-    expect(endSessions).toBeGreaterThan(saveAll);
+    expect(finalSave).toBeGreaterThan(-1);
+    expect(endSessions).toBeGreaterThan(finalSave);
     expect(ledgerDrain).toBeGreaterThan(endSessions);
     expect(deedsDrain).toBeGreaterThan(endSessions);
-    expect(sweep).toBeGreaterThan(saveAll);
+    expect(sweep).toBeGreaterThan(finalSave);
     expect(unstuckDrain).toBeGreaterThan(endSessions);
     expect(unstuckDrain).toBeGreaterThan(endSessions);
-    expect(sweep).toBeGreaterThan(saveAll);
+    expect(sweep).toBeGreaterThan(finalSave);
     expect(sweep).toBeGreaterThan(ledgerDrain);
     expect(sweep).toBeGreaterThan(deedsDrain);
     expect(sweep).toBeGreaterThan(unstuckDrain);

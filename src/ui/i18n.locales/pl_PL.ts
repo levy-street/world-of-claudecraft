@@ -26074,4 +26074,36 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Zielone opary',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Grzechoczące kości',
   'seasonal.tricks.gourdlight_trick_strawling': 'Postać słomiaka',
+  'hudChrome.membershipWelcome.body':
+    'Twoje członkostwo jest aktywne. Korzystaj ze wszystkich jego korzyści, poszukiwaczu przygód!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Twoje członkostwo jest aktywne do {date}. Korzystaj ze wszystkich jego korzyści, poszukiwaczu przygód!',
+  'hudChrome.membershipWelcome.close': 'Naprzód',
+  'hudChrome.membershipWelcome.title': 'Gratulacje!',
+  'hudChrome.purchaseLoot.collect': 'Odbierz',
+  'hudChrome.purchaseLoot.description':
+    'Odbierz swój zakup teraz. Jeśli twoje torby są pełne, zostanie przechowany jako nadmiar. Wszystko, co zostawisz na później, będzie czekać w twojej skrzynce pocztowej.',
+  'hudChrome.purchaseLoot.later': 'Później',
+  'hudChrome.purchaseLoot.title': 'Twój zakup dotarł',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Wszystkie korzyści miesięcznego członkostwa.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Wodze twojego wierzchowca dotarły. Odbierz je w oknie łupów.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Wodze twojego wierzchowca pojawią się w oknie łupów tej postaci po rozliczeniu płatności. Jeśli trwa okres próbny, dotrą po pierwszej płatności.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Rycerz w zbroi członkowskiej z osłem kurierskim i wierzchowcem Chimerą Nocnego Skrzydła',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Zawiera wierzchowca Chimerę Nocnego Skrzydła dla każdej postaci na twoim koncie. Jego związane z duszą wodze trafiają do okna łupów postaci, która go kupi. Jeden na konto i pozostaje twój po zakończeniu członkostwa.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Tylko {price} miesięcznie, oszczędzasz {percent} w porównaniu z płatnością co miesiąc.',
+  'hudChrome.wocStore.subscription.checkoutPending': 'Zakup w toku. Oczekiwanie na potwierdzenie.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Rycerz w zbroi członkowskiej obok skrzydlatego osła kurierskiego',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Twój żeton pojawi się w oknie łupów tej postaci po rozliczeniu płatności.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Złoty żeton członkostwa',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Żeton członkostwa, który otrzymujesz w grze. Wymień go na 30 dni członkostwa lub handluj nim z innymi graczami i sprzedaj go w domu aukcyjnym.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Przejdź na 12 miesięcy',
 };

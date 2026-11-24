@@ -25826,4 +25826,35 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Yeşil Dumanlar',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Takırdayan Kemikler',
   'seasonal.tricks.gourdlight_trick_strawling': 'Samancık Görünümü',
+  'hudChrome.membershipWelcome.body':
+    'Üyeliğin aktif. Tüm üyelik avantajlarının tadını çıkar, maceracı!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Üyeliğin {date} tarihine kadar aktif. Tüm üyelik avantajlarının tadını çıkar, maceracı!',
+  'hudChrome.membershipWelcome.close': 'İleri',
+  'hudChrome.membershipWelcome.title': 'Tebrikler!',
+  'hudChrome.purchaseLoot.collect': 'Al',
+  'hudChrome.purchaseLoot.description':
+    'Satın aldıklarını şimdi al. Çantaların doluysa kapasite fazlası olarak saklanır. Sonraya bıraktıkların posta kutunda seni bekler.',
+  'hudChrome.purchaseLoot.later': 'Daha sonra',
+  'hudChrome.purchaseLoot.title': 'Satın aldıkların geldi',
+  'hudChrome.wocStore.subscription.annualAllBenefits': 'Aylık üyeliğin tüm avantajları.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Bineğinin dizginleri geldi. Ganimet penceresinden al.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Bineğinin dizginleri ödeme tamamlandığında bu karakterin ganimet penceresinde görünür. Deneme süresi aktifse ilk ödemeden sonra gelir.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Kurye eşeği ve Gece Kanadı Kimera bineğiyle birlikte üyelik zırhı giymiş bir şövalye',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Hesabındaki tüm karakterler için Gece Kanadı Kimera bineğini içerir. Ruha bağlı dizginleri satın alan karakterin ganimet penceresine gelir. Hesap başına bir tane ve üyelik bittikten sonra da senin kalır.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Aylık ödemeye kıyasla {percent} tasarrufla ayda yalnızca {price}.',
+  'hudChrome.wocStore.subscription.checkoutPending': 'Satın alma beklemede. Onay bekleniyor.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Kanatlı kurye eşeğinin yanında üyelik zırhı giymiş bir şövalye',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Jetonun ödeme tamamlandığında bu karakterin ganimet penceresinde görünür.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Altın bir üyelik jetonu',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Oyun içinde aldığın bir üyelik jetonu. 30 günlük üyelik için kullan veya diğer oyuncularla takas edip müzayede evinde sat.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': '12 aya yükselt',
 };

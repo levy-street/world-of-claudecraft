@@ -1330,6 +1330,18 @@ export const ko_KR: EnTranslations = {
         "hintBelowMin": "거래소 최저 가격은 {usd}입니다."
       }
     },
+    "purchaseLoot": {
+      "title": "구매한 물품이 도착했습니다",
+      "description": "지금 받으세요. 가방이 가득 차 있으면 넘친 아이템으로 보관되며, 나중에 받을 물품은 우편함에서 기다립니다.",
+      "collect": "받기",
+      "later": "나중에"
+    },
+    "membershipWelcome": {
+      "title": "축하합니다!",
+      "body": "멤버십이 활성화되었습니다. 모든 멤버십 혜택을 즐기세요, 모험가여!",
+      "bodyUntil": "멤버십이 {date}까지 활성화되었습니다. 모든 멤버십 혜택을 즐기세요, 모험가여!",
+      "close": "출발"
+    },
     "wocStore": {
       "subscription": {
         "title": "게임 정기 구독",
@@ -1344,6 +1356,16 @@ export const ko_KR: EnTranslations = {
         "annualClaim": "묶음 탈것 받기",
         "annualPending": "결제 후 구매한 캐릭터로 돌아와 탈것을 받으세요. 결제 처리 중이거나 체험 중이면 유료 결제가 완료된 뒤 다시 시도하세요.",
         "annualDelivered": "묶음 탈것 열쇠가 우편으로 배송되었습니다.",
+        "monthlyArtAlt": "멤버십 방어구를 입은 기사와 날개 달린 배달 당나귀",
+        "annualArtAlt": "멤버십 방어구를 입은 기사, 배달 당나귀, 나이트윙 키메라 탈것",
+        "tokenArtAlt": "황금 멤버십 토큰",
+        "annualAllBenefits": "월간 멤버십의 모든 혜택.",
+        "annualPerMonth": "월 {price}꼴로, 매달 결제하는 것보다 {percent} 저렴합니다.",
+        "annualMountInfo": "계정의 모든 캐릭터가 쓸 수 있는 나이트윙 키메라 탈것이 포함됩니다. 영혼 귀속 고삐는 구매한 캐릭터의 전리품 창으로 도착합니다. 계정당 하나이며, 멤버십이 끝난 뒤에도 당신의 것입니다.",
+        "annualArriving": "유료 결제가 완료되면 탈것 고삐가 이 캐릭터의 전리품 창에 나타납니다. 체험 기간 중이라면 첫 결제 후에 도착합니다.",
+        "annualArrived": "탈것 고삐가 도착했습니다. 전리품 창에서 받으세요.",
+        "tokenDescription": "게임 안에서 받는 멤버십 토큰입니다. 사용하면 30일 멤버십을 얻고, 다른 플레이어와 거래하거나 경매장에서 팔 수도 있습니다.",
+        "tokenArriving": "결제가 완료되면 토큰이 이 캐릭터의 전리품 창에 나타납니다.",
         "tokenTitle": "거래 가능한 멤버십 토큰",
         "tokenPrice": "30일 {price}",
         "benefitsTitle": "활성 멤버십 혜택",
@@ -1363,9 +1385,11 @@ export const ko_KR: EnTranslations = {
         "subscribe": "구독하기",
         "addMonth": "1개월 추가",
         "addYear": "12개월 추가",
+        "upgradeAnnual": "12개월로 업그레이드",
         "stackTerms": "지금 결제합니다. 기간이 현재 멤버십 종료일 뒤에 추가되고 이후 이 요금제로 갱신됩니다.",
         "stackCapped": "멤버십은 한 번에 최대 2년까지 보유할 수 있습니다. 갱신일이 가까워지면 다시 시도하세요.",
         "stackUnavailable": "지금은 멤버십 기간을 추가할 수 없습니다. 잠시 후 다시 시도하세요.",
+        "checkoutPending": "결제가 대기 중입니다. 확인을 기다리고 있습니다.",
         "billingBlocked": "멤버십 기간을 추가하기 전에 구독 관리에서 결제 정보를 업데이트하세요.",
         "renewsOn": "{date}에 갱신",
         "endsOn": "멤버십 종료일: {date}",

@@ -425,6 +425,7 @@ import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
 import { resolveSfxOverlayFile } from './sfx_overlay';
+import { createShutdownHandler } from './shutdown_lifecycle';
 import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
@@ -4250,18 +4251,18 @@ export async function startServer(): Promise<http.Server> {
     withSweepLock: withAccountWealthSweepLock,
   });
 
-  const shutdown = async () => {
+  const shutdownWork = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
     // sheds new traffic before we stop the loop and persist (in-flight requests and
     // /livez keep working through the drain).
     markDraining();
+    game.beginShutdown();
     console.log('shutting down: saving characters...');
     // Stop the app-aggregate metric collectors so no refresh query races the pool
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
     await businessMetrics.stop();
     await bankLedgerGrowthMonitor.stop();
-    game.beginShutdown();
     await stopStoragePurchaseRecovery();
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
@@ -4287,7 +4288,7 @@ export async function startServer(): Promise<http.Server> {
     // World PvP spoils live only in memory: pay every unlooted body out before
     // the final save (src/sim/pvp/world_pvp_spoils.ts).
     settleAllWorldPvpSpoils(game.sim.ctx);
-    await game.saveAll('shutdown');
+    await game.saveForShutdown();
     await game.saveMarket();
     await game.saveMail();
     await game.saveRifts();
@@ -4377,6 +4378,13 @@ export async function startServer(): Promise<http.Server> {
     flushQueuedCharacterBlobWarnings();
     process.exit(0);
   };
+  const shutdown = createShutdownHandler(shutdownWork, (error) => {
+    process.exitCode = 1;
+    console.error(
+      'shutdown failed; clean teardown skipped; any retained character state is memory-only:',
+      error,
+    );
+  });
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 

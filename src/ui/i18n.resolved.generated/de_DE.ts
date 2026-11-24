@@ -1330,6 +1330,18 @@ export const de_DE: EnTranslations = {
         "hintBelowMin": "Der Mindestpreis der Börse liegt bei {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Dein Kauf ist angekommen",
+      "description": "Hol deinen Kauf jetzt ab. Wenn deine Taschen voll sind, wird er als Überlauf aufbewahrt. Alles, was du später abholen möchtest, wartet in deinem Briefkasten.",
+      "collect": "Abholen",
+      "later": "Später"
+    },
+    "membershipWelcome": {
+      "title": "Herzlichen Glückwunsch!",
+      "body": "Deine Mitgliedschaft ist aktiv. Genieße alle Mitgliedschaftsvorteile, Abenteurer!",
+      "bodyUntil": "Deine Mitgliedschaft ist bis {date} aktiv. Genieße alle Mitgliedschaftsvorteile, Abenteurer!",
+      "close": "Auf ins Abenteuer"
+    },
     "wocStore": {
       "subscription": {
         "title": "Spielabonnement",
@@ -1344,6 +1356,16 @@ export const de_DE: EnTranslations = {
         "annualClaim": "Paketreittier abholen",
         "annualPending": "Kehre nach der Zahlung zum kaufenden Charakter zurück, um das Paketreittier abzuholen. Wird die Zahlung noch verarbeitet oder läuft der Testzeitraum, versuche es nach der kostenpflichtigen Abbuchung erneut.",
         "annualDelivered": "Der Schlüssel für dein Paketreittier wurde per Post zugestellt.",
+        "monthlyArtAlt": "Ein Ritter in Mitgliedschaftsrüstung neben dem geflügelten Kurieresel",
+        "annualArtAlt": "Ein Ritter in Mitgliedschaftsrüstung mit dem Kurieresel und der Nachtflügelchimäre als Reittier",
+        "tokenArtAlt": "Eine goldene Mitgliedschaftsmarke",
+        "annualAllBenefits": "Alle Vorteile einer monatlichen Mitgliedschaft.",
+        "annualPerMonth": "Nur {price} pro Monat. Du sparst {percent} gegenüber monatlicher Zahlung.",
+        "annualMountInfo": "Enthält die Nachtflügelchimäre als Reittier für alle Charaktere deines Kontos. Ihre seelengebundenen Zügel erscheinen im Beutefenster des kaufenden Charakters. Einmal pro Konto, und sie bleibt nach Ende der Mitgliedschaft dein Eigentum.",
+        "annualArriving": "Die Zügel deines Reittiers erscheinen im Beutefenster dieses Charakters, sobald die Zahlung abgeschlossen ist. Während des Testzeitraums kommen sie nach der ersten Zahlung an.",
+        "annualArrived": "Die Zügel deines Reittiers sind angekommen. Hole sie im Beutefenster ab.",
+        "tokenDescription": "Eine Mitgliedschaftsmarke, die du im Spiel erhältst. Löse sie für 30 Tage Mitgliedschaft ein oder handle damit mit anderen Spielern und verkaufe sie im Auktionshaus.",
+        "tokenArriving": "Deine Marke erscheint im Beutefenster dieses Charakters, sobald die Zahlung abgeschlossen ist.",
         "tokenTitle": "Handelbare Mitgliedschaftsmarke",
         "tokenPrice": "{price} für 30 Tage",
         "benefitsTitle": "Vorteile der aktiven Mitgliedschaft",
@@ -1363,9 +1385,11 @@ export const de_DE: EnTranslations = {
         "subscribe": "Abonnieren",
         "addMonth": "1 Monat hinzufügen",
         "addYear": "12 Monate hinzufügen",
+        "upgradeAnnual": "Auf 12 Monate umstellen",
         "stackTerms": "Die Zahlung erfolgt sofort. Die Zeit wird an deine aktuelle Mitgliedschaft angehängt. Danach verlängert sie sich mit diesem Tarif.",
         "stackCapped": "Du kannst bis zu 2 Jahre Mitgliedschaft auf einmal ansammeln. Versuche es näher an deinem Verlängerungsdatum erneut.",
         "stackUnavailable": "Das Hinzufügen von Mitgliedschaftszeit ist derzeit nicht verfügbar. Versuche es in Kürze erneut.",
+        "checkoutPending": "Bezahlvorgang ausstehend. Warte auf Bestätigung.",
         "billingBlocked": "Aktualisiere deine Zahlungsdaten unter Abonnement verwalten, bevor du Mitgliedschaftszeit hinzufügst.",
         "renewsOn": "Verlängert sich am {date}",
         "endsOn": "Mitgliedschaft endet am {date}",

@@ -29,9 +29,9 @@ import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 // summary the exporter prints (sizes stay put on a fingerprint-only re-export).
 
 const REPO_ROOT = path.join(__dirname, '..');
-const SOURCE_FINGERPRINT = '8f76fbc5aaa8de6b414f0386128996a7d570774af4503309db86191ea5091f07';
+const SOURCE_FINGERPRINT = '35a501bf292d00c29eb219936aad8d137b1f5b2644526e6c48de549e68f03728';
 const BYTES = 132_792;
-const SHA256 = 'd10e7b1fe129f675956593d57f686586224fa2175b7303ffe187bc41fbba40f0';
+const SHA256 = '434a4d1374c3648e9acbd1558f7bbd02c266e1a1d2f9a13cf8d699519d35deef';
 
 interface NodePin {
   triangles: number;

@@ -119,9 +119,9 @@ describe('the Mother of Pearl chain in a real sim', () => {
 
     const boss = requireLiveBoss(sim);
     expect(boss.hostile).toBe(true);
-    // Level 2, so the open-world curve's x1.35 health applies (42 on the ladder).
-    expect(boss.maxHp).toBe(57);
-    expect(boss.hp).toBe(57);
+    // Level 2 keeps the unscaled early-game pool before the level-5 ramp.
+    expect(boss.maxHp).toBe(42);
+    expect(boss.hp).toBe(42);
     // Tapped to the summoner, so nobody else can steal the credit.
     expect(boss.tappedById).toBe(sim.playerId);
     // The lure is reusable: never consumed, so a wipe can always retry.

@@ -1330,6 +1330,18 @@ export const pt_BR: EnTranslations = {
         "hintBelowMin": "O preço mínimo do Mercado $WOC é {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Sua compra chegou",
+      "description": "Colete sua compra agora. Se suas bolsas estiverem cheias, ela ficará guardada como excedente. Tudo o que você deixar para depois aguardará na sua caixa de correio.",
+      "collect": "Coletar",
+      "later": "Depois"
+    },
+    "membershipWelcome": {
+      "title": "Parabéns!",
+      "body": "Sua assinatura está ativa. Aproveite todos os benefícios da assinatura, aventureiro!",
+      "bodyUntil": "Sua assinatura está ativa até {date}. Aproveite todos os benefícios da assinatura, aventureiro!",
+      "close": "Avante"
+    },
     "wocStore": {
       "subscription": {
         "title": "Assinatura do jogo",
@@ -1344,6 +1356,16 @@ export const pt_BR: EnTranslations = {
         "annualClaim": "Coletar montaria do pacote",
         "annualPending": "Volte ao personagem comprador após pagar para coletar a montaria do pacote. Se o pagamento estiver processando ou o teste ativo, tente novamente após a cobrança paga.",
         "annualDelivered": "A chave de montaria do seu pacote foi entregue pelo correio.",
+        "monthlyArtAlt": "Um cavaleiro com armadura de assinatura ao lado do burro mensageiro alado",
+        "annualArtAlt": "Um cavaleiro com armadura de assinatura junto ao burro mensageiro e à montaria Quimera de Asa Noturna",
+        "tokenArtAlt": "Uma ficha de assinatura dourada",
+        "annualAllBenefits": "Todos os benefícios de uma assinatura mensal.",
+        "annualPerMonth": "Apenas {price} por mês, economizando {percent} em comparação com o pagamento mensal.",
+        "annualMountInfo": "Inclui a montaria Quimera de Asa Noturna para todos os personagens da sua conta. Suas rédeas vinculadas à alma chegam em uma janela de saque do personagem que a compra. Uma por conta, e continua sua depois que a assinatura termina.",
+        "annualArriving": "As rédeas da sua montaria aparecerão na janela de saque deste personagem quando a cobrança for concluída. Se o período de teste estiver ativo, elas chegarão após o primeiro pagamento.",
+        "annualArrived": "As rédeas da sua montaria chegaram. Colete-as na janela de saque.",
+        "tokenDescription": "Uma ficha de assinatura que você recebe no jogo. Resgate-a por 30 dias de assinatura, ou negocie-a com outros jogadores e venda-a na casa de leilões.",
+        "tokenArriving": "Sua ficha aparecerá na janela de saque deste personagem quando o pagamento for concluído.",
         "tokenTitle": "Ficha de assinatura negociável",
         "tokenPrice": "{price} por 30 dias",
         "benefitsTitle": "Benefícios de assinatura ativos",
@@ -1363,9 +1385,11 @@ export const pt_BR: EnTranslations = {
         "subscribe": "Assinar",
         "addMonth": "Adicionar 1 mês",
         "addYear": "Adicionar 12 meses",
+        "upgradeAnnual": "Mudar para 12 meses",
         "stackTerms": "O pagamento é feito agora. O tempo é adicionado ao final da sua assinatura atual, que depois será renovada neste plano.",
         "stackCapped": "Você pode acumular até 2 anos de assinatura de uma vez. Tente novamente quando a data de renovação estiver mais próxima.",
         "stackUnavailable": "Não é possível adicionar tempo de assinatura no momento. Tente novamente em breve.",
+        "checkoutPending": "Compra pendente. Aguardando confirmação.",
         "billingBlocked": "Atualize seus dados de pagamento em Gerenciar assinatura antes de adicionar tempo de assinatura.",
         "renewsOn": "Renova em {date}",
         "endsOn": "A assinatura termina em {date}",

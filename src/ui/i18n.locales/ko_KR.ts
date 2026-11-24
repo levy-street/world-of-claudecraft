@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.checkoutPending':
+    '결제가 대기 중입니다. 확인을 기다리고 있습니다.',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '{every}초마다 {cast}초 시전 후 {radius}야드 안의 모두에게 {min}~{max} 피해를 줍니다. 꿰뚫린 플레이어는 거리와 관계없이 {pinMult}배 피해를 받습니다.',
   'bossJournal.wildheart.zulgar.spearSummary':
@@ -350,6 +352,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.membershipSlotLocked': '멤버십으로 이 가방 칸을 잠금 해제하세요.',
   'hudChrome.bags.membershipSlotHint':
     '멤버십이 활성화된 동안 가방을 하나 더 장착할 수 있습니다. 만료되어도 가방과 아이템은 안전하게 보관됩니다.',
+  'hudChrome.purchaseLoot.title': '구매한 물품이 도착했습니다',
+  'hudChrome.purchaseLoot.description':
+    '지금 받으세요. 가방이 가득 차 있으면 넘친 아이템으로 보관되며, 나중에 받을 물품은 우편함에서 기다립니다.',
+  'hudChrome.purchaseLoot.collect': '받기',
+  'hudChrome.purchaseLoot.later': '나중에',
+  'hudChrome.membershipWelcome.title': '축하합니다!',
+  'hudChrome.membershipWelcome.body':
+    '멤버십이 활성화되었습니다. 모든 멤버십 혜택을 즐기세요, 모험가여!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    '멤버십이 {date}까지 활성화되었습니다. 모든 멤버십 혜택을 즐기세요, 모험가여!',
+  'hudChrome.membershipWelcome.close': '출발',
   'hudChrome.wocStore.subscription.benefitBag':
     '멤버십 가방 칸에 가방을 하나 더 장착할 수 있습니다.',
   'hudChrome.wocStore.subscription.benefitArmour':
@@ -433,6 +446,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountDepositLead': '아이템을 클릭하면 {name}의 은행으로 보냅니다.',
   'hudChrome.bank.accountBankEmpty': '이 은행은 비어 있습니다.',
   'hudChrome.bank.accountBagsEmpty': '가방이 비어 있습니다.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    '멤버십 방어구를 입은 기사와 날개 달린 배달 당나귀',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    '멤버십 방어구를 입은 기사, 배달 당나귀, 나이트윙 키메라 탈것',
+  'hudChrome.wocStore.subscription.tokenArtAlt': '황금 멤버십 토큰',
+  'hudChrome.wocStore.subscription.annualAllBenefits': '월간 멤버십의 모든 혜택.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    '월 {price}꼴로, 매달 결제하는 것보다 {percent} 저렴합니다.',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    '계정의 모든 캐릭터가 쓸 수 있는 나이트윙 키메라 탈것이 포함됩니다. 영혼 귀속 고삐는 구매한 캐릭터의 전리품 창으로 도착합니다. 계정당 하나이며, 멤버십이 끝난 뒤에도 당신의 것입니다.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    '유료 결제가 완료되면 탈것 고삐가 이 캐릭터의 전리품 창에 나타납니다. 체험 기간 중이라면 첫 결제 후에 도착합니다.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    '탈것 고삐가 도착했습니다. 전리품 창에서 받으세요.',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    '게임 안에서 받는 멤버십 토큰입니다. 사용하면 30일 멤버십을 얻고, 다른 플레이어와 거래하거나 경매장에서 팔 수도 있습니다.',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    '결제가 완료되면 토큰이 이 캐릭터의 전리품 창에 나타납니다.',
   'hudChrome.wocStore.subscription.tokenTitle': '거래 가능한 멤버십 토큰',
   'hudChrome.wocStore.subscription.tokenPrice': '30일 {price}',
   'hudChrome.wocStore.subscription.tokenTerms':
@@ -467,6 +498,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.subscribe': '구독하기',
   'hudChrome.wocStore.subscription.addMonth': '1개월 추가',
   'hudChrome.wocStore.subscription.addYear': '12개월 추가',
+  'hudChrome.wocStore.subscription.upgradeAnnual': '12개월로 업그레이드',
   'hudChrome.wocStore.subscription.stackTerms':
     '지금 결제합니다. 기간이 현재 멤버십 종료일 뒤에 추가되고 이후 이 요금제로 갱신됩니다.',
   'hudChrome.wocStore.subscription.stackCapped':

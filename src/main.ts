@@ -4794,7 +4794,7 @@ async function startGame(
   await nextPaint();
   entryDiagnostics.checkpoint('prewarm-start', {
     ...renderEntryDiagnostics(),
-    prewarmEntry: 'initial',
+    prewarmEntry: 'prepare-zones',
   });
   try {
     await loadSpanAsync('prepare-zone', () =>

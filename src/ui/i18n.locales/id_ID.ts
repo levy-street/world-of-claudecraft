@@ -26129,4 +26129,35 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Asap Hijau',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Tulang Gemeretak',
   'seasonal.tricks.gourdlight_trick_strawling': 'Wujud Makhluk Jerami',
+  'hudChrome.membershipWelcome.body':
+    'Keanggotaanmu aktif. Nikmati semua manfaat keanggotaan, petualang!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Keanggotaanmu aktif hingga {date}. Nikmati semua manfaat keanggotaan, petualang!',
+  'hudChrome.membershipWelcome.close': 'Maju',
+  'hudChrome.membershipWelcome.title': 'Selamat!',
+  'hudChrome.purchaseLoot.collect': 'Ambil',
+  'hudChrome.purchaseLoot.description':
+    'Ambil pembelianmu sekarang. Jika tasmu penuh, barang akan disimpan sebagai kelebihan kapasitas. Apa pun yang kamu tinggalkan untuk nanti akan menunggu di kotak suratmu.',
+  'hudChrome.purchaseLoot.later': 'Nanti',
+  'hudChrome.purchaseLoot.title': 'Pembelianmu telah tiba',
+  'hudChrome.wocStore.subscription.annualAllBenefits': 'Semua manfaat keanggotaan bulanan.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Kekang tungganganmu telah tiba. Ambil dari jendela jarahan.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Kekang tungganganmu akan muncul di jendela jarahan karakter ini setelah pembayaran selesai. Jika masa uji coba masih aktif, kekang akan tiba setelah pembayaran pertama.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Seorang kesatria mengenakan zirah keanggotaan bersama keledai kurir dan tunggangan Kimera Nightwing',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Termasuk tunggangan Kimera Nightwing untuk semua karakter di akunmu. Kekang terikat jiwanya tiba di jendela jarahan karakter yang membelinya. Satu per akun, dan tetap milikmu setelah keanggotaan berakhir.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Hanya {price} per bulan, hemat {percent} dibandingkan membayar bulanan.',
+  'hudChrome.wocStore.subscription.checkoutPending': 'Pembelian tertunda. Menunggu konfirmasi.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Seorang kesatria mengenakan zirah keanggotaan di samping keledai kurir bersayap',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Tokenmu akan muncul di jendela jarahan karakter ini setelah pembayaran selesai.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Token keanggotaan berwarna emas',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Token keanggotaan yang kamu terima di dalam game. Tukarkan untuk 30 hari keanggotaan, atau perdagangkan dengan pemain lain dan jual di rumah lelang.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Beralih ke 12 bulan',
 };

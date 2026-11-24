@@ -30,7 +30,7 @@ import {
 // summary the exporter prints (sizes stay put on a fingerprint-only re-export).
 
 const REPO_ROOT = path.join(__dirname, '..');
-const SOURCE_FINGERPRINT = '5c2baf9a26333f8fd7e6c51c9ec7b559dd66b7d950d538e5ab5468fdbde19476';
+const SOURCE_FINGERPRINT = 'e3ae415949ad45f23642bb5efa86089e71f48c0afbd1c0d5bcc57bc2e8ebfa54';
 
 interface Pin {
   bytes: number;
@@ -43,91 +43,91 @@ interface Pin {
 const PINS: Record<MusterKitKey, Pin> = {
   musterPalisade: {
     bytes: 37_092,
-    sha256: 'b34d0ee3dea1b0610e895a67ff97325c9d96b3e7329e5ddda58298248b7f0fa8',
+    sha256: '403d253c8470249291deb582fcc7c883c23b8b5f3d2e0c60debe8af731e7fc8f',
     triangles: 1426,
     primitives: 3,
     materials: ['MusterCloth', 'MusterRock', 'MusterWood'],
   },
   musterBarricade: {
     bytes: 41_688,
-    sha256: '15d972b9ee3572eb0a322e8f25dbd19133fa716c959556465ac82146d7d29723',
+    sha256: 'd0d368d55f7a9c036cf64aa3e5896af52557176270650370571b47274f50cb72',
     triangles: 1760,
     primitives: 4,
     materials: ['MusterCloth', 'MusterIron', 'MusterRock', 'MusterWood'],
   },
   musterGate: {
     bytes: 54_372,
-    sha256: '99567b195b1294ce4dd0e22717dc8dc626f62e71ccaea5c51c579441007a6a2e',
+    sha256: 'e073373cf629370f9e329d0c4574aa8016f8ec86d43631d599f040001e5ffcc6',
     triangles: 2568,
     primitives: 4,
     materials: ['MusterCloth', 'MusterIron', 'MusterRock', 'MusterWood'],
   },
   musterWatchtower: {
     bytes: 68_272,
-    sha256: 'e48d3492ae41189a4e01cd0a0da05e2d41eeaf5e91bd08e68a7fa5ae0907b5c5',
+    sha256: '6c284ce9346b98bdd59f0b7f706ad421d28ccb4a1bcc0b4efacc9584700aa42d',
     triangles: 3464,
     primitives: 3,
     materials: ['MusterCloth', 'MusterRock', 'MusterWood'],
   },
   musterTentLarge: {
     bytes: 21_404,
-    sha256: 'e049fbeafc2169e59802d746b0e50b42459f4f75b9f8d19e53464313be549ced',
+    sha256: '1dab5280289193a03440c8b09e758cdaacab026c25a6d40e62cf43fe9e92a272',
     triangles: 702,
     primitives: 3,
     materials: ['MusterCloth', 'MusterRock', 'MusterWood'],
   },
   musterTentSmall: {
     bytes: 20_960,
-    sha256: 'fe131d35572f7349b92388c691d05f8deb53d164148df21bf63fe20cb48388ae',
+    sha256: '2646398de502934a350dd740191b863aa9de281d3c2fbd8f9801dbc04f90f07d',
     triangles: 678,
     primitives: 3,
     materials: ['MusterCloth', 'MusterRock', 'MusterWood'],
   },
   musterWeaponRack: {
     bytes: 43_748,
-    sha256: '528574913daa8bd20b90a0a94012393643edd099a9840c3737b7ed513975fa36',
+    sha256: '483e1cc3334e2c81855907d482b4d3e0bb57fef4917ad0a0e00edba6d26e4c24',
     triangles: 1830,
     primitives: 5,
     materials: ['MusterCloth', 'MusterCrystal', 'MusterIron', 'MusterRock', 'MusterWood'],
   },
   musterLanternPost: {
     bytes: 20_624,
-    sha256: 'db3e9a8f5427627fa521a73a0d3ac8f35fbd52c8fddf73c063d323d6c0901c4b',
+    sha256: '9dcfa64f1c392d9968b654d868d91d3cc73954f8fc06dc11ed3d429e8302ff72',
     triangles: 520,
     primitives: 5,
     materials: ['MusterCloth', 'MusterGlow', 'MusterIron', 'MusterRock', 'MusterWood'],
   },
   musterCrate: {
     bytes: 14_816,
-    sha256: '34d5046c243cb1681cbf4c5be9221f103ada9ec8dc1d2c02e4622bd1e5a45d1d',
+    sha256: '60c5dfcf529e71c15704f22cae8791ab08ec1937f78f4dcbe0c1ed6d3b80c4a0',
     triangles: 572,
     primitives: 2,
     materials: ['MusterIron', 'MusterWood'],
   },
   musterBarrel: {
     bytes: 7_548,
-    sha256: '281ba5565cb54916a7b57891f8cabb1cb5ee506a44ee4c4c47579b98c60ecfa9',
+    sha256: 'b543e0d089b03b26b8598401f5bd69ad3628af7491b1e7cd7c42e57326501e70',
     triangles: 188,
     primitives: 2,
     materials: ['MusterIron', 'MusterWood'],
   },
   musterSacks: {
     bytes: 11_212,
-    sha256: 'b61b27ff2815ee0702057b2d7d9eeb39bbe120356a182eb4afe11026ffd7d63b',
+    sha256: '522e93d32eefd1651a19bb7eba670eec451def785ebc436fb549d1aa116fd7c6',
     triangles: 408,
     primitives: 1,
     materials: ['MusterCloth'],
   },
   musterCartWheel: {
     bytes: 16_992,
-    sha256: '6e4917e83d311f39be6503f5488d6cd5d23f98f4bfbc6e7181e1d5fab994c4dd',
+    sha256: '9c09c272569a94758d6f4d15e8ddea33cfe60b853a00c22ef280e8fdffc09239',
     triangles: 620,
     primitives: 3,
     materials: ['MusterIron', 'MusterRock', 'MusterWood'],
   },
   musterTorch: {
     bytes: 18_476,
-    sha256: '43d89ef6d1163140f83486064d8ef4b1e1515a9529f8f863c83c2bb374caeb20',
+    sha256: 'a65e6bdf3159e173a0d3c452982b30453149fc6c5ce61ac6ba391d805abf4283',
     triangles: 368,
     primitives: 5,
     materials: ['MusterCloth', 'MusterGlow', 'MusterIron', 'MusterRock', 'MusterWood'],

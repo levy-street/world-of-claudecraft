@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.checkoutPending': '購入手続きは保留中です。確認を待っています。',
   'bossJournal.wildheart.zulgar.pulseSummaryRework':
     '{every}秒ごとに{cast}秒詠唱し、{radius}ヤード以内の全員に{min}から{max}ダメージ。串刺しのプレイヤーは距離に関係なく{pinMult}倍のダメージを受ける。',
   'bossJournal.wildheart.zulgar.spearSummary':
@@ -362,6 +363,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.membershipSlotLocked': 'メンバーシップでこのバッグ枠を解放。',
   'hudChrome.bags.membershipSlotHint':
     'メンバーシップ有効中はバッグを1個追加で装備できます。期限が切れてもバッグとアイテムは安全に保管されます。',
+  'hudChrome.purchaseLoot.title': '購入品が届きました',
+  'hudChrome.purchaseLoot.description':
+    '今すぐ受け取りましょう。バッグがいっぱいの場合はあふれたアイテムとして保持され、後で受け取るものはメールボックスで待機します。',
+  'hudChrome.purchaseLoot.collect': '受け取る',
+  'hudChrome.purchaseLoot.later': '後で',
+  'hudChrome.membershipWelcome.title': 'おめでとうございます！',
+  'hudChrome.membershipWelcome.body':
+    'メンバーシップが有効になりました。すべてのメンバー特典をお楽しみください、冒険者よ！',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'メンバーシップは{date}まで有効です。すべてのメンバー特典をお楽しみください、冒険者よ！',
+  'hudChrome.membershipWelcome.close': '出発',
   'hudChrome.wocStore.subscription.benefitBag':
     'メンバーシップバッグ枠にバッグを1個追加で装備できます。',
   'hudChrome.wocStore.subscription.benefitArmour':
@@ -445,6 +457,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountDepositLead': 'アイテムをクリックすると{name}の銀行に送ります。',
   'hudChrome.bank.accountBankEmpty': 'この銀行は空です。',
   'hudChrome.bank.accountBagsEmpty': 'バッグは空です。',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'メンバーシップ防具をまとった騎士と翼のある配達ロバ',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'メンバーシップ防具をまとった騎士、配達ロバ、ナイトウィング・キメラのマウント',
+  'hudChrome.wocStore.subscription.tokenArtAlt': '金色のメンバーシップトークン',
+  'hudChrome.wocStore.subscription.annualAllBenefits': '月額メンバーシップのすべての特典。',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    '月あたり{price}で、月払いより{percent}お得です。',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'アカウントの全キャラクターで使えるナイトウィング・キメラのマウント付き。魂の絆で結ばれた手綱は、購入したキャラクターの戦利品ウィンドウに届きます。1アカウントにつき1つで、メンバーシップ終了後もあなたのものです。',
+  'hudChrome.wocStore.subscription.annualArriving':
+    '有料の請求が完了すると、マウントの手綱がこのキャラクターの戦利品ウィンドウに表示されます。トライアル中の場合は、最初の支払い後に届きます。',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'マウントの手綱が届きました。戦利品ウィンドウから受け取ってください。',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'ゲーム内で受け取るメンバーシップトークン。使用すると30日間のメンバーシップを得られ、他のプレイヤーと取引したりオークションハウスで売ったりもできます。',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    '支払いが完了すると、トークンがこのキャラクターの戦利品ウィンドウに表示されます。',
   'hudChrome.wocStore.subscription.tokenTitle': '取引可能なメンバーシップトークン',
   'hudChrome.wocStore.subscription.tokenPrice': '30日分で{price}',
   'hudChrome.wocStore.subscription.tokenTerms':
@@ -479,6 +509,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.subscribe': '定期購入する',
   'hudChrome.wocStore.subscription.addMonth': '1か月追加',
   'hudChrome.wocStore.subscription.addYear': '12か月追加',
+  'hudChrome.wocStore.subscription.upgradeAnnual': '12か月にアップグレード',
   'hudChrome.wocStore.subscription.stackTerms':
     '今すぐお支払い。期間は現在のメンバーシップの終了日に追加され、その後このプランで更新されます。',
   'hudChrome.wocStore.subscription.stackCapped':

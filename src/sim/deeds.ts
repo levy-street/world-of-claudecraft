@@ -1989,9 +1989,10 @@ export function onNythraxisKillForDeeds(
   boss: Entity,
   roomMetas: PlayerMeta[],
 ): void {
-  onDungeonFinalBossKilledForDeeds(ctx, boss, instanceForMob(ctx, boss), roomMetas);
+  const instance = instanceForMob(ctx, boss);
+  onDungeonFinalBossKilledForDeeds(ctx, boss, instance, roomMetas);
   onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[boss.templateId], roomMetas);
-  emitReferralBossEvidence(ctx, boss, roomMetas);
+  emitReferralBossEvidence(ctx, boss, roomMetas, instance?.dungeonId);
 }
 
 /** World-boss credit: the loot-roster snapshot (never pruned by dying). */

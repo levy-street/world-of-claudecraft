@@ -1330,6 +1330,18 @@ export const cs_CZ: EnTranslations = {
         "hintBelowMin": "Minimální cena na burze je {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Tvůj nákup dorazil",
+      "description": "Vyzvedni si svůj nákup hned. Pokud máš plné brašny, zůstane uložený jako přebytek. Vše, co si necháš na později, na tebe počká v poštovní schránce.",
+      "collect": "Vyzvednout",
+      "later": "Později"
+    },
+    "membershipWelcome": {
+      "title": "Gratulujeme!",
+      "body": "Tvé členství je aktivní. Užij si všechny členské výhody, dobrodruhu!",
+      "bodyUntil": "Tvé členství je aktivní do {date}. Užij si všechny členské výhody, dobrodruhu!",
+      "close": "Vpřed"
+    },
     "wocStore": {
       "subscription": {
         "title": "Herní předplatné",
@@ -1344,6 +1356,16 @@ export const cs_CZ: EnTranslations = {
         "annualClaim": "Vyzvednout jízdní zvíře z balíčku",
         "annualPending": "Po zaplacení se vrať na postavu, která nákup provedla, a vyzvedni si jízdní zvíře z balíčku. Pokud se platba zpracovává nebo běží zkušební období, zkus to znovu po stržení platby.",
         "annualDelivered": "Klíč k jízdnímu zvířeti z balíčku byl doručen poštou.",
+        "monthlyArtAlt": "Rytíř v členské zbroji vedle okřídleného kurýrního osla",
+        "annualArtAlt": "Rytíř v členské zbroji s kurýrním oslem a jízdním zvířetem Chiméra nočního křídla",
+        "tokenArtAlt": "Zlatý žeton členství",
+        "annualAllBenefits": "Všechny výhody měsíčního členství.",
+        "annualPerMonth": "Jen {price} měsíčně, úspora {percent} oproti měsíčním platbám.",
+        "annualMountInfo": "Obsahuje jízdní zvíře Chiméra nočního křídla pro všechny postavy na tvém účtu. Jeho otěže vázané na duši dorazí do okna s kořistí u postavy, která ho koupí. Jednou na účet a zůstane ti i po skončení členství.",
+        "annualArriving": "Otěže tvého jízdního zvířete se objeví v okně s kořistí u této postavy po dokončení platby. Pokud je aktivní zkušební období, dorazí po první platbě.",
+        "annualArrived": "Otěže tvého jízdního zvířete dorazily. Vyzvedni si je v okně s kořistí.",
+        "tokenDescription": "Žeton členství, který obdržíš ve hře. Vyměň ho za 30 dní členství, nebo s ním obchoduj s ostatními hráči a prodej ho v aukční síni.",
+        "tokenArriving": "Tvůj žeton se objeví v okně s kořistí u této postavy po dokončení platby.",
         "tokenTitle": "Obchodovatelný žeton členství",
         "tokenPrice": "{price} za 30 dní",
         "benefitsTitle": "Výhody aktivního členství",
@@ -1363,9 +1385,11 @@ export const cs_CZ: EnTranslations = {
         "subscribe": "Předplatit",
         "addMonth": "Přidat 1 měsíc",
         "addYear": "Přidat 12 měsíců",
+        "upgradeAnnual": "Přejít na 12 měsíců",
         "stackTerms": "Platba proběhne ihned. Doba se přidá na konec tvého současného členství, které se pak obnoví podle tohoto plánu.",
         "stackCapped": "Najednou můžeš mít předplacené až 2 roky členství. Zkus to znovu blíže k datu obnovení.",
         "stackUnavailable": "Dobu členství momentálně nelze přidat. Zkus to znovu za chvíli.",
+        "checkoutPending": "Nákup čeká na dokončení. Čeká se na potvrzení.",
         "billingBlocked": "Než přidáš dobu členství, aktualizuj své platební údaje v části Spravovat předplatné.",
         "renewsOn": "Obnoví se {date}",
         "endsOn": "Členství končí {date}",

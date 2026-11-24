@@ -19,20 +19,45 @@ const ORIGIN = { x: 0, y: 0, z: 0 };
 // Expected spawn health for a template at a level, through the curve when
 // tuned, with the classic elite multiplier createMob applies on top.
 function expectedMaxHp(t: MobTemplate, level: number): number {
-  const scale = isOpenWorldTuned(t) ? openWorldMobScale(level).health : 1;
-  const elite = t.elite ? 2.3 : 1;
-  return Math.round((t.hpBase * scale + t.hpPerLevel * scale * (level - 1)) * elite);
+  const base = t.hpBase + t.hpPerLevel * (level - 1);
+  if (!isOpenWorldTuned(t)) return Math.round(base * (t.elite ? 2.3 : 1));
+  const curve = openWorldMobScale(level).health;
+  const scale = t.elite ? Math.max(1, ((40 + 18 * level) * curve) / base) : curve;
+  return Math.round((t.hpBase * scale + t.hpPerLevel * scale * (level - 1)) * (t.elite ? 2.3 : 1));
 }
 
 describe('open-world mob curve', () => {
-  it('pins the shipped curve: level 1 untouched, full strength from level 8', () => {
-    expect(openWorldMobScale(1)).toEqual({ health: 1, damage: 1, armor: 1 });
-    expect(openWorldMobScale(3)).toEqual({ health: 1.7, damage: 1.1225, armor: 1 });
-    for (const level of [8, 10, 14, 20]) {
-      expect(openWorldMobScale(level)).toEqual({ health: 3.25, damage: 1.35, armor: 1 });
+  it('ramps health evenly from the authored level-5 pool to full strength at 20', () => {
+    for (let level = 1; level <= 5; level++) {
+      expect(openWorldMobScale(level).health).toBe(1);
     }
-    // Linear between points: level 2 sits halfway between 1 and 1.7.
-    expect(openWorldMobScale(2).health).toBeCloseTo(1.35, 10);
+    for (let level = 6; level <= 20; level++) {
+      expect(openWorldMobScale(level).health - openWorldMobScale(level - 1).health).toBeCloseTo(
+        0.15,
+        10,
+      );
+    }
+    expect(openWorldMobScale(20).health).toBe(3.25);
+    expect(openWorldMobScale(25).health).toBe(3.25);
+  });
+
+  it('gives the level-16 elite Crusher more HP than the normal ogre without buffing damage', () => {
+    const ogre = spawnOpenWorldMob(1, MOBS.thornpeak_ogre, 16, ORIGIN);
+    const crusher = spawnOpenWorldMob(2, MOBS.ogre_crusher, 16, ORIGIN);
+    expect(crusher.maxHp).toBeGreaterThan(ogre.maxHp);
+    expect(ogre.maxHp).toBe(1089);
+    expect(crusher.maxHp).toBe(1999);
+    expect(crusher.weapon).toEqual(createMob(3, MOBS.ogre_crusher, 16, ORIGIN).weapon);
+    expect(crusher.mechanicDamageMult).toBeUndefined();
+  });
+
+  it('preserves the damage curve at every level and leaves armor unchanged', () => {
+    for (let level = 1; level <= 25; level++) {
+      const expected =
+        level <= 3 ? 1 + (level - 1) * 0.06125 : level < 8 ? 1.1225 + (level - 3) * 0.0455 : 1.35;
+      expect(openWorldMobScale(level).damage).toBeCloseTo(expected, 12);
+      expect(openWorldMobScale(level).armor).toBe(1);
+    }
   });
 
   it('never decreases with level', () => {
@@ -47,16 +72,16 @@ describe('open-world mob curve', () => {
     expect(OPEN_WORLD_MOB_CURVE[0].level).toBe(1);
   });
 
-  it('scales an ordinary mob: a level-10 Fen Troll has 796 health and hits 33 to 52', () => {
+  it('scales an ordinary mob: a level-10 Fen Troll has 429 health and hits 33 to 52', () => {
     const troll = spawnOpenWorldMob(1, MOBS.fen_troll, 10, ORIGIN);
     // Template ladder: 56 + 21 x 9 = 245 health, 9 + 2.4 x 9 = 30.6 damage, 18 x 9 armor.
-    expect(troll.maxHp).toBe(796);
-    expect(troll.hp).toBe(796);
+    expect(troll.maxHp).toBe(429);
+    expect(troll.hp).toBe(429);
     expect(troll.weapon.min).toBe(33);
     expect(troll.weapon.max).toBe(52);
     expect(troll.stats.armor).toBe(162);
     expect(troll.mechanicDamageMult).toBe(1.35);
-    expect(troll.mechanicHealMult).toBe(3.25);
+    expect(troll.mechanicHealMult).toBe(1.75);
     const untuned = createMob(2, MOBS.fen_troll, 10, ORIGIN);
     expect(untuned.maxHp).toBe(245);
     expect(untuned.mechanicDamageMult).toBeUndefined();
@@ -65,22 +90,50 @@ describe('open-world mob curve', () => {
   it('leaves open-world elites on their authored elite ladder without double-scaling', () => {
     const mogger = MOBS.mogger;
     expect(mogger.elite).toBe(true);
-    expect(isOpenWorldTuned(mogger)).toBe(false);
+    expect(isOpenWorldTuned(mogger)).toBe(true);
     const spawned = spawnOpenWorldMob(1, mogger, 6, ORIGIN);
     expect(spawned.maxHp).toBe(createMob(2, mogger, 6, ORIGIN).maxHp);
     expect(spawned.maxHp).toBe(1357);
     expect(spawned.maxHp).toBeGreaterThan(spawnOpenWorldMob(3, MOBS.wild_boar, 6, ORIGIN).maxHp);
     expect(spawned.mechanicDamageMult).toBeUndefined();
+    expect(spawned.mechanicHealMult).toBeUndefined();
+    expect(spawnOpenWorldMob(4, MOBS.brutok_skullsmasher, 17, ORIGIN).maxHp).toBe(3036);
   });
 
-  it('leaves decoration, practice targets, elites, world bosses and puzzle objects alone', () => {
+  it('raises weak elites throughout the world and scales their support heals by the HP gain', () => {
+    expect(spawnOpenWorldMob(1, MOBS.drowned_warlord, 12, ORIGIN).maxHp).toBe(1207);
+    const croaker = spawnOpenWorldMob(2, MOBS.drowsy_croaker, 20, ORIGIN);
+    expect(croaker.maxHp).toBe(2990);
+    expect(croaker.mechanicHealMult).toBeCloseTo(1300 / 786, 10);
+    expect(croaker.mechanicDamageMult).toBeUndefined();
+    const elites = [...new Set(CAMPS.map((c) => c.mobId))]
+      .map((id) => MOBS[id])
+      .filter((t) => t.elite && isOpenWorldTuned(t));
+    expect(elites.length).toBeGreaterThan(20);
+    for (const t of elites) {
+      for (let level = t.minLevel; level <= t.maxLevel; level++) {
+        const mob = spawnOpenWorldMob(1, t, level, ORIGIN);
+        expect(mob.maxHp, `${t.id}@${level}`).toBeGreaterThanOrEqual(
+          createMob(2, t, level, ORIGIN).maxHp,
+        );
+      }
+    }
+  });
+
+  it('leaves decoration, practice targets, world bosses and puzzle objects alone', () => {
     const exempt = Object.values(MOBS).filter(
-      (t) => t.dummy || t.ambient || t.elite || t.worldBoss || t.xpMult === 0 || t.requiresQuestId,
+      (t) =>
+        t.dummy ||
+        t.ambient ||
+        t.friendlyPracticeTarget ||
+        t.worldBoss ||
+        t.xpMult === 0 ||
+        t.requiresQuestId,
     );
     // Every exempt class is present, so this cannot pass vacuously.
     expect(exempt.some((t) => t.dummy)).toBe(true);
     expect(exempt.some((t) => t.ambient)).toBe(true);
-    expect(exempt.some((t) => t.elite)).toBe(true);
+    expect(exempt.some((t) => t.friendlyPracticeTarget)).toBe(true);
     expect(exempt.some((t) => t.worldBoss)).toBe(true);
     expect(exempt.some((t) => t.xpMult === 0)).toBe(true);
     for (const t of exempt) {
@@ -94,10 +147,12 @@ describe('open-world mob curve', () => {
   });
 
   it('never mutates the shared template table', () => {
-    const before = { ...MOBS.fen_troll };
-    openWorldMobTemplate(MOBS.fen_troll, 15);
-    spawnOpenWorldMob(1, MOBS.fen_troll, 15, ORIGIN);
-    expect(MOBS.fen_troll).toEqual(before);
+    for (const template of [MOBS.fen_troll, MOBS.ogre_crusher, MOBS.mogger]) {
+      const before = { ...template };
+      openWorldMobTemplate(template, 15);
+      spawnOpenWorldMob(1, template, 15, ORIGIN);
+      expect(template).toEqual(before);
+    }
   });
 });
 
@@ -118,9 +173,9 @@ describe('open-world curve at the spawn sites', () => {
         expectedMaxHp(MOBS[mob.templateId], mob.level),
       );
     }
-    // Level-1 camps are untouched; a level-10+ camp carries the full curve.
+    // Level-1 camps are untouched; a level-20 camp carries the full curve.
     const levelOne = camps.find((e) => e.level === 1);
-    const highLevel = camps.find((e) => e.level >= 10 && !MOBS[e.templateId].elite);
+    const highLevel = camps.find((e) => e.level === 20 && !MOBS[e.templateId].elite);
     expect(levelOne?.maxHp).toBe(createMob(0, MOBS[levelOne?.templateId ?? ''], 1, ORIGIN).maxHp);
     expect(highLevel?.maxHp).toBe(
       Math.round(
@@ -141,18 +196,14 @@ describe('open-world curve at the spawn sites', () => {
       (e) => e.kind === 'mob' && e.templateId === template.id && e.tappedById === p.id,
     );
     expect(summoned?.maxHp).toBe(expectedMaxHp(template, template.maxLevel));
-    expect(summoned?.maxHp).toBeGreaterThan(
-      createMob(0, template, template.maxLevel, ORIGIN).maxHp,
-    );
+    expect(summoned?.maxHp).toBe(createMob(0, template, template.maxLevel, ORIGIN).maxHp);
     const eliteTemplate = MOBS.bound_guardian;
-    expect(isOpenWorldTuned(eliteTemplate)).toBe(false);
+    expect(isOpenWorldTuned(eliteTemplate)).toBe(true);
     summonQuestMob(sim.ctx, eliteTemplate.id, { ...p.pos }, p.id);
     const summonedElite = [...sim.entities.values()].find(
       (e) => e.kind === 'mob' && e.templateId === eliteTemplate.id && e.tappedById === p.id,
     );
-    expect(summonedElite?.maxHp).toBe(
-      createMob(0, eliteTemplate, eliteTemplate.maxLevel, ORIGIN).maxHp,
-    );
+    expect(summonedElite?.maxHp).toBe(expectedMaxHp(eliteTemplate, eliteTemplate.maxLevel));
   });
 
   it('keeps instanced spawns on their own tuning table', () => {

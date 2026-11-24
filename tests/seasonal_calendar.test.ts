@@ -16,11 +16,11 @@ import { GOURDLIGHT_EVE_ID } from '../src/sim/content/gourdlight_eve';
 import { KNOWN_SEASONAL_EVENTS } from '../src/sim/seasonal';
 
 describe('the seasonal calendar', () => {
-  it('ships a two-week Gourdlight Eve window that closes after the 31st', () => {
+  it('extends Gourdlight Eve through November 7 worldwide', () => {
     const w = DEFAULT_SEASONAL_WINDOWS.find((x) => x.eventId === GOURDLIGHT_EVE_ID);
     expect(w).toBeDefined();
     expect(w?.startMs).toBe(Date.UTC(2026, 9, 18));
-    expect(w?.endMs).toBe(Date.UTC(2026, 10, 1, 12));
+    expect(w?.endMs).toBe(Date.UTC(2026, 10, 8, 12));
     for (const window of DEFAULT_SEASONAL_WINDOWS) {
       expect(KNOWN_SEASONAL_EVENTS).toContain(window.eventId);
     }
@@ -31,7 +31,12 @@ describe('the seasonal calendar', () => {
     expect(activeSeasonalEventAt(Date.UTC(2026, 9, 17, 23, 59, 59), windows)).toBeNull();
     expect(activeSeasonalEventAt(Date.UTC(2026, 9, 18), windows)).toBe(GOURDLIGHT_EVE_ID);
     expect(activeSeasonalEventAt(Date.UTC(2026, 9, 31, 22), windows)).toBe(GOURDLIGHT_EVE_ID);
-    expect(activeSeasonalEventAt(Date.UTC(2026, 10, 1, 12), windows)).toBeNull();
+    expect(activeSeasonalEventAt(Date.UTC(2026, 10, 1, 12), windows)).toBe(GOURDLIGHT_EVE_ID);
+    expect(activeSeasonalEventAt(Date.UTC(2026, 10, 7, 23, 59, 59), windows)).toBe(
+      GOURDLIGHT_EVE_ID,
+    );
+    expect(activeSeasonalEventAt(Date.UTC(2026, 10, 8, 12) - 1, windows)).toBe(GOURDLIGHT_EVE_ID);
+    expect(activeSeasonalEventAt(Date.UTC(2026, 10, 8, 12), windows)).toBeNull();
   });
 
   it('parses an operator override and drops malformed entries', () => {
@@ -55,9 +60,9 @@ describe('the seasonal calendar', () => {
       worldQuestExpiresAtMs: 0,
       seasonal: { hostEventId: null },
     };
-    feedRealmCalendar(sink, Date.UTC(2026, 9, 25, 18), DEFAULT_RAID_RESET_TIME_ZONE);
+    feedRealmCalendar(sink, Date.UTC(2026, 10, 2, 18), DEFAULT_RAID_RESET_TIME_ZONE);
     expect(sink.seasonal?.hostEventId).toBe(GOURDLIGHT_EVE_ID);
-    feedRealmCalendar(sink, Date.UTC(2026, 11, 25, 18), DEFAULT_RAID_RESET_TIME_ZONE);
+    feedRealmCalendar(sink, Date.UTC(2026, 10, 8, 12), DEFAULT_RAID_RESET_TIME_ZONE);
     expect(sink.seasonal?.hostEventId).toBeNull();
   });
 });

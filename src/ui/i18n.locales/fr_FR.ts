@@ -26513,4 +26513,37 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Vapeurs vertes',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Os cliquetants',
   'seasonal.tricks.gourdlight_trick_strawling': 'Apparence de créature de paille',
+  'hudChrome.membershipWelcome.body':
+    'Votre abonnement est actif. Profitez de tous ses avantages, aventurier !',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Votre abonnement est actif jusqu’au {date}. Profitez de tous ses avantages, aventurier !',
+  'hudChrome.membershipWelcome.close': 'En avant',
+  'hudChrome.membershipWelcome.title': 'Félicitations !',
+  'hudChrome.purchaseLoot.collect': 'Récupérer',
+  'hudChrome.purchaseLoot.description':
+    'Récupérez votre achat maintenant. Si vos sacs sont pleins, il est conservé en surplus. Tout ce que vous laissez pour plus tard vous attend dans votre boîte aux lettres.',
+  'hudChrome.purchaseLoot.later': 'Plus tard',
+  'hudChrome.purchaseLoot.title': 'Votre achat est arrivé',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Tous les avantages d’un abonnement mensuel.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Les rênes de votre monture sont arrivées. Récupérez-les dans la fenêtre de butin.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Les rênes de votre monture apparaîtront dans la fenêtre de butin de ce personnage une fois le paiement encaissé. Si l’essai est actif, elles arriveront après le premier paiement.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Un chevalier en armure d’abonnement avec l’âne coursier et la monture Chimère Aile-de-nuit',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Comprend la monture Chimère Aile-de-nuit pour tous les personnages de votre compte. Ses rênes liées à l’âme arrivent dans une fenêtre de butin sur le personnage qui l’achète. Une par compte, et elle reste à vous après la fin de l’abonnement.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Seulement {price} par mois, soit {percent} d’économie par rapport au paiement mensuel.',
+  'hudChrome.wocStore.subscription.checkoutPending':
+    'Achat en attente. En attente de confirmation.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Un chevalier en armure d’abonnement à côté de l’âne coursier ailé',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Votre jeton apparaîtra dans la fenêtre de butin de ce personnage une fois le paiement encaissé.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Un jeton d’abonnement doré',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Un jeton d’abonnement que vous recevez en jeu. Échangez-le contre 30 jours d’abonnement, ou échangez-le avec d’autres joueurs et vendez-le à l’hôtel des ventes.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Passer à 12 mois',
 };

@@ -7,7 +7,7 @@
 // ship with the build; an operator can replace them without a deploy of new code
 // through SEASONAL_EVENT_WINDOWS, a comma-separated list of
 // `<eventId>:<startISO>/<endISO>` entries, e.g.
-//   SEASONAL_EVENT_WINDOWS=gourdlight_eve:2026-10-18T00:00:00Z/2026-11-01T12:00:00Z
+//   SEASONAL_EVENT_WINDOWS=gourdlight_eve:2026-10-18T00:00:00Z/2026-11-08T12:00:00Z
 // An empty value (`SEASONAL_EVENT_WINDOWS=`) turns every event off. A malformed
 // entry is dropped (and reported once at boot), never guessed at.
 
@@ -17,13 +17,13 @@ export interface SeasonalWindow {
   endMs: number;
 }
 
-/** The shipped windows. Gourdlight Eve: two weeks, closing the morning after the
- *  31st in the Americas so its last night is whole everywhere. */
+/** The shipped windows. Gourdlight Eve was released on October 28, so extend it
+ *  through November 7 worldwide to give players another week to earn rewards. */
 export const DEFAULT_SEASONAL_WINDOWS: readonly SeasonalWindow[] = Object.freeze([
   {
     eventId: 'gourdlight_eve',
     startMs: Date.UTC(2026, 9, 18, 0, 0, 0),
-    endMs: Date.UTC(2026, 10, 1, 12, 0, 0),
+    endMs: Date.UTC(2026, 10, 8, 12, 0, 0),
   },
 ]);
 

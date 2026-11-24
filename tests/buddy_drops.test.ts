@@ -20,9 +20,13 @@ import {
   updateBuddyReveals,
 } from '../src/sim/buddy_drops';
 import {
+  BUDDY_BOSS_CHANCE,
   BUDDY_BOSS_DROPS,
+  BUDDY_FULL_GROUP,
   BUDDY_WORLD_REVEAL_DISTANCE,
   buddyBossDropsFor,
+  buddyChancePerPlayer,
+  FORGEMAW_PER_BOSS_CHANCE,
 } from '../src/sim/content/buddy_sources';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -65,7 +69,7 @@ describe('boss pets: one independent roll per player', () => {
     expect(buddyBossDropsFor('forest_wolf')).toEqual([]);
   });
 
-  it('draws once per (player, row) at the normal rate, whatever each player owns', () => {
+  it('draws once per (player, row) at the split rate, whatever each player owns', () => {
     const sim = makeWorld();
     const a = join(sim, 'Alpha');
     const b = join(sim, 'Beta');
@@ -75,9 +79,12 @@ describe('boss pets: one independent roll per player', () => {
     const rows = buddyBossDropsFor(NYTHRAXIS);
     expect(rows.length).toBeGreaterThan(0);
     const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(true);
-    rollBossBuddyDrops(sim.ctx, boss, [sim.players.get(a)!, sim.players.get(b)!], null);
+    rollBossBuddyDrops(sim.ctx, boss, [sim.players.get(a)!, sim.players.get(b)!], {
+      difficulty: 'heroic',
+    } as never);
     expect(chance).toHaveBeenCalledTimes(2 * rows.length);
-    for (const call of chance.mock.calls) expect(call[0]).toBe(rows[0].chance);
+    // Two players split the full group's 1% total: 0.5% each.
+    for (const call of chance.mock.calls) expect(call[0]).toBeCloseTo(0.005, 12);
     // Alpha owned it: no presence line, nothing pending. Beta won it: pending.
     expect(sim.players.get(a)!.buddies.pending).toEqual([]);
     expect(sim.players.get(b)!.buddies.pending.map((p) => p.key)).toEqual(['crystal_lich']);
@@ -86,21 +93,54 @@ describe('boss pets: one independent roll per player', () => {
     expect(presence[0]).toMatchObject({ pid: b, key: 'crystal_lich' });
   });
 
-  it('uses the heroic rate under a heroic claim, and skips heroic-only rows on normal', () => {
+  it('Normal Nythraxis and the Normal Crucible roll nothing; Heroic rolls', () => {
     const sim = makeWorld();
     const pid = join(sim);
     const meta = sim.players.get(pid)!;
     const nythraxis = bossAt(sim, NYTHRAXIS, 10, 10);
     const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+    rollBossBuddyDrops(sim.ctx, nythraxis, [meta], { difficulty: 'normal' } as never);
+    rollBossBuddyDrops(sim.ctx, nythraxis, [meta], null);
+    expect(chance).not.toHaveBeenCalled();
     rollBossBuddyDrops(sim.ctx, nythraxis, [meta], { difficulty: 'heroic' } as never);
-    const row = buddyBossDropsFor(NYTHRAXIS)[0];
-    expect(chance).toHaveBeenLastCalledWith(row.heroicChance);
+    // Solo: the whole 1% total rides the one player.
+    expect(chance).toHaveBeenCalledTimes(1);
+    expect(chance.mock.calls[0][0]).toBeCloseTo(0.01, 12);
     chance.mockClear();
     const ignivar = bossAt(sim, FORGE_BOSS, 20, 20);
     rollBossBuddyDrops(sim.ctx, ignivar, [meta], { difficulty: 'normal' } as never);
     expect(chance).not.toHaveBeenCalled();
     rollBossBuddyDrops(sim.ctx, ignivar, [meta], { difficulty: 'heroic' } as never);
     expect(chance).toHaveBeenCalledTimes(1);
+    // Forgemaw is spread across both Crucible bosses: half of 1% solo.
+    expect(chance.mock.calls[0][0]).toBeCloseTo(0.005, 12);
+  });
+
+  it('Varkhul splits its half rate across a small group too', () => {
+    const sim = makeWorld();
+    const a = sim.players.get(join(sim, 'Alpha'))!;
+    const b = sim.players.get(join(sim, 'Beta'))!;
+    const varkhul = bossAt(sim, 'varkhul_forgefather_of_the_last_flame', 10, 10);
+    const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+    rollBossBuddyDrops(sim.ctx, varkhul, [a, b], { difficulty: 'normal' } as never);
+    expect(chance).not.toHaveBeenCalled();
+    rollBossBuddyDrops(sim.ctx, varkhul, [a, b], { difficulty: 'heroic' } as never);
+    expect(chance).toHaveBeenCalledTimes(2);
+    for (const call of chance.mock.calls) expect(call[0]).toBeCloseTo(0.0025, 12);
+  });
+
+  it('a full group of ten or more rolls the flat per-player rate', () => {
+    const sim = makeWorld();
+    const metas = Array.from({ length: 12 }, (_, i) => sim.players.get(join(sim, `P${i}`))!);
+    const boss = bossAt(sim, NYTHRAXIS, 10, 10);
+    const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+    rollBossBuddyDrops(sim.ctx, boss, metas.slice(0, 10), { difficulty: 'heroic' } as never);
+    expect(chance).toHaveBeenCalledTimes(10);
+    for (const call of chance.mock.calls) expect(call[0]).toBe(0.001);
+    chance.mockClear();
+    rollBossBuddyDrops(sim.ctx, boss, metas, { difficulty: 'heroic' } as never);
+    expect(chance).toHaveBeenCalledTimes(12);
+    for (const call of chance.mock.calls) expect(call[0]).toBe(0.001);
   });
 
   it('records the kill position and the source kind on the pending entry', () => {
@@ -109,7 +149,7 @@ describe('boss pets: one independent roll per player', () => {
     const meta = sim.players.get(pid)!;
     const boss = bossAt(sim, NYTHRAXIS, 33, 44);
     vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(true);
-    rollBossBuddyDrops(sim.ctx, boss, [meta], { difficulty: 'normal' } as never);
+    rollBossBuddyDrops(sim.ctx, boss, [meta], { difficulty: 'heroic' } as never);
     expect(meta.buddies.pending[0]).toEqual({
       key: 'crystal_lich',
       source: 'instance',
@@ -118,7 +158,7 @@ describe('boss pets: one independent roll per player', () => {
     });
   });
 
-  it('is wired to the death site: killing a listed boss in the open world attaches a pending pet', () => {
+  it('is wired to the death site: an unclaimed (Normal-rate) Nythraxis kill attaches nothing', () => {
     const sim = makeWorld();
     const pid = join(sim);
     const meta = sim.players.get(pid)!;
@@ -127,8 +167,79 @@ describe('boss pets: one independent roll per player', () => {
     boss.tappedById = pid;
     vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(true);
     sim.ctx.handleDeath(boss, player);
+    expect(meta.buddies.pending).toEqual([]);
+  });
+
+  it('is wired to the death site: a Heroic claim kill attaches a pending pet', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    const player = sim.entities.get(pid)!;
+    const boss = bossAt(sim, NYTHRAXIS, player.pos.x + 3, player.pos.z);
+    boss.tappedById = pid;
+    const inst = sim.ctx.instances[0];
+    expect(inst, 'the test world has an instance slot').toBeTruthy();
+    inst.partyKey = 'test-party';
+    inst.difficulty = 'heroic';
+    inst.mobIds.push(boss.id);
+    vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(true);
+    sim.ctx.handleDeath(boss, player);
     expect(meta.buddies.pending.map((p) => p.key)).toContain('crystal_lich');
-    expect(meta.buddies.pending[0].source).toBe('world');
+    expect(meta.buddies.pending[0].source).toBe('instance');
+  });
+
+  it('is wired to the death site: a Normal claim kill attaches nothing', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    const player = sim.entities.get(pid)!;
+    const boss = bossAt(sim, NYTHRAXIS, player.pos.x + 3, player.pos.z);
+    boss.tappedById = pid;
+    const inst = sim.ctx.instances[0];
+    inst.partyKey = 'test-party';
+    inst.difficulty = 'normal';
+    inst.mobIds.push(boss.id);
+    vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(true);
+    sim.ctx.handleDeath(boss, player);
+    expect(meta.buddies.pending).toEqual([]);
+  });
+
+  it('the death site splits across the credited party only, never a bystander', () => {
+    const sim = makeWorld();
+    const leader = join(sim, 'Leader');
+    const member = join(sim, 'Member');
+    const outsider = join(sim, 'Outsider');
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.tick();
+    expect(sim.ctx.partyOf(leader)?.members).toContain(member);
+    const player = sim.entities.get(leader)!;
+    for (const id of [member, outsider]) {
+      const e = sim.entities.get(id)!;
+      e.pos.x = player.pos.x + 1;
+      e.pos.z = player.pos.z;
+    }
+    const boss = bossAt(sim, NYTHRAXIS, player.pos.x + 3, player.pos.z);
+    boss.tappedById = leader;
+    const inst = sim.ctx.instances[0];
+    inst.partyKey = 'test-party';
+    inst.difficulty = 'heroic';
+    inst.mobIds.push(boss.id);
+    // Record only the draws made from the buddy roll (other loot draws share
+    // the same rng and can use the same probabilities).
+    const buddyDraws: number[] = [];
+    vi.spyOn(sim.ctx.rng, 'chance').mockImplementation((p: number) => {
+      if (new Error().stack?.includes('rollBossBuddyDrops')) buddyDraws.push(p);
+      return true;
+    });
+    sim.ctx.handleDeath(boss, player);
+    // Two credited players: exactly two buddy draws, each at half of 1%.
+    expect(buddyDraws).toHaveLength(2);
+    for (const p of buddyDraws) expect(p).toBeCloseTo(0.005, 12);
+    for (const id of [leader, member]) {
+      expect(sim.players.get(id)!.buddies.pending.map((p) => p.key)).toEqual(['crystal_lich']);
+    }
+    expect(sim.players.get(outsider)!.buddies.pending).toEqual([]);
   });
 });
 
@@ -243,13 +354,32 @@ describe('the reveal: on the zone-out, or once the player walks away', () => {
 });
 
 describe('the boss source table', () => {
-  it('names only real bosses and real companions', () => {
+  it('names only real bosses and real companions, every row heroic-only', () => {
     for (const row of BUDDY_BOSS_DROPS) {
       expect(MOBS[row.bossId], `${row.bossId} is not a mob`).toBeTruthy();
-      expect(row.chance).toBeGreaterThan(0);
-      expect(row.chance).toBeLessThanOrEqual(0.05);
-      if (row.heroicChance !== undefined)
-        expect(row.heroicChance).toBeGreaterThanOrEqual(row.chance);
+      expect(row.heroicOnly, row.bossId).toBe(true);
     }
+  });
+
+  it('pins the owner rates: 0.1% Nythraxis, 0.05% per Crucible boss', () => {
+    expect(BUDDY_BOSS_CHANCE).toBe(0.001);
+    expect(FORGEMAW_PER_BOSS_CHANCE).toBe(0.0005);
+    expect(BUDDY_FULL_GROUP).toBe(10);
+    expect(BUDDY_BOSS_DROPS.map((row) => [row.bossId, row.chance])).toEqual([
+      [NYTHRAXIS, 0.001],
+      [FORGE_BOSS, 0.0005],
+      ['varkhul_forgefather_of_the_last_flame', 0.0005],
+    ]);
+  });
+
+  it('buddyChancePerPlayer keeps the group total fixed under ten players', () => {
+    for (let n = 1; n < BUDDY_FULL_GROUP; n++) {
+      expect(buddyChancePerPlayer(0.001, n) * n, `n=${n}`).toBeCloseTo(0.01, 12);
+    }
+    expect(buddyChancePerPlayer(0.001, 1)).toBeCloseTo(0.01, 12);
+    expect(buddyChancePerPlayer(0.001, 2)).toBeCloseTo(0.005, 12);
+    expect(buddyChancePerPlayer(0.001, 10)).toBe(0.001);
+    expect(buddyChancePerPlayer(0.001, 25)).toBe(0.001);
+    expect(buddyChancePerPlayer(0.0005, 5)).toBeCloseTo(0.001, 12);
   });
 });

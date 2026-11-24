@@ -4086,7 +4086,8 @@
   [data-subscription-section] p {
     margin-block: var(--spacing-sm);
   }
-  /* Memberships tab: one badge per membership, price on top, benefits beneath. */
+  /* Memberships tab: one column per membership. Art on top, then title, price and the
+     purchase controls, then what it gives. */
   .membership-badges {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -4097,6 +4098,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    overflow: hidden;
     padding: 16px;
     border: 1px solid var(--color-membership-border);
     border-radius: 10px;
@@ -4109,6 +4111,16 @@
   .membership-badge--current {
     border-color: var(--color-membership-current);
     box-shadow: 0 0 0 1px var(--color-membership-current) inset;
+  }
+  .membership-badge-art {
+    display: block;
+    width: calc(100% + 32px);
+    max-width: none;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    margin: -16px -16px 6px;
+    object-fit: cover;
+    border-bottom: 1px solid var(--color-membership-border);
   }
   .membership-badge-head h3 {
     margin: 0;
@@ -4134,14 +4146,28 @@
   .membership-badge-benefits {
     margin: 0;
     padding-left: 18px;
+    list-style: disc;
+  }
+  .membership-badge-benefits li + li {
+    margin-top: 4px;
   }
   .membership-badge-action {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    margin-top: auto;
-    padding-top: 8px;
+    padding-top: 4px;
+  }
+  .membership-badge-action p:empty {
+    display: none;
+  }
+  .membership-badge-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-membership-border);
   }
   .membership-badge-action .ui-btn {
     min-height: 40px;
@@ -28214,6 +28240,76 @@
     gap: 10px;
   }
   .weekly-ready-actions .ui-btn {
+    min-height: 40px;
+  }
+  /* Store purchase dialogs (src/ui/purchase_reward_dialogs.ts): the loot window a paid
+     reward opens, and the membership congratulation. */
+  .purchase-reward-prompt {
+    box-sizing: border-box;
+    width: min(440px, calc(100vw - 32px));
+    min-width: 0;
+    padding: 24px;
+    pointer-events: auto;
+    text-align: center;
+  }
+  .purchase-reward-prompt .prompt-text {
+    margin: 0 0 12px;
+    color: var(--color-gold);
+    font-size: 20px;
+  }
+  .purchase-loot-items {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+    text-align: start;
+  }
+  .purchase-loot-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-membership-border);
+    border-radius: 6px;
+    background: var(--color-membership-surface);
+  }
+  .purchase-loot-row img {
+    flex: none;
+    width: 40px;
+    height: 40px;
+  }
+  .purchase-loot-name {
+    flex: 1;
+    font-weight: 600;
+  }
+  .purchase-loot-name[data-quality="uncommon"] {
+    color: var(--color-quality-uncommon);
+  }
+  .purchase-loot-name[data-quality="rare"] {
+    color: var(--color-quality-rare);
+  }
+  .purchase-loot-name[data-quality="epic"] {
+    color: var(--color-quality-epic);
+  }
+  .purchase-loot-name[data-quality="legendary"] {
+    color: var(--color-quality-legendary);
+  }
+  .purchase-loot-count {
+    color: var(--color-text-muted);
+  }
+  .purchase-reward-description {
+    margin: 0 0 18px;
+    color: var(--color-text-light);
+    line-height: 1.5;
+  }
+  .purchase-reward-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .purchase-reward-actions .ui-btn {
     min-height: 40px;
   }
   .weekly-confirm-panel {

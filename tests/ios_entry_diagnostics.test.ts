@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 const viewController = readFileSync('ios/App/App/AppViewController.swift', 'utf8');
 const appDelegate = readFileSync('ios/App/App/AppDelegate.swift', 'utf8');
+const sceneDelegate = readFileSync('ios/App/App/SceneDelegate.swift', 'utf8');
 const storyboard = readFileSync('ios/App/App/Base.lproj/Main.storyboard', 'utf8');
 
 describe('native iOS entry diagnostics wiring', () => {
@@ -22,10 +23,10 @@ describe('native iOS entry diagnostics wiring', () => {
 
   it('logs memory warnings and every relevant app lifecycle transition', () => {
     expect(appDelegate).toContain('func applicationDidReceiveMemoryWarning');
-    expect(appDelegate).toContain('application will resign active');
-    expect(appDelegate).toContain('application entered background');
-    expect(appDelegate).toContain('application will enter foreground');
-    expect(appDelegate).toContain('application became active');
+    expect(sceneDelegate).toContain('scene will resign active');
+    expect(sceneDelegate).toContain('scene entered background');
+    expect(sceneDelegate).toContain('scene will enter foreground');
+    expect(sceneDelegate).toContain('scene became active');
     expect(appDelegate).toContain('application will terminate');
   });
 });

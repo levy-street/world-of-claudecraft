@@ -1330,6 +1330,18 @@ export const id_ID: EnTranslations = {
         "hintBelowMin": "Harga minimum Bursa adalah {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Pembelianmu telah tiba",
+      "description": "Ambil pembelianmu sekarang. Jika tasmu penuh, barang akan disimpan sebagai kelebihan kapasitas. Apa pun yang kamu tinggalkan untuk nanti akan menunggu di kotak suratmu.",
+      "collect": "Ambil",
+      "later": "Nanti"
+    },
+    "membershipWelcome": {
+      "title": "Selamat!",
+      "body": "Keanggotaanmu aktif. Nikmati semua manfaat keanggotaan, petualang!",
+      "bodyUntil": "Keanggotaanmu aktif hingga {date}. Nikmati semua manfaat keanggotaan, petualang!",
+      "close": "Maju"
+    },
     "wocStore": {
       "subscription": {
         "title": "Langganan gim",
@@ -1344,6 +1356,16 @@ export const id_ID: EnTranslations = {
         "annualClaim": "Ambil tunggangan bundel",
         "annualPending": "Kembali ke karakter pembeli setelah pembayaran untuk mengambil tunggangan bundel. Jika pembayaran diproses atau uji coba aktif, coba lagi setelah tagihan berbayar ditarik.",
         "annualDelivered": "Kunci tunggangan bundelmu telah dikirim melalui surat.",
+        "monthlyArtAlt": "Seorang kesatria mengenakan zirah keanggotaan di samping keledai kurir bersayap",
+        "annualArtAlt": "Seorang kesatria mengenakan zirah keanggotaan bersama keledai kurir dan tunggangan Kimera Nightwing",
+        "tokenArtAlt": "Token keanggotaan berwarna emas",
+        "annualAllBenefits": "Semua manfaat keanggotaan bulanan.",
+        "annualPerMonth": "Hanya {price} per bulan, hemat {percent} dibandingkan membayar bulanan.",
+        "annualMountInfo": "Termasuk tunggangan Kimera Nightwing untuk semua karakter di akunmu. Kekang terikat jiwanya tiba di jendela jarahan karakter yang membelinya. Satu per akun, dan tetap milikmu setelah keanggotaan berakhir.",
+        "annualArriving": "Kekang tungganganmu akan muncul di jendela jarahan karakter ini setelah pembayaran selesai. Jika masa uji coba masih aktif, kekang akan tiba setelah pembayaran pertama.",
+        "annualArrived": "Kekang tungganganmu telah tiba. Ambil dari jendela jarahan.",
+        "tokenDescription": "Token keanggotaan yang kamu terima di dalam game. Tukarkan untuk 30 hari keanggotaan, atau perdagangkan dengan pemain lain dan jual di rumah lelang.",
+        "tokenArriving": "Tokenmu akan muncul di jendela jarahan karakter ini setelah pembayaran selesai.",
         "tokenTitle": "Token keanggotaan yang dapat diperdagangkan",
         "tokenPrice": "{price} untuk 30 hari",
         "benefitsTitle": "Manfaat keanggotaan aktif",
@@ -1363,9 +1385,11 @@ export const id_ID: EnTranslations = {
         "subscribe": "Berlangganan",
         "addMonth": "Tambah 1 bulan",
         "addYear": "Tambah 12 bulan",
+        "upgradeAnnual": "Beralih ke 12 bulan",
         "stackTerms": "Dibayar sekarang. Waktunya ditambahkan setelah masa keanggotaanmu saat ini berakhir, lalu keanggotaan diperpanjang dengan paket ini.",
         "stackCapped": "Kamu dapat mengakumulasi hingga 2 tahun keanggotaan sekaligus. Coba lagi mendekati tanggal perpanjanganmu.",
         "stackUnavailable": "Penambahan waktu keanggotaan tidak tersedia saat ini. Coba lagi sebentar lagi.",
+        "checkoutPending": "Pembelian tertunda. Menunggu konfirmasi.",
         "billingBlocked": "Perbarui detail pembayaranmu di Kelola langganan sebelum menambahkan waktu keanggotaan.",
         "renewsOn": "Diperbarui pada {date}",
         "endsOn": "Keanggotaan berakhir pada {date}",

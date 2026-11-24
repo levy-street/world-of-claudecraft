@@ -1,3 +1,4 @@
+import { MEMBERSHIP_ITEM_DAYS } from '../src/membership_contract';
 import { nearBanker } from '../src/sim/bank';
 import {
   abandonCourierAccountLeg,
@@ -552,6 +553,12 @@ export class MembershipGameServices {
           bustMembership(session.accountId);
           this.redemptionArmourClaims.add(session);
           this.requestRefresh(session.accountId);
+          this.host.sim.ctx.emit({
+            type: 'membershipRedeemed',
+            days: MEMBERSHIP_ITEM_DAYS,
+            expiresAt: result.expiresAt,
+            pid: session.pid,
+          });
         },
         controller.signal,
       );

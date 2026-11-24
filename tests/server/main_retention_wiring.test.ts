@@ -462,7 +462,7 @@ describe('retention sweep wiring in server/main.ts', () => {
   });
 
   it('stops admitting storage recovery before the database pool closes', () => {
-    const shutdown = MAIN.indexOf('const shutdown = async () => {');
+    const shutdown = MAIN.indexOf('const shutdownWork = async () => {');
     const stopRecovery = MAIN.indexOf('await stopStoragePurchaseRecovery();', shutdown);
     const closePool = MAIN.indexOf('await pool.end();', shutdown);
     expect(shutdown).toBeGreaterThan(-1);
@@ -474,11 +474,12 @@ describe('retention sweep wiring in server/main.ts', () => {
   it('starts the ledger-growth monitor after listen and drains it before pool close', () => {
     const listen = MAIN.indexOf('server.listen(');
     const start = MAIN.indexOf('bankLedgerGrowthMonitor.start()');
-    const shutdown = MAIN.indexOf('const shutdown = async () => {');
+    const shutdown = MAIN.indexOf('const shutdownWork = async () => {');
     const stop = MAIN.indexOf('await bankLedgerGrowthMonitor.stop();', shutdown);
     const closePool = MAIN.indexOf('await pool.end();', shutdown);
     expect(listen).toBeGreaterThan(-1);
     expect(start).toBeGreaterThan(listen);
+    expect(shutdown).toBeGreaterThan(-1);
     expect(stop).toBeGreaterThan(shutdown);
     expect(stop).toBeLessThan(closePool);
     expect(count(MAIN, 'bankLedgerGrowthMonitor.start()')).toBe(1);

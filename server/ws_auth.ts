@@ -27,6 +27,7 @@ import {
   STABLE_TIMER_WIRE_VERSION,
 } from '../src/world_api';
 import { sanitizeAppearance } from '../src/world_api/appearance';
+import { accountAdmissionsFor } from './account_admission';
 import type { AccountMountItemsRow } from './account_mount_items_core';
 import type {
   AccountChatMuteStatus,
@@ -314,6 +315,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       return;
     }
     const accountId = account.accountId;
+    const admission = accountAdmissionsFor(game).begin(accountId);
     // Capture immediately before the existing auth query. A committed policy
     // notification received during later handshake awaits overrides this query's
     // stale value at the synchronous game.join boundary, with no second DB read.
@@ -449,6 +451,19 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // resumes and keeps its nonce; a live duplicate is rejected) and never
           // re-stamp the row with a fresh acquire that a doomed handshake could
           // leave mismatched.
+          if (
+            !admission.allows(account) ||
+            !admission.allows(await accountAndScopeForToken(token))
+          ) {
+            rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
+            return;
+          }
+          // The final read can outlive linkdead grace. Never let join turn
+          // this resume into a fresh load without its lease/reload/cap checks.
+          if (!game.hasSessionForCharacter(character.id)) {
+            rejectHandshake(ws, WS_AUTH_ERROR.alreadyInWorld);
+            return;
+          }
           if (membershipLocked(character)) {
             rejectHandshake(ws, WS_AUTH_ERROR.membershipRequired);
             return;
@@ -560,10 +575,27 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 return;
               }
               admittedCharacter = refreshedCharacter;
+              // Re-read even if the initial query returned after revocation,
+              // before this probe existed. Check the probe AFTER that await to
+              // fence a disconnect during the final query's stale snapshot.
+              // Keep this within lease cleanup, with no await on success before join.
+              if (
+                !admission.allows(account) ||
+                !admission.allows(await accountAndScopeForToken(token))
+              ) {
+                await releaseCharacterLease(character.id, leaseNonce).catch((err) =>
+                  console.error('lease release failed:', err),
+                );
+                leaseNonce = undefined;
+                rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
+                return;
+              }
             } catch (err) {
-              await releaseCharacterLease(character.id, leaseNonce).catch((releaseErr) =>
-                console.error('lease release failed:', releaseErr),
-              );
+              if (leaseNonce !== undefined) {
+                await releaseCharacterLease(character.id, leaseNonce).catch((releaseErr) =>
+                  console.error('lease release failed:', releaseErr),
+                );
+              }
               leaseNonce = undefined;
               throw err;
             }
@@ -719,6 +751,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         pendingLeaseJoins.delete(character.id);
       }
     } finally {
+      admission.release();
       generalChatRateLimitHydration.release();
       chatModerationHydration.release();
     }

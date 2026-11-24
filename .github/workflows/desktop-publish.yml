@@ -63,8 +63,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
         with:
-          # Full history so the main-ancestry guard below can walk it.
+          # Keep full commit ancestry, but fetch blobs only for the guard inputs.
+          # Historical game assets can exceed this job's checkout timeout.
           fetch-depth: 0
+          sparse-checkout: |
+            /package.json
+            /src/game/desktop_download.ts
+            /vite.config.ts
+          sparse-checkout-cone-mode: false
 
       # A tag alone must not be able to publish code that never landed on main
       # (the contract is: merge to main, then tag the merge).

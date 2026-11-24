@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/render_finder_portraits.mjs",
+  "rendererFingerprint": "62769378878f05d6b44a916bdb3145f710872f92ef9e6ab6bfd2d72385fd01ef",
+  "renderEnv": {
+    "schemaVersion": 1,
+    "platform": "darwin",
+    "arch": "arm64",
+    "gpuVendor": "Google Inc. (Google)",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "156",
+    "browserVersion": "Chrome/156.0.8078.74",
+    "requestedBackend": "swiftshader",
+    "fingerprint": "9d557a3eb124d4b56ba598134261e432742c42c2c3e6c918df522c59de3d290d"
+  },
+  "portraits": [
+    {
+      "id": "muster_effigy",
+      "sourceFingerprint": "be9afeaaabe5479545c14f910f71551c43d56585271b8d46cb692c7c1d727fa5",
+      "output": {
+        "bytes": 3978,
+        "sha256": "2ed0ee3eff45ea4d8791830b1f402e7d9b9e7c42c8676f9a17809da81682b42e"
+      }
+    }
+  ]
+}

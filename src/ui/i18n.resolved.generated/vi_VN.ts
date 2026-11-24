@@ -1330,6 +1330,18 @@ export const vi_VN: EnTranslations = {
         "hintBelowMin": "Giá tối thiểu trên Sàn là {usd}."
       }
     },
+    "purchaseLoot": {
+      "title": "Món hàng của bạn đã đến",
+      "description": "Nhận món hàng ngay. Nếu túi đã đầy, món hàng sẽ được giữ ở phần vượt sức chứa. Những gì bạn để dành nhận sau sẽ chờ trong hộp thư.",
+      "collect": "Nhận",
+      "later": "Để sau"
+    },
+    "membershipWelcome": {
+      "title": "Chúc mừng!",
+      "body": "Tư cách thành viên của bạn đã có hiệu lực. Hãy tận hưởng mọi quyền lợi thành viên, nhà thám hiểm!",
+      "bodyUntil": "Tư cách thành viên của bạn có hiệu lực đến {date}. Hãy tận hưởng mọi quyền lợi thành viên, nhà thám hiểm!",
+      "close": "Tiến lên"
+    },
     "wocStore": {
       "subscription": {
         "title": "Đăng Ký Trò Chơi",
@@ -1344,6 +1356,16 @@ export const vi_VN: EnTranslations = {
         "annualClaim": "Nhận Thú Cưỡi Gói",
         "annualPending": "Quay về nhân vật mua sau thanh toán để nhận thú cưỡi gói. Nếu thanh toán đang xử lý hoặc còn dùng thử, thử lại sau khi khoản phí trả tiền được thu.",
         "annualDelivered": "Chìa khóa thú cưỡi trong gói đã được gửi qua thư.",
+        "monthlyArtAlt": "Một hiệp sĩ mặc giáp thành viên bên lừa chuyển phát có cánh",
+        "annualArtAlt": "Một hiệp sĩ mặc giáp thành viên bên lừa chuyển phát và thú cưỡi Chimera Cánh Đêm",
+        "tokenArtAlt": "Một thẻ thành viên màu vàng",
+        "annualAllBenefits": "Tất cả quyền lợi của gói thành viên hằng tháng.",
+        "annualPerMonth": "Chỉ {price} mỗi tháng, tiết kiệm {percent} so với thanh toán hằng tháng.",
+        "annualMountInfo": "Bao gồm thú cưỡi Chimera Cánh Đêm cho mọi nhân vật trong tài khoản. Dây cương khóa hồn xuất hiện trong cửa sổ chiến lợi phẩm của nhân vật mua. Mỗi tài khoản một con, và vẫn là của bạn sau khi tư cách thành viên kết thúc.",
+        "annualArriving": "Dây cương thú cưỡi sẽ xuất hiện trong cửa sổ chiến lợi phẩm của nhân vật này khi thanh toán hoàn tất. Nếu đang dùng thử, dây cương sẽ đến sau lần thanh toán đầu tiên.",
+        "annualArrived": "Dây cương thú cưỡi của bạn đã đến. Hãy nhận trong cửa sổ chiến lợi phẩm.",
+        "tokenDescription": "Thẻ thành viên bạn nhận trong trò chơi. Đổi thẻ lấy 30 ngày thành viên, hoặc giao dịch với người chơi khác và bán tại nhà đấu giá.",
+        "tokenArriving": "Thẻ của bạn sẽ xuất hiện trong cửa sổ chiến lợi phẩm của nhân vật này khi thanh toán hoàn tất.",
         "tokenTitle": "Thẻ Thành Viên Giao Dịch Được",
         "tokenPrice": "{price} cho 30 ngày",
         "benefitsTitle": "Lợi Ích Thành Viên Đang Hiệu Lực",
@@ -1363,9 +1385,11 @@ export const vi_VN: EnTranslations = {
         "subscribe": "Đăng Ký",
         "addMonth": "Thêm 1 tháng",
         "addYear": "Thêm 12 tháng",
+        "upgradeAnnual": "Nâng cấp lên 12 tháng",
         "stackTerms": "Thanh toán ngay. Thời gian được cộng vào cuối kỳ thành viên hiện tại, sau đó tư cách thành viên sẽ được gia hạn theo gói này.",
         "stackCapped": "Bạn có thể tích lũy tối đa 2 năm thành viên cùng lúc. Vui lòng thử lại khi gần đến ngày gia hạn.",
         "stackUnavailable": "Hiện không thể thêm thời gian thành viên. Vui lòng thử lại sau ít phút.",
+        "checkoutPending": "Đang chờ hoàn tất giao dịch. Đợi xác nhận.",
         "billingBlocked": "Cập nhật thông tin thanh toán trong Quản Lý Đăng Ký trước khi thêm thời gian thành viên.",
         "renewsOn": "Gia hạn vào {date}",
         "endsOn": "Tư cách thành viên kết thúc vào {date}",

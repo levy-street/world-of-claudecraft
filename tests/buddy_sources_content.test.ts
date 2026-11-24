@@ -36,7 +36,7 @@ describe('every buddy source resolves', () => {
     expect(BUDDY_DEED_REWARDS).toEqual({});
   });
 
-  it('boss rows name real bosses and real companions, and Forgemaw stays heroic-only', () => {
+  it('boss rows name real bosses and real companions, and every row is heroic-only', () => {
     expect(BUDDY_BOSS_DROPS.map((row) => [row.key, row.bossId])).toEqual([
       ['crystal_lich', 'nythraxis_scourge_of_thornpeak'],
       ['forgemaw', 'ignivar_herald_of_the_last_flame'],
@@ -48,7 +48,7 @@ describe('every buddy source resolves', () => {
     }
     const forge = BUDDY_BOSS_DROPS.filter((row) => row.key === 'forgemaw');
     expect(forge).toHaveLength(2);
-    for (const row of forge) expect(row.heroicOnly).toBe(true);
+    for (const row of BUDDY_BOSS_DROPS) expect(row.heroicOnly, row.bossId).toBe(true);
   });
 
   it('no charm items remain and nothing crafts a buddy item', () => {

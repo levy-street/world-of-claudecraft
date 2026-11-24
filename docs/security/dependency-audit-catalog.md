@@ -247,6 +247,35 @@ server at runtime, and never merges untrusted user input.
 **Retire this entry when** a patched `deepmerge` release ships or
 `@sveltejs/vite-plugin-svelte` drops `deepmerge`.
 
+### GHSA-g3hv-75wg-m249: minimatch preprocessing amplification
+
+**Reviewed 2026-11-01. Severity** moderate. The
+[advisory](https://github.com/advisories/GHSA-g3hv-75wg-m249) describes
+`firstPhasePreProcess()` amplification with `optimizationLevel >= 2`, while
+its version range includes every release below 11.0.1.
+
+**Modern copies are upgraded.** Version-scoped overrides move minimatch 9/10
+to 11.0.1 or later, and glob 10/13 to 14.0.2 or later. The latter also fixes
+[GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4).
+These consumers use the named CommonJS exports retained by the patched versions.
+
+**The exception covers only legacy minimatch 3.1.5 and 5.1.9.** Electron's
+`@electron/asar`, `dir-compare`, legacy glob 7, and `filelist` still require
+these legacy CommonJS APIs (`filelist` uses `minimatch.match`). Neither installed legacy version contains
+`firstPhasePreProcess` or `optimizationLevel`, so this advisory's vulnerable
+path does not exist there. Forcing them to minimatch 11 changes the export to
+an object and breaks packaging callers such as `@electron/asar`.
+
+Because pnpm's ignore is advisory-wide, `tests/dependency_glob_security.test.ts`
+checks every minimatch version in the lockfile: only the two exact legacy
+versions or patched versions are accepted. It also checks the legacy API and
+absence of the vulnerable preprocessor, and exercises the upgraded consumers.
+This is not an exception for affected modern minimatch releases or other advisories.
+
+**Retire this entry when** Electron's packaging dependency graph no longer
+requires the legacy callable matcher, or the advisory range is corrected to
+exclude these unaffected implementations.
+
 ## The re-mint chore any dependency change triggers
 
 `pnpm-lock.yaml` is a fingerprinted source input of the Eastbrook, Fenbridge,

@@ -26170,4 +26170,36 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Vapores verdes',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Ossos chocalhantes',
   'seasonal.tricks.gourdlight_trick_strawling': 'Disfarce de palhudo',
+  'hudChrome.membershipWelcome.body':
+    'Sua assinatura está ativa. Aproveite todos os benefícios da assinatura, aventureiro!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Sua assinatura está ativa até {date}. Aproveite todos os benefícios da assinatura, aventureiro!',
+  'hudChrome.membershipWelcome.close': 'Avante',
+  'hudChrome.membershipWelcome.title': 'Parabéns!',
+  'hudChrome.purchaseLoot.collect': 'Coletar',
+  'hudChrome.purchaseLoot.description':
+    'Colete sua compra agora. Se suas bolsas estiverem cheias, ela ficará guardada como excedente. Tudo o que você deixar para depois aguardará na sua caixa de correio.',
+  'hudChrome.purchaseLoot.later': 'Depois',
+  'hudChrome.purchaseLoot.title': 'Sua compra chegou',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Todos os benefícios de uma assinatura mensal.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'As rédeas da sua montaria chegaram. Colete-as na janela de saque.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'As rédeas da sua montaria aparecerão na janela de saque deste personagem quando a cobrança for concluída. Se o período de teste estiver ativo, elas chegarão após o primeiro pagamento.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Um cavaleiro com armadura de assinatura junto ao burro mensageiro e à montaria Quimera de Asa Noturna',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Inclui a montaria Quimera de Asa Noturna para todos os personagens da sua conta. Suas rédeas vinculadas à alma chegam em uma janela de saque do personagem que a compra. Uma por conta, e continua sua depois que a assinatura termina.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Apenas {price} por mês, economizando {percent} em comparação com o pagamento mensal.',
+  'hudChrome.wocStore.subscription.checkoutPending': 'Compra pendente. Aguardando confirmação.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Um cavaleiro com armadura de assinatura ao lado do burro mensageiro alado',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Sua ficha aparecerá na janela de saque deste personagem quando o pagamento for concluído.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Uma ficha de assinatura dourada',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Uma ficha de assinatura que você recebe no jogo. Resgate-a por 30 dias de assinatura, ou negocie-a com outros jogadores e venda-a na casa de leilões.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Mudar para 12 meses',
 };

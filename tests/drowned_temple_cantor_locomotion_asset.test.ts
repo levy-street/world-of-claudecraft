@@ -44,7 +44,7 @@ describe('Laverock original-rig locomotion bank', () => {
     const buffer = readFileSync('public/models/creatures/temple_laverock_locomotion.glb');
     expect(buffer.length).toBeLessThan(150_000);
     expect(createHash('sha256').update(buffer).digest('hex')).toBe(
-      '10d9d4534a839c04fb86470f8e317a52b6bc6f8e1084c39b5c8d23605ce55a49',
+      'b35f9c8f478b9c5cddc3ae3040f28075858bc506cdc28920563dd1ddde98d321',
     );
     expect(
       bank.document

@@ -25848,4 +25848,37 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Grønne dampe',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Raslende knogler',
   'seasonal.tricks.gourdlight_trick_strawling': 'Halmvætteskikkelse',
+  'hudChrome.membershipWelcome.body':
+    'Dit medlemskab er aktivt. Nyd alle medlemsfordelene, eventyrer!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Dit medlemskab er aktivt indtil {date}. Nyd alle medlemsfordelene, eventyrer!',
+  'hudChrome.membershipWelcome.close': 'Fremad',
+  'hudChrome.membershipWelcome.title': 'Tillykke!',
+  'hudChrome.purchaseLoot.collect': 'Hent',
+  'hudChrome.purchaseLoot.description':
+    'Hent dit køb nu. Hvis dine tasker er fulde, opbevares det som overskud. Alt, hvad du gemmer til senere, venter i din postkasse.',
+  'hudChrome.purchaseLoot.later': 'Senere',
+  'hudChrome.purchaseLoot.title': 'Dit køb er ankommet',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Alle fordelene ved et månedligt medlemskab.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Dit ridedyrs tøjler er ankommet. Hent dem i byttevinduet.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Dit ridedyrs tøjler vises i denne figurs byttevindue, når betalingen er gennemført. Hvis prøveperioden er aktiv, ankommer de efter den første betaling.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'En ridder i medlemsrustning med kureræslet og den natvingede kimære som ridedyr',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Indeholder den natvingede kimære som ridedyr for alle figurer på din konto. Dens sjælebundne tøjler ankommer i et byttevindue hos den figur, der køber den. Én pr. konto, og den forbliver din, når medlemskabet slutter.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Kun {price} om måneden, så du sparer {percent} i forhold til månedlig betaling.',
+  'hudChrome.wocStore.subscription.checkoutPending':
+    'Købet afventer gennemførelse. Venter på bekræftelse.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'En ridder i medlemsrustning ved siden af det bevingede kureræsel',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Din polet vises i denne figurs byttevindue, når betalingen er gennemført.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'En gylden medlemskabspolet',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'En medlemskabspolet, du modtager i spillet. Indløs den til 30 dages medlemskab, eller byt den med andre spillere og sælg den i auktionshuset.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Skift til 12 måneder',
 };

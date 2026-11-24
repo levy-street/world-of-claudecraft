@@ -26425,4 +26425,37 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Grüne Dämpfe',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Klapperknochen',
   'seasonal.tricks.gourdlight_trick_strawling': 'Strohlingsgestalt',
+  'hudChrome.membershipWelcome.body':
+    'Deine Mitgliedschaft ist aktiv. Genieße alle Mitgliedschaftsvorteile, Abenteurer!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Deine Mitgliedschaft ist bis {date} aktiv. Genieße alle Mitgliedschaftsvorteile, Abenteurer!',
+  'hudChrome.membershipWelcome.close': 'Auf ins Abenteuer',
+  'hudChrome.membershipWelcome.title': 'Herzlichen Glückwunsch!',
+  'hudChrome.purchaseLoot.collect': 'Abholen',
+  'hudChrome.purchaseLoot.description':
+    'Hol deinen Kauf jetzt ab. Wenn deine Taschen voll sind, wird er als Überlauf aufbewahrt. Alles, was du später abholen möchtest, wartet in deinem Briefkasten.',
+  'hudChrome.purchaseLoot.later': 'Später',
+  'hudChrome.purchaseLoot.title': 'Dein Kauf ist angekommen',
+  'hudChrome.wocStore.subscription.annualAllBenefits':
+    'Alle Vorteile einer monatlichen Mitgliedschaft.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Die Zügel deines Reittiers sind angekommen. Hole sie im Beutefenster ab.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Die Zügel deines Reittiers erscheinen im Beutefenster dieses Charakters, sobald die Zahlung abgeschlossen ist. Während des Testzeitraums kommen sie nach der ersten Zahlung an.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Ein Ritter in Mitgliedschaftsrüstung mit dem Kurieresel und der Nachtflügelchimäre als Reittier',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Enthält die Nachtflügelchimäre als Reittier für alle Charaktere deines Kontos. Ihre seelengebundenen Zügel erscheinen im Beutefenster des kaufenden Charakters. Einmal pro Konto, und sie bleibt nach Ende der Mitgliedschaft dein Eigentum.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Nur {price} pro Monat. Du sparst {percent} gegenüber monatlicher Zahlung.',
+  'hudChrome.wocStore.subscription.checkoutPending':
+    'Bezahlvorgang ausstehend. Warte auf Bestätigung.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Ein Ritter in Mitgliedschaftsrüstung neben dem geflügelten Kurieresel',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Deine Marke erscheint im Beutefenster dieses Charakters, sobald die Zahlung abgeschlossen ist.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Eine goldene Mitgliedschaftsmarke',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Eine Mitgliedschaftsmarke, die du im Spiel erhältst. Löse sie für 30 Tage Mitgliedschaft ein oder handle damit mit anderen Spielern und verkaufe sie im Auktionshaus.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Auf 12 Monate umstellen',
 };

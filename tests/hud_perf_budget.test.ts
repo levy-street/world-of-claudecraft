@@ -1250,6 +1250,8 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       },
     ],
   },
+  // Membership paints preserve body scroll only when the resolved markup changes.
+  { file: 'store_membership_controller.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'deeds_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The Harvest Journal's countdown clock: ONE 1 Hz interval armed on open and
   // cleared on close, the finest resolution any line in that window renders. It

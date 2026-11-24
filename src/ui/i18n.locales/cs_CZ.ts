@@ -25732,4 +25732,36 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'seasonal.tricks.gourdlight_trick_fumes': 'Zelené výpary',
   'seasonal.tricks.gourdlight_trick_skeleton': 'Chrastící kosti',
   'seasonal.tricks.gourdlight_trick_strawling': 'Podoba slaměnce',
+  'hudChrome.membershipWelcome.body':
+    'Tvé členství je aktivní. Užij si všechny členské výhody, dobrodruhu!',
+  'hudChrome.membershipWelcome.bodyUntil':
+    'Tvé členství je aktivní do {date}. Užij si všechny členské výhody, dobrodruhu!',
+  'hudChrome.membershipWelcome.close': 'Vpřed',
+  'hudChrome.membershipWelcome.title': 'Gratulujeme!',
+  'hudChrome.purchaseLoot.collect': 'Vyzvednout',
+  'hudChrome.purchaseLoot.description':
+    'Vyzvedni si svůj nákup hned. Pokud máš plné brašny, zůstane uložený jako přebytek. Vše, co si necháš na později, na tebe počká v poštovní schránce.',
+  'hudChrome.purchaseLoot.later': 'Později',
+  'hudChrome.purchaseLoot.title': 'Tvůj nákup dorazil',
+  'hudChrome.wocStore.subscription.annualAllBenefits': 'Všechny výhody měsíčního členství.',
+  'hudChrome.wocStore.subscription.annualArrived':
+    'Otěže tvého jízdního zvířete dorazily. Vyzvedni si je v okně s kořistí.',
+  'hudChrome.wocStore.subscription.annualArriving':
+    'Otěže tvého jízdního zvířete se objeví v okně s kořistí u této postavy po dokončení platby. Pokud je aktivní zkušební období, dorazí po první platbě.',
+  'hudChrome.wocStore.subscription.annualArtAlt':
+    'Rytíř v členské zbroji s kurýrním oslem a jízdním zvířetem Chiméra nočního křídla',
+  'hudChrome.wocStore.subscription.annualMountInfo':
+    'Obsahuje jízdní zvíře Chiméra nočního křídla pro všechny postavy na tvém účtu. Jeho otěže vázané na duši dorazí do okna s kořistí u postavy, která ho koupí. Jednou na účet a zůstane ti i po skončení členství.',
+  'hudChrome.wocStore.subscription.annualPerMonth':
+    'Jen {price} měsíčně, úspora {percent} oproti měsíčním platbám.',
+  'hudChrome.wocStore.subscription.checkoutPending':
+    'Nákup čeká na dokončení. Čeká se na potvrzení.',
+  'hudChrome.wocStore.subscription.monthlyArtAlt':
+    'Rytíř v členské zbroji vedle okřídleného kurýrního osla',
+  'hudChrome.wocStore.subscription.tokenArriving':
+    'Tvůj žeton se objeví v okně s kořistí u této postavy po dokončení platby.',
+  'hudChrome.wocStore.subscription.tokenArtAlt': 'Zlatý žeton členství',
+  'hudChrome.wocStore.subscription.tokenDescription':
+    'Žeton členství, který obdržíš ve hře. Vyměň ho za 30 dní členství, nebo s ním obchoduj s ostatními hráči a prodej ho v aukční síni.',
+  'hudChrome.wocStore.subscription.upgradeAnnual': 'Přejít na 12 měsíců',
 };
