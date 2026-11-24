@@ -1577,7 +1577,10 @@ const MONOLITHS: MonolithRow[] = [
     // Landing-first integration extracts the project counter and community tracking.
     // Re-pin the combined release entrypoint at its measured size, with zero slack.
     // LOWERED to 10773 at the merge of PR 4390 (riding ranks) over release/v0.45.0. wc -l.
-    ceiling: 10773,
+    // LOWERED 10773 -> 10693: the character-select class-detail ability
+    // description moved to src/ui/class_detail_ability_text.ts, which reuses
+    // the HUD tooltip formatter. wc -l on the tree. Exact count, zero slack.
+    ceiling: 10693,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

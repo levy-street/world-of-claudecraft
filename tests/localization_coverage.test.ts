@@ -1117,11 +1117,22 @@ describe('i18n Localization Key Coverage', () => {
   });
 
   it('should route class-detail damage ranges through localized templates', () => {
-    const source = fs.readFileSync(path.resolve(process.cwd(), 'src/main.ts'), 'utf8');
-    expect(source).toContain('abilityUi.tooltip.damageRange');
-    expect(source).toContain('abilityUi.tooltip.finisherDamage');
-    expect(source).not.toContain(' to ${primaryEffect.max}');
-    expect(source).not.toContain(' plus ${primaryEffect.perCombo} per combo point');
+    // The class-detail panel no longer keeps its own filler in main.ts: it resolves
+    // through the HUD tooltip formatter (src/ui/class_detail_ability_text.ts), so the
+    // localized-template pins follow the formatter, and main.ts must stay free of
+    // hand-built English range text.
+    const read = (rel: string) => fs.readFileSync(path.resolve(process.cwd(), rel), 'utf8');
+    const main = read('src/main.ts');
+    const panel = read('src/ui/class_detail_ability_text.ts');
+    const formatter = read('src/ui/ability_description.ts');
+    expect(main).toContain('classDetailAbilityDescription(');
+    expect(panel).toContain('abilityEffectText(');
+    expect(formatter).toContain('abilityUi.tooltip.damageRange');
+    expect(formatter).toContain('abilityUi.tooltip.finisherDamage');
+    for (const source of [main, panel, formatter]) {
+      expect(source).not.toContain(' to ${primaryEffect.max}');
+      expect(source).not.toContain(' plus ${primaryEffect.perCombo} per combo point');
+    }
 
     setLanguage('de_DE');
     expect(t('abilityUi.tooltip.damageRange', { min: '16', max: '25' })).toBe('16 bis 25');
