@@ -1037,6 +1037,17 @@ export const pt_BR: EnTranslations = {
       "fateThreadsConsumeReady": "Três Fios do Destino: Consumir pode tecê-los em Condenação adicional.",
       "fateThreadsSentenceReady": "Três Fios do Destino: Sentença pode consumi-los para 18% de dano aumentado."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open",
+      "moonriseOpen": "Moonrise is open",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Dízimo sombrio",
       "bombLabel": "Bomba do dízimo",
@@ -4842,6 +4853,9 @@ export const pt_BR: EnTranslations = {
       "coldsightRead": "Seu próximo Tiro longo causa {longDrawPct}% a mais de dano, ou seu próximo Tiro funesto causa {fellShotPct}% a mais",
       "duskEconomy": "As habilidades custam {pct}% menos energia",
       "moontide": "Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster",
       "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Golpes conectados de Gato e Bruin compartilham este banco; com {max}, Mordida Sanguinária ou Esmaga-Ossos se transforma",
       "verdance": "Verdor {stacks}/{max}. Cada Cura de Esporos, Segundo Florescer ou Cura Selvagem que você lançar adiciona 1, e cada ponto encurta o lançamento de Cura Selvagem. Com {max}, Recuperação Rápida vira Superflorescência",
       "freeExecute": "Sua próxima habilidade de execução elegível não custa nada",
@@ -9668,6 +9682,7 @@ export const pt_BR: EnTranslations = {
       "framesGovernedShardpike": "Editar quadros também permite mover a barra do Pique de Estilhaços, a pequena fileira de ações de ferramenta de missão que aparece ao lado das barras de ações apenas enquanto você carrega o próprio pique. Ela mostra sua etiqueta de nome enquanto está solta para posicioná-la antes do combate, em vez de durante ele.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Editar quadros também permite mover o medalhão de Dízimo sombrio e Bomba do dízimo do sacerdote de Sombra.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Ative Separar barra de recursos na aba Quadros para que Editar Quadros também libere sua barra de recursos, permitindo posicionar mana, energia ou raiva separadamente onde quiser. Largura da barra de recursos e Altura da barra de recursos, na mesma aba, ajustam seu tamanho. Editar Quadros também libera a barra do Rei da Colina; Opacidade do fundo do Rei da Colina, nessa aba, esmaece o painel sem prejudicar a leitura do texto.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
@@ -18389,7 +18404,8 @@ export const pt_BR: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Raízes Agarradoras",
-        "description": "Enraíza o alvo no lugar por até 12 s."
+        "description": "Enraíza o alvo no lugar por até 12 s.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Forma de Bruin",
@@ -18492,7 +18508,8 @@ export const pt_BR: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Enxame Ferroante",
-        "description": "O inimigo é atacado por um enxame de insetos, sofrendo {damage} de dano de Natureza ao longo de 12 s."
+        "description": "O inimigo é atacado por um enxame de insetos, sofrendo {damage} de dano de Natureza ao longo de 12 s.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Sangue de Lince",

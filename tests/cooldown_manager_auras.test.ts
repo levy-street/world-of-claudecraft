@@ -61,9 +61,9 @@ describe('cooldown manager aura catalog', () => {
   it('lists the class engines first and every talent proc of every row option', () => {
     expect(
       cooldownAuraCatalog('druid')
-        .slice(0, 3)
+        .slice(0, 4)
         .map((e) => e.token),
-    ).toEqual(['kind:old_blood', 'kind:moontide', 'kind:verdance']);
+    ).toEqual(['kind:old_blood', 'kind:moontide', 'kind:suntide', 'kind:verdance']);
     expect(cooldownAuraCatalog('warlock').map((e) => e.token)).toEqual(
       expect.arrayContaining(['kind:soul_fragments', 'kind:destruction_ruin']),
     );

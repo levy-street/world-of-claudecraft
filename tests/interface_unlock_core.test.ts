@@ -58,6 +58,7 @@ describe('HUD_FRAME_SPECS', () => {
       'recipeTracker',
       'paladinDevotion',
       'priestCharge',
+      'druidTide',
       'doomMeter',
       'procOverlay',
       'talkingHead',
@@ -183,6 +184,7 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_recipe_tracker',
       'woc_hud_frame_paladin_devotion',
       'woc_hud_frame_priest_charge',
+      'woc_hud_frame_druid_tide',
       // The doom meter joined the registry AFTER shipping its own mover, so
       // its row keeps the key that mover persisted under (movable frame
       // positions are player data; renaming the key orphans saved layouts).

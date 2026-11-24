@@ -326,11 +326,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'write-elided paladin Devotion/Ascension resource widget driven by the paladinDevotionView core',
   },
   {
-    call: 'this.doomMeter.paintShadow',
+    call: 'this.doomMeter.paintSpecMeters',
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'write-elided Shadow Gloomtithe and Tithe Bomb meters read replicated aura banks',
+    why: 'write-elided Shadow Gloomtithe and Tithe Bomb meters and the Moonwing Tidewheel orbs read replicated aura banks',
   },
   {
     call: 'this.syncActiveHotbarForm',

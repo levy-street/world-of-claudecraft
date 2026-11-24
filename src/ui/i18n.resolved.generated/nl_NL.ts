@@ -1037,6 +1037,17 @@ export const nl_NL: EnTranslations = {
       "fateThreadsConsumeReady": "Drie Lotsdraden: Verteren kan ze verweven tot extra Verdoemenis.",
       "fateThreadsSentenceReady": "Drie Lotsdraden: Vonnis kan ze verbruiken voor 18% meer schade."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open",
+      "moonriseOpen": "Moonrise is open",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Schemertiende",
       "bombLabel": "Tiendbom",
@@ -4842,6 +4853,9 @@ export const nl_NL: EnTranslations = {
       "coldsightRead": "Je volgende Lange Trek richt {longDrawPct}% meer schade aan, of je volgende Onheilsschot richt {fellShotPct}% meer aan",
       "duskEconomy": "Vaardigheden kosten {pct}% minder energie",
       "moontide": "Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster",
       "oldBlood": "Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen",
       "verdance": "Groenkracht: stadium {stacks} van {max}. Elke Sporenheling, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei",
       "freeExecute": "Je volgende in aanmerking komende afmaakvaardigheid kost niets",
@@ -9668,6 +9682,7 @@ export const nl_NL: EnTranslations = {
       "framesGovernedShardpike": "Kaders bewerken maakt ook de Schervenpiekbalk los: de korte rij handelingen voor het missiehulpmiddel naast je actiebalken, die alleen verschijnt zolang je de Schervenpiek draagt. Losgemaakt heeft hij een naamlabel, zodat je hem vóór het gevecht kunt plaatsen.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Met Kaders bewerken kun je ook het medaillon voor Schemertiende en Tiendbom van de schaduwpriester verplaatsen.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Schakel Hulpbronnenbalk losmaken in op het tabblad Frames. Frames Bewerken maakt dan ook je hulpbronnenbalk los, zodat je mana, energie of woede afzonderlijk overal kunt neerzetten. Breedte van de hulpbronnenbalk en Hoogte van de hulpbronnenbalk op hetzelfde tabblad bepalen het formaat. Frames Bewerken maakt ook de balk van Koning van de Heuvel los. Achtergronddekking van Koning van de Heuvel op dat tabblad vervaagt het paneel terwijl de tekst duidelijk leesbaar blijft.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
@@ -18389,7 +18404,8 @@ export const nl_NL: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Grijpende Wortels",
-        "description": "Wortelt het doelwit ter plaatse gedurende maximaal 12 sec."
+        "description": "Wortelt het doelwit ter plaatse gedurende maximaal 12 sec.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Bruingedaante",
@@ -18492,7 +18508,8 @@ export const nl_NL: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Stekende Zwerm",
-        "description": "De vijand wordt belaagd door insecten en lijdt {damage} Natuurschade gedurende 12 sec."
+        "description": "De vijand wordt belaagd door insecten en lijdt {damage} Natuurschade gedurende 12 sec.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Lynxbloed",

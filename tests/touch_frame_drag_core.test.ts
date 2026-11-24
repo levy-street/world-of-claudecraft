@@ -30,6 +30,7 @@ describe('TOUCH_DRAG_FRAMES', () => {
       'paladinDevotion',
       'doomMeter',
       'priestCharge',
+      'druidTide',
     ]);
     for (const row of TOUCH_DRAG_FRAMES) {
       const spec = HUD_FRAME_SPECS.find((s) => s.id === row.frameId);
@@ -42,6 +43,7 @@ describe('TOUCH_DRAG_FRAMES', () => {
       'paladin-devotion-frame',
       'warlock-doom-frame',
       'priest-charge-frame',
+      'druid-tide-frame',
     ]);
   });
 
@@ -52,6 +54,7 @@ describe('TOUCH_DRAG_FRAMES', () => {
       paladinDevotion: 'paladinDevotionAnchor',
       doomMeter: 'warlockDoomAnchor',
       priestCharge: 'priestChargeAnchor',
+      druidTide: 'druidTideAnchor',
     });
     expect(new Set(TOUCH_DRAG_FRAMES.map((row) => row.storageKey)).size).toBe(
       TOUCH_DRAG_FRAMES.length,

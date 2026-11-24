@@ -476,6 +476,27 @@ describe('auraEffectDescriptor', () => {
       key: 'hudChrome.auraEffect.verdance',
       nums: { stacks: 3, max: 3 },
     });
+    expect(desc({ id: 'suntide', kind: 'suntide', value: 0, stacks: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.suntide',
+      nums: { stacks: 1, max: 3 },
+    });
+    // Tidewheel: each bank's tooltip names only its own builders and payoff.
+    expect(hudChromeStrings.auraEffect.moontide).toContain('Skyfall and Moonseed');
+    expect(hudChromeStrings.auraEffect.moontide).not.toContain('Wildbolt');
+    expect(hudChromeStrings.auraEffect.moontide).not.toContain('Sunwake');
+    expect(hudChromeStrings.auraEffect.suntide).toContain('Wildbolt');
+    expect(hudChromeStrings.auraEffect.suntide).toContain('Sunwake');
+  });
+
+  it('teaches the Tidewheel windows from the sim constants', () => {
+    expect(desc({ id: 'sunrise', kind: 'internal_cd', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.sunrise',
+      nums: { castPct: 20, tickPct: 20 },
+    });
+    expect(desc({ id: 'moonrise', kind: 'internal_cd', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.moonrise',
+      nums: { dmgPct: 25, tickPct: 20 },
+    });
   });
 
   it('reports a movement slow as a percent reduction from the multiplier', () => {

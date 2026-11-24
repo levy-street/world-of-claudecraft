@@ -1037,6 +1037,17 @@ export const zh_CN: EnTranslations = {
       "fateThreadsConsumeReady": "三层命运丝线：吞噬可将其编织为额外的谴罪。",
       "fateThreadsSentenceReady": "三层命运丝线：裁决可消耗它们以提高18%的伤害。"
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open",
+      "moonriseOpen": "Moonrise is open",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "幽暗什一",
       "bombLabel": "献纳灵魂炸弹",
@@ -4842,6 +4853,9 @@ export const zh_CN: EnTranslations = {
       "coldsightRead": "你的下一次引弓长射造成的伤害提高{longDrawPct}%，或你的下一次凶邪射击造成的伤害提高{fellShotPct}%",
       "duskEconomy": "技能的能量消耗降低{pct}%",
       "moontide": "月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster",
       "oldBlood": "古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓",
       "verdance": "繁茂：第{stacks}/{max}层。每施放一次孢愈术、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放",
       "freeExecute": "下一个符合条件的斩杀技能不消耗资源",
@@ -9668,6 +9682,7 @@ export const zh_CN: EnTranslations = {
       "framesGovernedShardpike": "“编辑框体”也会解锁碎晶长矛栏：这一小排任务道具动作只在你携带碎晶长矛时才会出现在动作条旁；处于解锁状态时它会显示自己的名称标签，因此你可以在战斗开始前就把它摆好，而不必临阵调整。",
       "framesGovernedUnitTooltip": "“编辑框体”也会解锁提示框框体，也就是鼠标所停留对象的信息卡出现的位置：生物的等级与种类，或其他玩家的头衔、公会、等级与职业，以及专精和对应定位。把它拖到任意位置，信息卡就会从那里朝远离屏幕最近边缘的方向展开。在“框体设置”的“显示或隐藏框体”中取消勾选“提示框”，即可完全隐藏这张信息卡。",
       "framesGovernedPriest": "编辑框架还可移动暗影牧师显示幽暗什一和献纳灵魂炸弹的徽章。",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "在“头像框”标签页中开启“分离资源条”后，“编辑框体”也会解锁你的资源条，让你的法力、能量或怒气可以单独放在任意位置；同一标签页中的“资源条宽度”和“资源条高度”可调整它的大小。“编辑框体”也会解锁山丘之王条，同一标签页中的“山丘之王背景不透明度”可淡化它的面板，而文字保持清晰。",
       "barsTitle": "各类条、计时与战斗文字",
       "barsBody": "你施法或引导时，施法条会出现在屏幕中央、动作条正上方，并带着法术的名称与剩余时间。你的目标在它自己的框体上也有一条施法条，好让你看清接下来会发生什么并作出应对。\n\n施法条下方是一条细细的挥击条，它在你两次武器挥击之间填充，让近战或远程攻击者看清下一次自动攻击何时落下。\n\n你的经验条横贯动作条下方的整个宽度，被刻成一段一段，其中较亮的一截表示你已经存下的休息经验。\n\n潜入水下时，屏幕顶部会出现一条蓝色的呼吸条。头没在水里时它会一直下降，耗尽后会闪红并让你开始溺水，而你一浮出水面它就迅速回满。空格键让你上浮，下潜键（默认为 Ctrl）带你潜得更深。\n\n伤害与治疗会以小小的数字从命中之处向上飘起，让你不必读文字也能看懂一场战斗。聊天框里的“战斗”标签页保留着完整的文字记录。",
@@ -18389,7 +18404,8 @@ export const zh_CN: EnTranslations = {
       },
       "entangling_roots": {
         "name": "缠握根须",
-        "description": "将目标缠绕在原地，最多持续 12 秒。"
+        "description": "将目标缠绕在原地，最多持续 12 秒。",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "巨熊形态",
@@ -18492,7 +18508,8 @@ export const zh_CN: EnTranslations = {
       },
       "insect_swarm": {
         "name": "蜇刺虫群",
-        "description": "敌人被虫群侵袭，在 12 秒内受到 {damage} 点自然伤害。"
+        "description": "敌人被虫群侵袭，在 12 秒内受到 {damage} 点自然伤害。",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "豹血",

@@ -68,6 +68,7 @@ const TOUCH_DRAG_ROWS = [
   { frameId: 'paladinDevotion', storageKey: 'paladinDevotionAnchor' },
   { frameId: 'doomMeter', storageKey: 'warlockDoomAnchor' },
   { frameId: 'priestCharge', storageKey: 'priestChargeAnchor' },
+  { frameId: 'druidTide', storageKey: 'druidTideAnchor' },
 ] as const;
 
 /** Every frame the touch layout keeps draggable, in attach order. A row whose

@@ -383,6 +383,19 @@ export const hudChromeStrings = {
     fateThreadsSentenceReady:
       'Three Fate Threads: Sentence can consume them for 18% increased damage.',
   },
+  druid: {
+    suntideLabel: 'Suntide',
+    moontideLabel: 'Moontide',
+    suntideStatus: '{value} of {max} Suntide',
+    moontideStatus: '{value} of {max} Moontide',
+    sunriseOpen: 'Sunrise is open',
+    moonriseOpen: 'Moonrise is open',
+    noWindow: 'No Tidewheel window open',
+    suntideTooltip:
+      'Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.',
+    moontideTooltip:
+      'Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise.',
+  },
   priest: {
     gloomtitheLabel: 'Gloomtithe',
     bombLabel: 'Tithe Bomb',
@@ -6080,7 +6093,11 @@ export const hudChromeStrings = {
       'Your next Long Draw deals {longDrawPct}% more damage, or your next Fell Shot deals {fellShotPct}% more',
     duskEconomy: 'Abilities cost {pct}% less energy',
     moontide:
-      'Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3',
+      'Moontide {stacks}/{max}. In Moonwing Form, Skyfall and Moonseed casts each add 1, and Lunar Tempest ticks add 1 at most once every 8 sec. At {max}, Moonseed becomes Moonsurge, which spends all 3',
+    suntide:
+      'Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3',
+    sunrise: 'Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster',
+    moonrise: 'Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster',
     oldBlood:
       'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:

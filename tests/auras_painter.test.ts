@@ -496,9 +496,14 @@ describe('AurasPainter: static-preset visible-count cap', () => {
     const slots = Array.from({ length: AURA_VISIBLE_CAP_LOW + 2 }, (_, i) =>
       slot({ key: `buff${i}` }),
     );
-    slots.push(slot({ key: 'moontide' }), slot({ key: 'old_blood' }), slot({ key: 'verdance' }));
+    slots.push(
+      slot({ key: 'moontide' }),
+      slot({ key: 'suntide' }),
+      slot({ key: 'old_blood' }),
+      slot({ key: 'verdance' }),
+    );
     tierPainter('low').paint(state(slots));
-    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 3);
+    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 4);
   });
 
   it('low keeps the Vespers priest Gloomtithe bank visible beyond the ordinary buff cap', () => {

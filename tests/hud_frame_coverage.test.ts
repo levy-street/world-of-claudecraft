@@ -181,7 +181,7 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
     'mounts the referral card window and launcher; the shared window focus and close bridge owns its lifecycle',
   'src/ui/hud.ts': 'the HUD coordinator: mounts the proc overlay, FCT pool, match strips',
   'src/ui/hud/class_resources.ts':
-    'mounts the runtime priestCharge frame registered with the shared editor',
+    'mounts the runtime priestCharge and druidTide frames registered with the shared editor',
   'src/ui/interface_unlock.ts': 'the unlock coordinator: its own edit chrome + the detacher',
   'src/ui/meters_frame.ts': 're-homes framed meter panels onto #ui',
   'src/ui/bootcamp.ts': 'world-anchored tutorial prompts, transient coachmarks',
@@ -217,6 +217,7 @@ const RUNTIME_MOUNTED_FRAME_IDS = [
   'proc-overlay',
   'warlock-doom-frame',
   'priest-charge-frame',
+  'druid-tide-frame',
   'focus-target-1',
   'focus-target-2',
   'focus-target-3',

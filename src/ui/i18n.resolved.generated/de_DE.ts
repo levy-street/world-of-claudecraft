@@ -1037,6 +1037,17 @@ export const de_DE: EnTranslations = {
       "fateThreadsConsumeReady": "Drei Schicksalsfäden: Verzehren kann sie zu zusätzlicher Verdammnis verweben.",
       "fateThreadsSentenceReady": "Drei Schicksalsfäden: Schuldspruch kann sie für 18% erhöhten Schaden verbrauchen."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open",
+      "moonriseOpen": "Moonrise is open",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Düsterzehnt",
       "bombLabel": "Zehntbombe",
@@ -4842,6 +4853,9 @@ export const de_DE: EnTranslations = {
       "coldsightRead": "Euer nächster Langer Zug verursacht {longDrawPct}% mehr Schaden, oder Euer nächster Unheilsschuss verursacht {fellShotPct}% mehr",
       "duskEconomy": "Fähigkeiten kosten {pct}% weniger Energie",
       "moontide": "Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster",
       "oldBlood": "Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer",
       "verdance": "Grünkraft: Stufe {stacks} von {max}. Jede Sporenheilung, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.",
       "freeExecute": "Eure nächste berechtigte Hinrichtungsfähigkeit kostet nichts",
@@ -9668,6 +9682,7 @@ export const de_DE: EnTranslations = {
       "framesGovernedShardpike": "Rahmen bearbeiten löst auch die Splitterpikenleiste: die kurze Reihe mit Aktionen des Questwerkzeugs, die neben deinen Aktionsleisten erscheint, solange du die Splitterpike selbst trägst. Während sie verschiebbar ist, trägt sie ihr Namensschild, damit du sie vor dem Kampf platzieren kannst.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Mit Rahmen bearbeiten kannst du auch das Medaillon für Düsterzehnt und Zehntbombe des Schattenpriesters verschieben.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Aktiviere Ressourcenleiste abtrennen im Reiter Rahmen. Dann gibt Rahmen bearbeiten auch deine Ressourcenleiste frei, sodass du Mana, Energie oder Wut unabhängig an einer beliebigen Stelle platzieren kannst. Breite der Ressourcenleiste und Höhe der Ressourcenleiste im selben Reiter passen ihre Größe an. Rahmen bearbeiten gibt auch die Leiste für König des Hügels frei. Hintergrunddeckkraft von König des Hügels im selben Reiter blendet deren Fläche aus, während der Text gut lesbar bleibt.",
       "barsTitle": "Leisten, Timer und Kampftext",
       "barsBody": "Deine Zauberleiste erscheint in der Mitte des Bildschirms, direkt über deinen Aktionsleisten, sobald du zauberst oder kanalisierst, und zeigt den Namen des Zaubers sowie die verbleibende Zeit. Dein Ziel bekommt eine eigene Zauberleiste auf seinem Fenster, sodass du siehst, was kommt, und darauf reagieren kannst.\n\nEine dünne Schwungleiste liegt unter deiner Zauberleiste und füllt sich zwischen deinen Waffenschwüngen, sodass ein Nah- oder Fernkämpfer sehen kann, wann der nächste automatische Treffer landet.\n\nDeine Erfahrungsleiste läuft über die volle Breite unter deinen Aktionsleisten, in Segmente unterteilt, mit einem helleren Abschnitt, der die ausgeruhte Erfahrung zeigt, die du angesammelt hast.\n\nSchwimme unter Wasser, und am oberen Bildschirmrand erscheint eine blaue Atemleiste. Sie leert sich, während dein Kopf unter Wasser ist, blinkt rot auf, sobald sie aufgebraucht ist und du zu ertrinken beginnst, und füllt sich schnell wieder, sobald du auftauchst. Die Leertaste lässt dich nach oben schwimmen, und die Taste zum Abtauchen, standardmäßig Strg, bringt dich tiefer.\n\nSchaden und Heilung schweben als kleine Zahlen über dem auf, was sie getroffen haben, sodass du einen Kampf lesen kannst, ohne Text lesen zu müssen. Der Kampf-Reiter in deinem Chatfenster führt das vollständige schriftliche Protokoll.",
@@ -18389,7 +18404,8 @@ export const de_DE: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Greifende Wurzeln",
-        "description": "Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle."
+        "description": "Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Bruin-Gestalt",
@@ -18492,7 +18508,8 @@ export const de_DE: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Stechender Schwarm",
-        "description": "Der Gegner wird von Insekten umschwärmt und erleidet {damage} Naturschaden über 12 Sek."
+        "description": "Der Gegner wird von Insekten umschwärmt und erleidet {damage} Naturschaden über 12 Sek.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Luchsblut",

@@ -1037,6 +1037,17 @@ export const cs_CZ: EnTranslations = {
       "fateThreadsConsumeReady": "Tři Nitě osudu: Vysát je dokáže vetkat do dalšího Odsouzení.",
       "fateThreadsSentenceReady": "Tři Nitě osudu: Rozsudek je dokáže spotřebovat za 18% zvýšené poškození."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open",
+      "moonriseOpen": "Moonrise is open",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Desátek temnoty",
       "bombLabel": "Desátková bomba",
@@ -4842,6 +4853,9 @@ export const cs_CZ: EnTranslations = {
       "coldsightRead": "Tvůj příští Dlouhý nátah způsobí o {longDrawPct}% vyšší poškození, nebo tvůj příští Padlý výstřel o {fellShotPct}% vyšší",
       "duskEconomy": "Schopnosti stojí o {pct}% méně energie",
       "moontide": "Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster",
       "oldBlood": "Stará krev: stupeň {stacks} z {max}. Zasažené kočičí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí",
       "verdance": "Zeleň {stacks}/{max}. Každé seslání Divokého květu, Druhého květu nebo Divokého zhojení přidá 1 a každá Zeleň zkrátí seslání Divokého zhojení. Při {max} se Rychlé zhojení mění v Překvět",
       "freeExecute": "Tvá příští způsobilá dorážecí schopnost nic nestojí",
@@ -9668,6 +9682,7 @@ export const cs_CZ: EnTranslations = {
       "framesGovernedShardpike": "Upravit rámečky také uvolní lištu Střepové píky, krátkou řadu akcí úkolového nástroje vedle akčních lišt, která se objevuje jen při nesení samotné píky. Při uvolnění má vlastní jmenovku, takže ji můžeš umístit před bojem místo během něj.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Úprava rámečků také umožňuje přesunout medailon stínového kněze s Desátkem temnoty a Desátkovou bombou.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Zapni Oddělit lištu zdrojů na kartě Rámy. Volba Upravit rámečky pak uvolní i lištu zdrojů, takže manu, energii nebo zuřivost můžeš umístit samostatně kamkoli. Šířka lišty zdrojů a Výška lišty zdrojů na stejné kartě nastavují její velikost. Upravit rámečky uvolní také lištu Krále kopce. Krytí pozadí Krále kopce na stejné kartě zeslabí její panel, zatímco text zůstane dobře čitelný.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
@@ -18389,7 +18404,8 @@ export const cs_CZ: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Svazující kořeny",
-        "description": "Zakoření cíl na místě až na 12 s."
+        "description": "Zakoření cíl na místě až na 12 s.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Medvědí podoba",
@@ -18492,7 +18508,8 @@ export const cs_CZ: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Bodavý roj",
-        "description": "Nepřítele obklopí roj hmyzu a způsobí {damage} přírodního poškození během 12 s."
+        "description": "Nepřítele obklopí roj hmyzu a způsobí {damage} přírodního poškození během 12 s.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Rysí krev",

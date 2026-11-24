@@ -41,6 +41,7 @@ export function frameMenuGroup(id: string): (typeof FRAME_MENU_GROUPS)[number][0
       'doomMeter',
       'paladinDevotion',
       'priestCharge',
+      'druidTide',
     ].includes(id)
   )
     return 'combat';

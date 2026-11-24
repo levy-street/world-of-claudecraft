@@ -796,6 +796,8 @@ export const guideStrings = {
     // hudChrome.options values. Wordy (M16): non-Latin fills ride along.
     framesGovernedPriest:
       "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+    framesGovernedDruid:
+      "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
     framesGovernedResourceAndHill:
       'Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.',
 

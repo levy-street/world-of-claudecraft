@@ -27,6 +27,7 @@ export const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
   'shaman_thunder_charges',
   'shaman_warspirit_cadence',
   'moontide',
+  'suntide',
   'old_blood',
   'verdance',
   'priest_gloomtithe',

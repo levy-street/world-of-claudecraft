@@ -1037,6 +1037,17 @@ export const en_CA: EnTranslations = {
       "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
       "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open",
+      "moonriseOpen": "Moonrise is open",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Gloomtithe",
       "bombLabel": "Tithe Bomb",
@@ -4841,7 +4852,10 @@ export const en_CA: EnTranslations = {
       "veiledEdgeStrike": "Your next Lurker's Strike deals {pct}% more weapon damage",
       "coldsightRead": "Your next Long Draw deals {longDrawPct}% more damage, or your next Fell Shot deals {fellShotPct}% more",
       "duskEconomy": "Abilities cost {pct}% less energy",
-      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "moontide": "Moontide {stacks}/{max}. In Moonwing Form, Skyfall and Moonseed casts each add 1, and Lunar Tempest ticks add 1 at most once every 8 sec. At {max}, Moonseed becomes Moonsurge, which spends all 3",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster",
       "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form",
       "verdance": "Verdance {stacks}/{max}. Each Sporemending, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Your next eligible execute ability costs nothing",
@@ -9668,6 +9682,7 @@ export const en_CA: EnTranslations = {
       "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
       "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
       "barsTitle": "Bars, timers, and combat text",
       "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
@@ -18358,7 +18373,7 @@ export const en_CA: EnTranslations = {
       "wrath": {
         "name": "Wildbolt",
         "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Suntide (max 3) and extends your Stinging Swarm by 2 sec, up to 6 sec per application. Deals 25% more damage during Moonrise. At 3 Suntide, Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Wildmend",
@@ -18371,12 +18386,12 @@ export const en_CA: EnTranslations = {
       },
       "moonfire": {
         "name": "Lunar Tempest",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage, then {overTime} Arcane damage over {duration} sec.",
+        "specNote_balance": "Keep it burning: Skyfall extends it by 2 sec and Moonseed by 6 sec. In Moonwing Form, its ticks add 1 Moontide, at most once every 8 sec. Moonsurge refreshes it, and it ticks 20% faster during Sunrise."
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge."
       },
       "rejuvenation": {
         "name": "Sporemending",
@@ -18389,7 +18404,8 @@ export const en_CA: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Gripping Roots",
-        "description": "Roots the target in place for up to 12 sec."
+        "description": "Roots the target in place for up to 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Bruin Form",
@@ -18452,7 +18468,7 @@ export const en_CA: EnTranslations = {
       "starfire": {
         "name": "Skyfall",
         "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3) and extends your Lunar Tempest by 2 sec, up to 12 sec per application together with Moonseed. Casts 20% faster during Sunrise. At 3 Suntide, this button becomes Sunwake."
       },
       "travel_form": {
         "name": "Fleet Form",
@@ -18492,7 +18508,8 @@ export const en_CA: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Stinging Swarm",
-        "description": "The enemy is swarmed by insects, taking {damage} Nature damage over 12 sec."
+        "description": "The enemy is swarmed by insects, taking {damage} Nature damage over 12 sec.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Lynxblood",
@@ -18710,11 +18727,11 @@ export const en_CA: EnTranslations = {
       },
       "moonlash": {
         "name": "Moonsurge",
-        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
+        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage, refreshes your Lunar Tempest to full duration, and opens Moonrise for 10 sec: Wildbolt deals 25% more damage and Stinging Swarm ticks 20% faster. Opening Moonrise closes Sunrise."
       },
       "sunlance": {
         "name": "Sunwake",
-        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
+        "description": "Spends your 3 Suntide for a strike of {damage} Nature damage plus {overTime} Nature damage over 9 sec, restores 35 mana, refreshes your Stinging Swarm to full duration, and opens Sunrise for 10 sec: Skyfall casts 20% faster and Lunar Tempest ticks 20% faster. Opening Sunrise closes Moonrise."
       },
       "redharvest": {
         "name": "Redharvest",
@@ -30950,8 +30967,8 @@ export const en_CA: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "bonus2": "Gripping Roots becomes instant. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Your first Skyfall on a target held by your Gripping Roots is instant and deals 20 percent more damage."
       },
       "vanguard_druid_feral": {
         "name": "Bloodmane Hide",

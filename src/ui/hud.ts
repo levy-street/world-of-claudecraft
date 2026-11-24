@@ -8654,7 +8654,7 @@ export class Hud {
       this.writerFacet.setAttr(this.comboRowEl, 'aria-hidden', 'true');
     }
     this.paladinDevotionPainter.paint(this.paladinDevotionView.tick(p));
-    this.doomMeter.paintShadow(p, this.sim.talentSpec);
+    this.doomMeter.paintSpecMeters(p, this.sim.talentSpec);
 
     // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
     // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to

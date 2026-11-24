@@ -402,6 +402,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/pet_slot_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/priest/shadow_charge_view.ts',
+  'src/ui/hud/druid/tide_orbs_view.ts',
   'src/ui/hud/aura_tracks/aura_track_catalog.ts',
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
   'src/ui/hud/aura_tracks/aura_track_view.ts',

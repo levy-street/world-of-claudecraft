@@ -1037,6 +1037,17 @@ export const fr_FR: EnTranslations = {
       "fateThreadsConsumeReady": "Trois Fils du destin : Consumer peut les tisser en Condamnation supplémentaire.",
       "fateThreadsSentenceReady": "Trois Fils du destin : Sentence peut les consommer pour 18% de dégâts supplémentaires."
     },
+    "druid": {
+      "suntideLabel": "Suntide",
+      "moontideLabel": "Moontide",
+      "suntideStatus": "{value} of {max} Suntide",
+      "moontideStatus": "{value} of {max} Moontide",
+      "sunriseOpen": "Sunrise is open",
+      "moonriseOpen": "Moonrise is open",
+      "noWindow": "No Tidewheel window open",
+      "suntideTooltip": "Suntide: Wildbolt casts and Stinging Swarm ticks fill it, up to 3. At 3, Sunwake spends it, refreshes Stinging Swarm and opens Sunrise.",
+      "moontideTooltip": "Moontide: Skyfall and Moonseed casts and Lunar Tempest ticks fill it, up to 3. At 3, Moonsurge spends it, refreshes Lunar Tempest and opens Moonrise."
+    },
     "priest": {
       "gloomtitheLabel": "Dîme sombre",
       "bombLabel": "Bombe de dîme",
@@ -4842,6 +4853,9 @@ export const fr_FR: EnTranslations = {
       "coldsightRead": "Votre prochain Tir long inflige {longDrawPct}% de dégâts supplémentaires, ou votre prochain Tir funeste en inflige {fellShotPct}% de plus",
       "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
       "moontide": "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
+      "suntide": "Suntide {stacks}/{max}. In Moonwing Form, Wildbolt casts each add 1, and Stinging Swarm ticks add 1 at most once every 8 sec. At {max}, Skyfall becomes Sunwake, which spends all 3",
+      "sunrise": "Skyfall casts {castPct}% faster and Lunar Tempest ticks {tickPct}% faster",
+      "moonrise": "Wildbolt deals {dmgPct}% more damage and Stinging Swarm ticks {tickPct}% faster",
       "oldBlood": "Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme",
       "verdance": "Verdoyance : cran {stacks} sur {max}. Chaque Soin de spores, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
       "freeExecute": "Votre prochaine capacité d'exécution éligible ne coûte rien",
@@ -9668,6 +9682,7 @@ export const fr_FR: EnTranslations = {
       "framesGovernedShardpike": "Modifier les cadres déverrouille aussi la barre de la Pique-éclat, la courte rangée d'actions d'outil de quête qui apparaît près de vos barres d'action uniquement lorsque vous portez la Pique-éclat elle-même ; elle affiche son étiquette de nom quand elle est déverrouillée, pour pouvoir la placer avant le combat.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "framesGovernedPriest": "Modifier les cadres permet aussi de déplacer le médaillon de Dîme sombre et de Bombe de dîme du prêtre Ombre.",
+      "framesGovernedDruid": "Edit Frames also lets you move the Moonwing druid's Suntide and Moontide orbs.",
       "framesGovernedResourceAndHill": "Activez Détacher la barre de ressource dans l’onglet Cadres pour que Modifier les cadres déverrouille aussi votre barre de ressource : votre mana, votre énergie ou votre rage peut ainsi être placé séparément, où vous le souhaitez. Largeur de la barre de ressource et Hauteur de la barre de ressource, dans ce même onglet, règlent sa taille. Modifier les cadres déverrouille aussi la barre du Roi de la colline ; Opacité du fond du Roi de la colline, dans cet onglet, estompe son panneau sans nuire à la lisibilité du texte.",
       "barsTitle": "Barres, minuteries et texte de combat",
       "barsBody": "Votre barre d'incantation apparaît au milieu de l'écran, juste au-dessus de vos barres d'action, chaque fois que vous incantez ou canalisez, et affiche le nom du sort ainsi que le temps restant. Votre cible dispose de sa propre barre d'incantation sur son cadre, pour que vous puissiez voir ce qui arrive et y répondre.\n\nUne fine barre de cadence se trouve sous votre barre d'incantation et se remplit entre vos coups d'arme, pour qu'un attaquant au corps à corps ou à distance puisse voir quand le prochain coup automatique arrivera.\n\nVotre barre d'expérience s'étend sur toute la largeur sous vos barres d'action, graduée en segments, avec une portion plus claire montrant l'expérience reposée que vous avez accumulée.\n\nNagez sous l'eau et une barre de souffle bleue apparaît en haut de l'écran. Elle se vide tant que votre tête est immergée, clignote en rouge une fois épuisée quand vous commencez à vous noyer, puis se remplit rapidement dès que vous refaites surface. Espace vous fait remonter, et la touche Nager vers le bas, Ctrl par défaut, vous emmène plus profond.\n\nLes dégâts et les soins flottent au-dessus de ce qu'ils ont touché sous forme de petits nombres, pour que vous puissiez lire un combat sans lire de texte. L'onglet Combat de votre fenêtre de discussion conserve le relevé écrit complet.",
@@ -18389,7 +18404,8 @@ export const fr_FR: EnTranslations = {
       },
       "entangling_roots": {
         "name": "Racines agrippantes",
-        "description": "Enracine la cible sur place pendant un maximum de 12 s."
+        "description": "Enracine la cible sur place pendant un maximum de 12 s.",
+        "descriptionWithDot": "Roots the target in place for up to 12 sec and deals {overTime} Nature damage over 12 sec. Against players, each repeat within 18 sec lasts half as long as the one before, and the fourth fails."
       },
       "bear_form": {
         "name": "Forme de Bruin",
@@ -18492,7 +18508,8 @@ export const fr_FR: EnTranslations = {
       },
       "insect_swarm": {
         "name": "Nuée cinglante",
-        "description": "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s."
+        "description": "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
+        "specNote_balance": "Keep it buzzing: Wildbolt extends it by 2 sec, up to 6 sec per application. In Moonwing Form, its ticks add 1 Suntide, at most once every 8 sec. Sunwake refreshes it, and it ticks 20% faster during Moonrise."
       },
       "tigers_fury": {
         "name": "Sang de lynx",

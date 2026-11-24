@@ -1,0 +1,259 @@
+/* The Moonwing Tidewheel strip: three Suntide orbs, the window gem, three Moontide
+   orbs, on the warlock resource strip's footprint. A filled orb glows in its school's
+   color, a full bank breathes, and the gem's ring drains with the open window.
+   Counts and the window survive every quality tier; only the glow scales. */
+@layer components {
+  .druid-tide-frame {
+    --tide-glow: calc(12px * var(--fx-shadow, 1));
+    --tide-glow-full: calc(24px * var(--fx-shadow, 1));
+    position: fixed;
+    left: 50%;
+    top: 72%;
+    translate: -50% -50%;
+    z-index: 24;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 300px;
+    height: 48px;
+    box-sizing: border-box;
+    border: 1px solid var(--color-tide-rim);
+    border-radius: var(--radius-md);
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-tide-sun-deep) 14%, var(--color-tide-strip)),
+      var(--color-tide-strip) 42%,
+      var(--color-tide-strip) 58%,
+      color-mix(in srgb, var(--color-tide-moon-deep) 18%, var(--color-tide-strip))
+    );
+    box-shadow: 0 2px 6px var(--color-ink-deep);
+    isolation: isolate;
+    pointer-events: none;
+  }
+  .druid-tide-frame.hud-frame-detached {
+    translate: none;
+  }
+  #ui > .druid-tide-frame:not(.tf-unlocked) {
+    pointer-events: none;
+  }
+  .druid-tide-bank {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px;
+    border-radius: 999px;
+    pointer-events: auto;
+    transition: background calc(180ms * var(--motion-scale));
+  }
+  /* A full bank also lights its own well behind the orbs. */
+  .druid-tide-bank.sun.full {
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--color-tide-sun) 30%, transparent),
+      transparent
+    );
+  }
+  .druid-tide-bank.moon.full {
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--color-tide-moon) 30%, transparent),
+      transparent
+    );
+  }
+  .druid-tide-orb {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    box-sizing: border-box;
+    border: 1.5px solid var(--color-tide-rim);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-tide-rim) 70%, var(--color-tide-empty)),
+      var(--color-tide-empty) 70%
+    );
+    box-shadow: inset 0 2px 3px var(--color-ink-deep);
+    transition:
+      background calc(180ms * var(--motion-scale)),
+      box-shadow calc(180ms * var(--motion-scale)),
+      border-color calc(180ms * var(--motion-scale));
+  }
+  .druid-tide-bank.sun .druid-tide-orb.on {
+    border-color: var(--color-tide-sun-deep);
+    background: radial-gradient(
+      circle at 34% 30%,
+      var(--color-tide-sun-hi),
+      var(--color-tide-sun) 42%,
+      var(--color-tide-sun-deep) 100%
+    );
+    box-shadow:
+      0 0 var(--tide-glow) color-mix(in srgb, var(--color-tide-sun) 80%, transparent),
+      inset 0 -2px 3px color-mix(in srgb, var(--color-tide-sun-deep) 70%, transparent);
+  }
+  .druid-tide-bank.moon .druid-tide-orb.on {
+    border-color: var(--color-tide-moon-deep);
+    background: radial-gradient(
+      circle at 34% 30%,
+      var(--color-tide-moon-hi),
+      var(--color-tide-moon) 42%,
+      var(--color-tide-moon-deep) 100%
+    );
+    box-shadow:
+      0 0 var(--tide-glow) color-mix(in srgb, var(--color-tide-moon) 80%, transparent),
+      inset 0 -2px 3px color-mix(in srgb, var(--color-tide-moon-deep) 70%, transparent);
+  }
+  /* A full bank is a spend cue: the three orbs breathe together. */
+  .druid-tide-bank.sun.full .druid-tide-orb.on {
+    --tide-breathe-color: var(--color-tide-sun);
+    animation: druid-tide-breathe calc(1.4s * var(--motion-scale)) ease-in-out infinite alternate;
+  }
+  .druid-tide-bank.moon.full .druid-tide-orb.on {
+    --tide-breathe-color: var(--color-tide-moon);
+    animation: druid-tide-breathe calc(1.4s * var(--motion-scale)) ease-in-out infinite alternate;
+  }
+  .druid-tide-gem {
+    --tide-gem-color: var(--color-tide-rim);
+    position: relative;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+  .druid-tide-gem.sun {
+    --tide-gem-color: var(--color-tide-sun);
+    --tide-gem-hi: var(--color-tide-sun-hi);
+    --tide-gem-deep: var(--color-tide-sun-deep);
+  }
+  .druid-tide-gem.moon {
+    --tide-gem-color: var(--color-tide-moon);
+    --tide-gem-hi: var(--color-tide-moon-hi);
+    --tide-gem-deep: var(--color-tide-moon-deep);
+  }
+  /* The window ring: drains clockwise as Sunrise or Moonrise runs out. */
+  .druid-tide-gem::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      var(--tide-gem-color) calc(var(--tide-window-left, 0) * 1turn),
+      color-mix(in srgb, var(--color-tide-rim) 45%, transparent) 0
+    );
+    mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 3px),
+      var(--color-tide-strip) calc(100% - 2.5px)
+    );
+  }
+  .druid-tide-gem::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 7px;
+    width: 18px;
+    height: 18px;
+    box-sizing: border-box;
+    rotate: 45deg;
+    border: 1.5px solid var(--color-tide-rim);
+    border-radius: 3px;
+    background: var(--color-tide-empty);
+    transition:
+      background calc(180ms * var(--motion-scale)),
+      box-shadow calc(180ms * var(--motion-scale));
+  }
+  .druid-tide-gem.sun::after,
+  .druid-tide-gem.moon::after {
+    border-color: var(--tide-gem-deep);
+    background: linear-gradient(
+      135deg,
+      var(--tide-gem-hi),
+      var(--tide-gem-color) 45%,
+      var(--tide-gem-deep)
+    );
+    box-shadow: 0 0 var(--tide-glow-full) color-mix(in srgb, var(--tide-gem-color) 85%, transparent);
+  }
+  .druid-tide-bank:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @keyframes druid-tide-breathe {
+    from {
+      box-shadow: 0 0 calc(var(--tide-glow) * 0.6)
+        color-mix(in srgb, var(--tide-breathe-color) 55%, transparent);
+      filter: brightness(0.92);
+    }
+    to {
+      box-shadow:
+        0 0 var(--tide-glow-full) var(--tide-breathe-color),
+        0 0 calc(var(--tide-glow) * 0.6) var(--tide-breathe-color);
+      filter: brightness(1.18);
+    }
+  }
+  @media (max-height: 820px) {
+    .druid-tide-frame {
+      top: 67%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .druid-tide-frame *,
+    .druid-tide-frame *::before,
+    .druid-tide-frame *::after {
+      animation: none !important;
+      transition: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .druid-tide-orb,
+    .druid-tide-gem::after {
+      border-color: CanvasText;
+    }
+    .druid-tide-bank .druid-tide-orb.on,
+    .druid-tide-gem.sun::after,
+    .druid-tide-gem.moon::after {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
+  }
+}
+@layer hud-mobile {
+  /* Touch HUD: a smaller strip above the player frame, draggable like the
+     other class-resource seats (touch_frame_drag_core.ts druidTide row). */
+  body.mobile-touch .druid-tide-frame {
+    top: 70%;
+    width: min(220px, 56vw);
+    height: 38px;
+    gap: 8px;
+    pointer-events: auto;
+    touch-action: none;
+    cursor: var(--cursor-move, move);
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  body.mobile-touch .druid-tide-bank {
+    gap: 5px;
+    padding: 2px;
+  }
+  body.mobile-touch .druid-tide-orb {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+  }
+  body.mobile-touch .druid-tide-gem {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+  }
+  body.mobile-touch .druid-tide-gem::after {
+    left: 6px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+  }
+  body.mobile-touch .druid-tide-frame.tf-touch-placed {
+    left: var(--touch-fx);
+    top: var(--touch-fy);
+    translate: -50% -50%;
+    bottom: auto;
+  }
+}
