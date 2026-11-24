@@ -13566,6 +13566,11 @@ export const TARGETS = [
         ['slinkstrike', 'pounce'],
         ['bloodrift', 'rip'],
         ['lynxblood', 'tigers_fury'],
+        // Oakhide's damage cut, Stoke's 15 sec cooldown, and the Cat Form
+        // Nature's Boon Sporemending note.
+        ['oakhide', 'barkskin'],
+        ['stoke', 'enrage'],
+        ['natures-boon', 'natures_boon'],
       ].map(([key, abilityId]) => ({
         key: `wildfang-${key}`,
         charClass: 'druid',
