@@ -12,11 +12,13 @@ import {
   targetBodyRadius,
 } from '../src/sim/combat/player_attack_reach';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { heatFight } from './helpers/heat_fight';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const HEAT = 'heart_heat_guardian';
@@ -115,5 +117,34 @@ describe('a gap closer measures its band from a big body edge', () => {
     expect(charge('training_dummy', 7.5)).toBe('Too close!');
     expect(charge('training_dummy', 8.5)).toBeNull();
     expect(charge('training_dummy', 25.5)).toBe('Out of range.');
+  });
+
+  it('a Charge at the Heat guardian arrives at its lip wall and starts swinging', () => {
+    // Its pivot sits behind the lip wall's colliders: the run ends at the
+    // body's edge, never grinding into the wall until its budget runs out.
+    for (const out of [9, 20]) {
+      const f = heatFight(1, 31);
+      const [p] = f.players;
+      f.put(p, HEARTH_WELL.x + body + out, HEARTH_WELL.z);
+      const boss = f.boss();
+      p.facing = Math.atan2(boss.pos.x - p.pos.x, boss.pos.z - p.pos.z);
+      p.targetId = boss.id;
+      p.autoAttack = false;
+      const meta = f.sim.meta(p.id);
+      if (!meta) throw new Error('no raider');
+      meta.known = abilitiesKnownAt('warrior', 20, emptyModifiers()) as typeof meta.known;
+      f.sim.drainEvents();
+      f.sim.castAbility('charge', p.id);
+      expect(p.chargeTargetId).toBe(boss.id);
+      let ticks = 0;
+      while (p.chargeTargetId !== null && ticks < 80) {
+        f.tick(1);
+        ticks++;
+      }
+      expect(p.chargeTargetId).toBeNull();
+      // Arrived (well inside the 3 s budget) and swinging.
+      expect(ticks).toBeLessThan(40);
+      expect(p.autoAttack).toBe(true);
+    }
   });
 });

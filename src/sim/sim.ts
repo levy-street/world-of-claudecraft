@@ -125,7 +125,7 @@ import {
   isStunned,
   isUnbreakableControlAura,
 } from './combat/cc';
-import { CHARGE_ARRIVE_RANGE, CHARGE_SPEED_MULT, finishChargeArrival } from './combat/charge_route';
+import { CHARGE_SPEED_MULT, chargeArriveRange, finishChargeArrival } from './combat/charge_route';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
@@ -6443,7 +6443,7 @@ export class Sim {
       return true;
     };
     if (!target || target.dead || p.chargeTimeLeft <= 0 || isRooted(p)) return done(false);
-    if (dist2d(p.pos, target.pos) <= CHARGE_ARRIVE_RANGE) return done(true);
+    if (dist2d(p.pos, target.pos) <= chargeArriveRange(target)) return done(true);
     if (p.sitting) seatingMod.standUp(this.ctx, p);
     // re-route when the target has run well away from where the path ends
     const pathEnd = p.chargePath[p.chargePath.length - 1];
