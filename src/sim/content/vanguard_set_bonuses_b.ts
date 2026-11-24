@@ -86,8 +86,8 @@ export const VANGUARD_DESTRUCTION_4PC_WINDOW_SEC = 8;
 export const VANGUARD_BALANCE_2PC_ROOTS_CAST_PCT = -1;
 /** The Starwarden Raiment set id (combat/druid_starfall_snare.ts reads it). */
 export const VANGUARD_BALANCE_SET_ID = 'vanguard_druid_balance';
-/** Starwarden 4pc (Starfall Snare): damage multiplier on the first Skyfall
- *  into a target held by the wearer's Gripping Roots (+20 percent). */
+/** Starwarden 4pc (Starfall Snare): damage multiplier on the first Skyfall or
+ *  Wildbolt into a target held by the wearer's Gripping Roots (+20 percent). */
 export const VANGUARD_BALANCE_4PC_SKYFALL_DMG_MULT = 1.2;
 /** Bloodmane 2pc: seconds cut from Lunge's cooldown (12 to 9). */
 export const VANGUARD_FERAL_2PC_LUNGE_COOLDOWN_CUT_SEC = 3;
@@ -431,7 +431,7 @@ export const VANGUARD_BONUSES_B: Record<string, readonly SetEngineBonusTier[]> =
     },
     {
       pieces: 4,
-      // Bespoke (Starfall Snare): the first Skyfall into a target held by
+      // Bespoke (Starfall Snare): the first Skyfall or Wildbolt into a target held by
       // the wearer's own Gripping Roots is instant and deals 20 percent more
       // damage, once per Roots application (combat/druid_starfall_snare.ts:
       // the cast-time seam in casting_lifecycle.ts, the damage in

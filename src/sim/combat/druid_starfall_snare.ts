@@ -1,15 +1,16 @@
 // Starfall Snare, the Starwarden Raiment (Moongrove Season 2 PvP) 4pc: the
-// wearer's first Skyfall on a target held by the wearer's own Gripping Roots
-// is instant and deals 20% more damage. The 2pc makes Gripping Roots instant,
-// so the set reads as one combo: root, step back, land a free big Skyfall.
+// wearer's first Skyfall or Wildbolt on a target held by the wearer's own
+// Gripping Roots is instant and deals 20% more damage. The 2pc makes Gripping
+// Roots instant, so the set reads as one combo: root, step back, land a free
+// strike, Skyfall to start a Moontide cycle or Wildbolt to start a Suntide one.
 //
-// "First" is per Gripping Roots application: a Skyfall that used the snare
+// "First" is per Gripping Roots application: whichever of the two used the snare
 // marks that target spent in the wearer's procState icds (keyed by target id,
 // lasting as long as the root has left, so it expires on its own), and the
 // next Gripping Roots cast on that target clears the mark. procState is
 // server-side bookkeeping, never an aura, so nothing extra shows on the HUD.
 //
-// Skyfall is a projectile: its damage lands AFTER onCastCompleted ran. So the
+// Both are projectiles: their damage lands AFTER onCastCompleted ran. So the
 // completed cast also ARMS the bonus for that target (a short-lived icd), and
 // the impact consumes it. A hit that resolves before the cast-completed hook
 // (no travel) takes the bonus directly and marks the target spent itself.
@@ -27,12 +28,13 @@ import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 import { wearsSetBonus } from './set_bonus_wearer';
 
-const SKYFALL_ID = 'starfire';
+/** The spells the snare pays for: Skyfall and Wildbolt, the first one cast. */
+const SNARE_SPELL_IDS: ReadonlySet<string> = new Set(['starfire', 'wrath']);
 const GRIPPING_ROOTS_ID = 'entangling_roots';
 const GRIPPING_ROOTS_AURA_ID = `${GRIPPING_ROOTS_ID}_root`;
 const SPENT_KEY_PREFIX = 'dru_starfall_snare_spent_';
 const ARMED_KEY_PREFIX = 'dru_starfall_snare_armed_';
-/** How long an armed (in-flight) snared Skyfall keeps its bonus. */
+/** How long an armed (in-flight) snared cast keeps its bonus. */
 const ARMED_SECONDS = 5;
 
 function spentKey(target: Entity): string {
@@ -56,20 +58,22 @@ function ownRoot(caster: Entity, target: Entity): Aura | undefined {
   );
 }
 
-/** Is the snare live for this Skyfall on this target right now? */
+/** Is the snare live for this Skyfall or Wildbolt on this target right now? */
 export function starfallSnareActive(
   ctx: SimContext,
   caster: Entity,
   abilityId: string,
   target: Entity | null | undefined,
 ): boolean {
-  if (abilityId !== SKYFALL_ID || !target || target.dead || target.id === caster.id) return false;
+  if (!SNARE_SPELL_IDS.has(abilityId) || !target || target.dead || target.id === caster.id) {
+    return false;
+  }
   if (!ownRoot(caster, target)) return false;
   if (caster.procState?.icds[spentKey(target)] !== undefined) return false;
   return wearsSetBonus(ctx, caster, VANGUARD_BALANCE_SET_ID, 4);
 }
 
-/** Skyfall's cast time: 0 while the snare is live on its target. */
+/** Skyfall's or Wildbolt's cast time: 0 while the snare is live on its target. */
 export function starfallSnareCastTime(
   ctx: SimContext,
   caster: Entity,
@@ -81,7 +85,7 @@ export function starfallSnareCastTime(
   return starfallSnareActive(ctx, caster, abilityId, target) ? 0 : castTime;
 }
 
-/** Read-only: would this Skyfall into this target get the bonus right now
+/** Read-only: would this Skyfall or Wildbolt into this target get the bonus now
  *  (an armed in-flight one, or a live snare)? For tests and readouts; the
  *  damage hook below is the one that spends it. */
 export function starfallSnarePending(
@@ -90,12 +94,12 @@ export function starfallSnarePending(
   abilityId: string,
   target: Entity | null | undefined,
 ): boolean {
-  if (abilityId !== SKYFALL_ID || !target) return false;
+  if (!SNARE_SPELL_IDS.has(abilityId) || !target) return false;
   if (caster.procState?.icds[armedKey(target)] !== undefined) return true;
   return starfallSnareActive(ctx, caster, abilityId, target);
 }
 
-/** Skyfall's direct damage multiplier: an armed (in-flight) snared Skyfall
+/** The direct damage multiplier: an armed (in-flight) snared Skyfall or Wildbolt
  *  consumes its arm; a hit with no travel takes the live snare and marks the
  *  target spent. 1 otherwise. */
 export function starfallSnareDamageMult(
@@ -104,7 +108,7 @@ export function starfallSnareDamageMult(
   abilityId: string,
   target: Entity | null | undefined,
 ): number {
-  if (abilityId !== SKYFALL_ID || !target) return 1;
+  if (!SNARE_SPELL_IDS.has(abilityId) || !target) return 1;
   const armed = armedKey(target);
   if (caster.procState?.icds[armed] !== undefined) {
     delete caster.procState.icds[armed];
@@ -116,7 +120,7 @@ export function starfallSnareDamageMult(
   return VANGUARD_BALANCE_4PC_SKYFALL_DMG_MULT;
 }
 
-/** After a completed cast: a snared Skyfall marks its target spent for the
+/** After a completed cast: a snared Skyfall or Wildbolt marks its target spent for the
  *  rest of that root and arms the bonus for its projectile; a fresh Gripping
  *  Roots clears both marks. */
 export function starfallSnareOnCast(

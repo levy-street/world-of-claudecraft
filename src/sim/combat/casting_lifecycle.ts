@@ -1861,7 +1861,8 @@ export function castAbility(
   // Brineward 2pc (Warfare Season 2) reads the resolved friendly target's
   // health; a pass-through for every other ability and caster.
   // Starwarden 4pc (combat/druid_starfall_snare.ts) reads the target too:
-  // a Skyfall into the wearer's own Gripping Roots is instant.
+  // the first Skyfall or Wildbolt into the wearer's own Gripping Roots is
+  // instant.
   const castTime = starfallSnareCastTime(
     ctx,
     p,

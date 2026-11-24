@@ -647,24 +647,34 @@ describe('Starwarden Raiment (balance)', () => {
     return { sim, mob, p: sim.player };
   }
 
-  /** Presses Skyfall at the target and reports whether a cast bar started. */
-  function skyfallHasCastBar(sim: Sim, mob: Entity): boolean {
+  /** Presses a hard cast at the target and reports whether a cast bar started. */
+  function hasCastBar(sim: Sim, mob: Entity, abilityId: 'starfire' | 'wrath'): boolean {
     sim.targetEntity(mob.id);
-    ready(sim, 'starfire');
-    sim.castAbility('starfire');
-    const hard = sim.player.castingAbility === 'starfire';
+    ready(sim, abilityId);
+    sim.castAbility(abilityId);
+    const hard = sim.player.castingAbility === abilityId;
     for (let i = 0; i < 20 * 5 && sim.player.castingAbility; i++) sim.tick();
     for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++) sim.tick();
     return hard;
   }
+  const skyfallHasCastBar = (sim: Sim, mob: Entity) => hasCastBar(sim, mob, 'starfire');
 
   it('4pc: the first Skyfall into your own Gripping Roots is instant and 20 percent stronger', () => {
     const { sim, mob, p } = rooted(4);
     expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(true);
-    // Only Skyfall: Wildbolt into the same root takes nothing.
-    expect(starfallSnarePending(sim.ctx, p, 'wrath', mob)).toBe(false);
+    // Wildbolt is covered too (to open a Suntide cycle instead); Moonseed is not.
+    expect(starfallSnarePending(sim.ctx, p, 'wrath', mob)).toBe(true);
+    expect(starfallSnarePending(sim.ctx, p, 'moonseed', mob)).toBe(false);
     expect(skyfallHasCastBar(sim, mob)).toBe(false);
     // Spent for the rest of this root: the next Skyfall is an ordinary cast.
+    expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(false);
+    expect(starfallSnarePending(sim.ctx, p, 'wrath', mob)).toBe(false);
+    expect(skyfallHasCastBar(sim, mob)).toBe(true);
+  });
+
+  it('4pc: a Wildbolt opener takes it instead, and then Skyfall casts normally', () => {
+    const { sim, mob, p } = rooted(4);
+    expect(hasCastBar(sim, mob, 'wrath')).toBe(false);
     expect(starfallSnarePending(sim.ctx, p, 'starfire', mob)).toBe(false);
     expect(skyfallHasCastBar(sim, mob)).toBe(true);
   });

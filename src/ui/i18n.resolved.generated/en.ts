@@ -30968,7 +30968,7 @@ export const en: EnTranslations = {
       "vanguard_druid_balance": {
         "name": "Starwarden Raiment",
         "bonus2": "Gripping Roots becomes instant. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your first Skyfall on a target held by your Gripping Roots is instant and deals 20 percent more damage."
+        "bonus4": "Your first Skyfall or Wildbolt on a target held by your Gripping Roots is instant and deals 20 percent more damage."
       },
       "vanguard_druid_feral": {
         "name": "Bloodmane Hide",

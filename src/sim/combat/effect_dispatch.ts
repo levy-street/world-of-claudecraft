@@ -982,7 +982,8 @@ export function runEffects(
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
         dmg *= tidewheelDirectMult(p, ability.id);
-        // Starwarden 4pc: the first Skyfall into the wearer's own Gripping Roots.
+        // Starwarden 4pc: the first Skyfall or Wildbolt into the wearer's own
+        // Gripping Roots.
         dmg *= starfallSnareDamageMult(ctx, p, ability.id, target);
         const finalDamage = Math.round(dmg * primaryDamageMult);
         lastDirectDamage = finalDamage;

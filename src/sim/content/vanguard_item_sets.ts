@@ -376,7 +376,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 4,
         effect: {},
-        text: 'Your first Skyfall on a target held by your Gripping Roots is instant and deals 20 percent more damage.',
+        text: 'Your first Skyfall or Wildbolt on a target held by your Gripping Roots is instant and deals 20 percent more damage.',
       },
     ],
   },
