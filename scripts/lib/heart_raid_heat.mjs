@@ -57,6 +57,8 @@ const T = HEAT_TUNING;
  *  sim's own (they follow the well's lip). */
 const BANDS = ZONE_BANDS;
 const STRIKERS = ['rogue', 'arms'];
+/** Yards a bot keeps off a red Wheel slice's edge. */
+const WHEEL_EDGE_PAD = 1.5;
 
 const L = (world, p) => ({ x: p.x - world.origin.x, z: p.z - world.origin.z });
 const W = (world, p) => ({ x: p.x + world.origin.x, z: p.z + world.origin.z });
@@ -158,6 +160,13 @@ export const heat = {
       } else if (gapOf(t) !== null) o.gaps.push({ g: e.f ?? 0, half: e.sc ?? 3 });
     }
     world.o = o;
+  },
+
+  // The lip wall's colliders (smith_heart_layout.ts HEARTH_LIP_WALLS): a bot
+  // crossing the shore walks round them, never into them (a straight line
+  // between two Wheel slices near the wall clips it).
+  obstacles(world) {
+    return world.center ? [{ x: world.center.x, z: world.center.z, r: LIP + 0.2 }] : [];
   },
 
   onFloor(world, at) {
@@ -293,16 +302,21 @@ function inDanger(world, at, st) {
         d < BANDS[z.band][1] + 1
       )
         return true;
-  // A red slice burning, or about to erupt; one early in its warning (the next
-  // round's, shown as the last erupts) is where the raid crosses to once the
-  // fire it stands beside has died down.
-  for (const w of o.wheel)
-    if (
-      (w.state === 'burn' || (w.state === 'warn' && w.seconds <= 2.6)) &&
-      wheelSliceAt(l.x, l.z) === w.slice &&
-      d > HEARTH_WELL.r
-    )
-      return true;
+  // A red slice warning or burning, and its edge's last yard and a half (a bot
+  // stops within its tolerance of a goal: never on the line). Since Jose's
+  // playtest of 2026-11-24 the sim puts out the way to the next safe slice at
+  // once (heat_wheel.ts wheelCrossing), so the raid crosses the moment the next
+  // round shows, with its whole warning, instead of waiting out the fire.
+  if (o.wheel.length && d > HEARTH_WELL.r) {
+    const red = new Set(o.wheel.filter((w) => w.state !== 'safe').map((w) => w.slice));
+    const a = Math.atan2(l.x - HEARTH_WELL.x, l.z - HEARTH_WELL.z);
+    const pad = WHEEL_EDGE_PAD / d;
+    for (const da of [0, -pad, pad]) {
+      const b = a + da;
+      const at = { x: HEARTH_WELL.x + Math.sin(b) * d, z: HEARTH_WELL.z + Math.cos(b) * d };
+      if (red.has(wheelSliceAt(at.x, at.z))) return true;
+    }
+  }
   // A lava wave's wall on it now or about to be, outside its corridors.
   for (const r of o.rings)
     if (
