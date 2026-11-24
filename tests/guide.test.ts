@@ -43,6 +43,7 @@ import { arena } from '../src/guide/pages/arena';
 import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
+import { gear as gearPage } from '../src/guide/pages/gear';
 import { interfacePage } from '../src/guide/pages/interface';
 import { professions as professionsPage, ringCards } from '../src/guide/pages/professions';
 import { craftDetailHtml, effectLines, itemNameKey } from '../src/guide/pages/professions_craft';
@@ -6314,6 +6315,23 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         }
       }
     }
+  });
+
+  it('guide.gear.soulboundBodyCache: the soulbound example is a bound item, not the Heroic Marks currency', () => {
+    // The predecessor soulboundBodyBound named Heroic Marks as the prize a
+    // soulbound flag guards, but marks are now a PlayerMeta counter
+    // (src/sim/heroic_marks.ts), never a bag stack, so the Gear page names the
+    // Emissary's Cache (soulbound: true in src/sim/content/items.ts) instead.
+    setLanguage('en');
+    const html = gearPage.render({ params: [], sub: 'gear', titleKey: 'guide.nav.gear' });
+    const body = t('guide.gear.soulboundBodyCache');
+    const predecessor = guideStrings.gear.soulboundBodyBound;
+    expect(html).toContain(esc(body));
+    expect(html).not.toContain(esc(predecessor));
+    expect(html).not.toContain('prize tokens such as Heroic Marks');
+    expect(RETIRED_KEYS).toContain('guide.gear.soulboundBodyBound');
+    expect(body).toContain(ITEMS.emissary_cache.name);
+    expect(ITEMS.emissary_cache.soulbound).toBe(true);
   });
 
   it('guide.arenaPage.warfareTradeBodyRatingSpent: only the Warfare rating and set bonuses are spent on players (the wiki completeness audit)', () => {
